@@ -140,7 +140,7 @@ class _MailWidgetState extends State<MailWidget> {
     }
     EmailAddress? current = mailAddressController.current;
     String? currentMailboxName = mailAddressController.currentMailboxName;
-    String? title = 'Mail list';
+    String? title = AppLocalizations.t('Mail list');
     if (current != null) {
       title = current.email;
       if (currentMailboxName != null) {

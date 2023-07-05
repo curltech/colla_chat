@@ -407,7 +407,7 @@ class ImageUtil {
     Uint8List? avatar;
     Directory dir = await PathUtil.getTemporaryDirectory();
     if (image != null) {
-      var path = await FileUtil.writeTempFile(image, extension: extension);
+      var path = await FileUtil.writeTempFileAsBytes(image, extension: extension);
       xfile = XFile(path!);
     }
     if (xfile != null) {
@@ -416,7 +416,7 @@ class ImageUtil {
         double quality = 10240 * 100 / length;
         String? filename = await compress(
             filename: xfile.path, path: dir.path, quality: quality.toInt());
-        avatar = await FileUtil.readFile(filename!);
+        avatar = await FileUtil.readFileAsBytes(filename!);
       } else {
         avatar = await xfile.readAsBytes();
       }

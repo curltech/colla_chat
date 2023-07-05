@@ -442,7 +442,7 @@ class _IndexViewState extends State<IndexView>
                           contentType = ChatMessageContentType.image;
                         }
                         String filename = content!;
-                        Uint8List? data = await FileUtil.readFile(filename);
+                        Uint8List? data = await FileUtil.readFileAsBytes(filename);
                         if (data != null) {
                           String? mimeType = FileUtil.mimeType(filename);
                           mimeType = mimeType ?? 'text/plain';

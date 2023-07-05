@@ -98,7 +98,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
     switch (index) {
       case 0:
         Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
-        FileUtil.writeFile(bytes, myself.peerId!);
+        FileUtil.writeFileAsBytes(bytes, myself.peerId!);
         break;
       case 1:
         Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
@@ -106,7 +106,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
         break;
       case 2:
         Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
-        var path = await FileUtil.writeFile(bytes, myself.peerId!);
+        var path = await FileUtil.writeFileAsBytes(bytes, myself.peerId!);
         Share.shareXFiles([XFileUtil.open(path)]);
         break;
       case 3:

@@ -97,7 +97,7 @@ class PlatformMediaSource {
       {required Uint8List data,
       required ChatMessageMimeType mediaFormat}) async {
     String? filename =
-        await FileUtil.writeTempFile(data, extension: mediaFormat.name);
+        await FileUtil.writeTempFileAsBytes(data, extension: mediaFormat.name);
     PlatformMediaSource? mediaSource =
         await media(filename: filename!, mediaFormat: mediaFormat);
 

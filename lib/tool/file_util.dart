@@ -21,7 +21,8 @@ import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class FileUtil {
   ///写内容到文件
-  static Future<String> writeFile(List<int> bytes, String filename) async {
+  static Future<String> writeFileAsBytes(
+      List<int> bytes, String filename) async {
     if (!filename.contains(p.separator)) {
       final dir = await PathUtil.getApplicationDirectory();
       filename = p.join(dir!.path, filename);
@@ -32,6 +33,21 @@ class FileUtil {
       file = await file.create(recursive: true);
     }
     await file.writeAsBytes(bytes, flush: true);
+
+    return filename;
+  }
+
+  static Future<String> writeFileAsString(String str, String filename) async {
+    if (!filename.contains(p.separator)) {
+      final dir = await PathUtil.getApplicationDirectory();
+      filename = p.join(dir!.path, filename);
+    }
+    var file = File(filename);
+    bool exist = await file.exists();
+    if (!exist) {
+      file = await file.create(recursive: true);
+    }
+    file.writeAsStringSync(str, flush: true);
 
     return filename;
   }
@@ -62,7 +78,7 @@ class FileUtil {
   }
 
   ///写内容到临时文件
-  static Future<String?> writeTempFile(List<int> bytes,
+  static Future<String?> writeTempFileAsBytes(List<int> bytes,
       {String? filename, String? extension}) async {
     String tempFilename =
         await getTempFilename(filename: filename, extension: extension);
@@ -80,8 +96,26 @@ class FileUtil {
     return tempFilename;
   }
 
+  static Future<String?> writeTempFileAsString(String str,
+      {String? filename, String? extension}) async {
+    String tempFilename =
+        await getTempFilename(filename: filename, extension: extension);
+    final file = File(tempFilename);
+    bool exist = await file.exists();
+    if (exist) {
+      file.deleteSync();
+    }
+    file.writeAsStringSync(str, flush: true);
+    exist = await file.exists();
+    if (!exist) {
+      return null;
+    }
+
+    return tempFilename;
+  }
+
   ///读文件内容
-  static Future<Uint8List?> readFile(String filename) async {
+  static Future<Uint8List?> readFileAsBytes(String filename) async {
     if (filename.startsWith('assets')) {
       return await _readAssetData(filename);
     } else {
@@ -90,7 +124,6 @@ class FileUtil {
   }
 
   static Future<Uint8List?> _readFileBytes(String filename) async {
-    // Uri uri = Uri.parse(filename);
     File file = File(filename);
     bool exists = await file.exists();
     if (exists) {
@@ -105,6 +138,16 @@ class FileUtil {
   static Future<Uint8List> _readAssetData(String filename) async {
     var asset = await rootBundle.load(filename);
     return asset.buffer.asUint8List();
+  }
+
+  static Future<String?> readFileAsString(String filename) async {
+    File file = File(filename);
+    bool exists = await file.exists();
+    if (exists) {
+      Uint8List bytes;
+      return file.readAsStringSync();
+    }
+    return null;
   }
 
   ///选择文件对话框，适用于所有的平台

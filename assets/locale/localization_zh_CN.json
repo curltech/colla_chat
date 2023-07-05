@@ -440,5 +440,6 @@
   "Save draft content successfully": "草案保存成功",
   "Publish document successfully": "文章发布成功",
   "Subscribe channel": "频道",
-  "Publish channel": "发布"
+  "Publish channel": "发布",
+  "Toggle mail address view": "切换邮件地址视图"
 }

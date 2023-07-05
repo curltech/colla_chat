@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -222,11 +223,13 @@ class _NewMailWidgetState extends State<NewMailWidget> {
   @override
   Widget build(BuildContext context) {
     List<Widget> rightWidgets = [
-      IconButton(
-          onPressed: () {
-            _send();
-          },
-          icon: const Icon(Icons.send)),
+      Tooltip(
+          message: AppLocalizations.t('Send'),
+          child: IconButton(
+              onPressed: () {
+                _send();
+              },
+              icon: const Icon(Icons.send))),
     ];
     var appBarView = AppBarView(
         title: widget.title,

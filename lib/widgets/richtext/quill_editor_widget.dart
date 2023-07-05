@@ -1,20 +1,21 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/document_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:cross_file/cross_file.dart';
-import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
-import 'package:path_provider/path_provider.dart';
 
 ///quill_editor的实现，用于IOS,LINUX,MACOS,WINDOWS桌面平台
 ///编辑的时候是quill可识别的json格式，完成后可转换成html格式，就不可以再编辑了
@@ -24,6 +25,7 @@ class QuillEditorWidget extends StatefulWidget {
   final String? initialText;
   final ChatMessageMimeType mimeType;
   final bool withMultiMedia;
+  final bool base64;
   final Function(String content, ChatMessageMimeType mimeType)? onSubmit;
   final Function(String content, ChatMessageMimeType mimeType)? onPreview;
 
@@ -34,7 +36,8 @@ class QuillEditorWidget extends StatefulWidget {
     this.onSubmit,
     this.onPreview,
     this.mimeType = ChatMessageMimeType.json,
-    this.withMultiMedia = false,
+    this.withMultiMedia = true,
+    this.base64 = true,
   }) : super(key: key);
 
   @override
@@ -68,7 +71,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
 
   Future<String?> _onImagePaste(Uint8List imageBytes) async {
     String? filename =
-        await FileUtil.writeTempFile(imageBytes, extension: 'png');
+        await FileUtil.writeTempFileAsBytes(imageBytes, extension: 'png');
 
     return filename;
   }
@@ -119,83 +122,123 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     }
   }
 
-  Future<String> _onMediaPickCallback(File file) async {
-    final filename = await FileUtil.getTempFilename();
-    final copiedFile = await file.copy(filename);
+  ///以下多媒体文件选择按钮的功能，其调用方式是：
+  ///1.如果mediaPickSettingSelector存在则调用，否则调用通用的，选择媒体文件的两个选项，图片廊和link
+  ///2.如果是图片廊，则调用filePickImpl，找到文件
+  ///3.调用onImagePickCallback，获取资源的获取方式
+  ///这些功能都有默认实现
 
-    return copiedFile.path.toString();
+  ///媒体选择回调，当选择了一个本地文件后，给出访问这个选择文件的办法
+  ///比如上传内容到网上，然后给出url
+  Future<String> _onImagePickCallback(File file) async {
+    if (widget.base64) {
+      Uint8List data = file.readAsBytesSync();
+      String img = CryptoUtil.encodeBase64(data);
+      return ImageUtil.base64Img(img);
+    }
+
+    return file.path.toString();
   }
 
+  Future<String> _onVideoPickCallback(File file) async {
+    if (widget.base64) {
+      Uint8List data = file.readAsBytesSync();
+      String img = CryptoUtil.encodeBase64(data);
+      return VideoUtil.base64Video(img);
+    }
+
+    return file.path.toString();
+  }
+
+  ///桌面平台的文件选择对话框，返回选择的文件名
+  Future<String?> _filePickImpl(BuildContext context) async {
+    final List<XFile> result = await FileUtil.pickFiles();
+    if (result.isEmpty) {
+      return null;
+    }
+    final filename = result.first.path;
+
+    return filename;
+  }
+
+  ///web平台选择图像文件
   Future<String?> _webImagePickImpl(
       OnImagePickCallback onImagePickCallback) async {
     final List<XFile> result = await FileUtil.pickFiles();
     if (result.isEmpty) {
       return null;
     }
-    final fileName = result.first.name;
-    final file = File(fileName);
+    final filename = result.first.name;
+    final file = File(filename);
 
     return onImagePickCallback(file);
   }
 
-  Future<String?> openFileSystemPickerForDesktop(BuildContext context) async {
-    return await FileUtil.open(
+  ///web平台选择视频文件
+  Future<String?> _webVideoPickImpl(
+      OnVideoPickCallback onVideoPickCallback) async {
+    final List<XFile> result = await FileUtil.pickFiles();
+    if (result.isEmpty) {
+      return null;
+    }
+    final filename = result.first.name;
+    final file = File(filename);
+
+    return onVideoPickCallback(file);
+  }
+
+  /// 媒体来源的选择界面
+  /// 从图片廊和link中选择
+  Future<MediaPickSetting?> _mediaPickSettingSelector(
+      BuildContext context) async {
+    return await showDialog<MediaPickSetting>(
       context: context,
-      rootDirectory: await getApplicationDocumentsDirectory(),
-      fsType: FilesystemType.file,
-      fileTileSelectMode: FileTileSelectMode.wholeTile,
+      builder: (ctx) => AlertDialog(
+        contentPadding: EdgeInsets.zero,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextButton.icon(
+              icon: const Icon(Icons.collections),
+              label: Text(AppLocalizations.t('Gallery')),
+              onPressed: () => Navigator.pop(ctx, MediaPickSetting.Gallery),
+            ),
+            TextButton.icon(
+              icon: const Icon(Icons.link),
+              label: Text(AppLocalizations.t('Link')),
+              onPressed: () => Navigator.pop(ctx, MediaPickSetting.Link),
+            )
+          ],
+        ),
+      ),
     );
   }
 
-  /// 定制媒体选择界面
-  Future<MediaPickSetting?> _selectMediaPickSetting(BuildContext context) =>
-      showDialog<MediaPickSetting>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          contentPadding: EdgeInsets.zero,
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextButton.icon(
-                icon: const Icon(Icons.collections),
-                label: CommonAutoSizeText(AppLocalizations.t('Gallery')),
-                onPressed: () => Navigator.pop(ctx, MediaPickSetting.Gallery),
-              ),
-              TextButton.icon(
-                icon: const Icon(Icons.link),
-                label: CommonAutoSizeText(AppLocalizations.t('Link')),
-                onPressed: () => Navigator.pop(ctx, MediaPickSetting.Link),
-              )
-            ],
-          ),
+  /// 相机模式选择，照相还是录制视频
+  Future<MediaPickSetting?> _cameraPickSettingSelector(
+      BuildContext context) async {
+    return await showDialog<MediaPickSetting>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        contentPadding: EdgeInsets.zero,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextButton.icon(
+              icon: const Icon(Icons.camera),
+              label: Text(AppLocalizations.t('Capture a photo')),
+              onPressed: () => Navigator.pop(ctx, MediaPickSetting.Camera),
+            ),
+            TextButton.icon(
+              icon: const Icon(Icons.video_call),
+              label: Text(AppLocalizations.t('Capture a video')),
+              onPressed: () => Navigator.pop(ctx, MediaPickSetting.Video),
+            )
+          ],
         ),
-      );
-
-  // ignore: unused_element
-  Future<MediaPickSetting?> _selectCameraPickSetting(BuildContext context) =>
-      showDialog<MediaPickSetting>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          contentPadding: EdgeInsets.zero,
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextButton.icon(
-                icon: const Icon(Icons.camera),
-                label:
-                    CommonAutoSizeText(AppLocalizations.t('Capture a photo')),
-                onPressed: () => Navigator.pop(ctx, MediaPickSetting.Camera),
-              ),
-              TextButton.icon(
-                icon: const Icon(Icons.video_call),
-                label:
-                    CommonAutoSizeText(AppLocalizations.t('Capture a video')),
-                onPressed: () => Navigator.pop(ctx, MediaPickSetting.Video),
-              )
-            ],
-          ),
-        ),
-      );
+      ),
+    );
+  }
 
   Widget _buildQuillToolbar(BuildContext context) {
     ///定制提交按钮
@@ -225,12 +268,23 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
         embedButtons;
     if (widget.withMultiMedia) {
       embedButtons = FlutterQuillEmbeds.buttons(
-        onImagePickCallback: _onMediaPickCallback,
-        onVideoPickCallback: _onMediaPickCallback,
-        // uncomment to provide a custom "pick from" dialog.
-        // mediaPickSettingSelector: _selectMediaPickSetting,
-        // uncomment to provide a custom "pick from" dialog.
-        // cameraPickSettingSelector: _selectCameraPickSetting,
+        showImageButton: true,
+        showVideoButton: true,
+        showCameraButton: true,
+        showFormulaButton: false,
+        imageButtonTooltip: AppLocalizations.t('Image'),
+        videoButtonTooltip: AppLocalizations.t('Video'),
+        cameraButtonTooltip: AppLocalizations.t('Camera'),
+        formulaButtonTooltip: AppLocalizations.t('Image'),
+        //默认的实现是直接输入link
+        onImagePickCallback: _onImagePickCallback,
+        onVideoPickCallback: _onVideoPickCallback,
+        //选择是图片廊还是link
+        mediaPickSettingSelector: _mediaPickSettingSelector,
+        cameraPickSettingSelector: _cameraPickSettingSelector,
+        filePickImpl: _filePickImpl,
+        webImagePickImpl: _webImagePickImpl,
+        webVideoPickImpl: _webVideoPickImpl,
       );
     }
     var toolbar = QuillToolbar.basic(
@@ -300,10 +354,11 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
                 const SizedBox(
                   height: 5.0,
                 ),
-                SizedBox(
+                Expanded(
+                    child: SizedBox(
                   height: widget.height,
                   child: quillEditor,
-                ),
+                )),
               ]),
         ));
   }

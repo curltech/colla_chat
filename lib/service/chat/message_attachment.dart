@@ -64,12 +64,12 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
     String contentPath = p.join(myself.myPath, 'content');
     if (!platformParams.web) {
       String path = p.join(contentPath, filename);
-      Uint8List? data = await FileUtil.readFile(path);
+      Uint8List? data = await FileUtil.readFileAsBytes(path);
       if (data != null) {
         data = await decryptContent(data);
         if (data != null) {
           try {
-            filename = await FileUtil.writeTempFile(data, filename: filename);
+            filename = await FileUtil.writeTempFileAsBytes(data, filename: filename);
             return filename;
           } catch (e) {
             logger.e('writeTempFile $filename failure:$e');
@@ -83,7 +83,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
         var content = attachment.content;
         if (content != null) {
           var data = CryptoUtil.decodeBase64(content);
-          filename = await FileUtil.writeTempFile(data, filename: filename);
+          filename = await FileUtil.writeTempFileAsBytes(data, filename: filename);
           return filename;
         }
       }
@@ -98,7 +98,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
     if (!platformParams.web) {
       final filename = await getEncryptFilename(messageId, title);
       if (filename != null) {
-        Uint8List? data = await FileUtil.readFile(filename);
+        Uint8List? data = await FileUtil.readFileAsBytes(filename);
         if (data != null) {
           data = await decryptContent(data);
           if (data != null) {
@@ -160,7 +160,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
       if (filename != null) {
         data = await encryptContent(data);
         if (data != null) {
-          await FileUtil.writeFile(data, filename);
+          await FileUtil.writeFileAsBytes(data, filename);
           logger.i('message attachment writeFile filename:$filename');
         }
       }

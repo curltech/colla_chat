@@ -12,6 +12,7 @@ class QuillHtmlEditorWidget extends StatefulWidget {
   final String? initialText;
   final ChatMessageMimeType mimeType;
   final bool withMultiMedia;
+  final bool base64;
   final Function(String content, ChatMessageMimeType mimeType)? onSubmit;
   final Function(String content, ChatMessageMimeType mimeType)? onPreview;
 
@@ -22,7 +23,8 @@ class QuillHtmlEditorWidget extends StatefulWidget {
     this.mimeType = ChatMessageMimeType.json,
     this.onSubmit,
     this.onPreview,
-    this.withMultiMedia = false,
+    this.withMultiMedia = true,
+    this.base64 = true,
   }) : super(key: key);
 
   @override
@@ -132,7 +134,11 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
               thickness: 1.0,
               color: myself.primary,
             ),
-            quillHtmlEditor,
+            Expanded(
+                child: SizedBox(
+              height: widget.height,
+              child: quillHtmlEditor,
+            )),
           ],
         ));
   }

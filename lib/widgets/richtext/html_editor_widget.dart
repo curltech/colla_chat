@@ -1,14 +1,7 @@
-import 'dart:async';
-
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/tool/document_util.dart';
-import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/tool/smart_dialog_util.dart';
-import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

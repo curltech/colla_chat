@@ -103,7 +103,11 @@ class _EnoughHtmlEditorWidgetState extends State<EnoughHtmlEditorWidget> {
             const SizedBox(
               height: 10.0,
             ),
-            Expanded(child: _buildHtmlEditor()),
+            Expanded(
+                child: SizedBox(
+                  height: widget.height,
+                  child: _buildHtmlEditor(),
+                )),
           ],
         ));
   }

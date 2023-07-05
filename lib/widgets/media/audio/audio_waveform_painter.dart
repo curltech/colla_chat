@@ -38,7 +38,7 @@ Widget buildAudioWaveformPainter(
 ///异步产生波形图形组件
 Future<StreamBuilder<WaveformProgress>?> buildWaveformProgress(
     String filename) async {
-  var data = await FileUtil.readFile(filename);
+  var data = await FileUtil.readFileAsBytes(filename);
   if (data == null) {
     return null;
   }

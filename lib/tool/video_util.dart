@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:fc_native_video_thumbnail/fc_native_video_thumbnail.dart';
@@ -8,6 +9,16 @@ import 'package:video_compress/video_compress.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 class VideoUtil {
+  static String prefixBase64 = 'data:video/*;base64,';
+
+  static String base64Video(String img, {ChatMessageMimeType? type}) {
+    if (type != null) {
+      return prefixBase64.replaceFirst('*', type.name) + img;
+    } else {
+      return prefixBase64 + img;
+    }
+  }
+
   ///支持ANDROID，IOS
   static Future<Uint8List?> thumbnailData({
     required String videoFile,
@@ -76,7 +87,7 @@ class VideoUtil {
         keepAspectRatio: keepAspectRatio,
         format: format,
         quality: quality);
-    Uint8List? data = await FileUtil.readFile(thumbnailPath);
+    Uint8List? data = await FileUtil.readFileAsBytes(thumbnailPath);
 
     return data;
   }

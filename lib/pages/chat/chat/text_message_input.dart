@@ -69,7 +69,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   ///停止录音，把录音数据作为消息发送
   _onStop(String filename) async {
     if (StringUtil.isNotEmpty(filename)) {
-      List<int>? data = await FileUtil.readFile(filename);
+      List<int>? data = await FileUtil.readFileAsBytes(filename);
       if (data == null) {
         return;
       }
