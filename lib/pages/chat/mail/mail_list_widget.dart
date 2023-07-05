@@ -80,7 +80,7 @@ class _MailListWidgetState extends State<MailListWidget> {
         builder:
             (BuildContext context, AsyncSnapshot<List<MimeMessage>?> snapshot) {
           if (!snapshot.hasData) {
-            return LoadingUtil.buildCircularLoadingWidget();
+            return LoadingUtil.buildLoadingIndicator();
           }
           List<MimeMessage>? mimeMessages = snapshot.data;
           if (mimeMessages != null) {

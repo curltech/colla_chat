@@ -3,7 +3,6 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -73,6 +72,17 @@ class PrimaryNavigation {
         valueListenable: mainViewVisible,
         builder: (BuildContext context, bool mainViewVisible, Widget? child) {
           return ButtonBar(children: [
+            // IconButton(
+            //     color: myself.primary,
+            //     tooltip: indexWidgetProvider.grid
+            //         ? AppLocalizations.t('Close grid view')
+            //         : AppLocalizations.t('Open grid view'),
+            //     onPressed: () {
+            //       indexWidgetProvider.grid = !indexWidgetProvider.grid;
+            //     },
+            //     icon: indexWidgetProvider.grid
+            //         ? const Icon(Icons.view_agenda)
+            //         : const Icon(Icons.grid_view)),
             IconButton(
                 color: myself.primary,
                 tooltip: mainViewVisible
@@ -84,7 +94,7 @@ class PrimaryNavigation {
                 },
                 icon: mainViewVisible
                     ? const Icon(Icons.menu_open)
-                    : const Icon(Icons.menu_book))
+                    : const Icon(Icons.menu_book)),
           ]);
         });
   }

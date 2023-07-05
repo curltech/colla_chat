@@ -13,7 +13,7 @@ class FlutterInAppWebView extends StatelessWidget {
   final void Function(InAppWebViewController controller)? onWebViewCreated;
 
   PullToRefreshController pullToRefreshController = PullToRefreshController();
-  late final InAppWebViewController? controller;
+  InAppWebViewController? controller;
   late final Widget inAppWebView;
   final InAppBrowser browser = InAppBrowser();
 

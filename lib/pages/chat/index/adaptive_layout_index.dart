@@ -2,6 +2,7 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/pages/chat/channel/subscribe_channel_list_widget.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/index/bottom_navigation.dart';
+import 'package:colla_chat/pages/chat/index/index_grid_view_widget.dart';
 import 'package:colla_chat/pages/chat/index/primary_navigation.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_widget.dart';

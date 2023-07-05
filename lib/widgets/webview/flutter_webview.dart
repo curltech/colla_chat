@@ -12,8 +12,8 @@ class FlutterWebView extends StatelessWidget {
   final String? initialFilename;
   final void Function(WebViewController controller)? onWebViewCreated;
 
-  late final WebViewController? controller;
-  late final Widget? webView;
+  WebViewController? controller;
+  Widget? webView;
 
   FlutterWebView(
       {super.key,

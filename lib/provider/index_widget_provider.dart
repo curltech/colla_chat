@@ -22,8 +22,7 @@ class IndexWidgetProvider with ChangeNotifier {
 
   //当前的主视图，左边栏和底部栏的指示，范围0-mainViews.length-1
   int _currentMainIndex = 0;
-
-  bool popAction = false;
+  bool grid = false;
 
   IndexWidgetProvider();
 
@@ -147,7 +146,6 @@ class IndexWidgetProvider with ChangeNotifier {
       if (index < mainViews.length) {
         index = _currentMainIndex;
       }
-      popAction = true;
       controller.move(index);
       notifyListeners();
     }

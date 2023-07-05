@@ -8,6 +8,7 @@ import 'package:colla_chat/pages/chat/me/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_webview_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/webrtc_widget.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -33,22 +34,28 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(collectionListView);
     indexWidgetProvider.define(settingWidget);
     indexWidgetProvider.define(personalInfoWidget);
-    indexWidgetProvider.define(contactWidget);
     indexWidgetProvider.define(webrtcWidget);
     indexWidgetProvider.define(webViewWidget);
     indexWidgetProvider.define(mediaWidget);
-    indexWidgetProvider.define(openVpnWidget);
+    if (platformParams.mobile) {
+      indexWidgetProvider.define(contactWidget);
+      indexWidgetProvider.define(openVpnWidget);
+    }
     indexWidgetProvider.define(loggerConsoleView);
     List<TileDataMixin> mixins = [
       settingWidget,
       collectionListView,
-      contactWidget,
       webrtcWidget,
       webViewWidget,
       mediaWidget,
-      openVpnWidget,
       loggerConsoleView,
     ];
+    if (platformParams.mobile) {
+      mixins.addAll([
+        contactWidget,
+        openVpnWidget,
+      ]);
+    }
     meTileData = TileData.from(mixins);
     for (var tile in meTileData) {
       tile.dense = true;
