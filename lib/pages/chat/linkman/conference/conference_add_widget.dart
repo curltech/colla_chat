@@ -168,7 +168,9 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
             }
           }
           Option<String> option = Option<String>(linkman.name, linkman.peerId,
-              checked: checked, leading: linkman.avatarImage);
+              checked: checked,
+              leading: linkman.avatarImage,
+              hint: linkman.email!);
           conferenceOwnerOptions.add(option);
         } else {
           logger.e('Conference member $conferenceMemberId is not linkman');

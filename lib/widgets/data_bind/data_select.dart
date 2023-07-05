@@ -489,27 +489,29 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
         valueListenable: options,
         builder: (BuildContext context, List<Option<String>> options,
             Widget? child) {
-          List<FilterChip> chips = [];
+          List<Widget> chips = [];
           for (var option in options) {
-            var chip = FilterChip(
-              avatar: option.leading,
-              label: CommonAutoSizeText(
-                option.label,
-                style: TextStyle(
-                    color: option.checked ? Colors.white : Colors.black),
-              ),
-              //avatar: option.leading,
-              disabledColor: Colors.white,
-              selectedColor: myself.primary,
-              backgroundColor: Colors.white,
-              showCheckmark: false,
-              checkmarkColor: myself.primary,
-              selected: option.checked,
-              onSelected: (bool value) {
-                option.checked = value;
-                this.options.value = [...options];
-              },
-            );
+            var chip = Tooltip(
+                message: option.hint,
+                child: FilterChip(
+                  avatar: option.leading,
+                  label: CommonAutoSizeText(
+                    option.label,
+                    style: TextStyle(
+                        color: option.checked ? Colors.white : Colors.black),
+                  ),
+                  //avatar: option.leading,
+                  disabledColor: Colors.white,
+                  selectedColor: myself.primary,
+                  backgroundColor: Colors.white,
+                  showCheckmark: false,
+                  checkmarkColor: myself.primary,
+                  selected: option.checked,
+                  onSelected: (bool value) {
+                    option.checked = value;
+                    this.options.value = [...options];
+                  },
+                ));
             chips.add(chip);
           }
           return Wrap(
@@ -694,22 +696,24 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
     return ValueListenableBuilder(
         valueListenable: optionsChanged,
         builder: (BuildContext context, bool optionsChanged, Widget? child) {
-          List<Chip> chips = [];
+          List<Widget> chips = [];
           for (var option in widget.optionController.options) {
             if (option.checked) {
-              var chip = Chip(
-                label: CommonAutoSizeText(
-                  option.label,
-                  style: const TextStyle(color: Colors.black),
-                ),
-                avatar: option.leading,
-                backgroundColor: Colors.white,
-                deleteIconColor: myself.primary,
-                onDeleted: () {
-                  widget.optionController.setChecked(option, false);
-                  widget.onConfirm!(widget.optionController.selected);
-                },
-              );
+              var chip = Tooltip(
+                  message: option.hint,
+                  child: Chip(
+                    label: CommonAutoSizeText(
+                      option.label,
+                      style: const TextStyle(color: Colors.black),
+                    ),
+                    avatar: option.leading,
+                    backgroundColor: Colors.white,
+                    deleteIconColor: myself.primary,
+                    onDeleted: () {
+                      widget.optionController.setChecked(option, false);
+                      widget.onConfirm!(widget.optionController.selected);
+                    },
+                  ));
               chips.add(chip);
             }
           }

@@ -131,7 +131,9 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
             }
           }
           Option<String> option = Option<String>(linkman.name, linkman.peerId,
-              checked: checked, leading: linkman.avatarImage);
+              checked: checked,
+              leading: linkman.avatarImage,
+              hint: linkman.email!);
           groupOwnerOptions.add(option);
         } else {
           logger.e('Group member $groupMemberId is not linkman');

@@ -29,8 +29,9 @@ class _LocalePickerState extends State<LocalePicker> {
   Widget _buildSelectWidget(BuildContext context) {
     List<Option<String>> options = [];
     for (var localeOption in localeOptions) {
-      Option<String> option =
-          Option<String>(localeOption.label, localeOption.value.toString());
+      Option<String> option = Option<String>(
+          localeOption.label, localeOption.value.toString(),
+          hint: '');
       String tag = '${myself.locale.languageCode}_${myself.locale.countryCode}';
       if (tag == option.value) {
         option.checked = true;

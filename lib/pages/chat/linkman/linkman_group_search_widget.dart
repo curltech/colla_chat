@@ -60,7 +60,9 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
           Linkman? linkman = await linkmanService.findCachedOneByPeerId(select);
           if (linkman != null) {
             Option<String> item = Option<String>(linkman.name, linkman.peerId,
-                checked: true, leading: linkman.avatarImage);
+                checked: true,
+                leading: linkman.avatarImage,
+                hint: linkman.email!);
             options.add(item);
           }
         }
@@ -68,7 +70,7 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
           Group? group = await groupService.findCachedOneByPeerId(select);
           if (group != null) {
             Option<String> item = Option<String>(group.name, group.peerId,
-                checked: true, leading: group.avatarImage);
+                checked: true, leading: group.avatarImage, hint: '');
             options.add(item);
           }
         }
@@ -93,7 +95,9 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
       for (Linkman linkman in linkmen) {
         bool checked = widget.selected.contains(linkman.peerId);
         Option<String> item = Option<String>(linkman.name, linkman.peerId,
-            checked: checked, leading: linkman.avatarImage);
+            checked: checked,
+            leading: linkman.avatarImage,
+            hint: linkman.email!);
         options.add(item);
       }
     }
@@ -101,7 +105,7 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
       for (Group group in groups) {
         bool checked = widget.selected.contains(group.peerId);
         Option<String> item = Option<String>(group.name, group.peerId,
-            checked: checked, leading: group.avatarImage);
+            checked: checked, leading: group.avatarImage, hint: '');
         options.add(item);
       }
     }

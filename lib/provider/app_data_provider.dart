@@ -7,11 +7,11 @@ import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 
 /// 不同语言版本的下拉选择框的选项
 final localeOptions = [
-  Option('English', LocaleUtil.getLocale('en_US')),
-  Option('中文', LocaleUtil.getLocale('zh_CN')),
-  Option('繁体中文', LocaleUtil.getLocale('zh_TW')),
-  Option('日本語', LocaleUtil.getLocale('ja_JP')),
-  Option('한국어', LocaleUtil.getLocale('ko_KR'))
+  Option('English', LocaleUtil.getLocale('en_US'), hint: ''),
+  Option('中文', LocaleUtil.getLocale('zh_CN'), hint: ''),
+  Option('繁体中文', LocaleUtil.getLocale('zh_TW'), hint: ''),
+  Option('日本語', LocaleUtil.getLocale('ja_JP'), hint: ''),
+  Option('한국어', LocaleUtil.getLocale('ko_KR'), hint: '')
 ];
 
 /// 本应用的参数状态管理器，与操作系统系统和硬件无关

@@ -147,11 +147,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   }
 
   Option _buildOption(int deleteTime) {
-    return Option(
-      '${deleteTime}s',
-      deleteTime,
-      checked: chatMessageController.deleteTime == deleteTime,
-    );
+    return Option('${deleteTime}s', deleteTime,
+        checked: chatMessageController.deleteTime == deleteTime, hint: '');
   }
 
   ///视频通话

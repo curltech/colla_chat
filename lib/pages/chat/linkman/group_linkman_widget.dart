@@ -44,8 +44,7 @@ class _GroupLinkmanWidgetState extends State<GroupLinkmanWidget> {
   ///查询群的成员，并生成群成员的选项
   Future<List<Option<String>>> _buildOptions() async {
     title = await _findGroupName();
-    var groupMembers =
-        await groupMemberService.findByGroupId(widget.groupId);
+    var groupMembers = await groupMemberService.findByGroupId(widget.groupId);
     List<Option<String>> options = [];
     for (GroupMember groupMember in groupMembers) {
       String? memberPeerId = groupMember.memberPeerId;
@@ -54,7 +53,7 @@ class _GroupLinkmanWidgetState extends State<GroupLinkmanWidget> {
         bool checked = widget.selected.contains(memberPeerId);
         Option<String> item = Option<String>(
             groupMember.memberAlias!, memberPeerId,
-            leading: avatar, checked: checked);
+            leading: avatar, checked: checked, hint: '');
         options.add(item);
       }
     }

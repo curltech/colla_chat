@@ -65,8 +65,8 @@ class ConferenceShowWidget extends StatelessWidget {
     for (String participant in participants) {
       var linkman = await linkmanService.findCachedOneByPeerId(participant);
       if (linkman != null) {
-        options.add(
-            Option(linkman.name, linkman.peerId, leading: linkman.avatarImage));
+        options.add(Option(linkman.name, linkman.peerId,
+            leading: linkman.avatarImage, hint: linkman.email!));
       }
     }
     return options;

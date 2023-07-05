@@ -31,7 +31,7 @@ class _BrightnessPickerState extends State<BrightnessPicker> {
     List<Option<String>> themeModeOptions = [];
     for (var themeModeOption in ThemeMode.values) {
       Option<String> option =
-          Option<String>(themeModeOption.name, themeModeOption.name);
+          Option<String>(themeModeOption.name, themeModeOption.name, hint: '');
 
       if (myself.themeMode.name == option.value) {
         option.checked = true;

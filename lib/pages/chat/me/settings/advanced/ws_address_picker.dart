@@ -44,7 +44,7 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
     List<Option<String>> addressOptions = [];
     for (var peerEndpoint in peerEndpoints) {
       Option<String> option =
-          Option<String>(peerEndpoint.name, peerEndpoint.peerId);
+          Option<String>(peerEndpoint.name, peerEndpoint.peerId, hint: '');
       if (defaultPeerEndpoint?.peerId == peerEndpoint.peerId) {
         option.checked = true;
       }
