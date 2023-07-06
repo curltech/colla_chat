@@ -703,10 +703,10 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
               padding: const EdgeInsets.all(2.0),
               label: CommonAutoSizeText(
                 option.label,
-                style: const TextStyle(color: Colors.black),
+                //style: const TextStyle(color: Colors.black),
               ),
               avatar: option.leading,
-              backgroundColor: Colors.white,
+              //backgroundColor: Colors.white,
               deleteIconColor: myself.primary,
               onDeleted: () {
                 widget.optionController.setChecked(option, false);
@@ -748,8 +748,8 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
           return ListTile(
               contentPadding: EdgeInsets.zero,
               minVerticalPadding: 0.0,
-              horizontalTitleGap: 0.0,
-              minLeadingWidth: 0.0,
+              // horizontalTitleGap: 0.0,
+              // minLeadingWidth: 0.0,
               leading: widget.prefix,
               isThreeLine: true,
               trailing: const Icon(
