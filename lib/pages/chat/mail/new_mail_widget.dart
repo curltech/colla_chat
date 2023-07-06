@@ -186,8 +186,8 @@ class _NewMailWidgetState extends State<NewMailWidget> {
   /// 附件显示区
   Widget _buildAttachmentChips(BuildContext context) {
     return Container(
+        alignment: Alignment.centerLeft,
         color: myself.getBackgroundColor(context).withOpacity(0.6),
-        height: 130,
         child: ValueListenableBuilder(
             valueListenable: attachmentInfos,
             builder: (BuildContext context,
@@ -220,8 +220,8 @@ class _NewMailWidgetState extends State<NewMailWidget> {
                                 onTap: () {
                                   _removeAttachment(attachmentInfo);
                                 },
-                                child: Icon(Icons.clear,
-                                    size: 20, color: myself.primary)),
+                                child: Icon(Icons.cancel,
+                                    size: 18, color: myself.primary)),
                           ],
                         ),
                         Text(
@@ -229,7 +229,6 @@ class _NewMailWidgetState extends State<NewMailWidget> {
                           softWrap: true,
                           overflow: TextOverflow.fade,
                           maxLines: 3,
-                          style: const TextStyle(color: Colors.black),
                         ),
                         Text('$size'),
                       ])),
@@ -237,15 +236,11 @@ class _NewMailWidgetState extends State<NewMailWidget> {
                 chips.add(chip);
               }
               if (chips.isNotEmpty) {
-                return SizedBox(
-                    width: double.infinity,
-                    child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Wrap(
-                          spacing: 10,
-                          runSpacing: 10,
-                          children: chips,
-                        )));
+                return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: chips,
+                    ));
               } else {
                 return Container();
               }

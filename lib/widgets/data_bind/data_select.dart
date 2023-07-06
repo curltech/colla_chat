@@ -717,14 +717,11 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
       }
     }
     if (chips.isNotEmpty) {
-      return Wrap(
-        spacing: 5,
-        runSpacing: 5,
-        alignment: WrapAlignment.start,
-        crossAxisAlignment: WrapCrossAlignment.start,
-        runAlignment: WrapAlignment.start,
-        children: chips,
-      );
+      return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: chips,
+          ));
     } else {
       return Container();
     }
@@ -732,12 +729,7 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
 
   ///带增加按钮面板样式，以及弹出的选择对话框
   Widget _buildChipPanel(BuildContext context) {
-    return SizedBox(
-        height: widget.height,
-        child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            controller: ScrollController(),
-            child: _buildSelectedChips(context)));
+    return SizedBox(height: widget.height, child: _buildSelectedChips(context));
   }
 
   ///ExpandablePanel样式，以及弹出的选择对话框

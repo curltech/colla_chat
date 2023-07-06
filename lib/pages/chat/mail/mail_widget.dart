@@ -11,10 +11,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:draggable_home/draggable_home.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
-import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 
 ///邮件应用总体视图，由三个子视图组成
 ///第一个是邮件地址视图，列出邮件地址的列表和邮件地址下的目录结构
@@ -49,75 +46,80 @@ class MailWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _MailWidgetState extends State<MailWidget> {
-  final AdvancedDrawerController controller = AdvancedDrawerController();
+  ValueNotifier<bool> addressVisible = ValueNotifier<bool>(false);
+  ValueNotifier<String> mailboxName = ValueNotifier<String>('');
 
   @override
   initState() {
-    controller.addListener(() {
-      setState(() {});
-    });
+    mailAddressController.addListener(_update);
     super.initState();
     mailAddressController.findAllMailAddress();
   }
 
-  AdvancedDrawer _buildAdvancedDrawer() {
-    AdvancedDrawer advancedDrawer = AdvancedDrawer(
-      backdropColor: Colors.white.withOpacity(0),
-      openRatio: 0.6,
-      openScale: 1,
-      controller: controller,
-      drawer: controller.value.visible ? widget.mailAddressWidget : Container(),
-      child: widget.mailListWidget,
-    );
-
-    return advancedDrawer;
+  _update() {
+    EmailAddress? current = mailAddressController.current;
+    String email = current?.email ?? '';
+    String? name = mailAddressController.currentMailboxName;
+    if (name == null) {
+      mailboxName.value = email;
+    } else {
+      mailboxName.value = '$email($name)';
+    }
   }
 
-  SlidingUpPanel _buildSlidingUpPanel() {
-    SlidingUpPanel slidingUpPanel = SlidingUpPanel(
-      panelBuilder: () {
-        return widget.mailListWidget;
-      },
-      body: widget.mailAddressWidget,
-    );
+  Widget _buildPlatformDrawer() {
+    Widget view = Stack(children: [
+      widget.mailListWidget,
+      ValueListenableBuilder(
+          valueListenable: addressVisible,
+          builder: (BuildContext context, bool addressVisible, Widget? child) {
+            return Visibility(
+                visible: addressVisible,
+                child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Card(
+                          elevation: 0.0,
+                          shape: const ContinuousRectangleBorder(),
+                          margin: EdgeInsets.zero,
+                          child: SizedBox(
+                              width: 280,
+                              height: double.infinity,
+                              child: widget.mailAddressWidget)),
+                      Expanded(
+                          child: GestureDetector(
+                              onTap: () {
+                                this.addressVisible.value = false;
+                              },
+                              child: Container(
+                                color: Colors.black.withOpacity(0.4),
+                              ))),
+                    ]));
+          }),
+    ]);
 
-    return slidingUpPanel;
-  }
-
-  DraggableHome _buildDraggableHome() {
-    DraggableHome draggableHome = DraggableHome(
-      fullyStretchable: true,
-      title: const Text('Title'),
-      leading: const Icon(Icons.arrow_back_ios),
-      expandedBody: const Text('Expanded Body'),
-      headerBottomBar: const Text('HeaderBottomBar'),
-      headerWidget: widget.mailListWidget,
-      body: [widget.mailAddressWidget],
-    );
-
-    return draggableHome;
+    return view;
   }
 
   @override
   Widget build(BuildContext context) {
     Widget body;
     if (appDataProvider.smallBreakpoint.isActive(context)) {
-      body = _buildAdvancedDrawer(); //_buildDraggableHome();
+      body = _buildPlatformDrawer();
     } else {
-      body = _buildAdvancedDrawer();
+      body = _buildPlatformDrawer();
     }
-    //open ? controller.showDrawer() : controller.hideDrawer();
     List<Widget> rightWidgets = [
       IconButton(
           tooltip: AppLocalizations.t('Toggle mail address view'),
           onPressed: () {
-            controller.toggleDrawer();
+            addressVisible.value = !addressVisible.value;
           },
-          icon: controller.value.visible
+          icon: addressVisible.value
               ? const Icon(Icons.toggle_off)
               : const Icon(Icons.toggle_on)),
     ];
-    if (controller.value.visible) {
+    if (addressVisible.value) {
       rightWidgets.add(IconButton(
           onPressed: () {
             indexWidgetProvider.push('mail_address_auto_discover');
@@ -138,23 +140,16 @@ class _MailWidgetState extends State<MailWidget> {
           icon: const Icon(Icons.note_add),
           tooltip: AppLocalizations.t('New mail')));
     }
-    EmailAddress? current = mailAddressController.current;
-    String? currentMailboxName = mailAddressController.currentMailboxName;
-    String? title = AppLocalizations.t('Mail list');
-    if (current != null) {
-      title = current.email;
-      if (currentMailboxName != null) {
-        title = '$title($currentMailboxName)';
-      }
-    }
+    Widget titleWidget = ValueListenableBuilder(
+        valueListenable: mailboxName,
+        builder: (BuildContext context, String mailboxName, Widget? child) {
+          return CommonAutoSizeText(
+            mailboxName,
+            style: const TextStyle(fontSize: AppFontSize.smFontSize),
+          );
+        });
     var appBarView = AppBarView(
-        title: controller.value.visible ? 'Mail address' : null,
-        titleWidget: controller.value.visible
-            ? null
-            : CommonAutoSizeText(
-                title,
-                style: const TextStyle(fontSize: AppFontSize.smFontSize),
-              ),
+        titleWidget: titleWidget,
         withLeading: widget.withLeading,
         rightWidgets: rightWidgets,
         child: body);
@@ -164,6 +159,7 @@ class _MailWidgetState extends State<MailWidget> {
 
   @override
   void dispose() {
+    mailAddressController.removeListener(_update);
     super.dispose();
   }
 }
