@@ -693,79 +693,41 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
 
   ///已经选择的数据的Chip样式显示
   Widget _buildSelectedChips(BuildContext context) {
-    return ValueListenableBuilder(
-        valueListenable: optionsChanged,
-        builder: (BuildContext context, bool optionsChanged, Widget? child) {
-          List<Widget> chips = [];
-          for (var option in widget.optionController.options) {
-            if (option.checked) {
-              var chip = Tooltip(
-                  message: option.hint,
-                  child: Chip(
-                    label: CommonAutoSizeText(
-                      option.label,
-                      style: const TextStyle(color: Colors.black),
-                    ),
-                    avatar: option.leading,
-                    backgroundColor: Colors.white,
-                    deleteIconColor: myself.primary,
-                    onDeleted: () {
-                      widget.optionController.setChecked(option, false);
-                      widget.onConfirm!(widget.optionController.selected);
-                    },
-                  ));
-              chips.add(chip);
-            }
-          }
-          if (chips.isNotEmpty) {
-            return Wrap(
-              spacing: 5,
-              runSpacing: 5,
-              alignment: WrapAlignment.start,
-              crossAxisAlignment: WrapCrossAlignment.start,
-              runAlignment: WrapAlignment.start,
-              children: chips,
-            );
-          } else {
-            return Container();
-          }
-        });
-  }
-
-  ///ExpandablePanel样式，以及弹出的选择对话框
-  Widget _buildMultiSelectField(BuildContext context) {
-    return Column(children: [
-      ListTile(
-        leading: widget.prefix!,
-        trailing: const Icon(
-          Icons.navigate_next,
-          color: Colors.white,
-        ),
-        title: CommonAutoSizeText(AppLocalizations.t(widget.title ?? '')),
-        onTap: () async {
-          List<String>? selected = await DialogUtil.show(
-              context: context,
-              builder: (BuildContext context) {
-                return CustomMultiSelect(
-                  title: widget.title,
-                  selectType: widget.selectType,
-                  optionController: widget.optionController,
-                  onSearch: widget.onSearch,
-                  onConfirm: (List<String>? selected) {
-                    Navigator.pop(
-                      context,
-                      selected,
-                    );
-                  },
-                );
-              });
-          if (widget.onConfirm != null) {
-            widget.onConfirm!(selected);
-          }
-        },
-      ),
-      _buildChipPanel(context)
-    ]);
+    List<Widget> chips = [];
+    for (var option in widget.optionController.options) {
+      if (option.checked) {
+        var chip = Tooltip(
+            message: option.hint,
+            child: Chip(
+              //labelPadding: EdgeInsets.zero,
+              padding: const EdgeInsets.all(2.0),
+              label: CommonAutoSizeText(
+                option.label,
+                style: const TextStyle(color: Colors.black),
+              ),
+              avatar: option.leading,
+              backgroundColor: Colors.white,
+              deleteIconColor: myself.primary,
+              onDeleted: () {
+                widget.optionController.setChecked(option, false);
+                widget.onConfirm!(widget.optionController.selected);
+              },
+            ));
+        chips.add(chip);
+      }
+    }
+    if (chips.isNotEmpty) {
+      return Wrap(
+        spacing: 5,
+        runSpacing: 5,
+        alignment: WrapAlignment.start,
+        crossAxisAlignment: WrapCrossAlignment.start,
+        runAlignment: WrapAlignment.start,
+        children: chips,
+      );
+    } else {
+      return Container();
+    }
   }
 
   ///带增加按钮面板样式，以及弹出的选择对话框
@@ -776,6 +738,48 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
             scrollDirection: Axis.horizontal,
             controller: ScrollController(),
             child: _buildSelectedChips(context)));
+  }
+
+  ///ExpandablePanel样式，以及弹出的选择对话框
+  Widget _buildMultiSelectField(BuildContext context) {
+    return ValueListenableBuilder(
+        valueListenable: optionsChanged,
+        builder: (BuildContext context, bool optionsChanged, Widget? child) {
+          return ListTile(
+              contentPadding: EdgeInsets.zero,
+              minVerticalPadding: 0.0,
+              horizontalTitleGap: 0.0,
+              minLeadingWidth: 0.0,
+              leading: widget.prefix,
+              isThreeLine: true,
+              trailing: const Icon(
+                Icons.navigate_next,
+                color: Colors.white,
+              ),
+              title: CommonAutoSizeText(AppLocalizations.t(widget.title ?? '')),
+              subtitle: _buildChipPanel(context),
+              onTap: () async {
+                List<String>? selected = await DialogUtil.show(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return CustomMultiSelect(
+                        title: widget.title,
+                        selectType: widget.selectType,
+                        optionController: widget.optionController,
+                        onSearch: widget.onSearch,
+                        onConfirm: (List<String>? selected) {
+                          Navigator.pop(
+                            context,
+                            selected,
+                          );
+                        },
+                      );
+                    });
+                if (widget.onConfirm != null) {
+                  widget.onConfirm!(selected);
+                }
+              });
+        });
   }
 
   @override

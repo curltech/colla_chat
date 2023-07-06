@@ -117,10 +117,10 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
   Widget _buildChipMultiSelectField(BuildContext context) {
     var selector = CustomMultiSelectField(
       title: title,
-      prefix: Icon(
-        Icons.person_add,
-        color: myself.primary,
-      ),
+      // prefix: Icon(
+      //   Icons.person_add,
+      //   color: myself.primary,
+      // ),
       optionController: optionController,
       onSearch: _onSearch,
       onConfirm: (selected) {

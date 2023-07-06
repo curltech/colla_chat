@@ -472,22 +472,24 @@ class FileUtil {
           onError(error);
         }
       },
-      onSelected: (FullPickerOutput file) {
+      onSelected: (FullPickerOutput fileOut) {
         if (onSelectedFilenames != null) {
-          if (file.name.isNotEmpty) {
+          List<File?> files = fileOut.file;
+          if (files.isNotEmpty) {
             List<String> filenames = [];
-            for (String? filename in file.name) {
-              if (filename != null) {
-                filenames.add(filename);
+            for (File? file in files) {
+              if (file != null) {
+                filenames.add(file.path);
               }
             }
             onSelectedFilenames(filenames);
           }
         }
         if (onSelectedBytes != null) {
-          if (file.bytes.isNotEmpty) {
+          List<Uint8List?> fileBytes = fileOut.bytes;
+          if (fileBytes.isNotEmpty) {
             List<Uint8List> bytes = [];
-            for (Uint8List? byte in file.bytes) {
+            for (Uint8List? byte in fileBytes) {
               if (byte != null) {
                 bytes.add(byte);
               }

@@ -13,8 +13,10 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/richtext/platform_editor_widget.dart';
+import 'package:cross_file/cross_file.dart';
 import 'package:enough_mail/highlevel.dart';
 import 'package:flutter/material.dart';
+import 'package:mimecon/mimecon.dart';
 
 ///邮件内容子视图
 class NewMailWidget extends StatefulWidget with TileDataMixin {
@@ -39,6 +41,9 @@ class NewMailWidget extends StatefulWidget with TileDataMixin {
 class _NewMailWidgetState extends State<NewMailWidget> {
   //已经选择的收件人
   ValueNotifier<List<String>> receipts = ValueNotifier([]);
+
+  ValueNotifier<List<AttachmentInfo>> attachmentInfos =
+      ValueNotifier<List<AttachmentInfo>>([]);
 
   ///邮件消息的构造器
   MessageBuilder builder = MessageBuilder.prepareMultipartAlternativeMessage();
@@ -115,12 +120,8 @@ class _NewMailWidgetState extends State<NewMailWidget> {
     return builder.addTextPlain(text);
   }
 
-  ValueNotifier<List<PartBuilder>> attachmentPartBuilders =
-      ValueNotifier<List<PartBuilder>>([]);
-
-  ///设置邮件的地址和主题
-  void _buildMessageAttachment() {
-    List<PartBuilder> attachments = [];
+  ///加附件
+  void _addAttachment() {
     FileUtil.fullPicker(
         context: context,
         file: true,
@@ -128,19 +129,22 @@ class _NewMailWidgetState extends State<NewMailWidget> {
           if (filenames.isNotEmpty) {
             for (var filename in filenames) {
               File file = File(filename);
-              PartBuilder partBuilder = await builder.addFile(
-                  file, MediaSubtype.applicationPdf.mediaType);
-              attachments.add(partBuilder);
+              await builder.addFile(
+                  file, MediaType.guessFromFileName(filename));
             }
+            List<AttachmentInfo> infos = [];
+            infos.addAll(builder.attachments);
+            attachmentInfos.value = infos;
           }
         });
-    attachmentPartBuilders.value = [...attachments];
   }
 
-  _removePartBuilder(List<PartBuilder> partBuilders) {
-    for (var partBuilder in partBuilders) {
-      builder.removePart(partBuilder);
-    }
+  ///删除附件
+  _removeAttachment(AttachmentInfo info) {
+    builder.removeAttachment(info);
+    List<AttachmentInfo> infos = [];
+    infos.addAll(builder.attachments);
+    attachmentInfos.value = infos;
   }
 
   final ColumnFieldController receiptColumnFieldController =
@@ -183,34 +187,65 @@ class _NewMailWidgetState extends State<NewMailWidget> {
   Widget _buildAttachmentChips(BuildContext context) {
     return Container(
         color: myself.getBackgroundColor(context).withOpacity(0.6),
-        height: 100,
+        height: 130,
         child: ValueListenableBuilder(
-            valueListenable: attachmentPartBuilders,
+            valueListenable: attachmentInfos,
             builder: (BuildContext context,
-                List<PartBuilder> attachmentPartBuilders, Widget? child) {
-              List<Chip> chips = [];
-              for (var partBuilder in attachmentPartBuilders) {
-                String? name = partBuilder.attachments.first.name;
-                int? size = partBuilder.attachments.first.size;
-
-                var chip = Chip(
-                  label: CommonAutoSizeText(
-                    name ?? '',
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                  //avatar: option.leading,
-                  backgroundColor: Colors.white,
-                  deleteIconColor: myself.primary,
-                  onDeleted: () {},
+                List<AttachmentInfo> attachmentInfos, Widget? child) {
+              List<Widget> chips = [];
+              for (var attachmentInfo in attachmentInfos) {
+                String? name = attachmentInfo.name;
+                int? size = attachmentInfo.size;
+                MediaType mediaType = attachmentInfo.mediaType;
+                String? mimeType = FileUtil.mimeType(name!);
+                Widget icon = Mimecon(
+                  mimetype: mimeType!,
+                  color: myself.primary,
+                  size: 32,
+                  isOutlined: true,
+                );
+                var chip = Card(
+                  elevation: 0.0,
+                  //margin: const EdgeInsets.all(10.0),
+                  child: Container(
+                      padding: const EdgeInsets.all(5.0),
+                      width: 150,
+                      child: Column(children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            icon,
+                            const Spacer(),
+                            InkWell(
+                                onTap: () {
+                                  _removeAttachment(attachmentInfo);
+                                },
+                                child: Icon(Icons.clear,
+                                    size: 20, color: myself.primary)),
+                          ],
+                        ),
+                        Text(
+                          name ?? '',
+                          softWrap: true,
+                          overflow: TextOverflow.fade,
+                          maxLines: 3,
+                          style: const TextStyle(color: Colors.black),
+                        ),
+                        Text('$size'),
+                      ])),
                 );
                 chips.add(chip);
               }
               if (chips.isNotEmpty) {
-                return Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: chips,
-                );
+                return SizedBox(
+                    width: double.infinity,
+                    child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Wrap(
+                          spacing: 10,
+                          runSpacing: 10,
+                          children: chips,
+                        )));
               } else {
                 return Container();
               }
@@ -223,6 +258,13 @@ class _NewMailWidgetState extends State<NewMailWidget> {
   @override
   Widget build(BuildContext context) {
     List<Widget> rightWidgets = [
+      Tooltip(
+          message: AppLocalizations.t('Attachment'),
+          child: IconButton(
+              onPressed: () {
+                _addAttachment();
+              },
+              icon: const Icon(Icons.attach_file))),
       Tooltip(
           message: AppLocalizations.t('Send'),
           child: IconButton(
