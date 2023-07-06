@@ -26,15 +26,13 @@ class QuillEditorWidget extends StatefulWidget {
   final ChatMessageMimeType mimeType;
   final bool withMultiMedia;
   final bool base64;
-  final Function(String content, ChatMessageMimeType mimeType)? onSubmit;
-  final Function(String content, ChatMessageMimeType mimeType)? onPreview;
+  final Function(QuillController controller)? onCreateController;
 
   const QuillEditorWidget({
     Key? key,
     this.height,
     this.initialText,
-    this.onSubmit,
-    this.onPreview,
+    this.onCreateController,
     this.mimeType = ChatMessageMimeType.json,
     this.withMultiMedia = true,
     this.base64 = true,
@@ -67,6 +65,9 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     }
     quillController = QuillController(
         document: doc, selection: const TextSelection.collapsed(offset: 0));
+    if (widget.onCreateController != null) {
+      widget.onCreateController!(quillController);
+    }
   }
 
   Future<String?> _onImagePaste(Uint8List imageBytes) async {
@@ -242,26 +243,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
 
   Widget _buildQuillToolbar(BuildContext context) {
     ///定制提交按钮
-    var customButtons = <QuillCustomButton>[
-      QuillCustomButton(
-          icon: Icons.preview,
-          onTap: () async {
-            if (widget.onPreview != null) {
-              String html = DocumentUtil.deltaToHtml(doc.toDelta());
-              widget.onPreview!(html, ChatMessageMimeType.html);
-            }
-          },
-          tooltip: AppLocalizations.t('Preview')),
-      QuillCustomButton(
-          icon: Icons.check,
-          onTap: () {
-            if (widget.onSubmit != null) {
-              String jsonStr = DocumentUtil.deltaToJson(doc.toDelta());
-              widget.onSubmit!(jsonStr, ChatMessageMimeType.json);
-            }
-          },
-          tooltip: AppLocalizations.t('Submit')),
-    ];
+    var customButtons = <QuillCustomButton>[];
     List<
             Widget Function(
                 QuillController, double, QuillIconTheme?, QuillDialogTheme?)>?

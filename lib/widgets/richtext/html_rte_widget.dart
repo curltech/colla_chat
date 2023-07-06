@@ -13,17 +13,15 @@ class HtmlRteWidget extends StatefulWidget {
   final double? height;
   final String? initialText;
   final ChatMessageMimeType mimeType;
-  final Function(String content, ChatMessageMimeType mimeType)? onSubmit;
-  final Function(String content, ChatMessageMimeType mimeType)? onPreview;
+  final Function(HtmlEditorController controller)? onCreateController;
 
-  const HtmlRteWidget(
-      {Key? key,
-      this.height,
-      this.initialText,
-      this.mimeType = ChatMessageMimeType.html,
-      this.onSubmit,
-      this.onPreview})
-      : super(key: key);
+  const HtmlRteWidget({
+    Key? key,
+    this.height,
+    this.initialText,
+    this.mimeType = ChatMessageMimeType.html,
+    this.onCreateController,
+  }) : super(key: key);
 
   @override
   State createState() => _HtmlRteWidgetState();
@@ -36,6 +34,9 @@ class _HtmlRteWidgetState extends State<HtmlRteWidget> {
   void initState() {
     super.initState();
     controller = HtmlEditorController();
+    if (widget.onCreateController != null) {
+      widget.onCreateController!(controller);
+    }
     controller.editorOptions.decoration = BoxDecoration(
         borderRadius: const BorderRadius.all(Radius.circular(10)),
         border: Border.all(color: Colors.white, width: 2));
@@ -51,45 +52,24 @@ class _HtmlRteWidgetState extends State<HtmlRteWidget> {
   }
 
   HtmlToolbarOptions _buildToolbarOptions() {
-    var customButtonGroups = [
-      CustomButtonGroup(buttons: [
-        CustomToolbarButton(
-            icon: Icons.preview,
-            action: () async {
-              if (widget.onPreview != null) {
-                String html = await controller.getText();
-                widget.onPreview!(html, ChatMessageMimeType.html);
-              }
-            },
-            isSelected: false),
-        CustomToolbarButton(
-            icon: Icons.check,
-            action: () async {
-              if (widget.onSubmit != null) {
-                String html = await controller.getText();
-                widget.onSubmit!(html, ChatMessageMimeType.html);
-              }
-            },
-            isSelected: false),
-      ])
-    ];
+    var customButtonGroups = [CustomButtonGroup(buttons: [])];
     var toolbarOptions = HtmlToolbarOptions(
-        toolbarType: ToolbarType.nativeScrollable,
-        backgroundColor: Colors.transparent,
-        toolbarPosition: ToolbarPosition.aboveEditor,
+      toolbarType: ToolbarType.nativeScrollable,
+      backgroundColor: Colors.transparent,
+      toolbarPosition: ToolbarPosition.aboveEditor,
       initiallyExpanded: true,
-        defaultToolbarButtons: const [
-          VoiceToTextButtons(),
-          OtherButtons(),
-          FontButtons(),
-          ColorButtons(),
-          ParagraphButtons(),
-          ListButtons(),
-          InsertButtons(),
-          OtherButtons()
-        ],
+      defaultToolbarButtons: const [
+        VoiceToTextButtons(),
+        OtherButtons(),
+        FontButtons(),
+        ColorButtons(),
+        ParagraphButtons(),
+        ListButtons(),
+        InsertButtons(),
+        OtherButtons()
+      ],
       toolbarItemHeight: 36,
-        customButtonGroups: customButtonGroups,
+      customButtonGroups: customButtonGroups,
       gridViewHorizontalSpacing: 1,
       gridViewVerticalSpacing: 1,
     );

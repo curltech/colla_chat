@@ -14,15 +14,13 @@ class HtmlEditorWidget extends StatefulWidget {
   final String? initialText;
   final ChatMessageMimeType mimeType;
   final bool withMultiMedia;
-  final Function(String result, ChatMessageMimeType mimeType)? onSubmit;
-  final Function(String content, ChatMessageMimeType mimeType)? onPreview;
+  final Function(HtmlEditorController controller)? onCreateController;
 
   const HtmlEditorWidget({
     Key? key,
     this.height,
     this.initialText,
-    this.onSubmit,
-    this.onPreview,
+    this.onCreateController,
     this.mimeType = ChatMessageMimeType.html,
     this.withMultiMedia = false,
   }) : super(key: key);
@@ -44,33 +42,13 @@ class _HtmlEditorWidgetState extends State<HtmlEditorWidget> {
         controller.setText(widget.initialText!);
       }
     }
+    if (widget.onCreateController != null) {
+      widget.onCreateController!(controller);
+    }
   }
 
   HtmlToolbarOptions _buildHtmlToolbarOptions() {
-    var customToolbarButtons = [
-      Tooltip(
-          message: AppLocalizations.t('Preview'),
-          child: InkWell(
-            onTap: () async {
-              if (widget.onPreview != null) {
-                String html = await controller.getText();
-                widget.onPreview!(html, ChatMessageMimeType.html);
-              }
-            },
-            child: const Icon(Icons.preview),
-          )),
-      Tooltip(
-          message: AppLocalizations.t('Submit'),
-          child: InkWell(
-            onTap: () async {
-              if (widget.onSubmit != null) {
-                String html = await controller.getText();
-                widget.onSubmit!(html, ChatMessageMimeType.html);
-              }
-            },
-            child: const Icon(Icons.check),
-          )),
-    ];
+    var customToolbarButtons = <Widget>[];
     return HtmlToolbarOptions(
       toolbarPosition: ToolbarPosition.aboveEditor,
       toolbarType: ToolbarType.nativeScrollable,

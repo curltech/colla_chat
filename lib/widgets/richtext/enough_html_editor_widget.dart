@@ -12,16 +12,14 @@ class EnoughHtmlEditorWidget extends StatefulWidget {
   final double? height;
   final String? initialText;
   final ChatMessageMimeType mimeType;
-  final Function(String content, ChatMessageMimeType mimeType)? onSubmit;
-  final Function(String content, ChatMessageMimeType mimeType)? onPreview;
+  final Function(HtmlEditorApi controller)? onCreateController;
 
   const EnoughHtmlEditorWidget({
     Key? key,
     this.height,
     this.initialText,
     this.mimeType = ChatMessageMimeType.html,
-    this.onSubmit,
-    this.onPreview,
+    this.onCreateController,
   }) : super(key: key);
 
   @override
@@ -40,38 +38,7 @@ class _EnoughHtmlEditorWidgetState extends State<EnoughHtmlEditorWidget> {
     if (controller == null) {
       return const PlatformProgressIndicator();
     } else {
-      return SliverHeaderHtmlEditorControls(
-          editorApi: controller,
-          suffix: ButtonBar(
-            children: [
-              Tooltip(
-                  message: AppLocalizations.t('Preview'),
-                  child: InkWell(
-                    onTap: () async {
-                      if (widget.onPreview != null) {
-                        String html = await controller!.getFullHtml();
-                        widget.onPreview!(html, ChatMessageMimeType.html);
-                      }
-                    },
-                    child: const Icon(
-                      Icons.check,
-                    ),
-                  )),
-              Tooltip(
-                  message: AppLocalizations.t('Submit'),
-                  child: InkWell(
-                    onTap: () async {
-                      if (widget.onSubmit != null) {
-                        String html = await controller!.getFullHtml();
-                        widget.onSubmit!(html, ChatMessageMimeType.html);
-                      }
-                    },
-                    child: const Icon(
-                      Icons.check,
-                    ),
-                  )),
-            ],
-          ));
+      return SliverHeaderHtmlEditorControls(editorApi: controller);
     }
   }
 
@@ -85,6 +52,9 @@ class _EnoughHtmlEditorWidgetState extends State<EnoughHtmlEditorWidget> {
         if (widget.initialText != null) {
           var html = widget.initialText!;
           controller!.setText(html);
+        }
+        if (widget.onCreateController != null) {
+          widget.onCreateController!(controller!);
         }
       },
     );
@@ -105,9 +75,9 @@ class _EnoughHtmlEditorWidgetState extends State<EnoughHtmlEditorWidget> {
             ),
             Expanded(
                 child: SizedBox(
-                  height: widget.height,
-                  child: _buildHtmlEditor(),
-                )),
+              height: widget.height,
+              child: _buildHtmlEditor(),
+            )),
           ],
         ));
   }

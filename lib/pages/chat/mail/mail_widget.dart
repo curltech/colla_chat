@@ -90,6 +90,7 @@ class _MailWidgetState extends State<MailWidget> {
                           child: GestureDetector(
                               onTap: () {
                                 this.addressVisible.value = false;
+                                setState(() {});
                               },
                               child: Container(
                                 color: Colors.black.withOpacity(0.4),
@@ -103,17 +104,13 @@ class _MailWidgetState extends State<MailWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Widget body;
-    if (appDataProvider.smallBreakpoint.isActive(context)) {
-      body = _buildPlatformDrawer();
-    } else {
-      body = _buildPlatformDrawer();
-    }
+    Widget body = _buildPlatformDrawer();
     List<Widget> rightWidgets = [
       IconButton(
           tooltip: AppLocalizations.t('Toggle mail address view'),
           onPressed: () {
             addressVisible.value = !addressVisible.value;
+            setState(() {});
           },
           icon: addressVisible.value
               ? const Icon(Icons.toggle_off)

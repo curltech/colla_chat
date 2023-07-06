@@ -1,19 +1,21 @@
 import 'dart:io';
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/emailaddress.dart';
+import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/document_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/richtext/platform_editor_widget.dart';
-import 'package:cross_file/cross_file.dart';
 import 'package:enough_mail/highlevel.dart';
 import 'package:flutter/material.dart';
 import 'package:mimecon/mimecon.dart';
@@ -45,6 +47,11 @@ class _NewMailWidgetState extends State<NewMailWidget> {
   ValueNotifier<List<AttachmentInfo>> attachmentInfos =
       ValueNotifier<List<AttachmentInfo>>([]);
 
+  TextEditingController subjectController = TextEditingController();
+
+  PlatformEditorController platformEditorController =
+      PlatformEditorController();
+
   ///邮件消息的构造器
   MessageBuilder builder = MessageBuilder.prepareMultipartAlternativeMessage();
 
@@ -55,18 +62,6 @@ class _NewMailWidgetState extends State<NewMailWidget> {
   }
 
   _update() {}
-
-  /// html编辑完成，草案原始格式暂存到chatMessage中
-  _onSubmit(String? content, ChatMessageMimeType mimeType) {
-    if (content != null) {
-      String html = content;
-      if (mimeType == ChatMessageMimeType.json) {
-        List<dynamic> deltaJson = JsonUtil.toJson(content);
-        html = DocumentUtil.jsonToHtml(deltaJson);
-      }
-      _addTextHtml(html);
-    }
-  }
 
   //收件人，联系人显示和选择界面
   Widget _buildReceiptsWidget(BuildContext context) {
@@ -108,12 +103,14 @@ class _NewMailWidgetState extends State<NewMailWidget> {
     builder.subject = subject;
   }
 
+  ///如果是正式发送html
   PartBuilder _addTextHtml(String html) {
     return builder.addTextHtml(html);
   }
 
-  PartBuilder _addText(String text) {
-    return builder.addText(text);
+  ///如果是草案json字符串
+  PartBuilder _addText(String content) {
+    return builder.addText(content);
   }
 
   PartBuilder _addTextPlain(String text) {
@@ -147,19 +144,6 @@ class _NewMailWidgetState extends State<NewMailWidget> {
     attachmentInfos.value = infos;
   }
 
-  final ColumnFieldController receiptColumnFieldController =
-      ColumnFieldController(ColumnFieldDef(
-    name: 'receipt',
-    label: 'Receipt',
-    cancel: true,
-  ));
-  final ColumnFieldController subjectColumnFieldController =
-      ColumnFieldController(ColumnFieldDef(
-    name: 'subject',
-    label: 'Subject',
-    cancel: true,
-  ));
-
   _buildMailSubjectWidget() {
     return Container(
         padding: const EdgeInsets.all(10.0),
@@ -168,16 +152,16 @@ class _NewMailWidgetState extends State<NewMailWidget> {
           const SizedBox(
             height: 10.0,
           ),
-          ColumnFieldWidget(
-            controller: subjectColumnFieldController,
-          )
+          CommonAutoSizeTextFormField(
+              controller: subjectController,
+              labelText: AppLocalizations.t('Subject'))
         ]));
   }
 
   /// html编辑器
   Widget _buildEnoughHtmlEditorWidget(BuildContext context) {
     PlatformEditorWidget platformEditorWidget = PlatformEditorWidget(
-      onSubmit: _onSubmit,
+      platformEditorController: platformEditorController,
     );
 
     return platformEditorWidget;
@@ -247,8 +231,72 @@ class _NewMailWidgetState extends State<NewMailWidget> {
             }));
   }
 
+  ///发送前的准备，准备数据和地址
+  Future<String?> _preSend() async {
+    List<MailAddress> from = [];
+    MailAddress? sender;
+    EmailAddress? current = mailAddressController.current;
+    String? email;
+    if (current != null) {
+      email = current.email;
+      sender = MailAddress(current.name, email);
+      from.add(sender);
+    }
+
+    List<MailAddress> to = [];
+    List<String> peerIds = receipts.value;
+    if (peerIds.isNotEmpty) {
+      for (String peerId in peerIds) {
+        Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+        if (linkman != null) {
+          String name = linkman.name;
+          String? email = linkman.email;
+          if (email != null) {
+            to.add(MailAddress(name, email));
+          }
+        }
+      }
+    }
+    _buildMailSubject(
+        from: from, sender: sender, to: to, subject: subjectController.text);
+
+    return email;
+  }
+
+  _draft() async {
+    String? email = await _preSend();
+    String? content = await platformEditorController.content;
+    if (content != null) {
+      _addText(content);
+    }
+
+    MimeMessage mimeMessage = builder.buildMimeMessage();
+    if (email != null) {
+      EmailClient? emailClient = emailClientPool.get(email);
+      if (emailClient != null) {
+        Mailbox? drafts = emailClient.getMailbox(MailboxFlag.drafts);
+        emailClient.sendMessage(mimeMessage,
+            sentMailbox: drafts, appendToSent: false);
+      }
+    }
+  }
+
   ///发送邮件，首先将邮件的编辑部分转换成html格式，对邮件的各个组成部分加密，目标为多人时采用群加密方式，然后发送
-  _send() {}
+  _send() async {
+    String? email = await _preSend();
+    String? html = await platformEditorController.html;
+    if (html != null) {
+      _addTextHtml(html);
+    }
+
+    MimeMessage mimeMessage = builder.buildMimeMessage();
+    if (email != null) {
+      EmailClient? emailClient = emailClientPool.get(email);
+      if (emailClient != null) {
+        emailClient.sendMessage(mimeMessage);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -260,6 +308,13 @@ class _NewMailWidgetState extends State<NewMailWidget> {
                 _addAttachment();
               },
               icon: const Icon(Icons.attach_file))),
+      Tooltip(
+          message: AppLocalizations.t('Draft'),
+          child: IconButton(
+              onPressed: () {
+                _draft();
+              },
+              icon: const Icon(Icons.drafts))),
       Tooltip(
           message: AppLocalizations.t('Send'),
           child: IconButton(

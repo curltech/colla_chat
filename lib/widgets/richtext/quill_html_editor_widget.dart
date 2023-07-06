@@ -13,16 +13,14 @@ class QuillHtmlEditorWidget extends StatefulWidget {
   final ChatMessageMimeType mimeType;
   final bool withMultiMedia;
   final bool base64;
-  final Function(String content, ChatMessageMimeType mimeType)? onSubmit;
-  final Function(String content, ChatMessageMimeType mimeType)? onPreview;
+  final Function(QuillEditorController controller)? onCreateController;
 
   const QuillHtmlEditorWidget({
     Key? key,
     this.height,
     this.initialText,
     this.mimeType = ChatMessageMimeType.json,
-    this.onSubmit,
-    this.onPreview,
+    this.onCreateController,
     this.withMultiMedia = true,
     this.base64 = true,
   }) : super(key: key);
@@ -37,6 +35,9 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
   @override
   void initState() {
     super.initState();
+    if (widget.onCreateController != null) {
+      widget.onCreateController!(controller);
+    }
 
     ///初始化数据的是json和html格式则可以编辑
     if (widget.initialText != null) {
@@ -60,40 +61,7 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
         toolBarConfig.add(toolBarStyle);
       }
     }
-    var customButtons = [
-      Tooltip(
-          message: AppLocalizations.t('Preview'),
-          child: InkWell(
-              onTap: () async {
-                if (widget.onPreview != null) {
-                  String html = await controller.getText();
-                  widget.onPreview!(html, ChatMessageMimeType.html);
-
-                  // var delta = await controller.getDelta();
-                  // String deltaJson = JsonUtil.toJsonString(delta);
-                  // widget.onSubmit!(deltaJson, ChatMessageMimeType.json);
-                }
-              },
-              child: const Icon(
-                Icons.preview,
-              ))),
-      Tooltip(
-          message: AppLocalizations.t('Submit'),
-          child: InkWell(
-              onTap: () async {
-                if (widget.onSubmit != null) {
-                  String html = await controller.getText();
-                  widget.onSubmit!(html, ChatMessageMimeType.html);
-
-                  // var delta = await controller.getDelta();
-                  // String deltaJson = JsonUtil.toJsonString(delta);
-                  // widget.onSubmit!(deltaJson, ChatMessageMimeType.json);
-                }
-              },
-              child: const Icon(
-                Icons.check,
-              ))),
-    ];
+    var customButtons = <Widget>[];
     return ToolBar(
         toolBarColor: Colors.white,
         padding: const EdgeInsets.all(8),

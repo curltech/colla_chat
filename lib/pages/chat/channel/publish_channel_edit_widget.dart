@@ -42,6 +42,8 @@ class PublishChannelEditWidget extends StatefulWidget with TileDataMixin {
 class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
   ValueNotifier<String?> thumbnail = ValueNotifier<String?>(null);
   final TextEditingController textEditingController = TextEditingController();
+  PlatformEditorController platformEditorController =
+      PlatformEditorController();
 
   @override
   void initState() {
@@ -70,27 +72,21 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
     return null;
   }
 
-  _onPreview(String? content, ChatMessageMimeType mimeType) {
-    if (mimeType == ChatMessageMimeType.html) {
-      indexWidgetProvider.push('html_preview');
-      htmlPreviewController.title = textEditingController.text;
-      htmlPreviewController.html = content;
-    }
-  }
-
-  ///编辑器提交表示暂存，原生的格式，json或者html
-  Future<void> _onSubmit(String? content, ChatMessageMimeType mimeType) async {
-    await _save(content, mimeType);
+  _onPreview() async {
+    indexWidgetProvider.push('html_preview');
+    htmlPreviewController.title = textEditingController.text;
+    htmlPreviewController.html = await platformEditorController.html;
   }
 
   ///保存到数据库为草案，采用原生的可编辑模式，发布后才转换成统一的html格式，便不可更改
-  Future<void> _save(String? content, ChatMessageMimeType mimeType) async {
+  Future<void> _save() async {
     String title = textEditingController.text;
     if (StringUtil.isEmpty(title)) {
       DialogUtil.error(context, content: AppLocalizations.t('Must have title'));
       return;
     }
-    if (StringUtil.isEmpty(content)) {
+    String? content = await platformEditorController.content;
+    if (mounted && StringUtil.isEmpty(content)) {
       DialogUtil.error(context,
           content: AppLocalizations.t('Must have content'));
       return;
@@ -116,7 +112,7 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
       myChannelChatMessageController.current = chatMessage;
       newDocument = true;
     }
-    chatMessage.mimeType = mimeType.name;
+    chatMessage.mimeType = ChatMessageMimeType.json.name;
     await chatMessageService.store(chatMessage);
     if (newDocument) {
       myChannelChatMessageController.add(chatMessage);
@@ -183,8 +179,7 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
                 child: KeepAliveWrapper(
                     child: PlatformEditorWidget(
               initialText: content,
-              onPreview: _onPreview,
-              onSubmit: _onSubmit,
+              platformEditorController: platformEditorController,
             )))
           ]);
         });
