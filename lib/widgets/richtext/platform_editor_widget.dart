@@ -1,4 +1,3 @@
-import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/document_util.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
@@ -21,23 +20,19 @@ class PlatformEditorController with ChangeNotifier {
       QuillController controller = originalController as QuillController;
       Delta delta = controller.document.toDelta();
       return DocumentUtil.deltaToJson(delta);
-    }
-    if (originalController is QuillEditorController) {
+    } else if (originalController is QuillEditorController) {
       QuillEditorController controller =
           originalController as QuillEditorController;
       return await controller.getText();
-    }
-    if (originalController is HtmlEditorController) {
+    } else if (originalController is HtmlEditorController) {
       HtmlEditorController controller =
           originalController as HtmlEditorController;
       return await controller.getText();
-    }
-    if (originalController is rte.HtmlEditorController) {
+    } else if (originalController is rte.HtmlEditorController) {
       rte.HtmlEditorController controller =
           originalController as rte.HtmlEditorController;
       return await controller.getText();
-    }
-    if (originalController is HtmlEditorApi) {
+    } else if (originalController is HtmlEditorApi) {
       HtmlEditorApi controller = originalController as HtmlEditorApi;
       return await controller.getText();
     }
@@ -48,23 +43,19 @@ class PlatformEditorController with ChangeNotifier {
       QuillController controller = originalController as QuillController;
       Delta delta = controller.document.toDelta();
       return DocumentUtil.deltaToHtml(delta);
-    }
-    if (originalController is QuillEditorController) {
+    } else if (originalController is QuillEditorController) {
       QuillEditorController controller =
           originalController as QuillEditorController;
       return await controller.getText();
-    }
-    if (originalController is HtmlEditorController) {
+    } else if (originalController is HtmlEditorController) {
       HtmlEditorController controller =
           originalController as HtmlEditorController;
       return await controller.getText();
-    }
-    if (originalController is rte.HtmlEditorController) {
+    } else if (originalController is rte.HtmlEditorController) {
       rte.HtmlEditorController controller =
           originalController as rte.HtmlEditorController;
       return await controller.getText();
-    }
-    if (originalController is HtmlEditorApi) {
+    } else if (originalController is HtmlEditorApi) {
       HtmlEditorApi controller = originalController as HtmlEditorApi;
       return await controller.getFullHtml();
     }
