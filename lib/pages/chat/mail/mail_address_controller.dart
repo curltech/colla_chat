@@ -251,7 +251,8 @@ class MailAddressController extends DataListController<entity.EmailAddress> {
     }
   }
 
-  Future<void> updateMimeMessageContent() async {
+  ///当前邮件获取全部内容，包括附件
+  Future<void> fetchMessageContents() async {
     if (current == null) {
       return;
     }
@@ -272,6 +273,27 @@ class MailAddressController extends DataListController<entity.EmailAddress> {
           currentMimeMessage = mimeMsg;
         }
       }
+    }
+  }
+
+  ///当前邮件根据fetchId获取附件
+  Future<MimePart?> fetchMessagePart(
+    String fetchId, {
+    Duration? responseTimeout,
+  }) async {
+    if (current == null) {
+      return null;
+    }
+    String email = current!.email;
+    EmailClient? emailClient = emailClientPool.get(email);
+    if (emailClient == null) {
+      return null;
+    }
+
+    enough_mail.MimeMessage? mimeMessage = currentMimeMessage;
+    if (mimeMessage != null) {
+      return await emailClient.fetchMessagePart(mimeMessage, fetchId,
+          responseTimeout: responseTimeout);
     }
   }
 }

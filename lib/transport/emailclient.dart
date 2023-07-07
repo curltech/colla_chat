@@ -48,11 +48,22 @@ class EmailMessageUtil {
   }
 
   ///把邮件消息转换成html
-  static String convertToHtml(enough_mail.MimeMessage mimeMessage) {
+  static String convertToHtml(
+    enough_mail.MimeMessage mimeMessage, {
+    bool blockExternalImages = false,
+    bool preferPlainText = false,
+    bool enableDarkMode = false,
+    int? maxImageWidth,
+    String? emptyMessageText,
+    TransformConfiguration? transformConfiguration,
+  }) {
     return mimeMessage.transformToHtml(
-      blockExternalImages: false,
-      emptyMessageText: 'Nothing here, move on!',
-    );
+        blockExternalImages: blockExternalImages,
+        preferPlainText: preferPlainText,
+        enableDarkMode: enableDarkMode,
+        maxImageWidth: maxImageWidth,
+        emptyMessageText: emptyMessageText,
+        transformConfiguration: transformConfiguration);
   }
 
   ///把html转换成普通文本
@@ -391,7 +402,8 @@ class EmailClient {
     return null;
   }
 
-  ///用邮件客户端获取消息
+  ///用邮件客户端获取消息，可以设定完全获取，或者部分获取
+  ///默认是在尺寸内的完全获取，或者只获取封面
   Future<List<enough_mail.MimeMessage>?> fetchMessages(
       {int limit = defaultLimit,
       FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
@@ -432,6 +444,7 @@ class EmailClient {
     return null;
   }
 
+  ///取给定的页号的下一页
   Future<List<enough_mail.MimeMessage>?> fetchMessagesNextPage(
     PagedMessageSequence pagedSequence, {
     Mailbox? mailbox,
@@ -448,6 +461,20 @@ class EmailClient {
     return null;
   }
 
+  ///根据fetchId获取邮件的部分，fetchId是由邮件的findContentInfo方法获取的
+  Future<MimePart?> fetchMessagePart(
+    MimeMessage message,
+    String fetchId, {
+    Duration? responseTimeout,
+  }) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      return await mailClient.fetchMessagePart(message, fetchId,
+          responseTimeout: responseTimeout);
+    }
+  }
+
+  ///删除邮件
   Future<DeleteResult?> deleteMessage(enough_mail.MimeMessage message,
       {bool expunge = false}) async {
     final enough_mail.MailClient? mailClient = this.mailClient;

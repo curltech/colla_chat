@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -7,6 +8,7 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/emailaddress.dart';
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/path_util.dart';
@@ -17,6 +19,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:enough_mail/highlevel.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:mimecon/mimecon.dart';
 import 'package:path/path.dart' as p;
 
 ///邮件内容子视图
@@ -71,24 +74,58 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     setState(() {});
   }
 
+  ///获取当前邮件的附件目录信息，用于展示
+  List<ContentInfo>? findContentInfos() {
+    MimeMessage? mimeMessage = mailAddressController.currentMimeMessage;
+    if (mimeMessage == null) {
+      return null;
+    }
+    bool hasAttachment = mimeMessage.hasAttachmentsOrInlineNonTextualParts();
+    if (!hasAttachment) {
+      return null;
+    }
+    final List<ContentInfo> infos =
+        mimeMessage.findContentInfo(disposition: ContentDisposition.attachment);
+    return infos;
+  }
+
+  ///根据fetchId获取当前邮件的特定附件数据
+  Future<MediaProvider?> findAttachmentMediaProvider(String fetchId) async {
+    MimeMessage? mimeMessage = mailAddressController.currentMimeMessage;
+    if (mimeMessage == null) {
+      return null;
+    }
+    MimePart? mimePart = mimeMessage.getPart(fetchId);
+    //如果附件还未获取，则获取
+    mimePart ??= await mailAddressController.fetchMessagePart(fetchId);
+    if (mimePart == null) {
+      return null;
+    }
+
+    ///获取附件的内容，文本内容或者二进制内容
+    final name = mimePart.decodeFileName();
+    final mediaType = mimePart.mediaType.text;
+    if (mimePart.mediaType.isText) {
+      return TextMediaProvider(name!, mediaType, mimePart.decodeContentText()!);
+    } else {
+      Uint8List? data = mimePart.decodeContentBinary();
+      return MemoryMediaProvider(name!, mediaType, data!,
+          description: mimeMessage.decodeSubject());
+    }
+  }
+
   ///当前的邮件发生变化，如果没有获取内容，则获取内容
   Future<MimeMessage?> findMimeMessage() async {
     MimeMessage? mimeMessage = mailAddressController.currentMimeMessage;
     if (mimeMessage != null) {
       try {
-        await mailAddressController.updateMimeMessageContent();
+        await mailAddressController.fetchMessageContents();
       } catch (e) {
         logger.e('updateMimeMessageContent failure:$e');
       }
       mimeMessage = mailAddressController.currentMimeMessage;
       if (mimeMessage != null) {
         String? keys = mimeMessage.decodeHeaderValue('payloadKeys');
-        String? subject = mimeMessage.decodeSubject();
-        String? html = mimeMessage.decodeTextHtmlPart();
-        List<MimePart>? parts = mimeMessage.parts;
-        List<MimePart>? allPartsFlat = mimeMessage.allPartsFlat;
-        BodyPart? bodyPart = mimeMessage.body;
-        MimeData? mimeData = mimeMessage.mimeData;
         if (keys != null && keys.isNotEmpty) {
           Map<String, String> payloadKeys = JsonUtil.toJson(keys);
           String payloadKey = payloadKeys[myself.peerId]!;
@@ -159,32 +196,55 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     return mimeMessageViewer;
   }
 
-  Future<dynamic> handleMailto(Uri mailto, MimeMessage mimeMessage) async {
-    final fromAddress = MailAddress('My Name', 'email@domain.com');
-    final messageBuilder =
-        MessageBuilder.prepareMailtoBasedMessage(mailto, MailAddress('', ''));
-    return null;
-  }
-
-  Widget? buildViewerForMessage(
-      MimeMessage mimeMessage, MailClient mailClient) {
-    mailClient.fetchMessages(fetchPreference: FetchPreference.envelope);
-
-    ///在ios下会引发启动崩溃
-    return null;
-    //   MimeMessageDownloader(
-    //   mimeMessage: mimeMessage,
-    //   mailClient: mailClient,
-    //   onDownloaded: onMessageDownloaded,
-    //   blockExternalImages: false,
-    //   markAsSeen: true,
-    //   mailtoDelegate: handleMailto,
-    // );
-  }
-
-  void onMessageDownloaded(MimeMessage mimeMessage) {
-    // update other things to show eg attachment view, e.g.:
-    setState(() {});
+  /// 附件显示区
+  Widget _buildAttachmentChips(BuildContext context) {
+    List<Widget> chips = [];
+    List<ContentInfo>? contentInfos = findContentInfos();
+    if (contentInfos == null) {
+      return Container();
+    }
+    for (var contentInfo in contentInfos!) {
+      String? name = contentInfo.fileName;
+      int? size = contentInfo.size;
+      MediaType? mediaType = contentInfo.mediaType;
+      String? mimeType = FileUtil.mimeType(name!);
+      Widget icon = Mimecon(
+        mimetype: mimeType!,
+        color: myself.primary,
+        size: 32,
+        isOutlined: true,
+      );
+      var chip = Card(
+        elevation: 0.0,
+        //margin: const EdgeInsets.all(10.0),
+        child: Container(
+            padding: const EdgeInsets.all(5.0),
+            width: 150,
+            child: Column(children: [
+              icon,
+              Text(
+                name ?? '',
+                softWrap: true,
+                overflow: TextOverflow.fade,
+                maxLines: 3,
+              ),
+              Text('$size'),
+            ])),
+      );
+      chips.add(chip);
+    }
+    if (chips.isNotEmpty) {
+      return Container(
+          alignment: Alignment.centerLeft,
+          color: myself.getBackgroundColor(context).withOpacity(0.6),
+          child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: chips,
+              )));
+    } else {
+      return Container();
+    }
   }
 
   @override
@@ -203,7 +263,10 @@ class _MailContentWidgetState extends State<MailContentWidget> {
             margin: EdgeInsets.zero,
             child: SizedBox(
                 width: double.infinity,
-                child: Center(child: _buildMimeMessageViewer(context)))));
+                child: Column(children: [
+                  Expanded(child: _buildMimeMessageViewer(context)),
+                  _buildAttachmentChips(context)
+                ]))));
     return appBarView;
   }
 
