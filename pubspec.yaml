@@ -54,7 +54,11 @@ dependencies:
   flutter_contacts: ^1.1.6
   #fast_contacts: ^3.0.3
   connectivity_plus: ^4.0.1
-  #flutter_nearby_connections: ^1.1.1  #目前不支持ios和android之间通信，而且gradle版本配置低，需要修改
+  #flutter_nearby_connections: ^1.1.1  #ANDROID，IOS，目前不支持ios和android之间通信，而且gradle版本配置低，需要修改
+  nearby_connections: ^3.3.0 #android
+  nfc_manager: ^3.3.0 #mobile
+  flutter_nfc_kit: ^3.3.1 #mobile
+  flutter_blue_plus: ^1.5.2 #ANDROID，IOS，MACOS
   mimecon: ^0.0.2
   wakelock: ^0.6.2 #让系统不会睡眠
 

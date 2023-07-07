@@ -105,5 +105,19 @@
 	<false/>
 	<key>kTCCServiceMediaLibrary</key>
 	<string>media</string>
+	<key>NFCReaderUsageDescription</key>
+    <string>Read NFC Tags</string>
+    <key>UIRequiredDeviceCapabilities</key>
+    <array>
+        <string>nfc</string>
+    </array>
+    <key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
+    <array>
+        <string>A00000000386980701</string>
+    </array>
+    <key>com.apple.developer.nfc.readersession.felica.systemcodes</key>
+    <array>
+        <string>0000</string>
+    </array>
 </dict>
 </plist>

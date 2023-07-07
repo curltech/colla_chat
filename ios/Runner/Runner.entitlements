@@ -6,5 +6,9 @@
 	<array>
 		<string>group.io.curltech.colla</string>
 	</array>
+	<key>com.apple.developer.nfc.readersession.formats</key>
+    <array>
+        <string>TAG</string>
+    </array>
 </dict>
 </plist>
