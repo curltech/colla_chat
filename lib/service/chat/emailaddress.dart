@@ -44,19 +44,13 @@ class EmailAddressService extends GeneralBaseService<EmailAddress> {
 
   ///加密邮件消息，要么对非组的消息或者拆分后的群消息进行linkman方式加密，
   ///要么对组消息进行加密，返回可发送的多条消息
-  Future<Map<String, List<int>>> encrypt(
-    List<int> data,
-    List<String> peerIds, {
-    CryptoOption? cryptoOption,
-  }) async {
-    Map<String, List<int>> encryptData = {};
+  Future<PlatformEncryptData?> encrypt(List<int> data, List<String> peerIds,
+      {CryptoOption? cryptoOption, List<int>? secretKey}) async {
     if (cryptoOption == null) {
       if (peerIds.length == 1) {
         cryptoOption = CryptoOption.linkman;
-      } else if (peerIds.length > 1) {
-        cryptoOption = CryptoOption.group;
       } else {
-        return {};
+        cryptoOption = CryptoOption.group;
       }
     }
     int cryptOptionIndex = cryptoOption.index;
@@ -79,19 +73,17 @@ class EmailAddressService extends GeneralBaseService<EmailAddress> {
         if (result) {
           data = CryptoUtil.concat(
               securityContext.payload, [CryptoOption.linkman.index]);
-          encryptData[receiverPeerId] = data;
 
-          return encryptData;
+          return PlatformEncryptData(data);
         }
       }
     } else if (cryptoOption == CryptoOption.group) {
+      securityContext.secretKey = secretKey;
+
       ///再根据群进行消息的复制成多条进行处理
       if (peerIds.isNotEmpty) {
+        Map<String, String> payloadKeys = {};
         for (var receiverPeerId in peerIds) {
-          if (securityContext.secretKey != null) {
-            securityContext.needSign = false;
-            securityContext.needCompress = false;
-          }
           Linkman? linkman =
               await linkmanService.findCachedOneByPeerId(receiverPeerId);
           if (linkman != null) {
@@ -100,19 +92,29 @@ class EmailAddressService extends GeneralBaseService<EmailAddress> {
             bool result = await securityContextService.encrypt(securityContext);
             if (result) {
               ///对群加密来说，返回的是通用的加密后数据
-              List<int> encryptedKey =
-                  CryptoUtil.decodeBase64(securityContext.payloadKey!);
-              encryptedKey =
-                  CryptoUtil.concat(encryptedKey, [CryptoOption.group.index]);
-              data = CryptoUtil.concat(securityContext.payload, encryptedKey);
-              encryptData[receiverPeerId] = data;
+              payloadKeys[receiverPeerId] = securityContext.payloadKey!;
             }
           }
+        }
+        data = CryptoUtil.concat(
+            securityContext.payload, [CryptoOption.group.index]);
+
+        return PlatformEncryptData(data,
+            secretKey: securityContext.secretKey, payloadKeys: payloadKeys);
+      } else {
+        securityContext.secretKey = secretKey;
+        bool result = await securityContextService.encrypt(securityContext);
+        if (result) {
+          data = CryptoUtil.concat(
+              securityContext.payload, [CryptoOption.group.index]);
+
+          return PlatformEncryptData(data,
+              secretKey: securityContext.secretKey);
         }
       }
     }
 
-    return encryptData;
+    return null;
   }
 
   Future<List<int>?> decrypt(List<int> data) async {

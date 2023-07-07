@@ -10,6 +10,7 @@ import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/emailaddress.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/tool/document_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -101,61 +102,6 @@ class _NewMailWidgetState extends State<NewMailWidget> {
         });
 
     return selector;
-  }
-
-  ///设置邮件的地址和主题
-  Future<void> _buildMailSubject({
-    List<MailAddress>? from,
-    List<MailAddress>? to,
-    MailAddress? sender,
-    List<MailAddress>? cc,
-    List<MailAddress>? bcc,
-    String? subject,
-  }) async {
-    builder.from = from;
-    builder.to = to;
-    builder.sender = sender;
-    builder.cc = cc;
-    builder.bcc = bcc;
-
-    Map<String, List<int>> encryptSubjects = await emailAddressService.encrypt(
-        CryptoUtil.stringToUtf8(subject!), receipts.value);
-
-    builder.subject = subject;
-  }
-
-  ///如果是正式发送html
-  Future<PartBuilder> _addTextHtml(String html) async {
-    Map<String, List<int>> encryptSubjects = await emailAddressService.encrypt(
-        CryptoUtil.stringToUtf8(html), receipts.value);
-
-    return builder.addTextHtml(html);
-  }
-
-  ///如果是草案json字符串
-  PartBuilder _addText(String content) {
-    return builder.addText(content);
-  }
-
-  PartBuilder _addTextPlain(String text) {
-    return builder.addTextPlain(text);
-  }
-
-  ///加附件
-  Future<void> _addAttachments() async {
-    if (attachmentInfos.value.isNotEmpty) {
-      for (var attachmentInfo in attachmentInfos.value) {
-        String filename = attachmentInfo.name;
-        File file = File(attachmentInfo.name);
-        Uint8List data = file.readAsBytesSync();
-
-        ///加密
-        Map<String, List<int>> encryptSubjects =
-            await emailAddressService.encrypt(data, receipts.value);
-
-        builder.addBinary(data, MediaType.guessFromFileName(filename));
-      }
-    }
   }
 
   ///加附件信息
@@ -286,6 +232,8 @@ class _NewMailWidgetState extends State<NewMailWidget> {
       sender = MailAddress(current.name, email);
       from.add(sender);
     }
+    builder.from = from;
+    builder.sender = sender;
 
     List<MailAddress> to = [];
     List<String> peerIds = receipts.value;
@@ -301,23 +249,55 @@ class _NewMailWidgetState extends State<NewMailWidget> {
         }
       }
     }
-    _buildMailSubject(
-        from: from, sender: sender, to: to, subject: subjectController.text);
+    builder.to = to;
 
-    await _addAttachments();
+    PlatformEncryptData? encryptedSubject = await emailAddressService.encrypt(
+        CryptoUtil.stringToUtf8(subjectController.text), receipts.value);
+    if (encryptedSubject == null) {
+      return null;
+    }
+    builder.subject = CryptoUtil.encodeBase64(encryptedSubject.data);
+
+    List<int>? secretKey = encryptedSubject.secretKey;
+
+    String? html = await platformEditorController.html;
+    if (html != null) {
+      PlatformEncryptData? encryptedHtml = await emailAddressService
+          .encrypt(CryptoUtil.stringToUtf8(html), [], secretKey: secretKey);
+      if (encryptedHtml != null) {
+        builder.addTextHtml(CryptoUtil.encodeBase64(encryptedHtml.data));
+      }
+    }
+
+    for (PlatformAttachmentInfo attachmentInfo in attachmentInfos.value) {
+      String filename = attachmentInfo.name;
+      File file = File(filename);
+      bool exists = await file.exists();
+      if (exists) {
+        Uint8List bytes = file.readAsBytesSync();
+
+        PlatformEncryptData? encryptedAttachment =
+            await emailAddressService.encrypt(bytes, [], secretKey: secretKey);
+        if (encryptedAttachment != null) {
+          builder.addBinary(Uint8List.fromList(encryptedAttachment.data),
+              MediaType.guessFromFileName(filename));
+        }
+      }
+    }
+
+    Map<String, String>? payloadKeys = encryptedSubject.payloadKeys;
+    if (payloadKeys != null) {
+      builder.addHeader('payloadKeys', JsonUtil.toJsonString(payloadKeys));
+    }
 
     return email;
   }
 
   _draft() async {
     String? email = await _preSend();
-    String? content = await platformEditorController.content;
-    if (content != null) {
-      _addText(content);
-    }
-
-    MimeMessage mimeMessage = builder.buildMimeMessage();
     if (email != null) {
+      MimeMessage mimeMessage = builder.buildMimeMessage();
+
       EmailClient? emailClient = emailClientPool.get(email);
       if (emailClient != null) {
         Mailbox? drafts = emailClient.getMailbox(MailboxFlag.drafts);
@@ -330,13 +310,9 @@ class _NewMailWidgetState extends State<NewMailWidget> {
   ///发送邮件，首先将邮件的编辑部分转换成html格式，对邮件的各个组成部分加密，目标为多人时采用群加密方式，然后发送
   _send() async {
     String? email = await _preSend();
-    String? html = await platformEditorController.html;
-    if (html != null) {
-      _addTextHtml(html);
-    }
-
-    MimeMessage mimeMessage = builder.buildMimeMessage();
     if (email != null) {
+      MimeMessage mimeMessage = builder.buildMimeMessage();
+
       EmailClient? emailClient = emailClientPool.get(email);
       if (emailClient != null) {
         emailClient.sendMessage(mimeMessage);

@@ -127,8 +127,7 @@ class FileUtil {
     File file = File(filename);
     bool exists = await file.exists();
     if (exists) {
-      Uint8List bytes;
-      bytes = await file.readAsBytes();
+      Uint8List bytes = file.readAsBytesSync();
 
       return bytes;
     }

@@ -418,6 +418,21 @@ final LinkmanCryptographySecurityContextService
     linkmanCryptographySecurityContextService =
     LinkmanCryptographySecurityContextService();
 
+///加密的结果，包含共同的加密过的对称密钥的映射，和加密数据组成
+///如果对称密钥为空，表示不是群加密，而是个人加密方式
+class PlatformEncryptData {
+  ///加密后的密钥
+  Map<String, String>? payloadKeys;
+
+  ///未加密的密钥
+  List<int>? secretKey;
+
+  ///加密后的数据
+  List<int> data;
+
+  PlatformEncryptData(this.data, {this.secretKey, this.payloadKeys});
+}
+
 ///群加密方式，加密随机生成的密钥，用共同的密钥加密内容，然后再加密密钥
 ///加密密钥放在数据的后面
 ///secretKey存放明文的密钥，直接用于后续的加密，不能传输
@@ -465,34 +480,40 @@ class GroupCryptographySecurityContextService
   @override
   Future<List<int>?> pureEncrypt(
       SecurityContext securityContext, List<int> data) async {
-    var targetPeerId = securityContext.targetPeerId;
-    if (targetPeerId == null) {
-      logger.e("targetPeerId is null, will not be encrypted!");
-
-      return null;
-    }
-    SimplePublicKey? targetPublicKey = await findTargetPublicKey(targetPeerId);
-    if (targetPublicKey == null) {
-      logger.e("TargetPublicKey is null, will not be encrypted!");
-
-      return null;
-    }
-
     /// 安全上下文中没有加密key表示第一次加密，key随机数产生，
     /// 否则表示第n次，要采用同样的加密key做多次加密
     List<int>? secretKey = securityContext.secretKey;
     logger.i('group encrypt and secretKey:${secretKey != null}');
     if (secretKey == null) {
       secretKey = await cryptoGraphy.getRandomBytes();
-      securityContext.secretKey = secretKey;
       try {
         data = await cryptoGraphy.aesEncrypt(data, secretKey);
+        securityContext.secretKey = secretKey;
       } catch (e) {
         logger.e('aesEncrypt data failure:$e');
-
         return null;
       }
     }
+
+    var targetPeerId = securityContext.targetPeerId;
+    if (targetPeerId == null) {
+      try {
+        data = await cryptoGraphy.aesEncrypt(data, secretKey);
+        securityContext.secretKey = secretKey;
+      } catch (e) {
+        logger.e('aesEncrypt data failure:$e');
+        return null;
+      }
+
+      return data;
+    }
+    SimplePublicKey? targetPublicKey = await findTargetPublicKey(targetPeerId);
+    if (targetPublicKey == null) {
+      logger.e("TargetPublicKey is null, secretKey will not be encrypted!");
+
+      return data;
+    }
+
     try {
       // 对对称密钥进行目标公钥加密
       var encryptedKey = await cryptoGraphy.eccEncrypt(secretKey,
@@ -503,7 +524,7 @@ class GroupCryptographySecurityContextService
     } catch (e) {
       logger.e('eccEncrypt secretKey failure:$e');
 
-      return null;
+      return data;
     }
 
     return data;
@@ -556,6 +577,7 @@ class GroupCryptographySecurityContextService
     try {
       // 数据解密
       data = await cryptoGraphy.aesDecrypt(data, secretKey);
+      securityContext.secretKey = secretKey;
     } catch (e) {
       logger.e('aesDecrypt data failure:%e');
 
