@@ -117,7 +117,7 @@ class EmailAddressService extends GeneralBaseService<EmailAddress> {
     return null;
   }
 
-  Future<List<int>?> decrypt(List<int> data) async {
+  Future<List<int>?> decrypt(List<int> data,String payloadKey) async {
     ///数据的最后一位是加密方式，还有32位的加密的密钥
     int cryptOption = data[data.length - 1];
     SecurityContextService? securityContextService =
@@ -127,13 +127,9 @@ class EmailAddressService extends GeneralBaseService<EmailAddress> {
     SecurityContext securityContext = SecurityContext();
     if (cryptOption == CryptoOption.linkman.index) {
       securityContext.payload = data.sublist(0, data.length - 1);
-    }
-    if (cryptOption == CryptoOption.group.index) {
-      List<int> payloadKey = data.sublist(
-          data.length - CryptoGraphy.randomBytesLength - 1, data.length - 1);
-      securityContext.payloadKey = CryptoUtil.encodeBase64(payloadKey);
-      securityContext.payload =
-          data.sublist(0, data.length - CryptoGraphy.randomBytesLength - 1);
+    } else if (cryptOption == CryptoOption.group.index) {
+      securityContext.payload = data.sublist(0, data.length - 1);
+      securityContext.payloadKey = payloadKey;
     }
     bool result = await securityContextService.decrypt(securityContext);
     if (result) {

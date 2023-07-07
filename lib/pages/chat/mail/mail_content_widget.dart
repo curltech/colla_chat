@@ -1,9 +1,13 @@
 import 'dart:io';
 
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/emailaddress.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
@@ -78,6 +82,21 @@ class _MailContentWidgetState extends State<MailContentWidget> {
       }
       mimeMessage = mailAddressController.currentMimeMessage;
       if (mimeMessage != null) {
+        String? keys = mimeMessage.decodeHeaderValue('payloadKeys');
+        String? subject = mimeMessage.decodeSubject();
+        String? html = mimeMessage.decodeTextHtmlPart();
+        List<MimePart>? parts = mimeMessage.parts;
+        List<MimePart>? allPartsFlat = mimeMessage.allPartsFlat;
+        BodyPart? bodyPart = mimeMessage.body;
+        MimeData? mimeData = mimeMessage.mimeData;
+        if (keys != null && keys.isNotEmpty) {
+          Map<String, String> payloadKeys = JsonUtil.toJson(keys);
+          String payloadKey = payloadKeys[myself.peerId]!;
+          emailAddressService.decrypt(
+              CryptoUtil.decodeBase64(html!), payloadKey);
+          if (payloadKeys.containsKey(myself.peerId)) {}
+        }
+
         ///windows平台采用文件加载的方式，避免中文乱码
         if (platformParams.windows) {
           int? uid = mimeMessage.uid;
