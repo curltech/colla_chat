@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:typed_data';
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/emailaddress.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
@@ -6,6 +8,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/emailaddress.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/document_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
@@ -19,6 +22,20 @@ import 'package:colla_chat/widgets/richtext/platform_editor_widget.dart';
 import 'package:enough_mail/highlevel.dart';
 import 'package:flutter/material.dart';
 import 'package:mimecon/mimecon.dart';
+
+class PlatformAttachmentInfo {
+  PlatformAttachmentInfo(
+      {required this.mediaType, required this.name, required this.size});
+
+  /// The name of the attachment
+  final String name;
+
+  /// The size of the attachment in bytes
+  final int size;
+
+  /// The media type
+  final MediaType mediaType;
+}
 
 ///邮件内容子视图
 class NewMailWidget extends StatefulWidget with TileDataMixin {
@@ -44,8 +61,8 @@ class _NewMailWidgetState extends State<NewMailWidget> {
   //已经选择的收件人
   ValueNotifier<List<String>> receipts = ValueNotifier([]);
 
-  ValueNotifier<List<AttachmentInfo>> attachmentInfos =
-      ValueNotifier<List<AttachmentInfo>>([]);
+  ValueNotifier<List<PlatformAttachmentInfo>> attachmentInfos =
+      ValueNotifier<List<PlatformAttachmentInfo>>([]);
 
   TextEditingController subjectController = TextEditingController();
 
@@ -87,24 +104,31 @@ class _NewMailWidgetState extends State<NewMailWidget> {
   }
 
   ///设置邮件的地址和主题
-  void _buildMailSubject({
+  Future<void> _buildMailSubject({
     List<MailAddress>? from,
     List<MailAddress>? to,
     MailAddress? sender,
     List<MailAddress>? cc,
     List<MailAddress>? bcc,
     String? subject,
-  }) {
+  }) async {
     builder.from = from;
     builder.to = to;
     builder.sender = sender;
     builder.cc = cc;
     builder.bcc = bcc;
+
+    Map<String, List<int>> encryptSubjects = await emailAddressService.encrypt(
+        CryptoUtil.stringToUtf8(subject!), receipts.value);
+
     builder.subject = subject;
   }
 
   ///如果是正式发送html
-  PartBuilder _addTextHtml(String html) {
+  Future<PartBuilder> _addTextHtml(String html) async {
+    Map<String, List<int>> encryptSubjects = await emailAddressService.encrypt(
+        CryptoUtil.stringToUtf8(html), receipts.value);
+
     return builder.addTextHtml(html);
   }
 
@@ -118,29 +142,49 @@ class _NewMailWidgetState extends State<NewMailWidget> {
   }
 
   ///加附件
-  void _addAttachment() {
+  Future<void> _addAttachments() async {
+    if (attachmentInfos.value.isNotEmpty) {
+      for (var attachmentInfo in attachmentInfos.value) {
+        String filename = attachmentInfo.name;
+        File file = File(attachmentInfo.name);
+        Uint8List data = file.readAsBytesSync();
+
+        ///加密
+        Map<String, List<int>> encryptSubjects =
+            await emailAddressService.encrypt(data, receipts.value);
+
+        builder.addBinary(data, MediaType.guessFromFileName(filename));
+      }
+    }
+  }
+
+  ///加附件信息
+  void _addAttachmentInfo() {
     FileUtil.fullPicker(
         context: context,
         file: true,
         onSelectedFilenames: (filenames) async {
           if (filenames.isNotEmpty) {
+            List<PlatformAttachmentInfo> infos = [];
             for (var filename in filenames) {
               File file = File(filename);
-              await builder.addFile(
-                  file, MediaType.guessFromFileName(filename));
+              int size = await file.length();
+              PlatformAttachmentInfo info = PlatformAttachmentInfo(
+                  mediaType: MediaType.guessFromFileName(filename),
+                  name: filename,
+                  size: size);
+              infos.add(info);
             }
-            List<AttachmentInfo> infos = [];
-            infos.addAll(builder.attachments);
             attachmentInfos.value = infos;
           }
         });
   }
 
-  ///删除附件
-  _removeAttachment(AttachmentInfo info) {
-    builder.removeAttachment(info);
-    List<AttachmentInfo> infos = [];
-    infos.addAll(builder.attachments);
+  ///删除附件信息
+  _removeAttachment(PlatformAttachmentInfo info) {
+    List<PlatformAttachmentInfo> infos = [];
+    attachmentInfos.value.remove(info);
+    infos.addAll(attachmentInfos.value);
     attachmentInfos.value = infos;
   }
 
@@ -175,13 +219,13 @@ class _NewMailWidgetState extends State<NewMailWidget> {
         child: ValueListenableBuilder(
             valueListenable: attachmentInfos,
             builder: (BuildContext context,
-                List<AttachmentInfo> attachmentInfos, Widget? child) {
+                List<PlatformAttachmentInfo> attachmentInfos, Widget? child) {
               List<Widget> chips = [];
               for (var attachmentInfo in attachmentInfos) {
-                String? name = attachmentInfo.name;
+                String name = attachmentInfo.name;
                 int? size = attachmentInfo.size;
                 MediaType mediaType = attachmentInfo.mediaType;
-                String? mimeType = FileUtil.mimeType(name!);
+                String? mimeType = FileUtil.mimeType(name);
                 Widget icon = Mimecon(
                   mimetype: mimeType!,
                   color: myself.primary,
@@ -260,6 +304,8 @@ class _NewMailWidgetState extends State<NewMailWidget> {
     _buildMailSubject(
         from: from, sender: sender, to: to, subject: subjectController.text);
 
+    await _addAttachments();
+
     return email;
   }
 
@@ -305,7 +351,7 @@ class _NewMailWidgetState extends State<NewMailWidget> {
           message: AppLocalizations.t('Attachment'),
           child: IconButton(
               onPressed: () {
-                _addAttachment();
+                _addAttachmentInfo();
               },
               icon: const Icon(Icons.attach_file))),
       Tooltip(

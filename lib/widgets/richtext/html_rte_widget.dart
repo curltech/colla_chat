@@ -12,14 +12,12 @@ import 'package:flutter_rte/flutter_rte.dart';
 class HtmlRteWidget extends StatefulWidget {
   final double? height;
   final String? initialText;
-  final ChatMessageMimeType mimeType;
   final Function(HtmlEditorController controller)? onCreateController;
 
   const HtmlRteWidget({
     Key? key,
     this.height,
     this.initialText,
-    this.mimeType = ChatMessageMimeType.html,
     this.onCreateController,
   }) : super(key: key);
 
@@ -42,10 +40,8 @@ class _HtmlRteWidgetState extends State<HtmlRteWidget> {
         border: Border.all(color: Colors.white, width: 2));
     if (widget.initialText != null) {
       var html = widget.initialText!;
-      if (widget.mimeType == ChatMessageMimeType.json) {
-        var deltaJson = JsonUtil.toJson(html);
-        html = DocumentUtil.jsonToHtml(deltaJson);
-      }
+      var deltaJson = JsonUtil.toJson(html);
+      html = DocumentUtil.jsonToHtml(deltaJson);
       controller.setInitialText(html);
     }
     _buildToolbarOptions();

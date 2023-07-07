@@ -1,5 +1,4 @@
 import 'package:colla_chat/entity/chat/chat_message.dart';
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
@@ -11,14 +10,12 @@ import 'package:flutter/material.dart';
 class EnoughHtmlEditorWidget extends StatefulWidget {
   final double? height;
   final String? initialText;
-  final ChatMessageMimeType mimeType;
   final Function(HtmlEditorApi controller)? onCreateController;
 
   const EnoughHtmlEditorWidget({
     Key? key,
     this.height,
     this.initialText,
-    this.mimeType = ChatMessageMimeType.html,
     this.onCreateController,
   }) : super(key: key);
 

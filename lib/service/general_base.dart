@@ -5,7 +5,6 @@ import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
-import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
@@ -224,8 +223,6 @@ abstract class GeneralBaseService<T> {
                 .encrypt(securityContext);
             if (result) {
               List<int> data = securityContext.payload;
-              // List<int> data = CryptoUtil.concat(
-              //     securityContext.payload, [CryptoOption.linkman.index]);
               json[encryptField] = CryptoUtil.encodeBase64(data);
               json['payloadHash'] = securityContext.payloadHash;
               json['needCompress'] = securityContext.needCompress;
@@ -258,7 +255,6 @@ abstract class GeneralBaseService<T> {
           try {
             List<int> data = CryptoUtil.decodeBase64(value!);
             securityContext.payload = data;
-            // securityContext.payload = data.sublist(0, data.length - 1);
             var result = await linkmanCryptographySecurityContextService
                 .decrypt(securityContext);
             if (result) {

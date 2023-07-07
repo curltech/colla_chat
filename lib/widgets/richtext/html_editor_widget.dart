@@ -1,5 +1,4 @@
 import 'package:colla_chat/entity/chat/chat_message.dart';
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:file_picker/file_picker.dart';
@@ -12,7 +11,6 @@ import 'package:html_editor_enhanced/html_editor.dart';
 class HtmlEditorWidget extends StatefulWidget {
   final double? height;
   final String? initialText;
-  final ChatMessageMimeType mimeType;
   final bool withMultiMedia;
   final Function(HtmlEditorController controller)? onCreateController;
 
@@ -21,7 +19,6 @@ class HtmlEditorWidget extends StatefulWidget {
     this.height,
     this.initialText,
     this.onCreateController,
-    this.mimeType = ChatMessageMimeType.html,
     this.withMultiMedia = false,
   }) : super(key: key);
 
@@ -38,9 +35,7 @@ class _HtmlEditorWidgetState extends State<HtmlEditorWidget> {
 
     ///初始化数据的是json和html格式则可以编辑
     if (widget.initialText != null) {
-      if (widget.mimeType == ChatMessageMimeType.html) {
-        controller.setText(widget.initialText!);
-      }
+      controller.setText(widget.initialText!);
     }
     if (widget.onCreateController != null) {
       widget.onCreateController!(controller);

@@ -23,7 +23,6 @@ import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 class QuillEditorWidget extends StatefulWidget {
   final double? height;
   final String? initialText;
-  final ChatMessageMimeType mimeType;
   final bool withMultiMedia;
   final bool base64;
   final Function(QuillController controller)? onCreateController;
@@ -33,7 +32,6 @@ class QuillEditorWidget extends StatefulWidget {
     this.height,
     this.initialText,
     this.onCreateController,
-    this.mimeType = ChatMessageMimeType.json,
     this.withMultiMedia = true,
     this.base64 = true,
   }) : super(key: key);
@@ -54,9 +52,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     ///初始化数据的是json格式则可以编辑
     if (widget.initialText != null) {
       try {
-        if (widget.mimeType == ChatMessageMimeType.json) {
-          doc = Document.fromJson(JsonUtil.toJson(widget.initialText!));
-        }
+        doc = Document.fromJson(JsonUtil.toJson(widget.initialText!));
       } catch (e) {
         doc = Document();
       }
