@@ -119,5 +119,11 @@
     <array>
         <string>0000</string>
     </array>
+    <key>NSBonjourServices</key>
+    <array>
+        <string>_{YOUR_SERVICE_TYPE}._tcp</string>
+    </array>
+    <key>UIRequiresPersistentWiFi</key>
+    <true/>
 </dict>
 </plist>
