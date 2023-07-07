@@ -101,6 +101,7 @@ class CustomAutoSizeTextFormField extends AutoSizeTextFormField {
     SmartQuotesType? smartQuotesType,
     bool enableSuggestions = true,
     int? maxLines,
+    int? minLines,
     bool expands = false,
     bool readOnly = false,
     EditableTextContextMenuBuilder? contextMenuBuilder,
@@ -130,7 +131,6 @@ class CustomAutoSizeTextFormField extends AutoSizeTextFormField {
         buildCounter,
     ScrollPhysics? scrollPhysics,
     ScrollController? scrollController,
-    int minLines = 1,
     double? minWidth,
     String obscuringCharacter = '*',
     void Function(String?)? onSaved,
@@ -217,6 +217,8 @@ class CommonAutoSizeTextFormField extends StatelessWidget {
   final bool readOnly;
   final Color? fillColor;
   final Color? focusColor;
+  final bool autofocus;
+  final bool enableInteractiveSelection;
   final Color? hoverColor;
   final String? labelText;
   final Widget? prefixIcon;
@@ -240,6 +242,8 @@ class CommonAutoSizeTextFormField extends StatelessWidget {
     this.minLines,
     this.fillColor,
     this.focusColor,
+    this.autofocus = false,
+    this.enableInteractiveSelection = true,
     this.hoverColor,
     this.labelText,
     this.prefixIcon,
@@ -265,12 +269,14 @@ class CommonAutoSizeTextFormField extends StatelessWidget {
       controller: controller,
       keyboardType: keyboardType,
       maxLines: maxLines,
-      minLines: 1,
+      minLines: minLines,
       readOnly: readOnly,
       focusNode: focusNode,
+      autofocus: autofocus,
       obscureText: obscureText,
       initialValue: initialValue,
       validator: validator,
+      enableInteractiveSelection: enableInteractiveSelection,
       decoration: InputDecoration(
           fillColor: fillColor ?? Colors.grey.withOpacity(AppOpacity.xlOpacity),
           focusColor:

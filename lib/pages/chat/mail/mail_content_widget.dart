@@ -91,13 +91,11 @@ class _MailContentWidgetState extends State<MailContentWidget> {
             file.writeAsStringSync(html!, flush: true);
             html = null;
           }
-        } else if (platformParams.macos) {
-          ///macos平台，可以直接使用html字符串
+        } else {
+          ///非windos平台，可以直接使用html字符串
           html = EmailMessageUtil.convertToHtml(mimeMessage);
           filename = null;
         }
-
-        ///其他平台，移动平台，不使用文件或者html字符串，而采用邮件的显示组建
       }
     } else {
       html = null;
@@ -125,13 +123,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
 
             ///移动平台使用邮件的显示组建
             if (platformParams.mobile) {
-              ///在ios下会引发启动崩溃
-              MimeMessageViewer mimeMessageViewer = MimeMessageViewer(
-                mimeMessage: mimeMessage,
-                blockExternalImages: false,
-                mailtoDelegate: handleMailto,
-              );
-              return mimeMessageViewer;
+              return PlatformWebView(html: html);
             } else if (platformParams.macos) {
               ///macos使用html字符串
               return PlatformWebView(html: html);

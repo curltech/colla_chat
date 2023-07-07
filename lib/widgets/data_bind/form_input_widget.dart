@@ -264,15 +264,16 @@ class _FormInputWidgetState extends State<FormInputWidget> {
     ButtonStyle style = StyleUtil.buildButtonStyle();
     ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);
-    List<Widget> btns = [];
-    if (widget.formButtonDefs == null) {
-      btns.add(TextButton(
+    List<Widget> btns = [
+      TextButton(
         style: style,
         child: CommonAutoSizeText(AppLocalizations.t('Reset')),
         onPressed: () {
           widget.controller.clear();
         },
-      ));
+      )
+    ];
+    if (widget.formButtonDefs == null) {
       btns.add(TextButton(
         style: mainStyle,
         child: CommonAutoSizeText(AppLocalizations.t(widget.okLabel!)),

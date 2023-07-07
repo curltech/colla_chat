@@ -4,6 +4,7 @@ import 'package:colla_chat/pages/chat/linkman/group/linkman_group_add_widget.dar
 import 'package:colla_chat/pages/chat/linkman/group/nearby_group_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/chat_gpt_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/contact_linkman_add_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman/json_linkman_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/p2p_linkman_add_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -17,6 +18,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
   final P2pLinkmanAddWidget p2pLinkmanAddWidget = P2pLinkmanAddWidget();
   final ContactLinkmanAddWidget contactLinkmanAddWidget =
       ContactLinkmanAddWidget();
+  final JsonLinkmanAddWidget jsonLinkmanAddWidget = JsonLinkmanAddWidget();
 
   // final NearbyLinkmanAddWidget nearbyLinkmanAddWidget =
   //     NearbyLinkmanAddWidget();
@@ -30,6 +32,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
   LinkmanAddWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(p2pLinkmanAddWidget);
     indexWidgetProvider.define(contactLinkmanAddWidget);
+    indexWidgetProvider.define(jsonLinkmanAddWidget);
     //indexWidgetProvider.define(nearbyLinkmanAddWidget);
     indexWidgetProvider.define(chatGPTAddWidget);
     indexWidgetProvider.define(linkmanGroupAddWidget);
@@ -39,6 +42,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
     List<TileDataMixin> mixins = [
       p2pLinkmanAddWidget,
       contactLinkmanAddWidget,
+      jsonLinkmanAddWidget,
       //nearbyLinkmanAddWidget,
       chatGPTAddWidget,
       linkmanGroupAddWidget,

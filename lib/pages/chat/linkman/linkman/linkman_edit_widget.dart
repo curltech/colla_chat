@@ -1,15 +1,20 @@
 import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/service/dht/peerclient.dart';
+import 'package:colla_chat/tool/clipboard_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 final List<ColumnFieldDef> linkmanColumnFieldDefs = [
   ColumnFieldDef(
@@ -88,14 +93,29 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
   Widget _buildFormInputWidget(BuildContext context) {
     Map<String, dynamic>? initValues =
         linkmanController.getInitValue(linkmanColumnFieldDefs);
+    List<FormButtonDef> formButtonDefs = [
+      FormButtonDef(
+          label: 'Ok',
+          onTap: (Map<String, dynamic> values) {
+            _onOk(values);
+          }),
+      FormButtonDef(
+          label: 'Share',
+          onTap: (Map<String, dynamic> values) {
+            _onShare(values);
+          }),
+      FormButtonDef(
+          label: 'Copy',
+          onTap: (Map<String, dynamic> values) {
+            _onCopy(values);
+          }),
+    ];
 
     var formInputWidget = Container(
         padding: const EdgeInsets.all(10.0),
         child: FormInputWidget(
           height: 430,
-          onOk: (Map<String, dynamic> values) {
-            _onOk(values);
-          },
+          formButtonDefs: formButtonDefs,
           columnFieldDefs: linkmanColumnFieldDefs,
           initValues: initValues,
         ));
@@ -115,6 +135,31 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
       DialogUtil.info(context,
           content: AppLocalizations.t('Linkman has stored completely'));
     }
+  }
+
+  _onShare(Map<String, dynamic> values) async {
+    final box = context.findRenderObject() as RenderBox?;
+    String peerId = values['peerId'];
+    PeerClient? peerClient =
+        await peerClientService.findCachedOneByPeerId(peerId);
+    if (peerClient == null) {
+      return;
+    }
+    Share.share(
+      JsonUtil.toJsonString(peerClient),
+      subject: peerClient.name,
+      sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+    );
+  }
+
+  _onCopy(Map<String, dynamic> values) async {
+    String peerId = values['peerId'];
+    PeerClient? peerClient =
+        await peerClientService.findCachedOneByPeerId(peerId);
+    if (peerClient == null) {
+      return;
+    }
+    await ClipboardUtil.copy(JsonUtil.toJsonString(peerClient));
   }
 
   _changeLinkmanStatus(LinkmanStatus status) async {
