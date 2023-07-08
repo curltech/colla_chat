@@ -58,7 +58,7 @@ dependencies:
   nearby_connections: ^3.3.0 #android
   nfc_manager: ^3.3.0 #mobile
   flutter_nfc_kit: ^3.3.1 #mobile
-  flutter_blue_plus: ^1.5.2 #ANDROID，IOS，MACOS
+  #  flutter_blue_plus: ^1.5.2 #ANDROID，IOS，MACOS
   mimecon: ^0.0.2
   wakelock: ^0.6.2 #让系统不会睡眠
 
@@ -324,15 +324,8 @@ dependencies:
   #youtube_player_flutter_quill: ^8.2.2
   flutter_rte: ^1.0.0
   appflowy_editor: ^1.0.3
+  flutter_platform_widgets: ^3.3.5
   universal_html: ^2.0.8
-  enough_mail: ^2.1.0
-  enough_media: ^2.2.0
-  #  enough_mail_html: #^2.0.0
-  #    git: https://github.com/Enough-Software/enough_mail_html.git
-  enough_html_editor: #^0.0.5
-    git: https://github.com/Enough-Software/enough_html_editor.git
-  enough_mail_flutter: #^2.0.0 #ios崩溃
-    git: https://github.com/Enough-Software/enough_mail_flutter.git
   backdrop: ^0.9.0 #Use BackdropScaffold instead of the standard Scaffold in your app
   material_floating_search_bar: ^0.3.7
   google_maps_flutter: ^2.2.1
@@ -424,6 +417,18 @@ dependency_overrides:
   flutter_map: ^5.0.0
   win32: ^4.1.4
   markdown: ^6.0.1
+  enough_mail:
+    git: https://github.com/Enough-Software/enough_mail.git
+  enough_media: #^2.2.0
+    git: https://github.com/enough-software/enough_media
+  enough_mail_html: #^2.0.0
+    git: https://github.com/Enough-Software/enough_mail_html.git
+  enough_html_editor: #^0.0.5
+    git: https://github.com/Enough-Software/enough_html_editor.git
+  enough_platform_widgets: #^0.7.2
+    git: https://github.com/Enough-Software/enough_platform_widgets
+  enough_mail_flutter: #^2.0.0 #ios崩溃
+    git: https://github.com/Enough-Software/enough_mail_flutter.git
 dev_dependencies:
   flutter_test:
     sdk: flutter

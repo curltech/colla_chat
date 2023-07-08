@@ -62,20 +62,18 @@ class EmailAddressService extends GeneralBaseService<EmailAddress> {
     securityContext.payload = data;
     if (cryptoOption == CryptoOption.linkman) {
       String receiverPeerId = peerIds[0];
-      if (receiverPeerId != myself.peerId) {
-        Linkman? linkman =
-            await linkmanService.findCachedOneByPeerId(receiverPeerId);
-        if (linkman != null) {
-          securityContext.targetPeerId = receiverPeerId;
-          securityContext.targetClientId = linkman.clientId;
-        }
-        bool result = await securityContextService.encrypt(securityContext);
-        if (result) {
-          data = CryptoUtil.concat(
-              securityContext.payload, [CryptoOption.linkman.index]);
+      Linkman? linkman =
+          await linkmanService.findCachedOneByPeerId(receiverPeerId);
+      if (linkman != null) {
+        securityContext.targetPeerId = receiverPeerId;
+        securityContext.targetClientId = linkman.clientId;
+      }
+      bool result = await securityContextService.encrypt(securityContext);
+      if (result) {
+        data = CryptoUtil.concat(
+            securityContext.payload, [CryptoOption.linkman.index]);
 
-          return PlatformEncryptData(data);
-        }
+        return PlatformEncryptData(data);
       }
     } else if (cryptoOption == CryptoOption.group) {
       securityContext.secretKey = secretKey;
@@ -117,7 +115,7 @@ class EmailAddressService extends GeneralBaseService<EmailAddress> {
     return null;
   }
 
-  Future<List<int>?> decrypt(List<int> data,String payloadKey) async {
+  Future<List<int>?> decrypt(List<int> data, String payloadKey) async {
     ///数据的最后一位是加密方式，还有32位的加密的密钥
     int cryptOption = data[data.length - 1];
     SecurityContextService? securityContextService =

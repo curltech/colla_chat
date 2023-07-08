@@ -111,6 +111,17 @@ class EmailMessageUtil {
     return message;
   }
 
+  ///把外部的html字符串转换成邮件生成的html
+  String convertToMimeMessageHtml(String html) {
+    MessageBuilder builder =
+        MessageBuilder.prepareMultipartAlternativeMessage();
+    builder.addTextHtml(html);
+    MimeMessage mimeMessage = builder.buildMimeMessage();
+    html = convertToHtml(mimeMessage);
+
+    return html;
+  }
+
   ///转换邮件地址实体信息到邮件地址配置
   static enough_mail.ClientConfig? buildDiscoverConfig(
       entity.EmailAddress mailAddress) {
@@ -124,8 +135,8 @@ class EmailMessageUtil {
     if (imapServerConfigStr != null) {
       Map<String, dynamic> imapServerConfigMap =
           JsonUtil.toJson(imapServerConfigStr) as Map<String, dynamic>;
-      ServerConfig imapServerConfig = ServerConfig();
-      imapServerConfig.read(imapServerConfigMap);
+      ServerConfig imapServerConfig =
+          ServerConfig.fromJson(imapServerConfigMap);
       provider.addIncomingServer(imapServerConfig);
       incoming = true;
     }
@@ -133,8 +144,7 @@ class EmailMessageUtil {
     if (popServerConfigStr != null) {
       Map<String, dynamic> popServerConfigMap =
           JsonUtil.toJson(popServerConfigStr) as Map<String, dynamic>;
-      ServerConfig popServerConfig = ServerConfig();
-      popServerConfig.read(popServerConfigMap);
+      ServerConfig popServerConfig = ServerConfig.fromJson(popServerConfigMap);
       provider.addIncomingServer(popServerConfig);
       incoming = true;
     }
@@ -142,10 +152,9 @@ class EmailMessageUtil {
     if (smtpServerConfigStr != null) {
       Map<String, dynamic> smtpServerConfigMap =
           JsonUtil.toJson(smtpServerConfigStr) as Map<String, dynamic>;
-      ServerConfig smtpServerConfig = ServerConfig();
-      smtpServerConfig.read(smtpServerConfigMap);
-      ConfigEmailProvider provider = ConfigEmailProvider();
-      provider.addIncomingServer(smtpServerConfig);
+      ServerConfig smtpServerConfig =
+          ServerConfig.fromJson(smtpServerConfigMap);
+      provider.addOutgoingServer(smtpServerConfig);
       outcoming = true;
     }
     if (incoming && outcoming) {
@@ -177,8 +186,7 @@ class EmailMessageUtil {
           mailAddress.imapServerPort = port;
         }
         mailAddress.imapServerHost = imapServerConfig.hostname;
-        Map<String, dynamic> attributes = {};
-        imapServerConfig.write(attributes);
+        Map<String, dynamic> attributes = imapServerConfig.toJson();
         mailAddress.imapServerConfig = JsonUtil.toJsonString(attributes);
       }
       ServerConfig? popServerConfig = provider.preferredIncomingPopServer;
@@ -189,8 +197,7 @@ class EmailMessageUtil {
           mailAddress.popServerPort = port;
         }
         mailAddress.popServerHost = popServerConfig.hostname;
-        Map<String, dynamic> attributes = {};
-        popServerConfig.write(attributes);
+        Map<String, dynamic> attributes = popServerConfig.toJson();
         mailAddress.popServerConfig = JsonUtil.toJsonString(attributes);
       }
       ServerConfig? smtpServerConfig = provider.preferredOutgoingSmtpServer;
@@ -201,8 +208,7 @@ class EmailMessageUtil {
           mailAddress.smtpServerPort = port;
         }
         mailAddress.smtpServerHost = smtpServerConfig.hostname;
-        Map<String, dynamic> attributes = {};
-        smtpServerConfig.write(attributes);
+        Map<String, dynamic> attributes = smtpServerConfig.toJson();
         mailAddress.smtpServerConfig = JsonUtil.toJsonString(attributes);
       }
       break;
@@ -225,8 +231,12 @@ class EmailMessageUtil {
       required String password,
       required enough_mail.ClientConfig config}) {
     final account = enough_mail.MailAccount.fromDiscoveredSettings(
-        name, email, password, config,
-        outgoingClientDomain: '');
+        name: name,
+        email: email,
+        password: password,
+        config: config,
+        outgoingClientDomain: 'curltech.io',
+        userName: email);
 
     final mailClient =
         enough_mail.MailClient(account, isLogEnabled: true, clientId: clientId);
@@ -680,13 +690,17 @@ class EmailClient {
   }) async {
     final enough_mail.MailClient? mailClient = this.mailClient;
     if (mailClient != null) {
-      await mailClient.sendMessage(mimeMessage,
-          from: from,
-          appendToSent: appendToSent,
-          sentMailbox: sentMailbox,
-          use8BitEncoding: use8BitEncoding,
-          recipients: recipients);
-      return true;
+      try {
+        await mailClient.sendMessage(mimeMessage,
+            from: from,
+            appendToSent: appendToSent,
+            sentMailbox: sentMailbox,
+            use8BitEncoding: use8BitEncoding,
+            recipients: recipients);
+        return true;
+      } catch (e) {
+        logger.e('send message failure:$e');
+      }
     }
     return false;
   }
@@ -813,9 +827,8 @@ class EmailClient {
   }
 
   /// smtp协议连接Connect
-  Future<bool> smtpConnect() async {
-    var client =
-        enough_mail.SmtpClient(mailAddress.domain!, isLogEnabled: true);
+  Future<bool> _smtpConnect() async {
+    var client = enough_mail.SmtpClient('curltech.io', isLogEnabled: true);
     try {
       if (mailAddress.smtpServerHost != null) {
         var connectionInfo = await client.connectToServer(
@@ -823,6 +836,7 @@ class EmailClient {
             isSecure: mailAddress.smtpServerSecure);
         SmtpResponse smtpResponse = await client.ehlo();
         if (!smtpResponse.isOkStatus) {
+          logger.e('smtpConnect failure: ${smtpResponse.errorMessage}');
           return false;
         }
         if (client.serverInfo.supportsAuth(enough_mail.AuthMechanism.plain)) {
@@ -831,9 +845,10 @@ class EmailClient {
               mailAddress.password!,
               enough_mail.AuthMechanism.plain);
           if (!smtpResponse.isOkStatus) {
+            logger.e('smtpConnect failure: ${smtpResponse.errorMessage}');
             return false;
           }
-          logger.i('smtpConnect successfully: $connectionInfo');
+          logger.i('smtpConnect successfully: ${smtpResponse.message}');
           smtpClient = client;
           return true;
         }
@@ -842,12 +857,14 @@ class EmailClient {
         SmtpResponse smtpResponse = await client.authenticate(mailAddress.email,
             mailAddress.password!, enough_mail.AuthMechanism.login);
         if (!smtpResponse.isOkStatus) {
+          logger.e('smtpConnect failure: ${smtpResponse.errorMessage}');
           return false;
         }
         smtpClient = client;
         logger.i('smtpConnect successfully: $smtpResponse');
         return true;
       } else {
+        logger.e('smtpConnect failure: error authMechanism');
         return false;
       }
     } on enough_mail.SmtpException catch (e) {
@@ -856,12 +873,36 @@ class EmailClient {
     return false;
   }
 
-  Future<bool> smtpSend(MimeMessage mimeMessage) async {
+  Future<bool> smtpSend(
+    MimeMessage mimeMessage, {
+    bool use8BitEncoding = false,
+    MailAddress? from,
+    List<MailAddress>? recipients,
+  }) async {
     var smtpClient = this.smtpClient;
-    if (smtpClient != null) {
-      final sendResponse = await smtpClient.sendMessage(mimeMessage);
-      logger.i('smtpSend message: ${sendResponse.isOkStatus}');
-      return sendResponse.isOkStatus;
+    if (smtpClient == null || !smtpClient.isConnected) {
+      bool success = await _smtpConnect();
+      smtpClient = this.smtpClient;
+      if (!success) {
+        return false;
+      }
+    }
+    if (smtpClient != null && smtpClient.isConnected) {
+      try {
+        final sendResponse = await smtpClient.sendMessage(mimeMessage,
+            use8BitEncoding: use8BitEncoding,
+            from: from,
+            recipients: recipients);
+        logger.i('smtpSend message: ${sendResponse.isOkStatus}');
+        smtpClient.disconnect();
+        this.smtpClient = null;
+
+        return sendResponse.isOkStatus;
+      } catch (e) {
+        logger.i('smtpSend message failure: $e');
+        smtpClient.disconnect();
+        this.smtpClient = null;
+      }
     }
     return false;
   }

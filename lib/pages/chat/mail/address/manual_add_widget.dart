@@ -190,7 +190,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
         hostname: imapServerHost,
         port: int.parse(imapServerPort!),
         socketType: SocketType.ssl,
-        authentication: Authentication.passwordClearText,
+        authentication: Authentication.plain,
         usernameType: UsernameType.emailAddress,
       )
     ];
@@ -203,7 +203,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
         hostname: popServerHost,
         port: int.parse(popServerPort!),
         socketType: SocketType.ssl,
-        authentication: Authentication.passwordClearText,
+        authentication: Authentication.plain,
         usernameType: UsernameType.emailAddress,
       ));
     }
@@ -213,7 +213,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
         hostname: smtpServerHost,
         port: int.parse(smtpServerPort!),
         socketType: SocketType.ssl,
-        authentication: Authentication.passwordClearText,
+        authentication: Authentication.plain,
         usernameType: UsernameType.emailAddress,
       )
     ];

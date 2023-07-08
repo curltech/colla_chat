@@ -138,11 +138,11 @@ abstract class CryptographySecurityContextService
   Future<SimplePublicKey?> findTargetPublicKey(String targetPeerId) async {
     var peerId = myself.peerId;
     SimplePublicKey? targetPublicKey;
-    if (peerId != null && targetPeerId != peerId) {
-      targetPublicKey = await linkmanService.getCachedPublicKey(targetPeerId);
-    } else {
+    if (targetPeerId == peerId) {
       // 本地保存前加密
       targetPublicKey = myself.publicKey;
+    } else {
+      targetPublicKey = await linkmanService.getCachedPublicKey(targetPeerId);
     }
     if (targetPublicKey == null) {
       logger.e("TargetPublicKey is null, will not be encrypted!");
