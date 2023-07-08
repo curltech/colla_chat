@@ -444,13 +444,17 @@ class GroupCryptographySecurityContextService
   Future<bool> encrypt(SecurityContext securityContext) async {
     List<int>? secretKey = securityContext.secretKey;
 
-    ///如果存在加密密钥，说明只对加密密钥进行加密处理，不处理内容
+    ///如果存在加密密钥，
+    ///如果有目标peerId，说明只对加密密钥进行加密处理，不处理内容
+    ///如果没有目标peerId，说明处理内容的对称加密
     if (secretKey != null) {
       var targetPeerId = securityContext.targetPeerId;
       if (targetPeerId == null) {
-        logger.e("targetPeerId is null, will not be encrypted!");
+        securityContext.payload =
+            await cryptoGraphy.aesEncrypt(securityContext.payload, secretKey);
+        logger.i("targetPeerId is null, will only aes encrypt payload");
 
-        return false;
+        return true;
       }
       SimplePublicKey? targetPublicKey =
           await findTargetPublicKey(targetPeerId);
@@ -533,17 +537,16 @@ class GroupCryptographySecurityContextService
   @override
   Future<List<int>?> pureDecrypt(
       SecurityContext securityContext, List<int> data) async {
-    var privateKey = myself.privateKey;
-    if (privateKey == null) {
-      logger.e('Null myself privateKey');
-
-      return null;
-    }
-
     // 1.对对称密钥进行私钥解密
     // 如果存在加密密钥，对密钥进行ecc解密
     List<int>? secretKey = securityContext.secretKey;
     if (secretKey == null) {
+      var privateKey = myself.privateKey;
+      if (privateKey == null) {
+        logger.e('Null myself privateKey');
+
+        return null;
+      }
       String? payloadKeyStr = securityContext.payloadKey;
       if (payloadKeyStr == null) {
         logger.e('Null payloadKey');
@@ -551,6 +554,7 @@ class GroupCryptographySecurityContextService
         return null;
       }
       List<int> payloadKey = CryptoUtil.decodeBase64(payloadKeyStr);
+
       try {
         secretKey =
             await cryptoGraphy.eccDecrypt(payloadKey, localKeyPair: privateKey);

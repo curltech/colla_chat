@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/emailaddress.dart';
@@ -338,6 +339,7 @@ class _NewMailWidgetState extends State<NewMailWidget> {
       EmailClient? emailClient = emailClientPool.get(email);
       if (emailClient != null) {
         bool success = false;
+
         ///目前采用smtp直接发送，email客户端目前有小bug，能发送，但是会报异常
         success = await emailClient.smtpSend(mimeMessage, from: builder.sender);
         // success =

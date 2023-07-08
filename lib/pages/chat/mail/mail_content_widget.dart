@@ -129,8 +129,8 @@ class _MailContentWidgetState extends State<MailContentWidget> {
         if (keys != null && keys.isNotEmpty) {
           Map<String, String> payloadKeys = JsonUtil.toJson(keys);
           String payloadKey = payloadKeys[myself.peerId]!;
-          emailAddressService.decrypt(
-              CryptoUtil.decodeBase64(html!), payloadKey);
+          emailAddressService.decrypt(CryptoUtil.decodeBase64(html!),
+              payloadKey: payloadKey);
           if (payloadKeys.containsKey(myself.peerId)) {}
         }
 
