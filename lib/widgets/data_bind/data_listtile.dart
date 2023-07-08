@@ -203,7 +203,8 @@ class DataListTile extends StatelessWidget {
       minVerticalPadding: minVerticalPadding,
       minLeadingWidth: minLeadingWidth,
       selected: selected,
-      selectedColor: myself.primary,
+      // selectedColor: myself.primary,
+      selectedTileColor: myself.primary,
       leading: leading,
       title: titleWidget,
       subtitle: tileData.subtitle != null
@@ -255,7 +256,7 @@ class DataListTile extends StatelessWidget {
         foregroundColor: myself.primary,
         icon: slideAction.prefix,
         label: AppLocalizations.t(slideAction.title),
-        borderRadius : BorderRadius.circular(0),
+        borderRadius: BorderRadius.circular(0),
       );
       slidableActions.add(slidableAction);
     }
