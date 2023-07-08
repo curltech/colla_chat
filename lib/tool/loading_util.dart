@@ -6,6 +6,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 
 class LoadingUtil {
@@ -18,6 +19,17 @@ class LoadingUtil {
           child: LoadingIndicator(
             indicatorType: Indicator.ballRotateChase,
           )),
+      const SizedBox(
+        height: 10,
+      ),
+      CommonAutoSizeText(AppLocalizations.t("Loading, please waiting..."))
+    ]));
+  }
+
+  static Widget buildLoadingAnimation() {
+    return Center(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+      LoadingAnimationWidget.discreteCircle(color: myself.primary, size: 200),
       const SizedBox(
         height: 10,
       ),

@@ -182,6 +182,7 @@ dependencies:
   animate_do: ^3.0.2
   animated_text_kit: ^4.2.1
   loading_indicator: ^3.1.1
+  loading_animation_widget: ^1.2.0+4
 
   #安全加密
   cryptography: ^2.0.5 #ecc,aes
