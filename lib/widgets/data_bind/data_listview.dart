@@ -1,4 +1,5 @@
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -51,6 +52,7 @@ class DataListView extends StatefulWidget {
 
 class _DataListViewState extends State<DataListView> {
   final ScrollController scrollController = ScrollController();
+  // late final EasyRefreshController easyRefreshController;
 
   @override
   initState() {
@@ -58,6 +60,10 @@ class _DataListViewState extends State<DataListView> {
     widget.controller.addListener(_update);
     myself.addListener(_update);
     scrollController.addListener(_onScroll);
+    // easyRefreshController = EasyRefreshController(
+    //   controlFinishRefresh: true,
+    //   controlFinishLoad: true,
+    // );
 
     ///滚到指定的位置
     // widget.scrollController.animateTo(offset,
@@ -94,6 +100,15 @@ class _DataListViewState extends State<DataListView> {
     if (widget.onRefresh != null) {
       await widget.onRefresh!();
     }
+    // easyRefreshController.finishRefresh();
+    // easyRefreshController.resetFooter();
+  }
+
+  Future<void> _onLoad() async {
+    if (widget.onRefresh != null) {
+      await widget.onRefresh!();
+    }
+    // easyRefreshController.finishLoad(IndicatorResult.success);
   }
 
   _onTap(int index, String title, {String? subtitle}) {
@@ -117,34 +132,77 @@ class _DataListViewState extends State<DataListView> {
   }
 
   Widget _buildListView(BuildContext context) {
-    Widget listViewWidget = EasyRefresh(
-        header: const ClassicHeader(),
-        footer: const ClassicFooter(),
-        onRefresh: _onRefresh,
-        child: ListView.builder(
-            //该属性将决定列表的长度是否仅包裹其内容的长度。
-            // 当 ListView 嵌在一个无限长的容器组件中时， shrinkWrap 必须为true
-            shrinkWrap: true,
-            reverse: widget.reverse,
-            itemCount: widget.controller.length,
-            //physics: const NeverScrollableScrollPhysics(),
-            controller: scrollController,
-            itemBuilder: (BuildContext context, int index) {
-              TileData tile = widget.controller.get(index);
+    Widget listViewWidget = ListView.builder(
+        //该属性将决定列表的长度是否仅包裹其内容的长度。
+        // 当 ListView 嵌在一个无限长的容器组件中时， shrinkWrap 必须为true
+        shrinkWrap: true,
+        reverse: widget.reverse,
+        itemCount: widget.controller.length,
+        //physics: const NeverScrollableScrollPhysics(),
+        controller: scrollController,
+        itemBuilder: (BuildContext context, int index) {
+          TileData tile = widget.controller.get(index);
 
-              Widget tileWidget = _buildListTile(
-                  context,
-                  DataListTile(
-                    dataListViewController: widget.controller,
-                    tileData: tile,
-                    index: index,
-                    onTap: _onTap,
-                  ));
+          Widget tileWidget = _buildListTile(
+              context,
+              DataListTile(
+                dataListViewController: widget.controller,
+                tileData: tile,
+                index: index,
+                onTap: _onTap,
+              ));
 
-              return tileWidget;
-            }));
+          return tileWidget;
+        });
 
-    return listViewWidget;
+    if (widget.onRefresh == null) {
+      return listViewWidget;
+    }
+
+    Widget view =RefreshIndicator(
+      onRefresh: _onRefresh,
+      child: listViewWidget);
+
+      // Widget view = EasyRefresh(
+    //   header: ClassicHeader(
+    //     clamping: false,
+    //     backgroundColor: myself.primary,
+    //     mainAxisAlignment: MainAxisAlignment.center,
+    //     showMessage: true,
+    //     showText: true,
+    //     infiniteOffset: 70,
+    //     triggerWhenReach: true,
+    //     dragText: AppLocalizations.t('Pull to refresh'),
+    //     armedText: AppLocalizations.t('Release ready'),
+    //     readyText: AppLocalizations.t('Refreshing...'),
+    //     processingText: AppLocalizations.t('Refreshing...'),
+    //     processedText: AppLocalizations.t('Succeeded'),
+    //     noMoreText: AppLocalizations.t('No more'),
+    //     failedText: AppLocalizations.t('Failed'),
+    //     messageText: AppLocalizations.t('Last updated at %T'),
+    //   ),
+    //   footer: ClassicFooter(
+    //     clamping: false,
+    //     backgroundColor: myself.primary,
+    //     mainAxisAlignment: MainAxisAlignment.center,
+    //     showMessage: true,
+    //     showText: true,
+    //     infiniteOffset: 70,
+    //     triggerWhenReach: true,
+    //     dragText: AppLocalizations.t('Pull to load'),
+    //     armedText: AppLocalizations.t('Release ready'),
+    //     readyText: AppLocalizations.t('Loading...'),
+    //     processingText: AppLocalizations.t('Loading...'),
+    //     processedText: AppLocalizations.t('Succeeded'),
+    //     noMoreText: AppLocalizations.t('No more'),
+    //     failedText: AppLocalizations.t('Failed'),
+    //     messageText: AppLocalizations.t('Last updated at %T'),
+    //   ),
+    //   onRefresh: _onRefresh,
+    //   controller: easyRefreshController,
+    //   child: listViewWidget);
+
+    return view;
   }
 
   @override
