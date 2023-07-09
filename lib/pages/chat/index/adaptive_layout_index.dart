@@ -92,9 +92,11 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
         },
         itemCount: indexWidgetProvider.views.length,
         itemBuilder: (BuildContext context, int index) {
+          if (appDataProvider.smallBreakpoint.isActive(context)) {
+            return indexWidgetProvider.views[index];
+          }
           Widget view;
-          if (index >= indexWidgetProvider.mainViews.length ||
-              appDataProvider.smallBreakpoint.isActive(context)) {
+          if (index >= indexWidgetProvider.mainViews.length) {
             view = indexWidgetProvider.views[index];
           } else {
             view = Container();

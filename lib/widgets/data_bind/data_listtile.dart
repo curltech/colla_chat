@@ -203,8 +203,8 @@ class DataListTile extends StatelessWidget {
       minVerticalPadding: minVerticalPadding,
       minLeadingWidth: minLeadingWidth,
       selected: selected,
-      // selectedColor: myself.primary,
-      selectedTileColor: myself.primary,
+      selectedColor: Colors.white,
+      // selectedTileColor: myself.primary,
       leading: leading,
       title: titleWidget,
       subtitle: tileData.subtitle != null
@@ -236,6 +236,14 @@ class DataListTile extends StatelessWidget {
             }
           : null,
     );
+
+    if (selected) {
+      return Card(
+        margin: const EdgeInsets.symmetric(horizontal: 10.0),
+        color: myself.primary,
+        child: listTile,
+      );
+    }
 
     return listTile;
   }

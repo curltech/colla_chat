@@ -67,7 +67,8 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
               TileData tile = TileData(
                   title: mailbox.name,
                   prefix: icon,
-                  selected: currentMailboxName == mailbox.name);
+                  selected: mailAddressController.currentIndex == i &&
+                      currentMailboxName == mailbox.name);
               tiles.add(tile);
             }
           }

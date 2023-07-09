@@ -115,7 +115,7 @@ class _DataListViewState extends State<DataListView> {
     ]);
   }
 
-  Widget _buildGroup(BuildContext context) {
+  Widget _buildListView(BuildContext context) {
     Widget groupWidget = RefreshIndicator(
         onRefresh: _onRefresh,
         child: ListView.builder(
@@ -146,7 +146,7 @@ class _DataListViewState extends State<DataListView> {
 
   @override
   Widget build(BuildContext context) {
-    return _buildGroup(context);
+    return _buildListView(context);
   }
 
   @override

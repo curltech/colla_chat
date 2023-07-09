@@ -174,7 +174,8 @@ class _MailContentWidgetState extends State<MailContentWidget> {
             MimeMessage? mimeMessageContent =
                 mimeMessage.decodeContentMessage();
             if (mimeMessageContent == null) {
-              return Text(AppLocalizations.t('MimeMessage is no content'));
+              return Center(
+                  child: Text(AppLocalizations.t('MimeMessage is no content')));
             }
 
             ///移动平台使用邮件的显示组建
@@ -255,7 +256,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
       title = mimeMessage.envelope?.subject;
     }
     var appBarView = AppBarView(
-        title: title,
+        title: title ?? widget.title,
         withLeading: widget.withLeading,
         child: Card(
             elevation: 0.0,

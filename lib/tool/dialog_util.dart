@@ -318,7 +318,7 @@ class DialogUtil {
             const SizedBox(
               height: 25.0,
             ),
-            CommonAutoSizeText(content),
+            CommonAutoSizeText(AppLocalizations.t(content)),
             const SizedBox(
               height: 25.0,
             ),

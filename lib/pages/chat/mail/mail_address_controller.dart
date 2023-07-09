@@ -64,13 +64,16 @@ class MailAddressController extends DataListController<entity.EmailAddress> {
   findAllMailAddress() async {
     data = await emailAddressService.findAllMailAddress();
     if (data.isNotEmpty) {
-      for (var mailAddress in data) {
-        String email = mailAddress.email;
+      for (var emailAddress in data) {
+        String email = emailAddress.email;
         if (!_addressMimeMessages.containsKey(email)) {
-          await connectMailAddress(mailAddress);
-        }
-        if (mailAddress.isDefault) {
-          defaultMailAddress = mailAddress;
+          connectMailAddress(emailAddress).then((isConnected) {
+            if (isConnected) {
+              if (emailAddress.isDefault) {
+                defaultMailAddress = emailAddress;
+              }
+            }
+          });
         }
       }
     }
@@ -97,22 +100,23 @@ class MailAddressController extends DataListController<entity.EmailAddress> {
   }
 
   ///连接特定的邮件地址服务器，获取地址的所有的邮箱
-  connectMailAddress(entity.EmailAddress mailAddress,
+  Future<bool> connectMailAddress(entity.EmailAddress emailAddress,
       {bool listen = true}) async {
-    var password = mailAddress.password;
+    var password = emailAddress.password;
     if (password != null) {
       EmailClient? emailClient =
-          await emailClientPool.create(mailAddress, password);
+          await emailClientPool.create(emailAddress, password);
       if (emailClient != null) {
         List<enough_mail.Mailbox>? mailboxes =
             await emailClient.listMailboxes();
         if (mailboxes != null) {
-          _setMailboxes(mailAddress.email, mailboxes, listen: listen);
-          return;
+          _setMailboxes(emailAddress.email, mailboxes, listen: listen);
+
+          return true;
         }
       }
     }
-    _setMailboxes(mailAddress.email, [], listen: listen);
+    return false;
   }
 
   ///获取邮件地址的邮箱
@@ -202,7 +206,9 @@ class MailAddressController extends DataListController<entity.EmailAddress> {
 
   MimeMessage? get currentMimeMessage {
     var currentMimeMessages = this.currentMimeMessages;
-    if (currentMimeMessages != null && _currentMailIndex >= 0) {
+    if (currentMimeMessages != null &&
+        _currentMailIndex >= 0 &&
+        _currentMailIndex < currentMimeMessages.length) {
       return currentMimeMessages[_currentMailIndex];
     }
 
@@ -211,7 +217,9 @@ class MailAddressController extends DataListController<entity.EmailAddress> {
 
   set currentMimeMessage(MimeMessage? mimeMessage) {
     var currentMimeMessages = this.currentMimeMessages;
-    if (currentMimeMessages != null && _currentMailIndex >= 0) {
+    if (currentMimeMessages != null &&
+        _currentMailIndex >= 0 &&
+        _currentMailIndex < currentMimeMessages.length) {
       currentMimeMessages[_currentMailIndex] = mimeMessage!;
     }
   }

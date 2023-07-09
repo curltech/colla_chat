@@ -154,12 +154,12 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
       }
       return;
     }
-    var mailAddress =
-        EmailMessageUtil.buildDiscoverMailAddress(email!, name!, clientConfig);
+    EmailAddress emailAddress =
+        EmailMessageUtil.buildDiscoverEmailAddress(email!, name!, clientConfig);
     DialogUtil.loadingShow(context,
         tip: 'Auto connecting email server,\n please waiting...');
     EmailClient? emailClient = await emailClientPool
-        .create(mailAddress, password!, config: clientConfig);
+        .create(emailAddress, password!, config: clientConfig);
     if (mounted) {
       DialogUtil.loadingHide(context);
     }
@@ -174,15 +174,17 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
       DialogUtil.info(context, content: 'Connect successfully');
     }
     logger.i('create (or connect) success to $name.');
-    EmailAddress? emailAddress =
-        await emailAddressService.findByMailAddress(email);
-    if (emailAddress == null && mounted) {
+    if (mounted) {
       bool? result =
           await DialogUtil.confirm(context, content: 'Save new mail address?');
-
       if (result != null && result) {
+        EmailAddress? old = await emailAddressService.findByMailAddress(email);
+        if (old != null) {
+          emailAddress.id = old.id;
+        }
+
         ///保存地址
-        await emailAddressService.store(mailAddress);
+        await emailAddressService.store(emailAddress);
       }
     }
   }

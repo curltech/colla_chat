@@ -444,5 +444,7 @@
   "Toggle mail address view": "切换邮件地址视图",
   "Json add linkman": "字符串加联系人",
   "Paste": "粘贴",
-  "Please paste linkman json here": "请粘贴联系人字符串"
+  "Please paste linkman json here": "请粘贴联系人字符串",
+  "MimeMessage is no content": "邮件没有内容或者内容未下载",
+  "Have no mimeMessage": "没有邮件"
 }

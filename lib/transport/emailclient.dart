@@ -172,7 +172,7 @@ class EmailMessageUtil {
   }
 
   ///传入email，name和邮件地址配置参数，产生新的邮件地址实体
-  static entity.EmailAddress buildDiscoverMailAddress(
+  static entity.EmailAddress buildDiscoverEmailAddress(
       String email, String name, ClientConfig config) {
     entity.EmailAddress mailAddress =
         entity.EmailAddress(email: email, name: name);
@@ -246,7 +246,7 @@ class EmailMessageUtil {
 }
 
 class EmailClient {
-  entity.EmailAddress mailAddress;
+  entity.EmailAddress emailAddress;
 
   ///mailClient是自动发现产生的客户端
   ClientConfig? config;
@@ -256,13 +256,13 @@ class EmailClient {
   enough_mail.SmtpClient? smtpClient;
 
   EmailClient({
-    required this.mailAddress,
+    required this.emailAddress,
   });
 
   ///统一的连接方法，先用邮件地址参数连接，不成功再用imap和pop手工配置的参数连接
   Future<bool> connect(String? password, {ClientConfig? config}) async {
-    if (password != null && mailAddress.password != password) {
-      mailAddress.password = password;
+    if (password != null && emailAddress.password != password) {
+      emailAddress.password = password;
     }
     bool success = false;
     if (mailClient == null) {
@@ -289,29 +289,29 @@ class EmailClient {
   ///邮件客户端连接，可以传入密码和邮件地址参数，如果没有则使用当前邮件客户端的数据
   Future<bool> mailClientConnect(
       {String? password, ClientConfig? config}) async {
-    if (password != null && mailAddress.password != password) {
-      mailAddress.password = password;
+    if (password != null && emailAddress.password != password) {
+      emailAddress.password = password;
     }
     if (config != null) {
       this.config = config;
     }
     config = this.config;
     if (config == null) {
-      this.config = EmailMessageUtil.buildDiscoverConfig(mailAddress);
+      this.config = EmailMessageUtil.buildDiscoverConfig(emailAddress);
       config = this.config;
       if (config == null) {
         logger.e('no discover config');
         return false;
       }
     }
-    password = mailAddress.password;
+    password = emailAddress.password;
     if (password == null) {
       logger.e('no password');
       return false;
     }
     final enough_mail.MailClient mailClient = EmailMessageUtil.createMailClient(
-        name: mailAddress.name,
-        email: mailAddress.email,
+        name: emailAddress.name,
+        email: emailAddress.email,
         password: password,
         config: config);
     try {
@@ -732,12 +732,12 @@ class EmailClient {
       logger.i(serverId);
     }
     try {
-      if (mailAddress.imapServerHost != null) {
+      if (emailAddress.imapServerHost != null) {
         await client.connectToServer(
-            mailAddress.imapServerHost!, mailAddress.imapServerPort,
-            isSecure: mailAddress.imapServerSecure);
+            emailAddress.imapServerHost!, emailAddress.imapServerPort,
+            isSecure: emailAddress.imapServerSecure);
         List<enough_mail.Capability> capabilities =
-            await client.login(mailAddress.email, mailAddress.password!);
+            await client.login(emailAddress.email, emailAddress.password!);
         logger.i('imap login successfully, $capabilities');
 
         imapClient = client;
@@ -830,10 +830,10 @@ class EmailClient {
   Future<bool> _smtpConnect() async {
     var client = enough_mail.SmtpClient('curltech.io', isLogEnabled: true);
     try {
-      if (mailAddress.smtpServerHost != null) {
+      if (emailAddress.smtpServerHost != null) {
         var connectionInfo = await client.connectToServer(
-            mailAddress.smtpServerHost!, mailAddress.smtpServerPort,
-            isSecure: mailAddress.smtpServerSecure);
+            emailAddress.smtpServerHost!, emailAddress.smtpServerPort,
+            isSecure: emailAddress.smtpServerSecure);
         SmtpResponse smtpResponse = await client.ehlo();
         if (!smtpResponse.isOkStatus) {
           logger.e('smtpConnect failure: ${smtpResponse.errorMessage}');
@@ -841,8 +841,8 @@ class EmailClient {
         }
         if (client.serverInfo.supportsAuth(enough_mail.AuthMechanism.plain)) {
           SmtpResponse smtpResponse = await client.authenticate(
-              mailAddress.email,
-              mailAddress.password!,
+              emailAddress.email,
+              emailAddress.password!,
               enough_mail.AuthMechanism.plain);
           if (!smtpResponse.isOkStatus) {
             logger.e('smtpConnect failure: ${smtpResponse.errorMessage}');
@@ -854,8 +854,8 @@ class EmailClient {
         }
       } else if (client.serverInfo
           .supportsAuth(enough_mail.AuthMechanism.login)) {
-        SmtpResponse smtpResponse = await client.authenticate(mailAddress.email,
-            mailAddress.password!, enough_mail.AuthMechanism.login);
+        SmtpResponse smtpResponse = await client.authenticate(emailAddress.email,
+            emailAddress.password!, enough_mail.AuthMechanism.login);
         if (!smtpResponse.isOkStatus) {
           logger.e('smtpConnect failure: ${smtpResponse.errorMessage}');
           return false;
@@ -911,12 +911,12 @@ class EmailClient {
   Future<PopStatus?> popConnect() async {
     final client = enough_mail.PopClient(isLogEnabled: false);
     try {
-      if (mailAddress.popServerHost != null) {
+      if (emailAddress.popServerHost != null) {
         var connectionInfo = await client.connectToServer(
-            mailAddress.popServerHost!, mailAddress.popServerPort,
-            isSecure: mailAddress.popServerSecure);
+            emailAddress.popServerHost!, emailAddress.popServerPort,
+            isSecure: emailAddress.popServerSecure);
         logger.i('connectToServer $connectionInfo');
-        await client.login(mailAddress.email, mailAddress.password!);
+        await client.login(emailAddress.email, emailAddress.password!);
         // alternative login:
         // await client.loginWithApop(username, password);
         final status = await client.status();
@@ -994,7 +994,7 @@ class EmailClient {
 }
 
 class EmailClientPool {
-  var mailClients = <String, EmailClient>{};
+  var emailClients = <String, EmailClient>{};
   EmailClient? _default;
 
   EmailClientPool();
@@ -1008,16 +1008,16 @@ class EmailClientPool {
       logger.e('mailAddress email error');
       return null;
     }
-    EmailClient? mailClient = mailClients[mailAddress.email];
-    if (mailClient != null) {
-      return mailClient;
+    EmailClient? emailClient = emailClients[mailAddress.email];
+    if (emailClient != null) {
+      return emailClient;
     } else {
-      mailClient = EmailClient(mailAddress: mailAddress);
-      bool success = await mailClient.connect(password, config: config);
+      emailClient = EmailClient(emailAddress: mailAddress);
+      bool success = await emailClient.connect(password, config: config);
       if (success) {
-        mailClients[mailAddress.email] = mailClient;
+        emailClients[mailAddress.email] = emailClient;
 
-        return mailClient;
+        return emailClient;
       }
     }
 
@@ -1026,30 +1026,30 @@ class EmailClientPool {
 
   ///如果池中的邮件客户端断开了，可以重新进行连接
   Future<bool> connect(String email, String? password) async {
-    EmailClient? mailClient = get(email);
+    EmailClient? emailClient = get(email);
     bool success = false;
-    if (mailClient != null) {
-      success = await mailClient.connect(password);
+    if (emailClient != null) {
+      success = await emailClient.connect(password);
       return success;
     }
     return success;
   }
 
   EmailClient? get(String email) {
-    if (mailClients.containsKey(email)) {
-      return mailClients[email];
+    if (emailClients.containsKey(email)) {
+      return emailClients[email];
     } else {
       return null;
     }
   }
 
   close(String email) async {
-    if (mailClients.containsKey(email)) {
-      var mailClient = mailClients[email];
+    if (emailClients.containsKey(email)) {
+      var mailClient = emailClients[email];
       if (mailClient != null) {
         await mailClient.close();
       }
-      mailClients.remove(email);
+      emailClients.remove(email);
     }
   }
 
@@ -1059,8 +1059,8 @@ class EmailClientPool {
 
   EmailClient? setDefaultMailClient(String email) {
     EmailClient? mailClient;
-    if (mailClients.containsKey(email)) {
-      mailClient = mailClients[email];
+    if (emailClients.containsKey(email)) {
+      mailClient = emailClients[email];
     }
     _default = mailClient;
 

@@ -50,6 +50,11 @@ class _MailListWidgetState extends State<MailListWidget> {
     if (mimeMessages.isNotEmpty) {
       int i = 0;
       for (var mimeMessage in mimeMessages) {
+        Envelope? envelope=mimeMessage.envelope;
+        if (envelope==null){
+          //logger.e('');
+          continue;
+        }
         var title = mimeMessage.envelope?.subject;
         var subtitle = mimeMessage.envelope?.sender?.personalName;
         subtitle = subtitle ?? '';

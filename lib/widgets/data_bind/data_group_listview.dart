@@ -135,13 +135,14 @@ class _GroupDataListViewState extends State<GroupDataListView> {
 
     Widget dataListView = DataListView(
         onTap: _onTap, group: tile, controller: dataListController);
+    bool selected = tile.selected ?? false;
 
     ///未来不使用ListTile，因为高度固定，不够灵活
     return ExpansionTile(
-      // tilePadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
       childrenPadding: const EdgeInsets.all(0),
       maintainState: true,
       leading: leading,
+      textColor: selected ? myself.primary : null,
       title: CommonAutoSizeText(
         AppLocalizations.t(tile.title),
       ),

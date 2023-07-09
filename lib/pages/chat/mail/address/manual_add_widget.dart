@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/chat/emailaddress.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/emailaddress.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -126,10 +127,11 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
   }
 
   Widget _buildFormInputWidget(BuildContext context) {
+    double height = appDataProvider.portraitSize.height - 150;
     var formInputWidget = Container(
         padding: const EdgeInsets.all(10.0),
         child: FormInputWidget(
-          height: 550,
+          height: height,
           formButtonDefs: [
             FormButtonDef(
                 label: 'Connect',
@@ -184,52 +186,52 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
     List<String?>? domains = [domain];
     String? displayName = domain;
     String? displayShortName = name;
-    List<ServerConfig>? incomingServers = [
-      ServerConfig(
-        type: ServerType.imap,
-        hostname: imapServerHost,
-        port: int.parse(imapServerPort!),
-        socketType: SocketType.ssl,
-        authentication: Authentication.plain,
-        usernameType: UsernameType.emailAddress,
-      )
-    ];
+    ServerConfig imapServerConfig = ServerConfig(
+      type: ServerType.imap,
+      hostname: imapServerHost,
+      port: int.parse(imapServerPort!),
+      socketType: SocketType.ssl,
+      authentication: Authentication.plain,
+      usernameType: UsernameType.emailAddress,
+    );
     String? popServerHost = values['popServerHost'];
     String? popServerPort = values['popServerPort'];
+    ServerConfig? popServerConfig;
     if (StringUtil.isNotEmpty(popServerHost) ||
         StringUtil.isNotEmpty(popServerPort)) {
-      incomingServers.add(ServerConfig(
+      popServerConfig = ServerConfig(
         type: ServerType.pop,
         hostname: popServerHost,
         port: int.parse(popServerPort!),
         socketType: SocketType.ssl,
         authentication: Authentication.plain,
         usernameType: UsernameType.emailAddress,
-      ));
+      );
     }
-    List<ServerConfig>? outgoingServers = [
-      ServerConfig(
-        type: ServerType.smtp,
-        hostname: smtpServerHost,
-        port: int.parse(smtpServerPort!),
-        socketType: SocketType.ssl,
-        authentication: Authentication.plain,
-        usernameType: UsernameType.emailAddress,
-      )
-    ];
+    ServerConfig smtpServerConfig = ServerConfig(
+      type: ServerType.smtp,
+      hostname: smtpServerHost,
+      port: int.parse(smtpServerPort!),
+      socketType: SocketType.ssl,
+      authentication: Authentication.plain,
+      usernameType: UsernameType.emailAddress,
+    );
     ConfigEmailProvider emailProviders = ConfigEmailProvider(
         domains: domains,
         displayName: displayName,
-        displayShortName: displayShortName,
-        incomingServers: incomingServers,
-        outgoingServers: outgoingServers);
+        displayShortName: displayShortName);
+    emailProviders.addIncomingServer(imapServerConfig);
+    if (popServerConfig != null) {
+      emailProviders.addIncomingServer(popServerConfig);
+    }
+    emailProviders.addOutgoingServer(smtpServerConfig);
     ClientConfig clientConfig = ClientConfig(emailProviders: [emailProviders]);
-    var mailAddress =
-        EmailMessageUtil.buildDiscoverMailAddress(email, name!, clientConfig);
+    EmailAddress emailAddress =
+        EmailMessageUtil.buildDiscoverEmailAddress(email, name!, clientConfig);
     DialogUtil.loadingShow(context,
         tip: 'Manual connecting email server,\n please waiting...');
     EmailClient? emailClient = await emailClientPool
-        .create(mailAddress, password!, config: clientConfig);
+        .create(emailAddress, password!, config: clientConfig);
     if (mounted) {
       DialogUtil.loadingHide(context);
     }
@@ -244,15 +246,17 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
       DialogUtil.info(context, content: 'Connect successfully');
     }
     logger.i('create (or connect) success to $name.');
-    EmailAddress? emailAddress =
-        await emailAddressService.findByMailAddress(email);
-    if (emailAddress == null && mounted) {
+    if (mounted) {
       bool? result =
           await DialogUtil.confirm(context, content: 'Save new mail address?');
-
       if (result != null && result) {
+        EmailAddress? old = await emailAddressService.findByMailAddress(email);
+        if (old != null) {
+          emailAddress.id = old.id;
+        }
+
         ///保存地址
-        await emailAddressService.store(mailAddress);
+        await emailAddressService.store(emailAddress);
       }
     }
   }
