@@ -423,12 +423,16 @@ class EmailClient {
     if (mailClient != null && mailbox != null) {
       int total = mailbox.messagesExists;
       int page = Pagination.getPage(offset, limit);
-      final messages = await mailClient.fetchMessages(
-          count: limit,
-          fetchPreference: fetchPreference,
-          mailbox: mailbox,
-          page: page);
-      return messages;
+      try {
+        final messages = await mailClient.fetchMessages(
+            count: limit,
+            fetchPreference: fetchPreference,
+            mailbox: mailbox,
+            page: page);
+        return messages;
+      } catch (e) {
+        logger.e('fetch messages failure:$e');
+      }
     }
     return null;
   }
@@ -854,8 +858,10 @@ class EmailClient {
         }
       } else if (client.serverInfo
           .supportsAuth(enough_mail.AuthMechanism.login)) {
-        SmtpResponse smtpResponse = await client.authenticate(emailAddress.email,
-            emailAddress.password!, enough_mail.AuthMechanism.login);
+        SmtpResponse smtpResponse = await client.authenticate(
+            emailAddress.email,
+            emailAddress.password!,
+            enough_mail.AuthMechanism.login);
         if (!smtpResponse.isOkStatus) {
           logger.e('smtpConnect failure: ${smtpResponse.errorMessage}');
           return false;

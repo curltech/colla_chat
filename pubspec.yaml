@@ -211,7 +211,8 @@ dependencies:
   json_annotation: ^4.3.0
   permission_handler: ^10.0.0 #权限处理1
   provider: ^6.0.1 #状态管理
-  pull_to_refresh_notification: ^3.0.0
+  easy_refresh: ^3.3.2+1
+  percent_indicator: ^4.2.3
   share_plus: 7.0.2
   flutter_sharing_intent: ^1.0.6
   #  receive_sharing_intent: #^1.4.6 #gradle版本低的问题

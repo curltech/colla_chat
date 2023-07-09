@@ -3,6 +3,7 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 
 ///根据构造函数传入的数据列表，构造内容与空间匹配的ListView列表视图
@@ -12,9 +13,8 @@ class DataListView extends StatefulWidget {
   final TileData? group;
   final bool reverse;
   late final DataListController<TileData> controller;
-  final ScrollController scrollController = ScrollController();
-  final Function()? onScrollMax;
-  final Function()? onScrollMin;
+  final Future<void> Function()? onScrollMax;
+  final Future<void> Function()? onScrollMin;
   final Future<void> Function()? onRefresh;
   final Function(
     int index,
@@ -50,12 +50,13 @@ class DataListView extends StatefulWidget {
 }
 
 class _DataListViewState extends State<DataListView> {
+  final ScrollController scrollController = ScrollController();
+
   @override
   initState() {
     super.initState();
     widget.controller.addListener(_update);
     myself.addListener(_update);
-    var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
 
     ///滚到指定的位置
@@ -67,29 +68,29 @@ class _DataListViewState extends State<DataListView> {
     setState(() {});
   }
 
-  void _onScroll() {
-    double offset = widget.scrollController.offset;
+  Future<void> _onScroll() async {
+    double offset = scrollController.offset;
     logger.i('scrolled to $offset');
 
     ///判断是否滚动到最底，需要加载更多数据
-    if (widget.scrollController.position.pixels ==
-        widget.scrollController.position.maxScrollExtent) {
+    if (scrollController.position.pixels ==
+        scrollController.position.maxScrollExtent) {
       logger.i('scrolled to max');
       if (widget.onScrollMax != null) {
-        widget.onScrollMax!();
+        await widget.onScrollMax!();
       }
     }
-    if (widget.scrollController.position.pixels ==
-        widget.scrollController.position.minScrollExtent) {
+    if (scrollController.position.pixels ==
+        scrollController.position.minScrollExtent) {
       logger.i('scrolled to min');
       if (widget.onScrollMin != null) {
-        widget.onScrollMin!();
+        await widget.onScrollMin!();
       }
     }
   }
 
+  ///下拉刷新数据的地方，比如从数据库取更多数据
   Future<void> _onRefresh() async {
-    ///下拉刷新数据的地方，比如从数据库取更多数据
     if (widget.onRefresh != null) {
       await widget.onRefresh!();
     }
@@ -116,7 +117,9 @@ class _DataListViewState extends State<DataListView> {
   }
 
   Widget _buildListView(BuildContext context) {
-    Widget groupWidget = RefreshIndicator(
+    Widget listViewWidget = EasyRefresh(
+        header: const ClassicHeader(),
+        footer: const ClassicFooter(),
         onRefresh: _onRefresh,
         child: ListView.builder(
             //该属性将决定列表的长度是否仅包裹其内容的长度。
@@ -125,7 +128,7 @@ class _DataListViewState extends State<DataListView> {
             reverse: widget.reverse,
             itemCount: widget.controller.length,
             //physics: const NeverScrollableScrollPhysics(),
-            controller: widget.scrollController,
+            controller: scrollController,
             itemBuilder: (BuildContext context, int index) {
               TileData tile = widget.controller.get(index);
 
@@ -141,7 +144,7 @@ class _DataListViewState extends State<DataListView> {
               return tileWidget;
             }));
 
-    return groupWidget;
+    return listViewWidget;
   }
 
   @override
@@ -152,7 +155,7 @@ class _DataListViewState extends State<DataListView> {
   @override
   void dispose() {
     widget.controller.removeListener(_update);
-    widget.scrollController.removeListener(_onScroll);
+    scrollController.removeListener(_onScroll);
     myself.removeListener(_update);
     super.dispose();
   }

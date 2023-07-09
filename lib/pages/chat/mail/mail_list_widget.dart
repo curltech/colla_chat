@@ -50,8 +50,8 @@ class _MailListWidgetState extends State<MailListWidget> {
     if (mimeMessages.isNotEmpty) {
       int i = 0;
       for (var mimeMessage in mimeMessages) {
-        Envelope? envelope=mimeMessage.envelope;
-        if (envelope==null){
+        Envelope? envelope = mimeMessage.envelope;
+        if (envelope == null) {
           //logger.e('');
           continue;
         }
@@ -79,6 +79,18 @@ class _MailListWidgetState extends State<MailListWidget> {
     return tiles;
   }
 
+  Future<void> _onScrollMax() async {
+    await mailAddressController.findMoreMimeMessages();
+  }
+
+  Future<void> _onScrollMin() async {
+    // await mailAddressController.findMoreMimeMessages();
+  }
+
+  Future<void> _onRefresh() async {
+    await mailAddressController.findMoreMimeMessages();
+  }
+
   Widget _buildMailListWidget(BuildContext context) {
     var dataListView = FutureBuilder(
         future: findMoreMimeMessages(),
@@ -91,7 +103,13 @@ class _MailListWidgetState extends State<MailListWidget> {
           if (mimeMessages != null) {
             var tiles = _convertMimeMessage(mimeMessages);
 
-            return DataListView(reverse: true, onTap: _onTap, tileData: tiles);
+            return DataListView(
+                reverse: true,
+                onTap: _onTap,
+                tileData: tiles,
+                onScrollMax: _onScrollMax,
+                onScrollMin: _onScrollMin,
+                onRefresh: _onRefresh);
           }
 
           return Center(
