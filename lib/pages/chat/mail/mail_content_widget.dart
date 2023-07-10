@@ -140,6 +140,29 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     }
   }
 
+  ///加密标题和文本
+  encryptText(String subject, String text, String keys) async {
+    //加密
+    needEncrypt = true;
+    Map<String, String> payloadKeys = JsonUtil.toJson(keys);
+    if (payloadKeys.isEmpty) {
+      //linkman加密
+      payloadKey = null;
+    } else {
+      if (payloadKeys.containsKey(myself.peerId)) {
+        //group加密
+        payloadKey = payloadKeys[myself.peerId]!;
+      }
+    }
+    List<int>? data = await emailAddressService
+        .decrypt(CryptoUtil.decodeBase64(subject), payloadKey: payloadKey);
+    this.subject = CryptoUtil.utf8ToString(data!);
+    data = await emailAddressService.decrypt(CryptoUtil.decodeBase64(text),
+        payloadKey: payloadKey);
+    text = CryptoUtil.utf8ToString(data!);
+    html = EmailMessageUtil.convertToMimeMessageHtml(text);
+  }
+
   ///当前的邮件发生变化，如果没有获取内容，则获取内容
   Future<MimeMessage?> findMimeMessage() async {
     MimeMessage? mimeMessage = mailAddressController.currentMimeMessage;
@@ -155,26 +178,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
         String? text = mimeMessage.decodeContentText();
         String? keys = mimeMessage.decodeHeaderValue(payloadKeysName);
         if (keys != null && keys.isNotEmpty) {
-          //加密
-          needEncrypt = true;
-          Map<String, String> payloadKeys = JsonUtil.toJson(keys);
-          if (payloadKeys.isEmpty) {
-            //linkman加密
-            payloadKey = null;
-          } else {
-            if (payloadKeys.containsKey(myself.peerId)) {
-              //group加密
-              payloadKey = payloadKeys[myself.peerId]!;
-            }
-          }
-          List<int>? data = await emailAddressService.decrypt(
-              CryptoUtil.decodeBase64(subject!),
-              payloadKey: payloadKey);
-          this.subject = CryptoUtil.utf8ToString(data!);
-          data = await emailAddressService
-              .decrypt(CryptoUtil.decodeBase64(text!), payloadKey: payloadKey);
-          text = CryptoUtil.utf8ToString(data!);
-          html = EmailMessageUtil.convertToMimeMessageHtml(text);
+          await encryptText(subject!, text!, keys);
         } else {
           //不加密
           needEncrypt = false;
@@ -213,6 +217,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
                 IconButton(
                     onPressed: () {
                       mailAddressController.fetchMessageContents();
+                      setState(() {});
                     },
                     icon: Icon(
                       Icons.refresh,
