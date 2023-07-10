@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
+import 'package:colla_chat/pages/chat/mail/new_mail_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -45,8 +46,17 @@ class MailContentWidget extends StatefulWidget with TileDataMixin {
 class _MailContentWidgetState extends State<MailContentWidget> {
   PlatformWebView? platformWebView;
   PlatformWebViewController? platformWebViewController;
+
+  bool needEncrypt = false;
+
+  //如果needEncrypt为true，payloadKey为空，则为linkman加密，否则是group的加密密钥
+  String? payloadKey;
+
+  //解密后的标题
+  String? subject;
+
+  //解密后的html
   String? html;
-  String? filename;
 
   ///移动平台采用MimeMessage显示
   ///非windows平台直接使用html显示
@@ -106,11 +116,27 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     final name = mimePart.decodeFileName();
     final mediaType = mimePart.mediaType.text;
     if (mimePart.mediaType.isText) {
-      return TextMediaProvider(name!, mediaType, mimePart.decodeContentText()!);
+      String? text = mimePart.decodeContentText();
+      if (text != null) {
+        if (needEncrypt) {
+          List<int>? data = await emailAddressService
+              .decrypt(CryptoUtil.stringToUtf8(text), payloadKey: payloadKey);
+          if (data != null) {
+            text = CryptoUtil.utf8ToString(data);
+          }
+        }
+        return TextMediaProvider(name!, mediaType, text);
+      }
     } else {
-      Uint8List? data = mimePart.decodeContentBinary();
-      return MemoryMediaProvider(name!, mediaType, data!,
-          description: mimeMessage.decodeSubject());
+      List<int>? data = mimePart.decodeContentBinary();
+      if (data != null) {
+        if (needEncrypt) {
+          data =
+              await emailAddressService.decrypt(data, payloadKey: payloadKey);
+        }
+        return MemoryMediaProvider(name!, mediaType, Uint8List.fromList(data!),
+            description: subject);
+      }
     }
   }
 
@@ -125,37 +151,41 @@ class _MailContentWidgetState extends State<MailContentWidget> {
       }
       mimeMessage = mailAddressController.currentMimeMessage;
       if (mimeMessage != null) {
-        String? keys = mimeMessage.decodeHeaderValue('payloadKeys');
+        String? subject = mimeMessage.decodeSubject();
+        String? text = mimeMessage.decodeContentText();
+        String? keys = mimeMessage.decodeHeaderValue(payloadKeysName);
         if (keys != null && keys.isNotEmpty) {
+          //加密
+          needEncrypt = true;
           Map<String, String> payloadKeys = JsonUtil.toJson(keys);
-          String payloadKey = payloadKeys[myself.peerId]!;
-          emailAddressService.decrypt(CryptoUtil.decodeBase64(html!),
-              payloadKey: payloadKey);
-          if (payloadKeys.containsKey(myself.peerId)) {}
-        }
-
-        ///windows平台采用文件加载的方式，避免中文乱码
-        if (platformParams.windows) {
-          int? uid = mimeMessage.uid;
-          String? sender = mimeMessage.envelope?.sender?.email;
-          Directory tempDir = await PathUtil.getTemporaryDirectory();
-          String filename = p.join(tempDir.path, '${sender}_$uid.html');
-          File file = File(filename);
-          bool exist = file.existsSync();
-          if (!exist) {
-            html = EmailMessageUtil.convertToHtml(mimeMessage);
-            file.writeAsStringSync(html!, flush: true);
-            html = null;
+          if (payloadKeys.isEmpty) {
+            //linkman加密
+            payloadKey = null;
+          } else {
+            if (payloadKeys.containsKey(myself.peerId)) {
+              //group加密
+              payloadKey = payloadKeys[myself.peerId]!;
+            }
           }
+          List<int>? data = await emailAddressService.decrypt(
+              CryptoUtil.decodeBase64(subject!),
+              payloadKey: payloadKey);
+          this.subject = CryptoUtil.utf8ToString(data!);
+          data = await emailAddressService
+              .decrypt(CryptoUtil.decodeBase64(text!), payloadKey: payloadKey);
+          text = CryptoUtil.utf8ToString(data!);
+          html = EmailMessageUtil.convertToMimeMessageHtml(text);
         } else {
-          ///非windos平台，可以直接使用html字符串
+          //不加密
+          needEncrypt = false;
+          this.subject = subject;
           html = EmailMessageUtil.convertToHtml(mimeMessage);
-          filename = null;
         }
       }
-    } else {
+    }
+    if (mimeMessage == null) {
+      subject = null;
       html = null;
-      filename = null;
     }
     return mimeMessage;
   }
@@ -175,20 +205,22 @@ class _MailContentWidgetState extends State<MailContentWidget> {
                 mimeMessage.decodeContentMessage();
             if (mimeMessageContent == null) {
               return Center(
-                  child: Text(AppLocalizations.t('MimeMessage is no content')));
+                  child: Column(children: [
+                Text(AppLocalizations.t('MimeMessage is no content')),
+                const SizedBox(
+                  height: 15.0,
+                ),
+                IconButton(
+                    onPressed: () {
+                      mailAddressController.fetchMessageContents();
+                    },
+                    icon: Icon(
+                      Icons.refresh,
+                      color: myself.primary,
+                    ))
+              ]));
             }
-
-            ///移动平台使用邮件的显示组建
-            if (platformParams.mobile) {
-              return PlatformWebView(html: html);
-            } else if (platformParams.macos) {
-              ///macos使用html字符串
-              return PlatformWebView(html: html);
-            } else {
-              ///windows平台使用文件
-              platformWebViewController!.load(filename);
-              return platformWebView!;
-            }
+            return PlatformWebView(html: html);
           }
           return Center(
             child: Text(AppLocalizations.t("Have no mimeMessage")),
@@ -204,7 +236,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     if (contentInfos == null) {
       return Container();
     }
-    for (var contentInfo in contentInfos!) {
+    for (var contentInfo in contentInfos) {
       String? name = contentInfo.fileName;
       int? size = contentInfo.size;
       MediaType? mediaType = contentInfo.mediaType;

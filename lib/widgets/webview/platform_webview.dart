@@ -44,7 +44,7 @@ class PlatformWebViewController with ChangeNotifier {
   loadHtml(String html) async {
     if (webViewController != null) {
       if (platformParams.windows) {
-        Directory tempDir = await PathUtil.getTemporaryDirectory();
+        //windows平台不能直接加载html，会乱码
         String filename = await FileUtil.getTempFilename(extension: 'html');
         File file = File(filename);
         bool exist = file.existsSync();

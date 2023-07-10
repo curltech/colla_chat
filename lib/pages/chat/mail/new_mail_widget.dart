@@ -66,6 +66,8 @@ class NewMailWidget extends StatefulWidget with TileDataMixin {
   String get title => 'New mail';
 }
 
+const String payloadKeysName = 'payloadKeys';
+
 class _NewMailWidgetState extends State<NewMailWidget> {
   //已经选择的收件人
   ValueNotifier<List<String>> receipts = ValueNotifier([]);
@@ -269,7 +271,9 @@ class _NewMailWidgetState extends State<NewMailWidget> {
       secretKey = encryptedSubject.secretKey;
       Map<String, String>? payloadKeys = encryptedSubject.payloadKeys;
       if (payloadKeys != null) {
-        builder.addHeader('payloadKeys', JsonUtil.toJsonString(payloadKeys));
+        builder.addHeader(payloadKeysName, JsonUtil.toJsonString(payloadKeys));
+      } else {
+        builder.addHeader(payloadKeysName, JsonUtil.toJsonString({}));
       }
     } else {
       builder.subject = subjectController.text;

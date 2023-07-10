@@ -112,14 +112,13 @@ class EmailMessageUtil {
   }
 
   ///把外部的html字符串转换成邮件生成的html
-  String convertToMimeMessageHtml(String html) {
+  static String convertToMimeMessageHtml(String text) {
     MessageBuilder builder =
         MessageBuilder.prepareMultipartAlternativeMessage();
-    builder.addTextHtml(html);
+    builder.addTextHtml(text);
     MimeMessage mimeMessage = builder.buildMimeMessage();
-    html = convertToHtml(mimeMessage);
 
-    return html;
+    return convertToHtml(mimeMessage);
   }
 
   ///转换邮件地址实体信息到邮件地址配置

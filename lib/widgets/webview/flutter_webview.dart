@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -54,7 +57,19 @@ class FlutterWebView extends StatelessWidget {
       controller!.loadFile(initialFilename!);
     }
     if (html != null) {
-      controller!.loadHtmlString(html!);
+      if (platformParams.windows) {
+        //windows平台不能直接加载html，会乱码
+        FileUtil.getTempFilename(extension: 'html').then((String filename) {
+          File file = File(filename);
+          bool exist = file.existsSync();
+          if (!exist) {
+            file.writeAsStringSync(html!, flush: true);
+          }
+          controller!.loadFile(filename);
+        });
+      } else {
+        controller!.loadHtmlString(html!);
+      }
     }
   }
 
