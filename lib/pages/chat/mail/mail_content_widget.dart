@@ -2,14 +2,17 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/mail/full_screen_attachment_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/emailaddress.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/webview/platform_webview.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:enough_mail/highlevel.dart';
@@ -20,7 +23,11 @@ import 'package:path/path.dart' as p;
 
 ///邮件内容子视图
 class MailContentWidget extends StatefulWidget with TileDataMixin {
-  const MailContentWidget({Key? key}) : super(key: key);
+  MailContentWidget({Key? key}) : super(key: key) {
+    FullScreenAttachmentWidget fullScreenAttachmentWidget =
+        const FullScreenAttachmentWidget();
+    indexWidgetProvider.define(fullScreenAttachmentWidget);
+  }
 
   @override
   State<StatefulWidget> createState() => _MailContentWidgetState();
@@ -42,6 +49,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
   PlatformWebView? platformWebView;
   PlatformWebViewController? platformWebViewController;
   DecryptedMimeMessage decryptedMimeMessage = DecryptedMimeMessage();
+  ValueNotifier<String?> subject = ValueNotifier<String?>(null);
 
   ///移动平台采用MimeMessage显示
   ///非windows平台直接使用html显示
@@ -81,6 +89,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     }
     final List<ContentInfo> infos =
         mimeMessage.findContentInfo(disposition: ContentDisposition.attachment);
+
     return infos;
   }
 
@@ -149,10 +158,12 @@ class _MailContentWidgetState extends State<MailContentWidget> {
       if (mimeMessage != null) {
         decryptedMimeMessage =
             await mailMimeMessageController.decryptMimeMessage(mimeMessage);
+        subject.value = decryptedMimeMessage.subject;
       }
     }
     if (mimeMessage == null) {
       decryptedMimeMessage.subject = null;
+      subject.value = null;
       decryptedMimeMessage.html = null;
     }
     return mimeMessage;
@@ -180,7 +191,6 @@ class _MailContentWidgetState extends State<MailContentWidget> {
                 ),
                 IconButton(
                     onPressed: () {
-                      //mailAddressController.fetchMessageContents();
                       setState(() {});
                     },
                     icon: Icon(
@@ -189,7 +199,10 @@ class _MailContentWidgetState extends State<MailContentWidget> {
                     ))
               ]));
             }
-            return PlatformWebView(html: decryptedMimeMessage.html);
+            return Column(children: [
+              Expanded(child: PlatformWebView(html: decryptedMimeMessage.html)),
+              _buildAttachmentChips(context)
+            ]);
           }
           return Center(
             child: Text(AppLocalizations.t("Have no mimeMessage")),
@@ -208,6 +221,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     for (ContentInfo contentInfo in contentInfos) {
       String? fileName = contentInfo.fileName;
       fileName = fileName ?? AppLocalizations.t('Unknown filename');
+      fileName = FileUtil.filename(fileName);
       int? size = contentInfo.size;
       MediaType? mediaType = contentInfo.mediaType;
       String? mimeType = FileUtil.mimeType(fileName);
@@ -217,23 +231,35 @@ class _MailContentWidgetState extends State<MailContentWidget> {
         size: 32,
         isOutlined: true,
       );
-      var chip = Card(
-        elevation: 0.0,
-        //margin: const EdgeInsets.all(10.0),
-        child: Container(
-            padding: const EdgeInsets.all(5.0),
-            width: 150,
-            child: Column(children: [
-              icon,
-              Text(
-                fileName,
-                softWrap: true,
-                overflow: TextOverflow.fade,
-                maxLines: 3,
-              ),
-              Text('$size'),
-            ])),
-      );
+      String fetchId = contentInfo.fetchId;
+      var chip = GestureDetector(
+          onDoubleTap: () async {
+            MediaProvider? mediaProvider =
+                await findAttachmentMediaProvider(fetchId);
+            if (mediaProvider != null) {
+              mimeMessageAttachmentController.mediaProvider = mediaProvider;
+              indexWidgetProvider.push('full_screen_attachment');
+            }
+          },
+          child: Card(
+            elevation: 0.0,
+            shape: ContinuousRectangleBorder(
+                side: BorderSide(color: myself.primary)),
+            //margin: const EdgeInsets.all(10.0),
+            child: Container(
+                padding: const EdgeInsets.all(5.0),
+                width: 150,
+                child: Column(children: [
+                  icon,
+                  Text(
+                    fileName,
+                    softWrap: true,
+                    overflow: TextOverflow.fade,
+                    maxLines: 3,
+                  ),
+                  Text('$size'),
+                ])),
+          ));
       chips.add(chip);
     }
     if (chips.isNotEmpty) {
@@ -252,13 +278,13 @@ class _MailContentWidgetState extends State<MailContentWidget> {
 
   @override
   Widget build(BuildContext context) {
-    String? title = widget.title;
-    MimeMessage? mimeMessage = mailMimeMessageController.currentMimeMessage;
-    if (mimeMessage != null) {
-      title = decryptedMimeMessage.subject;
-    }
     var appBarView = AppBarView(
-        title: title ?? 'No subject',
+        titleWidget: ValueListenableBuilder(
+          valueListenable: subject,
+          builder: (BuildContext context, subject, Widget? child) {
+            return CommonAutoSizeText(subject ?? '');
+          },
+        ),
         withLeading: widget.withLeading,
         child: Card(
             elevation: 0.0,
@@ -266,10 +292,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
             margin: EdgeInsets.zero,
             child: SizedBox(
                 width: double.infinity,
-                child: Column(children: [
-                  Expanded(child: _buildMimeMessageViewer(context)),
-                  _buildAttachmentChips(context)
-                ]))));
+                child: _buildMimeMessageViewer(context))));
     return appBarView;
   }
 

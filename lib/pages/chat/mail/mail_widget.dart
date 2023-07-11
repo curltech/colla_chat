@@ -20,7 +20,7 @@ import 'package:flutter/material.dart';
 class MailWidget extends StatefulWidget with TileDataMixin {
   final MailAddressWidget mailAddressWidget = MailAddressWidget();
   final MailListWidget mailListWidget = const MailListWidget();
-  final MailContentWidget mailContentWidget = const MailContentWidget();
+  final MailContentWidget mailContentWidget = MailContentWidget();
   final NewMailWidget newMailWidget = const NewMailWidget();
 
   MailWidget({Key? key}) : super(key: key) {
