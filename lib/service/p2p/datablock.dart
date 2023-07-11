@@ -32,7 +32,7 @@ class DataBlockService extends BaseService {
       dataBlock.payload = payload.payload;
       dataBlock.metadata = payload.metadata;
       dataBlock.thumbnail = payload.thumbnail;
-      dataBlock.name = payload.name;
+      dataBlock.name = payload.domainName;
       dataBlock.description = payload.description;
       dataBlock.expireDate = payload.expireDate;
       dataBlock.mimeType = payload.mimeType;

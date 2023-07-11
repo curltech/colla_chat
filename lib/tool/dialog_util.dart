@@ -111,6 +111,7 @@ class DialogUtil {
     for (var item in items) {
       SimpleDialogOption option = _simpleDialogOption(
           context: context,
+          prefix: item.leading,
           label: item.label,
           value: item.value,
           checked: item.checked);
@@ -136,25 +137,35 @@ class DialogUtil {
     required String label,
     required T value,
     required bool checked,
+    Widget? prefix,
   }) {
     TextStyle style = TextStyle(color: myself.primary);
+    List<Widget> children = [];
+    if (prefix != null) {
+      children.add(prefix);
+      children.add(const SizedBox(
+        width: 10.0,
+      ));
+    }
+    children.add(CommonAutoSizeText(
+      label,
+      style: checked ? style : null,
+    ));
+    children.add(
+      const Spacer(),
+    );
+    children.add(checked
+        ? Icon(
+            Icons.check,
+            color: myself.primary,
+          )
+        : Container());
     return SimpleDialogOption(
         onPressed: () {
           Navigator.pop(context, value);
         },
-        child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          CommonAutoSizeText(
-            label,
-            style: checked ? style : null,
-          ),
-          const Spacer(),
-          checked
-              ? Icon(
-                  Icons.check,
-                  color: myself.primary,
-                )
-              : Container()
-        ]));
+        child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end, children: children));
   }
 
   ///利用Option产生的SelectMenu

@@ -1,6 +1,7 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/emailaddress.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/mail/address/email_service_provider.dart';
 import 'package:colla_chat/pages/chat/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/pages/chat/mail/mail_address_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_content_widget.dart';
@@ -24,6 +25,7 @@ class MailWidget extends StatefulWidget with TileDataMixin {
   final NewMailWidget newMailWidget = const NewMailWidget();
 
   MailWidget({Key? key}) : super(key: key) {
+    platformEmailServiceProvider.init();
     indexWidgetProvider.define(mailContentWidget);
     indexWidgetProvider.define(newMailWidget);
   }

@@ -1,4 +1,5 @@
 import 'package:colla_chat/entity/chat/emailaddress.dart';
+import 'package:colla_chat/pages/chat/mail/address/email_service_provider.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/emailaddress.dart';
@@ -8,6 +9,7 @@ import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:enough_mail/discover.dart';
@@ -34,12 +36,75 @@ class AutoDiscoverWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
-  ValueNotifier<ClientConfig?> clientConfig =
-      ValueNotifier<ClientConfig?>(null);
+  ValueNotifier<EmailServiceProvider?> emailServiceProvider =
+      ValueNotifier<EmailServiceProvider?>(null);
+  TextEditingController emailServiceProviderController =
+      TextEditingController();
+  ValueNotifier<List<Option<String>>> emailServiceProviderOptions =
+      ValueNotifier<List<Option<String>>>([]);
 
   @override
   void initState() {
     super.initState();
+    _updateEmailServiceProviderOptions();
+  }
+
+  _updateEmailServiceProviderOptions() {
+    List<Option<String>> items = [];
+    for (var emailServiceProvider
+        in platformEmailServiceProvider.emailServiceProviders) {
+      items.add(Option(
+          emailServiceProvider.domainName, emailServiceProvider.domainName,
+          leading: emailServiceProvider.logo,
+          checked: emailServiceProviderController.text ==
+              emailServiceProvider.domainName,
+          hint: emailServiceProvider.incomingHostName));
+    }
+    emailServiceProviderOptions.value = items;
+  }
+
+  Widget _buildEmailServiceProviderSelector(BuildContext context) {
+    Widget emailServiceProvider = ValueListenableBuilder(
+        valueListenable: emailServiceProviderOptions,
+        builder: (BuildContext buildContext, List<Option<String>> options,
+            Widget? child) {
+          Widget? prefix;
+          for (var option in options) {
+            if (option.checked && option.leading != null) {
+              prefix = Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: option.leading);
+              break;
+            }
+          }
+          return CommonAutoSizeTextFormField(
+            labelText: 'Select email service provider',
+            prefixIcon: prefix,
+            controller: emailServiceProviderController,
+            readOnly: true,
+            suffixIcon: IconButton(
+              onPressed: () async {
+                String? domainName = await DialogUtil.showSelectDialog<String>(
+                    context: context,
+                    title: const CommonAutoSizeText(
+                        'Select email service provider'),
+                    items: options);
+                if (domainName != null) {
+                  emailServiceProviderController.text = domainName;
+                  _updateEmailServiceProviderOptions();
+                }
+              },
+              icon: Icon(
+                Icons.search,
+                color: myself.primary,
+              ),
+            ),
+          );
+        });
+
+    return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        child: emailServiceProvider);
   }
 
   List<ColumnFieldDef> _getAutoDiscoveryColumnFieldDefs() {
@@ -111,12 +176,13 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
     DialogUtil.loadingShow(context,
         tip: 'Auto discovering email server,\n please waiting...');
     try {
-      ClientConfig? clientConfig = await EmailMessageUtil.discover(email!);
-      if (clientConfig != null) {
+      EmailServiceProvider? emailServiceProvider =
+          await EmailMessageUtil.discover(email!);
+      if (emailServiceProvider != null) {
         if (mounted) {
           DialogUtil.info(context, content: 'Auto discover successfully');
         }
-        this.clientConfig.value = clientConfig;
+        this.emailServiceProvider.value = emailServiceProvider;
       } else {
         if (mounted) {
           DialogUtil.error(context, content: 'Auto discover failure');
@@ -146,14 +212,16 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
       }
       return;
     }
-    var clientConfig = this.clientConfig.value;
-    if (clientConfig == null) {
-      logger.e('auto discover config is null');
+    var emailServiceProvider = this.emailServiceProvider.value;
+    if (emailServiceProvider == null) {
+      logger.e('auto discover emailServiceProvider is null');
       if (mounted) {
-        DialogUtil.error(context, content: 'Auto discovery config is null');
+        DialogUtil.error(context,
+            content: 'Auto discovery emailServiceProvider is null');
       }
       return;
     }
+    ClientConfig clientConfig = emailServiceProvider.clientConfig;
     EmailAddress emailAddress =
         EmailMessageUtil.buildDiscoverEmailAddress(email!, name!, clientConfig);
     DialogUtil.loadingShow(context,
@@ -189,7 +257,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
     }
   }
 
-  static List<Widget> clientConfigWidget(ClientConfig clientConfig) {
+  List<Widget> clientConfigWidget(ClientConfig clientConfig) {
     List<Widget> configWidgets = [];
     for (final ConfigEmailProvider provider in clientConfig.emailProviders!) {
       configWidgets
@@ -216,13 +284,18 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
         title: widget.title,
         withLeading: widget.withLeading,
         child: Column(children: [
+          const SizedBox(
+            height: 10.0,
+          ),
+          _buildEmailServiceProviderSelector(context),
           _buildFormInputWidget(context),
           Expanded(
               child: ValueListenableBuilder(
-                  valueListenable: clientConfig,
-                  builder: (BuildContext context, ClientConfig? clientConfig,
+                  valueListenable: emailServiceProvider,
+                  builder: (BuildContext context,
+                      EmailServiceProvider? emailServiceProvider,
                       Widget? child) {
-                    if (clientConfig != null) {
+                    if (emailServiceProvider != null) {
                       return Card(
                           elevation: 0.0,
                           margin: EdgeInsets.zero,
@@ -231,7 +304,8 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 5.0, horizontal: 15.0),
                               child: ListView(
-                                children: clientConfigWidget(clientConfig),
+                                children: clientConfigWidget(
+                                    emailServiceProvider.clientConfig),
                               )));
                     }
                     return Container();

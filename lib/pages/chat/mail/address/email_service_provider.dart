@@ -1,49 +1,45 @@
 import 'package:colla_chat/pages/chat/mail/address/oauth.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:enough_mail/discover.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-final Map<String, EmailServiceProvider> emailServiceProviders =
-    <String, EmailServiceProvider>{
-  'gmail': GmailProvider(),
-  'outlook': OutlookProvider(),
-  'yahoo': YahooProvider(),
-  'aol': AolProvider(),
-  'apple': AppleProvider(),
-  'gmx': GmxProvider(),
-  'mailbox': MailboxOrgProvider(),
-};
+class PlatformEmailServiceProvider {
+  final Map<String, EmailServiceProvider> domainNameServiceProviders =
+      <String, EmailServiceProvider>{};
+  final List<EmailServiceProvider> emailServiceProviders =
+      <EmailServiceProvider>[];
 
-Future<EmailServiceProvider?> discover(String email) async {
-  final emailDomain = email.substring(email.indexOf('@') + 1);
-  final providerEmail = emailServiceProviders[emailDomain];
-  if (providerEmail != null) {
-    return providerEmail;
+  PlatformEmailServiceProvider();
+
+  init() {
+    ///著名的邮件服务提供商
+    _init(GmailProvider());
+    _init(OutlookProvider());
+    _init(YahooProvider());
+    _init(AolProvider());
+    _init(AppleProvider());
+    _init(GmxProvider());
+    _init(MailboxOrgProvider());
+    _init(Mail163Provider());
   }
-  try {
-    final clientConfig = await Discover.discover(email,
-        forceSslConnection: true, isLogEnabled: true);
-    if (clientConfig == null || clientConfig.preferredIncomingServer == null) {
-      return null;
+
+  _init(EmailServiceProvider emailServiceProvider) {
+    emailServiceProviders.add(emailServiceProvider);
+    var domains = emailServiceProvider.domains;
+    if (domains != null && domains.isNotEmpty) {
+      for (String domain in domains) {
+        platformEmailServiceProvider.domainNameServiceProviders[domain] =
+            emailServiceProvider;
+      }
     }
-    final hostName = clientConfig.preferredIncomingServer!.hostname!;
-    final providerHostName = emailServiceProviders[hostName];
-    if (providerHostName != null) {
-      return providerHostName;
-    }
-    final id = email.substring(email.indexOf('@') + 1);
-    return EmailServiceProvider(id, hostName, clientConfig);
-  } catch (e, s) {
-    if (kDebugMode) {
-      print('Unable to discover settings for [$email]: $e $s');
-    }
-    return null;
   }
 }
 
+final PlatformEmailServiceProvider platformEmailServiceProvider =
+    PlatformEmailServiceProvider();
+
 class EmailServiceProvider {
-  final String name; //邮件服务商提供者
+  final String domainName; //邮件服务商提供者的域名
   final String incomingHostName; //imap主机名
   final ClientConfig clientConfig; //客户端配置
   Widget? logo;
@@ -51,7 +47,7 @@ class EmailServiceProvider {
   final OauthClient? oauthClient; //oauth验证客户端
   final String? appSpecificPasswordSetupUrl;
   final String? manualImapAccessSetupUrl;
-  final List<String>? domains;
+  final List<String>? domains; //邮件服务商提供者的所有域名
 
   String? get displayName => (clientConfig.emailProviders == null ||
           clientConfig.emailProviders!.isEmpty)
@@ -59,7 +55,7 @@ class EmailServiceProvider {
       : clientConfig.emailProviders!.first.displayName;
 
   EmailServiceProvider(
-    this.name,
+    this.domainName,
     this.incomingHostName,
     this.clientConfig, {
     this.oauthClient,
@@ -67,15 +63,16 @@ class EmailServiceProvider {
     this.manualImapAccessSetupUrl,
     this.domains,
   }) {
+    String name = domainName.substring(0, domainName.indexOf('.'));
     logo = ImageUtil.buildImageWidget(
-        image: 'assets/images/providers/$name.png', height: 50);
+        image: 'assets/images/email/$name.png', height: 36);
   }
 }
 
 class GmailProvider extends EmailServiceProvider {
   GmailProvider()
       : super(
-          'gmail',
+          'gmail.com',
           'imap.gmail.com',
           ClientConfig()
             ..emailProviders = [
@@ -114,7 +111,7 @@ class GmailProvider extends EmailServiceProvider {
 class OutlookProvider extends EmailServiceProvider {
   OutlookProvider()
       : super(
-          'outlook',
+          'outlook.com',
           'outlook.office365.com',
           ClientConfig()
             ..emailProviders = [
@@ -256,7 +253,7 @@ class OutlookProvider extends EmailServiceProvider {
 class YahooProvider extends EmailServiceProvider {
   YahooProvider()
       : super(
-          'yahoo',
+          'yahoo.com',
           'imap.mail.yahoo.com',
           ClientConfig()
             ..emailProviders = [
@@ -312,7 +309,7 @@ class YahooProvider extends EmailServiceProvider {
 class AolProvider extends EmailServiceProvider {
   AolProvider()
       : super(
-          'aol',
+          'aol.com',
           'imap.aol.com',
           ClientConfig()
             ..emailProviders = [
@@ -370,7 +367,7 @@ class AolProvider extends EmailServiceProvider {
 class AppleProvider extends EmailServiceProvider {
   AppleProvider()
       : super(
-          'apple',
+          'apple.com',
           'imap.mail.me.com',
           ClientConfig()
             ..emailProviders = [
@@ -408,7 +405,7 @@ class AppleProvider extends EmailServiceProvider {
 class GmxProvider extends EmailServiceProvider {
   GmxProvider()
       : super(
-          'gmx',
+          'gmx.net',
           'imap.gmx.net',
           ClientConfig()
             ..emailProviders = [
@@ -455,7 +452,7 @@ class GmxProvider extends EmailServiceProvider {
 class MailboxOrgProvider extends EmailServiceProvider {
   MailboxOrgProvider()
       : super(
-          'mailbox_org',
+          'mailbox.org',
           'imap.gmx.net',
           ClientConfig()
             ..emailProviders = [
@@ -485,5 +482,49 @@ class MailboxOrgProvider extends EmailServiceProvider {
               )
             ],
           domains: ['mailbox.org'],
+        );
+}
+
+class Mail163Provider extends EmailServiceProvider {
+  Mail163Provider()
+      : super(
+          '163.com',
+          'imap.163.com',
+          ClientConfig()
+            ..emailProviders = [
+              ConfigEmailProvider(
+                displayName: '163.com',
+                displayShortName: '163',
+                incomingServers: [
+                  ServerConfig(
+                    type: ServerType.imap,
+                    hostname: 'imap.163.com',
+                    port: 993,
+                    socketType: SocketType.ssl,
+                    authentication: Authentication.passwordClearText,
+                    usernameType: UsernameType.emailAddress,
+                  ),
+                  ServerConfig(
+                    type: ServerType.pop,
+                    hostname: 'pop.163.com',
+                    port: 995,
+                    socketType: SocketType.ssl,
+                    authentication: Authentication.passwordClearText,
+                    usernameType: UsernameType.emailAddress,
+                  )
+                ],
+                outgoingServers: [
+                  ServerConfig(
+                    type: ServerType.smtp,
+                    hostname: 'smtp.163.com',
+                    port: 465,
+                    socketType: SocketType.ssl,
+                    authentication: Authentication.passwordClearText,
+                    usernameType: UsernameType.emailAddress,
+                  )
+                ],
+              )
+            ],
+          domains: ['163.com'],
         );
 }

@@ -4,13 +4,13 @@ import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/emailaddress.dart' as entity;
 import 'package:colla_chat/entity/chat/message_attachment.dart';
+import 'package:colla_chat/pages/chat/mail/address/email_service_provider.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_html/enough_mail_html.dart';
 import 'package:event_bus/event_bus.dart';
-import 'package:synchronized/extension.dart';
 import 'package:synchronized/synchronized.dart';
 
 class EmailMessageUtil {
@@ -164,12 +164,33 @@ class EmailMessageUtil {
     return null;
   }
 
-  /// 自动发现邮件地址配置
-  static Future<enough_mail.ClientConfig?> discover(String email) async {
-    final config =
-        await enough_mail.Discover.discover(email, isLogEnabled: false);
+  /// 寻找email的邮件服务提供商，先搜索著名的提供商列表，如果存在直接返回
+  /// 否则，自动发现邮件地址配置，然后加入服务商提供商列表
+  static Future<EmailServiceProvider?> discover(String email) async {
+    final emailDomain = email.substring(email.indexOf('@') + 1);
+    final emailServiceProvider = platformEmailServiceProvider.domainNameServiceProviders[emailDomain];
+    if (emailServiceProvider != null) {
+      return emailServiceProvider;
+    }
+    try {
+      final clientConfig = await Discover.discover(email,
+          forceSslConnection: true, isLogEnabled: true);
+      if (clientConfig == null ||
+          clientConfig.preferredIncomingServer == null) {
+        return null;
+      }
+      final hostName = clientConfig.preferredIncomingServer!.hostname!;
+      final providerHostName = platformEmailServiceProvider.domainNameServiceProviders[hostName];
+      if (providerHostName != null) {
+        return providerHostName;
+      }
+      final domainName = email.substring(email.indexOf('@') + 1);
 
-    return config;
+      return EmailServiceProvider(domainName, hostName, clientConfig);
+    } catch (e, s) {
+      logger.e('Unable to discover settings for [$email]: $e $s');
+      return null;
+    }
   }
 
   ///传入email，name和邮件地址配置参数，产生新的邮件地址实体

@@ -1,4 +1,5 @@
 import 'package:colla_chat/entity/chat/emailaddress.dart';
+import 'package:colla_chat/pages/chat/mail/address/email_service_provider.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -182,56 +183,65 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
     }
 
     var emails = email!.split('@');
+    EmailServiceProvider? emailServiceProvider;
     String domain = emails[1];
-    List<String?>? domains = [domain];
-    String? displayName = domain;
-    String? displayShortName = name;
-    ServerConfig imapServerConfig = ServerConfig(
-      type: ServerType.imap,
-      hostname: imapServerHost,
-      port: int.parse(imapServerPort!),
-      socketType: SocketType.ssl,
-      authentication: Authentication.plain,
-      usernameType: UsernameType.emailAddress,
-    );
-    String? popServerHost = values['popServerHost'];
-    String? popServerPort = values['popServerPort'];
-    ServerConfig? popServerConfig;
-    if (StringUtil.isNotEmpty(popServerHost) ||
-        StringUtil.isNotEmpty(popServerPort)) {
-      popServerConfig = ServerConfig(
-        type: ServerType.pop,
-        hostname: popServerHost,
-        port: int.parse(popServerPort!),
+    if (platformEmailServiceProvider.domainNameServiceProviders
+        .containsKey(domain)) {
+      emailServiceProvider =
+          platformEmailServiceProvider.domainNameServiceProviders[domain];
+    } else {
+      String? displayName = domain;
+      String? displayShortName = name;
+      ServerConfig imapServerConfig = ServerConfig(
+        type: ServerType.imap,
+        hostname: imapServerHost,
+        port: int.parse(imapServerPort!),
         socketType: SocketType.ssl,
         authentication: Authentication.plain,
         usernameType: UsernameType.emailAddress,
       );
+      String? popServerHost = values['popServerHost'];
+      String? popServerPort = values['popServerPort'];
+      ServerConfig? popServerConfig;
+      if (StringUtil.isNotEmpty(popServerHost) ||
+          StringUtil.isNotEmpty(popServerPort)) {
+        popServerConfig = ServerConfig(
+          type: ServerType.pop,
+          hostname: popServerHost,
+          port: int.parse(popServerPort!),
+          socketType: SocketType.ssl,
+          authentication: Authentication.plain,
+          usernameType: UsernameType.emailAddress,
+        );
+      }
+      ServerConfig smtpServerConfig = ServerConfig(
+        type: ServerType.smtp,
+        hostname: smtpServerHost,
+        port: int.parse(smtpServerPort!),
+        socketType: SocketType.ssl,
+        authentication: Authentication.plain,
+        usernameType: UsernameType.emailAddress,
+      );
+      ClientConfig clientConfig = ClientConfig();
+      clientConfig.emailProviders = [
+        ConfigEmailProvider(
+          displayName: displayName,
+          displayShortName: displayShortName,
+          incomingServers: [imapServerConfig],
+          outgoingServers: [smtpServerConfig],
+        )
+      ];
+
+      emailServiceProvider =
+          EmailServiceProvider(domain, imapServerHost!, clientConfig);
     }
-    ServerConfig smtpServerConfig = ServerConfig(
-      type: ServerType.smtp,
-      hostname: smtpServerHost,
-      port: int.parse(smtpServerPort!),
-      socketType: SocketType.ssl,
-      authentication: Authentication.plain,
-      usernameType: UsernameType.emailAddress,
-    );
-    ConfigEmailProvider emailProviders = ConfigEmailProvider(
-        domains: domains,
-        displayName: displayName,
-        displayShortName: displayShortName);
-    emailProviders.addIncomingServer(imapServerConfig);
-    if (popServerConfig != null) {
-      emailProviders.addIncomingServer(popServerConfig);
-    }
-    emailProviders.addOutgoingServer(smtpServerConfig);
-    ClientConfig clientConfig = ClientConfig(emailProviders: [emailProviders]);
-    EmailAddress emailAddress =
-        EmailMessageUtil.buildDiscoverEmailAddress(email, name!, clientConfig);
+    EmailAddress emailAddress = EmailMessageUtil.buildDiscoverEmailAddress(
+        email, name!, emailServiceProvider!.clientConfig);
     DialogUtil.loadingShow(context,
         tip: 'Manual connecting email server,\n please waiting...');
-    EmailClient? emailClient = await emailClientPool
-        .create(emailAddress, password!, config: clientConfig);
+    EmailClient? emailClient = await emailClientPool.create(
+        emailAddress, password!,
+        config: emailServiceProvider.clientConfig);
     if (mounted) {
       DialogUtil.loadingHide(context);
     }
