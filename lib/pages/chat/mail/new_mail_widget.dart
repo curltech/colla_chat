@@ -1,20 +1,17 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/crypto/util.dart';
-import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/emailaddress.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
-import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/pages/chat/mail/mail_mime_message_controller.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/emailaddress.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/document_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
@@ -82,7 +79,7 @@ class _NewMailWidgetState extends State<NewMailWidget> {
 
   @override
   initState() {
-    mailAddressController.addListener(_update);
+    mailMimeMessageController.addListener(_update);
     super.initState();
   }
 
@@ -229,12 +226,12 @@ class _NewMailWidgetState extends State<NewMailWidget> {
             }));
   }
 
-  ///发送前的准备，准备数据和地址
+  ///发送前的准备，准备数据和地址，加密
   Future<String?> _preSend(MessageBuilder builder,
       {bool needEncrypt = true}) async {
     List<MailAddress> from = [];
     MailAddress? sender;
-    EmailAddress? current = mailAddressController.current;
+    EmailAddress? current = mailMimeMessageController.current;
     String? email;
     if (current != null) {
       email = current.email;
@@ -267,13 +264,14 @@ class _NewMailWidgetState extends State<NewMailWidget> {
       if (encryptedSubject == null) {
         return null;
       }
-      builder.subject = CryptoUtil.encodeBase64(encryptedSubject.data);
+      String subject = CryptoUtil.encodeBase64(encryptedSubject.data);
+      //加前后缀表示加密
+      builder.subject = '#{$subject}';
       secretKey = encryptedSubject.secretKey;
       Map<String, String>? payloadKeys = encryptedSubject.payloadKeys;
+      //表示群加密
       if (payloadKeys != null) {
         builder.addHeader(payloadKeysName, JsonUtil.toJsonString(payloadKeys));
-      } else {
-        builder.addHeader(payloadKeysName, JsonUtil.toJsonString({}));
       }
     } else {
       builder.subject = subjectController.text;
@@ -305,7 +303,8 @@ class _NewMailWidgetState extends State<NewMailWidget> {
               .encrypt(bytes, receipts.value, secretKey: secretKey);
           if (encryptedAttachment != null) {
             builder.addBinary(Uint8List.fromList(encryptedAttachment.data),
-                MediaType.guessFromFileName(filename));
+                MediaType.guessFromFileName(filename),
+                filename: filename);
           }
         } else {
           builder.addBinary(bytes, MediaType.guessFromFileName(filename));
@@ -333,6 +332,8 @@ class _NewMailWidgetState extends State<NewMailWidget> {
 
   ///发送邮件，首先将邮件的编辑部分转换成html格式，对邮件的各个组成部分加密，目标为多人时采用群加密方式，然后发送
   _send() async {
+    DialogUtil.loadingShow(context);
+
     ///邮件消息的构造器
     MessageBuilder builder =
         MessageBuilder.prepareMultipartAlternativeMessage();
@@ -357,6 +358,11 @@ class _NewMailWidgetState extends State<NewMailWidget> {
         }
       }
     }
+    if (mounted) {
+      DialogUtil.loadingHide(context);
+    }
+
+    indexWidgetProvider.pop();
   }
 
   @override
@@ -398,7 +404,7 @@ class _NewMailWidgetState extends State<NewMailWidget> {
 
   @override
   void dispose() {
-    mailAddressController.removeListener(_update);
+    mailMimeMessageController.removeListener(_update);
     super.dispose();
   }
 }

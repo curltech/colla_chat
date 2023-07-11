@@ -1,7 +1,7 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/emailaddress.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
+import 'package:colla_chat/pages/chat/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/pages/chat/mail/mail_address_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_content_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_list_widget.dart';
@@ -50,15 +50,15 @@ class _MailWidgetState extends State<MailWidget> {
 
   @override
   initState() {
-    mailAddressController.addListener(_update);
+    mailMimeMessageController.addListener(_update);
     super.initState();
-    mailAddressController.findAllMailAddress();
+    mailMimeMessageController.findAllMailAddress();
   }
 
   _update() {
-    EmailAddress? current = mailAddressController.current;
+    EmailAddress? current = mailMimeMessageController.current;
     String email = current?.email ?? '';
-    String? name = mailAddressController.currentMailboxName;
+    String? name = mailMimeMessageController.currentMailboxName;
     if (name == null) {
       mailboxName.value = email;
     } else {
@@ -131,6 +131,12 @@ class _MailWidgetState extends State<MailWidget> {
     } else {
       rightWidgets.add(IconButton(
           onPressed: () {
+            mailMimeMessageController.findMoreMimeMessages();
+          },
+          icon: const Icon(Icons.refresh),
+          tooltip: AppLocalizations.t('Refresh')));
+      rightWidgets.add(IconButton(
+          onPressed: () {
             indexWidgetProvider.push('new_mail');
           },
           icon: const Icon(Icons.note_add),
@@ -155,7 +161,7 @@ class _MailWidgetState extends State<MailWidget> {
 
   @override
   void dispose() {
-    mailAddressController.removeListener(_update);
+    mailMimeMessageController.removeListener(_update);
     super.dispose();
   }
 }

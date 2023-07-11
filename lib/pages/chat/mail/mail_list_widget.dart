@@ -1,6 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
+import 'package:colla_chat/pages/chat/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -20,42 +21,46 @@ class MailListWidget extends StatefulWidget {
 class _MailListWidgetState extends State<MailListWidget> {
   @override
   initState() {
-    mailAddressController.addListener(_update);
+    mailMimeMessageController.addListener(_update);
     super.initState();
-    mailAddressController.findMoreMimeMessages();
+    mailMimeMessageController.currentMimeMessages?.clear();
+    mailMimeMessageController.findMoreMimeMessages();
   }
 
   _update() {
     setState(() {});
   }
 
-  Future<List<MimeMessage>?> findMoreMimeMessages() async {
+  ///当前邮箱邮件消息转换成tileData，如果为空则返回空列表
+  Future<List<TileData>> findMoreMimeMessageTiles() async {
     List<MimeMessage>? currentMimeMessages =
-        mailAddressController.currentMimeMessages;
+        mailMimeMessageController.currentMimeMessages;
     if (currentMimeMessages == null || currentMimeMessages.isEmpty) {
-      await mailAddressController.findMoreMimeMessages();
+      await mailMimeMessageController.findMoreMimeMessages();
     }
-    currentMimeMessages = mailAddressController.currentMimeMessages;
+    currentMimeMessages = mailMimeMessageController.currentMimeMessages;
+    if (currentMimeMessages == null) {
+      return [];
+    }
 
-    return currentMimeMessages;
+    return await _convertMimeMessage(currentMimeMessages);
   }
 
-  _onTap(int index, String title, {String? subtitle, TileData? group}) {
-    mailAddressController.currentMailIndex = index;
-    indexWidgetProvider.push('mail_content');
-  }
-
-  List<TileData> _convertMimeMessage(List<MimeMessage> mimeMessages) {
+  Future<List<TileData>> _convertMimeMessage(
+      List<MimeMessage> mimeMessages) async {
     List<TileData> tiles = [];
     if (mimeMessages.isNotEmpty) {
       int i = 0;
       for (var mimeMessage in mimeMessages) {
+        DecryptedMimeMessage decryptedMimeMessage =
+            await mailMimeMessageController.decryptMimeMessage(mimeMessage);
+        var title = decryptedMimeMessage.subject;
         Envelope? envelope = mimeMessage.envelope;
         if (envelope == null) {
           //logger.e('');
           continue;
         }
-        var title = mimeMessage.envelope?.subject;
+        title ??= mimeMessage.envelope?.subject;
         var subtitle = mimeMessage.envelope?.sender?.personalName;
         subtitle = subtitle ?? '';
         var email = mimeMessage.envelope?.sender?.email;
@@ -67,10 +72,11 @@ class _MailListWidgetState extends State<MailListWidget> {
           titleTail = DateUtil.formatEasyRead(sendDate.toIso8601String());
         }
         TileData tile = TileData(
+            prefix: decryptedMimeMessage.needDecrypt ? Icons.lock : null,
             title: title ?? '',
             titleTail: titleTail,
             subtitle: subtitle.toString(),
-            selected: mailAddressController.currentMailIndex == i);
+            selected: mailMimeMessageController.currentMailIndex == i);
         tiles.add(tile);
         i++;
       }
@@ -79,8 +85,13 @@ class _MailListWidgetState extends State<MailListWidget> {
     return tiles;
   }
 
+  _onTap(int index, String title, {String? subtitle, TileData? group}) {
+    mailMimeMessageController.currentMailIndex = index;
+    indexWidgetProvider.push('mail_content');
+  }
+
   Future<void> _onScrollMax() async {
-    await mailAddressController.findMoreMimeMessages();
+    await mailMimeMessageController.findMoreMimeMessages();
   }
 
   Future<void> _onScrollMin() async {
@@ -88,23 +99,20 @@ class _MailListWidgetState extends State<MailListWidget> {
   }
 
   Future<void> _onRefresh() async {
-    await mailAddressController.findMoreMimeMessages();
+    await mailMimeMessageController.findMoreMimeMessages();
   }
 
   Widget _buildMailListWidget(BuildContext context) {
     var dataListView = FutureBuilder(
-        future: findMoreMimeMessages(),
+        future: findMoreMimeMessageTiles(),
         builder:
-            (BuildContext context, AsyncSnapshot<List<MimeMessage>?> snapshot) {
+            (BuildContext context, AsyncSnapshot<List<TileData>> snapshot) {
           if (!snapshot.hasData) {
             return LoadingUtil.buildLoadingIndicator();
           }
-          List<MimeMessage>? mimeMessages = snapshot.data;
-          if (mimeMessages != null) {
-            var tiles = _convertMimeMessage(mimeMessages);
-
+          List<TileData>? tiles = snapshot.data;
+          if (tiles != null) {
             return DataListView(
-                reverse: true,
                 onTap: _onTap,
                 tileData: tiles,
                 onScrollMax: _onScrollMax,
@@ -127,7 +135,7 @@ class _MailListWidgetState extends State<MailListWidget> {
 
   @override
   void dispose() {
-    mailAddressController.removeListener(_update);
+    mailMimeMessageController.removeListener(_update);
     super.dispose();
   }
 }

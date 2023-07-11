@@ -446,5 +446,6 @@
   "Paste": "粘贴",
   "Please paste linkman json here": "请粘贴联系人字符串",
   "MimeMessage is no content": "邮件没有内容或者内容未下载",
-  "Have no mimeMessage": "没有邮件"
+  "Have no mimeMessage": "没有邮件",
+  "MailContent": "邮件内容"
 }

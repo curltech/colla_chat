@@ -91,9 +91,9 @@ class TileData {
       } else if (prefix is IconData) {
         // leading = Icon(prefix);
         if (selected) {
-          leading = Icon(prefix, color: myself.primary);
+          leading = Icon(prefix, color: Colors.white);
         } else {
-          leading = Icon(prefix, color: myself.secondary);
+          leading = Icon(prefix, color: myself.primary);
         }
       }
     }
@@ -204,7 +204,7 @@ class DataListTile extends StatelessWidget {
       minLeadingWidth: minLeadingWidth,
       selected: selected,
       selectedColor: Colors.white,
-      // selectedTileColor: myself.primary,
+      selectedTileColor: myself.primary,
       leading: leading,
       title: titleWidget,
       subtitle: tileData.subtitle != null

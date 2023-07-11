@@ -10,6 +10,8 @@ import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_html/enough_mail_html.dart';
 import 'package:event_bus/event_bus.dart';
+import 'package:synchronized/extension.dart';
+import 'package:synchronized/synchronized.dart';
 
 class EmailMessageUtil {
   /// 创建带附件的消息
@@ -246,6 +248,7 @@ class EmailMessageUtil {
 
 class EmailClient {
   entity.EmailAddress emailAddress;
+  Lock lock = Lock();
 
   ///mailClient是自动发现产生的客户端
   ClientConfig? config;
@@ -411,9 +414,23 @@ class EmailClient {
     return null;
   }
 
+  Future<List<enough_mail.MimeMessage>?> fetchMessages(
+      {int limit = defaultLimit,
+      FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
+      Mailbox? mailbox,
+      int offset = defaultOffset}) async {
+    return await lock.synchronized(() async {
+      return await _fetchMessages(
+          limit: limit,
+          fetchPreference: fetchPreference,
+          mailbox: mailbox,
+          offset: offset);
+    });
+  }
+
   ///用邮件客户端获取消息，可以设定完全获取，或者部分获取
   ///默认是在尺寸内的完全获取，或者只获取封面
-  Future<List<enough_mail.MimeMessage>?> fetchMessages(
+  Future<List<enough_mail.MimeMessage>?> _fetchMessages(
       {int limit = defaultLimit,
       FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
       Mailbox? mailbox,
@@ -457,8 +474,22 @@ class EmailClient {
     return null;
   }
 
-  ///取给定的页号的下一页
   Future<List<enough_mail.MimeMessage>?> fetchMessagesNextPage(
+    PagedMessageSequence pagedSequence, {
+    Mailbox? mailbox,
+    FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
+    bool markAsSeen = false,
+  }) async {
+    return await lock.synchronized(() async {
+      return await _fetchMessagesNextPage(pagedSequence,
+          fetchPreference: fetchPreference,
+          mailbox: mailbox,
+          markAsSeen: markAsSeen);
+    });
+  }
+
+  ///取给定的页号的下一页
+  Future<List<enough_mail.MimeMessage>?> _fetchMessagesNextPage(
     PagedMessageSequence pagedSequence, {
     Mailbox? mailbox,
     FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
@@ -522,6 +553,20 @@ class EmailClient {
     FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
     bool markAsSeen = false,
   }) async {
+    return await lock.synchronized(() async {
+      return await _fetchMessageSequence(sequence,
+          fetchPreference: fetchPreference,
+          mailbox: mailbox,
+          markAsSeen: markAsSeen);
+    });
+  }
+
+  Future<List<enough_mail.MimeMessage>?> _fetchMessageSequence(
+    MessageSequence sequence, {
+    Mailbox? mailbox,
+    FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
+    bool markAsSeen = false,
+  }) async {
     final enough_mail.MailClient? mailClient = this.mailClient;
     if (mailClient != null) {
       return await mailClient.fetchMessageSequence(sequence,
@@ -557,6 +602,13 @@ class EmailClient {
 
   Future<List<enough_mail.MimeMessage>?> searchMessagesNextPage(
       MailSearchResult searchResult) async {
+    return await lock.synchronized(() async {
+      return await _searchMessagesNextPage(searchResult);
+    });
+  }
+
+  Future<List<enough_mail.MimeMessage>?> _searchMessagesNextPage(
+      MailSearchResult searchResult) async {
     final enough_mail.MailClient? mailClient = this.mailClient;
     if (mailClient != null) {
       return await mailClient.searchMessagesNextPage(searchResult);
@@ -565,6 +617,13 @@ class EmailClient {
   }
 
   Future<enough_mail.MailSearchResult?> searchMessages(
+      MailSearch search) async {
+    return await lock.synchronized(() async {
+      return await _searchMessages(search);
+    });
+  }
+
+  Future<enough_mail.MailSearchResult?> _searchMessages(
       MailSearch search) async {
     final enough_mail.MailClient? mailClient = this.mailClient;
     if (mailClient != null) {

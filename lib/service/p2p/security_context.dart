@@ -9,7 +9,6 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/tool/string_util.dart';
 import 'package:cryptography/cryptography.dart';
 
 ///0表示不会根据长度来决定是否压缩

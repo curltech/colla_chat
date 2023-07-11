@@ -1,15 +1,39 @@
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/emailaddress.dart' as entity;
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/mail/new_mail_widget.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/emailaddress.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/material.dart';
+import 'package:synchronized/synchronized.dart';
+
+class DecryptedMimeMessage {
+  //如果needDecrypt为true，payloadKey为空，则为linkman加密，否则是group的加密密钥
+  String? payloadKey;
+
+  //解密后的标题
+  String? subject;
+
+  //解密后的html
+  String? html;
+  bool needDecrypt;
+
+  DecryptedMimeMessage(
+      {this.needDecrypt = false, this.payloadKey, this.subject, this.html});
+}
 
 /// 邮件地址控制器，每个地址有多个邮箱，每个邮箱包含多个邮件
-class MailAddressController extends DataListController<entity.EmailAddress> {
+class MailMimeMessageController
+    extends DataListController<entity.EmailAddress> {
+  Lock lock = Lock();
+
   ///缺省的邮件地址
   entity.EmailAddress? defaultMailAddress;
 
@@ -43,7 +67,7 @@ class MailAddressController extends DataListController<entity.EmailAddress> {
   };
 
   ///构造函数从数据库获取所有的邮件地址，初始化邮箱数据
-  MailAddressController() {
+  MailMimeMessageController() {
     for (var mailBoxeIcon in mailBoxeIcons.entries) {
       String name = mailBoxeIcon.key;
       String localeName = AppLocalizations.t(name);
@@ -230,6 +254,14 @@ class MailAddressController extends DataListController<entity.EmailAddress> {
   findMoreMimeMessages({
     FetchPreference fetchPreference = FetchPreference.envelope,
   }) async {
+    return await lock.synchronized(() async {
+      return await _findMoreMimeMessages(fetchPreference: fetchPreference);
+    });
+  }
+
+  _findMoreMimeMessages({
+    FetchPreference fetchPreference = FetchPreference.envelope,
+  }) async {
     if (current == null) {
       return;
     }
@@ -253,8 +285,20 @@ class MailAddressController extends DataListController<entity.EmailAddress> {
               offset: offset,
               fetchPreference: fetchPreference);
       if (mimeMessages != null && mimeMessages.isNotEmpty) {
+        mimeMessages.sort((a, b) {
+          DateTime? aDate = a.envelope?.date;
+          DateTime? bDate = b.envelope?.date;
+          if (aDate == null && bDate == null) {
+            return 0;
+          } else if (aDate != null && bDate != null) {
+            return bDate.compareTo(aDate);
+          } else if (aDate == null) {
+            return 1;
+          }
+          return -1;
+        });
         currentMimeMessages.addAll(mimeMessages);
-        currentMailIndex = currentMimeMessages.length - 1;
+        currentMailIndex = 0;
       }
     }
   }
@@ -304,6 +348,74 @@ class MailAddressController extends DataListController<entity.EmailAddress> {
           responseTimeout: responseTimeout);
     }
   }
+
+  ///加密标题和文本
+  Future<DecryptedMimeMessage> decryptMimeMessage(
+      MimeMessage mimeMessage) async {
+    String? subject = mimeMessage.decodeSubject();
+    String? text = mimeMessage.decodeTextPlainPart();
+    String? keys = mimeMessage.decodeHeaderValue(payloadKeysName);
+    DecryptedMimeMessage decryptedData = DecryptedMimeMessage();
+    if (subject != null) {
+      if (subject.startsWith('#{') && subject.endsWith('}')) {
+        //加密
+        decryptedData.needDecrypt = true;
+      }
+    }
+    if (decryptedData.needDecrypt) {
+      if (keys != null) {
+        Map<String, dynamic> payloadKeys = JsonUtil.toJson(keys);
+        if (payloadKeys.isEmpty) {
+          //linkman加密
+          decryptedData.payloadKey = null;
+        } else {
+          if (payloadKeys.containsKey(myself.peerId)) {
+            //group加密
+            decryptedData.payloadKey = payloadKeys[myself.peerId]!;
+          }
+        }
+      } else {
+        //linkman加密
+        decryptedData.payloadKey = null;
+      }
+      List<int>? data;
+      decryptedData.subject = null;
+      if (subject != null) {
+        try {
+          subject = subject.substring(2, subject.length - 1);
+          subject = subject.replaceAll(' ', '');
+          subject = subject.replaceAll('\r\n', '');
+          data = CryptoUtil.decodeBase64(subject);
+          data = await emailAddressService.decrypt(data,
+              payloadKey: decryptedData.payloadKey);
+          decryptedData.subject = CryptoUtil.utf8ToString(data!);
+        } catch (e) {
+          logger.e('subject decrypt failure:$e');
+        }
+      }
+      decryptedData.html = null;
+      if (text != null) {
+        try {
+          text = text.replaceAll(' ', '');
+          text = text.replaceAll('\r\n', '');
+          data = CryptoUtil.decodeBase64(text);
+          data = await emailAddressService.decrypt(data,
+              payloadKey: decryptedData.payloadKey);
+          text = CryptoUtil.utf8ToString(data!);
+          decryptedData.html = EmailMessageUtil.convertToMimeMessageHtml(text);
+        } catch (e) {
+          logger.e('text decrypt failure:$e');
+        }
+      }
+    } else {
+      //不加密
+      decryptedData.subject = subject;
+      decryptedData.html = EmailMessageUtil.convertToHtml(mimeMessage);
+    }
+
+    return decryptedData;
+  }
 }
 
-final MailAddressController mailAddressController = MailAddressController();
+final MailMimeMessageController mailMimeMessageController =
+    MailMimeMessageController();

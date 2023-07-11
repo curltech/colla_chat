@@ -28,8 +28,8 @@ class DateUtil {
     pos = strTime.lastIndexOf(':');
     strTime = strTime.substring(0, pos);
     DateTime c = DateTime.now().toLocal();
-    int diff = c.day - t.day;
-    switch (diff) {
+    Duration diff = c.difference(t);
+    switch (diff.inDays) {
       case -3:
         strDay = AppLocalizations.t('Three days from now');
         break;
