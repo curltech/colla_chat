@@ -58,7 +58,7 @@ class MailMimeMessageController
     'DRAFTS': Icons.drafts,
     'SENT': Icons.send,
     'TRASH': Icons.delete,
-    'JUNK': Icons.garage,
+    'JUNK': Icons.restore_from_trash,
     'MARK': Icons.flag,
     'BACKUP': Icons.backup,
     'ADS': Icons.ads_click,

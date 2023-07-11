@@ -4,6 +4,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
+import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -72,7 +73,7 @@ class _MailListWidgetState extends State<MailListWidget> {
           titleTail = DateUtil.formatEasyRead(sendDate.toIso8601String());
         }
         TileData tile = TileData(
-            prefix: decryptedMimeMessage.needDecrypt ? Icons.lock : null,
+            prefix: decryptedMimeMessage.needDecrypt ? Icons.mail_lock : null,
             title: title ?? '',
             titleTail: titleTail,
             subtitle: subtitle.toString(),
@@ -82,20 +83,52 @@ class _MailListWidgetState extends State<MailListWidget> {
               prefix: Icons.delete,
               title: 'Delete',
               onTap: (int index, String title, {String? subtitle}) async {
-
+                EmailClient? emailClient =
+                    mailMimeMessageController.currentEmailClient;
+                if (emailClient != null) {
+                  emailClient.deleteMessage(mimeMessage);
+                }
               }),
           TileData(
               prefix: Icons.mark_email_unread,
               title: 'Unread',
-              onTap: (int index, String title, {String? subtitle}) async {}),
+              onTap: (int index, String title, {String? subtitle}) async {
+                EmailClient? emailClient =
+                    mailMimeMessageController.currentEmailClient;
+                if (emailClient != null) {
+                  emailClient.flagMessage(mimeMessage,isSeen:false);
+                }
+              }),
           TileData(
               prefix: Icons.mark_email_read,
               title: 'Read',
-              onTap: (int index, String title, {String? subtitle}) async {}),
+              onTap: (int index, String title, {String? subtitle}) async {
+                EmailClient? emailClient =
+                    mailMimeMessageController.currentEmailClient;
+                if (emailClient != null) {
+                  emailClient.flagMessage(mimeMessage,isSeen:true);
+                }
+              }),
           TileData(
               prefix: Icons.flag,
               title: 'Flag',
-              onTap: (int index, String title, {String? subtitle}) async {}),
+              onTap: (int index, String title, {String? subtitle}) async {
+                EmailClient? emailClient =
+                    mailMimeMessageController.currentEmailClient;
+                if (emailClient != null) {
+                  emailClient.flagMessage(mimeMessage, isFlagged: true);
+                }
+              }),
+          TileData(
+              prefix: Icons.restore_from_trash,
+              title: 'Junk',
+              onTap: (int index, String title, {String? subtitle}) async {
+                EmailClient? emailClient =
+                    mailMimeMessageController.currentEmailClient;
+                if (emailClient != null) {
+                  emailClient.junkMessage(mimeMessage);
+                }
+              }),
         ];
         tile.endSlideActions = [
           TileData(
