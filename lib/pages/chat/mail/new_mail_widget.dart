@@ -316,18 +316,40 @@ class _NewMailWidgetState extends State<NewMailWidget> {
   }
 
   _draft() async {
+    DialogUtil.loadingShow(context);
+
+    ///邮件消息的构造器
     MessageBuilder builder =
         MessageBuilder.prepareMultipartAlternativeMessage();
-    String? email = await _preSend(builder);
+    String? email = await _preSend(builder, needEncrypt: true);
     if (email != null) {
       MimeMessage mimeMessage = builder.buildMimeMessage();
 
       EmailClient? emailClient = emailClientPool.get(email);
       if (emailClient != null) {
+        bool success = false;
         Mailbox? drafts = emailClient.getMailbox(MailboxFlag.drafts);
-        emailClient.saveDraftMessage(mimeMessage, draftsMailbox: drafts);
+        if (drafts != null) {
+          UidResponseCode? responseCode = await emailClient
+              .saveDraftMessage(mimeMessage, draftsMailbox: drafts);
+          if (responseCode != null) {
+            success = true;
+          }
+        }
+        if (mounted) {
+          if (success) {
+            DialogUtil.info(context, content: 'draft message successfully');
+          } else {
+            DialogUtil.error(context, content: 'draft message failure');
+          }
+        }
       }
     }
+    if (mounted) {
+      DialogUtil.loadingHide(context);
+    }
+
+    indexWidgetProvider.pop();
   }
 
   ///发送邮件，首先将邮件的编辑部分转换成html格式，对邮件的各个组成部分加密，目标为多人时采用群加密方式，然后发送

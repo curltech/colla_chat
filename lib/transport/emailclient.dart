@@ -735,8 +735,12 @@ class EmailClient {
       {Mailbox? draftsMailbox}) async {
     final enough_mail.MailClient? mailClient = this.mailClient;
     if (mailClient != null) {
-      return await mailClient.saveDraftMessage(message,
-          draftsMailbox: draftsMailbox);
+      try {
+        return await mailClient.saveDraftMessage(message,
+            draftsMailbox: draftsMailbox);
+      } catch (e) {
+        logger.e('save draft message failure:$e');
+      }
     }
     return null;
   }

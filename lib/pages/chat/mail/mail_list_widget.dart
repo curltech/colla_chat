@@ -77,6 +77,41 @@ class _MailListWidgetState extends State<MailListWidget> {
             titleTail: titleTail,
             subtitle: subtitle.toString(),
             selected: mailMimeMessageController.currentMailIndex == i);
+        tile.slideActions = [
+          TileData(
+              prefix: Icons.delete,
+              title: 'Delete',
+              onTap: (int index, String title, {String? subtitle}) async {
+
+              }),
+          TileData(
+              prefix: Icons.mark_email_unread,
+              title: 'Unread',
+              onTap: (int index, String title, {String? subtitle}) async {}),
+          TileData(
+              prefix: Icons.mark_email_read,
+              title: 'Read',
+              onTap: (int index, String title, {String? subtitle}) async {}),
+          TileData(
+              prefix: Icons.flag,
+              title: 'Flag',
+              onTap: (int index, String title, {String? subtitle}) async {}),
+        ];
+        tile.endSlideActions = [
+          TileData(
+              prefix: Icons.reply,
+              title: 'Reply',
+              onTap: (int index, String title, {String? subtitle}) async {}),
+          TileData(
+              prefix: Icons.reply_all,
+              title: 'Reply all',
+              onTap: (int index, String title, {String? subtitle}) async {}),
+          TileData(
+              prefix: Icons.forward,
+              title: 'Reply',
+              onTap: (int index, String title, {String? subtitle}) async {}),
+        ];
+
         tiles.add(tile);
         i++;
       }

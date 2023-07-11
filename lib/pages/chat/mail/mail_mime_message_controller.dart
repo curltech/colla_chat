@@ -248,6 +248,15 @@ class MailMimeMessageController
     }
   }
 
+  EmailClient? get currentEmailClient {
+    if (current == null) {
+      return null;
+    }
+    String email = current!.email;
+
+    return emailClientPool.get(email);
+  }
+
   ///以下是从数据库取邮件的部分
 
   ///从邮件服务器中取当前地址当前邮箱的下一页的邮件数据，放入数据提供者的数组中
@@ -262,11 +271,7 @@ class MailMimeMessageController
   _findMoreMimeMessages({
     FetchPreference fetchPreference = FetchPreference.envelope,
   }) async {
-    if (current == null) {
-      return;
-    }
-    String email = current!.email;
-    EmailClient? emailClient = emailClientPool.get(email);
+    EmailClient? emailClient = currentEmailClient;
     if (emailClient == null) {
       return;
     }
@@ -305,11 +310,7 @@ class MailMimeMessageController
 
   ///当前邮件获取全部内容，包括附件
   Future<void> fetchMessageContents() async {
-    if (current == null) {
-      return;
-    }
-    String email = current!.email;
-    EmailClient? emailClient = emailClientPool.get(email);
+    EmailClient? emailClient = currentEmailClient;
     if (emailClient == null) {
       return;
     }
@@ -333,11 +334,7 @@ class MailMimeMessageController
     String fetchId, {
     Duration? responseTimeout,
   }) async {
-    if (current == null) {
-      return null;
-    }
-    String email = current!.email;
-    EmailClient? emailClient = emailClientPool.get(email);
+    EmailClient? emailClient = currentEmailClient;
     if (emailClient == null) {
       return null;
     }
