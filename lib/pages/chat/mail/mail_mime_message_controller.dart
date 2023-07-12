@@ -52,6 +52,14 @@ class MailMimeMessageController
 
   final Map<String, IconData> _mailBoxIcons = {};
 
+  @override
+  clear({bool? notify}) {
+    _addressMailboxes.clear();
+    _addressMimeMessages.clear();
+    _currentMailboxName = null;
+    return super.clear(notify: notify);
+  }
+
   ///常用的邮箱名称
   static const Map<String, IconData> mailBoxeIcons = {
     'INBOX': Icons.inbox,
@@ -309,10 +317,10 @@ class MailMimeMessageController
   }
 
   ///当前邮件获取全部内容，包括附件
-  Future<void> fetchMessageContents() async {
+  Future<enough_mail.MimeMessage?> fetchMessageContents() async {
     EmailClient? emailClient = currentEmailClient;
     if (emailClient == null) {
-      return;
+      return null;
     }
 
     enough_mail.MimeMessage? mimeMessage = currentMimeMessage;
@@ -324,9 +332,13 @@ class MailMimeMessageController
         if (mimeMsg != null) {
           mimeMsg.envelope = mimeMessage.envelope;
           currentMimeMessage = mimeMsg;
+
+          return mimeMsg;
         }
       }
     }
+
+    return mimeMessage;
   }
 
   ///当前邮件根据fetchId获取附件
@@ -346,7 +358,7 @@ class MailMimeMessageController
     }
   }
 
-  ///加密标题和文本
+  ///解密标题和文本
   Future<DecryptedMimeMessage> decryptMimeMessage(
       MimeMessage mimeMessage) async {
     String? subject = mimeMessage.decodeSubject();
@@ -368,13 +380,24 @@ class MailMimeMessageController
         } else {
           if (payloadKeys.containsKey(myself.peerId)) {
             //group加密
-            decryptedData.payloadKey = payloadKeys[myself.peerId]!;
+            var payloadKey = payloadKeys[myself.peerId]!;
+            payloadKey = payloadKey.replaceAll(' ', '');
+            payloadKey = payloadKey.replaceAll('\r\n', '');
+            decryptedData.payloadKey = payloadKey;
+          } else {
+            logger.e('No myself payload key');
+            decryptedData.payloadKey = null;
+            decryptedData.subject = AppLocalizations.t('No myself payload key');
+            decryptedData.html = AppLocalizations.t('No myself payload key');
+
+            return decryptedData;
           }
         }
       } else {
-        //linkman加密
+        logger.e('needEncrypt but no keys');
         decryptedData.payloadKey = null;
       }
+
       List<int>? data;
       decryptedData.subject = null;
       if (subject != null) {
@@ -385,7 +408,9 @@ class MailMimeMessageController
           data = CryptoUtil.decodeBase64(subject);
           data = await emailAddressService.decrypt(data,
               payloadKey: decryptedData.payloadKey);
-          decryptedData.subject = CryptoUtil.utf8ToString(data!);
+          if (data != null) {
+            decryptedData.subject = CryptoUtil.utf8ToString(data);
+          }
         } catch (e) {
           logger.e('subject decrypt failure:$e');
         }
@@ -398,7 +423,9 @@ class MailMimeMessageController
           data = CryptoUtil.decodeBase64(text);
           data = await emailAddressService.decrypt(data,
               payloadKey: decryptedData.payloadKey);
-          text = CryptoUtil.utf8ToString(data!);
+          if (data != null) {
+            text = CryptoUtil.utf8ToString(data);
+          }
           decryptedData.html = EmailMessageUtil.convertToMimeMessageHtml(text);
         } catch (e) {
           logger.e('text decrypt failure:$e');

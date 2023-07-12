@@ -179,7 +179,7 @@ abstract class CryptographySecurityContextService
   ///压缩数据，如果压缩成功，返回压缩数据，否则返回null
   List<int>? compress(List<int> data) {
     if (data.length < compressLimit) {
-      return null;
+      return data;
     } else {
       try {
         data = CryptoUtil.compress(data);
@@ -207,8 +207,6 @@ abstract class CryptographySecurityContextService
   /// @param securityParams
   @override
   Future<bool> encrypt(SecurityContext securityContext) async {
-    bool result = true;
-    dynamic payload = securityContext.payload;
     bool needEncrypt = securityContext.needEncrypt;
     bool needCompress = securityContext.needCompress;
     bool needSign = securityContext.needSign;
@@ -216,7 +214,10 @@ abstract class CryptographySecurityContextService
       return true;
     }
 
+    bool result = true;
+
     ///转换要处理的数据
+    var payload = securityContext.payload;
     List<int> data = JsonUtil.toUintList(payload);
     // 1.设置签名（本地保存前加密不签名），只有在加密的情况下才设置签名
     if (needSign) {
@@ -227,6 +228,7 @@ abstract class CryptographySecurityContextService
 
         return success;
       }
+      securityContext.payloadHash = await hash(data);
     }
     //2. 压缩数据
     if (needCompress) {
@@ -249,7 +251,6 @@ abstract class CryptographySecurityContextService
       }
     }
 
-    securityContext.payloadHash = await hash(data);
     securityContext.payload = data;
 
     return result;
@@ -440,7 +441,8 @@ class GroupCryptographySecurityContextService
   GroupCryptographySecurityContextService();
 
   @override
-  Future<bool> encrypt(SecurityContext securityContext) async {
+  Future<List<int>?> pureEncrypt(
+      SecurityContext securityContext, List<int> data) async {
     List<int>? secretKey = securityContext.secretKey;
 
     ///如果存在加密密钥，
@@ -449,18 +451,18 @@ class GroupCryptographySecurityContextService
     if (secretKey != null) {
       var targetPeerId = securityContext.targetPeerId;
       if (targetPeerId == null) {
-        securityContext.payload =
-            await cryptoGraphy.aesEncrypt(securityContext.payload, secretKey);
+        data = await cryptoGraphy.aesEncrypt(data, secretKey);
         logger.i("targetPeerId is null, will only aes encrypt payload");
 
-        return true;
+        return data;
       }
       SimplePublicKey? targetPublicKey =
           await findTargetPublicKey(targetPeerId);
       if (targetPublicKey == null) {
         logger.e("TargetPublicKey is null, will not be encrypted!");
+        securityContext.needEncrypt = false;
 
-        return false;
+        return data;
       }
       try {
         var encryptedKey = await cryptoGraphy.eccEncrypt(secretKey,
@@ -470,23 +472,15 @@ class GroupCryptographySecurityContextService
         securityContext.payloadKey = CryptoUtil.encodeBase64(encryptedKey);
       } catch (e) {
         logger.e('eccEncrypt secretKey failure:$e');
-
-        return false;
+        securityContext.needEncrypt = false;
       }
 
-      return true;
+      return data;
     }
 
-    return super.encrypt(securityContext);
-  }
-
-  @override
-  Future<List<int>?> pureEncrypt(
-      SecurityContext securityContext, List<int> data) async {
     /// 安全上下文中没有加密key表示第一次加密，key随机数产生，
     /// 否则表示第n次，要采用同样的加密key做多次加密
-    List<int>? secretKey = securityContext.secretKey;
-    logger.i('group encrypt and secretKey:${secretKey != null}');
+    logger.i('group encrypt and secretKey has value:${secretKey != null}');
     if (secretKey == null) {
       secretKey = await cryptoGraphy.getRandomBytes();
       try {

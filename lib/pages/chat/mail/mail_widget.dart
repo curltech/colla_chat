@@ -134,8 +134,8 @@ class _MailWidgetState extends State<MailWidget> {
     } else {
       rightWidgets.add(IconButton(
           onPressed: () {
-            emailClientPool.close();
-            mailMimeMessageController.connectAllMailAddress();
+            mailMimeMessageController.currentMimeMessages?.clear();
+            mailMimeMessageController.findMoreMimeMessages();
           },
           icon: const Icon(Icons.refresh),
           tooltip: AppLocalizations.t('Refresh')));

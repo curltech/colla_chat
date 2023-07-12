@@ -100,21 +100,32 @@ class EmailAddressService extends GeneralBaseService<EmailAddress> {
       if (peerIds.isNotEmpty) {
         ///没有密钥，则在第一条的时候会生成新的密钥，处理数据，每一条都处理第一条生成的密钥
         Map<String, String> payloadKeys = {};
+        int i = 0;
         for (var receiverPeerId in peerIds) {
           Linkman? linkman =
               await linkmanService.findCachedOneByPeerId(receiverPeerId);
           if (linkman != null) {
             securityContext.targetPeerId = linkman.peerId;
             securityContext.targetClientId = linkman.clientId;
+            if (i == 0) {
+              securityContext.needSign = true;
+              securityContext.needCompress = true;
+            } else {
+              securityContext.needSign = false;
+              securityContext.needCompress = false;
+            }
             bool result = await securityContextService.encrypt(securityContext);
             if (result) {
               ///对群加密来说，返回的是通用的加密后数据
               payloadKeys[receiverPeerId] = securityContext.payloadKey!;
+              if (i == 0) {
+                data = CryptoUtil.concat(
+                    securityContext.payload, [CryptoOption.group.index]);
+              }
             }
           }
+          i++;
         }
-        data = CryptoUtil.concat(
-            securityContext.payload, [CryptoOption.group.index]);
 
         return PlatformEncryptData(data,
             secretKey: securityContext.secretKey, payloadKeys: payloadKeys);
