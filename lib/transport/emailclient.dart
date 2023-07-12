@@ -24,6 +24,7 @@ class EmailMessageUtil {
         enough_mail.TransferEncoding.eightBit,
     List<File>? files,
     List<enough_mail.MediaSubtype>? mediaTypes,
+    ContentDispositionHeader? disposition,
   }) async {
     final builder = enough_mail.MessageBuilder();
 
@@ -43,7 +44,8 @@ class EmailMessageUtil {
       for (int i = 0; i < files.length; ++i) {
         var file = files[i];
         var mediaType = mediaTypes[i];
-        await builder.addFile(file, mediaType.mediaType);
+        await builder.addFile(file, mediaType.mediaType,
+            disposition: disposition);
       }
     }
     return builder.buildMimeMessage();
@@ -168,7 +170,8 @@ class EmailMessageUtil {
   /// 否则，自动发现邮件地址配置，然后加入服务商提供商列表
   static Future<EmailServiceProvider?> discover(String email) async {
     final emailDomain = email.substring(email.indexOf('@') + 1);
-    final emailServiceProvider = platformEmailServiceProvider.domainNameServiceProviders[emailDomain];
+    final emailServiceProvider =
+        platformEmailServiceProvider.domainNameServiceProviders[emailDomain];
     if (emailServiceProvider != null) {
       return emailServiceProvider;
     }
@@ -180,7 +183,8 @@ class EmailMessageUtil {
         return null;
       }
       final hostName = clientConfig.preferredIncomingServer!.hostname!;
-      final providerHostName = platformEmailServiceProvider.domainNameServiceProviders[hostName];
+      final providerHostName =
+          platformEmailServiceProvider.domainNameServiceProviders[hostName];
       if (providerHostName != null) {
         return providerHostName;
       }
@@ -339,7 +343,9 @@ class EmailClient {
         config: config);
     try {
       await mailClient.connect();
-      logger.i('connected successfully');
+      bool supports8BitEncoding = await mailClient.supports8BitEncoding();
+      logger.i('connected successfully:$supports8BitEncoding');
+      ;
       this.mailClient = mailClient;
 
       return true;
@@ -605,7 +611,6 @@ class EmailClient {
     bool? isAnswered,
     bool? isForwarded,
     bool? isDeleted,
-    bool? isMdnSent,
     bool? isReadReceiptSent,
   }) async {
     final enough_mail.MailClient? mailClient = this.mailClient;
@@ -616,7 +621,6 @@ class EmailClient {
           isAnswered: isAnswered,
           isForwarded: isForwarded,
           isDeleted: isDeleted,
-          isMdnSent: isMdnSent,
           isReadReceiptSent: isReadReceiptSent);
     }
   }
@@ -772,7 +776,7 @@ class EmailClient {
     MailAddress? from,
     bool appendToSent = true,
     Mailbox? sentMailbox,
-    bool use8BitEncoding = false,
+    bool use8BitEncoding = true,
     List<MailAddress>? recipients,
   }) async {
     final enough_mail.MailClient? mailClient = this.mailClient;
@@ -814,6 +818,7 @@ class EmailClient {
         logName: logName,
         defaultWriteTimeout: defaultWriteTimeout,
         defaultResponseTimeout: defaultResponseTimeout);
+    client.enable([ImapServerInfo.capabilityUtf8Accept]);
     if (client.serverInfo.supportsId) {
       final serverId = await client.id(clientId: EmailMessageUtil.clientId);
       logger.i(serverId);
@@ -964,7 +969,7 @@ class EmailClient {
 
   Future<bool> smtpSend(
     MimeMessage mimeMessage, {
-    bool use8BitEncoding = false,
+    bool use8BitEncoding = true,
     MailAddress? from,
     List<MailAddress>? recipients,
   }) async {
@@ -1132,13 +1137,21 @@ class EmailClientPool {
     }
   }
 
-  close(String email) async {
-    if (emailClients.containsKey(email)) {
-      var mailClient = emailClients[email];
-      if (mailClient != null) {
-        await mailClient.close();
+  close({String? email}) async {
+    if (email != null) {
+      if (emailClients.containsKey(email)) {
+        var emailClient = emailClients[email];
+        if (emailClient != null) {
+          await emailClient.close();
+        }
+        emailClients.remove(email);
       }
-      emailClients.remove(email);
+    } else {
+      for (var entry in emailClients.entries) {
+        EmailClient emailClient = entry.value;
+        await emailClient.close();
+      }
+      emailClients.clear();
     }
   }
 

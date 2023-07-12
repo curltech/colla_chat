@@ -85,7 +85,7 @@ class MailMimeMessageController
 
   ///以下是与邮件地址相关的部分
   ///重新获取所有的邮件地址实体，对没有连接的进行连接，设置缺省邮件地址
-  findAllMailAddress() async {
+  connectAllMailAddress() async {
     data = await emailAddressService.findAllMailAddress();
     if (data.isNotEmpty) {
       for (var emailAddress in data) {

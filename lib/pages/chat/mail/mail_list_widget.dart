@@ -1,7 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
@@ -86,7 +85,7 @@ class _MailListWidgetState extends State<MailListWidget> {
                 EmailClient? emailClient =
                     mailMimeMessageController.currentEmailClient;
                 if (emailClient != null) {
-                  emailClient.deleteMessage(mimeMessage);
+                  emailClient.deleteMessage(mimeMessage, expunge: false);
                 }
               }),
           TileData(
@@ -96,7 +95,7 @@ class _MailListWidgetState extends State<MailListWidget> {
                 EmailClient? emailClient =
                     mailMimeMessageController.currentEmailClient;
                 if (emailClient != null) {
-                  emailClient.flagMessage(mimeMessage,isSeen:false);
+                  emailClient.flagMessage(mimeMessage, isSeen: false);
                 }
               }),
           TileData(
@@ -106,7 +105,7 @@ class _MailListWidgetState extends State<MailListWidget> {
                 EmailClient? emailClient =
                     mailMimeMessageController.currentEmailClient;
                 if (emailClient != null) {
-                  emailClient.flagMessage(mimeMessage,isSeen:true);
+                  emailClient.flagMessage(mimeMessage, isSeen: true);
                 }
               }),
           TileData(
