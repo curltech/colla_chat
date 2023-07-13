@@ -224,14 +224,16 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
         usernameType: UsernameType.emailAddress,
       );
       ClientConfig clientConfig = ClientConfig();
-      clientConfig.emailProviders = [
-        ConfigEmailProvider(
-          displayName: displayName,
-          displayShortName: displayShortName,
-          incomingServers: [imapServerConfig],
-          outgoingServers: [smtpServerConfig],
-        )
-      ];
+      ConfigEmailProvider configEmailProvider = ConfigEmailProvider(
+        displayName: displayName,
+        displayShortName: displayShortName,
+      );
+      configEmailProvider.addIncomingServer(imapServerConfig);
+      if (popServerConfig != null) {
+        configEmailProvider.addIncomingServer(popServerConfig);
+      }
+      configEmailProvider.addOutgoingServer(smtpServerConfig);
+      clientConfig.addEmailProvider(configEmailProvider);
 
       emailServiceProvider =
           EmailServiceProvider(domain, imapServerHost!, clientConfig);

@@ -820,7 +820,7 @@ class EmailClient {
         logName: logName,
         defaultWriteTimeout: defaultWriteTimeout,
         defaultResponseTimeout: defaultResponseTimeout);
-    client.enable([ImapServerInfo.capabilityUtf8Accept]);
+    //client.enable([ImapServerInfo.capabilityUtf8Accept]);
     if (client.serverInfo.supportsId) {
       final serverId = await client.id(clientId: EmailMessageUtil.clientId);
       logger.i(serverId);

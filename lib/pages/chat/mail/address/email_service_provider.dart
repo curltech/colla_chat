@@ -79,27 +79,23 @@ class GmailProvider extends EmailServiceProvider {
               ConfigEmailProvider(
                 displayName: 'Google Mail',
                 displayShortName: 'Gmail',
-                incomingServers: [
-                  ServerConfig(
-                    type: ServerType.imap,
-                    hostname: 'imap.gmail.com',
-                    port: 993,
-                    socketType: SocketType.ssl,
-                    authentication: Authentication.oauth2,
-                    usernameType: UsernameType.emailAddress,
-                  )
-                ],
-                outgoingServers: [
-                  ServerConfig(
-                    type: ServerType.smtp,
-                    hostname: 'smtp.gmail.com',
-                    port: 465,
-                    socketType: SocketType.ssl,
-                    authentication: Authentication.oauth2,
-                    usernameType: UsernameType.emailAddress,
-                  )
-                ],
               )
+                ..addIncomingServer(ServerConfig(
+                  type: ServerType.imap,
+                  hostname: 'imap.gmail.com',
+                  port: 993,
+                  socketType: SocketType.ssl,
+                  authentication: Authentication.oauth2,
+                  usernameType: UsernameType.emailAddress,
+                ))
+                ..addOutgoingServer(ServerConfig(
+                  type: ServerType.smtp,
+                  hostname: 'smtp.gmail.com',
+                  port: 465,
+                  socketType: SocketType.ssl,
+                  authentication: Authentication.oauth2,
+                  usernameType: UsernameType.emailAddress,
+                ))
             ],
           appSpecificPasswordSetupUrl:
               'https://support.google.com/accounts/answer/185833',
@@ -118,27 +114,23 @@ class OutlookProvider extends EmailServiceProvider {
               ConfigEmailProvider(
                 displayName: 'Outlook.com',
                 displayShortName: 'Outlook',
-                incomingServers: [
-                  ServerConfig(
-                    type: ServerType.imap,
-                    hostname: 'outlook.office365.com',
-                    port: 993,
-                    socketType: SocketType.ssl,
-                    authentication: Authentication.oauth2,
-                    usernameType: UsernameType.emailAddress,
-                  )
-                ],
-                outgoingServers: [
-                  ServerConfig(
-                    type: ServerType.smtp,
-                    hostname: 'smtp.office365.com',
-                    port: 587,
-                    socketType: SocketType.starttls,
-                    authentication: Authentication.oauth2,
-                    usernameType: UsernameType.emailAddress,
-                  )
-                ],
               )
+                ..addIncomingServer(ServerConfig(
+                  type: ServerType.imap,
+                  hostname: 'outlook.office365.com',
+                  port: 993,
+                  socketType: SocketType.ssl,
+                  authentication: Authentication.oauth2,
+                  usernameType: UsernameType.emailAddress,
+                ))
+                ..addOutgoingServer(ServerConfig(
+                  type: ServerType.smtp,
+                  hostname: 'smtp.office365.com',
+                  port: 587,
+                  socketType: SocketType.starttls,
+                  authentication: Authentication.oauth2,
+                  usernameType: UsernameType.emailAddress,
+                ))
             ],
           oauthClient: OutlookOAuthClient(),
           appSpecificPasswordSetupUrl:
@@ -260,27 +252,23 @@ class YahooProvider extends EmailServiceProvider {
               ConfigEmailProvider(
                 displayName: 'Yahoo! Mail',
                 displayShortName: 'Yahoo',
-                incomingServers: [
-                  ServerConfig(
-                    type: ServerType.imap,
-                    hostname: 'imap.mail.yahoo.com',
-                    port: 993,
-                    socketType: SocketType.ssl,
-                    authentication: Authentication.passwordClearText,
-                    usernameType: UsernameType.emailAddress,
-                  )
-                ],
-                outgoingServers: [
-                  ServerConfig(
-                    type: ServerType.smtp,
-                    hostname: 'smtp.mail.yahoo.com',
-                    port: 465,
-                    socketType: SocketType.ssl,
-                    authentication: Authentication.passwordClearText,
-                    usernameType: UsernameType.emailAddress,
-                  )
-                ],
               )
+                ..addIncomingServer(ServerConfig(
+                  type: ServerType.imap,
+                  hostname: 'imap.mail.yahoo.com',
+                  port: 993,
+                  socketType: SocketType.ssl,
+                  authentication: Authentication.passwordClearText,
+                  usernameType: UsernameType.emailAddress,
+                ))
+                ..addOutgoingServer(ServerConfig(
+                  type: ServerType.smtp,
+                  hostname: 'smtp.mail.yahoo.com',
+                  port: 465,
+                  socketType: SocketType.ssl,
+                  authentication: Authentication.passwordClearText,
+                  usernameType: UsernameType.emailAddress,
+                ))
             ],
           appSpecificPasswordSetupUrl:
               'https://help.yahoo.com/kb/SLN15241.html',
@@ -316,27 +304,23 @@ class AolProvider extends EmailServiceProvider {
               ConfigEmailProvider(
                 displayName: 'AOL Mail',
                 displayShortName: 'AOL',
-                incomingServers: [
-                  ServerConfig(
-                    type: ServerType.imap,
-                    hostname: 'imap.aol.com',
-                    port: 993,
-                    socketType: SocketType.ssl,
-                    authentication: Authentication.passwordClearText,
-                    usernameType: UsernameType.emailAddress,
-                  )
-                ],
-                outgoingServers: [
-                  ServerConfig(
-                    type: ServerType.smtp,
-                    hostname: 'smtp.aol.com',
-                    port: 465,
-                    socketType: SocketType.ssl,
-                    authentication: Authentication.passwordClearText,
-                    usernameType: UsernameType.emailAddress,
-                  )
-                ],
               )
+                ..addIncomingServer(ServerConfig(
+                  type: ServerType.imap,
+                  hostname: 'imap.aol.com',
+                  port: 993,
+                  socketType: SocketType.ssl,
+                  authentication: Authentication.passwordClearText,
+                  usernameType: UsernameType.emailAddress,
+                ))
+                ..addOutgoingServer(ServerConfig(
+                  type: ServerType.smtp,
+                  hostname: 'smtp.aol.com',
+                  port: 465,
+                  socketType: SocketType.ssl,
+                  authentication: Authentication.passwordClearText,
+                  usernameType: UsernameType.emailAddress,
+                ))
             ],
           appSpecificPasswordSetupUrl:
               'https://help.aol.com/articles/Create-and-manage-app-password',
@@ -374,27 +358,23 @@ class AppleProvider extends EmailServiceProvider {
               ConfigEmailProvider(
                 displayName: 'Apple iCloud',
                 displayShortName: 'Apple',
-                incomingServers: [
-                  ServerConfig(
-                    type: ServerType.imap,
-                    hostname: 'imap.mail.me.com',
-                    port: 993,
-                    socketType: SocketType.ssl,
-                    authentication: Authentication.passwordClearText,
-                    usernameType: UsernameType.emailAddress,
-                  )
-                ],
-                outgoingServers: [
-                  ServerConfig(
-                    type: ServerType.smtp,
-                    hostname: 'smtp.mail.me.com',
-                    port: 587,
-                    socketType: SocketType.starttls,
-                    authentication: Authentication.passwordClearText,
-                    usernameType: UsernameType.emailAddress,
-                  )
-                ],
               )
+                ..addIncomingServer(ServerConfig(
+                  type: ServerType.imap,
+                  hostname: 'imap.mail.me.com',
+                  port: 993,
+                  socketType: SocketType.ssl,
+                  authentication: Authentication.passwordClearText,
+                  usernameType: UsernameType.emailAddress,
+                ))
+                ..addOutgoingServer(ServerConfig(
+                  type: ServerType.smtp,
+                  hostname: 'smtp.mail.me.com',
+                  port: 587,
+                  socketType: SocketType.starttls,
+                  authentication: Authentication.passwordClearText,
+                  usernameType: UsernameType.emailAddress,
+                ))
             ],
           appSpecificPasswordSetupUrl:
               'https://support.apple.com/en-us/HT204397',
@@ -412,27 +392,23 @@ class GmxProvider extends EmailServiceProvider {
               ConfigEmailProvider(
                 displayName: 'GMX Freemail',
                 displayShortName: 'GMX',
-                incomingServers: [
-                  ServerConfig(
-                    type: ServerType.imap,
-                    hostname: 'imap.gmx.net',
-                    port: 993,
-                    socketType: SocketType.ssl,
-                    authentication: Authentication.passwordClearText,
-                    usernameType: UsernameType.emailAddress,
-                  )
-                ],
-                outgoingServers: [
-                  ServerConfig(
-                    type: ServerType.smtp,
-                    hostname: 'mail.gmx.net',
-                    port: 465,
-                    socketType: SocketType.ssl,
-                    authentication: Authentication.passwordClearText,
-                    usernameType: UsernameType.emailAddress,
-                  )
-                ],
               )
+                ..addIncomingServer(ServerConfig(
+                  type: ServerType.imap,
+                  hostname: 'imap.gmx.net',
+                  port: 993,
+                  socketType: SocketType.ssl,
+                  authentication: Authentication.passwordClearText,
+                  usernameType: UsernameType.emailAddress,
+                ))
+                ..addOutgoingServer(ServerConfig(
+                  type: ServerType.smtp,
+                  hostname: 'mail.gmx.net',
+                  port: 465,
+                  socketType: SocketType.ssl,
+                  authentication: Authentication.passwordClearText,
+                  usernameType: UsernameType.emailAddress,
+                ))
             ],
           manualImapAccessSetupUrl:
               'https://hilfe.gmx.net/pop-imap/einschalten.html',
@@ -459,27 +435,23 @@ class MailboxOrgProvider extends EmailServiceProvider {
               ConfigEmailProvider(
                 displayName: 'mailbox.org',
                 displayShortName: 'mailbox',
-                incomingServers: [
-                  ServerConfig(
-                    type: ServerType.imap,
-                    hostname: 'imap.mailbox.org',
-                    port: 993,
-                    socketType: SocketType.ssl,
-                    authentication: Authentication.passwordClearText,
-                    usernameType: UsernameType.emailAddress,
-                  )
-                ],
-                outgoingServers: [
-                  ServerConfig(
-                    type: ServerType.smtp,
-                    hostname: 'smtp.mailbox.org',
-                    port: 465,
-                    socketType: SocketType.ssl,
-                    authentication: Authentication.passwordClearText,
-                    usernameType: UsernameType.emailAddress,
-                  )
-                ],
               )
+                ..addIncomingServer(ServerConfig(
+                  type: ServerType.imap,
+                  hostname: 'imap.mailbox.org',
+                  port: 993,
+                  socketType: SocketType.ssl,
+                  authentication: Authentication.passwordClearText,
+                  usernameType: UsernameType.emailAddress,
+                ))
+                ..addOutgoingServer(ServerConfig(
+                  type: ServerType.smtp,
+                  hostname: 'smtp.mailbox.org',
+                  port: 465,
+                  socketType: SocketType.ssl,
+                  authentication: Authentication.passwordClearText,
+                  usernameType: UsernameType.emailAddress,
+                ))
             ],
           domains: ['mailbox.org'],
         );
@@ -495,35 +467,31 @@ class Mail163Provider extends EmailServiceProvider {
               ConfigEmailProvider(
                 displayName: '163.com',
                 displayShortName: '163',
-                incomingServers: [
-                  ServerConfig(
-                    type: ServerType.imap,
-                    hostname: 'imap.163.com',
-                    port: 993,
-                    socketType: SocketType.ssl,
-                    authentication: Authentication.passwordClearText,
-                    usernameType: UsernameType.emailAddress,
-                  ),
-                  ServerConfig(
-                    type: ServerType.pop,
-                    hostname: 'pop.163.com',
-                    port: 995,
-                    socketType: SocketType.ssl,
-                    authentication: Authentication.passwordClearText,
-                    usernameType: UsernameType.emailAddress,
-                  )
-                ],
-                outgoingServers: [
-                  ServerConfig(
-                    type: ServerType.smtp,
-                    hostname: 'smtp.163.com',
-                    port: 465,
-                    socketType: SocketType.ssl,
-                    authentication: Authentication.passwordClearText,
-                    usernameType: UsernameType.emailAddress,
-                  )
-                ],
               )
+                ..addIncomingServer(ServerConfig(
+                  type: ServerType.imap,
+                  hostname: 'imap.163.com',
+                  port: 993,
+                  socketType: SocketType.ssl,
+                  authentication: Authentication.passwordClearText,
+                  usernameType: UsernameType.emailAddress,
+                ))
+                ..addIncomingServer(ServerConfig(
+                  type: ServerType.pop,
+                  hostname: 'pop.163.com',
+                  port: 995,
+                  socketType: SocketType.ssl,
+                  authentication: Authentication.passwordClearText,
+                  usernameType: UsernameType.emailAddress,
+                ))
+                ..addOutgoingServer(ServerConfig(
+                  type: ServerType.smtp,
+                  hostname: 'smtp.163.com',
+                  port: 465,
+                  socketType: SocketType.ssl,
+                  authentication: Authentication.passwordClearText,
+                  usernameType: UsernameType.emailAddress,
+                ))
             ],
           domains: ['163.com'],
         );
