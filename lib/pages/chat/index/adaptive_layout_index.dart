@@ -80,9 +80,9 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
     var pageView = Consumer<IndexWidgetProvider>(
         builder: (context, indexWidgetProvider, child) {
       ScrollPhysics? physics = const NeverScrollableScrollPhysics();
-      if (!indexWidgetProvider.bottomBarVisible) {
-        physics = null;
-      }
+      // if (!indexWidgetProvider.bottomBarVisible) {
+      //   physics = null;
+      // }
       return Swiper(
         physics: physics,
         controller: indexWidgetProvider.controller,
