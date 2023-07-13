@@ -542,31 +542,28 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
       ValueListenableBuilder(
           valueListenable: _currentTab,
           builder: (context, value, child) {
-            return Tab(
-              icon: Icon(Icons.person,
-                  color: value == 0 ? myself.primary : myself.secondary),
+            return const Tab(
+              icon: Icon(Icons.person),
               //text: AppLocalizations.t('Linkman'),
-              iconMargin: const EdgeInsets.all(0.0),
+              iconMargin: EdgeInsets.all(0.0),
             );
           }),
       ValueListenableBuilder(
           valueListenable: _currentTab,
           builder: (context, value, child) {
-            return Tab(
-              icon: Icon(Icons.group,
-                  color: value == 1 ? myself.primary : myself.secondary),
+            return const Tab(
+              icon: Icon(Icons.group),
               //text: AppLocalizations.t('Group'),
-              iconMargin: const EdgeInsets.all(0.0),
+              iconMargin: EdgeInsets.all(0.0),
             );
           }),
       ValueListenableBuilder(
           valueListenable: _currentTab,
           builder: (context, value, child) {
-            return Tab(
-              icon: Icon(Icons.meeting_room,
-                  color: value == 2 ? myself.primary : myself.secondary),
+            return const Tab(
+              icon: Icon(Icons.video_chat),
               //text: AppLocalizations.t('Group'),
-              iconMargin: const EdgeInsets.all(0.0),
+              iconMargin: EdgeInsets.all(0.0),
             );
           }),
     ];

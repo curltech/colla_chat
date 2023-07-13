@@ -61,7 +61,7 @@ class _JsonLinkmanAddWidgetState extends State<JsonLinkmanAddWidget> {
         const SizedBox(
           height: 15.0,
         ),
-        ButtonBar(children: [
+        ButtonBar(alignment: MainAxisAlignment.end, children: [
           TextButton.icon(
             style: StyleUtil.buildButtonStyle(elevation: 10.0),
             onPressed: () async {
@@ -84,6 +84,8 @@ class _JsonLinkmanAddWidgetState extends State<JsonLinkmanAddWidget> {
             ),
             label: CommonAutoSizeText(AppLocalizations.t('Paste')),
           ),
+        ]),
+        ButtonBar(alignment: MainAxisAlignment.end, children: [
           TextButton.icon(
             style: StyleUtil.buildButtonStyle(
                 backgroundColor: myself.primary, elevation: 10.0),
