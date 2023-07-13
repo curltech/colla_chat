@@ -55,6 +55,31 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
     super.initState();
   }
 
+  Future<void> _rightCallBack(int index) async {
+    switch (index) {
+      case 0:
+        Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
+        FileUtil.writeFileAsBytes(bytes, myself.peerId!);
+        break;
+      case 1:
+        Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
+        ImageUtil.saveImageGallery(bytes, myself.peerId!);
+        break;
+      case 2:
+        Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
+        var path = await FileUtil.writeFileAsBytes(bytes, myself.peerId!);
+        Share.shareXFiles([XFileUtil.open(path)]);
+        break;
+      case 3:
+        setState(() {
+          qrImage = QrcodeUtil.create(content!);
+        });
+        break;
+      default:
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var peerId = myself.peerId ?? '';
@@ -94,33 +119,8 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
     return AppBarView(
       title: widget.title,
       withLeading: widget.withLeading,
-      rightPopupMenus: widget.menus,
+      //rightPopupMenus: widget.menus,
       child: Column(children: children),
     );
-  }
-
-  Future<void> _rightCallBack(int index) async {
-    switch (index) {
-      case 0:
-        Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
-        FileUtil.writeFileAsBytes(bytes, myself.peerId!);
-        break;
-      case 1:
-        Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
-        ImageUtil.saveImageGallery(bytes, myself.peerId!);
-        break;
-      case 2:
-        Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
-        var path = await FileUtil.writeFileAsBytes(bytes, myself.peerId!);
-        Share.shareXFiles([XFileUtil.open(path)]);
-        break;
-      case 3:
-        setState(() {
-          qrImage = QrcodeUtil.create(content!);
-        });
-        break;
-      default:
-        break;
-    }
   }
 }
