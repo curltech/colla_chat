@@ -272,7 +272,9 @@ class MailMimeMessageController
     FetchPreference fetchPreference = FetchPreference.envelope,
   }) async {
     return await lock.synchronized(() async {
-      return await _findMoreMimeMessages(fetchPreference: fetchPreference);
+      return await _findMoreMimeMessages(
+        fetchPreference: fetchPreference,
+      );
     });
   }
 
@@ -288,39 +290,54 @@ class MailMimeMessageController
       return;
     }
 
-    int offset = defaultOffset;
     var currentMimeMessages = this.currentMimeMessages;
-    if (currentMimeMessages != null) {
-      offset = currentMimeMessages.length;
-      List<enough_mail.MimeMessage>? mimeMessages =
-          await emailClient.fetchMessages(
-              mailbox: currentMailbox,
-              offset: offset,
-              fetchPreference: fetchPreference);
-      if (mimeMessages != null && mimeMessages.isNotEmpty) {
-        mimeMessages.sort((a, b) {
-          DateTime? aDate = a.envelope?.date;
-          DateTime? bDate = b.envelope?.date;
-          if (aDate == null && bDate == null) {
-            return 0;
-          } else if (aDate != null && bDate != null) {
-            return bDate.compareTo(aDate);
-          } else if (aDate == null) {
-            return 1;
-          }
-          return -1;
-        });
+    List<enough_mail.MimeMessage>? mimeMessages;
+    if (currentMimeMessages == null || currentMimeMessages.isEmpty) {
+      mimeMessages = await emailClient.fetchMessages(
+          mailbox: currentMailbox, fetchPreference: fetchPreference);
+    } else {
+      var offset = currentMimeMessages.length;
+      int mod = offset % 20;
+      int page = offset ~/ 20;
+      if (mod == 0) {
+        page++;
+      } else {
+        page += 2;
+      }
+      mimeMessages = await emailClient.fetchMessages(
+          page: page,
+          mailbox: currentMailbox,
+          fetchPreference: fetchPreference);
+    }
+    if (mimeMessages != null && mimeMessages.isNotEmpty) {
+      mimeMessages.sort((a, b) {
+        DateTime? aDate = a.envelope?.date;
+        DateTime? bDate = b.envelope?.date;
+        if (aDate == null && bDate == null) {
+          return 0;
+        } else if (aDate != null && bDate != null) {
+          return bDate.compareTo(aDate);
+        } else if (aDate == null) {
+          return 1;
+        }
+        return -1;
+      });
+      if (currentMimeMessages != null) {
         currentMimeMessages.addAll(mimeMessages);
-        currentMailIndex = 0;
+        if (currentMailIndex != 0) {
+          currentMailIndex = 0;
+        } else {
+          notifyListeners();
+        }
       }
     }
   }
 
   ///当前邮件获取全部内容，包括附件
-  Future<enough_mail.MimeMessage?> fetchMessageContents() async {
+  Future<void> fetchMessageContents() async {
     EmailClient? emailClient = currentEmailClient;
     if (emailClient == null) {
-      return null;
+      return;
     }
 
     enough_mail.MimeMessage? mimeMessage = currentMimeMessage;
@@ -332,13 +349,10 @@ class MailMimeMessageController
         if (mimeMsg != null) {
           mimeMsg.envelope = mimeMessage.envelope;
           currentMimeMessage = mimeMsg;
-
-          return mimeMsg;
+          notifyListeners();
         }
       }
     }
-
-    return mimeMessage;
   }
 
   ///当前邮件根据fetchId获取附件

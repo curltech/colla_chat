@@ -150,7 +150,8 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     MimeMessage? mimeMessage = mailMimeMessageController.currentMimeMessage;
     if (mimeMessage != null) {
       try {
-        mimeMessage = await mailMimeMessageController.fetchMessageContents();
+        await mailMimeMessageController.fetchMessageContents();
+        mimeMessage = mailMimeMessageController.currentMimeMessage;
       } catch (e) {
         logger.e('updateMimeMessageContent failure:$e');
       }

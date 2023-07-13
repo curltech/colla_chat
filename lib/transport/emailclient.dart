@@ -441,31 +441,30 @@ class EmailClient {
     return null;
   }
 
+  ///按照指定的页号获取消息
   Future<List<enough_mail.MimeMessage>?> fetchMessages(
-      {int limit = defaultLimit,
+      {int limit = 20,
       FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
       Mailbox? mailbox,
-      int offset = defaultOffset}) async {
+      int page = 1}) async {
     return await lock.synchronized(() async {
       return await _fetchMessages(
           limit: limit,
           fetchPreference: fetchPreference,
           mailbox: mailbox,
-          offset: offset);
+          page: page);
     });
   }
 
   ///用邮件客户端获取消息，可以设定完全获取，或者部分获取
   ///默认是在尺寸内的完全获取，或者只获取封面
   Future<List<enough_mail.MimeMessage>?> _fetchMessages(
-      {int limit = defaultLimit,
+      {int limit = 20,
       FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
       Mailbox? mailbox,
-      int offset = defaultOffset}) async {
+      int page = 1}) async {
     final enough_mail.MailClient? mailClient = this.mailClient;
     if (mailClient != null && mailbox != null) {
-      int total = mailbox.messagesExists;
-      int page = Pagination.getPage(offset, limit);
       try {
         final messages = await mailClient.fetchMessages(
             count: limit,
@@ -502,13 +501,13 @@ class EmailClient {
   }
 
   Future<List<enough_mail.MimeMessage>?> fetchMessagesNextPage(
-    PagedMessageSequence pagedSequence, {
+    enough_mail.MimeMessage mimeMessage, {
     Mailbox? mailbox,
     FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
     bool markAsSeen = false,
   }) async {
     return await lock.synchronized(() async {
-      return await _fetchMessagesNextPage(pagedSequence,
+      return await _fetchMessagesNextPage(mimeMessage,
           fetchPreference: fetchPreference,
           mailbox: mailbox,
           markAsSeen: markAsSeen);
@@ -517,13 +516,16 @@ class EmailClient {
 
   ///取给定的页号的下一页
   Future<List<enough_mail.MimeMessage>?> _fetchMessagesNextPage(
-    PagedMessageSequence pagedSequence, {
+    enough_mail.MimeMessage mimeMessage, {
     Mailbox? mailbox,
     FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
     bool markAsSeen = false,
   }) async {
     final enough_mail.MailClient? mailClient = this.mailClient;
     if (mailClient != null) {
+      var pagedSequence = PagedMessageSequence(
+          MessageSequence.fromMessage(mimeMessage),
+          pageSize: 20);
       return await mailClient.fetchMessagesNextPage(pagedSequence,
           mailbox: mailbox,
           fetchPreference: fetchPreference,

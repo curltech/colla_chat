@@ -23,7 +23,6 @@ class _MailListWidgetState extends State<MailListWidget> {
   initState() {
     mailMimeMessageController.addListener(_update);
     super.initState();
-    mailMimeMessageController.currentMimeMessages?.clear();
     mailMimeMessageController.findMoreMimeMessages();
   }
 
@@ -152,8 +151,11 @@ class _MailListWidgetState extends State<MailListWidget> {
     return tiles;
   }
 
-  _onTap(int index, String title, {String? subtitle, TileData? group}) {
+  _onTap(int index, String title, {String? subtitle, TileData? group}) async {
     mailMimeMessageController.currentMailIndex = index;
+    if (mailMimeMessageController.currentMimeMessage != null) {
+      await mailMimeMessageController.fetchMessageContents();
+    }
     indexWidgetProvider.push('mail_content');
   }
 
