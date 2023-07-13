@@ -178,7 +178,7 @@ class PlatformWebView extends StatelessWidget {
   final String? initialFilename;
   final void Function(PlatformWebViewController controller)? onWebViewCreated;
 
-  late final PlatformWebViewController? webViewController;
+  PlatformWebViewController? webViewController;
 
   PlatformWebView(
       {super.key,
