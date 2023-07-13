@@ -1,23 +1,15 @@
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
-import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/p2p/chain/action/findclient.dart';
-import 'package:colla_chat/p2p/chain/baseaction.dart';
-import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
-import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/clipboard_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/tool/validator_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
-import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
 ///粘贴linkman的json字符串增加
