@@ -75,13 +75,18 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
           leading: myself.avatarImage,
           title: CommonAutoSizeText(name),
           subtitle: CommonAutoSizeText(peerId)),
-      SizedBox(
-          width: 280,
-          key: globalKey,
-          child: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: qrImage,
-          )),
+      const SizedBox(
+        height: 40.0,
+      ),
+      Center(
+          child: Container(
+        key: globalKey,
+        alignment: Alignment.center,
+        width: 300,
+        color: Colors.white,
+        padding: const EdgeInsets.all(5.0),
+        child: qrImage,
+      )),
       const Spacer(),
       CommonAutoSizeText(AppLocalizations.t('Scan qrcode, add linkman')),
       const SizedBox(height: 30),

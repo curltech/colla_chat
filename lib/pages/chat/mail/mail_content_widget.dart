@@ -200,9 +200,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
               ]));
             }
             return Column(children: [
-              Expanded(
-                  child: SingleChildScrollView(
-                      child: PlatformWebView(html: decryptedMimeMessage.html))),
+              Expanded(child: PlatformWebView(html: decryptedMimeMessage.html)),
               _buildAttachmentChips(context)
             ]);
           }
