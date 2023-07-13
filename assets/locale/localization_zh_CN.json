@@ -450,5 +450,6 @@
   "MailContent": "邮件内容",
   "Attachment": "附件",
   "Send": "发送",
-  "Draft": "草稿"
+  "Draft": "草稿",
+  "Select email service provider": "选择邮件服务提供商"
 }

@@ -61,7 +61,7 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
       }
     }
     var customButtons = <Widget>[];
-    return ToolBar(
+    return ToolBar.scroll(
         toolBarColor: Colors.white,
         padding: const EdgeInsets.all(8),
         iconSize: 25,
@@ -78,36 +78,31 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
       controller: controller,
       isEnabled: true,
       minHeight: 200,
+      ensureVisible: true,
       hintTextAlign: TextAlign.start,
-      backgroundColor: myself.getBackgroundColor(context).withOpacity(0.6),
+      hintText: '',
     );
     var toolbar = _buildQuillToolbar(context);
-    return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        color: myself.getBackgroundColor(context).withOpacity(0.6),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            const SizedBox(
-              height: 5.0,
-            ),
-            toolbar,
-            const SizedBox(
-              height: 5.0,
-            ),
-            Divider(
-              height: 1.0,
-              thickness: 1.0,
-              color: myself.primary,
-            ),
-            Expanded(
-                child: SizedBox(
-              height: widget.height,
-              child: quillHtmlEditor,
-            )),
-          ],
-        ));
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        const SizedBox(
+          height: 5.0,
+        ),
+        toolbar,
+        Divider(
+          height: 1.0,
+          thickness: 1.0,
+          color: myself.primary,
+        ),
+        Expanded(
+            child: SizedBox(
+          height: widget.height,
+          child: quillHtmlEditor,
+        )),
+      ],
+    );
   }
 
   @override

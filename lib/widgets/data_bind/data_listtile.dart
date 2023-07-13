@@ -47,16 +47,19 @@ class TileData {
       this.isThreeLine = false,
       this.onTap});
 
-  static TileData of(TileDataMixin mixin) {
+  static TileData of(TileDataMixin mixin, {bool dense = false}) {
     return TileData(
-        title: mixin.title, routeName: mixin.routeName, prefix: mixin.iconData);
+        title: mixin.title,
+        routeName: mixin.routeName,
+        dense: dense,
+        prefix: mixin.iconData);
   }
 
-  static List<TileData> from(List<TileDataMixin> mixins) {
+  static List<TileData> from(List<TileDataMixin> mixins, {bool dense = false}) {
     List<TileData> tileData = [];
     if (mixins.isNotEmpty) {
       for (var mixin in mixins) {
-        TileData tile = TileData.of(mixin);
+        TileData tile = TileData.of(mixin, dense: dense);
         tileData.add(tile);
       }
     }

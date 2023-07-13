@@ -141,11 +141,11 @@ class _NewMailWidgetState extends State<NewMailWidget> {
 
   _buildMailSubjectWidget() {
     return Container(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
         child: Column(children: [
           _buildReceiptsWidget(context),
           const SizedBox(
-            height: 10.0,
+            height: 5.0,
           ),
           CommonAutoSizeTextFormField(
               controller: subjectController,
