@@ -561,45 +561,49 @@ class PeerConnectionPool {
         (signalType == SignalType.sdp.name && signal.sdp!.type == 'offer')) {
       bool? allowed = false;
       Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
-      if (linkman != null &&
-          linkman.linkmanStatus == LinkmanStatus.friend.name) {
-        ///如果是好友，则直接接受
-        allowed = true;
-      } else {
-        ///如果不是好友，调用注册的事件，看返回结果决定
-        WebrtcEvent webrtcEvent = WebrtcEvent(peerId,
-            clientId: clientId,
-            name: name,
-            eventType: WebrtcEventType.signal,
-            data: signal);
-        //对消息进行业务处理
-        allowed =
-            await globalWebrtcEventController.receiveWebrtcEvent(webrtcEvent);
-      }
-      if (allowed != null && allowed) {
-        advancedPeerConnection = await createIfNotExist(peerId,
-            clientId: clientId,
-            name: name,
-            conference: conference,
-            iceServers: iceServers);
-        if (advancedPeerConnection == null) {
-          logger.e('createIfNotExist fail');
+      if (linkman != null) {
+        if (linkman.linkmanStatus == LinkmanStatus.friend.name) {
+          ///如果是好友，则直接接受
+          allowed = true;
+        } else if (linkman.linkmanStatus == LinkmanStatus.blacklist.name) {
+          ///如果是黑名单，则直接拒绝
+          allowed = false;
+        } else {
+          ///如果不是好友，调用注册的事件，看返回结果决定
+          WebrtcEvent webrtcEvent = WebrtcEvent(peerId,
+              clientId: clientId,
+              name: name,
+              eventType: WebrtcEventType.signal,
+              data: signal);
+          //对消息进行业务处理
+          allowed =
+              await globalWebrtcEventController.receiveWebrtcEvent(webrtcEvent);
+        }
+        if (allowed != null && allowed) {
+          advancedPeerConnection = await createIfNotExist(peerId,
+              clientId: clientId,
+              name: name,
+              conference: conference,
+              iceServers: iceServers);
+          if (advancedPeerConnection == null) {
+            logger.e('createIfNotExist fail');
+            return null;
+          }
+        } else {
+          String error =
+              'peerId:$peerId name:${linkman?.name} is not friend, can not receive a webrtc connection';
+          logger.e(error);
+          WebrtcSignal webrtcSignal =
+              WebrtcSignal(SignalType.error.name, error: error);
+          WebrtcEvent webrtcEvent = WebrtcEvent(peerId,
+              clientId: clientId,
+              name: name,
+              eventType: WebrtcEventType.signal,
+              data: webrtcSignal);
+          await advancedPeerConnection!.signal(webrtcEvent);
+
           return null;
         }
-      } else {
-        String error =
-            'peerId:$peerId name:${linkman?.name} is not friend, can not receive a webrtc connection';
-        logger.e(error);
-        WebrtcSignal webrtcSignal =
-            WebrtcSignal(SignalType.error.name, error: error);
-        WebrtcEvent webrtcEvent = WebrtcEvent(peerId,
-            clientId: clientId,
-            name: name,
-            eventType: WebrtcEventType.signal,
-            data: webrtcSignal);
-        await advancedPeerConnection!.signal(webrtcEvent);
-
-        return null;
       }
     }
     if (advancedPeerConnection != null) {
