@@ -24,6 +24,8 @@ import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
@@ -78,7 +80,18 @@ class _IndexViewState extends State<IndexView>
     globalChatMessageController.addListener(_updateGlobalChatMessage);
     myself.addListener(_update);
     appDataProvider.addListener(_update);
+    globalWebrtcEventController.onWebrtcEvent = _onWebrtcEvent;
     _initSystemTray();
+  }
+
+  Future<bool?> _onWebrtcEvent(WebrtcEvent webrtcEvent) async {
+    String peerId = webrtcEvent.peerId;
+    String name = webrtcEvent.name;
+    WebrtcEventType eventType = webrtcEvent.eventType;
+
+    return await DialogUtil.confirm(context,
+        content: name +
+            AppLocalizations.t(' want to chat with you, are you agree?'));
   }
 
   Future<void> _initSystemTray() async {
@@ -442,7 +455,8 @@ class _IndexViewState extends State<IndexView>
                           contentType = ChatMessageContentType.image;
                         }
                         String filename = content!;
-                        Uint8List? data = await FileUtil.readFileAsBytes(filename);
+                        Uint8List? data =
+                            await FileUtil.readFileAsBytes(filename);
                         if (data != null) {
                           String? mimeType = FileUtil.mimeType(filename);
                           mimeType = mimeType ?? 'text/plain';
@@ -517,6 +531,7 @@ class _IndexViewState extends State<IndexView>
     myself.removeListener(_update);
     appDataProvider.removeListener(_update);
     _intentDataStreamSubscription.cancel();
+    globalWebrtcEventController.onWebrtcEvent = null;
     super.dispose();
   }
 }

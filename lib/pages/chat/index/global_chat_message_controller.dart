@@ -17,6 +17,32 @@ import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 
+///跟踪影响全局的webrtc事件到来，对不同类型的事件进行分派
+class GlobalWebrtcEventController with ChangeNotifier {
+  Future<bool?> Function(WebrtcEvent webrtcEvent)? onWebrtcEvent;
+  Map<String, bool?> results = {};
+
+  ///跟踪影响全局的webrtc事件到来，对不同类型的事件进行分派
+  ///目前用于处理对方的webrtc呼叫是否被允许
+  Future<bool?> receiveWebrtcEvent(WebrtcEvent webrtcEvent) async {
+    String peerId = webrtcEvent.peerId;
+    if (results.containsKey(peerId)) {
+      return results[peerId];
+    }
+    if (onWebrtcEvent != null) {
+      bool? allowed = await onWebrtcEvent!(webrtcEvent);
+      results[peerId] = allowed;
+
+      return allowed;
+    }
+
+    return false;
+  }
+}
+
+final GlobalWebrtcEventController globalWebrtcEventController =
+    GlobalWebrtcEventController();
+
 ///跟踪影响全局的消息到来，对不同类型的消息进行分派
 class GlobalChatMessageController with ChangeNotifier {
   //最新的到来消息

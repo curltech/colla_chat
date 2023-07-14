@@ -4,7 +4,6 @@ import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
-import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/p2p/chain/action/signal.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -129,7 +128,7 @@ class PeerConnectionPool {
 
   Map<String, dynamic> protocolHandlers = {};
 
-  Map<String, List<Future<void> Function(WebrtcEvent event)>> fnsm = {};
+  Map<String, List<Future<dynamic> Function(WebrtcEvent event)>> fnsm = {};
 
   PeerConnectionPool() {
     signalAction.registerReceiver(onSignal);
@@ -196,7 +195,7 @@ class PeerConnectionPool {
   }
 
   registerWebrtcEvent(String peerId, WebrtcEventType eventType,
-      Future<void> Function(WebrtcEvent) fn) {
+      Future<dynamic> Function(WebrtcEvent) fn) {
     String key = _getKey(peerId, eventType);
     List<Future<void> Function(WebrtcEvent)>? fns = fnsm[key];
     if (fns == null) {
@@ -207,7 +206,7 @@ class PeerConnectionPool {
   }
 
   unregisterWebrtcEvent(String peerId, WebrtcEventType eventType,
-      Future<void> Function(WebrtcEvent) fn) {
+      Future<dynamic> Function(WebrtcEvent) fn) {
     String key = _getKey(peerId, eventType);
     List<Future<void> Function(WebrtcEvent)>? fns = fnsm[key];
     if (fns == null) {
@@ -219,17 +218,20 @@ class PeerConnectionPool {
     }
   }
 
-  onWebrtcEvent(WebrtcEvent event) {
+  Future<List> onWebrtcEvent(WebrtcEvent event) async {
     String peerId = event.peerId;
     WebrtcEventType eventType = event.eventType;
     logger.w('Webrtc peer connection $peerId webrtcEvent $eventType coming');
     String key = _getKey(peerId, eventType);
-    List<Future<void> Function(WebrtcEvent)>? fns = fnsm[key];
+    List<Future<dynamic> Function(WebrtcEvent)>? fns = fnsm[key];
+    var results = [];
     if (fns != null) {
       for (var fn in fns) {
-        fn(event);
+        results.add(await fn(event));
       }
     }
+
+    return results;
   }
 
   /// 获取peerId的webrtc连接，可能是多个
@@ -475,6 +477,7 @@ class PeerConnectionPool {
     return advancedPeerConnection;
   }
 
+  ///从信号服务器传来的webrtc的协商消息
   Future<void> onSignal(ChainMessage chainMessage) async {
     if (chainMessage.srcPeerId == null) {
       logger.e('chainMessage.srcPeerId is null');
@@ -556,9 +559,24 @@ class PeerConnectionPool {
     }
     if (signalType == SignalType.candidate.name ||
         (signalType == SignalType.sdp.name && signal.sdp!.type == 'offer')) {
+      bool? allowed = false;
       Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
       if (linkman != null &&
           linkman.linkmanStatus == LinkmanStatus.friend.name) {
+        ///如果是好友，则直接接受
+        allowed = true;
+      } else {
+        ///如果不是好友，调用注册的事件，看返回结果决定
+        WebrtcEvent webrtcEvent = WebrtcEvent(peerId,
+            clientId: clientId,
+            name: name,
+            eventType: WebrtcEventType.signal,
+            data: signal);
+        //对消息进行业务处理
+        allowed =
+            await globalWebrtcEventController.receiveWebrtcEvent(webrtcEvent);
+      }
+      if (allowed != null && allowed) {
         advancedPeerConnection = await createIfNotExist(peerId,
             clientId: clientId,
             name: name,
@@ -580,6 +598,7 @@ class PeerConnectionPool {
             eventType: WebrtcEventType.signal,
             data: webrtcSignal);
         await advancedPeerConnection!.signal(webrtcEvent);
+
         return null;
       }
     }
