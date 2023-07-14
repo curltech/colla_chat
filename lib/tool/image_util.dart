@@ -407,7 +407,8 @@ class ImageUtil {
     Uint8List? avatar;
     Directory dir = await PathUtil.getTemporaryDirectory();
     if (image != null) {
-      var path = await FileUtil.writeTempFileAsBytes(image, extension: extension);
+      var path =
+          await FileUtil.writeTempFileAsBytes(image, extension: extension);
       xfile = XFile(path!);
     }
     if (xfile != null) {
@@ -447,7 +448,8 @@ class ImageUtil {
   ) async {
     Uint8List? avatar;
     if (platformParams.desktop) {
-      List<XFile> xfiles = await FileUtil.pickFiles(type: FileType.image);
+      List<XFile> xfiles = await FileUtil.selectFiles(
+          allowedExtensions: ['png', 'jpg', 'jpeg', 'webp', 'gif']);
       if (xfiles.isNotEmpty) {
         avatar = await compressThumbnail(xfile: xfiles[0]);
       }

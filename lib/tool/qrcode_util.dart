@@ -14,6 +14,7 @@ class QrcodeUtil {
   static QrImageView create(
     String data, {
     double size = 320,
+    padding = const EdgeInsets.all(5.0),
     String? embed,
     ImageProvider<Object>? embeddedImage,
     QrEmbeddedImageStyle? embeddedImageStyle,
@@ -25,8 +26,8 @@ class QrcodeUtil {
       bytes = CryptoUtil.decodeBase64(embed.substring(pos));
       embeddedImage = MemoryImage(bytes);
     }
-    embeddedImageStyle ??= QrEmbeddedImageStyle(
-      size: const Size(80, 80),
+    embeddedImageStyle ??= const QrEmbeddedImageStyle(
+      size: Size(80, 80),
     );
 
     return QrImageView(
@@ -34,6 +35,7 @@ class QrcodeUtil {
       version: QrVersions.auto,
       size: size,
       gapless: false,
+      padding: padding,
       embeddedImage: embeddedImage,
       embeddedImageStyle: embeddedImageStyle,
     );

@@ -160,29 +160,6 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
       }
       return;
     }
-    String? smtpServerHost = values['smtpServerHost'];
-    String? smtpServerPort = values['smtpServerPort'];
-    if (StringUtil.isEmpty(smtpServerHost) ||
-        StringUtil.isEmpty(smtpServerPort)) {
-      logger.e('smtpServerHost or smtpServerPort  is empty');
-      if (mounted) {
-        DialogUtil.error(context,
-            content: 'smtpServerHost or smtpServerPort is empty');
-      }
-      return;
-    }
-    String? imapServerHost = values['imapServerHost'];
-    String? imapServerPort = values['imapServerPort'];
-    if (StringUtil.isEmpty(imapServerHost) ||
-        StringUtil.isEmpty(imapServerPort)) {
-      logger.e('imapServerHost or imapServerPort  is empty');
-      if (mounted) {
-        DialogUtil.error(context,
-            content: 'imapServerHost or imapServerPort is empty');
-      }
-      return;
-    }
-
     var emails = email!.split('@');
     EmailServiceProvider? emailServiceProvider;
     String domain = emails[1];
@@ -191,6 +168,28 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
       emailServiceProvider =
           platformEmailServiceProvider.domainNameServiceProviders[domain];
     } else {
+      String? smtpServerHost = values['smtpServerHost'];
+      String? smtpServerPort = values['smtpServerPort'];
+      if (StringUtil.isEmpty(smtpServerHost) ||
+          StringUtil.isEmpty(smtpServerPort)) {
+        logger.e('smtpServerHost or smtpServerPort  is empty');
+        if (mounted) {
+          DialogUtil.error(context,
+              content: 'smtpServerHost or smtpServerPort is empty');
+        }
+        return;
+      }
+      String? imapServerHost = values['imapServerHost'];
+      String? imapServerPort = values['imapServerPort'];
+      if (StringUtil.isEmpty(imapServerHost) ||
+          StringUtil.isEmpty(imapServerPort)) {
+        logger.e('imapServerHost or imapServerPort  is empty');
+        if (mounted) {
+          DialogUtil.error(context,
+              content: 'imapServerHost or imapServerPort is empty');
+        }
+        return;
+      }
       String? displayName = domain;
       String? displayShortName = name;
       ServerConfig imapServerConfig = ServerConfig(
@@ -238,6 +237,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
       emailServiceProvider =
           EmailServiceProvider(domain, imapServerHost!, clientConfig);
     }
+
     EmailAddress emailAddress = EmailMessageUtil.buildDiscoverEmailAddress(
         email, name!, emailServiceProvider!.clientConfig);
     DialogUtil.loadingShow(context,

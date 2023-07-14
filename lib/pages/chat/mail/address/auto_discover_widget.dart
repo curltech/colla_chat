@@ -214,18 +214,24 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
     }
     var emailServiceProvider = this.emailServiceProvider.value;
     if (emailServiceProvider == null) {
-      logger.e('auto discover emailServiceProvider is null');
-      if (mounted) {
-        DialogUtil.error(context,
-            content: 'Auto discovery emailServiceProvider is null');
+      EmailServiceProvider? emailServiceProvider =
+      await EmailMessageUtil.discover(email!);
+      if (emailServiceProvider == null) {
+        logger.e('auto discover emailServiceProvider is null');
+        if (mounted) {
+          DialogUtil.error(context,
+              content: 'Auto discovery emailServiceProvider is null');
+        }
+        return;
       }
-      return;
     }
-    ClientConfig clientConfig = emailServiceProvider.clientConfig;
+    ClientConfig clientConfig = emailServiceProvider!.clientConfig;
     EmailAddress emailAddress =
         EmailMessageUtil.buildDiscoverEmailAddress(email!, name!, clientConfig);
-    DialogUtil.loadingShow(context,
-        tip: 'Auto connecting email server,\n please waiting...');
+    if (mounted) {
+      DialogUtil.loadingShow(context,
+          tip: 'Auto connecting email server,\n please waiting...');
+    }
     EmailClient? emailClient = await emailClientPool
         .create(emailAddress, password!, config: clientConfig);
     if (mounted) {
@@ -287,7 +293,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
           const SizedBox(
             height: 10.0,
           ),
-          _buildEmailServiceProviderSelector(context),
+          //_buildEmailServiceProviderSelector(context),
           _buildFormInputWidget(context),
           Expanded(
               child: ValueListenableBuilder(

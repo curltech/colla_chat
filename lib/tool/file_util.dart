@@ -162,6 +162,10 @@ class FileUtil {
     bool withReadStream = false,
     bool lockParentWindow = false,
   }) async {
+    if (initialDirectory == null) {
+      Directory? dir = await PathUtil.getApplicationDirectory();
+      initialDirectory = dir?.path;
+    }
     List<XFile> xfiles = [];
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       dialogTitle: dialogTitle,
@@ -197,6 +201,16 @@ class FileUtil {
     List<String>? allowedExtensions,
     String? confirmButtonText,
   }) async {
+    if (initialDirectory == null) {
+      Directory? dir = await PathUtil.getApplicationDirectory();
+      initialDirectory = dir?.path;
+    }
+    if (platformParams.android) {
+      return await pickFiles(
+          initialDirectory: initialDirectory,
+          type: FileType.custom,
+          allowedExtensions: allowedExtensions);
+    }
     XTypeGroup typeGroup = XTypeGroup(
       extensions: allowedExtensions,
     );

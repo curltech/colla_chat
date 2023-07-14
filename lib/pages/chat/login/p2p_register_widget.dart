@@ -102,7 +102,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
   Future<void> _restore() async {
     String? backup;
     if (platformParams.desktop) {
-      List<XFile> xfiles = await FileUtil.pickFiles();
+      List<XFile> xfiles = await FileUtil.selectFiles();
       if (xfiles.isNotEmpty) {
         backup = await xfiles[0].readAsString();
       }

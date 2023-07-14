@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -11,20 +12,28 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
 class QrcodeWidget extends StatefulWidget with TileDataMixin {
-  final List<AppBarPopupMenu> menus = [
-    AppBarPopupMenu(
-        title: 'Save to file', icon: Icon(Icons.save, color: myself.primary)),
-    AppBarPopupMenu(
-        title: 'Save to image', icon: Icon(Icons.image, color: myself.primary)),
-    AppBarPopupMenu(
-        title: 'Share', icon: Icon(Icons.share, color: myself.primary)),
-    AppBarPopupMenu(
-        title: 'Reset qrcode',
-        icon: Icon(Icons.lock_reset, color: myself.primary))
+  final List<ActionData> actionData = [
+    ActionData(
+      label: 'Save to file',
+      icon: Icon(Icons.save, color: myself.primary),
+    ),
+    ActionData(
+      label: 'Save to image',
+      icon: Icon(Icons.image, color: myself.primary),
+    ),
+    ActionData(
+      label: 'Share',
+      icon: Icon(Icons.share, color: myself.primary),
+    ),
+    ActionData(
+      label: 'Reset qrcode',
+      icon: Icon(Icons.lock_reset, color: myself.primary),
+    )
   ];
 
   QrcodeWidget({Key? key}) : super(key: key);
@@ -55,22 +64,23 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
     super.initState();
   }
 
-  Future<void> _rightCallBack(int index) async {
-    switch (index) {
-      case 0:
+  _onPopAction(BuildContext context, int index, String label,
+      {String? value}) async {
+    switch (label) {
+      case 'Save to file':
         Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
         FileUtil.writeFileAsBytes(bytes, myself.peerId!);
         break;
-      case 1:
+      case 'Save to image':
         Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
         ImageUtil.saveImageGallery(bytes, myself.peerId!);
         break;
-      case 2:
+      case 'Share':
         Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
         var path = await FileUtil.writeFileAsBytes(bytes, myself.peerId!);
         Share.shareXFiles([XFileUtil.open(path)]);
         break;
-      case 3:
+      case 'Reset qrcode':
         setState(() {
           qrImage = QrcodeUtil.create(content!);
         });
@@ -107,19 +117,49 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
           child: Container(
         key: globalKey,
         alignment: Alignment.center,
-        width: 300,
+        width: 320,
         color: Colors.white,
         padding: const EdgeInsets.all(5.0),
         child: qrImage,
       )),
       const Spacer(),
-      CommonAutoSizeText(AppLocalizations.t('Scan qrcode, add linkman')),
+      CommonAutoSizeText(
+        AppLocalizations.t('Scan qrcode, add linkman'),
+        style: const TextStyle(color: Colors.white),
+      ),
       const SizedBox(height: 30),
+    ];
+    List<Widget>? rightWidgets = [
+      IconButton(
+          onPressed: () async {
+            await DialogUtil.show(
+              context: context,
+              builder: (BuildContext context) {
+                return Dialog(
+                    elevation: 0.0,
+                    insetPadding: EdgeInsets.zero,
+                    child: DataActionCard(
+                        onPressed: (int index, String label, {String? value}) {
+                          Navigator.pop(context);
+                          _onPopAction(context, index, label, value: value);
+                        },
+                        crossAxisCount: 2,
+                        actions: widget.actionData,
+                        height: 140,
+                        width: 220,
+                        size: 20));
+              },
+            );
+          },
+          icon: const Icon(
+            Icons.more_horiz,
+            color: Colors.white,
+          ))
     ];
     return AppBarView(
       title: widget.title,
       withLeading: widget.withLeading,
-      //rightPopupMenus: widget.menus,
+      rightWidgets: rightWidgets,
       child: Column(children: children),
     );
   }
