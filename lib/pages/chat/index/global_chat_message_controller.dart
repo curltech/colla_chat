@@ -1,5 +1,6 @@
 import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/p2p/chain/action/chat.dart';
@@ -25,18 +26,30 @@ class GlobalWebrtcEventController with ChangeNotifier {
   ///跟踪影响全局的webrtc事件到来，对不同类型的事件进行分派
   ///目前用于处理对方的webrtc呼叫是否被允许
   Future<bool?> receiveWebrtcEvent(WebrtcEvent webrtcEvent) async {
+    bool? allowed = false;
     String peerId = webrtcEvent.peerId;
-    if (results.containsKey(peerId)) {
-      return results[peerId];
-    }
-    if (onWebrtcEvent != null) {
-      bool? allowed = await onWebrtcEvent!(webrtcEvent);
-      results[peerId] = allowed;
+    Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+    if (linkman != null) {
+      if (linkman.linkmanStatus == LinkmanStatus.friend.name) {
+        ///如果是好友，则直接接受
+        allowed = true;
+      } else if (linkman.linkmanStatus == LinkmanStatus.blacklist.name) {
+        ///如果是黑名单，则直接拒绝
+        allowed = false;
+      } else {
+        if (results.containsKey(peerId)) {
+          return results[peerId];
+        }
+        if (onWebrtcEvent != null) {
+          bool? allowed = await onWebrtcEvent!(webrtcEvent);
+          results[peerId] = allowed;
 
-      return allowed;
+          return allowed;
+        }
+      }
     }
 
-    return false;
+    return allowed;
   }
 }
 
