@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/me/settings/security/logger_console_view.dart';
 import 'package:colla_chat/pages/chat/me/settings/security/password_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
@@ -23,12 +24,15 @@ import 'package:flutter/material.dart';
 /// 安全设置组件，包括修改密码，登录选项（免登录设置），加密选项（加密算法，signal）
 class SecuritySettingWidget extends StatefulWidget with TileDataMixin {
   final PasswordWidget passwordWidget = const PasswordWidget();
+  final LoggerConsoleView loggerConsoleView = const LoggerConsoleView();
   late final List<TileData> securitySettingTileData;
 
   SecuritySettingWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(passwordWidget);
+    indexWidgetProvider.define(loggerConsoleView);
     List<TileDataMixin> mixins = [
       passwordWidget,
+      loggerConsoleView,
     ];
     securitySettingTileData = TileData.from(mixins);
     for (var tile in securitySettingTileData) {

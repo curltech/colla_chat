@@ -1,6 +1,6 @@
 import 'package:colla_chat/pages/chat/me/collection/collection_list_view.dart';
 import 'package:colla_chat/pages/chat/me/contact_widget.dart';
-import 'package:colla_chat/pages/chat/me/logger_console_view.dart';
+import 'package:colla_chat/pages/chat/me/settings/security/logger_console_view.dart';
 import 'package:colla_chat/pages/chat/me/me_head_widget.dart';
 import 'package:colla_chat/pages/chat/me/media/media_widget.dart';
 import 'package:colla_chat/pages/chat/me/openvpn_widget.dart';
@@ -25,7 +25,6 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   final MediaWidget mediaWidget = MediaWidget();
   final PlatformWebViewWidget webViewWidget = PlatformWebViewWidget();
   final OpenVpnWidget openVpnWidget = const OpenVpnWidget();
-  final LoggerConsoleView loggerConsoleView = const LoggerConsoleView();
   final ContactWidget contactWidget = const ContactWidget();
 
   late final List<TileData> meTileData;
@@ -41,14 +40,12 @@ class MeWidget extends StatelessWidget with TileDataMixin {
       indexWidgetProvider.define(contactWidget);
       indexWidgetProvider.define(openVpnWidget);
     }
-    indexWidgetProvider.define(loggerConsoleView);
     List<TileDataMixin> mixins = [
       settingWidget,
       collectionListView,
       webrtcWidget,
       webViewWidget,
       mediaWidget,
-      loggerConsoleView,
     ];
     if (platformParams.mobile) {
       mixins.addAll([
