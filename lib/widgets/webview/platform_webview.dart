@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
-import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/webview/flutter_webview.dart';
 import 'package:colla_chat/widgets/webview/html_webview.dart';
@@ -11,7 +10,6 @@ import 'package:colla_chat/widgets/webview/inapp_webview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart' as inapp;
 import 'package:webview_flutter/webview_flutter.dart' as webview;
-import 'package:path/path.dart' as p;
 
 class PlatformWebViewController with ChangeNotifier {
   inapp.InAppWebViewController? inAppWebViewController;
@@ -205,36 +203,16 @@ class PlatformWebView extends StatelessWidget {
     return null;
   }
 
-  Future<String> writeHtml(String html) async {
-    String filename = await FileUtil.getTempFilename(extension: 'html');
-    File file = File(filename);
-    bool exist = file.existsSync();
-    if (exist) {
-      file.deleteSync();
-    }
-    file.writeAsStringSync(html, flush: true);
-
-    return filename;
-  }
-
   Widget _buildPlatformWebView() {
     Widget platformWebView;
     if (platformParams.windows) {
       if (html != null) {
-        platformWebView = FutureBuilder(
-            future: writeHtml(html!),
-            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-              if (snapshot.connectionState != ConnectionState.done) {
-                return LoadingUtil.buildLoadingIndicator();
-              }
-              String filename = snapshot.data;
-              return FlutterWebView(
-                initialFilename: filename,
-                onWebViewCreated: (webview.WebViewController controller) {
-                  _onWebViewCreated(controller);
-                },
-              );
-            });
+        platformWebView = FlutterWebView(
+          html: html!,
+          onWebViewCreated: (webview.WebViewController controller) {
+            _onWebViewCreated(controller);
+          },
+        );
       } else {
         platformWebView = FlutterWebView(
           initialUrl: initialUrl,

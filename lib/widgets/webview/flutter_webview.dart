@@ -49,6 +49,18 @@ class FlutterWebView extends StatelessWidget {
     }
   }
 
+  Future<String> writeHtml(String html) async {
+    String filename = await FileUtil.getTempFilename(extension: 'html');
+    File file = File(filename);
+    bool exist = file.existsSync();
+    if (exist) {
+      file.deleteSync();
+    }
+    file.writeAsStringSync(html, flush: true);
+
+    return filename;
+  }
+
   _initWebViewContent() {
     if (initialUrl != null) {
       controller!.loadRequest(Uri.parse(initialUrl!));
@@ -59,12 +71,7 @@ class FlutterWebView extends StatelessWidget {
     if (html != null) {
       if (platformParams.windows) {
         //windows平台不能直接加载html，会乱码
-        FileUtil.getTempFilename(extension: 'html').then((String filename) {
-          File file = File(filename);
-          bool exist = file.existsSync();
-          if (!exist) {
-            file.writeAsStringSync(html!, flush: true);
-          }
+        writeHtml(html!).then((String filename) {
           controller!.loadFile(filename);
         });
       } else {
