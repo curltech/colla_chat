@@ -266,7 +266,10 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
         EmailAddress? old = await emailAddressService.findByMailAddress(email);
         if (old != null) {
           emailAddress.id = old.id;
+          emailAddress.createDate = old.createDate;
         }
+        emailAddress.name = name;
+        emailAddress.password = password;
 
         ///保存地址
         await emailAddressService.store(emailAddress);

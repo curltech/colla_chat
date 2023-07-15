@@ -7,6 +7,7 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/emailaddress.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
@@ -147,6 +148,8 @@ class MailMimeMessageController
           return true;
         }
       }
+    } else {
+      logger.e('email address:${emailAddress.email} password is empty');
     }
     return false;
   }

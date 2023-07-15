@@ -215,7 +215,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
     var emailServiceProvider = this.emailServiceProvider.value;
     if (emailServiceProvider == null) {
       EmailServiceProvider? emailServiceProvider =
-      await EmailMessageUtil.discover(email!);
+          await EmailMessageUtil.discover(email!);
       if (emailServiceProvider == null) {
         logger.e('auto discover emailServiceProvider is null');
         if (mounted) {
@@ -255,7 +255,10 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
         EmailAddress? old = await emailAddressService.findByMailAddress(email);
         if (old != null) {
           emailAddress.id = old.id;
+          emailAddress.createDate = old.createDate;
         }
+        emailAddress.name = name;
+        emailAddress.password = password;
 
         ///保存地址
         await emailAddressService.store(emailAddress);
