@@ -72,17 +72,14 @@ class PrimaryNavigation {
         valueListenable: mainViewVisible,
         builder: (BuildContext context, bool mainViewVisible, Widget? child) {
           return ButtonBar(children: [
-            // IconButton(
-            //     color: myself.primary,
-            //     tooltip: indexWidgetProvider.grid
-            //         ? AppLocalizations.t('Close grid view')
-            //         : AppLocalizations.t('Open grid view'),
-            //     onPressed: () {
-            //       indexWidgetProvider.grid = !indexWidgetProvider.grid;
-            //     },
-            //     icon: indexWidgetProvider.grid
-            //         ? const Icon(Icons.view_agenda)
-            //         : const Icon(Icons.grid_view)),
+            IconButton(
+              color: Colors.white,
+              onPressed: () {
+                indexWidgetProvider.push('personal_info');
+              },
+              tooltip: myself.name,
+              icon: myself.avatarImage ?? AppImage.mdAppImage,
+            ),
             IconButton(
                 color: myself.primary,
                 tooltip: mainViewVisible
@@ -174,6 +171,7 @@ class PrimaryNavigation {
             builder: (BuildContext context) {
               return Card(
                   elevation: 0.0,
+                  color: Colors.black54,
                   shape: const ContinuousRectangleBorder(),
                   margin: EdgeInsets.zero,
                   child: AdaptiveScaffold.standardNavigationRail(
@@ -183,6 +181,7 @@ class PrimaryNavigation {
                       indexWidgetProvider.currentMainIndex = index;
                     },
                     padding: const EdgeInsets.all(0.0),
+                    backgroundColor: Colors.black54,
                     leading: _buildAppBar(context),
                     destinations: destinations,
                     selectedIconTheme: IconThemeData(
@@ -205,6 +204,7 @@ class PrimaryNavigation {
             builder: (BuildContext context) {
               return Card(
                   elevation: 0.0,
+                  color: Colors.black54,
                   shape: const ContinuousRectangleBorder(),
                   margin: EdgeInsets.zero,
                   child: AdaptiveScaffold.standardNavigationRail(
@@ -214,6 +214,7 @@ class PrimaryNavigation {
                       indexWidgetProvider.currentMainIndex = index;
                     },
                     padding: const EdgeInsets.all(0.0),
+                    backgroundColor: Colors.black54,
                     leading: _buildAppBar(context),
                     destinations: destinations,
                     extended: true,
