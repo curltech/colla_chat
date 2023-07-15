@@ -309,137 +309,137 @@ class DialogUtil {
 
   ///返回为true，代表按的确认
   static Future<bool?> confirm(BuildContext context,
-      {Icon? icon, String title = 'Confirm', String content = ''}) {
-    icon = icon ?? const Icon(Icons.privacy_tip_outlined);
+      {Icon? icon, String title = 'Confirm', String content = ''}) async {
     ButtonStyle style = StyleUtil.buildButtonStyle();
     ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);
-    return showDialog(
+    bool? result;
+    await showDialog(
       context: context,
-      barrierDismissible: false,
       builder: (context) {
-        return Dialog(
-            child: Column(
-          children: [
-            AppBarWidget.buildTitleBar(
-                title: CommonAutoSizeText(
-              AppLocalizations.t(title),
-              style: const TextStyle(fontSize: 16, color: Colors.white),
-            )),
-            const SizedBox(
-              height: 25.0,
+        return AlertDialog(
+          title: AppBarWidget.buildTitleBar(
+              title: Text(
+            AppLocalizations.t(title),
+          )),
+          titlePadding: EdgeInsets.zero,
+          content: Row(children: [
+            const Icon(
+              Icons.question_mark,
+              color: Colors.blue,
             ),
-            CommonAutoSizeText(AppLocalizations.t(content)),
-            const SizedBox(
-              height: 25.0,
+            const Spacer(),
+            Text(AppLocalizations.t(content)),
+          ]),
+          actions: <Widget>[
+            TextButton(
+              style: style,
+              onPressed: () {
+                result = false;
+                Navigator.of(context).pop();
+              },
+              child: Text(AppLocalizations.t('Cancel')),
             ),
-            ButtonBar(
-              children: <Widget>[
-                TextButton(
-                  style: style,
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: CommonAutoSizeText(AppLocalizations.t('Cancel')),
-                ),
-                TextButton(
-                  style: mainStyle,
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                  },
-                  child: CommonAutoSizeText(AppLocalizations.t('Ok')),
-                ),
-              ],
+            TextButton(
+              style: mainStyle,
+              onPressed: () {
+                result = true;
+                Navigator.of(context).pop(true);
+              },
+              child: Text(AppLocalizations.t('Ok')),
             ),
           ],
-        ));
+        );
       },
     );
+
+    return result;
   }
 
   static Future<String?> showTextFormField(BuildContext context,
-      {Icon? icon, String title = '', String content = '', String tip = ''}) {
+      {Icon? icon,
+      String title = '',
+      String content = '',
+      String tip = ''}) async {
     ButtonStyle style = StyleUtil.buildButtonStyle();
     ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);
-    icon = icon ?? const Icon(Icons.privacy_tip_outlined);
-    var size = MediaQuery.of(context).size;
-    return showDialog(
+    String? result;
+    TextEditingController controller = TextEditingController();
+    controller.text = tip;
+    await showDialog(
       context: context,
-      barrierDismissible: true,
       builder: (context) {
-        TextEditingController controller = TextEditingController();
-        controller.text = tip;
-        return Center(
-            child: SizedBox(
-                width: size.width * dialogSizeIndex,
-                height: size.height * dialogSizeIndex,
-                child: Card(
-                    elevation: 0,
-                    shape: const ContinuousRectangleBorder(),
-                    child: Column(children: [
-                      AppBarWidget.buildTitleBar(
-                          title: CommonAutoSizeText(
-                        AppLocalizations.t(title),
-                        style:
-                            const TextStyle(fontSize: 16, color: Colors.white),
-                      )),
-                      Container(
-                          alignment: Alignment.center,
-                          padding: const EdgeInsets.all(10),
-                          child: Column(children: [
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            CommonAutoSizeTextFormField(
-                              keyboardType: TextInputType.text,
-                              labelText: content,
-                              controller: controller,
-                            ),
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            ButtonBar(
-                              children: [
-                                TextButton(
-                                  style: style,
-                                  onPressed: () =>
-                                      Navigator.of(context).pop(null),
-                                  child: CommonAutoSizeText(
-                                      AppLocalizations.t('Cancel')),
-                                ),
-                                TextButton(
-                                  style: mainStyle,
-                                  onPressed: () {
-                                    Navigator.of(context).pop(controller.text);
-                                  },
-                                  child: CommonAutoSizeText(
-                                      AppLocalizations.t('Ok')),
-                                ),
-                              ],
-                            ),
-                          ])),
-                    ]))));
+        return AlertDialog(
+          title: AppBarWidget.buildTitleBar(
+              title: Text(
+            AppLocalizations.t(title),
+          )),
+          titlePadding: EdgeInsets.zero,
+          content: Row(children: [
+            const Icon(
+              Icons.input,
+              color: Colors.blue,
+            ),
+            const Spacer(),
+            CommonAutoSizeTextFormField(
+              keyboardType: TextInputType.text,
+              labelText: content,
+              controller: controller,
+            )
+          ]),
+          actions: <Widget>[
+            TextButton(
+              style: style,
+              onPressed: () {
+                result = null;
+                Navigator.of(context).pop();
+              },
+              child: CommonAutoSizeText(AppLocalizations.t('Cancel')),
+            ),
+            TextButton(
+              style: mainStyle,
+              onPressed: () {
+                result = controller.text;
+                Navigator.of(context).pop();
+              },
+              child: CommonAutoSizeText(AppLocalizations.t('Ok')),
+            ),
+          ],
+        );
       },
     );
+    return result;
   }
 
   /// 模态警告
   static Future<bool?> alert(BuildContext context,
-      {Icon? icon, String title = 'Warning', String content = ''}) {
-    return confirm(context,
-        title: title, content: content, icon: const Icon(Icons.info));
+      {Icon? icon, String title = 'Warning', String content = ''}) async {
+    return await confirm(context,
+        title: title,
+        content: content,
+        icon: const Icon(
+          Icons.warning,
+          color: Colors.yellow,
+        ));
   }
 
   /// 模态提示
   static Future<bool?> prompt(BuildContext context,
-      {Icon? icon, String title = 'Prompt', String content = ''}) {
-    return confirm(context,
-        title: title, content: content, icon: const Icon(Icons.info));
+      {Icon? icon, String title = 'Prompt', String content = ''}) async {
+    return await confirm(context,
+        title: title,
+        content: content,
+        icon: const Icon(
+          Icons.info,
+          color: Colors.green,
+        ));
   }
 
   /// 模态提示错误
   static Future<bool?> fault(BuildContext context,
-      {Icon? icon, String title = 'Fault', String content = ''}) {
-    return confirm(context,
+      {Icon? icon, String title = 'Fault', String content = ''}) async {
+    return await confirm(context,
         title: title,
         content: content,
         icon: const Icon(
