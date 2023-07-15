@@ -112,7 +112,6 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
       ColumnFieldDef(
           name: 'name',
           label: 'Name',
-          initValue: '胡劲松',
           prefixIcon: Icon(
             Icons.person,
             color: myself.primary,
@@ -120,7 +119,6 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
       ColumnFieldDef(
         name: 'email',
         label: 'Email',
-        initValue: 'hujs06@163.com',
         prefixIcon: Icon(
           Icons.email,
           color: myself.primary,
@@ -130,7 +128,6 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
       ColumnFieldDef(
           name: 'password',
           label: 'Password',
-          initValue: 'GRDCGOUASMNEBSTH',
           prefixIcon: Icon(
             Icons.password,
             color: myself.primary,
