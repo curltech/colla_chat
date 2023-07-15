@@ -140,9 +140,10 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
 
   Widget _buildFormInputWidget(BuildContext context) {
     var formInputWidget = Container(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
         child: FormInputWidget(
           height: 250,
+          spacing: 5.0,
           formButtonDefs: [
             FormButtonDef(
                 label: 'Discover',

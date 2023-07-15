@@ -128,18 +128,22 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
     double height = appDataProvider.portraitSize.height - 250;
     var formInputWidget = SingleChildScrollView(
         child: Container(
-            padding: const EdgeInsets.all(10.0),
-            child: FormInputWidget(
-              height: height,
-              formButtonDefs: [
-                FormButtonDef(
-                    label: 'Connect',
-                    onTap: (Map<String, dynamic> values) {
-                      _connect(values);
-                    }),
-              ],
-              columnFieldDefs: _getManualDiscoveryColumnFieldDefs(),
-            )));
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Column(children: [
+              const SizedBox(height: 10.0),
+              FormInputWidget(
+                height: height,
+                spacing : 5.0,
+                formButtonDefs: [
+                  FormButtonDef(
+                      label: 'Connect',
+                      onTap: (Map<String, dynamic> values) {
+                        _connect(values);
+                      }),
+                ],
+                columnFieldDefs: _getManualDiscoveryColumnFieldDefs(),
+              )
+            ])));
 
     return formInputWidget;
   }
