@@ -9,10 +9,14 @@ import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 
 class EmailAddressService extends GeneralBaseService<EmailAddress> {
-  EmailAddressService(
-      {required super.tableName,
-      required super.fields,
-      required super.indexFields}) {
+  EmailAddressService({
+    required super.tableName,
+    required super.fields,
+    required super.indexFields,
+    super.encryptFields = const [
+      'password',
+    ],
+  }) {
     post = (Map map) {
       return EmailAddress.fromJson(map);
     };
