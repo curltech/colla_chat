@@ -1,3 +1,4 @@
+import 'package:colla_chat/pages/chat/index/platform_breakpoint.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/locale_util.dart';
@@ -24,7 +25,7 @@ class AppDataProvider with ChangeNotifier {
   Size _totalSize = const Size(412.0, 892.0);
   double bottomBarHeight = kBottomNavigationBarHeight;
   double toolbarHeight = kToolbarHeight;
-  double primaryNavigationWidth = 145;
+  double primaryNavigationWidth = 170;
   double mediumPrimaryNavigationWidth = 90;
   double _bodyRatio = 0.4;
   double dividerWidth = 1;
@@ -69,23 +70,24 @@ class AppDataProvider with ChangeNotifier {
 
   ///横屏
   bool get landscape {
-    return _totalSize.width >
-        _totalSize.height; // || _totalSize.width >= smallBreakpointLimit;
+    return _totalSize.width > _totalSize.height &&
+        _totalSize.width >= smallBreakpointLimit;
   }
 
-  ///竖屏，宽度小于600
-  WidthPlatformBreakpoint get smallBreakpoint {
-    return const WidthPlatformBreakpoint(end: smallBreakpointLimit);
+  ///竖屏，宽度小于高度或者宽度小于600
+  PlatformBreakpoint get smallBreakpoint {
+    return const PlatformBreakpoint(end: smallBreakpointLimit);
   }
 
-  ///横屏，宽度大于600
-  WidthPlatformBreakpoint get mediumBreakpoint {
-    return const WidthPlatformBreakpoint(
+  ///横屏，宽度大于600并且小于1000，并且宽度大于高度
+  PlatformBreakpoint get mediumBreakpoint {
+    return const PlatformBreakpoint(
         begin: smallBreakpointLimit, end: largeBreakpointLimit);
   }
 
-  WidthPlatformBreakpoint get largeBreakpoint {
-    return const WidthPlatformBreakpoint(begin: largeBreakpointLimit);
+  ///大横屏，宽度大于1000，并且宽度大于高度
+  PlatformBreakpoint get largeBreakpoint {
+    return const PlatformBreakpoint(begin: largeBreakpointLimit);
   }
 
   ///计算实际的主视图宽度
