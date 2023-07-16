@@ -2,6 +2,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/login/myself_peer_view_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/myselfpeer/myself_peer_controller.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
@@ -94,22 +95,22 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
   @override
   Widget build(BuildContext context) {
     return ListView(children: [
-      const SizedBox(
-        height: 50,
+      SizedBox(
+        height: appDataProvider.portraitSize.height * 0.1,
       ),
       ImageUtil.buildImageWidget(
         image: 'assets/images/colla.png',
         height: AppImageSize.xlSize,
         width: AppImageSize.xlSize,
       ),
-      const SizedBox(
-        height: 50,
+      SizedBox(
+        height: appDataProvider.portraitSize.height * 0.1,
       ),
       Container(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           child: FormInputWidget(
             mainAxisAlignment: MainAxisAlignment.start,
-            height: 300,
+            height: appDataProvider.portraitSize.height * 0.3,
             spacing: 10.0,
             onOk: (Map<String, dynamic> values) async {
               await _login(values);

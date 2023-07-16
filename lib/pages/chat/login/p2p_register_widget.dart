@@ -5,6 +5,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/myselfpeer/myself_peer_controller.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/asset_util.dart';
@@ -193,7 +194,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
         Container(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
             child: FormInputWidget(
-              height: 600,
+              height: appDataProvider.portraitSize.height * 0.6,
               spacing: 5.0,
               onOk: _onOk,
               okLabel: 'Register',
