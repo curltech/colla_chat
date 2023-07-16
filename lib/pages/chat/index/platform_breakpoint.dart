@@ -13,14 +13,14 @@ class PlatformBreakpoint extends Breakpoint {
     final double width = MediaQuery.of(context).size.width;
     final double height = MediaQuery.of(context).size.height;
 
-    ///竖屏
-    if (end != null) {
-      return width < end! || width <= height;
-    }
-
     ///中等横屏
     if (begin != null && end != null) {
       return width > begin! && width < end! && width > height;
+    }
+
+    ///竖屏
+    if (end != null) {
+      return width < end! || width <= height;
     }
 
     ///大横屏

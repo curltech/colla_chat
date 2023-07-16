@@ -278,7 +278,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                     if (mounted) {
                       DialogUtil.info(context,
                           content:
-                          '${AppLocalizations.t('Linkman:')} ${linkman.name} ${AppLocalizations.t('is requested add me as friend')}');
+                              '${AppLocalizations.t('Linkman:')} ${linkman.name} ${AppLocalizations.t('is requested add me as friend')}');
                     }
                   }
                 }
@@ -542,28 +542,31 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
       ValueListenableBuilder(
           valueListenable: _currentTab,
           builder: (context, value, child) {
-            return const Tab(
-              icon: Icon(Icons.person),
+            return Tab(
+              icon: Icon(Icons.person,
+                  color: value == 0 ? myself.primary : Colors.white),
               //text: AppLocalizations.t('Linkman'),
-              iconMargin: EdgeInsets.all(0.0),
+              iconMargin: const EdgeInsets.all(0.0),
             );
           }),
       ValueListenableBuilder(
           valueListenable: _currentTab,
           builder: (context, value, child) {
-            return const Tab(
-              icon: Icon(Icons.group),
+            return Tab(
+              icon: Icon(Icons.group,
+                  color: value == 1 ? myself.primary : Colors.white),
               //text: AppLocalizations.t('Group'),
-              iconMargin: EdgeInsets.all(0.0),
+              iconMargin: const EdgeInsets.all(0.0),
             );
           }),
       ValueListenableBuilder(
           valueListenable: _currentTab,
           builder: (context, value, child) {
-            return const Tab(
-              icon: Icon(Icons.video_chat),
+            return Tab(
+              icon: Icon(Icons.video_chat,
+                  color: value == 2 ? myself.primary : Colors.white),
               //text: AppLocalizations.t('Group'),
-              iconMargin: EdgeInsets.all(0.0),
+              iconMargin: const EdgeInsets.all(0.0),
             );
           }),
     ];

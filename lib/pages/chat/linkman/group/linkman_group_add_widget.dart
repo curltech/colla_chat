@@ -9,6 +9,7 @@ import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
@@ -263,7 +264,7 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
                 entity: group);
           }
           return FormInputWidget(
-            height: 220,
+            height: appDataProvider.portraitSize.height * 0.5,
             onOk: (Map<String, dynamic> values) {
               _onOk(values).then((group) {
                 if (group != null) {

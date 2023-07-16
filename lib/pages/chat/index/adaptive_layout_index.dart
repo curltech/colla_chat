@@ -146,17 +146,19 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
     double? bodyRatio = appDataProvider.smallBreakpoint.isActive(context)
         ? 0.0
         : appDataProvider.bodyRatio;
+
     return Consumer<IndexWidgetProvider>(
         builder: (context, indexWidgetProvider, child) {
+      SlotLayout? bottomSlotLayout;
+      if (indexWidgetProvider.bottomBarVisible && !appDataProvider.landscape) {
+        bottomSlotLayout = bottomNavigation.build(indexWidgetProvider);
+      }
       return AdaptiveLayout(
           primaryNavigation: primaryNavigation.build(indexWidgetProvider),
           body: _buildBody(),
           secondaryBody: _buildSecondaryBody(context),
           bodyRatio: bodyRatio,
-          bottomNavigation:
-              indexWidgetProvider.bottomBarVisible && !appDataProvider.landscape
-                  ? bottomNavigation.build(indexWidgetProvider)
-                  : null);
+          bottomNavigation: bottomSlotLayout);
     });
   }
 

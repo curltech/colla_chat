@@ -125,7 +125,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
   }
 
   Widget _buildFormInputWidget(BuildContext context) {
-    double height = appDataProvider.portraitSize.height - 250;
+    double height = appDataProvider.portraitSize.height * 0.7;
     var formInputWidget = SingleChildScrollView(
         child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -133,7 +133,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
               const SizedBox(height: 10.0),
               FormInputWidget(
                 height: height,
-                spacing : 5.0,
+                spacing: 5.0,
                 formButtonDefs: [
                   FormButtonDef(
                       label: 'Connect',

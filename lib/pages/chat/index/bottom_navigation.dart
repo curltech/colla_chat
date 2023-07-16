@@ -1,5 +1,6 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -56,17 +57,19 @@ class BottomNavigation {
         _buildNavigationDestination(indexWidgetProvider);
     return SlotLayout(
       config: <Breakpoint, SlotLayoutConfig>{
-        Breakpoints.small: SlotLayout.from(
+        appDataProvider.smallBreakpoint: SlotLayout.from(
           key: const Key('Bottom Navigation Small'),
           inAnimation: AdaptiveScaffold.bottomToTop,
           outAnimation: AdaptiveScaffold.topToBottom,
-          builder: (_) => AdaptiveScaffold.standardBottomNavigationBar(
-            destinations: destinations,
-            currentIndex: indexWidgetProvider.currentMainIndex,
-            onDestinationSelected: (int index) {
-              indexWidgetProvider.currentMainIndex = index;
-            },
-          ),
+          builder: (_) {
+            return AdaptiveScaffold.standardBottomNavigationBar(
+              destinations: destinations,
+              currentIndex: indexWidgetProvider.currentMainIndex,
+              onDestinationSelected: (int index) {
+                indexWidgetProvider.currentMainIndex = index;
+              },
+            );
+          },
         )
       },
     );

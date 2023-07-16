@@ -7,6 +7,7 @@ import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_control
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/service/chat/group.dart';
@@ -240,7 +241,7 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
                 .getInitValue(conferenceColumnFieldDefs, entity: conference);
           }
           return FormInputWidget(
-            height: 270,
+            height: appDataProvider.portraitSize.height * 0.5,
             onOk: (Map<String, dynamic> values) {
               _onOk(values).then((conference) {
                 if (conference != null) {
