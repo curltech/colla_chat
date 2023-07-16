@@ -158,7 +158,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     if (peer != null) {
       throw 'Same name account exist';
     }
-    peer = await findOneByName(loginName);
+    peer = await findOneByLoginName(loginName);
     if (peer != null) {
       throw 'Same loginName account exist';
     }

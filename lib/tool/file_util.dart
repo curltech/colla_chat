@@ -430,6 +430,72 @@ class FileUtil {
     return [];
   }
 
+  static Future<List<String>?> fullSelectFiles({
+    required BuildContext context,
+    bool image = true,
+    bool video = false,
+    bool file = false,
+    bool voiceRecorder = false,
+    bool imageCamera = false,
+    bool videoCamera = false,
+    String prefixName = "File",
+    bool videoCompressor = false,
+    bool imageCropper = false,
+    bool multiFile = false,
+  }) async {
+    List<String>? filenames;
+    fullPicker(
+        context: context,
+        image: image,
+        video: video,
+        file: file,
+        voiceRecorder: voiceRecorder,
+        imageCamera: imageCamera,
+        videoCamera: videoCamera,
+        videoCompressor: videoCompressor,
+        prefixName: prefixName,
+        imageCropper: imageCropper,
+        multiFile: multiFile,
+        onSelectedFilenames: (fs) async {
+          filenames = fs;
+        });
+
+    return filenames;
+  }
+
+  static Future<List<Uint8List>?> fullSelectBytes({
+    required BuildContext context,
+    bool image = true,
+    bool video = false,
+    bool file = false,
+    bool voiceRecorder = false,
+    bool imageCamera = false,
+    bool videoCamera = false,
+    String prefixName = "File",
+    bool videoCompressor = false,
+    bool imageCropper = false,
+    bool multiFile = false,
+  }) async {
+    List<Uint8List>? data;
+    fullPicker(
+        context: context,
+        image: image,
+        video: video,
+        file: file,
+        voiceRecorder: voiceRecorder,
+        imageCamera: imageCamera,
+        videoCamera: videoCamera,
+        prefixName: prefixName,
+        videoCompressor: videoCompressor,
+        imageCropper: imageCropper,
+        multiFile: multiFile,
+        onSelectedBytes: (bytes) async {
+          data = bytes;
+        });
+
+    return data;
+  }
+
   ///从图像，音频，录音，视频，文件系统等各种方式选择文件
   static void fullPicker({
     required BuildContext context,

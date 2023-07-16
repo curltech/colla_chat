@@ -46,7 +46,7 @@ abstract class PeerLocationService<T> extends GeneralBaseService<T> {
   }
 
   Future<int> deleteByPeerId(String peerId) async {
-    var count = await delete(where: 'peerId=?', whereArgs: [peerId]);
+    var count = delete(where: 'peerId=?', whereArgs: [peerId]);
 
     return count;
   }

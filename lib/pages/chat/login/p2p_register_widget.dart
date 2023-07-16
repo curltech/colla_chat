@@ -116,23 +116,6 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
   Widget build(BuildContext context) {
     return ListView(
       children: <Widget>[
-        const SizedBox(height: 10.0),
-        Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            alignment: Alignment.centerRight,
-            child: TextButton.icon(
-              label: CommonAutoSizeText(
-                AppLocalizations.t('Restore peer'),
-                style: const TextStyle(color: Colors.white),
-              ),
-              icon: Icon(
-                Icons.restore,
-                color: myself.primary,
-              ),
-              onPressed: () {
-                _restore();
-              },
-            )),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           child: ValueListenableBuilder(
@@ -140,7 +123,10 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
             builder: (BuildContext context, String countryCode, Widget? child) {
               return IntlPhoneField(
                 languageCode: myself.locale.languageCode,
-                pickerDialogStyle: PickerDialogStyle(),
+                pickerDialogStyle: PickerDialogStyle(
+                    searchFieldInputDecoration: InputDecoration(
+                  labelText: AppLocalizations.t('Search country'),
+                )),
                 invalidNumberMessage:
                     AppLocalizations.t('Invalid Mobile Number'),
                 controller: mobileController,
@@ -208,9 +194,28 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
             child: FormInputWidget(
               height: 380,
+              spacing: 5.0,
               onOk: _onOk,
               okLabel: 'Register',
               columnFieldDefs: p2pRegisterInputFieldDef,
+            )),
+        Container(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              style:
+                  StyleUtil.buildButtonStyle(backgroundColor: myself.primary),
+              label: CommonAutoSizeText(
+                AppLocalizations.t('Restore peer'),
+                style: const TextStyle(color: Colors.white),
+              ),
+              icon: const Icon(
+                Icons.restore,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                _restore();
+              },
             )),
       ],
     );
