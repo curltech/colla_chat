@@ -52,7 +52,7 @@ class AppDataProvider with ChangeNotifier {
     double width = _totalSize.width;
     double height = _totalSize.height;
     //横屏需要根据固定的尺寸来计算
-    if (landscape || (!landscape && _totalSize.width > designSize.width)) {
+    if (landscape) {
       width = _totalSize.width < designSize.width
           ? _totalSize.width
           : designSize.width;
@@ -69,15 +69,16 @@ class AppDataProvider with ChangeNotifier {
 
   ///横屏
   bool get landscape {
-    return _totalSize.width >= smallBreakpointLimit;
+    return _totalSize.width >
+        _totalSize.height; // || _totalSize.width >= smallBreakpointLimit;
   }
 
-  ///竖屏，宽度小于700
+  ///竖屏，宽度小于600
   WidthPlatformBreakpoint get smallBreakpoint {
     return const WidthPlatformBreakpoint(end: smallBreakpointLimit);
   }
 
-  ///横屏，宽度大于700
+  ///横屏，宽度大于600
   WidthPlatformBreakpoint get mediumBreakpoint {
     return const WidthPlatformBreakpoint(
         begin: smallBreakpointLimit, end: largeBreakpointLimit);
