@@ -325,13 +325,10 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     bool lockParentWindow = false,
   }) async {
     List<PlatformMediaSource> mediaSources = [];
-    final List<XFile> xfiles = await FileUtil.selectFiles(
-        initialDirectory: initialDirectory,
+    final xfiles = await FileUtil.pickFiles(
+        allowMultiple: allowMultiple,
+        type: fileType,
         allowedExtensions: this.allowedExtensions);
-    // final xfiles = await FileUtil.pickFiles(
-    //     allowMultiple: allowMultiple,
-    //     type: fileType,
-    //     allowedExtensions: this.allowedExtensions);
     if (xfiles.isNotEmpty) {
       for (var xfile in xfiles) {
         PlatformMediaSource? mediaSource = await add(filename: xfile.path);

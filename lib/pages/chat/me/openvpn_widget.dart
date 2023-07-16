@@ -117,7 +117,7 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
     BuildContext context,
   ) async {
     if (platformParams.desktop) {
-      List<XFile> xfiles = await FileUtil.selectFiles();
+      List<XFile> xfiles = await FileUtil.pickFiles();
       if (xfiles.isNotEmpty) {
         config.value = await xfiles[0].readAsString();
       }

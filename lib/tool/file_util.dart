@@ -430,6 +430,7 @@ class FileUtil {
     return [];
   }
 
+  ///各种文件的输入方式，文件采用pickFiles
   static Future<List<String>?> fullSelectFiles({
     required BuildContext context,
     bool image = true,
@@ -514,24 +515,24 @@ class FileUtil {
     void Function(int)? onError,
   }) {
     Language language = Language.copy(
-      camera: AppLocalizations.t('camera'),
-      selectFile: AppLocalizations.t('selectFile'),
-      file: AppLocalizations.t('file'),
-      voiceRecorder: AppLocalizations.t('voiceRecorder'),
-      gallery: AppLocalizations.t('gallery'),
-      cropper: AppLocalizations.t('cropper'),
-      url: AppLocalizations.t('url'),
-      enterURL: AppLocalizations.t('enterURL'),
-      ok: AppLocalizations.t('ok'),
-      cancel: AppLocalizations.t('cancel'),
-      on: AppLocalizations.t('on'),
-      off: AppLocalizations.t('off'),
-      auto: AppLocalizations.t('auto'),
-      onCompressing: AppLocalizations.t('onCompressing'),
-      tapForPhotoHoldForVideo: AppLocalizations.t('tapForPhotoHoldForVideo'),
-      cameraNotFound: AppLocalizations.t('cameraNotFound'),
-      noVoiceRecorded: AppLocalizations.t('noVoiceRecorded'),
-      denyAccessPermission: AppLocalizations.t('denyAccessPermission'),
+      camera: AppLocalizations.t('Camera'),
+      selectFile: AppLocalizations.t('SelectFile'),
+      file: AppLocalizations.t('File'),
+      voiceRecorder: AppLocalizations.t('VoiceRecorder'),
+      gallery: AppLocalizations.t('Gallery'),
+      cropper: AppLocalizations.t('Cropper'),
+      url: AppLocalizations.t('Url'),
+      enterURL: AppLocalizations.t('EnterURL'),
+      ok: AppLocalizations.t('Ok'),
+      cancel: AppLocalizations.t('Cancel'),
+      on: AppLocalizations.t('On'),
+      off: AppLocalizations.t('Off'),
+      auto: AppLocalizations.t('Auto'),
+      onCompressing: AppLocalizations.t('OnCompressing'),
+      tapForPhotoHoldForVideo: AppLocalizations.t('TapForPhotoHoldForVideo'),
+      cameraNotFound: AppLocalizations.t('CameraNotFound'),
+      noVoiceRecorded: AppLocalizations.t('NoVoiceRecorded'),
+      denyAccessPermission: AppLocalizations.t('DenyAccessPermission'),
     );
     FullPicker(
       context: context,

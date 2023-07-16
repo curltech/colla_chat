@@ -448,7 +448,7 @@ class ImageUtil {
   ) async {
     Uint8List? avatar;
     if (platformParams.desktop) {
-      List<XFile> xfiles = await FileUtil.selectFiles(
+      List<XFile> xfiles = await FileUtil.pickFiles(
           allowedExtensions: ['png', 'jpg', 'jpeg', 'webp', 'gif']);
       if (xfiles.isNotEmpty) {
         avatar = await compressThumbnail(xfile: xfiles[0]);

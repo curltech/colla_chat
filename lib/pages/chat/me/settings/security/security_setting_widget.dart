@@ -148,7 +148,7 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
 
   ///从备份的peer的登录信息json文件恢复到数据库
   Future<void> _restorePeer() async {
-    List<XFile> xfiles = await FileUtil.selectFiles(
+    List<XFile> xfiles = await FileUtil.pickFiles(
         initialDirectory: platformParams.path, allowedExtensions: ['json']);
     if (xfiles.isNotEmpty) {
       String backup = await xfiles.first.readAsString();
@@ -180,7 +180,7 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
   Future<String?> _restoreAttachment() async {
     String? peerId = myself.peerId;
     if (peerId != null) {
-      List<XFile> xfiles = await FileUtil.selectFiles(
+      List<XFile> xfiles = await FileUtil.pickFiles(
           initialDirectory: platformParams.path, allowedExtensions: ['tgz']);
       if (xfiles.isNotEmpty) {
         String? path =

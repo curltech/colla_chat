@@ -451,5 +451,19 @@
   "Attachment": "附件",
   "Send": "发送",
   "Draft": "草稿",
-  "Select email service provider": "选择邮件服务提供商"
+  "Select email service provider": "选择邮件服务提供商",
+  "Camera":"相机",
+  "SelectFile":"选择文件",
+  "VoiceRecorder":"录音",
+  "Gallery":"图片廊",
+  "Cropper":"图片剪切",
+  "Url":"链接",
+  "EnterURL":"输入链接",
+  "On":"开",
+  "Off":"关",
+  "OnCompressing":"压缩中",
+  "TapForPhotoHoldForVideo":"视频图片",
+  "CameraNotFound":"没有相机",
+  "NoVoiceRecorded":"没有录音设备",
+  "DenyAccessPermission":"没有权限"
 }
