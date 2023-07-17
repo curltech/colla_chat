@@ -506,8 +506,13 @@ class _ChatListWidgetState extends State<ChatListWidget>
           valueListenable: _currentTab,
           builder: (context, value, child) {
             return Tab(
-              icon: Icon(Icons.person,
-                  color: value == 0 ? myself.primary : Colors.white),
+              icon: value == 0
+                  ? Icon(
+                      Icons.person,
+                      color: myself.primary,
+                      size: AppIconSize.mdSize,
+                    )
+                  : const Icon(Icons.person, color: Colors.white),
               //text: AppLocalizations.t('Linkman'),
               iconMargin: const EdgeInsets.all(0.0),
             );
@@ -516,8 +521,13 @@ class _ChatListWidgetState extends State<ChatListWidget>
           valueListenable: _currentTab,
           builder: (context, value, child) {
             return Tab(
-              icon: Icon(Icons.group,
-                  color: value == 1 ? myself.primary : Colors.white),
+              icon: value == 1
+                  ? Icon(
+                      Icons.group,
+                      color: myself.primary,
+                      size: AppIconSize.mdSize,
+                    )
+                  : const Icon(Icons.group, color: Colors.white),
               //text: AppLocalizations.t('Group'),
               iconMargin: const EdgeInsets.all(0.0),
             );
@@ -526,8 +536,13 @@ class _ChatListWidgetState extends State<ChatListWidget>
           valueListenable: _currentTab,
           builder: (context, value, child) {
             return Tab(
-              icon: Icon(Icons.video_chat,
-                  color: value == 2 ? myself.primary : Colors.white),
+              icon: value == 2
+                  ? Icon(
+                      Icons.video_chat,
+                      color: myself.primary,
+                      size: AppIconSize.mdSize,
+                    )
+                  : const Icon(Icons.video_chat, color: Colors.white),
               //text: AppLocalizations.t('Conference'),
               iconMargin: const EdgeInsets.all(0.0),
             );
@@ -537,8 +552,8 @@ class _ChatListWidgetState extends State<ChatListWidget>
       tabs: tabs,
       controller: _tabController,
       isScrollable: false,
-      indicatorColor: myself.primary.withOpacity(AppOpacity.xlOpacity),
-      dividerColor: Colors.white.withOpacity(AppOpacity.xlOpacity),
+      indicatorColor: Colors.white,
+      dividerColor: Colors.white.withOpacity(0),
       padding: const EdgeInsets.all(0.0),
       labelPadding: const EdgeInsets.all(0.0),
       onTap: (int index) {
