@@ -35,9 +35,17 @@ class ManualAddWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _ManualAddWidgetState extends State<ManualAddWidget> {
+  late final FormInputController controller;
+
   static const String imapServerPort = '993';
   static const String popServerPort = '995';
   static const String smtpServerPort = '465';
+
+  @override
+  initState() {
+    super.initState();
+    controller = FormInputController(_getManualDiscoveryColumnFieldDefs());
+  }
 
   List<ColumnFieldDef> _getManualDiscoveryColumnFieldDefs() {
     final List<ColumnFieldDef> manualDiscoveryColumnFieldDefs = [
@@ -141,7 +149,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
                         _connect(values);
                       }),
                 ],
-                columnFieldDefs: _getManualDiscoveryColumnFieldDefs(),
+                controller: controller,
               )
             ])));
 

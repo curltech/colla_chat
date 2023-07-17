@@ -5,6 +5,7 @@ import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_control
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
@@ -54,9 +55,10 @@ final List<ColumnFieldDef> conferenceColumnFieldDefs = [
 ///显示会议的基本信息，会议成员和会议发起人
 class ConferenceShowWidget extends StatelessWidget {
   final Conference conference;
+  final FormInputController controller =
+      FormInputController(conferenceColumnFieldDefs);
 
-  const ConferenceShowWidget({Key? key, required this.conference})
-      : super(key: key);
+  ConferenceShowWidget({Key? key, required this.conference}) : super(key: key);
 
   //当当前会议改变后，更新数据，局部刷新
   Future<List<Option<String>>> _buildConferenceOptions() async {
@@ -109,16 +111,13 @@ class ConferenceShowWidget extends StatelessWidget {
 
   //会议信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
-    Map<String, dynamic>? initValues = {};
-    initValues = conferenceController.getInitValue(conferenceColumnFieldDefs,
-        entity: conference);
+    controller.setInitValue(JsonUtil.toJson(conference));
     var formInputWidget = SingleChildScrollView(
         child: Container(
             padding: const EdgeInsets.all(10.0),
             child: FormInputWidget(
               height: 300,
-              columnFieldDefs: conferenceColumnFieldDefs,
-              initValues: initValues,
+              controller: controller,
             )));
 
     return formInputWidget;

@@ -12,10 +12,39 @@ import 'package:provider/provider.dart';
 
 class FormInputController with ChangeNotifier {
   final List<ColumnFieldDef> columnFieldDefs;
+  final Map<String, dynamic> initValues;
+
   final Map<String, ColumnFieldController> controllers = {};
   EntityState? state;
 
-  FormInputController(this.columnFieldDefs, {this.state});
+  FormInputController(this.columnFieldDefs,
+      {this.initValues = const {}, this.state}) {
+    for (var columnFieldDef in columnFieldDefs) {
+      String name = columnFieldDef.name;
+      var initValue = columnFieldDef.initValue;
+      if (!initValues.containsKey(name)) {
+        initValues[name] = initValue;
+      }
+    }
+    var state = initValues['state'];
+    if (state != null) {
+      state = state;
+    }
+  }
+
+  setInitValue(Map<String, dynamic> json) {
+    for (var columnFieldDef in columnFieldDefs) {
+      String name = columnFieldDef.name;
+      var value = json[name];
+      if (value != null) {
+        initValues[name] = value;
+      }
+    }
+    var state = initValues['state'];
+    if (state != null) {
+      state = state;
+    }
+  }
 
   setController(String name, ColumnFieldController controller) {
     controllers[name] = controller;
@@ -52,7 +81,7 @@ class FormInputController with ChangeNotifier {
     }
   }
 
-  //获取真实值
+  ///获取真实值
   dynamic getValue(String name) {
     var controller = controllers[name];
     if (controller != null) {
@@ -60,7 +89,7 @@ class FormInputController with ChangeNotifier {
     }
   }
 
-  //获取所有真实值
+  ///获取所有真实值
   dynamic getValues() {
     Map<String, dynamic> values = {};
     for (var entry in controllers.entries) {
@@ -129,8 +158,7 @@ class FormButtonDef {
 }
 
 class FormInputWidget extends StatefulWidget {
-  final Map<String, dynamic>? initValues;
-  late final FormInputController controller;
+  final FormInputController controller;
   final List<FormButtonDef>? formButtonDefs;
   final Function(Map<String, dynamic> values)? onOk;
   final String okLabel;
@@ -141,10 +169,9 @@ class FormInputWidget extends StatefulWidget {
   final List<Widget>? heads;
   final List<Widget>? tails;
 
-  FormInputWidget({
+  const FormInputWidget({
     Key? key,
-    required List<ColumnFieldDef> columnFieldDefs,
-    this.initValues,
+    required this.controller,
     this.formButtonDefs,
     this.onOk,
     this.okLabel = 'Ok',
@@ -154,15 +181,7 @@ class FormInputWidget extends StatefulWidget {
     this.buttonSpacing = 10.0,
     this.heads,
     this.tails,
-  }) : super(key: key) {
-    controller = FormInputController(columnFieldDefs);
-    if (initValues != null) {
-      var state = initValues!['state'];
-      if (state != null) {
-        controller.state = state;
-      }
-    }
-  }
+  }) : super(key: key);
 
   @override
   State createState() => _FormInputWidgetState();
@@ -224,10 +243,10 @@ class _FormInputWidgetState extends State<FormInputWidget> {
       ));
       String name = columnFieldDef.name;
       dynamic initValue;
-      if (widget.initValues == null) {
+      if (widget.controller.initValues == null) {
         initValue = columnFieldDef.initValue;
       } else {
-        initValue = widget.initValues![name];
+        initValue = widget.controller.initValues![name];
       }
       ColumnFieldController columnFieldController = ColumnFieldController(
         columnFieldDef,

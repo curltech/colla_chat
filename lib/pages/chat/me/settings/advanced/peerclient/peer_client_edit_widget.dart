@@ -2,6 +2,7 @@ import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerclient/peer_client_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
@@ -80,6 +81,9 @@ class PeerClientEditWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _PeerClientEditWidgetState extends State<PeerClientEditWidget> {
+  final FormInputController controller =
+      FormInputController(peerClientColumnFieldDefs);
+
   @override
   initState() {
     super.initState();
@@ -91,15 +95,16 @@ class _PeerClientEditWidgetState extends State<PeerClientEditWidget> {
   }
 
   Widget _buildFormInputWidget(BuildContext context) {
-    var initValues =
-        peerClientController.getInitValue(peerClientColumnFieldDefs);
+    PeerClient? peerClient = peerClientController.current;
+    if (peerClient != null) {
+      controller.setInitValue(JsonUtil.toJson(peerClient));
+    }
     var formInputWidget = FormInputWidget(
       height: 500,
       onOk: (Map<String, dynamic> values) {
         _onOk(values);
       },
-      columnFieldDefs: peerClientColumnFieldDefs,
-      initValues: initValues,
+      controller: controller,
     );
 
     return formInputWidget;

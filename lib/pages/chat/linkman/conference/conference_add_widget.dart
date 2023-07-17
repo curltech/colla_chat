@@ -13,6 +13,7 @@ import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -103,7 +104,8 @@ class ConferenceAddWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
-  TextEditingController controller = TextEditingController();
+  final FormInputController controller =
+      FormInputController(conferenceColumnFieldDefs);
 
   OptionController conferenceOwnerController = OptionController();
 
@@ -235,10 +237,8 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
     var formInputWidget = ValueListenableBuilder(
         valueListenable: conference,
         builder: (BuildContext context, Conference? conference, Widget? child) {
-          Map<String, dynamic>? initValues = {};
           if (conference != null) {
-            initValues = conferenceController
-                .getInitValue(conferenceColumnFieldDefs, entity: conference);
+            controller.setInitValue(JsonUtil.toJson(conference));
           }
           return FormInputWidget(
             height: appDataProvider.portraitSize.height * 0.5,
@@ -251,8 +251,7 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
                 }
               });
             },
-            columnFieldDefs: conferenceColumnFieldDefs,
-            initValues: initValues,
+            controller: controller,
           );
         });
     children.add(formInputWidget);
@@ -382,7 +381,6 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
   @override
   void dispose() {
     conferenceController.removeListener(_update);
-    controller.dispose();
     super.dispose();
   }
 }

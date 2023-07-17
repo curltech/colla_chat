@@ -9,6 +9,7 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
@@ -86,6 +87,8 @@ class ChatGPTAddWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _ChatGPTAddWidgetState extends State<ChatGPTAddWidget> {
+  final FormInputController controller =
+      FormInputController(chatGPTColumnFieldDefs);
   Linkman? linkman;
 
   @override
@@ -100,8 +103,10 @@ class _ChatGPTAddWidgetState extends State<ChatGPTAddWidget> {
   }
 
   Widget _buildFormInputWidget(BuildContext context) {
-    Map<String, dynamic>? initValues =
-        linkmanController.getInitValue(chatGPTColumnFieldDefs);
+    Linkman? linkman = linkmanController.current;
+    if (linkman != null) {
+      controller.setInitValue(JsonUtil.toJson(linkman));
+    }
 
     var formInputWidget = Container(
         padding: const EdgeInsets.all(15.0),
@@ -110,8 +115,7 @@ class _ChatGPTAddWidgetState extends State<ChatGPTAddWidget> {
           onOk: (Map<String, dynamic> values) {
             _onOk(values);
           },
-          columnFieldDefs: chatGPTColumnFieldDefs,
-          initValues: initValues,
+          controller: controller,
         ));
 
     return ListView(children: [formInputWidget]);

@@ -26,7 +26,7 @@ class P2pLoginWidget extends StatefulWidget {
 }
 
 class _P2pLoginWidgetState extends State<P2pLoginWidget> {
-  final List<ColumnFieldDef> p2pLoginInputFieldDef = [];
+  late final FormInputController controller;
 
   @override
   void initState() {
@@ -36,6 +36,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
   }
 
   init() {
+    final List<ColumnFieldDef> p2pLoginInputFieldDef = [];
     p2pLoginInputFieldDef.add(ColumnFieldDef(
       name: 'credential',
       label: 'Credential(Mobile/Email/LoginName)',
@@ -67,6 +68,8 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
         color: myself.primary,
       ),
     ));
+
+    controller = FormInputController(p2pLoginInputFieldDef);
   }
 
   Widget _buildMyselfPeers(BuildContext context) {
@@ -84,7 +87,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
   _lastLogin() async {
     String? credential = await myselfPeerService.lastCredentialName();
     if (StringUtil.isNotEmpty(credential)) {
-      ColumnFieldDef def = p2pLoginInputFieldDef[0];
+      ColumnFieldDef def = controller.columnFieldDefs[0];
       def.initValue = credential;
       if (mounted) {
         setState(() {});
@@ -116,7 +119,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
               await _login(values);
             },
             okLabel: 'Login',
-            columnFieldDefs: p2pLoginInputFieldDef,
+            controller: controller,
           )),
     ]);
   }

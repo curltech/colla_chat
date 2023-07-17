@@ -37,6 +37,8 @@ class AutoDiscoverWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
+  late final FormInputController controller;
+
   ValueNotifier<EmailServiceProvider?> emailServiceProvider =
       ValueNotifier<EmailServiceProvider?>(null);
   TextEditingController emailServiceProviderController =
@@ -47,6 +49,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
   @override
   void initState() {
     super.initState();
+    controller = FormInputController(_getAutoDiscoveryColumnFieldDefs());
     _updateEmailServiceProviderOptions();
   }
 
@@ -157,7 +160,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
                   _connect(values);
                 }),
           ],
-          columnFieldDefs: _getAutoDiscoveryColumnFieldDefs(),
+          controller: controller,
         ));
 
     return formInputWidget;

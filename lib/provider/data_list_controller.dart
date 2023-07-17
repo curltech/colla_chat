@@ -124,30 +124,6 @@ class DataListController<T> with ChangeNotifier {
 
   int get length => data.length;
 
-  Map<String, dynamic>? getInitValue(List<ColumnFieldDef> inputFieldDefs,
-      {T? entity}) {
-    T? current = entity ?? this.current;
-    if (current != null) {
-      var currentMap = JsonUtil.toJson(current);
-      Map<String, dynamic> values = {};
-      for (var inputFieldDef in inputFieldDefs) {
-        String name = inputFieldDef.name;
-        var value = currentMap[name];
-        if (value != null) {
-          values[name] = value;
-        }
-      }
-      if (current is BaseEntity) {
-        var state = current.state;
-        if (state != null) {
-          values['state'] = state;
-        }
-      }
-      return values;
-    }
-    return null;
-  }
-
   sort(String name, bool sortAscending) {
     if (sortAscending) {
       data.sort((a, b) {

@@ -78,6 +78,8 @@ class LinkmanEditWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
+  final FormInputController controller =
+      FormInputController(linkmanColumnFieldDefs);
   Linkman? linkman;
 
   @override
@@ -92,8 +94,10 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
   }
 
   Widget _buildFormInputWidget(BuildContext context) {
-    Map<String, dynamic>? initValues =
-        linkmanController.getInitValue(linkmanColumnFieldDefs);
+    Linkman? linkman = linkmanController.current;
+    if (linkman != null) {
+      controller.setInitValue(JsonUtil.toJson(linkman));
+    }
     List<FormButtonDef> formButtonDefs = [
       FormButtonDef(
           label: 'Ok',
@@ -117,8 +121,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
         child: FormInputWidget(
           height: appDataProvider.portraitSize.height * 0.5,
           formButtonDefs: formButtonDefs,
-          columnFieldDefs: linkmanColumnFieldDefs,
-          initValues: initValues,
+          controller: controller,
         ));
 
     return formInputWidget;

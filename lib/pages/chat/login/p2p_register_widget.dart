@@ -80,6 +80,8 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
   TextEditingController mobileController = TextEditingController();
   ValueNotifier<String?> peerId = ValueNotifier<String?>(null);
   ValueNotifier<Uint8List?> avatar = ValueNotifier<Uint8List?>(null);
+  final FormInputController controller =
+      FormInputController(p2pRegisterInputFieldDef);
 
   @override
   void initState() {
@@ -198,7 +200,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
               spacing: 5.0,
               onOk: _onOk,
               okLabel: 'Register',
-              columnFieldDefs: p2pRegisterInputFieldDef,
+              controller: controller,
             )),
         Container(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),

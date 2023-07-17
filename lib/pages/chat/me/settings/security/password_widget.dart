@@ -10,7 +10,7 @@ import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-final List<ColumnFieldDef> p2pRegisterInputFieldDef = [
+final List<ColumnFieldDef> passwordInputFieldDef = [
   ColumnFieldDef(
       name: 'oldPassword',
       label: 'oldPassword',
@@ -49,7 +49,10 @@ class PasswordWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _PasswordWidgetState extends State<PasswordWidget> {
-  Widget _build(BuildContext context) {
+  final FormInputController controller =
+      FormInputController(passwordInputFieldDef);
+
+  Widget _buildPasswordWidget(BuildContext context) {
     return ListView(
       children: <Widget>[
         Container(
@@ -58,16 +61,10 @@ class _PasswordWidgetState extends State<PasswordWidget> {
               height: 200,
               onOk: _onOk,
               okLabel: 'Ok',
-              columnFieldDefs: p2pRegisterInputFieldDef,
+              controller: controller,
             )),
       ],
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBarView(
-        withLeading: true, title: widget.title, child: _build(context));
   }
 
   _onOk(Map<String, dynamic> values) async {
@@ -91,14 +88,14 @@ class _PasswordWidgetState extends State<PasswordWidget> {
         return;
       }
       if (plainPassword == confirmPassword) {
-        String loginName = myself.myselfPeer!.loginName;
+        String loginName = myself.myselfPeer.loginName;
         await myselfService.updateMyselfPassword(
-            myself.myselfPeer!, plainPassword);
+            myself.myselfPeer, plainPassword);
         if (myself.peerProfile.autoLogin) {
           await myselfPeerService.saveAutoCredential(loginName, plainPassword);
         }
-        String peerPrivateKey = myself.myselfPeer!.peerPrivateKey;
-        String privateKey = myself.myselfPeer!.privateKey;
+        String peerPrivateKey = myself.myselfPeer.peerPrivateKey;
+        String privateKey = myself.myselfPeer.privateKey;
         await myselfPeerService.update(
             {'peerPrivateKey': peerPrivateKey, 'privateKey': privateKey},
             where: 'loginName=?',
@@ -111,5 +108,13 @@ class _PasswordWidgetState extends State<PasswordWidget> {
       DialogUtil.error(context,
           content: AppLocalizations.t('old password is not matched'));
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBarView(
+        withLeading: true,
+        title: widget.title,
+        child: _buildPasswordWidget(context));
   }
 }

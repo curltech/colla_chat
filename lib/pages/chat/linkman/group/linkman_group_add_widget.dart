@@ -15,6 +15,7 @@ import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -66,7 +67,8 @@ class LinkmanGroupAddWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
-  TextEditingController controller = TextEditingController();
+  final FormInputController controller =
+      FormInputController(groupColumnFieldDefs);
 
   OptionController groupOwnerController = OptionController();
 
@@ -258,10 +260,8 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
     var formInputWidget = ValueListenableBuilder(
         valueListenable: group,
         builder: (BuildContext context, Group? group, Widget? child) {
-          Map<String, dynamic>? initValues = {};
           if (group != null) {
-            initValues = groupController.getInitValue(groupColumnFieldDefs,
-                entity: group);
+            controller.setInitValue(JsonUtil.toJson(group));
           }
           return FormInputWidget(
             height: appDataProvider.portraitSize.height * 0.5,
@@ -273,8 +273,7 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
                 }
               });
             },
-            columnFieldDefs: groupColumnFieldDefs,
-            initValues: initValues,
+            controller: controller,
           );
         });
     children.add(formInputWidget);
@@ -409,7 +408,6 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
   @override
   void dispose() {
     groupController.removeListener(_update);
-    controller.dispose();
     super.dispose();
   }
 }
