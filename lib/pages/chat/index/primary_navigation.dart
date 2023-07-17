@@ -71,14 +71,15 @@ class PrimaryNavigation {
     return ValueListenableBuilder(
         valueListenable: mainViewVisible,
         builder: (BuildContext context, bool mainViewVisible, Widget? child) {
-          return ButtonBar(children: [
+          Widget avatarImage = myself.avatarImage ?? AppImage.mdAppImage;
+          return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             IconButton(
               color: Colors.white,
               onPressed: () {
                 indexWidgetProvider.push('personal_info');
               },
               tooltip: myself.name,
-              icon: myself.avatarImage ?? AppImage.mdAppImage,
+              icon: avatarImage,
             ),
             IconButton(
                 color: myself.primary,
