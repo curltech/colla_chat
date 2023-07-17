@@ -465,5 +465,10 @@
   "TapForPhotoHoldForVideo":"视频图片",
   "CameraNotFound":"没有相机",
   "NoVoiceRecorded":"没有录音设备",
-  "DenyAccessPermission":"没有权限"
+  "DenyAccessPermission":"没有权限",
+  "Network status":"网络状态",
+  "Websocket status":"定位器状态",
+  "Webrtc status":"点对点状态",
+  "More":"更多",
+  "Emoji":"表情"
 }
