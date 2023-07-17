@@ -12,32 +12,37 @@ import 'package:provider/provider.dart';
 
 class FormInputController with ChangeNotifier {
   final List<ColumnFieldDef> columnFieldDefs;
-  final Map<String, dynamic> initValues;
+  final Map<String, dynamic> initValues = {};
 
   final Map<String, ColumnFieldController> controllers = {};
   EntityState? state;
 
   FormInputController(this.columnFieldDefs,
-      {this.initValues = const {}, this.state}) {
+      {Map<String, dynamic> initValues = const {}, this.state}) {
     for (var columnFieldDef in columnFieldDefs) {
       String name = columnFieldDef.name;
-      var initValue = columnFieldDef.initValue;
-      if (!initValues.containsKey(name)) {
-        initValues[name] = initValue;
+      var initValue = initValues[name];
+      initValue ??= columnFieldDef.initValue;
+      if (initValue != null) {
+        this.initValues[name] = initValue;
+      } else {
+        this.initValues.remove(name);
       }
     }
-    var state = initValues['state'];
+    var state = this.initValues['state'];
     if (state != null) {
       state = state;
     }
   }
 
   setInitValue(Map<String, dynamic> json) {
-    for (var columnFieldDef in columnFieldDefs) {
-      String name = columnFieldDef.name;
-      var value = json[name];
+    for (var entry in json.entries) {
+      String name = entry.key;
+      var value = entry.value;
       if (value != null) {
         initValues[name] = value;
+      } else {
+        initValues.remove(name);
       }
     }
     var state = initValues['state'];
@@ -242,18 +247,17 @@ class _FormInputWidgetState extends State<FormInputWidget> {
         height: widget.spacing,
       ));
       String name = columnFieldDef.name;
-      dynamic initValue;
-      if (widget.controller.initValues == null) {
-        initValue = columnFieldDef.initValue;
-      } else {
-        initValue = widget.controller.initValues![name];
+      ColumnFieldController? columnFieldController =
+          widget.controller.controllers[name];
+      if (columnFieldController == null) {
+        dynamic initValue = widget.controller.initValues[name];
+        columnFieldController = ColumnFieldController(
+          columnFieldDef,
+          value: initValue,
+        );
+        widget.controller
+            .setController(columnFieldDef.name, columnFieldController);
       }
-      ColumnFieldController columnFieldController = ColumnFieldController(
-        columnFieldDef,
-        value: initValue,
-      );
-      widget.controller
-          .setController(columnFieldDef.name, columnFieldController);
       Widget columnFieldWidget = ColumnFieldWidget(
         controller: columnFieldController,
         focusNode: focusNodes[name],

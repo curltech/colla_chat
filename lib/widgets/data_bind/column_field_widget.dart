@@ -131,7 +131,7 @@ class ColumnFieldController with ChangeNotifier {
     _controller = controller;
   }
 
-  ///获取真实值
+  ///获取真实值，如果控制器为空，返回_value，否则取控制器的值，并覆盖_value
   dynamic get value {
     var controller = _controller;
     if (controller != null) {
@@ -154,7 +154,7 @@ class ColumnFieldController with ChangeNotifier {
     return _value;
   }
 
-  ///设置真实值
+  ///设置真实值，如果控制器为空，设置_value，否则设置控制器的值，并设置_value
   set value(dynamic value) {
     var realValue = value;
     String valueStr = '';
@@ -170,6 +170,8 @@ class ColumnFieldController with ChangeNotifier {
             columnFieldDef.inputType == InputType.time) {
           valueStr = value.toString();
           realValue = value.toString();
+        } else {
+          valueStr = value.toString();
         }
       } else {
         valueStr = '';
@@ -178,10 +180,13 @@ class ColumnFieldController with ChangeNotifier {
     }
     if (_value != realValue) {
       _value = realValue;
-      if (controller != null) {
-        controller.text = valueStr;
-      }
       _changed = true;
+    }
+    if (controller != null) {
+      if (valueStr != controller.text) {
+        controller.text = valueStr;
+        _changed = true;
+      }
     }
   }
 
@@ -204,6 +209,10 @@ class ColumnFieldController with ChangeNotifier {
     if (_changed != changed) {
       _changed = changed;
     }
+  }
+
+  TextEditingController? get controller {
+    return _controller;
   }
 
   set controller(TextEditingController? controller) {
@@ -302,14 +311,17 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
   }
 
   Widget _buildTextFormField(BuildContext context) {
-    final value = widget.controller.value;
-    var controller = TextEditingController();
-    widget.controller.controller = controller;
-    final valueStr = value == null ? '' : value.toString();
-    controller.value = TextEditingValue(
-        text: valueStr,
-        selection: TextSelection.fromPosition(TextPosition(
-            offset: valueStr.length, affinity: TextAffinity.downstream)));
+    TextEditingController? controller = widget.controller.controller;
+    if (controller == null) {
+      final value = widget.controller.value;
+      final valueStr = value == null ? '' : value.toString();
+      controller = TextEditingController();
+      controller.value = TextEditingValue(
+          text: valueStr,
+          selection: TextSelection.fromPosition(TextPosition(
+              offset: valueStr.length, affinity: TextAffinity.downstream)));
+      widget.controller.controller = controller;
+    }
 
     var columnFieldDef = widget.controller.columnFieldDef;
     var suffixIcon = columnFieldDef.suffixIcon;
@@ -319,7 +331,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
           ? IconButton(
               //如果文本长度不为空则显示清除按钮
               onPressed: () {
-                controller.clear();
+                controller!.clear();
               },
               icon: Icon(
                 Icons.cancel,
@@ -351,15 +363,17 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
   }
 
   Widget _buildPasswordField(BuildContext context) {
-    bool pwdShow = widget.controller.flag ?? false;
-    final value = widget.controller.value;
-    var controller = TextEditingController();
-    widget.controller.controller = controller;
-    final valueStr = value == null ? '' : value.toString();
-    controller.value = TextEditingValue(
-        text: valueStr,
-        selection: TextSelection.fromPosition(TextPosition(
-            offset: valueStr.length, affinity: TextAffinity.downstream)));
+    TextEditingController? controller = widget.controller.controller;
+    if (controller == null) {
+      final value = widget.controller.value;
+      final valueStr = value == null ? '' : value.toString();
+      controller = TextEditingController();
+      controller.value = TextEditingValue(
+          text: valueStr,
+          selection: TextSelection.fromPosition(TextPosition(
+              offset: valueStr.length, affinity: TextAffinity.downstream)));
+      widget.controller.controller = controller;
+    }
 
     var columnFieldDef = widget.controller.columnFieldDef;
     Widget? suffix;
@@ -368,7 +382,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
           ? IconButton(
               //如果文本长度不为空则显示清除按钮
               onPressed: () {
-                controller.clear();
+                controller!.clear();
               },
               icon: Icon(
                 Icons.cancel,
@@ -376,6 +390,8 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
               ))
           : null;
     }
+
+    bool pwdShow = widget.controller.flag ?? false;
     var textFormField = CommonAutoSizeTextFormField(
       controller: controller,
       focusNode: widget.focusNode,
@@ -391,7 +407,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
         ),
         onPressed: () {
           setState(() {
-            widget.controller.value = controller.value.text;
+            widget.controller.value = controller!.value.text;
             widget.controller.flag = !pwdShow;
           });
         },
