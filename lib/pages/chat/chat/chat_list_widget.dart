@@ -506,13 +506,15 @@ class _ChatListWidgetState extends State<ChatListWidget>
           valueListenable: _currentTab,
           builder: (context, value, child) {
             return Tab(
-              icon: value == 0
-                  ? Icon(
-                      Icons.person,
-                      color: myself.primary,
-                      size: AppIconSize.mdSize,
-                    )
-                  : const Icon(Icons.person, color: Colors.white),
+              icon: Tooltip(
+                  message: AppLocalizations.t('Linkman'),
+                  child: value == 0
+                      ? const Icon(
+                          Icons.person,
+                          color: Colors.white,
+                          size: AppIconSize.mdSize,
+                        )
+                      : const Icon(Icons.person, color: Colors.white)),
               //text: AppLocalizations.t('Linkman'),
               iconMargin: const EdgeInsets.all(0.0),
             );
@@ -521,13 +523,15 @@ class _ChatListWidgetState extends State<ChatListWidget>
           valueListenable: _currentTab,
           builder: (context, value, child) {
             return Tab(
-              icon: value == 1
-                  ? Icon(
-                      Icons.group,
-                      color: myself.primary,
-                      size: AppIconSize.mdSize,
-                    )
-                  : const Icon(Icons.group, color: Colors.white),
+              icon: Tooltip(
+                  message: AppLocalizations.t('Group'),
+                  child: value == 1
+                      ? const Icon(
+                          Icons.group,
+                          color: Colors.white,
+                          size: AppIconSize.mdSize,
+                        )
+                      : const Icon(Icons.group, color: Colors.white)),
               //text: AppLocalizations.t('Group'),
               iconMargin: const EdgeInsets.all(0.0),
             );
@@ -536,13 +540,15 @@ class _ChatListWidgetState extends State<ChatListWidget>
           valueListenable: _currentTab,
           builder: (context, value, child) {
             return Tab(
-              icon: value == 2
-                  ? Icon(
-                      Icons.video_chat,
-                      color: myself.primary,
-                      size: AppIconSize.mdSize,
-                    )
-                  : const Icon(Icons.video_chat, color: Colors.white),
+              icon: Tooltip(
+                  message: AppLocalizations.t('Conference'),
+                  child: value == 2
+                      ? const Icon(
+                          Icons.video_chat,
+                          color: Colors.white,
+                          size: AppIconSize.mdSize,
+                        )
+                      : const Icon(Icons.video_chat, color: Colors.white)),
               //text: AppLocalizations.t('Conference'),
               iconMargin: const EdgeInsets.all(0.0),
             );
@@ -611,24 +617,28 @@ class _ChatListWidgetState extends State<ChatListWidget>
     var connectivityWidget = ValueListenableBuilder(
         valueListenable: _connectivityResult,
         builder: (context, value, child) {
-          return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const SizedBox(
-              height: 3,
-            ),
-            CommonAutoSizeText(_connectivityResult.value.name,
-                style: const TextStyle(fontSize: 12)),
-            _connectivityResult.value == ConnectivityResult.none
-                ? const Icon(
-                    Icons.wifi_off,
-                    size: 20,
-                    color: Colors.red,
-                  )
-                : const Icon(
-                    Icons.wifi,
-                    size: 20,
-                    //color: Colors.green,
-                  ),
-          ]);
+          return Tooltip(
+              message: AppLocalizations.t('Network status'),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(
+                      height: 3,
+                    ),
+                    CommonAutoSizeText(_connectivityResult.value.name,
+                        style: const TextStyle(fontSize: 12)),
+                    _connectivityResult.value == ConnectivityResult.none
+                        ? const Icon(
+                            Icons.wifi_off,
+                            size: 20,
+                            color: Colors.red,
+                          )
+                        : const Icon(
+                            Icons.wifi,
+                            size: 20,
+                            //color: Colors.green,
+                          ),
+                  ]));
         });
     rightWidgets.add(connectivityWidget);
     rightWidgets.add(const SizedBox(
@@ -639,6 +649,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
         valueListenable: _socketStatus,
         builder: (context, value, child) {
           return IconButton(
+              tooltip: AppLocalizations.t('Websocket status'),
               onPressed: _socketStatus.value != SocketStatus.connected
                   ? () async {
                       //缺省的websocket如果不存在，尝试重连

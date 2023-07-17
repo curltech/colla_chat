@@ -543,13 +543,15 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           valueListenable: _currentTab,
           builder: (context, value, child) {
             return Tab(
-              icon: value == 0
-                  ? Icon(
-                      Icons.person,
-                      color: myself.primary,
-                      size: AppIconSize.mdSize,
-                    )
-                  : const Icon(Icons.person, color: Colors.white),
+              icon: Tooltip(
+                  message: AppLocalizations.t('Linkman'),
+                  child: value == 0
+                      ? const Icon(
+                          Icons.person,
+                          color: Colors.white,
+                          size: AppIconSize.mdSize,
+                        )
+                      : const Icon(Icons.person, color: Colors.white)),
               //text: AppLocalizations.t('Linkman'),
               iconMargin: const EdgeInsets.all(0.0),
             );
@@ -558,13 +560,15 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           valueListenable: _currentTab,
           builder: (context, value, child) {
             return Tab(
-              icon: value == 1
-                  ? Icon(
-                      Icons.group,
-                      color: myself.primary,
-                      size: AppIconSize.mdSize,
-                    )
-                  : const Icon(Icons.group, color: Colors.white),
+              icon: Tooltip(
+                  message: AppLocalizations.t('Group'),
+                  child: value == 1
+                      ? const Icon(
+                          Icons.group,
+                          color: Colors.white,
+                          size: AppIconSize.mdSize,
+                        )
+                      : const Icon(Icons.group, color: Colors.white)),
               //text: AppLocalizations.t('Group'),
               iconMargin: const EdgeInsets.all(0.0),
             );
@@ -573,14 +577,16 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           valueListenable: _currentTab,
           builder: (context, value, child) {
             return Tab(
-              icon: value == 2
-                  ? Icon(
-                      Icons.video_chat,
-                      color: myself.primary,
-                      size: AppIconSize.mdSize,
-                    )
-                  : const Icon(Icons.video_chat, color: Colors.white),
-              //text: AppLocalizations.t('Group'),
+              icon: Tooltip(
+                  message: AppLocalizations.t('Conference'),
+                  child: value == 2
+                      ? const Icon(
+                          Icons.video_chat,
+                          color: Colors.white,
+                          size: AppIconSize.mdSize,
+                        )
+                      : const Icon(Icons.video_chat, color: Colors.white)),
+              //text: AppLocalizations.t('Conference'),
               iconMargin: const EdgeInsets.all(0.0),
             );
           }),
@@ -659,6 +665,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   Widget build(BuildContext context) {
     List<Widget> rightWidgets = [
       IconButton(
+        tooltip: AppLocalizations.t('Add linkman'),
         onPressed: () {
           linkmanController.currentIndex = -1;
           groupController.currentIndex = -1;
@@ -670,6 +677,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     ];
     if (platformParams.mobile) {
       rightWidgets.add(IconButton(
+        tooltip: AppLocalizations.t('Scan qrcode'),
         onPressed: () async {
           await scanQrcode(context);
         },

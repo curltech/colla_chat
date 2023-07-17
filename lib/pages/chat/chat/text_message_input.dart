@@ -4,6 +4,7 @@ import 'package:another_audio_recorder/another_audio_recorder.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/extended_text_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/message/message_widget.dart';
@@ -301,6 +302,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
           child: IconButton(
+            tooltip: AppLocalizations.t('Send'),
             icon: Icon(Icons.send_outlined, color: myself.primary),
             onPressed: () {
               _send();
@@ -352,6 +354,9 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
             margin: EdgeInsets.symmetric(
                 horizontal: iconInset, vertical: iconInset),
             child: IconButton(
+              tooltip: voiceVisible
+                  ? AppLocalizations.t('Voice')
+                  : AppLocalizations.t('Keyboard'),
               icon: voiceVisible
                   ? Icon(Icons.record_voice_over_outlined,
                       color: myself.primary)
@@ -368,6 +373,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
             margin: EdgeInsets.symmetric(
                 horizontal: iconInset, vertical: iconInset),
             child: IconButton(
+              tooltip: AppLocalizations.t('Emoji'),
               icon: Icon(Icons.emoji_emotions_outlined, color: myself.primary),
               onPressed: () {
                 if (widget.onEmojiPressed != null) {
@@ -382,7 +388,8 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
                 margin:
                     const EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
                 child: IconButton(
-                  icon: Icon(Icons.add_circle_outline, color: myself.primary),
+                  tooltip: AppLocalizations.t('More'),
+                  icon: Icon(Icons.more_horiz, color: myself.primary),
                   onPressed: () {
                     if (widget.onMorePressed != null) {
                       widget.onMorePressed!();

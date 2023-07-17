@@ -349,7 +349,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
                     color: Colors.red,
                   ));
             }
-            return widget;
+            return Tooltip(
+                message: AppLocalizations.t('Webrtc status'), child: widget);
           });
       rightWidgets.add(peerConnectionStatusWidget);
       rightWidgets.add(const SizedBox(
