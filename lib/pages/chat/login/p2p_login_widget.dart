@@ -20,9 +20,14 @@ import 'package:flutter/material.dart';
 
 /// 远程登录组件，一个card下的录入框和按钮组合
 class P2pLoginWidget extends StatefulWidget {
+  //是否指定登录用户，如果指定将不能修改登录名，表示只做用户验证，否则做用户登录
+  final String? credential;
+
+  //当指定用户做验证的时候不为空
   final void Function(bool result)? onAuthenticate;
 
-  const P2pLoginWidget({Key? key, this.onAuthenticate}) : super(key: key);
+  const P2pLoginWidget({Key? key, this.credential, this.onAuthenticate})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _P2pLoginWidgetState();
@@ -38,28 +43,33 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
   }
 
   init() {
+    bool isAuth = widget.credential != null;
     final List<ColumnFieldDef> p2pLoginInputFieldDef = [];
     p2pLoginInputFieldDef.add(ColumnFieldDef(
       name: 'credential',
       label: 'Credential(Mobile/Email/LoginName)',
-      prefixIcon: IconButton(
-        icon: Icon(Icons.person, color: myself.primary),
-        onPressed: () async {
-          await DialogUtil.show(context: context, builder: _buildMyselfPeers);
-          var myselfPeer = myselfPeerController.current;
-          if (myselfPeer != null) {
-            String? credential = myselfPeer.loginName;
-            if (StringUtil.isNotEmpty(credential)) {
-              ColumnFieldController? columnFieldController =
-                  controller.controllers['credential'];
-              if (columnFieldController != null) {
-                columnFieldController.value = credential;
-              }
-            }
-          }
-        },
-      ),
-      cancel: true,
+      readOnly: isAuth,
+      cancel: !isAuth,
+      prefixIcon: !isAuth
+          ? IconButton(
+              icon: Icon(Icons.person, color: myself.primary),
+              onPressed: () async {
+                await DialogUtil.show(
+                    context: context, builder: _buildMyselfPeers);
+                var myselfPeer = myselfPeerController.current;
+                if (myselfPeer != null) {
+                  String? credential = myselfPeer.loginName;
+                  if (StringUtil.isNotEmpty(credential)) {
+                    ColumnFieldController? columnFieldController =
+                        controller.controllers['credential'];
+                    if (columnFieldController != null) {
+                      columnFieldController.value = credential;
+                    }
+                  }
+                }
+              },
+            )
+          : null,
     ));
     p2pLoginInputFieldDef.add(ColumnFieldDef(
       name: 'password',
@@ -85,6 +95,37 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
     ]));
   }
 
+  //验证
+  _auth(Map<String, dynamic> values) async {
+    String? credential = values[credentialName];
+    String? password = values[passwordName];
+    if (credential == null) {
+      DialogUtil.error(context, content: 'Must have node credential');
+      return;
+    }
+    if (password == null) {
+      DialogUtil.error(context, content: 'Must have node password');
+      return;
+    }
+    try {
+      DialogUtil.loadingShow(context);
+      bool loginStatus = await myselfPeerService.auth(credential, password);
+      if (mounted) {
+        DialogUtil.loadingHide(context);
+      }
+      if (widget.onAuthenticate != null) {
+        widget.onAuthenticate!(loginStatus);
+      }
+    } catch (e) {
+      if (widget.onAuthenticate != null) {
+        widget.onAuthenticate!(false);
+      } else {
+        DialogUtil.error(context, content: e.toString());
+      }
+    }
+  }
+
+  ///登录
   _login(Map<String, dynamic> values) async {
     String? credential = values[credentialName];
     String? password = values[passwordName];
@@ -102,31 +143,22 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
       if (mounted) {
         DialogUtil.loadingHide(context);
       }
-      if (widget.onAuthenticate != null) {
-        widget.onAuthenticate!(loginStatus);
-      } else {
-        if (loginStatus) {
-          if (myself.autoLogin) {
-            myselfPeerService.saveAutoCredential(credential, password);
-          }
+      if (loginStatus) {
+        if (myself.autoLogin) {
+          myselfPeerService.saveAutoCredential(credential, password);
+        }
 
-          if (mounted) {
-            Application.router
-                .navigateTo(context, Application.index, replace: true);
-          }
-        } else {
-          if (mounted) {
-            DialogUtil.error(context,
-                content: AppLocalizations.t('Login fail'));
-          }
+        if (mounted) {
+          Application.router
+              .navigateTo(context, Application.index, replace: true);
+        }
+      } else {
+        if (mounted) {
+          DialogUtil.error(context, content: AppLocalizations.t('Login fail'));
         }
       }
     } catch (e) {
-      if (widget.onAuthenticate != null) {
-        widget.onAuthenticate!(false);
-      } else {
-        DialogUtil.error(context, content: e.toString());
-      }
+      DialogUtil.error(context, content: e.toString());
     }
   }
 
@@ -152,7 +184,8 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
             if (!snapshot.hasData) {
               return LoadingUtil.buildLoadingIndicator();
             }
-            String? credential = snapshot.data;
+            String? credential = widget.credential;
+            credential ??= snapshot.data;
             if (StringUtil.isNotEmpty(credential)) {
               controller.setInitValue({'credential': credential});
             }
@@ -161,9 +194,13 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
               height: appDataProvider.portraitSize.height * 0.3,
               spacing: 10.0,
               onOk: (Map<String, dynamic> values) async {
-                await _login(values);
+                if (widget.credential == null) {
+                  await _login(values);
+                } else {
+                  await _auth(values);
+                }
               },
-              okLabel: 'Login',
+              okLabel: widget.credential == null ? 'Login' : 'Auth',
               controller: controller,
             );
           },

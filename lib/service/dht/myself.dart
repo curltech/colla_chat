@@ -56,6 +56,34 @@ class MyselfService {
     myself.password = password;
   }
 
+  /// 获取自己节点的记录，并解开私钥，进行验证
+  Future<bool> auth(MyselfPeer myselfPeer, String password) async {
+    //解开身份公钥和加密公钥
+    SimplePublicKey publicKey = await cryptoGraphy
+        .importPublicKey(myselfPeer.publicKey!, type: KeyPairType.x25519);
+    SimplePublicKey peerPublicKey =
+        await cryptoGraphy.importPublicKey(myselfPeer.peerPublicKey!);
+    //解开身份密钥对和加密密钥对
+    SimpleKeyPair privateKey = await cryptoGraphy.import(
+        myselfPeer.privateKey, password.codeUnits, publicKey,
+        type: KeyPairType.x25519);
+    SimpleKeyPair peerPrivateKey = await cryptoGraphy.import(
+        myselfPeer.peerPrivateKey, password.codeUnits, peerPublicKey);
+
+    //检查身份密钥对
+    var timestamp_ = DateUtil.currentDate();
+    var random_ = await cryptoGraphy.getRandomAsciiString();
+    var key = timestamp_ + random_;
+    var signature = await cryptoGraphy.sign(key.codeUnits, peerPrivateKey);
+    bool pass = await cryptoGraphy.verify(key.codeUnits, signature,
+        publicKey: peerPublicKey);
+    if (!pass) {
+      logger.e('Verify not pass');
+    }
+
+    return pass;
+  }
+
   /// 获取自己节点的记录，并解开私钥，设置当前myself
   /// 一般发生在登录后重新设置当前的账户
   Future<bool> login(MyselfPeer myselfPeer, String password) async {
@@ -82,7 +110,6 @@ class MyselfService {
       logger.e('Verify not pass');
       return false;
     }
-
     myself.myselfPeer = myselfPeer;
     myself.id = myselfPeer.id;
     myself.peerId = myselfPeer.peerId;

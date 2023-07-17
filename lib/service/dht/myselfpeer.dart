@@ -265,6 +265,25 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     return false;
   }
 
+  /// 验证本地账户
+  Future<bool> auth(String credential, String password) async {
+    ///本地查找账户
+    MyselfPeer? myselfPeer = await myselfPeerService.findOneByLogin(credential);
+    if (myselfPeer != null) {
+      /// 1.验证账户与密码匹配
+      try {
+        var loginStatus = await myselfService.auth(myselfPeer, password);
+        if (!loginStatus) {
+          return false;
+        }
+      } catch (err) {
+        logger.e('login err:$err');
+        return false;
+      }
+    }
+    return false;
+  }
+
   /// 登录，验证本地账户，连接p2p服务节点，注册成功
   Future<bool> login(String credential, String password) async {
     ///本地查找账户
