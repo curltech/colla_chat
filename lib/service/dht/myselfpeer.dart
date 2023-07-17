@@ -273,9 +273,8 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       /// 1.验证账户与密码匹配
       try {
         var loginStatus = await myselfService.auth(myselfPeer, password);
-        if (!loginStatus) {
-          return false;
-        }
+
+        return loginStatus;
       } catch (err) {
         logger.e('login err:$err');
         return false;
