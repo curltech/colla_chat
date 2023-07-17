@@ -55,7 +55,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     }
     meTileData = TileData.from(mixins);
     for (var tile in meTileData) {
-      tile.dense = true;
+      tile.dense = false;
       tile.selected = false;
     }
   }

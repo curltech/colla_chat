@@ -33,6 +33,11 @@ target 'Runner' do
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
   pod 'PhoneNumberKit/PhoneNumberKitCore', :git => 'https://github.com/marmelroy/PhoneNumberKit', :tag => '3.5.10'
 end
+#
+# target 'VPNExtension' do
+#   use_frameworks!
+#   pod 'OpenVPNAdapter', :git => 'https://github.com/ss-abramchuk/OpenVPNAdapter.git', :tag => '0.8.0'
+# end
 
 post_install do |installer|
   installer.pods_project.targets.each do |target|
