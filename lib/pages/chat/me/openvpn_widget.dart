@@ -79,6 +79,14 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
     }
   }
 
+  Future<bool> _requestPermissionAndroid() async {
+    if (platformParams.android) {
+      return await openvpn.requestPermissionAndroid();
+    }
+
+    return false;
+  }
+
   _getConfig() async {
     String? config = await localSecurityStorage.get('openvpn');
     this.config.value = config;
