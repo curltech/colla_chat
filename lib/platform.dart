@@ -6,6 +6,7 @@ import 'package:colla_chat/tool/path_util.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:path/path.dart' as p;
 
 /// 平台的参数，包括平台的硬件和系统软件特征，是只读的数据
 class PlatformParams {
@@ -53,7 +54,7 @@ class PlatformParams {
 
     var dir = await PathUtil.getApplicationDirectory();
     if (dir != null) {
-      path = dir.path;
+      path = p.join(dir.path, 'colla_chat');
     }
 
     try {
