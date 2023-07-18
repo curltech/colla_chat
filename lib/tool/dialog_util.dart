@@ -3,6 +3,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/login/loading.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
+import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
@@ -382,7 +383,7 @@ class DialogUtil {
               color: Colors.blue,
             ),
             const Spacer(),
-            CommonAutoSizeTextFormField(
+            CommonTextFormField(
               keyboardType: TextInputType.text,
               labelText: content,
               controller: controller,

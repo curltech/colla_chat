@@ -1,10 +1,8 @@
 import 'package:colla_chat/constant/base.dart';
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
-import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 
 ///根据构造函数传入的数据列表，构造内容与空间匹配的ListView列表视图

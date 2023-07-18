@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -412,7 +413,7 @@ class SessionOptionsWidget extends StatelessWidget {
               Container(
                   padding: EdgeInsets.only(left: 8),
                   width: 80,
-                  child: CommonAutoSizeTextFormField(
+                  child: CommonTextFormField(
                     controller: pauseForController,
                   )),
               Container(
@@ -421,7 +422,7 @@ class SessionOptionsWidget extends StatelessWidget {
               Container(
                   padding: EdgeInsets.only(left: 8),
                   width: 80,
-                  child: CommonAutoSizeTextFormField(
+                  child: CommonTextFormField(
                     controller: listenForController,
                   )),
             ],

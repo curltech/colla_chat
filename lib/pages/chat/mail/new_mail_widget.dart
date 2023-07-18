@@ -16,6 +16,7 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
@@ -147,7 +148,7 @@ class _NewMailWidgetState extends State<NewMailWidget> {
           const SizedBox(
             height: 5.0,
           ),
-          CommonAutoSizeTextFormField(
+          CommonTextFormField(
               controller: subjectController,
               labelText: AppLocalizations.t('Subject'))
         ]));

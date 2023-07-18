@@ -4,9 +4,9 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
+import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
-import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 
 class OptionController with ChangeNotifier {
@@ -181,7 +181,7 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
   }
 
   Widget _buildSearchTextField(BuildContext context) {
-    var searchTextField = CommonAutoSizeTextFormField(
+    var searchTextField = CommonTextFormField(
       controller: textController,
       keyboardType: TextInputType.text,
       suffixIcon: IconButton(
@@ -349,7 +349,7 @@ class _CustomSingleSelectFieldState extends State<CustomSingleSelectField> {
           Icons.arrow_drop_down,
           color: Colors.white,
         );
-    return CommonAutoSizeTextFormField(
+    return CommonTextFormField(
       controller: textEditingController,
       readOnly: true,
       keyboardType: TextInputType.text,
@@ -457,7 +457,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
   }
 
   Widget _buildSearchTextField(BuildContext context) {
-    var searchTextField = CommonAutoSizeTextFormField(
+    var searchTextField = CommonTextFormField(
       controller: textController,
       keyboardType: TextInputType.text,
       suffixIcon: IconButton(

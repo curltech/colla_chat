@@ -9,7 +9,7 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/special_text/custom_extended_text_selection_controls.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';

@@ -1,5 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -106,7 +107,7 @@ class DataActionCard extends StatelessWidget {
     var controller = TextEditingController();
     var addFriendTextField = Container(
         padding: const EdgeInsets.all(10.0),
-        child: CommonAutoSizeTextFormField(
+        child: CommonTextFormField(
           controller: controller,
           keyboardType: TextInputType.text,
           labelText: label,

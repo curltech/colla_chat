@@ -1,6 +1,7 @@
 import 'package:colla_chat/entity/stock/user.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/routers/routes.dart';
+import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -45,14 +46,14 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Padding(
-              padding: EdgeInsets.symmetric(horizontal: 50.0),
-              child: CommonAutoSizeTextFormField(
+              padding: const EdgeInsets.symmetric(horizontal: 50.0),
+              child: CommonTextFormField(
                 keyboardType: TextInputType.text,
                 //controller: _credentialController,
 
                   labelText:
                       AppLocalizations.t('Credential(Mobile/Email/LoginName)'),
-                  prefixIcon: Icon(Icons.person),
+                  prefixIcon: const Icon(Icons.person),
 
                 initialValue: _credential,
                 onChanged: (String val) {
@@ -65,7 +66,7 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
           SizedBox(height: 30.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 50.0),
-              child: CommonAutoSizeTextFormField(
+              child: CommonTextFormField(
                 keyboardType: TextInputType.text,
                 obscureText: !_pwdShow,
                 //controller: passwordController,

@@ -12,7 +12,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/richtext/platform_editor_widget.dart';
@@ -154,7 +154,7 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
   }
 
   Widget _buildTitleTextField(BuildContext context) {
-    var textFormField = CommonAutoSizeTextFormField(
+    var textFormField = CommonTextFormField(
       controller: textEditingController,
       labelText: AppLocalizations.t('Title'),
     );

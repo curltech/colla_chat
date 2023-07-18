@@ -1,3 +1,4 @@
+import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -66,7 +67,7 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
         children: <Widget>[
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: CommonAutoSizeTextFormField(
+              child: CommonTextFormField(
                 controller: nameController,
                 labelText: AppLocalizations.t('Username'),
                 prefixIcon: Icon(Icons.person),
@@ -81,7 +82,7 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
           SizedBox(height: 10.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: CommonAutoSizeTextFormField(
+              child: CommonTextFormField(
                 //controller: loginNameController,
                 labelText: AppLocalizations.t('LoginName'),
                 prefixIcon: Icon(Icons.desktop_mac),
@@ -96,7 +97,7 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
           SizedBox(height: 10.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: CommonAutoSizeTextFormField(
+              child: CommonTextFormField(
                 //controller: mobileController,
                 labelText: AppLocalizations.t('Mobile'),
                 prefixIcon: Icon(Icons.mobile_friendly),
@@ -111,7 +112,7 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
           SizedBox(height: 10.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: CommonAutoSizeTextFormField(
+              child: CommonTextFormField(
                 //controller: emailController,
                 keyboardType: TextInputType.emailAddress,
                 labelText: AppLocalizations.t('Email'),
@@ -127,7 +128,7 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
           SizedBox(height: 10.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: CommonAutoSizeTextFormField(
+              child: CommonTextFormField(
                 keyboardType: TextInputType.text,
                 obscureText: !_pwdShow,
                 //controller: passwordController,
@@ -153,7 +154,7 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
           SizedBox(height: 10.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: CommonAutoSizeTextFormField(
+              child: CommonTextFormField(
                 keyboardType: TextInputType.text,
                 obscureText: !_pwdShow,
                 //controller: passwordController,

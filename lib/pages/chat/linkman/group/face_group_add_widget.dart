@@ -10,7 +10,7 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -59,7 +59,7 @@ class _FaceGroupAddWidgetState extends State<FaceGroupAddWidget> {
   }
 
   _buildSearchTextField(BuildContext context) {
-    var searchTextField = CommonAutoSizeTextFormField(
+    var searchTextField = CommonTextFormField(
         controller: controller,
         keyboardType: TextInputType.text,
         labelText: AppLocalizations.t('PeerId/Mobile/Email/Name'),

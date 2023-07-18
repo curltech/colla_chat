@@ -8,6 +8,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
@@ -81,7 +82,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
               break;
             }
           }
-          return CommonAutoSizeTextFormField(
+          return CommonTextFormField(
             labelText: 'Select email service provider',
             prefixIcon: prefix,
             controller: emailServiceProviderController,

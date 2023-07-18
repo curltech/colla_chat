@@ -6,6 +6,7 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -110,15 +111,15 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        CommonAutoSizeTextFormField(
+        CommonTextFormField(
           controller: roomController,
           labelText: 'room',
         ),
-        CommonAutoSizeTextFormField(
+        CommonTextFormField(
           controller: peerIdController,
           labelText: 'peerId',
         ),
-        CommonAutoSizeTextFormField(
+        CommonTextFormField(
           controller: clientIdController,
           labelText: 'clientId',
         ),
@@ -128,7 +129,7 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
         CommonAutoSizeText(
           '接收到的消息:$message',
         ),
-        CommonAutoSizeTextFormField(
+        CommonTextFormField(
           controller: messageController,
           labelText: 'message',
         ),

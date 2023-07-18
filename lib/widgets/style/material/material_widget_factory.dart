@@ -2,6 +2,7 @@ import 'package:badges/badges.dart' as badges;
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/routers/routes.dart';
+import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:data_table_2/data_table_2.dart';
@@ -304,7 +305,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     bool enableIMEPersonalizedLearning = true,
     MouseCursor? mouseCursor,
   }) {
-    return CustomAutoSizeTextFormField(
+    return CommonTextFormField(
       key: key,
       controller: controller,
       initialValue: initialValue,

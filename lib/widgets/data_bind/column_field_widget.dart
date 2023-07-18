@@ -4,6 +4,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
@@ -345,7 +346,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
       }
     }
     String label = AppLocalizations.t(columnFieldDef.label);
-    var textFormField = CommonAutoSizeTextFormField(
+    var textFormField = CommonTextFormField(
       controller: controller,
       focusNode: widget.focusNode,
       keyboardType: columnFieldDef.textInputType,
@@ -392,7 +393,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     }
 
     bool pwdShow = widget.controller.flag ?? false;
-    var textFormField = CommonAutoSizeTextFormField(
+    var textFormField = CommonTextFormField(
       controller: controller,
       focusNode: widget.focusNode,
       keyboardType: columnFieldDef.textInputType,
@@ -668,7 +669,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
               icon: const Icon(Icons.cancel, color: Colors.grey))
           : null;
     }
-    var textFormField = CommonAutoSizeTextFormField(
+    var textFormField = CommonTextFormField(
       controller: controller,
       focusNode: widget.focusNode,
       keyboardType: columnFieldDef.textInputType,
@@ -765,7 +766,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
               icon: const Icon(Icons.cancel, color: Colors.grey))
           : null;
     }
-    var textFormField = CommonAutoSizeTextFormField(
+    var textFormField = CommonTextFormField(
       controller: controller,
       focusNode: widget.focusNode,
       keyboardType: columnFieldDef.textInputType,
@@ -836,7 +837,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
               icon: const Icon(Icons.cancel, color: Colors.grey))
           : null;
     }
-    var textFormField = CommonAutoSizeTextFormField(
+    var textFormField = CommonTextFormField(
       controller: controller,
       focusNode: widget.focusNode,
       keyboardType: columnFieldDef.textInputType,
