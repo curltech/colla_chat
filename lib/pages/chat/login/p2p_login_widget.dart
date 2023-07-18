@@ -10,7 +10,6 @@ import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
-import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -60,11 +59,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
                 if (myselfPeer != null) {
                   String? credential = myselfPeer.loginName;
                   if (StringUtil.isNotEmpty(credential)) {
-                    ColumnFieldController? columnFieldController =
-                        controller.controllers['credential'];
-                    if (columnFieldController != null) {
-                      columnFieldController.value = credential;
-                    }
+                    controller.setValue('credential', credential);
                   }
                 }
               },
@@ -181,15 +176,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
         child: FutureBuilder(
           future: myselfPeerService.lastCredentialName(),
           builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-            if (snapshot.connectionState != ConnectionState.done) {
-              return LoadingUtil.buildLoadingIndicator();
-            }
-            String? credential = widget.credential;
-            credential ??= snapshot.data;
-            if (StringUtil.isNotEmpty(credential)) {
-              controller.setInitValue({'credential': credential});
-            }
-            return FormInputWidget(
+            FormInputWidget formInputWidget = FormInputWidget(
               mainAxisAlignment: MainAxisAlignment.start,
               height: appDataProvider.portraitSize.height * 0.3,
               spacing: 10.0,
@@ -203,6 +190,16 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
               okLabel: widget.credential == null ? 'Login' : 'Auth',
               controller: controller,
             );
+            var value = controller.getValue('credential');
+            if (value == null) {
+              String? credential = widget.credential;
+              credential ??= snapshot.data;
+              if (StringUtil.isNotEmpty(credential)) {
+                controller.setValue('credential', credential);
+              }
+            }
+
+            return formInputWidget;
           },
         ),
       ),
