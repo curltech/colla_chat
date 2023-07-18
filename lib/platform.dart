@@ -1,5 +1,6 @@
 import 'dart:core';
 import 'dart:io' as io;
+import 'dart:io';
 
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/path_util.dart';
@@ -55,6 +56,10 @@ class PlatformParams {
     var dir = await PathUtil.getApplicationDirectory();
     if (dir != null) {
       path = p.join(dir.path, 'colla_chat');
+      Directory directory = Directory(path);
+      if (!directory.existsSync()) {
+        directory.createSync();
+      }
     }
 
     try {
