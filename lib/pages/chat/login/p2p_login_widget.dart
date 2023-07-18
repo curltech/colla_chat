@@ -181,7 +181,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
         child: FutureBuilder(
           future: myselfPeerService.lastCredentialName(),
           builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-            if (!snapshot.hasData) {
+            if (snapshot.connectionState != ConnectionState.done) {
               return LoadingUtil.buildLoadingIndicator();
             }
             String? credential = widget.credential;
