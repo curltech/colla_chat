@@ -75,8 +75,17 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
         color: myself.primary,
       ),
     ));
-
     controller = FormInputController(p2pLoginInputFieldDef);
+    myselfPeerService.lastCredentialName().then((value) {
+      String? credential = controller.getValue('credential');
+      if (credential == null) {
+        credential = widget.credential;
+        credential ??= value;
+        if (StringUtil.isNotEmpty(credential)) {
+          controller.setValue('credential', credential);
+        }
+      }
+    });
   }
 
   Widget _buildMyselfPeers(BuildContext context) {
@@ -172,37 +181,21 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
         height: appDataProvider.portraitSize.height * 0.1,
       ),
       Container(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0),
-        child: FutureBuilder(
-          future: myselfPeerService.lastCredentialName(),
-          builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-            FormInputWidget formInputWidget = FormInputWidget(
-              mainAxisAlignment: MainAxisAlignment.start,
-              height: appDataProvider.portraitSize.height * 0.3,
-              spacing: 10.0,
-              onOk: (Map<String, dynamic> values) async {
-                if (widget.credential == null) {
-                  await _login(values);
-                } else {
-                  await _auth(values);
-                }
-              },
-              okLabel: widget.credential == null ? 'Login' : 'Auth',
-              controller: controller,
-            );
-            var value = controller.getValue('credential');
-            if (value == null) {
-              String? credential = widget.credential;
-              credential ??= snapshot.data;
-              if (StringUtil.isNotEmpty(credential)) {
-                controller.setValue('credential', credential);
+          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+          child: FormInputWidget(
+            mainAxisAlignment: MainAxisAlignment.start,
+            height: appDataProvider.portraitSize.height * 0.3,
+            spacing: 10.0,
+            onOk: (Map<String, dynamic> values) async {
+              if (widget.credential == null) {
+                await _login(values);
+              } else {
+                await _auth(values);
               }
-            }
-
-            return formInputWidget;
-          },
-        ),
-      ),
+            },
+            okLabel: widget.credential == null ? 'Login' : 'Auth',
+            controller: controller,
+          ))
     ]);
   }
 }
