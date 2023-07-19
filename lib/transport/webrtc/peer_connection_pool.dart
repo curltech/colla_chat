@@ -433,7 +433,7 @@ class PeerConnectionPool {
 
   //var lock = Lock(reentrant: true);
 
-  ///如果不存在，创建被叫
+  ///如果不存在，创建被叫，如果存在直接返回
   Future<AdvancedPeerConnection?> createIfNotExist(String peerId,
       {required String clientId,
       required String name,
@@ -558,40 +558,43 @@ class PeerConnectionPool {
       }
     } else if (signalType == SignalType.candidate.name ||
         (signalType == SignalType.sdp.name && signal.sdp!.type == 'offer')) {
-      WebrtcEvent webrtcEvent = WebrtcEvent(peerId,
-          clientId: clientId,
-          name: name,
-          eventType: WebrtcEventType.signal,
-          data: signal);
-      bool? allowed =
-          await globalWebrtcEventController.receiveWebrtcEvent(webrtcEvent);
-      if (allowed != null && allowed) {
-        advancedPeerConnection = await createIfNotExist(peerId,
-            clientId: clientId,
-            name: name,
-            conference: conference,
-            iceServers: iceServers);
-        if (advancedPeerConnection == null) {
-          logger.e('createIfNotExist fail');
-          return null;
-        }
-      } else {
-        String error = 'peerId:$peerId can not receive a webrtc connection';
-        logger.e(error);
-        WebrtcSignal webrtcSignal =
-            WebrtcSignal(SignalType.error.name, error: error);
+      if (advancedPeerConnection == null) {
         WebrtcEvent webrtcEvent = WebrtcEvent(peerId,
             clientId: clientId,
             name: name,
             eventType: WebrtcEventType.signal,
-            data: webrtcSignal);
-        if (advancedPeerConnection != null) {
-          await advancedPeerConnection.signal(webrtcEvent);
-        }
+            data: signal);
+        bool? allowed =
+            await globalWebrtcEventController.receiveWebrtcEvent(webrtcEvent);
+        if (allowed != null && allowed) {
+          advancedPeerConnection = await createIfNotExist(peerId,
+              clientId: clientId,
+              name: name,
+              conference: conference,
+              iceServers: iceServers);
+          if (advancedPeerConnection == null) {
+            logger.e('createIfNotExist fail');
+            return null;
+          }
+        } else {
+          String error = 'peerId:$peerId can not receive a webrtc connection';
+          logger.e(error);
+          WebrtcSignal webrtcSignal =
+              WebrtcSignal(SignalType.error.name, error: error);
+          WebrtcEvent webrtcEvent = WebrtcEvent(peerId,
+              clientId: clientId,
+              name: name,
+              eventType: WebrtcEventType.signal,
+              data: webrtcSignal);
+          if (advancedPeerConnection != null) {
+            await advancedPeerConnection.signal(webrtcEvent);
+          }
 
-        return null;
+          return null;
+        }
       }
     }
+
     ///转发信号到base层处理，包括renegotiate
     if (advancedPeerConnection != null) {
       await advancedPeerConnection.onSignal(signal);
@@ -634,6 +637,8 @@ class PeerConnectionPool {
     onWebrtcEvent(event);
   }
 
+  ///webrtc连接完成后首先交换最新的联系人信息，然后请求新的订阅渠道消息
+  ///然后交换棘轮加密的密钥
   onConnected(WebrtcEvent event) async {
     globalChatMessageController.sendModifyLinkman(event.peerId,
         clientId: event.clientId);

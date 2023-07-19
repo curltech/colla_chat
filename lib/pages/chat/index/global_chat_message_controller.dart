@@ -17,17 +17,21 @@ import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
+import 'package:synchronized/synchronized.dart';
 
 ///跟踪影响全局的webrtc事件到来，对不同类型的事件进行分派
 class GlobalWebrtcEventController with ChangeNotifier {
   Future<bool?> Function(WebrtcEvent webrtcEvent)? onWebrtcEvent;
   Map<String, bool?> results = {};
+  Lock lock = Lock();
 
   ///跟踪影响全局的webrtc事件到来，对不同类型的事件进行分派
   ///目前用于处理对方的webrtc呼叫是否被允许
   Future<bool?> receiveWebrtcEvent(WebrtcEvent webrtcEvent) async {
     bool? allowed;
     String peerId = webrtcEvent.peerId;
+    String name = webrtcEvent.name;
+    String clientId = webrtcEvent.clientId;
 
     Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
     if (linkman != null) {
@@ -39,20 +43,25 @@ class GlobalWebrtcEventController with ChangeNotifier {
         ///如果是黑名单，则直接拒绝
         allowed = false;
       }
+    } else {
+      // Linkman linkman = Linkman(peerId, name);
+      // linkman.clientId = clientId;
+      // linkman.peerPublicKey = peerId;
+      // linkmanService.store(linkman);
+    }
+    if (results.containsKey(peerId)) {
+      return results[peerId];
     }
 
     ///linkman不存在，或者既不是好友也不是黑名单，由外部接口判断
-    if (allowed == null) {
-      if (results.containsKey(peerId)) {
-        return results[peerId];
-      }
+    allowed ??= await lock.synchronized(() async {
       if (onWebrtcEvent != null) {
         bool? allowed = await onWebrtcEvent!(webrtcEvent);
         results[peerId] = allowed;
 
         return allowed;
       }
-    }
+    });
 
     return allowed;
   }
