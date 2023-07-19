@@ -558,6 +558,8 @@ class PeerConnectionPool {
       }
     } else if (signalType == SignalType.candidate.name ||
         (signalType == SignalType.sdp.name && signal.sdp!.type == 'offer')) {
+      ///如果连接没有创建，则申请许可是否允许创建连接
+      ///对于主叫或者已经创建的被叫来说，不需要申请许可
       if (advancedPeerConnection == null) {
         WebrtcEvent webrtcEvent = WebrtcEvent(peerId,
             clientId: clientId,
