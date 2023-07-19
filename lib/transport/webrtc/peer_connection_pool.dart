@@ -556,8 +556,7 @@ class PeerConnectionPool {
       if (advancedPeerConnection == null) {
         logger.w('peerId:$peerId, clientId:$clientId has no master to match');
       }
-    }
-    if (signalType == SignalType.candidate.name ||
+    } else if (signalType == SignalType.candidate.name ||
         (signalType == SignalType.sdp.name && signal.sdp!.type == 'offer')) {
       WebrtcEvent webrtcEvent = WebrtcEvent(peerId,
           clientId: clientId,
@@ -577,8 +576,7 @@ class PeerConnectionPool {
           return null;
         }
       } else {
-        String error =
-            'peerId:$peerId can not receive a webrtc connection';
+        String error = 'peerId:$peerId can not receive a webrtc connection';
         logger.e(error);
         WebrtcSignal webrtcSignal =
             WebrtcSignal(SignalType.error.name, error: error);
@@ -587,11 +585,14 @@ class PeerConnectionPool {
             name: name,
             eventType: WebrtcEventType.signal,
             data: webrtcSignal);
-        await advancedPeerConnection!.signal(webrtcEvent);
+        if (advancedPeerConnection != null) {
+          await advancedPeerConnection.signal(webrtcEvent);
+        }
 
         return null;
       }
     }
+    ///转发信号到base层处理，包括renegotiate
     if (advancedPeerConnection != null) {
       await advancedPeerConnection.onSignal(signal);
     }
