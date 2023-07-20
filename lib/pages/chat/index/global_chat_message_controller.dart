@@ -49,12 +49,12 @@ class GlobalWebrtcEventController with ChangeNotifier {
       // linkman.peerPublicKey = peerId;
       // linkmanService.store(linkman);
     }
-    if (results.containsKey(peerId)) {
-      return results[peerId];
-    }
 
     ///linkman不存在，或者既不是好友也不是黑名单，由外部接口判断
     allowed ??= await lock.synchronized(() async {
+      if (results.containsKey(peerId)) {
+        return results[peerId];
+      }
       if (onWebrtcEvent != null) {
         bool? allowed = await onWebrtcEvent!(webrtcEvent);
         results[peerId] = allowed;

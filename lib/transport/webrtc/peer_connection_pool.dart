@@ -624,8 +624,12 @@ class PeerConnectionPool {
         }
       }
     } else {
-      logger.e(
-          'PeerConnection:$peerId,clientId;$clientId is not exist, cannot send');
+      if (peerId == myself.peerId) {
+        logger.i('Target $peerId,clientId;$clientId is myself, cannot send');
+      } else {
+        logger.e(
+            'PeerConnection:$peerId,clientId;$clientId is not exist, cannot send');
+      }
     }
     return false;
   }
