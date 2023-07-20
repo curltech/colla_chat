@@ -25,7 +25,6 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
-import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
@@ -91,7 +90,7 @@ class _IndexViewState extends State<IndexView>
 
     return await DialogUtil.confirm(context,
         content: name +
-            AppLocalizations.t(' want to chat with you, are you agree?'));
+            AppLocalizations.t(' is a stranger, want to chat with you, are you agree?'));
   }
 
   Future<void> _initSystemTray() async {
