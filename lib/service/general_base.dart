@@ -221,13 +221,15 @@ abstract class GeneralBaseService<T> {
             securityContext.payload = raw;
             var result = await linkmanCryptographySecurityContextService
                 .encrypt(securityContext);
-            if (result) {
-              List<int> data = securityContext.payload;
-              json[encryptField] = CryptoUtil.encodeBase64(data);
-              json['payloadHash'] = securityContext.payloadHash;
-              json['needCompress'] = securityContext.needCompress;
-              json['needEncrypt'] = securityContext.needEncrypt;
+            if (!result) {
+              logger.e(
+                  'linkmanCryptographySecurityContextService encrypt encryptField:$encryptField failure');
             }
+            List<int> data = securityContext.payload;
+            json[encryptField] = CryptoUtil.encodeBase64(data);
+            json['payloadHash'] = securityContext.payloadHash;
+            json['needCompress'] = securityContext.needCompress;
+            json['needEncrypt'] = securityContext.needEncrypt;
           } catch (err) {
             logger.e('SecurityContextService encrypt err:$err');
           }
@@ -257,10 +259,12 @@ abstract class GeneralBaseService<T> {
             securityContext.payload = data;
             var result = await linkmanCryptographySecurityContextService
                 .decrypt(securityContext);
-            if (result) {
-              var data = securityContext.payload;
-              json[encryptField] = CryptoUtil.utf8ToString(data);
+            if (!result) {
+              logger.e(
+                  'linkmanCryptographySecurityContextService encryptField:$encryptField decrypt failure');
             }
+            data = securityContext.payload;
+            json[encryptField] = CryptoUtil.utf8ToString(data);
           } catch (e) {
             logger.e('SecurityContextService decrypt err:$e');
           }

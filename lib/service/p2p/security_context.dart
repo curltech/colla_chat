@@ -238,6 +238,8 @@ abstract class CryptographySecurityContextService
       } else {
         needCompress = false;
         securityContext.needCompress = false;
+        result = false;
+        logger.e('compress failure');
       }
     }
     //3. 数据加密
@@ -248,6 +250,8 @@ abstract class CryptographySecurityContextService
       } else {
         needEncrypt = false;
         securityContext.needEncrypt = false;
+        result = false;
+        logger.e('pureEncrypt failure');
       }
     }
 
@@ -331,6 +335,8 @@ abstract class CryptographySecurityContextService
       } else {
         needEncrypt = false;
         securityContext.needEncrypt = false;
+        logger.e('pureDecrypt failure');
+        result = false;
       }
     }
     // 2. 解压缩
@@ -341,6 +347,7 @@ abstract class CryptographySecurityContextService
         logger.e("uncompress failure:$err");
         securityContext.needCompress = false;
         needCompress = false;
+        result = false;
       }
     }
     //3. 消息的数据部分，验证签名
@@ -372,10 +379,10 @@ class LinkmanCryptographySecurityContextService
       SecurityContext securityContext, List<int> data) async {
     var targetPeerId = securityContext.targetPeerId;
     if (targetPeerId == null) {
-      logger.e("targetPeerId is null, will not be encrypted!");
-      return null;
+      logger.w("targetPeerId is null, will be set myself peerId encrypted!");
+      targetPeerId = myself.peerId;
     }
-    SimplePublicKey? targetPublicKey = await findTargetPublicKey(targetPeerId);
+    SimplePublicKey? targetPublicKey = await findTargetPublicKey(targetPeerId!);
     if (targetPublicKey == null) {
       logger.e("TargetPublicKey is null, will not be encrypted!");
       return null;
