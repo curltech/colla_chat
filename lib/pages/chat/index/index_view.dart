@@ -79,18 +79,37 @@ class _IndexViewState extends State<IndexView>
     globalChatMessageController.addListener(_updateGlobalChatMessage);
     myself.addListener(_update);
     appDataProvider.addListener(_update);
-    globalWebrtcEventController.onWebrtcEvent = _onWebrtcEvent;
+    globalWebrtcEventController.onWebrtcSignal = _onWebrtcSignal;
+    globalWebrtcEventController.onWebrtcErrorSignal = _onWebrtcErrorSignal;
+
     _initSystemTray();
   }
 
-  Future<bool?> _onWebrtcEvent(WebrtcEvent webrtcEvent) async {
+  Future<bool?> _onWebrtcSignal(WebrtcEvent webrtcEvent) async {
     String peerId = webrtcEvent.peerId;
     String name = webrtcEvent.name;
     WebrtcEventType eventType = webrtcEvent.eventType;
 
     return await DialogUtil.confirm(context,
         content: name +
-            AppLocalizations.t(' is a stranger, want to chat with you, are you agree?'));
+            AppLocalizations.t(
+                ' is a stranger, want to chat with you, are you agree?'));
+  }
+
+  Future<void> _onWebrtcErrorSignal(WebrtcEvent webrtcEvent) async {
+    String peerId = webrtcEvent.peerId;
+    String name = webrtcEvent.name;
+    String clientId = webrtcEvent.clientId;
+    WebrtcEventType eventType = webrtcEvent.eventType;
+    if (eventType == WebrtcEventType.signal) {
+      WebrtcSignal signal = webrtcEvent.data;
+      if (signal.signalType == SignalType.error.name) {
+        DialogUtil.error(context,
+            content: name +
+                AppLocalizations.t(' response error:') +
+                (signal.error ?? ''));
+      }
+    }
   }
 
   Future<void> _initSystemTray() async {
@@ -530,7 +549,8 @@ class _IndexViewState extends State<IndexView>
     myself.removeListener(_update);
     appDataProvider.removeListener(_update);
     _intentDataStreamSubscription.cancel();
-    globalWebrtcEventController.onWebrtcEvent = null;
+    globalWebrtcEventController.onWebrtcSignal = null;
+    globalWebrtcEventController.onWebrtcErrorSignal = null;
     super.dispose();
   }
 }

@@ -21,13 +21,14 @@ import 'package:synchronized/synchronized.dart';
 
 ///跟踪影响全局的webrtc事件到来，对不同类型的事件进行分派
 class GlobalWebrtcEventController with ChangeNotifier {
-  Future<bool?> Function(WebrtcEvent webrtcEvent)? onWebrtcEvent;
+  Future<bool?> Function(WebrtcEvent webrtcEvent)? onWebrtcSignal;
+  Future<void> Function(WebrtcEvent webrtcEvent)? onWebrtcErrorSignal;
   Map<String, bool?> results = {};
   Lock lock = Lock();
 
-  ///跟踪影响全局的webrtc事件到来，对不同类型的事件进行分派
+  ///跟踪影响全局的webrtc协商信号事件到来，对不同类型的事件进行分派
   ///目前用于处理对方的webrtc呼叫是否被允许
-  Future<bool?> receiveWebrtcEvent(WebrtcEvent webrtcEvent) async {
+  Future<bool?> receiveWebrtcSignal(WebrtcEvent webrtcEvent) async {
     bool? allowed;
     String peerId = webrtcEvent.peerId;
     String name = webrtcEvent.name;
@@ -55,8 +56,8 @@ class GlobalWebrtcEventController with ChangeNotifier {
       if (results.containsKey(peerId)) {
         return results[peerId];
       }
-      if (onWebrtcEvent != null) {
-        bool? allowed = await onWebrtcEvent!(webrtcEvent);
+      if (onWebrtcSignal != null) {
+        bool? allowed = await onWebrtcSignal!(webrtcEvent);
         results[peerId] = allowed;
 
         return allowed;
@@ -64,6 +65,22 @@ class GlobalWebrtcEventController with ChangeNotifier {
     });
 
     return allowed;
+  }
+
+  ///接收到webrtc的错误信号
+  Future<void> receiveErrorSignal(WebrtcEvent webrtcEvent) async {
+    String peerId = webrtcEvent.peerId;
+    String name = webrtcEvent.name;
+    String clientId = webrtcEvent.clientId;
+    WebrtcEventType eventType = webrtcEvent.eventType;
+    if (eventType == WebrtcEventType.signal) {
+      WebrtcSignal signal = webrtcEvent.data;
+      if (signal.signalType == SignalType.error.name) {
+        if (onWebrtcErrorSignal != null) {
+          await onWebrtcErrorSignal!(webrtcEvent);
+        }
+      }
+    }
   }
 }
 
