@@ -549,8 +549,17 @@ class PeerConnectionPool {
     //   }
     // }
 
+    if (signalType == SignalType.error.name) {
+      WebrtcEvent webrtcEvent = WebrtcEvent(peerId,
+          clientId: clientId,
+          name: name,
+          eventType: WebrtcEventType.signal,
+          data: signal);
+      await globalWebrtcEventController.receiveErrorSignal(webrtcEvent);
+    }
     //作为主叫收到被叫的answer
-    if ((signalType == SignalType.sdp.name && signal.sdp!.type == 'answer')) {
+    else if ((signalType == SignalType.sdp.name &&
+        signal.sdp!.type == 'answer')) {
       //符合的主叫不存在，说明存在多个同peerid的被叫，其他的被叫的answer先来，将主叫占用了
       //需要再建新的主叫
       if (advancedPeerConnection == null) {
@@ -567,7 +576,7 @@ class PeerConnectionPool {
             eventType: WebrtcEventType.signal,
             data: signal);
         bool? allowed =
-            await globalWebrtcEventController.receiveWebrtcEvent(webrtcEvent);
+            await globalWebrtcEventController.receiveWebrtcSignal(webrtcEvent);
         if (allowed != null && allowed) {
           advancedPeerConnection = await createIfNotExist(peerId,
               clientId: clientId,
