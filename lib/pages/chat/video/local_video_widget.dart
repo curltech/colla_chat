@@ -272,6 +272,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   ///选择会议参加人的界面，返回会议参加人
+  ///在会议模式和群模式下，弹出对话框选择参加人
+  ///在对话模式下直接加入对方
   Future<List<String>> _selectParticipants() async {
     List<String> participants = [];
     var partyType = chatSummary.partyType!;

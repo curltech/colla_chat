@@ -267,9 +267,9 @@ class LocalVideoRenderController extends VideoRenderController {
     }
     //根据conference.video来判断是请求音频还是视频，并创建本地视频render
     if (video) {
-      //await localVideoRenderController.createVideoMediaRender();
+      await localVideoRenderController.createVideoMediaRender();
       //测试目的，使用屏幕
-      await localVideoRenderController.createDisplayMediaRender();
+      // await localVideoRenderController.createDisplayMediaRender();
     } else {
       await localVideoRenderController.createAudioMediaRender();
     }

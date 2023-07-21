@@ -29,6 +29,9 @@ enum VideoChatStatus {
 class VideoChatMessageController with ChangeNotifier {
   final Key key = UniqueKey();
 
+  ///当主视频不存在的时候是否自动创建
+  bool auto = true;
+
   //视频邀请消息对应的汇总消息
   ChatSummary? _chatSummary;
 
@@ -522,11 +525,30 @@ class VideoChatMessageController with ChangeNotifier {
     await chatMessageService.updateReceiptType(chatMessage, receiptType);
   }
 
-  ///在会议创建后，自动创建本地视频，如果存在则直接返回
+  ///在会议创建后，打开本地视频，如果存在则直接返回，
+  ///否则在linkman模式下自动创建，会议和群模式根据auto参数决定是否自动创建
   openLocalMainVideoRender() async {
-    //如果本地主视频存在，直接返回
-    await localVideoRenderController
-        .openLocalMainVideoRender(_conference!.video);
+    PeerVideoRender? mainVideoRender =
+        localVideoRenderController.mainVideoRender;
+    if (mainVideoRender != null) {
+      return;
+    } else {
+      if (chatSummary == null) {
+        logger.e('chatSummary is null');
+        return;
+      }
+      var partyType = chatSummary!.partyType!;
+      if (partyType == PartyType.linkman.name) {
+        await localVideoRenderController
+            .openLocalMainVideoRender(_conference!.video);
+      } else {
+        if (auto) {
+          //如果本地主视频存在，直接返回
+          await localVideoRenderController
+              .openLocalMainVideoRender(_conference!.video);
+        }
+      }
+    }
   }
 
   ///在视频会议中增加本地视频到所有连接
