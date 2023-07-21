@@ -326,7 +326,9 @@ class VideoChatMessageController with ChangeNotifier {
       if (peerId == null) {
         return;
       }
-      participants.add(peerId);
+      if (!participants.contains(peerId)) {
+        participants.add(peerId);
+      }
     }
     var name = this.name;
     var current = DateTime.now();

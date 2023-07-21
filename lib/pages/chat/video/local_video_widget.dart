@@ -285,7 +285,11 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             return LinkmanGroupSearchWidget(
                 onSelected: (List<String>? peerIds) async {
                   if (peerIds != null) {
-                    participants.addAll(peerIds);
+                    for (var peerId in peerIds) {
+                      if (!participants.contains(peerId)) {
+                        participants.add(peerId);
+                      }
+                    }
                   }
                   Navigator.pop(context, participants);
                 },
@@ -304,7 +308,11 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             builder: (BuildContext context) {
               return GroupLinkmanWidget(
                 onSelected: (List<String> peerIds) {
-                  participants.addAll(peerIds);
+                  for (var peerId in peerIds) {
+                    if (!participants.contains(peerId)) {
+                      participants.add(peerId);
+                    }
+                  }
                   Navigator.pop(context, participants);
                 },
                 selected: const <String>[],
@@ -317,7 +325,9 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       if (peerId == null) {
         return participants;
       }
-      participants.add(peerId);
+      if (!participants.contains(peerId)) {
+        participants.add(peerId);
+      }
     }
 
     return participants;

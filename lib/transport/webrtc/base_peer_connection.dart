@@ -247,7 +247,7 @@ class BasePeerConnection {
 
   //媒体流的轨道，流和发送者之间的关系
   //Map<String, Map<String, MediaStreamTrack>> tracks = {};
-  Map<String, Map<String, RTCRtpSender>> trackSenders = {};
+  Map<String, RTCRtpSender> trackSenders = {};
 
   //外部使用时注册的回调方法，也就是注册事件
   //WebrtcEvent定义了事件的名称
@@ -920,41 +920,52 @@ class BasePeerConnection {
     // }
 
     ///以下是推荐的做法
+    bool result = false;
     var tracks = stream.getTracks();
     for (var track in tracks) {
-      addLocalTrack(stream, track);
+      bool success = await addLocalTrack(stream, track);
+      if (success) {
+        result = true;
+      }
+    }
+
+    return result;
+  }
+
+  /// 把本地流轨道加入到连接中
+  Future<bool> addLocalTrack(MediaStream stream, MediaStreamTrack track) async {
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return false;
+    }
+    logger.i(
+        'addLocalTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id}');
+    String streamId = stream.id;
+    String trackId = track.id!;
+
+    RTCPeerConnection peerConnection = this.peerConnection!;
+
+    ///加入重复轨道应用会崩溃
+    if (trackSenders.containsKey(trackId)) {
+      logger.e(
+          'addLocalTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id} is exist, addLocalTrack failure');
+      return false;
+    }
+
+    try {
+      RTCRtpSender streamSender = await peerConnection.addTrack(track, stream);
+      trackSenders[trackId] = streamSender;
+
+      return true;
+    } catch (e) {
+      logger.e('peer connection addTrack failure, $e');
     }
 
     return false;
   }
 
-  /// 把本地流轨道加入到连接中
-  addLocalTrack(MediaStream stream, MediaStreamTrack track) async {
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
-    }
-    logger.i(
-        'addLocalTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id}');
-    String streamId = stream.id;
-    String? trackId = track.id;
-
-    RTCPeerConnection peerConnection = this.peerConnection!;
-    var streamSenders = trackSenders[trackId!];
-    if (streamSenders == null) {
-      streamSenders = {};
-      trackSenders[trackId] = streamSenders;
-    }
-    try {
-      var streamSender = await peerConnection.addTrack(track, stream);
-      streamSenders[streamId] = streamSender;
-    } catch (e) {
-      logger.e('peer connection addTrack failure, $e');
-    }
-  }
-
   ///判断本地流是否存在
-  bool existLocal(MediaStream stream) {
+  bool _existLocal(MediaStream stream) {
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return false;
@@ -981,7 +992,7 @@ class BasePeerConnection {
   }
 
   ///判断远程流是否存在
-  bool existRemote(MediaStream stream) {
+  bool _existRemote(MediaStream stream) {
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return false;
@@ -1016,7 +1027,7 @@ class BasePeerConnection {
     }
     RTCPeerConnection? peerConnection = this.peerConnection;
     if (peerConnection != null) {
-      existLocal(stream);
+      _existLocal(stream);
       // try {
       //   await peerConnection.removeStream(stream);
       // } catch (e) {
@@ -1039,11 +1050,10 @@ class BasePeerConnection {
       return;
     }
     var streamId = stream.id;
-    var trackId = track.id;
+    var trackId = track.id!;
 
-    var streamSenders = trackSenders[trackId];
-    if (streamSenders != null) {
-      RTCRtpSender? sender = streamSenders[streamId];
+    if (trackSenders.containsKey(trackId)) {
+      RTCRtpSender? sender = trackSenders[trackId];
       if (sender == null) {
         logger.e('Cannot remove track that was never added.');
       } else {
@@ -1070,7 +1080,7 @@ class BasePeerConnection {
     RTCPeerConnection? peerConnection = this.peerConnection;
     if (peerConnection != null) {
       try {
-        existRemote(stream);
+        _existRemote(stream);
         try {
           List<MediaStream?> streams = peerConnection.getRemoteStreams();
           if (streams.isNotEmpty) {
@@ -1104,14 +1114,14 @@ class BasePeerConnection {
     var oldTrackId = oldTrack.id;
     var newTrackId = newTrack.id;
 
-    var streamSenders = trackSenders[oldTrackId];
-    if (streamSenders != null) {
-      RTCRtpSender? sender = streamSenders[streamId];
+    if (trackSenders.containsKey(oldTrackId)) {
+      RTCRtpSender? sender = trackSenders[oldTrackId];
       if (sender == null) {
         logger.e('Cannot replace track that was never added.');
       } else {
-        trackSenders[newTrackId!] = streamSenders;
         await sender.replaceTrack(newTrack);
+        trackSenders.remove(oldTrackId);
+        trackSenders[newTrackId!] = sender;
       }
     }
   }
