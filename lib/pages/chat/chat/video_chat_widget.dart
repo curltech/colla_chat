@@ -48,6 +48,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
       ValueNotifier<VideoChatMessageController?>(
           videoConferenceRenderPool.videoChatMessageController);
   ChatSummary chatSummary = chatMessageController.chatSummary!;
+  SwiperController swiperController = SwiperController();
 
   @override
   void initState() {
@@ -93,7 +94,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
 
   Widget _buildVideoChatView(BuildContext context) {
     return Swiper(
-      controller: SwiperController(),
+      controller: swiperController,
       itemCount: 3,
       index: 0,
       itemBuilder: (BuildContext context, int index) {
@@ -122,10 +123,19 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   Widget build(BuildContext context) {
     List<Widget> rightWidgets = [
       IconButton(
-          onPressed: () {
-            _minimize(context);
-          },
-          icon: const Icon(Icons.zoom_in_map, color: Colors.white)),
+        onPressed: () {
+          swiperController.next();
+        },
+        icon: const Icon(Icons.next_plan_outlined),
+        tooltip: AppLocalizations.t('Next view'),
+      ),
+      IconButton(
+        onPressed: () {
+          _minimize(context);
+        },
+        icon: const Icon(Icons.zoom_in_map),
+        tooltip: AppLocalizations.t('Minimize'),
+      ),
     ];
 
     Widget videoChatView = _buildVideoChatView(context);
