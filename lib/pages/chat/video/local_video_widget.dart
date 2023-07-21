@@ -484,7 +484,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       case 'Media play':
         //await _openMediaStream(stream);
         break;
-      case 'Close all':
+      case 'Close':
         await _close();
         break;
       default:

@@ -150,7 +150,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
       ActionData(
           label: 'Close',
           // actionType: ActionType.inkwell,
-          icon: const Icon(Icons.close)),
+          icon: const Icon(Icons.closed_caption_disabled)),
     );
     return videoActionData;
   }

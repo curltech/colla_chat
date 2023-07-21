@@ -96,7 +96,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
     if (remoteVideoRenderController!.videoRenders.isNotEmpty) {
       actionData.add(
         ActionData(
-            label: 'Close all',
+            label: 'Close',
             tooltip: 'Close all video',
             icon:
                 const Icon(Icons.closed_caption_disabled, color: Colors.white)),
