@@ -1,11 +1,9 @@
 import 'dart:core';
 
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -134,16 +132,16 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
       throw 'Stream is not initialized';
     }
     final frame = await render!.captureFrame();
-    if (frame != null) {
+    if (mounted && frame != null) {
       await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-                content: Image.memory(frame!.asUint8List(),
-                    height: 720, width: 1280),
+                content:
+                    Image.memory(frame.asUint8List(), height: 720, width: 1280),
                 actions: <Widget>[
                   TextButton(
                     onPressed: Navigator.of(context, rootNavigator: true).pop,
-                    child: CommonAutoSizeText('OK'),
+                    child: const CommonAutoSizeText('Ok'),
                   )
                 ],
               ));
@@ -214,20 +212,20 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
     var appBarView = AppBarView(
       title: widget.title,
       withLeading: widget.withLeading,
-      rightWidgets: _buildActions(context),
-      rightPopupMenus: [_buildAppBarPopupMenu()],
+      rightWidgets: _buildAppBarButton(),
       child: _buildVideoView(context),
     );
     return appBarView;
   }
 
-  AppBarPopupMenu _buildAppBarPopupMenu() {
-    return AppBarPopupMenu(
-      onPressed: _inCalling ? _hangUp : _makeCall,
-      title: _inCalling ? 'Hangup' : 'Call',
-      icon: Icon(_inCalling ? Icons.call_end : Icons.phone,
-          color: myself.primary),
-    );
+  List<Widget> _buildAppBarButton() {
+    return [
+      IconButton(
+        onPressed: _inCalling ? _hangUp : _makeCall,
+        tooltip: _inCalling ? 'Hangup' : 'Call',
+        icon: Icon(_inCalling ? Icons.call_end : Icons.phone),
+      )
+    ];
   }
 
   void _selectAudioOutput(String deviceId) {

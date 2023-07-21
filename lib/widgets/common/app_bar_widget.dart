@@ -1,7 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -22,7 +21,7 @@ class AppBarWidget {
     Color? foregroundColor,
     bool withLeading = false, //是否有缺省的回退按钮
     Function? leadingCallBack, //回退按钮的回调
-    Widget? title = const CommonAutoSizeText(''),
+    Widget? title = const Text(''),
     bool centerTitle = false, //标题是否居中
     List<Widget>? rightWidgets, //右边的排列组件（按钮）
     List<AppBarPopupMenu>? rightPopupMenus, //右边的下拉菜单组件
@@ -69,7 +68,7 @@ class AppBarWidget {
   static Widget buildTitleBar({
     Color? backgroundColor,
     Color? foregroundColor,
-    Widget? title = const CommonAutoSizeText(''),
+    Widget? title = const Text(''),
     bool centerTitle = false, //标题是否居中
     List<Widget>? rightWidgets, //右边的排列组件（按钮）
     List<AppBarPopupMenu>? rightPopupMenus,
@@ -144,7 +143,7 @@ class AppBarWidget {
         PopupMenuItem<int> item;
         Widget? iconWidget = rightAction.icon;
         String text = rightAction.title ?? '';
-        Widget textWidget = CommonAutoSizeText(AppLocalizations.t(text));
+        Widget textWidget = Text(AppLocalizations.t(text));
         List<Widget> rows = [];
         if (iconWidget != null) {
           rows.add(iconWidget);
@@ -165,12 +164,12 @@ class AppBarWidget {
         ++i;
       }
       popMenuButton = PopupMenuButton<int>(
-        color: Colors.grey,
+        color: Colors.white,
         itemBuilder: (BuildContext context) {
           return items;
         },
         icon: Icon(
-          Icons.more_vert,
+          Icons.more_horiz,
           color: foregroundColor,
         ),
         //调用下拉按钮的回调函数，参数为按钮序号

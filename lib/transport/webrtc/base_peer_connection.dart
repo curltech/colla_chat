@@ -305,8 +305,8 @@ class BasePeerConnection {
       this.extension = extension;
       var configuration = {
         ///plan-b格式是老的格式，将会淘汰
-        "sdpSemantics": "plan-b",
-        //"sdpSemantics": "unified-plan",
+        // "sdpSemantics": "plan-b",
+        "sdpSemantics": "unified-plan",
         'iceServers': extension.iceServers
       };
       //1.创建连接
