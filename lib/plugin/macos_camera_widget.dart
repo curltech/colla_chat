@@ -7,6 +7,7 @@ import 'package:camera_macos/camera_macos_device.dart';
 import 'package:camera_macos/camera_macos_platform_interface.dart';
 import 'package:camera_macos/exceptions.dart';
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -21,8 +22,8 @@ import 'package:path/path.dart' as p;
 import 'package:video_player/video_player.dart';
 
 class MacosCameraWidget extends StatefulWidget {
-  final Function(String filename)? onFile;
-  final Function(List<int> data)? onData;
+  final Function(XFile file)? onFile;
+  final Function(Uint8List data, String mimeType)? onData;
 
   const MacosCameraWidget({super.key, this.onFile, this.onData});
 
@@ -254,10 +255,9 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
                             border: Border.all(color: Colors.pink)),
                         child: Center(
                           child: AspectRatio(
-                              aspectRatio:
-                              videoController.value.size != null
-                                      ? videoController.value.aspectRatio
-                                      : 1.0,
+                              aspectRatio: videoController.value.size != null
+                                  ? videoController.value.aspectRatio
+                                  : 1.0,
                               child: VideoPlayer(videoController)),
                         ),
                       ),
@@ -476,24 +476,30 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
   _back() async {
     if (widget.onData != null) {
       if (lastImagePreviewData != null) {
-        widget.onData!(lastImagePreviewData!);
+        widget.onData!(lastImagePreviewData!, ChatMessageMimeType.jpg.name);
       }
       if (lastRecordedVideoData != null) {
-        widget.onData!(lastRecordedVideoData!);
+        widget.onData!(lastRecordedVideoData!, ChatMessageMimeType.mp4.name);
       }
     }
     if (widget.onFile != null) {
       if (lastImagePreviewData != null) {
         String? filename = await FileUtil.writeTempFileAsBytes(
             lastImagePreviewData!,
-            extension: 'jpg');
-        widget.onFile!(filename!);
+            extension: ChatMessageMimeType.jpg.name);
+        XFile file = XFile(filename!,
+            mimeType: ChatMessageMimeType.jpg.name,
+            length: lastImagePreviewData!.length);
+        widget.onFile!(file);
       }
       if (lastRecordedVideoData != null) {
         String? filename = await FileUtil.writeTempFileAsBytes(
-            lastImagePreviewData!,
-            extension: 'mp4');
-        widget.onFile!(filename!);
+            lastRecordedVideoData!,
+            extension: ChatMessageMimeType.mp4.name);
+        XFile file = XFile(filename!,
+            mimeType: ChatMessageMimeType.mp4.name,
+            length: lastRecordedVideoData!.length);
+        widget.onFile!(file);
       }
     }
     if (mounted) {

@@ -15,8 +15,10 @@ import 'package:video_player/video_player.dart';
 
 class MobileCameraWidget extends StatefulWidget {
   final Function(XFile file)? onFile;
+  final Function(Uint8List data, String mimeType)? onData;
 
-  const MobileCameraWidget({Key? key, this.onFile}) : super(key: key);
+  const MobileCameraWidget({Key? key, this.onFile, this.onData})
+      : super(key: key);
 
   @override
   State<MobileCameraWidget> createState() {

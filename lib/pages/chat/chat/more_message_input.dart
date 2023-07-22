@@ -187,7 +187,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   _onActionPicture() async {
     Uint8List? data;
     String? filename;
-    String? mimeType = ChatMessageMimeType.jpg.name;
+    String mimeType = ChatMessageMimeType.jpg.name;
     ChatMessageContentType contentType = ChatMessageContentType.image;
     if (platformParams.linux) {
       List<Uint8List>? bytes = await FileUtil.fullSelectBytes(
@@ -201,13 +201,13 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         data = bytes.first;
       }
     } else if (platformParams.macos) {
-      String? filename;
       await DialogUtil.show<String?>(
           context: context,
           builder: (BuildContext context) {
             return Dialog(child: MacosCameraWidget(
-              onFile: (String name) {
-                filename = name;
+              onData: (Uint8List bytes, String type) {
+                data = bytes;
+                mimeType = type;
               },
             ));
           });
@@ -225,8 +225,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       if (mediaFile != null) {
         data = await mediaFile!.readAsBytes();
         filename = mediaFile!.name;
-        mimeType = mediaFile!.mimeType;
-        mimeType = FileUtil.mimeType(filename);
+        mimeType = mediaFile!.mimeType!;
+        mimeType = FileUtil.mimeType(filename)!;
         mimeType = mimeType ?? 'text/plain';
       }
     }
