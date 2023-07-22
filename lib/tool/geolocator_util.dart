@@ -10,9 +10,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart' as google_maps;
 import 'package:latlong2/latlong.dart' as latlong2;
 import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 import 'package:map_launcher/map_launcher.dart' as map_launcher;
-import 'package:maps_launcher/maps_launcher.dart';
-import 'package:platform_maps_flutter/platform_maps_flutter.dart'
-    as platform_map;
 
 class LocationPosition {
   double latitude;
@@ -204,20 +201,6 @@ class GeolocatorUtil {
     return steps;
   }
 
-  /// url地图
-  static Future<bool> launchQuery(String query) async {
-    return await MapsLauncher.launchQuery(query);
-  }
-
-  /// url地图
-  static Future<bool> launchCoordinates(
-    double latitude,
-    double longitude, [
-    String? label,
-  ]) async {
-    return await MapsLauncher.launchCoordinates(latitude, longitude, label);
-  }
-
   ///获取安装的地图软件列表,android/ios,调用安装的地图应用
   static Future<List<map_launcher.AvailableMap>> installedMaps() async {
     final availableMaps = await map_launcher.MapLauncher.installedMaps;
@@ -235,7 +218,7 @@ class GeolocatorUtil {
     );
   }
 
-  ///是否安装了地图类型,android/ios,调用安装的地图应用
+  ///是否安装了地图软件,android/ios,调用安装的地图应用
   static Future<bool?> isMapAvailable(map_launcher.MapType mapType) async {
     return await map_launcher.MapLauncher.isMapAvailable(mapType);
   }
@@ -264,87 +247,7 @@ class GeolocatorUtil {
     }
   }
 
-  ///构建地图Widget,Android/iOS,platform_maps_flutter
-  static platform_map.PlatformMap buildPlatformMap(
-      {Key? key,
-      required double latitude,
-      required double longitude,
-      double zoom = 0,
-      void Function(platform_map.LatLng)? onTap,
-      void Function()? onMarkerTap,
-      void Function(platform_map.CameraPosition)? onCameraMove}) {
-    platform_map.LatLng target = platform_map.LatLng(latitude, longitude);
-    return platform_map.PlatformMap(
-      key: key,
-      initialCameraPosition: platform_map.CameraPosition(
-        target: target,
-        zoom: zoom,
-      ),
-      markers: <platform_map.Marker>{
-        platform_map.Marker(
-          markerId: platform_map.MarkerId(AppLocalizations.t('marker_1')),
-          position: target,
-          consumeTapEvents: true,
-          infoWindow: platform_map.InfoWindow(
-            title: AppLocalizations.t('PlatformMarker'),
-            snippet: AppLocalizations.t("Hi I'm a Platform Marker"),
-          ),
-          onTap: onMarkerTap,
-        ),
-      },
-      myLocationEnabled: true,
-      myLocationButtonEnabled: true,
-      onTap: onTap,
-      onCameraMove: onCameraMove,
-      compassEnabled: true,
-      onMapCreated: (controller) {
-        Future.delayed(const Duration(seconds: 2)).then(
-          (_) {
-            controller.animateCamera(
-              platform_map.CameraUpdate.newCameraPosition(
-                platform_map.CameraPosition(
-                  bearing: 270.0,
-                  target: target,
-                  tilt: 30.0,
-                  zoom: 18,
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  // static MapWidget buildMapWidget({
-  //   Key? key,
-  //   required double latitude,
-  //   required double longitude,
-  //   String? query,
-  //   double bearing = 0, //方向
-  //   double tilt = 0, //角度
-  //   double zoom = 0,
-  // }) {
-  //   // Set default adapter
-  //   MapAdapter.defaultInstance = const MapAdapter.platformSpecific(
-  //     ios: AppleMapsNativeAdapter(),
-  //     otherwise: BingMapsIframeAdapter(),
-  //   );
-  //
-  //   // Construct a map widget
-  //   return MapWidget(
-  //     location: MapLocation(
-  //       query: query,
-  //     ),
-  //     markers: {
-  //       MapMarker(
-  //         query: query,
-  //       ),
-  //     },
-  //   );
-  // }
-
-  /// 需要price key
+  /// 谷歌地图，需要price key
   static google_maps.GoogleMap buildGoogleMap({
     Key? key,
     required double latitude,
@@ -371,6 +274,7 @@ class GeolocatorUtil {
     );
   }
 
+  /// 苹果地图
   static apple_maps.AppleMap buildAppleMap({
     Key? key,
     required double latitude,

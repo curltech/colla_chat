@@ -310,6 +310,7 @@ dependencies:
   #image_cropping: ^0.0.13 #裁剪图片
   crop_your_image: ^0.7.4
   #chatview: ^1.2.1
+  dismissible_page: ^1.0.2
 
   #应用
   #  flutter_filereader: 3.0.0 #引入x5浏览器
@@ -332,16 +333,11 @@ dependencies:
   universal_html: ^2.0.8
   backdrop: ^0.9.0 #Use BackdropScaffold instead of the standard Scaffold in your app
   material_floating_search_bar: ^0.3.7
-  google_maps_flutter: ^2.2.1
-  #google_map_location_picker: ^4.1.7
-  map_launcher: ^2.4.0 #Map Launcher is a flutter plugin to find available maps installed on a device and launch them
   flutter_svg: ^2.0.3
+  google_maps_flutter: ^2.3.1 #谷歌地图，移动设备
   apple_maps_flutter: ^1.2.0
-  platform_maps_flutter: ^1.0.2
-  maps_launcher: ^2.0.1
-  location_picker_flutter_map: ^1.2.0
-  #maps: ^0.5.0
-  #google_map_location_picker: ^4.1.7
+  map_launcher: ^2.5.0+1 #打开设备已安装的地图软件，移动设备
+  location_picker_flutter_map: ^1.2.1 #Open Street Map，需要翻墙
 
   #服务
   flutter_local_notifications: ^15.1.0+1 #本地通知，不支持windows和web

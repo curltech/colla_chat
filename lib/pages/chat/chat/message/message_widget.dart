@@ -25,7 +25,6 @@ import 'package:colla_chat/pages/chat/chat/message/url_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/video_chat_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/video_message.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
@@ -34,18 +33,13 @@ import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/clipboard_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/tool/geolocator_util.dart';
-import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/pdf_util.dart';
-import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
-import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 import 'package:share_plus/share_plus.dart';
 
 final List<ActionData> messagePopActionData = [
@@ -543,52 +537,6 @@ class MessageWidget {
       thumbnail: thumbnail,
       fullScreen: fullScreen,
     );
-  }
-
-  ///打开地图
-  openLocationMap(BuildContext context) async {
-    String? content = chatMessage.content;
-    if (content == null) {
-      return;
-    }
-    content = chatMessageService.recoverContent(content);
-    Map<String, dynamic> map = JsonUtil.toJson(content);
-    LocationPosition locationPosition = LocationPosition.fromJson(map);
-    var latitude = locationPosition.latitude; //纬度
-    var longitude = locationPosition.longitude; //经度
-    if (platformParams.desktop) {
-      await SmartDialogUtil.show(
-          context: context,
-          title: AppBarWidget.buildTitleBar(
-              title: CommonAutoSizeText(AppLocalizations.t('Location map'))),
-          builder: (BuildContext? context) {
-            return GeolocatorUtil.buildLocationPicker(
-                latitude: latitude,
-                longitude: longitude,
-                onPicked: (PickedData data) {});
-          });
-      // GeolocatorUtil.launchCoordinates(latitude, longitude);
-    } else {
-      await SmartDialogUtil.show(
-          context: context,
-          title: AppBarWidget.buildTitleBar(
-              title: CommonAutoSizeText(AppLocalizations.t('Location map'))),
-          builder: (BuildContext? context) {
-            return GeolocatorUtil.buildPlatformMap(
-                latitude: latitude, longitude: longitude);
-          });
-      // DialogUtil.show(
-      //     context: context,
-      //     builder: (BuildContext context) {
-      //       return GeolocatorUtil.buildPlatformMap(
-      //         latitude: latitude,
-      //         longitude: longitude,
-      //       );
-      //     });
-      // GeolocatorUtil.launchCoordinates(latitude, longitude);
-      // GeolocatorUtil.mapLauncher(
-      //     latitude: latitude, longitude: longitude, title: '');
-    }
   }
 
   /// 非全屏场景下是缩略图

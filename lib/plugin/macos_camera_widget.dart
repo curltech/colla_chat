@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'package:camera_macos/camera_macos_view.dart';
 import 'package:camera_macos/camera_macos_controller.dart';
-import 'package:camera_macos/camera_macos_file.dart';
 import 'package:camera_macos/camera_macos_device.dart';
+import 'package:camera_macos/camera_macos_file.dart';
 import 'package:camera_macos/camera_macos_platform_interface.dart';
+import 'package:camera_macos/camera_macos_view.dart';
 import 'package:camera_macos/exceptions.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
@@ -17,8 +17,8 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 
 class MacosCameraWidget extends StatefulWidget {
@@ -41,7 +41,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
   late double durationValue;
   Uint8List? lastImagePreviewData;
   Uint8List? lastRecordedVideoData;
-  String? filename;
+  XFile? mediaFile;
   VideoPlayerController? videoController;
   VoidCallback? videoPlayerListener;
   ValueNotifier<List<CameraMacOSDevice>> videoDevices =
@@ -204,12 +204,12 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
     if (platformParams.desktop) {
       return;
     }
-    if (filename == null) {
+    if (mediaFile == null) {
       return;
     }
 
     final VideoPlayerController vController =
-        VideoPlayerController.file(File(filename!));
+        VideoPlayerController.file(File(mediaFile!.path));
 
     videoPlayerListener = () {
       if (videoController != null) {
@@ -242,14 +242,14 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            if (videoController == null && filename == null)
+            if (videoController == null && mediaFile == null)
               Container()
             else
               SizedBox(
                 width: 64.0,
                 height: 64.0,
                 child: (videoController == null)
-                    ? Image.file(File(filename!))
+                    ? Image.file(File(mediaFile!.path))
                     : Container(
                         decoration: BoxDecoration(
                             border: Border.all(color: Colors.pink)),
@@ -487,19 +487,19 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
         String? filename = await FileUtil.writeTempFileAsBytes(
             lastImagePreviewData!,
             extension: ChatMessageMimeType.jpg.name);
-        XFile file = XFile(filename!,
+         mediaFile = XFile(filename!,
             mimeType: ChatMessageMimeType.jpg.name,
             length: lastImagePreviewData!.length);
-        widget.onFile!(file);
+        widget.onFile!(mediaFile!);
       }
       if (lastRecordedVideoData != null) {
         String? filename = await FileUtil.writeTempFileAsBytes(
             lastRecordedVideoData!,
             extension: ChatMessageMimeType.mp4.name);
-        XFile file = XFile(filename!,
+        mediaFile = XFile(filename!,
             mimeType: ChatMessageMimeType.mp4.name,
             length: lastRecordedVideoData!.length);
-        widget.onFile!(file);
+        widget.onFile!(mediaFile!);
       }
     }
     if (mounted) {

@@ -1,5 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/message/common_message.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
@@ -36,9 +37,15 @@ class LocationMessage extends StatelessWidget {
     var floor = locationPosition.floor; //精度
     var heading = locationPosition.heading; //
     var address = locationPosition.address; //
-    Widget headingWidget = Icon(
-      Icons.location_on,
+    Widget headingWidget = IconButton(
+      icon: const Icon(Icons.location_on),
       color: myself.primary,
+      onPressed: platformParams.mobile
+          ? () {
+              GeolocatorUtil.mapLauncher(
+                  latitude: latitude, longitude: longitude, title: address!);
+            }
+          : null,
     );
     if (thumbnail != null) {
       headingWidget = ImageUtil.buildImageWidget(image: thumbnail);

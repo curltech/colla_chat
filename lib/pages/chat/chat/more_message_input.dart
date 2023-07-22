@@ -272,20 +272,23 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       await DialogUtil.show(
           context: context,
           builder: (BuildContext? context) {
-            return Dialog(
+            return Card(
+                elevation: 0.0,
+                margin: EdgeInsets.zero,
+                shape: const ContinuousRectangleBorder(),
                 child: Column(children: [
-              title,
-              Expanded(
-                  child: GeolocatorUtil.buildLocationPicker(
-                      latitude: latitude,
-                      longitude: longitude,
-                      onPicked: (PickedData data) {
-                        longitude = data.latLong.longitude;
-                        latitude = data.latLong.latitude;
-                        address = data.address;
-                        Navigator.pop(context!);
-                      }))
-            ]));
+                  title,
+                  Expanded(
+                      child: GeolocatorUtil.buildLocationPicker(
+                          latitude: latitude,
+                          longitude: longitude,
+                          onPicked: (PickedData data) {
+                            longitude = data.latLong.longitude;
+                            latitude = data.latLong.latitude;
+                            address = data.address;
+                            Navigator.pop(context!);
+                          }))
+                ]));
           });
       if (address == null) {
         return;
