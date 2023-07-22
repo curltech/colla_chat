@@ -431,6 +431,7 @@ class FileUtil {
   }
 
   ///各种文件的输入方式，文件采用pickFiles
+  ///在macos下相机不能用，layout也有问题
   static Future<List<String>?> fullSelectFiles({
     required BuildContext context,
     bool image = true,

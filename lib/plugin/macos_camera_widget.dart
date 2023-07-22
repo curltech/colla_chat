@@ -1,46 +1,61 @@
+import 'dart:io';
+
 import 'package:camera_macos/camera_macos_view.dart';
 import 'package:camera_macos/camera_macos_controller.dart';
 import 'package:camera_macos/camera_macos_file.dart';
 import 'package:camera_macos/camera_macos_device.dart';
 import 'package:camera_macos/camera_macos_platform_interface.dart';
 import 'package:camera_macos/exceptions.dart';
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as pathJoiner;
+import 'package:path/path.dart' as p;
+import 'package:video_player/video_player.dart';
 
 class MacosCameraWidget extends StatefulWidget {
-  final Function(XFile file)? onFile;
+  final Function(String filename)? onFile;
+  final Function(List<int> data)? onData;
 
-  const MacosCameraWidget({super.key, this.onFile});
+  const MacosCameraWidget({super.key, this.onFile, this.onData});
 
   @override
   MacosCameraWidgetState createState() => MacosCameraWidgetState();
 }
 
 class MacosCameraWidgetState extends State<MacosCameraWidget> {
-  CameraMacOSController? macOSController;
-  late CameraMacOSMode cameraMode;
+  GlobalKey cameraKey = GlobalKey();
+  ValueNotifier<CameraMacOSController?> cameraController =
+      ValueNotifier<CameraMacOSController?>(null);
+  ValueNotifier<CameraMacOSMode> cameraMacOSMode =
+      ValueNotifier<CameraMacOSMode>(CameraMacOSMode.photo);
   late TextEditingController durationController;
   late double durationValue;
   Uint8List? lastImagePreviewData;
   Uint8List? lastRecordedVideoData;
-  GlobalKey cameraKey = GlobalKey();
-  List<CameraMacOSDevice> videoDevices = [];
-  String? selectedVideoDevice;
+  String? filename;
+  VideoPlayerController? videoController;
+  VoidCallback? videoPlayerListener;
+  ValueNotifier<List<CameraMacOSDevice>> videoDevices =
+      ValueNotifier<List<CameraMacOSDevice>>([]);
+  int selectedVideoIndex = -1;
 
   List<CameraMacOSDevice> audioDevices = [];
-  String? selectedAudioDevice;
+  int selectedAudioIndex = -1;
 
-  bool enableAudio = true;
+  ValueNotifier<bool> enableAudio = ValueNotifier<bool>(true);
   bool usePlatformView = false;
 
   @override
   void initState() {
     super.initState();
-    cameraMode = CameraMacOSMode.photo;
     durationValue = 15;
     durationController = TextEditingController(text: "$durationValue");
     durationController.addListener(() {
@@ -54,479 +69,495 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
         }
       });
     });
+    _initVideoDevices();
+    _initAudioDevices();
   }
 
   String get cameraButtonText {
     String label = AppLocalizations.t("Do something");
-    switch (cameraMode) {
-      case CameraMacOSMode.photo:
-        label = AppLocalizations.t("Take Picture");
-        break;
-      case CameraMacOSMode.video:
-        if (macOSController?.isRecording ?? false) {
-          label = AppLocalizations.t("Stop recording");
-        } else {
-          label = AppLocalizations.t("Record video");
-        }
-        break;
+    if (cameraMacOSMode.value == CameraMacOSMode.photo) {
+      label = AppLocalizations.t("Take Picture");
+    } else {
+      if (cameraController.value?.isRecording ?? false) {
+        label = AppLocalizations.t("Stop recording");
+      } else {
+        label = AppLocalizations.t("Record video");
+      }
     }
     return label;
   }
 
-  Future<String> get videoFilePath async => pathJoiner.join(
-      (await getApplicationDocumentsDirectory()).path, "output.mp4");
+  Future<String> get videoFilePath async =>
+      p.join((await getApplicationDocumentsDirectory()).path, "output.mp4");
 
-  _buildVideoDeviceWidget() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppLocalizations.t("Video Devices"),
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Row(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: DropdownButton<String>(
-                  elevation: 3,
-                  isExpanded: true,
-                  value: selectedVideoDevice,
-                  underline: Container(color: Colors.transparent),
-                  items: videoDevices.map((CameraMacOSDevice device) {
-                    return DropdownMenuItem(
-                      value: device.deviceId,
-                      child: Text(device.deviceId),
-                    );
-                  }).toList(),
-                  onChanged: (String? newDeviceID) {
-                    setState(() {
-                      selectedVideoDevice = newDeviceID;
-                    });
-                  },
+  Future<void> _initVideoDevices() async {
+    try {
+      videoDevices.value = await CameraMacOS.instance.listDevices(
+        deviceType: CameraMacOSDeviceType.video,
+      );
+      if (videoDevices.value.isNotEmpty) {
+        selectedVideoIndex = 0;
+      }
+    } catch (e) {
+      DialogUtil.error(context, content: e.toString());
+    }
+  }
+
+  Future<void> _initAudioDevices() async {
+    try {
+      audioDevices = await CameraMacOS.instance.listDevices(
+        deviceType: CameraMacOSDeviceType.audio,
+      );
+      if (audioDevices.isNotEmpty) {
+        selectedAudioIndex = 0;
+      }
+    } catch (e) {
+      DialogUtil.error(context, content: e.toString());
+    }
+  }
+
+  ///当视频设备识别后，显示预览界面
+  _buildPreviewWidget() {
+    return ValueListenableBuilder(
+        valueListenable: videoDevices,
+        builder: (BuildContext context, List<CameraMacOSDevice> videoDevices,
+            Widget? child) {
+          if (videoDevices.isNotEmpty) {
+            return CameraMacOSView(
+              key: cameraKey,
+              deviceId: videoDevices[selectedVideoIndex].deviceId,
+              audioDeviceId: audioDevices[selectedAudioIndex].deviceId,
+              fit: BoxFit.fill,
+              cameraMode: cameraMacOSMode.value,
+              onCameraInizialized: (CameraMacOSController controller) {
+                cameraController.value = controller;
+              },
+              onCameraDestroyed: () {
+                return Text(AppLocalizations.t("Camera Destroyed!"));
+              },
+              enableAudio: enableAudio.value,
+              usePlatformView: usePlatformView,
+            );
+          }
+          return Center(
+              child: Text(AppLocalizations.t("Video Devices is empty")));
+        });
+  }
+
+  _buildLastImagePreviewData() {
+    return lastImagePreviewData != null
+        ? Container(
+            decoration: ShapeDecoration(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+                side: const BorderSide(
+                  color: Colors.lightBlue,
+                  width: 10,
                 ),
               ),
             ),
-            MaterialButton(
-              color: Colors.lightBlue,
-              textColor: Colors.white,
-              onPressed: listVideoDevices,
-              child: Text(AppLocalizations.t("List video devices")),
+            child: Image.memory(
+              lastImagePreviewData!,
+              height: 50,
+              width: 90,
             ),
-          ],
-        ),
-      ],
-    );
+          )
+        : Container();
   }
 
-  _buildAudioDeviceWidget() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppLocalizations.t("Audio Devices"),
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        Row(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: DropdownButton<String>(
-                  elevation: 3,
-                  isExpanded: true,
-                  value: selectedAudioDevice,
-                  underline: Container(color: Colors.transparent),
-                  items: audioDevices.map((CameraMacOSDevice device) {
-                    return DropdownMenuItem(
-                      value: device.deviceId,
-                      child: Text(device.deviceId),
-                    );
-                  }).toList(),
-                  onChanged: (String? newDeviceID) {
-                    setState(() {
-                      selectedAudioDevice = newDeviceID;
-                    });
-                  },
-                ),
+  void _toggleAudioMode() {
+    enableAudio.value = !enableAudio.value;
+  }
+
+  Future<void> _toggleCamera() async {
+    if (videoDevices.value.isNotEmpty) {
+      if (selectedVideoIndex < videoDevices.value.length - 1) {
+        selectedVideoIndex++;
+      } else {
+        if (selectedVideoIndex != 0) {
+          selectedVideoIndex = 0;
+        }
+      }
+    }
+  }
+
+  /// 镜头切换按钮
+  Widget _buildCameraToggleWidget() {
+    var videoDevices = this.videoDevices.value;
+    if (videoDevices.length > 1) {
+      var cameraController = this.cameraController.value;
+      Widget toggleWidget = IconButton(
+        icon: const Icon(Icons.cameraswitch),
+        color: myself.primary,
+        onPressed: cameraController != null && cameraController.isRecording
+            ? null
+            : _toggleCamera,
+      );
+
+      return toggleWidget;
+    }
+    return Container();
+  }
+
+  Future<void> _startVideoPlayer() async {
+    if (platformParams.desktop) {
+      return;
+    }
+    if (filename == null) {
+      return;
+    }
+
+    final VideoPlayerController vController =
+        VideoPlayerController.file(File(filename!));
+
+    videoPlayerListener = () {
+      if (videoController != null) {
+        // Refreshing the state to update video player with the correct ratio.
+        if (mounted) {
+          setState(() {});
+        }
+        videoController!.removeListener(videoPlayerListener!);
+      }
+    };
+    vController.addListener(videoPlayerListener!);
+    await vController.setLooping(true);
+    await vController.initialize();
+    await videoController?.dispose();
+    if (mounted) {
+      setState(() {
+        videoController = vController;
+      });
+    }
+    await vController.play();
+  }
+
+  /// 显示捕获图片和录像的缩略图
+  Widget _buildThumbnailWidget() {
+    final VideoPlayerController? videoController = this.videoController;
+
+    return Expanded(
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            if (videoController == null && filename == null)
+              Container()
+            else
+              SizedBox(
+                width: 64.0,
+                height: 64.0,
+                child: (videoController == null)
+                    ? Image.file(File(filename!))
+                    : Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.pink)),
+                        child: Center(
+                          child: AspectRatio(
+                              aspectRatio:
+                              videoController.value.size != null
+                                      ? videoController.value.aspectRatio
+                                      : 1.0,
+                              child: VideoPlayer(videoController)),
+                        ),
+                      ),
               ),
-            ),
-            MaterialButton(
-              color: Colors.lightBlue,
-              textColor: Colors.white,
-              onPressed: listAudioDevices,
-              child: Text(AppLocalizations.t("List audio devices")),
-            ),
           ],
         ),
-      ],
-    );
-  }
-
-  _buildDeviceWidget() {
-    return Padding(
-      padding: const EdgeInsets.all(12.0),
-      child: Column(
-        children: [
-          _buildVideoDeviceWidget(),
-          const Divider(),
-          _buildAudioDeviceWidget(),
-          const Divider(),
-          Expanded(
-            child: _buildCameraMacOSView(),
-          ),
-        ],
       ),
     );
   }
 
-  _buildCameraMacOSView() {
-    return Stack(
-      alignment: Alignment.bottomRight,
-      children: [
-        selectedVideoDevice != null && selectedVideoDevice!.isNotEmpty
-            ? CameraMacOSView(
-                key: cameraKey,
-                deviceId: selectedVideoDevice,
-                audioDeviceId: selectedAudioDevice,
-                fit: BoxFit.fill,
-                cameraMode: CameraMacOSMode.photo,
-                onCameraInizialized: (CameraMacOSController controller) {
-                  setState(() {
-                    macOSController = controller;
-                  });
-                },
-                onCameraDestroyed: () {
-                  return Text(AppLocalizations.t("Camera Destroyed!"));
-                },
-                enableAudio: enableAudio,
-                usePlatformView: usePlatformView,
-              )
-            : Center(
-                child: Text(AppLocalizations.t("Tap on List Devices first")),
-              ),
-        lastImagePreviewData != null
-            ? Container(
-                decoration: ShapeDecoration(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    side: const BorderSide(
-                      color: Colors.lightBlue,
-                      width: 10,
-                    ),
-                  ),
-                ),
-                child: Image.memory(
-                  lastImagePreviewData!,
-                  height: 50,
-                  width: 90,
-                ),
-              )
-            : Container(),
-      ],
-    );
-  }
-
-  _buildSettingWidget() {
+  /// 相机的所有控制按钮
+  Widget _buildCameraController(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        CheckboxListTile(
-          value: enableAudio,
-          contentPadding: EdgeInsets.zero,
-          tristate: false,
-          controlAffinity: ListTileControlAffinity.leading,
-          title: Text(AppLocalizations.t("Enable Audio")),
-          onChanged: (bool? newValue) {
-            setState(() {
-              enableAudio = newValue ?? false;
-            });
-          },
+      children: <Widget>[
+        Expanded(
+          child: Container(),
         ),
-        CheckboxListTile(
-          value: usePlatformView,
-          contentPadding: EdgeInsets.zero,
-          tristate: false,
-          controlAffinity: ListTileControlAffinity.leading,
-          title: Text(AppLocalizations.t(
-              "Use Platform View (Experimental - Not Working)")),
-          onChanged: (bool? newValue) {
-            setState(() {
-              usePlatformView = newValue ?? false;
-            });
-          },
-        ),
-        Text(
-          AppLocalizations.t("Camera mode"),
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        RadioListTile(
-          title: Text(AppLocalizations.t("Photo")),
-          contentPadding: EdgeInsets.zero,
-          value: CameraMacOSMode.photo,
-          groupValue: cameraMode,
-          onChanged: (CameraMacOSMode? newMode) {
-            setState(() {
-              if (newMode != null) {
-                cameraMode = newMode;
-              }
-            });
-          },
-        ),
-        Row(
-          children: [
-            Expanded(
-              child: RadioListTile(
-                contentPadding: EdgeInsets.zero,
-                title: Text(AppLocalizations.t("Video")),
-                value: CameraMacOSMode.video,
-                groupValue: cameraMode,
-                onChanged: (CameraMacOSMode? newMode) {
-                  setState(() {
-                    if (newMode != null) {
-                      cameraMode = newMode;
-                    }
-                  });
-                },
-              ),
-            ),
-            Visibility(
-              visible: cameraMode == CameraMacOSMode.video,
-              child: Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  child: TextField(
-                    controller: durationController,
-                    decoration: InputDecoration(
-                      labelText: AppLocalizations.t("Video Length"),
-                    ),
-                  ),
+        Container(
+            color: Colors.grey.withOpacity(AppOpacity.lgOpacity),
+            child: Center(
+                child: Column(children: <Widget>[
+              _buildCaptureModeWidget(),
+              Padding(
+                padding: const EdgeInsets.all(5.0),
+                child: Row(
+                  children: <Widget>[
+                    _buildBackButton(),
+                    _buildCameraToggleWidget(),
+                    _buildThumbnailWidget(),
+                  ],
                 ),
-              ),
-            ),
-          ],
-        ),
+              )
+            ]))),
       ],
     );
   }
 
-  _buildCameraWidget() {
-    return Padding(
-      padding: const EdgeInsets.all(12.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            AppLocalizations.t("Settings"),
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Row(
-            children: [
-              Expanded(
-                flex: 90,
-                child: _buildSettingWidget(),
-              ),
-              const Spacer(flex: 10),
-            ],
-          ),
-          Container(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              MaterialButton(
-                color: Colors.red,
-                textColor: Colors.white,
-                onPressed: destroyCamera,
-                child: Builder(
-                  builder: (context) {
-                    String buttonText = AppLocalizations.t("Destroy");
-                    if (macOSController != null &&
-                        macOSController!.isDestroyed) {
-                      buttonText = AppLocalizations.t("Reinitialize");
-                    }
-                    return Text(buttonText);
-                  },
-                ),
-              ),
-              MaterialButton(
-                color: Colors.lightBlue,
-                textColor: Colors.white,
-                onPressed: onCameraButtonTap,
-                child: Text(cameraButtonText),
-              ),
-            ],
-          ),
-        ],
-      ),
+  /// 拍照和录像按钮
+  Widget _buildCaptureModeWidget() {
+    var primary = myself.primary;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        ValueListenableBuilder(
+            valueListenable: enableAudio,
+            builder: (BuildContext context, bool enableAudio, Widget? child) {
+              return IconButton(
+                icon: Icon(enableAudio ? Icons.volume_up : Icons.volume_mute),
+                color: primary,
+                onPressed: _toggleAudioMode,
+                tooltip: AppLocalizations.t('Toggle AudioMode'),
+              );
+            }),
+        ValueListenableBuilder(
+            valueListenable: cameraController,
+            builder: (BuildContext context,
+                CameraMacOSController? cameraController, Widget? child) {
+              return ValueListenableBuilder(
+                  valueListenable: cameraMacOSMode,
+                  builder: (BuildContext context,
+                      CameraMacOSMode cameraMacOSMode, Widget? child) {
+                    return CircleTextButton(
+                      onPressed: _captureMedia,
+                      elevation: 2.0,
+                      backgroundColor: primary,
+                      padding: const EdgeInsets.all(15.0),
+                      child: _getCaptureIcon(),
+                    );
+                  });
+            }),
+        ValueListenableBuilder(
+            valueListenable: cameraMacOSMode,
+            builder: (BuildContext context, CameraMacOSMode cameraMacOSMode,
+                Widget? child) {
+              return IconButton(
+                icon: Icon(cameraMacOSMode == CameraMacOSMode.photo
+                    ? Icons.camera_alt
+                    : Icons.videocam),
+                color: primary,
+                onPressed: () {
+                  if (cameraMacOSMode == CameraMacOSMode.photo) {
+                    this.cameraMacOSMode.value = CameraMacOSMode.video;
+                  } else if (cameraMacOSMode == CameraMacOSMode.video) {
+                    this.cameraMacOSMode.value = CameraMacOSMode.photo;
+                  }
+                },
+                tooltip: AppLocalizations.t('Toggle Picture Video'),
+              );
+            }),
+      ],
     );
+  }
+
+  Icon _getCaptureIcon() {
+    CameraMacOSController? cameraController = this.cameraController.value;
+    if (cameraController != null) {
+      if (cameraMacOSMode.value == CameraMacOSMode.photo) {
+        return const Icon(
+          Icons.camera,
+          size: 48.0,
+          color: Colors.white,
+        );
+      } else {
+        if (cameraController.isRecording) {
+          return const Icon(
+            Icons.stop,
+            size: 48.0,
+            color: Colors.white,
+          );
+        } else {
+          return const Icon(
+            Icons.play_arrow,
+            size: 48.0,
+            color: Colors.white,
+          );
+        }
+      }
+    } else {
+      return const Icon(
+        Icons.camera,
+        size: 48.0,
+        color: Colors.grey,
+      );
+    }
   }
 
   Future<void> startRecording() async {
-    try {
-      String urlPath = await videoFilePath;
-      await macOSController!.recordVideo(
-        maxVideoDuration: durationValue,
-        url: urlPath,
-        enableAudio: enableAudio,
-        onVideoRecordingFinished:
-            (CameraMacOSFile? result, CameraMacOSException? exception) {
-          setState(() {});
-          if (exception != null) {
-            showAlert(message: exception.toString());
-          } else if (result != null) {
-            showAlert(
-              title: "SUCCESS",
-              message: "Video saved at ${result.url}",
-            );
-          }
-        },
-      );
-    } catch (e) {
-      showAlert(message: e.toString());
-    } finally {
-      setState(() {});
-    }
-  }
-
-  Future<void> listVideoDevices() async {
-    try {
-      List<CameraMacOSDevice> videoDevices =
-          await CameraMacOS.instance.listDevices(
-        deviceType: CameraMacOSDeviceType.video,
-      );
-      setState(() {
-        this.videoDevices = videoDevices;
-        if (videoDevices.isNotEmpty) {
-          selectedVideoDevice = videoDevices.first.deviceId;
-        }
-      });
-    } catch (e) {
-      showAlert(message: e.toString());
-    }
-  }
-
-  Future<void> listAudioDevices() async {
-    try {
-      List<CameraMacOSDevice> audioDevices =
-          await CameraMacOS.instance.listDevices(
-        deviceType: CameraMacOSDeviceType.audio,
-      );
-      setState(() {
-        this.audioDevices = audioDevices;
-        if (audioDevices.isNotEmpty) {
-          selectedAudioDevice = audioDevices.first.deviceId;
-        }
-      });
-    } catch (e) {
-      showAlert(message: e.toString());
-    }
-  }
-
-  void changeCameraMode() {
-    setState(() {
-      cameraMode = cameraMode == CameraMacOSMode.photo
-          ? CameraMacOSMode.video
-          : CameraMacOSMode.photo;
-    });
-  }
-
-  Future<void> destroyCamera() async {
-    try {
-      if (macOSController != null) {
-        if (macOSController!.isDestroyed) {
-          setState(() {
-            cameraKey = GlobalKey();
-          });
-        } else {
-          await macOSController?.destroy();
-          setState(() {});
-        }
-      }
-    } catch (e) {
-      showAlert(message: e.toString());
-    }
-  }
-
-  Future<void> onCameraButtonTap() async {
-    try {
-      if (macOSController != null) {
-        switch (cameraMode) {
-          case CameraMacOSMode.photo:
-            CameraMacOSFile? imageData = await macOSController!.takePicture();
-            if (imageData != null) {
-              setState(() {
-                lastImagePreviewData = imageData.bytes;
-              });
-              showAlert(
-                title: "SUCCESS",
-                message: "Image successfully created",
-              );
-              //widget.onFile!(file);
+    CameraMacOSController? cameraController = this.cameraController.value;
+    if (cameraController != null) {
+      try {
+        String urlPath = await videoFilePath;
+        await cameraController.recordVideo(
+          maxVideoDuration: durationValue,
+          url: urlPath,
+          enableAudio: enableAudio.value,
+          onVideoRecordingFinished:
+              (CameraMacOSFile? result, CameraMacOSException? exception) {
+            setState(() {});
+            if (exception != null) {
+              DialogUtil.error(context, content: exception.toString());
+            } else if (result != null) {
+              DialogUtil.info(context,
+                  content: AppLocalizations.t('Video saved at ') +
+                      (result.url ?? ''));
             }
-            break;
-          case CameraMacOSMode.video:
-            if (macOSController!.isRecording) {
-              CameraMacOSFile? videoData =
-                  await macOSController!.stopRecording();
-              if (videoData != null) {
-                setState(() {
-                  lastRecordedVideoData = videoData.bytes;
-                });
-                showAlert(
-                  title: "SUCCESS",
-                  message: "Video saved at ${videoData.url}",
-                );
-                //widget.onFile!(file);
-              }
-            } else {
-              startRecording();
-            }
-            break;
-        }
-      }
-    } catch (e) {
-      showAlert(message: e.toString());
-    }
-  }
-
-  Future<void> showAlert({
-    String title = "ERROR",
-    String message = "",
-  }) async {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(AppLocalizations.t(title)),
-          content: Text(AppLocalizations.t(message)),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(AppLocalizations.t('Ok')),
-            ),
-          ],
+          },
         );
+      } catch (e) {
+        DialogUtil.error(context, content: e.toString());
+      }
+    }
+  }
+
+  Future<void> stopRecording() async {
+    CameraMacOSController? cameraController = this.cameraController.value;
+    if (cameraController != null) {
+      if (cameraController.isRecording) {
+        CameraMacOSFile? videoData = await cameraController.stopRecording();
+        if (videoData != null) {
+          lastRecordedVideoData = videoData.bytes;
+          lastImagePreviewData = null;
+          if (mounted) {
+            DialogUtil.info(context,
+                content: AppLocalizations.t('Video saved at ') +
+                    (videoData.url ?? ''));
+          }
+        }
+      }
+    }
+  }
+
+  /// 拍照或者开始录像
+  Future<void> _captureMedia() async {
+    CameraMacOSController? cameraController = this.cameraController.value;
+    if (cameraController != null) {
+      if (cameraMacOSMode.value == CameraMacOSMode.photo) {
+        _takePicture();
+      } else {
+        if (cameraController.isRecording) {
+          stopRecording();
+        } else {
+          startRecording();
+        }
+      }
+    }
+  }
+
+  _takePicture() async {
+    CameraMacOSController? cameraController = this.cameraController.value;
+    if (cameraController != null) {
+      CameraMacOSFile? imageData = await cameraController.takePicture();
+      if (imageData != null) {
+        lastImagePreviewData = imageData.bytes;
+        lastRecordedVideoData = null;
+        if (mounted) {
+          DialogUtil.info(context,
+              content: AppLocalizations.t('Picture saved at ') +
+                  (imageData.url ?? ''));
+        }
+      }
+    }
+  }
+
+  Widget _buildBackButton() {
+    var iconButton = IconButton(
+      icon: const Icon(Icons.arrow_back_ios_new, size: 32),
+      color: myself.primary,
+      onPressed: () async {
+        await _back();
       },
     );
+
+    return iconButton;
   }
+
+  _back() async {
+    if (widget.onData != null) {
+      if (lastImagePreviewData != null) {
+        widget.onData!(lastImagePreviewData!);
+      }
+      if (lastRecordedVideoData != null) {
+        widget.onData!(lastRecordedVideoData!);
+      }
+    }
+    if (widget.onFile != null) {
+      if (lastImagePreviewData != null) {
+        String? filename = await FileUtil.writeTempFileAsBytes(
+            lastImagePreviewData!,
+            extension: 'jpg');
+        widget.onFile!(filename!);
+      }
+      if (lastRecordedVideoData != null) {
+        String? filename = await FileUtil.writeTempFileAsBytes(
+            lastImagePreviewData!,
+            extension: 'mp4');
+        widget.onFile!(filename!);
+      }
+    }
+    if (mounted) {
+      Navigator.pop(context);
+    }
+  }
+
+  /// 预览窗口数据，分辨率，尺寸
+  // Widget _buildPreviewData() {
+  //   if (macOSController != null && macOSController.value.isInitialized) {
+  //     Size? previewSize = controller!.value.previewSize;
+  //     var resolutionPreset = controller!.resolutionPreset;
+  //     Widget previewText = Container();
+  //     if (previewSize != null) {
+  //       previewText = Align(
+  //           alignment: Alignment.topRight,
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               CommonAutoSizeText(
+  //                 '${AppLocalizations.t('Resolution')}: ${resolutionPreset.name}',
+  //                 style: const TextStyle(
+  //                   color: Colors.white,
+  //                   fontSize: 12.0,
+  //                   fontWeight: FontWeight.w400,
+  //                 ),
+  //               ),
+  //               CommonAutoSizeText(
+  //                 '${AppLocalizations.t('Size')}: ${previewSize.width.toStringAsFixed(0)}x${previewSize.height.toStringAsFixed(0)}',
+  //                 style: const TextStyle(
+  //                   color: Colors.white,
+  //                   fontSize: 12.0,
+  //                   fontWeight: FontWeight.w400,
+  //                 ),
+  //               ),
+  //             ],
+  //           ));
+  //     }
+  //     return previewText;
+  //   }
+  //
+  //   return Container();
+  // }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(flex: 90, child: _buildDeviceWidget()),
-        _buildCameraWidget(),
+    return Stack(
+      children: <Widget>[
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.black,
+            border: Border.all(
+              color: Colors.black,
+              width: 3.0,
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(1.0),
+            child: Center(
+              child: _buildPreviewWidget(),
+            ),
+          ),
+        ),
+        _buildCameraController(context),
       ],
     );
   }

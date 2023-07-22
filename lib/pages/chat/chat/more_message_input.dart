@@ -192,7 +192,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     if (platformParams.linux) {
       List<Uint8List>? bytes = await FileUtil.fullSelectBytes(
         context: context,
-        image: false,
+        file: true,
+        image: true,
         imageCamera: true,
         videoCamera: true,
       );
@@ -200,15 +201,15 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         data = bytes.first;
       }
     } else if (platformParams.macos) {
-      XFile? mediaFile;
-      await DialogUtil.show<XFile?>(
+      String? filename;
+      await DialogUtil.show<String?>(
           context: context,
           builder: (BuildContext context) {
-            return MacosCameraWidget(
-              onFile: (XFile file) {
-                mediaFile = file;
+            return Dialog(child: MacosCameraWidget(
+              onFile: (String name) {
+                filename = name;
               },
-            );
+            ));
           });
     } else {
       XFile? mediaFile;
