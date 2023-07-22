@@ -68,7 +68,10 @@ class AppBarWidget {
   static Widget buildTitleBar({
     Color? backgroundColor,
     Color? foregroundColor,
-    Widget? title = const Text(''),
+    Widget? title = const Text(
+      '',
+      style: TextStyle(color: Colors.white),
+    ),
     bool centerTitle = false, //标题是否居中
     List<Widget>? rightWidgets, //右边的排列组件（按钮）
     List<AppBarPopupMenu>? rightPopupMenus,

@@ -89,7 +89,9 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
   Future<List<CameraDescription>> _fetchCameras() async {
     if (cameras.isEmpty) {
       try {
-        cameras = await availableCameras();
+        if (!platformParams.macos) {
+          cameras = await availableCameras();
+        }
         if (cameras.isEmpty) {
           cameraIndex = -1;
           logger.i('No available cameras');

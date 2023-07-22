@@ -322,6 +322,7 @@ class DialogUtil {
           title: AppBarWidget.buildTitleBar(
               title: Text(
             AppLocalizations.t(title),
+            style: const TextStyle(color: Colors.white),
           )),
           titlePadding: EdgeInsets.zero,
           content: Row(children: [

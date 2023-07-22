@@ -11,6 +11,7 @@ import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/me/collection/collection_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/me/collection/collection_list_widget.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/macos_camera_widget.dart';
 import 'package:colla_chat/plugin/mobile_camera_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/group.dart';
@@ -84,7 +85,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   @override
   initState() {
     super.initState();
-    if (platformParams.ios || platformParams.android || platformParams.macos) {
+    if (platformParams.mobile) {
       var albumActionData = ActionData(
           label: 'Album',
           tooltip: 'Photo album',
@@ -184,36 +185,61 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   ///拍照
   _onActionPicture() async {
-    XFile? mediaFile;
-    await DialogUtil.show<XFile?>(
+    Uint8List? data;
+    String? filename;
+    String? mimeType = ChatMessageMimeType.jpg.name;
+    ChatMessageContentType contentType = ChatMessageContentType.image;
+    if (platformParams.linux) {
+      List<Uint8List>? bytes = await FileUtil.fullSelectBytes(
         context: context,
-        builder: (BuildContext context) {
-          return MobileCameraWidget(
-            onFile: (XFile file) {
-              mediaFile = file;
-            },
-          );
-        });
-    if (mediaFile != null) {
-      Uint8List data = await mediaFile!.readAsBytes();
-      // Uint8List? thumbnail =
-      //     await ImageUtil.compressThumbnail(xfile: mediaFile);
-      String filename = mediaFile!.name;
-      String? mimeType = mediaFile!.mimeType;
-      mimeType = FileUtil.mimeType(filename);
-      mimeType = mimeType ?? 'text/plain';
-      ChatMessageContentType contentType = ChatMessageContentType.image;
-      if (mimeType.endsWith('mp4')) {
-        contentType = ChatMessageContentType.video;
-        mimeType = ChatMessageMimeType.mp4.name;
+        image: false,
+        imageCamera: true,
+        videoCamera: true,
+      );
+      if (bytes != null && bytes.isNotEmpty) {
+        data = bytes.first;
       }
-      await chatMessageController.send(
-          title: filename,
-          content: data,
-          // thumbnail: thumbnail,
-          contentType: contentType,
-          mimeType: mimeType);
+    } else if (platformParams.macos) {
+      XFile? mediaFile;
+      await DialogUtil.show<XFile?>(
+          context: context,
+          builder: (BuildContext context) {
+            return MacosCameraWidget(
+              onFile: (XFile file) {
+                mediaFile = file;
+              },
+            );
+          });
+    } else {
+      XFile? mediaFile;
+      await DialogUtil.show<XFile?>(
+          context: context,
+          builder: (BuildContext context) {
+            return MobileCameraWidget(
+              onFile: (XFile file) {
+                mediaFile = file;
+              },
+            );
+          });
+      if (mediaFile != null) {
+        data = await mediaFile!.readAsBytes();
+        filename = mediaFile!.name;
+        mimeType = mediaFile!.mimeType;
+        mimeType = FileUtil.mimeType(filename);
+        mimeType = mimeType ?? 'text/plain';
+      }
     }
+
+    if (mimeType.endsWith('mp4')) {
+      contentType = ChatMessageContentType.video;
+      mimeType = ChatMessageMimeType.mp4.name;
+    }
+    await chatMessageController.send(
+        title: filename,
+        content: data,
+        // thumbnail: thumbnail,
+        contentType: contentType,
+        mimeType: mimeType);
   }
 
   ///位置
