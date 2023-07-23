@@ -90,15 +90,27 @@ class RecordAudioRecorderController extends AbstractAudioRecorderController {
         this.filename = await FileUtil.getTempFilename(extension: extension);
         await super.start();
         RecordConfig recordConfig = RecordConfig(
-            encoder: encoder,
-            bitRate: bitRate ?? this.bitRate,
-            sampleRate: sampleRate ?? this.sampleRate,
-            numChannels: numChannels ?? this.numChannels,
-            device: device);
+          encoder: encoder,
+          // bitRate: bitRate ?? this.bitRate,
+          // sampleRate: sampleRate ?? this.sampleRate,
+          // numChannels: numChannels ?? this.numChannels,
+          // device: device
+        );
         await _audioRecorder.start(
           recordConfig,
           path: this.filename!,
         );
+        // final stream = await _audioRecorder.startStream(recordConfig);
+        // stream.listen(
+        //   (data) async {
+        //     await FileUtil.writeFileAsBytes(data, this.filename!);
+        //     logger.i('record audio recorder filename:${this.filename}');
+        //   },
+        //   onDone: () async {
+        //     await super.stop();
+        //     status = RecorderStatus.stop;
+        //   },
+        // );
         status = RecorderStatus.recording;
       }
     } catch (e) {

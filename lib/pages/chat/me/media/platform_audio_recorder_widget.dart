@@ -61,7 +61,7 @@ class _PlatformAudioRecorderWidgetState
       if (recordAudioRecorderController.encoder == AudioEncoder.aacLc) {
         isSelected = const [true, false, false, false, false];
       }
-      if (recordAudioRecorderController.encoder == AudioEncoder.aacHe) {
+      if (recordAudioRecorderController.encoder == AudioEncoder.flac) {
         isSelected = const [false, true, false, false, false];
       }
       if (recordAudioRecorderController.encoder == AudioEncoder.pcm16bits) {
@@ -93,7 +93,7 @@ class _PlatformAudioRecorderWidgetState
             RecordAudioRecorderController recordAudioRecorderController =
                 widget.audioRecorderController as RecordAudioRecorderController;
             setState(() {
-              recordAudioRecorderController.encoder = AudioEncoder.aacHe;
+              recordAudioRecorderController.encoder = AudioEncoder.flac;
             });
           }
         } else if (newIndex == 2) {
@@ -128,7 +128,7 @@ class _PlatformAudioRecorderWidgetState
             child: const CommonAutoSizeText('aacLc')),
         Container(
             padding: const EdgeInsets.all(10.0),
-            child: const CommonAutoSizeText('aacHe')),
+            child: const CommonAutoSizeText('flac')),
         Container(
             padding: const EdgeInsets.all(10.0),
             child: const CommonAutoSizeText('pcm16bits')),

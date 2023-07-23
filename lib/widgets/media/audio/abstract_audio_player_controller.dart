@@ -1,3 +1,4 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
@@ -66,10 +67,11 @@ abstract class AbstractAudioPlayerController
   }) {
     var progressText = this.progressText;
     Widget stopBtn = IconButton(
-      icon: Icon(
+      tooltip: AppLocalizations.t('Stop'),
+      icon: const Icon(
         Icons.stop_rounded,
         size: 32,
-        color: myself.primary,
+        color: Colors.white,
       ),
       onPressed: () async {
         await stop();
@@ -82,10 +84,11 @@ abstract class AbstractAudioPlayerController
     if (mediaPlayerState.mediaPlayerStatus == MediaPlayerStatus.playing) {
       controls.add(
         IconButton(
-          icon: Icon(
+          tooltip: AppLocalizations.t('Pause'),
+          icon: const Icon(
             Icons.pause_rounded,
             size: 32,
-            color: myself.primary,
+            color: Colors.white,
           ),
           onPressed: () async {
             await pause();
@@ -104,10 +107,11 @@ abstract class AbstractAudioPlayerController
     } else {
       controls.add(
         IconButton(
-          icon: Icon(
+          tooltip: AppLocalizations.t('Play'),
+          icon: const Icon(
             Icons.play_arrow_rounded,
             size: 32,
-            color: myself.primary,
+            color: Colors.white,
           ),
           onPressed: () async {
             await play();

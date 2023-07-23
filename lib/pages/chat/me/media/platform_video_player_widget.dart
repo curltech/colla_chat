@@ -1,4 +1,5 @@
 import 'package:card_swiper/card_swiper.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -42,9 +43,16 @@ class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
+  ValueNotifier<int> index = ValueNotifier<int>(0);
+
   @override
   void initState() {
+    widget.swiperController.addListener(_update);
     super.initState();
+  }
+
+  _update() {
+    index.value = widget.swiperController.index;
   }
 
   List<Widget>? _buildRightWidgets() {
@@ -89,32 +97,49 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
               color: Colors.white,
             )),
         Tooltip(
-          message: 'Meedu',
-          child: Icon(
-          Icons.video_call_outlined,
-          color: Colors.white,
-        )),
+            message: 'Meedu',
+            child: Icon(
+              Icons.video_call_outlined,
+              color: Colors.white,
+            )),
         Tooltip(
-          message: 'MediaKit',
-          child:Icon(
-          Icons.media_bluetooth_on,
-          color: Colors.white,
-        )),
+            message: 'MediaKit',
+            child: Icon(
+              Icons.media_bluetooth_on,
+              color: Colors.white,
+            )),
         Tooltip(
-          message: 'Origin',
-          child:Icon(
-          Icons.video_camera_back_outlined,
-          color: Colors.white,
-        )),
+            message: 'Origin',
+            child: Icon(
+              Icons.video_camera_back_outlined,
+              color: Colors.white,
+            )),
       ],
     );
     List<Widget> children = [
-      IconButton(
-        onPressed: () {
-          widget.swiperController.next();
-        },
-        icon: const Icon(Icons.more_horiz_outlined),
-      ),
+      ValueListenableBuilder(
+          valueListenable: index,
+          builder: (BuildContext context, int index, Widget? child) {
+            if (index == 0) {
+              return IconButton(
+                tooltip: AppLocalizations.t('Video player'),
+                onPressed: () {
+                  widget.swiperController.move(1);
+                  this.index.value = 1;
+                },
+                icon: const Icon(Icons.video_call),
+              );
+            } else {
+              return IconButton(
+                tooltip: AppLocalizations.t('Playlist'),
+                onPressed: () {
+                  widget.swiperController.move(0);
+                  this.index.value = 0;
+                },
+                icon: const Icon(Icons.featured_play_list_outlined),
+              );
+            }
+          }),
       toggleWidget,
       const SizedBox(
         width: 5.0,
@@ -142,6 +167,7 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
 
   @override
   void dispose() {
+    widget.swiperController.removeListener(_update);
     widget.mediaPlayerController.close();
     super.dispose();
   }

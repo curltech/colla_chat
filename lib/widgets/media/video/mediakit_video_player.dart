@@ -7,7 +7,7 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_meedu_videoplayer/meedu_player.dart';
+import 'package:flutter_meedu_media_kit/meedu_player.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
 class MediaKitMediaSource {
@@ -45,6 +45,8 @@ class MediaKitMediaSource {
 class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
   late final Player player;
   late final VideoController videoController;
+  ValueNotifier<MeeduPlayerController?> meeduPlayerController =
+      ValueNotifier<MeeduPlayerController?>(null);
 
   double volume = 1.0;
   double speed = 1.0;
@@ -71,8 +73,8 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
     MediaKit.ensureInitialized();
     player = Player();
     videoController = VideoController(player);
-    player.streams.playlist.listen((e) {});
-    player.streams.playing.listen((e) {
+    player.stream.playlist.listen((e) {});
+    player.stream.playing.listen((e) {
       if (e) {
         mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.playing;
         playing.value = true;
@@ -81,26 +83,28 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
         playing.value = false;
       }
     });
-    player.streams.completed.listen((e) {
+    player.stream.completed.listen((e) {
       if (e) {
         mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.completed;
         playing.value = false;
       }
     });
-    player.streams.position.listen((e) {
+    player.stream.position.listen((e) {
       mediaPlayerState.position = e;
     });
-    player.streams.duration.listen((e) {
+    player.stream.duration.listen((e) {
       mediaPlayerState.duration = e;
     });
-    player.streams.volume.listen((e) {
+    player.stream.volume.listen((e) {
       volume = e;
     });
-    player.streams.rate.listen((e) {
+    player.stream.rate.listen((e) {
       speed = e;
     });
-    player.streams.pitch.listen((e) {});
-    player.streams.buffering.listen((e) {});
+    player.stream.pitch.listen((e) {});
+    player.stream.buffering.listen((e) {});
+
+    meeduPlayerController.value = MeeduPlayerController();
   }
 
   @override
@@ -133,6 +137,9 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
       player = Video(
         controller: videoController,
       );
+      // player = MeeduVideoPlayer(
+      //   controller: meeduPlayerController,
+      // );
 
       Widget playerControlPanel = ValueListenableBuilder(
           valueListenable: playing,

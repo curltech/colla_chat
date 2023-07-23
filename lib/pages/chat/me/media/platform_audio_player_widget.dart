@@ -38,10 +38,16 @@ class PlatformAudioPlayerWidget extends StatefulWidget with TileDataMixin {
 
 class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
   AudioPlayerType audioPlayerType = AudioPlayerType.audioplayers;
+  ValueNotifier<int> index = ValueNotifier<int>(0);
 
   @override
   void initState() {
+    widget.swiperController.addListener(_update);
     super.initState();
+  }
+
+  _update() {
+    index.value = widget.swiperController.index;
   }
 
   List<Widget>? _buildRightWidgets() {
@@ -106,12 +112,29 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
       ],
     );
     List<Widget> children = [
-      IconButton(
-        onPressed: () {
-          widget.swiperController.next();
-        },
-        icon: const Icon(Icons.more_horiz_outlined),
-      ),
+      ValueListenableBuilder(
+          valueListenable: index,
+          builder: (BuildContext context, int index, Widget? child) {
+            if (index == 0) {
+              return IconButton(
+                tooltip: AppLocalizations.t('Audio player'),
+                onPressed: () {
+                  widget.swiperController.move(1);
+                  this.index.value = 1;
+                },
+                icon: const Icon(Icons.audiotrack),
+              );
+            } else {
+              return IconButton(
+                tooltip: AppLocalizations.t('Playlist'),
+                onPressed: () {
+                  widget.swiperController.move(0);
+                  this.index.value = 0;
+                },
+                icon: const Icon(Icons.featured_play_list_outlined),
+              );
+            }
+          }),
       toggleWidget,
       const SizedBox(
         width: 5.0,
@@ -140,6 +163,7 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
 
   @override
   void dispose() {
+    widget.swiperController.removeListener(_update);
     widget.mediaPlayerController.close();
     super.dispose();
   }

@@ -28,10 +28,10 @@ class PlatformAudioRecorder extends StatefulWidget {
     if (audioRecorderController is RecordAudioRecorderController) {
       RecordAudioRecorderController recordAudioRecorderController =
           audioRecorderController as RecordAudioRecorderController;
-      if (recordAudioRecorderController.encoder == AudioEncoder.wav) {
-        if (platformParams.ios || platformParams.macos) {
+      if (recordAudioRecorderController.encoder == AudioEncoder.pcm16bits) {
+        if (platformParams.linux) {
           logger.e(
-              'Not support wav in ios and macos, please use another recorder');
+              'Not support pcm in ios and macos, please use another recorder');
         }
       }
     }
@@ -74,9 +74,9 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
       if (widget.audioRecorderController is RecordAudioRecorderController) {
         RecordAudioRecorderController recordAudioRecorderController =
             widget.audioRecorderController as RecordAudioRecorderController;
-        if (recordAudioRecorderController.encoder == AudioEncoder.wav) {
-          if (platformParams.ios || platformParams.macos) {
-            throw 'Not support wav in ios and macos, please use another recorder';
+        if (recordAudioRecorderController.encoder == AudioEncoder.pcm16bits) {
+          if (platformParams.linux) {
+            throw 'Not support pcm in ios and macos, please use another recorder';
           }
         }
       }
@@ -125,28 +125,32 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
     var controlText =
         AppLocalizations.t(widget.audioRecorderController.durationText);
     Icon playIcon;
+    String tooltip;
     if (widget.audioRecorderController.status == RecorderStatus.recording) {
-      playIcon = Icon(
+      playIcon = const Icon(
         Icons.pause,
         size: 32,
-        color: myself.primary,
+        color: Colors.white,
       );
+      tooltip = AppLocalizations.t('Pause');
     } else {
-      playIcon = Icon(
+      playIcon = const Icon(
         Icons.play_arrow,
         size: 32,
-        color: myself.primary,
+        color: Colors.white,
       );
+      tooltip = AppLocalizations.t('Play');
     }
     List<Widget> controls = [];
     if (widget.audioRecorderController.status == RecorderStatus.recording ||
         widget.audioRecorderController.status == RecorderStatus.pause) {
       controls.add(
         IconButton(
-          icon: Icon(
+          tooltip: AppLocalizations.t('Stop'),
+          icon: const Icon(
             Icons.stop,
             size: 32,
-            color: myself.primary,
+            color: Colors.white,
           ),
           onPressed: () async {
             await _stop();
@@ -161,6 +165,7 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
     }
     controls.add(
       IconButton(
+        tooltip: tooltip,
         icon: playIcon,
         onPressed: () async {
           await _action();
