@@ -22,7 +22,7 @@ class BlueFireAudioPlayer {
   AudioContext audioContext = const AudioContext();
 
   BlueFireAudioPlayer() {
-    _global.setGlobalAudioContext(audioContextConfig.build());
+    _global.setAudioContext(audioContextConfig.build());
   }
 
   setGlobalAudioContext({
@@ -31,7 +31,7 @@ class BlueFireAudioPlayer {
     bool? respectSilence,
     bool? stayAwake,
   }) async {
-    await _global.setGlobalAudioContext(_buildAudioContextConfig(
+    await _global.setAudioContext(_buildAudioContextConfig(
         forceSpeaker: forceSpeaker,
         duckAudio: duckAudio,
         respectSilence: respectSilence,

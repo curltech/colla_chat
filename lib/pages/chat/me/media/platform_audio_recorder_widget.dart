@@ -4,6 +4,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/abstract_audio_recorder_controller.dart';
+import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/waveforms_audio_recorder.dart';
@@ -202,10 +203,15 @@ class _PlatformAudioRecorderWidgetState
             _buildAudioFormats(),
             const Spacer(),
             PlatformAudioRecorder(
-              onStop: (String filename) {
+              onStop: (String filename) async {
                 if (mounted) {
-                  DialogUtil.info(context,
-                      content: 'record audio filename:$filename');
+                  bool? confirm = await DialogUtil.confirm(context,
+                      content:
+                          'Record audio filename:$filename, need you play?');
+                  if (confirm != null && confirm) {
+                    BlueFireAudioPlayer audioPlayer = BlueFireAudioPlayer();
+                    audioPlayer.play(filename);
+                  }
                 }
               },
               audioRecorderController: widget.audioRecorderController,
