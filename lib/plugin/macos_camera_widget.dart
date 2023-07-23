@@ -11,12 +11,11 @@ import 'package:colla_chat/plugin/camera_file_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 
 class MacosCameraWidget extends StatefulWidget {
@@ -70,23 +69,6 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
     _initVideoDevices();
     _initAudioDevices();
   }
-
-  String get cameraButtonText {
-    String label = AppLocalizations.t("Do something");
-    if (cameraMacOSMode.value == CameraMacOSMode.photo) {
-      label = AppLocalizations.t("Take Picture");
-    } else {
-      if (cameraController.value?.isRecording ?? false) {
-        label = AppLocalizations.t("Stop recording");
-      } else {
-        label = AppLocalizations.t("Record video");
-      }
-    }
-    return label;
-  }
-
-  Future<String> get videoFilePath async =>
-      p.join((await getApplicationDocumentsDirectory()).path, "output.mp4");
 
   Future<void> _initVideoDevices() async {
     try {
@@ -311,14 +293,14 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
     CameraMacOSController? cameraController = this.cameraController.value;
     if (cameraController != null) {
       try {
-        String urlPath = await videoFilePath;
+        String urlPath = await FileUtil.getTempFilename(
+            extension: ChatMessageMimeType.jpeg.name);
         await cameraController.recordVideo(
           maxVideoDuration: durationValue,
           url: urlPath,
           enableAudio: enableAudio.value,
           onVideoRecordingFinished:
               (CameraMacOSFile? result, CameraMacOSException? exception) {
-            setState(() {});
             if (exception != null) {
               DialogUtil.error(context, content: exception.toString());
             } else if (result != null) {

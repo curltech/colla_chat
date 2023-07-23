@@ -37,16 +37,17 @@ class LocationMessage extends StatelessWidget {
     var floor = locationPosition.floor; //精度
     var heading = locationPosition.heading; //
     var address = locationPosition.address; //
-    Widget headingWidget = IconButton(
-      icon: const Icon(Icons.location_on),
-      color: myself.primary,
-      onPressed: platformParams.mobile
-          ? () {
-              GeolocatorUtil.mapLauncher(
-                  latitude: latitude, longitude: longitude, title: address!);
-            }
-          : null,
-    );
+    Widget headingWidget = Icon(Icons.location_on, color: myself.primary);
+    if (platformParams.mobile) {
+      headingWidget = IconButton(
+        icon: headingWidget,
+        color: myself.primary,
+        onPressed: () {
+          GeolocatorUtil.mapLauncher(
+              latitude: latitude, longitude: longitude, title: address!);
+        },
+      );
+    }
     if (thumbnail != null) {
       headingWidget = ImageUtil.buildImageWidget(image: thumbnail);
     }

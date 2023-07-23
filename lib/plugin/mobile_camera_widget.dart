@@ -10,6 +10,8 @@ import 'package:colla_chat/plugin/camera_file_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -261,6 +263,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
+            _buildCameraToggleWidget(),
             IconButton(
               icon: const Icon(Icons.flash_on),
               color: primary,
@@ -365,15 +368,11 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
   Widget _buildExposureModeWidget() {
     var primary = myself.primary;
     final ButtonStyle styleAuto = TextButton.styleFrom(
-      // TODO(darrenaustin): Migrate to new API once it lands in stable: https://github.com/flutter/flutter/issues/105724
-      // ignore: deprecated_member_use
       primary: cameraController?.value.exposureMode == ExposureMode.auto
           ? Colors.orange
           : primary,
     );
     final ButtonStyle styleLocked = TextButton.styleFrom(
-      // TODO(darrenaustin): Migrate to new API once it lands in stable: https://github.com/flutter/flutter/issues/105724
-      // ignore: deprecated_member_use
       primary: cameraController?.value.exposureMode == ExposureMode.locked
           ? Colors.orange
           : primary,
@@ -455,15 +454,11 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
   Widget _buildFocusModeWidget() {
     var primary = myself.primary;
     final ButtonStyle styleAuto = TextButton.styleFrom(
-      // TODO(darrenaustin): Migrate to new API once it lands in stable: https://github.com/flutter/flutter/issues/105724
-      // ignore: deprecated_member_use
       primary: cameraController?.value.focusMode == FocusMode.auto
           ? Colors.orange
           : primary,
     );
     final ButtonStyle styleLocked = TextButton.styleFrom(
-      // TODO(darrenaustin): Migrate to new API once it lands in stable: https://github.com/flutter/flutter/issues/105724
-      // ignore: deprecated_member_use
       primary: cameraController?.value.focusMode == FocusMode.locked
           ? Colors.orange
           : primary,
@@ -535,7 +530,6 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
           },
           tooltip: AppLocalizations.t('Toggle Picture Video'),
         ),
-        _buildCameraToggleWidget(),
         CircleTextButton(
           onPressed:
               cameraController != null && cameraController.value.isInitialized
@@ -653,7 +647,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
             AsyncSnapshot<List<CameraDescription>> snapshot) {
           if (snapshot.hasData) {
             var cameras = snapshot.data;
-            if (cameras != null && cameras.length > 1) {
+            if (cameras != null) {
               var iconButton = IconButton(
                 icon: const Icon(Icons.cameraswitch),
                 color: myself.primary,
@@ -673,10 +667,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
   }
 
   void _showInSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: CommonAutoSizeText(AppLocalizations.t(message)),
-      duration: const Duration(seconds: 5),
-    ));
+    DialogUtil.info(context, content: message);
   }
 
   ///对焦和曝光手势的处理
@@ -698,11 +689,6 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
   _disposeController() async {
     final CameraController? oldController = cameraController;
     if (oldController != null) {
-      // `controller` needs to be set to null before getting disposed,
-      // to avoid a race condition when we use the controller that is being
-      // disposed. This happens when camera permission dialog shows up,
-      // which triggers `didChangeAppLifecycleState`, which disposes and
-      // re-creates the controller.
       cameraController = null;
       await oldController.dispose();
     }
@@ -907,6 +893,12 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
 
     try {
       XFile xfile = await cameraController.stopVideoRecording();
+      var data = await xfile.readAsBytes();
+      xfile = XFile.fromData(data,
+          mimeType: ChatMessageMimeType.jpeg.name,
+          path: xfile.path,
+          length: data.length,
+          name: FileUtil.filename(xfile.path));
       mediaFileController.add(xfile);
       if (mounted) {
         setState(() {});
@@ -1102,7 +1094,13 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
     }
 
     try {
-      final XFile xfile = await cameraController.takePicture();
+      XFile xfile = await cameraController.takePicture();
+      var data = await xfile.readAsBytes();
+      xfile = XFile.fromData(data,
+          mimeType: ChatMessageMimeType.jpeg.name,
+          path: xfile.path,
+          length: data.length,
+          name: FileUtil.filename(xfile.path));
       mediaFileController.add(xfile);
       if (mounted) {
         setState(() {

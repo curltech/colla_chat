@@ -1,29 +1,11 @@
-import 'dart:io';
-
-import 'package:camera_macos/camera_macos_controller.dart';
-import 'package:camera_macos/camera_macos_device.dart';
-import 'package:camera_macos/camera_macos_file.dart';
-import 'package:camera_macos/camera_macos_platform_interface.dart';
-import 'package:camera_macos/camera_macos_view.dart';
-import 'package:camera_macos/exceptions.dart';
-import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
-import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:cross_file/cross_file.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
-import 'package:video_player/video_player.dart';
 
 class CameraFileWidget extends StatefulWidget {
   final DataListController<XFile> mediaFileController;
@@ -113,11 +95,19 @@ class CameraFileWidgetState extends State<CameraFileWidget> {
     }
     if (chips.isNotEmpty) {
       return Align(
-          alignment: Alignment.centerRight,
-          child: Wrap(
-            runSpacing: 5.0,
+        alignment: Alignment.centerRight,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Flex(
+            direction: Axis.horizontal,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            textDirection: TextDirection.ltr,
+            verticalDirection: VerticalDirection.down,
+            clipBehavior: Clip.none,
             children: chips,
-          ));
+          ),
+        ),
+      );
     } else {
       return Container();
     }

@@ -158,8 +158,8 @@ dependencies:
   wechat_assets_picker: ^8.4.0 #移动平台，选择图像，视频等媒体并展示
   flutter_slidable: ^3.0.0 #滑动的按钮
   #下面是各种轮播图组件
-  carousel_slider: ^4.2.1 #不错的类似swiper的组件
-  flutter_carousel_widget: ^2.0.4 #类似carousel_slider
+  carousel_slider: ^4.2.1 #不错的类似swiper的组件 CarouselSlider
+  flutter_carousel_widget: ^2.0.4 #类似carousel_slider，支持单页多item
   card_swiper: ^3.0.1 #不错的swiper的组件
   flutter_card_swiper: ^6.0.0 #不错的swiper的组件
   another_transformer_page_view: ^2.0.1
