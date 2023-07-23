@@ -74,13 +74,20 @@ class LocationMessage extends StatelessWidget {
           ]),
         ),
       );
+
+      return CommonMessage(child: child);
     } else {
       child = GeolocatorUtil.buildLocationPicker(
         latitude: latitude,
         longitude: longitude,
         onPicked: (PickedData data) {},
       );
+
+      return Card(
+          elevation: 0,
+          margin: EdgeInsets.zero,
+          shape: const ContinuousRectangleBorder(),
+          child: child);
     }
-    return CommonMessage(child: child);
   }
 }

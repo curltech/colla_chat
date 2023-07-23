@@ -16,7 +16,7 @@ class VideoMessage extends StatefulWidget {
   final bool isMyself;
   final bool fullScreen;
 
-  VideoMessage({
+  const VideoMessage({
     Key? key,
     required this.id,
     required this.messageId,
