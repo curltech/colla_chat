@@ -4,6 +4,7 @@ import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/message/common_message.dart';
 import 'package:colla_chat/pages/chat/linkman/conference/conference_show_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -61,6 +62,12 @@ class VideoChatMessage extends StatelessWidget {
     Widget actionWidget;
     if (fullScreen) {
       actionWidget = ConferenceShowWidget(conference: conference);
+
+      return Card(
+          elevation: 0,
+          margin: EdgeInsets.zero,
+          shape: const ContinuousRectangleBorder(),
+          child: actionWidget);
     } else {
       String subtitle = conference.name;
       if (conference.topic != null) {
@@ -81,8 +88,14 @@ class VideoChatMessage extends StatelessWidget {
                 conference.video ? Icons.video_call : Icons.multitrack_audio,
                 color: primary,
               )));
-      actionWidget = DataListTile(tileData: tileData);
+      actionWidget = DataListTile(
+          contentPadding: EdgeInsets.zero,
+          horizontalTitleGap: 0.0,
+          minVerticalPadding: 0.0,
+          minLeadingWidth: 0.0,
+          tileData: tileData);
+
+      return CommonMessage(child: actionWidget);
     }
-    return Card(elevation: 0, child: actionWidget);
   }
 }
