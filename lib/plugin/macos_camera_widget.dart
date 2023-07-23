@@ -469,4 +469,14 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
       ],
     );
   }
+
+  @override
+  void dispose() {
+    var cameraController = this.cameraController.value;
+    if (cameraController != null) {
+      this.cameraController.value = null;
+      cameraController.destroy();
+    }
+    super.dispose();
+  }
 }
