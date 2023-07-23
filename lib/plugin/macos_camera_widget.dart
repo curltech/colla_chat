@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:camera_macos/camera_macos_controller.dart';
 import 'package:camera_macos/camera_macos_device.dart';
 import 'package:camera_macos/camera_macos_file.dart';
@@ -9,10 +7,10 @@ import 'package:camera_macos/exceptions.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/camera_file_widget.dart';
+import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/foundation.dart';
@@ -39,9 +37,8 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
       ValueNotifier<CameraMacOSMode>(CameraMacOSMode.photo);
   late TextEditingController durationController;
   late double durationValue;
-  Uint8List? lastImagePreviewData;
-  Uint8List? lastRecordedVideoData;
-  XFile? mediaFile;
+  DataListController<XFile> mediaFileController = DataListController<XFile>();
+
   VideoPlayerController? videoController;
   VoidCallback? videoPlayerListener;
   ValueNotifier<List<CameraMacOSDevice>> videoDevices =
@@ -124,10 +121,16 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
         builder: (BuildContext context, List<CameraMacOSDevice> videoDevices,
             Widget? child) {
           if (videoDevices.isNotEmpty) {
+            String? audioDeviceId;
+            if (audioDevices.isNotEmpty &&
+                selectedAudioIndex >= 0 &&
+                selectedAudioIndex < audioDevices.length) {
+              audioDeviceId = audioDevices[selectedAudioIndex].deviceId;
+            }
             return CameraMacOSView(
               key: cameraKey,
               deviceId: videoDevices[selectedVideoIndex].deviceId,
-              audioDeviceId: audioDevices[selectedAudioIndex].deviceId,
+              audioDeviceId: audioDeviceId,
               fit: BoxFit.fill,
               cameraMode: cameraMacOSMode.value,
               onCameraInizialized: (CameraMacOSController controller) {
@@ -145,25 +148,9 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
         });
   }
 
-  _buildLastImagePreviewData() {
-    return lastImagePreviewData != null
-        ? Container(
-            decoration: ShapeDecoration(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-                side: const BorderSide(
-                  color: Colors.lightBlue,
-                  width: 10,
-                ),
-              ),
-            ),
-            child: Image.memory(
-              lastImagePreviewData!,
-              height: 50,
-              width: 90,
-            ),
-          )
-        : Container();
+  /// 图片显示区
+  Widget _buildMediaPreviewData(BuildContext context) {
+    return CameraFileWidget(mediaFileController: mediaFileController);
   }
 
   void _toggleAudioMode() {
@@ -183,7 +170,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
   }
 
   /// 镜头切换按钮
-  Widget _buildCameraToggleWidget() {
+  Widget? _buildCameraToggleWidget() {
     var videoDevices = this.videoDevices.value;
     if (videoDevices.length > 1) {
       var cameraController = this.cameraController.value;
@@ -197,75 +184,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
 
       return toggleWidget;
     }
-    return Container();
-  }
-
-  Future<void> _startVideoPlayer() async {
-    if (platformParams.desktop) {
-      return;
-    }
-    if (mediaFile == null) {
-      return;
-    }
-
-    final VideoPlayerController vController =
-        VideoPlayerController.file(File(mediaFile!.path));
-
-    videoPlayerListener = () {
-      if (videoController != null) {
-        // Refreshing the state to update video player with the correct ratio.
-        if (mounted) {
-          setState(() {});
-        }
-        videoController!.removeListener(videoPlayerListener!);
-      }
-    };
-    vController.addListener(videoPlayerListener!);
-    await vController.setLooping(true);
-    await vController.initialize();
-    await videoController?.dispose();
-    if (mounted) {
-      setState(() {
-        videoController = vController;
-      });
-    }
-    await vController.play();
-  }
-
-  /// 显示捕获图片和录像的缩略图
-  Widget _buildThumbnailWidget() {
-    final VideoPlayerController? videoController = this.videoController;
-
-    return Expanded(
-      child: Align(
-        alignment: Alignment.centerRight,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            if (videoController == null && mediaFile == null)
-              Container()
-            else
-              SizedBox(
-                width: 64.0,
-                height: 64.0,
-                child: (videoController == null)
-                    ? Image.file(File(mediaFile!.path))
-                    : Container(
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Colors.pink)),
-                        child: Center(
-                          child: AspectRatio(
-                              aspectRatio: videoController.value.size != null
-                                  ? videoController.value.aspectRatio
-                                  : 1.0,
-                              child: VideoPlayer(videoController)),
-                        ),
-                      ),
-              ),
-          ],
-        ),
-      ),
-    );
+    return null;
   }
 
   /// 相机的所有控制按钮
@@ -285,8 +204,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
                 child: Row(
                   children: <Widget>[
                     _buildBackButton(),
-                    _buildCameraToggleWidget(),
-                    _buildThumbnailWidget(),
+                    Expanded(child: _buildMediaPreviewData(context)),
                   ],
                 ),
               )
@@ -298,56 +216,61 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
   /// 拍照和录像按钮
   Widget _buildCaptureModeWidget() {
     var primary = myself.primary;
+    List<Widget> children = [
+      ValueListenableBuilder(
+          valueListenable: enableAudio,
+          builder: (BuildContext context, bool enableAudio, Widget? child) {
+            return IconButton(
+              icon: Icon(enableAudio ? Icons.volume_up : Icons.volume_mute),
+              color: primary,
+              onPressed: _toggleAudioMode,
+              tooltip: AppLocalizations.t('Toggle AudioMode'),
+            );
+          }),
+      ValueListenableBuilder(
+          valueListenable: cameraController,
+          builder: (BuildContext context,
+              CameraMacOSController? cameraController, Widget? child) {
+            return ValueListenableBuilder(
+                valueListenable: cameraMacOSMode,
+                builder: (BuildContext context, CameraMacOSMode cameraMacOSMode,
+                    Widget? child) {
+                  return CircleTextButton(
+                    onPressed: _captureMedia,
+                    elevation: 2.0,
+                    backgroundColor: primary,
+                    padding: const EdgeInsets.all(15.0),
+                    child: _getCaptureIcon(),
+                  );
+                });
+          }),
+      ValueListenableBuilder(
+          valueListenable: cameraMacOSMode,
+          builder: (BuildContext context, CameraMacOSMode cameraMacOSMode,
+              Widget? child) {
+            return IconButton(
+              icon: Icon(cameraMacOSMode == CameraMacOSMode.photo
+                  ? Icons.camera_alt
+                  : Icons.videocam),
+              color: primary,
+              onPressed: () {
+                if (cameraMacOSMode == CameraMacOSMode.photo) {
+                  this.cameraMacOSMode.value = CameraMacOSMode.video;
+                } else if (cameraMacOSMode == CameraMacOSMode.video) {
+                  this.cameraMacOSMode.value = CameraMacOSMode.photo;
+                }
+              },
+              tooltip: AppLocalizations.t('Toggle Picture Video'),
+            );
+          }),
+    ];
+    Widget? cameraToggle = _buildCameraToggleWidget();
+    if (cameraToggle != null) {
+      children.add(cameraToggle);
+    }
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: <Widget>[
-        ValueListenableBuilder(
-            valueListenable: enableAudio,
-            builder: (BuildContext context, bool enableAudio, Widget? child) {
-              return IconButton(
-                icon: Icon(enableAudio ? Icons.volume_up : Icons.volume_mute),
-                color: primary,
-                onPressed: _toggleAudioMode,
-                tooltip: AppLocalizations.t('Toggle AudioMode'),
-              );
-            }),
-        ValueListenableBuilder(
-            valueListenable: cameraController,
-            builder: (BuildContext context,
-                CameraMacOSController? cameraController, Widget? child) {
-              return ValueListenableBuilder(
-                  valueListenable: cameraMacOSMode,
-                  builder: (BuildContext context,
-                      CameraMacOSMode cameraMacOSMode, Widget? child) {
-                    return CircleTextButton(
-                      onPressed: _captureMedia,
-                      elevation: 2.0,
-                      backgroundColor: primary,
-                      padding: const EdgeInsets.all(15.0),
-                      child: _getCaptureIcon(),
-                    );
-                  });
-            }),
-        ValueListenableBuilder(
-            valueListenable: cameraMacOSMode,
-            builder: (BuildContext context, CameraMacOSMode cameraMacOSMode,
-                Widget? child) {
-              return IconButton(
-                icon: Icon(cameraMacOSMode == CameraMacOSMode.photo
-                    ? Icons.camera_alt
-                    : Icons.videocam),
-                color: primary,
-                onPressed: () {
-                  if (cameraMacOSMode == CameraMacOSMode.photo) {
-                    this.cameraMacOSMode.value = CameraMacOSMode.video;
-                  } else if (cameraMacOSMode == CameraMacOSMode.video) {
-                    this.cameraMacOSMode.value = CameraMacOSMode.photo;
-                  }
-                },
-                tooltip: AppLocalizations.t('Toggle Picture Video'),
-              );
-            }),
-      ],
+      children: children,
     );
   }
 
@@ -417,8 +340,9 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
       if (cameraController.isRecording) {
         CameraMacOSFile? videoData = await cameraController.stopRecording();
         if (videoData != null) {
-          lastRecordedVideoData = videoData.bytes;
-          lastImagePreviewData = null;
+          XFile xfile = XFile.fromData(videoData.bytes!,
+              mimeType: ChatMessageMimeType.mp4.name);
+          mediaFileController.add(xfile);
           if (mounted) {
             DialogUtil.info(context,
                 content: AppLocalizations.t('Video saved at ') +
@@ -450,8 +374,9 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
     if (cameraController != null) {
       CameraMacOSFile? imageData = await cameraController.takePicture();
       if (imageData != null) {
-        lastImagePreviewData = imageData.bytes;
-        lastRecordedVideoData = null;
+        XFile xfile = XFile.fromData(imageData.bytes!,
+            mimeType: ChatMessageMimeType.jpeg.name);
+        mediaFileController.add(xfile);
         if (mounted) {
           DialogUtil.info(context,
               content: AppLocalizations.t('Picture saved at ') +
@@ -462,44 +387,39 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
   }
 
   Widget _buildBackButton() {
-    var iconButton = IconButton(
-      icon: const Icon(Icons.arrow_back_ios_new, size: 32),
-      color: myself.primary,
-      onPressed: () async {
-        await _back();
-      },
-    );
+    var iconButton = ButtonBar(alignment: MainAxisAlignment.start, children: [
+      IconButton(
+        icon: const Icon(Icons.arrow_back_ios_new, size: 32),
+        color: myself.primary,
+        onPressed: () async {
+          await _back();
+        },
+      ),
+      IconButton(
+        icon: const Icon(Icons.cancel, size: 32),
+        color: myself.primary,
+        onPressed: () async {
+          if (mounted) {
+            Navigator.pop(context);
+          }
+        },
+      )
+    ]);
 
     return iconButton;
   }
 
   _back() async {
+    XFile? current = mediaFileController.current;
     if (widget.onData != null) {
-      if (lastImagePreviewData != null) {
-        widget.onData!(lastImagePreviewData!, ChatMessageMimeType.jpg.name);
-      }
-      if (lastRecordedVideoData != null) {
-        widget.onData!(lastRecordedVideoData!, ChatMessageMimeType.mp4.name);
+      if (current != null) {
+        var data = await current.readAsBytes();
+        widget.onData!(data, current.mimeType!);
       }
     }
     if (widget.onFile != null) {
-      if (lastImagePreviewData != null) {
-        String? filename = await FileUtil.writeTempFileAsBytes(
-            lastImagePreviewData!,
-            extension: ChatMessageMimeType.jpg.name);
-         mediaFile = XFile(filename!,
-            mimeType: ChatMessageMimeType.jpg.name,
-            length: lastImagePreviewData!.length);
-        widget.onFile!(mediaFile!);
-      }
-      if (lastRecordedVideoData != null) {
-        String? filename = await FileUtil.writeTempFileAsBytes(
-            lastRecordedVideoData!,
-            extension: ChatMessageMimeType.mp4.name);
-        mediaFile = XFile(filename!,
-            mimeType: ChatMessageMimeType.mp4.name,
-            length: lastRecordedVideoData!.length);
-        widget.onFile!(mediaFile!);
+      if (current != null) {
+        widget.onFile!(current);
       }
     }
     if (mounted) {

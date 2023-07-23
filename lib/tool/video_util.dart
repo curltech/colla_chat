@@ -71,7 +71,8 @@ class VideoUtil {
 
   ///支持ANDROID，IOS，MACOS，WINDOWS
   static Future<Uint8List?> videoThumbnailData({
-    required String videoFile,
+    String? videoFile,
+    List<int>? data,
     int width = 1024,
     int height = 768,
     bool keepAspectRatio = true,
@@ -81,30 +82,38 @@ class VideoUtil {
     String thumbnailPath = await FileUtil.getTempFilename();
     await videoThumbnailFile(
         videoFile: videoFile,
+        data: data,
         thumbnailPath: thumbnailPath,
         width: width,
         height: height,
         keepAspectRatio: keepAspectRatio,
         format: format,
         quality: quality);
-    Uint8List? data = await FileUtil.readFileAsBytes(thumbnailPath);
+    Uint8List? bytes = await FileUtil.readFileAsBytes(thumbnailPath);
 
-    return data;
+    return bytes;
   }
 
   ///支持ANDROID，IOS，MACOS，WINDOWS
   static Future<void> videoThumbnailFile({
-    required String videoFile,
     required String thumbnailPath,
+    String? videoFile,
+    List<int>? data,
     int width = 1024,
     int height = 768,
     bool keepAspectRatio = true,
     String? format,
     int quality = 10,
   }) async {
+    if (videoFile == null && data == null) {
+      throw 'videoFile and data can not be empty in same time';
+    }
+    if (videoFile == null && data != null) {
+      videoFile = await FileUtil.writeTempFileAsBytes(data);
+    }
     final plugin = FcNativeVideoThumbnail();
     await plugin.getVideoThumbnail(
-        srcFile: videoFile,
+        srcFile: videoFile!,
         destFile: thumbnailPath,
         width: width,
         height: height,
@@ -136,9 +145,10 @@ class VideoUtil {
     return mediaInfo;
   }
 
-  ///ANDROID,IOS,MACOS
+  ///ANDROID,IOS,MACOS,WINDOWS
   static Future<Uint8List?> getByteThumbnail({
-    required String videoFile,
+    String? videoFile,
+    List<int>? data,
     int quality = 10,
     int position = -1,
   }) async {
@@ -149,7 +159,13 @@ class VideoUtil {
       return thumbnail;
     }
     if (platformParams.mobile || platformParams.macos) {
-      final thumbnail = await VideoCompress.getByteThumbnail(videoFile,
+      if (videoFile == null && data == null) {
+        throw 'videoFile and data can not be empty in same time';
+      }
+      if (videoFile == null && data != null) {
+        videoFile = await FileUtil.writeTempFileAsBytes(data);
+      }
+      final thumbnail = await VideoCompress.getByteThumbnail(videoFile!,
           quality: quality, // default(100)
           position: position // default(-1)
           );
@@ -158,18 +174,34 @@ class VideoUtil {
     }
   }
 
-  ///ANDROID,IOS,MACOS
-  static Future<File> getFileThumbnail({
-    required String videoFile,
+  ///ANDROID,IOS,MACOS,WINDOWS
+  static Future<File?> getFileThumbnail({
+    String? videoFile,
+    List<int>? data,
     int quality = 10,
     int position = -1,
   }) async {
-    final thumbnailFile = await VideoCompress.getFileThumbnail(videoFile,
-        quality: quality, // default(100)
-        position: position // default(-1)
-        );
+    if (platformParams.windows) {
+      String thumbnailPath = await FileUtil.getTempFilename();
+      await videoThumbnailFile(
+          thumbnailPath: thumbnailPath, videoFile: videoFile, quality: quality);
 
-    return thumbnailFile;
+      return File(thumbnailPath);
+    }
+    if (platformParams.mobile || platformParams.macos) {
+      if (videoFile == null && data == null) {
+        throw 'videoFile and data can not be empty in same time';
+      }
+      if (videoFile == null && data != null) {
+        videoFile = await FileUtil.writeTempFileAsBytes(data);
+      }
+      final thumbnailFile = await VideoCompress.getFileThumbnail(videoFile!,
+          quality: quality, // default(100)
+          position: position // default(-1)
+          );
+
+      return thumbnailFile;
+    }
   }
 
   ///ANDROID,IOS,MACOS

@@ -6,7 +6,9 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/camera_file_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/foundation.dart';
@@ -33,9 +35,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
   int cameraIndex = -1;
   bool isPicture = true;
   CameraController? cameraController;
-  Uint8List? lastImagePreviewData;
-  Uint8List? lastRecordedVideoData;
-  XFile? mediaFile;
+  DataListController<XFile> mediaFileController = DataListController<XFile>();
   VideoPlayerController? videoController;
   VoidCallback? videoPlayerListener;
   bool enableAudio = true;
@@ -156,8 +156,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
                 child: Row(
                   children: <Widget>[
                     _buildBackButton(),
-                    _buildCameraToggleWidget(),
-                    _buildThumbnailWidget(),
+                    Expanded(child: _buildMediaPreviewData(context)),
                   ],
                 ),
               )
@@ -249,40 +248,9 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
     await cameraController!.setZoomLevel(_currentScale);
   }
 
-  /// 显示捕获图片和录像的缩略图
-  Widget _buildThumbnailWidget() {
-    final VideoPlayerController? videoController = this.videoController;
-
-    return Expanded(
-      child: Align(
-        alignment: Alignment.centerRight,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            if (videoController == null && mediaFile == null)
-              Container()
-            else
-              SizedBox(
-                width: 64.0,
-                height: 64.0,
-                child: (videoController == null)
-                    ? Image.file(File(mediaFile!.path))
-                    : Container(
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Colors.pink)),
-                        child: Center(
-                          child: AspectRatio(
-                              aspectRatio: videoController.value.size != null
-                                  ? videoController.value.aspectRatio
-                                  : 1.0,
-                              child: VideoPlayer(videoController)),
-                        ),
-                      ),
-              ),
-          ],
-        ),
-      ),
-    );
+  /// 图片显示区
+  Widget _buildMediaPreviewData(BuildContext context) {
+    return CameraFileWidget(mediaFileController: mediaFileController);
   }
 
   /// 闪光，曝光，旋转开关的工具按钮，只有移动设备才会显示
@@ -567,6 +535,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
           },
           tooltip: AppLocalizations.t('Toggle Picture Video'),
         ),
+        _buildCameraToggleWidget(),
         CircleTextButton(
           onPressed:
               cameraController != null && cameraController.value.isInitialized
@@ -654,13 +623,24 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
   }
 
   Widget _buildBackButton() {
-    var iconButton = IconButton(
-      icon: const Icon(Icons.arrow_back, size: 32),
-      color: myself.primary,
-      onPressed: () {
-        _back();
-      },
-    );
+    var iconButton = ButtonBar(alignment: MainAxisAlignment.start, children: [
+      IconButton(
+        icon: const Icon(Icons.arrow_back_ios_new, size: 32),
+        color: myself.primary,
+        onPressed: () async {
+          await _back();
+        },
+      ),
+      IconButton(
+        icon: const Icon(Icons.cancel, size: 32),
+        color: myself.primary,
+        onPressed: () async {
+          if (mounted) {
+            Navigator.pop(context);
+          }
+        },
+      )
+    ]);
 
     return iconButton;
   }
@@ -926,15 +906,15 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
     }
 
     try {
-      XFile file = await cameraController.stopVideoRecording();
+      XFile xfile = await cameraController.stopVideoRecording();
+      mediaFileController.add(xfile);
       if (mounted) {
         setState(() {});
       }
-      _showInSnackBar('Video recorded to ${file.path}');
-      mediaFile = file;
+      _showInSnackBar('Video recorded to ${xfile.path}');
       _startVideoPlayer();
 
-      return file;
+      return xfile;
     } on CameraException catch (e) {
       _showCameraException(e);
       return null;
@@ -1066,13 +1046,9 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
     if (platformParams.desktop) {
       return;
     }
-    if (mediaFile == null) {
-      return;
-    }
-
-    final VideoPlayerController vController = kIsWeb
-        ? VideoPlayerController.network(mediaFile!.path)
-        : VideoPlayerController.file(File(mediaFile!.path));
+    XFile? current = mediaFileController.current;
+    final VideoPlayerController vController =
+        VideoPlayerController.file(File(current!.path));
 
     videoPlayerListener = () {
       if (videoController != null) {
@@ -1126,16 +1102,16 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
     }
 
     try {
-      final XFile file = await cameraController.takePicture();
+      final XFile xfile = await cameraController.takePicture();
+      mediaFileController.add(xfile);
       if (mounted) {
         setState(() {
-          mediaFile = file;
           videoController?.dispose();
           videoController = null;
         });
-        _showInSnackBar('Picture saved to ${file.path}');
+        _showInSnackBar('Picture saved to ${xfile.path}');
       }
-      return file;
+      return xfile;
     } on CameraException catch (e) {
       _showCameraException(e);
       return null;
@@ -1143,20 +1119,16 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
   }
 
   _back() async {
+    XFile? current = mediaFileController.current;
     if (widget.onData != null) {
-      if (lastImagePreviewData != null) {
-        widget.onData!(lastImagePreviewData!, ChatMessageMimeType.jpg.name);
-      }
-      if (lastRecordedVideoData != null) {
-        widget.onData!(lastRecordedVideoData!, ChatMessageMimeType.mp4.name);
+      if (current != null) {
+        var data = await current.readAsBytes();
+        widget.onData!(data, current.mimeType!);
       }
     }
     if (widget.onFile != null) {
-      if (lastImagePreviewData != null) {
-        widget.onFile!(mediaFile!);
-      }
-      if (lastRecordedVideoData != null) {
-        widget.onFile!(mediaFile!);
+      if (current != null) {
+        widget.onFile!(current);
       }
     }
     if (mounted) {

@@ -187,7 +187,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   _onActionPicture() async {
     Uint8List? data;
     String? filename;
-    String mimeType = ChatMessageMimeType.jpg.name;
+    String? mimeType = ChatMessageMimeType.jpg.name;
     ChatMessageContentType contentType = ChatMessageContentType.image;
     if (platformParams.linux) {
       List<Uint8List>? bytes = await FileUtil.fullSelectBytes(
@@ -204,7 +204,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       await DialogUtil.show<String?>(
           context: context,
           builder: (BuildContext context) {
-            return Dialog(child: MacosCameraWidget(
+            return Center(child: MacosCameraWidget(
               onData: (Uint8List bytes, String type) {
                 data = bytes;
                 mimeType = type;
@@ -216,31 +216,31 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       await DialogUtil.show<XFile?>(
           context: context,
           builder: (BuildContext context) {
-            return MobileCameraWidget(
+            return Center(child: MobileCameraWidget(
               onFile: (XFile file) {
                 mediaFile = file;
               },
-            );
+            ));
           });
       if (mediaFile != null) {
         data = await mediaFile!.readAsBytes();
         filename = mediaFile!.name;
-        mimeType = mediaFile!.mimeType!;
-        mimeType = FileUtil.mimeType(filename)!;
-        mimeType = mimeType ?? 'text/plain';
+        mimeType = FileUtil.mimeType(filename);
       }
     }
 
-    if (mimeType.endsWith('mp4')) {
+    if (mimeType != null && mimeType!.endsWith('mp4')) {
       contentType = ChatMessageContentType.video;
       mimeType = ChatMessageMimeType.mp4.name;
     }
-    await chatMessageController.send(
-        title: filename,
-        content: data,
-        // thumbnail: thumbnail,
-        contentType: contentType,
-        mimeType: mimeType);
+    if (data != null) {
+      await chatMessageController.send(
+          title: filename,
+          content: data,
+          // thumbnail: thumbnail,
+          contentType: contentType,
+          mimeType: mimeType);
+    }
   }
 
   ///位置
