@@ -267,7 +267,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
       String? title,
       String? contentType,
       String? content}) {
-    String subtitle = '';
+    String? subtitle;
     if (subMessageType == ChatMessageSubType.chat.name) {
       if (contentType == null ||
           contentType == ChatMessageContentType.text.name) {
@@ -275,13 +275,14 @@ class _ChatListWidgetState extends State<ChatListWidget>
           subtitle = chatMessageService.recoverContent(content);
         }
       }
-      if (contentType == ChatMessageContentType.location.name) {
+      if (contentType == ChatMessageContentType.location.name &&
+          subtitle != null) {
         Map<String, dynamic> map = JsonUtil.toJson(subtitle);
         String? address = map['address'];
         address = address ?? '';
         subtitle = address;
       }
-      if (subtitle.isEmpty) {
+      if (subtitle == null) {
         if (title != null && title.isNotEmpty) {
           subtitle = title;
         }
@@ -289,7 +290,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
     } else {
       subtitle = AppLocalizations.t(subMessageType);
     }
-    return subtitle;
+    return subtitle ?? '';
   }
 
   Widget _buildBadge(int unreadNumber, {Widget? avatarImage}) {
