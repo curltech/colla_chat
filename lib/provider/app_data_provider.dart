@@ -27,7 +27,7 @@ class AppDataProvider with ChangeNotifier {
   double toolbarHeight = kToolbarHeight;
   double primaryNavigationWidth = 170;
   double mediumPrimaryNavigationWidth = 90;
-  double _bodyRatio = 0.4;
+  int _bodyRatio = 40;
   double dividerWidth = 1;
   double topPadding = 0;
   double bottomPadding = 0;
@@ -106,25 +106,28 @@ class AppDataProvider with ChangeNotifier {
   }
 
   double get bodyRatio {
-    return _bodyRatio;
+    return _bodyRatio / 100;
   }
 
   set bodyRatio(double bodyRatio) {
-    if (_bodyRatio != bodyRatio) {
-      _bodyRatio = bodyRatio;
+    int r = (bodyRatio * 100).toInt();
+    if (_bodyRatio != r) {
+      _bodyRatio = r;
       notifyListeners();
     }
   }
 
-  toggleBody() {
-    if (_bodyRatio == 0.0) {
+  changeBodyRatio() {
+    if (_bodyRatio < 30) {
       if (_totalSize.width >= largeBreakpointLimit) {
-        _bodyRatio = 0.4;
+        _bodyRatio = 40;
       } else if (_totalSize.width >= smallBreakpointLimit) {
-        _bodyRatio = 0.5;
+        _bodyRatio = 50;
       }
+    } else if (_bodyRatio == 30) {
+      _bodyRatio = 0;
     } else {
-      _bodyRatio = 0.0;
+      _bodyRatio = _bodyRatio - 5;
     }
     notifyListeners();
   }
@@ -171,11 +174,11 @@ class AppDataProvider with ChangeNotifier {
     if (totalSize.width != _totalSize.width ||
         totalSize.height != _totalSize.height) {
       _totalSize = totalSize;
-      if (_bodyRatio > 0.0) {
+      if (_bodyRatio > 0) {
         if (_totalSize.width >= largeBreakpointLimit) {
-          _bodyRatio = 0.4;
+          _bodyRatio = 40;
         } else if (_totalSize.width >= smallBreakpointLimit) {
-          _bodyRatio = 0.5;
+          _bodyRatio = 50;
         }
       }
       logger.i('Total size: $_totalSize');

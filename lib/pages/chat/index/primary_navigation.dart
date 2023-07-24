@@ -68,33 +68,25 @@ class PrimaryNavigation {
     if (appDataProvider.smallBreakpoint.isActive(context)) {
       return Container();
     }
-    return ValueListenableBuilder(
-        valueListenable: mainViewVisible,
-        builder: (BuildContext context, bool mainViewVisible, Widget? child) {
-          Widget avatarImage = myself.avatarImage ?? AppImage.mdAppImage;
-          return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            IconButton(
-              color: Colors.white,
-              onPressed: () {
-                indexWidgetProvider.push('personal_info');
-              },
-              tooltip: myself.name,
-              icon: avatarImage,
-            ),
-            IconButton(
-                color: myself.primary,
-                tooltip: mainViewVisible
-                    ? AppLocalizations.t('Close main view')
-                    : AppLocalizations.t('Open main view'),
-                onPressed: () {
-                  this.mainViewVisible.value = !this.mainViewVisible.value;
-                  appDataProvider.toggleBody();
-                },
-                icon: mainViewVisible
-                    ? const Icon(Icons.menu_open)
-                    : const Icon(Icons.menu_book)),
-          ]);
-        });
+
+    Widget avatarImage = myself.avatarImage ?? AppImage.mdAppImage;
+    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      IconButton(
+        color: Colors.white,
+        onPressed: () {
+          indexWidgetProvider.push('personal_info');
+        },
+        tooltip: myself.name,
+        icon: avatarImage,
+      ),
+      IconButton(
+          color: myself.primary,
+          tooltip: AppLocalizations.t('Change body ratio'),
+          onPressed: () {
+            appDataProvider.changeBodyRatio();
+          },
+          icon: const Icon(Icons.width_wide_outlined)),
+    ]);
   }
 
   NavigationRailDestination slideInNavigationRailDestination({
