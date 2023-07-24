@@ -144,10 +144,34 @@ class PrimaryNavigation {
 
   ///附属菜单按钮，用于大屏幕下侧边显示更多的菜单项
   Widget _buildTrailingNavRail() {
-    return const SizedBox(
-      width: 0.0,
-      height: 0.0,
-    );
+    var recentViews = indexWidgetProvider.recentViews;
+    if (recentViews.isNotEmpty) {
+      List<Widget> children = [
+        const SizedBox(
+          height: 30,
+        )
+      ];
+      for (var view in recentViews) {
+        var routeName = view.routeName;
+        children.add(IconButton(
+            onPressed: () {
+              indexWidgetProvider.push(routeName);
+            },
+            icon: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+              Icon(
+                view.iconData,
+                color: myself.secondary,
+              ),
+              const SizedBox(
+                width: 10.0,
+              ),
+              Text(AppLocalizations.t(view.title))
+            ])));
+      }
+      return Column(
+          mainAxisAlignment: MainAxisAlignment.start, children: children);
+    }
+    return Container();
   }
 
   /// Primary navigation，侧边栏，在小屏幕时为空， 中屏幕时为只有图标的菜单，大屏幕时为带文字的图标，且有附加菜单项

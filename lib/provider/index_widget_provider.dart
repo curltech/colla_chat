@@ -18,6 +18,8 @@ class IndexWidgetProvider with ChangeNotifier {
   ///当前出现在工作区的视图，mainViews是主视图，始终都在，然后每进入一个新视图，则添加
   ///每退出一个则删除，
   List<TileDataMixin> views = [];
+  List<TileDataMixin> recentViews = [];
+
   SwiperController? controller;
 
   //当前的主视图，左边栏和底部栏的指示，范围0-mainViews.length-1
@@ -121,6 +123,14 @@ class IndexWidgetProvider with ChangeNotifier {
     }
     if (index < allViews.length) {
       controller.move(index);
+      TileDataMixin mixin = views[index];
+      if (!recentViews.contains(mixin)) {
+        if (recentViews.length > 5) {
+          recentViews.removeAt(0);
+        }
+        recentViews.add(views[index]);
+      }
+
       notifyListeners();
     }
   }
