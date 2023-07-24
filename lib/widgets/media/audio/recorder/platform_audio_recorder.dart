@@ -29,6 +29,7 @@ class PlatformAudioRecorder extends StatefulWidget {
       ///在macos上wav，aacLc可以录制和播放，pcm目前崩溃，opus，flac可以录制
       ///在windows上，aaclc，flac可以录制和播放，pcm，opus，wav尚未实现
       ///在ios上，aaclc，wav可以录制和播放，pcm崩溃，flac可以录制，opus尚未实现
+      ///在android上，aaclc，可以录制和播放，wav,pcm,flac,opus尚未实现
       RecordAudioRecorderController recordAudioRecorderController =
           audioRecorderController as RecordAudioRecorderController;
       if (recordAudioRecorderController.encoder == AudioEncoder.pcm16bits) {
