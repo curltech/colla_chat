@@ -225,11 +225,27 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
   }
 
   _onOk(Map<String, dynamic> values) {
+    if (!values.containsKey('plainPassword')) {
+      DialogUtil.error(context, content: 'plainPassword must be not empty');
+      return;
+    }
+    if (!values.containsKey('confirmPassword')) {
+      DialogUtil.error(context, content: 'confirmPassword must be not empty');
+      return;
+    }
+    if (!values.containsKey('name')) {
+      DialogUtil.error(context, content: 'name must be not empty');
+      return;
+    }
+    if (!values.containsKey('loginName')) {
+      DialogUtil.error(context, content: 'loginName must be not empty');
+      return;
+    }
     String plainPassword = values['plainPassword'];
     String confirmPassword = values['confirmPassword'];
     String name = values['name'];
     String loginName = values['loginName'];
-    String email = values['email'];
+    String? email = values['email'];
     if (plainPassword == confirmPassword) {
       myselfPeerService
           .register(name, loginName, plainPassword,

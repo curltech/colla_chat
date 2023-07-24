@@ -330,8 +330,7 @@ class DialogUtil {
               Icons.question_mark,
               color: Colors.blue,
             ),
-            const Spacer(),
-            Text(AppLocalizations.t(content)),
+            Expanded(child: Text(AppLocalizations.t(content), softWrap: true)),
           ]),
           actions: <Widget>[
             TextButton(
