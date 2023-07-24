@@ -108,35 +108,43 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
         return view;
       },
       onIndexChanged: (int index) {
-        logger.i('changed to index $index');
+        swiperController.index = index;
       },
-      // pagination: SwiperPagination(
-      //     builder: DotSwiperPaginationBuilder(
-      //   activeColor: myself.primary,
-      //   color: Colors.white,
-      //   activeSize: 15,)
-      // ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> rightWidgets = [
-      IconButton(
-        onPressed: () {
-          swiperController.next();
-        },
-        icon: const Icon(Icons.next_plan_outlined),
-        tooltip: AppLocalizations.t('Next view'),
-      ),
-      IconButton(
-        onPressed: () {
-          _minimize(context);
-        },
-        icon: const Icon(Icons.zoom_in_map),
-        tooltip: AppLocalizations.t('Minimize'),
-      ),
-    ];
+    List<Widget> rightWidgets = [];
+    rightWidgets.add(IconButton(
+      onPressed: () {
+        swiperController.move(0);
+      },
+      icon: const Icon(Icons.local_library),
+      tooltip: AppLocalizations.t('Local'),
+    ));
+    rightWidgets.add(IconButton(
+      onPressed: () {
+        swiperController.move(1);
+      },
+      icon: const Icon(Icons.devices_other),
+      tooltip: AppLocalizations.t('Remote'),
+    ));
+    rightWidgets.add(IconButton(
+      onPressed: () {
+        swiperController.move(2);
+      },
+      icon: const Icon(Icons.list),
+      tooltip: AppLocalizations.t('Conference pool'),
+    ));
+
+    rightWidgets.add(IconButton(
+      onPressed: () {
+        _minimize(context);
+      },
+      icon: const Icon(Icons.zoom_in_map),
+      tooltip: AppLocalizations.t('Minimize'),
+    ));
 
     Widget videoChatView = _buildVideoChatView(context);
     Widget titleWidget = _buildTitleWidget(context);
