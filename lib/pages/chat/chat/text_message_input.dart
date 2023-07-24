@@ -94,24 +94,13 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
 
   ///语音录音按钮
   Widget _buildVoiceRecordButton(context) {
-    PlatformAudioRecorder platformAudioRecorder;
-    if (platformParams.mobile) {
-      AnotherAudioRecorderController audioRecorderController =
-          globalAnotherAudioRecorderController;
-      audioRecorderController.audioFormat = AudioFormat.WAV;
-      platformAudioRecorder = PlatformAudioRecorder(
-        onStop: _onStop,
-        audioRecorderController: audioRecorderController,
-      );
-    } else {
-      RecordAudioRecorderController audioRecorderController =
-          globalRecordAudioRecorderController;
-      audioRecorderController.encoder = AudioEncoder.wav;
-      platformAudioRecorder = PlatformAudioRecorder(
-        onStop: _onStop,
-        audioRecorderController: audioRecorderController,
-      );
-    }
+    RecordAudioRecorderController audioRecorderController =
+        globalRecordAudioRecorderController;
+    audioRecorderController.encoder = AudioEncoder.aacLc;
+    PlatformAudioRecorder platformAudioRecorder = PlatformAudioRecorder(
+      onStop: _onStop,
+      audioRecorderController: audioRecorderController,
+    );
 
     return platformAudioRecorder;
   }

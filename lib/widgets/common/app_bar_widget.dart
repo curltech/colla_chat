@@ -115,7 +115,8 @@ class AppBarWidget {
     ///是否加上回退按钮，如果回调存在，调用回调函数，然后回退路由
     if (withLeading) {
       leadingButton = IconButton(
-        icon: Icon(Icons.chevron_left, color: foregroundColor),
+        tooltip: AppLocalizations.t('Back'),
+        icon: Icon(Icons.arrow_back_ios_new, color: foregroundColor),
         onPressed: () {
           if (leadingCallBack != null) {
             leadingCallBack();

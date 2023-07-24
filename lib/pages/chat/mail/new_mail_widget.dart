@@ -217,9 +217,10 @@ class _NewMailWidgetState extends State<NewMailWidget> {
               if (chips.isNotEmpty) {
                 return SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
-                    child: Row(
+                    child: Expanded(
+                        child: Row(
                       children: chips,
-                    ));
+                    )));
               } else {
                 return Container();
               }

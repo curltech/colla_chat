@@ -2,6 +2,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/message/common_message.dart';
@@ -9,6 +10,7 @@ import 'package:colla_chat/pages/chat/linkman/conference/conference_show_widget.
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -46,6 +48,27 @@ class VideoChatMessage extends StatelessWidget {
     }
   }
 
+  bool isValid(String? startDate, String? endDate) {
+    bool valid = true;
+    DateTime? eDate;
+    if (endDate != null) {
+      eDate = DateUtil.toDateTime(endDate);
+    } else {
+      if (startDate != null) {
+        DateTime sDate = DateUtil.toDateTime(startDate);
+        eDate = sDate.add(const Duration(days: 1));
+      }
+    }
+    if (eDate != null) {
+      DateTime now = DateTime.now();
+      if (now.isAfter(eDate)) {
+        valid = false;
+      }
+    }
+
+    return valid;
+  }
+
   @override
   Widget build(BuildContext context) {
     var title = chatMessage.title;
@@ -56,6 +79,7 @@ class VideoChatMessage extends StatelessWidget {
     Color primary = myself.primary;
     Map<String, dynamic> map = JsonUtil.toJson(content);
     Conference conference = Conference.fromJson(map);
+    bool valid = isValid(conference.startDate, conference.endDate);
     var video = conference.video
         ? ChatMessageContentType.video.name
         : ChatMessageContentType.audio.name;
@@ -78,11 +102,14 @@ class VideoChatMessage extends StatelessWidget {
           subtitle: subtitle,
           dense: false,
           prefix: IconButton(
-              onPressed: () async {
-                chatMessageController.current = chatMessage;
-                await _initVideoChatMessageController();
-                indexWidgetProvider.push('video_chat');
-              },
+              tooltip: AppLocalizations.t('Join conference'),
+              onPressed: valid
+                  ? () async {
+                      chatMessageController.current = chatMessage;
+                      await _initVideoChatMessageController();
+                      indexWidgetProvider.push('video_chat');
+                    }
+                  : null,
               iconSize: AppIconSize.mdSize,
               icon: Icon(
                 conference.video ? Icons.video_call : Icons.multitrack_audio,

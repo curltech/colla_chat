@@ -1,4 +1,5 @@
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/pages/chat/chat/message/common_message.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/image_util.dart';
@@ -25,19 +26,22 @@ class ImageMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     double? width;
     double? height;
+    Widget imageWidget;
     if (!fullScreen) {
       width = AppImageSize.lgSize;
       height = AppImageSize.lgSize;
       if (thumbnail != null) {
-        return ImageUtil.buildImageWidget(
+        imageWidget = ImageUtil.buildImageWidget(
           image: thumbnail,
           width: width,
           height: height,
         );
+
+        return CommonMessage(child: imageWidget);
       }
     }
 
-    Widget imageWidget = FutureBuilder(
+    imageWidget = FutureBuilder(
         future: messageAttachmentService.getDecryptFilename(messageId, title),
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
           if (snapshot.hasData) {
@@ -57,6 +61,10 @@ class ImageMessage extends StatelessWidget {
                 color: myself.primary,
               ));
         });
+
+    if (!fullScreen) {
+      return CommonMessage(child: imageWidget);
+    }
 
     return imageWidget;
   }

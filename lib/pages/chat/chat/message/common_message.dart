@@ -14,7 +14,7 @@ class CommonMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget actionWidget = Container();
+    Widget actionWidget;
     if (child != null) {
       actionWidget = child!;
     } else {
@@ -26,14 +26,11 @@ class CommonMessage extends StatelessWidget {
         minLeadingWidth: 0.0,
       );
     }
-    Widget tile = Center(
-      child: actionWidget,
-    );
 
     return Card(
         elevation: 0,
         shape: const ContinuousRectangleBorder(),
         margin: const EdgeInsets.all(5.0),
-        child: tile);
+        child: actionWidget);
   }
 }

@@ -251,12 +251,13 @@ class _MailContentWidgetState extends State<MailContentWidget> {
                 width: 150,
                 child: Column(children: [
                   icon,
-                  Text(
+                  Expanded(
+                      child: Text(
                     fileName,
                     softWrap: true,
                     overflow: TextOverflow.fade,
                     maxLines: 3,
-                  ),
+                  )),
                   Text('$size'),
                 ])),
           ));
@@ -268,9 +269,10 @@ class _MailContentWidgetState extends State<MailContentWidget> {
           color: myself.getBackgroundColor(context).withOpacity(0.6),
           child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Row(
+              child: Expanded(
+                  child: Row(
                 children: chips,
-              )));
+              ))));
     } else {
       return Container();
     }
