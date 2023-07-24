@@ -55,7 +55,7 @@ class _PlatformAudioRecorderWidgetState
   }
 
   Widget _buildAudioFormats() {
-    List<bool> isSelected = const [true, false, false, false];
+    List<bool> isSelected = const [true, false, false, false, false];
     if (widget.audioRecorderController is RecordAudioRecorderController) {
       RecordAudioRecorderController recordAudioRecorderController =
           widget.audioRecorderController as RecordAudioRecorderController;
