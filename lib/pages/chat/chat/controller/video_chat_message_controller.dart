@@ -340,10 +340,8 @@ class VideoChatMessageController with ChangeNotifier {
         'video-chat-$dateName',
         video: video,
         startDate: current.toUtc().toIso8601String(),
-        endDate: current
-            .add(const Duration(seconds: 7200))
-            .toUtc()
-            .toIso8601String(),
+        endDate:
+            current.add(const Duration(hours: 2)).toUtc().toIso8601String(),
         participants: participants);
     if (partyType == PartyType.group.name) {
       _conference!.groupId = groupId;
