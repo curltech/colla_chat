@@ -95,10 +95,10 @@ class AppDataProvider with ChangeNotifier {
     double width = portraitSize.width;
     if (_totalSize.width >= largeBreakpointLimit) {
       width = totalSize.width - primaryNavigationWidth;
-      width = width * _bodyRatio;
+      width = width * bodyRatio;
     } else if (_totalSize.width >= smallBreakpointLimit) {
       width = totalSize.width - mediumPrimaryNavigationWidth;
-      width = width * _bodyRatio;
+      width = width * bodyRatio;
     } else {
       width = 0.0;
     }
@@ -137,10 +137,10 @@ class AppDataProvider with ChangeNotifier {
     double width = portraitSize.width;
     if (_totalSize.width >= largeBreakpointLimit) {
       width = totalSize.width - primaryNavigationWidth;
-      width = width * (1 - _bodyRatio);
+      width = width * (1 - bodyRatio);
     } else if (_totalSize.width >= smallBreakpointLimit) {
       width = totalSize.width - mediumPrimaryNavigationWidth;
-      width = width * (1 - _bodyRatio);
+      width = width * (1 - bodyRatio);
     } else {
       width = portraitSize.width;
     }
