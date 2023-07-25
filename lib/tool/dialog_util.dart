@@ -382,11 +382,12 @@ class DialogUtil {
               color: Colors.blue,
             ),
             const Spacer(),
-            CommonTextFormField(
+            Expanded(
+                child: CommonTextFormField(
               keyboardType: TextInputType.text,
               labelText: content,
               controller: controller,
-            )
+            ))
           ]),
           actions: <Widget>[
             TextButton(
