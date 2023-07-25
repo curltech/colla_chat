@@ -713,7 +713,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     }
     if (mounted) {
       String? content = await DialogUtil.showTextFormField(context,
-          title: AppLocalizations.t('Request add friend'));
+          content: 'tip', title: AppLocalizations.t('Request add friend'));
       if (content != null) {
         await linkmanService.addFriend(peerClient.peerId, content);
       }

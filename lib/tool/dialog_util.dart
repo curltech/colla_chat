@@ -324,13 +324,7 @@ class DialogUtil {
             style: const TextStyle(color: Colors.white),
           )),
           titlePadding: EdgeInsets.zero,
-          content: Row(children: [
-            const Icon(
-              Icons.question_mark,
-              color: Colors.blue,
-            ),
-            Expanded(child: Text(AppLocalizations.t(content), softWrap: true)),
-          ]),
+          content: Text(AppLocalizations.t(content), softWrap: true),
           actions: <Widget>[
             TextButton(
               style: style,
@@ -376,19 +370,11 @@ class DialogUtil {
             AppLocalizations.t(title),
           )),
           titlePadding: EdgeInsets.zero,
-          content: Row(children: [
-            const Icon(
-              Icons.input,
-              color: Colors.blue,
-            ),
-            const Spacer(),
-            Expanded(
-                child: CommonTextFormField(
-              keyboardType: TextInputType.text,
-              labelText: content,
-              controller: controller,
-            ))
-          ]),
+          content: CommonTextFormField(
+            keyboardType: TextInputType.text,
+            labelText: AppLocalizations.t(content),
+            controller: controller,
+          ),
           actions: <Widget>[
             TextButton(
               style: style,
