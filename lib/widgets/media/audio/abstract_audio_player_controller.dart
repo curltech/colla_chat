@@ -71,7 +71,7 @@ abstract class AbstractAudioPlayerController
       icon: const Icon(
         Icons.stop_rounded,
         size: 32,
-        color: Colors.white,
+        //color: Colors.white,
       ),
       onPressed: () async {
         await stop();
@@ -88,7 +88,7 @@ abstract class AbstractAudioPlayerController
           icon: const Icon(
             Icons.pause_rounded,
             size: 32,
-            color: Colors.white,
+            //color: Colors.white,
           ),
           onPressed: () async {
             await pause();
@@ -111,7 +111,7 @@ abstract class AbstractAudioPlayerController
           icon: const Icon(
             Icons.play_arrow_rounded,
             size: 32,
-            color: Colors.white,
+            //color: Colors.white,
           ),
           onPressed: () async {
             await play();

@@ -134,14 +134,14 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
       playIcon = const Icon(
         Icons.pause,
         size: 32,
-        color: Colors.white,
+        //color: Colors.white,
       );
       tooltip = AppLocalizations.t('Pause');
     } else {
       playIcon = const Icon(
         Icons.play_arrow,
         size: 32,
-        color: Colors.white,
+        //color: Colors.white,
       );
       tooltip = AppLocalizations.t('Play');
     }
@@ -154,7 +154,7 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
           icon: const Icon(
             Icons.stop,
             size: 32,
-            color: Colors.white,
+            //color: Colors.white,
           ),
           onPressed: () async {
             await _stop();
