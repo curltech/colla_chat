@@ -246,7 +246,6 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     //最后一次成功登录的用户名
     String lastLogin = JsonUtil.toJsonString({credentialName: credential});
     await localSecurityStorage.save(lastLoginName, lastLogin);
-    var m = await localSecurityStorage.getAll();
   }
 
   ///获取最后一次登录的用户名和密码，如果都存在，快捷登录
