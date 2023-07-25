@@ -1,4 +1,3 @@
-import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/login/loading.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -396,7 +395,7 @@ class DialogUtil {
                 result = null;
                 Navigator.of(context).pop();
               },
-              child: CommonAutoSizeText(AppLocalizations.t('Cancel')),
+              child: Text(AppLocalizations.t('Cancel')),
             ),
             TextButton(
               style: mainStyle,
@@ -404,7 +403,7 @@ class DialogUtil {
                 result = controller.text;
                 Navigator.of(context).pop();
               },
-              child: CommonAutoSizeText(AppLocalizations.t('Ok')),
+              child: Text(AppLocalizations.t('Ok')),
             ),
           ],
         );
