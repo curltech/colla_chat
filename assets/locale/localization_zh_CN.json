@@ -496,5 +496,7 @@
   "Please go to Settings app to enable audio access.": "请到设置界面获取音频权限",
   "Audio access is restricted.": "音频权限受限",
   "Capture orientation unlocked": "捕获方向解锁",
-  "Error: select a camera first.": "错误，先选择选择相机"
+  "Error: select a camera first.": "错误，先选择选择相机",
+  "ChatMessage": "聊天",
+  "Linkman edit": "联系人编辑"
 }
