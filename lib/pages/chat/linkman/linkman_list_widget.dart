@@ -700,7 +700,17 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     if (linkman.linkmanStatus == LinkmanStatus.friend.name) {
       return;
     }
-    await _changeLinkmanStatus(linkman, LinkmanStatus.friend);
+    if (mounted) {
+      bool? confirm = await DialogUtil.confirm(context,
+          content: 'You confirm add ${linkman.name} as friend?');
+      if (confirm != null && confirm) {
+        await _changeLinkmanStatus(linkman, LinkmanStatus.friend);
+        if (mounted) {
+          DialogUtil.info(context,
+              content: 'You add ${linkman.name} as friend successfully');
+        }
+      }
+    }
     if (mounted) {
       String? content = await DialogUtil.showTextFormField(context,
           title: AppLocalizations.t('Request add friend'));
