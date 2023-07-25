@@ -5,15 +5,19 @@ import 'logger.dart';
 
 ///在操作系统层面的安全存储
 class LocalSecurityStorage {
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+  final IOSOptions iOptions =
+      const IOSOptions(accessibility: KeychainAccessibility.unlocked);
+  final AndroidOptions aOptions =
+      const AndroidOptions(encryptedSharedPreferences: true);
+  late final FlutterSecureStorage _secureStorage;
+
+  LocalSecurityStorage() {
+    _secureStorage =
+        FlutterSecureStorage(iOptions: iOptions, aOptions: aOptions);
+  }
 
   save(String key, String value) async {
     try {
-      const iOptions =
-          IOSOptions(accessibility: KeychainAccessibility.unlocked);
-      AndroidOptions aOptions = const AndroidOptions(
-        encryptedSharedPreferences: true,
-      );
       if (platformParams.android) {
         return await _secureStorage.write(
             key: key, value: value, aOptions: aOptions);
