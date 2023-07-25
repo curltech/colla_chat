@@ -37,7 +37,7 @@ class LocationMessage extends StatelessWidget {
     var floor = locationPosition.floor; //精度
     var heading = locationPosition.heading; //
     var address = locationPosition.address; //
-    Widget headingWidget = Icon(Icons.location_on, color: myself.primary);
+    Widget headingWidget = Icon(Icons.location_on, color: myself.secondary);
     if (platformParams.mobile) {
       headingWidget = IconButton(
         icon: headingWidget,

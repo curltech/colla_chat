@@ -76,7 +76,7 @@ class VideoChatMessage extends StatelessWidget {
     if (content != null) {
       content = chatMessageService.recoverContent(content);
     }
-    Color primary = myself.primary;
+
     Map<String, dynamic> map = JsonUtil.toJson(content);
     Conference conference = Conference.fromJson(map);
     bool valid = isValid(conference.startDate, conference.endDate);
@@ -113,7 +113,7 @@ class VideoChatMessage extends StatelessWidget {
               iconSize: AppIconSize.mdSize,
               icon: Icon(
                 conference.video ? Icons.video_call : Icons.multitrack_audio,
-                color: primary,
+                color: valid ? myself.primary : myself.secondary,
               )));
       actionWidget = DataListTile(
           contentPadding: EdgeInsets.zero,

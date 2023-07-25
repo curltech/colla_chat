@@ -16,8 +16,7 @@ class RemoveGroupMemberMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color primary = myself.primary;
-    List<dynamic> maps = JsonUtil.toJson(content!);
+    List<dynamic> maps = JsonUtil.toJson(content);
     List<String> members = [];
     if (maps.isNotEmpty) {
       for (var map in maps) {
@@ -30,7 +29,7 @@ class RemoveGroupMemberMessage extends StatelessWidget {
         onPressed: null,
         icon: Icon(
           Icons.person_remove,
-          color: primary,
+          color: myself.primary,
         ));
     var tileData = TileData(
       prefix: prefix,

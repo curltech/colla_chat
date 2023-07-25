@@ -25,13 +25,11 @@ class RequestAddFriendMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color primary = myself.primary;
-    Icon icon = Icon(
-      Icons.person_add,
-      color: primary,
-    );
     Widget prefix = IconButton(
-      icon: icon,
+      icon: Icon(
+        Icons.person_add,
+        color: isMyself || isFriend ? myself.secondary : myself.primary,
+      ),
       iconSize: AppIconSize.mdSize,
       onPressed: isMyself || isFriend
           ? null

@@ -58,11 +58,12 @@ class _VideoMessageState extends State<VideoMessage> {
   @override
   Widget build(BuildContext context) {
     if (!widget.fullScreen) {
-      Widget prefix = Icon(
-        Icons.video_call_outlined,
-        color: myself.primary,
-      );
-      prefix = IconButton(onPressed: null, icon: prefix);
+      Widget prefix = IconButton(
+          onPressed: null,
+          icon: Icon(
+            Icons.video_call_outlined,
+            color: myself.primary,
+          ));
       if (widget.thumbnail != null) {
         prefix = ImageUtil.buildImageWidget(
           image: widget.thumbnail,
