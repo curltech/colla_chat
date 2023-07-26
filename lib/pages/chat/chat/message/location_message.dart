@@ -40,7 +40,7 @@ class LocationMessage extends StatelessWidget {
     Widget headingWidget = Icon(Icons.location_on, color: myself.secondary);
     if (platformParams.mobile) {
       headingWidget = IconButton(
-        icon: headingWidget,
+        icon: Icon(Icons.location_on, color: myself.primary),
         color: myself.primary,
         onPressed: () {
           GeolocatorUtil.mapLauncher(

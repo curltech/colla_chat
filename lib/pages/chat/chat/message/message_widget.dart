@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
@@ -28,11 +29,13 @@ import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/clipboard_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/pdf_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -143,7 +146,7 @@ class MessageWidget {
           body = buildImageMessageWidget(context);
           break;
         case ChatMessageContentType.card:
-          body = buildNameCardMessageWidget(context);
+          body = await buildNameCardMessageWidget(context);
           break;
         case ChatMessageContentType.rich:
           body = buildRichTextMessageWidget(context);
@@ -509,15 +512,26 @@ class MessageWidget {
     );
   }
 
-  NameCardMessage buildNameCardMessageWidget(BuildContext context) {
+  Future<NameCardMessage> buildNameCardMessageWidget(
+      BuildContext context) async {
+    String? mimeType = chatMessage.mimeType;
     String? content = chatMessage.content;
+    Linkman? linkman;
+    Group? group;
     if (content != null) {
       content = chatMessageService.recoverContent(content);
+      Map<String, dynamic> map = JsonUtil.toJson(content);
+      if (mimeType == PartyType.linkman.name) {
+        linkman = Linkman.fromJson(map);
+      }
+      if (mimeType == PartyType.group.name) {
+        group = Group.fromJson(map);
+      }
     }
-    String? mimeType = chatMessage.mimeType;
     return NameCardMessage(
       key: UniqueKey(),
-      content: content!,
+      linkman: linkman,
+      group: group,
       isMyself: isMyself,
       fullScreen: fullScreen,
       mimeType: mimeType,

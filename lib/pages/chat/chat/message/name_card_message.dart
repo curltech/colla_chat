@@ -3,28 +3,31 @@ import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/pages/chat/chat/message/common_message.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
-import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
 ///消息体：名片消息，content是json字符串
 class NameCardMessage extends StatelessWidget {
-  final String content;
+  final Linkman? linkman;
+  final Group? group;
   final bool isMyself;
   final bool fullScreen;
   final String? mimeType;
 
   const NameCardMessage(
       {Key? key,
-      required this.content,
+      this.linkman,
+      this.group,
       required this.isMyself,
       this.fullScreen = false,
       this.mimeType})
       : super(key: key);
 
-  Widget _buildLinkman(Linkman linkman) {
+  Widget _buildLinkmanWidget(Linkman linkman) {
     String name = linkman.name;
     var peerId = linkman.peerId;
     final List<TileData> linkmanInfoTileData = [
@@ -53,7 +56,7 @@ class NameCardMessage extends StatelessWidget {
     return DataListView(tileData: linkmanInfoTileData);
   }
 
-  Widget _buildGroup(Group group) {
+  Widget _buildGroupWidget(Group group) {
     String name = group.name;
     var peerId = group.peerId;
     final List<TileData> groupInfoTileData = [
@@ -88,25 +91,38 @@ class NameCardMessage extends StatelessWidget {
     String? name;
     String? avatar;
     Widget? prefix;
-    Map<String, dynamic> map = JsonUtil.toJson(content);
-    if (mimeType == PartyType.linkman.name) {
-      Linkman linkman = Linkman.fromJson(map);
-
-      peerId = linkman.peerId;
-      name = linkman.name;
-      avatar = linkman.avatar;
+    if (mimeType == PartyType.linkman.name && linkman != null) {
+      peerId = linkman!.peerId;
+      name = linkman!.name;
+      avatar = linkman!.avatar;
       prefix = ImageUtil.buildImageWidget(
           image: avatar, isRadius: true, radius: 2.0);
-      linkman.avatarImage = prefix;
+      linkman!.avatarImage = prefix;
       if (fullScreen) {
-        return _buildLinkman(linkman);
+        return _buildLinkmanWidget(linkman!);
+      } else {
+        prefix = IconButton(
+            onPressed: () async {
+              bool? confirm = await DialogUtil.confirm(context,
+                  content: 'Do you add as friend?');
+              await linkmanService.store(linkman!);
+              if (confirm != null && confirm) {
+                linkmanService.update(
+                    {'linkmanStatus': LinkmanStatus.friend.name},
+                    where: 'peerId=?',
+                    whereArgs: [peerId!]);
+              }
+            },
+            icon: prefix);
+        var tileData = TileData(prefix: prefix, title: name, subtitle: peerId);
+
+        return CommonMessage(tileData: tileData);
       }
     }
-    if (mimeType == PartyType.group.name) {
-      Group group = Group.fromJson(map);
-      peerId = group.peerId;
-      name = group.name;
-      avatar = group.avatar;
+    if (mimeType == PartyType.group.name && group != null) {
+      peerId = group!.peerId;
+      name = group!.name;
+      avatar = group!.avatar;
       if (avatar != null) {
         prefix = ImageUtil.buildImageWidget(
             image: avatar, isRadius: true, radius: 2.0);
@@ -116,14 +132,17 @@ class NameCardMessage extends StatelessWidget {
           color: myself.primary,
         );
       }
-      group.avatarImage = prefix;
+      group!.avatarImage = prefix;
       if (fullScreen) {
-        return _buildGroup(group);
+        return _buildGroupWidget(group!);
+      } else {
+        prefix = IconButton(onPressed: null, icon: prefix);
+        var tileData = TileData(prefix: prefix, title: name, subtitle: peerId);
+
+        return CommonMessage(tileData: tileData);
       }
     }
-    prefix = IconButton(onPressed: null, icon: prefix!);
-    var tileData = TileData(prefix: prefix, title: name!, subtitle: peerId);
 
-    return CommonMessage(tileData: tileData);
+    return Container();
   }
 }
