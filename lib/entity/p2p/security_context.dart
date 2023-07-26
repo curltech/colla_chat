@@ -6,7 +6,7 @@ class SecurityContext {
   String? targetClientId;
   String? srcPeerId;
 
-  bool needCompress = true;
+  bool needCompress = false;
   bool needEncrypt = true;
   bool needSign = false;
 
