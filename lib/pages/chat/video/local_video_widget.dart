@@ -134,7 +134,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     audioPlayer.play('assets/medias/call.mp3');
   }
 
-  _stop() {
+  _stop() async {
+    await audioPlayer.release();
     audioPlayer.setLoopMode(false);
     audioPlayer.play('assets/medias/close.mp3');
   }
