@@ -16,7 +16,7 @@ class ChatSummary extends StatusEntity {
   String? thumbnail; // 预览缩略图（base64图片，适用需预览的content，如笔记、联系人名片）
   String? content;
   String? contentType;
-  bool needCompress = true;
+  bool needCompress = false;
   bool needEncrypt = true;
   String? sendReceiveTime; // 发送接收时间
   int unreadNumber = 0;

@@ -164,7 +164,7 @@ class ChatMessage extends StatusEntity {
   String? mimeType;
   int deleteTime = 0; // 阅读后的删除时间，秒数，0表示不删除
   String? parentMessageId; //引用的消息编号
-  bool needCompress = true;
+  bool needCompress = false;
   bool needEncrypt = true;
   bool needReceipt = false;
   bool needReadReceipt = false;

@@ -204,7 +204,7 @@ abstract class GeneralBaseService<T> {
   ///‘’，产生新的对称密钥并返回
   ///有值，用于加密,secretKey有值，用于加密
   Future<Map<String, dynamic>> _encryptFields(dynamic entity,
-      {bool needCompress = true,
+      {bool needCompress = false,
       bool needEncrypt = true,
       bool needSign = false}) async {
     Map<String, dynamic> json = JsonUtil.toJson(entity) as Map<String, dynamic>;
@@ -242,7 +242,7 @@ abstract class GeneralBaseService<T> {
   ///payloadKey：空，直接ecc解密
   ///有值，用于加密,secretKey有值，用于解密
   Future<Map<String, dynamic>> _decryptFields(T entity,
-      {bool needCompress = true,
+      {bool needCompress = false,
       bool needEncrypt = true,
       bool needSign = false}) async {
     Map<String, dynamic> json = JsonUtil.toJson(entity) as Map<String, dynamic>;
