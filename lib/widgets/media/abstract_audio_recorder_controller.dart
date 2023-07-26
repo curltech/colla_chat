@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:flutter/material.dart';
-import 'package:record/record.dart';
 
 enum RecorderStatus { pause, recording, stop }
 
