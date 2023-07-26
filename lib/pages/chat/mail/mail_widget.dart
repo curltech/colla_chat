@@ -8,7 +8,6 @@ import 'package:colla_chat/pages/chat/mail/mail_content_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_list_widget.dart';
 import 'package:colla_chat/pages/chat/mail/new_mail_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';

@@ -63,7 +63,7 @@ class NavigatorUtil {
 
   /// 自定义 转场动画
   static Future gotransitionCustomDemoPage(BuildContext context, String title) {
-    var transition = (BuildContext context, Animation<double> animation,
+    transition(BuildContext context, Animation<double> animation,
         Animation<double> secondaryAnimation, Widget child) {
       return ScaleTransition(
           scale: animation,
@@ -71,7 +71,7 @@ class NavigatorUtil {
             turns: animation,
             child: child,
           ));
-    };
+    }
 
     return Application.router.navigateTo(context, title,
         transition: TransitionType.custom,

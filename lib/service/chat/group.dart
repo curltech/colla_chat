@@ -375,7 +375,7 @@ class GroupService extends PeerPartyService<Group> {
     await chatMessageService.updateReceiptType(
         chatMessage, MessageReceiptType.accepted);
 
-    await chatMessageService.sendAndStore(chatReceipt!);
+    await chatMessageService.sendAndStore(chatReceipt);
   }
 
   ///向群成员发送群文件的消息
@@ -397,12 +397,12 @@ class GroupService extends PeerPartyService<Group> {
     await chatMessageService.updateReceiptType(
         chatMessage, MessageReceiptType.accepted);
 
-    await chatMessageService.sendAndStore(chatReceipt!);
+    await chatMessageService.sendAndStore(chatReceipt);
   }
 
   ///删除群
   removeBygroupId(String peerId) async {
-    await delete(where: 'peerId=?', whereArgs: [peerId]);
+    delete(where: 'peerId=?', whereArgs: [peerId]);
     groups.remove(peerId);
   }
 }

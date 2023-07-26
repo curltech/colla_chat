@@ -1,12 +1,8 @@
-import 'dart:ui';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/widgets/common/auto_size_text_form_field.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 ///平台定制的通用AutoSizeText，规定了一些参数的缺省值外，还规定了文本的样式
 ///本类的目的是统一平台文本显示的样式，包括自动调整字体大小适应

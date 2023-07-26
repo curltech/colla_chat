@@ -299,7 +299,7 @@ class _FormInputWidgetState extends State<FormInputWidget> {
     if (widget.formButtonDefs == null) {
       btns.add(TextButton(
         style: mainStyle,
-        child: CommonAutoSizeText(AppLocalizations.t(widget.okLabel!)),
+        child: CommonAutoSizeText(AppLocalizations.t(widget.okLabel)),
         onPressed: () {
           if (widget.onOk != null) {
             var values = widget.controller.getValues();

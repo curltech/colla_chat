@@ -1,9 +1,7 @@
 import 'dart:io';
 
 import 'package:classic_logger/classic_logger.dart' as classic_logger;
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/tool/path_util.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:path/path.dart' as p;

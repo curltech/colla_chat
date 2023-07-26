@@ -28,7 +28,7 @@ class FirebaseNotificationController with ChangeNotifier {
 
   String get firebaseToken => _firebaseToken;
 
-  String _nativeToken = '';
+  final String _nativeToken = '';
 
   String get nativeToken => _nativeToken;
 
@@ -46,8 +46,8 @@ class FirebaseNotificationController with ChangeNotifier {
               channelName: 'Alerts',
               channelDescription: 'Notification alerts',
               importance: NotificationImportance.Max,
-              defaultColor: Color(0xFF9D50DD),
-              ledColor: Color.fromARGB(255, 190, 56, 56),
+              defaultColor: const Color(0xFF9D50DD),
+              ledColor: const Color.fromARGB(255, 190, 56, 56),
               groupKey: 'alerts',
               channelShowBadge: true)
         ],
@@ -190,7 +190,7 @@ class FirebaseNotificationController with ChangeNotifier {
 
   static Future<void> executeLongTaskTest() async {
     print("starting long task");
-    await Future.delayed(Duration(seconds: 4));
+    await Future.delayed(const Duration(seconds: 4));
     final url = Uri.parse("http://google.com");
     final re = await http.get(url);
     print(re.body);

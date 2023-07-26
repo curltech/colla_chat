@@ -36,7 +36,7 @@ class LocalAuthUtil {
     late List<BiometricType> availableBiometrics;
     try {
       availableBiometrics = await LocalAuthUtil.auth.getAvailableBiometrics();
-    } on PlatformException catch (e) {
+    } on PlatformException {
       availableBiometrics = <BiometricType>[];
     }
     return availableBiometrics;

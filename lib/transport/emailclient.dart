@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/emailaddress.dart' as entity;
 import 'package:colla_chat/entity/chat/message_attachment.dart';
@@ -345,7 +344,6 @@ class EmailClient {
       await mailClient.connect();
       bool supports8BitEncoding = await mailClient.supports8BitEncoding();
       logger.i('connected successfully:$supports8BitEncoding');
-      ;
       this.mailClient = mailClient;
 
       return true;
@@ -545,6 +543,7 @@ class EmailClient {
       return await mailClient.fetchMessagePart(message, fetchId,
           responseTimeout: responseTimeout);
     }
+    return null;
   }
 
   ///删除邮件

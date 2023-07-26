@@ -16,6 +16,8 @@ abstract class OauthClient {
   bool get isEnabled => (oauthClientId != null);
 
   OauthClientId? get oauthClientId {
+    return null;
+  
     // incomingHostName
   }
 

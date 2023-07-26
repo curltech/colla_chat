@@ -97,7 +97,7 @@ class SystemTrayUtil {
                   label: 'setTitle',
                   image: imagePath,
                   onClicked: (menuItem) {
-                    final String text = '';
+                    const String text = '';
                     print("click 'setTitle' : $text");
                     _systemTray.setTitle(text);
                   },
@@ -115,7 +115,7 @@ class SystemTrayUtil {
                   label: 'setToolTip',
                   image: imagePath,
                   onClicked: (menuItem) {
-                    final String text = '';
+                    const String text = '';
                     print("click 'setToolTip' : $text");
                     _systemTray.setToolTip(text);
                   },

@@ -36,6 +36,7 @@ class PlatformEditorController with ChangeNotifier {
       HtmlEditorApi controller = originalController as HtmlEditorApi;
       return await controller.getText();
     }
+    return null;
   }
 
   Future<String?> get html async {
@@ -59,6 +60,7 @@ class PlatformEditorController with ChangeNotifier {
       HtmlEditorApi controller = originalController as HtmlEditorApi;
       return await controller.getFullHtml();
     }
+    return null;
   }
 }
 

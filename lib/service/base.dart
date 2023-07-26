@@ -28,7 +28,7 @@ abstract class BaseService {
       int? limit,
       int? offset,
       dynamic Function(Map)? post}) async {
-    Map<dynamic, dynamic>? m = await dataStore.findOne(tableName,
+    Map<dynamic, dynamic>? m = dataStore.findOne(tableName,
         where: where,
         distinct: distinct,
         columns: columns,
@@ -62,7 +62,7 @@ abstract class BaseService {
       int? limit,
       int? offset,
       dynamic Function(Map)? post}) async {
-    var ms = await dataStore.find(tableName,
+    var ms = dataStore.find(tableName,
         where: where,
         distinct: distinct,
         columns: columns,
@@ -97,7 +97,7 @@ abstract class BaseService {
       int limit = defaultLimit,
       int offset = defaultOffset,
       dynamic Function(Map)? post}) async {
-    var page = await dataStore.findPage(tableName,
+    var page = dataStore.findPage(tableName,
         where: where,
         distinct: distinct,
         columns: columns,
@@ -150,7 +150,7 @@ abstract class BaseService {
         post: post);
   }
 
-  int insert(dynamic entity, [dynamic? ignore, dynamic? parent]) {
+  int insert(dynamic entity, [dynamic ignore, dynamic parent]) {
     EntityUtil.createTimestamp(entity);
     return dataStore.insert(tableName, entity);
   }
@@ -159,13 +159,13 @@ abstract class BaseService {
     return dataStore.delete(tableName, entity: entity);
   }
 
-  int update(dynamic entity, [dynamic? ignore, dynamic? parent]) {
+  int update(dynamic entity, [dynamic ignore, dynamic parent]) {
     EntityUtil.updateTimestamp(entity);
     return dataStore.update(tableName, entity);
   }
 
   /// 批量保存，根据脏标志新增，修改或者删除
-  save(List<Object> entities, [dynamic? ignore, dynamic? parent]) {
+  save(List<Object> entities, [dynamic ignore, dynamic parent]) {
     List<Map<String, dynamic>> operators = [];
     for (var entity in entities) {
       operators.add({'table': tableName, 'entity': entity});
@@ -174,7 +174,7 @@ abstract class BaseService {
   }
 
   /// 根据_id是否存在逐条增加或者修改
-  int upsert(dynamic entity, [dynamic? ignore, dynamic? parent]) {
+  int upsert(dynamic entity, [dynamic ignore, dynamic parent]) {
     var id = EntityUtil.getId(entity);
     if (id != null) {
       return update(entity, ignore, parent);

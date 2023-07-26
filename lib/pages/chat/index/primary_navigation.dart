@@ -37,7 +37,7 @@ class PrimaryNavigation {
 
   Widget _createNavigationDestinationItem(
       IndexWidgetProvider indexWidgetProvider, int index, Icon icon,
-      {String? label, String? tooltip}) {
+      {String? label}) {
     bool current = indexWidgetProvider.currentMainIndex == index;
     List<Widget> children = [icon];
     if (label != null) {

@@ -41,7 +41,7 @@ class XFileUtil {
   ) async {
     Map<String, dynamic> map = {};
     var originBytes = await entry.readAsBytes();
-    map['data'] = CryptoUtil.encodeBase64(originBytes!);
+    map['data'] = CryptoUtil.encodeBase64(originBytes);
     map['mimeType'] = entry.mimeType;
     map['name'] = entry.name;
     map['length'] = entry.length();

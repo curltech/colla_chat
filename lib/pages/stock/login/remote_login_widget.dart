@@ -63,16 +63,16 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
                 },
                 onFieldSubmitted: (String val) {},
               )),
-          SizedBox(height: 30.0),
+          const SizedBox(height: 30.0),
           Padding(
-              padding: EdgeInsets.symmetric(horizontal: 50.0),
+              padding: const EdgeInsets.symmetric(horizontal: 50.0),
               child: CommonTextFormField(
                 keyboardType: TextInputType.text,
                 obscureText: !_pwdShow,
                 //controller: passwordController,
 
                   labelText: AppLocalizations.t('Password'),
-                  prefixIcon: Icon(Icons.lock),
+                  prefixIcon: const Icon(Icons.lock),
                   suffixIcon: IconButton(
                     icon: Icon(
                         _pwdShow ? Icons.visibility : Icons.visibility_off),
@@ -91,9 +91,9 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
                 },
                 onFieldSubmitted: (String val) {},
               )),
-          SizedBox(height: 30.0),
+          const SizedBox(height: 30.0),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 50.0),
+            padding: const EdgeInsets.symmetric(horizontal: 50.0),
             child: Row(children: [
               TextButton(
                 child: CommonAutoSizeText(AppLocalizations.t('Login')),

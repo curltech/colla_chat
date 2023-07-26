@@ -32,7 +32,7 @@ class ScreenUtil {
   }
 
   static double statusBarHeight(BuildContext context) {
-    return MediaQueryData.fromWindow(ui.window).padding.top;
+    return MediaQueryData.fromView(ui.window).padding.top;
   }
 
   static double navigationBarHeight(BuildContext context) {
@@ -40,6 +40,6 @@ class ScreenUtil {
   }
 
   static double topBarHeight(BuildContext context) {
-    return kToolbarHeight + MediaQueryData.fromWindow(ui.window).padding.top;
+    return kToolbarHeight + MediaQueryData.fromView(ui.window).padding.top;
   }
 }

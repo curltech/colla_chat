@@ -31,7 +31,7 @@ class ThreeDTransformer extends PageTransformer {
     double? height = info.height;
     double? width = info.width;
     double pivotX = 0.0;
-    if (position! < 0 && position! >= -1) {
+    if (position! < 0 && position>= -1) {
       // left scrolling
       pivotX = width!;
     }
@@ -51,7 +51,7 @@ class ZoomInPageTransformer extends PageTransformer {
   Widget transform(Widget child, TransformInfo info) {
     double? position = info.position;
     double? width = info.width;
-    if (position! > 0 && position! <= 1) {
+    if (position! > 0 && position<= 1) {
       return Transform.translate(
         offset: Offset(-width! * position, 0.0),
         child: Transform.scale(
@@ -157,7 +157,7 @@ class ScaleAndFadeTransformer extends PageTransformer {
   final double _scale;
   final double _fade;
 
-  ScaleAndFadeTransformer({double fade: 0.3, double scale: 0.8})
+  ScaleAndFadeTransformer({double fade = 0.3, double scale = 0.8})
       : _fade = fade,
         _scale = scale;
 
@@ -165,7 +165,7 @@ class ScaleAndFadeTransformer extends PageTransformer {
   Widget transform(Widget item, TransformInfo info) {
     double? position = info.position;
     double scaleFactor = (1 - position!.abs()) * (1 - _scale);
-    double fadeFactor = (1 - position!.abs()) * (1 - _fade);
+    double fadeFactor = (1 - position.abs()) * (1 - _fade);
     double opacity = _fade + fadeFactor;
     double scale = _scale + scaleFactor;
     return Opacity(

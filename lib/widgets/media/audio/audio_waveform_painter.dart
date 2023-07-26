@@ -65,7 +65,7 @@ Future<StreamBuilder<WaveformProgress>?> buildWaveformProgress(
         return Center(
           child: CommonAutoSizeText(
             'Error: ${snapshot.error}',
-            style: Theme.of(context).textTheme.headline6,
+            style: Theme.of(context).textTheme.titleLarge,
             textAlign: TextAlign.center,
           ),
         );
@@ -76,7 +76,7 @@ Future<StreamBuilder<WaveformProgress>?> buildWaveformProgress(
         return Center(
           child: CommonAutoSizeText(
             '${(100 * progress).toInt()}%',
-            style: Theme.of(context).textTheme.headline6,
+            style: Theme.of(context).textTheme.titleLarge,
           ),
         );
       }

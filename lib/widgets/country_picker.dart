@@ -28,7 +28,7 @@ Widget _buildDropdownItem(Country country) {
     child: Row(
       children: <Widget>[
         CountryPickerUtils.getDefaultFlagImage(country),
-        SizedBox(
+        const SizedBox(
           width: 8.0,
         ),
         CommonAutoSizeText("+${country.phoneCode} ${country.isoCode}"),
@@ -60,9 +60,9 @@ Widget _buildDropdownItem(Country country) {
 Widget _buildDialogItem(Country country) => Row(
       children: <Widget>[
         CountryPickerUtils.getDefaultFlagImage(country),
-        SizedBox(width: 8.0),
+        const SizedBox(width: 8.0),
         CommonAutoSizeText("+${country.phoneCode}"),
-        SizedBox(width: 8.0),
+        const SizedBox(width: 8.0),
         Flexible(child: CommonAutoSizeText(country.name))
       ],
     );

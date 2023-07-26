@@ -1,10 +1,8 @@
 import 'package:colla_chat/pages/chat/index/platform_breakpoint.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/locale_util.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 
 /// 不同语言版本的下拉选择框的选项
 final localeOptions = [

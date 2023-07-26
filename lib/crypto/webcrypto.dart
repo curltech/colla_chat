@@ -5,7 +5,7 @@ import 'package:colla_chat/crypto/util.dart';
 import 'package:webcrypto/webcrypto.dart';
 
 class WebCrypto {
-  WebCrypto() {}
+  WebCrypto();
 
   /// 对消息进行hash处理，输入消息可以为字符串或者uintarray，
   Future<Uint8List> hash(List<int> data) async {

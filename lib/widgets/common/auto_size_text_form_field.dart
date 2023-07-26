@@ -803,14 +803,14 @@ class _AutoSizeTextFormFieldState extends State<AutoSizeTextFormField> {
         ? tp.width + widget.decoration.contentPadding!.horizontal
         : tp.width;
 
-    double _height = (widget.decoration.contentPadding != null)
+    double height = (widget.decoration.contentPadding != null)
         ? tp.height + widget.decoration.contentPadding!.vertical
         : tp.height;
 
     _textSpanWidth = math.max(width0, widget.minWidth ?? 0);
 
     if (maxLines == null) {
-      if (_height >= constraintHeight) {
+      if (height >= constraintHeight) {
         return false;
       } else {
         return true;

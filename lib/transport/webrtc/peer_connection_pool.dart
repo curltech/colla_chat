@@ -412,7 +412,7 @@ class PeerConnectionPool {
             var gap = now - start!;
             var limit = const Duration(seconds: 20);
             if (gap > limit.inMilliseconds) {
-              removedClientIds.add(peerConnection.clientId!);
+              removedClientIds.add(peerConnection.clientId);
               logger.e(
                   'peerConnection peerId:${peerConnection.peerId},clientId:${peerConnection.clientId} is overtime unconnected');
             }

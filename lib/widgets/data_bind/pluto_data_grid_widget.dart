@@ -150,7 +150,7 @@ class _PaginatedDataTableState<T> extends State<PlutoDataGridWidget> {
         },
         onRowChecked: (PlutoGridOnRowCheckedEvent event) {},
         onRowDoubleTap: (PlutoGridOnRowDoubleTapEvent event) {
-          onTap(event.rowIdx!);
+          onTap(event.rowIdx);
         },
         onRowSecondaryTap: (PlutoGridOnRowSecondaryTapEvent event) {},
         onRowsMoved: (PlutoGridOnRowsMovedEvent event) {},

@@ -33,7 +33,7 @@ class BackgroundPicker extends StatelessWidget {
                 _openGallery(source: ImageSource.camera);
               }),
           const Spacer(),
-          SizedBox(),
+          const SizedBox(),
         ],
       ),
     );

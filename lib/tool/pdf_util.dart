@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:colla_chat/platform.dart';
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
-import 'package:pdf/pdf.dart' as pdf;
 
 ///显示pdf文件
 class PdfUtil {

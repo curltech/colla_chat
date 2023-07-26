@@ -1,8 +1,6 @@
-import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/document_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rte/flutter_rte.dart';
 

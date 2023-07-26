@@ -37,11 +37,11 @@ class DocumentTile extends StatelessWidget {
           _documentData.icon,
           CommonAutoSizeText(
             _documentData.title,
-            style: TextStyle(fontSize: 16.0, color: Colors.cyan),
+            style: const TextStyle(fontSize: 16.0, color: Colors.cyan),
           ),
           CommonAutoSizeText(
             _documentData.subtitle!,
-            style: TextStyle(fontSize: 12.0, color: Colors.cyan),
+            style: const TextStyle(fontSize: 12.0, color: Colors.cyan),
           ),
         ],
       ),

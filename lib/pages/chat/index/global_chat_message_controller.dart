@@ -62,6 +62,7 @@ class GlobalWebrtcEventController with ChangeNotifier {
 
         return allowed;
       }
+      return null;
     });
 
     return allowed;

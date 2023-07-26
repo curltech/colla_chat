@@ -66,11 +66,11 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
               child: CommonTextFormField(
                 controller: nameController,
                 labelText: AppLocalizations.t('Username'),
-                prefixIcon: Icon(Icons.person),
+                prefixIcon: const Icon(Icons.person),
                 initialValue: _name,
                 onChanged: (String val) {
                   setState(() {
@@ -79,13 +79,13 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
                 },
                 onFieldSubmitted: (String val) {},
               )),
-          SizedBox(height: 10.0),
+          const SizedBox(height: 10.0),
           Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
               child: CommonTextFormField(
                 //controller: loginNameController,
                 labelText: AppLocalizations.t('LoginName'),
-                prefixIcon: Icon(Icons.desktop_mac),
+                prefixIcon: const Icon(Icons.desktop_mac),
                 initialValue: _loginName,
                 onChanged: (String val) {
                   setState(() {
@@ -94,13 +94,13 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
                 },
                 onFieldSubmitted: (String val) {},
               )),
-          SizedBox(height: 10.0),
+          const SizedBox(height: 10.0),
           Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
               child: CommonTextFormField(
                 //controller: mobileController,
                 labelText: AppLocalizations.t('Mobile'),
-                prefixIcon: Icon(Icons.mobile_friendly),
+                prefixIcon: const Icon(Icons.mobile_friendly),
                 initialValue: _mobile,
                 onChanged: (String val) {
                   setState(() {
@@ -109,14 +109,14 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
                 },
                 onFieldSubmitted: (String val) {},
               )),
-          SizedBox(height: 10.0),
+          const SizedBox(height: 10.0),
           Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
               child: CommonTextFormField(
                 //controller: emailController,
                 keyboardType: TextInputType.emailAddress,
                 labelText: AppLocalizations.t('Email'),
-                prefixIcon: Icon(Icons.email),
+                prefixIcon: const Icon(Icons.email),
                 initialValue: _email,
                 onChanged: (String val) {
                   setState(() {
@@ -125,15 +125,15 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
                 },
                 onFieldSubmitted: (String val) {},
               )),
-          SizedBox(height: 10.0),
+          const SizedBox(height: 10.0),
           Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
               child: CommonTextFormField(
                 keyboardType: TextInputType.text,
                 obscureText: !_pwdShow,
                 //controller: passwordController,
                 labelText: AppLocalizations.t('Password'),
-                prefixIcon: Icon(Icons.lock),
+                prefixIcon: const Icon(Icons.lock),
                 suffixIcon: IconButton(
                   icon:
                       Icon(_pwdShow ? Icons.visibility : Icons.visibility_off),
@@ -151,15 +151,15 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
                 },
                 onFieldSubmitted: (String val) {},
               )),
-          SizedBox(height: 10.0),
+          const SizedBox(height: 10.0),
           Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
               child: CommonTextFormField(
                 keyboardType: TextInputType.text,
                 obscureText: !_pwdShow,
                 //controller: passwordController,
                 labelText: AppLocalizations.t('Confirm Password'),
-                prefixIcon: Icon(Icons.lock),
+                prefixIcon: const Icon(Icons.lock),
                 suffixIcon: IconButton(
                   icon:
                       Icon(_pwdShow ? Icons.visibility : Icons.visibility_off),
@@ -177,9 +177,9 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
                 },
                 onFieldSubmitted: (String val) {},
               )),
-          SizedBox(height: 10.0),
+          const SizedBox(height: 10.0),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 15.0),
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
             child: Row(children: [
               TextButton(
                 child: CommonAutoSizeText(AppLocalizations.t('Register')),

@@ -91,16 +91,16 @@ class SignalKeyPair {
     map['preKeyId'] = preKeyBundle.getPreKeyId();
     ECPublicKey? signedPreKey = preKeyBundle.getSignedPreKey();
     if (signedPreKey != null) {
-      map['signedPreKey'] = CryptoUtil.encodeBase64(signedPreKey!.serialize());
+      map['signedPreKey'] = CryptoUtil.encodeBase64(signedPreKey.serialize());
     }
     map['signedPreKeyId'] = preKeyBundle.getSignedPreKeyId();
     Uint8List? signedPreKeySignature = preKeyBundle.getSignedPreKeySignature();
     if (signedPreKeySignature != null) {
       map['signedPreKeySignature'] =
-          CryptoUtil.encodeBase64(signedPreKeySignature!);
+          CryptoUtil.encodeBase64(signedPreKeySignature);
     }
     var identityKey = preKeyBundle.getIdentityKey();
-    map['identityKey'] = CryptoUtil.encodeBase64(identityKey!.serialize());
+    map['identityKey'] = CryptoUtil.encodeBase64(identityKey.serialize());
 
     return JsonUtil.toJsonString(map);
   }
@@ -137,11 +137,11 @@ class SignalKeyPair {
           registrationId,
           deviceId,
           preKeyId,
-          preKey!,
+          preKey,
           signedPreKeyId,
           signedPreKey!,
           signedPreKeySignature,
-          identityKey!);
+          identityKey);
 
       return preKeyBundle;
     }

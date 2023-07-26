@@ -173,12 +173,12 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
               onPressed: _toggleTorch,
             ),
             IconButton(
-              icon: Icon(Icons.switch_video),
+              icon: const Icon(Icons.switch_video),
               tooltip: 'toggleCamera',
               onPressed: _toggleCamera,
             ),
             IconButton(
-              icon: Icon(Icons.camera),
+              icon: const Icon(Icons.camera),
               tooltip: 'captureFrame',
               onPressed: _captureFrame,
             ),
@@ -191,8 +191,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
               onSelected: _selectAudioOutput,
               itemBuilder: (BuildContext context) {
                 if (mediaDevicesList != null) {
-                  return mediaDevicesList!
-                      .where((device) => device.kind == 'audiooutput')
+                  return mediaDevicesList.where((device) => device.kind == 'audiooutput')
                       .map((device) {
                     return PopupMenuItem<String>(
                       value: device.deviceId,

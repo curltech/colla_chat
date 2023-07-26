@@ -86,7 +86,9 @@ class FlutterInAppWebView extends StatelessWidget {
           return PermissionResponse(
               resources: [], action: PermissionResponseAction.DENY);
         },
-        shouldOverrideUrlLoading: (controller, navigationAction) async {},
+        shouldOverrideUrlLoading: (controller, navigationAction) async {
+          return null;
+        },
         onLoadStop: (controller, url) async {
           pullToRefreshController.endRefreshing();
         },

@@ -53,10 +53,10 @@ class ValidatorUtil {
     }
     int v = int.parse(value!);
     if (min != null && v < min) {
-      return AppLocalizations.t('Value must more than ') + '$min';
+      return '${AppLocalizations.t('Value must more than ')}$min';
     }
     if (max != null && v > max) {
-      return AppLocalizations.t('Value must less than ') + '$max';
+      return '${AppLocalizations.t('Value must less than ')}$max';
     }
     return null;
   }
@@ -67,10 +67,10 @@ class ValidatorUtil {
     }
     double v = double.parse(value!);
     if (min != null && v < min) {
-      return AppLocalizations.t('Value must more than ') + '$min';
+      return '${AppLocalizations.t('Value must more than ')}$min';
     }
     if (max != null && v > max) {
-      return AppLocalizations.t('Value must less than ') + '$max';
+      return '${AppLocalizations.t('Value must less than ')}$max';
     }
     return null;
   }
@@ -84,10 +84,10 @@ class ValidatorUtil {
     }
     DateTime? v = value == null ? null : DateTime.parse(value);
     if (v != null && min != null && v.isBefore(min)) {
-      return AppLocalizations.t('Value must more than ') + '$min';
+      return '${AppLocalizations.t('Value must more than ')}$min';
     }
     if (v != null && max != null && v.isAfter(max)) {
-      return AppLocalizations.t('Value must less than ') + '$max';
+      return '${AppLocalizations.t('Value must less than ')}$max';
     }
     return null;
   }

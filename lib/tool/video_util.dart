@@ -172,6 +172,7 @@ class VideoUtil {
 
       return thumbnail;
     }
+    return null;
   }
 
   ///ANDROID,IOS,MACOS,WINDOWS
@@ -202,6 +203,7 @@ class VideoUtil {
 
       return thumbnailFile;
     }
+    return null;
   }
 
   ///ANDROID,IOS,MACOS

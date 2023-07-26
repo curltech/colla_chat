@@ -1,15 +1,15 @@
 import 'package:colla_chat/crypto/cryptography.dart';
+import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/entity/dht/peerclient.dart';
+import 'package:colla_chat/entity/p2p/datablock.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/base.dart';
+import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/type_util.dart';
-
-import '../../crypto/util.dart';
-import '../../entity/dht/peerclient.dart';
-import '../../entity/p2p/datablock.dart';
-import '../../provider/myself.dart';
-import '../base.dart';
-import '../dht/peerclient.dart';
+import 'package:cryptography/src/cryptography/simple_public_key.dart';
 
 class DataBlockService extends BaseService {
   DataBlockService({required super.tableName, required super.fields});
@@ -65,16 +65,16 @@ class DataBlockService extends BaseService {
     if (sliceSize == null) {
       // 对每一个块分片
       var sliceHashs = [];
-      var slice0 = null;
+      DataBlock slice0;
       var transportPayload = dataBlock.transportPayload;
       var expireDate = dataBlock.expireDate;
       var mimeType = dataBlock.mimeType;
       DataBlock db;
-      var slicePayload = null;
+      String slicePayload;
       if (transportPayload != null && transportPayload.length > sliceLimit) {
         sliceSize = transportPayload.length ~/ sliceLimit;
         sliceSize = sliceSize.ceil();
-        for (var i = 0; i < sliceSize!; ++i) {
+        for (var i = 0; i < sliceSize; ++i) {
           // 第一个分片
           if (i == 0) {
             db = dataBlock;
@@ -90,12 +90,12 @@ class DataBlockService extends BaseService {
           db.sliceSize = sliceSize;
           db.expireDate = expireDate;
           db.mimeType = mimeType;
-          if (i == sliceSize! - 1) {
-            slicePayload = transportPayload!
-                .substring(i * sliceLimit, transportPayload.length);
+          if (i == sliceSize - 1) {
+            slicePayload = transportPayload.substring(
+                i * sliceLimit, transportPayload.length);
           } else {
-            slicePayload = transportPayload!
-                .substring(i * sliceLimit, (i + 1) * sliceLimit);
+            slicePayload = transportPayload.substring(
+                i * sliceLimit, (i + 1) * sliceLimit);
           }
           db.transportPayload = slicePayload;
           // 每个块的负载计算hash
@@ -112,7 +112,7 @@ class DataBlockService extends BaseService {
         sliceHashs.add(dataBlock.payloadHash);
       }
       //每个交易分片结束
-      if (sliceHashs.length > 0) {
+      if (sliceHashs.isNotEmpty) {
         // var stateHashs = await merkleTree.buildStringTree(sliceHashs);
         // if (slice0) {
         //   slice0.stateHash =
@@ -129,19 +129,20 @@ class DataBlockService extends BaseService {
     if (privateKey == null) {
       throw 'NullPrivateKey';
     }
-    var signatureData;
+    String signatureData;
     var transportPayload = dataBlock.transportPayload;
     if (transportPayload != null) {
       // 设置数据的hash
-      var payloadHash = await cryptoGraphy.hash(transportPayload!.codeUnits);
+      var payloadHash = await cryptoGraphy.hash(transportPayload.codeUnits);
       dataBlock.payloadHash = CryptoUtil.encodeBase64(payloadHash);
       signatureData = transportPayload;
     } else {
       dataBlock.expireDate = DateUtil.currentDate();
-      signatureData = dataBlock.expireDate! + dataBlock!.peerId!;
+      signatureData = dataBlock.expireDate! + dataBlock.peerId!;
     }
     // 设置签名
-    var signature = await cryptoGraphy.sign(signatureData, privateKey);
+    var signature =
+        await cryptoGraphy.sign(signatureData.codeUnits, privateKey);
     dataBlock.signature = String.fromCharCodes(signature);
   }
 
@@ -159,7 +160,7 @@ class DataBlockService extends BaseService {
         var i = 0;
         while (!pass && i < myself.expiredKeys.length) {
           pass = await cryptoGraphy.verify(
-              transportPayload!.codeUnits, signature!.codeUnits,
+              transportPayload.codeUnits, signature.codeUnits,
               publicKey: await myself.expiredKeys[i].extractPublicKey());
           i++;
         }
@@ -216,7 +217,7 @@ class DataBlockService extends BaseService {
       dataBlocks.sort((a, b) {
         return a.sliceNumber! - b.sliceNumber!;
       });
-      var transportPayload = null;
+      var transportPayload;
       List<Future> ps = [];
       for (var i = 0; i < dataBlocks.length; ++i) {
         var dataBlock = dataBlocks[i];
@@ -225,7 +226,6 @@ class DataBlockService extends BaseService {
           throw 'ErrorSliceNumber';
         }
         var future = DataBlockService.verify(dataBlock);
-        ;
         ps.add(future);
       }
       var slicePayloads = await Future.wait(ps);
@@ -256,7 +256,7 @@ class DataBlockService extends BaseService {
     // 设置数据的时间戳
     dataBlock.createTimestamp ??= DateUtil.currentDate();
     // 如果有目标接受对象，需要加密处理，生成对称密钥
-    var secretKey = null;
+    List<int>? secretKey;
     var transactionKeys = dataBlock.transactionKeys;
     // 消息的数据部分转换成字符串，签名，加密，压缩，base64
     var privateKey = myself.privateKey;
@@ -264,18 +264,18 @@ class DataBlockService extends BaseService {
       throw 'NullPrivateKey';
     }
     if (transactionKeys!.isNotEmpty) {
-      secretKey = await cryptoGraphy.getRandomAsciiString();
+      secretKey = await cryptoGraphy.getRandomBytes();
       // 处理目标的加密密钥
       for (var transactionKey in transactionKeys) {
         // 对对称密钥进行公钥加密
-        var targetPublicKey = null;
+        SimplePublicKey? targetPublicKey;
         if (transactionKey.peerId == myself.peerId) {
           targetPublicKey = myself.publicKey;
         } else {
           targetPublicKey = await peerClientService
               .getCachedPublicKey(transactionKey.peerId!);
         }
-        if (!targetPublicKey) {
+        if (targetPublicKey == null) {
           logger.w('TargetPublicKey is null, will not be encrypted!');
           continue;
         }
@@ -306,7 +306,7 @@ class DataBlockService extends BaseService {
       // 压缩原始数据
       data = CryptoUtil.compress(data);
       // 对数据进行对称加密
-      if (secretKey) {
+      if (secretKey != null) {
         data = await cryptoGraphy.aesEncrypt(data, secretKey);
       }
       // 最终的数据放入
@@ -321,49 +321,46 @@ class DataBlockService extends BaseService {
 
     if (transactionKeys == null && dataBlock.transportKey != null) {
       var transportKey = CryptoUtil.decodeBase64(dataBlock.transportKey!);
-      if (transportKey != null) {
-        // Keys，验证签名
-        var keySignature = dataBlock.transactionKeySignature;
-        if (keySignature != null && verify == true) {
-          if (dataBlock.peerId == myself.peerId) {
-            var srcPublicKey = myself.publicKey;
-            var pass = await cryptoGraphy.verify(
-                transportKey, keySignature.codeUnits,
-                publicKey: srcPublicKey);
-            if (!pass) {
-              var i = 0;
-              while (!pass && i < myself.expiredKeys.length) {
-                pass = await cryptoGraphy.verify(
-                    transportKey, keySignature.codeUnits,
-                    publicKey: await myself.expiredKeys[i].extractPublicKey());
-                i++;
-              }
-              if (!pass) {
-                logger.e('TransactionKeyVerifyFailure');
-                //throw new Error("TransactionKeyVerifyFailure")
-              }
+      var keySignature = dataBlock.transactionKeySignature;
+      if (keySignature != null && verify == true) {
+        if (dataBlock.peerId == myself.peerId) {
+          var srcPublicKey = myself.publicKey;
+          var pass = await cryptoGraphy.verify(
+              transportKey, keySignature.codeUnits,
+              publicKey: srcPublicKey);
+          if (!pass) {
+            var i = 0;
+            while (!pass && i < myself.expiredKeys.length) {
+              pass = await cryptoGraphy.verify(
+                  transportKey, keySignature.codeUnits,
+                  publicKey: await myself.expiredKeys[i].extractPublicKey());
+              i++;
             }
-          } else {
-            var srcPublicKey =
-                await peerClientService.getCachedPublicKey(dataBlock.peerId!);
-            if (srcPublicKey == null) {
-              throw 'NullSrcPublicKey';
-            }
-            var pass = await cryptoGraphy.verify(
-                transportKey, keySignature.codeUnits,
-                publicKey: srcPublicKey);
             if (!pass) {
               logger.e('TransactionKeyVerifyFailure');
               //throw new Error("TransactionKeyVerifyFailure")
             }
           }
+        } else {
+          var srcPublicKey =
+              await peerClientService.getCachedPublicKey(dataBlock.peerId!);
+          if (srcPublicKey == null) {
+            throw 'NullSrcPublicKey';
+          }
+          var pass = await cryptoGraphy.verify(
+              transportKey, keySignature.codeUnits,
+              publicKey: srcPublicKey);
+          if (!pass) {
+            logger.e('TransactionKeyVerifyFailure');
+            //throw new Error("TransactionKeyVerifyFailure")
+          }
         }
-        transactionKeys = JsonUtil.toJson(transportKey);
-        dataBlock.transactionKeys = transactionKeys;
       }
+      transactionKeys = JsonUtil.toJson(transportKey);
+      dataBlock.transactionKeys = transactionKeys;
     }
     // 如果数据被加密，处理目标的加密密钥
-    var secretKey = null;
+    List<int>? secretKey;
 
     if (transactionKeys != null && transactionKeys.isNotEmpty) {
       for (var transactionKey in transactionKeys) {
@@ -382,7 +379,7 @@ class DataBlockService extends BaseService {
               logger.e(e);
             }
             var i = 0;
-            while (!secretKey && i < myself.expiredKeys.length) {
+            while (secretKey == null && i < myself.expiredKeys.length) {
               try {
                 secretKey = await cryptoGraphy.eccDecrypt(payloadKey.codeUnits,
                     localKeyPair: myself.expiredKeys[i]);
@@ -392,7 +389,7 @@ class DataBlockService extends BaseService {
                 i++;
               }
             }
-            if (!secretKey) {
+            if (secretKey == null) {
               throw 'EccDecryptFailed';
             }
           }
@@ -405,21 +402,18 @@ class DataBlockService extends BaseService {
     if (transportPayload != null) {
       List<int> data = CryptoUtil.decodeBase64(transportPayload);
       // 数据解密
-      if (secretKey) {
+      if (secretKey != null) {
         try {
           data = await cryptoGraphy.aesDecrypt(data, secretKey);
         } catch (err) {
           logger.e('data cannot aesDecrypt');
         }
       }
-      var payload = null;
-      if (data != null) {
-        // 解压缩
-        data = CryptoUtil.uncompress(data);
-        // 还原数据
-        var str = CryptoUtil.uint8ListToStr(data);
-        payload = JsonUtil.toJson(str);
-      }
+      var payload;
+      data = CryptoUtil.uncompress(data);
+      // 还原数据
+      var str = CryptoUtil.uint8ListToStr(data);
+      payload = JsonUtil.toJson(str);
       dataBlock.payload = payload;
       dataBlock.transportPayload = null;
     }
@@ -427,39 +421,30 @@ class DataBlockService extends BaseService {
 
   blockMerge(Map dbMap) async {
     var blocks = [];
-    if (dbMap != null) {
-      // 每个不同的块号循环
-      for (var key in dbMap.keys) {
-        var dataBlocks = dbMap[key];
-        if (dataBlocks &&
-            TypeUtil.isArray(dataBlocks) &&
-            dataBlocks.length > 0) {
-          var db = await DataBlockService.merge(dataBlocks);
-          await decrypt(db!, true);
-          blocks.add(db);
-        }
+    for (var key in dbMap.keys) {
+      var dataBlocks = dbMap[key];
+      if (dataBlocks && TypeUtil.isArray(dataBlocks) && dataBlocks.length > 0) {
+        var db = await DataBlockService.merge(dataBlocks);
+        await decrypt(db!, true);
+        blocks.add(db);
       }
     }
     return blocks;
   }
 
   blockMapMerge(Map targetMap, Map dbMap) async {
-    if (dbMap != null) {
-      var blocks = [];
-      // 每个不同的块号循环
-      for (var key in dbMap.keys) {
-        var ts = targetMap[key];
-        if (!ts) {
-          ts = [];
-          targetMap[key] = ts;
-        }
-        var dataBlocks = dbMap[key];
-        if (dataBlocks &&
-            TypeUtil.isArray(dataBlocks) &&
-            dataBlocks.length > 0) {
-          for (var dataBlock in dataBlocks) {
-            ts.push(dataBlock);
-          }
+    var blocks = [];
+    // 每个不同的块号循环
+    for (var key in dbMap.keys) {
+      var ts = targetMap[key];
+      if (!ts) {
+        ts = [];
+        targetMap[key] = ts;
+      }
+      var dataBlocks = dbMap[key];
+      if (dataBlocks && TypeUtil.isArray(dataBlocks) && dataBlocks.length > 0) {
+        for (var dataBlock in dataBlocks) {
+          ts.push(dataBlock);
         }
       }
     }
@@ -474,13 +459,11 @@ class DataBlockService extends BaseService {
       {required Map conditionBean, required Map options}) async {
     Map blockMap = {};
     conditionBean['receiverPeerId'] = myself.peerId;
-    if (options != null) {
-      if (options['createPeer'] == true) {
-        conditionBean['createPeerId'] = myself.peerId;
-      }
-      if (options['receiverPeer'] == true) {
-        conditionBean['receiverPeer'] = true;
-      }
+    if (options['createPeer'] == true) {
+      conditionBean['createPeerId'] = myself.peerId;
+    }
+    if (options['receiverPeer'] == true) {
+      conditionBean['receiverPeer'] = true;
     }
     // List? blocks = await queryValueAction.queryValue(conditionBean);
     // if (blocks != null && TypeUtil.isArray(blocks)) {
@@ -554,7 +537,7 @@ class DataBlockService extends BaseService {
           /**
            * 合并所有的分片
            */
-          if (blocks != null && blocks.length > 0) {
+          if (blocks.isNotEmpty) {
             for (var bs in blocks) {
               await blockMapMerge(blockMap, bs);
             }

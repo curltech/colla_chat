@@ -849,7 +849,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     double? minVerticalPadding,
     double? minLeadingWidth,
   }) {
-    return ListTile();
+    return const ListTile();
   }
 
   Widget buildStepper({
@@ -948,7 +948,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     StackFit stackFit = StackFit.loose,
     Gradient? gradient,
   }) {
-    return badges.Badge();
+    return const badges.Badge();
   }
 
   ///按钮
@@ -1335,7 +1335,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     ShapeBorder? shape,
     AlignmentGeometry? alignment,
   }) {
-    return SimpleDialog();
+    return const SimpleDialog();
   }
 
   Widget buildAlertDialog({
@@ -1364,7 +1364,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     AlignmentGeometry? alignment,
     bool scrollable = false,
   }) {
-    return AlertDialog();
+    return const AlertDialog();
   }
 
   Widget showDatePicker({
@@ -1607,7 +1607,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     TextStyle? titleTextStyle,
     SystemUiOverlayStyle? systemOverlayStyle,
   }) {
-    return SliverAppBar();
+    return const SliverAppBar();
   }
 
   Widget buildDrawer({

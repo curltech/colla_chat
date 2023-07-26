@@ -1,5 +1,4 @@
 import 'package:colla_chat/datastore/datastore.dart';
-import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:flutter/material.dart';

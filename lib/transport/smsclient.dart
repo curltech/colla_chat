@@ -115,9 +115,7 @@ class SmsClient extends IWebClient {
       return;
     }
     Linkman? linkman = linkmen[0];
-    if (linkman != null) {
-      receiveChatMessage(linkman, body);
-    }
+    receiveChatMessage(linkman, body);
   }
 
   ///接收到加密的短信内容

@@ -45,6 +45,7 @@ class _ContactWidgetState extends State<ContactWidget> {
     } catch (e) {
       logger.e('Failed to get contacts:\n$e');
     }
+    return null;
   }
 
   _refresh() async {

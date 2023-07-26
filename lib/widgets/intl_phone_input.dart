@@ -3,7 +3,7 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 
 var intlPhoneInput = IntlPhoneField(
-  decoration: InputDecoration(
+  decoration: const InputDecoration(
     labelText: 'Phone Number',
     border: OutlineInputBorder(
       borderSide: BorderSide(),
@@ -13,7 +13,7 @@ var intlPhoneInput = IntlPhoneField(
     print(phone.completeNumber);
   },
   onCountryChanged: (country) {
-    print('Country changed to: ' + country.name);
+    print('Country changed to: ${country.name}');
   },
 );
 // String? phoneNumber;
@@ -32,7 +32,7 @@ onValidPhoneNumber(
     String number, String internationalizedPhoneNumber, String isoCode) {}
 
 var phoneField = PhoneFormField(
-  key: Key('phone-field'),
+  key: const Key('phone-field'),
   controller: null,
   // controller & initialValue value
   initialValue: null,
@@ -41,19 +41,19 @@ var phoneField = PhoneFormField(
   // default
   defaultCountry: IsoCode.US,
   // default
-  decoration: InputDecoration(
+  decoration: const InputDecoration(
       labelText: 'Phone', // default to null
       border: OutlineInputBorder() // default to UnderlineInputBorder(),
 // ...
       ),
   validator: PhoneValidator.validMobile(),
   // default PhoneValidator.valid()
-  countrySelectorNavigator: CountrySelectorNavigator.bottomSheet(),
+  countrySelectorNavigator: const CountrySelectorNavigator.bottomSheet(),
   showFlagInInput: true,
   // default
   flagSize: 16,
   // default
-  autofillHints: [AutofillHints.telephoneNumber],
+  autofillHints: const [AutofillHints.telephoneNumber],
   // default to null
   enabled: true,
   // default

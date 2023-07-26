@@ -1,5 +1,4 @@
 import 'package:colla_chat/crypto/util.dart';
-import 'package:colla_chat/entity/dht/base.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/tool/image_util.dart';
 

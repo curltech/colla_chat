@@ -90,7 +90,7 @@ class _SpeechToTextWidgetState extends State<SpeechToTextWidget> {
       title: 'SpeechToText',
       withLeading: true,
       child: Column(children: [
-        HeaderWidget(),
+        const HeaderWidget(),
         Container(
           child: Column(
             children: <Widget>[
@@ -193,7 +193,7 @@ class _SpeechToTextWidgetState extends State<SpeechToTextWidget> {
     _logEvent(
         'Received listener status: $status, listening: ${speech.isListening}');
     setState(() {
-      lastStatus = '$status';
+      lastStatus = status;
     });
   }
 
@@ -233,7 +233,7 @@ class RecognitionResultsWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        Center(
+        const Center(
           child: CommonAutoSizeText(
             'Recognized Words',
             style: TextStyle(fontSize: 22.0),
@@ -267,11 +267,11 @@ class RecognitionResultsWidget extends StatelessWidget {
                             color: Colors.black.withOpacity(.05))
                       ],
                       color: Colors.white,
-                      borderRadius: BorderRadius.all(Radius.circular(50)),
+                      borderRadius: const BorderRadius.all(Radius.circular(50)),
                     ),
                     child: IconButton(
-                      icon: Icon(Icons.mic),
-                      onPressed: () => null,
+                      icon: const Icon(Icons.mic),
+                      onPressed: () {},
                     ),
                   ),
                 ),
@@ -314,7 +314,7 @@ class ErrorWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        Center(
+        const Center(
           child: CommonAutoSizeText(
             'Error Status',
             style: TextStyle(fontSize: 22.0),
@@ -348,15 +348,15 @@ class SpeechControlWidget extends StatelessWidget {
       children: <Widget>[
         TextButton(
           onPressed: !hasSpeech || isListening ? null : startListening,
-          child: CommonAutoSizeText('Start'),
+          child: const CommonAutoSizeText('Start'),
         ),
         TextButton(
           onPressed: isListening ? stopListening : null,
-          child: CommonAutoSizeText('Stop'),
+          child: const CommonAutoSizeText('Stop'),
         ),
         TextButton(
           onPressed: isListening ? cancelListening : null,
-          child: CommonAutoSizeText('Cancel'),
+          child: const CommonAutoSizeText('Cancel'),
         )
       ],
     );
@@ -392,7 +392,7 @@ class SessionOptionsWidget extends StatelessWidget {
         children: <Widget>[
           Row(
             children: [
-              CommonAutoSizeText('Language: '),
+              const CommonAutoSizeText('Language: '),
               DropdownButton<String>(
                 onChanged: (selectedVal) => switchLang(selectedVal),
                 value: currentLocaleId,
@@ -409,18 +409,18 @@ class SessionOptionsWidget extends StatelessWidget {
           ),
           Row(
             children: [
-              CommonAutoSizeText('pauseFor: '),
+              const CommonAutoSizeText('pauseFor: '),
               Container(
-                  padding: EdgeInsets.only(left: 8),
+                  padding: const EdgeInsets.only(left: 8),
                   width: 80,
                   child: CommonTextFormField(
                     controller: pauseForController,
                   )),
               Container(
-                  padding: EdgeInsets.only(left: 16),
-                  child: CommonAutoSizeText('listenFor: ')),
+                  padding: const EdgeInsets.only(left: 16),
+                  child: const CommonAutoSizeText('listenFor: ')),
               Container(
-                  padding: EdgeInsets.only(left: 8),
+                  padding: const EdgeInsets.only(left: 8),
                   width: 80,
                   child: CommonTextFormField(
                     controller: listenForController,
@@ -429,7 +429,7 @@ class SessionOptionsWidget extends StatelessWidget {
           ),
           Row(
             children: [
-              CommonAutoSizeText('Log events: '),
+              const CommonAutoSizeText('Log events: '),
               Checkbox(
                 value: logEvents,
                 onChanged: switchLogging,
@@ -456,7 +456,7 @@ class InitSpeechWidget extends StatelessWidget {
       children: <Widget>[
         TextButton(
           onPressed: hasSpeech ? null : initSpeechState,
-          child: CommonAutoSizeText('Initialize'),
+          child: const CommonAutoSizeText('Initialize'),
         ),
       ],
     );
@@ -475,15 +475,15 @@ class SpeechStatusWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 20),
-      color: Theme.of(context).backgroundColor,
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      color: Theme.of(context).colorScheme.background,
       child: Center(
         child: speech.isListening
-            ? CommonAutoSizeText(
+            ? const CommonAutoSizeText(
                 "I'm listening...",
                 style: TextStyle(fontWeight: FontWeight.bold),
               )
-            : CommonAutoSizeText(
+            : const CommonAutoSizeText(
                 'Not listening',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),

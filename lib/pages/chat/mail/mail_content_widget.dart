@@ -19,7 +19,6 @@ import 'package:enough_mail/highlevel.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:mimecon/mimecon.dart';
-import 'package:path/path.dart' as p;
 
 ///邮件内容子视图
 class MailContentWidget extends StatefulWidget with TileDataMixin {
@@ -143,6 +142,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
             description: decryptedMimeMessage.subject);
       }
     }
+    return null;
   }
 
   ///当前的邮件发生变化，如果没有获取内容，则获取内容

@@ -194,6 +194,7 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
         }
       }
     }
+    return null;
   }
 
   ///清楚当前账户的日志

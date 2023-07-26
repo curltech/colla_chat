@@ -1,8 +1,6 @@
-import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 ///EnoughHtmlEditor的实现，用于简单的编辑，inappwebview实现

@@ -10,7 +10,6 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:cross_file/cross_file.dart';
-import 'package:file_picker/src/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:openvpn_flutter/openvpn_flutter.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';

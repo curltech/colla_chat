@@ -1,5 +1,4 @@
 import 'package:colla_chat/crypto/util.dart';
-import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/emailaddress.dart' as entity;
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/mail/new_mail_widget.dart';
@@ -7,7 +6,6 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/emailaddress.dart';
-import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
@@ -373,6 +371,7 @@ class MailMimeMessageController
       return await emailClient.fetchMessagePart(mimeMessage, fetchId,
           responseTimeout: responseTimeout);
     }
+    return null;
   }
 
   ///解密标题和文本

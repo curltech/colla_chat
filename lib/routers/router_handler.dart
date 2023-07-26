@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 Handler remoteLoginHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
-  return RemoteLogin();
+  return const RemoteLogin();
 });
 
 // p2p登录页面

@@ -72,7 +72,7 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
 
     try {
       AdvancedPeerConnection? advancedPeerConnection =
-          await peerConnectionPool.create(peerId!);
+          await peerConnectionPool.create(peerId);
     } catch (e) {
       logger.i(e.toString());
     }
@@ -96,7 +96,7 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
   //关闭处理
   _close() async {
     try {
-      peerConnectionPool.close(peerId!, clientId: clientId);
+      peerConnectionPool.close(peerId, clientId: clientId);
     } catch (e) {
       logger.i(e.toString());
     }

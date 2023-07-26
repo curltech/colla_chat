@@ -368,12 +368,12 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
   Widget _buildExposureModeWidget() {
     var primary = myself.primary;
     final ButtonStyle styleAuto = TextButton.styleFrom(
-      primary: cameraController?.value.exposureMode == ExposureMode.auto
+      foregroundColor: cameraController?.value.exposureMode == ExposureMode.auto
           ? Colors.orange
           : primary,
     );
     final ButtonStyle styleLocked = TextButton.styleFrom(
-      primary: cameraController?.value.exposureMode == ExposureMode.locked
+      foregroundColor: cameraController?.value.exposureMode == ExposureMode.locked
           ? Colors.orange
           : primary,
     );
@@ -454,12 +454,12 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
   Widget _buildFocusModeWidget() {
     var primary = myself.primary;
     final ButtonStyle styleAuto = TextButton.styleFrom(
-      primary: cameraController?.value.focusMode == FocusMode.auto
+      foregroundColor: cameraController?.value.focusMode == FocusMode.auto
           ? Colors.orange
           : primary,
     );
     final ButtonStyle styleLocked = TextButton.styleFrom(
-      primary: cameraController?.value.focusMode == FocusMode.locked
+      foregroundColor: cameraController?.value.focusMode == FocusMode.locked
           ? Colors.orange
           : primary,
     );

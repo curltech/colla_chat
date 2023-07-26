@@ -113,7 +113,7 @@ class PhotoUtil {
   }) async {
     final ImagePicker picker = ImagePicker();
     // Pick multiple images
-    final List<XFile>? images = await picker.pickMultiImage(
+    final List<XFile> images = await picker.pickMultiImage(
         maxWidth: maxWidth, maxHeight: maxHeight, imageQuality: imageQuality);
 
     return images;

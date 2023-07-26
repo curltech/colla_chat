@@ -185,7 +185,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     String? peerId = myselfPeer.peerId;
     var profile = await peerProfileService.findOneByPeerId(peerId);
     if (profile != null) {
-      await peerProfileService.delete(entity: profile);
+      peerProfileService.delete(entity: profile);
     }
     var peerProfile = PeerProfile(peerId, clientId: myselfPeer.clientId);
     peerProfile.peerId = peerId;
@@ -341,7 +341,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
 
   Future<void> connect() async {
     if (myself.id != null) {
-      MyselfPeer myselfPeer = myself.myselfPeer!;
+      MyselfPeer myselfPeer = myself.myselfPeer;
       var json = JsonUtil.toJson(myselfPeer);
       var peerClient = PeerClient.fromJson(json);
       peerClient.activeStatus = ActiveStatus.Up.name;

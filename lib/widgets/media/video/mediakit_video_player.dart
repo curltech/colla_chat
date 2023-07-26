@@ -8,7 +8,6 @@ import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_meedu_media_kit/meedu_player.dart';
-import 'package:media_kit_video/media_kit_video.dart';
 
 class MediaKitMediaSource {
   static Media? media({required String filename}) {

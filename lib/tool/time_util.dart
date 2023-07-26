@@ -1,6 +1,6 @@
 import 'dart:async';
 
-typedef void OnTimerTickCallback(int millisUntilFinished);
+typedef OnTimerTickCallback = void Function(int millisUntilFinished);
 
 class TimerUtil {
   TimerUtil(
@@ -38,9 +38,7 @@ class TimerUtil {
   }
 
   void _doCallback(int time) {
-    if (_onTimerTickCallback != null) {
-      _onTimerTickCallback(time);
-    }
+    _onTimerTickCallback(time);
   }
 
   void startCountDown() {
@@ -68,10 +66,10 @@ class TimerUtil {
   }
 
   void cancel() {
-    final _mTimer = this._mTimer;
-    if (_mTimer != null) {
-      _mTimer.cancel();
-      this._mTimer = null;
+    final mTimer = _mTimer;
+    if (mTimer != null) {
+      mTimer.cancel();
+      _mTimer = null;
     }
     _isActive = false;
   }

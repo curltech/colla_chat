@@ -21,7 +21,7 @@ class StockAccountService extends GeneralBaseService<StockAccount> {
     String where = 'accountId = ?';
     StockAccount account;
     var accounts = await find(where: where, whereArgs: [user['userId']]);
-    if (accounts != null && accounts.isNotEmpty && accounts[0] != null) {
+    if (accounts.isNotEmpty) {
       var acc = accounts[0];
       account = StockAccount.fromJson(acc as Map);
     } else {

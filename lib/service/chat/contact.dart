@@ -60,7 +60,7 @@ class ContactService extends PeerPartyService<Contact> {
           lastContacts.add(contact);
         } else {
           // 如果通讯录不存在，则本地库删除
-          await delete(entity: contact);
+          delete(entity: contact);
         }
       }
     }

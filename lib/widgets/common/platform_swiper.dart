@@ -167,6 +167,7 @@ class _PlatformSwiperState extends State<PlatformSwiper> {
         int verticalOffsetPercentage,
       ) {
         widget.itemBuilder(context, index);
+        return null;
       },
       cardsCount: widget.itemCount,
       controller: CardSwiperController(),

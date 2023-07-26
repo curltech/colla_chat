@@ -244,12 +244,14 @@ class _TextToSpeechWidgetState extends State<TextToSpeechWidget> {
             if (snapshot.hasData) {
               return _enginesDropDownSection(snapshot.data);
             } else if (snapshot.hasError) {
-              return CommonAutoSizeText('Error loading engines...');
-            } else
-              return CommonAutoSizeText('Loading engines...');
+              return const CommonAutoSizeText('Error loading engines...');
+            } else {
+              return const CommonAutoSizeText('Loading engines...');
+            }
           });
-    } else
-      return Container(width: 0, height: 0);
+    } else {
+      return const SizedBox(width: 0, height: 0);
+    }
   }
 
   Widget _futureBuilder() => FutureBuilder<dynamic>(
@@ -258,14 +260,15 @@ class _TextToSpeechWidgetState extends State<TextToSpeechWidget> {
         if (snapshot.hasData) {
           return _languageDropDownSection(snapshot.data);
         } else if (snapshot.hasError) {
-          return CommonAutoSizeText('Error loading languages...');
-        } else
-          return CommonAutoSizeText('Loading Languages...');
+          return const CommonAutoSizeText('Error loading languages...');
+        } else {
+          return const CommonAutoSizeText('Loading Languages...');
+        }
       });
 
   Widget _inputSection() => Container(
       alignment: Alignment.topCenter,
-      padding: EdgeInsets.only(top: 25.0, left: 25.0, right: 25.0),
+      padding: const EdgeInsets.only(top: 25.0, left: 25.0, right: 25.0),
       child: TextField(
         onChanged: (String value) {
           _onChange(value);
@@ -275,7 +278,7 @@ class _TextToSpeechWidgetState extends State<TextToSpeechWidget> {
   Widget _btnSection() {
     if (isAndroid) {
       return Container(
-          padding: EdgeInsets.only(top: 50.0),
+          padding: const EdgeInsets.only(top: 50.0),
           child:
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
             _buildButtonColumn(Colors.green, Colors.greenAccent,
@@ -285,7 +288,7 @@ class _TextToSpeechWidgetState extends State<TextToSpeechWidget> {
           ]));
     } else {
       return Container(
-          padding: EdgeInsets.only(top: 50.0),
+          padding: const EdgeInsets.only(top: 50.0),
           child:
               Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
             _buildButtonColumn(Colors.green, Colors.greenAccent,
@@ -299,7 +302,7 @@ class _TextToSpeechWidgetState extends State<TextToSpeechWidget> {
   }
 
   Widget _enginesDropDownSection(dynamic engines) => Container(
-        padding: EdgeInsets.only(top: 50.0),
+        padding: const EdgeInsets.only(top: 50.0),
         child: DropdownButton(
           value: engine,
           items: getEnginesDropDownMenuItems(engines),
@@ -308,7 +311,7 @@ class _TextToSpeechWidgetState extends State<TextToSpeechWidget> {
       );
 
   Widget _languageDropDownSection(dynamic languages) => Container(
-      padding: EdgeInsets.only(top: 10.0),
+      padding: const EdgeInsets.only(top: 10.0),
       child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         DropdownButton(
           value: language,
@@ -348,7 +351,7 @@ class _TextToSpeechWidgetState extends State<TextToSpeechWidget> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         ElevatedButton(
-          child: CommonAutoSizeText('Get max speech input length'),
+          child: const CommonAutoSizeText('Get max speech input length'),
           onPressed: () async {
             _inputLength = await flutterTts.getMaxSpeechInputLength;
             setState(() {});

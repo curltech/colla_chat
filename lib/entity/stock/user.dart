@@ -87,43 +87,43 @@ class StockUser {
     account?.subscription = val;
   }
 
-  addSubscription(String ts_code) {
+  addSubscription(String tsCode) {
     final account = this.account;
     if (account != null) {
       var subscription = account.subscription;
       subscription ??= '';
-      var pos = subscription.indexOf(ts_code);
+      var pos = subscription.indexOf(tsCode);
       if (pos == -1) {
         if (subscription == '') {
-          account.subscription = (subscription + ts_code);
+          account.subscription = (subscription + tsCode);
         } else {
-          account.subscription = '$subscription,$ts_code';
+          account.subscription = '$subscription,$tsCode';
         }
         stockAccountService.upsert(account);
       }
     }
   }
 
-  removeSubscription(String ts_code) {
+  removeSubscription(String tsCode) {
     final account = this.account;
     if (account != null) {
       var subscription = account.subscription;
       subscription ??= '';
-      var pos = subscription.indexOf(ts_code);
+      var pos = subscription.indexOf(tsCode);
       if (pos != -1) {
-        account.subscription = subscription.replaceAll(',$ts_code', '');
-        account.subscription = subscription.replaceAll(ts_code, '');
+        account.subscription = subscription.replaceAll(',$tsCode', '');
+        account.subscription = subscription.replaceAll(tsCode, '');
         stockAccountService.upsert(account);
       }
     }
   }
 
-  bool canbeAdd(String ts_code) {
+  bool canbeAdd(String tsCode) {
     final account = this.account;
     if (account != null) {
       account.subscription ??= '';
       var subscription = account.subscription;
-      var pos = subscription?.indexOf(ts_code);
+      var pos = subscription?.indexOf(tsCode);
       if (pos == -1) {
         return true;
       }
@@ -131,12 +131,12 @@ class StockUser {
     return false;
   }
 
-  bool canbenRemove(String ts_code) {
+  bool canbenRemove(String tsCode) {
     final account = this.account;
     if (account != null) {
       account.subscription ??= '';
       var subscription = account.subscription;
-      var pos = subscription?.indexOf(ts_code);
+      var pos = subscription?.indexOf(tsCode);
       if (pos != -1) {
         return true;
       }
@@ -144,9 +144,7 @@ class StockUser {
     return false;
   }
 
-  /**
-   * 自选股中的当前指示器，用于在自选股中遍历，修改会同时修改指定股票
-   */
+  /// 自选股中的当前指示器，用于在自选股中遍历，修改会同时修改指定股票
   int get currentIndex {
     return _currentIndex;
   }
@@ -169,11 +167,9 @@ class StockUser {
     }
   }
 
-  /**
-   * 向服务器注册账号，成功后更新本地账号记录
-   * @param url
-   * @param params
-   */
+  /// 向服务器注册账号，成功后更新本地账号记录
+  /// @param url
+  /// @param params
   Future<StockAccount?> regist(String url, dynamic params) async {
     var response = await webClient.send(url, params);
     if (response != null) {

@@ -80,8 +80,8 @@ class QrcodeUtil {
             ),
             // size: 320.0,
             embeddedImage: snapshot.data,
-            embeddedImageStyle: QrEmbeddedImageStyle(
-              size: const Size.square(64),
+            embeddedImageStyle: const QrEmbeddedImageStyle(
+              size: Size.square(64),
             ),
           ),
         );
