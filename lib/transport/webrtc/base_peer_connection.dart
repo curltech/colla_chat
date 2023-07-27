@@ -335,7 +335,7 @@ class BasePeerConnection {
 
   ///激活流加密，在连接创建，而且sender存在的情况下
   ///每个轨道设置一个加密器，
-  void enableEncryption(RTCRtpSender sender) async {
+  Future<void> enableEncryption(RTCRtpSender sender) async {
     MediaStreamTrack? track = sender.track;
     if (track == null) {
       return;
@@ -373,7 +373,7 @@ class BasePeerConnection {
 
   ///激活流解密，在连接创建，receiver
   ///每个轨道设置一个解密器，
-  void enableDecryption(RTCRtpReceiver receiver) async {
+  Future<void> enableDecryption(RTCRtpReceiver receiver) async {
     MediaStreamTrack? track = receiver.track;
     if (track == null) {
       return;
@@ -523,6 +523,11 @@ class BasePeerConnection {
       onRemoteTrack(event);
     };
     status = PeerConnectionStatus.init;
+
+    /// 5.初始化加密
+    if (streamEncrypt) {
+      await _initKeyProvider();
+    }
 
     return true;
   }
@@ -1081,6 +1086,9 @@ class BasePeerConnection {
 
     try {
       RTCRtpSender streamSender = await peerConnection.addTrack(track, stream);
+      if (streamEncrypt) {
+        await enableEncryption(streamSender);
+      }
       trackSenders[trackId] = streamSender;
 
       return true;
@@ -1195,6 +1203,13 @@ class BasePeerConnection {
         }
       }
     }
+    if (streamEncrypt) {
+      if (frameCyrptors.containsKey(trackId)) {
+        FrameCryptor? frameCryptor = frameCyrptors[trackId];
+        frameCryptor!.dispose();
+        frameCyrptors.remove(trackId);
+      }
+    }
   }
 
   ///克隆远程流，可用于转发
@@ -1249,6 +1264,14 @@ class BasePeerConnection {
         await sender.replaceTrack(newTrack);
         trackSenders.remove(oldTrackId);
         trackSenders[newTrackId!] = sender;
+        if (streamEncrypt) {
+          if (frameCyrptors.containsKey(oldTrackId)) {
+            FrameCryptor? frameCryptor = frameCyrptors[oldTrackId];
+            frameCryptor!.dispose();
+            frameCyrptors.remove(oldTrackId);
+          }
+          await enableEncryption(sender);
+        }
       }
     }
   }
@@ -1266,15 +1289,30 @@ class BasePeerConnection {
   }
 
   ///对远端的连接来说，当有stream或者track到来时触发
-  onAddRemoteTrack(MediaStream stream, MediaStreamTrack track) {
+  onAddRemoteTrack(MediaStream stream, MediaStreamTrack track) async {
     logger.i(
         'onAddRemoteTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id}');
+    if (streamEncrypt) {
+      List<RTCRtpReceiver> receivers = await peerConnection!.receivers;
+      if (receivers.isNotEmpty) {
+        for (RTCRtpReceiver receiver in receivers) {
+          await enableDecryption(receiver);
+        }
+      }
+    }
     emit(WebrtcEventType.addTrack, {'stream': stream, 'track': track});
   }
 
   onRemoveRemoteTrack(MediaStream stream, MediaStreamTrack track) {
     logger.i(
         'onRemoveRemoteTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id}');
+    if (streamEncrypt) {
+      if (frameCyrptors.containsKey(track.id!)) {
+        FrameCryptor? frameCryptor = frameCyrptors[track.id!];
+        frameCryptor!.dispose();
+        frameCyrptors.remove(track.id!);
+      }
+    }
     emit(WebrtcEventType.removeTrack, {'stream': stream, 'track': track});
   }
 
