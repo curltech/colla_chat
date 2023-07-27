@@ -31,9 +31,11 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
+import 'package:screenshot_callback/screenshot_callback.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:no_screenshot/no_screenshot.dart';
 
 /// 聊天界面，包括文本聊天，视频通话呼叫，视频通话，全屏展示四个组件
 /// 支持群聊
@@ -78,6 +80,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
       ValueNotifier<ChatSummary?>(chatMessageController.chatSummary);
   final ValueNotifier<double> chatMessageHeight = ValueNotifier<double>(0);
   double visibleFraction = 0.0;
+  final NoScreenshot noScreenshot = NoScreenshot.instance;
+  final ScreenshotCallback screenshotCallback = ScreenshotCallback();
 
   @override
   void initState() {
@@ -90,6 +94,12 @@ class _ChatMessageViewState extends State<ChatMessageView>
     _buildReadStatus();
     _updateChatMessageView();
     Wakelock.enable();
+    if (platformParams.mobile) {
+      noScreenshot.screenshotOff();
+      screenshotCallback.addListener(() {
+        logger.w('screenshot');
+      });
+    }
   }
 
   @override
@@ -413,6 +423,9 @@ class _ChatMessageViewState extends State<ChatMessageView>
     WidgetsBinding.instance.removeObserver(this);
     windowManager.removeListener(this);
     Wakelock.disable();
+    if (platformParams.mobile) {
+      screenshotCallback.dispose();
+    }
     super.dispose();
   }
 }

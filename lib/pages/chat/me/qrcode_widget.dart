@@ -13,6 +13,7 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
+import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 
 class QrcodeWidget extends StatefulWidget with TileDataMixin {
@@ -57,6 +58,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
   GlobalKey? globalKey;
   String? content;
   Widget? qrImage;
+  ScreenshotController screenshotController = ScreenshotController();
 
   @override
   void initState() {
@@ -73,6 +75,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
       case 'Save to image':
         Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
         ImageUtil.saveImageGallery(bytes, myself.peerId!);
+        //Uint8List? bytes = await screenshotController.capture();
         break;
       case 'Share':
         Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
@@ -112,15 +115,17 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
       const SizedBox(
         height: 40.0,
       ),
-      Center(
-          child: Container(
-        key: globalKey,
-        alignment: Alignment.center,
-        width: 320,
-        color: Colors.white,
-        padding: const EdgeInsets.all(5.0),
-        child: qrImage,
-      )),
+      Screenshot(
+          controller: screenshotController,
+          child: Center(
+              child: Container(
+            key: globalKey,
+            alignment: Alignment.center,
+            width: 320,
+            color: Colors.white,
+            padding: const EdgeInsets.all(5.0),
+            child: qrImage,
+          ))),
       const Spacer(),
       CommonAutoSizeText(
         AppLocalizations.t('Scan qrcode, add linkman'),
