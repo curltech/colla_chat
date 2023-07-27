@@ -222,6 +222,18 @@ enum PeerConnectionStatus {
   closed, //是否关闭连接完成
 }
 
+///支持的音频编码
+const List<String> audioCodecList = <String>[
+  'OPUS',
+  'ISAC',
+  'PCMA',
+  'PCMU',
+  'G729'
+];
+
+///支持的视频编码
+const List<String> videoCodecList = <String>['VP8', 'VP9', 'H264', 'AV1'];
+
 /// 基础的PeerConnection，实现建立连接和sdp协商
 /// 代表一个本地与远程的webrtc连接，这个类不含业务含义，不包含与信号服务器的交互部分
 /// 有两个子类，分别代表主动发起连接的，和被动接受连接的，在两种场景下，协商过程中的行为稍有不同
@@ -245,9 +257,11 @@ class BasePeerConnection {
   //是否需要主动建立数据通道
   bool needDataChannel = true;
 
-  //媒体流的轨道，流和发送者之间的关系
-  //Map<String, Map<String, MediaStreamTrack>> tracks = {};
+  //媒体流的轨道，发送者之间的关系，每增加一个本地轨道就产生一个sender
   Map<String, RTCRtpSender> trackSenders = {};
+
+  //媒体流的轨道，接收者之间的关系，每增加一个远程轨道就产生一个receiver
+  Map<String, RTCRtpReceiver> trackReceiver = {};
 
   //外部使用时注册的回调方法，也就是注册事件
   //WebrtcEvent定义了事件的名称
@@ -276,8 +290,119 @@ class BasePeerConnection {
   int delayTimes = 20;
   int reconnectTimes = 1;
 
+  ///采用的音视频编码
+  String audioCodec = audioCodecList.first;
+  String videoCodec = videoCodecList.first;
+
+  ///下面是实现端到端加密的部分
+  final FrameCryptorFactory _frameCyrptorFactory = frameCryptorFactory;
+  KeyProvider? keyProvider;
+  final Map<String, FrameCryptor> frameCyrptors = {};
+  bool streamEncrypt = false;
+  String? senderTrackId;
+
+  ///棘轮加密的初始化对称密钥，可以在视频通话前由datachannel协商一致
+  final aesKey = Uint8List.fromList(''.codeUnits);
+
   BasePeerConnection({required this.initiator}) {
     logger.i('Create initiator:$initiator BasePeerConnection');
+  }
+
+  ///初始化加密密钥提供者，采用棘轮加密
+  _initKeyProvider() async {
+    var keyProviderOptions = KeyProviderOptions(
+      sharedKey: true,
+      ratchetSalt: Uint8List.fromList(''.codeUnits),
+      ratchetWindowSize: 16,
+    );
+
+    keyProvider ??=
+        await _frameCyrptorFactory.createDefaultKeyProvider(keyProviderOptions);
+
+    RTCRtpCapabilities acaps = await getRtpSenderCapabilities('audio');
+    logger.i('sender audio capabilities: ${acaps.toMap()}');
+
+    RTCRtpCapabilities vcaps = await getRtpSenderCapabilities('video');
+    logger.i('sender video capabilities: ${vcaps.toMap()}');
+  }
+
+  ///产生新的密钥
+  void _ratchetKey() async {
+    var newKey =
+        await keyProvider?.ratchetKey(participantId: senderTrackId!, index: 0);
+    logger.i('newKey $newKey');
+  }
+
+  ///激活流加密，在连接创建，而且sender存在的情况下
+  ///每个轨道设置一个加密器，
+  void enableEncryption(RTCRtpSender sender) async {
+    MediaStreamTrack? track = sender.track;
+    if (track == null) {
+      return;
+    }
+    String? kind = track.kind;
+    if (kind == null) {
+      return;
+    }
+    String? trackId = track.id;
+    if (trackId == null) {
+      return;
+    }
+    if (!frameCyrptors.containsKey(trackId)) {
+      var frameCyrptor =
+          await _frameCyrptorFactory.createFrameCryptorForRtpSender(
+              participantId: trackId,
+              sender: sender,
+              algorithm: Algorithm.kAesGcm,
+              keyProvider: keyProvider!);
+      frameCyrptor.onFrameCryptorStateChanged = (participantId, state) =>
+          logger.i('encrypt onFrameCryptorStateChanged $participantId $state');
+      frameCyrptors[id] = frameCyrptor;
+      await frameCyrptor.setKeyIndex(0);
+    }
+
+    if (kind == 'video') {
+      senderTrackId = trackId;
+    }
+
+    var frameCyrptor = frameCyrptors[trackId];
+    await frameCyrptor?.setEnabled(true);
+    await keyProvider?.setKey(participantId: trackId, index: 0, key: aesKey);
+    await frameCyrptor?.updateCodec(kind == 'video' ? videoCodec : audioCodec);
+  }
+
+  ///激活流解密，在连接创建，receiver
+  ///每个轨道设置一个解密器，
+  void enableDecryption(RTCRtpReceiver receiver) async {
+    MediaStreamTrack? track = receiver.track;
+    if (track == null) {
+      return;
+    }
+    String? kind = track.kind;
+    if (kind == null) {
+      return;
+    }
+    String? trackId = track.id;
+    if (trackId == null) {
+      return;
+    }
+    if (!frameCyrptors.containsKey(trackId)) {
+      var frameCyrptor =
+          await _frameCyrptorFactory.createFrameCryptorForRtpReceiver(
+              participantId: trackId,
+              receiver: receiver,
+              algorithm: Algorithm.kAesGcm,
+              keyProvider: keyProvider!);
+      frameCyrptor.onFrameCryptorStateChanged = (participantId, state) =>
+          logger.i('decrypt onFrameCryptorStateChanged $participantId $state');
+      frameCyrptors[trackId] = frameCyrptor;
+      await frameCyrptor.setKeyIndex(0);
+    }
+
+    var frameCyrptor = frameCyrptors[trackId];
+    await frameCyrptor?.setEnabled(true);
+    await keyProvider?.setKey(participantId: id, index: 0, key: aesKey);
+    await frameCyrptor?.updateCodec(kind == 'video' ? videoCodec : audioCodec);
   }
 
   ///初始化连接，可以传入外部视频流，这是异步的函数，不能在构造里调用
@@ -307,7 +432,9 @@ class BasePeerConnection {
         ///plan-b格式是老的格式，将会淘汰
         // "sdpSemantics": "plan-b",
         "sdpSemantics": "unified-plan",
-        'iceServers': extension.iceServers
+        'iceServers': extension.iceServers,
+        //端到端加密
+        'encodedInsertableStreams': true,
       };
       //1.创建连接
       this.peerConnection =
