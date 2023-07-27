@@ -348,27 +348,27 @@ class BasePeerConnection {
     if (trackId == null) {
       return;
     }
-    if (!frameCyrptors.containsKey(trackId)) {
-      var frameCyrptor =
-          await _frameCyrptorFactory.createFrameCryptorForRtpSender(
-              participantId: trackId,
-              sender: sender,
-              algorithm: Algorithm.kAesGcm,
-              keyProvider: keyProvider!);
-      frameCyrptor.onFrameCryptorStateChanged = (participantId, state) =>
-          logger.i('encrypt onFrameCryptorStateChanged $participantId $state');
-      frameCyrptors[id] = frameCyrptor;
-      await frameCyrptor.setKeyIndex(0);
+    if (frameCyrptors.containsKey(trackId)) {
+      return;
     }
+    FrameCryptor frameCyrptor =
+        await _frameCyrptorFactory.createFrameCryptorForRtpSender(
+            participantId: trackId,
+            sender: sender,
+            algorithm: Algorithm.kAesGcm,
+            keyProvider: keyProvider!);
+    frameCyrptor.onFrameCryptorStateChanged = (participantId, state) =>
+        logger.i('encrypt onFrameCryptorStateChanged $participantId $state');
+    frameCyrptors[id] = frameCyrptor;
+    await frameCyrptor.setKeyIndex(0);
 
     if (kind == 'video') {
       senderTrackId = trackId;
     }
 
-    var frameCyrptor = frameCyrptors[trackId];
-    await frameCyrptor?.setEnabled(true);
+    await frameCyrptor.setEnabled(true);
     await keyProvider?.setKey(participantId: trackId, index: 0, key: aesKey);
-    await frameCyrptor?.updateCodec(kind == 'video' ? videoCodec : audioCodec);
+    await frameCyrptor.updateCodec(kind == 'video' ? videoCodec : audioCodec);
   }
 
   ///激活流解密，在连接创建，receiver
@@ -386,23 +386,23 @@ class BasePeerConnection {
     if (trackId == null) {
       return;
     }
-    if (!frameCyrptors.containsKey(trackId)) {
-      var frameCyrptor =
-          await _frameCyrptorFactory.createFrameCryptorForRtpReceiver(
-              participantId: trackId,
-              receiver: receiver,
-              algorithm: Algorithm.kAesGcm,
-              keyProvider: keyProvider!);
-      frameCyrptor.onFrameCryptorStateChanged = (participantId, state) =>
-          logger.i('decrypt onFrameCryptorStateChanged $participantId $state');
-      frameCyrptors[trackId] = frameCyrptor;
-      await frameCyrptor.setKeyIndex(0);
+    if (frameCyrptors.containsKey(trackId)) {
+      return;
     }
+    FrameCryptor frameCyrptor =
+        await _frameCyrptorFactory.createFrameCryptorForRtpReceiver(
+            participantId: trackId,
+            receiver: receiver,
+            algorithm: Algorithm.kAesGcm,
+            keyProvider: keyProvider!);
+    frameCyrptor.onFrameCryptorStateChanged = (participantId, state) =>
+        logger.i('decrypt onFrameCryptorStateChanged $participantId $state');
+    frameCyrptors[trackId] = frameCyrptor;
+    await frameCyrptor.setKeyIndex(0);
 
-    var frameCyrptor = frameCyrptors[trackId];
-    await frameCyrptor?.setEnabled(true);
+    await frameCyrptor.setEnabled(true);
     await keyProvider?.setKey(participantId: id, index: 0, key: aesKey);
-    await frameCyrptor?.updateCodec(kind == 'video' ? videoCodec : audioCodec);
+    await frameCyrptor.updateCodec(kind == 'video' ? videoCodec : audioCodec);
   }
 
   ///初始化连接，可以传入外部视频流，这是异步的函数，不能在构造里调用
