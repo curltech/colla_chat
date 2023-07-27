@@ -21,10 +21,9 @@ import 'package:flutter/material.dart';
 class ChatMessageItem extends StatefulWidget {
   final ChatMessage chatMessage;
   final int index;
-
-  late final bool isMyself;
-  late final bool isSystem;
   late final MessageWidget messageWidget;
+  bool isMyself = false;
+  bool isPredefine = false;
 
   ChatMessageItem({
     Key? key,
@@ -32,8 +31,8 @@ class ChatMessageItem extends StatefulWidget {
     required this.index,
   }) : super(key: key) {
     messageWidget = MessageWidget(chatMessage, index);
-    isMyself = messageWidget.isMyself;
-    isSystem = messageWidget.isSystem;
+    isMyself = chatMessage.isMyself;
+    isPredefine = chatMessage.isPredefine;
     //logger.w('ChatMessageItem() chatMessage id: ${chatMessage.id}');
   }
 
@@ -199,7 +198,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
   }
 
   ///系统消息，显示在中间的消息容器
-  Widget _buildSystem(BuildContext context) {
+  Widget _buildPredefine(BuildContext context) {
     var sendTime = widget.chatMessage.sendTime;
     sendTime = sendTime = DateUtil.formatEasyRead(sendTime!);
     //${widget.chatMessage.id}:${widget.chatMessage.senderName}
@@ -371,8 +370,8 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.isSystem) {
-      return _buildSystem(context);
+    if (widget.isPredefine) {
+      return _buildPredefine(context);
     }
     if (widget.isMyself) {
       return _buildMe(context);

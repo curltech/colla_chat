@@ -2,9 +2,12 @@ import 'dart:async';
 
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_item.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 
 /// 消息发送和接受展示的界面组件
@@ -36,6 +39,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     with TickerProviderStateMixin {
   FocusNode textFocusNode = FocusNode();
   late final AnimationController animateController;
+  ValueNotifier<bool> securityTip = ValueNotifier<bool>(true);
 
   @override
   void initState() {
@@ -150,9 +154,40 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
 
   @override
   Widget build(BuildContext context) {
-    var chatMessageWidget = _buildChatMessageWidget(context);
-
-    return chatMessageWidget;
+    return ValueListenableBuilder(
+        valueListenable: securityTip,
+        builder: (BuildContext context, bool securityTip, Widget? child) {
+          var chatMessageWidget = _buildChatMessageWidget(context);
+          if (securityTip) {
+            return Column(children: [
+              Row(children: [
+                const SizedBox(
+                  width: 10.0,
+                ),
+                const Icon(
+                  Icons.security,
+                  color: Colors.yellow,
+                ),
+                const SizedBox(
+                  width: 10.0,
+                ),
+                Expanded(
+                    child: CommonAutoSizeText(AppLocalizations.t(
+                        'This is E2E communication and encryption chat, nobody can peek your content'))),
+                IconButton(
+                    onPressed: () {
+                      this.securityTip.value = false;
+                    },
+                    icon: const Icon(
+                      Icons.cancel,
+                      color: Colors.white,
+                    ))
+              ]),
+              Expanded(child: chatMessageWidget)
+            ]);
+          }
+          return chatMessageWidget;
+        });
   }
 
   @override

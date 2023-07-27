@@ -45,6 +45,8 @@ dependencies:
   wechat_camera_picker: ^3.8.0 #移动平台，wechat_assets_picker的扩展，照相，录像
   photo_manager: ^2.6.0 #移动平台，图像等媒体的抽象，wechat_assets_picker使用
   screenshot: ^2.1.0
+  no_screenshot: ^0.0.1+6
+  screenshot_callback: ^3.0.1
   orientation: ^1.2.0 # 控制屏幕旋转
   geolocator: ^9.0.2
   device_info_plus: ^8.0.0

@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/message_attachment.dart';
+import 'package:colla_chat/provider/myself.dart';
 
 enum ChatMessageContentType {
   rich, // 根据场景包含类型不同，如非系统类型、可搜索类型等
@@ -290,6 +291,26 @@ class ChatMessage extends StatusEntity {
       'needReadReceipt': needReadReceipt,
     });
     return json;
+  }
+
+  ///是否是自己发送的消息
+  bool get isMyself {
+    bool isMyself = false;
+    var peerId = myself.peerId;
+    if (direct == ChatDirect.send.name &&
+        (senderPeerId == null || senderPeerId == peerId)) {
+      isMyself = true;
+    }
+    return isMyself;
+  }
+
+  ///是否是预定义消息，显示在中间，在群的时候表示群消息
+  bool get isPredefine {
+    bool isPredefine = false;
+    if (subMessageType == ChatMessageSubType.predefine.name) {
+      isPredefine = true;
+    }
+    return isPredefine;
   }
 }
 
