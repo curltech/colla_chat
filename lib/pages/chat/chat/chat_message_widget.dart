@@ -6,7 +6,6 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_item.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -51,6 +50,9 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     scrollController.addListener(_onScroll);
     animateController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 500));
+    Future.delayed(const Duration(seconds: 60), () {
+      securityTip.value = false;
+    });
 
     ///滚到指定的位置
     // widget.scrollController.animateTo(offset,
