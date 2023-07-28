@@ -286,7 +286,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     ChatMessageSubType subMessageType = ChatMessageSubType.chat,
     ChatMessageContentType contentType = ChatMessageContentType.text,
     String? mimeType,
-    PartyType receiverType = PartyType.linkman,
+    PartyType? receiverType,
     String? receiverName,
     String? groupId,
     String? groupName,
@@ -328,7 +328,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         chatMessage.receiverAddress = peerClient.connectAddress;
       }
     }
-    chatMessage.receiverType = receiverType.name;
+    chatMessage.receiverType = receiverType?.name;
     chatMessage.receiverClientId = clientId;
     chatMessage.receiverName = receiverName;
     if (groupId != null) {
@@ -655,7 +655,6 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
             securityContext.needSign = false;
             securityContext.needCompress = false;
           }
-          chatMessage.receiverPeerId = peerId;
           Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
           if (linkman != null && linkman.peerId != myself.peerId) {
             securityContext.targetPeerId = linkman.peerId;
@@ -787,8 +786,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   ///发送消息，并保存本地，由于是先发送后保存，所以新消息的id，createDate等字段是空的
   ///如果是群消息，则需要群发
   Future<List<ChatMessage>> sendAndStore(ChatMessage chatMessage,
-      {CryptoOption cryptoOption = CryptoOption.linkman,
-      List<String>? peerIds}) async {
+      {CryptoOption? cryptoOption, List<String>? peerIds}) async {
     if (chatMessage.receiverPeerId == myself.peerId) {
       await chatMessageService.store(chatMessage);
       return [chatMessage];

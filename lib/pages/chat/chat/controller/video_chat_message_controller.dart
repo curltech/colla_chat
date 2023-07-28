@@ -1,6 +1,7 @@
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
+import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -371,7 +372,7 @@ class VideoChatMessageController with ChangeNotifier {
       subMessageType: ChatMessageSubType.videoChat,
     );
     await chatMessageService.sendAndStore(chatMessage,
-        peerIds: conference.participants);
+        cryptoOption: CryptoOption.group, peerIds: conference.participants);
 
     return chatMessage;
   }

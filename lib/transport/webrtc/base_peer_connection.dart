@@ -243,7 +243,7 @@ class BasePeerConnection {
   bool initiator;
 
   //webrtc连接，在失活状态下为空，init后不为空
-  RTCPeerConnection? peerConnection;
+  RTCPeerConnection? _peerConnection;
   PeerConnectionStatus _status = PeerConnectionStatus.created;
   NegotiateStatus _negotiateStatus = NegotiateStatus.none;
   bool renegotiate = false;
@@ -437,7 +437,7 @@ class BasePeerConnection {
         'encodedInsertableStreams': true,
       };
       //1.创建连接
-      this.peerConnection =
+      _peerConnection =
           await createPeerConnection(configuration, pcConstraints);
       //logger.i('Create PeerConnection peerConnection end:$id');
     } catch (err) {
@@ -445,7 +445,7 @@ class BasePeerConnection {
       return false;
     }
 
-    RTCPeerConnection peerConnection = this.peerConnection!;
+    RTCPeerConnection peerConnection = _peerConnection!;
     if (localStreams.isNotEmpty) {
       for (var localStream in localStreams) {
         await addLocalStream(localStream);
@@ -568,9 +568,16 @@ class BasePeerConnection {
     emit(WebrtcEventType.connected, '');
   }
 
+  RTCPeerConnection get peerConnection {
+    if (_peerConnection != null) {
+      return _peerConnection!;
+    }
+    throw 'PeerConnectionStatus is null';
+  }
+
   ///连接状态事件
   onConnectionState(RTCPeerConnectionState state) {
-    RTCPeerConnection peerConnection = this.peerConnection!;
+    RTCPeerConnection peerConnection = this.peerConnection;
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -591,7 +598,7 @@ class BasePeerConnection {
 
   ///ice连接状态事件
   onIceConnectionState(RTCIceConnectionState state) {
-    RTCPeerConnection peerConnection = this.peerConnection!;
+    RTCPeerConnection peerConnection = this.peerConnection;
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -611,7 +618,7 @@ class BasePeerConnection {
   }
 
   onIceGatheringState(RTCIceGatheringState state) {
-    RTCPeerConnection peerConnection = this.peerConnection!;
+    RTCPeerConnection peerConnection = this.peerConnection;
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -621,7 +628,7 @@ class BasePeerConnection {
 
   /// signal状态事件
   onSignalingState(RTCSignalingState state) {
-    RTCPeerConnection peerConnection = this.peerConnection!;
+    RTCPeerConnection peerConnection = this.peerConnection;
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -722,7 +729,7 @@ class BasePeerConnection {
 
   ///作为主叫，创建offer，设置到本地会话描述，并发送offer
   _createOffer() async {
-    RTCPeerConnection peerConnection = this.peerConnection!;
+    RTCPeerConnection peerConnection = this.peerConnection;
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -749,7 +756,7 @@ class BasePeerConnection {
 
   ///作为主叫，调用外部方法发送offer
   _sendOffer(RTCSessionDescription offer) async {
-    RTCPeerConnection peerConnection = this.peerConnection!;
+    RTCPeerConnection peerConnection = this.peerConnection;
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -769,7 +776,7 @@ class BasePeerConnection {
 
   ///作为主叫，从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
   _onOfferSignal(WebrtcSignal webrtcSignal) async {
-    RTCPeerConnection peerConnection = this.peerConnection!;
+    RTCPeerConnection peerConnection = this.peerConnection;
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -852,7 +859,7 @@ class BasePeerConnection {
 
   ///作为被叫，创建answer，发生在被叫方，将answer回到主叫方
   _createAnswer() async {
-    RTCPeerConnection peerConnection = this.peerConnection!;
+    RTCPeerConnection peerConnection = this.peerConnection;
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -890,7 +897,7 @@ class BasePeerConnection {
 
   //作为被叫，发送answer
   _sendAnswer(RTCSessionDescription answer) async {
-    RTCPeerConnection peerConnection = this.peerConnection!;
+    RTCPeerConnection peerConnection = this.peerConnection;
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -910,7 +917,7 @@ class BasePeerConnection {
 
   ///作为被叫，从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
   _onAnswerSignal(WebrtcSignal webrtcSignal) async {
-    RTCPeerConnection peerConnection = this.peerConnection!;
+    RTCPeerConnection peerConnection = this.peerConnection;
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -986,7 +993,7 @@ class BasePeerConnection {
     required RTCRtpMediaType kind,
     required RTCRtpTransceiverInit init,
   }) async {
-    RTCPeerConnection peerConnection = this.peerConnection!;
+    RTCPeerConnection peerConnection = this.peerConnection;
     logger.i('addTransceiver');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
@@ -1075,7 +1082,7 @@ class BasePeerConnection {
     String streamId = stream.id;
     String trackId = track.id!;
 
-    RTCPeerConnection peerConnection = this.peerConnection!;
+    RTCPeerConnection peerConnection = this.peerConnection;
 
     ///加入重复轨道应用会崩溃
     if (trackSenders.containsKey(trackId)) {
@@ -1105,7 +1112,7 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return false;
     }
-    RTCPeerConnection? peerConnection = this.peerConnection;
+    RTCPeerConnection? peerConnection = _peerConnection;
     if (peerConnection == null) {
       logger.e('PeerConnection is not exist');
       return false;
@@ -1132,7 +1139,7 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return false;
     }
-    RTCPeerConnection? peerConnection = this.peerConnection;
+    RTCPeerConnection? peerConnection = _peerConnection;
     if (peerConnection == null) {
       logger.e('PeerConnection is not exist');
       return false;
@@ -1160,7 +1167,7 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    RTCPeerConnection? peerConnection = this.peerConnection;
+    RTCPeerConnection? peerConnection = _peerConnection;
     if (peerConnection != null) {
       _existLocal(stream);
       // try {
@@ -1193,7 +1200,7 @@ class BasePeerConnection {
         logger.e('Cannot remove track that was never added.');
       } else {
         try {
-          RTCPeerConnection? peerConnection = this.peerConnection;
+          RTCPeerConnection? peerConnection = _peerConnection;
           if (peerConnection != null) {
             await peerConnection.removeTrack(sender);
           }
@@ -1219,7 +1226,7 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return null;
     }
-    RTCPeerConnection? peerConnection = this.peerConnection;
+    RTCPeerConnection? peerConnection = _peerConnection;
     if (peerConnection != null) {
       try {
         _existRemote(stream);
@@ -1364,7 +1371,7 @@ class BasePeerConnection {
 
   ///为连接加上候选的服务器
   addIceCandidate(RTCIceCandidate iceCandidate) async {
-    RTCPeerConnection peerConnection = this.peerConnection!;
+    RTCPeerConnection peerConnection = this.peerConnection;
     await peerConnection.addCandidate(iceCandidate);
     var map = iceCandidate.toMap();
     var jsonStr = JsonUtil.toJsonString(map);
@@ -1450,11 +1457,11 @@ class BasePeerConnection {
       dataChannel.onDataChannelState = null;
       this.dataChannel = null;
     }
-    final peerConnection = this.peerConnection;
+    final RTCPeerConnection? peerConnection = _peerConnection;
     if (peerConnection != null) {
       try {
         await peerConnection.close();
-        this.peerConnection = null;
+        _peerConnection = null;
       } catch (err) {
         logger.e('close peerConnection err:$err');
       }

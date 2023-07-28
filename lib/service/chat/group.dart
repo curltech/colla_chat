@@ -7,6 +7,7 @@ import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/chat_summary.dart';
@@ -212,8 +213,10 @@ class GroupService extends PeerPartyService<Group> {
       content: group,
       subMessageType: ChatMessageSubType.addGroup,
     );
+    peerIds ??= group.participants;
     await chatMessageService.sendAndStore(
       chatMessage,
+      cryptoOption: CryptoOption.group,
       peerIds: peerIds,
     );
   }
@@ -246,8 +249,10 @@ class GroupService extends PeerPartyService<Group> {
       content: group,
       subMessageType: ChatMessageSubType.modifyGroup,
     );
+    peerIds ??= group.participants;
     await chatMessageService.sendAndStore(
       chatMessage,
+      cryptoOption: CryptoOption.group,
       peerIds: peerIds,
     );
   }
@@ -285,7 +290,9 @@ class GroupService extends PeerPartyService<Group> {
       content: group.name,
       subMessageType: ChatMessageSubType.dismissGroup,
     );
-    await chatMessageService.sendAndStore(chatMessage);
+
+    await chatMessageService.sendAndStore(chatMessage,
+        cryptoOption: CryptoOption.group, peerIds: group.participants);
   }
 
   receiveDismissGroup(ChatMessage chatMessage) async {
@@ -321,8 +328,15 @@ class GroupService extends PeerPartyService<Group> {
         groupId, PartyType.group,
         content: groupMembers,
         subMessageType: ChatMessageSubType.addGroupMember);
+    if (peerIds == null) {
+      Group? group = await groupService.findCachedOneByPeerId(groupId);
+      if (group != null) {
+        peerIds = group.participants;
+      }
+    }
     await chatMessageService.sendAndStore(
       chatMessage,
+      cryptoOption: CryptoOption.group,
       peerIds: peerIds,
     );
   }
@@ -353,8 +367,15 @@ class GroupService extends PeerPartyService<Group> {
       content: groupMembers,
       subMessageType: ChatMessageSubType.removeGroupMember,
     );
+    if (peerIds == null) {
+      Group? group = await groupService.findCachedOneByPeerId(groupId);
+      if (group != null) {
+        peerIds = group.participants;
+      }
+    }
     await chatMessageService.sendAndStore(
       chatMessage,
+      cryptoOption: CryptoOption.group,
       peerIds: peerIds,
     );
   }
@@ -386,7 +407,13 @@ class GroupService extends PeerPartyService<Group> {
       content: data,
       subMessageType: ChatMessageSubType.groupFile,
     );
-    await chatMessageService.sendAndStore(chatMessage);
+    List<String>? peerIds;
+    Group? group = await groupService.findCachedOneByPeerId(groupId);
+    if (group != null) {
+      peerIds = group.participants;
+    }
+    await chatMessageService.sendAndStore(chatMessage,
+        cryptoOption: CryptoOption.group, peerIds: peerIds);
   }
 
   receiveGroupFile(ChatMessage chatMessage) async {

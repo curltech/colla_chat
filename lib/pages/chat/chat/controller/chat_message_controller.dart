@@ -3,6 +3,7 @@ import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -242,8 +243,9 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
           deleteTime: _deleteTime,
           parentMessageId: _parentMessageId);
       if (chatGPT == null) {
-        returnChatMessage =
-            (await chatMessageService.sendAndStore(chatMessage,peerIds:peerIds)).first;
+        returnChatMessage = (await chatMessageService.sendAndStore(chatMessage,
+                peerIds: peerIds))
+            .first;
       } else {
         await chatMessageService.store(chatMessage);
         returnChatMessage = chatMessage;
@@ -275,7 +277,8 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
           transportType: transportType,
           deleteTime: _deleteTime,
           parentMessageId: _parentMessageId);
-      await chatMessageService.sendAndStore(chatMessage, peerIds: peerIds);
+      await chatMessageService.sendAndStore(chatMessage,
+          cryptoOption: CryptoOption.group, peerIds: peerIds);
       returnChatMessage = chatMessage;
     }
     _deleteTime = 0;
