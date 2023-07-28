@@ -717,10 +717,12 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     for (var chatMessage in chatMessages) {
       String? peerId = chatMessage.receiverPeerId;
       if (peerId == null || peerId == myself.peerId) {
+        chatMessage.transportType = TransportType.none.name;
         continue;
       }
       List<int>? data = encryptData[peerId];
       if (data == null) {
+        chatMessage.transportType = TransportType.none.name;
         continue;
       }
       await _send(chatMessage, data);
