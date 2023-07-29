@@ -689,11 +689,12 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       securityContext.payload = data.sublist(0, data.length - 1);
     }
     if (cryptOption == CryptoOption.group.index) {
-      List<int> payloadKey = data.sublist(
-          data.length - CryptoGraphy.randomBytesLength - 1, data.length - 1);
+      int payloadKeyLength = CryptoGraphy.randomBytesLength + 60;
+      List<int> payloadKey =
+          data.sublist(data.length - payloadKeyLength - 1, data.length - 1);
       securityContext.payloadKey = CryptoUtil.encodeBase64(payloadKey);
       securityContext.payload =
-          data.sublist(0, data.length - CryptoGraphy.randomBytesLength - 1);
+          data.sublist(0, data.length - payloadKeyLength - 1);
     }
     bool result = await securityContextService.decrypt(securityContext);
     if (result) {
