@@ -261,7 +261,7 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
         valueListenable: group,
         builder: (BuildContext context, Group? group, Widget? child) {
           if (group != null) {
-            controller.setInitValue(JsonUtil.toJson(group));
+            controller.setValues(JsonUtil.toJson(group));
           }
           return FormInputWidget(
             height: appDataProvider.portraitSize.height * 0.5,

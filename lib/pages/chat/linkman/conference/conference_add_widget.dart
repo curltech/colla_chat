@@ -238,7 +238,7 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
         valueListenable: conference,
         builder: (BuildContext context, Conference? conference, Widget? child) {
           if (conference != null) {
-            controller.setInitValue(JsonUtil.toJson(conference));
+            controller.setValues(JsonUtil.toJson(conference));
           }
           return FormInputWidget(
             height: appDataProvider.portraitSize.height * 0.5,
