@@ -897,7 +897,6 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   store(ChatMessage chatMessage,
       {bool updateSummary = true, bool unreadNumber = false}) async {
     if (chatMessage.receiverPeerId == myself.peerId) {
-      chatMessage.transportType = TransportType.none.name;
       chatMessage.status = MessageStatus.sent.name;
     }
 
