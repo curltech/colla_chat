@@ -383,7 +383,7 @@ class _IndexViewState extends State<IndexView>
                 style: const TextStyle(color: Colors.white)),
             trailing: SizedBox(
               width: 200,
-              child: Row(children: buttons),
+              child: ButtonBar(children: buttons),
             )));
   }
 
