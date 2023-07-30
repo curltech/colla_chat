@@ -80,8 +80,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
       ValueNotifier<ChatSummary?>(chatMessageController.chatSummary);
   final ValueNotifier<double> chatMessageHeight = ValueNotifier<double>(0);
   double visibleFraction = 0.0;
-  final NoScreenshot noScreenshot = NoScreenshot.instance;
-  final ScreenshotCallback screenshotCallback = ScreenshotCallback();
+  NoScreenshot? noScreenshot;
+  ScreenshotCallback? screenshotCallback;
 
   @override
   void initState() {
@@ -95,8 +95,10 @@ class _ChatMessageViewState extends State<ChatMessageView>
     _updateChatMessageView();
     Wakelock.enable();
     if (platformParams.mobile) {
-      noScreenshot.screenshotOff();
-      screenshotCallback.addListener(() {
+      noScreenshot = NoScreenshot.instance;
+      screenshotCallback = ScreenshotCallback();
+      noScreenshot!.screenshotOff();
+      screenshotCallback!.addListener(() {
         logger.w('screenshot');
       });
     }
@@ -424,7 +426,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
     windowManager.removeListener(this);
     Wakelock.disable();
     if (platformParams.mobile) {
-      screenshotCallback.dispose();
+      screenshotCallback?.dispose();
     }
     super.dispose();
   }
