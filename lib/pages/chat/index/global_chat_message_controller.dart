@@ -140,10 +140,32 @@ class GlobalChatMessageController with ChangeNotifier {
     return _chatMessage;
   }
 
+  Future<bool> _allowedChatMessage(ChainMessage chainMessage) async {
+    String? peerId = chainMessage.srcPeerId;
+    if (peerId == null) {
+      return false;
+    }
+
+    Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+    if (linkman != null) {
+      ///呼叫者本地存在
+      if (linkman.linkmanStatus == LinkmanStatus.friend.name) {
+        ///如果是好友，则直接接受
+        return true;
+      } else if (linkman.linkmanStatus == LinkmanStatus.blacklist.name) {
+        ///如果是黑名单，则直接拒绝
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   ///从websocket的ChainMessage方式，chatAction接收到的ChatMessage
   Future<void> onChat(ChainMessage chainMessage) async {
-    if (chainMessage.srcPeerId == null) {
-      logger.e('chainMessage.srcPeerId is null');
+    bool allowed = await _allowedChatMessage(chainMessage);
+    if (!allowed) {
+      logger.e('chainMessage is not allowed receive');
       return;
     }
 
