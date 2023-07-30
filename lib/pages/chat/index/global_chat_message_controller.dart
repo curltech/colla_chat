@@ -151,6 +151,7 @@ class GlobalChatMessageController with ChangeNotifier {
     if (chainMessage.payloadType == PayloadType.list.name) {
       ChatMessage? msg = await chatMessageService.decrypt(chainMessage.payload);
       if (msg != null) {
+        msg.transportType = TransportType.websocket.name;
         await receiveChatMessage(msg);
       } else {
         logger.e('onChat response decrypt failure');
@@ -158,6 +159,7 @@ class GlobalChatMessageController with ChangeNotifier {
     } else if (chainMessage.payloadType == PayloadType.chatMessage.name) {
       ///如果是明文发送，chat自己加密的情况下
       ChatMessage chatMessage = ChatMessage.fromJson(chainMessage.payload);
+      chatMessage.transportType = TransportType.websocket.name;
       await receiveChatMessage(chatMessage);
     }
   }

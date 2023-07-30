@@ -341,6 +341,7 @@ class AdvancedPeerConnection {
     ChatMessage? chatMessage = await chatMessageService.decrypt(data);
     if (chatMessage != null) {
       //对消息进行业务处理
+      chatMessage.transportType = TransportType.webrtc.name;
       await globalChatMessageController.receiveChatMessage(chatMessage);
 
       var webrtcEvent = WebrtcEvent(peerId,

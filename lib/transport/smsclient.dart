@@ -144,6 +144,7 @@ class SmsClient extends IWebClient {
       chatMessage.senderPeerId = linkman.peerId;
       chatMessage.senderClientId = linkman.clientId;
       chatMessage.senderName = linkman.name;
+      chatMessage.transportType = TransportType.sms.name;
       globalChatMessageController.receiveChatMessage(chatMessage);
     }
   }
