@@ -165,7 +165,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     //当通过群peerId查询群消息时，发送的群消息会拆分到个体的消息记录需要排除，否则重复显示
     else if (groupId != null) {
       where =
-          '$where and receiverPeerId!=senderPeerId and groupId=? and subMessageType!=? and ((senderPeerId=? and receiverPeerId=?) or receiverPeerId=?)';
+          '$where and groupId=? and subMessageType!=? and ((senderPeerId=? and receiverPeerId=?) or receiverPeerId=?)';
       whereArgs.add(groupId);
       whereArgs.add(ChatMessageSubType.chatReceipt.name);
       whereArgs.add(myselfPeerId);
@@ -223,7 +223,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     //当通过群peerId查询群消息时，发送的群消息会拆分到个体的消息记录需要排除，否则重复显示
     else if (groupId != null) {
       where =
-          '$where and receiverPeerId!=senderPeerId and groupId=? and subMessageType!=? and ((senderPeerId=? and receiverPeerId=?) or receiverPeerId=?)';
+          '$where and groupId=? and subMessageType!=? and ((senderPeerId=? and receiverPeerId=?) or receiverPeerId=?)';
       whereArgs.add(groupId);
       whereArgs.add(ChatMessageSubType.chatReceipt.name);
       whereArgs.add(myselfPeerId);
@@ -422,9 +422,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   _writeReceiveChatMessage(ChatMessage chatMessage) {
     chatMessage.receiverPeerId = myself.peerId;
     chatMessage.receiverClientId = myself.clientId;
-    if (chatMessage.groupType != null) {
-      chatMessage.receiverType = chatMessage.groupType;
-    } else {
+    if (chatMessage.groupType == null) {
       chatMessage.receiverType = PartyType.linkman.name;
     }
     chatMessage.receiverName = myself.name;

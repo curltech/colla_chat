@@ -112,7 +112,7 @@ class EmailAddressService extends GeneralBaseService<EmailAddress> {
             securityContext.targetPeerId = linkman.peerId;
             securityContext.targetClientId = linkman.clientId;
             if (i == 0) {
-              securityContext.needSign = true;
+              securityContext.needSign = false;
               securityContext.needCompress = false;
             } else {
               securityContext.needSign = false;
