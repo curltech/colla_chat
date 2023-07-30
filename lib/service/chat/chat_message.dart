@@ -32,7 +32,6 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/transport/smsclient.dart';
-
 // import 'package:colla_chat/transport/nearby_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/websocket.dart';
@@ -789,6 +788,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   Future<List<ChatMessage>> sendAndStore(ChatMessage chatMessage,
       {CryptoOption? cryptoOption, List<String>? peerIds}) async {
     if (chatMessage.receiverPeerId == myself.peerId) {
+      chatMessage.transportType = TransportType.none.name;
       await chatMessageService.store(chatMessage);
       return [chatMessage];
     }
@@ -796,6 +796,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         await send(chatMessage, cryptoOption: cryptoOption, peerIds: peerIds);
     if (chatMessages.isNotEmpty) {
       for (var msg in chatMessages) {
+        if (msg.receiverPeerId == myself.peerId) {
+          msg.transportType = TransportType.none.name;
+        }
         await chatMessageService.store(msg);
       }
     }
