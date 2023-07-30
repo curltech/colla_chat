@@ -328,7 +328,8 @@ class _IndexViewState extends State<IndexView>
     name = name ?? '';
     var title = chatMessage.title;
     title = title ?? '';
-    var rejectedButton = CircleTextButton(
+    var rejectedButton = IconButton(
+        tooltip: AppLocalizations.t('Reject'),
         onPressed: () async {
           videoChatMessageVisible.value = false;
           _stop();
@@ -336,9 +337,9 @@ class _IndexViewState extends State<IndexView>
               .sendChatReceipt(MessageReceiptType.rejected);
           videoChatMessageController = null;
         },
-        backgroundColor: Colors.red,
-        child: const Icon(color: Colors.white, size: 16, Icons.call_end));
-    var holdButton = CircleTextButton(
+        icon: const Icon(color: Colors.red, size: 16, Icons.call_end));
+    var holdButton = IconButton(
+        tooltip: AppLocalizations.t('Hold'),
         onPressed: () async {
           videoChatMessageVisible.value = false;
           _stop();
@@ -346,9 +347,9 @@ class _IndexViewState extends State<IndexView>
               .sendChatReceipt(MessageReceiptType.hold);
           videoChatMessageController = null;
         },
-        backgroundColor: Colors.amber,
-        child: const Icon(color: Colors.white, size: 16, Icons.add_call));
-    var acceptedButton = CircleTextButton(
+        icon: const Icon(color: Colors.amber, size: 16, Icons.add_call));
+    var acceptedButton = IconButton(
+        tooltip: AppLocalizations.t('Accept'),
         onPressed: () async {
           videoChatMessageVisible.value = false;
           _stop();
@@ -356,12 +357,12 @@ class _IndexViewState extends State<IndexView>
               .sendChatReceipt(MessageReceiptType.accepted);
           videoChatMessageController = null;
         },
-        backgroundColor: Colors.green,
-        child: const Icon(color: Colors.white, size: 16, Icons.call));
+        icon: const Icon(color: Colors.green, size: 16, Icons.call));
     List<Widget> buttons = <Widget>[];
     buttons.add(rejectedButton);
     buttons.add(holdButton);
-    //立即接听按钮只有当前不在会议中，而且是个人或者群模式才可以
+
+    ///立即接听按钮只有当前不在会议中，而且是个人或者群模式才可以
     if (videoConferenceRenderPool.conferenceId == null &&
         chatMessage.groupType != PartyType.conference.name) {
       buttons.add(acceptedButton);
