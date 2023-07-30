@@ -230,7 +230,7 @@ class VideoChatMessageController with ChangeNotifier {
       await setChatSummary(chatSummary);
     } else if (_chatSummary != null && _chatMessage != null) {
       if (_chatMessage!.direct == ChatDirect.send.name) {
-        if (_chatSummary!.peerId != _chatMessage!.receiverPeerId!) {
+        if (_chatSummary!.peerId != _chatMessage!.receiverPeerId) {
           var chatSummary = await _findChatSummary();
           await setChatSummary(chatSummary);
         }
