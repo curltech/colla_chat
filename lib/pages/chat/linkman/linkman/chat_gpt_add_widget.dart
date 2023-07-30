@@ -105,7 +105,7 @@ class _ChatGPTAddWidgetState extends State<ChatGPTAddWidget> {
   Widget _buildFormInputWidget(BuildContext context) {
     Linkman? linkman = linkmanController.current;
     if (linkman != null) {
-      controller.setInitValue(JsonUtil.toJson(linkman));
+      controller.setValues(JsonUtil.toJson(linkman));
     }
 
     var formInputWidget = Container(

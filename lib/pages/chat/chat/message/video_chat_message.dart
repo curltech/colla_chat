@@ -44,6 +44,9 @@ class VideoChatMessage extends StatelessWidget {
         await videoChatMessageController.setChatMessage(chatMessage);
         videoConferenceRenderPool
             .createRemoteVideoRenderController(videoChatMessageController);
+      } else {
+        videoConferenceRenderPool.conferenceId =
+            videoChatMessageController.conferenceId;
       }
     }
   }

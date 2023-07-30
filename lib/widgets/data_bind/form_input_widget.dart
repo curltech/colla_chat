@@ -12,7 +12,7 @@ import 'package:provider/provider.dart';
 
 class FormInputController with ChangeNotifier {
   final List<ColumnFieldDef> columnFieldDefs;
-  final Map<String, dynamic> initValues = {};
+  final Map<String, dynamic> _values = {};
 
   final Map<String, ColumnFieldController> controllers = {};
   EntityState? state;
@@ -23,29 +23,9 @@ class FormInputController with ChangeNotifier {
       String name = columnFieldDef.name;
       var initValue = initValues[name];
       initValue ??= columnFieldDef.initValue;
-      if (initValue != null) {
-        this.initValues[name] = initValue;
-      } else {
-        this.initValues.remove(name);
-      }
+      setValue(name, initValue);
     }
-    var state = this.initValues['state'];
-    if (state != null) {
-      state = state;
-    }
-  }
-
-  setInitValue(Map<String, dynamic> json) {
-    for (var entry in json.entries) {
-      String name = entry.key;
-      var value = entry.value;
-      if (value != null) {
-        initValues[name] = value;
-      } else {
-        initValues.remove(name);
-      }
-    }
-    var state = initValues['state'];
+    var state = _values['state'];
     if (state != null) {
       state = state;
     }
@@ -86,24 +66,28 @@ class FormInputController with ChangeNotifier {
     }
   }
 
-  ///获取真实值
+  ///获取真实值，控制器的值优先
   dynamic getValue(String name) {
     var controller = controllers[name];
     if (controller != null) {
       return controller.value;
     }
+    return _values[name];
   }
 
   ///获取所有真实值
   dynamic getValues() {
     Map<String, dynamic> values = {};
-    for (var entry in controllers.entries) {
-      String name = entry.key;
-      values[name] = entry.value.value;
+    for (var columnFieldDefs in columnFieldDefs) {
+      String name = columnFieldDefs.name;
+      values[name] = getValue(name);
       if (state == null) {
-        bool changed = entry.value.changed;
-        if (changed) {
-          state = EntityState.update;
+        if (controllers.containsKey(name)) {
+          ColumnFieldController controller = controllers[name]!;
+          bool changed = controller.changed;
+          if (changed) {
+            state = EntityState.update;
+          }
         }
       }
     }
@@ -115,29 +99,25 @@ class FormInputController with ChangeNotifier {
     return values;
   }
 
-  ///内部改变值
-  changeValue(String name, dynamic value) {
-    var controller = controllers[name];
-    if (controller != null) {
-      controller.value = value;
-    }
-  }
-
   ///外部设置值
   setValue(String name, dynamic value) {
-    var controller = controllers[name];
-    if (controller != null) {
-      controller.value = value;
+    _values[name] = value;
+    if (controllers.containsKey(name)) {
+      var controller = controllers[name];
+      if (controller != null) {
+        controller.value = value;
+      }
     }
   }
 
   setValues(Map<String, dynamic> values) {
-    for (var entry in controllers.entries) {
-      var name = entry.key;
-      var value = values[name];
-      var controller = entry.value;
-      if (controller.value != value) {
-        controller.value = value;
+    for (var columnFieldDef in columnFieldDefs) {
+      var name = columnFieldDef.name;
+      if (values.containsKey(name)) {
+        var value = values[name];
+        setValue(name, value);
+      } else {
+        setValue(name, null);
       }
     }
   }
@@ -249,14 +229,16 @@ class _FormInputWidgetState extends State<FormInputWidget> {
       String name = columnFieldDef.name;
       ColumnFieldController? columnFieldController =
           widget.controller.controllers[name];
+      dynamic value = widget.controller.getValue(name);
       if (columnFieldController == null) {
-        dynamic initValue = widget.controller.initValues[name];
         columnFieldController = ColumnFieldController(
           columnFieldDef,
-          value: initValue,
+          value: value,
         );
         widget.controller
             .setController(columnFieldDef.name, columnFieldController);
+      } else {
+        columnFieldController.value = value;
       }
       Widget columnFieldWidget = ColumnFieldWidget(
         controller: columnFieldController,

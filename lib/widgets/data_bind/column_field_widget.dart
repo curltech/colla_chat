@@ -267,12 +267,13 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
   //获取初始化值，传入的初始值或者定义的初始值
   dynamic _getInitValue(BuildContext context) {
     var dataType = widget.controller.columnFieldDef.dataType;
-    dynamic v =
-        widget.controller.value ?? widget.controller.columnFieldDef.initValue;
-    if (dataType == DataType.set ||
-        dataType == DataType.list ||
-        dataType == DataType.map) {
-      return JsonUtil.toJsonString(v);
+    dynamic v = widget.controller.value;
+    if (v != null) {
+      if (dataType == DataType.set ||
+          dataType == DataType.list ||
+          dataType == DataType.map) {
+        return JsonUtil.toJsonString(v);
+      }
     }
     return v;
   }
@@ -313,16 +314,14 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
 
   Widget _buildTextFormField(BuildContext context) {
     TextEditingController? controller = widget.controller.controller;
-    if (controller == null) {
-      final value = widget.controller.value;
-      final valueStr = value == null ? '' : value.toString();
-      controller = TextEditingController();
-      controller.value = TextEditingValue(
-          text: valueStr,
-          selection: TextSelection.fromPosition(TextPosition(
-              offset: valueStr.length, affinity: TextAffinity.downstream)));
-      widget.controller.controller = controller;
-    }
+    controller ??= TextEditingController();
+    final value = widget.controller.value;
+    final valueStr = value == null ? '' : value.toString();
+    controller.value = TextEditingValue(
+        text: valueStr,
+        selection: TextSelection.fromPosition(TextPosition(
+            offset: valueStr.length, affinity: TextAffinity.downstream)));
+    widget.controller.controller = controller;
 
     var columnFieldDef = widget.controller.columnFieldDef;
     var suffixIcon = columnFieldDef.suffixIcon;
@@ -365,16 +364,14 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
 
   Widget _buildPasswordField(BuildContext context) {
     TextEditingController? controller = widget.controller.controller;
-    if (controller == null) {
-      final value = widget.controller.value;
-      final valueStr = value == null ? '' : value.toString();
-      controller = TextEditingController();
-      controller.value = TextEditingValue(
-          text: valueStr,
-          selection: TextSelection.fromPosition(TextPosition(
-              offset: valueStr.length, affinity: TextAffinity.downstream)));
-      widget.controller.controller = controller;
-    }
+    controller ??= TextEditingController();
+    final value = widget.controller.value;
+    final valueStr = value == null ? '' : value.toString();
+    controller.value = TextEditingValue(
+        text: valueStr,
+        selection: TextSelection.fromPosition(TextPosition(
+            offset: valueStr.length, affinity: TextAffinity.downstream)));
+    widget.controller.controller = controller;
 
     var columnFieldDef = widget.controller.columnFieldDef;
     Widget? suffix;

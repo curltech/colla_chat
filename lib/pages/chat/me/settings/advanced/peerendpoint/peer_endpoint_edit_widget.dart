@@ -122,7 +122,7 @@ class _PeerEndpointEditWidgetState extends State<PeerEndpointEditWidget> {
   Widget _buildFormInputWidget(BuildContext context) {
     PeerEndpoint? peerEndpoint = peerEndpointController.current;
     if (peerEndpoint != null) {
-      controller.setInitValue(JsonUtil.toJson(peerEndpoint));
+      controller.setValues(JsonUtil.toJson(peerEndpoint));
     }
     var formInputWidget = FormInputWidget(
       height: 500,

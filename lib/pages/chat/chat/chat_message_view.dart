@@ -371,8 +371,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
     }
     if (partyType == PartyType.group.name) {
       rightWidgets.add(IconButton(
-          onPressed: () {
-            indexWidgetProvider.push('linkman_add_group');
+          onPressed: () async {
+            indexWidgetProvider.push('linkman_edit_group');
           },
           icon: const Icon(Icons.more_vert)));
     }

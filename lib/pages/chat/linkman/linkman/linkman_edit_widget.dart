@@ -96,7 +96,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
   Widget _buildFormInputWidget(BuildContext context) {
     Linkman? linkman = linkmanController.current;
     if (linkman != null) {
-      controller.setInitValue(JsonUtil.toJson(linkman));
+      controller.setValues(JsonUtil.toJson(linkman));
     }
     List<FormButtonDef> formButtonDefs = [
       FormButtonDef(

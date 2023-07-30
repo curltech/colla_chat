@@ -110,7 +110,7 @@ class ConferenceShowWidget extends StatelessWidget {
 
   //会议信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
-    controller.setInitValue(JsonUtil.toJson(conference));
+    controller.setValues(JsonUtil.toJson(conference));
     var formInputWidget = SingleChildScrollView(
         child: Container(
             padding: const EdgeInsets.all(10.0),

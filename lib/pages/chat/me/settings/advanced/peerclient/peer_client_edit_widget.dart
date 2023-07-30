@@ -97,7 +97,7 @@ class _PeerClientEditWidgetState extends State<PeerClientEditWidget> {
   Widget _buildFormInputWidget(BuildContext context) {
     PeerClient? peerClient = peerClientController.current;
     if (peerClient != null) {
-      controller.setInitValue(JsonUtil.toJson(peerClient));
+      controller.setValues(JsonUtil.toJson(peerClient));
     }
     var formInputWidget = FormInputWidget(
       height: 500,
