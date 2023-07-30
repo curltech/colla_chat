@@ -368,23 +368,31 @@ class _IndexViewState extends State<IndexView>
       buttons.add(acceptedButton);
     }
     return Container(
+        height: 74,
         alignment: Alignment.topLeft,
         width: appDataProvider.totalSize.width,
         padding: const EdgeInsets.all(5.0),
         color: Colors.black.withOpacity(AppOpacity.mdOpacity),
-        child: ListTile(
-            leading: bannerAvatarImage,
-            isThreeLine: false,
-            title: CommonAutoSizeText(name,
-                style: const TextStyle(color: Colors.white)),
-            subtitle: CommonAutoSizeText(
-                AppLocalizations.t('Inviting you $title chat ') +
-                    videoChatMessageController!.conference!.name,
-                style: const TextStyle(color: Colors.white)),
-            trailing: SizedBox(
-              width: 200,
-              child: ButtonBar(children: buttons),
-            )));
+        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          bannerAvatarImage,
+          Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CommonAutoSizeText(name,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold)),
+                Expanded(
+                    child: CommonAutoSizeText(
+                        AppLocalizations.t('Inviting you $title chat ') +
+                            videoChatMessageController!.conference!.name,
+                        style: const TextStyle(color: Colors.white))),
+              ]),
+          const Spacer(),
+          ButtonBar(alignment: MainAxisAlignment.end, children: buttons),
+        ]));
   }
 
   _buildVideoChatMessageBanner(BuildContext context) {
