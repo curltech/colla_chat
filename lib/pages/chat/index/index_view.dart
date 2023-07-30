@@ -337,7 +337,7 @@ class _IndexViewState extends State<IndexView>
               .sendChatReceipt(MessageReceiptType.rejected);
           videoChatMessageController = null;
         },
-        icon: const Icon(color: Colors.red, size: 16, Icons.call_end));
+        icon: const Icon(color: Colors.red, size: 32, Icons.call_end));
     var holdButton = IconButton(
         tooltip: AppLocalizations.t('Hold'),
         onPressed: () async {
@@ -347,7 +347,7 @@ class _IndexViewState extends State<IndexView>
               .sendChatReceipt(MessageReceiptType.hold);
           videoChatMessageController = null;
         },
-        icon: const Icon(color: Colors.amber, size: 16, Icons.add_call));
+        icon: const Icon(color: Colors.amber, size: 32, Icons.add_call));
     var acceptedButton = IconButton(
         tooltip: AppLocalizations.t('Accept'),
         onPressed: () async {
@@ -357,7 +357,7 @@ class _IndexViewState extends State<IndexView>
               .sendChatReceipt(MessageReceiptType.accepted);
           videoChatMessageController = null;
         },
-        icon: const Icon(color: Colors.green, size: 16, Icons.call));
+        icon: const Icon(color: Colors.green, size: 32, Icons.call));
     List<Widget> buttons = <Widget>[];
     buttons.add(rejectedButton);
     buttons.add(holdButton);

@@ -421,9 +421,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   _writeReceiveChatMessage(ChatMessage chatMessage) {
     chatMessage.receiverPeerId = myself.peerId;
     chatMessage.receiverClientId = myself.clientId;
-    if (chatMessage.groupType == null) {
-      chatMessage.receiverType = PartyType.linkman.name;
-    }
+    chatMessage.receiverType = PartyType.linkman.name;
     chatMessage.receiverName = myself.name;
     chatMessage.direct = ChatDirect.receive.name;
     chatMessage.receiveTime = DateUtil.currentDate();
@@ -608,7 +606,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       {CryptoOption? cryptoOption, List<String>? peerIds}) async {
     Map<String, List<int>> encryptData = {};
     if (cryptoOption == null) {
-      if (chatMessage.groupType == null) {
+      if (chatMessage.groupId == null) {
         cryptoOption = CryptoOption.linkman;
       } else {
         cryptoOption = CryptoOption.group;
@@ -623,7 +621,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         securityContextService ?? linkmanCryptographySecurityContextService;
     SecurityContext securityContext = SecurityContext();
     securityContext.payload = data;
-    if (chatMessage.receiverPeerId != null) {
+    if (cryptOptionIndex == CryptoOption.linkman.index) {
       logger
           .i('this is linkman chatMessage, will be encrypted by linkman mode');
       if (chatMessage.receiverPeerId != myself.peerId) {
@@ -638,7 +636,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           return encryptData;
         }
       }
-    } else if (chatMessage.groupId != null) {
+    } else if (cryptOptionIndex == CryptoOption.group.index) {
       logger.i('this is group chatMessage, will be encrypted once');
 
       ///再根据群进行消息的复制成多条进行处理
