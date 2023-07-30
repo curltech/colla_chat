@@ -490,12 +490,14 @@ class VideoChatMessageController with ChangeNotifier {
     //如果存在，如果是rejected或者terminated，则不发送回执
     //创建回执消息
     //await conferenceService.store(_conference!);
-    List<ChatMessage> chatReceipts = await chatMessageService
-        .buildGroupChatReceipt(chatMessage, receiptType);
+    List<ChatMessage> chatReceipts =
+        await chatMessageService.buildGroupChatReceipt(chatMessage, receiptType,
+            peerIds: _conference!.participants);
     if (chatReceipts.isNotEmpty) {
       for (var chatReceipt in chatReceipts) {
         //发送回执
-        await chatMessageService.sendAndStore(chatReceipt);
+        await chatMessageService.sendAndStore(chatReceipt,
+            cryptoOption: CryptoOption.linkman);
       }
     }
     await chatMessageService.updateReceiptType(chatMessage, receiptType);
@@ -518,7 +520,8 @@ class VideoChatMessageController with ChangeNotifier {
     if (chatReceipts.isNotEmpty) {
       for (var chatReceipt in chatReceipts) {
         //发送回执
-        await chatMessageService.sendAndStore(chatReceipt);
+        await chatMessageService.sendAndStore(chatReceipt,
+            cryptoOption: CryptoOption.linkman);
       }
     }
     await chatMessageService.updateReceiptType(chatMessage, receiptType);
