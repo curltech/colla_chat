@@ -1,7 +1,7 @@
 enum CryptoOption { none, compress, linkman, group, web, openpgp, signal }
 
 class SecurityContext {
-  int cryptoOptionIndex = CryptoOption.linkman.index;
+  //int cryptoOptionIndex = CryptoOption.linkman.index;
   String? targetPeerId;
   String? targetClientId;
   String? srcPeerId;
@@ -31,9 +31,9 @@ class SecurityContext {
   SecurityContext({this.targetPeerId, this.targetClientId, this.srcPeerId});
 
   SecurityContext.fromJson(Map json)
-      : cryptoOptionIndex =
-            json['cryptoOptionIndex'] ?? CryptoOption.linkman.index,
-        payloadSignature = json['payloadSignature'],
+      : payloadSignature = json['payloadSignature'],
+        // cryptoOptionIndex =
+        //     json['cryptoOptionIndex'] ?? CryptoOption.linkman.index,
         previousPublicKeyPayloadSignature =
             json['previousPublicKeyPayloadSignature'],
         needCompress = json['needCompress'] == true || json['needCompress'] == 1
@@ -53,7 +53,7 @@ class SecurityContext {
   Map<String, dynamic> toJson() {
     var json = <String, dynamic>{};
     json.addAll({
-      'cryptoOptionIndex': cryptoOptionIndex,
+      //'cryptoOptionIndex': cryptoOptionIndex,
       'payloadSignature': payloadSignature,
       'previousPublicKeyPayloadSignature': previousPublicKeyPayloadSignature,
       'needCompress': needCompress,

@@ -54,7 +54,7 @@ class EmailAddressService extends GeneralBaseService<EmailAddress> {
     if (secretKey != null) {
       ///如果有密钥，设置目标为空，直接用密钥对数据进行对称加密
       ///不处理密钥
-      securityContext.cryptoOptionIndex = CryptoOption.group.index;
+      // securityContext.cryptoOptionIndex = CryptoOption.group.index;
       securityContext.secretKey = secretKey;
       securityContext.targetPeerId = null;
       securityContext.payload = data;
@@ -77,7 +77,7 @@ class EmailAddressService extends GeneralBaseService<EmailAddress> {
       }
     }
     int cryptOptionIndex = cryptoOption.index;
-    securityContext.cryptoOptionIndex = cryptOptionIndex;
+    // securityContext.cryptoOptionIndex = cryptOptionIndex;
     SecurityContextService? securityContextService =
         ServiceLocator.securityContextServices[cryptOptionIndex];
     securityContextService =

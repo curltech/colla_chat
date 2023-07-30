@@ -20,47 +20,47 @@ abstract class SecurityContextService {
 
   Future<bool> decrypt(SecurityContext securityContext);
 }
-
-class CommonSecurityContextService extends SecurityContextService {
-  ///加密，而且把二进制数据base64转换成为securityContext的transportPayload字段String
-  @override
-  Future<bool> encrypt(SecurityContext securityContext) async {
-    int cryptoOptionIndex = securityContext.cryptoOptionIndex;
-    if (cryptoOptionIndex == CryptoOption.linkman.index) {
-      return linkmanCryptographySecurityContextService.encrypt(securityContext);
-    } else if (cryptoOptionIndex == CryptoOption.group.index) {
-      return groupCryptographySecurityContextService.encrypt(securityContext);
-    } else if (cryptoOptionIndex == CryptoOption.signal.index) {
-      return signalCryptographySecurityContextService.encrypt(securityContext);
-    } else if (cryptoOptionIndex == CryptoOption.none.index) {
-      return noneSecurityContextService.encrypt(securityContext);
-    } else if (cryptoOptionIndex == CryptoOption.compress.index) {
-      return compressSecurityContextService.encrypt(securityContext);
-    }
-    return linkmanCryptographySecurityContextService.encrypt(securityContext);
-  }
-
-  ///解密，而且把String数据base64转换成为二进制的返回数据
-  @override
-  Future<bool> decrypt(SecurityContext securityContext) async {
-    int cryptoOptionIndex = securityContext.cryptoOptionIndex;
-    if (cryptoOptionIndex == CryptoOption.linkman.index) {
-      return linkmanCryptographySecurityContextService.decrypt(securityContext);
-    } else if (cryptoOptionIndex == CryptoOption.group.index) {
-      return groupCryptographySecurityContextService.decrypt(securityContext);
-    } else if (cryptoOptionIndex == CryptoOption.signal.index) {
-      return signalCryptographySecurityContextService.decrypt(securityContext);
-    } else if (cryptoOptionIndex == CryptoOption.none.index) {
-      return noneSecurityContextService.decrypt(securityContext);
-    } else if (cryptoOptionIndex == CryptoOption.compress.index) {
-      return compressSecurityContextService.decrypt(securityContext);
-    }
-    return linkmanCryptographySecurityContextService.decrypt(securityContext);
-  }
-}
-
-final CommonSecurityContextService commonSecurityContextService =
-    CommonSecurityContextService();
+//
+// class CommonSecurityContextService extends SecurityContextService {
+//   ///加密，而且把二进制数据base64转换成为securityContext的transportPayload字段String
+//   @override
+//   Future<bool> encrypt(SecurityContext securityContext) async {
+//     int cryptoOptionIndex = securityContext.cryptoOptionIndex;
+//     if (cryptoOptionIndex == CryptoOption.linkman.index) {
+//       return linkmanCryptographySecurityContextService.encrypt(securityContext);
+//     } else if (cryptoOptionIndex == CryptoOption.group.index) {
+//       return groupCryptographySecurityContextService.encrypt(securityContext);
+//     } else if (cryptoOptionIndex == CryptoOption.signal.index) {
+//       return signalCryptographySecurityContextService.encrypt(securityContext);
+//     } else if (cryptoOptionIndex == CryptoOption.none.index) {
+//       return noneSecurityContextService.encrypt(securityContext);
+//     } else if (cryptoOptionIndex == CryptoOption.compress.index) {
+//       return compressSecurityContextService.encrypt(securityContext);
+//     }
+//     return linkmanCryptographySecurityContextService.encrypt(securityContext);
+//   }
+//
+//   ///解密，而且把String数据base64转换成为二进制的返回数据
+//   @override
+//   Future<bool> decrypt(SecurityContext securityContext) async {
+//     int cryptoOptionIndex = securityContext.cryptoOptionIndex;
+//     if (cryptoOptionIndex == CryptoOption.linkman.index) {
+//       return linkmanCryptographySecurityContextService.decrypt(securityContext);
+//     } else if (cryptoOptionIndex == CryptoOption.group.index) {
+//       return groupCryptographySecurityContextService.decrypt(securityContext);
+//     } else if (cryptoOptionIndex == CryptoOption.signal.index) {
+//       return signalCryptographySecurityContextService.decrypt(securityContext);
+//     } else if (cryptoOptionIndex == CryptoOption.none.index) {
+//       return noneSecurityContextService.decrypt(securityContext);
+//     } else if (cryptoOptionIndex == CryptoOption.compress.index) {
+//       return compressSecurityContextService.decrypt(securityContext);
+//     }
+//     return linkmanCryptographySecurityContextService.decrypt(securityContext);
+//   }
+// }
+//
+// final CommonSecurityContextService commonSecurityContextService =
+//     CommonSecurityContextService();
 
 class NoneSecurityContextService extends SecurityContextService {
   NoneSecurityContextService();
