@@ -380,6 +380,7 @@ class _IndexViewState extends State<IndexView>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CommonAutoSizeText(name,
+                    softWrap: true,
                     style: const TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -388,6 +389,7 @@ class _IndexViewState extends State<IndexView>
                     child: CommonAutoSizeText(
                         AppLocalizations.t('Inviting you $title chat ') +
                             videoChatMessageController!.conference!.name,
+                        softWrap: true,
                         style: const TextStyle(color: Colors.white))),
               ]),
           const Spacer(),

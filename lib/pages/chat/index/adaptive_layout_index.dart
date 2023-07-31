@@ -86,7 +86,7 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
         physics: physics,
         controller: indexWidgetProvider.controller,
         onIndexChanged: (int index) {
-          logger.i('PageChanged:$index');
+          //logger.i('PageChanged:$index');
           //indexWidgetProvider.pop(context: context);
         },
         itemCount: indexWidgetProvider.views.length,

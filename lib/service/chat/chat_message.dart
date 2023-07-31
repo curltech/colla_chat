@@ -867,7 +867,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     ///对组消息进行拆分
     if (chatMessage.groupId != null && chatMessage.receiverPeerId == null) {
       ///再根据群进行消息的复制成多条进行处理
-      logger.i('this is group chatMessage, will be split');
+      //logger.i('this is group chatMessage, will be split');
       if (peerIds == null || peerIds.isEmpty) {
         String groupId = chatMessage.groupId!;
         peerIds = await groupMemberService.findPeerIdsByGroupId(groupId);
