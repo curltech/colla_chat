@@ -1,4 +1,5 @@
 import 'package:colla_chat/entity/chat/group.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/message/common_message.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -17,15 +18,17 @@ class DismissGroupMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget prefix = IconButton(
+        tooltip: AppLocalizations.t('Dismiss group'),
         onPressed: null,
-        icon:Icon(
-      Icons.group_off,
-      color: myself.primary,
-    ));
+        icon: Icon(
+          Icons.group_off,
+          color: myself.primary,
+        ));
     Group group = Group.fromJson(JsonUtil.toJson(content));
     var tileData = TileData(
       prefix: prefix,
-      title: group.name,
+      title: 'Dismiss group',
+      subtitle: group.name,
       dense: true,
     );
     return CommonMessage(tileData: tileData);

@@ -1,4 +1,5 @@
 import 'package:colla_chat/entity/chat/group.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/message/common_message.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -26,6 +27,7 @@ class RemoveGroupMemberMessage extends StatelessWidget {
       }
     }
     Widget prefix = IconButton(
+        tooltip: AppLocalizations.t('Remove group member'),
         onPressed: null,
         icon: Icon(
           Icons.person_remove,
