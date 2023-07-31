@@ -662,9 +662,6 @@ class PeerConnectionPool {
     globalChatMessageController.sendPreKeyBundle(event.peerId,
         clientId: event.clientId);
     onWebrtcEvent(event);
-
-    ///连接完成后，清除暂存的连接许可，保证下次需要重新申请许可
-    globalWebrtcEventController.results.remove(event.peerId);
   }
 
   ///从池中移除连接

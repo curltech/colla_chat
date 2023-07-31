@@ -19,17 +19,24 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 import 'package:synchronized/synchronized.dart';
 
+class AllowedResult {
+  bool allowed;
+  DateTime timestamp;
+
+  AllowedResult(this.allowed, this.timestamp);
+}
+
 ///跟踪影响全局的webrtc事件到来，对不同类型的事件进行分派
 class GlobalWebrtcEventController with ChangeNotifier {
   Future<bool?> Function(WebrtcEvent webrtcEvent)? onWebrtcSignal;
   Future<void> Function(WebrtcEvent webrtcEvent)? onWebrtcErrorSignal;
-  Map<String, bool?> results = {};
+  Map<String, AllowedResult> results = {};
   Lock lock = Lock();
 
   ///跟踪影响全局的webrtc协商信号事件到来，对不同类型的事件进行分派
   ///目前用于处理对方的webrtc呼叫是否被允许
-  Future<bool?> receiveWebrtcSignal(WebrtcEvent webrtcEvent) async {
-    bool? allowed;
+  Future<bool> receiveWebrtcSignal(WebrtcEvent webrtcEvent) async {
+    bool allowed;
     String peerId = webrtcEvent.peerId;
     String name = webrtcEvent.name;
     String clientId = webrtcEvent.clientId;
@@ -39,10 +46,10 @@ class GlobalWebrtcEventController with ChangeNotifier {
       ///呼叫者本地存在
       if (linkman.linkmanStatus == LinkmanStatus.friend.name) {
         ///如果是好友，则直接接受
-        allowed = true;
+        return true;
       } else if (linkman.linkmanStatus == LinkmanStatus.blacklist.name) {
         ///如果是黑名单，则直接拒绝
-        allowed = false;
+        return false;
       }
     } else {
       // Linkman linkman = Linkman(peerId, name);
@@ -52,17 +59,27 @@ class GlobalWebrtcEventController with ChangeNotifier {
     }
 
     ///linkman不存在，或者既不是好友也不是黑名单，由外部接口判断
-    allowed ??= await lock.synchronized(() async {
+    allowed = await lock.synchronized(() async {
+      ///如果保存的判断结果是24小时之内
       if (results.containsKey(peerId)) {
-        return results[peerId];
+        bool a = results[peerId]!.allowed;
+        DateTime t = results[peerId]!.timestamp;
+        t = t.add(const Duration(hours: 24));
+        DateTime c = DateTime.now();
+        if (t.isAfter(c)) {
+          return a;
+        }
       }
-      if (onWebrtcSignal != null) {
-        bool? allowed = await onWebrtcSignal!(webrtcEvent);
-        results[peerId] = allowed;
 
-        return allowed;
+      ///否则重新判断
+      if (onWebrtcSignal != null) {
+        bool? a = await onWebrtcSignal!(webrtcEvent);
+        a ??= true;
+        results[peerId] = AllowedResult(a, DateTime.now());
+
+        return a;
       }
-      return null;
+      return true;
     });
 
     return allowed;
