@@ -243,9 +243,9 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
           deleteTime: _deleteTime,
           parentMessageId: _parentMessageId);
       if (chatGPT == null) {
-        returnChatMessage = (await chatMessageService.sendAndStore(chatMessage,
-                peerIds: peerIds))
-            .first;
+        List<ChatMessage> returnChatMessages = await chatMessageService
+            .sendAndStore(chatMessage, peerIds: peerIds);
+        returnChatMessage = returnChatMessages.first;
       } else {
         await chatMessageService.store(chatMessage);
         returnChatMessage = chatMessage;
