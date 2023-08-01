@@ -32,6 +32,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/transport/smsclient.dart';
+
 // import 'package:colla_chat/transport/nearby_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/websocket.dart';
@@ -476,11 +477,48 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     }
   }
 
-  ///接受到普通消息，创建回执，subMessageType为chatReceipt
-  ///一般只有对一些特殊命令才需要发送回执并保存，或者发送者明确要求回执
+  ///创建消息回执，不填充接收者相关的信息
+  ///可以用于群消息的群回复
   ///一般的命令回执只发送给发送人，群发的消息回执也是各自回复发送人
   ///群视频邀请命令的回执是需要两两发送的，也就是每个人都需要知道其他人的回复
-  Future<ChatMessage> buildChatReceipt(
+  Future<ChatMessage> buildGroupChatReceipt(
+      ChatMessage chatMessage, MessageReceiptType receiptType) async {
+    //创建回执消息
+    ChatMessageType? messageType = StringUtil.enumFromString(
+        ChatMessageType.values, chatMessage.messageType);
+    PartyType? groupType;
+    if (chatMessage.groupType != null) {
+      groupType =
+          StringUtil.enumFromString(PartyType.values, chatMessage.groupType);
+    }
+    PartyType? receiverType;
+    if (chatMessage.senderType != null) {
+      receiverType =
+          StringUtil.enumFromString(PartyType.values, chatMessage.senderType);
+    }
+    ChatMessage chatReceipt = await buildChatMessage(
+      messageId: chatMessage.messageId,
+      messageType: messageType!,
+      subMessageType: ChatMessageSubType.chatReceipt,
+      groupId: chatMessage.groupId,
+      groupName: chatMessage.groupName,
+      groupType: groupType,
+      title: chatMessage.title,
+      receiverType: receiverType!,
+      receiptType: receiptType.name,
+    );
+    var currentDate = DateUtil.currentDate();
+    chatReceipt.receiptTime = currentDate;
+    chatReceipt.receiveTime = chatMessage.receiveTime;
+    chatReceipt.readTime = currentDate;
+    chatReceipt.deleteTime = chatMessage.deleteTime;
+
+    return chatReceipt;
+  }
+
+  ///接受到普通消息，创建回执，subMessageType为chatReceipt
+  ///一般只有对一些特殊命令才需要发送回执并保存，或者发送者明确要求回执
+  Future<ChatMessage> buildLinkmanChatReceipt(
       ChatMessage chatMessage, MessageReceiptType receiptType,
       {String? receiverPeerId, String? clientId, String? receiverName}) async {
     //创建回执消息
@@ -524,6 +562,18 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   ///发送回执消息的时候，更新收到的消息的状态
+  Future<void> updateReceiptType(
+      ChatMessage chatMessage, MessageReceiptType receiptType) async {
+    chatMessage.receiptType = receiptType.name;
+    await update(
+        {
+          'receiptType': chatMessage.receiptType,
+        },
+        where: 'id=?',
+        whereArgs: [chatMessage.id!]);
+  }
+
+  ///发送回执消息的时候，更新收到的消息的状态
   Future<void> updateMessageStatus(
       ChatMessage chatMessage, MessageStatus messageStatus) async {
     if (messageStatus == MessageStatus.read) {
@@ -549,55 +599,6 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         },
         where: 'id=?',
         whereArgs: [chatMessage.id!]);
-  }
-
-  ///发送回执消息的时候，更新收到的消息的状态
-  Future<void> updateReceiptType(
-      ChatMessage chatMessage, MessageReceiptType receiptType) async {
-    chatMessage.receiptType = receiptType.name;
-    await update(
-        {
-          'receiptType': chatMessage.receiptType,
-        },
-        where: 'id=?',
-        whereArgs: [chatMessage.id!]);
-  }
-
-  ///创建群回执消息，如果peerIds为空，通过groupId查询成员表决定
-  Future<List<ChatMessage>> buildGroupChatReceipt(
-    ChatMessage chatMessage,
-    MessageReceiptType receiptType, {
-    List<String>? peerIds,
-  }) async {
-    String groupId = chatMessage.groupId!;
-    List<ChatMessage> chatReceipts = [];
-
-    if (peerIds == null) {
-      peerIds = <String>[];
-      List<GroupMember> groupMembers =
-          await groupMemberService.findByGroupId(groupId);
-      if (groupMembers.isNotEmpty) {
-        for (var groupMember in groupMembers) {
-          peerIds.add(groupMember.memberPeerId!);
-        }
-      }
-    }
-    for (var peerId in peerIds) {
-      Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
-      if (linkman == null || peerId == myself.peerId) {
-        logger.i('peerId $peerId linkman is not exist or myself');
-        continue;
-      }
-      ChatMessage chatReceipt = await buildChatReceipt(
-        chatMessage,
-        receiptType,
-        receiverPeerId: peerId,
-        receiverName: linkman.name,
-        clientId: linkman.clientId,
-      );
-      chatReceipts.add(chatReceipt);
-    }
-    return chatReceipts;
   }
 
   ///加密消息，要么对非组的消息或者拆分后的群消息进行linkman方式加密，
@@ -703,11 +704,13 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   ///发送消息，并更新发送状态字段，如果chatMessage的groupType不为空，则是群消息，支持群发
+  ///群发的时候peerIds不为空，有值
   ///以特定的发送方式发送数据，返回实际成功的发送方式
   Future<List<ChatMessage>> send(ChatMessage chatMessage,
       {CryptoOption? cryptoOption, List<String>? peerIds}) async {
     ///对消息进行分拆和加密
-    List<ChatMessage> chatMessages = await split(chatMessage, peerIds: peerIds);
+    List<ChatMessage> chatMessages =
+        await _buildGroupChatMessages(chatMessage, peerIds: peerIds);
     Map<String, List<int>> encryptData = await encrypt(chatMessage,
         cryptoOption: cryptoOption, peerIds: peerIds);
     for (var chatMessage in chatMessages) {
@@ -782,7 +785,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   ///发送消息，并保存本地，由于是先发送后保存，所以新消息的id，createDate等字段是空的
-  ///如果是群消息，则需要群发
+  ///如果chatMessage的groupType不为空，则是群消息，支持群发
+  ///群发的时候peerIds不为空，有值
   Future<List<ChatMessage>> sendAndStore(ChatMessage chatMessage,
       {CryptoOption? cryptoOption, List<String>? peerIds}) async {
     if (chatMessage.receiverPeerId == myself.peerId) {
@@ -860,14 +864,13 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
 
   /// 如果是群消息，拆分多条消息，拆分后的接收者信息被填充
   /// 如果是非群消息或者拆分过的群消息返回单条消息的数组
-  Future<List<ChatMessage>> split(ChatMessage chatMessage,
+  Future<List<ChatMessage>> _buildGroupChatMessages(ChatMessage chatMessage,
       {List<String>? peerIds}) async {
     List<ChatMessage> chatMessages = [chatMessage];
 
     ///对组消息进行拆分
     if (chatMessage.groupId != null && chatMessage.receiverPeerId == null) {
       ///再根据群进行消息的复制成多条进行处理
-      //logger.i('this is group chatMessage, will be split');
       if (peerIds == null || peerIds.isEmpty) {
         String groupId = chatMessage.groupId!;
         peerIds = await groupMemberService.findPeerIdsByGroupId(groupId);

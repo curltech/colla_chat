@@ -228,7 +228,7 @@ class GroupService extends PeerPartyService<Group> {
     Group group = Group.fromJson(map);
     group.id = null;
     await groupService.store(group);
-    ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
+    ChatMessage? chatReceipt = await chatMessageService.buildLinkmanChatReceipt(
         chatMessage, MessageReceiptType.accepted);
     await chatMessageService.updateReceiptType(
         chatMessage, MessageReceiptType.accepted);
@@ -263,7 +263,7 @@ class GroupService extends PeerPartyService<Group> {
     Map<String, dynamic> map = JsonUtil.toJson(json);
     Group group = Group.fromJson(map);
     await groupService.store(group);
-    ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
+    ChatMessage? chatReceipt = await chatMessageService.buildLinkmanChatReceipt(
         chatMessage, MessageReceiptType.accepted);
     await chatMessageService.updateReceiptType(
         chatMessage, MessageReceiptType.accepted);
@@ -313,7 +313,7 @@ class GroupService extends PeerPartyService<Group> {
     chatSummaryService.delete(entity: {
       'peerId': peerId,
     });
-    ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
+    ChatMessage? chatReceipt = await chatMessageService.buildLinkmanChatReceipt(
         chatMessage, MessageReceiptType.accepted);
     await chatMessageService.updateReceiptType(
         chatMessage, MessageReceiptType.accepted);
@@ -350,7 +350,7 @@ class GroupService extends PeerPartyService<Group> {
       await groupMemberService.store(groupMember);
     }
 
-    ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
+    ChatMessage? chatReceipt = await chatMessageService.buildLinkmanChatReceipt(
         chatMessage, MessageReceiptType.accepted);
     await chatMessageService.updateReceiptType(
         chatMessage, MessageReceiptType.accepted);
@@ -391,7 +391,7 @@ class GroupService extends PeerPartyService<Group> {
       });
     }
 
-    ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
+    ChatMessage? chatReceipt = await chatMessageService.buildLinkmanChatReceipt(
         chatMessage, MessageReceiptType.accepted);
     await chatMessageService.updateReceiptType(
         chatMessage, MessageReceiptType.accepted);
@@ -419,7 +419,7 @@ class GroupService extends PeerPartyService<Group> {
   receiveGroupFile(ChatMessage chatMessage) async {
     Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
 
-    ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
+    ChatMessage? chatReceipt = await chatMessageService.buildLinkmanChatReceipt(
         chatMessage, MessageReceiptType.accepted);
     await chatMessageService.updateReceiptType(
         chatMessage, MessageReceiptType.accepted);

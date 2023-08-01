@@ -472,8 +472,8 @@ class VideoChatMessageController with ChangeNotifier {
       return;
     }
     //创建回执消息
-    ChatMessage chatReceipt =
-        await chatMessageService.buildChatReceipt(chatMessage, receiptType);
+    ChatMessage chatReceipt = await chatMessageService.buildLinkmanChatReceipt(
+        chatMessage, receiptType);
     await chatMessageService.sendAndStore(chatReceipt);
     await chatMessageService.updateReceiptType(chatMessage, receiptType);
   }
@@ -490,16 +490,10 @@ class VideoChatMessageController with ChangeNotifier {
     //如果存在，如果是rejected或者terminated，则不发送回执
     //创建回执消息
     //await conferenceService.store(_conference!);
-    List<ChatMessage> chatReceipts =
-        await chatMessageService.buildGroupChatReceipt(chatMessage, receiptType,
-            peerIds: _conference!.participants);
-    if (chatReceipts.isNotEmpty) {
-      for (var chatReceipt in chatReceipts) {
-        //发送回执
-        await chatMessageService.sendAndStore(chatReceipt,
-            cryptoOption: CryptoOption.linkman);
-      }
-    }
+    ChatMessage chatReceipt = await chatMessageService.buildGroupChatReceipt(
+        chatMessage, receiptType);
+    await chatMessageService.sendAndStore(chatReceipt,
+        cryptoOption: CryptoOption.group, peerIds: _conference!.participants);
     await chatMessageService.updateReceiptType(chatMessage, receiptType);
   }
 
@@ -514,16 +508,10 @@ class VideoChatMessageController with ChangeNotifier {
     //首先检查接收人是否已经存在给自己的回执，不存在或者存在是accepted则发送回执
     //如果存在，如果是rejected或者terminated，则不发送回执
     await conferenceService.store(_conference!);
-    List<ChatMessage> chatReceipts =
-        await chatMessageService.buildGroupChatReceipt(chatMessage, receiptType,
-            peerIds: _conference!.participants);
-    if (chatReceipts.isNotEmpty) {
-      for (var chatReceipt in chatReceipts) {
-        //发送回执
-        await chatMessageService.sendAndStore(chatReceipt,
-            cryptoOption: CryptoOption.linkman);
-      }
-    }
+    ChatMessage chatReceipt = await chatMessageService.buildGroupChatReceipt(
+        chatMessage, receiptType);
+    await chatMessageService.sendAndStore(chatReceipt,
+        cryptoOption: CryptoOption.group, peerIds: _conference!.participants);
     await chatMessageService.updateReceiptType(chatMessage, receiptType);
   }
 

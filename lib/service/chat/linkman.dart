@@ -220,7 +220,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
     Map<String, dynamic> map = JsonUtil.toJson(myself.myselfPeer);
     PeerClient peerClient = PeerClient.fromJson(map);
     ChatMessage? chatReceipt =
-        await chatMessageService.buildChatReceipt(chatMessage, receiptType);
+        await chatMessageService.buildLinkmanChatReceipt(chatMessage, receiptType);
     //改变发送消息的状态为接收
     await chatMessageService.updateReceiptType(chatMessage, receiptType);
     if (receiptType == MessageReceiptType.accepted) {
