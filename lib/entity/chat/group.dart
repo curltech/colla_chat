@@ -52,6 +52,12 @@ class Group extends PeerParty {
     });
     return json;
   }
+
+  Group copy() {
+    Map<String, dynamic> json = toJson();
+
+    return Group.fromJson(json);
+  }
 }
 
 enum MemberType { owner, admin, member }
@@ -85,6 +91,12 @@ class GroupMember extends StatusEntity {
       'memberType': memberType,
     });
     return json;
+  }
+
+  GroupMember copy() {
+    Map<String, dynamic> json = toJson();
+
+    return GroupMember.fromJson(json);
   }
 }
 

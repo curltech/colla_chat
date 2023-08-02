@@ -112,13 +112,19 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   ///返回数组，内含保存的组，增加的成员和删除的成员
-  Future<GroupChange> store(Group group) async {
+  Future<GroupChange> store(Group group, {bool myAlias = true}) async {
     Group? old = await findOneByPeerId(group.peerId);
     if (old != null) {
       group.id = old.id;
       group.createDate = old.createDate;
+      if (!myAlias) {
+        group.myAlias = old.myAlias;
+      }
     } else {
       group.id = null;
+      if (!myAlias) {
+        group.myAlias = null;
+      }
     }
     await upsert(group);
 
@@ -207,10 +213,12 @@ class GroupService extends PeerPartyService<Group> {
   ///向联系人发送加群的消息，群成员在group的participants中
   ///发送的目标在peerIds参数中，如果peerIds为空，则在group的participants中
   addGroup(Group group, {List<String>? peerIds}) async {
+    Group g = group.copy();
+    g.myAlias = null;
     ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
       group.peerId,
       PartyType.group,
-      content: group,
+      content: g,
       subMessageType: ChatMessageSubType.addGroup,
     );
     peerIds ??= group.participants;
@@ -227,7 +235,7 @@ class GroupService extends PeerPartyService<Group> {
     Map<String, dynamic> map = JsonUtil.toJson(json);
     Group group = Group.fromJson(map);
     group.id = null;
-    await groupService.store(group);
+    await groupService.store(group, myAlias: false);
     ChatMessage? chatReceipt = await chatMessageService.buildLinkmanChatReceipt(
         chatMessage, MessageReceiptType.accepted);
     await chatMessageService.updateReceiptType(
@@ -243,10 +251,12 @@ class GroupService extends PeerPartyService<Group> {
 
   ///向群成员发送群属性变化的消息
   modifyGroup(Group group, {List<String>? peerIds}) async {
+    Group g = group.copy();
+    g.myAlias = null;
     ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
       group.peerId,
       PartyType.group,
-      content: group,
+      content: g,
       subMessageType: ChatMessageSubType.modifyGroup,
     );
     peerIds ??= group.participants;
@@ -262,7 +272,7 @@ class GroupService extends PeerPartyService<Group> {
     String json = chatMessageService.recoverContent(chatMessage.content!);
     Map<String, dynamic> map = JsonUtil.toJson(json);
     Group group = Group.fromJson(map);
-    await groupService.store(group);
+    await groupService.store(group, myAlias: false);
     ChatMessage? chatReceipt = await chatMessageService.buildLinkmanChatReceipt(
         chatMessage, MessageReceiptType.accepted);
     await chatMessageService.updateReceiptType(
@@ -347,7 +357,7 @@ class GroupService extends PeerPartyService<Group> {
     for (var map in maps) {
       GroupMember groupMember = GroupMember.fromJson(map);
       groupMember.id = null;
-      await groupMemberService.store(groupMember);
+      await groupMemberService.store(groupMember, memberAlias: false);
     }
 
     ChatMessage? chatReceipt = await chatMessageService.buildLinkmanChatReceipt(
@@ -502,12 +512,19 @@ class GroupMemberService extends GeneralBaseService<GroupMember> {
     return linkmen;
   }
 
-  Future<void> store(GroupMember groupMember) async {
+  Future<void> store(GroupMember groupMember, {bool memberAlias = true}) async {
     GroupMember? old =
         await findOneByGroupId(groupMember.groupId!, groupMember.memberPeerId!);
     if (old != null) {
       groupMember.id = old.id;
       groupMember.createDate = old.createDate;
+      if (!memberAlias) {
+        groupMember.memberAlias = old.memberAlias;
+      }
+    } else {
+      if (!memberAlias) {
+        groupMember.memberAlias = null;
+      }
     }
     await upsert(groupMember);
     Linkman? linkman =

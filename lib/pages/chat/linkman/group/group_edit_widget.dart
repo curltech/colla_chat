@@ -286,7 +286,6 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     }
     if (current.myAlias != currentGroup.myAlias) {
       current.myAlias = currentGroup.myAlias;
-      groupModified = true;
     }
     if (current.alias != currentGroup.alias) {
       current.alias = currentGroup.alias;
