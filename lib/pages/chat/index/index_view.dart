@@ -5,8 +5,10 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/group.dart';
+import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/index/adaptive_layout_index.dart';
@@ -328,6 +330,13 @@ class _IndexViewState extends State<IndexView>
     name = name ?? '';
     var title = chatMessage.title;
     title = title ?? '';
+    String? topic;
+    if (chatMessage.content != null) {
+      var content = chatMessageService.recoverContent(chatMessage.content!);
+      Map<String, dynamic> json = JsonUtil.toJson(content);
+      var conference = Conference.fromJson(json);
+      topic = conference.topic;
+    }
     var rejectedButton = IconButton(
         tooltip: AppLocalizations.t('Reject'),
         onPressed: () async {
@@ -337,7 +346,7 @@ class _IndexViewState extends State<IndexView>
               .sendChatReceipt(MessageReceiptType.rejected);
           videoChatMessageController = null;
         },
-        icon: const Icon(color: Colors.red, size: 32, Icons.call_end));
+        icon: const Icon(color: Colors.red, size: 24, Icons.call_end));
     var holdButton = IconButton(
         tooltip: AppLocalizations.t('Hold'),
         onPressed: () async {
@@ -347,7 +356,7 @@ class _IndexViewState extends State<IndexView>
               .sendChatReceipt(MessageReceiptType.hold);
           videoChatMessageController = null;
         },
-        icon: const Icon(color: Colors.amber, size: 32, Icons.add_call));
+        icon: const Icon(color: Colors.amber, size: 24, Icons.add_call));
     var acceptedButton = IconButton(
         tooltip: AppLocalizations.t('Accept'),
         onPressed: () async {
@@ -357,7 +366,7 @@ class _IndexViewState extends State<IndexView>
               .sendChatReceipt(MessageReceiptType.accepted);
           videoChatMessageController = null;
         },
-        icon: const Icon(color: Colors.green, size: 32, Icons.call));
+        icon: const Icon(color: Colors.green, size: 24, Icons.call));
     List<Widget> buttons = <Widget>[];
     buttons.add(rejectedButton);
     buttons.add(holdButton);
@@ -367,15 +376,15 @@ class _IndexViewState extends State<IndexView>
         chatMessage.groupType != PartyType.conference.name) {
       buttons.add(acceptedButton);
     }
-    return Card(
-        elevation: 0.0,
-        margin: EdgeInsets.zero,
-        shape: const ContinuousRectangleBorder(),
-        child: Container(
-            height: 74,
-            alignment: Alignment.topLeft,
-            width: appDataProvider.totalSize.width,
-            padding: const EdgeInsets.all(5.0),
+    return Container(
+        height: 154,
+        alignment: Alignment.topLeft,
+        width: appDataProvider.totalSize.width,
+        padding: const EdgeInsets.all(0.0),
+        child: Card(
+            elevation: 0.0,
+            margin: EdgeInsets.zero,
+            shape: const ContinuousRectangleBorder(),
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               bannerAvatarImage,
               Expanded(
@@ -393,6 +402,10 @@ class _IndexViewState extends State<IndexView>
                           videoChatMessageController!.conference!.name,
                       softWrap: true,
                     )),
+                    CommonAutoSizeText(
+                      topic ?? '',
+                      softWrap: true,
+                    ),
                     ButtonBar(
                         alignment: MainAxisAlignment.end, children: buttons),
                   ])),
