@@ -367,34 +367,36 @@ class _IndexViewState extends State<IndexView>
         chatMessage.groupType != PartyType.conference.name) {
       buttons.add(acceptedButton);
     }
-    return Container(
-        height: 74,
-        alignment: Alignment.topLeft,
-        width: appDataProvider.totalSize.width,
-        padding: const EdgeInsets.all(5.0),
-        color: Colors.black.withOpacity(AppOpacity.mdOpacity),
-        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          bannerAvatarImage,
-          Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CommonAutoSizeText(name,
-                    softWrap: true,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold)),
-                Expanded(
-                    child: CommonAutoSizeText(
-                        AppLocalizations.t('Inviting you $title chat ') +
-                            videoChatMessageController!.conference!.name,
+    return Card(
+        elevation: 0.0,
+        margin: EdgeInsets.zero,
+        shape: const ContinuousRectangleBorder(),
+        child: Container(
+            height: 74,
+            alignment: Alignment.topLeft,
+            width: appDataProvider.totalSize.width,
+            padding: const EdgeInsets.all(5.0),
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              bannerAvatarImage,
+              Expanded(
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                    CommonAutoSizeText(name,
                         softWrap: true,
-                        style: const TextStyle(color: Colors.white))),
-              ]),
-          const Spacer(),
-          ButtonBar(alignment: MainAxisAlignment.end, children: buttons),
-        ]));
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    Expanded(
+                        child: CommonAutoSizeText(
+                      AppLocalizations.t('Inviting you $title chat ') +
+                          videoChatMessageController!.conference!.name,
+                      softWrap: true,
+                    )),
+                    ButtonBar(
+                        alignment: MainAxisAlignment.end, children: buttons),
+                  ])),
+            ])));
   }
 
   _buildVideoChatMessageBanner(BuildContext context) {
