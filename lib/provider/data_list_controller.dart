@@ -25,7 +25,7 @@ class DataListController<T> with ChangeNotifier {
   }
 
   T? get current {
-    if (_currentIndex > -1) {
+    if (_currentIndex > -1 && data.isNotEmpty) {
       return data[_currentIndex];
     }
     return null;
