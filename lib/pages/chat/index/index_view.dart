@@ -377,7 +377,7 @@ class _IndexViewState extends State<IndexView>
       buttons.add(acceptedButton);
     }
     return Container(
-        height: 154,
+        height: 148,
         alignment: Alignment.topLeft,
         width: appDataProvider.totalSize.width,
         padding: const EdgeInsets.all(0.0),
@@ -403,7 +403,7 @@ class _IndexViewState extends State<IndexView>
                       softWrap: true,
                     )),
                     CommonAutoSizeText(
-                      topic ?? '',
+                      '${AppLocalizations.t('Topic:')} ${topic ?? ''}',
                       softWrap: true,
                     ),
                     ButtonBar(
