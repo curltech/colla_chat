@@ -33,7 +33,7 @@ import 'package:flutter/material.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:screenshot_callback/screenshot_callback.dart';
 import 'package:visibility_detector/visibility_detector.dart';
-import 'package:wakelock/wakelock.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:no_screenshot/no_screenshot.dart';
 
@@ -93,7 +93,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
     _createPeerConnection();
     _buildReadStatus();
     _updateChatMessageView();
-    Wakelock.enable();
+    WakelockPlus.enable();
     if (platformParams.mobile) {
       noScreenshot = NoScreenshot.instance;
       screenshotCallback = ScreenshotCallback();
@@ -424,7 +424,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
     }
     WidgetsBinding.instance.removeObserver(this);
     windowManager.removeListener(this);
-    Wakelock.disable();
+    WakelockPlus.disable();
     if (platformParams.mobile) {
       screenshotCallback?.dispose();
     }

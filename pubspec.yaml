@@ -65,13 +65,13 @@ dependencies:
   flutter_nfc_kit: ^3.3.1 #mobile
   #  flutter_blue_plus: ^1.5.2 #ANDROID，IOS，MACOS
   mimecon: ^0.0.2
-  wakelock: ^0.6.2 #让系统不会睡眠
+  wakelock_plus: ^1.1.1 #让系统不会睡眠
 
   # 存储
   shared_preferences: ^2.0.10
   flutter_secure_storage: ^8.0.0
-  sqlite3: ^2.0.0
-  sqlite3_flutter_libs: ^0.5.13
+  sqlite3: ^2.1.0
+  sqlite3_flutter_libs: ^0.5.15
   idb_shim: ^2.0.1
 
   #网络
@@ -270,7 +270,7 @@ dependencies:
   record_mp3: ^3.0.0
   audio_waveforms: 1.0.4
   video_player_web: ^2.0.15
-  flick_video_player: ^0.5.0 #video_player的封装
+  #flick_video_player: ^0.5.0 #video_player的封装
   #appinio_video_player: ^1.2.0 #video_player的封装
   video_player: ^2.6.0 #mobile and web
   video_player_win: ^2.2.0
@@ -286,7 +286,7 @@ dependencies:
   media_kit_libs_macos_video: ^1.0.5             # macOS package for video native libraries.
   media_kit_libs_windows_video: ^1.0.2           # Windows package for video native libraries.
   media_kit_libs_linux: ^1.0.2
-  flutter_meedu_media_kit: ^4.2.14
+  #flutter_meedu_media_kit: ^4.2.14
   #better_player: ^0.0.83 #chewie的封装,ios下有问题
   #fijkplayer: ^0.10.1 #mobile
   just_audio: ^0.9.30

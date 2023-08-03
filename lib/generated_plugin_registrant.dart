@@ -18,7 +18,6 @@ import 'package:openpgp/web/openpgp_web.dart';
 import 'package:shared_preferences_web/shared_preferences_web.dart';
 import 'package:url_launcher_web/url_launcher_web.dart';
 import 'package:video_player_web/video_player_web.dart';
-import 'package:wakelock_web/wakelock_web.dart';
 import 'package:webcrypto/src/flutter/webcrypto_plugin.dart';
 
 // ignore: public_member_api_docs
@@ -34,7 +33,6 @@ void registerPlugins(Registrar registrar) {
   SharedPreferencesPlugin.registerWith(registrar);
   UrlLauncherPlugin.registerWith(registrar);
   VideoPlayerPlugin.registerWith(registrar);
-  WakelockWeb.registerWith(registrar);
   WebcryptoPlugin.registerWith(registrar);
   registrar.registerMessageHandler();
 }
