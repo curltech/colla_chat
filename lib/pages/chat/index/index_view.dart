@@ -258,20 +258,18 @@ class _IndexViewState extends State<IndexView>
               if (name != null) {
                 children.add(
                   CommonAutoSizeText(name,
+                      softWrap: true,
                       style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500)),
+                          fontSize: 16, fontWeight: FontWeight.w500)),
                 );
               }
               String? title = chatMessage.title;
               if (title != null) {
                 children.add(
                   CommonAutoSizeText(title,
+                      softWrap: true,
                       style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400)),
+                          fontSize: 14, fontWeight: FontWeight.w400)),
                 );
               }
               String? content = chatMessage.content;
@@ -283,10 +281,10 @@ class _IndexViewState extends State<IndexView>
                 children.add(Expanded(
                     child: ExtendedText(
                   content,
+                  softWrap: true,
                   style: const TextStyle(
-                    color: Colors.white,
-                    //fontSize: 16.0,
-                  ),
+                      //fontSize: 16.0,
+                      ),
                   specialTextSpanBuilder: customSpecialTextSpanBuilder,
                 )));
               }
@@ -301,17 +299,22 @@ class _IndexViewState extends State<IndexView>
                       alignment: Alignment.topLeft,
                       padding: const EdgeInsets.all(5.0),
                       color: Colors.black.withOpacity(AppOpacity.mdOpacity),
-                      child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            bannerAvatarImage,
-                            const SizedBox(
-                              width: 15.0,
-                            ),
-                            Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: children),
-                          ])));
+                      child: Card(
+                          elevation: 0.0,
+                          margin: EdgeInsets.zero,
+                          shape: const ContinuousRectangleBorder(),
+                          child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                bannerAvatarImage,
+                                const SizedBox(
+                                  width: 15.0,
+                                ),
+                                Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: children),
+                              ]))));
 
               //延时30秒后一般消息消失
               Future.delayed(const Duration(seconds: 30)).then((value) {
