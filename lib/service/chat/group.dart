@@ -240,7 +240,8 @@ class GroupService extends PeerPartyService<Group> {
         chatMessage, MessageReceiptType.accepted);
     await chatMessageService.updateReceiptType(
         chatMessage, MessageReceiptType.accepted);
-    await chatMessageService.sendAndStore(chatReceipt);
+    await chatMessageService.sendAndStore(chatReceipt,
+        cryptoOption: CryptoOption.linkman);
     //同意加入群，向群的所有成员告知自己加入
     GroupMember? member =
         await groupMemberService.findOneByGroupId(group.peerId, myself.peerId!);
@@ -278,7 +279,8 @@ class GroupService extends PeerPartyService<Group> {
     await chatMessageService.updateReceiptType(
         chatMessage, MessageReceiptType.accepted);
 
-    await chatMessageService.sendAndStore(chatReceipt);
+    await chatMessageService.sendAndStore(chatReceipt,
+        cryptoOption: CryptoOption.linkman);
   }
 
   ///向群成员发送散群的消息
@@ -328,7 +330,8 @@ class GroupService extends PeerPartyService<Group> {
     await chatMessageService.updateReceiptType(
         chatMessage, MessageReceiptType.accepted);
 
-    await chatMessageService.sendAndStore(chatReceipt);
+    await chatMessageService.sendAndStore(chatReceipt,
+        cryptoOption: CryptoOption.linkman);
   }
 
   ///向群成员发送加群成员的消息
@@ -365,7 +368,8 @@ class GroupService extends PeerPartyService<Group> {
     await chatMessageService.updateReceiptType(
         chatMessage, MessageReceiptType.accepted);
 
-    await chatMessageService.sendAndStore(chatReceipt);
+    await chatMessageService.sendAndStore(chatReceipt,
+        cryptoOption: CryptoOption.linkman);
   }
 
   ///向群成员发送删群成员的消息
@@ -406,7 +410,8 @@ class GroupService extends PeerPartyService<Group> {
     await chatMessageService.updateReceiptType(
         chatMessage, MessageReceiptType.accepted);
 
-    await chatMessageService.sendAndStore(chatReceipt);
+    await chatMessageService.sendAndStore(chatReceipt,
+        cryptoOption: CryptoOption.linkman);
   }
 
   ///向群成员发送群文件的消息

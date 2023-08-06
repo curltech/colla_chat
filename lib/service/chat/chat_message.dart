@@ -32,7 +32,6 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/transport/smsclient.dart';
-
 // import 'package:colla_chat/transport/nearby_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/websocket.dart';
@@ -638,12 +637,13 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         }
       }
     } else if (cryptOptionIndex == CryptoOption.group.index) {
-      logger.i('this is group chatMessage, will be encrypted once');
-
       ///再根据群进行消息的复制成多条进行处理
       if (peerIds == null || peerIds.isEmpty) {
         String groupId = chatMessage.groupId!;
         peerIds = await groupMemberService.findPeerIdsByGroupId(groupId);
+      }
+      if (peerIds.isEmpty) {
+        peerIds.add(chatMessage.receiverPeerId!);
       }
       if (peerIds.isNotEmpty) {
         for (var peerId in peerIds) {
