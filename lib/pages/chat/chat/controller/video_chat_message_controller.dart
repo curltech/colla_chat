@@ -349,11 +349,6 @@ class VideoChatMessageController with ChangeNotifier {
       _conference!.groupName = name;
       _conference!.groupType = partyType;
     }
-    // if (_conference != null) {
-    //   if (partyType == PartyType.group.name) {
-    //     await conferenceService.store(_conference!);
-    //   }
-    // }
   }
 
   ///1.发送视频通邀请话消息,此时消息必须有content,包含conference信息
