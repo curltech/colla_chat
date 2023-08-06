@@ -329,7 +329,15 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
       await groupService.addGroup(current);
     } else {
       if (groupModified) {
-        await groupService.modifyGroup(current);
+        bool allowed = groupService.canModifyGroup(current);
+        if (!allowed) {
+          if (mounted) {
+            DialogUtil.error(context,
+                content: 'Not group owner or myself, can not modify group');
+          }
+        } else {
+          await groupService.modifyGroup(current);
+        }
       }
     }
     //新增加的成员
@@ -349,7 +357,19 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     //处理删除的成员
     if (oldMembers is List<GroupMember> && oldMembers.isNotEmpty) {
       //对所有的成员发送组员删除的消息
-      await groupService.removeGroupMember(groupId, oldMembers);
+      Group? group = await groupService.findCachedOneByPeerId(groupId);
+      if (group != null) {
+        bool allowed = groupService.canRemoveGroupMember(group, oldMembers);
+        if (!allowed) {
+          if (mounted) {
+            DialogUtil.error(context,
+                content:
+                    'Not group owner or myself, can not remove group member');
+          }
+        } else {
+          await groupService.removeGroupMember(group, oldMembers);
+        }
+      }
     }
     if (add || groupModified) {
       groupChatSummaryController.refresh();

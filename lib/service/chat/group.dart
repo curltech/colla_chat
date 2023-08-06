@@ -8,6 +8,7 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/chat_summary.dart';
@@ -250,8 +251,27 @@ class GroupService extends PeerPartyService<Group> {
     }
   }
 
+  bool canModifyGroup(Group group) {
+    if (myself.peerId == group.groupOwnerPeerId) {
+      return true;
+    }
+    List<String>? participants = group.participants;
+    if (participants != null && participants.isNotEmpty) {
+      for (var participant in participants) {
+        if (participant == myself.peerId) {
+          return true;
+        }
+      }
+    }
+    logger.e('Not group owner or myself, can not modify group');
+    return false;
+  }
+
   ///向群成员发送群属性变化的消息
   modifyGroup(Group group, {List<String>? peerIds}) async {
+    if (!canModifyGroup(group)) {
+      return;
+    }
     Group g = group.copy();
     g.myAlias = null;
     ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
@@ -283,9 +303,20 @@ class GroupService extends PeerPartyService<Group> {
         cryptoOption: CryptoOption.linkman);
   }
 
+  bool canDismissGroup(Group group) {
+    if (myself.peerId != group.groupOwnerPeerId) {
+      logger.e('Not group owner, can not modify group');
+      return false;
+    }
+    return true;
+  }
+
   ///向群成员发送散群的消息
   dismissGroup(Group group) async {
-    await groupMemberService.removeBygroupId(group.peerId);
+    if (!canDismissGroup(group)) {
+      return;
+    }
+    await groupMemberService.removeByGroupId(group.peerId);
     groupService.delete(entity: {
       'peerId': group.peerId,
     });
@@ -372,21 +403,37 @@ class GroupService extends PeerPartyService<Group> {
         cryptoOption: CryptoOption.linkman);
   }
 
+  bool canRemoveGroupMember(Group group, List<GroupMember> groupMembers) {
+    if (groupMembers.isNotEmpty) {
+      for (var groupMember in groupMembers) {
+        if (groupMember.memberPeerId == myself.peerId) {
+          return true;
+        }
+      }
+    }
+
+    if (myself.peerId == group.groupOwnerPeerId) {
+      return true;
+    }
+    logger.e('Not group owner or myself, can not remove group member');
+
+    return false;
+  }
+
   ///向群成员发送删群成员的消息
-  removeGroupMember(String groupId, List<GroupMember> groupMembers,
+  removeGroupMember(Group group, List<GroupMember> groupMembers,
       {List<String>? peerIds}) async {
+    if (!canRemoveGroupMember(group, groupMembers)) {
+      return;
+    }
+    peerIds ??= group.participants;
     ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
-      groupId,
+      group.peerId,
       PartyType.group,
       content: groupMembers,
       subMessageType: ChatMessageSubType.removeGroupMember,
     );
-    if (peerIds == null) {
-      Group? group = await groupService.findCachedOneByPeerId(groupId);
-      if (group != null) {
-        peerIds = group.participants;
-      }
-    }
+
     await chatMessageService.sendAndStore(
       chatMessage,
       cryptoOption: CryptoOption.group,
@@ -541,7 +588,7 @@ class GroupMemberService extends GeneralBaseService<GroupMember> {
   }
 
   ///删除群的组员
-  removeBygroupId(String peerId) async {
+  removeByGroupId(String peerId) async {
     delete(where: 'groupId=?', whereArgs: [peerId]);
   }
 }
