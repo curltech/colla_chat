@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/emailaddress.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
@@ -62,8 +63,6 @@ class NewMailWidget extends StatefulWidget with TileDataMixin {
   @override
   String get title => 'New mail';
 }
-
-const String payloadKeysName = 'payloadKeys';
 
 class _NewMailWidgetState extends State<NewMailWidget> {
   //已经选择的收件人
@@ -267,12 +266,15 @@ class _NewMailWidgetState extends State<NewMailWidget> {
       }
       String subject = CryptoUtil.encodeBase64(encryptedSubject.data);
       //加前后缀表示加密
-      builder.subject = '#{$subject}';
+
       secretKey = encryptedSubject.secretKey;
       Map<String, String>? payloadKeys = encryptedSubject.payloadKeys;
       //表示群加密
       if (payloadKeys != null) {
-        builder.addHeader(payloadKeysName, JsonUtil.toJsonString(payloadKeys));
+        var payloadKeysStr = JsonUtil.toJsonString(payloadKeys);
+        builder.subject = '$subject#{$payloadKeysStr}';
+      } else {
+        builder.subject = '$subject#{}';
       }
     } else {
       builder.subject = subjectController.text;

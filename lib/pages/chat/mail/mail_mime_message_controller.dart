@@ -1,7 +1,6 @@
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/emailaddress.dart' as entity;
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/mail/new_mail_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -377,14 +376,20 @@ class MailMimeMessageController
   ///解密标题和文本
   Future<DecryptedMimeMessage> decryptMimeMessage(
       MimeMessage mimeMessage) async {
-    String? subject = mimeMessage.decodeSubject();
+    String? subjects = mimeMessage.decodeSubject();
     String? text = mimeMessage.decodeTextPlainPart();
-    String? keys = mimeMessage.decodeHeaderValue(payloadKeysName);
     DecryptedMimeMessage decryptedData = DecryptedMimeMessage();
-    if (subject != null) {
-      if (subject.startsWith('#{') && subject.endsWith('}')) {
+    String? keys;
+    String? subject = subjects;
+    if (subjects != null) {
+      int pos = subjects.indexOf('#{');
+      if (pos > -1 && subjects.endsWith('}')) {
         //加密
         decryptedData.needDecrypt = true;
+        subject = subjects.substring(0, pos);
+        keys = subjects.substring(pos + 2, subjects.length - 1);
+        subject = subject.replaceAll(' ', '');
+        subject = subject.replaceAll('\r\n', '');
       }
     }
     if (decryptedData.needDecrypt) {
@@ -415,12 +420,9 @@ class MailMimeMessageController
       }
 
       List<int>? data;
-      decryptedData.subject = null;
+      decryptedData.subject = subject;
       if (subject != null) {
         try {
-          subject = subject.substring(2, subject.length - 1);
-          subject = subject.replaceAll(' ', '');
-          subject = subject.replaceAll('\r\n', '');
           data = CryptoUtil.decodeBase64(subject);
           data = await emailAddressService.decrypt(data,
               payloadKey: decryptedData.payloadKey);
