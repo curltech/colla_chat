@@ -165,19 +165,8 @@ class ChatMessage extends StatusEntity {
   String? mimeType;
   int deleteTime = 0; // 阅读后的删除时间，秒数，0表示不删除
   String? parentMessageId; //引用的消息编号
-  bool needCompress = false;
-  bool needEncrypt = true;
   bool needReceipt = false;
   bool needReadReceipt = false;
-
-  /// primary peer的publicKey
-  String? primaryPeerId;
-  String? primaryPublicKey;
-  String? primaryAddress;
-  String? ephemeralPublicKey;
-  String? payloadHash;
-  String? payloadSignature;
-  String? payloadKey;
 
   //消息附件
   List<MessageAttachment> attaches = [];
@@ -218,23 +207,6 @@ class ChatMessage extends StatusEntity {
         mimeType = json['mimeType'],
         deleteTime = json['deleteTime'],
         parentMessageId = json['parentMessageId'],
-        payloadHash = json['payloadHash'],
-        payloadSignature = json['payloadSignature'],
-        primaryPeerId = json['primaryPeerId'],
-        primaryPublicKey = json['primaryPublicKey'],
-        primaryAddress = json['primaryAddress'],
-        payloadKey = json['payloadKey'],
-        ephemeralPublicKey = json['ephemeralPublicKey'],
-        needCompress = json['needEncrypt'] == null ||
-                json['needCompress'] == true ||
-                json['needCompress'] == 1
-            ? true
-            : false,
-        needEncrypt = json['needEncrypt'] == null ||
-                json['needEncrypt'] == true ||
-                json['needEncrypt'] == 1
-            ? true
-            : false,
         needReceipt = json['needReceipt'] == true || json['needReceipt'] == 1
             ? true
             : false,
@@ -278,15 +250,6 @@ class ChatMessage extends StatusEntity {
       'mimeType': mimeType,
       'deleteTime': deleteTime,
       'parentMessageId': parentMessageId,
-      'payloadHash': payloadHash,
-      'payloadSignature': payloadSignature,
-      'primaryPeerId': primaryPeerId,
-      'primaryPublicKey': primaryPublicKey,
-      'primaryAddress': primaryAddress,
-      'payloadKey': payloadKey,
-      'ephemeralPublicKey': ephemeralPublicKey,
-      'needCompress': needCompress,
-      'needEncrypt': needEncrypt,
       'needReceipt': needReceipt,
       'needReadReceipt': needReadReceipt,
     });
