@@ -290,6 +290,13 @@ class Sqlite3 extends DataStore {
       if (id != null) {
         where = 'id=?';
         whereArgs = [id];
+      } else if (map.isNotEmpty) {
+        where ??= '1=1';
+        whereArgs ??= [];
+        for (var entry in map.entries) {
+          where = '$where and ${entry.key} = ?';
+          whereArgs.addAll(entry.value);
+        }
       }
     }
 
