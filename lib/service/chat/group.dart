@@ -414,7 +414,6 @@ class GroupService extends PeerPartyService<Group> {
     if (!canRemoveGroupMember(group, groupMembers)) {
       return;
     }
-    peerIds ??= group.participants;
     ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
       group.peerId,
       PartyType.group,
@@ -422,6 +421,12 @@ class GroupService extends PeerPartyService<Group> {
       subMessageType: ChatMessageSubType.removeGroupMember,
     );
 
+    peerIds ??= group.participants;
+    for (var groupMember in groupMembers) {
+      if (!peerIds!.contains(groupMember.memberPeerId)) {
+        peerIds.add(groupMember.memberPeerId!);
+      }
+    }
     await chatMessageService.sendAndStore(
       chatMessage,
       cryptoOption: CryptoOption.group,
