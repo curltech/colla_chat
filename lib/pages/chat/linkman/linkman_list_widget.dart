@@ -414,7 +414,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             onTap: (int index, String label, {String? subtitle}) async {
               groupController.currentIndex = index;
               await groupService.removeBygroupId(peerId);
-              await groupMemberService.removeByGroupId(peerId);
+              groupMemberService
+                  .delete(where: 'groupId=?', whereArgs: [peerId]);
               await chatSummaryService.removeChatSummary(peerId);
               await chatMessageService.removeByGroup(peerId);
               groupController.delete();
@@ -490,7 +491,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             onTap: (int index, String label, {String? subtitle}) async {
               conferenceController.currentIndex = index;
               await conferenceService.removeByConferenceId(conferenceId);
-              await groupMemberService.removeByGroupId(conferenceId);
+              groupMemberService
+                  .delete(where: 'groupId=?', whereArgs: [conferenceId]);
               await chatSummaryService.removeChatSummary(conferenceId);
               await chatMessageService.removeByGroup(conferenceId);
               conferenceController.delete();

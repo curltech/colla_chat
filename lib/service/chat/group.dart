@@ -316,9 +316,9 @@ class GroupService extends PeerPartyService<Group> {
     if (!canDismissGroup(group)) {
       return;
     }
-    await groupMemberService.removeByGroupId(group.peerId);
+    groupMemberService.delete(where: 'groupId=?', whereArgs: [group.peerId]);
     groupService.delete(entity: {
-      'peerId': group.peerId,
+      'groupId': group.peerId,
     });
     chatMessageService.delete(entity: {
       'senderPeerId': group.peerId,
@@ -345,16 +345,10 @@ class GroupService extends PeerPartyService<Group> {
       return;
     }
     groupMemberService.delete(entity: {
-      'peerId': peerId,
+      'groupId': peerId,
     });
     groupService.delete(entity: {
       'groupId': peerId,
-    });
-    chatMessageService.delete(entity: {
-      'receiverPeerId': peerId,
-    });
-    chatSummaryService.delete(entity: {
-      'peerId': peerId,
     });
     ChatMessage? chatReceipt = await chatMessageService.buildLinkmanChatReceipt(
         chatMessage, MessageReceiptType.accepted);
@@ -585,11 +579,6 @@ class GroupMemberService extends GeneralBaseService<GroupMember> {
       linkman = Linkman(groupMember.memberPeerId!, groupMember.memberAlias!);
       await linkmanService.insert(linkman);
     }
-  }
-
-  ///删除群的组员
-  removeByGroupId(String peerId) async {
-    delete(where: 'groupId=?', whereArgs: [peerId]);
   }
 }
 
