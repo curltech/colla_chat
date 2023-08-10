@@ -87,12 +87,13 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
         groupMembers.add(member.memberPeerId!);
       }
     }
-    await _buildGroupOwnerOptions(groupMembers);
     this.groupMembers.value = groupMembers;
+    await _buildGroupOwnerOptions();
   }
 
   //更新groupOwnerChoices
-  _buildGroupOwnerOptions(List<String> selected) async {
+  _buildGroupOwnerOptions() async {
+    List<String> selected = groupMembers.value;
     Group current = group.value;
     current.groupOwnerPeerId ??= myself.peerId;
     current.groupOwnerName ??= myself.name;
@@ -140,7 +141,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
                 onSelected: (List<String>? selected) async {
                   if (selected != null) {
                     this.groupMembers.value = selected;
-                    await _buildGroupOwnerOptions(selected);
+                    await _buildGroupOwnerOptions();
                   }
                 },
                 selected: this.groupMembers.value,
@@ -314,6 +315,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     if (!participants.contains(myself.peerId!)) {
       participants.add(myself.peerId!);
       groupMembers.value = [...participants];
+      await _buildGroupOwnerOptions();
     }
     current.participants = groupMembers.value;
     GroupChange groupChange = await groupService.store(current);
@@ -350,7 +352,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
       }
 
       //对原有的成员发送加成员消息
-      await groupService.addGroupMember(current.peerId, newMembers);
+      await groupService.addGroupMember(current, newMembers);
     }
 
     List<GroupMember>? oldMembers = groupChange.removeGroupMembers;

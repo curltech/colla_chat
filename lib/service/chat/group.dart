@@ -42,6 +42,12 @@ class GroupService extends PeerPartyService<Group> {
     Group? group = await findOneByPeerId(peerId);
     if (group != null) {
       await setAvatar(group);
+
+      List<String> participants =
+          await groupMemberService.findPeerIdsByGroupId(group.peerId);
+      if (participants.isNotEmpty) {
+        group.participants = participants;
+      }
     }
     return group;
   }
@@ -247,7 +253,7 @@ class GroupService extends PeerPartyService<Group> {
     GroupMember? member =
         await groupMemberService.findOneByGroupId(group.peerId, myself.peerId!);
     if (member != null) {
-      await addGroupMember(group.peerId, [member]);
+      await addGroupMember(group, [member]);
     }
   }
 
@@ -354,16 +360,24 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   ///向群成员发送加群成员的消息
-  addGroupMember(String groupId, List<GroupMember> groupMembers,
+  addGroupMember(Group group, List<GroupMember> groupMembers,
       {List<String>? peerIds}) async {
     ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
-        groupId, PartyType.group,
+        group.peerId, PartyType.group,
         content: groupMembers,
         subMessageType: ChatMessageSubType.addGroupMember);
-    if (peerIds == null) {
-      Group? group = await groupService.findCachedOneByPeerId(groupId);
-      if (group != null) {
-        peerIds = group.participants;
+    peerIds ??= [];
+    if (group.participants != null) {
+      peerIds.addAll(group.participants!);
+    } else {
+      Group? g = await groupService.findCachedOneByPeerId(group.peerId);
+      if (g != null && g.participants != null) {
+        peerIds.addAll(g!.participants!);
+      }
+    }
+    for (var groupMember in groupMembers) {
+      if (!peerIds.contains(groupMember.memberPeerId)) {
+        peerIds.add(groupMember.memberPeerId!);
       }
     }
     await chatMessageService.sendAndStore(
@@ -421,9 +435,17 @@ class GroupService extends PeerPartyService<Group> {
       subMessageType: ChatMessageSubType.removeGroupMember,
     );
 
-    peerIds ??= group.participants;
+    peerIds ??= [];
+    if (group.participants != null) {
+      peerIds.addAll(group.participants!);
+    } else {
+      Group? g = await groupService.findCachedOneByPeerId(group.peerId);
+      if (g != null && g.participants != null) {
+        peerIds.addAll(g!.participants!);
+      }
+    }
     for (var groupMember in groupMembers) {
-      if (!peerIds!.contains(groupMember.memberPeerId)) {
+      if (!peerIds.contains(groupMember.memberPeerId)) {
         peerIds.add(groupMember.memberPeerId!);
       }
     }
