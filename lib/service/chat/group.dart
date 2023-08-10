@@ -320,12 +320,6 @@ class GroupService extends PeerPartyService<Group> {
     groupService.delete(entity: {
       'groupId': group.peerId,
     });
-    chatMessageService.delete(entity: {
-      'senderPeerId': group.peerId,
-    });
-    chatSummaryService.delete(entity: {
-      'peerId': group.peerId,
-    });
     ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
       group.peerId,
       PartyType.group,
