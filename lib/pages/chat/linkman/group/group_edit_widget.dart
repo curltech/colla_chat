@@ -71,24 +71,26 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
   @override
   initState() {
     super.initState();
-    widget.group ??= Group('', '');
-    group = ValueNotifier(widget.group!);
     _buildGroupData();
   }
 
   _buildGroupData() async {
-    var current = group.value;
-    groupAvatar.value = current.avatar;
-    List<String> groupMembers = [];
-    List<GroupMember> members =
-        await groupMemberService.findByGroupId(current.peerId);
-    if (members.isNotEmpty) {
-      for (GroupMember member in members) {
-        groupMembers.add(member.memberPeerId!);
+    if (widget.group == null) {
+      widget.group ??= Group('', '');
+      group = ValueNotifier(widget.group!);
+    } else {
+      group = ValueNotifier(widget.group!);
+      Group current = group.value;
+      groupAvatar.value = current.avatar;
+      List<String>? participants = current.participants;
+      if (participants == null) {
+        participants =
+            await groupMemberService.findPeerIdsByGroupId(current.peerId);
+        current.participants = participants;
       }
+      groupMembers.value = participants;
+      await _buildGroupOwnerOptions();
     }
-    this.groupMembers.value = groupMembers;
-    await _buildGroupOwnerOptions();
   }
 
   //更新groupOwnerChoices
@@ -351,14 +353,9 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     //新增加的成员
     List<GroupMember>? newMembers = groupChange.addGroupMembers;
     if (newMembers is List<GroupMember> && newMembers.isNotEmpty) {
-      //对增加的成员发送群消息
-      List<String> peerIds = [];
-      for (var newMember in newMembers) {
-        peerIds.add(newMember.memberPeerId!);
+      if (!add) {
+        await groupService.addGroupMember(current, newMembers);
       }
-
-      //对原有的成员发送加成员消息
-      await groupService.addGroupMember(current, newMembers);
     }
 
     List<GroupMember>? oldMembers = groupChange.removeGroupMembers;

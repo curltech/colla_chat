@@ -135,8 +135,8 @@ class GroupService extends PeerPartyService<Group> {
     }
     await upsert(group);
 
-    var participants = group.participants;
-    if (participants == null || participants.isEmpty) {
+    List<String>? participants = group.participants;
+    if (participants == null) {
       return GroupChange(group: group);
     }
     String groupId = group.peerId;
@@ -150,13 +150,13 @@ class GroupService extends PeerPartyService<Group> {
     }
     //新增加的成员
     List<GroupMember> newMembers = [];
-    for (var groupMemberId in participants) {
-      var member = oldMembers[groupMemberId];
+    for (String participant in participants) {
+      var member = oldMembers[participant];
       //成员不存在，创建新的
       if (member == null) {
-        GroupMember groupMember = GroupMember(groupId, groupMemberId);
+        GroupMember groupMember = GroupMember(groupId, participant);
         Linkman? linkman =
-            await linkmanService.findCachedOneByPeerId(groupMemberId);
+            await linkmanService.findCachedOneByPeerId(participant);
         if (linkman != null) {
           if (linkman.peerId == group.groupOwnerPeerId) {
             groupMember.memberType = MemberType.owner.name;
@@ -170,14 +170,14 @@ class GroupService extends PeerPartyService<Group> {
           }
         } else {
           //加新的联系人，没有名字
-          linkman = Linkman(groupMemberId, '');
+          linkman = Linkman(participant, '');
           await linkmanService.insert(linkman);
         }
         groupMember.status = EntityStatus.effective.name;
         await groupMemberService.store(groupMember);
         newMembers.add(groupMember);
       } else {
-        oldMembers.remove(groupMemberId);
+        oldMembers.remove(participant);
       }
     }
     //处理删除的成员
@@ -220,12 +220,12 @@ class GroupService extends PeerPartyService<Group> {
   ///向联系人发送加群的消息，群成员在group的participants中
   ///发送的目标在peerIds参数中，如果peerIds为空，则在group的participants中
   addGroup(Group group, {List<String>? peerIds}) async {
-    Group g = group.copy();
+    Group g = group.copyWithMembers();
     g.myAlias = null;
     ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
       group.peerId,
       PartyType.group,
-      content: g,
+      content: g.toJsonWithMembers(),
       subMessageType: ChatMessageSubType.addGroup,
     );
     peerIds ??= group.participants;
@@ -240,7 +240,7 @@ class GroupService extends PeerPartyService<Group> {
   receiveAddGroup(ChatMessage chatMessage) async {
     String json = chatMessageService.recoverContent(chatMessage.content!);
     Map<String, dynamic> map = JsonUtil.toJson(json);
-    Group group = Group.fromJson(map);
+    Group group = Group.fromJsonWithMembers(map);
     group.id = null;
     await groupService.store(group, myAlias: false);
     ChatMessage? chatReceipt = await chatMessageService.buildLinkmanChatReceipt(
@@ -353,13 +353,9 @@ class GroupService extends PeerPartyService<Group> {
         cryptoOption: CryptoOption.linkman);
   }
 
-  ///向群成员发送加群成员的消息
+  ///向群成员发送加群成员的消息，想新增的成员发送加群消息
   addGroupMember(Group group, List<GroupMember> groupMembers,
       {List<String>? peerIds}) async {
-    ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
-        group.peerId, PartyType.group,
-        content: groupMembers,
-        subMessageType: ChatMessageSubType.addGroupMember);
     peerIds ??= [];
     if (group.participants != null) {
       peerIds.addAll(group.participants!);
@@ -369,11 +365,18 @@ class GroupService extends PeerPartyService<Group> {
         peerIds.addAll(g.participants!);
       }
     }
+    List<String> addPeerIds = [];
     for (var groupMember in groupMembers) {
-      if (!peerIds.contains(groupMember.memberPeerId)) {
-        peerIds.add(groupMember.memberPeerId!);
-      }
+      addPeerIds.add(groupMember.memberPeerId!);
+      peerIds.remove(groupMember.memberPeerId!);
     }
+    await addGroup(group, peerIds: addPeerIds);
+
+    ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
+        group.peerId, PartyType.group,
+        content: groupMembers,
+        subMessageType: ChatMessageSubType.addGroupMember);
+
     await chatMessageService.sendAndStore(
       chatMessage,
       cryptoOption: CryptoOption.group,
@@ -435,7 +438,7 @@ class GroupService extends PeerPartyService<Group> {
     } else {
       Group? g = await groupService.findCachedOneByPeerId(group.peerId);
       if (g != null && g.participants != null) {
-        peerIds.addAll(g!.participants!);
+        peerIds.addAll(g.participants!);
       }
     }
     for (var groupMember in groupMembers) {

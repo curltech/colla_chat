@@ -53,10 +53,37 @@ class Group extends PeerParty {
     return json;
   }
 
+  static Group fromJsonWithMembers(Map json) {
+    Group group = Group.fromJson(json);
+    if (json.containsKey('participants')) {
+      List<String>? participants = json['participants'];
+      if (participants != null) {
+        group.participants = participants;
+      }
+    }
+
+    return group;
+  }
+
+  Map<String, dynamic> toJsonWithMembers() {
+    Map<String, dynamic> groupMap = toJson();
+    if (participants != null) {
+      groupMap['participants'] = participants;
+    }
+
+    return groupMap;
+  }
+
   Group copy() {
-    Map<String, dynamic> json = toJson();
+    Map<String, dynamic> json = toJsonWithMembers();
 
     return Group.fromJson(json);
+  }
+
+  Group copyWithMembers() {
+    Map<String, dynamic> json = toJsonWithMembers();
+
+    return Group.fromJsonWithMembers(json);
   }
 }
 
