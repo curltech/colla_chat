@@ -455,10 +455,22 @@ class GroupService extends PeerPartyService<Group> {
     List<dynamic> maps = JsonUtil.toJson(json);
     for (var map in maps) {
       GroupMember groupMember = GroupMember.fromJson(map);
-      groupMemberService.delete(entity: {
-        'memberPeerId': groupMember.memberPeerId,
-        'groupId': groupMember.groupId
-      });
+      var memberPeerId = groupMember.memberPeerId;
+      var groupId = groupMember.groupId;
+      if (memberPeerId == myself.peerId) {
+        groupMemberService.delete(entity: {
+          'groupId': groupId,
+        });
+        groupService.delete(entity: {
+          'groupId': groupId,
+        });
+        break;
+      } else {
+        groupMemberService.delete(entity: {
+          'memberPeerId': groupMember.memberPeerId,
+          'groupId': groupMember.groupId
+        });
+      }
     }
 
     ChatMessage? chatReceipt = await chatMessageService.buildLinkmanChatReceipt(
