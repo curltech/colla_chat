@@ -501,5 +501,7 @@
   "Error: select a camera first.": "错误，先选择选择相机",
   "ChatMessage": "聊天",
   "FullScreenChatMessage": "全屏聊天",
-  "Linkman edit": "联系人编辑"
+  "Linkman edit": "联系人编辑",
+  "Back": "返回",
+  "This is E2E encrypt communication, nobody can peek your chat content": "采用端到端加密通讯，没有人可以窥探你的聊天内容"
 }
