@@ -22,7 +22,8 @@ class AddGroupMemberMessage extends StatelessWidget {
     if (maps.isNotEmpty) {
       for (var map in maps) {
         GroupMember groupMember = GroupMember.fromJson(map);
-        var member = groupMember.memberAlias!;
+        var member = groupMember.memberAlias;
+        member ??= '';
         members.add(member);
       }
     }
