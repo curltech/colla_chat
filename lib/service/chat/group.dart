@@ -317,9 +317,7 @@ class GroupService extends PeerPartyService<Group> {
       return;
     }
     groupMemberService.delete(where: 'groupId=?', whereArgs: [group.peerId]);
-    groupService.delete(entity: {
-      'groupId': group.peerId,
-    });
+    removeByGroupId(group.peerId);
     ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
       group.peerId,
       PartyType.group,
@@ -341,9 +339,7 @@ class GroupService extends PeerPartyService<Group> {
     groupMemberService.delete(entity: {
       'groupId': peerId,
     });
-    groupService.delete(entity: {
-      'groupId': peerId,
-    });
+    removeByGroupId(peerId);
     ChatMessage? chatReceipt = await chatMessageService.buildLinkmanChatReceipt(
         chatMessage, MessageReceiptType.accepted);
     await chatMessageService.updateReceiptType(
@@ -464,9 +460,7 @@ class GroupService extends PeerPartyService<Group> {
         groupMemberService.delete(entity: {
           'groupId': groupId,
         });
-        groupService.delete(entity: {
-          'groupId': groupId,
-        });
+        removeByGroupId(groupId!);
         break;
       } else {
         groupMemberService.delete(entity: {
@@ -514,7 +508,7 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   ///删除群
-  removeBygroupId(String peerId) async {
+  removeByGroupId(String peerId) {
     delete(where: 'peerId=?', whereArgs: [peerId]);
     groups.remove(peerId);
   }

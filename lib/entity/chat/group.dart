@@ -56,9 +56,9 @@ class Group extends PeerParty {
   static Group fromJsonWithMembers(Map json) {
     Group group = Group.fromJson(json);
     if (json.containsKey('participants')) {
-      List<String>? participants = json['participants'];
+      List<dynamic>? participants = json['participants'];
       if (participants != null) {
-        group.participants = participants;
+        group.participants = participants.cast<String>();
       }
     }
 

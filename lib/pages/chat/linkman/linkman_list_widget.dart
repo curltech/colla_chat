@@ -413,7 +413,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             prefix: Icons.group_remove,
             onTap: (int index, String label, {String? subtitle}) async {
               groupController.currentIndex = index;
-              await groupService.removeBygroupId(peerId);
+              await groupService.removeByGroupId(peerId);
               groupMemberService
                   .delete(where: 'groupId=?', whereArgs: [peerId]);
               await chatSummaryService.removeChatSummary(peerId);

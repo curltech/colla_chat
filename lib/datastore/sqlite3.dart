@@ -295,7 +295,7 @@ class Sqlite3 extends DataStore {
         whereArgs ??= [];
         for (var entry in map.entries) {
           where = '$where and ${entry.key} = ?';
-          whereArgs.addAll(entry.value);
+          whereArgs.add(entry.value);
         }
       }
     }
