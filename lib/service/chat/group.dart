@@ -249,12 +249,6 @@ class GroupService extends PeerPartyService<Group> {
         chatMessage, MessageReceiptType.accepted);
     await chatMessageService.sendAndStore(chatReceipt,
         cryptoOption: CryptoOption.linkman);
-    //同意加入群，向群的所有成员告知自己加入
-    GroupMember? member =
-        await groupMemberService.findOneByGroupId(group.peerId, myself.peerId!);
-    if (member != null) {
-      await addGroupMember(group, [member]);
-    }
   }
 
   bool canModifyGroup(Group group) {
@@ -372,7 +366,7 @@ class GroupService extends PeerPartyService<Group> {
     } else {
       Group? g = await groupService.findCachedOneByPeerId(group.peerId);
       if (g != null && g.participants != null) {
-        peerIds.addAll(g!.participants!);
+        peerIds.addAll(g.participants!);
       }
     }
     for (var groupMember in groupMembers) {
