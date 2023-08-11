@@ -593,7 +593,9 @@ class GroupMemberService extends GeneralBaseService<GroupMember> {
         Linkman? linkman = await linkmanService
             .findCachedOneByPeerId(groupMember.memberPeerId!);
         if (linkman != null) {
-          groupMember.memberAlias = linkman.name;
+          var alias = linkman.alias;
+          alias ??= linkman.name;
+          groupMember.memberAlias = alias;
         } else {
           groupMember.memberAlias = null;
         }
