@@ -590,7 +590,13 @@ class GroupMemberService extends GeneralBaseService<GroupMember> {
       }
     } else {
       if (!memberAlias) {
-        groupMember.memberAlias = null;
+        Linkman? linkman = await linkmanService
+            .findCachedOneByPeerId(groupMember.memberPeerId!);
+        if (linkman != null) {
+          groupMember.memberAlias = linkman.name;
+        } else {
+          groupMember.memberAlias = null;
+        }
       }
     }
     await upsert(groupMember);
