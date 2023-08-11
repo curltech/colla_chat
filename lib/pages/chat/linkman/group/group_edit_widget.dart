@@ -133,6 +133,9 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
         valueListenable: groupMembers,
         builder:
             (BuildContext context, List<String> groupMembers, Widget? child) {
+          if (!this.groupMembers.value.contains(myself.peerId)) {
+            this.groupMembers.value.add(myself.peerId!);
+          }
           return Container(
               padding: const EdgeInsets.symmetric(horizontal: 0.0),
               child: LinkmanGroupSearchWidget(
@@ -140,6 +143,9 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
                 selectType: SelectType.chipMultiSelectField,
                 onSelected: (List<String>? selected) async {
                   if (selected != null) {
+                    if (!selected.contains(myself.peerId)) {
+                      selected.add(myself.peerId!);
+                    }
                     this.groupMembers.value = selected;
                     await _buildGroupOwnerOptions();
                   }
