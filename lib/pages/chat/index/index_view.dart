@@ -66,8 +66,8 @@ class _IndexViewState extends State<IndexView>
   //JustAudioPlayer audioPlayer = JustAudioPlayer();
   Widget bannerAvatarImage = AppImage.mdAppImage;
 
-  late StreamSubscription _intentDataStreamSubscription;
-  late List<SharedFile> _sharedFiles;
+  StreamSubscription? _intentDataStreamSubscription;
+  List<SharedFile>? _sharedFiles;
 
   @override
   void initState() {
@@ -166,8 +166,8 @@ class _IndexViewState extends State<IndexView>
         .getMediaStream()
         .listen((List<SharedFile> value) {
       _sharedFiles = value;
-      if (_sharedFiles.isNotEmpty) {
-        _shareChatMessage(_sharedFiles.first);
+      if (_sharedFiles != null && _sharedFiles!.isNotEmpty) {
+        _shareChatMessage(_sharedFiles!.first);
       }
     }, onError: (err) {
       logger.e("getIntentDataStream error: $err");
@@ -178,8 +178,8 @@ class _IndexViewState extends State<IndexView>
         .getInitialSharing()
         .then((List<SharedFile> value) {
       _sharedFiles = value;
-      if (_sharedFiles.isNotEmpty) {
-        _shareChatMessage(_sharedFiles.first);
+      if (_sharedFiles != null && _sharedFiles!.isNotEmpty) {
+        _shareChatMessage(_sharedFiles!.first);
       }
     });
   }
@@ -577,7 +577,7 @@ class _IndexViewState extends State<IndexView>
     globalChatMessageController.removeListener(_updateGlobalChatMessage);
     myself.removeListener(_update);
     appDataProvider.removeListener(_update);
-    _intentDataStreamSubscription.cancel();
+    _intentDataStreamSubscription?.cancel();
     globalWebrtcEventController.onWebrtcSignal = null;
     globalWebrtcEventController.onWebrtcErrorSignal = null;
     super.dispose();

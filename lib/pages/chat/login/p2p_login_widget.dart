@@ -1,7 +1,9 @@
 import 'dart:core';
 
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/entity/dht/myselfpeer.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/login/loading.dart';
 import 'package:colla_chat/pages/chat/login/myself_peer_view_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/myselfpeer/myself_peer_controller.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
@@ -10,10 +12,13 @@ import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
+import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
+import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -88,6 +93,23 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
     });
   }
 
+  List<TileData> _buildMyselfPeerTiles() {
+    List<TileData> tiles = [];
+    List<MyselfPeer> myselfPeers = myselfPeerController.data;
+    if (myselfPeers.isNotEmpty) {
+      for (var myselfPeer in myselfPeers) {
+        var tile = TileData(
+          title: myselfPeer.loginName,
+          subtitle: myselfPeer.peerId,
+          titleTail: myselfPeer.name,
+          prefix: myselfPeer.avatarImage,
+        );
+        tiles.add(tile);
+      }
+    }
+    return tiles;
+  }
+
   Widget _buildMyselfPeers(BuildContext context) {
     return Dialog(
         child: Column(children: [
@@ -95,7 +117,14 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
         context,
         title: CommonAutoSizeText(AppLocalizations.t('Select login peer')),
       ),
-      const MyselfPeerViewWidget()
+      DataListView(
+        tileData: _buildMyselfPeerTiles(),
+        currentIndex: myselfPeerController.currentIndex,
+        onTap: (int index, String title, {TileData? group, String? subtitle}) {
+          myselfPeerController.currentIndex = index;
+          Navigator.pop(context);
+        },
+      )
     ]));
   }
 

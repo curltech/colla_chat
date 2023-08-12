@@ -4,9 +4,11 @@ import 'package:colla_chat/service/dht/myselfpeer.dart';
 
 // 本机定位器，初始化后按照优先级排序
 class MyselfPeerController extends DataListController<MyselfPeer> {
-  MyselfPeerController();
+  MyselfPeerController() {
+    _init();
+  }
 
-  init() async {
+  _init() async {
     List<MyselfPeer> myselfPeers = await myselfPeerService.findAll();
     clear();
     if (myselfPeers.isNotEmpty) {
