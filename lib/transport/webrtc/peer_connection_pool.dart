@@ -8,6 +8,7 @@ import 'package:colla_chat/p2p/chain/action/signal.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
@@ -661,6 +662,7 @@ class PeerConnectionPool {
         clientId: event.clientId);
     globalChatMessageController.sendPreKeyBundle(event.peerId,
         clientId: event.clientId);
+    chatMessageService.sendUnsent(receiverPeerId: event.peerId);
     onWebrtcEvent(event);
   }
 

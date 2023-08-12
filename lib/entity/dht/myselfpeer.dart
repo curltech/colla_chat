@@ -10,20 +10,6 @@ class MyselfPeer extends PeerClient {
   String? loginStatus;
   String? password;
 
-  /// 以下的字段是和证书相关，不是必须的
-  String? certType;
-  String? certFormat;
-
-  // peer的保护密码，不保存到数据库，hash后成为password
-  String? oldPassword;
-
-  // peer的证书的原密码，申请新证书的时候必须提供，不保存数据库
-  String? oldCertPassword;
-
-  // peer的新证书的密码，申请新证书的时候必须提供，不保存数据库
-  String? newCertPassword;
-  String? certContent;
-
   MyselfPeer(String peerId, String name, String clientId, this.loginName)
       : super(peerId, name, clientId: clientId);
 
@@ -35,12 +21,6 @@ class MyselfPeer extends PeerClient {
         signalPrivateKey = json['signalPrivateKey'],
         loginStatus = json['loginStatus'],
         password = json['password'],
-        certType = json['certType'],
-        certFormat = json['certFormat'],
-        oldPassword = json['oldPassword'],
-        oldCertPassword = json['oldCertPassword'],
-        newCertPassword = json['newCertPassword'],
-        certContent = json['certContent'],
         super.fromJson(json);
 
   @override
@@ -54,12 +34,6 @@ class MyselfPeer extends PeerClient {
       'signalPrivateKey': signalPrivateKey,
       'loginStatus': loginStatus,
       'password': password,
-      'certType': certType,
-      'certFormat': certFormat,
-      'oldPassword': oldPassword,
-      'oldCertPassword': oldCertPassword,
-      'newCertPassword': newCertPassword,
-      'certContent': certContent,
     });
     return json;
   }

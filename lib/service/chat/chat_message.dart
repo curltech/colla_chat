@@ -32,6 +32,8 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/transport/smsclient.dart';
+import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
+
 // import 'package:colla_chat/transport/nearby_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/websocket.dart';
@@ -745,11 +747,20 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     var transportType = chatMessage.transportType;
     String? factTransportType;
     if (transportType == TransportType.webrtc.name) {
-      bool success = await peerConnectionPool.send(peerId, data);
-      if (success) {
-        factTransportType = TransportType.webrtc.name;
+      List<AdvancedPeerConnection>? advancedPeerConnections =
+          peerConnectionPool.getConnected(peerId);
+      if (advancedPeerConnections != null &&
+          advancedPeerConnections.isNotEmpty) {
+        bool success = await peerConnectionPool.send(peerId, data);
+        if (success) {
+          factTransportType = TransportType.webrtc.name;
+        } else {
+          transportType = TransportType.websocket.name;
+        }
       } else {
-        transportType = TransportType.websocket.name;
+        if (data.length <= 10 * 1024 * 1024) {
+          transportType = TransportType.websocket.name;
+        }
       }
     }
     if (factTransportType == null &&
@@ -781,6 +792,32 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       chatMessage.status = MessageStatus.sent.name;
     } else {
       chatMessage.status = MessageStatus.unsent.name;
+    }
+  }
+
+  Future<List<ChatMessage>> findByStatusAndReceiverPeer(String status,
+      {String? receiverPeerId}) async {
+    var where = 'status = ?';
+    var whereArgs = [status];
+    if (receiverPeerId != null) {
+      where = '$where and receiverPeerId=?';
+      whereArgs.add(receiverPeerId);
+    }
+    var es = await find(where: where, whereArgs: whereArgs);
+
+    return es;
+  }
+
+  ///对发送失败的消息重新发送
+  sendUnsent({String? receiverPeerId}) async {
+    logger.i('resent unsent chat message:$receiverPeerId');
+    List<ChatMessage> chatMessages = await findByStatusAndReceiverPeer(
+        MessageStatus.unsent.name,
+        receiverPeerId: receiverPeerId);
+    if (chatMessages.isNotEmpty) {
+      for (var chatMessage in chatMessages) {
+        await sendAndStore(chatMessage);
+      }
     }
   }
 
