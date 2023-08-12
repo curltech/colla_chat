@@ -32,7 +32,39 @@ final List<ColumnFieldDef> peerClientColumnFieldDefs = [
       label: 'PeerId',
       readOnly: true,
       prefixIcon: Icon(
-        Icons.perm_identity,
+        Icons.location_history,
+        color: myself.primary,
+      )),
+  ColumnFieldDef(
+      name: 'clientId',
+      label: 'ClientId',
+      readOnly: true,
+      prefixIcon: Icon(
+        Icons.token,
+        color: myself.primary,
+      )),
+  ColumnFieldDef(
+      name: 'connectPeerId',
+      label: 'ConnectPeerId',
+      readOnly: true,
+      prefixIcon: Icon(
+        Icons.location_history_rounded,
+        color: myself.primary,
+      )),
+  ColumnFieldDef(
+      name: 'connectAddress',
+      label: 'ConnectAddress',
+      readOnly: true,
+      prefixIcon: Icon(
+        Icons.location_searching,
+        color: myself.primary,
+      )),
+  ColumnFieldDef(
+      name: 'connectSessionId',
+      label: 'ConnectSessionId',
+      readOnly: true,
+      prefixIcon: Icon(
+        Icons.connected_tv,
         color: myself.primary,
       )),
   ColumnFieldDef(

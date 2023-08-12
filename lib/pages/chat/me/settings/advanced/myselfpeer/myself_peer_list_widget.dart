@@ -27,22 +27,15 @@ class MyselfPeerListWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _MyselfPeerListWidgetState extends State<MyselfPeerListWidget> {
-  final ValueNotifier<List<TileData>> tiles = ValueNotifier<List<TileData>>([]);
-
   @override
   initState() {
     super.initState();
-    myselfPeerController.addListener(_update);
   }
 
-  _update() {
-    _buildMyselfPeerTileData();
-  }
-
-  void _buildMyselfPeerTileData() {
+  List<TileData> _buildMyselfPeerTileData() {
+    List<TileData> tiles = [];
     List<MyselfPeer> myselfPeers = myselfPeerController.data;
     if (myselfPeers.isNotEmpty) {
-      List<TileData> tiles = [];
       for (var myselfPeer in myselfPeers) {
         var tile = TileData(
           title: myselfPeer.loginName,
@@ -52,24 +45,20 @@ class _MyselfPeerListWidgetState extends State<MyselfPeerListWidget> {
         );
         tiles.add(tile);
       }
-      this.tiles.value = tiles;
     }
+
+    return tiles;
   }
 
   @override
   Widget build(BuildContext context) {
-    var myselfPeers = ValueListenableBuilder(
-        valueListenable: tiles,
-        builder: (BuildContext context, List<TileData> tiles, Widget? child) {
-          return DataListView(
-            tileData: tiles,
-            currentIndex: myselfPeerController.currentIndex,
-            onTap: (int index, String title,
-                {TileData? group, String? subtitle}) {
-              myselfPeerController.currentIndex = index;
-            },
-          );
-        });
+    var myselfPeers = DataListView(
+      tileData: _buildMyselfPeerTileData(),
+      currentIndex: myselfPeerController.currentIndex,
+      onTap: (int index, String title, {TileData? group, String? subtitle}) {
+        myselfPeerController.currentIndex = index;
+      },
+    );
     var appBarView = AppBarView(
         title: widget.title,
         withLeading: widget.withLeading,

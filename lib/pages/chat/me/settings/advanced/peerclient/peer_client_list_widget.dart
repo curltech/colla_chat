@@ -44,6 +44,7 @@ class _PeerClientListWidgetState extends State<PeerClientListWidget> {
   @override
   initState() {
     super.initState();
+    peerClientController.clear(notify: false);
     _more();
   }
 
