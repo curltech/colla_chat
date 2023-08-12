@@ -40,6 +40,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
   @override
   void initState() {
     super.initState();
+    myselfPeerController.data;
     init();
   }
 
