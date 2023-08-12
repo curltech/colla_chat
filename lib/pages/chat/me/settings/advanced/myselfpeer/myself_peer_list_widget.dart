@@ -1,5 +1,4 @@
 import 'package:colla_chat/entity/dht/myselfpeer.dart';
-import 'package:colla_chat/pages/chat/login/myself_peer_view_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/myselfpeer/myself_peer_controller.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
