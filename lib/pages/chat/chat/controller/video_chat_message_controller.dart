@@ -311,7 +311,7 @@ class VideoChatMessageController with ChangeNotifier {
   ///对群模式，可以创建一个会议，会议成员从群成员中选择，会议名称是群的名称加上当前时间，保存会议
   ///对会议模式，直接转到会议创建界面，
   Future<void> buildConference(
-      {bool video = true, required List<String> participants}) async {
+      {required bool video, required List<String> participants}) async {
     var conference = _conference;
     if (conference != null) {
       logger.e('conference ${conference.name} is exist');
@@ -338,8 +338,7 @@ class VideoChatMessageController with ChangeNotifier {
     var current = DateTime.now();
     var dateName = current.toLocal().toIso8601String();
     _conference = await conferenceService.createConference(
-        'video-chat-$dateName',
-        video: video,
+        'video-chat-$dateName', video,
         startDate: current.toUtc().toIso8601String(),
         endDate:
             current.add(const Duration(hours: 2)).toUtc().toIso8601String(),

@@ -102,7 +102,8 @@ class ConferenceService extends GeneralBaseService<Conference> {
   }
 
   Future<Conference> createConference(
-    String name, {
+    String name,
+    bool video, {
     String? topic,
     String? conferenceOwnerPeerId,
     String? groupId,
@@ -110,7 +111,6 @@ class ConferenceService extends GeneralBaseService<Conference> {
     String? groupType,
     String? startDate,
     String? endDate,
-    bool video = true,
     List<String>? participants,
   }) async {
     //不允许创建同名的会议

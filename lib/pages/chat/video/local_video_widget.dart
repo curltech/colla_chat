@@ -384,8 +384,16 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     var videoChatMessageController = VideoChatMessageController();
     this.videoChatMessageController.value = videoChatMessageController;
     await videoChatMessageController.setChatSummary(chatSummary);
+
+    ///根据本地视频决定音视频选项，如果没有则认为是音频
+    PeerVideoRender? mainVideoRender =
+        localVideoRenderController.mainVideoRender;
+    bool video = false;
+    if (mainVideoRender != null) {
+      video = mainVideoRender.video;
+    }
     await videoChatMessageController.buildConference(
-        participants: participants);
+        video: video, participants: participants);
     Conference? conference = videoChatMessageController.conference;
     if (conference == null) {
       if (mounted) {
@@ -440,6 +448,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (conference == null) {
       return;
     }
+    await videoChatMessageController.openLocalMainVideoRender();
     await videoChatMessageController.join();
     if (mounted) {
       DialogUtil.info(context,

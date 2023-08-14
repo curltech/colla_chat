@@ -284,9 +284,9 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
         participants.add(myself.peerId!);
         conferenceMembers.value = [...participants];
       }
-      current = await conferenceService.createConference(currentConference.name,
+      current = await conferenceService.createConference(
+          currentConference.name, currentConference.video,
           topic: currentConference.topic,
-          video: currentConference.video,
           conferenceOwnerPeerId: conference.value.conferenceOwnerPeerId,
           startDate: currentConference.startDate,
           endDate: currentConference.endDate,

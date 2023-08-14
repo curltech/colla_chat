@@ -79,7 +79,7 @@ class VideoRenderController with ChangeNotifier {
     }
   }
 
-  //判断是否有视频
+  ///判断是否有视频
   bool get video {
     if (_mainVideoRender != null) {
       return _mainVideoRender!.video;
