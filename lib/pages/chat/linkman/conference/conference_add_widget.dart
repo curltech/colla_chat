@@ -29,33 +29,28 @@ final List<ColumnFieldDef> conferenceColumnFieldDefs = [
     label: 'ConferenceId',
     inputType: InputType.label,
     prefixIcon: Icon(Icons.meeting_room, color: myself.primary),
-    groupName: '1',
   ),
   ColumnFieldDef(
     name: 'name',
     label: 'Name',
     prefixIcon: Icon(Icons.person, color: myself.primary),
-    groupName: '1',
   ),
   ColumnFieldDef(
     name: 'topic',
     label: 'Topic',
     prefixIcon: Icon(Icons.topic, color: myself.primary),
-    groupName: '1',
   ),
   ColumnFieldDef(
     name: 'conferenceOwnerPeerId',
     label: 'ConferenceOwnerPeerId',
     inputType: InputType.label,
     prefixIcon: Icon(Icons.perm_identity, color: myself.primary),
-    groupName: '1',
   ),
   ColumnFieldDef(
     name: 'password',
     label: 'Password',
     inputType: InputType.password,
     prefixIcon: Icon(Icons.password, color: myself.primary),
-    groupName: '1',
   ),
   ColumnFieldDef(
     name: 'video',
@@ -63,7 +58,6 @@ final List<ColumnFieldDef> conferenceColumnFieldDefs = [
     inputType: InputType.switcher,
     dataType: DataType.bool,
     prefixIcon: Icon(Icons.video_call, color: myself.primary),
-    groupName: '2',
   ),
   ColumnFieldDef(
     name: 'startDate',
@@ -71,7 +65,6 @@ final List<ColumnFieldDef> conferenceColumnFieldDefs = [
     inputType: InputType.datetime,
     dataType: DataType.string,
     prefixIcon: Icon(Icons.start, color: myself.primary),
-    groupName: '2',
   ),
   ColumnFieldDef(
     name: 'endDate',
@@ -79,7 +72,6 @@ final List<ColumnFieldDef> conferenceColumnFieldDefs = [
     inputType: InputType.datetime,
     dataType: DataType.string,
     prefixIcon: Icon(Icons.pin_end, color: myself.primary),
-    groupName: '2',
   ),
 ];
 
@@ -232,6 +224,9 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
   Widget _buildFormInputWidget(BuildContext context) {
     var children = [
       _buildConferenceMembersWidget(context),
+      const SizedBox(
+        height: 5,
+      ),
       _buildConferenceOwnerWidget(context),
     ];
     var formInputWidget = ValueListenableBuilder(
@@ -241,7 +236,8 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
             controller.setValues(JsonUtil.toJson(conference));
           }
           return FormInputWidget(
-            height: appDataProvider.portraitSize.height * 0.5,
+            spacing: 5.0,
+            height: appDataProvider.portraitSize.height * 0.6,
             onOk: (Map<String, dynamic> values) {
               _onOk(values).then((conference) {
                 if (conference != null) {

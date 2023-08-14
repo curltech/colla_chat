@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/p2p/chain/action/signal.dart';
@@ -83,6 +84,7 @@ class AdvancedPeerConnection {
 
   Future<bool> init(
       {List<Map<String, String>>? iceServers,
+      Uint8List? aesKey,
       List<PeerVideoRender> localRenders = const []}) async {
     var myselfPeerId = myself.peerId;
     var myselfClientId = myself.clientId;
@@ -91,6 +93,7 @@ class AdvancedPeerConnection {
     if (myselfPeerId != null && myselfClientId != null) {
       extension = SignalExtension(myselfPeerId, myselfClientId,
           name: myselfName, iceServers: iceServers);
+      extension.aesKey = aesKey;
     } else {
       logger.e('myself peerId or clientId is null');
       return false;

@@ -73,7 +73,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
           fit: BoxFit.contain);
       linkman.avatarImage = avatarImage;
     } else {
-      PeerClient? peerClient = await peerClientService.findOneByPeerId(peerId);
+      PeerClient? peerClient = await peerClientService.findCachedOneByPeerId(peerId);
       if (peerClient != null) {
         linkman.avatarImage = peerClient.avatarImage;
       }

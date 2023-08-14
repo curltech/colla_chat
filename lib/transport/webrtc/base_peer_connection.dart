@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/cryptography.dart';
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -13,6 +14,7 @@ class SignalExtension {
   late String peerId;
   late String clientId;
   late String name;
+  Uint8List? aesKey;
   Conference? conference;
   List<Map<String, String>>? iceServers;
 
@@ -23,6 +25,10 @@ class SignalExtension {
     peerId = json['peerId'];
     clientId = json['clientId'];
     name = json['name'];
+    String? aesKey = json['aesKey'];
+    if (aesKey != null) {
+      this.aesKey = CryptoUtil.decodeBase64(aesKey);
+    }
     Map<String, dynamic>? conference = json['conference'];
     if (conference != null) {
       this.conference = Conference(
@@ -59,7 +65,11 @@ class SignalExtension {
       'name': name,
       'iceServers': iceServers,
     });
-    var conference = this.conference;
+    Uint8List? aesKey = this.aesKey;
+    if (aesKey != null) {
+      json['aesKey'] = CryptoUtil.encodeBase64(aesKey);
+    }
+    Conference? conference = this.conference;
     if (conference != null) {
       json['conference'] = conference.toJson();
     }
@@ -302,7 +312,7 @@ class BasePeerConnection {
   String? senderTrackId;
 
   ///棘轮加密的初始化对称密钥，可以在视频通话前由datachannel协商一致
-  final aesKey = Uint8List.fromList(''.codeUnits);
+  Uint8List? aesKey;
 
   BasePeerConnection({required this.initiator}) {
     logger.i('Create initiator:$initiator BasePeerConnection');
@@ -336,6 +346,10 @@ class BasePeerConnection {
   ///激活流加密，在连接创建，而且sender存在的情况下
   ///每个轨道设置一个加密器，
   Future<void> enableEncryption(RTCRtpSender sender) async {
+    if (keyProvider == null || aesKey == null) {
+      logger.e('keyProvider or aesKey is null, can not enableEncryption');
+      return;
+    }
     MediaStreamTrack? track = sender.track;
     if (track == null) {
       return;
@@ -367,13 +381,17 @@ class BasePeerConnection {
     }
 
     await frameCyrptor.setEnabled(true);
-    await keyProvider?.setKey(participantId: trackId, index: 0, key: aesKey);
+    await keyProvider!.setKey(participantId: trackId, index: 0, key: aesKey!);
     await frameCyrptor.updateCodec(kind == 'video' ? videoCodec : audioCodec);
   }
 
   ///激活流解密，在连接创建，receiver
   ///每个轨道设置一个解密器，
   Future<void> enableDecryption(RTCRtpReceiver receiver) async {
+    if (keyProvider == null || aesKey == null) {
+      logger.e('keyProvider or aesKey is null, can not enableDecryption');
+      return;
+    }
     MediaStreamTrack? track = receiver.track;
     if (track == null) {
       return;
@@ -401,7 +419,7 @@ class BasePeerConnection {
     await frameCyrptor.setKeyIndex(0);
 
     await frameCyrptor.setEnabled(true);
-    await keyProvider?.setKey(participantId: id, index: 0, key: aesKey);
+    await keyProvider!.setKey(participantId: id, index: 0, key: aesKey!);
     await frameCyrptor.updateCodec(kind == 'video' ? videoCodec : audioCodec);
   }
 
@@ -414,6 +432,12 @@ class BasePeerConnection {
       List<MediaStream> localStreams = const []}) async {
     start = DateTime.now().millisecondsSinceEpoch;
     id = await cryptoGraphy.getRandomAsciiString(length: 8);
+    aesKey = extension.aesKey;
+    if (initiator) {
+      aesKey ??=
+          Uint8List.fromList(await cryptoGraphy.getRandomBytes(length: 8));
+      extension.aesKey = aesKey;
+    }
     try {
       if (extension.iceServers == null) {
         if (peerEndpointController.defaultPeerEndpoint != null) {

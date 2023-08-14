@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
@@ -439,13 +440,15 @@ class PeerConnectionPool {
       {required String clientId,
       required String name,
       Conference? conference,
-      List<Map<String, String>>? iceServers}) async {
+      List<Map<String, String>>? iceServers,
+      Uint8List? aesKey}) async {
     return await synchronized(() async {
       return await _createIfNotExist(peerId,
           clientId: clientId,
           name: name,
           conference: conference,
-          iceServers: iceServers);
+          iceServers: iceServers,
+          aesKey: aesKey);
     });
   }
 
@@ -453,7 +456,8 @@ class PeerConnectionPool {
       {required String clientId,
       required String name,
       Conference? conference,
-      List<Map<String, String>>? iceServers}) async {
+      List<Map<String, String>>? iceServers,
+      Uint8List? aesKey}) async {
     AdvancedPeerConnection? advancedPeerConnection =
         getOne(peerId, clientId: clientId);
     if (advancedPeerConnection == null) {
@@ -461,7 +465,8 @@ class PeerConnectionPool {
       advancedPeerConnection =
           AdvancedPeerConnection(peerId, false, clientId: clientId, name: name);
       await put(peerId, advancedPeerConnection, clientId: clientId);
-      var result = await advancedPeerConnection.init(iceServers: iceServers);
+      var result = await advancedPeerConnection.init(
+          iceServers: iceServers, aesKey: aesKey);
       if (!result) {
         logger.e('webrtcPeer.init fail');
         return null;
@@ -576,14 +581,16 @@ class PeerConnectionPool {
             name: name,
             eventType: WebrtcEventType.signal,
             data: signal);
-        bool? allowed =
+        bool allowed =
             await globalWebrtcEventController.receiveWebrtcSignal(webrtcEvent);
-        if (allowed != null && allowed) {
+        if (allowed) {
+          Uint8List? aesKey = extension?.aesKey;
           advancedPeerConnection = await createIfNotExist(peerId,
               clientId: clientId,
               name: name,
               conference: conference,
-              iceServers: iceServers);
+              iceServers: iceServers,
+              aesKey: aesKey);
           if (advancedPeerConnection == null) {
             logger.e('createIfNotExist fail');
             return null;
