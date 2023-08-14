@@ -438,14 +438,25 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
     var videoChatMessageController = this.videoChatMessageController.value;
     if (videoChatMessageController == null) {
+      if (mounted) {
+        DialogUtil.error(context,
+            content: AppLocalizations.t('No video chat message controller'));
+      }
       return;
     }
     ChatMessage? chatMessage = videoChatMessageController.chatMessage;
     if (chatMessage == null) {
+      if (mounted) {
+        DialogUtil.error(context,
+            content: AppLocalizations.t('No video chat message'));
+      }
       return;
     }
     Conference? conference = videoChatMessageController.conference;
     if (conference == null) {
+      if (mounted) {
+        DialogUtil.error(context, content: AppLocalizations.t('No conference'));
+      }
       return;
     }
     await videoChatMessageController.openLocalMainVideoRender();
