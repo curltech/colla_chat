@@ -1237,7 +1237,6 @@ class BasePeerConnection {
     var streamId = stream.id;
     var trackId = track.id!;
     var kind = track.kind;
-    String? participantId = '${kind}_${trackId}_sender';
 
     if (trackSenders.containsKey(trackId)) {
       RTCRtpSender? sender = trackSenders[trackId];
@@ -1257,6 +1256,7 @@ class BasePeerConnection {
       }
     }
     if (streamEncrypt) {
+      String? participantId = '${kind}_${trackId}_sender';
       if (frameCyrptors.containsKey(participantId)) {
         FrameCryptor? frameCryptor = frameCyrptors[participantId];
         frameCryptor!.dispose();
