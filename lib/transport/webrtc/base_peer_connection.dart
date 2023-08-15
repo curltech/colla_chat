@@ -322,7 +322,7 @@ class BasePeerConnection {
   _initKeyProvider() async {
     var keyProviderOptions = KeyProviderOptions(
       sharedKey: true,
-      ratchetSalt: Uint8List.fromList(''.codeUnits),
+      ratchetSalt: Uint8List.fromList('CollaChat RatchetSalt'.codeUnits),
       ratchetWindowSize: 16,
     );
 
@@ -435,7 +435,7 @@ class BasePeerConnection {
     aesKey = extension.aesKey;
     if (initiator) {
       aesKey ??=
-          Uint8List.fromList(await cryptoGraphy.getRandomBytes(length: 8));
+          Uint8List.fromList(await cryptoGraphy.getRandomBytes(length: 32));
       extension.aesKey = aesKey;
     }
     try {
