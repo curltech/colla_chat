@@ -549,15 +549,15 @@ class BasePeerConnection {
     }
 
     /// 4.建立连接的监听轨道到来的监听器，当远方由轨道来的时候执行
-    peerConnection.onAddStream = (MediaStream stream) {
-      onAddRemoteStream(stream);
-    };
-    peerConnection.onRemoveStream = (MediaStream stream) {
-      onRemoveRemoteStream(stream);
-    };
-    peerConnection.onAddTrack = (MediaStream stream, MediaStreamTrack track) {
-      onAddRemoteTrack(stream, track);
-    };
+    // peerConnection.onAddStream = (MediaStream stream) {
+    //   onAddRemoteStream(stream);
+    // };
+    // peerConnection.onRemoveStream = (MediaStream stream) {
+    //   onRemoveRemoteStream(stream);
+    // };
+    // peerConnection.onAddTrack = (MediaStream stream, MediaStreamTrack track) {
+    //   onAddRemoteTrack(stream, track);
+    // };
     peerConnection.onRemoveTrack =
         (MediaStream stream, MediaStreamTrack track) {
       onRemoveRemoteTrack(stream, track);
@@ -1342,6 +1342,21 @@ class BasePeerConnection {
     emit(WebrtcEventType.removeStream, stream);
   }
 
+  ///连接的监听轨道到来的监听器，当远方由轨道来的时候执行
+  onRemoteTrack(RTCTrackEvent event) {
+    var track = event.track;
+    logger.i('onRemoteTrack event:${track.id}');
+    if (status != PeerConnectionStatus.connected) {
+      logger.e('PeerConnectionStatus is not connected');
+      return false;
+    }
+    var streams = event.streams;
+    if (streams.isNotEmpty) {
+      onAddRemoteTrack(streams.first, track);
+      emit(WebrtcEventType.track, event);
+    }
+  }
+
   ///对远端的连接来说，当有stream或者track到来时触发
   onAddRemoteTrack(MediaStream stream, MediaStreamTrack track) async {
     logger.i(
@@ -1373,22 +1388,6 @@ class BasePeerConnection {
     }
 
     emit(WebrtcEventType.removeTrack, {'stream': stream, 'track': track});
-  }
-
-  ///连接的监听轨道到来的监听器，当远方由轨道来的时候执行
-  onRemoteTrack(RTCTrackEvent event) {
-    logger.i('onRemoteTrack event');
-    if (status != PeerConnectionStatus.connected) {
-      logger.e('PeerConnectionStatus is not connected');
-      return false;
-    }
-
-    for (var eventStream in event.streams) {
-      logger.i('onRemoteTrack event stream:${eventStream.id}');
-      onAddRemoteStream(eventStream);
-      emit(WebrtcEventType.stream, eventStream);
-    }
-    emit(WebrtcEventType.track, event);
   }
 
   /// 注册一组回调函数，内部可以调用外部注册事件的方法
