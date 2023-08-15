@@ -159,7 +159,7 @@ class RemoteVideoRenderController extends VideoRenderController {
     if (!_peerConnections.containsKey(key)) {
       _peerConnections[key] = peerConnection;
       peerConnection.registerWebrtcEvent(
-          WebrtcEventType.stream, _onAddRemoteTrack);
+          WebrtcEventType.track, _onAddRemoteTrack);
       peerConnection.registerWebrtcEvent(
           WebrtcEventType.removeTrack, _onRemoveRemoteTrack);
       peerConnection.registerWebrtcEvent(WebrtcEventType.closed, _onClosed);
@@ -176,8 +176,7 @@ class RemoteVideoRenderController extends VideoRenderController {
           WebrtcEventType.track, _onAddRemoteTrack);
       peerConnection.unregisterWebrtcEvent(
           WebrtcEventType.removeTrack, _onRemoveRemoteTrack);
-      peerConnection.unregisterWebrtcEvent(
-          WebrtcEventType.closed, _onClosed);
+      peerConnection.unregisterWebrtcEvent(WebrtcEventType.closed, _onClosed);
       await _removeVideoRender(peerConnection);
     }
   }

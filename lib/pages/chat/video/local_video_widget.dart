@@ -11,6 +11,7 @@ import 'package:colla_chat/pages/chat/linkman/group_linkman_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/video/video_view_card.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
@@ -631,6 +632,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                   _hangup();
                 } else if (value == VideoChatStatus.chatting) {
                   _exit();
+                  indexWidgetProvider.pop(context: context);
                 }
               },
               backgroundColor: Colors.red,
