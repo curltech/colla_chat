@@ -750,6 +750,10 @@ class BasePeerConnection {
           reconnectTimes--;
           negotiate();
         }
+      } else if (negotiateStatus == NegotiateStatus.negotiating) {
+        logger.w('delayed $delayTimes second negotiating, will be renegotiate');
+        negotiateStatus = NegotiateStatus.none;
+        negotiate();
       }
     });
   }
