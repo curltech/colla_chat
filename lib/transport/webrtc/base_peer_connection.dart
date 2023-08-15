@@ -549,15 +549,15 @@ class BasePeerConnection {
     }
 
     /// 4.建立连接的监听轨道到来的监听器，当远方由轨道来的时候执行
-    // peerConnection.onAddStream = (MediaStream stream) {
-    //   onAddRemoteStream(stream);
-    // };
-    // peerConnection.onRemoveStream = (MediaStream stream) {
-    //   onRemoveRemoteStream(stream);
-    // };
-    // peerConnection.onAddTrack = (MediaStream stream, MediaStreamTrack track) {
-    //   onAddRemoteTrack(stream, track);
-    // };
+    peerConnection.onAddStream = (MediaStream stream) {
+      onAddRemoteStream(stream);
+    };
+    peerConnection.onRemoveStream = (MediaStream stream) {
+      onRemoveRemoteStream(stream);
+    };
+    peerConnection.onAddTrack = (MediaStream stream, MediaStreamTrack track) {
+      logger.i('onAddTrack');
+    };
     peerConnection.onRemoveTrack =
         (MediaStream stream, MediaStreamTrack track) {
       onRemoveRemoteTrack(stream, track);
