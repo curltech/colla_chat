@@ -172,9 +172,9 @@ class AdvancedPeerConnection {
       await onRemoveRemoteStream(stream);
     });
 
-    basePeerConnection.on(WebrtcEventType.track, (RTCTrackEvent event) async {
+    basePeerConnection.on(WebrtcEventType.track, (data) async {
       logger.i('${DateTime.now().toUtc().toIso8601String()}:track');
-      await onRemoteTrack(event);
+      await onRemoteTrack(data);
     });
 
     basePeerConnection.on(WebrtcEventType.addTrack, (data) async {
