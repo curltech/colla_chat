@@ -159,9 +159,9 @@ class RemoteVideoRenderController extends VideoRenderController {
     if (!_peerConnections.containsKey(key)) {
       _peerConnections[key] = peerConnection;
       peerConnection.registerWebrtcEvent(
-          WebrtcEventType.stream, _onAddRemoteStream);
+          WebrtcEventType.stream, _onAddRemoteTrack);
       peerConnection.registerWebrtcEvent(
-          WebrtcEventType.removeStream, _onRemoveRemoteStream);
+          WebrtcEventType.removeTrack, _onRemoveRemoteTrack);
       peerConnection.registerWebrtcEvent(WebrtcEventType.closed, _onClosed);
       await _addVideoRender(peerConnection);
     }
@@ -173,11 +173,11 @@ class RemoteVideoRenderController extends VideoRenderController {
     var advancedPeerConnection = _peerConnections.remove(key);
     if (advancedPeerConnection != null) {
       peerConnection.unregisterWebrtcEvent(
-          WebrtcEventType.stream, _onAddRemoteStream);
+          WebrtcEventType.track, _onAddRemoteTrack);
       peerConnection.unregisterWebrtcEvent(
-          WebrtcEventType.removeStream, _onRemoveRemoteStream);
+          WebrtcEventType.removeTrack, _onRemoveRemoteTrack);
       peerConnection.unregisterWebrtcEvent(
-          WebrtcEventType.removeStream, _onClosed);
+          WebrtcEventType.closed, _onClosed);
       await _removeVideoRender(peerConnection);
     }
   }
@@ -188,28 +188,50 @@ class RemoteVideoRenderController extends VideoRenderController {
   }
 
   ///远程流到来渲染流，激活add事件
-  Future<void> _onAddRemoteStream(WebrtcEvent webrtcEvent) async {
-    MediaStream stream = webrtcEvent.data;
+  Future<void> _onAddRemoteTrack(WebrtcEvent webrtcEvent) async {
+    Map<String, dynamic> data = webrtcEvent.data;
+    MediaStream? stream = data['stream'];
+    MediaStreamTrack track = data['track'];
     String peerId = webrtcEvent.peerId;
     String clientId = webrtcEvent.clientId;
     String name = webrtcEvent.name;
-    String streamId = stream.id;
-    PeerVideoRender? videoRender = videoRenders[streamId];
-    if (videoRender != null) {
-      return;
+    if (stream != null) {
+      String streamId = stream.id;
+      PeerVideoRender? videoRender = videoRenders[streamId];
+      if (videoRender != null) {
+        // bool exist = false;
+        // for (var mediaStreamTrack in videoRender.mediaStream!.getTracks()) {
+        //   if (mediaStreamTrack.id == track.id) {
+        //     exist = true;
+        //     break;
+        //   }
+        // }
+        // if (!exist) {
+        //   videoRender.mediaStream!.addTrack(track);
+        // }
+        return;
+      }
+      PeerVideoRender render = await PeerVideoRender.fromMediaStream(peerId,
+          clientId: clientId, name: name, stream: stream);
+      add(render);
+    } else {
+      logger.e('onAddRemoteTrack stream is null');
     }
-    PeerVideoRender render = await PeerVideoRender.fromMediaStream(peerId,
-        clientId: clientId, name: name, stream: stream);
-    add(render);
   }
 
   ///远程关闭流事件触发，激活remove事件
-  Future<void> _onRemoveRemoteStream(WebrtcEvent webrtcEvent) async {
-    MediaStream stream = webrtcEvent.data;
-    PeerVideoRender? videoRender = videoRenders[stream.id];
-    if (videoRender != null) {
-      await remove(videoRender);
-      await close(videoRender);
+  Future<void> _onRemoveRemoteTrack(WebrtcEvent webrtcEvent) async {
+    Map<String, dynamic> data = webrtcEvent.data;
+    MediaStream? stream = data['stream'];
+    MediaStreamTrack track = data['track'];
+    if (stream != null) {
+      PeerVideoRender? videoRender = videoRenders[stream.id];
+      if (videoRender != null) {
+        await remove(videoRender);
+        await close(videoRender);
+      }
+    } else {
+      logger.e('onAddRemoteTrack stream is null');
     }
   }
 

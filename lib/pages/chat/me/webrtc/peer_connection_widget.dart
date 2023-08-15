@@ -179,7 +179,7 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
       _remoteConnection = BasePeerConnection(initiator: false);
       await _remoteConnection!.init(extension: extension);
       //监听获取到远端视频流事件
-      _remoteConnection!.on(WebrtcEventType.stream, _onRemoteAddStream);
+      _remoteConnection!.on(WebrtcEventType.addTrack, _onRemoteAddStream);
       //添加远端Candidate事件监听
       _remoteConnection!.on(WebrtcEventType.iceCandidate, _onRemoteCandidate);
       //添加远端Ice连接状态事件监听
