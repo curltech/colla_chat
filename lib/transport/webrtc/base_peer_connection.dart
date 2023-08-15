@@ -1360,16 +1360,17 @@ class BasePeerConnection {
   onRemoveRemoteTrack(MediaStream stream, MediaStreamTrack track) {
     logger.i(
         'onRemoveRemoteTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id}');
-    lock.synchronized(() {
-      if (streamEncrypt) {
+
+    if (streamEncrypt) {
+      lock.synchronized(() {
         String? participantId = '${track.kind}_${track.id!}_receiver';
         if (frameCyrptors.containsKey(track.id!)) {
           FrameCryptor? frameCryptor = frameCyrptors[participantId];
           frameCryptor!.dispose();
           frameCyrptors.remove(participantId);
         }
-      }
-    });
+      });
+    }
 
     emit(WebrtcEventType.removeTrack, {'stream': stream, 'track': track});
   }
