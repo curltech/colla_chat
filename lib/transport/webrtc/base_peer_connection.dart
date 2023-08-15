@@ -358,10 +358,11 @@ class BasePeerConnection {
     if (kind == null) {
       return;
     }
-    String? trackId = track.id;
-    if (trackId == null) {
+    if (track.id == null) {
       return;
     }
+    String? trackId = '${kind}_${track.id!}_sender';
+
     if (frameCyrptors.containsKey(trackId)) {
       return;
     }
@@ -371,9 +372,11 @@ class BasePeerConnection {
             sender: sender,
             algorithm: Algorithm.kAesGcm,
             keyProvider: keyProvider!);
-    frameCyrptor.onFrameCryptorStateChanged = (participantId, state) =>
-        logger.i('encrypt onFrameCryptorStateChanged $participantId $state');
-    frameCyrptors[id] = frameCyrptor;
+    frameCyrptor.onFrameCryptorStateChanged = (participantId, state) {
+      logger.w('encrypt onFrameCryptorStateChanged $participantId $state');
+    };
+    frameCyrptors[trackId] = frameCyrptor;
+    logger.w('createFrameCryptorForRtpSender trackId:$trackId, video:$kind');
     await frameCyrptor.setKeyIndex(0);
 
     if (kind == 'video') {
@@ -400,10 +403,11 @@ class BasePeerConnection {
     if (kind == null) {
       return;
     }
-    String? trackId = track.id;
-    if (trackId == null) {
+    if (track.id == null) {
       return;
     }
+    String? trackId = '${kind}_${track.id!}_receiver';
+
     if (frameCyrptors.containsKey(trackId)) {
       return;
     }
@@ -413,9 +417,11 @@ class BasePeerConnection {
             receiver: receiver,
             algorithm: Algorithm.kAesGcm,
             keyProvider: keyProvider!);
-    frameCyrptor.onFrameCryptorStateChanged = (participantId, state) =>
-        logger.i('decrypt onFrameCryptorStateChanged $participantId $state');
+    frameCyrptor.onFrameCryptorStateChanged = (participantId, state) {
+      logger.w('decrypt onFrameCryptorStateChanged $participantId $state');
+    };
     frameCyrptors[trackId] = frameCyrptor;
+    logger.w('createFrameCryptorForRtpReceiver trackId:$trackId, video:$kind');
     await frameCyrptor.setKeyIndex(0);
 
     await frameCyrptor.setEnabled(true);
@@ -1070,8 +1076,8 @@ class BasePeerConnection {
   ///增加本地流到到连接中
   Future<bool> addLocalStream(MediaStream stream) async {
     logger.i('addLocalStream ${stream.id} ${stream.ownerTag}');
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
+    if (status != PeerConnectionStatus.connected) {
+      logger.e('PeerConnectionStatus is not connected');
       return false;
     }
     // try {
@@ -1097,8 +1103,8 @@ class BasePeerConnection {
 
   /// 把本地流轨道加入到连接中
   Future<bool> addLocalTrack(MediaStream stream, MediaStreamTrack track) async {
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
+    if (status != PeerConnectionStatus.connected) {
+      logger.e('PeerConnectionStatus is not connected');
       return false;
     }
     logger.i(
@@ -1132,8 +1138,8 @@ class BasePeerConnection {
 
   ///判断本地流是否存在
   bool _existLocal(MediaStream stream) {
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
+    if (status != PeerConnectionStatus.connected) {
+      logger.e('PeerConnectionStatus is not connected');
       return false;
     }
     RTCPeerConnection? peerConnection = _peerConnection;
@@ -1159,8 +1165,8 @@ class BasePeerConnection {
 
   ///判断远程流是否存在
   bool _existRemote(MediaStream stream) {
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
+    if (status != PeerConnectionStatus.connected) {
+      logger.e('PeerConnectionStatus is not connected');
       return false;
     }
     RTCPeerConnection? peerConnection = _peerConnection;
@@ -1187,9 +1193,9 @@ class BasePeerConnection {
   /// 主动从连接中移除流，然后会激活onRemoveStream
   removeStream(MediaStream stream) async {
     logger.i('removeStream stream:${stream.id} ${stream.ownerTag}');
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
+    if (status != PeerConnectionStatus.connected) {
+      logger.e('PeerConnectionStatus is not connected');
+      return false;
     }
     RTCPeerConnection? peerConnection = _peerConnection;
     if (peerConnection != null) {
@@ -1211,9 +1217,9 @@ class BasePeerConnection {
   removeTrack(MediaStream stream, MediaStreamTrack track) async {
     logger.i(
         'removeTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id}');
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
+    if (status != PeerConnectionStatus.connected) {
+      logger.e('PeerConnectionStatus is not connected');
+      return false;
     }
     var streamId = stream.id;
     var trackId = track.id!;
@@ -1246,8 +1252,8 @@ class BasePeerConnection {
   ///克隆远程流，可用于转发
   Future<MediaStream?> cloneStream(MediaStream stream) async {
     logger.i('removeStream stream:${stream.id} ${stream.ownerTag}');
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
+    if (status != PeerConnectionStatus.connected) {
+      logger.e('PeerConnectionStatus is not connected');
       return null;
     }
     RTCPeerConnection? peerConnection = _peerConnection;
@@ -1279,9 +1285,9 @@ class BasePeerConnection {
       MediaStreamTrack newTrack) async {
     logger.i(
         'replaceTrack stream:${stream.id} ${stream.ownerTag}, oldTrack:${oldTrack.id}, newTrack:${newTrack.id}');
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
+    if (status != PeerConnectionStatus.connected) {
+      logger.e('PeerConnectionStatus is not connected');
+      return false;
     }
     var streamId = stream.id;
     var oldTrackId = oldTrack.id;
@@ -1324,7 +1330,7 @@ class BasePeerConnection {
     logger.i(
         'onAddRemoteTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id}');
     if (streamEncrypt) {
-      List<RTCRtpReceiver> receivers = await peerConnection!.receivers;
+      List<RTCRtpReceiver> receivers = await peerConnection.receivers;
       if (receivers.isNotEmpty) {
         for (RTCRtpReceiver receiver in receivers) {
           await enableDecryption(receiver);
@@ -1350,9 +1356,9 @@ class BasePeerConnection {
   ///连接的监听轨道到来的监听器，当远方由轨道来的时候执行
   onRemoteTrack(RTCTrackEvent event) {
     logger.i('onRemoteTrack event');
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
+    if (status != PeerConnectionStatus.connected) {
+      logger.e('PeerConnectionStatus is not connected');
+      return false;
     }
 
     for (var eventStream in event.streams) {
@@ -1419,8 +1425,8 @@ class BasePeerConnection {
   }
 
   Future<bool> _send(List<int> message) async {
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed, cannot send');
+    if (status != PeerConnectionStatus.connected) {
+      logger.e('PeerConnectionStatus is not connected');
       return false;
     }
     logger.i('webrtc send message length: ${message.length}');
@@ -1438,9 +1444,9 @@ class BasePeerConnection {
   /// webrtc的数据通道发来的消息可以是ChainMessage，
   /// 也可以是简单的非ChainMessage，比如最简单的文本或者复合文档，也就是ChatMessage
   onMessage(RTCDataChannelMessage message) {
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
+    if (status != PeerConnectionStatus.connected) {
+      logger.e('PeerConnectionStatus is not connected');
+      return false;
     }
     if (message.isBinary) {
       var data = message.binary;

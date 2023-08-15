@@ -459,7 +459,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       }
       return;
     }
-    await videoChatMessageController.openLocalMainVideoRender();
     await videoChatMessageController.join();
     if (mounted) {
       DialogUtil.info(context,

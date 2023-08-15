@@ -123,7 +123,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
     conferenceOwnerPeerId = conferenceOwnerPeerId ?? myself.peerId;
     startDate ??= DateUtil.currentDate();
     endDate ??= DateUtil.currentDateTime()
-        .add(const Duration(minutes: 60))
+        .add(const Duration(minutes: 240))
         .toIso8601String();
     var conference = Conference(conferenceId,
         name: name,
