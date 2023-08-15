@@ -9,6 +9,7 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/message_slice.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:synchronized/synchronized.dart';
 
 class SignalExtension {
   late String peerId;
@@ -309,7 +310,7 @@ class BasePeerConnection {
   KeyProvider? keyProvider;
   final Map<String, FrameCryptor> frameCyrptors = {};
   bool streamEncrypt = true;
-  String? senderTrackId;
+  String? senderParticipantId;
 
   ///棘轮加密的初始化对称密钥，可以在视频通话前由datachannel协商一致
   Uint8List? aesKey;
@@ -338,8 +339,8 @@ class BasePeerConnection {
 
   ///产生新的密钥
   void _ratchetKey() async {
-    var newKey =
-        await keyProvider?.ratchetKey(participantId: senderTrackId!, index: 0);
+    var newKey = await keyProvider?.ratchetKey(
+        participantId: senderParticipantId!, index: 0);
     logger.i('newKey $newKey');
   }
 
@@ -361,36 +362,46 @@ class BasePeerConnection {
     if (track.id == null) {
       return;
     }
-    String? trackId = '${kind}_${track.id!}_sender';
+    String? participantId = '${kind}_${track.id!}_sender';
 
-    if (frameCyrptors.containsKey(trackId)) {
+    if (frameCyrptors.containsKey(participantId)) {
       return;
     }
     FrameCryptor frameCyrptor =
         await _frameCyrptorFactory.createFrameCryptorForRtpSender(
-            participantId: trackId,
+            participantId: participantId,
             sender: sender,
             algorithm: Algorithm.kAesGcm,
             keyProvider: keyProvider!);
     frameCyrptor.onFrameCryptorStateChanged = (participantId, state) {
       logger.w('encrypt onFrameCryptorStateChanged $participantId $state');
     };
-    frameCyrptors[trackId] = frameCyrptor;
-    logger.w('createFrameCryptorForRtpSender trackId:$trackId, video:$kind');
+    frameCyrptors[participantId] = frameCyrptor;
+    logger.w(
+        'createFrameCryptorForRtpSender participantId:$participantId, video:$kind');
     await frameCyrptor.setKeyIndex(0);
 
     if (kind == 'video') {
-      senderTrackId = trackId;
+      senderParticipantId = participantId;
     }
 
     await frameCyrptor.setEnabled(true);
-    await keyProvider!.setKey(participantId: trackId, index: 0, key: aesKey!);
+    await keyProvider!
+        .setKey(participantId: participantId, index: 0, key: aesKey!);
     await frameCyrptor.updateCodec(kind == 'video' ? videoCodec : audioCodec);
   }
+
+  Lock lock = Lock();
 
   ///激活流解密，在连接创建，receiver
   ///每个轨道设置一个解密器，
   Future<void> enableDecryption(RTCRtpReceiver receiver) async {
+    await lock.synchronized(() async {
+      await _enableDecryption(receiver);
+    });
+  }
+
+  Future<void> _enableDecryption(RTCRtpReceiver receiver) async {
     if (keyProvider == null || aesKey == null) {
       logger.e('keyProvider or aesKey is null, can not enableDecryption');
       return;
@@ -406,26 +417,28 @@ class BasePeerConnection {
     if (track.id == null) {
       return;
     }
-    String? trackId = '${kind}_${track.id!}_receiver';
+    String? participantId = '${kind}_${track.id!}_receiver';
 
-    if (frameCyrptors.containsKey(trackId)) {
+    if (frameCyrptors.containsKey(participantId)) {
       return;
     }
     FrameCryptor frameCyrptor =
         await _frameCyrptorFactory.createFrameCryptorForRtpReceiver(
-            participantId: trackId,
+            participantId: participantId,
             receiver: receiver,
             algorithm: Algorithm.kAesGcm,
             keyProvider: keyProvider!);
     frameCyrptor.onFrameCryptorStateChanged = (participantId, state) {
       logger.w('decrypt onFrameCryptorStateChanged $participantId $state');
     };
-    frameCyrptors[trackId] = frameCyrptor;
-    logger.w('createFrameCryptorForRtpReceiver trackId:$trackId, video:$kind');
+    frameCyrptors[participantId] = frameCyrptor;
+    logger.w(
+        'createFrameCryptorForRtpReceiver participantId:$participantId, video:$kind');
     await frameCyrptor.setKeyIndex(0);
 
     await frameCyrptor.setEnabled(true);
-    await keyProvider!.setKey(participantId: trackId, index: 0, key: aesKey!);
+    await keyProvider!
+        .setKey(participantId: participantId, index: 0, key: aesKey!);
     await frameCyrptor.updateCodec(kind == 'video' ? videoCodec : audioCodec);
   }
 
@@ -1223,6 +1236,8 @@ class BasePeerConnection {
     }
     var streamId = stream.id;
     var trackId = track.id!;
+    var kind = track.kind;
+    String? participantId = '${kind}_${trackId}_sender';
 
     if (trackSenders.containsKey(trackId)) {
       RTCRtpSender? sender = trackSenders[trackId];
@@ -1238,13 +1253,14 @@ class BasePeerConnection {
           logger.e('removeTrack err $err');
           close();
         }
+        trackSenders.remove(trackId);
       }
     }
     if (streamEncrypt) {
-      if (frameCyrptors.containsKey(trackId)) {
-        FrameCryptor? frameCryptor = frameCyrptors[trackId];
+      if (frameCyrptors.containsKey(participantId)) {
+        FrameCryptor? frameCryptor = frameCyrptors[participantId];
         frameCryptor!.dispose();
-        frameCyrptors.remove(trackId);
+        frameCyrptors.remove(participantId);
       }
     }
   }
@@ -1292,6 +1308,7 @@ class BasePeerConnection {
     var streamId = stream.id;
     var oldTrackId = oldTrack.id;
     var newTrackId = newTrack.id;
+    String? oldParticipantId = '${oldTrack.kind}_${oldTrackId}_sender';
 
     if (trackSenders.containsKey(oldTrackId)) {
       RTCRtpSender? sender = trackSenders[oldTrackId];
@@ -1302,10 +1319,10 @@ class BasePeerConnection {
         trackSenders.remove(oldTrackId);
         trackSenders[newTrackId!] = sender;
         if (streamEncrypt) {
-          if (frameCyrptors.containsKey(oldTrackId)) {
-            FrameCryptor? frameCryptor = frameCyrptors[oldTrackId];
+          if (frameCyrptors.containsKey(oldParticipantId)) {
+            FrameCryptor? frameCryptor = frameCyrptors[oldParticipantId];
             frameCryptor!.dispose();
-            frameCyrptors.remove(oldTrackId);
+            frameCyrptors.remove(oldParticipantId);
           }
           await enableEncryption(sender);
         }
@@ -1343,13 +1360,17 @@ class BasePeerConnection {
   onRemoveRemoteTrack(MediaStream stream, MediaStreamTrack track) {
     logger.i(
         'onRemoveRemoteTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id}');
-    if (streamEncrypt) {
-      if (frameCyrptors.containsKey(track.id!)) {
-        FrameCryptor? frameCryptor = frameCyrptors[track.id!];
-        frameCryptor!.dispose();
-        frameCyrptors.remove(track.id!);
+    lock.synchronized(() {
+      if (streamEncrypt) {
+        String? participantId = '${track.kind}_${track.id!}_receiver';
+        if (frameCyrptors.containsKey(track.id!)) {
+          FrameCryptor? frameCryptor = frameCyrptors[participantId];
+          frameCryptor!.dispose();
+          frameCyrptors.remove(participantId);
+        }
       }
-    }
+    });
+
     emit(WebrtcEventType.removeTrack, {'stream': stream, 'track': track});
   }
 
