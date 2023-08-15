@@ -308,7 +308,7 @@ class BasePeerConnection {
   final FrameCryptorFactory _frameCyrptorFactory = frameCryptorFactory;
   KeyProvider? keyProvider;
   final Map<String, FrameCryptor> frameCyrptors = {};
-  bool streamEncrypt = false;
+  bool streamEncrypt = true;
   String? senderTrackId;
 
   ///棘轮加密的初始化对称密钥，可以在视频通话前由datachannel协商一致
