@@ -242,13 +242,15 @@ class AdvancedPeerConnection {
     await peerConnectionPool.onRemoveStream(webrtcEvent);
   }
 
-  onRemoteTrack(RTCTrackEvent event) async {
-    logger.i('trackId: ${event.track.id} onRemoteTrack');
+  onRemoteTrack(dynamic data) async {
+    MediaStream stream = data['stream'];
+    MediaStreamTrack track = data['track'];
+    logger.i('streamId: ${stream.id} trackId:${track.id} is onRemoteTrack');
     var webrtcEvent = WebrtcEvent(peerId,
         clientId: clientId,
         name: name,
         eventType: WebrtcEventType.track,
-        data: event);
+        data: data);
     onWebrtcEvent(webrtcEvent);
     await peerConnectionPool.onTrack(webrtcEvent);
   }
