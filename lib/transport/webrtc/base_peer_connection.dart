@@ -425,7 +425,7 @@ class BasePeerConnection {
     await frameCyrptor.setKeyIndex(0);
 
     await frameCyrptor.setEnabled(true);
-    await keyProvider!.setKey(participantId: id, index: 0, key: aesKey!);
+    await keyProvider!.setKey(participantId: trackId, index: 0, key: aesKey!);
     await frameCyrptor.updateCodec(kind == 'video' ? videoCodec : audioCodec);
   }
 
