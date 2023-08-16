@@ -1,6 +1,7 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
@@ -156,11 +157,11 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   }
 
   Future<dynamic> _showActionCard(BuildContext context) {
-    return SmartDialogUtil.popModalBottomSheet(context, builder: (context) {
+    return DialogUtil.popModalBottomSheet(context, builder: (context) {
       return Card(
           child: DataActionCard(
               onPressed: (int index, String label, {String? value}) {
-                _onAction(context!, index, label, value: value);
+                _onAction(context, index, label, value: value);
               },
               showLabel: true,
               showTooltip: true,
@@ -281,6 +282,9 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         break;
       default:
         break;
+    }
+    if (mounted) {
+      Navigator.pop(context);
     }
   }
 
