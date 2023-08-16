@@ -223,21 +223,23 @@ class RemoteVideoRenderController extends VideoRenderController {
       if (videoRender != null) {
         var mediaStream = videoRender.mediaStream;
         if (mediaStream != null) {
-          List<MediaStreamTrack> tracks = mediaStream.getTracks();
-          List<MediaStreamTrack> removes = [];
-          for (MediaStreamTrack mediaStreamTrack in tracks) {
-            if (mediaStreamTrack.id == track.id) {
-              removes.add(mediaStreamTrack);
-            }
-          }
-          for (MediaStreamTrack mediaStreamTrack in removes) {
-            await mediaStream.removeTrack(mediaStreamTrack);
-          }
-          tracks = mediaStream.getTracks();
-          if (tracks.isEmpty) {
-            await remove(videoRender);
-            await close(videoRender);
-          }
+          // List<MediaStreamTrack> tracks = mediaStream.getTracks();
+          // List<MediaStreamTrack> removes = [];
+          // for (MediaStreamTrack mediaStreamTrack in tracks) {
+          //   if (mediaStreamTrack.id == track.id) {
+          //     removes.add(mediaStreamTrack);
+          //   }
+          // }
+          // for (MediaStreamTrack mediaStreamTrack in removes) {
+          //   await mediaStream.removeTrack(mediaStreamTrack);
+          // }
+          // tracks = mediaStream.getTracks();
+          // if (tracks.isEmpty) {
+          //   await remove(videoRender);
+          //   await close(videoRender);
+          // }
+          await remove(videoRender);
+          await close(videoRender);
         }
       }
     } else {
