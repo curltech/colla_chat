@@ -60,7 +60,7 @@ class VideoChatMessage extends StatelessWidget {
 
     Map<String, dynamic> map = JsonUtil.toJson(content);
     Conference conference = Conference.fromJson(map);
-    bool valid = true; //isValid(conference.startDate, conference.endDate);
+    bool valid = isValid(conference.startDate, conference.endDate);
     var video = conference.video
         ? ChatMessageContentType.video.name
         : ChatMessageContentType.audio.name;
