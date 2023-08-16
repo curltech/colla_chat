@@ -764,6 +764,7 @@ class BasePeerConnection {
           reconnectTimes--;
           negotiateStatus = NegotiateStatus.none;
           negotiate();
+          renegotiateNeed = false;
         } else {
           logger.e('renegotiateNeed always is true, error state');
         }
