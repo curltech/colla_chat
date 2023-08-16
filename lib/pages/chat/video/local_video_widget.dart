@@ -11,6 +11,7 @@ import 'package:colla_chat/pages/chat/linkman/group_linkman_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/video/video_view_card.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -652,22 +653,35 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           } else if (value == VideoChatStatus.end) {
             String? label;
             String? tip;
-            var videoChatMessageController =
+            VideoChatMessageController? videoChatMessageController =
                 this.videoChatMessageController.value;
+            String? partyType = chatSummary.partyType;
             Conference? conference = videoChatMessageController?.conference;
-            if (conference == null) {
-              label = 'Invite';
-              tip = 'No conference';
+            if (partyType == PartyType.conference.name) {
+              if (conference == null) {
+                label = 'Error';
+                tip = 'No conference';
+              } else {
+                label = 'Join';
+                tip = 'In conference';
+              }
             } else {
-              label = 'Join';
-              tip = 'In conference';
+              if (conference == null) {
+                label = 'Invite';
+                tip = 'No conference';
+              } else {
+                label = 'Join';
+                tip = 'In conference';
+              }
             }
             buttonWidget = CircleTextButton(
               label: label,
               tip: tip,
               onPressed: () async {
                 if (conference == null) {
-                  await _invite();
+                  if (partyType != PartyType.conference.name) {
+                    await _invite();
+                  }
                 } else {
                   await _join();
                 }

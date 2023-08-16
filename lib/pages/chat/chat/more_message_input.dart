@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -14,6 +15,7 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/macos_camera_widget.dart';
 import 'package:colla_chat/plugin/mobile_camera_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
@@ -153,10 +155,29 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   }
 
   ///视频通话
-  _onActionVideoChat() {
-    chatMessageController.current = null;
-    videoConferenceRenderPool.conferenceId = null;
-    indexWidgetProvider.push('video_chat');
+  _onActionVideoChat() async {
+    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    String? partyType = chatSummary?.partyType;
+    if (partyType == PartyType.linkman.name) {
+      chatMessageController.current = null;
+      videoConferenceRenderPool.conferenceId = null;
+      indexWidgetProvider.push('video_chat');
+    } else if (partyType == PartyType.group.name) {
+      chatMessageController.current = null;
+      videoConferenceRenderPool.conferenceId = null;
+      indexWidgetProvider.push('video_chat');
+    } else if (partyType == PartyType.conference.name) {
+      if (chatSummary != null) {
+        String groupId = chatSummary.peerId!;
+        ChatMessage? chatMessage =
+            await chatMessageService.findVideoChatChatMessage(groupId);
+        if (chatMessage != null) {
+          await videoConferenceRenderPool.createVideoChatMessageController(
+              chatSummary, chatMessage);
+          indexWidgetProvider.push('video_chat');
+        }
+      }
+    }
   }
 
   ///相册

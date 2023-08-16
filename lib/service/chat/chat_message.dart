@@ -33,8 +33,6 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/transport/smsclient.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
-
-// import 'package:colla_chat/transport/nearby_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/websocket.dart';
 import 'package:uuid/uuid.dart';
@@ -255,6 +253,23 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         whereArgs: whereArgs,
         orderBy: 'sendTime desc',
         limit: limit);
+  }
+
+  Future<ChatMessage?> findVideoChatChatMessage(
+    String groupId,
+  ) async {
+    String where =
+        'receiverPeerId=? and messageType=? and subMessageType=? and groupId=?';
+    List<Object> whereArgs = [
+      myself.peerId!,
+      ChatMessageType.chat.name,
+      ChatMessageSubType.videoChat.name,
+      groupId
+    ];
+    var chatMessages =
+        await find(where: where, whereArgs: whereArgs, orderBy: 'id');
+
+    return chatMessages.firstOrNull;
   }
 
   ///字符串变成utf8,然后base64

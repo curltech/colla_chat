@@ -1,4 +1,7 @@
+import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
+import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
@@ -273,6 +276,24 @@ class VideoConferenceRenderPool with ChangeNotifier {
   String? _conferenceId;
 
   VideoConferenceRenderPool();
+
+  ///根据当前的视频邀请消息，查找或者创建当前消息对应的会议，并设置为当前会议
+  Future<void> createVideoChatMessageController(
+      ChatSummary chatSummary, ChatMessage chatMessage) async {
+    //创建基于当前聊天的视频消息控制器
+    if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
+      VideoChatMessageController? videoChatMessageController =
+          getVideoChatMessageController(chatMessage.messageId!);
+      if (videoChatMessageController == null) {
+        videoChatMessageController = VideoChatMessageController();
+        await videoChatMessageController.setChatSummary(chatSummary);
+        await videoChatMessageController.setChatMessage(chatMessage);
+        createRemoteVideoRenderController(videoChatMessageController);
+      } else {
+        conferenceId = videoChatMessageController.conferenceId;
+      }
+    }
+  }
 
   ///获取当前会议号
   String? get conferenceId {

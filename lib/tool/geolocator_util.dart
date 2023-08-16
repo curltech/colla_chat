@@ -361,7 +361,6 @@ class GeolocatorUtil {
       showLocationController: showLocationController,
       showSelectLocationButton: showSelectLocationButton,
       selectLocationButtonStyle: selectLocationButtonStyle,
-      selectLocationTextColor: selectLocationTextColor,
       showSearchBar: showSearchBar,
       searchBarBackgroundColor: searchBarBackgroundColor,
       searchBarTextColor: searchBarTextColor,

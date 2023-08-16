@@ -187,6 +187,9 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
         valueListenable: conferenceMembers,
         builder: (BuildContext context, List<String> conferenceMembers,
             Widget? child) {
+          if (!this.conferenceMembers.value.contains(myself.peerId)) {
+            this.conferenceMembers.value.add(myself.peerId!);
+          }
           return Container(
               padding: const EdgeInsets.symmetric(horizontal: 0.0),
               child: LinkmanGroupSearchWidget(

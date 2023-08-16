@@ -29,28 +29,6 @@ class VideoChatMessage extends StatelessWidget {
       required this.chatMessage})
       : super(key: key);
 
-  ///查找或者创建当前消息对应的会议，并设置为当前会议
-  Future<void> _initVideoChatMessageController() async {
-    //创建基于当前聊天的视频消息控制器
-    ChatSummary chatSummary = chatMessageController.chatSummary!;
-    ChatMessage chatMessage = chatMessageController.current!;
-    if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-      VideoChatMessageController? videoChatMessageController =
-          videoConferenceRenderPool
-              .getVideoChatMessageController(chatMessage.messageId!);
-      if (videoChatMessageController == null) {
-        videoChatMessageController = VideoChatMessageController();
-        await videoChatMessageController.setChatSummary(chatSummary);
-        await videoChatMessageController.setChatMessage(chatMessage);
-        videoConferenceRenderPool
-            .createRemoteVideoRenderController(videoChatMessageController);
-      } else {
-        videoConferenceRenderPool.conferenceId =
-            videoChatMessageController.conferenceId;
-      }
-    }
-  }
-
   bool isValid(String? startDate, String? endDate) {
     bool valid = true;
     DateTime? eDate;
@@ -82,7 +60,7 @@ class VideoChatMessage extends StatelessWidget {
 
     Map<String, dynamic> map = JsonUtil.toJson(content);
     Conference conference = Conference.fromJson(map);
-    bool valid = isValid(conference.startDate, conference.endDate);
+    bool valid = true; //isValid(conference.startDate, conference.endDate);
     var video = conference.video
         ? ChatMessageContentType.video.name
         : ChatMessageContentType.audio.name;
@@ -108,9 +86,14 @@ class VideoChatMessage extends StatelessWidget {
               tooltip: AppLocalizations.t('Join conference'),
               onPressed: valid
                   ? () async {
-                      chatMessageController.current = chatMessage;
-                      await _initVideoChatMessageController();
-                      indexWidgetProvider.push('video_chat');
+                      ChatSummary? chatSummary =
+                          chatMessageController.chatSummary;
+                      if (chatSummary != null) {
+                        await videoConferenceRenderPool
+                            .createVideoChatMessageController(
+                                chatSummary, chatMessage);
+                        indexWidgetProvider.push('video_chat');
+                      }
                     }
                   : null,
               iconSize: AppIconSize.mdSize,
