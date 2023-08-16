@@ -257,7 +257,9 @@ class BasePeerConnection {
   RTCPeerConnection? _peerConnection;
   PeerConnectionStatus _status = PeerConnectionStatus.created;
   NegotiateStatus _negotiateStatus = NegotiateStatus.none;
-  bool renegotiate = false;
+
+  //需要新的协商过程
+  bool renegotiateNeed = false;
 
   //数据通道的状态是否打开
   bool dataChannelOpen = false;
@@ -555,9 +557,6 @@ class BasePeerConnection {
     peerConnection.onRemoveStream = (MediaStream stream) {
       onRemoveRemoteStream(stream);
     };
-    peerConnection.onAddTrack = (MediaStream stream, MediaStreamTrack track) {
-      logger.i('onAddTrack');
-    };
     peerConnection.onRemoveTrack =
         (MediaStream stream, MediaStreamTrack track) {
       onRemoveRemoteTrack(stream, track);
@@ -676,12 +675,11 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
+
+    ///协商过程完成
     if (state == RTCSignalingState.RTCSignalingStateStable) {
       negotiateStatus = NegotiateStatus.negotiated;
-      if (renegotiate) {
-        renegotiate = false;
-        negotiate();
-      }
+      renegotiateNeed = false;
     }
     emit(WebrtcEventType.signalingState, state);
   }
@@ -709,9 +707,10 @@ class BasePeerConnection {
     }
   }
 
+  ///需要重新协商
   onRenegotiationNeeded() {
     logger.w('onRenegotiationNeeded event');
-    negotiate();
+    renegotiateNeed = true;
   }
 
   //数据通道状态事件
@@ -733,6 +732,7 @@ class BasePeerConnection {
     }
   }
 
+  ///实际开始执行协商过程
   ///被叫不能在第一次的时候主动发起协议过程，主叫或者被叫不在第一次的时候可以发起协商过程
   negotiate() async {
     if (initiator) {
@@ -748,12 +748,19 @@ class BasePeerConnection {
         close();
         if (reconnectTimes > 0) {
           reconnectTimes--;
+          init(extension: extension!);
           negotiate();
         }
-      } else if (negotiateStatus == NegotiateStatus.negotiating) {
-        logger.w('delayed $delayTimes second negotiating, will be renegotiate');
-        negotiateStatus = NegotiateStatus.none;
-        negotiate();
+      } else if (renegotiateNeed) {
+        logger.w(
+            'delayed $delayTimes second renegotiateNeed is true, will be renegotiate');
+        if (reconnectTimes > 0) {
+          reconnectTimes--;
+          negotiateStatus = NegotiateStatus.none;
+          negotiate();
+        } else {
+          logger.e('renegotiateNeed always is true, error state');
+        }
       }
     });
   }
@@ -766,7 +773,6 @@ class BasePeerConnection {
     }
     if (negotiateStatus == NegotiateStatus.negotiating) {
       logger.e('PeerConnectionStatus already negotiating');
-      renegotiate = true;
       return;
     }
     logger.w('Start negotiate');
@@ -836,7 +842,8 @@ class BasePeerConnection {
     if (signalType == SignalType.renegotiate.name &&
         webrtcSignal.renegotiate != null) {
       logger.i('onSignal renegotiate');
-      await negotiate();
+      renegotiateNeed = true;
+      negotiate();
     }
     //被要求收发，则加收发器
     else if (webrtcSignal.transceiverRequest != null) {
@@ -890,7 +897,6 @@ class BasePeerConnection {
     }
     if (negotiateStatus == NegotiateStatus.negotiating) {
       logger.e('already negotiating');
-      renegotiate = true;
       return;
     }
     if (status != PeerConnectionStatus.connected) {

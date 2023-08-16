@@ -198,16 +198,11 @@ class RemoteVideoRenderController extends VideoRenderController {
       String streamId = stream.id;
       PeerVideoRender? videoRender = videoRenders[streamId];
       if (videoRender != null) {
-        // bool exist = false;
-        // for (var mediaStreamTrack in videoRender.mediaStream!.getTracks()) {
-        //   if (mediaStreamTrack.id == track.id) {
-        //     exist = true;
-        //     break;
-        //   }
-        // }
-        // if (!exist) {
-        //   videoRender.mediaStream!.addTrack(track);
-        // }
+        MediaStream? oldStream = videoRender.mediaStream;
+        if (oldStream != null && oldStream != stream) {
+          oldStream.dispose();
+        }
+        videoRender.setStream(stream);
         return;
       }
       PeerVideoRender render = await PeerVideoRender.fromMediaStream(peerId,
