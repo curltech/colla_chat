@@ -557,12 +557,18 @@ class BasePeerConnection {
     peerConnection.onRemoveStream = (MediaStream stream) {
       onRemoveRemoteStream(stream);
     };
+    peerConnection.onAddTrack = (MediaStream stream, MediaStreamTrack track) {
+      onRemoteTrack(stream, track);
+    };
+    peerConnection.onTrack = (RTCTrackEvent event) {
+      List<MediaStream> streams = event.streams;
+      MediaStream? stream = streams.firstOrNull;
+      MediaStreamTrack track = event.track;
+      onRemoteTrack(stream, track);
+    };
     peerConnection.onRemoveTrack =
         (MediaStream stream, MediaStreamTrack track) {
       onRemoveRemoteTrack(stream, track);
-    };
-    peerConnection.onTrack = (RTCTrackEvent event) {
-      onRemoteTrack(event);
     };
     status = PeerConnectionStatus.init;
 
@@ -1339,23 +1345,28 @@ class BasePeerConnection {
     }
   }
 
-  ///对远端的连接来说，当有stream或者track到来时触发
-  ///什么都不做，由onAddTrack事件处理
-  onAddRemoteStream(MediaStream stream) {
+  ///对远端的连接来说，当有stream到来时触发
+  ///由onRemoteTrack事件处理
+  onAddRemoteStream(MediaStream stream) async {
     logger.i('onAddRemoteStream stream:${stream.id} ${stream.ownerTag}');
+    List<MediaStreamTrack> tracks = stream.getTracks();
+    for (MediaStreamTrack track in tracks) {
+      await onRemoteTrack(stream, track);
+    }
     emit(WebrtcEventType.stream, stream);
   }
 
-  onRemoveRemoteStream(MediaStream stream) {
+  onRemoveRemoteStream(MediaStream stream) async {
     logger.i('onRemoveRemoteStream stream:${stream.id} ${stream.ownerTag}');
+    List<MediaStreamTrack> tracks = stream.getTracks();
+    for (MediaStreamTrack track in tracks) {
+      await onRemoveRemoteTrack(stream, track);
+    }
     emit(WebrtcEventType.removeStream, stream);
   }
 
   ///连接的监听轨道到来的监听器，当远方由轨道来的时候执行
-  onRemoteTrack(RTCTrackEvent event) async {
-    var track = event.track;
-    List<MediaStream> streams = event.streams;
-    MediaStream? stream = streams.firstOrNull;
+  onRemoteTrack(MediaStream? stream, MediaStreamTrack track) async {
     logger.i('onRemoteTrack event:${track.id}, stream:${stream?.id}');
     if (peerConnection == null || status != PeerConnectionStatus.connected) {
       logger.e('PeerConnectionStatus is not connected');
@@ -1365,7 +1376,11 @@ class BasePeerConnection {
       List<RTCRtpReceiver> receivers = await peerConnection!.receivers;
       if (receivers.isNotEmpty) {
         for (RTCRtpReceiver receiver in receivers) {
-          await enableDecryption(receiver);
+          String? trackId = receiver.track!.id;
+          if (track.id == trackId) {
+            await enableDecryption(receiver);
+            break;
+          }
         }
       }
     }

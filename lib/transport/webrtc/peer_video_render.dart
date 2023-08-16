@@ -51,6 +51,7 @@ class PeerVideoRender {
     if (mediaStream != null) {
       this.mediaStream = mediaStream;
       id = mediaStream.id;
+      bindRTCVideoRender();
     } else {
       this.mediaStream = null;
       id = null;
@@ -282,6 +283,13 @@ class PeerVideoRender {
         renderer.srcObject = mediaStream;
         this.renderer = renderer;
         logger.i('bind VideoRender videoHeight:$height, videoWidth:$width');
+      } else {
+        renderer.srcObject = mediaStream;
+      }
+    } else {
+      RTCVideoRenderer? renderer = this.renderer;
+      if (renderer != null) {
+        renderer.srcObject = null;
       }
     }
   }
