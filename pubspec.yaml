@@ -75,8 +75,8 @@ dependencies:
   idb_shim: ^2.0.1
 
   #网络
-  #  dart_webrtc: ^1.1.2
-  #  webrtc_interface: 1.1.1
+  dart_webrtc: ^1.1.2
+  webrtc_interface: 1.1.1
   dio: ^5.0.2
   dio_http2_adapter: ^2.1.0
   web_socket_channel: ^2.2.0

@@ -3,13 +3,13 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/video/local_video_widget.dart';
 import 'package:colla_chat/pages/chat/video/remote_video_widget.dart';
 import 'package:colla_chat/pages/chat/video/video_conference_pool_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
+import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/drag_overlay.dart';
@@ -43,9 +43,9 @@ class VideoChatWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _VideoChatWidgetState extends State<VideoChatWidget> {
-  ValueNotifier<VideoChatMessageController?> videoChatMessageController =
-      ValueNotifier<VideoChatMessageController?>(
-          videoConferenceRenderPool.videoChatMessageController);
+  ValueNotifier<ConferenceChatMessageController?> videoChatMessageController =
+      ValueNotifier<ConferenceChatMessageController?>(
+          p2pConferenceClientPool.videoChatMessageController);
   ChatSummary chatSummary = chatMessageController.chatSummary!;
   SwiperController swiperController = SwiperController();
 
@@ -57,12 +57,12 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
       widget.overlayEntry!.dispose();
       widget.overlayEntry = null;
     }
-    videoConferenceRenderPool.addListener(_update);
+    p2pConferenceClientPool.addListener(_update);
   }
 
   _update() {
     videoChatMessageController.value =
-        videoConferenceRenderPool.videoChatMessageController;
+        p2pConferenceClientPool.videoChatMessageController;
   }
 
   ///关闭最小化界面，把本界面显示
@@ -159,7 +159,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     return ValueListenableBuilder(
         valueListenable: videoChatMessageController,
         builder: (BuildContext context,
-            VideoChatMessageController? videoChatMessageController,
+            ConferenceChatMessageController? videoChatMessageController,
             Widget? child) {
           var chatSummary = this.chatSummary;
           var peerName = '';
@@ -186,7 +186,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
 
   @override
   void dispose() {
-    videoConferenceRenderPool.removeListener(_update);
+    p2pConferenceClientPool.removeListener(_update);
     super.dispose();
   }
 }

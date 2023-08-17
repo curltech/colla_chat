@@ -3,7 +3,7 @@ import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
-import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -347,7 +347,7 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
     conference.value = current;
     //发出新增的会议邀请消息
     if (conferenceAdd) {
-      await VideoChatMessageController.invite(current);
+      await ConferenceChatMessageController.invite(current);
     }
 
     if (conferenceController.current == null) {

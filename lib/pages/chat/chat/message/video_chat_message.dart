@@ -4,7 +4,6 @@ import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/message/common_message.dart';
 import 'package:colla_chat/pages/chat/linkman/conference/conference_show_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -12,7 +11,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
+import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 
@@ -89,7 +88,7 @@ class VideoChatMessage extends StatelessWidget {
                       ChatSummary? chatSummary =
                           chatMessageController.chatSummary;
                       if (chatSummary != null) {
-                        await videoConferenceRenderPool
+                        await p2pConferenceClientPool
                             .createVideoChatMessageController(
                                 chatSummary, chatMessage);
                         indexWidgetProvider.push('video_chat');

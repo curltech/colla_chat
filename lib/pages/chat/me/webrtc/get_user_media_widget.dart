@@ -1,7 +1,7 @@
 import 'dart:core';
 
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
+import 'package:colla_chat/transport/webrtc/p2p/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';

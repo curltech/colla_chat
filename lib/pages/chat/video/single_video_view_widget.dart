@@ -3,7 +3,7 @@ import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/smart_dialog_util.dart';
-import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
+import 'package:colla_chat/transport/webrtc/p2p/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';

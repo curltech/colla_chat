@@ -8,12 +8,13 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 ///前者代表本地的视频和音频的总共只能有一个，屏幕共享和媒体播放可以有多个
 ///后者代表远程的视频，包含所有的远程视频流的PeerVideoRender
 class VideoRenderController with ChangeNotifier {
-  //当前选择的render
+  //当前选择的界面渲染器
   PeerVideoRender? _currentVideoRender;
 
-  //主视频
+  //主视频对应的界面渲染器
   PeerVideoRender? _mainVideoRender;
 
+  //所有的视频流和对应的界面渲染器
   final Map<String, PeerVideoRender> videoRenders = {};
 
   Map<String, List<Future<void> Function(PeerVideoRender? videoRender)>> fnsm =

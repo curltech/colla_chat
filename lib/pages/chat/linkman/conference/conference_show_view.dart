@@ -1,7 +1,7 @@
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/conference/conference_show_widget.dart';
-import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
+import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -37,7 +37,7 @@ class _ConferenceShowViewState extends State<ConferenceShowView> {
 
   @override
   Widget build(BuildContext context) {
-    var conferenceId = videoConferenceRenderPool.conferenceId;
+    var conferenceId = p2pConferenceClientPool.conferenceId;
     if (conferenceId == null) {
       return Center(
           child: CommonAutoSizeText(
@@ -46,7 +46,7 @@ class _ConferenceShowViewState extends State<ConferenceShowView> {
       ));
     }
     Conference? conference =
-        videoConferenceRenderPool.getConference(conferenceId);
+        p2pConferenceClientPool.getConference(conferenceId);
     var appBarView = AppBarView(
         title: widget.title,
         withLeading: widget.withLeading,

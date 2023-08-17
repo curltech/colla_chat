@@ -6,20 +6,19 @@ import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/group_linkman_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/video/video_view_card.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
-import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
+import 'package:colla_chat/transport/webrtc/p2p/local_video_render_controller.dart';
+import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
-import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -54,9 +53,9 @@ class LocalVideoWidget extends StatefulWidget {
 }
 
 class _LocalVideoWidgetState extends State<LocalVideoWidget> {
-  ValueNotifier<VideoChatMessageController?> videoChatMessageController =
-      ValueNotifier<VideoChatMessageController?>(
-          videoConferenceRenderPool.videoChatMessageController);
+  ValueNotifier<ConferenceChatMessageController?> videoChatMessageController =
+      ValueNotifier<ConferenceChatMessageController?>(
+          p2pConferenceClientPool.videoChatMessageController);
 
   ChatSummary chatSummary = chatMessageController.chatSummary!;
 
@@ -93,7 +92,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     // 本地视频可能在其他地方关闭，所有需要注册关闭事件
     localVideoRenderController.registerVideoRenderOperator(
         VideoRenderOperator.remove.name, _updateVideoRender);
-    videoConferenceRenderPool.addListener(_updateVideoChatMessageController);
+    p2pConferenceClientPool.addListener(_updateVideoChatMessageController);
     _updateVideoChatMessageController();
     _update();
   }
@@ -106,7 +105,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           ChatMessageSubType.chatReceipt.name, _receivedChatReceipt);
     }
     videoChatMessageController =
-        videoConferenceRenderPool.videoChatMessageController;
+        p2pConferenceClientPool.videoChatMessageController;
     if (videoChatMessageController != null) {
       videoChatMessageController.addListener(_updateVideoChatStatus);
       videoChatStatus.value = videoChatMessageController.status;
@@ -383,7 +382,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       }
       return;
     }
-    var videoChatMessageController = VideoChatMessageController();
+    var videoChatMessageController = ConferenceChatMessageController();
     this.videoChatMessageController.value = videoChatMessageController;
     await videoChatMessageController.setChatSummary(chatSummary);
 
@@ -475,7 +474,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     var videoChatMessageController = this.videoChatMessageController.value;
     Conference? conference = videoChatMessageController?.conference;
     if (conference != null) {
-      await videoConferenceRenderPool.removeVideoRender(
+      await p2pConferenceClientPool.removeVideoRender(
           conference.conferenceId, videoRenders);
     }
     await localVideoRenderController.exit();
@@ -653,7 +652,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           } else if (value == VideoChatStatus.end) {
             String? label;
             String? tip;
-            VideoChatMessageController? videoChatMessageController =
+            ConferenceChatMessageController? videoChatMessageController =
                 this.videoChatMessageController.value;
             String? partyType = chatSummary.partyType;
             Conference? conference = videoChatMessageController?.conference;
@@ -727,7 +726,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         videoChatMessageController.conference != null) {
       //在会议中，如果是本地流，先所有的连接中移除
       String conferenceId = videoChatMessageController.conference!.conferenceId;
-      await videoConferenceRenderPool
+      await p2pConferenceClientPool
           .removeVideoRender(conferenceId, [videoRender]);
     }
     localVideoRenderController.close(videoRender);
@@ -773,7 +772,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     videoChatMessageController?.removeListener(_updateVideoChatStatus);
     videoChatMessageController?.unregisterReceiver(
         ChatMessageSubType.chatReceipt.name, _receivedChatReceipt);
-    videoConferenceRenderPool.removeListener(_updateVideoChatMessageController);
+    p2pConferenceClientPool.removeListener(_updateVideoChatMessageController);
     super.dispose();
   }
 }

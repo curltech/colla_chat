@@ -10,7 +10,7 @@ import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/index/adaptive_layout_index.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
@@ -27,7 +27,7 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
-import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
+import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
@@ -60,7 +60,7 @@ class _IndexViewState extends State<IndexView>
   final ValueNotifier<bool> chatMessageVisible = ValueNotifier<bool>(false);
   final CustomSpecialTextSpanBuilder customSpecialTextSpanBuilder =
       CustomSpecialTextSpanBuilder();
-  VideoChatMessageController? videoChatMessageController;
+  ConferenceChatMessageController? videoChatMessageController;
   BlueFireAudioPlayer? audioPlayer;
 
   //JustAudioPlayer audioPlayer = JustAudioPlayer();
@@ -230,11 +230,11 @@ class _IndexViewState extends State<IndexView>
       //新的视频邀请消息到来，创建新的视频消息控制器，原来的如果存在，新的将被忽视，占线
       if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
         if (videoChatMessageController == null) {
-          videoChatMessageController = VideoChatMessageController();
+          videoChatMessageController = ConferenceChatMessageController();
           await videoChatMessageController!.setChatMessage(chatMessage);
           videoChatMessageVisible.value = true;
         } else {
-          var videoChatMessageController = VideoChatMessageController();
+          var videoChatMessageController = ConferenceChatMessageController();
           await videoChatMessageController.setChatMessage(chatMessage);
           await videoChatMessageController
               .sendChatReceipt(MessageReceiptType.busy);
@@ -375,7 +375,7 @@ class _IndexViewState extends State<IndexView>
     buttons.add(holdButton);
 
     ///立即接听按钮只有当前不在会议中，而且是个人或者群模式才可以
-    if (videoConferenceRenderPool.conferenceId == null &&
+    if (p2pConferenceClientPool.conferenceId == null &&
         chatMessage.groupType != PartyType.conference.name) {
       buttons.add(acceptedButton);
     }

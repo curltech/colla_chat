@@ -1,32 +1,28 @@
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
-import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
-import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
+import 'package:colla_chat/transport/webrtc/p2p/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 ///视频会议控制器，代表一个正在进行的视频会议，
-///包含一个必须的视频会议消息控制器和一个会议内的所有的webrtc连接及其包含的远程视频，
+///包含一个必须的视频会议消息控制器和一个会议内的所有的webrtc连接及其包含的远程视频渲染器，
 ///这些连接与自己正在视频通话
-class RemoteVideoRenderController extends VideoRenderController {
+class P2pConferenceClient extends VideoRenderController {
   final Key key = UniqueKey();
 
   //根据peerId和clientId对应的所有的webrtc连接
   final Map<String, AdvancedPeerConnection> _peerConnections = {};
 
-  //根据peerId和clientId的连接所对应的视频render控制器，每一个视频render控制器包含多个视频render
-  //Map<String, VideoRenderController> videoRenderControllers = {};
+  //会议的视频消息控制器，是创建会议的邀请消息，包含会议的信息
+  final ConferenceChatMessageController conferenceChatMessageController;
 
-  //总的视频消息控制器，是所有连接对应的远程流的汇总控制器
-  final VideoChatMessageController videoChatMessageController;
-
-  RemoteVideoRenderController({required this.videoChatMessageController});
+  P2pConferenceClient({required this.conferenceChatMessageController});
 
   String _getKey(String peerId, String clientId) {
     var key = '$peerId:$clientId';
@@ -271,21 +267,21 @@ class RemoteVideoRenderController extends VideoRenderController {
 }
 
 ///所有的正在视频会议的池，包含多个视频会议，每个会议的会议号是视频通话邀请的消息号
-class VideoConferenceRenderPool with ChangeNotifier {
-  Map<String, RemoteVideoRenderController> remoteVideoRenderControllers = {};
+class P2pConferenceClientPool with ChangeNotifier {
+  Map<String, P2pConferenceClient> remoteVideoRenderControllers = {};
   String? _conferenceId;
 
-  VideoConferenceRenderPool();
+  P2pConferenceClientPool();
 
   ///根据当前的视频邀请消息，查找或者创建当前消息对应的会议，并设置为当前会议
   Future<void> createVideoChatMessageController(
       ChatSummary chatSummary, ChatMessage chatMessage) async {
     //创建基于当前聊天的视频消息控制器
     if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-      VideoChatMessageController? videoChatMessageController =
+      ConferenceChatMessageController? videoChatMessageController =
           getVideoChatMessageController(chatMessage.messageId!);
       if (videoChatMessageController == null) {
-        videoChatMessageController = VideoChatMessageController();
+        videoChatMessageController = ConferenceChatMessageController();
         await videoChatMessageController.setChatSummary(chatSummary);
         await videoChatMessageController.setChatMessage(chatMessage);
         createRemoteVideoRenderController(videoChatMessageController);
@@ -317,7 +313,7 @@ class VideoConferenceRenderPool with ChangeNotifier {
   }
 
   ///获取当前房间的控制器
-  RemoteVideoRenderController? get remoteVideoRenderController {
+  P2pConferenceClient? get remoteVideoRenderController {
     if (_conferenceId != null) {
       return remoteVideoRenderControllers[_conferenceId];
     }
@@ -325,42 +321,41 @@ class VideoConferenceRenderPool with ChangeNotifier {
   }
 
   ///获取当前会议控制器
-  VideoChatMessageController? get videoChatMessageController {
+  ConferenceChatMessageController? get videoChatMessageController {
     if (_conferenceId != null) {
       return remoteVideoRenderControllers[_conferenceId]
-          ?.videoChatMessageController;
+          ?.conferenceChatMessageController;
     }
     return null;
   }
 
   ///根据会议号返回会议控制器，没有则返回null
-  RemoteVideoRenderController? getRemoteVideoRenderController(
-      String conferenceId) {
+  P2pConferenceClient? getRemoteVideoRenderController(String conferenceId) {
     return remoteVideoRenderControllers[conferenceId];
   }
 
-  VideoChatMessageController? getVideoChatMessageController(
+  ConferenceChatMessageController? getVideoChatMessageController(
       String conferenceId) {
     return getRemoteVideoRenderController(conferenceId)
-        ?.videoChatMessageController;
+        ?.conferenceChatMessageController;
   }
 
   Conference? getConference(String conferenceId) {
     return getRemoteVideoRenderController(conferenceId)
-        ?.videoChatMessageController
+        ?.conferenceChatMessageController
         .conference;
   }
 
   ///创建新的远程视频会议控制器，假如会议号已经存在，直接返回控制器
   ///在发起者接收到至少一个同意回执，开始重新协商，或者接收者发送出同意回执的时候调用
-  RemoteVideoRenderController createRemoteVideoRenderController(
-      VideoChatMessageController videoChatMessageController) {
+  P2pConferenceClient createRemoteVideoRenderController(
+      ConferenceChatMessageController videoChatMessageController) {
     String conferenceId = videoChatMessageController.conferenceId!;
-    RemoteVideoRenderController? remoteVideoRenderController =
+    P2pConferenceClient? remoteVideoRenderController =
         remoteVideoRenderControllers[conferenceId];
     if (remoteVideoRenderController == null) {
-      remoteVideoRenderController = RemoteVideoRenderController(
-          videoChatMessageController: videoChatMessageController);
+      remoteVideoRenderController = P2pConferenceClient(
+          conferenceChatMessageController: videoChatMessageController);
       remoteVideoRenderControllers[conferenceId] = remoteVideoRenderController;
     }
     this.conferenceId = conferenceId;
@@ -371,7 +366,7 @@ class VideoConferenceRenderPool with ChangeNotifier {
   ///把本地新的videoRender加入到会议的所有连接中，并且都重新协商
   addLocalVideoRender(String conferenceId, List<PeerVideoRender> videoRenders,
       {AdvancedPeerConnection? peerConnection}) async {
-    RemoteVideoRenderController? remoteVideoRenderController =
+    P2pConferenceClient? remoteVideoRenderController =
         remoteVideoRenderControllers[conferenceId];
     if (remoteVideoRenderController != null) {
       await remoteVideoRenderController.addLocalVideoRender(videoRenders,
@@ -382,7 +377,7 @@ class VideoConferenceRenderPool with ChangeNotifier {
   ///会议的指定连接或者所有连接中移除本地或者远程的videoRender，并且都重新协商
   removeVideoRender(String conferenceId, List<PeerVideoRender> videoRenders,
       {AdvancedPeerConnection? peerConnection}) async {
-    RemoteVideoRenderController? remoteVideoRenderController =
+    P2pConferenceClient? remoteVideoRenderController =
         remoteVideoRenderControllers[conferenceId];
     if (remoteVideoRenderController != null) {
       await remoteVideoRenderController.removeVideoRender(videoRenders,
@@ -393,14 +388,14 @@ class VideoConferenceRenderPool with ChangeNotifier {
   ///关闭会议，或者叫退出会议
   ///首先移除所有连接的所有远程流，然后关闭这些流，激活exit事件
   closeConferenceId(String conferenceId) async {
-    RemoteVideoRenderController? remoteVideoRenderController =
+    P2pConferenceClient? remoteVideoRenderController =
         remoteVideoRenderControllers[conferenceId];
     if (remoteVideoRenderController != null) {
       await remoteVideoRenderController.exit();
       remoteVideoRenderControllers.remove(conferenceId);
-      remoteVideoRenderController.videoChatMessageController
+      remoteVideoRenderController.conferenceChatMessageController
           .setChatMessage(null);
-      remoteVideoRenderController.videoChatMessageController
+      remoteVideoRenderController.conferenceChatMessageController
           .setChatSummary(null);
       if (conferenceId == _conferenceId) {
         _conferenceId = null;
@@ -411,5 +406,5 @@ class VideoConferenceRenderPool with ChangeNotifier {
 }
 
 ///存放已经开始的会议，就是发起者接收到至少一个同意回执，开始重新协商，或者接收者发送出同意回执
-final VideoConferenceRenderPool videoConferenceRenderPool =
-    VideoConferenceRenderPool();
+final P2pConferenceClientPool p2pConferenceClientPool =
+    P2pConferenceClientPool();

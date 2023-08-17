@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/video/video_view_card.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
-import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
@@ -25,9 +25,9 @@ class RemoteVideoWidget extends StatefulWidget {
 }
 
 class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
-  ValueNotifier<VideoChatMessageController?> videoChatMessageController =
-      ValueNotifier<VideoChatMessageController?>(
-          videoConferenceRenderPool.videoChatMessageController);
+  ValueNotifier<ConferenceChatMessageController?> videoChatMessageController =
+      ValueNotifier<ConferenceChatMessageController?>(
+          p2pConferenceClientPool.videoChatMessageController);
 
   //控制面板的可见性，包括视频功能按钮和呼叫按钮
   ValueNotifier<bool> controlPanelVisible = ValueNotifier<bool>(true);
@@ -39,7 +39,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   ValueNotifier<List<ActionData>> actionData =
       ValueNotifier<List<ActionData>>([]);
 
-  RemoteVideoRenderController? remoteVideoRenderController;
+  P2pConferenceClient? remoteVideoRenderController;
 
   //控制面板可见性的计时器
   Timer? _hideControlPanelTimer;
@@ -54,10 +54,10 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   ///注册远程流到来或者关闭的监听器
   ///重新计算远程流的数量是否变化，决定是否重新渲染界面
   void _init() {
-    videoConferenceRenderPool.addListener(_updateVideoChatMessageController);
+    p2pConferenceClientPool.addListener(_updateVideoChatMessageController);
     String? conferenceId = videoChatMessageController.value?.conferenceId;
     if (conferenceId != null) {
-      remoteVideoRenderController = videoConferenceRenderPool
+      remoteVideoRenderController = p2pConferenceClientPool
           .getRemoteVideoRenderController(conferenceId);
       if (remoteVideoRenderController != null) {
         remoteVideoRenderController!.registerVideoRenderOperator(
@@ -71,7 +71,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
 
   _updateVideoChatMessageController() {
     videoChatMessageController.value =
-        videoConferenceRenderPool.videoChatMessageController;
+        p2pConferenceClientPool.videoChatMessageController;
     _update();
   }
 
@@ -119,7 +119,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
           remoteVideoRenderController!.videoRenders.values.toList();
       Conference? conference = videoChatMessageController.conference;
       if (conference != null) {
-        videoConferenceRenderPool.removeVideoRender(
+        p2pConferenceClientPool.removeVideoRender(
             conference.conferenceId, videoRenders);
       }
       await remoteVideoRenderController!.exit();
@@ -160,7 +160,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   void _toggleActionCard() {
     int count = 0;
     var videoRoomController =
-        videoConferenceRenderPool.remoteVideoRenderController;
+        p2pConferenceClientPool.remoteVideoRenderController;
     if (videoRoomController != null) {
       count = videoRoomController.videoRenders.length;
     }
@@ -244,8 +244,8 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
     if (videoChatMessageController.conference != null) {
       //在会议中，如果是本地流，先所有的连接中移除
       String conferenceId = videoChatMessageController.conference!.conferenceId;
-      RemoteVideoRenderController? remoteVideoRenderController =
-          videoConferenceRenderPool
+      P2pConferenceClient? remoteVideoRenderController =
+          p2pConferenceClientPool
               .getRemoteVideoRenderController(conferenceId);
       if (remoteVideoRenderController != null) {
         await remoteVideoRenderController.removeVideoRender([videoRender]);
@@ -276,7 +276,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
       remoteVideoRenderController!.unregisterVideoRenderOperator(
           VideoRenderOperator.remove.name, _onRemoveVideoRender);
     }
-    videoConferenceRenderPool.removeListener(_updateVideoChatMessageController);
+    p2pConferenceClientPool.removeListener(_updateVideoChatMessageController);
     super.dispose();
   }
 }

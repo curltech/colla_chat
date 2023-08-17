@@ -1,7 +1,7 @@
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
-import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -124,7 +124,7 @@ class ConferenceShowWidget extends StatelessWidget {
 
   Future<List<TileData>> _buildChatReceipts() async {
     Map<String, Map<String, ChatMessage>> chatReceiptMap =
-        await VideoChatMessageController.findChatReceipts(
+        await ConferenceChatMessageController.findChatReceipts(
             conference.conferenceId);
     List<TileData> tiles = [];
     for (var key in chatReceiptMap.keys) {

@@ -26,7 +26,7 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
+import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
@@ -160,11 +160,11 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     String? partyType = chatSummary?.partyType;
     if (partyType == PartyType.linkman.name) {
       chatMessageController.current = null;
-      videoConferenceRenderPool.conferenceId = null;
+      p2pConferenceClientPool.conferenceId = null;
       indexWidgetProvider.push('video_chat');
     } else if (partyType == PartyType.group.name) {
       chatMessageController.current = null;
-      videoConferenceRenderPool.conferenceId = null;
+      p2pConferenceClientPool.conferenceId = null;
       indexWidgetProvider.push('video_chat');
     } else if (partyType == PartyType.conference.name) {
       if (chatSummary != null) {
@@ -172,7 +172,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         ChatMessage? chatMessage =
             await chatMessageService.findVideoChatChatMessage(groupId);
         if (chatMessage != null) {
-          await videoConferenceRenderPool.createVideoChatMessageController(
+          await p2pConferenceClientPool.createVideoChatMessageController(
               chatSummary, chatMessage);
           indexWidgetProvider.push('video_chat');
         }

@@ -1,9 +1,9 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
+import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -24,7 +24,7 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
   @override
   initState() {
     super.initState();
-    videoConferenceRenderPool.addListener(_update);
+    p2pConferenceClientPool.addListener(_update);
     _buildConferenceTileData();
   }
 
@@ -33,14 +33,14 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
   }
 
   _buildConferenceTileData() {
-    Map<String, RemoteVideoRenderController> remoteVideoRenderControllers =
-        videoConferenceRenderPool.remoteVideoRenderControllers;
+    Map<String, P2pConferenceClient> remoteVideoRenderControllers =
+        p2pConferenceClientPool.remoteVideoRenderControllers;
     List<TileData> tiles = [];
     if (remoteVideoRenderControllers.isNotEmpty) {
       for (var remoteVideoRenderController
           in remoteVideoRenderControllers.values) {
-        VideoChatMessageController videoChatMessageController =
-            remoteVideoRenderController.videoChatMessageController;
+        ConferenceChatMessageController videoChatMessageController =
+            remoteVideoRenderController.conferenceChatMessageController;
         Conference? conference = videoChatMessageController.conference;
         if (conference == null) {
           continue;
@@ -54,7 +54,7 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
             title: conferenceName,
             titleTail: conferenceOwnerName,
             subtitle: topic,
-            selected: videoConferenceRenderPool.conferenceId == conferenceId,
+            selected: p2pConferenceClientPool.conferenceId == conferenceId,
             isThreeLine: false,
             routeName: 'conference_show');
         List<TileData> slideActions = [];
@@ -62,8 +62,8 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
             title: 'Delete',
             prefix: Icons.playlist_remove_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
-              videoConferenceRenderPool.closeConferenceId(conferenceId);
-              videoConferenceRenderPool.conferenceId = null;
+              p2pConferenceClientPool.closeConferenceId(conferenceId);
+              p2pConferenceClientPool.conferenceId = null;
               if (mounted) {
                 DialogUtil.info(context,
                     content:
@@ -104,7 +104,7 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
 
   @override
   void dispose() {
-    videoConferenceRenderPool.removeListener(_update);
+    p2pConferenceClientPool.removeListener(_update);
     super.dispose();
   }
 }
