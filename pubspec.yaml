@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.2.0+1
 
 environment:
-  sdk: '>=2.19.4 <3.0.0'
+  sdk: '>=2.19.4 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -371,8 +371,9 @@ dependency_overrides:
   photo_view: ^0.14.0
   device_info_plus: ^9.0.2
   ffi: ^2.0.1
-  flutter_ion: ^1.0.0
+  livekit_client: ^1.4.3 #livekit sfu server flutter client
   flutter_webrtc: ^0.9.40
+  protobuf: ^3.1.0
   analyzer: ^6.0.0
   provider: ^6.0.1
   geolocator: ^9.0.2
