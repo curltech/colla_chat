@@ -385,14 +385,12 @@ class FluentWidgetFactory extends WidgetFactory {
     ToggleSwitchThemeData? style,
     Widget? content,
     String? semanticLabel,
-    Widget? thumb,
     FocusNode? focusNode,
     bool autofocus = false,
   }) {
     return ToggleSwitch(
       key: key,
       style: style,
-      thumb: thumb,
       onChanged: onChanged,
       checked: checked,
     );
@@ -496,8 +494,8 @@ class FluentWidgetFactory extends WidgetFactory {
     bool debugShowCheckedModeBanner = true,
     Map<LogicalKeySet, Intent>? shortcuts,
     Map<Type, Action<Intent>>? actions,
-    ThemeData? theme,
-    ThemeData? darkTheme,
+    FluentThemeData? theme,
+    FluentThemeData? darkTheme,
     ThemeMode? themeMode,
     String? restorationScopeId,
     ScrollBehavior scrollBehavior = const FluentScrollBehavior(),
