@@ -1,5 +1,6 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/media_stream_util.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
@@ -39,6 +40,7 @@ class MediaRenderView extends StatefulWidget {
 
 class _MediaRenderViewState extends State<MediaRenderView> {
   RTCVideoRenderer renderer = RTCVideoRenderer();
+  ValueNotifier<bool> readyRenderer = ValueNotifier<bool>(false);
 
   @override
   initState() {
@@ -52,6 +54,7 @@ class _MediaRenderViewState extends State<MediaRenderView> {
     await renderer.initialize();
     renderer.srcObject = widget.mediaStream;
     this.renderer = renderer;
+    readyRenderer.value = true;
   }
 
   close() {
@@ -97,10 +100,18 @@ class _MediaRenderViewState extends State<MediaRenderView> {
   Widget _buildVideoView() {
     Widget? videoView;
     var renderer = this.renderer;
-    videoView = RTCVideoView(renderer,
-        objectFit: widget.objectFit,
-        mirror: widget.mirror,
-        filterQuality: widget.filterQuality);
+    videoView = ValueListenableBuilder(
+        valueListenable: readyRenderer,
+        builder: (BuildContext context, bool readyRenderer, Widget? child) {
+          if (readyRenderer) {
+            return RTCVideoView(renderer,
+                objectFit: widget.objectFit,
+                mirror: widget.mirror,
+                filterQuality: widget.filterQuality);
+          }
+          return LoadingUtil.buildCircularLoadingWidget();
+        });
+
     if (widget.audio && !widget.video) {
       videoView = Stack(children: [
         const Center(
