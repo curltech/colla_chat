@@ -13,10 +13,10 @@ import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
-import 'package:colla_chat/transport/webrtc/p2p/local_video_render_controller.dart';
+import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
-import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
+import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter/material.dart';
 
 enum VideoChatStatus {
@@ -387,7 +387,7 @@ class ConferenceChatMessageController with ChangeNotifier {
       logger.i('send video chatMessage ${chatMessage.messageId}');
     }
     await setChatMessage(chatMessage!);
-    p2pConferenceClientPool.createRemoteVideoRenderController(this);
+    p2pConferenceClientPool.createP2pConferenceClient(this);
     status = VideoChatStatus.calling;
 
     return chatMessage;
@@ -511,10 +511,10 @@ class ConferenceChatMessageController with ChangeNotifier {
 
   ///在会议创建后，打开本地视频，如果存在则直接返回，
   ///否则在linkman模式下自动创建，会议和群模式根据auto参数决定是否自动创建
-  openLocalMainVideoRender() async {
-    PeerVideoRender? mainVideoRender =
-        localVideoRenderController.mainVideoRender;
-    if (mainVideoRender != null) {
+  openLocalMainPeerMediaStream() async {
+    PeerMediaStream? mainPeerMediaStream =
+        localPeerMediaStreamController.mainPeerMediaStream;
+    if (mainPeerMediaStream != null) {
       return;
     } else {
       if (chatSummary == null) {
@@ -523,41 +523,41 @@ class ConferenceChatMessageController with ChangeNotifier {
       }
       var partyType = chatSummary!.partyType!;
       if (partyType == PartyType.linkman.name) {
-        await localVideoRenderController
-            .openLocalMainVideoRender(_conference!.video);
+        await localPeerMediaStreamController
+            .openLocalMainPeerMediaStream(_conference!.video);
       } else {
         if (auto) {
           //如果本地主视频存在，直接返回
-          await localVideoRenderController
-              .openLocalMainVideoRender(_conference!.video);
+          await localPeerMediaStreamController
+              .openLocalMainPeerMediaStream(_conference!.video);
         }
       }
     }
   }
 
   ///在视频会议中增加本地视频到所有连接
-  addLocalVideoRender(PeerVideoRender videoRender) async {
+  addLocalPeerMediaStream(PeerMediaStream peerMediaStream) async {
     if (_conference != null && _status == VideoChatStatus.chatting) {
       await p2pConferenceClientPool
-          .addLocalVideoRender(_conference!.conferenceId, [videoRender]);
+          .addLocalPeerMediaStream(_conference!.conferenceId, [peerMediaStream]);
     }
   }
 
   ///在视频会议中增加多个本地视频到所有连接
-  addLocalVideoRenders() async {
+  addLocalPeerMediaStreams() async {
     if (_conference != null && _status == VideoChatStatus.chatting) {
-      var videoRenders =
-          localVideoRenderController.videoRenders.values.toList();
-      await p2pConferenceClientPool.addLocalVideoRender(
-          _conference!.conferenceId, videoRenders);
+      var peerMediaStreams =
+          localPeerMediaStreamController.peerMediaStreams.values.toList();
+      await p2pConferenceClientPool.addLocalPeerMediaStream(
+          _conference!.conferenceId, peerMediaStreams);
     }
   }
 
   ///在视频会议中删除本地视频到所有连接
-  removeVideoRender(PeerVideoRender videoRender) async {
+  removePeerMediaStream(PeerMediaStream peerMediaStream) async {
     if (_conference != null && _status == VideoChatStatus.chatting) {
       await p2pConferenceClientPool
-          .removeVideoRender(_conference!.conferenceId, [videoRender]);
+          .removePeerMediaStream(_conference!.conferenceId, [peerMediaStream]);
     }
   }
 
@@ -675,15 +675,15 @@ class ConferenceChatMessageController with ChangeNotifier {
     );
     //与发送者的连接存在，将本地的视频render加入连接中
     if (advancedPeerConnection != null) {
-      P2pConferenceClient? remoteVideoRenderController =
-          p2pConferenceClientPool.getRemoteVideoRenderController(messageId);
-      if (remoteVideoRenderController != null) {
-        remoteVideoRenderController
+      P2pConferenceClient? p2pConferenceClient =
+          p2pConferenceClientPool.getP2pConferenceClient(messageId);
+      if (p2pConferenceClient != null) {
+        p2pConferenceClient
             .removeAdvancedPeerConnection(advancedPeerConnection);
-        Map<String, PeerVideoRender> videoRenders =
-            localVideoRenderController.getVideoRenders();
-        remoteVideoRenderController.removeVideoRender(
-            videoRenders.values.toList(),
+        Map<String, PeerMediaStream> peerMediaStreams =
+            localPeerMediaStreamController.getPeerMediaStreams();
+        p2pConferenceClient.removePeerMediaStream(
+            peerMediaStreams.values.toList(),
             peerConnection: advancedPeerConnection);
       }
     } else {
@@ -722,15 +722,15 @@ class ConferenceChatMessageController with ChangeNotifier {
     );
     //将发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
     if (advancedPeerConnection != null) {
-      P2pConferenceClient remoteVideoRenderController =
-          p2pConferenceClientPool.createRemoteVideoRenderController(this);
-      remoteVideoRenderController
+      P2pConferenceClient p2pConferenceClient =
+          p2pConferenceClientPool.createP2pConferenceClient(this);
+      p2pConferenceClient
           .addAdvancedPeerConnection(advancedPeerConnection);
       //把本地视频加入连接中，然后重新协商
-      List<PeerVideoRender> videoRenders =
-          localVideoRenderController.getVideoRenders().values.toList();
-      if (videoRenders.isNotEmpty) {
-        await remoteVideoRenderController.addLocalVideoRender(videoRenders,
+      List<PeerMediaStream> peerMediaStreams =
+          localPeerMediaStreamController.getPeerMediaStreams().values.toList();
+      if (peerMediaStreams.isNotEmpty) {
+        await p2pConferenceClient.addLocalPeerMediaStream(peerMediaStreams,
             peerConnection: advancedPeerConnection);
       }
     } else {
@@ -749,18 +749,18 @@ class ConferenceChatMessageController with ChangeNotifier {
     );
     //将发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
     if (advancedPeerConnection != null) {
-      P2pConferenceClient? remoteVideoRenderController =
+      P2pConferenceClient? p2pConferenceClient =
           p2pConferenceClientPool
-              .getRemoteVideoRenderController(_conference!.conferenceId);
-      if (remoteVideoRenderController != null) {
-        remoteVideoRenderController
+              .getP2pConferenceClient(_conference!.conferenceId);
+      if (p2pConferenceClient != null) {
+        p2pConferenceClient
             .removeAdvancedPeerConnection(advancedPeerConnection);
 
         //把本地视频加入连接中，然后重新协商
-        Map<String, PeerVideoRender> videoRenders =
-            localVideoRenderController.getVideoRenders();
-        await remoteVideoRenderController.removeVideoRender(
-            videoRenders.values.toList(),
+        Map<String, PeerMediaStream> peerMediaStreams =
+            localPeerMediaStreamController.getPeerMediaStreams();
+        await p2pConferenceClient.removePeerMediaStream(
+            peerMediaStreams.values.toList(),
             peerConnection: advancedPeerConnection);
       }
     } else {
@@ -777,10 +777,10 @@ class ConferenceChatMessageController with ChangeNotifier {
   ///自己主动加入，包含加本地视频和将会议的每个参与者加入会议中两步，对会议的参与者的所以连接操作
   ///每一个新加入的会议是池中的当前会议
   joinConference() async {
-    await openLocalMainVideoRender();
+    await openLocalMainPeerMediaStream();
     //创建新的视频会议控制器
-    P2pConferenceClient remoteVideoRenderController =
-        p2pConferenceClientPool.createRemoteVideoRenderController(this);
+    P2pConferenceClient p2pConferenceClient =
+        p2pConferenceClientPool.createP2pConferenceClient(this);
     List<String>? participants = conference!.participants;
     if (participants != null && participants.isNotEmpty) {
       //将所有的参与者的连接加入会议控制器，自己除外
@@ -792,11 +792,11 @@ class ConferenceChatMessageController with ChangeNotifier {
             peerConnectionPool.get(participant);
         if (peerConnections.isNotEmpty) {
           AdvancedPeerConnection peerConnection = peerConnections[0];
-          remoteVideoRenderController.addAdvancedPeerConnection(peerConnection);
+          p2pConferenceClient.addAdvancedPeerConnection(peerConnection);
           //把本地视频加入会议的所有连接中，然后重新协商
-          List<PeerVideoRender> videoRenders =
-              localVideoRenderController.getVideoRenders().values.toList();
-          await remoteVideoRenderController.addLocalVideoRender(videoRenders);
+          List<PeerMediaStream> peerMediaStreams =
+              localPeerMediaStreamController.getPeerMediaStreams().values.toList();
+          await p2pConferenceClient.addLocalPeerMediaStream(peerMediaStreams);
         } else {
           logger.e('participant $participant has no peerConnections');
         }

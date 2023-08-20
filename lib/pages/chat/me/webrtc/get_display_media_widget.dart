@@ -2,7 +2,8 @@ import 'dart:core';
 
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
+import 'package:colla_chat/transport/webrtc/media_render_view.dart';
+import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
@@ -30,7 +31,7 @@ class GetDisplayMediaWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
-  PeerVideoRender peerVideoRenderer = PeerVideoRender();
+  PeerMediaStream peerMediaStream = PeerMediaStream();
   bool _inCalling = false;
   DesktopCapturerSource? selectedSource;
 
@@ -56,10 +57,8 @@ class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
     });
 
     try {
-      await peerVideoRenderer.createDisplayMedia(
+      await peerMediaStream.buildDisplayMedia('',
           selectedSource: selectedSource);
-      await peerVideoRenderer.enumerateDevices();
-      await peerVideoRenderer.bindRTCVideoRender();
       // var stream =
       //     await navigator.mediaDevices.getDisplayMedia(<String, dynamic>{
       //   'video': selectedSource == null
@@ -85,7 +84,7 @@ class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
 
   void _hangUp() async {
     try {
-      peerVideoRenderer.close();
+      peerMediaStream.close();
       setState(() {
         _inCalling = false;
       });
@@ -109,7 +108,8 @@ class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
             width: width,
             height: height,
             decoration: const BoxDecoration(color: Colors.black),
-            child: peerVideoRenderer.createVideoView(
+            child: MediaRenderView(
+              mediaStream: peerMediaStream.mediaStream!,
               width: width,
               height: height,
             ),

@@ -33,14 +33,14 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
   }
 
   _buildConferenceTileData() {
-    Map<String, P2pConferenceClient> remoteVideoRenderControllers =
-        p2pConferenceClientPool.remoteVideoRenderControllers;
+    Map<String, P2pConferenceClient> p2pConferenceClients =
+        p2pConferenceClientPool.p2pConferenceClients;
     List<TileData> tiles = [];
-    if (remoteVideoRenderControllers.isNotEmpty) {
-      for (var remoteVideoRenderController
-          in remoteVideoRenderControllers.values) {
+    if (p2pConferenceClients.isNotEmpty) {
+      for (var p2pConferenceClient
+          in p2pConferenceClients.values) {
         ConferenceChatMessageController videoChatMessageController =
-            remoteVideoRenderController.conferenceChatMessageController;
+            p2pConferenceClient.conferenceChatMessageController;
         Conference? conference = videoChatMessageController.conference;
         if (conference == null) {
           continue;

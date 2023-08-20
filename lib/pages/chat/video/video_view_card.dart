@@ -1,18 +1,18 @@
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/video/single_video_view_widget.dart';
-import 'package:colla_chat/transport/webrtc/p2p/local_video_render_controller.dart';
-import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
+import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controller.dart';
+import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter/material.dart';
 
 ///多个小视频窗口的排列
 class VideoViewCard extends StatefulWidget {
-  final VideoRenderController videoRenderController;
+  final PeerMediaStreamController peerMediaStreamController;
   final Conference? conference;
-  final Function(PeerVideoRender render) onClosed;
+  final Function(PeerMediaStream peerMediaStream) onClosed;
 
   const VideoViewCard(
       {Key? key,
-      required this.videoRenderController,
+      required this.peerMediaStreamController,
       required this.onClosed,
       this.conference})
       : super(key: key);
@@ -25,7 +25,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
   @override
   initState() {
     super.initState();
-    widget.videoRenderController.addListener(_update);
+    widget.peerMediaStreamController.addListener(_update);
   }
 
   _update() {
@@ -35,19 +35,19 @@ class _VideoViewCardState extends State<VideoViewCard> {
   }
 
   Widget _buildVideoViews(BuildContext context, BoxConstraints constraints) {
-    List<PeerVideoRender> videoRenders =
-        widget.videoRenderController.videoRenders.values.toList();
+    List<PeerMediaStream> peerMediaStreams =
+        widget.peerMediaStreamController.peerMediaStreams.values.toList();
     int crossAxisCount = 1;
-    if (videoRenders.length > 1) {
+    if (peerMediaStreams.length > 1) {
       crossAxisCount = 2;
     }
     List<Widget> videoViews = [];
-    for (var render in videoRenders) {
+    for (var peerMediaStream in peerMediaStreams) {
       Widget videoView = SingleVideoViewWidget(
-        videoRenderController: widget.videoRenderController,
+        peerMediaStreamController: widget.peerMediaStreamController,
         onClosed: widget.onClosed,
         conference: widget.conference,
-        render: render,
+        peerMediaStream: peerMediaStream,
         // width: size.width,
         // height: size.height,
       );
@@ -84,7 +84,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
 
   @override
   void dispose() {
-    widget.videoRenderController.removeListener(_update);
+    widget.peerMediaStreamController.removeListener(_update);
     super.dispose();
   }
 }

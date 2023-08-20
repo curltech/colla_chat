@@ -45,7 +45,7 @@ class VideoChatWidget extends StatefulWidget with TileDataMixin {
 class _VideoChatWidgetState extends State<VideoChatWidget> {
   ValueNotifier<ConferenceChatMessageController?> videoChatMessageController =
       ValueNotifier<ConferenceChatMessageController?>(
-          p2pConferenceClientPool.videoChatMessageController);
+          p2pConferenceClientPool.conferenceChatMessageController);
   ChatSummary chatSummary = chatMessageController.chatSummary!;
   SwiperController swiperController = SwiperController();
 
@@ -62,7 +62,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
 
   _update() {
     videoChatMessageController.value =
-        p2pConferenceClientPool.videoChatMessageController;
+        p2pConferenceClientPool.conferenceChatMessageController;
   }
 
   ///关闭最小化界面，把本界面显示

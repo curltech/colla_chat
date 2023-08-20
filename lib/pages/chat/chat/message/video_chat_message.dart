@@ -89,7 +89,7 @@ class VideoChatMessage extends StatelessWidget {
                           chatMessageController.chatSummary;
                       if (chatSummary != null) {
                         await p2pConferenceClientPool
-                            .createVideoChatMessageController(
+                            .createConferenceChatMessageController(
                                 chatSummary, chatMessage);
                         indexWidgetProvider.push('video_chat');
                       }

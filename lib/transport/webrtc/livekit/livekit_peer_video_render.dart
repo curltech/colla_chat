@@ -1,36 +1,25 @@
 import 'dart:typed_data';
 
-import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/logger.dart' as logger;
+import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:livekit_client/livekit_client.dart';
 
-final emptyVideoView = Center(
-  child: AppImage.mdAppImage,
-);
-
-enum VideoRenderOperator {
-  create,
-  add,
-  remove,
-  unselected,
-  selected,
-  exit,
-  mute,
-  volume,
-  torch
-}
-
-/// 简单包装webrtc视频流的渲染器，可以构造本地视频流或者传入的视频流
+/// LiveKit简单包装webrtc视频流的渲染器，可以构造本地视频流或者传入的视频流
 /// 视频流绑定渲染器，并创建展示视图
-class PeerVideoRender {
+class LiveKitPeerVideoRender {
   String? id;
   MediaStream? mediaStream;
-  RTCVideoRenderer? renderer;
+  VideoTrack? track;
+  VideoTrackRenderer? renderer;
   MediaRecorder? mediaRecorder;
   List<MediaDeviceInfo>? mediaDevicesList;
+
+  int? _width;
+  int? _height;
 
   //业务相关的数据
   String? peerId;
@@ -40,25 +29,28 @@ class PeerVideoRender {
   bool audio = false;
   bool video = false;
 
-  PeerVideoRender({this.mediaStream}) {
-    if (mediaStream != null) {
-      id = mediaStream!.id;
+  LiveKitPeerVideoRender({this.track}) {
+    if (track != null) {
+      id = track!.mediaStream.id;
+      renderer = VideoTrackRenderer(track!);
     }
   }
 
-  setStream(MediaStream? mediaStream) async {
+  setTrack(VideoTrack? track) async {
     await close();
-    if (mediaStream != null) {
-      this.mediaStream = mediaStream;
-      id = mediaStream.id;
-      bindRTCVideoRender();
+    if (track != null) {
+      this.track = track;
+      mediaStream = track.mediaStream;
+      id = mediaStream!.id;
+      renderer = VideoTrackRenderer(track);
     } else {
-      this.mediaStream = null;
+      this.track = null;
       id = null;
+      renderer = null;
     }
   }
 
-  static Future<PeerVideoRender> fromVideoMedia(
+  static Future<LiveKitPeerVideoRender> fromVideoMedia(
     String peerId, {
     String? clientId,
     String? name,
@@ -67,7 +59,7 @@ class PeerVideoRender {
     double height = 480,
     int frameRate = 30,
   }) async {
-    PeerVideoRender render = PeerVideoRender();
+    LiveKitPeerVideoRender render = LiveKitPeerVideoRender();
     render.peerId = peerId;
     render.clientId = clientId;
     render.name = name;
@@ -82,12 +74,12 @@ class PeerVideoRender {
     return render;
   }
 
-  static Future<PeerVideoRender> fromAudioMedia(
+  static Future<LiveKitPeerVideoRender> fromAudioMedia(
     String peerId, {
     String? clientId,
     String? name,
   }) async {
-    PeerVideoRender render = PeerVideoRender();
+    LiveKitPeerVideoRender render = LiveKitPeerVideoRender();
     render.peerId = peerId;
     render.clientId = clientId;
     render.name = name;
@@ -97,14 +89,14 @@ class PeerVideoRender {
     return render;
   }
 
-  static Future<PeerVideoRender> fromDisplayMedia(
+  static Future<LiveKitPeerVideoRender> fromDisplayMedia(
     String peerId, {
     String? clientId,
     String? name,
     DesktopCapturerSource? selectedSource,
     bool audio = false,
   }) async {
-    PeerVideoRender render = PeerVideoRender();
+    LiveKitPeerVideoRender render = LiveKitPeerVideoRender();
     render.peerId = peerId;
     render.clientId = clientId;
     render.name = name;
@@ -117,18 +109,18 @@ class PeerVideoRender {
     return render;
   }
 
-  static Future<PeerVideoRender> fromMediaStream(
+  static Future<LiveKitPeerVideoRender> fromMediaStream(
     String peerId, {
-    required MediaStream stream,
+    required VideoTrack track,
     String? clientId,
     String? name,
   }) async {
-    PeerVideoRender render = PeerVideoRender();
+    LiveKitPeerVideoRender render = LiveKitPeerVideoRender();
     render.peerId = peerId;
     render.clientId = clientId;
     render.name = name;
-    render.mediaStream = stream;
-    render.id = stream.id;
+    render.track = track;
+    render.id = track.mediaStream.id;
     await render.bindRTCVideoRender();
 
     return render;
@@ -194,7 +186,7 @@ class PeerVideoRender {
         _getDefaultConstraints(width: width, height: height);
     var mediaStream =
         await navigator.mediaDevices.getUserMedia(mediaConstraints);
-    this.mediaStream = mediaStream;
+    track = track;
     id = mediaStream.id;
     this.audio = audio;
     video = true;
@@ -274,38 +266,15 @@ class PeerVideoRender {
 
   //绑定视频流到渲染器
   Future<void> bindRTCVideoRender() async {
-    var mediaStream = this.mediaStream;
-    if (mediaStream != null) {
-      RTCVideoRenderer? renderer = this.renderer;
-      if (renderer == null) {
-        renderer = RTCVideoRenderer();
-        await renderer.initialize();
-        renderer.srcObject = mediaStream;
-        this.renderer = renderer;
-        logger.i('bind VideoRender videoHeight:$height, videoWidth:$width');
-      } else {
-        renderer.srcObject = mediaStream;
-      }
-    } else {
-      RTCVideoRenderer? renderer = this.renderer;
-      if (renderer != null) {
-        renderer.srcObject = null;
-      }
-    }
+    renderer ??= VideoTrackRenderer(track!);
   }
 
   int? get height {
-    if (renderer != null) {
-      return renderer!.videoHeight;
-    }
-    return null;
+    return _height;
   }
 
   int? get width {
-    if (renderer != null) {
-      return renderer!.videoWidth;
-    }
-    return null;
+    return _width;
   }
 
   String? get ownerTag {
@@ -320,26 +289,22 @@ class PeerVideoRender {
     var mediaStream = this.mediaStream;
     if (mediaStream != null) {
       if (mediaStream.ownerTag != 'local') {
-        logger.e('dispose stream:${mediaStream.id} ${mediaStream.ownerTag}');
+        logger.logger
+            .e('dispose stream:${mediaStream.id} ${mediaStream.ownerTag}');
       } else {
-        logger.i('dispose stream:${mediaStream.id} ${mediaStream.ownerTag}');
+        logger.logger
+            .i('dispose stream:${mediaStream.id} ${mediaStream.ownerTag}');
       }
       try {
         await mediaStream.dispose();
       } catch (e) {
-        logger.e('mediaStream.close failure:$e');
+        logger.logger.e('mediaStream.close failure:$e');
       }
       this.mediaStream = null;
       id = null;
     }
     var renderer = this.renderer;
     if (renderer != null) {
-      renderer.srcObject = null;
-      try {
-        renderer.dispose();
-      } catch (e) {
-        logger.e('renderer.dispose failure:$e');
-      }
       this.renderer = null;
     }
   }
@@ -373,7 +338,7 @@ class PeerVideoRender {
   Widget createVideoView({
     RTCVideoViewObjectFit objectFit =
         RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
-    bool mirror = false,
+    VideoViewMirrorMode mirrorMode = VideoViewMirrorMode.auto,
     FilterQuality filterQuality = FilterQuality.low,
     bool fitScreen = false,
     double? width,
@@ -382,9 +347,9 @@ class PeerVideoRender {
   }) {
     Widget? videoView;
     var renderer = this.renderer;
-    if (renderer != null) {
-      videoView = RTCVideoView(renderer,
-          objectFit: objectFit, mirror: mirror, filterQuality: filterQuality);
+    if (renderer == null) {
+      this.renderer =
+          VideoTrackRenderer(track!, fit: objectFit, mirrorMode: mirrorMode);
       if (audio && !video) {
         videoView = Stack(children: [
           const Center(
@@ -393,7 +358,7 @@ class PeerVideoRender {
             color: Colors.white,
             size: 60,
           )),
-          videoView,
+          this.renderer!,
         ]);
       }
     }
@@ -499,7 +464,7 @@ class PeerVideoRender {
   void startRecording({String? filePath}) async {
     if (mediaStream == null) throw 'Stream is not initialized';
     if (platformParams.ios) {
-      logger.e('Recording is not available on iOS');
+      logger.logger.e('Recording is not available on iOS');
       return;
     }
     // TODO(rostopira): request write storage permission

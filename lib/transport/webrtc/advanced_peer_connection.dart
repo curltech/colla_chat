@@ -10,7 +10,7 @@ import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
-import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
+import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 ///基础的PeerConnection之上加入了业务的编号，peerId和clientId，自动进行信号的协商
@@ -85,7 +85,7 @@ class AdvancedPeerConnection {
   Future<bool> init(
       {List<Map<String, String>>? iceServers,
       Uint8List? aesKey,
-      List<PeerVideoRender> localRenders = const []}) async {
+      List<PeerMediaStream> localPeerMediaStreams = const []}) async {
     var myselfPeerId = myself.peerId;
     var myselfClientId = myself.clientId;
     var myselfName = myself.myselfPeer.name;
@@ -99,9 +99,9 @@ class AdvancedPeerConnection {
       return false;
     }
     List<MediaStream> localStreams = [];
-    if (localRenders.isNotEmpty) {
-      for (var localRender in localRenders) {
-        var stream = localRender.mediaStream;
+    if (localPeerMediaStreams.isNotEmpty) {
+      for (var localPeerMediaStream in localPeerMediaStreams) {
+        var stream = localPeerMediaStream.mediaStream;
         if (stream != null) {
           localStreams.add(stream);
         }
@@ -283,9 +283,9 @@ class AdvancedPeerConnection {
   }
 
   ///将本地渲染器包含的流加入连接中，在收到接受视频要求的时候调用
-  Future<bool> addLocalRender(PeerVideoRender render) async {
-    logger.i('addLocalRender ${render.id}');
-    var stream = render.mediaStream;
+  Future<bool> addLocalStream(PeerMediaStream peerMediaStream) async {
+    logger.i('addLocalStream ${peerMediaStream.id}');
+    var stream = peerMediaStream.mediaStream;
     if (stream != null) {
       var success = await basePeerConnection.addLocalStream(stream);
       return success;
@@ -294,31 +294,31 @@ class AdvancedPeerConnection {
   }
 
   ///把渲染器的流连接中删除，然后把渲染器从渲染器集合删除，并关闭
-  removeRender(PeerVideoRender render) async {
-    logger.i('removeRender ${render.id}');
+  removeStream(PeerMediaStream peerMediaStream) async {
+    logger.i('removeStream ${peerMediaStream.id}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    var streamId = render.id;
+    var streamId = peerMediaStream.id;
     if (streamId != null) {
-      if (render.mediaStream != null) {
-        await basePeerConnection.removeStream(render.mediaStream!);
+      if (peerMediaStream.mediaStream != null) {
+        await basePeerConnection.removeStream(peerMediaStream.mediaStream!);
       }
     }
   }
 
   ///把渲染器的流克隆，然后可以当作本地流加入到其他连接中，用于转发
-  Future<MediaStream?> cloneRender(PeerVideoRender render) async {
-    logger.i('removeRender ${render.id}');
+  Future<MediaStream?> cloneStream(PeerMediaStream peerMediaStream) async {
+    logger.i('cloneStream ${peerMediaStream.id}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return null;
     }
-    var streamId = render.id;
+    var streamId = peerMediaStream.id;
     if (streamId != null) {
-      if (render.mediaStream != null) {
-        return await basePeerConnection.cloneStream(render.mediaStream!);
+      if (peerMediaStream.mediaStream != null) {
+        return await basePeerConnection.cloneStream(peerMediaStream.mediaStream!);
       }
     }
     return null;

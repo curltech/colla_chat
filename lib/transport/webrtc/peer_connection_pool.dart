@@ -13,7 +13,7 @@ import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
-import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
+import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:synchronized/extension.dart';
@@ -289,7 +289,7 @@ class PeerConnectionPool {
       {String clientId = unknownClientId,
       Conference? conference,
       List<Map<String, String>>? iceServers,
-      List<PeerVideoRender> localRenders = const []}) async {
+      List<PeerMediaStream> localRenders = const []}) async {
     //如果已经存在，先关闭删除
     AdvancedPeerConnection? peerConnection = getOne(peerId, clientId: clientId);
     if (peerConnection != null) {
@@ -305,7 +305,7 @@ class PeerConnectionPool {
       name = linkman.name;
     }
     bool result = await peerConnection.init(
-        iceServers: iceServers, localRenders: localRenders);
+        iceServers: iceServers, localPeerMediaStreams: localRenders);
     if (!result) {
       logger.e('webrtcPeer.init fail');
       return null;

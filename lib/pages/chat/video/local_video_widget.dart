@@ -15,10 +15,10 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
-import 'package:colla_chat/transport/webrtc/p2p/local_video_render_controller.dart';
+import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
-import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
+import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -55,7 +55,7 @@ class LocalVideoWidget extends StatefulWidget {
 class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ValueNotifier<ConferenceChatMessageController?> videoChatMessageController =
       ValueNotifier<ConferenceChatMessageController?>(
-          p2pConferenceClientPool.videoChatMessageController);
+          p2pConferenceClientPool.conferenceChatMessageController);
 
   ChatSummary chatSummary = chatMessageController.chatSummary!;
 
@@ -90,8 +90,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   void initState() {
     super.initState();
     // 本地视频可能在其他地方关闭，所有需要注册关闭事件
-    localVideoRenderController.registerVideoRenderOperator(
-        VideoRenderOperator.remove.name, _updateVideoRender);
+    localPeerMediaStreamController.registerPeerMediaStreamOperator(
+        PeerMediaStreamOperator.remove.name, _updatePeerMediaStream);
     p2pConferenceClientPool.addListener(_updateVideoChatMessageController);
     _updateVideoChatMessageController();
     _update();
@@ -105,7 +105,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           ChatMessageSubType.chatReceipt.name, _receivedChatReceipt);
     }
     videoChatMessageController =
-        p2pConferenceClientPool.videoChatMessageController;
+        p2pConferenceClientPool.conferenceChatMessageController;
     if (videoChatMessageController != null) {
       videoChatMessageController.addListener(_updateVideoChatStatus);
       videoChatStatus.value = videoChatMessageController.status;
@@ -148,15 +148,15 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
   }
 
-  Future<void> _updateVideoRender(PeerVideoRender? peerVideoRender) async {
+  Future<void> _updatePeerMediaStream(PeerMediaStream? peerMediaStream) async {
     _update();
   }
 
   ///调整界面的显示
   Future<void> _update() async {
     List<ActionData> actionData = [];
-    if (localVideoRenderController.mainVideoRender == null ||
-        !localVideoRenderController.video) {
+    if (localPeerMediaStreamController.mainPeerMediaStream == null ||
+        !localPeerMediaStreamController.video) {
       actionData.add(
         ActionData(
             label: 'Video',
@@ -164,8 +164,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             icon: const Icon(Icons.video_call, color: Colors.white)),
       );
     }
-    if (localVideoRenderController.mainVideoRender == null ||
-        localVideoRenderController.video) {
+    if (localPeerMediaStreamController.mainPeerMediaStream == null ||
+        localPeerMediaStreamController.video) {
       actionData.add(
         ActionData(
           label: 'Audio',
@@ -174,7 +174,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         ),
       );
     }
-    if (localVideoRenderController.mainVideoRender != null) {
+    if (localPeerMediaStreamController.mainPeerMediaStream != null) {
       actionData.add(
         ActionData(
             label: 'Screen share',
@@ -188,7 +188,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     //       tooltip: 'Open media play',
     //       icon: const Icon(Icons.video_file, color: Colors.white)),
     // );
-    if (localVideoRenderController.videoRenders.isNotEmpty) {
+    if (localPeerMediaStreamController.peerMediaStreams.isNotEmpty) {
       actionData.add(
         ActionData(
             label: 'Close',
@@ -200,77 +200,77 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       controlPanelVisible.value = true;
     }
     this.actionData.value = actionData;
-    videoViewCount.value = localVideoRenderController.videoRenders.length;
+    videoViewCount.value = localPeerMediaStreamController.peerMediaStreams.length;
   }
 
   ///创建本地的Video render，支持视频和音频的切换，设置当前videoChatRender，激活create。add和remove监听事件
-  Future<PeerVideoRender?> _openVideoMedia({bool video = true}) async {
+  Future<PeerMediaStream?> _openVideoMedia({bool video = true}) async {
     var videoChatMessageController = this.videoChatMessageController.value;
 
     ///本地视频不存在，可以直接创建，并发送视频邀请消息，否则根据情况觉得是否音视频切换
-    PeerVideoRender? videoRender = localVideoRenderController.mainVideoRender;
-    if (videoRender == null) {
+    PeerMediaStream? peerMediaStream = localPeerMediaStreamController.mainPeerMediaStream;
+    if (peerMediaStream == null) {
       if (video) {
-        videoRender = await localVideoRenderController.createVideoMediaRender();
+        peerMediaStream = await localPeerMediaStreamController.createPeerVideoStream();
       } else {
-        videoRender = await localVideoRenderController.createAudioMediaRender();
+        peerMediaStream = await localPeerMediaStreamController.createPeerAudioStream();
       }
-      await videoChatMessageController?.addLocalVideoRender(videoRender);
+      await videoChatMessageController?.addLocalPeerMediaStream(peerMediaStream);
       _update();
     } else {
       if (video) {
-        if (!localVideoRenderController.video) {
-          await videoChatMessageController?.removeVideoRender(videoRender);
-          await localVideoRenderController.close(videoRender);
-          videoRender =
-              await localVideoRenderController.createVideoMediaRender();
-          await videoChatMessageController?.addLocalVideoRender(videoRender);
+        if (!localPeerMediaStreamController.video) {
+          await videoChatMessageController?.removePeerMediaStream(peerMediaStream);
+          await localPeerMediaStreamController.close(peerMediaStream);
+          peerMediaStream =
+              await localPeerMediaStreamController.createPeerVideoStream();
+          await videoChatMessageController?.addLocalPeerMediaStream(peerMediaStream);
           _update();
         }
       } else {
-        if (localVideoRenderController.video) {
-          await videoChatMessageController?.removeVideoRender(videoRender);
-          await localVideoRenderController.close(videoRender);
-          videoRender =
-              await localVideoRenderController.createAudioMediaRender();
-          await videoChatMessageController?.addLocalVideoRender(videoRender);
+        if (localPeerMediaStreamController.video) {
+          await videoChatMessageController?.removePeerMediaStream(peerMediaStream);
+          await localPeerMediaStreamController.close(peerMediaStream);
+          peerMediaStream =
+              await localPeerMediaStreamController.createPeerAudioStream();
+          await videoChatMessageController?.addLocalPeerMediaStream(peerMediaStream);
           _update();
         }
       }
     }
-    return videoRender;
+    return peerMediaStream;
   }
 
-  Future<PeerVideoRender?> _openDisplayMedia() async {
+  Future<PeerMediaStream?> _openDisplayMedia() async {
     var videoChatMessageController = this.videoChatMessageController.value;
     final source = await DialogUtil.show<DesktopCapturerSource>(
       context: context,
       builder: (context) => Dialog(child: ScreenSelectDialog()),
     );
     if (source != null) {
-      PeerVideoRender videoRender = await localVideoRenderController
-          .createDisplayMediaRender(selectedSource: source);
-      await videoChatMessageController?.addLocalVideoRender(videoRender);
+      PeerMediaStream peerMediaStream = await localPeerMediaStreamController
+          .createPeerDisplayStream(selectedSource: source);
+      await videoChatMessageController?.addLocalPeerMediaStream(peerMediaStream);
       _update();
 
-      return videoRender;
+      return peerMediaStream;
     }
     return null;
   }
 
-  Future<PeerVideoRender?> _openMediaStream(MediaStream stream) async {
+  Future<PeerMediaStream?> _openMediaStream(MediaStream stream) async {
     var videoChatMessageController = this.videoChatMessageController.value;
     ChatMessage? chatMessage = videoChatMessageController?.chatMessage;
     if (chatMessage == null) {
       DialogUtil.error(context, content: AppLocalizations.t('No conference'));
       return null;
     }
-    PeerVideoRender? videoRender =
-        await localVideoRenderController.createMediaStreamRender(stream);
-    await videoChatMessageController?.addLocalVideoRender(videoRender);
+    PeerMediaStream? peerMediaStream =
+        await localPeerMediaStreamController.createPeerMediaStream(stream);
+    await videoChatMessageController?.addLocalPeerMediaStream(peerMediaStream);
     _update();
 
-    return videoRender;
+    return peerMediaStream;
   }
 
   ///选择会议参加人的界面，返回会议参加人
@@ -387,11 +387,11 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     await videoChatMessageController.setChatSummary(chatSummary);
 
     ///根据本地视频决定音视频选项，如果没有则认为是音频
-    PeerVideoRender? mainVideoRender =
-        localVideoRenderController.mainVideoRender;
+    PeerMediaStream? mainPeerMediaStream =
+        localPeerMediaStreamController.mainPeerMediaStream;
     bool video = false;
-    if (mainVideoRender != null) {
-      video = mainVideoRender.video;
+    if (mainPeerMediaStream != null) {
+      video = mainPeerMediaStream.video;
     }
     await videoChatMessageController.buildConference(
         video: video, participants: participants);
@@ -403,7 +403,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       }
     }
 
-    await videoChatMessageController.openLocalMainVideoRender();
+    await videoChatMessageController.openLocalMainPeerMediaStream();
     //发送会议邀请消息
     await videoChatMessageController.inviteWithChatSummary();
     ChatMessage? chatMessage = videoChatMessageController.chatMessage;
@@ -470,14 +470,14 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   ///移除本地所有的视频，这时候还能看远程的视频
   _close() async {
-    var videoRenders = localVideoRenderController.videoRenders.values.toList();
+    var peerMediaStreams = localPeerMediaStreamController.peerMediaStreams.values.toList();
     var videoChatMessageController = this.videoChatMessageController.value;
     Conference? conference = videoChatMessageController?.conference;
     if (conference != null) {
-      await p2pConferenceClientPool.removeVideoRender(
-          conference.conferenceId, videoRenders);
+      await p2pConferenceClientPool.removePeerMediaStream(
+          conference.conferenceId, peerMediaStreams);
     }
-    await localVideoRenderController.exit();
+    await localPeerMediaStreamController.exit();
     _update();
   }
 
@@ -547,7 +547,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   ///切换显示按钮面板
   void _toggleActionCardVisible() {
-    bool visible = localVideoRenderController.videoRenders.isEmpty;
+    bool visible = localPeerMediaStreamController.peerMediaStreams.isEmpty;
     if (visible) {
       controlPanelVisible.value = true;
     } else {
@@ -719,17 +719,17 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         });
   }
 
-  Future<void> _onClosedVideoRender(PeerVideoRender videoRender) async {
-    localVideoRenderController.remove(videoRender);
+  Future<void> _onClosedPeerMediaStream(PeerMediaStream peerMediaStream) async {
+    localPeerMediaStreamController.remove(peerMediaStream);
     var videoChatMessageController = this.videoChatMessageController.value;
     if (videoChatMessageController != null &&
         videoChatMessageController.conference != null) {
       //在会议中，如果是本地流，先所有的连接中移除
       String conferenceId = videoChatMessageController.conference!.conferenceId;
       await p2pConferenceClientPool
-          .removeVideoRender(conferenceId, [videoRender]);
+          .removePeerMediaStream(conferenceId, [peerMediaStream]);
     }
-    localVideoRenderController.close(videoRender);
+    localPeerMediaStreamController.close(peerMediaStream);
   }
 
   @override
@@ -742,8 +742,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               var videoChatMessageController =
                   this.videoChatMessageController.value;
               return VideoViewCard(
-                videoRenderController: localVideoRenderController,
-                onClosed: _onClosedVideoRender,
+                peerMediaStreamController: localPeerMediaStreamController,
+                onClosed: _onClosedPeerMediaStream,
                 conference: videoChatMessageController?.conference,
               );
             } else {
@@ -766,8 +766,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   @override
   void dispose() {
-    localVideoRenderController.unregisterVideoRenderOperator(
-        VideoRenderOperator.remove.name, _updateVideoRender);
+    localPeerMediaStreamController.unregisterPeerMediaStreamOperator(
+        PeerMediaStreamOperator.remove.name, _updatePeerMediaStream);
     var videoChatMessageController = this.videoChatMessageController.value;
     videoChatMessageController?.removeListener(_updateVideoChatStatus);
     videoChatMessageController?.unregisterReceiver(

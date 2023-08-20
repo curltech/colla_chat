@@ -2,28 +2,29 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/smart_dialog_util.dart';
-import 'package:colla_chat/transport/webrtc/p2p/local_video_render_controller.dart';
-import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
+import 'package:colla_chat/tool/media_stream_util.dart';
+import 'package:colla_chat/transport/webrtc/media_render_view.dart';
+import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controller.dart';
+import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 
-///单个小视频窗口，显示一个视频流的PeerVideoRender，长按出现更大的窗口，带有操作按钮
+///单个小视频窗口，显示一个视频流的PeerpeerMediaStream，长按出现更大的窗口，带有操作按钮
 class SingleVideoViewWidget extends StatefulWidget {
-  final VideoRenderController videoRenderController;
+  final PeerMediaStreamController peerMediaStreamController;
   final Conference? conference;
-  final PeerVideoRender render;
+  final PeerMediaStream peerMediaStream;
   final double? height;
   final double? width;
-  final Function(PeerVideoRender render) onClosed;
+  final Function(PeerMediaStream peerMediaStream) onClosed;
 
   const SingleVideoViewWidget({
     Key? key,
-    required this.videoRenderController,
+    required this.peerMediaStreamController,
     required this.onClosed,
     this.conference,
-    required this.render,
+    required this.peerMediaStream,
     this.height,
     this.width,
   }) : super(key: key);
@@ -44,16 +45,16 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   @override
   initState() {
     super.initState();
-    widget.videoRenderController.registerVideoRenderOperator(
-        VideoRenderOperator.selected.name, _updateSelected);
-    widget.videoRenderController.registerVideoRenderOperator(
-        VideoRenderOperator.unselected.name, _updateSelected);
+    widget.peerMediaStreamController.registerPeerMediaStreamOperator(
+        PeerMediaStreamOperator.selected.name, _updateSelected);
+    widget.peerMediaStreamController.registerPeerMediaStreamOperator(
+        PeerMediaStreamOperator.unselected.name, _updateSelected);
   }
 
-  Future<void> _updateSelected(PeerVideoRender? videoRender) async {
-    if (widget.render.id != null &&
-        videoRender != null &&
-        videoRender.id == widget.render.id) {
+  Future<void> _updateSelected(PeerMediaStream? peerMediaStream) async {
+    if (widget.peerMediaStream.id != null &&
+        peerMediaStream != null &&
+        peerMediaStream.id == widget.peerMediaStream.id) {
       setState(() {});
     }
   }
@@ -69,14 +70,14 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   Widget _buildPopupVideoView() {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    Widget videoView =
-        widget.render.createVideoView(height: height, width: width);
+    Widget mediaRenderView = MediaRenderView(
+        mediaStream: widget.peerMediaStream.mediaStream!, height: height, width: width);
     Widget singleVideoView = Builder(
       builder: (context) => InkWell(
         onLongPress: () async {
           await _showActionCard(context);
         },
-        child: videoView,
+        child: mediaRenderView,
       ),
     );
 
@@ -85,7 +86,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
 
   List<ActionData> _buildVideoActionData() {
     List<ActionData> videoActionData = [];
-    if (widget.videoRenderController.currentVideoRender != null) {
+    if (widget.peerMediaStreamController.currentPeerMediaStream != null) {
       videoActionData.add(
         ActionData(
             label: 'Camera switch',
@@ -176,30 +177,31 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   ///单个视频窗口
   Widget _buildSingleVideoView(
       BuildContext context, double? height, double? width) {
-    String name = widget.render.name ?? '';
-    Widget videoView =
-        widget.render.createVideoView(height: height, width: width);
+    String name = widget.peerMediaStream.name ?? '';
+    Widget mediaRenderView = MediaRenderView(
+        mediaStream: widget.peerMediaStream.mediaStream!, height: height, width: width);
+
     Widget singleVideoView = Builder(
       builder: (context) => InkWell(
         onTap: () async {
           setState(() {
-            widget.videoRenderController.currentVideoRender = widget.render;
+            widget.peerMediaStreamController.currentPeerMediaStream = widget.peerMediaStream;
           });
         },
         onLongPress: () async {
           setState(() {
-            widget.videoRenderController.currentVideoRender = widget.render;
+            widget.peerMediaStreamController.currentPeerMediaStream = widget.peerMediaStream;
           });
           await _showActionCard(context);
         },
-        child: videoView,
+        child: mediaRenderView,
       ),
     );
     var selected = false;
-    if (widget.render.id != null &&
-        widget.videoRenderController.currentVideoRender != null) {
-      selected = widget.render.id ==
-          widget.videoRenderController.currentVideoRender!.id;
+    if (widget.peerMediaStream.id != null &&
+        widget.peerMediaStreamController.currentPeerMediaStream != null) {
+      selected = widget.peerMediaStream.id ==
+          widget.peerMediaStreamController.currentPeerMediaStream!.id;
     }
     return Container(
       decoration: selected
@@ -224,19 +226,20 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
 
   Future<void> _onAction(BuildContext context, int index, String name,
       {String? value}) async {
+    var mediaStream = widget.peerMediaStream.mediaStream!;
     switch (name) {
       case 'Camera switch':
-        await widget.render.switchCamera();
+        await MediaStreamUtil.switchCamera(mediaStream);
         setState(() {});
         break;
       case 'Microphone switch':
         enableSpeaker = false;
-        await widget.render.switchSpeaker(enableSpeaker);
+        await MediaStreamUtil.switchSpeaker(mediaStream, enableSpeaker);
         setState(() {});
         break;
       case 'Speaker switch':
         enableSpeaker = true;
-        await widget.render.switchSpeaker(enableSpeaker);
+        await MediaStreamUtil.switchSpeaker(mediaStream, enableSpeaker);
         setState(() {});
         break;
       case 'Volume increase':
@@ -244,14 +247,14 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         volume = volume > 1 ? 1 : volume;
         enableMute = false;
         setState(() {});
-        await widget.render.setVolume(volume);
+        await MediaStreamUtil.setVolume(mediaStream, volume);
         break;
       case 'Volume decrease':
         volume = volume - 0.1;
         volume = volume < 0 ? 0 : volume;
         enableMute = volume <= 0 ? true : false;
         setState(() {});
-        await widget.render.setVolume(volume);
+        await MediaStreamUtil.setVolume(mediaStream, volume);
         break;
       case 'Volume mute':
         enableMute = !enableMute;
@@ -261,7 +264,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
           volume = 1;
         }
         setState(() {
-          widget.render.setMute(enableMute);
+          MediaStreamUtil.setMute(mediaStream, enableMute);
         });
         break;
       case 'Zoom out':
@@ -289,7 +292,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   }
 
   Future<void> _close() async {
-    widget.onClosed(widget.render);
+    widget.onClosed(widget.peerMediaStream);
   }
 
   @override
@@ -299,10 +302,10 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
 
   @override
   void dispose() {
-    widget.videoRenderController.unregisterVideoRenderOperator(
-        VideoRenderOperator.selected.name, _updateSelected);
-    widget.videoRenderController.unregisterVideoRenderOperator(
-        VideoRenderOperator.unselected.name, _updateSelected);
+    widget.peerMediaStreamController.unregisterPeerMediaStreamOperator(
+        PeerMediaStreamOperator.selected.name, _updateSelected);
+    widget.peerMediaStreamController.unregisterPeerMediaStreamOperator(
+        PeerMediaStreamOperator.unselected.name, _updateSelected);
     super.dispose();
   }
 }

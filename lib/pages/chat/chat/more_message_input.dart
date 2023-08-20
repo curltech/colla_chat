@@ -172,7 +172,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         ChatMessage? chatMessage =
             await chatMessageService.findVideoChatChatMessage(groupId);
         if (chatMessage != null) {
-          await p2pConferenceClientPool.createVideoChatMessageController(
+          await p2pConferenceClientPool.createConferenceChatMessageController(
               chatSummary, chatMessage);
           indexWidgetProvider.push('video_chat');
         }
