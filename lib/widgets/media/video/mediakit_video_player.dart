@@ -7,7 +7,6 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_meedu_videoplayer/meedu_player.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 
@@ -46,8 +45,8 @@ class MediaKitMediaSource {
 class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
   late final Player player;
   late final VideoController videoController;
-  ValueNotifier<MeeduPlayerController?> meeduPlayerController =
-      ValueNotifier<MeeduPlayerController?>(null);
+  // ValueNotifier<MeeduPlayerController?> meeduPlayerController =
+  //     ValueNotifier<MeeduPlayerController?>(null);
 
   double volume = 1.0;
   double speed = 1.0;
@@ -105,7 +104,7 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
     player.stream.pitch.listen((e) {});
     player.stream.buffering.listen((e) {});
 
-    meeduPlayerController.value = MeeduPlayerController();
+    // meeduPlayerController.value = MeeduPlayerController();
   }
 
   @override

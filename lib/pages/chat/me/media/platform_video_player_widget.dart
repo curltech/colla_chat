@@ -57,9 +57,9 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
 
   List<Widget>? _buildRightWidgets() {
     List<bool> isSelected = const [true, false, false, false];
-    if (widget.mediaPlayerController is MeeduVideoPlayerController) {
-      isSelected = const [false, true, false, false];
-    }
+    // if (widget.mediaPlayerController is MeeduVideoPlayerController) {
+    //   isSelected = const [false, true, false, false];
+    // }
     if (widget.mediaPlayerController is MediaKitVideoPlayerController) {
       isSelected = const [false, false, true, false];
     }
@@ -77,7 +77,7 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
           });
         } else if (newIndex == 1) {
           setState(() {
-            widget.mediaPlayerController = globalMeeduVideoPlayerController;
+            // widget.mediaPlayerController = globalMeeduVideoPlayerController;
           });
         } else if (newIndex == 2) {
           setState(() {
