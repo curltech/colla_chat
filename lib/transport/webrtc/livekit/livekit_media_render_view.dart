@@ -1,15 +1,11 @@
-import 'package:colla_chat/constant/base.dart';
-import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/tool/loading_util.dart';
-import 'package:colla_chat/tool/media_stream_util.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
-import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:livekit_client/livekit_client.dart';
 
 /// 媒体流绑定渲染器，并创建展示视图
-class MediaRenderView extends StatefulWidget {
-  final MediaStream mediaStream;
+class LiveKitMediaRenderView extends StatefulWidget {
+  final VideoTrack videoTrack;
   final RTCVideoViewObjectFit objectFit;
   final bool mirror;
   final FilterQuality filterQuality;
@@ -20,9 +16,9 @@ class MediaRenderView extends StatefulWidget {
   final bool audio;
   final bool video;
 
-  const MediaRenderView({
+  const LiveKitMediaRenderView({
     super.key,
-    required this.mediaStream,
+    required this.videoTrack,
     this.objectFit = RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
     this.mirror = false,
     this.filterQuality = FilterQuality.low,
@@ -35,44 +31,13 @@ class MediaRenderView extends StatefulWidget {
   });
 
   @override
-  State createState() => _MediaRenderViewState();
+  State createState() => _LiveKitMediaRenderViewState();
 }
 
-class _MediaRenderViewState extends State<MediaRenderView> {
-  RTCVideoRenderer renderer = RTCVideoRenderer();
-  ValueNotifier<bool> readyRenderer = ValueNotifier<bool>(false);
-
+class _LiveKitMediaRenderViewState extends State<LiveKitMediaRenderView> {
   @override
   initState() {
     super.initState();
-    bindRTCVideoRender();
-  }
-
-  //绑定视频流到渲染器
-  bindRTCVideoRender() async {
-    RTCVideoRenderer renderer = this.renderer;
-    await renderer.initialize();
-    renderer.srcObject = widget.mediaStream;
-    this.renderer = renderer;
-    readyRenderer.value = true;
-  }
-
-  close() {
-    var renderer = this.renderer;
-    renderer.srcObject = null;
-    try {
-      renderer.dispose();
-    } catch (e) {
-      logger.e('renderer.dispose failure:$e');
-    }
-  }
-
-  int? get height {
-    return renderer.videoHeight;
-  }
-
-  int? get width {
-    return renderer.videoWidth;
   }
 
   Widget _buildVideoViewContainer(Widget? child,
@@ -98,19 +63,11 @@ class _MediaRenderViewState extends State<MediaRenderView> {
 
   /// 创建展示视图，纯音频显示图标
   Widget _buildVideoView() {
-    Widget? videoView;
-    var renderer = this.renderer;
-    videoView = ValueListenableBuilder(
-        valueListenable: readyRenderer,
-        builder: (BuildContext context, bool readyRenderer, Widget? child) {
-          if (readyRenderer) {
-            return RTCVideoView(renderer,
-                objectFit: widget.objectFit,
-                mirror: widget.mirror,
-                filterQuality: widget.filterQuality);
-          }
-          return LoadingUtil.buildCircularLoadingWidget();
-        });
+    Widget? videoView = VideoTrackRenderer(widget.videoTrack,
+        fit: widget.objectFit,
+        mirrorMode: widget.mirror
+            ? VideoViewMirrorMode.mirror
+            : VideoViewMirrorMode.off);
 
     if (widget.audio && !widget.video) {
       videoView = Stack(children: [
@@ -123,7 +80,8 @@ class _MediaRenderViewState extends State<MediaRenderView> {
         videoView,
       ]);
     }
-    Widget container = _buildVideoViewContainer(videoView);
+    Widget container = _buildVideoViewContainer(videoView,
+        width: widget.width, height: widget.height);
     if (!widget.fitScreen) {
       return container;
     }
@@ -150,7 +108,6 @@ class _MediaRenderViewState extends State<MediaRenderView> {
 
   @override
   void dispose() {
-    renderer.dispose();
     super.dispose();
   }
 }

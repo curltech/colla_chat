@@ -3,7 +3,7 @@ import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/media_stream_util.dart';
-import 'package:colla_chat/transport/webrtc/media_render_view.dart';
+import 'package:colla_chat/transport/webrtc/p2p/p2p_media_render_view.dart';
 import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -70,7 +70,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   Widget _buildPopupVideoView() {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    Widget mediaRenderView = MediaRenderView(
+    Widget mediaRenderView = P2pMediaRenderView(
         mediaStream: widget.peerMediaStream.mediaStream!, height: height, width: width);
     Widget singleVideoView = Builder(
       builder: (context) => InkWell(
@@ -178,7 +178,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   Widget _buildSingleVideoView(
       BuildContext context, double? height, double? width) {
     String name = widget.peerMediaStream.name ?? '';
-    Widget mediaRenderView = MediaRenderView(
+    Widget mediaRenderView = P2pMediaRenderView(
         mediaStream: widget.peerMediaStream.mediaStream!, height: height, width: width);
 
     Widget singleVideoView = Builder(
