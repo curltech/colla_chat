@@ -134,4 +134,60 @@ class AudioSessionUtil {
       devicesChangedEventStream!(event);
     });
   }
+
+  // void _handleInterruptions(AudioSession audioSession) {
+  //   // just_audio can handle interruptions for us, but we have disabled that in
+  //   // order to demonstrate manual configuration.
+  //   bool playInterrupted = false;
+  //   audioSession.becomingNoisyEventStream.listen((_) {
+  //     print('PAUSE');
+  //     _player.pause();
+  //   });
+  //   _player.playingStream.listen((playing) {
+  //     playInterrupted = false;
+  //     if (playing) {
+  //       audioSession.setActive(true);
+  //     }
+  //   });
+  //   audioSession.interruptionEventStream.listen((event) {
+  //     print('interruption begin: ${event.begin}');
+  //     print('interruption type: ${event.type}');
+  //     if (event.begin) {
+  //       switch (event.type) {
+  //         case AudioInterruptionType.duck:
+  //           if (audioSession.androidAudioAttributes!.usage ==
+  //               AndroidAudioUsage.game) {
+  //             _player.setVolume(_player.volume / 2);
+  //           }
+  //           playInterrupted = false;
+  //           break;
+  //         case AudioInterruptionType.pause:
+  //         case AudioInterruptionType.unknown:
+  //           if (_player.playing) {
+  //             _player.pause();
+  //             playInterrupted = true;
+  //           }
+  //           break;
+  //       }
+  //     } else {
+  //       switch (event.type) {
+  //         case AudioInterruptionType.duck:
+  //           _player.setVolume(min(1.0, _player.volume * 2));
+  //           playInterrupted = false;
+  //           break;
+  //         case AudioInterruptionType.pause:
+  //           if (playInterrupted) _player.play();
+  //           playInterrupted = false;
+  //           break;
+  //         case AudioInterruptionType.unknown:
+  //           playInterrupted = false;
+  //           break;
+  //       }
+  //     }
+  //   });
+  //   audioSession.devicesChangedEventStream.listen((event) {
+  //     print('Devices added: ${event.devicesAdded}');
+  //     print('Devices removed: ${event.devicesRemoved}');
+  //   });
+  // }
 }

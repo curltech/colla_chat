@@ -204,7 +204,8 @@ dependencies:
   crypto: ^3.0.1 #sha
   archive: ^3.3.7
   uuid: 3.0.7
-  local_auth: any
+  local_auth: ^2.1.6
+
   #基本开发工具
   xml: ^6.0.1
   mime: ^1.0.2
@@ -249,7 +250,6 @@ dependencies:
   #flutter_webview_pro: ^3.0.1+4
   #easy_web_view: ^1.6.0
   flutter_widget_from_html: ^0.13.0-alpha.1
-
   any_link_preview: ^3.0.1 #预览link
 
   # 多媒体
@@ -279,15 +279,15 @@ dependencies:
   video_player_macos: ^2.0.1
   video_player_control_panel: ^1.1.0
   chewie: ^1.3.6 #video_player的封装
-  flutter_meedu_videoplayer: ^4.2.18
-  media_kit: ^1.0.2                             # Primary package.
-  media_kit_video: ^1.0.2                       # For video rendering.
-  media_kit_native_event_loop: ^1.0.4            # Support for higher number of concurrent instances & better performance.
-  media_kit_libs_android_video: ^1.0.6           # Android package for video native libraries.
-  media_kit_libs_ios_video: ^1.0.4               # iOS package for video native libraries.
-  media_kit_libs_macos_video: ^1.0.5             # macOS package for video native libraries.
-  media_kit_libs_windows_video: ^1.0.2           # Windows package for video native libraries.
-  media_kit_libs_linux: ^1.0.2
+  flutter_meedu_videoplayer: ^4.2.26
+  media_kit: ^1.1.5                              # Primary package.
+  media_kit_video: ^1.1.6                        # For video rendering.
+  media_kit_native_event_loop: ^1.0.7            # Support for higher number of concurrent instances & better performance.
+  media_kit_libs_android_video: ^1.3.2           # Android package for video native libraries.
+  media_kit_libs_ios_video: ^1.1.3               # iOS package for video native libraries.
+  media_kit_libs_macos_video: ^1.1.3             # macOS package for video native libraries.
+  media_kit_libs_windows_video: ^1.0.7           # Windows package for video native libraries.
+  media_kit_libs_linux: ^1.1.1                   # GNU/Linux dependency package.
   #flutter_meedu_media_kit: ^4.2.14
   #better_player: ^0.0.83 #chewie的封装,ios下有问题
   #fijkplayer: ^0.10.1 #mobile
@@ -297,7 +297,7 @@ dependencies:
   just_waveform: ^0.0.4
   audio_service: ^0.18.9
   just_audio_background: ^0.0.1-beta.9
-  audio_session: ^0.1.13
+  audio_session: ^0.1.16
   flutter_tts: ^3.5.3
   speech_to_text: any
   flutter_image_compress: ^2.0.4
