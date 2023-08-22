@@ -68,7 +68,7 @@ class LiveKitConferenceClient {
     });
     listener.on<TrackSubscribedEvent>((e) {
       if (e.publication.kind == TrackType.VIDEO) {
-        e.publication.videoQuality = VideoQuality.LOW;
+        e.publication.setVideoQuality(VideoQuality.LOW);
       }
     });
     listener
