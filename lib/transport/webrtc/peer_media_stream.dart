@@ -49,9 +49,13 @@ class PeerMediaStream {
     if (mediaStream != null) {
       this.mediaStream = mediaStream;
       id = mediaStream.id;
+      video = mediaStream.getVideoTracks().isNotEmpty;
+      audio = mediaStream.getAudioTracks().isNotEmpty;
     } else {
       this.mediaStream = null;
       id = null;
+      video = false;
+      audio = false;
     }
   }
 
@@ -185,6 +189,8 @@ class PeerMediaStream {
       }
       this.mediaStream = null;
       id = null;
+      audio = false;
+      video = false;
     }
   }
 }

@@ -18,7 +18,7 @@ class PeerMediaStreamController with ChangeNotifier {
   //所有的视频流和对应的界面渲染器
   final Map<String, PeerMediaStream> _peerMediaStreams = {};
 
-  Lock _lock = Lock();
+  final Lock _lock = Lock();
 
   Map<String, List<Future<void> Function(PeerMediaStream? peerMediaStream)>>
       fnsm = {};
@@ -163,7 +163,7 @@ class PeerMediaStreamController with ChangeNotifier {
     });
   }
 
-  ///移除视频渲染器和流，激活remove事件
+  ///移除媒体流，激活remove事件
   remove(PeerMediaStream peerMediaStream) async {
     await _lock.synchronized(() async {
       var streamId = peerMediaStream.id;

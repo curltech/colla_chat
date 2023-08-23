@@ -116,7 +116,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
     }
   }
 
-  ///会议的指定连接或者所有连接中移除本地或者远程的peerMediaStream，并且都重新协商
+  ///会议的指定连接或者所有连接中移除peerMediaStream，并且都重新协商
   removePeerMediaStream(List<PeerMediaStream> peerMediaStreams,
       {AdvancedPeerConnection? peerConnection}) async {
     if (peerConnection != null) {

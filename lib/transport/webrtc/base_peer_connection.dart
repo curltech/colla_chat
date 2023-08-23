@@ -1231,16 +1231,15 @@ class BasePeerConnection {
     RTCPeerConnection? peerConnection = _peerConnection;
     if (peerConnection != null) {
       _existLocal(stream);
+      var tracks = stream.getTracks();
+      for (var track in tracks) {
+        removeTrack(stream, track);
+      }
       // try {
       //   await peerConnection.removeStream(stream);
       // } catch (e) {
       //   logger.e('peer connection removeStream failure, $e');
       // }
-
-      var tracks = stream.getTracks();
-      for (var track in tracks) {
-        removeTrack(stream, track);
-      }
     }
   }
 
