@@ -173,6 +173,7 @@ class PeerMediaStreamController with ChangeNotifier {
 
   ///关闭渲染器和流
   close(PeerMediaStream peerMediaStream) async {
+    await remove(peerMediaStream);
     await peerMediaStream.close();
   }
 

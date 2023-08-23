@@ -186,7 +186,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
     var mediaStream = widget.peerMediaStream.mediaStream;
     if (mediaStream != null) {
       mediaRenderView = P2pMediaRenderView(
-          mediaStream: mediaStream!, height: height, width: width);
+          mediaStream: mediaStream, height: height, width: width);
     }
     Widget singleVideoView = Builder(
       builder: (context) => InkWell(
