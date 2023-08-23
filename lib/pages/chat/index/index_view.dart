@@ -198,6 +198,7 @@ class _IndexViewState extends State<IndexView>
 
   _stop() {
     audioPlayer?.stop();
+    audioPlayer?.release();
   }
 
   ///有新消息到来的时候，一般消息直接显示
@@ -580,6 +581,7 @@ class _IndexViewState extends State<IndexView>
     _intentDataStreamSubscription?.cancel();
     globalWebrtcEventController.onWebrtcSignal = null;
     globalWebrtcEventController.onWebrtcErrorSignal = null;
+    _stop();
     super.dispose();
   }
 }
