@@ -49,11 +49,12 @@ class P2pConferenceClient extends PeerMediaStreamController {
         logger.e('A peerConnection remoteStream is null');
         continue;
       }
-      if (peerMediaStreams.containsKey(stream.id)) {
+      PeerMediaStream? peerMediaStream = await getPeerMediaStream(stream.id);
+      if (peerMediaStream != null) {
         logger.e('A peerConnection remoteStream video stream is exist');
         continue;
       }
-      PeerMediaStream peerMediaStream = PeerMediaStream();
+      peerMediaStream = PeerMediaStream();
       await peerMediaStream.buildMediaStream(stream, peerId,
           clientId: clientId, name: name);
       add(peerMediaStream);
@@ -85,14 +86,12 @@ class P2pConferenceClient extends PeerMediaStreamController {
         logger.e('A peerConnection remoteStream is null');
         continue;
       }
-      if (!peerMediaStreams.containsKey(stream.id)) {
+      PeerMediaStream? peerMediaStream = await getPeerMediaStream(stream.id);
+      if (peerMediaStream == null) {
         logger.e('A peerConnection remoteStream video stream is not exist');
         continue;
       }
-      var peerMediaStream = peerMediaStreams[stream.id];
-      if (peerMediaStream != null) {
-        await remove(peerMediaStream);
-      }
+      await remove(peerMediaStream);
       logger.i(
           'A peerConnection remoteStream video stream ${stream.id} is removed');
     }
@@ -196,7 +195,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
     String name = webrtcEvent.name;
     if (stream != null) {
       String streamId = stream.id;
-      PeerMediaStream? peerMediaStream = peerMediaStreams[streamId];
+      PeerMediaStream? peerMediaStream = await getPeerMediaStream(streamId);
       if (peerMediaStream != null) {
         peerMediaStream.setStream(stream);
         return;
@@ -216,7 +215,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
     MediaStream? stream = data['stream'];
     MediaStreamTrack track = data['track'];
     if (stream != null) {
-      PeerMediaStream? peerMediaStream = peerMediaStreams[stream.id];
+      PeerMediaStream? peerMediaStream = await getPeerMediaStream(stream.id);
       if (peerMediaStream != null) {
         var mediaStream = peerMediaStream.mediaStream;
         if (mediaStream != null) {
@@ -246,18 +245,18 @@ class P2pConferenceClient extends PeerMediaStreamController {
 
   @override
   close(PeerMediaStream peerMediaStream) async {
-    await peerMediaStream.close();
+    await super.close(peerMediaStream);
   }
 
   ///移除并且关闭控制器所有的视频，激活exit事件
   @override
   exit() async {
     //先移除，后关闭
-    var peerMediaStreams = this.peerMediaStreams.values.toList();
-    this.peerMediaStreams.clear();
-    // for (var peerMediaStream in peerMediaStreams) {
-    //   await peerMediaStream.close();
-    // }
+    var peerMediaStreams = getPeerMediaStreams();
+    for (var peerMediaStream in peerMediaStreams.values) {
+      await peerMediaStream.close();
+    }
+    peerMediaStreams.clear();
     currentPeerMediaStream = null;
     mainPeerMediaStream = null;
     await onPeerMediaStreamOperator(PeerMediaStreamOperator.exit.name, null);
@@ -362,7 +361,8 @@ class P2pConferenceClientPool with ChangeNotifier {
   }
 
   ///把本地新的peerMediaStream加入到会议的所有连接中，并且都重新协商
-  addLocalPeerMediaStream(String conferenceId, List<PeerMediaStream> peerMediaStreams,
+  addLocalPeerMediaStream(
+      String conferenceId, List<PeerMediaStream> peerMediaStreams,
       {AdvancedPeerConnection? peerConnection}) async {
     P2pConferenceClient? p2pConferenceClient =
         p2pConferenceClients[conferenceId];
@@ -373,7 +373,8 @@ class P2pConferenceClientPool with ChangeNotifier {
   }
 
   ///会议的指定连接或者所有连接中移除本地或者远程的peerMediaStream，并且都重新协商
-  removePeerMediaStream(String conferenceId, List<PeerMediaStream> peerMediaStreams,
+  removePeerMediaStream(
+      String conferenceId, List<PeerMediaStream> peerMediaStreams,
       {AdvancedPeerConnection? peerConnection}) async {
     P2pConferenceClient? p2pConferenceClient =
         p2pConferenceClients[conferenceId];
@@ -391,10 +392,8 @@ class P2pConferenceClientPool with ChangeNotifier {
     if (p2pConferenceClient != null) {
       await p2pConferenceClient.exit();
       p2pConferenceClients.remove(conferenceId);
-      p2pConferenceClient.conferenceChatMessageController
-          .setChatMessage(null);
-      p2pConferenceClient.conferenceChatMessageController
-          .setChatSummary(null);
+      p2pConferenceClient.conferenceChatMessageController.setChatMessage(null);
+      p2pConferenceClient.conferenceChatMessageController.setChatSummary(null);
       if (conferenceId == _conferenceId) {
         _conferenceId = null;
       }

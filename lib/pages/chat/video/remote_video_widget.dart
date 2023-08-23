@@ -64,7 +64,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
             PeerMediaStreamOperator.add.name, _onAddPeerMediaStream);
         p2pConferenceClient!.registerPeerMediaStreamOperator(
             PeerMediaStreamOperator.remove.name, _onRemovePeerMediaStream);
-        videoViewCount.value = p2pConferenceClient!.peerMediaStreams.length;
+        videoViewCount.value = p2pConferenceClient!.getPeerMediaStreams().length;
       }
     }
   }
@@ -77,13 +77,13 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
 
   Future<void> _onAddPeerMediaStream(PeerMediaStream? peerMediaStream) async {
     if (p2pConferenceClient != null) {
-      videoViewCount.value = p2pConferenceClient!.peerMediaStreams.length;
+      videoViewCount.value = p2pConferenceClient!.getPeerMediaStreams().length;
     }
   }
 
   Future<void> _onRemovePeerMediaStream(PeerMediaStream? peerMediaStream) async {
     if (p2pConferenceClient != null) {
-      videoViewCount.value = p2pConferenceClient!.peerMediaStreams.length;
+      videoViewCount.value = p2pConferenceClient!.getPeerMediaStreams().length;
     }
   }
 
@@ -93,7 +93,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
     if (p2pConferenceClient == null) {
       return;
     }
-    if (p2pConferenceClient!.peerMediaStreams.isNotEmpty) {
+    if (p2pConferenceClient!.getPeerMediaStreams().isNotEmpty) {
       actionData.add(
         ActionData(
             label: 'Close',
@@ -105,7 +105,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
       controlPanelVisible.value = true;
     }
     this.actionData.value = actionData;
-    videoViewCount.value = p2pConferenceClient!.peerMediaStreams.length;
+    videoViewCount.value = p2pConferenceClient!.getPeerMediaStreams().length;
   }
 
   ///移除远程所有的视频，这时候还能看远程的视频
@@ -116,7 +116,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
     }
     if (p2pConferenceClient != null) {
       var peerMediaStreams =
-          p2pConferenceClient!.peerMediaStreams.values.toList();
+          p2pConferenceClient!.getPeerMediaStreams().values.toList();
       Conference? conference = videoChatMessageController.conference;
       if (conference != null) {
         p2pConferenceClientPool.removePeerMediaStream(
@@ -162,7 +162,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
     var videoRoomController =
         p2pConferenceClientPool.p2pConferenceClient;
     if (videoRoomController != null) {
-      count = videoRoomController.peerMediaStreams.length;
+      count = videoRoomController.getPeerMediaStreams().length;
     }
     if (count == 0) {
       controlPanelVisible.value = true;

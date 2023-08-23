@@ -59,7 +59,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
     try {
       await localPeerMediaStreamController.createPeerVideoStream();
       List<PeerMediaStream> renders =
-          localPeerMediaStreamController.peerMediaStreams.values.toList();
+          localPeerMediaStreamController.getPeerMediaStreams().values.toList();
       if (renders.isNotEmpty) {
         peerMediaStream = renders[0];
         await MediaStreamUtil.enumerateDevices();
@@ -141,7 +141,8 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
     if (peerMediaStream!.mediaStream == null) {
       throw 'Stream is not initialized';
     }
-    final frame = await MediaStreamUtil.captureFrame(peerMediaStream!.mediaStream!);
+    final frame =
+        await MediaStreamUtil.captureFrame(peerMediaStream!.mediaStream!);
     if (mounted && frame != null) {
       await showDialog(
           context: context,

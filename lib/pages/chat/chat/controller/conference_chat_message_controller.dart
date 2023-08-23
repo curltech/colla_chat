@@ -547,7 +547,7 @@ class ConferenceChatMessageController with ChangeNotifier {
   addLocalPeerMediaStreams() async {
     if (_conference != null && _status == VideoChatStatus.chatting) {
       var peerMediaStreams =
-          localPeerMediaStreamController.peerMediaStreams.values.toList();
+          localPeerMediaStreamController.getPeerMediaStreams().values.toList();
       await p2pConferenceClientPool.addLocalPeerMediaStream(
           _conference!.conferenceId, peerMediaStreams);
     }

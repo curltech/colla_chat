@@ -2,6 +2,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:synchronized/synchronized.dart';
 
 ///媒体控制器，内部是PeerMediaStream的集合，以流的id为key
 ///LocalPeerMediaStreamController和RemotePeerMediaStreamController是其子类，
@@ -15,7 +16,9 @@ class PeerMediaStreamController with ChangeNotifier {
   PeerMediaStream? _mainPeerMediaStream;
 
   //所有的视频流和对应的界面渲染器
-  final Map<String, PeerMediaStream> peerMediaStreams = {};
+  final Map<String, PeerMediaStream> _peerMediaStreams = {};
+
+  Lock _lock = Lock();
 
   Map<String, List<Future<void> Function(PeerMediaStream? peerMediaStream)>>
       fnsm = {};
@@ -106,10 +109,10 @@ class PeerMediaStreamController with ChangeNotifier {
   Map<String, PeerMediaStream> getPeerMediaStreams(
       {String? peerId, String? clientId}) {
     if (peerId == null && clientId == null) {
-      return this.peerMediaStreams;
+      return _peerMediaStreams;
     }
     Map<String, PeerMediaStream> peerMediaStreams = {};
-    for (var peerMediaStream in this.peerMediaStreams.values) {
+    for (var peerMediaStream in _peerMediaStreams.values) {
       if (peerId != null && peerId == peerMediaStream.peerId) {
         if (clientId != null) {
           if (clientId == peerMediaStream.clientId) {
@@ -142,52 +145,63 @@ class PeerMediaStreamController with ChangeNotifier {
     return streams;
   }
 
+  Future<PeerMediaStream?> getPeerMediaStream(String streamId) async {
+    return await _lock.synchronized(() {
+      return _peerMediaStreams[streamId];
+    });
+  }
+
   ///增加peerMediaStream，激活add事件
-  add(PeerMediaStream peerMediaStream) {
-    var id = peerMediaStream.id;
-    if (id != null && !peerMediaStreams.containsKey(id)) {
-      peerMediaStreams[id] = peerMediaStream;
-      onPeerMediaStreamOperator(
-          PeerMediaStreamOperator.add.name, peerMediaStream);
-    }
+  add(PeerMediaStream peerMediaStream) async {
+    await _lock.synchronized(() {
+      var id = peerMediaStream.id;
+      if (id != null && !_peerMediaStreams.containsKey(id)) {
+        _peerMediaStreams[id] = peerMediaStream;
+        onPeerMediaStreamOperator(
+            PeerMediaStreamOperator.add.name, peerMediaStream);
+      }
+    });
   }
 
   ///移除视频渲染器和流，激活remove事件
   remove(PeerMediaStream peerMediaStream) async {
-    var streamId = peerMediaStream.id;
-    if (streamId != null && peerMediaStreams.containsKey(streamId)) {
-      peerMediaStreams.remove(streamId);
-      if (_currentPeerMediaStream != null &&
-          _currentPeerMediaStream!.id == streamId) {
-        _currentPeerMediaStream = null;
+    await _lock.synchronized(() async {
+      var streamId = peerMediaStream.id;
+      if (streamId != null && _peerMediaStreams.containsKey(streamId)) {
+        _peerMediaStreams.remove(streamId);
+        if (_currentPeerMediaStream != null &&
+            _currentPeerMediaStream!.id == streamId) {
+          _currentPeerMediaStream = null;
+        }
+        if (_mainPeerMediaStream != null &&
+            _mainPeerMediaStream!.id == streamId) {
+          _mainPeerMediaStream = null;
+        }
+        //在流被关闭前调用事件处理
+        await onPeerMediaStreamOperator(
+            PeerMediaStreamOperator.remove.name, peerMediaStream);
       }
-      if (_mainPeerMediaStream != null &&
-          _mainPeerMediaStream!.id == streamId) {
-        _mainPeerMediaStream = null;
-      }
-      //在流被关闭前调用事件处理
-      await onPeerMediaStreamOperator(
-          PeerMediaStreamOperator.remove.name, peerMediaStream);
-    }
+    });
   }
 
   ///关闭渲染器和流
   close(PeerMediaStream peerMediaStream) async {
-    await remove(peerMediaStream);
     await peerMediaStream.close();
   }
 
   ///移除并且关闭控制器所有的视频，激活exit事件
   exit() async {
-    //先移除，后关闭
-    var peerMediaStreams = this.peerMediaStreams.values.toList();
-    this.peerMediaStreams.clear();
-    for (var peerMediaStream in peerMediaStreams) {
-      await peerMediaStream.close();
-    }
-    _currentPeerMediaStream = null;
-    _mainPeerMediaStream = null;
-    await onPeerMediaStreamOperator(PeerMediaStreamOperator.exit.name, null);
+    await _lock.synchronized(() async {
+      //先移除，后关闭
+      var peerMediaStreams = _peerMediaStreams.values.toList();
+      _peerMediaStreams.clear();
+      for (var peerMediaStream in peerMediaStreams) {
+        await peerMediaStream.close();
+      }
+      _currentPeerMediaStream = null;
+      _mainPeerMediaStream = null;
+      await onPeerMediaStreamOperator(PeerMediaStreamOperator.exit.name, null);
+    });
   }
 }
 
@@ -255,7 +269,7 @@ class LocalPeerMediaStreamController extends PeerMediaStreamController {
     MediaStream stream,
   ) async {
     var streamId = stream.id;
-    PeerMediaStream? peerMediaStream = peerMediaStreams[streamId];
+    PeerMediaStream? peerMediaStream = _peerMediaStreams[streamId];
     if (peerMediaStream != null) {
       return peerMediaStream;
     }

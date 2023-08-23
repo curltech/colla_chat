@@ -36,7 +36,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
 
   Widget _buildVideoViews(BuildContext context, BoxConstraints constraints) {
     List<PeerMediaStream> peerMediaStreams =
-        widget.peerMediaStreamController.peerMediaStreams.values.toList();
+        widget.peerMediaStreamController.getPeerMediaStreams().values.toList();
     int crossAxisCount = 1;
     if (peerMediaStreams.length > 1) {
       crossAxisCount = 2;
