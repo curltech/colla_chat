@@ -158,7 +158,9 @@ class LoggerController with ChangeNotifier {
   append(List<String> logs) async {
     if (_logs.length >= 100) {
       await synchronized(() async {
-        _logs.removeRange(0, logs.length);
+        try {
+          _logs.removeRange(0, logs.length);
+        } catch (e) {}
       });
     }
     await synchronized(() async {
