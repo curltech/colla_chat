@@ -246,7 +246,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
 
   @override
   close(PeerMediaStream peerMediaStream) async {
-    //await peerMediaStream.close();
+    await peerMediaStream.close();
   }
 
   ///移除并且关闭控制器所有的视频，激活exit事件
