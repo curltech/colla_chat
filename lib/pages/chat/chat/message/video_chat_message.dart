@@ -65,7 +65,8 @@ class VideoChatMessage extends StatelessWidget {
         : ChatMessageContentType.audio.name;
     Widget actionWidget;
     if (fullScreen) {
-      actionWidget = ConferenceShowWidget(conference: conference);
+      actionWidget =
+          ConferenceShowWidget(hasTitle: false, conference: conference);
 
       return Card(
           elevation: 0,

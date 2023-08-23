@@ -61,8 +61,10 @@ ValueNotifier<Conference?> conferenceNotifier =
 class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
   final FormInputController controller =
       FormInputController(conferenceColumnFieldDefs);
+  final bool hasTitle;
 
-  ConferenceShowWidget({Key? key, Conference? conference}) : super(key: key) {
+  ConferenceShowWidget({Key? key, this.hasTitle = true, Conference? conference})
+      : super(key: key) {
     if (conference != null) {
       conferenceNotifier.value = conference;
     }
@@ -141,7 +143,7 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
           child: Container(
               padding: const EdgeInsets.all(10.0),
               child: FormInputWidget(
-                height: 300,
+                height: 400,
                 controller: controller,
               )));
 
@@ -208,9 +210,12 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
         builder: (BuildContext context, Conference? conference, Widget? child) {
           return _buildConferenceShow(context);
         });
-
+    if (!hasTitle) {
+      return child;
+    }
     var appBarView =
         AppBarView(title: title, withLeading: withLeading, child: child);
+
     return appBarView;
   }
 }
