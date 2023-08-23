@@ -228,6 +228,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         if (!localPeerMediaStreamController.video) {
           await videoChatMessageController
               ?.removePeerMediaStream(peerMediaStream);
+          await localPeerMediaStreamController.remove(peerMediaStream);
           await localPeerMediaStreamController.close(peerMediaStream);
           peerMediaStream =
               await localPeerMediaStreamController.createPeerVideoStream();
@@ -239,6 +240,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         if (localPeerMediaStreamController.video) {
           await videoChatMessageController
               ?.removePeerMediaStream(peerMediaStream);
+          await localPeerMediaStreamController.remove(peerMediaStream);
           await localPeerMediaStreamController.close(peerMediaStream);
           peerMediaStream =
               await localPeerMediaStreamController.createPeerAudioStream();
@@ -745,7 +747,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           .removePeerMediaStream(conferenceId, [peerMediaStream]);
     }
     //流关闭
-    localPeerMediaStreamController.close(peerMediaStream);
+    await localPeerMediaStreamController.remove(peerMediaStream);
+    await localPeerMediaStreamController.close(peerMediaStream);
   }
 
   @override
