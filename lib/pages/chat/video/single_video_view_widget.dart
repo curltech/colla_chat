@@ -80,6 +80,12 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         onLongPress: () async {
           await _showActionCard(context);
         },
+        onDoubleTap: (){
+          _popupDialog.remove();
+          setState(() {
+            enableFullScreen = false;
+          });
+        },
         child: mediaRenderView,
       ),
     );
