@@ -198,10 +198,6 @@ class P2pConferenceClient extends PeerMediaStreamController {
       String streamId = stream.id;
       PeerMediaStream? peerMediaStream = peerMediaStreams[streamId];
       if (peerMediaStream != null) {
-        MediaStream? oldStream = peerMediaStream.mediaStream;
-        if (oldStream != null && oldStream != stream) {
-          oldStream.dispose();
-        }
         peerMediaStream.setStream(stream);
         return;
       }

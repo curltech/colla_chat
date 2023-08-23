@@ -42,8 +42,11 @@ class PeerMediaStream {
 
   ///关闭旧的媒体流，设置新的媒体流，
   setStream(MediaStream? mediaStream) async {
+    if (this.mediaStream == mediaStream) {
+      return;
+    }
     await close();
-    if (mediaStream != null && this.mediaStream != mediaStream) {
+    if (mediaStream != null) {
       this.mediaStream = mediaStream;
       id = mediaStream.id;
     } else {
@@ -170,7 +173,8 @@ class PeerMediaStream {
     var mediaStream = this.mediaStream;
     if (mediaStream != null) {
       if (mediaStream.ownerTag != 'local') {
-        logger.e('dispose stream:${mediaStream.id} ${mediaStream.ownerTag}');
+        logger.i(
+            'dispose non local stream:${mediaStream.id} ${mediaStream.ownerTag}');
       } else {
         logger.i('dispose stream:${mediaStream.id} ${mediaStream.ownerTag}');
       }
