@@ -2,6 +2,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/linkman/conference/conference_show_widget.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -37,8 +38,7 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
         p2pConferenceClientPool.p2pConferenceClients;
     List<TileData> tiles = [];
     if (p2pConferenceClients.isNotEmpty) {
-      for (var p2pConferenceClient
-          in p2pConferenceClients.values) {
+      for (var p2pConferenceClient in p2pConferenceClients.values) {
         ConferenceChatMessageController videoChatMessageController =
             p2pConferenceClient.conferenceChatMessageController;
         Conference? conference = videoChatMessageController.conference;
@@ -56,6 +56,9 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
             subtitle: topic,
             selected: p2pConferenceClientPool.conferenceId == conferenceId,
             isThreeLine: false,
+            onTap: (int index, String title, {String? subtitle}) {
+              conferenceNotifier.value = conference;
+            },
             routeName: 'conference_show');
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(

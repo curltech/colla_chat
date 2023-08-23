@@ -7,7 +7,7 @@ import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/linkman/conference/conference_show_view.dart';
+import 'package:colla_chat/pages/chat/linkman/conference/conference_show_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_add_widget.dart';
 import 'package:colla_chat/platform.dart';
@@ -41,17 +41,17 @@ final DataListController<Conference> conferenceController =
 class LinkmanListWidget extends StatefulWidget with TileDataMixin {
   final LinkmanAddWidget linkmanAddWidget = LinkmanAddWidget();
   final LinkmanEditWidget linkmanEditWidget = LinkmanEditWidget();
-  final ConferenceShowView conferenceShowView = ConferenceShowView();
+  final ConferenceShowWidget conferenceShowWidget = ConferenceShowWidget();
   late final List<TileData> linkmanTileData;
 
   LinkmanListWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(linkmanEditWidget);
     indexWidgetProvider.define(linkmanAddWidget);
-    indexWidgetProvider.define(conferenceShowView);
+    indexWidgetProvider.define(conferenceShowWidget);
     List<TileDataMixin> mixins = [
       linkmanEditWidget,
       linkmanAddWidget,
-      conferenceShowView,
+      conferenceShowWidget,
     ];
     linkmanTileData = TileData.from(mixins);
     for (var tile in linkmanTileData) {

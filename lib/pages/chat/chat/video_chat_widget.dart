@@ -48,6 +48,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
           p2pConferenceClientPool.conferenceChatMessageController);
   ChatSummary chatSummary = chatMessageController.chatSummary!;
   SwiperController swiperController = SwiperController();
+  int index = 0;
 
   @override
   void initState() {
@@ -95,7 +96,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     return Swiper(
       controller: swiperController,
       itemCount: 3,
-      index: 0,
+      index: index,
       itemBuilder: (BuildContext context, int index) {
         Widget view = const LocalVideoWidget();
         if (index == 1) {
@@ -107,7 +108,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
         return view;
       },
       onIndexChanged: (int index) {
-        swiperController.index = index;
+        this.index = index;
       },
     );
   }

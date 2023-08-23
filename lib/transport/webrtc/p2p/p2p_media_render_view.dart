@@ -14,10 +14,10 @@ class P2pMediaRenderView extends StatefulWidget {
   final double? width;
   final double? height;
   final Color? color;
-  final bool audio;
-  final bool video;
+  late final bool audio;
+  late final bool video;
 
-  const P2pMediaRenderView({
+  P2pMediaRenderView({
     super.key,
     required this.mediaStream,
     this.objectFit = RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
@@ -26,10 +26,11 @@ class P2pMediaRenderView extends StatefulWidget {
     this.fitScreen = false,
     this.width,
     this.height,
-    this.audio = true,
-    this.video = true,
     this.color = Colors.black,
-  });
+  }) {
+    audio = mediaStream.getAudioTracks().isNotEmpty;
+    video = mediaStream.getVideoTracks().isNotEmpty;
+  }
 
   @override
   State createState() => _P2pMediaRenderViewState();

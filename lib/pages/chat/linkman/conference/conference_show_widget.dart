@@ -1,11 +1,14 @@
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -51,23 +54,44 @@ final List<ColumnFieldDef> conferenceColumnFieldDefs = [
       prefixIcon: Icon(Icons.pin_end, color: myself.primary)),
 ];
 
+ValueNotifier<Conference?> conferenceNotifier =
+    ValueNotifier<Conference?>(null);
+
 ///显示会议的基本信息，会议成员和会议发起人
-class ConferenceShowWidget extends StatelessWidget {
-  final Conference conference;
+class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
   final FormInputController controller =
       FormInputController(conferenceColumnFieldDefs);
 
-  ConferenceShowWidget({Key? key, required this.conference}) : super(key: key);
+  ConferenceShowWidget({Key? key, Conference? conference}) : super(key: key) {
+    if (conference != null) {
+      conferenceNotifier.value = conference;
+    }
+  }
 
-  //当当前会议改变后，更新数据，局部刷新
+  @override
+  IconData get iconData => Icons.meeting_room_outlined;
+
+  @override
+  String get routeName => 'conference_show';
+
+  @override
+  String get title => 'Conference show';
+
+  @override
+  bool get withLeading => true;
+
+  //当会议改变后，更新数据，局部刷新
   Future<List<Option<String>>> _buildConferenceOptions() async {
     List<Option<String>> options = <Option<String>>[];
-    List<String> participants = conference.participants ?? [];
-    for (String participant in participants) {
-      var linkman = await linkmanService.findCachedOneByPeerId(participant);
-      if (linkman != null) {
-        options.add(Option(linkman.name, linkman.peerId,
-            leading: linkman.avatarImage, hint: linkman.email!));
+    final Conference? conference = conferenceNotifier.value;
+    if (conference != null) {
+      List<String> participants = conference.participants ?? [];
+      for (String participant in participants) {
+        var linkman = await linkmanService.findCachedOneByPeerId(participant);
+        if (linkman != null) {
+          options.add(Option(linkman.name, linkman.peerId,
+              leading: linkman.avatarImage, hint: linkman.email!));
+        }
       }
     }
     return options;
@@ -110,34 +134,43 @@ class ConferenceShowWidget extends StatelessWidget {
 
   //会议信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
-    controller.setValues(JsonUtil.toJson(conference));
-    var formInputWidget = SingleChildScrollView(
-        child: Container(
-            padding: const EdgeInsets.all(10.0),
-            child: FormInputWidget(
-              height: 300,
-              controller: controller,
-            )));
+    final Conference? conference = conferenceNotifier.value;
+    if (conference != null) {
+      controller.setValues(JsonUtil.toJson(conference));
+      var formInputWidget = SingleChildScrollView(
+          child: Container(
+              padding: const EdgeInsets.all(10.0),
+              child: FormInputWidget(
+                height: 300,
+                controller: controller,
+              )));
 
-    return formInputWidget;
+      return formInputWidget;
+    }
+
+    return Center(
+        child: CommonAutoSizeText(AppLocalizations.t('No conference')));
   }
 
   Future<List<TileData>> _buildChatReceipts() async {
-    Map<String, Map<String, ChatMessage>> chatReceiptMap =
-        await ConferenceChatMessageController.findChatReceipts(
-            conference.conferenceId);
     List<TileData> tiles = [];
-    for (var key in chatReceiptMap.keys) {
-      var chatReceipts = chatReceiptMap[key];
-      for (var chatReceipt in chatReceipts!.values) {
-        Linkman? linkman = await linkmanService
-            .findCachedOneByPeerId(chatReceipt.senderPeerId!);
-        var tile = TileData(
-            title: chatReceipt.senderName!,
-            titleTail: key,
-            prefix: linkman?.avatarImage);
+    final Conference? conference = conferenceNotifier.value;
+    if (conference != null) {
+      Map<String, Map<String, ChatMessage>> chatReceiptMap =
+          await ConferenceChatMessageController.findChatReceipts(
+              conference.conferenceId);
+      for (var key in chatReceiptMap.keys) {
+        var chatReceipts = chatReceiptMap[key];
+        for (var chatReceipt in chatReceipts!.values) {
+          Linkman? linkman = await linkmanService
+              .findCachedOneByPeerId(chatReceipt.senderPeerId!);
+          var tile = TileData(
+              title: chatReceipt.senderName!,
+              titleTail: key,
+              prefix: linkman?.avatarImage);
 
-        tiles.add(tile);
+          tiles.add(tile);
+        }
       }
     }
     return tiles;
@@ -170,6 +203,14 @@ class ConferenceShowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _buildConferenceShow(context);
+    Widget child = ValueListenableBuilder(
+        valueListenable: conferenceNotifier,
+        builder: (BuildContext context, Conference? conference, Widget? child) {
+          return _buildConferenceShow(context);
+        });
+
+    var appBarView =
+        AppBarView(title: title, withLeading: withLeading, child: child);
+    return appBarView;
   }
 }
