@@ -1,5 +1,6 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/media_stream_util.dart';
@@ -71,7 +72,9 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     Widget mediaRenderView = P2pMediaRenderView(
-        mediaStream: widget.peerMediaStream.mediaStream!, height: height, width: width);
+        mediaStream: widget.peerMediaStream.mediaStream!,
+        height: height,
+        width: width);
     Widget singleVideoView = Builder(
       builder: (context) => InkWell(
         onLongPress: () async {
@@ -178,19 +181,25 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   Widget _buildSingleVideoView(
       BuildContext context, double? height, double? width) {
     String name = widget.peerMediaStream.name ?? '';
-    Widget mediaRenderView = P2pMediaRenderView(
-        mediaStream: widget.peerMediaStream.mediaStream!, height: height, width: width);
-
+    Widget mediaRenderView =
+        Center(child: CommonAutoSizeText(AppLocalizations.t('No stream')));
+    var mediaStream = widget.peerMediaStream.mediaStream;
+    if (mediaStream != null) {
+      mediaRenderView = P2pMediaRenderView(
+          mediaStream: mediaStream!, height: height, width: width);
+    }
     Widget singleVideoView = Builder(
       builder: (context) => InkWell(
         onTap: () async {
           setState(() {
-            widget.peerMediaStreamController.currentPeerMediaStream = widget.peerMediaStream;
+            widget.peerMediaStreamController.currentPeerMediaStream =
+                widget.peerMediaStream;
           });
         },
         onLongPress: () async {
           setState(() {
-            widget.peerMediaStreamController.currentPeerMediaStream = widget.peerMediaStream;
+            widget.peerMediaStreamController.currentPeerMediaStream =
+                widget.peerMediaStream;
           });
           await _showActionCard(context);
         },
