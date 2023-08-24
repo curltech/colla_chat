@@ -34,11 +34,11 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
   }
 
   _buildConferenceTileData() {
-    Map<String, P2pConferenceClient> p2pConferenceClients =
+    List<P2pConferenceClient> p2pConferenceClients =
         p2pConferenceClientPool.p2pConferenceClients;
     List<TileData> tiles = [];
     if (p2pConferenceClients.isNotEmpty) {
-      for (var p2pConferenceClient in p2pConferenceClients.values) {
+      for (var p2pConferenceClient in p2pConferenceClients) {
         ConferenceChatMessageController videoChatMessageController =
             p2pConferenceClient.conferenceChatMessageController;
         Conference? conference = videoChatMessageController.conference;
@@ -65,7 +65,7 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
             title: 'Delete',
             prefix: Icons.playlist_remove_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
-              p2pConferenceClientPool.closeConferenceId(conferenceId);
+              p2pConferenceClientPool.exitConference(conferenceId);
               p2pConferenceClientPool.conferenceId = null;
               if (mounted) {
                 DialogUtil.info(context,

@@ -751,15 +751,15 @@ class ConferenceChatMessageController with ChangeNotifier {
       P2pConferenceClient? p2pConferenceClient = p2pConferenceClientPool
           .getP2pConferenceClient(_conference!.conferenceId);
       if (p2pConferenceClient != null) {
-        p2pConferenceClient
-            .removeAdvancedPeerConnection(advancedPeerConnection);
-
-        //把本地视频加入连接中，然后重新协商
+        //把本地视频连接中删除，然后重新协商
         Map<String, PeerMediaStream> peerMediaStreams =
             localPeerMediaStreamController.getPeerMediaStreams();
         await p2pConferenceClient.removePeerMediaStream(
             peerMediaStreams.values.toList(),
             peerConnection: advancedPeerConnection);
+
+        p2pConferenceClient
+            .removeAdvancedPeerConnection(advancedPeerConnection);
       }
     } else {
       logger.e('participant $peerId has no peerConnections');
@@ -809,7 +809,7 @@ class ConferenceChatMessageController with ChangeNotifier {
   ///自己主动退出会议，发送exit回执，关闭会议
   exit() async {
     await _sendChatReceipt(MessageReceiptType.exit);
-    await p2pConferenceClientPool.closeConferenceId(_conference!.conferenceId);
+    await p2pConferenceClientPool.exitConference(_conference!.conferenceId);
     status = VideoChatStatus.end;
   }
 
@@ -817,7 +817,7 @@ class ConferenceChatMessageController with ChangeNotifier {
   ///如果会议发起人发出终止信号，收到的参与者都将退出，而且会议将不可再加入
   terminate() async {
     await _sendChatReceipt(MessageReceiptType.terminated);
-    await p2pConferenceClientPool.closeConferenceId(_conference!.conferenceId);
+    await p2pConferenceClientPool.exitConference(_conference!.conferenceId);
     status = VideoChatStatus.end;
   }
 }

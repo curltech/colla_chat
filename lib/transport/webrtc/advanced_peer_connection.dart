@@ -293,7 +293,7 @@ class AdvancedPeerConnection {
     return false;
   }
 
-  ///把渲染器的流连接中删除，然后把渲染器从渲染器集合删除，并关闭
+  /// 主动从连接中移除本地媒体流，然后会激活onRemoveStream
   removeStream(PeerMediaStream peerMediaStream) async {
     logger.i('removeStream ${peerMediaStream.id}');
     if (status == PeerConnectionStatus.closed) {
@@ -308,6 +308,11 @@ class AdvancedPeerConnection {
     }
   }
 
+  /// 主动从连接中移除一个本地轨道，然后会激活onRemoveTrack
+  removeTrack(MediaStream stream, MediaStreamTrack track) async {
+    await basePeerConnection.removeTrack(stream, track);
+  }
+
   ///把渲染器的流克隆，然后可以当作本地流加入到其他连接中，用于转发
   Future<MediaStream?> cloneStream(PeerMediaStream peerMediaStream) async {
     logger.i('cloneStream ${peerMediaStream.id}');
@@ -318,14 +323,11 @@ class AdvancedPeerConnection {
     var streamId = peerMediaStream.id;
     if (streamId != null) {
       if (peerMediaStream.mediaStream != null) {
-        return await basePeerConnection.cloneStream(peerMediaStream.mediaStream!);
+        return await basePeerConnection
+            .cloneStream(peerMediaStream.mediaStream!);
       }
     }
     return null;
-  }
-
-  removeTrack(MediaStream stream, MediaStreamTrack track) async {
-    await basePeerConnection.removeTrack(stream, track);
   }
 
   replaceTrack(MediaStream stream, MediaStreamTrack oldTrack,

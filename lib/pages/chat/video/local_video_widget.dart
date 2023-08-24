@@ -492,7 +492,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       await p2pConferenceClientPool.removePeerMediaStream(
           conference.conferenceId, peerMediaStreams);
     }
-    await localPeerMediaStreamController.exit();
+    await localPeerMediaStreamController.closeAll();
     _update();
   }
 

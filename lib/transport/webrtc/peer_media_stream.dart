@@ -165,11 +165,11 @@ class PeerMediaStream {
     setStream(mediaStream);
   }
 
-  String? get ownerTag {
+  bool get local {
     if (mediaStream != null) {
-      return mediaStream!.ownerTag;
+      return mediaStream!.ownerTag == 'local';
     }
-    return null;
+    return false;
   }
 
   ///关闭媒体流，关闭后里面的流为空

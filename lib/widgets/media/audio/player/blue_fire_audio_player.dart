@@ -98,6 +98,8 @@ class BlueFireAudioPlayer {
           mode: mode);
     } catch (e) {
       logger.e('$e');
+      player.stop();
+      player.release();
     }
   }
 

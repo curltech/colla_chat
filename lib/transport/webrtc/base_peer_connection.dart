@@ -769,6 +769,8 @@ class BasePeerConnection {
           renegotiateNeed = false;
         } else {
           logger.e('renegotiateNeed always is true, error state');
+          negotiateStatus = NegotiateStatus.none;
+          renegotiateNeed = false;
         }
       }
     });
@@ -1167,61 +1169,7 @@ class BasePeerConnection {
     return false;
   }
 
-  ///判断本地流是否存在
-  bool _existLocal(MediaStream stream) {
-    if (status != PeerConnectionStatus.connected) {
-      logger.e('PeerConnectionStatus is not connected');
-      return false;
-    }
-    RTCPeerConnection? peerConnection = _peerConnection;
-    if (peerConnection == null) {
-      logger.e('PeerConnection is not exist');
-      return false;
-    }
-    try {
-      List<MediaStream?> streams = peerConnection.getLocalStreams();
-      if (streams.isNotEmpty) {
-        for (var s in streams) {
-          if (s != null && s.id == stream.id) {
-            logger.i('stream ${stream.id} is local');
-            return true;
-          }
-        }
-      }
-    } catch (e) {
-      logger.e('peer connection getLocalStreams failure, $e');
-    }
-    return false;
-  }
-
-  ///判断远程流是否存在
-  bool _existRemote(MediaStream stream) {
-    if (status != PeerConnectionStatus.connected) {
-      logger.e('PeerConnectionStatus is not connected');
-      return false;
-    }
-    RTCPeerConnection? peerConnection = _peerConnection;
-    if (peerConnection == null) {
-      logger.e('PeerConnection is not exist');
-      return false;
-    }
-    try {
-      List<MediaStream?> streams = peerConnection.getRemoteStreams();
-      if (streams.isNotEmpty) {
-        for (var s in streams) {
-          if (s != null && s.id == stream.id) {
-            logger.i('stream ${stream.id} is remote');
-            return true;
-          }
-        }
-      }
-    } catch (e) {
-      logger.e('peer connection getRemoteStreams failure, $e');
-    }
-    return false;
-  }
-
-  /// 主动从连接中移除流，然后会激活onRemoveStream
+  /// 主动从连接中移除本地媒体流，然后会激活onRemoveStream
   removeStream(MediaStream stream) async {
     logger.i('removeStream stream:${stream.id} ${stream.ownerTag}');
     if (status != PeerConnectionStatus.connected) {
@@ -1230,20 +1178,14 @@ class BasePeerConnection {
     }
     RTCPeerConnection? peerConnection = _peerConnection;
     if (peerConnection != null) {
-      _existLocal(stream);
       var tracks = stream.getTracks();
       for (var track in tracks) {
         removeTrack(stream, track);
       }
-      // try {
-      //   await peerConnection.removeStream(stream);
-      // } catch (e) {
-      //   logger.e('peer connection removeStream failure, $e');
-      // }
     }
   }
 
-  /// 主动从连接中移除一个轨道，然后会激活onRemoveTrack
+  /// 主动从连接中移除一个本地轨道，然后会激活onRemoveTrack
   removeTrack(MediaStream stream, MediaStreamTrack track) async {
     logger.i(
         'removeTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id}');
@@ -1292,19 +1234,14 @@ class BasePeerConnection {
     RTCPeerConnection? peerConnection = _peerConnection;
     if (peerConnection != null) {
       try {
-        _existRemote(stream);
-        try {
-          List<MediaStream?> streams = peerConnection.getRemoteStreams();
-          if (streams.isNotEmpty) {
-            for (var s in streams) {
-              if (s != null && s.id == stream.id) {
-                MediaStream cloneStream = await s.clone();
-                return cloneStream;
-              }
+        List<MediaStream?> streams = peerConnection.getRemoteStreams();
+        if (streams.isNotEmpty) {
+          for (var s in streams) {
+            if (s != null && s.id == stream.id) {
+              MediaStream cloneStream = await s.clone();
+              return cloneStream;
             }
           }
-        } catch (e) {
-          logger.e('peer connection getRemoteStreams failure, $e');
         }
       } catch (e) {
         logger.e('peer connection stream clone failure, $e');

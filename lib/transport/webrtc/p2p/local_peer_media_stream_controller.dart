@@ -15,9 +15,10 @@ class PeerMediaStreamController with ChangeNotifier {
   //主视频对应的界面渲染器
   PeerMediaStream? _mainPeerMediaStream;
 
-  //所有的视频流和对应的界面渲染器
+  //媒体流集合，所有的视频流，包括本地和远程
   final Map<String, PeerMediaStream> _peerMediaStreams = {};
 
+  //媒体流集合的操作锁
   final Lock _lock = Lock();
 
   Map<String, List<Future<void> Function(PeerMediaStream? peerMediaStream)>>
@@ -67,11 +68,12 @@ class PeerMediaStreamController with ChangeNotifier {
     }
   }
 
-  //本地视频和音频的stream
+  ///主媒体流
   PeerMediaStream? get mainPeerMediaStream {
     return _mainPeerMediaStream;
   }
 
+  ///设置主媒体流，替换掉主媒体流
   set mainPeerMediaStream(PeerMediaStream? mainPeerMediaStream) {
     if (_mainPeerMediaStream != mainPeerMediaStream) {
       if (_mainPeerMediaStream != null) {
@@ -84,7 +86,7 @@ class PeerMediaStreamController with ChangeNotifier {
     }
   }
 
-  ///判断是否有视频
+  ///判断主媒体流是否有视频
   bool get video {
     if (_mainPeerMediaStream != null) {
       return _mainPeerMediaStream!.video;
@@ -92,10 +94,12 @@ class PeerMediaStreamController with ChangeNotifier {
     return false;
   }
 
+  ///获取当前媒体流
   PeerMediaStream? get currentPeerMediaStream {
     return _currentPeerMediaStream;
   }
 
+  ///设置当前媒体流
   set currentPeerMediaStream(PeerMediaStream? currentPeerMediaStream) {
     if (_currentPeerMediaStream != currentPeerMediaStream) {
       onPeerMediaStreamOperator(
@@ -106,6 +110,12 @@ class PeerMediaStreamController with ChangeNotifier {
     }
   }
 
+  ///获取所有的媒体流的列表
+  List<PeerMediaStream> get peerMediaStreams {
+    return [..._peerMediaStreams.values];
+  }
+
+  ///根据peerId筛选，获取相应的Peer媒体流的集合
   Map<String, PeerMediaStream> getPeerMediaStreams(
       {String? peerId, String? clientId}) {
     if (peerId == null && clientId == null) {
@@ -130,6 +140,7 @@ class PeerMediaStreamController with ChangeNotifier {
     return peerMediaStreams;
   }
 
+  ///根据peerId筛选，获取相应的原生的媒体流的集合
   Map<String, MediaStream> getMediaStreams({String? peerId, String? clientId}) {
     Map<String, PeerMediaStream> peerMediaStreams =
         getPeerMediaStreams(peerId: peerId, clientId: clientId);
@@ -145,13 +156,14 @@ class PeerMediaStreamController with ChangeNotifier {
     return streams;
   }
 
+  ///根据流编号获取相应的媒体流
   Future<PeerMediaStream?> getPeerMediaStream(String streamId) async {
     return await _lock.synchronized(() {
       return _peerMediaStreams[streamId];
     });
   }
 
-  ///增加peerMediaStream，激活add事件
+  ///如果不存在，增加peerMediaStream，激活add事件
   add(PeerMediaStream peerMediaStream) async {
     await _lock.synchronized(() {
       var id = peerMediaStream.id;
@@ -163,7 +175,7 @@ class PeerMediaStreamController with ChangeNotifier {
     });
   }
 
-  ///移除媒体流，激活remove事件
+  ///移除媒体流，如果是当前媒体流，则设置当前的媒体流为null，激活remove事件
   remove(PeerMediaStream peerMediaStream) async {
     await _lock.synchronized(() async {
       var streamId = peerMediaStream.id;
@@ -184,20 +196,21 @@ class PeerMediaStreamController with ChangeNotifier {
     });
   }
 
-  ///关闭渲染器和流
+  ///关闭指定流并且从集合中删除
   close(PeerMediaStream peerMediaStream) async {
     await peerMediaStream.close();
+    remove(peerMediaStream);
   }
 
-  ///移除并且关闭控制器所有的视频，激活exit事件
-  exit() async {
+  ///移除并且关闭控制器所有的媒体流，激活exit事件
+  closeAll() async {
     await _lock.synchronized(() async {
       //先移除，后关闭
-      var peerMediaStreams = _peerMediaStreams.values.toList();
-      _peerMediaStreams.clear();
+      List<PeerMediaStream> peerMediaStreams = [..._peerMediaStreams.values];
       for (var peerMediaStream in peerMediaStreams) {
         await peerMediaStream.close();
       }
+      _peerMediaStreams.clear();
       _currentPeerMediaStream = null;
       _mainPeerMediaStream = null;
       await onPeerMediaStreamOperator(PeerMediaStreamOperator.exit.name, null);
@@ -264,7 +277,7 @@ class LocalPeerMediaStreamController extends PeerMediaStreamController {
     return peerMediaStream;
   }
 
-  ///创建本地的Stream stream，激活add监听事件
+  ///创建本地的Stream，激活add监听事件
   Future<PeerMediaStream> createPeerMediaStream(
     MediaStream stream,
   ) async {
@@ -313,10 +326,10 @@ class LocalPeerMediaStreamController extends PeerMediaStreamController {
     }
   }
 
-  ///关闭本地所有的流，激活exit事件
+  ///关闭本地所有的流
   @override
-  exit() async {
-    await super.exit();
+  closeAll() async {
+    await super.closeAll();
     mainPeerMediaStream = null;
   }
 }

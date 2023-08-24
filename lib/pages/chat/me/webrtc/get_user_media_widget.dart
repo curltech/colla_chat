@@ -76,7 +76,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
 
   void _hangUp() async {
     try {
-      localPeerMediaStreamController.exit();
+      localPeerMediaStreamController.closeAll();
       setState(() {
         _inCalling = false;
       });
