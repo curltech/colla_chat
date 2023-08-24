@@ -93,6 +93,12 @@ class P2pConferenceClient extends PeerMediaStreamController {
           WebrtcEventType.removeTrack, _onRemoveRemoteTrack);
       peerConnection.registerWebrtcEvent(WebrtcEventType.closed, _onClosed);
       await _addPeerMediaStream(peerConnection);
+      List<PeerMediaStream> peerMediaStreams =
+          localPeerMediaStreamController.peerMediaStreams;
+      if (peerMediaStreams.isNotEmpty) {
+        await addLocalPeerMediaStream(peerMediaStreams,
+            peerConnection: peerConnection);
+      }
     }
   }
 
@@ -179,8 +185,10 @@ class P2pConferenceClient extends PeerMediaStreamController {
       peerConnection.unregisterWebrtcEvent(WebrtcEventType.closed, _onClosed);
       List<PeerMediaStream> peerMediaStreams =
           localPeerMediaStreamController.peerMediaStreams;
-      await removePeerMediaStream(peerMediaStreams,
-          peerConnection: peerConnection);
+      if (peerMediaStreams.isNotEmpty) {
+        await removePeerMediaStream(peerMediaStreams,
+            peerConnection: peerConnection);
+      }
       await _removePeerMediaStream(peerConnection);
     }
   }

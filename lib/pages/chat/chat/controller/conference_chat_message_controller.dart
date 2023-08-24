@@ -680,11 +680,6 @@ class ConferenceChatMessageController with ChangeNotifier {
       if (p2pConferenceClient != null) {
         p2pConferenceClient
             .removeAdvancedPeerConnection(advancedPeerConnection);
-        Map<String, PeerMediaStream> peerMediaStreams =
-            localPeerMediaStreamController.getPeerMediaStreams();
-        p2pConferenceClient.removePeerMediaStream(
-            peerMediaStreams.values.toList(),
-            peerConnection: advancedPeerConnection);
       }
     } else {
       logger.e('participant $peerId has no peerConnections');
@@ -725,13 +720,6 @@ class ConferenceChatMessageController with ChangeNotifier {
       P2pConferenceClient p2pConferenceClient =
           p2pConferenceClientPool.createP2pConferenceClient(this);
       p2pConferenceClient.addAdvancedPeerConnection(advancedPeerConnection);
-      //把本地视频加入连接中，然后重新协商
-      List<PeerMediaStream> peerMediaStreams =
-          localPeerMediaStreamController.getPeerMediaStreams().values.toList();
-      if (peerMediaStreams.isNotEmpty) {
-        await p2pConferenceClient.addLocalPeerMediaStream(peerMediaStreams,
-            peerConnection: advancedPeerConnection);
-      }
     } else {
       logger.e('participant $peerId has no peerConnections');
     }
@@ -751,13 +739,6 @@ class ConferenceChatMessageController with ChangeNotifier {
       P2pConferenceClient? p2pConferenceClient = p2pConferenceClientPool
           .getP2pConferenceClient(_conference!.conferenceId);
       if (p2pConferenceClient != null) {
-        //把本地视频连接中删除，然后重新协商
-        Map<String, PeerMediaStream> peerMediaStreams =
-            localPeerMediaStreamController.getPeerMediaStreams();
-        await p2pConferenceClient.removePeerMediaStream(
-            peerMediaStreams.values.toList(),
-            peerConnection: advancedPeerConnection);
-
         p2pConferenceClient
             .removeAdvancedPeerConnection(advancedPeerConnection);
       }
@@ -790,14 +771,7 @@ class ConferenceChatMessageController with ChangeNotifier {
             peerConnectionPool.get(participant);
         if (peerConnections.isNotEmpty) {
           AdvancedPeerConnection peerConnection = peerConnections[0];
-          p2pConferenceClient.addAdvancedPeerConnection(peerConnection);
-          //把本地视频加入会议的所有连接中，然后重新协商
-          List<PeerMediaStream> peerMediaStreams =
-              localPeerMediaStreamController
-                  .getPeerMediaStreams()
-                  .values
-                  .toList();
-          await p2pConferenceClient.addLocalPeerMediaStream(peerMediaStreams);
+          await p2pConferenceClient.addAdvancedPeerConnection(peerConnection);
         } else {
           logger.e('participant $participant has no peerConnections');
         }
