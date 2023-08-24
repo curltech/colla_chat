@@ -272,6 +272,8 @@ class P2pConferenceClient extends PeerMediaStreamController {
       await removeAdvancedPeerConnection(peerConnection);
     }
     _peerConnections.clear();
+    conferenceChatMessageController.setChatMessage(null);
+    conferenceChatMessageController.setChatSummary(null);
     await onPeerMediaStreamOperator(PeerMediaStreamOperator.exit.name, null);
   }
 }
@@ -411,8 +413,6 @@ class P2pConferenceClientPool with ChangeNotifier {
     if (p2pConferenceClient != null) {
       await p2pConferenceClient.exit();
       _p2pConferenceClients.remove(conferenceId);
-      p2pConferenceClient.conferenceChatMessageController.setChatMessage(null);
-      p2pConferenceClient.conferenceChatMessageController.setChatSummary(null);
       if (conferenceId == _conferenceId) {
         _conferenceId = null;
       }
