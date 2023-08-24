@@ -1,3 +1,4 @@
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter/material.dart';
@@ -179,27 +180,30 @@ class PeerMediaStreamController with ChangeNotifier {
   remove(PeerMediaStream peerMediaStream) async {
     await _lock.synchronized(() async {
       var streamId = peerMediaStream.id;
-      if (streamId != null && _peerMediaStreams.containsKey(streamId)) {
-        _peerMediaStreams.remove(streamId);
-        if (_currentPeerMediaStream != null &&
-            _currentPeerMediaStream!.id == streamId) {
-          _currentPeerMediaStream = null;
+      if (streamId != null) {
+        PeerMediaStream? old = _peerMediaStreams[streamId];
+        if (old != null) {
+          _peerMediaStreams.remove(streamId);
+          if (_currentPeerMediaStream != null &&
+              _currentPeerMediaStream!.id == streamId) {
+            _currentPeerMediaStream = null;
+          }
+          if (_mainPeerMediaStream != null &&
+              _mainPeerMediaStream!.id == streamId) {
+            _mainPeerMediaStream = null;
+          }
+          //在流被关闭前调用事件处理
+          await onPeerMediaStreamOperator(
+              PeerMediaStreamOperator.remove.name, peerMediaStream);
         }
-        if (_mainPeerMediaStream != null &&
-            _mainPeerMediaStream!.id == streamId) {
-          _mainPeerMediaStream = null;
-        }
-        //在流被关闭前调用事件处理
-        await onPeerMediaStreamOperator(
-            PeerMediaStreamOperator.remove.name, peerMediaStream);
       }
     });
   }
 
   ///关闭指定流并且从集合中删除
   close(PeerMediaStream peerMediaStream) async {
+    await remove(peerMediaStream);
     await peerMediaStream.close();
-    remove(peerMediaStream);
   }
 
   ///移除并且关闭控制器所有的媒体流，激活exit事件

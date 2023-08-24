@@ -179,23 +179,23 @@ class AppDataProvider with ChangeNotifier {
           _bodyRatio = 50;
         }
       }
-      logger.i('Total size: $_totalSize');
+      // logger.i('Total size: $_totalSize');
     }
     var bottom = MediaQuery.of(context).viewInsets.bottom;
     if (_keyboardHeight == 270.0 && bottom != 0) {
       _keyboardHeight = bottom;
-      logger.i('KeyboardHeight: $_keyboardHeight');
+      // logger.i('KeyboardHeight: $_keyboardHeight');
     }
-    logger.i('bottomBarHeight: $bottomBarHeight');
-    logger.i('toolbarHeight: $toolbarHeight');
+    // logger.i('bottomBarHeight: $bottomBarHeight');
+    // logger.i('toolbarHeight: $toolbarHeight');
     // 上下边距 （主要用于 刘海  和  内置导航键）
     topPadding = MediaQuery.of(context).padding.top;
-    logger.i('topPadding: $topPadding');
+    // logger.i('topPadding: $topPadding');
     bottomPadding = MediaQuery.of(context).padding.bottom;
-    logger.i('bottomPadding: $bottomPadding');
+    // logger.i('bottomPadding: $bottomPadding');
 
     textScaleFactor = MediaQuery.of(context).textScaleFactor;
-    logger.i('textScaleFactor: $textScaleFactor');
+    // logger.i('textScaleFactor: $textScaleFactor');
   }
 }
 

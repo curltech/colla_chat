@@ -81,7 +81,7 @@ class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
 
   @override
   Future<AppLocalizations> load(Locale locale) async {
-    logger.i('will load ${locale.toString()}');
+    // logger.i('will load ${locale.toString()}');
     AppLocalizations? appLocalizations = await AppLocalizations.load(locale);
 
     return appLocalizations!;

@@ -51,7 +51,7 @@ void main(List<String> args) async {
   await _initDesktopWindows();
 
   SystemChannels.lifecycle.setMessageHandler((msg) async {
-    logger.i('SystemChannels> $msg');
+    // logger.i('SystemChannels> $msg');
     return msg;
   });
 
