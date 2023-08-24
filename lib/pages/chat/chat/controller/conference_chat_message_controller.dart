@@ -572,7 +572,7 @@ class ConferenceChatMessageController with ChangeNotifier {
     }
     String? subMessageType = chatReceipt.subMessageType;
     if (subMessageType != ChatMessageSubType.chatReceipt.name) {
-      logger.e('chatReceipt is not chatReceipt');
+      logger.e('chatMessage is not chatReceipt');
       return;
     }
     //当前到来的回执是新的
@@ -580,7 +580,6 @@ class ConferenceChatMessageController with ChangeNotifier {
     //当前的视频通话邀请消息一致
     if (_chatMessage!.messageId != chatReceipt.messageId) {
       logger.e('messageId $messageId is not equal');
-      return;
     }
 
     _current = chatReceipt;
