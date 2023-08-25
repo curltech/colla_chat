@@ -783,7 +783,7 @@ class BasePeerConnection {
       return;
     }
     if (negotiateStatus == NegotiateStatus.negotiating) {
-      logger.e('PeerConnectionStatus already negotiating');
+      logger.w('PeerConnectionStatus already negotiating');
       return;
     }
     logger.w('Start negotiate');
