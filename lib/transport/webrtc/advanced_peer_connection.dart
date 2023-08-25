@@ -65,7 +65,7 @@ class AdvancedPeerConnection {
   }
 
   ///调用注册到本连接的事件处理监听器
-  onWebrtcEvent(WebrtcEvent event) {
+  onWebrtcEvent(WebrtcEvent event) async {
     String peerId = event.peerId;
     WebrtcEventType eventType = event.eventType;
     logger.w('Webrtc peer connection $peerId webrtcEvent $eventType coming');
@@ -77,7 +77,7 @@ class AdvancedPeerConnection {
     List<Future<void> Function(WebrtcEvent)>? fns = fnsm[eventType.name];
     if (fns != null) {
       for (var fn in fns) {
-        fn(event);
+        await fn(event);
       }
     }
   }
@@ -123,7 +123,7 @@ class AdvancedPeerConnection {
           name: name,
           eventType: WebrtcEventType.signal,
           data: webrtcSignal);
-      onWebrtcEvent(webrtcEvent);
+      await onWebrtcEvent(webrtcEvent);
       await signal(webrtcEvent);
     });
 
@@ -134,7 +134,7 @@ class AdvancedPeerConnection {
           name: name,
           eventType: WebrtcEventType.connected,
           data: data);
-      onWebrtcEvent(webrtcEvent);
+      await onWebrtcEvent(webrtcEvent);
       await peerConnectionPool.onConnected(webrtcEvent);
     });
 
@@ -144,7 +144,7 @@ class AdvancedPeerConnection {
           name: name,
           eventType: WebrtcEventType.status,
           data: data);
-      onWebrtcEvent(webrtcEvent);
+      await onWebrtcEvent(webrtcEvent);
       await peerConnectionPool.onStatusChanged(webrtcEvent);
     });
 
@@ -154,7 +154,7 @@ class AdvancedPeerConnection {
           name: name,
           eventType: WebrtcEventType.closed,
           data: this);
-      onWebrtcEvent(webrtcEvent);
+      await onWebrtcEvent(webrtcEvent);
       await peerConnectionPool.onClosed(webrtcEvent);
     });
 
@@ -193,7 +193,7 @@ class AdvancedPeerConnection {
           name: name,
           eventType: WebrtcEventType.error,
           data: err);
-      onWebrtcEvent(webrtcEvent);
+      await onWebrtcEvent(webrtcEvent);
       await peerConnectionPool.onError(webrtcEvent);
     });
 
@@ -227,7 +227,7 @@ class AdvancedPeerConnection {
         name: name,
         eventType: WebrtcEventType.stream,
         data: stream);
-    onWebrtcEvent(webrtcEvent);
+    await onWebrtcEvent(webrtcEvent);
     await peerConnectionPool.onAddStream(webrtcEvent);
   }
 
@@ -238,7 +238,7 @@ class AdvancedPeerConnection {
         name: name,
         eventType: WebrtcEventType.removeStream,
         data: stream);
-    onWebrtcEvent(webrtcEvent);
+    await onWebrtcEvent(webrtcEvent);
     await peerConnectionPool.onRemoveStream(webrtcEvent);
   }
 
@@ -251,7 +251,7 @@ class AdvancedPeerConnection {
         name: name,
         eventType: WebrtcEventType.track,
         data: data);
-    onWebrtcEvent(webrtcEvent);
+    await onWebrtcEvent(webrtcEvent);
     await peerConnectionPool.onTrack(webrtcEvent);
   }
 
@@ -264,7 +264,7 @@ class AdvancedPeerConnection {
         name: name,
         eventType: WebrtcEventType.addTrack,
         data: data);
-    onWebrtcEvent(webrtcEvent);
+    await onWebrtcEvent(webrtcEvent);
     await peerConnectionPool.onAddTrack(webrtcEvent);
   }
 
@@ -278,7 +278,7 @@ class AdvancedPeerConnection {
         name: name,
         eventType: WebrtcEventType.removeTrack,
         data: data);
-    onWebrtcEvent(webrtcEvent);
+    await onWebrtcEvent(webrtcEvent);
     await peerConnectionPool.onRemoveTrack(webrtcEvent);
   }
 
@@ -356,7 +356,7 @@ class AdvancedPeerConnection {
           name: name,
           eventType: WebrtcEventType.message,
           data: chatMessage);
-      onWebrtcEvent(webrtcEvent);
+      await onWebrtcEvent(webrtcEvent);
       await peerConnectionPool.onMessage(webrtcEvent);
     } else {
       logger.e('Received chatMessage but decrypt failure');
