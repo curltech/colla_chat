@@ -603,7 +603,7 @@ class BasePeerConnection {
     _negotiateStatus = negotiateStatus;
   }
 
-  void connected() {
+  Future<void> connected() async {
     if (status == PeerConnectionStatus.connected) {
       logger.i('PeerConnectionStatus has already connected');
       return;
@@ -615,7 +615,7 @@ class BasePeerConnection {
       var interval = end! - start!;
       logger.i('id:$id connected time:$interval');
     }
-    emit(WebrtcEventType.connected, '');
+    await emit(WebrtcEventType.connected, '');
   }
 
   RTCPeerConnection? get peerConnection {
@@ -626,13 +626,13 @@ class BasePeerConnection {
   }
 
   ///连接状态事件
-  onConnectionState(RTCPeerConnectionState state) {
+  onConnectionState(RTCPeerConnectionState state) async {
     RTCPeerConnection? peerConnection = this.peerConnection;
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    emit(WebrtcEventType.connectionState, state);
+    await emit(WebrtcEventType.connectionState, state);
     if (state == RTCPeerConnectionState.RTCPeerConnectionStateFailed ||
         state == RTCPeerConnectionState.RTCPeerConnectionStateClosed ||
         state == RTCPeerConnectionState.RTCPeerConnectionStateFailed ||
@@ -647,14 +647,14 @@ class BasePeerConnection {
   }
 
   ///ice连接状态事件
-  onIceConnectionState(RTCIceConnectionState state) {
+  onIceConnectionState(RTCIceConnectionState state) async {
     RTCPeerConnection? peerConnection = this.peerConnection;
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
     }
 
-    emit(WebrtcEventType.iceConnectionState, state);
+    await emit(WebrtcEventType.iceConnectionState, state);
     if (state == RTCIceConnectionState.RTCIceConnectionStateConnected ||
         state == RTCIceConnectionState.RTCIceConnectionStateCompleted) {
       connected();
@@ -667,17 +667,17 @@ class BasePeerConnection {
     }
   }
 
-  onIceGatheringState(RTCIceGatheringState state) {
+  onIceGatheringState(RTCIceGatheringState state) async {
     RTCPeerConnection? peerConnection = this.peerConnection;
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    emit(WebrtcEventType.iceGatheringState, state);
+    await emit(WebrtcEventType.iceGatheringState, state);
   }
 
   /// signal状态事件
-  onSignalingState(RTCSignalingState state) {
+  onSignalingState(RTCSignalingState state) async {
     RTCPeerConnection? peerConnection = this.peerConnection;
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
@@ -689,11 +689,11 @@ class BasePeerConnection {
       negotiateStatus = NegotiateStatus.negotiated;
       renegotiateNeed = false;
     }
-    emit(WebrtcEventType.signalingState, state);
+    await emit(WebrtcEventType.signalingState, state);
   }
 
   ///onIceCandidate事件表示本地candidate准备好，可以发送IceCandidate到远端
-  onIceCandidate(RTCIceCandidate candidate) {
+  onIceCandidate(RTCIceCandidate candidate) async {
     ///如果注册了iceCandidate事件，则直接执行事件
     var handler = events[WebrtcEventType.iceCandidate];
     if (handler != null) {
@@ -708,7 +708,7 @@ class BasePeerConnection {
     if (candidate.candidate != null) {
       //发送candidate信号
       //logger.i('Send Candidate signal.');
-      emit(
+      await emit(
           WebrtcEventType.signal,
           WebrtcSignal(SignalType.candidate.name,
               candidates: [candidate], extension: extension));
@@ -833,7 +833,7 @@ class BasePeerConnection {
       logger.e('peerConnection getLocalDescription failure:$e');
     }
     sdp ??= offer;
-    emit(WebrtcEventType.signal,
+    await emit(WebrtcEventType.signal,
         WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
     logger.i('end sendOffer');
   }
@@ -916,7 +916,7 @@ class BasePeerConnection {
     }
     //被叫发送重新协商的请求
     logger.w('send signal renegotiate');
-    emit(WebrtcEventType.signal,
+    await emit(WebrtcEventType.signal,
         WebrtcSignal('renegotiate', renegotiate: true, extension: extension));
     negotiateStatus = NegotiateStatus.negotiating;
   }
@@ -974,7 +974,7 @@ class BasePeerConnection {
       logger.e('peerConnection getLocalDescription failure:$e');
     }
     sdp ??= answer;
-    emit(WebrtcEventType.signal,
+    await emit(WebrtcEventType.signal,
         WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
     logger.i('sendAnswer:${answer.type} successfully');
   }
@@ -1100,7 +1100,7 @@ class BasePeerConnection {
     }
     logger.i('addTransceiver()');
 
-    emit(
+    await emit(
         WebrtcEventType.signal,
         WebrtcSignal(SignalType.transceiverRequest.name,
             transceiverRequest: {'kind': kind, 'init': init},
@@ -1292,7 +1292,7 @@ class BasePeerConnection {
     for (MediaStreamTrack track in tracks) {
       await onRemoteTrack(stream, track);
     }
-    emit(WebrtcEventType.stream, stream);
+    await emit(WebrtcEventType.stream, stream);
   }
 
   onRemoveRemoteStream(MediaStream stream) async {
@@ -1301,7 +1301,7 @@ class BasePeerConnection {
     for (MediaStreamTrack track in tracks) {
       await onRemoveRemoteTrack(stream, track);
     }
-    emit(WebrtcEventType.removeStream, stream);
+    await emit(WebrtcEventType.removeStream, stream);
   }
 
   ///连接的监听轨道到来的监听器，当远方由轨道来的时候执行
@@ -1323,10 +1323,10 @@ class BasePeerConnection {
         }
       }
     }
-    emit(WebrtcEventType.track, {'stream': stream, 'track': track});
+    await emit(WebrtcEventType.track, {'stream': stream, 'track': track});
   }
 
-  onRemoveRemoteTrack(MediaStream stream, MediaStreamTrack track) {
+  onRemoveRemoteTrack(MediaStream stream, MediaStreamTrack track) async {
     logger.i(
         'onRemoveRemoteTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id}');
 
@@ -1341,7 +1341,7 @@ class BasePeerConnection {
       });
     }
 
-    emit(WebrtcEventType.removeTrack, {'stream': stream, 'track': track});
+    await emit(WebrtcEventType.removeTrack, {'stream': stream, 'track': track});
   }
 
   /// 注册一组回调函数，内部可以调用外部注册事件的方法
@@ -1358,10 +1358,10 @@ class BasePeerConnection {
   }
 
   /// 调用外部事件注册方法
-  emit(WebrtcEventType name, dynamic webrtcEvent) {
+  emit(WebrtcEventType name, dynamic webrtcEvent) async {
     var event = events[name];
     if (event != null) {
-      event(webrtcEvent);
+      await event(webrtcEvent);
     }
   }
 
@@ -1422,7 +1422,7 @@ class BasePeerConnection {
   /// 被叫方的数据传输事件
   /// webrtc的数据通道发来的消息可以是ChainMessage，
   /// 也可以是简单的非ChainMessage，比如最简单的文本或者复合文档，也就是ChatMessage
-  onMessage(RTCDataChannelMessage message) {
+  onMessage(RTCDataChannelMessage message) async {
     if (status != PeerConnectionStatus.connected) {
       logger.e('PeerConnectionStatus is not connected');
       return false;
@@ -1433,7 +1433,7 @@ class BasePeerConnection {
 
       if (slices != null) {
         logger.i('webrtc binary onMessage length: ${slices.length}');
-        emit(WebrtcEventType.message, slices);
+        await emit(WebrtcEventType.message, slices);
       }
     } else {
       var data = message.text.codeUnits;
@@ -1441,7 +1441,7 @@ class BasePeerConnection {
 
       if (slices != null) {
         logger.i('webrtc text onMessage length: ${slices.length}');
-        emit(WebrtcEventType.message, slices);
+        await emit(WebrtcEventType.message, slices);
       }
     }
   }
@@ -1490,6 +1490,6 @@ class BasePeerConnection {
     // if (reconnectTimes > 0) {
     //   reconnect();
     // }
-    emit(WebrtcEventType.closed, this);
+    await emit(WebrtcEventType.closed, this);
   }
 }
