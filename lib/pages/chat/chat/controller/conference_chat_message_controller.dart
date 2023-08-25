@@ -659,7 +659,7 @@ class ConferenceChatMessageController with ChangeNotifier {
     if (_status == VideoChatStatus.calling) {
       status = VideoChatStatus.chatting;
     }
-    await joinConference();
+    await join();
   }
 
   ///对方拒绝，自己什么都不用做
@@ -725,7 +725,8 @@ class ConferenceChatMessageController with ChangeNotifier {
     if (advancedPeerConnection != null) {
       P2pConferenceClient p2pConferenceClient =
           p2pConferenceClientPool.createP2pConferenceClient(this);
-      p2pConferenceClient.addAdvancedPeerConnection(advancedPeerConnection);
+      await p2pConferenceClient
+          .addAdvancedPeerConnection(advancedPeerConnection);
     } else {
       logger.e('participant $peerId has no peerConnections');
     }
@@ -759,37 +760,37 @@ class ConferenceChatMessageController with ChangeNotifier {
     await joinConference();
   }
 
-  ///自己主动加入，包含加本地视频和将会议的每个参与者加入会议中两步，对会议的参与者的所以连接操作
-  ///每一个新加入的会议是池中的当前会议
+  ///自己主动加入
   joinConference() async {
     await openLocalMainPeerMediaStream();
     //创建新的视频会议控制器
     P2pConferenceClient p2pConferenceClient =
         p2pConferenceClientPool.createP2pConferenceClient(this);
-    List<String>? participants = conference!.participants;
-    if (participants != null && participants.isNotEmpty) {
-      //将所有的参与者的连接加入会议控制器，自己除外
-      for (var participant in participants) {
-        if (participant == myself.peerId) {
-          continue;
-        }
-        List<AdvancedPeerConnection> peerConnections =
-            peerConnectionPool.get(participant);
-        if (peerConnections.isNotEmpty) {
-          AdvancedPeerConnection peerConnection = peerConnections[0];
-          await p2pConferenceClient.addAdvancedPeerConnection(peerConnection);
-        } else {
-          logger.e('participant $participant has no peerConnections');
-        }
-      }
-    }
+    await p2pConferenceClient.join();
+    // List<String>? participants = conference!.participants;
+    // if (participants != null && participants.isNotEmpty) {
+    //   //将所有的参与者的连接加入会议控制器，自己除外
+    //   for (var participant in participants) {
+    //     if (participant == myself.peerId) {
+    //       continue;
+    //     }
+    //     List<AdvancedPeerConnection> peerConnections =
+    //         peerConnectionPool.get(participant);
+    //     if (peerConnections.isNotEmpty) {
+    //       AdvancedPeerConnection peerConnection = peerConnections[0];
+    //       await p2pConferenceClient.addAdvancedPeerConnection(peerConnection);
+    //     } else {
+    //       logger.e('participant $participant has no peerConnections');
+    //     }
+    //   }
+    // }
     status = VideoChatStatus.chatting;
   }
 
   ///自己主动退出会议，发送exit回执，关闭会议
   exit() async {
     await _sendChatReceipt(MessageReceiptType.exit);
-    await p2pConferenceClientPool.exitConference(_conference!.conferenceId);
+    await p2pConferenceClientPool.exit(_conference!.conferenceId);
     status = VideoChatStatus.end;
   }
 
@@ -797,7 +798,7 @@ class ConferenceChatMessageController with ChangeNotifier {
   ///如果会议发起人发出终止信号，收到的参与者都将退出，而且会议将不可再加入
   terminate() async {
     await _sendChatReceipt(MessageReceiptType.terminated);
-    await p2pConferenceClientPool.exitConference(_conference!.conferenceId);
+    await p2pConferenceClientPool.terminate(_conference!.conferenceId);
     status = VideoChatStatus.end;
   }
 }

@@ -65,7 +65,7 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
             title: 'Delete',
             prefix: Icons.playlist_remove_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
-              p2pConferenceClientPool.exitConference(conferenceId);
+              p2pConferenceClientPool.terminate(conferenceId);
               p2pConferenceClientPool.conferenceId = null;
               if (mounted) {
                 DialogUtil.info(context,

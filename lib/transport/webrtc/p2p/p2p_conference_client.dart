@@ -16,10 +16,11 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 class P2pConferenceClient extends PeerMediaStreamController {
   final Key key = UniqueKey();
 
-  //根据peerId和clientId对应的所有的webrtc连接
+  //对方加入的webrtc连接，根据peerId和clientId作为key值
   final Map<String, AdvancedPeerConnection> _peerConnections = {};
 
-  final Set<String> _participants = {};
+  //自己是否加入
+  bool _joined = false;
 
   //会议的视频消息控制器，是创建会议的邀请消息，包含会议的信息
   final ConferenceChatMessageController conferenceChatMessageController;
@@ -29,6 +30,22 @@ class P2pConferenceClient extends PeerMediaStreamController {
   String _getKey(String peerId, String clientId) {
     var key = '$peerId:$clientId';
     return key;
+  }
+
+  ///自己加入会议
+  join() async {
+    _joined = true;
+    for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
+      await addAdvancedPeerConnection(peerConnection);
+    }
+  }
+
+  ///自己退出会议
+  exit() async {
+    _joined = false;
+    for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
+      await removeAdvancedPeerConnection(peerConnection);
+    }
   }
 
   ///生成并且加入连接的远程视频stream，确保之前连接已经加入
@@ -62,32 +79,38 @@ class P2pConferenceClient extends PeerMediaStreamController {
   ///指定连接用在加入新的连接的时候，所有连接用在加入新的peerMediaStream的时候
   addLocalPeerMediaStream(List<PeerMediaStream> peerMediaStreams,
       {AdvancedPeerConnection? peerConnection}) async {
-    if (peerConnection != null) {
-      for (var peerMediaStream in peerMediaStreams) {
-        await peerConnection.addLocalStream(peerMediaStream);
-      }
-      await peerConnection.negotiate();
-    } else {
-      for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
+    if (_joined) {
+      if (peerConnection != null) {
         for (var peerMediaStream in peerMediaStreams) {
           await peerConnection.addLocalStream(peerMediaStream);
         }
         await peerConnection.negotiate();
+      } else {
+        for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
+          for (var peerMediaStream in peerMediaStreams) {
+            await peerConnection.addLocalStream(peerMediaStream);
+          }
+          await peerConnection.negotiate();
+        }
       }
     }
   }
 
-  ///将连接加入控制器，此连接将与自己展开视频通话
+  ///对方连接加入会议，此连接将与自己展开视频通话
+  ///如果自己已经加入，将加入本地流
   addAdvancedPeerConnection(AdvancedPeerConnection peerConnection) async {
     var key = _getKey(peerConnection.peerId, peerConnection.clientId);
     if (!_peerConnections.containsKey(key)) {
       _peerConnections[key] = peerConnection;
-      _participants.add(key);
       peerConnection.registerWebrtcEvent(
           WebrtcEventType.track, _onAddRemoteTrack);
       peerConnection.registerWebrtcEvent(
           WebrtcEventType.removeTrack, _onRemoveRemoteTrack);
       peerConnection.registerWebrtcEvent(WebrtcEventType.closed, _onClosed);
+    }
+
+    //只有自己已经加入，才需要加本地流和远程流
+    if (_joined) {
       await _addPeerMediaStream(peerConnection);
       List<PeerMediaStream> peerMediaStreams =
           localPeerMediaStreamController.peerMediaStreams;
@@ -147,11 +170,10 @@ class P2pConferenceClient extends PeerMediaStreamController {
     }
   }
 
-  ///从会议中移除指定连接
+  ///对方退出会议，移除指定连接
   ///把指定连接中的本地媒体关闭并且移除
   removeAdvancedPeerConnection(AdvancedPeerConnection peerConnection) async {
     var key = _getKey(peerConnection.peerId, peerConnection.clientId);
-    _participants.remove(key);
     var advancedPeerConnection = _peerConnections.remove(key);
     if (advancedPeerConnection != null) {
       peerConnection.unregisterWebrtcEvent(
@@ -159,13 +181,15 @@ class P2pConferenceClient extends PeerMediaStreamController {
       peerConnection.unregisterWebrtcEvent(
           WebrtcEventType.removeTrack, _onRemoveRemoteTrack);
       peerConnection.unregisterWebrtcEvent(WebrtcEventType.closed, _onClosed);
-      List<PeerMediaStream> peerMediaStreams =
-          localPeerMediaStreamController.peerMediaStreams;
-      if (peerMediaStreams.isNotEmpty) {
-        await removePeerMediaStream(peerMediaStreams,
-            peerConnection: peerConnection);
+      if (_joined) {
+        await _removePeerMediaStream(peerConnection);
+        List<PeerMediaStream> peerMediaStreams =
+            localPeerMediaStreamController.peerMediaStreams;
+        if (peerMediaStreams.isNotEmpty) {
+          await removePeerMediaStream(peerMediaStreams,
+              peerConnection: peerConnection);
+        }
       }
-      await _removePeerMediaStream(peerConnection);
     }
   }
 
@@ -217,24 +241,18 @@ class P2pConferenceClient extends PeerMediaStreamController {
     }
   }
 
-  ///退出会议，移除所有的webrtc连接
+  ///终止会议，移除所有的webrtc连接
   ///激活exit事件
-  exit() async {
+  terminate() async {
     currentPeerMediaStream = null;
     mainPeerMediaStream = null;
-    List<AdvancedPeerConnection> peerConnections = [..._peerConnections.values];
-    for (var peerConnection in peerConnections) {
-      await removeAdvancedPeerConnection(peerConnection);
-    }
+    await exit();
     _peerConnections.clear();
-    _participants.clear();
-    for (var peerMediaStream in peerMediaStreams) {
-      await peerMediaStream.close();
-    }
     peerMediaStreams.clear();
     conferenceChatMessageController.setChatMessage(null);
     conferenceChatMessageController.setChatSummary(null);
-    await onPeerMediaStreamOperator(PeerMediaStreamOperator.exit.name, null);
+    await onPeerMediaStreamOperator(
+        PeerMediaStreamOperator.terminate.name, null);
   }
 }
 
@@ -378,12 +396,23 @@ class P2pConferenceClientPool with ChangeNotifier {
   }
 
   ///根据会议编号退出会议
-  ///调用对应会议的退出方法，然后从会议池中删除，设置当前会议编号为null
-  exitConference(String conferenceId) async {
+  ///调用对应会议的退出方法
+  exit(String conferenceId) async {
     P2pConferenceClient? p2pConferenceClient =
         _p2pConferenceClients[conferenceId];
     if (p2pConferenceClient != null) {
       await p2pConferenceClient.exit();
+      notifyListeners();
+    }
+  }
+
+  ///根据会议编号终止会议
+  ///调用对应会议的终止方法，然后从会议池中删除，设置当前会议编号为null
+  terminate(String conferenceId) async {
+    P2pConferenceClient? p2pConferenceClient =
+        _p2pConferenceClients[conferenceId];
+    if (p2pConferenceClient != null) {
+      await p2pConferenceClient.terminate();
       _p2pConferenceClients.remove(conferenceId);
       if (conferenceId == _conferenceId) {
         _conferenceId = null;

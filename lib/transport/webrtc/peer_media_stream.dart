@@ -16,6 +16,7 @@ enum PeerMediaStreamOperator {
   unselected,
   selected,
   exit,
+  terminate,
   mute,
   volume,
   torch

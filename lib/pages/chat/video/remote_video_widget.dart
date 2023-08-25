@@ -122,7 +122,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
         p2pConferenceClientPool.removePeerMediaStream(
             conference.conferenceId, peerMediaStreams);
       }
-      await p2pConferenceClient!.exit();
+      await p2pConferenceClient!.terminate();
     }
   }
 

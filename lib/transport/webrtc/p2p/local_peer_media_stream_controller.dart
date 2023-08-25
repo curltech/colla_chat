@@ -111,7 +111,7 @@ class PeerMediaStreamController with ChangeNotifier {
     }
   }
 
-  ///获取所有的媒体流的列表
+  ///获取所有的remote媒体流的列表
   List<PeerMediaStream> get peerMediaStreams {
     return [..._peerMediaStreams.values];
   }
