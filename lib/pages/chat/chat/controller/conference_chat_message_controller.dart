@@ -466,8 +466,16 @@ class ConferenceChatMessageController with ChangeNotifier {
       return;
     }
     //创建回执消息
+    String? receiverPeerId = chatMessage.receiverPeerId;
+    String? receiverName = chatMessage.receiverName;
+    String? direct = chatMessage.direct;
+    if (direct == ChatDirect.receive.name) {
+      receiverPeerId = chatMessage.senderPeerId;
+      receiverName = chatMessage.senderName;
+    }
     ChatMessage chatReceipt = await chatMessageService.buildLinkmanChatReceipt(
-        chatMessage, receiptType);
+        chatMessage, receiptType,
+        receiverPeerId: receiverPeerId, receiverName: receiverName);
     await chatMessageService.sendAndStore(chatReceipt);
     await chatMessageService.updateReceiptType(chatMessage, receiptType);
   }
