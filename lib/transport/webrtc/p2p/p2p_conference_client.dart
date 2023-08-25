@@ -124,7 +124,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
         getPeerMediaStreams(peerId, clientId: clientId);
     if (peerMediaStreams.isNotEmpty) {
       for (var peerMediaStream in peerMediaStreams) {
-        await remove(peerMediaStream);
+        await close(peerMediaStream);
       }
     }
   }
@@ -220,11 +220,6 @@ class P2pConferenceClient extends PeerMediaStreamController {
   ///退出会议，移除所有的webrtc连接
   ///激活exit事件
   exit() async {
-    //先移除，后关闭
-    for (var peerMediaStream in peerMediaStreams) {
-      await peerMediaStream.close();
-    }
-    peerMediaStreams.clear();
     currentPeerMediaStream = null;
     mainPeerMediaStream = null;
     List<AdvancedPeerConnection> peerConnections = [..._peerConnections.values];
@@ -233,6 +228,10 @@ class P2pConferenceClient extends PeerMediaStreamController {
     }
     _peerConnections.clear();
     _participants.clear();
+    for (var peerMediaStream in peerMediaStreams) {
+      await peerMediaStream.close();
+    }
+    peerMediaStreams.clear();
     conferenceChatMessageController.setChatMessage(null);
     conferenceChatMessageController.setChatSummary(null);
     await onPeerMediaStreamOperator(PeerMediaStreamOperator.exit.name, null);
