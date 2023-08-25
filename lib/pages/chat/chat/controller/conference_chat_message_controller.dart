@@ -546,8 +546,7 @@ class ConferenceChatMessageController with ChangeNotifier {
   ///在视频会议中增加多个本地视频到所有连接
   addLocalPeerMediaStreams() async {
     if (_conference != null && _status == VideoChatStatus.chatting) {
-      var peerMediaStreams =
-          localPeerMediaStreamController.getPeerMediaStreams().values.toList();
+      var peerMediaStreams = localPeerMediaStreamController.peerMediaStreams;
       await p2pConferenceClientPool.addLocalPeerMediaStream(
           _conference!.conferenceId, peerMediaStreams);
     }

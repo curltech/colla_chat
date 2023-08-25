@@ -17,6 +17,7 @@ import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:synchronized/extension.dart';
+import 'package:synchronized/synchronized.dart';
 
 ///一个队列，按照被使用的新旧排序，当元素超过最大数量的时候，溢出最旧的元素
 class LruQueue<T> {
@@ -131,6 +132,7 @@ class PeerConnectionPool {
   Map<String, dynamic> protocolHandlers = {};
 
   Map<String, List<Future<dynamic> Function(WebrtcEvent event)>> fnsm = {};
+  final Lock _fnsmLock = Lock();
 
   PeerConnectionPool() {
     signalAction.registerReceiver(onSignal);
@@ -197,43 +199,49 @@ class PeerConnectionPool {
   }
 
   registerWebrtcEvent(String peerId, WebrtcEventType eventType,
-      Future<dynamic> Function(WebrtcEvent) fn) {
-    String key = _getKey(peerId, eventType);
-    List<Future<void> Function(WebrtcEvent)>? fns = fnsm[key];
-    if (fns == null) {
-      fns = [];
-      fnsm[key] = fns;
-    }
-    fns.add(fn);
+      Future<dynamic> Function(WebrtcEvent) fn) async {
+    await _fnsmLock.synchronized(() {
+      String key = _getKey(peerId, eventType);
+      List<Future<void> Function(WebrtcEvent)>? fns = fnsm[key];
+      if (fns == null) {
+        fns = [];
+        fnsm[key] = fns;
+      }
+      fns.add(fn);
+    });
   }
 
   unregisterWebrtcEvent(String peerId, WebrtcEventType eventType,
-      Future<dynamic> Function(WebrtcEvent) fn) {
-    String key = _getKey(peerId, eventType);
-    List<Future<void> Function(WebrtcEvent)>? fns = fnsm[key];
-    if (fns == null) {
-      return;
-    }
-    fns.remove(fn);
-    if (fns.isEmpty) {
-      fnsm.remove(key);
-    }
+      Future<dynamic> Function(WebrtcEvent) fn) async {
+    await _fnsmLock.synchronized(() {
+      String key = _getKey(peerId, eventType);
+      List<Future<void> Function(WebrtcEvent)>? fns = fnsm[key];
+      if (fns == null) {
+        return;
+      }
+      fns.remove(fn);
+      if (fns.isEmpty) {
+        fnsm.remove(key);
+      }
+    });
   }
 
   Future<List> onWebrtcEvent(WebrtcEvent event) async {
-    String peerId = event.peerId;
-    WebrtcEventType eventType = event.eventType;
-    logger.w('Webrtc peer connection $peerId webrtcEvent $eventType coming');
-    String key = _getKey(peerId, eventType);
-    List<Future<dynamic> Function(WebrtcEvent)>? fns = fnsm[key];
-    var results = [];
-    if (fns != null) {
-      for (var fn in fns) {
-        results.add(await fn(event));
+    return await _fnsmLock.synchronized(() async {
+      String peerId = event.peerId;
+      WebrtcEventType eventType = event.eventType;
+      logger.w('Webrtc peer connection $peerId webrtcEvent $eventType coming');
+      String key = _getKey(peerId, eventType);
+      List<Future<dynamic> Function(WebrtcEvent)>? fns = fnsm[key];
+      var results = [];
+      if (fns != null) {
+        for (var fn in fns) {
+          results.add(await fn(event));
+        }
       }
-    }
 
-    return results;
+      return results;
+    });
   }
 
   /// 获取peerId的webrtc连接，可能是多个
@@ -656,10 +664,12 @@ class PeerConnectionPool {
     onWebrtcEvent(event);
   }
 
+  ///连接状态发生改变
   onStatusChanged(WebrtcEvent event) async {
     onWebrtcEvent(event);
   }
 
+  ///连接成功
   ///webrtc连接完成后首先交换最新的联系人信息，然后请求新的订阅渠道消息
   ///然后交换棘轮加密的密钥
   onConnected(WebrtcEvent event) async {
@@ -723,6 +733,7 @@ class PeerConnectionPool {
     }
   }
 
+  ///获取连接状态
   PeerConnectionStatus status(String peerId, {String? clientId}) {
     var status = PeerConnectionStatus.none;
     if (clientId == null) {

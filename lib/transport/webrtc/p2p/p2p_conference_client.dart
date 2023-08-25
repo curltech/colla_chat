@@ -35,15 +35,8 @@ class P2pConferenceClient extends PeerMediaStreamController {
     var peerId = peerConnection.peerId;
     var clientId = peerConnection.clientId;
     var name = peerConnection.name;
-    var key = _getKey(peerId, clientId);
-    if (!_peerConnections.containsKey(key)) {
-      logger.e('PeerConnection of add peerMediaStream is not exist');
-    }
     List<MediaStream?> remoteStreams =
         peerConnection.basePeerConnection.peerConnection!.getRemoteStreams();
-    if (remoteStreams.isEmpty) {
-      logger.e('PeerConnection of add peerMediaStream is no remote stream');
-    }
     for (var stream in remoteStreams) {
       if (stream == null) {
         logger.e('A peerConnection remoteStream is null');
@@ -124,33 +117,12 @@ class P2pConferenceClient extends PeerMediaStreamController {
   _removePeerMediaStream(AdvancedPeerConnection peerConnection) async {
     var peerId = peerConnection.peerId;
     var clientId = peerConnection.clientId;
-    var key = _getKey(peerId, clientId);
-    if (!_peerConnections.containsKey(key)) {
-      logger.e('PeerConnection of remove peerMediaStream is not exist');
-    }
-    RTCPeerConnection? pc = peerConnection.basePeerConnection.peerConnection;
-    if (pc == null) {
-      logger.e('RTCPeerConnection of remove peerMediaStream is null');
-      return;
-    }
-    List<MediaStream?> remoteStreams = pc.getRemoteStreams();
-    if (remoteStreams.isEmpty) {
-      logger.e('PeerConnection of remove peerMediaStream is no remote stream');
-      return;
-    }
-    for (var stream in remoteStreams) {
-      if (stream == null) {
-        logger.e('A peerConnection remoteStream is null');
-        continue;
+    List<PeerMediaStream> peerMediaStreams =
+        getPeerMediaStreams(peerId, clientId: clientId);
+    if (peerMediaStreams.isNotEmpty) {
+      for (var peerMediaStream in peerMediaStreams) {
+        await remove(peerMediaStream);
       }
-      PeerMediaStream? peerMediaStream = await getPeerMediaStream(stream.id);
-      if (peerMediaStream == null) {
-        logger.e('A peerConnection remoteStream video stream is not exist');
-        continue;
-      }
-      await remove(peerMediaStream);
-      logger.i(
-          'A peerConnection remoteStream video stream ${stream.id} is removed');
     }
   }
 
@@ -233,21 +205,6 @@ class P2pConferenceClient extends PeerMediaStreamController {
       if (peerMediaStream != null) {
         var mediaStream = peerMediaStream.mediaStream;
         if (mediaStream != null) {
-          // List<MediaStreamTrack> tracks = mediaStream.getTracks();
-          // List<MediaStreamTrack> removes = [];
-          // for (MediaStreamTrack mediaStreamTrack in tracks) {
-          //   if (mediaStreamTrack.id == track.id) {
-          //     removes.add(mediaStreamTrack);
-          //   }
-          // }
-          // for (MediaStreamTrack mediaStreamTrack in removes) {
-          //   await mediaStream.removeTrack(mediaStreamTrack);
-          // }
-          // tracks = mediaStream.getTracks();
-          // if (tracks.isEmpty) {
-          //   await remove(peerMediaStream);
-          //   await close(peerMediaStream);
-          // }
           await close(peerMediaStream);
         }
       }
@@ -260,8 +217,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
   ///激活exit事件
   exit() async {
     //先移除，后关闭
-    var peerMediaStreams = getPeerMediaStreams();
-    for (var peerMediaStream in peerMediaStreams.values) {
+    for (var peerMediaStream in peerMediaStreams) {
       await peerMediaStream.close();
     }
     peerMediaStreams.clear();
@@ -379,6 +335,18 @@ class P2pConferenceClientPool with ChangeNotifier {
     this.conferenceId = conferenceId;
 
     return p2pConferenceClient;
+  }
+
+  ///加新的连接
+  addAdvancedPeerConnection(AdvancedPeerConnection peerConnection) async {
+    if (conferenceId == null) {
+      return;
+    }
+    P2pConferenceClient? p2pConferenceClient =
+        _p2pConferenceClients[conferenceId];
+    if (p2pConferenceClient != null) {
+      await p2pConferenceClient.addAdvancedPeerConnection(peerConnection);
+    }
   }
 
   ///把本地新的peerMediaStream加入到会议的所有连接中，并且都重新协商

@@ -615,7 +615,7 @@ class BasePeerConnection {
       var interval = end! - start!;
       logger.i('id:$id connected time:$interval');
     }
-    await emit(WebrtcEventType.connected, '');
+    emit(WebrtcEventType.connected, '');
   }
 
   RTCPeerConnection? get peerConnection {
@@ -632,7 +632,7 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    await emit(WebrtcEventType.connectionState, state);
+    emit(WebrtcEventType.connectionState, state);
     if (state == RTCPeerConnectionState.RTCPeerConnectionStateFailed ||
         state == RTCPeerConnectionState.RTCPeerConnectionStateClosed ||
         state == RTCPeerConnectionState.RTCPeerConnectionStateFailed ||
@@ -654,7 +654,7 @@ class BasePeerConnection {
       return;
     }
 
-    await emit(WebrtcEventType.iceConnectionState, state);
+    emit(WebrtcEventType.iceConnectionState, state);
     if (state == RTCIceConnectionState.RTCIceConnectionStateConnected ||
         state == RTCIceConnectionState.RTCIceConnectionStateCompleted) {
       connected();
@@ -673,7 +673,7 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    await emit(WebrtcEventType.iceGatheringState, state);
+    emit(WebrtcEventType.iceGatheringState, state);
   }
 
   /// signal状态事件
@@ -689,7 +689,7 @@ class BasePeerConnection {
       negotiateStatus = NegotiateStatus.negotiated;
       renegotiateNeed = false;
     }
-    await emit(WebrtcEventType.signalingState, state);
+    emit(WebrtcEventType.signalingState, state);
   }
 
   ///onIceCandidate事件表示本地candidate准备好，可以发送IceCandidate到远端
@@ -708,7 +708,7 @@ class BasePeerConnection {
     if (candidate.candidate != null) {
       //发送candidate信号
       //logger.i('Send Candidate signal.');
-      await emit(
+      emit(
           WebrtcEventType.signal,
           WebrtcSignal(SignalType.candidate.name,
               candidates: [candidate], extension: extension));
@@ -833,7 +833,7 @@ class BasePeerConnection {
       logger.e('peerConnection getLocalDescription failure:$e');
     }
     sdp ??= offer;
-    await emit(WebrtcEventType.signal,
+    emit(WebrtcEventType.signal,
         WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
     logger.i('end sendOffer');
   }
@@ -916,7 +916,7 @@ class BasePeerConnection {
     }
     //被叫发送重新协商的请求
     logger.w('send signal renegotiate');
-    await emit(WebrtcEventType.signal,
+    emit(WebrtcEventType.signal,
         WebrtcSignal('renegotiate', renegotiate: true, extension: extension));
     negotiateStatus = NegotiateStatus.negotiating;
   }
@@ -974,7 +974,7 @@ class BasePeerConnection {
       logger.e('peerConnection getLocalDescription failure:$e');
     }
     sdp ??= answer;
-    await emit(WebrtcEventType.signal,
+    emit(WebrtcEventType.signal,
         WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
     logger.i('sendAnswer:${answer.type} successfully');
   }
@@ -1100,7 +1100,7 @@ class BasePeerConnection {
     }
     logger.i('addTransceiver()');
 
-    await emit(
+    emit(
         WebrtcEventType.signal,
         WebrtcSignal(SignalType.transceiverRequest.name,
             transceiverRequest: {'kind': kind, 'init': init},
@@ -1292,7 +1292,7 @@ class BasePeerConnection {
     for (MediaStreamTrack track in tracks) {
       await onRemoteTrack(stream, track);
     }
-    await emit(WebrtcEventType.stream, stream);
+    emit(WebrtcEventType.stream, stream);
   }
 
   onRemoveRemoteStream(MediaStream stream) async {
@@ -1301,7 +1301,7 @@ class BasePeerConnection {
     for (MediaStreamTrack track in tracks) {
       await onRemoveRemoteTrack(stream, track);
     }
-    await emit(WebrtcEventType.removeStream, stream);
+    emit(WebrtcEventType.removeStream, stream);
   }
 
   ///连接的监听轨道到来的监听器，当远方由轨道来的时候执行
@@ -1323,7 +1323,7 @@ class BasePeerConnection {
         }
       }
     }
-    await emit(WebrtcEventType.track, {'stream': stream, 'track': track});
+    emit(WebrtcEventType.track, {'stream': stream, 'track': track});
   }
 
   onRemoveRemoteTrack(MediaStream stream, MediaStreamTrack track) async {
@@ -1341,7 +1341,7 @@ class BasePeerConnection {
       });
     }
 
-    await emit(WebrtcEventType.removeTrack, {'stream': stream, 'track': track});
+    emit(WebrtcEventType.removeTrack, {'stream': stream, 'track': track});
   }
 
   /// 注册一组回调函数，内部可以调用外部注册事件的方法
@@ -1361,7 +1361,7 @@ class BasePeerConnection {
   emit(WebrtcEventType name, dynamic webrtcEvent) async {
     var event = events[name];
     if (event != null) {
-      await event(webrtcEvent);
+      event(webrtcEvent);
     }
   }
 
@@ -1433,7 +1433,7 @@ class BasePeerConnection {
 
       if (slices != null) {
         logger.i('webrtc binary onMessage length: ${slices.length}');
-        await emit(WebrtcEventType.message, slices);
+        emit(WebrtcEventType.message, slices);
       }
     } else {
       var data = message.text.codeUnits;
@@ -1441,7 +1441,7 @@ class BasePeerConnection {
 
       if (slices != null) {
         logger.i('webrtc text onMessage length: ${slices.length}');
-        await emit(WebrtcEventType.message, slices);
+        emit(WebrtcEventType.message, slices);
       }
     }
   }
@@ -1490,6 +1490,6 @@ class BasePeerConnection {
     // if (reconnectTimes > 0) {
     //   reconnect();
     // }
-    await emit(WebrtcEventType.closed, this);
+    emit(WebrtcEventType.closed, this);
   }
 }

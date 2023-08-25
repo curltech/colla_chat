@@ -189,7 +189,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     //       tooltip: 'Open media play',
     //       icon: const Icon(Icons.video_file, color: Colors.white)),
     // );
-    if (localPeerMediaStreamController.getPeerMediaStreams().isNotEmpty) {
+    if (localPeerMediaStreamController.peerMediaStreams.isNotEmpty) {
       actionData.add(
         ActionData(
             label: 'Close',
@@ -202,7 +202,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
     this.actionData.value = actionData;
     videoViewCount.value =
-        localPeerMediaStreamController.getPeerMediaStreams().length;
+        localPeerMediaStreamController.peerMediaStreams.length;
   }
 
   ///创建本地的Video render，支持视频和音频的切换，设置当前videoChatRender，激活create。add和remove监听事件
@@ -483,8 +483,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   ///移除本地所有的视频，这时候还能看远程的视频
   _close() async {
-    var peerMediaStreams =
-        localPeerMediaStreamController.getPeerMediaStreams().values.toList();
+    var peerMediaStreams = localPeerMediaStreamController.peerMediaStreams;
     var videoChatMessageController = this.videoChatMessageController.value;
     Conference? conference = videoChatMessageController?.conference;
     //从webrtc连接中移除流
@@ -562,7 +561,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   ///切换显示按钮面板
   void _toggleActionCardVisible() {
-    bool visible = localPeerMediaStreamController.getPeerMediaStreams().isEmpty;
+    bool visible = localPeerMediaStreamController.peerMediaStreams.isEmpty;
     if (visible) {
       controlPanelVisible.value = true;
     } else {

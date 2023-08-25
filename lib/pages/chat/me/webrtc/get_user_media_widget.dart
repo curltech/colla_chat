@@ -59,7 +59,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
     try {
       await localPeerMediaStreamController.createPeerVideoStream();
       List<PeerMediaStream> renders =
-          localPeerMediaStreamController.getPeerMediaStreams().values.toList();
+          localPeerMediaStreamController.peerMediaStreams;
       if (renders.isNotEmpty) {
         peerMediaStream = renders[0];
         await MediaStreamUtil.enumerateDevices();

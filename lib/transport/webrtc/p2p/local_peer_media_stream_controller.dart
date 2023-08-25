@@ -117,23 +117,20 @@ class PeerMediaStreamController with ChangeNotifier {
   }
 
   ///根据peerId筛选，获取相应的Peer媒体流的集合
-  Map<String, PeerMediaStream> getPeerMediaStreams(
-      {String? peerId, String? clientId}) {
-    if (peerId == null && clientId == null) {
-      return _peerMediaStreams;
-    }
-    Map<String, PeerMediaStream> peerMediaStreams = {};
+  List<PeerMediaStream> getPeerMediaStreams(String peerId,
+      {String? clientId}) {
+    List<PeerMediaStream> peerMediaStreams = [];
     for (var peerMediaStream in _peerMediaStreams.values) {
-      if (peerId != null && peerId == peerMediaStream.peerId) {
+      if (peerId == peerMediaStream.peerId) {
         if (clientId != null) {
           if (clientId == peerMediaStream.clientId) {
             if (peerMediaStream.id != null) {
-              peerMediaStreams[peerMediaStream.id!] = peerMediaStream;
+              peerMediaStreams.add(peerMediaStream);
             }
           }
         } else {
           if (peerMediaStream.id != null) {
-            peerMediaStreams[peerMediaStream.id!] = peerMediaStream;
+            peerMediaStreams.add(peerMediaStream);
           }
         }
       }
@@ -142,15 +139,15 @@ class PeerMediaStreamController with ChangeNotifier {
   }
 
   ///根据peerId筛选，获取相应的原生的媒体流的集合
-  Map<String, MediaStream> getMediaStreams({String? peerId, String? clientId}) {
-    Map<String, PeerMediaStream> peerMediaStreams =
-        getPeerMediaStreams(peerId: peerId, clientId: clientId);
-    Map<String, MediaStream> streams = {};
+  List<MediaStream> getMediaStreams(String peerId, {String? clientId}) {
+    List<PeerMediaStream> peerMediaStreams =
+        getPeerMediaStreams(peerId, clientId: clientId);
+    List<MediaStream> streams = [];
     if (peerMediaStreams.isNotEmpty) {
-      for (var stream in peerMediaStreams.values) {
+      for (var stream in peerMediaStreams) {
         var mediaStream = stream.mediaStream;
         if (mediaStream != null) {
-          streams[mediaStream.id] = mediaStream;
+          streams.add(mediaStream);
         }
       }
     }
