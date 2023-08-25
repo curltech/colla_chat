@@ -738,7 +738,7 @@ class ConferenceChatMessageController with ChangeNotifier {
       P2pConferenceClient? p2pConferenceClient = p2pConferenceClientPool
           .getP2pConferenceClient(_conference!.conferenceId);
       if (p2pConferenceClient != null) {
-        p2pConferenceClient
+        await p2pConferenceClient
             .removeAdvancedPeerConnection(advancedPeerConnection);
       }
     } else {

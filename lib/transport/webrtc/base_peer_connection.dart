@@ -1180,7 +1180,7 @@ class BasePeerConnection {
     if (peerConnection != null) {
       var tracks = stream.getTracks();
       for (var track in tracks) {
-        removeTrack(stream, track);
+        await removeTrack(stream, track);
       }
     }
   }
@@ -1209,7 +1209,7 @@ class BasePeerConnection {
           }
         } catch (err) {
           logger.e('removeTrack err $err');
-          close();
+          await close();
         }
         trackSenders.remove(trackId);
       }

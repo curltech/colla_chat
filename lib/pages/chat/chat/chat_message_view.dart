@@ -317,8 +317,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
               onVisibilityChanged: (VisibilityInfo visibilityInfo) {
                 if (visibleFraction == 0.0 &&
                     visibilityInfo.visibleFraction > 0) {
-                  logger.i(
-                      'ChatMessageView visibleFraction from 0 to ${visibilityInfo.visibleFraction}');
+                  // logger.i(
+                  //     'ChatMessageView visibleFraction from 0 to ${visibilityInfo.visibleFraction}');
                   _createPeerConnection();
                 }
                 visibleFraction = visibilityInfo.visibleFraction;
