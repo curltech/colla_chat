@@ -19,6 +19,8 @@ class P2pConferenceClient extends PeerMediaStreamController {
   //根据peerId和clientId对应的所有的webrtc连接
   final Map<String, AdvancedPeerConnection> _peerConnections = {};
 
+  final Set<String> _participants = {};
+
   //会议的视频消息控制器，是创建会议的邀请消息，包含会议的信息
   final ConferenceChatMessageController conferenceChatMessageController;
 
@@ -80,6 +82,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
     var key = _getKey(peerConnection.peerId, peerConnection.clientId);
     if (!_peerConnections.containsKey(key)) {
       _peerConnections[key] = peerConnection;
+      _participants.add(key);
       peerConnection.registerWebrtcEvent(
           WebrtcEventType.track, _onAddRemoteTrack);
       peerConnection.registerWebrtcEvent(
@@ -148,6 +151,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
   ///把指定连接中的本地媒体关闭并且移除
   removeAdvancedPeerConnection(AdvancedPeerConnection peerConnection) async {
     var key = _getKey(peerConnection.peerId, peerConnection.clientId);
+    _participants.remove(key);
     var advancedPeerConnection = _peerConnections.remove(key);
     if (advancedPeerConnection != null) {
       peerConnection.unregisterWebrtcEvent(
@@ -228,6 +232,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
       await removeAdvancedPeerConnection(peerConnection);
     }
     _peerConnections.clear();
+    _participants.clear();
     conferenceChatMessageController.setChatMessage(null);
     conferenceChatMessageController.setChatSummary(null);
     await onPeerMediaStreamOperator(PeerMediaStreamOperator.exit.name, null);
