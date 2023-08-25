@@ -46,7 +46,13 @@ class P2pConferenceClient extends PeerMediaStreamController {
     _joined = false;
     List<AdvancedPeerConnection> peerConnections = [..._peerConnections.values];
     for (AdvancedPeerConnection peerConnection in peerConnections) {
-      await removeAdvancedPeerConnection(peerConnection);
+      await _removePeerMediaStream(peerConnection);
+      List<PeerMediaStream> peerMediaStreams =
+          localPeerMediaStreamController.peerMediaStreams;
+      if (peerMediaStreams.isNotEmpty) {
+        await removePeerMediaStream(peerMediaStreams,
+            peerConnection: peerConnection);
+      }
     }
   }
 
@@ -163,7 +169,9 @@ class P2pConferenceClient extends PeerMediaStreamController {
       }
       await peerConnection.negotiate();
     } else {
-      List<AdvancedPeerConnection> peerConnections=[..._peerConnections.values];
+      List<AdvancedPeerConnection> peerConnections = [
+        ..._peerConnections.values
+      ];
       for (AdvancedPeerConnection peerConnection in peerConnections) {
         for (var peerMediaStream in peerMediaStreams) {
           await peerConnection.removeStream(peerMediaStream);
