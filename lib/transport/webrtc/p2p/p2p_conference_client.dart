@@ -35,7 +35,8 @@ class P2pConferenceClient extends PeerMediaStreamController {
   ///自己加入会议
   join() async {
     _joined = true;
-    for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
+    List<AdvancedPeerConnection> peerConnections = [..._peerConnections.values];
+    for (AdvancedPeerConnection peerConnection in peerConnections) {
       await addAdvancedPeerConnection(peerConnection);
     }
   }
@@ -43,7 +44,8 @@ class P2pConferenceClient extends PeerMediaStreamController {
   ///自己退出会议
   exit() async {
     _joined = false;
-    for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
+    List<AdvancedPeerConnection> peerConnections = [..._peerConnections.values];
+    for (AdvancedPeerConnection peerConnection in peerConnections) {
       await removeAdvancedPeerConnection(peerConnection);
     }
   }
@@ -161,7 +163,8 @@ class P2pConferenceClient extends PeerMediaStreamController {
       }
       await peerConnection.negotiate();
     } else {
-      for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
+      List<AdvancedPeerConnection> peerConnections=[..._peerConnections.values];
+      for (AdvancedPeerConnection peerConnection in peerConnections) {
         for (var peerMediaStream in peerMediaStreams) {
           await peerConnection.removeStream(peerMediaStream);
         }
