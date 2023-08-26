@@ -117,8 +117,7 @@ class PeerMediaStreamController with ChangeNotifier {
   }
 
   ///根据peerId筛选，获取相应的Peer媒体流的集合
-  List<PeerMediaStream> getPeerMediaStreams(String peerId,
-      {String? clientId}) {
+  List<PeerMediaStream> getPeerMediaStreams(String peerId, {String? clientId}) {
     List<PeerMediaStream> peerMediaStreams = [];
     for (var peerMediaStream in _peerMediaStreams.values) {
       if (peerId == peerMediaStream.peerId) {
@@ -200,6 +199,7 @@ class PeerMediaStreamController with ChangeNotifier {
   ///关闭指定流并且从集合中删除
   close(PeerMediaStream peerMediaStream) async {
     await remove(peerMediaStream);
+    //在windows平台上关闭远程流似乎会崩溃，可以注释后进行测试
     await peerMediaStream.close();
   }
 
