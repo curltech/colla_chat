@@ -9,6 +9,7 @@ import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controll
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:synchronized/synchronized.dart';
 
 ///视频会议客户端，代表一个正在进行的视频会议，
 ///包含一个必须的视频会议消息控制器和一个会议内的所有的webrtc连接及其包含的远程视频，
@@ -271,6 +272,8 @@ class P2pConferenceClient extends PeerMediaStreamController {
 class P2pConferenceClientPool with ChangeNotifier {
   final Map<String, P2pConferenceClient> _p2pConferenceClients = {};
 
+  final Lock _clientLock = Lock();
+
   //当前会议编号
   String? _conferenceId;
 
@@ -355,19 +358,21 @@ class P2pConferenceClientPool with ChangeNotifier {
 
   ///创建新的远程视频会议控制器，假如会议号已经存在，直接返回控制器
   ///在发起者接收到至少一个同意回执，开始重新协商，或者接收者发送出同意回执的时候调用
-  P2pConferenceClient createP2pConferenceClient(
-      ConferenceChatMessageController conferenceChatMessageController) {
-    String conferenceId = conferenceChatMessageController.conferenceId!;
-    P2pConferenceClient? p2pConferenceClient =
-        _p2pConferenceClients[conferenceId];
-    if (p2pConferenceClient == null) {
-      p2pConferenceClient = P2pConferenceClient(
-          conferenceChatMessageController: conferenceChatMessageController);
-      _p2pConferenceClients[conferenceId] = p2pConferenceClient;
-    }
-    this.conferenceId = conferenceId;
+  Future<P2pConferenceClient> createP2pConferenceClient(
+      ConferenceChatMessageController conferenceChatMessageController) async {
+    return await _clientLock.synchronized(() {
+      String conferenceId = conferenceChatMessageController.conferenceId!;
+      P2pConferenceClient? p2pConferenceClient =
+          _p2pConferenceClients[conferenceId];
+      if (p2pConferenceClient == null) {
+        p2pConferenceClient = P2pConferenceClient(
+            conferenceChatMessageController: conferenceChatMessageController);
+        _p2pConferenceClients[conferenceId] = p2pConferenceClient;
+      }
+      this.conferenceId = conferenceId;
 
-    return p2pConferenceClient;
+      return p2pConferenceClient;
+    });
   }
 
   ///加新的连接
@@ -409,27 +414,34 @@ class P2pConferenceClientPool with ChangeNotifier {
   ///根据会议编号退出会议
   ///调用对应会议的退出方法
   exit(String conferenceId) async {
-    P2pConferenceClient? p2pConferenceClient =
-        _p2pConferenceClients[conferenceId];
-    if (p2pConferenceClient != null) {
-      await p2pConferenceClient.exit();
-      notifyListeners();
-    }
+    await _clientLock.synchronized(() async {
+      P2pConferenceClient? p2pConferenceClient =
+          _p2pConferenceClients[conferenceId];
+      if (p2pConferenceClient != null) {
+        await p2pConferenceClient.exit();
+        if (conferenceId == _conferenceId) {
+          _conferenceId = null;
+        }
+        notifyListeners();
+      }
+    });
   }
 
   ///根据会议编号终止会议
   ///调用对应会议的终止方法，然后从会议池中删除，设置当前会议编号为null
   terminate(String conferenceId) async {
-    P2pConferenceClient? p2pConferenceClient =
-        _p2pConferenceClients[conferenceId];
-    if (p2pConferenceClient != null) {
-      await p2pConferenceClient.terminate();
-      _p2pConferenceClients.remove(conferenceId);
-      if (conferenceId == _conferenceId) {
-        _conferenceId = null;
+    await _clientLock.synchronized(() async {
+      P2pConferenceClient? p2pConferenceClient =
+          _p2pConferenceClients[conferenceId];
+      if (p2pConferenceClient != null) {
+        await p2pConferenceClient.terminate();
+        _p2pConferenceClients.remove(conferenceId);
+        if (conferenceId == _conferenceId) {
+          _conferenceId = null;
+        }
+        notifyListeners();
       }
-      notifyListeners();
-    }
+    });
   }
 }
 

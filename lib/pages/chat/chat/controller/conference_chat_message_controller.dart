@@ -724,7 +724,7 @@ class ConferenceChatMessageController with ChangeNotifier {
     //将发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
     if (advancedPeerConnection != null) {
       P2pConferenceClient p2pConferenceClient =
-          p2pConferenceClientPool.createP2pConferenceClient(this);
+          await p2pConferenceClientPool.createP2pConferenceClient(this);
       await p2pConferenceClient
           .addAdvancedPeerConnection(advancedPeerConnection);
     } else {
@@ -765,25 +765,8 @@ class ConferenceChatMessageController with ChangeNotifier {
     await openLocalMainPeerMediaStream();
     //创建新的视频会议控制器
     P2pConferenceClient p2pConferenceClient =
-        p2pConferenceClientPool.createP2pConferenceClient(this);
+        await p2pConferenceClientPool.createP2pConferenceClient(this);
     await p2pConferenceClient.join();
-    // List<String>? participants = conference!.participants;
-    // if (participants != null && participants.isNotEmpty) {
-    //   //将所有的参与者的连接加入会议控制器，自己除外
-    //   for (var participant in participants) {
-    //     if (participant == myself.peerId) {
-    //       continue;
-    //     }
-    //     List<AdvancedPeerConnection> peerConnections =
-    //         peerConnectionPool.get(participant);
-    //     if (peerConnections.isNotEmpty) {
-    //       AdvancedPeerConnection peerConnection = peerConnections[0];
-    //       await p2pConferenceClient.addAdvancedPeerConnection(peerConnection);
-    //     } else {
-    //       logger.e('participant $participant has no peerConnections');
-    //     }
-    //   }
-    // }
     status = VideoChatStatus.chatting;
   }
 

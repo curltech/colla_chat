@@ -20,7 +20,7 @@ class PeerMediaStreamController with ChangeNotifier {
   final Map<String, PeerMediaStream> _peerMediaStreams = {};
 
   //媒体流集合的操作锁
-  final Lock _lock = Lock();
+  final Lock _streamLock = Lock();
 
   Map<String, List<Future<void> Function(PeerMediaStream? peerMediaStream)>>
       fnsm = {};
@@ -156,14 +156,14 @@ class PeerMediaStreamController with ChangeNotifier {
 
   ///根据流编号获取相应的媒体流
   Future<PeerMediaStream?> getPeerMediaStream(String streamId) async {
-    return await _lock.synchronized(() {
+    return await _streamLock.synchronized(() {
       return _peerMediaStreams[streamId];
     });
   }
 
   ///如果不存在，增加peerMediaStream，激活add事件
   add(PeerMediaStream peerMediaStream) async {
-    await _lock.synchronized(() {
+    await _streamLock.synchronized(() {
       var id = peerMediaStream.id;
       if (id != null && !_peerMediaStreams.containsKey(id)) {
         _peerMediaStreams[id] = peerMediaStream;
@@ -175,7 +175,7 @@ class PeerMediaStreamController with ChangeNotifier {
 
   ///移除媒体流，如果是当前媒体流，则设置当前的媒体流为null，激活remove事件
   remove(PeerMediaStream peerMediaStream) async {
-    await _lock.synchronized(() async {
+    await _streamLock.synchronized(() async {
       var streamId = peerMediaStream.id;
       if (streamId != null) {
         PeerMediaStream? old = _peerMediaStreams[streamId];
@@ -205,7 +205,7 @@ class PeerMediaStreamController with ChangeNotifier {
 
   ///移除并且关闭控制器所有的媒体流，激活exit事件
   closeAll() async {
-    await _lock.synchronized(() async {
+    await _streamLock.synchronized(() async {
       //先移除，后关闭
       List<PeerMediaStream> peerMediaStreams = [..._peerMediaStreams.values];
       for (var peerMediaStream in peerMediaStreams) {
