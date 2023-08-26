@@ -80,7 +80,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         onLongPress: () async {
           await _showActionCard(context);
         },
-        onDoubleTap: (){
+        onDoubleTap: () {
           _popupDialog.remove();
           setState(() {
             enableFullScreen = false;
@@ -177,8 +177,10 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
               showTooltip: true,
               crossAxisCount: 4,
               actions: _buildVideoActionData(),
-              height: 160,
-              width: 380,
+              mainAxisSpacing: 20,
+              crossAxisSpacing: 20,
+              height: 200,
+              width: 420,
               size: 30));
     });
   }
