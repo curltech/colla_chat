@@ -1295,15 +1295,6 @@ class BasePeerConnection {
     emit(WebrtcEventType.stream, stream);
   }
 
-  onRemoveRemoteStream(MediaStream stream) async {
-    logger.i('onRemoveRemoteStream stream:${stream.id} ${stream.ownerTag}');
-    List<MediaStreamTrack> tracks = stream.getTracks();
-    for (MediaStreamTrack track in tracks) {
-      await onRemoveRemoteTrack(stream, track);
-    }
-    emit(WebrtcEventType.removeStream, stream);
-  }
-
   ///连接的监听轨道到来的监听器，当远方由轨道来的时候执行
   onRemoteTrack(MediaStream? stream, MediaStreamTrack track) async {
     logger.i('onRemoteTrack event:${track.id}, stream:${stream?.id}');
@@ -1324,6 +1315,15 @@ class BasePeerConnection {
       }
     }
     emit(WebrtcEventType.track, {'stream': stream, 'track': track});
+  }
+
+  onRemoveRemoteStream(MediaStream stream) async {
+    logger.i('onRemoveRemoteStream stream:${stream.id} ${stream.ownerTag}');
+    List<MediaStreamTrack> tracks = stream.getTracks();
+    for (MediaStreamTrack track in tracks) {
+      await onRemoveRemoteTrack(stream, track);
+    }
+    emit(WebrtcEventType.removeStream, stream);
   }
 
   onRemoveRemoteTrack(MediaStream stream, MediaStreamTrack track) async {
