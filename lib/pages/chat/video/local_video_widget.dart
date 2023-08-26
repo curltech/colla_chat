@@ -551,6 +551,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               actions: value,
               height: height,
               //width: 320,
+              mainAxisSpacing: 20,
+              crossAxisSpacing: 20,
               onPressed: _onAction,
               crossAxisCount: 4,
               labelColor: Colors.white,

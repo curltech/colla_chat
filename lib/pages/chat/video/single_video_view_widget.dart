@@ -180,7 +180,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
               mainAxisSpacing: 20,
               crossAxisSpacing: 20,
               height: 200,
-              width: 420,
+              //width: 420,
               size: 30));
     });
   }
