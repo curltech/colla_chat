@@ -445,8 +445,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         actions: actionData,
         height: chatMessageViewController.moreMessageInputHeight,
         onPressed: _onAction,
-        mainAxisSpacing: 20,
-        crossAxisSpacing: 20,
+        mainAxisSpacing: 40,
+        crossAxisSpacing: 40,
         crossAxisCount: 4,
       ),
     );
