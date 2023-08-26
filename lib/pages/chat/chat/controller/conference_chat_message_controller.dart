@@ -418,7 +418,7 @@ class ConferenceChatMessageController with ChangeNotifier {
     if (groupType == null) {
       //立即接听
       if (receiptType == MessageReceiptType.accepted) {
-        await joinConference();
+        await join();
         //设置当前消息，转入视频会议界面
         chatMessageController.chatSummary = _chatSummary;
         chatMessageController.current = _chatMessage;
@@ -429,7 +429,7 @@ class ConferenceChatMessageController with ChangeNotifier {
     } else if (groupType == PartyType.group.name) {
       //立即接听
       if (receiptType == MessageReceiptType.accepted) {
-        await joinConference();
+        await join();
         //设置当前消息，转入视频会议界面
         chatMessageController.chatSummary = _chatSummary;
         chatMessageController.current = _chatMessage;
