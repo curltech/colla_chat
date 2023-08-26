@@ -255,7 +255,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
           continue;
         }
         List<AdvancedPeerConnection> advancedPeerConnections =
-            peerConnectionPool.get(peerId);
+            await peerConnectionPool.get(peerId);
         //如果连接不存在，则创建新连接
         if (advancedPeerConnections.isEmpty) {
           peerConnectionPool.create(peerId);
@@ -622,26 +622,20 @@ class _ChatListWidgetState extends State<ChatListWidget>
         builder: (context, value, child) {
           return Tooltip(
               message: AppLocalizations.t('Network status'),
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(
-                      height: 3,
-                    ),
-                    CommonAutoSizeText(_connectivityResult.value.name,
-                        style: const TextStyle(fontSize: 12)),
-                    _connectivityResult.value == ConnectivityResult.none
-                        ? const Icon(
-                            Icons.wifi_off,
-                            size: 20,
-                            color: Colors.red,
-                          )
-                        : const Icon(
-                            Icons.wifi,
-                            size: 20,
-                            //color: Colors.green,
-                          ),
-                  ]));
+              child:
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                _connectivityResult.value == ConnectivityResult.none
+                    ? const Icon(
+                        Icons.wifi_off,
+                        color: Colors.red,
+                      )
+                    : const Icon(
+                        Icons.wifi,
+                        //color: Colors.green,
+                      ),
+                CommonAutoSizeText(_connectivityResult.value.name,
+                    style: const TextStyle(fontSize: 12)),
+              ]));
         });
     rightWidgets.add(connectivityWidget);
     rightWidgets.add(const SizedBox(

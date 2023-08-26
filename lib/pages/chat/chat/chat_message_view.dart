@@ -220,7 +220,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
       chatMessageController.chatGPT = chatGPT;
     } else {
       List<AdvancedPeerConnection> advancedPeerConnections =
-          peerConnectionPool.get(peerId);
+          await peerConnectionPool.get(peerId);
       //如果连接不存在，则创建新连接
       if (advancedPeerConnections.isEmpty) {
         AdvancedPeerConnection? advancedPeerConnection =
@@ -250,7 +250,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
       String? memberPeerId = groupMember.memberPeerId;
       if (memberPeerId != null && memberPeerId != myself.peerId) {
         List<AdvancedPeerConnection> advancedPeerConnections =
-            peerConnectionPool.get(memberPeerId);
+            await peerConnectionPool.get(memberPeerId);
         if (advancedPeerConnections.isEmpty) {
           peerConnectionPool.create(memberPeerId);
         }

@@ -40,6 +40,7 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
   String peerId = '';
   String clientId = '';
   String? roomId;
+  AdvancedPeerConnection? advancedPeerConnection;
 
   @override
   initState() {
@@ -57,22 +58,13 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
     super.dispose();
   }
 
-  AdvancedPeerConnection? _getAdvancedPeerConnection() {
-    AdvancedPeerConnection? advancedPeerConnection;
-    advancedPeerConnection =
-        peerConnectionPool.getOne(peerId, clientId: clientId);
-
-    return advancedPeerConnection;
-    return null;
-  }
-
   _open() async {
     peerId = peerIdController.text;
     clientId = clientIdController.text;
 
     try {
-      AdvancedPeerConnection? advancedPeerConnection =
-          await peerConnectionPool.create(peerId);
+      advancedPeerConnection =
+          await peerConnectionPool.create(peerId, clientId: clientId);
     } catch (e) {
       logger.i(e.toString());
     }
@@ -83,12 +75,10 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
   }
 
   //发送消息
-  _sendMessage() {
-    AdvancedPeerConnection? advancedPeerConnection =
-        _getAdvancedPeerConnection();
+  _sendMessage() async {
     if (advancedPeerConnection != null) {
       var msg = CryptoUtil.stringToUtf8(messageController.text);
-      advancedPeerConnection.send(Uint8List.fromList(msg));
+      await advancedPeerConnection!.send(Uint8List.fromList(msg));
       messageController.clear();
     }
   }
@@ -105,8 +95,6 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
   }
 
   Widget _buildBody(BuildContext context) {
-    AdvancedPeerConnection? advancedPeerConnection =
-        _getAdvancedPeerConnection();
     var view = Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,8 +158,6 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
   }
 
   Widget _buildIconButton(BuildContext context) {
-    AdvancedPeerConnection? advancedPeerConnection =
-        _getAdvancedPeerConnection();
     return IconButton(
       onPressed: advancedPeerConnection != null ? _close : _open,
       icon: Icon(advancedPeerConnection != null ? Icons.close : Icons.add),

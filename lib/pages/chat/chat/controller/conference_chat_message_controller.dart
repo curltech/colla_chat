@@ -671,11 +671,12 @@ class ConferenceChatMessageController with ChangeNotifier {
   }
 
   ///对方终止，把对方移除会议
-  _onTerminated(String peerId, String clientId, String messageId) {
+  _onTerminated(String peerId, String clientId, String messageId) async {
     if (_status == VideoChatStatus.calling) {
       status = VideoChatStatus.end;
     }
-    AdvancedPeerConnection? advancedPeerConnection = peerConnectionPool.getOne(
+    AdvancedPeerConnection? advancedPeerConnection =
+        await peerConnectionPool.getOne(
       peerId,
       clientId: clientId,
     );
@@ -717,7 +718,8 @@ class ConferenceChatMessageController with ChangeNotifier {
 
   ///对方加入，自己也要配合把对方的连接加入本地流，属于被动加入
   Future<void> _onJoin(String peerId, String clientId, String messageId) async {
-    AdvancedPeerConnection? advancedPeerConnection = peerConnectionPool.getOne(
+    AdvancedPeerConnection? advancedPeerConnection =
+        await peerConnectionPool.getOne(
       peerId,
       clientId: clientId,
     );
@@ -737,7 +739,8 @@ class ConferenceChatMessageController with ChangeNotifier {
     if (_status == VideoChatStatus.calling) {
       status = VideoChatStatus.end;
     }
-    AdvancedPeerConnection? advancedPeerConnection = peerConnectionPool.getOne(
+    AdvancedPeerConnection? advancedPeerConnection =
+        await peerConnectionPool.getOne(
       peerId,
       clientId: clientId,
     );
