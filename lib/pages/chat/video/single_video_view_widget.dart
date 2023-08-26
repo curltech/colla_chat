@@ -177,9 +177,9 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
               showTooltip: true,
               crossAxisCount: 4,
               actions: _buildVideoActionData(),
-              height: 120,
-              width: 320,
-              size: 20));
+              height: 160,
+              width: 380,
+              size: 30));
     });
   }
 

@@ -177,9 +177,9 @@ class MessageWidget {
                         },
                         crossAxisCount: 4,
                         actions: messagePopActionData,
-                        height: 140,
-                        width: 320,
-                        size: 20));
+                        height: 180,
+                        width: 380,
+                        size: 30));
               },
             );
           },
