@@ -119,7 +119,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     var formInputWidget = Container(
         padding: const EdgeInsets.all(10.0),
         child: FormInputWidget(
-          height: appDataProvider.portraitSize.height * 0.5,
+          height: appDataProvider.portraitSize.height * 0.7,
           formButtonDefs: formButtonDefs,
           controller: controller,
         ));
