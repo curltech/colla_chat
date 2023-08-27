@@ -249,32 +249,38 @@ class PeerConnectionPool {
   /// 获取peerId的webrtc连接，可能是多个
   /// @param peerId
   Future<List<AdvancedPeerConnection>> get(String peerId) async {
-    bool locked = _connLock.locked;
-    logger.i('peer connections is locked');
     return await _connLock.synchronized(() {
-      if (_peerConnections.containsKey(peerId)) {
-        Map<String, AdvancedPeerConnection>? aps = _peerConnections.use(peerId);
-        if (aps != null) {
-          return aps.values.toList();
-        }
-      }
-
-      return [];
+      return _get(peerId);
     });
+  }
+
+  List<AdvancedPeerConnection> _get(String peerId) {
+    if (_peerConnections.containsKey(peerId)) {
+      Map<String, AdvancedPeerConnection>? aps = _peerConnections.use(peerId);
+      if (aps != null) {
+        return aps.values.toList();
+      }
+    }
+
+    return [];
   }
 
   Future<AdvancedPeerConnection?> getOne(String peerId,
       {required String clientId}) async {
     return await _connLock.synchronized(() {
-      if (_peerConnections.containsKey(peerId)) {
-        Map<String, AdvancedPeerConnection>? aps = _peerConnections.use(peerId);
-        if (aps != null && aps.isNotEmpty) {
-          return aps[clientId];
-        }
-      }
-
-      return null;
+      return _getOne(peerId, clientId: clientId);
     });
+  }
+
+  AdvancedPeerConnection? _getOne(String peerId, {required String clientId}) {
+    if (_peerConnections.containsKey(peerId)) {
+      Map<String, AdvancedPeerConnection>? aps = _peerConnections.use(peerId);
+      if (aps != null && aps.isNotEmpty) {
+        return aps[clientId];
+      }
+    }
+
+    return null;
   }
 
   Future<void> put(
@@ -484,7 +490,7 @@ class PeerConnectionPool {
       List<Map<String, String>>? iceServers,
       Uint8List? aesKey}) async {
     AdvancedPeerConnection? advancedPeerConnection =
-        await getOne(peerId, clientId: clientId);
+        _getOne(peerId, clientId: clientId);
     if (advancedPeerConnection == null) {
       logger.i('advancedPeerConnection is null,create new one');
       advancedPeerConnection =
@@ -647,7 +653,7 @@ class PeerConnectionPool {
 
   /// 向peer发送信息，如果是多个，遍历发送
   Future<bool> send(String peerId, List<int> data) async {
-    List<AdvancedPeerConnection> peerConnections = await get(peerId);
+    List<AdvancedPeerConnection> peerConnections = _get(peerId);
     if (peerConnections.isNotEmpty) {
       List<Future<bool>> ps = [];
       for (var peerConnection in peerConnections) {
@@ -751,10 +757,10 @@ class PeerConnectionPool {
   }
 
   ///获取连接状态
-  Future<PeerConnectionStatus> status(String peerId, {String? clientId}) async {
+  PeerConnectionStatus status(String peerId, {String? clientId}) {
     var status = PeerConnectionStatus.none;
     if (clientId == null) {
-      var advancedPeerConnections = await get(peerId);
+      var advancedPeerConnections = _get(peerId);
       for (var advancedPeerConnection in advancedPeerConnections) {
         if (advancedPeerConnection.status == PeerConnectionStatus.connected) {
           status = PeerConnectionStatus.connected;
@@ -763,7 +769,7 @@ class PeerConnectionPool {
       }
     } else {
       AdvancedPeerConnection? advancedPeerConnection =
-          await peerConnectionPool.getOne(peerId, clientId: clientId);
+          _getOne(peerId, clientId: clientId);
       if (advancedPeerConnection != null) {
         status = advancedPeerConnection.status;
       }

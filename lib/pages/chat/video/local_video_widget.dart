@@ -354,13 +354,13 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///呼叫需要创建新的视频会议conference，linkman模式下是临时conference，不存储，group模式下存储
   ///发出会议邀请消息
   ///加入会议是在当前选择了会议邀请消息后的操作，需要创建本地视频（如果不存在）
-  Future<bool> _checkWebrtcStatus() async {
+  bool _checkWebrtcStatus() {
     //检查webrtc的状态
     var name = chatSummary.name;
     var partyType = chatSummary.partyType;
     var peerId = chatSummary.peerId;
     if (partyType == PartyType.linkman.name && peerId != null) {
-      var status = await peerConnectionPool.status(peerId);
+      var status = peerConnectionPool.status(peerId);
       if (status != PeerConnectionStatus.connected) {
         if (mounted) {
           DialogUtil.error(context,
