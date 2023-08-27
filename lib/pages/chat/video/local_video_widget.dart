@@ -354,17 +354,19 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///呼叫需要创建新的视频会议conference，linkman模式下是临时conference，不存储，group模式下存储
   ///发出会议邀请消息
   ///加入会议是在当前选择了会议邀请消息后的操作，需要创建本地视频（如果不存在）
-  bool _checkWebrtcStatus() {
+  Future<bool> _checkWebrtcStatus() async {
     //检查webrtc的状态
     var name = chatSummary.name;
     var partyType = chatSummary.partyType;
     var peerId = chatSummary.peerId;
     if (partyType == PartyType.linkman.name && peerId != null) {
-      var status = peerConnectionPool.status(peerId);
+      var status = await peerConnectionPool.status(peerId);
       if (status != PeerConnectionStatus.connected) {
-        DialogUtil.error(context,
-            content:
-                '$name ${AppLocalizations.t('has no webrtc connected peerConnection')}');
+        if (mounted) {
+          DialogUtil.error(context,
+              content:
+                  '$name ${AppLocalizations.t('has no webrtc connected peerConnection')}');
+        }
         return false;
       }
     }
@@ -373,7 +375,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   ///选择会议参与者，发送会议邀请消息，然后将新会议加入会议池，成为当前会议
   Future<void> _invite() async {
-    var status = _checkWebrtcStatus();
+    var status = await _checkWebrtcStatus();
     if (!status) {
       return;
     }
@@ -446,7 +448,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   ///加入当前会议，即开始视频会议
   Future<void> _join() async {
-    var status = _checkWebrtcStatus();
+    var status = await _checkWebrtcStatus();
     if (!status) {
       return;
     }

@@ -126,7 +126,7 @@ class PeerConnectionPool {
   ///对方的队列，每一个peerId的元素是一个列表，具有相同的peerId和不同的clientId
   final LruQueue<Map<String, AdvancedPeerConnection>> _peerConnections =
       LruQueue();
-  final Lock _connLock = Lock();
+  final Lock _connLock = Lock(reentrant: true);
 
   //所以注册的事件处理器
   Map<WebrtcEventType, Function(WebrtcEvent)> events = {};
@@ -249,6 +249,8 @@ class PeerConnectionPool {
   /// 获取peerId的webrtc连接，可能是多个
   /// @param peerId
   Future<List<AdvancedPeerConnection>> get(String peerId) async {
+    bool locked = _connLock.locked;
+    logger.i('peer connections is locked');
     return await _connLock.synchronized(() {
       if (_peerConnections.containsKey(peerId)) {
         Map<String, AdvancedPeerConnection>? aps = _peerConnections.use(peerId);
