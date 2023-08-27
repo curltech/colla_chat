@@ -800,7 +800,7 @@ class BasePeerConnection {
     }
     RTCSessionDescription? localDescription;
     try {
-      localDescription = await peerConnection?.getLocalDescription();
+      localDescription = await peerConnection.getLocalDescription();
     } catch (e) {
       logger.e('peerConnection getLocalDescription failure:$e');
     }

@@ -16,7 +16,6 @@ import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:synchronized/extension.dart';
 import 'package:synchronized/synchronized.dart';
 
 ///一个队列，按照被使用的新旧排序，当元素超过最大数量的时候，溢出最旧的元素
@@ -126,7 +125,7 @@ class PeerConnectionPool {
   ///对方的队列，每一个peerId的元素是一个列表，具有相同的peerId和不同的clientId
   final LruQueue<Map<String, AdvancedPeerConnection>> _peerConnections =
       LruQueue();
-  final Lock _connLock = Lock(reentrant: true);
+  final Lock _connLock = Lock(reentrant: false);
 
   //所以注册的事件处理器
   Map<WebrtcEventType, Function(WebrtcEvent)> events = {};
