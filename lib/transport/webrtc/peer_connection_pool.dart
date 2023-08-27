@@ -249,9 +249,7 @@ class PeerConnectionPool {
   /// 获取peerId的webrtc连接，可能是多个
   /// @param peerId
   Future<List<AdvancedPeerConnection>> get(String peerId) async {
-    return await _connLock.synchronized(() {
-      return _get(peerId);
-    });
+    return _get(peerId);
   }
 
   List<AdvancedPeerConnection> _get(String peerId) {
@@ -267,9 +265,7 @@ class PeerConnectionPool {
 
   Future<AdvancedPeerConnection?> getOne(String peerId,
       {required String clientId}) async {
-    return await _connLock.synchronized(() {
-      return _getOne(peerId, clientId: clientId);
-    });
+    return _getOne(peerId, clientId: clientId);
   }
 
   AdvancedPeerConnection? _getOne(String peerId, {required String clientId}) {
@@ -417,15 +413,13 @@ class PeerConnectionPool {
   }
 
   Future<List<AdvancedPeerConnection>> getAll() async {
-    return await _connLock.synchronized(() {
-      List<AdvancedPeerConnection> peerConnections = [];
-      for (var peers in _peerConnections.all) {
-        for (var peer in peers.values) {
-          peerConnections.add(peer);
-        }
+    List<AdvancedPeerConnection> peerConnections = [];
+    for (var peers in _peerConnections.all) {
+      for (var peer in peers.values) {
+        peerConnections.add(peer);
       }
-      return peerConnections;
-    });
+    }
+    return peerConnections;
   }
 
   ///清除过一段时间仍没有连接上的连接
