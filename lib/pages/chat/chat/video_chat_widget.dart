@@ -19,6 +19,10 @@ import 'package:flutter/material.dart';
 ///视频聊天窗口，分页显示本地视频和远程视频
 class VideoChatWidget extends StatefulWidget with TileDataMixin {
   DragOverlay? overlayEntry;
+  final LocalVideoWidget localVideoWidget = const LocalVideoWidget();
+  final RemoteVideoWidget remoteVideoWidget = const RemoteVideoWidget();
+  final VideoConferencePoolWidget videoConferencePoolWidget =
+      const VideoConferencePoolWidget();
 
   VideoChatWidget({
     Key? key,
@@ -98,12 +102,12 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
       itemCount: 3,
       index: index,
       itemBuilder: (BuildContext context, int index) {
-        Widget view = const LocalVideoWidget();
+        Widget view = widget.localVideoWidget;
         if (index == 1) {
-          view = const RemoteVideoWidget();
+          view = widget.remoteVideoWidget;
         }
         if (index == 2) {
-          view = const VideoConferencePoolWidget();
+          view = widget.videoConferencePoolWidget;
         }
         return view;
       },
