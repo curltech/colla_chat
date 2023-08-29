@@ -141,7 +141,7 @@ class _P2pMediaRenderViewState extends State<P2pMediaRenderView> {
 
   @override
   void dispose() {
-    renderer.dispose();
+    close();
     super.dispose();
   }
 }
