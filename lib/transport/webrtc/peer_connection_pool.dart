@@ -125,7 +125,8 @@ class PeerConnectionPool {
   ///对方的队列，每一个peerId的元素是一个列表，具有相同的peerId和不同的clientId
   final LruQueue<Map<String, AdvancedPeerConnection>> _peerConnections =
       LruQueue();
-  final Lock _connLock = Lock(reentrant: true);
+
+  final Lock _connLock = Lock();
 
   //所以注册的事件处理器
   Map<WebrtcEventType, Function(WebrtcEvent)> events = {};
@@ -283,25 +284,23 @@ class PeerConnectionPool {
     AdvancedPeerConnection advancedPeerConnection, {
     String clientId = unknownClientId,
   }) async {
-    await _connLock.synchronized(() async {
-      var peerConnections = _peerConnections.get(peerId);
-      peerConnections = peerConnections ?? {};
-      AdvancedPeerConnection? old = peerConnections[clientId];
-      if (old != null) {
-        logger.w('old peerId:$peerId clientId:$clientId is exist!');
-      }
-      peerConnections[clientId] = advancedPeerConnection;
+    var peerConnections = _peerConnections.get(peerId);
+    peerConnections = peerConnections ?? {};
+    AdvancedPeerConnection? old = peerConnections[clientId];
+    if (old != null) {
+      logger.w('old peerId:$peerId clientId:$clientId is exist!');
+    }
+    peerConnections[clientId] = advancedPeerConnection;
 
-      ///如果有溢出的连接，将溢出连接关闭
-      Map<String, AdvancedPeerConnection>? outs =
-          _peerConnections.put(peerId, peerConnections);
-      if (outs != null && outs.isNotEmpty) {
-        for (AdvancedPeerConnection out in outs.values) {
-          logger.e('over max webrtc peer number, knocked out');
-          await out.close();
-        }
+    ///如果有溢出的连接，将溢出连接关闭
+    Map<String, AdvancedPeerConnection>? outs =
+        _peerConnections.put(peerId, peerConnections);
+    if (outs != null && outs.isNotEmpty) {
+      for (AdvancedPeerConnection out in outs.values) {
+        logger.e('over max webrtc peer number, knocked out');
+        await out.close();
       }
-    });
+    }
   }
 
   ///主动方创建，此时clientId有可能不知道，如果已经存在，先关闭删除
@@ -345,34 +344,32 @@ class PeerConnectionPool {
   ///从池中移除连接，不关心连接的状态
   Future<Map<String, AdvancedPeerConnection>?> remove(String peerId,
       {String? clientId}) async {
-    return await _connLock.synchronized(() {
-      Map<String, AdvancedPeerConnection>? peerConnections =
-          _peerConnections.get(peerId);
-      if (peerConnections == null) {
-        return null;
-      }
-      Map<String, AdvancedPeerConnection>? removePeerConnections = {};
-      if (peerConnections.isNotEmpty) {
-        if (clientId == null) {
-          removePeerConnections.addAll(peerConnections);
-          peerConnections.clear();
-        } else {
-          AdvancedPeerConnection? advancedPeerConnection =
-              peerConnections.remove(clientId);
-          if (advancedPeerConnection != null) {
-            removePeerConnections[advancedPeerConnection.clientId] =
-                advancedPeerConnection;
-          }
-          logger.i('remove peerConnection peerId:$peerId,clientId:$clientId');
-        }
-        if (peerConnections.isEmpty) {
-          _peerConnections.remove(peerId);
-        }
-
-        return removePeerConnections;
-      }
+    Map<String, AdvancedPeerConnection>? peerConnections =
+        _peerConnections.get(peerId);
+    if (peerConnections == null) {
       return null;
-    });
+    }
+    Map<String, AdvancedPeerConnection>? removePeerConnections = {};
+    if (peerConnections.isNotEmpty) {
+      if (clientId == null) {
+        removePeerConnections.addAll(peerConnections);
+        peerConnections.clear();
+      } else {
+        AdvancedPeerConnection? advancedPeerConnection =
+            peerConnections.remove(clientId);
+        if (advancedPeerConnection != null) {
+          removePeerConnections[advancedPeerConnection.clientId] =
+              advancedPeerConnection;
+        }
+        logger.i('remove peerConnection peerId:$peerId,clientId:$clientId');
+      }
+      if (peerConnections.isEmpty) {
+        _peerConnections.remove(peerId);
+      }
+
+      return removePeerConnections;
+    }
+    return null;
   }
 
   ///主动关闭，从池中移除连接
@@ -423,40 +420,37 @@ class PeerConnectionPool {
 
   ///清除过一段时间仍没有连接上的连接
   clear() async {
-    await _connLock.synchronized(() {
-      List<String> removedPeerIds = [];
-      for (var peerId in _peerConnections.keys()) {
-        Map<String, AdvancedPeerConnection>? peerConnections =
-            _peerConnections.get(peerId);
-        if (peerConnections != null && peerConnections.isNotEmpty) {
-          List<String> removedClientIds = [];
-          for (AdvancedPeerConnection peerConnection
-              in peerConnections.values) {
-            if (peerConnection.basePeerConnection.status !=
-                PeerConnectionStatus.connected) {
-              var start = peerConnection.basePeerConnection.start;
-              var now = DateTime.now().millisecondsSinceEpoch;
-              var gap = now - start!;
-              var limit = const Duration(seconds: 20);
-              if (gap > limit.inMilliseconds) {
-                removedClientIds.add(peerConnection.clientId);
-                logger.e(
-                    'peerConnection peerId:${peerConnection.peerId},clientId:${peerConnection.clientId} is overtime unconnected');
-              }
+    List<String> removedPeerIds = [];
+    for (var peerId in _peerConnections.keys()) {
+      Map<String, AdvancedPeerConnection>? peerConnections =
+          _peerConnections.get(peerId);
+      if (peerConnections != null && peerConnections.isNotEmpty) {
+        List<String> removedClientIds = [];
+        for (AdvancedPeerConnection peerConnection in peerConnections.values) {
+          if (peerConnection.basePeerConnection.status !=
+              PeerConnectionStatus.connected) {
+            var start = peerConnection.basePeerConnection.start;
+            var now = DateTime.now().millisecondsSinceEpoch;
+            var gap = now - start!;
+            var limit = const Duration(seconds: 20);
+            if (gap > limit.inMilliseconds) {
+              removedClientIds.add(peerConnection.clientId);
+              logger.e(
+                  'peerConnection peerId:${peerConnection.peerId},clientId:${peerConnection.clientId} is overtime unconnected');
             }
           }
-          for (var removedClientId in removedClientIds) {
-            peerConnections.remove(removedClientId);
-          }
-          if (peerConnections.isEmpty) {
-            removedPeerIds.add(peerId);
-          }
+        }
+        for (var removedClientId in removedClientIds) {
+          peerConnections.remove(removedClientId);
+        }
+        if (peerConnections.isEmpty) {
+          removedPeerIds.add(peerId);
         }
       }
-      for (var removedPeerId in removedPeerIds) {
-        _peerConnections.remove(removedPeerId);
-      }
-    });
+    }
+    for (var removedPeerId in removedPeerIds) {
+      _peerConnections.remove(removedPeerId);
+    }
   }
 
   ///如果不存在，创建被叫，如果存在直接返回
