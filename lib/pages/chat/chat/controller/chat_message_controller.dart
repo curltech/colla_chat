@@ -403,9 +403,8 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         }
       }
     }
-    String content = JsonUtil.toJsonString(peers);
-    await chatMessageController.sendText(
-        message: content,
+    await chatMessageController.send(
+        content: peers,
         contentType: ChatMessageContentType.card,
         mimeType: mimeType);
   }
