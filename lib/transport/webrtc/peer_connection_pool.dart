@@ -319,35 +319,31 @@ class PeerConnectionPool {
       }
       //创建新的主叫方
       peerConnection = AdvancedPeerConnection(peerId, true, clientId: clientId);
+      bool result = await peerConnection.init(
+          iceServers: iceServers, localPeerMediaStreams: localRenders);
+      if (!result) {
+        logger.e('webrtcPeer.init fail');
+        return null;
+      }
       await put(peerId, peerConnection, clientId: clientId);
 
       return peerConnection;
     });
 
-    if (peerConnection == null) {
-      logger.e('peerId:$peerId clientId:$clientId is exist!');
-      peerConnection = _getOne(peerId, clientId: clientId);
-
-      return peerConnection;
+    if (peerConnection != null) {
+      String name = unknownName;
+      Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+      if (linkman != null) {
+        name = linkman.name;
+      }
+      onWebrtcEvent(WebrtcEvent(peerId,
+          clientId: clientId,
+          name: name,
+          eventType: WebrtcEventType.created,
+          data: peerConnection));
+      await peerConnection.negotiate();
     }
-
-    String name = unknownName;
-    Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
-    if (linkman != null) {
-      name = linkman.name;
-    }
-    bool result = await peerConnection.init(
-        iceServers: iceServers, localPeerMediaStreams: localRenders);
-    if (!result) {
-      logger.e('webrtcPeer.init fail');
-      return null;
-    }
-    onWebrtcEvent(WebrtcEvent(peerId,
-        clientId: clientId,
-        name: name,
-        eventType: WebrtcEventType.created,
-        data: peerConnection));
-    await peerConnection.negotiate();
+    peerConnection = _getOne(peerId, clientId: clientId);
 
     return peerConnection;
   }
@@ -441,13 +437,17 @@ class PeerConnectionPool {
           if (peerConnection.basePeerConnection.status !=
               PeerConnectionStatus.connected) {
             var start = peerConnection.basePeerConnection.start;
-            var now = DateTime.now().millisecondsSinceEpoch;
-            var gap = now - start!;
-            var limit = const Duration(seconds: 20);
-            if (gap > limit.inMilliseconds) {
+            if (start == null) {
               removedClientIds.add(peerConnection.clientId);
-              logger.e(
-                  'peerConnection peerId:${peerConnection.peerId},clientId:${peerConnection.clientId} is overtime unconnected');
+            } else {
+              var now = DateTime.now().millisecondsSinceEpoch;
+              var gap = now - start;
+              var limit = const Duration(seconds: 20);
+              if (gap > limit.inMilliseconds) {
+                removedClientIds.add(peerConnection.clientId);
+                logger.e(
+                    'peerConnection peerId:${peerConnection.peerId},clientId:${peerConnection.clientId} is overtime unconnected');
+              }
             }
           }
         }
@@ -479,6 +479,12 @@ class PeerConnectionPool {
         logger.i('advancedPeerConnection is null,create new one');
         advancedPeerConnection = AdvancedPeerConnection(peerId, false,
             clientId: clientId, name: name);
+        bool result = await advancedPeerConnection.init(
+            iceServers: iceServers, aesKey: aesKey);
+        if (!result) {
+          logger.e('webrtcPeer.init fail');
+          return null;
+        }
         await put(peerId, advancedPeerConnection, clientId: clientId);
 
         return advancedPeerConnection;
@@ -487,24 +493,17 @@ class PeerConnectionPool {
         return null;
       }
     });
-
-    if (advancedPeerConnection == null) {
-      advancedPeerConnection = _getOne(peerId, clientId: clientId);
-      bool result = await advancedPeerConnection!
-          .init(iceServers: iceServers, aesKey: aesKey);
-      if (!result) {
-        logger.e('webrtcPeer.init fail');
-        return null;
-      }
+    if (advancedPeerConnection != null) {
+      onWebrtcEvent(WebrtcEvent(peerId,
+          clientId: clientId,
+          name: name,
+          eventType: WebrtcEventType.created,
+          data: advancedPeerConnection));
+      logger.i(
+          'advancedPeerConnection ${advancedPeerConnection.basePeerConnection.id} createAnswer completed');
     }
 
-    onWebrtcEvent(WebrtcEvent(peerId,
-        clientId: clientId,
-        name: name,
-        eventType: WebrtcEventType.created,
-        data: advancedPeerConnection));
-    logger.i(
-        'advancedPeerConnection ${advancedPeerConnection.basePeerConnection.id} createAnswer completed');
+    advancedPeerConnection = _getOne(peerId, clientId: clientId);
 
     return advancedPeerConnection;
   }
