@@ -135,11 +135,6 @@ class LinkmanService extends PeerPartyService<Linkman> {
     return image;
   }
 
-  ///发出linkman邀请，把自己的详细的信息发出，当邀请被同意后，就会收到对方详细的信息
-  ///一般来说，采用websocket发送信息，是chainmessage，其中的payload是chatmessage
-  ///而采用webrtc时，直接是chatmessage，content里面是实际的信息
-  Future<void> requestLinkman(Linkman linkman) async {}
-
   ///保存新的联系人信息，同时修改自己，peerClient和chatSummary的信息
   Future<void> store(Linkman linkman) async {
     Linkman? old = await findCachedOneByPeerId(linkman.peerId);
@@ -313,8 +308,8 @@ class LinkmanService extends PeerPartyService<Linkman> {
   ///接收到联系人信息，会同时修改消息和联系人
   receiveModifyLinkman(ChatMessage chatMessage) async {
     String json = chatMessageService.recoverContent(chatMessage.content!);
-    List<Map<String, dynamic>> list = JsonUtil.toJson(json);
-    for (Map<String, dynamic> map in list) {
+    List<dynamic> list = JsonUtil.toJson(json);
+    for (dynamic map in list) {
       Linkman linkman = Linkman.fromJson(map);
       await store(linkman);
     }

@@ -492,7 +492,7 @@ class MessageWidget {
     List<Group>? groups;
     if (content != null) {
       content = chatMessageService.recoverContent(content);
-      List<Map<String, dynamic>> list = JsonUtil.toJson(content);
+      List<dynamic> list = JsonUtil.toJson(content);
       if (mimeType == PartyType.linkman.name) {
         linkmen = [];
         for (var map in list) {
