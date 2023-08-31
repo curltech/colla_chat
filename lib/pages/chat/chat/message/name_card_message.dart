@@ -41,7 +41,7 @@ class NameCardMessage extends StatelessWidget {
         prefix: prefix,
         title: name,
         subtitle: peerId,
-        titleTail: linkman.linkmanStatus,
+        titleTail: linkman.email,
       ));
     }
 
