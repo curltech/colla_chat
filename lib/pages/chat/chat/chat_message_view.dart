@@ -224,7 +224,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
       //如果连接不存在，则创建新连接
       if (advancedPeerConnections.isEmpty) {
         AdvancedPeerConnection? advancedPeerConnection =
-            await peerConnectionPool.create(peerId);
+            await peerConnectionPool.createOffer(peerId);
         if (advancedPeerConnection != null) {
           _peerConnectionStatus.value = advancedPeerConnection.status;
         } else {
@@ -252,7 +252,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
         List<AdvancedPeerConnection> advancedPeerConnections =
             await peerConnectionPool.get(memberPeerId);
         if (advancedPeerConnections.isEmpty) {
-          peerConnectionPool.create(memberPeerId);
+          peerConnectionPool.createOffer(memberPeerId);
         }
       }
     }

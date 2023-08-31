@@ -1,6 +1,7 @@
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/message/common_message.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
@@ -40,11 +41,13 @@ class NameCardMessage extends StatelessWidget {
         prefix: prefix,
         title: name,
         subtitle: peerId,
-        titleTail: linkman.email,
+        titleTail: linkman.linkmanStatus,
       ));
     }
 
-    return DataListView(tileData: linkmanInfoTileData);
+    return Container(
+        alignment: Alignment.topLeft,
+        child: DataListView(tileData: linkmanInfoTileData));
   }
 
   Widget _buildGroupWidget(List<Group> groups) {
@@ -98,7 +101,11 @@ class NameCardMessage extends StatelessWidget {
                 }
               }
             },
-            icon: const Icon(Icons.person_add));
+            tooltip: AppLocalizations.t('Add friend'),
+            icon: Icon(
+              Icons.person_add,
+              color: myself.primary,
+            ));
         List<String> names = [];
         for (Linkman linkman in linkmen!) {
           names.add(linkman.name);

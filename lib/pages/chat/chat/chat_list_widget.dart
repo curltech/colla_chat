@@ -258,7 +258,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
             await peerConnectionPool.get(peerId);
         //如果连接不存在，则创建新连接
         if (advancedPeerConnections.isEmpty) {
-          peerConnectionPool.create(peerId);
+          peerConnectionPool.createOffer(peerId);
         }
       }
     }

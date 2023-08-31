@@ -304,21 +304,33 @@ class PeerConnectionPool {
   }
 
   ///主动方创建，此时clientId有可能不知道，如果已经存在，先关闭删除
-  Future<AdvancedPeerConnection?> create(String peerId,
+  Future<AdvancedPeerConnection?> createOffer(String peerId,
       {String clientId = unknownClientId,
       Conference? conference,
       List<Map<String, String>>? iceServers,
       List<PeerMediaStream> localRenders = const []}) async {
-    //如果已经存在，先关闭删除
     AdvancedPeerConnection? peerConnection =
-        await getOne(peerId, clientId: clientId);
-    if (peerConnection != null) {
-      await close(peerId, clientId: clientId);
-      logger.i(
-          'peerId:$peerId clientId:$clientId is closed and will be re-created!');
+        await _connLock.synchronized(() async {
+      AdvancedPeerConnection? peerConnection =
+          _getOne(peerId, clientId: clientId);
+      if (peerConnection != null) {
+        logger.e('peerId:$peerId clientId:$clientId is exist!');
+        return null;
+      }
+      //创建新的主叫方
+      peerConnection = AdvancedPeerConnection(peerId, true, clientId: clientId);
+      await put(peerId, peerConnection, clientId: clientId);
+
+      return peerConnection;
+    });
+
+    if (peerConnection == null) {
+      logger.e('peerId:$peerId clientId:$clientId is exist!');
+      peerConnection = _getOne(peerId, clientId: clientId);
+
+      return peerConnection;
     }
-    //创建新的主叫方
-    peerConnection = AdvancedPeerConnection(peerId, true, clientId: clientId);
+
     String name = unknownName;
     Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
     if (linkman != null) {
@@ -336,7 +348,6 @@ class PeerConnectionPool {
         eventType: WebrtcEventType.created,
         data: peerConnection));
     await peerConnection.negotiate();
-    await put(peerId, peerConnection, clientId: clientId);
 
     return peerConnection;
   }
@@ -454,49 +465,46 @@ class PeerConnectionPool {
   }
 
   ///如果不存在，创建被叫，如果存在直接返回
-  Future<AdvancedPeerConnection?> createIfNotExist(String peerId,
-      {required String clientId,
-      required String name,
-      Conference? conference,
-      List<Map<String, String>>? iceServers,
-      Uint8List? aesKey}) async {
-    return await _connLock.synchronized(() async {
-      return await _createIfNotExist(peerId,
-          clientId: clientId,
-          name: name,
-          conference: conference,
-          iceServers: iceServers,
-          aesKey: aesKey);
-    });
-  }
-
-  Future<AdvancedPeerConnection?> _createIfNotExist(String peerId,
+  Future<AdvancedPeerConnection?> createAnswer(String peerId,
       {required String clientId,
       required String name,
       Conference? conference,
       List<Map<String, String>>? iceServers,
       Uint8List? aesKey}) async {
     AdvancedPeerConnection? advancedPeerConnection =
-        _getOne(peerId, clientId: clientId);
+        await _connLock.synchronized(() async {
+      AdvancedPeerConnection? advancedPeerConnection =
+          _getOne(peerId, clientId: clientId);
+      if (advancedPeerConnection == null) {
+        logger.i('advancedPeerConnection is null,create new one');
+        advancedPeerConnection = AdvancedPeerConnection(peerId, false,
+            clientId: clientId, name: name);
+        await put(peerId, advancedPeerConnection, clientId: clientId);
+
+        return advancedPeerConnection;
+      } else {
+        logger.e('peerId:$peerId clientId:$clientId is exist!');
+        return null;
+      }
+    });
+
     if (advancedPeerConnection == null) {
-      logger.i('advancedPeerConnection is null,create new one');
-      advancedPeerConnection =
-          AdvancedPeerConnection(peerId, false, clientId: clientId, name: name);
-      await put(peerId, advancedPeerConnection, clientId: clientId);
-      var result = await advancedPeerConnection.init(
-          iceServers: iceServers, aesKey: aesKey);
+      advancedPeerConnection = _getOne(peerId, clientId: clientId);
+      bool result = await advancedPeerConnection!
+          .init(iceServers: iceServers, aesKey: aesKey);
       if (!result) {
         logger.e('webrtcPeer.init fail');
         return null;
       }
-      onWebrtcEvent(WebrtcEvent(peerId,
-          clientId: clientId,
-          name: name,
-          eventType: WebrtcEventType.created,
-          data: advancedPeerConnection));
-      logger.i(
-          'advancedPeerConnection ${advancedPeerConnection.basePeerConnection.id} init completed');
     }
+
+    onWebrtcEvent(WebrtcEvent(peerId,
+        clientId: clientId,
+        name: name,
+        eventType: WebrtcEventType.created,
+        data: advancedPeerConnection));
+    logger.i(
+        'advancedPeerConnection ${advancedPeerConnection.basePeerConnection.id} createAnswer completed');
 
     return advancedPeerConnection;
   }
@@ -603,14 +611,14 @@ class PeerConnectionPool {
             await globalWebrtcEventController.receiveWebrtcSignal(webrtcEvent);
         if (allowed) {
           Uint8List? aesKey = extension?.aesKey;
-          advancedPeerConnection = await createIfNotExist(peerId,
+          advancedPeerConnection = await createAnswer(peerId,
               clientId: clientId,
               name: name,
               conference: conference,
               iceServers: iceServers,
               aesKey: aesKey);
           if (advancedPeerConnection == null) {
-            logger.e('createIfNotExist fail');
+            logger.e('createAnswer fail');
             return null;
           }
         } else {
