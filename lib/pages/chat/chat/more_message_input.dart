@@ -5,6 +5,7 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/entity/chat/peer_party.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controller.dart';
@@ -339,25 +340,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
           return LinkmanGroupSearchWidget(
               onSelected: (List<String>? selected) async {
                 if (selected != null && selected.isNotEmpty) {
-                  Linkman? linkman =
-                      await linkmanService.findCachedOneByPeerId(selected[0]);
-                  if (linkman != null) {
-                    String content = JsonUtil.toJsonString(linkman);
-                    await chatMessageController.sendText(
-                        message: content,
-                        contentType: ChatMessageContentType.card,
-                        mimeType: PartyType.linkman.name);
-                  } else {
-                    Group? group =
-                        await groupService.findCachedOneByPeerId(selected[0]);
-                    if (group != null) {
-                      String content = JsonUtil.toJsonString(group);
-                      await chatMessageController.sendText(
-                          message: content,
-                          contentType: ChatMessageContentType.card,
-                          mimeType: PartyType.group.name);
-                    }
-                  }
+                  await _sendNameCard(selected);
                 }
                 if (mounted) {
                   Navigator.pop(context);
@@ -366,6 +349,28 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
               selected: const <String>[],
               selectType: SelectType.chipMultiSelect);
         });
+  }
+
+  Future<void> _sendNameCard(List<String> peerIds) async {
+    List<PeerParty> peers = [];
+    String mimeType = PartyType.linkman.name;
+    for (String peerId in peerIds) {
+      Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+      if (linkman != null) {
+        peers.add(linkman);
+      } else {
+        Group? group = await groupService.findCachedOneByPeerId(peerId);
+        if (group != null) {
+          peers.add(group);
+          mimeType = PartyType.group.name;
+        }
+      }
+    }
+    String content = JsonUtil.toJsonString(peers);
+    await chatMessageController.sendText(
+        message: content,
+        contentType: ChatMessageContentType.card,
+        mimeType: mimeType);
   }
 
   ///文件

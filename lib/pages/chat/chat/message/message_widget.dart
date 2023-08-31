@@ -488,22 +488,30 @@ class MessageWidget {
       BuildContext context) async {
     String? mimeType = chatMessage.mimeType;
     String? content = chatMessage.content;
-    Linkman? linkman;
-    Group? group;
+    List<Linkman>? linkmen;
+    List<Group>? groups;
     if (content != null) {
       content = chatMessageService.recoverContent(content);
-      Map<String, dynamic> map = JsonUtil.toJson(content);
+      List<Map<String, dynamic>> list = JsonUtil.toJson(content);
       if (mimeType == PartyType.linkman.name) {
-        linkman = Linkman.fromJson(map);
+        linkmen = [];
+        for (var map in list) {
+          Linkman linkman = Linkman.fromJson(map);
+          linkmen.add(linkman);
+        }
       }
       if (mimeType == PartyType.group.name) {
-        group = Group.fromJson(map);
+        groups = [];
+        for (var map in list) {
+          Group group = Group.fromJson(map);
+          groups.add(group);
+        }
       }
     }
     return NameCardMessage(
       key: UniqueKey(),
-      linkman: linkman,
-      group: group,
+      linkmen: linkmen,
+      groups: groups,
       isMyself: isMyself,
       fullScreen: fullScreen,
       mimeType: mimeType,

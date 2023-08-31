@@ -6,123 +6,54 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
 ///消息体：名片消息，content是json字符串
 class NameCardMessage extends StatelessWidget {
-  final Linkman? linkman;
-  final Group? group;
+  final List<Linkman>? linkmen;
+  final List<Group>? groups;
   final bool isMyself;
   final bool fullScreen;
   final String? mimeType;
 
   const NameCardMessage(
       {Key? key,
-      this.linkman,
-      this.group,
+      this.linkmen,
+      this.groups,
       required this.isMyself,
       this.fullScreen = false,
       this.mimeType})
       : super(key: key);
 
-  Widget _buildLinkmanWidget(Linkman linkman) {
-    String name = linkman.name;
-    var peerId = linkman.peerId;
-    final List<TileData> linkmanInfoTileData = [
-      TileData(
-        title: 'Avatar',
-        suffix: linkman.avatarImage,
-      ),
-      TileData(
-        title: 'PeerId',
+  Widget _buildLinkmanWidget(List<Linkman> linkmen) {
+    final List<TileData> linkmanInfoTileData = [];
+    for (Linkman linkman in linkmen) {
+      String name = linkman.name;
+      var peerId = linkman.peerId;
+      String? avatar = linkman.avatar;
+      Widget prefix = ImageUtil.buildImageWidget(
+          image: avatar, isRadius: true, radius: 2.0);
+      linkmanInfoTileData.add(TileData(
+        prefix: prefix,
+        title: name,
         subtitle: peerId,
-      ),
-      TileData(
-        title: 'Name',
-        suffix: name,
-      ),
-      TileData(
-        title: 'Email',
-        suffix: linkman.email,
-      ),
-      TileData(
-        title: 'Mobile',
-        suffix: linkman.mobile,
-      ),
-    ];
+        titleTail: linkman.email,
+      ));
+    }
 
     return DataListView(tileData: linkmanInfoTileData);
   }
 
-  Widget _buildGroupWidget(Group group) {
-    String name = group.name;
-    var peerId = group.peerId;
-    final List<TileData> groupInfoTileData = [
-      TileData(
-        title: 'Avatar',
-        suffix: group.avatarImage,
-      ),
-      TileData(
-        title: 'PeerId',
-        subtitle: peerId,
-      ),
-      TileData(
-        title: 'Name',
-        suffix: name,
-      ),
-      TileData(
-        title: 'Email',
-        suffix: group.email,
-      ),
-      TileData(
-        title: 'Mobile',
-        suffix: group.mobile,
-      ),
-    ];
-
-    return DataListView(tileData: groupInfoTileData);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    String? peerId;
-    String? name;
-    String? avatar;
-    Widget? prefix;
-    if (mimeType == PartyType.linkman.name && linkman != null) {
-      peerId = linkman!.peerId;
-      name = linkman!.name;
-      avatar = linkman!.avatar;
-      prefix = ImageUtil.buildImageWidget(
-          image: avatar, isRadius: true, radius: 2.0);
-      linkman!.avatarImage = prefix;
-      if (fullScreen) {
-        return _buildLinkmanWidget(linkman!);
-      } else {
-        prefix = IconButton(
-            onPressed: () async {
-              bool? confirm = await DialogUtil.confirm(context,
-                  content: 'Do you add as friend?');
-              await linkmanService.store(linkman!);
-              if (confirm != null && confirm) {
-                linkmanService.update(
-                    {'linkmanStatus': LinkmanStatus.friend.name},
-                    where: 'peerId=?',
-                    whereArgs: [peerId!]);
-              }
-            },
-            icon: prefix);
-        var tileData = TileData(prefix: prefix, title: name, subtitle: peerId);
-
-        return CommonMessage(tileData: tileData);
-      }
-    }
-    if (mimeType == PartyType.group.name && group != null) {
-      peerId = group!.peerId;
-      name = group!.name;
-      avatar = group!.avatar;
+  Widget _buildGroupWidget(List<Group> groups) {
+    final List<TileData> groupInfoTileData = [];
+    for (Group group in groups) {
+      String name = group.name;
+      var peerId = group.peerId;
+      Widget prefix;
+      String? avatar = group.avatar;
       if (avatar != null) {
         prefix = ImageUtil.buildImageWidget(
             image: avatar, isRadius: true, radius: 2.0);
@@ -132,14 +63,72 @@ class NameCardMessage extends StatelessWidget {
           color: myself.primary,
         );
       }
-      group!.avatarImage = prefix;
-      if (fullScreen) {
-        return _buildGroupWidget(group!);
-      } else {
-        prefix = IconButton(onPressed: null, icon: prefix);
-        var tileData = TileData(prefix: prefix, title: name, subtitle: peerId);
+      groupInfoTileData.add(TileData(
+        prefix: prefix,
+        title: name,
+        subtitle: peerId,
+        titleTail: group.email,
+      ));
+    }
 
-        return CommonMessage(tileData: tileData);
+    return DataListView(tileData: groupInfoTileData);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (mimeType == PartyType.linkman.name &&
+        linkmen != null &&
+        linkmen!.isNotEmpty) {
+      if (fullScreen) {
+        return _buildLinkmanWidget(linkmen!);
+      } else {
+        Widget prefix = IconButton(
+            onPressed: () async {
+              for (Linkman linkman in linkmen!) {
+                linkmanService.store(linkman);
+              }
+              bool? confirm = await DialogUtil.confirm(context,
+                  content: 'Do you add as friend?');
+              if (confirm != null && confirm) {
+                for (Linkman linkman in linkmen!) {
+                  linkmanService.update(
+                      {'linkmanStatus': LinkmanStatus.friend.name},
+                      where: 'peerId=?',
+                      whereArgs: [linkman.peerId]);
+                }
+              }
+            },
+            icon: const Icon(Icons.person_add));
+        List<String> names = [];
+        for (Linkman linkman in linkmen!) {
+          names.add(linkman.name);
+        }
+        Widget child = Row(children: [
+          prefix,
+          Expanded(child: CommonAutoSizeText(names.toString()))
+        ]);
+
+        return CommonMessage(child: child);
+      }
+    }
+    if (mimeType == PartyType.group.name &&
+        groups != null &&
+        groups!.isNotEmpty) {
+      if (fullScreen) {
+        return _buildGroupWidget(groups!);
+      } else {
+        Widget prefix =
+            const IconButton(onPressed: null, icon: Icon(Icons.group_add));
+        List<String> names = [];
+        for (Group group in groups!) {
+          names.add(group.name);
+        }
+        Widget child = Row(children: [
+          prefix,
+          Expanded(child: CommonAutoSizeText(names.toString()))
+        ]);
+
+        return CommonMessage(child: child);
       }
     }
 
