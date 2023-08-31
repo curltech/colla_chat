@@ -9,7 +9,6 @@ import 'package:colla_chat/entity/chat/peer_party.dart';
 import 'package:colla_chat/entity/dht/base.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
-import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
@@ -136,10 +135,13 @@ class LinkmanService extends PeerPartyService<Linkman> {
   }
 
   ///保存新的联系人信息，同时修改自己，peerClient和chatSummary的信息
-  Future<void> store(Linkman linkman) async {
+  Future<void> store(Linkman linkman, {bool linkmanStatus = false}) async {
     Linkman? old = await findCachedOneByPeerId(linkman.peerId);
     if (old == null) {
       linkman.id = null;
+      if (!linkmanStatus) {
+        linkman.linkmanStatus = null;
+      }
       await insert(linkman);
     } else {
       old.email = linkman.email;
@@ -151,6 +153,9 @@ class LinkmanService extends PeerPartyService<Linkman> {
       old.address = linkman.address;
       old.startDate = linkman.startDate;
       old.endDate = linkman.endDate;
+      if (linkmanStatus) {
+        old.linkmanStatus = linkman.linkmanStatus;
+      }
       await update(old);
     }
     linkmen[linkman.peerId] = linkman;
