@@ -135,13 +135,10 @@ class LinkmanService extends PeerPartyService<Linkman> {
   }
 
   ///保存新的联系人信息，同时修改自己，peerClient和chatSummary的信息
-  Future<void> store(Linkman linkman, {bool linkmanStatus = false}) async {
+  Future<void> store(Linkman linkman) async {
     Linkman? old = await findCachedOneByPeerId(linkman.peerId);
     if (old == null) {
       linkman.id = null;
-      if (!linkmanStatus) {
-        linkman.linkmanStatus = null;
-      }
       await insert(linkman);
     } else {
       old.email = linkman.email;
@@ -153,9 +150,6 @@ class LinkmanService extends PeerPartyService<Linkman> {
       old.address = linkman.address;
       old.startDate = linkman.startDate;
       old.endDate = linkman.endDate;
-      if (linkmanStatus) {
-        old.linkmanStatus = linkman.linkmanStatus;
-      }
       await update(old);
     }
     linkmen[linkman.peerId] = linkman;
@@ -316,6 +310,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
     List<dynamic> list = JsonUtil.toJson(json);
     for (dynamic map in list) {
       Linkman linkman = Linkman.fromJson(map);
+      linkman.linkmanStatus = null;
       await store(linkman);
     }
   }

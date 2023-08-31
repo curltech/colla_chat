@@ -88,6 +88,7 @@ class NameCardMessage extends StatelessWidget {
         Widget prefix = IconButton(
             onPressed: () async {
               for (Linkman linkman in linkmen!) {
+                linkman.linkmanStatus = null;
                 linkmanService.store(linkman);
               }
               bool? confirm = await DialogUtil.confirm(context,
