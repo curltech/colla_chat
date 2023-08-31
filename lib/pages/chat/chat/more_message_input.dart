@@ -346,6 +346,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
                   Navigator.pop(context);
                 }
               },
+              includeGroup: false,
               selected: const <String>[],
               selectType: SelectType.chipMultiSelect);
         });
