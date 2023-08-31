@@ -115,7 +115,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
           Option<String> option = Option<String>(linkman.name, linkman.peerId,
               checked: checked,
               leading: linkman.avatarImage,
-              hint: linkman.email!);
+              hint: linkman.email??'');
           groupOwnerOptions.add(option);
         } else {
           logger.e('Group member $groupMemberId is not linkman');

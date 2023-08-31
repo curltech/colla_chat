@@ -62,7 +62,7 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
             Option<String> item = Option<String>(linkman.name, linkman.peerId,
                 checked: true,
                 leading: linkman.avatarImage,
-                hint: linkman.email!);
+                hint: linkman.email ?? '');
             options.add(item);
           }
         }
@@ -97,7 +97,7 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
         Option<String> item = Option<String>(linkman.name, linkman.peerId,
             checked: checked,
             leading: linkman.avatarImage,
-            hint: linkman.email!);
+            hint: linkman.email ?? '');
         options.add(item);
       }
     }

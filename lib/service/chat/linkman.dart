@@ -73,7 +73,8 @@ class LinkmanService extends PeerPartyService<Linkman> {
           fit: BoxFit.contain);
       linkman.avatarImage = avatarImage;
     } else {
-      PeerClient? peerClient = await peerClientService.findCachedOneByPeerId(peerId);
+      PeerClient? peerClient =
+          await peerClientService.findCachedOneByPeerId(peerId);
       if (peerClient != null) {
         linkman.avatarImage = peerClient.avatarImage;
       }
@@ -110,11 +111,11 @@ class LinkmanService extends PeerPartyService<Linkman> {
     if (simplePublicKey == null) {
       simplePublicKey = await peerClientService.getCachedPublicKey(peerId);
       if (simplePublicKey == null) {
-        if (publicKey == null) {
+        if (StringUtil.isEmpty(publicKey)) {
           logger.e('linkman $peerId has no publicKey');
           return null;
         }
-        simplePublicKey = await cryptoGraphy.importPublicKey(publicKey,
+        simplePublicKey = await cryptoGraphy.importPublicKey(publicKey!,
             type: KeyPairType.x25519);
         publicKeys[peerId] = simplePublicKey;
       }
@@ -219,8 +220,8 @@ class LinkmanService extends PeerPartyService<Linkman> {
       ChatMessage chatMessage, MessageReceiptType receiptType) async {
     Map<String, dynamic> map = JsonUtil.toJson(myself.myselfPeer);
     PeerClient peerClient = PeerClient.fromJson(map);
-    ChatMessage? chatReceipt =
-        await chatMessageService.buildLinkmanChatReceipt(chatMessage, receiptType);
+    ChatMessage? chatReceipt = await chatMessageService.buildLinkmanChatReceipt(
+        chatMessage, receiptType);
     //改变发送消息的状态为接收
     await chatMessageService.updateReceiptType(chatMessage, receiptType);
     if (receiptType == MessageReceiptType.accepted) {
