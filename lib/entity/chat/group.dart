@@ -131,8 +131,13 @@ class GroupChange {
   Group? group;
   List<GroupMember>? addGroupMembers;
   List<GroupMember>? removeGroupMembers;
+  List<String>? unknownPeerIds;
 
-  GroupChange({this.group, this.addGroupMembers, this.removeGroupMembers});
+  GroupChange(
+      {this.group,
+      this.addGroupMembers,
+      this.removeGroupMembers,
+      this.unknownPeerIds});
 
   GroupChange.fromJson(Map json) {
     if (json['group'] != null) {
@@ -152,6 +157,9 @@ class GroupChange {
         removeGroupMembers!.add(groupMember);
       }
     }
+    if (json['unknownPeerIds'] != null) {
+      unknownPeerIds = JsonUtil.toJson(json['unknownPeerIds']);
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -159,6 +167,7 @@ class GroupChange {
       'group': group?.toJson(),
       'addGroupMembers': JsonUtil.toJson(addGroupMembers),
       'removeGroupMembers': JsonUtil.toJson(removeGroupMembers),
+      'unknownPeerIds': JsonUtil.toJson(unknownPeerIds),
     };
   }
 }

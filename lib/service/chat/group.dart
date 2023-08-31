@@ -150,6 +150,7 @@ class GroupService extends PeerPartyService<Group> {
     }
     //新增加的成员
     List<GroupMember> newMembers = [];
+    List<String> peerIds = [];
     for (String participant in participants) {
       var member = oldMembers[participant];
       //成员不存在，创建新的
@@ -169,9 +170,7 @@ class GroupService extends PeerPartyService<Group> {
             groupMember.memberAlias = linkman.alias;
           }
         } else {
-          //加新的联系人，没有名字
-          linkman = Linkman(participant, '');
-          await linkmanService.insert(linkman);
+          peerIds.add(participant);
         }
         groupMember.status = EntityStatus.effective.name;
         await groupMemberService.store(groupMember);
@@ -192,7 +191,8 @@ class GroupService extends PeerPartyService<Group> {
     return GroupChange(
         group: group,
         addGroupMembers: newMembers,
-        removeGroupMembers: oldMembers.values.toList());
+        removeGroupMembers: oldMembers.values.toList(),
+        unknownPeerIds: peerIds);
   }
 
   Future<List<Group>> search(String key) async {
@@ -242,7 +242,14 @@ class GroupService extends PeerPartyService<Group> {
     Map<String, dynamic> map = JsonUtil.toJson(json);
     Group group = Group.fromJsonWithMembers(map);
     group.id = null;
-    await groupService.store(group, myAlias: false);
+    GroupChange groupChange = await groupService.store(group, myAlias: false);
+    var unknownPeerIds = groupChange.unknownPeerIds;
+    if (unknownPeerIds != null && unknownPeerIds.isNotEmpty) {
+      await linkmanService.findLinkman(
+          chatMessage.senderPeerId!, unknownPeerIds,
+          clientId: chatMessage.senderClientId);
+    }
+
     ChatMessage? chatReceipt = await chatMessageService.buildLinkmanChatReceipt(
         chatMessage, MessageReceiptType.accepted);
     await chatMessageService.updateReceiptType(
@@ -293,7 +300,13 @@ class GroupService extends PeerPartyService<Group> {
     String json = chatMessageService.recoverContent(chatMessage.content!);
     Map<String, dynamic> map = JsonUtil.toJson(json);
     Group group = Group.fromJson(map);
-    await groupService.store(group, myAlias: false);
+    GroupChange groupChange = await groupService.store(group, myAlias: false);
+    var unknownPeerIds = groupChange.unknownPeerIds;
+    if (unknownPeerIds != null && unknownPeerIds.isNotEmpty) {
+      await linkmanService.findLinkman(
+          chatMessage.senderPeerId!, unknownPeerIds,
+          clientId: chatMessage.senderClientId);
+    }
     ChatMessage? chatReceipt = await chatMessageService.buildLinkmanChatReceipt(
         chatMessage, MessageReceiptType.accepted);
     await chatMessageService.updateReceiptType(
