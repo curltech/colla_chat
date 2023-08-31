@@ -2,15 +2,19 @@ import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
+import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/entity/chat/peer_party.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/openai/openai_chat_gpt.dart';
 import 'package:dart_openai/dart_openai.dart';
@@ -382,6 +386,28 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       }
       notifyListeners();
     }
+  }
+
+  Future<void> sendNameCard(List<String> peerIds) async {
+    List<PeerParty> peers = [];
+    String mimeType = PartyType.linkman.name;
+    for (String peerId in peerIds) {
+      Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+      if (linkman != null) {
+        peers.add(linkman);
+      } else {
+        Group? group = await groupService.findCachedOneByPeerId(peerId);
+        if (group != null) {
+          peers.add(group);
+          mimeType = PartyType.group.name;
+        }
+      }
+    }
+    String content = JsonUtil.toJsonString(peers);
+    await chatMessageController.sendText(
+        message: content,
+        contentType: ChatMessageContentType.card,
+        mimeType: mimeType);
   }
 }
 

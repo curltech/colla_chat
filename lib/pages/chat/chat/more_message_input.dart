@@ -351,26 +351,9 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         });
   }
 
+  ///发送linkman的消息
   Future<void> _sendNameCard(List<String> peerIds) async {
-    List<PeerParty> peers = [];
-    String mimeType = PartyType.linkman.name;
-    for (String peerId in peerIds) {
-      Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
-      if (linkman != null) {
-        peers.add(linkman);
-      } else {
-        Group? group = await groupService.findCachedOneByPeerId(peerId);
-        if (group != null) {
-          peers.add(group);
-          mimeType = PartyType.group.name;
-        }
-      }
-    }
-    String content = JsonUtil.toJsonString(peers);
-    await chatMessageController.sendText(
-        message: content,
-        contentType: ChatMessageContentType.card,
-        mimeType: mimeType);
+    await chatMessageController.sendNameCard(peerIds);
   }
 
   ///文件

@@ -229,6 +229,9 @@ class GlobalChatMessageController with ChangeNotifier {
       case ChatMessageSubType.addFriend:
         linkmanService.receiveModifyLinkman(chatMessage);
         break;
+      case ChatMessageSubType.findLinkman:
+        linkmanService.receiveFindLinkman(chatMessage);
+        break;
       case ChatMessageSubType.modifyLinkman:
         linkmanService.receiveModifyLinkman(chatMessage);
         break;

@@ -5,9 +5,11 @@ import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/entity/chat/peer_party.dart';
 import 'package:colla_chat/entity/dht/base.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
+import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
@@ -257,33 +259,65 @@ class LinkmanService extends PeerPartyService<Linkman> {
   }
 
   ///发出更新联系人信息的请求
-  Future<ChatMessage> modifyLinkman(String peerId,
-      {String? clientId,
-      CryptoOption cryptoOption = CryptoOption.linkman}) async {
-    // 加好友会发送自己的信息，回执将收到对方的信息
-    Map<String, dynamic> map = JsonUtil.toJson(myself.myselfPeer);
-    PeerClient peerClient = PeerClient.fromJson(map);
+  Future<ChatMessage> findLinkman(String peerId, List<String> peerIds,
+      {String? clientId}) async {
     ChatMessage chatMessage = await chatMessageService.buildChatMessage(
       receiverPeerId: peerId,
       clientId: clientId,
-      content: peerClient,
+      content: peerIds,
       messageType: ChatMessageType.system,
-      subMessageType: ChatMessageSubType.modifyLinkman,
+      subMessageType: ChatMessageSubType.findLinkman,
     );
-    List<ChatMessage> chatMessages = await chatMessageService
-        .sendAndStore(chatMessage, cryptoOption: cryptoOption);
+    List<ChatMessage> chatMessages =
+        await chatMessageService.sendAndStore(chatMessage);
 
     return chatMessages.first;
   }
 
-  ///接收到更新联系人信息的请求，会同时修改消息和联系人
+  ///接收更新联系人信息的请求
+  receiveFindLinkman(ChatMessage chatMessage) async {
+    String json = chatMessageService.recoverContent(chatMessage.content!);
+    List<String> peerIds = [];
+    List<dynamic> list = JsonUtil.toJson(json);
+    for (String peerId in list) {
+      peerIds.add(peerId);
+    }
+    await modifyLinkman(chatMessage.senderPeerId!,
+        clientId: chatMessage.senderClientId, peerIds: peerIds);
+  }
+
+  ///发出联系人信息
+  Future<ChatMessage> modifyLinkman(String peerId,
+      {String? clientId, List<String>? peerIds}) async {
+    peerIds ??= [myself.peerId!];
+    List<PeerParty> peers = [];
+    for (String peerId in peerIds) {
+      Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+      if (linkman != null) {
+        peers.add(linkman);
+      }
+    }
+    ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+      receiverPeerId: peerId,
+      clientId: clientId,
+      content: peers,
+      messageType: ChatMessageType.system,
+      subMessageType: ChatMessageSubType.modifyLinkman,
+    );
+    List<ChatMessage> chatMessages =
+        await chatMessageService.sendAndStore(chatMessage);
+
+    return chatMessages.first;
+  }
+
+  ///接收到联系人信息，会同时修改消息和联系人
   receiveModifyLinkman(ChatMessage chatMessage) async {
     String json = chatMessageService.recoverContent(chatMessage.content!);
-    Map<String, dynamic> map = JsonUtil.toJson(json);
-    Linkman linkman = Linkman.fromJson(map);
-    await store(linkman);
-
-    return linkman;
+    List<Map<String, dynamic>> list = JsonUtil.toJson(json);
+    for (Map<String, dynamic> map in list) {
+      Linkman linkman = Linkman.fromJson(map);
+      await store(linkman);
+    }
   }
 
   removeByPeerId(String peerId) {

@@ -383,10 +383,21 @@ class GroupService extends PeerPartyService<Group> {
   receiveAddGroupMember(ChatMessage chatMessage) async {
     String json = chatMessageService.recoverContent(chatMessage.content!);
     List<dynamic> maps = JsonUtil.toJson(json);
+    List<String> peerIds = [];
     for (var map in maps) {
       GroupMember groupMember = GroupMember.fromJson(map);
       groupMember.id = null;
       await groupMemberService.store(groupMember, memberAlias: false);
+
+      Linkman? linkman =
+          await linkmanService.findCachedOneByPeerId(groupMember.memberPeerId!);
+      if (linkman == null) {
+        peerIds.add(groupMember.memberPeerId!);
+      }
+    }
+    if (peerIds.isNotEmpty) {
+      await linkmanService.findLinkman(chatMessage.senderPeerId!, peerIds,
+          clientId: chatMessage.senderClientId);
     }
 
     ChatMessage? chatReceipt = await chatMessageService.buildLinkmanChatReceipt(
@@ -605,12 +616,6 @@ class GroupMemberService extends GeneralBaseService<GroupMember> {
       }
     }
     await upsert(groupMember);
-    Linkman? linkman =
-        await linkmanService.findCachedOneByPeerId(groupMember.memberPeerId!);
-    if (linkman == null) {
-      linkman = Linkman(groupMember.memberPeerId!, groupMember.memberAlias!);
-      await linkmanService.insert(linkman);
-    }
   }
 }
 
