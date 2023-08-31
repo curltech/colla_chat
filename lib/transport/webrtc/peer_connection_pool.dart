@@ -554,14 +554,18 @@ class PeerConnectionPool {
     ///收到信号，连接已经存在，但是clientId为unknownClientId，表明自己是主叫，建立的时候对方的clientId未知
     ///设置clientId和name
     AdvancedPeerConnection? advancedPeerConnection =
-        await getOne(peerId, clientId: unknownClientId);
-    if (advancedPeerConnection != null) {
-      advancedPeerConnection.clientId = clientId;
-      advancedPeerConnection.name = name;
-      remove(peerId, clientId: unknownClientId);
-      await put(peerId, advancedPeerConnection, clientId: clientId);
-    }
-    advancedPeerConnection = await getOne(peerId, clientId: clientId);
+        await _connLock.synchronized(() async {
+      AdvancedPeerConnection? advancedPeerConnection =
+          _getOne(peerId, clientId: unknownClientId);
+      if (advancedPeerConnection != null) {
+        advancedPeerConnection.clientId = clientId;
+        advancedPeerConnection.name = name;
+        remove(peerId, clientId: unknownClientId);
+        await put(peerId, advancedPeerConnection, clientId: clientId);
+      }
+      return advancedPeerConnection;
+    });
+    advancedPeerConnection = _getOne(peerId, clientId: clientId);
     // peerId的连接存在，而且已经连接，报错
     if (advancedPeerConnection != null) {
       if (advancedPeerConnection.connected) {
