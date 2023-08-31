@@ -88,7 +88,7 @@ class NameCardMessage extends StatelessWidget {
                 linkmanService.store(linkman);
               }
               bool? confirm = await DialogUtil.confirm(context,
-                  content: 'Do you add as friend?');
+                  content: 'Do you add all as friend?');
               if (confirm != null && confirm) {
                 for (Linkman linkman in linkmen!) {
                   linkmanService.update(

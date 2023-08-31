@@ -508,5 +508,7 @@
   "Remote": "远程",
   "Conference pool": "会议池",
   "Minimize": "最小化",
-  "Join conference": "加入会议"
+  "Join conference": "加入会议",
+  "Do you add all as friend?": "全部加为好友吗？",
+  "Please input request add friend tip": "请输入加好友的提示"
 }

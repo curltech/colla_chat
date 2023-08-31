@@ -35,7 +35,7 @@ class RequestAddFriendMessage extends StatelessWidget {
           ? null
           : () async {
               bool? confirm = await DialogUtil.confirm(context,
-                  content: AppLocalizations.t('Do you agree to add friend?'));
+                  content: AppLocalizations.t('Do you add all as friend?'));
               if (confirm != null && confirm) {
                 await linkmanService.update(
                     {'linkmanStatus': LinkmanStatus.friend.name},
