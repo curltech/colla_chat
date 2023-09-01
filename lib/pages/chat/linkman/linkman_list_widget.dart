@@ -101,8 +101,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     groupController.addListener(_updateGroup);
     conferenceController.addListener(_updateConference);
     _searchLinkman(_linkmanTextController.text);
-    _searchGroup(_groupTextController.text);
-    _searchConference(_conferenceTextController.text);
+    // _searchGroup(_groupTextController.text);
+    // _searchConference(_conferenceTextController.text);
   }
 
   _updateCurrentTab() {
