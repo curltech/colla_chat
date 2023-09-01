@@ -198,7 +198,8 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummary.title = chatMessage.title;
       chatSummary.receiptContent = chatMessage.receiptType;
       chatSummary.thumbnail = chatMessage.thumbnail;
-      if (chatMessage.contentType != ChatMessageContentType.file.name &&
+      if (chatMessage.title == null &&
+          chatMessage.contentType != ChatMessageContentType.file.name &&
           chatMessage.contentType != ChatMessageContentType.video.name &&
           chatMessage.contentType != ChatMessageContentType.audio.name &&
           chatMessage.contentType != ChatMessageContentType.rich.name &&
