@@ -1,4 +1,5 @@
 import 'package:colla_chat/entity/base.dart';
+import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:flutter/material.dart';
 
@@ -100,5 +101,50 @@ class Conference extends StatusEntity {
           participants == null ? null : JsonUtil.toJsonString(participants),
     });
     return json;
+  }
+}
+
+class ConferenceChange {
+  Conference? conference;
+  List<GroupMember>? addGroupMembers;
+  List<GroupMember>? removeGroupMembers;
+  List<String>? unknownPeerIds;
+
+  ConferenceChange(
+      {this.conference,
+      this.addGroupMembers,
+      this.removeGroupMembers,
+      this.unknownPeerIds});
+
+  ConferenceChange.fromJson(Map json) {
+    if (json['conference'] != null) {
+      conference = Conference.fromJson(json['conference']);
+    }
+    if (json['addGroupMembers'] != null) {
+      addGroupMembers = <GroupMember>[];
+      for (var json in json['addGroupMembers']) {
+        var groupMember = GroupMember.fromJson(json);
+        addGroupMembers!.add(groupMember);
+      }
+    }
+    if (json['removeGroupMembers'] != null) {
+      removeGroupMembers = <GroupMember>[];
+      for (var json in json['removeGroupMembers']) {
+        var groupMember = GroupMember.fromJson(json);
+        removeGroupMembers!.add(groupMember);
+      }
+    }
+    if (json['unknownPeerIds'] != null) {
+      unknownPeerIds = JsonUtil.toJson(json['unknownPeerIds']);
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'conference': conference?.toJson(),
+      'addGroupMembers': JsonUtil.toJson(addGroupMembers),
+      'removeGroupMembers': JsonUtil.toJson(removeGroupMembers),
+      'unknownPeerIds': JsonUtil.toJson(unknownPeerIds),
+    };
   }
 }

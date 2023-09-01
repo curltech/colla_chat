@@ -143,7 +143,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
   }
 
   ///保存会议以及成员，成员根据participants,conferenceOwnerPeerId决定成员表的身份
-  Future<List<Object>> store(Conference conference) async {
+  Future<ConferenceChange> store(Conference conference) async {
     Conference? old = await findOneByConferenceId(conference.conferenceId);
     if (old != null) {
       conference.id = old.id;
@@ -155,7 +155,8 @@ class ConferenceService extends GeneralBaseService<Conference> {
     var conferenceId = conference.conferenceId;
     var participants = conference.participants;
     if (participants == null || participants.isEmpty) {
-      return [conference, [], []];
+      return ConferenceChange(
+          conference: conference, addGroupMembers: [], removeGroupMembers: []);
     }
     List<GroupMember> members =
         await groupMemberService.findByGroupId(conferenceId);
@@ -168,6 +169,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
     }
     //新增加的成员
     List<GroupMember> newMembers = [];
+    List<String> unknownPeerIds = [];
     for (var memberPeerId in participants) {
       var member = oldMembers[memberPeerId];
       if (member == null) {
@@ -185,10 +187,11 @@ class ConferenceService extends GeneralBaseService<Conference> {
           } else {
             groupMember.memberAlias = linkman.alias;
           }
+          if (linkman.publicKey == null) {
+            unknownPeerIds.add(memberPeerId);
+          }
         } else {
-          //加新的联系人，没有名字
-          linkman = Linkman(memberPeerId, '');
-          await linkmanService.insert(linkman);
+          unknownPeerIds.add(memberPeerId);
         }
         groupMember.status = EntityStatus.effective.name;
         await groupMemberService.store(groupMember);
@@ -207,7 +210,11 @@ class ConferenceService extends GeneralBaseService<Conference> {
     conferences[conference.conferenceId] = conference;
     await chatSummaryService.upsertByConference(conference);
 
-    return [conference, newMembers, oldMembers.values.toList()];
+    return ConferenceChange(
+        conference: conference,
+        addGroupMembers: newMembers,
+        removeGroupMembers: oldMembers.values.toList(),
+        unknownPeerIds: unknownPeerIds);
   }
 
   removeByConferenceId(String conferenceId) async {

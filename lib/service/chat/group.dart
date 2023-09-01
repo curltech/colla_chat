@@ -150,7 +150,7 @@ class GroupService extends PeerPartyService<Group> {
     }
     //新增加的成员
     List<GroupMember> newMembers = [];
-    List<String> peerIds = [];
+    List<String> unknownPeerIds = [];
     for (String participant in participants) {
       var member = oldMembers[participant];
       //成员不存在，创建新的
@@ -170,10 +170,10 @@ class GroupService extends PeerPartyService<Group> {
             groupMember.memberAlias = linkman.alias;
           }
           if (linkman.publicKey == null) {
-            peerIds.add(participant);
+            unknownPeerIds.add(participant);
           }
         } else {
-          peerIds.add(participant);
+          unknownPeerIds.add(participant);
         }
         groupMember.status = EntityStatus.effective.name;
         await groupMemberService.store(groupMember);
@@ -195,7 +195,7 @@ class GroupService extends PeerPartyService<Group> {
         group: group,
         addGroupMembers: newMembers,
         removeGroupMembers: oldMembers.values.toList(),
-        unknownPeerIds: peerIds);
+        unknownPeerIds: unknownPeerIds);
   }
 
   Future<List<Group>> search(String key) async {

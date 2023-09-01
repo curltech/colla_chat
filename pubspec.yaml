@@ -71,7 +71,7 @@ dependencies:
   shared_preferences: ^2.0.10
   flutter_secure_storage: ^8.0.0
   sqlite3: ^2.1.0
-  sqlite3_flutter_libs: ^0.5.15
+  sqlite3_flutter_libs: ^0.5.16
   idb_shim: ^2.0.1
 
   #网络

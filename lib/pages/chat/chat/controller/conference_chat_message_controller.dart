@@ -10,6 +10,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/chat_summary.dart';
 import 'package:colla_chat/service/chat/conference.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
@@ -509,7 +510,14 @@ class ConferenceChatMessageController with ChangeNotifier {
     //除了向发送方外，还需要向房间的各接收人发送回执，
     //首先检查接收人是否已经存在给自己的回执，不存在或者存在是accepted则发送回执
     //如果存在，如果是rejected或者terminated，则不发送回执
-    await conferenceService.store(_conference!);
+    ConferenceChange conferenceChange =
+        await conferenceService.store(_conference!);
+    var unknownPeerIds = conferenceChange.unknownPeerIds;
+    if (unknownPeerIds != null && unknownPeerIds.isNotEmpty) {
+      await linkmanService.findLinkman(
+          chatMessage.senderPeerId!, unknownPeerIds,
+          clientId: chatMessage.senderClientId);
+    }
     ChatMessage chatReceipt = await chatMessageService.buildGroupChatReceipt(
         chatMessage, receiptType);
     await chatMessageService.sendAndStore(chatReceipt,
