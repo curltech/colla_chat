@@ -67,10 +67,10 @@ ConnectivityController connectivityController = ConnectivityController();
 ///好友的汇总控制器，每当消息汇总表的数据有变化时更新控制器
 class LinkmanChatSummaryController extends DataListController<ChatSummary> {
   Future<void> refresh() async {
-    int start = DateTime.now().microsecond;
+    int start = DateTime.now().microsecondsSinceEpoch;
     List<ChatSummary> chatSummary =
         await chatSummaryService.findByPartyType(PartyType.linkman.name);
-    int end = DateTime.now().microsecond;
+    int end = DateTime.now().microsecondsSinceEpoch;
     logger.w('find chat summary refresh time: ${end - start} microsecond');
     if (chatSummary.isNotEmpty) {
       replaceAll(chatSummary);
