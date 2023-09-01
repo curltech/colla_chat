@@ -163,10 +163,10 @@ class _ChatListWidgetState extends State<ChatListWidget>
 
     linkmanChatSummaryController.addListener(_updateLinkmanChatSummary);
     linkmanChatSummaryController.refresh();
-    groupChatSummaryController.addListener(_updateGroupChatSummary);
-    groupChatSummaryController.refresh();
-    conferenceChatSummaryController.addListener(_updateConferenceChatSummary);
-    conferenceChatSummaryController.refresh();
+    // groupChatSummaryController.addListener(_updateGroupChatSummary);
+    // groupChatSummaryController.refresh();
+    // conferenceChatSummaryController.addListener(_updateConferenceChatSummary);
+    // conferenceChatSummaryController.refresh();
 
     connectivityController.addListener(_updateConnectivity);
 
