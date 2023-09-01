@@ -169,6 +169,9 @@ class GroupService extends PeerPartyService<Group> {
           } else {
             groupMember.memberAlias = linkman.alias;
           }
+          if (linkman.publicKey == null) {
+            peerIds.add(participant);
+          }
         } else {
           peerIds.add(participant);
         }
@@ -404,7 +407,7 @@ class GroupService extends PeerPartyService<Group> {
 
       Linkman? linkman =
           await linkmanService.findCachedOneByPeerId(groupMember.memberPeerId!);
-      if (linkman == null) {
+      if (linkman == null || linkman.publicKey == null) {
         peerIds.add(groupMember.memberPeerId!);
       }
     }
