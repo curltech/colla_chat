@@ -13,6 +13,7 @@ import 'package:colla_chat/pages/chat/chat/chat_message_view.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/group/linkman_group_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_info_widget.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -66,8 +67,11 @@ ConnectivityController connectivityController = ConnectivityController();
 ///好友的汇总控制器，每当消息汇总表的数据有变化时更新控制器
 class LinkmanChatSummaryController extends DataListController<ChatSummary> {
   Future<void> refresh() async {
+    int start = DateTime.now().microsecond;
     List<ChatSummary> chatSummary =
         await chatSummaryService.findByPartyType(PartyType.linkman.name);
+    int end = DateTime.now().microsecond;
+    logger.w('find chat summary refresh time: ${end - start} microsecond');
     if (chatSummary.isNotEmpty) {
       replaceAll(chatSummary);
     }

@@ -61,7 +61,10 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
 
   _update() {
     setState(() {
+      int start = DateTime.now().microsecond;
       chatMessageController.latest();
+      int end = DateTime.now().microsecond;
+      logger.w('find chat message latest time: ${end - start} microsecond');
     });
   }
 
