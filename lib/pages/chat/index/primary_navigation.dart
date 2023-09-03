@@ -165,10 +165,11 @@ class PrimaryNavigation {
               const SizedBox(
                 width: 10.0,
               ),
-              Text(
+              Expanded(
+                  child: Text(
                 AppLocalizations.t(view.title),
                 style: const TextStyle(color: Colors.white),
-              )
+              ))
             ])));
       }
       return Column(

@@ -511,5 +511,6 @@
   "Join conference": "加入会议",
   "Do you add all as friend?": "全部加为好友吗？",
   "Please input request add friend tip": "请输入加好友的提示",
-  "Change body ratio": "改变显示宽度"
+  "Change body ratio": "改变显示宽度",
+  "ChannelMessagePreview": "频道文章预览"
 }
