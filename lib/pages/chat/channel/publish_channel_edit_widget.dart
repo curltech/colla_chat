@@ -115,7 +115,7 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
     chatMessage.mimeType = ChatMessageMimeType.json.name;
     await chatMessageService.store(chatMessage);
     if (newDocument) {
-      myChannelChatMessageController.add(chatMessage);
+      //myChannelChatMessageController.add(chatMessage);
     }
     if (mounted) {
       DialogUtil.info(context,
@@ -195,12 +195,19 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
       title: widget.title,
       rightWidgets: [
         IconButton(
+          icon: const Icon(Icons.save),
+          onPressed: () async {
+            await _save();
+          },
+          tooltip: AppLocalizations.t('Save'),
+        ),
+        IconButton(
           icon: const Icon(Icons.publish),
           onPressed: () async {
             await _publish();
           },
           tooltip: AppLocalizations.t('Publish'),
-        )
+        ),
       ],
       child: _buildChannelItemView(context),
     );

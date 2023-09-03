@@ -375,7 +375,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   ///选择会议参与者，发送会议邀请消息，然后将新会议加入会议池，成为当前会议
   Future<void> _invite() async {
-    var status = await _checkWebrtcStatus();
+    var status = _checkWebrtcStatus();
     if (!status) {
       return;
     }
@@ -448,7 +448,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   ///加入当前会议，即开始视频会议
   Future<void> _join() async {
-    var status = await _checkWebrtcStatus();
+    var status = _checkWebrtcStatus();
     if (!status) {
       return;
     }

@@ -47,11 +47,11 @@ class P2pConferenceClient extends PeerMediaStreamController {
     _joined = false;
     List<AdvancedPeerConnection> peerConnections = [..._peerConnections.values];
     for (AdvancedPeerConnection peerConnection in peerConnections) {
-      await _removePeerMediaStream(peerConnection);
+      await _removeRemotePeerMediaStream(peerConnection);
       List<PeerMediaStream> peerMediaStreams =
           localPeerMediaStreamController.peerMediaStreams;
       if (peerMediaStreams.isNotEmpty) {
-        await removePeerMediaStream(peerMediaStreams,
+        await removeLocalPeerMediaStream(peerMediaStreams,
             peerConnection: peerConnection);
       }
     }
@@ -59,7 +59,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
 
   ///生成并且加入连接的远程视频stream，确保之前连接已经加入
   ///激活add事件
-  _addPeerMediaStream(AdvancedPeerConnection peerConnection) async {
+  _addRemotePeerMediaStream(AdvancedPeerConnection peerConnection) async {
     var peerId = peerConnection.peerId;
     var clientId = peerConnection.clientId;
     var name = peerConnection.name;
@@ -70,15 +70,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
         logger.e('A peerConnection remoteStream is null');
         continue;
       }
-      PeerMediaStream? peerMediaStream = await getPeerMediaStream(stream.id);
-      if (peerMediaStream != null) {
-        logger.e('A peerConnection remoteStream video stream is exist');
-        continue;
-      }
-      peerMediaStream = PeerMediaStream();
-      await peerMediaStream.buildMediaStream(stream, peerId,
-          clientId: clientId, name: name);
-      add(peerMediaStream);
+      await _onAddRemoteStream(stream, peerId, clientId, name);
       logger.i(
           'A peerConnection remoteStream video stream ${stream.id} is added');
     }
@@ -120,13 +112,14 @@ class P2pConferenceClient extends PeerMediaStreamController {
 
     //只有自己已经加入，才需要加本地流和远程流
     if (_joined) {
-      await _addPeerMediaStream(peerConnection);
       List<PeerMediaStream> peerMediaStreams =
           localPeerMediaStreamController.peerMediaStreams;
       if (peerMediaStreams.isNotEmpty) {
         await addLocalPeerMediaStream(peerMediaStreams,
             peerConnection: peerConnection);
       }
+
+      await _addRemotePeerMediaStream(peerConnection);
     }
   }
 
@@ -149,7 +142,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
   }
 
   ///移除连接的远程视频
-  _removePeerMediaStream(AdvancedPeerConnection peerConnection) async {
+  _removeRemotePeerMediaStream(AdvancedPeerConnection peerConnection) async {
     var peerId = peerConnection.peerId;
     var clientId = peerConnection.clientId;
     List<PeerMediaStream> peerMediaStreams =
@@ -162,7 +155,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
   }
 
   ///从会议的指定连接或者所有连接中移除local peerMediaStream，并且都重新协商
-  removePeerMediaStream(List<PeerMediaStream> peerMediaStreams,
+  removeLocalPeerMediaStream(List<PeerMediaStream> peerMediaStreams,
       {AdvancedPeerConnection? peerConnection}) async {
     if (peerConnection != null) {
       for (var peerMediaStream in peerMediaStreams) {
@@ -194,11 +187,11 @@ class P2pConferenceClient extends PeerMediaStreamController {
           WebrtcEventType.removeTrack, _onRemoveRemoteTrack);
       peerConnection.unregisterWebrtcEvent(WebrtcEventType.closed, _onClosed);
       if (_joined) {
-        await _removePeerMediaStream(peerConnection);
+        await _removeRemotePeerMediaStream(peerConnection);
         List<PeerMediaStream> peerMediaStreams =
             localPeerMediaStreamController.peerMediaStreams;
         if (peerMediaStreams.isNotEmpty) {
-          await removePeerMediaStream(peerMediaStreams,
+          await removeLocalPeerMediaStream(peerMediaStreams,
               peerConnection: peerConnection);
         }
       }
@@ -220,19 +213,23 @@ class P2pConferenceClient extends PeerMediaStreamController {
     String clientId = webrtcEvent.clientId;
     String name = webrtcEvent.name;
     if (stream != null) {
-      String streamId = stream.id;
-      PeerMediaStream? peerMediaStream = await getPeerMediaStream(streamId);
-      if (peerMediaStream != null) {
-        peerMediaStream.setStream(stream);
-        return;
-      }
-      peerMediaStream = PeerMediaStream();
-      await peerMediaStream.buildMediaStream(stream, peerId,
-          clientId: clientId, name: name);
-      add(peerMediaStream);
+      await _onAddRemoteStream(stream, peerId, clientId, name);
     } else {
       logger.e('onAddRemoteTrack stream is null');
     }
+  }
+
+  Future<void> _onAddRemoteStream(
+      MediaStream stream, String peerId, String clientId, String name) async {
+    String streamId = stream.id;
+    PeerMediaStream? peerMediaStream = await getPeerMediaStream(streamId);
+    if (peerMediaStream != null) {
+      return;
+    }
+    peerMediaStream = PeerMediaStream();
+    await peerMediaStream.buildMediaStream(stream, peerId,
+        clientId: clientId, name: name);
+    add(peerMediaStream);
   }
 
   ///远程关闭流事件触发，激活remove事件
@@ -406,7 +403,7 @@ class P2pConferenceClientPool with ChangeNotifier {
     P2pConferenceClient? p2pConferenceClient =
         _p2pConferenceClients[conferenceId];
     if (p2pConferenceClient != null) {
-      await p2pConferenceClient.removePeerMediaStream(peerMediaStreams,
+      await p2pConferenceClient.removeLocalPeerMediaStream(peerMediaStreams,
           peerConnection: peerConnection);
     }
   }
