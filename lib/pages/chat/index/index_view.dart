@@ -384,7 +384,7 @@ class _IndexViewState extends State<IndexView>
         height: 148,
         alignment: Alignment.topLeft,
         width: appDataProvider.totalSize.width,
-        padding: const EdgeInsets.all(0.0),
+        padding: const EdgeInsets.all(10.0),
         child: Card(
             elevation: 0.0,
             margin: EdgeInsets.zero,
