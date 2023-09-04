@@ -3,9 +3,6 @@ import 'dart:typed_data';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
-import 'package:colla_chat/entity/chat/group.dart';
-import 'package:colla_chat/entity/chat/linkman.dart';
-import 'package:colla_chat/entity/chat/peer_party.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controller.dart';
@@ -17,8 +14,6 @@ import 'package:colla_chat/plugin/macos_camera_widget.dart';
 import 'package:colla_chat/plugin/mobile_camera_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
-import 'package:colla_chat/service/chat/group.dart';
-import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -173,8 +168,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         ChatMessage? chatMessage =
             await chatMessageService.findVideoChatChatMessage(groupId);
         if (chatMessage != null) {
-          await p2pConferenceClientPool.createConferenceChatMessageController(
-              chatSummary, chatMessage);
+          await p2pConferenceClientPool.createP2pConferenceClient(
+              chatSummary:chatSummary, chatMessage);
           indexWidgetProvider.push('video_chat');
         }
       }

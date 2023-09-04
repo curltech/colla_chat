@@ -6,7 +6,6 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.da
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/chat_summary.dart';
 import 'package:colla_chat/service/chat/conference.dart';
@@ -140,7 +139,7 @@ class ConferenceChatMessageController with ChangeNotifier {
 
   ///设置当前的视频邀请消息汇总，可以从chatMessageController中获取当前
   ///在conference模式下，peerId就是会议编号
-  setChatSummary(ChatSummary? chatSummary) async {
+  setChatSummary(ChatSummary chatSummary) async {
     //消息汇总未变，直接返回
     if (_chatSummary == chatSummary) {
       return;
@@ -152,11 +151,6 @@ class ConferenceChatMessageController with ChangeNotifier {
     peerId = null;
     groupId = null;
     _conference = null;
-    if (chatSummary == null) {
-      globalChatMessageController.unregisterReceiver(
-          ChatMessageSubType.videoChat.name, onReceivedInvitation);
-      return;
-    }
     partyType = chatSummary.partyType;
     if (partyType == PartyType.linkman.name) {
       peerId = chatSummary.peerId!;
@@ -172,15 +166,15 @@ class ConferenceChatMessageController with ChangeNotifier {
         name = _conference!.name;
       }
     }
-    globalChatMessageController.registerReceiver(
-        ChatMessageSubType.videoChat.name, onReceivedInvitation);
+    // globalChatMessageController.registerReceiver(
+    //     ChatMessageSubType.videoChat.name, onReceivedInvitation);
   }
 
   ///设置当前的视频邀请消息，可以从chatMessageController中获取当前，
   ///当前chatSummary是必须存在的，不存在就查找到
   ///当前chatMessage在选择了视频邀请消息后，也是存在的
   ///如果chatMessage不存在，表明是准备新的会议
-  setChatMessage(ChatMessage? chatMessage) async {
+  setChatMessage(ChatMessage chatMessage) async {
     //消息未变，直接返回
     if (_chatMessage == chatMessage) {
       return;
@@ -189,12 +183,6 @@ class ConferenceChatMessageController with ChangeNotifier {
     //先清空数据
     _conference = null;
     _chatReceipts = {};
-    //如果是清空数据，直接返回
-    if (_chatMessage == null) {
-      globalChatMessageController.unregisterReceiver(
-          ChatMessageSubType.chatReceipt.name, onReceivedChatReceipt);
-      return;
-    }
     await _initChatSummary();
     await _initChatMessage();
     globalChatMessageController.registerReceiver(
@@ -228,19 +216,19 @@ class ConferenceChatMessageController with ChangeNotifier {
   _initChatSummary() async {
     if (_chatSummary == null && _chatMessage != null) {
       ChatSummary? chatSummary = await _findChatSummary();
-      await setChatSummary(chatSummary);
+      await setChatSummary(chatSummary!);
     } else if (_chatSummary != null && _chatMessage != null) {
       if (_chatMessage!.direct == ChatDirect.send.name) {
         if (_chatSummary!.peerId != _chatMessage!.receiverPeerId) {
           var chatSummary = await _findChatSummary();
-          await setChatSummary(chatSummary);
+          await setChatSummary(chatSummary!);
         }
       }
       if (_chatMessage!.direct == ChatDirect.receive.name) {
         if (_chatSummary!.peerId != _chatMessage!.senderPeerId!) {
           _chatSummary = null;
           var chatSummary = await _findChatSummary();
-          await setChatSummary(chatSummary);
+          await setChatSummary(chatSummary!);
         }
       }
     }
@@ -307,50 +295,6 @@ class ConferenceChatMessageController with ChangeNotifier {
     return _chatReceipts[subMessageType]?[peerId];
   }
 
-  ///创建新的会议功能
-  ///对联系人模式，可以临时创建一个会议，会议成员从群成员中选择就是自己和对方，会议名称是对方的名称，不保存会议
-  ///对群模式，可以创建一个会议，会议成员从群成员中选择，会议名称是群的名称加上当前时间，保存会议
-  ///对会议模式，直接转到会议创建界面，
-  Future<void> buildConference(
-      {required bool video, required List<String> participants}) async {
-    var conference = _conference;
-    if (conference != null) {
-      logger.e('conference ${conference.name} is exist');
-      return;
-    }
-    var partyType = this.partyType;
-    if (partyType == PartyType.conference.name) {}
-    var groupId = this.groupId;
-    if (partyType == PartyType.group.name) {
-      if (groupId == null) {
-        return;
-      }
-    }
-    if (partyType == PartyType.linkman.name) {
-      var peerId = this.peerId;
-      if (peerId == null) {
-        return;
-      }
-      if (!participants.contains(peerId)) {
-        participants.add(peerId);
-      }
-    }
-    var name = this.name;
-    var current = DateTime.now();
-    var dateName = current.toLocal().toIso8601String();
-    _conference = await conferenceService.createConference(
-        'video-chat-$dateName', video,
-        startDate: current.toUtc().toIso8601String(),
-        endDate:
-            current.add(const Duration(hours: 2)).toUtc().toIso8601String(),
-        participants: participants);
-    if (partyType == PartyType.group.name) {
-      _conference!.groupId = groupId;
-      _conference!.groupName = name;
-      _conference!.groupType = partyType;
-    }
-  }
-
   ///1.发送视频通邀请话消息,此时消息必须有content,包含conference信息
   ///当前chatSummary可以不存在，因此不需要当前处于聊天场景下，因此是一个静态方法，创建永久conference的时候使用
   ///对linkman模式下，conference是临时的，不保存数据库
@@ -374,25 +318,6 @@ class ConferenceChatMessageController with ChangeNotifier {
 
   ///1.发送视频通邀请话消息,此时消息必须有content,包含conference信息
   ///当前chatSummary必须存在，因此只能用于当前正在聊天的时候
-  Future<ChatMessage?> inviteWithChatSummary() async {
-    ///有chatSummary和conference的时候发送邀请消息
-    ChatMessage? chatMessage = await chatMessageController.send(
-        title: _conference!.video
-            ? ChatMessageContentType.video.name
-            : ChatMessageContentType.audio.name,
-        content: _conference,
-        messageId: _conference!.conferenceId,
-        subMessageType: ChatMessageSubType.videoChat,
-        peerIds: _conference!.participants);
-    if (chatMessage != null) {
-      logger.i('send video chatMessage ${chatMessage.messageId}');
-    }
-    await setChatMessage(chatMessage!);
-    p2pConferenceClientPool.createP2pConferenceClient(this);
-    status = VideoChatStatus.calling;
-
-    return chatMessage;
-  }
 
   ///2.接收会议邀请消息
   onReceivedInvitation(ChatMessage chatMessage) async {
@@ -593,6 +518,7 @@ class ConferenceChatMessageController with ChangeNotifier {
     //当前的视频通话邀请消息一致
     if (_chatMessage!.messageId != chatReceipt.messageId) {
       logger.e('messageId $messageId is not equal');
+      return;
     }
 
     _current = chatReceipt;
@@ -731,10 +657,12 @@ class ConferenceChatMessageController with ChangeNotifier {
     );
     //将发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
     if (advancedPeerConnection != null) {
-      P2pConferenceClient p2pConferenceClient =
-          await p2pConferenceClientPool.createP2pConferenceClient(this);
-      await p2pConferenceClient
-          .addAdvancedPeerConnection(advancedPeerConnection);
+      P2pConferenceClient? p2pConferenceClient =
+          p2pConferenceClientPool.getP2pConferenceClient(messageId);
+      if (p2pConferenceClient != null) {
+        await p2pConferenceClient
+            .addAdvancedPeerConnection(advancedPeerConnection);
+      }
     } else {
       logger.e('participant $peerId has no peerConnections');
     }
@@ -773,9 +701,9 @@ class ConferenceChatMessageController with ChangeNotifier {
   joinConference() async {
     await openLocalMainPeerMediaStream();
     //创建新的视频会议控制器
-    P2pConferenceClient p2pConferenceClient =
-        await p2pConferenceClientPool.createP2pConferenceClient(this);
-    await p2pConferenceClient.join();
+    P2pConferenceClient? p2pConferenceClient = p2pConferenceClientPool
+        .getP2pConferenceClient(_conference!.conferenceId);
+    await p2pConferenceClient?.join();
     status = VideoChatStatus.chatting;
   }
 
@@ -789,8 +717,11 @@ class ConferenceChatMessageController with ChangeNotifier {
   ///自己主动终止，发送terminate回执，关闭会议
   ///如果会议发起人发出终止信号，收到的参与者都将退出，而且会议将不可再加入
   terminate() async {
+    globalChatMessageController.unregisterReceiver(
+        ChatMessageSubType.videoChat.name, onReceivedInvitation);
+    globalChatMessageController.unregisterReceiver(
+        ChatMessageSubType.chatReceipt.name, onReceivedChatReceipt);
     await _sendChatReceipt(MessageReceiptType.terminated);
-    await p2pConferenceClientPool.terminate(_conference!.conferenceId);
     status = VideoChatStatus.end;
   }
 }

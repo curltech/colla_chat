@@ -208,7 +208,6 @@ class P2pConferenceClient extends PeerMediaStreamController {
   Future<void> _onAddRemoteTrack(WebrtcEvent webrtcEvent) async {
     Map<String, dynamic> data = webrtcEvent.data;
     MediaStream? stream = data['stream'];
-    MediaStreamTrack track = data['track'];
     String peerId = webrtcEvent.peerId;
     String clientId = webrtcEvent.clientId;
     String name = webrtcEvent.name;
@@ -236,7 +235,6 @@ class P2pConferenceClient extends PeerMediaStreamController {
   Future<void> _onRemoveRemoteTrack(WebrtcEvent webrtcEvent) async {
     Map<String, dynamic> data = webrtcEvent.data;
     MediaStream? stream = data['stream'];
-    MediaStreamTrack track = data['track'];
     if (stream != null) {
       PeerMediaStream? peerMediaStream = await getPeerMediaStream(stream.id);
       if (peerMediaStream != null) {
@@ -258,8 +256,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
     await exit();
     _peerConnections.clear();
     peerMediaStreams.clear();
-    conferenceChatMessageController.setChatMessage(null);
-    conferenceChatMessageController.setChatSummary(null);
+    conferenceChatMessageController.terminate();
     await onPeerMediaStreamOperator(
         PeerMediaStreamOperator.terminate.name, null);
   }
@@ -281,21 +278,34 @@ class P2pConferenceClientPool with ChangeNotifier {
   }
 
   ///根据当前的视频邀请消息，查找或者创建当前消息对应的会议，并设置为当前会议
-  Future<void> createConferenceChatMessageController(
-      ChatSummary chatSummary, ChatMessage chatMessage) async {
-    //创建基于当前聊天的视频消息控制器
-    if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-      ConferenceChatMessageController? conferenceChatMessageController =
-          getConferenceChatMessageController(chatMessage.messageId!);
-      if (conferenceChatMessageController == null) {
-        conferenceChatMessageController = ConferenceChatMessageController();
-        await conferenceChatMessageController.setChatSummary(chatSummary);
-        await conferenceChatMessageController.setChatMessage(chatMessage);
-        createP2pConferenceClient(conferenceChatMessageController);
-      } else {
-        conferenceId = conferenceChatMessageController.conferenceId;
+  ///在发起者接收到至少一个同意回执，开始重新协商，或者接收者发送出同意回执的时候调用
+  Future<P2pConferenceClient?> createP2pConferenceClient(
+      ChatMessage chatMessage,
+      {ChatSummary? chatSummary}) async {
+    return await _clientLock.synchronized(() async {
+      P2pConferenceClient? p2pConferenceClient;
+      //创建基于当前聊天的视频消息控制器
+      if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
+        String conferenceId = chatMessage.messageId!;
+        p2pConferenceClient = _p2pConferenceClients[conferenceId];
+        if (p2pConferenceClient == null) {
+          ConferenceChatMessageController conferenceChatMessageController =
+              ConferenceChatMessageController();
+          if (chatSummary != null) {
+            await conferenceChatMessageController.setChatSummary(chatSummary);
+          }
+          await conferenceChatMessageController.setChatMessage(chatMessage);
+          p2pConferenceClient = P2pConferenceClient(
+              conferenceChatMessageController: conferenceChatMessageController);
+          _p2pConferenceClients[conferenceId] = p2pConferenceClient;
+        }
+        this.conferenceId = conferenceId;
+
+        return p2pConferenceClient;
       }
-    }
+
+      return p2pConferenceClient;
+    });
   }
 
   ///获取当前会议号
@@ -351,25 +361,6 @@ class P2pConferenceClientPool with ChangeNotifier {
     return getP2pConferenceClient(conferenceId)
         ?.conferenceChatMessageController
         .conference;
-  }
-
-  ///创建新的远程视频会议控制器，假如会议号已经存在，直接返回控制器
-  ///在发起者接收到至少一个同意回执，开始重新协商，或者接收者发送出同意回执的时候调用
-  Future<P2pConferenceClient> createP2pConferenceClient(
-      ConferenceChatMessageController conferenceChatMessageController) async {
-    return await _clientLock.synchronized(() {
-      String conferenceId = conferenceChatMessageController.conferenceId!;
-      P2pConferenceClient? p2pConferenceClient =
-          _p2pConferenceClients[conferenceId];
-      if (p2pConferenceClient == null) {
-        p2pConferenceClient = P2pConferenceClient(
-            conferenceChatMessageController: conferenceChatMessageController);
-        _p2pConferenceClients[conferenceId] = p2pConferenceClient;
-      }
-      this.conferenceId = conferenceId;
-
-      return p2pConferenceClient;
-    });
   }
 
   ///加新的连接

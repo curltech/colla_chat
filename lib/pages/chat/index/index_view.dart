@@ -4,11 +4,10 @@ import 'dart:typed_data';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
-import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
+import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/index/adaptive_layout_index.dart';
@@ -26,6 +25,7 @@ import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -55,12 +55,13 @@ class IndexView extends StatefulWidget {
 
 class _IndexViewState extends State<IndexView>
     with SingleTickerProviderStateMixin {
-  final ValueNotifier<bool> videoChatMessageVisible =
+  final ValueNotifier<bool> conferenceChatMessageVisible =
       ValueNotifier<bool>(false);
   final ValueNotifier<bool> chatMessageVisible = ValueNotifier<bool>(false);
   final CustomSpecialTextSpanBuilder customSpecialTextSpanBuilder =
       CustomSpecialTextSpanBuilder();
-  ConferenceChatMessageController? videoChatMessageController;
+  ChatMessage? chatMessage;
+  ChatMessage? conferenceChatMessage;
   BlueFireAudioPlayer? audioPlayer;
 
   //JustAudioPlayer audioPlayer = JustAudioPlayer();
@@ -204,41 +205,35 @@ class _IndexViewState extends State<IndexView>
   ///有新消息到来的时候，一般消息直接显示
   _updateGlobalChatMessage() async {
     ChatMessage? chatMessage = globalChatMessageController.chatMessage;
-    if (chatMessage != null) {
-      String senderPeerId = chatMessage.senderPeerId!;
-      String? groupId = chatMessage.groupId;
-      Linkman? linkman =
-          await linkmanService.findCachedOneByPeerId(senderPeerId);
-      if (linkman != null) {
-        bannerAvatarImage = linkman.avatarImage ?? AppImage.mdAppImage;
-      }
-      if (chatMessage.subMessageType == ChatMessageSubType.chat.name) {
-        String? current = indexWidgetProvider.current;
-        if (current != 'chat_message') {
+    if (chatMessage == null) {
+      this.chatMessage = null;
+      conferenceChatMessage = null;
+      return;
+    }
+    String? subMessageType = chatMessage.subMessageType;
+    if (ChatMessageSubType.videoChat.name == subMessageType) {
+      conferenceChatMessage = chatMessage;
+    }
+    String senderPeerId = chatMessage.senderPeerId!;
+    String? groupId = chatMessage.groupId;
+    Linkman? linkman = await linkmanService.findCachedOneByPeerId(senderPeerId);
+    if (linkman != null) {
+      bannerAvatarImage = linkman.avatarImage ?? AppImage.mdAppImage;
+    }
+    if (chatMessage.subMessageType == ChatMessageSubType.chat.name) {
+      this.chatMessage = chatMessage;
+      String? current = indexWidgetProvider.current;
+      if (current != 'chat_message') {
+        chatMessageVisible.value = true;
+      } else {
+        ChatSummary? chatSummary = chatMessageController.chatSummary;
+        if (chatSummary == null) {
           chatMessageVisible.value = true;
         } else {
-          ChatSummary? chatSummary = chatMessageController.chatSummary;
-          if (chatSummary == null) {
+          String? peerId = chatSummary.peerId;
+          if (senderPeerId != peerId && groupId != peerId) {
             chatMessageVisible.value = true;
-          } else {
-            String? peerId = chatSummary.peerId;
-            if (senderPeerId != peerId && groupId != peerId) {
-              chatMessageVisible.value = true;
-            }
           }
-        }
-      }
-      //新的视频邀请消息到来，创建新的视频消息控制器，原来的如果存在，新的将被忽视，占线
-      if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-        if (videoChatMessageController == null) {
-          videoChatMessageController = ConferenceChatMessageController();
-          await videoChatMessageController!.setChatMessage(chatMessage);
-          videoChatMessageVisible.value = true;
-        } else {
-          var videoChatMessageController = ConferenceChatMessageController();
-          await videoChatMessageController.setChatMessage(chatMessage);
-          await videoChatMessageController
-              .sendChatReceipt(MessageReceiptType.busy);
         }
       }
     }
@@ -251,11 +246,10 @@ class _IndexViewState extends State<IndexView>
         builder: (BuildContext context, bool value, Widget? child) {
           Widget banner = Container();
           if (value) {
-            ChatMessage? chatMessage = globalChatMessageController.chatMessage;
             if (chatMessage != null &&
-                chatMessage.subMessageType == ChatMessageSubType.chat.name) {
+                chatMessage!.subMessageType == ChatMessageSubType.chat.name) {
               List<Widget> children = <Widget>[];
-              var name = chatMessage.senderName;
+              var name = chatMessage!.senderName;
               if (name != null) {
                 children.add(
                   CommonAutoSizeText(name,
@@ -264,7 +258,7 @@ class _IndexViewState extends State<IndexView>
                           fontSize: 16, fontWeight: FontWeight.w500)),
                 );
               }
-              String? title = chatMessage.title;
+              String? title = chatMessage!.title;
               if (title != null) {
                 children.add(
                   CommonAutoSizeText(title,
@@ -273,8 +267,8 @@ class _IndexViewState extends State<IndexView>
                           fontSize: 14, fontWeight: FontWeight.w400)),
                 );
               }
-              String? content = chatMessage.content;
-              String? contentType = chatMessage.contentType;
+              String? content = chatMessage!.content;
+              String? contentType = chatMessage!.contentType;
               if (content != null &&
                   (contentType == null ||
                       contentType == ChatMessageContentType.text.name)) {
@@ -344,31 +338,42 @@ class _IndexViewState extends State<IndexView>
     var rejectedButton = IconButton(
         tooltip: AppLocalizations.t('Reject'),
         onPressed: () async {
-          videoChatMessageVisible.value = false;
+          conferenceChatMessageVisible.value = false;
           _stop();
-          await videoChatMessageController!
+          ConferenceChatMessageController conferenceChatMessageController =
+              ConferenceChatMessageController();
+          await conferenceChatMessageController.setChatMessage(chatMessage);
+          await conferenceChatMessageController
               .sendChatReceipt(MessageReceiptType.rejected);
-          videoChatMessageController = null;
+          conferenceChatMessageController.terminate();
         },
         icon: const Icon(color: Colors.red, size: 24, Icons.call_end));
     var holdButton = IconButton(
         tooltip: AppLocalizations.t('Hold'),
         onPressed: () async {
-          videoChatMessageVisible.value = false;
+          conferenceChatMessageVisible.value = false;
           _stop();
-          await videoChatMessageController!
-              .sendChatReceipt(MessageReceiptType.hold);
-          videoChatMessageController = null;
+          P2pConferenceClient? p2pConferenceClient =
+              await p2pConferenceClientPool
+                  .createP2pConferenceClient(chatMessage);
+          ConferenceChatMessageController? conferenceChatMessageController =
+              p2pConferenceClient?.conferenceChatMessageController;
+          await conferenceChatMessageController
+              ?.sendChatReceipt(MessageReceiptType.hold);
         },
         icon: const Icon(color: Colors.amber, size: 24, Icons.add_call));
     var acceptedButton = IconButton(
         tooltip: AppLocalizations.t('Accept'),
         onPressed: () async {
-          videoChatMessageVisible.value = false;
+          conferenceChatMessageVisible.value = false;
           _stop();
-          await videoChatMessageController!
-              .sendChatReceipt(MessageReceiptType.accepted);
-          videoChatMessageController = null;
+          P2pConferenceClient? p2pConferenceClient =
+              await p2pConferenceClientPool
+                  .createP2pConferenceClient(chatMessage);
+          ConferenceChatMessageController? conferenceChatMessageController =
+              p2pConferenceClient?.conferenceChatMessageController;
+          await conferenceChatMessageController
+              ?.sendChatReceipt(MessageReceiptType.accepted);
         },
         icon: const Icon(color: Colors.green, size: 24, Icons.call));
     List<Widget> buttons = <Widget>[];
@@ -403,7 +408,7 @@ class _IndexViewState extends State<IndexView>
                     Expanded(
                         child: CommonAutoSizeText(
                       AppLocalizations.t('Inviting you $title chat ') +
-                          videoChatMessageController!.conference!.name,
+                          (chatMessage.senderName ?? ''),
                       softWrap: true,
                     )),
                     CommonAutoSizeText(
@@ -418,34 +423,37 @@ class _IndexViewState extends State<IndexView>
 
   _buildVideoChatMessageBanner(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: videoChatMessageVisible,
+      valueListenable: conferenceChatMessageVisible,
       builder: (BuildContext context, bool value, Widget? child) {
         Widget videoChatMessageWidget = Container();
         if (value) {
           _play();
-          ChatMessage? chatMessage = videoChatMessageController!.chatMessage;
-          if (chatMessage != null) {
+          if (conferenceChatMessage != null) {
             //视频通话请求消息
-            if (chatMessage.subMessageType ==
+            if (conferenceChatMessage!.subMessageType ==
                 ChatMessageSubType.videoChat.name) {
               videoChatMessageWidget =
-                  _buildVideoChatMessageWidget(context, chatMessage);
+                  _buildVideoChatMessageWidget(context, conferenceChatMessage!);
               //延时60秒后视频邀请消息消失，发送ignored回执
               Future.delayed(const Duration(seconds: 60)).then((value) async {
                 _stop();
-                if (videoChatMessageVisible.value) {
-                  videoChatMessageVisible.value = false;
-                  await videoChatMessageController!
+                if (conferenceChatMessageVisible.value) {
+                  conferenceChatMessageVisible.value = false;
+                  ConferenceChatMessageController
+                      conferenceChatMessageController =
+                      ConferenceChatMessageController();
+                  await conferenceChatMessageController
+                      .setChatMessage(conferenceChatMessage!);
+                  await conferenceChatMessageController
                       .sendChatReceipt(MessageReceiptType.ignored);
-                  videoChatMessageController?.dispose();
-                  videoChatMessageController = null;
+                  conferenceChatMessageController.terminate();
                 }
               });
             }
           }
         }
         return Visibility(
-            visible: videoChatMessageVisible.value,
+            visible: conferenceChatMessageVisible.value,
             child: videoChatMessageWidget);
       },
     );

@@ -171,19 +171,16 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
           peerName = chatSummary.name!;
           String title = widget.title;
           if (chatSummary.partyType == PartyType.conference.name) {
-            title = 'VideoConference';
+            //title = 'VideoConference';
           }
-          Widget titleWidget =
-              CommonAutoSizeText('${AppLocalizations.t(title)} - $peerName');
+          title = '${AppLocalizations.t(title)} - $peerName';
           if (videoChatMessageController != null &&
               videoChatMessageController.conferenceName != null &&
               chatSummary.partyType != PartyType.conference.name) {
-            titleWidget = Column(children: [
-              titleWidget,
-              CommonAutoSizeText('${videoChatMessageController.conferenceName}',
-                  style: const TextStyle(fontSize: 12))
-            ]);
+            title = '$title${videoChatMessageController.conferenceName}';
           }
+
+          Widget titleWidget = CommonAutoSizeText(title);
 
           return titleWidget;
         });
