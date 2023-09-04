@@ -1,14 +1,16 @@
+import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
-import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
@@ -345,9 +347,24 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
           content: AppLocalizations.t('Conference has stored completely'));
     }
     conference.value = current;
-    //发出新增的会议邀请消息
+
+    ///1.发送视频通邀请话消息,此时消息必须有content,包含conference信息
+    ///当前chatSummary可以不存在，因此不需要当前处于聊天场景下，因此是一个静态方法，创建永久conference的时候使用
+    ///对linkman模式下，conference是临时的，不保存数据库
+    ///对group和conference模式下，conference是永久的，保存数据库，可以以后重新加入
     if (conferenceAdd) {
-      await ConferenceChatMessageController.invite(current);
+      ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
+        current.conferenceId,
+        PartyType.conference,
+        title: current.video
+            ? ChatMessageContentType.video.name
+            : ChatMessageContentType.audio.name,
+        content: current,
+        messageId: current.conferenceId,
+        subMessageType: ChatMessageSubType.videoChat,
+      );
+      await chatMessageService.sendAndStore(chatMessage,
+          cryptoOption: CryptoOption.group, peerIds: current.participants);
     }
 
     if (conferenceController.current == null) {

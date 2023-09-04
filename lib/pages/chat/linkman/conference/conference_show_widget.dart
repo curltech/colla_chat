@@ -6,6 +6,7 @@ import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_co
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -158,9 +159,14 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
     List<TileData> tiles = [];
     final Conference? conference = conferenceNotifier.value;
     if (conference != null) {
+      ConferenceChatMessageController? conferenceChatMessageController =
+          p2pConferenceClientPool
+              .getConferenceChatMessageController(conference.conferenceId);
+      if (conferenceChatMessageController == null) {
+        return tiles;
+      }
       Map<String, Map<String, ChatMessage>> chatReceiptMap =
-          await ConferenceChatMessageController.findChatReceipts(
-              conference.conferenceId);
+          conferenceChatMessageController.chatReceipts();
       for (var key in chatReceiptMap.keys) {
         var chatReceipts = chatReceiptMap[key];
         for (var chatReceipt in chatReceipts!.values) {

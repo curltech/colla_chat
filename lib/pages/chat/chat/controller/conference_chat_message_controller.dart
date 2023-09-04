@@ -17,6 +17,7 @@ import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controll
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
+import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:flutter/material.dart';
 
 enum VideoChatStatus {
@@ -61,46 +62,9 @@ class ConferenceChatMessageController with ChangeNotifier {
 
   VideoChatStatus _status = VideoChatStatus.end;
 
-  final Map<String, List<Function(ChatMessage chatMessage)>> _receivers = {};
+  BlueFireAudioPlayer audioPlayer = BlueFireAudioPlayer();
 
   ConferenceChatMessageController();
-
-  ///注册消息接收监听器，用于自定义的特殊处理
-  registerReceiver(
-      String subMessageType, Function(ChatMessage chatMessage) fn) {
-    List<Function(ChatMessage chatMessage)>? fns = _receivers[subMessageType];
-    if (fns == null) {
-      fns = <Function(ChatMessage chatMessage)>[];
-      _receivers[subMessageType] = fns;
-    }
-    if (!fns.contains(fn)) {
-      fns.add(fn);
-    }
-  }
-
-  unregisterReceiver(
-      String subMessageType, Function(ChatMessage chatMessage) fn) {
-    List<Function(ChatMessage chatMessage)>? fns = _receivers[subMessageType];
-    if (fns != null) {
-      if (fns.contains(fn)) {
-        fns.remove(fn);
-        if (fns.isEmpty) {
-          _receivers.remove(subMessageType);
-        }
-      }
-    }
-  }
-
-  onVideoChatMessage(ChatMessage chatMessage) async {
-    //调用注册的消息接收监听器，用于自定义的特殊处理
-    List<Function(ChatMessage chatMessage)>? fns =
-        _receivers[chatMessage.subMessageType];
-    if (fns != null && fns.isNotEmpty) {
-      for (var fn in fns) {
-        fn(chatMessage);
-      }
-    }
-  }
 
   ChatSummary? get chatSummary {
     return _chatSummary;
@@ -166,8 +130,6 @@ class ConferenceChatMessageController with ChangeNotifier {
         name = _conference!.name;
       }
     }
-    // globalChatMessageController.registerReceiver(
-    //     ChatMessageSubType.videoChat.name, onReceivedInvitation);
   }
 
   ///设置当前的视频邀请消息，可以从chatMessageController中获取当前，
@@ -249,46 +211,35 @@ class ConferenceChatMessageController with ChangeNotifier {
             await conferenceService.findOneByConferenceId(conferenceId);
         if (conference != null) {
           logger.e('Conference $conferenceId name ${conference.name} is exist');
-          // _conference!.id = conference.id;
-          // await conferenceService.store(_conference!);
         }
       }
     }
   }
 
-  static Future<Map<String, Map<String, ChatMessage>>> findChatReceipts(
-      String messageId) async {
-    List<ChatMessage> chatMessages =
-        await chatMessageService.findByMessageId(messageId);
-    Map<String, Map<String, ChatMessage>> chatReceipts = {};
-    if (chatMessages.isEmpty) {
-      return chatReceipts;
-    }
-
-    for (var chatMessage in chatMessages) {
-      if (chatMessage.subMessageType == ChatMessageSubType.chatReceipt.name) {
-        putChatReceipt(chatReceipts, chatMessage);
-      }
-    }
-    return chatReceipts;
+  Map<String, Map<String, ChatMessage>> chatReceipts() {
+    return _chatReceipts;
   }
 
-  static void putChatReceipt(
-      Map<String, Map<String, ChatMessage>> chatReceiptMap,
-      ChatMessage chatReceipt) {
+  void putChatReceipt(ChatMessage chatReceipt) {
     Map<String, ChatMessage>? chatReceipts =
-        chatReceiptMap[chatReceipt.receiptType!];
+        _chatReceipts[chatReceipt.receiptType!];
     if (chatReceipts == null) {
       chatReceipts = {};
-      chatReceiptMap[chatReceipt.receiptType!] = chatReceipts;
+      _chatReceipts[chatReceipt.receiptType!] = chatReceipts;
     }
     chatReceipts[chatReceipt.senderPeerId!] = chatReceipt;
   }
 
   _initChatReceipt() async {
-    //如果_chatMessage不为空，查询所有的相同的消息
+    _chatReceipts.clear();
     var messageId = _chatMessage!.messageId!;
-    _chatReceipts = await findChatReceipts(messageId);
+    List<ChatMessage> chatMessages =
+        await chatMessageService.findByMessageId(messageId);
+    for (var chatMessage in chatMessages) {
+      if (chatMessage.subMessageType == ChatMessageSubType.chatReceipt.name) {
+        putChatReceipt(chatMessage);
+      }
+    }
   }
 
   ChatMessage? getChatReceipt(String subMessageType, String peerId) {
@@ -296,39 +247,9 @@ class ConferenceChatMessageController with ChangeNotifier {
   }
 
   ///1.发送视频通邀请话消息,此时消息必须有content,包含conference信息
-  ///当前chatSummary可以不存在，因此不需要当前处于聊天场景下，因此是一个静态方法，创建永久conference的时候使用
-  ///对linkman模式下，conference是临时的，不保存数据库
-  ///对group和conference模式下，conference是永久的，保存数据库，可以以后重新加入
-  static Future<ChatMessage?> invite(Conference conference) async {
-    ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
-      conference.conferenceId,
-      PartyType.conference,
-      title: conference.video
-          ? ChatMessageContentType.video.name
-          : ChatMessageContentType.audio.name,
-      content: conference,
-      messageId: conference.conferenceId,
-      subMessageType: ChatMessageSubType.videoChat,
-    );
-    await chatMessageService.sendAndStore(chatMessage,
-        cryptoOption: CryptoOption.group, peerIds: conference.participants);
-
-    return chatMessage;
-  }
-
-  ///1.发送视频通邀请话消息,此时消息必须有content,包含conference信息
   ///当前chatSummary必须存在，因此只能用于当前正在聊天的时候
 
   ///2.接收会议邀请消息
-  onReceivedInvitation(ChatMessage chatMessage) async {
-    if (_chatMessage == null || _chatMessage != chatMessage) {
-      if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-        _current = chatMessage;
-        await setChatMessage(chatMessage);
-        await onVideoChatMessage(chatMessage);
-      }
-    }
-  }
 
   ///3.发送会议邀请回执，用于被邀请方
   ///接收到视频通话邀请，做出接受或者拒绝视频通话邀请的决定
@@ -522,9 +443,8 @@ class ConferenceChatMessageController with ChangeNotifier {
     }
 
     _current = chatReceipt;
-    putChatReceipt(_chatReceipts, chatReceipt);
+    putChatReceipt(chatReceipt);
     await _onReceivedChatReceipt(chatReceipt);
-    await onVideoChatMessage(chatReceipt);
   }
 
   ///收到视频通话的回执的处理，
@@ -717,8 +637,6 @@ class ConferenceChatMessageController with ChangeNotifier {
   ///自己主动终止，发送terminate回执，关闭会议
   ///如果会议发起人发出终止信号，收到的参与者都将退出，而且会议将不可再加入
   terminate() async {
-    globalChatMessageController.unregisterReceiver(
-        ChatMessageSubType.videoChat.name, onReceivedInvitation);
     globalChatMessageController.unregisterReceiver(
         ChatMessageSubType.chatReceipt.name, onReceivedChatReceipt);
     await _sendChatReceipt(MessageReceiptType.terminated);

@@ -25,7 +25,6 @@ import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
-import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
@@ -80,7 +79,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   //呼叫时间的计时器，如果是在单聊的场景下，对方在时间内未有回执，则自动关闭
   Timer? _linkmanCallTimer;
 
-  BlueFireAudioPlayer audioPlayer = BlueFireAudioPlayer();
+  ConferenceChatMessageController? conferenceChatMessageController;
 
   //JustAudioPlayer audioPlayer = JustAudioPlayer();
 
@@ -101,8 +100,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (conferenceChatMessageController != null) {
       conferenceChatMessageController.addListener(_updateVideoChatStatus);
       videoChatStatus.value = conferenceChatMessageController.status;
-      conferenceChatMessageController.registerReceiver(
-          ChatMessageSubType.chatReceipt.name, _receivedChatReceipt);
     } else {
       videoChatStatus.value = VideoChatStatus.end;
     }
@@ -123,22 +120,18 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   _play() {
-    audioPlayer.setLoopMode(true);
-    audioPlayer.play('assets/medias/call.mp3');
+    conferenceChatMessageController?.audioPlayer.setLoopMode(true);
+    conferenceChatMessageController?.audioPlayer.play('assets/medias/call.mp3');
   }
 
   _stop() async {
-    await audioPlayer.stop();
-    await audioPlayer.release();
-    audioPlayer.setLoopMode(false);
-    audioPlayer.play('assets/medias/close.mp3');
-    await audioPlayer.stop();
-    await audioPlayer.release();
-  }
-
-  ///收到回执，如果是拒绝，则stop呼叫
-  _receivedChatReceipt(ChatMessage chatReceipt) {
-    _stop();
+    await conferenceChatMessageController?.audioPlayer.stop();
+    await conferenceChatMessageController?.audioPlayer.release();
+    conferenceChatMessageController?.audioPlayer.setLoopMode(false);
+    conferenceChatMessageController?.audioPlayer
+        .play('assets/medias/close.mp3');
+    await conferenceChatMessageController?.audioPlayer.stop();
+    await conferenceChatMessageController?.audioPlayer.release();
   }
 
   Future<void> _updatePeerMediaStream(PeerMediaStream? peerMediaStream) async {
@@ -644,8 +637,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             label: status ? 'Speaker on' : 'Speaker off',
             onPressed: () async {
               speakerStatus.value = !speakerStatus.value;
-              await audioPlayer.setAudioContext(
-                  forceSpeaker: speakerStatus.value);
+              await conferenceChatMessageController?.audioPlayer
+                  .setAudioContext(forceSpeaker: speakerStatus.value);
             },
             backgroundColor: status ? Colors.black : Colors.white,
             child: Icon(
@@ -830,12 +823,10 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     var conferenceChatMessageController =
         p2pConferenceClientPool.conferenceChatMessageController;
     conferenceChatMessageController?.removeListener(_updateVideoChatStatus);
-    conferenceChatMessageController?.unregisterReceiver(
-        ChatMessageSubType.chatReceipt.name, _receivedChatReceipt);
     p2pConferenceClientPool
         .removeListener(_updateConferenceChatMessageController);
-    audioPlayer.stop();
-    audioPlayer.release();
+    conferenceChatMessageController?.audioPlayer.stop();
+    conferenceChatMessageController?.audioPlayer.release();
     super.dispose();
   }
 }

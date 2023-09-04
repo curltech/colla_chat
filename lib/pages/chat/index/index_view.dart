@@ -30,7 +30,6 @@ import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
-import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:extended_text/extended_text.dart';
@@ -61,8 +60,8 @@ class _IndexViewState extends State<IndexView>
   final CustomSpecialTextSpanBuilder customSpecialTextSpanBuilder =
       CustomSpecialTextSpanBuilder();
   ChatMessage? chatMessage;
-  ChatMessage? conferenceChatMessage;
-  BlueFireAudioPlayer? audioPlayer;
+  ConferenceChatMessageController conferenceChatMessageController =
+      ConferenceChatMessageController();
 
   //JustAudioPlayer audioPlayer = JustAudioPlayer();
   Widget bannerAvatarImage = AppImage.mdAppImage;
@@ -74,11 +73,6 @@ class _IndexViewState extends State<IndexView>
   void initState() {
     super.initState();
     _initShare();
-    try {
-      audioPlayer = BlueFireAudioPlayer();
-    } catch (e) {
-      logger.e('BlueFireAudioPlayer create error:$e');
-    }
     globalChatMessageController.addListener(_updateGlobalChatMessage);
     myself.addListener(_update);
     appDataProvider.addListener(_update);
@@ -89,9 +83,7 @@ class _IndexViewState extends State<IndexView>
   }
 
   Future<bool?> _onWebrtcSignal(WebrtcEvent webrtcEvent) async {
-    String peerId = webrtcEvent.peerId;
     String name = webrtcEvent.name;
-    WebrtcEventType eventType = webrtcEvent.eventType;
 
     return await DialogUtil.confirm(context,
         content: name +
@@ -100,9 +92,7 @@ class _IndexViewState extends State<IndexView>
   }
 
   Future<void> _onWebrtcErrorSignal(WebrtcEvent webrtcEvent) async {
-    String peerId = webrtcEvent.peerId;
     String name = webrtcEvent.name;
-    String clientId = webrtcEvent.clientId;
     WebrtcEventType eventType = webrtcEvent.eventType;
     if (eventType == WebrtcEventType.signal) {
       WebrtcSignal signal = webrtcEvent.data;
@@ -193,13 +183,14 @@ class _IndexViewState extends State<IndexView>
   }
 
   _play() {
-    audioPlayer?.setLoopMode(true);
-    audioPlayer?.play('assets/medias/invitation.mp3');
+    conferenceChatMessageController.audioPlayer.setLoopMode(true);
+    conferenceChatMessageController.audioPlayer
+        .play('assets/medias/invitation.mp3');
   }
 
   _stop() {
-    audioPlayer?.stop();
-    audioPlayer?.release();
+    conferenceChatMessageController.audioPlayer.stop();
+    conferenceChatMessageController.audioPlayer.release();
   }
 
   ///有新消息到来的时候，一般消息直接显示
@@ -207,12 +198,12 @@ class _IndexViewState extends State<IndexView>
     ChatMessage? chatMessage = globalChatMessageController.chatMessage;
     if (chatMessage == null) {
       this.chatMessage = null;
-      conferenceChatMessage = null;
+      await conferenceChatMessageController.terminate();
       return;
     }
     String? subMessageType = chatMessage.subMessageType;
     if (ChatMessageSubType.videoChat.name == subMessageType) {
-      conferenceChatMessage = chatMessage;
+      await conferenceChatMessageController.setChatMessage(chatMessage);
     }
     String senderPeerId = chatMessage.senderPeerId!;
     String? groupId = chatMessage.groupId;
@@ -322,15 +313,24 @@ class _IndexViewState extends State<IndexView>
   }
 
   ///显示视频邀请消息组件
-  Widget _buildVideoChatMessageWidget(
-      BuildContext context, ChatMessage chatMessage) {
-    var name = chatMessage.senderName;
+  Widget _buildVideoChatMessageWidget(BuildContext context) {
+    ChatMessage? conferenceChatMessage =
+        conferenceChatMessageController.chatMessage;
+    if (conferenceChatMessage == null) {
+      return Container();
+    }
+    if (conferenceChatMessage.subMessageType !=
+        ChatMessageSubType.videoChat.name) {
+      return Container();
+    }
+    var name = conferenceChatMessage.senderName;
     name = name ?? '';
-    var title = chatMessage.title;
+    var title = conferenceChatMessage.title;
     title = title ?? '';
     String? topic;
-    if (chatMessage.content != null) {
-      var content = chatMessageService.recoverContent(chatMessage.content!);
+    if (conferenceChatMessage.content != null) {
+      var content =
+          chatMessageService.recoverContent(conferenceChatMessage.content!);
       Map<String, dynamic> json = JsonUtil.toJson(content);
       var conference = Conference.fromJson(json);
       topic = conference.topic;
@@ -340,9 +340,6 @@ class _IndexViewState extends State<IndexView>
         onPressed: () async {
           conferenceChatMessageVisible.value = false;
           _stop();
-          ConferenceChatMessageController conferenceChatMessageController =
-              ConferenceChatMessageController();
-          await conferenceChatMessageController.setChatMessage(chatMessage);
           await conferenceChatMessageController
               .sendChatReceipt(MessageReceiptType.rejected);
           conferenceChatMessageController.terminate();
@@ -355,7 +352,7 @@ class _IndexViewState extends State<IndexView>
           _stop();
           P2pConferenceClient? p2pConferenceClient =
               await p2pConferenceClientPool
-                  .createP2pConferenceClient(chatMessage);
+                  .createP2pConferenceClient(conferenceChatMessage);
           ConferenceChatMessageController? conferenceChatMessageController =
               p2pConferenceClient?.conferenceChatMessageController;
           await conferenceChatMessageController
@@ -369,7 +366,7 @@ class _IndexViewState extends State<IndexView>
           _stop();
           P2pConferenceClient? p2pConferenceClient =
               await p2pConferenceClientPool
-                  .createP2pConferenceClient(chatMessage);
+                  .createP2pConferenceClient(conferenceChatMessage);
           ConferenceChatMessageController? conferenceChatMessageController =
               p2pConferenceClient?.conferenceChatMessageController;
           await conferenceChatMessageController
@@ -382,7 +379,7 @@ class _IndexViewState extends State<IndexView>
 
     ///立即接听按钮只有当前不在会议中，而且是个人或者群模式才可以
     if (p2pConferenceClientPool.conferenceId == null &&
-        chatMessage.groupType != PartyType.conference.name) {
+        conferenceChatMessage.groupType != PartyType.conference.name) {
       buttons.add(acceptedButton);
     }
     return Container(
@@ -408,7 +405,7 @@ class _IndexViewState extends State<IndexView>
                     Expanded(
                         child: CommonAutoSizeText(
                       AppLocalizations.t('Inviting you $title chat ') +
-                          (chatMessage.senderName ?? ''),
+                          (conferenceChatMessage.senderName ?? ''),
                       softWrap: true,
                     )),
                     CommonAutoSizeText(
@@ -428,28 +425,25 @@ class _IndexViewState extends State<IndexView>
         Widget videoChatMessageWidget = Container();
         if (value) {
           _play();
-          if (conferenceChatMessage != null) {
-            //视频通话请求消息
-            if (conferenceChatMessage!.subMessageType ==
-                ChatMessageSubType.videoChat.name) {
-              videoChatMessageWidget =
-                  _buildVideoChatMessageWidget(context, conferenceChatMessage!);
-              //延时60秒后视频邀请消息消失，发送ignored回执
-              Future.delayed(const Duration(seconds: 60)).then((value) async {
-                _stop();
-                if (conferenceChatMessageVisible.value) {
-                  conferenceChatMessageVisible.value = false;
-                  ConferenceChatMessageController
-                      conferenceChatMessageController =
-                      ConferenceChatMessageController();
-                  await conferenceChatMessageController
-                      .setChatMessage(conferenceChatMessage!);
-                  await conferenceChatMessageController
-                      .sendChatReceipt(MessageReceiptType.ignored);
-                  conferenceChatMessageController.terminate();
-                }
-              });
-            }
+          ChatMessage? conferenceChatMessage =
+              conferenceChatMessageController.chatMessage;
+          if (conferenceChatMessage == null) {
+            return Container();
+          }
+          //视频通话请求消息
+          if (conferenceChatMessage.subMessageType ==
+              ChatMessageSubType.videoChat.name) {
+            videoChatMessageWidget = _buildVideoChatMessageWidget(context);
+            //延时60秒后视频邀请消息消失，发送ignored回执
+            Future.delayed(const Duration(seconds: 60)).then((value) async {
+              _stop();
+              if (conferenceChatMessageVisible.value) {
+                conferenceChatMessageVisible.value = false;
+                await conferenceChatMessageController
+                    .sendChatReceipt(MessageReceiptType.ignored);
+                conferenceChatMessageController.terminate();
+              }
+            });
           }
         }
         return Visibility(
