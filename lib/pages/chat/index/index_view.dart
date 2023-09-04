@@ -342,7 +342,7 @@ class _IndexViewState extends State<IndexView>
           _stop();
           await conferenceChatMessageController
               .sendChatReceipt(MessageReceiptType.rejected);
-          conferenceChatMessageController.terminate();
+          conferenceChatMessageController.close();
         },
         icon: const Icon(color: Colors.red, size: 24, Icons.call_end));
     var holdButton = IconButton(
@@ -357,6 +357,7 @@ class _IndexViewState extends State<IndexView>
               p2pConferenceClient?.conferenceChatMessageController;
           await conferenceChatMessageController
               ?.sendChatReceipt(MessageReceiptType.hold);
+          this.conferenceChatMessageController.close();
         },
         icon: const Icon(color: Colors.amber, size: 24, Icons.add_call));
     var acceptedButton = IconButton(
@@ -371,6 +372,7 @@ class _IndexViewState extends State<IndexView>
               p2pConferenceClient?.conferenceChatMessageController;
           await conferenceChatMessageController
               ?.sendChatReceipt(MessageReceiptType.accepted);
+          this.conferenceChatMessageController.close();
         },
         icon: const Icon(color: Colors.green, size: 24, Icons.call));
     List<Widget> buttons = <Widget>[];
@@ -441,7 +443,7 @@ class _IndexViewState extends State<IndexView>
                 conferenceChatMessageVisible.value = false;
                 await conferenceChatMessageController
                     .sendChatReceipt(MessageReceiptType.ignored);
-                conferenceChatMessageController.terminate();
+                conferenceChatMessageController.close();
               }
             });
           }

@@ -637,9 +637,22 @@ class ConferenceChatMessageController with ChangeNotifier {
   ///自己主动终止，发送terminate回执，关闭会议
   ///如果会议发起人发出终止信号，收到的参与者都将退出，而且会议将不可再加入
   terminate() async {
+    await _sendChatReceipt(MessageReceiptType.terminated);
+    close();
+  }
+
+  void close() {
     globalChatMessageController.unregisterReceiver(
         ChatMessageSubType.chatReceipt.name, onReceivedChatReceipt);
-    await _sendChatReceipt(MessageReceiptType.terminated);
-    status = VideoChatStatus.end;
+    _status = VideoChatStatus.end;
+    _chatMessage = null;
+    _chatSummary = null;
+    _chatReceipts.clear();
+    _conference = null;
+    _current = null;
+    partyType = null;
+    peerId = null;
+    groupId = null;
+    name = null;
   }
 }
