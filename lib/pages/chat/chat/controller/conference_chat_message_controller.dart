@@ -439,8 +439,6 @@ class ConferenceChatMessageController with ChangeNotifier {
         return;
       }
     }
-    await setChatSummary(null);
-    await setChatMessage(null);
   }
 
   ///仅仅发送回执消息
