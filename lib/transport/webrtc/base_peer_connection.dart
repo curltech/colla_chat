@@ -662,7 +662,7 @@ class BasePeerConnection {
     if (state == RTCIceConnectionState.RTCIceConnectionStateFailed ||
         state == RTCIceConnectionState.RTCIceConnectionStateClosed ||
         state == RTCIceConnectionState.RTCIceConnectionStateDisconnected) {
-      logger.e('Ice connection failed.');
+      logger.e('Ice connection failed:$state');
       close();
     }
   }
@@ -678,7 +678,7 @@ class BasePeerConnection {
 
   /// signal状态事件
   onSignalingState(RTCSignalingState state) async {
-    RTCPeerConnection? peerConnection = this.peerConnection;
+    logger.w('RTCSignalingState:$state');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -719,6 +719,7 @@ class BasePeerConnection {
   onRenegotiationNeeded() {
     logger.w('onRenegotiationNeeded event');
     renegotiateNeed = true;
+    negotiate();
   }
 
   //数据通道状态事件
@@ -766,7 +767,6 @@ class BasePeerConnection {
           reconnectTimes--;
           negotiateStatus = NegotiateStatus.none;
           negotiate();
-          renegotiateNeed = false;
         } else {
           logger.e('renegotiateNeed always is true, error state');
           negotiateStatus = NegotiateStatus.none;

@@ -88,6 +88,18 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
               }
             });
         slideActions.add(deleteSlideAction);
+        TileData refreshSlideAction = TileData(
+            title: 'refresh',
+            prefix: Icons.refresh,
+            onTap: (int index, String label, {String? subtitle}) async {
+              p2pConferenceClientPool.p2pConferenceClient?.negotiate();
+              if (mounted) {
+                DialogUtil.info(context,
+                    content:
+                        '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is renegotiate')}');
+              }
+            });
+        slideActions.add(refreshSlideAction);
         tile.slideActions = slideActions;
 
         tiles.add(tile);

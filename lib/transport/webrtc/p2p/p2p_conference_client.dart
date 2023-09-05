@@ -3,6 +3,7 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
@@ -75,6 +76,16 @@ class P2pConferenceClient extends PeerMediaStreamController {
       await _onAddRemoteStream(stream, peerId, clientId, name);
       logger.i(
           'A peerConnection remoteStream video stream ${stream.id} is added');
+    }
+  }
+
+  negotiate({AdvancedPeerConnection? peerConnection}) async {
+    if (peerConnection != null) {
+      await peerConnection.negotiate();
+    } else {
+      for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
+        await peerConnection.negotiate();
+      }
     }
   }
 
@@ -264,6 +275,9 @@ class P2pConferenceClient extends PeerMediaStreamController {
     _peerConnections.clear();
     peerMediaStreams.clear();
     conferenceChatMessageController.terminate();
+    globalChatMessageController.unregisterReceiver(
+        ChatMessageSubType.chatReceipt.name,
+        conferenceChatMessageController.onReceivedChatReceipt);
     await onPeerMediaStreamOperator(
         PeerMediaStreamOperator.terminate.name, null);
   }
@@ -300,6 +314,9 @@ class P2pConferenceClientPool with ChangeNotifier {
               ConferenceChatMessageController();
           await conferenceChatMessageController.setChatMessage(chatMessage,
               chatSummary: chatSummary);
+          globalChatMessageController.registerReceiver(
+              ChatMessageSubType.chatReceipt.name,
+              conferenceChatMessageController.onReceivedChatReceipt);
           p2pConferenceClient = P2pConferenceClient(
               conferenceChatMessageController: conferenceChatMessageController);
           _p2pConferenceClients[conferenceId] = p2pConferenceClient;

@@ -138,8 +138,6 @@ class ConferenceChatMessageController with ChangeNotifier {
       }
       await _initChatSummary();
       await _initChatMessage();
-      globalChatMessageController.registerReceiver(
-          ChatMessageSubType.chatReceipt.name, onReceivedChatReceipt);
       await _initChatReceipt();
     });
   }
@@ -644,8 +642,6 @@ class ConferenceChatMessageController with ChangeNotifier {
   }
 
   void _close() {
-    globalChatMessageController.unregisterReceiver(
-        ChatMessageSubType.chatReceipt.name, onReceivedChatReceipt);
     _status = VideoChatStatus.end;
     _chatMessage = null;
     _chatSummary = null;
