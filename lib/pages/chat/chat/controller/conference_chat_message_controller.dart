@@ -416,31 +416,6 @@ class ConferenceChatMessageController with ChangeNotifier {
     }
   }
 
-  ///在视频会议中增加本地视频到所有连接
-  addLocalPeerMediaStream(PeerMediaStream peerMediaStream) async {
-    if (_conference != null && _status == VideoChatStatus.chatting) {
-      await p2pConferenceClientPool.addLocalPeerMediaStream(
-          _conference!.conferenceId, [peerMediaStream]);
-    }
-  }
-
-  ///在视频会议中增加多个本地视频到所有连接
-  addLocalPeerMediaStreams() async {
-    if (_conference != null && _status == VideoChatStatus.chatting) {
-      var peerMediaStreams = localPeerMediaStreamController.peerMediaStreams;
-      await p2pConferenceClientPool.addLocalPeerMediaStream(
-          _conference!.conferenceId, peerMediaStreams);
-    }
-  }
-
-  ///在视频会议中删除本地视频到所有连接
-  removePeerMediaStream(PeerMediaStream peerMediaStream) async {
-    if (_conference != null) {
-      await p2pConferenceClientPool
-          .removePeerMediaStream(_conference!.conferenceId, [peerMediaStream]);
-    }
-  }
-
   ///4.接受到视频通话回执，一般由globalChatMessageController分发到此
   ///在多个接收人的场景下，首先检查自己是否已经发过回执，存在是accepted则继续处理
   ///如果不存在，则发送自己的决定，如果存在是rejected或者terminated，则不处理

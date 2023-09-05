@@ -185,11 +185,33 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         localPeerMediaStreamController.peerMediaStreams.length;
   }
 
+  ///在视频会议中增加本地视频到会议的所有连接
+  addLocalPeerMediaStream(PeerMediaStream peerMediaStream) async {
+    P2pConferenceClient? p2pConferenceClient =
+        p2pConferenceClientPool.p2pConferenceClient;
+    ConferenceChatMessageController? conferenceChatMessageController =
+        p2pConferenceClient?.conferenceChatMessageController;
+    Conference? conference = conferenceChatMessageController?.conference;
+    VideoChatStatus? status = conferenceChatMessageController?.status;
+    if (conference != null && status == VideoChatStatus.chatting) {
+      await p2pConferenceClient?.addLocalPeerMediaStream([peerMediaStream]);
+    }
+  }
+
+  ///在视频会议中删除本地视频到会议的所有连接
+  removeLocalPeerMediaStream(PeerMediaStream peerMediaStream) async {
+    P2pConferenceClient? p2pConferenceClient =
+        p2pConferenceClientPool.p2pConferenceClient;
+    ConferenceChatMessageController? conferenceChatMessageController =
+        p2pConferenceClient?.conferenceChatMessageController;
+    Conference? conference = conferenceChatMessageController?.conference;
+    if (conference != null) {
+      await p2pConferenceClient?.removeLocalPeerMediaStream([peerMediaStream]);
+    }
+  }
+
   ///创建本地的Video render，支持视频和音频的切换，设置当前videoChatRender，激活create。add和remove监听事件
   Future<PeerMediaStream?> _openVideoMedia({bool video = true}) async {
-    ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClientPool.conferenceChatMessageController;
-
     ///本地视频不存在，可以直接创建，并发送视频邀请消息，否则根据情况觉得是否音视频切换
     PeerMediaStream? peerMediaStream =
         localPeerMediaStreamController.mainPeerMediaStream;
@@ -201,32 +223,27 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         peerMediaStream =
             await localPeerMediaStreamController.createPeerAudioStream();
       }
-      await conferenceChatMessageController
-          ?.addLocalPeerMediaStream(peerMediaStream);
+      await addLocalPeerMediaStream(peerMediaStream);
       _update();
     } else {
       if (video) {
         if (!localPeerMediaStreamController.video) {
-          await conferenceChatMessageController
-              ?.removePeerMediaStream(peerMediaStream);
+          await removeLocalPeerMediaStream(peerMediaStream);
           await localPeerMediaStreamController.remove(peerMediaStream);
           await localPeerMediaStreamController.close(peerMediaStream);
           peerMediaStream =
               await localPeerMediaStreamController.createPeerVideoStream();
-          await conferenceChatMessageController
-              ?.addLocalPeerMediaStream(peerMediaStream);
+          await addLocalPeerMediaStream(peerMediaStream);
           _update();
         }
       } else {
         if (localPeerMediaStreamController.video) {
-          await conferenceChatMessageController
-              ?.removePeerMediaStream(peerMediaStream);
+          await removeLocalPeerMediaStream(peerMediaStream);
           await localPeerMediaStreamController.remove(peerMediaStream);
           await localPeerMediaStreamController.close(peerMediaStream);
           peerMediaStream =
               await localPeerMediaStreamController.createPeerAudioStream();
-          await conferenceChatMessageController
-              ?.addLocalPeerMediaStream(peerMediaStream);
+          await addLocalPeerMediaStream(peerMediaStream);
           _update();
         }
       }
@@ -235,8 +252,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   Future<PeerMediaStream?> _openDisplayMedia() async {
-    ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClientPool.conferenceChatMessageController;
     final source = await DialogUtil.show<DesktopCapturerSource>(
       context: context,
       builder: (context) => Dialog(child: ScreenSelectDialog()),
@@ -244,8 +259,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (source != null) {
       PeerMediaStream peerMediaStream = await localPeerMediaStreamController
           .createPeerDisplayStream(selectedSource: source);
-      await conferenceChatMessageController
-          ?.addLocalPeerMediaStream(peerMediaStream);
+      await addLocalPeerMediaStream(peerMediaStream);
       _update();
 
       return peerMediaStream;
@@ -263,8 +277,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
     PeerMediaStream? peerMediaStream =
         await localPeerMediaStreamController.createPeerMediaStream(stream);
-    await conferenceChatMessageController
-        ?.addLocalPeerMediaStream(peerMediaStream);
+    await addLocalPeerMediaStream(peerMediaStream);
     _update();
 
     return peerMediaStream;
@@ -416,6 +429,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
     Conference conference =
         await _buildConference(video: video, participants: participants);
+
     ///创建并发送邀请消息
     ChatMessage? chatMessage = await chatMessageController.send(
         title: conference.video
@@ -438,6 +452,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           content:
               '${AppLocalizations.t('Send videoChat chatMessage')} ${chatMessage.messageId}');
     }
+
     ///根据邀请消息创建会议
     P2pConferenceClient? p2pConferenceClient = await p2pConferenceClientPool
         .createP2pConferenceClient(chatSummary: chatSummary, chatMessage);
@@ -513,7 +528,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     Conference? conference = conferenceChatMessageController?.conference;
     //从webrtc连接中移除流
     if (conference != null) {
-      await p2pConferenceClientPool.removePeerMediaStream(
+      await p2pConferenceClientPool.removeLocalPeerMediaStream(
           conference.conferenceId, peerMediaStreams);
     }
     await localPeerMediaStreamController.closeAll();
@@ -777,7 +792,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       String conferenceId =
           conferenceChatMessageController.conference!.conferenceId;
       await p2pConferenceClientPool
-          .removePeerMediaStream(conferenceId, [peerMediaStream]);
+          .removeLocalPeerMediaStream(conferenceId, [peerMediaStream]);
     }
     //流关闭
     await localPeerMediaStreamController.remove(peerMediaStream);

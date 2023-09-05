@@ -119,7 +119,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
       var peerMediaStreams = p2pConferenceClient!.peerMediaStreams;
       Conference? conference = videoChatMessageController.conference;
       if (conference != null) {
-        p2pConferenceClientPool.removePeerMediaStream(
+        p2pConferenceClientPool.removeLocalPeerMediaStream(
             conference.conferenceId, peerMediaStreams);
       }
       await p2pConferenceClient!.terminate();

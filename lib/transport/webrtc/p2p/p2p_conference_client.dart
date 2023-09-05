@@ -1,8 +1,10 @@
+import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controller.dart';
@@ -253,6 +255,11 @@ class P2pConferenceClient extends PeerMediaStreamController {
   terminate() async {
     currentPeerMediaStream = null;
     mainPeerMediaStream = null;
+    if (conferenceChatMessageController.conferenceId != null) {
+      conferenceService.update({'status': EntityStatus.expired.name},
+          where: 'conferenceId=?',
+          whereArgs: [conferenceChatMessageController.conferenceId!]);
+    }
     await exit();
     _peerConnections.clear();
     peerMediaStreams.clear();
@@ -386,7 +393,7 @@ class P2pConferenceClientPool with ChangeNotifier {
   }
 
   ///会议的指定连接或者所有连接中移除本地或者远程的peerMediaStream，并且都重新协商
-  removePeerMediaStream(
+  removeLocalPeerMediaStream(
       String conferenceId, List<PeerMediaStream> peerMediaStreams,
       {AdvancedPeerConnection? peerConnection}) async {
     P2pConferenceClient? p2pConferenceClient =
