@@ -3,7 +3,6 @@ import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
@@ -53,7 +52,7 @@ class ConferenceChatMessageController with ChangeNotifier {
 
   VideoChatStatus _status = VideoChatStatus.end;
 
-  Lock _lock = Lock();
+  final Lock _lock = Lock();
 
   final BlueFireAudioPlayer _audioPlayer = BlueFireAudioPlayer();
 

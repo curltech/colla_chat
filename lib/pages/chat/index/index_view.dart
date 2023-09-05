@@ -277,10 +277,10 @@ class _IndexViewState extends State<IndexView>
                     chatMessageVisible.value = false;
                   },
                   child: Container(
-                      height: appDataProvider.toolbarHeight,
+                      height: 148,
                       width: appDataProvider.totalSize.width,
                       alignment: Alignment.topLeft,
-                      padding: const EdgeInsets.all(5.0),
+                      padding: const EdgeInsets.all(10.0),
                       color: Colors.black.withOpacity(AppOpacity.mdOpacity),
                       child: Card(
                           elevation: 0.0,

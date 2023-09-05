@@ -133,9 +133,9 @@ class DeepthPageTransformer extends PageTransformer {
         ),
       );
     } else if (position <= 1) {
-      const double MIN_SCALE = 0.75;
+      const double minScale = 0.75;
       // Scale the page down (between MIN_SCALE and 1)
-      double scaleFactor = MIN_SCALE + (1 - MIN_SCALE) * (1 - position);
+      double scaleFactor = minScale + (1 - minScale) * (1 - position);
 
       return Opacity(
         opacity: 1.0 - position,

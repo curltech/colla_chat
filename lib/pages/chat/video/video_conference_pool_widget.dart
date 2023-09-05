@@ -92,11 +92,11 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
             title: 'refresh',
             prefix: Icons.refresh,
             onTap: (int index, String label, {String? subtitle}) async {
-              p2pConferenceClientPool.p2pConferenceClient?.negotiate();
+              p2pConferenceClientPool.p2pConferenceClient?.join();
               if (mounted) {
                 DialogUtil.info(context,
                     content:
-                        '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is renegotiate')}');
+                        '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is rejoin')}');
               }
             });
         slideActions.add(refreshSlideAction);

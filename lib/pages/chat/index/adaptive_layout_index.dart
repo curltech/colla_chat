@@ -6,7 +6,6 @@ import 'package:colla_chat/pages/chat/index/primary_navigation.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_widget.dart';
 import 'package:colla_chat/pages/chat/me/me_widget.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';

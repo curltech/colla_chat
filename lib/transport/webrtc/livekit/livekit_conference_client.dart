@@ -230,6 +230,7 @@ class LiveKitConferenceClient {
     } catch (e) {
       logger.warning('could not publish video: $e');
     }
+    return null;
   }
 
   ///创建本地音频并发布
@@ -241,6 +242,7 @@ class LiveKitConferenceClient {
     } catch (e) {
       logger.warning('could not publish audio: $e');
     }
+    return null;
   }
 
   VideoTrackRenderer buildVideoTrackRenderer(

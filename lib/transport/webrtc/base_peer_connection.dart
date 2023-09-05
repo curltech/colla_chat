@@ -719,7 +719,6 @@ class BasePeerConnection {
   onRenegotiationNeeded() {
     logger.w('onRenegotiationNeeded event');
     renegotiateNeed = true;
-    negotiate();
   }
 
   //数据通道状态事件
@@ -1149,9 +1148,15 @@ class BasePeerConnection {
 
     ///加入重复轨道应用会崩溃
     if (trackSenders.containsKey(trackId)) {
-      logger.e(
-          'addLocalTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id} is exist, addLocalTrack failure');
-      return false;
+      RTCRtpSender sender = trackSenders[trackId]!;
+      MediaStreamTrack? oldTrack = sender.track;
+      if (oldTrack != null) {
+        await replaceTrack(stream, oldTrack, track);
+      }
+      logger.w(
+          'addLocalTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id} is exist, replaceTrack');
+
+      return true;
     }
 
     try {
