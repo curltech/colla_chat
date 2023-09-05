@@ -19,6 +19,7 @@ import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:flutter/material.dart';
+import 'package:synchronized/synchronized.dart';
 
 enum VideoChatStatus {
   chatting, //正在视频中，只要开始重新协商，表明进入
@@ -44,17 +45,7 @@ class ConferenceChatMessageController with ChangeNotifier {
   ChatMessage? _current;
 
   //回执
-  Map<String, Map<String, ChatMessage>> _chatReceipts = {};
-  String? partyType;
-
-  //或者会议名称，或者群名称，或者联系人名称
-  String? name;
-
-  //当前的群编号，说明正在群中聊天
-  String? groupId;
-
-  //当前的联系人编号和名称，说明正在一对一聊天
-  String? peerId;
+  final Map<String, Map<String, ChatMessage>> _chatReceipts = {};
 
   //当前的通话房间，房间是临时组建的一组联系人，互相聊天和视频通话
   //如果当前的群存在的话，房间的人在群的联系人中选择，否则在所有的联系人中选择
@@ -62,7 +53,9 @@ class ConferenceChatMessageController with ChangeNotifier {
 
   VideoChatStatus _status = VideoChatStatus.end;
 
-  BlueFireAudioPlayer audioPlayer = BlueFireAudioPlayer();
+  Lock _lock = Lock();
+
+  final BlueFireAudioPlayer _audioPlayer = BlueFireAudioPlayer();
 
   ConferenceChatMessageController();
 
@@ -101,55 +94,54 @@ class ConferenceChatMessageController with ChangeNotifier {
     }
   }
 
-  ///设置当前的视频邀请消息汇总，可以从chatMessageController中获取当前
-  ///在conference模式下，peerId就是会议编号
-  setChatSummary(ChatSummary chatSummary) async {
-    //消息汇总未变，直接返回
-    if (_chatSummary == chatSummary) {
-      return;
-    }
-    _chatSummary = chatSummary;
-    //先清空数据
-    _chatReceipts = {};
-    partyType = null;
-    peerId = null;
-    groupId = null;
-    _conference = null;
-    partyType = chatSummary.partyType;
+  String? get partyType {
+    return chatSummary?.partyType;
+  }
+
+  ///当前的联系人编号和名称，说明正在一对一聊天
+  String? get peerId {
+    String? partyType = this.partyType;
     if (partyType == PartyType.linkman.name) {
-      peerId = chatSummary.peerId!;
-      name = chatSummary.name!;
-    } else if (partyType == PartyType.group.name) {
-      groupId = chatSummary.peerId!;
-      name = chatSummary.name!;
-    } else if (partyType == PartyType.conference.name) {
-      //conference的会议信息保存，_chatSummary中获取peerId，就是conferenceId
-      var conferenceId = _chatSummary!.peerId!;
-      _conference = await conferenceService.findOneByConferenceId(conferenceId);
-      if (_conference != null) {
-        name = _conference!.name;
-      }
+      return chatSummary?.peerId;
     }
+    return null;
+  }
+
+  ///或者会议名称，或者群名称，或者联系人名称
+  String? get name {
+    return chatSummary?.name;
+  }
+
+  ///当前的群编号，说明正在群中聊天
+  String? get groupId {
+    String? partyType = this.partyType;
+    if (partyType == PartyType.group.name) {
+      return chatSummary?.peerId;
+    }
+    return null;
   }
 
   ///设置当前的视频邀请消息，可以从chatMessageController中获取当前，
   ///当前chatSummary是必须存在的，不存在就查找到
   ///当前chatMessage在选择了视频邀请消息后，也是存在的
   ///如果chatMessage不存在，表明是准备新的会议
-  setChatMessage(ChatMessage chatMessage) async {
-    //消息未变，直接返回
-    if (_chatMessage == chatMessage) {
-      return;
-    }
-    _chatMessage = chatMessage;
-    //先清空数据
-    _conference = null;
-    _chatReceipts = {};
-    await _initChatSummary();
-    await _initChatMessage();
-    globalChatMessageController.registerReceiver(
-        ChatMessageSubType.chatReceipt.name, onReceivedChatReceipt);
-    await _initChatReceipt();
+  setChatMessage(ChatMessage chatMessage, {ChatSummary? chatSummary}) async {
+    await _lock.synchronized(() async {
+      _close();
+      //消息未变，直接返回
+      if (_chatMessage == chatMessage) {
+        return;
+      }
+      _chatMessage = chatMessage;
+      if (chatSummary != null) {
+        _chatSummary = chatSummary;
+      }
+      await _initChatSummary();
+      await _initChatMessage();
+      globalChatMessageController.registerReceiver(
+          ChatMessageSubType.chatReceipt.name, onReceivedChatReceipt);
+      await _initChatReceipt();
+    });
   }
 
   ///根据_chatMessage查找对应的chatSummary
@@ -178,19 +170,19 @@ class ConferenceChatMessageController with ChangeNotifier {
   _initChatSummary() async {
     if (_chatSummary == null && _chatMessage != null) {
       ChatSummary? chatSummary = await _findChatSummary();
-      await setChatSummary(chatSummary!);
+      _chatSummary = chatSummary;
     } else if (_chatSummary != null && _chatMessage != null) {
       if (_chatMessage!.direct == ChatDirect.send.name) {
         if (_chatSummary!.peerId != _chatMessage!.receiverPeerId) {
           var chatSummary = await _findChatSummary();
-          await setChatSummary(chatSummary!);
+          _chatSummary = chatSummary;
         }
       }
       if (_chatMessage!.direct == ChatDirect.receive.name) {
         if (_chatSummary!.peerId != _chatMessage!.senderPeerId!) {
           _chatSummary = null;
           var chatSummary = await _findChatSummary();
-          await setChatSummary(chatSummary!);
+          _chatSummary = chatSummary;
         }
       }
     }
@@ -244,6 +236,35 @@ class ConferenceChatMessageController with ChangeNotifier {
 
   ChatMessage? getChatReceipt(String subMessageType, String peerId) {
     return _chatReceipts[subMessageType]?[peerId];
+  }
+
+  play(String filename, bool loopMode) {
+    _audioPlayer.setLoopMode(loopMode);
+    _audioPlayer.play(filename);
+  }
+
+  stop({String? filename, bool loopMode = false}) async {
+    await _audioPlayer.stop();
+    await _audioPlayer.release();
+    if (filename != null) {
+      _audioPlayer.setLoopMode(loopMode);
+      _audioPlayer.play(filename);
+      await _audioPlayer.stop();
+      await _audioPlayer.release();
+    }
+  }
+
+  setAudioContext({
+    bool? forceSpeaker,
+    bool? duckAudio,
+    bool? respectSilence,
+    bool? stayAwake,
+  }) async {
+    await _audioPlayer.setAudioContext(
+        forceSpeaker: forceSpeaker,
+        duckAudio: duckAudio,
+        respectSilence: respectSilence,
+        stayAwake: stayAwake);
   }
 
   ///1.发送视频通邀请话消息,此时消息必须有content,包含conference信息
@@ -641,7 +662,13 @@ class ConferenceChatMessageController with ChangeNotifier {
     close();
   }
 
-  void close() {
+  close() async {
+    await _lock.synchronized(() {
+      _close();
+    });
+  }
+
+  void _close() {
     globalChatMessageController.unregisterReceiver(
         ChatMessageSubType.chatReceipt.name, onReceivedChatReceipt);
     _status = VideoChatStatus.end;
@@ -650,9 +677,5 @@ class ConferenceChatMessageController with ChangeNotifier {
     _chatReceipts.clear();
     _conference = null;
     _current = null;
-    partyType = null;
-    peerId = null;
-    groupId = null;
-    name = null;
   }
 }

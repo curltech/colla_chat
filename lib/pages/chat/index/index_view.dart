@@ -183,14 +183,11 @@ class _IndexViewState extends State<IndexView>
   }
 
   _play() {
-    conferenceChatMessageController.audioPlayer.setLoopMode(true);
-    conferenceChatMessageController.audioPlayer
-        .play('assets/medias/invitation.mp3');
+    conferenceChatMessageController.play('assets/medias/invitation.mp3', true);
   }
 
   _stop() {
-    conferenceChatMessageController.audioPlayer.stop();
-    conferenceChatMessageController.audioPlayer.release();
+    conferenceChatMessageController.stop();
   }
 
   ///有新消息到来的时候，一般消息直接显示

@@ -120,18 +120,11 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   _play() {
-    conferenceChatMessageController?.audioPlayer.setLoopMode(true);
-    conferenceChatMessageController?.audioPlayer.play('assets/medias/call.mp3');
+    conferenceChatMessageController?.play('assets/medias/call.mp3', true);
   }
 
   _stop() async {
-    await conferenceChatMessageController?.audioPlayer.stop();
-    await conferenceChatMessageController?.audioPlayer.release();
-    conferenceChatMessageController?.audioPlayer.setLoopMode(false);
-    conferenceChatMessageController?.audioPlayer
-        .play('assets/medias/close.mp3');
-    await conferenceChatMessageController?.audioPlayer.stop();
-    await conferenceChatMessageController?.audioPlayer.release();
+    conferenceChatMessageController?.stop(filename: 'assets/medias/close.mp3');
   }
 
   Future<void> _updatePeerMediaStream(PeerMediaStream? peerMediaStream) async {
@@ -637,8 +630,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             label: status ? 'Speaker on' : 'Speaker off',
             onPressed: () async {
               speakerStatus.value = !speakerStatus.value;
-              await conferenceChatMessageController?.audioPlayer
-                  .setAudioContext(forceSpeaker: speakerStatus.value);
+              await conferenceChatMessageController?.setAudioContext(
+                  forceSpeaker: speakerStatus.value);
             },
             backgroundColor: status ? Colors.black : Colors.white,
             child: Icon(
@@ -825,8 +818,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     conferenceChatMessageController?.removeListener(_updateVideoChatStatus);
     p2pConferenceClientPool
         .removeListener(_updateConferenceChatMessageController);
-    conferenceChatMessageController?.audioPlayer.stop();
-    conferenceChatMessageController?.audioPlayer.release();
+    conferenceChatMessageController?.stop();
     super.dispose();
   }
 }

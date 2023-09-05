@@ -291,10 +291,8 @@ class P2pConferenceClientPool with ChangeNotifier {
         if (p2pConferenceClient == null) {
           ConferenceChatMessageController conferenceChatMessageController =
               ConferenceChatMessageController();
-          if (chatSummary != null) {
-            await conferenceChatMessageController.setChatSummary(chatSummary);
-          }
-          await conferenceChatMessageController.setChatMessage(chatMessage);
+          await conferenceChatMessageController.setChatMessage(chatMessage,
+              chatSummary: chatSummary);
           p2pConferenceClient = P2pConferenceClient(
               conferenceChatMessageController: conferenceChatMessageController);
           _p2pConferenceClients[conferenceId] = p2pConferenceClient;
