@@ -546,15 +546,14 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///如果正在通话chatting，挂断视频通话，关闭所有的本地视频和远程视频，呼叫状态改为结束
   ///结束会议，这时候本地和远程的视频都应该被关闭
   _exit() async {
+    P2pConferenceClient? p2pConferenceClient =
+        p2pConferenceClientPool.p2pConferenceClient;
     ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClientPool.conferenceChatMessageController;
+        p2pConferenceClient?.conferenceChatMessageController;
     var status = conferenceChatMessageController?.status;
     if (status == VideoChatStatus.chatting) {
       await _close();
-      Conference? conference = conferenceChatMessageController!.conference;
-      if (conference != null) {
-        await conferenceChatMessageController.exit();
-      }
+      await p2pConferenceClient?.exit();
     }
     conferenceChatMessageController?.status = VideoChatStatus.end;
   }

@@ -620,10 +620,9 @@ class ConferenceChatMessageController with ChangeNotifier {
     status = VideoChatStatus.chatting;
   }
 
-  ///自己主动退出会议，发送exit回执，关闭会议
+  ///自己主动退出会议，发送exit回执
   exit() async {
     await _sendChatReceipt(MessageReceiptType.exit);
-    await p2pConferenceClientPool.exit(_conference!.conferenceId);
     status = VideoChatStatus.end;
   }
 

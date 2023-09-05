@@ -48,6 +48,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
   ///自己退出会议
   exit() async {
     _joined = false;
+    await conferenceChatMessageController.exit();
     List<AdvancedPeerConnection> peerConnections = [..._peerConnections.values];
     for (AdvancedPeerConnection peerConnection in peerConnections) {
       await _removeRemotePeerMediaStream(peerConnection);
