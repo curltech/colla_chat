@@ -126,7 +126,6 @@ class _ChatMessageViewState extends State<ChatMessageView>
   @override
   void didChangeMetrics() {
     super.didChangeMetrics();
-    logger.i('app change metrics');
   }
 
   @override

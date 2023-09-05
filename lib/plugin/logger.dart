@@ -15,7 +15,7 @@ class CustomLogger {
     _logger = Logger(
       printer: PrettyPrinter(printTime: true),
       output: FileOutput(),
-      level: Level.info,
+      level: Level.warning,
     );
     Logger.level = Level.warning;
   }

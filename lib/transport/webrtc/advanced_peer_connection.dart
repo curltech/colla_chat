@@ -75,10 +75,10 @@ class AdvancedPeerConnection {
     await _fnsmLock.synchronized(() {
       String peerId = event.peerId;
       WebrtcEventType eventType = event.eventType;
-      logger.w('Webrtc peer connection $peerId webrtcEvent $eventType coming');
+      logger.i('Webrtc peer connection $peerId webrtcEvent $eventType coming');
       var data = event.data;
       if (data != null && data is WebrtcSignal) {
-        logger.w(
+        logger.i(
             'Webrtc peer connection $peerId webrtcEvent $eventType coming, and signalType:${data.signalType}');
       }
       List<Future<void> Function(WebrtcEvent)>? fns = fnsm[eventType.name];

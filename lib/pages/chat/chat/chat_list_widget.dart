@@ -71,7 +71,7 @@ class LinkmanChatSummaryController extends DataListController<ChatSummary> {
     List<ChatSummary> chatSummary =
         await chatSummaryService.findByPartyType(PartyType.linkman.name);
     int end = DateTime.now().microsecondsSinceEpoch;
-    logger.w('find chat summary refresh time: ${end - start} microsecond');
+    // logger.i('find chat summary refresh time: ${end - start} microsecond');
     if (chatSummary.isNotEmpty) {
       replaceAll(chatSummary);
     }
