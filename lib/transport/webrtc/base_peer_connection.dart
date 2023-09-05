@@ -638,7 +638,7 @@ class BasePeerConnection {
         state == RTCPeerConnectionState.RTCPeerConnectionStateFailed ||
         state == RTCPeerConnectionState.RTCPeerConnectionStateDisconnected) {
       logger.e('Connection failed.');
-      close();
+      await close();
     }
     if (peerConnection?.connectionState ==
         RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
@@ -663,7 +663,7 @@ class BasePeerConnection {
         state == RTCIceConnectionState.RTCIceConnectionStateClosed ||
         state == RTCIceConnectionState.RTCIceConnectionStateDisconnected) {
       logger.e('Ice connection failed:$state');
-      close();
+      await close();
     }
   }
 
@@ -715,14 +715,14 @@ class BasePeerConnection {
     }
   }
 
-  ///需要重新协商
+  ///需要重新协商，一般是本节点有增减轨道的时候，但是不能直接调用协商的方法，会造成死循环
   onRenegotiationNeeded() {
     logger.w('onRenegotiationNeeded event');
     renegotiateNeed = true;
   }
 
   //数据通道状态事件
-  onDataChannelState(RTCDataChannelState state) {
+  onDataChannelState(RTCDataChannelState state) async {
     logger.i('onDataChannelState event:$state');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
@@ -736,7 +736,7 @@ class BasePeerConnection {
     //数据通道关闭
     if (state == RTCDataChannelState.RTCDataChannelClosed) {
       logger.i('data channel close');
-      close();
+      await close();
     }
   }
 
@@ -750,14 +750,14 @@ class BasePeerConnection {
     }
 
     //延时关闭
-    Future.delayed(Duration(seconds: delayTimes)).then((value) {
+    Future.delayed(Duration(seconds: delayTimes)).then((value) async {
       if (status != PeerConnectionStatus.connected) {
         logger.w('delayed $delayTimes second cannot connected, will be closed');
-        close();
+        await close();
         if (reconnectTimes > 0) {
           reconnectTimes--;
-          init(extension: extension!);
-          negotiate();
+          await init(extension: extension!);
+          await negotiate();
         }
       } else if (renegotiateNeed) {
         logger.w(
@@ -765,7 +765,8 @@ class BasePeerConnection {
         if (reconnectTimes > 0) {
           reconnectTimes--;
           negotiateStatus = NegotiateStatus.none;
-          negotiate();
+          await negotiate();
+          renegotiateNeed = false; //调用一次协商的方法后，就设置成无需协商
         } else {
           logger.e('renegotiateNeed always is true, error state');
           negotiateStatus = NegotiateStatus.none;
@@ -1069,7 +1070,7 @@ class BasePeerConnection {
       //negotiate();
     } catch (err) {
       logger.e(err);
-      close();
+      await close();
     }
   }
 
