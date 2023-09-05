@@ -199,9 +199,7 @@ class _IndexViewState extends State<IndexView>
       return;
     }
     String? subMessageType = chatMessage.subMessageType;
-    if (ChatMessageSubType.videoChat.name == subMessageType) {
-      await conferenceChatMessageController.setChatMessage(chatMessage);
-    }
+
     String senderPeerId = chatMessage.senderPeerId!;
     String? groupId = chatMessage.groupId;
     Linkman? linkman = await linkmanService.findCachedOneByPeerId(senderPeerId);
@@ -222,6 +220,20 @@ class _IndexViewState extends State<IndexView>
           if (senderPeerId != peerId && groupId != peerId) {
             chatMessageVisible.value = true;
           }
+        }
+      }
+      //新的视频邀请消息到来，创建新的视频消息控制器，原来的如果存在，新的将被忽视，占线
+      if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
+        if (!conferenceChatMessageVisible.value) {
+          await conferenceChatMessageController.setChatMessage(chatMessage);
+          conferenceChatMessageVisible.value = true;
+        } else {
+          ConferenceChatMessageController conferenceChatMessageController =
+              ConferenceChatMessageController();
+          await conferenceChatMessageController.setChatMessage(chatMessage);
+          await conferenceChatMessageController
+              .sendChatReceipt(MessageReceiptType.busy);
+          await conferenceChatMessageController.terminate();
         }
       }
     }

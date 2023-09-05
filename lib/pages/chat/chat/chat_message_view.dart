@@ -124,11 +124,6 @@ class _ChatMessageViewState extends State<ChatMessageView>
   }
 
   @override
-  void didChangeMetrics() {
-    super.didChangeMetrics();
-  }
-
-  @override
   void onWindowEvent(String eventName) {
     //logger.i('[WindowManager] onWindowEvent: $eventName');
   }
