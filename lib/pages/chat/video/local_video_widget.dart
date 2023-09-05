@@ -79,8 +79,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   //呼叫时间的计时器，如果是在单聊的场景下，对方在时间内未有回执，则自动关闭
   Timer? _linkmanCallTimer;
 
-  ConferenceChatMessageController? conferenceChatMessageController;
-
   //JustAudioPlayer audioPlayer = JustAudioPlayer();
 
   @override
@@ -120,10 +118,14 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   _play() {
+    var conferenceChatMessageController =
+        p2pConferenceClientPool.conferenceChatMessageController;
     conferenceChatMessageController?.play('assets/medias/call.mp3', true);
   }
 
   _stop() async {
+    var conferenceChatMessageController =
+        p2pConferenceClientPool.conferenceChatMessageController;
     conferenceChatMessageController?.stop(filename: 'assets/medias/close.mp3');
   }
 
@@ -394,6 +396,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       }
       return;
     }
+    //当前会议存在不能邀请
     ConferenceChatMessageController? conferenceChatMessageController =
         p2pConferenceClientPool.conferenceChatMessageController;
     if (conferenceChatMessageController != null) {
@@ -413,6 +416,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
     Conference conference =
         await _buildConference(video: video, participants: participants);
+    ///创建并发送邀请消息
     ChatMessage? chatMessage = await chatMessageController.send(
         title: conference.video
             ? ChatMessageContentType.video.name
@@ -434,6 +438,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           content:
               '${AppLocalizations.t('Send videoChat chatMessage')} ${chatMessage.messageId}');
     }
+    ///根据邀请消息创建会议
     P2pConferenceClient? p2pConferenceClient = await p2pConferenceClientPool
         .createP2pConferenceClient(chatSummary: chatSummary, chatMessage);
     conferenceChatMessageController =
@@ -630,6 +635,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             label: status ? 'Speaker on' : 'Speaker off',
             onPressed: () async {
               speakerStatus.value = !speakerStatus.value;
+              var conferenceChatMessageController =
+                  p2pConferenceClientPool.conferenceChatMessageController;
               await conferenceChatMessageController?.setAudioContext(
                   forceSpeaker: speakerStatus.value);
             },
