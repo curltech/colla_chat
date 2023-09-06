@@ -165,10 +165,10 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
 
     try {
       //创建本地连接对象
-      _localConnection = BasePeerConnection(initiator: true);
+      _localConnection = BasePeerConnection();
       var extension = SignalExtension('', '',
           name: '', iceServers: configuration['iceServers']!);
-      await _localConnection!.init(extension: extension);
+      await _localConnection!.init(true, extension);
       //添加本地Candidate事件监听
       _localConnection!.on(WebrtcEventType.iceCandidate, _onLocalCandidate);
       //添加本地Ice连接状态事件监听
@@ -176,8 +176,8 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
           .on(WebrtcEventType.iceConnectionState, _onLocalIceConnectionState);
 
       //创建远端连接对象
-      _remoteConnection = BasePeerConnection(initiator: false);
-      await _remoteConnection!.init(extension: extension);
+      _remoteConnection = BasePeerConnection();
+      await _remoteConnection!.init(false, extension);
       //监听获取到远端视频流事件
       _remoteConnection!.on(WebrtcEventType.addTrack, _onRemoteAddStream);
       //添加远端Candidate事件监听

@@ -25,21 +25,24 @@ class AdvancedPeerConnection {
   String clientId;
   String name;
 
+  //完美协商过程需要的状态变量
+  bool ignoreOffer = false; //是否忽略offer冲突
+  bool polite = false; //是否礼貌处理
+
   Map<String, List<Future<void> Function(WebrtcEvent event)>> fnsm = {};
   final Lock _fnsmLock = Lock();
 
   AdvancedPeerConnection(
-    this.peerId,
-    bool initiator, {
+    this.peerId, {
     this.clientId = unknownClientId,
     this.name = unknownName,
   }) {
-    logger.w(
-        'advancedPeerConnection peerId:$peerId, clientId:$clientId, initiator:$initiator create');
+    logger
+        .w('advancedPeerConnection peerId:$peerId, clientId:$clientId create');
     if (StringUtil.isEmpty(clientId)) {
       logger.e('SlavePeerConnection clientId must be value');
     }
-    final basePeerConnection = BasePeerConnection(initiator: initiator);
+    final basePeerConnection = BasePeerConnection();
     this.basePeerConnection = basePeerConnection;
   }
 
@@ -90,7 +93,7 @@ class AdvancedPeerConnection {
     });
   }
 
-  Future<bool> init(
+  Future<bool> init(bool initiator,
       {List<Map<String, String>>? iceServers,
       Uint8List? aesKey,
       List<PeerMediaStream> localPeerMediaStreams = const []}) async {
@@ -115,8 +118,8 @@ class AdvancedPeerConnection {
         }
       }
     }
-    bool result = await basePeerConnection.init(
-        extension: extension, localStreams: localStreams);
+    bool result = await basePeerConnection.init(initiator, extension,
+        localStreams: localStreams);
     if (!result) {
       logger.e('WebrtcCorePeer init result is false');
       return false;
