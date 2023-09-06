@@ -1,5 +1,6 @@
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 
 class StringUtil {
@@ -58,6 +59,21 @@ class StringUtil {
         break;
       case DataType.time:
         value = DateUtil.toTime(str);
+        break;
+      case DataType.string:
+        value = str;
+        break;
+      case DataType.bool:
+        value = bool.parse(str);
+        break;
+      case DataType.set:
+        value = JsonUtil.toJson(str);
+        break;
+      case DataType.list:
+        value = JsonUtil.toJson(str);
+        break;
+      case DataType.map:
+        value = JsonUtil.toJson(str);
         break;
     }
     return value;
