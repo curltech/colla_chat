@@ -788,13 +788,14 @@ class BasePeerConnection {
   ///重新连接，限于主叫，有次数的上限，用于连接被closed的情况下重新连接
   ///当次数超过上限后连接将被关闭
   reconnect() async {
-    logger.w('will be renegotiate');
     if (initiator == true && reconnectTimes > 0) {
+      logger.w('will be renegotiate');
       reconnectTimes--;
       // init(extension: extension!);
       await restartIce();
       // await negotiate();
     } else {
+      logger.w('will be close');
       close();
     }
   }
@@ -1563,10 +1564,6 @@ class BasePeerConnection {
     status = PeerConnectionStatus.closed;
     negotiateStatus = NegotiateStatus.none;
     logger.i('PeerConnectionStatus closed');
-
-    // if (reconnectTimes > 0) {
-    //   reconnect();
-    // }
     emit(WebrtcEventType.closed, this);
   }
 }
