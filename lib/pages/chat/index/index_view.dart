@@ -183,11 +183,11 @@ class _IndexViewState extends State<IndexView>
   }
 
   _play() {
-    conferenceChatMessageController.play('assets/medias/invitation.mp3', true);
+    conferenceChatMessageController.playAudio('assets/medias/invitation.mp3', true);
   }
 
   _stop() {
-    conferenceChatMessageController.stop();
+    conferenceChatMessageController.stopAudio();
   }
 
   ///有新消息到来的时候，一般消息直接显示
@@ -206,7 +206,7 @@ class _IndexViewState extends State<IndexView>
     if (linkman != null) {
       bannerAvatarImage = linkman.avatarImage ?? AppImage.mdAppImage;
     }
-    if (chatMessage.subMessageType == ChatMessageSubType.chat.name) {
+    if (subMessageType == ChatMessageSubType.chat.name) {
       this.chatMessage = chatMessage;
       String? current = indexWidgetProvider.current;
       if (current != 'chat_message') {
@@ -222,19 +222,19 @@ class _IndexViewState extends State<IndexView>
           }
         }
       }
-      //新的视频邀请消息到来，创建新的视频消息控制器，原来的如果存在，新的将被忽视，占线
-      if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-        if (!conferenceChatMessageVisible.value) {
-          await conferenceChatMessageController.setChatMessage(chatMessage);
-          conferenceChatMessageVisible.value = true;
-        } else {
-          ConferenceChatMessageController conferenceChatMessageController =
-              ConferenceChatMessageController();
-          await conferenceChatMessageController.setChatMessage(chatMessage);
-          await conferenceChatMessageController
-              .sendChatReceipt(MessageReceiptType.busy);
-          await conferenceChatMessageController.terminate();
-        }
+    }
+    //新的视频邀请消息到来，创建新的视频消息控制器，原来的如果存在，新的将被忽视，占线
+    if (subMessageType == ChatMessageSubType.videoChat.name) {
+      if (!conferenceChatMessageVisible.value) {
+        await conferenceChatMessageController.setChatMessage(chatMessage);
+        conferenceChatMessageVisible.value = true;
+      } else {
+        ConferenceChatMessageController conferenceChatMessageController =
+            ConferenceChatMessageController();
+        await conferenceChatMessageController.setChatMessage(chatMessage);
+        await conferenceChatMessageController
+            .sendChatReceipt(MessageReceiptType.busy);
+        await conferenceChatMessageController.terminate();
       }
     }
   }

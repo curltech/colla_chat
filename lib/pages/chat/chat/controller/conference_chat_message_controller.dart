@@ -235,12 +235,12 @@ class ConferenceChatMessageController with ChangeNotifier {
     return _chatReceipts[subMessageType]?[peerId];
   }
 
-  play(String filename, bool loopMode) {
+  playAudio(String filename, bool loopMode) {
     _audioPlayer.setLoopMode(loopMode);
     _audioPlayer.play(filename);
   }
 
-  stop({String? filename, bool loopMode = false}) async {
+  stopAudio({String? filename, bool loopMode = false}) async {
     await _audioPlayer.stop();
     await _audioPlayer.release();
     if (filename != null) {

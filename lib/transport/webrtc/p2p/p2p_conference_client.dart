@@ -36,7 +36,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
     return key;
   }
 
-  ///自己加入会议
+  ///自己加入会议，在所有的连接中加上本地流
   join() async {
     _joined = true;
     List<AdvancedPeerConnection> peerConnections = [..._peerConnections.values];
@@ -45,7 +45,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
     }
   }
 
-  ///自己退出会议
+  ///自己退出会议，从所有的连接中移除本地流和远程流
   exit() async {
     _joined = false;
     await conferenceChatMessageController.exit();

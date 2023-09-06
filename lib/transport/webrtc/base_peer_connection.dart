@@ -1438,7 +1438,7 @@ class BasePeerConnection {
       List<int>? slices = messageSlice.merge(data);
 
       if (slices != null) {
-        logger.i('webrtc binary onMessage length: ${slices.length}');
+        // logger.i('webrtc binary onMessage length: ${slices.length}');
         emit(WebrtcEventType.message, slices);
       }
     } else {

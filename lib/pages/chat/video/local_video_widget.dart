@@ -117,16 +117,17 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
   }
 
-  _play() {
+  _playAudio() {
     var conferenceChatMessageController =
         p2pConferenceClientPool.conferenceChatMessageController;
-    conferenceChatMessageController?.play('assets/medias/call.mp3', true);
+    conferenceChatMessageController?.playAudio('assets/medias/call.mp3', true);
   }
 
-  _stop() async {
+  _stopAudio() async {
     var conferenceChatMessageController =
         p2pConferenceClientPool.conferenceChatMessageController;
-    conferenceChatMessageController?.stop(filename: 'assets/medias/close.mp3');
+    conferenceChatMessageController?.stopAudio(
+        filename: 'assets/medias/close.mp3');
   }
 
   Future<void> _updatePeerMediaStream(PeerMediaStream? peerMediaStream) async {
@@ -470,12 +471,12 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     conferenceChatMessageController.status = VideoChatStatus.calling;
     await conferenceChatMessageController.openLocalMainPeerMediaStream();
 
-    _play();
+    _playAudio();
     //延时60秒后自动挂断
     Future.delayed(const Duration(seconds: 60)).then((value) {
       //时间到了后，如果还是呼叫状态，则修改状态为结束
       if (conferenceChatMessageController?.status == VideoChatStatus.calling) {
-        _stop();
+        _stopAudio();
         conferenceChatMessageController?.status = VideoChatStatus.end;
       }
     });
@@ -520,25 +521,30 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     _update();
   }
 
-  ///移除本地所有的视频，这时候还能看远程的视频
+  ///关闭并且移除本地所有的视频，这时候还能看远程的视频
   _close() async {
     var peerMediaStreams = localPeerMediaStreamController.peerMediaStreams;
+    P2pConferenceClient? p2pConferenceClient =
+        p2pConferenceClientPool.p2pConferenceClient;
     ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClientPool.conferenceChatMessageController;
+        p2pConferenceClient?.conferenceChatMessageController;
     Conference? conference = conferenceChatMessageController?.conference;
     //从webrtc连接中移除流
     if (conference != null) {
-      await p2pConferenceClientPool.removeLocalPeerMediaStream(
-          conference.conferenceId, peerMediaStreams);
+      await p2pConferenceClient?.removeLocalPeerMediaStream(peerMediaStreams);
     }
     await localPeerMediaStreamController.closeAll();
     _update();
   }
 
+  ///呼叫挂断，关闭音频和本地视频，设置结束状态
   _hangup() async {
-    _stop();
+    _stopAudio();
+    await localPeerMediaStreamController.closeAll();
+    P2pConferenceClient? p2pConferenceClient =
+        p2pConferenceClientPool.p2pConferenceClient;
     ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClientPool.conferenceChatMessageController;
+        p2pConferenceClient?.conferenceChatMessageController;
     conferenceChatMessageController?.status = VideoChatStatus.end;
   }
 
@@ -839,7 +845,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     conferenceChatMessageController?.removeListener(_updateVideoChatStatus);
     p2pConferenceClientPool
         .removeListener(_updateConferenceChatMessageController);
-    conferenceChatMessageController?.stop();
+    conferenceChatMessageController?.stopAudio();
     super.dispose();
   }
 }
