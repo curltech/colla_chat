@@ -149,14 +149,14 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
   _onLocalCandidate(RTCIceCandidate candidate) {
     logger.i('LocalCandidate: ${candidate.candidate!}');
     //将本地Candidate添加至远端连接
-    _remoteConnection!.addIceCandidate(candidate);
+    _remoteConnection!.addIceCandidate([candidate]);
   }
 
   //远端Candidate数据回调
   _onRemoteCandidate(RTCIceCandidate candidate) {
     logger.i('RemoteCandidate: ${candidate.candidate!}');
     //将远端Candidate添加至本地连接
-    _localConnection!.addIceCandidate(candidate);
+    _localConnection!.addIceCandidate([candidate]);
   }
 
   _open() async {

@@ -260,6 +260,9 @@ class BasePeerConnection {
   PeerConnectionStatus _status = PeerConnectionStatus.created;
   NegotiateStatus _negotiateStatus = NegotiateStatus.none;
 
+  //暂存candidate
+  final List<RTCIceCandidate> _pendingIceCandidates = [];
+
   //完美协商过程需要的状态变量
   bool makingOffer = false; //主叫是否发出offer信号
   bool isSettingRemoteAnswerPending =
@@ -622,10 +625,7 @@ class BasePeerConnection {
   }
 
   RTCPeerConnection? get peerConnection {
-    if (_peerConnection != null) {
-      return _peerConnection!;
-    }
-    return null;
+    return _peerConnection;
   }
 
   ///连接状态事件
@@ -708,12 +708,30 @@ class BasePeerConnection {
       return;
     }
     if (candidate.candidate != null) {
+      _pendingIceCandidates.add(candidate);
+      await _postIceCandidates();
+    }
+  }
+
+  _postIceCandidates() async {
+    if (peerConnection == null || status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return;
+    }
+
+    RTCSessionDescription? localDescription =
+        await peerConnection?.getLocalDescription();
+    RTCSessionDescription? remoteDescription =
+        await peerConnection?.getRemoteDescription();
+
+    if (localDescription != null && remoteDescription != null) {
+      List<RTCIceCandidate> pending = [..._pendingIceCandidates];
+      _pendingIceCandidates.clear();
       //发送candidate信号
-      //logger.i('Send Candidate signal.');
       emit(
           WebrtcEventType.signal,
           WebrtcSignal(SignalType.candidate.name,
-              candidates: [candidate], extension: extension));
+              candidates: pending, extension: extension));
     }
   }
 
@@ -871,9 +889,7 @@ class BasePeerConnection {
     //如果是候选信息
     else if (signalType == SignalType.candidate.name && candidates != null) {
       //logger.i('onSignal candidate:${candidate.candidate}');
-      for (var candidate in candidates) {
-        await addIceCandidate(candidate);
-      }
+      await addIceCandidate(candidates);
     }
     //如果sdp信息，则设置远程描述
     //对主叫节点来说，sdp应该是answer
@@ -895,6 +911,7 @@ class BasePeerConnection {
         isSettingRemoteAnswerPending = sdp.type == "answer";
         await peerConnection.setRemoteDescription(sdp);
         isSettingRemoteAnswerPending = false;
+        await _postIceCandidates();
       } catch (e) {
         isSettingRemoteAnswerPending = false;
         logger.e('setRemoteDescription failure:$e');
@@ -965,6 +982,7 @@ class BasePeerConnection {
         logger.e('createAnswer failure:$e');
       }
       await _sendAnswer(answer);
+      await _postIceCandidates();
     }
   }
 
@@ -1011,9 +1029,7 @@ class BasePeerConnection {
     }
     //如果是候选信息
     else if (signalType == SignalType.candidate.name && candidates != null) {
-      for (var candidate in candidates) {
-        await addIceCandidate(candidate);
-      }
+      await addIceCandidate(candidates);
     }
     //如果sdp信息，则设置远程描述
     else if (signalType == SignalType.sdp.name && sdp != null) {
@@ -1423,16 +1439,15 @@ class BasePeerConnection {
   }
 
   ///为连接加上候选的服务器
-  addIceCandidate(RTCIceCandidate iceCandidate) async {
+  addIceCandidate(List<RTCIceCandidate> iceCandidates) async {
     RTCPeerConnection? peerConnection = this.peerConnection;
     if (peerConnection == null || status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus is closed');
       return;
     }
-    await peerConnection.addCandidate(iceCandidate);
-    var map = iceCandidate.toMap();
-    var jsonStr = JsonUtil.toJsonString(map);
-    logger.i('addIceCandidate: $jsonStr');
+    for (RTCIceCandidate iceCandidate in iceCandidates) {
+      await peerConnection.addCandidate(iceCandidate);
+    }
   }
 
   ///消息分片处理器
