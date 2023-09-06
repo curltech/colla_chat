@@ -213,6 +213,8 @@ final Map<String, dynamic> sdpConstraints = {
     "OfferToReceiveAudio": true,
     //接收视频数据
     "OfferToReceiveVideo": true,
+    //
+    "IceRestart": true
   },
   "optional": [],
 };
@@ -633,15 +635,14 @@ class BasePeerConnection {
       return;
     }
     emit(WebrtcEventType.connectionState, state);
-    if (state == RTCPeerConnectionState.RTCPeerConnectionStateFailed ||
-        state == RTCPeerConnectionState.RTCPeerConnectionStateClosed ||
-        state == RTCPeerConnectionState.RTCPeerConnectionStateFailed ||
-        state == RTCPeerConnectionState.RTCPeerConnectionStateDisconnected) {
-      logger.e('Connection failed.');
-      await close();
+    if (state == RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
+      logger.e('Connection closed.');
+      close();
     }
     if (peerConnection?.connectionState ==
         RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+      negotiateStatus = NegotiateStatus.negotiated;
+      renegotiateNeed = false;
       connected();
     }
   }
@@ -655,15 +656,22 @@ class BasePeerConnection {
     }
 
     emit(WebrtcEventType.iceConnectionState, state);
-    if (state == RTCIceConnectionState.RTCIceConnectionStateConnected ||
-        state == RTCIceConnectionState.RTCIceConnectionStateCompleted) {
+    if (state == RTCIceConnectionState.RTCIceConnectionStateConnected) {
+      negotiateStatus = NegotiateStatus.none;
+      renegotiateNeed = false;
       connected();
     }
-    if (state == RTCIceConnectionState.RTCIceConnectionStateFailed ||
-        state == RTCIceConnectionState.RTCIceConnectionStateClosed ||
-        state == RTCIceConnectionState.RTCIceConnectionStateDisconnected) {
-      logger.e('Ice connection failed:$state');
-      await close();
+    if (state == RTCIceConnectionState.RTCIceConnectionStateFailed) {
+      logger.e('Ice connection failure:$state');
+
+      ///当连接暂时性失败的情况下，启动重新协商
+      await restartIce();
+    }
+    if (state == RTCIceConnectionState.RTCIceConnectionStateClosed) {
+      logger.e('Ice connection closed:$state');
+
+      ///尝试重新连接
+      reconnect();
     }
   }
 
@@ -682,12 +690,6 @@ class BasePeerConnection {
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
-    }
-
-    ///协商过程完成
-    if (state == RTCSignalingState.RTCSignalingStateStable) {
-      negotiateStatus = NegotiateStatus.negotiated;
-      renegotiateNeed = false;
     }
     emit(WebrtcEventType.signalingState, state);
   }
@@ -719,6 +721,9 @@ class BasePeerConnection {
   onRenegotiationNeeded() {
     logger.w('onRenegotiationNeeded event');
     renegotiateNeed = true;
+
+    ///在启动restartIce或者流有变化的时候，重新协商
+    negotiate();
   }
 
   //数据通道状态事件
@@ -736,7 +741,6 @@ class BasePeerConnection {
     //数据通道关闭
     if (state == RTCDataChannelState.RTCDataChannelClosed) {
       logger.i('data channel close');
-      await close();
     }
   }
 
@@ -748,32 +752,25 @@ class BasePeerConnection {
     } else {
       await _negotiateAnswer();
     }
+  }
 
-    //延时关闭
-    Future.delayed(Duration(seconds: delayTimes)).then((value) async {
-      if (status != PeerConnectionStatus.connected) {
-        logger.w('delayed $delayTimes second cannot connected, will be closed');
-        await close();
-        if (reconnectTimes > 0) {
-          reconnectTimes--;
-          await init(extension: extension!);
-          await negotiate();
-        }
-      } else if (renegotiateNeed) {
-        logger.w(
-            'delayed $delayTimes second renegotiateNeed is true, will be renegotiate');
-        if (reconnectTimes > 0) {
-          reconnectTimes--;
-          negotiateStatus = NegotiateStatus.none;
-          await negotiate();
-          renegotiateNeed = false; //调用一次协商的方法后，就设置成无需协商
-        } else {
-          logger.e('renegotiateNeed always is true, error state');
-          negotiateStatus = NegotiateStatus.none;
-          renegotiateNeed = false;
-        }
-      }
-    });
+  ///重新连接，有次数的上限，用于连接被closed的情况下重新连接
+  ///当次数超过上限后连接将被关闭
+  reconnect() async {
+    logger.w('Will be renegotiate');
+    if (reconnectTimes > 0) {
+      reconnectTimes--;
+      // init(extension: extension!);
+      await restartIce();
+      // await negotiate();
+    } else {
+      close();
+    }
+  }
+
+  ///发起重新连接的请求，将激活onRenegotiationNeeded，从而调用negotiate进行协商
+  restartIce() async {
+    await _peerConnection?.restartIce();
   }
 
   ///作为主叫，发起协商过程createOffer
@@ -998,9 +995,6 @@ class BasePeerConnection {
     }
     //如果sdp信息，则设置远程描述
     else if (signalType == SignalType.sdp.name && sdp != null) {
-      if (sdp.type != 'offer') {
-        logger.e('onSignal sdp is not offer:${sdp.type}');
-      }
       logger.i('start setRemoteDescription sdp offer:${sdp.type}');
       RTCSessionDescription? remoteDescription;
       try {
@@ -1046,6 +1040,19 @@ class BasePeerConnection {
       await _onOfferSignal(webrtcSignal);
     } else {
       await _onAnswerSignal(webrtcSignal);
+    }
+  }
+
+  checkStats() async {
+    if (_peerConnection != null) {
+      List<StatsReport>? statsReport = await _peerConnection?.getStats();
+
+      for (StatsReport statReport in statsReport!) {
+        if (statReport.type == 'transport') {
+          Map<dynamic, dynamic> values = statReport.values;
+          logger.i('statReport:$values');
+        }
+      }
     }
   }
 
@@ -1491,6 +1498,7 @@ class BasePeerConnection {
     }
     status = PeerConnectionStatus.closed;
     negotiateStatus = NegotiateStatus.none;
+    renegotiateNeed = false;
     logger.i('PeerConnectionStatus closed');
 
     // if (reconnectTimes > 0) {
