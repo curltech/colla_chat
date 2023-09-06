@@ -230,6 +230,7 @@ enum PeerConnectionStatus {
   created,
   init,
   reconnecting,
+  disconnected,
   failed,
   connected, //连接是否完全建立，即协商过程结束
   closed, //是否关闭连接完成
@@ -640,7 +641,7 @@ class BasePeerConnection {
       logger.e('Connection closed.');
       close();
     }
-    if (peerConnection?.connectionState ==
+    if (peerConnection.connectionState ==
         RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
       negotiateStatus = NegotiateStatus.negotiated;
       connected();
@@ -659,11 +660,20 @@ class BasePeerConnection {
       negotiateStatus = NegotiateStatus.none;
       connected();
     }
-    if (state == RTCIceConnectionState.RTCIceConnectionStateFailed) {
+    if (state == RTCIceConnectionState.RTCIceConnectionStateDisconnected) {
       logger.e('Ice connection failure:$state');
 
-      ///当连接暂时性失败的情况下，启动重新协商
-      await restartIce();
+      status = PeerConnectionStatus.disconnected;
+
+      ///尝试重新连接
+      reconnect();
+    }
+    if (state == RTCIceConnectionState.RTCIceConnectionStateFailed) {
+      logger.e('Ice connection failure:$state');
+      status = PeerConnectionStatus.failed;
+
+      ///尝试重新连接
+      reconnect();
     }
     if (state == RTCIceConnectionState.RTCIceConnectionStateClosed) {
       logger.e('Ice connection closed:$state');
@@ -778,7 +788,7 @@ class BasePeerConnection {
   ///重新连接，限于主叫，有次数的上限，用于连接被closed的情况下重新连接
   ///当次数超过上限后连接将被关闭
   reconnect() async {
-    logger.w('Will be renegotiate');
+    logger.w('will be renegotiate');
     if (initiator == true && reconnectTimes > 0) {
       reconnectTimes--;
       // init(extension: extension!);
@@ -1446,7 +1456,11 @@ class BasePeerConnection {
       return;
     }
     for (RTCIceCandidate iceCandidate in iceCandidates) {
-      await peerConnection.addCandidate(iceCandidate);
+      try {
+        await peerConnection.addCandidate(iceCandidate);
+      } catch (e) {
+        logger.e('addCandidate failure:$e');
+      }
     }
   }
 
