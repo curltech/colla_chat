@@ -358,8 +358,8 @@ class WebsocketPool {
     Websocket? websocket;
     if (websockets.containsKey(address)) {
       websocket = websockets[address];
-      logger.i('wss address:$address websocket is exist:${websocket!.status}');
-      if (websocket.status == SocketStatus.connected ||
+      // logger.i('wss address:$address websocket is exist:${websocket!.status}');
+      if (websocket!.status == SocketStatus.connected ||
           websocket.status == SocketStatus.reconnecting ||
           websocket.status == SocketStatus.connecting) {
         if (isDefault) {

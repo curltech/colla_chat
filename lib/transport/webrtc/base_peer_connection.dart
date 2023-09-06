@@ -545,7 +545,7 @@ class BasePeerConnection {
             (RTCDataChannelState state) => {onDataChannelState(state)};
         dataChannel!.onMessage =
             (RTCDataChannelMessage message) => {onMessage(message)};
-        logger.i('peerConnection createDataChannel end');
+        // logger.i('peerConnection createDataChannel end');
       } else {
         peerConnection.onDataChannel = (RTCDataChannel dataChannel) {
           this.dataChannel = dataChannel;
@@ -604,7 +604,7 @@ class BasePeerConnection {
   }
 
   set negotiateStatus(NegotiateStatus negotiateStatus) {
-    logger.i(
+    logger.w(
         'negotiateStatus from oldStatus: $_negotiateStatus, newStatus: $negotiateStatus');
     _negotiateStatus = negotiateStatus;
   }
@@ -614,7 +614,7 @@ class BasePeerConnection {
       logger.i('PeerConnectionStatus has already connected');
       return;
     }
-    logger.i('PeerConnectionStatus connected, webrtc connection is completed');
+    logger.w('PeerConnectionStatus connected, webrtc connection is completed');
     end = DateTime.now().millisecondsSinceEpoch;
     status = PeerConnectionStatus.connected;
     if (end != null && start != null) {
@@ -834,7 +834,7 @@ class BasePeerConnection {
       RTCSessionDescription offer =
           await peerConnection.createOffer(sdpConstraints);
       await peerConnection.setLocalDescription(offer);
-      logger.i('createOffer and setLocalDescription offer successfully');
+      // logger.i('createOffer and setLocalDescription offer successfully');
       await _sendOffer(offer);
     } catch (e) {
       makingOffer = false;
@@ -859,7 +859,7 @@ class BasePeerConnection {
     sdp ??= offer;
     emit(WebrtcEventType.signal,
         WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
-    logger.i('end sendOffer');
+    // logger.i('end sendOffer');
   }
 
   ///作为主叫，从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
@@ -1471,7 +1471,7 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus is not connected');
       return false;
     }
-    logger.i('webrtc send message length: ${message.length}');
+    // logger.i('webrtc send message length: ${message.length}');
     final dataChannel = this.dataChannel;
     if (dataChannel != null) {
       var dataChannelMessage =
