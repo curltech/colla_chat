@@ -1196,7 +1196,8 @@ class BasePeerConnection {
   ///增加本地流到到连接中
   Future<bool> addLocalStream(MediaStream stream) async {
     logger.i('addLocalStream ${stream.id} ${stream.ownerTag}');
-    if (status != PeerConnectionStatus.connected) {
+
+    if (_peerConnection == null) {
       logger.e('PeerConnectionStatus is not connected');
       return false;
     }
@@ -1224,7 +1225,7 @@ class BasePeerConnection {
   /// 把本地流轨道加入到连接中
   Future<bool> addLocalTrack(MediaStream stream, MediaStreamTrack track) async {
     RTCPeerConnection? peerConnection = this.peerConnection;
-    if (peerConnection == null || status != PeerConnectionStatus.connected) {
+    if (peerConnection == null) {
       logger.e('PeerConnectionStatus is not connected');
       return false;
     }
@@ -1265,7 +1266,7 @@ class BasePeerConnection {
   removeStream(MediaStream stream) async {
     logger.i('removeStream stream:${stream.id} ${stream.ownerTag}');
     RTCPeerConnection? peerConnection = _peerConnection;
-    if (peerConnection == null || status != PeerConnectionStatus.connected) {
+    if (peerConnection == null) {
       logger.e('PeerConnectionStatus is not connected');
       return false;
     }
@@ -1280,7 +1281,7 @@ class BasePeerConnection {
   removeTrack(MediaStream stream, MediaStreamTrack track) async {
     logger.i(
         'removeTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id}');
-    if (status != PeerConnectionStatus.connected) {
+    if (_peerConnection == null) {
       logger.e('PeerConnectionStatus is not connected');
       return false;
     }
