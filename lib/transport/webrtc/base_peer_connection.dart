@@ -519,7 +519,34 @@ class BasePeerConnection {
         (RTCIceCandidate candidate) => {onIceCandidate(candidate)};
     peerConnection.onRenegotiationNeeded = () => {onRenegotiationNeeded()};
 
-    ///3.建立发送数据通道和接受数据通道
+    /// 3.建立连接的监听轨道到来的监听器，当远方由轨道来的时候执行
+    peerConnection.onAddStream = (MediaStream stream) {
+      onAddRemoteStream(stream);
+    };
+    peerConnection.onRemoveStream = (MediaStream stream) {
+      onRemoveRemoteStream(stream);
+    };
+    peerConnection.onAddTrack = (MediaStream stream, MediaStreamTrack track) {
+      onRemoteTrack(stream, track);
+    };
+    peerConnection.onTrack = (RTCTrackEvent event) {
+      List<MediaStream> streams = event.streams;
+      MediaStream? stream = streams.firstOrNull;
+      MediaStreamTrack track = event.track;
+      onRemoteTrack(stream, track);
+    };
+    peerConnection.onRemoveTrack =
+        (MediaStream stream, MediaStreamTrack track) {
+      onRemoveRemoteTrack(stream, track);
+    };
+    status = PeerConnectionStatus.init;
+
+    /// 4.初始化加密
+    if (streamEncrypt) {
+      await _initKeyProvider();
+    }
+
+    /// 5.建立发送数据通道和接受数据通道
     if (needDataChannel) {
       //建立数据通道的监听器
       if (initiator) {
@@ -557,33 +584,6 @@ class BasePeerConnection {
         };
         logger.i('peerConnection set onDataChannel end');
       }
-    }
-
-    /// 4.建立连接的监听轨道到来的监听器，当远方由轨道来的时候执行
-    peerConnection.onAddStream = (MediaStream stream) {
-      onAddRemoteStream(stream);
-    };
-    peerConnection.onRemoveStream = (MediaStream stream) {
-      onRemoveRemoteStream(stream);
-    };
-    peerConnection.onAddTrack = (MediaStream stream, MediaStreamTrack track) {
-      onRemoteTrack(stream, track);
-    };
-    peerConnection.onTrack = (RTCTrackEvent event) {
-      List<MediaStream> streams = event.streams;
-      MediaStream? stream = streams.firstOrNull;
-      MediaStreamTrack track = event.track;
-      onRemoteTrack(stream, track);
-    };
-    peerConnection.onRemoveTrack =
-        (MediaStream stream, MediaStreamTrack track) {
-      onRemoveRemoteTrack(stream, track);
-    };
-    status = PeerConnectionStatus.init;
-
-    /// 5.初始化加密
-    if (streamEncrypt) {
-      await _initKeyProvider();
     }
 
     return true;
@@ -672,8 +672,8 @@ class BasePeerConnection {
       logger.e('Ice connection failure:$state');
       status = PeerConnectionStatus.failed;
 
-      ///尝试重新连接
-      reconnect();
+      ///尝试重新协商
+      await restartIce();
     }
     if (state == RTCIceConnectionState.RTCIceConnectionStateClosed) {
       logger.e('Ice connection closed:$state');
@@ -751,7 +751,7 @@ class BasePeerConnection {
     logger.w('onRenegotiationNeeded event');
 
     ///在启动restartIce或者流有变化的时候，重新协商
-    negotiate();
+    _negotiate();
   }
 
   //数据通道状态事件
@@ -774,7 +774,7 @@ class BasePeerConnection {
 
   ///实际开始执行协商过程
   ///被叫不能在第一次的时候主动发起协议过程，主叫或者被叫不在第一次的时候可以发起协商过程
-  negotiate() async {
+  _negotiate() async {
     if (initiator == null) {
       logger.e('BasePeerConnection is not init');
       return;
@@ -889,7 +889,7 @@ class BasePeerConnection {
     if (signalType == SignalType.renegotiate.name &&
         webrtcSignal.renegotiate != null) {
       logger.i('onSignal renegotiate');
-      negotiate();
+      await restartIce();
     }
     //被要求收发，则加收发器
     else if (webrtcSignal.transceiverRequest != null) {

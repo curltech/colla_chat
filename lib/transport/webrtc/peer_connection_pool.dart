@@ -341,7 +341,6 @@ class PeerConnectionPool {
           name: name,
           eventType: WebrtcEventType.created,
           data: peerConnection));
-      await peerConnection.negotiate();
     }
     peerConnection = _getOne(peerId, clientId: clientId);
 

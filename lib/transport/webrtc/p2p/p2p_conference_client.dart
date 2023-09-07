@@ -3,7 +3,6 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
@@ -45,10 +44,16 @@ class P2pConferenceClient extends PeerMediaStreamController {
     }
   }
 
-  refresh() async {
-    List<AdvancedPeerConnection> peerConnections = [..._peerConnections.values];
-    for (AdvancedPeerConnection peerConnection in peerConnections) {
-      await peerConnection.basePeerConnection.restartIce();
+  restartIce({AdvancedPeerConnection? peerConnection}) async {
+    if (peerConnection != null) {
+      await peerConnection.restartIce();
+    } else {
+      List<AdvancedPeerConnection> peerConnections = [
+        ..._peerConnections.values
+      ];
+      for (AdvancedPeerConnection peerConnection in peerConnections) {
+        await peerConnection.restartIce();
+      }
     }
   }
 
@@ -87,16 +92,6 @@ class P2pConferenceClient extends PeerMediaStreamController {
     }
   }
 
-  negotiate({AdvancedPeerConnection? peerConnection}) async {
-    if (peerConnection != null) {
-      await peerConnection.negotiate();
-    } else {
-      for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
-        await peerConnection.negotiate();
-      }
-    }
-  }
-
   ///把本地新的peerMediaStream加入到指定连接或者会议的所有连接中，并且都重新协商
   ///指定连接用在加入新的连接的时候，所有连接用在加入新的peerMediaStream的时候
   addLocalPeerMediaStream(List<PeerMediaStream> peerMediaStreams,
@@ -106,13 +101,11 @@ class P2pConferenceClient extends PeerMediaStreamController {
         for (var peerMediaStream in peerMediaStreams) {
           await peerConnection.addLocalStream(peerMediaStream);
         }
-        await peerConnection.negotiate();
       } else {
         for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
           for (var peerMediaStream in peerMediaStreams) {
             await peerConnection.addLocalStream(peerMediaStream);
           }
-          await peerConnection.negotiate();
         }
       }
     }
@@ -182,7 +175,6 @@ class P2pConferenceClient extends PeerMediaStreamController {
       for (var peerMediaStream in peerMediaStreams) {
         await peerConnection.removeStream(peerMediaStream);
       }
-      await peerConnection.negotiate();
     } else {
       List<AdvancedPeerConnection> peerConnections = [
         ..._peerConnections.values
@@ -191,7 +183,6 @@ class P2pConferenceClient extends PeerMediaStreamController {
         for (var peerMediaStream in peerMediaStreams) {
           await peerConnection.removeStream(peerMediaStream);
         }
-        await peerConnection.negotiate();
       }
     }
   }

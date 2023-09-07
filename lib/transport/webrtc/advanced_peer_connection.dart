@@ -211,8 +211,8 @@ class AdvancedPeerConnection {
     return result;
   }
 
-  negotiate() async {
-    await basePeerConnection.negotiate();
+  restartIce() async {
+    await basePeerConnection.restartIce();
   }
 
   bool get dataChannelOpen {
