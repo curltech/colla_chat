@@ -155,21 +155,17 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     ChatSummary? chatSummary = chatMessageController.chatSummary;
     String? partyType = chatSummary?.partyType;
     if (partyType == PartyType.linkman.name) {
-      chatMessageController.current = null;
-      p2pConferenceClientPool.conferenceId = null;
       indexWidgetProvider.push('video_chat');
     } else if (partyType == PartyType.group.name) {
-      chatMessageController.current = null;
-      p2pConferenceClientPool.conferenceId = null;
       indexWidgetProvider.push('video_chat');
     } else if (partyType == PartyType.conference.name) {
       if (chatSummary != null) {
         String groupId = chatSummary.peerId!;
         ChatMessage? chatMessage =
-            await chatMessageService.findVideoChatChatMessage(groupId);
+            await chatMessageService.findVideoChatMessage(groupId: groupId);
         if (chatMessage != null) {
           await p2pConferenceClientPool.createP2pConferenceClient(
-              chatSummary:chatSummary, chatMessage);
+              chatSummary: chatSummary, chatMessage);
           indexWidgetProvider.push('video_chat');
         }
       }

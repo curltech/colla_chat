@@ -283,9 +283,6 @@ class P2pConferenceClient extends PeerMediaStreamController {
     _peerConnections.clear();
     peerMediaStreams.clear();
     conferenceChatMessageController.terminate();
-    globalChatMessageController.unregisterReceiver(
-        ChatMessageSubType.chatReceipt.name,
-        conferenceChatMessageController.onReceivedChatReceipt);
     await onPeerMediaStreamOperator(
         PeerMediaStreamOperator.terminate.name, null);
   }
@@ -322,9 +319,6 @@ class P2pConferenceClientPool with ChangeNotifier {
               ConferenceChatMessageController();
           await conferenceChatMessageController.setChatMessage(chatMessage,
               chatSummary: chatSummary);
-          globalChatMessageController.registerReceiver(
-              ChatMessageSubType.chatReceipt.name,
-              conferenceChatMessageController.onReceivedChatReceipt);
           p2pConferenceClient = P2pConferenceClient(
               conferenceChatMessageController: conferenceChatMessageController);
           _p2pConferenceClients[conferenceId] = p2pConferenceClient;
@@ -334,9 +328,6 @@ class P2pConferenceClientPool with ChangeNotifier {
           if (conferenceChatMessageController.chatMessage == null) {
             await conferenceChatMessageController.setChatMessage(chatMessage,
                 chatSummary: chatSummary);
-            globalChatMessageController.registerReceiver(
-                ChatMessageSubType.chatReceipt.name,
-                conferenceChatMessageController.onReceivedChatReceipt);
           }
         }
         this.conferenceId = conferenceId;

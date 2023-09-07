@@ -255,17 +255,41 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         limit: limit);
   }
 
-  Future<ChatMessage?> findVideoChatChatMessage(
-    String groupId,
-  ) async {
-    String where =
-        'receiverPeerId=? and messageType=? and subMessageType=? and groupId=?';
+  ///根据senderPeerId，receiverPeerId，groupId或者messageId查找匹配的视频邀请消息
+  ///如果全部为空，则返回最新的视频邀请消息
+  Future<ChatMessage?> findVideoChatMessage(
+      {String? messageId,
+      String? groupId,
+      String? receiverPeerId,
+      String? senderPeerId}) async {
+    String where = 'messageType=? and subMessageType=?';
     List<Object> whereArgs = [
-      myself.peerId!,
       ChatMessageType.chat.name,
       ChatMessageSubType.videoChat.name,
-      groupId
     ];
+    if (messageId != null) {
+      where = '$where and messageId=? and (senderPeerId=? or receiverPeerId=?)';
+      whereArgs.add(messageId);
+      whereArgs.add(myself.peerId!);
+      whereArgs.add(myself.peerId!);
+    } else if (groupId != null) {
+      where = '$where and groupId=? and (senderPeerId=? or receiverPeerId=?)';
+      whereArgs.add(groupId);
+      whereArgs.add(myself.peerId!);
+      whereArgs.add(myself.peerId!);
+    } else if (senderPeerId != null) {
+      where = '$where and senderPeerId=? and receiverPeerId=?';
+      whereArgs.add(senderPeerId);
+      whereArgs.add(myself.peerId!);
+    } else if (receiverPeerId != null) {
+      where = '$where and senderPeerId=? and receiverPeerId=?';
+      whereArgs.add(myself.peerId!);
+      whereArgs.add(receiverPeerId);
+    } else {
+      where = '$where and (senderPeerId=? or receiverPeerId=?)';
+      whereArgs.add(myself.peerId!);
+      whereArgs.add(myself.peerId!);
+    }
     var chatMessages =
         await find(where: where, whereArgs: whereArgs, orderBy: 'id');
 

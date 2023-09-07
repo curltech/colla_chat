@@ -422,11 +422,6 @@ class ConferenceChatMessageController with ChangeNotifier {
       logger.e('Video chatMessage is null');
       return;
     }
-    String? subMessageType = chatReceipt.subMessageType;
-    if (subMessageType != ChatMessageSubType.chatReceipt.name) {
-      logger.e('chatMessage is not chatReceipt');
-      return;
-    }
     //当前到来的回执是新的
     String messageId = chatReceipt.messageId!;
     //当前的视频通话邀请消息一致
@@ -532,6 +527,8 @@ class ConferenceChatMessageController with ChangeNotifier {
       if (p2pConferenceClient != null) {
         p2pConferenceClient
             .removeAdvancedPeerConnection(advancedPeerConnection);
+      } else {
+        logger.e('p2pConferenceClient:$messageId is not exist');
       }
     } else {
       logger.e('participant $peerId has no peerConnections');
@@ -575,6 +572,9 @@ class ConferenceChatMessageController with ChangeNotifier {
       if (p2pConferenceClient != null) {
         await p2pConferenceClient
             .addAdvancedPeerConnection(advancedPeerConnection);
+        indexWidgetProvider.push('video_chat');
+      } else {
+        logger.e('p2pConferenceClient:$messageId is not exist');
       }
     } else {
       logger.e('participant $peerId has no peerConnections');
@@ -598,6 +598,8 @@ class ConferenceChatMessageController with ChangeNotifier {
       if (p2pConferenceClient != null) {
         await p2pConferenceClient
             .removeAdvancedPeerConnection(advancedPeerConnection);
+      } else {
+        logger.e('p2pConferenceClient:$messageId is not exist');
       }
     } else {
       logger.e('participant $peerId has no peerConnections');
@@ -616,8 +618,12 @@ class ConferenceChatMessageController with ChangeNotifier {
     //创建新的视频会议控制器
     P2pConferenceClient? p2pConferenceClient = p2pConferenceClientPool
         .getP2pConferenceClient(_conference!.conferenceId);
-    await p2pConferenceClient?.join();
-    status = VideoChatStatus.chatting;
+    if (p2pConferenceClient != null) {
+      await p2pConferenceClient.join();
+      status = VideoChatStatus.chatting;
+    } else {
+      logger.e('p2pConferenceClient:${_conference!.conferenceId} is not exist');
+    }
   }
 
   ///自己主动退出会议，发送exit回执

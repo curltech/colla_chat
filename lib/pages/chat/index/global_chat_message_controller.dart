@@ -6,6 +6,7 @@ import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/p2p/chain/action/chat.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/channel_chat_message.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
@@ -13,7 +14,9 @@ import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
@@ -225,6 +228,7 @@ class GlobalChatMessageController with ChangeNotifier {
       case ChatMessageSubType.videoChat:
         break;
       case ChatMessageSubType.chatReceipt:
+        _receiveChatReceipt(chatMessage);
         break;
       case ChatMessageSubType.addFriend:
         linkmanService.receiveModifyLinkman(chatMessage);
@@ -285,6 +289,62 @@ class GlobalChatMessageController with ChangeNotifier {
       }
     }
     notifyListeners();
+  }
+
+  _receiveChatReceipt(ChatMessage chatMessage) async {
+    String? subMessageType = chatMessage.subMessageType;
+    if (subMessageType != ChatMessageSubType.chatReceipt.name) {
+      logger.e('chatMessage is not chatReceipt');
+      return;
+    }
+    String? receiptType = chatMessage.receiptType;
+    if (receiptType == null) {
+      return;
+    }
+    MessageReceiptType? messageReceiptType =
+        StringUtil.enumFromString(MessageReceiptType.values, receiptType);
+    if (messageReceiptType == null) {
+      return;
+    }
+    String peerId = chatMessage.senderPeerId!;
+    String clientId = chatMessage.senderClientId!;
+    String messageId = chatMessage.messageId!;
+    if (messageReceiptType == MessageReceiptType.rejected ||
+        messageReceiptType == MessageReceiptType.terminated ||
+        messageReceiptType == MessageReceiptType.exit) {}
+    if (messageReceiptType == MessageReceiptType.received ||
+        messageReceiptType == MessageReceiptType.accepted ||
+        messageReceiptType == MessageReceiptType.busy ||
+        messageReceiptType == MessageReceiptType.ignored ||
+        messageReceiptType == MessageReceiptType.hold ||
+        messageReceiptType == MessageReceiptType.join) {
+      AdvancedPeerConnection? advancedPeerConnection =
+          await peerConnectionPool.getOne(
+        peerId,
+        clientId: clientId,
+      );
+      if (advancedPeerConnection == null) {
+        logger.e('participant $peerId has no peerConnections');
+        return;
+      }
+      //将发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
+      P2pConferenceClient? p2pConferenceClient =
+          p2pConferenceClientPool.getP2pConferenceClient(messageId);
+      if (p2pConferenceClient == null) {
+        ChatMessage? videoChatMessage =
+            await chatMessageService.findVideoChatMessage(messageId: messageId);
+        if (videoChatMessage != null) {
+          p2pConferenceClient = await p2pConferenceClientPool
+              .createP2pConferenceClient(videoChatMessage);
+          if (p2pConferenceClient != null) {
+            logger.w('create p2pConferenceClient:$messageId successfully');
+          }
+        }
+      }
+    }
+    ConferenceChatMessageController? conferenceChatMessageController =
+        p2pConferenceClientPool.getConferenceChatMessageController(messageId);
+    await conferenceChatMessageController?.onReceivedChatReceipt(chatMessage);
   }
 
   ///收到signal加密初始化消息
