@@ -850,8 +850,9 @@ class BasePeerConnection {
       // logger.i('createOffer and setLocalDescription offer successfully');
       await _sendOffer(offer);
     } catch (e) {
-      makingOffer = false;
       logger.e('createOffer,setLocalDescription and sendOffer failure:$e');
+    } finally {
+      makingOffer = false;
     }
   }
 
@@ -1263,16 +1264,15 @@ class BasePeerConnection {
   /// 主动从连接中移除本地媒体流，然后会激活onRemoveStream
   removeStream(MediaStream stream) async {
     logger.i('removeStream stream:${stream.id} ${stream.ownerTag}');
-    if (status != PeerConnectionStatus.connected) {
+    RTCPeerConnection? peerConnection = _peerConnection;
+    if (peerConnection == null || status != PeerConnectionStatus.connected) {
       logger.e('PeerConnectionStatus is not connected');
       return false;
     }
-    RTCPeerConnection? peerConnection = _peerConnection;
-    if (peerConnection != null) {
-      var tracks = stream.getTracks();
-      for (var track in tracks) {
-        await removeTrack(stream, track);
-      }
+
+    var tracks = stream.getTracks();
+    for (var track in tracks) {
+      await removeTrack(stream, track);
     }
   }
 
@@ -1389,7 +1389,7 @@ class BasePeerConnection {
   ///连接的监听轨道到来的监听器，当远方由轨道来的时候执行
   onRemoteTrack(MediaStream? stream, MediaStreamTrack track) async {
     logger.i('onRemoteTrack event:${track.id}, stream:${stream?.id}');
-    if (peerConnection == null || status != PeerConnectionStatus.connected) {
+    if (peerConnection == null) {
       logger.e('PeerConnectionStatus is not connected');
       return false;
     }
