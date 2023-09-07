@@ -597,7 +597,7 @@ class PeerConnectionPool {
           }
         } else {
           logger
-              .e('advancedPeerConnection error, initiator is unknownClientId');
+              .w('no match advancedPeerConnection, will create new one answer');
         }
       } else {
         bool ignoreOffer = _perfectIgnoreOffer(advancedPeerConnection, signal);

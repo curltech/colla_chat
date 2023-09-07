@@ -931,11 +931,18 @@ class BasePeerConnection {
         isSettingRemoteAnswerPending = false;
         logger.e('setRemoteDescription sdp type:${sdp.type} failure:$e');
       }
-      if (remoteDescription != null && remoteDescription.type == 'offer') {
-        await _createAnswer();
-      } else {
-        logger
-            .e('RemoteDescription sdp is not offer:${remoteDescription!.type}');
+      try {
+        remoteDescription = await peerConnection.getRemoteDescription();
+      } catch (e) {
+        logger.e('peerConnection getRemoteDescription failure:$e');
+      }
+      if (remoteDescription != null) {
+        if (sdp.type == 'offer') {
+          await _createAnswer();
+        } else {
+          logger.w(
+              'RemoteDescription sdp is not offer:${remoteDescription.type}');
+        }
       }
     } else if (signalType == SignalType.error.name) {
       logger.e('received error signal:${webrtcSignal.error}');

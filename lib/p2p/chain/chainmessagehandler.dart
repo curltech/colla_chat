@@ -218,14 +218,15 @@ class ChainMessageHandler {
     //分发到对应注册好的处理器，主要是Receive和Response方法
     if (direct == MsgDirect.Request.name) {
       if (receiveHandler != null) {
-        try {
-          await receiveHandler(chainMessage);
-        } catch (err) {
-          logger.e('receiveHandler chainMessage:$err');
-          if (chainMessage.srcPeerId != null) {
-            //chatAction.chat(err.toString(), chainMessage.srcPeerId!);
-          }
-        }
+        await receiveHandler(chainMessage);
+        // try {
+        //   await receiveHandler(chainMessage);
+        // } catch (err) {
+        //   logger.e('receiveHandler chainMessage:$err');
+        //   if (chainMessage.srcPeerId != null) {
+        //     //chatAction.chat(err.toString(), chainMessage.srcPeerId!);
+        //   }
+        // }
       }
     } else if (direct == MsgDirect.Response.name) {
       if (responseHandler != null) {
