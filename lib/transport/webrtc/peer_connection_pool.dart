@@ -522,26 +522,23 @@ class PeerConnectionPool {
   /// 如果对端发过来的描述类型为offer前提下，如果本地正在生成offer，或者本地的信令状态不为stable，就认为是信令冲突
   bool _perfectIgnoreOffer(AdvancedPeerConnection advancedPeerConnection,
       WebrtcSignal webrtcSignal) {
+    //自己是否正在发出offer
     bool makingOffer = advancedPeerConnection.basePeerConnection.makingOffer;
+    //自己的状态是否稳定
     bool stable = advancedPeerConnection
             .basePeerConnection.peerConnection!.signalingState ==
         RTCSignalingState.RTCSignalingStateStable;
+    //自己是否正在设置远程answer
     bool isSettingRemoteAnswerPending =
         advancedPeerConnection.basePeerConnection.isSettingRemoteAnswerPending;
+    //没有发出offer而且稳定或者正在设置远程answer，表明准备好了
     bool readyForOffer =
         !makingOffer && (stable || isSettingRemoteAnswerPending);
+    //如果接收到offer，而且没有准备好（要么在发出offer，要么不稳定而且正在设置answer），则offer冲突发生
     bool offerCollision = (webrtcSignal.sdp?.type == "offer") && !readyForOffer;
 
+    //如果冲突发生，而且自己不礼貌，则忽略offer，如果自己礼貌，则可以允许设置offer
     bool ignoreOffer = !advancedPeerConnection.polite && offerCollision;
-
-    return ignoreOffer;
-  }
-
-  ///如果是offer信号，同时连接是offer，则发送offer冲突，需要忽略
-  bool _initIgnoreOffer(AdvancedPeerConnection advancedPeerConnection,
-      WebrtcSignal webrtcSignal) {
-    bool ignoreOffer = (webrtcSignal.sdp?.type == "offer") &&
-        (advancedPeerConnection.basePeerConnection.initiator == true);
 
     return ignoreOffer;
   }

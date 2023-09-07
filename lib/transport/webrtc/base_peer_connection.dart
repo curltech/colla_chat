@@ -905,10 +905,10 @@ class BasePeerConnection {
     //对主叫节点来说，sdp应该是answer，如果是offer，可能是对方发起了重新协商，发送了offer
     else if (signalType == SignalType.sdp.name && sdp != null) {
       if (initiator! && sdp.type == 'offer') {
-        logger.e('offer received sdp type which is offer:${sdp.type}');
+        logger.w('offer received sdp type which is offer:${sdp.type}');
       }
       if (!initiator! && sdp.type == 'answer') {
-        logger.e('answer received sdp type which is answer:${sdp.type}');
+        logger.w('answer received sdp type which is answer:${sdp.type}');
       }
       logger.w('initiator:$initiator received sdp type which is ${sdp.type}');
       RTCSessionDescription? remoteDescription;
@@ -918,7 +918,8 @@ class BasePeerConnection {
         logger.e('peerConnection getRemoteDescription failure:$e');
       }
       if (remoteDescription != null) {
-        logger.w('remoteDescription is exist:${remoteDescription.type}');
+        logger.w(
+            'sdp type:${sdp.type}, in same time remoteDescription type:${remoteDescription.type}');
       }
       try {
         isSettingRemoteAnswerPending = sdp.type == "answer";
