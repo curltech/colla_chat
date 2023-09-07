@@ -155,8 +155,12 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     ChatSummary? chatSummary = chatMessageController.chatSummary;
     String? partyType = chatSummary?.partyType;
     if (partyType == PartyType.linkman.name) {
+      chatMessageController.current = null;
+      p2pConferenceClientPool.conferenceId = null;
       indexWidgetProvider.push('video_chat');
     } else if (partyType == PartyType.group.name) {
+      chatMessageController.current = null;
+      p2pConferenceClientPool.conferenceId = null;
       indexWidgetProvider.push('video_chat');
     } else if (partyType == PartyType.conference.name) {
       if (chatSummary != null) {
