@@ -700,6 +700,7 @@ class BasePeerConnection {
     }
     if (state == RTCSignalingState.RTCSignalingStateStable) {
       logger.w('RTCSignalingState is stable:$state');
+      negotiateStatus = NegotiateStatus.negotiated;
     }
     emit(WebrtcEventType.signalingState, state);
   }

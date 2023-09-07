@@ -328,6 +328,16 @@ class P2pConferenceClientPool with ChangeNotifier {
           p2pConferenceClient = P2pConferenceClient(
               conferenceChatMessageController: conferenceChatMessageController);
           _p2pConferenceClients[conferenceId] = p2pConferenceClient;
+        } else {
+          ConferenceChatMessageController conferenceChatMessageController =
+              p2pConferenceClient.conferenceChatMessageController;
+          if (conferenceChatMessageController.chatMessage == null) {
+            await conferenceChatMessageController.setChatMessage(chatMessage,
+                chatSummary: chatSummary);
+            globalChatMessageController.registerReceiver(
+                ChatMessageSubType.chatReceipt.name,
+                conferenceChatMessageController.onReceivedChatReceipt);
+          }
         }
         this.conferenceId = conferenceId;
 
