@@ -946,7 +946,7 @@ class BasePeerConnection {
     }
     if (negotiateStatus == NegotiateStatus.negotiating) {
       logger.e('already negotiating');
-      return;
+      // return;
     }
     //被叫发送重新协商的请求
     logger.w('send signal renegotiate');
@@ -991,6 +991,7 @@ class BasePeerConnection {
       }
       await _sendAnswer(answer);
       await _postIceCandidates();
+      negotiateStatus == NegotiateStatus.negotiated;
     }
   }
 
