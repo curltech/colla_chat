@@ -548,9 +548,6 @@ class PeerConnectionPool {
   /// 接收到信号服务器发来的signal的处理,没有完成，要仔细考虑多终端的情况
   /// 如果发来的是answer,寻找主叫的peerId,必须找到，否则报错，找到后检查clientId
   /// 如果发来的是offer,检查peerId，没找到创建一个新的被叫，如果找到，检查clientId
-  /// @param peerId
-  /// @param connectSessionId
-  /// @param data
   onWebrtcSignal(String peerId, WebrtcSignal signal,
       {required String clientId}) async {
     var signalType = signal.signalType;
@@ -584,11 +581,12 @@ class PeerConnectionPool {
       if (advancedPeerConnection == null) {
         advancedPeerConnection = _getOne(peerId, clientId: unknownClientId);
         if (advancedPeerConnection != null) {
-          bool ignoreOffer = _initIgnoreOffer(advancedPeerConnection, signal);
+          bool ignoreOffer =
+              _perfectIgnoreOffer(advancedPeerConnection, signal);
           if (ignoreOffer) {
-            //主叫而且收到offer，这个连接不能用
+            //刚发出offer而且收到offer，这个连接不能用
             logger.e(
-                'peerId:$peerId, clientId:$clientId offer advancedPeerConnection received offer');
+                'peerId:$peerId, clientId:$clientId making offer true advancedPeerConnection received offer');
             remove(peerId, clientId: clientId);
             advancedPeerConnection = null;
           } else {
@@ -602,7 +600,7 @@ class PeerConnectionPool {
               .e('advancedPeerConnection error, initiator is unknownClientId');
         }
       } else {
-        bool ignoreOffer = _initIgnoreOffer(advancedPeerConnection, signal);
+        bool ignoreOffer = _perfectIgnoreOffer(advancedPeerConnection, signal);
         if (ignoreOffer) {
           logger.e(
               'peerId:$peerId, clientId:$clientId offer advancedPeerConnection received offer');
@@ -632,21 +630,21 @@ class PeerConnectionPool {
       await globalWebrtcEventController.receiveErrorSignal(webrtcEvent);
     }
     //收到被叫的answer，正常情况下能找到合适的主叫
-    else if ((signalType == SignalType.sdp.name &&
-        signal.sdp!.type == 'answer')) {
-      //符合的主叫不存在
-      if (advancedPeerConnection == null) {
-        logger.e(
-            'peerId:$peerId, clientId:$clientId has no offer advancedPeerConnection to match');
-      }
-      //符合的主叫存在，但是已经连接上了，可能在重新协商
-      else if (advancedPeerConnection.status ==
-          PeerConnectionStatus.connected) {
-        // logger.e(
-        //     'peerId:$peerId, clientId:$clientId offer advancedPeerConnection is connected');
-      }
-    }
-    //收到candidate信号或者offer信号
+    // else if ((signalType == SignalType.sdp.name &&
+    //     signal.sdp!.type == 'answer')) {
+    //   //符合的主叫不存在
+    //   if (advancedPeerConnection == null) {
+    //     logger.e(
+    //         'peerId:$peerId, clientId:$clientId has no offer advancedPeerConnection to match');
+    //   }
+    //   //符合的主叫存在，但是已经连接上了，可能在重新协商
+    //   else if (advancedPeerConnection.status ==
+    //       PeerConnectionStatus.connected) {
+    //     // logger.e(
+    //     //     'peerId:$peerId, clientId:$clientId offer advancedPeerConnection is connected');
+    //   }
+    // }
+    //收到candidate信号或者sdp offer信号的时候，如果连接不存在需要创建新的连接
     else if (signalType == SignalType.candidate.name ||
         (signalType == SignalType.sdp.name && signal.sdp!.type == 'offer')) {
       ///如果连接没有创建，则申请许可是否允许创建被叫连接
