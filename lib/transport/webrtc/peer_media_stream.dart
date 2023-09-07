@@ -177,7 +177,7 @@ class PeerMediaStream {
   close() async {
     var mediaStream = this.mediaStream;
     if (mediaStream != null) {
-      if (mediaStream.ownerTag != 'local') {
+      if (!local) {
         logger.i(
             'dispose non local stream:${mediaStream.id} ${mediaStream.ownerTag}');
       } else {

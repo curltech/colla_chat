@@ -643,8 +643,8 @@ class PeerConnectionPool {
       //符合的主叫存在，但是已经连接上了，可能在重新协商
       else if (advancedPeerConnection.status ==
           PeerConnectionStatus.connected) {
-        logger.e(
-            'peerId:$peerId, clientId:$clientId offer advancedPeerConnection is connected');
+        // logger.e(
+        //     'peerId:$peerId, clientId:$clientId offer advancedPeerConnection is connected');
       }
     }
     //收到candidate信号或者offer信号

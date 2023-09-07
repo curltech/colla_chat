@@ -248,8 +248,12 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
           p2pConferenceClientPool.getP2pConferenceClient(conferenceId);
       if (p2pConferenceClient != null) {
         //从webrtc连接中移除
-        await p2pConferenceClient.removeLocalPeerMediaStream([peerMediaStream]);
-        await p2pConferenceClient.close(peerMediaStream);
+        if (peerMediaStream.local) {
+          await p2pConferenceClient
+              .removeLocalPeerMediaStream([peerMediaStream]);
+        } else {
+          await p2pConferenceClient.close(peerMediaStream);
+        }
       } else {
         logger.e('RemotePeerMediaStreamController is null');
       }
