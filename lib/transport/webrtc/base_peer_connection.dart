@@ -948,10 +948,6 @@ class BasePeerConnection {
       logger.e('already negotiating');
       return;
     }
-    if (status != PeerConnectionStatus.connected) {
-      logger.e('answer renegotiate only connected');
-      return;
-    }
     //被叫发送重新协商的请求
     logger.w('send signal renegotiate');
     emit(WebrtcEventType.signal,
