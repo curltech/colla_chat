@@ -456,7 +456,6 @@ class BasePeerConnection {
       {List<MediaStream> localStreams = const []}) async {
     this.initiator = initiator;
     logger.i('init BasePeerConnection initiator:$initiator');
-    start = DateTime.now().millisecondsSinceEpoch;
     id = await cryptoGraphy.getRandomAsciiString(length: 8);
     aesKey = extension.aesKey;
     if (initiator) {
@@ -756,6 +755,7 @@ class BasePeerConnection {
       return;
     }
     logger.w('start negotiate');
+    start = DateTime.now().millisecondsSinceEpoch;
     await _createOffer();
   }
 
@@ -900,8 +900,7 @@ class BasePeerConnection {
     else if (signalType == SignalType.sdp.name && sdp != null) {
       if (initiator! && sdp.type == 'offer') {
         logger.e('offer received sdp type offer');
-        // initiator = false;
-        return;
+        initiator = false;
       }
       RTCSessionDescription? remoteDescription;
       try {

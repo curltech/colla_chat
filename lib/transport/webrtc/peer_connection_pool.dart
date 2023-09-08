@@ -433,8 +433,8 @@ class PeerConnectionPool {
       if (peerConnections != null && peerConnections.isNotEmpty) {
         List<String> removedClientIds = [];
         for (AdvancedPeerConnection peerConnection in peerConnections.values) {
-          if (peerConnection.state ==
-              RTCIceConnectionState.RTCIceConnectionStateClosed) {
+          if (peerConnection.state !=
+              RTCIceConnectionState.RTCIceConnectionStateConnected) {
             var start = peerConnection.basePeerConnection.start;
             if (start == null) {
               removedClientIds.add(peerConnection.clientId);
