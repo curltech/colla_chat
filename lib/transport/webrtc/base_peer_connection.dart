@@ -624,7 +624,7 @@ class BasePeerConnection {
       logger.e('Ice connection failure:$state');
 
       ///尝试重新协商
-      await negotiate();
+      await restartIce();
     }
     if (state == RTCIceConnectionState.RTCIceConnectionStateClosed) {
       logger.e('Ice connection closed:$state');
