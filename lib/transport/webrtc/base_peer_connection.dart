@@ -752,7 +752,7 @@ class BasePeerConnection {
     logger.w('onRenegotiationNeeded event');
 
     ///在启动restartIce或者流有变化的时候，重新协商
-    _negotiate();
+    negotiate();
   }
 
   //数据通道状态事件
@@ -775,7 +775,8 @@ class BasePeerConnection {
 
   ///实际开始执行协商过程
   ///被叫不能在第一次的时候主动发起协议过程，主叫或者被叫不在第一次的时候可以发起协商过程
-  _negotiate() async {
+  ///一般情况下系统
+  negotiate() async {
     if (initiator == null) {
       logger.e('BasePeerConnection is not init');
       return;

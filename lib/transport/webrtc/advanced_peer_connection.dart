@@ -25,8 +25,6 @@ class AdvancedPeerConnection {
   String clientId;
   String name;
 
-
-
   Map<String, List<Future<void> Function(WebrtcEvent event)>> fnsm = {};
   final Lock _fnsmLock = Lock();
 
@@ -207,6 +205,10 @@ class AdvancedPeerConnection {
     });
 
     return result;
+  }
+
+  negotiate() async {
+    await basePeerConnection.negotiate();
   }
 
   restartIce() async {
