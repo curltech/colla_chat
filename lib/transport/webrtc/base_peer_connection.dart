@@ -1101,6 +1101,16 @@ class BasePeerConnection {
     if (signalType == SignalType.renegotiate.name) {
       logger
           .e('answer received renegotiate signal:${webrtcSignal.renegotiate}');
+      if (RenegotiateType.request.name == webrtcSignal.renegotiate) {
+        if (negotiateStatus != NegotiateStatus.negotiating) {
+          initiator = false;
+          emit(
+              WebrtcEventType.signal,
+              WebrtcSignal('renegotiate',
+                  renegotiate: RenegotiateType.agree.name,
+                  extension: extension));
+        }
+      }
       if (RenegotiateType.agree.name == webrtcSignal.renegotiate) {
         initiator = true;
         await restartIce();
