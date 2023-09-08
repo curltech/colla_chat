@@ -957,6 +957,7 @@ class BasePeerConnection {
     else if (signalType == SignalType.sdp.name && sdp != null) {
       if (initiator! && sdp.type == 'offer') {
         logger.e('offer received sdp type offer');
+        // initiator = false;
         return;
       }
       RTCSessionDescription? remoteDescription;
