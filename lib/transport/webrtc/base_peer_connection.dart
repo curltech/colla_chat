@@ -954,8 +954,13 @@ class BasePeerConnection {
       }
       try {
         isSettingRemoteAnswerPending = sdp.type == "answer";
-        logger.i(
-            'before setRemoteDescription, signalingState:${peerConnection.signalingState}');
+        RTCSignalingState? signalingState = peerConnection.signalingState;
+        if (signalingState ==
+                RTCSignalingState.RTCSignalingStateHaveLocalOffer &&
+            sdp.type == 'offer') {
+          logger.e('peerConnection haveLocalOffer, will be set offer');
+        }
+
         await peerConnection.setRemoteDescription(sdp);
         isSettingRemoteAnswerPending = false;
         logger.i('setRemoteDescription sdp type:${sdp.type} successfully');
