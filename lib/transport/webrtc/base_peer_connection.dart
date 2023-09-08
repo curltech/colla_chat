@@ -753,7 +753,8 @@ class BasePeerConnection {
       logger.e('PeerConnection closed');
       return;
     }
-    if (signalingState != RTCSignalingState.RTCSignalingStateStable) {
+    if (signalingState != null &&
+        signalingState != RTCSignalingState.RTCSignalingStateStable) {
       logger.w('PeerConnectionStatus already negotiating');
       return;
     }
@@ -856,7 +857,8 @@ class BasePeerConnection {
         webrtcSignal.renegotiate != null) {
       logger.i('receive renegotiate signal:${webrtcSignal.renegotiate}');
       if (RenegotiateType.request.name == webrtcSignal.renegotiate) {
-        if (signalingState == RTCSignalingState.RTCSignalingStateStable) {
+        if (signalingState == null ||
+            signalingState == RTCSignalingState.RTCSignalingStateStable) {
           initiator = false;
           emit(
               WebrtcEventType.signal,
@@ -1034,7 +1036,8 @@ class BasePeerConnection {
       logger
           .w('answer received renegotiate signal:${webrtcSignal.renegotiate}');
       if (RenegotiateType.request.name == webrtcSignal.renegotiate) {
-        if (signalingState == RTCSignalingState.RTCSignalingStateStable) {
+        if (signalingState == null ||
+            signalingState == RTCSignalingState.RTCSignalingStateStable) {
           initiator = false;
           emit(
               WebrtcEventType.signal,
