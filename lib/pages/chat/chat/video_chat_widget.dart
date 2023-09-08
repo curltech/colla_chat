@@ -7,6 +7,7 @@ import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_co
 import 'package:colla_chat/pages/chat/video/local_video_widget.dart';
 import 'package:colla_chat/pages/chat/video/remote_video_widget.dart';
 import 'package:colla_chat/pages/chat/video/video_conference_pool_widget.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
@@ -50,7 +51,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   ValueNotifier<ConferenceChatMessageController?> videoChatMessageController =
       ValueNotifier<ConferenceChatMessageController?>(
           p2pConferenceClientPool.conferenceChatMessageController);
-  ChatSummary chatSummary = chatMessageController.chatSummary!;
+  ChatSummary? chatSummary;
   SwiperController swiperController = SwiperController();
   int index = 0;
 
@@ -63,6 +64,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
       widget.overlayEntry = null;
     }
     p2pConferenceClientPool.addListener(_update);
+    chatSummary = chatMessageController.chatSummary;
   }
 
   _update() {
@@ -166,17 +168,21 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
         builder: (BuildContext context,
             ConferenceChatMessageController? videoChatMessageController,
             Widget? child) {
-          var chatSummary = this.chatSummary;
-          var peerName = '';
-          peerName = chatSummary.name!;
           String title = widget.title;
-          if (chatSummary.partyType == PartyType.conference.name) {
+          ChatSummary? chatSummary = this.chatSummary;
+          if (chatSummary == null) {
+            logger.e('chatSummary is null');
+          }
+          String? peerName;
+          peerName = chatSummary?.name;
+          peerName ??= '';
+          if (chatSummary?.partyType == PartyType.conference.name) {
             //title = 'VideoConference';
           }
           title = '${AppLocalizations.t(title)} - $peerName';
           if (videoChatMessageController != null &&
               videoChatMessageController.conferenceName != null &&
-              chatSummary.partyType != PartyType.conference.name) {
+              chatSummary?.partyType != PartyType.conference.name) {
             title = '$title${videoChatMessageController.conferenceName}';
           }
 
