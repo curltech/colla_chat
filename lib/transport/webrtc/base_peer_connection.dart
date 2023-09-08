@@ -958,7 +958,8 @@ class BasePeerConnection {
         if (signalingState ==
                 RTCSignalingState.RTCSignalingStateHaveLocalOffer &&
             sdp.type == 'offer') {
-          logger.e('peerConnection haveLocalOffer, will be set offer');
+          logger.e(
+              'peerConnection haveLocalOffer, setRemoteDescription want to set offer');
         }
 
         await peerConnection.setRemoteDescription(sdp);
