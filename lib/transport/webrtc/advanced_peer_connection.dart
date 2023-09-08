@@ -207,6 +207,10 @@ class AdvancedPeerConnection {
     return result;
   }
 
+  renegotiate() async {
+    await basePeerConnection.negotiate();
+  }
+
   restartIce() async {
     await basePeerConnection.restartIce();
   }
@@ -219,8 +223,8 @@ class AdvancedPeerConnection {
     return basePeerConnection.state;
   }
 
-  NegotiateStatus get negotiateStatus {
-    return basePeerConnection.negotiateStatus;
+  RTCSignalingState? get signalingState {
+    return basePeerConnection.signalingState;
   }
 
   onAddRemoteStream(MediaStream stream) async {

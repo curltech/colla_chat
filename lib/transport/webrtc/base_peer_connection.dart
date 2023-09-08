@@ -231,12 +231,6 @@ final Map<String, dynamic> sdpConstraints = {
   "optional": [],
 };
 
-enum NegotiateStatus {
-  none,
-  negotiating, //协商过程中
-  negotiated,
-}
-
 ///支持的音频编码
 const List<String> audioCodecList = <String>[
   'OPUS',
@@ -259,7 +253,6 @@ class BasePeerConnection {
 
   //webrtc连接，在失活状态下为空，init后不为空
   RTCPeerConnection? _peerConnection;
-  NegotiateStatus _negotiateStatus = NegotiateStatus.none;
 
   //暂存candidate
   final List<RTCIceCandidate> _pendingIceCandidates = [];
@@ -593,14 +586,8 @@ class BasePeerConnection {
     return _peerConnection?.iceConnectionState;
   }
 
-  NegotiateStatus get negotiateStatus {
-    return _negotiateStatus;
-  }
-
-  set negotiateStatus(NegotiateStatus negotiateStatus) {
-    logger.w(
-        'negotiateStatus from oldStatus: $_negotiateStatus, newStatus: $negotiateStatus');
-    _negotiateStatus = negotiateStatus;
+  RTCSignalingState? get signalingState {
+    return _peerConnection?.signalingState;
   }
 
   Future<void> connected() async {
@@ -623,7 +610,6 @@ class BasePeerConnection {
   ///ice连接状态事件
   onIceConnectionState(RTCIceConnectionState state) async {
     if (state == RTCIceConnectionState.RTCIceConnectionStateConnected) {
-      negotiateStatus = NegotiateStatus.none;
       connected();
     }
     if (state == RTCIceConnectionState.RTCIceConnectionStateDisconnected) {
@@ -654,7 +640,6 @@ class BasePeerConnection {
     logger.w('RTCSignalingState:$state');
     if (state == RTCSignalingState.RTCSignalingStateStable) {
       logger.w('RTCSignalingState is stable:$state');
-      negotiateStatus = NegotiateStatus.negotiated;
     }
     emit(WebrtcEventType.signalingState, state);
   }
@@ -702,7 +687,7 @@ class BasePeerConnection {
     logger.w('onRenegotiationNeeded event');
 
     ///在启动restartIce或者流有变化的时候，重新协商
-    _negotiate();
+    negotiate();
   }
 
   //数据通道状态事件
@@ -722,7 +707,7 @@ class BasePeerConnection {
   ///实际开始执行协商过程
   ///被叫不能在第一次的时候主动发起协议过程，主叫或者被叫不在第一次的时候可以发起协商过程
   ///一般情况下系统
-  _negotiate() async {
+  negotiate() async {
     if (initiator == null) {
       logger.e('BasePeerConnection is not init');
       return;
@@ -768,12 +753,11 @@ class BasePeerConnection {
       logger.e('PeerConnection closed');
       return;
     }
-    if (negotiateStatus == NegotiateStatus.negotiating) {
+    if (signalingState != RTCSignalingState.RTCSignalingStateStable) {
       logger.w('PeerConnectionStatus already negotiating');
       return;
     }
     logger.w('Start negotiate');
-    negotiateStatus = NegotiateStatus.negotiating;
     await _createOffer();
   }
 
@@ -872,7 +856,7 @@ class BasePeerConnection {
         webrtcSignal.renegotiate != null) {
       logger.i('receive renegotiate signal:${webrtcSignal.renegotiate}');
       if (RenegotiateType.request.name == webrtcSignal.renegotiate) {
-        if (negotiateStatus != NegotiateStatus.negotiating) {
+        if (signalingState == RTCSignalingState.RTCSignalingStateStable) {
           initiator = false;
           emit(
               WebrtcEventType.signal,
@@ -938,12 +922,10 @@ class BasePeerConnection {
         if (remoteDescription != null) {
           if (sdp.type == 'answer') {
             await _postIceCandidates();
-            negotiateStatus == NegotiateStatus.negotiated;
           }
         }
       } catch (e) {
         isSettingRemoteAnswerPending = false;
-        negotiateStatus == NegotiateStatus.negotiated;
         logger.e('setRemoteDescription sdp type:${sdp.type} failure:$e');
       }
     } else if (signalType == SignalType.error.name) {
@@ -962,10 +944,6 @@ class BasePeerConnection {
         _peerConnection!.iceConnectionState ==
             RTCIceConnectionState.RTCIceConnectionStateClosed) {
       logger.e('PeerConnection closed');
-      return;
-    }
-    if (negotiateStatus == NegotiateStatus.negotiating) {
-      logger.e('already negotiating');
       return;
     }
     //被叫发送重新协商的请求
@@ -1048,7 +1026,6 @@ class BasePeerConnection {
       return;
     }
     RTCPeerConnection peerConnection = _peerConnection!;
-    negotiateStatus = NegotiateStatus.negotiating;
     String signalType = webrtcSignal.signalType;
     var candidates = webrtcSignal.candidates;
     var sdp = webrtcSignal.sdp;
@@ -1057,7 +1034,7 @@ class BasePeerConnection {
       logger
           .w('answer received renegotiate signal:${webrtcSignal.renegotiate}');
       if (RenegotiateType.request.name == webrtcSignal.renegotiate) {
-        if (negotiateStatus != NegotiateStatus.negotiating) {
+        if (signalingState == RTCSignalingState.RTCSignalingStateStable) {
           initiator = false;
           emit(
               WebrtcEventType.signal,
@@ -1631,8 +1608,6 @@ class BasePeerConnection {
     } catch (err) {
       logger.e('close peerConnection err:$err');
     }
-
-    negotiateStatus = NegotiateStatus.none;
     logger.i('PeerConnection closed');
     emit(WebrtcEventType.closed, this);
   }
