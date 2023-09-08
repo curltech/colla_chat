@@ -46,13 +46,13 @@ class P2pConferenceClient extends PeerMediaStreamController {
 
   negotiate({AdvancedPeerConnection? peerConnection}) async {
     if (peerConnection != null) {
-      await peerConnection.negotiate();
+      await peerConnection.restartIce();
     } else {
       List<AdvancedPeerConnection> peerConnections = [
         ..._peerConnections.values
       ];
       for (AdvancedPeerConnection peerConnection in peerConnections) {
-        await peerConnection.negotiate();
+        await peerConnection.restartIce();
       }
     }
   }
