@@ -215,8 +215,8 @@ class AdvancedPeerConnection {
     return basePeerConnection.dataChannelOpen;
   }
 
-  PeerConnectionStatus get status {
-    return basePeerConnection.status;
+  RTCIceConnectionState? get state {
+    return basePeerConnection.state;
   }
 
   NegotiateStatus get negotiateStatus {
@@ -225,8 +225,8 @@ class AdvancedPeerConnection {
 
   onAddRemoteStream(MediaStream stream) async {
     logger.i('streamId: ${stream.id} onAddRemoteStream');
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
+    if (state == RTCIceConnectionState.RTCIceConnectionStateClosed) {
+      logger.e('PeerConnection closed');
       return;
     }
     var webrtcEvent = WebrtcEvent(peerId,
@@ -303,8 +303,8 @@ class AdvancedPeerConnection {
   /// 主动从连接中移除本地媒体流，然后会激活onRemoveStream
   removeStream(PeerMediaStream peerMediaStream) async {
     logger.i('removeStream ${peerMediaStream.id}');
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
+    if (state == RTCIceConnectionState.RTCIceConnectionStateClosed) {
+      logger.e('PeerConnection closed');
       return;
     }
     var streamId = peerMediaStream.id;
@@ -323,8 +323,8 @@ class AdvancedPeerConnection {
   ///把渲染器的流克隆，然后可以当作本地流加入到其他连接中，用于转发
   Future<MediaStream?> cloneStream(PeerMediaStream peerMediaStream) async {
     logger.i('cloneStream ${peerMediaStream.id}');
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
+    if (state == RTCIceConnectionState.RTCIceConnectionStateClosed) {
+      logger.e('PeerConnection closed');
       return null;
     }
     var streamId = peerMediaStream.id;
@@ -347,7 +347,8 @@ class AdvancedPeerConnection {
   }
 
   bool get connected {
-    return basePeerConnection.status == PeerConnectionStatus.connected;
+    return basePeerConnection.state ==
+        RTCIceConnectionState.RTCIceConnectionStateConnected;
   }
 
   ///收到数据，先解密，然后转换成还原utf-8字符串，再将json字符串变成map对象

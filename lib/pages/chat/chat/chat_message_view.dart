@@ -34,6 +34,7 @@ import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:screenshot_callback/screenshot_callback.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
+import 'package:webrtc_interface/webrtc_interface.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:no_screenshot/no_screenshot.dart';
 
@@ -74,8 +75,8 @@ class ChatMessageView extends StatefulWidget with TileDataMixin {
 
 class _ChatMessageViewState extends State<ChatMessageView>
     with WidgetsBindingObserver, WindowListener {
-  final ValueNotifier<PeerConnectionStatus> _peerConnectionStatus =
-      ValueNotifier<PeerConnectionStatus>(PeerConnectionStatus.none);
+  final ValueNotifier<RTCIceConnectionState?> _peerConnectionState =
+      ValueNotifier<RTCIceConnectionState?>(null);
   final ValueNotifier<ChatSummary?> _chatSummary =
       ValueNotifier<ChatSummary?>(chatMessageController.chatSummary);
   final ValueNotifier<double> chatMessageHeight = ValueNotifier<double>(0);
@@ -220,15 +221,16 @@ class _ChatMessageViewState extends State<ChatMessageView>
         AdvancedPeerConnection? advancedPeerConnection =
             await peerConnectionPool.createOffer(peerId);
         if (advancedPeerConnection != null) {
-          _peerConnectionStatus.value = advancedPeerConnection.status;
+          _peerConnectionState.value = advancedPeerConnection.state;
         } else {
-          _peerConnectionStatus.value = PeerConnectionStatus.none;
+          _peerConnectionState.value = null;
         }
       } else {
         for (AdvancedPeerConnection advancedPeerConnection
             in advancedPeerConnections) {
-          _peerConnectionStatus.value = advancedPeerConnection.status;
-          if (advancedPeerConnection.status == PeerConnectionStatus.connected) {
+          _peerConnectionState.value = advancedPeerConnection.state;
+          if (advancedPeerConnection.state ==
+              RTCIceConnectionState.RTCIceConnectionStateConnected) {
             break;
           }
         }
@@ -253,15 +255,16 @@ class _ChatMessageViewState extends State<ChatMessageView>
   }
 
   Future<void> _updatePeerConnectionStatus(WebrtcEvent event) async {
-    PeerConnectionStatus status = event.data;
-    var oldStatus = _peerConnectionStatus.value;
-    if (oldStatus != status) {
-      _peerConnectionStatus.value = status;
-      if (_peerConnectionStatus.value == PeerConnectionStatus.connected) {
+    RTCIceConnectionState? state = event.data;
+    RTCIceConnectionState? oldState = _peerConnectionState.value;
+    if (oldState != state) {
+      _peerConnectionState.value = state;
+      if (_peerConnectionState.value ==
+          RTCIceConnectionState.RTCIceConnectionStateConnected) {
         if (mounted) {
           DialogUtil.info(context,
               content:
-                  '${AppLocalizations.t('PeerConnection status was changed from ')}${oldStatus.name}${AppLocalizations.t(' to ')}${status.name}');
+                  '${AppLocalizations.t('PeerConnection status was changed from ')}${oldState?.name}${AppLocalizations.t(' to ')}${state?.name}');
         }
       } else {
         if (mounted) {
@@ -339,24 +342,39 @@ class _ChatMessageViewState extends State<ChatMessageView>
     List<Widget> rightWidgets = [];
     if (partyType == PartyType.linkman.name) {
       var peerConnectionStatusWidget = ValueListenableBuilder(
-          valueListenable: _peerConnectionStatus,
+          valueListenable: _peerConnectionState,
           builder: (context, value, child) {
-            Widget widget = const Icon(
-              Icons.wifi,
-              color: Colors.white,
-            );
-            if (_peerConnectionStatus.value != PeerConnectionStatus.connected) {
+            Widget widget = Tooltip(
+                message: AppLocalizations.t('Webrtc state'),
+                child: const Icon(
+                  Icons.wifi,
+                  color: Colors.white,
+                ));
+
+            if (_peerConnectionState.value !=
+                RTCIceConnectionState.RTCIceConnectionStateConnected) {
+              String? stateText = _peerConnectionState.value?.name;
+              stateText = stateText?.substring(21);
               widget = IconButton(
-                  onPressed: () {
-                    _createPeerConnection();
-                  },
-                  icon: const Icon(
-                    Icons.wifi_off,
-                    color: Colors.red,
-                  ));
+                onPressed: () {
+                  _createPeerConnection();
+                },
+                icon: const Icon(
+                  Icons.wifi_off,
+                  color: Colors.red,
+                ),
+              );
+              if (stateText != null) {
+                widget = Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      widget,
+                      CommonAutoSizeText(stateText,
+                          style: const TextStyle(fontSize: 12))
+                    ]);
+              }
             }
-            return Tooltip(
-                message: AppLocalizations.t('Webrtc status'), child: widget);
+            return widget;
           });
       rightWidgets.add(peerConnectionStatusWidget);
       rightWidgets.add(const SizedBox(
@@ -392,14 +410,13 @@ class _ChatMessageViewState extends State<ChatMessageView>
             String name = chatSummary.name!;
             String title = AppLocalizations.t(name);
             return AppBarView(
-                titleWidget: CommonAutoSizeText(title),
+                title: title,
                 withLeading: widget.withLeading,
                 rightWidgets: _buildRightWidgets(context, chatSummary),
                 child: chatMessageWidget);
           }
           return AppBarView(
-              titleWidget: CommonAutoSizeText(
-                  AppLocalizations.t('No current chatSummary')),
+              title: AppLocalizations.t('No current chatSummary'),
               withLeading: widget.withLeading,
               child: chatMessageWidget);
         });

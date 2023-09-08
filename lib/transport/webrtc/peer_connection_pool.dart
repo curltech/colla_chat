@@ -433,8 +433,8 @@ class PeerConnectionPool {
       if (peerConnections != null && peerConnections.isNotEmpty) {
         List<String> removedClientIds = [];
         for (AdvancedPeerConnection peerConnection in peerConnections.values) {
-          if (peerConnection.basePeerConnection.status !=
-              PeerConnectionStatus.connected) {
+          if (peerConnection.state ==
+              RTCIceConnectionState.RTCIceConnectionStateClosed) {
             var start = peerConnection.basePeerConnection.start;
             if (start == null) {
               removedClientIds.add(peerConnection.clientId);
@@ -656,7 +656,8 @@ class PeerConnectionPool {
     if (peerConnections.isNotEmpty) {
       List<Future<bool>> ps = [];
       for (var peerConnection in peerConnections) {
-        if (peerConnection.status == PeerConnectionStatus.connected) {
+        if (peerConnection.state ==
+            RTCIceConnectionState.RTCIceConnectionStateConnected) {
           Future<bool> p = peerConnection.send(data);
           //logger.w('send signal');
           ps.add(p);
@@ -756,13 +757,14 @@ class PeerConnectionPool {
   }
 
   ///获取连接状态
-  PeerConnectionStatus status(String peerId, {String? clientId}) {
-    var status = PeerConnectionStatus.none;
+  RTCIceConnectionState? state(String peerId, {String? clientId}) {
+    RTCIceConnectionState? state;
     if (clientId == null) {
       var advancedPeerConnections = _get(peerId);
       for (var advancedPeerConnection in advancedPeerConnections) {
-        if (advancedPeerConnection.status == PeerConnectionStatus.connected) {
-          status = PeerConnectionStatus.connected;
+        if (advancedPeerConnection.state ==
+            RTCIceConnectionState.RTCIceConnectionStateConnected) {
+          state = RTCIceConnectionState.RTCIceConnectionStateConnected;
           break;
         }
       }
@@ -770,11 +772,11 @@ class PeerConnectionPool {
       AdvancedPeerConnection? advancedPeerConnection =
           _getOne(peerId, clientId: clientId);
       if (advancedPeerConnection != null) {
-        status = advancedPeerConnection.status;
+        state = advancedPeerConnection.state;
       }
     }
 
-    return status;
+    return state;
   }
 }
 
