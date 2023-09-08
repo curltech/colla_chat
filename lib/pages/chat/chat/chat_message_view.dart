@@ -189,6 +189,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
     String partyType = chatSummary.partyType!;
     peerConnectionPool.registerWebrtcEvent(
         peerId, WebrtcEventType.state, _updatePeerConnectionState);
+    peerConnectionPool.registerWebrtcEvent(
+        peerId, WebrtcEventType.closed, _updatePeerConnectionState);
     if (partyType == PartyType.linkman.name) {
       await _createLinkmanPeerConnection(peerId);
     } else if (partyType == PartyType.group.name) {
@@ -255,22 +257,32 @@ class _ChatMessageViewState extends State<ChatMessageView>
   }
 
   Future<void> _updatePeerConnectionState(WebrtcEvent event) async {
-    RTCPeerConnectionState? state = event.data;
-    RTCPeerConnectionState? oldState = _peerConnectionState.value;
-    if (oldState != state) {
-      _peerConnectionState.value = state;
-      if (_peerConnectionState.value !=
-          RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
-        if (mounted) {
-          DialogUtil.info(context,
-              content:
-                  '${AppLocalizations.t('PeerConnection status was changed from ')}${oldState?.name}${AppLocalizations.t(' to ')}${state?.name}');
-        }
-      } else {
-        if (mounted) {
-          // DialogUtil.error(context,
-          //     content:
-          //         '${AppLocalizations.t('PeerConnection status was changed from ')}${oldStatus.name}${AppLocalizations.t(' to ')}${status.name}');
+    WebrtcEventType eventType = event.eventType;
+    if (eventType == WebrtcEventType.closed) {
+      _peerConnectionState.value =
+          RTCPeerConnectionState.RTCPeerConnectionStateClosed;
+      if (mounted) {
+        DialogUtil.info(context,
+            content: AppLocalizations.t('PeerConnection was closed'));
+      }
+    } else if (eventType == WebrtcEventType.state) {
+      RTCPeerConnectionState? state = event.data;
+      RTCPeerConnectionState? oldState = _peerConnectionState.value;
+      if (oldState != state) {
+        _peerConnectionState.value = state;
+        if (_peerConnectionState.value !=
+            RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
+          if (mounted) {
+            DialogUtil.info(context,
+                content:
+                    '${AppLocalizations.t('PeerConnection status was changed from ')}${oldState?.name}${AppLocalizations.t(' to ')}${state?.name}');
+          }
+        } else {
+          if (mounted) {
+            // DialogUtil.error(context,
+            //     content:
+            //         '${AppLocalizations.t('PeerConnection status was changed from ')}${oldStatus.name}${AppLocalizations.t(' to ')}${status.name}');
+          }
         }
       }
     }
@@ -364,8 +376,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
                       RTCPeerConnectionState
                           .RTCPeerConnectionStateDisconnected) {
                 widget = const Icon(
-                  Icons.wifi,
-                  color: Colors.grey,
+                  Icons.wifi_off,
+                  color: Colors.red,
                 );
               } else if (_peerConnectionState.value ==
                   RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
@@ -446,6 +458,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
     if (chatSummary != null) {
       peerConnectionPool.unregisterWebrtcEvent(chatSummary.peerId!,
           WebrtcEventType.state, _updatePeerConnectionState);
+      peerConnectionPool.unregisterWebrtcEvent(chatSummary.peerId!,
+          WebrtcEventType.closed, _updatePeerConnectionState);
     }
     WidgetsBinding.instance.removeObserver(this);
     windowManager.removeListener(this);
