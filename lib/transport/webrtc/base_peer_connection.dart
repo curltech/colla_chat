@@ -879,6 +879,11 @@ class BasePeerConnection {
               WebrtcSignal('renegotiate',
                   renegotiate: RenegotiateType.agree.name,
                   extension: extension));
+          logger.w(
+              'answer sent agree renegotiate signal:${webrtcSignal.renegotiate}');
+        } else {
+          logger.w(
+              'answer negotiating, can not agree renegotiate signal:${webrtcSignal.renegotiate}');
         }
         // else {
         //   emit(
@@ -1059,13 +1064,19 @@ class BasePeerConnection {
               WebrtcSignal('renegotiate',
                   renegotiate: RenegotiateType.agree.name,
                   extension: extension));
+          logger.w(
+              'answer sent agree renegotiate signal:${webrtcSignal.renegotiate}');
         }
       }
       if (RenegotiateType.agree.name == webrtcSignal.renegotiate) {
         initiator = true;
+        logger.w(
+            'answer received agree renegotiate signal:${webrtcSignal.renegotiate}');
         await restartIce();
       } else if (RenegotiateType.disagree.name == webrtcSignal.renegotiate) {
         initiator = false;
+        logger.w(
+            'answer received disagree renegotiate signal:${webrtcSignal.renegotiate}');
       }
       return;
     }
