@@ -236,18 +236,26 @@ class ConferenceChatMessageController with ChangeNotifier {
   }
 
   playAudio(String filename, bool loopMode) {
-    _audioPlayer.setLoopMode(loopMode);
-    _audioPlayer.play(filename);
+    try {
+      _audioPlayer.setLoopMode(loopMode);
+      _audioPlayer.play(filename);
+    } catch (e) {
+      logger.e('audioPlayer play failure');
+    }
   }
 
   stopAudio({String? filename, bool loopMode = false}) async {
-    await _audioPlayer.stop();
-    await _audioPlayer.release();
-    if (filename != null) {
-      _audioPlayer.setLoopMode(loopMode);
-      _audioPlayer.play(filename);
+    try {
       await _audioPlayer.stop();
       await _audioPlayer.release();
+      if (filename != null) {
+        _audioPlayer.setLoopMode(loopMode);
+        _audioPlayer.play(filename);
+        await _audioPlayer.stop();
+        await _audioPlayer.release();
+      }
+    } catch (e) {
+      logger.e('audioPlayer stop failure');
     }
   }
 
