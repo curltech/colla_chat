@@ -51,7 +51,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   ValueNotifier<ConferenceChatMessageController?> videoChatMessageController =
       ValueNotifier<ConferenceChatMessageController?>(
           p2pConferenceClientPool.conferenceChatMessageController);
-  ChatSummary? chatSummary;
+  ChatSummary chatSummary = chatMessageController.chatSummary!;
   SwiperController swiperController = SwiperController();
   int index = 0;
 
@@ -64,7 +64,6 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
       widget.overlayEntry = null;
     }
     p2pConferenceClientPool.addListener(_update);
-    chatSummary = chatMessageController.chatSummary;
   }
 
   _update() {
@@ -169,20 +168,17 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
             ConferenceChatMessageController? videoChatMessageController,
             Widget? child) {
           String title = widget.title;
-          ChatSummary? chatSummary = this.chatSummary;
-          if (chatSummary == null) {
-            logger.e('chatSummary is null');
-          }
+          ChatSummary chatSummary = this.chatSummary;
           String? peerName;
-          peerName = chatSummary?.name;
+          peerName = chatSummary.name;
           peerName ??= '';
-          if (chatSummary?.partyType == PartyType.conference.name) {
+          if (chatSummary.partyType == PartyType.conference.name) {
             //title = 'VideoConference';
           }
           title = '${AppLocalizations.t(title)} - $peerName';
           if (videoChatMessageController != null &&
               videoChatMessageController.conferenceName != null &&
-              chatSummary?.partyType != PartyType.conference.name) {
+              chatSummary.partyType != PartyType.conference.name) {
             title = '$title${videoChatMessageController.conferenceName}';
           }
 
