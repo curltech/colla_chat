@@ -268,6 +268,7 @@ class BasePeerConnection {
   bool makingOffer = false; //主叫是否发出offer信号
   bool isSettingRemoteAnswerPending =
       false; //远程Answer是否等待设置，接收到answer信号时，设置为true，设置完设置为false
+  bool ignoreOffer = false; //是否忽略offer冲突
 
   //数据通道的状态是否打开
   bool dataChannelOpen = false;
@@ -876,11 +877,40 @@ class BasePeerConnection {
     // logger.i('end sendOffer');
   }
 
+  /// 如果对端发过来的描述类型为offer前提下，如果本地正在生成offer，或者本地的信令状态不为stable，就认为是信令冲突
+  bool _perfectIgnoreOffer(WebrtcSignal webrtcSignal) {
+    //自己的状态是否稳定
+    bool stable = peerConnection!.signalingState ==
+        RTCSignalingState.RTCSignalingStateStable;
+    //没有发出offer而且稳定或者正在设置远程answer，表明准备好了
+    bool readyForOffer =
+        !makingOffer && (stable || isSettingRemoteAnswerPending);
+    //如果接收到offer，而且没有准备好（要么在发出offer，要么不稳定而且正在设置answer），则offer冲突发生
+    bool offerCollision = (webrtcSignal.sdp?.type == "offer") && !readyForOffer;
+    //被叫为礼貌方，主叫为不礼貌方，也就是冲突发送时，被叫礼让主叫
+    bool polite = !initiator!;
+    if (offerCollision) {
+      logger.e('offer collision happened，i am polite:$polite');
+    }
+    //如果冲突发生，而且自己不礼貌，则忽略offer，如果自己礼貌，则可以允许设置offer
+    ignoreOffer = !polite && offerCollision;
+
+    return ignoreOffer;
+  }
+
   ///作为主叫，从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
   _onOfferSignal(WebrtcSignal webrtcSignal) async {
     RTCPeerConnection? peerConnection = this.peerConnection;
     if (peerConnection == null || status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
+      return;
+    }
+
+    ///发送offer冲突，如果自己是礼貌方，继续接收offer信号的设置
+    ignoreOffer = _perfectIgnoreOffer(webrtcSignal);
+    if (ignoreOffer) {
+      //如果是不礼貌方，则不处理，直接返回
+      logger.e('offer collision happened，impolite return');
       return;
     }
     String signalType = webrtcSignal.signalType;
@@ -923,28 +953,33 @@ class BasePeerConnection {
       }
       try {
         isSettingRemoteAnswerPending = sdp.type == "answer";
+        logger.i(
+            'before setRemoteDescription, signalingState:${peerConnection.signalingState}');
         await peerConnection.setRemoteDescription(sdp);
         isSettingRemoteAnswerPending = false;
         logger.i('setRemoteDescription sdp type:${sdp.type} successfully');
-        if (sdp.type == 'answer') {
-          await _postIceCandidates();
+
+        try {
+          remoteDescription = await peerConnection.getRemoteDescription();
+        } catch (e) {
+          logger.e('peerConnection getRemoteDescription failure:$e');
+          remoteDescription = null;
+        }
+        if (remoteDescription != null) {
+          if (sdp.type == 'offer') {
+            await _createAnswer();
+          } else {
+            logger.w(
+                'RemoteDescription sdp is not offer:${remoteDescription.type}');
+          }
+
+          if (sdp.type == 'answer') {
+            await _postIceCandidates();
+          }
         }
       } catch (e) {
         isSettingRemoteAnswerPending = false;
         logger.e('setRemoteDescription sdp type:${sdp.type} failure:$e');
-      }
-      try {
-        remoteDescription = await peerConnection.getRemoteDescription();
-      } catch (e) {
-        logger.e('peerConnection getRemoteDescription failure:$e');
-      }
-      if (remoteDescription != null) {
-        if (sdp.type == 'offer') {
-          await _createAnswer();
-        } else {
-          logger.w(
-              'RemoteDescription sdp is not offer:${remoteDescription.type}');
-        }
       }
     } else if (signalType == SignalType.error.name) {
       logger.e('received error signal:${webrtcSignal.error}');

@@ -25,9 +25,7 @@ class AdvancedPeerConnection {
   String clientId;
   String name;
 
-  //完美协商过程需要的状态变量
-  bool ignoreOffer = false; //是否忽略offer冲突
-  bool polite = true; //是否礼貌处理
+
 
   Map<String, List<Future<void> Function(WebrtcEvent event)>> fnsm = {};
   final Lock _fnsmLock = Lock();

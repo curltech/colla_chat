@@ -183,7 +183,8 @@ class _IndexViewState extends State<IndexView>
   }
 
   _play() {
-    conferenceChatMessageController.playAudio('assets/medias/invitation.mp3', true);
+    conferenceChatMessageController.playAudio(
+        'assets/medias/invitation.mp3', true);
   }
 
   _stop() {
@@ -404,6 +405,9 @@ class _IndexViewState extends State<IndexView>
             shape: const ContinuousRectangleBorder(),
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               bannerAvatarImage,
+              const SizedBox(
+                width: 10.0,
+              ),
               Expanded(
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,

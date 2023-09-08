@@ -519,30 +519,6 @@ class PeerConnectionPool {
     await onWebrtcSignal(peerId, signal, clientId: clientId);
   }
 
-  /// 如果对端发过来的描述类型为offer前提下，如果本地正在生成offer，或者本地的信令状态不为stable，就认为是信令冲突
-  bool _perfectIgnoreOffer(AdvancedPeerConnection advancedPeerConnection,
-      WebrtcSignal webrtcSignal) {
-    //自己是否正在发出offer
-    bool makingOffer = advancedPeerConnection.basePeerConnection.makingOffer;
-    //自己的状态是否稳定
-    bool stable = advancedPeerConnection
-            .basePeerConnection.peerConnection!.signalingState ==
-        RTCSignalingState.RTCSignalingStateStable;
-    //自己是否正在设置远程answer
-    bool isSettingRemoteAnswerPending =
-        advancedPeerConnection.basePeerConnection.isSettingRemoteAnswerPending;
-    //没有发出offer而且稳定或者正在设置远程answer，表明准备好了
-    bool readyForOffer =
-        !makingOffer && (stable || isSettingRemoteAnswerPending);
-    //如果接收到offer，而且没有准备好（要么在发出offer，要么不稳定而且正在设置answer），则offer冲突发生
-    bool offerCollision = (webrtcSignal.sdp?.type == "offer") && !readyForOffer;
-
-    //如果冲突发生，而且自己不礼貌，则忽略offer，如果自己礼貌，则可以允许设置offer
-    bool ignoreOffer = !advancedPeerConnection.polite && offerCollision;
-
-    return ignoreOffer;
-  }
-
   /// 接收到信号服务器发来的signal的处理,没有完成，要仔细考虑多终端的情况
   /// 如果发来的是answer,寻找主叫的peerId,必须找到，否则报错，找到后检查clientId
   /// 如果发来的是offer,检查peerId，没找到创建一个新的被叫，如果找到，检查clientId
@@ -579,31 +555,13 @@ class PeerConnectionPool {
       if (advancedPeerConnection == null) {
         advancedPeerConnection = _getOne(peerId, clientId: unknownClientId);
         if (advancedPeerConnection != null) {
-          bool ignoreOffer =
-              _perfectIgnoreOffer(advancedPeerConnection, signal);
-          if (ignoreOffer) {
-            //刚发出offer而且收到offer，这个连接不能用
-            logger.e(
-                'peerId:$peerId, clientId:$clientId making offer true advancedPeerConnection received offer');
-            remove(peerId, clientId: clientId);
-            advancedPeerConnection = null;
-          } else {
-            advancedPeerConnection.clientId = clientId;
-            advancedPeerConnection.name = name;
-            remove(peerId, clientId: unknownClientId);
-            put(peerId, advancedPeerConnection, clientId: clientId);
-          }
+          advancedPeerConnection.clientId = clientId;
+          advancedPeerConnection.name = name;
+          remove(peerId, clientId: unknownClientId);
+          put(peerId, advancedPeerConnection, clientId: clientId);
         } else {
           logger
               .w('no match advancedPeerConnection, will create new one answer');
-        }
-      } else {
-        bool ignoreOffer = _perfectIgnoreOffer(advancedPeerConnection, signal);
-        if (ignoreOffer) {
-          logger.e(
-              'peerId:$peerId, clientId:$clientId offer advancedPeerConnection received offer');
-          remove(peerId, clientId: clientId);
-          advancedPeerConnection = null;
         }
       }
       return advancedPeerConnection;
