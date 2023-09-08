@@ -57,6 +57,19 @@ class P2pConferenceClient extends PeerMediaStreamController {
     }
   }
 
+  restartIce({AdvancedPeerConnection? peerConnection}) async {
+    if (peerConnection != null) {
+      await peerConnection.restartIce();
+    } else {
+      List<AdvancedPeerConnection> peerConnections = [
+        ..._peerConnections.values
+      ];
+      for (AdvancedPeerConnection peerConnection in peerConnections) {
+        await peerConnection.restartIce();
+      }
+    }
+  }
+
   ///自己退出会议，从所有的连接中移除本地流和远程流
   exit() async {
     _joined = false;

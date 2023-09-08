@@ -263,6 +263,8 @@ class BasePeerConnection {
       false; //远程Answer是否等待设置，接收到answer信号时，设置为true，设置完设置为false
   bool ignoreOffer = false; //是否忽略offer冲突
 
+  Lock _offerLock = Lock();
+
   //数据通道的状态是否打开
   bool dataChannelOpen = false;
 
@@ -395,12 +397,12 @@ class BasePeerConnection {
     await frameCyrptor.updateCodec(kind == 'video' ? videoCodec : audioCodec);
   }
 
-  Lock lock = Lock();
+  Lock streamEncryptLock = Lock();
 
   ///激活流解密，在连接创建，receiver
   ///每个轨道设置一个解密器，
   Future<void> enableDecryption(RTCRtpReceiver receiver) async {
-    await lock.synchronized(() async {
+    await streamEncryptLock.synchronized(() async {
       await _enableDecryption(receiver);
     });
   }
@@ -622,7 +624,7 @@ class BasePeerConnection {
       logger.e('Ice connection failure:$state');
 
       ///尝试重新协商
-      await restartIce();
+      await negotiate();
     }
     if (state == RTCIceConnectionState.RTCIceConnectionStateClosed) {
       logger.e('Ice connection closed:$state');
@@ -726,7 +728,7 @@ class BasePeerConnection {
       logger.w('will be renegotiate');
       reconnectTimes--;
       // init(extension: extension!);
-      await restartIce();
+      await negotiate();
       // await negotiate();
     } else {
       logger.w('will be close');
@@ -743,7 +745,6 @@ class BasePeerConnection {
       return;
     }
     await _peerConnection?.restartIce();
-    // await negotiate();
   }
 
   ///作为主叫，发起协商过程createOffer
@@ -754,13 +755,7 @@ class BasePeerConnection {
       logger.e('PeerConnection closed');
       return;
     }
-    if (signalingState != null &&
-        signalingState != RTCSignalingState.RTCSignalingStateStable &&
-        signalingState != RTCSignalingState.RTCSignalingStateHaveLocalOffer) {
-      logger.w('PeerConnectionStatus already negotiating');
-      return;
-    }
-    logger.w('Start negotiate');
+    logger.w('start negotiate');
     await _createOffer();
   }
 
@@ -783,18 +778,28 @@ class BasePeerConnection {
     if (localDescription != null) {
       logger.w('LocalDescription sdp offer is exist:${localDescription.type}');
     }
-    try {
-      makingOffer = true;
-      RTCSessionDescription offer =
-          await peerConnection.createOffer(sdpConstraints);
-      await peerConnection.setLocalDescription(offer);
-      // logger.i('createOffer and setLocalDescription offer successfully');
-      await _sendOffer(offer);
-    } catch (e) {
-      logger.e('createOffer,setLocalDescription and sendOffer failure:$e');
-    } finally {
-      makingOffer = false;
-    }
+
+    await _offerLock.synchronized(() async {
+      if (signalingState == null ||
+          signalingState == RTCSignalingState.RTCSignalingStateStable ||
+          signalingState == RTCSignalingState.RTCSignalingStateHaveLocalOffer) {
+        try {
+          makingOffer = true;
+          RTCSessionDescription offer =
+              await peerConnection.createOffer(sdpConstraints);
+          await peerConnection.setLocalDescription(offer);
+          logger.w('createOffer and setLocalDescription offer successfully');
+          await _sendOffer(offer);
+        } catch (e) {
+          logger.e('createOffer,setLocalDescription and sendOffer failure:$e');
+        } finally {
+          makingOffer = false;
+        }
+      } else {
+        logger.e(
+            'PeerConnection create offer, but signalingState:$signalingState');
+      }
+    });
   }
 
   ///作为主叫，调用外部方法发送offer
@@ -816,7 +821,7 @@ class BasePeerConnection {
     sdp ??= offer;
     emit(WebrtcEventType.signal,
         WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
-    // logger.i('end sendOffer');
+    logger.w('sendOffer successfully');
   }
 
   /// 如果对端发过来的描述类型为offer前提下，如果本地正在生成offer，或者本地的信令状态不为stable，就认为是信令冲突
@@ -868,7 +873,7 @@ class BasePeerConnection {
                   renegotiate: RenegotiateType.agree.name,
                   extension: extension));
           logger.w(
-              'answer sent agree renegotiate signal:${webrtcSignal.renegotiate}');
+              'answer sent agree renegotiate signal:${webrtcSignal.renegotiate} successfully');
         } else {
           logger.w(
               'answer negotiating, can not agree renegotiate signal:${webrtcSignal.renegotiate}');
@@ -915,7 +920,7 @@ class BasePeerConnection {
             'peerConnection signalingState:$signalingState, setRemoteDescription want to set ${sdp.type}');
         await peerConnection.setRemoteDescription(sdp);
         isSettingRemoteAnswerPending = false;
-        logger.i('setRemoteDescription sdp type:${sdp.type} successfully');
+        logger.w('setRemoteDescription sdp type:${sdp.type} successfully');
 
         try {
           remoteDescription = await peerConnection.getRemoteDescription();
@@ -956,6 +961,7 @@ class BasePeerConnection {
         WebrtcEventType.signal,
         WebrtcSignal('renegotiate',
             renegotiate: RenegotiateType.request.name, extension: extension));
+    logger.w('send signal renegotiate request successfully');
   }
 
   ///作为被叫，创建answer，发生在被叫方，将answer回到主叫方
@@ -989,7 +995,7 @@ class BasePeerConnection {
           .i('create local sdp answer:${answer.type}, and setLocalDescription');
       try {
         await peerConnection.setLocalDescription(answer);
-        logger.i(
+        logger.w(
             'setLocalDescription local sdp answer:${answer.type} successfully');
       } catch (e) {
         logger.e('createAnswer failure:$e');
@@ -1047,18 +1053,18 @@ class BasePeerConnection {
                   renegotiate: RenegotiateType.agree.name,
                   extension: extension));
           logger.w(
-              'answer sent agree renegotiate signal:${webrtcSignal.renegotiate}');
+              'answer sent agree renegotiate signal:${webrtcSignal.renegotiate} successfully');
         }
       }
       if (RenegotiateType.agree.name == webrtcSignal.renegotiate) {
         initiator = true;
         logger.w(
-            'answer received agree renegotiate signal:${webrtcSignal.renegotiate}');
-        await restartIce();
+            'answer received agree renegotiate signal:${webrtcSignal.renegotiate} successfully');
+        await negotiate();
       } else if (RenegotiateType.disagree.name == webrtcSignal.renegotiate) {
         initiator = false;
         logger.w(
-            'answer received disagree renegotiate signal:${webrtcSignal.renegotiate}');
+            'answer received disagree renegotiate signal:${webrtcSignal.renegotiate} successfully');
       }
       return;
     }
@@ -1093,7 +1099,7 @@ class BasePeerConnection {
       } catch (e) {
         logger.e('peerConnection setRemoteDescription failure:$e');
       }
-      logger.i('setRemoteDescription sdp offer:${sdp.type} successfully');
+      logger.w('setRemoteDescription sdp offer:${sdp.type} successfully');
       try {
         //如果远程描述是offer请求，则创建answer
         remoteDescription = await peerConnection.getRemoteDescription();
@@ -1455,7 +1461,7 @@ class BasePeerConnection {
         'onRemoveRemoteTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id}');
 
     if (streamEncrypt) {
-      lock.synchronized(() {
+      streamEncryptLock.synchronized(() {
         String? participantId = '${track.kind}_${track.id!}_receiver';
         if (frameCyrptors.containsKey(track.id!)) {
           FrameCryptor? frameCryptor = frameCyrptors[participantId];
