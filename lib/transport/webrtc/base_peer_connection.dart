@@ -682,7 +682,7 @@ class BasePeerConnection {
     }
   }
 
-  ///需要重新协商，一般是本节点有增减轨道的时候，但是不能直接调用协商的方法，会造成死循环
+  ///需要重新协商，一般是本节点有增减轨道的时候
   onRenegotiationNeeded() {
     logger.w('onRenegotiationNeeded event');
 
@@ -743,6 +743,7 @@ class BasePeerConnection {
       return;
     }
     await _peerConnection?.restartIce();
+    // await negotiate();
   }
 
   ///作为主叫，发起协商过程createOffer
@@ -754,7 +755,8 @@ class BasePeerConnection {
       return;
     }
     if (signalingState != null &&
-        signalingState != RTCSignalingState.RTCSignalingStateStable) {
+        signalingState != RTCSignalingState.RTCSignalingStateStable &&
+        signalingState != RTCSignalingState.RTCSignalingStateHaveLocalOffer) {
       logger.w('PeerConnectionStatus already negotiating');
       return;
     }
