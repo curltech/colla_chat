@@ -273,8 +273,14 @@ class ConferenceChatMessageController with ChangeNotifier {
   ///接收到视频通话邀请，做出接受或者拒绝视频通话邀请的决定
   ///如果是接受决定，本控制器将被加入到池中
   sendChatReceipt(MessageReceiptType receiptType) async {
+    ChatSummary? chatSummary = _chatSummary;
+    if (chatSummary == null) {
+      logger.e('conference chat message controller chatSummary is null');
+      return;
+    }
     ChatMessage? chatMessage = _chatMessage;
     if (chatMessage == null) {
+      logger.e('conference chat message controller chatMessage is null');
       return;
     }
     await _sendChatReceipt(receiptType);
@@ -291,7 +297,7 @@ class ConferenceChatMessageController with ChangeNotifier {
         indexWidgetProvider.push('video_chat');
         return;
       }
-    } else if (groupType == PartyType.group.name) {
+    } else {
       //立即接听
       if (receiptType == MessageReceiptType.accepted) {
         await join();
