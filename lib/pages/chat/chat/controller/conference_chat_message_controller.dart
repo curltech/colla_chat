@@ -289,23 +289,23 @@ class ConferenceChatMessageController with ChangeNotifier {
     if (groupType == null) {
       //立即接听
       if (receiptType == MessageReceiptType.accepted) {
-        await join();
         //设置当前消息，转入视频会议界面
         chatMessageController.chatSummary = _chatSummary;
         chatMessageController.current = _chatMessage;
         indexWidgetProvider.push('chat_message');
         indexWidgetProvider.push('video_chat');
+        await join();
         return;
       }
     } else {
       //立即接听
       if (receiptType == MessageReceiptType.accepted) {
-        await join();
         //设置当前消息，转入视频会议界面
         chatMessageController.chatSummary = _chatSummary;
         chatMessageController.current = _chatMessage;
         indexWidgetProvider.push('chat_message');
         indexWidgetProvider.push('video_chat');
+        await join();
         return;
       }
     }
