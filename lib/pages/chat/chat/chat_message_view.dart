@@ -259,8 +259,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
     RTCIceConnectionState? oldState = _peerConnectionState.value;
     if (oldState != state) {
       _peerConnectionState.value = state;
-      if (_peerConnectionState.value ==
-          RTCIceConnectionState.RTCIceConnectionStateConnected) {
+      if (_peerConnectionState.value !=
+          RTCIceConnectionState.RTCIceConnectionStateClosed) {
         if (mounted) {
           DialogUtil.info(context,
               content:
@@ -344,34 +344,47 @@ class _ChatMessageViewState extends State<ChatMessageView>
       var peerConnectionStatusWidget = ValueListenableBuilder(
           valueListenable: _peerConnectionState,
           builder: (context, value, child) {
-            Widget widget = Tooltip(
-                message: AppLocalizations.t('Webrtc state'),
-                child: const Icon(
-                  Icons.wifi,
-                  color: Colors.white,
-                ));
+            Widget widget = IconButton(
+              onPressed: () {
+                _createPeerConnection();
+              },
+              icon: const Icon(
+                Icons.wifi_off,
+                color: Colors.red,
+              ),
+              tooltip: AppLocalizations.t('Webrtc state'),
+            );
 
             if (_peerConnectionState.value !=
-                RTCIceConnectionState.RTCIceConnectionStateConnected) {
+                RTCIceConnectionState.RTCIceConnectionStateClosed) {
               String? stateText = _peerConnectionState.value?.name;
               stateText = stateText?.substring(21);
-              widget = IconButton(
-                onPressed: () {
-                  _createPeerConnection();
-                },
-                icon: const Icon(
-                  Icons.wifi_off,
-                  color: Colors.red,
-                ),
-              );
+              if (_peerConnectionState.value == null ||
+                  _peerConnectionState.value ==
+                      RTCIceConnectionState.RTCIceConnectionStateDisconnected) {
+                widget = const Icon(
+                  Icons.wifi,
+                  color: Colors.grey,
+                );
+              } else if (_peerConnectionState.value ==
+                  RTCIceConnectionState.RTCIceConnectionStateConnected) {
+                widget = const Icon(
+                  Icons.wifi,
+                  color: Colors.white,
+                );
+              } else {
+                widget = const Icon(
+                  Icons.wifi,
+                  color: Colors.yellow,
+                );
+              }
               if (stateText != null) {
-                widget = Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      widget,
-                      CommonAutoSizeText(stateText,
-                          style: const TextStyle(fontSize: 12))
-                    ]);
+                widget =
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  widget,
+                  CommonAutoSizeText(AppLocalizations.t(stateText),
+                      style: const TextStyle(fontSize: 12))
+                ]);
               }
             }
             return widget;
