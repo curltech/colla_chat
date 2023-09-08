@@ -359,7 +359,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     var peerId = chatSummary.peerId;
     if (partyType == PartyType.linkman.name && peerId != null) {
       RTCIceConnectionState? state = peerConnectionPool.state(peerId);
-      if (state != RTCIceConnectionState.RTCIceConnectionStateConnected) {
+      if (state == RTCIceConnectionState.RTCIceConnectionStateClosed) {
         if (mounted) {
           DialogUtil.error(context,
               content:
