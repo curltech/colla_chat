@@ -145,11 +145,11 @@ class AdvancedPeerConnection {
       await peerConnectionPool.onConnected(webrtcEvent);
     });
 
-    basePeerConnection.on(WebrtcEventType.status, (data) async {
+    basePeerConnection.on(WebrtcEventType.state, (data) async {
       var webrtcEvent = WebrtcEvent(peerId,
           clientId: clientId,
           name: name,
-          eventType: WebrtcEventType.status,
+          eventType: WebrtcEventType.state,
           data: data);
       onWebrtcEvent(webrtcEvent);
       await peerConnectionPool.onStatusChanged(webrtcEvent);
@@ -219,7 +219,7 @@ class AdvancedPeerConnection {
     return basePeerConnection.dataChannelOpen;
   }
 
-  RTCIceConnectionState? get state {
+  RTCPeerConnectionState? get state {
     return basePeerConnection.state;
   }
 

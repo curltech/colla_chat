@@ -757,14 +757,14 @@ class PeerConnectionPool {
   }
 
   ///获取连接状态
-  RTCIceConnectionState? state(String peerId, {String? clientId}) {
-    RTCIceConnectionState? state;
+  RTCPeerConnectionState? state(String peerId, {String? clientId}) {
+    RTCPeerConnectionState? state;
     if (clientId == null) {
       var advancedPeerConnections = _get(peerId);
       for (var advancedPeerConnection in advancedPeerConnections) {
         if (advancedPeerConnection.state ==
-            RTCIceConnectionState.RTCIceConnectionStateConnected) {
-          state = RTCIceConnectionState.RTCIceConnectionStateConnected;
+            RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+          state = RTCPeerConnectionState.RTCPeerConnectionStateConnected;
           break;
         }
       }

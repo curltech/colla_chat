@@ -75,8 +75,8 @@ class ChatMessageView extends StatefulWidget with TileDataMixin {
 
 class _ChatMessageViewState extends State<ChatMessageView>
     with WidgetsBindingObserver, WindowListener {
-  final ValueNotifier<RTCIceConnectionState?> _peerConnectionState =
-      ValueNotifier<RTCIceConnectionState?>(null);
+  final ValueNotifier<RTCPeerConnectionState?> _peerConnectionState =
+      ValueNotifier<RTCPeerConnectionState?>(null);
   final ValueNotifier<ChatSummary?> _chatSummary =
       ValueNotifier<ChatSummary?>(chatMessageController.chatSummary);
   final ValueNotifier<double> chatMessageHeight = ValueNotifier<double>(0);
@@ -188,7 +188,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
     String peerId = chatSummary.peerId!;
     String partyType = chatSummary.partyType!;
     peerConnectionPool.registerWebrtcEvent(
-        peerId, WebrtcEventType.status, _updatePeerConnectionState);
+        peerId, WebrtcEventType.state, _updatePeerConnectionState);
     if (partyType == PartyType.linkman.name) {
       await _createLinkmanPeerConnection(peerId);
     } else if (partyType == PartyType.group.name) {
@@ -230,7 +230,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
             in advancedPeerConnections) {
           _peerConnectionState.value = advancedPeerConnection.state;
           if (advancedPeerConnection.state ==
-              RTCIceConnectionState.RTCIceConnectionStateConnected) {
+              RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
             break;
           }
         }
@@ -255,12 +255,12 @@ class _ChatMessageViewState extends State<ChatMessageView>
   }
 
   Future<void> _updatePeerConnectionState(WebrtcEvent event) async {
-    RTCIceConnectionState? state = event.data;
-    RTCIceConnectionState? oldState = _peerConnectionState.value;
+    RTCPeerConnectionState? state = event.data;
+    RTCPeerConnectionState? oldState = _peerConnectionState.value;
     if (oldState != state) {
       _peerConnectionState.value = state;
       if (_peerConnectionState.value !=
-          RTCIceConnectionState.RTCIceConnectionStateClosed) {
+          RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
         if (mounted) {
           DialogUtil.info(context,
               content:
@@ -356,18 +356,19 @@ class _ChatMessageViewState extends State<ChatMessageView>
             );
 
             if (_peerConnectionState.value !=
-                RTCIceConnectionState.RTCIceConnectionStateClosed) {
+                RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
               String? stateText = _peerConnectionState.value?.name;
-              stateText = stateText?.substring(21);
+              stateText = stateText?.substring(22);
               if (_peerConnectionState.value == null ||
                   _peerConnectionState.value ==
-                      RTCIceConnectionState.RTCIceConnectionStateDisconnected) {
+                      RTCPeerConnectionState
+                          .RTCPeerConnectionStateDisconnected) {
                 widget = const Icon(
                   Icons.wifi,
                   color: Colors.grey,
                 );
               } else if (_peerConnectionState.value ==
-                  RTCIceConnectionState.RTCIceConnectionStateConnected) {
+                  RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
                 widget = const Icon(
                   Icons.wifi,
                   color: Colors.white,
@@ -444,7 +445,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
     var chatSummary = _chatSummary.value;
     if (chatSummary != null) {
       peerConnectionPool.unregisterWebrtcEvent(chatSummary.peerId!,
-          WebrtcEventType.status, _updatePeerConnectionState);
+          WebrtcEventType.state, _updatePeerConnectionState);
     }
     WidgetsBinding.instance.removeObserver(this);
     windowManager.removeListener(this);

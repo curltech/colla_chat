@@ -85,7 +85,7 @@ enum WebrtcEventType {
   onSignal, //接收到信号
   connected,
   closed,
-  status, //状态发生变化
+  state, //状态发生变化
   message, //接收到消息
   stream,
   removeStream,
@@ -263,7 +263,7 @@ class BasePeerConnection {
       false; //远程Answer是否等待设置，接收到answer信号时，设置为true，设置完设置为false
   bool ignoreOffer = false; //是否忽略offer冲突
 
-  Lock _offerLock = Lock();
+  final Lock _offerLock = Lock();
 
   //数据通道的状态是否打开
   bool dataChannelOpen = false;
@@ -506,8 +506,8 @@ class BasePeerConnection {
         (RTCIceConnectionState state) => {onIceConnectionState(state)};
     peerConnection.onIceGatheringState =
         (RTCIceGatheringState state) => {onIceGatheringState(state)};
-    // peerConnection.onConnectionState =
-    //     (RTCPeerConnectionState state) => {onConnectionState(state)};
+    peerConnection.onConnectionState =
+        (RTCPeerConnectionState state) => {onConnectionState(state)};
     peerConnection.onSignalingState =
         (RTCSignalingState state) => {onSignalingState(state)};
     peerConnection.onIceCandidate =
@@ -583,8 +583,8 @@ class BasePeerConnection {
     return true;
   }
 
-  RTCIceConnectionState? get state {
-    return _peerConnection?.iceConnectionState;
+  RTCPeerConnectionState? get state {
+    return _peerConnection?.connectionState;
   }
 
   RTCSignalingState? get signalingState {
@@ -606,16 +606,20 @@ class BasePeerConnection {
   }
 
   ///连接状态事件
-  onConnectionState(RTCPeerConnectionState state) async {}
+  onConnectionState(RTCPeerConnectionState state) async {
+    if (state == RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+      connected();
+    }
+    if (state == RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
+      logger.e('Ice connection closed:$state');
+    }
+    emit(WebrtcEventType.state, state);
+  }
 
   ///ice连接状态事件
   onIceConnectionState(RTCIceConnectionState state) async {
-    if (state == RTCIceConnectionState.RTCIceConnectionStateConnected) {
-      connected();
-    }
     if (state == RTCIceConnectionState.RTCIceConnectionStateDisconnected) {
       logger.e('Ice connection disconnected:$state');
-
       ///尝试重新连接
       reconnect();
     }
@@ -625,10 +629,6 @@ class BasePeerConnection {
       ///尝试重新协商
       await restartIce();
     }
-    if (state == RTCIceConnectionState.RTCIceConnectionStateClosed) {
-      logger.e('Ice connection closed:$state');
-    }
-    emit(WebrtcEventType.status, state);
   }
 
   onIceGatheringState(RTCIceGatheringState state) async {
