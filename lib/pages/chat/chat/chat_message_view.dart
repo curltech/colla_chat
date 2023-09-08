@@ -229,8 +229,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
         for (AdvancedPeerConnection advancedPeerConnection
             in advancedPeerConnections) {
           _peerConnectionState.value = advancedPeerConnection.state;
-          if (advancedPeerConnection.state ==
-              RTCIceConnectionState.RTCIceConnectionStateConnected) {
+          if (advancedPeerConnection.state !=
+              RTCIceConnectionState.RTCIceConnectionStateClosed) {
             break;
           }
         }
