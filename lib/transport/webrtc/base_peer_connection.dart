@@ -1101,7 +1101,7 @@ class BasePeerConnection {
     //被要求重新协商，则发起协商
     if (signalType == SignalType.renegotiate.name) {
       logger
-          .e('answer received renegotiate signal:${webrtcSignal.renegotiate}');
+          .w('answer received renegotiate signal:${webrtcSignal.renegotiate}');
       if (RenegotiateType.request.name == webrtcSignal.renegotiate) {
         if (negotiateStatus != NegotiateStatus.negotiating) {
           initiator = false;
