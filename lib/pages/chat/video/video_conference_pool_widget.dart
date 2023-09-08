@@ -92,7 +92,7 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
             title: 'refresh',
             prefix: Icons.refresh,
             onTap: (int index, String label, {String? subtitle}) async {
-              p2pConferenceClientPool.p2pConferenceClient?.restartIce();
+              p2pConferenceClientPool.p2pConferenceClient?.negotiate();
               if (mounted) {
                 DialogUtil.info(context,
                     content:

@@ -819,10 +819,10 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    if (negotiateStatus == NegotiateStatus.negotiating) {
-      logger.w('PeerConnectionStatus already negotiating');
-      return;
-    }
+    // if (negotiateStatus == NegotiateStatus.negotiating) {
+    //   logger.w('PeerConnectionStatus already negotiating');
+    //   return;
+    // }
     logger.w('Start negotiate');
     negotiateStatus = NegotiateStatus.negotiating;
     await _createOffer();
@@ -976,10 +976,12 @@ class BasePeerConnection {
 
           if (sdp.type == 'answer') {
             await _postIceCandidates();
+            negotiateStatus == NegotiateStatus.negotiated;
           }
         }
       } catch (e) {
         isSettingRemoteAnswerPending = false;
+        negotiateStatus == NegotiateStatus.negotiated;
         logger.e('setRemoteDescription sdp type:${sdp.type} failure:$e');
       }
     } else if (signalType == SignalType.error.name) {
@@ -1045,7 +1047,6 @@ class BasePeerConnection {
       }
       await _sendAnswer(answer);
       await _postIceCandidates();
-      negotiateStatus == NegotiateStatus.negotiated;
     }
   }
 
