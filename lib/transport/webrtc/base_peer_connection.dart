@@ -1060,7 +1060,7 @@ class BasePeerConnection {
         initiator = true;
         logger.w(
             'answer received agree renegotiate signal:${webrtcSignal.renegotiate} successfully');
-        await negotiate();
+        await restartIce();
       } else if (RenegotiateType.disagree.name == webrtcSignal.renegotiate) {
         initiator = false;
         logger.w(
