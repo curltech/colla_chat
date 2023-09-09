@@ -52,12 +52,12 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
         var conferenceOwnerName = conference.conferenceOwnerName;
         var topic = conference.topic;
         TileData tile = TileData(
-            prefix: conference.avatarImage ?? AppImage.mdAppImage,
+            prefix: conference.avatarImage,
             title: conferenceName,
-            titleTail: conferenceOwnerName,
-            subtitle: topic,
+            titleTail: topic,
+            subtitle: conferenceId,
             selected: p2pConferenceClientPool.conferenceId == conferenceId,
-            isThreeLine: true,
+            isThreeLine: false,
             onTap: (int index, String title, {String? subtitle}) {
               conferenceNotifier.value = conference;
             },

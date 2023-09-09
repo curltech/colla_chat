@@ -371,7 +371,6 @@
   "Collect video file": "从收藏增加文件",
   "Select collect file": "收藏文件",
   "Remove collect file": "从收藏移除文件",
-  "Please input request add friend tip": "请求加好友的提示",
   "Do you agree to add friend?": "同意加好友吗？",
   "I am ": "我是",
   "Auto login": "自动登录",
@@ -512,5 +511,12 @@
   "Do you add all as friend?": "全部加为好友吗？",
   "Please input request add friend tip": "请输入加好友的提示",
   "Change body ratio": "改变显示宽度",
-  "ChannelMessagePreview": "频道文章预览"
+  "ChannelMessagePreview": "频道文章预览",
+  "Closed": "已关闭",
+  "Connected": "已连接",
+  "Disconnected": "已断开",
+  "Failed": "连接失败",
+  "Create": "创建",
+  "Video conference pool": "会议池",
+  "Video conference connection": "会议连接"
 }
