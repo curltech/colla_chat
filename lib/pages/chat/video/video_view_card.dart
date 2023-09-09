@@ -1,5 +1,7 @@
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/video/single_video_view_widget.dart';
+import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter/material.dart';
@@ -38,8 +40,22 @@ class _VideoViewCardState extends State<VideoViewCard> {
     List<PeerMediaStream> peerMediaStreams =
         widget.peerMediaStreamController.peerMediaStreams;
     int crossAxisCount = 1;
-    if (peerMediaStreams.length > 1) {
-      crossAxisCount = 2;
+    double secondaryBodyWidth = appDataProvider.secondaryBodyWidth;
+    double smallBreakpointLimit = AppDataProvider.smallBreakpointLimit;
+    double largeBreakpointLimit = AppDataProvider.largeBreakpointLimit;
+    if (secondaryBodyWidth >= smallBreakpointLimit &&
+        secondaryBodyWidth < largeBreakpointLimit) {
+      if (peerMediaStreams.length > 3) {
+        crossAxisCount = 3;
+      } else {
+        crossAxisCount = peerMediaStreams.length;
+      }
+    } else if (secondaryBodyWidth >= largeBreakpointLimit) {
+      if (peerMediaStreams.length > 4) {
+        crossAxisCount = 4;
+      } else {
+        crossAxisCount = peerMediaStreams.length;
+      }
     }
     List<Widget> videoViews = [];
     for (var peerMediaStream in peerMediaStreams) {
