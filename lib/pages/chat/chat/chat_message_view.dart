@@ -371,13 +371,14 @@ class _ChatMessageViewState extends State<ChatMessageView>
                 RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
               String? stateText = _peerConnectionState.value?.name;
               stateText = stateText?.substring(22);
+              stateText ??= 'Create';
               if (_peerConnectionState.value == null ||
                   _peerConnectionState.value ==
                       RTCPeerConnectionState
                           .RTCPeerConnectionStateDisconnected) {
                 widget = const Icon(
                   Icons.wifi_off,
-                  color: Colors.red,
+                  color: Colors.grey,
                 );
               } else if (_peerConnectionState.value ==
                   RTCPeerConnectionState.RTCPeerConnectionStateConnected) {

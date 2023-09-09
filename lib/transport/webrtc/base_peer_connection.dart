@@ -612,6 +612,7 @@ class BasePeerConnection {
     }
     if (state == RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
       logger.e('Ice connection closed:$state');
+      close();
     }
     emit(WebrtcEventType.state, state);
   }
@@ -620,6 +621,7 @@ class BasePeerConnection {
   onIceConnectionState(RTCIceConnectionState state) async {
     if (state == RTCIceConnectionState.RTCIceConnectionStateDisconnected) {
       logger.e('Ice connection disconnected:$state');
+
       ///尝试重新连接
       reconnect();
     }

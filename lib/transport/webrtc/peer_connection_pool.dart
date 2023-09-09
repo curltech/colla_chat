@@ -209,7 +209,9 @@ class PeerConnectionPool {
         fns = [];
         fnsm[key] = fns;
       }
-      fns.add(fn);
+      if (!fns.contains(fn)) {
+        fns.add(fn);
+      }
     });
   }
 
@@ -221,7 +223,9 @@ class PeerConnectionPool {
       if (fns == null) {
         return;
       }
-      fns.remove(fn);
+      fns.removeWhere((element) {
+        return element == fn;
+      });
       if (fns.isEmpty) {
         fnsm.remove(key);
       }
@@ -426,40 +430,46 @@ class PeerConnectionPool {
 
   ///清除过一段时间仍没有连接上的连接
   clear() async {
-    List<String> removedPeerIds = [];
+    List<AdvancedPeerConnection> removedPeerConnections = [];
     for (var peerId in _peerConnections.keys()) {
       Map<String, AdvancedPeerConnection>? peerConnections =
           _peerConnections.get(peerId);
       if (peerConnections != null && peerConnections.isNotEmpty) {
-        List<String> removedClientIds = [];
         for (AdvancedPeerConnection peerConnection in peerConnections.values) {
           if (peerConnection.state !=
-              RTCIceConnectionState.RTCIceConnectionStateConnected) {
+              RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
             var start = peerConnection.basePeerConnection.start;
             if (start == null) {
-              removedClientIds.add(peerConnection.clientId);
+              removedPeerConnections.add(peerConnection);
             } else {
               var now = DateTime.now().millisecondsSinceEpoch;
               var gap = now - start;
               var limit = const Duration(seconds: 20);
               if (gap > limit.inMilliseconds) {
-                removedClientIds.add(peerConnection.clientId);
+                removedPeerConnections.add(peerConnection);
                 logger.e(
                     'peerConnection peerId:${peerConnection.peerId},clientId:${peerConnection.clientId} is overtime unconnected');
               }
             }
           }
         }
-        for (var removedClientId in removedClientIds) {
-          peerConnections.remove(removedClientId);
-        }
-        if (peerConnections.isEmpty) {
-          removedPeerIds.add(peerId);
-        }
       }
     }
-    for (var removedPeerId in removedPeerIds) {
-      _peerConnections.remove(removedPeerId);
+    for (var removedPeerConnection in removedPeerConnections) {
+      var peerId = removedPeerConnection.peerId;
+      var clientId = removedPeerConnection.clientId;
+      var name = removedPeerConnection.name;
+      Map<String, AdvancedPeerConnection>? peerConnections =
+          _peerConnections.get(peerId);
+      if (peerConnections != null && peerConnections.isNotEmpty) {
+        peerConnections.remove(clientId);
+        if (peerConnections.isEmpty) {
+          _peerConnections.remove(peerId);
+        }
+      }
+      WebrtcEvent event = WebrtcEvent(peerId,
+          clientId: clientId, name: name, eventType: WebrtcEventType.closed);
+      onWebrtcEvent(event);
     }
   }
 
