@@ -185,7 +185,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
             title = '$title${videoChatMessageController.conferenceName}';
           }
 
-          Widget titleWidget = CommonAutoSizeText(title);
+          Widget titleWidget = CommonAutoSizeText(title, maxLines: 1);
 
           return titleWidget;
         });
