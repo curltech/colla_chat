@@ -43,7 +43,13 @@ class _VideoViewCardState extends State<VideoViewCard> {
     double secondaryBodyWidth = appDataProvider.secondaryBodyWidth;
     double smallBreakpointLimit = AppDataProvider.smallBreakpointLimit;
     double largeBreakpointLimit = AppDataProvider.largeBreakpointLimit;
-    if (secondaryBodyWidth >= smallBreakpointLimit &&
+    if (secondaryBodyWidth < smallBreakpointLimit) {
+      if (peerMediaStreams.length > 4) {
+        crossAxisCount = 3;
+      } else if (peerMediaStreams.length > 1) {
+        crossAxisCount = 2;
+      }
+    } else if (secondaryBodyWidth >= smallBreakpointLimit &&
         secondaryBodyWidth < largeBreakpointLimit) {
       if (peerMediaStreams.length > 3) {
         crossAxisCount = 3;
