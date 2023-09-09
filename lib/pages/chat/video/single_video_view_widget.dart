@@ -189,6 +189,8 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   Widget _buildSingleVideoView(
       BuildContext context, double? height, double? width) {
     String name = widget.peerMediaStream.name ?? '';
+    String streamId = widget.peerMediaStream.mediaStream?.id ?? '';
+    bool video = widget.peerMediaStream.video;
     Widget mediaRenderView =
         Center(child: CommonAutoSizeText(AppLocalizations.t('No stream')));
     var mediaStream = widget.peerMediaStream.mediaStream;
@@ -231,11 +233,28 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
           Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
-              child: CommonAutoSizeText(
-                name,
-                style: const TextStyle(
-                    color: Colors.white, fontSize: AppFontSize.xsFontSize),
-              )),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CommonAutoSizeText(
+                      name,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: AppFontSize.xsFontSize),
+                    ),
+                    CommonAutoSizeText(
+                      streamId,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: AppFontSize.xsFontSize),
+                    ),
+                    CommonAutoSizeText(
+                      video ? 'video' : 'audio',
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: AppFontSize.xsFontSize),
+                    )
+                  ])),
         ],
       ),
     );

@@ -236,7 +236,6 @@ class PeerConnectionPool {
     return await _fnsmLock.synchronized(() async {
       String peerId = event.peerId;
       WebrtcEventType eventType = event.eventType;
-      logger.w('Webrtc peer connection $peerId webrtcEvent $eventType coming');
       String key = _getKey(peerId, eventType);
       List<Future<dynamic> Function(WebrtcEvent)>? fns = fnsm[key];
       var results = [];
@@ -535,7 +534,6 @@ class PeerConnectionPool {
   onWebrtcSignal(String peerId, WebrtcSignal signal,
       {required String clientId}) async {
     var signalType = signal.signalType;
-    logger.w('receive signal type: $signalType from webrtcPeer: $peerId');
     String name = unknownName;
     List<Map<String, String>>? iceServers;
     Conference? conference;

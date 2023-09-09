@@ -17,7 +17,7 @@ import 'package:flutter/material.dart';
 ///会议池的显示界面
 class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
   final VideoConferenceConnectionWidget videoConferenceConnectionWidget =
-      const VideoConferenceConnectionWidget();
+      VideoConferenceConnectionWidget();
 
   VideoConferencePoolWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(videoConferenceConnectionWidget);
@@ -107,6 +107,16 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
             });
         slideActions.add(restartIceSlideAction);
         tile.slideActions = slideActions;
+
+        List<TileData> endSlideActions = [];
+        TileData checkSlideAction = TileData(
+            title: 'Connection',
+            prefix: Icons.connecting_airports_outlined,
+            onTap: (int index, String label, {String? subtitle}) async {
+              indexWidgetProvider.push('video_conference_connection');
+            });
+        endSlideActions.add(checkSlideAction);
+        tile.endSlideActions = endSlideActions;
 
         tiles.add(tile);
       }

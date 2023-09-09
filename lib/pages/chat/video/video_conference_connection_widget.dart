@@ -3,6 +3,8 @@ import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/conference/conference_show_widget.dart';
+import 'package:colla_chat/pages/chat/video/video_conference_track_widget.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
@@ -12,11 +14,17 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 ///会议池的会议的连接列表显示界面
 class VideoConferenceConnectionWidget extends StatelessWidget
     with TileDataMixin {
-  const VideoConferenceConnectionWidget({Key? key}) : super(key: key);
+  final VideoConferenceTrackWidget videoConferenceTrackWidget =
+      const VideoConferenceTrackWidget();
+
+  VideoConferenceConnectionWidget({Key? key}) : super(key: key) {
+    indexWidgetProvider.define(videoConferenceTrackWidget);
+  }
 
   @override
   bool get withLeading => true;
@@ -53,11 +61,14 @@ class VideoConferenceConnectionWidget extends StatelessWidget
                     color: Colors.grey,
                   ),
             title: name,
-            titleTail: connectionState?.name,
+            titleTail: connectionState?.name.substring(22),
             subtitle: peerId,
-            isThreeLine: true,
-            onTap: (int index, String title, {String? subtitle}) {},
-            routeName: 'peer_connection_show');
+            isThreeLine: false,
+            onTap: (int index, String title, {String? subtitle}) {
+              peerConnectionNotifier.value = peerConnection;
+              indexWidgetProvider.push('video_conference_track');
+            },
+            routeName: null);
 
         tiles.add(tile);
       }

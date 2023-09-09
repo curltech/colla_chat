@@ -179,28 +179,23 @@ class AdvancedPeerConnection {
     basePeerConnection.on(WebrtcEventType.message, onMessage);
 
     basePeerConnection.on(WebrtcEventType.stream, (MediaStream stream) async {
-      logger.i('${DateTime.now().toUtc().toIso8601String()}:stream');
       await onAddRemoteStream(stream);
     });
 
     basePeerConnection.on(WebrtcEventType.removeStream,
         (MediaStream stream) async {
-      logger.i('${DateTime.now().toUtc().toIso8601String()}:removeStream');
       await onRemoveRemoteStream(stream);
     });
 
     basePeerConnection.on(WebrtcEventType.track, (data) async {
-      logger.i('${DateTime.now().toUtc().toIso8601String()}:track');
       await onRemoteTrack(data);
     });
 
     basePeerConnection.on(WebrtcEventType.addTrack, (data) async {
-      logger.i('${DateTime.now().toUtc().toIso8601String()}:addTrack');
       await onAddRemoteTrack(data);
     });
 
     basePeerConnection.on(WebrtcEventType.removeTrack, (data) async {
-      logger.i('${DateTime.now().toUtc().toIso8601String()}:removeTrack');
       await onRemoveRemoteTrack(data);
     });
 
@@ -238,7 +233,6 @@ class AdvancedPeerConnection {
   }
 
   onAddRemoteStream(MediaStream stream) async {
-    logger.i('streamId: ${stream.id} onAddRemoteStream');
     if (connectionState ==
         RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
       logger.e('PeerConnection closed');
@@ -254,7 +248,6 @@ class AdvancedPeerConnection {
   }
 
   onRemoveRemoteStream(MediaStream stream) async {
-    logger.i('streamId: ${stream.id} onRemoveRemoteStream');
     var webrtcEvent = WebrtcEvent(peerId,
         clientId: clientId,
         name: name,
@@ -267,7 +260,6 @@ class AdvancedPeerConnection {
   onRemoteTrack(dynamic data) async {
     MediaStream stream = data['stream'];
     MediaStreamTrack track = data['track'];
-    logger.i('streamId: ${stream.id} trackId:${track.id} is onRemoteTrack');
     var webrtcEvent = WebrtcEvent(peerId,
         clientId: clientId,
         name: name,
@@ -280,7 +272,6 @@ class AdvancedPeerConnection {
   onAddRemoteTrack(dynamic data) async {
     MediaStream stream = data['stream'];
     MediaStreamTrack track = data['track'];
-    logger.i('streamId: ${stream.id} trackId:${track.id} is onAddRemoteTrack');
     var webrtcEvent = WebrtcEvent(peerId,
         clientId: clientId,
         name: name,
@@ -293,8 +284,6 @@ class AdvancedPeerConnection {
   onRemoveRemoteTrack(dynamic data) async {
     MediaStream stream = data['stream'];
     MediaStreamTrack track = data['track'];
-    logger
-        .i('streamId: ${stream.id} trackId:${track.id} is onRemoveRemoteTrack');
     var webrtcEvent = WebrtcEvent(peerId,
         clientId: clientId,
         name: name,
@@ -306,7 +295,6 @@ class AdvancedPeerConnection {
 
   ///将本地渲染器包含的流加入连接中，在收到接受视频要求的时候调用
   Future<bool> addLocalStream(PeerMediaStream peerMediaStream) async {
-    logger.i('addLocalStream ${peerMediaStream.id}');
     var stream = peerMediaStream.mediaStream;
     if (stream != null) {
       var success = await basePeerConnection.addLocalStream(stream);
@@ -317,7 +305,6 @@ class AdvancedPeerConnection {
 
   /// 主动从连接中移除本地媒体流，然后会激活onRemoveStream
   removeStream(PeerMediaStream peerMediaStream) async {
-    logger.i('removeStream ${peerMediaStream.id}');
     if (connectionState ==
         RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
       logger.e('PeerConnection closed');
@@ -338,7 +325,6 @@ class AdvancedPeerConnection {
 
   ///把渲染器的流克隆，然后可以当作本地流加入到其他连接中，用于转发
   Future<MediaStream?> cloneStream(PeerMediaStream peerMediaStream) async {
-    logger.i('cloneStream ${peerMediaStream.id}');
     if (connectionState ==
         RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
       logger.e('PeerConnection closed');
