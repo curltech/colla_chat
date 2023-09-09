@@ -707,7 +707,11 @@ class BasePeerConnection {
     }
   }
 
-  set initiator(bool initiator) {
+  bool? get initiator {
+    return _initiator;
+  }
+
+  set initiator(bool? initiator) {
     if (_initiator != initiator) {
       _initiator = initiator;
       emit(WebrtcEventType.initiator, _initiator);

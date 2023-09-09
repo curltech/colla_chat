@@ -227,6 +227,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
             await peerConnectionPool.createOffer(peerId);
         if (advancedPeerConnection != null) {
           _peerConnectionState.value = advancedPeerConnection.connectionState;
+          _initiator.value = advancedPeerConnection.basePeerConnection.initiator;
         } else {
           _peerConnectionState.value = null;
         }
@@ -234,6 +235,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
         for (AdvancedPeerConnection advancedPeerConnection
             in advancedPeerConnections) {
           _peerConnectionState.value = advancedPeerConnection.connectionState;
+          _initiator.value = advancedPeerConnection.basePeerConnection.initiator;
           if (advancedPeerConnection.connectionState ==
               RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
             break;
