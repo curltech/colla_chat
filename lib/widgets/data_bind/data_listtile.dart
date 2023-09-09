@@ -287,8 +287,14 @@ class DataListTile extends StatelessWidget {
       slidableActions.add(slidableAction);
       i++;
     }
+    double extentRatio = 0.3 * slideActions.length;
+    if (extentRatio < 0.3) {
+      extentRatio = 0.3;
+    } else if (extentRatio > 0.9) {
+      extentRatio = 0.9;
+    }
     ActionPane actionPane = ActionPane(
-      extentRatio: 0.2 * slideActions.length,
+      extentRatio: extentRatio,
       motion: const DrawerMotion(),
       //BehindMotion,StretchMotion,DrawerMotion,ScrollMotion
       //dismissible: DismissiblePane(onDismissed: () {}),
