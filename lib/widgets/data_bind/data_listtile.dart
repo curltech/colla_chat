@@ -5,6 +5,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -254,7 +255,21 @@ class DataListTile extends StatelessWidget {
   ActionPane _buildActionPane(
       BuildContext context, List<TileData>? slideActions) {
     List<SlidableAction> slidableActions = [];
+    int i = 0;
+
     for (var slideAction in slideActions!) {
+      Color backgroundColor = myself.primary;
+      if (i == 0) {
+        backgroundColor = Colors.blue;
+      } else if (i == 1) {
+        backgroundColor = Colors.amber;
+      } else if (i == 2) {
+        backgroundColor = Colors.red;
+      } else if (i == 3) {
+        backgroundColor = Colors.purple;
+      } else if (i == 4) {
+        backgroundColor = myself.primary;
+      }
       SlidableAction slidableAction = SlidableAction(
         padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 0),
         onPressed: (context) {
@@ -263,13 +278,14 @@ class DataListTile extends StatelessWidget {
                 subtitle: slideAction.title);
           }
         },
-        backgroundColor: Colors.white,
-        foregroundColor: myself.primary,
+        backgroundColor: backgroundColor,
+        foregroundColor: Colors.white,
         icon: slideAction.prefix,
         label: AppLocalizations.t(slideAction.title),
         borderRadius: BorderRadius.circular(0),
       );
       slidableActions.add(slidableAction);
+      i++;
     }
     ActionPane actionPane = ActionPane(
       extentRatio: 0.2 * slideActions.length,

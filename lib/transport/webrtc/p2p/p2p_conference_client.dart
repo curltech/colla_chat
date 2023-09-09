@@ -114,11 +114,13 @@ class P2pConferenceClient extends PeerMediaStreamController {
         for (var peerMediaStream in peerMediaStreams) {
           await peerConnection.addLocalStream(peerMediaStream);
         }
+        await renegotiate(peerConnection:peerConnection);
       } else {
         for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
           for (var peerMediaStream in peerMediaStreams) {
             await peerConnection.addLocalStream(peerMediaStream);
           }
+          await renegotiate(peerConnection:peerConnection);
         }
       }
     }
@@ -188,6 +190,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
       for (var peerMediaStream in peerMediaStreams) {
         await peerConnection.removeStream(peerMediaStream);
       }
+      await renegotiate(peerConnection:peerConnection);
     } else {
       List<AdvancedPeerConnection> peerConnections = [
         ..._peerConnections.values
@@ -196,6 +199,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
         for (var peerMediaStream in peerMediaStreams) {
           await peerConnection.removeStream(peerMediaStream);
         }
+        await renegotiate(peerConnection:peerConnection);
       }
     }
   }
