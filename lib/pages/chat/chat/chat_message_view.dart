@@ -80,6 +80,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
   final ValueNotifier<ChatSummary?> _chatSummary =
       ValueNotifier<ChatSummary?>(chatMessageController.chatSummary);
   final ValueNotifier<double> chatMessageHeight = ValueNotifier<double>(0);
+  final ValueNotifier<bool?> _initiator = ValueNotifier<bool?>(null);
   double visibleFraction = 0.0;
   NoScreenshot? noScreenshot;
   ScreenshotCallback? screenshotCallback;
@@ -188,9 +189,11 @@ class _ChatMessageViewState extends State<ChatMessageView>
     String peerId = chatSummary.peerId!;
     String partyType = chatSummary.partyType!;
     peerConnectionPool.registerWebrtcEvent(
-        peerId, WebrtcEventType.state, _updatePeerConnectionState);
+        peerId, WebrtcEventType.connectionState, _updatePeerConnectionState);
     peerConnectionPool.registerWebrtcEvent(
         peerId, WebrtcEventType.closed, _updatePeerConnectionState);
+    peerConnectionPool.registerWebrtcEvent(
+        peerId, WebrtcEventType.initiator, _updatePeerConnectionState);
     if (partyType == PartyType.linkman.name) {
       await _createLinkmanPeerConnection(peerId);
     } else if (partyType == PartyType.group.name) {
@@ -223,15 +226,15 @@ class _ChatMessageViewState extends State<ChatMessageView>
         AdvancedPeerConnection? advancedPeerConnection =
             await peerConnectionPool.createOffer(peerId);
         if (advancedPeerConnection != null) {
-          _peerConnectionState.value = advancedPeerConnection.state;
+          _peerConnectionState.value = advancedPeerConnection.connectionState;
         } else {
           _peerConnectionState.value = null;
         }
       } else {
         for (AdvancedPeerConnection advancedPeerConnection
             in advancedPeerConnections) {
-          _peerConnectionState.value = advancedPeerConnection.state;
-          if (advancedPeerConnection.state ==
+          _peerConnectionState.value = advancedPeerConnection.connectionState;
+          if (advancedPeerConnection.connectionState ==
               RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
             break;
           }
@@ -261,11 +264,12 @@ class _ChatMessageViewState extends State<ChatMessageView>
     if (eventType == WebrtcEventType.closed) {
       _peerConnectionState.value =
           RTCPeerConnectionState.RTCPeerConnectionStateClosed;
+      _initiator.value = null;
       if (mounted) {
         DialogUtil.info(context,
             content: AppLocalizations.t('PeerConnection was closed'));
       }
-    } else if (eventType == WebrtcEventType.state) {
+    } else if (eventType == WebrtcEventType.connectionState) {
       RTCPeerConnectionState? state = event.data;
       RTCPeerConnectionState? oldState = _peerConnectionState.value;
       if (oldState != state) {
@@ -285,6 +289,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
           }
         }
       }
+    } else if (eventType == WebrtcEventType.initiator) {
+      _initiator.value = event.data;
     }
   }
 
@@ -392,17 +398,36 @@ class _ChatMessageViewState extends State<ChatMessageView>
                   color: Colors.yellow,
                 );
               }
-              if (stateText != null) {
-                widget =
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  widget,
-                  CommonAutoSizeText(AppLocalizations.t(stateText),
-                      style: const TextStyle(fontSize: 12))
-                ]);
-              }
+              widget =
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                widget,
+                CommonAutoSizeText(AppLocalizations.t(stateText),
+                    style: const TextStyle(fontSize: 12))
+              ]);
             }
             return widget;
           });
+      rightWidgets.add(ValueListenableBuilder(
+          valueListenable: _initiator,
+          builder: (context, initiator, child) {
+            if (initiator != null) {
+              if (initiator) {
+                return const Icon(
+                  Icons.light_mode,
+                  color: Colors.green,
+                );
+              } else {
+                return const Icon(
+                  Icons.light_mode,
+                  color: Colors.grey,
+                );
+              }
+            }
+            return Container();
+          }));
+      rightWidgets.add(const SizedBox(
+        width: 15,
+      ));
       rightWidgets.add(peerConnectionStatusWidget);
       rightWidgets.add(const SizedBox(
         width: 15,
@@ -458,7 +483,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
     var chatSummary = _chatSummary.value;
     if (chatSummary != null) {
       peerConnectionPool.unregisterWebrtcEvent(chatSummary.peerId!,
-          WebrtcEventType.state, _updatePeerConnectionState);
+          WebrtcEventType.connectionState, _updatePeerConnectionState);
       peerConnectionPool.unregisterWebrtcEvent(chatSummary.peerId!,
           WebrtcEventType.closed, _updatePeerConnectionState);
     }

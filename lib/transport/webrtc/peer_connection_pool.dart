@@ -436,7 +436,7 @@ class PeerConnectionPool {
           _peerConnections.get(peerId);
       if (peerConnections != null && peerConnections.isNotEmpty) {
         for (AdvancedPeerConnection peerConnection in peerConnections.values) {
-          if (peerConnection.state !=
+          if (peerConnection.connectionState !=
               RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
             var start = peerConnection.basePeerConnection.start;
             if (start == null) {
@@ -666,7 +666,7 @@ class PeerConnectionPool {
     if (peerConnections.isNotEmpty) {
       List<Future<bool>> ps = [];
       for (var peerConnection in peerConnections) {
-        if (peerConnection.state ==
+        if (peerConnection.connectionState ==
             RTCIceConnectionState.RTCIceConnectionStateConnected) {
           Future<bool> p = peerConnection.send(data);
           //logger.w('send signal');
@@ -727,6 +727,10 @@ class PeerConnectionPool {
     onWebrtcEvent(event);
   }
 
+  onInitiator(WebrtcEvent event) async {
+    onWebrtcEvent(event);
+  }
+
   onAddStream(WebrtcEvent event) async {
     onWebrtcEvent(event);
   }
@@ -767,12 +771,12 @@ class PeerConnectionPool {
   }
 
   ///获取连接状态
-  RTCPeerConnectionState? state(String peerId, {String? clientId}) {
+  RTCPeerConnectionState? connectionState(String peerId, {String? clientId}) {
     RTCPeerConnectionState? state;
     if (clientId == null) {
       var advancedPeerConnections = _get(peerId);
       for (var advancedPeerConnection in advancedPeerConnections) {
-        if (advancedPeerConnection.state ==
+        if (advancedPeerConnection.connectionState ==
             RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
           state = RTCPeerConnectionState.RTCPeerConnectionStateConnected;
           break;
@@ -782,7 +786,7 @@ class PeerConnectionPool {
       AdvancedPeerConnection? advancedPeerConnection =
           _getOne(peerId, clientId: clientId);
       if (advancedPeerConnection != null) {
-        state = advancedPeerConnection.state;
+        state = advancedPeerConnection.connectionState;
       }
     }
 
