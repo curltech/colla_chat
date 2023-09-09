@@ -114,6 +114,16 @@ class AdvancedPeerConnection {
         }
       }
     }
+    basePeerConnection.on(WebrtcEventType.initiator, (data) async {
+      var webrtcEvent = WebrtcEvent(peerId,
+          clientId: clientId,
+          name: name,
+          eventType: WebrtcEventType.initiator,
+          data: data);
+      onWebrtcEvent(webrtcEvent);
+      await peerConnectionPool.onInitiator(webrtcEvent);
+    });
+
     bool result = await basePeerConnection.init(initiator, extension,
         localStreams: localStreams);
     if (!result) {
@@ -202,16 +212,6 @@ class AdvancedPeerConnection {
           data: err);
       onWebrtcEvent(webrtcEvent);
       await peerConnectionPool.onError(webrtcEvent);
-    });
-
-    basePeerConnection.on(WebrtcEventType.initiator, (data) async {
-      var webrtcEvent = WebrtcEvent(peerId,
-          clientId: clientId,
-          name: name,
-          eventType: WebrtcEventType.error,
-          data: data);
-      onWebrtcEvent(webrtcEvent);
-      await peerConnectionPool.onInitiator(webrtcEvent);
     });
 
     return result;

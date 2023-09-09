@@ -454,7 +454,7 @@ class BasePeerConnection {
   ///可输入的参数包括外部媒体流和定制扩展属性
   Future<bool> init(bool initiator, SignalExtension extension,
       {List<MediaStream> localStreams = const []}) async {
-    _initiator = initiator;
+    this.initiator = initiator;
     logger.i('init BasePeerConnection initiator:$initiator');
     id = await cryptoGraphy.getRandomAsciiString(length: 8);
     aesKey = extension.aesKey;

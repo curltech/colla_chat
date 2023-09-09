@@ -407,6 +407,11 @@ class _ChatMessageViewState extends State<ChatMessageView>
             }
             return widget;
           });
+
+      rightWidgets.add(peerConnectionStatusWidget);
+      rightWidgets.add(const SizedBox(
+        width: 15,
+      ));
       rightWidgets.add(ValueListenableBuilder(
           valueListenable: _initiator,
           builder: (context, initiator, child) {
@@ -414,7 +419,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
               if (initiator) {
                 return const Icon(
                   Icons.light_mode,
-                  color: Colors.green,
+                  color: Colors.yellow,
                 );
               } else {
                 return const Icon(
@@ -425,10 +430,6 @@ class _ChatMessageViewState extends State<ChatMessageView>
             }
             return Container();
           }));
-      rightWidgets.add(const SizedBox(
-        width: 15,
-      ));
-      rightWidgets.add(peerConnectionStatusWidget);
       rightWidgets.add(const SizedBox(
         width: 15,
       ));
