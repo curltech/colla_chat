@@ -3,45 +3,47 @@ import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/conference/conference_show_widget.dart';
+import 'package:colla_chat/pages/chat/video/video_conference_connection_widget.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
 ///会议池的显示界面
-class VideoConferencePoolWidget extends StatefulWidget {
-  const VideoConferencePoolWidget({Key? key}) : super(key: key);
+class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
+  final VideoConferenceConnectionWidget videoConferenceConnectionWidget =
+      const VideoConferenceConnectionWidget();
 
-  @override
-  State<StatefulWidget> createState() => _VideoConferencePoolWidgetState();
-}
-
-class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
-  final ValueNotifier<List<TileData>> _conferenceTileData =
-      ValueNotifier<List<TileData>>([]);
-
-  @override
-  initState() {
-    super.initState();
-    p2pConferenceClientPool.addListener(_update);
-    _buildConferenceTileData();
+  VideoConferencePoolWidget({Key? key}) : super(key: key) {
+    indexWidgetProvider.define(videoConferenceConnectionWidget);
   }
 
-  _update() {
-    _buildConferenceTileData();
-  }
+  @override
+  bool get withLeading => true;
 
-  _buildConferenceTileData() {
+  @override
+  String get routeName => 'video_conference_pool';
+
+  @override
+  IconData get iconData => Icons.meeting_room;
+
+  @override
+  String get title => 'Video conference pool';
+
+  List<TileData> _buildConferenceTileData(BuildContext context) {
     List<P2pConferenceClient> p2pConferenceClients =
         p2pConferenceClientPool.p2pConferenceClients;
     List<TileData> tiles = [];
     if (p2pConferenceClients.isNotEmpty) {
-      for (var p2pConferenceClient in p2pConferenceClients) {
-        ConferenceChatMessageController videoChatMessageController =
+      for (P2pConferenceClient p2pConferenceClient in p2pConferenceClients) {
+        ConferenceChatMessageController conferenceChatMessageController =
             p2pConferenceClient.conferenceChatMessageController;
-        Conference? conference = videoChatMessageController.conference;
+        Conference? conference = conferenceChatMessageController.conference;
         if (conference == null) {
           continue;
         }
@@ -55,7 +57,7 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
             titleTail: conferenceOwnerName,
             subtitle: topic,
             selected: p2pConferenceClientPool.conferenceId == conferenceId,
-            isThreeLine: false,
+            isThreeLine: true,
             onTap: (int index, String title, {String? subtitle}) {
               conferenceNotifier.value = conference;
             },
@@ -67,11 +69,9 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
               prefix: Icons.playlist_add_check_outlined,
               onTap: (int index, String label, {String? subtitle}) async {
                 p2pConferenceClientPool.conferenceId = conferenceId;
-                if (mounted) {
-                  DialogUtil.info(context,
-                      content:
-                          '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is set current')}');
-                }
+                DialogUtil.info(context,
+                    content:
+                        '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is set current')}');
               });
           slideActions.add(checkSlideAction);
         }
@@ -81,11 +81,9 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
             onTap: (int index, String label, {String? subtitle}) async {
               p2pConferenceClientPool.terminate(conferenceId);
               p2pConferenceClientPool.conferenceId = null;
-              if (mounted) {
-                DialogUtil.info(context,
-                    content:
-                        '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is closed')}');
-              }
+              DialogUtil.info(context,
+                  content:
+                      '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is closed')}');
             });
         slideActions.add(deleteSlideAction);
         TileData renegotiateSlideAction = TileData(
@@ -93,11 +91,9 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
             prefix: Icons.repeat_one_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
               p2pConferenceClientPool.p2pConferenceClient?.renegotiate();
-              if (mounted) {
-                DialogUtil.info(context,
-                    content:
-                        '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is renegotiate')}');
-              }
+              DialogUtil.info(context,
+                  content:
+                      '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is renegotiate')}');
             });
         slideActions.add(renegotiateSlideAction);
         TileData restartIceSlideAction = TileData(
@@ -105,11 +101,9 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
             prefix: Icons.recycling_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
               p2pConferenceClientPool.p2pConferenceClient?.restartIce();
-              if (mounted) {
-                DialogUtil.info(context,
-                    content:
-                    '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is restartIce')}');
-              }
+              DialogUtil.info(context,
+                  content:
+                      '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is restartIce')}');
             });
         slideActions.add(restartIceSlideAction);
         tile.slideActions = slideActions;
@@ -117,35 +111,23 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
         tiles.add(tile);
       }
     }
-    _conferenceTileData.value = tiles;
+    return tiles;
   }
 
   Widget _buildVideoConferenceListView(BuildContext context) {
-    var conferenceView = ValueListenableBuilder(
-        valueListenable: _conferenceTileData,
-        builder: (context, value, child) {
-          if (value.isEmpty) {
-            return Center(
-                child: CommonAutoSizeText(
-                    AppLocalizations.t('No active conference in pool'),
-                    style: const TextStyle(color: Colors.white)));
-          }
-          return DataListView(
-            tileData: value,
-          );
-        });
+    var conferenceView = DataListView(
+      tileData: _buildConferenceTileData(context),
+    );
 
     return conferenceView;
   }
 
   @override
   Widget build(BuildContext context) {
-    return _buildVideoConferenceListView(context);
-  }
-
-  @override
-  void dispose() {
-    p2pConferenceClientPool.removeListener(_update);
-    super.dispose();
+    return AppBarView(
+      title: title,
+      withLeading: withLeading,
+      child: _buildVideoConferenceListView(context),
+    );
   }
 }

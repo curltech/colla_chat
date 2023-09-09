@@ -45,13 +45,13 @@ class QrcodeWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'qrcode';
 
   @override
-  State<StatefulWidget> createState() => _QrcodeWidgetState();
-
-  @override
   IconData get iconData => Icons.qr_code;
 
   @override
   String get title => 'Qrcode';
+
+  @override
+  State<StatefulWidget> createState() => _QrcodeWidgetState();
 }
 
 class _QrcodeWidgetState extends State<QrcodeWidget> {

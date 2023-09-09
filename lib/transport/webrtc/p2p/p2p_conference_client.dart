@@ -35,6 +35,10 @@ class P2pConferenceClient extends PeerMediaStreamController {
     return key;
   }
 
+  List<AdvancedPeerConnection> get peerConnections {
+    return [..._peerConnections.values];
+  }
+
   ///自己加入会议，在所有的连接中加上本地流
   join() async {
     _joined = true;
@@ -114,13 +118,13 @@ class P2pConferenceClient extends PeerMediaStreamController {
         for (var peerMediaStream in peerMediaStreams) {
           await peerConnection.addLocalStream(peerMediaStream);
         }
-        await renegotiate(peerConnection:peerConnection);
+        await renegotiate(peerConnection: peerConnection);
       } else {
         for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
           for (var peerMediaStream in peerMediaStreams) {
             await peerConnection.addLocalStream(peerMediaStream);
           }
-          await renegotiate(peerConnection:peerConnection);
+          await renegotiate(peerConnection: peerConnection);
         }
       }
     }
@@ -190,7 +194,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
       for (var peerMediaStream in peerMediaStreams) {
         await peerConnection.removeStream(peerMediaStream);
       }
-      await renegotiate(peerConnection:peerConnection);
+      await renegotiate(peerConnection: peerConnection);
     } else {
       List<AdvancedPeerConnection> peerConnections = [
         ..._peerConnections.values
@@ -199,7 +203,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
         for (var peerMediaStream in peerMediaStreams) {
           await peerConnection.removeStream(peerMediaStream);
         }
-        await renegotiate(peerConnection:peerConnection);
+        await renegotiate(peerConnection: peerConnection);
       }
     }
   }

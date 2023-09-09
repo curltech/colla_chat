@@ -23,11 +23,13 @@ class VideoChatWidget extends StatefulWidget with TileDataMixin {
   final LocalVideoWidget localVideoWidget = const LocalVideoWidget();
   final RemoteVideoWidget remoteVideoWidget = const RemoteVideoWidget();
   final VideoConferencePoolWidget videoConferencePoolWidget =
-      const VideoConferencePoolWidget();
+      VideoConferencePoolWidget();
 
   VideoChatWidget({
     Key? key,
-  }) : super(key: key);
+  }) : super(key: key) {
+    indexWidgetProvider.define(videoConferencePoolWidget);
+  }
 
   @override
   State<StatefulWidget> createState() {
@@ -48,7 +50,8 @@ class VideoChatWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _VideoChatWidgetState extends State<VideoChatWidget> {
-  ValueNotifier<ConferenceChatMessageController?> videoChatMessageController =
+  ValueNotifier<ConferenceChatMessageController?>
+      conferenceChatMessageController =
       ValueNotifier<ConferenceChatMessageController?>(
           p2pConferenceClientPool.conferenceChatMessageController);
   ChatSummary chatSummary = chatMessageController.chatSummary!;
@@ -67,7 +70,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   }
 
   _update() {
-    videoChatMessageController.value =
+    conferenceChatMessageController.value =
         p2pConferenceClientPool.conferenceChatMessageController;
   }
 
@@ -100,15 +103,12 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   Widget _buildVideoChatView(BuildContext context) {
     return Swiper(
       controller: swiperController,
-      itemCount: 3,
+      itemCount: 2,
       index: index,
       itemBuilder: (BuildContext context, int index) {
         Widget view = widget.localVideoWidget;
         if (index == 1) {
           view = widget.remoteVideoWidget;
-        }
-        if (index == 2) {
-          view = widget.videoConferencePoolWidget;
         }
         return view;
       },
@@ -137,7 +137,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     ));
     rightWidgets.add(IconButton(
       onPressed: () {
-        swiperController.move(2);
+        indexWidgetProvider.push('video_conference_pool');
       },
       icon: const Icon(Icons.list),
       tooltip: AppLocalizations.t('Conference pool'),
@@ -163,7 +163,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
 
   Widget _buildTitleWidget(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: videoChatMessageController,
+        valueListenable: conferenceChatMessageController,
         builder: (BuildContext context,
             ConferenceChatMessageController? videoChatMessageController,
             Widget? child) {
