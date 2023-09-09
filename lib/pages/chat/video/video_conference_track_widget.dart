@@ -3,6 +3,7 @@ import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/conference/conference_show_widget.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
@@ -57,9 +58,9 @@ class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
                       Icons.audiotrack_outlined,
                     ),
               title: senderId,
-              titleTail: label,
+              titleTail: platformParams.desktop ? label : null,
               subtitle: trackId,
-              isThreeLine: true,
+              isThreeLine: false,
               onTap: (int index, String title, {String? subtitle}) {},
               routeName: 'peer_connection_show');
 
@@ -112,9 +113,9 @@ class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
                       Icons.audiotrack_outlined,
                     ),
               title: streamId,
-              titleTail: ownerTag,
+              titleTail: platformParams.desktop ? ownerTag : null,
               subtitle: trackId,
-              isThreeLine: true,
+              isThreeLine: false,
               onTap: (int index, String title, {String? subtitle}) {},
               routeName: 'peer_connection_show');
 
