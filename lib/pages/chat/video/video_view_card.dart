@@ -1,6 +1,5 @@
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/video/single_video_view_widget.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
