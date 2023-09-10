@@ -876,29 +876,29 @@ class BasePeerConnection {
     if (signalType == SignalType.renegotiate.name &&
         webrtcSignal.renegotiate != null) {
       logger.i('receive renegotiate signal:${webrtcSignal.renegotiate}');
-      await _offerLock.synchronized(() {
-        if (RenegotiateType.request.name == webrtcSignal.renegotiate) {
-          if (signalingState == null ||
-              signalingState == RTCSignalingState.RTCSignalingStateStable) {
-            initiator = false;
-            emit(
-                WebrtcEventType.signal,
-                WebrtcSignal('renegotiate',
-                    renegotiate: RenegotiateType.agree.name,
-                    extension: extension));
-            logger.w(
-                'answer sent agree renegotiate signal:${webrtcSignal.renegotiate} successfully');
-          } else {
-            emit(
-                WebrtcEventType.signal,
-                WebrtcSignal('renegotiate',
-                    renegotiate: RenegotiateType.disagree.name,
-                    extension: extension));
-            logger.w(
-                'answer negotiating:$signalingState, can not agree renegotiate signal:${webrtcSignal.renegotiate}');
-          }
+      //await _offerLock.synchronized(() {
+      if (RenegotiateType.request.name == webrtcSignal.renegotiate) {
+        if (signalingState == null ||
+            signalingState == RTCSignalingState.RTCSignalingStateStable) {
+          initiator = false;
+          emit(
+              WebrtcEventType.signal,
+              WebrtcSignal('renegotiate',
+                  renegotiate: RenegotiateType.agree.name,
+                  extension: extension));
+          logger.w(
+              'answer sent agree renegotiate signal:${webrtcSignal.renegotiate} successfully');
+        } else {
+          emit(
+              WebrtcEventType.signal,
+              WebrtcSignal('renegotiate',
+                  renegotiate: RenegotiateType.disagree.name,
+                  extension: extension));
+          logger.w(
+              'answer negotiating:$signalingState, can not agree renegotiate signal:${webrtcSignal.renegotiate}');
         }
-      });
+      }
+      //});
     }
     //被要求收发，则加收发器
     else if (webrtcSignal.transceiverRequest != null) {
@@ -1055,30 +1055,30 @@ class BasePeerConnection {
     if (signalType == SignalType.renegotiate.name) {
       logger
           .w('answer received renegotiate signal:${webrtcSignal.renegotiate}');
-      await _offerLock.synchronized(() async {
-        if (RenegotiateType.request.name == webrtcSignal.renegotiate) {
-          if (signalingState == null ||
-              signalingState == RTCSignalingState.RTCSignalingStateStable) {
-            initiator = false;
-            emit(
-                WebrtcEventType.signal,
-                WebrtcSignal('renegotiate',
-                    renegotiate: RenegotiateType.agree.name,
-                    extension: extension));
-            logger.w(
-                'answer sent agree renegotiate signal:${webrtcSignal.renegotiate} successfully');
-          }
-        } else if (RenegotiateType.agree.name == webrtcSignal.renegotiate) {
-          initiator = true;
-          logger.w(
-              'answer received agree renegotiate signal:${webrtcSignal.renegotiate} successfully');
-          await negotiate();
-        } else if (RenegotiateType.disagree.name == webrtcSignal.renegotiate) {
+      //await _offerLock.synchronized(() async {
+      if (RenegotiateType.request.name == webrtcSignal.renegotiate) {
+        if (signalingState == null ||
+            signalingState == RTCSignalingState.RTCSignalingStateStable) {
           initiator = false;
+          emit(
+              WebrtcEventType.signal,
+              WebrtcSignal('renegotiate',
+                  renegotiate: RenegotiateType.agree.name,
+                  extension: extension));
           logger.w(
-              'answer received disagree renegotiate signal:${webrtcSignal.renegotiate} successfully');
+              'answer sent agree renegotiate signal:${webrtcSignal.renegotiate} successfully');
         }
-      });
+      } else if (RenegotiateType.agree.name == webrtcSignal.renegotiate) {
+        initiator = true;
+        logger.w(
+            'answer received agree renegotiate signal:${webrtcSignal.renegotiate} successfully');
+        await negotiate();
+      } else if (RenegotiateType.disagree.name == webrtcSignal.renegotiate) {
+        initiator = false;
+        logger.w(
+            'answer received disagree renegotiate signal:${webrtcSignal.renegotiate} successfully');
+      }
+      //});
 
       return;
     }
