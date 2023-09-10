@@ -110,14 +110,8 @@ class MessageWidget {
         case ChatMessageContentType.video:
           body = buildVideoMessageWidget(context);
           break;
-        case ChatMessageContentType.file:
-          body = await buildFileMessageWidget(context);
-          break;
         case ChatMessageContentType.image:
           body = buildImageMessageWidget(context);
-          break;
-        case ChatMessageContentType.card:
-          body = await buildNameCardMessageWidget(context);
           break;
         case ChatMessageContentType.rich:
           body = buildRichTextMessageWidget(context);
@@ -127,6 +121,12 @@ class MessageWidget {
           break;
         case ChatMessageContentType.location:
           body = buildLocationMessageWidget(context);
+          break;
+        case ChatMessageContentType.card:
+          body = await buildNameCardMessageWidget(context);
+          break;
+        case ChatMessageContentType.file:
+          body = await buildFileMessageWidget(context);
           break;
         default:
           body = Container();
@@ -192,7 +192,8 @@ class MessageWidget {
       {String? value}) async {
     switch (label) {
       case 'Delete':
-        chatMessageService.remove(where: 'id=?', whereArgs: [chatMessage.id!]);
+        await chatMessageService
+            .remove(where: 'id=?', whereArgs: [chatMessage.id!]);
         chatMessageController.delete(index: this.index);
         break;
       case 'Cancel':
