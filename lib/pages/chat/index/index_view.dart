@@ -196,7 +196,7 @@ class _IndexViewState extends State<IndexView>
     ChatMessage? chatMessage = globalChatMessageController.chatMessage;
     if (chatMessage == null) {
       this.chatMessage = null;
-      await conferenceChatMessageController.terminate();
+      await conferenceChatMessageController.close();
       return;
     }
     String? subMessageType = chatMessage.subMessageType;
