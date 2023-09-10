@@ -3,8 +3,10 @@ import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/conference/conference_show_widget.dart';
+import 'package:colla_chat/pages/chat/login/loading.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -34,40 +36,45 @@ class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Video conference track';
 
-  List<TileData> _buildTrackSenderTileData(BuildContext context) {
+  Future<List<TileData>> _buildTrackSenderTileData(BuildContext context) async {
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionNotifier.value;
     List<TileData> tiles = [];
-    if (advancedPeerConnection != null) {
-      List<RTCRtpSender> trackSenders = advancedPeerConnection
-          .basePeerConnection.trackSenders.values
-          .toList();
-      for (var trackSender in trackSenders) {
-        MediaStreamTrack? track = trackSender.track;
-        String senderId = trackSender.senderId;
-        if (track != null) {
-          var trackId = track.id;
-          var kind = track.kind;
-          var label = track.label;
-          TileData tile = TileData(
-              prefix: kind == 'video'
-                  ? const Icon(
-                      Icons.video_call_outlined,
-                    )
-                  : const Icon(
-                      Icons.audiotrack_outlined,
-                    ),
-              title: senderId,
-              titleTail: platformParams.desktop ? label : null,
-              subtitle: trackId,
-              isThreeLine: false,
-              onTap: (int index, String title, {String? subtitle}) {},
-              routeName: 'peer_connection_show');
+    if (advancedPeerConnection == null) {
+      return tiles;
+    }
+    RTCPeerConnection? peerConnection =
+        advancedPeerConnection.basePeerConnection.peerConnection;
+    if (peerConnection == null) {
+      return tiles;
+    }
+    List<RTCRtpSender>? trackSenders = await peerConnection.getSenders();
+    for (var trackSender in trackSenders) {
+      MediaStreamTrack? track = trackSender.track;
+      String senderId = trackSender.senderId;
+      if (track != null) {
+        var trackId = track.id;
+        var kind = track.kind;
+        var label = track.label;
+        TileData tile = TileData(
+            prefix: kind == 'video'
+                ? const Icon(
+                    Icons.video_call_outlined,
+                  )
+                : const Icon(
+                    Icons.audiotrack_outlined,
+                  ),
+            title: senderId,
+            titleTail: platformParams.desktop ? label : null,
+            subtitle: trackId,
+            isThreeLine: false,
+            onTap: (int index, String title, {String? subtitle}) {},
+            routeName: 'peer_connection_show');
 
-          tiles.add(tile);
-        }
+        tiles.add(tile);
       }
     }
+
     return tiles;
   }
 
@@ -75,52 +82,50 @@ class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionNotifier.value;
     List<TileData> tiles = [];
-    if (advancedPeerConnection != null) {
-      List<MediaStream?>? streams = [];
-      List<MediaStream?>? localStreams = advancedPeerConnection
-          .basePeerConnection.peerConnection
-          ?.getLocalStreams();
-      if (localStreams != null) {
-        streams.addAll(localStreams);
+    if (advancedPeerConnection == null) {
+      return tiles;
+    }
+    RTCPeerConnection? peerConnection =
+        advancedPeerConnection.basePeerConnection.peerConnection;
+    if (peerConnection == null) {
+      return tiles;
+    }
+    List<MediaStream?> streams = [];
+    List<MediaStream?> localStreams = peerConnection.getLocalStreams();
+    streams.addAll(localStreams);
+    List<MediaStream?> remoteStreams = peerConnection.getRemoteStreams();
+    streams.addAll(remoteStreams);
+    for (MediaStream? stream in streams) {
+      if (stream == null) {
+        continue;
       }
-      List<MediaStream?>? remoteStreams = advancedPeerConnection
-          .basePeerConnection.peerConnection
-          ?.getRemoteStreams();
-      if (remoteStreams != null) {
-        streams.addAll(remoteStreams);
-      }
-      for (MediaStream? stream in streams) {
-        if (stream == null) {
-          continue;
-        }
-        String streamId = stream.id;
-        String ownerTag = stream.ownerTag;
-        List<MediaStreamTrack> tracks = [];
-        List<MediaStreamTrack> videoTracks = stream.getVideoTracks();
-        tracks.addAll(videoTracks);
-        List<MediaStreamTrack> audioTracks = stream.getAudioTracks();
-        tracks.addAll(audioTracks);
-        for (MediaStreamTrack track in tracks) {
-          var trackId = track.id;
-          var kind = track.kind;
-          var label = track.label;
-          TileData tile = TileData(
-              prefix: kind == 'video'
-                  ? const Icon(
-                      Icons.video_call_outlined,
-                    )
-                  : const Icon(
-                      Icons.audiotrack_outlined,
-                    ),
-              title: streamId,
-              titleTail: platformParams.desktop ? ownerTag : null,
-              subtitle: trackId,
-              isThreeLine: false,
-              onTap: (int index, String title, {String? subtitle}) {},
-              routeName: 'peer_connection_show');
+      String streamId = stream.id;
+      String ownerTag = stream.ownerTag;
+      List<MediaStreamTrack> tracks = [];
+      List<MediaStreamTrack> videoTracks = stream.getVideoTracks();
+      tracks.addAll(videoTracks);
+      List<MediaStreamTrack> audioTracks = stream.getAudioTracks();
+      tracks.addAll(audioTracks);
+      for (MediaStreamTrack track in tracks) {
+        var trackId = track.id;
+        var kind = track.kind;
+        var label = track.label;
+        TileData tile = TileData(
+            prefix: kind == 'video'
+                ? const Icon(
+                    Icons.video_call_outlined,
+                  )
+                : const Icon(
+                    Icons.audiotrack_outlined,
+                  ),
+            title: streamId,
+            titleTail: platformParams.desktop ? ownerTag : null,
+            subtitle: trackId,
+            isThreeLine: false,
+            onTap: (int index, String title, {String? subtitle}) {},
+            routeName: 'peer_connection_show');
 
-          tiles.add(tile);
-        }
+        tiles.add(tile);
       }
     }
     return tiles;
@@ -129,9 +134,20 @@ class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
   Widget _buildTrackListView(BuildContext context) {
     var trackView = Column(children: [
       CommonAutoSizeText(AppLocalizations.t('TrackSender')),
-      DataListView(
-        tileData: _buildTrackSenderTileData(context),
-      ),
+      FutureBuilder(
+          future: _buildTrackSenderTileData(context),
+          builder:
+              (BuildContext context, AsyncSnapshot<List<TileData>> snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              List<TileData>? tiles = snapshot.data;
+              if (tiles != null) {
+                return DataListView(
+                  tileData: tiles,
+                );
+              }
+            }
+            return LoadingUtil.buildCircularLoadingWidget();
+          }),
       const SizedBox(
         height: 15.0,
       ),

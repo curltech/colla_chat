@@ -58,10 +58,8 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
             subtitle: conferenceId,
             selected: p2pConferenceClientPool.conferenceId == conferenceId,
             isThreeLine: false,
-            onTap: (int index, String title, {String? subtitle}) {
-              conferenceNotifier.value = conference;
-            },
-            routeName: 'conference_show');
+            onTap: (int index, String title, {String? subtitle}) {},
+            routeName: 'video_conference_connection');
         List<TileData> slideActions = [];
         if (p2pConferenceClientPool.conferenceId != conferenceId) {
           TileData checkSlideAction = TileData(
@@ -86,8 +84,19 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
                       '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is closed')}');
             });
         slideActions.add(deleteSlideAction);
+        TileData conferenceSlideAction = TileData(
+            title: 'Conference',
+            prefix: Icons.meeting_room,
+            onTap: (int index, String label, {String? subtitle}) async {
+              conferenceNotifier.value = conference;
+              indexWidgetProvider.push('conference_show');
+            });
+        slideActions.add(conferenceSlideAction);
+        tile.slideActions = slideActions;
+
+        List<TileData> endSlideActions = [];
         TileData renegotiateSlideAction = TileData(
-            title: 'renegotiate',
+            title: 'Renegotiate',
             prefix: Icons.repeat_one_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
               p2pConferenceClientPool.p2pConferenceClient?.renegotiate();
@@ -95,9 +104,9 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
                   content:
                       '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is renegotiate')}');
             });
-        slideActions.add(renegotiateSlideAction);
+        endSlideActions.add(renegotiateSlideAction);
         TileData restartIceSlideAction = TileData(
-            title: 'restartIce',
+            title: 'RestartIce',
             prefix: Icons.recycling_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
               p2pConferenceClientPool.p2pConferenceClient?.restartIce();
@@ -105,17 +114,7 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
                   content:
                       '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is restartIce')}');
             });
-        slideActions.add(restartIceSlideAction);
-        tile.slideActions = slideActions;
-
-        List<TileData> endSlideActions = [];
-        TileData checkSlideAction = TileData(
-            title: 'Connection',
-            prefix: Icons.connecting_airports_outlined,
-            onTap: (int index, String label, {String? subtitle}) async {
-              indexWidgetProvider.push('video_conference_connection');
-            });
-        endSlideActions.add(checkSlideAction);
+        endSlideActions.add(restartIceSlideAction);
         tile.endSlideActions = endSlideActions;
 
         tiles.add(tile);

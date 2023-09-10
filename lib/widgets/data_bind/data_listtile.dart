@@ -242,9 +242,9 @@ class DataListTile extends StatelessWidget {
     );
 
     if (selected) {
-      return Card(
-        margin: const EdgeInsets.symmetric(horizontal: 10.0),
-        color: myself.primary,
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 0.0),
+        color: myself.secondary.withOpacity(0.2),
         child: listTile,
       );
     }

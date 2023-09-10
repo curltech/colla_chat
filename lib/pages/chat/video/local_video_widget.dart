@@ -156,7 +156,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         ),
       );
     }
-    if (localPeerMediaStreamController.mainPeerMediaStream != null) {
+    if (localPeerMediaStreamController.mainPeerMediaStream != null &&
+        platformParams.desktop) {
       actionData.add(
         ActionData(
             label: 'Screen share',
@@ -358,7 +359,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     var partyType = chatSummary.partyType;
     var peerId = chatSummary.peerId;
     if (partyType == PartyType.linkman.name && peerId != null) {
-      RTCPeerConnectionState? state = peerConnectionPool.connectionState(peerId);
+      RTCPeerConnectionState? state =
+          peerConnectionPool.connectionState(peerId);
       if (state == RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
         if (mounted) {
           DialogUtil.error(context,
