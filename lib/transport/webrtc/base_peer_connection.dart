@@ -878,7 +878,18 @@ class BasePeerConnection {
       logger.i('receive renegotiate signal:${webrtcSignal.renegotiate}');
       //await _offerLock.synchronized(() {
       if (RenegotiateType.request.name == webrtcSignal.renegotiate) {
-        if (signalingState == null ||
+        if (signalingState ==
+            RTCSignalingState.RTCSignalingStateHaveLocalOffer) {
+          initiator = true;
+          emit(
+              WebrtcEventType.signal,
+              WebrtcSignal('renegotiate',
+                  renegotiate: RenegotiateType.disagree.name,
+                  extension: extension));
+          logger.w(
+              'answer negotiating:$signalingState, can not agree renegotiate signal:${webrtcSignal.renegotiate}');
+          await negotiate();
+        } else if (signalingState == null ||
             signalingState == RTCSignalingState.RTCSignalingStateStable) {
           initiator = false;
           emit(
