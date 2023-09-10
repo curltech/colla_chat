@@ -8,6 +8,10 @@ class GlobalAudioSession {
     init();
   }
 
+  AudioSession? get session {
+    return _session;
+  }
+
   ///初始化平台定制的全局音频会话
   init() async {
     _session ??= await AudioSession.instance;
@@ -27,6 +31,7 @@ class GlobalAudioSession {
       androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
       androidWillPauseWhenDucked: true,
     ));
+    await _session?.setActive(true);
   }
 
   initMusic() async {
