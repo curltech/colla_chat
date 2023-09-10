@@ -889,16 +889,14 @@ class BasePeerConnection {
             logger.w(
                 'answer sent agree renegotiate signal:${webrtcSignal.renegotiate} successfully');
           } else {
+            emit(
+                WebrtcEventType.signal,
+                WebrtcSignal('renegotiate',
+                    renegotiate: RenegotiateType.disagree.name,
+                    extension: extension));
             logger.w(
-                'answer negotiating, can not agree renegotiate signal:${webrtcSignal.renegotiate}');
+                'answer negotiating:$signalingState, can not agree renegotiate signal:${webrtcSignal.renegotiate}');
           }
-          // else {
-          //   emit(
-          //       WebrtcEventType.signal,
-          //       WebrtcSignal('renegotiate',
-          //           renegotiate: RenegotiateType.disagree.name,
-          //           extension: extension));
-          // }
         }
       });
     }
