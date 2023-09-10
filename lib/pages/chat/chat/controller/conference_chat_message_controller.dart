@@ -183,6 +183,7 @@ class ConferenceChatMessageController with ChangeNotifier {
         }
       }
     }
+    logger.e('init find chatSummary failure');
   }
 
   ///根据_chatMessage设置会议属性
