@@ -521,5 +521,7 @@
   "Video conference connection": "会议连接",
   "Video conference track": "会议轨道",
   "TrackSender": "本地轨道发送者",
-  "Track": "轨道"
+  "Track": "轨道",
+  "Renegotiate": "重新协商",
+  "RestartIce": "重启Ice"
 }
