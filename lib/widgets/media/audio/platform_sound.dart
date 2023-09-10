@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/widgets/media/audio/audio_service.dart';
+import 'package:colla_chat/service/audio_session.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -69,7 +69,7 @@ class PlatformSoundRecorder {
     if (!encoderSupported && platformParams.web) {
       codec = Codec.opusWebM;
     }
-    await AudioSessionUtil.initCustom();
+    await globalAudioSession.init();
   }
 
   void cancelRecorderSubscriptions() {
@@ -211,7 +211,7 @@ class PlatformSoundPlayer {
   init() async {
     await player.setSubscriptionDuration(const Duration(milliseconds: 10));
     decoderSupported = await player.isDecoderSupported(codec);
-    await AudioSessionUtil.initCustom();
+    await globalAudioSession.init();
   }
 
   void cancelPlayerSubscriptions() {
