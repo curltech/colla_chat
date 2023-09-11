@@ -515,6 +515,7 @@
   "Closed": "已关闭",
   "Connected": "已连接",
   "Disconnected": "已断开",
+  "Connecting": "正在连接",
   "Failed": "连接失败",
   "Video conference pool": "会议池",
   "Video conference connection": "会议连接",
@@ -522,5 +523,6 @@
   "TrackSender": "本地轨道发送者",
   "Track": "轨道",
   "Renegotiate": "重新协商",
-  "RestartIce": "重启Ice"
+  "RestartIce": "重启Ice",
+  "Reconnect": "重连"
 }

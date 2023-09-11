@@ -1065,15 +1065,15 @@ class BasePeerConnection {
       }
       logger.i('start setRemoteDescription sdp offer:${sdp.type}');
       RTCSessionDescription? remoteDescription;
-      try {
-        remoteDescription = await peerConnection.getRemoteDescription();
-      } catch (e) {
-        logger.e('peerConnection getRemoteDescription failure:$e');
-      }
-      if (remoteDescription != null) {
-        logger.w(
-            'RemoteDescription sdp offer is exist:${remoteDescription.type}');
-      }
+      // try {
+      //   remoteDescription = await peerConnection.getRemoteDescription();
+      // } catch (e) {
+      //   logger.e('peerConnection getRemoteDescription failure:$e');
+      // }
+      // if (remoteDescription != null) {
+      //   logger.w(
+      //       'RemoteDescription sdp offer is exist:${remoteDescription.type}');
+      // }
       try {
         await peerConnection.setRemoteDescription(sdp);
       } catch (e) {
