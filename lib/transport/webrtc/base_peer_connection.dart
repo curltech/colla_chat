@@ -690,7 +690,7 @@ class BasePeerConnection {
     logger.w('onRenegotiationNeeded event');
 
     ///在启动restartIce或者流有变化的时候，重新协商
-    negotiate();
+    // negotiate();
   }
 
   //数据通道状态事件
