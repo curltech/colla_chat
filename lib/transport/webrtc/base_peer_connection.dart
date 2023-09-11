@@ -622,8 +622,8 @@ class BasePeerConnection {
     if (state == RTCIceConnectionState.RTCIceConnectionStateDisconnected) {
       logger.e('Ice connection disconnected:$state');
 
-      ///尝试重新连接
-      //reconnect();
+      ///一般可以自动恢复，尝试重新协商
+      await negotiate();
     }
     if (state == RTCIceConnectionState.RTCIceConnectionStateFailed) {
       logger.e('Ice connection failure:$state');
@@ -719,6 +719,8 @@ class BasePeerConnection {
     }
   }
 
+  bool negotiating = false;
+
   ///实际开始执行协商过程
   ///被叫不能在第一次的时候主动发起协议过程，主叫或者被叫不在第一次的时候可以发起协商过程
   ///一般情况下系统
@@ -727,10 +729,20 @@ class BasePeerConnection {
       logger.e('BasePeerConnection is not init');
       return;
     }
-    if (_initiator!) {
-      await _negotiateOffer();
-    } else {
-      await _negotiateAnswer();
+    if (negotiating) {
+      logger.e('BasePeerConnection is negotiating');
+      return;
+    }
+    try {
+      if (_initiator!) {
+        await _negotiateOffer();
+      } else {
+        await _negotiateAnswer();
+      }
+    } catch (e) {
+      logger.e('BasePeerConnection negotiate failure:$e');
+    } finally {
+      negotiating = false;
     }
   }
 
