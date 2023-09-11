@@ -96,8 +96,11 @@ class P2pConferenceClient extends PeerMediaStreamController {
     var peerId = peerConnection.peerId;
     var clientId = peerConnection.clientId;
     var name = peerConnection.name;
-    List<MediaStream?> remoteStreams =
-        peerConnection.basePeerConnection.peerConnection!.getRemoteStreams();
+    RTCPeerConnection? conn = peerConnection.basePeerConnection.peerConnection;
+    if (conn == null) {
+      return;
+    }
+    List<MediaStream?> remoteStreams = conn.getRemoteStreams();
     for (var stream in remoteStreams) {
       if (stream == null) {
         logger.e('A peerConnection remoteStream is null');
