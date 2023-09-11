@@ -1094,42 +1094,13 @@ class BasePeerConnection {
   ///如果是disagree信号，则保持answer
   Future<void> _onRenegotiate(WebrtcSignal webrtcSignal) async {
     logger.w('received renegotiate signal:${webrtcSignal.renegotiate}');
-    //await _offerLock.synchronized(() async {
     if (RenegotiateType.request.name == webrtcSignal.renegotiate) {
       if (_initiator != null && _initiator!) {
         await negotiate();
-      } else if (signalingState ==
-          RTCSignalingState.RTCSignalingStateHaveLocalOffer) {
-        initiator = true;
-        emit(
-            WebrtcEventType.signal,
-            WebrtcSignal('renegotiate',
-                renegotiate: RenegotiateType.disagree.name,
-                extension: extension));
-        logger.w(
-            'answer negotiating:$signalingState, can not agree renegotiate signal:${webrtcSignal.renegotiate}');
-        await negotiate();
-      } else if (signalingState == null ||
-          signalingState == RTCSignalingState.RTCSignalingStateStable) {
-        initiator = false;
-        emit(
-            WebrtcEventType.signal,
-            WebrtcSignal('renegotiate',
-                renegotiate: RenegotiateType.agree.name, extension: extension));
-        logger.w(
-            'answer sent agree renegotiate signal:${webrtcSignal.renegotiate} successfully');
+      } else {
+        logger.e('offer received renegotiate request');
       }
-    } else if (RenegotiateType.agree.name == webrtcSignal.renegotiate) {
-      initiator = true;
-      logger.w(
-          'answer received agree renegotiate signal:${webrtcSignal.renegotiate} successfully');
-      await negotiate();
-    } else if (RenegotiateType.disagree.name == webrtcSignal.renegotiate) {
-      initiator = false;
-      logger.w(
-          'answer received disagree renegotiate signal:${webrtcSignal.renegotiate} successfully');
     }
-    //});
 
     return;
   }
