@@ -805,27 +805,27 @@ class BasePeerConnection {
       logger.w('LocalDescription sdp offer is exist:${localDescription.type}');
     }
 
-    await _offerLock.synchronized(() async {
-      if (signalingState == null ||
-          signalingState == RTCSignalingState.RTCSignalingStateStable ||
-          signalingState == RTCSignalingState.RTCSignalingStateHaveLocalOffer) {
-        try {
-          makingOffer = true;
-          RTCSessionDescription offer =
-              await peerConnection.createOffer(sdpConstraints);
-          await peerConnection.setLocalDescription(offer);
-          logger.w('createOffer and setLocalDescription offer successfully');
-          await _sendOffer(offer);
-        } catch (e) {
-          logger.e('createOffer,setLocalDescription and sendOffer failure:$e');
-        } finally {
-          makingOffer = false;
-        }
-      } else {
-        logger.e(
-            'PeerConnection create offer, but signalingState:$signalingState');
+    // await _offerLock.synchronized(() async {
+    if (signalingState == null ||
+        signalingState == RTCSignalingState.RTCSignalingStateStable ||
+        signalingState == RTCSignalingState.RTCSignalingStateHaveLocalOffer) {
+      try {
+        makingOffer = true;
+        RTCSessionDescription offer =
+            await peerConnection.createOffer(sdpConstraints);
+        await peerConnection.setLocalDescription(offer);
+        logger.w('createOffer and setLocalDescription offer successfully');
+        await _sendOffer(offer);
+      } catch (e) {
+        logger.e('createOffer,setLocalDescription and sendOffer failure:$e');
+      } finally {
+        makingOffer = false;
       }
-    });
+    } else {
+      logger
+          .e('PeerConnection create offer, but signalingState:$signalingState');
+    }
+    // });
   }
 
   ///作为主叫，调用外部方法发送offer

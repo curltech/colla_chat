@@ -401,6 +401,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
                   Icons.wifi_off,
                   color: Colors.red,
                 ),
+                tooltip: AppLocalizations.t('Reconnect'),
               );
             }
             String? stateText = _peerConnectionState.value?.name;
