@@ -737,16 +737,17 @@ class BasePeerConnection {
       return;
     }
     negotiating = true;
-    try {
-      if (_initiator!) {
+
+    if (_initiator!) {
+      try {
         await _negotiateOffer();
-      } else {
-        await _negotiateAnswer();
+      } catch (e) {
+        logger.e('BasePeerConnection negotiate failure:$e');
+      } finally {
+        negotiating = false;
       }
-    } catch (e) {
-      logger.e('BasePeerConnection negotiate failure:$e');
-    } finally {
-      negotiating = false;
+    } else {
+      await _negotiateAnswer();
     }
   }
 
