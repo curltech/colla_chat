@@ -623,7 +623,7 @@ class BasePeerConnection {
       logger.e('Ice connection disconnected:$state');
 
       ///尝试重新连接
-      reconnect();
+      //reconnect();
     }
     if (state == RTCIceConnectionState.RTCIceConnectionStateFailed) {
       logger.e('Ice connection failure:$state');
