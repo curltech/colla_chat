@@ -109,13 +109,13 @@ class P2pConferenceClient extends PeerMediaStreamController {
         for (var peerMediaStream in peerMediaStreams) {
           await peerConnection.addLocalStream(peerMediaStream);
         }
-        await renegotiate(peerConnection: peerConnection);
+        await renegotiate(peerConnection: peerConnection, toggle: true);
       } else {
         for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
           for (var peerMediaStream in peerMediaStreams) {
             await peerConnection.addLocalStream(peerMediaStream);
           }
-          await renegotiate(peerConnection: peerConnection);
+          await renegotiate(peerConnection: peerConnection, toggle: true);
         }
       }
     }
