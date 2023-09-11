@@ -524,5 +524,8 @@
   "Track": "轨道",
   "Renegotiate": "重新协商",
   "RestartIce": "重启Ice",
-  "Reconnect": "重连"
+  "Reconnect": "重连",
+  "Reject": "拒绝",
+  "Hold": "保持",
+  "Accept": "接通"
 }

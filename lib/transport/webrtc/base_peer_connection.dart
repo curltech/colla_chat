@@ -963,7 +963,7 @@ class BasePeerConnection {
       return;
     }
     //被叫发送重新协商的请求
-    logger.w('send signal renegotiate:$toggle');
+    logger.w('send signal renegotiate toggle:$toggle');
     if (toggle && !negotiating) {
       emit(
           WebrtcEventType.signal,
@@ -975,7 +975,7 @@ class BasePeerConnection {
           WebrtcSignal('renegotiate',
               renegotiate: RenegotiateType.request.name, extension: extension));
     }
-    logger.w('send signal renegotiate request $toggle successfully');
+    logger.w('send signal renegotiate request toggle:$toggle successfully');
   }
 
   ///作为被叫，创建answer，发生在被叫方，将answer回到主叫方

@@ -254,7 +254,6 @@ class _IndexViewState extends State<IndexView>
               if (name != null) {
                 children.add(
                   CommonAutoSizeText(name,
-                      softWrap: true,
                       style: const TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w500)),
                 );
@@ -263,7 +262,6 @@ class _IndexViewState extends State<IndexView>
               if (title != null) {
                 children.add(
                   CommonAutoSizeText(title,
-                      softWrap: true,
                       style: const TextStyle(
                           fontSize: 14, fontWeight: FontWeight.w400)),
                 );
@@ -274,43 +272,43 @@ class _IndexViewState extends State<IndexView>
                   (contentType == null ||
                       contentType == ChatMessageContentType.text.name)) {
                 content = chatMessageService.recoverContent(content);
-                children.add(Expanded(
-                    child: ExtendedText(
+                children.add(ExtendedText(
                   content,
-                  softWrap: true,
                   style: const TextStyle(
                       //fontSize: 16.0,
                       ),
                   specialTextSpanBuilder: customSpecialTextSpanBuilder,
-                )));
+                ));
               }
 
               banner = InkWell(
                   onTap: () {
                     chatMessageVisible.value = false;
                   },
-                  child: Container(
-                      height: 148,
-                      width: appDataProvider.totalSize.width,
-                      alignment: Alignment.topLeft,
-                      padding: const EdgeInsets.all(10.0),
-                      color: Colors.black.withOpacity(AppOpacity.mdOpacity),
-                      child: Card(
-                          elevation: 0.0,
-                          margin: EdgeInsets.zero,
-                          shape: const ContinuousRectangleBorder(),
-                          child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                bannerAvatarImage,
-                                const SizedBox(
-                                  width: 15.0,
-                                ),
-                                Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: children),
-                              ]))));
+                  child: Column(children: [
+                    Container(
+                        width: appDataProvider.totalSize.width,
+                        alignment: Alignment.topLeft,
+                        padding: const EdgeInsets.all(10.0),
+                        child: Card(
+                            elevation: 0.0,
+                            child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const SizedBox(
+                                    width: 15.0,
+                                  ),
+                                  bannerAvatarImage,
+                                  const SizedBox(
+                                    width: 15.0,
+                                  ),
+                                  Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: children),
+                                ]))),
+                    const Spacer()
+                  ]));
 
               //延时30秒后一般消息消失
               Future.delayed(const Duration(seconds: 30)).then((value) {
@@ -394,44 +392,43 @@ class _IndexViewState extends State<IndexView>
         conferenceChatMessage.groupType != PartyType.conference.name) {
       buttons.add(acceptedButton);
     }
-    return Container(
-        height: 148,
-        alignment: Alignment.topLeft,
-        width: appDataProvider.totalSize.width,
-        padding: const EdgeInsets.all(0.0),
-        child: Card(
-            // color: Colors.black.withOpacity(0.5),
-            elevation: 0.0,
-            margin: EdgeInsets.zero,
-            shape: const ContinuousRectangleBorder(),
-            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              bannerAvatarImage,
-              const SizedBox(
-                width: 10.0,
-              ),
-              Expanded(
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                    CommonAutoSizeText(name,
-                        softWrap: true,
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    Expanded(
-                        child: CommonAutoSizeText(
-                      AppLocalizations.t('Inviting you $title chat ') +
-                          (conferenceChatMessage.senderName ?? ''),
-                      softWrap: true,
-                    )),
-                    CommonAutoSizeText(
-                      '${AppLocalizations.t('Topic:')} ${topic ?? ''}',
-                      softWrap: true,
-                    ),
-                    ButtonBar(
-                        alignment: MainAxisAlignment.end, children: buttons),
-                  ])),
-            ])));
+    return Column(children: [
+      Container(
+          alignment: Alignment.topLeft,
+          width: appDataProvider.totalSize.width,
+          padding: const EdgeInsets.all(10.0),
+          child: Card(
+              elevation: 0.0,
+              child:
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                const SizedBox(
+                  width: 10.0,
+                ),
+                bannerAvatarImage,
+                const SizedBox(
+                  width: 10.0,
+                ),
+                Expanded(
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                      CommonAutoSizeText(name,
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold)),
+                      CommonAutoSizeText(
+                        AppLocalizations.t('Inviting you $title chat ') +
+                            (conferenceChatMessage.senderName ?? ''),
+                      ),
+                      CommonAutoSizeText(
+                        '${AppLocalizations.t('Topic:')} ${topic ?? ''}',
+                      ),
+                      ButtonBar(
+                          alignment: MainAxisAlignment.end, children: buttons),
+                    ])),
+              ]))),
+      const Spacer()
+    ]);
   }
 
   _buildVideoChatMessageBanner(BuildContext context) {
