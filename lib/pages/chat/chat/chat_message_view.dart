@@ -191,6 +191,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
     peerConnectionPool.registerWebrtcEvent(
         peerId, WebrtcEventType.connectionState, _updatePeerConnectionState);
     peerConnectionPool.registerWebrtcEvent(
+        peerId, WebrtcEventType.signalingState, _updatePeerConnectionState);
+    peerConnectionPool.registerWebrtcEvent(
         peerId, WebrtcEventType.closed, _updatePeerConnectionState);
     peerConnectionPool.registerWebrtcEvent(
         peerId, WebrtcEventType.initiator, _updatePeerConnectionState);
@@ -227,7 +229,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
             await peerConnectionPool.createOffer(peerId);
         if (advancedPeerConnection != null) {
           _peerConnectionState.value = advancedPeerConnection.connectionState;
-          _initiator.value = advancedPeerConnection.basePeerConnection.initiator;
+          _initiator.value =
+              advancedPeerConnection.basePeerConnection.initiator;
         } else {
           _peerConnectionState.value = null;
         }
@@ -235,7 +238,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
         for (AdvancedPeerConnection advancedPeerConnection
             in advancedPeerConnections) {
           _peerConnectionState.value = advancedPeerConnection.connectionState;
-          _initiator.value = advancedPeerConnection.basePeerConnection.initiator;
+          _initiator.value =
+              advancedPeerConnection.basePeerConnection.initiator;
           if (advancedPeerConnection.connectionState ==
               RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
             break;
@@ -263,7 +267,14 @@ class _ChatMessageViewState extends State<ChatMessageView>
 
   Future<void> _updatePeerConnectionState(WebrtcEvent event) async {
     WebrtcEventType eventType = event.eventType;
-    if (eventType == WebrtcEventType.closed) {
+    if (eventType == WebrtcEventType.signalingState) {
+      RTCSignalingState? state = event.data;
+      if (mounted) {
+        DialogUtil.info(context,
+            content: AppLocalizations.t(
+                'PeerConnection signalingState was changed to $state'));
+      }
+    } else if (eventType == WebrtcEventType.closed) {
       _peerConnectionState.value =
           RTCPeerConnectionState.RTCPeerConnectionStateClosed;
       _initiator.value = null;
@@ -293,6 +304,11 @@ class _ChatMessageViewState extends State<ChatMessageView>
       }
     } else if (eventType == WebrtcEventType.initiator) {
       _initiator.value = event.data;
+      if (mounted) {
+        DialogUtil.info(context,
+            content: AppLocalizations.t(
+                'PeerConnection initiator was changed to $_initiator'));
+      }
     }
   }
 

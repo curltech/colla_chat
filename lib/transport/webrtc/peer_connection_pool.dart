@@ -700,6 +700,10 @@ class PeerConnectionPool {
     onWebrtcEvent(event);
   }
 
+  onSignalingState(WebrtcEvent event) async {
+    onWebrtcEvent(event);
+  }
+
   ///连接成功
   ///webrtc连接完成后首先交换最新的联系人信息，然后请求新的订阅渠道消息
   ///然后交换棘轮加密的密钥

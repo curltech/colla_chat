@@ -165,6 +165,16 @@ class AdvancedPeerConnection {
       await peerConnectionPool.onStatusChanged(webrtcEvent);
     });
 
+    basePeerConnection.on(WebrtcEventType.signalingState, (data) async {
+      var webrtcEvent = WebrtcEvent(peerId,
+          clientId: clientId,
+          name: name,
+          eventType: WebrtcEventType.signalingState,
+          data: data);
+      onWebrtcEvent(webrtcEvent);
+      await peerConnectionPool.onSignalingState(webrtcEvent);
+    });
+
     basePeerConnection.on(WebrtcEventType.closed, (data) async {
       var webrtcEvent = WebrtcEvent(peerId,
           clientId: clientId,
