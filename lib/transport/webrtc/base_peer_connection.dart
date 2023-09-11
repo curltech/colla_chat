@@ -691,9 +691,6 @@ class BasePeerConnection {
   ///需要重新协商，一般是本节点有增减轨道的时候
   onRenegotiationNeeded() {
     logger.w('onRenegotiationNeeded event');
-
-    ///在启动restartIce或者流有变化的时候，重新协商
-    negotiate();
   }
 
   //数据通道状态事件

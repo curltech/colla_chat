@@ -328,7 +328,11 @@ class PeerConnectionPool {
         logger.e('webrtcPeer.init fail');
         return null;
       }
+
       await put(peerId, peerConnection, clientId: clientId);
+
+      ///在启动协商
+      await peerConnection.renegotiate();
 
       return peerConnection;
     });
