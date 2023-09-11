@@ -593,6 +593,7 @@ class BasePeerConnection {
 
   Future<void> connected() async {
     logger.w('PeerConnectionStatus connected, webrtc connection is completed');
+    negotiating = false;
     end = DateTime.now().millisecondsSinceEpoch;
     if (end != null && start != null) {
       var interval = end! - start!;
@@ -641,8 +642,10 @@ class BasePeerConnection {
   /// signal状态事件
   onSignalingState(RTCSignalingState state) async {
     logger.w('RTCSignalingState was changed to:$state');
-    if (state == RTCSignalingState.RTCSignalingStateStable) {
-      logger.w('RTCSignalingState is stable:$state');
+    if (state == RTCSignalingState.RTCSignalingStateStable ||
+        state == RTCSignalingState.RTCSignalingStateClosed) {
+      negotiating = false;
+      logger.w('RTCSignalingState is stable or closed:$state');
     }
     emit(WebrtcEventType.signalingState, state);
   }
@@ -733,16 +736,11 @@ class BasePeerConnection {
       logger.e('BasePeerConnection is negotiating');
       return;
     }
-    try {
-      if (_initiator!) {
-        await _negotiateOffer();
-      } else {
-        await _negotiateAnswer();
-      }
-    } catch (e) {
-      logger.e('BasePeerConnection negotiate failure:$e');
-    } finally {
-      negotiating = false;
+    negotiating = true;
+    if (_initiator!) {
+      await _negotiateOffer();
+    } else {
+      await _negotiateAnswer();
     }
   }
 
@@ -1606,6 +1604,7 @@ class BasePeerConnection {
     final RTCPeerConnection peerConnection = _peerConnection!;
     try {
       await peerConnection.close();
+      negotiating = false;
       // allow events concurrent with destruction to be handled
       peerConnection.onIceConnectionState = null;
       peerConnection.onIceGatheringState = null;
