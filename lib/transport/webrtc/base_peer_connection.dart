@@ -891,7 +891,7 @@ class BasePeerConnection {
     else if (signalType == SignalType.sdp.name && sdp != null) {
       if (_initiator! && sdp.type == 'offer') {
         logger.e('offer received sdp type offer');
-        initiator = false;
+        return;
       }
       RTCSessionDescription? remoteDescription;
       try {
@@ -1093,7 +1093,7 @@ class BasePeerConnection {
   ///如果是agree信号，则变成offer
   ///如果是disagree信号，则保持answer
   Future<void> _onRenegotiate(WebrtcSignal webrtcSignal) async {
-    logger.w('answer received renegotiate signal:${webrtcSignal.renegotiate}');
+    logger.w('received renegotiate signal:${webrtcSignal.renegotiate}');
     //await _offerLock.synchronized(() async {
     if (RenegotiateType.request.name == webrtcSignal.renegotiate) {
       if (_initiator != null && _initiator!) {
