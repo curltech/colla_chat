@@ -103,16 +103,17 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
                       '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is renegotiate')}');
             });
         endSlideActions.add(renegotiateSlideAction);
-        TileData restartIceSlideAction = TileData(
-            title: 'RestartIce',
+        TileData toggleIceSlideAction = TileData(
+            title: 'Toggle',
             prefix: Icons.recycling_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
-              p2pConferenceClientPool.p2pConferenceClient?.restartIce();
+              p2pConferenceClientPool.p2pConferenceClient
+                  ?.renegotiate(toggle: true);
               DialogUtil.info(context,
                   content:
-                      '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is restartIce')}');
+                      '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is toggle renegotiate')}');
             });
-        endSlideActions.add(restartIceSlideAction);
+        endSlideActions.add(toggleIceSlideAction);
         tile.endSlideActions = endSlideActions;
 
         tiles.add(tile);

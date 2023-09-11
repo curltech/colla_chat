@@ -48,28 +48,16 @@ class P2pConferenceClient extends PeerMediaStreamController {
     }
   }
 
-  renegotiate({AdvancedPeerConnection? peerConnection}) async {
+  renegotiate(
+      {AdvancedPeerConnection? peerConnection, bool toggle = false}) async {
     if (peerConnection != null) {
-      await peerConnection.renegotiate();
+      await peerConnection.renegotiate(toggle: toggle);
     } else {
       List<AdvancedPeerConnection> peerConnections = [
         ..._peerConnections.values
       ];
       for (AdvancedPeerConnection peerConnection in peerConnections) {
-        await peerConnection.renegotiate();
-      }
-    }
-  }
-
-  restartIce({AdvancedPeerConnection? peerConnection}) async {
-    if (peerConnection != null) {
-      await peerConnection.restartIce();
-    } else {
-      List<AdvancedPeerConnection> peerConnections = [
-        ..._peerConnections.values
-      ];
-      for (AdvancedPeerConnection peerConnection in peerConnections) {
-        await peerConnection.restartIce();
+        await peerConnection.renegotiate(toggle: toggle);
       }
     }
   }

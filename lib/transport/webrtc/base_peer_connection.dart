@@ -133,6 +133,7 @@ enum SignalType {
 ///被叫收到同意的信号完成切换后则开始重新协商
 enum RenegotiateType {
   request,
+  toggle,
   agree,
   disagree,
 }
@@ -593,7 +594,6 @@ class BasePeerConnection {
 
   Future<void> connected() async {
     logger.w('PeerConnectionStatus connected, webrtc connection is completed');
-    negotiating = false;
     end = DateTime.now().millisecondsSinceEpoch;
     if (end != null && start != null) {
       var interval = end! - start!;
@@ -644,7 +644,6 @@ class BasePeerConnection {
     logger.w('RTCSignalingState was changed to:$state');
     if (state == RTCSignalingState.RTCSignalingStateStable ||
         state == RTCSignalingState.RTCSignalingStateClosed) {
-      negotiating = false;
       logger.w('RTCSignalingState is stable or closed:$state');
     }
     emit(WebrtcEventType.signalingState, state);
@@ -719,12 +718,20 @@ class BasePeerConnection {
     }
   }
 
-  bool negotiating = false;
+  bool get negotiating {
+    RTCSignalingState? signalingState = _peerConnection?.signalingState;
+    if (signalingState == null ||
+        signalingState == RTCSignalingState.RTCSignalingStateStable ||
+        signalingState == RTCSignalingState.RTCSignalingStateClosed) {
+      return false;
+    }
+    return true;
+  }
 
   ///实际开始执行协商过程
   ///被叫不能在第一次的时候主动发起协议过程，主叫或者被叫不在第一次的时候可以发起协商过程
   ///一般情况下系统
-  negotiate() async {
+  negotiate({bool toggle = false}) async {
     if (_initiator == null) {
       logger.e('BasePeerConnection is not init');
       return;
@@ -733,18 +740,11 @@ class BasePeerConnection {
       logger.e('BasePeerConnection is negotiating');
       return;
     }
-    negotiating = true;
 
     if (_initiator!) {
-      try {
-        await _negotiateOffer();
-      } catch (e) {
-        logger.e('BasePeerConnection negotiate failure:$e');
-      } finally {
-        negotiating = false;
-      }
+      await _negotiateOffer();
     } else {
-      await _negotiateAnswer();
+      await _negotiateAnswer(toggle: toggle);
     }
   }
 
@@ -808,6 +808,7 @@ class BasePeerConnection {
     }
 
     // await _offerLock.synchronized(() async {
+    RTCSignalingState? signalingState = _peerConnection?.signalingState;
     if (signalingState == null ||
         signalingState == RTCSignalingState.RTCSignalingStateStable ||
         signalingState == RTCSignalingState.RTCSignalingStateHaveLocalOffer) {
@@ -953,7 +954,7 @@ class BasePeerConnection {
   }
 
   ///作为被叫，协商时发送再协商信号给主叫，要求重新发起协商
-  _negotiateAnswer() async {
+  _negotiateAnswer({bool toggle = false}) async {
     logger.i('Negotiation start, requesting negotiation from answer');
     if (_peerConnection == null ||
         connectionState ==
@@ -962,12 +963,19 @@ class BasePeerConnection {
       return;
     }
     //被叫发送重新协商的请求
-    logger.w('send signal renegotiate');
-    emit(
-        WebrtcEventType.signal,
-        WebrtcSignal('renegotiate',
-            renegotiate: RenegotiateType.request.name, extension: extension));
-    logger.w('send signal renegotiate request successfully');
+    logger.w('send signal renegotiate:$toggle');
+    if (toggle && !negotiating) {
+      emit(
+          WebrtcEventType.signal,
+          WebrtcSignal('renegotiate',
+              renegotiate: RenegotiateType.toggle.name, extension: extension));
+    } else {
+      emit(
+          WebrtcEventType.signal,
+          WebrtcSignal('renegotiate',
+              renegotiate: RenegotiateType.request.name, extension: extension));
+    }
+    logger.w('send signal renegotiate request $toggle successfully');
   }
 
   ///作为被叫，创建answer，发生在被叫方，将answer回到主叫方
@@ -1067,15 +1075,15 @@ class BasePeerConnection {
       }
       logger.i('start setRemoteDescription sdp offer:${sdp.type}');
       RTCSessionDescription? remoteDescription;
-      // try {
-      //   remoteDescription = await peerConnection.getRemoteDescription();
-      // } catch (e) {
-      //   logger.e('peerConnection getRemoteDescription failure:$e');
-      // }
-      // if (remoteDescription != null) {
-      //   logger.w(
-      //       'RemoteDescription sdp offer is exist:${remoteDescription.type}');
-      // }
+      try {
+        remoteDescription = await peerConnection.getRemoteDescription();
+      } catch (e) {
+        logger.e('peerConnection getRemoteDescription failure:$e');
+      }
+      if (remoteDescription != null) {
+        logger.w(
+            'RemoteDescription sdp offer is exist:${remoteDescription.type}');
+      }
       try {
         await peerConnection.setRemoteDescription(sdp);
       } catch (e) {
@@ -1117,6 +1125,34 @@ class BasePeerConnection {
       } else {
         logger.e('offer received renegotiate request');
       }
+    } else if (RenegotiateType.toggle.name == webrtcSignal.renegotiate) {
+      if (!negotiating) {
+        initiator = false;
+        logger
+            .w('offer agree renegotiate toggle，will be initiator:$_initiator');
+        emit(
+            WebrtcEventType.signal,
+            WebrtcSignal('renegotiate',
+                renegotiate: RenegotiateType.agree.name, extension: extension));
+      } else {
+        initiator = true;
+        logger.w(
+            'offer disagree renegotiate toggle，will be initiator:$_initiator');
+        emit(
+            WebrtcEventType.signal,
+            WebrtcSignal('renegotiate',
+                renegotiate: RenegotiateType.disagree.name,
+                extension: extension));
+      }
+    } else if (RenegotiateType.agree.name == webrtcSignal.renegotiate) {
+      initiator = true;
+      logger
+          .w('answer received agree renegotiate，will be initiator:$_initiator');
+      await negotiate();
+    } else if (RenegotiateType.disagree.name == webrtcSignal.renegotiate) {
+      initiator = false;
+      logger.w(
+          'answer received disagree renegotiate，will be initiator:$_initiator');
     }
 
     return;
@@ -1608,7 +1644,6 @@ class BasePeerConnection {
     final RTCPeerConnection peerConnection = _peerConnection!;
     try {
       await peerConnection.close();
-      negotiating = false;
       // allow events concurrent with destruction to be handled
       peerConnection.onIceConnectionState = null;
       peerConnection.onIceGatheringState = null;
