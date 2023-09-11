@@ -589,7 +589,7 @@ class ConferenceChatMessageController with ChangeNotifier {
       if (p2pConferenceClient != null) {
         await p2pConferenceClient
             .addAdvancedPeerConnection(advancedPeerConnection);
-        indexWidgetProvider.push('video_chat');
+        // indexWidgetProvider.push('video_chat');
       } else {
         logger.e('p2pConferenceClient:$messageId is not exist');
       }
