@@ -1096,7 +1096,10 @@ class BasePeerConnection {
     logger.w('answer received renegotiate signal:${webrtcSignal.renegotiate}');
     //await _offerLock.synchronized(() async {
     if (RenegotiateType.request.name == webrtcSignal.renegotiate) {
-      if (signalingState == RTCSignalingState.RTCSignalingStateHaveLocalOffer) {
+      if (_initiator != null && _initiator!) {
+        await negotiate();
+      } else if (signalingState ==
+          RTCSignalingState.RTCSignalingStateHaveLocalOffer) {
         initiator = true;
         emit(
             WebrtcEventType.signal,
