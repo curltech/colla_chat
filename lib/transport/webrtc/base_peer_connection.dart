@@ -640,7 +640,7 @@ class BasePeerConnection {
 
   /// signal状态事件
   onSignalingState(RTCSignalingState state) async {
-    logger.w('RTCSignalingState:$state');
+    logger.w('RTCSignalingState was changed to:$state');
     if (state == RTCSignalingState.RTCSignalingStateStable) {
       logger.w('RTCSignalingState is stable:$state');
     }
@@ -714,6 +714,7 @@ class BasePeerConnection {
   set initiator(bool? initiator) {
     if (_initiator != initiator) {
       _initiator = initiator;
+      logger.w('BasePeerConnection initiator is changed to $_initiator');
       emit(WebrtcEventType.initiator, _initiator);
     }
   }
