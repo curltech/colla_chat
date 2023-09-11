@@ -900,9 +900,11 @@ class BasePeerConnection {
     }
     //如果sdp信息，则设置远程描述，如果是offer，还需要设置和发送answer
     //对主叫节点来说，sdp应该是answer，如果是offer，表示出错了
+    //只能等待连接被清除
     else if (signalType == SignalType.sdp.name && sdp != null) {
       if (_initiator! && sdp.type == 'offer') {
-        logger.e('offer received sdp type offer');
+        logger.e('offer received sdp type offer，will be closed');
+        await close();
         return;
       }
       RTCSessionDescription? remoteDescription;
@@ -1057,7 +1059,8 @@ class BasePeerConnection {
     //如果sdp信息，则设置远程描述，对被叫来说，收到answer表示出错了
     else if (signalType == SignalType.sdp.name && sdp != null) {
       if (sdp.type == 'answer') {
-        logger.e('answer received sdp type answer');
+        logger.e('answer received sdp type answer, will be closed');
+        await close();
         return;
       }
       logger.i('start setRemoteDescription sdp offer:${sdp.type}');

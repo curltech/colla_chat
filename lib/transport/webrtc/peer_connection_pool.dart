@@ -435,8 +435,8 @@ class PeerConnectionPool {
           _peerConnections.get(peerId);
       if (peerConnections != null && peerConnections.isNotEmpty) {
         for (AdvancedPeerConnection peerConnection in peerConnections.values) {
-          if (peerConnection.connectionState ==
-              RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
+          if (peerConnection.connectionState !=
+              RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
             var start = peerConnection.basePeerConnection.start;
             if (start == null) {
               removedPeerConnections.add(peerConnection);
@@ -455,20 +455,7 @@ class PeerConnectionPool {
       }
     }
     for (var removedPeerConnection in removedPeerConnections) {
-      var peerId = removedPeerConnection.peerId;
-      var clientId = removedPeerConnection.clientId;
-      var name = removedPeerConnection.name;
-      Map<String, AdvancedPeerConnection>? peerConnections =
-          _peerConnections.get(peerId);
-      if (peerConnections != null && peerConnections.isNotEmpty) {
-        peerConnections.remove(clientId);
-        if (peerConnections.isEmpty) {
-          _peerConnections.remove(peerId);
-        }
-      }
-      WebrtcEvent event = WebrtcEvent(peerId,
-          clientId: clientId, name: name, eventType: WebrtcEventType.closed);
-      onWebrtcEvent(event);
+      await removedPeerConnection.close();
     }
   }
 

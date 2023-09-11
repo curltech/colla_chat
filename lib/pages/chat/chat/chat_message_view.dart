@@ -221,10 +221,25 @@ class _ChatMessageViewState extends State<ChatMessageView>
       }
       chatMessageController.chatGPT = chatGPT;
     } else {
+      AdvancedPeerConnection? connected;
       List<AdvancedPeerConnection> advancedPeerConnections =
           await peerConnectionPool.get(peerId);
       //如果连接不存在，则创建新连接
-      if (advancedPeerConnections.isEmpty) {
+      if (advancedPeerConnections.isNotEmpty) {
+        for (AdvancedPeerConnection advancedPeerConnection
+            in advancedPeerConnections) {
+          _peerConnectionState.value = advancedPeerConnection.connectionState;
+          _initiator.value =
+              advancedPeerConnection.basePeerConnection.initiator;
+          if (advancedPeerConnection.connectionState !=
+              RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+            await advancedPeerConnection.close();
+          } else {
+            connected = advancedPeerConnection;
+          }
+        }
+      }
+      if (connected == null) {
         AdvancedPeerConnection? advancedPeerConnection =
             await peerConnectionPool.createOffer(peerId);
         if (advancedPeerConnection != null) {
@@ -233,17 +248,6 @@ class _ChatMessageViewState extends State<ChatMessageView>
               advancedPeerConnection.basePeerConnection.initiator;
         } else {
           _peerConnectionState.value = null;
-        }
-      } else {
-        for (AdvancedPeerConnection advancedPeerConnection
-            in advancedPeerConnections) {
-          _peerConnectionState.value = advancedPeerConnection.connectionState;
-          _initiator.value =
-              advancedPeerConnection.basePeerConnection.initiator;
-          if (advancedPeerConnection.connectionState ==
-              RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
-            break;
-          }
         }
       }
     }
@@ -380,49 +384,35 @@ class _ChatMessageViewState extends State<ChatMessageView>
       var peerConnectionStatusWidget = ValueListenableBuilder(
           valueListenable: _peerConnectionState,
           builder: (context, value, child) {
-            Widget widget = IconButton(
-              onPressed: () {
-                _createPeerConnection();
-              },
-              icon: const Icon(
-                Icons.wifi_off,
-                color: Colors.red,
-              ),
-              tooltip: AppLocalizations.t('Webrtc state'),
-            );
+            Widget widget;
 
-            if (_peerConnectionState.value !=
-                RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
-              String? stateText = _peerConnectionState.value?.name;
-              stateText = stateText?.substring(22);
-              stateText ??= 'Create';
-              if (_peerConnectionState.value == null ||
-                  _peerConnectionState.value ==
-                      RTCPeerConnectionState
-                          .RTCPeerConnectionStateDisconnected) {
-                widget = const Icon(
+            if (_peerConnectionState.value ==
+                RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+              widget = const Icon(
+                Icons.wifi,
+                color: Colors.white,
+              );
+            } else {
+              widget = IconButton(
+                onPressed: () {
+                  _createPeerConnection();
+                },
+                icon: const Icon(
                   Icons.wifi_off,
-                  color: Colors.grey,
-                );
-              } else if (_peerConnectionState.value ==
-                  RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
-                widget = const Icon(
-                  Icons.wifi,
-                  color: Colors.white,
-                );
-              } else {
-                widget = const Icon(
-                  Icons.wifi,
-                  color: Colors.yellow,
-                );
-              }
-              widget =
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                widget,
-                CommonAutoSizeText(AppLocalizations.t(stateText),
-                    style: const TextStyle(fontSize: 12))
-              ]);
+                  color: Colors.red,
+                ),
+              );
             }
+            String? stateText = _peerConnectionState.value?.name;
+            stateText = stateText?.substring(22);
+            stateText ??= 'Unknown';
+            widget =
+                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              widget,
+              CommonAutoSizeText(AppLocalizations.t(stateText),
+                  style: const TextStyle(fontSize: 12))
+            ]);
+
             return widget;
           });
 
