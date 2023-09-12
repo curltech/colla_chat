@@ -112,14 +112,17 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
     if (width > 300) {
       width = 300;
     }
+    bool transportType =
+        widget.chatMessage.transportType == TransportType.webrtc.name;
     List<Widget> children = [
       Bubble(
           elevation: 0.0,
           stick: false,
           margin: const BubbleEdges.only(top: 1),
           nip: widget.isMyself ? BubbleNip.rightTop : BubbleNip.leftTop,
-          color: widget.isMyself ? myself.primary : Colors.white,
-          //myself.secondary,
+          color: transportType
+              ? (widget.isMyself ? myself.primary : Colors.white)
+              : Colors.yellow,
           padding: const BubbleEdges.all(0),
           child: body)
     ];
@@ -245,9 +248,9 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
   Widget _buildOther(BuildContext context) {
     var sendTime = widget.chatMessage.sendTime;
     sendTime = sendTime = DateUtil.formatEasyRead(sendTime!);
-    int? id=widget.chatMessage.id;
-    Widget title =
-        CommonAutoSizeText('$id: $sendTime', style: const TextStyle(fontSize: 12));
+    int? id = widget.chatMessage.id;
+    Widget title = CommonAutoSizeText('$id: $sendTime',
+        style: const TextStyle(fontSize: 12));
     // CommonAutoSizeText('${widget.chatMessage.id}:${widget.chatMessage.senderName}');
     if (timer != null) {
       title = Row(
@@ -295,9 +298,9 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
   Widget _buildMe(BuildContext context) {
     var sendTime = widget.chatMessage.sendTime;
     sendTime = sendTime = DateUtil.formatEasyRead(sendTime!);
-    int? id=widget.chatMessage.id;
-    Widget title =
-        CommonAutoSizeText('$id: $sendTime', style: const TextStyle(fontSize: 12));
+    int? id = widget.chatMessage.id;
+    Widget title = CommonAutoSizeText('$id: $sendTime',
+        style: const TextStyle(fontSize: 12));
     if (timer != null) {
       title = Row(
         children: [
