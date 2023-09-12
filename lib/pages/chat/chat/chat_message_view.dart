@@ -178,6 +178,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
   }
 
   ///初始化，webrtc如果没有连接，尝试连接
+  ///在初始化，窗口恢复，背景恢复都会调用，因此需要能够重复调用
   ///如果ChatGPT，则设置
   _createPeerConnection() async {
     var chatSummary = _chatSummary.value;
@@ -205,7 +206,21 @@ class _ChatMessageViewState extends State<ChatMessageView>
     }
   }
 
-  ///linkman的PeerConnection初始化
+  _disconnectPeerConnection() async {
+    var chatSummary = _chatSummary.value;
+    if (chatSummary == null) {
+      logger.e('chatSummary is null');
+      return;
+    }
+    chatMessageController.chatGPT = null;
+    String peerId = chatSummary.peerId!;
+    String partyType = chatSummary.partyType!;
+    if (partyType == PartyType.linkman.name) {
+      await _disconnectLinkmanPeerConnection(peerId);
+    }
+  }
+
+  ///创建linkman的PeerConnection，可以重复调用只会创建一次
   _createLinkmanPeerConnection(String peerId) async {
     if (peerId == myself.peerId) {
       return;
@@ -221,25 +236,10 @@ class _ChatMessageViewState extends State<ChatMessageView>
       }
       chatMessageController.chatGPT = chatGPT;
     } else {
-      AdvancedPeerConnection? connected;
       List<AdvancedPeerConnection> advancedPeerConnections =
           await peerConnectionPool.get(peerId);
-      //如果连接不存在，则创建新连接
-      if (advancedPeerConnections.isNotEmpty) {
-        for (AdvancedPeerConnection advancedPeerConnection
-            in advancedPeerConnections) {
-          _peerConnectionState.value = advancedPeerConnection.connectionState;
-          _initiator.value =
-              advancedPeerConnection.basePeerConnection.initiator;
-          if (advancedPeerConnection.connectionState !=
-              RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
-            await advancedPeerConnection.close();
-          } else {
-            connected = advancedPeerConnection;
-          }
-        }
-      }
-      if (connected == null) {
+      //如果连接不存在，则创建新连接，
+      if (advancedPeerConnections.isEmpty) {
         AdvancedPeerConnection? advancedPeerConnection =
             await peerConnectionPool.createOffer(peerId);
         if (advancedPeerConnection != null) {
@@ -248,6 +248,39 @@ class _ChatMessageViewState extends State<ChatMessageView>
               advancedPeerConnection.basePeerConnection.initiator;
         } else {
           _peerConnectionState.value = null;
+        }
+      } else {
+        advancedPeerConnections.first;
+        for (AdvancedPeerConnection advancedPeerConnection
+            in advancedPeerConnections) {
+          _peerConnectionState.value = advancedPeerConnection.connectionState;
+          _initiator.value =
+              advancedPeerConnection.basePeerConnection.initiator;
+          if (advancedPeerConnection.connectionState ==
+              RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  _disconnectLinkmanPeerConnection(String peerId) async {
+    if (peerId == myself.peerId) {
+      return;
+    }
+    Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+    if (linkman == null) {
+      return;
+    }
+    if (linkman.linkmanStatus != LinkmanStatus.chatGPT.name) {
+      List<AdvancedPeerConnection> advancedPeerConnections =
+          await peerConnectionPool.get(peerId);
+      //如果连接存在，则关闭连接
+      if (advancedPeerConnections.isNotEmpty) {
+        for (AdvancedPeerConnection advancedPeerConnection
+            in advancedPeerConnections) {
+          await advancedPeerConnection.close();
         }
       }
     }
@@ -388,9 +421,15 @@ class _ChatMessageViewState extends State<ChatMessageView>
 
             if (_peerConnectionState.value ==
                 RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
-              widget = const Icon(
-                Icons.wifi,
-                color: Colors.white,
+              widget = IconButton(
+                onPressed: () {
+                  _disconnectPeerConnection();
+                },
+                icon: const Icon(
+                  Icons.wifi,
+                  color: Colors.white,
+                ),
+                tooltip: AppLocalizations.t('Disconnect'),
               );
             } else {
               widget = IconButton(
@@ -495,7 +534,11 @@ class _ChatMessageViewState extends State<ChatMessageView>
       peerConnectionPool.unregisterWebrtcEvent(chatSummary.peerId!,
           WebrtcEventType.connectionState, _updatePeerConnectionState);
       peerConnectionPool.unregisterWebrtcEvent(chatSummary.peerId!,
+          WebrtcEventType.signalingState, _updatePeerConnectionState);
+      peerConnectionPool.unregisterWebrtcEvent(chatSummary.peerId!,
           WebrtcEventType.closed, _updatePeerConnectionState);
+      peerConnectionPool.unregisterWebrtcEvent(chatSummary.peerId!,
+          WebrtcEventType.initiator, _updatePeerConnectionState);
     }
     WidgetsBinding.instance.removeObserver(this);
     windowManager.removeListener(this);
