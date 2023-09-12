@@ -710,9 +710,11 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               ),
             );
             if (value == VideoChatStatus.calling && platformParams.mobile) {
-              buttonWidget =
-                  ButtonBar(alignment: MainAxisAlignment.center, children: [
+              buttonWidget = Row(children: [
                 buttonWidget,
+                const SizedBox(
+                  width: 10.0,
+                ),
                 _buildSpeakerSwitchButton(context),
               ]);
             }

@@ -570,7 +570,7 @@ class ConferenceChatMessageController with ChangeNotifier {
   ///对方保持，自己可以先加入，等待对方后续加入
   Future<void> _onHold(String peerId, String clientId, String messageId) async {
     if (_status == VideoChatStatus.calling) {
-      status = VideoChatStatus.end;
+      status = VideoChatStatus.chatting;
     }
     await join();
   }
@@ -589,6 +589,9 @@ class ConferenceChatMessageController with ChangeNotifier {
       if (p2pConferenceClient != null) {
         await p2pConferenceClient
             .addAdvancedPeerConnection(advancedPeerConnection);
+        if (_status == VideoChatStatus.calling) {
+          status = VideoChatStatus.chatting;
+        }
       } else {
         logger.e('p2pConferenceClient:$messageId is not exist');
       }
