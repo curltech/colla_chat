@@ -584,6 +584,7 @@ class BasePeerConnection {
     return true;
   }
 
+  ///返回连接状态
   RTCPeerConnectionState? get connectionState {
     return _peerConnection?.connectionState;
   }
@@ -592,14 +593,31 @@ class BasePeerConnection {
     return _peerConnection?.signalingState;
   }
 
-  Future<void> connected() async {
-    logger.w('PeerConnectionStatus connected, webrtc connection is completed');
-    end = DateTime.now().millisecondsSinceEpoch;
-    if (end != null && start != null) {
-      var interval = end! - start!;
-      logger.i('id:$id connected time:$interval');
+  ///连接状态为连接，而且数据通道打开
+  bool get connected {
+    if (dataChannelOpen &&
+        dataChannel != null &&
+        _peerConnection?.connectionState ==
+            RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+      return true;
     }
-    emit(WebrtcEventType.connected, '');
+    return false;
+  }
+
+  Future<void> onConnected() async {
+    if (dataChannelOpen &&
+        dataChannel != null &&
+        _peerConnection?.connectionState ==
+            RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+      logger
+          .w('PeerConnectionStatus connected, webrtc connection is completed');
+      end = DateTime.now().millisecondsSinceEpoch;
+      if (end != null && start != null) {
+        var interval = end! - start!;
+        logger.i('id:$id connected time:$interval');
+      }
+      emit(WebrtcEventType.connected, '');
+    }
   }
 
   RTCPeerConnection? get peerConnection {
@@ -609,7 +627,7 @@ class BasePeerConnection {
   ///连接状态事件
   onConnectionState(RTCPeerConnectionState state) async {
     if (state == RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
-      connected();
+      onConnected();
     }
     if (state == RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
       logger.e('Ice connection closed:$state');
@@ -703,6 +721,7 @@ class BasePeerConnection {
     //数据通道关闭
     if (state == RTCDataChannelState.RTCDataChannelClosed) {
       logger.i('data channel close');
+      dataChannelOpen = false;
     }
   }
 
@@ -1582,13 +1601,17 @@ class BasePeerConnection {
       return false;
     }
     final dataChannel = this.dataChannel;
-    if (dataChannel != null) {
-      var dataChannelMessage =
-          RTCDataChannelMessage.fromBinary(Uint8List.fromList(message));
-      await dataChannel.send(dataChannelMessage);
-      return true;
+    if (dataChannel == null) {
+      logger.e('PeerConnection dataChannel is not open');
+
+      return false;
     }
-    return false;
+
+    var dataChannelMessage =
+        RTCDataChannelMessage.fromBinary(Uint8List.fromList(message));
+    await dataChannel.send(dataChannelMessage);
+
+    return true;
   }
 
   /// 被叫方的数据传输事件
