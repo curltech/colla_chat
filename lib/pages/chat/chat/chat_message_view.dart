@@ -250,7 +250,6 @@ class _ChatMessageViewState extends State<ChatMessageView>
           _peerConnectionState.value = null;
         }
       } else {
-        advancedPeerConnections.first;
         for (AdvancedPeerConnection advancedPeerConnection
             in advancedPeerConnections) {
           _peerConnectionState.value = advancedPeerConnection.connectionState;
@@ -296,7 +295,26 @@ class _ChatMessageViewState extends State<ChatMessageView>
         List<AdvancedPeerConnection> advancedPeerConnections =
             await peerConnectionPool.get(memberPeerId);
         if (advancedPeerConnections.isEmpty) {
-          peerConnectionPool.createOffer(memberPeerId);
+          AdvancedPeerConnection? advancedPeerConnection =
+              await peerConnectionPool.createOffer(memberPeerId);
+          if (advancedPeerConnection != null) {
+            _peerConnectionState.value = advancedPeerConnection.connectionState;
+            _initiator.value =
+                advancedPeerConnection.basePeerConnection.initiator;
+          } else {
+            _peerConnectionState.value = null;
+          }
+        } else {
+          for (AdvancedPeerConnection advancedPeerConnection
+              in advancedPeerConnections) {
+            _peerConnectionState.value = advancedPeerConnection.connectionState;
+            _initiator.value =
+                advancedPeerConnection.basePeerConnection.initiator;
+            if (advancedPeerConnection.connectionState ==
+                RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+              break;
+            }
+          }
         }
       }
     }
