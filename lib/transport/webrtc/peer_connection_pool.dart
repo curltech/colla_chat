@@ -153,7 +153,7 @@ class PeerConnectionPool {
       throw 'myself peerPublicKey is null';
     }
     this.peerPublicKey = peerPublicKey;
-    Timer.periodic(const Duration(seconds: 60), (Timer timer) {
+    Timer.periodic(const Duration(seconds: 20), (Timer timer) {
       clear();
     });
   }
@@ -559,8 +559,7 @@ class PeerConnectionPool {
           remove(peerId, clientId: unknownClientId);
           put(peerId, advancedPeerConnection, clientId: clientId);
         } else {
-          logger.w(
-              'no match advancedPeerConnection, signalType:$signalType');
+          logger.w('no match advancedPeerConnection, signalType:$signalType');
         }
       }
       return advancedPeerConnection;

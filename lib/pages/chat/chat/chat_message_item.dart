@@ -122,7 +122,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
           nip: widget.isMyself ? BubbleNip.rightTop : BubbleNip.leftTop,
           color: transportType
               ? (widget.isMyself ? myself.primary : Colors.white)
-              : Colors.yellow,
+              : myself.primaryColor,
           padding: const BubbleEdges.all(0),
           child: body)
     ];
