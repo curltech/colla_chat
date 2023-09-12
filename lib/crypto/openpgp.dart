@@ -53,13 +53,12 @@ class OpenPGP {
     return msg;
   }
 
-  Future<String> sign(
-      dynamic message, String publicKey, String privateKey, String passphrase,
+  Future<String> sign(dynamic message, String privateKey, String passphrase,
       {flutter_openpgp.KeyOptions? options}) async {
     var msg = _toUint8List(message);
 
     var result = await FlutterOpenPGP.signBytesToString(
-        msg, publicKey, privateKey, passphrase,
+        msg, privateKey, passphrase,
         options: options);
 
     return result;
