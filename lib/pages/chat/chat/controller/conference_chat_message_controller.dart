@@ -357,6 +357,8 @@ class ConferenceChatMessageController with ChangeNotifier {
         chatMessage, receiptType,
         receiverPeerId: receiverPeerId, receiverName: receiverName);
     await chatMessageService.sendAndStore(chatReceipt);
+    logger.w(
+        'send chatReceipt peerId:${chatReceipt.receiverPeerId}, name:${chatReceipt.receiverName}, receiptType:${chatReceipt.receiptType} successfully');
     await chatMessageService.updateReceiptType(chatMessage, receiptType);
   }
 
