@@ -605,6 +605,9 @@ class BasePeerConnection {
   }
 
   Future<void> onConnected() async {
+    if (end != null) {
+      return;
+    }
     if (dataChannelOpen &&
         dataChannel != null &&
         _peerConnection?.connectionState ==
@@ -717,6 +720,7 @@ class BasePeerConnection {
     if (state == RTCDataChannelState.RTCDataChannelOpen) {
       logger.i('data channel open');
       dataChannelOpen = true;
+      onConnected();
     }
     //数据通道关闭
     if (state == RTCDataChannelState.RTCDataChannelClosed) {
@@ -803,6 +807,7 @@ class BasePeerConnection {
     }
     logger.w('start negotiate');
     start = DateTime.now().millisecondsSinceEpoch;
+    end = null;
     await _createOffer();
   }
 
