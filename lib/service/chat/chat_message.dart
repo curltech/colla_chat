@@ -791,6 +791,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       if (advancedPeerConnections != null &&
           advancedPeerConnections.isNotEmpty) {
         bool success = await peerConnectionPool.send(peerId, data);
+        logger.w('webrtc send data result:$success');
         if (success) {
           factTransportType = TransportType.webrtc.name;
         } else {
@@ -808,6 +809,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         ///chatMessage已经加密，所以chatAction无需加密
         bool success = await chatAction.chat(data, peerId,
             payloadType: PayloadType.list, needEncrypt: false);
+        logger.w('websocket send data result:$success');
 
         ///另一种做法是不加密，由chatAction加密
         // bool success = await chatAction.chat(chatMessage, peerId,
@@ -822,6 +824,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     if (factTransportType == null && transportType == TransportType.sms.name) {
       bool success = await smsClient.sendMessage(chatMessage.content,
           chatMessage.receiverPeerId!, chatMessage.receiverClientId!);
+      logger.w('sms send data result:$success');
       if (success) {
         factTransportType = TransportType.sms.name;
       }

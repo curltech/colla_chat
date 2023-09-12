@@ -655,10 +655,8 @@ class PeerConnectionPool {
     if (peerConnections.isNotEmpty) {
       List<Future<bool>> ps = [];
       for (var peerConnection in peerConnections) {
-        if (peerConnection.connectionState ==
-            RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+        if (peerConnection.connected) {
           Future<bool> p = peerConnection.send(data);
-          //logger.w('send signal');
           ps.add(p);
         }
       }
