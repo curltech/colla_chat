@@ -361,7 +361,7 @@ class AdvancedPeerConnection {
 
   bool get connected {
     return basePeerConnection.connectionState ==
-        RTCIceConnectionState.RTCIceConnectionStateConnected;
+        RTCPeerConnectionState.RTCPeerConnectionStateConnected;
   }
 
   ///收到数据，先解密，然后转换成还原utf-8字符串，再将json字符串变成map对象
