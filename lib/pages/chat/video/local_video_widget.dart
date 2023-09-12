@@ -85,6 +85,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     super.initState();
     // 本地视频可能在其他地方关闭，所有需要注册关闭事件
     localPeerMediaStreamController.registerPeerMediaStreamOperator(
+        PeerMediaStreamOperator.add.name, _updatePeerMediaStream);
+    localPeerMediaStreamController.registerPeerMediaStreamOperator(
         PeerMediaStreamOperator.remove.name, _updatePeerMediaStream);
     p2pConferenceClientPool.addListener(_updateConferenceChatMessageController);
     _updateConferenceChatMessageController();
@@ -842,6 +844,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   @override
   void dispose() {
+    localPeerMediaStreamController.unregisterPeerMediaStreamOperator(
+        PeerMediaStreamOperator.add.name, _updatePeerMediaStream);
     localPeerMediaStreamController.unregisterPeerMediaStreamOperator(
         PeerMediaStreamOperator.remove.name, _updatePeerMediaStream);
     var conferenceChatMessageController =

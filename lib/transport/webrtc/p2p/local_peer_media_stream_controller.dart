@@ -308,11 +308,11 @@ class LocalPeerMediaStreamController extends PeerMediaStreamController {
     }
     //根据conference.video来判断是请求音频还是视频，并创建本地视频stream
     if (video) {
-      await localPeerMediaStreamController.createPeerVideoStream();
+      await createPeerVideoStream();
       //测试目的，使用屏幕
       // await localPeerMediaStreamController.createDisplayMediaStream();
     } else {
-      await localPeerMediaStreamController.createPeerAudioStream();
+      await createPeerAudioStream();
     }
   }
 
