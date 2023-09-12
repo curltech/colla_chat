@@ -561,6 +561,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (status == VideoChatStatus.chatting) {
       await _close();
       await p2pConferenceClient?.exit();
+      p2pConferenceClientPool.conferenceId = null;
     }
     conferenceChatMessageController?.status = VideoChatStatus.end;
   }
