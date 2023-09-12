@@ -575,8 +575,9 @@ class ConferenceChatMessageController with ChangeNotifier {
     await join();
   }
 
-  ///对方加入，自己也要配合把对方的连接加入本地流，属于被动加入
-  Future<void> _onJoin(String peerId, String clientId, String messageId) async {
+  ///将指定的连接加入会议，用于对方加入会议，接受会议
+  addAdvancedPeerConnection(
+      String peerId, String clientId, String messageId) async {
     AdvancedPeerConnection? advancedPeerConnection =
         await peerConnectionPool.getOne(
       peerId,
@@ -598,6 +599,11 @@ class ConferenceChatMessageController with ChangeNotifier {
     } else {
       logger.e('participant $peerId has no peerConnections');
     }
+  }
+
+  ///对方加入，自己也要配合把对方的连接加入本地流，属于被动加入
+  Future<void> _onJoin(String peerId, String clientId, String messageId) async {
+    await addAdvancedPeerConnection(peerId, clientId, messageId);
   }
 
   ///对方退出，自己也要配合把对方的连接退出
