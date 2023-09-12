@@ -345,8 +345,8 @@ class GlobalChatMessageController with ChangeNotifier {
     ConferenceChatMessageController? conferenceChatMessageController =
         p2pConferenceClientPool.getConferenceChatMessageController(messageId);
 
-    await conferenceChatMessageController?.stopAudio();
     await conferenceChatMessageController?.onReceivedChatReceipt(chatMessage);
+    await conferenceChatMessageController?.stopAudio();
   }
 
   ///收到signal加密初始化消息

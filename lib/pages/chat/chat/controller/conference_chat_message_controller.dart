@@ -258,7 +258,7 @@ class ConferenceChatMessageController with ChangeNotifier {
         await _audioPlayer.release();
       }
     } catch (e) {
-      logger.e('audioPlayer stop failure');
+      logger.e('audioPlayer stop failure:$e');
     }
   }
 
@@ -268,11 +268,15 @@ class ConferenceChatMessageController with ChangeNotifier {
     bool? respectSilence,
     bool? stayAwake,
   }) async {
-    await _audioPlayer.setAudioContext(
-        forceSpeaker: forceSpeaker,
-        duckAudio: duckAudio,
-        respectSilence: respectSilence,
-        stayAwake: stayAwake);
+    try {
+      await _audioPlayer.setAudioContext(
+          forceSpeaker: forceSpeaker,
+          duckAudio: duckAudio,
+          respectSilence: respectSilence,
+          stayAwake: stayAwake);
+    } catch (e) {
+      logger.e('setAudioContext failure:$e');
+    }
   }
 
   ///1.发送视频通邀请话消息,此时消息必须有content,包含conference信息

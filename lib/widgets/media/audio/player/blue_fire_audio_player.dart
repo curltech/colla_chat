@@ -97,7 +97,7 @@ class BlueFireAudioPlayer {
           position: position,
           mode: mode);
     } catch (e) {
-      logger.e('$e');
+      logger.e('blue fire audio player play failure:$e');
       player.stop();
       player.release();
     }
