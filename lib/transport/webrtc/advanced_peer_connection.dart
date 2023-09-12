@@ -397,7 +397,7 @@ class AdvancedPeerConnection {
   ///调用本连接或者signalAction发送signal到信号服务器
   Future<bool> signal(WebrtcEvent evt) async {
     try {
-      if (connected) {
+      if (dataChannelOpen) {
         ChatMessage chatMessage = await chatMessageService.buildChatMessage(
             receiverPeerId: peerId,
             content: evt.data,
