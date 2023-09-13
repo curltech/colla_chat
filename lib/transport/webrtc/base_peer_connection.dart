@@ -692,19 +692,23 @@ class BasePeerConnection {
       return;
     }
 
-    RTCSessionDescription? localDescription =
-        await peerConnection?.getLocalDescription();
-    RTCSessionDescription? remoteDescription =
-        await peerConnection?.getRemoteDescription();
+    try {
+      RTCSessionDescription? localDescription =
+          await peerConnection?.getLocalDescription();
+      RTCSessionDescription? remoteDescription =
+          await peerConnection?.getRemoteDescription();
 
-    if (localDescription != null && remoteDescription != null) {
-      List<RTCIceCandidate> pending = [..._pendingIceCandidates];
-      _pendingIceCandidates.clear();
-      //发送candidate信号
-      emit(
-          WebrtcEventType.signal,
-          WebrtcSignal(SignalType.candidate.name,
-              candidates: pending, extension: extension));
+      if (localDescription != null && remoteDescription != null) {
+        List<RTCIceCandidate> pending = [..._pendingIceCandidates];
+        _pendingIceCandidates.clear();
+        //发送candidate信号
+        emit(
+            WebrtcEventType.signal,
+            WebrtcSignal(SignalType.candidate.name,
+                candidates: pending, extension: extension));
+      }
+    } catch (e) {
+      logger.e('postIceCandidates failure:$e');
     }
   }
 
