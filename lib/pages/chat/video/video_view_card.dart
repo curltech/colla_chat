@@ -45,7 +45,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
     if (secondaryBodyWidth < smallBreakpointLimit) {
       if (peerMediaStreams.length > 4) {
         crossAxisCount = 3;
-      } else if (peerMediaStreams.length > 1) {
+      } else if (peerMediaStreams.length > 2) {
         crossAxisCount = 2;
       }
     } else if (secondaryBodyWidth >= smallBreakpointLimit &&
