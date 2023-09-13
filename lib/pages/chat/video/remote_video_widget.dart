@@ -147,9 +147,8 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
             return DataActionCard(
               actions: value,
               height: height,
-              //width: 320,
               onPressed: _onAction,
-              crossAxisCount: 4,
+              crossAxisCount: 1,
               labelColor: Colors.white,
             );
           }),
@@ -201,7 +200,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   Widget _buildGestureDetector(BuildContext context) {
     return GestureDetector(
       child: _buildVideoChatView(context),
-      onLongPress: () {
+      onDoubleTap: () {
         _toggleActionCard();
       },
     );

@@ -70,7 +70,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       ValueNotifier<VideoChatStatus>(VideoChatStatus.end);
 
   //Speaker状态
-  ValueNotifier<bool> speakerStatus = ValueNotifier<bool>(false);
+  ValueNotifier<bool> speakerStatus = ValueNotifier<bool>(true);
 
   //控制面板可见性的计时器
   Timer? _hideControlPanelTimer;
@@ -476,7 +476,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
     _playAudio();
     //延时60秒后自动挂断
-    Future.delayed(const Duration(seconds: 60)).then((value) {
+    Future.delayed(const Duration(seconds: 30)).then((value) {
       //时间到了后，如果还是呼叫状态，则修改状态为结束
       if (conferenceChatMessageController?.status == VideoChatStatus.calling) {
         _stopAudio();
@@ -601,7 +601,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             return DataActionCard(
               actions: value,
               height: height,
-              //width: 320,
               mainAxisSpacing: 20,
               crossAxisSpacing: 20,
               onPressed: _onAction,
@@ -656,7 +655,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         valueListenable: speakerStatus,
         builder: (BuildContext context, bool status, Widget? child) {
           return CircleTextButton(
-            label: status ? 'Speaker on' : 'Speaker off',
+            label: 'Speaker',
+            tip: status ? 'On' : 'Off',
             onPressed: () async {
               speakerStatus.value = !speakerStatus.value;
               var conferenceChatMessageController =
@@ -664,7 +664,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               await conferenceChatMessageController?.setAudioContext(
                   forceSpeaker: speakerStatus.value);
             },
-            backgroundColor: status ? Colors.black : Colors.white,
+            backgroundColor: status ? Colors.green : Colors.white,
             child: Icon(
               status ? Icons.volume_up : Icons.volume_off,
               size: AppIconSize.mdSize,
@@ -711,11 +711,14 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                 color: Colors.white,
               ),
             );
-            if (value == VideoChatStatus.calling && platformParams.mobile) {
-              buttonWidget = Row(children: [
+            if ((value == VideoChatStatus.calling ||
+                    value == VideoChatStatus.chatting) &&
+                platformParams.mobile) {
+              buttonWidget =
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 buttonWidget,
                 const SizedBox(
-                  width: 10.0,
+                  width: 50.0,
                 ),
                 _buildSpeakerSwitchButton(context),
               ]);
@@ -812,34 +815,33 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var videoViewCard = GestureDetector(
-      child: ValueListenableBuilder<int>(
-          valueListenable: videoViewCount,
-          builder: (context, value, child) {
-            if (value > 0) {
-              ConferenceChatMessageController? conferenceChatMessageController =
-                  p2pConferenceClientPool.conferenceChatMessageController;
-              return VideoViewCard(
-                peerMediaStreamController: localPeerMediaStreamController,
-                onClosed: _onClosedPeerMediaStream,
-                conference: conferenceChatMessageController?.conference,
-              );
-            } else {
-              var size = MediaQuery.of(context).size;
-              return SizedBox(
-                width: size.width,
-                height: size.height,
-              );
-            }
-          }),
-      onLongPress: () {
-        _toggleActionCardVisible();
-      },
-    );
-    return Stack(children: [
-      videoViewCard,
-      _buildControlPanel(context),
-    ]);
+    var videoViewCard = ValueListenableBuilder<int>(
+        valueListenable: videoViewCount,
+        builder: (context, value, child) {
+          if (value > 0) {
+            ConferenceChatMessageController? conferenceChatMessageController =
+                p2pConferenceClientPool.conferenceChatMessageController;
+            return VideoViewCard(
+              peerMediaStreamController: localPeerMediaStreamController,
+              onClosed: _onClosedPeerMediaStream,
+              conference: conferenceChatMessageController?.conference,
+            );
+          } else {
+            var size = MediaQuery.of(context).size;
+            return SizedBox(
+              width: size.width,
+              height: size.height,
+            );
+          }
+        });
+    return GestureDetector(
+        onDoubleTap: () {
+          _toggleActionCardVisible();
+        },
+        child: Stack(children: [
+          videoViewCard,
+          _buildControlPanel(context),
+        ]));
   }
 
   @override
