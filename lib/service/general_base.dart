@@ -299,7 +299,7 @@ abstract class GeneralBaseService<T> {
     String? where,
     List<Object>? whereArgs,
   }) async {
-    EntityUtil.updateTimestamp(entity);
+    entity = EntityUtil.updateTimestamp(entity);
     List<Object> args = [];
     if (whereArgs != null) {
       args.addAll(whereArgs);
