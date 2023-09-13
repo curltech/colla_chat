@@ -282,15 +282,15 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         volume = volume + 0.1;
         volume = volume > 1 ? 1 : volume;
         enableMute = false;
-        setState(() {});
         await MediaStreamUtil.setVolume(mediaStream, volume);
+        setState(() {});
         break;
       case 'Volume decrease':
         volume = volume - 0.1;
         volume = volume < 0 ? 0 : volume;
         enableMute = volume <= 0 ? true : false;
-        setState(() {});
         await MediaStreamUtil.setVolume(mediaStream, volume);
+        setState(() {});
         break;
       case 'Volume mute':
         enableMute = !enableMute;
