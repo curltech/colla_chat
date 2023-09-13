@@ -109,8 +109,8 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
       crossAxisAlignment = CrossAxisAlignment.end;
     }
     double width = appDataProvider.secondaryBodyWidth - 80;
-    if (width > 300) {
-      width = 300;
+    if (width > 320) {
+      width = 320;
     }
     bool transportType =
         widget.chatMessage.transportType == TransportType.webrtc.name;
@@ -164,12 +164,9 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
       ));
       children.add(parentWidget);
     }
-    double width = appDataProvider.portraitSize.width - 150;
-    if (appDataProvider.landscape) {
-      width = appDataProvider.secondaryBodyWidth - 150;
-      if (width > appDataProvider.designSize.width) {
-        width = appDataProvider.designSize.width;
-      }
+    double width = appDataProvider.secondaryBodyWidth - 80;
+    if (width > 320) {
+      width = 320;
     }
     return Row(
       mainAxisAlignment:
