@@ -347,7 +347,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
       if (mounted) {
         DialogUtil.info(context,
             content: AppLocalizations.t(
-                'PeerConnection signalingState was changed to $state'));
+                    'PeerConnection signalingState was changed to ') +
+                AppLocalizations.t(state.toString().substring(21)));
       }
     } else if (eventType == WebrtcEventType.closed) {
       _peerConnectionState.value =
@@ -365,9 +366,14 @@ class _ChatMessageViewState extends State<ChatMessageView>
         if (_peerConnectionState.value !=
             RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
           if (mounted) {
+            String stateText = "Unknown";
+            if (state != null) {
+              stateText = state.name.substring(22);
+            }
             DialogUtil.info(context,
                 content:
-                    '${AppLocalizations.t('PeerConnection status was changed from ')}${oldState?.name}${AppLocalizations.t(' to ')}${state?.name}');
+                    AppLocalizations.t('PeerConnection state was changed to ') +
+                        AppLocalizations.t(stateText));
           }
         } else {
           if (mounted) {
@@ -381,8 +387,9 @@ class _ChatMessageViewState extends State<ChatMessageView>
       _initiator.value = event.data;
       if (mounted) {
         DialogUtil.info(context,
-            content: AppLocalizations.t(
-                'PeerConnection initiator was changed to $_initiator'));
+            content:
+                AppLocalizations.t('PeerConnection initiator was changed to ') +
+                    _initiator.value.toString());
       }
     }
   }

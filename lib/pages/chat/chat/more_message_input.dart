@@ -132,7 +132,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   _onActionDeleteTime() async {
     int? deleteTime = await DialogUtil.showSelectDialog<int>(
         context: context,
-        title: const CommonAutoSizeText('Select deleteTime'),
+        title: const CommonAutoSizeText('Select delete time'),
         items: [
           _buildOption(0),
           _buildOption(15),

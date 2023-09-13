@@ -527,5 +527,10 @@
   "Reconnect": "重连",
   "Reject": "拒绝",
   "Hold": "保持",
-  "Accept": "接通"
+  "Accept": "接通",
+  "Select delete time": "选择删除时间",
+  "PeerConnection was closed": "连接被关闭",
+  "PeerConnection signalingState was changed to ": "连接信号变成",
+  "PeerConnection state was changed to ": "连接状态变成",
+  "PeerConnection initiator was changed to ": "连接主叫状态变成"
 }
