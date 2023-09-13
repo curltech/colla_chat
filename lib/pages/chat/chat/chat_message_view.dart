@@ -377,9 +377,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
           }
         } else {
           if (mounted) {
-            // DialogUtil.error(context,
-            //     content:
-            //         '${AppLocalizations.t('PeerConnection status was changed from ')}${oldStatus.name}${AppLocalizations.t(' to ')}${status.name}');
+            DialogUtil.info(context,
+                content: AppLocalizations.t('PeerConnection was closed'));
           }
         }
       }
