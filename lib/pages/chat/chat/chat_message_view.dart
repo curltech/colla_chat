@@ -31,12 +31,12 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
+import 'package:no_screenshot/no_screenshot.dart';
 import 'package:screenshot_callback/screenshot_callback.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:webrtc_interface/webrtc_interface.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:no_screenshot/no_screenshot.dart';
 
 /// 聊天界面，包括文本聊天，视频通话呼叫，视频通话，全屏展示四个组件
 /// 支持群聊
@@ -149,11 +149,12 @@ class _ChatMessageViewState extends State<ChatMessageView>
 
   _updateChatMessage() {
     if (_chatSummary.value != chatMessageController.chatSummary) {
+      _chatSummary.value = chatMessageController.chatSummary;
+
       ///初始化数据
       _createPeerConnection();
       _buildReadStatus();
       _updateChatMessageView();
-      _chatSummary.value = chatMessageController.chatSummary;
     }
   }
 
@@ -236,11 +237,16 @@ class _ChatMessageViewState extends State<ChatMessageView>
 
   ///创建linkman的PeerConnection，可以重复调用只会创建一次
   _createLinkmanPeerConnection(String peerId) async {
+    ///未来应该可以自己连接另一个自己
     if (peerId == myself.peerId) {
+      _peerConnectionState.value = null;
+      _initiator.value = null;
       return;
     }
     Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
     if (linkman == null) {
+      _peerConnectionState.value = null;
+      _initiator.value = null;
       return;
     }
     if (linkman.linkmanStatus == LinkmanStatus.chatGPT.name) {
