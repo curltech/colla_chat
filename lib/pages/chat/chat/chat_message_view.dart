@@ -92,18 +92,26 @@ class _ChatMessageViewState extends State<ChatMessageView>
     windowManager.addListener(this);
     chatMessageController.addListener(_updateChatMessage);
     chatMessageViewController.addListener(_updateChatMessageView);
+    WakelockPlus.enable();
+
+    ///不准截屏
+    if (platformParams.mobile) {
+      try {
+        noScreenshot = NoScreenshot.instance;
+        screenshotCallback = ScreenshotCallback();
+        noScreenshot!.screenshotOff();
+        screenshotCallback!.addListener(() {
+          logger.w('screenshot');
+        });
+      } catch (e) {
+        logger.e('screenshotOff failure:$e');
+      }
+    }
+
+    ///初始化数据
     _createPeerConnection();
     _buildReadStatus();
     _updateChatMessageView();
-    WakelockPlus.enable();
-    if (platformParams.mobile) {
-      noScreenshot = NoScreenshot.instance;
-      screenshotCallback = ScreenshotCallback();
-      noScreenshot!.screenshotOff();
-      screenshotCallback!.addListener(() {
-        logger.w('screenshot');
-      });
-    }
   }
 
   @override
@@ -140,7 +148,13 @@ class _ChatMessageViewState extends State<ChatMessageView>
   }
 
   _updateChatMessage() {
-    _chatSummary.value = chatMessageController.chatSummary;
+    if (_chatSummary.value != chatMessageController.chatSummary) {
+      ///初始化数据
+      _createPeerConnection();
+      _buildReadStatus();
+      _updateChatMessageView();
+      _chatSummary.value = chatMessageController.chatSummary;
+    }
   }
 
   ///更新为已读状态
