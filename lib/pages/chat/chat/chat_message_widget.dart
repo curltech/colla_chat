@@ -50,10 +50,10 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     scrollController.addListener(_onScroll);
     animateController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 500));
-    Future.delayed(const Duration(seconds: 60), () {
+    Future.delayed(const Duration(seconds: 30), () {
       securityTip.value = false;
     });
-
+    chatMessageController.latest();
     ///滚到指定的位置
     // widget.scrollController.animateTo(offset,
     //     duration: const Duration(milliseconds: 1000), curve: Curves.ease);
