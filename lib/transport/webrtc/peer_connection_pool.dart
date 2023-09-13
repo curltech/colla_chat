@@ -117,6 +117,8 @@ class LruQueue<T> {
 
 /// webrtc的连接池，键值是对方的peerId
 class PeerConnectionPool {
+  Duration clearDuration = const Duration(seconds: 20);
+
   ///自己的peerId,clientId和公钥
   late String peerId;
   late String clientId;
@@ -153,7 +155,7 @@ class PeerConnectionPool {
       throw 'myself peerPublicKey is null';
     }
     this.peerPublicKey = peerPublicKey;
-    Timer.periodic(const Duration(seconds: 20), (Timer timer) {
+    Timer.periodic(clearDuration, (Timer timer) {
       clear();
     });
   }
@@ -447,7 +449,7 @@ class PeerConnectionPool {
             } else {
               var now = DateTime.now().millisecondsSinceEpoch;
               var gap = now - start;
-              var limit = const Duration(seconds: 20);
+              var limit = clearDuration;
               if (gap > limit.inMilliseconds) {
                 removedPeerConnections.add(peerConnection);
                 logger.e(
