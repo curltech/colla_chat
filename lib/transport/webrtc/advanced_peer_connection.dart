@@ -385,7 +385,7 @@ class AdvancedPeerConnection {
 
   ///发送数据
   Future<bool> send(List<int> data) async {
-    if (connected) {
+    if (dataChannelOpen && basePeerConnection.dataChannel != null) {
       return await basePeerConnection.send(data);
     } else {
       logger.e(
@@ -397,14 +397,14 @@ class AdvancedPeerConnection {
   ///调用本连接或者signalAction发送signal到信号服务器
   Future<bool> signal(WebrtcEvent evt) async {
     try {
-      if (dataChannelOpen) {
+      if (dataChannelOpen && basePeerConnection.dataChannel != null) {
         ChatMessage chatMessage = await chatMessageService.buildChatMessage(
             receiverPeerId: peerId,
             content: evt.data,
             clientId: clientId,
             messageType: ChatMessageType.system,
             subMessageType: ChatMessageSubType.signal);
-        await chatMessageService.sendAndStore(chatMessage);
+        await chatMessageService.send(chatMessage);
         // logger.w(
         //     'sent signal chatMessage by webrtc peerId:$peerId, clientId:$clientId, signal:$jsonStr');
       } else {

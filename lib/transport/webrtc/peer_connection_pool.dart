@@ -654,7 +654,8 @@ class PeerConnectionPool {
     if (peerConnections.isNotEmpty) {
       List<Future<bool>> ps = [];
       for (var peerConnection in peerConnections) {
-        if (peerConnection.connected) {
+        if (peerConnection.dataChannelOpen &&
+            peerConnection.basePeerConnection.dataChannel != null) {
           Future<bool> p = peerConnection.send(data);
           ps.add(p);
         }

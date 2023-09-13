@@ -1606,7 +1606,7 @@ class BasePeerConnection {
       return false;
     }
     final dataChannel = this.dataChannel;
-    if (dataChannel == null) {
+    if (!dataChannelOpen || dataChannel == null) {
       logger.e('PeerConnection dataChannel is not open');
 
       return false;
