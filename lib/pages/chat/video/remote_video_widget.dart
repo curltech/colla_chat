@@ -148,7 +148,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
               actions: value,
               height: height,
               onPressed: _onAction,
-              crossAxisCount: 1,
+              crossAxisCount: value.length,
               labelColor: Colors.white,
             );
           }),

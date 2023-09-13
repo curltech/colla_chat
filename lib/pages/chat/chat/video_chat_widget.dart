@@ -177,11 +177,11 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
           if (chatSummary.partyType == PartyType.conference.name) {
             //title = 'VideoConference';
           }
-          title = '${AppLocalizations.t(title)} - $peerName\n';
+          title = '${AppLocalizations.t(title)} - $peerName';
           if (videoChatMessageController != null &&
               videoChatMessageController.conferenceName != null &&
               chatSummary.partyType != PartyType.conference.name) {
-            title = '$title${videoChatMessageController.conferenceName}';
+            title = '$title\n${videoChatMessageController.conferenceName}';
           }
 
           Widget titleWidget = CommonAutoSizeText(title, maxLines: 2);
