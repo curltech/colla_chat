@@ -173,7 +173,6 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
             width: width,
             decoration: BoxDecoration(
               color: widget.isMyself ? myself.primary : Colors.white,
-              //myself.secondary,
               borderRadius: BorderRadius.only(
                 bottomLeft: const Radius.circular(8.0),
                 bottomRight: const Radius.circular(8.0),
