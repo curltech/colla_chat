@@ -109,7 +109,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
       crossAxisAlignment = CrossAxisAlignment.end;
     }
     double width = appDataProvider.secondaryBodyWidth * 0.8;
-    logger.w('secondaryBodyWidth width:${appDataProvider.secondaryBodyWidth}');
+    // logger.w('secondaryBodyWidth width:${appDataProvider.secondaryBodyWidth}');
     bool transportType =
         widget.chatMessage.transportType == TransportType.webrtc.name;
     List<Widget> children = [
