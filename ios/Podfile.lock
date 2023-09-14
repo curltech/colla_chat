@@ -33,7 +33,6 @@ PODS:
     - SwiftProtobuf
   - battery_plus (1.0.0):
     - Flutter
-  - BIJKPlayer (0.7.16)
   - camera_avfoundation (0.0.1):
     - Flutter
   - connectivity_plus (0.0.1):
@@ -74,8 +73,7 @@ PODS:
     - SwiftyGif
   - emoji_picker_flutter (0.0.1):
     - Flutter
-  - fijkplayer (0.10.1):
-    - BIJKPlayer (~> 0.7.16)
+  - fc_native_video_thumbnail (0.0.1):
     - Flutter
   - file_picker (0.0.1):
     - DKImagePickerController/PhotoGallery
@@ -84,53 +82,53 @@ PODS:
     - Flutter
   - file_selector_ios (0.0.1):
     - Flutter
-  - Firebase (10.7.0):
-    - Firebase/Core (= 10.7.0)
-  - Firebase/Core (10.7.0):
+  - Firebase (10.12.0):
+    - Firebase/Core (= 10.12.0)
+  - Firebase/Core (10.12.0):
     - Firebase/CoreOnly
-    - FirebaseAnalytics (~> 10.7.0)
-  - Firebase/CoreOnly (10.7.0):
-    - FirebaseCore (= 10.7.0)
-  - Firebase/Messaging (10.7.0):
+    - FirebaseAnalytics (~> 10.12.0)
+  - Firebase/CoreOnly (10.12.0):
+    - FirebaseCore (= 10.12.0)
+  - Firebase/Messaging (10.12.0):
     - Firebase/CoreOnly
-    - FirebaseMessaging (~> 10.7.0)
-  - firebase_core (2.9.0):
-    - Firebase/CoreOnly (= 10.7.0)
+    - FirebaseMessaging (~> 10.12.0)
+  - firebase_core (2.15.1):
+    - Firebase/CoreOnly (= 10.12.0)
     - Flutter
-  - firebase_messaging (14.4.0):
-    - Firebase/Messaging (= 10.7.0)
+  - firebase_messaging (12.0.3):
+    - Firebase/Messaging (= 10.12.0)
     - firebase_core
     - Flutter
-  - FirebaseAnalytics (10.7.0):
-    - FirebaseAnalytics/AdIdSupport (= 10.7.0)
+  - FirebaseAnalytics (10.12.0):
+    - FirebaseAnalytics/AdIdSupport (= 10.12.0)
     - FirebaseCore (~> 10.0)
     - FirebaseInstallations (~> 10.0)
-    - GoogleUtilities/AppDelegateSwizzler (~> 7.8)
-    - GoogleUtilities/MethodSwizzler (~> 7.8)
-    - GoogleUtilities/Network (~> 7.8)
-    - "GoogleUtilities/NSData+zlib (~> 7.8)"
+    - GoogleUtilities/AppDelegateSwizzler (~> 7.11)
+    - GoogleUtilities/MethodSwizzler (~> 7.11)
+    - GoogleUtilities/Network (~> 7.11)
+    - "GoogleUtilities/NSData+zlib (~> 7.11)"
     - nanopb (< 2.30910.0, >= 2.30908.0)
-  - FirebaseAnalytics/AdIdSupport (10.7.0):
+  - FirebaseAnalytics/AdIdSupport (10.12.0):
     - FirebaseCore (~> 10.0)
     - FirebaseInstallations (~> 10.0)
-    - GoogleAppMeasurement (= 10.7.0)
-    - GoogleUtilities/AppDelegateSwizzler (~> 7.8)
-    - GoogleUtilities/MethodSwizzler (~> 7.8)
-    - GoogleUtilities/Network (~> 7.8)
-    - "GoogleUtilities/NSData+zlib (~> 7.8)"
+    - GoogleAppMeasurement (= 10.12.0)
+    - GoogleUtilities/AppDelegateSwizzler (~> 7.11)
+    - GoogleUtilities/MethodSwizzler (~> 7.11)
+    - GoogleUtilities/Network (~> 7.11)
+    - "GoogleUtilities/NSData+zlib (~> 7.11)"
     - nanopb (< 2.30910.0, >= 2.30908.0)
-  - FirebaseCore (10.7.0):
+  - FirebaseCore (10.12.0):
     - FirebaseCoreInternal (~> 10.0)
     - GoogleUtilities/Environment (~> 7.8)
     - GoogleUtilities/Logger (~> 7.8)
-  - FirebaseCoreInternal (10.7.0):
+  - FirebaseCoreInternal (10.15.0):
     - "GoogleUtilities/NSData+zlib (~> 7.8)"
-  - FirebaseInstallations (10.7.0):
+  - FirebaseInstallations (10.15.0):
     - FirebaseCore (~> 10.0)
     - GoogleUtilities/Environment (~> 7.8)
     - GoogleUtilities/UserDefaults (~> 7.8)
     - PromisesObjC (~> 2.1)
-  - FirebaseMessaging (10.7.0):
+  - FirebaseMessaging (10.12.0):
     - FirebaseCore (~> 10.0)
     - FirebaseInstallations (~> 10.0)
     - GoogleDataTransport (~> 9.2)
@@ -142,13 +140,15 @@ PODS:
   - Flutter (1.0.0)
   - flutter_apns_only (0.0.1):
     - Flutter
+  - flutter_background_executor (0.0.1):
+    - Flutter
   - flutter_background_service_ios (0.0.3):
     - Flutter
   - flutter_compass (0.0.1):
     - Flutter
   - flutter_contacts (0.0.1):
     - Flutter
-  - flutter_image_compress (1.0.0):
+  - flutter_image_compress_common (1.0.0):
     - Flutter
     - Mantle
     - SDWebImage
@@ -164,11 +164,13 @@ PODS:
     - Flutter
   - flutter_local_notifications (0.0.1):
     - Flutter
-  - flutter_native_image (0.0.1):
-    - Flutter
   - flutter_native_splash (0.0.1):
     - Flutter
+  - flutter_nfc_kit (2.0.0):
+    - Flutter
   - flutter_secure_storage (6.0.0):
+    - Flutter
+  - flutter_sharing_intent (0.0.1):
     - Flutter
   - flutter_sound (9.2.13):
     - Flutter
@@ -176,41 +178,47 @@ PODS:
   - flutter_sound_core (9.2.13)
   - flutter_tts (0.0.1):
     - Flutter
-  - flutter_webrtc (0.9.20):
+  - flutter_web_auth_2 (1.1.1):
     - Flutter
-    - WebRTC-SDK (= 104.5112.09)
+  - flutter_webrtc (0.9.36):
+    - Flutter
+    - WebRTC-SDK (= 114.5735.02)
+  - fluttercontactpicker (4.6.0):
+    - Flutter
   - fluttertoast (0.0.2):
     - Flutter
     - Toast
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
   - FMDB/standard (2.7.5)
+  - gallery_saver (0.0.1):
+    - Flutter
   - geolocator_apple (1.2.0):
     - Flutter
   - google_maps_flutter_ios (0.0.1):
     - Flutter
-    - GoogleMaps
-  - GoogleAppMeasurement (10.7.0):
-    - GoogleAppMeasurement/AdIdSupport (= 10.7.0)
-    - GoogleUtilities/AppDelegateSwizzler (~> 7.8)
-    - GoogleUtilities/MethodSwizzler (~> 7.8)
-    - GoogleUtilities/Network (~> 7.8)
-    - "GoogleUtilities/NSData+zlib (~> 7.8)"
+    - GoogleMaps (< 8.0)
+  - GoogleAppMeasurement (10.12.0):
+    - GoogleAppMeasurement/AdIdSupport (= 10.12.0)
+    - GoogleUtilities/AppDelegateSwizzler (~> 7.11)
+    - GoogleUtilities/MethodSwizzler (~> 7.11)
+    - GoogleUtilities/Network (~> 7.11)
+    - "GoogleUtilities/NSData+zlib (~> 7.11)"
     - nanopb (< 2.30910.0, >= 2.30908.0)
-  - GoogleAppMeasurement/AdIdSupport (10.7.0):
-    - GoogleAppMeasurement/WithoutAdIdSupport (= 10.7.0)
-    - GoogleUtilities/AppDelegateSwizzler (~> 7.8)
-    - GoogleUtilities/MethodSwizzler (~> 7.8)
-    - GoogleUtilities/Network (~> 7.8)
-    - "GoogleUtilities/NSData+zlib (~> 7.8)"
+  - GoogleAppMeasurement/AdIdSupport (10.12.0):
+    - GoogleAppMeasurement/WithoutAdIdSupport (= 10.12.0)
+    - GoogleUtilities/AppDelegateSwizzler (~> 7.11)
+    - GoogleUtilities/MethodSwizzler (~> 7.11)
+    - GoogleUtilities/Network (~> 7.11)
+    - "GoogleUtilities/NSData+zlib (~> 7.11)"
     - nanopb (< 2.30910.0, >= 2.30908.0)
-  - GoogleAppMeasurement/WithoutAdIdSupport (10.7.0):
-    - GoogleUtilities/AppDelegateSwizzler (~> 7.8)
-    - GoogleUtilities/MethodSwizzler (~> 7.8)
-    - GoogleUtilities/Network (~> 7.8)
-    - "GoogleUtilities/NSData+zlib (~> 7.8)"
+  - GoogleAppMeasurement/WithoutAdIdSupport (10.12.0):
+    - GoogleUtilities/AppDelegateSwizzler (~> 7.11)
+    - GoogleUtilities/MethodSwizzler (~> 7.11)
+    - GoogleUtilities/Network (~> 7.11)
+    - "GoogleUtilities/NSData+zlib (~> 7.11)"
     - nanopb (< 2.30910.0, >= 2.30908.0)
-  - GoogleDataTransport (9.2.2):
+  - GoogleDataTransport (9.2.5):
     - GoogleUtilities/Environment (~> 7.7)
     - nanopb (< 2.30910.0, >= 2.30908.0)
     - PromisesObjC (< 3.0, >= 1.2)
@@ -219,41 +227,38 @@ PODS:
   - GoogleMaps/Base (7.4.0)
   - GoogleMaps/Maps (7.4.0):
     - GoogleMaps/Base
-  - GoogleUtilities/AppDelegateSwizzler (7.11.1):
+  - GoogleUtilities/AppDelegateSwizzler (7.11.5):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
     - GoogleUtilities/Network
-  - GoogleUtilities/Environment (7.11.1):
+  - GoogleUtilities/Environment (7.11.5):
     - PromisesObjC (< 3.0, >= 1.2)
-  - GoogleUtilities/Logger (7.11.1):
+  - GoogleUtilities/Logger (7.11.5):
     - GoogleUtilities/Environment
-  - GoogleUtilities/MethodSwizzler (7.11.1):
+  - GoogleUtilities/MethodSwizzler (7.11.5):
     - GoogleUtilities/Logger
-  - GoogleUtilities/Network (7.11.1):
+  - GoogleUtilities/Network (7.11.5):
     - GoogleUtilities/Logger
     - "GoogleUtilities/NSData+zlib"
     - GoogleUtilities/Reachability
-  - "GoogleUtilities/NSData+zlib (7.11.1)"
-  - GoogleUtilities/Reachability (7.11.1):
+  - "GoogleUtilities/NSData+zlib (7.11.5)"
+  - GoogleUtilities/Reachability (7.11.5):
     - GoogleUtilities/Logger
-  - GoogleUtilities/UserDefaults (7.11.1):
+  - GoogleUtilities/UserDefaults (7.11.5):
     - GoogleUtilities/Logger
   - image_cropper (0.0.4):
     - Flutter
     - TOCropViewController (~> 2.6.1)
   - image_editor_common (1.0.0):
     - Flutter
-  - image_gallery_saver (1.5.0):
+  - image_gallery_saver (2.0.2):
     - Flutter
   - image_picker_ios (0.0.1):
     - Flutter
-  - images_picker (0.0.1):
-    - Flutter
-    - ZLPhotoBrowser (= 4.2.5)
-  - Intercom (14.0.7)
+  - Intercom (15.2.1)
   - intercom_flutter (7.5.0):
     - Flutter
-    - Intercom (~> 14.0.7)
+    - Intercom (= 15.2.1)
   - IosAwnCore (0.7.3)
   - IosAwnFcmDist (0.7.5):
     - IosAwnCore (= 0.7.3)
@@ -261,17 +266,23 @@ PODS:
     - Flutter
   - just_waveform (0.0.1):
     - Flutter
-  - libwebp (1.2.4):
-    - libwebp/demux (= 1.2.4)
-    - libwebp/mux (= 1.2.4)
-    - libwebp/webp (= 1.2.4)
-  - libwebp/demux (1.2.4):
+  - libwebp (1.3.1):
+    - libwebp/demux (= 1.3.1)
+    - libwebp/mux (= 1.3.1)
+    - libwebp/sharpyuv (= 1.3.1)
+    - libwebp/webp (= 1.3.1)
+  - libwebp/demux (1.3.1):
     - libwebp/webp
-  - libwebp/mux (1.2.4):
+  - libwebp/mux (1.3.1):
     - libwebp/demux
-  - libwebp/webp (1.2.4)
-  - light_compressor (0.0.1):
+  - libwebp/sharpyuv (1.3.1)
+  - libwebp/webp (1.3.1):
+    - libwebp/sharpyuv
+  - light_compressor (1.0.0):
     - Flutter
+  - livekit_client (1.4.0):
+    - Flutter
+    - WebRTC-SDK (= 114.5735.02)
   - local_auth_ios (0.0.1):
     - Flutter
   - Mantle (2.2.0):
@@ -279,7 +290,11 @@ PODS:
   - Mantle/extobjc (2.2.0)
   - map_launcher (0.0.1):
     - Flutter
-  - maps_launcher (0.0.1):
+  - media_kit_libs_ios_video (1.0.4):
+    - Flutter
+  - media_kit_native_event_loop (1.0.0):
+    - Flutter
+  - media_kit_video (0.0.1):
     - Flutter
   - MTBBarcodeScanner (5.0.11)
   - nanopb (2.30909.0):
@@ -289,6 +304,11 @@ PODS:
   - nanopb/encode (2.30909.0)
   - network_info_plus (0.0.1):
     - Flutter
+  - nfc_manager (0.0.1):
+    - Flutter
+  - "no_screenshot (0.0.1+4)":
+    - Flutter
+    - ScreenProtectorKit (~> 1.2.0)
   - open_file (0.0.1):
     - Flutter
   - openpgp (0.6.0):
@@ -300,32 +320,40 @@ PODS:
     - Flutter
   - package_info_plus (0.4.5):
     - Flutter
+  - pasteboard (0.0.1):
+    - Flutter
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
   - pdfx (1.0.0):
     - Flutter
-  - permission_handler_apple (9.0.4):
+  - permission_handler_apple (9.1.1):
     - Flutter
-  - phone_number (1.0.0):
+  - phone_number (2.0.1):
     - Flutter
-    - PhoneNumberKit/PhoneNumberKitCore (= 3.3.4)
-  - PhoneNumberKit/PhoneNumberKitCore (3.3.4)
+    - PhoneNumberKit/PhoneNumberKitCore (= 3.5.10)
+  - PhoneNumberKit/PhoneNumberKitCore (3.5.10)
   - photo_manager (2.0.0):
     - Flutter
     - FlutterMacOS
-  - PromisesObjC (2.2.0)
+  - PromisesObjC (2.3.1)
   - ReachabilitySwift (5.0.0)
-  - record (0.0.1):
+  - record_darwin (1.0.0):
     - Flutter
+    - FlutterMacOS
   - record_mp3 (0.0.1):
     - Flutter
-  - SDWebImage (5.15.5):
-    - SDWebImage/Core (= 5.15.5)
-  - SDWebImage/Core (5.15.5)
-  - SDWebImageWebPCoder (0.11.0):
+  - screen_brightness_ios (0.1.0):
+    - Flutter
+  - ScreenProtectorKit (1.2.0)
+  - screenshot_callback (0.0.1):
+    - Flutter
+  - SDWebImage (5.18.1):
+    - SDWebImage/Core (= 5.18.1)
+  - SDWebImage/Core (5.18.1)
+  - SDWebImageWebPCoder (0.13.0):
     - libwebp (~> 1.0)
-    - SDWebImage/Core (~> 5.15)
+    - SDWebImage/Core (~> 5.17)
   - sensors_plus (0.0.1):
     - Flutter
   - share_plus (0.0.1):
@@ -336,25 +364,25 @@ PODS:
   - speech_to_text (0.0.1):
     - Flutter
     - Try
-  - sqflite (0.0.2):
+  - sqflite (0.0.3):
     - Flutter
     - FMDB (>= 2.7.5)
-  - sqlite3 (3.41.0):
-    - sqlite3/common (= 3.41.0)
-  - sqlite3/common (3.41.0)
-  - sqlite3/fts5 (3.41.0):
+  - sqlite3 (3.43.1):
+    - sqlite3/common (= 3.43.1)
+  - sqlite3/common (3.43.1)
+  - sqlite3/fts5 (3.43.1):
     - sqlite3/common
-  - sqlite3/perf-threadsafe (3.41.0):
+  - sqlite3/perf-threadsafe (3.43.1):
     - sqlite3/common
-  - sqlite3/rtree (3.41.0):
+  - sqlite3/rtree (3.43.1):
     - sqlite3/common
   - sqlite3_flutter_libs (0.0.1):
     - Flutter
-    - sqlite3 (~> 3.41.0)
+    - sqlite3 (~> 3.43.1)
     - sqlite3/fts5
     - sqlite3/perf-threadsafe
     - sqlite3/rtree
-  - SwiftProtobuf (1.21.0)
+  - SwiftProtobuf (1.23.0)
   - SwiftyGif (5.4.4)
   - telephony (0.0.1):
     - Flutter
@@ -363,21 +391,22 @@ PODS:
   - Try (2.1.1)
   - url_launcher_ios (0.0.1):
     - Flutter
+  - video_compress (0.3.0):
+    - Flutter
   - video_player_avfoundation (0.0.1):
     - Flutter
   - video_thumbnail (0.0.1):
     - Flutter
     - libwebp
-  - wakelock (0.0.1):
+  - volume_controller (0.0.1):
+    - Flutter
+  - wakelock_plus (0.0.1):
     - Flutter
   - webcrypto (0.1.1):
     - Flutter
-  - WebRTC-SDK (104.5112.09)
+  - WebRTC-SDK (114.5735.02)
   - webview_flutter_wkwebview (0.0.1):
     - Flutter
-  - ZLPhotoBrowser (4.2.5):
-    - ZLPhotoBrowser/Core (= 4.2.5)
-  - ZLPhotoBrowser/Core (4.2.5)
 
 DEPENDENCIES:
   - another_audio_recorder (from `.symlinks/plugins/another_audio_recorder/ios`)
@@ -397,7 +426,7 @@ DEPENDENCIES:
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - emoji_picker_flutter (from `.symlinks/plugins/emoji_picker_flutter/ios`)
-  - fijkplayer (from `.symlinks/plugins/fijkplayer/ios`)
+  - fc_native_video_thumbnail (from `.symlinks/plugins/fc_native_video_thumbnail/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - file_saver (from `.symlinks/plugins/file_saver/ios`)
   - file_selector_ios (from `.symlinks/plugins/file_selector_ios/ios`)
@@ -405,64 +434,78 @@ DEPENDENCIES:
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
   - flutter_apns_only (from `.symlinks/plugins/flutter_apns_only/ios`)
+  - flutter_background_executor (from `.symlinks/plugins/flutter_background_executor/ios`)
   - flutter_background_service_ios (from `.symlinks/plugins/flutter_background_service_ios/ios`)
   - flutter_compass (from `.symlinks/plugins/flutter_compass/ios`)
   - flutter_contacts (from `.symlinks/plugins/flutter_contacts/ios`)
-  - flutter_image_compress (from `.symlinks/plugins/flutter_image_compress/ios`)
+  - flutter_image_compress_common (from `.symlinks/plugins/flutter_image_compress_common/ios`)
   - flutter_inappwebview (from `.symlinks/plugins/flutter_inappwebview/ios`)
   - flutter_keyboard_visibility (from `.symlinks/plugins/flutter_keyboard_visibility/ios`)
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
-  - flutter_native_image (from `.symlinks/plugins/flutter_native_image/ios`)
   - flutter_native_splash (from `.symlinks/plugins/flutter_native_splash/ios`)
+  - flutter_nfc_kit (from `.symlinks/plugins/flutter_nfc_kit/ios`)
   - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
+  - flutter_sharing_intent (from `.symlinks/plugins/flutter_sharing_intent/ios`)
   - flutter_sound (from `.symlinks/plugins/flutter_sound/ios`)
   - flutter_tts (from `.symlinks/plugins/flutter_tts/ios`)
+  - flutter_web_auth_2 (from `.symlinks/plugins/flutter_web_auth_2/ios`)
   - flutter_webrtc (from `.symlinks/plugins/flutter_webrtc/ios`)
+  - fluttercontactpicker (from `.symlinks/plugins/fluttercontactpicker/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
+  - gallery_saver (from `.symlinks/plugins/gallery_saver/ios`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/ios`)
   - google_maps_flutter_ios (from `.symlinks/plugins/google_maps_flutter_ios/ios`)
   - image_cropper (from `.symlinks/plugins/image_cropper/ios`)
   - image_editor_common (from `.symlinks/plugins/image_editor_common/ios`)
   - image_gallery_saver (from `.symlinks/plugins/image_gallery_saver/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
-  - images_picker (from `.symlinks/plugins/images_picker/ios`)
   - intercom_flutter (from `.symlinks/plugins/intercom_flutter/ios`)
   - just_audio (from `.symlinks/plugins/just_audio/ios`)
   - just_waveform (from `.symlinks/plugins/just_waveform/ios`)
   - light_compressor (from `.symlinks/plugins/light_compressor/ios`)
+  - livekit_client (from `.symlinks/plugins/livekit_client/ios`)
   - local_auth_ios (from `.symlinks/plugins/local_auth_ios/ios`)
   - map_launcher (from `.symlinks/plugins/map_launcher/ios`)
-  - maps_launcher (from `.symlinks/plugins/maps_launcher/ios`)
+  - media_kit_libs_ios_video (from `.symlinks/plugins/media_kit_libs_ios_video/ios`)
+  - media_kit_native_event_loop (from `.symlinks/plugins/media_kit_native_event_loop/ios`)
+  - media_kit_video (from `.symlinks/plugins/media_kit_video/ios`)
   - network_info_plus (from `.symlinks/plugins/network_info_plus/ios`)
+  - nfc_manager (from `.symlinks/plugins/nfc_manager/ios`)
+  - no_screenshot (from `.symlinks/plugins/no_screenshot/ios`)
   - open_file (from `.symlinks/plugins/open_file/ios`)
   - openpgp (from `.symlinks/plugins/openpgp/ios`)
   - openvpn_flutter (from `.symlinks/plugins/openvpn_flutter/ios`)
   - orientation (from `.symlinks/plugins/orientation/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
-  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/ios`)
+  - pasteboard (from `.symlinks/plugins/pasteboard/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - pdfx (from `.symlinks/plugins/pdfx/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - phone_number (from `.symlinks/plugins/phone_number/ios`)
+  - PhoneNumberKit/PhoneNumberKitCore (from `https://github.com/marmelroy/PhoneNumberKit`, tag `3.5.10`)
   - photo_manager (from `.symlinks/plugins/photo_manager/ios`)
-  - record (from `.symlinks/plugins/record/ios`)
+  - record_darwin (from `.symlinks/plugins/record_darwin/ios`)
   - record_mp3 (from `.symlinks/plugins/record_mp3/ios`)
+  - screen_brightness_ios (from `.symlinks/plugins/screen_brightness_ios/ios`)
+  - screenshot_callback (from `.symlinks/plugins/screenshot_callback/ios`)
   - sensors_plus (from `.symlinks/plugins/sensors_plus/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
-  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/ios`)
+  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
   - speech_to_text (from `.symlinks/plugins/speech_to_text/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/ios`)
   - sqlite3_flutter_libs (from `.symlinks/plugins/sqlite3_flutter_libs/ios`)
   - telephony (from `.symlinks/plugins/telephony/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
+  - video_compress (from `.symlinks/plugins/video_compress/ios`)
   - video_player_avfoundation (from `.symlinks/plugins/video_player_avfoundation/ios`)
   - video_thumbnail (from `.symlinks/plugins/video_thumbnail/ios`)
-  - wakelock (from `.symlinks/plugins/wakelock/ios`)
+  - volume_controller (from `.symlinks/plugins/volume_controller/ios`)
+  - wakelock_plus (from `.symlinks/plugins/wakelock_plus/ios`)
   - webcrypto (from `.symlinks/plugins/webcrypto/ios`)
   - webview_flutter_wkwebview (from `.symlinks/plugins/webview_flutter_wkwebview/ios`)
 
 SPEC REPOS:
   trunk:
-    - BIJKPlayer
     - DKImagePickerController
     - DKPhotoGallery
     - Firebase
@@ -485,9 +528,9 @@ SPEC REPOS:
     - MTBBarcodeScanner
     - nanopb
     - OrderedSet
-    - PhoneNumberKit
     - PromisesObjC
     - ReachabilitySwift
+    - ScreenProtectorKit
     - SDWebImage
     - SDWebImageWebPCoder
     - sqlite3
@@ -497,7 +540,6 @@ SPEC REPOS:
     - TOCropViewController
     - Try
     - WebRTC-SDK
-    - ZLPhotoBrowser
 
 EXTERNAL SOURCES:
   another_audio_recorder:
@@ -534,8 +576,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/device_info_plus/ios"
   emoji_picker_flutter:
     :path: ".symlinks/plugins/emoji_picker_flutter/ios"
-  fijkplayer:
-    :path: ".symlinks/plugins/fijkplayer/ios"
+  fc_native_video_thumbnail:
+    :path: ".symlinks/plugins/fc_native_video_thumbnail/ios"
   file_picker:
     :path: ".symlinks/plugins/file_picker/ios"
   file_saver:
@@ -550,34 +592,44 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_apns_only:
     :path: ".symlinks/plugins/flutter_apns_only/ios"
+  flutter_background_executor:
+    :path: ".symlinks/plugins/flutter_background_executor/ios"
   flutter_background_service_ios:
     :path: ".symlinks/plugins/flutter_background_service_ios/ios"
   flutter_compass:
     :path: ".symlinks/plugins/flutter_compass/ios"
   flutter_contacts:
     :path: ".symlinks/plugins/flutter_contacts/ios"
-  flutter_image_compress:
-    :path: ".symlinks/plugins/flutter_image_compress/ios"
+  flutter_image_compress_common:
+    :path: ".symlinks/plugins/flutter_image_compress_common/ios"
   flutter_inappwebview:
     :path: ".symlinks/plugins/flutter_inappwebview/ios"
   flutter_keyboard_visibility:
     :path: ".symlinks/plugins/flutter_keyboard_visibility/ios"
   flutter_local_notifications:
     :path: ".symlinks/plugins/flutter_local_notifications/ios"
-  flutter_native_image:
-    :path: ".symlinks/plugins/flutter_native_image/ios"
   flutter_native_splash:
     :path: ".symlinks/plugins/flutter_native_splash/ios"
+  flutter_nfc_kit:
+    :path: ".symlinks/plugins/flutter_nfc_kit/ios"
   flutter_secure_storage:
     :path: ".symlinks/plugins/flutter_secure_storage/ios"
+  flutter_sharing_intent:
+    :path: ".symlinks/plugins/flutter_sharing_intent/ios"
   flutter_sound:
     :path: ".symlinks/plugins/flutter_sound/ios"
   flutter_tts:
     :path: ".symlinks/plugins/flutter_tts/ios"
+  flutter_web_auth_2:
+    :path: ".symlinks/plugins/flutter_web_auth_2/ios"
   flutter_webrtc:
     :path: ".symlinks/plugins/flutter_webrtc/ios"
+  fluttercontactpicker:
+    :path: ".symlinks/plugins/fluttercontactpicker/ios"
   fluttertoast:
     :path: ".symlinks/plugins/fluttertoast/ios"
+  gallery_saver:
+    :path: ".symlinks/plugins/gallery_saver/ios"
   geolocator_apple:
     :path: ".symlinks/plugins/geolocator_apple/ios"
   google_maps_flutter_ios:
@@ -590,8 +642,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/image_gallery_saver/ios"
   image_picker_ios:
     :path: ".symlinks/plugins/image_picker_ios/ios"
-  images_picker:
-    :path: ".symlinks/plugins/images_picker/ios"
   intercom_flutter:
     :path: ".symlinks/plugins/intercom_flutter/ios"
   just_audio:
@@ -600,14 +650,24 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/just_waveform/ios"
   light_compressor:
     :path: ".symlinks/plugins/light_compressor/ios"
+  livekit_client:
+    :path: ".symlinks/plugins/livekit_client/ios"
   local_auth_ios:
     :path: ".symlinks/plugins/local_auth_ios/ios"
   map_launcher:
     :path: ".symlinks/plugins/map_launcher/ios"
-  maps_launcher:
-    :path: ".symlinks/plugins/maps_launcher/ios"
+  media_kit_libs_ios_video:
+    :path: ".symlinks/plugins/media_kit_libs_ios_video/ios"
+  media_kit_native_event_loop:
+    :path: ".symlinks/plugins/media_kit_native_event_loop/ios"
+  media_kit_video:
+    :path: ".symlinks/plugins/media_kit_video/ios"
   network_info_plus:
     :path: ".symlinks/plugins/network_info_plus/ios"
+  nfc_manager:
+    :path: ".symlinks/plugins/nfc_manager/ios"
+  no_screenshot:
+    :path: ".symlinks/plugins/no_screenshot/ios"
   open_file:
     :path: ".symlinks/plugins/open_file/ios"
   openpgp:
@@ -618,26 +678,35 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/orientation/ios"
   package_info_plus:
     :path: ".symlinks/plugins/package_info_plus/ios"
+  pasteboard:
+    :path: ".symlinks/plugins/pasteboard/ios"
   path_provider_foundation:
-    :path: ".symlinks/plugins/path_provider_foundation/ios"
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
   pdfx:
     :path: ".symlinks/plugins/pdfx/ios"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
   phone_number:
     :path: ".symlinks/plugins/phone_number/ios"
+  PhoneNumberKit:
+    :git: https://github.com/marmelroy/PhoneNumberKit
+    :tag: 3.5.10
   photo_manager:
     :path: ".symlinks/plugins/photo_manager/ios"
-  record:
-    :path: ".symlinks/plugins/record/ios"
+  record_darwin:
+    :path: ".symlinks/plugins/record_darwin/ios"
   record_mp3:
     :path: ".symlinks/plugins/record_mp3/ios"
+  screen_brightness_ios:
+    :path: ".symlinks/plugins/screen_brightness_ios/ios"
+  screenshot_callback:
+    :path: ".symlinks/plugins/screenshot_callback/ios"
   sensors_plus:
     :path: ".symlinks/plugins/sensors_plus/ios"
   share_plus:
     :path: ".symlinks/plugins/share_plus/ios"
   shared_preferences_foundation:
-    :path: ".symlinks/plugins/shared_preferences_foundation/ios"
+    :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
   speech_to_text:
     :path: ".symlinks/plugins/speech_to_text/ios"
   sqflite:
@@ -648,16 +717,25 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/telephony/ios"
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
+  video_compress:
+    :path: ".symlinks/plugins/video_compress/ios"
   video_player_avfoundation:
     :path: ".symlinks/plugins/video_player_avfoundation/ios"
   video_thumbnail:
     :path: ".symlinks/plugins/video_thumbnail/ios"
-  wakelock:
-    :path: ".symlinks/plugins/wakelock/ios"
+  volume_controller:
+    :path: ".symlinks/plugins/volume_controller/ios"
+  wakelock_plus:
+    :path: ".symlinks/plugins/wakelock_plus/ios"
   webcrypto:
     :path: ".symlinks/plugins/webcrypto/ios"
   webview_flutter_wkwebview:
     :path: ".symlinks/plugins/webview_flutter_wkwebview/ios"
+
+CHECKOUT OPTIONS:
+  PhoneNumberKit:
+    :git: https://github.com/marmelroy/PhoneNumberKit
+    :tag: 3.5.10
 
 SPEC CHECKSUMS:
   another_audio_recorder: dee1fef684a64f55beda4b16b847d264455b5de9
@@ -672,110 +750,123 @@ SPEC CHECKSUMS:
   awesome_notifications: d63d9a25f126860f9a600850d99772237895b3ba
   awesome_notifications_fcm: 7e2d7ab4ca1826fe3a9a5ca96771ace73e05db48
   barcode_scan2: 0af2bb63c81b4565aab6cd78278e4c0fa136dbb0
-  battery_plus: 7851ab482c336dd101ae735dc9363f01e1223c7c
-  BIJKPlayer: 4c5d66e5cb99ae5bade6f22a4fcc031722a81c64
+  battery_plus: 9bff772a7e5e4d5381ca3ca92a97373a3d8b2738
   camera_avfoundation: 3125e8cd1a4387f6f31c6c63abb8a55892a9eeeb
-  connectivity_plus: 413a8857dd5d9f1c399a39130850d02fe0feaf7e
-  device_info_plus: e5c5da33f982a436e103237c0c85f9031142abed
+  connectivity_plus: 07c49e96d7fc92bc9920617b83238c4d178b446a
+  device_info_plus: 7545d84d8d1b896cb16a4ff98c19f07ec4b298ea
   DKImagePickerController: b512c28220a2b8ac7419f21c491fc8534b7601ac
   DKPhotoGallery: fdfad5125a9fdda9cc57df834d49df790dbb4179
   emoji_picker_flutter: df19dac03a2b39ac667dc8d1da939ef3a9e21347
-  fijkplayer: 5ecf78e80cb97eed64cc170b094a4f691d9b9691
+  fc_native_video_thumbnail: acf173eee42a60561203851e02b38a5202adc206
   file_picker: ce3938a0df3cc1ef404671531facef740d03f920
   file_saver: 503e386464dbe118f630e17b4c2e1190fa0cf808
   file_selector_ios: 8c25d700d625e1dcdd6599f2d927072f2254647b
-  Firebase: 0219acf760880eeec8ce479895bd7767466d9f81
-  firebase_core: d85432877e814811e040e7659f9c82faeab66e04
-  firebase_messaging: 45c0514ca78426630338a42fb7b55af962c7ccd2
-  FirebaseAnalytics: f8133442ee6f8512e28ff19e62ce15398bfaeace
-  FirebaseCore: e317665b9d744727a97e623edbbed009320afdd7
-  FirebaseCoreInternal: 8845798510aae74703467480f71ac613788d0696
-  FirebaseInstallations: 59c0e4c7a816a0f76710d83f77e5369b3e45eb96
-  FirebaseMessaging: ac9062bcc35ed56e15a0241d8fd317022499baf8
+  Firebase: 07150e75d142fb9399f6777fa56a187b17f833a0
+  firebase_core: 4a3246a02f828a01c74a2c26427037786d90f17f
+  firebase_messaging: 8fe827c5ffe5aac213908a14733a72414ebfcfd7
+  FirebaseAnalytics: 0270389efbe3022b54ec4588862dabec3477ee98
+  FirebaseCore: f86a1394906b97ac445ae49c92552a9425831bed
+  FirebaseCoreInternal: 2f4bee5ed00301b5e56da0849268797a2dd31fb4
+  FirebaseInstallations: cae95cab0f965ce05b805189de1d4c70b11c76fb
+  FirebaseMessaging: bb2c4f6422a753038fe137d90ae7c1af57251316
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
   flutter_apns_only: 3d91c0ca9dbef4439874858590909a19f8ed06a4
+  flutter_background_executor: 050cdc7fb2cc0680f3cbc59c6d272db44f9d5b03
   flutter_background_service_ios: e30e0d3ee69e4cee66272d0c78eacd48c2e94aac
   flutter_compass: cbbd285cea1584c7ac9c4e0c3e1f17cbea55e855
   flutter_contacts: edb1c5ce76aa433e20e6cb14c615f4c0b66e0983
-  flutter_image_compress: 5a5e9aee05b6553048b8df1c3bc456d0afaac433
-  flutter_inappwebview: bfd58618f49dc62f2676de690fc6dcda1d6c3721
+  flutter_image_compress_common: ec1d45c362c9d30a3f6a0426c297f47c52007e3e
+  flutter_inappwebview: 50b55a88f5dddadc9e741a7caf72f378116e2156
   flutter_keyboard_visibility: 0339d06371254c3eb25eeb90ba8d17dca8f9c069
   flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
-  flutter_native_image: 9c0b7451838484458e5b0fae007b86a4c2d4bdfe
   flutter_native_splash: 52501b97d1c0a5f898d687f1646226c1f93c56ef
+  flutter_nfc_kit: 965c98c3fa68f5609f1cc89abb968fe1b8ffdbaa
   flutter_secure_storage: 23fc622d89d073675f2eaa109381aefbcf5a49be
+  flutter_sharing_intent: e35380d0e1501d7111dbb7e46d5ac6339da6da98
   flutter_sound: c60effa2a350fb977885f0db2fbc4c1ad5160900
   flutter_sound_core: 26c10e5832e76aaacfae252d8925232281c486ae
   flutter_tts: 0f492aab6accf87059b72354fcb4ba934304771d
-  flutter_webrtc: 15c5fb4ea324f3178ff97c0f02b9467b85977e42
-  fluttertoast: eb263d302cc92e04176c053d2385237e9f43fad0
+  flutter_web_auth_2: a1bc00762c408a8f80b72a538cd7ff5b601c3e71
+  flutter_webrtc: 1944895d4e908c4bc722929dc4b9f8620d8e1b2f
+  fluttercontactpicker: d582836dea6b5d489f3d259f35d7817ae82ee5e6
+  fluttertoast: fafc4fa4d01a6a9e4f772ecd190ffa525e9e2d9c
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
+  gallery_saver: 9fc173c9f4fcc48af53b2a9ebea1b643255be542
   geolocator_apple: cc556e6844d508c95df1e87e3ea6fa4e58c50401
-  google_maps_flutter_ios: 3e0b99383a8003b8169d06e7e324170bd0424105
-  GoogleAppMeasurement: fe17c92a32207dd5cdd4e8d742767f2da74857f6
-  GoogleDataTransport: 8378d1fa8ac49753ea6ce70d65a7cb70ce5f66e6
+  google_maps_flutter_ios: abdac20d6ce8931f6ebc5f46616df241bfaa2cfd
+  GoogleAppMeasurement: 2d800fab85e7848b1e66a6f8ce5bca06c5aad892
+  GoogleDataTransport: 54dee9d48d14580407f8f5fbf2f496e92437a2f2
   GoogleMaps: 032f676450ba0779bd8ce16840690915f84e57ac
-  GoogleUtilities: 9aa0ad5a7bc171f8bae016300bfcfa3fb8425749
-  image_cropper: 60c2789d1f1a78c873235d4319ca0c34a69f2d98
+  GoogleUtilities: 13e2c67ede716b8741c7989e26893d151b2b2084
+  image_cropper: a3291c624a953049bc6a02e1f8c8ceb162a24b25
   image_editor_common: d6f6644ae4a6de80481e89fe6d0a8c49e30b4b43
-  image_gallery_saver: 259eab68fb271cfd57d599904f7acdc7832e7ef2
+  image_gallery_saver: cb43cc43141711190510e92c460eb1655cd343cb
   image_picker_ios: 4a8aadfbb6dc30ad5141a2ce3832af9214a705b5
-  images_picker: fa9364e3a7d3083c49f865fcfb2b9e7cdc574d3a
-  Intercom: d5aa0683b023ff4d475305a81ba69ae08d96dbf2
-  intercom_flutter: ca81ba88e71a59996f1493e94a0d1ef28568d58f
+  Intercom: 2bba441963d87eddbbf66bcb88e364fd301116c0
+  intercom_flutter: caf31481bcbaf3e904474907121df3e949102d09
   IosAwnCore: 6494e0e174d49f04f513e8a002187be226889a37
   IosAwnFcmDist: 47578dd46472304b20f1965ad12cc893c877e57c
   just_audio: baa7252489dbcf47a4c7cc9ca663e9661c99aafa
   just_waveform: e03174d1eadf4b096b01715a3e3ccbf940a05d25
-  libwebp: f62cb61d0a484ba548448a4bd52aabf150ff6eef
-  light_compressor: 789ed7df289f0cd43f1dae8a6eed5d932b214c59
+  libwebp: 33dc822fbbf4503668d09f7885bbfedc76c45e96
+  light_compressor: 0b2cd9485749052fa6d6aaf4a600b48f1581abe5
+  livekit_client: dedfd6601bfb2c567d6988491c8bab7ceeb5a6d9
   local_auth_ios: c6cf091ded637a88f24f86a8875d8b0f526e2605
   Mantle: c5aa8794a29a022dfbbfc9799af95f477a69b62d
   map_launcher: e325db1261d029ff33e08e03baccffe09593ffea
-  maps_launcher: 2e5b6a2d664ec6c27f82ffa81b74228d770ab203
+  media_kit_libs_ios_video: a5fe24bc7875ccd6378a0978c13185e1344651c1
+  media_kit_native_event_loop: e6b2ab20cf0746eb1c33be961fcf79667304fa2a
+  media_kit_video: 5da63f157170e5bf303bf85453b7ef6971218a2e
   MTBBarcodeScanner: f453b33c4b7dfe545d8c6484ed744d55671788cb
   nanopb: b552cce312b6c8484180ef47159bc0f65a1f0431
-  network_info_plus: b78876159360f5580608c2cea620d6ceffabd0ad
+  network_info_plus: 122280582fe2fa2bbb8681a4269745cd5c3a9b32
+  nfc_manager: d7da7cb781f7744b94df5fe9dbca904ac4a0939e
+  no_screenshot: 9755402d8c6142353ac9e6874d6d8292370f2960
   open_file: 02eb5cb6b21264bd3a696876f5afbfb7ca4f4b7d
-  openpgp: 50fa5a026d4239461dfb0e4bd7a59e49dbd2063b
+  openpgp: 6e33ab15cb2540f8b6414fb0edc58f8db0d75e48
   openvpn_flutter: 35f2b149956e0be8d97c2af221321a495bcd92fa
   OrderedSet: aaeb196f7fef5a9edf55d89760da9176ad40b93c
   orientation: 6c9203efe86ce4cff379756910f18b2d745628c3
-  package_info_plus: 6c92f08e1f853dc01228d6f553146438dafcd14e
-  path_provider_foundation: c68054786f1b4f3343858c1e1d0caaded73f0be9
+  package_info_plus: fd030dabf36271f146f1f3beacd48f564b0f17f7
+  pasteboard: 982969ebaa7c78af3e6cc7761e8f5e77565d9ce0
+  path_provider_foundation: 29f094ae23ebbca9d3d0cec13889cd9060c0e943
   pdfx: 7b876b09de8b7a0bf444a4f82b439ffcff4ee1ec
-  permission_handler_apple: 44366e37eaf29454a1e7b1b7d736c2cceaeb17ce
-  phone_number: ad6f917e4fd2e507a198b93dca5eadcb463ec8c2
-  PhoneNumberKit: 441e8b26ec88d598e3591de9061eff18f5dd12e8
+  permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
+  phone_number: 3f4cef3301f0df6a8cc76d66d48968d63a2cf8ea
+  PhoneNumberKit: 0e34a6e8a50e4624e96a4710bc4a7211464a934e
   photo_manager: 4f6810b7dfc4feb03b461ac1a70dacf91fba7604
-  PromisesObjC: 09985d6d70fbe7878040aa746d78236e6946d2ef
+  PromisesObjC: c50d2056b5253dadbd6c2bea79b0674bd5a52fa4
   ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
-  record: cae05d8dd3cdb1dea3511b20e5a5811a1ae00d0d
+  record_darwin: 1f6619f2abac4d1ca91d3eeab038c980d76f1517
   record_mp3: b842d3900f65a0707e4064d9bcfac6323dea0b4f
-  SDWebImage: fd7e1a22f00303e058058278639bf6196ee431fe
-  SDWebImageWebPCoder: 295a6573c512f54ad2dd58098e64e17dcf008499
-  sensors_plus: 5717760720f7e6acd96fdbd75b7428f5ad755ec2
-  share_plus: 056a1e8ac890df3e33cb503afffaf1e9b4fbae68
-  shared_preferences_foundation: 986fc17f3d3251412d18b0265f9c64113a8c2472
+  screen_brightness_ios: 715ca807df953bf676d339f11464e438143ee625
+  ScreenProtectorKit: 823e5b0342eea5acd7e9b8d92956a5a7f9c2ce40
+  screenshot_callback: b173e7f4bd8d2ef14a9a5e5a77c0ac6a47578608
+  SDWebImage: ebdbcebc7933a45226d9313bd0118bc052ad458b
+  SDWebImageWebPCoder: af09429398d99d524cae2fe00f6f0f6e491ed102
+  sensors_plus: bda64198ccc7d3ccbb49e6ae17d92f67687bee20
+  share_plus: 599aa54e4ea31d4b4c0e9c911bcc26c55e791028
+  shared_preferences_foundation: 5b919d13b803cadd15ed2dc053125c68730e5126
   speech_to_text: b43a7d99aef037bd758ed8e45d79bbac035d2dfe
-  sqflite: 6d358c025f5b867b29ed92fc697fd34924e11904
-  sqlite3: d31b2b69d59bd1b4ab30e5c92eb18fd8e82fa392
-  sqlite3_flutter_libs: 78f93cb854d4680595bc2c63c57209a104b2efb1
-  SwiftProtobuf: afced68785854575756db965e9da52bbf3dc45e7
+  sqflite: 31f7eba61e3074736dff8807a9b41581e4f7f15a
+  sqlite3: e0a0623a33a20a47cb5921552aebc6e9e437dc91
+  sqlite3_flutter_libs: 0d61e18fab1bed977dbd2d2fc76a726044ca00e7
+  SwiftProtobuf: b70d65f419fbfe61a2d58003456ca5da58e337d6
   SwiftyGif: 93a1cc87bf3a51916001cf8f3d63835fb64c819f
   telephony: c41768fae9fb5495781b05a72004106ca33ec777
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863
   Try: 5ef669ae832617b3cee58cb2c6f99fb767a4ff96
   url_launcher_ios: 08a3dfac5fb39e8759aeb0abbd5d9480f30fc8b4
+  video_compress: fce97e4fb1dfd88175aa07d2ffc8a2f297f87fbe
   video_player_avfoundation: 81e49bb3d9fb63dccf9fa0f6d877dc3ddbeac126
   video_thumbnail: c4e2a3c539e247d4de13cd545344fd2d26ffafd1
-  wakelock: d0fc7c864128eac40eba1617cb5264d9c940b46f
+  volume_controller: 531ddf792994285c9b17f9d8a7e4dcdd29b3eae9
+  wakelock_plus: 8b09852c8876491e4b6d179e17dfe2a0b5f60d47
   webcrypto: 58dac29c85327d3d72a47d19d44128f10905f58e
-  WebRTC-SDK: 3fa5c6fa717314fade68bffed85737484a28ad0b
+  WebRTC-SDK: dd913fd31cfbf1d43b9a22d83f4c6354c960c623
   webview_flutter_wkwebview: 2e2d318f21a5e036e2c3f26171342e95908bd60a
-  ZLPhotoBrowser: 4bfab86b851042e18d7f413284472aa68759626a
 
-PODFILE CHECKSUM: 9f97248a709080b99110e4e19a34fd46da6b102e
+PODFILE CHECKSUM: 69e40b9a90bba6a0f356293513afa2c3fba0df56
 
-COCOAPODS: 1.12.0
+COCOAPODS: 1.12.1
