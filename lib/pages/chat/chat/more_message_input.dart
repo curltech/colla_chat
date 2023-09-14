@@ -12,6 +12,7 @@ import 'package:colla_chat/pages/chat/me/collection/collection_list_widget.dart'
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/macos_camera_widget.dart';
 import 'package:colla_chat/plugin/mobile_camera_widget.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
@@ -427,6 +428,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       padding: const EdgeInsets.only(bottom: 0.0),
       child: DataActionCard(
         actions: actionData,
+        width: appDataProvider.secondaryBodyWidth * 0.8,
         height: chatMessageViewController.moreMessageInputHeight,
         onPressed: _onAction,
         mainAxisSpacing: 40,
