@@ -65,7 +65,7 @@ class AppDataProvider with ChangeNotifier {
   static const double smallBreakpointLimit = 600;
   static const double largeBreakpointLimit = 1000;
 
-  ///横屏
+  ///横屏，宽度大于高度而且宽度大于最小宽度
   bool get landscape {
     return _totalSize.width > _totalSize.height &&
         _totalSize.width >= smallBreakpointLimit;
@@ -87,15 +87,19 @@ class AppDataProvider with ChangeNotifier {
     return const PlatformBreakpoint(begin: largeBreakpointLimit);
   }
 
-  ///计算实际的主视图宽度
+  ///计算实际的主视图宽度，在竖屏的情况下始终为0，
   double get bodyWidth {
     double width = portraitSize.width;
-    if (_totalSize.width >= largeBreakpointLimit) {
-      width = totalSize.width - primaryNavigationWidth;
-      width = width * bodyRatio;
-    } else if (_totalSize.width >= smallBreakpointLimit) {
-      width = totalSize.width - mediumPrimaryNavigationWidth;
-      width = width * bodyRatio;
+    if (landscape) {
+      if (_totalSize.width >= largeBreakpointLimit) {
+        width = totalSize.width - primaryNavigationWidth;
+        width = width * bodyRatio;
+      } else if (_totalSize.width >= smallBreakpointLimit) {
+        width = totalSize.width - mediumPrimaryNavigationWidth;
+        width = width * bodyRatio;
+      } else {
+        width = 0.0;
+      }
     } else {
       width = 0.0;
     }
@@ -132,14 +136,18 @@ class AppDataProvider with ChangeNotifier {
   ///计算实际的当前视图宽度
   double get secondaryBodyWidth {
     double width = portraitSize.width;
-    if (_totalSize.width >= largeBreakpointLimit) {
-      width = totalSize.width - primaryNavigationWidth;
-      width = width * (1 - bodyRatio);
-    } else if (_totalSize.width >= smallBreakpointLimit) {
-      width = totalSize.width - mediumPrimaryNavigationWidth;
-      width = width * (1 - bodyRatio);
+    if (landscape) {
+      if (_totalSize.width >= largeBreakpointLimit) {
+        width = totalSize.width - primaryNavigationWidth;
+        width = width * (1 - bodyRatio);
+      } else if (_totalSize.width >= smallBreakpointLimit) {
+        width = totalSize.width - mediumPrimaryNavigationWidth;
+        width = width * (1 - bodyRatio);
+      } else {
+        width = portraitSize.width;
+      }
     } else {
-      width = portraitSize.width;
+      width = _totalSize.width;
     }
     return width;
   }
