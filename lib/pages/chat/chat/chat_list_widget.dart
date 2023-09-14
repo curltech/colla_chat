@@ -231,7 +231,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
     if (socketStatus != status) {
       ///websocket连接后所有的friend的webrtc重连
       if (_socketStatus.value == SocketStatus.connected) {
-        _reconnectWebrtc(); //在ios下会死机
+        // _reconnectWebrtc(); //在ios下会死机
         if (mounted) {
           DialogUtil.info(context,
               content:

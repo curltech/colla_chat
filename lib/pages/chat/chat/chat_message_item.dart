@@ -162,10 +162,8 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
       ));
       children.add(parentWidget);
     }
-    double width = appDataProvider.secondaryBodyWidth - 80;
-    if (width > 320) {
-      width = 320;
-    }
+    double width = appDataProvider.secondaryBodyWidth * 0.8;
+    logger.w('secondaryBodyWidth width:${appDataProvider.secondaryBodyWidth}');
     return Row(
       mainAxisAlignment:
           widget.isMyself ? MainAxisAlignment.end : MainAxisAlignment.start,
