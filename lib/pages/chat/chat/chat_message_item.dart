@@ -108,10 +108,10 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
     if (widget.isMyself) {
       crossAxisAlignment = CrossAxisAlignment.end;
     }
-    double width = appDataProvider.secondaryBodyWidth - 80;
-    if (width > 320) {
-      width = 320;
-    }
+    double width = appDataProvider.secondaryBodyWidth * 0.8;
+    // if (width > 320) {
+    //   width = 320;
+    // }
     bool transportType =
         widget.chatMessage.transportType == TransportType.webrtc.name;
     List<Widget> children = [
