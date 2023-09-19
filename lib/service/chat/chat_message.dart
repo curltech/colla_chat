@@ -999,6 +999,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     if (content != null) {
       if (contentType != null &&
           (contentType == ChatMessageContentType.file.name ||
+              contentType == ChatMessageContentType.media.name ||
               contentType == ChatMessageContentType.image.name ||
               contentType == ChatMessageContentType.video.name ||
               contentType == ChatMessageContentType.audio.name ||
