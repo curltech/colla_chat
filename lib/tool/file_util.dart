@@ -368,24 +368,35 @@ class FileUtil {
     return theme;
   }
 
+  ///根据文件名获取类型
   static String? mimeType(String filename) {
     return lookupMimeType(filename);
   }
 
-  static String? subMimeType(String mimeType) {
+  ///image/jpeg的子类型，image
+  static String mainMimeType(String mimeType) {
+    int pos = mimeType.lastIndexOf('/');
+    return mimeType.substring(0, pos);
+  }
+
+  ///image/jpeg的子类型，jpeg
+  static String subMimeType(String mimeType) {
     int pos = mimeType.lastIndexOf('/');
     return mimeType.substring(pos + 1);
   }
 
+  ///image/jpeg的子类型，jpeg
   static String extensionFromMime(String mime) {
-    return extensionFromMime(mime);
+    return subMimeType(mime);
   }
 
+  ///获取扩展名
   static String extension(String filename) {
     int pos = filename.lastIndexOf('.');
     return filename.substring(pos + 1);
   }
 
+  ///获取全路径下的文件名部分
   static String filename(String filename) {
     int pos = filename.lastIndexOf(p.separator);
     return filename.substring(pos + 1);

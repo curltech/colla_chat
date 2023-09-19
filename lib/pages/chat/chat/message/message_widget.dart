@@ -98,7 +98,7 @@ class MessageWidget {
     ChatMessageSubType? subMessageType;
     subMessageType = StringUtil.enumFromString(
         ChatMessageSubType.values, chatMessage.subMessageType);
-    Widget body;
+    Widget body = CommonAutoSizeText(AppLocalizations.t('No content'));
     if (subMessageType == ChatMessageSubType.chat) {
       switch (contentType) {
         case ChatMessageContentType.text:
@@ -129,7 +129,18 @@ class MessageWidget {
           body = await buildFileMessageWidget(context);
           break;
         default:
-          body = Container();
+          if (chatMessage.mimeType != null) {
+            String mainMimeType = FileUtil.mainMimeType(chatMessage.mimeType!);
+            ChatMessageContentType? contentType = StringUtil.enumFromString(
+                ChatMessageContentType.values, mainMimeType);
+            if (contentType == ChatMessageContentType.image) {
+              body = buildImageMessageWidget(context);
+            } else if (contentType == ChatMessageContentType.audio) {
+              body = buildAudioMessageWidget(context);
+            } else if (contentType == ChatMessageContentType.video) {
+              body = buildVideoMessageWidget(context);
+            }
+          }
           break;
       }
     } else if (subMessageType == ChatMessageSubType.videoChat) {
@@ -150,8 +161,6 @@ class MessageWidget {
       body = buildCancelMessageWidget(context, chatMessage.content!);
     } else if (subMessageType == ChatMessageSubType.chatReceipt) {
       body = buildChatReceiptMessageWidget(context, chatMessage);
-    } else {
-      body = Container();
     }
 
     ///双击全屏

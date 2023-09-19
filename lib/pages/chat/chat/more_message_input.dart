@@ -187,10 +187,14 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       String? mimeType = await result[0].mimeTypeAsync;
       String title = await result[0].titleAsync;
       mimeType = mimeType ?? FileUtil.mimeType(title);
+      String mainMimeType = FileUtil.mainMimeType(mimeType!);
+      ChatMessageContentType? contentType = StringUtil.enumFromString(
+          ChatMessageContentType.values, mainMimeType);
+      contentType ??= ChatMessageContentType.image;
       await chatMessageController.send(
           title: title,
           content: data,
-          contentType: ChatMessageContentType.media,
+          contentType: contentType,
           mimeType: mimeType);
     }
   }
