@@ -60,8 +60,6 @@
 	<string>reminders</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>speech</string>
-	<key>NSUserTrackingUsageDescription</key>
-	<string>appTrackingTransparency</string>
 	<key>UILaunchStoryboardName</key>
 	<string>MainMenu.xib</string>
 	<key>kTCCServiceMediaLibrary</key>
