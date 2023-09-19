@@ -19,6 +19,9 @@
 		F41955FB2A361F68008F271E /* Share Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F41955F12A361F68008F271E /* Share Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F455125E2A3749E300DBE275 /* SharingFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = F455125D2A3749E300DBE275 /* SharingFile.swift */; };
 		F45512602A374A0F00DBE275 /* SharingFileType.swift in Sources */ = {isa = PBXBuildFile; fileRef = F455125F2A374A0F00DBE275 /* SharingFileType.swift */; };
+		F4A60ED92ABA2F51003CA827 /* ReplayKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4A60ED82ABA2F51003CA827 /* ReplayKit.framework */; };
+		F4A60EDC2ABA2F51003CA827 /* SampleHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A60EDB2ABA2F51003CA827 /* SampleHandler.swift */; };
+		F4A60EE02ABA2F52003CA827 /* BroadcastExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F4A60ED72ABA2F51003CA827 /* BroadcastExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -28,6 +31,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = F41955F02A361F68008F271E;
 			remoteInfo = "Share Extension";
+		};
+		F4A60EDE2ABA2F52003CA827 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F4A60ED62ABA2F51003CA827;
+			remoteInfo = BroadcastExtension;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -48,6 +58,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				F4A60EE02ABA2F52003CA827 /* BroadcastExtension.appex in Embed Foundation Extensions */,
 				F41955FB2A361F68008F271E /* Share Extension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
@@ -85,6 +96,10 @@
 		F41956022A36260C008F271E /* Share Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Share Extension.entitlements"; sourceTree = "<group>"; };
 		F455125D2A3749E300DBE275 /* SharingFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingFile.swift; sourceTree = "<group>"; };
 		F455125F2A374A0F00DBE275 /* SharingFileType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingFileType.swift; sourceTree = "<group>"; };
+		F4A60ED72ABA2F51003CA827 /* BroadcastExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BroadcastExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		F4A60ED82ABA2F51003CA827 /* ReplayKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ReplayKit.framework; path = System/Library/Frameworks/ReplayKit.framework; sourceTree = SDKROOT; };
+		F4A60EDB2ABA2F51003CA827 /* SampleHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleHandler.swift; sourceTree = "<group>"; };
+		F4A60EDD2ABA2F52003CA827 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F4E542812A648E190035A3F0 /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -104,6 +119,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F4A60ED42ABA2F51003CA827 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F4A60ED92ABA2F51003CA827 /* ReplayKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -113,6 +136,7 @@
 				01FB7EDF6D8A1418DD02E0D2 /* Pods_Runner.framework */,
 				F4E542812A648E190035A3F0 /* NetworkExtension.framework */,
 				E84F2C8828903F5A342E4AAB /* Pods_VPNExtension.framework */,
+				F4A60ED82ABA2F51003CA827 /* ReplayKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -147,6 +171,7 @@
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
 				F41955F22A361F68008F271E /* Share Extension */,
+				F4A60EDA2ABA2F51003CA827 /* BroadcastExtension */,
 				97C146EF1CF9000F007C117D /* Products */,
 				91215A247515B451D89F9354 /* Pods */,
 				597AEFAF510653A06208CA64 /* Frameworks */,
@@ -158,6 +183,7 @@
 			children = (
 				97C146EE1CF9000F007C117D /* Runner.app */,
 				F41955F12A361F68008F271E /* Share Extension.appex */,
+				F4A60ED72ABA2F51003CA827 /* BroadcastExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -191,6 +217,15 @@
 			path = "Share Extension";
 			sourceTree = "<group>";
 		};
+		F4A60EDA2ABA2F51003CA827 /* BroadcastExtension */ = {
+			isa = PBXGroup;
+			children = (
+				F4A60EDB2ABA2F51003CA827 /* SampleHandler.swift */,
+				F4A60EDD2ABA2F52003CA827 /* Info.plist */,
+			);
+			path = BroadcastExtension;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -213,6 +248,7 @@
 			);
 			dependencies = (
 				F41955FA2A361F68008F271E /* PBXTargetDependency */,
+				F4A60EDF2ABA2F52003CA827 /* PBXTargetDependency */,
 			);
 			name = Runner;
 			productName = Runner;
@@ -236,6 +272,23 @@
 			productReference = F41955F12A361F68008F271E /* Share Extension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		F4A60ED62ABA2F51003CA827 /* BroadcastExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F4A60EE12ABA2F52003CA827 /* Build configuration list for PBXNativeTarget "BroadcastExtension" */;
+			buildPhases = (
+				F4A60ED32ABA2F51003CA827 /* Sources */,
+				F4A60ED42ABA2F51003CA827 /* Frameworks */,
+				F4A60ED52ABA2F51003CA827 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BroadcastExtension;
+			productName = BroadcastExtension;
+			productReference = F4A60ED72ABA2F51003CA827 /* BroadcastExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -251,6 +304,9 @@
 						LastSwiftMigration = 1100;
 					};
 					F41955F02A361F68008F271E = {
+						CreatedOnToolsVersion = 14.3.1;
+					};
+					F4A60ED62ABA2F51003CA827 = {
 						CreatedOnToolsVersion = 14.3.1;
 					};
 				};
@@ -270,6 +326,7 @@
 			targets = (
 				97C146ED1CF9000F007C117D /* Runner */,
 				F41955F02A361F68008F271E /* Share Extension */,
+				F4A60ED62ABA2F51003CA827 /* BroadcastExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -291,6 +348,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				F41955F72A361F68008F271E /* MainInterface.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F4A60ED52ABA2F51003CA827 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -406,6 +470,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F4A60ED32ABA2F51003CA827 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F4A60EDC2ABA2F51003CA827 /* SampleHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -413,6 +485,11 @@
 			isa = PBXTargetDependency;
 			target = F41955F02A361F68008F271E /* Share Extension */;
 			targetProxy = F41955F92A361F68008F271E /* PBXContainerItemProxy */;
+		};
+		F4A60EDF2ABA2F52003CA827 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F4A60ED62ABA2F51003CA827 /* BroadcastExtension */;
+			targetProxy = F4A60EDE2ABA2F52003CA827 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -508,7 +585,7 @@
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 6T8MC3433B;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -655,7 +732,7 @@
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 6T8MC3433B;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -692,7 +769,7 @@
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 6T8MC3433B;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -822,6 +899,114 @@
 			};
 			name = Profile;
 		};
+		F4A60EE22ABA2F52003CA827 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6T8MC3433B;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BroadcastExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BroadcastExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = io.curltech.colla.BroadcastExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F4A60EE32ABA2F52003CA827 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6T8MC3433B;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BroadcastExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BroadcastExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = io.curltech.colla.BroadcastExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		F4A60EE42ABA2F52003CA827 /* Profile */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6T8MC3433B;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BroadcastExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BroadcastExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = io.curltech.colla.BroadcastExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Profile;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -851,6 +1036,16 @@
 				F41955FD2A361F68008F271E /* Debug */,
 				F41955FE2A361F68008F271E /* Release */,
 				F41955FF2A361F68008F271E /* Profile */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F4A60EE12ABA2F52003CA827 /* Build configuration list for PBXNativeTarget "BroadcastExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F4A60EE22ABA2F52003CA827 /* Debug */,
+				F4A60EE32ABA2F52003CA827 /* Release */,
+				F4A60EE42ABA2F52003CA827 /* Profile */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
