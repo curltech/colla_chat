@@ -157,8 +157,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         ),
       );
     }
-    if (localPeerMediaStreamController.mainPeerMediaStream != null &&
-        platformParams.desktop) {
+    if (localPeerMediaStreamController.mainPeerMediaStream != null) {
       actionData.add(
         ActionData(
             label: 'Screen share',
@@ -255,19 +254,19 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   Future<PeerMediaStream?> _openDisplayMedia() async {
-    final source = await DialogUtil.show<DesktopCapturerSource>(
-      context: context,
-      builder: (context) => Dialog(child: ScreenSelectDialog()),
-    );
-    if (source != null) {
-      PeerMediaStream peerMediaStream = await localPeerMediaStreamController
-          .createPeerDisplayStream(selectedSource: source);
-      await addLocalPeerMediaStream(peerMediaStream);
-      _update();
-
-      return peerMediaStream;
+    DesktopCapturerSource? source;
+    if (!platformParams.ios) {
+      source = await DialogUtil.show<DesktopCapturerSource>(
+        context: context,
+        builder: (context) => Dialog(child: ScreenSelectDialog()),
+      );
     }
-    return null;
+    PeerMediaStream peerMediaStream = await localPeerMediaStreamController
+        .createPeerDisplayStream(selectedSource: source);
+    await addLocalPeerMediaStream(peerMediaStream);
+    _update();
+
+    return peerMediaStream;
   }
 
   Future<PeerMediaStream?> _openMediaStream(MediaStream stream) async {

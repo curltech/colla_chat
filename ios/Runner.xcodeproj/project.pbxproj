@@ -14,6 +14,10 @@
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		C1ADE324630851F3976FCE7C /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01FB7EDF6D8A1418DD02E0D2 /* Pods_Runner.framework */; };
+		F40D646E2ABA3B9F0088D39C /* Atomic.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40D646D2ABA3B9F0088D39C /* Atomic.swift */; };
+		F40D64732ABA3BB70088D39C /* SocketConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40D646F2ABA3BB70088D39C /* SocketConnection.swift */; };
+		F40D64742ABA3BB70088D39C /* DarwinNotificationCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40D64712ABA3BB70088D39C /* DarwinNotificationCenter.swift */; };
+		F40D64752ABA3BB70088D39C /* SampleUploader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F40D64722ABA3BB70088D39C /* SampleUploader.swift */; };
 		F41955F42A361F68008F271E /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41955F32A361F68008F271E /* ShareViewController.swift */; };
 		F41955F72A361F68008F271E /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F41955F52A361F68008F271E /* MainInterface.storyboard */; };
 		F41955FB2A361F68008F271E /* Share Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F41955F12A361F68008F271E /* Share Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -88,6 +92,11 @@
 		AC2842990C8C5C8E9C501F79 /* Pods-VPNExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VPNExtension.release.xcconfig"; path = "Target Support Files/Pods-VPNExtension/Pods-VPNExtension.release.xcconfig"; sourceTree = "<group>"; };
 		E1B94E439AE52BE65E38A8DC /* Pods-Runner.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.debug.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.debug.xcconfig"; sourceTree = "<group>"; };
 		E84F2C8828903F5A342E4AAB /* Pods_VPNExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_VPNExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F40D646D2ABA3B9F0088D39C /* Atomic.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Atomic.swift; sourceTree = "<group>"; };
+		F40D646F2ABA3BB70088D39C /* SocketConnection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SocketConnection.swift; sourceTree = "<group>"; };
+		F40D64702ABA3BB70088D39C /* BroadcastExtension.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = BroadcastExtension.entitlements; sourceTree = "<group>"; };
+		F40D64712ABA3BB70088D39C /* DarwinNotificationCenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DarwinNotificationCenter.swift; sourceTree = "<group>"; };
+		F40D64722ABA3BB70088D39C /* SampleUploader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SampleUploader.swift; sourceTree = "<group>"; };
 		F41955F12A361F68008F271E /* Share Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Share Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F41955F32A361F68008F271E /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		F41955F62A361F68008F271E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
@@ -220,6 +229,11 @@
 		F4A60EDA2ABA2F51003CA827 /* BroadcastExtension */ = {
 			isa = PBXGroup;
 			children = (
+				F40D64702ABA3BB70088D39C /* BroadcastExtension.entitlements */,
+				F40D64712ABA3BB70088D39C /* DarwinNotificationCenter.swift */,
+				F40D64722ABA3BB70088D39C /* SampleUploader.swift */,
+				F40D646F2ABA3BB70088D39C /* SocketConnection.swift */,
+				F40D646D2ABA3B9F0088D39C /* Atomic.swift */,
 				F4A60EDB2ABA2F51003CA827 /* SampleHandler.swift */,
 				F4A60EDD2ABA2F52003CA827 /* Info.plist */,
 			);
@@ -474,6 +488,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F40D646E2ABA3B9F0088D39C /* Atomic.swift in Sources */,
+				F40D64732ABA3BB70088D39C /* SocketConnection.swift in Sources */,
+				F40D64742ABA3BB70088D39C /* DarwinNotificationCenter.swift in Sources */,
+				F40D64752ABA3BB70088D39C /* SampleUploader.swift in Sources */,
 				F4A60EDC2ABA2F51003CA827 /* SampleHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

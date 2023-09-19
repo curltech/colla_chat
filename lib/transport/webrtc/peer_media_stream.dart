@@ -1,4 +1,5 @@
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/media_stream_util.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
@@ -129,18 +130,27 @@ class PeerMediaStream {
     this.peerId = peerId;
     this.clientId = clientId;
     this.name = name;
-    if (selectedSource == null) {
-      var sources = await ScreenSelectUtil.getSources();
-      if (sources.isNotEmpty) {
-        selectedSource = sources[0];
+
+    dynamic video = true;
+    if (platformParams.ios) {
+      video = {
+        'deviceId': 'broadcast',
+        'mandatory': {'frameRate': 30.0}
+      };
+    } else {
+      if (selectedSource == null) {
+        var sources = await ScreenSelectUtil.getSources();
+        if (sources.isNotEmpty) {
+          selectedSource = sources[0];
+        }
       }
     }
-    dynamic video = selectedSource == null
-        ? true
-        : {
-            'deviceId': {'exact': selectedSource.id},
-            'mandatory': {'frameRate': 30.0}
-          };
+    if (selectedSource != null) {
+      video = {
+        'deviceId': {'exact': selectedSource.id},
+        'mandatory': {'frameRate': 30.0}
+      };
+    }
     Map<String, dynamic> mediaConstraints = <String, dynamic>{
       'audio': audio,
       'video': video
