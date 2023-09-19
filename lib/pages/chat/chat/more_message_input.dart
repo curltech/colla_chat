@@ -184,19 +184,13 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     );
     if (result != null && result.isNotEmpty) {
       Uint8List? data = await result[0].originBytes;
-      // Uint8List? thumbnail =
-      //     await ImageUtil.compressThumbnail(assetEntity: result[0]);
-      String? mimeType = result[0].mimeType;
-      String? title = result[0].title;
-      if (title != null) {
-        mimeType = FileUtil.mimeType(title);
-      }
-      mimeType = mimeType ?? 'text/plain';
+      String? mimeType = await result[0].mimeTypeAsync;
+      String title = await result[0].titleAsync;
+      mimeType = mimeType ?? FileUtil.mimeType(title);
       await chatMessageController.send(
-          title: result[0].title,
+          title: title,
           content: data,
-          // thumbnail: thumbnail,
-          contentType: ChatMessageContentType.image,
+          contentType: ChatMessageContentType.media,
           mimeType: mimeType);
     }
   }

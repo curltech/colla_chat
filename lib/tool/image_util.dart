@@ -260,7 +260,7 @@ class ImageUtil {
     return platform_image.decodeImage(data);
   }
 
-  ///压缩图片，适用于多个平台，但是不支持png
+  ///压缩图片，适用于多个平台
   static compress({
     required String filename,
     String? path,
