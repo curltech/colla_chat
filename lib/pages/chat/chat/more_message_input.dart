@@ -428,7 +428,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       padding: const EdgeInsets.only(bottom: 0.0),
       child: DataActionCard(
         actions: actionData,
-        width: appDataProvider.secondaryBodyWidth * 0.8,
+        width: appDataProvider.secondaryBodyWidth * 0.9,
         height: chatMessageViewController.moreMessageInputHeight,
         onPressed: _onAction,
         mainAxisSpacing: 40,

@@ -241,7 +241,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
     var sendTime = widget.chatMessage.sendTime;
     sendTime = sendTime = DateUtil.formatEasyRead(sendTime!);
     int? id = widget.chatMessage.id;
-    Widget title = CommonAutoSizeText('$id: $sendTime',
+    Widget title = CommonAutoSizeText(sendTime,
         style: const TextStyle(fontSize: 12));
     // CommonAutoSizeText('${widget.chatMessage.id}:${widget.chatMessage.senderName}');
     if (timer != null) {
@@ -291,7 +291,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
     var sendTime = widget.chatMessage.sendTime;
     sendTime = sendTime = DateUtil.formatEasyRead(sendTime!);
     int? id = widget.chatMessage.id;
-    Widget title = CommonAutoSizeText('$id: $sendTime',
+    Widget title = CommonAutoSizeText(sendTime,
         style: const TextStyle(fontSize: 12));
     if (timer != null) {
       title = Row(

@@ -627,13 +627,12 @@ class MessageWidget {
     Widget prefix = IconButton(
         onPressed: null,
         icon: Icon(
-          Icons.extension_off,
+          Icons.local_post_office_outlined,
           color: myself.primary,
         ));
     var tileData = TileData(
       prefix: prefix,
       title: title ?? '',
-      subtitle: 'Not exist',
       dense: true,
     );
     return CommonMessage(tileData: tileData);

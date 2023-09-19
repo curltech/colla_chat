@@ -344,20 +344,20 @@ class _ChatMessageViewState extends State<ChatMessageView>
     WebrtcEventType eventType = event.eventType;
     if (eventType == WebrtcEventType.signalingState) {
       RTCSignalingState? state = event.data;
-      if (mounted) {
-        DialogUtil.info(context,
-            content: AppLocalizations.t(
-                    'PeerConnection signalingState was changed to ') +
-                AppLocalizations.t(state.toString().substring(21)));
-      }
+      // if (mounted) {
+      //   DialogUtil.info(context,
+      //       content: AppLocalizations.t(
+      //               'PeerConnection signalingState was changed to ') +
+      //           AppLocalizations.t(state.toString().substring(21)));
+      // }
     } else if (eventType == WebrtcEventType.closed) {
       _peerConnectionState.value =
           RTCPeerConnectionState.RTCPeerConnectionStateClosed;
       _initiator.value = null;
-      if (mounted) {
-        DialogUtil.info(context,
-            content: AppLocalizations.t('PeerConnection was closed'));
-      }
+      // if (mounted) {
+      //   DialogUtil.info(context,
+      //       content: AppLocalizations.t('PeerConnection was closed'));
+      // }
     } else if (eventType == WebrtcEventType.connectionState) {
       RTCPeerConnectionState? state = event.data;
       RTCPeerConnectionState? oldState = _peerConnectionState.value;
@@ -365,31 +365,31 @@ class _ChatMessageViewState extends State<ChatMessageView>
         _peerConnectionState.value = state;
         if (_peerConnectionState.value !=
             RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
-          if (mounted) {
-            String stateText = "Unknown";
-            if (state != null) {
-              stateText = state.name.substring(22);
-            }
-            DialogUtil.info(context,
-                content:
-                    AppLocalizations.t('PeerConnection state was changed to ') +
-                        AppLocalizations.t(stateText));
-          }
+          // if (mounted) {
+          //   String stateText = "Unknown";
+          //   if (state != null) {
+          //     stateText = state.name.substring(22);
+          //   }
+          //   DialogUtil.info(context,
+          //       content:
+          //           AppLocalizations.t('PeerConnection state was changed to ') +
+          //               AppLocalizations.t(stateText));
+          // }
         } else {
-          if (mounted) {
-            DialogUtil.info(context,
-                content: AppLocalizations.t('PeerConnection was closed'));
-          }
+          // if (mounted) {
+          //   DialogUtil.info(context,
+          //       content: AppLocalizations.t('PeerConnection was closed'));
+          // }
         }
       }
     } else if (eventType == WebrtcEventType.initiator) {
       _initiator.value = event.data;
-      if (mounted) {
-        DialogUtil.info(context,
-            content:
-                AppLocalizations.t('PeerConnection initiator was changed to ') +
-                    _initiator.value.toString());
-      }
+      // if (mounted) {
+      //   DialogUtil.info(context,
+      //       content:
+      //           AppLocalizations.t('PeerConnection initiator was changed to ') +
+      //               _initiator.value.toString());
+      // }
     }
   }
 

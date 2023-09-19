@@ -260,10 +260,11 @@ class ImageUtil {
     return platform_image.decodeImage(data);
   }
 
+  ///压缩图片，适用于多个平台，但是不支持png
   static compress({
     required String filename,
     String? path,
-    CompressMode mode = CompressMode.AUTO,
+    CompressMode mode = CompressMode.LARGE2SMALL,
     int quality = 80,
     int step = 6,
     bool autoRatio = true,
@@ -278,7 +279,7 @@ class ImageUtil {
         //first compress quality, default 80
         step: step,
         //compress quality step, The bigger the fast, Smaller is more accurate, default 6
-        mode: CompressMode.LARGE2SMALL,
+        mode: mode,
         autoRatio: autoRatio //default AUTO
         );
     var name = await Luban.compressImage(compressObject);
@@ -371,7 +372,7 @@ class ImageUtil {
     return list;
   }
 
-  /// compress Uint8List and get another Uint8List.
+  /// 压缩图片，移动平台，compress Uint8List and get another Uint8List.
   static Future<Uint8List> compressWithList(
     Uint8List list, {
     int minWidth = 1920,
