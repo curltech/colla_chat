@@ -210,17 +210,17 @@ class _ChatListWidgetState extends State<ChatListWidget>
   _updateConnectivity() {
     var result = connectivityController.connectivityResult;
     if (result == ConnectivityResult.none) {
-      if (mounted) {
-        DialogUtil.error(context,
-            content: AppLocalizations.t('Connectivity were break down'));
-      }
+      // if (mounted) {
+      //   DialogUtil.error(context,
+      //       content: AppLocalizations.t('Connectivity were break down'));
+      // }
     } else {
       _reconnect();
-      if (mounted) {
-        DialogUtil.info(context,
-            content: AppLocalizations.t('Connectivity status was changed to:') +
-                result.name);
-      }
+      // if (mounted) {
+      //   DialogUtil.info(context,
+      //       content: AppLocalizations.t('Connectivity status was changed to:') +
+      //           result.name);
+      // }
     }
     _connectivityResult.value = result;
   }
@@ -232,17 +232,17 @@ class _ChatListWidgetState extends State<ChatListWidget>
       ///websocket连接后所有的friend的webrtc重连
       if (_socketStatus.value == SocketStatus.connected) {
         // _reconnectWebrtc(); //在ios下会死机
-        if (mounted) {
-          DialogUtil.info(context,
-              content:
-                  '$address ${AppLocalizations.t('Websocket status was changed to:')}${_socketStatus.value.name}');
-        }
+        // if (mounted) {
+        //   DialogUtil.info(context,
+        //       content:
+        //           '$address ${AppLocalizations.t('Websocket status was changed to:')}${_socketStatus.value.name}');
+        // }
       } else {
-        if (mounted) {
+        // if (mounted) {
           // DialogUtil.error(context,
           //     content:
           //         '$address ${AppLocalizations.t('Websocket status was changed to:')}${_socketStatus.value.name}');
-        }
+        // }
       }
     }
   }
