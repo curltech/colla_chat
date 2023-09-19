@@ -119,5 +119,7 @@
     </array>
     <key>UIRequiresPersistentWiFi</key>
     <true/>
+    <key>RTCAppGroupIdentifier</key>
+    <string>group.io.curltech.colla</string>
 </dict>
 </plist>

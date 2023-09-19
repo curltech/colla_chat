@@ -75,8 +75,6 @@ dependencies:
   idb_shim: ^2.0.1
 
   #网络
-  dart_webrtc: ^1.1.2
-  webrtc_interface: 1.1.1
   dio: ^5.0.2
   dio_http2_adapter: ^2.1.0
   web_socket_channel: ^2.2.0
@@ -369,6 +367,8 @@ dependency_overrides:
   device_info_plus: ^9.0.2
   ffi: ^2.0.1
   livekit_client: ^1.4.3 #livekit sfu server flutter client
+  dart_webrtc: ^1.1.3
+  webrtc_interface: 1.1.2
   flutter_webrtc: ^0.9.42+hotfix.1
   protobuf: ^3.1.0
   analyzer: ^6.0.0

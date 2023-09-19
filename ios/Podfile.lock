@@ -823,7 +823,7 @@ SPEC CHECKSUMS:
   nfc_manager: d7da7cb781f7744b94df5fe9dbca904ac4a0939e
   no_screenshot: 9755402d8c6142353ac9e6874d6d8292370f2960
   open_file: 02eb5cb6b21264bd3a696876f5afbfb7ca4f4b7d
-  openpgp: 6e33ab15cb2540f8b6414fb0edc58f8db0d75e48
+  openpgp: 4632eee673afda29ec892ff41770f49db6d0184a
   openvpn_flutter: 35f2b149956e0be8d97c2af221321a495bcd92fa
   OrderedSet: aaeb196f7fef5a9edf55d89760da9176ad40b93c
   orientation: 6c9203efe86ce4cff379756910f18b2d745628c3
