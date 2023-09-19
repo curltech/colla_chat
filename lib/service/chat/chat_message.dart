@@ -1009,7 +1009,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           Uint8List image = CryptoUtil.decodeBase64(content);
           mimeType = FileUtil.subMimeType(mimeType!);
           Uint8List? data = await ImageUtil.compressThumbnail(
-              image: image, extension: mimeType!);
+              image: image, extension: mimeType);
           if (data != null) {
             String base64 = CryptoUtil.encodeBase64(data);
             chatMessage.thumbnail = ImageUtil.base64Img(base64);

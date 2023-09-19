@@ -548,12 +548,13 @@ class MessageWidget {
     String? messageId = chatMessage.messageId;
     String? title = chatMessage.title;
     String? thumbnail = chatMessage.thumbnail;
-    String? mimeType = chatMessage.mimeType;
+    String? content = chatMessage.content;
     return ImageMessage(
       key: UniqueKey(),
       messageId: messageId!,
       title: title,
       thumbnail: thumbnail,
+      content: content,
       isMyself: isMyself,
       fullScreen: fullScreen,
     );

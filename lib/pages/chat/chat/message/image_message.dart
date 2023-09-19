@@ -11,6 +11,7 @@ class ImageMessage extends StatelessWidget {
   final String? thumbnail;
   final String messageId;
   final String? title;
+  final String? content;
   final bool isMyself;
   final bool fullScreen;
 
@@ -20,6 +21,7 @@ class ImageMessage extends StatelessWidget {
     required this.messageId,
     required this.isMyself,
     this.title,
+    this.content,
     this.fullScreen = false,
   }) : super(key: key);
 
@@ -39,7 +41,27 @@ class ImageMessage extends StatelessWidget {
         );
 
         return CommonMessage(child: imageWidget);
+      } else if (content != null) {
+        String image = ImageUtil.base64Img(content!);
+        imageWidget = ImageUtil.buildImageWidget(
+          image: image,
+          width: width,
+          height: height,
+        );
+
+        return CommonMessage(child: imageWidget);
       }
+    }
+
+    if (content != null) {
+      String image = ImageUtil.base64Img(content!);
+      imageWidget = ImageUtil.buildImageWidget(
+        image: image,
+        width: width,
+        height: height,
+      );
+
+      return imageWidget;
     }
 
     imageWidget = FutureBuilder(
@@ -57,10 +79,6 @@ class ImageMessage extends StatelessWidget {
           }
           return LoadingUtil.buildCircularLoadingWidget();
         });
-
-    if (!fullScreen) {
-      return CommonMessage(child: imageWidget);
-    }
 
     return imageWidget;
   }
