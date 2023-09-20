@@ -534,5 +534,6 @@
   "PeerConnection signalingState was changed to ": "连接信号变成",
   "PeerConnection state was changed to ": "连接状态变成",
   "PeerConnection initiator was changed to ": "连接主叫状态变成",
+  "Delete peer": "删除当前账户",
   "Confirm delete current peer?": "确认删除当前账户?"
 }
