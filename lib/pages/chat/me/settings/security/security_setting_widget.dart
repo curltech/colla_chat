@@ -8,8 +8,17 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/routers/routes.dart';
+import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/service/chat/chat_summary.dart';
+import 'package:colla_chat/service/chat/conference.dart';
+import 'package:colla_chat/service/chat/group.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
+import 'package:colla_chat/service/dht/peerclient.dart';
+import 'package:colla_chat/service/dht/peerendpoint.dart';
+import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/path_util.dart';
@@ -72,6 +81,7 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
       TileData(title: 'Backup', prefix: Icons.backup),
       TileData(title: 'Restore', prefix: Icons.restore),
       TileData(title: 'Backup peer', prefix: Icons.backup_table),
+      TileData(title: 'Delete peer', prefix: Icons.delete_outline),
       TileData(title: 'Restore peer', prefix: Icons.restore_page),
       TileData(title: 'Backup attachment', prefix: Icons.copy),
       TileData(title: 'Restore attachment', prefix: Icons.paste),
@@ -91,6 +101,9 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
         break;
       case 'Backup peer':
         _backupPeer();
+        break;
+      case 'Delete peer':
+        _deletePeer();
         break;
       case 'Restore peer':
         _restorePeer();
@@ -141,6 +154,36 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
           DialogUtil.info(context,
               content:
                   '${AppLocalizations.t('Successfully backup peer filename')} $filename');
+        }
+      }
+    }
+  }
+
+  ///删除当前的peer和所拥有的信息
+  Future<void> _deletePeer() async {
+    String? peerId = myself.peerId;
+    if (peerId != null) {
+      bool? confirm = await DialogUtil.confirm(context,
+          content: 'Confirm delete current peer?');
+      if (confirm == true) {
+        myselfPeerService.delete();
+        peerClientService.delete();
+        peerProfileService.delete();
+        peerEndpointService.delete();
+        linkmanService.delete();
+        groupService.delete();
+        conferenceService.delete();
+        chatMessageService.delete();
+        messageAttachmentService.delete();
+        chatSummaryService.delete();
+        groupMemberService.delete();
+
+        myselfPeerService.logout();
+        if (mounted) {
+          indexWidgetProvider.pop(context: context);
+          indexWidgetProvider.currentMainIndex = 0;
+          Application.router
+              .navigateTo(context, Application.p2pLogin, replace: true);
         }
       }
     }
