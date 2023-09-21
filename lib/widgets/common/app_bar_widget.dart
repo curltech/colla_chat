@@ -18,7 +18,7 @@ class AppBarPopupMenu {
 class AppBarWidget {
   static PreferredSizeWidget buildAppBar(
     BuildContext context, {
-    // Color? backgroundColor,
+    Color? backgroundColor,
     Color? foregroundColor,
     bool withLeading = false, //是否有缺省的回退按钮
     Function? leadingCallBack, //回退按钮的回调
@@ -52,16 +52,16 @@ class AppBarWidget {
         leadingCallBack: leadingCallBack);
     // backgroundColor ??= myself.primary;
     // foregroundColor ??= Colors.white;
-    PreferredSizeWidget appBar = platformWidgetFactory.appBar(
+    PreferredSizeWidget appBar = AppBar(
       title: title,
       centerTitle: centerTitle,
       leading: leading,
       actions: actions,
-      // automaticallyImplyLeading: false,
-      // elevation: 0,
-      // backgroundColor: backgroundColor,
-      // foregroundColor: foregroundColor,
-      // bottom: bottom,
+      automaticallyImplyLeading: false,
+      elevation: 0,
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
+      bottom: bottom,
     );
     return appBar;
   }
