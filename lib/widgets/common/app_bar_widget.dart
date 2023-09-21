@@ -1,6 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,9 +16,9 @@ class AppBarPopupMenu {
 ///工作区的顶部栏AppBar，定义了前导组件，比如回退按钮
 ///定义了尾部组件和下拉按钮
 class AppBarWidget {
-  static AppBar buildAppBar(
+  static PreferredSizeWidget buildAppBar(
     BuildContext context, {
-    Color? backgroundColor,
+    // Color? backgroundColor,
     Color? foregroundColor,
     bool withLeading = false, //是否有缺省的回退按钮
     Function? leadingCallBack, //回退按钮的回调
@@ -51,16 +52,16 @@ class AppBarWidget {
         leadingCallBack: leadingCallBack);
     // backgroundColor ??= myself.primary;
     // foregroundColor ??= Colors.white;
-    AppBar appBar = AppBar(
+    PreferredSizeWidget appBar = platformWidgetFactory.appBar(
       title: title,
-      elevation: 0,
-      backgroundColor: backgroundColor,
-      foregroundColor: foregroundColor,
       centerTitle: centerTitle,
-      automaticallyImplyLeading: false,
       leading: leading,
       actions: actions,
-      bottom: bottom,
+      // automaticallyImplyLeading: false,
+      // elevation: 0,
+      // backgroundColor: backgroundColor,
+      // foregroundColor: foregroundColor,
+      // bottom: bottom,
     );
     return appBar;
   }

@@ -1,24 +1,129 @@
+import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/style/glass/glass_kit_widget_factory.dart';
 import 'package:flutter/material.dart';
 
-import 'glass_widget_factory.dart';
-import 'neumorphic/neumorphic_widget_factory.dart';
+import 'package:colla_chat/widgets/style/neumorphic/neumorphic_widget_factory.dart';
 
 enum WidgetStyle { material, glass, neumorphic, fluent }
 
+final defaultLinearGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Colors.white.withOpacity(AppOpacity.lgOpacity),
+      Colors.white.withOpacity(AppOpacity.xlOpacity),
+    ],
+    stops: const [
+      AppOpacity.lgOpacity,
+      AppOpacity.xsOpacity,
+    ]);
+final defaultBorderGradient = LinearGradient(
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+  colors: [
+    Colors.white.withOpacity(AppOpacity.lgOpacity),
+    Colors.white.withOpacity(AppOpacity.lgOpacity),
+  ],
+);
+
+final primaryLinearGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      myself.primary.withOpacity(AppOpacity.smOpacity),
+      myself.primary.withOpacity(AppOpacity.xsOpacity),
+    ],
+    stops: const [
+      AppOpacity.lgOpacity,
+      AppOpacity.xsOpacity,
+    ]);
+final primaryBorderGradient = LinearGradient(
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+  colors: [
+    myself.primary.withOpacity(AppOpacity.smOpacity),
+    myself.primary.withOpacity(AppOpacity.smOpacity),
+  ],
+);
+
+const double blur = 20;
+const BorderRadius borderRadius = BorderRadius.zero;
+
+///不同样式的widget的抽象工厂
 abstract class WidgetFactory {
-  Widget buildContainer({
+  ///容器
+  Widget container({
     Key? key,
     Widget? child,
   });
 
-  Widget buildSizedBox({
+  ///尺寸容器
+  Widget sizedBox({
     Key? key,
     required double width,
     required double height,
     Widget? child,
   });
+
+  ///文本
+  Widget text(
+    String data, {
+    Key? key,
+    TextStyle? style,
+    Color color = Colors.white,
+    double opacity = 0.5,
+    double? fontSize,
+    FontWeight fontWeight = FontWeight.bold,
+  });
+
+  ///标题栏
+  PreferredSizeWidget appBar({
+    Key? key,
+    Widget? leading,
+    Widget? title,
+    bool? centerTitle,
+    List<Widget>? actions,
+  });
+
+  ///列表行
+  Widget listTile({
+    Key? key,
+    Widget? leading,
+    Widget? title,
+    Widget? subtitle,
+    Widget? trailing,
+    void Function()? onTap,
+  });
+
+  ///按钮
+  Widget button({
+    Key? key,
+    Widget? child,
+    void Function()? onPressed,
+    void Function()? onLongPressed,
+  });
+
+  Widget bottomNavigationBar({
+    Key? key,
+    required List<BottomNavigationBarItem> items,
+    int currentIndex = 0,
+    dynamic Function(int)? onTap,
+    Color? selectedItemColor,
+    Color? unselectedItemColor,
+    double? selectedColorOpacity,
+  });
+
+  icon(
+    IconData icon, {
+    Key? key,
+    double? size,
+    Color? color,
+    double opacity = 0.5,
+  });
 }
 
+///平台使用的widget样式的工厂
 class PlatformWidgetFactory {
   late WidgetFactory widgetFactory;
   WidgetStyle widgetStyle = WidgetStyle.glass;
@@ -26,33 +131,129 @@ class PlatformWidgetFactory {
   PlatformWidgetFactory() {
     switch (widgetStyle) {
       case WidgetStyle.glass:
-        widgetFactory = glassWidgetFactory;
+        widgetFactory = glassKitWidgetFactory;
         break;
       case WidgetStyle.neumorphic:
         widgetFactory = neumorphicWidgetFactory;
         break;
       default:
-        widgetFactory = glassWidgetFactory;
+        widgetFactory = glassKitWidgetFactory;
         break;
     }
   }
 
-  Widget buildContainer({
+  Widget container({
     Key? key,
     Widget? child,
   }) {
-    return widgetFactory.buildContainer(key: key, child: child);
+    return widgetFactory.container(key: key, child: child);
   }
 
-  Widget buildSizedBox({
+  Widget sizedBox({
     Key? key,
     required double width,
     required double height,
     Widget? child,
   }) {
-    return widgetFactory.buildSizedBox(
+    return widgetFactory.sizedBox(
         key: key, width: width, height: height, child: child);
+  }
+
+  Widget text(
+    String data, {
+    TextStyle? style,
+    Color color = Colors.white,
+    double opacity = 0.5,
+    double? fontSize,
+    FontWeight fontWeight = FontWeight.bold,
+    Key? key,
+  }) {
+    return widgetFactory.text(data,
+        style: style,
+        color: color,
+        opacity: opacity,
+        fontSize: fontSize,
+        fontWeight: fontWeight);
+  }
+
+  icon(
+    IconData icon, {
+    Key? key,
+    double? size,
+    Color? color,
+    double opacity = 0.5,
+  }) {
+    return widgetFactory.icon(icon,
+        key: key, size: size, color: color, opacity: opacity);
+  }
+
+  ///平台选择的标题栏
+  PreferredSizeWidget appBar({
+    Key? key,
+    Widget? leading,
+    Widget? title,
+    bool? centerTitle,
+    List<Widget>? actions,
+  }) {
+    return widgetFactory.appBar(
+        key: key,
+        leading: leading,
+        title: title,
+        centerTitle: centerTitle,
+        actions: actions);
+  }
+
+  ///列表行
+  Widget listTile({
+    Key? key,
+    Widget? leading,
+    Widget? title,
+    Widget? subtitle,
+    Widget? trailing,
+    void Function()? onTap,
+  }) {
+    return widgetFactory.listTile(
+        key: key,
+        leading: leading,
+        title: title,
+        subtitle: subtitle,
+        trailing: trailing,
+        onTap: onTap);
+  }
+
+  ///按钮
+  Widget button({
+    Key? key,
+    Widget? child,
+    void Function()? onPressed,
+    void Function()? onLongPressed,
+  }) {
+    return widgetFactory.button(
+        key: key,
+        child: child,
+        onPressed: onPressed,
+        onLongPressed: onLongPressed);
+  }
+
+  Widget bottomNavigationBar({
+    Key? key,
+    required List<BottomNavigationBarItem> items,
+    int currentIndex = 0,
+    dynamic Function(int)? onTap,
+    Color? selectedItemColor,
+    Color? unselectedItemColor,
+    double? selectedColorOpacity,
+  }) {
+    return widgetFactory.bottomNavigationBar(
+      key: key,
+      items: items,
+      currentIndex: currentIndex,
+      onTap: onTap,
+      selectedItemColor: selectedItemColor,
+      unselectedItemColor: unselectedItemColor,
+      selectedColorOpacity: selectedColorOpacity,
+    );
   }
 }
 
-final platformWidgetFactory = PlatformWidgetFactory();
+final PlatformWidgetFactory platformWidgetFactory = PlatformWidgetFactory();

@@ -7,6 +7,7 @@ import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:glassmorphism_widgets/src/glass_bottom_bar.dart';
 
 class NeumorphicWidgetFactory extends WidgetFactory {
   NeumorphicTheme buildTheme(Widget child) {
@@ -20,7 +21,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
   }
 
   @override
-  Widget buildContainer({
+  Widget container({
     Key? key,
     Widget? child,
     Duration duration = Neumorphic.DEFAULT_DURATION,
@@ -45,7 +46,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
   }
 
   @override
-  Widget buildSizedBox({
+  Widget sizedBox({
     Key? key,
     required double width,
     required double height,
@@ -74,7 +75,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
         ));
   }
 
-  Widget buildCard({
+  Widget card({
     Widget? child,
     EdgeInsets? padding,
     EdgeInsets? margin,
@@ -90,7 +91,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildTextFormField({
+  Widget textFormField({
     Key? key,
     TextEditingController? controller,
     String? initialValue,
@@ -200,7 +201,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     ));
   }
 
-  Widget buildTextField({
+  Widget textField({
     Key? key,
     TextEditingController? controller,
     FocusNode? focusNode,
@@ -301,39 +302,30 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     ));
   }
 
-  Widget buildButton({
+  @override
+  Widget button({
     Key? key,
-    EdgeInsets? padding,
-    EdgeInsets? margin = EdgeInsets.zero,
     Widget? child,
-    String? tooltip,
-    bool drawSurfaceAboveChild = true,
-    bool? pressed,
-    Duration duration = Neumorphic.DEFAULT_DURATION,
-    Curve curve = Neumorphic.DEFAULT_CURVE,
     void Function()? onPressed,
-    double minDistance = 0,
-    NeumorphicStyle? style,
-    bool provideHapticFeedback = true,
+    void Function()? onLongPressed,
   }) {
     return NeumorphicButton(
       key: key,
-      padding: padding,
-      margin: margin,
-      tooltip: tooltip,
-      drawSurfaceAboveChild: drawSurfaceAboveChild,
-      pressed: pressed,
-      duration: duration,
-      curve: curve,
+      padding: EdgeInsets.zero,
+      margin: EdgeInsets.zero,
+      drawSurfaceAboveChild: true,
+      pressed: onPressed != null,
+      duration: Neumorphic.DEFAULT_DURATION,
+      curve: Neumorphic.DEFAULT_CURVE,
       onPressed: onPressed,
-      minDistance: minDistance,
-      style: style,
-      provideHapticFeedback: provideHapticFeedback,
+      minDistance: 0,
+      style: const NeumorphicStyle(),
+      provideHapticFeedback: true,
       child: child,
     );
   }
 
-  Widget buildRadio({
+  Widget radio({
     Widget? child,
     NeumorphicRadioStyle style = const NeumorphicRadioStyle(),
     dynamic value,
@@ -357,7 +349,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildCheckbox({
+  Widget checkbox({
     NeumorphicCheckboxStyle style = const NeumorphicCheckboxStyle(),
     required bool value,
     required void Function(dynamic) onChanged,
@@ -379,45 +371,48 @@ class NeumorphicWidgetFactory extends WidgetFactory {
         isEnabled: isEnabled);
   }
 
-  Widget buildText(
-    String text, {
+  @override
+  Widget text(
+    String data, {
     Key? key,
-    Duration duration = Neumorphic.DEFAULT_DURATION,
-    Curve curve = Neumorphic.DEFAULT_CURVE,
-    NeumorphicStyle? style,
+    TextStyle? style,
+    Color color = Colors.white,
+    double opacity = 0.5,
+    double? fontSize,
+    FontWeight fontWeight = FontWeight.bold,
     TextAlign textAlign = TextAlign.center,
-    NeumorphicTextStyle? textStyle,
   }) {
     return NeumorphicText(
-      text,
+      data,
       key: key,
-      duration: duration,
-      style: style,
-      curve: curve,
+      duration: Neumorphic.DEFAULT_DURATION,
+      style: NeumorphicStyle(color: color),
+      curve: Neumorphic.DEFAULT_CURVE,
       textAlign: textAlign,
-      textStyle: textStyle,
+      textStyle:
+          NeumorphicTextStyle(fontSize: fontSize, fontWeight: fontWeight),
     );
   }
 
-  Widget buildIcon(
+  @override
+  Widget icon(
     IconData icon, {
     Key? key,
-    Duration duration = Neumorphic.DEFAULT_DURATION,
-    Curve curve = Neumorphic.DEFAULT_CURVE,
-    NeumorphicStyle? style,
-    double size = 20,
+    double? size = 20,
+    Color? color,
+    double opacity = 0.5,
   }) {
     return NeumorphicIcon(
       icon,
       key: key,
-      duration: duration,
-      style: style,
-      curve: curve,
-      size: size,
+      duration: Neumorphic.DEFAULT_DURATION,
+      style: NeumorphicStyle(color: color),
+      curve: Neumorphic.DEFAULT_CURVE,
+      size: size ?? 20,
     );
   }
 
-  Widget buildSwitch({
+  Widget switchButton({
     NeumorphicSwitchStyle style = const NeumorphicSwitchStyle(),
     Key? key,
     Curve curve = Neumorphic.DEFAULT_CURVE,
@@ -438,7 +433,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
         isEnabled: isEnabled);
   }
 
-  Widget buildToggle({
+  Widget toggle({
     NeumorphicToggleStyle? style = const NeumorphicToggleStyle(),
     Key? key,
     required List<ToggleElement> children,
@@ -474,7 +469,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildSlider({
+  Widget slider({
     Key? key,
     SliderStyle style = const SliderStyle(),
     double min = 0,
@@ -502,7 +497,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildProgress({
+  Widget progress({
     Key? key,
     double? percent,
     double height = 10,
@@ -520,7 +515,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildProgressIndeterminate({
+  Widget progressIndeterminate({
     Key? key,
     double height = 10,
     ProgressStyle style = const ProgressStyle(),
@@ -538,7 +533,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildApp(
+  Widget app(
     BuildContext context, {
     Key? key,
     String title = '',
@@ -634,7 +629,8 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildAppBar({
+  @override
+  PreferredSizeWidget appBar({
     Key? key,
     Widget? title,
     EdgeInsets? buttonPadding,
@@ -666,6 +662,49 @@ class NeumorphicWidgetFactory extends WidgetFactory {
       actionSpacing: actionSpacing,
       padding: padding = 16,
     );
+  }
+
+  @override
+  Widget bottomNavigationBar({
+    Key? key,
+    required List<BottomNavigationBarItem> items,
+    int currentIndex = 0,
+    Function(int p1)? onTap,
+    Color? selectedItemColor,
+    Color? unselectedItemColor,
+    double? selectedColorOpacity,
+  }) {
+    return Neumorphic(
+        margin: const EdgeInsets.all(8),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeOutQuint,
+        child: BottomNavigationBar(
+          items: items,
+          currentIndex: currentIndex,
+          onTap: onTap,
+          selectedItemColor: selectedItemColor,
+          unselectedItemColor: unselectedItemColor,
+        ));
+  }
+
+  @override
+  Widget listTile(
+      {Key? key,
+      Widget? leading,
+      Widget? title,
+      Widget? subtitle,
+      Widget? trailing,
+      void Function()? onTap}) {
+    return Neumorphic(
+        child: ListTile(
+      key: key,
+      leading: leading,
+      title: title,
+      subtitle: subtitle,
+      trailing: trailing,
+      onTap: onTap,
+    ));
   }
 }
 

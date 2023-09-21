@@ -18,7 +18,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 class MaterialWidgetFactory extends WidgetFactory {
   ///可变容器
   @override
-  Widget buildContainer({
+  Widget container({
     Key? key,
     AlignmentGeometry? alignment,
     EdgeInsetsGeometry? padding,
@@ -54,7 +54,7 @@ class MaterialWidgetFactory extends WidgetFactory {
 
   ///指定大小的容器
   @override
-  Widget buildSizedBox({
+  Widget sizedBox({
     Key? key,
     double? width,
     double? height,
@@ -68,7 +68,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildCard({
+  Widget card({
     Key? key,
     Color? color,
     Color? shadowColor,
@@ -96,7 +96,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  ExpansionPanel buildExpansionPanel({
+  ExpansionPanel expansionPanel({
     required Widget Function(BuildContext, bool) headerBuilder,
     required Widget body,
     bool isExpanded = false,
@@ -112,7 +112,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildPageView({
+  Widget pageView({
     Key? key,
     Axis scrollDirection = Axis.horizontal,
     bool reverse = false,
@@ -146,7 +146,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildDataTable2({
+  Widget dataTable2({
     Key? key,
     required List<DataColumn> columns,
     int? sortColumnIndex,
@@ -184,7 +184,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildTabBar({
+  Widget tabBar({
     Key? key,
     required List<Widget> tabs,
     TabController? controller,
@@ -216,7 +216,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildTabBarView({
+  Widget tabBarView({
     Key? key,
     required List<Widget> children,
     TabController? controller,
@@ -234,7 +234,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildTabPageSelector({
+  Widget tabPageSelector({
     Key? key,
     TabController? controller,
     double indicatorSize = 12.0,
@@ -252,7 +252,7 @@ class MaterialWidgetFactory extends WidgetFactory {
   }
 
   ///输入小控件
-  Widget buildTextFormField({
+  Widget textFormField({
     Key? key,
     TextEditingController? controller,
     String? initialValue,
@@ -360,7 +360,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildTextField({
+  Widget textField({
     Key? key,
     TextEditingController? controller,
     FocusNode? focusNode,
@@ -460,7 +460,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildTextButton({
+  Widget textButton({
     Key? key,
     required void Function()? onPressed,
     void Function()? onLongPress,
@@ -486,7 +486,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildRadio({
+  Widget radio({
     Key? key,
     required dynamic value,
     required dynamic groupValue,
@@ -524,7 +524,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildCheckbox({
+  Widget checkbox({
     Key? key,
     required bool? value,
     bool tristate = false,
@@ -566,57 +566,40 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildText(
+  @override
+  Widget text(
     String data, {
     Key? key,
     TextStyle? style,
-    StrutStyle? strutStyle,
-    TextAlign? textAlign,
-    TextDirection? textDirection,
-    Locale? locale,
-    bool? softWrap,
-    TextOverflow? overflow,
-    double? textScaleFactor,
-    int? maxLines,
-    String? semanticsLabel,
+    Color color = Colors.white,
+    double opacity = 0.5,
+    double? fontSize,
+    FontWeight fontWeight = FontWeight.bold,
   }) {
     return CommonAutoSizeText(
       data,
       key: key,
       style: style,
-      strutStyle: strutStyle,
-      textAlign: textAlign,
-      textDirection: textDirection,
-      locale: locale,
-      softWrap: softWrap,
-      overflow: overflow,
-      textScaleFactor: textScaleFactor,
-      maxLines: maxLines,
-      semanticsLabel: semanticsLabel,
     );
   }
 
-  Widget buildIcon(
-    IconData? icon, {
+  @override
+  icon(
+    IconData icon, {
     Key? key,
     double? size,
     Color? color,
-    String? semanticLabel,
-    TextDirection? textDirection,
-    List<Shadow>? shadows,
+    double opacity = 0.5,
   }) {
     return Icon(
       icon,
       key: key,
       size: size,
       color: color,
-      semanticLabel: semanticLabel,
-      textDirection: textDirection,
-      shadows: shadows,
     );
   }
 
-  Widget buildSwitch({
+  Widget switchButton({
     Key? key,
     required bool value,
     required void Function(bool)? onChanged,
@@ -647,7 +630,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildToggle({
+  Widget toggle({
     Key? key,
     required List children,
     required List isSelected,
@@ -681,7 +664,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildSlider({
+  Widget slider({
     Key? key,
     required double value,
     required void Function(double)? onChanged,
@@ -706,7 +689,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildProgress({
+  Widget progress({
     Key? key,
     double? value,
     Color? backgroundColor,
@@ -728,7 +711,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildProgressIndeterminate({
+  Widget progressIndeterminate({
     Key? key,
     double? value,
     Color? backgroundColor,
@@ -750,7 +733,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildChip({
+  Widget chip({
     Key? key,
     Widget? avatar,
     required Widget label,
@@ -778,7 +761,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildCircularProgressIndicator({
+  Widget circularProgressIndicator({
     Key? key,
     double? value,
     Color? backgroundColor,
@@ -800,7 +783,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildDivider({
+  Widget divider({
     Key? key,
     double? height,
     double? thickness,
@@ -818,7 +801,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildListTile({
+  Widget listTile({
     Key? key,
     Widget? leading,
     Widget? title,
@@ -852,7 +835,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     return const ListTile();
   }
 
-  Widget buildStepper({
+  Widget stepper({
     Key? key,
     required List<Step> steps,
     ScrollPhysics? physics,
@@ -880,7 +863,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildImage({
+  Widget image({
     Key? key,
     required ImageProvider image,
     Widget Function(BuildContext, Widget, int?, bool)? frameBuilder,
@@ -907,7 +890,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildTooltip({
+  Widget tooltip({
     Key? key,
     String? message,
     InlineSpan? richMessage,
@@ -928,7 +911,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     return Tooltip();
   }
 
-  Widget buildBadge({
+  Widget badge({
     Key? key,
     Widget? badgeContent,
     Widget? child,
@@ -952,7 +935,7 @@ class MaterialWidgetFactory extends WidgetFactory {
   }
 
   ///按钮
-  Widget buildIconButton({
+  Widget iconButton({
     Key? key,
     double? iconSize,
     VisualDensity? visualDensity,
@@ -982,7 +965,7 @@ class MaterialWidgetFactory extends WidgetFactory {
   }
 
   ///InkWell,可点击的，子组件可以是任何组件的组件，用来代替按钮
-  Widget buildInkWell({
+  Widget inkWell({
     Key? key,
     Widget? child,
     void Function()? onTap,
@@ -1040,7 +1023,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildDropdownButton<T>({
+  Widget dropdownButton<T>({
     Key? key,
     required List? items,
     List Function(BuildContext)? selectedItemBuilder,
@@ -1075,7 +1058,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildElevatedButton({
+  Widget elevatedButton({
     Key? key,
     required void Function()? onPressed,
     void Function()? onLongPress,
@@ -1101,7 +1084,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildFloatingActionButton({
+  Widget floatingActionButton({
     Key? key,
     Widget? child,
     String? tooltip,
@@ -1133,7 +1116,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildOutlinedButton({
+  Widget outlinedButton({
     Key? key,
     required void Function()? onPressed,
     void Function()? onLongPress,
@@ -1159,7 +1142,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildPopupMenuButton({
+  Widget popupMenuButton({
     Key? key,
     required List<PopupMenuEntry<dynamic>> Function(BuildContext) itemBuilder,
     dynamic initialValue,
@@ -1204,7 +1187,7 @@ class MaterialWidgetFactory extends WidgetFactory {
   }
 
   ///对话框和展示页面
-  Widget buildBottomSheet({
+  Widget bottomSheet({
     Key? key,
     AnimationController? animationController,
     bool enableDrag = true,
@@ -1295,7 +1278,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildSnackBar({
+  Widget snackBar({
     Key? key,
     required Widget content,
     Color? backgroundColor,
@@ -1317,7 +1300,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildSimpleDialog({
+  Widget simpleDialog({
     Key? key,
     Widget? title,
     EdgeInsetsGeometry titlePadding =
@@ -1338,7 +1321,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     return const SimpleDialog();
   }
 
-  Widget buildAlertDialog({
+  Widget alertDialog({
     Key? key,
     Widget? title,
     EdgeInsetsGeometry? titlePadding,
@@ -1398,7 +1381,7 @@ class MaterialWidgetFactory extends WidgetFactory {
         initialDate: initialDate);
   }
 
-  Widget buildApp(
+  Widget app(
     BuildContext context, {
     Key? key,
     GlobalKey<NavigatorState>? navigatorKey,
@@ -1494,7 +1477,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildScaffold({
+  Widget scaffold({
     Key? key,
     PreferredSizeWidget? appBar,
     Widget? body,
@@ -1525,7 +1508,8 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildAppBar({
+  @override
+  PreferredSizeWidget appBar({
     Key? key,
     Widget? leading,
     bool automaticallyImplyLeading = true,
@@ -1568,7 +1552,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildSliverAppBar({
+  Widget sliverAppBar({
     Key? key,
     Widget? leading,
     bool automaticallyImplyLeading = true,
@@ -1610,7 +1594,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     return const SliverAppBar();
   }
 
-  Widget buildDrawer({
+  Widget drawer({
     Key? key,
     Color? backgroundColor,
     double? elevation,
@@ -1630,34 +1614,36 @@ class MaterialWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildBottomNavigationBar({
+  @override
+  Widget bottomNavigationBar({
     Key? key,
     required List<BottomNavigationBarItem> items,
-    void Function(int)? onTap,
     int currentIndex = 0,
-    double? elevation,
-    BottomNavigationBarType? type,
-    Color? fixedColor,
-    Color? backgroundColor,
-    double iconSize = 24.0,
+    dynamic Function(int)? onTap,
     Color? selectedItemColor,
     Color? unselectedItemColor,
-    IconThemeData? selectedIconTheme,
-    IconThemeData? unselectedIconTheme,
-    double selectedFontSize = 14.0,
-    double unselectedFontSize = 12.0,
-    TextStyle? selectedLabelStyle,
-    TextStyle? unselectedLabelStyle,
-    bool? showSelectedLabels,
-    bool? showUnselectedLabels,
-    MouseCursor? mouseCursor,
-    bool? enableFeedback,
-    BottomNavigationBarLandscapeLayout? landscapeLayout,
+    double? selectedColorOpacity,
+    ShapeBorder itemShape = const StadiumBorder(),
+    EdgeInsets margin = const EdgeInsets.all(8),
+    EdgeInsets itemPadding =
+        const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+    Duration duration = const Duration(milliseconds: 500),
+    Curve curve = Curves.easeOutQuint,
   }) {
     return BottomNavigationBar(
       key: key,
       items: items,
     );
+  }
+
+  @override
+  Widget button(
+      {Key? key,
+      Widget? child,
+      void Function()? onPressed,
+      void Function()? onLongPressed}) {
+    // TODO: implement button
+    throw UnimplementedError();
   }
 }
 

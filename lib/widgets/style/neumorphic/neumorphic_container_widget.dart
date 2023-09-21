@@ -67,4 +67,4 @@ class NeumorphicConstants {
   }
 }
 
-final neumorphicConstants = NeumorphicConstants();
+final NeumorphicConstants neumorphicConstants = NeumorphicConstants();

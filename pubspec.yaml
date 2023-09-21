@@ -122,8 +122,8 @@ dependencies:
   phone_numbers_parser: ^8.0.0 #支持所有的平台
   badges: ^3.0.2
   extended_list: any
-  glassmorphism: ^3.0.0
-  glass_kit: ^2.0.1
+  glassmorphism_widgets: ^0.2.2
+  glass_kit: ^3.0.0
   #flui: 0.9.2
   pluto_grid: ^7.0.2
   data_table_2: any

@@ -564,7 +564,7 @@ class _IndexViewState extends State<IndexView>
               child: loadingWidget,
             ),
             Center(
-                child: platformWidgetFactory.buildSizedBox(
+                child: platformWidgetFactory.sizedBox(
                     child: widget.adaptiveLayoutIndex,
                     height: height,
                     width: width)),

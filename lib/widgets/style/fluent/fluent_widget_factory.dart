@@ -11,7 +11,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 ///只适合桌面和web，样式是windows样式
 class FluentWidgetFactory extends WidgetFactory {
   @override
-  Widget buildContainer({
+  Widget container({
     Key? key,
     AlignmentGeometry? alignment,
     EdgeInsetsGeometry? padding,
@@ -36,7 +36,7 @@ class FluentWidgetFactory extends WidgetFactory {
   }
 
   @override
-  Widget buildSizedBox({
+  Widget sizedBox({
     Key? key,
     AlignmentGeometry? alignment,
     EdgeInsetsGeometry? padding,
@@ -62,7 +62,7 @@ class FluentWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildTextFormField({
+  Widget textFormField({
     Key? key,
     TextEditingController? controller,
     FocusNode? focusNode,
@@ -169,7 +169,7 @@ class FluentWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildTextField({
+  Widget textField({
     Key? key,
     TextEditingController? controller,
     FocusNode? focusNode,
@@ -268,24 +268,20 @@ class FluentWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildButton({
+  Widget button({
     Key? key,
-    required Widget child,
-    required void Function()? onPressed,
-    void Function()? onLongPress,
-    FocusNode? focusNode,
-    bool autofocus = false,
-    ButtonStyle? style,
+    Widget? child,
+    void Function()? onPressed,
+    void Function()? onLongPressed,
   }) {
     return Button(
       key: key,
-      style: style,
-      onPressed: () {},
-      child: child,
+      onPressed: onPressed,
+      child: child!,
     );
   }
 
-  Widget buildRadio({
+  Widget radio({
     Key? key,
     required bool checked,
     required void Function(bool)? onChanged,
@@ -302,7 +298,7 @@ class FluentWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildCheckbox({
+  Widget checkbox({
     Key? key,
     required bool? checked,
     required void Function(bool?)? onChanged,
@@ -319,38 +315,28 @@ class FluentWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildText(
+  Widget text(
     String data, {
     Key? key,
     TextStyle? style,
-    StrutStyle? strutStyle,
-    TextAlign? textAlign,
-    TextDirection? textDirection,
-    Locale? locale,
-    bool? softWrap,
-    TextOverflow? overflow,
-    double? textScaleFactor,
-    int? maxLines,
-    String? semanticsLabel,
-    TextWidthBasis? textWidthBasis,
-    TextHeightBehavior? textHeightBehavior,
+    Color color = Colors.white,
+    double opacity = 0.5,
+    double? fontSize,
+    FontWeight fontWeight = FontWeight.bold,
   }) {
     return CommonAutoSizeText(
       data,
       key: key,
       style: style,
-      textAlign: textAlign,
     );
   }
 
-  Widget buildIcon(
-    IconData? icon, {
+  icon(
+    IconData icon, {
     Key? key,
     double? size,
     Color? color,
-    String? semanticLabel,
-    TextDirection? textDirection,
-    List? shadows,
+    double opacity = 0.5,
   }) {
     return Icon(
       icon,
@@ -359,7 +345,7 @@ class FluentWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildSwitch({
+  Widget switchButton({
     Key? key,
     required bool checked,
     required void Function(bool)? onChanged,
@@ -378,7 +364,7 @@ class FluentWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildToggle({
+  Widget toggle({
     Key? key,
     required bool checked,
     required void Function(bool)? onChanged,
@@ -396,7 +382,7 @@ class FluentWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildSlider({
+  Widget slider({
     Key? key,
     required double value,
     required void Function(double)? onChanged,
@@ -424,7 +410,7 @@ class FluentWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildProgress({
+  Widget progress({
     Key? key,
     double? value,
     double strokeWidth = 4.5,
@@ -437,7 +423,7 @@ class FluentWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildProgressIndeterminate({
+  Widget progressIndeterminate({
     Key? key,
     double? value,
     double strokeWidth = 4.5,
@@ -450,7 +436,7 @@ class FluentWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildBackground({
+  Widget background({
     Key? key,
     required Widget child,
     EdgeInsets padding = const EdgeInsets.all(12.0),
@@ -467,7 +453,7 @@ class FluentWidgetFactory extends WidgetFactory {
   }
 
   ///与其他的样式设计不同，
-  Widget buildApp(
+  Widget app(
     BuildContext context, {
     Key? key,
     GlobalKey<NavigatorState>? navigatorKey,
@@ -559,7 +545,7 @@ class FluentWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildScaffoldPage({
+  Widget scaffoldPage({
     Key? key,
     Widget? header,
     Widget content = const SizedBox.expand(),
@@ -571,7 +557,7 @@ class FluentWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget buildNavigationView({
+  Widget navigationView({
     Key? key,
     NavigationAppBar? appBar,
     NavigationPane? pane,
@@ -584,7 +570,7 @@ class FluentWidgetFactory extends WidgetFactory {
     );
   }
 
-  NavigationPane buildNavigationPane({
+  NavigationPane navigationPane({
     Key? key,
     int? selected,
     void Function(int)? onChanged,
@@ -606,21 +592,45 @@ class FluentWidgetFactory extends WidgetFactory {
     );
   }
 
-  NavigationAppBar buildAppBar({
+  PreferredSizeWidget appBar({
     Key? key,
     Widget? leading,
     Widget? title,
-    Widget? actions,
-    bool automaticallyImplyLeading = true,
-    double height = 50,
-    Color? backgroundColor,
+    bool? centerTitle,
+    List<Widget>? actions,
   }) {
-    return NavigationAppBar(
-      key: key,
-      title: title,
-      leading: leading,
-      automaticallyImplyLeading: automaticallyImplyLeading,
-    );
+    return material.AppBar();
+  }
+
+  @override
+  Widget bottomNavigationBar(
+      {Key? key,
+      required List<BottomNavigationBarItem> items,
+      int currentIndex = 0,
+      Function(int p1)? onTap,
+      Color? selectedItemColor,
+      Color? unselectedItemColor,
+      double? selectedColorOpacity,
+      ShapeBorder itemShape = const StadiumBorder(),
+      EdgeInsets margin = const EdgeInsets.all(8),
+      EdgeInsets itemPadding =
+          const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+      Duration duration = const Duration(milliseconds: 500),
+      Curve curve = Curves.easeOutQuint}) {
+    // TODO: implement bottomNavigationBar
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget listTile(
+      {Key? key,
+      Widget? leading,
+      Widget? title,
+      Widget? subtitle,
+      Widget? trailing,
+      void Function()? onTap}) {
+    // TODO: implement listTile
+    throw UnimplementedError();
   }
 }
 
