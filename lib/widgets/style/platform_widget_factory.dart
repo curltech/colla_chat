@@ -7,48 +7,6 @@ import 'package:colla_chat/widgets/style/neumorphic/neumorphic_widget_factory.da
 
 enum WidgetStyle { material, glass, neumorphic, fluent }
 
-final defaultLinearGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [
-      Colors.white.withOpacity(AppOpacity.lgOpacity),
-      Colors.white.withOpacity(AppOpacity.xlOpacity),
-    ],
-    stops: const [
-      AppOpacity.lgOpacity,
-      AppOpacity.xsOpacity,
-    ]);
-final defaultBorderGradient = LinearGradient(
-  begin: Alignment.topLeft,
-  end: Alignment.bottomRight,
-  colors: [
-    Colors.white.withOpacity(AppOpacity.lgOpacity),
-    Colors.white.withOpacity(AppOpacity.lgOpacity),
-  ],
-);
-
-final primaryLinearGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [
-      myself.primary.withOpacity(AppOpacity.smOpacity),
-      myself.primary.withOpacity(AppOpacity.xsOpacity),
-    ],
-    stops: const [
-      AppOpacity.lgOpacity,
-      AppOpacity.xsOpacity,
-    ]);
-final primaryBorderGradient = LinearGradient(
-  begin: Alignment.topLeft,
-  end: Alignment.bottomRight,
-  colors: [
-    myself.primary.withOpacity(AppOpacity.smOpacity),
-    myself.primary.withOpacity(AppOpacity.smOpacity),
-  ],
-);
-
-const double blur = 20;
-const BorderRadius borderRadius = BorderRadius.zero;
 
 ///不同样式的widget的抽象工厂
 abstract class WidgetFactory {
