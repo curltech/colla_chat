@@ -187,6 +187,9 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
 
   Future<dynamic> _showActionCard(BuildContext context) {
     return DialogUtil.popModalBottomSheet(context, builder: (context) {
+      List<ActionData> actions = _buildVideoActionData();
+      int level = (actions.length / 4).ceil();
+      double height = 100.0 * level;
       return Card(
           child: DataActionCard(
               onPressed: (int index, String label, {String? value}) {
@@ -195,11 +198,10 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
               showLabel: true,
               showTooltip: true,
               crossAxisCount: 4,
-              actions: _buildVideoActionData(),
+              actions: actions,
               mainAxisSpacing: 20,
               crossAxisSpacing: 20,
-              height: 200,
-              //width: 420,
+              height: height,
               size: 30));
     });
   }
