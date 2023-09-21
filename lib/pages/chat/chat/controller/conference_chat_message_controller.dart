@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
@@ -263,14 +264,14 @@ class ConferenceChatMessageController with ChangeNotifier {
   }
 
   setAudioContext({
-    bool? forceSpeaker,
+    AudioContextConfigRoute? route,
     bool? duckAudio,
     bool? respectSilence,
     bool? stayAwake,
   }) async {
     try {
       await _audioPlayer.setAudioContext(
-          forceSpeaker: forceSpeaker,
+          route: route,
           duckAudio: duckAudio,
           respectSilence: respectSilence,
           stayAwake: stayAwake);

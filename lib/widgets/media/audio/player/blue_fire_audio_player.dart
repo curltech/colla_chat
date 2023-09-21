@@ -26,26 +26,26 @@ class BlueFireAudioPlayer {
   }
 
   setGlobalAudioContext({
-    bool? forceSpeaker,
+    AudioContextConfigRoute? route,
     bool? duckAudio,
     bool? respectSilence,
     bool? stayAwake,
   }) async {
     await _global.setAudioContext(_buildAudioContextConfig(
-        forceSpeaker: forceSpeaker,
+        route: route,
         duckAudio: duckAudio,
         respectSilence: respectSilence,
         stayAwake: stayAwake));
   }
 
   setAudioContext({
-    bool? forceSpeaker,
+    AudioContextConfigRoute? route,
     bool? duckAudio,
     bool? respectSilence,
     bool? stayAwake,
   }) async {
     audioContext = _buildAudioContextConfig(
-        forceSpeaker: forceSpeaker,
+        route: route,
         duckAudio: duckAudio,
         respectSilence: respectSilence,
         stayAwake: stayAwake);
@@ -55,20 +55,20 @@ class BlueFireAudioPlayer {
   }
 
   AudioContext _buildAudioContextConfig({
-    bool? forceSpeaker,
+    AudioContextConfigRoute? route,
     bool? duckAudio,
     bool? respectSilence,
     bool? stayAwake,
   }) {
     AudioContextConfig config = audioContextConfig.copy(
-        forceSpeaker: forceSpeaker,
+        route: route,
         duckAudio: duckAudio,
         respectSilence: respectSilence,
         stayAwake: stayAwake);
 
     return config.build();
     audioContext.android.copy(
-      isSpeakerphoneOn: forceSpeaker,
+      isSpeakerphoneOn: route == AudioContextConfigRoute.speaker,
       stayAwake: stayAwake,
       audioMode: AndroidAudioMode.normal,
       contentType: AndroidContentType.unknown,

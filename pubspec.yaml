@@ -257,13 +257,13 @@ dependencies:
   #-lc++
   #-lstd++
   flutter_sound: ^9.2.13
-  audioplayers: ^4.1.0 #音频处理,所有平台
-  audioplayers_platform_interface: ^5.0.1
-  audioplayers_windows: ^2.0.2
-  audioplayers_darwin: ^4.1.0
-  audioplayers_linux: ^2.1.0
-  audioplayers_web: ^3.1.0
-  audioplayers_android: ^3.0.2
+  audioplayers: ^5.1.0 #音频处理,所有平台
+  audioplayers_platform_interface: ^6.0.0
+  audioplayers_windows: ^3.0.0
+  audioplayers_darwin: ^5.0.1
+  audioplayers_linux: ^3.0.0
+  audioplayers_web: ^4.0.0
+  audioplayers_android: ^4.0.1
   another_audio_recorder: ^1.0.1
   assets_audio_player: ^3.0.6
   audiofileplayer: ^2.1.1
@@ -285,7 +285,7 @@ dependencies:
   #flutter_meedu_media_kit: ^4.2.14
   #better_player: ^0.0.83 #chewie的封装,ios下有问题
   #fijkplayer: ^0.10.1 #mobile
-  just_audio: ^0.9.30
+  just_audio: ^0.9.35
   just_audio_windows: ^0.2.0
   just_audio_mpv: ^0.1.4
   just_waveform: ^0.0.4
@@ -412,7 +412,7 @@ dependency_overrides:
   #      ref: master
   #      path: printing
   pdf: ^3.10.4 #所有平台，创建pdf
-  record: ^5.0.0-beta.2
+  record: ^5.0.0-beta.3
   visibility_detector: ^0.4.0+2 #组建可见性的大小发生变化
   focus_detector: ^2.0.1 #组建在界面上消失或者出现
   image_picker: ^1.0.1 #选取图库,移动从图像廊或者相机选，桌面实现采用file_selector，从文件系统选

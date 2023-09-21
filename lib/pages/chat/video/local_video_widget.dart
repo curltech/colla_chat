@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
@@ -661,7 +662,9 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               var conferenceChatMessageController =
                   p2pConferenceClientPool.conferenceChatMessageController;
               await conferenceChatMessageController?.setAudioContext(
-                  forceSpeaker: speakerStatus.value);
+                  route: status
+                      ? AudioContextConfigRoute.speaker
+                      : AudioContextConfigRoute.system);
             },
             backgroundColor: status ? Colors.green : Colors.white,
             child: Icon(

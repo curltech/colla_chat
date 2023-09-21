@@ -1,4 +1,3 @@
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -160,7 +159,7 @@ class IconTextButton extends StatelessWidget {
       );
       children.add(
         Expanded(
-            child: CommonAutoSizeText(
+            child: Text(
           label ?? '',
           style: TextStyle(
             color: labelColor,
@@ -215,7 +214,7 @@ class InkWellTextButton extends StatelessWidget {
       );
       children.add(
         Expanded(
-            child: CommonAutoSizeText(
+            child: Text(
           label ?? '',
           style: TextStyle(
             color: labelColor,
