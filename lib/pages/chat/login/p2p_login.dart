@@ -75,25 +75,34 @@ class _P2pLoginState extends State<P2pLogin> {
       context,
       title: CommonAutoSizeText(AppLocalizations.t('Login')),
       rightWidgets: [
-        IconButton(
+        IconTextButton(
+            padding: const EdgeInsets.symmetric(vertical: 5.0),
             onPressed: () {
               _animateToPage(0);
             },
             icon: const Icon(Icons.login, color: Colors.white),
-            tooltip: AppLocalizations.t('Login')),
-        IconButton(
+            label: AppLocalizations.t('Login')),
+        const SizedBox(
+          width: 10.0,
+        ),
+        IconTextButton(
+          padding: const EdgeInsets.symmetric(vertical: 5.0),
           onPressed: () {
             _animateToPage(1);
           },
           icon: const Icon(Icons.app_registration, color: Colors.white),
-          tooltip: AppLocalizations.t('Register'),
+          label: AppLocalizations.t('Register'),
         ),
-        IconButton(
+        const SizedBox(
+          width: 10.0,
+        ),
+        IconTextButton(
+          padding: const EdgeInsets.symmetric(vertical: 5.0),
           onPressed: () {
             _animateToPage(2);
           },
           icon: const Icon(Icons.settings, color: Colors.white),
-          tooltip: AppLocalizations.t('Setting'),
+          label: AppLocalizations.t('Setting'),
         ),
       ],
     );

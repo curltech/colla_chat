@@ -95,13 +95,13 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
       return;
     }
     if (p2pConferenceClient!.peerMediaStreams.isNotEmpty) {
-      actionData.add(
-        ActionData(
-            label: 'Close',
-            tooltip: 'Close all video',
-            icon:
-                const Icon(Icons.closed_caption_disabled, color: Colors.white)),
-      );
+      // actionData.add(
+      //   ActionData(
+      //       label: 'Close',
+      //       tooltip: 'Close all video',
+      //       icon:
+      //           const Icon(Icons.closed_caption_disabled, color: Colors.white)),
+      // );
     } else {
       controlPanelVisible.value = true;
     }

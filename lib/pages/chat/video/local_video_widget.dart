@@ -17,6 +17,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/media_stream_util.dart';
 import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
@@ -661,10 +662,11 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               speakerStatus.value = !speakerStatus.value;
               var conferenceChatMessageController =
                   p2pConferenceClientPool.conferenceChatMessageController;
-              await conferenceChatMessageController?.setAudioContext(
-                  route: status
-                      ? AudioContextConfigRoute.speaker
-                      : AudioContextConfigRoute.system);
+              await MediaStreamUtil.setSpeakerphoneOn(status);
+              // await conferenceChatMessageController?.setAudioContext(
+              //     route: status
+              //         ? AudioContextConfigRoute.speaker
+              //         : AudioContextConfigRoute.system);
             },
             backgroundColor: status ? Colors.green : Colors.white,
             child: Icon(

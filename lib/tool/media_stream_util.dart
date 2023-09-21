@@ -130,14 +130,31 @@ class MediaStreamUtil {
     return false;
   }
 
+  /// 对视频流的第一个视频轨道设置远近
+  static Future<void> setZoom(MediaStream mediaStream, double zoomLevel) async {
+    var tracks = mediaStream.getVideoTracks();
+    if (tracks.isNotEmpty) {
+      return await Helper.setZoom(tracks[0], zoomLevel);
+    }
+  }
+
   /// 对视频流的第一个音频轨道切换音频播放设备，对手机来说就是耳机还是喇叭
   static Future<void> switchSpeaker(
       MediaStream mediaStream, bool enable) async {
     var tracks = mediaStream.getAudioTracks();
     if (tracks.isNotEmpty) {
       tracks[0].enableSpeakerphone(enable);
-      await Helper.setSpeakerphoneOn(enable);
     }
+  }
+
+  /// 打开或者关闭手机的喇叭
+  static Future<void> setSpeakerphoneOn(bool enable) async {
+    await Helper.setSpeakerphoneOn(enable);
+  }
+
+  /// 打开手机的喇叭，优先使用蓝牙
+  static Future<void> setSpeakerphoneOnButPreferBluetooth() async {
+    await Helper.setSpeakerphoneOnButPreferBluetooth();
   }
 
   static Future<void> setTorch(MediaStream mediaStream, bool torch) async {
@@ -147,8 +164,8 @@ class MediaStreamUtil {
     }
   }
 
-  /// 对视频流的第一个音频轨道静音设置
-  static Future<void> setMute(MediaStream mediaStream, bool mute) async {
+  /// 对视频流的第一个音频轨道的输入设备设置静音设置
+  static Future<void> setMicrophoneMute(MediaStream mediaStream, bool mute) async {
     var tracks = mediaStream.getAudioTracks();
     if (tracks.isNotEmpty) {
       await Helper.setMicrophoneMute(mute, tracks[0]);

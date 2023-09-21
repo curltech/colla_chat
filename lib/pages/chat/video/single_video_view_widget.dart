@@ -1,6 +1,7 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/media_stream_util.dart';
@@ -40,6 +41,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   bool enableSpeaker = false;
   bool enableTorch = false;
   double volume = 1;
+  double zoomLevel = 1;
 
   late OverlayEntry _popupDialog;
 
@@ -103,29 +105,39 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
             icon: const Icon(Icons.cameraswitch)),
       );
     }
-    if (enableSpeaker) {
+    if (platformParams.mobile) {
+      if (enableSpeaker) {
+        videoActionData.add(
+          ActionData(
+              label: 'Handset switch',
+              // actionType: ActionType.inkwell,
+              icon: const Icon(Icons.earbuds)),
+        );
+      } else {
+        videoActionData.add(
+          ActionData(
+              label: 'Speaker switch',
+              // actionType: ActionType.inkwell,
+              icon: const Icon(Icons.speaker_phone)),
+        );
+      }
+    }
+    if (enableMute) {
       videoActionData.add(
         ActionData(
-            label: 'Microphone switch',
+            label: 'Microphone unmute',
             // actionType: ActionType.inkwell,
-            icon: const Icon(Icons.mic_rounded)),
+            icon: const Icon(Icons.mic)),
       );
     } else {
       videoActionData.add(
         ActionData(
-            label: 'Speaker switch',
+            label: 'Microphone mute',
             // actionType: ActionType.inkwell,
-            icon: const Icon(Icons.speaker_phone)),
+            icon: const Icon(Icons.mic_off)),
       );
     }
-    if (volume < 1) {
-      videoActionData.add(
-        ActionData(
-            label: 'Volume increase',
-            // actionType: ActionType.inkwell,
-            icon: const Icon(Icons.volume_up)),
-      );
-    }
+
     if (volume > 0) {
       videoActionData.add(
         ActionData(
@@ -142,14 +154,19 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
             icon: const Icon(Icons.volume_down)),
       );
     }
-    if (enableFullScreen) {
+    videoActionData.add(
+      ActionData(
+          label: 'Volume increase',
+          // actionType: ActionType.inkwell,
+          icon: const Icon(Icons.volume_up)),
+    );
+    if (platformParams.mobile) {
       videoActionData.add(
         ActionData(
             label: 'Zoom in',
             // actionType: ActionType.inkwell,
             icon: const Icon(Icons.zoom_in_map)),
       );
-    } else {
       videoActionData.add(
         ActionData(
             label: 'Zoom out',
@@ -157,12 +174,14 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
             icon: const Icon(Icons.zoom_out_map)),
       );
     }
-    videoActionData.add(
-      ActionData(
-          label: 'Close',
-          // actionType: ActionType.inkwell,
-          icon: const Icon(Icons.closed_caption_disabled)),
-    );
+    if (widget.peerMediaStream.local) {
+      videoActionData.add(
+        ActionData(
+            label: 'Close',
+            // actionType: ActionType.inkwell,
+            icon: const Icon(Icons.closed_caption_disabled)),
+      );
+    }
     return videoActionData;
   }
 
@@ -249,11 +268,21 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
                           fontSize: AppFontSize.xsFontSize),
                     ),
                     CommonAutoSizeText(
-                      video ? 'video' : 'audio',
+                      '$volume',
                       style: const TextStyle(
                           color: Colors.white,
                           fontSize: AppFontSize.xsFontSize),
-                    )
+                    ),
+                    // Icon(
+                    //   video
+                    //       ? Icons.video_call_outlined
+                    //       : Icons.audiotrack_outlined,
+                    //   color: Colors.white,
+                    // ),
+                    Icon(
+                      enableMute ? Icons.mic_off : Icons.mic,
+                      color: Colors.white,
+                    ),
                   ])),
         ],
       ),
@@ -268,7 +297,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         await MediaStreamUtil.switchCamera(mediaStream);
         setState(() {});
         break;
-      case 'Microphone switch':
+      case 'Handset switch':
         enableSpeaker = false;
         await MediaStreamUtil.switchSpeaker(mediaStream, enableSpeaker);
         setState(() {});
@@ -278,43 +307,49 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         await MediaStreamUtil.switchSpeaker(mediaStream, enableSpeaker);
         setState(() {});
         break;
+      case 'Microphone unmute':
+        enableMute = false;
+        await MediaStreamUtil.setMicrophoneMute(mediaStream, enableMute);
+        setState(() {});
+        break;
+      case 'Microphone mute':
+        enableMute = true;
+        await MediaStreamUtil.setMicrophoneMute(mediaStream, enableMute);
+        setState(() {});
+        break;
       case 'Volume increase':
         volume = volume + 0.1;
-        volume = volume > 1 ? 1 : volume;
-        enableMute = false;
+        //volume = volume > 1 ? 1 : volume;
         await MediaStreamUtil.setVolume(mediaStream, volume);
         setState(() {});
         break;
       case 'Volume decrease':
         volume = volume - 0.1;
         volume = volume < 0 ? 0 : volume;
-        enableMute = volume <= 0 ? true : false;
         await MediaStreamUtil.setVolume(mediaStream, volume);
         setState(() {});
         break;
       case 'Volume mute':
-        enableMute = !enableMute;
-        if (enableMute) {
-          volume = 0;
-        } else {
+        if (volume == 0) {
           volume = 1;
+        } else {
+          volume = 0;
         }
         setState(() {
-          MediaStreamUtil.setMute(mediaStream, enableMute);
+          MediaStreamUtil.setVolume(mediaStream, volume);
         });
         break;
       case 'Zoom out':
-        _popupDialog = _buildPopupDialog();
-        Overlay.of(context).insert(_popupDialog);
-        setState(() {
-          enableFullScreen = true;
-        });
+        zoomLevel = zoomLevel + 0.1;
+        //zoomLevel = zoomLevel > 1 ? 1 : zoomLevel;
+        await MediaStreamUtil.setZoom(mediaStream, zoomLevel);
+        setState(() {});
         break;
       case 'Zoom in':
-        _popupDialog.remove();
-        setState(() {
-          enableFullScreen = false;
-        });
+        zoomLevel = zoomLevel - 0.1;
+        //zoomLevel = zoomLevel < 0 ? 0 : zoomLevel;
+        await MediaStreamUtil.setZoom(mediaStream, zoomLevel);
+        setState(() {});
         break;
       case 'Close':
         await _close();

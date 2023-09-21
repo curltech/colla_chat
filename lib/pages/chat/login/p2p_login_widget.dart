@@ -189,7 +189,9 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
         }
       }
     } catch (e) {
-      DialogUtil.error(context, content: e.toString());
+      if (mounted) {
+        DialogUtil.error(context, content: e.toString());
+      }
     }
   }
 

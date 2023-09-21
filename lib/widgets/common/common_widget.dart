@@ -165,6 +165,7 @@ class IconTextButton extends StatelessWidget {
             color: labelColor,
           ),
           overflow: TextOverflow.visible,
+          softWrap: false,
         )),
       );
     }
@@ -220,6 +221,7 @@ class InkWellTextButton extends StatelessWidget {
             color: labelColor,
           ),
           overflow: TextOverflow.visible,
+          softWrap: false,
         )),
       );
     }
