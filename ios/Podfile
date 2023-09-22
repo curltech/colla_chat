@@ -39,6 +39,11 @@ end
 #   pod 'OpenVPNAdapter', :git => 'https://github.com/ss-abramchuk/OpenVPNAdapter.git', :tag => '0.8.0'
 # end
 
+target 'ImageNotification' do
+  use_frameworks!
+  pod 'Firebase/Messaging'
+end
+
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|

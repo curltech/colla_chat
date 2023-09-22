@@ -39,6 +39,8 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NFCReaderUsageDescription</key>
+	<string>Read NFC Tags</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -50,6 +52,10 @@
 	<string>bluetooth</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>bluetooth</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_{YOUR_SERVICE_TYPE}._tcp</string>
+	</array>
 	<key>NSCalendarsUsageDescription</key>
 	<string>Calendars</string>
 	<key>NSCameraUsageDescription</key>
@@ -74,13 +80,28 @@
 	<string>reminders</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>speech</string>
+	<key>RTCAppGroupIdentifier</key>
+	<string>group.io.curltech.colla</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+		<string>fetch</string>
+		<string>location</string>
+		<string>nearby-interaction</string>
+		<string>processing</string>
+		<string>push-to-talk</string>
+		<string>remote-notification</string>
+		<string>voip</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen.storyboard</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UIRequiresFullScreen</key>
+	<true/>
+	<key>UIRequiresPersistentWiFi</key>
 	<true/>
 	<key>UIStatusBarHidden</key>
 	<false/>
@@ -101,25 +122,15 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>com.apple.developer.nfc.readersession.felica.systemcodes</key>
+	<array>
+		<string>0000</string>
+	</array>
+	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
+	<array>
+		<string>A00000000386980701</string>
+	</array>
 	<key>kTCCServiceMediaLibrary</key>
 	<string>media</string>
-	<key>NFCReaderUsageDescription</key>
-    <string>Read NFC Tags</string>
-    <key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
-    <array>
-        <string>A00000000386980701</string>
-    </array>
-    <key>com.apple.developer.nfc.readersession.felica.systemcodes</key>
-    <array>
-        <string>0000</string>
-    </array>
-    <key>NSBonjourServices</key>
-    <array>
-        <string>_{YOUR_SERVICE_TYPE}._tcp</string>
-    </array>
-    <key>UIRequiresPersistentWiFi</key>
-    <true/>
-    <key>RTCAppGroupIdentifier</key>
-    <string>group.io.curltech.colla</string>
 </dict>
 </plist>
