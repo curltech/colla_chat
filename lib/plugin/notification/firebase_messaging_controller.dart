@@ -19,9 +19,9 @@ class FirebaseMessagingController with ChangeNotifier {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   NotificationSettings? settings;
 
-  FirebaseMessagingController();
-
   String? _fcmToken;
+
+  FirebaseMessagingController();
 
   String? get fcmToken => _fcmToken;
 
@@ -38,7 +38,14 @@ class FirebaseMessagingController with ChangeNotifier {
     return settings!.authorizationStatus;
   }
 
+  ///在main的runApp之前调用，用于初始化
   init() async {
+    await Firebase.initializeApp();
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    await register();
+  }
+
+  register() async {
     ///foreground message
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       logger.i('foreground message data: ${message.data}');
@@ -49,10 +56,44 @@ class FirebaseMessagingController with ChangeNotifier {
       }
     });
 
-    ///在main的runApp之前调用，用于初始化
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    ///opened App message
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      logger.i('openedApp message data: ${message.data}');
+    });
 
+    ///apple的参数配置
+    await messaging.setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+  }
+
+  Future<String?> getToken() async {
     _fcmToken = await messaging.getToken();
+
+    return _fcmToken;
+  }
+
+  Future<String?> getAPNSToken() async {
+    if (platformParams.ios || platformParams.macos) {
+      String? token = await messaging.getAPNSToken();
+
+      return token;
+    }
+  }
+
+  ///app被重新打开时调用，获取初始通知消息
+  Future<RemoteMessage?> getInitialMessage() async {
+    return await messaging.getInitialMessage();
+  }
+
+  subscribe(String topic) async {
+    await messaging.subscribeToTopic(topic);
+  }
+
+  unsubscribe(String topic) async {
+    await messaging.unsubscribeFromTopic(topic);
   }
 
   Future<void> sendPushMessage(

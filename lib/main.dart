@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/notification/firebase_messaging_controller.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -54,6 +55,8 @@ void main(List<String> args) async {
     // logger.i('SystemChannels> $msg');
     return msg;
   });
+
+  await firebaseMessagingController.init();
 
   ///加载主应用组件
   runApp(MultiProvider(providers: [

@@ -71,9 +71,9 @@
     <uses-permission android:name="android.permission.NFC"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <!-- Permissions options for the `manage external storage` group -->
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
@@ -107,6 +107,8 @@
                 android:name=".MainActivity"
                 android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
                 android:exported="true"
+                android:showWhenLocked="true"
+                android:turnScreenOn="true"
                 android:hardwareAccelerated="true"
                 android:launchMode="singleTask"
                 android:theme="@style/LaunchTheme"
@@ -183,10 +185,10 @@
                 android:name="com.linusu.flutter_web_auth_2.CallbackActivity"
                 android:exported="true">
             <intent-filter android:label="flutter_web_auth_2">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="YOUR_CALLBACK_URL_SCHEME_HERE" />
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="YOUR_CALLBACK_URL_SCHEME_HERE"/>
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
@@ -205,5 +207,22 @@
         <service
                 android:name="de.julianassmann.flutter_background.IsolateHolderService"
                 android:exported="false"/>
+        <service
+                android:name="com.dexterous.flutterlocalnotifications.ForegroundService"
+                android:exported="false"
+                android:stopWithTask="false"/>
+        <receiver android:exported="false"
+                  android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver"/>
+        <receiver android:exported="false"
+                  android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"/>
+        <receiver android:exported="false"
+                  android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>
