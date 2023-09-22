@@ -339,21 +339,16 @@ dependencies:
   location_picker_flutter_map: ^1.2.1 #Open Street Map，需要翻墙
 
   #服务
-  flutter_local_notifications: ^15.1.0+1 #本地通知，不支持windows和web
-  pull_to_refresh_notification: ^3.1.0
-  #onesignal_flutter: ^3.5.0 #要求OneSignal Account
-  intercom_flutter: ^7.6.3+1
-  #pusher_channels_flutter: ^2.0.1
-  flutter_apns: ^1.6.0
-  #xiao_mi_push_plugin: ^2.0.0  #android下有错误，gradle的配置旧了
-  huawei_push: ^6.7.0+300
+  firebase_core: ^2.16.0
+  firebase_messaging: ^14.6.8
   # 支持本地和fcm
   awesome_notifications: ^0.7.4+1
   awesome_notifications_fcm: ^0.7.4+1 #对minsdk有要求
+  pull_to_refresh_notification: ^3.1.0
+  intercom_flutter: ^7.6.3+1
   flutter_native_splash: ^2.2.19
   system_tray: ^2.0.2
   tray_manager: ^0.2.0
-  #openai_gpt3_api:
   dart_openai: ^3.0.0
   chat_gpt_sdk: ^2.0.4
   flutter_chatgpt_api: ^1.1.0

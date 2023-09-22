@@ -7,7 +7,6 @@ import 'package:colla_chat/widgets/style/neumorphic/neumorphic_widget_factory.da
 
 enum WidgetStyle { material, glass, neumorphic, fluent }
 
-
 ///不同样式的widget的抽象工厂
 abstract class WidgetFactory {
   ///容器
@@ -83,7 +82,7 @@ abstract class WidgetFactory {
 
 ///平台使用的widget样式的工厂
 class PlatformWidgetFactory {
-  late WidgetFactory widgetFactory;
+  WidgetFactory widgetFactory = glassKitWidgetFactory;
   WidgetStyle widgetStyle = WidgetStyle.glass;
 
   PlatformWidgetFactory() {
