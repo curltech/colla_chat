@@ -342,8 +342,8 @@ dependencies:
   firebase_core: ^2.16.0
   firebase_messaging: ^14.6.8
   # 支持本地和fcm
-  awesome_notifications: ^0.7.4+1
-  awesome_notifications_fcm: ^0.7.4+1 #对minsdk有要求
+  #  awesome_notifications: ^0.7.4+1
+  #  awesome_notifications_fcm: ^0.7.4+1 #对minsdk有要求
   pull_to_refresh_notification: ^3.1.0
   intercom_flutter: ^7.6.3+1
   flutter_native_splash: ^2.2.19
