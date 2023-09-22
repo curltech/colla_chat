@@ -343,8 +343,8 @@ class _IndexViewState extends State<IndexView>
       var conference = Conference.fromJson(json);
       topic = conference.topic;
     }
-    var rejectedButton = IconButton(
-        tooltip: AppLocalizations.t('Reject'),
+    var rejectedButton = IconTextButton(
+        label: AppLocalizations.t('Reject'),
         onPressed: () async {
           conferenceChatMessageVisible.value = false;
           _stop();
@@ -353,8 +353,8 @@ class _IndexViewState extends State<IndexView>
           conferenceChatMessageController.close();
         },
         icon: const Icon(color: Colors.red, size: 24, Icons.call_end));
-    var holdButton = IconButton(
-        tooltip: AppLocalizations.t('Hold'),
+    var holdButton = IconTextButton(
+        label: AppLocalizations.t('Hold'),
         onPressed: () async {
           conferenceChatMessageVisible.value = false;
           _stop();
@@ -368,8 +368,8 @@ class _IndexViewState extends State<IndexView>
           this.conferenceChatMessageController.close();
         },
         icon: const Icon(color: Colors.amber, size: 24, Icons.add_call));
-    var acceptedButton = IconButton(
-        tooltip: AppLocalizations.t('Accept'),
+    var acceptedButton = IconTextButton(
+        label: AppLocalizations.t('Accept'),
         onPressed: () async {
           conferenceChatMessageVisible.value = false;
           _stop();
@@ -387,11 +387,35 @@ class _IndexViewState extends State<IndexView>
     buttons.add(rejectedButton);
     buttons.add(holdButton);
 
+    List<Widget> children = [];
+
     ///立即接听按钮只有当前不在会议中，而且是个人或者群模式才可以
     if (p2pConferenceClientPool.conferenceId == null &&
         conferenceChatMessage.groupType != PartyType.conference.name) {
       buttons.add(acceptedButton);
+    } else if (p2pConferenceClientPool.conferenceId != null) {
+      String? conferenceName = p2pConferenceClientPool
+          .conferenceChatMessageController?.conference?.name;
+      conferenceName = conferenceName ?? '';
+      children.add(
+        CommonAutoSizeText(
+          AppLocalizations.t('You are in conference:') + conferenceName,
+          style: const TextStyle(color: Colors.amber),
+        ),
+      );
     }
+    children.addAll([
+      CommonAutoSizeText(name,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+      CommonAutoSizeText(
+        AppLocalizations.t('Inviting you $title chat ') +
+            (conferenceChatMessage.senderName ?? ''),
+      ),
+      CommonAutoSizeText(
+        '${AppLocalizations.t('Topic:')} ${topic ?? ''}',
+      ),
+      ButtonBar(alignment: MainAxisAlignment.end, children: buttons),
+    ]);
     return Column(children: [
       Container(
           alignment: Alignment.topLeft,
@@ -412,20 +436,7 @@ class _IndexViewState extends State<IndexView>
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                      CommonAutoSizeText(name,
-                          style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold)),
-                      CommonAutoSizeText(
-                        AppLocalizations.t('Inviting you $title chat ') +
-                            (conferenceChatMessage.senderName ?? ''),
-                      ),
-                      CommonAutoSizeText(
-                        '${AppLocalizations.t('Topic:')} ${topic ?? ''}',
-                      ),
-                      ButtonBar(
-                          alignment: MainAxisAlignment.end, children: buttons),
-                    ])),
+                        children: children)),
               ]))),
       const Spacer()
     ]);

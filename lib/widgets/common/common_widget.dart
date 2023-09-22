@@ -89,8 +89,10 @@ class CircleTextButton extends StatelessWidget {
     List<Widget> children = [];
     if (tip != null) {
       children.add(
-        CommonAutoSizeText(
+        Text(
           AppLocalizations.t(tip!),
+          softWrap: false,
+          overflow: TextOverflow.visible,
           style: const TextStyle(
               color: Colors.white, fontSize: AppFontSize.xsFontSize),
         ),
@@ -158,15 +160,14 @@ class IconTextButton extends StatelessWidget {
         const SizedBox(height: 3.0),
       );
       children.add(
-        Expanded(
-            child: Text(
+        Text(
           label ?? '',
           style: TextStyle(
             color: labelColor,
           ),
           overflow: TextOverflow.visible,
           softWrap: false,
-        )),
+        ),
       );
     }
     return IconButton(
@@ -176,6 +177,7 @@ class IconTextButton extends StatelessWidget {
         iconSize: iconSize,
         tooltip: tooltip != null ? AppLocalizations.t(tooltip ?? '') : null,
         icon: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: children,
         ));
   }
@@ -214,15 +216,14 @@ class InkWellTextButton extends StatelessWidget {
         const SizedBox(height: 3.0),
       );
       children.add(
-        Expanded(
-            child: Text(
+        Text(
           label ?? '',
           style: TextStyle(
             color: labelColor,
           ),
           overflow: TextOverflow.visible,
           softWrap: false,
-        )),
+        ),
       );
     }
     return Ink(
@@ -230,6 +231,7 @@ class InkWellTextButton extends StatelessWidget {
         child: InkWell(
             onTap: onPressed,
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: children,
             )));
   }
