@@ -124,13 +124,18 @@ class FirebaseMessagingController with ChangeNotifier {
           to: fcmToken, data: data, messageId: title, messageType: messageType);
     } else {
       try {
-        await http.post(
+        String bodyStr = JsonUtil.toJsonString(body);
+        http.Response response = await http.post(
           Uri.parse('https://api.rnfirebase.io/messaging/send'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
           },
-          body: JsonUtil.toJsonString(body),
+          body: bodyStr,
         );
+        int statusCode = response.statusCode;
+        String responseBody = response.body;
+        logger.i(
+            'http response statusCode:$statusCode,responseBody:$responseBody');
       } catch (e) {
         logger.e('post push message failure:$e');
       }

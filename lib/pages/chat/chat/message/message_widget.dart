@@ -26,6 +26,7 @@ import 'package:colla_chat/pages/chat/chat/message/url_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/video_chat_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/video_message.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
+import 'package:colla_chat/plugin/notification/firebase_messaging_controller.dart';
 import 'package:colla_chat/plugin/notification/local_notifications_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -307,8 +308,11 @@ class MessageWidget {
       content = chatMessageService.recoverContent(content);
     }
     String? senderName = chatMessage.senderName;
-    await localNotificationsController
-        .showNotification(senderName ?? '', title ?? '', payload: content);
+    // await localNotificationsController
+    //     .showNotification(senderName ?? '', title ?? '', payload: content);
+    String? fcmToken = await firebaseMessagingController.getToken();
+    firebaseMessagingController.sendPushMessage(
+        fcmToken!, senderName ?? '', 'chat', content);
   }
 
   ExtendedTextMessage buildExtendedTextMessageWidget(BuildContext context) {
