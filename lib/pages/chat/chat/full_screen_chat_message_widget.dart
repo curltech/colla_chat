@@ -98,6 +98,13 @@ class _FullScreenChatMessageWidgetState
     return AppBarView(
         titleWidget: _buildTitleWidget(),
         withLeading: true,
+        rightWidgets: [
+          IconButton(
+              onPressed: () {
+                swiperController.next();
+              },
+              icon: const Icon(Icons.more_horiz_outlined))
+        ],
         child: _buildFullScreenWidget(context));
   }
 
