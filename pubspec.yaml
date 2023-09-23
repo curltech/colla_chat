@@ -32,8 +32,9 @@ dependencies:
     sdk: flutter
 
   # 系统功能，获取系统信息和操作，需要调用插件才能完成
-  flutter_background: ^1.2.0
-  flutter_background_service: ^3.0.1
+  flutter_background: ^1.2.0  #android,后台运行，可以保持网络连接
+  background_fetch: ^1.2.1
+  flutter_background_service: ^5.0.1
   flutter_background_executor: ^1.0.0
   path_provider: ^2.0.11
   url_launcher: ^6.1.11 #打开系统浏览器

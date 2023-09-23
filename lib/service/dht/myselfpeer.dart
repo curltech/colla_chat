@@ -16,6 +16,7 @@ import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/backgroud_service.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/notification/firebase_messaging_controller.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
@@ -346,6 +347,15 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       var peerClient = PeerClient.fromJson(json);
       peerClient.activeStatus = ActiveStatus.Up.name;
       peerClient.clientId = myselfPeer.clientId;
+      //设置firebase token
+      String? fcmToken = await firebaseMessagingController.getToken();
+      logger.w('fcmToken:$fcmToken');
+      peerClient.deviceToken = fcmToken;
+      peerClient.deviceDesc = platformParams.operatingSystem;
+      if (platformParams.ios || platformParams.macos) {
+        String? apnsToken = await firebaseMessagingController.getAPNSToken();
+        logger.w('apnsToken:$apnsToken');
+      }
       bool success = await connectAction.connect(peerClient);
       if (success) {
         logger.i('login connect successfully,activeStatus up');
