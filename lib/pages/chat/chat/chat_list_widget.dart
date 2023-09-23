@@ -13,6 +13,7 @@ import 'package:colla_chat/pages/chat/chat/chat_message_view.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/group/linkman_group_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_info_widget.dart';
+import 'package:colla_chat/plugin/notification/local_notifications_controller.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -23,7 +24,6 @@ import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/connectivity_util.dart';
 import 'package:colla_chat/tool/date_util.dart';
-import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
@@ -177,6 +177,8 @@ class _ChatListWidgetState extends State<ChatListWidget>
     } else {
       _socketStatus.value = SocketStatus.closed;
     }
+    localNotificationsController.isAndroidPermissionGranted();
+    localNotificationsController.requestPermissions();
   }
 
   ///网络连通的情况下，如果没有缺省的websocket，尝试重连websocket
@@ -239,9 +241,9 @@ class _ChatListWidgetState extends State<ChatListWidget>
         // }
       } else {
         // if (mounted) {
-          // DialogUtil.error(context,
-          //     content:
-          //         '$address ${AppLocalizations.t('Websocket status was changed to:')}${_socketStatus.value.name}');
+        // DialogUtil.error(context,
+        //     content:
+        //         '$address ${AppLocalizations.t('Websocket status was changed to:')}${_socketStatus.value.name}');
         // }
       }
     }

@@ -1,101 +1,23 @@
 import 'dart:async';
 import 'dart:ui';
-
-import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/p2p/chain/action/ping.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter_background/flutter_background.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 
-///flutter_background背景服务实现，android
-///可以用于实现在后台接收消息
-class AndroidBackgroundService {
-  final config = FlutterBackgroundAndroidConfig(
-    notificationTitle: 'CollaChat',
-    notificationText: AppLocalizations.t(
-        'Keeping the CollaChat app running in the background'),
-    notificationIcon: const AndroidResource(name: 'background_icon'),
-    notificationImportance: AndroidNotificationImportance.Default,
-    enableWifiLock: true,
-    showBadge: true,
-  );
-  Timer? _heartTimer;
-
-  ///请求权限
-  Future<bool> requestPermission() async {
-    var hasPermissions = await FlutterBackground.hasPermissions;
-    // if (!hasPermissions) {
-    //   hasPermissions = await showDialog(
-    //       context: context,
-    //       builder: (context) {
-    //         return AlertDialog(
-    //             title: Text(AppLocalizations.t('Permissions needed')),
-    //             content: Text(AppLocalizations.t(
-    //                 'Shortly the OS will ask you for permission to execute this app in the background. This is required in order to receive chat messages when the app is not in the foreground.')),
-    //             actions: [
-    //               TextButton(
-    //                 onPressed: () => Navigator.pop(context, true),
-    //                 child: Text(AppLocalizations.t('Ok')),
-    //               ),
-    //             ]);
-    //       });
-    // }
-    return hasPermissions;
-  }
-
-  ///初始化并启动后台服务
-  Future<bool> enableBackgroundExecution({bool heartTimer = false}) async {
-    bool hasPermissions = await requestPermission();
-    if (hasPermissions) {}
-    hasPermissions = await FlutterBackground.initialize(androidConfig: config);
-
-    if (hasPermissions) {
-      final backgroundExecution =
-          await FlutterBackground.enableBackgroundExecution();
-      if (backgroundExecution && heartTimer) {
-        _heartTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
-          pingAction.ping({'content': 'hello'});
-          logger.i('pingAction ping hello');
-        });
-      }
-
-      return backgroundExecution;
-    }
-    return false;
-  }
-
-  ///关闭后台服务
-  Future<void> disableBackgroundExecution() async {
-    bool enabled = FlutterBackground.isBackgroundExecutionEnabled;
-    if (enabled) {
-      await FlutterBackground.disableBackgroundExecution();
-      if (_heartTimer != null) {
-        _heartTimer!.cancel();
-        _heartTimer = null;
-      }
-    }
-  }
-}
-
-final AndroidBackgroundService androidBackgroundService =
-    AndroidBackgroundService();
-
-///后台服务
-///UI和Service之间的通讯用invoke()发送数据和on(String method)接收数据.
-class BackgroundService {
+///支持android和ios，在单独线程中执行一些任务
+class MobileBackgroundService {
   final FlutterBackgroundService service = FlutterBackgroundService();
 
   ///初始化后台服务，并启动
   Future<bool> start() async {
     await service.configure(
       androidConfiguration: AndroidConfiguration(
-        // this will be executed when app is in foreground or background in separated isolate
+        // 无论应用在前台还是后台，都在独立的线程中执行
         onStart: onStart,
-        // auto start service
         autoStart: true,
+        //服务是前台还是后台，前台优先级高
         isForegroundMode: true,
         notificationChannelId: 'CollaChat foreground',
         initialNotificationTitle: 'CollaChat foreground service',
@@ -103,11 +25,11 @@ class BackgroundService {
         foregroundServiceNotificationId: 8888,
       ),
       iosConfiguration: IosConfiguration(
-        // auto start service
         autoStart: true,
-        // this will be executed when app is in foreground in separated isolate
+        // 无论应用在前台，在独立的线程中执行
         onForeground: onStart,
-        // you have to enable background fetch capability on xcode project
+        // 应用在后台，在独立的线程中执行，background fetch capability
+        // ios每隔15分钟调用一次
         onBackground: onIosBackground,
       ),
     );
@@ -138,7 +60,7 @@ class BackgroundService {
   }
 }
 
-final BackgroundService backgroundService = BackgroundService();
+final MobileBackgroundService backgroundService = MobileBackgroundService();
 
 // to ensure this is executed
 // run app from xcode, then from xcode menu, select Simulate Background Fetch
@@ -152,7 +74,6 @@ Future<bool> onIosBackground(ServiceInstance service) async {
   return true;
 }
 
-///应用到前景
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
   logger.i('onStart:${DateTime.now().toIso8601String()}');

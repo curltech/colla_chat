@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/plugin/notification/firebase_messaging_controller.dart';
+import 'package:colla_chat/plugin/notification/local_notifications_controller.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -56,6 +58,7 @@ void main(List<String> args) async {
     return msg;
   });
 
+  await localNotificationsController.init();
   await firebaseMessagingController.init();
 
   ///加载主应用组件
@@ -90,7 +93,7 @@ Future<void> _initDesktopWindows() async {
   if (platformParams.windows || platformParams.macos || platformParams.linux) {
     await windowManager.ensureInitialized();
     WindowOptions windowOptions = const WindowOptions(
-      title: 'CollaChat',
+      title: appName,
       center: true,
       titleBarStyle: TitleBarStyle.normal,
       windowButtonVisibility: true,

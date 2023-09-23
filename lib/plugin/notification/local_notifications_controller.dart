@@ -4,6 +4,7 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+///应用处于后台时，点击通知的响应函数
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse notificationResponse) {
   logger.i('notification(${notificationResponse.id}) action tapped: '
@@ -30,14 +31,9 @@ class ReceivedNotification {
   final String? payload;
 }
 
+///本地通知消息
 class LocalNotificationsController {
-  final StreamController<ReceivedNotification>
-      didReceiveLocalNotificationStream =
-      StreamController<ReceivedNotification>.broadcast();
-
-  final StreamController<String?> selectNotificationStream =
-      StreamController<String?>.broadcast();
-
+  int id = 0;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
@@ -60,9 +56,11 @@ class LocalNotificationsController {
       requestAlertPermission: false,
       requestBadgePermission: false,
       requestSoundPermission: false,
+
+      ///只用于ios10之前的版本，应用处于前台收到本地通知
       onDidReceiveLocalNotification:
           (int id, String? title, String? body, String? payload) async {
-        didReceiveLocalNotificationStream.add(
+        onDidReceiveLocalNotification(
           ReceivedNotification(
             id: id,
             title: title,
@@ -93,17 +91,18 @@ class LocalNotificationsController {
     //初始化，定义通知的响应函数，包括通知选择本身和通知的按钮
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
+      //用户选择或者点击了通知
       onDidReceiveNotificationResponse:
           (NotificationResponse notificationResponse) {
         switch (notificationResponse.notificationResponseType) {
           case NotificationResponseType.selectedNotification:
-            selectNotificationStream.add(notificationResponse.payload);
+            onSelectNotification(notificationResponse);
             break;
           case NotificationResponseType.selectedNotificationAction:
             break;
         }
       },
-      //后台的响应函数
+      //应用处于后台时，点击通知的响应函数
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
   }
@@ -135,8 +134,7 @@ class LocalNotificationsController {
             badge: true,
             sound: true,
           );
-    }
-    if (platformParams.macos) {
+    } else if (platformParams.macos) {
       granted = await flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
               MacOSFlutterLocalNotificationsPlugin>()
@@ -145,8 +143,7 @@ class LocalNotificationsController {
             badge: true,
             sound: true,
           );
-    }
-    if (platformParams.android) {
+    } else if (platformParams.android) {
       final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
           flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>();
@@ -156,21 +153,24 @@ class LocalNotificationsController {
     return granted;
   }
 
-  void configureDidReceiveLocalNotificationSubject() {
-    didReceiveLocalNotificationStream.stream
-        .listen((ReceivedNotification receivedNotification) async {});
+  ///只用于ios10之前的版本，应用处于前台收到本地通知
+  void onDidReceiveLocalNotification(
+      ReceivedNotification receivedNotification) {
+    String? title = receivedNotification.title;
+    String? payload = receivedNotification.payload;
   }
 
-  void configureSelectNotificationSubject() {
-    selectNotificationStream.stream.listen((String? payload) async {});
+  ///用户选择或者点击了通知
+  void onSelectNotification(NotificationResponse notificationResponse) {
+    String? payload = notificationResponse.payload;
   }
 
   ///显示通知
   Future<void> showNotification(
-    int id,
-    String? title,
-    String? body,
-    NotificationDetails? notificationDetails, {
+    String title,
+    String body, {
+    int? id,
+    NotificationDetails? notificationDetails,
     String? payload,
   }) async {
     const AndroidNotificationDetails androidNotificationDetails =
@@ -179,9 +179,12 @@ class LocalNotificationsController {
             importance: Importance.max,
             priority: Priority.high,
             ticker: 'ticker');
-    const NotificationDetails notificationDetails =
-        NotificationDetails(android: androidNotificationDetails);
-
+    notificationDetails ??=
+        const NotificationDetails(android: androidNotificationDetails);
+    if (id == null) {
+      this.id++;
+      id = this.id;
+    }
     await flutterLocalNotificationsPlugin
         .show(id, title, body, notificationDetails, payload: payload);
   }

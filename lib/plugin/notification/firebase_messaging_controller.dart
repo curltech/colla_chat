@@ -21,9 +21,9 @@ class FirebaseMessagingController with ChangeNotifier {
 
   String? _fcmToken;
 
-  FirebaseMessagingController();
+  String? _apnsToken;
 
-  String? get fcmToken => _fcmToken;
+  FirebaseMessagingController();
 
   Future<AuthorizationStatus> requestPermission() async {
     settings ??= await FirebaseMessaging.instance.requestPermission(
@@ -72,16 +72,27 @@ class FirebaseMessagingController with ChangeNotifier {
   }
 
   Future<String?> getToken() async {
-    _fcmToken = await FirebaseMessaging.instance.getToken();
-
+    if (_fcmToken == null) {
+      try {
+        _fcmToken = await FirebaseMessaging.instance.getToken();
+      } catch (e) {
+        logger.e('getToken failure:$e');
+      }
+    }
     return _fcmToken;
   }
 
   Future<String?> getAPNSToken() async {
     if (platformParams.ios || platformParams.macos) {
-      String? token = await FirebaseMessaging.instance.getAPNSToken();
+      if (_apnsToken == null) {
+        try {
+          _apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+        } catch (e) {
+          logger.e('getAPNSToken failure:$e');
+        }
+      }
 
-      return token;
+      return _apnsToken;
     }
   }
 

@@ -26,6 +26,7 @@ import 'package:colla_chat/pages/chat/chat/message/url_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/video_chat_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/video_message.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
+import 'package:colla_chat/plugin/notification/local_notifications_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
@@ -73,6 +74,10 @@ final List<ActionData> messagePopActionData = [
       icon: const Icon(Icons.collections)),
   ActionData(
       label: 'Share', tooltip: 'Share', icon: const Icon(Icons.share_outlined)),
+  ActionData(
+      label: 'Notify',
+      tooltip: 'Notify',
+      icon: const Icon(Icons.notifications)),
 ];
 
 ///每种消息的显示组件
@@ -255,6 +260,10 @@ class MessageWidget {
       case 'Share':
         await _share(context);
         break;
+      case 'Notify':
+        await _notify();
+        break;
+
       default:
     }
   }
@@ -289,6 +298,17 @@ class MessageWidget {
         }
       }
     }
+  }
+
+  _notify() async {
+    String? title = chatMessage.title;
+    String? content = chatMessage.content;
+    if (content != null) {
+      content = chatMessageService.recoverContent(content);
+    }
+    String? senderName = chatMessage.senderName;
+    await localNotificationsController
+        .showNotification(senderName ?? '', title ?? '', payload: content);
   }
 
   ExtendedTextMessage buildExtendedTextMessageWidget(BuildContext context) {

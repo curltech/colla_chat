@@ -14,7 +14,7 @@ import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/p2p/chain/action/connect.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/backgroud_service.dart';
+import 'package:colla_chat/plugin/background/android_backgroud_service.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/plugin/notification/firebase_messaging_controller.dart';
 import 'package:colla_chat/plugin/security_storage.dart';

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/emailaddress.dart' as entity;
 import 'package:colla_chat/entity/chat/message_attachment.dart';
@@ -244,9 +245,9 @@ class EmailMessageUtil {
 
   ///识别本APP的客户端Id
   static const clientId = Id(
-      name: 'CollaChat',
-      version: '1.2.0',
-      vendor: 'curltech.io',
+      name: appName,
+      version: appVersion,
+      vendor: vendorUrl,
       nonStandardFields: {'support-email': 'hujs@curltech.io'});
 
   ///用邮件地址配置创建邮件客户端
