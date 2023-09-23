@@ -26,8 +26,7 @@ import 'package:colla_chat/pages/chat/chat/message/url_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/video_chat_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/video_message.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
-import 'package:colla_chat/plugin/notification/firebase_messaging_controller.dart';
-import 'package:colla_chat/plugin/notification/local_notifications_controller.dart';
+import 'package:colla_chat/plugin/notification/firebase_messaging_service.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
@@ -310,8 +309,8 @@ class MessageWidget {
     String? senderName = chatMessage.senderName;
     // await localNotificationsController
     //     .showNotification(senderName ?? '', title ?? '', payload: content);
-    String? fcmToken = await firebaseMessagingController.getToken();
-    firebaseMessagingController.sendPushMessage(
+    String? fcmToken = await firebaseMessagingService.getToken();
+    firebaseMessagingService.sendPushMessage(
         fcmToken!, senderName ?? '', 'chat', content);
   }
 

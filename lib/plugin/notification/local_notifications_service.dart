@@ -32,7 +32,7 @@ class ReceivedNotification {
 }
 
 ///本地通知消息
-class LocalNotificationsController {
+class LocalNotificationsService {
   int id = 0;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
@@ -190,5 +190,5 @@ class LocalNotificationsController {
   }
 }
 
-final LocalNotificationsController localNotificationsController =
-    LocalNotificationsController();
+final LocalNotificationsService localNotificationsService =
+    LocalNotificationsService();

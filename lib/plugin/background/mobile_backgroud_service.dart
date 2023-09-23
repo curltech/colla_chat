@@ -60,7 +60,7 @@ class MobileBackgroundService {
   }
 }
 
-final MobileBackgroundService backgroundService = MobileBackgroundService();
+final MobileBackgroundService mobileBackgroundService = MobileBackgroundService();
 
 // to ensure this is executed
 // run app from xcode, then from xcode menu, select Simulate Background Fetch

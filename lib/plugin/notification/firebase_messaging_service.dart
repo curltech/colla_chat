@@ -16,14 +16,14 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 ///firebase remote messaging推送通知控制器
-class FirebaseMessagingController with ChangeNotifier {
+class FirebaseMessagingService {
   NotificationSettings? settings;
 
   String? _fcmToken;
 
   String? _apnsToken;
 
-  FirebaseMessagingController();
+  FirebaseMessagingService();
 
   Future<AuthorizationStatus> requestPermission() async {
     settings ??= await FirebaseMessaging.instance.requestPermission(
@@ -143,5 +143,5 @@ class FirebaseMessagingController with ChangeNotifier {
   }
 }
 
-final FirebaseMessagingController firebaseMessagingController =
-    FirebaseMessagingController();
+final FirebaseMessagingService firebaseMessagingService =
+    FirebaseMessagingService();
