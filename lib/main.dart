@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/background/mobile_foregroud_task.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/plugin/notification/firebase_messaging_service.dart';
 import 'package:colla_chat/plugin/notification/local_notifications_service.dart';
@@ -17,6 +18,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_foreground_task/ui/will_start_foreground_task.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart' as inapp;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -134,6 +136,11 @@ class _CollaChatAppState extends State<CollaChatApp>
   }
 
   Widget _buildMaterialApp(BuildContext context, Widget? child) {
+    Widget willStartForegroundTask = widget.loginStatus ? indexView : p2pLogin;
+    if (platformParams.mobile) {
+      willStartForegroundTask = mobileForegroundTask.willStartForegroundTask(
+          child: willStartForegroundTask);
+    }
     return MaterialApp(
       onGenerateTitle: (context) {
         return AppLocalizations.t('Welcome to CollaChat');
@@ -145,7 +152,7 @@ class _CollaChatAppState extends State<CollaChatApp>
       themeMode: myself.themeMode,
 
       ///Scaffold 是 Material 库中提供的一个 widget，它提供了默认的导航栏、标题和包含主屏幕 widget 树的 body 属性
-      home: widget.loginStatus ? indexView : p2pLogin,
+      home: willStartForegroundTask,
       onGenerateRoute: Application.router.generator,
       // 初始化FlutterSmartDialog
       navigatorObservers: [FlutterSmartDialog.observer],
