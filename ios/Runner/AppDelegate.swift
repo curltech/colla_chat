@@ -12,6 +12,7 @@ import Flutter
         FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { (registry) in
             GeneratedPluginRegistrant.register(with: registry)
         }
+        SwiftFlutterForegroundTaskPlugin.setPluginRegistrantCallback(registerPlugins)
       if #available(iOS 10.0, *) {
         UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
       }
@@ -29,5 +30,9 @@ import Flutter
 
      // Proceed url handling for other Flutter libraries like uni_links
      return super.application(app, open: url, options:options)
+   }
+
+   func registerPlugins(registry: FlutterPluginRegistry) {
+     GeneratedPluginRegistrant.register(with: registry)
    }
 }

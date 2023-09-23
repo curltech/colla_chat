@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 
@@ -37,22 +38,27 @@ class MobileBackgroundService {
     return await service.startService();
   }
 
+  ///设置服务线程为前台模式，使用service.invoke将方法字符串setAsForeground数据发送给服务线程
   setAsForeground() {
     service.invoke("setAsForeground");
   }
 
+  ///设置服务线程为后台模式
   setAsBackground() {
     service.invoke("setAsBackground");
   }
 
+  ///判断服务线程是否正在运行
   Future<bool> isRunning() async {
     return await service.isRunning();
   }
 
+  ///注册服务线程的方法调用事件，使用service.on服务线程接收方法字符串
   Stream<Map<String, dynamic>?> on(String method) {
     return service.on(method);
   }
 
+  ///停止服务线程
   stop() async {
     if (await isRunning()) {
       service.invoke("stopService");
@@ -60,13 +66,13 @@ class MobileBackgroundService {
   }
 }
 
-final MobileBackgroundService mobileBackgroundService = MobileBackgroundService();
+final MobileBackgroundService mobileBackgroundService =
+    MobileBackgroundService();
 
-// to ensure this is executed
-// run app from xcode, then from xcode menu, select Simulate Background Fetch
+///ios应用在后台
 @pragma('vm:entry-point')
 Future<bool> onIosBackground(ServiceInstance service) async {
-  // WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
 
   logger.i('ios background:${DateTime.now().toIso8601String()}');
@@ -74,13 +80,13 @@ Future<bool> onIosBackground(ServiceInstance service) async {
   return true;
 }
 
+///服务线程启动，在单独的服务线程中执行的代码
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
   logger.i('onStart:${DateTime.now().toIso8601String()}');
-
-  // Only available for flutter 3.0.0 and later
   DartPluginRegistrant.ensureInitialized();
 
+  ///注册方法事件，服务接收到方法数据调用方法设置服务的前台或者后台模式
   if (service is AndroidServiceInstance) {
     service.on('setAsForeground').listen((event) {
       service.setAsForegroundService();
@@ -91,24 +97,26 @@ void onStart(ServiceInstance service) async {
     });
   }
 
+  service.on('update').listen((event) {
+    logger.i('received method update $event');
+  });
+
+  ///注册服务的停止方法事件
   service.on('stopService').listen((event) {
     service.stopSelf();
   });
 
-  // bring to foreground
+  /// 每隔1s判断是否是前台服务，如果是，设置前台的通知内容（左上角）
   Timer.periodic(const Duration(seconds: 1), (timer) async {
     if (service is AndroidServiceInstance) {
       if (await service.isForegroundService()) {
-        // if you don't using custom notification, uncomment this
+        ///这里可以显示本地通知
         service.setForegroundNotificationInfo(
           title: "CollaChat Service",
           content: "Updated at ${DateTime.now()}",
         );
       }
     }
-
-    /// you can see this log in logcat
-    logger.i('CollaChat BackGround Service: ${DateTime.now()}');
 
     // test using external plugin
     final deviceInfo = DeviceInfoPlugin();
