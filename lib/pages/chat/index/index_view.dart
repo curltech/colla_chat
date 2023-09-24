@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:colla_chat/constant/base.dart';
@@ -15,6 +16,7 @@ import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart'
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/login/loading.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/background/mobile_foregroud_task.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -80,6 +82,15 @@ class _IndexViewState extends State<IndexView>
     globalWebrtcEventController.onWebrtcErrorSignal = _onWebrtcErrorSignal;
 
     _initSystemTray();
+    _initMobileForegroundTask();
+  }
+
+  _initMobileForegroundTask() {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await mobileForegroundTask.requestPermissionForAndroid();
+      mobileForegroundTask.init();
+      await mobileForegroundTask.start();
+    });
   }
 
   Future<bool?> _onWebrtcSignal(WebrtcEvent webrtcEvent) async {
@@ -593,9 +604,11 @@ class _IndexViewState extends State<IndexView>
   Widget build(BuildContext context) {
     appDataProvider.changeSize(context);
     var provider = Consumer3<AppDataProvider, IndexWidgetProvider, Myself>(
-      builder: (context, appDataProvider, indexWidgetProvider, myself, child) =>
-          _createScaffold(context, indexWidgetProvider),
-    );
+        builder:
+            (context, appDataProvider, indexWidgetProvider, myself, child) {
+      return mobileForegroundTask.withForegroundTask(
+          child: _createScaffold(context, indexWidgetProvider));
+    });
     return provider;
   }
 
@@ -608,6 +621,7 @@ class _IndexViewState extends State<IndexView>
     globalWebrtcEventController.onWebrtcSignal = null;
     globalWebrtcEventController.onWebrtcErrorSignal = null;
     _stop();
+    mobileForegroundTask.stop();
     super.dispose();
   }
 }

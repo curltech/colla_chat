@@ -85,12 +85,9 @@ class MobileForegroundTask {
 
   /// 手工启动任务
   Future<bool> start() async {
-    /// 存储数据到前台任务线程
-    await FlutterForegroundTask.saveData(key: 'customData', value: 'hello');
-
     /// 启动前台任务前注册接收端口
     final ReceivePort? receivePort = FlutterForegroundTask.receivePort;
-    final bool isRegistered = registerReceivePort(receivePort);
+    final bool isRegistered = _registerReceivePort(receivePort);
     if (!isRegistered) {
       logger.e('Failed to register receivePort!');
       return false;
@@ -108,7 +105,7 @@ class MobileForegroundTask {
   }
 
   /// 注册接收端口
-  bool registerReceivePort(ReceivePort? newReceivePort) {
+  bool _registerReceivePort(ReceivePort? newReceivePort) {
     newReceivePort ??= FlutterForegroundTask.receivePort;
     if (newReceivePort == receivePort) {
       return false;
@@ -137,7 +134,13 @@ class MobileForegroundTask {
 
   /// 停止任务
   Future<bool> stop() {
+    receivePort?.close();
+    receivePort = null;
     return FlutterForegroundTask.stopService();
+  }
+
+  Future<bool> get isRunningService async {
+    return await FlutterForegroundTask.isRunningService;
   }
 
   ///创建WillStartForegroundTask组件，MaterialApp的home，用于包裹Scaffold

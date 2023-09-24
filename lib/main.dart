@@ -136,24 +136,17 @@ class _CollaChatAppState extends State<CollaChatApp>
   }
 
   Widget _buildMaterialApp(BuildContext context, Widget? child) {
-    Widget willStartForegroundTask = widget.loginStatus ? indexView : p2pLogin;
-    if (platformParams.mobile) {
-      willStartForegroundTask = mobileForegroundTask.willStartForegroundTask(
-          child: willStartForegroundTask);
-      logger.w('willStartForegroundTask');
-    }
     return MaterialApp(
       onGenerateTitle: (context) {
         return AppLocalizations.t('Welcome to CollaChat');
       },
-      //title: 'Welcome to CollaChat',
       debugShowCheckedModeBanner: false,
       theme: myself.themeData,
       darkTheme: myself.darkThemeData,
       themeMode: myself.themeMode,
 
       ///Scaffold 是 Material 库中提供的一个 widget，它提供了默认的导航栏、标题和包含主屏幕 widget 树的 body 属性
-      home: willStartForegroundTask,
+      home: widget.loginStatus ? indexView : p2pLogin,
       onGenerateRoute: Application.router.generator,
       // 初始化FlutterSmartDialog
       navigatorObservers: [FlutterSmartDialog.observer],
