@@ -132,6 +132,8 @@ class PeerConnectionPool {
 
   Map<String, List<Future<dynamic> Function(WebrtcEvent event)>> fnsm = {};
   final Lock _fnsmLock = Lock();
+  StreamController<WebrtcEvent> webrtcEventStreamController =
+      StreamController<WebrtcEvent>.broadcast();
 
   PeerConnectionPool() {
     signalAction.registerReceiver(onSignal);

@@ -179,7 +179,7 @@ class MobileForegroundTask {
 
   ///前台服务任务发来数据事件
   void onData(dynamic data) async {
-    logger.i('received foreground service data:$data');
+    logger.w('received foreground service data:$data');
   }
 
   ///创建WillForegroundTask组件，用于包裹Scaffold，使用前需要先调用初始化init方法

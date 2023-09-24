@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
@@ -81,6 +83,9 @@ class _ChatMessageViewState extends State<ChatMessageView>
       ValueNotifier<ChatSummary?>(chatMessageController.chatSummary);
   final ValueNotifier<double> chatMessageHeight = ValueNotifier<double>(0);
   final ValueNotifier<bool?> _initiator = ValueNotifier<bool?>(null);
+  StreamSubscription<WebrtcEvent> webrtcEventStreamSubscription =
+      peerConnectionPool.webrtcEventStreamController.stream
+          .listen((WebrtcEvent event) {});
   double visibleFraction = 0.0;
   NoScreenshot? noScreenshot;
   ScreenshotCallback? screenshotCallback;

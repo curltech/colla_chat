@@ -140,6 +140,7 @@ class _CollaChatAppState extends State<CollaChatApp>
     if (platformParams.mobile) {
       willStartForegroundTask = mobileForegroundTask.willStartForegroundTask(
           child: willStartForegroundTask);
+      logger.w('willStartForegroundTask');
     }
     return MaterialApp(
       onGenerateTitle: (context) {
