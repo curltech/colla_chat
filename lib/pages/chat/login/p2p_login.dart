@@ -76,7 +76,7 @@ class _P2pLoginState extends State<P2pLogin> {
       title: CommonAutoSizeText(AppLocalizations.t('Login')),
       rightWidgets: [
         IconTextButton(
-          padding: const EdgeInsets.symmetric(vertical: 3.0),
+          padding: const EdgeInsets.symmetric(vertical: 1.0),
           onPressed: () {
             _animateToPage(0);
           },
@@ -88,7 +88,7 @@ class _P2pLoginState extends State<P2pLogin> {
           width: 10.0,
         ),
         IconTextButton(
-          padding: const EdgeInsets.symmetric(vertical: 3.0),
+          padding: const EdgeInsets.symmetric(vertical: 1.0),
           onPressed: () {
             _animateToPage(1);
           },
@@ -100,7 +100,7 @@ class _P2pLoginState extends State<P2pLogin> {
           width: 10.0,
         ),
         IconTextButton(
-          padding: const EdgeInsets.symmetric(vertical: 3.0),
+          padding: const EdgeInsets.symmetric(vertical: 1.0),
           onPressed: () {
             _animateToPage(2);
           },

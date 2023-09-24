@@ -157,7 +157,7 @@ class IconTextButton extends StatelessWidget {
     ];
     if (label != null) {
       children.add(
-        const SizedBox(height: 3.0),
+        const SizedBox(height: 2.0),
       );
       children.add(
         Text(
@@ -213,7 +213,7 @@ class InkWellTextButton extends StatelessWidget {
     ];
     if (label != null) {
       children.add(
-        const SizedBox(height: 3.0),
+        const SizedBox(height: 2.0),
       );
       children.add(
         Text(
