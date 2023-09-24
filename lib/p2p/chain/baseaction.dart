@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:core';
 
 import 'package:colla_chat/crypto/util.dart';
@@ -70,6 +71,12 @@ abstract class BaseAction {
   List<Future<void> Function(ChainMessage)> receivers = [];
 
   List<Future<void> Function(ChainMessage)> responsors = [];
+
+  StreamController<ChainMessage> receiverStreamController =
+      StreamController<ChainMessage>.broadcast();
+
+  StreamController<ChainMessage> responsorStreamController =
+      StreamController<ChainMessage>.broadcast();
 
   BaseAction(this.msgType) {
     chainMessageDispatch.registerChainMessageHandler(
@@ -159,6 +166,7 @@ abstract class BaseAction {
     var chainMessage_ = chainMessageHandler.merge(chainMessage);
     if (chainMessage_ != null && receivers.isNotEmpty) {
       await transferPayload(chainMessage_);
+      receiverStreamController.add(chainMessage);
       for (var receiver in receivers) {
         await receiver(chainMessage_);
       }
@@ -172,6 +180,7 @@ abstract class BaseAction {
   Future<void> response(ChainMessage chainMessage) async {
     if (responsors.isNotEmpty) {
       await transferPayload(chainMessage);
+      responsorStreamController.add(chainMessage);
       for (var responsor in responsors) {
         responsor(chainMessage);
       }

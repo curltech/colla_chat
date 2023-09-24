@@ -130,16 +130,15 @@ class PeerConnectionPool {
 
   final Lock _connLock = Lock();
 
-  //所以注册的事件处理器
-  Map<WebrtcEventType, Function(WebrtcEvent)> events = {};
-
-  Map<String, dynamic> protocolHandlers = {};
-
   Map<String, List<Future<dynamic> Function(WebrtcEvent event)>> fnsm = {};
   final Lock _fnsmLock = Lock();
 
   PeerConnectionPool() {
     signalAction.registerReceiver(onSignal);
+    // signalAction.receiverStreamController.stream
+    //     .listen((ChainMessage chainMessage) {
+    //   onSignal(chainMessage);
+    // });
     var peerId = myself.peerId;
     if (peerId == null) {
       throw 'myself peerId is null';
@@ -158,44 +157,6 @@ class PeerConnectionPool {
     Timer.periodic(clearDuration, (Timer timer) {
       clear();
     });
-  }
-
-  ///webrtc onMessage接收到链协议消息的处理，收到的数据被转换成ChainMessage消息
-  ///ChainMessageHandler类调用本方法注册
-  registerProtocolHandler(String protocol, dynamic receiveHandler) {
-    protocolHandlers[protocol] = {'receiveHandler': receiveHandler};
-  }
-
-  dynamic getProtocolHandler(String protocol) {
-    return protocolHandlers[protocol];
-  }
-
-  ///注册事件，当事件发生时，调用外部注册的方法
-  ///缺省情况下，所有的basePeerConnection的事件都已经注册成peerconnectionpool的相同方法处理
-  bool on(WebrtcEventType type, Function(WebrtcEvent)? func) {
-    if (func != null) {
-      events[type] = func;
-      return true;
-    } else {
-      var fn = events.remove(type);
-      if (fn != null) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-  }
-
-  ///调用外部注册事件方法
-  Future<dynamic> emit(WebrtcEventType type, WebrtcEvent evt) async {
-    if (events.containsKey(type)) {
-      var func = events[type];
-      if (func != null) {
-        return await func(evt);
-      } else {
-        logger.e('event:$type is not func');
-      }
-    }
   }
 
   String _getKey(String peerId, WebrtcEventType eventType) {
