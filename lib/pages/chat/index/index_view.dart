@@ -86,11 +86,14 @@ class _IndexViewState extends State<IndexView>
   }
 
   _initMobileForegroundTask() {
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await mobileForegroundTask.requestPermissionForAndroid();
-      mobileForegroundTask.init();
-      await mobileForegroundTask.start();
-    });
+    if (platformParams.mobile) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await mobileForegroundTask.requestPermissionForAndroid();
+        mobileForegroundTask.init();
+        bool status = await mobileForegroundTask.start();
+        logger.w('mobileForegroundTask start status:$status');
+      });
+    }
   }
 
   Future<bool?> _onWebrtcSignal(WebrtcEvent webrtcEvent) async {

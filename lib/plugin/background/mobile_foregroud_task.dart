@@ -94,8 +94,10 @@ class MobileForegroundTask {
     }
 
     if (await FlutterForegroundTask.isRunningService) {
+      logger.w('FlutterForegroundTask restartService');
       return FlutterForegroundTask.restartService();
     } else {
+      logger.w('FlutterForegroundTask startService');
       return FlutterForegroundTask.startService(
         notificationTitle: notificationTitle,
         notificationText: notificationText,
