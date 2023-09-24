@@ -1,6 +1,7 @@
 import UIKit
 import flutter_sharing_intent
 import Flutter
+import flutter_local_notifications
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
@@ -8,11 +9,13 @@ import Flutter
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-        // This is required to make any communication available in the action isolate.
-        FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { (registry) in
-            GeneratedPluginRegistrant.register(with: registry)
-        }
-        SwiftFlutterForegroundTaskPlugin.setPluginRegistrantCallback(registerPlugins)
+      // This is required to make any communication available in the action isolate.
+      FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { (registry) in
+        GeneratedPluginRegistrant.register(with: registry)
+      }
+      SwiftFlutterForegroundTaskPlugin.setPluginRegistrantCallback { (registry) in
+        GeneratedPluginRegistrant.register(with: registry)
+      }
       if #available(iOS 10.0, *) {
         UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
       }
@@ -30,9 +33,5 @@ import Flutter
 
      // Proceed url handling for other Flutter libraries like uni_links
      return super.application(app, open: url, options:options)
-   }
-
-   func registerPlugins(registry: FlutterPluginRegistry) {
-     GeneratedPluginRegistrant.register(with: registry)
    }
 }
