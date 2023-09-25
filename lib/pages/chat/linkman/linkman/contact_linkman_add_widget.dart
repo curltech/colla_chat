@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
@@ -50,14 +52,18 @@ class ContactLinkmanAddWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _ContactLinkmanAddWidgetState extends State<ContactLinkmanAddWidget> {
-  var controller = TextEditingController();
+  TextEditingController controller = TextEditingController();
   var contactMap = {};
+  StreamSubscription<ChainMessage>? chainMessageListen;
 
   @override
   initState() {
     super.initState();
     widget.controller.addListener(_update);
-    findClientAction.registerResponsor(_responsePeerClients);
+    chainMessageListen = findClientAction.responseStreamController.stream
+        .listen((ChainMessage chainMessage) {
+      _responsePeerClients(chainMessage);
+    });
   }
 
   _update() {
@@ -173,8 +179,9 @@ class _ContactLinkmanAddWidgetState extends State<ContactLinkmanAddWidget> {
   @override
   void dispose() {
     widget.controller.removeListener(_update);
+    chainMessageListen?.cancel();
+    chainMessageListen = null;
     controller.dispose();
-    findClientAction.unregisterResponsor(_responsePeerClients);
     super.dispose();
   }
 }

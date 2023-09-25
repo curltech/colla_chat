@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
@@ -45,13 +47,17 @@ class NearbyGroupAddWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _NearbyGroupAddWidgetState extends State<NearbyGroupAddWidget> {
-  var controller = TextEditingController();
+  TextEditingController controller = TextEditingController();
+  StreamSubscription<ChainMessage>? chainMessageListen;
 
   @override
   initState() {
     super.initState();
     widget.controller.addListener(_update);
-    findClientAction.registerResponsor(_responsePeerClients);
+    chainMessageListen = findClientAction.responseStreamController.stream
+        .listen((ChainMessage chainMessage) {
+      _responsePeerClients(chainMessage);
+    });
   }
 
   _update() {
@@ -133,6 +139,8 @@ class _NearbyGroupAddWidgetState extends State<NearbyGroupAddWidget> {
   @override
   void dispose() {
     widget.controller.removeListener(_update);
+    chainMessageListen?.cancel();
+    chainMessageListen = null;
     controller.dispose();
     super.dispose();
   }

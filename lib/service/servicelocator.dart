@@ -38,7 +38,6 @@ import 'package:colla_chat/tool/json_util.dart';
 
 class ServiceLocator {
   static Map<String, GeneralBaseService> services = {};
-  static Map<MsgType, BaseAction> actions = {};
   static Map<int, SecurityContextService> securityContextServices = {};
 
   static GeneralBaseService? get(String serviceName) {
@@ -70,13 +69,6 @@ class ServiceLocator {
     services['chatSummaryService'] = chatSummaryService;
     services['mailAddressService'] = emailAddressService;
     services['conferenceService'] = conferenceService;
-
-    actions[MsgType.CONNECT] = connectAction;
-    actions[MsgType.SIGNAL] = signalAction;
-    actions[MsgType.CHAT] = chatAction;
-    actions[MsgType.P2PCHAT] = p2pChatAction;
-    actions[MsgType.PING] = pingAction;
-    actions[MsgType.IONSIGNAL] = ionSignalAction;
 
     securityContextServices[CryptoOption.none.index] =
         noneSecurityContextService;

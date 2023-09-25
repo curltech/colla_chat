@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/dht/peerendpoint.dart';
@@ -12,6 +14,7 @@ import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/service/p2p/message_serializer.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/httpclient.dart';
 import 'package:colla_chat/transport/websocket.dart';
 import 'package:dio/dio.dart';
@@ -20,13 +23,18 @@ import 'package:uuid/uuid.dart';
 const packetSize = 4 * 1024 * 1024;
 const webRtcPacketSize = 128 * 1024;
 
-/// 原始消息的分派处理
+/// websocket的原始消息的分派处理
 class ChainMessageHandler {
   Map<String, List<ChainMessage>> caches = <String, List<ChainMessage>>{};
 
+  /// websocket的原始消息流
+  StreamController<WebsocketData> websocketDataStreamController =
+      StreamController<WebsocketData>();
+
   ChainMessageHandler() {
-    // webrtcPeerPool.registProtocolHandler(config.appParams.chainProtocolId, this.receiveRaw);
-    // ionSfuClientPool.registProtocolHandler(config.appParams.chainProtocolId, this.receiveRaw);
+    websocketDataStreamController.stream.listen((WebsocketData websocketData) {
+      receiveRaw(websocketData);
+    });
   }
 
   ///发送前的预处理，设置消息的初始值
@@ -108,14 +116,16 @@ class ChainMessageHandler {
 
   /// 将接收的原始数据还原成ChainMessage，然后根据消息类型进行分支处理
   /// 并将处理的结果转换成原始数据，发回去
-  Future<void> receiveRaw(
-      List<int> data, String? remotePeerId, String? remoteAddr) async {
+  Future<void> receiveRaw(WebsocketData websocketData) async {
+    String? remotePeerId = websocketData.peerId;
+    String? remoteAddr = websocketData.address;
+    List<int> data = websocketData.data;
     var json = JsonUtil.toJson(String.fromCharCodes(data));
     ChainMessage chainMessage = ChainMessage.fromJson(json);
     // 源节点的peerid和地址
     chainMessage.srcPeerId ??= remotePeerId;
     chainMessage.srcConnectAddress ??= remoteAddr;
-    await chainMessageHandler.receive(chainMessage);
+    await receive(chainMessage);
   }
 
   /// 将返回的原始报文数据转换成chainmessge
@@ -126,7 +136,7 @@ class ChainMessageHandler {
       {String? remotePeerId, String? remoteAddr}) async {
     var json = JsonUtil.toJson(String.fromCharCodes(data));
     ChainMessage chainMessage = ChainMessage.fromJson(json);
-    await chainMessageHandler.receive(chainMessage);
+    await receive(chainMessage);
   }
 
   // 发送ChainMessage消息的唯一方法
@@ -145,7 +155,7 @@ class ChainMessageHandler {
     var connectAddress = chainMessage.connectAddress;
     //目标PeerClient的连接定位器地址
     var targetConnectAddress = chainMessage.targetConnectAddress;
-    await chainMessageHandler.encrypt(chainMessage);
+    await encrypt(chainMessage);
     //// 发送数据后返回的响应数据
     var success = false;
     dynamic result;
@@ -195,9 +205,9 @@ class ChainMessageHandler {
       ChainMessage? response;
       if (result is Map) {
         response = ChainMessage.fromJson(result);
-        await chainMessageHandler.receive(response);
+        await receive(response);
       } else if (result is List<int>) {
-        await chainMessageHandler.responseRaw(result);
+        await responseRaw(result);
       }
     }
 
@@ -206,39 +216,24 @@ class ChainMessageHandler {
 
   /// 接收报文处理的入口，包括接收请求报文和返回报文，并分配不同的处理方法
   Future<void> receive(ChainMessage chainMessage) async {
-    await chainMessageHandler.decrypt(chainMessage);
+    await decrypt(chainMessage);
     var typ = chainMessage.messageType;
     var direct = chainMessage.messageDirect;
-    Map<String, Future<void> Function(ChainMessage)> handlers =
-        chainMessageDispatch.getChainMessageHandler(typ);
-    Future<void> Function(ChainMessage)? receiveHandler =
-        handlers['receiveHandler'];
-    Future<void> Function(ChainMessage)? responseHandler =
-        handlers['responseHandler'];
+    MsgType? msgType = StringUtil.enumFromString(MsgType.values, typ);
+    if (msgType == null) {
+      logger.e('chainMessage has no msgType p2p action:$typ');
+      return;
+    }
+    BaseAction? action = p2pActions[msgType];
+    if (action == null) {
+      logger.e('chainMessage has no register msgType p2p action:$typ');
+      return;
+    }
     //分发到对应注册好的处理器，主要是Receive和Response方法
     if (direct == MsgDirect.Request.name) {
-      if (receiveHandler != null) {
-        await receiveHandler(chainMessage);
-        // try {
-        //   await receiveHandler(chainMessage);
-        // } catch (err) {
-        //   logger.e('receiveHandler chainMessage:$err');
-        //   if (chainMessage.srcPeerId != null) {
-        //     //chatAction.chat(err.toString(), chainMessage.srcPeerId!);
-        //   }
-        // }
-      }
+      await action.receive(chainMessage);
     } else if (direct == MsgDirect.Response.name) {
-      if (responseHandler != null) {
-        try {
-          await responseHandler(chainMessage);
-        } catch (err) {
-          logger.e('responseHandler chainMessage:$err');
-          if (chainMessage.srcPeerId != null) {
-            //chatAction.chat(err.toString(), chainMessage.srcPeerId!);
-          }
-        }
-      }
+      await action.response(chainMessage);
     }
   }
 
@@ -405,35 +400,4 @@ class ChainMessageHandler {
   }
 }
 
-var chainMessageHandler = ChainMessageHandler();
-
-/// 根据ChainMessage的类型进行分派
-class ChainMessageDispatch {
-  //   为每个消息类型注册接收和发送的处理函数，从ChainMessage中解析出消息类型，自动分发到合适的处理函数
-  Map<String, Map<String, Future<void> Function(ChainMessage chainMessage)>>
-      chainMessageHandlers = {};
-
-  Map<String, Future<void> Function(ChainMessage chainMessage)>
-      getChainMessageHandler(String msgType) {
-    var chainMessageHandler = chainMessageHandlers[msgType];
-    if (chainMessageHandler != null) {
-      return chainMessageHandler;
-    }
-    throw '';
-  }
-
-  registerChainMessageHandler(
-      String msgType,
-      Future<void> Function(ChainMessage chainMessage) receiveHandler,
-      Future<void> Function(ChainMessage chainMessage) responseHandler) {
-    Map<String, Future<void> Function(ChainMessage chainMessage)>
-        chainMessageHandler = {
-      'receiveHandler': receiveHandler,
-      'responseHandler': responseHandler
-    };
-
-    chainMessageHandlers[msgType] = chainMessageHandler;
-  }
-}
-
-var chainMessageDispatch = ChainMessageDispatch();
+final ChainMessageHandler chainMessageHandler = ChainMessageHandler();

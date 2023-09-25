@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
@@ -113,10 +115,16 @@ class GlobalChatMessageController with ChangeNotifier {
   //最新的到来消息
   ChatMessage? _chatMessage;
 
+  /// websocket onChat传来的消息
+  StreamSubscription<ChainMessage>? chainMessageListen;
+
   final Map<String, List<Function(ChatMessage chatMessage)>> _receivers = {};
 
   GlobalChatMessageController() {
-    chatAction.registerReceiver(onChat);
+    chainMessageListen = chatAction.responseStreamController.stream
+        .listen((ChainMessage chainMessage) {
+      onChat(chainMessage);
+    });
   }
 
   ///注册消息接收监听器，用于自定义的特殊处理

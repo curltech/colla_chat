@@ -19,6 +19,9 @@ class SignalAction extends BaseAction {
   }
 
   @override
+  Future<void> response(ChainMessage chainMessage) async {}
+
+  @override
   Future<void> transferPayload(ChainMessage chainMessage) async {
     super.transferPayload(chainMessage);
     var json = chainMessage.payload;

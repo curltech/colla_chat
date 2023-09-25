@@ -4,6 +4,7 @@ import 'dart:core';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/p2p/chain/chainmessagehandler.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
 
 enum PayloadType {
@@ -65,39 +66,22 @@ class NamespacePrefix {
   }
 }
 
+final Map<MsgType, BaseAction> p2pActions = {};
+
 /// 发送和接受链消息的抽象类
 abstract class BaseAction {
   late MsgType msgType;
-  List<Future<void> Function(ChainMessage)> receivers = [];
 
-  List<Future<void> Function(ChainMessage)> responsors = [];
-
-  StreamController<ChainMessage> receiverStreamController =
+  /// websocket收到的chainMessage
+  StreamController<ChainMessage> receiveStreamController =
       StreamController<ChainMessage>.broadcast();
 
-  StreamController<ChainMessage> responsorStreamController =
+  /// websocket发送后收到返回的chainMessage
+  StreamController<ChainMessage> responseStreamController =
       StreamController<ChainMessage>.broadcast();
 
   BaseAction(this.msgType) {
-    chainMessageDispatch.registerChainMessageHandler(
-        msgType.name, receive, response);
-  }
-
-  ///注册接收消息的处理器
-  void registerReceiver(Future<void> Function(ChainMessage) receiver) {
-    receivers.add(receiver);
-  }
-
-  void registerResponsor(Future<void> Function(ChainMessage) responsor) {
-    responsors.add(responsor);
-  }
-
-  void unregisterReceiver(Future<void> Function(ChainMessage) receiver) {
-    receivers.remove(receiver);
-  }
-
-  void unregisterResponsor(Future<void> Function(ChainMessage) responsor) {
-    responsors.remove(responsor);
+    p2pActions[msgType] = this;
   }
 
   ///发送前的预处理，设置消息的初始值
@@ -163,29 +147,21 @@ abstract class BaseAction {
   /// 缺省的行为是调用注册的接收处理器
   /// 子类可以覆盖这个方法，或者注册自己的接收处理器
   Future<void> receive(ChainMessage chainMessage) async {
-    var chainMessage_ = chainMessageHandler.merge(chainMessage);
-    if (chainMessage_ != null && receivers.isNotEmpty) {
+    ChainMessage? chainMessage_ = chainMessageHandler.merge(chainMessage);
+    if (chainMessage_ != null) {
       await transferPayload(chainMessage_);
-      receiverStreamController.add(chainMessage);
-      for (var receiver in receivers) {
-        await receiver(chainMessage_);
-      }
+      receiveStreamController.add(chainMessage_);
+    } else {
+      logger.e('receive chainMessage merge failure');
     }
-    return;
   }
 
   /// 返回消息进行处理的方法，
   /// 缺省的行为是调用注册的返回处理器
   /// 子类可以覆盖这个方法，或者注册自己的返回处理器
   Future<void> response(ChainMessage chainMessage) async {
-    if (responsors.isNotEmpty) {
-      await transferPayload(chainMessage);
-      responsorStreamController.add(chainMessage);
-      for (var responsor in responsors) {
-        responsor(chainMessage);
-      }
-    }
-    return;
+    await transferPayload(chainMessage);
+    responseStreamController.add(chainMessage);
   }
 
   ///将消息负载转换成具体类型的消息负载
@@ -200,8 +176,8 @@ abstract class BaseAction {
     } else if (payloadType == PayloadType.list.name) {
       payload = chainMessage.payload;
     } else {
-      String payloadstr = CryptoUtil.utf8ToString(data);
-      payload = JsonUtil.toJson(payloadstr);
+      String payloadStr = CryptoUtil.utf8ToString(data);
+      payload = JsonUtil.toJson(payloadStr);
     }
 
     chainMessage.payload = payload;

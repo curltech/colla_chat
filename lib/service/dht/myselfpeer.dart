@@ -49,7 +49,10 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     post = (Map map) {
       return MyselfPeer.fromJson(map);
     };
-    connectAction.registerResponsor(_connectResponse);
+    connectAction.responseStreamController.stream
+        .listen((ChainMessage chainMessage) {
+      _connectResponse(chainMessage);
+    });
   }
 
   @override

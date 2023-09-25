@@ -136,11 +136,10 @@ class PeerConnectionPool {
       StreamController<WebrtcEvent>.broadcast();
 
   PeerConnectionPool() {
-    signalAction.registerReceiver(onSignal);
-    // signalAction.receiverStreamController.stream
-    //     .listen((ChainMessage chainMessage) {
-    //   onSignal(chainMessage);
-    // });
+    signalAction.receiveStreamController.stream
+        .listen((ChainMessage chainMessage) {
+      onSignal(chainMessage);
+    });
     var peerId = myself.peerId;
     if (peerId == null) {
       throw 'myself peerId is null';

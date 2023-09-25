@@ -283,5 +283,6 @@ class MobileForegroundTaskHandler extends TaskHandler {
 void onStart() async {
   print('MobileForegroundTask entry-point onStart');
   WidgetsFlutterBinding.ensureInitialized();
+  DartPluginRegistrant.ensureInitialized();
   FlutterForegroundTask.setTaskHandler(MobileForegroundTaskHandler());
 }

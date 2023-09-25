@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:colla_chat/constant/base.dart';
@@ -82,7 +81,7 @@ class _IndexViewState extends State<IndexView>
     globalWebrtcEventController.onWebrtcErrorSignal = _onWebrtcErrorSignal;
 
     _initSystemTray();
-    _initMobileForegroundTask();
+    //_initMobileForegroundTask();
   }
 
   _initMobileForegroundTask() {
@@ -609,8 +608,9 @@ class _IndexViewState extends State<IndexView>
     var provider = Consumer3<AppDataProvider, IndexWidgetProvider, Myself>(
         builder:
             (context, appDataProvider, indexWidgetProvider, myself, child) {
-      return mobileForegroundTask.withForegroundTask(
-          child: _createScaffold(context, indexWidgetProvider));
+          return _createScaffold(context, indexWidgetProvider);
+      // return mobileForegroundTask.withForegroundTask(
+      //     child: _createScaffold(context, indexWidgetProvider));
     });
     return provider;
   }
@@ -624,7 +624,7 @@ class _IndexViewState extends State<IndexView>
     globalWebrtcEventController.onWebrtcSignal = null;
     globalWebrtcEventController.onWebrtcErrorSignal = null;
     _stop();
-    mobileForegroundTask.stop();
+    // mobileForegroundTask.stop();
     super.dispose();
   }
 }

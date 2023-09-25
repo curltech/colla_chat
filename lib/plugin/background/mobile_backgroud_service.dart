@@ -75,7 +75,7 @@ Future<bool> onIosBackground(ServiceInstance service) async {
   WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
 
-  logger.i('ios background:${DateTime.now().toIso8601String()}');
+  print('ios background:${DateTime.now().toIso8601String()}');
 
   return true;
 }

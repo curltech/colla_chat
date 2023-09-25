@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
@@ -39,10 +41,11 @@ class P2pLinkmanAddWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
-  var controller = TextEditingController();
+  TextEditingController controller = TextEditingController();
   final DataListController<TileData> tileDataController =
       DataListController<TileData>();
   late final DataListView dataListView;
+  StreamSubscription<ChainMessage>? chainMessageListen;
 
   @override
   initState() {
@@ -51,7 +54,10 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
       controller: tileDataController,
     );
     //tileDataController.addListener(_update);
-    findClientAction.registerResponsor(_responsePeerClients);
+    chainMessageListen = findClientAction.responseStreamController.stream
+        .listen((ChainMessage chainMessage) {
+      _responsePeerClients(chainMessage);
+    });
   }
 
   _update() {
@@ -116,7 +122,8 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
               _buildTiles(peerClients);
               if (mounted) {
                 DialogUtil.info(context,
-                    content: '${AppLocalizations.t('Add peerClient as linkman')}:$peerId');
+                    content:
+                        '${AppLocalizations.t('Add peerClient as linkman')}:$peerId');
               }
             },
             tooltip: AppLocalizations.t('Add peerClient as linkman'),
@@ -136,7 +143,8 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
                 _buildTiles(peerClients);
                 if (mounted) {
                   DialogUtil.info(context,
-                      content: '${AppLocalizations.t('Add peerClient as friend')}:$peerId');
+                      content:
+                          '${AppLocalizations.t('Add peerClient as friend')}:$peerId');
                 }
               },
               tooltip: AppLocalizations.t('Add peerClient as friend'),
@@ -192,8 +200,9 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
   @override
   void dispose() {
     //tileDataController.removeListener(_update);
+    chainMessageListen?.cancel();
+    chainMessageListen = null;
     controller.dispose();
-    findClientAction.unregisterResponsor(_responsePeerClients);
     super.dispose();
   }
 }

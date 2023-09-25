@@ -26,6 +26,16 @@ enum SocketStatus {
 
 const String prefix = 'wss://';
 
+/// websocket接收到的原始数据
+class WebsocketData {
+  String peerId;
+  String address;
+  String sessionId;
+  dynamic data;
+
+  WebsocketData(this.peerId, this.address, this.sessionId, this.data);
+}
+
 class Websocket extends IWebClient {
   Key? key;
   String? peerId;
@@ -88,7 +98,11 @@ class Websocket extends IWebClient {
         this.sessionId = sessionId;
       }
     } else {
-      await chainMessageHandler.receiveRaw(data, peerId, address);
+      if (peerId != null && sessionId != null) {
+        chainMessageHandler.websocketDataStreamController
+            .add(WebsocketData(peerId!, address, sessionId!, data));
+      }
+      //await chainMessageHandler.receiveRaw(data, peerId, address);
     }
   }
 
