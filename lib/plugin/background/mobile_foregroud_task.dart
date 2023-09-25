@@ -94,10 +94,10 @@ class MobileForegroundTask {
     }
 
     if (await FlutterForegroundTask.isRunningService) {
-      logger.w('FlutterForegroundTask restartService');
+      print('FlutterForegroundTask restartService');
       return FlutterForegroundTask.restartService();
     } else {
-      logger.w('FlutterForegroundTask startService');
+      print('FlutterForegroundTask startService');
       return FlutterForegroundTask.startService(
         notificationTitle: notificationTitle,
         notificationText: notificationText,
@@ -184,7 +184,7 @@ class MobileForegroundTask {
 
   ///前台服务任务发来数据事件
   void onData(dynamic data) async {
-    logger.w('received foreground service data:$data');
+    print('received foreground service data:$data');
   }
 
   ///创建WillForegroundTask组件，用于包裹Scaffold，使用前需要先调用初始化init方法
@@ -243,44 +243,45 @@ class MobileForegroundTaskHandler extends TaskHandler {
   @override
   void onStart(DateTime timestamp, SendPort? sendPort) async {
     _sendPort = sendPort;
-    logger.w('MobileForegroundTask started');
+    print('MobileForegroundTask started');
   }
 
   // 周期任务调用 [ForegroundTaskOptions].
   @override
   void onRepeatEvent(DateTime timestamp, SendPort? sendPort) async {
-    logger.w('MobileForegroundTask onRepeatEvent');
+    print('MobileForegroundTask onRepeatEvent');
     // 发送数据给主线程
-    sendPort?.send(timestamp);
-    logger.w('MobileForegroundTask send data');
+    sendPort?.send(timestamp.toIso8601String());
+    print('MobileForegroundTask send data');
   }
 
   /// 通知按钮被按的时候调用，android平台
   @override
   void onDestroy(DateTime timestamp, SendPort? sendPort) async {
-    logger.w('MobileForegroundTask onDestroy');
+    print('MobileForegroundTask onDestroy');
   }
 
   /// 通知按钮被按的时候调用，android平台
   @override
   void onNotificationButtonPressed(String id) {
-    logger.w('MobileForegroundTask onNotificationButtonPressed');
+    print('MobileForegroundTask onNotificationButtonPressed');
   }
 
   /// 通知被按的时候调用，android平台
   /// 必须有"android.permission.SYSTEM_ALERT_WINDOW"权限
   @override
   void onNotificationPressed() {
-    logger.w('MobileForegroundTask onNotificationPressed');
+    print('MobileForegroundTask onNotificationPressed');
     // 应用退出的时候重启应用，并且发送数据到应用
     FlutterForegroundTask.launchApp();
-    logger.w('MobileForegroundTask launchApp');
+    print('MobileForegroundTask launchApp');
   }
 }
 
 ///服务线程启动，在单独的服务线程中执行的代码
 @pragma('vm:entry-point')
 void onStart() async {
-  logger.w('MobileForegroundTask entry-point onStart');
+  print('MobileForegroundTask entry-point onStart');
+  WidgetsFlutterBinding.ensureInitialized();
   FlutterForegroundTask.setTaskHandler(MobileForegroundTaskHandler());
 }

@@ -50,7 +50,6 @@ Future<void> setCert() async {
 ///应用主函数，使用runApp加载主应用Widget
 void main(List<String> args) async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  DartPluginRegistrant.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   bool loginStatus = await ServiceLocator.init();
