@@ -121,7 +121,7 @@ class GlobalChatMessageController with ChangeNotifier {
   final Map<String, List<Function(ChatMessage chatMessage)>> _receivers = {};
 
   GlobalChatMessageController() {
-    chainMessageListen = chatAction.responseStreamController.stream
+    chainMessageListen = chatAction.receiveStreamController.stream
         .listen((ChainMessage chainMessage) {
       onChat(chainMessage);
     });
