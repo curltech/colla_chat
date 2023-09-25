@@ -356,6 +356,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
     }
     String peerId = chatSummary.peerId!;
     if (peerId != event.peerId) {
+      logger.e('peerId is not same');
       return;
     }
     WebrtcEventType eventType = event.eventType;
