@@ -83,9 +83,11 @@ class _ChatMessageViewState extends State<ChatMessageView>
       ValueNotifier<ChatSummary?>(chatMessageController.chatSummary);
   final ValueNotifier<double> chatMessageHeight = ValueNotifier<double>(0);
   final ValueNotifier<bool?> _initiator = ValueNotifier<bool?>(null);
-  StreamSubscription<WebrtcEvent> webrtcEventStreamSubscription =
-      peerConnectionPool.webrtcEventStreamController.stream
-          .listen((WebrtcEvent event) {});
+  StreamSubscription<WebrtcEvent>? connectionStateStreamSubscription;
+  StreamSubscription<WebrtcEvent>? signalingStateStreamSubscription;
+  StreamSubscription<WebrtcEvent>? closedStreamSubscription;
+  StreamSubscription<WebrtcEvent>? initiatorStreamSubscription;
+
   double visibleFraction = 0.0;
   NoScreenshot? noScreenshot;
   ScreenshotCallback? screenshotCallback;
@@ -209,14 +211,6 @@ class _ChatMessageViewState extends State<ChatMessageView>
     chatMessageController.chatGPT = null;
     String peerId = chatSummary.peerId!;
     String partyType = chatSummary.partyType!;
-    peerConnectionPool.registerWebrtcEvent(
-        peerId, WebrtcEventType.connectionState, _updatePeerConnectionState);
-    peerConnectionPool.registerWebrtcEvent(
-        peerId, WebrtcEventType.signalingState, _updatePeerConnectionState);
-    peerConnectionPool.registerWebrtcEvent(
-        peerId, WebrtcEventType.closed, _updatePeerConnectionState);
-    peerConnectionPool.registerWebrtcEvent(
-        peerId, WebrtcEventType.initiator, _updatePeerConnectionState);
     if (partyType == PartyType.linkman.name) {
       await _createLinkmanPeerConnection(peerId);
     } else if (partyType == PartyType.group.name) {
@@ -261,12 +255,12 @@ class _ChatMessageViewState extends State<ChatMessageView>
       }
       chatMessageController.chatGPT = chatGPT;
     } else {
+      AdvancedPeerConnection? advancedPeerConnection;
       List<AdvancedPeerConnection> advancedPeerConnections =
           await peerConnectionPool.get(peerId);
       //如果连接不存在，则创建新连接，
       if (advancedPeerConnections.isEmpty) {
-        AdvancedPeerConnection? advancedPeerConnection =
-            await peerConnectionPool.createOffer(peerId);
+        advancedPeerConnection = await peerConnectionPool.createOffer(peerId);
         if (advancedPeerConnection != null) {
           _peerConnectionState.value = advancedPeerConnection.connectionState;
           _initiator.value =
@@ -275,6 +269,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
           _peerConnectionState.value = null;
         }
       } else {
+        advancedPeerConnection = advancedPeerConnections.first;
         for (AdvancedPeerConnection advancedPeerConnection
             in advancedPeerConnections) {
           _peerConnectionState.value = advancedPeerConnection.connectionState;
@@ -286,6 +281,14 @@ class _ChatMessageViewState extends State<ChatMessageView>
           }
         }
       }
+      connectionStateStreamSubscription = advancedPeerConnection?.listen(
+          WebrtcEventType.connectionState, _updatePeerConnectionState);
+      signalingStateStreamSubscription = advancedPeerConnection?.listen(
+          WebrtcEventType.signalingState, _updatePeerConnectionState);
+      closedStreamSubscription = advancedPeerConnection?.listen(
+          WebrtcEventType.closed, _updatePeerConnectionState);
+      initiatorStreamSubscription = advancedPeerConnection?.listen(
+          WebrtcEventType.initiator, _updatePeerConnectionState);
     }
   }
 
@@ -346,6 +349,15 @@ class _ChatMessageViewState extends State<ChatMessageView>
   }
 
   Future<void> _updatePeerConnectionState(WebrtcEvent event) async {
+    var chatSummary = _chatSummary.value;
+    if (chatSummary == null) {
+      logger.e('chatSummary is null');
+      return;
+    }
+    String peerId = chatSummary.peerId!;
+    if (peerId != event.peerId) {
+      return;
+    }
     WebrtcEventType eventType = event.eventType;
     if (eventType == WebrtcEventType.signalingState) {
       RTCSignalingState? state = event.data;
@@ -580,14 +592,14 @@ class _ChatMessageViewState extends State<ChatMessageView>
     chatMessageViewController.removeListener(_updateChatMessageView);
     var chatSummary = _chatSummary.value;
     if (chatSummary != null) {
-      peerConnectionPool.unregisterWebrtcEvent(chatSummary.peerId!,
-          WebrtcEventType.connectionState, _updatePeerConnectionState);
-      peerConnectionPool.unregisterWebrtcEvent(chatSummary.peerId!,
-          WebrtcEventType.signalingState, _updatePeerConnectionState);
-      peerConnectionPool.unregisterWebrtcEvent(chatSummary.peerId!,
-          WebrtcEventType.closed, _updatePeerConnectionState);
-      peerConnectionPool.unregisterWebrtcEvent(chatSummary.peerId!,
-          WebrtcEventType.initiator, _updatePeerConnectionState);
+      connectionStateStreamSubscription?.cancel();
+      connectionStateStreamSubscription = null;
+      signalingStateStreamSubscription?.cancel();
+      signalingStateStreamSubscription = null;
+      closedStreamSubscription?.cancel();
+      closedStreamSubscription = null;
+      initiatorStreamSubscription?.cancel();
+      initiatorStreamSubscription = null;
     }
     WidgetsBinding.instance.removeObserver(this);
     windowManager.removeListener(this);

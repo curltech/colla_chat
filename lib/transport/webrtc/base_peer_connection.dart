@@ -1634,7 +1634,7 @@ class BasePeerConnection {
       return null;
     }
     if (message.isBinary) {
-      var data = message.binary;
+      Uint8List data = message.binary;
       List<int>? slices = messageSlice.merge(data);
 
       if (slices != null) {
@@ -1642,7 +1642,7 @@ class BasePeerConnection {
         emit(WebrtcEventType.message, slices);
       }
     } else {
-      var data = message.text.codeUnits;
+      List<int> data = message.text.codeUnits;
       List<int>? slices = messageSlice.merge(data);
 
       if (slices != null) {

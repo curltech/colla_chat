@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
@@ -8,10 +10,18 @@ import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controller.dart';
+import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:synchronized/synchronized.dart';
+
+class P2pConferencePeerConnection {
+  AdvancedPeerConnection peerConnection;
+
+  P2pConferencePeerConnection(this.peerConnection);
+}
 
 ///视频会议客户端，代表一个正在进行的视频会议，
 ///包含一个必须的视频会议消息控制器和一个会议内的所有的webrtc连接及其包含的远程视频，
@@ -21,6 +31,8 @@ class P2pConferenceClient extends PeerMediaStreamController {
 
   //对方加入的webrtc连接，根据peerId和clientId作为key值
   final Map<String, AdvancedPeerConnection> _peerConnections = {};
+  final Map<String, List<StreamSubscription<WebrtcEvent>>>
+      _streamSubscriptions = {};
 
   //自己是否加入
   bool _joined = false;
@@ -127,11 +139,24 @@ class P2pConferenceClient extends PeerMediaStreamController {
     var key = _getKey(peerConnection.peerId, peerConnection.clientId);
     if (!_peerConnections.containsKey(key)) {
       _peerConnections[key] = peerConnection;
-      peerConnection.registerWebrtcEvent(
-          WebrtcEventType.track, _onAddRemoteTrack);
-      peerConnection.registerWebrtcEvent(
-          WebrtcEventType.removeTrack, _onRemoveRemoteTrack);
-      peerConnection.registerWebrtcEvent(WebrtcEventType.closed, _onClosed);
+      List<StreamSubscription<WebrtcEvent>> streamSubscriptions = [];
+      StreamSubscription<WebrtcEvent>? trackStreamSubscription =
+          peerConnection.listen(WebrtcEventType.track, _onAddRemoteTrack);
+      if (trackStreamSubscription != null) {
+        streamSubscriptions.add(trackStreamSubscription);
+      }
+      StreamSubscription<WebrtcEvent>? removeTrackStreamSubscription =
+          peerConnection.listen(
+              WebrtcEventType.removeTrack, _onRemoveRemoteTrack);
+      if (removeTrackStreamSubscription != null) {
+        streamSubscriptions.add(removeTrackStreamSubscription);
+      }
+      StreamSubscription<WebrtcEvent>? closedStreamSubscription =
+          peerConnection.listen(WebrtcEventType.closed, _onClosed);
+      if (closedStreamSubscription != null) {
+        streamSubscriptions.add(closedStreamSubscription);
+      }
+      _streamSubscriptions[key] = streamSubscriptions;
     }
 
     //只有自己已经加入，才需要加本地流和远程流
@@ -205,11 +230,15 @@ class P2pConferenceClient extends PeerMediaStreamController {
     var key = _getKey(peerConnection.peerId, peerConnection.clientId);
     var advancedPeerConnection = _peerConnections.remove(key);
     if (advancedPeerConnection != null) {
-      peerConnection.unregisterWebrtcEvent(
-          WebrtcEventType.track, _onAddRemoteTrack);
-      peerConnection.unregisterWebrtcEvent(
-          WebrtcEventType.removeTrack, _onRemoveRemoteTrack);
-      peerConnection.unregisterWebrtcEvent(WebrtcEventType.closed, _onClosed);
+      List<StreamSubscription<WebrtcEvent>>? streamSubscriptions =
+          _streamSubscriptions[key];
+      if (streamSubscriptions != null) {
+        for (StreamSubscription<WebrtcEvent> streamSubscription
+            in streamSubscriptions) {
+          streamSubscription.cancel();
+        }
+      }
+      _streamSubscriptions.remove(key);
       if (_joined) {
         await _removeRemotePeerMediaStream(peerConnection);
         List<PeerMediaStream> peerMediaStreams =

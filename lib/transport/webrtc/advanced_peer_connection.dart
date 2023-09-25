@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/p2p/chain/action/signal.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -12,7 +14,6 @@ import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:synchronized/synchronized.dart';
 
 ///基础的PeerConnection之上加入了业务的编号，peerId和clientId，自动进行信号的协商
 class AdvancedPeerConnection {
@@ -25,8 +26,8 @@ class AdvancedPeerConnection {
   String clientId;
   String name;
 
-  Map<String, List<Future<void> Function(WebrtcEvent event)>> fnsm = {};
-  final Lock _fnsmLock = Lock();
+  Map<WebrtcEventType, StreamController<WebrtcEvent>>
+      webrtcEventStreamControllers = {};
 
   AdvancedPeerConnection(
     this.peerId, {
@@ -40,53 +41,41 @@ class AdvancedPeerConnection {
     }
     final basePeerConnection = BasePeerConnection();
     this.basePeerConnection = basePeerConnection;
+    _registerStreamController();
   }
 
-  ///注册特定连接的事件监听器
-  registerWebrtcEvent(
-      WebrtcEventType eventType, Future<void> Function(WebrtcEvent) fn) async {
-    await _fnsmLock.synchronized(() {
-      List<Future<void> Function(WebrtcEvent)>? fns = fnsm[eventType.name];
-      if (fns == null) {
-        fns = [];
-        fnsm[eventType.name] = fns;
-      }
-      fns.add(fn);
-    });
+  /// 监听信号流，注册各种webrtc event
+  _registerStreamController() {
+    for (WebrtcEventType webrtcEventType in WebrtcEventType.values) {
+      webrtcEventStreamControllers[webrtcEventType] =
+          StreamController<WebrtcEvent>.broadcast();
+    }
+    listen(WebrtcEventType.message, onMessage);
+    listen(WebrtcEventType.initiator, onInitiator);
+    listen(WebrtcEventType.connected, onConnected);
+    listen(WebrtcEventType.connectionState, onConnectionState);
+    listen(WebrtcEventType.signalingState, onSignalingState);
+    listen(WebrtcEventType.closed, onClosed);
+    listen(WebrtcEventType.stream, onStream);
+    listen(WebrtcEventType.removeStream, onRemoveStream);
+    listen(WebrtcEventType.track, onTrack);
+    listen(WebrtcEventType.addTrack, onAddTrack);
+    listen(WebrtcEventType.removeTrack, onRemoveTrack);
+    listen(WebrtcEventType.error, onError);
   }
 
-  unregisterWebrtcEvent(
-      WebrtcEventType eventType, Future<void> Function(WebrtcEvent) fn) async {
-    await _fnsmLock.synchronized(() {
-      List<Future<void> Function(WebrtcEvent)>? fns = fnsm[eventType.name];
-      if (fns == null) {
-        return;
-      }
-      fns.remove(fn);
-      if (fns.isEmpty) {
-        fnsm.remove(eventType.name);
-      }
-    });
-  }
-
-  ///调用注册到本连接的事件处理监听器
-  onWebrtcEvent(WebrtcEvent event) async {
-    await _fnsmLock.synchronized(() {
-      String peerId = event.peerId;
-      WebrtcEventType eventType = event.eventType;
-      // logger.i('Webrtc peer connection $peerId webrtcEvent $eventType coming');
-      var data = event.data;
-      if (data != null && data is WebrtcSignal) {
-        // logger.i(
-        //     'Webrtc peer connection $peerId webrtcEvent $eventType coming, and signalType:${data.signalType}');
-      }
-      List<Future<void> Function(WebrtcEvent)>? fns = fnsm[eventType.name];
-      if (fns != null) {
-        for (var fn in fns) {
-          fn(event);
-        }
-      }
-    });
+  StreamSubscription<WebrtcEvent>? listen(
+    WebrtcEventType webrtcEventType,
+    void Function(WebrtcEvent) onData, {
+    Function? onError,
+    void Function()? onDone,
+    bool? cancelOnError,
+  }) {
+    StreamController<WebrtcEvent>? webrtcEventStreamController =
+        webrtcEventStreamControllers[webrtcEventType];
+    return webrtcEventStreamController?.stream.listen((WebrtcEvent event) {
+      onData(event);
+    }, onError: onError, onDone: onDone, cancelOnError: cancelOnError);
   }
 
   Future<bool> init(bool initiator,
@@ -115,13 +104,7 @@ class AdvancedPeerConnection {
       }
     }
     basePeerConnection.on(WebrtcEventType.initiator, (data) async {
-      var webrtcEvent = WebrtcEvent(peerId,
-          clientId: clientId,
-          name: name,
-          eventType: WebrtcEventType.initiator,
-          data: data);
-      onWebrtcEvent(webrtcEvent);
-      await peerConnectionPool.onInitiator(webrtcEvent);
+      _addWebrtcEventType(WebrtcEventType.initiator, data);
     });
 
     bool result = await basePeerConnection.init(initiator, extension,
@@ -131,95 +114,82 @@ class AdvancedPeerConnection {
       return false;
     }
 
-    ///所有basePeerConnection的事件都缺省转发到peerConnectionPool相同的处理
-    //触发basePeerConnection的signal事件，就是调用peerConnectionPool对应的signal方法
+    /// 在basePeerConnection中注册webrtcEvent，当basePeerConnection发生相应的事件后，
+    /// 在peerConnectionPool的webrtcEventType的流控制器中加入事件
+    /// 然后basePeerConnection中调用emit方法，就可以调用对应的方法
     basePeerConnection.on(WebrtcEventType.signal,
         (WebrtcSignal webrtcSignal) async {
-      var webrtcEvent = WebrtcEvent(peerId,
-          clientId: clientId,
-          name: name,
-          eventType: WebrtcEventType.signal,
-          data: webrtcSignal);
-      onWebrtcEvent(webrtcEvent);
-      await signal(webrtcEvent);
+      await sendSignal(webrtcSignal);
     });
 
     //触发basePeerConnection的connect事件，就是调用peerConnectionPool对应的signal方法
     basePeerConnection.on(WebrtcEventType.connected, (data) async {
-      var webrtcEvent = WebrtcEvent(peerId,
-          clientId: clientId,
-          name: name,
-          eventType: WebrtcEventType.connected,
-          data: data);
-      onWebrtcEvent(webrtcEvent);
-      await peerConnectionPool.onConnected(webrtcEvent);
+      _addWebrtcEventType(WebrtcEventType.connected, data);
     });
 
     basePeerConnection.on(WebrtcEventType.connectionState, (data) async {
-      var webrtcEvent = WebrtcEvent(peerId,
-          clientId: clientId,
-          name: name,
-          eventType: WebrtcEventType.connectionState,
-          data: data);
-      onWebrtcEvent(webrtcEvent);
-      await peerConnectionPool.onStatusChanged(webrtcEvent);
+      _addWebrtcEventType(WebrtcEventType.connectionState, data);
     });
 
     basePeerConnection.on(WebrtcEventType.signalingState, (data) async {
-      var webrtcEvent = WebrtcEvent(peerId,
-          clientId: clientId,
-          name: name,
-          eventType: WebrtcEventType.signalingState,
-          data: data);
-      onWebrtcEvent(webrtcEvent);
-      await peerConnectionPool.onSignalingState(webrtcEvent);
+      _addWebrtcEventType(WebrtcEventType.signalingState, data);
     });
 
     basePeerConnection.on(WebrtcEventType.closed, (data) async {
-      var webrtcEvent = WebrtcEvent(peerId,
-          clientId: clientId,
-          name: name,
-          eventType: WebrtcEventType.closed,
-          data: this);
-      onWebrtcEvent(webrtcEvent);
-      await peerConnectionPool.onClosed(webrtcEvent);
+      _addWebrtcEventType(WebrtcEventType.closed, data);
     });
 
     //收到数据，带解密功能，取最后一位整数，表示解密选项，得到何种解密方式，然后解密
-    basePeerConnection.on(WebrtcEventType.message, onMessage);
+    basePeerConnection.on(WebrtcEventType.message, (data) async {
+      _addWebrtcEventType(WebrtcEventType.message, data);
+    });
 
     basePeerConnection.on(WebrtcEventType.stream, (MediaStream stream) async {
-      await onAddRemoteStream(stream);
+      if (connectionState ==
+          RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
+        logger.e('PeerConnection closed');
+        return;
+      }
+      _addWebrtcEventType(WebrtcEventType.stream, stream);
     });
 
     basePeerConnection.on(WebrtcEventType.removeStream,
         (MediaStream stream) async {
-      await onRemoveRemoteStream(stream);
+      _addWebrtcEventType(WebrtcEventType.removeStream, stream);
     });
 
     basePeerConnection.on(WebrtcEventType.track, (data) async {
-      await onRemoteTrack(data);
+      _addWebrtcEventType(WebrtcEventType.track, data);
     });
 
     basePeerConnection.on(WebrtcEventType.addTrack, (data) async {
-      await onAddRemoteTrack(data);
+      _addWebrtcEventType(WebrtcEventType.addTrack, data);
     });
 
     basePeerConnection.on(WebrtcEventType.removeTrack, (data) async {
-      await onRemoveRemoteTrack(data);
+      _addWebrtcEventType(WebrtcEventType.removeTrack, data);
     });
 
     basePeerConnection.on(WebrtcEventType.error, (err) async {
-      var webrtcEvent = WebrtcEvent(peerId,
-          clientId: clientId,
-          name: name,
-          eventType: WebrtcEventType.error,
-          data: err);
-      onWebrtcEvent(webrtcEvent);
-      await peerConnectionPool.onError(webrtcEvent);
+      _addWebrtcEventType(WebrtcEventType.error, err);
     });
 
     return result;
+  }
+
+  /// 在peerConnectionPool的webrtcEventType的流控制器中加入事件
+  _addWebrtcEventType(WebrtcEventType webrtcEventType, dynamic data) async {
+    StreamController<WebrtcEvent>? webrtcEventStreamController =
+        webrtcEventStreamControllers[webrtcEventType];
+    if (webrtcEventStreamController != null) {
+      WebrtcEvent webrtcEvent = WebrtcEvent(peerId,
+          clientId: clientId,
+          name: name,
+          eventType: webrtcEventType,
+          data: data);
+
+      webrtcEventStreamController.add(webrtcEvent);
+    }
   }
 
   renegotiate({bool toggle = false}) async {
@@ -240,67 +210,6 @@ class AdvancedPeerConnection {
 
   RTCSignalingState? get signalingState {
     return basePeerConnection.signalingState;
-  }
-
-  onAddRemoteStream(MediaStream stream) async {
-    if (connectionState ==
-        RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
-      logger.e('PeerConnection closed');
-      return;
-    }
-    var webrtcEvent = WebrtcEvent(peerId,
-        clientId: clientId,
-        name: name,
-        eventType: WebrtcEventType.stream,
-        data: stream);
-    onWebrtcEvent(webrtcEvent);
-    await peerConnectionPool.onAddStream(webrtcEvent);
-  }
-
-  onRemoveRemoteStream(MediaStream stream) async {
-    var webrtcEvent = WebrtcEvent(peerId,
-        clientId: clientId,
-        name: name,
-        eventType: WebrtcEventType.removeStream,
-        data: stream);
-    onWebrtcEvent(webrtcEvent);
-    await peerConnectionPool.onRemoveStream(webrtcEvent);
-  }
-
-  onRemoteTrack(dynamic data) async {
-    MediaStream stream = data['stream'];
-    MediaStreamTrack track = data['track'];
-    var webrtcEvent = WebrtcEvent(peerId,
-        clientId: clientId,
-        name: name,
-        eventType: WebrtcEventType.track,
-        data: data);
-    onWebrtcEvent(webrtcEvent);
-    await peerConnectionPool.onTrack(webrtcEvent);
-  }
-
-  onAddRemoteTrack(dynamic data) async {
-    MediaStream stream = data['stream'];
-    MediaStreamTrack track = data['track'];
-    var webrtcEvent = WebrtcEvent(peerId,
-        clientId: clientId,
-        name: name,
-        eventType: WebrtcEventType.addTrack,
-        data: data);
-    onWebrtcEvent(webrtcEvent);
-    await peerConnectionPool.onAddTrack(webrtcEvent);
-  }
-
-  onRemoveRemoteTrack(dynamic data) async {
-    MediaStream stream = data['stream'];
-    MediaStreamTrack track = data['track'];
-    var webrtcEvent = WebrtcEvent(peerId,
-        clientId: clientId,
-        name: name,
-        eventType: WebrtcEventType.removeTrack,
-        data: data);
-    onWebrtcEvent(webrtcEvent);
-    await peerConnectionPool.onRemoveTrack(webrtcEvent);
   }
 
   ///将本地渲染器包含的流加入连接中，在收到接受视频要求的时候调用
@@ -355,32 +264,8 @@ class AdvancedPeerConnection {
     await basePeerConnection.replaceTrack(stream, oldTrack, newTrack);
   }
 
-  onSignal(WebrtcSignal signal) async {
-    await basePeerConnection.onSignal(signal);
-  }
-
   bool get connected {
     return basePeerConnection.connected;
-  }
-
-  ///收到数据，先解密，然后转换成还原utf-8字符串，再将json字符串变成map对象
-  onMessage(List<int> data) async {
-    ChatMessage? chatMessage = await chatMessageService.decrypt(data);
-    if (chatMessage != null) {
-      //对消息进行业务处理
-      chatMessage.transportType = TransportType.webrtc.name;
-      await globalChatMessageController.receiveChatMessage(chatMessage);
-
-      var webrtcEvent = WebrtcEvent(peerId,
-          clientId: clientId,
-          name: name,
-          eventType: WebrtcEventType.message,
-          data: chatMessage);
-      onWebrtcEvent(webrtcEvent);
-      await peerConnectionPool.onMessage(webrtcEvent);
-    } else {
-      logger.e('Received chatMessage but decrypt failure');
-    }
   }
 
   ///发送数据
@@ -394,13 +279,13 @@ class AdvancedPeerConnection {
     }
   }
 
-  ///调用本连接或者signalAction发送signal到信号服务器
-  Future<bool> signal(WebrtcEvent evt) async {
+  /// 调用本连接或者signalAction发送signal到信号服务器
+  Future<bool> sendSignal(WebrtcSignal signal) async {
     try {
       if (dataChannelOpen && basePeerConnection.dataChannel != null) {
         ChatMessage chatMessage = await chatMessageService.buildChatMessage(
             receiverPeerId: peerId,
-            content: evt.data,
+            content: signal,
             clientId: clientId,
             messageType: ChatMessageType.system,
             subMessageType: ChatMessageSubType.signal);
@@ -408,8 +293,8 @@ class AdvancedPeerConnection {
         // logger.w(
         //     'sent signal chatMessage by webrtc peerId:$peerId, clientId:$clientId, signal:$jsonStr');
       } else {
-        var success = await signalAction.signal(evt.data, peerId,
-            targetClientId: clientId);
+        var success =
+            await signalAction.signal(signal, peerId, targetClientId: clientId);
         if (!success) {
           logger.e('signalAction signal err');
         }
@@ -419,6 +304,96 @@ class AdvancedPeerConnection {
       logger.e('signal err:$err');
     }
     return false;
+  }
+
+  /// 收到数据，先解密，然后转换成还原utf-8字符串，再将json字符串变成map对象
+  /// 收到发来的ChatMessage的payload（map对象），进行后续的action处理
+  onMessage(WebrtcEvent event) async {
+    List<int> data = event.data;
+    ChatMessage? chatMessage = await chatMessageService.decrypt(data);
+    if (chatMessage != null) {
+      //对消息进行业务处理
+      chatMessage.transportType = TransportType.webrtc.name;
+      await globalChatMessageController.receiveChatMessage(chatMessage);
+    } else {
+      logger.e('Received chatMessage but decrypt failure');
+    }
+  }
+
+  ///连接成功
+  ///webrtc连接完成后首先交换最新的联系人信息，然后请求新的订阅渠道消息
+  ///然后交换棘轮加密的密钥
+  onConnected(WebrtcEvent event) async {
+    globalChatMessageController.sendModifyLinkman(event.peerId,
+        clientId: event.clientId);
+    globalChatMessageController.sendGetChannel(event.peerId,
+        clientId: event.clientId);
+    globalChatMessageController.sendPreKeyBundle(event.peerId,
+        clientId: event.clientId);
+    chatMessageService.sendUnsent(receiverPeerId: event.peerId);
+  }
+
+  ///从池中移除连接
+  onClosed(WebrtcEvent event) async {
+    peerConnectionPool.remove(event.peerId, clientId: event.clientId);
+    signalSessionPool.close(peerId: event.peerId, clientId: event.clientId);
+  }
+
+  ///连接状态发生改变
+  onConnectionState(WebrtcEvent event) async {}
+
+  onSignalingState(WebrtcEvent event) async {}
+
+  onError(WebrtcEvent event) async {}
+
+  onInitiator(WebrtcEvent event) async {}
+
+  onStream(WebrtcEvent event) async {
+    String peerId = event.peerId;
+    String clientId = event.clientId;
+    String name = event.name;
+    MediaStream stream = event.data;
+  }
+
+  onAddStream(WebrtcEvent event) async {
+    String peerId = event.peerId;
+    String clientId = event.clientId;
+    String name = event.name;
+    MediaStream stream = event.data;
+  }
+
+  onRemoveStream(WebrtcEvent event) async {
+    String peerId = event.peerId;
+    String clientId = event.clientId;
+    String name = event.name;
+    MediaStream stream = event.data;
+  }
+
+  onTrack(WebrtcEvent event) async {
+    String peerId = event.peerId;
+    String clientId = event.clientId;
+    String name = event.name;
+    dynamic data = event.data;
+    MediaStream stream = data['stream'];
+    MediaStreamTrack track = data['track'];
+  }
+
+  onAddTrack(WebrtcEvent event) async {
+    String peerId = event.peerId;
+    String clientId = event.clientId;
+    String name = event.name;
+    dynamic data = event.data;
+    MediaStream stream = data['stream'];
+    MediaStreamTrack track = data['track'];
+  }
+
+  onRemoveTrack(WebrtcEvent event) async {
+    String peerId = event.peerId;
+    String clientId = event.clientId;
+    String name = event.name;
+    dynamic data = event.data;
+    MediaStream stream = data['stream'];
+    MediaStreamTrack track = data['track'];
   }
 
   close() async {

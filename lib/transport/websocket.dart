@@ -102,7 +102,6 @@ class Websocket extends IWebClient {
         chainMessageHandler.websocketDataStreamController
             .add(WebsocketData(peerId!, address, sessionId!, data));
       }
-      //await chainMessageHandler.receiveRaw(data, peerId, address);
     }
   }
 

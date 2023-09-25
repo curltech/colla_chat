@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/signalprotocol.dart';
+import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
@@ -130,16 +131,12 @@ class PeerConnectionPool {
 
   final Lock _connLock = Lock();
 
-  Map<String, List<Future<dynamic> Function(WebrtcEvent event)>> fnsm = {};
-  final Lock _fnsmLock = Lock();
-  StreamController<WebrtcEvent> webrtcEventStreamController =
-      StreamController<WebrtcEvent>.broadcast();
-
   PeerConnectionPool() {
     signalAction.receiveStreamController.stream
         .listen((ChainMessage chainMessage) {
       onSignal(chainMessage);
     });
+
     var peerId = myself.peerId;
     if (peerId == null) {
       throw 'myself peerId is null';
@@ -157,59 +154,6 @@ class PeerConnectionPool {
     this.peerPublicKey = peerPublicKey;
     Timer.periodic(clearDuration, (Timer timer) {
       clear();
-    });
-  }
-
-  String _getKey(String peerId, WebrtcEventType eventType) {
-    return '$peerId:${eventType.name}';
-  }
-
-  registerWebrtcEvent(String peerId, WebrtcEventType eventType,
-      Future<dynamic> Function(WebrtcEvent) fn) async {
-    await _fnsmLock.synchronized(() {
-      String key = _getKey(peerId, eventType);
-      List<Future<void> Function(WebrtcEvent)>? fns = fnsm[key];
-      if (fns == null) {
-        fns = [];
-        fnsm[key] = fns;
-      }
-      if (!fns.contains(fn)) {
-        fns.add(fn);
-      }
-    });
-  }
-
-  unregisterWebrtcEvent(String peerId, WebrtcEventType eventType,
-      Future<dynamic> Function(WebrtcEvent) fn) async {
-    await _fnsmLock.synchronized(() {
-      String key = _getKey(peerId, eventType);
-      List<Future<void> Function(WebrtcEvent)>? fns = fnsm[key];
-      if (fns == null) {
-        return;
-      }
-      fns.removeWhere((element) {
-        return element == fn;
-      });
-      if (fns.isEmpty) {
-        fnsm.remove(key);
-      }
-    });
-  }
-
-  Future<List> onWebrtcEvent(WebrtcEvent event) async {
-    return await _fnsmLock.synchronized(() async {
-      String peerId = event.peerId;
-      WebrtcEventType eventType = event.eventType;
-      String key = _getKey(peerId, eventType);
-      List<Future<dynamic> Function(WebrtcEvent)>? fns = fnsm[key];
-      var results = [];
-      if (fns != null) {
-        for (var fn in fns) {
-          results.add(await fn(event));
-        }
-      }
-
-      return results;
     });
   }
 
@@ -307,11 +251,17 @@ class PeerConnectionPool {
       if (linkman != null) {
         name = linkman.name;
       }
-      onWebrtcEvent(WebrtcEvent(peerId,
-          clientId: clientId,
-          name: name,
-          eventType: WebrtcEventType.created,
-          data: peerConnection));
+
+      ///created事件加入流
+      StreamController<WebrtcEvent>? createdWebrtcEventStreamController =
+          peerConnection.webrtcEventStreamControllers[WebrtcEventType.created];
+      if (createdWebrtcEventStreamController != null) {
+        createdWebrtcEventStreamController.add(WebrtcEvent(peerId,
+            clientId: clientId,
+            name: name,
+            eventType: WebrtcEventType.created,
+            data: peerConnection));
+      }
     }
     peerConnection = _getOne(peerId, clientId: clientId);
 
@@ -457,11 +407,17 @@ class PeerConnectionPool {
       }
     });
     if (advancedPeerConnection != null) {
-      onWebrtcEvent(WebrtcEvent(peerId,
-          clientId: clientId,
-          name: name,
-          eventType: WebrtcEventType.created,
-          data: advancedPeerConnection));
+      ///created事件加入流
+      StreamController<WebrtcEvent>? createdWebrtcEventStreamController =
+          advancedPeerConnection
+              .webrtcEventStreamControllers[WebrtcEventType.created];
+      if (createdWebrtcEventStreamController != null) {
+        createdWebrtcEventStreamController.add(WebrtcEvent(peerId,
+            clientId: clientId,
+            name: name,
+            eventType: WebrtcEventType.created,
+            data: advancedPeerConnection));
+      }
       logger.i(
           'advancedPeerConnection ${advancedPeerConnection.basePeerConnection.id} createAnswer completed');
     }
@@ -471,7 +427,8 @@ class PeerConnectionPool {
     return advancedPeerConnection;
   }
 
-  ///从信号服务器传来的webrtc的协商消息
+  /// 从信号服务器传来的webrtc的协商消息
+  /// 通过监听signalAction的流控制器
   Future<void> onSignal(ChainMessage chainMessage) async {
     if (chainMessage.srcPeerId == null) {
       logger.e('chainMessage.srcPeerId is null');
@@ -592,13 +549,8 @@ class PeerConnectionPool {
           logger.e(error);
           WebrtcSignal webrtcSignal =
               WebrtcSignal(SignalType.error.name, error: error);
-          WebrtcEvent webrtcEvent = WebrtcEvent(peerId,
-              clientId: clientId,
-              name: name,
-              eventType: WebrtcEventType.signal,
-              data: webrtcSignal);
           if (advancedPeerConnection != null) {
-            await advancedPeerConnection.signal(webrtcEvent);
+            await advancedPeerConnection.sendSignal(webrtcSignal);
           }
 
           return null;
@@ -608,7 +560,7 @@ class PeerConnectionPool {
 
     ///转发信号到base层处理，包括renegotiate
     if (advancedPeerConnection != null) {
-      await advancedPeerConnection.onSignal(signal);
+      await advancedPeerConnection.basePeerConnection.onSignal(signal);
     }
   }
 
@@ -643,68 +595,7 @@ class PeerConnectionPool {
     return false;
   }
 
-  ///收到发来的ChatMessage的payload（map对象），进行后续的action处理
-  onMessage(WebrtcEvent event) async {
-    onWebrtcEvent(event);
-  }
 
-  ///连接状态发生改变
-  onStatusChanged(WebrtcEvent event) async {
-    onWebrtcEvent(event);
-  }
-
-  onSignalingState(WebrtcEvent event) async {
-    onWebrtcEvent(event);
-  }
-
-  ///连接成功
-  ///webrtc连接完成后首先交换最新的联系人信息，然后请求新的订阅渠道消息
-  ///然后交换棘轮加密的密钥
-  onConnected(WebrtcEvent event) async {
-    globalChatMessageController.sendModifyLinkman(event.peerId,
-        clientId: event.clientId);
-    globalChatMessageController.sendGetChannel(event.peerId,
-        clientId: event.clientId);
-    globalChatMessageController.sendPreKeyBundle(event.peerId,
-        clientId: event.clientId);
-    chatMessageService.sendUnsent(receiverPeerId: event.peerId);
-    onWebrtcEvent(event);
-  }
-
-  ///从池中移除连接
-  onClosed(WebrtcEvent event) async {
-    remove(event.peerId, clientId: event.clientId);
-    onWebrtcEvent(event);
-    signalSessionPool.close(peerId: event.peerId, clientId: event.clientId);
-  }
-
-  onError(WebrtcEvent event) async {
-    onWebrtcEvent(event);
-  }
-
-  onInitiator(WebrtcEvent event) async {
-    onWebrtcEvent(event);
-  }
-
-  onAddStream(WebrtcEvent event) async {
-    onWebrtcEvent(event);
-  }
-
-  onRemoveStream(WebrtcEvent event) async {
-    onWebrtcEvent(event);
-  }
-
-  onTrack(WebrtcEvent event) async {
-    onWebrtcEvent(event);
-  }
-
-  onAddTrack(WebrtcEvent event) async {
-    onWebrtcEvent(event);
-  }
-
-  onRemoveTrack(WebrtcEvent event) async {
-    onWebrtcEvent(event);
-  }
 
   removeTrack(String peerId, MediaStream stream, MediaStreamTrack track,
       {required String clientId}) async {
