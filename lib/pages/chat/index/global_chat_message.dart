@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/signalprotocol.dart';
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
@@ -10,17 +12,22 @@ import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/channel_chat_message.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/service/p2p/security_context.dart';
+import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/transport/smsclient.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
+import 'package:telephony/telephony.dart';
 
 ///跟踪影响全局的消息到来，对不同类型的消息进行分派
 class GlobalChatMessage {
@@ -35,6 +42,9 @@ class GlobalChatMessage {
     chainMessageListen = chatAction.receiveStreamController.stream
         .listen((ChainMessage chainMessage) {
       onChat(chainMessage);
+    });
+    smsClient.smsMessageStreamController.stream.listen((SmsMessage smsMessage) {
+      onSmsMessage(smsMessage);
     });
   }
 
@@ -92,6 +102,53 @@ class GlobalChatMessage {
       receiveChatMessage(chatMessage);
     } else {
       logger.e('onChat response chatMessage parse failure');
+    }
+  }
+
+  ///接收到加密的短信
+  onSmsMessage(SmsMessage smsMessage) async {
+    var mobile = smsMessage.address;
+    String? body = smsMessage.body;
+    if (body == null) {
+      return;
+    }
+    logger
+        .i('${DateTime.now().toUtc()}:got a message from mobile: $mobile sms');
+    List<Linkman> linkmen = await linkmanService.findByMobile(mobile!);
+    if (linkmen.isEmpty) {
+      return;
+    }
+    Linkman? linkman = linkmen[0];
+    onLinkmanSmsMessage(linkman, body);
+  }
+
+  onLinkmanSmsMessage(Linkman linkman, String text) async {
+    var peerId = linkman.peerId;
+    var clientId = linkman.clientId;
+    Uint8List data = CryptoUtil.decodeBase64(text);
+    int cryptOption = data[data.length - 1];
+    SecurityContextService? securityContextService =
+        ServiceLocator.securityContextServices[cryptOption];
+    securityContextService =
+        securityContextService ?? noneSecurityContextService;
+    SecurityContext securityContext = SecurityContext();
+    securityContext.srcPeerId = peerId;
+    securityContext.targetClientId = clientId;
+    securityContext.payload = data.sublist(0, data.length - 1);
+    bool result = await securityContextService.decrypt(securityContext);
+    if (result) {
+      text = CryptoUtil.utf8ToString(securityContext.payload);
+      ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+        receiverPeerId: myself.peerId,
+        receiverName: myself.name,
+        content: text,
+        transportType: TransportType.sms,
+      );
+      chatMessage.senderPeerId = linkman.peerId;
+      chatMessage.senderClientId = linkman.clientId;
+      chatMessage.senderName = linkman.name;
+      chatMessage.transportType = TransportType.sms.name;
+      receiveChatMessage(chatMessage);
     }
   }
 

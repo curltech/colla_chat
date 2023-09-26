@@ -7,6 +7,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/extended_text_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/message/message_widget.dart';
+import 'package:colla_chat/pages/chat/index/global_chat_message.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -22,6 +23,7 @@ import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.da
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:record/record.dart';
+import 'package:telephony/telephony.dart';
 
 ///发送文本消息的输入框和按钮，
 ///包括声音按钮，扩展文本输入框，emoji按钮，其他多种格式输入按钮和发送按钮
@@ -277,7 +279,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
         await linkmanService.findCachedOneByPeerId(chatSummary.peerId!);
     String text = widget.textEditingController.text;
     if (linkman != null && text.isNotEmpty) {
-      smsClient.receiveChatMessage(linkman, text);
+      await globalChatMessage.onLinkmanSmsMessage(linkman, text);
     }
     widget.textEditingController.clear();
   }

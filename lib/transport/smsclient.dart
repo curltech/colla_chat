@@ -1,13 +1,9 @@
-import 'dart:typed_data';
+import 'dart:async';
 
 import 'package:colla_chat/crypto/util.dart';
-import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
-import 'package:colla_chat/pages/chat/index/global_chat_message.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/service/servicelocator.dart';
@@ -23,6 +19,8 @@ onBackgroundMessage(SmsMessage message) async {
 class SmsClient extends IWebClient {
   final Telephony telephony = Telephony.backgroundInstance;
   SmsSendStatusListener? listener;
+  StreamController<SmsMessage> smsMessageStreamController =
+      StreamController<SmsMessage>();
 
   SmsClient() {
     listener = (SendStatus status) {
@@ -33,6 +31,11 @@ class SmsClient extends IWebClient {
           onMessage(message);
         },
         onBackgroundMessage: onBackgroundMessage);
+  }
+
+  ///接收到加密的短信
+  onMessage(SmsMessage smsMessage) async {
+    smsMessageStreamController.add(smsMessage);
   }
 
   Future<bool> sendMsg(String message, String mobile,
@@ -99,54 +102,6 @@ class SmsClient extends IWebClient {
         sortOrder: [OrderBy(ConversationColumn.THREAD_ID, sort: Sort.ASC)]);
 
     return messages;
-  }
-
-  ///接收到加密的短信
-  onMessage(SmsMessage message) async {
-    var mobile = message.address;
-    String? body = message.body;
-    if (body == null) {
-      return;
-    }
-    logger
-        .i('${DateTime.now().toUtc()}:got a message from mobile: $mobile sms');
-    List<Linkman> linkmen = await linkmanService.findByMobile(mobile!);
-    if (linkmen.isEmpty) {
-      return;
-    }
-    Linkman? linkman = linkmen[0];
-    receiveChatMessage(linkman, body);
-  }
-
-  ///接收到加密的短信内容
-  receiveChatMessage(Linkman linkman, String message) async {
-    var peerId = linkman.peerId;
-    var clientId = linkman.clientId;
-    Uint8List data = CryptoUtil.decodeBase64(message);
-    int cryptOption = data[data.length - 1];
-    SecurityContextService? securityContextService =
-        ServiceLocator.securityContextServices[cryptOption];
-    securityContextService =
-        securityContextService ?? noneSecurityContextService;
-    SecurityContext securityContext = SecurityContext();
-    securityContext.srcPeerId = peerId;
-    securityContext.targetClientId = clientId;
-    securityContext.payload = data.sublist(0, data.length - 1);
-    bool result = await securityContextService.decrypt(securityContext);
-    if (result) {
-      message = CryptoUtil.utf8ToString(securityContext.payload);
-      ChatMessage chatMessage = await chatMessageService.buildChatMessage(
-        receiverPeerId: myself.peerId,
-        receiverName: myself.name,
-        content: message,
-        transportType: TransportType.sms,
-      );
-      chatMessage.senderPeerId = linkman.peerId;
-      chatMessage.senderClientId = linkman.clientId;
-      chatMessage.senderName = linkman.name;
-      chatMessage.transportType = TransportType.sms.name;
-      globalChatMessage.receiveChatMessage(chatMessage);
-    }
   }
 
   dynamic sendMessage(dynamic data, String targetPeerId, String targetClientId,
