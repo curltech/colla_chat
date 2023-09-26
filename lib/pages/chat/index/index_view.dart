@@ -11,7 +11,8 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/index/adaptive_layout_index.dart';
-import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/index/global_chat_message.dart';
+import 'package:colla_chat/pages/chat/index/global_webrtc_event.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/login/loading.dart';
 import 'package:colla_chat/platform.dart';
@@ -61,6 +62,7 @@ class _IndexViewState extends State<IndexView>
   final CustomSpecialTextSpanBuilder customSpecialTextSpanBuilder =
       CustomSpecialTextSpanBuilder();
   ChatMessage? chatMessage;
+
   ConferenceChatMessageController conferenceChatMessageController =
       ConferenceChatMessageController();
 
@@ -68,17 +70,27 @@ class _IndexViewState extends State<IndexView>
   Widget bannerAvatarImage = AppImage.mdAppImage;
 
   StreamSubscription? _intentDataStreamSubscription;
+  StreamSubscription<ChatMessage>? chatMessageStreamSubscription;
+  StreamSubscription<WebrtcEvent>? errorWebrtcEventStreamSubscription;
   List<SharedFile>? _sharedFiles;
 
   @override
   void initState() {
     super.initState();
     _initShare();
-    globalChatMessageController.addListener(_updateGlobalChatMessage);
+    chatMessageStreamSubscription = globalChatMessage
+        .chatMessageStreamController.stream
+        .listen((ChatMessage chatMessage) {
+      _updateGlobalChatMessage(chatMessage);
+    });
     myself.addListener(_update);
     appDataProvider.addListener(_update);
-    globalWebrtcEventController.onWebrtcSignal = _onWebrtcSignal;
-    globalWebrtcEventController.onWebrtcErrorSignal = _onWebrtcErrorSignal;
+    globalWebrtcEvent.onWebrtcSignal = _onWebrtcSignal;
+    errorWebrtcEventStreamSubscription = globalWebrtcEvent
+        .errorWebrtcEventStreamController.stream
+        .listen((WebrtcEvent event) {
+      _onWebrtcErrorSignal(event);
+    });
 
     _initSystemTray();
     //_initMobileForegroundTask();
@@ -205,15 +217,8 @@ class _IndexViewState extends State<IndexView>
   }
 
   ///有新消息到来的时候，一般消息直接显示
-  _updateGlobalChatMessage() async {
-    ChatMessage? chatMessage = globalChatMessageController.chatMessage;
-    if (chatMessage == null) {
-      this.chatMessage = null;
-      await conferenceChatMessageController.close();
-      return;
-    }
+  _updateGlobalChatMessage(ChatMessage chatMessage) async {
     String? subMessageType = chatMessage.subMessageType;
-
     String senderPeerId = chatMessage.senderPeerId!;
     String? groupId = chatMessage.groupId;
     Linkman? linkman = await linkmanService.findCachedOneByPeerId(senderPeerId);
@@ -295,8 +300,10 @@ class _IndexViewState extends State<IndexView>
               }
 
               banner = InkWell(
-                  onTap: () {
+                  onTap: () async {
                     chatMessageVisible.value = false;
+                    chatMessage = null;
+                    await conferenceChatMessageController.close();
                   },
                   child: Column(children: [
                     Container(
@@ -324,8 +331,10 @@ class _IndexViewState extends State<IndexView>
                   ]));
 
               //延时30秒后一般消息消失
-              Future.delayed(const Duration(seconds: 30)).then((value) {
+              Future.delayed(const Duration(seconds: 30)).then((value) async {
                 chatMessageVisible.value = false;
+                chatMessage = null;
+                await conferenceChatMessageController.close();
               });
             }
           }
@@ -608,7 +617,7 @@ class _IndexViewState extends State<IndexView>
     var provider = Consumer3<AppDataProvider, IndexWidgetProvider, Myself>(
         builder:
             (context, appDataProvider, indexWidgetProvider, myself, child) {
-          return _createScaffold(context, indexWidgetProvider);
+      return _createScaffold(context, indexWidgetProvider);
       // return mobileForegroundTask.withForegroundTask(
       //     child: _createScaffold(context, indexWidgetProvider));
     });
@@ -617,12 +626,15 @@ class _IndexViewState extends State<IndexView>
 
   @override
   void dispose() {
-    globalChatMessageController.removeListener(_updateGlobalChatMessage);
+    chatMessageStreamSubscription?.cancel();
+    chatMessageStreamSubscription = null;
     myself.removeListener(_update);
     appDataProvider.removeListener(_update);
     _intentDataStreamSubscription?.cancel();
-    globalWebrtcEventController.onWebrtcSignal = null;
-    globalWebrtcEventController.onWebrtcErrorSignal = null;
+    _intentDataStreamSubscription = null;
+    globalWebrtcEvent.onWebrtcSignal = null;
+    errorWebrtcEventStreamSubscription?.cancel();
+    errorWebrtcEventStreamSubscription = null;
     _stop();
     // mobileForegroundTask.stop();
     super.dispose();

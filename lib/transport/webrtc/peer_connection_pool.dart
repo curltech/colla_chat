@@ -1,16 +1,13 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:colla_chat/crypto/signalprotocol.dart';
-import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/p2p/chain/action/signal.dart';
-import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/index/global_webrtc_event.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
@@ -132,6 +129,7 @@ class PeerConnectionPool {
   final Lock _connLock = Lock();
 
   PeerConnectionPool() {
+    /// websocket发来的信号处理
     signalAction.receiveStreamController.stream
         .listen((ChainMessage chainMessage) {
       onSignal(chainMessage);
@@ -502,7 +500,7 @@ class PeerConnectionPool {
           name: name,
           eventType: WebrtcEventType.signal,
           data: signal);
-      await globalWebrtcEventController.receiveErrorSignal(webrtcEvent);
+      globalWebrtcEvent.errorWebrtcEventStreamController.add(webrtcEvent);
     }
     //收到被叫的answer，正常情况下能找到合适的主叫
     // else if ((signalType == SignalType.sdp.name &&
@@ -530,8 +528,7 @@ class PeerConnectionPool {
             name: name,
             eventType: WebrtcEventType.signal,
             data: signal);
-        bool allowed =
-            await globalWebrtcEventController.receiveWebrtcSignal(webrtcEvent);
+        bool allowed = await globalWebrtcEvent.receiveWebrtcSignal(webrtcEvent);
         if (allowed) {
           Uint8List? aesKey = extension?.aesKey;
           advancedPeerConnection = await createAnswer(peerId,
@@ -594,8 +591,6 @@ class PeerConnectionPool {
     }
     return false;
   }
-
-
 
   removeTrack(String peerId, MediaStream stream, MediaStreamTrack track,
       {required String clientId}) async {

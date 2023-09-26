@@ -7,7 +7,6 @@ import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:glassmorphism_widgets/src/glass_bottom_bar.dart';
 
 class NeumorphicWidgetFactory extends WidgetFactory {
   NeumorphicTheme buildTheme(Widget child) {

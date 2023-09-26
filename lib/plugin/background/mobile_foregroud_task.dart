@@ -4,10 +4,7 @@ import 'dart:ui';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_background_service/flutter_background_service.dart';
-import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
 ///支持android和ios，在单独线程中执行一些前台任务

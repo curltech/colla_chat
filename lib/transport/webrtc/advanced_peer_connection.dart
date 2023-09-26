@@ -3,9 +3,8 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
-import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/p2p/chain/action/signal.dart';
-import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/index/global_chat_message.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
@@ -50,7 +49,7 @@ class AdvancedPeerConnection {
       webrtcEventStreamControllers[webrtcEventType] =
           StreamController<WebrtcEvent>.broadcast();
     }
-    listen(WebrtcEventType.message, onMessage);
+    listen(WebrtcEventType.message, globalChatMessage.onMessage);
     listen(WebrtcEventType.initiator, onInitiator);
     listen(WebrtcEventType.connected, onConnected);
     listen(WebrtcEventType.connectionState, onConnectionState);
@@ -306,30 +305,13 @@ class AdvancedPeerConnection {
     return false;
   }
 
-  /// 收到数据，先解密，然后转换成还原utf-8字符串，再将json字符串变成map对象
-  /// 收到发来的ChatMessage的payload（map对象），进行后续的action处理
-  onMessage(WebrtcEvent event) async {
-    List<int> data = event.data;
-    ChatMessage? chatMessage = await chatMessageService.decrypt(data);
-    if (chatMessage != null) {
-      //对消息进行业务处理
-      chatMessage.transportType = TransportType.webrtc.name;
-      await globalChatMessageController.receiveChatMessage(chatMessage);
-    } else {
-      logger.e('Received chatMessage but decrypt failure');
-    }
-  }
-
   ///连接成功
   ///webrtc连接完成后首先交换最新的联系人信息，然后请求新的订阅渠道消息
   ///然后交换棘轮加密的密钥
   onConnected(WebrtcEvent event) async {
-    globalChatMessageController.sendModifyLinkman(event.peerId,
-        clientId: event.clientId);
-    globalChatMessageController.sendGetChannel(event.peerId,
-        clientId: event.clientId);
-    globalChatMessageController.sendPreKeyBundle(event.peerId,
-        clientId: event.clientId);
+    globalChatMessage.sendModifyLinkman(event.peerId, clientId: event.clientId);
+    globalChatMessage.sendGetChannel(event.peerId, clientId: event.clientId);
+    globalChatMessage.sendPreKeyBundle(event.peerId, clientId: event.clientId);
     chatMessageService.sendUnsent(receiverPeerId: event.peerId);
   }
 

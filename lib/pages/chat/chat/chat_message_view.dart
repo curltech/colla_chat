@@ -22,7 +22,6 @@ import 'package:colla_chat/service/chat/chat_summary.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/date_util.dart';
-import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/openai/openai_chat_gpt.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';

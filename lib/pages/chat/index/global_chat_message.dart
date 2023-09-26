@@ -20,152 +20,34 @@ import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
-import 'package:fluent_ui/fluent_ui.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
-import 'package:synchronized/synchronized.dart';
-
-class AllowedResult {
-  bool allowed;
-  DateTime timestamp;
-
-  AllowedResult(this.allowed, this.timestamp);
-}
-
-///跟踪影响全局的webrtc事件到来，对不同类型的事件进行分派
-class GlobalWebrtcEventController with ChangeNotifier {
-  Future<bool?> Function(WebrtcEvent webrtcEvent)? onWebrtcSignal;
-  Future<void> Function(WebrtcEvent webrtcEvent)? onWebrtcErrorSignal;
-  Map<String, AllowedResult> results = {};
-  Lock lock = Lock();
-
-  ///跟踪影响全局的webrtc协商信号事件到来，对不同类型的事件进行分派
-  ///目前用于处理对方的webrtc呼叫是否被允许
-  Future<bool> receiveWebrtcSignal(WebrtcEvent webrtcEvent) async {
-    bool allowed;
-    String peerId = webrtcEvent.peerId;
-    String name = webrtcEvent.name;
-    String clientId = webrtcEvent.clientId;
-
-    Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
-    if (linkman != null) {
-      ///呼叫者本地存在
-      if (linkman.linkmanStatus == LinkmanStatus.friend.name) {
-        ///如果是好友，则直接接受
-        return true;
-      } else if (linkman.linkmanStatus == LinkmanStatus.blacklist.name) {
-        ///如果是黑名单，则直接拒绝
-        return false;
-      }
-    } else {
-      // Linkman linkman = Linkman(peerId, name);
-      // linkman.clientId = clientId;
-      // linkman.peerPublicKey = peerId;
-      // linkmanService.store(linkman);
-    }
-
-    ///linkman不存在，或者既不是好友也不是黑名单，由外部接口判断
-    allowed = await lock.synchronized(() async {
-      ///如果保存的判断结果是24小时之内
-      if (results.containsKey(peerId)) {
-        bool a = results[peerId]!.allowed;
-        DateTime t = results[peerId]!.timestamp;
-        t = t.add(const Duration(hours: 24));
-        DateTime c = DateTime.now();
-        if (t.isAfter(c)) {
-          return a;
-        }
-      }
-
-      ///否则重新判断
-      if (onWebrtcSignal != null) {
-        bool? a = await onWebrtcSignal!(webrtcEvent);
-        a ??= true;
-        results[peerId] = AllowedResult(a, DateTime.now());
-
-        return a;
-      }
-      return true;
-    });
-
-    return allowed;
-  }
-
-  ///接收到webrtc的错误信号
-  Future<void> receiveErrorSignal(WebrtcEvent webrtcEvent) async {
-    String peerId = webrtcEvent.peerId;
-    String name = webrtcEvent.name;
-    String clientId = webrtcEvent.clientId;
-    WebrtcEventType eventType = webrtcEvent.eventType;
-    if (eventType == WebrtcEventType.signal) {
-      WebrtcSignal signal = webrtcEvent.data;
-      if (signal.signalType == SignalType.error.name) {
-        if (onWebrtcErrorSignal != null) {
-          await onWebrtcErrorSignal!(webrtcEvent);
-        }
-      }
-    }
-  }
-}
-
-final GlobalWebrtcEventController globalWebrtcEventController =
-    GlobalWebrtcEventController();
 
 ///跟踪影响全局的消息到来，对不同类型的消息进行分派
-class GlobalChatMessageController with ChangeNotifier {
-  //最新的到来消息
-  ChatMessage? _chatMessage;
+class GlobalChatMessage {
+  StreamController<ChatMessage> chatMessageStreamController =
+      StreamController<ChatMessage>.broadcast();
 
-  /// websocket onChat传来的消息
+  /// 订阅websocket onChat传来的消息
   StreamSubscription<ChainMessage>? chainMessageListen;
 
-  final Map<String, List<Function(ChatMessage chatMessage)>> _receivers = {};
-
-  GlobalChatMessageController() {
+  GlobalChatMessage() {
+    /// websocket转发的聊天消息处理
     chainMessageListen = chatAction.receiveStreamController.stream
         .listen((ChainMessage chainMessage) {
       onChat(chainMessage);
     });
   }
 
-  ///注册消息接收监听器，用于自定义的特殊处理
-  registerReceiver(
-      String subMessageType, Function(ChatMessage chatMessage) fn) {
-    List<Function(ChatMessage chatMessage)>? fns = _receivers[subMessageType];
-    if (fns == null) {
-      fns = <Function(ChatMessage chatMessage)>[];
-      _receivers[subMessageType] = fns;
+  /// 从AdvancedPeerConnection收到消息事件，先解密数据，然后转换成chatMessage
+  onMessage(WebrtcEvent event) async {
+    List<int> data = event.data;
+    ChatMessage? chatMessage = await chatMessageService.decrypt(data);
+    if (chatMessage != null) {
+      chatMessage.transportType = TransportType.webrtc.name;
+      receiveChatMessage(chatMessage);
+    } else {
+      logger.e('Received chatMessage but decrypt failure');
     }
-    if (!fns.contains(fn)) {
-      fns.add(fn);
-    }
-  }
-
-  unregisterReceiver(
-      String subMessageType, Function(ChatMessage chatMessage) fn) {
-    List<Function(ChatMessage chatMessage)>? fns = _receivers[subMessageType];
-    if (fns != null) {
-      if (fns.contains(fn)) {
-        fns.remove(fn);
-        if (fns.isEmpty) {
-          _receivers.remove(subMessageType);
-        }
-      }
-    }
-  }
-
-  callReceiver(ChatMessage chatMessage) async {
-    //调用注册的消息接收监听器，用于自定义的特殊处理
-    List<Function(ChatMessage chatMessage)>? fns =
-        _receivers[chatMessage.subMessageType];
-    if (fns != null && fns.isNotEmpty) {
-      for (var fn in fns) {
-        fn(chatMessage);
-      }
-    }
-  }
-
-  ChatMessage? get chatMessage {
-    return _chatMessage;
   }
 
   Future<bool> _allowedChatMessage(ChainMessage chainMessage) async {
@@ -189,7 +71,7 @@ class GlobalChatMessageController with ChangeNotifier {
     return true;
   }
 
-  ///从websocket的ChainMessage方式，chatAction接收到的ChatMessage
+  /// 从websocket的ChainMessage方式，chatAction接收到的ChatMessage
   Future<void> onChat(ChainMessage chainMessage) async {
     bool allowed = await _allowedChatMessage(chainMessage);
     if (!allowed) {
@@ -197,20 +79,19 @@ class GlobalChatMessageController with ChangeNotifier {
       return;
     }
 
-    ///如果是密文发送，chat无需加密的情况下，对群发的时候统一加密有帮助
+    /// 如果是密文发送，chat无需加密的情况下，对群发的时候统一加密有帮助
+    ChatMessage? chatMessage;
     if (chainMessage.payloadType == PayloadType.list.name) {
-      ChatMessage? msg = await chatMessageService.decrypt(chainMessage.payload);
-      if (msg != null) {
-        msg.transportType = TransportType.websocket.name;
-        await receiveChatMessage(msg);
-      } else {
-        logger.e('onChat response decrypt failure');
-      }
+      chatMessage = await chatMessageService.decrypt(chainMessage.payload);
     } else if (chainMessage.payloadType == PayloadType.chatMessage.name) {
       ///如果是明文发送，chat自己加密的情况下
-      ChatMessage chatMessage = ChatMessage.fromJson(chainMessage.payload);
+      chatMessage = ChatMessage.fromJson(chainMessage.payload);
+    }
+    if (chatMessage != null) {
       chatMessage.transportType = TransportType.websocket.name;
-      await receiveChatMessage(chatMessage);
+      receiveChatMessage(chatMessage);
+    } else {
+      logger.e('onChat response chatMessage parse failure');
     }
   }
 
@@ -222,7 +103,6 @@ class GlobalChatMessageController with ChangeNotifier {
     if (savedChatMessage == null) {
       logger.e('new or original chatMessage save fail');
     }
-    _chatMessage = chatMessage;
     String messageId = chatMessage.messageId!;
     String peerId = chatMessage.senderPeerId!;
     String? title = chatMessage.title;
@@ -284,8 +164,8 @@ class GlobalChatMessageController with ChangeNotifier {
       default:
         break;
     }
-    //调用注册的消息接收监听器，用于自定义的特殊处理
-    await callReceiver(chatMessage);
+
+    chatMessageStreamController.add(chatMessage);
     //对于接收到的非系统消息，如果消息控制器的目标与发送者相同，进行刷新
     //由于此处刷新了消息控制器，所以对非系统消息，不能同时监听chatMessageController和globalChatMessageController
     //否则会出现消息的重复
@@ -296,7 +176,6 @@ class GlobalChatMessageController with ChangeNotifier {
         chatMessageController.notifyListeners();
       }
     }
-    notifyListeners();
   }
 
   _receiveChatReceipt(ChatMessage chatMessage) async {
@@ -390,7 +269,7 @@ class GlobalChatMessageController with ChangeNotifier {
     }
   }
 
-  ///收到webrtc signal消息
+  /// 收到webrtc signal消息
   _receiveSignal(ChatMessage chatMessage) async {
     var json = chatMessageService.recoverContent(chatMessage.content!);
     String peerId = chatMessage.senderPeerId!;
@@ -431,5 +310,4 @@ class GlobalChatMessageController with ChangeNotifier {
 }
 
 ///收到的最新消息
-final GlobalChatMessageController globalChatMessageController =
-    GlobalChatMessageController();
+final GlobalChatMessage globalChatMessage = GlobalChatMessage();

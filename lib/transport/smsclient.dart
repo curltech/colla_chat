@@ -4,7 +4,7 @@ import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
-import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/index/global_chat_message.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
@@ -145,7 +145,7 @@ class SmsClient extends IWebClient {
       chatMessage.senderClientId = linkman.clientId;
       chatMessage.senderName = linkman.name;
       chatMessage.transportType = TransportType.sms.name;
-      globalChatMessageController.receiveChatMessage(chatMessage);
+      globalChatMessage.receiveChatMessage(chatMessage);
     }
   }
 

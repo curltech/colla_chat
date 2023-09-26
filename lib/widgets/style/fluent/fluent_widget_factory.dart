@@ -268,6 +268,7 @@ class FluentWidgetFactory extends WidgetFactory {
     );
   }
 
+  @override
   Widget button({
     Key? key,
     Widget? child,
@@ -315,6 +316,7 @@ class FluentWidgetFactory extends WidgetFactory {
     );
   }
 
+  @override
   Widget text(
     String data, {
     Key? key,
@@ -331,6 +333,7 @@ class FluentWidgetFactory extends WidgetFactory {
     );
   }
 
+  @override
   icon(
     IconData icon, {
     Key? key,
@@ -592,6 +595,7 @@ class FluentWidgetFactory extends WidgetFactory {
     );
   }
 
+  @override
   PreferredSizeWidget appBar({
     Key? key,
     Widget? leading,

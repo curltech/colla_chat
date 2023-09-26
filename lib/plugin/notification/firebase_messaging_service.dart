@@ -4,7 +4,6 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 ///顶级函数用于处理后台或者终止的应用的消息通知处理
@@ -94,6 +93,7 @@ class FirebaseMessagingService {
 
       return _apnsToken;
     }
+    return null;
   }
 
   ///app被重新打开时调用，获取初始通知消息

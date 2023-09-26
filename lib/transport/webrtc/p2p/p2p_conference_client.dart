@@ -10,10 +10,8 @@ import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controller.dart';
-import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:synchronized/synchronized.dart';
 
