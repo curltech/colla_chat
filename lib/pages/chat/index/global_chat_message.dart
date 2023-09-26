@@ -54,6 +54,7 @@ class GlobalChatMessage {
     ChatMessage? chatMessage = await chatMessageService.decrypt(data);
     if (chatMessage != null) {
       chatMessage.transportType = TransportType.webrtc.name;
+      logger.w('got a webrtcEvent chatMessage from webrtc');
       _receiveChatMessage(chatMessage);
     } else {
       logger.e('Received chatMessage but decrypt failure');
@@ -83,6 +84,7 @@ class GlobalChatMessage {
 
   /// 从websocket的ChainMessage方式，chatAction接收到的ChatMessage
   Future<void> onChat(ChainMessage chainMessage) async {
+    logger.w('got a chainMessage from websocket');
     bool allowed = await _allowedChatMessage(chainMessage);
     if (!allowed) {
       logger.e('chainMessage is not allowed receive');
@@ -99,6 +101,7 @@ class GlobalChatMessage {
     }
     if (chatMessage != null) {
       chatMessage.transportType = TransportType.websocket.name;
+      logger.w('got a chatMessage from websocket');
       _receiveChatMessage(chatMessage);
     } else {
       logger.e('onChat response chatMessage parse failure');
@@ -112,8 +115,7 @@ class GlobalChatMessage {
     if (body == null) {
       return;
     }
-    logger
-        .i('${DateTime.now().toUtc()}:got a message from mobile: $mobile sms');
+    logger.w('got a message from mobile: $mobile sms');
     List<Linkman> linkmen = await linkmanService.findByMobile(mobile!);
     if (linkmen.isEmpty) {
       return;
@@ -148,6 +150,7 @@ class GlobalChatMessage {
       chatMessage.senderClientId = linkman.clientId;
       chatMessage.senderName = linkman.name;
       chatMessage.transportType = TransportType.sms.name;
+      logger.w('got a chatMessage from sms');
       _receiveChatMessage(chatMessage);
     }
   }
