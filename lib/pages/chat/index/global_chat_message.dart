@@ -54,7 +54,7 @@ class GlobalChatMessage {
     ChatMessage? chatMessage = await chatMessageService.decrypt(data);
     if (chatMessage != null) {
       chatMessage.transportType = TransportType.webrtc.name;
-      receiveChatMessage(chatMessage);
+      _receiveChatMessage(chatMessage);
     } else {
       logger.e('Received chatMessage but decrypt failure');
     }
@@ -99,7 +99,7 @@ class GlobalChatMessage {
     }
     if (chatMessage != null) {
       chatMessage.transportType = TransportType.websocket.name;
-      receiveChatMessage(chatMessage);
+      _receiveChatMessage(chatMessage);
     } else {
       logger.e('onChat response chatMessage parse failure');
     }
@@ -148,12 +148,12 @@ class GlobalChatMessage {
       chatMessage.senderClientId = linkman.clientId;
       chatMessage.senderName = linkman.name;
       chatMessage.transportType = TransportType.sms.name;
-      receiveChatMessage(chatMessage);
+      _receiveChatMessage(chatMessage);
     }
   }
 
   ///跟踪影响全局的消息到来，对不同类型的消息进行分派
-  Future<void> receiveChatMessage(ChatMessage chatMessage) async {
+  Future<void> _receiveChatMessage(ChatMessage chatMessage) async {
     ///保存消息
     ChatMessage? savedChatMessage =
         await chatMessageService.receiveChatMessage(chatMessage);

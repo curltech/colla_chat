@@ -343,7 +343,7 @@ class PeerConnectionPool {
     return peerConnections;
   }
 
-  ///清除过一段时间仍没有连接上的连接
+  /// 清除过一段时间仍没有连接上的连接
   clear() async {
     List<AdvancedPeerConnection> removedPeerConnections = [];
     for (var peerId in _peerConnections.keys()) {
