@@ -252,7 +252,7 @@ class MobileForegroundTaskHandler extends TaskHandler {
     print('MobileForegroundTask started');
     chatAction.receiveStreamController.stream
         .listen((ChainMessage chainMessage) {
-      print('MobileForegroundTaskHandler got a chainMessage from websocket');
+      print('mobileForegroundTaskHandler got a chainMessage from websocket');
     });
   }
 
@@ -292,4 +292,8 @@ void onStart() async {
   WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
   FlutterForegroundTask.setTaskHandler(MobileForegroundTaskHandler());
+  chatAction.receiveStreamController.stream
+      .listen((ChainMessage chainMessage) {
+    print('entry-point onStart got a chainMessage from websocket');
+  });
 }
