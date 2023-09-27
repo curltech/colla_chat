@@ -241,6 +241,9 @@ class MobileForegroundTaskHandler extends TaskHandler {
   void onStart(DateTime timestamp, SendPort? sendPort) async {
     _sendPort = sendPort;
     print('MobileForegroundTask started');
+    Timer.periodic(const Duration(seconds: 1), (timer) async {
+      print('MobileForegroundTask onStart entry-point periodic print');
+    });
   }
 
   // 周期任务调用 [ForegroundTaskOptions].
@@ -279,6 +282,9 @@ class MobileForegroundTaskHandler extends TaskHandler {
 @pragma('vm:entry-point')
 void onStart() async {
   print('MobileForegroundTask entry-point onStart');
+  Timer.periodic(const Duration(seconds: 1), (timer) async {
+    print('MobileForegroundTask entry-point periodic print');
+  });
   WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
   FlutterForegroundTask.setTaskHandler(MobileForegroundTaskHandler());

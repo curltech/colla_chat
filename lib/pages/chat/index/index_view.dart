@@ -93,7 +93,7 @@ class _IndexViewState extends State<IndexView>
     });
 
     _initSystemTray();
-    //_initMobileForegroundTask();
+    _initMobileForegroundTask();
   }
 
   _initMobileForegroundTask() {
@@ -617,9 +617,9 @@ class _IndexViewState extends State<IndexView>
     var provider = Consumer3<AppDataProvider, IndexWidgetProvider, Myself>(
         builder:
             (context, appDataProvider, indexWidgetProvider, myself, child) {
-      return _createScaffold(context, indexWidgetProvider);
-      // return mobileForegroundTask.withForegroundTask(
-      //     child: _createScaffold(context, indexWidgetProvider));
+      // return _createScaffold(context, indexWidgetProvider);
+      return mobileForegroundTask.withForegroundTask(
+          child: _createScaffold(context, indexWidgetProvider));
     });
     return provider;
   }
@@ -636,7 +636,7 @@ class _IndexViewState extends State<IndexView>
     errorWebrtcEventStreamSubscription?.cancel();
     errorWebrtcEventStreamSubscription = null;
     _stop();
-    // mobileForegroundTask.stop();
+    mobileForegroundTask.stop();
     super.dispose();
   }
 }
