@@ -11,6 +11,7 @@ import 'package:colla_chat/p2p/chain/action/chat.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/channel_chat_message.dart';
@@ -43,9 +44,12 @@ class GlobalChatMessage {
         .listen((ChainMessage chainMessage) {
       onChat(chainMessage);
     });
-    smsClient.smsMessageStreamController.stream.listen((SmsMessage smsMessage) {
-      onSmsMessage(smsMessage);
-    });
+    if (platformParams.android) {
+      smsClient.smsMessageStreamController.stream
+          .listen((SmsMessage smsMessage) {
+        onSmsMessage(smsMessage);
+      });
+    }
   }
 
   /// 从AdvancedPeerConnection收到消息事件，先解密数据，然后转换成chatMessage

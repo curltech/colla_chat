@@ -135,7 +135,7 @@ class AdvancedPeerConnection {
     });
 
     basePeerConnection.on(WebrtcEventType.closed, (data) async {
-      _addWebrtcEventType(WebrtcEventType.closed, data);
+      _addWebrtcEventType(WebrtcEventType.closed, this);
     });
 
     //收到数据，带解密功能，取最后一位整数，表示解密选项，得到何种解密方式，然后解密
