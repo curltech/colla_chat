@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'dart:isolate';
 import 'dart:ui';
+import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/p2p/chain/action/chat.dart';
+import 'package:colla_chat/pages/chat/index/global_chat_message.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:flutter/material.dart';
@@ -11,11 +14,13 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 ///只要前台任务运行，则应用不会被关闭
 /// iOS有一些限制：app被强制终止时，设备重启时，任务不会工作，onRepeatEvent可能不能正常工作
 class MobileForegroundTask {
+  void Function()? onRepeatEvent;
+
   ///接收数据端口，接收前台服务任务发送来的数据
   ReceivePort? receivePort;
   AndroidNotificationOptions androidNotificationOptions =
       AndroidNotificationOptions(
-    channelId: 'fCollaChat foreground',
+    channelId: 'CollaChat foreground',
     channelName: 'CollaChat foreground service',
     channelDescription: AppLocalizations.t(
         'This notification appears when the CollaChat foreground service is running.'),
@@ -47,7 +52,8 @@ class MobileForegroundTask {
   String notificationText = AppLocalizations.t('Tap to return to the app');
 
   /// 初始化前台任务
-  init() {
+  _init() async {
+    await _requestPermissionForAndroid();
     FlutterForegroundTask.init(
       androidNotificationOptions: androidNotificationOptions,
       iosNotificationOptions: iosNotificationOptions,
@@ -55,7 +61,7 @@ class MobileForegroundTask {
     );
   }
 
-  Future<void> requestPermissionForAndroid() async {
+  Future<void> _requestPermissionForAndroid() async {
     if (!platformParams.android) {
       return;
     }
@@ -81,7 +87,10 @@ class MobileForegroundTask {
   }
 
   /// 手工启动任务
-  Future<bool> start() async {
+  Future<bool> start({void Function()? onRepeatEvent}) async {
+    this.onRepeatEvent = onRepeatEvent;
+    await _init();
+
     /// 启动前台任务前注册接收端口
     final ReceivePort? receivePort = FlutterForegroundTask.receivePort;
     final bool isRegistered = _registerReceivePort(receivePort);
@@ -241,18 +250,18 @@ class MobileForegroundTaskHandler extends TaskHandler {
   void onStart(DateTime timestamp, SendPort? sendPort) async {
     _sendPort = sendPort;
     print('MobileForegroundTask started');
-    Timer.periodic(const Duration(seconds: 1), (timer) async {
-      print('MobileForegroundTask onStart entry-point periodic print');
+    chatAction.receiveStreamController.stream
+        .listen((ChainMessage chainMessage) {
+      print('MobileForegroundTaskHandler got a chainMessage from websocket');
     });
   }
 
   // 周期任务调用 [ForegroundTaskOptions].
   @override
   void onRepeatEvent(DateTime timestamp, SendPort? sendPort) async {
-    print('MobileForegroundTask onRepeatEvent');
-    // 发送数据给主线程
-    sendPort?.send(timestamp.toIso8601String());
-    print('MobileForegroundTask send data');
+    if (mobileForegroundTask.onRepeatEvent != null) {
+      mobileForegroundTask.onRepeatEvent!();
+    }
   }
 
   /// 通知按钮被按的时候调用，android平台
@@ -274,17 +283,12 @@ class MobileForegroundTaskHandler extends TaskHandler {
     print('MobileForegroundTask onNotificationPressed');
     // 应用退出的时候重启应用，并且发送数据到应用
     FlutterForegroundTask.launchApp();
-    print('MobileForegroundTask launchApp');
   }
 }
 
 ///服务线程启动，在单独的服务线程中执行的代码
 @pragma('vm:entry-point')
 void onStart() async {
-  print('MobileForegroundTask entry-point onStart');
-  Timer.periodic(const Duration(seconds: 1), (timer) async {
-    print('MobileForegroundTask entry-point periodic print');
-  });
   WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
   FlutterForegroundTask.setTaskHandler(MobileForegroundTaskHandler());

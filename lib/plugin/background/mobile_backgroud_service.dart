@@ -10,9 +10,12 @@ import 'package:flutter_background_service_android/flutter_background_service_an
 ///支持android和ios，在单独线程中执行一些任务
 class MobileBackgroundService {
   final FlutterBackgroundService service = FlutterBackgroundService();
+  void Function()? onRepeatEvent;
+  int interval = 5000;
 
-  ///初始化后台服务，并启动
-  Future<bool> start() async {
+  /// 初始化后台服务，并启动
+  Future<bool> start({void Function()? onRepeatEvent}) async {
+    this.onRepeatEvent = onRepeatEvent;
     await service.configure(
       androidConfiguration: AndroidConfiguration(
         // 无论应用在前台还是后台，都在独立的线程中执行
@@ -75,15 +78,12 @@ Future<bool> onIosBackground(ServiceInstance service) async {
   WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
 
-  print('ios background:${DateTime.now().toIso8601String()}');
-
   return true;
 }
 
 ///服务线程启动，在单独的服务线程中执行的代码
 @pragma('vm:entry-point')
 void onStart(ServiceInstance service) async {
-  logger.i('onStart:${DateTime.now().toIso8601String()}');
   DartPluginRegistrant.ensureInitialized();
 
   ///注册方法事件，服务接收到方法数据调用方法设置服务的前台或者后台模式
@@ -106,37 +106,11 @@ void onStart(ServiceInstance service) async {
     service.stopSelf();
   });
 
-  /// 每隔1s判断是否是前台服务，如果是，设置前台的通知内容（左上角）
-  Timer.periodic(const Duration(seconds: 1), (timer) async {
-    if (service is AndroidServiceInstance) {
-      if (await service.isForegroundService()) {
-        ///这里可以显示本地通知
-        service.setForegroundNotificationInfo(
-          title: "CollaChat Service",
-          content: "Updated at ${DateTime.now()}",
-        );
-      }
+  /// 每隔5s判断是否是前台服务，如果是，设置前台的通知内容（左上角）
+  Timer.periodic(Duration(milliseconds: mobileBackgroundService.interval),
+      (timer) async {
+    if (mobileBackgroundService.onRepeatEvent != null) {
+      mobileBackgroundService.onRepeatEvent!();
     }
-
-    // test using external plugin
-    final deviceInfo = DeviceInfoPlugin();
-    String? device;
-    if (platformParams.android) {
-      final androidInfo = await deviceInfo.androidInfo;
-      device = androidInfo.model;
-    }
-
-    if (platformParams.ios) {
-      final iosInfo = await deviceInfo.iosInfo;
-      device = iosInfo.model;
-    }
-
-    service.invoke(
-      'update',
-      {
-        "current_date": DateTime.now().toIso8601String(),
-        "device": device,
-      },
-    );
   });
 }

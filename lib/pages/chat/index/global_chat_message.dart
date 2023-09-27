@@ -36,11 +36,11 @@ class GlobalChatMessage {
       StreamController<ChatMessage>.broadcast();
 
   /// 订阅websocket onChat传来的消息
-  StreamSubscription<ChainMessage>? chainMessageListen;
+  StreamSubscription<ChainMessage>? chainMessageStreamSubscription;
 
   GlobalChatMessage() {
     /// websocket转发的聊天消息处理
-    chainMessageListen = chatAction.receiveStreamController.stream
+    chainMessageStreamSubscription = chatAction.receiveStreamController.stream
         .listen((ChainMessage chainMessage) {
       onChat(chainMessage);
     });

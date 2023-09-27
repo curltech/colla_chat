@@ -99,8 +99,6 @@ class _IndexViewState extends State<IndexView>
   _initMobileForegroundTask() {
     if (platformParams.mobile) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await mobileForegroundTask.requestPermissionForAndroid();
-        mobileForegroundTask.init();
         bool status = await mobileForegroundTask.start();
         logger.w('mobileForegroundTask start status:$status');
       });
