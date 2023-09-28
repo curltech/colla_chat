@@ -66,8 +66,6 @@ class NamespacePrefix {
   }
 }
 
-final Map<MsgType, BaseAction> p2pActions = {};
-
 /// 发送和接受链消息的抽象类
 abstract class BaseAction {
   late MsgType msgType;
@@ -81,7 +79,7 @@ abstract class BaseAction {
       StreamController<ChainMessage>.broadcast();
 
   BaseAction(this.msgType) {
-    p2pActions[msgType] = this;
+    chainMessageHandler.p2pActions[msgType] = this;
     print('register msgType:$msgType');
   }
 

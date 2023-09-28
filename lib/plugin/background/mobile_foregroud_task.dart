@@ -5,6 +5,7 @@ import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/p2p/chain/action/chat.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
+import 'package:colla_chat/p2p/chain/chainmessagehandler.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -290,9 +291,9 @@ void onStart() async {
   WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
   FlutterForegroundTask.setTaskHandler(MobileForegroundTaskHandler());
-  print('onStart start chatAction:${p2pActions.keys}');
+  print('onStart start chatAction:${chainMessageHandler.p2pActions.keys}');
   chatAction.receiveStreamController.stream.listen((ChainMessage chainMessage) {
     print('entry-point onStart got a chainMessage from websocket');
   });
-  print('onStart start chatAction:${p2pActions.keys}');
+  print('onStart start chatAction:${chainMessageHandler.p2pActions.keys}');
 }

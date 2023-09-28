@@ -27,6 +27,7 @@ const webRtcPacketSize = 128 * 1024;
 /// websocket的原始消息的分派处理
 class ChainMessageHandler {
   Key? key;
+  final Map<MsgType, BaseAction> p2pActions = {};
   Map<String, List<ChainMessage>> caches = <String, List<ChainMessage>>{};
 
   /// websocket的原始消息流
