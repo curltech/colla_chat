@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:ui';
-import 'package:colla_chat/platform.dart';
+
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
@@ -24,8 +24,10 @@ class MobileBackgroundService {
         //服务是前台还是后台，前台优先级高
         isForegroundMode: true,
         notificationChannelId: 'CollaChat foreground',
-        initialNotificationTitle: 'CollaChat foreground service',
-        initialNotificationContent: 'CollaChat foreground service initializing',
+        initialNotificationTitle:
+            AppLocalizations.t('CollaChat foreground service'),
+        initialNotificationContent:
+            AppLocalizations.t('CollaChat foreground service initializing'),
         foregroundServiceNotificationId: 8888,
       ),
       iosConfiguration: IosConfiguration(

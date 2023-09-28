@@ -20,7 +20,7 @@ class MobileForegroundTask {
     channelId: 'CollaChat foreground',
     channelName: 'CollaChat foreground service',
     channelDescription: AppLocalizations.t(
-        'This notification appears when the CollaChat foreground service is running.'),
+        'CollaChat foreground service is running'),
     channelImportance: NotificationChannelImportance.HIGH,
     priority: NotificationPriority.MAX,
     iconData: const NotificationIconData(

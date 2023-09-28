@@ -539,5 +539,9 @@
   "PeerConnection initiator was changed to ": "连接主叫状态变成",
   "Delete peer": "删除当前账户",
   "Confirm delete current peer?": "确认删除当前账户?",
-  "You are in conference:": "你正在视频会议中:"
+  "You are in conference:": "你正在视频会议中:",
+  "CollaChat foreground Service is running": "CollaChat前台服务正在运行",
+  "Tap to return to the app": "点击返回app",
+  "CollaChat foreground service": "CollaChat前台服务",
+  "CollaChat foreground service initializing": "CollaChat前台服务正在初始化"
 }
