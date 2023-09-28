@@ -103,6 +103,7 @@
             android:icon="@mipmap/ic_launcher"
             android:label="CollaChat"
             android:largeHeap="true"
+            android:allowBackup="false"
             android:usesCleartextTraffic="true">
         <activity
                 android:name=".MainActivity"
