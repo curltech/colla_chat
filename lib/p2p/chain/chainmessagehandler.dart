@@ -225,10 +225,7 @@ class ChainMessageHandler {
       return;
     }
     BaseAction? action = p2pActions[msgType];
-    if (p2pActions.isEmpty) {
-      logger.e('p2pActions is null');
-      return;
-    }
+    logger.w('p2pActions is ${p2pActions.keys}');
     if (action == null) {
       logger.e('chainMessage has no register msgType p2p action:$typ');
       return;
