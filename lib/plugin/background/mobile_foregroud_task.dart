@@ -291,7 +291,7 @@ void onStart() async {
   WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
   FlutterForegroundTask.setTaskHandler(MobileForegroundTaskHandler());
-  print('onStart start chatAction:${chainMessageHandler.p2pActions.keys}');
+  print('onStart start chatAction:${chainMessageHandler.key}');
   chatAction.receiveStreamController.stream.listen((ChainMessage chainMessage) {
     print('entry-point onStart got a chainMessage from websocket');
   });
