@@ -80,7 +80,6 @@ abstract class BaseAction {
 
   BaseAction(this.msgType) {
     chainMessageHandler.p2pActions[msgType] = this;
-    print('register msgType:$msgType');
   }
 
   ///发送前的预处理，设置消息的初始值

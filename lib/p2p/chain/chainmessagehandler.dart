@@ -18,7 +18,6 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/httpclient.dart';
 import 'package:colla_chat/transport/websocket.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 const packetSize = 4 * 1024 * 1024;
@@ -26,7 +25,6 @@ const webRtcPacketSize = 128 * 1024;
 
 /// websocket的原始消息的分派处理
 class ChainMessageHandler {
-  Key? key;
   final Map<MsgType, BaseAction> p2pActions = {};
   Map<String, List<ChainMessage>> caches = <String, List<ChainMessage>>{};
 
@@ -35,8 +33,6 @@ class ChainMessageHandler {
       StreamController<WebsocketData>();
 
   ChainMessageHandler() {
-    key = UniqueKey();
-    print('ChainMessageHandler key:$key');
     websocketDataStreamController.stream.listen((WebsocketData websocketData) {
       receiveRaw(websocketData);
     });
@@ -230,7 +226,6 @@ class ChainMessageHandler {
       return;
     }
     BaseAction? action = p2pActions[msgType];
-    logger.w('p2pActions is ${p2pActions.keys}');
     if (action == null) {
       logger.e('chainMessage has no register msgType p2p action:$typ');
       return;
