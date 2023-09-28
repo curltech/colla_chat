@@ -250,15 +250,12 @@ class MobileForegroundTaskHandler extends TaskHandler {
   void onStart(DateTime timestamp, SendPort? sendPort) async {
     _sendPort = sendPort;
     print('MobileForegroundTask started');
-    chatAction.receiveStreamController.stream
-        .listen((ChainMessage chainMessage) {
-      print('mobileForegroundTaskHandler got a chainMessage from websocket');
-    });
   }
 
   // 周期任务调用 [ForegroundTaskOptions].
   @override
   void onRepeatEvent(DateTime timestamp, SendPort? sendPort) async {
+    print('onRepeatEvent started');
     if (mobileForegroundTask.onRepeatEvent != null) {
       mobileForegroundTask.onRepeatEvent!();
     }
@@ -292,8 +289,8 @@ void onStart() async {
   WidgetsFlutterBinding.ensureInitialized();
   DartPluginRegistrant.ensureInitialized();
   FlutterForegroundTask.setTaskHandler(MobileForegroundTaskHandler());
-  chatAction.receiveStreamController.stream
-      .listen((ChainMessage chainMessage) {
+  print('onStart start chatAction');
+  chatAction.receiveStreamController.stream.listen((ChainMessage chainMessage) {
     print('entry-point onStart got a chainMessage from websocket');
   });
 }

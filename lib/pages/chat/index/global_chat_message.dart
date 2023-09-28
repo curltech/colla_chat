@@ -40,10 +40,10 @@ class GlobalChatMessage {
 
   GlobalChatMessage() {
     /// websocket转发的聊天消息处理
-    chainMessageStreamSubscription = chatAction.receiveStreamController.stream
-        .listen((ChainMessage chainMessage) {
-      onChat(chainMessage);
-    });
+    // chainMessageStreamSubscription = chatAction.receiveStreamController.stream
+    //     .listen((ChainMessage chainMessage) {
+    //   onChat(chainMessage);
+    // });
     if (platformParams.android) {
       smsClient.smsMessageStreamController.stream
           .listen((SmsMessage smsMessage) {
