@@ -82,6 +82,7 @@ abstract class BaseAction {
 
   BaseAction(this.msgType) {
     p2pActions[msgType] = this;
+    logger.w('register msgType:$msgType');
   }
 
   ///发送前的预处理，设置消息的初始值
