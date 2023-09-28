@@ -18,6 +18,7 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/httpclient.dart';
 import 'package:colla_chat/transport/websocket.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 const packetSize = 4 * 1024 * 1024;
@@ -25,6 +26,7 @@ const webRtcPacketSize = 128 * 1024;
 
 /// websocket的原始消息的分派处理
 class ChainMessageHandler {
+  Key? key;
   Map<String, List<ChainMessage>> caches = <String, List<ChainMessage>>{};
 
   /// websocket的原始消息流
@@ -32,6 +34,8 @@ class ChainMessageHandler {
       StreamController<WebsocketData>();
 
   ChainMessageHandler() {
+    key = UniqueKey();
+    print('ChainMessageHandler key:$key');
     websocketDataStreamController.stream.listen((WebsocketData websocketData) {
       receiveRaw(websocketData);
     });
