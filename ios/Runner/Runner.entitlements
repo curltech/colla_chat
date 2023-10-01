@@ -14,5 +14,7 @@
 	<array>
 		<string>group.io.curltech.colla</string>
 	</array>
+	<key>com.apple.security.network.client</key>
+    <true/>
 </dict>
 </plist>
