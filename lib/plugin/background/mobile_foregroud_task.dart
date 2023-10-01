@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:isolate';
 import 'dart:ui';
+
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -19,8 +20,8 @@ class MobileForegroundTask {
       AndroidNotificationOptions(
     channelId: 'CollaChat foreground',
     channelName: 'CollaChat foreground service',
-    channelDescription: AppLocalizations.t(
-        'CollaChat foreground service is running'),
+    channelDescription:
+        AppLocalizations.t('CollaChat foreground service is running'),
     channelImportance: NotificationChannelImportance.HIGH,
     priority: NotificationPriority.MAX,
     iconData: const NotificationIconData(
@@ -247,6 +248,9 @@ class MobileForegroundTaskHandler extends TaskHandler {
   void onStart(DateTime timestamp, SendPort? sendPort) async {
     _sendPort = sendPort;
     print('MobileForegroundTask started');
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      print('MobileForegroundTask periodic running');
+    });
   }
 
   // 周期任务调用 [ForegroundTaskOptions].

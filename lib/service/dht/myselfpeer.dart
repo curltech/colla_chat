@@ -307,7 +307,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       ///2.启动android后台服务
       if (platformParams.android) {
         try {
-          androidForegroundService.start();
+          androidBackgroundService.start();
         } catch (e) {
           logger.e('androidForegroundService start failure:$e');
         }

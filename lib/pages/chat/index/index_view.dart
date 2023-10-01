@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:colla_chat/constant/base.dart';
@@ -16,7 +17,6 @@ import 'package:colla_chat/pages/chat/index/global_webrtc_event.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/login/loading.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/background/mobile_foregroud_task.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -74,6 +74,9 @@ class _IndexViewState extends State<IndexView>
   StreamSubscription<WebrtcEvent>? errorWebrtcEventStreamSubscription;
   List<SharedFile>? _sharedFiles;
 
+  Socket? _socket;
+  StreamSubscription? _socketStreamSub;
+
   @override
   void initState() {
     super.initState();
@@ -93,16 +96,6 @@ class _IndexViewState extends State<IndexView>
     });
 
     _initSystemTray();
-    _initMobileForegroundTask();
-  }
-
-  _initMobileForegroundTask() {
-    if (platformParams.mobile) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        bool status = await mobileForegroundTask.start();
-        logger.w('mobileForegroundTask start status:$status');
-      });
-    }
   }
 
   Future<bool?> _onWebrtcSignal(WebrtcEvent webrtcEvent) async {
@@ -615,9 +608,7 @@ class _IndexViewState extends State<IndexView>
     var provider = Consumer3<AppDataProvider, IndexWidgetProvider, Myself>(
         builder:
             (context, appDataProvider, indexWidgetProvider, myself, child) {
-      // return _createScaffold(context, indexWidgetProvider);
-      return mobileForegroundTask.withForegroundTask(
-          child: _createScaffold(context, indexWidgetProvider));
+      return _createScaffold(context, indexWidgetProvider);
     });
     return provider;
   }
@@ -634,7 +625,6 @@ class _IndexViewState extends State<IndexView>
     errorWebrtcEventStreamSubscription?.cancel();
     errorWebrtcEventStreamSubscription = null;
     _stop();
-    mobileForegroundTask.stop();
     super.dispose();
   }
 }

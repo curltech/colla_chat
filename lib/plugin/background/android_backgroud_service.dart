@@ -20,7 +20,7 @@ class AndroidBackgroundService {
   );
 
   ///初始化并启动后台运行模式
-  Future<bool> enableBackgroundExecution() async {
+  Future<bool> start() async {
     bool hasPermissions = await FlutterBackground.hasPermissions;
     if (!hasPermissions) {
       return false;
@@ -36,19 +36,23 @@ class AndroidBackgroundService {
   }
 
   ///关闭后台运行模式
-  Future<void> disableBackgroundExecution() async {
+  Future<void> stop() async {
     bool enabled = FlutterBackground.isBackgroundExecutionEnabled;
     if (enabled) {
       await FlutterBackground.disableBackgroundExecution();
     }
+  }
+
+  bool isRunning() {
+    bool enabled = FlutterBackground.isBackgroundExecutionEnabled;
+    return enabled;
   }
 }
 
 final AndroidBackgroundService androidBackgroundService =
     AndroidBackgroundService();
 
-///与AndroidBackgroundService功能相同
-///其功能是维持当前应用的运行，哪怕在后台运行
+///保持app的运行，哪怕是在后台模式下也不会被杀死
 class AndroidForegroundService {
   ///启动前台运行模式
   start() {
