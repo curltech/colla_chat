@@ -11,7 +11,7 @@ import 'package:flutter_background_service_android/flutter_background_service_an
 class MobileBackgroundService {
   final FlutterBackgroundService service = FlutterBackgroundService();
   void Function()? onRepeatEvent;
-  int interval = 5000;
+  int interval = 2000;
 
   /// 初始化后台服务，并启动
   Future<bool> start({void Function()? onRepeatEvent}) async {
@@ -111,6 +111,7 @@ void onStart(ServiceInstance service) async {
   /// 每隔5s判断是否是前台服务，如果是，设置前台的通知内容（左上角）
   Timer.periodic(Duration(milliseconds: mobileBackgroundService.interval),
       (timer) async {
+    print('onStart periodic running');
     if (mobileBackgroundService.onRepeatEvent != null) {
       mobileBackgroundService.onRepeatEvent!();
     }
