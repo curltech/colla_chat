@@ -289,6 +289,8 @@ class OverlayAppWindow {
   }
 }
 
+OverlayAppWindow overlayAppWindow = OverlayAppWindow();
+
 @pragma('vm:entry-point')
 void callBack(String tag) {
   WidgetsFlutterBinding.ensureInitialized();

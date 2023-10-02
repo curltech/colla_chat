@@ -3,6 +3,7 @@ import 'package:colla_chat/pages/chat/me/contact_widget.dart';
 import 'package:colla_chat/pages/chat/me/me_head_widget.dart';
 import 'package:colla_chat/pages/chat/me/media/media_widget.dart';
 import 'package:colla_chat/pages/chat/me/openvpn_widget.dart';
+import 'package:colla_chat/pages/chat/me/overlay_app_window_widget.dart';
 import 'package:colla_chat/pages/chat/me/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_webview_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
@@ -25,6 +26,8 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   final PlatformWebViewWidget webViewWidget = PlatformWebViewWidget();
   final OpenVpnWidget openVpnWidget = const OpenVpnWidget();
   final ContactWidget contactWidget = const ContactWidget();
+  final OverlayAppWindowWidget overlayAppWindowWidget =
+      const OverlayAppWindowWidget();
 
   late final List<TileData> meTileData;
 
@@ -38,6 +41,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     if (platformParams.mobile) {
       indexWidgetProvider.define(contactWidget);
       indexWidgetProvider.define(openVpnWidget);
+      indexWidgetProvider.define(overlayAppWindowWidget);
     }
     List<TileDataMixin> mixins = [
       settingWidget,
@@ -50,6 +54,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
       mixins.addAll([
         contactWidget,
         openVpnWidget,
+        overlayAppWindowWidget,
       ]);
     }
     meTileData = TileData.from(mixins);
