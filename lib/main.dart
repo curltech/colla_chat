@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/background/android_overlay_app_window.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/plugin/notification/firebase_messaging_service.dart';
 import 'package:colla_chat/plugin/notification/local_notifications_service.dart';
@@ -43,6 +44,14 @@ Future<void> setCert() async {
       await PlatformAssetBundle().load('assets/ca/lets-encrypt-r3.pem');
   SecurityContext.defaultContext
       .setTrustedCertificatesBytes(data.buffer.asUint8List());
+}
+
+/// 启动android的系统窗口
+@pragma("vm:entry-point")
+void overlayMain() {
+  if (platformParams.android) {
+    androidOverlayWindow.overlayMain();
+  }
 }
 
 ///应用主函数，使用runApp加载主应用Widget
