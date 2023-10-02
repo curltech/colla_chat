@@ -2,11 +2,12 @@ import 'dart:isolate';
 import 'dart:ui';
 
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:flutter/material.dart';
 import 'package:system_alert_window/system_alert_window.dart';
 import 'package:app_to_foreground/app_to_foreground.dart';
 
-class OverlayAppWindow {
+class AndroidSystemAlertWindow {
   appToForeground() {
     AppToForeground.appToForeground();
   }
@@ -144,7 +145,9 @@ class OverlayAppWindow {
         backgroundColor: Colors.black12,
         isDisableClicks: false);
 
-    SystemAlertWindow.registerOnClickListener(callBack);
+    if (platformParams.android) {
+      SystemAlertWindow.registerOnClickListener(callBack);
+    }
   }
 
   /// 更新系统窗口
@@ -289,7 +292,7 @@ class OverlayAppWindow {
   }
 }
 
-OverlayAppWindow overlayAppWindow = OverlayAppWindow();
+AndroidSystemAlertWindow overlayAppWindow = AndroidSystemAlertWindow();
 
 @pragma('vm:entry-point')
 void callBack(String tag) {

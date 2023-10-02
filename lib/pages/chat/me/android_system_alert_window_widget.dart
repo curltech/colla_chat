@@ -1,43 +1,30 @@
-import 'dart:typed_data';
-
-import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/me/qrcode_widget.dart';
-import 'package:colla_chat/plugin/overlay/overlay_app_window.dart';
-import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/routers/routes.dart';
-import 'package:colla_chat/service/dht/myselfpeer.dart';
-import 'package:colla_chat/tool/image_util.dart';
+import 'package:colla_chat/plugin/overlay/android_system_alert_window.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
-import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-class OverlayAppWindowWidget extends StatefulWidget with TileDataMixin {
-  const OverlayAppWindowWidget({Key? key}) : super(key: key);
+class SystemAlertWindowWidget extends StatefulWidget with TileDataMixin {
+  const SystemAlertWindowWidget({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return _OverlayAppWindowWidgetState();
+    return _SystemAlertWindowWidgetState();
   }
 
   @override
   bool get withLeading => true;
 
   @override
-  String get routeName => 'overlay_app';
+  String get routeName => 'system_alert_window';
 
   @override
   IconData get iconData => Icons.sensor_window_outlined;
 
   @override
-  String get title => 'Overlay app window';
+  String get title => 'System alert window';
 }
 
-class _OverlayAppWindowWidgetState extends State<OverlayAppWindowWidget>
+class _SystemAlertWindowWidgetState extends State<SystemAlertWindowWidget>
     with SingleTickerProviderStateMixin {
   @override
   void initState() {

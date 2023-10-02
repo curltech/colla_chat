@@ -7,28 +7,28 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 
-class AndroidOverlayAppWindowWidget extends StatefulWidget with TileDataMixin {
-  const AndroidOverlayAppWindowWidget({Key? key}) : super(key: key);
+class AndroidOverlayWindowWidget extends StatefulWidget with TileDataMixin {
+  const AndroidOverlayWindowWidget({Key? key}) : super(key: key);
 
   @override
   bool get withLeading => true;
 
   @override
-  String get routeName => 'android_overlay_app';
+  String get routeName => 'android_overlay_window';
 
   @override
   IconData get iconData => Icons.android_outlined;
 
   @override
-  String get title => 'Android overlay app window';
+  String get title => 'Android overlay window';
 
   @override
-  State<AndroidOverlayAppWindowWidget> createState() =>
-      _AndroidOverlayAppWindowWidgetState();
+  State<AndroidOverlayWindowWidget> createState() =>
+      _AndroidOverlayWindowWidgetState();
 }
 
-class _AndroidOverlayAppWindowWidgetState
-    extends State<AndroidOverlayAppWindowWidget> {
+class _AndroidOverlayWindowWidgetState
+    extends State<AndroidOverlayWindowWidget> {
   static const String _kPortNameOverlay = 'OVERLAY';
   static const String _kPortNameHome = 'UI';
   final _receivePort = ReceivePort();
