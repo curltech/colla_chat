@@ -263,13 +263,13 @@ dependencies:
   #-lc++
   #-lstd++
   flutter_sound: ^9.2.13
-  audioplayers: ^5.1.0 #音频处理,所有平台
-  audioplayers_platform_interface: ^6.0.0
-  audioplayers_windows: ^3.0.0
-  audioplayers_darwin: ^5.0.1
-  audioplayers_linux: ^3.0.0
-  audioplayers_web: ^4.0.0
-  audioplayers_android: ^4.0.1
+  audioplayers: ^5.2.0 #音频处理,所有平台
+  audioplayers_platform_interface: ^6.1.0
+  audioplayers_windows: ^3.1.0
+  audioplayers_darwin: ^5.0.2
+  audioplayers_linux: ^3.1.0
+  audioplayers_web: ^4.1.0
+  audioplayers_android: ^4.0.2
   another_audio_recorder: ^1.0.1
   assets_audio_player: ^3.0.6
   audiofileplayer: ^2.1.1
