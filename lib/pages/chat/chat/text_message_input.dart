@@ -16,14 +16,12 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/openai/openai_chat_gpt.dart';
-import 'package:colla_chat/transport/smsclient.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:record/record.dart';
-import 'package:telephony/telephony.dart';
 
 ///发送文本消息的输入框和按钮，
 ///包括声音按钮，扩展文本输入框，emoji按钮，其他多种格式输入按钮和发送按钮

@@ -59,7 +59,8 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
     var file = File(tempFilename);
     bool exist = await file.exists();
     if (exist) {
-      return tempFilename;
+      file.deleteSync();
+      // return tempFilename;
     }
     String contentPath = p.join(myself.myPath, 'content');
     if (!platformParams.web) {
