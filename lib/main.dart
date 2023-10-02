@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/background/android_overlay_app_window.dart';
+import 'package:colla_chat/plugin/overlay/android_overlay_app_window.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/plugin/notification/firebase_messaging_service.dart';
 import 'package:colla_chat/plugin/notification/local_notifications_service.dart';
