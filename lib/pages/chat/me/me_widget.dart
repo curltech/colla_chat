@@ -41,7 +41,9 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     if (platformParams.mobile) {
       indexWidgetProvider.define(contactWidget);
       indexWidgetProvider.define(openVpnWidget);
-      indexWidgetProvider.define(systemAlertWindowWidget);
+      if (platformParams.android) {
+        indexWidgetProvider.define(systemAlertWindowWidget);
+      }
     }
     List<TileDataMixin> mixins = [
       settingWidget,
@@ -54,8 +56,12 @@ class MeWidget extends StatelessWidget with TileDataMixin {
       mixins.addAll([
         contactWidget,
         openVpnWidget,
-        systemAlertWindowWidget,
       ]);
+      if (platformParams.android) {
+        mixins.addAll([
+          systemAlertWindowWidget,
+        ]);
+      }
     }
     meTileData = TileData.from(mixins);
     for (var tile in meTileData) {
