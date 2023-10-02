@@ -64,5 +64,10 @@
 	<string>MainMenu.xib</string>
 	<key>kTCCServiceMediaLibrary</key>
 	<string>media</string>
+	<key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+    </dict>
 </dict>
 </plist>
