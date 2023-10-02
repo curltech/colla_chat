@@ -38,8 +38,8 @@ dependencies:
   flutter_background_service: ^5.0.1
   flutter_background_executor: ^1.0.0
   system_alert_window: ^1.2.2
-  #  flutter_overlay_apps: ^1.2.0
   flutter_overlay_window: ^0.4.3
+  flutter_floating: ^1.0.8
   app_to_foreground: ^0.0.3
   path_provider: ^2.0.11
   url_launcher: ^6.1.11 #打开系统浏览器
