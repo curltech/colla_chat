@@ -517,9 +517,9 @@ class _ChatListWidgetState extends State<ChatListWidget>
               icon: Tooltip(
                   message: AppLocalizations.t('Linkman'),
                   child: value == 0
-                      ? const Icon(
+                      ? Icon(
                           Icons.person,
-                          color: Colors.white,
+                          color: myself.primary,
                           size: AppIconSize.mdSize,
                         )
                       : const Icon(Icons.person, color: Colors.white)),
@@ -534,9 +534,9 @@ class _ChatListWidgetState extends State<ChatListWidget>
               icon: Tooltip(
                   message: AppLocalizations.t('Group'),
                   child: value == 1
-                      ? const Icon(
+                      ? Icon(
                           Icons.group,
-                          color: Colors.white,
+                          color: myself.primary,
                           size: AppIconSize.mdSize,
                         )
                       : const Icon(Icons.group, color: Colors.white)),
@@ -551,9 +551,9 @@ class _ChatListWidgetState extends State<ChatListWidget>
               icon: Tooltip(
                   message: AppLocalizations.t('Conference'),
                   child: value == 2
-                      ? const Icon(
+                      ? Icon(
                           Icons.video_chat,
-                          color: Colors.white,
+                          color: myself.primary,
                           size: AppIconSize.mdSize,
                         )
                       : const Icon(Icons.video_chat, color: Colors.white)),
@@ -566,7 +566,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
       tabs: tabs,
       controller: _tabController,
       isScrollable: false,
-      indicatorColor: Colors.white,
+      indicatorColor: myself.primary,
       dividerColor: Colors.white.withOpacity(0),
       padding: const EdgeInsets.all(0.0),
       labelPadding: const EdgeInsets.all(0.0),
