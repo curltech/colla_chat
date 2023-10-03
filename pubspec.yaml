@@ -376,7 +376,7 @@ dependency_overrides:
   geolocator: ^9.0.2
   apple_maps_flutter: ^1.2.0
   http: ^1.1.0
-  flutter_inappwebview: ^6.0.0-beta.24+1
+  flutter_inappwebview: ^6.0.0-beta.25
   webview_flutter: ^4.2.2
   webview_flutter_android: ^3.7.1
   webview_flutter_wkwebview: ^3.4.4
