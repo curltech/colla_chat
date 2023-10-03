@@ -1,3 +1,4 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -207,7 +208,7 @@ class _PlatformAudioRecorderWidgetState
                 if (mounted) {
                   bool? confirm = await DialogUtil.confirm(context,
                       content:
-                          'Record audio filename:$filename, need you play?');
+                          '${AppLocalizations.t('Need you play record audio filename')} $filename?');
                   if (confirm != null && confirm) {
                     BlueFireAudioPlayer audioPlayer = BlueFireAudioPlayer();
                     audioPlayer.play(filename);

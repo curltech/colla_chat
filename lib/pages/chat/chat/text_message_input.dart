@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
@@ -80,6 +81,9 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
           contentType: ChatMessageContentType.audio,
           mimeType: mimeType,
           subMessageType: ChatMessageSubType.chat);
+      // 发送保存结束后删除录音文件
+      File file = File(filename);
+      file.deleteSync();
     }
   }
 

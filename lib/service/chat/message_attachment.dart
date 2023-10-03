@@ -30,14 +30,13 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
   }
 
   ///获取加密的数据在content路径下附件的文件名称
-  ///假如title不为空，而且文件存在，则title就是实际的文件名，直接返回
-  ///否则，组合messageId和title，取在应用用户的内容路径下
+  ///文件名是messageId
   Future<String?> getEncryptFilename(String messageId, String? title) async {
     String contentPath = p.join(myself.myPath, 'content');
     String? filename;
     if (!platformParams.web) {
       if (title != null) {
-        filename = p.join(contentPath, '${messageId}_$title');
+        filename = p.join(contentPath, messageId);
       } else {
         filename = p.join(contentPath, messageId);
       }
@@ -51,7 +50,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
   Future<String?> getDecryptFilename(String messageId, String? title) async {
     String? filename;
     if (title != null) {
-      filename = '${messageId}_$title';
+      filename = messageId;
     } else {
       filename = messageId;
     }
@@ -59,8 +58,8 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
     var file = File(tempFilename);
     bool exist = await file.exists();
     if (exist) {
-      file.deleteSync();
-      // return tempFilename;
+      //file.deleteSync();
+      return tempFilename;
     }
     String contentPath = p.join(myself.myPath, 'content');
     if (!platformParams.web) {
@@ -70,7 +69,8 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
         data = await decryptContent(data);
         if (data != null) {
           try {
-            filename = await FileUtil.writeTempFileAsBytes(data, filename: filename);
+            filename =
+                await FileUtil.writeTempFileAsBytes(data, filename: filename);
             return filename;
           } catch (e) {
             logger.e('writeTempFile $filename failure:$e');
@@ -84,7 +84,8 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
         var content = attachment.content;
         if (content != null) {
           var data = CryptoUtil.decodeBase64(content);
-          filename = await FileUtil.writeTempFileAsBytes(data, filename: filename);
+          filename =
+              await FileUtil.writeTempFileAsBytes(data, filename: filename);
           return filename;
         }
       }
@@ -125,8 +126,8 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
   ) async {
     SecurityContext securityContext = SecurityContext();
     securityContext.payload = data;
-    var result =
-        await linkmanCryptographySecurityContextService.encrypt(securityContext);
+    var result = await linkmanCryptographySecurityContextService
+        .encrypt(securityContext);
     if (result) {
       var encrypted = securityContext.payload;
       return encrypted;
@@ -140,8 +141,8 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
   ) async {
     SecurityContext securityContext = SecurityContext();
     securityContext.payload = data;
-    var result =
-        await linkmanCryptographySecurityContextService.decrypt(securityContext);
+    var result = await linkmanCryptographySecurityContextService
+        .decrypt(securityContext);
     if (result) {
       var decrypted = securityContext.payload;
       return decrypted;
