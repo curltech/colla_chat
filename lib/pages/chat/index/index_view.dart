@@ -270,9 +270,11 @@ class _IndexViewState extends State<IndexView>
               String? title = chatMessage!.title;
               if (title != null) {
                 children.add(
-                  CommonAutoSizeText(title,
-                      style: const TextStyle(
-                          fontSize: 14, fontWeight: FontWeight.w400)),
+                  CommonAutoSizeText(
+                    title,
+                    style: const TextStyle(
+                        fontSize: 14.0, fontWeight: FontWeight.w400),
+                  ),
                 );
               }
               String? content = chatMessage!.content;
@@ -283,8 +285,6 @@ class _IndexViewState extends State<IndexView>
                 content = chatMessageService.recoverContent(content);
                 children.add(ExtendedText(
                   content,
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
                   specialTextSpanBuilder: customSpecialTextSpanBuilder,
                 ));
               }
@@ -312,16 +312,17 @@ class _IndexViewState extends State<IndexView>
                                   const SizedBox(
                                     width: 15.0,
                                   ),
-                                  Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: children),
+                                  Expanded(
+                                      child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: children)),
                                 ]))),
                     const Spacer()
                   ]));
 
               //延时30秒后一般消息消失
-              Future.delayed(const Duration(seconds: 30)).then((value) async {
+              Future.delayed(const Duration(seconds: 15)).then((value) async {
                 chatMessageVisible.value = false;
                 chatMessage = null;
                 await conferenceChatMessageController.close();
