@@ -30,13 +30,13 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
   }
 
   ///获取加密的数据在content路径下附件的文件名称
-  ///文件名是messageId
+  ///文件名是title，如果为空则是messageId
   Future<String?> getEncryptFilename(String messageId, String? title) async {
     String contentPath = p.join(myself.myPath, 'content');
     String? filename;
     if (!platformParams.web) {
       if (title != null) {
-        filename = p.join(contentPath, messageId);
+        filename = p.join(contentPath, title);
       } else {
         filename = p.join(contentPath, messageId);
       }
@@ -50,7 +50,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
   Future<String?> getDecryptFilename(String messageId, String? title) async {
     String? filename;
     if (title != null) {
-      filename = messageId;
+      filename = title;
     } else {
       filename = messageId;
     }

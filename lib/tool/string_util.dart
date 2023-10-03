@@ -105,7 +105,7 @@ class StringUtil {
       return values
           .firstWhere((type) => type.toString().split('.').last == value);
     } catch (e) {
-      logger.e('enum exception:$e');
+      logger.e('enum value:$value exception:$e');
     }
 
     return defaultType;

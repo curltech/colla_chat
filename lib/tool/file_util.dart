@@ -391,9 +391,13 @@ class FileUtil {
   }
 
   ///获取扩展名
-  static String extension(String filename) {
-    int pos = filename.lastIndexOf('.');
-    return filename.substring(pos + 1);
+  static String? extension(String filename) {
+    int pos = filename.lastIndexOf(p.separator);
+    int dotPos = filename.lastIndexOf('.');
+    if (dotPos > pos) {
+      return filename.substring(dotPos + 1);
+    }
+    return null;
   }
 
   ///获取全路径下的文件名部分

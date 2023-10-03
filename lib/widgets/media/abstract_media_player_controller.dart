@@ -108,12 +108,14 @@ class PlatformMediaSource {
       {required String filename, ChatMessageMimeType? mediaFormat}) async {
     PlatformMediaSource mediaSource;
     if (mediaFormat == null) {
-      int pos = filename.lastIndexOf('.');
-      String extension = filename.substring(pos + 1);
-      mediaFormat =
-          StringUtil.enumFromString(ChatMessageMimeType.values, extension);
+      String? extension = FileUtil.extension(filename);
+      if (extension != null) {
+        mediaFormat =
+            StringUtil.enumFromString(ChatMessageMimeType.values, extension);
+      }
     }
     if (mediaFormat == null) {
+      logger.e('filename:$filename has no mediaFormat');
       return null;
     }
     if (filename.startsWith('assets')) {
