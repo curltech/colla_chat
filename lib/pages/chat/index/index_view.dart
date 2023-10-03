@@ -283,9 +283,8 @@ class _IndexViewState extends State<IndexView>
                 content = chatMessageService.recoverContent(content);
                 children.add(ExtendedText(
                   content,
-                  style: const TextStyle(
-                      //fontSize: 16.0,
-                      ),
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
                   specialTextSpanBuilder: customSpecialTextSpanBuilder,
                 ));
               }
