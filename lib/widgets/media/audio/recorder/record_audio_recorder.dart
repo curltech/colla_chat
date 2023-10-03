@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
@@ -122,12 +123,25 @@ class RecordAudioRecorderController extends AbstractAudioRecorderController {
   Future<String?> stop() async {
     if (status == RecorderStatus.recording || status == RecorderStatus.pause) {
       String? filename = await _audioRecorder.stop();
-      logger.i('record audio recorder filename:$filename');
-      this.filename = filename;
-      await super.stop();
-      status = RecorderStatus.stop;
+      if (filename != null) {
+        File file = File(filename);
+        bool exists = file.existsSync();
+        if (!exists) {
+          return null;
+        }
+        int length = file.lengthSync();
+        if (length < 1024) {
+          logger.e('record file is too small');
+          file.deleteSync();
+          return null;
+        }
+        logger.i('record audio recorder filename:$filename');
+        this.filename = filename;
+        await super.stop();
+        status = RecorderStatus.stop;
 
-      return filename;
+        return filename;
+      }
     }
     return null;
   }
