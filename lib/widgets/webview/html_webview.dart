@@ -1,3 +1,4 @@
+import 'package:colla_chat/tool/loading_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
@@ -22,11 +23,20 @@ class _HtmlWebViewState extends State<HtmlWebView> {
 
   @override
   Widget build(context) {
-    return SingleChildScrollView(
-        padding: EdgeInsets.zero,
-        child:
-        HtmlWidget(
-          widget.html,
-        ));
+    HtmlWidget htmlWidget = HtmlWidget(
+      widget.html,
+      onErrorBuilder: (context, element, error) {
+        return Text(
+          '$element error: $error',
+          style: const TextStyle(color: Colors.white),
+        );
+      },
+      onLoadingBuilder: (context, element, loadingProgress) {
+        return LoadingUtil.buildCircularLoadingWidget();
+      },
+      renderMode: RenderMode.listView,
+    );
+
+    return htmlWidget;
   }
 }

@@ -174,6 +174,8 @@ class PlatformWebView extends StatelessWidget {
   final String? initialUrl;
   final String? html;
   final String? initialFilename;
+  double? width;
+  double? height;
   final void Function(PlatformWebViewController controller)? onWebViewCreated;
 
   PlatformWebViewController? webViewController;
@@ -183,6 +185,8 @@ class PlatformWebView extends StatelessWidget {
       this.initialUrl,
       this.html,
       this.initialFilename,
+      this.width,
+      this.height,
       this.onWebViewCreated}) {
     _buildPlatformWebView();
   }
@@ -270,6 +274,13 @@ class PlatformWebView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _buildPlatformWebView();
+    if (width == null && height == null) {
+      return _buildPlatformWebView();
+    }
+    return SizedBox(
+      width: width,
+      height: height,
+      child: _buildPlatformWebView(),
+    );
   }
 }

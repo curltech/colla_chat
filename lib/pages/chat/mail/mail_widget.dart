@@ -108,7 +108,9 @@ class _MailWidgetState extends State<MailWidget> {
     Widget body = _buildPlatformDrawer();
     List<Widget> rightWidgets = [
       IconButton(
-          tooltip: AppLocalizations.t('Toggle mail address view'),
+          tooltip: addressVisible.value
+              ? AppLocalizations.t('Mail address')
+              : AppLocalizations.t('Mail list'),
           onPressed: () {
             addressVisible.value = !addressVisible.value;
             setState(() {});
@@ -145,6 +147,9 @@ class _MailWidgetState extends State<MailWidget> {
           icon: const Icon(Icons.note_add),
           tooltip: AppLocalizations.t('New mail')));
     }
+    rightWidgets.add(const SizedBox(
+      width: 10.0,
+    ));
     Widget titleWidget = ValueListenableBuilder(
         valueListenable: mailboxName,
         builder: (BuildContext context, String mailboxName, Widget? child) {

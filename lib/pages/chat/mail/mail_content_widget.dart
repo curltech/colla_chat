@@ -6,6 +6,7 @@ import 'package:colla_chat/pages/chat/mail/full_screen_attachment_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/emailaddress.dart';
@@ -199,9 +200,19 @@ class _MailContentWidgetState extends State<MailContentWidget> {
                     ))
               ]));
             }
-            return Column(children: [
-              Expanded(child: PlatformWebView(html: decryptedMimeMessage.html)),
-              _buildAttachmentChips(context)
+            Widget webView = Container();
+            try {
+              webView = PlatformWebView(html: decryptedMimeMessage.html);
+            } catch (e) {
+              logger.e('PlatformWebView failure:$e');
+            }
+            Widget? attachWidget = _buildAttachmentChips(context);
+            if (attachWidget == null) {
+              return webView;
+            }
+            return Column(mainAxisSize: MainAxisSize.min, children: [
+              Expanded(child: webView),
+              attachWidget,
             ]);
           }
           return Center(
@@ -212,11 +223,11 @@ class _MailContentWidgetState extends State<MailContentWidget> {
   }
 
   /// 附件显示区
-  Widget _buildAttachmentChips(BuildContext context) {
+  Widget? _buildAttachmentChips(BuildContext context) {
     List<Widget> chips = [];
     List<ContentInfo>? contentInfos = findContentInfos();
     if (contentInfos == null) {
-      return Container();
+      return null;
     }
     for (ContentInfo contentInfo in contentInfos) {
       String? fileName = contentInfo.fileName;
@@ -274,7 +285,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
                 children: chips,
               ))));
     } else {
-      return Container();
+      return null;
     }
   }
 

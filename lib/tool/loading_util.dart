@@ -1,4 +1,3 @@
-
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -50,7 +49,9 @@ class LoadingUtil {
         const SizedBox(
           height: 10,
         ),
-        CommonAutoSizeText(AppLocalizations.t("Loading, please waiting...")),
+        Expanded(
+            child: CommonAutoSizeText(
+                AppLocalizations.t("Loading, please waiting..."))),
       ],
     ));
   }
