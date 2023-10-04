@@ -130,7 +130,7 @@ class RecordAudioRecorderController extends AbstractAudioRecorderController {
           return null;
         }
         int length = file.lengthSync();
-        if (length < 1024) {
+        if (length < 256) {
           logger.e('record file is too small');
           file.deleteSync();
           return null;

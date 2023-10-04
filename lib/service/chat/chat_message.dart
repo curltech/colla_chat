@@ -1069,17 +1069,15 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         String? title = chatMessage.title;
         String? contentType = chatMessage.contentType;
         String? messageId = chatMessage.messageId;
-        if (content != null) {
-          if (contentType != null &&
-              (contentType == ChatMessageContentType.file.name ||
-                  contentType == ChatMessageContentType.image.name ||
-                  contentType == ChatMessageContentType.video.name ||
-                  contentType == ChatMessageContentType.audio.name ||
-                  contentType == ChatMessageContentType.rich.name)) {
-            if (!platformParams.web) {
-              final filename =
-                  await messageAttachmentService.remove(messageId!, title);
-            }
+        if (contentType != null &&
+            (contentType == ChatMessageContentType.file.name ||
+                contentType == ChatMessageContentType.image.name ||
+                contentType == ChatMessageContentType.video.name ||
+                contentType == ChatMessageContentType.audio.name ||
+                contentType == ChatMessageContentType.rich.name)) {
+          if (!platformParams.web) {
+            final filename =
+                await messageAttachmentService.remove(messageId!, title);
           }
         }
       }
