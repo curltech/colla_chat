@@ -245,7 +245,7 @@ dependencies:
   #barcode: ^2.2.3
   #barcode_image: ^2.0.2
   #barcode_widget: ^2.0.2
-#  barcode_scan2: ^4.2.4
+  barcode_scan2: ^4.2.4
   #mobile_scanner: ^2.0.0  #macos有问题
   lpinyin: ^2.0.3 #拼音
   window_manager: ^0.3.6 #桌面应用的窗口管理
@@ -273,7 +273,7 @@ dependencies:
   #  another_audio_recorder: ^1.0.1
 #  assets_audio_player: ^3.0.6
 #  audiofileplayer: ^2.1.1
-  record_mp3: ^3.0.0
+#  record_mp3: ^3.0.0
   audio_waveforms: 1.0.4
   video_player_web: ^2.0.15
   #flick_video_player: ^0.5.0 #video_player的封装
