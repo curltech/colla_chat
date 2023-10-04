@@ -5,7 +5,6 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_audio_recorder_controller.dart';
-import 'package:colla_chat/widgets/media/audio/recorder/another_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
 import 'package:flutter/material.dart';
 import 'package:record/record.dart';
@@ -36,11 +35,6 @@ class PlatformAudioRecorder extends StatefulWidget {
           logger.e(
               'Not support pcm in ios and macos, please use another recorder');
         }
-      }
-    }
-    if (audioRecorderController is AnotherAudioRecorderController) {
-      if (!platformParams.mobile) {
-        logger.e('Not support non mobile, please use record recorder');
       }
     }
   }
@@ -81,11 +75,6 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
           if (platformParams.linux) {
             throw 'Not support pcm in ios and macos, please use another recorder';
           }
-        }
-      }
-      if (widget.audioRecorderController is AnotherAudioRecorderController) {
-        if (!platformParams.mobile) {
-          throw 'Not support non mobile, please use record recorder';
         }
       }
       await widget.audioRecorderController.start();

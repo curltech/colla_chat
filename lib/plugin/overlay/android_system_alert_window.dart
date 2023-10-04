@@ -5,11 +5,10 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:flutter/material.dart';
 import 'package:system_alert_window/system_alert_window.dart';
-import 'package:app_to_foreground/app_to_foreground.dart';
 
 class AndroidSystemAlertWindow {
   appToForeground() {
-    AppToForeground.appToForeground();
+    // AppToForeground.appToForeground();
   }
 
   Future<bool?> requestPermissions(

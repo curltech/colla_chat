@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 
-import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class QrcodeUtil {
@@ -125,42 +125,50 @@ class QrcodeUtil {
   // }
 
   ///使用barcode_scan2扫描二维码的功能，仅支持移动设备
-  static Future<ScanResult> scan(
-      {List<BarcodeFormat> restrictFormat = const [],
-      int useCamera = -1,
-      AndroidOptions android = const AndroidOptions(),
-      bool autoEnableFlash = false,
-      Map<String, String> strings = const {
-        'cancel': 'Cancel',
-        'flash_on': 'Flash on',
-        'flash_off': 'Flash off',
-      }}) async {
-    var options = ScanOptions(
-      restrictFormat: restrictFormat,
-      useCamera: useCamera,
-      android: android,
-      autoEnableFlash: autoEnableFlash,
-      strings: strings,
-    );
+  // static Future<ScanResult> scan(
+  //     {List<BarcodeFormat> restrictFormat = const [],
+  //     int useCamera = -1,
+  //     AndroidOptions android = const AndroidOptions(),
+  //     bool autoEnableFlash = false,
+  //     Map<String, String> strings = const {
+  //       'cancel': 'Cancel',
+  //       'flash_on': 'Flash on',
+  //       'flash_off': 'Flash off',
+  //     }}) async {
+  //   var options = ScanOptions(
+  //     restrictFormat: restrictFormat,
+  //     useCamera: useCamera,
+  //     android: android,
+  //     autoEnableFlash: autoEnableFlash,
+  //     strings: strings,
+  //   );
+  //
+  //   ScanResult result = await BarcodeScanner.scan(options: options);
+  //
+  //   return result;
+  // }
 
-    ScanResult result = await BarcodeScanner.scan(options: options);
+  static Future<String?> mobileScan(BuildContext context) async {
+    String? result;
+    MobileScannerController cameraController = MobileScannerController();
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return MobileScanner(
+              controller: cameraController,
+              onDetect: (BarcodeCapture capture) {
+                final List<Barcode> barcodes = capture.barcodes;
+                for (final barcode in barcodes) {
+                  result = barcode.rawValue;
+                  if (result != null) {
+                    return;
+                  }
+                }
+              });
+        },
+      ),
+    );
 
     return result;
   }
-
-  ///macos有问题
-// static Future<String?> mobileScan() async {
-//   mobile_scanner.MobileScannerController cameraController =
-//       mobile_scanner.MobileScannerController();
-//   Future<String?> result = Future(() {
-//     mobile_scanner.MobileScanner(
-//         allowDuplicates: false,
-//         controller: cameraController,
-//         onDetect: (barcode, args) {
-//           return barcode.rawValue;
-//         });
-//   });
-//
-//   return result;
-// }
 }

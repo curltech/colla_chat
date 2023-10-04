@@ -1,4 +1,3 @@
-import 'package:barcode_scan2/model/model.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
@@ -693,8 +692,10 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   }
 
   Future<void> scanQrcode(BuildContext context) async {
-    ScanResult scanResult = await QrcodeUtil.scan();
-    String content = scanResult.rawContent;
+    String? content = await QrcodeUtil.mobileScan(context);
+    if (content == null) {
+      return;
+    }
     var map = JsonUtil.toJson(content);
     PeerClient peerClient = PeerClient.fromJson(map);
     await peerClientService.store(peerClient);
