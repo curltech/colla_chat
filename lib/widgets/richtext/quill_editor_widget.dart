@@ -221,12 +221,12 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
           children: [
             TextButton.icon(
               icon: const Icon(Icons.camera),
-              label: Text(AppLocalizations.t('Capture a photo')),
+              label: Text(AppLocalizations.t('Capture photo')),
               onPressed: () => Navigator.pop(ctx, MediaPickSetting.Camera),
             ),
             TextButton.icon(
               icon: const Icon(Icons.video_call),
-              label: Text(AppLocalizations.t('Capture a video')),
+              label: Text(AppLocalizations.t('Capture video')),
               onPressed: () => Navigator.pop(ctx, MediaPickSetting.Video),
             )
           ],

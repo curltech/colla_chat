@@ -126,14 +126,14 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
     }
     var sendTime = DateUtil.formatEasyRead(chatMessage.sendTime!);
     var status = chatMessage.status;
-    Widget leading = Icon(
+    Widget leading = const Icon(
       Icons.unpublished,
-      color: myself.primary,
+      // color: myself.primary,
     );
     if (MessageStatus.published.name == status) {
-      leading = Icon(
+      leading = const Icon(
         Icons.check_circle,
-        color: myself.primary,
+        // color: myself.primary,
       );
     }
     Widget chatMessageItem = ListTile(
@@ -190,7 +190,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
   Widget build(BuildContext context) {
     var channelChatMessageWidget = _buildChannelChatMessageWidget(context);
     List<Widget>? rightWidgets = [
-      IconButton(
+      IconTextButton(
         onPressed: () {
           myChannelChatMessageController.current = null;
           indexWidgetProvider.push('publish_channel_edit');
@@ -199,7 +199,10 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
           Icons.note_add,
           color: Colors.white,
         ),
-        tooltip: AppLocalizations.t('Add new document'),
+        label: AppLocalizations.t('Add document'),
+      ),
+      const SizedBox(
+        width: 10,
       ),
     ];
     return AppBarView(

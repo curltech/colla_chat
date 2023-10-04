@@ -13,6 +13,7 @@ import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/richtext/platform_editor_widget.dart';
@@ -127,7 +128,20 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
   _publish() async {
     ChatMessage? chatMessage = myChannelChatMessageController.current;
     if (chatMessage == null) {
-      return;
+      String title = textEditingController.text;
+      if (StringUtil.isEmpty(title)) {
+        DialogUtil.error(context, content: AppLocalizations.t('Must have title'));
+        return;
+      }
+      String? content = await platformEditorController.content;
+      if (mounted && StringUtil.isEmpty(content)) {
+        DialogUtil.error(context,
+            content: AppLocalizations.t('Must have content'));
+        return;
+      }
+      chatMessage = await myChannelChatMessageController
+          .buildChannelChatMessage(title, content!, thumbnail.value);
+      myChannelChatMessageController.current = chatMessage;
     }
     String? mimeType = chatMessage.mimeType;
     if (mimeType == ChatMessageMimeType.json.name) {
@@ -194,20 +208,21 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
       withLeading: true,
       title: widget.title,
       rightWidgets: [
-        IconButton(
+        IconTextButton(
           icon: const Icon(Icons.save),
           onPressed: () async {
             await _save();
           },
-          tooltip: AppLocalizations.t('Save'),
+          label: AppLocalizations.t('Save'),
         ),
-        IconButton(
+        IconTextButton(
           icon: const Icon(Icons.publish),
           onPressed: () async {
             await _publish();
           },
-          tooltip: AppLocalizations.t('Publish'),
+          label: AppLocalizations.t('Publish'),
         ),
+        const SizedBox(width: 10,),
       ],
       child: _buildChannelItemView(context),
     );

@@ -159,7 +159,7 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
   Widget build(BuildContext context) {
     var channelChatMessageWidget = _buildChannelChatMessageWidget(context);
     List<Widget>? rightWidgets = [
-      IconButton(
+      IconTextButton(
         onPressed: () async {
           myChannelChatMessageController.clear(notify: false);
           await myChannelChatMessageController.previous(limit: defaultLimit);
@@ -169,8 +169,9 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
           Icons.my_library_add,
           color: Colors.white,
         ),
-        tooltip: AppLocalizations.t('Publish channel'),
+        label: AppLocalizations.t('Publish channel'),
       ),
+      const SizedBox(width: 10,),
     ];
     return AppBarView(
         centerTitle: false,
