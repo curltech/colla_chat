@@ -88,6 +88,14 @@ class GmailProvider extends EmailServiceProvider {
                   authentication: Authentication.oauth2,
                   usernameType: UsernameType.emailAddress,
                 ))
+                ..addIncomingServer(ServerConfig(
+                  type: ServerType.pop,
+                  hostname: 'pop.gmail.com',
+                  port: 995,
+                  socketType: SocketType.ssl,
+                  authentication: Authentication.oauth2,
+                  usernameType: UsernameType.emailAddress,
+                ))
                 ..addOutgoingServer(ServerConfig(
                   type: ServerType.smtp,
                   hostname: 'smtp.gmail.com',
