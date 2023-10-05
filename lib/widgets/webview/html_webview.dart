@@ -1,4 +1,3 @@
-import 'package:colla_chat/tool/loading_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
@@ -32,7 +31,7 @@ class _HtmlWebViewState extends State<HtmlWebView> {
         );
       },
       onLoadingBuilder: (context, element, loadingProgress) {
-        return LoadingUtil.buildCircularLoadingWidget();
+        // return LoadingUtil.buildCircularLoadingWidget();
       },
       renderMode: RenderMode.listView,
     );
