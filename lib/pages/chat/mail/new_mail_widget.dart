@@ -226,7 +226,9 @@ class _NewMailWidgetState extends State<NewMailWidget> {
             }));
   }
 
-  ///发送前的准备，准备数据和地址，加密
+  /// 发送前的准备，准备数据和地址，加密
+  /// 发送到目标的peerId对应的linkman的邮件地址，加密采用对方的peerId进行加密
+  /// 对方需要解密的话，需要绑定正确的邮件地址和登录peerId
   Future<String?> _preSend(MessageBuilder builder,
       {bool needEncrypt = true}) async {
     List<MailAddress> from = [];

@@ -3,6 +3,7 @@ import 'package:colla_chat/pages/chat/mail/address/auto_discover_widget.dart';
 import 'package:colla_chat/pages/chat/mail/address/manual_add_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/service/chat/emailaddress.dart';
 import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
@@ -71,6 +72,22 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
                   selected: mailMimeMessageController.currentIndex == i &&
                       currentMailboxName == mailbox.name);
               tiles.add(tile);
+
+              // 删除地址按钮
+              List<TileData> slideActions = [];
+              TileData slideTile = TileData(
+                  title: 'Delete',
+                  prefix: Icons.delete_outline,
+                  onTap: (int index, String label, {String? subtitle}) async {
+                    int? id = mailAddress.id;
+                    if (id != null) {
+                      emailAddressService
+                          .delete(where: 'id=?', whereArgs: [id]);
+                      mailMimeMessageController.delete(index: i);
+                    }
+                  });
+              slideActions.add(slideTile);
+              tile.slideActions = slideActions;
             }
           }
         }
