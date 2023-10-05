@@ -91,7 +91,7 @@ class GmailProvider extends EmailServiceProvider {
                 ..addOutgoingServer(ServerConfig(
                   type: ServerType.smtp,
                   hostname: 'smtp.gmail.com',
-                  port: 465,
+                  port: 465, //587 for tls
                   socketType: SocketType.ssl,
                   authentication: Authentication.oauth2,
                   usernameType: UsernameType.emailAddress,
