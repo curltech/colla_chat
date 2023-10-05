@@ -95,7 +95,8 @@ class MyChannelChatMessageController extends DataMoreController<ChatMessage> {
   }
 
   Future<ChatMessage> buildChannelChatMessage(
-      String title, String content, String? thumbnail) async {
+      String title, String content, String? thumbnail,
+      {ChatMessageMimeType mimeType = ChatMessageMimeType.html}) async {
     ChatMessage chatMessage = await chatMessageService.buildChatMessage(
         title: title,
         content: content,
@@ -105,7 +106,7 @@ class MyChannelChatMessageController extends DataMoreController<ChatMessage> {
         transportType: TransportType.none,
         contentType: ChatMessageContentType.rich,
         status: MessageStatus.draft.name,
-        mimeType: ChatMessageMimeType.html.name);
+        mimeType: mimeType.name);
 
     return chatMessage;
   }

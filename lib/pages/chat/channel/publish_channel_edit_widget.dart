@@ -140,8 +140,12 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
             content: AppLocalizations.t('Must have content'));
         return;
       }
-      chatMessage = await myChannelChatMessageController
-          .buildChannelChatMessage(title, content!, thumbnail.value);
+      chatMessage =
+          await myChannelChatMessageController.buildChannelChatMessage(
+              title,
+              content!,
+              mimeType: ChatMessageMimeType.json,
+              thumbnail.value);
       myChannelChatMessageController.current = chatMessage;
     }
     String? mimeType = chatMessage.mimeType;
