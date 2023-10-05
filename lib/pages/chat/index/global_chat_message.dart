@@ -225,6 +225,9 @@ class GlobalChatMessage {
       case ChatMessageSubType.groupFile:
         await groupService.receiveGroupFile(chatMessage);
         break;
+      case ChatMessageSubType.updateSubscript:
+        await channelChatMessageService.receiveUpdateSubscript(chatMessage);
+        break;
       default:
         break;
     }
