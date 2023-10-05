@@ -310,7 +310,7 @@ class AdvancedPeerConnection {
   ///然后交换棘轮加密的密钥
   onConnected(WebrtcEvent event) async {
     globalChatMessage.sendModifyLinkman(event.peerId, clientId: event.clientId);
-    globalChatMessage.sendGetChannel(event.peerId, clientId: event.clientId);
+    globalChatMessage.sendUpdateSubscript(event.peerId, clientId: event.clientId);
     globalChatMessage.sendPreKeyBundle(event.peerId, clientId: event.clientId);
     chatMessageService.sendUnsent(receiverPeerId: event.peerId);
   }

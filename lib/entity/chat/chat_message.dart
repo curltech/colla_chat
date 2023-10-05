@@ -85,7 +85,7 @@ enum ChatMessageSubType {
   groupFile, // 群文件
   channel, //普通的频道消息
   comment, //评论
-  getChannel, //请求获取最新的频道文
+  updateSubscript, //请求获取最新的频道文
   collection,
   // 以下system消息，不在聊天界面显示
   signal, //webrtc signal消息，一般用于重新协商的情况

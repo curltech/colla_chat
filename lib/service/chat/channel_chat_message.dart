@@ -51,8 +51,8 @@ class ChannelChatMessageService {
         limit: limit);
   }
 
-  ///发出更新频道消息的请求
-  Future<ChatMessage?> getChannel(String peerId, {String? clientId}) async {
+  /// 发出更新频道消息的请求
+  Future<ChatMessage?> updateSubscript(String peerId, {String? clientId}) async {
     Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
     if (linkman == null) {
       return null;
@@ -71,7 +71,7 @@ class ChannelChatMessageService {
       clientId: clientId,
       content: sendTime,
       messageType: ChatMessageType.system,
-      subMessageType: ChatMessageSubType.getChannel,
+      subMessageType: ChatMessageSubType.updateSubscript,
     );
     List<ChatMessage> msgs = await chatMessageService.sendAndStore(chatMessage);
 
@@ -79,9 +79,9 @@ class ChannelChatMessageService {
   }
 
   ///接收到更新频道消息的请求,发送发布的频道消息
-  receiveGetChannel(ChatMessage chatMessage) async {
+  receiveUpdateSubscript(ChatMessage chatMessage) async {
     var subMessageType = chatMessage.subMessageType;
-    if (ChatMessageSubType.getChannel.name != subMessageType) {
+    if (ChatMessageSubType.updateSubscript.name != subMessageType) {
       return;
     }
     String? sendTime = chatMessage.sendTime;

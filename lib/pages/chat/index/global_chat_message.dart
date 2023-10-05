@@ -351,8 +351,8 @@ class GlobalChatMessage {
   }
 
   ///发送获取新的频道消息的请求
-  sendGetChannel(String peerId, {String? clientId}) async {
-    channelChatMessageService.getChannel(peerId, clientId: clientId);
+  sendUpdateSubscript(String peerId, {String? clientId}) async {
+    channelChatMessageService.updateSubscript(peerId, clientId: clientId);
   }
 
   ///发送PreKeyBundle
