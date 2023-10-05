@@ -110,11 +110,11 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
     } else {
       chatMessage = await myChannelChatMessageController
           .buildChannelChatMessage(title, content!, thumbnail.value);
-      myChannelChatMessageController.add(chatMessage);
+      myChannelChatMessageController.insert(0, chatMessage);
       newDocument = true;
     }
-    ChatMessageMimeType? mimeType = platformEditorController.mimeType;
-    chatMessage.mimeType = mimeType?.name;
+    ChatMessageMimeType mimeType = platformEditorController.mimeType;
+    chatMessage.mimeType = mimeType.name;
     await chatMessageService.store(chatMessage);
     if (newDocument) {
       //myChannelChatMessageController.add(chatMessage);

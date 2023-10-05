@@ -14,71 +14,52 @@ import 'package:quill_html_editor/quill_html_editor.dart';
 import 'package:flutter_rte/flutter_rte.dart' as rte;
 
 class PlatformEditorController with ChangeNotifier {
-  dynamic _originalController;
-  ChatMessageMimeType? mimeType;
-
-  dynamic get originalController {
-    return _originalController;
-  }
-
-  set originalController(dynamic originalController) {
-    this.originalController = originalController;
-    if (_originalController is QuillController) {
-      mimeType = ChatMessageMimeType.json;
-    } else if (_originalController is QuillEditorController) {
-      mimeType = ChatMessageMimeType.html;
-    } else if (_originalController is HtmlEditorController) {
-      mimeType = ChatMessageMimeType.html;
-    } else if (_originalController is rte.HtmlEditorController) {
-      mimeType = ChatMessageMimeType.html;
-    } else if (_originalController is HtmlEditorApi) {
-      mimeType = ChatMessageMimeType.html;
-    }
-  }
+  dynamic originalController;
+  ChatMessageMimeType mimeType = ChatMessageMimeType.html;
 
   Future<String?> get content async {
-    if (_originalController is QuillController) {
-      QuillController controller = _originalController as QuillController;
+    if (originalController is QuillController) {
+      QuillController controller = originalController as QuillController;
       Delta delta = controller.document.toDelta();
       return DocumentUtil.deltaToJson(delta);
-    } else if (_originalController is QuillEditorController) {
+    } else if (originalController is QuillEditorController) {
       QuillEditorController controller =
-          _originalController as QuillEditorController;
+          originalController as QuillEditorController;
       return await controller.getText();
-    } else if (_originalController is HtmlEditorController) {
+    } else if (originalController is HtmlEditorController) {
       HtmlEditorController controller =
-          _originalController as HtmlEditorController;
+          originalController as HtmlEditorController;
       return await controller.getText();
-    } else if (_originalController is rte.HtmlEditorController) {
+    } else if (originalController is rte.HtmlEditorController) {
       rte.HtmlEditorController controller =
-          _originalController as rte.HtmlEditorController;
+          originalController as rte.HtmlEditorController;
       return await controller.getText();
-    } else if (_originalController is HtmlEditorApi) {
-      HtmlEditorApi controller = _originalController as HtmlEditorApi;
+    } else if (originalController is HtmlEditorApi) {
+      HtmlEditorApi controller = originalController as HtmlEditorApi;
       return await controller.getText();
     }
     return null;
   }
 
   Future<String?> get html async {
-    if (_originalController is QuillController) {
-      QuillController controller = _originalController as QuillController;
+    if (originalController is QuillController) {
+      QuillController controller = originalController as QuillController;
       Delta delta = controller.document.toDelta();
       return DocumentUtil.deltaToHtml(delta);
-    } else if (_originalController is QuillEditorController) {
+    } else if (originalController is QuillEditorController) {
       QuillEditorController controller =
-          _originalController as QuillEditorController;
+          originalController as QuillEditorController;
       return await controller.getText();
-    } else if (_originalController is HtmlEditorController) {
+    } else if (originalController is HtmlEditorController) {
       HtmlEditorController controller =
-          _originalController as HtmlEditorController;
+          originalController as HtmlEditorController;
       return await controller.getText();
-    } else if (_originalController is rte.HtmlEditorController) {
+    } else if (originalController is rte.HtmlEditorController) {
       rte.HtmlEditorController controller =
-          _originalController as rte.HtmlEditorController;
+          originalController as rte.HtmlEditorController;
       return await controller.getText();
-    } else if (_originalController is HtmlEditorApi) {
-      HtmlEditorApi controller = _originalController as HtmlEditorApi;
+    } else if (originalController is HtmlEditorApi) {
+      HtmlEditorApi controller = originalController as HtmlEditorApi;
       return await controller.getFullHtml();
     }
     return null;
@@ -89,16 +70,14 @@ class PlatformEditorController with ChangeNotifier {
 class PlatformEditorWidget extends StatefulWidget {
   final double? height;
   final String? initialText;
-  PlatformEditorController? platformEditorController;
+  final PlatformEditorController platformEditorController;
 
-  PlatformEditorWidget({
+  const PlatformEditorWidget({
     Key? key,
     this.initialText,
     this.height,
-    this.platformEditorController,
-  }) : super(key: key) {
-    platformEditorController ??= PlatformEditorController();
-  }
+    required this.platformEditorController,
+  }) : super(key: key);
 
   @override
   State createState() => _PlatformEditorWidgetState();
@@ -111,12 +90,13 @@ class _PlatformEditorWidgetState extends State<PlatformEditorWidget> {
   }
 
   _onCreateController(dynamic controller) {
-    widget.platformEditorController!._originalController = controller;
+    widget.platformEditorController.originalController = controller;
   }
 
   @override
   Widget build(BuildContext context) {
     if (platformParams.desktop) {
+      widget.platformEditorController.mimeType = ChatMessageMimeType.json;
       return KeepAliveWrapper(
           child: QuillEditorWidget(
         height: widget.height,
