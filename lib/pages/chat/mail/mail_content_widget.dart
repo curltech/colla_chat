@@ -6,7 +6,6 @@ import 'package:colla_chat/pages/chat/mail/full_screen_attachment_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/emailaddress.dart';

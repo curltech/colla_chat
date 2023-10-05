@@ -31,6 +31,8 @@ class _HtmlWebViewState extends State<HtmlWebView> {
         );
       },
       onLoadingBuilder: (context, element, loadingProgress) {
+        return null;
+      
         // return LoadingUtil.buildCircularLoadingWidget();
       },
       renderMode: RenderMode.listView,
