@@ -8,13 +8,14 @@ import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.da
 import 'package:colla_chat/pages/chat/channel/publish_channel_edit_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 //频道的页面,展示自己发布的频道消息列表
 class PublishChannelListWidget extends StatefulWidget with TileDataMixin {
@@ -150,6 +151,31 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
       subtitle: CommonAutoSizeText(sendTime),
       leading: leading,
       trailing: thumbnailWidget,
+    );
+
+    ActionPane actionPane = ActionPane(
+      extentRatio: 0.3,
+      motion: const DrawerMotion(),
+      children: <SlidableAction>[
+        SlidableAction(
+          padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 0),
+          onPressed: (context) async {
+            await chatMessageService
+                .remove(where: 'id=?', whereArgs: [chatMessage.id!]);
+          },
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+          icon: Icons.delete_outline,
+          label: AppLocalizations.t('Delete'),
+          borderRadius: BorderRadius.circular(0),
+        )
+      ],
+    );
+
+    chatMessageItem = Slidable(
+      key: UniqueKey(),
+      startActionPane: actionPane,
+      child: chatMessageItem,
     );
 
     // index=0执行动画，对最新的消息执行动画

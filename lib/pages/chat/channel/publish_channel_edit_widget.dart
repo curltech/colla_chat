@@ -110,7 +110,7 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
     } else {
       chatMessage = await myChannelChatMessageController
           .buildChannelChatMessage(title, content!, thumbnail.value);
-      myChannelChatMessageController.current = chatMessage;
+      myChannelChatMessageController.add(chatMessage);
       newDocument = true;
     }
     chatMessage.mimeType = ChatMessageMimeType.json.name;
@@ -126,27 +126,10 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
 
   ///将编辑的内容正式发布，统一采用html格式保存和发送，原先保存的草案要转换格式，更新状态
   _publish() async {
+    await _save();
     ChatMessage? chatMessage = myChannelChatMessageController.current;
     if (chatMessage == null) {
-      String title = textEditingController.text;
-      if (StringUtil.isEmpty(title)) {
-        DialogUtil.error(context,
-            content: AppLocalizations.t('Must have title'));
-        return;
-      }
-      String? content = await platformEditorController.content;
-      if (mounted && StringUtil.isEmpty(content)) {
-        DialogUtil.error(context,
-            content: AppLocalizations.t('Must have content'));
-        return;
-      }
-      chatMessage =
-          await myChannelChatMessageController.buildChannelChatMessage(
-              title,
-              content!,
-              mimeType: ChatMessageMimeType.json,
-              thumbnail.value);
-      myChannelChatMessageController.current = chatMessage;
+      return;
     }
     String? mimeType = chatMessage.mimeType;
     if (mimeType == ChatMessageMimeType.json.name) {

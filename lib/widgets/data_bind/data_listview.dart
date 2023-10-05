@@ -50,6 +50,7 @@ class DataListView extends StatefulWidget {
 
 class _DataListViewState extends State<DataListView> {
   final ScrollController scrollController = ScrollController();
+
   // late final EasyRefreshController easyRefreshController;
 
   @override
@@ -58,10 +59,6 @@ class _DataListViewState extends State<DataListView> {
     widget.controller.addListener(_update);
     myself.addListener(_update);
     scrollController.addListener(_onScroll);
-    // easyRefreshController = EasyRefreshController(
-    //   controlFinishRefresh: true,
-    //   controlFinishLoad: true,
-    // );
 
     ///滚到指定的位置
     // widget.scrollController.animateTo(offset,
@@ -98,15 +95,12 @@ class _DataListViewState extends State<DataListView> {
     if (widget.onRefresh != null) {
       await widget.onRefresh!();
     }
-    // easyRefreshController.finishRefresh();
-    // easyRefreshController.resetFooter();
   }
 
   Future<void> _onLoad() async {
     if (widget.onRefresh != null) {
       await widget.onRefresh!();
     }
-    // easyRefreshController.finishLoad(IndicatorResult.success);
   }
 
   _onTap(int index, String title, {String? subtitle}) {
@@ -157,48 +151,8 @@ class _DataListViewState extends State<DataListView> {
       return listViewWidget;
     }
 
-    Widget view =RefreshIndicator(
-      onRefresh: _onRefresh,
-      child: listViewWidget);
-
-      // Widget view = EasyRefresh(
-    //   header: ClassicHeader(
-    //     clamping: false,
-    //     backgroundColor: myself.primary,
-    //     mainAxisAlignment: MainAxisAlignment.center,
-    //     showMessage: true,
-    //     showText: true,
-    //     infiniteOffset: 70,
-    //     triggerWhenReach: true,
-    //     dragText: AppLocalizations.t('Pull to refresh'),
-    //     armedText: AppLocalizations.t('Release ready'),
-    //     readyText: AppLocalizations.t('Refreshing...'),
-    //     processingText: AppLocalizations.t('Refreshing...'),
-    //     processedText: AppLocalizations.t('Succeeded'),
-    //     noMoreText: AppLocalizations.t('No more'),
-    //     failedText: AppLocalizations.t('Failed'),
-    //     messageText: AppLocalizations.t('Last updated at %T'),
-    //   ),
-    //   footer: ClassicFooter(
-    //     clamping: false,
-    //     backgroundColor: myself.primary,
-    //     mainAxisAlignment: MainAxisAlignment.center,
-    //     showMessage: true,
-    //     showText: true,
-    //     infiniteOffset: 70,
-    //     triggerWhenReach: true,
-    //     dragText: AppLocalizations.t('Pull to load'),
-    //     armedText: AppLocalizations.t('Release ready'),
-    //     readyText: AppLocalizations.t('Loading...'),
-    //     processingText: AppLocalizations.t('Loading...'),
-    //     processedText: AppLocalizations.t('Succeeded'),
-    //     noMoreText: AppLocalizations.t('No more'),
-    //     failedText: AppLocalizations.t('Failed'),
-    //     messageText: AppLocalizations.t('Last updated at %T'),
-    //   ),
-    //   onRefresh: _onRefresh,
-    //   controller: easyRefreshController,
-    //   child: listViewWidget);
+    Widget view =
+        RefreshIndicator(onRefresh: _onRefresh, child: listViewWidget);
 
     return view;
   }
