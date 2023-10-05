@@ -170,8 +170,11 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
           color: Colors.white,
         ),
         label: AppLocalizations.t('Publish channel'),
+        labelColor: Colors.white,
       ),
-      const SizedBox(width: 10,),
+      const SizedBox(
+        width: 10,
+      ),
     ];
     return AppBarView(
         centerTitle: false,

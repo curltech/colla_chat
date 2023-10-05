@@ -130,7 +130,8 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
     if (chatMessage == null) {
       String title = textEditingController.text;
       if (StringUtil.isEmpty(title)) {
-        DialogUtil.error(context, content: AppLocalizations.t('Must have title'));
+        DialogUtil.error(context,
+            content: AppLocalizations.t('Must have title'));
         return;
       }
       String? content = await platformEditorController.content;
@@ -214,6 +215,7 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
             await _save();
           },
           label: AppLocalizations.t('Save'),
+          labelColor: Colors.white,
         ),
         IconTextButton(
           icon: const Icon(Icons.publish),
@@ -221,8 +223,11 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
             await _publish();
           },
           label: AppLocalizations.t('Publish'),
+          labelColor: Colors.white,
         ),
-        const SizedBox(width: 10,),
+        const SizedBox(
+          width: 10,
+        ),
       ],
       child: _buildChannelItemView(context),
     );

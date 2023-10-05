@@ -200,6 +200,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
           color: Colors.white,
         ),
         label: AppLocalizations.t('Add document'),
+        labelColor: Colors.white,
       ),
       const SizedBox(
         width: 10,
