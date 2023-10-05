@@ -162,6 +162,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
           onPressed: (context) async {
             await chatMessageService
                 .remove(where: 'id=?', whereArgs: [chatMessage.id!]);
+            myChannelChatMessageController.delete(index: index);
           },
           backgroundColor: Colors.blue,
           foregroundColor: Colors.white,
