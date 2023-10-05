@@ -5,6 +5,7 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class GroupDataListController with ChangeNotifier {
   final Map<TileData, DataListController<TileData>> controllers = {};
@@ -104,14 +105,14 @@ class _GroupDataListViewState extends State<GroupDataListView> {
     }
   }
 
-  Widget? _buildExpansionTile(TileData tile) {
-    var dataListController = widget.controller.get(tile);
+  Widget? _buildExpansionTile(TileData tileData) {
+    var dataListController = widget.controller.get(tileData);
     if (dataListController == null) {
       return null;
     }
-    Widget? leading = tile.getPrefixWidget(true);
+    Widget? leading = tileData.getPrefixWidget(true);
     List<Widget>? trailing = <Widget>[];
-    var suffix = tile.suffix;
+    var suffix = tileData.suffix;
     if (suffix != null) {
       if (suffix is Widget) {
         trailing.add(suffix);
@@ -134,27 +135,29 @@ class _GroupDataListViewState extends State<GroupDataListView> {
     }
 
     Widget dataListView = DataListView(
-        onTap: _onTap, group: tile, controller: dataListController);
-    bool selected = tile.selected ?? false;
+        onTap: _onTap, group: tileData, controller: dataListController);
+    bool selected = tileData.selected ?? false;
 
-    ///未来不使用ListTile，因为高度固定，不够灵活
-    return ExpansionTile(
+    /// 未来不使用ListTile，因为高度固定，不够灵活
+    ExpansionTile expansionTile = ExpansionTile(
       childrenPadding: const EdgeInsets.all(0),
       maintainState: true,
       leading: leading,
       textColor: selected ? myself.primary : null,
       title: CommonAutoSizeText(
-        AppLocalizations.t(tile.title),
+        AppLocalizations.t(tileData.title),
       ),
-      subtitle: tile.subtitle != null
+      subtitle: tileData.subtitle != null
           ? CommonAutoSizeText(
-              tile.subtitle!,
+              tileData.subtitle!,
             )
           : null,
       trailing: trailingWidget,
       initiallyExpanded: true,
       children: [dataListView],
     );
+
+    return expansionTile;
   }
 
   Widget _buildListView(BuildContext context) {

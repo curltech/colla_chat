@@ -1,4 +1,5 @@
 import 'package:colla_chat/entity/chat/emailaddress.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/mail/address/auto_discover_widget.dart';
 import 'package:colla_chat/pages/chat/mail/address/manual_add_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_mime_message_controller.dart';
@@ -55,6 +56,17 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
         TileData groupTile = TileData(
             title: mailAddress.email,
             subtitle: mailAddress.name,
+            prefix: IconButton(
+              onPressed: () {
+                int? id = mailAddress.id;
+                if (id != null) {
+                  emailAddressService.delete(where: 'id=?', whereArgs: [id]);
+                  mailMimeMessageController.delete(index: i);
+                }
+              },
+              icon: const Icon(Icons.delete_outline),
+              tooltip: AppLocalizations.t('Delete'),
+            ),
             selected: mailMimeMessageController.currentIndex == i);
         List<TileData> tiles = [];
         List<enough_mail.Mailbox?>? mailboxes =
@@ -72,22 +84,6 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
                   selected: mailMimeMessageController.currentIndex == i &&
                       currentMailboxName == mailbox.name);
               tiles.add(tile);
-
-              // 删除地址按钮
-              List<TileData> slideActions = [];
-              TileData slideTile = TileData(
-                  title: 'Delete',
-                  prefix: Icons.delete_outline,
-                  onTap: (int index, String label, {String? subtitle}) async {
-                    int? id = mailAddress.id;
-                    if (id != null) {
-                      emailAddressService
-                          .delete(where: 'id=?', whereArgs: [id]);
-                      mailMimeMessageController.delete(index: i);
-                    }
-                  });
-              slideActions.add(slideTile);
-              tile.slideActions = slideActions;
             }
           }
         }

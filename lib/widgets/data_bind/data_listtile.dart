@@ -251,8 +251,7 @@ class DataListTile extends StatelessWidget {
     return listTile;
   }
 
-  ActionPane _buildActionPane(
-      BuildContext context, List<TileData>? slideActions) {
+  ActionPane _buildActionPane(List<TileData>? slideActions) {
     List<SlidableAction> slidableActions = [];
     int i = 0;
 
@@ -310,12 +309,12 @@ class DataListTile extends StatelessWidget {
 
     ActionPane? startActionPane;
     if (tileData.slideActions != null && tileData.slideActions!.isNotEmpty) {
-      startActionPane = _buildActionPane(context, tileData.slideActions);
+      startActionPane = _buildActionPane(tileData.slideActions);
     }
     ActionPane? endActionPane;
     if (tileData.endSlideActions != null &&
         tileData.endSlideActions!.isNotEmpty) {
-      endActionPane = _buildActionPane(context, tileData.endSlideActions);
+      endActionPane = _buildActionPane(tileData.endSlideActions);
     }
 
     Slidable slidable = Slidable(
