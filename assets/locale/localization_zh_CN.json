@@ -550,5 +550,7 @@
   "Tap to return to the app": "点击返回app",
   "CollaChat foreground service": "CollaChat前台服务",
   "CollaChat foreground service initializing": "CollaChat前台服务正在初始化",
-  "Need you play record audio filename": "需要播放记录的音频文件"
+  "Need you play record audio filename": "需要播放记录的音频文件",
+  "Do you confirm publish?": "确认发布吗？",
+  "Do you confirm delete?": "确认删除吗？"
 }

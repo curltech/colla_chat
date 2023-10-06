@@ -5,16 +5,12 @@ import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.da
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
-import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/document_util.dart';
-import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
-import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/richtext/platform_editor_widget.dart';
 import 'package:colla_chat/widgets/webview/html_preview_widget.dart';
@@ -125,37 +121,6 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
     }
   }
 
-  ///将编辑的内容正式发布，统一采用html格式保存和发送，原先保存的草案要转换格式，更新状态
-  _publish() async {
-    await _save();
-    ChatMessage? chatMessage = myChannelChatMessageController.current;
-    if (chatMessage == null) {
-      return;
-    }
-    String? mimeType = chatMessage.mimeType;
-    if (mimeType == ChatMessageMimeType.json.name) {
-      var bytes = await messageAttachmentService.findContent(
-          chatMessage.messageId!, chatMessage.title!);
-      if (bytes != null) {
-        String json = CryptoUtil.utf8ToString(bytes);
-        var deltaJson = JsonUtil.toJson(json);
-        var html = DocumentUtil.jsonToHtml(deltaJson);
-        chatMessage.mimeType = ChatMessageMimeType.html.name;
-        chatMessage.content = chatMessageService.processContent(html);
-      }
-      chatMessage.status = MessageStatus.published.name;
-      chatMessage.sendTime = DateUtil.currentDate();
-      await chatMessageService.store(chatMessage);
-    } else if (mimeType == ChatMessageMimeType.html.name) {
-      await myChannelChatMessageController.publish(chatMessage.messageId!);
-    }
-
-    if (mounted) {
-      DialogUtil.info(context,
-          content: AppLocalizations.t('Publish document successfully'));
-    }
-  }
-
   Widget _buildTitleTextField(BuildContext context) {
     var textFormField = CommonTextFormField(
       controller: textEditingController,
@@ -167,7 +132,7 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
 
   Widget _buildChannelItemView(BuildContext context) {
     Widget titleWidget = Container(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(5.0),
         child: _buildTitleTextField(context));
     Widget view = FutureBuilder(
         future: _findContent(),
@@ -179,11 +144,13 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
           return Column(children: [
             titleWidget,
             Expanded(
-                child: KeepAliveWrapper(
+                child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 0.0, horizontal: 5.0),
                     child: PlatformEditorWidget(
-              initialText: content,
-              platformEditorController: platformEditorController,
-            )))
+                      initialText: content,
+                      platformEditorController: platformEditorController,
+                    )))
           ]);
         });
 
@@ -203,14 +170,6 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
             await _save();
           },
           label: AppLocalizations.t('Save'),
-          labelColor: Colors.white,
-        ),
-        IconTextButton(
-          icon: const Icon(Icons.publish),
-          onPressed: () async {
-            await _publish();
-          },
-          label: AppLocalizations.t('Publish'),
           labelColor: Colors.white,
         ),
         const SizedBox(

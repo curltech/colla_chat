@@ -18,7 +18,7 @@ class QuillHtmlEditorWidget extends StatefulWidget {
     Key? key,
     this.height,
     this.initialText,
-    this.mimeType = ChatMessageMimeType.json,
+    this.mimeType = ChatMessageMimeType.html,
     this.onCreateController,
     this.withMultiMedia = true,
     this.base64 = true,
@@ -44,7 +44,8 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
         var delta = JsonUtil.toJson(widget.initialText!);
         controller.setDelta(delta);
       }
-      if (widget.mimeType == ChatMessageMimeType.html) {
+      if (widget.mimeType == ChatMessageMimeType.html &&
+          widget.initialText != null) {
         controller.setText(widget.initialText!);
       }
     }
@@ -74,14 +75,19 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
   }
 
   Widget _buildQuillHtmlEditor(BuildContext context) {
-    Widget quillHtmlEditor = QuillHtmlEditor(
-      controller: controller,
-      isEnabled: true,
-      minHeight: 200,
-      ensureVisible: true,
-      hintTextAlign: TextAlign.start,
-      hintText: '',
-    );
+    Widget quillHtmlEditor = LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+      double height = widget.height ?? constraints.minHeight;
+      return QuillHtmlEditor(
+        text: widget.initialText,
+        controller: controller,
+        isEnabled: true,
+        minHeight: height,
+        ensureVisible: true,
+        hintTextAlign: TextAlign.start,
+        hintText: '',
+      );
+    });
     var toolbar = _buildQuillToolbar(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -97,10 +103,8 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
           color: myself.primary,
         ),
         Expanded(
-            child: SizedBox(
-          height: widget.height,
           child: quillHtmlEditor,
-        )),
+        ),
       ],
     );
   }

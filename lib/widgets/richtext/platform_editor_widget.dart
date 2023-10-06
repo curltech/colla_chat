@@ -9,9 +9,9 @@ import 'package:colla_chat/widgets/richtext/quill_html_editor_widget.dart';
 import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_rte/flutter_rte.dart' as rte;
 import 'package:html_editor_enhanced/html_editor.dart';
 import 'package:quill_html_editor/quill_html_editor.dart';
-import 'package:flutter_rte/flutter_rte.dart' as rte;
 
 class PlatformEditorController with ChangeNotifier {
   dynamic originalController;
@@ -95,36 +95,34 @@ class _PlatformEditorWidgetState extends State<PlatformEditorWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (platformParams.desktop) {
-      widget.platformEditorController.mimeType = ChatMessageMimeType.json;
-      return KeepAliveWrapper(
-          child: QuillEditorWidget(
-        height: widget.height,
-        initialText: widget.initialText,
-        onCreateController: _onCreateController,
-      ));
-    }
-    if (platformParams.mobile || platformParams.web) {
-      return KeepAliveWrapper(
-          child: QuillHtmlEditorWidget(
-        height: widget.height,
-        initialText: widget.initialText,
-        onCreateController: _onCreateController,
-      ));
-    }
-    if (platformParams.windows) {
-      return KeepAliveWrapper(
-          child: HtmlRteWidget(
-        height: widget.height,
-        initialText: widget.initialText,
-        onCreateController: _onCreateController,
-      ));
-    }
-    return KeepAliveWrapper(
-        child: HtmlEditorWidget(
+    Widget editor = HtmlEditorWidget(
       height: widget.height,
       initialText: widget.initialText,
       onCreateController: _onCreateController,
-    ));
+    );
+    if (platformParams.desktop) {
+      widget.platformEditorController.mimeType = ChatMessageMimeType.json;
+      editor = QuillEditorWidget(
+        height: widget.height,
+        initialText: widget.initialText,
+        onCreateController: _onCreateController,
+      );
+    }
+    if (platformParams.mobile || platformParams.web) {
+      editor = QuillHtmlEditorWidget(
+        height: widget.height,
+        initialText: widget.initialText,
+        mimeType: ChatMessageMimeType.html,
+        onCreateController: _onCreateController,
+      );
+    }
+    if (platformParams.windows) {
+      editor = HtmlRteWidget(
+        height: widget.height,
+        initialText: widget.initialText,
+        onCreateController: _onCreateController,
+      );
+    }
+    return KeepAliveWrapper(child: editor);
   }
 }
