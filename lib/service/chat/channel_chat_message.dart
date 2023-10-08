@@ -93,10 +93,11 @@ class ChannelChatMessageService {
     List<ChatMessage> chatMessages = await findMyselfByPeerId(
         status: MessageStatus.published.name, sendTime: sendTime);
     if (chatMessages.isNotEmpty) {
-      for (var msg in chatMessages) {
+      for (ChatMessage msg in chatMessages) {
         msg.receiverPeerId = chatMessage.senderPeerId;
         msg.receiverName = chatMessage.senderName;
-        msg.senderClientId = chatMessage.senderClientId;
+        msg.receiverClientId = chatMessage.senderClientId;
+        msg.transportType = TransportType.webrtc.name;
         await chatMessageService.send(msg);
       }
     }
