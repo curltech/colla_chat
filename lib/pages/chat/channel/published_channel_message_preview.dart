@@ -9,27 +9,28 @@ import 'package:colla_chat/widgets/webview/platform_webview.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
-//频道消息的展示页面
-class ChannelMessagePreview extends StatefulWidget with TileDataMixin {
-  ChannelMessagePreview({Key? key}) : super(key: key);
+/// 发布频道消息的展示页面
+class PublishedChannelMessagePreview extends StatefulWidget with TileDataMixin {
+  PublishedChannelMessagePreview({Key? key}) : super(key: key);
 
   @override
-  State createState() => _ChannelMessagePreviewState();
+  State createState() => _PublishedChannelMessagePreviewState();
 
   @override
   bool get withLeading => true;
 
   @override
-  String get routeName => 'channel_message_preview';
+  String get routeName => 'published_channel_message_preview';
 
   @override
   IconData get iconData => Icons.view_agenda;
 
   @override
-  String get title => 'ChannelMessagePreview';
+  String get title => 'PublishedChannelMessagePreview';
 }
 
-class _ChannelMessagePreviewState extends State<ChannelMessagePreview>
+class _PublishedChannelMessagePreviewState
+    extends State<PublishedChannelMessagePreview>
     with TickerProviderStateMixin {
   @override
   void initState() {

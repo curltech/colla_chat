@@ -6,8 +6,9 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/channel/channel_message_preview.dart';
 import 'package:colla_chat/pages/chat/channel/publish_channel_list_widget.dart';
+import 'package:colla_chat/pages/chat/channel/published_channel_message_preview.dart';
+import 'package:colla_chat/pages/chat/channel/subscribe_channel_message_preview.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/channel_chat_message.dart';
@@ -26,7 +27,10 @@ class SubscribeChannelListWidget extends StatefulWidget with TileDataMixin {
   final ScrollController scrollController = ScrollController();
   final PublishChannelListWidget publishChannelListWidget =
       PublishChannelListWidget();
-  final ChannelMessagePreview channelMessagePreview = ChannelMessagePreview();
+  final PublishedChannelMessagePreview publishedChannelMessagePreview =
+      PublishedChannelMessagePreview();
+  final SubscribeChannelMessagePreview subscribeChannelMessagePreview =
+      SubscribeChannelMessagePreview();
 
   SubscribeChannelListWidget({
     Key? key,
@@ -35,7 +39,8 @@ class SubscribeChannelListWidget extends StatefulWidget with TileDataMixin {
     this.onScrollMin,
   }) : super(key: key) {
     indexWidgetProvider.define(publishChannelListWidget);
-    indexWidgetProvider.define(channelMessagePreview);
+    indexWidgetProvider.define(publishedChannelMessagePreview);
+    indexWidgetProvider.define(subscribeChannelMessagePreview);
   }
 
   @override
@@ -148,7 +153,7 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
         child: ListView.builder(
           controller: widget.scrollController,
           padding: const EdgeInsets.all(8.0),
-          reverse: true,
+          reverse: false,
           //消息组件渲染
           itemBuilder: _buildChannelChatMessageItem,
           //消息条目数
@@ -229,23 +234,29 @@ class ChannelChatMessageItem extends StatelessWidget {
       avatarImage = linkman.avatarImage!;
     }
     String title = chatMessage.title!;
-    String thumbnail = chatMessage.thumbnail!;
-    Widget thumbnailWidget = ImageUtil.buildImageWidget(image: thumbnail);
+    String? thumbnail = chatMessage.thumbnail;
+
+    List<Widget> children = [
+      Row(
+        children: [
+          avatarImage,
+          CommonAutoSizeText(name),
+        ],
+      ),
+      CommonAutoSizeText(title),
+    ];
+    Widget? thumbnailWidget;
+    if (thumbnail != null) {
+      thumbnailWidget = ImageUtil.buildImageWidget(image: thumbnail);
+      children.add(thumbnailWidget);
+    }
     Widget chatMessageItem = InkWell(
         onTap: () {
           channelChatMessageController.current = chatMessage;
-          indexWidgetProvider.push('channel_message_view');
+          indexWidgetProvider.push('subscribe_channel_message_preview');
         },
-        child: Column(children: [
-          Row(
-            children: [
-              avatarImage,
-              CommonAutoSizeText(name),
-            ],
-          ),
-          CommonAutoSizeText(title),
-          thumbnailWidget,
-        ]));
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start, children: children));
 
     return chatMessageItem;
   }
