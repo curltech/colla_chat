@@ -36,6 +36,11 @@ class _SubscribeChannelMessagePreviewState
   @override
   void initState() {
     super.initState();
+    channelChatMessageController.addListener(_update);
+  }
+
+  _update() {
+    setState(() {});
   }
 
   Future<String?> _buildHtml() async {
@@ -78,5 +83,11 @@ class _SubscribeChannelMessagePreviewState
             return Container();
           }),
     );
+  }
+
+  @override
+  void dispose() {
+    channelChatMessageController.removeListener(_update);
+    super.dispose();
   }
 }
