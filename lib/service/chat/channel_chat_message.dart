@@ -52,7 +52,8 @@ class ChannelChatMessageService {
   }
 
   /// 发出更新频道消息的请求
-  Future<ChatMessage?> updateSubscript(String peerId, {String? clientId}) async {
+  Future<ChatMessage?> updateSubscript(String peerId,
+      {String? clientId}) async {
     Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
     if (linkman == null) {
       return null;
@@ -84,7 +85,11 @@ class ChannelChatMessageService {
     if (ChatMessageSubType.updateSubscript.name != subMessageType) {
       return;
     }
-    String? sendTime = chatMessage.sendTime;
+    String? content = chatMessage.content;
+    String? sendTime;
+    if (content != null) {
+      sendTime = chatMessageService.recoverContent(content);
+    }
     List<ChatMessage> chatMessages = await findMyselfByPeerId(
         status: MessageStatus.published.name, sendTime: sendTime);
     if (chatMessages.isNotEmpty) {
