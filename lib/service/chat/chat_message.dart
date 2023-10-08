@@ -745,33 +745,6 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return null;
   }
 
-  ///发送消息，并更新发送状态字段，如果chatMessage的groupType不为空，则是群消息，支持群发
-  ///群发的时候peerIds不为空，有值
-  ///以特定的发送方式发送数据，返回实际成功的发送方式
-  Future<List<ChatMessage>> send(ChatMessage chatMessage,
-      {CryptoOption? cryptoOption, List<String>? peerIds}) async {
-    ///对消息进行分拆和加密
-    List<ChatMessage> chatMessages =
-        await _buildGroupChatMessages(chatMessage, peerIds: peerIds);
-    Map<String, List<int>> encryptData = await encrypt(chatMessage,
-        cryptoOption: cryptoOption, peerIds: peerIds);
-    for (var chatMessage in chatMessages) {
-      String? peerId = chatMessage.receiverPeerId;
-      if (peerId == null || peerId == myself.peerId) {
-        chatMessage.transportType = TransportType.none.name;
-        continue;
-      }
-      List<int>? data = encryptData[peerId];
-      if (data == null) {
-        chatMessage.transportType = TransportType.none.name;
-        continue;
-      }
-      await _send(chatMessage, data);
-    }
-
-    return chatMessages;
-  }
-
   ///对单条消息和对应的加密数据进行发送
   ///对webrtc和websocket来说是发送已经加密的数据，因为单发和群发的加密方式不一样
   ///对sms来说是发送文本内容，也是自己进行加密，加密的时机不一样
@@ -864,29 +837,6 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     }
   }
 
-  ///发送消息，并保存本地，由于是先发送后保存，所以新消息的id，createDate等字段是空的
-  ///如果chatMessage的groupType不为空，则是群消息，支持群发
-  ///群发的时候peerIds不为空，有值
-  Future<List<ChatMessage>> sendAndStore(ChatMessage chatMessage,
-      {CryptoOption? cryptoOption, List<String>? peerIds}) async {
-    if (chatMessage.receiverPeerId == myself.peerId) {
-      chatMessage.transportType = TransportType.none.name;
-      await chatMessageService.store(chatMessage);
-      return [chatMessage];
-    }
-    List<ChatMessage> chatMessages =
-        await send(chatMessage, cryptoOption: cryptoOption, peerIds: peerIds);
-    if (chatMessages.isNotEmpty) {
-      for (var msg in chatMessages) {
-        if (msg.receiverPeerId == myself.peerId) {
-          msg.transportType = TransportType.none.name;
-        }
-        await chatMessageService.store(msg);
-      }
-    }
-    return chatMessages;
-  }
-
   ///转发消息
   Future<List<ChatMessage>?> forward(ChatMessage chatMessage, String peerId,
       {CryptoOption cryptoOption = CryptoOption.linkman}) async {
@@ -976,6 +926,65 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return chatMessages;
   }
 
+  ///发送消息，并保存本地，由于是先发送后保存，所以新消息的id，createDate等字段是空的
+  ///如果chatMessage的groupType不为空，则是群消息，支持群发
+  ///群发的时候peerIds不为空，有值
+  Future<List<ChatMessage>> sendAndStore(ChatMessage chatMessage,
+      {CryptoOption? cryptoOption, List<String>? peerIds}) async {
+    if (chatMessage.receiverPeerId == myself.peerId) {
+      chatMessage.transportType = TransportType.none.name;
+      await chatMessageService.store(chatMessage);
+      return [chatMessage];
+    }
+    List<ChatMessage> chatMessages =
+        await send(chatMessage, cryptoOption: cryptoOption, peerIds: peerIds);
+    if (chatMessages.isNotEmpty) {
+      for (var msg in chatMessages) {
+        if (msg.receiverPeerId == myself.peerId) {
+          msg.transportType = TransportType.none.name;
+        }
+        await chatMessageService.store(msg);
+      }
+    }
+    return chatMessages;
+  }
+
+  ///发送消息，并更新发送状态字段，如果chatMessage的groupType不为空，则是群消息，支持群发
+  ///群发的时候peerIds不为空，有值
+  ///以特定的发送方式发送数据，返回实际成功的发送方式
+  Future<List<ChatMessage>> send(ChatMessage chatMessage,
+      {CryptoOption? cryptoOption, List<String>? peerIds}) async {
+    ///对消息进行分拆和加密
+    List<ChatMessage> chatMessages =
+        await _buildGroupChatMessages(chatMessage, peerIds: peerIds);
+    Map<String, List<int>> encryptData = await encrypt(chatMessage,
+        cryptoOption: cryptoOption, peerIds: peerIds);
+    for (var chatMessage in chatMessages) {
+      String? peerId = chatMessage.receiverPeerId;
+      if (peerId == null || peerId == myself.peerId) {
+        chatMessage.transportType = TransportType.none.name;
+        continue;
+      }
+      List<int>? data = encryptData[peerId];
+      if (data == null) {
+        chatMessage.transportType = TransportType.none.name;
+        continue;
+      }
+      await _send(chatMessage, data);
+    }
+
+    return chatMessages;
+  }
+
+  bool hasAttachment(String contentType) {
+    return (contentType == ChatMessageContentType.file.name ||
+        contentType == ChatMessageContentType.media.name ||
+        contentType == ChatMessageContentType.image.name ||
+        contentType == ChatMessageContentType.video.name ||
+        contentType == ChatMessageContentType.audio.name ||
+        contentType == ChatMessageContentType.rich.name);
+  }
+
   /// 保存单条消息，对于复杂消息，存储附件
   /// 如果content为空，不用考虑附件，有可能title就是文件名
   store(ChatMessage chatMessage,
@@ -995,16 +1004,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String? contentType = chatMessage.contentType;
     String? mimeType = chatMessage.mimeType;
     String? messageId;
-    //内容是否需要以附件形式保存
+    // 内容是否需要以附件形式保存
     bool attachment = false;
     if (content != null) {
-      if (contentType != null &&
-          (contentType == ChatMessageContentType.file.name ||
-              contentType == ChatMessageContentType.media.name ||
-              contentType == ChatMessageContentType.image.name ||
-              contentType == ChatMessageContentType.video.name ||
-              contentType == ChatMessageContentType.audio.name ||
-              contentType == ChatMessageContentType.rich.name)) {
+      if (contentType != null && hasAttachment(contentType)) {
         if (chatMessage.thumbnail == null &&
             contentType == ChatMessageContentType.image.name) {
           Uint8List image = CryptoUtil.decodeBase64(content);

@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:typed_data';
 
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/service/chat/message_attachment.dart';
 
 class ChannelChatMessageService {
   ///获取所有的其他人发出的，接收人是自己的频道消息
@@ -98,6 +101,11 @@ class ChannelChatMessageService {
         msg.receiverName = chatMessage.senderName;
         msg.receiverClientId = chatMessage.senderClientId;
         msg.transportType = TransportType.webrtc.name;
+        Uint8List? content = await messageAttachmentService.findContent(
+            msg.messageId!, msg.title);
+        if (content != null) {
+          msg.content = CryptoUtil.encodeBase64(content);
+        }
         await chatMessageService.send(msg);
       }
     }
