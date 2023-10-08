@@ -2,7 +2,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:flutter/material.dart';
 
 class DateUtil {
-  ///获取当前时间的ISO字符串
+  ///获取当前Utc时间
   static DateTime currentDateTime() {
     var currentDate = DateTime.now().toUtc();
     return currentDate;

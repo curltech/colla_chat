@@ -10,6 +10,7 @@ import 'package:colla_chat/pages/chat/channel/channel_message_preview.dart';
 import 'package:colla_chat/pages/chat/channel/publish_channel_list_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/service/chat/channel_chat_message.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -159,6 +160,27 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
   Widget build(BuildContext context) {
     var channelChatMessageWidget = _buildChannelChatMessageWidget(context);
     List<Widget>? rightWidgets = [
+      IconTextButton(
+        onPressed: () async {
+          List<Linkman> linkmen =
+              await linkmanService.findSubscript(LinkmanStatus.subscript);
+          if (linkmen.isNotEmpty) {
+            for (Linkman linkman in linkmen) {
+              channelChatMessageService.updateSubscript(linkman.peerId,
+                  clientId: linkman.clientId);
+            }
+          }
+        },
+        icon: const Icon(
+          Icons.refresh,
+          color: Colors.white,
+        ),
+        label: AppLocalizations.t('Refresh'),
+        labelColor: Colors.white,
+      ),
+      const SizedBox(
+        width: 10,
+      ),
       IconTextButton(
         onPressed: () async {
           myChannelChatMessageController.clear(notify: false);

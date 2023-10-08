@@ -134,6 +134,16 @@ class LinkmanService extends PeerPartyService<Linkman> {
     return image;
   }
 
+  Future<List<Linkman>> findSubscript(LinkmanStatus linkmanStatus) async {
+    var where = 'subscriptStatus=?';
+    List<Object> whereArgs = [linkmanStatus.name];
+    var linkmen = await find(
+      where: where,
+      whereArgs: whereArgs,
+    );
+    return linkmen;
+  }
+
   ///保存新的联系人信息，同时修改自己，peerClient和chatSummary的信息
   Future<void> store(Linkman linkman) async {
     Linkman? old = await findCachedOneByPeerId(linkman.peerId);

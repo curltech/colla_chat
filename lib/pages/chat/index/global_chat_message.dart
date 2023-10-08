@@ -353,11 +353,6 @@ class GlobalChatMessage {
     linkmanService.modifyLinkman(peerId, clientId: clientId);
   }
 
-  ///发送获取新的频道消息的请求
-  sendUpdateSubscript(String peerId, {String? clientId}) async {
-    channelChatMessageService.updateSubscript(peerId, clientId: clientId);
-  }
-
   ///发送PreKeyBundle
   sendPreKeyBundle(String peerId, {required String clientId}) async {
     return;

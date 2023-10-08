@@ -54,9 +54,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     post = (Map map) {
       return ChatMessage.fromJson(map);
     };
-    // timer = Timer.periodic(const Duration(seconds: 60), (timer) async {
-    //   deleteTimeout();
-    // });
+    timer = Timer.periodic(const Duration(seconds: 60), (timer) async {
+      deleteTimeout();
+      deleteSystem();
+    });
   }
 
   ///查询消息号相同的所有消息
@@ -1131,8 +1132,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     }
   }
 
+  /// 删除所有已读且有销毁时间的记录
+  /// 删除一天前的系统记录
   deleteTimeout() async {
-    //所有已读且有销毁时间的记录
     String where = 'deleteTime>0 and readTime is not null';
     List<Object> whereArgs = [];
     var chatMessages = await find(
@@ -1161,7 +1163,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     }
   }
 
-  ///删除linkman的消息
+  /// 删除linkman的消息
   removeByLinkman(String peerId) {
     var myselfPeerId = myself.peerId!;
     delete(
@@ -1170,9 +1172,18 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         whereArgs: [peerId, myselfPeerId, myselfPeerId, peerId]);
   }
 
-  ///删除group的消息
+  /// 删除group的消息
   removeByGroup(String peerId) {
     delete(where: 'groupId=?', whereArgs: [peerId]);
+  }
+
+  /// 删除过期的系统消息
+  deleteSystem() {
+    String yesterday =
+        DateTime.now().toUtc().add(const Duration(days: -1)).toIso8601String();
+    delete(
+        where: 'messageType=? and createDate<?',
+        whereArgs: [ChatMessageType.system.name, yesterday]);
   }
 }
 
