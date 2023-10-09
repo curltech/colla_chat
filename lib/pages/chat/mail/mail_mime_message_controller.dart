@@ -393,7 +393,7 @@ class MailMimeMessageController
       }
     }
     if (decryptedData.needDecrypt) {
-      if (keys != null) {
+      if (keys != null && keys.isNotEmpty) {
         Map<String, dynamic> payloadKeys = JsonUtil.toJson(keys);
         if (payloadKeys.isEmpty) {
           //linkman加密
@@ -415,6 +415,7 @@ class MailMimeMessageController
           }
         }
       } else {
+        /// 如果没有key，则是自己发送给自己
         logger.e('needEncrypt but no keys');
         decryptedData.payloadKey = null;
       }
