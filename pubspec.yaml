@@ -83,7 +83,7 @@ dependencies:
   #网络
   dio: ^5.0.2
   dio_http2_adapter: ^2.1.0
-  web_socket_channel: ^2.2.0
+  web_socket_channel: ^2.4.0
   #cached_network_image: ^3.0.0
   #flutter_sms: ^2.3.3 #android compile failure
   #sms_advanced: ^1.0.2 #android版本有问题
@@ -401,7 +401,7 @@ dependency_overrides:
   #  firebase_core_desktop: ^1.0.2
   video_player_platform_interface: ^6.0.1
   path: ^1.8.3
-  dio: ^5.0.2 #^4.0.6 openai
+  dio: ^5.3.3 #^4.0.6 openai
   audio_video_progress_bar: ^1.0.0
   pdfx: 2.2.0 #2.3.0在macos下编译错误,web下不能使用
   #printing: ^5.11.0 #所有平台，使用pdf，把一些其他的格式转换成pdf并显示，目前windows下有bug

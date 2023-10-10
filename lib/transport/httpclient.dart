@@ -14,8 +14,8 @@ class DioHttpClient implements IWebClient {
   DioHttpClient(String address) {
     if (address.startsWith('http')) {
       ///获取dio中的httpclient，处理证书问题
-      (_client.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate =
-          (HttpClient client) {
+      (_client.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+        final client = HttpClient();
         client.findProxy = (url) {
           // ///设置代理 电脑ip地址
           // return "PROXY 192.168.31.102:8888";
@@ -44,7 +44,7 @@ class DioHttpClient implements IWebClient {
         logger.e(response.statusCode);
       }
       return handler.next(response);
-    }, onError: (DioError e, handler) {
+    }, onError: (DioException e, handler) {
       logger.e(e.message);
       var statusCode = e.response?.statusCode;
       if (statusCode == 401) {
