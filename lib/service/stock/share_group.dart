@@ -5,7 +5,9 @@ import 'package:colla_chat/service/servicelocator.dart';
 
 class ShareGroupService extends GeneralBaseService<ShareGroup> {
   String defaultGroupName = '我的自选';
-  Map<String, List<String>> shareGroupCodes = {};
+
+  /// 分组对应的tscode的字符串
+  Map<String, String> groupSubscription = {};
 
   ShareGroupService(
       {required super.tableName,
@@ -16,51 +18,47 @@ class ShareGroupService extends GeneralBaseService<ShareGroup> {
     };
   }
 
-  Future<List<String>?> findShareGroup(String groupName) async {
-    List<String>? shareCodes = shareGroupCodes[groupName];
-    if (shareCodes == null) {
+  Future<String?> findSubscription(String groupName) async {
+    String? subscription = groupSubscription[groupName];
+    if (subscription == null) {
       List<ShareGroup> shareGroups =
           await find(where: 'groupName=?', whereArgs: [groupName]);
       if (shareGroups.isNotEmpty) {
-        shareCodes = [];
+        subscription = '';
         for (ShareGroup shareGroup in shareGroups) {
-          shareCodes.add(shareGroup.tsCode!);
+          subscription = '${subscription!},${shareGroup.subscription!}';
         }
-        shareGroupCodes[groupName] = shareCodes;
+        groupSubscription[groupName] = subscription!;
       }
     }
-    return shareCodes;
+    return subscription;
   }
 
   removeShareGroup(String groupName) async {
-    shareGroupCodes.remove(groupName);
+    groupSubscription.remove(groupName);
     delete(where: 'groupName=?', whereArgs: [groupName]);
   }
 
-  /// 获取股票所属的组
-  Future<List<String>> getShareGroups(String tsCode) async {
-    List<String> groupNames = [];
-    List<ShareGroup> shareGroups =
-        await find(where: 'tsCode=?', whereArgs: [tsCode]);
-    if (shareGroups.isNotEmpty) {
-      for (ShareGroup shareGroup in shareGroups) {
-        groupNames.add(shareGroup.groupName!);
-      }
+  bool add(String groupName, String tsCode) {
+    String? subscription = groupSubscription[groupName];
+    subscription ??= '';
+    if (!subscription.contains(tsCode)) {
+      subscription = '$subscription,$tsCode';
+      groupSubscription[groupName] = subscription;
+      ShareGroup shareGroup = ShareGroup();
+      shareGroup.groupName = groupName;
+      shareGroup.subscription = subscription;
+      update(shareGroup, where: 'groupName=?', whereArgs: [groupName]);
     }
-
-    return groupNames;
+    return true;
   }
 
   bool canBeAdd(String groupName, String tsCode) {
-    List<String>? shareCodes = shareGroupCodes[groupName];
-    if (shareCodes != null && shareCodes.isNotEmpty) {
-      for (String shareCode in shareCodes) {
-        if (shareCode == tsCode) {
-          return false;
-        }
-      }
+    String? subscription = groupSubscription[groupName];
+    if (subscription != null && subscription.isNotEmpty) {
+      return !subscription.contains(tsCode);
     }
-    return false;
+    return true;
   }
 
   bool canBeRemove(String groupName, String tsCode) {
@@ -71,4 +69,4 @@ class ShareGroupService extends GeneralBaseService<ShareGroup> {
 final ShareGroupService shareGroupService = ShareGroupService(
     tableName: 'stk_shareGroup',
     fields: ServiceLocator.buildFields(ShareGroup(), []),
-    indexFields: ['tsCode', 'groupName']);
+    indexFields: ['subscription', 'groupName']);
