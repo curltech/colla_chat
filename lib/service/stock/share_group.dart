@@ -1,4 +1,3 @@
-import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/entity/stock/share_group.dart';
 
 import 'package:colla_chat/service/general_base.dart';
