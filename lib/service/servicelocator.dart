@@ -25,7 +25,7 @@ import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/service/dht/peersignal.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
-import 'package:colla_chat/service/stock/account.dart';
+import 'package:colla_chat/service/stock/stock_account.dart';
 import 'package:colla_chat/tool/json_util.dart';
 
 class ServiceLocator {

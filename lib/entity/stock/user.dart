@@ -1,9 +1,8 @@
+import 'package:colla_chat/entity/stock/stock_account.dart';
+import 'package:colla_chat/service/stock/stock_account.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/type_util.dart';
-
-import '../../service/stock/account.dart';
-import '../../transport/webclient.dart';
-import 'account.dart';
+import 'package:colla_chat/transport/webclient.dart';
 
 class StockUser {
   //登录用户的基本信息

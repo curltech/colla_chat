@@ -1,4 +1,4 @@
-import '../base.dart';
+import 'package:colla_chat/entity/base.dart';
 
 class StockAccount extends StatusEntity {
   String? accountId;

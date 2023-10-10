@@ -1,9 +1,9 @@
+import 'package:colla_chat/entity/stock/stock_account.dart';
+import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/service/general_base.dart';
+import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/date_util.dart';
 
-import '../../entity/stock/account.dart';
-import '../../plugin/security_storage.dart';
-import '../servicelocator.dart';
 
 class StockAccountService extends GeneralBaseService<StockAccount> {
   StockAccountService(
