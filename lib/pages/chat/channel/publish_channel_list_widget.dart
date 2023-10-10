@@ -175,7 +175,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
           indexWidgetProvider.push('publish_channel_edit');
         }
         if (chatMessage.status == MessageStatus.published.name) {
-          indexWidgetProvider.push('channel_message_preview');
+          indexWidgetProvider.push('published_channel_message_preview');
         }
       },
       title: CommonAutoSizeText(title),
