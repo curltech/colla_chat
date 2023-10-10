@@ -27,7 +27,7 @@ class WebClient extends IWebClient {
       _wsDefault = await websocketPool.get(address, isDefault: true);
     } else if (address.startsWith('https') || address.startsWith('http')) {
       if (address == 'https' || address == 'http') {
-        _httpDefault = httpClientPool.setDefalutHttpClient(address);
+        _httpDefault = httpClientPool.setDefaultHttpClient(address);
       }
     }
   }

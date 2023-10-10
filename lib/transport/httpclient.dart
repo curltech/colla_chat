@@ -108,7 +108,7 @@ class HttpClientPool {
     return _default;
   }
 
-  DioHttpClient? setDefalutHttpClient(String address) {
+  DioHttpClient? setDefaultHttpClient(String address) {
     DioHttpClient? httpClient;
     if (_httpClients.containsKey(address)) {
       httpClient = _httpClients[address];
