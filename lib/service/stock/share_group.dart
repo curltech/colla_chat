@@ -68,7 +68,7 @@ class ShareGroupService extends GeneralBaseService<ShareGroup> {
   }
 }
 
-final ShareGroupService shareService = ShareGroupService(
+final ShareGroupService shareGroupService = ShareGroupService(
     tableName: 'stk_shareGroup',
     fields: ServiceLocator.buildFields(ShareGroup(), []),
     indexFields: ['tsCode', 'groupName']);
