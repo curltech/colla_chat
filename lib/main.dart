@@ -15,6 +15,7 @@ import 'package:colla_chat/routers/router_handler.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/transport/websocket.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -65,7 +66,16 @@ void main(List<String> args) async {
   await _initDesktopWindows();
 
   SystemChannels.lifecycle.setMessageHandler((msg) async {
-    // logger.i('SystemChannels> $msg');
+    logger.i('system channel switch to $msg');
+    if (msg == AppLifecycleState.resumed.name) {
+      logger.i('system channel switch to foreground');
+      Websocket? websocket = websocketPool.getDefault();
+      if (websocket == null) {
+        await websocketPool.connect();
+      }
+    } else if (msg == AppLifecycleState.paused.name) {
+      logger.i('system channel switch to background');
+    }
     return msg;
   });
 
@@ -140,6 +150,15 @@ class _CollaChatAppState extends State<CollaChatApp>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     logger.i('app switch new state:$state');
+    if (state == AppLifecycleState.resumed) {
+      logger.i('app switch to foreground');
+      Websocket? websocket = websocketPool.getDefault();
+      if (websocket == null) {
+        websocketPool.connect();
+      }
+    } else if (state == AppLifecycleState.paused) {
+      logger.i('app switch to background');
+    }
   }
 
   Widget _buildMaterialApp(BuildContext context, Widget? child) {

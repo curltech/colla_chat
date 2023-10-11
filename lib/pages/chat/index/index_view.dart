@@ -30,6 +30,7 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
+import 'package:colla_chat/transport/websocket.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';

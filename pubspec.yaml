@@ -246,7 +246,7 @@ dependencies:
   barcode_scan2: ^4.2.4
   #mobile_scanner: ^2.0.0  #macos有问题
   lpinyin: ^2.0.3 #拼音
-  window_manager: ^0.3.6 #桌面应用的窗口管理
+  window_manager: ^0.3.7 #桌面应用的窗口管理
   #有特殊安装要求，否则编译出错
   #webview_windows: ^0.2.2
   #flutter_inappwebview: ^5.7.2+3
