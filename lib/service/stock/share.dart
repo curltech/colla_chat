@@ -6,8 +6,6 @@ import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/service/stock/share_group.dart';
 import 'package:colla_chat/transport/httpclient.dart';
-import 'package:colla_chat/transport/httpclient.dart';
-import 'package:colla_chat/transport/httpclient.dart';
 
 class ShareService extends GeneralBaseService<Share> {
   ShareService(
