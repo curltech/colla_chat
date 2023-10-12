@@ -1,15 +1,4 @@
-import 'package:colla_chat/pages/chat/me/collection/collection_list_view.dart';
-import 'package:colla_chat/pages/chat/me/contact_widget.dart';
-import 'package:colla_chat/pages/chat/me/me_head_widget.dart';
-import 'package:colla_chat/pages/chat/me/media/media_widget.dart';
-import 'package:colla_chat/pages/chat/me/openvpn_widget.dart';
-import 'package:colla_chat/pages/chat/me/android_system_alert_window_widget.dart';
-import 'package:colla_chat/pages/chat/me/personal_info_widget.dart';
-import 'package:colla_chat/pages/chat/me/platform_webview_widget.dart';
-import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
-import 'package:colla_chat/pages/chat/me/webrtc/webrtc_widget.dart';
-import 'package:colla_chat/pages/stock/self_selection_widget.dart';
-import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/pages/stock/my_selection_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';

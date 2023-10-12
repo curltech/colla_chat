@@ -9,6 +9,8 @@ import 'package:colla_chat/transport/httpclient.dart';
 import 'package:dio/dio.dart';
 
 class ShareService extends GeneralBaseService<Share> {
+  String? _subscription;
+
   ShareService(
       {required super.tableName,
       required super.fields,
@@ -16,6 +18,18 @@ class ShareService extends GeneralBaseService<Share> {
     post = (Map map) {
       return Share.fromJson(map);
     };
+  }
+
+  Future<String?> findSubscription() async {
+    if (_subscription == null) {
+      List<Share> shares = await shareService.findAll();
+      _subscription = '';
+      for (Share share in shares) {
+        _subscription = '$_subscription${share.tsCode},';
+      }
+    }
+
+    return _subscription;
   }
 
   dynamic _send(String url, dynamic data) async {
@@ -52,6 +66,16 @@ class ShareService extends GeneralBaseService<Share> {
     }
 
     return shares;
+  }
+
+  Future<void> add(Share share) async {
+    await insert(share);
+    _subscription = null;
+  }
+
+  Future<void> remove(String tsCode) async {
+    delete(where: 'tscode=?', whereArgs: [tsCode]);
+    _subscription = null;
   }
 }
 

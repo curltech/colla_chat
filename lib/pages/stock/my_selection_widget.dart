@@ -28,13 +28,13 @@ class ShareSelectionWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  String get routeName => 'self_selection';
+  String get routeName => 'my_selection';
 
   @override
   IconData get iconData => Icons.featured_play_list_outlined;
 
   @override
-  String get title => 'SelfSelection';
+  String get title => 'MySelection';
 }
 
 class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
