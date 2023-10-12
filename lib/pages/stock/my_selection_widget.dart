@@ -43,16 +43,10 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
       ValueNotifier<List<TileData>>([]);
   final ValueNotifier<int> _currentTab = ValueNotifier<int>(0);
 
-  late TabController _tabController;
-
   @override
   initState() {
     super.initState();
     shareController.addListener(_updateShare);
-  }
-
-  _updateCurrentTab() {
-    _currentTab.value = _tabController.index;
   }
 
   _updateShare() {
@@ -121,8 +115,6 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
 
   @override
   void dispose() {
-    _tabController.removeListener(_updateCurrentTab);
-    _tabController.dispose();
     shareController.removeListener(_updateShare);
     super.dispose();
   }
