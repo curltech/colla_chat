@@ -50,10 +50,15 @@ class ShareService extends GeneralBaseService<Share> {
   }
 
   /// 查询自选股的详细信息
-  findMine() async {
+  Future<List<dynamic>> findMine() async {
     // 数据为逗号分割的tscode
-    var response = await _send(
-        '/share/GetMine', {'ts_code': shareGroupService.groupSubscription});
+    String? subscription = await findSubscription();
+    List<dynamic> data = [];
+    if (subscription != null) {
+      data = await _send('/share/GetMine', {'ts_code': subscription});
+    }
+
+    return data;
   }
 
   /// 根据关键字搜索股票

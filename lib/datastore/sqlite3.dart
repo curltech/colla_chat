@@ -35,20 +35,19 @@ class Sqlite3 extends DataStore {
     } catch (e) {
       print('sqlite3 db get userVersion failure:$e');
     }
-    if (userVersion == 0) {
-      print('sqlite3 db ${appDataProvider.sqlite3Path} table will be created');
-      for (GeneralBaseService service in ServiceLocator.services.values) {
-        try {
-          create(service.tableName, service.fields, service.indexFields);
-        } catch (e) {
-          print('sqlite3 init create table exception:$e');
-        }
-      }
+
+    for (GeneralBaseService service in ServiceLocator.services.values) {
       try {
-        db.userVersion = 1;
+        create(service.tableName, service.fields,
+            indexFields: service.indexFields);
       } catch (e) {
-        print('sqlite3 db set userVersion 1 failure:$e');
+        print('sqlite3 init create table exception:$e');
       }
+    }
+    try {
+      db.userVersion = 1;
+    } catch (e) {
+      print('sqlite3 db set userVersion 1 failure:$e');
     }
     for (GeneralBaseService service in ServiceLocator.services.values) {
       service.dataStore = this;
@@ -129,9 +128,11 @@ class Sqlite3 extends DataStore {
   /// 建表和索引
   @override
   dynamic create(String tableName, List<String> fields,
-      [List<String>? indexFields]) {
-    String clause = sqlBuilder.drop(tableName);
-    run(Sql(clause));
+      {List<String>? indexFields, bool drop = false}) {
+    if (drop) {
+      String clause = sqlBuilder.drop(tableName);
+      run(Sql(clause));
+    }
     List<String> clauses = sqlBuilder.create(tableName, fields, indexFields);
     for (var query in clauses) {
       run(Sql(query));

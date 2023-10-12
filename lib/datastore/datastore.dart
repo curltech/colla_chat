@@ -86,7 +86,7 @@ const String dbname =
 abstract class DataStore {
   ///建表和索引
   dynamic create(String tableName, List<String> fields,
-      [List<String>? indexFields]);
+      {List<String>? indexFields, bool drop = false});
 
   dynamic run(Sql sql);
 

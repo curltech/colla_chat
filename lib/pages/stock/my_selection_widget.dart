@@ -3,6 +3,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/stock/add_share_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -41,12 +42,12 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
     with TickerProviderStateMixin {
   final ValueNotifier<List<TileData>> _shareTileData =
       ValueNotifier<List<TileData>>([]);
-  final ValueNotifier<int> _currentTab = ValueNotifier<int>(0);
 
   @override
   initState() {
     super.initState();
     shareController.addListener(_updateShare);
+    shareService.findMine();
   }
 
   _updateShare() {
