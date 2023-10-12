@@ -5,14 +5,17 @@ import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
+import 'package:pluto_grid/pluto_grid.dart';
 
 /// 自选股的控制器
-final DataListController<Share> shareController = DataListController<Share>();
+final DataListController<dynamic> shareController =
+    DataListController<dynamic>();
 
 ///自选股和分组的查询界面
 class ShareSelectionWidget extends StatefulWidget with TileDataMixin {
@@ -40,59 +43,112 @@ class ShareSelectionWidget extends StatefulWidget with TileDataMixin {
 
 class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
     with TickerProviderStateMixin {
-  final ValueNotifier<List<TileData>> _shareTileData =
-      ValueNotifier<List<TileData>>([]);
+  final ValueNotifier<List<PlutoColumn>> _sharePlutoColumns =
+      ValueNotifier<List<PlutoColumn>>([]);
 
   @override
   initState() {
     super.initState();
     shareController.addListener(_updateShare);
-    shareService.findMine();
+    shareService.findMine().then((List<dynamic> value) {
+      shareController.replaceAll(value);
+    });
   }
 
   _updateShare() {
-    _buildShareTileData();
+    _buildRows();
+    _buildPlutoColumn();
   }
 
-  /// 将linkman和group数据转换从列表显示数据
-  _buildShareTileData() {
-    List<Share> shares = shareController.data;
-    List<TileData> tiles = [];
-    if (shares.isNotEmpty) {
-      for (var share in shares) {
-        var name = share.name;
-        var tsCode = share.tsCode;
-        TileData tile = TileData(
-            title: name!, subtitle: tsCode, selected: false, routeName: '');
-        List<TileData> slideActions = [];
-        TileData deleteSlideAction = TileData(
-            title: 'Remove',
-            prefix: Icons.playlist_remove_outlined,
-            onTap: (int index, String label, {String? subtitle}) async {
-              if (mounted) {
-                DialogUtil.info(context,
-                    content:
-                        '${AppLocalizations.t('Share:')} ${share.name}${AppLocalizations.t(' is removed')}');
-              }
-            });
-        slideActions.add(deleteSlideAction);
-
-        tiles.add(tile);
+  _buildPlutoColumn() {
+    var data = shareController.data;
+    List<PlutoColumn> dataColumns = [];
+    if (data.isNotEmpty) {
+      Map<String, dynamic> map = data.first;
+      for (var entry in map.entries) {
+        String key = entry.key;
+        dynamic value = entry.value;
+        var type = PlutoColumnType.text();
+        if (value != null) {
+          if (value is int || value is double) {
+            type = PlutoColumnType.number();
+          } else if (value is DateTime) {
+            type = PlutoColumnType.date();
+          } else if (value is TimeOfDay) {
+            type = PlutoColumnType.time();
+          }
+        }
+        var dataColumn = PlutoColumn(
+            title: AppLocalizations.t(key),
+            field: key,
+            type: type,
+            sort: PlutoColumnSort.ascending);
+        dataColumns.add(dataColumn);
       }
     }
-    _shareTileData.value = tiles;
+    _sharePlutoColumns.value = dataColumns;
   }
 
-  _onTapShare(int index, String title, {TileData? group, String? subtitle}) {}
+  List<PlutoRow> _buildRows() {
+    List<PlutoRow> rows = [];
+    var data = shareController.data;
+    for (int index = 0; index < data.length; ++index) {
+      var d = data[index];
+      var dataMap = JsonUtil.toJson(d);
+      Map<String, PlutoCell> cells = {};
+      for (var entry in dataMap.entries) {
+        String key = entry.key;
+        dynamic value = entry.value;
+        value = value ?? '';
+        var dataCell = PlutoCell(value: value);
+        cells[key] = dataCell;
+      }
+      var dataRow = PlutoRow(
+        cells: cells,
+      );
+      rows.add(dataRow);
+    }
+    return rows;
+  }
 
   Widget _buildShareListView(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: _shareTileData,
+        valueListenable: _sharePlutoColumns,
         builder: (context, value, child) {
-          return DataListView(
-            tileData: value,
-            onTap: _onTapShare,
-          );
+          return PlutoGrid(
+              columns: value,
+              rows: _buildRows(),
+              onChanged: (PlutoGridOnChangedEvent event) {},
+              onSelected: (PlutoGridOnSelectedEvent event) {
+                ///进入路由
+                ///event.row
+              },
+              onRowChecked: (PlutoGridOnRowCheckedEvent event) {},
+              onRowDoubleTap: (PlutoGridOnRowDoubleTapEvent event) {},
+              onRowSecondaryTap: (PlutoGridOnRowSecondaryTapEvent event) {},
+              onRowsMoved: (PlutoGridOnRowsMovedEvent event) {},
+              createHeader: (PlutoGridStateManager stateManager) {
+                //前端分页
+                stateManager.setPageSize(10, notify: false);
+                //stateManager.setShowLoading(true);
+                //stateManager.refRows
+                //stateManager.refRows.originalList
+                return PlutoPagination(stateManager);
+              },
+              // createFooter: (PlutoGridStateManager event) {},
+              // rowColorCallback: (PlutoRowColorContext event) {},
+              configuration: const PlutoGridConfiguration(
+                style: PlutoGridStyleConfig(
+                  enableColumnBorderVertical: false,
+                  enableColumnBorderHorizontal: false,
+                  gridBorderColor: Colors.white,
+                  borderColor: Colors.white,
+                  activatedBorderColor: Colors.white,
+                  inactivatedBorderColor: Colors.white,
+                ),
+                localeText: PlutoGridLocaleText.china(),
+              ),
+              mode: PlutoGridMode.normal);
         });
   }
 
