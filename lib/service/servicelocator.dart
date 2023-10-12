@@ -25,6 +25,8 @@ import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/service/dht/peersignal.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
+import 'package:colla_chat/service/stock/share.dart';
+import 'package:colla_chat/service/stock/share_group.dart';
 import 'package:colla_chat/service/stock/stock_account.dart';
 import 'package:colla_chat/tool/json_util.dart';
 
@@ -61,6 +63,8 @@ class ServiceLocator {
     services['chatSummaryService'] = chatSummaryService;
     services['mailAddressService'] = emailAddressService;
     services['conferenceService'] = conferenceService;
+    services['shareService'] = shareService;
+    services['shareGroupService'] = shareGroupService;
 
     securityContextServices[CryptoOption.none.index] =
         noneSecurityContextService;
