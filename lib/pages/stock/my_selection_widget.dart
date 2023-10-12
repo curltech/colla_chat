@@ -65,13 +65,13 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
             title: name!, subtitle: tsCode, selected: false, routeName: '');
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(
-            title: 'Delete',
-            prefix: Icons.person_remove,
+            title: 'Remove',
+            prefix: Icons.playlist_remove_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
               if (mounted) {
                 DialogUtil.info(context,
                     content:
-                        '${AppLocalizations.t('Share:')} ${share.name}${AppLocalizations.t(' is deleted')}');
+                        '${AppLocalizations.t('Share:')} ${share.name}${AppLocalizations.t(' is removed')}');
               }
             });
         slideActions.add(deleteSlideAction);
