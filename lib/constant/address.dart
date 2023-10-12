@@ -7,7 +7,7 @@ final Map<String, PeerEndpoint> nodeAddressOptions = {
       name: 'default',
       priority: 0,
       wsConnectAddress: 'wss://kr.curltech.cc:9090/websocket',
-      httpConnectAddress: 'https://kr.curltech.cc:9090',
+      httpConnectAddress: 'https://kr.curltech.cc:9091',
       peerId: '12D3KooWBiuFtWRQ5qrUmT5AFbJ6NXCqM9oKCMBUA3Dncm2mhLx8',
       libp2pConnectAddress:
           '/ip4/kr.curltech.cc/tcp/5720/wss/p2p/12D3KooWBiuFtWRQ5qrUmT5AFbJ6NXCqM9oKCMBUA3Dncm2mhLx8',

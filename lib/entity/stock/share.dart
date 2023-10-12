@@ -20,6 +20,26 @@ class Share extends StatusEntity {
 
   Share();
 
+  /// 从服务器端获取的map转换成share对象
+  Share.fromRemoteJson(Map json)
+      : tsCode = json['ts_code'],
+        symbol = json['symbol'],
+        name = json['name'],
+        area = json['area'],
+        industry = json['industry'],
+        sector = json['sector'],
+        fullName = json['fullname'],
+        englishName = json['enname'],
+        market = json['market'],
+        exchange = json['exchange'],
+        currType = json['curr_type'],
+        listStatus = json['list_status'],
+        listDate = json['list_date'],
+        delistDate = json['delist_date'],
+        isHs = json['is_hs'],
+        pinyin = json['pin_yin'],
+        super.fromJson(json);
+
   Share.fromJson(Map json)
       : tsCode = json['tsCode'],
         symbol = json['symbol'],

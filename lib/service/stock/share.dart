@@ -6,6 +6,7 @@ import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/service/stock/share_group.dart';
 import 'package:colla_chat/transport/httpclient.dart';
+import 'package:dio/dio.dart';
 
 class ShareService extends GeneralBaseService<Share> {
   ShareService(
@@ -17,7 +18,7 @@ class ShareService extends GeneralBaseService<Share> {
     };
   }
 
-  findMine() async {
+  dynamic _send(String url, dynamic data) async {
     PeerEndpoint? defaultPeerEndpoint =
         peerEndpointController.defaultPeerEndpoint;
     if (defaultPeerEndpoint != null) {
@@ -25,12 +26,32 @@ class ShareService extends GeneralBaseService<Share> {
       if (httpConnectAddress != null) {
         DioHttpClient? client = httpClientPool.get(httpConnectAddress);
         if (client != null) {
-          // 数据为逗号分割的tscode
-          var response = await client.send('/share/GetMine',
-              {'ts_code': shareGroupService.groupSubscription});
+          Response<dynamic> response = await client.send(url, data);
+          if (response.statusCode == 200) {
+            return response.data;
+          }
         }
       }
     }
+  }
+
+  /// 查询自选股的详细信息
+  findMine() async {
+    // 数据为逗号分割的tscode
+    var response = await _send(
+        '/share/GetMine', {'ts_code': shareGroupService.groupSubscription});
+  }
+
+  /// 根据关键字搜索股票
+  Future<List<Share>> searchShare(String keyword) async {
+    List<dynamic> data = await _send('/share/Search', {'keyword': keyword});
+    List<Share> shares = [];
+    for (dynamic map in data) {
+      Share share = Share.fromRemoteJson(map);
+      shares.add(share);
+    }
+
+    return shares;
   }
 }
 

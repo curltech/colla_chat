@@ -553,5 +553,8 @@
   "CollaChat foreground service initializing": "CollaChat前台服务正在初始化",
   "Need you play record audio filename": "需要播放记录的音频文件",
   "Do you confirm publish?": "确认发布吗？",
-  "Do you confirm delete?": "确认删除吗？"
+  "Do you confirm delete?": "确认删除吗？",
+  "Stock": "股票",
+  "SelfSelection": "自选股",
+  "AddShare": "查询股票"
 }

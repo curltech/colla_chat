@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/stock/add_share_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -9,29 +10,15 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
+/// 自选股的控制器
 final DataListController<Share> shareController = DataListController<Share>();
 
 ///自选股和分组的查询界面
 class ShareSelectionWidget extends StatefulWidget with TileDataMixin {
-  // final LinkmanAddWidget linkmanAddWidget = LinkmanAddWidget();
-  // final LinkmanEditWidget linkmanEditWidget = LinkmanEditWidget();
-  // final ConferenceShowWidget conferenceShowWidget = ConferenceShowWidget();
-  // late final List<TileData> linkmanTileData;
+  final AddShareWidget addShareWidget = AddShareWidget();
 
   ShareSelectionWidget({Key? key}) : super(key: key) {
-    // indexWidgetProvider.define(linkmanEditWidget);
-    // indexWidgetProvider.define(linkmanAddWidget);
-    // indexWidgetProvider.define(conferenceShowWidget);
-    // List<TileDataMixin> mixins = [
-    //   linkmanEditWidget,
-    //   linkmanAddWidget,
-    //   conferenceShowWidget,
-    // ];
-    // linkmanTileData = TileData.from(mixins);
-    // for (var tile in linkmanTileData) {
-    //   tile.dense = false;
-    //   tile.selected = false;
-    // }
+    indexWidgetProvider.define(addShareWidget);
   }
 
   @override
@@ -72,7 +59,7 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
     _buildShareTileData();
   }
 
-  //将linkman和group数据转换从列表显示数据
+  /// 将linkman和group数据转换从列表显示数据
   _buildShareTileData() {
     List<Share> shares = shareController.data;
     List<TileData> tiles = [];
@@ -120,13 +107,14 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
       IconButton(
         tooltip: AppLocalizations.t('Add share'),
         onPressed: () {
-          indexWidgetProvider.push('share_add');
+          indexWidgetProvider.push('add_share');
         },
         icon: const Icon(Icons.add_circle_outline),
       ),
     ];
     return AppBarView(
         title: widget.title,
+        withLeading: true,
         rightWidgets: rightWidgets,
         child: _buildShareListView(context));
   }
