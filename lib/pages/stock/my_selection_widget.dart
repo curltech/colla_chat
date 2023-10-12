@@ -1,17 +1,69 @@
-import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/stock/add_share_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/stock/share.dart';
-import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
-import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 import 'package:pluto_grid/pluto_grid.dart';
+
+final List<PlutoColumn> shareColumns = [
+  PlutoColumn(
+    title: '代码/名',
+    field: 'ts_code/name',
+    type: PlutoColumnType.text(),
+  ),
+  PlutoColumn(
+    title: '细分行业',
+    field: 'industry',
+    type: PlutoColumnType.text(),
+    textAlign: PlutoColumnTextAlign.start,
+  ),
+  PlutoColumn(
+    title: '日期/来源',
+    field: 'trade_date/source',
+    type: PlutoColumnType.text(),
+    textAlign: PlutoColumnTextAlign.start,
+  ),
+  PlutoColumn(
+    title: '价/涨幅',
+    field: 'close/pct_chg_close',
+    type: PlutoColumnType.text(),
+    textAlign: PlutoColumnTextAlign.end,
+  ),
+  PlutoColumn(
+    title: '量变化/换手率',
+    field: 'pct_chg_vol/turnover',
+    type: PlutoColumnType.text(),
+    textAlign: PlutoColumnTextAlign.end,
+  ),
+  PlutoColumn(
+    title: 'pe/peg',
+    field: 'pe/peg',
+    type: PlutoColumnType.text(),
+    textAlign: PlutoColumnTextAlign.end,
+  ),
+  PlutoColumn(
+    title: 'pe/peg位置',
+    field: 'percent_pe/percent_peg',
+    type: PlutoColumnType.text(),
+    textAlign: PlutoColumnTextAlign.end,
+  ),
+  PlutoColumn(
+    title: 'industry pe/peg位置',
+    field: 'industry_percent_pe/industry_percent_peg',
+    type: PlutoColumnType.text(),
+    textAlign: PlutoColumnTextAlign.end,
+  ),
+  PlutoColumn(
+    title: '13close/34close位置',
+    field: 'percent13_close/percent34_close',
+    type: PlutoColumnType.text(),
+    textAlign: PlutoColumnTextAlign.end,
+  ),
+];
 
 /// 自选股的控制器
 final DataListController<dynamic> shareController =
@@ -43,8 +95,8 @@ class ShareSelectionWidget extends StatefulWidget with TileDataMixin {
 
 class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
     with TickerProviderStateMixin {
-  final ValueNotifier<List<PlutoColumn>> _sharePlutoColumns =
-      ValueNotifier<List<PlutoColumn>>([]);
+  final ValueNotifier<List<PlutoRow>> _sharePlutoRows =
+      ValueNotifier<List<PlutoRow>>([]);
 
   @override
   initState() {
@@ -56,99 +108,71 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
   }
 
   _updateShare() {
-    _buildRows();
-    _buildPlutoColumn();
+    _buildSharePlutoRows();
   }
 
-  _buildPlutoColumn() {
-    var data = shareController.data;
-    List<PlutoColumn> dataColumns = [];
-    if (data.isNotEmpty) {
-      Map<String, dynamic> map = data.first;
-      for (var entry in map.entries) {
-        String key = entry.key;
-        dynamic value = entry.value;
-        var type = PlutoColumnType.text();
-        if (value != null) {
-          if (value is int || value is double) {
-            type = PlutoColumnType.number();
-          } else if (value is DateTime) {
-            type = PlutoColumnType.date();
-          } else if (value is TimeOfDay) {
-            type = PlutoColumnType.time();
-          }
-        }
-        var dataColumn = PlutoColumn(
-            title: AppLocalizations.t(key),
-            field: key,
-            type: type,
-            sort: PlutoColumnSort.ascending);
-        dataColumns.add(dataColumn);
-      }
-    }
-    _sharePlutoColumns.value = dataColumns;
-  }
-
-  List<PlutoRow> _buildRows() {
+  _buildSharePlutoRows() {
     List<PlutoRow> rows = [];
     var data = shareController.data;
     for (int index = 0; index < data.length; ++index) {
       var d = data[index];
       var dataMap = JsonUtil.toJson(d);
       Map<String, PlutoCell> cells = {};
-      for (var entry in dataMap.entries) {
-        String key = entry.key;
-        dynamic value = entry.value;
-        value = value ?? '';
+      for (PlutoColumn shareColumn in shareColumns) {
+        List<String> fields = shareColumn.field.split('/');
+        String? value;
+        for (int j = 0; j < fields.length; ++j) {
+          String field = fields[j];
+          dynamic fieldValue = dataMap[field];
+          fieldValue ??= '';
+          if (value == null) {
+            value = fieldValue.toString();
+          } else {
+            value = '$value\n$fieldValue';
+          }
+        }
+
         var dataCell = PlutoCell(value: value);
-        cells[key] = dataCell;
+        cells[shareColumn.field] = dataCell;
       }
       var dataRow = PlutoRow(
         cells: cells,
       );
       rows.add(dataRow);
     }
-    return rows;
+    _sharePlutoRows.value = rows;
   }
 
   Widget _buildShareListView(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: _sharePlutoColumns,
+        valueListenable: _sharePlutoRows,
         builder: (context, value, child) {
           return PlutoGrid(
-              columns: value,
-              rows: _buildRows(),
-              onChanged: (PlutoGridOnChangedEvent event) {},
-              onSelected: (PlutoGridOnSelectedEvent event) {
-                ///进入路由
-                ///event.row
-              },
-              onRowChecked: (PlutoGridOnRowCheckedEvent event) {},
-              onRowDoubleTap: (PlutoGridOnRowDoubleTapEvent event) {},
-              onRowSecondaryTap: (PlutoGridOnRowSecondaryTapEvent event) {},
-              onRowsMoved: (PlutoGridOnRowsMovedEvent event) {},
-              createHeader: (PlutoGridStateManager stateManager) {
-                //前端分页
-                stateManager.setPageSize(10, notify: false);
-                //stateManager.setShowLoading(true);
-                //stateManager.refRows
-                //stateManager.refRows.originalList
-                return PlutoPagination(stateManager);
-              },
-              // createFooter: (PlutoGridStateManager event) {},
-              // rowColorCallback: (PlutoRowColorContext event) {},
-              configuration: const PlutoGridConfiguration(
-                style: PlutoGridStyleConfig(
-                  enableColumnBorderVertical: false,
-                  enableColumnBorderHorizontal: false,
-                  gridBorderColor: Colors.white,
-                  borderColor: Colors.white,
-                  activatedBorderColor: Colors.white,
-                  inactivatedBorderColor: Colors.white,
+              key: UniqueKey(),
+              columns: shareColumns,
+              rows: value,
+              // rowColorCallback:(PlutoRowColorContext context){
+              //   return context.row.cells[''].value;
+              // },
+              configuration: PlutoGridConfiguration(
+                  style: PlutoGridStyleConfig(
+                enableColumnBorderVertical: false,
+                enableColumnBorderHorizontal: false,
+                enableCellBorderVertical: false,
+                enableCellBorderHorizontal: false,
+                gridBackgroundColor: Colors.white.withOpacity(0.0),
+                rowColor: Colors.white.withOpacity(0.0),
+                columnTextStyle: const TextStyle(
+                  color: Colors.black,
+                  decoration: TextDecoration.none,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
                 ),
-                localeText: PlutoGridLocaleText.china(),
-              ),
-              mode: PlutoGridMode.normal);
+                cellTextStyle: const TextStyle(
+                  color: Colors.black,
+                  fontSize: 14,
+                ),
+              )));
         });
   }
 
