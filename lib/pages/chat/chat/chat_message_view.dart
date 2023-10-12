@@ -27,6 +27,7 @@ import 'package:colla_chat/transport/openai/openai_chat_gpt.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
+import 'package:colla_chat/transport/websocket.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -141,7 +142,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
 
   @override
   void onWindowEvent(String eventName) {
-    //logger.i('[WindowManager] onWindowEvent: $eventName');
+    logger.i('[WindowManager] onWindowEvent: $eventName');
   }
 
   @override
@@ -202,6 +203,10 @@ class _ChatMessageViewState extends State<ChatMessageView>
   ///在初始化，窗口恢复，背景恢复都会调用，因此需要能够重复调用
   ///如果ChatGPT，则设置
   _createPeerConnection() async {
+    Websocket? websocket = websocketPool.getDefault();
+    if (websocket == null) {
+      await websocketPool.connect();
+    }
     var chatSummary = _chatSummary.value;
     if (chatSummary == null) {
       logger.e('chatSummary is null');
