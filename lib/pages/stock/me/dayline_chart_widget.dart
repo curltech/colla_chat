@@ -180,8 +180,70 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
                   indicators: indicators,
                   actions: <ToolBarAction>[
                     ToolBarAction(
-                      onPressed: () {},
-                      child: Text(AppLocalizations.t('dayline')),
+                      onPressed: () {
+                        dayLineController.lineType = 101;
+                      },
+                      child: Icon(
+                        Icons.calendar_view_day_outlined,
+                        color: dayLineController.lineType == 101
+                            ? myself.primary
+                            : Colors.white,
+                      ),
+                    ),
+                    ToolBarAction(
+                      onPressed: () {
+                        dayLineController.lineType = 102;
+                      },
+                      child: Icon(
+                        Icons.calendar_view_week_outlined,
+                        color: dayLineController.lineType == 102
+                            ? myself.primary
+                            : Colors.white,
+                      ),
+                    ),
+                    ToolBarAction(
+                      onPressed: () {
+                        dayLineController.lineType = 103;
+                      },
+                      child: Icon(
+                        Icons.calendar_view_month_outlined,
+                        color: dayLineController.lineType == 103
+                            ? myself.primary
+                            : Colors.white,
+                      ),
+                    ),
+                    ToolBarAction(
+                      onPressed: () {
+                        dayLineController.lineType = 104;
+                      },
+                      child: Icon(
+                        Icons.perm_contact_calendar,
+                        color: dayLineController.lineType == 104
+                            ? myself.primary
+                            : Colors.white,
+                      ),
+                    ),
+                    ToolBarAction(
+                      onPressed: () {
+                        dayLineController.lineType = 105;
+                      },
+                      child: Icon(
+                        Icons.calendar_month_outlined,
+                        color: dayLineController.lineType == 105
+                            ? myself.primary
+                            : Colors.white,
+                      ),
+                    ),
+                    ToolBarAction(
+                      onPressed: () {
+                        dayLineController.lineType = 106;
+                      },
+                      child: Icon(
+                        Icons.calendar_today_outlined,
+                        color: dayLineController.lineType == 106
+                            ? myself.primary
+                            : Colors.white,
+                      ),
                     ),
                   ],
                   candles: candles,
