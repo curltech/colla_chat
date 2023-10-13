@@ -13,7 +13,7 @@ import 'package:provider/provider.dart';
 ///系统提供的分页表格只能用于静态展示，不能进行增加删除等操作
 ///因为其计算记录的方法很粗糙，某页发生增删时不适用，自己实现新的会更好
 class PaginatedDataTable2Widget<T> extends StatefulWidget {
-  final List<ColumnFieldDef> columnDefs;
+  final List<PlatformDataField> columnDefs;
   final DataPageController<T> controller;
   final Function(int index)? onTap;
   final String? routeName;

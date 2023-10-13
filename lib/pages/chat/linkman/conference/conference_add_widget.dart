@@ -25,50 +25,50 @@ import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-final List<ColumnFieldDef> conferenceColumnFieldDefs = [
-  ColumnFieldDef(
+final List<PlatformDataField> conferenceColumnFieldDefs = [
+  PlatformDataField(
     name: 'conferenceId',
     label: 'ConferenceId',
     inputType: InputType.label,
     prefixIcon: Icon(Icons.meeting_room, color: myself.primary),
   ),
-  ColumnFieldDef(
+  PlatformDataField(
     name: 'name',
     label: 'Name',
     prefixIcon: Icon(Icons.person, color: myself.primary),
   ),
-  ColumnFieldDef(
+  PlatformDataField(
     name: 'topic',
     label: 'Topic',
     prefixIcon: Icon(Icons.topic, color: myself.primary),
   ),
-  ColumnFieldDef(
+  PlatformDataField(
     name: 'conferenceOwnerPeerId',
     label: 'ConferenceOwnerPeerId',
     inputType: InputType.label,
     prefixIcon: Icon(Icons.perm_identity, color: myself.primary),
   ),
-  ColumnFieldDef(
+  PlatformDataField(
     name: 'password',
     label: 'Password',
     inputType: InputType.password,
     prefixIcon: Icon(Icons.password, color: myself.primary),
   ),
-  ColumnFieldDef(
+  PlatformDataField(
     name: 'video',
     label: 'Video',
     inputType: InputType.switcher,
     dataType: DataType.bool,
     prefixIcon: Icon(Icons.video_call, color: myself.primary),
   ),
-  ColumnFieldDef(
+  PlatformDataField(
     name: 'startDate',
     label: 'StartDate',
     inputType: InputType.datetime,
     dataType: DataType.string,
     prefixIcon: Icon(Icons.start, color: myself.primary),
   ),
-  ColumnFieldDef(
+  PlatformDataField(
     name: 'endDate',
     label: 'EndDate',
     inputType: InputType.datetime,

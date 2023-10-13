@@ -112,16 +112,16 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
         child: emailServiceProvider);
   }
 
-  List<ColumnFieldDef> _getAutoDiscoveryColumnFieldDefs() {
-    final List<ColumnFieldDef> autoDiscoveryColumnFieldDefs = [
-      ColumnFieldDef(
+  List<PlatformDataField> _getAutoDiscoveryColumnFieldDefs() {
+    final List<PlatformDataField> autoDiscoveryColumnFieldDefs = [
+      PlatformDataField(
           name: 'name',
           label: 'Name',
           prefixIcon: Icon(
             Icons.person,
             color: myself.primary,
           )),
-      ColumnFieldDef(
+      PlatformDataField(
         name: 'email',
         label: 'Email',
         prefixIcon: Icon(
@@ -130,7 +130,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
         ),
         textInputType: TextInputType.emailAddress,
       ),
-      ColumnFieldDef(
+      PlatformDataField(
           name: 'password',
           label: 'Password',
           prefixIcon: Icon(

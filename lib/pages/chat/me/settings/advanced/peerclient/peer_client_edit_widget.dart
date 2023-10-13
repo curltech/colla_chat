@@ -9,8 +9,8 @@ import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-final List<ColumnFieldDef> peerClientColumnFieldDefs = [
-  ColumnFieldDef(
+final List<PlatformDataField> peerClientColumnFieldDefs = [
+  PlatformDataField(
       name: 'id',
       label: 'Id',
       dataType: DataType.int,
@@ -19,7 +19,7 @@ final List<ColumnFieldDef> peerClientColumnFieldDefs = [
         Icons.perm_identity,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'name',
       label: 'Name',
       readOnly: true,
@@ -27,7 +27,7 @@ final List<ColumnFieldDef> peerClientColumnFieldDefs = [
         Icons.person,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'peerId',
       label: 'PeerId',
       readOnly: true,
@@ -35,7 +35,7 @@ final List<ColumnFieldDef> peerClientColumnFieldDefs = [
         Icons.location_history,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'clientId',
       label: 'ClientId',
       readOnly: true,
@@ -43,7 +43,7 @@ final List<ColumnFieldDef> peerClientColumnFieldDefs = [
         Icons.token,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'connectPeerId',
       label: 'ConnectPeerId',
       readOnly: true,
@@ -51,7 +51,7 @@ final List<ColumnFieldDef> peerClientColumnFieldDefs = [
         Icons.location_history_rounded,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'connectAddress',
       label: 'ConnectAddress',
       readOnly: true,
@@ -59,7 +59,7 @@ final List<ColumnFieldDef> peerClientColumnFieldDefs = [
         Icons.location_searching,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'connectSessionId',
       label: 'ConnectSessionId',
       readOnly: true,
@@ -67,7 +67,7 @@ final List<ColumnFieldDef> peerClientColumnFieldDefs = [
         Icons.connected_tv,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
     name: 'email',
     label: 'Email',
     prefixIcon: Icon(
@@ -76,14 +76,14 @@ final List<ColumnFieldDef> peerClientColumnFieldDefs = [
     ),
     textInputType: TextInputType.emailAddress,
   ),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'mobile',
       label: 'Mobile',
       prefixIcon: Icon(
         Icons.mobile_friendly,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'status',
       label: 'Status',
       prefixIcon: Icon(

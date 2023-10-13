@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class DataTable2Widget<T> extends StatefulWidget {
-  final List<ColumnFieldDef> columnDefs;
+  final List<PlatformDataField> columnDefs;
   final DataListController<T> controller;
   final Function(int index)? onTap;
   final String? routeName;

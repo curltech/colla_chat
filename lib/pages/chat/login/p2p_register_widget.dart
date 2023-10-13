@@ -26,22 +26,22 @@ import 'package:phone_numbers_parser/phone_numbers_parser.dart'
     as phone_numbers_parser;
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
-final List<ColumnFieldDef> p2pRegisterInputFieldDef = [
-  ColumnFieldDef(
+final List<PlatformDataField> p2pRegisterInputFieldDef = [
+  PlatformDataField(
       name: 'name',
       label: 'Name',
       prefixIcon: Icon(
         Icons.person,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'loginName',
       label: 'LoginName',
       prefixIcon: Icon(
         Icons.mobile_friendly,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'email',
       label: 'Email',
       prefixIcon: Icon(
@@ -49,7 +49,7 @@ final List<ColumnFieldDef> p2pRegisterInputFieldDef = [
         color: myself.primary,
       ),
       textInputType: TextInputType.emailAddress),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'plainPassword',
       label: 'PlainPassword',
       inputType: InputType.password,
@@ -57,7 +57,7 @@ final List<ColumnFieldDef> p2pRegisterInputFieldDef = [
         Icons.password,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'confirmPassword',
       label: 'ConfirmPassword',
       inputType: InputType.password,

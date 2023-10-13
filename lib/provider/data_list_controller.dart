@@ -233,7 +233,7 @@ abstract class DataPageController<T> with ChangeNotifier {
 
   int get length => pagination.data.length;
 
-  Map<String, dynamic>? getInitValue(List<ColumnFieldDef> inputFieldDefs) {
+  Map<String, dynamic>? getInitValue(List<PlatformDataField> inputFieldDefs) {
     T? current = this.current;
     if (current != null) {
       var currentMap = JsonUtil.toJson(current);

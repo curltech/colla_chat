@@ -46,8 +46,8 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
 
   init() {
     bool isAuth = widget.credential != null;
-    final List<ColumnFieldDef> p2pLoginInputFieldDef = [];
-    p2pLoginInputFieldDef.add(ColumnFieldDef(
+    final List<PlatformDataField> p2pLoginInputFieldDef = [];
+    p2pLoginInputFieldDef.add(PlatformDataField(
       name: 'credential',
       label: 'Credential(Mobile/Email/LoginName)',
       readOnly: isAuth,
@@ -69,7 +69,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
             )
           : null,
     ));
-    p2pLoginInputFieldDef.add(ColumnFieldDef(
+    p2pLoginInputFieldDef.add(PlatformDataField(
       name: 'password',
       label: 'Password',
       inputType: InputType.password,

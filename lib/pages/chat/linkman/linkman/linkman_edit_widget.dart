@@ -17,8 +17,8 @@ import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
-final List<ColumnFieldDef> linkmanColumnFieldDefs = [
-  ColumnFieldDef(
+final List<PlatformDataField> linkmanColumnFieldDefs = [
+  PlatformDataField(
       name: 'peerId',
       label: 'PeerId',
       inputType: InputType.label,
@@ -26,21 +26,21 @@ final List<ColumnFieldDef> linkmanColumnFieldDefs = [
         Icons.perm_identity,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'name',
       label: 'Name',
       prefixIcon: Icon(
         Icons.person,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'alias',
       label: 'Alias',
       prefixIcon: Icon(
         Icons.person_pin,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'email',
       label: 'Email',
       prefixIcon: Icon(
@@ -48,7 +48,7 @@ final List<ColumnFieldDef> linkmanColumnFieldDefs = [
         color: myself.primary,
       ),
       textInputType: TextInputType.emailAddress),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'mobile',
       label: 'Mobile',
       prefixIcon: Icon(

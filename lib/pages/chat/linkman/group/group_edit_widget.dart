@@ -23,21 +23,21 @@ import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-final List<ColumnFieldDef> groupColumnFieldDefs = [
-  ColumnFieldDef(
+final List<PlatformDataField> groupColumnFieldDefs = [
+  PlatformDataField(
       name: 'peerId',
       label: 'PeerId',
       inputType: InputType.label,
       prefixIcon: Icon(Icons.perm_identity, color: myself.primary)),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'name',
       label: 'Name',
       prefixIcon: Icon(Icons.person, color: myself.primary)),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'alias',
       label: 'Alias',
       prefixIcon: Icon(Icons.person_pin_sharp, color: myself.primary)),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'myAlias',
       label: 'MyAlias',
       prefixIcon: Icon(Icons.person_pin, color: myself.primary)),

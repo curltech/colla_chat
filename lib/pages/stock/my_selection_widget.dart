@@ -4,66 +4,13 @@ import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/loading_util.dart';
+import 'package:colla_chat/tool/number_format_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:pluto_grid/pluto_grid.dart';
-
-final List<PlutoColumn> shareColumns = [
-  PlutoColumn(
-    title: '代码/名',
-    field: 'ts_code/name',
-    type: PlutoColumnType.text(),
-  ),
-  PlutoColumn(
-    title: '细分行业',
-    field: 'industry',
-    type: PlutoColumnType.text(),
-    textAlign: PlutoColumnTextAlign.start,
-  ),
-  PlutoColumn(
-    title: '日期/来源',
-    field: 'trade_date/source',
-    type: PlutoColumnType.text(),
-    textAlign: PlutoColumnTextAlign.start,
-  ),
-  PlutoColumn(
-    title: '价/涨幅',
-    field: 'close/pct_chg_close',
-    type: PlutoColumnType.text(),
-    textAlign: PlutoColumnTextAlign.end,
-  ),
-  PlutoColumn(
-    title: '量变化/换手率',
-    field: 'pct_chg_vol/turnover',
-    type: PlutoColumnType.text(),
-    textAlign: PlutoColumnTextAlign.end,
-  ),
-  PlutoColumn(
-    title: 'pe/peg',
-    field: 'pe/peg',
-    type: PlutoColumnType.text(),
-    textAlign: PlutoColumnTextAlign.end,
-  ),
-  PlutoColumn(
-    title: 'pe/peg位置',
-    field: 'percent_pe/percent_peg',
-    type: PlutoColumnType.text(),
-    textAlign: PlutoColumnTextAlign.end,
-  ),
-  PlutoColumn(
-    title: 'industry pe/peg位置',
-    field: 'industry_percent_pe/industry_percent_peg',
-    type: PlutoColumnType.text(),
-    textAlign: PlutoColumnTextAlign.end,
-  ),
-  PlutoColumn(
-    title: '13close/34close位置',
-    field: 'percent13_close/percent34_close',
-    type: PlutoColumnType.text(),
-    textAlign: PlutoColumnTextAlign.end,
-  ),
-];
+import 'package:data_table_2/data_table_2.dart';
 
 /// 自选股的控制器
 final DataListController<dynamic> shareController =
@@ -95,84 +42,136 @@ class ShareSelectionWidget extends StatefulWidget with TileDataMixin {
 
 class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
     with TickerProviderStateMixin {
-  final ValueNotifier<List<PlutoRow>> _sharePlutoRows =
-      ValueNotifier<List<PlutoRow>>([]);
+  final List<PlatformDataColumn> shareColumns = [
+    PlatformDataColumn(
+      label: '代码/名',
+      name: 'ts_code/name',
+    ),
+    PlatformDataColumn(
+      label: '日期/细分行业',
+      name: 'trade_date/industry',
+    ),
+    PlatformDataColumn(
+      label: '价/涨幅',
+      name: 'close/pct_chg_close',
+      dataType: DataType.double,
+      align: MainAxisAlignment.end,
+    ),
+    PlatformDataColumn(
+      label: '量变化/换手率',
+      name: 'pct_chg_vol/turnover',
+      dataType: DataType.double,
+      align: MainAxisAlignment.end,
+    ),
+    PlatformDataColumn(
+      label: 'pe/peg',
+      name: 'pe/peg',
+      dataType: DataType.double,
+      align: MainAxisAlignment.end,
+    ),
+    PlatformDataColumn(
+      label: 'pe/peg位置',
+      name: 'percent_pe/percent_peg',
+      dataType: DataType.double,
+      align: MainAxisAlignment.end,
+    ),
+    PlatformDataColumn(
+      label: 'industry pe/peg位置',
+      name: 'industry_percent_pe/industry_percent_peg',
+      dataType: DataType.double,
+      align: MainAxisAlignment.end,
+    ),
+    PlatformDataColumn(
+      label: '13close/34close位置',
+      name: 'percent13_close/percent34_close',
+      dataType: DataType.double,
+      align: MainAxisAlignment.end,
+    ),
+  ];
 
   @override
   initState() {
     super.initState();
     shareController.addListener(_updateShare);
-    shareService.findMine().then((List<dynamic> value) {
-      shareController.replaceAll(value);
-    });
   }
 
   _updateShare() {
-    _buildSharePlutoRows();
+    _buildShareDataRows();
   }
 
-  _buildSharePlutoRows() {
-    List<PlutoRow> rows = [];
+  List<DataColumn2> _buildShareDataColumns() {
+    List<DataColumn2> dataColumns = [];
+    for (var shareColumn in shareColumns) {
+      dataColumns.add(DataColumn2(
+          label: Text(shareColumn.label),
+          fixedWidth: 130,
+          numeric: shareColumn.dataType == DataType.double ||
+              shareColumn.dataType == DataType.int));
+    }
+    return dataColumns;
+  }
+
+  Future<List<DataRow>> _buildShareDataRows() async {
+    List<dynamic> value = await shareService.findMine();
+    shareController.replaceAll(value);
+    List<DataRow> rows = [];
     var data = shareController.data;
     for (int index = 0; index < data.length; ++index) {
       var d = data[index];
       var dataMap = JsonUtil.toJson(d);
-      Map<String, PlutoCell> cells = {};
-      for (PlutoColumn shareColumn in shareColumns) {
-        List<String> fields = shareColumn.field.split('/');
+      List<DataCell> cells = [];
+      for (PlatformDataColumn shareColumn in shareColumns) {
+        List<String> names = shareColumn.name.split('/');
         String? value;
-        for (int j = 0; j < fields.length; ++j) {
-          String field = fields[j];
-          dynamic fieldValue = dataMap[field];
-          fieldValue ??= '';
+        for (int j = 0; j < names.length; ++j) {
+          String name = names[j];
+          dynamic fieldValue = dataMap[name];
+          if (fieldValue != null) {
+            if (fieldValue is double) {
+              fieldValue = NumberFormatUtil.stdDouble(fieldValue);
+            } else {
+              fieldValue = fieldValue.toString();
+            }
+          } else {
+            fieldValue = '';
+          }
+
           if (value == null) {
-            value = fieldValue.toString();
+            value = fieldValue;
           } else {
             value = '$value\n$fieldValue';
           }
         }
 
-        var dataCell = PlutoCell(value: value);
-        cells[shareColumn.field] = dataCell;
+        var dataCell = DataCell(Text(value!));
+        cells.add(dataCell);
       }
-      var dataRow = PlutoRow(
+      var dataRow = DataRow(
         cells: cells,
       );
       rows.add(dataRow);
     }
-    _sharePlutoRows.value = rows;
+    return rows;
   }
 
   Widget _buildShareListView(BuildContext context) {
-    return ValueListenableBuilder(
-        valueListenable: _sharePlutoRows,
-        builder: (context, value, child) {
-          return PlutoGrid(
-              key: UniqueKey(),
-              columns: shareColumns,
-              rows: value,
-              // rowColorCallback:(PlutoRowColorContext context){
-              //   return context.row.cells[''].value;
-              // },
-              configuration: PlutoGridConfiguration(
-                  style: PlutoGridStyleConfig(
-                enableColumnBorderVertical: false,
-                enableColumnBorderHorizontal: false,
-                enableCellBorderVertical: false,
-                enableCellBorderHorizontal: false,
-                gridBackgroundColor: Colors.white.withOpacity(0.0),
-                rowColor: Colors.white.withOpacity(0.0),
-                columnTextStyle: const TextStyle(
-                  color: Colors.black,
-                  decoration: TextDecoration.none,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-                cellTextStyle: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 14,
-                ),
-              )));
+    return FutureBuilder(
+        future: _buildShareDataRows(),
+        builder: (BuildContext context, AsyncSnapshot<List<DataRow>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            var value = snapshot.data;
+            if (value != null) {
+              return DataTable2(
+                key: UniqueKey(),
+                minWidth: 2000,
+                dataRowHeight: 50,
+                fixedLeftColumns: 1,
+                columns: _buildShareDataColumns(),
+                rows: value!,
+              );
+            }
+          }
+          return LoadingUtil.buildLoadingIndicator();
         });
   }
 

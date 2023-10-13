@@ -66,7 +66,7 @@ void main(List<String> args) async {
   await _initDesktopWindows();
 
   SystemChannels.lifecycle.setMessageHandler((msg) async {
-    logger.i('system channel switch to $msg');
+    //logger.i('system channel switch to $msg');
     if (msg == AppLifecycleState.resumed.name) {
       logger.i('system channel switch to foreground');
       Websocket? websocket = websocketPool.getDefault();

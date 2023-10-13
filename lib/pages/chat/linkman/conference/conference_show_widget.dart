@@ -17,38 +17,38 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-final List<ColumnFieldDef> conferenceColumnFieldDefs = [
-  ColumnFieldDef(
+final List<PlatformDataField> conferenceColumnFieldDefs = [
+  PlatformDataField(
       name: 'conferenceId',
       label: 'ConferenceId',
       inputType: InputType.label,
       prefixIcon: Icon(Icons.meeting_room, color: myself.primary)),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'name',
       label: 'Name',
       inputType: InputType.label,
       prefixIcon: Icon(Icons.person, color: myself.primary)),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'topic',
       label: 'Topic',
       inputType: InputType.label,
       prefixIcon: Icon(Icons.topic, color: myself.primary)),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'conferenceOwnerPeerId',
       label: 'ConferenceOwnerPeerId',
       inputType: InputType.label,
       prefixIcon: Icon(Icons.perm_identity, color: myself.primary)),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'video',
       label: 'Video',
       inputType: InputType.label,
       prefixIcon: Icon(Icons.video_call, color: myself.primary)),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'startDate',
       label: 'StartDate',
       inputType: InputType.label,
       prefixIcon: Icon(Icons.start, color: myself.primary)),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'endDate',
       label: 'EndDate',
       inputType: InputType.label,

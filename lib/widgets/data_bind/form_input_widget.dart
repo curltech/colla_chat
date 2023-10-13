@@ -11,10 +11,10 @@ import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:provider/provider.dart';
 
 class FormInputController with ChangeNotifier {
-  final List<ColumnFieldDef> columnFieldDefs;
+  final List<PlatformDataField> columnFieldDefs;
   final Map<String, dynamic> _values = {};
 
-  final Map<String, ColumnFieldController> controllers = {};
+  final Map<String, DataFieldController> controllers = {};
   EntityState? state;
 
   FormInputController(this.columnFieldDefs,
@@ -31,7 +31,7 @@ class FormInputController with ChangeNotifier {
     }
   }
 
-  setController(String name, ColumnFieldController controller) {
+  setController(String name, DataFieldController controller) {
     controllers[name] = controller;
   }
 
@@ -83,7 +83,7 @@ class FormInputController with ChangeNotifier {
       values[name] = getValue(name);
       if (state == null) {
         if (controllers.containsKey(name)) {
-          ColumnFieldController controller = controllers[name]!;
+          DataFieldController controller = controllers[name]!;
           bool changed = controller.changed;
           if (changed) {
             state = EntityState.update;
@@ -184,7 +184,7 @@ class _FormInputWidgetState extends State<FormInputWidget> {
   KeyboardActionsConfig _buildKeyboardActionsConfig(BuildContext context) {
     List<KeyboardActionsItem> actions = [];
     for (var i = 0; i < widget.controller.columnFieldDefs.length; i++) {
-      ColumnFieldDef columnFieldDef = widget.controller.columnFieldDefs[i];
+      PlatformDataField columnFieldDef = widget.controller.columnFieldDefs[i];
       var name = columnFieldDef.name;
       var inputType = columnFieldDef.inputType;
       if (inputType == InputType.text ||
@@ -212,7 +212,7 @@ class _FormInputWidgetState extends State<FormInputWidget> {
   List<Widget> _buildFormViews(BuildContext context) {
     Map<String, List<Widget>> viewMap = {};
     for (var i = 0; i < widget.controller.columnFieldDefs.length; i++) {
-      ColumnFieldDef columnFieldDef = widget.controller.columnFieldDefs[i];
+      PlatformDataField columnFieldDef = widget.controller.columnFieldDefs[i];
       String? groupName = columnFieldDef.groupName;
       groupName = groupName ?? '';
       List<Widget>? children = viewMap[groupName];
@@ -227,11 +227,11 @@ class _FormInputWidgetState extends State<FormInputWidget> {
         height: widget.spacing,
       ));
       String name = columnFieldDef.name;
-      ColumnFieldController? columnFieldController =
+      DataFieldController? columnFieldController =
           widget.controller.controllers[name];
       dynamic value = widget.controller.getValue(name);
       if (columnFieldController == null) {
-        columnFieldController = ColumnFieldController(
+        columnFieldController = DataFieldController(
           columnFieldDef,
           value: value,
         );
@@ -240,7 +240,7 @@ class _FormInputWidgetState extends State<FormInputWidget> {
       } else {
         columnFieldController.value = value;
       }
-      Widget columnFieldWidget = ColumnFieldWidget(
+      Widget columnFieldWidget = DataFieldWidget(
         controller: columnFieldController,
         focusNode: focusNodes[name],
       );

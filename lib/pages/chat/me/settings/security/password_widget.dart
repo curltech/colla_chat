@@ -10,18 +10,18 @@ import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-final List<ColumnFieldDef> passwordInputFieldDef = [
-  ColumnFieldDef(
+final List<PlatformDataField> passwordInputFieldDef = [
+  PlatformDataField(
       name: 'oldPassword',
       label: 'oldPassword',
       inputType: InputType.password,
       prefixIcon: const Icon(Icons.pattern_sharp)),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'plainPassword',
       label: 'PlainPassword',
       inputType: InputType.password,
       prefixIcon: const Icon(Icons.password)),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'confirmPassword',
       label: 'ConfirmPassword',
       inputType: InputType.password,

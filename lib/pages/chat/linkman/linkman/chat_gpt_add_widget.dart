@@ -16,36 +16,36 @@ import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-final List<ColumnFieldDef> chatGPTColumnFieldDefs = [
-  ColumnFieldDef(
+final List<PlatformDataField> chatGPTColumnFieldDefs = [
+  PlatformDataField(
       name: 'peerId',
       label: 'ApiKey',
       prefixIcon: Icon(
         Icons.key,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'peerPublicKey',
       label: 'Model',
       prefixIcon: Icon(
         Icons.model_training,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'name',
       label: 'LoginName',
       prefixIcon: Icon(
         Icons.person,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'alias',
       label: 'Organization',
       prefixIcon: Icon(
         Icons.person_pin,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'email',
       label: 'Email',
       prefixIcon: Icon(
@@ -53,7 +53,7 @@ final List<ColumnFieldDef> chatGPTColumnFieldDefs = [
         color: myself.primary,
       ),
       inputType: InputType.text),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'publicKey',
       label: 'Password',
       inputType: InputType.password,

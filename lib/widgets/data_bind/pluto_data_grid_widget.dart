@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 
 ///PlutoGrid，一个功能非常强大的表格实现
 class PlutoDataGridWidget<T> extends StatefulWidget {
-  final List<ColumnFieldDef> columnDefs;
+  final List<PlatformDataField> columnDefs;
   final DataPageController<T> controller;
   final Function(int index)? onTap;
   final String? routeName;

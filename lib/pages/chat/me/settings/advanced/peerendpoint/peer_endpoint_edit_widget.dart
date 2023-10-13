@@ -9,8 +9,8 @@ import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-final List<ColumnFieldDef> peerEndpointColumnFieldDefs = [
-  ColumnFieldDef(
+final List<PlatformDataField> peerEndpointColumnFieldDefs = [
+  PlatformDataField(
       name: 'id',
       label: 'Id',
       dataType: DataType.int,
@@ -19,7 +19,7 @@ final List<ColumnFieldDef> peerEndpointColumnFieldDefs = [
         Icons.perm_identity,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'name',
       label: 'Name',
       readOnly: true,
@@ -27,7 +27,7 @@ final List<ColumnFieldDef> peerEndpointColumnFieldDefs = [
         Icons.person,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'peerId',
       label: 'PeerId',
       readOnly: true,
@@ -35,14 +35,14 @@ final List<ColumnFieldDef> peerEndpointColumnFieldDefs = [
         Icons.perm_identity,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'priority',
       label: 'Priority',
       prefixIcon: Icon(
         Icons.low_priority,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
     name: 'wsConnectAddress',
     label: 'wsConnectAddress',
     prefixIcon: Icon(
@@ -50,14 +50,14 @@ final List<ColumnFieldDef> peerEndpointColumnFieldDefs = [
       color: myself.primary,
     ),
   ),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'httpConnectAddress',
       label: 'httpConnectAddress',
       prefixIcon: Icon(
         Icons.http,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
     name: 'libp2pConnectAddress',
     label: 'libp2pConnectAddress',
     prefixIcon: Icon(
@@ -65,14 +65,14 @@ final List<ColumnFieldDef> peerEndpointColumnFieldDefs = [
       color: myself.primary,
     ),
   ),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'iceServers',
       label: 'iceServers',
       prefixIcon: Icon(
         Icons.record_voice_over,
         color: myself.primary,
       )),
-  ColumnFieldDef(
+  PlatformDataField(
       name: 'status',
       label: 'Status',
       readOnly: true,

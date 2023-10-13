@@ -47,16 +47,16 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
     controller = FormInputController(_getManualDiscoveryColumnFieldDefs());
   }
 
-  List<ColumnFieldDef> _getManualDiscoveryColumnFieldDefs() {
-    final List<ColumnFieldDef> manualDiscoveryColumnFieldDefs = [
-      ColumnFieldDef(
+  List<PlatformDataField> _getManualDiscoveryColumnFieldDefs() {
+    final List<PlatformDataField> manualDiscoveryColumnFieldDefs = [
+      PlatformDataField(
           name: 'name',
           label: 'Name',
           prefixIcon: Icon(
             Icons.person,
             color: myself.primary,
           )),
-      ColumnFieldDef(
+      PlatformDataField(
         name: 'email',
         label: 'Email',
         prefixIcon: Icon(
@@ -65,7 +65,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
         ),
         textInputType: TextInputType.emailAddress,
       ),
-      ColumnFieldDef(
+      PlatformDataField(
           name: 'password',
           label: 'Password',
           prefixIcon: Icon(
@@ -73,7 +73,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
             color: myself.primary,
           ),
           inputType: InputType.password),
-      ColumnFieldDef(
+      PlatformDataField(
         name: 'smtpServerHost',
         label: 'SmtpServerHost',
         prefixIcon: Icon(
@@ -82,7 +82,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
         ),
         initValue: 'smtp.163.com',
       ),
-      ColumnFieldDef(
+      PlatformDataField(
         name: 'smtpServerPort',
         label: 'SmtpServerPort',
         prefixIcon: Icon(
@@ -91,7 +91,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
         ),
         initValue: smtpServerPort,
       ),
-      ColumnFieldDef(
+      PlatformDataField(
         name: 'imapServerHost',
         label: 'ImapServerHost',
         prefixIcon: Icon(
@@ -100,7 +100,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
         ),
         initValue: 'imap.163.com',
       ),
-      ColumnFieldDef(
+      PlatformDataField(
         name: 'imapServerPort',
         label: 'ImapServerPort',
         prefixIcon: Icon(
@@ -109,7 +109,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
         ),
         initValue: imapServerPort,
       ),
-      ColumnFieldDef(
+      PlatformDataField(
         name: 'popServerHost',
         label: 'PopServerHost',
         prefixIcon: Icon(
@@ -118,7 +118,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
         ),
         initValue: 'pop.163.com',
       ),
-      ColumnFieldDef(
+      PlatformDataField(
         name: 'popServerPort',
         label: 'PopServerPort',
         prefixIcon: Icon(
