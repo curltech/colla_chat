@@ -140,15 +140,18 @@ dependencies:
     git:
       url: https://github.com/den0206/Flutter-Neumorphic.git
       ref: feature/remoce_accentcolor
-  fl_chart: ^0.61.0
+  fl_chart: ^0.64.0
   fluttertoast: ^8.2.1
   extended_text: ^11.1.0 #文本扩展显示
   extended_text_field: ^12.1.0 #文字表情混入
   extended_text_library: ^11.1.0 #Flutter2.5用这个,,其他可注释
   extended_masked_text: ^2.3.1
   azlistview: ^2.0.0 #特殊列表滑动
-  graphic: ^2.0.2
-  flutter_echarts: ^2.4.0
+  #  flutter_echarts: ^2.5.0
+  graphic: ^2.2.1 # 各种图表，取代flutter_echarts
+  candlesticks:
+    git:
+      url: https://github.com/r-mzy47/candlesticks.git
   fluent_ui: 4.7.3
   fluentui_system_icons: ^1.1.201 #FluentIcons.access_time_24_regular
   macos_ui: ^1.11.1

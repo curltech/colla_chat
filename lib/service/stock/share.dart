@@ -82,6 +82,88 @@ class ShareService extends GeneralBaseService<Share> {
     delete(where: 'tscode=?', whereArgs: [tsCode]);
     _subscription = null;
   }
+
+  /// 查询自选股的日线
+  Future<dynamic> findPreceding(String tsCode,
+      {int? from, int? limit, int? endDate, int? count}) async {
+    var params = {
+      'ts_code': tsCode,
+      'from': from,
+      'limit': limit,
+      'end_date': endDate,
+      'count': count,
+    };
+    dynamic data = await _send('/dayline/FindPreceding', params);
+
+    return data;
+  }
+
+  Future<List<dynamic>> findRange(String tsCode,
+      {int? startDate, int? endDate, int? limit}) async {
+    var params = {
+      'ts_code': tsCode,
+      'start_date': startDate,
+      'end_date': endDate,
+      'limit': limit,
+    };
+    List<dynamic> data = await _send('/dayline/FindRange', params);
+
+    return data;
+  }
+
+  Future<dynamic> search(String tsCode,
+      {int? from,
+      int? limit,
+      int? startDate,
+      int? endDate,
+      String? orderBy,
+      int? count}) async {
+    var params = {
+      'ts_code': tsCode,
+      'from': from,
+      'limit': limit,
+      'start_date': startDate,
+      'end_date': endDate,
+      'orderby': orderBy,
+      'count': count,
+    };
+    dynamic data = await _send('/dayline/Search', params);
+
+    return data;
+  }
+
+  /// 查询自选股的周，月，季度，半年，年线
+  Future<dynamic> findLinePreceding(String tsCode,
+      {int lineType = 102, //  102,103,104,105,106
+      int? from,
+      int? limit,
+      int? endDate,
+      int? count}) async {
+    var params = {
+      'ts_code': tsCode,
+      'line_type': lineType,
+      'from': from,
+      'limit': limit,
+      'end_date': endDate,
+      'count': count,
+    };
+    dynamic data = await _send('/wmqyline/FindPreceding', params);
+
+    return data;
+  }
+
+  /// 查询自选股的分钟线
+  Future<List<dynamic>> findMinLines(String tsCode,
+      {int? tradeDate, int? tradeMinute}) async {
+    var params = {
+      'ts_code': tsCode,
+      'trade_date': tradeDate,
+      'trade_minute': tradeMinute
+    };
+    List<dynamic> data = await _send('/minline/FindMinLines', params);
+
+    return data;
+  }
 }
 
 final ShareService shareService = ShareService(

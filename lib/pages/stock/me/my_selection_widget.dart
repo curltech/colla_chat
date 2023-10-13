@@ -1,5 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/stock/add_share_widget.dart';
+import 'package:colla_chat/pages/stock/me/add_share_widget.dart';
+import 'package:colla_chat/pages/stock/me/dayline_chart_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/stock/share.dart';
@@ -19,9 +20,11 @@ final DataListController<dynamic> shareController =
 ///自选股和分组的查询界面
 class ShareSelectionWidget extends StatefulWidget with TileDataMixin {
   final AddShareWidget addShareWidget = AddShareWidget();
+  final DayLineChartWidget dayLineChartWidget = const DayLineChartWidget();
 
   ShareSelectionWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(addShareWidget);
+    indexWidgetProvider.define(dayLineChartWidget);
   }
 
   @override
@@ -112,10 +115,13 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
   }
 
   Future<List<DataRow2>> _buildShareDataRows() async {
-    List<dynamic> value = await shareService.findMine();
-    shareController.replaceAll(value);
     List<DataRow2> rows = [];
-    var data = shareController.data;
+    List<dynamic> data = shareController.data;
+    if (data.isEmpty) {
+      List<dynamic> value = await shareService.findMine();
+      shareController.replaceAll(value);
+      data = shareController.data;
+    }
     for (int index = 0; index < data.length; ++index) {
       var d = data[index];
       var dataMap = JsonUtil.toJson(d);
@@ -148,7 +154,15 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
       }
       var dataRow = DataRow2(
         cells: cells,
-        onTap: () {},
+        onTap: () {
+          String? tsCode = dataMap['ts_code'];
+          String? name = dataMap['name'];
+          if (tsCode != null) {
+            dayLineController.tsCode = tsCode;
+            dayLineController.name = name;
+            indexWidgetProvider.push('dayline_chart');
+          }
+        },
       );
       rows.add(dataRow);
     }

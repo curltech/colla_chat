@@ -1,4 +1,4 @@
-import 'package:colla_chat/pages/stock/my_selection_widget.dart';
+import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -14,6 +14,7 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
 
   StockMainWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(shareSelectionWidget);
+
     List<TileDataMixin> mixins = [
       shareSelectionWidget,
     ];

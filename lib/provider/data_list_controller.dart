@@ -81,6 +81,14 @@ class DataListController<T> with ChangeNotifier {
     }
   }
 
+  insertAll(int index, List<T> ds) {
+    if (index >= 0 && index <= data.length) {
+      data.insertAll(index, ds);
+      _currentIndex = index;
+      notifyListeners();
+    }
+  }
+
   delete({int? index}) {
     index = index ?? _currentIndex;
     if (index >= 0 && index < data.length) {
