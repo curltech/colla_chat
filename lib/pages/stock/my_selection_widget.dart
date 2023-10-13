@@ -111,10 +111,10 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
     return dataColumns;
   }
 
-  Future<List<DataRow>> _buildShareDataRows() async {
+  Future<List<DataRow2>> _buildShareDataRows() async {
     List<dynamic> value = await shareService.findMine();
     shareController.replaceAll(value);
-    List<DataRow> rows = [];
+    List<DataRow2> rows = [];
     var data = shareController.data;
     for (int index = 0; index < data.length; ++index) {
       var d = data[index];
@@ -146,8 +146,9 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
         var dataCell = DataCell(Text(value!));
         cells.add(dataCell);
       }
-      var dataRow = DataRow(
+      var dataRow = DataRow2(
         cells: cells,
+        onTap: () {},
       );
       rows.add(dataRow);
     }
@@ -166,8 +167,9 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
                 minWidth: 2000,
                 dataRowHeight: 50,
                 fixedLeftColumns: 1,
+                dividerThickness: 0.0,
                 columns: _buildShareDataColumns(),
-                rows: value!,
+                rows: value,
               );
             }
           }
