@@ -1,3 +1,4 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/share.dart';
@@ -11,6 +12,7 @@ import 'package:candlesticks/candlesticks.dart';
 class DayLineController extends DataListController<dynamic> {
   String? _tsCode;
   String? name;
+  int _lineType = 101;
 
   int? count;
 
@@ -22,6 +24,20 @@ class DayLineController extends DataListController<dynamic> {
     if (_tsCode != tsCode) {
       _tsCode = tsCode;
       data.clear();
+      count = null;
+      notifyListeners();
+    }
+  }
+
+  int get lineType {
+    return _lineType;
+  }
+
+  set lineType(int lineType) {
+    if (_lineType != lineType) {
+      _lineType = lineType;
+      data.clear();
+      count = null;
       notifyListeners();
     }
   }
@@ -89,8 +105,15 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
     List<dynamic> data = dayLineController.data;
     int? count = dayLineController.count;
     if (count == null || data.length < count) {
-      Map<String, dynamic> response = await shareService.findPreceding(tsCode,
-          from: data.length, limit: 100);
+      Map<String, dynamic> response;
+      int lineType = dayLineController.lineType;
+      if (lineType == 101) {
+        response = await shareService.findPreceding(tsCode,
+            from: data.length, limit: 100);
+      } else {
+        response = await shareService.findLinePreceding(tsCode,
+            lineType: lineType, from: data.length, limit: 100);
+      }
       data = response['data'];
       dayLineController.insertAll(0, data);
       count = response['count'];
@@ -155,6 +178,12 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
                     : light();
                 return Candlesticks(
                   indicators: indicators,
+                  actions: <ToolBarAction>[
+                    ToolBarAction(
+                      onPressed: () {},
+                      child: Text(AppLocalizations.t('dayline')),
+                    ),
+                  ],
                   candles: candles,
                   style: style,
                   chartAdjust: ChartAdjust.visibleRange,
