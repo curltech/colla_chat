@@ -1,4 +1,5 @@
 import 'package:colla_chat/entity/stock/share.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/share.dart';
@@ -151,18 +152,18 @@ class _UpdateStockWidgetState extends State<UpdateStockWidget>
   Widget _buildUpdateStockView(BuildContext context) {
     return Column(children: [
       Container(
-          padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
           child: CommonAutoSizeTextFormField(
-            controller: _tsCodeTextController,
-            keyboardType: TextInputType.text,
-          )),
+              controller: _tsCodeTextController,
+              keyboardType: TextInputType.text,
+              labelText: AppLocalizations.t('tsCode'))),
       Container(
           padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
           child: CommonAutoSizeTextFormField(
-            controller: _startDateTextController,
-            keyboardType: TextInputType.number,
-          )),
-      DataListView(tileData: tileData),
+              controller: _startDateTextController,
+              keyboardType: TextInputType.number,
+              labelText: AppLocalizations.t('startDate'))),
+      Expanded(child: DataListView(tileData: tileData)),
     ]);
   }
 

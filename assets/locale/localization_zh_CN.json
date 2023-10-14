@@ -557,5 +557,7 @@
   "Stock": "股票",
   "MySelection": "自选股",
   "AddShare": "查询股票",
-  "Add share": "加自选股"
+  "Add share": "加自选股",
+  "RefreshStock": "刷新股票数据",
+  "UpdateStock": "更新股票数据"
 }
