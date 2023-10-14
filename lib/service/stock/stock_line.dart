@@ -4,7 +4,7 @@ import 'package:colla_chat/transport/httpclient.dart';
 import 'package:dio/dio.dart';
 
 class StockLineService {
-  dynamic send(String url, dynamic data) async {
+  dynamic send(String url, {dynamic data}) async {
     PeerEndpoint? defaultPeerEndpoint =
         peerEndpointController.defaultPeerEndpoint;
     if (defaultPeerEndpoint != null) {
@@ -21,177 +21,170 @@ class StockLineService {
     }
   }
 
-  dynamic schedule(int startDate) async {
-    var data = await stockLineService
-        .send('/processlog/Schedule', {'start_date': startDate});
+  dynamic schedule() async {
+    var data = await stockLineService.send('/processlog/Schedule');
     return data;
   }
 
-  dynamic refreshTodayLine(int startDate) async {
-    var data = await stockLineService
-        .send('/dayline/RefreshTodayLine', {'start_date': startDate});
+  dynamic refreshTodayLine({int? startDate}) async {
+    var data = await stockLineService.send('/dayline/RefreshTodayLine',
+        data: startDate == null ? null : {'start_date': startDate});
     return data;
   }
 
-  dynamic refreshMinLine(int startDate) async {
-    var data = await stockLineService
-        .send('/minline/RefreshMinLine', {'start_date': startDate});
+  dynamic refreshMinLine() async {
+    var data = await stockLineService.send('/minline/RefreshMinLine');
     return data;
   }
 
-  dynamic refreshTodayMinLine(int startDate) async {
-    var data = await stockLineService
-        .send('/minline/RefreshTodayMinLine', {'start_date': startDate});
+  dynamic refreshTodayMinLine() async {
+    var data = await stockLineService.send('/minline/RefreshTodayMinLine');
     return data;
   }
 
-  dynamic refreshQPerformance(int startDate) async {
-    var data = await stockLineService
-        .send('/qperformance/RefreshQPerformance', {'start_date': startDate});
+  dynamic refreshQPerformance() async {
+    var data = await stockLineService.send('/qperformance/RefreshQPerformance');
     return data;
   }
 
-  dynamic refreshQStat(int startDate) async {
-    var data = await stockLineService
-        .send('/qstat/RefreshQStat', {'start_date': startDate});
+  dynamic refreshQStat() async {
+    var data = await stockLineService.send('/qstat/RefreshQStat');
     return data;
   }
 
-  dynamic refreshStatScore(int startDate) async {
-    var data = await stockLineService
-        .send('/statscore/RefreshStatScore', {'start_date': startDate});
+  dynamic refreshStatScore() async {
+    var data = await stockLineService.send('/statscore/RefreshStatScore');
     return data;
   }
 
-  dynamic createScorePercentile(int startDate) async {
-    var data = await stockLineService
-        .send('/statscore/CreateScorePercentile', {'start_date': startDate});
+  dynamic createScorePercentile() async {
+    var data = await stockLineService.send('/statscore/CreateScorePercentile');
     return data;
   }
 
-  dynamic refreshStat(int startDate) async {
-    var data = await stockLineService
-        .send('/dayline/RefreshStat', {'start_date': startDate});
+  dynamic refreshStat({int? startDate}) async {
+    var data = await stockLineService.send('/dayline/RefreshStat',
+        data: startDate == null ? null : {'start_date': startDate});
     return data;
   }
 
-  dynamic refreshBeforeMa(int startDate) async {
-    var data = await stockLineService
-        .send('/dayline/RefreshBeforeMa', {'start_date': startDate});
+  dynamic refreshBeforeMa({int? startDate}) async {
+    var data = await stockLineService.send('/dayline/RefreshBeforeMa',
+        data: startDate == null ? null : {'start_date': startDate});
     return data;
   }
 
-  dynamic refreshEventCond(int startDate) async {
-    var data = await stockLineService
-        .send('/eventcond/RefreshEventCond', {'start_date': startDate});
+  dynamic refreshEventCond() async {
+    var data = await stockLineService.send('/eventcond/RefreshEventCond');
     return data;
   }
 
-  dynamic updateShares(int startDate) async {
-    var data = await stockLineService
-        .send('/share/UpdateShares', {'start_date': startDate});
+  dynamic updateShares() async {
+    var data = await stockLineService.send('/share/UpdateShares');
     return data;
   }
 
-  dynamic writeAllFile(int startDate) async {
-    var data = await stockLineService
-        .send('/dayline/WriteAllFile', {'start_date': startDate});
+  dynamic writeAllFile({int? startDate}) async {
+    var data = await stockLineService.send('/dayline/WriteAllFile',
+        data: startDate == null ? null : {'start_date': startDate});
     return data;
   }
 
   dynamic getUpdateForecast(String tsCode) async {
     var data = await stockLineService
-        .send('/forecast/GetUpdateForecast', {'ts_code': tsCode});
+        .send('/forecast/GetUpdateForecast', data: {'ts_code': tsCode});
     return data;
   }
 
   dynamic getUpdateExpress(String tsCode) async {
     var data = await stockLineService
-        .send('/express/GetUpdateExpress', {'ts_code': tsCode});
+        .send('/express/GetUpdateExpress', data: {'ts_code': tsCode});
     return data;
   }
 
   dynamic getUpdatePerformance(String tsCode) async {
     var data = await stockLineService
-        .send('/performance/GetUpdatePerformance', {'ts_code': tsCode});
+        .send('/performance/GetUpdatePerformance', data: {'ts_code': tsCode});
     return data;
   }
 
   dynamic getUpdateDayLine(String tsCode) async {
     var data = await stockLineService
-        .send('/dayline/GetUpdateDayLine', {'ts_code': tsCode});
+        .send('/dayline/GetUpdateDayLine', data: {'ts_code': tsCode});
     return data;
   }
 
   dynamic getUpdateTodayLine(String tsCode, int startDate) async {
     var data = await stockLineService.send('/dayline/GetUpdateTodayLine',
-        {'ts_code': tsCode, 'start_date': startDate});
+        data: {'ts_code': tsCode, 'start_date': startDate});
     return data;
   }
 
   dynamic getUpdateMinLine(String tsCode) async {
     var data = await stockLineService
-        .send('/minline/GetUpdateMinLine', {'ts_code': tsCode});
+        .send('/minline/GetUpdateMinLine', data: {'ts_code': tsCode});
     return data;
   }
 
   dynamic getUpdateTodayMinLine(String tsCode) async {
     var data = await stockLineService
-        .send('/minline/GetUpdateTodayMinLine', {'ts_code': tsCode});
+        .send('/minline/GetUpdateTodayMinLine', data: {'ts_code': tsCode});
     return data;
   }
 
   dynamic getUpdateWmqyLine(String tsCode) async {
     var data = await stockLineService
-        .send('/wmqyline/GetUpdateWmqyLine', {'ts_code': tsCode});
+        .send('/wmqyline/GetUpdateWmqyLine', data: {'ts_code': tsCode});
     return data;
   }
 
   dynamic getUpdateWmqyQPerformance(String tsCode) async {
-    var data = await stockLineService
-        .send('/qperformance/GetUpdateWmqyQPerformance', {'ts_code': tsCode});
+    var data = await stockLineService.send(
+        '/qperformance/GetUpdateWmqyQPerformance',
+        data: {'ts_code': tsCode});
     return data;
   }
 
   dynamic getUpdateDayQPerformance(String tsCode) async {
-    var data = await stockLineService
-        .send('/qperformance/GetUpdateDayQPerformance', {'ts_code': tsCode});
+    var data = await stockLineService.send(
+        '/qperformance/GetUpdateDayQPerformance',
+        data: {'ts_code': tsCode});
     return data;
   }
 
   dynamic getUpdateQStat(String tsCode) async {
     var data = await stockLineService
-        .send('/qstat/GetUpdateQStat', {'ts_code': tsCode});
+        .send('/qstat/GetUpdateQStat', data: {'ts_code': tsCode});
     return data;
   }
 
   dynamic getUpdateStatScore(String tsCode) async {
     var data = await stockLineService
-        .send('/statscore/GetUpdateStatScore', {'ts_code': tsCode});
+        .send('/statscore/GetUpdateStatScore', data: {'ts_code': tsCode});
     return data;
   }
 
   dynamic updateStat(String tsCode, int startDate) async {
-    var data = await stockLineService.send(
-        '/dayline/UpdateStat', {'ts_code': tsCode, 'start_date': startDate});
+    var data = await stockLineService.send('/dayline/UpdateStat',
+        data: {'ts_code': tsCode, 'start_date': startDate});
     return data;
   }
 
   dynamic updateBeforeMa(String tsCode, int startDate) async {
     var data = await stockLineService.send('/dayline/UpdateBeforeMa',
-        {'ts_code': tsCode, 'start_date': startDate});
+        data: {'ts_code': tsCode, 'start_date': startDate});
     return data;
   }
 
   dynamic getUpdateEventCond(String tsCode) async {
     var data = await stockLineService
-        .send('/eventcond/GetUpdateEventCond', {'ts_code': tsCode});
+        .send('/eventcond/GetUpdateEventCond', data: {'ts_code': tsCode});
     return data;
   }
 
   dynamic writeFile(String tsCode, int startDate) async {
-    var data = await stockLineService.send(
-        '/dayline/WriteFile', {'ts_code': tsCode, 'start_date': startDate});
+    var data = await stockLineService.send('/dayline/WriteFile',
+        data: {'ts_code': tsCode, 'start_date': startDate});
     return data;
   }
 }
