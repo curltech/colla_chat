@@ -1,12 +1,8 @@
-import 'package:colla_chat/entity/dht/peerendpoint.dart';
 import 'package:colla_chat/entity/stock/share.dart';
-import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
 
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
-import 'package:colla_chat/service/stock/share_group.dart';
-import 'package:colla_chat/transport/httpclient.dart';
-import 'package:dio/dio.dart';
+import 'package:colla_chat/service/stock/stock_line.dart';
 
 class ShareService extends GeneralBaseService<Share> {
   String? _subscription;
@@ -32,30 +28,14 @@ class ShareService extends GeneralBaseService<Share> {
     return _subscription;
   }
 
-  dynamic _send(String url, dynamic data) async {
-    PeerEndpoint? defaultPeerEndpoint =
-        peerEndpointController.defaultPeerEndpoint;
-    if (defaultPeerEndpoint != null) {
-      String? httpConnectAddress = defaultPeerEndpoint.httpConnectAddress;
-      if (httpConnectAddress != null) {
-        DioHttpClient? client = httpClientPool.get(httpConnectAddress);
-        if (client != null) {
-          Response<dynamic> response = await client.send(url, data);
-          if (response.statusCode == 200) {
-            return response.data;
-          }
-        }
-      }
-    }
-  }
-
   /// 查询自选股的详细信息
   Future<List<dynamic>> findMine() async {
     // 数据为逗号分割的tscode
     String? subscription = await findSubscription();
     List<dynamic> data = [];
     if (subscription != null) {
-      data = await _send('/share/GetMine', {'ts_code': subscription});
+      data = await stockLineService
+          .send('/share/GetMine', {'ts_code': subscription});
     }
 
     return data;
@@ -63,7 +43,8 @@ class ShareService extends GeneralBaseService<Share> {
 
   /// 根据关键字搜索股票
   Future<List<Share>> searchShare(String keyword) async {
-    List<dynamic> data = await _send('/share/Search', {'keyword': keyword});
+    List<dynamic> data =
+        await stockLineService.send('/share/Search', {'keyword': keyword});
     List<Share> shares = [];
     for (dynamic map in data) {
       Share share = Share.fromRemoteJson(map);
@@ -93,7 +74,8 @@ class ShareService extends GeneralBaseService<Share> {
       'end_date': endDate,
       'count': count,
     };
-    dynamic data = await _send('/dayline/FindPreceding', params);
+    dynamic data =
+        await stockLineService.send('/dayline/FindPreceding', params);
 
     return data;
   }
@@ -106,7 +88,8 @@ class ShareService extends GeneralBaseService<Share> {
       'end_date': endDate,
       'limit': limit,
     };
-    List<dynamic> data = await _send('/dayline/FindRange', params);
+    List<dynamic> data =
+        await stockLineService.send('/dayline/FindRange', params);
 
     return data;
   }
@@ -127,7 +110,7 @@ class ShareService extends GeneralBaseService<Share> {
       'orderby': orderBy,
       'count': count,
     };
-    dynamic data = await _send('/dayline/Search', params);
+    dynamic data = await stockLineService.send('/dayline/Search', params);
 
     return data;
   }
@@ -147,7 +130,8 @@ class ShareService extends GeneralBaseService<Share> {
       'end_date': endDate,
       'count': count,
     };
-    dynamic data = await _send('/wmqyline/FindPreceding', params);
+    dynamic data =
+        await stockLineService.send('/wmqyline/FindPreceding', params);
 
     return data;
   }
@@ -160,7 +144,8 @@ class ShareService extends GeneralBaseService<Share> {
       'trade_date': tradeDate,
       'trade_minute': tradeMinute
     };
-    List<dynamic> data = await _send('/minline/FindMinLines', params);
+    List<dynamic> data =
+        await stockLineService.send('/minline/FindMinLines', params);
 
     return data;
   }
