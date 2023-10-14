@@ -39,7 +39,7 @@ class FirebaseMessagingService {
 
   ///在main的runApp之前调用，用于初始化
   init() async {
-    if (platformParams.mobile || platformParams.desktop) {
+    if (platformParams.mobile || platformParams.macos) {
       await Firebase.initializeApp(
           options: DefaultFirebaseOptions.currentPlatform);
       FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
