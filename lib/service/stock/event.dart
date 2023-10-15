@@ -9,4 +9,4 @@ class EventService extends GeneralRemoteService<Event> {
   }
 }
 
-final eventService = EventService(name: 'event');
+final EventService eventService = EventService(name: 'event');

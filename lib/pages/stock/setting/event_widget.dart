@@ -80,8 +80,7 @@ class EventWidget extends StatefulWidget with TileDataMixin {
 
 class _EventWidgetState extends State<EventWidget>
     with TickerProviderStateMixin {
-  final FormInputController controller =
-      FormInputController(eventFieldDefs);
+  final FormInputController controller = FormInputController(eventFieldDefs);
   SwiperController swiperController = SwiperController();
   int index = 0;
   final List<PlatformDataColumn> eventColumns = [
@@ -223,8 +222,10 @@ class _EventWidgetState extends State<EventWidget>
   _onOk(Map<String, dynamic> values) async {
     Event currentEvent = Event.fromJson(values);
     if (eventController.currentIndex == -1) {
-      await eventService.insert(currentEvent);
-      eventController.insert(0, currentEvent);
+      Event? event = await eventService.insert(currentEvent);
+      if (event != null) {
+        eventController.insert(0, event);
+      }
     } else {
       Event? event = await eventService.update(currentEvent);
       if (event != null) {
