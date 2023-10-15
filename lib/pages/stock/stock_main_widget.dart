@@ -1,6 +1,7 @@
 import 'package:colla_chat/pages/stock/me/add_share_widget.dart';
 import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
 import 'package:colla_chat/pages/stock/setting/event_widget.dart';
+import 'package:colla_chat/pages/stock/setting/filter_cond_widget.dart';
 import 'package:colla_chat/pages/stock/setting/refresh_stock_widget.dart';
 import 'package:colla_chat/pages/stock/setting/update_stock_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -17,6 +18,7 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
   final RefreshStockWidget refreshStockWidget = RefreshStockWidget();
   final UpdateStockWidget updateStockWidget = UpdateStockWidget();
   final EventWidget eventWidget = EventWidget();
+  final FilterCondWidget filterCondWidget = FilterCondWidget();
 
   StockMainWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(shareSelectionWidget);
@@ -24,6 +26,7 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(refreshStockWidget);
     indexWidgetProvider.define(updateStockWidget);
     indexWidgetProvider.define(eventWidget);
+    indexWidgetProvider.define(filterCondWidget);
   }
 
   @override
@@ -54,6 +57,7 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
       refreshStockWidget,
       updateStockWidget,
       eventWidget,
+      filterCondWidget,
     ]);
     for (var tile in settingTileData) {
       tile.dense = false;
