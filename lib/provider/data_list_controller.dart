@@ -120,6 +120,13 @@ class DataListController<T> with ChangeNotifier {
     }
   }
 
+  replace(T d) {
+    if (_currentIndex > -1 && data.isNotEmpty) {
+      data[_currentIndex] = d;
+      notifyListeners();
+    }
+  }
+
   replaceAll(List<T> ds) {
     data.clear();
     data.addAll(ds);

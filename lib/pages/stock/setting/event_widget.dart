@@ -16,7 +16,7 @@ import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
 
-final List<PlatformDataField> eventColumnFieldDefs = [
+final List<PlatformDataField> eventFieldDefs = [
   PlatformDataField(
       name: 'id',
       label: 'Id',
@@ -81,7 +81,7 @@ class EventWidget extends StatefulWidget with TileDataMixin {
 class _EventWidgetState extends State<EventWidget>
     with TickerProviderStateMixin {
   final FormInputController controller =
-      FormInputController(eventColumnFieldDefs);
+      FormInputController(eventFieldDefs);
   SwiperController swiperController = SwiperController();
   int index = 0;
   final List<PlatformDataColumn> eventColumns = [
@@ -152,9 +152,9 @@ class _EventWidgetState extends State<EventWidget>
             eventController.delete(index: index);
           }
         },
-        icon: Icon(
-          Icons.delete_outline,
-          color: myself.primary,
+        icon: const Icon(
+          Icons.remove_circle_outline,
+          color: Colors.yellow,
         ),
       ));
       cells.add(dataCell);
@@ -199,14 +199,14 @@ class _EventWidgetState extends State<EventWidget>
     }
     List<FormButtonDef> formButtonDefs = [
       FormButtonDef(
-          label: 'Ok',
-          onTap: (Map<String, dynamic> values) {
-            _onOk(values);
-          }),
-      FormButtonDef(
           label: 'Cancel',
           onTap: (Map<String, dynamic> values) {
             _onCancel(values);
+          }),
+      FormButtonDef(
+          label: 'Ok',
+          onTap: (Map<String, dynamic> values) {
+            _onOk(values);
           }),
     ];
     var formInputWidget = Container(
@@ -226,7 +226,10 @@ class _EventWidgetState extends State<EventWidget>
       await eventService.insert(currentEvent);
       eventController.insert(0, currentEvent);
     } else {
-      await eventService.update(currentEvent);
+      Event? event = await eventService.update(currentEvent);
+      if (event != null) {
+        eventController.replace(event);
+      }
     }
     if (mounted) {
       DialogUtil.info(context,
