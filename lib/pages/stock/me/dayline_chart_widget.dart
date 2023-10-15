@@ -1,4 +1,3 @@
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/share.dart';
@@ -10,25 +9,37 @@ import 'package:flutter/material.dart';
 import 'package:candlesticks/candlesticks.dart';
 
 class DayLineController extends DataListController<dynamic> {
-  String? _tsCode;
-  String? name;
-  int _lineType = 101;
+  String tsCode;
+  String name;
+  int lineType;
 
   int? count;
 
+  DayLineController(this.tsCode, this.name, {this.lineType = 101});
+}
+
+class MultiDayLineController with ChangeNotifier {
+  String? _tsCode;
+
+  int _lineType = 101;
+
+  /// 增加自选股的查询结果控制器
+  final Map<String, Map<int, DayLineController>> dayLineControllers = {};
+
+  /// 当前股票代码
   String? get tsCode {
     return _tsCode;
   }
 
+  /// 设置当前股票代码
   set tsCode(String? tsCode) {
     if (_tsCode != tsCode) {
       _tsCode = tsCode;
-      data.clear();
-      count = null;
       notifyListeners();
     }
   }
 
+  /// 当前数据类型
   int get lineType {
     return _lineType;
   }
@@ -36,15 +47,40 @@ class DayLineController extends DataListController<dynamic> {
   set lineType(int lineType) {
     if (_lineType != lineType) {
       _lineType = lineType;
-      data.clear();
-      count = null;
+      notifyListeners();
+    }
+  }
+
+  /// 当前股票控制器
+  DayLineController? get dayLineController {
+    return dayLineControllers[_tsCode]?[_lineType];
+  }
+
+  /// 加入股票代码和控制器，并设置为当前
+  put(String tsCode, String name) {
+    if (tsCode != _tsCode) {
+      _tsCode = tsCode;
+      if (!dayLineControllers.containsKey(tsCode)) {
+        dayLineControllers[tsCode] = {};
+        dayLineControllers[tsCode]?[101] =
+            DayLineController(tsCode, name, lineType: 101);
+        dayLineControllers[tsCode]?[102] =
+            DayLineController(tsCode, name, lineType: 102);
+        dayLineControllers[tsCode]?[103] =
+            DayLineController(tsCode, name, lineType: 103);
+        dayLineControllers[tsCode]?[104] =
+            DayLineController(tsCode, name, lineType: 104);
+        dayLineControllers[tsCode]?[105] =
+            DayLineController(tsCode, name, lineType: 105);
+        dayLineControllers[tsCode]?[106] =
+            DayLineController(tsCode, name, lineType: 106);
+      }
       notifyListeners();
     }
   }
 }
 
-/// 增加自选股的查询结果控制器
-final DayLineController dayLineController = DayLineController();
+final MultiDayLineController multiDayLineController = MultiDayLineController();
 
 class DayLineChartWidget extends StatefulWidget with TileDataMixin {
   const DayLineChartWidget({Key? key}) : super(key: key);
@@ -87,7 +123,7 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
 
   @override
   void initState() {
-    dayLineController.addListener(_update);
+    multiDayLineController.addListener(_update);
     super.initState();
   }
 
@@ -96,12 +132,12 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
   }
 
   Future<List<Candle>> loadMoreCandles() async {
-    String? tsCode = dayLineController.tsCode;
-    if (tsCode == null) {
-      dayLineController.clear();
+    DayLineController? dayLineController =
+        multiDayLineController.dayLineController;
+    if (dayLineController == null) {
       return <Candle>[];
     }
-
+    String tsCode = dayLineController.tsCode;
     List<dynamic> data = dayLineController.data;
     int? count = dayLineController.count;
     if (count == null || data.length < count) {
@@ -163,8 +199,10 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
 
   @override
   Widget build(BuildContext context) {
+    DayLineController? dayLineController =
+        multiDayLineController.dayLineController;
     return AppBarView(
-      title: '${dayLineController.tsCode}-${dayLineController.name}',
+      title: '${dayLineController?.tsCode}-${dayLineController?.name}',
       withLeading: true,
       child: Center(
         child: FutureBuilder(
@@ -181,66 +219,66 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
                   actions: <ToolBarAction>[
                     ToolBarAction(
                       onPressed: () {
-                        dayLineController.lineType = 101;
+                        multiDayLineController.lineType = 101;
                       },
                       child: Icon(
                         Icons.calendar_view_day_outlined,
-                        color: dayLineController.lineType == 101
+                        color: multiDayLineController.lineType == 101
                             ? myself.primary
                             : Colors.white,
                       ),
                     ),
                     ToolBarAction(
                       onPressed: () {
-                        dayLineController.lineType = 102;
+                        multiDayLineController.lineType = 102;
                       },
                       child: Icon(
                         Icons.calendar_view_week_outlined,
-                        color: dayLineController.lineType == 102
+                        color: multiDayLineController.lineType == 102
                             ? myself.primary
                             : Colors.white,
                       ),
                     ),
                     ToolBarAction(
                       onPressed: () {
-                        dayLineController.lineType = 103;
+                        multiDayLineController.lineType = 103;
                       },
                       child: Icon(
                         Icons.calendar_view_month_outlined,
-                        color: dayLineController.lineType == 103
+                        color: multiDayLineController.lineType == 103
                             ? myself.primary
                             : Colors.white,
                       ),
                     ),
                     ToolBarAction(
                       onPressed: () {
-                        dayLineController.lineType = 104;
+                        multiDayLineController.lineType = 104;
                       },
                       child: Icon(
                         Icons.perm_contact_calendar,
-                        color: dayLineController.lineType == 104
+                        color: multiDayLineController.lineType == 104
                             ? myself.primary
                             : Colors.white,
                       ),
                     ),
                     ToolBarAction(
                       onPressed: () {
-                        dayLineController.lineType = 105;
+                        multiDayLineController.lineType = 105;
                       },
                       child: Icon(
                         Icons.calendar_month_outlined,
-                        color: dayLineController.lineType == 105
+                        color: multiDayLineController.lineType == 105
                             ? myself.primary
                             : Colors.white,
                       ),
                     ),
                     ToolBarAction(
                       onPressed: () {
-                        dayLineController.lineType = 106;
+                        multiDayLineController.lineType = 106;
                       },
                       child: Icon(
                         Icons.calendar_today_outlined,
-                        color: dayLineController.lineType == 106
+                        color: multiDayLineController.lineType == 106
                             ? myself.primary
                             : Colors.white,
                       ),
@@ -269,7 +307,7 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
 
   @override
   void dispose() {
-    dayLineController.removeListener(_update);
+    multiDayLineController.removeListener(_update);
     super.dispose();
   }
 }

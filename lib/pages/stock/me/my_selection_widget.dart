@@ -1,5 +1,4 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/stock/me/add_share_widget.dart';
 import 'package:colla_chat/pages/stock/me/dayline_chart_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -156,8 +155,7 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
           String? tsCode = dataMap['ts_code'];
           String? name = dataMap['name'];
           if (tsCode != null) {
-            dayLineController.tsCode = tsCode;
-            dayLineController.name = name;
+            multiDayLineController.put(tsCode, name!);
             indexWidgetProvider.push('dayline_chart');
           }
         },
