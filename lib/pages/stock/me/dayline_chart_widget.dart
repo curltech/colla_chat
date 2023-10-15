@@ -197,6 +197,92 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
     );
   }
 
+  _buildCandlesticks(List<Candle> candles) {
+    final style =
+        myself.getBrightness(context) == Brightness.dark ? dark() : light();
+    return Candlesticks(
+      indicators: indicators,
+      actions: <ToolBarAction>[
+        ToolBarAction(
+          onPressed: () {
+            multiDayLineController.lineType = 101;
+          },
+          child: Icon(
+            Icons.calendar_view_day_outlined,
+            color: multiDayLineController.lineType == 101
+                ? myself.primary
+                : Colors.white,
+          ),
+        ),
+        ToolBarAction(
+          onPressed: () {
+            multiDayLineController.lineType = 102;
+          },
+          child: Icon(
+            Icons.calendar_view_week_outlined,
+            color: multiDayLineController.lineType == 102
+                ? myself.primary
+                : Colors.white,
+          ),
+        ),
+        ToolBarAction(
+          onPressed: () {
+            multiDayLineController.lineType = 103;
+          },
+          child: Icon(
+            Icons.calendar_view_month_outlined,
+            color: multiDayLineController.lineType == 103
+                ? myself.primary
+                : Colors.white,
+          ),
+        ),
+        ToolBarAction(
+          onPressed: () {
+            multiDayLineController.lineType = 104;
+          },
+          child: Icon(
+            Icons.perm_contact_calendar,
+            color: multiDayLineController.lineType == 104
+                ? myself.primary
+                : Colors.white,
+          ),
+        ),
+        ToolBarAction(
+          onPressed: () {
+            multiDayLineController.lineType = 105;
+          },
+          child: Icon(
+            Icons.calendar_month_outlined,
+            color: multiDayLineController.lineType == 105
+                ? myself.primary
+                : Colors.white,
+          ),
+        ),
+        ToolBarAction(
+          onPressed: () {
+            multiDayLineController.lineType = 106;
+          },
+          child: Icon(
+            Icons.calendar_today_outlined,
+            color: multiDayLineController.lineType == 106
+                ? myself.primary
+                : Colors.white,
+          ),
+        ),
+      ],
+      candles: candles,
+      style: style,
+      chartAdjust: ChartAdjust.visibleRange,
+      onLoadMoreCandles: loadMoreCandles,
+      onRemoveIndicator: (String indicator) {
+        setState(() {
+          indicators = [...indicators];
+          indicators.removeWhere((element) => element.name == indicator);
+        });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     DayLineController? dayLineController =
@@ -211,91 +297,7 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
             if (snapshot.connectionState == ConnectionState.done) {
               List<Candle>? candles = snapshot.data;
               if (candles != null) {
-                final style = myself.getBrightness(context) == Brightness.dark
-                    ? dark()
-                    : light();
-                return Candlesticks(
-                  indicators: indicators,
-                  actions: <ToolBarAction>[
-                    ToolBarAction(
-                      onPressed: () {
-                        multiDayLineController.lineType = 101;
-                      },
-                      child: Icon(
-                        Icons.calendar_view_day_outlined,
-                        color: multiDayLineController.lineType == 101
-                            ? myself.primary
-                            : Colors.white,
-                      ),
-                    ),
-                    ToolBarAction(
-                      onPressed: () {
-                        multiDayLineController.lineType = 102;
-                      },
-                      child: Icon(
-                        Icons.calendar_view_week_outlined,
-                        color: multiDayLineController.lineType == 102
-                            ? myself.primary
-                            : Colors.white,
-                      ),
-                    ),
-                    ToolBarAction(
-                      onPressed: () {
-                        multiDayLineController.lineType = 103;
-                      },
-                      child: Icon(
-                        Icons.calendar_view_month_outlined,
-                        color: multiDayLineController.lineType == 103
-                            ? myself.primary
-                            : Colors.white,
-                      ),
-                    ),
-                    ToolBarAction(
-                      onPressed: () {
-                        multiDayLineController.lineType = 104;
-                      },
-                      child: Icon(
-                        Icons.perm_contact_calendar,
-                        color: multiDayLineController.lineType == 104
-                            ? myself.primary
-                            : Colors.white,
-                      ),
-                    ),
-                    ToolBarAction(
-                      onPressed: () {
-                        multiDayLineController.lineType = 105;
-                      },
-                      child: Icon(
-                        Icons.calendar_month_outlined,
-                        color: multiDayLineController.lineType == 105
-                            ? myself.primary
-                            : Colors.white,
-                      ),
-                    ),
-                    ToolBarAction(
-                      onPressed: () {
-                        multiDayLineController.lineType = 106;
-                      },
-                      child: Icon(
-                        Icons.calendar_today_outlined,
-                        color: multiDayLineController.lineType == 106
-                            ? myself.primary
-                            : Colors.white,
-                      ),
-                    ),
-                  ],
-                  candles: candles,
-                  style: style,
-                  chartAdjust: ChartAdjust.visibleRange,
-                  onLoadMoreCandles: loadMoreCandles,
-                  onRemoveIndicator: (String indicator) {
-                    setState(() {
-                      indicators = [...indicators];
-                      indicators
-                          .removeWhere((element) => element.name == indicator);
-                    });
-                  },
-                );
+                return _buildCandlesticks(candles);
               }
             }
             return LoadingUtil.buildLoadingIndicator();
