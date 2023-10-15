@@ -50,12 +50,14 @@ class PlatformDataColumn {
   final InputType inputType;
   final DataType dataType;
   final MainAxisAlignment align;
+  final double width;
 
   PlatformDataColumn(
       {required this.name,
       required this.label,
       this.dataType = DataType.string,
       this.inputType = InputType.label,
+      this.width = 100,
       this.align = MainAxisAlignment.start});
 }
 

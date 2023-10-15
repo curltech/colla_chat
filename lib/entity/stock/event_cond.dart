@@ -13,9 +13,9 @@ class EventCond extends StatusEntity {
   String? condAlias;
   String? condContent;
   String? condParas;
-  double? condValue;
-  double? condResult;
-  double? score;
+  num? condValue;
+  num? condResult;
+  num? score;
   String? descr;
 
   EventCond(this.tsCode, this.name, this.tradeDate, this.eventCode,

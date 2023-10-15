@@ -105,14 +105,12 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
     PlatformDataColumn(
       label: '条件代码',
       name: 'cond_code',
-    ),
-    PlatformDataColumn(
-      label: '条件类型',
-      name: 'cond_type',
+      width: 150,
     ),
     PlatformDataColumn(
       label: '条件名',
       name: 'name',
+      width: 200,
     ),
   ];
 
@@ -131,7 +129,7 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
     for (var shareColumn in filterCondColumns) {
       dataColumns.add(DataColumn2(
           label: Text(shareColumn.label),
-          fixedWidth: 130,
+          fixedWidth: shareColumn.width,
           numeric: shareColumn.dataType == DataType.double ||
               shareColumn.dataType == DataType.int));
     }

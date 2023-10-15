@@ -7,7 +7,7 @@ class Event extends StatusEntity {
   String eventName;
   String? content;
   String? contentParas;
-  double? score;
+  num? score;
   String? descr;
 
   Event(this.eventCode, this.eventName);

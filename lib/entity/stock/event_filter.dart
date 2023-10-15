@@ -10,7 +10,7 @@ class EventFilter extends StatusEntity {
   String? condAlias;
   String condContent;
   String? condParas;
-  double? score;
+  num? score;
   String? descr;
 
   EventFilter(this.condCode, this.condName, this.condContent, this.eventCode,

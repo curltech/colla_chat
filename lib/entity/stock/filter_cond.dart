@@ -7,7 +7,7 @@ class FilterCond extends StatusEntity {
   String condType;
   String? content;
   String? condParas;
-  double? score;
+  num? score;
   String? descr;
 
   FilterCond(this.condCode, this.condType, this.name);
