@@ -3,7 +3,6 @@ import 'package:colla_chat/entity/base.dart';
 /// 买卖点事件的条件组合
 class EventFilter extends StatusEntity {
   String eventCode;
-  String eventType;
   String eventName;
   String condCode;
   String? codeAlias;
@@ -15,11 +14,10 @@ class EventFilter extends StatusEntity {
   String? descr;
 
   EventFilter(this.condCode, this.condName, this.condContent, this.eventCode,
-      this.eventType, this.eventName);
+      this.eventName);
 
   EventFilter.fromJson(Map json)
       : eventCode = json['event_code'],
-        eventType = json['event_type'],
         eventName = json['event_name'],
         condCode = json['cond_code'],
         codeAlias = json['code_alias'],
@@ -36,7 +34,6 @@ class EventFilter extends StatusEntity {
     var json = super.toJson();
     json.addAll({
       'event_code': eventCode,
-      'event_type': eventType,
       'event_name': eventName,
       'cond_code': condCode,
       'code_alias': codeAlias,

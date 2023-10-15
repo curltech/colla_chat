@@ -15,6 +15,7 @@ import 'package:dio/dio.dart';
 
 /// 远程存储服务的通用访问类，所有的表访问服务都是这个类的实例
 abstract class GeneralRemoteService<T> {
+  late final T Function(Map) post;
   final String name;
   final int index = 0;
   String? httpConnectAddress;
@@ -69,7 +70,11 @@ abstract class GeneralRemoteService<T> {
       var json = JsonUtil.toJson(condiBean);
       params.addAll(json);
     }
-    return send(url, data: params);
+    var m = await send(url, data: params);
+    if (m != null) {
+      var o = post(m);
+      return o;
+    }
   }
 
   Future<List<T>> findAll() async {
@@ -102,9 +107,17 @@ abstract class GeneralRemoteService<T> {
     if (condiBean != null) {
       params['condiBean'] = JsonUtil.toJson(condiBean);
     }
-    var data = await send('/${this.name}/Find', data: params);
+    dynamic data = await send('/${this.name}/Find', data: params);
+    List<T> os = [];
+    var ms = data['data'];
+    if (ms.isNotEmpty) {
+      for (var m in ms) {
+        var o = post(m);
+        os.add(o);
+      }
+    }
 
-    return data;
+    return os;
   }
 
   /// 与find的不同是返回值是带有result，from，limit，total字段的对象
@@ -127,9 +140,17 @@ abstract class GeneralRemoteService<T> {
       params['condiBean'] = JsonUtil.toJson(condiBean);
     }
     var data = await send('/${this.name}/Find', data: params);
+    var ms = data['data'];
+    List<T> os = [];
+    if (ms.isNotEmpty) {
+      for (var m in ms) {
+        var o = post(m);
+        os.add(o);
+      }
+    }
     Pagination<T> pagination = Pagination<T>(
-        data: data.data,
-        rowsNumber: data.count,
+        data: os,
+        rowsNumber: data['count'],
         offset: offset,
         rowsPerPage: limit);
 
@@ -167,41 +188,54 @@ abstract class GeneralRemoteService<T> {
     );
   }
 
-  Future<int> insert(dynamic entity) async {
-    EntityUtil.createTimestamp(entity);
+  Future<T?> insert(dynamic entity) async {
     Map<String, dynamic> json = await JsonUtil.toJson(entity);
-    dynamic responseData = await send('/${this.name}/Insert', data: [json]);
-    Object? id = EntityUtil.getId(responseData);
-    if (id == null) {
-      EntityUtil.setId(entity, responseData);
+    List<dynamic> ms = await send('/${this.name}/Insert', data: [json]);
+    T? o;
+    if (ms.isNotEmpty) {
+      Object? id = EntityUtil.getId(entity);
+      dynamic m = ms.first;
+      if (id == null) {
+        id = EntityUtil.getId(m);
+        if (id != null) {
+          EntityUtil.setId(entity, id);
+        }
+      }
+      o = post(m);
     }
-    return responseData;
+
+    return o;
   }
 
   /// 删除记录。根据entity的id字段作为条件删除，entity可以是Map
-  Future<int> delete(
+  Future<T?> delete(
       {dynamic entity, String? where, List<Object>? whereArgs}) async {
     Map<String, dynamic> json = await JsonUtil.toJson(entity);
-    dynamic responseData = await send('/${this.name}/Delete', data: [json]);
-
-    return responseData;
+    List<dynamic> ms = await send('/${this.name}/Delete', data: [json]);
+    T? o;
+    if (ms.isNotEmpty) {
+      o = post(ms.first);
+    }
+    return o;
   }
 
   /// 更新记录。根据entity的id字段作为条件，其他字段作为更新的值，entity可以是Map
-  Future<int> update(
+  Future<T?> update(
     dynamic entity, {
     String? where,
     List<Object>? whereArgs,
   }) async {
-    entity = EntityUtil.updateTimestamp(entity);
     List<Object> args = [];
     if (whereArgs != null) {
       args.addAll(whereArgs);
     }
     Map<String, dynamic> json = await JsonUtil.toJson(entity);
-    dynamic responseData = await send('/${this.name}/Update', data: [json]);
-
-    return responseData;
+    List<dynamic> ms = await send('/${this.name}/Update', data: [json]);
+    T? o;
+    if (ms.isNotEmpty) {
+      o = post(ms.first);
+    }
+    return o;
   }
 
   /// 批量保存，根据脏标志新增，修改或者删除
@@ -217,7 +251,7 @@ abstract class GeneralRemoteService<T> {
   }
 
   /// 根据_id是否存在逐条增加或者修改
-  Future<int> upsert(
+  Future<T?> upsert(
     dynamic entity, {
     String? where,
     List<Object>? whereArgs,

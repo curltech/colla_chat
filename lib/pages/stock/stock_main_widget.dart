@@ -1,5 +1,6 @@
 import 'package:colla_chat/pages/stock/me/add_share_widget.dart';
 import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
+import 'package:colla_chat/pages/stock/setting/event_widget.dart';
 import 'package:colla_chat/pages/stock/setting/refresh_stock_widget.dart';
 import 'package:colla_chat/pages/stock/setting/update_stock_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -15,12 +16,14 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
   final AddShareWidget addShareWidget = AddShareWidget();
   final RefreshStockWidget refreshStockWidget = RefreshStockWidget();
   final UpdateStockWidget updateStockWidget = UpdateStockWidget();
+  final EventWidget eventWidget = EventWidget();
 
   StockMainWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(shareSelectionWidget);
     indexWidgetProvider.define(addShareWidget);
     indexWidgetProvider.define(refreshStockWidget);
     indexWidgetProvider.define(updateStockWidget);
+    indexWidgetProvider.define(eventWidget);
   }
 
   @override
@@ -50,6 +53,7 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
     final List<TileData> settingTileData = TileData.from([
       refreshStockWidget,
       updateStockWidget,
+      eventWidget,
     ]);
     for (var tile in settingTileData) {
       tile.dense = false;

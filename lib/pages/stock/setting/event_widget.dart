@@ -1,10 +1,8 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/entity/stock/event.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/stock/me/dayline_chart_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
-import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/event.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -20,22 +18,29 @@ import 'package:data_table_2/data_table_2.dart';
 
 final List<PlatformDataField> eventColumnFieldDefs = [
   PlatformDataField(
-      name: 'eventCode',
-      label: 'EventCode',
+      name: 'id',
+      label: 'Id',
       inputType: InputType.label,
       prefixIcon: Icon(
-        Icons.perm_identity,
+        Icons.perm_identity_outlined,
         color: myself.primary,
       )),
   PlatformDataField(
-      name: 'eventType',
+      name: 'event_code',
+      label: 'EventCode',
+      prefixIcon: Icon(
+        Icons.code,
+        color: myself.primary,
+      )),
+  PlatformDataField(
+      name: 'event_type',
       label: 'EventType',
       prefixIcon: Icon(
         Icons.type_specimen_outlined,
         color: myself.primary,
       )),
   PlatformDataField(
-      name: 'eventName',
+      name: 'event_name',
       label: 'EventName',
       prefixIcon: Icon(
         Icons.person,
@@ -75,7 +80,6 @@ class EventWidget extends StatefulWidget with TileDataMixin {
 
 class _EventWidgetState extends State<EventWidget>
     with TickerProviderStateMixin {
-  bool editMode = false;
   final FormInputController controller =
       FormInputController(eventColumnFieldDefs);
   SwiperController swiperController = SwiperController();
@@ -83,15 +87,15 @@ class _EventWidgetState extends State<EventWidget>
   final List<PlatformDataColumn> eventColumns = [
     PlatformDataColumn(
       label: '事件代码',
-      name: 'eventCode',
+      name: 'event_code',
     ),
     PlatformDataColumn(
       label: '事件类型',
-      name: 'eventType',
+      name: 'event_type',
     ),
     PlatformDataColumn(
       label: '事件名',
-      name: 'eventName',
+      name: 'event_name',
     ),
   ];
 
@@ -102,7 +106,7 @@ class _EventWidgetState extends State<EventWidget>
   }
 
   _update() {
-    _buildEventRows();
+    setState(() {});
   }
 
   List<DataColumn2> _buildEventColumns() {
@@ -114,24 +118,19 @@ class _EventWidgetState extends State<EventWidget>
           numeric: shareColumn.dataType == DataType.double ||
               shareColumn.dataType == DataType.int));
     }
+    dataColumns.add(const DataColumn2(label: Text('')));
     return dataColumns;
   }
 
   Future<List<DataRow2>> _buildEventRows() async {
     List<DataRow2> rows = [];
     List<Event> data = eventController.data;
-    if (data.isEmpty) {
-      List<Event> value = await eventService.findAll();
-      eventController.replaceAll(value);
-      data = eventController.data;
-    }
     for (int index = 0; index < data.length; ++index) {
       Event event = data[index];
       var eventMap = JsonUtil.toJson(event);
       List<DataCell> cells = [];
       for (PlatformDataColumn eventColumn in eventColumns) {
         String name = eventColumn.name;
-        String? value;
         dynamic fieldValue = eventMap[name];
         if (fieldValue != null) {
           if (fieldValue is double) {
@@ -143,15 +142,28 @@ class _EventWidgetState extends State<EventWidget>
           fieldValue = '';
         }
 
-        var dataCell = DataCell(Text(value!));
+        var dataCell = DataCell(Text(fieldValue!));
         cells.add(dataCell);
       }
+      var dataCell = DataCell(IconButton(
+        onPressed: () async {
+          Event? e = await eventService.delete(entity: event);
+          if (e != null) {
+            eventController.delete(index: index);
+          }
+        },
+        icon: Icon(
+          Icons.delete_outline,
+          color: myself.primary,
+        ),
+      ));
+      cells.add(dataCell);
       var dataRow = DataRow2(
         selected: eventController.currentIndex == index,
         cells: cells,
-        onTap: () {
+        onDoubleTap: () {
           eventController.currentIndex = index;
-          editMode = true;
+          swiperController.move(1);
         },
       );
       rows.add(dataRow);
@@ -168,9 +180,8 @@ class _EventWidgetState extends State<EventWidget>
             if (value != null) {
               return DataTable2(
                 key: UniqueKey(),
-                minWidth: 2000,
                 dataRowHeight: 50,
-                fixedLeftColumns: 1,
+                minWidth: 1000,
                 dividerThickness: 0.0,
                 columns: _buildEventColumns(),
                 rows: value,
@@ -213,7 +224,7 @@ class _EventWidgetState extends State<EventWidget>
     Event currentEvent = Event.fromJson(values);
     if (eventController.currentIndex == -1) {
       await eventService.insert(currentEvent);
-      eventController.add(currentEvent);
+      eventController.insert(0, currentEvent);
     } else {
       await eventService.update(currentEvent);
     }
@@ -224,7 +235,7 @@ class _EventWidgetState extends State<EventWidget>
   }
 
   _onCancel(Map<String, dynamic> values) async {
-    editMode = false;
+    swiperController.move(0);
   }
 
   @override
@@ -234,9 +245,18 @@ class _EventWidgetState extends State<EventWidget>
         tooltip: AppLocalizations.t('Add event'),
         onPressed: () {
           eventController.currentIndex = -1;
-          editMode = true;
+          swiperController.move(1);
+          _buildEventEditView(context);
         },
         icon: const Icon(Icons.add_circle_outline),
+      ),
+      IconButton(
+        tooltip: AppLocalizations.t('Refresh event'),
+        onPressed: () async {
+          List<Event> value = await eventService.findAll();
+          eventController.replaceAll(value);
+        },
+        icon: const Icon(Icons.refresh_outlined),
       ),
     ];
     return AppBarView(
