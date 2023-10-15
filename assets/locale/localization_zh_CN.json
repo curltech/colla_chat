@@ -559,5 +559,8 @@
   "AddShare": "查询股票",
   "Add share": "加自选股",
   "RefreshStock": "刷新股票数据",
-  "UpdateStock": "更新股票数据"
+  "UpdateStock": "更新股票数据",
+  "tsCode": "股票代码",
+  "startDate": "开始日期",
+  "endDate": "结束日期"
 }
