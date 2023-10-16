@@ -51,6 +51,9 @@ class StringUtil {
       case DataType.double:
         value = double.parse(str);
         break;
+      case DataType.num:
+        value = num.parse(str);
+        break;
       case DataType.date:
         value = DateTime.parse(str);
         break;

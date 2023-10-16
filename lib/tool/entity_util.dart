@@ -18,6 +18,22 @@ class EntityUtil {
     }
   }
 
+  static bool? getChecked(dynamic entity) {
+    if (entity is Map) {
+      return entity['checked'];
+    } else {
+      return entity.checked;
+    }
+  }
+
+  static setChecked(dynamic entity, bool? val) {
+    if (entity is Map) {
+      entity['checked'] = val;
+    } else {
+      entity.checked = val;
+    }
+  }
+
   static createTimestamp(dynamic entity) {
     var currentDate = DateUtil.currentDate();
     var ownerPeerId = myself.peerId;

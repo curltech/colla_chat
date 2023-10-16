@@ -1,59 +1,20 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/entity/stock/event.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/stock/setting/event_filter_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/event.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/tool/loading_util.dart';
-import 'package:colla_chat/tool/number_format_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:data_table_2/data_table_2.dart';
-
-final List<PlatformDataField> eventFieldDefs = [
-  PlatformDataField(
-      name: 'id',
-      label: 'Id',
-      inputType: InputType.label,
-      prefixIcon: Icon(
-        Icons.perm_identity_outlined,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'event_code',
-      label: 'EventCode',
-      prefixIcon: Icon(
-        Icons.code,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'event_type',
-      label: 'EventType',
-      prefixIcon: Icon(
-        Icons.type_specimen_outlined,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'event_name',
-      label: 'EventName',
-      prefixIcon: Icon(
-        Icons.person,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'descr',
-      label: 'Descr',
-      prefixIcon: Icon(
-        Icons.description_outlined,
-        color: myself.primary,
-      )),
-];
 
 /// 自选股的控制器
 final DataListController<Event> eventController = DataListController<Event>();
@@ -80,121 +41,140 @@ class EventWidget extends StatefulWidget with TileDataMixin {
 
 class _EventWidgetState extends State<EventWidget>
     with TickerProviderStateMixin {
-  final FormInputController controller = FormInputController(eventFieldDefs);
+  final List<PlatformDataField> eventDataField = [
+    PlatformDataField(
+        name: 'id',
+        label: 'Id',
+        inputType: InputType.label,
+        prefixIcon: Icon(
+          Icons.perm_identity_outlined,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'event_code',
+        label: 'EventCode',
+        prefixIcon: Icon(
+          Icons.code,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'event_type',
+        label: 'EventType',
+        prefixIcon: Icon(
+          Icons.type_specimen_outlined,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'event_name',
+        label: 'EventName',
+        prefixIcon: Icon(
+          Icons.person,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'descr',
+        label: 'Descr',
+        prefixIcon: Icon(
+          Icons.description_outlined,
+          color: myself.primary,
+        )),
+  ];
+  late final FormInputController controller;
   SwiperController swiperController = SwiperController();
   int index = 0;
-  final List<PlatformDataColumn> eventColumns = [
-    PlatformDataColumn(
-      label: '事件代码',
-      name: 'event_code',
-    ),
-    PlatformDataColumn(
-      label: '事件类型',
-      name: 'event_type',
-    ),
-    PlatformDataColumn(
-      label: '事件名',
-      name: 'event_name',
-    ),
-  ];
+  late final List<PlatformDataColumn> eventColumns;
 
   @override
   initState() {
-    super.initState();
+    controller = FormInputController(eventDataField);
     eventController.addListener(_update);
+    eventColumns = [
+      PlatformDataColumn(
+        label: '事件代码',
+        name: 'event_code',
+        width: 120,
+      ),
+      PlatformDataColumn(
+        label: '事件类型',
+        name: 'event_type',
+        width: 120,
+      ),
+      PlatformDataColumn(
+        label: '事件名',
+        name: 'event_name',
+        width: 140,
+      ),
+      PlatformDataColumn(
+          label: '',
+          name: 'action',
+          inputType: InputType.custom,
+          buildSuffix: _buildActionWidget),
+    ];
+    super.initState();
   }
 
   _update() {
     setState(() {});
   }
 
-  List<DataColumn2> _buildEventColumns() {
-    List<DataColumn2> dataColumns = [];
-    for (var shareColumn in eventColumns) {
-      dataColumns.add(DataColumn2(
-          label: Text(shareColumn.label),
-          fixedWidth: 130,
-          numeric: shareColumn.dataType == DataType.double ||
-              shareColumn.dataType == DataType.int));
-    }
-    dataColumns.add(const DataColumn2(label: Text('')));
-    return dataColumns;
+  Widget _buildActionWidget(int index, dynamic event) {
+    Widget actionWidget = Row(
+      children: [
+        IconButton(
+          onPressed: () async {
+            bool? confirm = await DialogUtil.confirm(context,
+                content: 'Do you want to delete event?');
+            if (confirm == true) {
+              Event? e = await eventService.delete(entity: event);
+              if (e != null) {
+                eventController.delete(index: index);
+              }
+            }
+          },
+          icon: const Icon(
+            Icons.remove_circle_outline,
+            color: Colors.yellow,
+          ),
+        ),
+        IconButton(
+          onPressed: () async {
+            await eventFilterController.setEventCode(event.eventCode,
+                eventName: event.eventName);
+            indexWidgetProvider.push('event_filter');
+          },
+          icon: const Icon(
+            Icons.filter,
+            color: Colors.yellow,
+          ),
+        )
+      ],
+    );
+    return actionWidget;
   }
 
-  Future<List<DataRow2>> _buildEventRows() async {
-    List<DataRow2> rows = [];
-    List<Event> data = eventController.data;
-    for (int index = 0; index < data.length; ++index) {
-      Event event = data[index];
-      var eventMap = JsonUtil.toJson(event);
-      List<DataCell> cells = [];
-      for (PlatformDataColumn eventColumn in eventColumns) {
-        String name = eventColumn.name;
-        dynamic fieldValue = eventMap[name];
-        if (fieldValue != null) {
-          if (fieldValue is double) {
-            fieldValue = NumberFormatUtil.stdDouble(fieldValue);
-          } else {
-            fieldValue = fieldValue.toString();
-          }
-        } else {
-          fieldValue = '';
-        }
-
-        var dataCell = DataCell(Text(fieldValue!));
-        cells.add(dataCell);
-      }
-      var dataCell = DataCell(IconButton(
-        onPressed: () async {
-          Event? e = await eventService.delete(entity: event);
-          if (e != null) {
-            eventController.delete(index: index);
-          }
-        },
-        icon: const Icon(
-          Icons.remove_circle_outline,
-          color: Colors.yellow,
-        ),
-      ));
-      cells.add(dataCell);
-      var dataRow = DataRow2(
-        selected: eventController.currentIndex == index,
-        cells: cells,
-        onDoubleTap: () {
-          eventController.currentIndex = index;
-          swiperController.move(1);
-        },
-      );
-      rows.add(dataRow);
-    }
-    return rows;
+  _onDoubleTap(int index) {
+    eventController.currentIndex = index;
+    swiperController.move(1);
   }
 
   Widget _buildEventListView(BuildContext context) {
-    return FutureBuilder(
-        future: _buildEventRows(),
-        builder: (BuildContext context, AsyncSnapshot<List<DataRow>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            var value = snapshot.data;
-            if (value != null) {
-              return DataTable2(
-                key: UniqueKey(),
-                dataRowHeight: 50,
-                minWidth: 1000,
-                dividerThickness: 0.0,
-                columns: _buildEventColumns(),
-                rows: value,
-              );
-            }
-          }
-          return LoadingUtil.buildLoadingIndicator();
-        });
+    return BindingDataTable2<Event>(
+      key: UniqueKey(),
+      showCheckboxColumn: false,
+      horizontalMargin: 10.0,
+      columnSpacing: 0.0,
+      platformDataColumns: eventColumns,
+      controller: eventController,
+      onDoubleTap: _onDoubleTap,
+    );
   }
 
   _buildEventEditView(BuildContext context) {
     Event? event = eventController.current;
     if (event != null) {
       controller.setValues(JsonUtil.toJson(event));
+    } else {
+      controller.setValues({});
     }
     List<FormButtonDef> formButtonDefs = [
       FormButtonDef(

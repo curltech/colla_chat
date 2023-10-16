@@ -91,8 +91,8 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
 
   @override
   initState() {
-    super.initState();
     shareController.addListener(_updateShare);
+    super.initState();
   }
 
   _updateShare() {

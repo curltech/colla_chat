@@ -542,6 +542,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
 
                 Widget tileWidget = CheckboxListTile(
                   title: CommonAutoSizeText(option.label),
+                  subtitle: CommonAutoSizeText(option.hint),
                   secondary: option.leading,
                   controlAffinity: ListTileControlAffinity.trailing,
                   value: option.checked,

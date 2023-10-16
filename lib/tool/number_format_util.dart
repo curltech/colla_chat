@@ -10,7 +10,7 @@ class NumberFormatUtil {
   }
 
   /// 标准的四舍五入2位小数
-  static String stdDouble(double value) {
+  static String stdDouble(num value) {
     return value.toStringAsFixed(2);
   }
 

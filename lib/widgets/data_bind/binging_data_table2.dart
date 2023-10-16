@@ -1,0 +1,226 @@
+import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/entity_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/number_format_util.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
+import 'package:data_table_2/data_table_2.dart';
+import 'package:flutter/material.dart';
+
+class BindingDataTable2<T> extends StatefulWidget {
+  final List<PlatformDataColumn> platformDataColumns;
+  final DataListController<T> controller;
+  final bool showCheckboxColumn;
+  final double? dataRowHeight;
+  final double? minWidth;
+  final double? horizontalMargin;
+  final double? columnSpacing;
+  final int fixedLeftColumns;
+  final Function(int index)? onTap;
+  final Function(int index)? onDoubleTap;
+  final Function(bool?)? onSelectChanged;
+  final Function(int index)? onLongPress;
+
+  const BindingDataTable2({
+    Key? key,
+    required this.platformDataColumns,
+    this.onTap,
+    this.onSelectChanged,
+    this.onLongPress,
+    required this.controller,
+    this.onDoubleTap,
+    this.showCheckboxColumn = true,
+    this.dataRowHeight,
+    this.minWidth,
+    this.horizontalMargin,
+    this.columnSpacing,
+    this.fixedLeftColumns = 0,
+  }) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() {
+    return _BindingDataTable2State<T>();
+  }
+}
+
+class _BindingDataTable2State<T> extends State<BindingDataTable2> {
+  int? sortColumnIndex;
+  bool sortAscending = true;
+  double totalWidth = 0.0;
+
+  @override
+  initState() {
+    widget.controller.addListener(_update);
+    super.initState();
+  }
+
+  _update() {
+    setState(() {});
+  }
+
+  /// 过滤条件的多项选择框的列定义
+  List<DataColumn2> _buildDataColumns() {
+    totalWidth = 0.0;
+    List<DataColumn2> dataColumns = [];
+    for (var platformDataColumn in widget.platformDataColumns) {
+      totalWidth += platformDataColumn.width;
+      InputType inputType = platformDataColumn.inputType;
+      if (inputType == InputType.custom) {
+        dataColumns.add(DataColumn2(
+            label: CommonAutoSizeText(
+                AppLocalizations.t(platformDataColumn.label))));
+      } else {
+        dataColumns.add(
+          DataColumn2(
+              label: CommonAutoSizeText(
+                  AppLocalizations.t(platformDataColumn.label)),
+              fixedWidth: platformDataColumn.width,
+              tooltip: platformDataColumn.hintText,
+              numeric: platformDataColumn.dataType == DataType.double ||
+                  platformDataColumn.dataType == DataType.int ||
+                  platformDataColumn.dataType == DataType.num,
+              onSort: platformDataColumn.onSort),
+        );
+      }
+    }
+    totalWidth += 300;
+    return dataColumns;
+  }
+
+  /// 过滤条件的多项选择框的行数据
+  List<DataRow2> _buildDataRows() {
+    List data = widget.controller.data;
+    List<DataRow2> rows = [];
+    for (int index = 0; index < data.length; ++index) {
+      dynamic t = data[index];
+      var tMap = JsonUtil.toJson(t);
+      List<DataCell> cells = [];
+      for (PlatformDataColumn platformDataColumn
+          in widget.platformDataColumns) {
+        InputType inputType = platformDataColumn.inputType;
+        if (inputType == InputType.custom &&
+            platformDataColumn.buildSuffix != null) {
+          Widget suffix = platformDataColumn.buildSuffix!(index, t);
+          var dataCell = DataCell(suffix);
+          cells.add(dataCell);
+        } else {
+          String name = platformDataColumn.name;
+          dynamic fieldValue = tMap[name];
+          if (fieldValue != null) {
+            if (fieldValue is double) {
+              fieldValue = NumberFormatUtil.stdDouble(fieldValue);
+            } else {
+              fieldValue = fieldValue.toString();
+            }
+          } else {
+            fieldValue = '';
+          }
+
+          var dataCell = DataCell(
+            CommonAutoSizeText(fieldValue!),
+          );
+          cells.add(dataCell);
+        }
+      }
+      bool? checked = EntityUtil.getChecked(t);
+      checked ??= false;
+      var dataRow = DataRow2.byIndex(
+        index: index,
+        selected: checked,
+        onSelectChanged: (value) {
+          bool? checked = EntityUtil.getChecked(t);
+          var fn = widget.onSelectChanged;
+          if (fn != null) {
+            fn(value);
+          } else if (checked != value) {
+            EntityUtil.setChecked(t, value);
+            setState(() {});
+          }
+        },
+        onTap: () {
+          widget.controller.currentIndex = index;
+          var fn = widget.onTap;
+          if (fn != null) {
+            fn(index);
+          }
+        },
+        onDoubleTap: () {
+          widget.controller.currentIndex = index;
+          var fn = widget.onDoubleTap;
+          if (fn != null) {
+            fn(index);
+          }
+        },
+        onLongPress: () {
+          var fn = widget.onLongPress;
+          if (fn != null) {
+            fn(index);
+          }
+        },
+        cells: cells,
+      );
+      rows.add(dataRow);
+    }
+    return rows;
+  }
+
+  _onSort(int sortColumnIndex, bool sortAscending) {
+    this.sortColumnIndex = sortColumnIndex;
+    this.sortAscending = sortAscending;
+    String name = widget.platformDataColumns[sortColumnIndex].name;
+    widget.controller.sort(name, sortAscending);
+  }
+
+  /// 过滤条件的多项选择框的表
+  Widget _buildDataTable(BuildContext context) {
+    return DataTable2(
+      key: UniqueKey(),
+      dataRowHeight: widget.dataRowHeight,
+      minWidth: widget.minWidth ?? 2000,
+      dividerThickness: 0.0,
+      showCheckboxColumn: widget.showCheckboxColumn,
+      horizontalMargin: widget.horizontalMargin,
+      columnSpacing: widget.columnSpacing,
+      fixedLeftColumns: widget.fixedLeftColumns,
+      headingCheckboxTheme: CheckboxThemeData(
+        side: BorderSide(color: myself.primary),
+        fillColor: MaterialStateColor.resolveWith((states) => myself.primary),
+        // checkColor: MaterialStateColor.resolveWith((states) => Colors.white)
+      ),
+      datarowCheckboxTheme: CheckboxThemeData(
+        side: BorderSide(color: myself.primary),
+        fillColor: MaterialStateColor.resolveWith((states) => myself.primary),
+        // checkColor: MaterialStateColor.resolveWith((states) => Colors.white)
+      ),
+      sortColumnIndex: sortColumnIndex,
+      sortAscending: sortAscending,
+      columns: _buildDataColumns(),
+      rows: _buildDataRows(),
+      onSelectAll: (val) {
+        if (val != null) {
+          setState(() {
+            List<dynamic> data = widget.controller.data;
+            for (dynamic t in data) {
+              EntityUtil.setChecked(t, val);
+            }
+          });
+        }
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var dataTableView = _buildDataTable(context);
+
+    return dataTableView;
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_update);
+    super.dispose();
+  }
+}

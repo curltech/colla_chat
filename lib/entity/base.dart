@@ -34,6 +34,7 @@ abstract class BaseEntity {
   String? ownerPeerId; // 区分属主
   String? entityId;
   EntityState? state;
+  bool? checked;
 
   BaseEntity();
 

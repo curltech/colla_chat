@@ -13,63 +13,11 @@ import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/number_format_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:data_table_2/data_table_2.dart';
-
-final List<PlatformDataField> filterCondFieldDefs = [
-  PlatformDataField(
-      name: 'id',
-      label: 'Id',
-      inputType: InputType.label,
-      prefixIcon: Icon(
-        Icons.perm_identity_outlined,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'cond_code',
-      label: 'CondCode',
-      prefixIcon: Icon(
-        Icons.code,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'cond_type',
-      label: 'CondType',
-      prefixIcon: Icon(
-        Icons.type_specimen_outlined,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'name',
-      label: 'Name',
-      prefixIcon: Icon(
-        Icons.person,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'content',
-      label: 'Content',
-      prefixIcon: Icon(
-        Icons.content_paste,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'cond_paras',
-      label: 'CondParas',
-      prefixIcon: Icon(
-        Icons.attribution_outlined,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'descr',
-      label: 'Descr',
-      prefixIcon: Icon(
-        Icons.description_outlined,
-        color: myself.primary,
-      )),
-];
 
 /// 自选股的控制器
 final DataListController<FilterCond> filterCondController =
@@ -97,11 +45,63 @@ class FilterCondWidget extends StatefulWidget with TileDataMixin {
 
 class _FilterCondWidgetState extends State<FilterCondWidget>
     with TickerProviderStateMixin {
-  final FormInputController controller =
-      FormInputController(filterCondFieldDefs);
+  final List<PlatformDataField> filterCondDataField = [
+    PlatformDataField(
+        name: 'id',
+        label: 'Id',
+        inputType: InputType.label,
+        prefixIcon: Icon(
+          Icons.perm_identity_outlined,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'cond_code',
+        label: 'CondCode',
+        prefixIcon: Icon(
+          Icons.code,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'cond_type',
+        label: 'CondType',
+        prefixIcon: Icon(
+          Icons.type_specimen_outlined,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'name',
+        label: 'Name',
+        prefixIcon: Icon(
+          Icons.person,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'content',
+        label: 'Content',
+        prefixIcon: Icon(
+          Icons.content_paste,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'cond_paras',
+        label: 'CondParas',
+        prefixIcon: Icon(
+          Icons.attribution_outlined,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'descr',
+        label: 'Descr',
+        prefixIcon: Icon(
+          Icons.description_outlined,
+          color: myself.primary,
+        )),
+  ];
+  late final FormInputController controller =
+      FormInputController(filterCondDataField);
   SwiperController swiperController = SwiperController();
   int index = 0;
-  final List<PlatformDataColumn> filterCondColumns = [
+  late final List<PlatformDataColumn> filterCondColumns = [
     PlatformDataColumn(
       label: '条件代码',
       name: 'cond_code',
@@ -112,6 +112,21 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
       name: 'name',
       width: 200,
     ),
+    PlatformDataColumn(
+      label: '条件公式',
+      name: 'content',
+      width: 250,
+    ),
+    PlatformDataColumn(
+      label: '条件参数',
+      name: 'cond_paras',
+      width: 200,
+    ),
+    PlatformDataColumn(
+        label: '',
+        name: 'action',
+        inputType: InputType.custom,
+        buildSuffix: _buildActionWidget),
   ];
 
   @override
@@ -124,93 +139,51 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
     setState(() {});
   }
 
-  List<DataColumn2> _buildFilterCondColumns() {
-    List<DataColumn2> dataColumns = [];
-    for (var shareColumn in filterCondColumns) {
-      dataColumns.add(DataColumn2(
-          label: Text(shareColumn.label),
-          fixedWidth: shareColumn.width,
-          numeric: shareColumn.dataType == DataType.double ||
-              shareColumn.dataType == DataType.int));
-    }
-    dataColumns.add(const DataColumn2(label: Text('')));
-    return dataColumns;
-  }
-
-  Future<List<DataRow2>> _buildFilterCondRows() async {
-    List<DataRow2> rows = [];
-    List<FilterCond> data = filterCondController.data;
-    for (int index = 0; index < data.length; ++index) {
-      FilterCond filterCond = data[index];
-      var filterCondMap = JsonUtil.toJson(filterCond);
-      List<DataCell> cells = [];
-      for (PlatformDataColumn filterCondColumn in filterCondColumns) {
-        String name = filterCondColumn.name;
-        dynamic fieldValue = filterCondMap[name];
-        if (fieldValue != null) {
-          if (fieldValue is double) {
-            fieldValue = NumberFormatUtil.stdDouble(fieldValue);
-          } else {
-            fieldValue = fieldValue.toString();
-          }
-        } else {
-          fieldValue = '';
-        }
-
-        var dataCell = DataCell(Text(fieldValue!));
-        cells.add(dataCell);
-      }
-      var dataCell = DataCell(IconButton(
-        onPressed: () async {
+  Widget _buildActionWidget(int index, dynamic filterCond) {
+    Widget actionWidget = IconButton(
+      onPressed: () async {
+        bool? confirm = await DialogUtil.confirm(context,
+            content: 'Do you want to delete filterCond?');
+        if (confirm == true) {
           FilterCond? e = await filterCondService.delete(entity: filterCond);
           if (e != null) {
             filterCondController.delete(index: index);
           }
-        },
-        icon: const Icon(
-          Icons.remove_circle_outline,
-          color: Colors.yellow,
-        ),
-      ));
-      cells.add(dataCell);
-      var dataRow = DataRow2(
-        selected: filterCondController.currentIndex == index,
-        cells: cells,
-        onDoubleTap: () {
-          filterCondController.currentIndex = index;
-          swiperController.move(1);
-        },
-      );
-      rows.add(dataRow);
-    }
-    return rows;
+        }
+      },
+      icon: const Icon(
+        Icons.remove_circle_outline,
+        color: Colors.yellow,
+      ),
+    );
+
+    return actionWidget;
   }
 
-  Widget _buildEventListView(BuildContext context) {
-    return FutureBuilder(
-        future: _buildFilterCondRows(),
-        builder: (BuildContext context, AsyncSnapshot<List<DataRow>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            var value = snapshot.data;
-            if (value != null) {
-              return DataTable2(
-                key: UniqueKey(),
-                dataRowHeight: 50,
-                minWidth: 1000,
-                dividerThickness: 0.0,
-                columns: _buildFilterCondColumns(),
-                rows: value,
-              );
-            }
-          }
-          return LoadingUtil.buildLoadingIndicator();
-        });
+  _onDoubleTap(int index) {
+    filterCondController.currentIndex = index;
+    swiperController.move(1);
+  }
+
+  Widget _buildFilterCondListView(BuildContext context) {
+    return BindingDataTable2<FilterCond>(
+      key: UniqueKey(),
+      showCheckboxColumn: false,
+      horizontalMargin: 10.0,
+      columnSpacing: 0.0,
+      fixedLeftColumns : 1,
+      platformDataColumns: filterCondColumns,
+      controller: filterCondController,
+      onDoubleTap: _onDoubleTap,
+    );
   }
 
   _buildFilterCondEditView(BuildContext context) {
     FilterCond? filterCond = filterCondController.current;
     if (filterCond != null) {
       controller.setValues(JsonUtil.toJson(filterCond));
+    } else {
+      controller.setValues({});
     }
     List<FormButtonDef> formButtonDefs = [
       FormButtonDef(
@@ -264,7 +237,7 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
   Widget build(BuildContext context) {
     List<Widget> rightWidgets = [
       IconButton(
-        tooltip: AppLocalizations.t('Add event'),
+        tooltip: AppLocalizations.t('Add filter cond'),
         onPressed: () {
           filterCondController.currentIndex = -1;
           swiperController.move(1);
@@ -273,7 +246,7 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
         icon: const Icon(Icons.add_circle_outline),
       ),
       IconButton(
-        tooltip: AppLocalizations.t('Refresh event'),
+        tooltip: AppLocalizations.t('Refresh filter cond'),
         onPressed: () async {
           List<FilterCond> value = await filterCondService.findAll();
           filterCondController.replaceAll(value);
@@ -290,7 +263,7 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
           itemCount: 2,
           index: index,
           itemBuilder: (BuildContext context, int index) {
-            Widget view = _buildEventListView(context);
+            Widget view = _buildFilterCondListView(context);
             if (index == 1) {
               view = _buildFilterCondEditView(context);
             }

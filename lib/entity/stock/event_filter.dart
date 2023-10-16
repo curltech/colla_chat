@@ -4,17 +4,16 @@ import 'package:colla_chat/entity/base.dart';
 class EventFilter extends StatusEntity {
   String eventCode;
   String eventName;
-  String condCode;
+  String? condCode;
   String? codeAlias;
-  String condName;
+  String? condName;
   String? condAlias;
-  String condContent;
+  String? condContent;
   String? condParas;
   num? score;
   String? descr;
 
-  EventFilter(this.condCode, this.condName, this.condContent, this.eventCode,
-      this.eventName);
+  EventFilter(this.eventCode, this.eventName);
 
   EventFilter.fromJson(Map json)
       : eventCode = json['event_code'],

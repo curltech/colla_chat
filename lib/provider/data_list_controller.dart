@@ -1,4 +1,5 @@
 import 'package:colla_chat/datastore/datastore.dart';
+import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:flutter/material.dart';
@@ -154,6 +155,18 @@ class DataListController<T> with ChangeNotifier {
     }
     _currentIndex = 0;
     notifyListeners();
+  }
+
+  List<T> get checked {
+    List<T> checkedData = [];
+    for (var t in data) {
+      bool? checked = EntityUtil.getChecked(t);
+      if (checked != null && checked) {
+        checkedData.add(t);
+      }
+    }
+
+    return checkedData;
   }
 }
 

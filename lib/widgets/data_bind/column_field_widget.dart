@@ -34,6 +34,7 @@ enum InputType {
 enum DataType {
   int,
   double,
+  num,
   string,
   bool,
   date,
@@ -44,6 +45,7 @@ enum DataType {
   map
 }
 
+/// 表的列定义
 class PlatformDataColumn {
   final String name;
   final String label;
@@ -51,18 +53,28 @@ class PlatformDataColumn {
   final DataType dataType;
   final MainAxisAlignment align;
   final double width;
+  final String? hintText;
+  final Widget Function(int, dynamic)? buildSuffix;
+  final Function(int, bool)? onSort;
 
   PlatformDataColumn(
       {required this.name,
       required this.label,
+      this.hintText,
       this.dataType = DataType.string,
       this.inputType = InputType.label,
       this.width = 100,
-      this.align = MainAxisAlignment.start});
+      this.align = MainAxisAlignment.start,
+      this.buildSuffix,
+      this.onSort});
 }
 
-/// 通用列表项的数据模型
-class PlatformDataField extends PlatformDataColumn {
+/// 表单的字段定义
+class PlatformDataField {
+  final String name;
+  final String label;
+  final InputType inputType;
+  final DataType dataType;
   dynamic initValue;
 
   //图标
@@ -100,11 +112,10 @@ class PlatformDataField extends PlatformDataColumn {
   final Widget? customWidget;
 
   PlatformDataField({
-    required super.name,
-    required super.label,
-    super.inputType = InputType.text,
-    super.dataType,
-    super.align,
+    required this.name,
+    required this.label,
+    this.inputType = InputType.text,
+    this.dataType = DataType.string,
     this.initValue = '',
     this.prefixIcon,
     this.avatar,
