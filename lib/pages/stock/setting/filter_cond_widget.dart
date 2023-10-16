@@ -113,6 +113,11 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
       width: 200,
     ),
     PlatformDataColumn(
+      label: '条件类型',
+      name: 'cond_type',
+      width: 100,
+    ),
+    PlatformDataColumn(
       label: '条件公式',
       name: 'content',
       width: 250,

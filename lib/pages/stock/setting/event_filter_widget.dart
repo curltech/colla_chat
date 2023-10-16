@@ -192,6 +192,11 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
       width: 150,
     ),
     PlatformDataColumn(
+      label: '条件类型',
+      name: 'cond_type',
+      width: 100,
+    ),
+    PlatformDataColumn(
       label: '条件名',
       name: 'name',
       width: 200,

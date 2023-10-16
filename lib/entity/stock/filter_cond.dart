@@ -1,5 +1,12 @@
 import 'package:colla_chat/entity/base.dart';
 
+enum CondType {
+  average, //均线价格
+  price, //价格
+  vol, //成交量
+  extreme, //价格极值
+}
+
 /// 买卖事件的条件定义
 class FilterCond extends StatusEntity {
   String condCode;
