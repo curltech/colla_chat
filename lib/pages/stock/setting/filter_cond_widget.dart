@@ -116,6 +116,8 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
       label: '条件类型',
       name: 'cond_type',
       width: 100,
+      onSort: (int index, bool ascending) =>
+          filterCondController.sort((t) => t.condType, index, ascending),
     ),
     PlatformDataColumn(
       label: '条件公式',
@@ -176,7 +178,7 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
       showCheckboxColumn: false,
       horizontalMargin: 10.0,
       columnSpacing: 0.0,
-      fixedLeftColumns : 1,
+      fixedLeftColumns: 1,
       platformDataColumns: filterCondColumns,
       controller: filterCondController,
       onDoubleTap: _onDoubleTap,

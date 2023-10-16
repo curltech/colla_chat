@@ -9,6 +9,8 @@ class DataListController<T> with ChangeNotifier {
   Key key = UniqueKey();
   List<T> data = <T>[];
   int _currentIndex = -1;
+  int? sortColumnIndex;
+  bool sortAscending = true;
 
   DataListController({List<T>? data, int? currentIndex}) {
     if (data != null && data.isNotEmpty) {
@@ -139,21 +141,19 @@ class DataListController<T> with ChangeNotifier {
 
   int get length => data.length;
 
-  sort(String name, bool sortAscending) {
-    if (sortAscending) {
-      data.sort((a, b) {
-        var aMap = JsonUtil.toJson(a);
-        var bMap = JsonUtil.toJson(b);
-        return aMap[name].compareTo(bMap[name]);
-      });
-    } else {
-      data.sort((a, b) {
-        var aMap = JsonUtil.toJson(a);
-        var bMap = JsonUtil.toJson(b);
-        return bMap[name].compareTo(aMap[name]);
-      });
-    }
+  sort<S>(Comparable<S> Function(T t) getFieldValue, int columnIndex,
+      bool ascending) {
+    data.sort((T a, T b) {
+      Comparable<S> av = getFieldValue(a);
+      Comparable<S> bv = getFieldValue(b);
+      return ascending
+          ? Comparable.compare(av, bv)
+          : Comparable.compare(bv, av);
+    });
+
     _currentIndex = 0;
+    sortColumnIndex = columnIndex;
+    sortAscending = ascending;
     notifyListeners();
   }
 

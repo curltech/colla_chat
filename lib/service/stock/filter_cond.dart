@@ -16,6 +16,10 @@ class FilterCondService extends GeneralRemoteService<FilterCond> {
 
     return _filterConds;
   }
+
+  refresh() {
+    _filterConds = null;
+  }
 }
 
 final FilterCondService filterCondService =

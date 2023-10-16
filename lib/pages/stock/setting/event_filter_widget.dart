@@ -185,7 +185,10 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
         buildSuffix: _buildActionWidget),
   ];
 
-  final List<PlatformDataColumn> filterCondColumns = [
+  final DataListController<FilterCond> filterCondController =
+      DataListController<FilterCond>();
+
+  late final List<PlatformDataColumn> filterCondColumns = [
     PlatformDataColumn(
       label: '条件代码',
       name: 'cond_code',
@@ -195,6 +198,8 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
       label: '条件类型',
       name: 'cond_type',
       width: 100,
+      onSort: (int index, bool ascending) =>
+          filterCondController.sort((t) => t.condType, index, ascending),
     ),
     PlatformDataColumn(
       label: '条件名',
@@ -212,8 +217,6 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
       width: 200,
     ),
   ];
-  final DataListController<FilterCond> filterCondController =
-      DataListController<FilterCond>();
 
   @override
   initState() {
@@ -343,6 +346,20 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
               child: CommonAutoSizeText(AppLocalizations.t('Cancel')),
               onPressed: () {
                 swiperController.move(0);
+              },
+            ),
+            TextButton(
+              style: mainStyle,
+              child: CommonAutoSizeText(AppLocalizations.t('Refresh')),
+              onPressed: () async {
+                filterCondService.refresh();
+                List<FilterCond>? filterConds =
+                    await filterCondService.findCachedAll();
+                if (filterConds != null) {
+                  filterCondController.replaceAll(filterConds);
+                } else {
+                  filterCondController.clear();
+                }
               },
             ),
             TextButton(

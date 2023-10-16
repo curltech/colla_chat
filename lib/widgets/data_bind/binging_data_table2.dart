@@ -46,8 +46,6 @@ class BindingDataTable2<T> extends StatefulWidget {
 }
 
 class _BindingDataTable2State<T> extends State<BindingDataTable2> {
-  int? sortColumnIndex;
-  bool sortAscending = true;
   double totalWidth = 0.0;
 
   @override
@@ -166,13 +164,6 @@ class _BindingDataTable2State<T> extends State<BindingDataTable2> {
     return rows;
   }
 
-  _onSort(int sortColumnIndex, bool sortAscending) {
-    this.sortColumnIndex = sortColumnIndex;
-    this.sortAscending = sortAscending;
-    String name = widget.platformDataColumns[sortColumnIndex].name;
-    widget.controller.sort(name, sortAscending);
-  }
-
   /// 过滤条件的多项选择框的表
   Widget _buildDataTable(BuildContext context) {
     return DataTable2(
@@ -184,6 +175,7 @@ class _BindingDataTable2State<T> extends State<BindingDataTable2> {
       horizontalMargin: widget.horizontalMargin,
       columnSpacing: widget.columnSpacing,
       fixedLeftColumns: widget.fixedLeftColumns,
+      sortArrowIcon: Icons.keyboard_arrow_up,
       headingCheckboxTheme: CheckboxThemeData(
         side: BorderSide(color: myself.primary),
         fillColor: MaterialStateColor.resolveWith((states) => myself.primary),
@@ -194,8 +186,8 @@ class _BindingDataTable2State<T> extends State<BindingDataTable2> {
         fillColor: MaterialStateColor.resolveWith((states) => myself.primary),
         // checkColor: MaterialStateColor.resolveWith((states) => Colors.white)
       ),
-      sortColumnIndex: sortColumnIndex,
-      sortAscending: sortAscending,
+      sortColumnIndex: widget.controller.sortColumnIndex,
+      sortAscending: widget.controller.sortAscending,
       columns: _buildDataColumns(),
       rows: _buildDataRows(),
       onSelectAll: (val) {
