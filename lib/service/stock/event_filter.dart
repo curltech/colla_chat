@@ -7,7 +7,7 @@ import 'package:colla_chat/service/servicelocator.dart';
 class RemoteEventFilterService extends GeneralRemoteService<EventFilter> {
   RemoteEventFilterService({required super.name}) {
     post = (Map map) {
-      return EventFilter.fromJson(map);
+      return EventFilter.fromRemoteJson(map);
     };
   }
 }
@@ -27,6 +27,6 @@ class EventFilterService extends GeneralBaseService<EventFilter> {
 }
 
 final EventFilterService eventFilterService = EventFilterService(
-    tableName: 'stk_eventFilter',
+    tableName: 'stk_eventfilter',
     fields: ServiceLocator.buildFields(EventFilter('', ''), []),
-    indexFields: ['eventCode', 'eventType', 'condCode', 'condName']);
+    indexFields: ['eventCode', 'eventName', 'condCode', 'condName']);

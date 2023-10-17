@@ -9,7 +9,6 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/event.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
@@ -92,19 +91,19 @@ class _EventWidgetState extends State<EventWidget>
     eventColumns = [
       PlatformDataColumn(
         label: '事件代码',
-        name: 'event_code',
+        name: 'eventCode',
         width: 120,
         onSort: (int index, bool ascending) =>
             eventController.sort((t) => t.eventCode, index, ascending),
       ),
       PlatformDataColumn(
         label: '事件类型',
-        name: 'event_type',
+        name: 'eventType',
         width: 120,
       ),
       PlatformDataColumn(
         label: '事件名',
-        name: 'event_name',
+        name: 'eventName',
         width: 140,
       ),
       PlatformDataColumn(
@@ -186,7 +185,7 @@ class _EventWidgetState extends State<EventWidget>
   _buildEventEditView(BuildContext context) {
     Event? event = eventController.current;
     if (event != null) {
-      controller.setValues(JsonUtil.toJson(event));
+      controller.setValues(event.toRemoteJson());
     } else {
       controller.setValues({});
     }
@@ -214,7 +213,7 @@ class _EventWidgetState extends State<EventWidget>
   }
 
   _onOk(Map<String, dynamic> values) async {
-    Event currentEvent = Event.fromJson(values);
+    Event currentEvent = Event.fromRemoteJson(values);
     if (eventController.currentIndex == -1) {
       Event? event = await remoteEventService.sendInsert(currentEvent);
       if (event != null) {

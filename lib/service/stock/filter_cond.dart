@@ -9,7 +9,7 @@ class RemoteFilterCondService extends GeneralRemoteService<FilterCond> {
 
   RemoteFilterCondService({required super.name}) {
     post = (Map map) {
-      return FilterCond.fromJson(map);
+      return FilterCond.fromRemoteJson(map);
     };
   }
 
@@ -50,6 +50,6 @@ class FilterCondService extends GeneralBaseService<FilterCond> {
 }
 
 final FilterCondService filterCondService = FilterCondService(
-    tableName: 'stk_filterCond',
-    fields: ServiceLocator.buildFields(Event('', ''), []),
+    tableName: 'stk_filtercond',
+    fields: ServiceLocator.buildFields(FilterCond('', '', ''), []),
     indexFields: ['condCode', 'name']);

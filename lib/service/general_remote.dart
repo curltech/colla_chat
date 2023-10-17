@@ -1,15 +1,9 @@
-import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/datastore/datastore.dart';
-import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/dht/peerendpoint.dart';
-import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/httpclient.dart';
 import 'package:dio/dio.dart';
 
@@ -67,7 +61,7 @@ abstract class GeneralRemoteService<T> {
     }
     Map<String, dynamic> params = {};
     if (condiBean != null) {
-      var json = JsonUtil.toJson(condiBean);
+      var json = JsonUtil.toRemoteJson(condiBean);
       params.addAll(json);
     }
     var ms = await send(url, data: params);
@@ -110,7 +104,7 @@ abstract class GeneralRemoteService<T> {
       params['from'] = offset;
     }
     if (condiBean != null) {
-      params['condiBean'] = JsonUtil.toJson(condiBean);
+      params['condiBean'] = JsonUtil.toRemoteJson(condiBean);
     }
     dynamic data = await send('/${this.name}/Find', data: params);
     List<T> os = [];
@@ -142,7 +136,7 @@ abstract class GeneralRemoteService<T> {
       params['orderby'] = orderBy;
     }
     if (condiBean != null) {
-      params['condiBean'] = JsonUtil.toJson(condiBean);
+      params['condiBean'] = JsonUtil.toRemoteJson(condiBean);
     }
     var data = await send('/${this.name}/Find', data: params);
     var ms = data['data'];
@@ -194,7 +188,7 @@ abstract class GeneralRemoteService<T> {
   }
 
   Future<T?> sendInsert(dynamic entity) async {
-    Map<String, dynamic> json = await JsonUtil.toJson(entity);
+    Map<String, dynamic> json = await JsonUtil.toRemoteJson(entity);
     List<dynamic> ms = await send('/${this.name}/Insert', data: [json]);
     T? o;
     if (ms.isNotEmpty) {
@@ -215,7 +209,7 @@ abstract class GeneralRemoteService<T> {
   /// 删除记录。根据entity的id字段作为条件删除，entity可以是Map
   Future<T?> sendDelete(
       {dynamic entity, String? where, List<Object>? whereArgs}) async {
-    Map<String, dynamic> json = await JsonUtil.toJson(entity);
+    Map<String, dynamic> json = await JsonUtil.toRemoteJson(entity);
     List<dynamic> ms = await send('/${this.name}/Delete', data: [json]);
     T? o;
     if (ms.isNotEmpty) {
@@ -234,7 +228,7 @@ abstract class GeneralRemoteService<T> {
     if (whereArgs != null) {
       args.addAll(whereArgs);
     }
-    Map<String, dynamic> json = await JsonUtil.toJson(entity);
+    Map<String, dynamic> json = await JsonUtil.toRemoteJson(entity);
     List<dynamic> ms = await send('/${this.name}/Update', data: [json]);
     T? o;
     if (ms.isNotEmpty) {
@@ -247,7 +241,7 @@ abstract class GeneralRemoteService<T> {
   sendSave(List<T> entities) async {
     List<Map<String, dynamic>> operators = [];
     for (var entity in entities) {
-      Map<String, dynamic> json = await JsonUtil.toJson(entity);
+      Map<String, dynamic> json = await JsonUtil.toRemoteJson(entity);
       operators.add(json);
     }
     dynamic responseData = await send('/${this.name}/Save', data: operators);

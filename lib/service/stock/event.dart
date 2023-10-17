@@ -6,7 +6,7 @@ import 'package:colla_chat/service/servicelocator.dart';
 class RemoteEventService extends GeneralRemoteService<Event> {
   RemoteEventService({required super.name}) {
     post = (Map map) {
-      return Event.fromJson(map);
+      return Event.fromRemoteJson(map);
     };
   }
 }

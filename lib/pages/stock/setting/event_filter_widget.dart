@@ -1,18 +1,13 @@
 import 'package:card_swiper/card_swiper.dart';
-import 'package:colla_chat/entity/stock/event.dart';
 import 'package:colla_chat/entity/stock/event_filter.dart';
 import 'package:colla_chat/entity/stock/filter_cond.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/stock/event.dart';
 import 'package:colla_chat/service/stock/event_filter.dart';
 import 'package:colla_chat/service/stock/filter_cond.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/tool/loading_util.dart';
-import 'package:colla_chat/tool/number_format_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -20,7 +15,6 @@ import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:data_table_2/data_table_2.dart';
 
 class EventFilterController extends DataListController<EventFilter> {
   String? _eventCode;
@@ -150,32 +144,32 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
   late final List<PlatformDataColumn> eventFilterColumns = [
     PlatformDataColumn(
       label: '事件代码',
-      name: 'event_code',
+      name: 'eventCode',
       width: 90,
     ),
     PlatformDataColumn(
       label: '事件名',
-      name: 'event_name',
+      name: 'eventName',
       width: 80,
     ),
     PlatformDataColumn(
       label: '条件代码',
-      name: 'cond_code',
+      name: 'condCode',
       width: 130,
     ),
     PlatformDataColumn(
       label: '条件名',
-      name: 'cond_name',
+      name: 'condName',
       width: 180,
     ),
     PlatformDataColumn(
       label: '条件内容',
-      name: 'cond_content',
+      name: 'condContent',
       width: 270,
     ),
     PlatformDataColumn(
       label: '条件参数',
-      name: 'cond_paras',
+      name: 'condParas',
       width: 100,
     ),
     PlatformDataColumn(
@@ -191,12 +185,12 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
   late final List<PlatformDataColumn> filterCondColumns = [
     PlatformDataColumn(
       label: '条件代码',
-      name: 'cond_code',
+      name: 'condCode',
       width: 150,
     ),
     PlatformDataColumn(
       label: '条件类型',
-      name: 'cond_type',
+      name: 'condType',
       width: 100,
       onSort: (int index, bool ascending) =>
           filterCondController.sort((t) => t.condType, index, ascending),
@@ -213,7 +207,7 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
     ),
     PlatformDataColumn(
       label: '条件参数',
-      name: 'cond_paras',
+      name: 'condParas',
       width: 200,
     ),
   ];
@@ -238,7 +232,8 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
   Widget _buildActionWidget(int index, dynamic eventFilter) {
     Widget actionWidget = IconButton(
       onPressed: () async {
-        EventFilter? e = await remoteEventFilterService.sendDelete(entity: eventFilter);
+        EventFilter? e =
+            await remoteEventFilterService.sendDelete(entity: eventFilter);
         if (e != null) {
           eventFilterController.delete(index: index);
         }
@@ -273,7 +268,7 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
   _buildEventFilterEditView(BuildContext context) {
     EventFilter? eventFilter = eventFilterController.current;
     if (eventFilter != null) {
-      controller.setValues(JsonUtil.toJson(eventFilter));
+      controller.setValues(eventFilter.toRemoteJson());
     } else {
       String? eventCode = eventFilterController.eventCode;
       String? eventName = eventFilterController.eventName;
@@ -308,7 +303,7 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
   }
 
   _onOk(Map<String, dynamic> values) async {
-    EventFilter currentFilterCond = EventFilter.fromJson(values);
+    EventFilter currentFilterCond = EventFilter.fromRemoteJson(values);
     if (eventFilterController.currentIndex == -1) {
       EventFilter? filterCond =
           await remoteEventFilterService.sendInsert(currentFilterCond);
@@ -423,7 +418,8 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
         tooltip: AppLocalizations.t('Refresh event filter'),
         onPressed: () async {
           if (eventFilterController.eventCode != null) {
-            List<EventFilter> value = await remoteEventFilterService.sendFind(condiBean: {
+            List<EventFilter> value =
+                await remoteEventFilterService.sendFind(condiBean: {
               'event_code': eventFilterController.eventCode,
             }, limit: 1000);
             eventFilterController.replaceAll(value);

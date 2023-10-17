@@ -1,23 +1,17 @@
 import 'package:card_swiper/card_swiper.dart';
-import 'package:colla_chat/entity/stock/event.dart';
 import 'package:colla_chat/entity/stock/filter_cond.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/stock/event.dart';
 import 'package:colla_chat/service/stock/filter_cond.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/tool/loading_util.dart';
-import 'package:colla_chat/tool/number_format_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:data_table_2/data_table_2.dart';
 
 /// 自选股的控制器
 final DataListController<FilterCond> filterCondController =
@@ -104,7 +98,7 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
   late final List<PlatformDataColumn> filterCondColumns = [
     PlatformDataColumn(
       label: '条件代码',
-      name: 'cond_code',
+      name: 'condCode',
       width: 150,
     ),
     PlatformDataColumn(
@@ -114,7 +108,7 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
     ),
     PlatformDataColumn(
       label: '条件类型',
-      name: 'cond_type',
+      name: 'condType',
       width: 100,
       onSort: (int index, bool ascending) =>
           filterCondController.sort((t) => t.condType, index, ascending),
@@ -126,7 +120,7 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
     ),
     PlatformDataColumn(
       label: '条件参数',
-      name: 'cond_paras',
+      name: 'condParas',
       width: 200,
     ),
     PlatformDataColumn(
@@ -152,7 +146,8 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
         bool? confirm = await DialogUtil.confirm(context,
             content: 'Do you want to delete filterCond?');
         if (confirm == true) {
-          FilterCond? e = await remoteFilterCondService.sendDelete(entity: filterCond);
+          FilterCond? e =
+              await remoteFilterCondService.sendDelete(entity: filterCond);
           if (e != null) {
             filterCondController.delete(index: index);
           }
@@ -188,7 +183,7 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
   _buildFilterCondEditView(BuildContext context) {
     FilterCond? filterCond = filterCondController.current;
     if (filterCond != null) {
-      controller.setValues(JsonUtil.toJson(filterCond));
+      controller.setValues(filterCond.toRemoteJson());
     } else {
       controller.setValues({});
     }
@@ -216,7 +211,7 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
   }
 
   _onOk(Map<String, dynamic> values) async {
-    FilterCond currentFilterCond = FilterCond.fromJson(values);
+    FilterCond currentFilterCond = FilterCond.fromRemoteJson(values);
     if (filterCondController.currentIndex == -1) {
       FilterCond? filterCond =
           await remoteFilterCondService.sendInsert(currentFilterCond);

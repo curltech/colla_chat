@@ -123,7 +123,7 @@ class ServiceLocator {
       if (value != null) {
         if (value is int) {
           field = key + ' INT';
-        } else if (value is double) {
+        } else if (value is double || value is num) {
           field = key + ' REAL';
         } else if (value is bool) {
           field = key + ' INT';
