@@ -1,4 +1,3 @@
-import 'package:colla_chat/entity/stock/event.dart';
 import 'package:colla_chat/entity/stock/filter_cond.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/general_remote.dart';

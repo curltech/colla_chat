@@ -1,6 +1,5 @@
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';

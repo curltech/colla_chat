@@ -1,8 +1,4 @@
-import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/data_list_controller.dart';
-import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/service/stock/stock_line.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';

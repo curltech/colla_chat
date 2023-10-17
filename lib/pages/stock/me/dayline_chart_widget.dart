@@ -203,7 +203,7 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
     return CandleSticksStyle.light(
       primaryBull: const Color(0xFFEF5350),
       secondaryBull: const Color(0xFFF1A3A1),
-      primaryBear: const Color(0xFF026A69A),
+      primaryBear: const Color(0xff026a69a),
       secondaryBear: const Color(0xFF8CCCC6),
     );
   }

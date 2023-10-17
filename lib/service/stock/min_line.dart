@@ -1,8 +1,5 @@
-import 'package:colla_chat/entity/stock/day_line.dart';
 import 'package:colla_chat/entity/stock/min_line.dart';
-import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/service/general_remote.dart';
-import 'package:colla_chat/service/stock/share.dart';
 
 class RemoteMinLineService extends GeneralRemoteService<MinLine> {
   RemoteMinLineService({required super.name}) {
