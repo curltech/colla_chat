@@ -162,12 +162,12 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
       }
       data = response['data'];
       count = response['count'];
+      dayLineController.insertAll(0, data);
+      dayLineController.count = count;
     }
     if (data.isEmpty) {
       return;
     }
-    dayLineController.insertAll(0, data);
-    dayLineController.count = count;
     data = dayLineController.data;
     for (int i = data.length - 1; i >= 0; i--) {
       Map<String, dynamic> map = data[i];
