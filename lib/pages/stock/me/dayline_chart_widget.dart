@@ -136,7 +136,6 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
   }
 
   _update() {
-    candles.clear();
     loadMoreCandles();
   }
 
@@ -169,6 +168,7 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
       return;
     }
     data = dayLineController.data;
+    candles.clear();
     for (int i = data.length - 1; i >= 0; i--) {
       Map<String, dynamic> map = data[i];
       int trade_date = map['trade_date'];
