@@ -115,7 +115,7 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
     List<DataRow2> rows = [];
     List<dynamic> data = shareController.data;
     if (data.isEmpty) {
-      List<dynamic> value = await shareService.findMine();
+      List<dynamic> value = await remoteShareService.sendFindMine();
       shareController.replaceAll(value);
       data = shareController.data;
     }

@@ -91,7 +91,7 @@ class _AddShareWidgetState extends State<AddShareWidget>
   }
 
   _searchShare(String keyword) async {
-    List<Share> shares = await shareService.searchShare(keyword);
+    List<Share> shares = await remoteShareService.sendSearchShare(keyword);
     searchShareController.replaceAll(shares);
   }
 

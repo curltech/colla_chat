@@ -26,6 +26,9 @@ import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/service/dht/peersignal.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
+import 'package:colla_chat/service/stock/event.dart';
+import 'package:colla_chat/service/stock/event_filter.dart';
+import 'package:colla_chat/service/stock/filter_cond.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/service/stock/share_group.dart';
 import 'package:colla_chat/service/stock/stock_account.dart';
@@ -66,6 +69,9 @@ class ServiceLocator {
     services['conferenceService'] = conferenceService;
     services['shareService'] = shareService;
     services['shareGroupService'] = shareGroupService;
+    services['eventService'] = eventService;
+    services['eventFilterService'] = eventFilterService;
+    services['filterCondService'] = filterCondService;
 
     securityContextServices[CryptoOption.none.index] =
         noneSecurityContextService;

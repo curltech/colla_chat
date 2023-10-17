@@ -1,15 +1,17 @@
 import 'package:colla_chat/entity/stock/day_line.dart';
+import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/service/general_remote.dart';
+import 'package:colla_chat/service/stock/share.dart';
 
-class DayLineService extends GeneralRemoteService<DayLine> {
-  DayLineService({required super.name}) {
+class RemoteDayLineService extends GeneralRemoteService<DayLine> {
+  RemoteDayLineService({required super.name}) {
     post = (Map map) {
       return DayLine.fromJson(map);
     };
   }
 
   /// 查询自选股的日线
-  Future<dynamic> findPreceding(String tsCode,
+  Future<dynamic> sendFindPreceding(String tsCode,
       {int? from, int? limit, int? endDate, int? count}) async {
     var params = {
       'ts_code': tsCode,
@@ -23,7 +25,7 @@ class DayLineService extends GeneralRemoteService<DayLine> {
     return data;
   }
 
-  Future<List<dynamic>> findRange(String tsCode,
+  Future<List<dynamic>> sendFindRange(String tsCode,
       {int? startDate, int? endDate, int? limit}) async {
     var params = {
       'ts_code': tsCode,
@@ -36,7 +38,7 @@ class DayLineService extends GeneralRemoteService<DayLine> {
     return data;
   }
 
-  Future<dynamic> search(String tsCode,
+  Future<dynamic> sendSearch(String tsCode,
       {int? from,
       int? limit,
       int? startDate,
@@ -58,7 +60,7 @@ class DayLineService extends GeneralRemoteService<DayLine> {
   }
 
   /// 查询股票的买卖点
-  Future<List<DayLine>> findInout(String eventCode,
+  Future<List<DayLine>> sendFindInout(String eventCode,
       {String? tsCode, int? tradeDate, int? startDate, int? endDate}) async {
     Map<String, dynamic> params = {
       'event_code': eventCode,
@@ -82,6 +84,11 @@ class DayLineService extends GeneralRemoteService<DayLine> {
       for (var m in ms) {
         var o = post(m);
         dayLines.add(o);
+        String tsCode = o.tsCode;
+        Share? share = await shareService.findShare(tsCode);
+        if (share != null) {
+          o.name = share.name;
+        }
       }
     }
 
@@ -89,7 +96,7 @@ class DayLineService extends GeneralRemoteService<DayLine> {
   }
 
   /// 查询股票的买卖点
-  Future<List<DayLine>> findAllInout(String eventCode,
+  Future<List<DayLine>> sendFindAllInout(String eventCode,
       {String? tsCode, int? startDate, int? endDate}) async {
     Map<String, dynamic> params = {
       'event_code': eventCode,
@@ -118,4 +125,4 @@ class DayLineService extends GeneralRemoteService<DayLine> {
   }
 }
 
-final DayLineService dayLineService = DayLineService(name: 'dayline');
+final RemoteDayLineService remoteDayLineService = RemoteDayLineService(name: 'dayline');

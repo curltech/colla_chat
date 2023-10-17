@@ -1,9 +1,8 @@
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/day_line.dart';
-import 'package:colla_chat/service/stock/share.dart';
+import 'package:colla_chat/service/stock/wmqy_line.dart';
 import 'package:colla_chat/tool/date_util.dart';
-import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -155,10 +154,10 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
       Map<String, dynamic> response;
       int lineType = dayLineController.lineType;
       if (lineType == 101) {
-        response = await dayLineService.findPreceding(tsCode,
+        response = await remoteDayLineService.sendFindPreceding(tsCode,
             from: data.length, limit: 100);
       } else {
-        response = await shareService.findLinePreceding(tsCode,
+        response = await remoteWmqyLineService.sendFindLinePreceding(tsCode,
             lineType: lineType, from: data.length, limit: 100);
       }
       data = response['data'];

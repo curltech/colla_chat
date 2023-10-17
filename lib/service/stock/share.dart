@@ -25,6 +25,28 @@ class RemoteShareService extends GeneralRemoteService<Share> {
       return Share.fromRemoteJson(map);
     };
   }
+
+  /// 查询自选股的详细信息
+  Future<List<dynamic>> sendFindMine() async {
+    List<dynamic> data = await stockLineService
+        .send('/share/GetMine', data: {'ts_code': shareService.subscription});
+
+    return data;
+  }
+
+  /// 根据关键字搜索股票
+  Future<List<Share>> sendSearchShare(String keyword) async {
+    List<dynamic> data = await stockLineService
+        .send('/share/Search', data: {'keyword': keyword});
+    List<Share> shares = [];
+    for (dynamic map in data) {
+      Share share = Share.fromRemoteJson(map);
+      shares.add(share);
+      shareService.store(share);
+    }
+
+    return shares;
+  }
 }
 
 final RemoteShareService remoteShareService = RemoteShareService(name: 'share');
@@ -96,63 +118,6 @@ class ShareService extends GeneralBaseService<Share> {
       await localSharedPreferences.save('subscription', _subscription,
           encrypt: true);
     }
-  }
-
-  /// 查询自选股的详细信息
-  Future<List<dynamic>> findMine() async {
-    List<dynamic> data = await stockLineService
-        .send('/share/GetMine', data: {'ts_code': _subscription});
-
-    return data;
-  }
-
-  /// 根据关键字搜索股票
-  Future<List<Share>> searchShare(String keyword) async {
-    List<dynamic> data = await stockLineService
-        .send('/share/Search', data: {'keyword': keyword});
-    List<Share> shares = [];
-    for (dynamic map in data) {
-      Share share = Share.fromRemoteJson(map);
-      shares.add(share);
-      store(share);
-    }
-
-    return shares;
-  }
-
-  /// 查询自选股的周，月，季度，半年，年线
-  Future<dynamic> findLinePreceding(String tsCode,
-      {int lineType = 102, //  102,103,104,105,106
-      int? from,
-      int? limit,
-      int? endDate,
-      int? count}) async {
-    var params = {
-      'ts_code': tsCode,
-      'line_type': lineType,
-      'from': from,
-      'limit': limit,
-      'end_date': endDate,
-      'count': count,
-    };
-    dynamic data =
-        await stockLineService.send('/wmqyline/FindPreceding', data: params);
-
-    return data;
-  }
-
-  /// 查询自选股的分钟线
-  Future<List<dynamic>> findMinLines(String tsCode,
-      {int? tradeDate, int? tradeMinute}) async {
-    var params = {
-      'ts_code': tsCode,
-      'trade_date': tradeDate,
-      'trade_minute': tradeMinute
-    };
-    List<dynamic> data =
-        await stockLineService.send('/minline/FindMinLines', data: params);
-
-    return data;
   }
 }
 

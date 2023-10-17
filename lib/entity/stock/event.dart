@@ -12,7 +12,7 @@ class Event extends StatusEntity {
 
   Event(this.eventCode, this.eventName);
 
-  Event.fromJson(Map json)
+  Event.fromRemoteJson(Map json)
       : eventCode = json['event_code'],
         eventType = json['event_type'],
         eventName = json['event_name'],
@@ -22,8 +22,17 @@ class Event extends StatusEntity {
         descr = json['descr'],
         super.fromJson(json);
 
-  @override
-  Map<String, dynamic> toJson() {
+  Event.fromJson(Map json)
+      : eventCode = json['eventCode'],
+        eventType = json['eventType'],
+        eventName = json['eventName'],
+        content = json['content'],
+        contentParas = json['contentParas'],
+        score = json['score'],
+        descr = json['descr'],
+        super.fromJson(json);
+
+  Map<String, dynamic> toRemoteJson() {
     var json = super.toJson();
     json.addAll({
       'event_code': eventCode,
@@ -31,6 +40,21 @@ class Event extends StatusEntity {
       'event_name': eventName,
       'content': content,
       'content_paras': contentParas,
+      'score': score,
+      'descr': descr,
+    });
+    return json;
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    var json = super.toJson();
+    json.addAll({
+      'eventCode': eventCode,
+      'eventType': eventType,
+      'eventName': eventName,
+      'content': content,
+      'contentParas': contentParas,
       'score': score,
       'descr': descr,
     });

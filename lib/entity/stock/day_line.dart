@@ -3,6 +3,7 @@ import 'package:colla_chat/entity/base.dart';
 class StockLine extends BaseEntity {
   String tsCode;
   int tradeDate;
+  String? name;
   num? shareNumber;
   num? open;
   num? high;
@@ -20,6 +21,7 @@ class StockLine extends BaseEntity {
 
   StockLine.fromJson(Map json)
       : tsCode = json['ts_code'],
+        name = json['name'],
         tradeDate = json['trade_date'],
         shareNumber = json['share_number'],
         open = json['open'],
@@ -42,6 +44,7 @@ class StockLine extends BaseEntity {
     var json = super.toJson();
     json.addAll({
       'ts_code': tsCode,
+      'name': name,
       'trade_date': tradeDate,
       'share_number': shareNumber,
       'open': open,

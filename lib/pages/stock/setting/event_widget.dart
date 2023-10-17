@@ -128,7 +128,7 @@ class _EventWidgetState extends State<EventWidget>
             bool? confirm = await DialogUtil.confirm(context,
                 content: 'Do you want to delete event?');
             if (confirm == true) {
-              Event? e = await eventService.sendDelete(entity: event);
+              Event? e = await remoteEventService.sendDelete(entity: event);
               if (e != null) {
                 eventController.delete(index: index);
               }
@@ -216,12 +216,12 @@ class _EventWidgetState extends State<EventWidget>
   _onOk(Map<String, dynamic> values) async {
     Event currentEvent = Event.fromJson(values);
     if (eventController.currentIndex == -1) {
-      Event? event = await eventService.sendInsert(currentEvent);
+      Event? event = await remoteEventService.sendInsert(currentEvent);
       if (event != null) {
         eventController.insert(0, event);
       }
     } else {
-      Event? event = await eventService.sendUpdate(currentEvent);
+      Event? event = await remoteEventService.sendUpdate(currentEvent);
       if (event != null) {
         eventController.replace(event);
       }
@@ -251,7 +251,7 @@ class _EventWidgetState extends State<EventWidget>
       IconButton(
         tooltip: AppLocalizations.t('Refresh event'),
         onPressed: () async {
-          List<Event> value = await eventService.sendFindAll();
+          List<Event> value = await remoteEventService.sendFindAll();
           eventController.replaceAll(value);
         },
         icon: const Icon(Icons.refresh_outlined),

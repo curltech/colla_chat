@@ -69,24 +69,29 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
       PlatformDataColumn(
         label: '股票代码',
         name: 'ts_code',
-        width: 120,
+        width: 100,
         onSort: (int index, bool ascending) =>
             inoutEventController.sort((t) => t.tsCode, index, ascending),
       ),
       PlatformDataColumn(
+        label: '股票名',
+        name: 'name',
+        width: 100,
+      ),
+      PlatformDataColumn(
         label: '交易日期',
         name: 'trade_date',
-        width: 120,
+        width: 100,
       ),
       PlatformDataColumn(
         label: '收盘价',
         name: 'close',
-        width: 140,
+        width: 100,
       ),
       PlatformDataColumn(
         label: '换手率',
         name: 'turnover',
-        width: 140,
+        width: 100,
       ),
       PlatformDataColumn(
           label: '',
@@ -145,7 +150,7 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
     if (eventCode != null) {
       int tradeDate = DateUtil.formatDateInt(DateUtil.currentDateTime());
       List<DayLine> dayLines =
-          await dayLineService.findInout(eventCode, tradeDate: tradeDate);
+          await remoteDayLineService.sendFindInout(eventCode, tradeDate: tradeDate);
       inoutEventController.replaceAll(dayLines);
     }
   }

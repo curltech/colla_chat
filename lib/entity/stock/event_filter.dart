@@ -15,7 +15,7 @@ class EventFilter extends StatusEntity {
 
   EventFilter(this.eventCode, this.eventName);
 
-  EventFilter.fromJson(Map json)
+  EventFilter.fromRemoteJson(Map json)
       : eventCode = json['event_code'],
         eventName = json['event_name'],
         condCode = json['cond_code'],
@@ -28,8 +28,20 @@ class EventFilter extends StatusEntity {
         descr = json['descr'],
         super.fromJson(json);
 
-  @override
-  Map<String, dynamic> toJson() {
+  EventFilter.fromJson(Map json)
+      : eventCode = json['eventCode'],
+        eventName = json['eventName'],
+        condCode = json['condCode'],
+        codeAlias = json['codeAlias'],
+        condName = json['condName'],
+        condAlias = json['condAlias'],
+        condContent = json['condContent'],
+        condParas = json['condParas'],
+        score = json['score'],
+        descr = json['descr'],
+        super.fromJson(json);
+
+  Map<String, dynamic> toRemoteJson() {
     var json = super.toJson();
     json.addAll({
       'event_code': eventCode,
@@ -40,6 +52,24 @@ class EventFilter extends StatusEntity {
       'cond_alias': condAlias,
       'cond_content': condContent,
       'cond_paras': condParas,
+      'score': score,
+      'descr': descr,
+    });
+    return json;
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    var json = super.toJson();
+    json.addAll({
+      'eventCode': eventCode,
+      'eventName': eventName,
+      'condCode': condCode,
+      'condCode': condCode,
+      'condName': condName,
+      'condAlias': condAlias,
+      'condContent': condContent,
+      'condParas': condParas,
       'score': score,
       'descr': descr,
     });
