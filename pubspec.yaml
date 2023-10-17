@@ -74,8 +74,8 @@ dependencies:
   wakelock_plus: ^1.1.1 #让系统不会睡眠
 
   # 存储
-  shared_preferences: ^2.0.10
-  flutter_secure_storage: ^8.0.0
+  shared_preferences: ^2.2.2
+  flutter_secure_storage: 8.1.0
   sqlite3: ^2.1.0
   sqlite3_flutter_libs: ^0.5.16
   idb_shim: ^2.0.1

@@ -12,7 +12,7 @@ class FilterCondService extends GeneralRemoteService<FilterCond> {
   }
 
   Future<List<FilterCond>?> findCachedAll() async {
-    _filterConds ??= await super.findAll();
+    _filterConds ??= await super.sendFindAll();
 
     return _filterConds;
   }

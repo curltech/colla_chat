@@ -1,6 +1,8 @@
 import 'package:colla_chat/entity/stock/share.dart';
+import 'package:colla_chat/plugin/security_storage.dart';
 
 import 'package:colla_chat/service/general_base.dart';
+import 'package:colla_chat/service/general_remote.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/service/stock/stock_line.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
@@ -17,8 +19,20 @@ final List<Option> outEventOption = [
   Option('石破天惊', 'StoneSky', hint: '阴线，最高价低于昨日最低价'),
 ];
 
+class RemoteShareService extends GeneralRemoteService<Share> {
+  RemoteShareService({required super.name}) {
+    post = (Map map) {
+      return Share.fromRemoteJson(map);
+    };
+  }
+}
+
+final RemoteShareService remoteShareService = RemoteShareService(name: 'share');
+
 class ShareService extends GeneralBaseService<Share> {
-  String? _subscription;
+  /// 存储在本地存储中
+  String _subscription = '';
+  Map<String, Share> shares = {};
 
   ShareService(
       {required super.tableName,
@@ -29,27 +43,65 @@ class ShareService extends GeneralBaseService<Share> {
     };
   }
 
-  Future<String?> findSubscription() async {
-    if (_subscription == null) {
-      List<Share> shares = await shareService.findAll();
-      _subscription = '';
-      for (Share share in shares) {
-        _subscription = '$_subscription${share.tsCode},';
+  String get subscription {
+    return _subscription;
+  }
+
+  init() async {
+    String? value =
+        await localSharedPreferences.get('subscription', encrypt: true);
+    _subscription = value ?? '';
+  }
+
+  Future<Share?> findShare(String tsCode) async {
+    if (!shares.containsKey(tsCode)) {
+      Share? share = await findOne(where: 'tscode=?', whereArgs: [tsCode]);
+      if (share == null) {
+        share = await remoteShareService
+            .sendFindOne(condiBean: {'ts_code': tsCode});
+        if (share != null) {
+          await store(share);
+        }
+      }
+      if (share != null) {
+        shares[tsCode] = share;
       }
     }
+    return shares[tsCode];
+  }
 
-    return _subscription;
+  store(Share share) async {
+    Share? old = await findOne(where: 'tscode=?', whereArgs: [share.tsCode!]);
+    if (old == null) {
+      share.id = null;
+    } else {
+      share.id = old.id;
+    }
+    await upsert(share);
+  }
+
+  Future<void> add(Share share) async {
+    await store(share);
+    String tsCode = share.tsCode!;
+    if (!_subscription.contains(tsCode)) {
+      _subscription += '$tsCode,';
+      await localSharedPreferences.save('subscription', _subscription,
+          encrypt: true);
+    }
+  }
+
+  Future<void> remove(String tsCode) async {
+    if (_subscription.contains(tsCode)) {
+      _subscription.replaceAll('$tsCode,', '');
+      await localSharedPreferences.save('subscription', _subscription,
+          encrypt: true);
+    }
   }
 
   /// 查询自选股的详细信息
   Future<List<dynamic>> findMine() async {
-    // 数据为逗号分割的tscode
-    String? subscription = await findSubscription();
-    List<dynamic> data = [];
-    if (subscription != null) {
-      data = await stockLineService
-          .send('/share/GetMine', data: {'ts_code': subscription});
-    }
+    List<dynamic> data = await stockLineService
+        .send('/share/GetMine', data: {'ts_code': _subscription});
 
     return data;
   }
@@ -62,70 +114,10 @@ class ShareService extends GeneralBaseService<Share> {
     for (dynamic map in data) {
       Share share = Share.fromRemoteJson(map);
       shares.add(share);
+      store(share);
     }
 
     return shares;
-  }
-
-  Future<void> add(Share share) async {
-    await insert(share);
-    _subscription = null;
-  }
-
-  Future<void> remove(String tsCode) async {
-    delete(where: 'tscode=?', whereArgs: [tsCode]);
-    _subscription = null;
-  }
-
-  /// 查询自选股的日线
-  Future<dynamic> findPreceding(String tsCode,
-      {int? from, int? limit, int? endDate, int? count}) async {
-    var params = {
-      'ts_code': tsCode,
-      'from': from,
-      'limit': limit,
-      'end_date': endDate,
-      'count': count,
-    };
-    dynamic data =
-        await stockLineService.send('/dayline/FindPreceding', data: params);
-
-    return data;
-  }
-
-  Future<List<dynamic>> findRange(String tsCode,
-      {int? startDate, int? endDate, int? limit}) async {
-    var params = {
-      'ts_code': tsCode,
-      'start_date': startDate,
-      'end_date': endDate,
-      'limit': limit,
-    };
-    List<dynamic> data =
-        await stockLineService.send('/dayline/FindRange', data: params);
-
-    return data;
-  }
-
-  Future<dynamic> search(String tsCode,
-      {int? from,
-      int? limit,
-      int? startDate,
-      int? endDate,
-      String? orderBy,
-      int? count}) async {
-    var params = {
-      'ts_code': tsCode,
-      'from': from,
-      'limit': limit,
-      'start_date': startDate,
-      'end_date': endDate,
-      'orderby': orderBy,
-      'count': count,
-    };
-    dynamic data = await stockLineService.send('/dayline/Search', data: params);
-
-    return data;
   }
 
   /// 查询自选股的周，月，季度，半年，年线
@@ -159,21 +151,6 @@ class ShareService extends GeneralBaseService<Share> {
     };
     List<dynamic> data =
         await stockLineService.send('/minline/FindMinLines', data: params);
-
-    return data;
-  }
-
-  /// 查询股票的买卖点
-  Future<dynamic> findInout(
-      String tsCode, int startDate, int endDate, String eventCode) async {
-    var params = {
-      'ts_code': tsCode,
-      'start_date': startDate,
-      'end_date': endDate,
-      'event_code': eventCode,
-    };
-    dynamic data =
-        await stockLineService.send('/dayline/FindAllInOutEvent', data: params);
 
     return data;
   }

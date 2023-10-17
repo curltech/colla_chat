@@ -99,6 +99,10 @@ class DateUtil {
     return format;
   }
 
+  static int formatDateInt(DateTime dateTime) {
+    return dateTime.year * 10000 + dateTime.month * 100 + dateTime.day;
+  }
+
   static DateTime toDateTime(String formattedString) {
     return DateTime.parse(formattedString);
   }

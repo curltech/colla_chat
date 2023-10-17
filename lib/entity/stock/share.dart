@@ -59,6 +59,29 @@ class Share extends StatusEntity {
         pinyin = json['pinyin'],
         super.fromJson(json);
 
+  Map<String, dynamic> toRemoteJson() {
+    var json = super.toJson();
+    json.addAll({
+      'ts_code': tsCode,
+      'symbol': symbol,
+      'name': name,
+      'area': area,
+      'industry': industry,
+      'sector': sector,
+      'fullname': fullName,
+      'enname': englishName,
+      'market': market,
+      'exchange': exchange,
+      'curr_type': currType,
+      'list_status': listStatus,
+      'list_dDate': listDate,
+      'delist_date': delistDate,
+      'is_hs': isHs,
+      'pin_yin': pinyin,
+    });
+    return json;
+  }
+
   @override
   Map<String, dynamic> toJson() {
     var json = super.toJson();

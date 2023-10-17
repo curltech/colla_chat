@@ -40,7 +40,7 @@ class EventFilterController extends DataListController<EventFilter> {
       _eventName = eventName;
       if (_eventCode != null) {
         List<EventFilter> eventFilters = await eventFilterService
-            .find(condiBean: {'event_code': _eventCode}, limit: 1000);
+            .sendFind(condiBean: {'event_code': _eventCode}, limit: 1000);
         replaceAll(eventFilters);
       } else {
         data.clear();
@@ -238,7 +238,7 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
   Widget _buildActionWidget(int index, dynamic eventFilter) {
     Widget actionWidget = IconButton(
       onPressed: () async {
-        EventFilter? e = await eventFilterService.delete(entity: eventFilter);
+        EventFilter? e = await eventFilterService.sendDelete(entity: eventFilter);
         if (e != null) {
           eventFilterController.delete(index: index);
         }
@@ -311,13 +311,13 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
     EventFilter currentFilterCond = EventFilter.fromJson(values);
     if (eventFilterController.currentIndex == -1) {
       EventFilter? filterCond =
-          await eventFilterService.insert(currentFilterCond);
+          await eventFilterService.sendInsert(currentFilterCond);
       if (filterCond != null) {
         eventFilterController.insert(0, filterCond);
       }
     } else {
       EventFilter? eventFilter =
-          await eventFilterService.update(currentFilterCond);
+          await eventFilterService.sendUpdate(currentFilterCond);
       if (eventFilter != null) {
         eventFilterController.replace(eventFilter);
       }
@@ -382,7 +382,7 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
                   eventFilter.codeAlias = filterCond.condCode;
                   if (eventFilterController.currentIndex == -1) {
                     EventFilter? filter =
-                        await eventFilterService.insert(eventFilter);
+                        await eventFilterService.sendInsert(eventFilter);
                     if (filter != null) {
                       eventFilterController.insert(0, filter);
                     }
@@ -423,7 +423,7 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
         tooltip: AppLocalizations.t('Refresh event filter'),
         onPressed: () async {
           if (eventFilterController.eventCode != null) {
-            List<EventFilter> value = await eventFilterService.find(condiBean: {
+            List<EventFilter> value = await eventFilterService.sendFind(condiBean: {
               'event_code': eventFilterController.eventCode,
             }, limit: 1000);
             eventFilterController.replaceAll(value);

@@ -152,7 +152,7 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
         bool? confirm = await DialogUtil.confirm(context,
             content: 'Do you want to delete filterCond?');
         if (confirm == true) {
-          FilterCond? e = await filterCondService.delete(entity: filterCond);
+          FilterCond? e = await filterCondService.sendDelete(entity: filterCond);
           if (e != null) {
             filterCondController.delete(index: index);
           }
@@ -219,13 +219,13 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
     FilterCond currentFilterCond = FilterCond.fromJson(values);
     if (filterCondController.currentIndex == -1) {
       FilterCond? filterCond =
-          await filterCondService.insert(currentFilterCond);
+          await filterCondService.sendInsert(currentFilterCond);
       if (filterCond != null) {
         filterCondController.insert(0, filterCond);
       }
     } else {
       FilterCond? filterCond =
-          await filterCondService.update(currentFilterCond);
+          await filterCondService.sendUpdate(currentFilterCond);
       if (filterCond != null) {
         filterCondController.replace(filterCond);
       }
@@ -255,7 +255,7 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
       IconButton(
         tooltip: AppLocalizations.t('Refresh filter cond'),
         onPressed: () async {
-          List<FilterCond> value = await filterCondService.findAll();
+          List<FilterCond> value = await filterCondService.sendFindAll();
           filterCondController.replaceAll(value);
         },
         icon: const Icon(Icons.refresh_outlined),

@@ -24,8 +24,8 @@ class ShareGroupService extends GeneralBaseService<ShareGroup> {
     String? subscription = groupSubscription[groupName];
     if (subscription == null) {
       if (defaultGroupName == groupName) {
-        subscription = await shareService.findSubscription();
-        groupSubscription[groupName] = subscription!;
+        subscription = shareService.subscription;
+        groupSubscription[groupName] = subscription;
       } else {
         List<ShareGroup> shareGroups =
             await find(where: 'groupName=?', whereArgs: [groupName]);

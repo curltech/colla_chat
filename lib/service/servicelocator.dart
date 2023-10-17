@@ -7,6 +7,7 @@ import 'package:colla_chat/main.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/chat_summary.dart';
@@ -84,7 +85,7 @@ class ServiceLocator {
       logger.i(
           'Default PeerEndpoint websocket address:${defaultPeerEndpoint.wsConnectAddress}');
     }
-
+    await localSharedPreferences.init();
     Map<String, dynamic>? autoLogin = await myselfPeerService.autoCredential();
     if (autoLogin != null) {
       appDataProvider.autoLogin = true;

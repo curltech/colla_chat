@@ -25,6 +25,7 @@ import 'package:colla_chat/service/dht/myself.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/service/servicelocator.dart';
+import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -250,6 +251,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     //最后一次成功登录的用户名
     String lastLogin = JsonUtil.toJsonString({credentialName: credential});
     await localSecurityStorage.save(lastLoginName, lastLogin);
+    String? last = await localSecurityStorage.get(lastLoginName);
   }
 
   ///获取最后一次登录的用户名和密码，如果都存在，快捷登录
@@ -365,6 +367,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     var peerId = peerConnectionPool.peerId;
     logger.i('peerConnectionPool init: $peerId');
     signalSessionPool.init();
+    shareService.init();
   }
 
   Future<bool> logout() async {

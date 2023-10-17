@@ -2,6 +2,7 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/entity/stock/event.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/stock/setting/event_filter_widget.dart';
+import 'package:colla_chat/pages/stock/trade/in_out_event_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -127,7 +128,7 @@ class _EventWidgetState extends State<EventWidget>
             bool? confirm = await DialogUtil.confirm(context,
                 content: 'Do you want to delete event?');
             if (confirm == true) {
-              Event? e = await eventService.delete(entity: event);
+              Event? e = await eventService.sendDelete(entity: event);
               if (e != null) {
                 eventController.delete(index: index);
               }
@@ -146,6 +147,17 @@ class _EventWidgetState extends State<EventWidget>
           },
           icon: const Icon(
             Icons.filter,
+            color: Colors.yellow,
+          ),
+        ),
+        IconButton(
+          onPressed: () async {
+            await inoutEventController.setEventCode(event.eventCode,
+                eventName: event.eventName);
+            indexWidgetProvider.push('in_out_event');
+          },
+          icon: const Icon(
+            Icons.event,
             color: Colors.yellow,
           ),
         )
@@ -204,12 +216,12 @@ class _EventWidgetState extends State<EventWidget>
   _onOk(Map<String, dynamic> values) async {
     Event currentEvent = Event.fromJson(values);
     if (eventController.currentIndex == -1) {
-      Event? event = await eventService.insert(currentEvent);
+      Event? event = await eventService.sendInsert(currentEvent);
       if (event != null) {
         eventController.insert(0, event);
       }
     } else {
-      Event? event = await eventService.update(currentEvent);
+      Event? event = await eventService.sendUpdate(currentEvent);
       if (event != null) {
         eventController.replace(event);
       }
@@ -239,7 +251,7 @@ class _EventWidgetState extends State<EventWidget>
       IconButton(
         tooltip: AppLocalizations.t('Refresh event'),
         onPressed: () async {
-          List<Event> value = await eventService.findAll();
+          List<Event> value = await eventService.sendFindAll();
           eventController.replaceAll(value);
         },
         icon: const Icon(Icons.refresh_outlined),

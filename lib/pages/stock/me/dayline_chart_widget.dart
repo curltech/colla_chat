@@ -1,5 +1,6 @@
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/stock/day_line.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
@@ -78,6 +79,12 @@ class MultiDayLineController with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  remove(String tsCode) {
+    if (dayLineControllers.containsKey(tsCode)) {
+      dayLineControllers.remove(tsCode);
+    }
+  }
 }
 
 final MultiDayLineController multiDayLineController = MultiDayLineController();
@@ -120,22 +127,26 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
       color: Colors.green.shade600,
     ),
   ];
+  List<Candle> candles = [];
 
   @override
   void initState() {
     multiDayLineController.addListener(_update);
+    loadMoreCandles();
     super.initState();
   }
 
   _update() {
-    setState(() {});
+    candles.clear();
+    loadMoreCandles();
   }
 
-  Future<List<Candle>> loadMoreCandles() async {
+  Future<void> loadMoreCandles() async {
     DayLineController? dayLineController =
         multiDayLineController.dayLineController;
     if (dayLineController == null) {
-      return <Candle>[];
+      candles.clear();
+      return;
     }
     String tsCode = dayLineController.tsCode;
     List<dynamic> data = dayLineController.data;
@@ -144,19 +155,21 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
       Map<String, dynamic> response;
       int lineType = dayLineController.lineType;
       if (lineType == 101) {
-        response = await shareService.findPreceding(tsCode,
+        response = await dayLineService.findPreceding(tsCode,
             from: data.length, limit: 100);
       } else {
         response = await shareService.findLinePreceding(tsCode,
             lineType: lineType, from: data.length, limit: 100);
       }
       data = response['data'];
-      dayLineController.insertAll(0, data);
       count = response['count'];
-      dayLineController.count = count;
     }
+    if (data.isEmpty) {
+      return;
+    }
+    dayLineController.insertAll(0, data);
+    dayLineController.count = count;
     data = dayLineController.data;
-    List<Candle> candles = [];
     for (int i = data.length - 1; i >= 0; i--) {
       Map<String, dynamic> map = data[i];
       int trade_date = map['trade_date'];
@@ -175,8 +188,7 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
           volume: volume.toDouble());
       candles.add(candle);
     }
-
-    return candles;
+    setState(() {});
   }
 
   CandleSticksStyle dark() {
@@ -198,8 +210,8 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
   }
 
   _buildCandlesticks(List<Candle> candles) {
-    final style =
-        myself.getBrightness(context) == Brightness.dark ? dark() : light();
+    final bool isDark = myself.getBrightness(context) == Brightness.dark;
+    final style = isDark ? dark() : light();
     return Candlesticks(
       indicators: indicators,
       actions: <ToolBarAction>[
@@ -211,7 +223,9 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
             Icons.calendar_view_day_outlined,
             color: multiDayLineController.lineType == 101
                 ? myself.primary
-                : Colors.white,
+                : isDark
+                    ? Colors.white
+                    : Colors.grey,
           ),
         ),
         ToolBarAction(
@@ -222,7 +236,9 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
             Icons.calendar_view_week_outlined,
             color: multiDayLineController.lineType == 102
                 ? myself.primary
-                : Colors.white,
+                : isDark
+                    ? Colors.white
+                    : Colors.grey,
           ),
         ),
         ToolBarAction(
@@ -233,7 +249,9 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
             Icons.calendar_view_month_outlined,
             color: multiDayLineController.lineType == 103
                 ? myself.primary
-                : Colors.white,
+                : isDark
+                    ? Colors.white
+                    : Colors.grey,
           ),
         ),
         ToolBarAction(
@@ -244,7 +262,9 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
             Icons.perm_contact_calendar,
             color: multiDayLineController.lineType == 104
                 ? myself.primary
-                : Colors.white,
+                : isDark
+                    ? Colors.white
+                    : Colors.grey,
           ),
         ),
         ToolBarAction(
@@ -255,7 +275,9 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
             Icons.calendar_month_outlined,
             color: multiDayLineController.lineType == 105
                 ? myself.primary
-                : Colors.white,
+                : isDark
+                    ? Colors.white
+                    : Colors.grey,
           ),
         ),
         ToolBarAction(
@@ -266,7 +288,9 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
             Icons.calendar_today_outlined,
             color: multiDayLineController.lineType == 106
                 ? myself.primary
-                : Colors.white,
+                : isDark
+                    ? Colors.white
+                    : Colors.grey,
           ),
         ),
       ],
@@ -291,18 +315,7 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
       title: '${dayLineController?.tsCode}-${dayLineController?.name}',
       withLeading: true,
       child: Center(
-        child: FutureBuilder(
-          future: loadMoreCandles(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              List<Candle>? candles = snapshot.data;
-              if (candles != null) {
-                return _buildCandlesticks(candles);
-              }
-            }
-            return LoadingUtil.buildLoadingIndicator();
-          },
-        ),
+        child: _buildCandlesticks(candles),
       ),
     );
   }

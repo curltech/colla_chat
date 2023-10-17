@@ -45,11 +45,11 @@ abstract class GeneralRemoteService<T> {
     }
   }
 
-  Future<T?> get(int id) async {
-    return await findOne(condiBean: {'id': id});
+  Future<T?> sendGet(int id) async {
+    return await sendFindOne(condiBean: {'id': id});
   }
 
-  Future<T?> findOne({
+  Future<T?> sendFindOne({
     String? where,
     bool? distinct,
     List<String>? columns,
@@ -70,19 +70,24 @@ abstract class GeneralRemoteService<T> {
       var json = JsonUtil.toJson(condiBean);
       params.addAll(json);
     }
-    var m = await send(url, data: params);
-    if (m != null) {
-      var o = post(m);
-      return o;
+    var ms = await send(url, data: params);
+    List<T> os = [];
+    if (ms.isNotEmpty) {
+      for (var m in ms) {
+        var o = post(m);
+        os.add(o);
+      }
     }
+
+    return os.firstOrNull;
   }
 
-  Future<List<T>> findAll() async {
-    return await find();
+  Future<List<T>> sendFindAll() async {
+    return await sendFind();
   }
 
   /// 原生的查询
-  Future<List<T>> find({
+  Future<List<T>> sendFind({
     String? where,
     bool? distinct,
     List<String>? columns,
@@ -121,7 +126,7 @@ abstract class GeneralRemoteService<T> {
   }
 
   /// 与find的不同是返回值是带有result，from，limit，total字段的对象
-  Future<Pagination<T>> findPage(
+  Future<Pagination<T>> sendFindPage(
       {String? where,
       bool? distinct,
       List<String>? columns,
@@ -158,7 +163,7 @@ abstract class GeneralRemoteService<T> {
   }
 
   /// 与find的区别是condi是普通对象，采用等于条件
-  Future<List<T>> seek(
+  Future<List<T>> sendSeek(
     Map<String, Object> whereBean, {
     bool? distinct,
     List<String>? columns,
@@ -175,7 +180,7 @@ abstract class GeneralRemoteService<T> {
       where = '$where and $key=?';
       whereArgs.add(value!);
     }
-    return await find(
+    return await sendFind(
       where: where,
       distinct: distinct,
       columns: columns,
@@ -188,7 +193,7 @@ abstract class GeneralRemoteService<T> {
     );
   }
 
-  Future<T?> insert(dynamic entity) async {
+  Future<T?> sendInsert(dynamic entity) async {
     Map<String, dynamic> json = await JsonUtil.toJson(entity);
     List<dynamic> ms = await send('/${this.name}/Insert', data: [json]);
     T? o;
@@ -208,7 +213,7 @@ abstract class GeneralRemoteService<T> {
   }
 
   /// 删除记录。根据entity的id字段作为条件删除，entity可以是Map
-  Future<T?> delete(
+  Future<T?> sendDelete(
       {dynamic entity, String? where, List<Object>? whereArgs}) async {
     Map<String, dynamic> json = await JsonUtil.toJson(entity);
     List<dynamic> ms = await send('/${this.name}/Delete', data: [json]);
@@ -220,7 +225,7 @@ abstract class GeneralRemoteService<T> {
   }
 
   /// 更新记录。根据entity的id字段作为条件，其他字段作为更新的值，entity可以是Map
-  Future<T?> update(
+  Future<T?> sendUpdate(
     dynamic entity, {
     String? where,
     List<Object>? whereArgs,
@@ -239,7 +244,7 @@ abstract class GeneralRemoteService<T> {
   }
 
   /// 批量保存，根据脏标志新增，修改或者删除
-  save(List<T> entities, [dynamic ignore, dynamic parent]) async {
+  sendSave(List<T> entities) async {
     List<Map<String, dynamic>> operators = [];
     for (var entity in entities) {
       Map<String, dynamic> json = await JsonUtil.toJson(entity);
@@ -251,38 +256,18 @@ abstract class GeneralRemoteService<T> {
   }
 
   /// 根据_id是否存在逐条增加或者修改
-  Future<T?> upsert(
+  Future<T?> sendUpsert(
     dynamic entity, {
     String? where,
     List<Object>? whereArgs,
   }) async {
     var id = EntityUtil.getId(entity);
     if (id != null) {
-      return await update(entity, where: where, whereArgs: whereArgs);
+      return await sendUpdate(entity, where: where, whereArgs: whereArgs);
     } else {
-      return await insert(
+      return await sendInsert(
         entity,
       );
     }
-  }
-
-  Future<List<T>> findByStatus(String status) async {
-    var condiBean = {'status': status};
-    var es = await find(condiBean: condiBean);
-
-    return es;
-  }
-
-  Future<List<T>> findEffective() async {
-    return await findByStatus(EntityStatus.effective.name);
-  }
-
-  Future<Object?> findOneEffective() async {
-    var es = await findByStatus(EntityStatus.effective.name);
-    if (es.isNotEmpty) {
-      return es[0];
-    }
-
-    return null;
   }
 }
