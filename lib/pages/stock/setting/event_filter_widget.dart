@@ -375,12 +375,10 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
                   eventFilter.condParas = filterCond.condParas;
                   eventFilter.condAlias = filterCond.name;
                   eventFilter.codeAlias = filterCond.condCode;
-                  if (eventFilterController.currentIndex == -1) {
-                    EventFilter? filter =
-                        await remoteEventFilterService.sendInsert(eventFilter);
-                    if (filter != null) {
-                      eventFilterController.insert(0, filter);
-                    }
+                  EventFilter? filter =
+                      await remoteEventFilterService.sendInsert(eventFilter);
+                  if (filter != null) {
+                    eventFilterController.insert(0, filter);
                   }
                 }
                 swiperController.move(0);

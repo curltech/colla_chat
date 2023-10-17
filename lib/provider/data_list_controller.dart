@@ -77,7 +77,7 @@ class DataListController<T> with ChangeNotifier {
   }
 
   insert(int index, T d) {
-    if (index >= 0 && index < data.length) {
+    if (index >= 0 && index <= data.length) {
       data.insert(index, d);
       _currentIndex = index;
       notifyListeners();
