@@ -94,35 +94,7 @@ class RemoteDayLineService extends GeneralRemoteService<DayLine> {
 
     return dayLines;
   }
-
-  /// 查询股票的买卖点
-  Future<List<DayLine>> sendFindAllInout(String eventCode,
-      {String? tsCode, int? startDate, int? endDate}) async {
-    Map<String, dynamic> params = {
-      'event_code': eventCode,
-    };
-    if (tsCode != null) {
-      params['ts_code'] = tsCode;
-    }
-    if (startDate != null) {
-      params['start_date'] = startDate;
-    }
-    if (endDate != null) {
-      params['end_date'] = endDate;
-    }
-    var responseData =
-        await await send('/dayline/FindAllInOutEvent', data: params);
-    List<DayLine> dayLines = [];
-    if (responseData != null) {
-      List ms = responseData['data'];
-      for (var m in ms) {
-        var o = post(m);
-        dayLines.add(o);
-      }
-    }
-
-    return dayLines;
-  }
 }
 
-final RemoteDayLineService remoteDayLineService = RemoteDayLineService(name: 'dayline');
+final RemoteDayLineService remoteDayLineService =
+    RemoteDayLineService(name: 'dayline');
