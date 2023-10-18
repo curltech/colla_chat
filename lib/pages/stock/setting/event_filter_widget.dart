@@ -12,7 +12,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
-import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
+import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -232,16 +232,21 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
   Widget _buildActionWidget(int index, dynamic eventFilter) {
     Widget actionWidget = IconButton(
       onPressed: () async {
-        EventFilter? e =
-            await remoteEventFilterService.sendDelete(entity: eventFilter);
-        if (e != null) {
-          eventFilterController.delete(index: index);
+        bool? confirm = await DialogUtil.confirm(context,
+            content: 'Do you confirm to delete event filter?');
+        if (confirm == true) {
+          EventFilter? e =
+              await remoteEventFilterService.sendDelete(entity: eventFilter);
+          if (e != null) {
+            eventFilterController.delete(index: index);
+          }
         }
       },
       icon: const Icon(
         Icons.remove_circle_outline,
         color: Colors.yellow,
       ),
+      tooltip: AppLocalizations.t('Delete'),
     );
 
     return actionWidget;
@@ -405,7 +410,7 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
   Widget build(BuildContext context) {
     List<Widget> rightWidgets = [
       IconButton(
-        tooltip: AppLocalizations.t('Add event filter'),
+        tooltip: AppLocalizations.t('Add'),
         onPressed: () {
           eventFilterController.currentIndex = -1;
           swiperController.move(2);
@@ -413,7 +418,7 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
         icon: const Icon(Icons.add_circle_outline),
       ),
       IconButton(
-        tooltip: AppLocalizations.t('Refresh event filter'),
+        tooltip: AppLocalizations.t('Refresh'),
         onPressed: () async {
           if (eventFilterController.eventCode != null) {
             List<EventFilter> value =

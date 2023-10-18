@@ -15,7 +15,7 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/mobile_util.dart';
 import 'package:colla_chat/tool/phone_number_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
-import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
+import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';

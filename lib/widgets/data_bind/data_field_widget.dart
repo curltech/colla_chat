@@ -91,6 +91,8 @@ class PlatformDataField {
 
   final bool cancel;
 
+  final int? minLines;
+
   final int? maxLines;
 
   bool readOnly;
@@ -123,6 +125,7 @@ class PlatformDataField {
     this.textInputType = TextInputType.text,
     this.suffixIcon,
     this.cancel = false,
+    this.minLines = 1,
     this.maxLines = 4,
     this.readOnly = false,
     this.options,
@@ -376,7 +379,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
       focusNode: widget.focusNode,
       keyboardType: columnFieldDef.textInputType,
       maxLines: columnFieldDef.maxLines,
-      minLines: 1,
+      minLines: columnFieldDef.minLines,
       readOnly: columnFieldDef.readOnly,
       labelText: label,
       prefixIcon: _buildIcon(),

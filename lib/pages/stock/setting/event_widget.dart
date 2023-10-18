@@ -12,7 +12,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
-import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
+import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -125,7 +125,7 @@ class _EventWidgetState extends State<EventWidget>
         IconButton(
           onPressed: () async {
             bool? confirm = await DialogUtil.confirm(context,
-                content: 'Do you want to delete event?');
+                content: 'Do you confirm to delete event?');
             if (confirm == true) {
               Event? e = await remoteEventService.sendDelete(entity: event);
               if (e != null) {
@@ -137,6 +137,7 @@ class _EventWidgetState extends State<EventWidget>
             Icons.remove_circle_outline,
             color: Colors.yellow,
           ),
+          tooltip: AppLocalizations.t('Delete'),
         ),
         IconButton(
           onPressed: () async {
@@ -148,6 +149,7 @@ class _EventWidgetState extends State<EventWidget>
             Icons.filter,
             color: Colors.yellow,
           ),
+          tooltip: AppLocalizations.t('EventFilter'),
         ),
         IconButton(
           onPressed: () async {
@@ -159,6 +161,7 @@ class _EventWidgetState extends State<EventWidget>
             Icons.event,
             color: Colors.yellow,
           ),
+          tooltip: AppLocalizations.t('InoutEvent'),
         )
       ],
     );
@@ -239,7 +242,7 @@ class _EventWidgetState extends State<EventWidget>
   Widget build(BuildContext context) {
     List<Widget> rightWidgets = [
       IconButton(
-        tooltip: AppLocalizations.t('Add event'),
+        tooltip: AppLocalizations.t('Add'),
         onPressed: () {
           eventController.currentIndex = -1;
           swiperController.move(1);
@@ -248,7 +251,7 @@ class _EventWidgetState extends State<EventWidget>
         icon: const Icon(Icons.add_circle_outline),
       ),
       IconButton(
-        tooltip: AppLocalizations.t('Refresh event'),
+        tooltip: AppLocalizations.t('Refresh'),
         onPressed: () async {
           List<Event> value = await remoteEventService.sendFindAll();
           eventController.replaceAll(value);

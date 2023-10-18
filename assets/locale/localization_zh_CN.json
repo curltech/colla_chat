@@ -562,5 +562,22 @@
   "UpdateStock": "更新股票数据",
   "tsCode": "股票代码",
   "startDate": "开始日期",
-  "endDate": "结束日期"
+  "endDate": "结束日期",
+  "Event": "事件",
+  "Do you confirm to delete event?": "删除事件吗?",
+  "InoutEvent": "买卖事件",
+  "FilterCond": "过滤条件",
+  "Do you confirm to delete filterCond?": "删除过滤器条件吗?",
+  "EventFilter": "事件过滤器",
+  "LocalEventFilter": "定制事件过滤器",
+  "Do you confirm to delete event filter?": "删除过滤器吗?",
+  "Id": "编号",
+  "EventCode": "事件编号",
+  "EventName": "事件名",
+  "CondCode": "条件代码",
+  "CondName": "条件名",
+  "CondAlias": "条件别名",
+  "CondContent": "条件内容",
+  "CondParas": "条件参数",
+  "Descr": "描述"
 }

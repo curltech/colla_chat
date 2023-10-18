@@ -1,10 +1,10 @@
 import 'package:card_swiper/card_swiper.dart';
-import 'package:colla_chat/entity/stock/filter_cond.dart';
+import 'package:colla_chat/entity/stock/event_filter.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/stock/filter_cond.dart';
+import 'package:colla_chat/service/stock/event_filter.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -13,33 +13,61 @@ import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
+class LocalEventFilterController extends DataListController<EventFilter> {
+  String? _eventCode;
+  String? _eventName;
+
+  String? get eventCode {
+    return _eventCode;
+  }
+
+  String? get eventName {
+    return _eventName;
+  }
+
+  setEventCode(String? eventCode, {String? eventName}) async {
+    if (_eventCode != eventCode) {
+      _eventCode = eventCode;
+      _eventName = eventName;
+      if (_eventCode != null) {
+        List<EventFilter> eventFilters = await eventFilterService
+            .find(where: 'eventCode=?', whereArgs: [_eventCode!]);
+        replaceAll(eventFilters);
+      } else {
+        data.clear();
+      }
+      notifyListeners();
+    }
+  }
+}
+
 /// 自选股的控制器
-final DataListController<FilterCond> filterCondController =
-    DataListController<FilterCond>();
+final LocalEventFilterController localEventFilterController =
+    LocalEventFilterController();
 
 ///自选股和分组的查询界面
-class FilterCondWidget extends StatefulWidget with TileDataMixin {
-  FilterCondWidget({Key? key}) : super(key: key);
+class LocalEventFilterWidget extends StatefulWidget with TileDataMixin {
+  LocalEventFilterWidget({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _FilterCondWidgetState();
+  State<StatefulWidget> createState() => _LocalEventFilterWidgetState();
 
   @override
   bool get withLeading => true;
 
   @override
-  String get routeName => 'filter_cond';
+  String get routeName => 'local_event_filter';
 
   @override
-  IconData get iconData => Icons.event_available_outlined;
+  IconData get iconData => Icons.filter;
 
   @override
-  String get title => 'FilterCond';
+  String get title => 'LocalEventFilter';
 }
 
-class _FilterCondWidgetState extends State<FilterCondWidget>
+class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
     with TickerProviderStateMixin {
-  final List<PlatformDataField> filterCondDataField = [
+  final List<PlatformDataField> eventFilterDataField = [
     PlatformDataField(
         name: 'id',
         label: 'Id',
@@ -49,35 +77,43 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
           color: myself.primary,
         )),
     PlatformDataField(
-        name: 'cond_code',
-        label: 'CondCode',
+        name: 'eventCode',
+        label: 'EventCode',
         prefixIcon: Icon(
           Icons.code,
           color: myself.primary,
         )),
     PlatformDataField(
-        name: 'cond_type',
-        label: 'CondType',
-        prefixIcon: Icon(
-          Icons.type_specimen_outlined,
-          color: myself.primary,
-        )),
-    PlatformDataField(
-        name: 'name',
-        label: 'Name',
+        name: 'eventName',
+        label: 'EventName',
         prefixIcon: Icon(
           Icons.person,
           color: myself.primary,
         )),
     PlatformDataField(
-        name: 'content',
-        label: 'Content',
+        name: 'condCode',
+        label: 'CondCode',
+        prefixIcon: Icon(
+          Icons.control_point_duplicate_outlined,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'condName',
+        label: 'condName',
+        prefixIcon: Icon(
+          Icons.person,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'condContent',
+        label: 'CondContent',
+        minLines : 4,
         prefixIcon: Icon(
           Icons.content_paste,
           color: myself.primary,
         )),
     PlatformDataField(
-        name: 'cond_paras',
+        name: 'condParas',
         label: 'CondParas',
         prefixIcon: Icon(
           Icons.attribution_outlined,
@@ -92,36 +128,39 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
         )),
   ];
   late final FormInputController controller =
-      FormInputController(filterCondDataField);
+      FormInputController(eventFilterDataField);
   SwiperController swiperController = SwiperController();
   int index = 0;
-  late final List<PlatformDataColumn> filterCondColumns = [
+  late final List<PlatformDataColumn> eventFilterColumns = [
+    PlatformDataColumn(
+      label: '事件代码',
+      name: 'eventCode',
+      width: 90,
+    ),
+    PlatformDataColumn(
+      label: '事件名',
+      name: 'eventName',
+      width: 80,
+    ),
     PlatformDataColumn(
       label: '条件代码',
       name: 'condCode',
-      width: 150,
+      width: 130,
     ),
     PlatformDataColumn(
       label: '条件名',
-      name: 'name',
-      width: 200,
+      name: 'condName',
+      width: 180,
     ),
     PlatformDataColumn(
-      label: '条件类型',
-      name: 'condType',
-      width: 100,
-      onSort: (int index, bool ascending) =>
-          filterCondController.sort((t) => t.condType, index, ascending),
-    ),
-    PlatformDataColumn(
-      label: '条件公式',
-      name: 'content',
-      width: 250,
+      label: '条件内容',
+      name: 'condContent',
+      width: 270,
     ),
     PlatformDataColumn(
       label: '条件参数',
       name: 'condParas',
-      width: 200,
+      width: 100,
     ),
     PlatformDataColumn(
         label: '',
@@ -132,25 +171,22 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
 
   @override
   initState() {
+    localEventFilterController.addListener(_update);
     super.initState();
-    filterCondController.addListener(_update);
   }
 
   _update() {
     setState(() {});
   }
 
-  Widget _buildActionWidget(int index, dynamic filterCond) {
+  Widget _buildActionWidget(int index, dynamic eventFilter) {
     Widget actionWidget = IconButton(
       onPressed: () async {
         bool? confirm = await DialogUtil.confirm(context,
-            content: 'Do you confirm to delete filterCond?');
+            content: 'Do you confirm to delete event filter?');
         if (confirm == true) {
-          FilterCond? e =
-              await remoteFilterCondService.sendDelete(entity: filterCond);
-          if (e != null) {
-            filterCondController.delete(index: index);
-          }
+          eventFilterService.delete(entity: eventFilter);
+          localEventFilterController.delete(index: index);
         }
       },
       icon: const Icon(
@@ -164,29 +200,36 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
   }
 
   _onDoubleTap(int index) {
-    filterCondController.currentIndex = index;
+    localEventFilterController.currentIndex = index;
     swiperController.move(1);
   }
 
-  Widget _buildFilterCondListView(BuildContext context) {
-    return BindingDataTable2<FilterCond>(
+  Widget _buildEventFilterListView(BuildContext context) {
+    return BindingDataTable2<EventFilter>(
       key: UniqueKey(),
       showCheckboxColumn: false,
       horizontalMargin: 10.0,
       columnSpacing: 0.0,
       fixedLeftColumns: 1,
-      platformDataColumns: filterCondColumns,
-      controller: filterCondController,
+      platformDataColumns: eventFilterColumns,
+      controller: localEventFilterController,
       onDoubleTap: _onDoubleTap,
     );
   }
 
-  _buildFilterCondEditView(BuildContext context) {
-    FilterCond? filterCond = filterCondController.current;
-    if (filterCond != null) {
-      controller.setValues(filterCond.toRemoteJson());
+  _buildEventFilterEditView(BuildContext context) {
+    EventFilter? eventFilter = localEventFilterController.current;
+    if (eventFilter != null) {
+      controller.setValues(eventFilter.toJson());
     } else {
-      controller.setValues({});
+      String? eventCode = localEventFilterController.eventCode;
+      String? eventName = localEventFilterController.eventName;
+      Map<String, dynamic> json = {};
+      if (eventCode != null && eventName != null) {
+        json['eventCode'] = eventCode;
+        json['eventName'] = eventName;
+      }
+      controller.setValues(json);
     }
     List<FormButtonDef> formButtonDefs = [
       FormButtonDef(
@@ -204,6 +247,7 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
         padding: const EdgeInsets.all(10.0),
         child: FormInputWidget(
           height: appDataProvider.portraitSize.height * 0.7,
+          spacing: 5.0,
           controller: controller,
           formButtonDefs: formButtonDefs,
         ));
@@ -212,23 +256,21 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
   }
 
   _onOk(Map<String, dynamic> values) async {
-    FilterCond currentFilterCond = FilterCond.fromRemoteJson(values);
-    if (filterCondController.currentIndex == -1) {
-      FilterCond? filterCond =
-          await remoteFilterCondService.sendInsert(currentFilterCond);
-      if (filterCond != null) {
-        filterCondController.insert(0, filterCond);
+    EventFilter currentFilterCond = EventFilter.fromJson(values);
+    if (localEventFilterController.currentIndex == -1) {
+      await eventFilterService.insert(currentFilterCond);
+      if (currentFilterCond.id != null) {
+        localEventFilterController.insert(0, currentFilterCond);
       }
     } else {
-      FilterCond? filterCond =
-          await remoteFilterCondService.sendUpdate(currentFilterCond);
-      if (filterCond != null) {
-        filterCondController.replace(filterCond);
+      int count = await eventFilterService.update(currentFilterCond);
+      if (count > 0) {
+        localEventFilterController.replace(currentFilterCond);
       }
     }
     if (mounted) {
       DialogUtil.info(context,
-          content: AppLocalizations.t('Event has save completely'));
+          content: AppLocalizations.t('EventFilter has save completely'));
     }
   }
 
@@ -242,23 +284,27 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
       IconButton(
         tooltip: AppLocalizations.t('Add'),
         onPressed: () {
-          filterCondController.currentIndex = -1;
+          localEventFilterController.currentIndex = -1;
           swiperController.move(1);
-          _buildFilterCondEditView(context);
         },
         icon: const Icon(Icons.add_circle_outline),
       ),
       IconButton(
         tooltip: AppLocalizations.t('Refresh'),
         onPressed: () async {
-          List<FilterCond> value = await remoteFilterCondService.sendFindAll();
-          filterCondController.replaceAll(value);
+          if (localEventFilterController.eventCode != null) {
+            List<EventFilter> value = await eventFilterService.find(
+                where: 'eventCode=?',
+                whereArgs: [localEventFilterController.eventCode!]);
+            localEventFilterController.replaceAll(value);
+          }
         },
         icon: const Icon(Icons.refresh_outlined),
       ),
     ];
     return AppBarView(
-        title: widget.title,
+        title:
+            '${localEventFilterController.eventCode ?? ''}-${localEventFilterController.eventName ?? ''}',
         withLeading: true,
         rightWidgets: rightWidgets,
         child: Swiper(
@@ -266,9 +312,9 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
           itemCount: 2,
           index: index,
           itemBuilder: (BuildContext context, int index) {
-            Widget view = _buildFilterCondListView(context);
+            Widget view = _buildEventFilterListView(context);
             if (index == 1) {
-              view = _buildFilterCondEditView(context);
+              view = _buildEventFilterEditView(context);
             }
             return view;
           },
@@ -280,7 +326,7 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
 
   @override
   void dispose() {
-    filterCondController.removeListener(_update);
+    localEventFilterController.removeListener(_update);
     super.dispose();
   }
 }
