@@ -1,11 +1,14 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/entity/stock/event_filter.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/stock/trade/in_out_event_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/event_filter.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
@@ -90,24 +93,24 @@ class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
           Icons.person,
           color: myself.primary,
         )),
-    PlatformDataField(
-        name: 'condCode',
-        label: 'CondCode',
-        prefixIcon: Icon(
-          Icons.control_point_duplicate_outlined,
-          color: myself.primary,
-        )),
-    PlatformDataField(
-        name: 'condName',
-        label: 'condName',
-        prefixIcon: Icon(
-          Icons.person,
-          color: myself.primary,
-        )),
+    // PlatformDataField(
+    //     name: 'condCode',
+    //     label: 'CondCode',
+    //     prefixIcon: Icon(
+    //       Icons.control_point_duplicate_outlined,
+    //       color: myself.primary,
+    //     )),
+    // PlatformDataField(
+    //     name: 'condName',
+    //     label: 'CondName',
+    //     prefixIcon: Icon(
+    //       Icons.person,
+    //       color: myself.primary,
+    //     )),
     PlatformDataField(
         name: 'condContent',
         label: 'CondContent',
-        minLines : 4,
+        minLines: 4,
         prefixIcon: Icon(
           Icons.content_paste,
           color: myself.primary,
@@ -142,16 +145,16 @@ class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
       name: 'eventName',
       width: 80,
     ),
-    PlatformDataColumn(
-      label: '条件代码',
-      name: 'condCode',
-      width: 130,
-    ),
-    PlatformDataColumn(
-      label: '条件名',
-      name: 'condName',
-      width: 180,
-    ),
+    // PlatformDataColumn(
+    //   label: '条件代码',
+    //   name: 'condCode',
+    //   width: 130,
+    // ),
+    // PlatformDataColumn(
+    //   label: '条件名',
+    //   name: 'condName',
+    //   width: 180,
+    // ),
     PlatformDataColumn(
       label: '条件内容',
       name: 'condContent',
@@ -180,20 +183,36 @@ class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
   }
 
   Widget _buildActionWidget(int index, dynamic eventFilter) {
-    Widget actionWidget = IconButton(
-      onPressed: () async {
-        bool? confirm = await DialogUtil.confirm(context,
-            content: 'Do you confirm to delete event filter?');
-        if (confirm == true) {
-          eventFilterService.delete(entity: eventFilter);
-          localEventFilterController.delete(index: index);
-        }
-      },
-      icon: const Icon(
-        Icons.remove_circle_outline,
-        color: Colors.yellow,
-      ),
-      tooltip: AppLocalizations.t('Delete'),
+    Widget actionWidget = Row(
+      children: [
+        IconButton(
+          onPressed: () async {
+            bool? confirm = await DialogUtil.confirm(context,
+                content: 'Do you confirm to delete event filter?');
+            if (confirm == true) {
+              eventFilterService.delete(entity: eventFilter);
+              localEventFilterController.delete(index: index);
+            }
+          },
+          icon: const Icon(
+            Icons.remove_circle_outline,
+            color: Colors.yellow,
+          ),
+          tooltip: AppLocalizations.t('Delete'),
+        ),
+        IconButton(
+          onPressed: () async {
+            await inoutEventController.setEventCode(eventFilter.eventCode,
+                eventName: eventFilter.eventName);
+            indexWidgetProvider.push('in_out_event');
+          },
+          icon: const Icon(
+            Icons.event,
+            color: Colors.yellow,
+          ),
+          tooltip: AppLocalizations.t('InoutEvent'),
+        )
+      ],
     );
 
     return actionWidget;
@@ -238,6 +257,11 @@ class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
             _onCancel(values);
           }),
       FormButtonDef(
+          label: 'Copy',
+          onTap: (Map<String, dynamic> values) {
+            _onCopy(values);
+          }),
+      FormButtonDef(
           label: 'Ok',
           onTap: (Map<String, dynamic> values) {
             _onOk(values);
@@ -257,21 +281,23 @@ class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
 
   _onOk(Map<String, dynamic> values) async {
     EventFilter currentFilterCond = EventFilter.fromJson(values);
-    if (localEventFilterController.currentIndex == -1) {
+    if (currentFilterCond.id == null) {
       await eventFilterService.insert(currentFilterCond);
       if (currentFilterCond.id != null) {
         localEventFilterController.insert(0, currentFilterCond);
       }
     } else {
-      int count = await eventFilterService.update(currentFilterCond);
-      if (count > 0) {
-        localEventFilterController.replace(currentFilterCond);
-      }
+      await eventFilterService.update(currentFilterCond);
     }
     if (mounted) {
       DialogUtil.info(context,
           content: AppLocalizations.t('EventFilter has save completely'));
     }
+  }
+
+  _onCopy(Map<String, dynamic> values) async {
+    controller.setValue('id', null);
+    localEventFilterController.currentIndex = -1;
   }
 
   _onCancel(Map<String, dynamic> values) async {
@@ -297,14 +323,16 @@ class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
                 where: 'eventCode=?',
                 whereArgs: [localEventFilterController.eventCode!]);
             localEventFilterController.replaceAll(value);
+          } else {
+            List<EventFilter> value = await eventFilterService.findAll();
+            localEventFilterController.replaceAll(value);
           }
         },
         icon: const Icon(Icons.refresh_outlined),
       ),
     ];
     return AppBarView(
-        title:
-            '${localEventFilterController.eventCode ?? ''}-${localEventFilterController.eventName ?? ''}',
+        title: widget.title,
         withLeading: true,
         rightWidgets: rightWidgets,
         child: Swiper(

@@ -1,16 +1,22 @@
 import 'package:colla_chat/entity/stock/day_line.dart';
+import 'package:colla_chat/entity/stock/event_filter.dart';
 import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/stock/me/dayline_chart_widget.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/day_line.dart';
+import 'package:colla_chat/service/stock/event_filter.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
 class InoutEventController extends DataListController<DayLine> {
@@ -62,9 +68,47 @@ class InoutEventWidget extends StatefulWidget with TileDataMixin {
 class _InoutEventWidgetState extends State<InoutEventWidget>
     with TickerProviderStateMixin {
   late final List<PlatformDataColumn> inoutEventColumns;
+  late final FormInputController searchController;
+  ExpansionTileController expansionTileController = ExpansionTileController();
 
   @override
   initState() {
+    final List<PlatformDataField> searchDataField = [
+      PlatformDataField(
+          name: 'tsCode',
+          label: 'TsCode',
+          prefixIcon: Icon(
+            Icons.perm_identity_outlined,
+            color: myself.primary,
+          )),
+      PlatformDataField(
+          name: 'tradeDate',
+          label: 'TradeDate',
+          dataType: DataType.int,
+          textInputType: TextInputType.number,
+          prefixIcon: Icon(
+            Icons.code,
+            color: myself.primary,
+          )),
+      PlatformDataField(
+          name: 'startDate',
+          label: 'StartDate',
+          dataType: DataType.int,
+          textInputType: TextInputType.number,
+          prefixIcon: Icon(
+            Icons.type_specimen_outlined,
+            color: myself.primary,
+          )),
+      PlatformDataField(
+          name: 'endDate',
+          label: 'EndDate',
+          dataType: DataType.int,
+          textInputType: TextInputType.number,
+          prefixIcon: Icon(
+            Icons.person,
+            color: myself.primary,
+          )),
+    ];
     inoutEventColumns = [
       PlatformDataColumn(
         label: '股票代码',
@@ -99,7 +143,7 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
           inputType: InputType.custom,
           buildSuffix: _buildActionWidget),
     ];
-
+    searchController = FormInputController(searchDataField);
     inoutEventController.addListener(_update);
     super.initState();
   }
@@ -133,6 +177,46 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
     inoutEventController.currentIndex = index;
   }
 
+  /// 构建搜索条件
+  _buildSearchView(BuildContext context) {
+    int tradeDate = DateUtil.formatDateInt(DateUtil.currentDateTime());
+    searchController.setValues({'tradeDate': tradeDate});
+    List<FormButtonDef> formButtonDefs = [
+      FormButtonDef(
+          label: 'Ok',
+          onTap: (Map<String, dynamic> values) {
+            _onOk(values);
+          }),
+    ];
+    var formInputWidget = Container(
+        padding: const EdgeInsets.all(10.0),
+        child: FormInputWidget(
+          height: appDataProvider.portraitSize.height * 0.4,
+          spacing: 5.0,
+          controller: searchController,
+          formButtonDefs: formButtonDefs,
+        ));
+
+    return formInputWidget;
+  }
+
+  _onOk(Map<String, dynamic> values) async {
+    String? tsCode = values['tsCode'];
+    int? tradeDate = values['tradeDate'];
+    int? startDate = values['startDate'];
+    int? endDate = values['endDate'];
+    refresh(
+        tsCode: tsCode,
+        tradeDate: tradeDate,
+        startDate: startDate,
+        endDate: endDate);
+    expansionTileController.collapse();
+    if (mounted) {
+      DialogUtil.info(context,
+          content: AppLocalizations.t('Inout search completely'));
+    }
+  }
+
   Widget _buildInOutEventListView(BuildContext context) {
     return BindingDataTable2<DayLine>(
       key: UniqueKey(),
@@ -145,32 +229,54 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
     );
   }
 
-  refresh() async {
+  refresh(
+      {String? tsCode, int? tradeDate, int? startDate, int? endDate}) async {
     String? eventCode = inoutEventController.eventCode;
-    if (eventCode != null) {
-      int tradeDate = DateUtil.formatDateInt(DateUtil.currentDateTime());
-      List<DayLine> dayLines =
-          await remoteDayLineService.sendFindInout(eventCode, tradeDate: tradeDate);
+    if (eventCode == null) {
+      return;
+    }
+    //先寻找本地的定制事件代码
+    EventFilter? eventFilter = await eventFilterService
+        .findOne(where: 'eventCode=?', whereArgs: [eventCode]);
+    if (eventFilter != null) {
+      String? filterContent = eventFilter.condContent;
+      String? filterParas = eventFilter.condParas;
+      if (filterContent != null) {
+        List<DayLine> dayLines = await remoteDayLineService.sendFindFlexPoint(
+            filterContent,
+            tsCode: tsCode,
+            tradeDate: tradeDate,
+            startDate: startDate,
+            endDate: endDate,
+            filterParas: filterParas);
+        inoutEventController.replaceAll(dayLines);
+      }
+    } else {
+      List<DayLine> dayLines = await remoteDayLineService.sendFindInout(
+          eventCode,
+          tsCode: tsCode,
+          tradeDate: tradeDate,
+          startDate: startDate,
+          endDate: endDate);
       inoutEventController.replaceAll(dayLines);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> rightWidgets = [
-      IconButton(
-        tooltip: AppLocalizations.t('Refresh inout event'),
-        onPressed: () async {
-          await refresh();
-        },
-        icon: const Icon(Icons.refresh_outlined),
-      ),
-    ];
+    List<Widget> rightWidgets = [];
     return AppBarView(
         title: widget.title,
         withLeading: true,
         rightWidgets: rightWidgets,
-        child: _buildInOutEventListView(context));
+        child: Column(children: [
+          ExpansionTile(
+            title: Text(AppLocalizations.t('Search')),
+            controller: expansionTileController,
+            children: [_buildSearchView(context)],
+          ),
+          Expanded(child: _buildInOutEventListView(context))
+        ]));
   }
 
   @override

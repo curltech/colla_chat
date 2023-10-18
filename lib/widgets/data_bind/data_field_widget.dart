@@ -147,14 +147,14 @@ class DataFieldController with ChangeNotifier {
   dynamic _flag;
   bool _changed = false;
 
-  //文本框的值
-  TextEditingController? _controller;
+  //文本框的时候是TextEditingController，其他的时候是普通的ValueNotifier
+  ValueNotifier<dynamic>? _controller;
 
   DataFieldController(
     this.dataField, {
     dynamic value,
     dynamic flag,
-    TextEditingController? controller,
+    ValueNotifier<dynamic>? controller,
   }) {
     _value = value;
     _flag = flag;
@@ -167,7 +167,7 @@ class DataFieldController with ChangeNotifier {
     if (controller != null) {
       if (dataField.inputType == InputType.text ||
           dataField.inputType == InputType.password) {
-        String valueStr = controller.text;
+        String valueStr = (controller as TextEditingController).text;
         if (valueStr.isNotEmpty) {
           if (dataField.dataType == DataType.int) {
             _value = int.parse(valueStr);
@@ -213,9 +213,18 @@ class DataFieldController with ChangeNotifier {
       _changed = true;
     }
     if (controller != null) {
-      if (valueStr != controller.text) {
-        controller.text = valueStr;
-        _changed = true;
+      if (controller is TextEditingController) {
+        String v = controller.text;
+        if (valueStr != v) {
+          controller.text = valueStr;
+          _changed = true;
+        }
+      } else {
+        dynamic v = controller.value;
+        if (valueStr != v) {
+          controller.value = valueStr;
+          _changed = true;
+        }
       }
     }
   }
@@ -241,18 +250,22 @@ class DataFieldController with ChangeNotifier {
     }
   }
 
-  TextEditingController? get controller {
+  ValueNotifier<dynamic>? get controller {
     return _controller;
   }
 
-  set controller(TextEditingController? controller) {
+  set controller(ValueNotifier<dynamic>? controller) {
     _controller = controller;
   }
 
   clear() {
     var controller = _controller;
     if (controller != null) {
-      controller.clear();
+      if (controller is TextEditingController) {
+        controller.clear();
+      } else {
+        controller.value = null;
+      }
     } else {
       if (dataField.inputType == InputType.label) {
       } else {
@@ -320,10 +333,11 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
   }
 
   Widget _buildLabel(BuildContext context) {
-    widget.controller.controller = null;
+    ValueNotifier<dynamic>? controller = widget.controller.controller;
+    controller ??= ValueNotifier<dynamic>(null);
+    widget.controller.controller = controller;
     String label = widget.controller.dataField.label;
     label = '${AppLocalizations.t(label)}:';
-    final value = widget.controller.value ?? '';
     return Container(
         padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 14.0),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -336,13 +350,20 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
             width: 10.0,
           ),
           Expanded(
-              child: CommonAutoSizeText(value.toString(),
-                  textAlign: TextAlign.start))
+              child: ValueListenableBuilder(
+            valueListenable: controller,
+            builder: (BuildContext context, value, Widget? child) {
+              value ??= '';
+              return CommonAutoSizeText(value.toString(),
+                  textAlign: TextAlign.start);
+            },
+          )),
         ]));
   }
 
   Widget _buildTextFormField(BuildContext context) {
-    TextEditingController? controller = widget.controller.controller;
+    TextEditingController? controller =
+        widget.controller.controller as TextEditingController?;
     controller ??= TextEditingController();
     final value = widget.controller.value;
     final valueStr = value == null ? '' : value.toString();
@@ -352,10 +373,10 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
             offset: valueStr.length, affinity: TextAffinity.downstream)));
     widget.controller.controller = controller;
 
-    var columnFieldDef = widget.controller.dataField;
-    var suffixIcon = columnFieldDef.suffixIcon;
+    var dataFieldDef = widget.controller.dataField;
+    var suffixIcon = dataFieldDef.suffixIcon;
     Widget? suffix;
-    if (columnFieldDef.cancel) {
+    if (dataFieldDef.cancel) {
       suffix = controller.text.isNotEmpty
           ? IconButton(
               //如果文本长度不为空则显示清除按钮
@@ -373,26 +394,27 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
         suffix = null;
       }
     }
-    String label = AppLocalizations.t(columnFieldDef.label);
+    String label = AppLocalizations.t(dataFieldDef.label);
     var textFormField = CommonTextFormField(
       controller: controller,
       focusNode: widget.focusNode,
-      keyboardType: columnFieldDef.textInputType,
-      maxLines: columnFieldDef.maxLines,
-      minLines: columnFieldDef.minLines,
-      readOnly: columnFieldDef.readOnly,
+      keyboardType: dataFieldDef.textInputType,
+      maxLines: dataFieldDef.maxLines,
+      minLines: dataFieldDef.minLines,
+      readOnly: dataFieldDef.readOnly,
       labelText: label,
       prefixIcon: _buildIcon(),
       suffixIcon: suffixIcon,
       suffix: suffix,
-      hintText: columnFieldDef.hintText,
+      hintText: dataFieldDef.hintText,
     );
 
     return textFormField;
   }
 
   Widget _buildPasswordField(BuildContext context) {
-    TextEditingController? controller = widget.controller.controller;
+    TextEditingController? controller =
+        widget.controller.controller as TextEditingController?;
     controller ??= TextEditingController();
     final value = widget.controller.value;
     final valueStr = value == null ? '' : value.toString();
@@ -402,9 +424,9 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
             offset: valueStr.length, affinity: TextAffinity.downstream)));
     widget.controller.controller = controller;
 
-    var columnFieldDef = widget.controller.dataField;
+    var dataFieldDef = widget.controller.dataField;
     Widget? suffix;
-    if (columnFieldDef.cancel) {
+    if (dataFieldDef.cancel) {
       suffix = controller.text.isNotEmpty
           ? IconButton(
               //如果文本长度不为空则显示清除按钮
@@ -422,10 +444,10 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     var textFormField = CommonTextFormField(
       controller: controller,
       focusNode: widget.focusNode,
-      keyboardType: columnFieldDef.textInputType,
+      keyboardType: dataFieldDef.textInputType,
       obscureText: !pwdShow,
       maxLines: 1,
-      labelText: AppLocalizations.t(columnFieldDef.label),
+      labelText: AppLocalizations.t(dataFieldDef.label),
       prefixIcon: _buildIcon(),
       suffixIcon: IconButton(
         icon: Icon(
@@ -440,7 +462,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
         },
       ),
       suffix: suffix,
-      hintText: columnFieldDef.hintText,
+      hintText: dataFieldDef.hintText,
     );
     return textFormField;
   }
@@ -448,9 +470,9 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
   ///多个字符串选择一个，对应的字段是字符串
   Widget _buildRadioField(BuildContext context) {
     widget.controller.controller = null;
-    var columnFieldDef = widget.controller.dataField;
-    var label = columnFieldDef.label;
-    var options = columnFieldDef.options;
+    var dataFieldDef = widget.controller.dataField;
+    var label = dataFieldDef.label;
+    var options = dataFieldDef.options;
     List<Widget> children = [Text(label)];
     if (options != null && options.isNotEmpty) {
       for (var i = 0; i < options.length; ++i) {
@@ -476,9 +498,9 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
   ///多个字符串选择一个，对应的字段是字符串
   Widget _buildToggleField(BuildContext context) {
     widget.controller.controller = null;
-    var columnFieldDef = widget.controller.dataField;
-    var label = columnFieldDef.label;
-    var options = columnFieldDef.options;
+    var dataFieldDef = widget.controller.dataField;
+    var label = dataFieldDef.label;
+    var options = dataFieldDef.options;
     List<String> labels = [];
     List<IconData?> icons = [];
     String? value = _getInitValue(context);
@@ -518,9 +540,9 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
   ///多个字符串选择多个，对应的字段是字符串的Set
   Widget _buildCheckboxField(BuildContext context) {
     widget.controller.controller = null;
-    var columnFieldDef = widget.controller.dataField;
-    var label = columnFieldDef.label;
-    var options = columnFieldDef.options;
+    var dataFieldDef = widget.controller.dataField;
+    var label = dataFieldDef.label;
+    var options = dataFieldDef.options;
     List<Widget> children = [Text(label)];
     if (options != null && options.isNotEmpty) {
       for (var i = 0; i < options.length; ++i) {
@@ -554,9 +576,9 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
   ///多个字符串选择多个，对应的字段是字符串的Set
   Widget _buildToggleButtonsField(BuildContext context) {
     widget.controller.controller = null;
-    var columnFieldDef = widget.controller.dataField;
-    var label = columnFieldDef.label;
-    var options = columnFieldDef.options;
+    var dataFieldDef = widget.controller.dataField;
+    var label = dataFieldDef.label;
+    var options = dataFieldDef.options;
     List<Widget> children = [];
     List<bool> isSelected = [];
     Set<String>? value = _getInitValue(context);
@@ -600,16 +622,16 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
   ///适合数据类型为bool
   Widget _buildSwitchField(BuildContext context) {
     widget.controller.controller = null;
-    var columnFieldDef = widget.controller.dataField;
+    var dataFieldDef = widget.controller.dataField;
     List<Widget> children = [];
-    var prefixIcon = columnFieldDef.prefixIcon;
+    var prefixIcon = dataFieldDef.prefixIcon;
     if (prefixIcon != null) {
       children.add(prefixIcon);
       children.add(const SizedBox(
         width: 15.0,
       ));
     }
-    var label = columnFieldDef.label;
+    var label = dataFieldDef.label;
     if (prefixIcon != null) {
       children.add(Text(AppLocalizations.t(label)));
       children.add(const SizedBox(
@@ -636,8 +658,8 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
 
   Widget _buildDropdownButton(BuildContext context) {
     widget.controller.controller = null;
-    var columnFieldDef = widget.controller.dataField;
-    var options = columnFieldDef.options;
+    var dataFieldDef = widget.controller.dataField;
+    var options = dataFieldDef.options;
     List<DropdownMenuItem<String>> children = [];
     if (options != null && options.isNotEmpty) {
       for (var i = 0; i < options.length; ++i) {
@@ -650,13 +672,13 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
       }
     }
     var dropdownButton = Row(children: [
-      CommonAutoSizeText(AppLocalizations.t(columnFieldDef.label)),
+      CommonAutoSizeText(AppLocalizations.t(dataFieldDef.label)),
       const Spacer(),
       DropdownButton<String>(
         dropdownColor: Colors.grey.withOpacity(0.7),
         underline: Container(),
-        hint: CommonAutoSizeText(
-            AppLocalizations.t(columnFieldDef.hintText ?? '')),
+        hint:
+            CommonAutoSizeText(AppLocalizations.t(dataFieldDef.hintText ?? '')),
         elevation: 0,
         value: widget.controller.value,
         items: children,
@@ -683,9 +705,9 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
         selection: TextSelection.fromPosition(TextPosition(
             offset: valueText.length, affinity: TextAffinity.downstream)));
 
-    var columnFieldDef = widget.controller.dataField;
+    var dataFieldDef = widget.controller.dataField;
     Widget? suffix;
-    if (columnFieldDef.cancel) {
+    if (dataFieldDef.cancel) {
       suffix = controller.text.isNotEmpty
           ? IconButton(
               //如果文本长度不为空则显示清除按钮
@@ -698,9 +720,9 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     var textFormField = CommonTextFormField(
       controller: controller,
       focusNode: widget.focusNode,
-      keyboardType: columnFieldDef.textInputType,
+      keyboardType: dataFieldDef.textInputType,
       readOnly: true,
-      labelText: AppLocalizations.t(columnFieldDef.label),
+      labelText: AppLocalizations.t(dataFieldDef.label),
       prefixIcon: _buildIcon(),
       suffixIcon: IconButton(
           icon: Icon(Icons.date_range, color: myself.primary),
@@ -714,7 +736,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
             widget.controller.value = value;
           }),
       suffix: suffix,
-      hintText: columnFieldDef.hintText,
+      hintText: dataFieldDef.hintText,
     );
 
     return textFormField;
@@ -780,9 +802,9 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
         selection: TextSelection.fromPosition(TextPosition(
             offset: valueText.length, affinity: TextAffinity.downstream)));
 
-    var columnFieldDef = widget.controller.dataField;
+    var dataFieldDef = widget.controller.dataField;
     Widget? suffix;
-    if (columnFieldDef.cancel) {
+    if (dataFieldDef.cancel) {
       suffix = controller.text.isNotEmpty
           ? IconButton(
               //如果文本长度不为空则显示清除按钮
@@ -795,9 +817,9 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     var textFormField = CommonTextFormField(
       controller: controller,
       focusNode: widget.focusNode,
-      keyboardType: columnFieldDef.textInputType,
+      keyboardType: dataFieldDef.textInputType,
       readOnly: true,
-      labelText: AppLocalizations.t(columnFieldDef.label),
+      labelText: AppLocalizations.t(dataFieldDef.label),
       prefixIcon: _buildIcon(),
       suffixIcon: IconButton(
           icon: Icon(Icons.access_time_filled, color: myself.primary),
@@ -811,7 +833,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
             widget.controller.value = value;
           }),
       suffix: suffix,
-      hintText: columnFieldDef.hintText,
+      hintText: dataFieldDef.hintText,
     );
 
     return textFormField;
@@ -851,9 +873,9 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
         text: valueText,
         selection: TextSelection.fromPosition(TextPosition(
             offset: valueText.length, affinity: TextAffinity.downstream)));
-    var columnFieldDef = widget.controller.dataField;
+    var dataFieldDef = widget.controller.dataField;
     Widget? suffix;
-    if (columnFieldDef.cancel) {
+    if (dataFieldDef.cancel) {
       suffix = controller.text.isNotEmpty
           ? IconButton(
               //如果文本长度不为空则显示清除按钮
@@ -866,9 +888,9 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     var textFormField = CommonTextFormField(
       controller: controller,
       focusNode: widget.focusNode,
-      keyboardType: columnFieldDef.textInputType,
+      keyboardType: dataFieldDef.textInputType,
       readOnly: true,
-      labelText: AppLocalizations.t(columnFieldDef.label),
+      labelText: AppLocalizations.t(dataFieldDef.label),
       prefixIcon: _buildIcon(),
       suffixIcon: IconButton(
           icon: Icon(Icons.date_range, color: myself.primary),
@@ -882,7 +904,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
             widget.controller.value = value;
           }),
       suffix: suffix,
-      hintText: columnFieldDef.hintText,
+      hintText: dataFieldDef.hintText,
     );
 
     return textFormField;
@@ -1008,54 +1030,54 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Widget columnFieldWidget;
+    Widget dataFieldWidget;
     var customWidget = widget.controller.dataField.customWidget;
     if (customWidget != null) {
-      columnFieldWidget = customWidget;
-      return columnFieldWidget;
+      dataFieldWidget = customWidget;
+      return dataFieldWidget;
     }
     var inputType = widget.controller.dataField.inputType;
     switch (inputType) {
       case InputType.label:
-        columnFieldWidget = _buildLabel(context);
+        dataFieldWidget = _buildLabel(context);
         break;
       case InputType.text:
-        columnFieldWidget = _buildTextFormField(context);
+        dataFieldWidget = _buildTextFormField(context);
         break;
       case InputType.password:
-        columnFieldWidget = _buildPasswordField(context);
+        dataFieldWidget = _buildPasswordField(context);
         break;
       case InputType.togglebuttons:
-        columnFieldWidget = _buildToggleButtonsField(context);
+        dataFieldWidget = _buildToggleButtonsField(context);
         break;
       case InputType.checkbox:
-        columnFieldWidget = _buildCheckboxField(context);
+        dataFieldWidget = _buildCheckboxField(context);
         break;
       case InputType.radio:
-        columnFieldWidget = _buildRadioField(context);
+        dataFieldWidget = _buildRadioField(context);
         break;
       case InputType.select:
-        columnFieldWidget = _buildDropdownButton(context);
+        dataFieldWidget = _buildDropdownButton(context);
         break;
       case InputType.toggle:
-        columnFieldWidget = _buildToggleField(context);
+        dataFieldWidget = _buildToggleField(context);
         break;
       case InputType.switcher:
-        columnFieldWidget = _buildSwitchField(context);
+        dataFieldWidget = _buildSwitchField(context);
         break;
       case InputType.date:
-        columnFieldWidget = _buildInputDate(context);
+        dataFieldWidget = _buildInputDate(context);
         break;
       case InputType.time:
-        columnFieldWidget = _buildInputTime(context);
+        dataFieldWidget = _buildInputTime(context);
         break;
       case InputType.datetime:
-        columnFieldWidget = _buildInputDateTime(context);
+        dataFieldWidget = _buildInputDateTime(context);
         break;
       default:
-        columnFieldWidget = _buildTextFormField(context);
+        dataFieldWidget = _buildTextFormField(context);
     }
-    return columnFieldWidget;
+    return dataFieldWidget;
   }
 
   @override

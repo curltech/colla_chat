@@ -110,6 +110,7 @@ class FormInputController with ChangeNotifier {
     }
   }
 
+  /// 设置字段的值，values中如果没有的字段设置为null
   setValues(Map<String, dynamic> values) {
     for (var columnFieldDef in columnFieldDefs) {
       var name = columnFieldDef.name;
@@ -177,7 +178,12 @@ class _FormInputWidgetState extends State<FormInputWidget> {
 
   @override
   initState() {
+    widget.controller.addListener(_update);
     super.initState();
+  }
+
+  _update() {
+    setState(() {});
   }
 
   ///创建KeyboardActionsConfig钩住所有的字段
@@ -227,24 +233,24 @@ class _FormInputWidgetState extends State<FormInputWidget> {
         height: widget.spacing,
       ));
       String name = columnFieldDef.name;
-      DataFieldController? columnFieldController =
+      DataFieldController? dataFieldController =
           widget.controller.controllers[name];
       dynamic value = widget.controller.getValue(name);
-      if (columnFieldController == null) {
-        columnFieldController = DataFieldController(
+      if (dataFieldController == null) {
+        dataFieldController = DataFieldController(
           columnFieldDef,
           value: value,
         );
         widget.controller
-            .setController(columnFieldDef.name, columnFieldController);
+            .setController(columnFieldDef.name, dataFieldController);
       } else {
-        columnFieldController.value = value;
+        dataFieldController.value = value;
       }
-      Widget columnFieldWidget = DataFieldWidget(
-        controller: columnFieldController,
+      Widget dataFieldWidget = DataFieldWidget(
+        controller: dataFieldController,
         focusNode: focusNodes[name],
       );
-      children.add(columnFieldWidget);
+      children.add(dataFieldWidget);
       if (i == widget.controller.columnFieldDefs.length - 1) {
         if (widget.tails != null) {
           children.addAll(widget.tails!);
@@ -350,5 +356,11 @@ class _FormInputWidgetState extends State<FormInputWidget> {
     }, create: (BuildContext context) {
       return widget.controller;
     });
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_update);
+    super.dispose();
   }
 }

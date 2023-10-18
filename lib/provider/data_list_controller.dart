@@ -123,6 +123,7 @@ class DataListController<T> with ChangeNotifier {
     }
   }
 
+  ///替换了当前的对象
   replace(T d) {
     if (_currentIndex > -1 && data.isNotEmpty) {
       data[_currentIndex] = d;
