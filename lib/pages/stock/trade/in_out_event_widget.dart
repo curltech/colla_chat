@@ -12,6 +12,7 @@ import 'package:colla_chat/service/stock/event_filter.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
@@ -236,19 +237,39 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
       return;
     }
     //先寻找本地的定制事件代码
-    EventFilter? eventFilter = await eventFilterService
-        .findOne(where: 'eventCode=?', whereArgs: [eventCode]);
-    if (eventFilter != null) {
-      String? filterContent = eventFilter.condContent;
-      String? filterParas = eventFilter.condParas;
-      if (filterContent != null) {
+    List<EventFilter> eventFilters = await eventFilterService
+        .find(where: 'eventCode=?', whereArgs: [eventCode]);
+    if (eventFilters.isNotEmpty) {
+      String? filterContents;
+      List<dynamic>? filterParas;
+      for (var eventFilter in eventFilters) {
+        String? filterContent = eventFilter.condContent;
+        if (filterContent != null) {
+          if (filterContents == null) {
+            filterContents = filterContent;
+          } else {
+            filterContents = '$filterContents and $filterContent';
+          }
+        }
+        String? condParas = eventFilter.condParas;
+        if (condParas != null) {
+          if (filterParas == null) {
+            filterParas = JsonUtil.toJson(condParas);
+          } else {
+            filterParas.addAll(JsonUtil.toJson(condParas));
+          }
+        }
+      }
+      if (filterContents != null) {
         List<DayLine> dayLines = await remoteDayLineService.sendFindFlexPoint(
-            filterContent,
+            filterContents,
             tsCode: tsCode,
             tradeDate: tradeDate,
             startDate: startDate,
             endDate: endDate,
-            filterParas: filterParas);
+            filterParas: filterParas != null
+                ? JsonUtil.toJsonString(filterParas)
+                : null);
         inoutEventController.replaceAll(dayLines);
       }
     } else {
