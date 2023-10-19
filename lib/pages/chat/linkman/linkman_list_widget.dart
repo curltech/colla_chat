@@ -6,7 +6,9 @@ import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/linkman/conference/conference_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/conference/conference_show_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/group/group_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_add_widget.dart';
 import 'package:colla_chat/platform.dart';
@@ -22,13 +24,17 @@ import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/qrcode_util.dart';
+import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
+import 'package:badges/badges.dart' as badges;
 
 final DataListController<Linkman> linkmanController =
     DataListController<Linkman>();
@@ -210,6 +216,35 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     linkmanService.linkmen.remove(linkman.peerId);
   }
 
+  Widget _buildBadge(int connectionNum, {Widget? avatarImage}) {
+    var badge = avatarImage ?? AppImage.mdAppImage;
+    badge = badges.Badge(
+      position: badges.BadgePosition.topEnd(),
+      stackFit: StackFit.loose,
+      badgeContent: ConstrainedBox(
+          constraints: const BoxConstraints(
+            minWidth: 12,
+          ),
+          child: Center(
+              child: CommonAutoSizeText('$connectionNum',
+                  style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white)))),
+      badgeStyle: badges.BadgeStyle(
+        elevation: 0.0,
+        badgeColor: connectionNum == 0 ? Colors.red : Colors.green,
+        shape: badges.BadgeShape.square,
+        borderRadius: const BorderRadius.horizontal(
+            left: Radius.circular(8), right: Radius.circular(8)),
+        padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 2.0),
+      ),
+      child: badge,
+    );
+
+    return badge;
+  }
+
   //将linkman和group数据转换从列表显示数据
   _buildLinkmanTileData() {
     var linkmen = linkmanController.data;
@@ -235,8 +270,14 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           routeName = 'chat_gpt_add';
         }
         prefix = prefix ?? AppImage.mdAppImage;
+        int connectionNum = 0;
+        List<AdvancedPeerConnection>? connections =
+            peerConnectionPool.getConnected(peerId);
+        if (connections != null && connections.isNotEmpty) {
+          connectionNum = connections.length;
+        }
         TileData tile = TileData(
-            prefix: prefix,
+            prefix: _buildBadge(connectionNum, avatarImage: prefix),
             title: name,
             subtitle: linkmanStatus,
             selected: false,
@@ -405,7 +446,10 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             title: groupName,
             subtitle: groupOwnerName,
             selected: false,
-            routeName: 'linkman_add_group');
+            onTap: (int index, String title, {String? subtitle}) {
+              groupNotifier.value = group;
+            },
+            routeName: 'group_edit');
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(
             title: 'Delete',
@@ -482,7 +526,10 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             subtitle: topic,
             selected: false,
             isThreeLine: false,
-            routeName: 'conference_add');
+            onTap: (int index, String title, {String? subtitle}) {
+              conferenceNotifier.value = conference;
+            },
+            routeName: 'conference_edit');
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(
             title: 'Delete',

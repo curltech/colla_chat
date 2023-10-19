@@ -435,7 +435,6 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
   @override
   void dispose() {
     conferenceNotifier.removeListener(_update);
-    conferenceNotifier.value = null;
     super.dispose();
   }
 }

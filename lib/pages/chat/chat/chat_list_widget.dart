@@ -302,32 +302,39 @@ class _ChatListWidgetState extends State<ChatListWidget>
     return subtitle ?? '';
   }
 
-  Widget _buildBadge(int unreadNumber, {Widget? avatarImage}) {
-    var badge = avatarImage ?? AppImage.mdAppImage;
-    if (unreadNumber > 0) {
-      badge = badges.Badge(
-        position: BadgePosition.topEnd(),
-        stackFit: StackFit.loose,
-        badgeContent: ConstrainedBox(
-            constraints: const BoxConstraints(
-              minWidth: 12,
-            ),
-            child: Center(
-                child: CommonAutoSizeText('$unreadNumber',
-                    style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white)))),
-        badgeStyle: const badges.BadgeStyle(
-          elevation: 0.0,
-          shape: badges.BadgeShape.square,
-          borderRadius: BorderRadius.horizontal(
-              left: Radius.circular(8), right: Radius.circular(8)),
-          padding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 2.0),
-        ),
-        child: badge,
-      );
+  Widget _buildBadge(int unreadNumber, {Widget? avatarImage, String? peerId}) {
+    int connectionNum = 0;
+    if (peerId != null) {
+      List<AdvancedPeerConnection>? connections =
+          peerConnectionPool.getConnected(peerId);
+      if (connections != null && connections.isNotEmpty) {
+        connectionNum = connections.length;
+      }
     }
+    var badge = avatarImage ?? AppImage.mdAppImage;
+    badge = badges.Badge(
+      position: BadgePosition.topEnd(),
+      stackFit: StackFit.loose,
+      badgeContent: ConstrainedBox(
+          constraints: const BoxConstraints(
+            minWidth: 12,
+          ),
+          child: Center(
+              child: CommonAutoSizeText('$unreadNumber',
+                  style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white)))),
+      badgeStyle: badges.BadgeStyle(
+        elevation: 0.0,
+        badgeColor: connectionNum == 0 ? Colors.red : Colors.green,
+        shape: badges.BadgeShape.square,
+        borderRadius: const BorderRadius.horizontal(
+            left: Radius.circular(8), right: Radius.circular(8)),
+        padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 2.0),
+      ),
+      child: badge,
+    );
 
     return badge;
   }
@@ -374,7 +381,8 @@ class _ChatListWidgetState extends State<ChatListWidget>
                   width: AppImageSize.mdSize,
                   height: AppImageSize.mdSize);
         }
-        var badge = _buildBadge(unreadNumber, avatarImage: avatarImage);
+        var badge =
+            _buildBadge(unreadNumber, avatarImage: avatarImage, peerId: peerId);
 
         TileData tile = _buildTile(badge, name, sendReceiveTime, subtitle,
             peerId, linkmanChatSummaryController);

@@ -465,7 +465,6 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
   @override
   void dispose() {
     groupNotifier.removeListener(_update);
-    groupNotifier.value = null;
     super.dispose();
   }
 }
