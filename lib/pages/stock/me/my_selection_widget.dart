@@ -1,5 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/stock/me/dayline_chart_widget.dart';
+import 'package:colla_chat/pages/stock/me/stock_line_chart_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/stock/share.dart';
@@ -18,10 +18,11 @@ final DataListController<dynamic> shareController =
 
 ///自选股和分组的查询界面
 class ShareSelectionWidget extends StatefulWidget with TileDataMixin {
-  final DayLineChartWidget dayLineChartWidget = const DayLineChartWidget();
+  final StockLineChartWidget stockLineChartWidget =
+      const StockLineChartWidget();
 
   ShareSelectionWidget({Key? key}) : super(key: key) {
-    indexWidgetProvider.define(dayLineChartWidget);
+    indexWidgetProvider.define(stockLineChartWidget);
   }
 
   @override
@@ -155,8 +156,8 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
           String? tsCode = dataMap['ts_code'];
           String? name = dataMap['name'];
           if (tsCode != null) {
-            multiDayLineController.put(tsCode, name!);
-            indexWidgetProvider.push('dayline_chart');
+            multiStockLineController.put(tsCode, name!);
+            indexWidgetProvider.push('stockline_chart');
           }
         },
       );

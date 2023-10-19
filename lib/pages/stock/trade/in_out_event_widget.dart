@@ -2,7 +2,7 @@ import 'package:colla_chat/entity/stock/day_line.dart';
 import 'package:colla_chat/entity/stock/event_filter.dart';
 import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/stock/me/dayline_chart_widget.dart';
+import 'package:colla_chat/pages/stock/me/stock_line_chart_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -161,8 +161,8 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
             String tsCode = dayLine.tsCode;
             Share? share = await shareService.findShare(tsCode);
             String name = share?.name ?? '';
-            multiDayLineController.put(tsCode, name);
-            indexWidgetProvider.push('dayline_chart');
+            multiStockLineController.put(tsCode, name);
+            indexWidgetProvider.push('stockline_chart');
           },
           icon: const Icon(
             Icons.filter,

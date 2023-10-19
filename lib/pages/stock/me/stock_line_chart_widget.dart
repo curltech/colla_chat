@@ -8,23 +8,23 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:candlesticks/candlesticks.dart';
 
-class DayLineController extends DataListController<dynamic> {
+class StockLineController extends DataListController<dynamic> {
   String tsCode;
   String name;
   int lineType;
 
   int? count;
 
-  DayLineController(this.tsCode, this.name, {this.lineType = 101});
+  StockLineController(this.tsCode, this.name, {this.lineType = 101});
 }
 
-class MultiDayLineController with ChangeNotifier {
+class MultiStockLineController with ChangeNotifier {
   String? _tsCode;
 
   int _lineType = 101;
 
   /// 增加自选股的查询结果控制器
-  final Map<String, Map<int, DayLineController>> dayLineControllers = {};
+  final Map<String, Map<int, StockLineController>> stockLineControllers = {};
 
   /// 当前股票代码
   String? get tsCode {
@@ -52,62 +52,62 @@ class MultiDayLineController with ChangeNotifier {
   }
 
   /// 当前股票控制器
-  DayLineController? get dayLineController {
-    return dayLineControllers[_tsCode]?[_lineType];
+  StockLineController? get stockLineController {
+    return stockLineControllers[_tsCode]?[_lineType];
   }
 
   /// 加入股票代码和控制器，并设置为当前
   put(String tsCode, String name) {
     if (tsCode != _tsCode) {
       _tsCode = tsCode;
-      if (!dayLineControllers.containsKey(tsCode)) {
-        dayLineControllers[tsCode] = {};
-        dayLineControllers[tsCode]?[101] =
-            DayLineController(tsCode, name, lineType: 101);
-        dayLineControllers[tsCode]?[102] =
-            DayLineController(tsCode, name, lineType: 102);
-        dayLineControllers[tsCode]?[103] =
-            DayLineController(tsCode, name, lineType: 103);
-        dayLineControllers[tsCode]?[104] =
-            DayLineController(tsCode, name, lineType: 104);
-        dayLineControllers[tsCode]?[105] =
-            DayLineController(tsCode, name, lineType: 105);
-        dayLineControllers[tsCode]?[106] =
-            DayLineController(tsCode, name, lineType: 106);
+      if (!stockLineControllers.containsKey(tsCode)) {
+        stockLineControllers[tsCode] = {};
+        stockLineControllers[tsCode]?[101] =
+            StockLineController(tsCode, name, lineType: 101);
+        stockLineControllers[tsCode]?[102] =
+            StockLineController(tsCode, name, lineType: 102);
+        stockLineControllers[tsCode]?[103] =
+            StockLineController(tsCode, name, lineType: 103);
+        stockLineControllers[tsCode]?[104] =
+            StockLineController(tsCode, name, lineType: 104);
+        stockLineControllers[tsCode]?[105] =
+            StockLineController(tsCode, name, lineType: 105);
+        stockLineControllers[tsCode]?[106] =
+            StockLineController(tsCode, name, lineType: 106);
       }
       notifyListeners();
     }
   }
 
   remove(String tsCode) {
-    if (dayLineControllers.containsKey(tsCode)) {
-      dayLineControllers.remove(tsCode);
+    if (stockLineControllers.containsKey(tsCode)) {
+      stockLineControllers.remove(tsCode);
     }
   }
 }
 
-final MultiDayLineController multiDayLineController = MultiDayLineController();
+final MultiStockLineController multiStockLineController = MultiStockLineController();
 
-class DayLineChartWidget extends StatefulWidget with TileDataMixin {
-  const DayLineChartWidget({Key? key}) : super(key: key);
+class StockLineChartWidget extends StatefulWidget with TileDataMixin {
+  const StockLineChartWidget({Key? key}) : super(key: key);
 
   @override
-  State createState() => _DayLineChartWidgetState();
+  State createState() => _StockLineChartWidgetState();
 
   @override
   bool get withLeading => true;
 
   @override
-  String get routeName => 'dayline_chart';
+  String get routeName => 'stockline_chart';
 
   @override
   IconData get iconData => Icons.insert_chart_outlined;
 
   @override
-  String get title => 'DayLineChart';
+  String get title => 'StockLineChart';
 }
 
-class _DayLineChartWidgetState extends State<DayLineChartWidget> {
+class _StockLineChartWidgetState extends State<StockLineChartWidget> {
   List<Indicator> indicators = [
     MovingAverageIndicator(
       length: 5,
@@ -130,7 +130,7 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
 
   @override
   void initState() {
-    multiDayLineController.addListener(_update);
+    multiStockLineController.addListener(_update);
     loadMoreCandles();
     super.initState();
   }
@@ -140,8 +140,8 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
   }
 
   Future<void> loadMoreCandles() async {
-    DayLineController? dayLineController =
-        multiDayLineController.dayLineController;
+    StockLineController? dayLineController =
+        multiStockLineController.stockLineController;
     if (dayLineController == null) {
       candles.clear();
       return;
@@ -216,11 +216,11 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
       actions: <ToolBarAction>[
         ToolBarAction(
           onPressed: () {
-            multiDayLineController.lineType = 101;
+            multiStockLineController.lineType = 101;
           },
           child: Icon(
             Icons.calendar_view_day_outlined,
-            color: multiDayLineController.lineType == 101
+            color: multiStockLineController.lineType == 101
                 ? myself.primary
                 : isDark
                     ? Colors.white
@@ -229,11 +229,11 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
         ),
         ToolBarAction(
           onPressed: () {
-            multiDayLineController.lineType = 102;
+            multiStockLineController.lineType = 102;
           },
           child: Icon(
             Icons.calendar_view_week_outlined,
-            color: multiDayLineController.lineType == 102
+            color: multiStockLineController.lineType == 102
                 ? myself.primary
                 : isDark
                     ? Colors.white
@@ -242,11 +242,11 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
         ),
         ToolBarAction(
           onPressed: () {
-            multiDayLineController.lineType = 103;
+            multiStockLineController.lineType = 103;
           },
           child: Icon(
             Icons.calendar_view_month_outlined,
-            color: multiDayLineController.lineType == 103
+            color: multiStockLineController.lineType == 103
                 ? myself.primary
                 : isDark
                     ? Colors.white
@@ -255,11 +255,11 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
         ),
         ToolBarAction(
           onPressed: () {
-            multiDayLineController.lineType = 104;
+            multiStockLineController.lineType = 104;
           },
           child: Icon(
             Icons.perm_contact_calendar,
-            color: multiDayLineController.lineType == 104
+            color: multiStockLineController.lineType == 104
                 ? myself.primary
                 : isDark
                     ? Colors.white
@@ -268,11 +268,11 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
         ),
         ToolBarAction(
           onPressed: () {
-            multiDayLineController.lineType = 105;
+            multiStockLineController.lineType = 105;
           },
           child: Icon(
             Icons.calendar_month_outlined,
-            color: multiDayLineController.lineType == 105
+            color: multiStockLineController.lineType == 105
                 ? myself.primary
                 : isDark
                     ? Colors.white
@@ -281,11 +281,11 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
         ),
         ToolBarAction(
           onPressed: () {
-            multiDayLineController.lineType = 106;
+            multiStockLineController.lineType = 106;
           },
           child: Icon(
             Icons.calendar_today_outlined,
-            color: multiDayLineController.lineType == 106
+            color: multiStockLineController.lineType == 106
                 ? myself.primary
                 : isDark
                     ? Colors.white
@@ -308,8 +308,8 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
 
   @override
   Widget build(BuildContext context) {
-    DayLineController? dayLineController =
-        multiDayLineController.dayLineController;
+    StockLineController? dayLineController =
+        multiStockLineController.stockLineController;
     return AppBarView(
       title: '${dayLineController?.tsCode}-${dayLineController?.name}',
       withLeading: true,
@@ -321,7 +321,7 @@ class _DayLineChartWidgetState extends State<DayLineChartWidget> {
 
   @override
   void dispose() {
-    multiDayLineController.removeListener(_update);
+    multiStockLineController.removeListener(_update);
     super.dispose();
   }
 }
