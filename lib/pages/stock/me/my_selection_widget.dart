@@ -120,6 +120,8 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
       shareController.replaceAll(value);
       data = shareController.data;
     }
+    List<String> tsCodes = shareService.subscription.split(',');
+    multiStockLineController.replaceAll(tsCodes);
     for (int index = 0; index < data.length; ++index) {
       var d = data[index];
       var dataMap = JsonUtil.toJson(d);
