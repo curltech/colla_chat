@@ -149,13 +149,13 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
         child: FormInputWidget(
           height: appDataProvider.portraitSize.height * 0.4,
           spacing: 5.0,
-          formButtonDefs: [
-            FormButtonDef(
+          formButtons: [
+            FormButton(
                 label: 'Discover',
                 onTap: (Map<String, dynamic> values) {
                   _discover(values);
                 }),
-            FormButtonDef(
+            FormButton(
                 label: 'Connect',
                 onTap: (Map<String, dynamic> values) {
                   _connect(values);

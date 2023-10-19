@@ -14,5 +14,9 @@
 	<array>
 		<string>group.io.curltech.colla</string>
 	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)io.curltech.colla</string>
+	</array>
 </dict>
 </plist>

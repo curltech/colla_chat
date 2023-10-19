@@ -70,7 +70,7 @@ class VideoChatMessage extends StatelessWidget {
     Widget actionWidget;
     if (fullScreen) {
       actionWidget =
-          ConferenceShowWidget(hasTitle: false, conference: conference);
+          ConferenceShowWidget(hasTitle: false);
 
       return Card(
           elevation: 0,

@@ -11,18 +11,18 @@ import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:provider/provider.dart';
 
 class FormInputController with ChangeNotifier {
-  final List<PlatformDataField> columnFieldDefs;
+  final List<PlatformDataField> dataFields;
   final Map<String, dynamic> _values = {};
 
   final Map<String, DataFieldController> controllers = {};
   EntityState? state;
 
-  FormInputController(this.columnFieldDefs,
+  FormInputController(this.dataFields,
       {Map<String, dynamic> initValues = const {}, this.state}) {
-    for (var columnFieldDef in columnFieldDefs) {
-      String name = columnFieldDef.name;
+    for (var dataField in dataFields) {
+      String name = dataField.name;
       var initValue = initValues[name];
-      initValue ??= columnFieldDef.initValue;
+      initValue ??= dataField.initValue;
       setValue(name, initValue);
     }
     var state = _values['state'];
@@ -43,10 +43,10 @@ class FormInputController with ChangeNotifier {
 
   ///加入数据类型与值不匹配，将字符串转换成合适类型
   _adjustValues(Map<String, dynamic> values) {
-    for (var columnFieldDef in columnFieldDefs) {
-      String name = columnFieldDef.name;
+    for (var dataField in dataFields) {
+      String name = dataField.name;
       if (values.containsKey(name)) {
-        DataType dataType = columnFieldDef.dataType;
+        DataType dataType = dataField.dataType;
         dynamic value = values[name];
         if (value == null) {
           continue;
@@ -78,8 +78,8 @@ class FormInputController with ChangeNotifier {
   ///获取所有真实值
   dynamic getValues() {
     Map<String, dynamic> values = {};
-    for (var columnFieldDefs in columnFieldDefs) {
-      String name = columnFieldDefs.name;
+    for (var dataField in dataFields) {
+      String name = dataField.name;
       values[name] = getValue(name);
       if (state == null) {
         if (controllers.containsKey(name)) {
@@ -112,8 +112,8 @@ class FormInputController with ChangeNotifier {
 
   /// 设置字段的值，values中如果没有的字段设置为null
   setValues(Map<String, dynamic> values) {
-    for (var columnFieldDef in columnFieldDefs) {
-      var name = columnFieldDef.name;
+    for (var dataField in dataFields) {
+      var name = dataField.name;
       if (values.containsKey(name)) {
         var value = values[name];
         setValue(name, value);
@@ -124,14 +124,14 @@ class FormInputController with ChangeNotifier {
   }
 }
 
-class FormButtonDef {
+class FormButton {
   final String label;
   ButtonStyle? buttonStyle;
   Widget? icon;
   String? tooltip;
   Function(Map<String, dynamic> values)? onTap;
 
-  FormButtonDef(
+  FormButton(
       {required this.label,
       this.buttonStyle,
       this.icon,
@@ -145,7 +145,7 @@ class FormButtonDef {
 
 class FormInputWidget extends StatefulWidget {
   final FormInputController controller;
-  final List<FormButtonDef>? formButtonDefs;
+  final List<FormButton>? formButtons;
   final Function(Map<String, dynamic> values)? onOk;
   final String okLabel;
   final double height; //高度
@@ -158,7 +158,7 @@ class FormInputWidget extends StatefulWidget {
   const FormInputWidget({
     Key? key,
     required this.controller,
-    this.formButtonDefs,
+    this.formButtons,
     this.onOk,
     this.okLabel = 'Ok',
     required this.height,
@@ -189,8 +189,8 @@ class _FormInputWidgetState extends State<FormInputWidget> {
   ///创建KeyboardActionsConfig钩住所有的字段
   KeyboardActionsConfig _buildKeyboardActionsConfig(BuildContext context) {
     List<KeyboardActionsItem> actions = [];
-    for (var i = 0; i < widget.controller.columnFieldDefs.length; i++) {
-      PlatformDataField columnFieldDef = widget.controller.columnFieldDefs[i];
+    for (var i = 0; i < widget.controller.dataFields.length; i++) {
+      PlatformDataField columnFieldDef = widget.controller.dataFields[i];
       var name = columnFieldDef.name;
       var inputType = columnFieldDef.inputType;
       if (inputType == InputType.text ||
@@ -217,9 +217,9 @@ class _FormInputWidgetState extends State<FormInputWidget> {
 
   List<Widget> _buildFormViews(BuildContext context) {
     Map<String, List<Widget>> viewMap = {};
-    for (var i = 0; i < widget.controller.columnFieldDefs.length; i++) {
-      PlatformDataField columnFieldDef = widget.controller.columnFieldDefs[i];
-      String? groupName = columnFieldDef.groupName;
+    for (var i = 0; i < widget.controller.dataFields.length; i++) {
+      PlatformDataField dataField = widget.controller.dataFields[i];
+      String? groupName = dataField.groupName;
       groupName = groupName ?? '';
       List<Widget>? children = viewMap[groupName];
       if (children == null) {
@@ -232,17 +232,17 @@ class _FormInputWidgetState extends State<FormInputWidget> {
       children.add(SizedBox(
         height: widget.spacing,
       ));
-      String name = columnFieldDef.name;
+      String name = dataField.name;
       DataFieldController? dataFieldController =
           widget.controller.controllers[name];
       dynamic value = widget.controller.getValue(name);
       if (dataFieldController == null) {
         dataFieldController = DataFieldController(
-          columnFieldDef,
+          dataField,
           value: value,
         );
         widget.controller
-            .setController(columnFieldDef.name, dataFieldController);
+            .setController(dataField.name, dataFieldController);
       } else {
         dataFieldController.value = value;
       }
@@ -251,7 +251,7 @@ class _FormInputWidgetState extends State<FormInputWidget> {
         focusNode: focusNodes[name],
       );
       children.add(dataFieldWidget);
-      if (i == widget.controller.columnFieldDefs.length - 1) {
+      if (i == widget.controller.dataFields.length - 1) {
         if (widget.tails != null) {
           children.addAll(widget.tails!);
         }
@@ -284,7 +284,7 @@ class _FormInputWidgetState extends State<FormInputWidget> {
         },
       )
     ];
-    if (widget.formButtonDefs == null) {
+    if (widget.formButtons == null) {
       btns.add(TextButton(
         style: mainStyle,
         child: CommonAutoSizeText(AppLocalizations.t(widget.okLabel)),
@@ -296,14 +296,14 @@ class _FormInputWidgetState extends State<FormInputWidget> {
         },
       ));
     } else {
-      for (FormButtonDef formButtonDef in widget.formButtonDefs!) {
+      for (FormButton formButton in widget.formButtons!) {
         btns.add(TextButton(
-          style: formButtonDef.buttonStyle,
-          child: CommonAutoSizeText(AppLocalizations.t(formButtonDef.label)),
+          style: formButton.buttonStyle,
+          child: CommonAutoSizeText(AppLocalizations.t(formButton.label)),
           onPressed: () {
-            if (formButtonDef.onTap != null) {
+            if (formButton.onTap != null) {
               var values = widget.controller.getValues();
-              formButtonDef.onTap!(values);
+              formButton.onTap!(values);
             }
           },
         ));

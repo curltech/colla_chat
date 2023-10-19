@@ -142,8 +142,8 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
               FormInputWidget(
                 height: height,
                 spacing: 5.0,
-                formButtonDefs: [
-                  FormButtonDef(
+                formButtons: [
+                  FormButton(
                       label: 'Connect',
                       onTap: (Map<String, dynamic> values) {
                         _connect(values);

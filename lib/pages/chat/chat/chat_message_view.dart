@@ -13,6 +13,7 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.da
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controller.dart';
 import 'package:colla_chat/pages/chat/chat/full_screen_chat_message_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video_chat_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/group/group_edit_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -551,7 +552,19 @@ class _ChatMessageViewState extends State<ChatMessageView>
     if (partyType == PartyType.group.name) {
       rightWidgets.add(IconButton(
           onPressed: () async {
-            indexWidgetProvider.push('linkman_edit_group');
+            ChatSummary? chatSummary = chatMessageController.chatSummary;
+            if (chatSummary != null) {
+              String? partyType = chatSummary.partyType;
+              String? groupId = chatSummary.peerId;
+              if (partyType == PartyType.group.name && groupId != null) {
+                Group? group =
+                    await groupService.findCachedOneByPeerId(groupId);
+                if (group != null) {
+                  groupNotifier.value = group;
+                  indexWidgetProvider.push('group_edit');
+                }
+              }
+            }
           },
           icon: const Icon(Icons.more_vert)));
     }

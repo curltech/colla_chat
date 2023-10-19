@@ -11,7 +11,7 @@ import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_view.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/linkman/group/linkman_group_edit_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/group/group_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_info_widget.dart';
 import 'package:colla_chat/plugin/notification/local_notifications_service.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
@@ -116,7 +116,7 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
     indexWidgetProvider.define(ChatMessageView());
     indexWidgetProvider.define(const LinkmanInfoWidget());
     indexWidgetProvider.define(const HtmlPreviewWidget());
-    indexWidgetProvider.define(const LinkmanGroupEditWidget());
+    indexWidgetProvider.define(groupEditWidget);
   }
 
   @override

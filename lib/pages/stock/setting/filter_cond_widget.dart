@@ -188,13 +188,13 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
     } else {
       controller.setValues({});
     }
-    List<FormButtonDef> formButtonDefs = [
-      FormButtonDef(
+    List<FormButton> formButtonDefs = [
+      FormButton(
           label: 'Cancel',
           onTap: (Map<String, dynamic> values) {
             _onCancel(values);
           }),
-      FormButtonDef(
+      FormButton(
           label: 'Ok',
           onTap: (Map<String, dynamic> values) {
             _onOk(values);
@@ -205,7 +205,7 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
         child: FormInputWidget(
           height: appDataProvider.portraitSize.height * 0.7,
           controller: controller,
-          formButtonDefs: formButtonDefs,
+          formButtons: formButtonDefs,
         ));
 
     return formInputWidget;

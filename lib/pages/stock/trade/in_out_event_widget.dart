@@ -182,8 +182,8 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
   _buildSearchView(BuildContext context) {
     int tradeDate = DateUtil.formatDateInt(DateUtil.currentDateTime());
     searchController.setValues({'tradeDate': tradeDate});
-    List<FormButtonDef> formButtonDefs = [
-      FormButtonDef(
+    List<FormButton> formButtonDefs = [
+      FormButton(
           label: 'Ok',
           onTap: (Map<String, dynamic> values) {
             _onOk(values);
@@ -195,7 +195,7 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
           height: appDataProvider.portraitSize.height * 0.4,
           spacing: 5.0,
           controller: searchController,
-          formButtonDefs: formButtonDefs,
+          formButtons: formButtonDefs,
         ));
 
     return formInputWidget;

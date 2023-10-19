@@ -1,6 +1,6 @@
-import 'package:colla_chat/pages/chat/linkman/conference/conference_add_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/conference/conference_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/group/face_group_add_widget.dart';
-import 'package:colla_chat/pages/chat/linkman/group/linkman_group_add_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/group/group_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/group/nearby_group_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/chat_gpt_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/contact_linkman_add_widget.dart';
@@ -23,11 +23,9 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
   // final NearbyLinkmanAddWidget nearbyLinkmanAddWidget =
   //     NearbyLinkmanAddWidget();
   final ChatGPTAddWidget chatGPTAddWidget = const ChatGPTAddWidget();
-  final LinkmanGroupAddWidget linkmanGroupAddWidget = LinkmanGroupAddWidget();
   final NearbyGroupAddWidget nearbyGroupAddWidget = NearbyGroupAddWidget();
   final FaceGroupAddWidget faceGroupAddWidget = FaceGroupAddWidget();
-  final ConferenceAddWidget conferenceAddWidget = ConferenceAddWidget();
-  late final List<TileData> linkmanAddTileData;
+  final ConferenceEditWidget conferenceEditWidget = const ConferenceEditWidget();
 
   LinkmanAddWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(p2pLinkmanAddWidget);
@@ -35,22 +33,19 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(jsonLinkmanAddWidget);
     //indexWidgetProvider.define(nearbyLinkmanAddWidget);
     indexWidgetProvider.define(chatGPTAddWidget);
-    indexWidgetProvider.define(linkmanGroupAddWidget);
     indexWidgetProvider.define(nearbyGroupAddWidget);
     indexWidgetProvider.define(faceGroupAddWidget);
-    indexWidgetProvider.define(conferenceAddWidget);
+    indexWidgetProvider.define(conferenceEditWidget);
     List<TileDataMixin> mixins = [
       p2pLinkmanAddWidget,
       contactLinkmanAddWidget,
       jsonLinkmanAddWidget,
       //nearbyLinkmanAddWidget,
       chatGPTAddWidget,
-      linkmanGroupAddWidget,
       nearbyGroupAddWidget,
       faceGroupAddWidget,
-      conferenceAddWidget,
+      conferenceEditWidget,
     ];
-    linkmanAddTileData = TileData.from(mixins);
   }
 
   @override
@@ -80,7 +75,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
       tile.selected = false;
     }
     final List<TileData> groupTileData = TileData.from([
-      linkmanGroupAddWidget,
+      groupEditWidget,
       nearbyGroupAddWidget,
       faceGroupAddWidget,
     ]);
@@ -89,7 +84,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
       tile.selected = false;
     }
     final List<TileData> conferenceTileData = TileData.from([
-      conferenceAddWidget,
+      conferenceEditWidget,
     ]);
     for (var tile in conferenceTileData) {
       tile.dense = false;

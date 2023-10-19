@@ -17,7 +17,7 @@ import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
-final List<PlatformDataField> linkmanColumnFieldDefs = [
+final List<PlatformDataField> linkmanDataField = [
   PlatformDataField(
       name: 'peerId',
       label: 'PeerId',
@@ -79,7 +79,7 @@ class LinkmanEditWidget extends StatefulWidget with TileDataMixin {
 
 class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
   final FormInputController controller =
-      FormInputController(linkmanColumnFieldDefs);
+      FormInputController(linkmanDataField);
   Linkman? linkman;
 
   @override
@@ -98,18 +98,18 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     if (linkman != null) {
       controller.setValues(JsonUtil.toJson(linkman));
     }
-    List<FormButtonDef> formButtonDefs = [
-      FormButtonDef(
+    List<FormButton> formButtons = [
+      FormButton(
           label: 'Ok',
           onTap: (Map<String, dynamic> values) {
             _onOk(values);
           }),
-      FormButtonDef(
+      FormButton(
           label: 'Share',
           onTap: (Map<String, dynamic> values) {
             _onShare(values);
           }),
-      FormButtonDef(
+      FormButton(
           label: 'Copy',
           onTap: (Map<String, dynamic> values) {
             _onCopy(values);
@@ -120,7 +120,8 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
         padding: const EdgeInsets.all(10.0),
         child: FormInputWidget(
           height: appDataProvider.portraitSize.height * 0.7,
-          formButtonDefs: formButtonDefs,
+          spacing: 5.0,
+          formButtons: formButtons,
           controller: controller,
         ));
 

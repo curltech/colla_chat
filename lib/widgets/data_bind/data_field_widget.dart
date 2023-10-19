@@ -334,8 +334,12 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
 
   Widget _buildLabel(BuildContext context) {
     ValueNotifier<dynamic>? controller = widget.controller.controller;
-    controller ??= ValueNotifier<dynamic>(null);
-    widget.controller.controller = controller;
+    if (controller == null) {
+      controller = ValueNotifier<dynamic>(null);
+      widget.controller.controller = controller;
+      final value = widget.controller.value;
+      controller.value = value;
+    }
     String label = widget.controller.dataField.label;
     label = '${AppLocalizations.t(label)}:';
     return Container(

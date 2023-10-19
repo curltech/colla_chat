@@ -3,6 +3,7 @@ import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/linkman/conference/conference_edit_widget.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -17,7 +18,7 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-final List<PlatformDataField> conferenceColumnFieldDefs = [
+final List<PlatformDataField> readOnlyConferenceDataField = [
   PlatformDataField(
       name: 'conferenceId',
       label: 'ConferenceId',
@@ -55,21 +56,13 @@ final List<PlatformDataField> conferenceColumnFieldDefs = [
       prefixIcon: Icon(Icons.pin_end, color: myself.primary)),
 ];
 
-ValueNotifier<Conference?> conferenceNotifier =
-    ValueNotifier<Conference?>(null);
-
 ///显示会议的基本信息，会议成员和会议发起人
 class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
   final FormInputController controller =
-      FormInputController(conferenceColumnFieldDefs);
+      FormInputController(readOnlyConferenceDataField);
   final bool hasTitle;
 
-  ConferenceShowWidget({Key? key, this.hasTitle = true, Conference? conference})
-      : super(key: key) {
-    if (conference != null) {
-      conferenceNotifier.value = conference;
-    }
-  }
+  ConferenceShowWidget({Key? key, this.hasTitle = true}) : super(key: key);
 
   @override
   IconData get iconData => Icons.meeting_room_outlined;

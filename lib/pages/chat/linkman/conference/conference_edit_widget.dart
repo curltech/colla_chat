@@ -25,7 +25,7 @@ import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-final List<PlatformDataField> conferenceColumnFieldDefs = [
+final List<PlatformDataField> conferenceDataField = [
   PlatformDataField(
     name: 'conferenceId',
     label: 'ConferenceId',
@@ -77,47 +77,51 @@ final List<PlatformDataField> conferenceColumnFieldDefs = [
   ),
 ];
 
+ValueNotifier<Conference?> conferenceNotifier =
+    ValueNotifier<Conference?>(null);
+
 ///创建和修改群，填写群的基本信息，选择群成员和群主
-class ConferenceAddWidget extends StatefulWidget with TileDataMixin {
-  ConferenceAddWidget({Key? key}) : super(key: key);
+class ConferenceEditWidget extends StatefulWidget with TileDataMixin {
+  const ConferenceEditWidget({Key? key}) : super(key: key);
 
   @override
   IconData get iconData => Icons.meeting_room_outlined;
 
   @override
-  String get routeName => 'conference_add';
+  String get routeName => 'conference_edit';
 
   @override
-  String get title => 'Add conference';
+  String get title => 'Conference edit';
 
   @override
   bool get withLeading => true;
 
   @override
-  State<StatefulWidget> createState() => _ConferenceAddWidgetState();
+  State<StatefulWidget> createState() => _ConferenceEditWidgetState();
 }
 
-class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
+class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
   final FormInputController controller =
-      FormInputController(conferenceColumnFieldDefs);
+      FormInputController(conferenceDataField);
 
   OptionController conferenceOwnerController = OptionController();
 
   //选择的会议成员
   ValueNotifier<List<String>> conferenceMembers = ValueNotifier([]);
 
-  //群主的选项
-  //ValueNotifier<List<Option<String>>> groupOwnerOptions = ValueNotifier([]);
-
-  //当前会议
-  ValueNotifier<Conference> conference =
-      ValueNotifier(Conference('', name: ''));
+  bool isNew = false;
 
   @override
   initState() {
+    Conference? current = conferenceNotifier.value;
+    if (current == null) {
+      current = Conference('', name: '');
+      conferenceNotifier.value = current;
+      isNew = true;
+    }
     conferenceController.addListener(_update);
-    super.initState();
     _buildConferenceData();
+    super.initState();
   }
 
   _update() {
@@ -128,16 +132,14 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
 
   //当当前会议改变后，更新数据，局部刷新
   _buildConferenceData() async {
-    var current = conferenceController.current;
-    if (current != null) {
-      conference.value = current;
-    } else {
-      conference.value = Conference('', name: '');
+    Conference? current = conferenceNotifier.value;
+    if (current == null) {
+      return;
     }
-    if (conference.value.id != null) {
+    if (current.id != null) {
       List<String> conferenceMembers = [];
       List<GroupMember> members =
-          await groupMemberService.findByGroupId(conference.value.conferenceId);
+          await groupMemberService.findByGroupId(current.conferenceId);
       if (members.isNotEmpty) {
         for (GroupMember member in members) {
           conferenceMembers.add(member.memberPeerId!);
@@ -150,7 +152,11 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
 
   //更新ConferenceOwnerOptions，从会议成员中选择
   _buildConferenceOwnerOptions(List<String> selected) async {
-    conference.value.conferenceOwnerPeerId ??= myself.peerId;
+    Conference? current = conferenceNotifier.value;
+    if (current == null) {
+      return;
+    }
+    current.conferenceOwnerPeerId ??= myself.peerId;
     List<Option<String>> conferenceOwnerOptions = [];
     if (selected.isNotEmpty) {
       for (String conferenceMemberId in selected) {
@@ -158,8 +164,8 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
             await linkmanService.findCachedOneByPeerId(conferenceMemberId);
         bool checked = false;
         if (linkman != null) {
-          if (conference.value.conferenceOwnerPeerId != null) {
-            String? peerId = conference.value.conferenceOwnerPeerId!;
+          if (current.conferenceOwnerPeerId != null) {
+            String? peerId = current.conferenceOwnerPeerId!;
             if (linkman.peerId == peerId) {
               checked = true;
             }
@@ -213,12 +219,16 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
 
   //会议发起人选择界面
   Widget _buildConferenceOwnerWidget(BuildContext context) {
+    Conference? current = conferenceNotifier.value;
+    if (current == null) {
+      return Container();
+    }
     var selector = Container(
         padding: const EdgeInsets.symmetric(horizontal: 0.0),
         child: CustomSingleSelectField(
             title: 'ConferenceOwnerPeer',
             onChanged: (selected) {
-              conference.value.conferenceOwnerPeerId = selected;
+              current.conferenceOwnerPeerId = selected;
             },
             optionController: conferenceOwnerController));
     // });
@@ -235,7 +245,7 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
       _buildConferenceOwnerWidget(context),
     ];
     var formInputWidget = ValueListenableBuilder(
-        valueListenable: conference,
+        valueListenable: conferenceNotifier,
         builder: (BuildContext context, Conference? conference, Widget? child) {
           if (conference != null) {
             controller.setValues(JsonUtil.toJson(conference));
@@ -264,6 +274,10 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
 
   //修改提交
   Future<Conference?> _onOk(Map<String, dynamic> values) async {
+    Conference? current = conferenceNotifier.value;
+    if (current == null) {
+      return null;
+    }
     bool conferenceModified = false;
     bool conferenceAdd = false;
     Conference currentConference = Conference.fromJson(values);
@@ -272,7 +286,7 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
           content: AppLocalizations.t('Must has conference name'));
       return null;
     }
-    if (StringUtil.isEmpty(conference.value.conferenceOwnerPeerId)) {
+    if (StringUtil.isEmpty(current.conferenceOwnerPeerId)) {
       DialogUtil.error(context,
           content: AppLocalizations.t('Must has conference owner'));
       return null;
@@ -282,8 +296,7 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
           content: AppLocalizations.t('Must has conference topic'));
       return null;
     }
-    var current = conferenceController.current;
-    if (current == null) {
+    if (current.id == null) {
       var participants = conferenceMembers.value;
       if (!participants.contains(myself.peerId!)) {
         participants.add(myself.peerId!);
@@ -292,7 +305,7 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
       current = await conferenceService.createConference(
           currentConference.name, currentConference.video,
           topic: currentConference.topic,
-          conferenceOwnerPeerId: conference.value.conferenceOwnerPeerId,
+          conferenceOwnerPeerId: current.conferenceOwnerPeerId,
           startDate: currentConference.startDate,
           endDate: currentConference.endDate,
           participants: conferenceMembers.value);
@@ -346,7 +359,6 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
       DialogUtil.info(context,
           content: AppLocalizations.t('Conference has stored completely'));
     }
-    conference.value = current;
 
     ///1.发送视频通邀请话消息,此时消息必须有content,包含conference信息
     ///当前chatSummary可以不存在，因此不需要当前处于聊天场景下，因此是一个静态方法，创建永久conference的时候使用
@@ -383,8 +395,7 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
   @override
   Widget build(BuildContext context) {
     String title = 'Add conference';
-    int? id = conference.value.id;
-    if (id != null) {
+    if (!isNew) {
       title = 'Edit conference';
     }
     var appBarView = AppBarView(
@@ -396,7 +407,8 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
 
   @override
   void dispose() {
-    conferenceController.removeListener(_update);
+    conferenceNotifier.removeListener(_update);
+    conferenceNotifier.value = null;
     super.dispose();
   }
 }

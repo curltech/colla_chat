@@ -363,7 +363,7 @@ class PeerConnectionPool {
               if (gap > limit.inMilliseconds) {
                 removedPeerConnections.add(peerConnection);
                 logger.e(
-                    'peerConnection peerId:${peerConnection.peerId},clientId:${peerConnection.clientId} is overtime unconnected');
+                    'peerConnection peerId:${peerConnection.peerId},name:${peerConnection.name} is overtime unconnected');
               }
             }
           }
