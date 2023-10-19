@@ -236,6 +236,7 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
     if (eventCode == null) {
       return;
     }
+    List<DayLine> dayLines = [];
     //先寻找本地的定制事件代码
     List<EventFilter> eventFilters = await eventFilterService
         .find(where: 'eventCode=?', whereArgs: [eventCode]);
@@ -261,8 +262,7 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
         }
       }
       if (filterContents != null) {
-        List<DayLine> dayLines = await remoteDayLineService.sendFindFlexPoint(
-            filterContents,
+        dayLines = await remoteDayLineService.sendFindFlexPoint(filterContents,
             tsCode: tsCode,
             tradeDate: tradeDate,
             startDate: startDate,
@@ -270,17 +270,20 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
             filterParas: filterParas != null
                 ? JsonUtil.toJsonString(filterParas)
                 : null);
-        inoutEventController.replaceAll(dayLines);
       }
     } else {
-      List<DayLine> dayLines = await remoteDayLineService.sendFindInout(
-          eventCode,
+      dayLines = await remoteDayLineService.sendFindInout(eventCode,
           tsCode: tsCode,
           tradeDate: tradeDate,
           startDate: startDate,
           endDate: endDate);
-      inoutEventController.replaceAll(dayLines);
     }
+    inoutEventController.replaceAll(dayLines);
+    List<String> tsCodes = [];
+    for (DayLine dayLine in dayLines) {
+      tsCodes.add(dayLine.tsCode);
+    }
+    multiStockLineController.replaceAll(tsCodes);
   }
 
   @override

@@ -1,8 +1,12 @@
+import 'package:colla_chat/entity/stock/share.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/day_line.dart';
+import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/service/stock/wmqy_line.dart';
 import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -18,26 +22,11 @@ class StockLineController extends DataListController<dynamic> {
   StockLineController(this.tsCode, this.name, {this.lineType = 101});
 }
 
-class MultiStockLineController with ChangeNotifier {
-  String? _tsCode;
-
+class MultiStockLineController extends DataListController<String> {
   int _lineType = 101;
 
   /// 增加自选股的查询结果控制器
   final Map<String, Map<int, StockLineController>> stockLineControllers = {};
-
-  /// 当前股票代码
-  String? get tsCode {
-    return _tsCode;
-  }
-
-  /// 设置当前股票代码
-  set tsCode(String? tsCode) {
-    if (_tsCode != tsCode) {
-      _tsCode = tsCode;
-      notifyListeners();
-    }
-  }
 
   /// 当前数据类型
   int get lineType {
@@ -53,13 +42,15 @@ class MultiStockLineController with ChangeNotifier {
 
   /// 当前股票控制器
   StockLineController? get stockLineController {
-    return stockLineControllers[_tsCode]?[_lineType];
+    if (current != null) {
+      return stockLineControllers[current]?[_lineType];
+    }
+    return null;
   }
 
   /// 加入股票代码和控制器，并设置为当前
   put(String tsCode, String name) {
-    if (tsCode != _tsCode) {
-      _tsCode = tsCode;
+    if (current != tsCode) {
       if (!stockLineControllers.containsKey(tsCode)) {
         stockLineControllers[tsCode] = {};
         stockLineControllers[tsCode]?[101] =
@@ -75,7 +66,7 @@ class MultiStockLineController with ChangeNotifier {
         stockLineControllers[tsCode]?[106] =
             StockLineController(tsCode, name, lineType: 106);
       }
-      notifyListeners();
+      current = tsCode;
     }
   }
 
@@ -84,9 +75,42 @@ class MultiStockLineController with ChangeNotifier {
       stockLineControllers.remove(tsCode);
     }
   }
+
+  previous() async {
+    int currentIndex = this.currentIndex - 1;
+    if (currentIndex >= 0 && currentIndex < data.length) {
+      String tsCode = data[currentIndex];
+      if (!stockLineControllers.containsKey(tsCode)) {
+        Share? share = await shareService.findShare(tsCode);
+        if (share != null) {
+          String? name = share.name;
+          name ??= '';
+          put(tsCode, name);
+        }
+      }
+      this.currentIndex = currentIndex;
+    }
+  }
+
+  next() async {
+    int currentIndex = this.currentIndex + 1;
+    if (currentIndex >= 0 && currentIndex < data.length) {
+      String tsCode = data[currentIndex];
+      if (!stockLineControllers.containsKey(tsCode)) {
+        Share? share = await shareService.findShare(tsCode);
+        if (share != null) {
+          String? name = share.name;
+          name ??= '';
+          put(tsCode, name);
+        }
+      }
+      this.currentIndex = currentIndex;
+    }
+  }
 }
 
-final MultiStockLineController multiStockLineController = MultiStockLineController();
+final MultiStockLineController multiStockLineController =
+    MultiStockLineController();
 
 class StockLineChartWidget extends StatefulWidget with TileDataMixin {
   const StockLineChartWidget({Key? key}) : super(key: key);
@@ -131,44 +155,75 @@ class _StockLineChartWidgetState extends State<StockLineChartWidget> {
   @override
   void initState() {
     multiStockLineController.addListener(_update);
-    loadMoreCandles();
+    reloadCandles();
     super.initState();
   }
 
   _update() {
-    loadMoreCandles();
+    reloadCandles();
   }
 
+  /// 重新加载数据，tsCode和lineType发生改变
+  Future<void> reloadCandles() async {
+    StockLineController? dayLineController =
+        multiStockLineController.stockLineController;
+    if (dayLineController == null) {
+      return;
+    }
+    int length = dayLineController.data.length;
+    int? count = dayLineController.count;
+    // 判断是否有更多的数据可以加载
+    if (count == null || length == 0) {
+      await _findMoreData(dayLineController);
+    }
+    _buildCandles(dayLineController);
+  }
+
+  /// 加载更多的数据，tsCode和lineType没有改变
   Future<void> loadMoreCandles() async {
     StockLineController? dayLineController =
         multiStockLineController.stockLineController;
     if (dayLineController == null) {
-      candles.clear();
       return;
     }
-    String tsCode = dayLineController.tsCode;
-    List<dynamic> data = dayLineController.data;
+    int length = dayLineController.data.length;
     int? count = dayLineController.count;
-    if (count == null || data.length < count) {
-      Map<String, dynamic> response;
-      int lineType = dayLineController.lineType;
-      if (lineType == 101) {
-        response = await remoteDayLineService.sendFindPreceding(tsCode,
-            from: data.length, limit: 100);
-      } else {
-        response = await remoteWmqyLineService.sendFindLinePreceding(tsCode,
-            lineType: lineType, from: data.length, limit: 100);
+    // 判断是否有更多的数据可以加载
+    if (count == null || length < count) {
+      bool hasMore = await _findMoreData(dayLineController);
+      if (hasMore) {
+        _buildCandles(dayLineController);
       }
-      data = response['data'];
-      count = response['count'];
+    }
+  }
+
+  Future<bool> _findMoreData(StockLineController dayLineController) async {
+    String tsCode = dayLineController.tsCode;
+    int length = dayLineController.data.length;
+    Map<String, dynamic> response;
+    int lineType = dayLineController.lineType;
+    if (lineType == 101) {
+      response = await remoteDayLineService.sendFindPreceding(tsCode,
+          from: length, limit: 100);
+    } else {
+      response = await remoteWmqyLineService.sendFindLinePreceding(tsCode,
+          lineType: lineType, from: length, limit: 100);
+    }
+    List<dynamic> data = response['data'];
+    int count = response['count'];
+    dayLineController.count = count;
+    if (data.isNotEmpty) {
       dayLineController.insertAll(0, data);
-      dayLineController.count = count;
+      return true;
     }
-    if (data.isEmpty) {
-      return;
-    }
-    data = dayLineController.data;
+
+    return false;
+  }
+
+  /// 创建图形的数据
+  _buildCandles(StockLineController dayLineController) {
     candles.clear();
+    List<dynamic> data = dayLineController.data;
     for (int i = data.length - 1; i >= 0; i--) {
       Map<String, dynamic> map = data[i];
       int trade_date = map['trade_date'];
@@ -212,7 +267,9 @@ class _StockLineChartWidgetState extends State<StockLineChartWidget> {
     final bool isDark = myself.getBrightness(context) == Brightness.dark;
     final style = isDark ? dark() : light();
     return Candlesticks(
+      key: UniqueKey(),
       indicators: indicators,
+      loadingWidget: LoadingUtil.buildLoadingIndicator(),
       actions: <ToolBarAction>[
         ToolBarAction(
           onPressed: () {
@@ -310,9 +367,28 @@ class _StockLineChartWidgetState extends State<StockLineChartWidget> {
   Widget build(BuildContext context) {
     StockLineController? dayLineController =
         multiStockLineController.stockLineController;
+    String title = widget.title;
+    if (dayLineController != null) {
+      title = '${dayLineController.tsCode}-${dayLineController.name}';
+    }
+    List<Widget> rightWidgets = [
+      IconButton(
+          tooltip: AppLocalizations.t('Previous'),
+          onPressed: () async {
+            await multiStockLineController.previous();
+          },
+          icon: const Icon(Icons.skip_previous_outlined)),
+      IconButton(
+          tooltip: AppLocalizations.t('Next'),
+          onPressed: () async {
+            await multiStockLineController.next();
+          },
+          icon: const Icon(Icons.skip_next_outlined)),
+    ];
     return AppBarView(
-      title: '${dayLineController?.tsCode}-${dayLineController?.name}',
+      title: title,
       withLeading: true,
+      rightWidgets: rightWidgets,
       child: Center(
         child: _buildCandlesticks(candles),
       ),

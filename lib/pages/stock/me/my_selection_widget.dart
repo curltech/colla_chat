@@ -155,8 +155,9 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
         onTap: () {
           String? tsCode = dataMap['ts_code'];
           String? name = dataMap['name'];
+          name ??= '';
           if (tsCode != null) {
-            multiStockLineController.put(tsCode, name!);
+            multiStockLineController.put(tsCode, name);
             indexWidgetProvider.push('stockline_chart');
           }
         },
