@@ -6,9 +6,11 @@ import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman/linkman_webrtc_connection_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
@@ -427,9 +429,34 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     if (!isNew) {
       title = 'Edit group';
     }
+    List<Widget> rightWidgets = [
+      IconButton(
+          onPressed: () async {
+            Group? current = groupNotifier.value;
+            if (current != null) {
+              List<GroupMember> members =
+                  await groupMemberService.findByGroupId(current.peerId);
+              List<Linkman> linkmen = [];
+              for (var member in members) {
+                String? memberPeerId = member.memberPeerId;
+                if (memberPeerId != null) {
+                  Linkman? linkman =
+                      await linkmanService.findCachedOneByPeerId(memberPeerId);
+                  if (linkman != null) {
+                    linkmen.add(linkman);
+                  }
+                }
+              }
+              groupLinkmanController.replaceAll(linkmen);
+            }
+            indexWidgetProvider.push('linkman_webrtc_connection');
+          },
+          icon: const Icon(Icons.more_horiz_outlined))
+    ];
     var appBarView = AppBarView(
         title: title,
         withLeading: widget.withLeading,
+        rightWidgets: rightWidgets,
         child: _buildFormInputWidget(context));
 
     return appBarView;
