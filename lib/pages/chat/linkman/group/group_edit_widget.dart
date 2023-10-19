@@ -348,10 +348,6 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
       current.email = currentGroup.email;
       groupModified = true;
     }
-    bool add = true;
-    if (current.id != null) {
-      add = false;
-    }
     current.groupOwnerPeerId = current.groupOwnerPeerId ?? myself.peerId;
     for (var option in groupOwnerController.options) {
       if (option.value == current.groupOwnerPeerId) {
@@ -374,7 +370,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     var groupId = current.peerId;
 
     //对所有的成员发送组变更的消息
-    if (add) {
+    if (isNew) {
       await groupService.addGroup(current);
     } else {
       if (groupModified) {
@@ -392,7 +388,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     //新增加的成员
     List<GroupMember>? newMembers = groupChange.addGroupMembers;
     if (newMembers is List<GroupMember> && newMembers.isNotEmpty) {
-      if (!add) {
+      if (!isNew) {
         await groupService.addGroupMember(current, newMembers);
       }
     }
@@ -412,12 +408,14 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
         await groupService.removeGroupMember(current, oldMembers);
       }
     }
-    if (add || groupModified) {
+    if (isNew || groupModified) {
       groupChatSummaryController.refresh();
     }
 
-    if (add) {
-      setState(() {});
+    if (isNew) {
+      setState(() {
+        isNew = false;
+      });
     }
 
     return current;

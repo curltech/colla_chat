@@ -281,7 +281,6 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
       return null;
     }
     bool conferenceModified = false;
-    bool conferenceAdd = false;
     Conference currentConference = Conference.fromJson(values);
     if (StringUtil.isEmpty(currentConference.name)) {
       DialogUtil.error(context,
@@ -316,7 +315,6 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
       current.mute = currentConference.mute;
       current.contact = currentConference.contact;
       conferenceModified = true;
-      conferenceAdd = true;
     } else {
       if (current.topic != currentConference.topic) {
         current.topic = currentConference.topic;
@@ -366,7 +364,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     ///当前chatSummary可以不存在，因此不需要当前处于聊天场景下，因此是一个静态方法，创建永久conference的时候使用
     ///对linkman模式下，conference是临时的，不保存数据库
     ///对group和conference模式下，conference是永久的，保存数据库，可以以后重新加入
-    if (conferenceAdd) {
+    if (isNew) {
       ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
         current.conferenceId,
         PartyType.conference,
@@ -387,8 +385,10 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     if (conferenceModified) {
       conferenceChatSummaryController.refresh();
     }
-    if (conferenceAdd) {
-      setState(() {});
+    if (isNew) {
+      setState(() {
+        isNew = false;
+      });
     }
 
     return current;
