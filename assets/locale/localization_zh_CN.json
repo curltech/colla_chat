@@ -578,5 +578,6 @@
   "CondAlias": "条件别名",
   "CondContent": "条件内容",
   "CondParas": "条件参数",
-  "Descr": "描述"
+  "Descr": "描述",
+  "StockLineChart": "行情"
 }
