@@ -8,7 +8,6 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/event_filter.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
@@ -138,12 +137,12 @@ class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
     PlatformDataColumn(
       label: '事件代码',
       name: 'eventCode',
-      width: 90,
+      width: 80,
     ),
     PlatformDataColumn(
       label: '事件名',
       name: 'eventName',
-      width: 80,
+      width: 100,
     ),
     // PlatformDataColumn(
     //   label: '条件代码',
@@ -160,11 +159,11 @@ class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
       name: 'condContent',
       width: 270,
     ),
-    PlatformDataColumn(
-      label: '条件参数',
-      name: 'condParas',
-      width: 100,
-    ),
+    // PlatformDataColumn(
+    //   label: '条件参数',
+    //   name: 'condParas',
+    //   width: 100,
+    // ),
     PlatformDataColumn(
         label: '',
         name: 'action',
@@ -230,6 +229,7 @@ class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
       horizontalMargin: 10.0,
       columnSpacing: 0.0,
       fixedLeftColumns: 1,
+      dataRowHeight: 100,
       platformDataColumns: eventFilterColumns,
       controller: localEventFilterController,
       onDoubleTap: _onDoubleTap,
