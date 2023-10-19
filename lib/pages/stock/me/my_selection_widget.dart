@@ -121,6 +121,7 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
       data = shareController.data;
     }
     List<String> tsCodes = shareService.subscription.split(',');
+    tsCodes.removeLast();
     multiStockLineController.replaceAll(tsCodes);
     for (int index = 0; index < data.length; ++index) {
       var d = data[index];
