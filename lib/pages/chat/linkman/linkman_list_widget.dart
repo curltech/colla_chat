@@ -218,19 +218,23 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
 
   Widget _buildBadge(int connectionNum, {Widget? avatarImage}) {
     var badge = avatarImage ?? AppImage.mdAppImage;
+    Widget? child;
+    if (connectionNum > 0) {
+      child = const Center(
+          child: CommonAutoSizeText('',
+              style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white)));
+    }
     badge = badges.Badge(
       position: badges.BadgePosition.topEnd(),
       stackFit: StackFit.loose,
       badgeContent: ConstrainedBox(
           constraints: const BoxConstraints(
-            minWidth: 12,
+            minWidth: 10,
           ),
-          child: Center(
-              child: CommonAutoSizeText('$connectionNum',
-                  style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white)))),
+          child: child),
       badgeStyle: badges.BadgeStyle(
         elevation: 0.0,
         badgeColor: connectionNum == 0 ? Colors.red : Colors.green,

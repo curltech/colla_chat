@@ -19,12 +19,16 @@ class DateUtil {
   }
 
   ///将时间字符串格式化成易读的文字
-  static String formatEasyRead(String strDate) {
+  static String formatEasyRead(String strDate, {bool withYear = true}) {
     DateTime t = DateTime.parse(strDate).toLocal();
     strDate = t.toIso8601String();
     int pos = strDate.indexOf('T');
-    var strDay = strDate.substring(0, pos);
-    var strTime = strDate.substring(pos + 1);
+    int start = 0;
+    if (!withYear) {
+      start = 5;
+    }
+    String strDay = strDate.substring(start, pos);
+    String strTime = strDate.substring(pos + 1);
     pos = strTime.lastIndexOf(':');
     strTime = strTime.substring(0, pos);
     DateTime c = DateTime.now().toLocal();

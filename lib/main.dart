@@ -62,23 +62,24 @@ void main(List<String> args) async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   bool loginStatus = await ServiceLocator.init();
-  _initWebView();
-  await _initDesktopWindows();
 
   SystemChannels.lifecycle.setMessageHandler((msg) async {
-    //logger.i('system channel switch to $msg');
-    if (msg == AppLifecycleState.resumed.name) {
+    if (msg == AppLifecycleState.resumed.toString()) {
       logger.i('system channel switch to foreground');
       Websocket? websocket = websocketPool.getDefault();
       if (websocket == null) {
         await websocketPool.connect();
       }
-    } else if (msg == AppLifecycleState.paused.name) {
-      logger.i('system channel switch to background');
+    } else if (msg == AppLifecycleState.paused.toString() ||
+        msg == AppLifecycleState.inactive.toString() ||
+        msg == AppLifecycleState.hidden.toString()) {
+      logger.i('system channel switch to $msg');
     }
     return msg;
   });
 
+  _initWebView();
+  await _initDesktopWindows();
   await localNotificationsService.init();
   await firebaseMessagingService.init();
 
@@ -149,16 +150,61 @@ class _CollaChatAppState extends State<CollaChatApp>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    logger.i('app switch new state:$state');
     if (state == AppLifecycleState.resumed) {
       logger.i('app switch to foreground');
       Websocket? websocket = websocketPool.getDefault();
       if (websocket == null) {
         websocketPool.connect();
       }
-    } else if (state == AppLifecycleState.paused) {
-      logger.i('app switch to background');
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.hidden) {
+      logger.i('app switch new state:$state');
     }
+  }
+
+  ///当前系统改变了一些访问性活动的回调
+  @override
+  void didChangeAccessibilityFeatures() {
+    super.didChangeAccessibilityFeatures();
+    logger.i("didChangeAccessibilityFeatures");
+  }
+
+  ///低内存回调
+  @override
+  void didHaveMemoryPressure() {
+    super.didHaveMemoryPressure();
+    logger.i("didHaveMemoryPressure");
+  }
+
+  ///用户本地设置变化时调用，如系统语言改变
+  @override
+  void didChangeLocales(List<Locale>? locales) {
+    super.didChangeLocales(locales);
+    logger.i("didChangeLocales");
+  }
+
+  ///应用尺寸改变时回调，例如旋转
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    Size size =
+        WidgetsBinding.instance.platformDispatcher.views.first.physicalSize;
+    logger.i("didChangeMetrics  ：宽：${size.width} 高：${size.height}");
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    super.didChangePlatformBrightness();
+    logger.i("didChangePlatformBrightness");
+  }
+
+  ///文字系数变化
+  @override
+  void didChangeTextScaleFactor() {
+    super.didChangeTextScaleFactor();
+    logger.i(
+        "didChangeTextScaleFactor  ：${WidgetsBinding.instance.platformDispatcher.textScaleFactor}");
   }
 
   Widget _buildMaterialApp(BuildContext context, Widget? child) {

@@ -125,7 +125,6 @@ class _ChatMessageViewState extends State<ChatMessageView>
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    logger.i('app switch new state:$state');
     switch (state) {
       case AppLifecycleState.resumed:
         _createPeerConnection();
@@ -134,7 +133,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
         break;
       case AppLifecycleState.inactive:
         break;
-      case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
         break;
       default:
         break;

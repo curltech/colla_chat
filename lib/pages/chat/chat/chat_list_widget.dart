@@ -312,19 +312,23 @@ class _ChatListWidgetState extends State<ChatListWidget>
       }
     }
     var badge = avatarImage ?? AppImage.mdAppImage;
+    Widget? child;
+    if (unreadNumber > 0 || connectionNum > 0) {
+      child = Center(
+          child: CommonAutoSizeText('$unreadNumber',
+              style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white)));
+    }
     badge = badges.Badge(
       position: BadgePosition.topEnd(),
       stackFit: StackFit.loose,
       badgeContent: ConstrainedBox(
           constraints: const BoxConstraints(
-            minWidth: 12,
+            minWidth: 10,
           ),
-          child: Center(
-              child: CommonAutoSizeText('$unreadNumber',
-                  style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white)))),
+          child: child),
       badgeStyle: badges.BadgeStyle(
         elevation: 0.0,
         badgeColor: connectionNum == 0 ? Colors.red : Colors.green,
@@ -351,7 +355,8 @@ class _ChatListWidgetState extends State<ChatListWidget>
         var subMessageType = chatSummary.subMessageType;
         var sendReceiveTime = chatSummary.sendReceiveTime;
         if (sendReceiveTime != null) {
-          sendReceiveTime = DateUtil.formatEasyRead(sendReceiveTime);
+          sendReceiveTime =
+              DateUtil.formatEasyRead(sendReceiveTime, withYear: false);
         } else {
           sendReceiveTime = '';
         }
