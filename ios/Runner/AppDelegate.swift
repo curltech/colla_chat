@@ -2,6 +2,7 @@ import UIKit
 import flutter_sharing_intent
 import Flutter
 import flutter_local_notifications
+import flutter_background_service_ios
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
