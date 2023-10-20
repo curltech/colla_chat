@@ -13,6 +13,7 @@ import flutter_local_notifications
       FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { (registry) in
         GeneratedPluginRegistrant.register(with: registry)
       }
+      SwiftFlutterBackgroundServicePlugin.taskIdentifier = "io.curltech.colla.task.identifier"
       SwiftFlutterForegroundTaskPlugin.setPluginRegistrantCallback { (registry) in
         GeneratedPluginRegistrant.register(with: registry)
       }

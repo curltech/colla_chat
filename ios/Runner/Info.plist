@@ -137,5 +137,9 @@
         <key>NSAllowsArbitraryLoads</key>
         <true/>
     </dict>
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>io.curltech.colla.task.identifier</string>
+    </array>
 </dict>
 </plist>
