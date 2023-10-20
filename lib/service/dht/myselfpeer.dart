@@ -215,7 +215,8 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
 
   ///获取最后一次登录的用户名
   Future<String?> lastCredentialName() async {
-    String? lastLoginStr = await localSecurityStorage.get(lastLoginName);
+    String? lastLoginStr =
+        await localSharedPreferences.get(lastLoginName, userKey: false);
     if (StringUtil.isNotEmpty(lastLoginStr)) {
       Map<String, dynamic> skipLogin = JsonUtil.toJson(lastLoginStr);
       String? credential = skipLogin[credentialName];
@@ -250,8 +251,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
   Future<void> saveLastCredentialName(String credential) async {
     //最后一次成功登录的用户名
     String lastLogin = JsonUtil.toJsonString({credentialName: credential});
-    await localSecurityStorage.save(lastLoginName, lastLogin);
-    String? last = await localSecurityStorage.get(lastLoginName);
+    await localSharedPreferences.save(lastLoginName, lastLogin, userKey: false);
   }
 
   ///获取最后一次登录的用户名和密码，如果都存在，快捷登录

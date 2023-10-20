@@ -29,17 +29,20 @@ class LocalSecurityStorage {
     );
   }
 
-  String _getKey(String key) {
-    String? peerId = myself.peerId;
-    peerId = peerId ?? '';
+  String _getKey(String key, {bool userKey = true}) {
+    if (userKey) {
+      String? peerId = myself.peerId;
+      peerId = peerId ?? '';
 
-    return '$peerId-key';
+      return '$peerId-$key';
+    }
+    return key;
   }
 
-  save(String key, String value) async {
+  save(String key, String value, {bool userKey = true}) async {
     try {
       return await _secureStorage.write(
-        key: key,
+        key: _getKey(key, userKey: userKey),
         value: value,
         iOptions: iOptions,
         aOptions: aOptions,
@@ -67,10 +70,10 @@ class LocalSecurityStorage {
     return {};
   }
 
-  Future<String?> get(String key) async {
+  Future<String?> get(String key, {bool userKey = true}) async {
     try {
       return await _secureStorage.read(
-        key: _getKey(key),
+        key: _getKey(key, userKey: userKey),
         iOptions: iOptions,
         aOptions: aOptions,
         wOptions: wOptions,
@@ -83,10 +86,10 @@ class LocalSecurityStorage {
     return null;
   }
 
-  remove(String key) async {
+  remove(String key, {bool userKey = true}) async {
     try {
       return await _secureStorage.delete(
-        key: _getKey(key),
+        key: _getKey(key, userKey: userKey),
         iOptions: iOptions,
         aOptions: aOptions,
         wOptions: wOptions,
@@ -166,31 +169,37 @@ class LocalSharedPreferences {
     return null;
   }
 
-  String _getKey(String key) {
-    String? peerId = myself.peerId;
-    peerId = peerId ?? '';
+  String _getKey(String key, {bool userKey = true}) {
+    if (userKey) {
+      String? peerId = myself.peerId;
+      peerId = peerId ?? '';
 
-    return '$peerId-key';
+      return '$peerId-$key';
+    }
+    return key;
   }
 
-  save(String key, String value, {bool encrypt = false}) async {
+  save(String key, String value,
+      {bool encrypt = false, bool userKey = true}) async {
     try {
       if (encrypt) {
         String? encrypted = await _encrypt(value);
         if (encrypted != null) {
-          return await prefs.setString(_getKey(key), encrypted);
+          return await prefs.setString(
+              _getKey(key, userKey: userKey), encrypted);
         }
       } else {
-        return await prefs.setString(_getKey(key), value);
+        return await prefs.setString(_getKey(key, userKey: userKey), value);
       }
     } catch (e) {
       logger.e('LocalSharedPreferences save:$e');
     }
   }
 
-  Future<String?> get(String key, {bool encrypt = false}) async {
+  Future<String?> get(String key,
+      {bool encrypt = false, bool userKey = true}) async {
     try {
-      String? value = prefs.getString(_getKey(key));
+      String? value = prefs.getString(_getKey(key, userKey: userKey));
       if (encrypt && value != null) {
         String? decrypted = await _decrypt(value);
         if (decrypted != null) {
@@ -204,9 +213,9 @@ class LocalSharedPreferences {
     return null;
   }
 
-  remove(String key) async {
+  remove(String key, {bool userKey = true}) async {
     try {
-      return await prefs.remove(_getKey(key));
+      return await prefs.remove(_getKey(key, userKey: userKey));
     } catch (e) {
       logger.e('LocalSharedPreferences remove:$e');
     }
