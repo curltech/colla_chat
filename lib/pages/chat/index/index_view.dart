@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
@@ -30,17 +31,20 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
+import 'package:colla_chat/transport/websocket.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_sharing_intent/flutter_sharing_intent.dart';
 import 'package:flutter_sharing_intent/model/sharing_file.dart';
 import 'package:provider/provider.dart';
 import 'package:system_tray/system_tray.dart';
+import 'package:window_manager/window_manager.dart';
 
 class IndexView extends StatefulWidget {
   final String title;
@@ -55,7 +59,10 @@ class IndexView extends StatefulWidget {
 }
 
 class _IndexViewState extends State<IndexView>
-    with SingleTickerProviderStateMixin {
+    with
+        SingleTickerProviderStateMixin,
+        WidgetsBindingObserver,
+        WindowListener {
   final ValueNotifier<bool> conferenceChatMessageVisible =
       ValueNotifier<bool>(false);
   final ValueNotifier<bool> chatMessageVisible = ValueNotifier<bool>(false);
@@ -77,6 +84,9 @@ class _IndexViewState extends State<IndexView>
   Socket? _socket;
   StreamSubscription? _socketStreamSub;
 
+  late final AppLifecycleListener _appLifecycleListener;
+  late AppLifecycleState? _appLifecycleState;
+
   @override
   void initState() {
     super.initState();
@@ -96,11 +106,116 @@ class _IndexViewState extends State<IndexView>
     });
 
     _initSystemTray();
+    _initObserver();
+  }
+
+  _initObserver() {
+    WidgetsBinding.instance.addObserver(this);
+    windowManager.addListener(this);
+    _appLifecycleState = SchedulerBinding.instance.lifecycleState;
+    _appLifecycleListener = AppLifecycleListener(
+      onShow: () {
+        logger.i('app switch to show');
+      },
+      onResume: () {
+        logger.i('app switch to resume');
+      },
+      onHide: () {
+        logger.i('app switch to hide');
+      },
+      onInactive: () {
+        logger.i('app switch to inactive');
+      },
+      onPause: () {
+        logger.i('app switch to pause');
+      },
+      onDetach: () {
+        logger.i('app switch to detach');
+      },
+      onRestart: () {
+        logger.i('app switch to restart');
+      },
+      onExitRequested: () {
+        logger.i('app switch to exit');
+        return Future.value(AppExitResponse.exit);
+      },
+      onStateChange: (AppLifecycleState state) {
+        logger.i('app state change:$state');
+      },
+    );
+  }
+
+  /// 应用窗口恢复的时候，恢复websocket的连接
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      logger.i('app switch to foreground');
+      await websocketPool.connect();
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.hidden) {
+      logger.i('app switch new state:$state');
+    }
+  }
+
+  @override
+  Future<void> onWindowFocus() async {
+    logger.i('app window focus');
+    await websocketPool.connect();
+  }
+
+  ///当前系统改变了一些访问性活动的回调
+  @override
+  void didChangeAccessibilityFeatures() {
+    super.didChangeAccessibilityFeatures();
+    logger.i("didChangeAccessibilityFeatures");
+  }
+
+  ///低内存回调
+  @override
+  void didHaveMemoryPressure() {
+    super.didHaveMemoryPressure();
+    logger.i("didHaveMemoryPressure");
+  }
+
+  ///用户本地设置变化时调用，如系统语言改变
+  @override
+  void didChangeLocales(List<Locale>? locales) {
+    super.didChangeLocales(locales);
+    logger.i("didChangeLocales");
+  }
+
+  ///应用尺寸改变时回调，例如旋转
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    Size size =
+        WidgetsBinding.instance.platformDispatcher.views.first.physicalSize;
+    logger.i("didChangeMetrics  ：宽：${size.width} 高：${size.height}");
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    super.didChangePlatformBrightness();
+    logger.i("didChangePlatformBrightness");
+  }
+
+  ///文字系数变化
+  @override
+  void didChangeTextScaleFactor() {
+    super.didChangeTextScaleFactor();
+    logger.i(
+        "didChangeTextScaleFactor  ：${WidgetsBinding.instance.platformDispatcher.textScaleFactor}");
+  }
+
+  @override
+  void onWindowEvent(String eventName) {
+    logger.i('[WindowManager] index view onWindowEvent: $eventName');
   }
 
   Future<bool?> _onWebrtcSignal(WebrtcEvent webrtcEvent) async {
     String name = webrtcEvent.name;
-
     return await DialogUtil.confirm(context,
         content: name +
             AppLocalizations.t(
@@ -625,6 +740,8 @@ class _IndexViewState extends State<IndexView>
     errorWebrtcEventStreamSubscription?.cancel();
     errorWebrtcEventStreamSubscription = null;
     _stop();
+    WidgetsBinding.instance.removeObserver(this);
+    windowManager.removeListener(this);
     super.dispose();
   }
 }

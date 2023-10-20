@@ -122,32 +122,29 @@ class _ChatMessageViewState extends State<ChatMessageView>
     _updateChatMessageView();
   }
 
+  /// 消息窗口恢复的时候，恢复webrtc的连接
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    switch (state) {
-      case AppLifecycleState.resumed:
-        _createPeerConnection();
-        break;
-      case AppLifecycleState.paused:
-        break;
-      case AppLifecycleState.inactive:
-        break;
-      case AppLifecycleState.hidden:
-        break;
-      default:
-        break;
+    if (state == AppLifecycleState.resumed) {
+      logger.i('chat message window switch to foreground');
+      _createPeerConnection();
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.hidden) {
+      logger.i('app switch new state:$state');
     }
   }
 
   @override
-  void onWindowEvent(String eventName) {
-    logger.i('[WindowManager] onWindowEvent: $eventName');
+  void onWindowFocus() {
+    logger.i('chat message window switch to foreground');
+    _createPeerConnection();
   }
 
   @override
-  void onWindowRestore() {
-    _createPeerConnection();
+  void onWindowEvent(String eventName) {
+    logger.i('[WindowManager] chat message view onWindowEvent: $eventName');
   }
 
   _updateChatMessageView() {

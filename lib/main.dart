@@ -4,10 +4,10 @@ import 'dart:ui';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/overlay/android_overlay_window.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/plugin/notification/firebase_messaging_service.dart';
 import 'package:colla_chat/plugin/notification/local_notifications_service.dart';
+import 'package:colla_chat/plugin/overlay/android_overlay_window.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -66,10 +66,7 @@ void main(List<String> args) async {
   SystemChannels.lifecycle.setMessageHandler((msg) async {
     if (msg == AppLifecycleState.resumed.toString()) {
       logger.w('system channel switch to foreground');
-      Websocket? websocket = websocketPool.getDefault();
-      if (websocket == null) {
-        await websocketPool.connect();
-      }
+      await websocketPool.connect();
     } else if (msg == AppLifecycleState.paused.toString() ||
         msg == AppLifecycleState.inactive.toString() ||
         msg == AppLifecycleState.hidden.toString()) {
@@ -139,72 +136,10 @@ class CollaChatApp extends StatefulWidget {
   }
 }
 
-class _CollaChatAppState extends State<CollaChatApp>
-    with WidgetsBindingObserver {
+class _CollaChatAppState extends State<CollaChatApp> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.resumed) {
-      logger.i('app switch to foreground');
-      Websocket? websocket = websocketPool.getDefault();
-      if (websocket == null) {
-        websocketPool.connect();
-      }
-    } else if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.inactive ||
-        state == AppLifecycleState.hidden) {
-      logger.i('app switch new state:$state');
-    }
-  }
-
-  ///当前系统改变了一些访问性活动的回调
-  @override
-  void didChangeAccessibilityFeatures() {
-    super.didChangeAccessibilityFeatures();
-    logger.i("didChangeAccessibilityFeatures");
-  }
-
-  ///低内存回调
-  @override
-  void didHaveMemoryPressure() {
-    super.didHaveMemoryPressure();
-    logger.i("didHaveMemoryPressure");
-  }
-
-  ///用户本地设置变化时调用，如系统语言改变
-  @override
-  void didChangeLocales(List<Locale>? locales) {
-    super.didChangeLocales(locales);
-    logger.i("didChangeLocales");
-  }
-
-  ///应用尺寸改变时回调，例如旋转
-  @override
-  void didChangeMetrics() {
-    super.didChangeMetrics();
-    Size size =
-        WidgetsBinding.instance.platformDispatcher.views.first.physicalSize;
-    logger.i("didChangeMetrics  ：宽：${size.width} 高：${size.height}");
-  }
-
-  @override
-  void didChangePlatformBrightness() {
-    super.didChangePlatformBrightness();
-    logger.i("didChangePlatformBrightness");
-  }
-
-  ///文字系数变化
-  @override
-  void didChangeTextScaleFactor() {
-    super.didChangeTextScaleFactor();
-    logger.i(
-        "didChangeTextScaleFactor  ：${WidgetsBinding.instance.platformDispatcher.textScaleFactor}");
   }
 
   Widget _buildMaterialApp(BuildContext context, Widget? child) {
@@ -286,7 +221,6 @@ class _CollaChatAppState extends State<CollaChatApp>
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 }

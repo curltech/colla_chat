@@ -73,11 +73,13 @@ class FirebaseMessagingService {
   }
 
   Future<String?> getToken() async {
-    if (_fcmToken == null) {
-      try {
-        _fcmToken = await FirebaseMessaging.instance.getToken();
-      } catch (e) {
-        logger.e('getToken failure:$e');
+    if (platformParams.mobile || platformParams.macos) {
+      if (_fcmToken == null) {
+        try {
+          _fcmToken = await FirebaseMessaging.instance.getToken();
+        } catch (e) {
+          logger.e('getToken failure:$e');
+        }
       }
     }
     return _fcmToken;

@@ -86,9 +86,11 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
   @override
   void initState() {
     super.initState();
-    MobileUtil.carrierRegionCode().then((value) {
-      countryCode.value = value;
-    });
+    if (platformParams.mobile) {
+      MobileUtil.carrierRegionCode().then((value) {
+        countryCode.value = value;
+      });
+    }
   }
 
   Future<void> _pickAvatar(

@@ -298,7 +298,12 @@ class WebsocketPool {
 
   Future<Websocket?> connect() async {
     return await lock.synchronized(() async {
-      return _connect();
+      Websocket? websocket = getDefault();
+      if (websocket == null) {
+        return _connect();
+      }
+
+      return websocket;
     });
   }
 
