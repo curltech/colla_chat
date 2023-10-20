@@ -352,9 +352,10 @@ class WebsocketPool {
 
   ///获取连接的缺省websocket
   Websocket? getDefault() {
-    if (_default != null && _default!.status == SocketStatus.connected ||
-        _default!.status == SocketStatus.reconnecting ||
-        _default!.status == SocketStatus.connecting) {
+    if (_default != null &&
+        (_default!.status == SocketStatus.connected ||
+            _default!.status == SocketStatus.reconnecting ||
+            _default!.status == SocketStatus.connecting)) {
       return _default;
     }
     return null;
