@@ -337,6 +337,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
                 advancedPeerConnection.basePeerConnection.initiator;
           } else {
             _peerConnectionState.value = null;
+            _dataChannelState.value = null;
           }
         } else {
           for (AdvancedPeerConnection advancedPeerConnection
@@ -394,6 +395,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
           AdvancedPeerConnection advancedPeerConnection =
               advancedPeerConnections.first;
           _dataChannelState.value = advancedPeerConnection.dataChannelState;
+        } else {
+          _dataChannelState.value = RTCDataChannelState.RTCDataChannelClosed;
         }
         if (_peerConnectionState.value !=
             RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
