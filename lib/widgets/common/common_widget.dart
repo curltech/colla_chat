@@ -160,7 +160,7 @@ class IconTextButton extends StatelessWidget {
         const SizedBox(height: 2.0),
       );
       children.add(
-        Text(
+        CommonAutoSizeText(
           label ?? '',
           style: TextStyle(
             color: labelColor,
