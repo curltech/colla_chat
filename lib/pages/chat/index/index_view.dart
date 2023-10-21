@@ -29,6 +29,7 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/notification_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/websocket.dart';
@@ -335,14 +336,23 @@ class _IndexViewState extends State<IndexView>
       this.chatMessage = chatMessage;
       String? current = indexWidgetProvider.current;
       if (current != 'chat_message') {
+        // if (mounted) {
+        //   _buildChatMessageNotification(context);
+        // }
         chatMessageVisible.value = true;
       } else {
         ChatSummary? chatSummary = chatMessageController.chatSummary;
         if (chatSummary == null) {
+          // if (mounted) {
+          //   _buildChatMessageNotification(context);
+          // }
           chatMessageVisible.value = true;
         } else {
           String? peerId = chatSummary.peerId;
           if (senderPeerId != peerId && groupId != peerId) {
+            // if (mounted) {
+            //   _buildChatMessageNotification(context);
+            // }
             chatMessageVisible.value = true;
           }
         }
@@ -362,6 +372,35 @@ class _IndexViewState extends State<IndexView>
         await conferenceChatMessageController.terminate();
       }
     }
+  }
+
+  _buildChatMessageNotification(BuildContext context) {
+    String? name = chatMessage!.senderName;
+    Widget icon = Column(
+      children: [
+        bannerAvatarImage,
+        Text(name ?? ''),
+      ],
+    );
+    String? title = chatMessage!.title;
+    Widget? titleWidget;
+    if (title != null) {
+      titleWidget = Text(title);
+    }
+    Widget contentWidget = Container();
+    String? content = chatMessage!.content;
+    String? contentType = chatMessage!.contentType;
+    if (content != null &&
+        (contentType == null ||
+            contentType == ChatMessageContentType.text.name)) {
+      content = chatMessageService.recoverContent(content);
+      contentWidget = ExtendedText(
+        content,
+        specialTextSpanBuilder: customSpecialTextSpanBuilder,
+      );
+    }
+    NotificationUtil.show(context,
+        title: titleWidget, description: contentWidget, icon: icon);
   }
 
   ///显示一般消息

@@ -9,7 +9,7 @@ class NotificationUtil {
   static show(
     BuildContext context, {
     Key? key,
-    required Widget title,
+    Widget? title,
     required Widget description,
     required Widget icon,
     Color shadowColor = Colors.grey,
@@ -74,7 +74,7 @@ class NotificationUtil {
   static info(
     BuildContext context, {
     Key? key,
-    required Widget title,
+    Widget? title,
     required Widget description,
     bool showProgressIndicator = true,
     Widget Function(void Function())? closeButton,
@@ -127,7 +127,7 @@ class NotificationUtil {
   static success(
     BuildContext context, {
     Key? key,
-    required Widget title,
+    Widget? title,
     required Widget description,
     bool showProgressIndicator = true,
     Widget Function(void Function())? closeButton,
@@ -180,7 +180,7 @@ class NotificationUtil {
   static error(
     BuildContext context, {
     Key? key,
-    required Widget title,
+    Widget? title,
     required Widget description,
     bool showProgressIndicator = true,
     Widget Function(void Function())? closeButton,
