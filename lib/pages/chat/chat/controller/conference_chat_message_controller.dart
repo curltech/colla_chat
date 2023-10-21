@@ -591,20 +591,21 @@ class ConferenceChatMessageController with ChangeNotifier {
       clientId: clientId,
     );
     //将发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
-    if (advancedPeerConnection != null) {
-      P2pConferenceClient? p2pConferenceClient =
-          p2pConferenceClientPool.getP2pConferenceClient(messageId);
-      if (p2pConferenceClient != null) {
+
+    P2pConferenceClient? p2pConferenceClient =
+        p2pConferenceClientPool.getP2pConferenceClient(messageId);
+    if (p2pConferenceClient != null) {
+      if (advancedPeerConnection != null) {
         await p2pConferenceClient
             .addAdvancedPeerConnection(advancedPeerConnection);
         if (_status == VideoChatStatus.calling) {
           status = VideoChatStatus.chatting;
         }
       } else {
-        logger.e('p2pConferenceClient:$messageId is not exist');
+        p2pConferenceClient.addParticipant(peerId, clientId);
       }
     } else {
-      logger.e('participant $peerId has no peerConnections');
+      logger.e('p2pConferenceClient:$messageId is not exist');
     }
   }
 
@@ -624,17 +625,17 @@ class ConferenceChatMessageController with ChangeNotifier {
       clientId: clientId,
     );
     //将发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
-    if (advancedPeerConnection != null) {
-      P2pConferenceClient? p2pConferenceClient = p2pConferenceClientPool
-          .getP2pConferenceClient(_conference!.conferenceId);
-      if (p2pConferenceClient != null) {
+    P2pConferenceClient? p2pConferenceClient = p2pConferenceClientPool
+        .getP2pConferenceClient(_conference!.conferenceId);
+    if (p2pConferenceClient != null) {
+      if (advancedPeerConnection != null) {
         await p2pConferenceClient
             .removeAdvancedPeerConnection(advancedPeerConnection);
       } else {
-        logger.e('p2pConferenceClient:$messageId is not exist');
+        p2pConferenceClient.removeParticipant(peerId, clientId);
       }
     } else {
-      logger.e('participant $peerId has no peerConnections');
+      logger.e('p2pConferenceClient:$messageId is not exist');
     }
   }
 

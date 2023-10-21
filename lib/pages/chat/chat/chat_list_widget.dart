@@ -313,10 +313,17 @@ class _ChatListWidgetState extends State<ChatListWidget>
     }
     var badge = avatarImage ?? AppImage.mdAppImage;
     Widget? child;
-    if (unreadNumber > 0 || connectionNum > 0) {
+    if (unreadNumber > 0) {
       child = Center(
           child: CommonAutoSizeText('$unreadNumber',
               style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white)));
+    } else if (connectionNum > 0) {
+      child = const Center(
+          child: CommonAutoSizeText('',
+              style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
                   color: Colors.white)));

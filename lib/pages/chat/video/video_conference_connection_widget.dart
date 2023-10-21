@@ -35,9 +35,12 @@ class VideoConferenceConnectionWidget extends StatelessWidget
         p2pConferenceClientPool.p2pConferenceClient;
     List<TileData> tiles = [];
     if (p2pConferenceClient != null) {
-      List<AdvancedPeerConnection> peerConnections =
+      List<AdvancedPeerConnection?> peerConnections =
           p2pConferenceClient.peerConnections;
-      for (AdvancedPeerConnection peerConnection in peerConnections) {
+      for (AdvancedPeerConnection? peerConnection in peerConnections) {
+        if (peerConnection == null) {
+          continue;
+        }
         var peerId = peerConnection.peerId;
         var name = peerConnection.name;
         var connectionState = peerConnection.connectionState;

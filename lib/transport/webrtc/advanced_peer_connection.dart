@@ -10,6 +10,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -312,6 +313,7 @@ class AdvancedPeerConnection {
     globalChatMessage.sendModifyLinkman(event.peerId, clientId: event.clientId);
     globalChatMessage.sendPreKeyBundle(event.peerId, clientId: event.clientId);
     chatMessageService.sendUnsent(receiverPeerId: event.peerId);
+    p2pConferenceClientPool.onConnected(this);
   }
 
   ///从池中移除连接

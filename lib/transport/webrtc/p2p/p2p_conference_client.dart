@@ -10,6 +10,7 @@ import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controller.dart';
+import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -27,8 +28,10 @@ class P2pConferencePeerConnection {
 class P2pConferenceClient extends PeerMediaStreamController {
   final Key key = UniqueKey();
 
-  //对方加入的webrtc连接，根据peerId和clientId作为key值
-  final Map<String, AdvancedPeerConnection> _peerConnections = {};
+  // 参与者的webrtc连接，如果连接为null，说明加入会议，但是连接还没有建立
+  final Map<String, AdvancedPeerConnection?> _peerConnections = {};
+
+  // 参与者的webrtc连接的订阅事件
   final Map<String, List<StreamSubscription<WebrtcEvent>>>
       _streamSubscriptions = {};
 
@@ -45,16 +48,20 @@ class P2pConferenceClient extends PeerMediaStreamController {
     return key;
   }
 
-  List<AdvancedPeerConnection> get peerConnections {
+  List<AdvancedPeerConnection?> get peerConnections {
     return [..._peerConnections.values];
   }
 
-  ///自己加入会议，在所有的连接中加上本地流
+  /// 自己加入会议，在所有的连接中加上本地流
   join() async {
     _joined = true;
-    List<AdvancedPeerConnection> peerConnections = [..._peerConnections.values];
-    for (AdvancedPeerConnection peerConnection in peerConnections) {
-      await addAdvancedPeerConnection(peerConnection);
+    List<AdvancedPeerConnection?> peerConnections = [
+      ..._peerConnections.values
+    ];
+    for (AdvancedPeerConnection? peerConnection in peerConnections) {
+      if (peerConnection != null) {
+        await addAdvancedPeerConnection(peerConnection);
+      }
     }
   }
 
@@ -63,11 +70,13 @@ class P2pConferenceClient extends PeerMediaStreamController {
     if (peerConnection != null) {
       await peerConnection.renegotiate(toggle: toggle);
     } else {
-      List<AdvancedPeerConnection> peerConnections = [
+      List<AdvancedPeerConnection?> peerConnections = [
         ..._peerConnections.values
       ];
-      for (AdvancedPeerConnection peerConnection in peerConnections) {
-        await peerConnection.renegotiate(toggle: toggle);
+      for (AdvancedPeerConnection? peerConnection in peerConnections) {
+        if (peerConnection != null) {
+          await peerConnection.renegotiate(toggle: toggle);
+        }
       }
     }
   }
@@ -76,9 +85,13 @@ class P2pConferenceClient extends PeerMediaStreamController {
   exit() async {
     _joined = false;
     await conferenceChatMessageController.exit();
-    List<AdvancedPeerConnection> peerConnections = [..._peerConnections.values];
-    for (AdvancedPeerConnection peerConnection in peerConnections) {
-      await _removeRemotePeerMediaStream(peerConnection);
+    List<AdvancedPeerConnection?> peerConnections = [
+      ..._peerConnections.values
+    ];
+    for (AdvancedPeerConnection? peerConnection in peerConnections) {
+      if (peerConnection != null) {
+        await _removeRemotePeerMediaStream(peerConnection);
+      }
       List<PeerMediaStream> peerMediaStreams =
           localPeerMediaStreamController.peerMediaStreams;
       if (peerMediaStreams.isNotEmpty) {
@@ -121,13 +134,32 @@ class P2pConferenceClient extends PeerMediaStreamController {
         }
         await renegotiate(peerConnection: peerConnection, toggle: true);
       } else {
-        for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
-          for (var peerMediaStream in peerMediaStreams) {
-            await peerConnection.addLocalStream(peerMediaStream);
+        for (AdvancedPeerConnection? peerConnection
+            in _peerConnections.values) {
+          if (peerConnection != null) {
+            for (var peerMediaStream in peerMediaStreams) {
+              await peerConnection.addLocalStream(peerMediaStream);
+            }
           }
           await renegotiate(peerConnection: peerConnection, toggle: true);
         }
       }
+    }
+  }
+
+  /// 对方加入会议，但是连接还未建立
+  addParticipant(String peerId, String clientId) {
+    var key = _getKey(peerId, clientId);
+    _peerConnections[key] = null;
+  }
+
+  /// 对方已经加入会议，但是连接建立了
+  updateAdvancedPeerConnection(AdvancedPeerConnection peerConnection) async {
+    var key = _getKey(peerConnection.peerId, peerConnection.clientId);
+    AdvancedPeerConnection? pc = _peerConnections[key];
+    if (pc == null) {
+      _peerConnections.remove(key);
+      await addAdvancedPeerConnection(peerConnection);
     }
   }
 
@@ -173,9 +205,11 @@ class P2pConferenceClient extends PeerMediaStreamController {
   ///获取同peerId的所有连接
   List<AdvancedPeerConnection> getAdvancedPeerConnections(String peerId) {
     List<AdvancedPeerConnection> pcs = [];
-    for (var pc in _peerConnections.values) {
-      if (peerId == pc.peerId) {
-        pcs.add(pc);
+    for (AdvancedPeerConnection? pc in _peerConnections.values) {
+      if (pc != null) {
+        if (peerId == pc.peerId) {
+          pcs.add(pc);
+        }
       }
     }
     return pcs;
@@ -210,14 +244,29 @@ class P2pConferenceClient extends PeerMediaStreamController {
       }
       await renegotiate(peerConnection: peerConnection);
     } else {
-      List<AdvancedPeerConnection> peerConnections = [
+      List<AdvancedPeerConnection?> peerConnections = [
         ..._peerConnections.values
       ];
-      for (AdvancedPeerConnection peerConnection in peerConnections) {
-        for (var peerMediaStream in peerMediaStreams) {
-          await peerConnection.removeStream(peerMediaStream);
+      for (AdvancedPeerConnection? peerConnection in peerConnections) {
+        if (peerConnection != null) {
+          for (var peerMediaStream in peerMediaStreams) {
+            await peerConnection.removeStream(peerMediaStream);
+          }
         }
         await renegotiate(peerConnection: peerConnection);
+      }
+    }
+  }
+
+  /// 对方退出会议
+  removeParticipant(String peerId, String clientId) {
+    var key = _getKey(peerId, clientId);
+    if (_peerConnections.containsKey(key)) {
+      AdvancedPeerConnection? advancedPeerConnection = _peerConnections[key];
+      if (advancedPeerConnection != null) {
+        removeAdvancedPeerConnection(advancedPeerConnection);
+      } else {
+        _peerConnections.remove(key);
       }
     }
   }
@@ -424,15 +473,11 @@ class P2pConferenceClientPool with ChangeNotifier {
         .conference;
   }
 
-  ///加新的连接
-  addAdvancedPeerConnection(AdvancedPeerConnection peerConnection) async {
-    if (conferenceId == null) {
-      return;
-    }
-    P2pConferenceClient? p2pConferenceClient =
-        _p2pConferenceClients[conferenceId];
-    if (p2pConferenceClient != null) {
-      await p2pConferenceClient.addAdvancedPeerConnection(peerConnection);
+  /// 新的连接建立事件，如果各会议的连接中存在已经加入但是连接为建立的情况则更新连接
+  onConnected(AdvancedPeerConnection peerConnection) async {
+    for (P2pConferenceClient p2pConferenceClient
+        in _p2pConferenceClients.values) {
+      await p2pConferenceClient.updateAdvancedPeerConnection(peerConnection);
     }
   }
 
