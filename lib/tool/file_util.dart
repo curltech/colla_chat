@@ -530,7 +530,7 @@ class FileUtil {
     void Function(List<Uint8List>)? onSelectedBytes,
     void Function(int)? onError,
   }) {
-    Language language = Language.copy(
+    FullPickerLanguage language = FullPickerLanguage.copy(
       camera: AppLocalizations.t('Camera'),
       selectFile: AppLocalizations.t('SelectFile'),
       file: AppLocalizations.t('File'),

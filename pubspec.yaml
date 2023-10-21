@@ -98,6 +98,10 @@ dependencies:
 
   #界面
   bubble: ^1.2.1
+  fluttertoast: ^8.2.1
+  flutter_local_notifications: ^15.1.1
+  stacked_notification_cards: ^0.1.0-dev.4
+  toastification: ^1.0.2
   cupertino_icons: ^1.0.2
   icons_plus: ^4.0.0
   simple_icons: ^7.10.0 #icon: Icon(SimpleIcons.github)
@@ -127,7 +131,8 @@ dependencies:
   mobile_number: ^2.1.1 #仅支持android，获取电话号码，ios无此功能
   phone_numbers_parser: ^8.0.0 #支持所有的平台
   badges: ^3.0.2
-  extended_list: any
+  elegant_notification: ^1.11.2
+  extended_list: ^3.0.0
   glassmorphism_widgets: ^0.2.2
   glass_kit: ^3.0.0
   #flui: 0.9.2
@@ -141,7 +146,6 @@ dependencies:
       url: https://github.com/den0206/Flutter-Neumorphic.git
       ref: feature/remoce_accentcolor
   fl_chart: ^0.64.0
-  fluttertoast: ^8.2.1
   extended_text: ^11.1.0 #文本扩展显示
   extended_text_field: ^12.1.0 #文字表情混入
   extended_text_library: ^11.1.0 #Flutter2.5用这个,,其他可注释
@@ -210,7 +214,6 @@ dependencies:
   libsignal_protocol_dart: ^0.7.1
   crypto: ^3.0.1 #sha
   archive: ^3.3.7
-  uuid: 3.0.7
   local_auth: ^2.1.6
 
   #基本开发工具
@@ -319,9 +322,9 @@ dependencies:
   #应用
   #  flutter_filereader: 3.0.0 #引入x5浏览器
   i18n_extension: ^9.0.2
-  quill_html_editor: ^2.1.9
+  quill_html_editor: ^2.2.6
   html_editor_enhanced: ^2.5.1
-  flutter_quill: ^7.2.6
+  flutter_quill: ^7.5.0
   vsc_quill_delta_to_html: ^1.0.3
   #git: https://github.com/singerdmx/flutter-quill.git
   flutter_quill_extensions: #^0.3.2
@@ -346,7 +349,6 @@ dependencies:
   #服务
   firebase_core: ^2.16.0
   firebase_messaging: ^14.6.8
-  flutter_local_notifications: ^15.1.1
   # 支持本地和fcm
   #  awesome_notifications: ^0.7.4+1
   #  awesome_notifications_fcm: ^0.7.4+1 #对minsdk有要求
@@ -364,6 +366,7 @@ dependencies:
   dart_chatgpt: ^1.0.2
   livekit_client: ^1.4.3 #livekit sfu server flutter client
 dependency_overrides:
+  uuid: ^4.1.0
   flutter_math_fork: ^0.7.1
   photo_view: ^0.14.0
   device_info_plus: ^9.0.2

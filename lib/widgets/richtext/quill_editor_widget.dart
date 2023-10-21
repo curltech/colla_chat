@@ -81,22 +81,25 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        titlePadding: const EdgeInsets.only(left: 16, top: 8),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            CommonAutoSizeText('${isEditing ? 'Edit' : 'Add'} note'),
-            IconButton(
-              onPressed: () => Navigator.of(context).pop(),
-              icon: const Icon(Icons.close),
-            )
-          ],
-        ),
-        content: QuillEditor.basic(
-          controller: quillEditorController,
-          readOnly: false,
-        ),
-      ),
+          titlePadding: const EdgeInsets.only(left: 16, top: 8),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              CommonAutoSizeText('${isEditing ? 'Edit' : 'Add'} note'),
+              IconButton(
+                onPressed: () => Navigator.of(context).pop(),
+                icon: const Icon(Icons.close),
+              )
+            ],
+          ),
+          content: QuillProvider(
+            configurations: QuillConfigurations(
+              controller: quillEditorController,
+            ),
+            child: QuillEditor.basic(
+              readOnly: false,
+            ),
+          )),
     );
 
     if (quillEditorController.document.isEmpty()) return;
@@ -265,7 +268,6 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     }
     var toolbar = QuillToolbar.basic(
       locale: myself.locale,
-      controller: quillController,
       toolbarIconAlignment: WrapAlignment.start,
       toolbarIconCrossAlignment: WrapCrossAlignment.start,
       toolbarSectionSpacing: 1,
@@ -286,7 +288,6 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
       minHeight: 200,
       maxHeight: widget.height,
       locale: myself.locale,
-      controller: quillController,
       scrollController: ScrollController(),
       scrollable: true,
       focusNode: _focusNode,
@@ -304,39 +305,43 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
 
     var toolbar = _buildQuillToolbar(context);
 
-    return Card(
-        color: myself.getBackgroundColor(context).withOpacity(0.6),
-        elevation: 0.0,
-        margin: EdgeInsets.zero,
-        shape: const ContinuousRectangleBorder(),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                const SizedBox(
-                  height: 5.0,
-                ),
-                toolbar,
-                const SizedBox(
-                  height: 5.0,
-                ),
-                Divider(
-                  height: 1.0,
-                  thickness: 1.0,
-                  color: myself.primary,
-                ),
-                const SizedBox(
-                  height: 5.0,
-                ),
-                Expanded(
-                    child: SizedBox(
-                  height: widget.height,
-                  child: quillEditor,
-                )),
-              ]),
-        ));
+    return QuillProvider(
+        configurations: QuillConfigurations(
+          controller: quillController,
+        ),
+        child: Card(
+            color: myself.getBackgroundColor(context).withOpacity(0.6),
+            elevation: 0.0,
+            margin: EdgeInsets.zero,
+            shape: const ContinuousRectangleBorder(),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    const SizedBox(
+                      height: 5.0,
+                    ),
+                    toolbar,
+                    const SizedBox(
+                      height: 5.0,
+                    ),
+                    Divider(
+                      height: 1.0,
+                      thickness: 1.0,
+                      color: myself.primary,
+                    ),
+                    const SizedBox(
+                      height: 5.0,
+                    ),
+                    Expanded(
+                        child: SizedBox(
+                      height: widget.height,
+                      child: quillEditor,
+                    )),
+                  ]),
+            )));
   }
 
   @override
