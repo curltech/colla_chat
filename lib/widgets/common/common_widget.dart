@@ -164,7 +164,7 @@ class IconTextButton extends StatelessWidget {
           label ?? '',
           style: TextStyle(
             color: labelColor,
-            fontSize: 14.0,
+            fontSize: 10.0,
           ),
           overflow: TextOverflow.visible,
           softWrap: false,
