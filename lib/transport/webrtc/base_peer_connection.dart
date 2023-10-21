@@ -266,9 +266,6 @@ class BasePeerConnection {
 
   final Lock _offerLock = Lock();
 
-  //数据通道的状态是否打开
-  bool dataChannelOpen = false;
-
   //主动发送数据的通道
   RTCDataChannel? dataChannel;
 
@@ -595,8 +592,8 @@ class BasePeerConnection {
 
   ///连接状态为连接，而且数据通道打开
   bool get connected {
-    if (dataChannelOpen &&
-        dataChannel != null &&
+    if (dataChannel != null &&
+        dataChannel!.state == RTCDataChannelState.RTCDataChannelOpen &&
         _peerConnection?.connectionState ==
             RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
       return true;
@@ -608,8 +605,8 @@ class BasePeerConnection {
     if (end != null) {
       return;
     }
-    if (dataChannelOpen &&
-        dataChannel != null &&
+    if (dataChannel != null &&
+        dataChannel!.state == RTCDataChannelState.RTCDataChannelOpen &&
         _peerConnection?.connectionState ==
             RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
       logger
@@ -670,6 +667,20 @@ class BasePeerConnection {
     emit(WebrtcEventType.signalingState, state);
   }
 
+  //数据通道状态事件
+  onDataChannelState(RTCDataChannelState state) async {
+    logger.i('onDataChannelState event:$state');
+    //数据通道打开
+    if (state == RTCDataChannelState.RTCDataChannelOpen) {
+      logger.i('data channel open');
+    }
+    //数据通道关闭
+    if (state == RTCDataChannelState.RTCDataChannelClosed) {
+      logger.i('data channel close');
+    }
+    emit(WebrtcEventType.dataChannelState, state);
+  }
+
   ///onIceCandidate事件表示本地candidate准备好，可以发送IceCandidate到远端
   onIceCandidate(RTCIceCandidate candidate) async {
     ///如果注册了iceCandidate事件，则直接执行事件
@@ -715,22 +726,6 @@ class BasePeerConnection {
   ///需要重新协商，一般是本节点有增减轨道的时候
   onRenegotiationNeeded() {
     logger.w('onRenegotiationNeeded event');
-  }
-
-  //数据通道状态事件
-  onDataChannelState(RTCDataChannelState state) async {
-    logger.i('onDataChannelState event:$state');
-    //数据通道打开
-    if (state == RTCDataChannelState.RTCDataChannelOpen) {
-      logger.i('data channel open');
-      dataChannelOpen = true;
-      onConnected();
-    }
-    //数据通道关闭
-    if (state == RTCDataChannelState.RTCDataChannelClosed) {
-      logger.i('data channel close');
-      dataChannelOpen = false;
-    }
   }
 
   bool? get initiator {
@@ -1610,7 +1605,8 @@ class BasePeerConnection {
       return false;
     }
     final dataChannel = this.dataChannel;
-    if (!dataChannelOpen || dataChannel == null) {
+    if (dataChannel == null ||
+        dataChannel.state != RTCDataChannelState.RTCDataChannelOpen) {
       logger.e('PeerConnection dataChannel is not open');
 
       return false;
@@ -1662,7 +1658,6 @@ class BasePeerConnection {
       } catch (err) {
         logger.e('close dataChannel err:$err');
       }
-      dataChannelOpen = false;
       // allow events concurrent with destruction to be handled
       dataChannel.onMessage = null;
       dataChannel.onDataChannelState = null;

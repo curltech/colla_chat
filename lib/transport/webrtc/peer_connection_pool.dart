@@ -313,9 +313,8 @@ class PeerConnectionPool {
     return false;
   }
 
-  /// 获取连接已经建立的连接，可能是多个
-  /// @param peerId
-  List<AdvancedPeerConnection>? getConnected(String peerId) {
+  /// 获取连接已经建立的连接，数据通道也是打开的，可能是多个
+  List<AdvancedPeerConnection> getConnected(String peerId) {
     List<AdvancedPeerConnection> peerConnections_ = [];
     Map<String, AdvancedPeerConnection>? peerConnections =
         _peerConnections.get(peerId);
@@ -326,11 +325,25 @@ class PeerConnectionPool {
         }
       }
     }
-    if (peerConnections_.isNotEmpty) {
-      return peerConnections_;
+
+    return peerConnections_;
+  }
+
+  /// 获取连接已经建立的连接，可能是多个
+  List<AdvancedPeerConnection>? getConnectedState(String peerId) {
+    List<AdvancedPeerConnection> peerConnections_ = [];
+    Map<String, AdvancedPeerConnection>? peerConnections =
+        _peerConnections.get(peerId);
+    if (peerConnections != null && peerConnections.isNotEmpty) {
+      for (AdvancedPeerConnection peerConnection in peerConnections.values) {
+        if (peerConnection.connectionState ==
+            RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+          peerConnections_.add(peerConnection);
+        }
+      }
     }
 
-    return null;
+    return peerConnections_;
   }
 
   Future<List<AdvancedPeerConnection>> getAll() async {
@@ -567,7 +580,8 @@ class PeerConnectionPool {
     if (peerConnections.isNotEmpty) {
       List<Future<bool>> ps = [];
       for (var peerConnection in peerConnections) {
-        if (peerConnection.dataChannelOpen &&
+        if (peerConnection.dataChannelState ==
+                RTCDataChannelState.RTCDataChannelOpen &&
             peerConnection.basePeerConnection.dataChannel != null) {
           Future<bool> p = peerConnection.send(data);
           ps.add(p);

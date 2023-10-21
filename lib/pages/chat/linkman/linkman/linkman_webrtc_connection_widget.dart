@@ -2,7 +2,9 @@ import 'package:badges/badges.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -11,6 +13,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
+import 'package:webrtc_interface/webrtc_interface.dart';
 
 final DataListController<Linkman> groupLinkmanController =
     DataListController<Linkman>();
@@ -76,7 +79,7 @@ class _LinkmanWebrtcConnectionWidgetState
     return badge;
   }
 
-  List<TileData> _buildConnectionTileData(BuildContext context) {
+  Future<List<TileData>> _buildConnectionTileData(BuildContext context) async {
     List<Linkman> linkmen = groupLinkmanController.data;
     List<TileData> tiles = [];
     if (linkmen.isNotEmpty) {
@@ -87,17 +90,24 @@ class _LinkmanWebrtcConnectionWidgetState
         String routeName = 'linkman_edit';
         prefix = prefix ?? AppImage.mdAppImage;
         int connectionNum = 0;
-        List<AdvancedPeerConnection>? connections =
-            peerConnectionPool.getConnected(peerId);
-        if (connections != null && connections.isNotEmpty) {
+        RTCDataChannelState? dataChannelState =
+            RTCDataChannelState.RTCDataChannelClosed;
+        List<AdvancedPeerConnection> connections =
+            await peerConnectionPool.get(peerId);
+        if (connections.isNotEmpty) {
           connectionNum = connections.length;
+          dataChannelState = connections.first.dataChannelState;
         }
         TileData tile = TileData(
             prefix: _buildBadge(connectionNum, avatarImage: prefix),
             title: name,
             subtitle: peerId,
+            titleTail: dataChannelState?.name.substring(14),
             selected: false,
-            routeName: routeName);
+            routeName: routeName,
+            onTap: (int index, String title, {String? subtitle}) {
+              linkmanController.current = linkman;
+            });
         tiles.add(tile);
       }
     }
@@ -106,9 +116,21 @@ class _LinkmanWebrtcConnectionWidgetState
   }
 
   Widget _buildConnectionListView(BuildContext context) {
-    var connectionView = DataListView(
-      tileData: _buildConnectionTileData(context),
-    );
+    var connectionView = FutureBuilder(
+        future: _buildConnectionTileData(context),
+        builder:
+            (BuildContext context, AsyncSnapshot<List<TileData>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            List<TileData>? tileData = snapshot.data;
+            tileData ??= [];
+
+            return DataListView(
+              tileData: snapshot.data!,
+            );
+          }
+
+          return LoadingUtil.buildLoadingIndicator();
+        });
 
     return connectionView;
   }

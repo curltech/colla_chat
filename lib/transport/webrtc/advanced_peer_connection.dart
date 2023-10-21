@@ -55,6 +55,7 @@ class AdvancedPeerConnection {
     listen(WebrtcEventType.connected, onConnected);
     listen(WebrtcEventType.connectionState, onConnectionState);
     listen(WebrtcEventType.signalingState, onSignalingState);
+    listen(WebrtcEventType.dataChannelState, onDataChannelState);
     listen(WebrtcEventType.closed, onClosed);
     listen(WebrtcEventType.stream, onStream);
     listen(WebrtcEventType.removeStream, onRemoveStream);
@@ -200,8 +201,8 @@ class AdvancedPeerConnection {
     await basePeerConnection.restartIce();
   }
 
-  bool get dataChannelOpen {
-    return basePeerConnection.dataChannelOpen;
+  RTCDataChannelState? get dataChannelState {
+    return basePeerConnection.dataChannel?.state;
   }
 
   RTCPeerConnectionState? get connectionState {
@@ -270,7 +271,8 @@ class AdvancedPeerConnection {
 
   ///发送数据
   Future<bool> send(List<int> data) async {
-    if (dataChannelOpen && basePeerConnection.dataChannel != null) {
+    if (basePeerConnection.dataChannel != null &&
+        dataChannelState == RTCDataChannelState.RTCDataChannelOpen) {
       return await basePeerConnection.send(data);
     } else {
       logger.e(
@@ -282,7 +284,8 @@ class AdvancedPeerConnection {
   /// 调用本连接或者signalAction发送signal到信号服务器
   Future<bool> sendSignal(WebrtcSignal signal) async {
     try {
-      if (dataChannelOpen && basePeerConnection.dataChannel != null) {
+      if (basePeerConnection.dataChannel != null &&
+          dataChannelState == RTCDataChannelState.RTCDataChannelOpen) {
         ChatMessage chatMessage = await chatMessageService.buildChatMessage(
             receiverPeerId: peerId,
             content: signal,
@@ -326,6 +329,8 @@ class AdvancedPeerConnection {
   onConnectionState(WebrtcEvent event) async {}
 
   onSignalingState(WebrtcEvent event) async {}
+
+  onDataChannelState(WebrtcEvent event) async {}
 
   onError(WebrtcEvent event) async {}
 

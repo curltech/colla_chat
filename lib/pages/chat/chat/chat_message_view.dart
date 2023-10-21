@@ -80,6 +80,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
     with WidgetsBindingObserver, WindowListener {
   final ValueNotifier<RTCPeerConnectionState?> _peerConnectionState =
       ValueNotifier<RTCPeerConnectionState?>(null);
+  final ValueNotifier<RTCDataChannelState?> _dataChannelState =
+      ValueNotifier<RTCDataChannelState?>(null);
   final ValueNotifier<ChatSummary?> _chatSummary =
       ValueNotifier<ChatSummary?>(chatMessageController.chatSummary);
   final ValueNotifier<double> chatMessageHeight = ValueNotifier<double>(0);
@@ -264,6 +266,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
         advancedPeerConnection = await peerConnectionPool.createOffer(peerId);
         if (advancedPeerConnection != null) {
           _peerConnectionState.value = advancedPeerConnection.connectionState;
+          _dataChannelState.value = advancedPeerConnection.dataChannelState;
           _initiator.value =
               advancedPeerConnection.basePeerConnection.initiator;
         } else {
@@ -274,6 +277,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
         for (AdvancedPeerConnection advancedPeerConnection
             in advancedPeerConnections) {
           _peerConnectionState.value = advancedPeerConnection.connectionState;
+          _dataChannelState.value = advancedPeerConnection.dataChannelState;
           _initiator.value =
               advancedPeerConnection.basePeerConnection.initiator;
           if (advancedPeerConnection.connectionState ==
@@ -328,6 +332,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
               await peerConnectionPool.createOffer(memberPeerId);
           if (advancedPeerConnection != null) {
             _peerConnectionState.value = advancedPeerConnection.connectionState;
+            _dataChannelState.value = advancedPeerConnection.dataChannelState;
             _initiator.value =
                 advancedPeerConnection.basePeerConnection.initiator;
           } else {
@@ -337,6 +342,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
           for (AdvancedPeerConnection advancedPeerConnection
               in advancedPeerConnections) {
             _peerConnectionState.value = advancedPeerConnection.connectionState;
+            _dataChannelState.value = advancedPeerConnection.dataChannelState;
             _initiator.value =
                 advancedPeerConnection.basePeerConnection.initiator;
             if (advancedPeerConnection.connectionState ==
@@ -382,6 +388,13 @@ class _ChatMessageViewState extends State<ChatMessageView>
       RTCPeerConnectionState? oldState = _peerConnectionState.value;
       if (oldState != state) {
         _peerConnectionState.value = state;
+        List<AdvancedPeerConnection> advancedPeerConnections =
+            await peerConnectionPool.get(peerId);
+        if (advancedPeerConnections.isNotEmpty) {
+          AdvancedPeerConnection advancedPeerConnection =
+              advancedPeerConnections.first;
+          _dataChannelState.value = advancedPeerConnection.dataChannelState;
+        }
         if (_peerConnectionState.value !=
             RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
           // if (mounted) {
@@ -481,7 +494,6 @@ class _ChatMessageViewState extends State<ChatMessageView>
           valueListenable: _peerConnectionState,
           builder: (context, value, child) {
             Widget widget;
-
             if (_peerConnectionState.value ==
                 RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
               widget = IconButton(
@@ -506,7 +518,9 @@ class _ChatMessageViewState extends State<ChatMessageView>
                 tooltip: AppLocalizations.t('Reconnect'),
               );
             }
-            String? stateText = _peerConnectionState.value?.name;
+            RTCPeerConnectionState? peerConnectionState =
+                _peerConnectionState.value;
+            String? stateText = peerConnectionState?.name;
             stateText = stateText?.substring(22);
             stateText ??= 'Unknown';
             widget =
@@ -518,8 +532,45 @@ class _ChatMessageViewState extends State<ChatMessageView>
 
             return widget;
           });
-
       rightWidgets.add(peerConnectionStatusWidget);
+      var dataChannelStatusWidget = ValueListenableBuilder(
+          valueListenable: _dataChannelState,
+          builder: (context, value, child) {
+            Widget widget;
+            if (_dataChannelState.value ==
+                RTCDataChannelState.RTCDataChannelOpen) {
+              widget = IconButton(
+                onPressed: () {},
+                icon: const Icon(
+                  Icons.wifi,
+                  color: Colors.white,
+                ),
+                tooltip: AppLocalizations.t('DataChannel'),
+              );
+            } else {
+              widget = IconButton(
+                onPressed: () {},
+                icon: const Icon(
+                  Icons.wifi_off,
+                  color: Colors.red,
+                ),
+                tooltip: AppLocalizations.t('DataChannel'),
+              );
+            }
+            RTCDataChannelState? dataChannelState = _dataChannelState.value;
+            String? stateText = dataChannelState?.name;
+            stateText = stateText?.substring(14);
+            stateText ??= 'Unknown';
+            widget =
+                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              widget,
+              CommonAutoSizeText(AppLocalizations.t(stateText),
+                  style: const TextStyle(fontSize: 12))
+            ]);
+
+            return widget;
+          });
+      rightWidgets.add(dataChannelStatusWidget);
       rightWidgets.add(const SizedBox(
         width: 15,
       ));
