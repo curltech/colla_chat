@@ -149,7 +149,7 @@ class FileUtil {
     return null;
   }
 
-  ///选择文件对话框，适用于所有的平台
+  /// 使用原生的选择文件对话框，适用于所有的平台，在ios平台上只能访问
   static Future<List<XFile>> pickFiles({
     String? dialogTitle,
     String? initialDirectory,
@@ -279,6 +279,7 @@ class FileUtil {
         .saveAs(name: name, bytes: bytes, ext: ext, mimeType: mimeType);
   }
 
+  /// 自定义的界面在文件系统中打开单个文件
   static Future<XFile?> open({
     required BuildContext context,
     Directory? rootDirectory,
