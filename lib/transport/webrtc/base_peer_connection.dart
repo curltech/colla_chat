@@ -257,6 +257,7 @@ class BasePeerConnection {
 
   //暂存candidate
   final List<RTCIceCandidate> _pendingIceCandidates = [];
+  final List<RTCIceCandidate> _pendingRemoteIceCandidates = [];
 
   //完美协商过程需要的状态变量
   bool makingOffer = false; //主叫是否发出offer信号
@@ -1586,8 +1587,10 @@ class BasePeerConnection {
             logger.e('addCandidate failure:$e');
           }
         }
+        // _pendingRemoteIceCandidates.clear();
       } else {
-        logger.e('get localDescription or remoteDescription failure');
+        // _pendingRemoteIceCandidates.clear();
+        // _pendingRemoteIceCandidates.addAll(iceCandidates);
       }
     } catch (e) {
       logger.e('get localDescription or remoteDescription failure:$e');
