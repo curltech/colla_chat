@@ -120,9 +120,10 @@ dependencies:
   #awesome_select: ^6.0.0
   #multi_select_flutter: ^4.1.2
   chips_choice: ^3.0.0
-  #fancy_password_field: ^2.0.0
+  validation_pro: ^1.1.0
   flutter_pw_validator: ^1.6.0 #FlutterPwValidator放在TextFormField下面显示校验结果
   fzregex: ^2.0.0 #静态方法：Fzregex.hasMatch
+  regexpattern: ^2.5.0
   phone_number: ^2.0.1 #仅支持ios和android，解析电话号码
   #sim_info: ^0.1.3
   phone_form_field: ^8.1.0 #支持所有平台，电话号码的录入字段
