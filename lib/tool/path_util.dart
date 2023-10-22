@@ -61,7 +61,7 @@ class PathUtil {
   }
 
   static Future<Directory?> getExternalStorageDirectory() async {
-    if (platformParams.mobile || platformParams.windows) {
+    if (platformParams.android || platformParams.windows) {
       final dir = await path.getExternalStorageDirectory();
       return dir;
     }
