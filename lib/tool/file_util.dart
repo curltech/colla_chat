@@ -298,10 +298,46 @@ class FileUtil {
     FilesystemPickerThemeBase? theme,
     List<FilesystemPickerContextAction> contextActions = const [],
   }) async {
+    List<FilesystemPickerShortcut> shortcuts = [
+      FilesystemPickerShortcut(
+          name: 'Documents',
+          path: await PathUtil.getApplicationDocumentsDirectory(),
+          icon: Icons.snippet_folder),
+      FilesystemPickerShortcut(
+          name: 'Temporary', path: await PathUtil.getTemporaryDirectory()),
+      FilesystemPickerShortcut(
+          name: 'Library',
+          path: await PathUtil.getLibraryDirectory(),
+          icon: Icons.snippet_folder),
+      FilesystemPickerShortcut(
+          name: 'Support',
+          path: await PathUtil.getApplicationSupportDirectory(),
+          icon: Icons.snippet_folder),
+    ];
+    Directory? downloadsDirectory = await PathUtil.getDownloadsDirectory();
+    if (downloadsDirectory != null) {
+      shortcuts.add(
+        FilesystemPickerShortcut(name: 'Downloads', path: downloadsDirectory),
+      );
+    }
+    Directory? externalStorageDirectory =
+        await PathUtil.getExternalStorageDirectory();
+    if (externalStorageDirectory != null) {
+      shortcuts.add(
+        FilesystemPickerShortcut(
+            name: 'ExternalStorage', path: externalStorageDirectory),
+      );
+    }
+    if (rootDirectory != null) {
+      shortcuts.add(
+        FilesystemPickerShortcut(name: 'Root', path: rootDirectory),
+      );
+    }
     String? path = await FilesystemPicker.open(
       title: AppLocalizations.t('Open file'),
       context: context,
       rootDirectory: rootDirectory,
+      directory: directory,
       fsType: fsType,
       allowedExtensions: allowedExtensions,
       fileTileSelectMode: fileTileSelectMode,
@@ -313,6 +349,7 @@ class FileUtil {
       theme: theme,
       itemFilter: itemFilter,
       requestPermission: requestPermission,
+      shortcuts: shortcuts,
     );
     if (path != null) {
       return XFile(path);

@@ -355,9 +355,9 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   ///文件
   Future<void> _onActionFile() async {
-    Directory? rootDirectory = await PathUtil.getLibraryDirectory();
-    XFile? xfile =
-        await FileUtil.open(context: context, rootDirectory: rootDirectory);
+    XFile? xfile = await FileUtil.open(
+      context: context,
+    );
     if (xfile != null) {
       Uint8List data = await xfile.readAsBytes();
       // Uint8List? thumbnail = await ImageUtil.compressThumbnail(xfile: xfile);
