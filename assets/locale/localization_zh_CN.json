@@ -584,5 +584,6 @@
   "Open": "打开",
   "Closing": "关闭中",
   "Leader": "主",
-  "Follower": "从"
+  "Follower": "从",
+  "Group edit": "群编辑"
 }
