@@ -584,15 +584,19 @@ class _ChatMessageViewState extends State<ChatMessageView>
           builder: (context, initiator, child) {
             if (initiator != null) {
               if (initiator) {
-                return const Icon(
-                  Icons.light_mode,
-                  color: Colors.yellow,
-                );
+                return Tooltip(
+                    message: AppLocalizations.t('Leader'),
+                    child: const Icon(
+                      Icons.light_mode,
+                      color: Colors.yellow,
+                    ));
               } else {
-                return const Icon(
-                  Icons.light_mode,
-                  color: Colors.grey,
-                );
+                return Tooltip(
+                    message: AppLocalizations.t('Follower'),
+                    child: const Icon(
+                      Icons.light_mode,
+                      color: Colors.grey,
+                    ));
               }
             }
             return Container();
