@@ -204,9 +204,9 @@ dependencies:
   loading_animation_widget: ^1.2.0+4
 
   #安全加密
-  cryptography: ^2.0.5 #ecc,aes
+  cryptography: ^2.7.0 #ecc,aes
   #在macos上不能使用，error: cannot call value of non-function type 'FlutterBinaryMessenger'
-  #cryptography_flutter: ^2.0.2
+  cryptography_flutter: ^2.3.2
   bs58: ^1.0.2
   webcrypto: ^0.5.3
   pinenacl: ^0.5.1

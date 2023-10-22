@@ -3,11 +3,12 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
 import 'package:cryptography/cryptography.dart';
+import 'package:cryptography_flutter/cryptography_flutter.dart';
 
 class CryptoGraphy {
   CryptoGraphy() {
     ///目前在macos上不能使用，其功能是加速快加密的速度
-    //FlutterCryptography.enable();
+    FlutterCryptography.enable();
   }
 
   /// 对消息进行hash处理，输入消息可以为字符串或者uintarray，

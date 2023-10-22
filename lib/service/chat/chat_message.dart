@@ -54,10 +54,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     post = (Map map) {
       return ChatMessage.fromJson(map);
     };
-    timer = Timer.periodic(const Duration(seconds: 60), (timer) async {
-      deleteTimeout();
-      deleteSystem();
-    });
+    // timer = Timer.periodic(const Duration(seconds: 60), (timer) async {
+    //   deleteTimeout();
+    //   deleteSystem();
+    // });
   }
 
   ///查询消息号相同的所有消息
