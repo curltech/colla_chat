@@ -132,6 +132,10 @@ class AdvancedPeerConnection {
       _addWebrtcEventType(WebrtcEventType.connectionState, data);
     });
 
+    basePeerConnection.on(WebrtcEventType.dataChannelState, (data) async {
+      _addWebrtcEventType(WebrtcEventType.dataChannelState, data);
+    });
+
     basePeerConnection.on(WebrtcEventType.signalingState, (data) async {
       _addWebrtcEventType(WebrtcEventType.signalingState, data);
     });

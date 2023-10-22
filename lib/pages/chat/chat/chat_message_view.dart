@@ -87,6 +87,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
   final ValueNotifier<double> chatMessageHeight = ValueNotifier<double>(0);
   final ValueNotifier<bool?> _initiator = ValueNotifier<bool?>(null);
   StreamSubscription<WebrtcEvent>? connectionStateStreamSubscription;
+  StreamSubscription<WebrtcEvent>? dataChannelStateStreamSubscription;
   StreamSubscription<WebrtcEvent>? signalingStateStreamSubscription;
   StreamSubscription<WebrtcEvent>? closedStreamSubscription;
   StreamSubscription<WebrtcEvent>? initiatorStreamSubscription;
@@ -242,12 +243,14 @@ class _ChatMessageViewState extends State<ChatMessageView>
     ///未来应该可以自己连接另一个自己
     if (peerId == myself.peerId) {
       _peerConnectionState.value = null;
+      _dataChannelState.value = null;
       _initiator.value = null;
       return;
     }
     Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
     if (linkman == null) {
       _peerConnectionState.value = null;
+      _dataChannelState.value = null;
       _initiator.value = null;
       return;
     }
@@ -271,6 +274,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
               advancedPeerConnection.basePeerConnection.initiator;
         } else {
           _peerConnectionState.value = null;
+          _dataChannelState.value = null;
         }
       } else {
         advancedPeerConnection = advancedPeerConnections.first;
@@ -288,6 +292,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
       }
       connectionStateStreamSubscription = advancedPeerConnection?.listen(
           WebrtcEventType.connectionState, _updatePeerConnectionState);
+      dataChannelStateStreamSubscription = advancedPeerConnection?.listen(
+          WebrtcEventType.dataChannelState, _updatePeerConnectionState);
       signalingStateStreamSubscription = advancedPeerConnection?.listen(
           WebrtcEventType.signalingState, _updatePeerConnectionState);
       closedStreamSubscription = advancedPeerConnection?.listen(
@@ -379,6 +385,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
     } else if (eventType == WebrtcEventType.closed) {
       _peerConnectionState.value =
           RTCPeerConnectionState.RTCPeerConnectionStateClosed;
+      _dataChannelState.value = RTCDataChannelState.RTCDataChannelClosed;
       _initiator.value = null;
       // if (mounted) {
       //   DialogUtil.info(context,
@@ -389,15 +396,6 @@ class _ChatMessageViewState extends State<ChatMessageView>
       RTCPeerConnectionState? oldState = _peerConnectionState.value;
       if (oldState != state) {
         _peerConnectionState.value = state;
-        List<AdvancedPeerConnection> advancedPeerConnections =
-            await peerConnectionPool.get(peerId);
-        if (advancedPeerConnections.isNotEmpty) {
-          AdvancedPeerConnection advancedPeerConnection =
-              advancedPeerConnections.first;
-          _dataChannelState.value = advancedPeerConnection.dataChannelState;
-        } else {
-          _dataChannelState.value = RTCDataChannelState.RTCDataChannelClosed;
-        }
         if (_peerConnectionState.value !=
             RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
           // if (mounted) {
@@ -417,6 +415,15 @@ class _ChatMessageViewState extends State<ChatMessageView>
           // }
         }
       }
+    } else if (eventType == WebrtcEventType.dataChannelState) {
+      RTCDataChannelState? state = event.data;
+      _dataChannelState.value = state;
+      // if (mounted) {
+      //   DialogUtil.info(context,
+      //       content:
+      //           AppLocalizations.t('PeerConnection initiator was changed to ') +
+      //               _initiator.value.toString());
+      // }
     } else if (eventType == WebrtcEventType.initiator) {
       _initiator.value = event.data;
       // if (mounted) {
