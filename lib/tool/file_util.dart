@@ -328,15 +328,19 @@ class FileUtil {
             name: 'ExternalStorage', path: externalStorageDirectory),
       );
     }
-    if (rootDirectory != null) {
-      shortcuts.add(
-        FilesystemPickerShortcut(name: 'Root', path: rootDirectory),
-      );
+    if (rootDirectory == null) {
+      if (platformParams.windows) {
+        rootDirectory = Directory('C:/');
+      } else {
+        rootDirectory = Directory('/');
+      }
     }
+    shortcuts.add(
+      FilesystemPickerShortcut(name: 'Root', path: rootDirectory),
+    );
     String? path = await FilesystemPicker.open(
       title: AppLocalizations.t('Open file'),
       context: context,
-      rootDirectory: rootDirectory,
       directory: directory,
       fsType: fsType,
       allowedExtensions: allowedExtensions,
