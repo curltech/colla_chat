@@ -8,6 +8,7 @@ import 'package:colla_chat/pages/stock/setting/go_code_widget.dart';
 import 'package:colla_chat/pages/stock/setting/refresh_stock_widget.dart';
 import 'package:colla_chat/pages/stock/setting/update_stock_widget.dart';
 import 'package:colla_chat/pages/stock/trade/in_out_event_widget.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -67,13 +68,16 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
       tile.selected = false;
     }
     tileData[TileData(title: 'Me')] = meTileData;
-    final List<TileData> settingTileData = TileData.from([
+    List<TileDataMixin> mixins = [
       refreshStockWidget,
       updateStockWidget,
       eventWidget,
       filterCondWidget,
-      goCodeWidget,
-    ]);
+    ];
+    if (platformParams.desktop) {
+      mixins.add(goCodeWidget);
+    }
+    final List<TileData> settingTileData = TileData.from(mixins);
     for (var tile in settingTileData) {
       tile.dense = false;
       tile.selected = false;
