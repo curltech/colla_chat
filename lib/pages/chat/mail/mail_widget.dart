@@ -48,7 +48,7 @@ class MailWidget extends StatefulWidget with TileDataMixin {
 
 class _MailWidgetState extends State<MailWidget> {
   ValueNotifier<bool> addressVisible = ValueNotifier<bool>(false);
-  ValueNotifier<String> mailboxName = ValueNotifier<String>('');
+  ValueNotifier<String> mailboxName = ValueNotifier<String>('Mail');
 
   @override
   initState() {
@@ -154,7 +154,7 @@ class _MailWidgetState extends State<MailWidget> {
         valueListenable: mailboxName,
         builder: (BuildContext context, String mailboxName, Widget? child) {
           return CommonAutoSizeText(
-            mailboxName,
+            AppLocalizations.t(mailboxName),
             style: const TextStyle(fontSize: AppFontSize.smFontSize),
           );
         });
