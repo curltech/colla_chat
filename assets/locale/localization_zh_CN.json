@@ -580,5 +580,7 @@
   "CondParas": "条件参数",
   "Descr": "描述",
   "StockLineChart": "行情",
-  "Linkman webrtc connection": "联系人webrtc状态"
+  "Linkman webrtc connection": "联系人webrtc状态",
+  "Open": "打开",
+  "Closing": "关闭中"
 }

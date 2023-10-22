@@ -503,10 +503,15 @@ class _ChatMessageViewState extends State<ChatMessageView>
       var peerConnectionStatusWidget = ValueListenableBuilder(
           valueListenable: _peerConnectionState,
           builder: (context, value, child) {
+            RTCPeerConnectionState? peerConnectionState =
+                _peerConnectionState.value;
+            String? stateText = peerConnectionState?.name;
+            stateText = stateText?.substring(22);
+            stateText ??= 'Unknown';
             Widget widget;
             if (_peerConnectionState.value ==
                 RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
-              widget = IconButton(
+              widget = IconTextButton(
                 onPressed: () {
                   _disconnectPeerConnection();
                 },
@@ -514,10 +519,11 @@ class _ChatMessageViewState extends State<ChatMessageView>
                   Icons.wifi,
                   color: Colors.white,
                 ),
-                tooltip: AppLocalizations.t('Disconnect'),
+                label: stateText,
+                tooltip: 'Disconnect',
               );
             } else {
-              widget = IconButton(
+              widget = IconTextButton(
                 onPressed: () {
                   _createPeerConnection();
                 },
@@ -525,58 +531,47 @@ class _ChatMessageViewState extends State<ChatMessageView>
                   Icons.wifi_off,
                   color: Colors.red,
                 ),
-                tooltip: AppLocalizations.t('Reconnect'),
+                label: stateText,
+                tooltip: 'Reconnect',
               );
             }
-            RTCPeerConnectionState? peerConnectionState =
-                _peerConnectionState.value;
-            String? stateText = peerConnectionState?.name;
-            stateText = stateText?.substring(22);
-            stateText ??= 'Unknown';
-            widget =
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              widget,
-              CommonAutoSizeText(AppLocalizations.t(stateText),
-                  style: const TextStyle(fontSize: 12))
-            ]);
 
             return widget;
           });
       rightWidgets.add(peerConnectionStatusWidget);
+      rightWidgets.add(const SizedBox(
+        width: 10,
+      ));
       var dataChannelStatusWidget = ValueListenableBuilder(
           valueListenable: _dataChannelState,
           builder: (context, value, child) {
-            Widget widget;
-            if (_dataChannelState.value ==
-                RTCDataChannelState.RTCDataChannelOpen) {
-              widget = IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.wifi,
-                  color: Colors.white,
-                ),
-                tooltip: AppLocalizations.t('DataChannel'),
-              );
-            } else {
-              widget = IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.wifi_off,
-                  color: Colors.red,
-                ),
-                tooltip: AppLocalizations.t('DataChannel'),
-              );
-            }
             RTCDataChannelState? dataChannelState = _dataChannelState.value;
             String? stateText = dataChannelState?.name;
             stateText = stateText?.substring(14);
             stateText ??= 'Unknown';
-            widget =
-                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              widget,
-              CommonAutoSizeText(AppLocalizations.t(stateText),
-                  style: const TextStyle(fontSize: 12))
-            ]);
+            Widget widget;
+            if (_dataChannelState.value ==
+                RTCDataChannelState.RTCDataChannelOpen) {
+              widget = IconTextButton(
+                onPressed: null,
+                icon: const Icon(
+                  Icons.wb_cloudy_outlined,
+                  color: Colors.white,
+                ),
+                label: stateText,
+                tooltip: 'DataChannel',
+              );
+            } else {
+              widget = IconTextButton(
+                onPressed: null,
+                icon: const Icon(
+                  Icons.cloud_off,
+                  color: Colors.red,
+                ),
+                label: stateText,
+                tooltip: 'DataChannel',
+              );
+            }
 
             return widget;
           });

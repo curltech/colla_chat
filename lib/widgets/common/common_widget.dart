@@ -134,9 +134,10 @@ class IconTextButton extends StatelessWidget {
   final double? iconSize;
   final EdgeInsetsGeometry padding;
   final String? label;
-  final String? tooltip;
   final Color? labelColor;
+  final double? labelSize;
   final Widget icon;
+  final String? tooltip;
 
   const IconTextButton({
     super.key,
@@ -144,8 +145,9 @@ class IconTextButton extends StatelessWidget {
     this.iconColor,
     this.iconSize,
     this.label,
-    this.tooltip,
     this.labelColor,
+    this.labelSize,
+    this.tooltip,
     required this.icon,
     this.padding = EdgeInsets.zero,
   });
@@ -164,6 +166,7 @@ class IconTextButton extends StatelessWidget {
           label ?? '',
           style: TextStyle(
             color: labelColor,
+            fontSize: labelSize,
           ),
           overflow: TextOverflow.visible,
           softWrap: false,
@@ -191,6 +194,7 @@ class InkWellTextButton extends StatelessWidget {
   final EdgeInsetsGeometry padding;
   final String? label;
   final Color? labelColor;
+  final double? labelSize;
   final Color? backgroundColor;
   final Widget icon;
 
@@ -201,6 +205,7 @@ class InkWellTextButton extends StatelessWidget {
     this.iconSize,
     this.label,
     this.labelColor,
+    this.labelSize,
     this.backgroundColor,
     required this.icon,
     this.padding = EdgeInsets.zero,
@@ -216,10 +221,11 @@ class InkWellTextButton extends StatelessWidget {
         const SizedBox(height: 2.0),
       );
       children.add(
-        Text(
+        CommonAutoSizeText(
           label ?? '',
           style: TextStyle(
             color: labelColor,
+            fontSize: labelSize,
           ),
           overflow: TextOverflow.visible,
           softWrap: false,
