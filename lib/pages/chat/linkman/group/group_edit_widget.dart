@@ -429,27 +429,29 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     }
     List<Widget> rightWidgets = [
       IconButton(
-          onPressed: () async {
-            Group? current = groupNotifier.value;
-            if (current != null) {
-              List<GroupMember> members =
-                  await groupMemberService.findByGroupId(current.peerId);
-              List<Linkman> linkmen = [];
-              for (var member in members) {
-                String? memberPeerId = member.memberPeerId;
-                if (memberPeerId != null) {
-                  Linkman? linkman =
-                      await linkmanService.findCachedOneByPeerId(memberPeerId);
-                  if (linkman != null) {
-                    linkmen.add(linkman);
-                  }
+        onPressed: () async {
+          Group? current = groupNotifier.value;
+          if (current != null) {
+            List<GroupMember> members =
+                await groupMemberService.findByGroupId(current.peerId);
+            List<Linkman> linkmen = [];
+            for (var member in members) {
+              String? memberPeerId = member.memberPeerId;
+              if (memberPeerId != null) {
+                Linkman? linkman =
+                    await linkmanService.findCachedOneByPeerId(memberPeerId);
+                if (linkman != null) {
+                  linkmen.add(linkman);
                 }
               }
-              groupLinkmanController.replaceAll(linkmen);
             }
-            indexWidgetProvider.push('linkman_webrtc_connection');
-          },
-          icon: const Icon(Icons.more_horiz_outlined))
+            groupLinkmanController.replaceAll(linkmen);
+          }
+          indexWidgetProvider.push('linkman_webrtc_connection');
+        },
+        icon: const Icon(Icons.more_horiz_outlined),
+        tooltip: AppLocalizations.t('More'),
+      )
     ];
     var appBarView = AppBarView(
         title: title,

@@ -603,29 +603,32 @@ class _ChatMessageViewState extends State<ChatMessageView>
     }
     if (partyType == PartyType.group.name) {
       rightWidgets.add(IconButton(
-          onPressed: () async {
-            ChatSummary? chatSummary = chatMessageController.chatSummary;
-            if (chatSummary != null) {
-              String? partyType = chatSummary.partyType;
-              String? groupId = chatSummary.peerId;
-              if (partyType == PartyType.group.name && groupId != null) {
-                Group? group =
-                    await groupService.findCachedOneByPeerId(groupId);
-                if (group != null) {
-                  groupNotifier.value = group;
-                  indexWidgetProvider.push('group_edit');
-                }
+        onPressed: () async {
+          ChatSummary? chatSummary = chatMessageController.chatSummary;
+          if (chatSummary != null) {
+            String? partyType = chatSummary.partyType;
+            String? groupId = chatSummary.peerId;
+            if (partyType == PartyType.group.name && groupId != null) {
+              Group? group = await groupService.findCachedOneByPeerId(groupId);
+              if (group != null) {
+                groupNotifier.value = group;
+                indexWidgetProvider.push('group_edit');
               }
             }
-          },
-          icon: const Icon(Icons.more_vert)));
+          }
+        },
+        icon: const Icon(Icons.more_vert),
+        tooltip: AppLocalizations.t('More'),
+      ));
     }
     if (partyType == PartyType.conference.name) {
       rightWidgets.add(IconButton(
-          onPressed: () {
-            indexWidgetProvider.push('conference_add');
-          },
-          icon: const Icon(Icons.more_vert)));
+        onPressed: () {
+          indexWidgetProvider.push('conference_add');
+        },
+        icon: const Icon(Icons.more_vert),
+        tooltip: AppLocalizations.t('More'),
+      ));
     }
 
     return rightWidgets;
