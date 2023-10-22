@@ -163,7 +163,7 @@ class FileUtil {
     bool lockParentWindow = false,
   }) async {
     if (initialDirectory == null) {
-      Directory? dir = await PathUtil.getApplicationDirectory();
+      Directory? dir = await PathUtil.getLibraryDirectory();
       initialDirectory = dir?.path;
     }
     List<XFile> xfiles = [];

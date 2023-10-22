@@ -353,12 +353,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   ///文件
   Future<void> _onActionFile() async {
-    String? initialDirectory;
-    if (platformParams.mobile) {
-      initialDirectory = await FileUtil.directoryPathPicker();
-    }
     List<XFile> xfiles =
-        await FileUtil.pickFiles(initialDirectory: initialDirectory);
+        await FileUtil.pickFiles();
     if (xfiles.isNotEmpty) {
       XFile xfile = xfiles[0];
       Uint8List data = await xfile.readAsBytes();
