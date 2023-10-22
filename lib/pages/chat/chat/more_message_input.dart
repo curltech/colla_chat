@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
@@ -34,6 +35,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
+import 'package:colla_chat/tool/path_util.dart';
 
 final List<ActionData> defaultActionData = [
   ActionData(
@@ -353,10 +355,10 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   ///文件
   Future<void> _onActionFile() async {
-    List<XFile> xfiles =
-        await FileUtil.pickFiles();
-    if (xfiles.isNotEmpty) {
-      XFile xfile = xfiles[0];
+    Directory? rootDirectory = await PathUtil.getApplicationDirectory();
+    XFile? xfile =
+        await FileUtil.open(context: context, rootDirectory: rootDirectory);
+    if (xfile != null) {
       Uint8List data = await xfile.readAsBytes();
       // Uint8List? thumbnail = await ImageUtil.compressThumbnail(xfile: xfile);
       String filename = xfile.name;

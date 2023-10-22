@@ -163,8 +163,8 @@ class FileUtil {
     bool lockParentWindow = false,
   }) async {
     if (initialDirectory == null) {
-      Directory? dir = await PathUtil.getLibraryDirectory();
-      initialDirectory = dir?.path;
+      Directory dir = await PathUtil.getApplicationDocumentsDirectory();
+      initialDirectory = dir.path;
     }
     List<XFile> xfiles = [];
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -279,9 +279,9 @@ class FileUtil {
         .saveAs(name: name, bytes: bytes, ext: ext, mimeType: mimeType);
   }
 
-  static Future<String?> open({
+  static Future<XFile?> open({
     required BuildContext context,
-    required Directory rootDirectory,
+    Directory? rootDirectory,
     String? rootName,
     Directory? directory,
     FilesystemType? fsType,
@@ -314,8 +314,11 @@ class FileUtil {
       itemFilter: itemFilter,
       requestPermission: requestPermission,
     );
+    if (path != null) {
+      return XFile(path);
+    }
 
-    return path;
+    return null;
   }
 
   static FilesystemPickerTheme buildFilesystemPickerTheme({

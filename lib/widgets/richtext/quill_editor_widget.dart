@@ -297,7 +297,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
       embedBuilders: [
         ...FlutterQuillEmbeds.builders(),
         NotesEmbedBuilder(addEditNote: _addEditNote)
-      ],
+      ], readOnly: false,
     );
 
     var toolbar = _buildQuillToolbar(context);
