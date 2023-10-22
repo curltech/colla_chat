@@ -163,7 +163,7 @@ class IconTextButton extends StatelessWidget {
       );
       children.add(
         CommonAutoSizeText(
-          label ?? '',
+          AppLocalizations.t(label ?? ''),
           style: TextStyle(
             color: labelColor,
             fontSize: labelSize,
@@ -222,7 +222,7 @@ class InkWellTextButton extends StatelessWidget {
       );
       children.add(
         CommonAutoSizeText(
-          label ?? '',
+          AppLocalizations.t(label ?? ''),
           style: TextStyle(
             color: labelColor,
             fontSize: labelSize,
