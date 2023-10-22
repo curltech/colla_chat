@@ -2,6 +2,7 @@ import 'package:badges/badges.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:colla_chat/pages/chat/linkman/linkman/linkman_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/tool/loading_util.dart';
@@ -106,7 +107,7 @@ class _LinkmanWebrtcConnectionWidgetState
             selected: false,
             routeName: routeName,
             onTap: (int index, String title, {String? subtitle}) {
-              linkmanController.current = linkman;
+              linkmanNotifier.value = linkman;
             });
         tiles.add(tile);
       }

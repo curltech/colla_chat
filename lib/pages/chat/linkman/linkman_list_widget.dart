@@ -277,7 +277,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         int connectionNum = 0;
         List<AdvancedPeerConnection>? connections =
             peerConnectionPool.getConnected(peerId);
-        if (connections != null && connections.isNotEmpty) {
+        if (connections.isNotEmpty) {
           connectionNum = connections.length;
         }
         TileData tile = TileData(
@@ -285,7 +285,10 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             title: name,
             subtitle: linkmanStatus,
             selected: false,
-            routeName: routeName);
+            routeName: routeName,
+            onTap: (int index, String title, {String? subtitle}) {
+              linkmanNotifier.value = linkman;
+            });
         List<TileData> slideActions = [];
         if (peerId != myself.peerId) {
           TileData deleteSlideAction = TileData(

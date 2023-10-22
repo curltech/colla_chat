@@ -57,6 +57,8 @@ final List<PlatformDataField> linkmanDataField = [
       )),
 ];
 
+final ValueNotifier<Linkman?> linkmanNotifier = ValueNotifier<Linkman?>(null);
+
 //联系人信息页面
 class LinkmanEditWidget extends StatefulWidget with TileDataMixin {
   LinkmanEditWidget({Key? key}) : super(key: key);
@@ -78,23 +80,15 @@ class LinkmanEditWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
-  final FormInputController controller =
-      FormInputController(linkmanDataField);
-  Linkman? linkman;
+  final FormInputController controller = FormInputController(linkmanDataField);
 
   @override
   initState() {
     super.initState();
-    linkmanController.addListener(_update);
-    linkman ??= linkmanController.current;
-  }
-
-  _update() {
-    setState(() {});
   }
 
   Widget _buildFormInputWidget(BuildContext context) {
-    Linkman? linkman = linkmanController.current;
+    Linkman? linkman = linkmanNotifier.value;
     if (linkman != null) {
       controller.setValues(JsonUtil.toJson(linkman));
     }
@@ -129,12 +123,17 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
   }
 
   _onOk(Map<String, dynamic> values) async {
+    Linkman? linkman = linkmanNotifier.value;
+    if (linkman == null) {
+      linkman = Linkman('', '');
+      linkmanNotifier.value = linkman;
+    }
     Linkman currentLinkman = Linkman.fromJson(values);
-    linkman!.name = currentLinkman.name;
-    linkman!.alias = currentLinkman.alias;
-    linkman!.mobile = currentLinkman.mobile;
-    linkman!.email = currentLinkman.email;
-    await linkmanService.store(linkman!);
+    linkman.name = currentLinkman.name;
+    linkman.alias = currentLinkman.alias;
+    linkman.mobile = currentLinkman.mobile;
+    linkman.email = currentLinkman.email;
+    await linkmanService.store(linkman);
     linkmanChatSummaryController.refresh();
     if (mounted) {
       DialogUtil.info(context,
@@ -167,24 +166,9 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     await ClipboardUtil.copy(JsonUtil.toJsonString(peerClient));
   }
 
-  _changeLinkmanStatus(LinkmanStatus status) async {
-    int id = linkman!.id!;
-    await linkmanService.update({'id': id, 'linkmanStatus': status.name});
-    linkman = await linkmanService.findOne(where: 'id=?', whereArgs: [id]);
-    linkmanController.current = linkman;
-    linkmanService.linkmen.remove(linkman!.peerId);
-  }
-
-  _changeSubscriptStatus(LinkmanStatus status) async {
-    int id = linkman!.id!;
-    await linkmanService.update({'id': id, 'subscriptStatus': status.name});
-    linkman = await linkmanService.findOne(where: 'id=?', whereArgs: [id]);
-    linkmanController.current = linkman;
-    linkmanService.linkmen.remove(linkman!.peerId);
-  }
-
   @override
   Widget build(BuildContext context) {
+    Linkman? linkman = linkmanNotifier.value;
     String title = 'Add linkman';
     int? id = linkman?.id;
     if (id != null) {
@@ -200,7 +184,6 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
 
   @override
   void dispose() {
-    linkmanController.removeListener(_update);
     super.dispose();
   }
 }
