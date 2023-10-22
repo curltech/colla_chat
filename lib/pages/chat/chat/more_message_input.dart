@@ -355,7 +355,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   ///文件
   Future<void> _onActionFile() async {
-    Directory? rootDirectory = await PathUtil.getApplicationDirectory();
+    Directory? rootDirectory = await PathUtil.getLibraryDirectory();
     XFile? xfile =
         await FileUtil.open(context: context, rootDirectory: rootDirectory);
     if (xfile != null) {
