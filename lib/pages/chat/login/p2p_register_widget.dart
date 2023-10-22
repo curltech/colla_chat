@@ -24,7 +24,9 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
 import 'package:phone_numbers_parser/phone_numbers_parser.dart'
     as phone_numbers_parser;
+import 'package:validation_pro/validate.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
+import 'package:regexpattern/regexpattern.dart';
 
 final List<PlatformDataField> p2pRegisterInputFieldDef = [
   PlatformDataField(
@@ -245,6 +247,14 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
     }
     String plainPassword = values['plainPassword'];
     String confirmPassword = values['confirmPassword'];
+    // 检查密码的难度
+    bool isPassword =
+        RegVal.hasMatch(plainPassword, RegexPattern.passwordNormal1);
+    isPassword = Validate.isPassword(plainPassword);
+    if (!isPassword) {
+      DialogUtil.error(context, content: 'password must be right password');
+      return;
+    }
     String name = values['name'];
     String loginName = values['loginName'];
     String? email = values['email'];
@@ -263,6 +273,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
       });
     } else {
       logger.e('password is not matched');
+      DialogUtil.error(context, content: 'password is not matched');
     }
   }
 }

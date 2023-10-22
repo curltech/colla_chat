@@ -165,7 +165,7 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
   Widget build(BuildContext context) {
     var channelChatMessageWidget = _buildChannelChatMessageWidget(context);
     List<Widget>? rightWidgets = [
-      IconTextButton(
+      IconButton(
         onPressed: () async {
           List<Linkman> linkmen =
               await linkmanService.findSubscript(LinkmanStatus.subscript);
@@ -180,13 +180,13 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
           Icons.refresh,
           color: Colors.white,
         ),
-        label: AppLocalizations.t('Refresh'),
-        labelColor: Colors.white,
+        tooltip: AppLocalizations.t('Refresh'),
+        // labelColor: Colors.white,
       ),
       const SizedBox(
-        width: 10,
+        width: 5,
       ),
-      IconTextButton(
+      IconButton(
         onPressed: () async {
           myChannelChatMessageController.clear(notify: false);
           await myChannelChatMessageController.previous(limit: defaultLimit);
@@ -196,11 +196,11 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
           Icons.my_library_add,
           color: Colors.white,
         ),
-        label: AppLocalizations.t('Publish channel'),
-        labelColor: Colors.white,
+        tooltip: AppLocalizations.t('Publish channel'),
+        // labelColor: Colors.white,
       ),
       const SizedBox(
-        width: 10,
+        width: 5,
       ),
     ];
     return AppBarView(

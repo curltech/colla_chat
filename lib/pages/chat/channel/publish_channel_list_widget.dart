@@ -268,7 +268,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
   Widget build(BuildContext context) {
     var channelChatMessageWidget = _buildChannelChatMessageWidget(context);
     List<Widget>? rightWidgets = [
-      IconTextButton(
+      IconButton(
         onPressed: () {
           myChannelChatMessageController.current = null;
           indexWidgetProvider.push('publish_channel_edit');
@@ -277,8 +277,8 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
           Icons.note_add,
           color: Colors.white,
         ),
-        label: AppLocalizations.t('Add document'),
-        labelColor: Colors.white,
+        tooltip: AppLocalizations.t('Add document'),
+        // labelColor: Colors.white,
       ),
       const SizedBox(
         width: 10,

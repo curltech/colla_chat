@@ -1572,12 +1572,25 @@ class BasePeerConnection {
       return null;
     }
     RTCPeerConnection peerConnection = _peerConnection!;
-    for (RTCIceCandidate iceCandidate in iceCandidates) {
-      try {
-        await peerConnection.addCandidate(iceCandidate);
-      } catch (e) {
-        logger.e('addCandidate failure:$e');
+    try {
+      RTCSessionDescription? localDescription =
+          await peerConnection.getLocalDescription();
+      RTCSessionDescription? remoteDescription =
+          await peerConnection.getRemoteDescription();
+
+      if (localDescription != null && remoteDescription != null) {
+        for (RTCIceCandidate iceCandidate in iceCandidates) {
+          try {
+            await peerConnection.addCandidate(iceCandidate);
+          } catch (e) {
+            logger.e('addCandidate failure:$e');
+          }
+        }
+      } else {
+        logger.e('get localDescription or remoteDescription failure');
       }
+    } catch (e) {
+      logger.e('get localDescription or remoteDescription failure:$e');
     }
   }
 

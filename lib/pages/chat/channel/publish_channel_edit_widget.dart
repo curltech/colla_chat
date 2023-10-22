@@ -164,13 +164,13 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
       withLeading: true,
       title: widget.title,
       rightWidgets: [
-        IconTextButton(
+        IconButton(
           icon: const Icon(Icons.save),
           onPressed: () async {
             await _save();
           },
-          label: AppLocalizations.t('Save'),
-          labelColor: Colors.white,
+          tooltip: AppLocalizations.t('Save'),
+          // labelColor: Colors.white,
         ),
         const SizedBox(
           width: 10,

@@ -511,7 +511,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
             Widget widget;
             if (_peerConnectionState.value ==
                 RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
-              widget = IconTextButton(
+              widget = IconButton(
                 onPressed: () {
                   _disconnectPeerConnection();
                 },
@@ -519,11 +519,11 @@ class _ChatMessageViewState extends State<ChatMessageView>
                   Icons.wifi,
                   color: Colors.white,
                 ),
-                label: stateText,
-                tooltip: 'Disconnect',
+                // label: stateText,
+                tooltip: AppLocalizations.t('Disconnect'),
               );
             } else {
-              widget = IconTextButton(
+              widget = IconButton(
                 onPressed: () {
                   _createPeerConnection();
                 },
@@ -531,8 +531,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
                   Icons.wifi_off,
                   color: Colors.red,
                 ),
-                label: stateText,
-                tooltip: 'Reconnect',
+                // label: stateText,
+                tooltip: AppLocalizations.t('Reconnect'),
               );
             }
 
@@ -540,7 +540,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
           });
       rightWidgets.add(peerConnectionStatusWidget);
       rightWidgets.add(const SizedBox(
-        width: 10,
+        width: 5,
       ));
       var dataChannelStatusWidget = ValueListenableBuilder(
           valueListenable: _dataChannelState,
@@ -552,24 +552,24 @@ class _ChatMessageViewState extends State<ChatMessageView>
             Widget widget;
             if (_dataChannelState.value ==
                 RTCDataChannelState.RTCDataChannelOpen) {
-              widget = IconTextButton(
+              widget = IconButton(
                 onPressed: null,
                 icon: const Icon(
                   Icons.wb_cloudy_outlined,
                   color: Colors.white,
                 ),
-                label: stateText,
-                tooltip: 'DataChannel',
+                // label: stateText,
+                tooltip: AppLocalizations.t('DataChannel'),
               );
             } else {
-              widget = IconTextButton(
+              widget = IconButton(
                 onPressed: null,
                 icon: const Icon(
                   Icons.cloud_off,
                   color: Colors.red,
                 ),
-                label: stateText,
-                tooltip: 'DataChannel',
+                // label: stateText,
+                tooltip: AppLocalizations.t('DataChannel'),
               );
             }
 
@@ -577,7 +577,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
           });
       rightWidgets.add(dataChannelStatusWidget);
       rightWidgets.add(const SizedBox(
-        width: 15,
+        width: 5,
       ));
       rightWidgets.add(ValueListenableBuilder(
           valueListenable: _initiator,
