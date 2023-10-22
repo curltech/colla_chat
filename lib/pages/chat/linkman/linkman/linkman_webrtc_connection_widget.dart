@@ -3,7 +3,6 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_edit_widget.dart';
-import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
@@ -41,14 +40,18 @@ class LinkmanWebrtcConnectionWidget extends StatefulWidget with TileDataMixin {
 
 class _LinkmanWebrtcConnectionWidgetState
     extends State<LinkmanWebrtcConnectionWidget> {
+  final ValueNotifier<List<TileData>> tileData =
+      ValueNotifier<List<TileData>>([]);
+
   @override
   initState() {
     groupLinkmanController.addListener(_update);
     super.initState();
+    _buildConnectionTileData(context);
   }
 
   _update() {
-    setState(() {});
+    _buildConnectionTileData(context);
   }
 
   Widget _buildBadge(int connectionNum, {Widget? avatarImage}) {
@@ -80,7 +83,7 @@ class _LinkmanWebrtcConnectionWidgetState
     return badge;
   }
 
-  Future<List<TileData>> _buildConnectionTileData(BuildContext context) async {
+  Future<void> _buildConnectionTileData(BuildContext context) async {
     List<Linkman> linkmen = groupLinkmanController.data;
     List<TileData> tiles = [];
     if (linkmen.isNotEmpty) {
@@ -113,24 +116,17 @@ class _LinkmanWebrtcConnectionWidgetState
       }
     }
 
-    return tiles;
+    tileData.value = tiles;
   }
 
   Widget _buildConnectionListView(BuildContext context) {
-    var connectionView = FutureBuilder(
-        future: _buildConnectionTileData(context),
+    var connectionView = ValueListenableBuilder(
+        valueListenable: tileData,
         builder:
-            (BuildContext context, AsyncSnapshot<List<TileData>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            List<TileData>? tileData = snapshot.data;
-            tileData ??= [];
-
-            return DataListView(
-              tileData: snapshot.data!,
-            );
-          }
-
-          return LoadingUtil.buildLoadingIndicator();
+            (BuildContext context, List<TileData> tileData, Widget? child) {
+          return DataListView(
+            tileData: tileData,
+          );
         });
 
     return connectionView;
