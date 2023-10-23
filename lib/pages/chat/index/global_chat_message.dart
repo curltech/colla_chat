@@ -272,15 +272,6 @@ class GlobalChatMessage {
         messageReceiptType == MessageReceiptType.ignored ||
         messageReceiptType == MessageReceiptType.hold ||
         messageReceiptType == MessageReceiptType.join) {
-      AdvancedPeerConnection? advancedPeerConnection =
-          await peerConnectionPool.getOne(
-        peerId,
-        clientId: clientId,
-      );
-      if (advancedPeerConnection == null) {
-        logger.e('participant $peerId has no peerConnections');
-        return;
-      }
       //将发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
       P2pConferenceClient? p2pConferenceClient =
           p2pConferenceClientPool.getP2pConferenceClient(messageId);
