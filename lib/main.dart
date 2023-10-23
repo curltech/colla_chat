@@ -65,12 +65,12 @@ void main(List<String> args) async {
 
   SystemChannels.lifecycle.setMessageHandler((msg) async {
     if (msg == AppLifecycleState.resumed.toString()) {
-      logger.w('system channel switch to foreground');
+      //logger.w('system channel switch to foreground');
       await websocketPool.connect();
     } else if (msg == AppLifecycleState.paused.toString() ||
         msg == AppLifecycleState.inactive.toString() ||
         msg == AppLifecycleState.hidden.toString()) {
-      logger.w('system channel switch to $msg');
+      //logger.w('system channel switch to $msg');
     }
     return msg;
   });
