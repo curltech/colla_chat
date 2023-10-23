@@ -542,20 +542,20 @@ class ConferenceChatMessageController with ChangeNotifier {
     if (_status == VideoChatStatus.calling) {
       status = VideoChatStatus.end;
     }
-    AdvancedPeerConnection? advancedPeerConnection =
-        await peerConnectionPool.getOne(
-      peerId,
-      clientId: clientId,
-    );
-    //与发送者的连接存在，将本地的视频render加入连接中
-    if (advancedPeerConnection != null) {
-      P2pConferenceClient? p2pConferenceClient =
-          p2pConferenceClientPool.getP2pConferenceClient(messageId);
-      if (p2pConferenceClient != null) {
+    P2pConferenceClient? p2pConferenceClient =
+        p2pConferenceClientPool.getP2pConferenceClient(messageId);
+    if (p2pConferenceClient != null) {
+      AdvancedPeerConnection? advancedPeerConnection =
+          await peerConnectionPool.getOne(
+        peerId,
+        clientId: clientId,
+      );
+      //与发送者的连接存在，将本地的视频render加入连接中
+      if (advancedPeerConnection != null) {
         p2pConferenceClient
             .removeAdvancedPeerConnection(advancedPeerConnection);
       } else {
-        logger.e('p2pConferenceClient:$messageId is not exist');
+        p2pConferenceClient.removeParticipant(peerId, clientId);
       }
     } else {
       logger.e('participant $peerId has no peerConnections');
@@ -588,15 +588,15 @@ class ConferenceChatMessageController with ChangeNotifier {
   ///收到对方加入会议的消息，将指定的连接加入会议，用于对方加入会议，接受会议
   addAdvancedPeerConnection(
       String peerId, String clientId, String messageId) async {
-    AdvancedPeerConnection? advancedPeerConnection =
-        await peerConnectionPool.getOne(
-      peerId,
-      clientId: clientId,
-    );
     //将邀请消息发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
     P2pConferenceClient? p2pConferenceClient =
         p2pConferenceClientPool.getP2pConferenceClient(messageId);
     if (p2pConferenceClient != null) {
+      AdvancedPeerConnection? advancedPeerConnection =
+          await peerConnectionPool.getOne(
+        peerId,
+        clientId: clientId,
+      );
       if (advancedPeerConnection != null) {
         logger.w(
             'p2pConferenceClient:$messageId add advancedPeerConnection:$peerId');
@@ -624,15 +624,16 @@ class ConferenceChatMessageController with ChangeNotifier {
     if (_status == VideoChatStatus.calling) {
       status = VideoChatStatus.end;
     }
-    AdvancedPeerConnection? advancedPeerConnection =
-        await peerConnectionPool.getOne(
-      peerId,
-      clientId: clientId,
-    );
+
     //将发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
     P2pConferenceClient? p2pConferenceClient = p2pConferenceClientPool
         .getP2pConferenceClient(_conference!.conferenceId);
     if (p2pConferenceClient != null) {
+      AdvancedPeerConnection? advancedPeerConnection =
+          await peerConnectionPool.getOne(
+        peerId,
+        clientId: clientId,
+      );
       if (advancedPeerConnection != null) {
         await p2pConferenceClient
             .removeAdvancedPeerConnection(advancedPeerConnection);
