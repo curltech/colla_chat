@@ -55,6 +55,21 @@ class P2pConferenceClient extends PeerMediaStreamController {
   /// 自己加入会议，在所有的连接中加上本地流
   join() async {
     _joined = true;
+    // Conference? conference = conferenceChatMessageController.conference;
+    // if (conference != null) {
+    //   List<String>? participants = conference.participants;
+    //   if (participants != null && participants.isNotEmpty) {
+    //     for (String participant in participants) {
+    //       List<AdvancedPeerConnection> peerConnections =
+    //           await peerConnectionPool.get(participant);
+    //       if (peerConnections.isNotEmpty) {
+    //         for (AdvancedPeerConnection peerConnection in peerConnections) {
+    //           await addAdvancedPeerConnection(peerConnection);
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
     List<AdvancedPeerConnection?> peerConnections = [
       ..._peerConnections.values
     ];
