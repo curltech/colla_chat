@@ -299,14 +299,12 @@ class P2pConferenceClient extends PeerMediaStreamController {
       }
       _streamSubscriptions.remove(key);
     }
-    if (_joined) {
-      await _removeRemotePeerMediaStream(peerConnection);
-      List<PeerMediaStream> peerMediaStreams =
-          localPeerMediaStreamController.peerMediaStreams;
-      if (peerMediaStreams.isNotEmpty) {
-        await removeLocalPeerMediaStream(peerMediaStreams,
-            peerConnection: peerConnection);
-      }
+    await _removeRemotePeerMediaStream(peerConnection);
+    List<PeerMediaStream> peerMediaStreams =
+        localPeerMediaStreamController.peerMediaStreams;
+    if (peerMediaStreams.isNotEmpty) {
+      await removeLocalPeerMediaStream(peerMediaStreams,
+          peerConnection: peerConnection);
     }
   }
 

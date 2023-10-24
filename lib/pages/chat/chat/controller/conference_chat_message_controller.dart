@@ -641,8 +641,8 @@ class ConferenceChatMessageController with ChangeNotifier {
 
   ///通知所有人自己加入会议，发送join回执，并且加入
   join() async {
-    await _sendChatReceipt(MessageReceiptType.join);
     await joinConference();
+    await _sendChatReceipt(MessageReceiptType.join);
   }
 
   ///自己主动加入

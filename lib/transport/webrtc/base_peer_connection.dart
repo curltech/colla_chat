@@ -761,7 +761,7 @@ class BasePeerConnection {
     }
     if (negotiating) {
       logger.e('BasePeerConnection is negotiating');
-      return;
+      // return;
     }
 
     if (_initiator!) {

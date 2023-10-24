@@ -43,25 +43,28 @@ class VideoConferenceConnectionWidget extends StatelessWidget
         var name = peerConnection.name;
         var connectionState = peerConnection.connectionState;
         var initiator = peerConnection.basePeerConnection.initiator;
+        var signalingState =
+            peerConnection.basePeerConnection.signalingState?.name ?? '';
         TileData tile = TileData(
-            prefix: initiator == true
-                ? const Icon(
-                    Icons.light_mode,
-                    color: Colors.yellow,
-                  )
-                : const Icon(
-                    Icons.light_mode,
-                    color: Colors.grey,
-                  ),
-            title: name,
-            titleTail: connectionState?.name.substring(22),
-            subtitle: peerId,
-            isThreeLine: false,
-            onTap: (int index, String title, {String? subtitle}) {
-              peerConnectionNotifier.value = peerConnection;
-              indexWidgetProvider.push('video_conference_track');
-            },
-            routeName: null);
+          prefix: initiator == true
+              ? const Icon(
+                  Icons.light_mode,
+                  color: Colors.yellow,
+                )
+              : const Icon(
+                  Icons.light_mode,
+                  color: Colors.grey,
+                ),
+          title: name,
+          titleTail: connectionState?.name.substring(22),
+          subtitle: peerId,
+          suffix: Text(signalingState.substring(17)),
+          isThreeLine: false,
+          onTap: (int index, String title, {String? subtitle}) {
+            peerConnectionNotifier.value = peerConnection;
+            indexWidgetProvider.push('video_conference_track');
+          },
+        );
 
         tiles.add(tile);
       }

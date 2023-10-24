@@ -139,7 +139,7 @@ class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
                 );
               }
             }
-            return LoadingUtil.buildCircularLoadingWidget();
+            return LoadingUtil.buildLoadingIndicator();
           }),
       const SizedBox(
         height: 15.0,
