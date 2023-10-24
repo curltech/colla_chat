@@ -1,5 +1,6 @@
 import 'package:colla_chat/pages/chat/video/video_conference_track_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -30,17 +31,14 @@ class VideoConferenceConnectionWidget extends StatelessWidget
   @override
   String get title => 'Video conference connection';
 
-  List<TileData> _buildConnectionTileData(BuildContext context) {
+  Future<List<TileData>> _buildConnectionTileData(BuildContext context) async {
     P2pConferenceClient? p2pConferenceClient =
         p2pConferenceClientPool.p2pConferenceClient;
     List<TileData> tiles = [];
     if (p2pConferenceClient != null) {
-      List<AdvancedPeerConnection?> peerConnections =
-          p2pConferenceClient.peerConnections;
-      for (AdvancedPeerConnection? peerConnection in peerConnections) {
-        if (peerConnection == null) {
-          continue;
-        }
+      List<AdvancedPeerConnection> peerConnections =
+          await p2pConferenceClient.peerConnections;
+      for (AdvancedPeerConnection peerConnection in peerConnections) {
         var peerId = peerConnection.peerId;
         var name = peerConnection.name;
         var connectionState = peerConnection.connectionState;
@@ -72,9 +70,17 @@ class VideoConferenceConnectionWidget extends StatelessWidget
   }
 
   Widget _buildConnectionListView(BuildContext context) {
-    var connectionView = DataListView(
-      tileData: _buildConnectionTileData(context),
-    );
+    var connectionView = FutureBuilder(
+        future: _buildConnectionTileData(context),
+        builder:
+            (BuildContext context, AsyncSnapshot<List<TileData>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            List<TileData>? tileData = snapshot.data;
+            tileData ??= [];
+            return DataListView(tileData: tileData);
+          }
+          return LoadingUtil.buildLoadingIndicator();
+        });
 
     return connectionView;
   }
