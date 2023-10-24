@@ -548,18 +548,7 @@ class ConferenceChatMessageController with ChangeNotifier {
     P2pConferenceClient? p2pConferenceClient =
         p2pConferenceClientPool.getP2pConferenceClient(messageId);
     if (p2pConferenceClient != null) {
-      AdvancedPeerConnection? advancedPeerConnection =
-          await peerConnectionPool.getOne(
-        peerId,
-        clientId: clientId,
-      );
-      //与发送者的连接存在，将本地的视频render加入连接中
-      if (advancedPeerConnection != null) {
-        p2pConferenceClient
-            .removeAdvancedPeerConnection(advancedPeerConnection);
-      } else {
-        p2pConferenceClient.removeParticipant(peerId, clientId);
-      }
+      p2pConferenceClient.removeParticipant(peerId, clientId);
     } else {
       logger.e('participant $peerId has no peerConnections');
     }
@@ -644,17 +633,7 @@ class ConferenceChatMessageController with ChangeNotifier {
     P2pConferenceClient? p2pConferenceClient = p2pConferenceClientPool
         .getP2pConferenceClient(_conference!.conferenceId);
     if (p2pConferenceClient != null) {
-      AdvancedPeerConnection? advancedPeerConnection =
-          await peerConnectionPool.getOne(
-        peerId,
-        clientId: clientId,
-      );
-      if (advancedPeerConnection != null) {
-        await p2pConferenceClient
-            .removeAdvancedPeerConnection(advancedPeerConnection);
-      } else {
-        p2pConferenceClient.removeParticipant(peerId, clientId);
-      }
+      p2pConferenceClient.removeParticipant(peerId, clientId);
     } else {
       logger.e('p2pConferenceClient:$messageId is not exist');
     }

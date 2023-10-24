@@ -201,29 +201,30 @@ class P2pConferenceClient extends PeerMediaStreamController {
     if (!exist) {
       addParticipant(peerConnection.peerId, peerConnection.clientId);
     }
-    if (!_streamSubscriptions.containsKey(key)) {
-      List<StreamSubscription<WebrtcEvent>> streamSubscriptions = [];
-      StreamSubscription<WebrtcEvent>? trackStreamSubscription =
-          peerConnection.listen(WebrtcEventType.track, _onAddRemoteTrack);
-      if (trackStreamSubscription != null) {
-        streamSubscriptions.add(trackStreamSubscription);
-      }
-      StreamSubscription<WebrtcEvent>? removeTrackStreamSubscription =
-          peerConnection.listen(
-              WebrtcEventType.removeTrack, _onRemoveRemoteTrack);
-      if (removeTrackStreamSubscription != null) {
-        streamSubscriptions.add(removeTrackStreamSubscription);
-      }
-      StreamSubscription<WebrtcEvent>? closedStreamSubscription =
-          peerConnection.listen(WebrtcEventType.closed, _onClosed);
-      if (closedStreamSubscription != null) {
-        streamSubscriptions.add(closedStreamSubscription);
-      }
-      String key = _getKey(peerConnection.peerId, peerConnection.clientId);
-      _streamSubscriptions[key] = streamSubscriptions;
-    }
     //只有自己已经加入，才需要加本地流和远程流
     if (_joined) {
+      if (!_streamSubscriptions.containsKey(key)) {
+        List<StreamSubscription<WebrtcEvent>> streamSubscriptions = [];
+        StreamSubscription<WebrtcEvent>? trackStreamSubscription =
+            peerConnection.listen(WebrtcEventType.track, _onAddRemoteTrack);
+        if (trackStreamSubscription != null) {
+          streamSubscriptions.add(trackStreamSubscription);
+        }
+        StreamSubscription<WebrtcEvent>? removeTrackStreamSubscription =
+            peerConnection.listen(
+                WebrtcEventType.removeTrack, _onRemoveRemoteTrack);
+        if (removeTrackStreamSubscription != null) {
+          streamSubscriptions.add(removeTrackStreamSubscription);
+        }
+        StreamSubscription<WebrtcEvent>? closedStreamSubscription =
+            peerConnection.listen(WebrtcEventType.closed, _onClosed);
+        if (closedStreamSubscription != null) {
+          streamSubscriptions.add(closedStreamSubscription);
+        }
+        String key = _getKey(peerConnection.peerId, peerConnection.clientId);
+        _streamSubscriptions[key] = streamSubscriptions;
+      }
+
       List<PeerMediaStream> peerMediaStreams =
           localPeerMediaStreamController.peerMediaStreams;
       if (peerMediaStreams.isNotEmpty) {
@@ -275,7 +276,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
         AdvancedPeerConnection? advancedPeerConnection =
             await peerConnectionPool.getOne(peerId, clientId: clientId);
         if (advancedPeerConnection != null) {
-          removeAdvancedPeerConnection(advancedPeerConnection);
+          _removeAdvancedPeerConnection(advancedPeerConnection);
         }
         clientIds.remove(clientId);
         if (clientIds.isEmpty) {
@@ -287,7 +288,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
 
   ///对方退出会议，移除指定连接
   ///把指定连接中的本地媒体关闭并且移除
-  removeAdvancedPeerConnection(AdvancedPeerConnection peerConnection) async {
+  _removeAdvancedPeerConnection(AdvancedPeerConnection peerConnection) async {
     var key = _getKey(peerConnection.peerId, peerConnection.clientId);
     List<StreamSubscription<WebrtcEvent>>? streamSubscriptions =
         _streamSubscriptions[key];
@@ -312,7 +313,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
   ///webrtc连接被关闭时，移除连接
   Future<void> _onClosed(WebrtcEvent webrtcEvent) async {
     AdvancedPeerConnection peerConnection = webrtcEvent.data;
-    await removeAdvancedPeerConnection(peerConnection);
+    await _removeAdvancedPeerConnection(peerConnection);
   }
 
   ///远程流到来渲染流，激活add事件
