@@ -87,7 +87,6 @@ class _IndexViewState extends State<IndexView>
 
   late final AppLifecycleListener _appLifecycleListener;
   late AppLifecycleState? _appLifecycleState;
-  Timer? timer;
 
   @override
   void initState() {
@@ -109,14 +108,6 @@ class _IndexViewState extends State<IndexView>
 
     _initSystemTray();
     _initObserver();
-    _initDelete();
-  }
-
-  _initDelete() {
-    timer = Timer.periodic(const Duration(seconds: 60), (timer) async {
-      chatMessageService.deleteTimeout();
-      chatMessageService.deleteSystem();
-    });
   }
 
   _initObserver() {

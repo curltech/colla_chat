@@ -181,6 +181,12 @@ class _ChatListWidgetState extends State<ChatListWidget>
     }
     localNotificationsService.isAndroidPermissionGranted();
     localNotificationsService.requestPermissions();
+    _initDelete();
+  }
+
+  _initDelete() {
+    chatMessageService.deleteTimeout();
+    chatMessageService.deleteSystem();
   }
 
   ///网络连通的情况下，如果没有缺省的websocket，尝试重连websocket
