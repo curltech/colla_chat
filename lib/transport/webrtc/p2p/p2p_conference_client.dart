@@ -288,25 +288,22 @@ class P2pConferenceClient extends PeerMediaStreamController {
   ///把指定连接中的本地媒体关闭并且移除
   removeAdvancedPeerConnection(AdvancedPeerConnection peerConnection) async {
     var key = _getKey(peerConnection.peerId, peerConnection.clientId);
-    var advancedPeerConnection = _participants.remove(key);
-    if (advancedPeerConnection != null) {
-      List<StreamSubscription<WebrtcEvent>>? streamSubscriptions =
-          _streamSubscriptions[key];
-      if (streamSubscriptions != null) {
-        for (StreamSubscription<WebrtcEvent> streamSubscription
-            in streamSubscriptions) {
-          streamSubscription.cancel();
-        }
+    List<StreamSubscription<WebrtcEvent>>? streamSubscriptions =
+        _streamSubscriptions[key];
+    if (streamSubscriptions != null) {
+      for (StreamSubscription<WebrtcEvent> streamSubscription
+          in streamSubscriptions) {
+        streamSubscription.cancel();
       }
-      _streamSubscriptions.remove(key);
-      if (_joined) {
-        await _removeRemotePeerMediaStream(peerConnection);
-        List<PeerMediaStream> peerMediaStreams =
-            localPeerMediaStreamController.peerMediaStreams;
-        if (peerMediaStreams.isNotEmpty) {
-          await removeLocalPeerMediaStream(peerMediaStreams,
-              peerConnection: peerConnection);
-        }
+    }
+    _streamSubscriptions.remove(key);
+    if (_joined) {
+      await _removeRemotePeerMediaStream(peerConnection);
+      List<PeerMediaStream> peerMediaStreams =
+          localPeerMediaStreamController.peerMediaStreams;
+      if (peerMediaStreams.isNotEmpty) {
+        await removeLocalPeerMediaStream(peerMediaStreams,
+            peerConnection: peerConnection);
       }
     }
   }
