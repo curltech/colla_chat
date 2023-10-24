@@ -936,13 +936,17 @@ class BasePeerConnection {
       RTCSignalingState? signalingState = peerConnection.signalingState;
       logger.i(
           'peerConnection signalingState:$signalingState, setRemoteDescription want to set ${sdp.type}');
-      try {
-        isSettingRemoteAnswerPending = sdp.type == "answer";
-        await peerConnection.setRemoteDescription(sdp);
-        isSettingRemoteAnswerPending = false;
-        logger.w('setRemoteDescription sdp type:${sdp.type} successfully');
-      } catch (e) {
-        logger.e('peerConnection setRemoteDescription failure:$e');
+      if (signalingState == RTCSignalingState.RTCSignalingStateHaveLocalOffer) {
+        try {
+          isSettingRemoteAnswerPending = sdp.type == "answer";
+          await peerConnection.setRemoteDescription(sdp);
+          isSettingRemoteAnswerPending = false;
+          logger.w('setRemoteDescription sdp type:${sdp.type} successfully');
+        } catch (e) {
+          logger.e('peerConnection setRemoteDescription failure:$e');
+        }
+      } else {
+        logger.e('setRemoteDescription signalingState:$signalingState error');
       }
       try {
         RTCSessionDescription? remoteDescription =
@@ -1003,6 +1007,7 @@ class BasePeerConnection {
     RTCSignalingState? signalingState = peerConnection.signalingState;
     logger.i(
         'peerConnection signalingState:$signalingState before setLocalDescription');
+
     RTCSessionDescription? answer;
     try {
       answer = await peerConnection.createAnswer(sdpConstraints);
@@ -1020,13 +1025,19 @@ class BasePeerConnection {
     if (answer != null) {
       logger
           .i('create local sdp answer:${answer.type}, and setLocalDescription');
-      try {
-        await peerConnection.setLocalDescription(answer);
-        logger.w(
-            'setLocalDescription local sdp answer:${answer.type} successfully');
-      } catch (e) {
-        logger.e('createAnswer failure:$e');
+      if (signalingState ==
+          RTCSignalingState.RTCSignalingStateHaveRemoteOffer) {
+        try {
+          await peerConnection.setLocalDescription(answer);
+          logger.w(
+              'setLocalDescription local sdp answer:${answer.type} successfully');
+        } catch (e) {
+          logger.e('createAnswer failure:$e');
+        }
+      } else {
+        logger.e('setLocalDescription signalingState:$signalingState error');
       }
+
       await _sendAnswer(answer);
       await _postIceCandidates();
     }
@@ -1083,13 +1094,17 @@ class BasePeerConnection {
       RTCSignalingState? signalingState = _peerConnection?.signalingState;
       logger.i(
           'peerConnection signalingState:$signalingState before setRemoteDescription');
-
-      try {
-        await peerConnection.setRemoteDescription(sdp);
-      } catch (e) {
-        logger.e('peerConnection setRemoteDescription failure:$e');
+      if (signalingState == RTCSignalingState.RTCSignalingStateStable ||
+          signalingState == null) {
+        try {
+          await peerConnection.setRemoteDescription(sdp);
+        } catch (e) {
+          logger.e('peerConnection setRemoteDescription failure:$e');
+        }
+        logger.w('setRemoteDescription sdp offer:${sdp.type} successfully');
+      } else {
+        logger.e('setRemoteDescription signalingState:$signalingState error');
       }
-      logger.w('setRemoteDescription sdp offer:${sdp.type} successfully');
       try {
         //如果远程描述是offer请求，则创建answer
         RTCSessionDescription? remoteDescription =

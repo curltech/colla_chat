@@ -162,7 +162,7 @@ class _IndexViewState extends State<IndexView>
 
   @override
   Future<void> onWindowFocus() async {
-    logger.i('app window focus');
+    //logger.i('app window focus');
     await websocketPool.connect();
   }
 
@@ -212,7 +212,7 @@ class _IndexViewState extends State<IndexView>
 
   @override
   void onWindowEvent(String eventName) {
-    logger.i('[WindowManager] index view onWindowEvent: $eventName');
+    //logger.i('[WindowManager] index view onWindowEvent: $eventName');
   }
 
   Future<bool?> _onWebrtcSignal(WebrtcEvent webrtcEvent) async {
