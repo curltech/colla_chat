@@ -504,6 +504,9 @@ class ConferenceChatMessageController with ChangeNotifier {
       case MessageReceiptType.join:
         await _onJoin(peerId, clientId, messageId);
         break;
+      case MessageReceiptType.joined:
+        await _onJoined(peerId, clientId, messageId);
+        break;
       case MessageReceiptType.exit:
         await _onExit(peerId, clientId, messageId);
         break;
@@ -615,7 +618,19 @@ class ConferenceChatMessageController with ChangeNotifier {
   }
 
   ///对方加入，自己也要配合把对方的连接加入本地流，属于被动加入
+  ///同时如果自己已经加入，返回joined消息
   Future<void> _onJoin(String peerId, String clientId, String messageId) async {
+    P2pConferenceClient? p2pConferenceClient =
+        p2pConferenceClientPool.getP2pConferenceClient(messageId);
+    if (p2pConferenceClient != null && p2pConferenceClient.joined) {
+      _sendChatReceipt(MessageReceiptType.joined);
+    }
+    await addAdvancedPeerConnection(peerId, clientId, messageId);
+  }
+
+  ///对方收到自己的join消息，返回已经加入消息，自己也要配合把对方的连接加入本地流，属于被动加入
+  Future<void> _onJoined(
+      String peerId, String clientId, String messageId) async {
     await addAdvancedPeerConnection(peerId, clientId, messageId);
   }
 

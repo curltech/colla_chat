@@ -263,15 +263,18 @@ class GlobalChatMessage {
     String peerId = chatMessage.senderPeerId!;
     String clientId = chatMessage.senderClientId!;
     String messageId = chatMessage.messageId!;
-    if (messageReceiptType == MessageReceiptType.rejected ||
+    if (messageReceiptType == MessageReceiptType.ignored ||
+        messageReceiptType == MessageReceiptType.busy ||
+        messageReceiptType == MessageReceiptType.received ||
+        messageReceiptType == MessageReceiptType.rejected ||
         messageReceiptType == MessageReceiptType.terminated ||
         messageReceiptType == MessageReceiptType.exit) {}
-    if (messageReceiptType == MessageReceiptType.received ||
-        messageReceiptType == MessageReceiptType.accepted ||
-        messageReceiptType == MessageReceiptType.busy ||
-        messageReceiptType == MessageReceiptType.ignored ||
+
+    /// 以下四种消息如果没有会议，需要创建会议
+    if (messageReceiptType == MessageReceiptType.accepted ||
         messageReceiptType == MessageReceiptType.hold ||
-        messageReceiptType == MessageReceiptType.join) {
+        messageReceiptType == MessageReceiptType.join ||
+        messageReceiptType == MessageReceiptType.joined) {
       //将发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
       P2pConferenceClient? p2pConferenceClient =
           p2pConferenceClientPool.getP2pConferenceClient(messageId);
@@ -287,6 +290,8 @@ class GlobalChatMessage {
         }
       }
     }
+
+    /// 如果存在会议则继续处理
     ConferenceChatMessageController? conferenceChatMessageController =
         p2pConferenceClientPool.getConferenceChatMessageController(messageId);
 
