@@ -184,7 +184,10 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
         const SizedBox(
           height: 5,
         ),
-        _buildFormInputWidget(context),
+        ExpansionTile(
+            title: Text(AppLocalizations.t('Conference')),
+            initiallyExpanded: true,
+            children: [_buildFormInputWidget(context)]),
         Expanded(
             child: FutureBuilder<List<TileData>>(
           future: _buildChatReceipts(),

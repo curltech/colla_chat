@@ -5,6 +5,7 @@ import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/message/common_message.dart';
+import 'package:colla_chat/pages/chat/linkman/conference/conference_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/conference/conference_show_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -69,8 +70,8 @@ class VideoChatMessage extends StatelessWidget {
         : ChatMessageContentType.audio.name;
     Widget actionWidget;
     if (fullScreen) {
-      actionWidget =
-          ConferenceShowWidget(hasTitle: false);
+      conferenceNotifier.value = conference;
+      actionWidget = ConferenceShowWidget(hasTitle: false);
 
       return Card(
           elevation: 0,
