@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/tool/message_slice.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:cryptography_flutter/cryptography_flutter.dart';
 
@@ -250,12 +251,21 @@ class CryptoGraphy {
         break;
     }
     final secretKey = SecretKey(hashPassphrase);
-    // Encrypt
-    final secretBox = await algorithm.encrypt(
-      message,
-      secretKey: secretKey,
-    );
-    return secretBox.concatenation();
+    List<int>? encryptedData;
+
+    ///数据分片处理器
+    MessageSlice messageSlice = MessageSlice();
+    Map<int, List<int>> slices = messageSlice.slice(message, withPrefix: false);
+    List<int> encrypted = [];
+    for (var slice in slices.values) {
+      final SecretBox secretBox = await algorithm.encrypt(
+        slice,
+        secretKey: secretKey,
+      );
+      Uint8List encryptedSlice = secretBox.concatenation();
+      encrypted = CryptoUtil.concat(encrypted, encryptedSlice);
+    }
+    return encrypted;
   }
 
   static const macLength = 16;
@@ -286,16 +296,23 @@ class CryptoGraphy {
         break;
     }
     final secretKey = SecretKey(hashPassphrase);
+    List<int>? decryptedData;
 
-    SecretBox secretBox = SecretBox.fromConcatenation(message,
-        macLength: macLength, nonceLength: nonceLength);
-    // Decrypt
-    final clearText = await algorithm.decrypt(
-      secretBox,
-      secretKey: secretKey,
-    );
-
-    return clearText;
+    ///数据分片处理器
+    MessageSlice messageSlice = MessageSlice();
+    messageSlice.sliceSize = messageSlice.sliceSize + macLength + nonceLength;
+    Map<int, List<int>> slices = messageSlice.slice(message, withPrefix: false);
+    List<int> decrypted = [];
+    for (var slice in slices.values) {
+      final SecretBox secretBox = SecretBox.fromConcatenation(slice,
+          macLength: macLength, nonceLength: nonceLength);
+      final List<int> clearText = await algorithm.decrypt(
+        secretBox,
+        secretKey: secretKey,
+      );
+      decrypted = CryptoUtil.concat(decrypted, clearText);
+    }
+    return decrypted;
   }
 
   /// 对消息先进行AES加密，密钥是随机数，对密钥用ecc加密，用自己的私钥和对方的公钥，对方是一个数组
