@@ -1125,7 +1125,7 @@ class BasePeerConnection {
         await _createAnswer();
       } else {
         logger
-            .e('RemoteDescription sdp is not offer:${remoteDescription!.type}');
+            .e('RemoteDescription sdp is not offer:${remoteDescription?.type}');
       }
     } else if (signalType == SignalType.error.name) {
       logger.e('received error signal:${webrtcSignal.error}');
