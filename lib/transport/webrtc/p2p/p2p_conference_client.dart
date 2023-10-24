@@ -200,6 +200,8 @@ class P2pConferenceClient extends PeerMediaStreamController {
     bool exist = contains(peerConnection.peerId, peerConnection.clientId);
     if (!exist) {
       addParticipant(peerConnection.peerId, peerConnection.clientId);
+    }
+    if (!_streamSubscriptions.containsKey(key)) {
       List<StreamSubscription<WebrtcEvent>> streamSubscriptions = [];
       StreamSubscription<WebrtcEvent>? trackStreamSubscription =
           peerConnection.listen(WebrtcEventType.track, _onAddRemoteTrack);
@@ -220,7 +222,6 @@ class P2pConferenceClient extends PeerMediaStreamController {
       String key = _getKey(peerConnection.peerId, peerConnection.clientId);
       _streamSubscriptions[key] = streamSubscriptions;
     }
-
     //只有自己已经加入，才需要加本地流和远程流
     if (_joined) {
       List<PeerMediaStream> peerMediaStreams =
@@ -295,8 +296,8 @@ class P2pConferenceClient extends PeerMediaStreamController {
           in streamSubscriptions) {
         streamSubscription.cancel();
       }
+      _streamSubscriptions.remove(key);
     }
-    _streamSubscriptions.remove(key);
     if (_joined) {
       await _removeRemotePeerMediaStream(peerConnection);
       List<PeerMediaStream> peerMediaStreams =
