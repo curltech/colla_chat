@@ -692,10 +692,10 @@ class BasePeerConnection {
     }
     if (candidate.candidate != null) {
       _pendingIceCandidates.add(candidate);
-      await _postIceCandidates();
     }
   }
 
+  ///向对方发送收集的IceCandidates
   _postIceCandidates() async {
     if (_peerConnection == null ||
         connectionState ==
