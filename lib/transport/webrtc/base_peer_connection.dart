@@ -631,7 +631,7 @@ class BasePeerConnection {
       onConnected();
     }
     if (state == RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
-      logger.e('Ice connection closed:$state');
+      logger.e('Connection closed:$state');
       close();
     }
     emit(WebrtcEventType.connectionState, state);
@@ -929,7 +929,10 @@ class BasePeerConnection {
     //只能等待连接被清除
     else if (signalType == SignalType.sdp.name && sdp != null) {
       if (_initiator! && sdp.type == 'offer') {
-        logger.e('offer received sdp type offer，will be closed');
+        String? peerId = webrtcSignal.extension?.peerId;
+        String? name = webrtcSignal.extension?.name;
+        logger.e(
+            'offer received peerId:$peerId, name:$name sdp type offer，will be closed');
         await close();
         return;
       }
@@ -1086,7 +1089,10 @@ class BasePeerConnection {
     //如果sdp信息，则设置远程描述，对被叫来说，收到answer表示出错了
     else if (signalType == SignalType.sdp.name && sdp != null) {
       if (sdp.type == 'answer') {
-        logger.e('answer received sdp type answer, will be closed');
+        String? peerId = webrtcSignal.extension?.peerId;
+        String? name = webrtcSignal.extension?.name;
+        logger.e(
+            'answer received peerId:$peerId,name:$name sdp type answer, will be closed');
         await close();
         return;
       }

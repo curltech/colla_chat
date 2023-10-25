@@ -117,9 +117,9 @@ class AppBarWidget {
       leadingButton = IconButton(
         tooltip: AppLocalizations.t('Back'),
         icon: Icon(Icons.arrow_back_ios_new, color: foregroundColor),
-        onPressed: () {
+        onPressed: () async {
           if (leadingCallBack != null) {
-            leadingCallBack();
+            await leadingCallBack();
           }
           var indexWidgetProvider =
               Provider.of<IndexWidgetProvider>(context, listen: false);

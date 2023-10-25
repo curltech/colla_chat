@@ -61,11 +61,13 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   @override
   void initState() {
     super.initState();
-    //如果此时overlay界面存在
-    if (widget.overlayEntry != null) {
-      widget.overlayEntry!.dispose();
-      widget.overlayEntry = null;
-    }
+    try {
+      //如果此时overlay界面存在
+      if (widget.overlayEntry != null) {
+        widget.overlayEntry!.dispose();
+        widget.overlayEntry = null;
+      }
+    } catch (e) {}
     p2pConferenceClientPool.addListener(_update);
   }
 
@@ -94,10 +96,10 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
           onPressed: () {
             _closeOverlayEntry();
           },
+          label: 'Conference',
           child: const Icon(size: 32, color: Colors.white, Icons.zoom_out_map)),
     );
     widget.overlayEntry!.show(context: context);
-    indexWidgetProvider.pop();
   }
 
   Widget _buildVideoChatView(BuildContext context) {
@@ -148,6 +150,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     rightWidgets.add(IconButton(
       onPressed: () {
         _minimize(context);
+        indexWidgetProvider.pop();
       },
       icon: const Icon(Icons.zoom_in_map),
       tooltip: AppLocalizations.t('Minimize'),
@@ -159,6 +162,12 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
       titleWidget: titleWidget,
       withLeading: true,
       rightWidgets: rightWidgets,
+      leadingCallBack: () {
+        bool? joined = p2pConferenceClientPool.p2pConferenceClient?.joined;
+        if (joined != null && joined) {
+          _minimize(context);
+        }
+      },
       child: videoChatView,
     );
   }
