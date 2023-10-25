@@ -9,7 +9,7 @@ class ShareGroupService extends GeneralBaseService<ShareGroup> {
   String defaultGroupName = AppLocalizations.t('MySelection');
 
   /// 分组对应的tscode的字符串
-  Map<String, String> groupSubscription = {};
+  final Map<String, String> _groupSubscription = {};
 
   ShareGroupService(
       {required super.tableName,
@@ -20,12 +20,24 @@ class ShareGroupService extends GeneralBaseService<ShareGroup> {
     };
   }
 
+  Future<Map<String, String>> get groupSubscription async {
+    if (_groupSubscription.isEmpty) {
+      _groupSubscription[defaultGroupName] = shareService.subscription;
+      List<ShareGroup> shareGroups = await findAll();
+      for (var shareGroup in shareGroups) {
+        _groupSubscription[shareGroup.groupName] = shareGroup.subscription;
+      }
+    }
+
+    return _groupSubscription;
+  }
+
   Future<String?> findSubscription(String groupName) async {
-    String? subscription = groupSubscription[groupName];
+    String? subscription = (await groupSubscription)[groupName];
     if (subscription == null) {
       if (defaultGroupName == groupName) {
         subscription = shareService.subscription;
-        groupSubscription[groupName] = subscription;
+        _groupSubscription[groupName] = subscription;
       } else {
         List<ShareGroup> shareGroups =
             await find(where: 'groupName=?', whereArgs: [groupName]);
@@ -34,7 +46,7 @@ class ShareGroupService extends GeneralBaseService<ShareGroup> {
           for (ShareGroup shareGroup in shareGroups) {
             subscription = '${shareGroup.subscription!}${subscription!},';
           }
-          groupSubscription[groupName] = subscription!;
+          _groupSubscription[groupName] = subscription!;
         }
       }
     }
@@ -42,18 +54,17 @@ class ShareGroupService extends GeneralBaseService<ShareGroup> {
   }
 
   removeShareGroup(String groupName) async {
-    groupSubscription.remove(groupName);
+    _groupSubscription.remove(groupName);
     delete(where: 'groupName=?', whereArgs: [groupName]);
   }
 
   bool add(String groupName, String tsCode) {
-    String? subscription = groupSubscription[groupName];
+    String? subscription = _groupSubscription[groupName];
     subscription ??= '';
     if (!subscription.contains(tsCode)) {
       subscription = '$subscription$tsCode,';
-      groupSubscription[groupName] = subscription;
-      ShareGroup shareGroup = ShareGroup();
-      shareGroup.groupName = groupName;
+      _groupSubscription[groupName] = subscription;
+      ShareGroup shareGroup = ShareGroup(groupName);
       shareGroup.subscription = subscription;
       update(shareGroup, where: 'groupName=?', whereArgs: [groupName]);
     }
@@ -61,13 +72,12 @@ class ShareGroupService extends GeneralBaseService<ShareGroup> {
   }
 
   bool remove(String groupName, String tsCode) {
-    String? subscription = groupSubscription[groupName];
+    String? subscription = _groupSubscription[groupName];
     if (subscription != null) {
       if (subscription.contains(tsCode)) {
         subscription = subscription.replaceAll('$tsCode,', '');
-        groupSubscription[groupName] = subscription;
-        ShareGroup shareGroup = ShareGroup();
-        shareGroup.groupName = groupName;
+        _groupSubscription[groupName] = subscription;
+        ShareGroup shareGroup = ShareGroup(groupName);
         shareGroup.subscription = subscription;
         update(shareGroup, where: 'groupName=?', whereArgs: [groupName]);
       }
@@ -76,7 +86,7 @@ class ShareGroupService extends GeneralBaseService<ShareGroup> {
   }
 
   bool canBeAdd(String groupName, String tsCode) {
-    String? subscription = groupSubscription[groupName];
+    String? subscription = _groupSubscription[groupName];
     if (subscription != null && subscription.isNotEmpty) {
       return !subscription.contains(tsCode);
     }
@@ -86,9 +96,21 @@ class ShareGroupService extends GeneralBaseService<ShareGroup> {
   bool canBeRemove(String groupName, String tsCode) {
     return !canBeAdd(groupName, tsCode);
   }
+
+  Future<void> store(ShareGroup shareGroup) async {
+    ShareGroup? old =
+        await findOne(where: 'groupName=?', whereArgs: [shareGroup.groupName]);
+    if (old == null) {
+      shareGroup.id = null;
+      await insert(shareGroup);
+    } else {
+      shareGroup.id = old.id;
+      await update(shareGroup);
+    }
+  }
 }
 
 final ShareGroupService shareGroupService = ShareGroupService(
     tableName: 'stk_sharegroup',
-    fields: ServiceLocator.buildFields(ShareGroup(), []),
+    fields: ServiceLocator.buildFields(ShareGroup(''), []),
     indexFields: ['subscription', 'groupName']);

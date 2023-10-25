@@ -1,5 +1,4 @@
 import 'package:colla_chat/entity/stock/share.dart';
-import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/share.dart';
@@ -74,7 +73,6 @@ class _AddShareWidgetState extends State<AddShareWidget>
                 suffix: IconButton(
                     onPressed: () async {
                       await shareService.add(share);
-                      shareController.clear();
                       _updateShare();
                     },
                     icon: const Icon(

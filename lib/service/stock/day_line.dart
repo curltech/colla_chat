@@ -10,6 +10,24 @@ class RemoteDayLineService extends GeneralRemoteService<DayLine> {
     };
   }
 
+  /// 查询自选股的最新日线
+  Future<List<DayLine>> sendFindNewest(String tsCode) async {
+    var params = {'ts_code': tsCode};
+    dynamic ms = await send('/dayline/FindNewest', data: params);
+    List<DayLine> dayLines = [];
+    for (var m in ms) {
+      var o = post(m);
+      dayLines.add(o);
+      String tsCode = o.tsCode;
+      Share? share = await shareService.findShare(tsCode);
+      if (share != null) {
+        o.name = share.name;
+      }
+    }
+
+    return dayLines;
+  }
+
   /// 查询自选股的日线
   Future<dynamic> sendFindPreceding(String tsCode,
       {int? from, int? limit, int? endDate, int? count}) async {
@@ -20,9 +38,22 @@ class RemoteDayLineService extends GeneralRemoteService<DayLine> {
       'end_date': endDate,
       'count': count,
     };
-    dynamic data = await send('/dayline/FindPreceding', data: params);
+    dynamic responseData = await send('/dayline/FindPreceding', data: params);
+    count = responseData['count'];
+    List ms = responseData['data'];
+    List<DayLine> dayLines = [];
+    for (var m in ms) {
+      var o = post(m);
+      dayLines.add(o);
+      String tsCode = o.tsCode;
+      Share? share = await shareService.findShare(tsCode);
+      if (share != null) {
+        o.name = share.name;
+      }
+    }
+    responseData['data'] = dayLines;
 
-    return data;
+    return responseData;
   }
 
   Future<List<dynamic>> sendFindRange(String tsCode,
@@ -33,9 +64,18 @@ class RemoteDayLineService extends GeneralRemoteService<DayLine> {
       'end_date': endDate,
       'limit': limit,
     };
-    List<dynamic> data = await send('/dayline/FindRange', data: params);
-
-    return data;
+    dynamic ms = await send('/dayline/FindRange', data: params);
+    List<DayLine> dayLines = [];
+    for (var m in ms) {
+      var o = post(m);
+      dayLines.add(o);
+      String tsCode = o.tsCode;
+      Share? share = await shareService.findShare(tsCode);
+      if (share != null) {
+        o.name = share.name;
+      }
+    }
+    return dayLines;
   }
 
   Future<dynamic> sendSearch(String tsCode,
@@ -54,9 +94,18 @@ class RemoteDayLineService extends GeneralRemoteService<DayLine> {
       'orderby': orderBy,
       'count': count,
     };
-    dynamic data = await send('/dayline/Search', data: params);
-
-    return data;
+    dynamic ms = await send('/dayline/Search', data: params);
+    List<DayLine> dayLines = [];
+    for (var m in ms) {
+      var o = post(m);
+      dayLines.add(o);
+      String tsCode = o.tsCode;
+      Share? share = await shareService.findShare(tsCode);
+      if (share != null) {
+        o.name = share.name;
+      }
+    }
+    return dayLines;
   }
 
   /// 查询股票的买卖点

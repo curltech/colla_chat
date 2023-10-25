@@ -585,5 +585,7 @@
   "Closing": "关闭中",
   "Leader": "主",
   "Follower": "从",
-  "Group edit": "群编辑"
+  "Group edit": "群编辑",
+  "Group name": "群名",
+  "MySelection": "我的自选"
 }

@@ -6,6 +6,7 @@ import 'package:colla_chat/service/stock/day_line.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/service/stock/wmqy_line.dart';
 import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -225,7 +226,7 @@ class _StockLineChartWidgetState extends State<StockLineChartWidget> {
     candles.clear();
     List<dynamic> data = dayLineController.data;
     for (int i = data.length - 1; i >= 0; i--) {
-      Map<String, dynamic> map = data[i];
+      Map<String, dynamic> map = JsonUtil.toJson(data[i]);
       int trade_date = map['trade_date'];
       DateTime tradeDate = DateUtil.toDateTime(trade_date.toString());
       num high = map['high'];

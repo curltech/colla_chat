@@ -168,14 +168,11 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
             Icons.filter,
             color: Colors.yellow,
           ),
+          tooltip: AppLocalizations.t('StockLineChart'),
         )
       ],
     );
     return actionWidget;
-  }
-
-  _onDoubleTap(int index) {
-    inoutEventController.currentIndex = index;
   }
 
   /// 构建搜索条件
@@ -226,7 +223,6 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
       columnSpacing: 0.0,
       platformDataColumns: inoutEventColumns,
       controller: inoutEventController,
-      onDoubleTap: _onDoubleTap,
     );
   }
 

@@ -40,6 +40,7 @@ enum DataType {
   date,
   time,
   datetime,
+  percentage,
   set,
   list,
   map
@@ -51,8 +52,10 @@ class PlatformDataColumn {
   final String label;
   final InputType inputType;
   final DataType dataType;
-  final MainAxisAlignment align;
+  final TextAlign align;
   final double width;
+  final Color? positiveColor;
+  final Color? negativeColor;
   final String? hintText;
   final Widget Function(int, dynamic)? buildSuffix;
   final Function(int, bool)? onSort;
@@ -62,9 +65,11 @@ class PlatformDataColumn {
       required this.label,
       this.hintText,
       this.dataType = DataType.string,
+      this.positiveColor,
+      this.negativeColor,
       this.inputType = InputType.label,
       this.width = 100,
-      this.align = MainAxisAlignment.start,
+      this.align = TextAlign.start,
       this.buildSuffix,
       this.onSort});
 }

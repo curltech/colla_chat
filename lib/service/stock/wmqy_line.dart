@@ -1,5 +1,7 @@
+import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/entity/stock/wmqy_line.dart';
 import 'package:colla_chat/service/general_remote.dart';
+import 'package:colla_chat/service/stock/share.dart';
 
 class RemoteWmqyLineService extends GeneralRemoteService<WmqyLine> {
   RemoteWmqyLineService({required super.name}) {
@@ -23,9 +25,22 @@ class RemoteWmqyLineService extends GeneralRemoteService<WmqyLine> {
       'end_date': endDate,
       'count': count,
     };
-    dynamic data = await send('/wmqyline/FindPreceding', data: params);
+    dynamic responseData = await send('/wmqyline/FindPreceding', data: params);
+    count = responseData['count'];
+    List ms = responseData['data'];
+    List<WmqyLine> wmqyLines = [];
+    for (var m in ms) {
+      var o = post(m);
+      wmqyLines.add(o);
+      String tsCode = o.tsCode;
+      Share? share = await shareService.findShare(tsCode);
+      if (share != null) {
+        o.name = share.name;
+      }
+    }
+    responseData['data'] = wmqyLines;
 
-    return data;
+    return responseData;
   }
 }
 

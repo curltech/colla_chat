@@ -1,7 +1,7 @@
 import 'package:colla_chat/entity/base.dart';
 
 class WmqyLine extends BaseEntity {
-  String? tsCode;
+  String tsCode;
   int? tradeDate;
   String? name;
   String? qDate;

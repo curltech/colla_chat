@@ -16,6 +16,6 @@ class NumberFormatUtil {
 
   /// 标准的百分比
   static String stdPercentage(double value) {
-    return format(value, '#.0%');
+    return format(value, '#0.00%');
   }
 }

@@ -76,7 +76,8 @@ class _BindingDataTable2State<T> extends State<BindingDataTable2> {
                   AppLocalizations.t(platformDataColumn.label)),
               fixedWidth: platformDataColumn.width,
               tooltip: platformDataColumn.hintText,
-              numeric: platformDataColumn.dataType == DataType.double ||
+              numeric: platformDataColumn.dataType == DataType.percentage ||
+                  platformDataColumn.dataType == DataType.double ||
                   platformDataColumn.dataType == DataType.int ||
                   platformDataColumn.dataType == DataType.num,
               onSort: platformDataColumn.onSort),
@@ -104,10 +105,27 @@ class _BindingDataTable2State<T> extends State<BindingDataTable2> {
           var dataCell = DataCell(suffix);
           cells.add(dataCell);
         } else {
+          DataType dataType = platformDataColumn.dataType;
           String name = platformDataColumn.name;
           dynamic fieldValue = tMap[name];
+          Color? textColor;
           if (fieldValue != null) {
-            if (fieldValue is double) {
+            if (fieldValue is num) {
+              if (fieldValue > 0 && platformDataColumn.positiveColor != null) {
+                textColor = platformDataColumn.positiveColor;
+              }
+              if (fieldValue < 0 && platformDataColumn.negativeColor != null) {
+                textColor = platformDataColumn.negativeColor;
+              }
+            }
+            if (dataType == DataType.percentage) {
+              if (fieldValue is num) {
+                fieldValue =
+                    NumberFormatUtil.stdPercentage(fieldValue.toDouble());
+              } else {
+                fieldValue = fieldValue.toString();
+              }
+            } else if (dataType == DataType.double) {
               fieldValue = NumberFormatUtil.stdDouble(fieldValue);
             } else {
               fieldValue = fieldValue.toString();
@@ -115,9 +133,10 @@ class _BindingDataTable2State<T> extends State<BindingDataTable2> {
           } else {
             fieldValue = '';
           }
-
+          TextAlign align = platformDataColumn.align;
           var dataCell = DataCell(
-            CommonAutoSizeText(fieldValue!),
+            CommonAutoSizeText(fieldValue!,
+                style: TextStyle(color: textColor), textAlign: align),
           );
           cells.add(dataCell);
         }
