@@ -146,7 +146,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
 
   @override
   void onWindowEvent(String eventName) {
-    logger.i('[WindowManager] chat message view onWindowEvent: $eventName');
+    //logger.i('[WindowManager] chat message view onWindowEvent: $eventName');
   }
 
   _updateChatMessageView() {
