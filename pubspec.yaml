@@ -359,7 +359,8 @@ dependencies:
   whisper_dart: ^0.0.11
   openai_dalle_wrapper: ^1.0.0
   dart_chatgpt: ^1.0.2
-  livekit_client: ^1.4.3 #livekit sfu server flutter client
+  livekit_client: ^1.5.2 #livekit sfu server flutter client
+  livekit_server_sdk: ^1.0.0
 dependency_overrides:
   uuid: ^4.1.0
   flutter_math_fork: ^0.7.1

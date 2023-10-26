@@ -6,7 +6,7 @@ import 'package:webrtc_interface/webrtc_interface.dart';
 class LiveKitConferenceClient {
   final bool _e2ee = true;
   final String sharedKey = '';
-  final String uri = '';
+  final String uri = 'ws://localhost:7880';
   final String token = '';
   final bool adaptiveStream = true;
   final bool dynacast = false;

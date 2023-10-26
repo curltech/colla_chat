@@ -4,7 +4,6 @@ import 'dart:ui';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/plugin/notification/firebase_messaging_service.dart';
 import 'package:colla_chat/plugin/notification/local_notifications_service.dart';
 import 'package:colla_chat/plugin/overlay/android_overlay_window.dart';
@@ -28,6 +27,7 @@ import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:webview_win_floating/webview.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 
 ///全局处理证书问题
 class PlatformHttpOverrides extends HttpOverrides {
@@ -105,6 +105,16 @@ void _initWebView() {
       inapp.AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
     }
   }
+}
+
+/// default, we use the communication audio mode,
+/// 使用媒体播放模式，media playback
+Future<void> initializeAndroidAudioSettings() async {
+  await webrtc.WebRTC.initialize(options: {
+    'androidAudioConfiguration': webrtc.AndroidAudioConfiguration.media.toMap()
+  });
+  webrtc.Helper.setAndroidAudioConfiguration(
+      webrtc.AndroidAudioConfiguration.media);
 }
 
 ///初始化桌面平台的窗口管理
