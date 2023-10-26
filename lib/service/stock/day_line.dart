@@ -11,9 +11,9 @@ class RemoteDayLineService extends GeneralRemoteService<DayLine> {
   }
 
   /// 查询自选股的最新日线
-  Future<List<DayLine>> sendFindNewest(String tsCode) async {
+  Future<List<DayLine>> sendFindLatest(String tsCode) async {
     var params = {'ts_code': tsCode};
-    dynamic ms = await send('/dayline/FindNewest', data: params);
+    dynamic ms = await send('/dayline/FindLatest', data: params);
     List<DayLine> dayLines = [];
     for (var m in ms) {
       var o = post(m);

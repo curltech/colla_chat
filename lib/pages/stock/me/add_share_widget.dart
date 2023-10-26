@@ -1,5 +1,8 @@
 import 'package:colla_chat/entity/stock/share.dart';
+import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/stock/me/stock_line_chart_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -71,13 +74,21 @@ class _AddShareWidgetState extends State<AddShareWidget>
                 subtitle: tsCode,
                 selected: false,
                 suffix: IconButton(
-                    onPressed: () async {
-                      await shareService.add(share);
-                      _updateShare();
-                    },
-                    icon: const Icon(
-                      Icons.add_box_outlined,
-                    )));
+                  onPressed: () async {
+                    await shareService.add(share);
+                    _updateShare();
+                  },
+                  icon: const Icon(
+                    Icons.add_box_outlined,
+                  ),
+                ),
+                onTap: (int index, String title, {String? subtitle}) async {
+                  Share? share = await shareService.findShare(tsCode);
+                  String name = share?.name ?? '';
+                  multiStockLineController.replaceAll([tsCode]);
+                  multiStockLineController.put(tsCode, name);
+                  indexWidgetProvider.push('stockline_chart');
+                });
           }
         }
 
@@ -89,8 +100,10 @@ class _AddShareWidgetState extends State<AddShareWidget>
   }
 
   _searchShare(String keyword) async {
-    List<Share> shares = await remoteShareService.sendSearchShare(keyword);
-    searchShareController.replaceAll(shares);
+    if (keyword.isNotEmpty) {
+      List<Share> shares = await remoteShareService.sendSearchShare(keyword);
+      searchShareController.replaceAll(shares);
+    }
   }
 
   Widget _buildSearchShareView(BuildContext context) {
@@ -110,11 +123,13 @@ class _AddShareWidgetState extends State<AddShareWidget>
               ),
             ),
           )),
-      ValueListenableBuilder(
-          valueListenable: tileData,
-          builder: (BuildContext context, List<TileData> value, Widget? child) {
-            return DataListView(tileData: value);
-          }),
+      Expanded(
+          child: ValueListenableBuilder(
+              valueListenable: tileData,
+              builder:
+                  (BuildContext context, List<TileData> value, Widget? child) {
+                return DataListView(tileData: value);
+              })),
     ]);
   }
 

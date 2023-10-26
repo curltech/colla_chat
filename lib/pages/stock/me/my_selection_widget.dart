@@ -197,7 +197,7 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
       return;
     }
     List<DayLine> dayLines =
-        await remoteDayLineService.sendFindNewest(subscription);
+        await remoteDayLineService.sendFindLatest(subscription);
     dayLineController.replaceAll(dayLines);
     List<String> tsCodes = [];
     for (var dayLine in dayLines) {
