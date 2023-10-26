@@ -109,13 +109,16 @@ class _BindingDataTable2State<T> extends State<BindingDataTable2> {
           String name = platformDataColumn.name;
           dynamic fieldValue = tMap[name];
           Color? textColor;
+          Color? textBackgroundColor;
           if (fieldValue != null) {
             if (fieldValue is num) {
               if (fieldValue > 0 && platformDataColumn.positiveColor != null) {
-                textColor = platformDataColumn.positiveColor;
+                textBackgroundColor = platformDataColumn.positiveColor;
+                textColor = Colors.white;
               }
               if (fieldValue < 0 && platformDataColumn.negativeColor != null) {
-                textColor = platformDataColumn.negativeColor;
+                textBackgroundColor = platformDataColumn.negativeColor;
+                textColor = Colors.white;
               }
             }
             if (dataType == DataType.percentage) {
@@ -136,7 +139,9 @@ class _BindingDataTable2State<T> extends State<BindingDataTable2> {
           TextAlign align = platformDataColumn.align;
           var dataCell = DataCell(
             CommonAutoSizeText(fieldValue!,
-                style: TextStyle(color: textColor), textAlign: align),
+                style: TextStyle(
+                    backgroundColor: textBackgroundColor, color: textColor),
+                textAlign: align),
           );
           cells.add(dataCell);
         }
