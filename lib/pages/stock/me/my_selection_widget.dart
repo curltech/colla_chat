@@ -102,17 +102,33 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
         inputType: InputType.custom,
         buildSuffix: _buildActionWidget),
   ];
-  ValueNotifier<String?> groupName = ValueNotifier<String?>(null);
+  ValueNotifier<String> groupName = ValueNotifier<String>(
+      AppLocalizations.t(shareGroupService.defaultGroupName));
+
+  ValueNotifier<Map<String, String>> groupSubscription =
+      ValueNotifier<Map<String, String>>({});
 
   @override
   initState() {
     dayLineController.addListener(_updateDayLine);
     super.initState();
-    _refresh();
+    _buildGroupSubscription().then((dynamic) {
+      _refresh(groupName.value);
+    });
   }
 
   _updateDayLine() {
     setState(() {});
+  }
+
+  _buildGroupSubscription() async {
+    Map<String, String> groupSubscription = {};
+    String defaultGroupName =
+        AppLocalizations.t(shareGroupService.defaultGroupName);
+    groupSubscription[defaultGroupName] = shareService.subscription;
+    groupSubscription.addAll(await shareGroupService.groupSubscription);
+
+    return this.groupSubscription.value = groupSubscription;
   }
 
   Widget _buildActionWidget(int index, dynamic dayLine) {
@@ -124,18 +140,24 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
         IconButton(
           onPressed: () async {
             String tsCode = dayLine.tsCode;
-            List<Option<dynamic>> items = [];
-            Map<String, String> groupSubscription =
-                await shareGroupService.groupSubscription;
-            for (String groupName in groupSubscription.keys) {
-              items.add(Option(groupName, groupName, hint: ''));
+            String groupName = this.groupName.value;
+            String defaultGroupName =
+                AppLocalizations.t(shareGroupService.defaultGroupName);
+            if (groupName != defaultGroupName) {
+              bool? confirm = await DialogUtil.confirm(context,
+                  content: 'Do you confirm remove from group?');
+              if (confirm != null && confirm) {
+                await shareGroupService.remove(groupName, tsCode);
+                _buildGroupSubscription();
+                dayLineController.delete(index: index);
+              }
             }
           },
           icon: const Icon(
-            Icons.group_add,
+            Icons.group_remove,
             color: Colors.yellow,
           ),
-          tooltip: AppLocalizations.t('Add group'),
+          tooltip: AppLocalizations.t('Remove from group'),
         ),
         IconButton(
           onPressed: () async {
@@ -156,9 +178,28 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
     return actionWidget;
   }
 
-  _refresh() async {
+  /// 如果此时有记录被选择，则选择的记录将被移入组中
+  _addMember(String groupName) async {
+    List<DayLine> checked = dayLineController.checked;
+    if (checked.isNotEmpty) {
+      List<String> tsCodes = [];
+      for (DayLine dayLine in checked) {
+        tsCodes.add(dayLine.tsCode);
+      }
+      await shareGroupService.add(groupName, tsCodes);
+      _buildGroupSubscription();
+    }
+  }
+
+  _refresh(String groupName) async {
+    String? subscription = groupSubscription.value[groupName];
+    if (subscription == null || subscription.isEmpty) {
+      dayLineController.replaceAll([]);
+      multiStockLineController.replaceAll([]);
+      return;
+    }
     List<DayLine> dayLines =
-        await remoteDayLineService.sendFindNewest(shareService.subscription);
+        await remoteDayLineService.sendFindNewest(subscription);
     dayLineController.replaceAll(dayLines);
     List<String> tsCodes = [];
     for (var dayLine in dayLines) {
@@ -170,53 +211,37 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
   Widget _buildShareListView(BuildContext context) {
     return BindingDataTable2<DayLine>(
       key: UniqueKey(),
-      showCheckboxColumn: false,
+      showCheckboxColumn: true,
       horizontalMargin: 10.0,
       columnSpacing: 0.0,
       platformDataColumns: dayLineDataColumns,
       controller: dayLineController,
+      fixedLeftColumns: 2,
     );
   }
 
-  _switchGroup(String groupName) {}
-
   Widget _buildShareGroupWidget() {
-    return FutureBuilder(
-        future: shareGroupService.groupSubscription,
-        builder: (BuildContext context,
-            AsyncSnapshot<Map<String, String>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            Map<String, String>? groupSubscription = snapshot.data;
-            if (groupSubscription != null) {
-              return ValueListenableBuilder(
-                  valueListenable: groupName,
-                  builder:
-                      (BuildContext context, String? groupName, Widget? child) {
-                    List<Widget> children = [];
-                    for (String key in groupSubscription.keys) {
-                      children.add(TextButton(
-                          onPressed: () {
-                            this.groupName.value = key;
-                            _switchGroup(key);
-                          },
-                          child: Text(key,
-                              style: TextStyle(
-                                  color: groupName != key
-                                      ? Colors.white
-                                      : null))));
-                    }
-                    return SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: children));
-                  });
-            } else {
-              return Container();
-            }
+    return ValueListenableBuilder(
+        valueListenable: groupSubscription,
+        builder: (BuildContext context, Map<String, String> groupSubscription,
+            Widget? child) {
+          List<Widget> children = [];
+          for (String key in groupSubscription.keys) {
+            children.add(TextButton(
+                onPressed: () {
+                  _addMember(key);
+                  groupName.value = key;
+                  _refresh(key);
+                },
+                child: Text(key,
+                    style: TextStyle(
+                        color: groupName.value != key ? Colors.white : null))));
           }
-
-          return LoadingUtil.buildLoadingIndicator();
+          return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: children));
         });
   }
 

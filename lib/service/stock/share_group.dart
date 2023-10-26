@@ -6,7 +6,7 @@ import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/service/stock/share.dart';
 
 class ShareGroupService extends GeneralBaseService<ShareGroup> {
-  String defaultGroupName = AppLocalizations.t('MySelection');
+  String defaultGroupName = 'MySelection';
 
   /// 分组对应的tscode的字符串
   final Map<String, String> _groupSubscription = {};
@@ -22,7 +22,6 @@ class ShareGroupService extends GeneralBaseService<ShareGroup> {
 
   Future<Map<String, String>> get groupSubscription async {
     if (_groupSubscription.isEmpty) {
-      _groupSubscription[defaultGroupName] = shareService.subscription;
       List<ShareGroup> shareGroups = await findAll();
       for (var shareGroup in shareGroups) {
         _groupSubscription[shareGroup.groupName] = shareGroup.subscription;
@@ -44,7 +43,7 @@ class ShareGroupService extends GeneralBaseService<ShareGroup> {
         if (shareGroups.isNotEmpty) {
           subscription = '';
           for (ShareGroup shareGroup in shareGroups) {
-            subscription = '${shareGroup.subscription!}${subscription!},';
+            subscription = '${shareGroup.subscription}${subscription!},';
           }
           _groupSubscription[groupName] = subscription!;
         }
@@ -58,43 +57,53 @@ class ShareGroupService extends GeneralBaseService<ShareGroup> {
     delete(where: 'groupName=?', whereArgs: [groupName]);
   }
 
-  bool add(String groupName, String tsCode) {
-    String? subscription = _groupSubscription[groupName];
+  Future<bool> add(String groupName, List<String> tsCodes) async {
+    String? subscription = (await groupSubscription)[groupName];
     subscription ??= '';
-    if (!subscription.contains(tsCode)) {
-      subscription = '$subscription$tsCode,';
-      _groupSubscription[groupName] = subscription;
-      ShareGroup shareGroup = ShareGroup(groupName);
-      shareGroup.subscription = subscription;
-      update(shareGroup, where: 'groupName=?', whereArgs: [groupName]);
+    bool result = false;
+    for (String tsCode in tsCodes) {
+      if (!subscription!.contains(tsCode)) {
+        subscription = '$subscription$tsCode,';
+        _groupSubscription[groupName] = subscription;
+        result = true;
+      }
     }
-    return true;
+    if (result) {
+      ShareGroup shareGroup =
+          ShareGroup(groupName, subscription: subscription!);
+      await store(shareGroup);
+
+      return true;
+    }
+    return false;
   }
 
-  bool remove(String groupName, String tsCode) {
-    String? subscription = _groupSubscription[groupName];
+  Future<bool> remove(String groupName, String tsCode) async {
+    String? subscription = (await groupSubscription)[groupName];
     if (subscription != null) {
       if (subscription.contains(tsCode)) {
         subscription = subscription.replaceAll('$tsCode,', '');
         _groupSubscription[groupName] = subscription;
-        ShareGroup shareGroup = ShareGroup(groupName);
-        shareGroup.subscription = subscription;
-        update(shareGroup, where: 'groupName=?', whereArgs: [groupName]);
+        ShareGroup shareGroup =
+            ShareGroup(groupName, subscription: subscription);
+        await store(shareGroup);
+
+        return true;
       }
     }
-    return true;
+    return false;
   }
 
-  bool canBeAdd(String groupName, String tsCode) {
-    String? subscription = _groupSubscription[groupName];
+  Future<bool> canBeAdd(String groupName, String tsCode) async {
+    String? subscription = (await groupSubscription)[groupName];
     if (subscription != null && subscription.isNotEmpty) {
       return !subscription.contains(tsCode);
     }
     return true;
   }
 
-  bool canBeRemove(String groupName, String tsCode) {
-    return !canBeAdd(groupName, tsCode);
+  Future<bool> canBeRemove(String groupName, String tsCode) async {
+    return !(await canBeAdd(groupName, tsCode));
   }
 
   Future<void> store(ShareGroup shareGroup) async {

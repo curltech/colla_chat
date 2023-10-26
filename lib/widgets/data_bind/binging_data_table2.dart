@@ -20,7 +20,7 @@ class BindingDataTable2<T> extends StatefulWidget {
   final int fixedLeftColumns;
   final Function(int index)? onTap;
   final Function(int index)? onDoubleTap;
-  final Function(bool?)? onSelectChanged;
+  final Function(int, bool?)? onSelectChanged;
   final Function(int index)? onLongPress;
 
   const BindingDataTable2({
@@ -150,7 +150,7 @@ class _BindingDataTable2State<T> extends State<BindingDataTable2> {
           bool? checked = EntityUtil.getChecked(t);
           var fn = widget.onSelectChanged;
           if (fn != null) {
-            fn(value);
+            fn(index, value);
           } else if (checked != value) {
             EntityUtil.setChecked(t, value);
             setState(() {});
