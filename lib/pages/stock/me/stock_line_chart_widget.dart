@@ -51,7 +51,7 @@ class MultiStockLineController extends DataListController<String> {
 
   /// 加入股票代码和控制器，并设置为当前
   put(String tsCode, String name) {
-    if (current != tsCode) {
+    if (current != tsCode || !stockLineControllers.containsKey(tsCode)) {
       if (!stockLineControllers.containsKey(tsCode)) {
         stockLineControllers[tsCode] = {};
         stockLineControllers[tsCode]?[101] =
