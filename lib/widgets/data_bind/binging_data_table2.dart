@@ -88,101 +88,107 @@ class _BindingDataTable2State<T> extends State<BindingDataTable2> {
     return dataColumns;
   }
 
-  /// 过滤条件的多项选择框的行数据
-  List<DataRow2> _buildDataRows() {
-    List data = widget.controller.data;
-    List<DataRow2> rows = [];
-    for (int index = 0; index < data.length; ++index) {
-      dynamic t = data[index];
-      var tMap = JsonUtil.toJson(t);
-      List<DataCell> cells = [];
-      for (PlatformDataColumn platformDataColumn
-          in widget.platformDataColumns) {
-        InputType inputType = platformDataColumn.inputType;
-        if (inputType == InputType.custom &&
-            platformDataColumn.buildSuffix != null) {
-          Widget suffix = platformDataColumn.buildSuffix!(index, t);
-          var dataCell = DataCell(suffix);
-          cells.add(dataCell);
-        } else {
-          DataType dataType = platformDataColumn.dataType;
-          String name = platformDataColumn.name;
-          dynamic fieldValue = tMap[name];
-          Color? textColor;
-          Color? textBackgroundColor;
-          if (fieldValue != null) {
-            if (fieldValue is num) {
-              if (fieldValue > 0 && platformDataColumn.positiveColor != null) {
-                textBackgroundColor = platformDataColumn.positiveColor;
-                textColor = Colors.white;
-              }
-              if (fieldValue < 0 && platformDataColumn.negativeColor != null) {
-                textBackgroundColor = platformDataColumn.negativeColor;
-                textColor = Colors.white;
-              }
+  DataRow2 _getRow(int index) {
+    List<dynamic> data = widget.controller.data;
+    dynamic t = data[index];
+    var tMap = JsonUtil.toJson(t);
+    List<DataCell> cells = [];
+    for (PlatformDataColumn platformDataColumn in widget.platformDataColumns) {
+      InputType inputType = platformDataColumn.inputType;
+      if (inputType == InputType.custom &&
+          platformDataColumn.buildSuffix != null) {
+        Widget suffix = platformDataColumn.buildSuffix!(index, t);
+        var dataCell = DataCell(suffix);
+        cells.add(dataCell);
+      } else {
+        DataType dataType = platformDataColumn.dataType;
+        String name = platformDataColumn.name;
+        dynamic fieldValue = tMap[name];
+        Color? textColor;
+        Color? textBackgroundColor;
+        if (fieldValue != null) {
+          if (fieldValue is num) {
+            if (fieldValue > 0 && platformDataColumn.positiveColor != null) {
+              textBackgroundColor = platformDataColumn.positiveColor;
+              textColor = Colors.white;
             }
-            if (dataType == DataType.percentage) {
-              if (fieldValue is num) {
-                fieldValue =
-                    NumberFormatUtil.stdPercentage(fieldValue.toDouble());
-              } else {
-                fieldValue = fieldValue.toString();
-              }
-            } else if (dataType == DataType.double) {
-              fieldValue = NumberFormatUtil.stdDouble(fieldValue);
+            if (fieldValue < 0 && platformDataColumn.negativeColor != null) {
+              textBackgroundColor = platformDataColumn.negativeColor;
+              textColor = Colors.white;
+            }
+          }
+          if (dataType == DataType.percentage) {
+            if (fieldValue is num) {
+              fieldValue =
+                  NumberFormatUtil.stdPercentage(fieldValue.toDouble());
             } else {
               fieldValue = fieldValue.toString();
             }
+          } else if (dataType == DataType.double) {
+            fieldValue = NumberFormatUtil.stdDouble(fieldValue);
           } else {
-            fieldValue = '';
+            fieldValue = fieldValue.toString();
           }
-          TextAlign align = platformDataColumn.align;
-          var dataCell = DataCell(
-            CommonAutoSizeText(fieldValue!,
-                style: TextStyle(
-                    backgroundColor: textBackgroundColor, color: textColor),
-                textAlign: align),
-          );
-          cells.add(dataCell);
+        } else {
+          fieldValue = '';
         }
+        TextAlign align = platformDataColumn.align;
+        var dataCell = DataCell(
+          CommonAutoSizeText(fieldValue!,
+              style: TextStyle(
+                  backgroundColor: textBackgroundColor, color: textColor),
+              textAlign: align),
+        );
+        cells.add(dataCell);
       }
-      bool? checked = EntityUtil.getChecked(t);
-      checked ??= false;
-      var dataRow = DataRow2.byIndex(
-        index: index,
-        selected: checked,
-        onSelectChanged: (value) {
-          bool? checked = EntityUtil.getChecked(t);
-          var fn = widget.onSelectChanged;
-          if (fn != null) {
-            fn(index, value);
-          } else if (checked != value) {
-            EntityUtil.setChecked(t, value);
-            setState(() {});
-          }
-        },
-        onTap: () {
-          widget.controller.currentIndex = index;
-          var fn = widget.onTap;
-          if (fn != null) {
-            fn(index);
-          }
-        },
-        onDoubleTap: () {
-          widget.controller.currentIndex = index;
-          var fn = widget.onDoubleTap;
-          if (fn != null) {
-            fn(index);
-          }
-        },
-        onLongPress: () {
-          var fn = widget.onLongPress;
-          if (fn != null) {
-            fn(index);
-          }
-        },
-        cells: cells,
-      );
+    }
+    bool? checked = EntityUtil.getChecked(t);
+    checked ??= false;
+    var dataRow = DataRow2.byIndex(
+      index: index,
+      selected: checked,
+      onSelectChanged: (value) {
+        bool? checked = EntityUtil.getChecked(t);
+        var fn = widget.onSelectChanged;
+        if (fn != null) {
+          fn(index, value);
+        } else if (checked != value) {
+          EntityUtil.setChecked(t, value);
+          setState(() {});
+        }
+      },
+      onTap: () {
+        widget.controller.currentIndex = index;
+        var fn = widget.onTap;
+        if (fn != null) {
+          fn(index);
+        }
+      },
+      onDoubleTap: () {
+        widget.controller.currentIndex = index;
+        var fn = widget.onDoubleTap;
+        if (fn != null) {
+          fn(index);
+        }
+      },
+      onLongPress: () {
+        var fn = widget.onLongPress;
+        if (fn != null) {
+          fn(index);
+        }
+      },
+      cells: cells,
+    );
+
+    return dataRow;
+  }
+
+  /// 过滤条件的多项选择框的行数据
+  List<DataRow2> _buildDataRows() {
+    int length = widget.controller.data.length;
+    List<DataRow2> rows = [];
+    for (int index = 0; index < length; ++index) {
+      DataRow2 dataRow = _getRow(index);
       rows.add(dataRow);
     }
     return rows;
