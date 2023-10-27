@@ -2,7 +2,7 @@ import 'package:livekit_server_sdk/livekit_server_sdk.dart';
 import 'package:livekit_server_sdk/src/proto/livekit_models.pb.dart';
 
 ///创建LiveKit房间的连接客户端
-class LiveKitConferenceServer {
+class LiveKitConferenceServiceClient {
   String host = "https://my.livekit.host";
   RoomServiceClient? roomServiceClient;
 

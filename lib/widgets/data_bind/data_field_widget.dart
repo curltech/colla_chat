@@ -281,6 +281,15 @@ class DataFieldController with ChangeNotifier {
       }
     }
   }
+
+  @override
+  dispose() {
+    super.dispose();
+    var controller = _controller;
+    if (controller != null) {
+      controller.dispose();
+    }
+  }
 }
 
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
@@ -1092,6 +1101,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
   @override
   void dispose() {
     widget.controller.removeListener(_update);
+    widget.controller.dispose();
     super.dispose();
   }
 }

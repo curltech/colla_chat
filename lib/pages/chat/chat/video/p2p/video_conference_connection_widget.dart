@@ -1,4 +1,4 @@
-import 'package:colla_chat/pages/chat/video/video_conference_track_widget.dart';
+import 'package:colla_chat/pages/chat/chat/video/p2p/video_conference_track_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';

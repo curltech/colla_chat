@@ -4,81 +4,46 @@ import 'package:webrtc_interface/webrtc_interface.dart';
 
 ///LiveKit的房间连接客户端
 class LiveKitConferenceClient {
-  final bool _e2ee = true;
-  final String sharedKey = '';
-  final String uri = 'ws://localhost:7880';
-  final String token = '';
-  final bool adaptiveStream = true;
-  final bool dynacast = false;
-  final bool simulcast = true;
-  final bool fastConnect = false;
+  final String uri;
+
+  final String token;
+
+  final String? sharedKey;
+
+  final bool adaptiveStream;
+
+  final bool dynacast;
+
+  final bool simulcast;
+
+  final bool fastConnect;
+
+  final bool e2ee;
+
   final Room room = Room();
+  EventsListener<RoomEvent>? listener;
 
-  String? get id {
-    return room.sid;
-  }
-
-  String? get name {
-    return room.name;
-  }
+  LiveKitConferenceClient(
+      {this.uri = 'ws://localhost:7880',
+      required this.token,
+      this.sharedKey,
+      this.adaptiveStream = true,
+      this.dynacast = false,
+      this.simulcast = true,
+      this.fastConnect = false,
+      this.e2ee = false});
 
   ///连接服务器，根据token建立房间的连接
   Future<void> connect() async {
     E2EEOptions? e2eeOptions;
-    if (_e2ee) {
+    if (e2ee) {
       final keyProvider = await BaseKeyProvider.create();
       e2eeOptions = E2EEOptions(keyProvider: keyProvider);
-      await keyProvider.setKey(sharedKey);
+      await keyProvider.setKey(sharedKey!);
     }
 
-    // ParticipantConnected	A RemoteParticipant joins after the local participant.	x
-    // ParticipantDisconnected	A RemoteParticipant leaves	x
-    // Reconnecting	The connection to the server has been interrupted and it's attempting to reconnect.	x
-    // Reconnected	Reconnection has been successful	x
-    // Disconnected	Disconnected from room due to the room closing or unrecoverable failure	x
-    // TrackPublished	A new track is published to room after the local participant has joined	x	x
-    // TrackUnpublished	A RemoteParticipant has unpublished a track	x	x
-    // TrackSubscribed	The LocalParticipant has subscribed to a track	x	x
-    // TrackUnsubscribed	A previously subscribed track has been unsubscribed	x	x
-    // TrackMuted	A track was muted, fires for both local tracks and remote tracks	x	x
-    // TrackUnmuted	A track was unmuted, fires for both local tracks and remote tracks	x	x
-    // LocalTrackPublished	A local track was published successfully	x	x
-    // LocalTrackUnpublished	A local track was unpublished	x	x
-    // ActiveSpeakersChanged	Current active speakers has changed	x
-    // IsSpeakingChanged	The current participant has changed speaking status		x
-    // ConnectionQualityChanged	Connection quality was changed for a Participant	x	x
-    // ParticipantMetadataChanged	A participant's metadata was updated via server API	x	x
-    // RoomMetadataChanged	Metadata associated with the room has changed	x
-    // DataReceived	Data received from another participant or server	x	x
-    // TrackStreamStateChanged	Indicates if a subscribed track has been paused due to bandwidth	x	x
-    // TrackSubscriptionPermissionChanged	One of subscribed tracks have changed track-level permissions for the current participant	x	x
-    // ParticipantPermissionsChanged	When the current participant's permissions have changed
-
     // Create a Listener before connecting
-    EventsListener<RoomEvent> listener = room.createListener();
-    //接收数据
-    listener.on<DataReceivedEvent>((e) {
-      // process received data: e.data
-    });
-    listener.on<SpeakingChangedEvent>((e) {
-      // handle isSpeaking change
-    });
-    listener.on<TrackPublishedEvent>((e) {
-      e.publication.subscribe();
-    });
-    listener.on<TrackSubscribedEvent>((e) {
-      if (e.publication.kind == TrackType.VIDEO) {
-        e.publication.setVideoQuality(VideoQuality.LOW);
-      }
-    });
-    listener
-      ..on<RoomDisconnectedEvent>((_) {
-        // handle disconnect
-      })
-      ..on<ParticipantConnectedEvent>((e) {
-        print("participant joined: ${e.participant.identity}");
-      });
-
+    listener = room.createListener();
     await room.connect(
       uri,
       token,
@@ -115,7 +80,55 @@ class LiveKitConferenceClient {
             )
           : null,
     );
+  }
 
+  // ParticipantConnected	A RemoteParticipant joins after the local participant.	x
+  // ParticipantDisconnected	A RemoteParticipant leaves	x
+  // Reconnecting	The connection to the server has been interrupted and it's attempting to reconnect.	x
+  // Reconnected	Reconnection has been successful	x
+  // Disconnected	Disconnected from room due to the room closing or unrecoverable failure	x
+  // TrackPublished	A new track is published to room after the local participant has joined	x	x
+  // TrackUnpublished	A RemoteParticipant has unpublished a track	x	x
+  // TrackSubscribed	The LocalParticipant has subscribed to a track	x	x
+  // TrackUnsubscribed	A previously subscribed track has been unsubscribed	x	x
+  // TrackMuted	A track was muted, fires for both local tracks and remote tracks	x	x
+  // TrackUnmuted	A track was unmuted, fires for both local tracks and remote tracks	x	x
+  // LocalTrackPublished	A local track was published successfully	x	x
+  // LocalTrackUnpublished	A local track was unpublished	x	x
+  // ActiveSpeakersChanged	Current active speakers has changed	x
+  // IsSpeakingChanged	The current participant has changed speaking status		x
+  // ConnectionQualityChanged	Connection quality was changed for a Participant	x	x
+  // ParticipantMetadataChanged	A participant's metadata was updated via server API	x	x
+  // RoomMetadataChanged	Metadata associated with the room has changed	x
+  // DataReceived	Data received from another participant or server	x	x
+  // TrackStreamStateChanged	Indicates if a subscribed track has been paused due to bandwidth	x	x
+  // TrackSubscriptionPermissionChanged	One of subscribed tracks have changed track-level permissions for the current participant	x	x
+  // ParticipantPermissionsChanged	When the current participant's permissions have changed
+  onRoomEvent() {
+    //接收数据
+    listener?.on<DataReceivedEvent>((e) {
+      // process received data: e.data
+    });
+    listener?.on<SpeakingChangedEvent>((e) {
+      // handle isSpeaking change
+    });
+    listener?.on<TrackPublishedEvent>((e) {
+      e.publication.subscribe();
+    });
+    listener?.on<TrackSubscribedEvent>((e) {
+      if (e.publication.kind == TrackType.VIDEO) {
+        e.publication.setVideoQuality(VideoQuality.LOW);
+      }
+    });
+    listener?.on<RoomDisconnectedEvent>((_) {
+      // handle disconnect
+    });
+    listener?.on<ParticipantConnectedEvent>((e) {
+      print("participant joined: ${e.participant.identity}");
+    });
+  }
+
+  onParticipantEvent() {
     //本地参与者的监听器
     room.localParticipant?.addListener(_onLocalParticipantChange);
   }
@@ -269,7 +282,7 @@ class LiveKitConferenceClientPool {
     if (clients.containsKey(name)) {
       return clients[name]!;
     }
-    LiveKitConferenceClient client = LiveKitConferenceClient();
+    LiveKitConferenceClient client = LiveKitConferenceClient(token: '');
     await client.connect();
     clients[name] = client;
 

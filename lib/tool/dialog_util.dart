@@ -309,7 +309,11 @@ class DialogUtil {
 
   ///返回为true，代表按的确认
   static Future<bool?> confirm(BuildContext context,
-      {Icon? icon, String title = 'Confirm', String content = ''}) async {
+      {Icon? icon,
+      String title = 'Confirm',
+      String content = '',
+      String cancelLabel = 'Cancel',
+      okLabel = 'Ok'}) async {
     ButtonStyle style = StyleUtil.buildButtonStyle();
     ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);
@@ -332,7 +336,7 @@ class DialogUtil {
                 result = false;
                 Navigator.of(context).pop();
               },
-              child: Text(AppLocalizations.t('Cancel')),
+              child: Text(AppLocalizations.t(cancelLabel)),
             ),
             TextButton(
               style: mainStyle,
@@ -340,7 +344,7 @@ class DialogUtil {
                 result = true;
                 Navigator.of(context).pop(true);
               },
-              child: Text(AppLocalizations.t('Ok')),
+              child: Text(AppLocalizations.t(okLabel)),
             ),
           ],
         );
