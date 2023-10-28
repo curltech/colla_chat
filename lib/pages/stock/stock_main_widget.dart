@@ -8,6 +8,7 @@ import 'package:colla_chat/pages/stock/setting/go_code_widget.dart';
 import 'package:colla_chat/pages/stock/setting/refresh_stock_widget.dart';
 import 'package:colla_chat/pages/stock/setting/update_stock_widget.dart';
 import 'package:colla_chat/pages/stock/trade/in_out_event_widget.dart';
+import 'package:colla_chat/pages/stock/value/performance_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -29,6 +30,7 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
   final InoutEventWidget inoutEventWidget = InoutEventWidget();
   final LocalEventFilterWidget localEventFilterWidget =
       LocalEventFilterWidget();
+  final PerformanceWidget performanceWidget = PerformanceWidget();
 
   StockMainWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(shareSelectionWidget);
@@ -41,6 +43,7 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(goCodeWidget);
     indexWidgetProvider.define(inoutEventWidget);
     indexWidgetProvider.define(localEventFilterWidget);
+    indexWidgetProvider.define(performanceWidget);
   }
 
   @override
@@ -68,6 +71,16 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
       tile.selected = false;
     }
     tileData[TileData(title: 'Me')] = meTileData;
+
+    final List<TileData> valueTileData = TileData.from([
+      performanceWidget,
+    ]);
+    for (var tile in valueTileData) {
+      tile.dense = false;
+      tile.selected = false;
+    }
+    tileData[TileData(title: 'Value')] = valueTileData;
+
     List<TileDataMixin> mixins = [
       refreshStockWidget,
       updateStockWidget,
@@ -77,13 +90,14 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
     if (platformParams.desktop) {
       mixins.add(goCodeWidget);
     }
+
     final List<TileData> settingTileData = TileData.from(mixins);
     for (var tile in settingTileData) {
       tile.dense = false;
       tile.selected = false;
     }
-    tileData[TileData(title: 'Me')] = meTileData;
     tileData[TileData(title: 'Setting')] = settingTileData;
+
     Widget child = GroupDataListView(tileData: tileData);
     var stockMain = AppBarView(title: title, child: child);
 

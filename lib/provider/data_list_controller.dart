@@ -1,6 +1,7 @@
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/pagination_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -171,160 +172,56 @@ class DataListController<T> with ChangeNotifier {
   }
 }
 
-///分页数据控制器，记录了分页的信息
-///页面迁移时，其中的数组的数据被换掉
-abstract class DataPageController<T> with ChangeNotifier {
-  late Pagination<T> pagination;
-  int _currentIndex = -1;
+/// 分页数据控制器，记录了分页的信息
+/// 页面迁移时，其中的数组的数据被换掉
+class DataPageController<T> extends DataListController<T> {
+  ///总行数
+  int count;
 
-  DataPageController() {
-    pagination = Pagination<T>(data: <T>[], rowsNumber: -1);
-    first();
-  }
+  ///当前页的第一行的行号
+  int offset = defaultOffset;
 
-  T? get current {
-    if (_currentIndex > -1) {
-      return pagination.data[_currentIndex];
-    }
-    return null;
-  }
+  ///每页行数
+  int limit = defaultLimit;
 
-  int get currentIndex {
-    return _currentIndex;
-  }
+  DataPageController({this.count = 0});
 
-  set currentIndex(int index) {
-    if (index < -1 || index > pagination.data.length - 1) {
-      return;
-    }
-    if (_currentIndex != index) {
-      _currentIndex = index;
-    }
-  }
-
-  addAll(List<T> ds) {
-    if (ds.isNotEmpty) {
-      _currentIndex = pagination.data.length;
-      pagination.data.addAll(ds);
+  previous() {
+    if (offset >= limit) {
+      offset = offset - limit;
       notifyListeners();
     }
   }
 
-  add(T d) {
-    pagination.data.add(d);
-    _currentIndex = pagination.data.length - 1;
-    notifyListeners();
-  }
-
-  T get(int index) {
-    return pagination.data[index];
-  }
-
-  insert(int index, T d) {
-    if (index >= 0 && index < pagination.data.length) {
-      pagination.data.insert(index, d);
-      _currentIndex = index;
+  next() {
+    if (offset + limit <= count) {
+      offset = offset + limit;
       notifyListeners();
     }
   }
 
-  delete({int? index}) {
-    index = index ?? _currentIndex;
-    if (index >= 0 && index < pagination.data.length) {
-      pagination.data.removeAt(index);
-      _currentIndex = index - 1;
+  first() {
+    if (offset != 0) {
+      offset = 0;
       notifyListeners();
     }
   }
 
-  update(T d, {int? index}) {
-    index = index ?? _currentIndex;
-    if (index >= 0 && index < pagination.data.length) {
-      pagination.data[index] = d;
+  last() {
+    int pageCount = PaginationUtil.getPageCount(count, limit);
+    if (pageCount > 0) {
+      offset = (pageCount - 1) * limit;
       notifyListeners();
     }
   }
 
-  clear() {
-    pagination.data.clear();
-    _currentIndex = -1;
-    notifyListeners();
-  }
-
-  replaceAll(List<T> ds) {
-    pagination.data.clear();
-    pagination.data.addAll(ds);
-    if (ds.isNotEmpty) {
-      _currentIndex = 0;
-    }
-    notifyListeners();
-  }
-
-  int get length => pagination.data.length;
-
-  Map<String, dynamic>? getInitValue(List<PlatformDataField> inputFieldDefs) {
-    T? current = this.current;
-    if (current != null) {
-      var currentMap = JsonUtil.toJson(current);
-      Map<String, dynamic> values = {};
-      for (var inputFieldDef in inputFieldDefs) {
-        String name = inputFieldDef.name;
-        var value = currentMap[name];
-        if (value != null) {
-          values[name] = value;
-        }
-      }
-      return values;
-    }
-    return null;
-  }
-
-  sort(String name, bool sortAscending) {
-    if (sortAscending) {
-      pagination.data.sort((a, b) {
-        var aMap = JsonUtil.toJson(a);
-        var bMap = JsonUtil.toJson(b);
-        return aMap[name].compareTo(bMap[name]);
-      });
-    } else {
-      pagination.data.sort((a, b) {
-        var aMap = JsonUtil.toJson(a);
-        var bMap = JsonUtil.toJson(b);
-        return bMap[name].compareTo(aMap[name]);
-      });
-    }
-    _currentIndex = 0;
-    notifyListeners();
-  }
-
-  ///总页数
-  int get pagesNumber {
-    return pagination.pagesNumber;
-  }
-
-  int get limit {
-    return pagination.rowsPerPage;
-  }
-
-  int get page {
-    return pagination.page;
-  }
-
-  set page(int page) {
-    if (page > 0) {
-      pagination.page = page;
+  move(int index) {
+    int currentPage = PaginationUtil.getCurrentPage(offset, limit);
+    if (currentPage != index) {
+      offset = index * limit;
+      notifyListeners();
     }
   }
-
-  Future<bool> previous();
-
-  Future<bool> next();
-
-  Future<bool> first();
-
-  Future<bool> last();
-
-  Future<bool> move(int index);
 }
 
 ///更多数据的数据控制器

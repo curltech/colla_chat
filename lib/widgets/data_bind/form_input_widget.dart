@@ -76,7 +76,7 @@ class FormInputController with ChangeNotifier {
   }
 
   ///获取所有真实值
-  dynamic getValues() {
+  Map<String, dynamic> getValues() {
     Map<String, dynamic> values = {};
     for (var dataField in dataFields) {
       String name = dataField.name;

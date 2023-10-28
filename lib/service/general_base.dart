@@ -162,9 +162,9 @@ abstract class GeneralBaseService<T> {
     }
     Pagination<T> pagination = Pagination<T>(
         data: os,
-        rowsNumber: page.rowsNumber,
+        count: page.count,
         offset: page.offset,
-        rowsPerPage: page.limit);
+        limit: page.limit);
 
     return pagination;
   }

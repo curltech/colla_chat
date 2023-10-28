@@ -149,9 +149,9 @@ abstract class GeneralRemoteService<T> {
     }
     Pagination<T> pagination = Pagination<T>(
         data: os,
-        rowsNumber: data['count'],
+        count: data['count'],
         offset: offset,
-        rowsPerPage: limit);
+        limit: limit);
 
     return pagination;
   }

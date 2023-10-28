@@ -1101,7 +1101,6 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
   @override
   void dispose() {
     widget.controller.removeListener(_update);
-    widget.controller.dispose();
     super.dispose();
   }
 }

@@ -1,83 +1,61 @@
 import 'package:colla_chat/datastore/sql_builder.dart';
+import 'package:colla_chat/tool/pagination_util.dart';
 
 const int defaultLimit = 10;
 const int defaultOffset = 0;
 
+/// 分页器
 class Pagination<T> {
-  int rowsNumber;
   List<T> data;
+  int count;
   int offset = defaultOffset;
-  int rowsPerPage = defaultLimit;
-
-  static int getPage(int offset, int limit) {
-    int page = offset ~/ limit + 1;
-
-    return page;
-  }
-
-  static int getPagesNumber(int total, int limit) {
-    int mod = total % limit;
-    int pageCount = total ~/ limit;
-    if (mod > 0) {
-      pageCount++;
-    }
-
-    return pageCount;
-  }
+  int limit = defaultLimit;
 
   Pagination(
       {required this.data,
-      this.rowsNumber = -1,
+      this.count = -1,
       this.offset = defaultOffset,
-      this.rowsPerPage = defaultLimit});
+      this.limit = defaultLimit});
 
   int get pagesNumber {
-    return getPagesNumber(rowsNumber, rowsPerPage);
+    return PaginationUtil.getPageCount(count, limit);
   }
 
   int get page {
-    return getPage(offset, rowsPerPage);
+    return PaginationUtil.getCurrentPage(offset, limit);
   }
 
   set page(int page) {
     if (page > 0) {
-      offset = (page - 1) * rowsPerPage;
+      offset = (page - 1) * limit;
     }
-  }
-
-  int get limit {
-    return rowsPerPage;
   }
 
   ///上一页的offset
   int previous() {
-    if (offset < rowsPerPage) {
+    if (offset < limit) {
       return 0;
     }
-    return offset - rowsPerPage;
+    return offset - limit;
   }
 
   ///下一页的offset
   int next() {
-    var off = offset + rowsPerPage;
-    if (off > rowsNumber) {
-      return rowsNumber;
+    var off = offset + limit;
+    if (off > count) {
+      return count;
     }
     return off;
   }
 
   Pagination.fromJson(Map json)
-      : rowsNumber = json['total'],
+      : count = json['total'],
         data = json['data'],
         offset = json['offset'],
-        rowsPerPage = json['limit'];
+        limit = json['limit'];
 
-  Map<String, dynamic> toJson() => {
-        'total': rowsNumber,
-        'data': data,
-        'offset': offset,
-        'limit': rowsPerPage
-      };
+  Map<String, dynamic> toJson() =>
+      {'total': count, 'data': data, 'offset': offset, 'limit': limit};
 }
 
 const String dbname =

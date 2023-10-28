@@ -186,7 +186,7 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
             _onOk(values);
           }),
     ];
-    var formInputWidget = Container(
+    Widget formInputWidget = Container(
         padding: const EdgeInsets.all(10.0),
         child: FormInputWidget(
           height: appDataProvider.portraitSize.height * 0.4,
@@ -194,6 +194,12 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
           controller: searchController,
           formButtons: formButtonDefs,
         ));
+
+    formInputWidget = ExpansionTile(
+      title: Text(AppLocalizations.t('Search')),
+      controller: expansionTileController,
+      children: [formInputWidget],
+    );
 
     return formInputWidget;
   }
@@ -290,11 +296,7 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
         withLeading: true,
         rightWidgets: rightWidgets,
         child: Column(children: [
-          ExpansionTile(
-            title: Text(AppLocalizations.t('Search')),
-            controller: expansionTileController,
-            children: [_buildSearchView(context)],
-          ),
+          _buildSearchView(context),
           Expanded(child: _buildInOutEventListView(context))
         ]));
   }
