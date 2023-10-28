@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/entity/base.dart';
@@ -37,7 +38,8 @@ class Sqlite3 extends DataStore {
       print('sqlite3 db get userVersion failure:$e');
     }
 
-    //drop(conferenceService.tableName);
+
+    // drop(conferenceService.tableName);
     for (GeneralBaseService service in ServiceLocator.services.values) {
       try {
         create(service.tableName, service.fields,

@@ -2,7 +2,7 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:flutter/widgets.dart';
 
 const String appName = 'CollaChat';
-const String appVersion = '1.3.0';
+const String appVersion = '1.4.0';
 const String appVendor = 'CurlTech';
 const String vendorUrl = 'curltech.io';
 
