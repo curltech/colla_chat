@@ -23,6 +23,9 @@ class Conference extends StatusEntity {
   bool wait = true; // 自动等待
   bool advance = true; // 参会者可提前加入
   int upperNumber = 300; // 参会人数上限
+  bool sfu = false;
+  String? sfuUri;
+  String? sfuToken;
   List<String>? participants; // 参与人peerId的集合
   Widget? avatarImage; //类似群的图标，几个参加者的图标的混合
 
@@ -63,6 +66,9 @@ class Conference extends StatusEntity {
         advance =
             json['advance'] == true || json['advance'] == 1 ? true : false,
         upperNumber = json['upperNumber'] ?? 300,
+        sfu = json['sfu'] ?? 300,
+        sfuUri = json['sfuUri'] ?? 300,
+        sfuToken = json['sfuToken'] ?? 300,
         super.fromJson(json) {
     var participants = json['participants'] != null
         ? JsonUtil.toJson(json['participants'])
@@ -97,6 +103,9 @@ class Conference extends StatusEntity {
       'advance': advance,
       'video': video,
       'upperNumber': upperNumber,
+      'sfu': sfu,
+      'sfuUri': sfuUri,
+      'sfuToken': sfuToken,
       'participants':
           participants == null ? null : JsonUtil.toJsonString(participants),
     });

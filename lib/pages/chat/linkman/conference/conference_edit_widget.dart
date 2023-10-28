@@ -27,58 +27,6 @@ import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-final List<PlatformDataField> conferenceDataField = [
-  PlatformDataField(
-    name: 'conferenceId',
-    label: 'ConferenceId',
-    inputType: InputType.label,
-    prefixIcon: Icon(Icons.meeting_room, color: myself.primary),
-  ),
-  PlatformDataField(
-    name: 'name',
-    label: 'Name',
-    prefixIcon: Icon(Icons.person, color: myself.primary),
-  ),
-  PlatformDataField(
-    name: 'topic',
-    label: 'Topic',
-    prefixIcon: Icon(Icons.topic, color: myself.primary),
-  ),
-  PlatformDataField(
-    name: 'conferenceOwnerPeerId',
-    label: 'ConferenceOwnerPeerId',
-    inputType: InputType.label,
-    prefixIcon: Icon(Icons.perm_identity, color: myself.primary),
-  ),
-  PlatformDataField(
-    name: 'password',
-    label: 'Password',
-    inputType: InputType.password,
-    prefixIcon: Icon(Icons.password, color: myself.primary),
-  ),
-  PlatformDataField(
-    name: 'video',
-    label: 'Video',
-    inputType: InputType.switcher,
-    dataType: DataType.bool,
-    prefixIcon: Icon(Icons.video_call, color: myself.primary),
-  ),
-  PlatformDataField(
-    name: 'startDate',
-    label: 'StartDate',
-    inputType: InputType.datetime,
-    dataType: DataType.string,
-    prefixIcon: Icon(Icons.start, color: myself.primary),
-  ),
-  PlatformDataField(
-    name: 'endDate',
-    label: 'EndDate',
-    inputType: InputType.datetime,
-    dataType: DataType.string,
-    prefixIcon: Icon(Icons.pin_end, color: myself.primary),
-  ),
-];
-
 ValueNotifier<Conference?> conferenceNotifier =
     ValueNotifier<Conference?>(null);
 
@@ -103,7 +51,79 @@ class ConferenceEditWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
-  final FormInputController controller =
+  final List<PlatformDataField> conferenceDataField = [
+    PlatformDataField(
+      name: 'conferenceId',
+      label: 'ConferenceId',
+      inputType: InputType.label,
+      prefixIcon: Icon(Icons.meeting_room, color: myself.primary),
+    ),
+    PlatformDataField(
+      name: 'name',
+      label: 'Name',
+      prefixIcon: Icon(Icons.person, color: myself.primary),
+    ),
+    PlatformDataField(
+      name: 'topic',
+      label: 'Topic',
+      prefixIcon: Icon(Icons.topic, color: myself.primary),
+    ),
+    PlatformDataField(
+      name: 'conferenceOwnerPeerId',
+      label: 'ConferenceOwnerPeerId',
+      inputType: InputType.label,
+      prefixIcon: Icon(Icons.perm_identity, color: myself.primary),
+    ),
+    PlatformDataField(
+      name: 'password',
+      label: 'Password',
+      inputType: InputType.password,
+      prefixIcon: Icon(Icons.password, color: myself.primary),
+    ),
+    PlatformDataField(
+      name: 'video',
+      label: 'Video',
+      inputType: InputType.switcher,
+      dataType: DataType.bool,
+      prefixIcon: Icon(Icons.video_call, color: myself.primary),
+    ),
+    PlatformDataField(
+      name: 'startDate',
+      label: 'StartDate',
+      inputType: InputType.datetime,
+      dataType: DataType.string,
+      prefixIcon: Icon(Icons.start, color: myself.primary),
+    ),
+    PlatformDataField(
+      name: 'endDate',
+      label: 'EndDate',
+      inputType: InputType.datetime,
+      dataType: DataType.string,
+      prefixIcon: Icon(Icons.pin_end, color: myself.primary),
+    ),
+    PlatformDataField(
+      name: 'sfu',
+      label: 'Sfu',
+      inputType: InputType.switcher,
+      dataType: DataType.bool,
+      prefixIcon: Icon(Icons.switch_access_shortcut, color: myself.primary),
+    ),
+    PlatformDataField(
+      name: 'sfuUri',
+      label: 'SfuUri',
+      inputType: InputType.text,
+      dataType: DataType.string,
+      prefixIcon: Icon(Icons.edit_location_outlined, color: myself.primary),
+    ),
+    PlatformDataField(
+      name: 'sfuToken',
+      label: 'SfuToken',
+      inputType: InputType.text,
+      dataType: DataType.string,
+      prefixIcon: Icon(Icons.token, color: myself.primary),
+    ),
+  ];
+  late final FormInputController controller =
       FormInputController(conferenceDataField);
 
   OptionController conferenceOwnerController = OptionController();
@@ -111,15 +131,12 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
   //选择的会议成员
   ValueNotifier<List<String>> conferenceMembers = ValueNotifier([]);
 
-  bool isNew = false;
-
   @override
   initState() {
     Conference? current = conferenceNotifier.value;
     if (current == null) {
       current = Conference('', name: '');
       conferenceNotifier.value = current;
-      isNew = true;
     }
     conferenceController.addListener(_update);
     _buildConferenceData();
@@ -364,7 +381,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     ///当前chatSummary可以不存在，因此不需要当前处于聊天场景下，因此是一个静态方法，创建永久conference的时候使用
     ///对linkman模式下，conference是临时的，不保存数据库
     ///对group和conference模式下，conference是永久的，保存数据库，可以以后重新加入
-    if (isNew) {
+    if (current.id == null) {
       ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
         current.conferenceId,
         PartyType.conference,
@@ -385,10 +402,8 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     if (conferenceModified) {
       conferenceChatSummaryController.refresh();
     }
-    if (isNew) {
-      setState(() {
-        isNew = false;
-      });
+    if (current.id == null) {
+      setState(() {});
     }
 
     return current;
@@ -397,7 +412,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
   @override
   Widget build(BuildContext context) {
     String title = 'Add conference';
-    if (!isNew) {
+    if (conferenceNotifier.value?.id != null) {
       title = 'Edit conference';
     }
     List<Widget> rightWidgets = [

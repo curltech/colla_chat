@@ -72,8 +72,6 @@ class GroupEditWidget extends StatefulWidget with TileDataMixin {
 class _GroupEditWidgetState extends State<GroupEditWidget> {
   final FormInputController controller = FormInputController(groupDataField);
 
-  bool isNew = false;
-
   OptionController groupOwnerController = OptionController();
 
   //已经选择的群成员
@@ -87,7 +85,6 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     Group? current = groupNotifier.value;
     if (current == null) {
       current = Group('', '');
-      isNew = true;
       groupNotifier.value = current;
     }
     groupNotifier.addListener(_update);
@@ -370,7 +367,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     var groupId = current.peerId;
 
     //对所有的成员发送组变更的消息
-    if (isNew) {
+    if (current.id == null) {
       await groupService.addGroup(current);
     } else {
       if (groupModified) {
@@ -388,7 +385,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     //新增加的成员
     List<GroupMember>? newMembers = groupChange.addGroupMembers;
     if (newMembers is List<GroupMember> && newMembers.isNotEmpty) {
-      if (!isNew) {
+      if (current.id != null) {
         await groupService.addGroupMember(current, newMembers);
       }
     }
@@ -408,14 +405,12 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
         await groupService.removeGroupMember(current, oldMembers);
       }
     }
-    if (isNew || groupModified) {
+    if (current.id == null || groupModified) {
       groupChatSummaryController.refresh();
     }
 
-    if (isNew) {
-      setState(() {
-        isNew = false;
-      });
+    if (current.id == null) {
+      setState(() {});
     }
 
     return current;
@@ -424,7 +419,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
   @override
   Widget build(BuildContext context) {
     String title = 'Add group';
-    if (!isNew) {
+    if (groupNotifier.value?.id != null) {
       title = 'Edit group';
     }
     List<Widget> rightWidgets = [

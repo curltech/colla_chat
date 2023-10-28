@@ -6,6 +6,7 @@ import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/entity_util.dart';
@@ -36,6 +37,7 @@ class Sqlite3 extends DataStore {
       print('sqlite3 db get userVersion failure:$e');
     }
 
+    //drop(conferenceService.tableName);
     for (GeneralBaseService service in ServiceLocator.services.values) {
       try {
         create(service.tableName, service.fields,
@@ -141,7 +143,6 @@ class Sqlite3 extends DataStore {
   }
 
   /// 删除表
-  /// @param {*} tableName
   drop(String tableName) {
     var query = sqlBuilder.drop(tableName);
 
