@@ -6,6 +6,7 @@ import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/service/general_base.dart';
@@ -27,10 +28,10 @@ class Sqlite3 extends DataStore {
     db = await sqlite3_open.openSqlite3(name: name);
     //开发调试阶段，每次都重建数据库表
     //db.userVersion = 0;
-    init(db);
+    await init(db);
   }
 
-  init(CommonDatabase db) {
+  init(CommonDatabase db) async {
     int userVersion = 0;
     try {
       userVersion = db.userVersion;
@@ -38,8 +39,14 @@ class Sqlite3 extends DataStore {
       print('sqlite3 db get userVersion failure:$e');
     }
 
+    /// 删除新版本中有变化的表，重建
+    String? existAppVersion = await localSharedPreferences.get('appVersion');
+    if (existAppVersion != null) {
+      if (existAppVersion.compareTo(appVersion) < 0) {
+        drop(conferenceService.tableName);
+      }
+    }
 
-    // drop(conferenceService.tableName);
     for (GeneralBaseService service in ServiceLocator.services.values) {
       try {
         create(service.tableName, service.fields,
