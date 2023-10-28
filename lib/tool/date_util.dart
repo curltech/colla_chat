@@ -109,7 +109,11 @@ class DateUtil {
 
   static String formatDateQuarter(DateTime dateTime) {
     int month = (dateTime.month / 3).floor();
-    return '${dateTime.year}Q$month';
+    if (month == 0) {
+      return '${dateTime.year - 1}Q4';
+    } else {
+      return '${dateTime.year}Q$month';
+    }
   }
 
   static DateTime toDateTime(String formattedString) {
