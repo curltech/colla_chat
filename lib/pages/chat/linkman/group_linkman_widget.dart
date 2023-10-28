@@ -79,7 +79,11 @@ class _GroupLinkmanWidgetState extends State<GroupLinkmanWidget> {
           return CustomMultiSelect(
             title: title,
             onConfirm: (selected) {
-              widget.onSelected(selected!);
+              if (selected == null) {
+                widget.onSelected([]);
+              } else {
+                widget.onSelected(selected);
+              }
             },
             optionController: optionController,
           );

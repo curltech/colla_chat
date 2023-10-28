@@ -140,7 +140,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
 
   @override
   void onWindowFocus() {
-    logger.i('chat message window switch to foreground');
+    //logger.i('chat message window switch to foreground');
     _createPeerConnection();
   }
 
