@@ -176,6 +176,8 @@ class _PerformanceWidgetState extends State<PerformanceWidget>
   @override
   initState() {
     performanceController.clear();
+    searchController.setValue(
+        'startDate', DateUtil.formatDateQuarter(DateTime.now()));
     performanceController.addListener(_updatePerformance);
     super.initState();
   }

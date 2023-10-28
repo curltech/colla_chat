@@ -107,6 +107,11 @@ class DateUtil {
     return dateTime.year * 10000 + dateTime.month * 100 + dateTime.day;
   }
 
+  static String formatDateQuarter(DateTime dateTime) {
+    int month = (dateTime.month / 3).floor();
+    return '${dateTime.year}Q$month';
+  }
+
   static DateTime toDateTime(String formattedString) {
     return DateTime.parse(formattedString);
   }
