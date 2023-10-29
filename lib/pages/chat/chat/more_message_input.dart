@@ -37,38 +37,6 @@ import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:colla_chat/tool/path_util.dart';
 
-final List<ActionData> defaultActionData = [
-  ActionData(
-      label: 'DeleteTime',
-      tooltip: 'Delete time',
-      icon: const Icon(Icons.timer_sharp)),
-  ActionData(
-      label: 'Picture',
-      tooltip: 'Take a picture',
-      icon: const Icon(Icons.camera)),
-  ActionData(
-    label: 'Video chat',
-    tooltip: 'Invite video chat',
-    icon: const Icon(Icons.video_call),
-  ),
-  ActionData(
-      label: 'Location',
-      tooltip: 'Geographical position',
-      icon: const Icon(Icons.location_on)),
-  ActionData(
-      label: 'Name card',
-      tooltip: 'Share name card',
-      icon: const Icon(Icons.card_membership)),
-  ActionData(
-      label: 'File',
-      tooltip: 'Pick and send file',
-      icon: const Icon(Icons.file_open)),
-  ActionData(
-      label: 'Collection',
-      tooltip: 'Collection',
-      icon: const Icon(Icons.collections)),
-];
-
 ///非文本的其他多种格式输入面板，包括照片等
 class MoreMessageInput extends StatefulWidget {
   final Future<void> Function(int index, String name, {String? value})?
@@ -81,6 +49,43 @@ class MoreMessageInput extends StatefulWidget {
 }
 
 class _MoreMessageInputState extends State<MoreMessageInput> {
+  final List<ActionData> defaultActionData = [
+    ActionData(
+        label: 'DeleteTime',
+        tooltip: 'Delete time',
+        icon: const Icon(Icons.timer_sharp)),
+    ActionData(
+        label: 'Picture',
+        tooltip: 'Take a picture',
+        icon: const Icon(Icons.camera)),
+    ActionData(
+      label: 'Video chat',
+      tooltip: 'Invite video chat',
+      icon: const Icon(Icons.video_call),
+    ),
+    ActionData(
+      label: 'Sfu video chat',
+      tooltip: 'Invite video chat',
+      icon: const Icon(Icons.missed_video_call_outlined),
+    ),
+    ActionData(
+        label: 'Location',
+        tooltip: 'Geographical position',
+        icon: const Icon(Icons.location_on)),
+    ActionData(
+        label: 'Name card',
+        tooltip: 'Share name card',
+        icon: const Icon(Icons.card_membership)),
+    ActionData(
+        label: 'File',
+        tooltip: 'Pick and send file',
+        icon: const Icon(Icons.file_open)),
+    ActionData(
+        label: 'Collection',
+        tooltip: 'Collection',
+        icon: const Icon(Icons.collections)),
+  ];
+
   List<ActionData> actionData = [];
 
   @override
@@ -113,6 +118,9 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         break;
       case 'Video chat':
         _onActionVideoChat();
+        break;
+      case 'Sfu video chat':
+        _onActionSfuVideoChat();
         break;
       case 'Location':
         _onActionLocation(context);
@@ -178,6 +186,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       }
     }
   }
+
+  _onActionSfuVideoChat() async {}
 
   ///相册
   _onActionAlbum() async {
@@ -431,8 +441,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         width: appDataProvider.secondaryBodyWidth * 0.9,
         height: chatMessageViewController.moreMessageInputHeight,
         onPressed: _onAction,
-        mainAxisSpacing: 40,
-        crossAxisSpacing: 40,
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
         crossAxisCount: 4,
       ),
     );

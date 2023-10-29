@@ -324,7 +324,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
                     : _buildTransportTypeSendAction(),
                 height: 140,
                 width: 320,
-                size: 20),
+                iconSize: 20),
           );
         },
         pressType: PressType.longPress);

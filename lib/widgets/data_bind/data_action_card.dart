@@ -46,7 +46,7 @@ class DataActionCard extends StatelessWidget {
   final double crossAxisSpacing;
   late double? mainAxisExtent;
   final double childAspectRatio;
-  final double size;
+  final double iconSize;
   final bool showLabel;
   final Color? labelColor;
   final bool showTooltip;
@@ -62,22 +62,20 @@ class DataActionCard extends StatelessWidget {
     this.crossAxisSpacing = 10.0,
     this.mainAxisExtent,
     this.childAspectRatio = 1,
-    this.size = 32,
+    this.iconSize = 32,
     this.showLabel = true,
     this.showTooltip = true,
     this.labelColor,
     this.width,
   }) : super(key: key) {
-    mainAxisExtent ??= size + (showLabel ? 30 : 10);
-    if (height == null) {
-      var mod = actions.length % crossAxisCount;
-      int lines = (actions.length / crossAxisCount).floor();
-      if (mod > 0) {
-        lines++;
-      }
-      height = lines * (mainAxisExtent!) + 10;
+    var mod = actions.length % crossAxisCount;
+    int lines = (actions.length / crossAxisCount).floor();
+    if (mod > 0) {
+      lines++;
     }
-    width ??= crossAxisCount * (size + 60);
+    mainAxisExtent ??= iconSize + (showLabel ? 25 : 0);
+    height ??= lines * mainAxisExtent! + 60;
+    width ??= crossAxisCount * mainAxisExtent! + 60;
   }
 
   Widget _buildIconTextButton(
@@ -86,7 +84,7 @@ class DataActionCard extends StatelessWidget {
     var tooltip = AppLocalizations.t(actionData.tooltip ?? '');
     return IconTextButton(
         iconColor: myself.primary,
-        iconSize: size,
+        iconSize: iconSize,
         onPressed: () {
           if (onPressed != null) {
             onPressed!(index, actionData.label);
@@ -134,7 +132,7 @@ class DataActionCard extends StatelessWidget {
     return InkWellTextButton(
         padding: const EdgeInsets.all(5.0),
         iconColor: myself.primary,
-        iconSize: size,
+        iconSize: iconSize,
         onPressed: () {
           if (onPressed != null) {
             onPressed!(index, actionData.label);

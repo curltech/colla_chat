@@ -162,7 +162,7 @@ class IconTextButton extends StatelessWidget {
         const SizedBox(height: 2.0),
       );
       children.add(
-        CommonAutoSizeText(
+        Expanded(child: CommonAutoSizeText(
           AppLocalizations.t(label ?? ''),
           style: TextStyle(
             color: labelColor,
@@ -170,7 +170,7 @@ class IconTextButton extends StatelessWidget {
           ),
           overflow: TextOverflow.visible,
           softWrap: false,
-        ),
+        )),
       );
     }
     return IconButton(

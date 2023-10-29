@@ -192,7 +192,7 @@ class MessageWidget {
                         actions: messagePopActionData,
                         height: 180,
                         width: 380,
-                        size: 30));
+                        iconSize: 30));
               },
             );
           },

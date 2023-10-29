@@ -151,7 +151,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
                         actions: widget.actionData,
                         height: 140,
                         width: 220,
-                        size: 20));
+                        iconSize: 20));
               },
             );
           },

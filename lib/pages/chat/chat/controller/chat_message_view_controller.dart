@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 class ChatMessageViewController with ChangeNotifier {
   static const double defaultChatMessageInputHeight = 48;
   static const double defaultEmojiMessageInputHeight = 270;
-  static const double defaultMoreMessageInputHeight = 200;
+  static const double defaultMoreMessageInputHeight = 230;
 
   //输入消息的焦点
   final FocusNode focusNode = FocusNode();
