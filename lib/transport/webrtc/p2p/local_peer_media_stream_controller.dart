@@ -288,8 +288,8 @@ class LocalPeerMediaStreamController extends PeerMediaStreamController {
     }
     peerMediaStream = PeerMediaStream();
     await peerMediaStream.buildMediaStream(
-      stream,
       myself.peerId!,
+      mediaStream: stream,
       clientId: myself.clientId,
       name: myself.myselfPeer.name,
     );

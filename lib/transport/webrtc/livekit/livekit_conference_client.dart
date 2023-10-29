@@ -1,9 +1,16 @@
+import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/chat_summary.dart';
+import 'package:colla_chat/entity/chat/conference.dart';
+import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
+import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:livekit_client/livekit_client.dart';
+import 'package:synchronized/synchronized.dart';
 import 'package:webrtc_interface/webrtc_interface.dart';
 
 ///LiveKit的房间连接客户端
-class LiveKitConferenceClient {
+class LiveKitRoomClient {
   final String uri;
 
   final String token;
@@ -23,7 +30,7 @@ class LiveKitConferenceClient {
   final Room room = Room();
   EventsListener<RoomEvent>? listener;
 
-  LiveKitConferenceClient(
+  LiveKitRoomClient(
       {this.uri = 'ws://localhost:7880',
       required this.token,
       this.sharedKey,
@@ -274,25 +281,197 @@ class LiveKitConferenceClient {
   }
 }
 
-class LiveKitConferenceClientPool {
-  final Map<String, LiveKitConferenceClient> clients = {};
+/// 会议客户端，包含有房间客户端和会议的消息控制器
+class LiveKitConferenceClient {
+  final LiveKitRoomClient roomClient;
+  final ConferenceChatMessageController conferenceChatMessageController;
 
-  Future<LiveKitConferenceClient> createLiveKitConferenceClient(
-      String name) async {
-    if (clients.containsKey(name)) {
-      return clients[name]!;
-    }
-    LiveKitConferenceClient client = LiveKitConferenceClient(token: '');
-    await client.connect();
-    clients[name] = client;
+  LiveKitConferenceClient(
+      this.roomClient, this.conferenceChatMessageController);
 
-    return client;
+  exit() {}
+
+  terminate() {}
+
+  removeLocalPeerMediaStream(List<PeerMediaStream> peerMediaStreams, {AdvancedPeerConnection? peerConnection}) {}
+
+  updateAdvancedPeerConnection(AdvancedPeerConnection peerConnection) {}
+}
+
+///所有的正在视频会议的池，包含多个视频会议，每个会议的会议号是视频通话邀请的消息号
+class LiveKitConferenceClientPool with ChangeNotifier {
+  final Map<String, LiveKitConferenceClient> _liveKitConferenceClients = {};
+
+  final Lock _clientLock = Lock();
+
+  //当前会议编号
+  String? _conferenceId;
+
+  LiveKitConferenceClientPool();
+
+  List<LiveKitConferenceClient> get liveKitConferenceClients {
+    return [..._liveKitConferenceClients.values];
   }
 
-  LiveKitConferenceClient? getLiveKitConferenceClient(String name) {
-    return clients[name];
+  ///根据当前的视频邀请消息，查找或者创建当前消息对应的会议，并设置为当前会议
+  ///在发起者接收到至少一个同意回执，开始重新协商，或者接收者发送出同意回执的时候调用
+  Future<LiveKitConferenceClient?> createLiveKitConferenceClient(
+      ChatMessage chatMessage,
+      {ChatSummary? chatSummary}) async {
+    return await _clientLock.synchronized(() async {
+      LiveKitConferenceClient? p2pConferenceClient;
+      //创建基于当前聊天的视频消息控制器
+      if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
+        String conferenceId = chatMessage.messageId!;
+        p2pConferenceClient = _liveKitConferenceClients[conferenceId];
+        if (p2pConferenceClient == null) {
+          ConferenceChatMessageController conferenceChatMessageController =
+              ConferenceChatMessageController();
+          await conferenceChatMessageController.setChatMessage(chatMessage,
+              chatSummary: chatSummary);
+          conferenceChatMessageController.conference?.sfuToken;
+          LiveKitRoomClient liveKitRoomClient = LiveKitRoomClient(token: '');
+          p2pConferenceClient = LiveKitConferenceClient(
+              liveKitRoomClient, conferenceChatMessageController);
+          _liveKitConferenceClients[conferenceId] = p2pConferenceClient;
+        } else {
+          ConferenceChatMessageController conferenceChatMessageController =
+              p2pConferenceClient.conferenceChatMessageController;
+          if (conferenceChatMessageController.chatMessage == null) {
+            await conferenceChatMessageController.setChatMessage(chatMessage,
+                chatSummary: chatSummary);
+          }
+        }
+        this.conferenceId = conferenceId;
+
+        return p2pConferenceClient;
+      }
+
+      return p2pConferenceClient;
+    });
+  }
+
+  ///获取当前会议号
+  String? get conferenceId {
+    return _conferenceId;
+  }
+
+  ///设置当前会议号
+  set conferenceId(String? conferenceId) {
+    if (_conferenceId != conferenceId) {
+      if (conferenceId != null) {
+        if (_liveKitConferenceClients.containsKey(conferenceId)) {
+          _conferenceId = conferenceId;
+        } else {
+          _conferenceId = null;
+        }
+      } else {
+        _conferenceId = conferenceId;
+      }
+      notifyListeners();
+    }
+  }
+
+  ///获取当前的会议
+  LiveKitConferenceClient? get p2pConferenceClient {
+    if (_conferenceId != null) {
+      return _liveKitConferenceClients[_conferenceId];
+    }
+    return null;
+  }
+
+  ///获取当前会议控制器
+  ConferenceChatMessageController? get conferenceChatMessageController {
+    if (_conferenceId != null) {
+      return _liveKitConferenceClients[_conferenceId]
+          ?.conferenceChatMessageController;
+    }
+    return null;
+  }
+
+  ///根据会议号返回会议控制器，没有则返回null
+  LiveKitConferenceClient? getP2pConferenceClient(String conferenceId) {
+    return _liveKitConferenceClients[conferenceId];
+  }
+
+  ConferenceChatMessageController? getConferenceChatMessageController(
+      String conferenceId) {
+    return getP2pConferenceClient(conferenceId)
+        ?.conferenceChatMessageController;
+  }
+
+  Conference? getConference(String conferenceId) {
+    return getP2pConferenceClient(conferenceId)
+        ?.conferenceChatMessageController
+        .conference;
+  }
+
+  /// 新的连接建立事件，如果各会议的连接中存在已经加入但是连接为建立的情况则更新连接
+  onConnected(AdvancedPeerConnection peerConnection) async {
+    for (LiveKitConferenceClient p2pConferenceClient
+        in _liveKitConferenceClients.values) {
+      await p2pConferenceClient.updateAdvancedPeerConnection(peerConnection);
+    }
+  }
+
+  ///把本地新的peerMediaStream加入到会议的所有连接中，并且都重新协商
+  addLocalPeerMediaStream(
+      String conferenceId, List<PeerMediaStream> peerMediaStreams,
+      {AdvancedPeerConnection? peerConnection}) async {
+    LiveKitConferenceClient? p2pConferenceClient =
+        _liveKitConferenceClients[conferenceId];
+    if (p2pConferenceClient != null) {
+      await p2pConferenceClient.roomClient.setCameraEnabled(true);
+      p2pConferenceClient.roomClient.publishVideoTrack();
+    }
+  }
+
+  ///会议的指定连接或者所有连接中移除本地或者远程的peerMediaStream，并且都重新协商
+  removeLocalPeerMediaStream(
+      String conferenceId, List<PeerMediaStream> peerMediaStreams,
+      {AdvancedPeerConnection? peerConnection}) async {
+    LiveKitConferenceClient? p2pConferenceClient =
+        _liveKitConferenceClients[conferenceId];
+    if (p2pConferenceClient != null) {
+      await p2pConferenceClient.removeLocalPeerMediaStream(peerMediaStreams,
+          peerConnection: peerConnection);
+    }
+  }
+
+  ///根据会议编号退出会议
+  ///调用对应会议的退出方法
+  exit(String conferenceId) async {
+    await _clientLock.synchronized(() async {
+      LiveKitConferenceClient? p2pConferenceClient =
+          _liveKitConferenceClients[conferenceId];
+      if (p2pConferenceClient != null) {
+        await p2pConferenceClient.exit();
+        if (conferenceId == _conferenceId) {
+          _conferenceId = null;
+        }
+        notifyListeners();
+      }
+    });
+  }
+
+  ///根据会议编号终止会议
+  ///调用对应会议的终止方法，然后从会议池中删除，设置当前会议编号为null
+  terminate(String conferenceId) async {
+    await _clientLock.synchronized(() async {
+      LiveKitConferenceClient? p2pConferenceClient =
+          _liveKitConferenceClients[conferenceId];
+      if (p2pConferenceClient != null) {
+        await p2pConferenceClient.terminate();
+        _liveKitConferenceClients.remove(conferenceId);
+        if (conferenceId == _conferenceId) {
+          _conferenceId = null;
+        }
+        notifyListeners();
+      }
+    });
   }
 }
 
+///存放已经开始的会议，就是发起者接收到至少一个同意回执，开始重新协商，或者接收者发送出同意回执
 final LiveKitConferenceClientPool liveKitConferenceClientPool =
     LiveKitConferenceClientPool();

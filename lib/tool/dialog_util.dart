@@ -313,7 +313,7 @@ class DialogUtil {
       String title = 'Confirm',
       String content = '',
       String cancelLabel = 'Cancel',
-      okLabel = 'Ok'}) async {
+      String okLabel = 'Ok'}) async {
     ButtonStyle style = StyleUtil.buildButtonStyle();
     ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);

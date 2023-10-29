@@ -1,4 +1,4 @@
-import 'package:colla_chat/pages/chat/chat/video/livekit/no_video.dart';
+import 'package:colla_chat/pages/chat/chat/video/livekit/widget/no_video.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';

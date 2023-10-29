@@ -74,9 +74,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     Widget mediaRenderView = P2pMediaRenderView(
-        mediaStream: widget.peerMediaStream.mediaStream!,
-        height: height,
-        width: width);
+        peerMediaStream: widget.peerMediaStream, height: height, width: width);
     Widget singleVideoView = Builder(
       builder: (context) => InkWell(
         onLongPress: () async {
@@ -214,11 +212,10 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
     bool video = widget.peerMediaStream.video;
     Widget mediaRenderView =
         Center(child: CommonAutoSizeText(AppLocalizations.t('No stream')));
-    var mediaStream = widget.peerMediaStream.mediaStream;
-    if (mediaStream != null) {
-      mediaRenderView = P2pMediaRenderView(
-          mediaStream: mediaStream, height: height, width: width);
-    }
+    var peerMediaStream = widget.peerMediaStream;
+    mediaRenderView = P2pMediaRenderView(
+        peerMediaStream: peerMediaStream, height: height, width: width);
+
     Widget singleVideoView = Builder(
       builder: (context) => InkWell(
         onTap: () async {

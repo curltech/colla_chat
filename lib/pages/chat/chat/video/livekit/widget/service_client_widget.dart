@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:livekit_server_sdk/src/proto/livekit_models.pb.dart';
 import 'package:fixnum/fixnum.dart';
 
-/// 增加自选股的查询结果控制器
+/// sfu房间的查询结果控制器
 final DataListController<Room> searchRoomController =
     DataListController<Room>();
 

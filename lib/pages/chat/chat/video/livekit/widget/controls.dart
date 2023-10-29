@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:colla_chat/pages/chat/chat/video/livekit/room_widget.dart';
+import 'package:colla_chat/pages/chat/chat/video/livekit/widget/room_widget.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';

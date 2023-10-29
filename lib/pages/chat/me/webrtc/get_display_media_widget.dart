@@ -109,7 +109,7 @@ class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
             height: height,
             decoration: const BoxDecoration(color: Colors.black),
             child: P2pMediaRenderView(
-              mediaStream: peerMediaStream.mediaStream!,
+              peerMediaStream: peerMediaStream,
               width: width,
               height: height,
             ),

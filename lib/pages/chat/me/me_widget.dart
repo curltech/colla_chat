@@ -1,4 +1,4 @@
-import 'package:colla_chat/pages/chat/chat/video/livekit/service_client_widget.dart';
+import 'package:colla_chat/pages/chat/chat/video/livekit/widget/service_client_widget.dart';
 import 'package:colla_chat/pages/chat/me/collection/collection_list_view.dart';
 import 'package:colla_chat/pages/chat/me/contact_widget.dart';
 import 'package:colla_chat/pages/chat/me/me_head_widget.dart';

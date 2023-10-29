@@ -6,7 +6,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 /// 媒体流绑定渲染器，并创建展示视图
 class P2pMediaRenderView extends StatefulWidget {
-  final MediaStream mediaStream;
+  final PeerMediaStream peerMediaStream;
   final RTCVideoViewObjectFit objectFit;
   final bool mirror;
   final FilterQuality filterQuality;
@@ -14,12 +14,10 @@ class P2pMediaRenderView extends StatefulWidget {
   final double? width;
   final double? height;
   final Color? color;
-  late final bool audio;
-  late final bool video;
 
-  P2pMediaRenderView({
+  const P2pMediaRenderView({
     super.key,
-    required this.mediaStream,
+    required this.peerMediaStream,
     this.objectFit = RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
     this.mirror = false,
     this.filterQuality = FilterQuality.low,
@@ -27,10 +25,7 @@ class P2pMediaRenderView extends StatefulWidget {
     this.width,
     this.height,
     this.color = Colors.black,
-  }) {
-    audio = mediaStream.getAudioTracks().isNotEmpty;
-    video = mediaStream.getVideoTracks().isNotEmpty;
-  }
+  });
 
   @override
   State createState() => _P2pMediaRenderViewState();
@@ -50,7 +45,7 @@ class _P2pMediaRenderViewState extends State<P2pMediaRenderView> {
   bindRTCVideoRender() async {
     RTCVideoRenderer renderer = this.renderer;
     await renderer.initialize();
-    renderer.srcObject = widget.mediaStream;
+    renderer.srcObject = widget.peerMediaStream.mediaStream;
     this.renderer = renderer;
     readyRenderer.value = true;
   }
@@ -102,7 +97,9 @@ class _P2pMediaRenderViewState extends State<P2pMediaRenderView> {
           return LoadingUtil.buildCircularLoadingWidget();
         });
 
-    if (widget.audio && !widget.video) {
+    bool audio = widget.peerMediaStream.audio;
+    bool video = widget.peerMediaStream.video;
+    if (audio && !video) {
       videoView = Stack(children: [
         const Center(
             child: Icon(

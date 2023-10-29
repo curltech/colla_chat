@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'dart:math' as math;
 
-import 'package:colla_chat/pages/chat/chat/video/livekit/controls.dart';
-import 'package:colla_chat/pages/chat/chat/video/livekit/local_participant_widget.dart';
-import 'package:colla_chat/pages/chat/chat/video/livekit/participant_info.dart';
-import 'package:colla_chat/pages/chat/chat/video/livekit/remote_participant_widget.dart';
+import 'package:colla_chat/pages/chat/chat/video/livekit/widget/controls.dart';
+import 'package:colla_chat/pages/chat/chat/video/livekit/widget/local_participant_widget.dart';
+import 'package:colla_chat/pages/chat/chat/video/livekit/widget/participant_info.dart';
+import 'package:colla_chat/pages/chat/chat/video/livekit/widget/remote_participant_widget.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flutter/material.dart';
 import 'package:livekit_client/livekit_client.dart';

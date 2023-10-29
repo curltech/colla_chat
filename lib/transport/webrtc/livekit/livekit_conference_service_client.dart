@@ -14,8 +14,8 @@ class LiveKitConferenceServiceClient {
   }
 
   /// CreateToken 创建新的token，这个token在客户端连接房间的时候要使用
-  List<String> createToken(String roomName, List<String> identities,
-      List<String> names, Duration? ttl, String? metadata) {
+  List<String> createToken({required String roomName, required List<String> identities,
+      required List<String> names, Duration? ttl, String? metadata}) {
     List<String> tokens = [];
     int i = 0;
     for (String identity in identities) {

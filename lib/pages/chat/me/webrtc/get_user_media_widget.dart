@@ -166,7 +166,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
     return P2pMediaRenderView(
-      mediaStream: peerMediaStream!.mediaStream!,
+      peerMediaStream: peerMediaStream!,
       width: width,
       height: height,
     );

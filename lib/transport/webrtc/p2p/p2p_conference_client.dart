@@ -336,8 +336,8 @@ class P2pConferenceClient extends PeerMediaStreamController {
       return;
     }
     peerMediaStream = PeerMediaStream();
-    await peerMediaStream.buildMediaStream(stream, peerId,
-        clientId: clientId, name: name);
+    await peerMediaStream.buildMediaStream(peerId,
+        mediaStream: stream, clientId: clientId, name: name);
     add(peerMediaStream);
   }
 

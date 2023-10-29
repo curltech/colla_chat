@@ -1,11 +1,10 @@
-import 'package:colla_chat/pages/chat/chat/video/livekit/no_video.dart';
+import 'package:colla_chat/pages/chat/chat/video/livekit/widget/no_video.dart';
+import 'package:colla_chat/pages/chat/chat/video/livekit/widget/participant_info.dart';
+import 'package:colla_chat/pages/chat/chat/video/livekit/widget/participant_stats.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:livekit_client/livekit_client.dart';
-
-import 'participant_info.dart';
-import 'participant_stats.dart';
 
 class RemoteParticipantWidget extends StatefulWidget {
   final RemoteParticipant participant;

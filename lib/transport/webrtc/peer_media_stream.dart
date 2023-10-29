@@ -5,6 +5,7 @@ import 'package:colla_chat/tool/media_stream_util.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:livekit_client/livekit_client.dart' as livekit_client;
 
 final emptyVideoView = Center(
   child: AppImage.mdAppImage,
@@ -27,37 +28,63 @@ enum PeerMediaStreamOperator {
 class PeerMediaStream {
   String? id;
   MediaStream? mediaStream;
+  livekit_client.VideoTrack? videoTrack;
 
   //业务相关的数据
   String? peerId;
   String? name;
   String? clientId;
 
-  bool audio = false;
-  bool video = false;
-
-  PeerMediaStream({this.mediaStream}) {
+  PeerMediaStream({this.mediaStream, this.videoTrack}) {
     if (mediaStream != null) {
       id = mediaStream!.id;
+    } else if (videoTrack != null) {
+      id = videoTrack!.mediaStream.id;
     }
   }
 
+  bool get audio {
+    bool a = false;
+    if (mediaStream != null) {
+      a = mediaStream!.getAudioTracks().isNotEmpty;
+    } else if (videoTrack != null) {
+      a = videoTrack!.mediaStream.getAudioTracks().isNotEmpty;
+    }
+
+    return a;
+  }
+
+  bool get video {
+    bool v = false;
+    if (mediaStream != null) {
+      v = mediaStream!.getVideoTracks().isNotEmpty;
+    } else if (videoTrack != null) {
+      v = videoTrack!.mediaStream.getVideoTracks().isNotEmpty;
+    }
+
+    return v;
+  }
+
   ///关闭旧的媒体流，设置新的媒体流，
-  setStream(MediaStream? mediaStream) async {
+  setStream(
+      {MediaStream? mediaStream, livekit_client.VideoTrack? videoTrack}) async {
     if (this.mediaStream == mediaStream) {
+      return;
+    }
+    if (this.videoTrack == videoTrack) {
       return;
     }
     await close();
     if (mediaStream != null) {
       this.mediaStream = mediaStream;
       id = mediaStream.id;
-      video = mediaStream.getVideoTracks().isNotEmpty;
-      audio = mediaStream.getAudioTracks().isNotEmpty;
+    } else if (videoTrack != null) {
+      this.videoTrack = videoTrack;
+      id = videoTrack.mediaStream.id;
     } else {
       this.mediaStream = null;
+      this.videoTrack = null;
       id = null;
-      video = false;
-      audio = false;
     }
   }
 
@@ -84,8 +111,6 @@ class PeerMediaStream {
         width: width, height: height, frameRate: frameRate);
     this.mediaStream = mediaStream;
     id = mediaStream.id;
-    this.audio = audio;
-    video = true;
   }
 
   ///获取本机音频流
@@ -109,8 +134,6 @@ class PeerMediaStream {
         await navigator.mediaDevices.getUserMedia(mediaConstraints);
     this.mediaStream = mediaStream;
     id = mediaStream.id;
-    audio = true;
-    video = false;
   }
 
   ///获取本机屏幕流
@@ -160,38 +183,39 @@ class PeerMediaStream {
         await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
     this.mediaStream = mediaStream;
     id = mediaStream.id;
-    this.audio = audio;
-    this.video = true;
   }
 
   Future<void> buildMediaStream(
-    MediaStream mediaStream,
     String peerId, {
+    MediaStream? mediaStream,
+    livekit_client.VideoTrack? videoTrack,
     String? clientId,
     String? name,
   }) async {
     this.peerId = peerId;
     this.clientId = clientId;
     this.name = name;
-    setStream(mediaStream);
+    setStream(mediaStream: mediaStream, videoTrack: videoTrack);
   }
 
   bool get local {
     if (mediaStream != null) {
       return mediaStream!.ownerTag == 'local';
+    } else if (videoTrack != null) {
+      return videoTrack!.mediaStream.ownerTag == 'local';
     }
     return false;
   }
 
   ///关闭媒体流，关闭后里面的流为空
   close() async {
-    var mediaStream = this.mediaStream;
     if (mediaStream != null) {
+      var mediaStream = this.mediaStream;
       if (!local) {
         logger.i(
-            'dispose non local stream:${mediaStream.id} ${mediaStream.ownerTag}');
+            'dispose non local stream:${mediaStream!.id} ${mediaStream.ownerTag}');
       } else {
-        logger.i('dispose stream:${mediaStream.id} ${mediaStream.ownerTag}');
+        logger.i('dispose stream:${mediaStream!.id} ${mediaStream.ownerTag}');
       }
       try {
         await mediaStream.dispose();
@@ -200,8 +224,23 @@ class PeerMediaStream {
       }
       this.mediaStream = null;
       id = null;
-      audio = false;
-      video = false;
+    }
+    if (videoTrack != null) {
+      var mediaStream = videoTrack!.mediaStream;
+      if (!local) {
+        logger.i(
+            'dispose non local videoTrack:${mediaStream.id} ${mediaStream.ownerTag}');
+      } else {
+        logger
+            .i('dispose videoTrack:${mediaStream.id} ${mediaStream.ownerTag}');
+      }
+      try {
+        await videoTrack!.dispose();
+      } catch (e) {
+        logger.e('videoTrack.close failure:$e');
+      }
+      videoTrack = null;
+      id = null;
     }
   }
 }
