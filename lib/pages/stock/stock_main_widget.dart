@@ -9,6 +9,7 @@ import 'package:colla_chat/pages/stock/setting/refresh_stock_widget.dart';
 import 'package:colla_chat/pages/stock/setting/update_stock_widget.dart';
 import 'package:colla_chat/pages/stock/trade/in_out_event_widget.dart';
 import 'package:colla_chat/pages/stock/value/performance_widget.dart';
+import 'package:colla_chat/pages/stock/value/qperformance_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -31,6 +32,7 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
   final LocalEventFilterWidget localEventFilterWidget =
       LocalEventFilterWidget();
   final PerformanceWidget performanceWidget = PerformanceWidget();
+  final QPerformanceWidget qperformanceWidget = QPerformanceWidget();
 
   StockMainWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(shareSelectionWidget);
@@ -44,6 +46,7 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(inoutEventWidget);
     indexWidgetProvider.define(localEventFilterWidget);
     indexWidgetProvider.define(performanceWidget);
+    indexWidgetProvider.define(qperformanceWidget);
   }
 
   @override
@@ -74,6 +77,7 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
 
     final List<TileData> valueTileData = TileData.from([
       performanceWidget,
+      qperformanceWidget,
     ]);
     for (var tile in valueTileData) {
       tile.dense = false;

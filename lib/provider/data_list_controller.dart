@@ -11,6 +11,7 @@ class DataListController<T> with ChangeNotifier {
   List<T> data = <T>[];
   int _currentIndex = -1;
   int? sortColumnIndex;
+  String? sortColumnName;
   bool sortAscending = true;
 
   DataListController({List<T>? data, int? currentIndex}) {
@@ -143,18 +144,33 @@ class DataListController<T> with ChangeNotifier {
 
   int get length => data.length;
 
-  sort<S>(Comparable<S> Function(T t) getFieldValue, int columnIndex,
-      bool ascending) {
+  sort<S>(Comparable<S>? Function(T t) getFieldValue, int columnIndex,
+      String columnName, bool ascending) {
     data.sort((T a, T b) {
-      Comparable<S> av = getFieldValue(a);
-      Comparable<S> bv = getFieldValue(b);
-      return ascending
-          ? Comparable.compare(av, bv)
-          : Comparable.compare(bv, av);
+      Comparable<S>? av = getFieldValue(a);
+      Comparable<S>? bv = getFieldValue(b);
+      if (ascending) {
+        if (av == null) {
+          return 0;
+        }
+        if (bv == null) {
+          return 1;
+        }
+        return Comparable.compare(av, bv);
+      } else {
+        if (av == null) {
+          return 1;
+        }
+        if (bv == null) {
+          return 0;
+        }
+        return Comparable.compare(bv, av);
+      }
     });
 
     _currentIndex = 0;
     sortColumnIndex = columnIndex;
+    sortColumnName = columnName;
     sortAscending = ascending;
     notifyListeners();
   }
@@ -185,6 +201,16 @@ class DataPageController<T> extends DataListController<T> {
   int limit = defaultLimit;
 
   DataPageController({this.count = 0});
+
+  reset() {
+    sortColumnName = null;
+    sortColumnIndex = null;
+    sortAscending = true;
+    count = 0;
+    offset = defaultOffset;
+    limit = defaultLimit;
+    data.clear();
+  }
 
   previous() {
     if (offset >= limit) {

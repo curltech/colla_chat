@@ -1,8 +1,8 @@
 import 'package:colla_chat/entity/base.dart';
 
 class Performance extends BaseEntity {
-  String? securityCode;
-  String? securityNameAbbr;
+  String securityCode;
+  String securityNameAbbr;
   String? tradeMarketCode;
   String? tradeMarket;
   String? securityTypeCode;

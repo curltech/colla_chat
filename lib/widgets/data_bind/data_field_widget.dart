@@ -395,17 +395,15 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     var suffixIcon = dataFieldDef.suffixIcon;
     Widget? suffix;
     if (dataFieldDef.cancel) {
-      suffix = controller.text.isNotEmpty
-          ? IconButton(
-              //如果文本长度不为空则显示清除按钮
-              onPressed: () {
-                controller!.clear();
-              },
-              icon: Icon(
-                Icons.cancel,
-                color: myself.primary,
-              ))
-          : null;
+      suffix = IconButton(
+          //如果文本长度不为空则显示清除按钮
+          onPressed: () {
+            controller!.clear();
+          },
+          icon: Icon(
+            Icons.cancel,
+            color: myself.primary,
+          ));
 
       if (suffixIcon == null) {
         suffixIcon = suffix;

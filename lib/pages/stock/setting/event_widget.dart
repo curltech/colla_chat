@@ -94,7 +94,7 @@ class _EventWidgetState extends State<EventWidget>
         name: 'eventCode',
         width: 120,
         onSort: (int index, bool ascending) =>
-            eventController.sort((t) => t.eventCode, index, ascending),
+            eventController.sort((t) => t.eventCode, index,'eventCode', ascending),
       ),
       PlatformDataColumn(
         label: '事件类型',

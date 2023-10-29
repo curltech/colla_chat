@@ -115,8 +115,8 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
         label: '股票代码',
         name: 'ts_code',
         width: 100,
-        onSort: (int index, bool ascending) =>
-            inoutEventController.sort((t) => t.tsCode, index, ascending),
+        onSort: (int index, bool ascending) => inoutEventController.sort(
+            (t) => t.tsCode, index, 'tsCode', ascending),
       ),
       PlatformDataColumn(
         label: '股票名',

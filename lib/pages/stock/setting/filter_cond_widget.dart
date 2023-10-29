@@ -110,8 +110,8 @@ class _FilterCondWidgetState extends State<FilterCondWidget>
       label: '条件类型',
       name: 'condType',
       width: 100,
-      onSort: (int index, bool ascending) =>
-          filterCondController.sort((t) => t.condType, index, ascending),
+      onSort: (int index, bool ascending) => filterCondController.sort(
+          (t) => t.condType, index, 'condType', ascending),
     ),
     PlatformDataColumn(
       label: '条件公式',
