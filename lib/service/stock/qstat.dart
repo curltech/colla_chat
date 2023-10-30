@@ -9,17 +9,50 @@ class RemoteQStatService extends GeneralRemoteService<QStat> {
     };
   }
 
-  /// 查询自选股的分钟线
-  Future<List<dynamic>> sendFindMinLines(String tsCode,
-      {int? tradeDate, int? tradeMinute}) async {
-    var params = {
-      'ts_code': tsCode,
-      'trade_date': tradeDate,
-      'trade_minute': tradeMinute
-    };
-    List<dynamic> data = await send('/qstat/FindMinLines', data: params);
+  /// 查询统计结果
+  Future<dynamic> sendFindQStatBy(
+      {String? tsCode,
+      List<int>? terms,
+      String? source,
+      String? sourceName,
+      String? orderBy,
+      int? from,
+      int? limit,
+      int? count}) async {
+    Map<String, dynamic> params = {};
+    if (tsCode != null) {
+      params['ts_code'] = tsCode;
+    }
+    if (terms != null) {
+      params['terms'] = terms;
+    }
+    if (source != null) {
+      params['source'] = source;
+    }
+    if (sourceName != null) {
+      params['sourceName'] = sourceName;
+    }
+    if (orderBy != null) {
+      params['orderby'] = orderBy;
+    }
+    if (from != null) {
+      params['from'] = from;
+    }
+    if (limit != null) {
+      params['limit'] = limit;
+    }
+    if (count != null) {
+      params['count'] = count;
+    }
+    dynamic responseData = await send('/qstat/FindQStatBy', data: params);
+    List<QStat> stats = [];
+    for (var m in responseData['data']) {
+      var o = post(m);
+      stats.add(o);
+    }
+    responseData['data'] = stats;
 
-    return data;
+    return responseData;
   }
 }
 

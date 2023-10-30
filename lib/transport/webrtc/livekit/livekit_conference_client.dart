@@ -293,7 +293,8 @@ class LiveKitConferenceClient {
 
   terminate() {}
 
-  removeLocalPeerMediaStream(List<PeerMediaStream> peerMediaStreams, {AdvancedPeerConnection? peerConnection}) {}
+  removeLocalPeerMediaStream(List<PeerMediaStream> peerMediaStreams,
+      {AdvancedPeerConnection? peerConnection}) {}
 
   updateAdvancedPeerConnection(AdvancedPeerConnection peerConnection) {}
 }

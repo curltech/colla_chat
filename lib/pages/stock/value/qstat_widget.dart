@@ -1,4 +1,5 @@
 import 'package:colla_chat/entity/stock/qperformance.dart';
+import 'package:colla_chat/entity/stock/qstat.dart';
 import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/stock/me/stock_line_chart_widget.dart';
@@ -7,20 +8,22 @@ import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/qperformance.dart';
+import 'package:colla_chat/service/stock/qstat.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/binging_paginated_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-class QPerformanceDataPageController extends DataPageController<QPerformance> {
+class QStatDataPageController extends DataPageController<QStat> {
   @override
-  sort<S>(Comparable<S>? Function(QPerformance t) getFieldValue,
-      int columnIndex, String columnName, bool ascending) {
+  sort<S>(Comparable<S>? Function(QStat t) getFieldValue, int columnIndex,
+      String columnName, bool ascending) {
     sortColumnIndex = columnIndex;
     sortColumnName = columnName;
     sortAscending = ascending;
@@ -28,33 +31,33 @@ class QPerformanceDataPageController extends DataPageController<QPerformance> {
   }
 }
 
-/// 自选股当前日线的控制器
-final QPerformanceDataPageController qperformanceDataPageController =
-    QPerformanceDataPageController();
+/// 统计指标
+final QStatDataPageController qstatDataPageController =
+    QStatDataPageController();
 
 ///自选股和分组的查询界面
-class QPerformanceWidget extends StatefulWidget with TileDataMixin {
-  QPerformanceWidget({Key? key}) : super(key: key);
+class QStatWidget extends StatefulWidget with TileDataMixin {
+  QStatWidget({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _QPerformanceWidgetState();
+  State<StatefulWidget> createState() => _QStatWidgetState();
 
   @override
   bool get withLeading => true;
 
   @override
-  String get routeName => 'qperformance';
+  String get routeName => 'qstat';
 
   @override
-  IconData get iconData => Icons.area_chart;
+  IconData get iconData => Icons.ssid_chart;
 
   @override
-  String get title => 'QPerformance';
+  String get title => 'QStat';
 }
 
-class _QPerformanceWidgetState extends State<QPerformanceWidget>
+class _QStatWidgetState extends State<QStatWidget>
     with TickerProviderStateMixin {
-  late final List<PlatformDataColumn> qperformanceDataColumns = [
+  late final List<PlatformDataColumn> qstatDataColumns = [
     PlatformDataColumn(
       label: '股票代码',
       name: 'ts_code',
@@ -67,7 +70,7 @@ class _QPerformanceWidgetState extends State<QPerformanceWidget>
     ),
     PlatformDataColumn(
       label: '业绩日期',
-      name: 'qdate',
+      name: 'term',
       width: 90,
     ),
     PlatformDataColumn(
@@ -76,13 +79,18 @@ class _QPerformanceWidgetState extends State<QPerformanceWidget>
       width: 80,
     ),
     PlatformDataColumn(
+      label: '交易日期',
+      name: 'source',
+      width: 80,
+    ),
+    PlatformDataColumn(
       label: 'pe',
       name: 'pe',
       width: 50,
       dataType: DataType.double,
       align: TextAlign.end,
-      onSort: (int index, bool ascending) => qperformanceDataPageController
-          .sort((t) => t.pe, index, 'pe', ascending),
+      onSort: (int index, bool ascending) =>
+          qstatDataPageController.sort((t) => t.pe, index, 'pe', ascending),
     ),
     PlatformDataColumn(
       label: 'peg',
@@ -90,8 +98,8 @@ class _QPerformanceWidgetState extends State<QPerformanceWidget>
       width: 70,
       dataType: DataType.double,
       align: TextAlign.end,
-      onSort: (int index, bool ascending) => qperformanceDataPageController
-          .sort((t) => t.peg, index, 'peg', ascending),
+      onSort: (int index, bool ascending) =>
+          qstatDataPageController.sort((t) => t.peg, index, 'peg', ascending),
     ),
     PlatformDataColumn(
       label: '收盘价',
@@ -101,8 +109,8 @@ class _QPerformanceWidgetState extends State<QPerformanceWidget>
       negativeColor: Colors.green,
       align: TextAlign.end,
       width: 80,
-      onSort: (int index, bool ascending) => qperformanceDataPageController
-          .sort((t) => t.close, index, 'close', ascending),
+      onSort: (int index, bool ascending) => qstatDataPageController.sort(
+          (t) => t.close, index, 'close', ascending),
     ),
     PlatformDataColumn(
       label: '涨幅',
@@ -112,8 +120,8 @@ class _QPerformanceWidgetState extends State<QPerformanceWidget>
       positiveColor: Colors.red,
       negativeColor: Colors.green,
       width: 80,
-      onSort: (int index, bool ascending) => qperformanceDataPageController
-          .sort((t) => t.pctChgClose, index, 'pctChgClose', ascending),
+      onSort: (int index, bool ascending) => qstatDataPageController.sort(
+          (t) => t.pctChgClose, index, 'pctChgClose', ascending),
     ),
     PlatformDataColumn(
       label: '年营收增长',
@@ -123,8 +131,8 @@ class _QPerformanceWidgetState extends State<QPerformanceWidget>
       negativeColor: Colors.green,
       align: TextAlign.end,
       width: 100,
-      onSort: (int index, bool ascending) => qperformanceDataPageController
-          .sort((t) => t.yoySales, index, 'yoySales', ascending),
+      onSort: (int index, bool ascending) => qstatDataPageController.sort(
+          (t) => t.yoySales, index, 'yoySales', ascending),
     ),
     PlatformDataColumn(
       label: '年净利润增长',
@@ -134,8 +142,8 @@ class _QPerformanceWidgetState extends State<QPerformanceWidget>
       negativeColor: Colors.green,
       align: TextAlign.end,
       width: 110,
-      onSort: (int index, bool ascending) => qperformanceDataPageController
-          .sort((t) => t.yoyDeduNp, index, 'yoyDeduNp', ascending),
+      onSort: (int index, bool ascending) => qstatDataPageController.sort(
+          (t) => t.yoyDeduNp, index, 'yoyDeduNp', ascending),
     ),
     PlatformDataColumn(
       label: '环比营收增长',
@@ -145,8 +153,8 @@ class _QPerformanceWidgetState extends State<QPerformanceWidget>
       negativeColor: Colors.green,
       align: TextAlign.end,
       width: 110,
-      onSort: (int index, bool ascending) => qperformanceDataPageController
-          .sort((t) => t.orLastMonth, index, 'orLastMonth', ascending),
+      onSort: (int index, bool ascending) => qstatDataPageController.sort(
+          (t) => t.orLastMonth, index, 'orLastMonth', ascending),
     ),
     PlatformDataColumn(
       label: '环比净利润增长',
@@ -156,8 +164,8 @@ class _QPerformanceWidgetState extends State<QPerformanceWidget>
       negativeColor: Colors.green,
       align: TextAlign.end,
       width: 130,
-      onSort: (int index, bool ascending) => qperformanceDataPageController
-          .sort((t) => t.npLastMonth, index, 'npLastMonth', ascending),
+      onSort: (int index, bool ascending) => qstatDataPageController.sort(
+          (t) => t.npLastMonth, index, 'npLastMonth', ascending),
     ),
     PlatformDataColumn(
       label: '净资产收益率',
@@ -167,8 +175,8 @@ class _QPerformanceWidgetState extends State<QPerformanceWidget>
       negativeColor: Colors.green,
       align: TextAlign.end,
       width: 100,
-      onSort: (int index, bool ascending) => qperformanceDataPageController
-          .sort((t) => t.weightAvgRoe, index, 'weightAvgRoe', ascending),
+      onSort: (int index, bool ascending) => qstatDataPageController.sort(
+          (t) => t.weightAvgRoe, index, 'weightAvgRoe', ascending),
     ),
     PlatformDataColumn(
       label: '毛利率',
@@ -178,9 +186,8 @@ class _QPerformanceWidgetState extends State<QPerformanceWidget>
       negativeColor: Colors.green,
       align: TextAlign.end,
       width: 80,
-      onSort: (int index, bool ascending) =>
-          qperformanceDataPageController.sort((t) => t.grossProfitMargin, index,
-              'grossProfitMargin', ascending),
+      onSort: (int index, bool ascending) => qstatDataPageController.sort(
+          (t) => t.grossProfitMargin, index, 'grossProfitMargin', ascending),
     ),
     PlatformDataColumn(
         label: '',
@@ -191,21 +198,29 @@ class _QPerformanceWidgetState extends State<QPerformanceWidget>
   late final List<PlatformDataField> searchDataField;
   late final FormInputController searchController;
   ExpansionTileController expansionTileController = ExpansionTileController();
-  int offset = qperformanceDataPageController.offset;
-  String? sortColumnName = qperformanceDataPageController.sortColumnName;
-  bool sortAscending = qperformanceDataPageController.sortAscending;
+  int offset = qstatDataPageController.offset;
+  String? sortColumnName = qstatDataPageController.sortColumnName;
+  bool sortAscending = qstatDataPageController.sortAscending;
 
   @override
   initState() {
     searchDataField = [
       PlatformDataField(
-        name: 'securityCode',
-        label: 'SecurityCode',
+        name: 'keyword',
+        label: 'keyword',
+        cancel: true,
+        prefixIcon: Icon(
+          Icons.wordpress_outlined,
+          color: myself.primary,
+        ),
+      ),
+      PlatformDataField(
+        name: 'tsCode',
+        label: 'TsCode',
         cancel: true,
         prefixIcon: IconButton(
           onPressed: () {
-            searchController.setValue(
-                'securityCode', shareService.subscription);
+            searchController.setValue('tsCode', shareService.subscription);
           },
           icon: Icon(
             Icons.perm_identity_outlined,
@@ -214,8 +229,45 @@ class _QPerformanceWidgetState extends State<QPerformanceWidget>
         ),
       ),
       PlatformDataField(
-          name: 'startDate',
-          label: 'StartDate',
+          name: 'terms',
+          label: 'Terms',
+          inputType: InputType.checkbox,
+          dataType: DataType.list,
+          options: [
+            Option('1', 1),
+            Option('3', 3),
+            Option('5', 5),
+            Option('10', 10),
+            Option('15', 15)
+          ],
+          prefixIcon: Icon(
+            Icons.date_range_outlined,
+            color: myself.primary,
+          )),
+      PlatformDataField(
+          name: 'source',
+          label: 'Source',
+          inputType: InputType.checkbox,
+          dataType: DataType.list,
+          options: [
+            Option('min', 'min'),
+            Option('min', 'min'),
+            Option('sum', 'sum'),
+            Option('sum', 'sum'),
+            Option('median', 'median'),
+            Option('stddev', 'stddev'),
+            Option('corr', 'corr'),
+            Option('last', 'last'),
+            Option('rsd', 'rsd'),
+            Option('acc', 'acc')
+          ],
+          prefixIcon: Icon(
+            Icons.indeterminate_check_box_outlined,
+            color: myself.primary,
+          )),
+      PlatformDataField(
+          name: 'sourceName',
+          label: 'SourceName',
           prefixIcon: Icon(
             Icons.date_range_outlined,
             color: myself.primary,
@@ -224,32 +276,38 @@ class _QPerformanceWidgetState extends State<QPerformanceWidget>
     searchController = FormInputController(searchDataField);
     searchController.setValue(
         'startDate', DateUtil.formatDateQuarter(DateTime.now()));
-    qperformanceDataPageController.addListener(_updateQPerformance);
+    qstatDataPageController.addListener(_updateQStat);
     super.initState();
   }
 
-  _updateQPerformance() {
-    if (offset != qperformanceDataPageController.offset ||
-        sortColumnName != qperformanceDataPageController.sortColumnName ||
-        sortAscending != qperformanceDataPageController.sortAscending) {
-      offset = qperformanceDataPageController.offset;
-      sortColumnName = qperformanceDataPageController.sortColumnName;
-      sortAscending = qperformanceDataPageController.sortAscending;
+  _updateQStat() {
+    if (offset != qstatDataPageController.offset ||
+        sortColumnName != qstatDataPageController.sortColumnName ||
+        sortAscending != qstatDataPageController.sortAscending) {
+      offset = qstatDataPageController.offset;
+      sortColumnName = qstatDataPageController.sortColumnName;
+      sortAscending = qstatDataPageController.sortAscending;
       String? orderBy;
       if (sortColumnName != null) {
         orderBy = '$sortColumnName ${sortAscending ? 'asc' : 'desc'}';
       }
       Map<String, dynamic> values = searchController.getValues();
-      String? securityCode = values['securityCode'];
-      String? startDate = values['startDate'];
+      String? tsCode = values['tsCode'];
+      List<int>? terms = values['terms'];
+      String? source = values['source'];
+      String? sourceName = values['sourceName'];
       _refresh(
-          securityCode: securityCode, startDate: startDate, orderBy: orderBy);
+          tsCode: tsCode,
+          terms: terms,
+          source: source,
+          sourceName: sourceName,
+          orderBy: orderBy);
     } else {
       setState(() {});
     }
   }
 
-  Widget _buildActionWidget(int index, dynamic qperformance) {
+  Widget _buildActionWidget(int index, dynamic qstat) {
     Widget actionWidget = Row(
       children: [
         const SizedBox(
@@ -257,7 +315,7 @@ class _QPerformanceWidgetState extends State<QPerformanceWidget>
         ),
         IconButton(
           onPressed: () async {
-            String tsCode = qperformance.securityCode;
+            String tsCode = qstat.tsCode;
             Share? share = await shareService.findShare(tsCode);
             String name = share?.name ?? '';
             multiStockLineController.put(tsCode, name);
@@ -274,22 +332,29 @@ class _QPerformanceWidgetState extends State<QPerformanceWidget>
     return actionWidget;
   }
 
-  _refresh({String? securityCode, String? startDate, String? orderBy}) async {
-    int offset = qperformanceDataPageController.offset;
-    int limit = qperformanceDataPageController.limit;
-    int count = qperformanceDataPageController.count;
+  _refresh(
+      {String? tsCode,
+      List<int>? terms,
+      String? source,
+      String? sourceName,
+      String? orderBy}) async {
+    int offset = qstatDataPageController.offset;
+    int limit = qstatDataPageController.limit;
+    int count = qstatDataPageController.count;
     Map<String, dynamic> responseData =
-        await remoteQPerformanceService.sendFindByQDate(
-            securityCode: securityCode,
-            startDate: startDate,
+        await remoteQStatService.sendFindQStatBy(
+            tsCode: tsCode,
+            terms: terms,
+            source: source,
+            sourceName: sourceName,
             from: offset,
             limit: limit,
             orderBy: orderBy,
             count: count);
     count = responseData['count'];
-    List<QPerformance> qperformances = responseData['data'];
-    qperformanceDataPageController.count = count;
-    qperformanceDataPageController.replaceAll(qperformances);
+    List<QStat> qstats = responseData['data'];
+    qstatDataPageController.count = count;
+    qstatDataPageController.replaceAll(qstats);
   }
 
   /// 构建搜索条件
@@ -321,29 +386,33 @@ class _QPerformanceWidgetState extends State<QPerformanceWidget>
   }
 
   _onOk(Map<String, dynamic> values) async {
-    qperformanceDataPageController.reset();
+    qstatDataPageController.reset();
 
-    String? securityCode = values['securityCode'];
-    String? startDate = values['startDate'];
+    String? tsCode = values['tsCode'];
+    List<int>? terms = values['terms'];
+    String? source = values['source'];
+    String? sourceName = values['sourceName'];
     _refresh(
-      securityCode: securityCode,
-      startDate: startDate,
+      tsCode: tsCode,
+      terms: terms,
+      source: source,
+      sourceName: sourceName,
     );
     expansionTileController.collapse();
     if (mounted) {
       DialogUtil.info(context,
-          content: AppLocalizations.t('QPerformance search completely'));
+          content: AppLocalizations.t('QStat search completely'));
     }
   }
 
-  Widget _buildQPerformanceListView(BuildContext context) {
-    return BindingPaginatedDataTable2<QPerformance>(
+  Widget _buildQStatListView(BuildContext context) {
+    return BindingPaginatedDataTable2<QStat>(
       key: UniqueKey(),
       showCheckboxColumn: false,
       horizontalMargin: 10.0,
       columnSpacing: 0.0,
-      platformDataColumns: qperformanceDataColumns,
-      controller: qperformanceDataPageController,
+      platformDataColumns: qstatDataColumns,
+      controller: qstatDataPageController,
       fixedLeftColumns: 3,
     );
   }
@@ -358,7 +427,7 @@ class _QPerformanceWidgetState extends State<QPerformanceWidget>
       child: Column(
         children: [
           _buildSearchView(context),
-          Expanded(child: _buildQPerformanceListView(context))
+          Expanded(child: _buildQStatListView(context))
         ],
       ),
     );
@@ -366,7 +435,7 @@ class _QPerformanceWidgetState extends State<QPerformanceWidget>
 
   @override
   void dispose() {
-    qperformanceDataPageController.removeListener(_updateQPerformance);
+    qstatDataPageController.removeListener(_updateQStat);
     super.dispose();
   }
 }

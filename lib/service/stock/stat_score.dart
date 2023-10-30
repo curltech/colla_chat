@@ -10,17 +10,47 @@ class RemoteStatScoreService extends GeneralRemoteService<StatScore> {
     };
   }
 
-  /// 查询自选股的分钟线
-  Future<List<dynamic>> sendFindMinLines(String tsCode,
-      {int? tradeDate, int? tradeMinute}) async {
-    var params = {
-      'ts_code': tsCode,
-      'trade_date': tradeDate,
-      'trade_minute': tradeMinute
-    };
-    List<dynamic> data = await send('/statscore/FindMinLines', data: params);
+  /// 查询统计结果
+  Future<dynamic> sendSearch(
+      {String? keyword,
+      String? tsCode,
+      List<int>? terms,
+      List<String>? scoreOptions,
+      String? orderBy,
+      int? from,
+      int? limit,
+      int? count}) async {
+    Map<String, dynamic> params = {};
+    if (tsCode != null) {
+      params['ts_code'] = tsCode;
+    }
+    if (terms != null) {
+      params['terms'] = terms;
+    }
+    if (scoreOptions != null) {
+      params['scoreOptions'] = scoreOptions;
+    }
+    if (orderBy != null) {
+      params['orderby'] = orderBy;
+    }
+    if (from != null) {
+      params['from'] = from;
+    }
+    if (limit != null) {
+      params['limit'] = limit;
+    }
+    if (count != null) {
+      params['count'] = count;
+    }
+    dynamic responseData = await send('/statscore/Search', data: params);
+    List<StatScore> statScores = [];
+    for (var m in responseData['data']) {
+      var o = post(m);
+      statScores.add(o);
+    }
+    responseData['data'] = statScores;
 
-    return data;
+    return responseData;
   }
 }
 

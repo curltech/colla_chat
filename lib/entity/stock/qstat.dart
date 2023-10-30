@@ -27,7 +27,7 @@ class QStat extends BaseEntity {
   num? pctChgClose;
   num? pctChgMarketValue;
   num? weightAvgRoe;
-  num? grossprofitMargin;
+  num? grossProfitMargin;
   num? parentNetProfit;
   num? basicEps;
   num? orLastMonth;
@@ -63,7 +63,7 @@ class QStat extends BaseEntity {
         pctChgClose = json['pct_chg_close'],
         pctChgMarketValue = json['pct_chg_market_value'],
         weightAvgRoe = json['weight_avg_roe'],
-        grossprofitMargin = json['gross_profit_margin'],
+        grossProfitMargin = json['gross_profit_margin'],
         parentNetProfit = json['parent_net_profit'],
         basicEps = json['basic_eps'],
         orLastMonth = json['or_last_month'],
@@ -103,7 +103,7 @@ class QStat extends BaseEntity {
       'pct_chg_close': pctChgClose,
       'pct_chg_market_value': pctChgMarketValue,
       'weight_avg_roe': weightAvgRoe,
-      'gross_profit_margin': grossprofitMargin,
+      'gross_profit_margin': grossProfitMargin,
       'parent_net_profit': parentNetProfit,
       'basic_eps': basicEps,
       'or_last_month': orLastMonth,

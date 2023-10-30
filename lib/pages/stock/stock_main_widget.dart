@@ -10,6 +10,8 @@ import 'package:colla_chat/pages/stock/setting/update_stock_widget.dart';
 import 'package:colla_chat/pages/stock/trade/in_out_event_widget.dart';
 import 'package:colla_chat/pages/stock/value/performance_widget.dart';
 import 'package:colla_chat/pages/stock/value/qperformance_widget.dart';
+import 'package:colla_chat/pages/stock/value/qstat_widget.dart';
+import 'package:colla_chat/pages/stock/value/stat_score_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -33,6 +35,8 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
       LocalEventFilterWidget();
   final PerformanceWidget performanceWidget = PerformanceWidget();
   final QPerformanceWidget qperformanceWidget = QPerformanceWidget();
+  final QStatWidget qstatWidget = QStatWidget();
+  final StatScoreWidget statScoreWidget = StatScoreWidget();
 
   StockMainWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(shareSelectionWidget);
@@ -47,6 +51,8 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(localEventFilterWidget);
     indexWidgetProvider.define(performanceWidget);
     indexWidgetProvider.define(qperformanceWidget);
+    indexWidgetProvider.define(qstatWidget);
+    indexWidgetProvider.define(statScoreWidget);
   }
 
   @override
@@ -56,7 +62,7 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
   String get routeName => 'stock_main';
 
   @override
-  IconData get iconData => Icons.waterfall_chart;
+  IconData get iconData => Icons.candlestick_chart;
 
   @override
   String get title => 'Stock';
@@ -78,6 +84,8 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
     final List<TileData> valueTileData = TileData.from([
       performanceWidget,
       qperformanceWidget,
+      qstatWidget,
+      statScoreWidget,
     ]);
     for (var tile in valueTileData) {
       tile.dense = false;
