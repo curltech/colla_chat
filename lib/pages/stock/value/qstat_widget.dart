@@ -69,7 +69,7 @@ class _QStatWidgetState extends State<QStatWidget>
       width: 80,
     ),
     PlatformDataColumn(
-      label: '业绩日期',
+      label: '年份',
       name: 'term',
       width: 90,
     ),
@@ -79,7 +79,7 @@ class _QStatWidgetState extends State<QStatWidget>
       width: 80,
     ),
     PlatformDataColumn(
-      label: '交易日期',
+      label: '指标',
       name: 'source',
       width: 80,
     ),
@@ -206,15 +206,6 @@ class _QStatWidgetState extends State<QStatWidget>
   initState() {
     searchDataField = [
       PlatformDataField(
-        name: 'keyword',
-        label: 'keyword',
-        cancel: true,
-        prefixIcon: Icon(
-          Icons.wordpress_outlined,
-          color: myself.primary,
-        ),
-      ),
-      PlatformDataField(
         name: 'tsCode',
         label: 'TsCode',
         cancel: true,
@@ -251,9 +242,9 @@ class _QStatWidgetState extends State<QStatWidget>
           dataType: DataType.set,
           options: [
             Option('min', 'min'),
-            Option('min', 'min'),
+            Option('max', 'max'),
             Option('sum', 'sum'),
-            Option('sum', 'sum'),
+            Option('mean', 'mean'),
             Option('median', 'median'),
             Option('stddev', 'stddev'),
             Option('corr', 'corr'),
@@ -294,7 +285,7 @@ class _QStatWidgetState extends State<QStatWidget>
       Map<String, dynamic> values = searchController.getValues();
       String? tsCode = values['tsCode'];
       List<int>? terms = values['terms'];
-      String? source = values['source'];
+      List<String>? source = values['source'];
       String? sourceName = values['sourceName'];
       _refresh(
           tsCode: tsCode,
@@ -334,12 +325,11 @@ class _QStatWidgetState extends State<QStatWidget>
 
   _refresh(
       {String? tsCode,
-      List<int>? terms,
-      String? source,
+      List<dynamic>? terms,
+      List<dynamic>? source,
       String? sourceName,
       String? orderBy}) async {
     int offset = qstatDataPageController.offset;
-    int limit = qstatDataPageController.limit;
     int count = qstatDataPageController.count;
     Map<String, dynamic> responseData =
         await remoteQStatService.sendFindQStatBy(
@@ -348,7 +338,6 @@ class _QStatWidgetState extends State<QStatWidget>
             source: source,
             sourceName: sourceName,
             from: offset,
-            limit: limit,
             orderBy: orderBy,
             count: count);
     count = responseData['count'];
@@ -369,7 +358,7 @@ class _QStatWidgetState extends State<QStatWidget>
     Widget formInputWidget = Container(
         padding: const EdgeInsets.all(10.0),
         child: FormInputWidget(
-          height: appDataProvider.portraitSize.height * 0.2,
+          height: appDataProvider.portraitSize.height * 0.4,
           spacing: 5.0,
           controller: searchController,
           formButtons: formButtonDefs,
@@ -387,15 +376,18 @@ class _QStatWidgetState extends State<QStatWidget>
 
   _onOk(Map<String, dynamic> values) async {
     qstatDataPageController.reset();
-
     String? tsCode = values['tsCode'];
-    List<int>? terms = values['terms'];
-    String? source = values['source'];
+    if (tsCode == null) {
+      DialogUtil.error(context, content: 'tsCode must be value');
+      return;
+    }
+    Set<dynamic>? terms = values['terms'];
+    Set<dynamic>? source = values['source'];
     String? sourceName = values['sourceName'];
     _refresh(
       tsCode: tsCode,
-      terms: terms,
-      source: source,
+      terms: terms?.toList(),
+      source: source?.toList(),
       sourceName: sourceName,
     );
     expansionTileController.collapse();

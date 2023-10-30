@@ -12,8 +12,8 @@ class RemoteQStatService extends GeneralRemoteService<QStat> {
   /// 查询统计结果
   Future<dynamic> sendFindQStatBy(
       {String? tsCode,
-      List<int>? terms,
-      String? source,
+      List<dynamic>? terms,
+      List<dynamic>? source,
       String? sourceName,
       String? orderBy,
       int? from,
