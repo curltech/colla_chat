@@ -91,7 +91,6 @@ class ServiceLocator {
       logger.i(
           'Default PeerEndpoint websocket address:${defaultPeerEndpoint.wsConnectAddress}');
     }
-    await localSharedPreferences.init();
     Map<String, dynamic>? autoLogin = await myselfPeerService.autoCredential();
     if (autoLogin != null) {
       appDataProvider.autoLogin = true;

@@ -232,7 +232,7 @@ class _QStatWidgetState extends State<QStatWidget>
           name: 'terms',
           label: 'Terms',
           inputType: InputType.checkbox,
-          dataType: DataType.list,
+          dataType: DataType.set,
           options: [
             Option('1', 1),
             Option('3', 3),
@@ -248,7 +248,7 @@ class _QStatWidgetState extends State<QStatWidget>
           name: 'source',
           label: 'Source',
           inputType: InputType.checkbox,
-          dataType: DataType.list,
+          dataType: DataType.set,
           options: [
             Option('min', 'min'),
             Option('min', 'min'),

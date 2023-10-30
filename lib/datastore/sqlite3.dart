@@ -39,6 +39,7 @@ class Sqlite3 extends DataStore {
       print('sqlite3 db get userVersion failure:$e');
     }
 
+    await localSharedPreferences.init();
     /// 删除新版本中有变化的表，重建
     String? existAppVersion = await localSharedPreferences.get('appVersion');
     if (existAppVersion != null) {

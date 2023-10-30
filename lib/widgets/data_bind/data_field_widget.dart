@@ -60,18 +60,17 @@ class PlatformDataColumn {
   final Widget Function(int, dynamic)? buildSuffix;
   final Function(int, bool)? onSort;
 
-  PlatformDataColumn(
-      {required this.name,
-      required this.label,
-      this.hintText,
-      this.dataType = DataType.string,
-      this.positiveColor,
-      this.negativeColor,
-      this.inputType = InputType.label,
-      this.width = 100,
-      this.align = TextAlign.start,
-      this.buildSuffix,
-      this.onSort});
+  PlatformDataColumn({required this.name,
+    required this.label,
+    this.hintText,
+    this.dataType = DataType.string,
+    this.positiveColor,
+    this.negativeColor,
+    this.inputType = InputType.label,
+    this.width = 100,
+    this.align = TextAlign.start,
+    this.buildSuffix,
+    this.onSort});
 }
 
 /// 表单的字段定义
@@ -123,7 +122,7 @@ class PlatformDataField {
     required this.label,
     this.inputType = InputType.text,
     this.dataType = DataType.string,
-    this.initValue = '',
+    this.initValue,
     this.prefixIcon,
     this.avatar,
     this.hintText,
@@ -155,8 +154,7 @@ class DataFieldController with ChangeNotifier {
   //文本框的时候是TextEditingController，其他的时候是普通的ValueNotifier
   ValueNotifier<dynamic>? _controller;
 
-  DataFieldController(
-    this.dataField, {
+  DataFieldController(this.dataField, {
     dynamic value,
     dynamic flag,
     ValueNotifier<dynamic>? controller,
@@ -272,8 +270,7 @@ class DataFieldController with ChangeNotifier {
         controller.value = null;
       }
     } else {
-      if (dataField.inputType == InputType.label) {
-      } else {
+      if (dataField.inputType == InputType.label) {} else {
         if (_value != null) {
           _value = null;
           notifyListeners();
@@ -322,15 +319,8 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
 
   //获取初始化值，传入的初始值或者定义的初始值
   dynamic _getInitValue(BuildContext context) {
-    var dataType = widget.controller.dataField.dataType;
     dynamic v = widget.controller.value;
-    if (v != null) {
-      if (dataType == DataType.set ||
-          dataType == DataType.list ||
-          dataType == DataType.map) {
-        return JsonUtil.toJsonString(v);
-      }
-    }
+
     return v;
   }
 
@@ -369,19 +359,19 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
           ),
           Expanded(
               child: ValueListenableBuilder(
-            valueListenable: controller,
-            builder: (BuildContext context, value, Widget? child) {
-              value ??= '';
-              return CommonAutoSizeText(value.toString(),
-                  textAlign: TextAlign.start);
-            },
-          )),
+                valueListenable: controller,
+                builder: (BuildContext context, value, Widget? child) {
+                  value ??= '';
+                  return CommonAutoSizeText(value.toString(),
+                      textAlign: TextAlign.start);
+                },
+              )),
         ]));
   }
 
   Widget _buildTextFormField(BuildContext context) {
     TextEditingController? controller =
-        widget.controller.controller as TextEditingController?;
+    widget.controller.controller as TextEditingController?;
     controller ??= TextEditingController();
     final value = widget.controller.value;
     final valueStr = value == null ? '' : value.toString();
@@ -396,7 +386,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     Widget? suffix;
     if (dataFieldDef.cancel) {
       suffix = IconButton(
-          //如果文本长度不为空则显示清除按钮
+        //如果文本长度不为空则显示清除按钮
           onPressed: () {
             controller!.clear();
           },
@@ -430,7 +420,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
 
   Widget _buildPasswordField(BuildContext context) {
     TextEditingController? controller =
-        widget.controller.controller as TextEditingController?;
+    widget.controller.controller as TextEditingController?;
     controller ??= TextEditingController();
     final value = widget.controller.value;
     final valueStr = value == null ? '' : value.toString();
@@ -445,14 +435,14 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     if (dataFieldDef.cancel) {
       suffix = controller.text.isNotEmpty
           ? IconButton(
-              //如果文本长度不为空则显示清除按钮
-              onPressed: () {
-                controller!.clear();
-              },
-              icon: Icon(
-                Icons.cancel,
-                color: myself.primary,
-              ))
+        //如果文本长度不为空则显示清除按钮
+          onPressed: () {
+            controller!.clear();
+          },
+          icon: Icon(
+            Icons.cancel,
+            color: myself.primary,
+          ))
           : null;
     }
 
@@ -563,8 +553,8 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     if (options != null && options.isNotEmpty) {
       for (var i = 0; i < options.length; ++i) {
         var option = options[i];
-        Set<String>? value = _getInitValue(context);
-        value ??= <String>{};
+        Set<dynamic>? value = _getInitValue(context);
+        value ??= <dynamic>{};
         var checkbox = Checkbox(
           onChanged: (bool? selected) {
             if (value != null) {
@@ -694,7 +684,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
         dropdownColor: Colors.grey.withOpacity(0.7),
         underline: Container(),
         hint:
-            CommonAutoSizeText(AppLocalizations.t(dataFieldDef.hintText ?? '')),
+        CommonAutoSizeText(AppLocalizations.t(dataFieldDef.hintText ?? '')),
         elevation: 0,
         value: widget.controller.value,
         items: children,
@@ -726,11 +716,11 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     if (dataFieldDef.cancel) {
       suffix = controller.text.isNotEmpty
           ? IconButton(
-              //如果文本长度不为空则显示清除按钮
-              onPressed: () {
-                controller.clear();
-              },
-              icon: const Icon(Icons.cancel, color: Colors.grey))
+        //如果文本长度不为空则显示清除按钮
+          onPressed: () {
+            controller.clear();
+          },
+          icon: const Icon(Icons.cancel, color: Colors.grey))
           : null;
     }
     var textFormField = CommonTextFormField(
@@ -748,7 +738,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
               initialDate = DateUtil.toDateTime(initialValue);
             }
             var value =
-                await _showDatePicker(context, initialDate: initialDate);
+            await _showDatePicker(context, initialDate: initialDate);
             widget.controller.value = value;
           }),
       suffix: suffix,
@@ -823,11 +813,11 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     if (dataFieldDef.cancel) {
       suffix = controller.text.isNotEmpty
           ? IconButton(
-              //如果文本长度不为空则显示清除按钮
-              onPressed: () {
-                controller.clear();
-              },
-              icon: const Icon(Icons.cancel, color: Colors.grey))
+        //如果文本长度不为空则显示清除按钮
+          onPressed: () {
+            controller.clear();
+          },
+          icon: const Icon(Icons.cancel, color: Colors.grey))
           : null;
     }
     var textFormField = CommonTextFormField(
@@ -845,7 +835,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
               initialTime = DateUtil.toTime(initialValue);
             }
             var value =
-                await _showTimePicker(context, initialTime: initialTime);
+            await _showTimePicker(context, initialTime: initialTime);
             widget.controller.value = value;
           }),
       suffix: suffix,
@@ -894,11 +884,11 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     if (dataFieldDef.cancel) {
       suffix = controller.text.isNotEmpty
           ? IconButton(
-              //如果文本长度不为空则显示清除按钮
-              onPressed: () {
-                controller.clear();
-              },
-              icon: const Icon(Icons.cancel, color: Colors.grey))
+        //如果文本长度不为空则显示清除按钮
+          onPressed: () {
+            controller.clear();
+          },
+          icon: const Icon(Icons.cancel, color: Colors.grey))
           : null;
     }
     var textFormField = CommonTextFormField(
@@ -916,7 +906,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
               initialDate = DateUtil.toDateTime(initialValue);
             }
             var value =
-                await _showDateTimePicker(context, initialDate: initialDate);
+            await _showDateTimePicker(context, initialDate: initialDate);
             widget.controller.value = value;
           }),
       suffix: suffix,
