@@ -15,6 +15,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
+import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/binging_paginated_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
@@ -59,23 +60,8 @@ class _QStatWidgetState extends State<QStatWidget>
     with TickerProviderStateMixin {
   late final List<PlatformDataColumn> qstatDataColumns = [
     PlatformDataColumn(
-      label: '股票代码',
-      name: 'ts_code',
-      width: 80,
-    ),
-    PlatformDataColumn(
       label: '股票名',
       name: 'security_name',
-      width: 80,
-    ),
-    PlatformDataColumn(
-      label: '年份',
-      name: 'term',
-      width: 90,
-    ),
-    PlatformDataColumn(
-      label: '交易日期',
-      name: 'trade_date',
       width: 80,
     ),
     PlatformDataColumn(
@@ -88,7 +74,7 @@ class _QStatWidgetState extends State<QStatWidget>
       name: 'pe',
       width: 50,
       dataType: DataType.double,
-      align: TextAlign.end,
+      align: TextAlign.right,
       onSort: (int index, bool ascending) =>
           qstatDataPageController.sort((t) => t.pe, index, 'pe', ascending),
     ),
@@ -97,7 +83,7 @@ class _QStatWidgetState extends State<QStatWidget>
       name: 'peg',
       width: 70,
       dataType: DataType.double,
-      align: TextAlign.end,
+      align: TextAlign.right,
       onSort: (int index, bool ascending) =>
           qstatDataPageController.sort((t) => t.peg, index, 'peg', ascending),
     ),
@@ -107,7 +93,7 @@ class _QStatWidgetState extends State<QStatWidget>
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 80,
       onSort: (int index, bool ascending) => qstatDataPageController.sort(
           (t) => t.close, index, 'close', ascending),
@@ -116,7 +102,7 @@ class _QStatWidgetState extends State<QStatWidget>
       label: '涨幅',
       name: 'pct_chg_close',
       dataType: DataType.percentage,
-      align: TextAlign.end,
+      align: TextAlign.right,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
       width: 80,
@@ -129,7 +115,7 @@ class _QStatWidgetState extends State<QStatWidget>
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 100,
       onSort: (int index, bool ascending) => qstatDataPageController.sort(
           (t) => t.yoySales, index, 'yoySales', ascending),
@@ -140,7 +126,7 @@ class _QStatWidgetState extends State<QStatWidget>
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 110,
       onSort: (int index, bool ascending) => qstatDataPageController.sort(
           (t) => t.yoyDeduNp, index, 'yoyDeduNp', ascending),
@@ -151,7 +137,7 @@ class _QStatWidgetState extends State<QStatWidget>
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 110,
       onSort: (int index, bool ascending) => qstatDataPageController.sort(
           (t) => t.orLastMonth, index, 'orLastMonth', ascending),
@@ -162,7 +148,7 @@ class _QStatWidgetState extends State<QStatWidget>
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 130,
       onSort: (int index, bool ascending) => qstatDataPageController.sort(
           (t) => t.npLastMonth, index, 'npLastMonth', ascending),
@@ -173,7 +159,7 @@ class _QStatWidgetState extends State<QStatWidget>
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 100,
       onSort: (int index, bool ascending) => qstatDataPageController.sort(
           (t) => t.weightAvgRoe, index, 'weightAvgRoe', ascending),
@@ -184,10 +170,33 @@ class _QStatWidgetState extends State<QStatWidget>
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 80,
       onSort: (int index, bool ascending) => qstatDataPageController.sort(
           (t) => t.grossProfitMargin, index, 'grossProfitMargin', ascending),
+    ),
+    PlatformDataColumn(
+        label: '',
+        name: 'action',
+        inputType: InputType.custom,
+        width: 20,
+        buildSuffix: (int index, dynamic data) {
+          return Container();
+        }),
+    PlatformDataColumn(
+      label: '股票代码',
+      name: 'ts_code',
+      width: 100,
+    ),
+    PlatformDataColumn(
+      label: '年份',
+      name: 'term',
+      width: 90,
+    ),
+    PlatformDataColumn(
+      label: '交易日期',
+      name: 'trade_date',
+      width: 80,
     ),
     PlatformDataColumn(
         label: '',
@@ -225,11 +234,13 @@ class _QStatWidgetState extends State<QStatWidget>
           inputType: InputType.checkbox,
           dataType: DataType.set,
           options: [
-            Option('1', 1),
-            Option('3', 3),
-            Option('5', 5),
-            Option('10', 10),
-            Option('15', 15)
+            Option('全部', 0),
+            Option('1年', 1),
+            Option('3年', 3),
+            Option('5年', 5),
+            Option('8年', 8),
+            Option('10年', 10),
+            Option('15年', 15)
           ],
           prefixIcon: Icon(
             Icons.date_range_outlined,
@@ -241,26 +252,19 @@ class _QStatWidgetState extends State<QStatWidget>
           inputType: InputType.checkbox,
           dataType: DataType.set,
           options: [
-            Option('min', 'min'),
-            Option('max', 'max'),
-            Option('sum', 'sum'),
-            Option('mean', 'mean'),
-            Option('median', 'median'),
-            Option('stddev', 'stddev'),
-            Option('corr', 'corr'),
-            Option('last', 'last'),
-            Option('rsd', 'rsd'),
-            Option('acc', 'acc')
+            Option('最小', 'min'),
+            Option('最大', 'max'),
+            Option('合计', 'sum'),
+            Option('均值', 'mean'),
+            Option('中位数', 'median'),
+            Option('标准差', 'stddev'),
+            Option('相关性', 'corr'),
+            Option('最新', 'last'),
+            Option('相对相关性', 'rsd'),
+            Option('累计', 'acc')
           ],
           prefixIcon: Icon(
             Icons.indeterminate_check_box_outlined,
-            color: myself.primary,
-          )),
-      PlatformDataField(
-          name: 'sourceName',
-          label: 'SourceName',
-          prefixIcon: Icon(
-            Icons.date_range_outlined,
             color: myself.primary,
           )),
     ];
@@ -284,14 +288,12 @@ class _QStatWidgetState extends State<QStatWidget>
       }
       Map<String, dynamic> values = searchController.getValues();
       String? tsCode = values['tsCode'];
-      List<int>? terms = values['terms'];
-      List<String>? source = values['source'];
-      String? sourceName = values['sourceName'];
+      Set<dynamic>? terms = values['terms'];
+      Set<dynamic>? source = values['source'];
       _refresh(
           tsCode: tsCode,
-          terms: terms,
-          source: source,
-          sourceName: sourceName,
+          terms: terms?.toList(),
+          source: source?.toList(),
           orderBy: orderBy);
     } else {
       setState(() {});
@@ -327,7 +329,6 @@ class _QStatWidgetState extends State<QStatWidget>
       {String? tsCode,
       List<dynamic>? terms,
       List<dynamic>? source,
-      String? sourceName,
       String? orderBy}) async {
     int offset = qstatDataPageController.offset;
     int count = qstatDataPageController.count;
@@ -336,7 +337,6 @@ class _QStatWidgetState extends State<QStatWidget>
             tsCode: tsCode,
             terms: terms,
             source: source,
-            sourceName: sourceName,
             from: offset,
             orderBy: orderBy,
             count: count);
@@ -383,29 +383,23 @@ class _QStatWidgetState extends State<QStatWidget>
     }
     Set<dynamic>? terms = values['terms'];
     Set<dynamic>? source = values['source'];
-    String? sourceName = values['sourceName'];
     _refresh(
       tsCode: tsCode,
       terms: terms?.toList(),
       source: source?.toList(),
-      sourceName: sourceName,
     );
     expansionTileController.collapse();
-    if (mounted) {
-      DialogUtil.info(context,
-          content: AppLocalizations.t('QStat search completely'));
-    }
   }
 
   Widget _buildQStatListView(BuildContext context) {
-    return BindingPaginatedDataTable2<QStat>(
+    return BindingDataTable2<QStat>(
       key: UniqueKey(),
       showCheckboxColumn: false,
       horizontalMargin: 10.0,
       columnSpacing: 0.0,
       platformDataColumns: qstatDataColumns,
       controller: qstatDataPageController,
-      fixedLeftColumns: 3,
+      fixedLeftColumns: 1,
     );
   }
 

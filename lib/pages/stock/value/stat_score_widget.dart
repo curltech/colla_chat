@@ -17,6 +17,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
+import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/binging_paginated_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
@@ -61,23 +62,8 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
     with TickerProviderStateMixin {
   late final List<PlatformDataColumn> statScoreDataColumns = [
     PlatformDataColumn(
-      label: '股票代码',
-      name: 'ts_code',
-      width: 80,
-    ),
-    PlatformDataColumn(
       label: '股票名',
       name: 'security_name',
-      width: 80,
-    ),
-    PlatformDataColumn(
-      label: '业绩日期',
-      name: 'term',
-      width: 90,
-    ),
-    PlatformDataColumn(
-      label: '交易日期',
-      name: 'trade_date',
       width: 80,
     ),
     PlatformDataColumn(
@@ -85,7 +71,7 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
       name: 'risk_score',
       width: 50,
       dataType: DataType.double,
-      align: TextAlign.end,
+      align: TextAlign.right,
       onSort: (int index, bool ascending) => statScoreDataPageController.sort(
           (t) => t.riskScore, index, 'riskScore', ascending),
     ),
@@ -94,7 +80,7 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
       name: 'stable_score',
       width: 70,
       dataType: DataType.double,
-      align: TextAlign.end,
+      align: TextAlign.right,
       onSort: (int index, bool ascending) => statScoreDataPageController.sort(
           (t) => t.stableScore, index, 'stableScore', ascending),
     ),
@@ -102,9 +88,7 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
       label: '增长',
       name: 'increase_score',
       dataType: DataType.double,
-      positiveColor: Colors.red,
-      negativeColor: Colors.green,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 80,
       onSort: (int index, bool ascending) => statScoreDataPageController.sort(
           (t) => t.increaseScore, index, 'increaseScore', ascending),
@@ -112,10 +96,8 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
     PlatformDataColumn(
       label: '累计业绩',
       name: 'acc_score',
-      dataType: DataType.percentage,
-      align: TextAlign.end,
-      positiveColor: Colors.red,
-      negativeColor: Colors.green,
+      dataType: DataType.double,
+      align: TextAlign.right,
       width: 80,
       onSort: (int index, bool ascending) => statScoreDataPageController.sort(
           (t) => t.accScore, index, 'accScore', ascending),
@@ -124,9 +106,7 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
       label: '相关性',
       name: 'corr_score',
       dataType: DataType.double,
-      positiveColor: Colors.red,
-      negativeColor: Colors.green,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 100,
       onSort: (int index, bool ascending) => statScoreDataPageController.sort(
           (t) => t.corrScore, index, 'corrScore', ascending),
@@ -135,9 +115,7 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
       label: '最新业绩',
       name: 'pros_score',
       dataType: DataType.double,
-      positiveColor: Colors.red,
-      negativeColor: Colors.green,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 110,
       onSort: (int index, bool ascending) => statScoreDataPageController.sort(
           (t) => t.prosScore, index, 'prosScore', ascending),
@@ -146,9 +124,7 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
       label: '趋势',
       name: 'trend_score',
       dataType: DataType.double,
-      positiveColor: Colors.red,
-      negativeColor: Colors.green,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 110,
       onSort: (int index, bool ascending) => statScoreDataPageController.sort(
           (t) => t.trendScore, index, 'trendScore', ascending),
@@ -157,9 +133,7 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
       label: '运营',
       name: 'operation_score',
       dataType: DataType.double,
-      positiveColor: Colors.red,
-      negativeColor: Colors.green,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 130,
       onSort: (int index, bool ascending) => statScoreDataPageController.sort(
           (t) => t.operationScore, index, 'operationScore', ascending),
@@ -168,26 +142,45 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
       label: '总分',
       name: 'total_score',
       dataType: DataType.double,
-      positiveColor: Colors.red,
-      negativeColor: Colors.green,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 100,
       onSort: (int index, bool ascending) => statScoreDataPageController.sort(
           (t) => t.totalScore, index, 'totalScore', ascending),
     ),
     PlatformDataColumn(
-      label: '毛利率',
-      name: 'gross_profit_margin',
+      label: '总分分位数',
+      name: 'percentile_total_score',
       dataType: DataType.double,
-      positiveColor: Colors.red,
-      negativeColor: Colors.green,
-      align: TextAlign.end,
-      width: 80,
+      align: TextAlign.right,
+      width: 100,
       onSort: (int index, bool ascending) => statScoreDataPageController.sort(
           (t) => t.percentileTotalScore,
           index,
           'percentileTotalScore',
           ascending),
+    ),
+    PlatformDataColumn(
+        label: '',
+        name: 'action',
+        inputType: InputType.custom,
+        width: 20,
+        buildSuffix: (int index, dynamic data) {
+          return Container();
+        }),
+    PlatformDataColumn(
+      label: '股票代码',
+      name: 'ts_code',
+      width: 100,
+    ),
+    PlatformDataColumn(
+      label: '年份',
+      name: 'term',
+      width: 90,
+    ),
+    PlatformDataColumn(
+      label: '交易日期',
+      name: 'trade_date',
+      width: 80,
     ),
     PlatformDataColumn(
         label: '',
@@ -207,7 +200,7 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
     searchDataField = [
       PlatformDataField(
         name: 'keyword',
-        label: 'keyword',
+        label: 'Keyword',
         cancel: true,
         prefixIcon: Icon(
           Icons.wordpress_outlined,
@@ -234,35 +227,16 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
           inputType: InputType.checkbox,
           dataType: DataType.set,
           options: [
-            Option('1', 1),
-            Option('3', 3),
-            Option('5', 5),
-            Option('10', 10),
-            Option('15', 15)
+            Option('全部', 0),
+            Option('1年', 1),
+            Option('3年', 3),
+            Option('5年', 5),
+            Option('8年', 8),
+            Option('10年', 10),
+            Option('15年', 15)
           ],
           prefixIcon: Icon(
             Icons.date_range_outlined,
-            color: myself.primary,
-          )),
-      PlatformDataField(
-          name: 'scoreOptions',
-          label: 'ScoreOptions',
-          inputType: InputType.checkbox,
-          dataType: DataType.set,
-          options: [
-            Option('min', 'min'),
-            Option('min', 'min'),
-            Option('sum', 'sum'),
-            Option('sum', 'sum'),
-            Option('median', 'median'),
-            Option('stddev', 'stddev'),
-            Option('corr', 'corr'),
-            Option('last', 'last'),
-            Option('rsd', 'rsd'),
-            Option('acc', 'acc')
-          ],
-          prefixIcon: Icon(
-            Icons.indeterminate_check_box_outlined,
             color: myself.primary,
           )),
     ];
@@ -284,13 +258,8 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
       }
       Map<String, dynamic> values = searchController.getValues();
       String? tsCode = values['tsCode'];
-      List<int>? terms = values['terms'];
-      List<String>? scoreOptions = values['scoreOptions'];
-      _refresh(
-          tsCode: tsCode,
-          terms: terms,
-          scoreOptions: scoreOptions,
-          orderBy: orderBy);
+      Set<dynamic>? terms = values['terms'];
+      _refresh(tsCode: tsCode, terms: terms?.toList(), orderBy: orderBy);
     } else {
       setState(() {});
     }
@@ -321,20 +290,13 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
     return actionWidget;
   }
 
-  _refresh(
-      {String? tsCode,
-      List<int>? terms,
-      List<String>? scoreOptions,
-      String? orderBy}) async {
+  _refresh({String? tsCode, List<dynamic>? terms, String? orderBy}) async {
     int offset = statScoreDataPageController.offset;
-    int limit = statScoreDataPageController.limit;
     int count = statScoreDataPageController.count;
     Map<String, dynamic> responseData = await remoteStatScoreService.sendSearch(
         tsCode: tsCode,
         terms: terms,
-        scoreOptions: scoreOptions,
         from: offset,
-        limit: limit,
         orderBy: orderBy,
         count: count);
     count = responseData['count'];
@@ -355,7 +317,7 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
     Widget formInputWidget = Container(
         padding: const EdgeInsets.all(10.0),
         child: FormInputWidget(
-          height: appDataProvider.portraitSize.height * 0.2,
+          height: appDataProvider.portraitSize.height * 0.5,
           spacing: 5.0,
           controller: searchController,
           formButtons: formButtonDefs,
@@ -375,29 +337,23 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
     statScoreDataPageController.reset();
 
     String? tsCode = values['tsCode'];
-    List<int>? terms = values['terms'];
-    List<String>? scoreOptions = values['scoreOptions'];
+    Set<dynamic>? terms = values['terms'];
     _refresh(
       tsCode: tsCode,
-      terms: terms,
-      scoreOptions: scoreOptions,
+      terms: terms?.toList(),
     );
     expansionTileController.collapse();
-    if (mounted) {
-      DialogUtil.info(context,
-          content: AppLocalizations.t('StatScore search completely'));
-    }
   }
 
   Widget _buildStatScoreListView(BuildContext context) {
-    return BindingPaginatedDataTable2<StatScore>(
+    return BindingDataTable2<StatScore>(
       key: UniqueKey(),
       showCheckboxColumn: false,
       horizontalMargin: 10.0,
       columnSpacing: 0.0,
       platformDataColumns: statScoreDataColumns,
       controller: statScoreDataPageController,
-      fixedLeftColumns: 3,
+      fixedLeftColumns: 1,
     );
   }
 

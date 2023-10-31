@@ -14,21 +14,20 @@ class RemoteStatScoreService extends GeneralRemoteService<StatScore> {
   Future<dynamic> sendSearch(
       {String? keyword,
       String? tsCode,
-      List<int>? terms,
-      List<String>? scoreOptions,
+      List<dynamic>? terms,
       String? orderBy,
       int? from,
       int? limit,
       int? count}) async {
     Map<String, dynamic> params = {};
+    if (keyword != null) {
+      params['keyword'] = keyword;
+    }
     if (tsCode != null) {
       params['ts_code'] = tsCode;
     }
     if (terms != null) {
       params['terms'] = terms;
-    }
-    if (scoreOptions != null) {
-      params['scoreOptions'] = scoreOptions;
     }
     if (orderBy != null) {
       params['orderby'] = orderBy;

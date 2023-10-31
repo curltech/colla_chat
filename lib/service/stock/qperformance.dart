@@ -10,15 +10,15 @@ class RemoteQPerformanceService extends GeneralRemoteService<QPerformance> {
 
   /// 查询自选股的最新日线
   Future<dynamic> sendFindByQDate(
-      {String? securityCode,
+      {String? tsCode,
       String? startDate,
       String? orderBy,
       int? from,
       int? limit,
       int? count}) async {
     Map<String, dynamic> params = {};
-    if (securityCode != null) {
-      params['security_code'] = securityCode;
+    if (tsCode != null) {
+      params['ts_code'] = tsCode;
     }
     if (startDate != null) {
       params['start_date'] = startDate;

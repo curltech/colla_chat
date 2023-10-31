@@ -14,7 +14,6 @@ class RemoteQStatService extends GeneralRemoteService<QStat> {
       {String? tsCode,
       List<dynamic>? terms,
       List<dynamic>? source,
-      String? sourceName,
       String? orderBy,
       int? from,
       int? limit,
@@ -28,9 +27,6 @@ class RemoteQStatService extends GeneralRemoteService<QStat> {
     }
     if (source != null) {
       params['source'] = source;
-    }
-    if (sourceName != null) {
-      params['sourceName'] = sourceName;
     }
     if (orderBy != null) {
       params['orderby'] = orderBy;

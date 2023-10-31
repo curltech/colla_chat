@@ -66,7 +66,7 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
       label: '收盘价',
       name: 'close',
       dataType: DataType.double,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 70,
     ),
     PlatformDataColumn(
@@ -75,7 +75,7 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
       dataType: DataType.percentage,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 70,
     ),
     PlatformDataColumn(
@@ -84,14 +84,14 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
       dataType: DataType.percentage,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 70,
     ),
     PlatformDataColumn(
       label: '换手率',
       name: 'turnover',
       dataType: DataType.double,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 70,
     ),
     PlatformDataColumn(

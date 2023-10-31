@@ -66,9 +66,13 @@ class _BindingDataTable2State<T> extends State<BindingDataTable2> {
       totalWidth += platformDataColumn.width;
       InputType inputType = platformDataColumn.inputType;
       if (inputType == InputType.custom) {
-        dataColumns.add(DataColumn2(
+        dataColumns.add(
+          DataColumn2(
             label: CommonAutoSizeText(
-                AppLocalizations.t(platformDataColumn.label))));
+                AppLocalizations.t(platformDataColumn.label)),
+            fixedWidth: platformDataColumn.width,
+          ),
+        );
       } else {
         dataColumns.add(
           DataColumn2(

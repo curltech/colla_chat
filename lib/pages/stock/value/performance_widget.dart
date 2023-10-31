@@ -11,9 +11,7 @@ import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/binging_paginated_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
@@ -58,55 +56,9 @@ class _PerformanceWidgetState extends State<PerformanceWidget>
     with TickerProviderStateMixin {
   late final List<PlatformDataColumn> performanceDataColumns = [
     PlatformDataColumn(
-      label: '股票代码',
-      name: 'security_code',
-      width: 80,
-    ),
-    PlatformDataColumn(
       label: '股票名',
       name: 'security_name_abbr',
       width: 80,
-    ),
-    PlatformDataColumn(
-      label: '业绩日期',
-      name: 'qdate',
-      width: 90,
-    ),
-    PlatformDataColumn(
-      label: '业绩类型',
-      name: 'data_type',
-      width: 100,
-    ),
-    PlatformDataColumn(
-      label: '基本每股收益',
-      name: 'basic_eps',
-      dataType: DataType.double,
-      positiveColor: Colors.red,
-      negativeColor: Colors.green,
-      align: TextAlign.end,
-      width: 110,
-      onSort: (int index, bool ascending) => performanceDataPageController.sort(
-          (t) => t.basicEps, index, 'basicEps', ascending),
-    ),
-    PlatformDataColumn(
-      label: '总营收',
-      name: 'total_operate_income',
-      dataType: DataType.double,
-      align: TextAlign.end,
-      width: 140,
-      onSort: (int index, bool ascending) => performanceDataPageController.sort(
-          (t) => t.totalOperateIncome, index, 'totalOperateIncome', ascending),
-    ),
-    PlatformDataColumn(
-      label: '归母净利润',
-      name: 'parent_net_profit',
-      dataType: DataType.double,
-      positiveColor: Colors.red,
-      negativeColor: Colors.green,
-      align: TextAlign.end,
-      width: 140,
-      onSort: (int index, bool ascending) => performanceDataPageController.sort(
-          (t) => t.parentNetProfit, index, 'parentNetProfit', ascending),
     ),
     PlatformDataColumn(
       label: '年营收增长',
@@ -114,7 +66,7 @@ class _PerformanceWidgetState extends State<PerformanceWidget>
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 100,
       onSort: (int index, bool ascending) => performanceDataPageController.sort(
           (t) => t.yoySales, index, 'yoySales', ascending),
@@ -125,7 +77,7 @@ class _PerformanceWidgetState extends State<PerformanceWidget>
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 110,
       onSort: (int index, bool ascending) => performanceDataPageController.sort(
           (t) => t.yoyDeduNp, index, 'yoyDeduNp', ascending),
@@ -136,7 +88,7 @@ class _PerformanceWidgetState extends State<PerformanceWidget>
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 110,
       onSort: (int index, bool ascending) => performanceDataPageController.sort(
           (t) => t.orLastMonth, index, 'orLastMonth', ascending),
@@ -147,7 +99,7 @@ class _PerformanceWidgetState extends State<PerformanceWidget>
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 130,
       onSort: (int index, bool ascending) => performanceDataPageController.sort(
           (t) => t.npLastMonth, index, 'npLastMonth', ascending),
@@ -158,7 +110,7 @@ class _PerformanceWidgetState extends State<PerformanceWidget>
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 100,
       onSort: (int index, bool ascending) => performanceDataPageController.sort(
           (t) => t.weightAvgRoe, index, 'weightAvgRoe', ascending),
@@ -169,10 +121,65 @@ class _PerformanceWidgetState extends State<PerformanceWidget>
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.end,
+      align: TextAlign.right,
       width: 80,
       onSort: (int index, bool ascending) => performanceDataPageController.sort(
           (t) => t.grossProfitMargin, index, 'grossProfitMargin', ascending),
+    ),
+    PlatformDataColumn(
+      label: '基本每股收益',
+      name: 'basic_eps',
+      dataType: DataType.double,
+      positiveColor: Colors.red,
+      negativeColor: Colors.green,
+      align: TextAlign.right,
+      width: 110,
+      onSort: (int index, bool ascending) => performanceDataPageController.sort(
+              (t) => t.basicEps, index, 'basicEps', ascending),
+    ),
+    PlatformDataColumn(
+      label: '总营收',
+      name: 'total_operate_income',
+      dataType: DataType.double,
+      align: TextAlign.right,
+      width: 140,
+      onSort: (int index, bool ascending) => performanceDataPageController.sort(
+              (t) => t.totalOperateIncome, index, 'totalOperateIncome', ascending),
+    ),
+    PlatformDataColumn(
+      label: '归母净利润',
+      name: 'parent_net_profit',
+      dataType: DataType.double,
+      positiveColor: Colors.red,
+      negativeColor: Colors.green,
+      align: TextAlign.right,
+      width: 140,
+      onSort: (int index, bool ascending) => performanceDataPageController.sort(
+              (t) => t.parentNetProfit, index, 'parentNetProfit', ascending),
+    ),
+    PlatformDataColumn(
+        label: '',
+        name: 'action',
+        inputType: InputType.custom,
+        width: 20,
+        buildSuffix: (int index, dynamic data){
+          return Container();
+        }),
+    PlatformDataColumn(
+      label: '股票代码',
+      name: 'security_code',
+      align: TextAlign.right,
+      width: 120,
+    ),
+    PlatformDataColumn(
+      label: '业绩日期',
+      name: 'qdate',
+      width: 90,
+    ),
+    PlatformDataColumn(
+      label: '业绩类型',
+      name: 'data_type',
+      width: 100,
     ),
     PlatformDataColumn(
         label: '',
@@ -322,10 +329,6 @@ class _PerformanceWidgetState extends State<PerformanceWidget>
       startDate: startDate,
     );
     expansionTileController.collapse();
-    if (mounted) {
-      DialogUtil.info(context,
-          content: AppLocalizations.t('Performance search completely'));
-    }
   }
 
   Widget _buildPerformanceListView(BuildContext context) {
@@ -336,7 +339,7 @@ class _PerformanceWidgetState extends State<PerformanceWidget>
       columnSpacing: 0.0,
       platformDataColumns: performanceDataColumns,
       controller: performanceDataPageController,
-      fixedLeftColumns: 3,
+      fixedLeftColumns: 1,
     );
   }
 
