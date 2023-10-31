@@ -179,6 +179,8 @@ class _StockLineChartWidgetState extends State<StockLineChartWidget> {
 
   _update() {
     reloadCandles();
+
+    setState(() {});
   }
 
   /// 重新加载数据，tsCode和lineType发生改变
@@ -274,7 +276,6 @@ class _StockLineChartWidgetState extends State<StockLineChartWidget> {
           volume: volume.toDouble());
       candles.add(candle);
     }
-    setState(() {});
   }
 
   CandleSticksStyle dark() {
@@ -570,7 +571,9 @@ class _StockLineChartWidgetState extends State<StockLineChartWidget> {
           return IconButton(
               tooltip: AppLocalizations.t('DayLine'),
               onPressed: () async {
-                await swiperController.move(1);
+                multiStockLineController.lineType = 101;
+                swiperController.move(1);
+                index.value = 1;
               },
               icon: const Icon(Icons.calendar_view_day_outlined));
         }
@@ -585,7 +588,9 @@ class _StockLineChartWidgetState extends State<StockLineChartWidget> {
           return IconButton(
               tooltip: AppLocalizations.t('MinLine'),
               onPressed: () async {
-                await swiperController.move(0);
+                multiStockLineController.lineType = 100;
+                swiperController.move(0);
+                index.value = 0;
               },
               icon: const Icon(Icons.timer_outlined));
         }
@@ -614,6 +619,7 @@ class _StockLineChartWidgetState extends State<StockLineChartWidget> {
       rightWidgets: rightWidgets,
       child: Center(
         child: Swiper(
+          controller: swiperController,
           index: index.value,
           itemCount: 2,
           onIndexChanged: (int index) {
