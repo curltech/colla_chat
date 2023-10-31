@@ -147,6 +147,7 @@ dependencies:
       url: https://github.com/den0206/Flutter-Neumorphic.git
       ref: feature/remoce_accentcolor
   fl_chart: ^0.64.0
+  k_chart: ^0.7.1
   extended_text: ^11.1.0 #文本扩展显示
   extended_text_field: ^12.1.0 #文字表情混入
   extended_text_library: ^11.1.0 #Flutter2.5用这个,,其他可注释

@@ -56,7 +56,7 @@ class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {
           p2pConferenceClientPool.conferenceChatMessageController);
   ChatSummary chatSummary = chatMessageController.chatSummary!;
   SwiperController swiperController = SwiperController();
-  int index = 0;
+  ValueNotifier<int> index = ValueNotifier<int>(0);
 
   @override
   void initState() {
@@ -106,7 +106,7 @@ class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {
     return Swiper(
       controller: swiperController,
       itemCount: 2,
-      index: index,
+      index: index.value,
       itemBuilder: (BuildContext context, int index) {
         Widget view = widget.localVideoWidget;
         if (index == 1) {
@@ -115,7 +115,7 @@ class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {
         return view;
       },
       onIndexChanged: (int index) {
-        this.index = index;
+        this.index.value = index;
       },
     );
   }
@@ -124,20 +124,38 @@ class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {
   Widget build(BuildContext context) {
     List<Widget> rightWidgets = [];
     if (platformParams.desktop) {
-      rightWidgets.add(IconButton(
-        onPressed: () {
-          swiperController.move(0);
+      Widget local = ValueListenableBuilder(
+        valueListenable: index,
+        builder: (BuildContext context, int value, Widget? child) {
+          if (value == 1) {
+            return IconButton(
+              onPressed: () {
+                swiperController.move(0);
+              },
+              icon: const Icon(Icons.local_library),
+              tooltip: AppLocalizations.t('Local'),
+            );
+          }
+          return Container();
         },
-        icon: const Icon(Icons.local_library),
-        tooltip: AppLocalizations.t('Local'),
-      ));
-      rightWidgets.add(IconButton(
-        onPressed: () {
-          swiperController.move(1);
+      );
+      rightWidgets.add(local);
+      Widget remote = ValueListenableBuilder(
+        valueListenable: index,
+        builder: (BuildContext context, int value, Widget? child) {
+          if (value == 0) {
+            return IconButton(
+              onPressed: () {
+                swiperController.move(1);
+              },
+              icon: const Icon(Icons.devices_other),
+              tooltip: AppLocalizations.t('Remote'),
+            );
+          }
+          return Container();
         },
-        icon: const Icon(Icons.devices_other),
-        tooltip: AppLocalizations.t('Remote'),
-      ));
+      );
+      rightWidgets.add(remote);
     }
     rightWidgets.add(IconButton(
       onPressed: () {

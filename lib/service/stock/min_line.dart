@@ -17,7 +17,11 @@ class RemoteMinLineService extends GeneralRemoteService<MinLine> {
       'trade_minute': tradeMinute
     };
     List<dynamic> data = await send('/minline/FindMinLines', data: params);
-
+    // List<MinLine> minLines = [];
+    // for (dynamic m in data) {
+    //   MinLine minLine = post(m);
+    //   minLines.add(minLine);
+    // }
     return data;
   }
 }
