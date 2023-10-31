@@ -499,58 +499,55 @@ class _StockLineChartWidgetState extends State<StockLineChartWidget> {
                     ),
                     crosshair: CrosshairGuide(followPointer: [false, true]),
                   )),
-              Expanded(
-                  child: SizedBox(
-                      // width: 350,
-                      height: 280,
-                      child: Chart(
-                        data: minLines,
-                        variables: {
-                          'TradeMinute': Variable(
-                            accessor: (dynamic data) {
-                              int tradeMinute = data['trade_minute'] as int;
-                              int hour = tradeMinute ~/ 60;
-                              int minute = tradeMinute % 60;
-                              return '$hour:$minute';
-                            },
-                            scale: OrdinalScale(tickCount: 5),
-                          ),
-                          'Vol': Variable(
-                            accessor: (dynamic data) {
-                              return (data['vol']) as num;
-                            },
-                          ),
+              SizedBox(
+                  // width: 350,
+                  height: 280,
+                  child: Chart(
+                    data: minLines,
+                    variables: {
+                      'TradeMinute': Variable(
+                        accessor: (dynamic data) {
+                          int tradeMinute = data['trade_minute'] as int;
+                          int hour = tradeMinute ~/ 60;
+                          int minute = tradeMinute % 60;
+                          return '$hour:$minute';
                         },
-                        marks: [
-                          IntervalMark(
-                            size: SizeEncode(value: 1),
-                          )
-                        ],
-                        axes: [
-                          Defaults.horizontalAxis,
-                        ],
-                        selections: {
-                          'touchMove': PointSelection(
-                            on: {
-                              GestureType.scaleUpdate,
-                              GestureType.tapDown,
-                              GestureType.longPressMoveUpdate
-                            },
-                            dim: Dim.x,
-                          )
+                        scale: OrdinalScale(tickCount: 5),
+                      ),
+                      'Vol': Variable(
+                        accessor: (dynamic data) {
+                          return (data['vol']) as num;
                         },
-                        crosshair: CrosshairGuide(
-                          followPointer: [true, false],
-                          styles: [
-                            PaintStyle(
-                                strokeColor: const Color(0xffbfbfbf),
-                                dash: [4, 2]),
-                            PaintStyle(
-                                strokeColor: const Color(0xffbfbfbf),
-                                dash: [4, 2]),
-                          ],
-                        ),
-                      ))),
+                      ),
+                    },
+                    marks: [
+                      IntervalMark(
+                        size: SizeEncode(value: 1),
+                      )
+                    ],
+                    axes: [
+                      Defaults.horizontalAxis,
+                    ],
+                    selections: {
+                      'touchMove': PointSelection(
+                        on: {
+                          GestureType.scaleUpdate,
+                          GestureType.tapDown,
+                          GestureType.longPressMoveUpdate
+                        },
+                        dim: Dim.x,
+                      )
+                    },
+                    crosshair: CrosshairGuide(
+                      followPointer: [true, false],
+                      styles: [
+                        PaintStyle(
+                            strokeColor: const Color(0xffbfbfbf), dash: [4, 2]),
+                        PaintStyle(
+                            strokeColor: const Color(0xffbfbfbf), dash: [4, 2]),
+                      ],
+                    ),
+                  )),
             ]));
       },
     );
