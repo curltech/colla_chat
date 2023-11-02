@@ -240,7 +240,6 @@ dependencies:
   omni_datetime_picker: ^1.0.1
   toggle_switch: ^2.0.1
   classic_logger: any
-  logger: ^1.1.0
   #logging: ^1.0.2
   cross_file: 0.3.3+4
   mobile_scanner: ^3.4.1
@@ -365,6 +364,7 @@ dependencies:
   livekit_server_sdk: ^1.0.0
 dependency_overrides:
   uuid: ^4.1.0
+  logger: ^2.0.2+1
   flutter_math_fork: ^0.7.1
   photo_view: ^0.14.0
   device_info_plus: ^9.0.2
