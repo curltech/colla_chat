@@ -1,5 +1,3 @@
-import 'package:colla_chat/entity/stock/performance.dart';
-import 'package:colla_chat/entity/stock/qstat.dart';
 import 'package:colla_chat/entity/stock/stat_score.dart';
 import 'package:colla_chat/service/general_remote.dart';
 

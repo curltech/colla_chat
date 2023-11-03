@@ -5,7 +5,7 @@ import 'package:livekit_client/livekit_client.dart';
 
 /// 媒体流绑定渲染器，并创建展示视图
 class LiveKitMediaRenderView extends StatefulWidget {
-  final VideoTrack videoTrack;
+  final PeerMediaStream peerMediaStream;
   final RTCVideoViewObjectFit objectFit;
   final bool mirror;
   final FilterQuality filterQuality;
@@ -13,20 +13,16 @@ class LiveKitMediaRenderView extends StatefulWidget {
   final double? width;
   final double? height;
   final Color? color;
-  final bool audio;
-  final bool video;
 
   const LiveKitMediaRenderView({
     super.key,
-    required this.videoTrack,
+    required this.peerMediaStream,
     this.objectFit = RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
     this.mirror = false,
     this.filterQuality = FilterQuality.low,
     this.fitScreen = false,
     this.width,
     this.height,
-    this.audio = true,
-    this.video = true,
     this.color = Colors.black,
   });
 
@@ -63,13 +59,14 @@ class _LiveKitMediaRenderViewState extends State<LiveKitMediaRenderView> {
 
   /// 创建展示视图，纯音频显示图标
   Widget _buildVideoView() {
-    Widget? videoView = VideoTrackRenderer(widget.videoTrack,
+    Widget? videoView = VideoTrackRenderer(widget.peerMediaStream.videoTrack!,
         fit: widget.objectFit,
         mirrorMode: widget.mirror
             ? VideoViewMirrorMode.mirror
             : VideoViewMirrorMode.off);
-
-    if (widget.audio && !widget.video) {
+    bool audio = widget.peerMediaStream.audio;
+    bool video = widget.peerMediaStream.video;
+    if (audio && !video) {
       videoView = Stack(children: [
         const Center(
             child: Icon(

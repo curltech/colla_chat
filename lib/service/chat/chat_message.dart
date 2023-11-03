@@ -762,8 +762,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     if (transportType == TransportType.webrtc.name) {
       List<AdvancedPeerConnection>? advancedPeerConnections =
           peerConnectionPool.getConnected(peerId);
-      if (advancedPeerConnections != null &&
-          advancedPeerConnections.isNotEmpty) {
+      if (advancedPeerConnections.isNotEmpty) {
         bool success = await peerConnectionPool.send(peerId, data);
         logger.w('webrtc send data result:$success');
         if (success) {

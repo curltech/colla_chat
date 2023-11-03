@@ -1,5 +1,4 @@
 import 'package:colla_chat/entity/stock/share_group.dart';
-import 'package:colla_chat/l10n/localization.dart';
 
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';

@@ -66,9 +66,9 @@ class Conference extends StatusEntity {
         advance =
             json['advance'] == true || json['advance'] == 1 ? true : false,
         upperNumber = json['upperNumber'] ?? 300,
-        sfu = json['sfu'] ?? 300,
-        sfuUri = json['sfuUri'] ?? 300,
-        sfuToken = json['sfuToken'] ?? 300,
+        sfu = json['sfu'] == true || json['sfu'] == 1 ? true : false,
+        sfuUri = json['sfuUri'],
+        sfuToken = json['sfuToken'],
         super.fromJson(json) {
     var participants = json['participants'] != null
         ? JsonUtil.toJson(json['participants'])
