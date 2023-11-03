@@ -317,7 +317,7 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
     Widget formInputWidget = Container(
         padding: const EdgeInsets.all(10.0),
         child: FormInputWidget(
-          height: appDataProvider.portraitSize.height * 0.5,
+          height: appDataProvider.portraitSize.height * 0.3,
           spacing: 5.0,
           controller: searchController,
           formButtons: formButtonDefs,

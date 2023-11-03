@@ -588,5 +588,16 @@
   "Leader": "主",
   "Follower": "从",
   "Group edit": "群编辑",
-  "Group name": "群名"
+  "Group name": "群名",
+  "Value": "价值",
+  "Performance": "表现",
+  "QPerformance": "价格表现",
+  "QStat": "统计指标",
+  "StatScore": "统计评分",
+  "SecurityCode": "股票代码",
+  "TsCode": "股票代码",
+  "Keyword": "关键值",
+  "Terms": "年份",
+  "Source": "指标"
+
 }
