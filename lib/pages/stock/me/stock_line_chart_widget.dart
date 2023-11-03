@@ -502,7 +502,7 @@ class _StockLineChartWidgetState extends State<StockLineChartWidget> {
                   )),
               SizedBox(
                   // width: 350,
-                  height: 280,
+                  height: 300,
                   child: Chart(
                     data: minLines,
                     variables: {

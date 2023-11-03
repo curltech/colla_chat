@@ -54,28 +54,27 @@ dependencies:
   no_screenshot: ^0.0.1+6
   screenshot_callback: ^3.0.1
   orientation: ^1.2.0 # 控制屏幕旋转
-  geolocator: ^9.0.2
+  geolocator: ^10.1.0
   device_info_plus: ^8.0.0
   network_info_plus: ^4.0.1
   beamer: ^1.4.1+1
   sensors_plus: ^3.0.2
   battery_plus: 4.0.1
-  package_info_plus: 4.0.2
+  package_info_plus: 4.2.0
   flutter_contacts: ^1.1.6
   fluttercontactpicker: ^4.7.0
   #fast_contacts: ^3.0.3
-  connectivity_plus: ^4.0.1
   #flutter_nearby_connections: ^1.1.1  #ANDROID，IOS，目前不支持ios和android之间通信，而且gradle版本配置低，需要修改
   nearby_connections: ^4.0.0 #android
   nfc_manager: ^3.3.0 #mobile
   flutter_nfc_kit: ^3.3.1 #mobile
   #  flutter_blue_plus: ^1.5.2 #ANDROID，IOS，MACOS
-  mimecon: ^0.0.2
+  mimecon: ^1.0.1
   wakelock_plus: ^1.1.1 #让系统不会睡眠
 
   # 存储
   shared_preferences: ^2.2.2
-  flutter_secure_storage: 8.1.0
+  flutter_secure_storage: 9.0.0
   sqlite3: ^2.1.0
   sqlite3_flutter_libs: ^0.5.17
   idb_shim: ^2.0.1
@@ -94,12 +93,12 @@ dependencies:
       url: https://github.com/suhardik/s_telephony.git
       ref: develop
   openvpn_flutter: ^1.2.2
-  flutter_web_auth_2: ^2.1.5
+  flutter_web_auth_2: ^3.0.3
 
   #界面
   bubble: ^1.2.1
   fluttertoast: ^8.2.1
-  flutter_local_notifications: ^15.1.1
+  flutter_local_notifications: ^16.1.0
   stacked_notification_cards: ^0.1.0-dev.4
   toastification: ^1.0.2
   cupertino_icons: ^1.0.2
@@ -160,20 +159,20 @@ dependencies:
       url: https://github.com/r-mzy47/candlesticks.git
   fluent_ui: 4.7.3
   fluentui_system_icons: ^1.1.201 #FluentIcons.access_time_24_regular
-  macos_ui: ^1.11.1
+  macos_ui: ^2.0.2
   flutter_material_color_picker: ^1.1.0+2
   after_layout: ^1.1.0
   snapping_sheet: ^3.1.0 #在上下可以滑出的sheet
 
   #flutter_bloc: ^6.1.0
   flutter_screenutil: ^5.5.3 # Flutter 屏幕适配 https://github.com/OpenFlutter/flutter_screenutil
-  easy_stepper: ^0.7.2
+  easy_stepper: ^0.8.1
   flex_color_scheme: ^7.1.2
   flex_seed_scheme: ^1.3.0
   file_selector: ^1.0.0
   filesystem_picker: ^4.0.0
   wechat_assets_picker: ^8.7.0 #移动平台，选择图像，视频等媒体并展示
-  flutter_slidable: ^3.0.0 #滑动的按钮
+  flutter_slidable: ^3.0.1 #滑动的按钮
   #下面是各种轮播图组件
   carousel_slider: ^4.2.1 #不错的类似swiper的组件 CarouselSlider
   flutter_carousel_widget: ^2.0.4 #类似carousel_slider，支持单页多item
@@ -227,11 +226,11 @@ dependencies:
   flutter_smart_dialog: ^4.9.4
   #pdf_flutter: ^1.1.4
   json_annotation: ^4.3.0
-  permission_handler: ^10.0.0 #权限处理1
+  permission_handler: ^11.0.1 #权限处理1
   provider: ^6.0.1 #状态管理
   easy_refresh: ^3.3.2+1
   percent_indicator: ^4.2.3
-  share_plus: 7.0.2
+  share_plus: 7.2.1
   flutter_sharing_intent: ^1.0.6
   #  receive_sharing_intent: #^1.4.6 #gradle版本低的问题
   #    git:
@@ -280,13 +279,13 @@ dependencies:
 #  audiofileplayer: ^2.1.1
 #  record_mp3: ^3.0.0
   audio_waveforms: 1.0.4
-  video_player_web: ^2.0.15
+  video_player_web: ^2.1.2
   #flick_video_player: ^0.5.0 #video_player的封装
   #appinio_video_player: ^1.2.0 #video_player的封装
-  video_player: ^2.6.0 #mobile and web
-  video_player_win: ^2.2.0
+  video_player: ^2.8.1 #mobile and web
+  video_player_win: ^2.3.4
   video_player_macos: ^2.0.1
-  video_player_control_panel: ^1.1.0
+  video_player_control_panel: ^1.1.1
   chewie: ^1.3.6 #video_player的封装
   #flutter_meedu_videoplayer: ^4.3.1 #这个版本在macos下会造成lib的签名问题
   #这个版本的media_kit在windows下有问题
@@ -309,7 +308,7 @@ dependencies:
   video_thumbnail: ^0.5.2
   video_compress: ^3.1.2
   #thumbnailer: ^2.2.0
-  fc_native_video_thumbnail: ^0.4.0
+  fc_native_video_thumbnail: ^0.7.0
   extended_image: ^8.1.0 #所有平台，官方软件，管理图像
   extended_image_library: ^3.6.0
   image_editor: ^1.3.0
@@ -339,7 +338,7 @@ dependencies:
   flutter_svg: ^2.0.3
   google_maps_flutter: ^2.5.0 #谷歌地图，移动设备
   apple_maps_flutter: ^1.2.0
-  map_launcher: ^2.5.0+1 #打开设备已安装的地图软件，移动设备
+  map_launcher: ^3.0.1 #打开设备已安装的地图软件，移动设备
   location_picker_flutter_map: ^1.2.1 #Open Street Map，需要翻墙
 
   #服务
@@ -349,14 +348,12 @@ dependencies:
   #  awesome_notifications: ^0.7.4+1
   #  awesome_notifications_fcm: ^0.7.4+1 #对minsdk有要求
   pull_to_refresh_notification: ^3.1.0
-  intercom_flutter: ^7.6.3+1
+  intercom_flutter: ^8.0.3
   flutter_native_splash: ^2.2.19
   system_tray: ^2.0.3
   tray_manager: ^0.2.0
-  dart_openai: ^3.0.0
   chat_gpt_sdk: ^2.0.4
   flutter_chatgpt_api: ^1.1.0
-  masamune_ai_openai: ^2.1.3
   whisper_dart: ^0.0.11
   openai_dalle_wrapper: ^1.0.0
   dart_chatgpt: ^1.0.2
@@ -379,6 +376,9 @@ dependency_overrides:
   apple_maps_flutter: ^1.2.0
   http: ^1.1.0
   flutter_inappwebview: ^6.0.0-beta.25
+  connectivity_plus: ^5.0.1
+  dart_openai: ^4.0.0
+  masamune_ai_openai: ^2.1.3
   webview_flutter: ^4.4.1
   webview_flutter_android: ^3.12.0
   webview_flutter_wkwebview: ^3.9.1
@@ -387,15 +387,15 @@ dependency_overrides:
   webview_win_floating: #2.0.0 #webView for
     git: https://github.com/jakky1/webview_win_floating.git
   #    desktop_webview_window: ^0.2.0
-  flutter_widget_from_html: ^0.13.0-alpha.4
+  flutter_widget_from_html: ^0.14.6
   sprintf: ^7.0.0
   flex_color_picker: ^3.1.0
   permission_handler: ^10.2.0
-  file_picker: ^5.3.2
+  file_picker: ^6.0.0
   #  file_picker_pro: ^1.4.0 #open_filex和open_file冲突
   intl: ^0.18.0
   image: ^4.0.12
-  google_fonts: ^5.1.0
+  google_fonts: ^6.1.0
   material_design_icons_flutter: ^7.0.7296
   image_cropper: ^5.0.0
   full_picker: ^1.3.3 #和最新版的record5不兼容,Recorder被AudioRecorder替换，需要修改源码
@@ -406,7 +406,7 @@ dependency_overrides:
   video_player_platform_interface: ^6.0.1
   path: ^1.8.3
   dio: ^5.3.3 #^4.0.6 openai
-  audio_video_progress_bar: ^1.0.0
+  audio_video_progress_bar: ^2.0.1
   pdfx: 2.2.0 #2.3.0在macos下编译错误,web下不能使用
   #printing: ^5.11.0 #所有平台，使用pdf，把一些其他的格式转换成pdf并显示，目前windows下有bug
   #  printing:
@@ -415,18 +415,18 @@ dependency_overrides:
   #      ref: master
   #      path: printing
   pdf: ^3.10.4 #所有平台，创建pdf
-  record: 5.0.0-beta.2
-  record_darwin: 1.0.0-beta.2+2
+  record: 5.0.1
+  record_darwin: 1.0.0
   visibility_detector: ^0.4.0+2 #组建可见性的大小发生变化
   focus_detector: ^2.0.1 #组建在界面上消失或者出现
   image_picker: ^1.0.1 #选取图库,移动从图像廊或者相机选，桌面实现采用file_selector，从文件系统选
   latlong2: ^0.9.0
-  flutter_map_location_marker: ^7.0.0
-  flutter_map: ^5.0.0
-  win32: ^4.1.4
-  markdown: ^6.0.1
+  flutter_map_location_marker: ^7.0.0 #^8.0.0
+  flutter_map: 5.0.0 #^6.0.1
+  win32: ^5.0.9
+  markdown: ^7.1.1
   lottie: ^2.4.0
-  flutter_quill: 7.5.0
+  flutter_quill: 7.5.0 #8.1.3
 #    git: https://github.com/singerdmx/flutter-quill.git
   flutter_quill_extensions: ^0.5.0
 #    git:

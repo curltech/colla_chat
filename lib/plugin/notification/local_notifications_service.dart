@@ -147,13 +147,13 @@ class LocalNotificationsService {
       final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
           flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>();
-
-      granted = await androidImplementation?.requestPermission();
+      await androidImplementation?.requestExactAlarmsPermission();
+      granted = await androidImplementation?.requestNotificationsPermission();
     }
     return granted;
   }
 
-  ///只用于ios10之前的版本，应用处于前台收到本地通知
+  ///只用于ios10之前的版本，应用处于前台收到本地通知.
   void onDidReceiveLocalNotification(
       ReceivedNotification receivedNotification) {
     String? title = receivedNotification.title;
