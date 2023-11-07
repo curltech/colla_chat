@@ -314,7 +314,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
           content: AppLocalizations.t('Must has conference topic'));
       return null;
     }
-    if (current.id == null) {
+    if (currentConference.id == null) {
       var participants = conferenceMembers.value;
       if (!participants.contains(myself.peerId!)) {
         participants.add(myself.peerId!);
@@ -331,6 +331,9 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
       current.advance = currentConference.advance;
       current.mute = currentConference.mute;
       current.contact = currentConference.contact;
+      current.sfu = currentConference.sfu;
+      current.sfuToken = currentConference.sfuToken;
+      current.sfuUri = currentConference.sfuUri;
       conferenceModified = true;
     } else {
       if (current.topic != currentConference.topic) {
@@ -372,6 +375,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     }
     current.participants = conferenceMembers.value;
     await conferenceService.store(current);
+    conferenceNotifier.value = current;
     if (mounted) {
       DialogUtil.info(context,
           content: AppLocalizations.t('Conference has stored completely'));
@@ -381,7 +385,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     ///当前chatSummary可以不存在，因此不需要当前处于聊天场景下，因此是一个静态方法，创建永久conference的时候使用
     ///对linkman模式下，conference是临时的，不保存数据库
     ///对group和conference模式下，conference是永久的，保存数据库，可以以后重新加入
-    if (current.id == null) {
+    if (currentConference.id == null) {
       ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
         current.conferenceId,
         PartyType.conference,
@@ -402,7 +406,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     if (conferenceModified) {
       conferenceChatSummaryController.refresh();
     }
-    if (current.id == null) {
+    if (currentConference.id == null) {
       setState(() {});
     }
 

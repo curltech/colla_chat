@@ -25,7 +25,8 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
   final ChatGPTAddWidget chatGPTAddWidget = const ChatGPTAddWidget();
   final NearbyGroupAddWidget nearbyGroupAddWidget = NearbyGroupAddWidget();
   final FaceGroupAddWidget faceGroupAddWidget = FaceGroupAddWidget();
-  final ConferenceEditWidget conferenceEditWidget = const ConferenceEditWidget();
+  final ConferenceEditWidget conferenceEditWidget =
+      const ConferenceEditWidget();
 
   LinkmanAddWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(p2pLinkmanAddWidget);
@@ -36,16 +37,6 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(nearbyGroupAddWidget);
     indexWidgetProvider.define(faceGroupAddWidget);
     indexWidgetProvider.define(conferenceEditWidget);
-    List<TileDataMixin> mixins = [
-      p2pLinkmanAddWidget,
-      contactLinkmanAddWidget,
-      jsonLinkmanAddWidget,
-      //nearbyLinkmanAddWidget,
-      chatGPTAddWidget,
-      nearbyGroupAddWidget,
-      faceGroupAddWidget,
-      conferenceEditWidget,
-    ];
   }
 
   @override
@@ -79,6 +70,9 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
       nearbyGroupAddWidget,
       faceGroupAddWidget,
     ]);
+    groupTileData.first.onTap = (int index, String title, {String? subtitle}) {
+      groupNotifier.value = null;
+    };
     for (var tile in groupTileData) {
       tile.dense = false;
       tile.selected = false;
@@ -86,6 +80,10 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
     final List<TileData> conferenceTileData = TileData.from([
       conferenceEditWidget,
     ]);
+    conferenceTileData.first.onTap =
+        (int index, String title, {String? subtitle}) {
+      conferenceNotifier.value = null;
+    };
     for (var tile in conferenceTileData) {
       tile.dense = false;
       tile.selected = false;

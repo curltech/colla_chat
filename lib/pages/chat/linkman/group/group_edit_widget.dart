@@ -27,26 +27,6 @@ import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-final List<PlatformDataField> groupDataField = [
-  PlatformDataField(
-      name: 'peerId',
-      label: 'PeerId',
-      inputType: InputType.label,
-      prefixIcon: Icon(Icons.perm_identity, color: myself.primary)),
-  PlatformDataField(
-      name: 'name',
-      label: 'Name',
-      prefixIcon: Icon(Icons.person, color: myself.primary)),
-  PlatformDataField(
-      name: 'alias',
-      label: 'Alias',
-      prefixIcon: Icon(Icons.person_pin_sharp, color: myself.primary)),
-  PlatformDataField(
-      name: 'myAlias',
-      label: 'MyAlias',
-      prefixIcon: Icon(Icons.person_pin, color: myself.primary)),
-];
-
 final ValueNotifier<Group?> groupNotifier = ValueNotifier<Group?>(null);
 
 ///创建和修改群，填写群的基本信息，选择群成员和群主
@@ -70,7 +50,27 @@ class GroupEditWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _GroupEditWidgetState extends State<GroupEditWidget> {
-  final FormInputController controller = FormInputController(groupDataField);
+  final List<PlatformDataField> groupDataField = [
+    PlatformDataField(
+        name: 'peerId',
+        label: 'PeerId',
+        inputType: InputType.label,
+        prefixIcon: Icon(Icons.perm_identity, color: myself.primary)),
+    PlatformDataField(
+        name: 'name',
+        label: 'Name',
+        prefixIcon: Icon(Icons.person, color: myself.primary)),
+    PlatformDataField(
+        name: 'alias',
+        label: 'Alias',
+        prefixIcon: Icon(Icons.person_pin_sharp, color: myself.primary)),
+    PlatformDataField(
+        name: 'myAlias',
+        label: 'MyAlias',
+        prefixIcon: Icon(Icons.person_pin, color: myself.primary)),
+  ];
+  late final FormInputController controller =
+      FormInputController(groupDataField);
 
   OptionController groupOwnerController = OptionController();
 
@@ -326,7 +326,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
           content: AppLocalizations.t('Must has group owner'));
       return null;
     }
-    if (current.id == null) {
+    if (currentGroup.id == null) {
       current = await groupService.createGroup(currentGroup.name);
       groupModified = true;
     }
@@ -364,10 +364,10 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
       DialogUtil.info(context,
           content: AppLocalizations.t('Group has stored completely'));
     }
-    var groupId = current.peerId;
+    groupNotifier.value = current;
 
     //对所有的成员发送组变更的消息
-    if (current.id == null) {
+    if (currentGroup.id == null) {
       await groupService.addGroup(current);
     } else {
       if (groupModified) {
@@ -405,11 +405,11 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
         await groupService.removeGroupMember(current, oldMembers);
       }
     }
-    if (current.id == null || groupModified) {
+    if (currentGroup.id == null || groupModified) {
       groupChatSummaryController.refresh();
     }
 
-    if (current.id == null) {
+    if (currentGroup.id == null) {
       setState(() {});
     }
 

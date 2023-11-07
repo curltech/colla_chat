@@ -892,6 +892,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   /// 如果是群消息，拆分多条消息，拆分后的接收者信息被填充
+  /// 拆分的群消息数目是peerIds的数目加一
   /// 如果是非群消息或者拆分过的群消息返回单条消息的数组
   Future<List<ChatMessage>> _buildGroupChatMessages(ChatMessage chatMessage,
       {List<String>? peerIds}) async {

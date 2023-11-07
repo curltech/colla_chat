@@ -489,11 +489,13 @@ class _ChatListWidgetState extends State<ChatListWidget>
         sendReceiveTime = sendReceiveTime != null
             ? DateUtil.formatEasyRead(sendReceiveTime)
             : '';
-        subtitle = _buildSubtitle(
-            subMessageType: subMessageType!,
-            title: title,
-            contentType: chatSummary.contentType,
-            content: chatSummary.content);
+        if (subMessageType!=null) {
+          subtitle = _buildSubtitle(
+              subMessageType: subMessageType!,
+              title: title,
+              contentType: chatSummary.contentType,
+              content: chatSummary.content);
+        }
         var unreadNumber = chatSummary.unreadNumber;
         Conference? conference =
             await conferenceService.findCachedOneByConferenceId(peerId);
