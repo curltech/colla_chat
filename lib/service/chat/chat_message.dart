@@ -33,9 +33,11 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/transport/smsclient.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/livekit/livekit_conference_service_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/websocket.dart';
 import 'package:uuid/uuid.dart';
+import 'package:livekit_server_sdk/src/proto/livekit_models.pb.dart';
 
 class ChatMessageService extends GeneralBaseService<ChatMessage> {
   Timer? timer;
@@ -457,6 +459,59 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         parentMessageId: parentMessageId);
 
     return groupChatMessage;
+  }
+
+  Future<List<ChatMessage>> buildSfuConference(
+      Conference conference, List<String> participants) async {
+    ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+      groupId: conference.conferenceId,
+      groupName: conference.name,
+      groupType: PartyType.conference,
+      title: conference.video
+          ? ChatMessageContentType.video.name
+          : ChatMessageContentType.audio.name,
+      content: conference,
+      messageId: conference.conferenceId,
+      subMessageType: ChatMessageSubType.videoChat,
+    );
+    await store(chatMessage);
+
+    LiveKitConferenceServiceClient serviceClient =
+        liveKitConferenceServiceClientPool.createServiceClient();
+    Room room =
+        await serviceClient.createRoom(roomName: conference.conferenceId);
+    Map<String, dynamic> conferenceMap = JsonUtil.toJson(conference);
+    List<ChatMessage> chatMessages = [chatMessage];
+    for (String participant in participants) {
+      String? name;
+      Linkman? linkman =
+          await linkmanService.findCachedOneByPeerId(participant);
+      if (linkman != null) {
+        name = linkman.name;
+      }
+      String token = serviceClient
+          .createToken(conference.conferenceId, participant, name: name);
+      Conference conf = Conference.fromJson(conferenceMap);
+      conf.sfuUri = serviceClient.host;
+      conf.sfuToken = token;
+
+      chatMessage = await chatMessageService.buildChatMessage(
+        receiverPeerId: participant,
+        groupId: conf.conferenceId,
+        groupName: conf.name,
+        groupType: PartyType.conference,
+        title: conf.video
+            ? ChatMessageContentType.video.name
+            : ChatMessageContentType.audio.name,
+        content: conf,
+        messageId: conf.conferenceId,
+        subMessageType: ChatMessageSubType.videoChat,
+      );
+      await chatMessageService.sendAndStore(chatMessage);
+      chatMessages.add(chatMessage);
+    }
+
+    return chatMessages;
   }
 
   ///收到消息后填写接收者字段，状态字段，接收时间
@@ -926,7 +981,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return chatMessages;
   }
 
-  ///发送消息，并保存本地，由于是先发送后保存，所以新消息的id，createDate等字段是空的
+  ///发送单个的消息到个人或者群（加密方式为群加密），并保存本地，由于是先发送后保存，所以新消息的id，createDate等字段是空的
   ///如果chatMessage的groupType不为空，则是群消息，支持群发
   ///群发的时候peerIds不为空，有值
   Future<List<ChatMessage>> sendAndStore(ChatMessage chatMessage,

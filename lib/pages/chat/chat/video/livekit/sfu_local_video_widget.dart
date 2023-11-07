@@ -14,6 +14,7 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/media_stream_util.dart';
@@ -364,7 +365,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
   }
 
   /// 创建新的会议
-  Future<Conference> _buildConference(
+  Future<List<ChatMessage>> _buildSfuConference(
       {required bool video, required List<String> participants}) async {
     var current = DateTime.now();
     var dateName = current.toLocal().toIso8601String();
@@ -384,12 +385,10 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
       conference.sfu = true;
       conference.sfuUri = '';
     }
-    LiveKitConferenceServiceClient liveKitConferenceServiceClient =
-        liveKitConferenceServiceClientPool.createServiceClient();
-    liveKitConferenceServiceClient.createRoom(
-        roomName: conference.conferenceId);
+    List<ChatMessage> chatMessages =
+        await chatMessageService.buildSfuConference(conference, participants);
 
-    return conference;
+    return chatMessages;
   }
 
   ///创建会议，选择会议参与者，发送会议邀请消息，然后将新会议加入会议池，成为当前会议
@@ -424,34 +423,13 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
         okLabel: 'Video',
         cancelLabel: 'Audio');
     video ??= false;
-    Conference conference =
-        await _buildConference(video: video, participants: participants);
-    LiveKitConferenceServiceClient? liveKitConferenceServiceClient =
-        liveKitConferenceServiceClientPool.getServiceClient();
-    List<String> tokens = liveKitConferenceServiceClient!.createToken(
-        roomName: conference.conferenceId, identities: participants, names: []);
-
-    ///创建并发送邀请消息
-    ChatMessage? chatMessage = await chatMessageController.send(
-        title: conference.video
-            ? ChatMessageContentType.video.name
-            : ChatMessageContentType.audio.name,
-        content: conference,
-        messageId: conference.conferenceId,
-        subMessageType: ChatMessageSubType.videoChat,
-        peerIds: conference.participants);
-    if (chatMessage == null) {
-      logger.e('send video chatMessage failure!');
-      if (mounted) {
-        DialogUtil.error(context,
-            content: AppLocalizations.t('Send videoChat chatMessage failure'));
-      }
-      return;
-    }
+    List<ChatMessage> chatMessages =
+        await _buildSfuConference(video: video, participants: participants);
+    ChatMessage chatMessage = chatMessages.first;
     if (mounted) {
       DialogUtil.info(context,
           content:
-              '${AppLocalizations.t('Send videoChat chatMessage')} ${chatMessage.messageId}');
+              '${AppLocalizations.t('Build sfu conference:')} ${chatMessage.messageId}');
     }
 
     ///根据邀请消息创建会议

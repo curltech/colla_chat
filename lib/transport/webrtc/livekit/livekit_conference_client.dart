@@ -320,24 +320,27 @@ class LiveKitConferenceClientPool with ChangeNotifier {
       ChatMessage chatMessage,
       {ChatSummary? chatSummary}) async {
     return await _clientLock.synchronized(() async {
-      LiveKitConferenceClient? p2pConferenceClient;
+      LiveKitConferenceClient? liveKitConferenceClient;
       //创建基于当前聊天的视频消息控制器
       if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
         String conferenceId = chatMessage.messageId!;
-        p2pConferenceClient = _liveKitConferenceClients[conferenceId];
-        if (p2pConferenceClient == null) {
+        liveKitConferenceClient = _liveKitConferenceClients[conferenceId];
+        if (liveKitConferenceClient == null) {
           ConferenceChatMessageController conferenceChatMessageController =
               ConferenceChatMessageController();
           await conferenceChatMessageController.setChatMessage(chatMessage,
               chatSummary: chatSummary);
-          conferenceChatMessageController.conference?.sfuToken;
-          LiveKitRoomClient liveKitRoomClient = LiveKitRoomClient(token: '');
-          p2pConferenceClient = LiveKitConferenceClient(
-              liveKitRoomClient, conferenceChatMessageController);
-          _liveKitConferenceClients[conferenceId] = p2pConferenceClient;
+          String? token = conferenceChatMessageController.conference?.sfuToken;
+          if (token != null) {
+            LiveKitRoomClient liveKitRoomClient =
+                LiveKitRoomClient(token: token);
+            liveKitConferenceClient = LiveKitConferenceClient(
+                liveKitRoomClient, conferenceChatMessageController);
+            _liveKitConferenceClients[conferenceId] = liveKitConferenceClient;
+          }
         } else {
           ConferenceChatMessageController conferenceChatMessageController =
-              p2pConferenceClient.conferenceChatMessageController;
+              liveKitConferenceClient.conferenceChatMessageController;
           if (conferenceChatMessageController.chatMessage == null) {
             await conferenceChatMessageController.setChatMessage(chatMessage,
                 chatSummary: chatSummary);
@@ -345,10 +348,10 @@ class LiveKitConferenceClientPool with ChangeNotifier {
         }
         this.conferenceId = conferenceId;
 
-        return p2pConferenceClient;
+        return liveKitConferenceClient;
       }
 
-      return p2pConferenceClient;
+      return liveKitConferenceClient;
     });
   }
 
@@ -374,7 +377,7 @@ class LiveKitConferenceClientPool with ChangeNotifier {
   }
 
   ///获取当前的会议
-  LiveKitConferenceClient? get p2pConferenceClient {
+  LiveKitConferenceClient? get liveKitConferenceClient {
     if (_conferenceId != null) {
       return _liveKitConferenceClients[_conferenceId];
     }
@@ -391,27 +394,28 @@ class LiveKitConferenceClientPool with ChangeNotifier {
   }
 
   ///根据会议号返回会议控制器，没有则返回null
-  LiveKitConferenceClient? getP2pConferenceClient(String conferenceId) {
+  LiveKitConferenceClient? getLiveKitConferenceClient(String conferenceId) {
     return _liveKitConferenceClients[conferenceId];
   }
 
   ConferenceChatMessageController? getConferenceChatMessageController(
       String conferenceId) {
-    return getP2pConferenceClient(conferenceId)
+    return getLiveKitConferenceClient(conferenceId)
         ?.conferenceChatMessageController;
   }
 
   Conference? getConference(String conferenceId) {
-    return getP2pConferenceClient(conferenceId)
+    return getLiveKitConferenceClient(conferenceId)
         ?.conferenceChatMessageController
         .conference;
   }
 
   /// 新的连接建立事件，如果各会议的连接中存在已经加入但是连接为建立的情况则更新连接
   onConnected(AdvancedPeerConnection peerConnection) async {
-    for (LiveKitConferenceClient p2pConferenceClient
+    for (LiveKitConferenceClient liveKitConferenceClient
         in _liveKitConferenceClients.values) {
-      await p2pConferenceClient.updateAdvancedPeerConnection(peerConnection);
+      await liveKitConferenceClient
+          .updateAdvancedPeerConnection(peerConnection);
     }
   }
 
@@ -419,11 +423,11 @@ class LiveKitConferenceClientPool with ChangeNotifier {
   addLocalPeerMediaStream(
       String conferenceId, List<PeerMediaStream> peerMediaStreams,
       {AdvancedPeerConnection? peerConnection}) async {
-    LiveKitConferenceClient? p2pConferenceClient =
+    LiveKitConferenceClient? liveKitConferenceClient =
         _liveKitConferenceClients[conferenceId];
-    if (p2pConferenceClient != null) {
-      await p2pConferenceClient.roomClient.setCameraEnabled(true);
-      p2pConferenceClient.roomClient.publishVideoTrack();
+    if (liveKitConferenceClient != null) {
+      await liveKitConferenceClient.roomClient.setCameraEnabled(true);
+      liveKitConferenceClient.roomClient.publishVideoTrack();
     }
   }
 
@@ -431,10 +435,10 @@ class LiveKitConferenceClientPool with ChangeNotifier {
   removeLocalPeerMediaStream(
       String conferenceId, List<PeerMediaStream> peerMediaStreams,
       {AdvancedPeerConnection? peerConnection}) async {
-    LiveKitConferenceClient? p2pConferenceClient =
+    LiveKitConferenceClient? liveKitConferenceClient =
         _liveKitConferenceClients[conferenceId];
-    if (p2pConferenceClient != null) {
-      await p2pConferenceClient.removeLocalPeerMediaStream(peerMediaStreams,
+    if (liveKitConferenceClient != null) {
+      await liveKitConferenceClient.removeLocalPeerMediaStream(peerMediaStreams,
           peerConnection: peerConnection);
     }
   }
@@ -443,10 +447,10 @@ class LiveKitConferenceClientPool with ChangeNotifier {
   ///调用对应会议的退出方法
   exit(String conferenceId) async {
     await _clientLock.synchronized(() async {
-      LiveKitConferenceClient? p2pConferenceClient =
+      LiveKitConferenceClient? liveKitConferenceClient =
           _liveKitConferenceClients[conferenceId];
-      if (p2pConferenceClient != null) {
-        await p2pConferenceClient.exit();
+      if (liveKitConferenceClient != null) {
+        await liveKitConferenceClient.exit();
         if (conferenceId == _conferenceId) {
           _conferenceId = null;
         }
@@ -459,10 +463,10 @@ class LiveKitConferenceClientPool with ChangeNotifier {
   ///调用对应会议的终止方法，然后从会议池中删除，设置当前会议编号为null
   terminate(String conferenceId) async {
     await _clientLock.synchronized(() async {
-      LiveKitConferenceClient? p2pConferenceClient =
+      LiveKitConferenceClient? liveKitConferenceClient =
           _liveKitConferenceClients[conferenceId];
-      if (p2pConferenceClient != null) {
-        await p2pConferenceClient.terminate();
+      if (liveKitConferenceClient != null) {
+        await liveKitConferenceClient.terminate();
         _liveKitConferenceClients.remove(conferenceId);
         if (conferenceId == _conferenceId) {
           _conferenceId = null;

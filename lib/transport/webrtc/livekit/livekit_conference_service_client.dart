@@ -14,24 +14,44 @@ class LiveKitConferenceServiceClient {
   }
 
   /// CreateToken 创建新的token，这个token在客户端连接房间的时候要使用
-  List<String> createToken({required String roomName, required List<String> identities,
-      required List<String> names, Duration? ttl, String? metadata}) {
+  List<String> createTokens(
+      {required String roomName,
+      required List<String> identities,
+      List<String>? names,
+      Duration? ttl,
+      String? metadata}) {
     List<String> tokens = [];
     int i = 0;
     for (String identity in identities) {
-      String name = names[i];
-      var ato = AccessTokenOptions(
-          ttl: ttl, name: name, identity: identity, metadata: metadata);
-      var videoGrant = VideoGrant(room: roomName, roomJoin: true);
-      var claimGrants = ClaimGrants(name: name, video: videoGrant);
-      var at = AccessToken(apiKey, apiSecret,
-          identity: identity, ttl: ttl, options: ato, grants: claimGrants);
-      i++;
-      String token = at.toJwt();
+      String? name;
+      if (names != null) {
+        name = names[i];
+      }
+      String token = createToken(roomName, identity,
+          name: name, ttl: ttl, metadata: metadata);
       tokens.add(token);
+      i++;
     }
 
     return tokens;
+  }
+
+  String createToken(
+    String roomName,
+    String identity, {
+    String? name,
+    Duration? ttl,
+    String? metadata,
+  }) {
+    var ato = AccessTokenOptions(
+        ttl: ttl, name: name, identity: identity, metadata: metadata);
+    var videoGrant = VideoGrant(room: roomName, roomJoin: true);
+    var claimGrants = ClaimGrants(name: name, video: videoGrant);
+    var at = AccessToken(apiKey, apiSecret,
+        identity: identity, ttl: ttl, options: ato, grants: claimGrants);
+    String token = at.toJwt();
+
+    return token;
   }
 
   Future<Room> createRoom(
@@ -39,6 +59,7 @@ class LiveKitConferenceServiceClient {
       Duration? emptyTimeout,
       int? maxParticipants,
       String? nodeId}) async {
+    emptyTimeout ??= const Duration(hours: 4);
     CreateOptions options = CreateOptions(
         name: roomName,
         emptyTimeout: emptyTimeout,

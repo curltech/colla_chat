@@ -314,6 +314,18 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
           content: AppLocalizations.t('Must has conference topic'));
       return null;
     }
+    // if (currentConference.sfu) {
+    //   if (StringUtil.isEmpty(current.sfuUri)) {
+    //     DialogUtil.error(context,
+    //         content: AppLocalizations.t('Must has conference sfu uri'));
+    //     return null;
+    //   }
+    //   if (StringUtil.isEmpty(current.sfuToken)) {
+    //     DialogUtil.error(context,
+    //         content: AppLocalizations.t('Must has conference sfu token'));
+    //     return null;
+    //   }
+    // }
     if (currentConference.id == null) {
       var participants = conferenceMembers.value;
       if (!participants.contains(myself.peerId!)) {
@@ -386,18 +398,27 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     ///对linkman模式下，conference是临时的，不保存数据库
     ///对group和conference模式下，conference是永久的，保存数据库，可以以后重新加入
     if (currentConference.id == null) {
-      ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
-        current.conferenceId,
-        PartyType.conference,
-        title: current.video
-            ? ChatMessageContentType.video.name
-            : ChatMessageContentType.audio.name,
-        content: current,
-        messageId: current.conferenceId,
-        subMessageType: ChatMessageSubType.videoChat,
-      );
-      await chatMessageService.sendAndStore(chatMessage,
-          cryptoOption: CryptoOption.group, peerIds: current.participants);
+      bool sfu = current.sfu;
+      if (sfu) {
+        List<String>? participants = current.participants;
+        if (participants != null) {
+          await chatMessageService.buildSfuConference(current, participants);
+        }
+      } else {
+        ChatMessage chatMessage =
+            await chatMessageService.buildGroupChatMessage(
+          current.conferenceId,
+          PartyType.conference,
+          title: current.video
+              ? ChatMessageContentType.video.name
+              : ChatMessageContentType.audio.name,
+          content: current,
+          messageId: current.conferenceId,
+          subMessageType: ChatMessageSubType.videoChat,
+        );
+        await chatMessageService.sendAndStore(chatMessage,
+            cryptoOption: CryptoOption.group, peerIds: current.participants);
+      }
     }
 
     if (conferenceController.current == null) {
