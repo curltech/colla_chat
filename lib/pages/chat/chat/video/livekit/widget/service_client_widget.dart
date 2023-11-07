@@ -1,7 +1,7 @@
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/transport/webrtc/livekit/livekit_conference_service_client.dart';
+import 'package:colla_chat/transport/webrtc/livekit/sfu_conference_service_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';

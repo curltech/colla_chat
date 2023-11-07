@@ -18,10 +18,8 @@ import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/media_stream_util.dart';
-import 'package:colla_chat/transport/webrtc/livekit/livekit_conference_client.dart';
-import 'package:colla_chat/transport/webrtc/livekit/livekit_conference_service_client.dart';
+import 'package:colla_chat/transport/webrtc/livekit/sfu_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controller.dart';
-import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
@@ -30,7 +28,6 @@ import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:livekit_server_sdk/src/proto/livekit_models.pb.dart';
 
 ///sfu模式下本地视频通话显示和拨出的窗口，显示多个本地视频，音频和屏幕共享的小视频窗口
 ///各种功能按钮，创建会议，邀请参与者，加入会议，可以切换视频和音频，添加屏幕共享视频

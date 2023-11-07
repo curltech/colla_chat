@@ -33,7 +33,7 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/transport/smsclient.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
-import 'package:colla_chat/transport/webrtc/livekit/livekit_conference_service_client.dart';
+import 'package:colla_chat/transport/webrtc/livekit/sfu_conference_service_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/websocket.dart';
 import 'package:uuid/uuid.dart';

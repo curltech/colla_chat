@@ -6,14 +6,11 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.da
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/video/livekit/sfu_local_video_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/livekit/sfu_remote_video_widget.dart';
-import 'package:colla_chat/pages/chat/chat/video/p2p/local_video_widget.dart';
-import 'package:colla_chat/pages/chat/chat/video/p2p/remote_video_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/p2p/video_conference_pool_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/transport/webrtc/livekit/livekit_conference_client.dart';
-import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
+import 'package:colla_chat/transport/webrtc/livekit/sfu_conference_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/drag_overlay.dart';
