@@ -4,12 +4,15 @@ import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/video/livekit/sfu_local_video_widget.dart';
+import 'package:colla_chat/pages/chat/chat/video/livekit/sfu_remote_video_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/p2p/local_video_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/p2p/remote_video_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/p2p/video_conference_pool_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/transport/webrtc/livekit/livekit_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -20,8 +23,8 @@ import 'package:flutter/material.dart';
 ///Sfu视频聊天窗口，分页显示本地视频和远程视频
 class SfuVideoChatWidget extends StatefulWidget with TileDataMixin {
   DragOverlay? overlayEntry;
-  final LocalVideoWidget localVideoWidget = const LocalVideoWidget();
-  final RemoteVideoWidget remoteVideoWidget = const RemoteVideoWidget();
+  final SfuLocalVideoWidget localVideoWidget = const SfuLocalVideoWidget();
+  final SfuRemoteVideoWidget remoteVideoWidget = const SfuRemoteVideoWidget();
   final VideoConferencePoolWidget videoConferencePoolWidget =
       VideoConferencePoolWidget();
 
@@ -53,7 +56,7 @@ class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {
   ValueNotifier<ConferenceChatMessageController?>
       conferenceChatMessageController =
       ValueNotifier<ConferenceChatMessageController?>(
-          p2pConferenceClientPool.conferenceChatMessageController);
+          liveKitConferenceClientPool.conferenceChatMessageController);
   ChatSummary chatSummary = chatMessageController.chatSummary!;
   SwiperController swiperController = SwiperController();
   ValueNotifier<int> index = ValueNotifier<int>(0);
@@ -68,12 +71,12 @@ class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {
         widget.overlayEntry = null;
       }
     } catch (e) {}
-    p2pConferenceClientPool.addListener(_update);
+    liveKitConferenceClientPool.addListener(_update);
   }
 
   _update() {
     conferenceChatMessageController.value =
-        p2pConferenceClientPool.conferenceChatMessageController;
+        liveKitConferenceClientPool.conferenceChatMessageController;
   }
 
   ///关闭最小化界面，把本界面显示
@@ -181,10 +184,10 @@ class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {
       withLeading: true,
       rightWidgets: rightWidgets,
       leadingCallBack: () {
-        bool? joined = p2pConferenceClientPool.p2pConferenceClient?.joined;
-        if (joined != null && joined) {
-          _minimize(context);
-        }
+        // bool? joined = liveKitConferenceClientPool.liveKitConferenceClient?.joined;
+        // if (joined != null && joined) {
+        //   _minimize(context);
+        // }
       },
       child: videoChatView,
     );
@@ -219,7 +222,7 @@ class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {
 
   @override
   void dispose() {
-    p2pConferenceClientPool.removeListener(_update);
+    liveKitConferenceClientPool.removeListener(_update);
     super.dispose();
   }
 }

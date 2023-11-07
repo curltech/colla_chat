@@ -79,14 +79,15 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
         PeerMediaStreamOperator.add.name, _updatePeerMediaStream);
     localPeerMediaStreamController.registerPeerMediaStreamOperator(
         PeerMediaStreamOperator.remove.name, _updatePeerMediaStream);
-    p2pConferenceClientPool.addListener(_updateConferenceChatMessageController);
+    liveKitConferenceClientPool
+        .addListener(_updateConferenceChatMessageController);
     _updateConferenceChatMessageController();
     _update();
   }
 
   _updateConferenceChatMessageController() {
     ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClientPool.conferenceChatMessageController;
+        liveKitConferenceClientPool.conferenceChatMessageController;
     if (conferenceChatMessageController != null) {
       conferenceChatMessageController.addListener(_updateVideoChatStatus);
       videoChatStatus.value = conferenceChatMessageController.status;
@@ -98,7 +99,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
 
   _updateVideoChatStatus() {
     ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClientPool.conferenceChatMessageController;
+        liveKitConferenceClientPool.conferenceChatMessageController;
     if (conferenceChatMessageController != null) {
       videoChatStatus.value = conferenceChatMessageController.status;
       if (mounted) {
@@ -111,13 +112,13 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
 
   _playAudio() {
     var conferenceChatMessageController =
-        p2pConferenceClientPool.conferenceChatMessageController;
+        liveKitConferenceClientPool.conferenceChatMessageController;
     conferenceChatMessageController?.playAudio('assets/medias/call.mp3', true);
   }
 
   _stopAudio() async {
     var conferenceChatMessageController =
-        p2pConferenceClientPool.conferenceChatMessageController;
+        liveKitConferenceClientPool.conferenceChatMessageController;
     conferenceChatMessageController?.stopAudio(
         filename: 'assets/medias/close.mp3');
   }
@@ -180,26 +181,27 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
 
   ///在视频会议中增加本地视频到会议的所有连接
   addLocalPeerMediaStream(PeerMediaStream peerMediaStream) async {
-    P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.p2pConferenceClient;
+    LiveKitConferenceClient? liveKitConferenceClient =
+        liveKitConferenceClientPool.liveKitConferenceClient;
     ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClient?.conferenceChatMessageController;
+        liveKitConferenceClient?.conferenceChatMessageController;
     Conference? conference = conferenceChatMessageController?.conference;
     VideoChatStatus? status = conferenceChatMessageController?.status;
     if (conference != null && status == VideoChatStatus.chatting) {
-      await p2pConferenceClient?.addLocalPeerMediaStream([peerMediaStream]);
+      //await liveKitConferenceClient?.addLocalPeerMediaStream([peerMediaStream]);
     }
   }
 
   ///在视频会议中删除本地视频到会议的所有连接
   removeLocalPeerMediaStream(PeerMediaStream peerMediaStream) async {
-    P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.p2pConferenceClient;
+    LiveKitConferenceClient? liveKitConferenceClient =
+        liveKitConferenceClientPool.liveKitConferenceClient;
     ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClient?.conferenceChatMessageController;
+        liveKitConferenceClient?.conferenceChatMessageController;
     Conference? conference = conferenceChatMessageController?.conference;
     if (conference != null) {
-      await p2pConferenceClient?.removeLocalPeerMediaStream([peerMediaStream]);
+      await liveKitConferenceClient
+          ?.removeLocalPeerMediaStream([peerMediaStream]);
     }
   }
 
@@ -262,7 +264,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
 
   Future<PeerMediaStream?> _openMediaStream(MediaStream stream) async {
     ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClientPool.conferenceChatMessageController;
+        liveKitConferenceClientPool.conferenceChatMessageController;
     ChatMessage? chatMessage = conferenceChatMessageController?.chatMessage;
     if (chatMessage == null) {
       DialogUtil.error(context, content: AppLocalizations.t('No conference'));
@@ -433,17 +435,18 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     }
 
     ///根据邀请消息创建会议
-    LiveKitConferenceClient? p2pConferenceClient =
+    LiveKitConferenceClient? liveKitConferenceClient =
         await liveKitConferenceClientPool.createLiveKitConferenceClient(
             chatSummary: chatSummary, chatMessage);
     conferenceChatMessageController =
-        p2pConferenceClient?.conferenceChatMessageController;
-    if (p2pConferenceClient == null ||
+        liveKitConferenceClient?.conferenceChatMessageController;
+    if (liveKitConferenceClient == null ||
         conferenceChatMessageController == null) {
-      logger.e('createP2pConferenceClient failure!');
+      logger.e('createLiveKitConferenceClient failure!');
       if (mounted) {
         DialogUtil.error(context,
-            content: AppLocalizations.t('CreateP2pConferenceClient failure'));
+            content:
+                AppLocalizations.t('CreateLiveKitConferenceClient failure'));
       }
       return;
     }
@@ -469,7 +472,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
       return;
     }
     ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClientPool.conferenceChatMessageController;
+        liveKitConferenceClientPool.conferenceChatMessageController;
     if (conferenceChatMessageController == null) {
       if (mounted) {
         DialogUtil.error(context,
@@ -503,14 +506,15 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
   ///关闭并且移除本地所有的视频，这时候还能看远程的视频
   _close() async {
     var peerMediaStreams = localPeerMediaStreamController.peerMediaStreams;
-    P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.p2pConferenceClient;
+    LiveKitConferenceClient? liveKitConferenceClient =
+        liveKitConferenceClientPool.liveKitConferenceClient;
     ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClient?.conferenceChatMessageController;
+        liveKitConferenceClient?.conferenceChatMessageController;
     Conference? conference = conferenceChatMessageController?.conference;
     //从webrtc连接中移除流
     if (conference != null) {
-      await p2pConferenceClient?.removeLocalPeerMediaStream(peerMediaStreams);
+      await liveKitConferenceClient
+          ?.removeLocalPeerMediaStream(peerMediaStreams);
     }
     await localPeerMediaStreamController.closeAll();
     _update();
@@ -520,10 +524,10 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
   _hangup() async {
     _stopAudio();
     await localPeerMediaStreamController.closeAll();
-    P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.p2pConferenceClient;
+    LiveKitConferenceClient? liveKitConferenceClient =
+        liveKitConferenceClientPool.liveKitConferenceClient;
     ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClient?.conferenceChatMessageController;
+        liveKitConferenceClient?.conferenceChatMessageController;
     conferenceChatMessageController?.status = VideoChatStatus.end;
   }
 
@@ -531,15 +535,15 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
   ///如果正在通话chatting，挂断视频通话，关闭所有的本地视频和远程视频，呼叫状态改为结束
   ///结束会议，这时候本地和远程的视频都应该被关闭
   _exit() async {
-    P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.p2pConferenceClient;
+    LiveKitConferenceClient? liveKitConferenceClient =
+        liveKitConferenceClientPool.liveKitConferenceClient;
     ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClient?.conferenceChatMessageController;
+        liveKitConferenceClient?.conferenceChatMessageController;
     var status = conferenceChatMessageController?.status;
     if (status == VideoChatStatus.chatting) {
       await _close();
-      await p2pConferenceClient?.exit();
-      p2pConferenceClientPool.conferenceId = null;
+      await liveKitConferenceClient?.exit();
+      liveKitConferenceClientPool.conferenceId = null;
     }
     conferenceChatMessageController?.status = VideoChatStatus.end;
   }
@@ -636,7 +640,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
             onPressed: () async {
               speakerStatus.value = !speakerStatus.value;
               var conferenceChatMessageController =
-                  p2pConferenceClientPool.conferenceChatMessageController;
+                  liveKitConferenceClientPool.conferenceChatMessageController;
               await MediaStreamUtil.setSpeakerphoneOn(status);
               // await conferenceChatMessageController?.setAudioContext(
               //     route: status
@@ -706,7 +710,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
             String? label;
             String? tip;
             ConferenceChatMessageController? conferenceChatMessageController =
-                p2pConferenceClientPool.conferenceChatMessageController;
+                liveKitConferenceClientPool.conferenceChatMessageController;
             String? partyType = chatSummary.partyType;
             Conference? conference =
                 conferenceChatMessageController?.conference;
@@ -778,13 +782,13 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     //从map中移除
     localPeerMediaStreamController.remove(peerMediaStream);
     ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClientPool.conferenceChatMessageController;
+        liveKitConferenceClientPool.conferenceChatMessageController;
     if (conferenceChatMessageController != null &&
         conferenceChatMessageController.conference != null) {
       //在会议中，如果是本地流，先所有的webrtc连接中移除
       String conferenceId =
           conferenceChatMessageController.conference!.conferenceId;
-      await p2pConferenceClientPool
+      await liveKitConferenceClientPool
           .removeLocalPeerMediaStream(conferenceId, [peerMediaStream]);
     }
     //流关闭
@@ -799,7 +803,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
         builder: (context, value, child) {
           if (value > 0) {
             ConferenceChatMessageController? conferenceChatMessageController =
-                p2pConferenceClientPool.conferenceChatMessageController;
+                liveKitConferenceClientPool.conferenceChatMessageController;
             return VideoViewCard(
               peerMediaStreamController: localPeerMediaStreamController,
               onClosed: _onClosedPeerMediaStream,
@@ -830,9 +834,9 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     localPeerMediaStreamController.unregisterPeerMediaStreamOperator(
         PeerMediaStreamOperator.remove.name, _updatePeerMediaStream);
     var conferenceChatMessageController =
-        p2pConferenceClientPool.conferenceChatMessageController;
+        liveKitConferenceClientPool.conferenceChatMessageController;
     conferenceChatMessageController?.removeListener(_updateVideoChatStatus);
-    p2pConferenceClientPool
+    liveKitConferenceClientPool
         .removeListener(_updateConferenceChatMessageController);
     conferenceChatMessageController?.stopAudio();
     super.dispose();
