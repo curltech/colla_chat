@@ -12,6 +12,7 @@ import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controller.dart';
 import 'package:colla_chat/pages/chat/chat/full_screen_chat_message_widget.dart';
+import 'package:colla_chat/pages/chat/chat/sfu_video_chat_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video_chat_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/group/group_edit_widget.dart';
 import 'package:colla_chat/platform.dart';
@@ -46,6 +47,7 @@ class ChatMessageView extends StatefulWidget with TileDataMixin {
   final FullScreenChatMessageWidget fullScreenChatMessageWidget =
       const FullScreenChatMessageWidget();
   final VideoChatWidget videoChatWidget = VideoChatWidget();
+  final SfuVideoChatWidget sfuVideoChatWidget = SfuVideoChatWidget();
   final ChatMessageWidget chatMessageWidget = ChatMessageWidget();
   final ChatMessageInputWidget chatMessageInputWidget =
       ChatMessageInputWidget();
@@ -55,6 +57,7 @@ class ChatMessageView extends StatefulWidget with TileDataMixin {
   }) : super(key: key) {
     indexWidgetProvider.define(fullScreenChatMessageWidget);
     indexWidgetProvider.define(videoChatWidget);
+    indexWidgetProvider.define(sfuVideoChatWidget);
   }
 
   @override

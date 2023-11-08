@@ -18,47 +18,64 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-final List<PlatformDataField> readOnlyConferenceDataField = [
-  PlatformDataField(
-      name: 'conferenceId',
-      label: 'ConferenceId',
-      inputType: InputType.label,
-      prefixIcon: Icon(Icons.meeting_room, color: myself.primary)),
-  PlatformDataField(
-      name: 'name',
-      label: 'Name',
-      inputType: InputType.label,
-      prefixIcon: Icon(Icons.person, color: myself.primary)),
-  PlatformDataField(
-      name: 'topic',
-      label: 'Topic',
-      inputType: InputType.label,
-      prefixIcon: Icon(Icons.topic, color: myself.primary)),
-  PlatformDataField(
-      name: 'conferenceOwnerPeerId',
-      label: 'ConferenceOwnerPeerId',
-      inputType: InputType.label,
-      prefixIcon: Icon(Icons.perm_identity, color: myself.primary)),
-  PlatformDataField(
-      name: 'video',
-      label: 'Video',
-      inputType: InputType.label,
-      prefixIcon: Icon(Icons.video_call, color: myself.primary)),
-  PlatformDataField(
-      name: 'startDate',
-      label: 'StartDate',
-      inputType: InputType.label,
-      prefixIcon: Icon(Icons.start, color: myself.primary)),
-  PlatformDataField(
-      name: 'endDate',
-      label: 'EndDate',
-      inputType: InputType.label,
-      prefixIcon: Icon(Icons.pin_end, color: myself.primary)),
-];
-
 ///显示会议的基本信息，会议成员和会议发起人
 class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
-  final FormInputController controller =
+  final List<PlatformDataField> readOnlyConferenceDataField = [
+    PlatformDataField(
+        name: 'conferenceId',
+        label: 'ConferenceId',
+        inputType: InputType.label,
+        prefixIcon: Icon(Icons.meeting_room, color: myself.primary)),
+    PlatformDataField(
+        name: 'name',
+        label: 'Name',
+        inputType: InputType.label,
+        prefixIcon: Icon(Icons.person, color: myself.primary)),
+    PlatformDataField(
+        name: 'topic',
+        label: 'Topic',
+        inputType: InputType.label,
+        prefixIcon: Icon(Icons.topic, color: myself.primary)),
+    PlatformDataField(
+        name: 'conferenceOwnerPeerId',
+        label: 'ConferenceOwnerPeerId',
+        inputType: InputType.label,
+        prefixIcon: Icon(Icons.perm_identity, color: myself.primary)),
+    PlatformDataField(
+        name: 'video',
+        label: 'Video',
+        inputType: InputType.label,
+        prefixIcon: Icon(Icons.video_call, color: myself.primary)),
+    PlatformDataField(
+        name: 'startDate',
+        label: 'StartDate',
+        inputType: InputType.label,
+        prefixIcon: Icon(Icons.start, color: myself.primary)),
+    PlatformDataField(
+        name: 'endDate',
+        label: 'EndDate',
+        inputType: InputType.label,
+        prefixIcon: Icon(Icons.pin_end, color: myself.primary)),
+    PlatformDataField(
+      name: 'sfu',
+      label: 'Sfu',
+      inputType: InputType.label,
+      prefixIcon: Icon(Icons.switch_access_shortcut, color: myself.primary),
+    ),
+    PlatformDataField(
+      name: 'sfuUri',
+      label: 'SfuUri',
+      inputType: InputType.label,
+      prefixIcon: Icon(Icons.edit_location_outlined, color: myself.primary),
+    ),
+    PlatformDataField(
+      name: 'sfuToken',
+      label: 'SfuToken',
+      inputType: InputType.label,
+      prefixIcon: Icon(Icons.token, color: myself.primary),
+    ),
+  ];
+  late final FormInputController controller =
       FormInputController(readOnlyConferenceDataField);
   final bool hasTitle;
 

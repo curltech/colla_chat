@@ -12,6 +12,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/transport/webrtc/livekit/sfu_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
@@ -48,6 +49,28 @@ class VideoChatMessage extends StatelessWidget {
     }
 
     return valid;
+  }
+
+  _join() async {
+    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    if (chatSummary != null) {
+      String? content = chatMessage.content;
+      if (content != null) {
+        content = chatMessageService.recoverContent(content);
+        Map<String, dynamic> json = JsonUtil.toJson(content);
+        Conference conference = Conference.fromJson(json);
+        if (conference.sfu) {
+          await liveKitConferenceClientPool.createLiveKitConferenceClient(
+              chatSummary: chatSummary, chatMessage);
+          indexWidgetProvider.push('sfu_video_chat');
+
+          return;
+        }
+      }
+      await p2pConferenceClientPool.createP2pConferenceClient(
+          chatSummary: chatSummary, chatMessage);
+      indexWidgetProvider.push('video_chat');
+    }
   }
 
   @override
@@ -89,17 +112,7 @@ class VideoChatMessage extends StatelessWidget {
           dense: false,
           prefix: IconButton(
               tooltip: AppLocalizations.t('Join conference'),
-              onPressed: valid
-                  ? () async {
-                      ChatSummary? chatSummary =
-                          chatMessageController.chatSummary;
-                      if (chatSummary != null) {
-                        await p2pConferenceClientPool.createP2pConferenceClient(
-                            chatSummary: chatSummary, chatMessage);
-                        indexWidgetProvider.push('video_chat');
-                      }
-                    }
-                  : null,
+              onPressed: valid ? _join : null,
               iconSize: AppIconSize.mdSize,
               icon: Icon(
                 conference.video ? Icons.video_call : Icons.multitrack_audio,
