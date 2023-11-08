@@ -630,7 +630,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
     if (partyType == PartyType.conference.name) {
       rightWidgets.add(IconButton(
         onPressed: () {
-          indexWidgetProvider.push('conference_add');
+          indexWidgetProvider.push('conference_edit');
         },
         icon: const Icon(Icons.more_vert),
         tooltip: AppLocalizations.t('More'),
