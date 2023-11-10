@@ -29,17 +29,29 @@ class PeerMediaStream {
   String? id;
   MediaStream? mediaStream;
   livekit_client.VideoTrack? videoTrack;
+  livekit_client.AudioTrack? audioTrack;
+  livekit_client.Participant? participant;
 
   //业务相关的数据
   String? peerId;
   String? name;
   String? clientId;
 
-  PeerMediaStream({this.mediaStream, this.videoTrack}) {
+  PeerMediaStream({
+    this.mediaStream,
+    this.videoTrack,
+    this.audioTrack,
+    this.participant,
+    this.peerId,
+    this.clientId,
+    this.name,
+  }) {
     if (mediaStream != null) {
       id = mediaStream!.id;
     } else if (videoTrack != null) {
       id = videoTrack!.mediaStream.id;
+    } else if (audioTrack != null) {
+      id = audioTrack!.mediaStream.id;
     }
   }
 
@@ -49,6 +61,8 @@ class PeerMediaStream {
       a = mediaStream!.getAudioTracks().isNotEmpty;
     } else if (videoTrack != null) {
       a = videoTrack!.mediaStream.getAudioTracks().isNotEmpty;
+    } else if (audioTrack != null) {
+      a = audioTrack!.mediaStream.getAudioTracks().isNotEmpty;
     }
 
     return a;

@@ -3,6 +3,7 @@ import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:livekit_client/livekit_client.dart' as livekit_client;
 
 /// 媒体流绑定渲染器，并创建展示视图
 class P2pMediaRenderView extends StatefulWidget {
@@ -45,7 +46,20 @@ class _P2pMediaRenderViewState extends State<P2pMediaRenderView> {
   bindRTCVideoRender() async {
     RTCVideoRenderer renderer = this.renderer;
     await renderer.initialize();
-    renderer.srcObject = widget.peerMediaStream.mediaStream;
+    MediaStream? mediaStream = widget.peerMediaStream.mediaStream;
+    if (mediaStream == null) {
+      livekit_client.VideoTrack? videoTrack = widget.peerMediaStream.videoTrack;
+      if (videoTrack != null) {
+        mediaStream = videoTrack.mediaStream;
+      } else {
+        livekit_client.AudioTrack? audioTrack =
+            widget.peerMediaStream.audioTrack;
+        if (audioTrack != null) {
+          mediaStream = audioTrack.mediaStream;
+        }
+      }
+    }
+    renderer.srcObject = mediaStream;
     this.renderer = renderer;
     readyRenderer.value = true;
   }

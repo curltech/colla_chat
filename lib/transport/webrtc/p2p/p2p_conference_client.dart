@@ -25,8 +25,11 @@ class P2pConferencePeerConnection {
 ///视频会议客户端，代表一个正在进行的视频会议，
 ///包含一个必须的视频会议消息控制器和一个会议内的所有的webrtc连接及其包含的远程视频，
 ///这些连接与自己正在视频通话
-class P2pConferenceClient extends PeerMediaStreamController {
+class P2pConferenceClient {
   final Key key = UniqueKey();
+
+  PeerMediaStreamController remotePeerMediaStreamController =
+      PeerMediaStreamController();
 
   // 参与者的webrtc连接，如果连接为null，说明加入会议，但是连接还没有建立
   final Map<String, Set<String>> _participants = {};
@@ -42,6 +45,14 @@ class P2pConferenceClient extends PeerMediaStreamController {
   final ConferenceChatMessageController conferenceChatMessageController;
 
   P2pConferenceClient({required this.conferenceChatMessageController});
+
+  List<PeerMediaStream> get localPeerMediaStreams {
+    return localPeerMediaStreamController.peerMediaStreams;
+  }
+
+  List<PeerMediaStream> get remotePeerMediaStreams {
+    return remotePeerMediaStreamController.peerMediaStreams;
+  }
 
   /// 获取本会议的所有连接
   Future<List<AdvancedPeerConnection>> get peerConnections async {
@@ -113,7 +124,7 @@ class P2pConferenceClient extends PeerMediaStreamController {
     }
   }
 
-  ///自己退出会议，从所有的连接中移除本地流和远程流
+  /// 自己退出会议，从所有的连接中移除本地流和远程流
   exit() async {
     _joined = false;
     await conferenceChatMessageController.exit();
@@ -240,11 +251,11 @@ class P2pConferenceClient extends PeerMediaStreamController {
   _removeRemotePeerMediaStream(AdvancedPeerConnection peerConnection) async {
     var peerId = peerConnection.peerId;
     var clientId = peerConnection.clientId;
-    List<PeerMediaStream> peerMediaStreams =
-        getPeerMediaStreams(peerId, clientId: clientId);
+    List<PeerMediaStream> peerMediaStreams = remotePeerMediaStreamController
+        .getPeerMediaStreams(peerId, clientId: clientId);
     if (peerMediaStreams.isNotEmpty) {
       for (var peerMediaStream in peerMediaStreams) {
-        await close(peerMediaStream);
+        await remotePeerMediaStreamController.close(peerMediaStream);
       }
     }
   }
@@ -331,14 +342,15 @@ class P2pConferenceClient extends PeerMediaStreamController {
   Future<void> _onAddRemoteStream(
       MediaStream stream, String peerId, String clientId, String name) async {
     String streamId = stream.id;
-    PeerMediaStream? peerMediaStream = await getPeerMediaStream(streamId);
+    PeerMediaStream? peerMediaStream =
+        await remotePeerMediaStreamController.getPeerMediaStream(streamId);
     if (peerMediaStream != null) {
       return;
     }
     peerMediaStream = PeerMediaStream();
     await peerMediaStream.buildMediaStream(peerId,
         mediaStream: stream, clientId: clientId, name: name);
-    add(peerMediaStream);
+    remotePeerMediaStreamController.add(peerMediaStream);
   }
 
   ///远程关闭流事件触发，激活remove事件
@@ -346,11 +358,12 @@ class P2pConferenceClient extends PeerMediaStreamController {
     Map<String, dynamic> data = webrtcEvent.data;
     MediaStream? stream = data['stream'];
     if (stream != null) {
-      PeerMediaStream? peerMediaStream = await getPeerMediaStream(stream.id);
+      PeerMediaStream? peerMediaStream =
+          await remotePeerMediaStreamController.getPeerMediaStream(stream.id);
       if (peerMediaStream != null) {
         var mediaStream = peerMediaStream.mediaStream;
         if (mediaStream != null) {
-          await close(peerMediaStream);
+          await remotePeerMediaStreamController.close(peerMediaStream);
         }
       }
     } else {
@@ -361,8 +374,8 @@ class P2pConferenceClient extends PeerMediaStreamController {
   ///终止会议，移除所有的webrtc连接
   ///激活exit事件
   terminate() async {
-    currentPeerMediaStream = null;
-    mainPeerMediaStream = null;
+    remotePeerMediaStreamController.currentPeerMediaStream = null;
+    remotePeerMediaStreamController.mainPeerMediaStream = null;
     if (conferenceChatMessageController.conferenceId != null) {
       conferenceService.update({'status': EntityStatus.expired.name},
           where: 'conferenceId=?',
@@ -370,9 +383,9 @@ class P2pConferenceClient extends PeerMediaStreamController {
     }
     await exit();
     _participants.clear();
-    peerMediaStreams.clear();
+    remotePeerMediaStreamController.peerMediaStreams.clear();
     conferenceChatMessageController.terminate();
-    await onPeerMediaStreamOperator(
+    await remotePeerMediaStreamController.onPeerMediaStreamOperator(
         PeerMediaStreamOperator.terminate.name, null);
   }
 }
@@ -515,8 +528,8 @@ class P2pConferenceClientPool with ChangeNotifier {
     }
   }
 
-  ///根据会议编号退出会议
-  ///调用对应会议的退出方法
+  /// 根据会议编号退出会议
+  /// 调用对应会议的退出方法
   exit(String conferenceId) async {
     await _clientLock.synchronized(() async {
       P2pConferenceClient? p2pConferenceClient =

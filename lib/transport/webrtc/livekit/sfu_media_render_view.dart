@@ -1,3 +1,4 @@
+import 'package:colla_chat/transport/webrtc/p2p/p2p_media_render_view.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -64,6 +65,10 @@ class _LiveKitMediaRenderViewState extends State<LiveKitMediaRenderView> {
         mirrorMode: widget.mirror
             ? VideoViewMirrorMode.mirror
             : VideoViewMirrorMode.off);
+    Widget? audioView = P2pMediaRenderView(
+        peerMediaStream: widget.peerMediaStream,
+        objectFit: widget.objectFit,
+        mirror: widget.mirror);
     bool audio = widget.peerMediaStream.audio;
     bool video = widget.peerMediaStream.video;
     if (audio && !video) {

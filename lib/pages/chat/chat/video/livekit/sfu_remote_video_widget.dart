@@ -60,11 +60,14 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
       p2pConferenceClient =
           p2pConferenceClientPool.getP2pConferenceClient(conferenceId);
       if (p2pConferenceClient != null) {
-        p2pConferenceClient!.registerPeerMediaStreamOperator(
-            PeerMediaStreamOperator.add.name, _onAddPeerMediaStream);
-        p2pConferenceClient!.registerPeerMediaStreamOperator(
-            PeerMediaStreamOperator.remove.name, _onRemovePeerMediaStream);
-        videoViewCount.value = p2pConferenceClient!.peerMediaStreams.length;
+        p2pConferenceClient!.remotePeerMediaStreamController
+            .registerPeerMediaStreamOperator(
+                PeerMediaStreamOperator.add.name, _onAddPeerMediaStream);
+        p2pConferenceClient!.remotePeerMediaStreamController
+            .registerPeerMediaStreamOperator(
+                PeerMediaStreamOperator.remove.name, _onRemovePeerMediaStream);
+        videoViewCount.value =
+            p2pConferenceClient!.remotePeerMediaStreams.length;
       }
     }
   }
@@ -77,14 +80,14 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
 
   Future<void> _onAddPeerMediaStream(PeerMediaStream? peerMediaStream) async {
     if (p2pConferenceClient != null) {
-      videoViewCount.value = p2pConferenceClient!.peerMediaStreams.length;
+      videoViewCount.value = p2pConferenceClient!.remotePeerMediaStreams.length;
     }
   }
 
   Future<void> _onRemovePeerMediaStream(
       PeerMediaStream? peerMediaStream) async {
     if (p2pConferenceClient != null) {
-      videoViewCount.value = p2pConferenceClient!.peerMediaStreams.length;
+      videoViewCount.value = p2pConferenceClient!.remotePeerMediaStreams.length;
     }
   }
 
@@ -94,7 +97,7 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
     if (p2pConferenceClient == null) {
       return;
     }
-    if (p2pConferenceClient!.peerMediaStreams.isNotEmpty) {
+    if (p2pConferenceClient!.remotePeerMediaStreams.isNotEmpty) {
       // actionData.add(
       //   ActionData(
       //       label: 'Close',
@@ -106,7 +109,7 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
       controlPanelVisible.value = true;
     }
     this.actionData.value = actionData;
-    videoViewCount.value = p2pConferenceClient!.peerMediaStreams.length;
+    videoViewCount.value = p2pConferenceClient!.remotePeerMediaStreams.length;
   }
 
   ///移除远程所有的视频，这时候还能看远程的视频
@@ -116,7 +119,7 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
       return;
     }
     if (p2pConferenceClient != null) {
-      var peerMediaStreams = p2pConferenceClient!.peerMediaStreams;
+      var peerMediaStreams = p2pConferenceClient!.remotePeerMediaStreams;
       Conference? conference = videoChatMessageController.conference;
       if (conference != null) {
         p2pConferenceClientPool.removeLocalPeerMediaStream(
@@ -160,7 +163,7 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
     int count = 0;
     var videoRoomController = p2pConferenceClientPool.p2pConferenceClient;
     if (videoRoomController != null) {
-      count = videoRoomController.peerMediaStreams.length;
+      count = videoRoomController.remotePeerMediaStreams.length;
     }
     if (count == 0) {
       controlPanelVisible.value = true;
@@ -227,7 +230,8 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
           return Container(
               padding: const EdgeInsets.all(0.0),
               child: VideoViewCard(
-                peerMediaStreamController: p2pConferenceClient!,
+                peerMediaStreamController:
+                    p2pConferenceClient!.remotePeerMediaStreamController,
                 onClosed: _onClosedPeerMediaStream,
                 conference: videoChatMessageController.conference,
               ));
@@ -251,7 +255,8 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
           await p2pConferenceClient
               .removeLocalPeerMediaStream([peerMediaStream]);
         } else {
-          await p2pConferenceClient.close(peerMediaStream);
+          await p2pConferenceClient.remotePeerMediaStreamController
+              .close(peerMediaStream);
         }
       } else {
         logger.e('RemotePeerMediaStreamController is null');
@@ -272,10 +277,12 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
   @override
   void dispose() {
     if (p2pConferenceClient != null) {
-      p2pConferenceClient!.unregisterPeerMediaStreamOperator(
-          PeerMediaStreamOperator.add.name, _onAddPeerMediaStream);
-      p2pConferenceClient!.unregisterPeerMediaStreamOperator(
-          PeerMediaStreamOperator.remove.name, _onRemovePeerMediaStream);
+      p2pConferenceClient!.remotePeerMediaStreamController
+          .unregisterPeerMediaStreamOperator(
+              PeerMediaStreamOperator.add.name, _onAddPeerMediaStream);
+      p2pConferenceClient!.remotePeerMediaStreamController
+          .unregisterPeerMediaStreamOperator(
+              PeerMediaStreamOperator.remove.name, _onRemovePeerMediaStream);
     }
     p2pConferenceClientPool.removeListener(_updateVideoChatMessageController);
     super.dispose();
