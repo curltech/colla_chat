@@ -436,15 +436,18 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
       child: ValueListenableBuilder<List<ActionData>>(
           valueListenable: actionData,
           builder: (context, value, child) {
-            return DataActionCard(
-              actions: value,
-              height: height,
-              mainAxisSpacing: 20,
-              crossAxisSpacing: 20,
-              onPressed: _onAction,
-              crossAxisCount: value.length,
-              labelColor: Colors.white,
-            );
+            if (value.isNotEmpty) {
+              return DataActionCard(
+                actions: value,
+                height: height,
+                mainAxisSpacing: 20,
+                crossAxisSpacing: 20,
+                onPressed: _onAction,
+                crossAxisCount: value.length,
+                labelColor: Colors.white,
+              );
+            }
+            return Container();
           }),
     );
   }

@@ -11,6 +11,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
@@ -51,7 +52,7 @@ class VideoChatMessage extends StatelessWidget {
     return valid;
   }
 
-  _join() async {
+  _join(BuildContext context) async {
     ChatSummary? chatSummary = chatMessageController.chatSummary;
     if (chatSummary != null) {
       String? content = chatMessage.content;
@@ -60,9 +61,14 @@ class VideoChatMessage extends StatelessWidget {
         Map<String, dynamic> json = JsonUtil.toJson(content);
         Conference conference = Conference.fromJson(json);
         if (conference.sfu) {
-          await liveKitConferenceClientPool.createLiveKitConferenceClient(
-              chatSummary: chatSummary, chatMessage);
-          indexWidgetProvider.push('sfu_video_chat');
+          try {
+            await liveKitConferenceClientPool.createLiveKitConferenceClient(
+                chatSummary: chatSummary, chatMessage);
+            indexWidgetProvider.push('sfu_video_chat');
+          } catch (e) {
+            DialogUtil.error(context,
+                content: 'createLiveKitConferenceClient failure:$e');
+          }
 
           return;
         }
@@ -112,7 +118,11 @@ class VideoChatMessage extends StatelessWidget {
           dense: false,
           prefix: IconButton(
               tooltip: AppLocalizations.t('Join conference'),
-              onPressed: valid ? _join : null,
+              onPressed: valid
+                  ? () {
+                      _join(context);
+                    }
+                  : null,
               iconSize: AppIconSize.mdSize,
               icon: Icon(
                 conference.video ? Icons.video_call : Icons.multitrack_audio,
