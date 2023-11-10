@@ -19,10 +19,8 @@ import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/media_stream_util.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_conference_client.dart';
-import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
-import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
@@ -76,11 +74,6 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
   @override
   void initState() {
     super.initState();
-    // 本地视频可能在其他地方关闭，所有需要注册关闭事件
-    localPeerMediaStreamController.registerPeerMediaStreamOperator(
-        PeerMediaStreamOperator.add.name, _updatePeerMediaStream);
-    localPeerMediaStreamController.registerPeerMediaStreamOperator(
-        PeerMediaStreamOperator.remove.name, _updatePeerMediaStream);
     liveKitConferenceClientPool.addListener(_updateConferenceClient);
     _updateConferenceClient();
     _updateView();
@@ -293,12 +286,13 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     }
 
     ///根据本地视频决定音视频选项，如果没有则认为是音频
-    PeerMediaStream? mainPeerMediaStream =
-        localPeerMediaStreamController.mainPeerMediaStream;
-    bool? video = await DialogUtil.confirm(context,
-        content: 'Do you open video chat?',
-        okLabel: 'Video',
-        cancelLabel: 'Audio');
+    bool? video = false;
+    if (mounted) {
+      video = await DialogUtil.confirm(context,
+          content: 'Do you open video chat?',
+          okLabel: 'Video',
+          cancelLabel: 'Audio');
+    }
     video ??= false;
     List<ChatMessage> chatMessages =
         await _buildSfuConference(video: video, participants: participants);
@@ -380,23 +374,17 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
 
   ///关闭并且移除本地所有的视频，这时候还能看远程的视频
   _close() async {
-    LiveKitConferenceClient? liveKitConferenceClient =
+    LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
-    ConferenceChatMessageController? conferenceChatMessageController =
-        liveKitConferenceClient?.conferenceChatMessageController;
-    Conference? conference = conferenceChatMessageController?.conference;
-    //从webrtc连接中移除流
-    if (conference != null) {
-      await liveKitConferenceClient?.exit();
+    if (conferenceClient != null) {
+      await conferenceClient.exit();
     }
-    await localPeerMediaStreamController.closeAll();
     _updateView();
   }
 
   ///呼叫挂断，关闭音频和本地视频，设置结束状态
   _hangup() async {
     _stopAudio();
-    await localPeerMediaStreamController.closeAll();
     LiveKitConferenceClient? liveKitConferenceClient =
         liveKitConferenceClientPool.conferenceClient;
     ConferenceChatMessageController? conferenceChatMessageController =
@@ -463,7 +451,12 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
 
   ///切换显示按钮面板
   void _toggleActionCardVisible() {
-    bool visible = localPeerMediaStreamController.peerMediaStreams.isEmpty;
+    bool visible = false;
+    LiveKitConferenceClient? conferenceClient =
+        liveKitConferenceClientPool.conferenceClient;
+    if (conferenceClient != null) {
+      visible = conferenceClient.localPeerMediaStreams.isEmpty;
+    }
     if (visible) {
       controlPanelVisible.value = true;
     } else {
@@ -649,8 +642,10 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
 
   ///关闭单个本地视频窗口的流
   Future<void> _onClosedPeerMediaStream(PeerMediaStream peerMediaStream) async {
+    LiveKitConferenceClient? conferenceClient =
+        liveKitConferenceClientPool.conferenceClient;
     //从map中移除
-    localPeerMediaStreamController.remove(peerMediaStream);
+    conferenceClient?.close(peerMediaStream);
     ConferenceChatMessageController? conferenceChatMessageController =
         liveKitConferenceClientPool.conferenceChatMessageController;
     if (conferenceChatMessageController != null &&
@@ -661,9 +656,6 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
       await liveKitConferenceClientPool
           .removeLocalPeerMediaStream(conferenceId, [peerMediaStream]);
     }
-    //流关闭
-    await localPeerMediaStreamController.remove(peerMediaStream);
-    await localPeerMediaStreamController.close(peerMediaStream);
   }
 
   @override
@@ -671,11 +663,14 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     var videoViewCard = ValueListenableBuilder<int>(
         valueListenable: videoViewCount,
         builder: (context, value, child) {
+          LiveKitConferenceClient? conferenceClient =
+              liveKitConferenceClientPool.conferenceClient;
           if (value > 0) {
             ConferenceChatMessageController? conferenceChatMessageController =
                 liveKitConferenceClientPool.conferenceChatMessageController;
             return VideoViewCard(
-              peerMediaStreamController: localPeerMediaStreamController,
+              peerMediaStreamController:
+                  conferenceClient!.localPeerMediaStreamController,
               onClosed: _onClosedPeerMediaStream,
               conference: conferenceChatMessageController?.conference,
             );
@@ -699,10 +694,6 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
 
   @override
   void dispose() {
-    localPeerMediaStreamController.unregisterPeerMediaStreamOperator(
-        PeerMediaStreamOperator.add.name, _updatePeerMediaStream);
-    localPeerMediaStreamController.unregisterPeerMediaStreamOperator(
-        PeerMediaStreamOperator.remove.name, _updatePeerMediaStream);
     var conferenceChatMessageController =
         liveKitConferenceClientPool.conferenceChatMessageController;
     conferenceChatMessageController?.removeListener(_updateVideoChatStatus);

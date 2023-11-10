@@ -16,12 +16,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:synchronized/synchronized.dart';
 
-class P2pConferencePeerConnection {
-  AdvancedPeerConnection peerConnection;
-
-  P2pConferencePeerConnection(this.peerConnection);
-}
-
 ///视频会议客户端，代表一个正在进行的视频会议，
 ///包含一个必须的视频会议消息控制器和一个会议内的所有的webrtc连接及其包含的远程视频，
 ///这些连接与自己正在视频通话
@@ -39,7 +33,7 @@ class P2pConferenceClient {
       _streamSubscriptions = {};
 
   //自己是否加入
-  bool _joined = false;
+  bool _published = false;
 
   //会议的视频消息控制器，是创建会议的邀请消息，包含会议的信息
   final ConferenceChatMessageController conferenceChatMessageController;
@@ -100,12 +94,12 @@ class P2pConferenceClient {
   }
 
   bool get joined {
-    return _joined;
+    return _published;
   }
 
   /// 自己加入会议，在所有的连接中加上本地流
-  join() async {
-    _joined = true;
+  publish() async {
+    _published = true;
     List<AdvancedPeerConnection> pcs = await peerConnections;
     for (AdvancedPeerConnection peerConnection in pcs) {
       await addAdvancedPeerConnection(peerConnection);
@@ -126,7 +120,7 @@ class P2pConferenceClient {
 
   /// 自己退出会议，从所有的连接中移除本地流和远程流
   exit() async {
-    _joined = false;
+    _published = false;
     await conferenceChatMessageController.exit();
     List<AdvancedPeerConnection> pcs = await peerConnections;
     for (AdvancedPeerConnection peerConnection in pcs) {
@@ -166,7 +160,7 @@ class P2pConferenceClient {
   ///指定连接用在加入新的连接的时候，所有连接用在加入新的peerMediaStream的时候
   addLocalPeerMediaStream(List<PeerMediaStream> peerMediaStreams,
       {AdvancedPeerConnection? peerConnection}) async {
-    if (_joined) {
+    if (_published) {
       if (peerConnection != null) {
         for (var peerMediaStream in peerMediaStreams) {
           await peerConnection.addLocalStream(peerMediaStream);
@@ -213,7 +207,7 @@ class P2pConferenceClient {
       addParticipant(peerConnection.peerId, peerConnection.clientId);
     }
     //只有自己已经加入，才需要加本地流和远程流
-    if (_joined) {
+    if (_published) {
       if (!_streamSubscriptions.containsKey(key)) {
         List<StreamSubscription<WebrtcEvent>> streamSubscriptions = [];
         StreamSubscription<WebrtcEvent>? trackStreamSubscription =
@@ -255,7 +249,7 @@ class P2pConferenceClient {
         .getPeerMediaStreams(peerId, clientId: clientId);
     if (peerMediaStreams.isNotEmpty) {
       for (var peerMediaStream in peerMediaStreams) {
-        await remotePeerMediaStreamController.close(peerMediaStream);
+        await remotePeerMediaStreamController.close(peerMediaStream.id!);
       }
     }
   }
@@ -363,7 +357,7 @@ class P2pConferenceClient {
       if (peerMediaStream != null) {
         var mediaStream = peerMediaStream.mediaStream;
         if (mediaStream != null) {
-          await remotePeerMediaStreamController.close(peerMediaStream);
+          await remotePeerMediaStreamController.close(peerMediaStream.id!);
         }
       }
     } else {
@@ -385,8 +379,6 @@ class P2pConferenceClient {
     _participants.clear();
     remotePeerMediaStreamController.peerMediaStreams.clear();
     conferenceChatMessageController.terminate();
-    await remotePeerMediaStreamController.onPeerMediaStreamOperator(
-        PeerMediaStreamOperator.terminate.name, null);
   }
 }
 

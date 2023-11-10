@@ -85,10 +85,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   void initState() {
     super.initState();
     // 本地视频可能在其他地方关闭，所有需要注册关闭事件
-    localPeerMediaStreamController.registerPeerMediaStreamOperator(
-        PeerMediaStreamOperator.add.name, _updatePeerMediaStream);
-    localPeerMediaStreamController.registerPeerMediaStreamOperator(
-        PeerMediaStreamOperator.remove.name, _updatePeerMediaStream);
+    localPeerMediaStreamController.addListener(_update);
     p2pConferenceClientPool.addListener(_updateConferenceChatMessageController);
     _updateConferenceChatMessageController();
     _update();
@@ -130,10 +127,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         p2pConferenceClientPool.conferenceChatMessageController;
     conferenceChatMessageController?.stopAudio(
         filename: 'assets/medias/close.mp3');
-  }
-
-  Future<void> _updatePeerMediaStream(PeerMediaStream? peerMediaStream) async {
-    _update();
   }
 
   ///调整界面的显示
@@ -232,8 +225,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       if (video) {
         if (!localPeerMediaStreamController.video) {
           await removeLocalPeerMediaStream(peerMediaStream);
-          await localPeerMediaStreamController.remove(peerMediaStream);
-          await localPeerMediaStreamController.close(peerMediaStream);
+          await localPeerMediaStreamController.remove(peerMediaStream.id!);
+          await localPeerMediaStreamController.close(peerMediaStream.id!);
           peerMediaStream =
               await localPeerMediaStreamController.createPeerVideoStream();
           await addLocalPeerMediaStream(peerMediaStream);
@@ -242,8 +235,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       } else {
         if (localPeerMediaStreamController.video) {
           await removeLocalPeerMediaStream(peerMediaStream);
-          await localPeerMediaStreamController.remove(peerMediaStream);
-          await localPeerMediaStreamController.close(peerMediaStream);
+          await localPeerMediaStreamController.remove(peerMediaStream.id!);
+          await localPeerMediaStreamController.close(peerMediaStream.id!);
           peerMediaStream =
               await localPeerMediaStreamController.createPeerAudioStream();
           await addLocalPeerMediaStream(peerMediaStream);
@@ -800,7 +793,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///关闭单个本地视频窗口的流
   Future<void> _onClosedPeerMediaStream(PeerMediaStream peerMediaStream) async {
     //从map中移除
-    localPeerMediaStreamController.remove(peerMediaStream);
+    localPeerMediaStreamController.remove(peerMediaStream.id!);
     ConferenceChatMessageController? conferenceChatMessageController =
         p2pConferenceClientPool.conferenceChatMessageController;
     if (conferenceChatMessageController != null &&
@@ -812,8 +805,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           .removeLocalPeerMediaStream(conferenceId, [peerMediaStream]);
     }
     //流关闭
-    await localPeerMediaStreamController.remove(peerMediaStream);
-    await localPeerMediaStreamController.close(peerMediaStream);
+    await localPeerMediaStreamController.remove(peerMediaStream.id!);
+    await localPeerMediaStreamController.close(peerMediaStream.id!);
   }
 
   @override
@@ -849,10 +842,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   @override
   void dispose() {
-    localPeerMediaStreamController.unregisterPeerMediaStreamOperator(
-        PeerMediaStreamOperator.add.name, _updatePeerMediaStream);
-    localPeerMediaStreamController.unregisterPeerMediaStreamOperator(
-        PeerMediaStreamOperator.remove.name, _updatePeerMediaStream);
+    localPeerMediaStreamController.removeListener(_update);
     var conferenceChatMessageController =
         p2pConferenceClientPool.conferenceChatMessageController;
     conferenceChatMessageController?.removeListener(_updateVideoChatStatus);

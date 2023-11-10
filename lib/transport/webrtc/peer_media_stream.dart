@@ -24,27 +24,31 @@ enum PeerMediaStreamOperator {
   torch
 }
 
+class Participant {
+  String peerId;
+  String? name;
+  String? clientId;
+
+  Participant(this.peerId, {this.clientId, this.name});
+}
+
 /// 关联webrtc媒体流和peer的类，可以构造本地媒体流或者传入的媒体流
 class PeerMediaStream {
   String? id;
   MediaStream? mediaStream;
   livekit_client.VideoTrack? videoTrack;
   livekit_client.AudioTrack? audioTrack;
-  livekit_client.Participant? participant;
+  livekit_client.Participant? livekitParticipant;
 
   //业务相关的数据
-  String? peerId;
-  String? name;
-  String? clientId;
+  Participant? participant;
 
   PeerMediaStream({
     this.mediaStream,
     this.videoTrack,
     this.audioTrack,
+    this.livekitParticipant,
     this.participant,
-    this.peerId,
-    this.clientId,
-    this.name,
   }) {
     if (mediaStream != null) {
       id = mediaStream!.id;
@@ -118,9 +122,7 @@ class PeerMediaStream {
         return;
       }
     }
-    this.peerId = peerId;
-    this.clientId = clientId;
-    this.name = name;
+    participant = Participant(peerId, clientId: clientId, name: name);
     var mediaStream = await MediaStreamUtil.createVideoMediaStream(
         width: width, height: height, frameRate: frameRate);
     this.mediaStream = mediaStream;
@@ -137,9 +139,7 @@ class PeerMediaStream {
         return;
       }
     }
-    this.peerId = peerId;
-    this.clientId = clientId;
-    this.name = name;
+    participant = Participant(peerId, clientId: clientId, name: name);
     Map<String, dynamic> mediaConstraints = <String, dynamic>{
       'audio': true,
       'video': false,
@@ -164,9 +164,7 @@ class PeerMediaStream {
         return;
       }
     }
-    this.peerId = peerId;
-    this.clientId = clientId;
-    this.name = name;
+    participant = Participant(peerId, clientId: clientId, name: name);
 
     dynamic video = true;
     if (platformParams.ios) {
@@ -206,9 +204,7 @@ class PeerMediaStream {
     String? clientId,
     String? name,
   }) async {
-    this.peerId = peerId;
-    this.clientId = clientId;
-    this.name = name;
+    participant = Participant(peerId, clientId: clientId, name: name);
     setStream(mediaStream: mediaStream, videoTrack: videoTrack);
   }
 

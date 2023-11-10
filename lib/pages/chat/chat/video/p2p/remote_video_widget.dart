@@ -61,12 +61,9 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
           p2pConferenceClientPool.getP2pConferenceClient(conferenceId);
       if (p2pConferenceClient != null) {
         p2pConferenceClient!.remotePeerMediaStreamController
-            .registerPeerMediaStreamOperator(
-                PeerMediaStreamOperator.add.name, _onAddPeerMediaStream);
-        p2pConferenceClient!.remotePeerMediaStreamController
-            .registerPeerMediaStreamOperator(
-                PeerMediaStreamOperator.remove.name, _onRemovePeerMediaStream);
-        videoViewCount.value = p2pConferenceClient!.remotePeerMediaStreams.length;
+            .addListener(_updatePeerMediaStream);
+        videoViewCount.value =
+            p2pConferenceClient!.remotePeerMediaStreams.length;
       }
     }
   }
@@ -77,14 +74,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
     _update();
   }
 
-  Future<void> _onAddPeerMediaStream(PeerMediaStream? peerMediaStream) async {
-    if (p2pConferenceClient != null) {
-      videoViewCount.value = p2pConferenceClient!.remotePeerMediaStreams.length;
-    }
-  }
-
-  Future<void> _onRemovePeerMediaStream(
-      PeerMediaStream? peerMediaStream) async {
+  Future<void> _updatePeerMediaStream() async {
     if (p2pConferenceClient != null) {
       videoViewCount.value = p2pConferenceClient!.remotePeerMediaStreams.length;
     }
@@ -255,7 +245,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
               .removeLocalPeerMediaStream([peerMediaStream]);
         } else {
           await p2pConferenceClient.remotePeerMediaStreamController
-              .close(peerMediaStream);
+              .close(peerMediaStream.id!);
         }
       } else {
         logger.e('RemotePeerMediaStreamController is null');
@@ -277,11 +267,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   void dispose() {
     if (p2pConferenceClient != null) {
       p2pConferenceClient!.remotePeerMediaStreamController
-          .unregisterPeerMediaStreamOperator(
-              PeerMediaStreamOperator.add.name, _onAddPeerMediaStream);
-      p2pConferenceClient!.remotePeerMediaStreamController
-          .unregisterPeerMediaStreamOperator(
-              PeerMediaStreamOperator.remove.name, _onRemovePeerMediaStream);
+          .removeListener(_updatePeerMediaStream);
     }
     p2pConferenceClientPool.removeListener(_updateVideoChatMessageController);
     super.dispose();

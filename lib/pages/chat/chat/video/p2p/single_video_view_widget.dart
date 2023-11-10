@@ -48,13 +48,12 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   @override
   initState() {
     super.initState();
-    widget.peerMediaStreamController.registerPeerMediaStreamOperator(
-        PeerMediaStreamOperator.selected.name, _updateSelected);
-    widget.peerMediaStreamController.registerPeerMediaStreamOperator(
-        PeerMediaStreamOperator.unselected.name, _updateSelected);
+    widget.peerMediaStreamController.addListener(_updateSelected);
   }
 
-  Future<void> _updateSelected(PeerMediaStream? peerMediaStream) async {
+  Future<void> _updateSelected() async {
+    PeerMediaStream? peerMediaStream =
+        widget.peerMediaStreamController.currentPeerMediaStream;
     if (widget.peerMediaStream.id != null &&
         peerMediaStream != null &&
         peerMediaStream.id == widget.peerMediaStream.id) {
@@ -207,7 +206,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   ///单个视频窗口
   Widget _buildSingleVideoView(
       BuildContext context, double? height, double? width) {
-    String name = widget.peerMediaStream.name ?? '';
+    String name = widget.peerMediaStream.participant?.name ?? '';
     String streamId = widget.peerMediaStream.mediaStream?.id ?? '';
     bool video = widget.peerMediaStream.video;
     Widget mediaRenderView =
@@ -372,10 +371,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
 
   @override
   void dispose() {
-    widget.peerMediaStreamController.unregisterPeerMediaStreamOperator(
-        PeerMediaStreamOperator.selected.name, _updateSelected);
-    widget.peerMediaStreamController.unregisterPeerMediaStreamOperator(
-        PeerMediaStreamOperator.unselected.name, _updateSelected);
+    widget.peerMediaStreamController.removeListener(_updateSelected);
     super.dispose();
   }
 }

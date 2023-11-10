@@ -21,49 +21,11 @@ class PeerMediaStreamController with ChangeNotifier {
   //媒体流集合的操作锁
   final Lock _streamLock = Lock();
 
-  Map<String, List<Future<void> Function(PeerMediaStream? peerMediaStream)>>
-      fnsm = {};
-
   PeerMediaStreamController(
       {List<PeerMediaStream> peerMediaStreams = const []}) {
     if (peerMediaStreams.isNotEmpty) {
       for (var peerMediaStream in peerMediaStreams) {
         add(peerMediaStream);
-      }
-    }
-  }
-
-  registerPeerMediaStreamOperator(String peerMediaStreamOperator,
-      Future<void> Function(PeerMediaStream?) fn) {
-    List<Future<void> Function(PeerMediaStream?)>? fns =
-        fnsm[peerMediaStreamOperator];
-    if (fns == null) {
-      fns = [];
-      fnsm[peerMediaStreamOperator] = fns;
-    }
-    fns.add(fn);
-  }
-
-  unregisterPeerMediaStreamOperator(String peerMediaStreamOperator,
-      Future<void> Function(PeerMediaStream?) fn) {
-    List<Future<void> Function(PeerMediaStream?)>? fns =
-        fnsm[peerMediaStreamOperator];
-    if (fns == null) {
-      return;
-    }
-    fns.remove(fn);
-    if (fns.isEmpty) {
-      fnsm.remove(peerMediaStreamOperator);
-    }
-  }
-
-  onPeerMediaStreamOperator(
-      String peerMediaStreamOperator, PeerMediaStream? peerMediaStream) {
-    List<Future<void> Function(PeerMediaStream?)>? fns =
-        fnsm[peerMediaStreamOperator];
-    if (fns != null) {
-      for (var fn in fns) {
-        fn(peerMediaStream);
       }
     }
   }
@@ -77,7 +39,7 @@ class PeerMediaStreamController with ChangeNotifier {
   set mainPeerMediaStream(PeerMediaStream? mainPeerMediaStream) {
     if (_mainPeerMediaStream != mainPeerMediaStream) {
       if (_mainPeerMediaStream != null) {
-        remove(_mainPeerMediaStream!);
+        remove(_mainPeerMediaStream!.id!);
       }
       _mainPeerMediaStream = mainPeerMediaStream;
       if (_mainPeerMediaStream != null) {
@@ -102,11 +64,8 @@ class PeerMediaStreamController with ChangeNotifier {
   ///设置当前媒体流
   set currentPeerMediaStream(PeerMediaStream? currentPeerMediaStream) {
     if (_currentPeerMediaStream != currentPeerMediaStream) {
-      onPeerMediaStreamOperator(
-          PeerMediaStreamOperator.unselected.name, _currentPeerMediaStream);
       _currentPeerMediaStream = currentPeerMediaStream;
-      onPeerMediaStreamOperator(
-          PeerMediaStreamOperator.selected.name, _currentPeerMediaStream);
+      notifyListeners();
     }
   }
 
@@ -119,9 +78,9 @@ class PeerMediaStreamController with ChangeNotifier {
   List<PeerMediaStream> getPeerMediaStreams(String peerId, {String? clientId}) {
     List<PeerMediaStream> peerMediaStreams = [];
     for (var peerMediaStream in _peerMediaStreams.values) {
-      if (peerId == peerMediaStream.peerId) {
+      if (peerId == peerMediaStream.participant?.peerId) {
         if (clientId != null) {
-          if (clientId == peerMediaStream.clientId) {
+          if (clientId == peerMediaStream.participant?.clientId) {
             if (peerMediaStream.id != null) {
               peerMediaStreams.add(peerMediaStream);
             }
@@ -165,41 +124,36 @@ class PeerMediaStreamController with ChangeNotifier {
       var id = peerMediaStream.id;
       if (id != null && !_peerMediaStreams.containsKey(id)) {
         _peerMediaStreams[id] = peerMediaStream;
-        onPeerMediaStreamOperator(
-            PeerMediaStreamOperator.add.name, peerMediaStream);
+        notifyListeners();
       }
     });
   }
 
   ///移除媒体流，如果是当前媒体流，则设置当前的媒体流为null，激活remove事件
-  remove(PeerMediaStream peerMediaStream) async {
-    await _streamLock.synchronized(() async {
-      var streamId = peerMediaStream.id;
-      if (streamId != null) {
-        PeerMediaStream? old = _peerMediaStreams[streamId];
-        if (old != null) {
-          _peerMediaStreams.remove(streamId);
-          if (_currentPeerMediaStream != null &&
-              _currentPeerMediaStream!.id == streamId) {
-            _currentPeerMediaStream = null;
-          }
-          if (_mainPeerMediaStream != null &&
-              _mainPeerMediaStream!.id == streamId) {
-            _mainPeerMediaStream = null;
-          }
-          //在流被关闭前调用事件处理
-          await onPeerMediaStreamOperator(
-              PeerMediaStreamOperator.remove.name, peerMediaStream);
+  Future<PeerMediaStream?> remove(String streamId) async {
+    return await _streamLock.synchronized(() async {
+      PeerMediaStream? peerMediaStream = _peerMediaStreams[streamId];
+      if (peerMediaStream != null) {
+        _peerMediaStreams.remove(streamId);
+        if (_currentPeerMediaStream != null &&
+            _currentPeerMediaStream!.id == streamId) {
+          _currentPeerMediaStream = null;
         }
+        if (_mainPeerMediaStream != null &&
+            _mainPeerMediaStream!.id == streamId) {
+          _mainPeerMediaStream = null;
+        }
+        notifyListeners();
       }
+      return peerMediaStream;
     });
   }
 
   ///关闭指定流并且从集合中删除
-  close(PeerMediaStream peerMediaStream) async {
-    await remove(peerMediaStream);
+  close(String streamId) async {
+    PeerMediaStream? peerMediaStream = await remove(streamId);
     //在windows平台上关闭远程流似乎会崩溃，可以注释后进行测试
-    await peerMediaStream.close();
+    await peerMediaStream?.close();
   }
 
   ///移除并且关闭控制器所有的媒体流，激活exit事件
@@ -213,7 +167,7 @@ class PeerMediaStreamController with ChangeNotifier {
       _peerMediaStreams.clear();
       _currentPeerMediaStream = null;
       _mainPeerMediaStream = null;
-      await onPeerMediaStreamOperator(PeerMediaStreamOperator.exit.name, null);
+      notifyListeners();
     });
   }
 }
@@ -237,9 +191,8 @@ class LocalPeerMediaStreamController extends PeerMediaStreamController {
       height: height,
       frameRate: frameRate,
     );
-    onPeerMediaStreamOperator(
-        PeerMediaStreamOperator.create.name, _mainPeerMediaStream);
     mainPeerMediaStream = peerMediaStream;
+    notifyListeners();
 
     return peerMediaStream;
   }
@@ -252,9 +205,8 @@ class LocalPeerMediaStreamController extends PeerMediaStreamController {
       clientId: myself.clientId,
       name: myself.myselfPeer.name,
     );
-    onPeerMediaStreamOperator(
-        PeerMediaStreamOperator.create.name, _mainPeerMediaStream);
     mainPeerMediaStream = peerMediaStream;
+    notifyListeners();
 
     return peerMediaStream;
   }
@@ -270,8 +222,6 @@ class LocalPeerMediaStreamController extends PeerMediaStreamController {
         name: myself.myselfPeer.name,
         selectedSource: selectedSource,
         audio: audio);
-    onPeerMediaStreamOperator(
-        PeerMediaStreamOperator.create.name, peerMediaStream);
     add(peerMediaStream);
 
     return peerMediaStream;
@@ -293,8 +243,6 @@ class LocalPeerMediaStreamController extends PeerMediaStreamController {
       clientId: myself.clientId,
       name: myself.myselfPeer.name,
     );
-    onPeerMediaStreamOperator(
-        PeerMediaStreamOperator.create.name, peerMediaStream);
     add(peerMediaStream);
 
     return peerMediaStream;
@@ -318,10 +266,9 @@ class LocalPeerMediaStreamController extends PeerMediaStreamController {
 
   ///关闭本地特定的流
   @override
-  close(PeerMediaStream peerMediaStream) async {
-    await super.close(peerMediaStream);
-    if (mainPeerMediaStream != null &&
-        peerMediaStream.id == mainPeerMediaStream!.id) {
+  close(String streamId) async {
+    await super.close(streamId);
+    if (mainPeerMediaStream != null && streamId == mainPeerMediaStream!.id) {
       mainPeerMediaStream = null;
     }
   }

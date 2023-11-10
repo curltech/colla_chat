@@ -6,6 +6,7 @@ import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart' as log;
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:livekit_client/livekit_client.dart';
@@ -278,6 +279,10 @@ class LiveKitRoomClient {
 /// 会议客户端，包含有房间客户端和会议的消息控制器
 class LiveKitConferenceClient {
   final LiveKitRoomClient roomClient;
+  final PeerMediaStreamController localPeerMediaStreamController =
+      PeerMediaStreamController();
+  final PeerMediaStreamController remotePeerMediaStreamController =
+      PeerMediaStreamController();
   final ConferenceChatMessageController conferenceChatMessageController;
   bool published = false;
 
@@ -295,20 +300,54 @@ class LiveKitConferenceClient {
     roomClient.onLocalParticipantEvent(onLocalParticipantEvent);
   }
 
-  /// 远程参与者事件，远程轨道发送变化
+  /// 远程参与者事件，远程轨道发生变化
   FutureOr<void> onParticipantEvent(ParticipantEvent event) {
     log.logger.i('on ParticipantEvent');
+    for (RemoteParticipant remoteParticipant
+    in roomClient.room.participants.values) {
+      String identity = remoteParticipant.identity;
+      String name = remoteParticipant.name;
+      for (RemoteTrackPublication<RemoteVideoTrack> remoteTrackPublication
+      in remoteParticipant.videoTracks) {
+        PeerMediaStream peerMediaStream =
+        PeerMediaStream(videoTrack: remoteTrackPublication.track);
+        remotePeerMediaStreamController.add(peerMediaStream);
+      }
+      for (RemoteTrackPublication<RemoteAudioTrack> remoteTrackPublication
+      in remoteParticipant.audioTracks) {
+        PeerMediaStream peerMediaStream =
+        PeerMediaStream(audioTrack: remoteTrackPublication.track);
+        remotePeerMediaStreamController.add(peerMediaStream);
+      }
+    }
   }
 
-  /// 本地发布事件，本地轨道发送变化
+  /// 本地发布事件，本地轨道发生变化
   FutureOr<void> onLocalTrackPublishedEvent(LocalTrackPublishedEvent event) {
     log.logger.i('on LocalTrackPublishedEvent');
+    LocalTrackPublication<LocalTrack> localTrackPublication = event.publication;
+    LocalTrack? track = localTrackPublication.track;
+    if (track != null) {
+      RTCRtpMediaType mediaType = track.mediaType;
+      if (mediaType == RTCRtpMediaType.RTCRtpMediaTypeVideo) {
+        localPeerMediaStreamController
+            .add(PeerMediaStream(videoTrack: track as LocalVideoTrack));
+      } else if (mediaType == RTCRtpMediaType.RTCRtpMediaTypeAudio) {
+        localPeerMediaStreamController
+            .add(PeerMediaStream(audioTrack: track as LocalAudioTrack));
+      }
+    }
   }
 
-  /// 本地退出事件，本地轨道发送变化
+  /// 本地退出事件，本地轨道发生变化
   FutureOr<void> onLocalTrackUnpublishedEvent(
       LocalTrackUnpublishedEvent event) {
     log.logger.i('on LocalTrackUnpublishedEvent');
+    LocalTrackPublication<LocalTrack> localTrackPublication = event.publication;
+    LocalTrack? track = localTrackPublication.track;
+    if (track != null) {
+      localPeerMediaStreamController.remove(track.mediaStream.id);
+    }
   }
 
   /// 本地参与者事件

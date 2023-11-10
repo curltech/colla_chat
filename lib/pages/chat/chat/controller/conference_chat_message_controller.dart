@@ -652,7 +652,7 @@ class ConferenceChatMessageController with ChangeNotifier {
     P2pConferenceClient? p2pConferenceClient = p2pConferenceClientPool
         .getP2pConferenceClient(_conference!.conferenceId);
     if (p2pConferenceClient != null) {
-      await p2pConferenceClient.join();
+      await p2pConferenceClient.publish();
       status = VideoChatStatus.chatting;
     } else {
       logger.e('p2pConferenceClient:${_conference!.conferenceId} is not exist');
