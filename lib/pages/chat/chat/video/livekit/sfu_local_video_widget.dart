@@ -234,7 +234,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     return true;
   }
 
-  /// 创建新的会议
+  /// 邀请的时候，在group模式下创建新的会议
   Future<List<ChatMessage>> _buildSfuConference(
       {required bool video, required List<String> participants}) async {
     var current = DateTime.now();
@@ -255,13 +255,22 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
       conference.sfu = true;
       conference.sfuUri = '';
     }
-    List<ChatMessage> chatMessages =
-        await chatMessageService.buildSfuConference(conference, participants);
+    try {
+      List<ChatMessage> chatMessages =
+          await chatMessageService.buildSfuConference(conference, participants);
 
-    return chatMessages;
+      return chatMessages;
+    } catch (e) {
+      logger.e('buildSfuConference failure:$e');
+      if (mounted) {
+        DialogUtil.error(context, content: 'build sfu conference failure');
+      }
+    }
+
+    return <ChatMessage>[];
   }
 
-  ///创建会议，选择会议参与者，发送会议邀请消息，然后将新会议加入会议池，成为当前会议
+  /// 在group模式下创建会议，选择会议参与者，发送会议邀请消息，然后将新会议加入会议池，成为当前会议
   Future<void> _invite() async {
     List<String> participants = await _selectParticipants();
     if (!participants.contains(myself.peerId!)) {
@@ -334,7 +343,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     _updateView();
   }
 
-  ///加入当前会议，即开始视频会议
+  /// 当前会议存在的时候加入当前会议，即开始视频会议
   Future<void> _join() async {
     var status = _checkWebrtcStatus();
     if (!status) {

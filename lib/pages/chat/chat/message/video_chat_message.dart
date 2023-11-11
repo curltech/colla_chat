@@ -31,26 +31,7 @@ class VideoChatMessage extends StatelessWidget {
       required this.chatMessage})
       : super(key: key);
 
-  bool isValid(String? startDate, String? endDate) {
-    bool valid = true;
-    DateTime? eDate;
-    if (endDate != null) {
-      eDate = DateUtil.toDateTime(endDate);
-    } else {
-      if (startDate != null) {
-        DateTime sDate = DateUtil.toDateTime(startDate);
-        eDate = sDate.add(const Duration(days: 1));
-      }
-    }
-    if (eDate != null) {
-      DateTime now = DateTime.now();
-      if (now.isAfter(eDate)) {
-        valid = false;
-      }
-    }
 
-    return valid;
-  }
 
   _join(BuildContext context) async {
     ChatSummary? chatSummary = chatMessageController.chatSummary;

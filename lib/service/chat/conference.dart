@@ -11,9 +11,12 @@ import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/transport/webrtc/livekit/sfu_conference_service_client.dart';
 import 'package:colla_chat/widgets/common/combine_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+import 'package:livekit_server_sdk/livekit_server_sdk.dart';
+import 'package:livekit_server_sdk/src/proto/livekit_models.pb.dart';
 
 class ConferenceService extends GeneralBaseService<Conference> {
   Map<String, Conference> conferences = {};
@@ -101,6 +104,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
     conferences[conferenceId] = conference;
   }
 
+  /// 创建会议，处理开始和结束时间
   Future<Conference> createConference(
     String name,
     bool video, {
@@ -123,7 +127,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
     conferenceOwnerPeerId = conferenceOwnerPeerId ?? myself.peerId;
     startDate ??= DateUtil.currentDate();
     endDate ??= DateUtil.currentDateTime()
-        .add(const Duration(minutes: 240))
+        .add(const Duration(days: 1))
         .toIso8601String();
     var conference = Conference(conferenceId,
         name: name,
@@ -142,7 +146,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
     return conference;
   }
 
-  ///保存会议以及成员，成员根据participants,conferenceOwnerPeerId决定成员表的身份
+  /// 保存会议以及成员，成员根据participants,conferenceOwnerPeerId决定成员表的身份
   Future<ConferenceChange> store(Conference conference) async {
     Conference? old = await findOneByConferenceId(conference.conferenceId);
     if (old != null) {
@@ -220,6 +224,62 @@ class ConferenceService extends GeneralBaseService<Conference> {
   removeByConferenceId(String conferenceId) async {
     delete(where: 'conferenceId=?', whereArgs: [conferenceId]);
     conferences.remove(conferenceId);
+  }
+
+  bool isValid(Conference conference) {
+    String? startDate = conference.startDate;
+    String? endDate = conference.endDate;
+    bool valid = true;
+    DateTime? eDate;
+    if (endDate != null) {
+      eDate = DateUtil.toDateTime(endDate);
+    } else {
+      if (startDate != null) {
+        DateTime sDate = DateUtil.toDateTime(startDate);
+        eDate = sDate.add(const Duration(days: 1));
+      }
+    }
+    if (eDate != null) {
+      DateTime now = DateTime.now();
+      if (now.isAfter(eDate)) {
+        valid = false;
+      }
+    }
+
+    return valid;
+  }
+
+  /// 如果sfu为true，创建sfu的Room
+  Future<Room?> createRoom(Conference conference) async {
+    String? startDate = conference.startDate;
+    if (startDate == null) {
+      startDate = DateUtil.currentDate();
+      conference.startDate = startDate;
+    }
+    String? endDate = conference.endDate;
+    DateTime? eDate;
+    if (endDate == null) {
+      DateTime sDate = DateUtil.toDateTime(startDate);
+      eDate = sDate.add(const Duration(days: 1));
+      endDate = eDate.toUtc().toIso8601String();
+      conference.endDate = endDate;
+    }
+    bool sfu = conference.sfu;
+    if (sfu) {
+      String? sfuUri = conference.sfuUri;
+      String? sfuToken = conference.sfuToken;
+      eDate = DateUtil.toDateTime(endDate);
+      DateTime now = DateTime.now();
+      Duration emptyTimeout = eDate.difference(now);
+      LiveKitConferenceServiceClient serviceClient =
+          liveKitConferenceServiceClientPool.createServiceClient();
+      Room room = await serviceClient.createRoom(
+          roomName: conference.conferenceId, emptyTimeout: emptyTimeout);
+
+      return room;
+    }
+
+    return null;
   }
 }
 

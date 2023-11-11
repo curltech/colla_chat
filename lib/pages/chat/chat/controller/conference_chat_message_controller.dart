@@ -203,7 +203,7 @@ class ConferenceChatMessageController with ChangeNotifier {
         var conference =
             await conferenceService.findOneByConferenceId(conferenceId);
         if (conference != null) {
-          logger.e('Conference $conferenceId name ${conference.name} is exist');
+          logger.w('Conference $conferenceId name ${conference.name} is exist');
         }
       }
     }

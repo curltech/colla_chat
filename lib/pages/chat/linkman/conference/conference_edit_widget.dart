@@ -402,7 +402,15 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
       if (sfu) {
         List<String>? participants = current.participants;
         if (participants != null) {
-          await chatMessageService.buildSfuConference(current, participants);
+          try {
+            await chatMessageService.buildSfuConference(current, participants);
+          } catch (e) {
+            logger.e('buildSfuConference failure:$e');
+            if (mounted) {
+              DialogUtil.error(context,
+                  content: 'build sfu conference failure');
+            }
+          }
         }
       } else {
         ChatMessage chatMessage =

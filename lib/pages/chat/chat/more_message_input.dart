@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
+import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controller.dart';
@@ -15,6 +16,7 @@ import 'package:colla_chat/plugin/mobile_camera_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -22,6 +24,7 @@ import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
@@ -48,48 +51,13 @@ class MoreMessageInput extends StatefulWidget {
 }
 
 class _MoreMessageInputState extends State<MoreMessageInput> {
-  final List<ActionData> defaultActionData = [
-    ActionData(
-        label: 'DeleteTime',
-        tooltip: 'Delete time',
-        icon: const Icon(Icons.timer_sharp)),
-    ActionData(
-        label: 'Picture',
-        tooltip: 'Take a picture',
-        icon: const Icon(Icons.camera)),
-    ActionData(
-      label: 'Video chat',
-      tooltip: 'Invite video chat',
-      icon: const Icon(Icons.video_call),
-    ),
-    ActionData(
-      label: 'Sfu video chat',
-      tooltip: 'Invite video chat',
-      icon: const Icon(Icons.missed_video_call_outlined),
-    ),
-    ActionData(
-        label: 'Location',
-        tooltip: 'Geographical position',
-        icon: const Icon(Icons.location_on)),
-    ActionData(
-        label: 'Name card',
-        tooltip: 'Share name card',
-        icon: const Icon(Icons.card_membership)),
-    ActionData(
-        label: 'File',
-        tooltip: 'Pick and send file',
-        icon: const Icon(Icons.file_open)),
-    ActionData(
-        label: 'Collection',
-        tooltip: 'Collection',
-        icon: const Icon(Icons.collections)),
-  ];
-
-  List<ActionData> actionData = [];
-
   @override
   initState() {
     super.initState();
+  }
+
+  Future<List<ActionData>> _buildActionData() async {
+    List<ActionData> actionData = [];
     if (platformParams.mobile) {
       var albumActionData = ActionData(
           label: 'Album',
@@ -97,7 +65,71 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
           icon: const Icon(Icons.photo_album));
       actionData.add(albumActionData);
     }
-    actionData.addAll(defaultActionData);
+    actionData.addAll([
+      ActionData(
+          label: 'DeleteTime',
+          tooltip: 'Delete time',
+          icon: const Icon(Icons.timer_sharp)),
+      ActionData(
+          label: 'Picture',
+          tooltip: 'Take a picture',
+          icon: const Icon(Icons.camera))
+    ]);
+    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    String? partyType = chatSummary?.partyType;
+    if (partyType == PartyType.conference.name) {
+      Conference? conference = await conferenceService
+          .findCachedOneByConferenceId(chatSummary!.messageId!);
+      if (conference != null) {
+        bool valid = conferenceService.isValid(conference);
+        if (valid) {
+          if (conference.sfu) {
+            actionData.add(ActionData(
+              label: 'Sfu video chat',
+              tooltip: 'Invite video chat',
+              icon: const Icon(Icons.missed_video_call_outlined),
+            ));
+          } else {
+            actionData.add(ActionData(
+              label: 'Video chat',
+              tooltip: 'Invite video chat',
+              icon: const Icon(Icons.video_call),
+            ));
+          }
+        }
+      }
+    } else {
+      actionData.add(ActionData(
+        label: 'Sfu video chat',
+        tooltip: 'Invite video chat',
+        icon: const Icon(Icons.missed_video_call_outlined),
+      ));
+      actionData.add(ActionData(
+        label: 'Video chat',
+        tooltip: 'Invite video chat',
+        icon: const Icon(Icons.video_call),
+      ));
+    }
+    actionData.addAll([
+      ActionData(
+          label: 'Location',
+          tooltip: 'Geographical position',
+          icon: const Icon(Icons.location_on)),
+      ActionData(
+          label: 'Name card',
+          tooltip: 'Share name card',
+          icon: const Icon(Icons.card_membership)),
+      ActionData(
+          label: 'File',
+          tooltip: 'Pick and send file',
+          icon: const Icon(Icons.file_open)),
+      ActionData(
+          label: 'Collection',
+          tooltip: 'Collection',
+          icon: const Icon(Icons.collections)),
+    ]);
+
+    return actionData;
   }
 
   _onAction(int index, String name, {String? value}) async {
@@ -203,9 +235,12 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         ChatMessage? chatMessage =
             await chatMessageService.findVideoChatMessage(groupId: groupId);
         if (chatMessage != null) {
-          await liveKitConferenceClientPool.createLiveKitConferenceClient(
-              chatSummary: chatSummary, chatMessage);
-          indexWidgetProvider.push('sfu_video_chat');
+          LiveKitConferenceClient? conferenceClient =
+              await liveKitConferenceClientPool.createLiveKitConferenceClient(
+                  chatSummary: chatSummary, chatMessage);
+          if (conferenceClient != null) {
+            indexWidgetProvider.push('sfu_video_chat');
+          }
         }
       }
     }
@@ -458,14 +493,27 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     return Container(
       margin: const EdgeInsets.all(0.0),
       padding: const EdgeInsets.only(bottom: 0.0),
-      child: DataActionCard(
-        actions: actionData,
-        width: appDataProvider.secondaryBodyWidth * 0.9,
-        height: chatMessageViewController.moreMessageInputHeight,
-        onPressed: _onAction,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
-        crossAxisCount: 4,
+      child: FutureBuilder(
+        future: _buildActionData(),
+        builder:
+            (BuildContext context, AsyncSnapshot<List<ActionData>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            List<ActionData>? actionData = snapshot.data;
+            if (actionData != null) {
+              return DataActionCard(
+                actions: actionData,
+                width: appDataProvider.secondaryBodyWidth * 0.9,
+                height: chatMessageViewController.moreMessageInputHeight,
+                onPressed: _onAction,
+                mainAxisSpacing: 10,
+                crossAxisSpacing: 10,
+                crossAxisCount: 4,
+              );
+            }
+          }
+
+          return LoadingUtil.buildLoadingIndicator();
+        },
       ),
     );
   }

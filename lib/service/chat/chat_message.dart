@@ -461,27 +461,31 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return groupChatMessage;
   }
 
+  /// 创建会议的消息，加上自己，每个参与者一条消息
   Future<List<ChatMessage>> buildSfuConference(
       Conference conference, List<String> participants) async {
-    ChatMessage chatMessage = await chatMessageService.buildChatMessage(
-      groupId: conference.conferenceId,
-      groupName: conference.name,
-      groupType: PartyType.conference,
-      title: conference.video
-          ? ChatMessageContentType.video.name
-          : ChatMessageContentType.audio.name,
-      content: conference,
-      messageId: conference.conferenceId,
-      subMessageType: ChatMessageSubType.videoChat,
-    );
-    await store(chatMessage);
+    // ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+    //   groupId: conference.conferenceId,
+    //   groupName: conference.name,
+    //   groupType: PartyType.conference,
+    //   transportType: TransportType.none,
+    //   title: conference.video
+    //       ? ChatMessageContentType.video.name
+    //       : ChatMessageContentType.audio.name,
+    //   content: conference,
+    //   messageId: conference.conferenceId,
+    //   subMessageType: ChatMessageSubType.videoChat,
+    // );
+    //await store(chatMessage);
 
-    LiveKitConferenceServiceClient serviceClient =
-        liveKitConferenceServiceClientPool.createServiceClient();
-    Room room =
-        await serviceClient.createRoom(roomName: conference.conferenceId);
+    if (conference.sfu) {
+      Room? room = await conferenceService.createRoom(conference);
+      if (room == null) {
+        logger.e('create Room failure');
+      }
+    }
     Map<String, dynamic> conferenceMap = JsonUtil.toJson(conference);
-    List<ChatMessage> chatMessages = [chatMessage];
+    List<ChatMessage> chatMessages = [];
     for (String participant in participants) {
       String? name;
       Linkman? linkman =
@@ -489,13 +493,15 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       if (linkman != null) {
         name = linkman.name;
       }
+      LiveKitConferenceServiceClient serviceClient =
+          liveKitConferenceServiceClientPool.createServiceClient();
       String token = serviceClient
           .createToken(conference.conferenceId, participant, name: name);
       Conference conf = Conference.fromJson(conferenceMap);
       conf.sfuUri = serviceClient.host;
       conf.sfuToken = token;
 
-      chatMessage = await chatMessageService.buildChatMessage(
+      ChatMessage chatMessage = await chatMessageService.buildChatMessage(
         receiverPeerId: participant,
         groupId: conf.conferenceId,
         groupName: conf.name,
@@ -951,7 +957,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   /// 如果是非群消息或者拆分过的群消息返回单条消息的数组
   Future<List<ChatMessage>> _buildGroupChatMessages(ChatMessage chatMessage,
       {List<String>? peerIds}) async {
-    List<ChatMessage> chatMessages = [chatMessage];
+    List<ChatMessage> chatMessages = [];
 
     ///对组消息进行拆分
     if (chatMessage.groupId != null && chatMessage.receiverPeerId == null) {
@@ -989,6 +995,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     if (chatMessage.receiverPeerId == myself.peerId) {
       chatMessage.transportType = TransportType.none.name;
       await chatMessageService.store(chatMessage);
+
       return [chatMessage];
     }
     List<ChatMessage> chatMessages =
