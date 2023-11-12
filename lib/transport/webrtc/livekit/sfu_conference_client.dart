@@ -284,13 +284,13 @@ class LiveKitConferenceClient {
   final PeerMediaStreamController remotePeerMediaStreamController =
       PeerMediaStreamController();
   final ConferenceChatMessageController conferenceChatMessageController;
-  bool published = false;
+  bool joined = false;
 
   LiveKitConferenceClient(
       this.roomClient, this.conferenceChatMessageController);
 
   /// 初始化会议，先连接，然后注册事件
-  init() async {
+  join() async {
     await roomClient.connect();
     roomClient.onRoomEvent<ParticipantEvent>(onParticipantEvent);
     roomClient
@@ -298,25 +298,27 @@ class LiveKitConferenceClient {
     roomClient
         .onRoomEvent<LocalTrackUnpublishedEvent>(onLocalTrackUnpublishedEvent);
     roomClient.onLocalParticipantEvent(onLocalParticipantEvent);
+    await conferenceChatMessageController.join();
+    joined = true;
   }
 
   /// 远程参与者事件，远程轨道发生变化
   FutureOr<void> onParticipantEvent(ParticipantEvent event) {
     log.logger.i('on ParticipantEvent');
     for (RemoteParticipant remoteParticipant
-    in roomClient.room.participants.values) {
+        in roomClient.room.participants.values) {
       String identity = remoteParticipant.identity;
       String name = remoteParticipant.name;
       for (RemoteTrackPublication<RemoteVideoTrack> remoteTrackPublication
-      in remoteParticipant.videoTracks) {
+          in remoteParticipant.videoTracks) {
         PeerMediaStream peerMediaStream =
-        PeerMediaStream(videoTrack: remoteTrackPublication.track);
+            PeerMediaStream(videoTrack: remoteTrackPublication.track);
         remotePeerMediaStreamController.add(peerMediaStream);
       }
       for (RemoteTrackPublication<RemoteAudioTrack> remoteTrackPublication
-      in remoteParticipant.audioTracks) {
+          in remoteParticipant.audioTracks) {
         PeerMediaStream peerMediaStream =
-        PeerMediaStream(audioTrack: remoteTrackPublication.track);
+            PeerMediaStream(audioTrack: remoteTrackPublication.track);
         remotePeerMediaStreamController.add(peerMediaStream);
       }
     }
@@ -441,7 +443,6 @@ class LiveKitConferenceClient {
     } catch (error) {
       log.logger.e('could not publish audio: $error');
     }
-    published = true;
   }
 
   /// 关闭本地的某个轨道或者流
@@ -459,15 +460,14 @@ class LiveKitConferenceClient {
   }
 
   /// 关闭本地的所有的轨道或者流
-  exit({bool notify = true, bool? stopOnUnpublish}) async {
+  closeAll({bool notify = true, bool? stopOnUnpublish}) async {
     await roomClient.exit(notify: notify, stopOnUnpublish: stopOnUnpublish);
-    published = false;
   }
 
   /// 断开连接，退出会议
   disconnect() async {
     await roomClient.disconnect();
-    published = false;
+    joined = false;
   }
 }
 
@@ -508,7 +508,6 @@ class LiveKitConferenceClientPool with ChangeNotifier {
                 LiveKitRoomClient(token: token);
             liveKitConferenceClient = LiveKitConferenceClient(
                 liveKitRoomClient, conferenceChatMessageController);
-            await liveKitConferenceClient.init();
             _liveKitConferenceClients[conferenceId] = liveKitConferenceClient;
           }
         } else {
@@ -618,15 +617,12 @@ class LiveKitConferenceClientPool with ChangeNotifier {
 
   ///根据会议编号退出会议
   ///调用对应会议的退出方法
-  exit(String conferenceId) async {
+  closeAll(String conferenceId) async {
     await _clientLock.synchronized(() async {
       LiveKitConferenceClient? liveKitConferenceClient =
           _liveKitConferenceClients[conferenceId];
       if (liveKitConferenceClient != null) {
-        await liveKitConferenceClient.exit();
-        if (conferenceId == _conferenceId) {
-          _conferenceId = null;
-        }
+        await liveKitConferenceClient.closeAll();
         notifyListeners();
       }
     });
@@ -634,7 +630,7 @@ class LiveKitConferenceClientPool with ChangeNotifier {
 
   ///根据会议编号终止会议
   ///调用对应会议的终止方法，然后从会议池中删除，设置当前会议编号为null
-  terminate(String conferenceId) async {
+  disconnect(String conferenceId) async {
     await _clientLock.synchronized(() async {
       LiveKitConferenceClient? liveKitConferenceClient =
           _liveKitConferenceClients[conferenceId];

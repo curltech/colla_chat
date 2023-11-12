@@ -66,11 +66,6 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
   //控制面板可见性的计时器
   Timer? _hideControlPanelTimer;
 
-  //呼叫时间的计时器，如果是在单聊的场景下，对方在时间内未有回执，则自动关闭
-  Timer? _linkmanCallTimer;
-
-  //JustAudioPlayer audioPlayer = JustAudioPlayer();
-
   @override
   void initState() {
     super.initState();
@@ -118,10 +113,6 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
         liveKitConferenceClientPool.conferenceChatMessageController;
     conferenceChatMessageController?.stopAudio(
         filename: 'assets/medias/close.mp3');
-  }
-
-  Future<void> _updatePeerMediaStream(PeerMediaStream? peerMediaStream) async {
-    _updateView();
   }
 
   /// 调整界面的显示
@@ -208,30 +199,6 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     }
 
     return participants;
-  }
-
-  ///呼叫或者加入会议，如果当前没有选择会议邀请消息（linkman或者group模式下），则呼叫
-  ///呼叫需要创建新的视频会议conference，linkman模式下是临时conference，不存储，group模式下存储
-  ///发出会议邀请消息
-  ///加入会议是在当前选择了会议邀请消息后的操作，需要创建本地视频（如果不存在）
-  bool _checkWebrtcStatus() {
-    //检查webrtc的状态
-    var name = chatSummary.name;
-    var partyType = chatSummary.partyType;
-    var peerId = chatSummary.peerId;
-    if (partyType == PartyType.linkman.name && peerId != null) {
-      RTCPeerConnectionState? state =
-          peerConnectionPool.connectionState(peerId);
-      if (state == RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
-        if (mounted) {
-          DialogUtil.error(context,
-              content:
-                  '$name ${AppLocalizations.t('has no webrtc connected peerConnection')}');
-        }
-        return false;
-      }
-    }
-    return true;
   }
 
   /// 邀请的时候，在group模式下创建新的会议
@@ -345,77 +312,78 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
 
   /// 当前会议存在的时候加入当前会议，即开始视频会议
   Future<void> _join() async {
-    var status = _checkWebrtcStatus();
-    if (!status) {
-      return;
-    }
-    ConferenceChatMessageController? conferenceChatMessageController =
-        liveKitConferenceClientPool.conferenceChatMessageController;
-    if (conferenceChatMessageController == null) {
+    LiveKitConferenceClient? conferenceClient =
+        liveKitConferenceClientPool.conferenceClient;
+    if (conferenceClient == null) {
       if (mounted) {
         DialogUtil.error(context,
-            content: AppLocalizations.t('No video chat message controller'));
+            content: AppLocalizations.t('No conference client'));
       }
       return;
     }
-    ChatMessage? chatMessage = conferenceChatMessageController.chatMessage;
-    if (chatMessage == null) {
-      if (mounted) {
-        DialogUtil.error(context,
-            content: AppLocalizations.t('No video chat message'));
-      }
-      return;
-    }
-    Conference? conference = conferenceChatMessageController.conference;
-    if (conference == null) {
-      if (mounted) {
-        DialogUtil.error(context, content: AppLocalizations.t('No conference'));
-      }
-      return;
-    }
-    await conferenceChatMessageController.join();
+    await conferenceClient.join();
     if (mounted) {
       DialogUtil.info(context,
-          content: AppLocalizations.t('Join conference:') + conference.name);
+          content: AppLocalizations.t('Join conference:') +
+              conferenceClient.roomClient.room.name!);
     }
     _updateView();
   }
 
   ///关闭并且移除本地所有的视频，这时候还能看远程的视频
-  _close() async {
+  _closeAll() async {
     LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
-    if (conferenceClient != null) {
-      await conferenceClient.exit();
+    if (conferenceClient == null) {
+      if (mounted) {
+        DialogUtil.error(context,
+            content: AppLocalizations.t('No conference client'));
+      }
+      return;
     }
+    await conferenceClient.closeAll();
     _updateView();
   }
 
   ///呼叫挂断，关闭音频和本地视频，设置结束状态
   _hangup() async {
     _stopAudio();
-    LiveKitConferenceClient? liveKitConferenceClient =
+    LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
-    ConferenceChatMessageController? conferenceChatMessageController =
-        liveKitConferenceClient?.conferenceChatMessageController;
-    conferenceChatMessageController?.status = VideoChatStatus.end;
+    if (conferenceClient == null) {
+      if (mounted) {
+        DialogUtil.error(context,
+            content: AppLocalizations.t('No conference client'));
+      }
+      return;
+    }
+    ConferenceChatMessageController conferenceChatMessageController =
+        conferenceClient.conferenceChatMessageController;
+    conferenceChatMessageController.status = VideoChatStatus.end;
   }
 
   ///如果正在呼叫calling，停止呼叫，关闭所有的本地视频，呼叫状态改为结束
   ///如果正在通话chatting，挂断视频通话，关闭所有的本地视频和远程视频，呼叫状态改为结束
   ///结束会议，这时候本地和远程的视频都应该被关闭
-  _exit() async {
-    LiveKitConferenceClient? liveKitConferenceClient =
+  _disconnect() async {
+    LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
-    ConferenceChatMessageController? conferenceChatMessageController =
-        liveKitConferenceClient?.conferenceChatMessageController;
-    var status = conferenceChatMessageController?.status;
-    if (status == VideoChatStatus.chatting) {
-      await _close();
-      await liveKitConferenceClient?.exit();
-      liveKitConferenceClientPool.conferenceId = null;
+    if (conferenceClient == null) {
+      if (mounted) {
+        DialogUtil.error(context,
+            content: AppLocalizations.t('No conference client'));
+      }
+      return;
     }
-    conferenceChatMessageController?.status = VideoChatStatus.end;
+    ConferenceChatMessageController conferenceChatMessageController =
+        conferenceClient.conferenceChatMessageController;
+    var status = conferenceChatMessageController.status;
+    if (status == VideoChatStatus.calling ||
+        status == VideoChatStatus.chatting) {
+      await liveKitConferenceClientPool
+          .disconnect(conferenceChatMessageController.conferenceId!);
+    }
+    conferenceChatMessageController.status = VideoChatStatus.end;
   }
 
   Future<void> _onAction(int index, String name, {String? value}) async {
@@ -430,7 +398,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
         //await _openMediaStream(stream);
         break;
       case 'Close':
-        await _close();
+        await _closeAll();
         break;
       default:
         break;
@@ -556,9 +524,9 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
               tip: tip,
               onPressed: () {
                 if (value == VideoChatStatus.calling) {
-                  _hangup();
+                  _disconnect();
                 } else if (value == VideoChatStatus.chatting) {
-                  _exit();
+                  _disconnect();
                   indexWidgetProvider.pop(context: context);
                 }
               },
