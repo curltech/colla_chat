@@ -17,7 +17,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/media_stream_util.dart';
-import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controller.dart';
+import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
@@ -185,7 +185,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     Conference? conference = conferenceChatMessageController?.conference;
     VideoChatStatus? status = conferenceChatMessageController?.status;
     if (conference != null && status == VideoChatStatus.chatting) {
-      await p2pConferenceClient?.addLocalPeerMediaStream([peerMediaStream]);
+      await p2pConferenceClient?.publish([peerMediaStream]);
     }
   }
 

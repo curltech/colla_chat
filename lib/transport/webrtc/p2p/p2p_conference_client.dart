@@ -9,7 +9,7 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
-import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controller.dart';
+import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter/material.dart';
@@ -26,14 +26,14 @@ class P2pConferenceClient {
       PeerMediaStreamController();
 
   // 参与者的webrtc连接，如果连接为null，说明加入会议，但是连接还没有建立
-  final Map<String, Set<String>> _participants = {};
+  final Map<String, Set<String>> _remoteParticipants = {};
 
   // 参与者的webrtc连接的订阅事件
   final Map<String, List<StreamSubscription<WebrtcEvent>>>
       _streamSubscriptions = {};
 
   //自己是否加入
-  bool _published = false;
+  bool _joined = false;
 
   //会议的视频消息控制器，是创建会议的邀请消息，包含会议的信息
   final ConferenceChatMessageController conferenceChatMessageController;
@@ -51,7 +51,7 @@ class P2pConferenceClient {
   /// 获取本会议的所有连接
   Future<List<AdvancedPeerConnection>> get peerConnections async {
     List<AdvancedPeerConnection> peerConnections = [];
-    for (MapEntry<String, Set<String>> entry in _participants.entries) {
+    for (MapEntry<String, Set<String>> entry in _remoteParticipants.entries) {
       String peerId = entry.key;
       Set<String> clientIds = entry.value;
       for (String clientId in clientIds) {
@@ -67,8 +67,8 @@ class P2pConferenceClient {
 
   /// 会议中是否存在的对应的participant
   bool contains(String peerId, String clientId) {
-    if (_participants.containsKey(peerId)) {
-      Set<String>? clientIds = _participants[peerId];
+    if (_remoteParticipants.containsKey(peerId)) {
+      Set<String>? clientIds = _remoteParticipants[peerId];
       if (clientIds != null && clientIds.contains(clientId)) {
         return true;
       }
@@ -79,8 +79,8 @@ class P2pConferenceClient {
   /// 获取会议中存在的对应的连接
   Future<AdvancedPeerConnection?> getAdvancedPeerConnection(
       String peerId, String clientId) async {
-    if (_participants.containsKey(peerId)) {
-      Set<String>? clientIds = _participants[peerId];
+    if (_remoteParticipants.containsKey(peerId)) {
+      Set<String>? clientIds = _remoteParticipants[peerId];
       if (clientIds != null && clientIds.contains(clientId)) {
         return await peerConnectionPool.getOne(peerId, clientId: clientId);
       }
@@ -94,12 +94,12 @@ class P2pConferenceClient {
   }
 
   bool get joined {
-    return _published;
+    return _joined;
   }
 
   /// 自己加入会议，在所有的连接中加上本地流
-  publish() async {
-    _published = true;
+  join() async {
+    _joined = true;
     List<AdvancedPeerConnection> pcs = await peerConnections;
     for (AdvancedPeerConnection peerConnection in pcs) {
       await addAdvancedPeerConnection(peerConnection);
@@ -120,7 +120,7 @@ class P2pConferenceClient {
 
   /// 自己退出会议，从所有的连接中移除本地流和远程流
   exit() async {
-    _published = false;
+    _joined = false;
     await conferenceChatMessageController.exit();
     List<AdvancedPeerConnection> pcs = await peerConnections;
     for (AdvancedPeerConnection peerConnection in pcs) {
@@ -158,9 +158,9 @@ class P2pConferenceClient {
 
   ///把本地新的peerMediaStream加入到指定连接或者会议的所有连接中，并且都重新协商
   ///指定连接用在加入新的连接的时候，所有连接用在加入新的peerMediaStream的时候
-  addLocalPeerMediaStream(List<PeerMediaStream> peerMediaStreams,
+  publish(List<PeerMediaStream> peerMediaStreams,
       {AdvancedPeerConnection? peerConnection}) async {
-    if (_published) {
+    if (_joined) {
       if (peerConnection != null) {
         for (var peerMediaStream in peerMediaStreams) {
           await peerConnection.addLocalStream(peerMediaStream);
@@ -180,14 +180,14 @@ class P2pConferenceClient {
 
   /// 对方加入会议
   addParticipant(String peerId, String clientId) {
-    Set<String>? clientIds = _participants[peerId];
+    Set<String>? clientIds = _remoteParticipants[peerId];
     if (clientIds != null) {
       if (!clientIds.contains(clientId)) {
         clientIds.add(clientId);
       }
     } else {
       clientIds = {clientId};
-      _participants[peerId] = clientIds;
+      _remoteParticipants[peerId] = clientIds;
     }
   }
 
@@ -207,7 +207,7 @@ class P2pConferenceClient {
       addParticipant(peerConnection.peerId, peerConnection.clientId);
     }
     //只有自己已经加入，才需要加本地流和远程流
-    if (_published) {
+    if (_joined) {
       if (!_streamSubscriptions.containsKey(key)) {
         List<StreamSubscription<WebrtcEvent>> streamSubscriptions = [];
         StreamSubscription<WebrtcEvent>? trackStreamSubscription =
@@ -233,7 +233,7 @@ class P2pConferenceClient {
       List<PeerMediaStream> peerMediaStreams =
           localPeerMediaStreamController.peerMediaStreams;
       if (peerMediaStreams.isNotEmpty) {
-        await addLocalPeerMediaStream(peerMediaStreams,
+        await publish(peerMediaStreams,
             peerConnection: peerConnection);
       }
 
@@ -275,8 +275,8 @@ class P2pConferenceClient {
 
   /// 对方退出会议
   removeParticipant(String peerId, String clientId) async {
-    if (_participants.containsKey(peerId)) {
-      Set<String>? clientIds = _participants[peerId];
+    if (_remoteParticipants.containsKey(peerId)) {
+      Set<String>? clientIds = _remoteParticipants[peerId];
       if (clientIds != null && clientIds.contains(clientId)) {
         AdvancedPeerConnection? advancedPeerConnection =
             await peerConnectionPool.getOne(peerId, clientId: clientId);
@@ -285,7 +285,7 @@ class P2pConferenceClient {
         }
         clientIds.remove(clientId);
         if (clientIds.isEmpty) {
-          _participants.remove(peerId);
+          _remoteParticipants.remove(peerId);
         }
       }
     }
@@ -374,7 +374,7 @@ class P2pConferenceClient {
           whereArgs: [conferenceChatMessageController.conferenceId!]);
     }
     await exit();
-    _participants.clear();
+    _remoteParticipants.clear();
     remotePeerMediaStreamController.peerMediaStreams.clear();
     conferenceChatMessageController.terminate();
   }
@@ -501,7 +501,7 @@ class P2pConferenceClientPool with ChangeNotifier {
     P2pConferenceClient? p2pConferenceClient =
         _p2pConferenceClients[conferenceId];
     if (p2pConferenceClient != null) {
-      await p2pConferenceClient.addLocalPeerMediaStream(peerMediaStreams,
+      await p2pConferenceClient.publish(peerMediaStreams,
           peerConnection: peerConnection);
     }
   }

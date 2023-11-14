@@ -7,7 +7,7 @@ import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_co
 import 'package:colla_chat/plugin/logger.dart' as log;
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
-import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controller.dart';
+import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:livekit_client/livekit_client.dart';
@@ -243,8 +243,6 @@ class LiveKitRoomClient {
 /// 会议客户端，包含有房间客户端和会议的消息控制器
 class LiveKitConferenceClient {
   final LiveKitRoomClient roomClient;
-  final LocalPeerMediaStreamController _localPeerMediaStreamController =
-      localPeerMediaStreamController;
   final PeerMediaStreamController remotePeerMediaStreamController =
       PeerMediaStreamController();
   final ConferenceChatMessageController conferenceChatMessageController;

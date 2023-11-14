@@ -13,7 +13,7 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
-import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controller.dart';
+import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
@@ -652,7 +652,7 @@ class ConferenceChatMessageController with ChangeNotifier {
     P2pConferenceClient? p2pConferenceClient = p2pConferenceClientPool
         .getP2pConferenceClient(_conference!.conferenceId);
     if (p2pConferenceClient != null) {
-      await p2pConferenceClient.publish();
+      await p2pConferenceClient.join();
       status = VideoChatStatus.chatting;
     } else {
       logger.e('p2pConferenceClient:${_conference!.conferenceId} is not exist');
