@@ -222,7 +222,6 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
                 peerMediaStreamController:
                     p2pConferenceClient!.remotePeerMediaStreamController,
                 onClosed: _onClosedPeerMediaStream,
-                conference: videoChatMessageController.conference,
               ));
         });
   }

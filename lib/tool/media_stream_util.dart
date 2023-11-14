@@ -63,8 +63,8 @@ class MediaStreamUtil {
   }
 
   ///获取本机屏幕流
-  Future<MediaStream> createDisplayMediaStream(
-      {DesktopCapturerSource? selectedSource, bool audio = false}) async {
+  static Future<MediaStream> createDisplayMediaStream(
+      {DesktopCapturerSource? selectedSource, bool audio = true}) async {
     if (selectedSource == null) {
       var sources = await ScreenSelectUtil.getSources();
       if (sources.isNotEmpty) {
@@ -87,7 +87,7 @@ class MediaStreamUtil {
   }
 
   ///获取本机音频流
-  Future<MediaStream> createAudioMediaStream({bool replace = false}) async {
+  static Future<MediaStream> createAudioMediaStream({bool replace = false}) async {
     Map<String, dynamic> mediaConstraints = <String, dynamic>{
       'audio': true,
       'video': false,

@@ -2,6 +2,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:livekit_client/livekit_client.dart';
 import 'package:synchronized/synchronized.dart';
 
 ///媒体控制器，内部是PeerMediaStream的集合，以流的id为key
@@ -11,9 +12,6 @@ import 'package:synchronized/synchronized.dart';
 class PeerMediaStreamController with ChangeNotifier {
   //当前选择的界面渲染器
   PeerMediaStream? _currentPeerMediaStream;
-
-  //主视频对应的界面渲染器
-  PeerMediaStream? _mainPeerMediaStream;
 
   //媒体流集合，所有的视频流，包括本地和远程
   final Map<String, PeerMediaStream> _peerMediaStreams = {};
@@ -28,32 +26,6 @@ class PeerMediaStreamController with ChangeNotifier {
         add(peerMediaStream);
       }
     }
-  }
-
-  ///主媒体流
-  PeerMediaStream? get mainPeerMediaStream {
-    return _mainPeerMediaStream;
-  }
-
-  ///设置主媒体流，替换掉主媒体流
-  set mainPeerMediaStream(PeerMediaStream? mainPeerMediaStream) {
-    if (_mainPeerMediaStream != mainPeerMediaStream) {
-      if (_mainPeerMediaStream != null) {
-        remove(_mainPeerMediaStream!.id!);
-      }
-      _mainPeerMediaStream = mainPeerMediaStream;
-      if (_mainPeerMediaStream != null) {
-        add(_mainPeerMediaStream!);
-      }
-    }
-  }
-
-  ///判断主媒体流是否有视频
-  bool get video {
-    if (_mainPeerMediaStream != null) {
-      return _mainPeerMediaStream!.video;
-    }
-    return false;
   }
 
   ///获取当前媒体流
@@ -78,9 +50,9 @@ class PeerMediaStreamController with ChangeNotifier {
   List<PeerMediaStream> getPeerMediaStreams(String peerId, {String? clientId}) {
     List<PeerMediaStream> peerMediaStreams = [];
     for (var peerMediaStream in _peerMediaStreams.values) {
-      if (peerId == peerMediaStream.participant?.peerId) {
+      if (peerId == peerMediaStream.platformParticipant?.peerId) {
         if (clientId != null) {
-          if (clientId == peerMediaStream.participant?.clientId) {
+          if (clientId == peerMediaStream.platformParticipant?.clientId) {
             if (peerMediaStream.id != null) {
               peerMediaStreams.add(peerMediaStream);
             }
@@ -139,10 +111,6 @@ class PeerMediaStreamController with ChangeNotifier {
             _currentPeerMediaStream!.id == streamId) {
           _currentPeerMediaStream = null;
         }
-        if (_mainPeerMediaStream != null &&
-            _mainPeerMediaStream!.id == streamId) {
-          _mainPeerMediaStream = null;
-        }
         notifyListeners();
       }
       return peerMediaStream;
@@ -152,21 +120,27 @@ class PeerMediaStreamController with ChangeNotifier {
   ///关闭指定流并且从集合中删除
   close(String streamId) async {
     PeerMediaStream? peerMediaStream = await remove(streamId);
-    //在windows平台上关闭远程流似乎会崩溃，可以注释后进行测试
-    await peerMediaStream?.close();
+    if (peerMediaStream != null) {
+      //在windows平台上关闭远程流似乎会崩溃，可以注释后进行测试
+      if (_currentPeerMediaStream != null &&
+          _currentPeerMediaStream!.id == streamId) {
+        _currentPeerMediaStream = null;
+      }
+      await peerMediaStream.close();
+      notifyListeners();
+    }
   }
 
   ///移除并且关闭控制器所有的媒体流，激活exit事件
   closeAll() async {
     await _streamLock.synchronized(() async {
+      _currentPeerMediaStream = null;
       //先移除，后关闭
       List<PeerMediaStream> peerMediaStreams = [..._peerMediaStreams.values];
       for (var peerMediaStream in peerMediaStreams) {
         await peerMediaStream.close();
       }
       _peerMediaStreams.clear();
-      _currentPeerMediaStream = null;
-      _mainPeerMediaStream = null;
       notifyListeners();
     });
   }
@@ -174,72 +148,92 @@ class PeerMediaStreamController with ChangeNotifier {
 
 ///本地媒体控制器
 class LocalPeerMediaStreamController extends PeerMediaStreamController {
-  ///创建本地的Video stream，设置当前PeerMediaStream，激活create和add监听事件
-  Future<PeerMediaStream> createPeerVideoStream({
-    bool audio = true,
-    double width = 640,
-    double height = 480,
-    int frameRate = 30,
-  }) async {
-    PeerMediaStream peerMediaStream = PeerMediaStream();
-    await peerMediaStream.buildVideoMedia(
-      myself.peerId!,
-      clientId: myself.clientId,
-      name: myself.myselfPeer.name,
-      audio: audio,
-      width: width,
-      height: height,
-      frameRate: frameRate,
-    );
-    mainPeerMediaStream = peerMediaStream;
-    notifyListeners();
+  //主视频对应的界面渲染器
+  PeerMediaStream? _mainPeerMediaStream;
 
-    return peerMediaStream;
+  ///主媒体流
+  PeerMediaStream? get mainPeerMediaStream {
+    return _mainPeerMediaStream;
   }
 
-  ///创建本地的Audio stream，设置当前PeerMediaStream，激活create和add监听事件
-  Future<PeerMediaStream> createPeerAudioStream() async {
-    PeerMediaStream peerMediaStream = PeerMediaStream();
-    await peerMediaStream.buildAudioMedia(
-      myself.peerId!,
-      clientId: myself.clientId,
-      name: myself.myselfPeer.name,
-    );
-    mainPeerMediaStream = peerMediaStream;
-    notifyListeners();
+  ///设置主媒体流，替换掉主媒体流
+  set mainPeerMediaStream(PeerMediaStream? mainPeerMediaStream) {
+    if (_mainPeerMediaStream != mainPeerMediaStream) {
+      _mainPeerMediaStream = mainPeerMediaStream;
+      notifyListeners();
+    }
+  }
 
-    return peerMediaStream;
+  ///判断主媒体流是否有视频
+  bool get video {
+    if (_mainPeerMediaStream != null) {
+      return _mainPeerMediaStream!.video;
+    }
+    return false;
+  }
+
+  /// 创建本地的主Video render，支持视频和音频的切换，设置当前videoChatRender，激活create。add和remove监听事件
+  Future<PeerMediaStream> createMainPeerMediaStream(
+      {bool video = true, bool sfu = false}) async {
+    ///本地视频不存在，可以直接创建，并发送视频邀请消息，否则根据情况觉得是否音视频切换
+    if (mainPeerMediaStream == null) {
+      if (video) {
+        if (sfu) {
+          mainPeerMediaStream = await PeerMediaStream.createLocalVideoTrack();
+        } else {
+          mainPeerMediaStream = await PeerMediaStream.createLocalVideoMedia();
+        }
+      } else {
+        if (sfu) {
+          mainPeerMediaStream = await PeerMediaStream.createLocalAudioTrack();
+        } else {
+          mainPeerMediaStream = await PeerMediaStream.createLocalAudioMedia();
+        }
+      }
+      add(mainPeerMediaStream!);
+    }
+
+    return mainPeerMediaStream!;
   }
 
   ///创建本地的Display stream，激活create和add监听事件
-  Future<PeerMediaStream> createPeerDisplayStream({
-    DesktopCapturerSource? selectedSource,
-    bool audio = false,
-  }) async {
-    PeerMediaStream peerMediaStream = PeerMediaStream();
-    await peerMediaStream.buildDisplayMedia(myself.peerId!,
-        clientId: myself.clientId,
-        name: myself.myselfPeer.name,
-        selectedSource: selectedSource,
-        audio: audio);
+  Future<PeerMediaStream> createPeerDisplayStream(
+      {DesktopCapturerSource? selectedSource,
+      bool audio = false,
+      bool sfu = false}) async {
+    PeerMediaStream peerMediaStream;
+    if (sfu) {
+      peerMediaStream = await PeerMediaStream.createLocalScreenShareTrack(
+          sourceId: selectedSource?.id, audio: audio);
+    } else {
+      peerMediaStream = await PeerMediaStream.createLocalDisplayMedia(
+          selectedSource: selectedSource, audio: audio);
+    }
     add(peerMediaStream);
 
     return peerMediaStream;
   }
 
   ///创建本地的Stream，激活add监听事件
-  Future<PeerMediaStream> createPeerMediaStream(
-    MediaStream stream,
-  ) async {
-    var streamId = stream.id;
+  Future<PeerMediaStream> createPeerMediaStream({
+    MediaStream? mediaStream,
+    VideoTrack? videoTrack,
+  }) async {
+    String streamId = '';
+    if (mediaStream != null) {
+      streamId = mediaStream.id;
+    }
+    if (videoTrack != null) {
+      streamId = videoTrack.mediaStream.id;
+    }
     PeerMediaStream? peerMediaStream = _peerMediaStreams[streamId];
     if (peerMediaStream != null) {
       return peerMediaStream;
     }
-    peerMediaStream = PeerMediaStream();
-    await peerMediaStream.buildMediaStream(
-      myself.peerId!,
-      mediaStream: stream,
+    peerMediaStream = await PeerMediaStream.createPeerMediaStream(
+      peerId: myself.peerId!,
+      mediaStream: mediaStream,
+      videoTrack: videoTrack,
       clientId: myself.clientId,
       name: myself.myselfPeer.name,
     );
@@ -248,36 +242,20 @@ class LocalPeerMediaStreamController extends PeerMediaStreamController {
     return peerMediaStream;
   }
 
-  ///在会议创建后，自动创建本地视频，如果存在则直接返回
-  openLocalMainPeerMediaStream(bool video) async {
-    //如果本地主视频存在，直接返回
-    if (mainPeerMediaStream != null) {
-      return;
-    }
-    //根据conference.video来判断是请求音频还是视频，并创建本地视频stream
-    if (video) {
-      await createPeerVideoStream();
-      //测试目的，使用屏幕
-      // await localPeerMediaStreamController.createDisplayMediaStream();
-    } else {
-      await createPeerAudioStream();
-    }
-  }
-
   ///关闭本地特定的流
   @override
   close(String streamId) async {
-    await super.close(streamId);
-    if (mainPeerMediaStream != null && streamId == mainPeerMediaStream!.id) {
-      mainPeerMediaStream = null;
+    if (_mainPeerMediaStream != null && streamId == _mainPeerMediaStream!.id) {
+      _mainPeerMediaStream = null;
     }
+    await super.close(streamId);
   }
 
   ///关闭本地所有的流
   @override
   closeAll() async {
+    _mainPeerMediaStream = null;
     await super.closeAll();
-    mainPeerMediaStream = null;
   }
 }
 

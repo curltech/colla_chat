@@ -8,15 +8,13 @@ import 'package:flutter/material.dart';
 ///多个小视频窗口的排列
 class VideoViewCard extends StatefulWidget {
   final PeerMediaStreamController peerMediaStreamController;
-  final Conference? conference;
   final Function(PeerMediaStream peerMediaStream) onClosed;
 
-  const VideoViewCard(
-      {Key? key,
-      required this.peerMediaStreamController,
-      required this.onClosed,
-      this.conference})
-      : super(key: key);
+  const VideoViewCard({
+    Key? key,
+    required this.peerMediaStreamController,
+    required this.onClosed,
+  }) : super(key: key);
 
   @override
   State createState() => _VideoViewCardState();
@@ -67,7 +65,6 @@ class _VideoViewCardState extends State<VideoViewCard> {
       Widget videoView = SingleVideoViewWidget(
         peerMediaStreamController: widget.peerMediaStreamController,
         onClosed: widget.onClosed,
-        conference: widget.conference,
         peerMediaStream: peerMediaStream,
         // width: size.width,
         // height: size.height,

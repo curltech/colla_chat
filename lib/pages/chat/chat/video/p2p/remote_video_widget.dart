@@ -222,7 +222,6 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
                 peerMediaStreamController:
                     p2pConferenceClient!.remotePeerMediaStreamController,
                 onClosed: _onClosedPeerMediaStream,
-                conference: videoChatMessageController.conference,
               ));
         });
   }

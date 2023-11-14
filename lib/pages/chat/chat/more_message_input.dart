@@ -78,6 +78,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     ChatSummary? chatSummary = chatMessageController.chatSummary;
     String? partyType = chatSummary?.partyType;
     if (partyType == PartyType.conference.name) {
+      /// 会议模式下会议是否有效
       Conference? conference = await conferenceService
           .findCachedOneByConferenceId(chatSummary!.messageId!);
       if (conference != null) {

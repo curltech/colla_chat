@@ -57,7 +57,7 @@ class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
     });
 
     try {
-      await peerMediaStream.buildDisplayMedia('',
+      peerMediaStream = await PeerMediaStream.createLocalDisplayMedia(
           selectedSource: selectedSource);
       // var stream =
       //     await navigator.mediaDevices.getDisplayMedia(<String, dynamic>{

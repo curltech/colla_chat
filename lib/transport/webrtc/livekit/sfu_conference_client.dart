@@ -5,6 +5,7 @@ import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart' as log;
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
@@ -13,7 +14,7 @@ import 'package:livekit_client/livekit_client.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-/// LiveKit的房间连接客户端
+/// LiveKit的房间连接客户端,ws协议
 class LiveKitRoomClient {
   final String uri;
   final String token;
@@ -165,23 +166,6 @@ class LiveKitRoomClient {
         ?.setCameraEnabled(enabled, cameraCaptureOptions: cameraCaptureOptions);
   }
 
-  /// 创建本地视频
-  Future<LocalVideoTrack?> createCameraTrack(
-      {CameraCaptureOptions options = const CameraCaptureOptions(
-        cameraPosition: CameraPosition.front,
-        params: VideoParametersPresets.h720_169,
-      )}) async {
-    try {
-      LocalVideoTrack localVideo =
-          await LocalVideoTrack.createCameraTrack(options);
-
-      return localVideo;
-    } catch (e) {
-      log.logger.e('could not create video: $e');
-    }
-    return null;
-  }
-
   /// 发布本地视频
   Future<LocalTrackPublication<LocalVideoTrack>?> publishVideoTrack(
       LocalVideoTrack localVideo,
@@ -199,18 +183,6 @@ class LiveKitRoomClient {
       {AudioCaptureOptions? audioCaptureOptions}) async {
     return await room.localParticipant?.setMicrophoneEnabled(enabled,
         audioCaptureOptions: audioCaptureOptions);
-  }
-
-  /// 创建本地音频
-  Future<LocalAudioTrack?> createAudioTrack(
-      {AudioCaptureOptions options = const AudioCaptureOptions()}) async {
-    try {
-      LocalAudioTrack localAudio = await LocalAudioTrack.create(options);
-      return localAudio;
-    } catch (e) {
-      logger.warning('could not create audio: $e');
-    }
-    return null;
   }
 
   /// 发布本地音频
@@ -237,14 +209,6 @@ class LiveKitRoomClient {
         screenShareCaptureOptions: screenShareCaptureOptions);
   }
 
-  /// 创建屏幕共享，screenShareCaptureOptions包含源界面的编号
-  Future<LocalVideoTrack> createScreenShareTrack({
-    ScreenShareCaptureOptions? screenShareCaptureOptions,
-  }) async {
-    return await LocalVideoTrack.createScreenShareTrack(
-        screenShareCaptureOptions);
-  }
-
   ///设置可否订阅本地轨道的参与人
   setTrackSubscriptionPermissions(
       {required bool allParticipantsAllowed,
@@ -260,12 +224,12 @@ class LiveKitRoomClient {
   }
 
   /// 关闭本地的某个轨道或者流
-  close(String trackSid, {bool notify = true}) async {
+  unpublish(String trackSid, {bool notify = true}) async {
     await room.localParticipant?.unpublishTrack(trackSid, notify: notify);
   }
 
   /// 关闭本地的所有的轨道或者流
-  exit({bool notify = true, bool? stopOnUnpublish}) async {
+  unpublishAll({bool notify = true, bool? stopOnUnpublish}) async {
     await room.localParticipant
         ?.unpublishAllTracks(notify: notify, stopOnUnpublish: stopOnUnpublish);
   }
@@ -279,8 +243,8 @@ class LiveKitRoomClient {
 /// 会议客户端，包含有房间客户端和会议的消息控制器
 class LiveKitConferenceClient {
   final LiveKitRoomClient roomClient;
-  final PeerMediaStreamController localPeerMediaStreamController =
-      PeerMediaStreamController();
+  final LocalPeerMediaStreamController _localPeerMediaStreamController =
+      localPeerMediaStreamController;
   final PeerMediaStreamController remotePeerMediaStreamController =
       PeerMediaStreamController();
   final ConferenceChatMessageController conferenceChatMessageController;
@@ -428,45 +392,91 @@ class LiveKitConferenceClient {
         screenShareCaptureOptions: screenShareCaptureOptions);
   }
 
-  /// 发布本地视频或者音频
-  void publish() async {
-    bool? video = conferenceChatMessageController.conference?.video;
-    if (video != null && video) {
-      try {
-        await setCameraEnabled(true);
-      } catch (error) {
-        log.logger.e('could not publish video: $error');
-      }
-    }
-    try {
-      await setMicrophoneEnabled(true);
-    } catch (error) {
-      log.logger.e('could not publish audio: $error');
-    }
-  }
-
-  /// 关闭本地的某个轨道或者流
-  close(PeerMediaStream peerMediaStream, {bool notify = true}) async {
-    List<MediaStreamTrack>? tracks = peerMediaStream.mediaStream?.getTracks();
-    if (tracks == null) {
+  /// 发布本地视频或者音频，如果参数的流为null，则创建本地主视频并发布
+  Future<void> publish({PeerMediaStream? peerMediaStream}) async {
+    if (!joined) {
       return;
     }
-    for (MediaStreamTrack track in tracks) {
-      String? id = track.id;
-      if (id != null) {
-        await roomClient.close(id, notify: notify);
+    if (peerMediaStream != null) {
+      if (peerMediaStream.videoTrack != null && peerMediaStream.local) {
+        await roomClient
+            .publishVideoTrack(peerMediaStream.videoTrack! as LocalVideoTrack);
+      }
+      if (peerMediaStream.audioTrack != null && peerMediaStream.local) {
+        await roomClient
+            .publishAudioTrack(peerMediaStream.audioTrack! as LocalAudioTrack);
+      }
+    } else {
+      bool? video = conferenceChatMessageController.conference?.video;
+      if (video != null && video) {
+        try {
+          LocalTrackPublication<LocalTrack>? localTrackPublication =
+              await setCameraEnabled(true);
+          if (localTrackPublication != null) {
+            PeerMediaStream peerMediaStream =
+                await PeerMediaStream.createPeerMediaStream(
+                    videoTrack: localTrackPublication.track! as VideoTrack,
+                    peerId: myself.peerId!,
+                    clientId: myself.clientId,
+                    name: myself.name);
+            localPeerMediaStreamController.mainPeerMediaStream =
+                peerMediaStream;
+          }
+        } catch (error) {
+          log.logger.e('could not publish video: $error');
+        }
+      }
+      try {
+        LocalTrackPublication<LocalTrack>? localTrackPublication =
+            await setMicrophoneEnabled(true);
+        if (localTrackPublication != null) {
+          PeerMediaStream peerMediaStream =
+              await PeerMediaStream.createPeerMediaStream(
+                  audioTrack: localTrackPublication.track! as AudioTrack,
+                  peerId: myself.peerId!,
+                  clientId: myself.clientId,
+                  name: myself.name);
+          localPeerMediaStreamController.mainPeerMediaStream = peerMediaStream;
+        }
+      } catch (error) {
+        log.logger.e('could not publish audio: $error');
       }
     }
   }
 
-  /// 关闭本地的所有的轨道或者流
-  closeAll({bool notify = true, bool? stopOnUnpublish}) async {
-    await roomClient.exit(notify: notify, stopOnUnpublish: stopOnUnpublish);
+  /// 退出发布并且关闭本地的某个轨道或者流
+  close(PeerMediaStream peerMediaStream, {bool notify = true}) async {
+    if (joined) {
+      List<MediaStreamTrack>? tracks = peerMediaStream.mediaStream?.getTracks();
+      if (tracks == null) {
+        return;
+      }
+      for (MediaStreamTrack track in tracks) {
+        String? id = track.id;
+        if (id != null) {
+          await roomClient.unpublish(id, notify: notify);
+        }
+      }
+    }
+    if (peerMediaStream.id != null) {
+      await localPeerMediaStreamController.close(peerMediaStream.id!);
+    }
+  }
+
+  /// 退出发布并且关闭本地的所有的轨道或者流
+  closeAll({bool notify = true}) async {
+    if (joined) {
+      await roomClient.unpublishAll(notify: notify, stopOnUnpublish: true);
+    }
+    await localPeerMediaStreamController.closeAll();
   }
 
   /// 断开连接，退出会议
   disconnect() async {
-    await roomClient.disconnect();
+    if (joined) {
+      await roomClient.disconnect();
+    }
+    await localPeerMediaStreamController.closeAll();
     joined = false;
   }
 }
@@ -592,26 +602,26 @@ class LiveKitConferenceClientPool with ChangeNotifier {
   }
 
   ///把本地新的peerMediaStream加入到会议的所有连接中，并且都重新协商
-  addLocalPeerMediaStream(
-      String conferenceId, List<PeerMediaStream> peerMediaStreams,
+  publish(String conferenceId, List<PeerMediaStream> peerMediaStreams,
       {AdvancedPeerConnection? peerConnection}) async {
     LiveKitConferenceClient? liveKitConferenceClient =
         _liveKitConferenceClients[conferenceId];
     if (liveKitConferenceClient != null) {
-      await liveKitConferenceClient.roomClient.setCameraEnabled(true);
-      //liveKitConferenceClient.roomClient.publishVideoTrack();
+      for (PeerMediaStream peerMediaStream in peerMediaStreams) {
+        liveKitConferenceClient.publish(peerMediaStream: peerMediaStream);
+      }
     }
   }
 
   ///会议的指定连接或者所有连接中移除本地或者远程的peerMediaStream，并且都重新协商
-  removeLocalPeerMediaStream(
-      String conferenceId, List<PeerMediaStream> peerMediaStreams,
+  close(String conferenceId, List<PeerMediaStream> peerMediaStreams,
       {AdvancedPeerConnection? peerConnection}) async {
     LiveKitConferenceClient? liveKitConferenceClient =
         _liveKitConferenceClients[conferenceId];
     if (liveKitConferenceClient != null) {
-      // await liveKitConferenceClient.removeLocalPeerMediaStream(peerMediaStreams,
-      //     peerConnection: peerConnection);
+      for (PeerMediaStream peerMediaStream in peerMediaStreams) {
+        await liveKitConferenceClient.close(peerMediaStream);
+      }
     }
   }
 

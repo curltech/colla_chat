@@ -341,9 +341,8 @@ class P2pConferenceClient {
     if (peerMediaStream != null) {
       return;
     }
-    peerMediaStream = PeerMediaStream();
-    await peerMediaStream.buildMediaStream(peerId,
-        mediaStream: stream, clientId: clientId, name: name);
+    peerMediaStream = await PeerMediaStream.createPeerMediaStream(
+        peerId: peerId, mediaStream: stream, clientId: clientId, name: name);
     remotePeerMediaStreamController.add(peerMediaStream);
   }
 
@@ -369,7 +368,6 @@ class P2pConferenceClient {
   ///激活exit事件
   terminate() async {
     remotePeerMediaStreamController.currentPeerMediaStream = null;
-    remotePeerMediaStreamController.mainPeerMediaStream = null;
     if (conferenceChatMessageController.conferenceId != null) {
       conferenceService.update({'status': EntityStatus.expired.name},
           where: 'conferenceId=?',

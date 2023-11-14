@@ -57,7 +57,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   // Platform messages are asynchronous, so we initialize in an async method.
   void _makeCall() async {
     try {
-      await localPeerMediaStreamController.createPeerVideoStream();
+      await localPeerMediaStreamController.createMainPeerMediaStream();
       List<PeerMediaStream> renders =
           localPeerMediaStreamController.peerMediaStreams;
       if (renders.isNotEmpty) {

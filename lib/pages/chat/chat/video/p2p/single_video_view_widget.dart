@@ -15,7 +15,6 @@ import 'package:flutter/material.dart';
 ///单个小视频窗口，显示一个视频流的PeerpeerMediaStream，长按出现更大的窗口，带有操作按钮
 class SingleVideoViewWidget extends StatefulWidget {
   final PeerMediaStreamController peerMediaStreamController;
-  final Conference? conference;
   final PeerMediaStream peerMediaStream;
   final double? height;
   final double? width;
@@ -25,7 +24,6 @@ class SingleVideoViewWidget extends StatefulWidget {
     Key? key,
     required this.peerMediaStreamController,
     required this.onClosed,
-    this.conference,
     required this.peerMediaStream,
     this.height,
     this.width,
@@ -206,7 +204,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   ///单个视频窗口
   Widget _buildSingleVideoView(
       BuildContext context, double? height, double? width) {
-    String name = widget.peerMediaStream.participant?.name ?? '';
+    String name = widget.peerMediaStream.platformParticipant?.name ?? '';
     String streamId = widget.peerMediaStream.mediaStream?.id ?? '';
     bool video = widget.peerMediaStream.video;
     Widget mediaRenderView =

@@ -1,11 +1,12 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/media_stream_util.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:livekit_client/livekit_client.dart' as livekit_client;
+import 'package:livekit_client/livekit_client.dart';
+import 'package:colla_chat/plugin/logger.dart' as log;
 
 final emptyVideoView = Center(
   child: AppImage.mdAppImage,
@@ -24,31 +25,31 @@ enum PeerMediaStreamOperator {
   torch
 }
 
-class Participant {
+class PlatformParticipant {
   String peerId;
   String? name;
   String? clientId;
 
-  Participant(this.peerId, {this.clientId, this.name});
+  PlatformParticipant(this.peerId, {this.clientId, this.name});
 }
 
 /// 关联webrtc媒体流和peer的类，可以构造本地媒体流或者传入的媒体流
 class PeerMediaStream {
   String? id;
   MediaStream? mediaStream;
-  livekit_client.VideoTrack? videoTrack;
-  livekit_client.AudioTrack? audioTrack;
-  livekit_client.Participant? livekitParticipant;
+  VideoTrack? videoTrack;
+  AudioTrack? audioTrack;
+  Participant? livekitParticipant;
 
   //业务相关的数据
-  Participant? participant;
+  PlatformParticipant? platformParticipant;
 
   PeerMediaStream({
     this.mediaStream,
     this.videoTrack,
     this.audioTrack,
     this.livekitParticipant,
-    this.participant,
+    this.platformParticipant,
   }) {
     if (mediaStream != null) {
       id = mediaStream!.id;
@@ -57,6 +58,103 @@ class PeerMediaStream {
     } else if (audioTrack != null) {
       id = audioTrack!.mediaStream.id;
     }
+  }
+
+  /// 创建本机视频流，并且设置peer信息
+  static Future<PeerMediaStream> createLocalVideoMedia(
+      {bool audio = true,
+      double width = 640,
+      double height = 480,
+      int frameRate = 30,
+      bool replace = false}) async {
+    PlatformParticipant platformParticipant = PlatformParticipant(
+        myself.peerId!,
+        clientId: myself.clientId,
+        name: myself.name);
+    var mediaStream = await MediaStreamUtil.createVideoMediaStream(
+        width: width, height: height, frameRate: frameRate);
+
+    return PeerMediaStream(
+        mediaStream: mediaStream, platformParticipant: platformParticipant);
+  }
+
+  /// 创建本地视频
+  static Future<PeerMediaStream> createLocalVideoTrack(
+      {CameraCaptureOptions options = const CameraCaptureOptions(
+        cameraPosition: CameraPosition.front,
+        params: VideoParametersPresets.h720_169,
+      )}) async {
+    LocalVideoTrack localVideo =
+        await LocalVideoTrack.createCameraTrack(options);
+    PlatformParticipant platformParticipant = PlatformParticipant(
+        myself.peerId!,
+        clientId: myself.clientId,
+        name: myself.name);
+
+    return PeerMediaStream(
+        videoTrack: localVideo, platformParticipant: platformParticipant);
+  }
+
+  ///获取本机音频流
+  static Future<PeerMediaStream> createLocalAudioMedia() async {
+    PlatformParticipant platformParticipant = PlatformParticipant(
+        myself.peerId!,
+        clientId: myself.clientId,
+        name: myself.name);
+    var mediaStream = await MediaStreamUtil.createAudioMediaStream();
+
+    return PeerMediaStream(
+        mediaStream: mediaStream, platformParticipant: platformParticipant);
+  }
+
+  /// 创建本地音频
+  static Future<PeerMediaStream?> createLocalAudioTrack(
+      {AudioCaptureOptions options = const AudioCaptureOptions()}) async {
+    try {
+      LocalAudioTrack localAudio = await LocalAudioTrack.create(options);
+      PlatformParticipant platformParticipant = PlatformParticipant(
+          myself.peerId!,
+          clientId: myself.clientId,
+          name: myself.name);
+      return PeerMediaStream(
+          audioTrack: localAudio, platformParticipant: platformParticipant);
+    } catch (e) {
+      log.logger.w('could not create audio: $e');
+    }
+    return null;
+  }
+
+  ///获取本机屏幕流
+  static Future<PeerMediaStream> createLocalDisplayMedia(
+      {DesktopCapturerSource? selectedSource, bool audio = false}) async {
+    PlatformParticipant platformParticipant = PlatformParticipant(
+        myself.peerId!,
+        clientId: myself.clientId,
+        name: myself.name);
+    var mediaStream = await MediaStreamUtil.createDisplayMediaStream(
+        selectedSource: selectedSource, audio: audio);
+
+    return PeerMediaStream(
+        mediaStream: mediaStream, platformParticipant: platformParticipant);
+  }
+
+  /// 创建屏幕共享，screenShareCaptureOptions包含源界面的编号
+  static Future<PeerMediaStream> createLocalScreenShareTrack({
+    String? sourceId,
+    bool audio = true,
+  }) async {
+    ScreenShareCaptureOptions screenShareCaptureOptions =
+        ScreenShareCaptureOptions(
+            sourceId: sourceId, captureScreenAudio: audio);
+    LocalVideoTrack localVideo =
+        await LocalVideoTrack.createScreenShareTrack(screenShareCaptureOptions);
+    PlatformParticipant platformParticipant = PlatformParticipant(
+        myself.peerId!,
+        clientId: myself.clientId,
+        name: myself.name);
+
+    return PeerMediaStream(
+        videoTrack: localVideo, platformParticipant: platformParticipant);
   }
 
   bool get audio {
@@ -84,12 +182,18 @@ class PeerMediaStream {
   }
 
   ///关闭旧的媒体流，设置新的媒体流，
-  setStream(
-      {MediaStream? mediaStream, livekit_client.VideoTrack? videoTrack}) async {
+  replaceStream({
+    MediaStream? mediaStream,
+    VideoTrack? videoTrack,
+    AudioTrack? audioTrack,
+  }) async {
     if (this.mediaStream == mediaStream) {
       return;
     }
     if (this.videoTrack == videoTrack) {
+      return;
+    }
+    if (this.audioTrack == audioTrack) {
       return;
     }
     await close();
@@ -99,6 +203,9 @@ class PeerMediaStream {
     } else if (videoTrack != null) {
       this.videoTrack = videoTrack;
       id = videoTrack.mediaStream.id;
+    } else if (audioTrack != null) {
+      this.audioTrack = audioTrack;
+      id = audioTrack.mediaStream.id;
     } else {
       this.mediaStream = null;
       this.videoTrack = null;
@@ -106,106 +213,29 @@ class PeerMediaStream {
     }
   }
 
-  ///创建本机视频流，并且设置peer信息
-  Future<void> buildVideoMedia(String peerId,
-      {String? clientId,
-      String? name,
-      bool audio = true,
-      double width = 640,
-      double height = 480,
-      int frameRate = 30,
-      bool replace = false}) async {
-    if (id != null) {
-      if (replace) {
-        await close();
-      } else {
-        return;
-      }
-    }
-    participant = Participant(peerId, clientId: clientId, name: name);
-    var mediaStream = await MediaStreamUtil.createVideoMediaStream(
-        width: width, height: height, frameRate: frameRate);
-    this.mediaStream = mediaStream;
-    id = mediaStream.id;
-  }
-
-  ///获取本机音频流
-  Future<void> buildAudioMedia(String peerId,
-      {String? clientId, String? name, bool replace = false}) async {
-    if (id != null) {
-      if (replace) {
-        await close();
-      } else {
-        return;
-      }
-    }
-    participant = Participant(peerId, clientId: clientId, name: name);
-    Map<String, dynamic> mediaConstraints = <String, dynamic>{
-      'audio': true,
-      'video': false,
-    };
-    var mediaStream =
-        await navigator.mediaDevices.getUserMedia(mediaConstraints);
-    this.mediaStream = mediaStream;
-    id = mediaStream.id;
-  }
-
-  ///获取本机屏幕流
-  Future<void> buildDisplayMedia(String peerId,
-      {String? clientId,
-      String? name,
-      DesktopCapturerSource? selectedSource,
-      bool audio = false,
-      bool replace = false}) async {
-    if (id != null) {
-      if (replace) {
-        await close();
-      } else {
-        return;
-      }
-    }
-    participant = Participant(peerId, clientId: clientId, name: name);
-
-    dynamic video = true;
-    if (platformParams.ios) {
-      video = {
-        'deviceId': 'broadcast',
-        'mandatory': {'frameRate': 30.0}
-      };
-    } else {
-      if (selectedSource == null) {
-        var sources = await ScreenSelectUtil.getSources();
-        if (sources.isNotEmpty) {
-          selectedSource = sources[0];
-        }
-      }
-    }
-    if (selectedSource != null) {
-      video = {
-        'deviceId': {'exact': selectedSource.id},
-        'mandatory': {'frameRate': 30.0}
-      };
-    }
-    Map<String, dynamic> mediaConstraints = <String, dynamic>{
-      'audio': audio,
-      'video': video
-    };
-    await close();
-    var mediaStream =
-        await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
-    this.mediaStream = mediaStream;
-    id = mediaStream.id;
-  }
-
-  Future<void> buildMediaStream(
-    String peerId, {
-    MediaStream? mediaStream,
-    livekit_client.VideoTrack? videoTrack,
+  static Future<PeerMediaStream> createPeerMediaStream({
+    required String peerId,
     String? clientId,
     String? name,
+    MediaStream? mediaStream,
+    VideoTrack? videoTrack,
+    AudioTrack? audioTrack,
   }) async {
-    participant = Participant(peerId, clientId: clientId, name: name);
-    setStream(mediaStream: mediaStream, videoTrack: videoTrack);
+    PlatformParticipant platformParticipant =
+        PlatformParticipant(peerId, clientId: clientId, name: name);
+    if (videoTrack != null) {
+      return PeerMediaStream(
+          videoTrack: videoTrack, platformParticipant: platformParticipant);
+    }
+    if (audioTrack != null) {
+      return PeerMediaStream(
+          audioTrack: audioTrack, platformParticipant: platformParticipant);
+    }
+    if (mediaStream != null) {
+      return PeerMediaStream(
+          mediaStream: mediaStream, platformParticipant: platformParticipant);
+    }
+    throw 'Must have mediaStream or videoTrack';
   }
 
   bool get local {
@@ -213,6 +243,8 @@ class PeerMediaStream {
       return mediaStream!.ownerTag == 'local';
     } else if (videoTrack != null) {
       return videoTrack!.mediaStream.ownerTag == 'local';
+    } else if (audioTrack != null) {
+      return audioTrack!.mediaStream.ownerTag == 'local';
     }
     return false;
   }
@@ -221,35 +253,36 @@ class PeerMediaStream {
   close() async {
     if (mediaStream != null) {
       var mediaStream = this.mediaStream;
-      if (!local) {
-        logger.i(
-            'dispose non local stream:${mediaStream!.id} ${mediaStream.ownerTag}');
-      } else {
-        logger.i('dispose stream:${mediaStream!.id} ${mediaStream.ownerTag}');
-      }
       try {
-        await mediaStream.dispose();
+        await mediaStream?.dispose();
       } catch (e) {
-        logger.e('mediaStream.close failure:$e');
+        log.logger.e('mediaStream.close failure:$e');
       }
       this.mediaStream = null;
       id = null;
     }
     if (videoTrack != null) {
-      var mediaStream = videoTrack!.mediaStream;
-      if (!local) {
-        logger.i(
-            'dispose non local videoTrack:${mediaStream.id} ${mediaStream.ownerTag}');
-      } else {
-        logger
-            .i('dispose videoTrack:${mediaStream.id} ${mediaStream.ownerTag}');
-      }
+      var mediaStream = videoTrack?.mediaStream;
       try {
-        await videoTrack!.dispose();
+        await mediaStream?.dispose();
+        await videoTrack?.stop();
+        await videoTrack?.dispose();
       } catch (e) {
-        logger.e('videoTrack.close failure:$e');
+        log.logger.e('videoTrack.close failure:$e');
       }
       videoTrack = null;
+      id = null;
+    }
+    if (audioTrack != null) {
+      var mediaStream = audioTrack?.mediaStream;
+      try {
+        await mediaStream?.dispose();
+        await audioTrack?.stop();
+        await audioTrack?.dispose();
+      } catch (e) {
+        log.logger.e('audioTrack.close failure:$e');
+      }
+      audioTrack = null;
       id = null;
     }
   }

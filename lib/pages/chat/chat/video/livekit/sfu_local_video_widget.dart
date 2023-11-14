@@ -19,8 +19,9 @@ import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/media_stream_util.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_conference_client.dart';
-import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
+import 'package:colla_chat/transport/webrtc/p2p/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
+import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
@@ -70,6 +71,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
   void initState() {
     super.initState();
     liveKitConferenceClientPool.addListener(_updateConferenceClient);
+    localPeerMediaStreamController.addListener(_updateLocalPeerMediaStream);
     _updateConferenceClient();
     _updateView();
   }
@@ -87,6 +89,11 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
       videoChatStatus.value = VideoChatStatus.end;
     }
     _updateView();
+  }
+
+  _updateLocalPeerMediaStream() {
+    videoViewCount.value =
+        localPeerMediaStreamController.peerMediaStreams.length;
   }
 
   _updateVideoChatStatus() {
@@ -118,10 +125,32 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
   /// 调整界面的显示
   Future<void> _updateView() async {
     List<ActionData> actionData = [];
-    LiveKitConferenceClient? conferenceClient = this.conferenceClient.value;
-    List<PeerMediaStream>? peerMediaStreams =
-        conferenceClient?.localPeerMediaStreams;
-    if (peerMediaStreams != null && peerMediaStreams.isNotEmpty) {
+    if (localPeerMediaStreamController.mainPeerMediaStream == null ||
+        !localPeerMediaStreamController.video) {
+      actionData.add(
+        ActionData(
+            label: 'Video',
+            tooltip: 'Open local video',
+            icon: const Icon(Icons.video_call, color: Colors.white)),
+      );
+    }
+    if (localPeerMediaStreamController.mainPeerMediaStream == null ||
+        localPeerMediaStreamController.video) {
+      actionData.add(
+        ActionData(
+          label: 'Audio',
+          tooltip: 'Open local audio',
+          icon: const Icon(Icons.multitrack_audio, color: Colors.white),
+        ),
+      );
+    }
+    actionData.add(
+      ActionData(
+          label: 'Screen share',
+          tooltip: 'Open screen share',
+          icon: const Icon(Icons.screen_share, color: Colors.white)),
+    );
+    if (localPeerMediaStreamController.peerMediaStreams.isNotEmpty) {
       actionData.add(
         ActionData(
             label: 'Close',
@@ -129,7 +158,8 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
             icon:
                 const Icon(Icons.closed_caption_disabled, color: Colors.white)),
       );
-      videoViewCount.value = peerMediaStreams.length;
+      videoViewCount.value =
+          localPeerMediaStreamController.peerMediaStreams.length;
     } else {
       controlPanelVisible.value = true;
       videoViewCount.value = 0;
@@ -296,7 +326,6 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
       return;
     }
     conferenceChatMessageController.status = VideoChatStatus.calling;
-    await conferenceChatMessageController.openLocalMainPeerMediaStream();
 
     _playAudio();
     //延时60秒后自动挂断
@@ -321,11 +350,20 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
       }
       return;
     }
-    await conferenceClient.join();
+    try {
+      await conferenceClient.join();
+    } catch (e) {
+      if (mounted) {
+        DialogUtil.error(context,
+            content: AppLocalizations.t('Join conference failure:') +
+                conferenceClient.conferenceChatMessageController.name!);
+      }
+      return;
+    }
     if (mounted) {
       DialogUtil.info(context,
           content: AppLocalizations.t('Join conference:') +
-              conferenceClient.roomClient.room.name!);
+              conferenceClient.conferenceChatMessageController.name!);
     }
     _updateView();
   }
@@ -343,23 +381,6 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     }
     await conferenceClient.closeAll();
     _updateView();
-  }
-
-  ///呼叫挂断，关闭音频和本地视频，设置结束状态
-  _hangup() async {
-    _stopAudio();
-    LiveKitConferenceClient? conferenceClient =
-        liveKitConferenceClientPool.conferenceClient;
-    if (conferenceClient == null) {
-      if (mounted) {
-        DialogUtil.error(context,
-            content: AppLocalizations.t('No conference client'));
-      }
-      return;
-    }
-    ConferenceChatMessageController conferenceChatMessageController =
-        conferenceClient.conferenceChatMessageController;
-    conferenceChatMessageController.status = VideoChatStatus.end;
   }
 
   ///如果正在呼叫calling，停止呼叫，关闭所有的本地视频，呼叫状态改为结束
@@ -386,13 +407,78 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     conferenceChatMessageController.status = VideoChatStatus.end;
   }
 
+  ///创建本地的Video render，支持视频和音频的切换，设置当前videoChatRender，激活create。add和remove监听事件
+  Future<PeerMediaStream?> _openMainPeerMediaStream({bool video = true}) async {
+    ///本地视频不存在，可以直接创建，并发送视频邀请消息，否则根据情况觉得是否音视频切换
+    PeerMediaStream? mainPeerMediaStream =
+        localPeerMediaStreamController.mainPeerMediaStream;
+    if (mainPeerMediaStream != null) {
+      if (mainPeerMediaStream.video != video) {
+        await _close(mainPeerMediaStream);
+      } else {
+        return null;
+      }
+    }
+    if (video) {
+      mainPeerMediaStream = await localPeerMediaStreamController
+          .createMainPeerMediaStream(sfu: true);
+    } else {
+      mainPeerMediaStream = await localPeerMediaStreamController
+          .createMainPeerMediaStream(video: false, sfu: true);
+    }
+    await publish(mainPeerMediaStream);
+    _updateView();
+
+    return mainPeerMediaStream;
+  }
+
+  Future<PeerMediaStream?> _openDisplayMedia() async {
+    DesktopCapturerSource? source;
+    if (!platformParams.ios) {
+      source = await DialogUtil.show<DesktopCapturerSource>(
+        context: context,
+        builder: (context) => Dialog(child: ScreenSelectDialog()),
+      );
+    }
+    PeerMediaStream peerMediaStream = await localPeerMediaStreamController
+        .createPeerDisplayStream(selectedSource: source, sfu: true);
+    await publish(peerMediaStream);
+    _updateView();
+
+    return peerMediaStream;
+  }
+
+  /// 发布视频流
+  publish(PeerMediaStream peerMediaStream) async {
+    LiveKitConferenceClient? conferenceClient =
+        liveKitConferenceClientPool.conferenceClient;
+    if (conferenceClient != null) {
+      await conferenceClient.publish(peerMediaStream: peerMediaStream);
+    }
+  }
+
+  /// 退出发布并且关闭视频流
+  _close(PeerMediaStream peerMediaStream) async {
+    LiveKitConferenceClient? conferenceClient =
+        liveKitConferenceClientPool.conferenceClient;
+    if (conferenceClient != null) {
+      await conferenceClient.close(peerMediaStream);
+    }
+    if (peerMediaStream.id != null) {
+      await localPeerMediaStreamController.close(peerMediaStream.id!);
+    }
+  }
+
   Future<void> _onAction(int index, String name, {String? value}) async {
     switch (name) {
       case 'Video':
+        await _openMainPeerMediaStream();
         break;
       case 'Audio':
+        await _openMainPeerMediaStream(video: false);
         break;
       case 'Screen share':
+        await _openDisplayMedia();
         break;
       case 'Media play':
         //await _openMediaStream(stream);
@@ -507,7 +593,16 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     return ValueListenableBuilder<VideoChatStatus>(
         valueListenable: videoChatStatus,
         builder: (BuildContext context, VideoChatStatus value, Widget? child) {
-          Widget buttonWidget;
+          Widget buttonWidget = const CircleTextButton(
+            elevation: 2.0,
+            backgroundColor: Colors.grey,
+            padding: EdgeInsets.all(15.0),
+            child: Icon(
+              Icons.call_end,
+              size: AppIconSize.mdSize,
+              color: Colors.white,
+            ),
+          );
           if (value == VideoChatStatus.calling ||
               value == VideoChatStatus.chatting) {
             String? label;
@@ -557,6 +652,10 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
             String? partyType = chatSummary.partyType;
             Conference? conference =
                 conferenceChatMessageController?.conference;
+            bool validConference = true;
+            if (conference != null) {
+              validConference = conferenceService.isValid(conference);
+            }
             if (partyType == PartyType.conference.name) {
               if (conference == null) {
                 label = 'Error';
@@ -574,36 +673,27 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
                 tip = 'In conference';
               }
             }
-            buttonWidget = CircleTextButton(
-              label: label,
-              tip: tip,
-              onPressed: () async {
-                if (conference == null) {
-                  if (partyType != PartyType.conference.name) {
-                    await _invite();
+            if (validConference) {
+              buttonWidget = CircleTextButton(
+                label: label,
+                tip: tip,
+                onPressed: () async {
+                  if (conference == null) {
+                    if (partyType != PartyType.conference.name) {
+                      await _invite();
+                    }
+                  } else {
+                    await _join();
                   }
-                } else {
-                  await _join();
-                }
-              },
-              backgroundColor: Colors.green,
-              child: const Icon(
-                Icons.call,
-                size: AppIconSize.mdSize,
-                color: Colors.white,
-              ),
-            );
-          } else {
-            buttonWidget = const CircleTextButton(
-              elevation: 2.0,
-              backgroundColor: Colors.grey,
-              padding: EdgeInsets.all(15.0),
-              child: Icon(
-                Icons.call_end,
-                size: AppIconSize.mdSize,
-                color: Colors.white,
-              ),
-            );
+                },
+                backgroundColor: Colors.green,
+                child: const Icon(
+                  Icons.call,
+                  size: AppIconSize.mdSize,
+                  color: Colors.white,
+                ),
+              );
+            }
           }
           List<Widget> children = [
             Container(
@@ -622,20 +712,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
 
   ///关闭单个本地视频窗口的流
   Future<void> _onClosedPeerMediaStream(PeerMediaStream peerMediaStream) async {
-    LiveKitConferenceClient? conferenceClient =
-        liveKitConferenceClientPool.conferenceClient;
-    //从map中移除
-    conferenceClient?.close(peerMediaStream);
-    ConferenceChatMessageController? conferenceChatMessageController =
-        liveKitConferenceClientPool.conferenceChatMessageController;
-    if (conferenceChatMessageController != null &&
-        conferenceChatMessageController.conference != null) {
-      //在会议中，如果是本地流，先所有的webrtc连接中移除
-      String conferenceId =
-          conferenceChatMessageController.conference!.conferenceId;
-      await liveKitConferenceClientPool
-          .removeLocalPeerMediaStream(conferenceId, [peerMediaStream]);
-    }
+    await _close(peerMediaStream);
   }
 
   @override
@@ -643,16 +720,10 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     var videoViewCard = ValueListenableBuilder<int>(
         valueListenable: videoViewCount,
         builder: (context, value, child) {
-          LiveKitConferenceClient? conferenceClient =
-              liveKitConferenceClientPool.conferenceClient;
           if (value > 0) {
-            ConferenceChatMessageController? conferenceChatMessageController =
-                liveKitConferenceClientPool.conferenceChatMessageController;
             return VideoViewCard(
-              peerMediaStreamController:
-                  conferenceClient!.localPeerMediaStreamController,
+              peerMediaStreamController: localPeerMediaStreamController,
               onClosed: _onClosedPeerMediaStream,
-              conference: conferenceChatMessageController?.conference,
             );
           } else {
             var size = MediaQuery.of(context).size;
@@ -678,6 +749,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
         liveKitConferenceClientPool.conferenceChatMessageController;
     conferenceChatMessageController?.removeListener(_updateVideoChatStatus);
     liveKitConferenceClientPool.removeListener(_updateConferenceClient);
+    localPeerMediaStreamController.removeListener(_updateLocalPeerMediaStream);
     conferenceChatMessageController?.stopAudio();
     super.dispose();
   }

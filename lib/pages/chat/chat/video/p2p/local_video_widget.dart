@@ -214,10 +214,10 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (peerMediaStream == null) {
       if (video) {
         peerMediaStream =
-            await localPeerMediaStreamController.createPeerVideoStream();
+            await localPeerMediaStreamController.createMainPeerMediaStream();
       } else {
         peerMediaStream =
-            await localPeerMediaStreamController.createPeerAudioStream();
+            await localPeerMediaStreamController.createMainPeerMediaStream();
       }
       await addLocalPeerMediaStream(peerMediaStream);
       _update();
@@ -228,7 +228,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           await localPeerMediaStreamController.remove(peerMediaStream.id!);
           await localPeerMediaStreamController.close(peerMediaStream.id!);
           peerMediaStream =
-              await localPeerMediaStreamController.createPeerVideoStream();
+              await localPeerMediaStreamController.createMainPeerMediaStream();
           await addLocalPeerMediaStream(peerMediaStream);
           _update();
         }
@@ -237,8 +237,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           await removeLocalPeerMediaStream(peerMediaStream);
           await localPeerMediaStreamController.remove(peerMediaStream.id!);
           await localPeerMediaStreamController.close(peerMediaStream.id!);
-          peerMediaStream =
-              await localPeerMediaStreamController.createPeerAudioStream();
+          peerMediaStream = await localPeerMediaStreamController
+              .createMainPeerMediaStream(video: false);
           await addLocalPeerMediaStream(peerMediaStream);
           _update();
         }
@@ -257,22 +257,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
     PeerMediaStream peerMediaStream = await localPeerMediaStreamController
         .createPeerDisplayStream(selectedSource: source);
-    await addLocalPeerMediaStream(peerMediaStream);
-    _update();
-
-    return peerMediaStream;
-  }
-
-  Future<PeerMediaStream?> _openMediaStream(MediaStream stream) async {
-    ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClientPool.conferenceChatMessageController;
-    ChatMessage? chatMessage = conferenceChatMessageController?.chatMessage;
-    if (chatMessage == null) {
-      DialogUtil.error(context, content: AppLocalizations.t('No conference'));
-      return null;
-    }
-    PeerMediaStream? peerMediaStream =
-        await localPeerMediaStreamController.createPeerMediaStream(stream);
     await addLocalPeerMediaStream(peerMediaStream);
     _update();
 
@@ -820,7 +804,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             return VideoViewCard(
               peerMediaStreamController: localPeerMediaStreamController,
               onClosed: _onClosedPeerMediaStream,
-              conference: conferenceChatMessageController?.conference,
             );
           } else {
             var size = MediaQuery.of(context).size;

@@ -425,13 +425,13 @@ class ConferenceChatMessageController with ChangeNotifier {
       }
       var partyType = chatSummary!.partyType!;
       if (partyType == PartyType.linkman.name) {
-        await localPeerMediaStreamController
-            .openLocalMainPeerMediaStream(_conference!.video);
+        await localPeerMediaStreamController.createMainPeerMediaStream(
+            video: _conference!.video);
       } else {
         if (auto) {
           //如果本地主视频存在，直接返回
-          await localPeerMediaStreamController
-              .openLocalMainPeerMediaStream(_conference!.video);
+          await localPeerMediaStreamController.createMainPeerMediaStream(
+              video: _conference!.video);
         }
       }
     }
