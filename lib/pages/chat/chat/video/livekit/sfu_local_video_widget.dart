@@ -44,8 +44,8 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
   ChatSummary chatSummary = chatMessageController.chatSummary!;
 
   /// 当前的视频会议，如果不存在，需要通过邀请创建
-  ValueNotifier<LiveKitConferenceClient?> conferenceClient =
-      ValueNotifier<LiveKitConferenceClient?>(null);
+  // ValueNotifier<LiveKitConferenceClient?> conferenceClient =
+  //     ValueNotifier<LiveKitConferenceClient?>(null);
 
   //控制面板的可见性，包括视频功能按钮和呼叫按钮
   ValueNotifier<bool> controlPanelVisible = ValueNotifier<bool>(true);
@@ -73,7 +73,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     liveKitConferenceClientPool.addListener(_updateConferenceClient);
     localPeerMediaStreamController.addListener(_updateLocalPeerMediaStream);
     _updateConferenceClient();
-    _updateView();
+    _updateLocalPeerMediaStream();
   }
 
   _updateConferenceClient() {
@@ -84,16 +84,10 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
           conferenceClient.conferenceChatMessageController;
       conferenceChatMessageController.addListener(_updateVideoChatStatus);
       videoChatStatus.value = conferenceChatMessageController.status;
-      this.conferenceClient.value = conferenceClient;
     } else {
       videoChatStatus.value = VideoChatStatus.end;
     }
-    _updateView();
-  }
-
-  _updateLocalPeerMediaStream() {
-    videoViewCount.value =
-        localPeerMediaStreamController.peerMediaStreams.length;
+    _updateLocalPeerMediaStream();
   }
 
   _updateVideoChatStatus() {
@@ -109,21 +103,8 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     }
   }
 
-  _playAudio() {
-    var conferenceChatMessageController =
-        liveKitConferenceClientPool.conferenceChatMessageController;
-    conferenceChatMessageController?.playAudio('assets/medias/call.mp3', true);
-  }
-
-  _stopAudio() async {
-    var conferenceChatMessageController =
-        liveKitConferenceClientPool.conferenceChatMessageController;
-    conferenceChatMessageController?.stopAudio(
-        filename: 'assets/medias/close.mp3');
-  }
-
   /// 调整界面的显示
-  Future<void> _updateView() async {
+  Future<void> _updateLocalPeerMediaStream() async {
     List<ActionData> actionData = [];
     if (localPeerMediaStreamController.mainPeerMediaStream == null ||
         !localPeerMediaStreamController.video) {
@@ -158,13 +139,25 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
             icon:
                 const Icon(Icons.closed_caption_disabled, color: Colors.white)),
       );
-      videoViewCount.value =
-          localPeerMediaStreamController.peerMediaStreams.length;
     } else {
       controlPanelVisible.value = true;
-      videoViewCount.value = 0;
     }
+    videoViewCount.value =
+        localPeerMediaStreamController.peerMediaStreams.length;
     this.actionData.value = actionData;
+  }
+
+  _playAudio() {
+    var conferenceChatMessageController =
+        liveKitConferenceClientPool.conferenceChatMessageController;
+    conferenceChatMessageController?.playAudio('assets/medias/call.mp3', true);
+  }
+
+  _stopAudio() async {
+    var conferenceChatMessageController =
+        liveKitConferenceClientPool.conferenceChatMessageController;
+    conferenceChatMessageController?.stopAudio(
+        filename: 'assets/medias/close.mp3');
   }
 
   ///选择会议参加人的界面，返回会议参加人
@@ -336,7 +329,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
         conferenceChatMessageController?.status = VideoChatStatus.end;
       }
     });
-    _updateView();
+    _updateLocalPeerMediaStream();
   }
 
   /// 当前会议存在的时候加入当前会议，即开始视频会议
@@ -365,7 +358,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
           content: AppLocalizations.t('Join conference:') +
               conferenceClient.conferenceChatMessageController.name!);
     }
-    _updateView();
+    _updateLocalPeerMediaStream();
   }
 
   ///关闭并且移除本地所有的视频，这时候还能看远程的视频
@@ -380,7 +373,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
       return;
     }
     await conferenceClient.closeAll();
-    _updateView();
+    _updateLocalPeerMediaStream();
   }
 
   ///如果正在呼叫calling，停止呼叫，关闭所有的本地视频，呼叫状态改为结束
@@ -426,8 +419,8 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
       mainPeerMediaStream = await localPeerMediaStreamController
           .createMainPeerMediaStream(video: false, sfu: true);
     }
-    await publish(mainPeerMediaStream);
-    _updateView();
+    await _publish(mainPeerMediaStream);
+    _updateLocalPeerMediaStream();
 
     return mainPeerMediaStream;
   }
@@ -442,14 +435,14 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     }
     PeerMediaStream peerMediaStream = await localPeerMediaStreamController
         .createPeerDisplayStream(selectedSource: source, sfu: true);
-    await publish(peerMediaStream);
-    _updateView();
+    await _publish(peerMediaStream);
+    _updateLocalPeerMediaStream();
 
     return peerMediaStream;
   }
 
   /// 发布视频流
-  publish(PeerMediaStream peerMediaStream) async {
+  _publish(PeerMediaStream peerMediaStream) async {
     LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
     if (conferenceClient != null) {
