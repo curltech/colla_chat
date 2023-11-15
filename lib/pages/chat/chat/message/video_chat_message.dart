@@ -54,7 +54,7 @@ class VideoChatMessage extends StatelessWidget {
           return;
         }
       }
-      await p2pConferenceClientPool.createP2pConferenceClient(
+      await p2pConferenceClientPool.createConferenceClient(
           chatSummary: chatSummary, chatMessage);
       indexWidgetProvider.push('video_chat');
     }

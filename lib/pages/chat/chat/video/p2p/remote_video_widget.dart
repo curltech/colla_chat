@@ -48,7 +48,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   void initState() {
     super.initState();
     _init();
-    _update();
+    _updateView();
   }
 
   ///注册远程流到来或者关闭的监听器
@@ -58,12 +58,12 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
     String? conferenceId = videoChatMessageController.value?.conferenceId;
     if (conferenceId != null) {
       p2pConferenceClient =
-          p2pConferenceClientPool.getP2pConferenceClient(conferenceId);
+          p2pConferenceClientPool.getConferenceClient(conferenceId);
       if (p2pConferenceClient != null) {
         p2pConferenceClient!.remotePeerMediaStreamController
             .addListener(_updatePeerMediaStream);
-        videoViewCount.value =
-            p2pConferenceClient!.remotePeerMediaStreams.length;
+        videoViewCount.value = p2pConferenceClient!
+            .remotePeerMediaStreamController.peerMediaStreams.length;
       }
     }
   }
@@ -71,22 +71,24 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   _updateVideoChatMessageController() {
     videoChatMessageController.value =
         p2pConferenceClientPool.conferenceChatMessageController;
-    _update();
+    _updateView();
   }
 
   Future<void> _updatePeerMediaStream() async {
     if (p2pConferenceClient != null) {
-      videoViewCount.value = p2pConferenceClient!.remotePeerMediaStreams.length;
+      videoViewCount.value = p2pConferenceClient!
+          .remotePeerMediaStreamController.peerMediaStreams.length;
     }
   }
 
   ///调整界面的显示
-  Future<void> _update() async {
+  Future<void> _updateView() async {
     List<ActionData> actionData = [];
     if (p2pConferenceClient == null) {
       return;
     }
-    if (p2pConferenceClient!.remotePeerMediaStreams.isNotEmpty) {
+    if (p2pConferenceClient!
+        .remotePeerMediaStreamController.peerMediaStreams.isNotEmpty) {
       // actionData.add(
       //   ActionData(
       //       label: 'Close',
@@ -98,17 +100,19 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
       controlPanelVisible.value = true;
     }
     this.actionData.value = actionData;
-    videoViewCount.value = p2pConferenceClient!.remotePeerMediaStreams.length;
+    videoViewCount.value = p2pConferenceClient!
+        .remotePeerMediaStreamController.peerMediaStreams.length;
   }
 
-  ///移除远程所有的视频，这时候还能看远程的视频
-  _close() async {
+  ///移除远程所有的视频
+  _closeAll() async {
     var videoChatMessageController = this.videoChatMessageController.value;
     if (videoChatMessageController == null) {
       return;
     }
     if (p2pConferenceClient != null) {
-      var peerMediaStreams = p2pConferenceClient!.remotePeerMediaStreams;
+      var peerMediaStreams =
+          p2pConferenceClient!.remotePeerMediaStreamController.peerMediaStreams;
       Conference? conference = videoChatMessageController.conference;
       if (conference != null) {
         p2pConferenceClientPool.removeLocalPeerMediaStream(
@@ -121,7 +125,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   Future<void> _onAction(int index, String name, {String? value}) async {
     switch (name) {
       case 'Close':
-        _close();
+        _closeAll();
         break;
       default:
         break;
@@ -150,9 +154,10 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   ///切换显示按钮面板
   void _toggleActionCard() {
     int count = 0;
-    var videoRoomController = p2pConferenceClientPool.p2pConferenceClient;
-    if (videoRoomController != null) {
-      count = videoRoomController.remotePeerMediaStreams.length;
+    var conferenceClient = p2pConferenceClientPool.conferenceClient;
+    if (conferenceClient != null) {
+      count = conferenceClient
+          .remotePeerMediaStreamController.peerMediaStreams.length;
     }
     if (count == 0) {
       controlPanelVisible.value = true;
@@ -236,7 +241,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
       //获取关联的会议
       String conferenceId = videoChatMessageController.conference!.conferenceId;
       P2pConferenceClient? p2pConferenceClient =
-          p2pConferenceClientPool.getP2pConferenceClient(conferenceId);
+          p2pConferenceClientPool.getConferenceClient(conferenceId);
       if (p2pConferenceClient != null) {
         //从webrtc连接中移除
         if (peerMediaStream.local) {

@@ -5,6 +5,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/video/p2p/video_view_card.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/transport/webrtc/livekit/sfu_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -25,10 +26,6 @@ class SfuRemoteVideoWidget extends StatefulWidget {
 }
 
 class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
-  ValueNotifier<ConferenceChatMessageController?> videoChatMessageController =
-      ValueNotifier<ConferenceChatMessageController?>(
-          p2pConferenceClientPool.conferenceChatMessageController);
-
   //控制面板的可见性，包括视频功能按钮和呼叫按钮
   ValueNotifier<bool> controlPanelVisible = ValueNotifier<bool>(true);
 
@@ -39,8 +36,6 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
   ValueNotifier<List<ActionData>> actionData =
       ValueNotifier<List<ActionData>>([]);
 
-  P2pConferenceClient? p2pConferenceClient;
-
   //控制面板可见性的计时器
   Timer? _hideControlPanelTimer;
 
@@ -48,45 +43,40 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
   void initState() {
     super.initState();
     _init();
-    _update();
+    _updateView();
   }
 
   ///注册远程流到来或者关闭的监听器
   ///重新计算远程流的数量是否变化，决定是否重新渲染界面
   void _init() {
-    p2pConferenceClientPool.addListener(_updateVideoChatMessageController);
-    String? conferenceId = videoChatMessageController.value?.conferenceId;
-    if (conferenceId != null) {
-      p2pConferenceClient =
-          p2pConferenceClientPool.getP2pConferenceClient(conferenceId);
-      if (p2pConferenceClient != null) {
-        p2pConferenceClient!.remotePeerMediaStreamController
-            .removeListener(_updatePeerMediaStream);
-        videoViewCount.value =
-            p2pConferenceClient!.remotePeerMediaStreams.length;
-      }
+    liveKitConferenceClientPool.addListener(_updateConferenceClient);
+    LiveKitConferenceClient? conferenceClient =
+        liveKitConferenceClientPool.conferenceClient;
+    if (conferenceClient != null) {
+      conferenceClient.remotePeerMediaStreamController
+          .addListener(_updatePeerMediaStreamController);
     }
   }
 
-  _updateVideoChatMessageController() {
-    videoChatMessageController.value =
-        p2pConferenceClientPool.conferenceChatMessageController;
-    _update();
+  _updateConferenceClient() {
+    _updateView();
   }
 
-  Future<void> _updatePeerMediaStream() async {
-    if (p2pConferenceClient != null) {
-      videoViewCount.value = p2pConferenceClient!.remotePeerMediaStreams.length;
-    }
+  _updatePeerMediaStreamController() {
+    _updateView();
   }
 
   ///调整界面的显示
-  Future<void> _update() async {
+  Future<void> _updateView() async {
     List<ActionData> actionData = [];
-    if (p2pConferenceClient == null) {
+    LiveKitConferenceClient? conferenceClient =
+        liveKitConferenceClientPool.conferenceClient;
+    if (conferenceClient == null) {
       return;
     }
-    if (p2pConferenceClient!.remotePeerMediaStreams.isNotEmpty) {
+    List<PeerMediaStream> peerMediaStreams =
+        conferenceClient.remotePeerMediaStreamController.peerMediaStreams;
+    if (peerMediaStreams.isNotEmpty) {
       // actionData.add(
       //   ActionData(
       //       label: 'Close',
@@ -98,30 +88,22 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
       controlPanelVisible.value = true;
     }
     this.actionData.value = actionData;
-    videoViewCount.value = p2pConferenceClient!.remotePeerMediaStreams.length;
+    videoViewCount.value = peerMediaStreams.length;
   }
 
-  ///移除远程所有的视频，这时候还能看远程的视频
-  _close() async {
-    var videoChatMessageController = this.videoChatMessageController.value;
-    if (videoChatMessageController == null) {
-      return;
-    }
-    if (p2pConferenceClient != null) {
-      var peerMediaStreams = p2pConferenceClient!.remotePeerMediaStreams;
-      Conference? conference = videoChatMessageController.conference;
-      if (conference != null) {
-        p2pConferenceClientPool.removeLocalPeerMediaStream(
-            conference.conferenceId, peerMediaStreams);
-      }
-      await p2pConferenceClient!.terminate();
+  /// 移除远程所有的视频
+  _closeAll() async {
+    LiveKitConferenceClient? conferenceClient =
+        liveKitConferenceClientPool.conferenceClient;
+    if (conferenceClient != null) {
+      conferenceClient.closeAll();
     }
   }
 
   Future<void> _onAction(int index, String name, {String? value}) async {
     switch (name) {
       case 'Close':
-        _close();
+        _closeAll();
         break;
       default:
         break;
@@ -150,9 +132,10 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
   ///切换显示按钮面板
   void _toggleActionCard() {
     int count = 0;
-    var videoRoomController = p2pConferenceClientPool.p2pConferenceClient;
-    if (videoRoomController != null) {
-      count = videoRoomController.remotePeerMediaStreams.length;
+    var conferenceClient = liveKitConferenceClientPool.conferenceClient;
+    if (conferenceClient != null) {
+      count = conferenceClient
+          .remotePeerMediaStreamController.peerMediaStreams.length;
     }
     if (count == 0) {
       controlPanelVisible.value = true;
@@ -202,10 +185,9 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
     return ValueListenableBuilder<int>(
         valueListenable: videoViewCount,
         builder: (context, value, child) {
-          var videoChatMessageController =
-              this.videoChatMessageController.value;
-          if (videoChatMessageController == null ||
-              p2pConferenceClient == null) {
+          LiveKitConferenceClient? conferenceClient =
+              liveKitConferenceClientPool.conferenceClient;
+          if (conferenceClient == null) {
             return Center(
                 child: CommonAutoSizeText(AppLocalizations.t('No conference'),
                     style: const TextStyle(color: Colors.white)));
@@ -220,38 +202,20 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
               padding: const EdgeInsets.all(0.0),
               child: VideoViewCard(
                 peerMediaStreamController:
-                    p2pConferenceClient!.remotePeerMediaStreamController,
+                    conferenceClient.remotePeerMediaStreamController,
                 onClosed: _onClosedPeerMediaStream,
               ));
         });
   }
 
-  ///关闭单个远程视频窗口的流
+  /// 关闭单个远程视频窗口的流
   Future<void> _onClosedPeerMediaStream(PeerMediaStream peerMediaStream) async {
-    var videoChatMessageController = this.videoChatMessageController.value;
-    if (videoChatMessageController == null) {
+    LiveKitConferenceClient? conferenceClient =
+        liveKitConferenceClientPool.conferenceClient;
+    if (conferenceClient == null) {
       return;
     }
-    if (videoChatMessageController.conference != null) {
-      //获取关联的会议
-      String conferenceId = videoChatMessageController.conference!.conferenceId;
-      P2pConferenceClient? p2pConferenceClient =
-          p2pConferenceClientPool.getP2pConferenceClient(conferenceId);
-      if (p2pConferenceClient != null) {
-        //从webrtc连接中移除
-        if (peerMediaStream.local) {
-          await p2pConferenceClient
-              .removeLocalPeerMediaStream([peerMediaStream]);
-        } else {
-          await p2pConferenceClient.remotePeerMediaStreamController
-              .close(peerMediaStream.id!);
-        }
-      } else {
-        logger.e('RemotePeerMediaStreamController is null');
-      }
-    } else {
-      logger.e('No in conference');
-    }
+    await conferenceClient.close(peerMediaStream);
   }
 
   @override
@@ -264,11 +228,13 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
 
   @override
   void dispose() {
-    if (p2pConferenceClient != null) {
-      p2pConferenceClient!.remotePeerMediaStreamController
-          .removeListener(_updatePeerMediaStream);
+    liveKitConferenceClientPool.removeListener(_updateConferenceClient);
+    LiveKitConferenceClient? conferenceClient =
+        liveKitConferenceClientPool.conferenceClient;
+    if (conferenceClient != null) {
+      conferenceClient.remotePeerMediaStreamController
+          .removeListener(_updatePeerMediaStreamController);
     }
-    p2pConferenceClientPool.removeListener(_updateVideoChatMessageController);
     super.dispose();
   }
 }

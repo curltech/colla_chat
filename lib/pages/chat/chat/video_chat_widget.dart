@@ -181,7 +181,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
       withLeading: true,
       rightWidgets: rightWidgets,
       leadingCallBack: () {
-        bool? joined = p2pConferenceClientPool.p2pConferenceClient?.joined;
+        bool? joined = p2pConferenceClientPool.conferenceClient?.joined;
         if (joined != null && joined) {
           _minimize(context);
         }

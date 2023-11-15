@@ -23,7 +23,6 @@ import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/smsclient.dart';
-import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
@@ -33,6 +32,8 @@ import 'package:telephony/telephony.dart';
 ///跟踪影响全局的消息到来，对不同类型的消息进行分派
 class GlobalChatMessage {
   StreamController<ChatMessage> chatMessageStreamController =
+      StreamController<ChatMessage>.broadcast();
+  StreamController<ChatMessage> chatReceiptStreamController =
       StreamController<ChatMessage>.broadcast();
 
   /// 订阅websocket onChat传来的消息
@@ -275,15 +276,16 @@ class GlobalChatMessage {
         messageReceiptType == MessageReceiptType.hold ||
         messageReceiptType == MessageReceiptType.join ||
         messageReceiptType == MessageReceiptType.joined) {
+      chatReceiptStreamController.add(chatMessage);
       //将发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
       P2pConferenceClient? p2pConferenceClient =
-          p2pConferenceClientPool.getP2pConferenceClient(messageId);
+          p2pConferenceClientPool.getConferenceClient(messageId);
       if (p2pConferenceClient == null) {
         ChatMessage? videoChatMessage =
             await chatMessageService.findVideoChatMessage(messageId: messageId);
         if (videoChatMessage != null) {
           p2pConferenceClient = await p2pConferenceClientPool
-              .createP2pConferenceClient(videoChatMessage);
+              .createConferenceClient(videoChatMessage);
           if (p2pConferenceClient != null) {
             logger.w('create p2pConferenceClient:$messageId successfully');
           }

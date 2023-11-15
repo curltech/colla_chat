@@ -527,7 +527,7 @@ class _IndexViewState extends State<IndexView>
           _stop();
           P2pConferenceClient? p2pConferenceClient =
               await p2pConferenceClientPool
-                  .createP2pConferenceClient(conferenceChatMessage);
+                  .createConferenceClient(conferenceChatMessage);
           ConferenceChatMessageController? conferenceChatMessageController =
               p2pConferenceClient?.conferenceChatMessageController;
           await conferenceChatMessageController
@@ -542,7 +542,7 @@ class _IndexViewState extends State<IndexView>
           _stop();
           P2pConferenceClient? p2pConferenceClient =
               await p2pConferenceClientPool
-                  .createP2pConferenceClient(conferenceChatMessage);
+                  .createConferenceClient(conferenceChatMessage);
           ConferenceChatMessageController? conferenceChatMessageController =
               p2pConferenceClient?.conferenceChatMessageController;
           await conferenceChatMessageController

@@ -251,10 +251,22 @@ class LiveKitConferenceClient {
   LiveKitConferenceClient(
       this.roomClient, this.conferenceChatMessageController);
 
+  // ParticipantConnected	A RemoteParticipant joins after the local participant.	x
+  // ParticipantDisconnected	A RemoteParticipant leaves	x
+  // Reconnecting	The connection to the server has been interrupted and it's attempting to reconnect.	x
+  // Reconnected	Reconnection has been successful	x
+  // Disconnected	Disconnected from room due to the room closing or unrecoverable failure	x
+  // TrackPublished	A new track is published to room after the local participant has joined	x	x
+  // TrackUnpublished	A RemoteParticipant has unpublished a track	x	x
   /// 初始化会议，先连接，然后注册事件
   join() async {
     await roomClient.connect();
-    roomClient.onRoomEvent<ParticipantEvent>(onParticipantEvent);
+    roomClient
+        .onRoomEvent<ParticipantConnectedEvent>(onParticipantConnectedEvent);
+    roomClient.onRoomEvent<ParticipantDisconnectedEvent>(
+        onParticipantDisconnectedEvent);
+    roomClient.onRoomEvent<TrackPublishedEvent>(onTrackPublishedEvent);
+    roomClient.onRoomEvent<TrackUnpublishedEvent>(onTrackUnpublishedEvent);
     roomClient
         .onRoomEvent<LocalTrackPublishedEvent>(onLocalTrackPublishedEvent);
     roomClient
@@ -264,24 +276,54 @@ class LiveKitConferenceClient {
     joined = true;
   }
 
-  /// 远程参与者事件，远程轨道发生变化
-  FutureOr<void> onParticipantEvent(ParticipantEvent event) {
-    log.logger.i('on ParticipantEvent');
-    for (RemoteParticipant remoteParticipant
-        in roomClient.room.participants.values) {
-      String identity = remoteParticipant.identity;
-      String name = remoteParticipant.name;
-      for (RemoteTrackPublication<RemoteVideoTrack> remoteTrackPublication
-          in remoteParticipant.videoTracks) {
-        PeerMediaStream peerMediaStream =
-            PeerMediaStream(videoTrack: remoteTrackPublication.track);
-        remotePeerMediaStreamController.add(peerMediaStream);
+  FutureOr<void> onParticipantConnectedEvent(ParticipantConnectedEvent event) {
+    log.logger.i('on ParticipantConnectedEvent');
+  }
+
+  FutureOr<void> onParticipantDisconnectedEvent(
+      ParticipantDisconnectedEvent event) {
+    log.logger.i('on ParticipantDisconnectedEvent');
+  }
+
+  Future<FutureOr<void>> onTrackPublishedEvent(
+      TrackPublishedEvent event) async {
+    log.logger.i('on TrackPublishedEvent');
+    RemoteTrack? track = event.publication.track;
+    RemoteParticipant remoteParticipant = event.participant;
+    if (track != null) {
+      String streamId = track.mediaStream.id;
+      PeerMediaStream? peerMediaStream =
+          await remotePeerMediaStreamController.getPeerMediaStream(streamId);
+      if (peerMediaStream == null) {
+        String identity = remoteParticipant.identity;
+        String name = remoteParticipant.name;
+        PlatformParticipant platformParticipant =
+            PlatformParticipant(identity, name: name);
+        if (track is RemoteVideoTrack) {
+          peerMediaStream = PeerMediaStream(
+              videoTrack: track, platformParticipant: platformParticipant);
+        }
+        if (track is RemoteAudioTrack) {
+          peerMediaStream = PeerMediaStream(
+              audioTrack: track, platformParticipant: platformParticipant);
+        }
+        if (peerMediaStream != null) {
+          remotePeerMediaStreamController.add(peerMediaStream);
+        }
       }
-      for (RemoteTrackPublication<RemoteAudioTrack> remoteTrackPublication
-          in remoteParticipant.audioTracks) {
-        PeerMediaStream peerMediaStream =
-            PeerMediaStream(audioTrack: remoteTrackPublication.track);
-        remotePeerMediaStreamController.add(peerMediaStream);
+    }
+  }
+
+  Future<FutureOr<void>> onTrackUnpublishedEvent(
+      TrackUnpublishedEvent event) async {
+    log.logger.i('on TrackUnpublishedEvent');
+    RemoteTrack? track = event.publication.track;
+    if (track != null) {
+      String streamId = track.mediaStream.id;
+      PeerMediaStream? peerMediaStream =
+          await remotePeerMediaStreamController.getPeerMediaStream(streamId);
+      if (peerMediaStream != null) {
+        remotePeerMediaStreamController.close(streamId);
       }
     }
   }

@@ -179,7 +179,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///在视频会议中增加本地视频到会议的所有连接
   _publish(PeerMediaStream peerMediaStream) async {
     P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.p2pConferenceClient;
+        p2pConferenceClientPool.conferenceClient;
     ConferenceChatMessageController? conferenceChatMessageController =
         p2pConferenceClient?.conferenceChatMessageController;
     Conference? conference = conferenceChatMessageController?.conference;
@@ -419,7 +419,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
     ///根据邀请消息创建会议
     P2pConferenceClient? p2pConferenceClient = await p2pConferenceClientPool
-        .createP2pConferenceClient(chatSummary: chatSummary, chatMessage);
+        .createConferenceClient(chatSummary: chatSummary, chatMessage);
     conferenceChatMessageController =
         p2pConferenceClient?.conferenceChatMessageController;
     if (p2pConferenceClient == null ||
@@ -488,7 +488,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   _closeAll() async {
     var peerMediaStreams = localPeerMediaStreamController.peerMediaStreams;
     P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.p2pConferenceClient;
+        p2pConferenceClientPool.conferenceClient;
     ConferenceChatMessageController? conferenceChatMessageController =
         p2pConferenceClient?.conferenceChatMessageController;
     Conference? conference = conferenceChatMessageController?.conference;
@@ -505,7 +505,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     _stopAudio();
     await localPeerMediaStreamController.closeAll();
     P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.p2pConferenceClient;
+        p2pConferenceClientPool.conferenceClient;
     ConferenceChatMessageController? conferenceChatMessageController =
         p2pConferenceClient?.conferenceChatMessageController;
     conferenceChatMessageController?.status = VideoChatStatus.end;
@@ -516,7 +516,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///结束会议，这时候本地和远程的视频都应该被关闭
   _disconnect() async {
     P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.p2pConferenceClient;
+        p2pConferenceClientPool.conferenceClient;
     ConferenceChatMessageController? conferenceChatMessageController =
         p2pConferenceClient?.conferenceChatMessageController;
     var status = conferenceChatMessageController?.status;

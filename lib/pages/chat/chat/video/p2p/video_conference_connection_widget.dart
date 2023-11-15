@@ -33,7 +33,7 @@ class VideoConferenceConnectionWidget extends StatelessWidget
 
   Future<List<TileData>> _buildConnectionTileData(BuildContext context) async {
     P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.p2pConferenceClient;
+        p2pConferenceClientPool.conferenceClient;
     List<TileData> tiles = [];
     if (p2pConferenceClient != null) {
       List<AdvancedPeerConnection> peerConnections =

@@ -39,14 +39,14 @@ class P2pConferenceClient {
   final ConferenceChatMessageController conferenceChatMessageController;
 
   P2pConferenceClient({required this.conferenceChatMessageController});
-
-  List<PeerMediaStream> get localPeerMediaStreams {
-    return localPeerMediaStreamController.peerMediaStreams;
-  }
-
-  List<PeerMediaStream> get remotePeerMediaStreams {
-    return remotePeerMediaStreamController.peerMediaStreams;
-  }
+  //
+  // List<PeerMediaStream> get localPeerMediaStreams {
+  //   return localPeerMediaStreamController.peerMediaStreams;
+  // }
+  //
+  // List<PeerMediaStream> get remotePeerMediaStreams {
+  //   return remotePeerMediaStreamController.peerMediaStreams;
+  // }
 
   /// 获取本会议的所有连接
   Future<List<AdvancedPeerConnection>> get peerConnections async {
@@ -102,7 +102,7 @@ class P2pConferenceClient {
     _joined = true;
     List<AdvancedPeerConnection> pcs = await peerConnections;
     for (AdvancedPeerConnection peerConnection in pcs) {
-      await addAdvancedPeerConnection(peerConnection);
+      await _addAdvancedPeerConnection(peerConnection);
     }
   }
 
@@ -179,7 +179,15 @@ class P2pConferenceClient {
   }
 
   /// 对方加入会议
-  addParticipant(String peerId, String clientId) {
+  addParticipant(String peerId, String clientId) async {
+    AdvancedPeerConnection? advancedPeerConnection =
+        await peerConnectionPool.getOne(
+      peerId,
+      clientId: clientId,
+    );
+    if (advancedPeerConnection != null) {
+      await _addAdvancedPeerConnection(advancedPeerConnection);
+    }
     Set<String>? clientIds = _remoteParticipants[peerId];
     if (clientIds != null) {
       if (!clientIds.contains(clientId)) {
@@ -195,13 +203,13 @@ class P2pConferenceClient {
   updateAdvancedPeerConnection(AdvancedPeerConnection peerConnection) async {
     bool exist = contains(peerConnection.peerId, peerConnection.clientId);
     if (exist) {
-      await addAdvancedPeerConnection(peerConnection);
+      await _addAdvancedPeerConnection(peerConnection);
     }
   }
 
   ///对方连接加入会议，此连接将与自己展开视频通话
   ///如果自己已经加入，将加入本地流
-  addAdvancedPeerConnection(AdvancedPeerConnection peerConnection) async {
+  _addAdvancedPeerConnection(AdvancedPeerConnection peerConnection) async {
     bool exist = contains(peerConnection.peerId, peerConnection.clientId);
     if (!exist) {
       addParticipant(peerConnection.peerId, peerConnection.clientId);
@@ -233,8 +241,7 @@ class P2pConferenceClient {
       List<PeerMediaStream> peerMediaStreams =
           localPeerMediaStreamController.peerMediaStreams;
       if (peerMediaStreams.isNotEmpty) {
-        await publish(peerMediaStreams,
-            peerConnection: peerConnection);
+        await publish(peerMediaStreams, peerConnection: peerConnection);
       }
 
       await _addRemotePeerMediaStream(peerConnection);
@@ -382,7 +389,7 @@ class P2pConferenceClient {
 
 ///所有的正在视频会议的池，包含多个视频会议，每个会议的会议号是视频通话邀请的消息号
 class P2pConferenceClientPool with ChangeNotifier {
-  final Map<String, P2pConferenceClient> _p2pConferenceClients = {};
+  final Map<String, P2pConferenceClient> _conferenceClients = {};
 
   final Lock _clientLock = Lock();
 
@@ -391,13 +398,13 @@ class P2pConferenceClientPool with ChangeNotifier {
 
   P2pConferenceClientPool();
 
-  List<P2pConferenceClient> get p2pConferenceClients {
-    return [..._p2pConferenceClients.values];
+  List<P2pConferenceClient> get conferenceClients {
+    return [..._conferenceClients.values];
   }
 
   ///根据当前的视频邀请消息，查找或者创建当前消息对应的会议，并设置为当前会议
   ///在发起者接收到至少一个同意回执，开始重新协商，或者接收者发送出同意回执的时候调用
-  Future<P2pConferenceClient?> createP2pConferenceClient(
+  Future<P2pConferenceClient?> createConferenceClient(
       ChatMessage chatMessage,
       {ChatSummary? chatSummary}) async {
     return await _clientLock.synchronized(() async {
@@ -405,7 +412,7 @@ class P2pConferenceClientPool with ChangeNotifier {
       //创建基于当前聊天的视频消息控制器
       if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
         String conferenceId = chatMessage.messageId!;
-        p2pConferenceClient = _p2pConferenceClients[conferenceId];
+        p2pConferenceClient = _conferenceClients[conferenceId];
         if (p2pConferenceClient == null) {
           ConferenceChatMessageController conferenceChatMessageController =
               ConferenceChatMessageController();
@@ -413,7 +420,7 @@ class P2pConferenceClientPool with ChangeNotifier {
               chatSummary: chatSummary);
           p2pConferenceClient = P2pConferenceClient(
               conferenceChatMessageController: conferenceChatMessageController);
-          _p2pConferenceClients[conferenceId] = p2pConferenceClient;
+          _conferenceClients[conferenceId] = p2pConferenceClient;
         } else {
           ConferenceChatMessageController conferenceChatMessageController =
               p2pConferenceClient.conferenceChatMessageController;
@@ -440,7 +447,7 @@ class P2pConferenceClientPool with ChangeNotifier {
   set conferenceId(String? conferenceId) {
     if (_conferenceId != conferenceId) {
       if (conferenceId != null) {
-        if (_p2pConferenceClients.containsKey(conferenceId)) {
+        if (_conferenceClients.containsKey(conferenceId)) {
           _conferenceId = conferenceId;
         } else {
           _conferenceId = null;
@@ -453,9 +460,9 @@ class P2pConferenceClientPool with ChangeNotifier {
   }
 
   ///获取当前的会议
-  P2pConferenceClient? get p2pConferenceClient {
+  P2pConferenceClient? get conferenceClient {
     if (_conferenceId != null) {
-      return _p2pConferenceClients[_conferenceId];
+      return _conferenceClients[_conferenceId];
     }
     return null;
   }
@@ -463,25 +470,25 @@ class P2pConferenceClientPool with ChangeNotifier {
   ///获取当前会议控制器
   ConferenceChatMessageController? get conferenceChatMessageController {
     if (_conferenceId != null) {
-      return _p2pConferenceClients[_conferenceId]
+      return _conferenceClients[_conferenceId]
           ?.conferenceChatMessageController;
     }
     return null;
   }
 
   ///根据会议号返回会议控制器，没有则返回null
-  P2pConferenceClient? getP2pConferenceClient(String conferenceId) {
-    return _p2pConferenceClients[conferenceId];
+  P2pConferenceClient? getConferenceClient(String conferenceId) {
+    return _conferenceClients[conferenceId];
   }
 
   ConferenceChatMessageController? getConferenceChatMessageController(
       String conferenceId) {
-    return getP2pConferenceClient(conferenceId)
+    return getConferenceClient(conferenceId)
         ?.conferenceChatMessageController;
   }
 
   Conference? getConference(String conferenceId) {
-    return getP2pConferenceClient(conferenceId)
+    return getConferenceClient(conferenceId)
         ?.conferenceChatMessageController
         .conference;
   }
@@ -489,7 +496,7 @@ class P2pConferenceClientPool with ChangeNotifier {
   /// 新的连接建立事件，如果各会议的连接中存在已经加入但是连接为建立的情况则更新连接
   onConnected(AdvancedPeerConnection peerConnection) async {
     for (P2pConferenceClient p2pConferenceClient
-        in _p2pConferenceClients.values) {
+        in _conferenceClients.values) {
       await p2pConferenceClient.updateAdvancedPeerConnection(peerConnection);
     }
   }
@@ -499,7 +506,7 @@ class P2pConferenceClientPool with ChangeNotifier {
       String conferenceId, List<PeerMediaStream> peerMediaStreams,
       {AdvancedPeerConnection? peerConnection}) async {
     P2pConferenceClient? p2pConferenceClient =
-        _p2pConferenceClients[conferenceId];
+        _conferenceClients[conferenceId];
     if (p2pConferenceClient != null) {
       await p2pConferenceClient.publish(peerMediaStreams,
           peerConnection: peerConnection);
@@ -511,7 +518,7 @@ class P2pConferenceClientPool with ChangeNotifier {
       String conferenceId, List<PeerMediaStream> peerMediaStreams,
       {AdvancedPeerConnection? peerConnection}) async {
     P2pConferenceClient? p2pConferenceClient =
-        _p2pConferenceClients[conferenceId];
+        _conferenceClients[conferenceId];
     if (p2pConferenceClient != null) {
       await p2pConferenceClient.removeLocalPeerMediaStream(peerMediaStreams,
           peerConnection: peerConnection);
@@ -523,7 +530,7 @@ class P2pConferenceClientPool with ChangeNotifier {
   exit(String conferenceId) async {
     await _clientLock.synchronized(() async {
       P2pConferenceClient? p2pConferenceClient =
-          _p2pConferenceClients[conferenceId];
+          _conferenceClients[conferenceId];
       if (p2pConferenceClient != null) {
         await p2pConferenceClient.exit();
         if (conferenceId == _conferenceId) {
@@ -539,10 +546,10 @@ class P2pConferenceClientPool with ChangeNotifier {
   terminate(String conferenceId) async {
     await _clientLock.synchronized(() async {
       P2pConferenceClient? p2pConferenceClient =
-          _p2pConferenceClients[conferenceId];
+          _conferenceClients[conferenceId];
       if (p2pConferenceClient != null) {
         await p2pConferenceClient.terminate();
-        _p2pConferenceClients.remove(conferenceId);
+        _conferenceClients.remove(conferenceId);
         if (conferenceId == _conferenceId) {
           _conferenceId = null;
         }

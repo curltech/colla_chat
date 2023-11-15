@@ -144,6 +144,15 @@ class PeerMediaStreamController with ChangeNotifier {
       notifyListeners();
     });
   }
+
+  replace(Map<String, PeerMediaStream> peerMediaStreams) async {
+    await _streamLock.synchronized(() async {
+      _currentPeerMediaStream = null;
+      _peerMediaStreams.clear();
+      _peerMediaStreams.addAll(peerMediaStreams);
+      notifyListeners();
+    });
+  }
 }
 
 ///本地媒体控制器

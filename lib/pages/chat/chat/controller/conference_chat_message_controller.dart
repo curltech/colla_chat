@@ -546,7 +546,7 @@ class ConferenceChatMessageController with ChangeNotifier {
       status = VideoChatStatus.end;
     }
     P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.getP2pConferenceClient(messageId);
+        p2pConferenceClientPool.getConferenceClient(messageId);
     if (p2pConferenceClient != null) {
       p2pConferenceClient.removeParticipant(peerId, clientId);
     } else {
@@ -577,53 +577,33 @@ class ConferenceChatMessageController with ChangeNotifier {
     await join();
   }
 
-  ///收到对方加入会议的消息，将指定的连接加入会议，用于对方加入会议，接受会议
-  addAdvancedPeerConnection(
+  /// 收到对方加入消息，自己加入，返回joined消息
+  Future<void> _onJoin(String peerId, String clientId, String messageId) async {
+    P2pConferenceClient? p2pConferenceClient =
+        p2pConferenceClientPool.getConferenceClient(messageId);
+    if (p2pConferenceClient != null && p2pConferenceClient.joined) {
+      _sendChatReceipt(MessageReceiptType.joined);
+    }
+    await _onJoined(peerId, clientId, messageId);
+  }
+
+  /// 对方收到自己的joined消息，返回已经加入消息，自己也要配合把对方的连接加入本地流，属于被动加入
+  Future<void> _onJoined(
       String peerId, String clientId, String messageId) async {
     //将邀请消息发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
     P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.getP2pConferenceClient(messageId);
+        p2pConferenceClientPool.getConferenceClient(messageId);
     if (p2pConferenceClient != null) {
-      AdvancedPeerConnection? advancedPeerConnection =
-          await peerConnectionPool.getOne(
-        peerId,
-        clientId: clientId,
-      );
-      if (advancedPeerConnection != null) {
-        logger.w(
-            'p2pConferenceClient:$messageId add advancedPeerConnection:$peerId');
-        await p2pConferenceClient
-            .addAdvancedPeerConnection(advancedPeerConnection);
-        if (_status == VideoChatStatus.calling) {
-          status = VideoChatStatus.chatting;
-        }
-      } else {
-        logger.w('p2pConferenceClient:$messageId add participant:$peerId');
-        p2pConferenceClient.addParticipant(peerId, clientId);
+      if (_status == VideoChatStatus.calling) {
+        status = VideoChatStatus.chatting;
       }
+      p2pConferenceClient.addParticipant(peerId, clientId);
     } else {
       logger.e('p2pConferenceClient:$messageId is not exist');
     }
   }
 
-  ///对方加入，自己也要配合把对方的连接加入本地流，属于被动加入
-  ///同时如果自己已经加入，返回joined消息
-  Future<void> _onJoin(String peerId, String clientId, String messageId) async {
-    P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.getP2pConferenceClient(messageId);
-    if (p2pConferenceClient != null && p2pConferenceClient.joined) {
-      _sendChatReceipt(MessageReceiptType.joined);
-    }
-    await addAdvancedPeerConnection(peerId, clientId, messageId);
-  }
-
-  ///对方收到自己的join消息，返回已经加入消息，自己也要配合把对方的连接加入本地流，属于被动加入
-  Future<void> _onJoined(
-      String peerId, String clientId, String messageId) async {
-    await addAdvancedPeerConnection(peerId, clientId, messageId);
-  }
-
-  ///对方退出，自己也要配合把对方的连接退出
+  /// 收到对方退出消息
   Future<void> _onExit(String peerId, String clientId, String messageId) async {
     if (_status == VideoChatStatus.calling) {
       status = VideoChatStatus.end;
@@ -631,7 +611,7 @@ class ConferenceChatMessageController with ChangeNotifier {
 
     //将发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
     P2pConferenceClient? p2pConferenceClient = p2pConferenceClientPool
-        .getP2pConferenceClient(_conference!.conferenceId);
+        .getConferenceClient(_conference!.conferenceId);
     if (p2pConferenceClient != null) {
       p2pConferenceClient.removeParticipant(peerId, clientId);
     } else {
@@ -650,7 +630,7 @@ class ConferenceChatMessageController with ChangeNotifier {
     await openLocalMainPeerMediaStream();
     //创建新的视频会议控制器
     P2pConferenceClient? p2pConferenceClient = p2pConferenceClientPool
-        .getP2pConferenceClient(_conference!.conferenceId);
+        .getConferenceClient(_conference!.conferenceId);
     if (p2pConferenceClient != null) {
       await p2pConferenceClient.join();
       status = VideoChatStatus.chatting;

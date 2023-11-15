@@ -35,7 +35,7 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
 
   List<TileData> _buildConferenceTileData(BuildContext context) {
     List<P2pConferenceClient> p2pConferenceClients =
-        p2pConferenceClientPool.p2pConferenceClients;
+        p2pConferenceClientPool.conferenceClients;
     List<TileData> tiles = [];
     if (p2pConferenceClients.isNotEmpty) {
       for (P2pConferenceClient p2pConferenceClient in p2pConferenceClients) {
@@ -97,7 +97,7 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
             title: 'Renegotiate',
             prefix: Icons.repeat_one_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
-              p2pConferenceClientPool.p2pConferenceClient?.renegotiate();
+              p2pConferenceClientPool.conferenceClient?.renegotiate();
               DialogUtil.info(context,
                   content:
                       '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is renegotiate')}');
@@ -107,7 +107,7 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
             title: 'Toggle',
             prefix: Icons.recycling_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
-              p2pConferenceClientPool.p2pConferenceClient
+              p2pConferenceClientPool.conferenceClient
                   ?.renegotiate(toggle: true);
               DialogUtil.info(context,
                   content:
