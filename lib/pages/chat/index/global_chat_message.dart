@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
@@ -24,6 +25,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/smsclient.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/livekit/sfu_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
@@ -271,32 +273,46 @@ class GlobalChatMessage {
         messageReceiptType == MessageReceiptType.terminated ||
         messageReceiptType == MessageReceiptType.exit) {}
 
+    ConferenceChatMessageController? conferenceChatMessageController;
     /// 以下四种消息如果没有会议，需要创建会议
     if (messageReceiptType == MessageReceiptType.accepted ||
         messageReceiptType == MessageReceiptType.hold ||
         messageReceiptType == MessageReceiptType.join ||
         messageReceiptType == MessageReceiptType.joined) {
-      chatReceiptStreamController.add(chatMessage);
       //将发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
-      P2pConferenceClient? p2pConferenceClient =
-          p2pConferenceClientPool.getConferenceClient(messageId);
-      if (p2pConferenceClient == null) {
-        ChatMessage? videoChatMessage =
-            await chatMessageService.findVideoChatMessage(messageId: messageId);
-        if (videoChatMessage != null) {
-          p2pConferenceClient = await p2pConferenceClientPool
-              .createConferenceClient(videoChatMessage);
-          if (p2pConferenceClient != null) {
-            logger.w('create p2pConferenceClient:$messageId successfully');
+      ChatMessage? videoChatMessage =
+          await chatMessageService.findVideoChatMessage(messageId: messageId);
+      if (videoChatMessage != null) {
+        String? content = videoChatMessage.content;
+        if (content != null) {
+          content = chatMessageService.recoverContent(content);
+          Map<String, dynamic> json = JsonUtil.toJson(content);
+          Conference conference = Conference.fromJson(json);
+          if (conference.sfu) {
+            LiveKitConferenceClient? conferenceClient =
+                await liveKitConferenceClientPool
+                    .createConferenceClient(videoChatMessage);
+            if (conferenceClient != null) {
+              logger
+                  .w('create liveKitConferenceClient:$messageId successfully');
+              conferenceChatMessageController =
+                  conferenceClient.conferenceChatMessageController;
+            }
+          } else {
+            P2pConferenceClient? conferenceClient =
+                await p2pConferenceClientPool
+                    .createConferenceClient(videoChatMessage);
+            if (conferenceClient != null) {
+              logger.w('create p2pConferenceClient:$messageId successfully');
+              conferenceChatMessageController =
+                  conferenceClient.conferenceChatMessageController;
+            }
+            conferenceChatMessageController = p2pConferenceClientPool
+                .getConferenceChatMessageController(messageId);
           }
         }
       }
     }
-
-    /// 如果存在会议则继续处理
-    ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClientPool.getConferenceChatMessageController(messageId);
-
     await conferenceChatMessageController?.onReceivedChatReceipt(chatMessage);
     await conferenceChatMessageController?.stopAudio();
   }

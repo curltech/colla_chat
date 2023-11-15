@@ -215,7 +215,7 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
     if (conferenceClient == null) {
       return;
     }
-    await conferenceClient.close(peerMediaStream);
+    await conferenceClient.close([peerMediaStream]);
   }
 
   @override

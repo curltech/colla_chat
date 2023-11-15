@@ -239,12 +239,14 @@ class LocalPeerMediaStreamController extends PeerMediaStreamController {
     if (peerMediaStream != null) {
       return peerMediaStream;
     }
+    PlatformParticipant platformParticipant = PlatformParticipant(
+        myself.peerId!,
+        clientId: myself.clientId,
+        name: myself.name);
     peerMediaStream = await PeerMediaStream.createPeerMediaStream(
-      peerId: myself.peerId!,
+      platformParticipant: platformParticipant,
       mediaStream: mediaStream,
       videoTrack: videoTrack,
-      clientId: myself.clientId,
-      name: myself.myselfPeer.name,
     );
     add(peerMediaStream);
 

@@ -276,10 +276,107 @@ class LiveKitConferenceClient {
     joined = true;
   }
 
+  Map<String, RemoteParticipant> participants() {
+    return roomClient.room.participants;
+  }
+
+  /// 发布本地视频或者音频，如果参数的流为null，则创建本地主视频并发布
+  Future<void> publish({List<PeerMediaStream>? peerMediaStreams}) async {
+    if (!joined) {
+      return;
+    }
+    if (peerMediaStreams != null) {
+      for (PeerMediaStream peerMediaStream in peerMediaStreams) {
+        if (peerMediaStream.videoTrack != null && peerMediaStream.local) {
+          await roomClient.publishVideoTrack(
+              peerMediaStream.videoTrack! as LocalVideoTrack);
+        }
+        if (peerMediaStream.audioTrack != null && peerMediaStream.local) {
+          await roomClient.publishAudioTrack(
+              peerMediaStream.audioTrack! as LocalAudioTrack);
+        }
+      }
+    } else {
+      bool? video = conferenceChatMessageController.conference?.video;
+      if (video != null && video) {
+        try {
+          LocalTrackPublication<LocalTrack>? localTrackPublication =
+              await setCameraEnabled(true);
+          if (localTrackPublication != null) {
+            PlatformParticipant platformParticipant = PlatformParticipant(
+                myself.peerId!,
+                clientId: myself.clientId,
+                name: myself.name);
+            PeerMediaStream peerMediaStream =
+                await PeerMediaStream.createPeerMediaStream(
+              videoTrack: localTrackPublication.track! as VideoTrack,
+              platformParticipant: platformParticipant,
+            );
+            localPeerMediaStreamController.mainPeerMediaStream =
+                peerMediaStream;
+          }
+        } catch (error) {
+          log.logger.e('could not publish video: $error');
+        }
+      }
+      try {
+        LocalTrackPublication<LocalTrack>? localTrackPublication =
+            await setMicrophoneEnabled(true);
+        if (localTrackPublication != null) {
+          PlatformParticipant platformParticipant = PlatformParticipant(
+              myself.peerId!,
+              clientId: myself.clientId,
+              name: myself.name);
+          PeerMediaStream peerMediaStream =
+              await PeerMediaStream.createPeerMediaStream(
+            audioTrack: localTrackPublication.track! as AudioTrack,
+            platformParticipant: platformParticipant,
+          );
+          localPeerMediaStreamController.mainPeerMediaStream = peerMediaStream;
+        }
+      } catch (error) {
+        log.logger.e('could not publish audio: $error');
+      }
+    }
+  }
+
+  /// 退出发布并且关闭本地的某个轨道或者流
+  close(List<PeerMediaStream> peerMediaStreams, {bool notify = true}) async {
+    if (joined) {
+      for (PeerMediaStream peerMediaStream in peerMediaStreams) {
+        List<MediaStreamTrack>? tracks =
+            peerMediaStream.mediaStream?.getTracks();
+        if (tracks == null) {
+          return;
+        }
+        for (MediaStreamTrack track in tracks) {
+          String? id = track.id;
+          if (id != null) {
+            await roomClient.unpublish(id, notify: notify);
+          }
+        }
+
+        if (peerMediaStream.id != null) {
+          await localPeerMediaStreamController.close(peerMediaStream.id!);
+        }
+      }
+    }
+  }
+
+  /// 退出发布并且关闭本地的所有的轨道或者流
+  closeAll({bool notify = true}) async {
+    if (joined) {
+      await roomClient.unpublishAll(notify: notify, stopOnUnpublish: true);
+    }
+    await localPeerMediaStreamController.closeAll();
+  }
+
+  /// 远程参与者加入会议
   FutureOr<void> onParticipantConnectedEvent(ParticipantConnectedEvent event) {
     log.logger.i('on ParticipantConnectedEvent');
   }
 
+  /// 远程参与者退出会议
   FutureOr<void> onParticipantDisconnectedEvent(
       ParticipantDisconnectedEvent event) {
     log.logger.i('on ParticipantDisconnectedEvent');
@@ -361,52 +458,6 @@ class LiveKitConferenceClient {
     log.logger.i('on LocalParticipantEvent');
   }
 
-  /// 获取所有的本地轨道并且转换成媒体流用于展示
-  List<PeerMediaStream> get localPeerMediaStreams {
-    List<PeerMediaStream> peerMediaStreams = [];
-    LocalParticipant? localParticipant = roomClient.room.localParticipant;
-    if (localParticipant != null) {
-      String identity = localParticipant.identity;
-      String name = localParticipant.name;
-      for (LocalTrackPublication<LocalVideoTrack> localTrackPublication
-          in localParticipant.videoTracks) {
-        PeerMediaStream peerMediaStream =
-            PeerMediaStream(videoTrack: localTrackPublication.track);
-        peerMediaStreams.add(peerMediaStream);
-      }
-      for (LocalTrackPublication<LocalAudioTrack> localTrackPublication
-          in localParticipant.audioTracks) {
-        PeerMediaStream peerMediaStream =
-            PeerMediaStream(audioTrack: localTrackPublication.track);
-        peerMediaStreams.add(peerMediaStream);
-      }
-    }
-    return peerMediaStreams;
-  }
-
-  /// 获取所有的远程轨道并且转换成媒体流用于展示
-  List<PeerMediaStream> get remotePeerMediaStreams {
-    List<PeerMediaStream> peerMediaStreams = [];
-    for (RemoteParticipant remoteParticipant
-        in roomClient.room.participants.values) {
-      String identity = remoteParticipant.identity;
-      String name = remoteParticipant.name;
-      for (RemoteTrackPublication<RemoteVideoTrack> remoteTrackPublication
-          in remoteParticipant.videoTracks) {
-        PeerMediaStream peerMediaStream =
-            PeerMediaStream(videoTrack: remoteTrackPublication.track);
-        peerMediaStreams.add(peerMediaStream);
-      }
-      for (RemoteTrackPublication<RemoteAudioTrack> remoteTrackPublication
-          in remoteParticipant.audioTracks) {
-        PeerMediaStream peerMediaStream =
-            PeerMediaStream(audioTrack: remoteTrackPublication.track);
-        peerMediaStreams.add(peerMediaStream);
-      }
-    }
-    return peerMediaStreams;
-  }
-
   /// 创建并且发布本地视频的快捷方法，必须room已经连接上
   Future<LocalTrackPublication<LocalTrack>?> setCameraEnabled(bool enabled,
       {CameraCaptureOptions? cameraCaptureOptions}) async {
@@ -432,87 +483,8 @@ class LiveKitConferenceClient {
         screenShareCaptureOptions: screenShareCaptureOptions);
   }
 
-  /// 发布本地视频或者音频，如果参数的流为null，则创建本地主视频并发布
-  Future<void> publish({PeerMediaStream? peerMediaStream}) async {
-    if (!joined) {
-      return;
-    }
-    if (peerMediaStream != null) {
-      if (peerMediaStream.videoTrack != null && peerMediaStream.local) {
-        await roomClient
-            .publishVideoTrack(peerMediaStream.videoTrack! as LocalVideoTrack);
-      }
-      if (peerMediaStream.audioTrack != null && peerMediaStream.local) {
-        await roomClient
-            .publishAudioTrack(peerMediaStream.audioTrack! as LocalAudioTrack);
-      }
-    } else {
-      bool? video = conferenceChatMessageController.conference?.video;
-      if (video != null && video) {
-        try {
-          LocalTrackPublication<LocalTrack>? localTrackPublication =
-              await setCameraEnabled(true);
-          if (localTrackPublication != null) {
-            PeerMediaStream peerMediaStream =
-                await PeerMediaStream.createPeerMediaStream(
-                    videoTrack: localTrackPublication.track! as VideoTrack,
-                    peerId: myself.peerId!,
-                    clientId: myself.clientId,
-                    name: myself.name);
-            localPeerMediaStreamController.mainPeerMediaStream =
-                peerMediaStream;
-          }
-        } catch (error) {
-          log.logger.e('could not publish video: $error');
-        }
-      }
-      try {
-        LocalTrackPublication<LocalTrack>? localTrackPublication =
-            await setMicrophoneEnabled(true);
-        if (localTrackPublication != null) {
-          PeerMediaStream peerMediaStream =
-              await PeerMediaStream.createPeerMediaStream(
-                  audioTrack: localTrackPublication.track! as AudioTrack,
-                  peerId: myself.peerId!,
-                  clientId: myself.clientId,
-                  name: myself.name);
-          localPeerMediaStreamController.mainPeerMediaStream = peerMediaStream;
-        }
-      } catch (error) {
-        log.logger.e('could not publish audio: $error');
-      }
-    }
-  }
-
-  /// 退出发布并且关闭本地的某个轨道或者流
-  close(PeerMediaStream peerMediaStream, {bool notify = true}) async {
-    if (joined) {
-      List<MediaStreamTrack>? tracks = peerMediaStream.mediaStream?.getTracks();
-      if (tracks == null) {
-        return;
-      }
-      for (MediaStreamTrack track in tracks) {
-        String? id = track.id;
-        if (id != null) {
-          await roomClient.unpublish(id, notify: notify);
-        }
-      }
-    }
-    if (peerMediaStream.id != null) {
-      await localPeerMediaStreamController.close(peerMediaStream.id!);
-    }
-  }
-
-  /// 退出发布并且关闭本地的所有的轨道或者流
-  closeAll({bool notify = true}) async {
-    if (joined) {
-      await roomClient.unpublishAll(notify: notify, stopOnUnpublish: true);
-    }
-    await localPeerMediaStreamController.closeAll();
-  }
-
   /// 断开连接，退出会议
-  disconnect() async {
+  _disconnect() async {
     if (joined) {
       await roomClient.disconnect();
     }
@@ -523,7 +495,7 @@ class LiveKitConferenceClient {
 
 ///所有的正在视频会议的池，包含多个视频会议，每个会议的会议号是视频通话邀请的消息号
 class LiveKitConferenceClientPool with ChangeNotifier {
-  final Map<String, LiveKitConferenceClient> _liveKitConferenceClients = {};
+  final Map<String, LiveKitConferenceClient> _conferenceClients = {};
 
   final Lock _clientLock = Lock();
 
@@ -532,13 +504,13 @@ class LiveKitConferenceClientPool with ChangeNotifier {
 
   LiveKitConferenceClientPool();
 
-  List<LiveKitConferenceClient> get liveKitConferenceClients {
-    return [..._liveKitConferenceClients.values];
+  List<LiveKitConferenceClient> get conferenceClients {
+    return [..._conferenceClients.values];
   }
 
   ///根据当前的视频邀请消息，查找或者创建当前消息对应的会议，并设置为当前会议
   ///在发起者接收到至少一个同意回执，开始重新协商，或者接收者发送出同意回执的时候调用
-  Future<LiveKitConferenceClient?> createLiveKitConferenceClient(
+  Future<LiveKitConferenceClient?> createConferenceClient(
       ChatMessage chatMessage,
       {ChatSummary? chatSummary}) async {
     return await _clientLock.synchronized(() async {
@@ -546,7 +518,7 @@ class LiveKitConferenceClientPool with ChangeNotifier {
       //创建基于当前聊天的视频消息控制器
       if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
         String conferenceId = chatMessage.messageId!;
-        liveKitConferenceClient = _liveKitConferenceClients[conferenceId];
+        liveKitConferenceClient = _conferenceClients[conferenceId];
         if (liveKitConferenceClient == null) {
           ConferenceChatMessageController conferenceChatMessageController =
               ConferenceChatMessageController();
@@ -558,7 +530,7 @@ class LiveKitConferenceClientPool with ChangeNotifier {
                 LiveKitRoomClient(token: token);
             liveKitConferenceClient = LiveKitConferenceClient(
                 liveKitRoomClient, conferenceChatMessageController);
-            _liveKitConferenceClients[conferenceId] = liveKitConferenceClient;
+            _conferenceClients[conferenceId] = liveKitConferenceClient;
           }
         } else {
           ConferenceChatMessageController conferenceChatMessageController =
@@ -586,7 +558,7 @@ class LiveKitConferenceClientPool with ChangeNotifier {
   set conferenceId(String? conferenceId) {
     if (_conferenceId != conferenceId) {
       if (conferenceId != null) {
-        if (_liveKitConferenceClients.containsKey(conferenceId)) {
+        if (_conferenceClients.containsKey(conferenceId)) {
           _conferenceId = conferenceId;
         } else {
           _conferenceId = null;
@@ -601,7 +573,7 @@ class LiveKitConferenceClientPool with ChangeNotifier {
   ///获取当前的会议
   LiveKitConferenceClient? get conferenceClient {
     if (_conferenceId != null) {
-      return _liveKitConferenceClients[_conferenceId];
+      return _conferenceClients[_conferenceId];
     }
     return null;
   }
@@ -609,59 +581,43 @@ class LiveKitConferenceClientPool with ChangeNotifier {
   ///获取当前会议控制器
   ConferenceChatMessageController? get conferenceChatMessageController {
     if (_conferenceId != null) {
-      return _liveKitConferenceClients[_conferenceId]
-          ?.conferenceChatMessageController;
+      return _conferenceClients[_conferenceId]?.conferenceChatMessageController;
     }
     return null;
   }
 
   ///根据会议号返回会议控制器，没有则返回null
-  LiveKitConferenceClient? getLiveKitConferenceClient(String conferenceId) {
-    return _liveKitConferenceClients[conferenceId];
+  LiveKitConferenceClient? getConferenceClient(String conferenceId) {
+    return _conferenceClients[conferenceId];
   }
 
   ConferenceChatMessageController? getConferenceChatMessageController(
       String conferenceId) {
-    return getLiveKitConferenceClient(conferenceId)
-        ?.conferenceChatMessageController;
+    return getConferenceClient(conferenceId)?.conferenceChatMessageController;
   }
 
   Conference? getConference(String conferenceId) {
-    return getLiveKitConferenceClient(conferenceId)
+    return getConferenceClient(conferenceId)
         ?.conferenceChatMessageController
         .conference;
-  }
-
-  /// 新的连接建立事件，如果各会议的连接中存在已经加入但是连接为建立的情况则更新连接
-  onConnected(AdvancedPeerConnection peerConnection) async {
-    for (LiveKitConferenceClient liveKitConferenceClient
-        in _liveKitConferenceClients.values) {
-      // await liveKitConferenceClient
-      //     .updateAdvancedPeerConnection(peerConnection);
-    }
   }
 
   ///把本地新的peerMediaStream加入到会议的所有连接中，并且都重新协商
   publish(String conferenceId, List<PeerMediaStream> peerMediaStreams,
       {AdvancedPeerConnection? peerConnection}) async {
-    LiveKitConferenceClient? liveKitConferenceClient =
-        _liveKitConferenceClients[conferenceId];
-    if (liveKitConferenceClient != null) {
-      for (PeerMediaStream peerMediaStream in peerMediaStreams) {
-        liveKitConferenceClient.publish(peerMediaStream: peerMediaStream);
-      }
+    LiveKitConferenceClient? conferenceClient =
+        _conferenceClients[conferenceId];
+    if (conferenceClient != null) {
+      conferenceClient.publish(peerMediaStreams: peerMediaStreams);
     }
   }
 
   ///会议的指定连接或者所有连接中移除本地或者远程的peerMediaStream，并且都重新协商
-  close(String conferenceId, List<PeerMediaStream> peerMediaStreams,
-      {AdvancedPeerConnection? peerConnection}) async {
-    LiveKitConferenceClient? liveKitConferenceClient =
-        _liveKitConferenceClients[conferenceId];
-    if (liveKitConferenceClient != null) {
-      for (PeerMediaStream peerMediaStream in peerMediaStreams) {
-        await liveKitConferenceClient.close(peerMediaStream);
-      }
+  close(String conferenceId, List<PeerMediaStream> peerMediaStreams) async {
+    LiveKitConferenceClient? conferenceClient =
+        _conferenceClients[conferenceId];
+    if (conferenceClient != null) {
+      await conferenceClient.close(peerMediaStreams);
     }
   }
 
@@ -669,10 +625,10 @@ class LiveKitConferenceClientPool with ChangeNotifier {
   ///调用对应会议的退出方法
   closeAll(String conferenceId) async {
     await _clientLock.synchronized(() async {
-      LiveKitConferenceClient? liveKitConferenceClient =
-          _liveKitConferenceClients[conferenceId];
-      if (liveKitConferenceClient != null) {
-        await liveKitConferenceClient.closeAll();
+      LiveKitConferenceClient? conferenceClient =
+          _conferenceClients[conferenceId];
+      if (conferenceClient != null) {
+        await conferenceClient.closeAll();
         notifyListeners();
       }
     });
@@ -680,13 +636,14 @@ class LiveKitConferenceClientPool with ChangeNotifier {
 
   ///根据会议编号终止会议
   ///调用对应会议的终止方法，然后从会议池中删除，设置当前会议编号为null
-  disconnect(String conferenceId) async {
+  disconnect({String? conferenceId}) async {
     await _clientLock.synchronized(() async {
+      conferenceId ??= _conferenceId;
       LiveKitConferenceClient? liveKitConferenceClient =
-          _liveKitConferenceClients[conferenceId];
+          _conferenceClients[conferenceId];
       if (liveKitConferenceClient != null) {
-        await liveKitConferenceClient.disconnect();
-        _liveKitConferenceClients.remove(conferenceId);
+        await liveKitConferenceClient._disconnect();
+        _conferenceClients.remove(conferenceId);
         if (conferenceId == _conferenceId) {
           _conferenceId = null;
         }

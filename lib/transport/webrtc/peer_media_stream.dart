@@ -65,8 +65,7 @@ class PeerMediaStream {
       {bool audio = true,
       double width = 640,
       double height = 480,
-      int frameRate = 30,
-      bool replace = false}) async {
+      int frameRate = 30}) async {
     PlatformParticipant platformParticipant = PlatformParticipant(
         myself.peerId!,
         clientId: myself.clientId,
@@ -214,15 +213,11 @@ class PeerMediaStream {
   }
 
   static Future<PeerMediaStream> createPeerMediaStream({
-    required String peerId,
-    String? clientId,
-    String? name,
+    required PlatformParticipant platformParticipant,
     MediaStream? mediaStream,
     VideoTrack? videoTrack,
     AudioTrack? audioTrack,
   }) async {
-    PlatformParticipant platformParticipant =
-        PlatformParticipant(peerId, clientId: clientId, name: name);
     if (videoTrack != null) {
       return PeerMediaStream(
           videoTrack: videoTrack, platformParticipant: platformParticipant);

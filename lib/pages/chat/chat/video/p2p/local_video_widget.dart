@@ -185,7 +185,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     Conference? conference = conferenceChatMessageController?.conference;
     VideoChatStatus? status = conferenceChatMessageController?.status;
     if (conference != null && status == VideoChatStatus.chatting) {
-      await p2pConferenceClient?.publish([peerMediaStream]);
+      await p2pConferenceClient?.publish(peerMediaStreams: [peerMediaStream]);
     }
   }
 
@@ -494,7 +494,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     Conference? conference = conferenceChatMessageController?.conference;
     //从webrtc连接中移除流
     if (conference != null) {
-      await p2pConferenceClient?.removeLocalPeerMediaStream(peerMediaStreams);
+      await p2pConferenceClient?.close(peerMediaStreams);
     }
     await localPeerMediaStreamController.closeAll();
     _updateLocalPeerMediaStream();
@@ -522,8 +522,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     var status = conferenceChatMessageController?.status;
     if (status == VideoChatStatus.chatting) {
       await _closeAll();
-      await p2pConferenceClient?.exit();
-      p2pConferenceClientPool.conferenceId = null;
+      await p2pConferenceClientPool.disconnect(
+          conferenceId: conferenceChatMessageController?.conferenceId!);
     }
     conferenceChatMessageController?.status = VideoChatStatus.end;
   }
@@ -768,8 +768,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       //在会议中，如果是本地流，先所有的webrtc连接中移除
       String conferenceId =
           conferenceChatMessageController.conference!.conferenceId;
-      await p2pConferenceClientPool
-          .removeLocalPeerMediaStream(conferenceId, [peerMediaStream]);
+      await p2pConferenceClientPool.close(conferenceId, [peerMediaStream]);
     }
     //流关闭
     await localPeerMediaStreamController.remove(peerMediaStream.id!);

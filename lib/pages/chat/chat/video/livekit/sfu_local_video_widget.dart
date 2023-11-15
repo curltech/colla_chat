@@ -304,7 +304,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
 
     ///根据邀请消息创建会议
     LiveKitConferenceClient? liveKitConferenceClient =
-        await liveKitConferenceClientPool.createLiveKitConferenceClient(
+        await liveKitConferenceClientPool.createConferenceClient(
             chatSummary: chatSummary, chatMessage);
     conferenceChatMessageController =
         liveKitConferenceClient?.conferenceChatMessageController;
@@ -394,8 +394,8 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     var status = conferenceChatMessageController.status;
     if (status == VideoChatStatus.calling ||
         status == VideoChatStatus.chatting) {
-      await liveKitConferenceClientPool
-          .disconnect(conferenceChatMessageController.conferenceId!);
+      await liveKitConferenceClientPool.disconnect(
+          conferenceId: conferenceChatMessageController.conferenceId!);
     }
     conferenceChatMessageController.status = VideoChatStatus.end;
   }
@@ -446,7 +446,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
     if (conferenceClient != null) {
-      await conferenceClient.publish(peerMediaStream: peerMediaStream);
+      await conferenceClient.publish(peerMediaStreams: [peerMediaStream]);
     }
   }
 
@@ -455,7 +455,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
     if (conferenceClient != null) {
-      await conferenceClient.close(peerMediaStream);
+      await conferenceClient.close([peerMediaStream]);
     }
     if (peerMediaStream.id != null) {
       await localPeerMediaStreamController.close(peerMediaStream.id!);
@@ -514,7 +514,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
     if (conferenceClient != null) {
-      visible = conferenceClient.localPeerMediaStreams.isEmpty;
+      visible = localPeerMediaStreamController.peerMediaStreams.isEmpty;
     }
     if (visible) {
       controlPanelVisible.value = true;

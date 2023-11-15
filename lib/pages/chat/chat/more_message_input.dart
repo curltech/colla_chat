@@ -237,7 +237,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
             await chatMessageService.findVideoChatMessage(groupId: groupId);
         if (chatMessage != null) {
           LiveKitConferenceClient? conferenceClient =
-              await liveKitConferenceClientPool.createLiveKitConferenceClient(
+              await liveKitConferenceClientPool.createConferenceClient(
                   chatSummary: chatSummary, chatMessage);
           if (conferenceClient != null) {
             indexWidgetProvider.push('sfu_video_chat');

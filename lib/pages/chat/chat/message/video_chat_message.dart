@@ -43,7 +43,7 @@ class VideoChatMessage extends StatelessWidget {
         Conference conference = Conference.fromJson(json);
         if (conference.sfu) {
           try {
-            await liveKitConferenceClientPool.createLiveKitConferenceClient(
+            await liveKitConferenceClientPool.createConferenceClient(
                 chatSummary: chatSummary, chatMessage);
             indexWidgetProvider.push('sfu_video_chat');
           } catch (e) {

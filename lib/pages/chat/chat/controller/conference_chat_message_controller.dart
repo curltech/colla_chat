@@ -476,39 +476,41 @@ class ConferenceChatMessageController with ChangeNotifier {
     String peerId = chatReceipt.senderPeerId!;
     String senderName = chatReceipt.senderName!;
     String clientId = chatReceipt.senderClientId!;
+    PlatformParticipant platformParticipant =
+        PlatformParticipant(peerId, clientId: clientId, name: senderName);
     String messageId = chatReceipt.messageId!;
     logger.w(
         'received messageReceiptType:$messageReceiptType from $peerId:$senderName');
     switch (messageReceiptType) {
       case MessageReceiptType.received:
-        await _onReceived(peerId, clientId, messageId);
+        await _onReceived(platformParticipant, messageId);
         break;
       case MessageReceiptType.accepted:
-        await _onAccepted(peerId, clientId, messageId);
+        await _onAccepted(platformParticipant, messageId);
         break;
       case MessageReceiptType.rejected:
-        await _onRejected(peerId, clientId, messageId);
+        await _onRejected(platformParticipant, messageId);
         break;
       case MessageReceiptType.terminated:
-        await _onTerminated(peerId, clientId, messageId);
+        await _onTerminated(platformParticipant, messageId);
         break;
       case MessageReceiptType.busy:
-        await _onBusy(peerId, clientId, messageId);
+        await _onBusy(platformParticipant, messageId);
         break;
       case MessageReceiptType.ignored:
-        await _onIgnored(peerId, clientId, messageId);
+        await _onIgnored(platformParticipant, messageId);
         break;
       case MessageReceiptType.hold:
-        await _onHold(peerId, clientId, messageId);
+        await _onHold(platformParticipant, messageId);
         break;
       case MessageReceiptType.join:
-        await _onJoin(peerId, clientId, messageId);
+        await _onJoin(platformParticipant, messageId);
         break;
       case MessageReceiptType.joined:
-        await _onJoined(peerId, clientId, messageId);
+        await _onJoined(platformParticipant, messageId);
         break;
       case MessageReceiptType.exit:
-        await _onExit(peerId, clientId, messageId);
+        await _onExit(platformParticipant, messageId);
         break;
       default:
         break;
@@ -517,7 +519,7 @@ class ConferenceChatMessageController with ChangeNotifier {
 
   ///对方只是表示收到，自己什么都不用做
   Future<void> _onReceived(
-      String peerId, String clientId, String messageId) async {
+      PlatformParticipant platformParticipant, String messageId) async {
     if (_status == VideoChatStatus.calling) {
       status = VideoChatStatus.end;
     }
@@ -525,7 +527,7 @@ class ConferenceChatMessageController with ChangeNotifier {
 
   ///对方立即接受邀请，并且加入会议，自己也要立即加入
   Future<void> _onAccepted(
-      String peerId, String clientId, String messageId) async {
+      PlatformParticipant platformParticipant, String messageId) async {
     if (_status == VideoChatStatus.calling) {
       status = VideoChatStatus.chatting;
     }
@@ -534,28 +536,30 @@ class ConferenceChatMessageController with ChangeNotifier {
 
   ///对方拒绝，自己什么都不用做
   Future<void> _onRejected(
-      String peerId, String clientId, String messageId) async {
+      PlatformParticipant platformParticipant, String messageId) async {
     if (_status == VideoChatStatus.calling) {
       status = VideoChatStatus.end;
     }
   }
 
   ///对方终止，把对方移除会议
-  _onTerminated(String peerId, String clientId, String messageId) async {
+  _onTerminated(
+      PlatformParticipant platformParticipant, String messageId) async {
     if (_status == VideoChatStatus.calling) {
       status = VideoChatStatus.end;
     }
     P2pConferenceClient? p2pConferenceClient =
         p2pConferenceClientPool.getConferenceClient(messageId);
     if (p2pConferenceClient != null) {
-      p2pConferenceClient.removeParticipant(peerId, clientId);
+      p2pConferenceClient.onParticipantDisconnectedEvent(platformParticipant);
     } else {
       logger.e('participant $peerId has no peerConnections');
     }
   }
 
   ///对方占线，自己什么都不用做
-  Future<void> _onBusy(String peerId, String clientId, String messageId) async {
+  Future<void> _onBusy(
+      PlatformParticipant platformParticipant, String messageId) async {
     if (_status == VideoChatStatus.calling) {
       status = VideoChatStatus.end;
     }
@@ -563,14 +567,15 @@ class ConferenceChatMessageController with ChangeNotifier {
 
   ///对方没响应，自己什么都不用做
   Future<void> _onIgnored(
-      String peerId, String clientId, String messageId) async {
+      PlatformParticipant platformParticipant, String messageId) async {
     if (_status == VideoChatStatus.calling) {
       status = VideoChatStatus.end;
     }
   }
 
   ///对方保持，自己可以先加入，等待对方后续加入
-  Future<void> _onHold(String peerId, String clientId, String messageId) async {
+  Future<void> _onHold(
+      PlatformParticipant platformParticipant, String messageId) async {
     if (_status == VideoChatStatus.calling) {
       status = VideoChatStatus.chatting;
     }
@@ -578,18 +583,19 @@ class ConferenceChatMessageController with ChangeNotifier {
   }
 
   /// 收到对方加入消息，自己加入，返回joined消息
-  Future<void> _onJoin(String peerId, String clientId, String messageId) async {
+  Future<void> _onJoin(
+      PlatformParticipant platformParticipant, String messageId) async {
     P2pConferenceClient? p2pConferenceClient =
         p2pConferenceClientPool.getConferenceClient(messageId);
     if (p2pConferenceClient != null && p2pConferenceClient.joined) {
       _sendChatReceipt(MessageReceiptType.joined);
     }
-    await _onJoined(peerId, clientId, messageId);
+    await _onJoined(platformParticipant, messageId);
   }
 
   /// 对方收到自己的joined消息，返回已经加入消息，自己也要配合把对方的连接加入本地流，属于被动加入
   Future<void> _onJoined(
-      String peerId, String clientId, String messageId) async {
+      PlatformParticipant platformParticipant, String messageId) async {
     //将邀请消息发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
     P2pConferenceClient? p2pConferenceClient =
         p2pConferenceClientPool.getConferenceClient(messageId);
@@ -597,23 +603,24 @@ class ConferenceChatMessageController with ChangeNotifier {
       if (_status == VideoChatStatus.calling) {
         status = VideoChatStatus.chatting;
       }
-      p2pConferenceClient.addParticipant(peerId, clientId);
+      p2pConferenceClient.onParticipantConnectedEvent(platformParticipant);
     } else {
       logger.e('p2pConferenceClient:$messageId is not exist');
     }
   }
 
   /// 收到对方退出消息
-  Future<void> _onExit(String peerId, String clientId, String messageId) async {
+  Future<void> _onExit(
+      PlatformParticipant platformParticipant, String messageId) async {
     if (_status == VideoChatStatus.calling) {
       status = VideoChatStatus.end;
     }
 
     //将发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
-    P2pConferenceClient? p2pConferenceClient = p2pConferenceClientPool
-        .getConferenceClient(_conference!.conferenceId);
+    P2pConferenceClient? p2pConferenceClient =
+        p2pConferenceClientPool.getConferenceClient(_conference!.conferenceId);
     if (p2pConferenceClient != null) {
-      p2pConferenceClient.removeParticipant(peerId, clientId);
+      p2pConferenceClient.onParticipantDisconnectedEvent(platformParticipant);
     } else {
       logger.e('p2pConferenceClient:$messageId is not exist');
     }
@@ -629,8 +636,8 @@ class ConferenceChatMessageController with ChangeNotifier {
   joinConference() async {
     await openLocalMainPeerMediaStream();
     //创建新的视频会议控制器
-    P2pConferenceClient? p2pConferenceClient = p2pConferenceClientPool
-        .getConferenceClient(_conference!.conferenceId);
+    P2pConferenceClient? p2pConferenceClient =
+        p2pConferenceClientPool.getConferenceClient(_conference!.conferenceId);
     if (p2pConferenceClient != null) {
       await p2pConferenceClient.join();
       status = VideoChatStatus.chatting;
