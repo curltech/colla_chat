@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
+import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -14,6 +15,7 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controll
 import 'package:colla_chat/pages/chat/chat/full_screen_chat_message_widget.dart';
 import 'package:colla_chat/pages/chat/chat/sfu_video_chat_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video_chat_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/conference/conference_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/group/group_edit_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -21,6 +23,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/chat_summary.dart';
+import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/date_util.dart';
@@ -629,8 +632,20 @@ class _ChatMessageViewState extends State<ChatMessageView>
     }
     if (partyType == PartyType.conference.name) {
       rightWidgets.add(IconButton(
-        onPressed: () {
-          indexWidgetProvider.push('conference_edit');
+        onPressed: () async {
+          ChatSummary? chatSummary = chatMessageController.chatSummary;
+          if (chatSummary != null) {
+            String? partyType = chatSummary.partyType;
+            String? messageId = chatSummary.messageId;
+            if (partyType == PartyType.conference.name && messageId != null) {
+              Conference? conference = await conferenceService
+                  .findCachedOneByConferenceId(messageId);
+              if (conference != null) {
+                conferenceNotifier.value = conference;
+                indexWidgetProvider.push('conference_edit');
+              }
+            }
+          }
         },
         icon: const Icon(Icons.more_vert),
         tooltip: AppLocalizations.t('More'),
