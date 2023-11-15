@@ -615,8 +615,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             tip: status ? 'On' : 'Off',
             onPressed: () async {
               speakerStatus.value = !speakerStatus.value;
-              var conferenceChatMessageController =
-                  p2pConferenceClientPool.conferenceChatMessageController;
               await MediaStreamUtil.setSpeakerphoneOn(status);
               // await conferenceChatMessageController?.setAudioContext(
               //     route: status

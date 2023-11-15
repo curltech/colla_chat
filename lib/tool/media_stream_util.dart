@@ -83,6 +83,7 @@ class MediaStreamUtil {
     };
     var mediaStream =
         await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
+
     return mediaStream;
   }
 
