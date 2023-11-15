@@ -80,10 +80,10 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   void initState() {
     super.initState();
     // 本地视频可能在其他地方关闭，所有需要注册关闭事件
-    localPeerMediaStreamController.addListener(_updateLocalPeerMediaStream);
+    localPeerMediaStreamController.addListener(_updateView);
     p2pConferenceClientPool.addListener(_updateConferenceClient);
     _updateConferenceClient();
-    _updateLocalPeerMediaStream();
+    _updateView();
   }
 
   _updateConferenceClient() {
@@ -95,7 +95,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     } else {
       videoChatStatus.value = VideoChatStatus.end;
     }
-    _updateLocalPeerMediaStream();
+    _updateView();
   }
 
   _updateVideoChatStatus() {
@@ -112,7 +112,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   ///调整界面的显示
-  Future<void> _updateLocalPeerMediaStream() async {
+  Future<void> _updateView() async {
     List<ActionData> actionData = [];
     if (localPeerMediaStreamController.mainPeerMediaStream == null ||
         !localPeerMediaStreamController.video) {
@@ -141,12 +141,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             icon: const Icon(Icons.screen_share, color: Colors.white)),
       );
     }
-    // actionData.add(
-    //   ActionData(
-    //       label: 'Media play',
-    //       tooltip: 'Open media play',
-    //       icon: const Icon(Icons.video_file, color: Colors.white)),
-    // );
     if (localPeerMediaStreamController.peerMediaStreams.isNotEmpty) {
       actionData.add(
         ActionData(
@@ -192,42 +186,26 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///创建本地的Video render，支持视频和音频的切换，设置当前videoChatRender，激活create。add和remove监听事件
   Future<PeerMediaStream?> _openMainPeerMediaStream({bool video = true}) async {
     ///本地视频不存在，可以直接创建，并发送视频邀请消息，否则根据情况觉得是否音视频切换
-    PeerMediaStream? peerMediaStream =
+    PeerMediaStream? mainPeerMediaStream =
         localPeerMediaStreamController.mainPeerMediaStream;
-    if (peerMediaStream == null) {
-      if (video) {
-        peerMediaStream =
-            await localPeerMediaStreamController.createMainPeerMediaStream();
+    if (mainPeerMediaStream != null) {
+      if (mainPeerMediaStream.video != video) {
+        await _close(mainPeerMediaStream);
       } else {
-        peerMediaStream =
-            await localPeerMediaStreamController.createMainPeerMediaStream();
-      }
-      await _publish(peerMediaStream);
-      _updateLocalPeerMediaStream();
-    } else {
-      if (video) {
-        if (!localPeerMediaStreamController.video) {
-          await _close(peerMediaStream);
-          await localPeerMediaStreamController.remove(peerMediaStream.id!);
-          await localPeerMediaStreamController.close(peerMediaStream.id!);
-          peerMediaStream =
-              await localPeerMediaStreamController.createMainPeerMediaStream();
-          await _publish(peerMediaStream);
-          _updateLocalPeerMediaStream();
-        }
-      } else {
-        if (localPeerMediaStreamController.video) {
-          await _close(peerMediaStream);
-          await localPeerMediaStreamController.remove(peerMediaStream.id!);
-          await localPeerMediaStreamController.close(peerMediaStream.id!);
-          peerMediaStream = await localPeerMediaStreamController
-              .createMainPeerMediaStream(video: false);
-          await _publish(peerMediaStream);
-          _updateLocalPeerMediaStream();
-        }
+        return null;
       }
     }
-    return peerMediaStream;
+    if (video) {
+      mainPeerMediaStream =
+          await localPeerMediaStreamController.createMainPeerMediaStream();
+    } else {
+      mainPeerMediaStream = await localPeerMediaStreamController
+          .createMainPeerMediaStream(video: false);
+    }
+    await _publish(mainPeerMediaStream);
+    _updateView();
+
+    return mainPeerMediaStream;
   }
 
   Future<PeerMediaStream?> _openDisplayMedia() async {
@@ -241,9 +219,93 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     PeerMediaStream peerMediaStream = await localPeerMediaStreamController
         .createPeerDisplayStream(selectedSource: source);
     await _publish(peerMediaStream);
-    _updateLocalPeerMediaStream();
+    _updateView();
 
     return peerMediaStream;
+  }
+
+  ///关闭单个本地视频窗口的流
+  Future<void> _close(PeerMediaStream peerMediaStream) async {
+    //从map中移除
+    localPeerMediaStreamController.remove(peerMediaStream.id!);
+    ConferenceChatMessageController? conferenceChatMessageController =
+        p2pConferenceClientPool.conferenceChatMessageController;
+    if (conferenceChatMessageController != null &&
+        conferenceChatMessageController.conference != null) {
+      //在会议中，如果是本地流，先所有的webrtc连接中移除
+      String conferenceId =
+          conferenceChatMessageController.conference!.conferenceId;
+      await p2pConferenceClientPool.close(conferenceId, [peerMediaStream]);
+    }
+    //流关闭
+    await localPeerMediaStreamController.remove(peerMediaStream.id!);
+    await localPeerMediaStreamController.close(peerMediaStream.id!);
+  }
+
+  ///关闭并且移除本地所有的视频，这时候还能看远程的视频
+  _closeAll() async {
+    var peerMediaStreams = localPeerMediaStreamController.peerMediaStreams;
+    P2pConferenceClient? p2pConferenceClient =
+        p2pConferenceClientPool.conferenceClient;
+    ConferenceChatMessageController? conferenceChatMessageController =
+        p2pConferenceClient?.conferenceChatMessageController;
+    Conference? conference = conferenceChatMessageController?.conference;
+    //从webrtc连接中移除流
+    if (conference != null) {
+      await p2pConferenceClient?.close(peerMediaStreams);
+    }
+    await localPeerMediaStreamController.closeAll();
+    _updateView();
+  }
+
+  ///呼叫挂断，关闭音频和本地视频，设置结束状态
+  _hangup() async {
+    _stopAudio();
+    await localPeerMediaStreamController.closeAll();
+    P2pConferenceClient? p2pConferenceClient =
+        p2pConferenceClientPool.conferenceClient;
+    ConferenceChatMessageController? conferenceChatMessageController =
+        p2pConferenceClient?.conferenceChatMessageController;
+    conferenceChatMessageController?.status = VideoChatStatus.end;
+  }
+
+  ///如果正在呼叫calling，停止呼叫，关闭所有的本地视频，呼叫状态改为结束
+  ///如果正在通话chatting，挂断视频通话，关闭所有的本地视频和远程视频，呼叫状态改为结束
+  ///结束会议，这时候本地和远程的视频都应该被关闭
+  _disconnect() async {
+    P2pConferenceClient? p2pConferenceClient =
+        p2pConferenceClientPool.conferenceClient;
+    ConferenceChatMessageController? conferenceChatMessageController =
+        p2pConferenceClient?.conferenceChatMessageController;
+    var status = conferenceChatMessageController?.status;
+    if (status == VideoChatStatus.chatting) {
+      await _closeAll();
+      await p2pConferenceClientPool.disconnect(
+          conferenceId: conferenceChatMessageController?.conferenceId!);
+    }
+    conferenceChatMessageController?.status = VideoChatStatus.end;
+  }
+
+  Future<void> _onAction(int index, String name, {String? value}) async {
+    switch (name) {
+      case 'Video':
+        await _openMainPeerMediaStream();
+        break;
+      case 'Audio':
+        await _openMainPeerMediaStream(video: false);
+        break;
+      case 'Screen share':
+        await _openDisplayMedia();
+        break;
+      case 'Media play':
+        //await _openMediaStream(stream);
+        break;
+      case 'Close':
+        await _closeAll();
+        break;
+      default:
+        break;
+    }
   }
 
   ///选择会议参加人的界面，返回会议参加人
@@ -443,7 +505,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         conferenceChatMessageController?.status = VideoChatStatus.end;
       }
     });
-    _updateLocalPeerMediaStream();
+    _updateView();
   }
 
   ///加入当前会议，即开始视频会议
@@ -481,73 +543,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       DialogUtil.info(context,
           content: AppLocalizations.t('Join conference:') + conference.name);
     }
-    _updateLocalPeerMediaStream();
-  }
-
-  ///关闭并且移除本地所有的视频，这时候还能看远程的视频
-  _closeAll() async {
-    var peerMediaStreams = localPeerMediaStreamController.peerMediaStreams;
-    P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.conferenceClient;
-    ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClient?.conferenceChatMessageController;
-    Conference? conference = conferenceChatMessageController?.conference;
-    //从webrtc连接中移除流
-    if (conference != null) {
-      await p2pConferenceClient?.close(peerMediaStreams);
-    }
-    await localPeerMediaStreamController.closeAll();
-    _updateLocalPeerMediaStream();
-  }
-
-  ///呼叫挂断，关闭音频和本地视频，设置结束状态
-  _hangup() async {
-    _stopAudio();
-    await localPeerMediaStreamController.closeAll();
-    P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.conferenceClient;
-    ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClient?.conferenceChatMessageController;
-    conferenceChatMessageController?.status = VideoChatStatus.end;
-  }
-
-  ///如果正在呼叫calling，停止呼叫，关闭所有的本地视频，呼叫状态改为结束
-  ///如果正在通话chatting，挂断视频通话，关闭所有的本地视频和远程视频，呼叫状态改为结束
-  ///结束会议，这时候本地和远程的视频都应该被关闭
-  _disconnect() async {
-    P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.conferenceClient;
-    ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClient?.conferenceChatMessageController;
-    var status = conferenceChatMessageController?.status;
-    if (status == VideoChatStatus.chatting) {
-      await _closeAll();
-      await p2pConferenceClientPool.disconnect(
-          conferenceId: conferenceChatMessageController?.conferenceId!);
-    }
-    conferenceChatMessageController?.status = VideoChatStatus.end;
-  }
-
-  Future<void> _onAction(int index, String name, {String? value}) async {
-    switch (name) {
-      case 'Video':
-        await _openMainPeerMediaStream();
-        break;
-      case 'Audio':
-        await _openMainPeerMediaStream(video: false);
-        break;
-      case 'Screen share':
-        await _openDisplayMedia();
-        break;
-      case 'Media play':
-        //await _openMediaStream(stream);
-        break;
-      case 'Close':
-        await _closeAll();
-        break;
-      default:
-        break;
-    }
+    _updateView();
   }
 
   Widget _buildActionCard(BuildContext context) {
@@ -757,24 +753,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         });
   }
 
-  ///关闭单个本地视频窗口的流
-  Future<void> _close(PeerMediaStream peerMediaStream) async {
-    //从map中移除
-    localPeerMediaStreamController.remove(peerMediaStream.id!);
-    ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClientPool.conferenceChatMessageController;
-    if (conferenceChatMessageController != null &&
-        conferenceChatMessageController.conference != null) {
-      //在会议中，如果是本地流，先所有的webrtc连接中移除
-      String conferenceId =
-          conferenceChatMessageController.conference!.conferenceId;
-      await p2pConferenceClientPool.close(conferenceId, [peerMediaStream]);
-    }
-    //流关闭
-    await localPeerMediaStreamController.remove(peerMediaStream.id!);
-    await localPeerMediaStreamController.close(peerMediaStream.id!);
-  }
-
   Future<void> _onClosedPeerMediaStream(PeerMediaStream peerMediaStream) async {
     await _close(peerMediaStream);
   }
@@ -811,7 +789,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   @override
   void dispose() {
-    localPeerMediaStreamController.removeListener(_updateLocalPeerMediaStream);
+    localPeerMediaStreamController.removeListener(_updateView);
     var conferenceChatMessageController =
         p2pConferenceClientPool.conferenceChatMessageController;
     conferenceChatMessageController?.removeListener(_updateVideoChatStatus);

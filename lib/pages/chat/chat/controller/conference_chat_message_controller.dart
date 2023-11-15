@@ -12,10 +12,9 @@ import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/livekit/sfu_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
-import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:flutter/material.dart';
@@ -320,7 +319,11 @@ class ConferenceChatMessageController with ChangeNotifier {
         chatMessageController.chatSummary = _chatSummary;
         chatMessageController.current = _chatMessage;
         indexWidgetProvider.push('chat_message');
-        indexWidgetProvider.push('video_chat');
+        if (_conference!.sfu) {
+          indexWidgetProvider.push('sfu_video_chat');
+        } else {
+          indexWidgetProvider.push('video_chat');
+        }
         await join();
         return;
       }
@@ -429,9 +432,10 @@ class ConferenceChatMessageController with ChangeNotifier {
             video: _conference!.video);
       } else {
         if (auto) {
+          bool sfu = _conference!.sfu;
           //如果本地主视频存在，直接返回
           await localPeerMediaStreamController.createMainPeerMediaStream(
-              video: _conference!.video);
+              sfu: sfu, video: _conference!.video);
         }
       }
     }
@@ -548,12 +552,15 @@ class ConferenceChatMessageController with ChangeNotifier {
     if (_status == VideoChatStatus.calling) {
       status = VideoChatStatus.end;
     }
-    P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.getConferenceClient(messageId);
-    if (p2pConferenceClient != null) {
-      p2pConferenceClient.onParticipantDisconnectedEvent(platformParticipant);
+    if (_conference!.sfu) {
     } else {
-      logger.e('participant $peerId has no peerConnections');
+      P2pConferenceClient? conferenceClient =
+          p2pConferenceClientPool.getConferenceClient(messageId);
+      if (conferenceClient != null) {
+        conferenceClient.onParticipantDisconnectedEvent(platformParticipant);
+      } else {
+        logger.e('participant $peerId has no peerConnections');
+      }
     }
   }
 
@@ -585,10 +592,13 @@ class ConferenceChatMessageController with ChangeNotifier {
   /// 收到对方加入消息，自己加入，返回joined消息
   Future<void> _onJoin(
       PlatformParticipant platformParticipant, String messageId) async {
-    P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.getConferenceClient(messageId);
-    if (p2pConferenceClient != null && p2pConferenceClient.joined) {
-      _sendChatReceipt(MessageReceiptType.joined);
+    if (_conference!.sfu) {
+    } else {
+      P2pConferenceClient? p2pConferenceClient =
+          p2pConferenceClientPool.getConferenceClient(messageId);
+      if (p2pConferenceClient != null && p2pConferenceClient.joined) {
+        _sendChatReceipt(MessageReceiptType.joined);
+      }
     }
     await _onJoined(platformParticipant, messageId);
   }
@@ -596,16 +606,19 @@ class ConferenceChatMessageController with ChangeNotifier {
   /// 对方收到自己的joined消息，返回已经加入消息，自己也要配合把对方的连接加入本地流，属于被动加入
   Future<void> _onJoined(
       PlatformParticipant platformParticipant, String messageId) async {
-    //将邀请消息发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
-    P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.getConferenceClient(messageId);
-    if (p2pConferenceClient != null) {
-      if (_status == VideoChatStatus.calling) {
-        status = VideoChatStatus.chatting;
-      }
-      p2pConferenceClient.onParticipantConnectedEvent(platformParticipant);
+    if (_conference!.sfu) {
     } else {
-      logger.e('p2pConferenceClient:$messageId is not exist');
+      //将邀请消息发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
+      P2pConferenceClient? p2pConferenceClient =
+          p2pConferenceClientPool.getConferenceClient(messageId);
+      if (p2pConferenceClient != null) {
+        if (_status == VideoChatStatus.calling) {
+          status = VideoChatStatus.chatting;
+        }
+        p2pConferenceClient.onParticipantConnectedEvent(platformParticipant);
+      } else {
+        logger.e('p2pConferenceClient:$messageId is not exist');
+      }
     }
   }
 
@@ -615,14 +628,16 @@ class ConferenceChatMessageController with ChangeNotifier {
     if (_status == VideoChatStatus.calling) {
       status = VideoChatStatus.end;
     }
-
-    //将发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
-    P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.getConferenceClient(_conference!.conferenceId);
-    if (p2pConferenceClient != null) {
-      p2pConferenceClient.onParticipantDisconnectedEvent(platformParticipant);
+    if (_conference!.sfu) {
     } else {
-      logger.e('p2pConferenceClient:$messageId is not exist');
+      //将发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
+      P2pConferenceClient? p2pConferenceClient = p2pConferenceClientPool
+          .getConferenceClient(_conference!.conferenceId);
+      if (p2pConferenceClient != null) {
+        p2pConferenceClient.onParticipantDisconnectedEvent(platformParticipant);
+      } else {
+        logger.e('p2pConferenceClient:$messageId is not exist');
+      }
     }
   }
 
@@ -635,14 +650,18 @@ class ConferenceChatMessageController with ChangeNotifier {
   ///自己主动加入
   joinConference() async {
     await openLocalMainPeerMediaStream();
-    //创建新的视频会议控制器
-    P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.getConferenceClient(_conference!.conferenceId);
-    if (p2pConferenceClient != null) {
-      await p2pConferenceClient.join();
-      status = VideoChatStatus.chatting;
+    if (_conference!.sfu) {
     } else {
-      logger.e('p2pConferenceClient:${_conference!.conferenceId} is not exist');
+      //创建新的视频会议控制器
+      P2pConferenceClient? p2pConferenceClient = p2pConferenceClientPool
+          .getConferenceClient(_conference!.conferenceId);
+      if (p2pConferenceClient != null) {
+        await p2pConferenceClient.join();
+        status = VideoChatStatus.chatting;
+      } else {
+        logger
+            .e('p2pConferenceClient:${_conference!.conferenceId} is not exist');
+      }
     }
   }
 

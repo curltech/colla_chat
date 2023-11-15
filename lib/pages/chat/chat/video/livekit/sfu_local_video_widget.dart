@@ -43,10 +43,6 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
   /// 当前的视频会议的消息汇总（也就是知道会议目标是谁，比如是linkman，group还是conference）必须存在
   ChatSummary chatSummary = chatMessageController.chatSummary!;
 
-  /// 当前的视频会议，如果不存在，需要通过邀请创建
-  // ValueNotifier<LiveKitConferenceClient?> conferenceClient =
-  //     ValueNotifier<LiveKitConferenceClient?>(null);
-
   //控制面板的可见性，包括视频功能按钮和呼叫按钮
   ValueNotifier<bool> controlPanelVisible = ValueNotifier<bool>(true);
 
@@ -71,9 +67,9 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
   void initState() {
     super.initState();
     liveKitConferenceClientPool.addListener(_updateConferenceClient);
-    localPeerMediaStreamController.addListener(_updateLocalPeerMediaStream);
+    localPeerMediaStreamController.addListener(_updateView);
     _updateConferenceClient();
-    _updateLocalPeerMediaStream();
+    _updateView();
   }
 
   _updateConferenceClient() {
@@ -87,7 +83,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     } else {
       videoChatStatus.value = VideoChatStatus.end;
     }
-    _updateLocalPeerMediaStream();
+    _updateView();
   }
 
   _updateVideoChatStatus() {
@@ -104,7 +100,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
   }
 
   /// 调整界面的显示
-  Future<void> _updateLocalPeerMediaStream() async {
+  Future<void> _updateView() async {
     List<ActionData> actionData = [];
     if (localPeerMediaStreamController.mainPeerMediaStream == null ||
         !localPeerMediaStreamController.video) {
@@ -158,6 +154,129 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
         liveKitConferenceClientPool.conferenceChatMessageController;
     conferenceChatMessageController?.stopAudio(
         filename: 'assets/medias/close.mp3');
+  }
+
+  /// 发布视频流
+  _publish(PeerMediaStream peerMediaStream) async {
+    LiveKitConferenceClient? conferenceClient =
+        liveKitConferenceClientPool.conferenceClient;
+    if (conferenceClient != null) {
+      await conferenceClient.publish(peerMediaStreams: [peerMediaStream]);
+    }
+  }
+
+  ///创建本地的Video render，支持视频和音频的切换，设置当前videoChatRender，激活create。add和remove监听事件
+  Future<PeerMediaStream?> _openMainPeerMediaStream({bool video = true}) async {
+    ///本地视频不存在，可以直接创建，并发送视频邀请消息，否则根据情况觉得是否音视频切换
+    PeerMediaStream? mainPeerMediaStream =
+        localPeerMediaStreamController.mainPeerMediaStream;
+    if (mainPeerMediaStream != null) {
+      if (mainPeerMediaStream.video != video) {
+        await _close(mainPeerMediaStream);
+      } else {
+        return null;
+      }
+    }
+    if (video) {
+      mainPeerMediaStream = await localPeerMediaStreamController
+          .createMainPeerMediaStream(sfu: true);
+    } else {
+      mainPeerMediaStream = await localPeerMediaStreamController
+          .createMainPeerMediaStream(video: false, sfu: true);
+    }
+    await _publish(mainPeerMediaStream);
+    _updateView();
+
+    return mainPeerMediaStream;
+  }
+
+  Future<PeerMediaStream?> _openDisplayMedia() async {
+    DesktopCapturerSource? source;
+    if (!platformParams.ios) {
+      source = await DialogUtil.show<DesktopCapturerSource>(
+        context: context,
+        builder: (context) => Dialog(child: ScreenSelectDialog()),
+      );
+    }
+    PeerMediaStream peerMediaStream = await localPeerMediaStreamController
+        .createPeerDisplayStream(selectedSource: source, sfu: true);
+    await _publish(peerMediaStream);
+    _updateView();
+
+    return peerMediaStream;
+  }
+
+  /// 退出发布并且关闭视频流
+  _close(PeerMediaStream peerMediaStream) async {
+    LiveKitConferenceClient? conferenceClient =
+        liveKitConferenceClientPool.conferenceClient;
+    if (conferenceClient != null) {
+      await conferenceClient.close([peerMediaStream]);
+    }
+    if (peerMediaStream.id != null) {
+      await localPeerMediaStreamController.close(peerMediaStream.id!);
+    }
+  }
+
+  ///关闭并且移除本地所有的视频，这时候还能看远程的视频
+  _closeAll() async {
+    LiveKitConferenceClient? conferenceClient =
+        liveKitConferenceClientPool.conferenceClient;
+    if (conferenceClient == null) {
+      if (mounted) {
+        DialogUtil.error(context,
+            content: AppLocalizations.t('No conference client'));
+      }
+      return;
+    }
+    await conferenceClient.closeAll();
+    _updateView();
+  }
+
+  ///如果正在呼叫calling，停止呼叫，关闭所有的本地视频，呼叫状态改为结束
+  ///如果正在通话chatting，挂断视频通话，关闭所有的本地视频和远程视频，呼叫状态改为结束
+  ///结束会议，这时候本地和远程的视频都应该被关闭
+  _disconnect() async {
+    LiveKitConferenceClient? conferenceClient =
+        liveKitConferenceClientPool.conferenceClient;
+    if (conferenceClient == null) {
+      if (mounted) {
+        DialogUtil.error(context,
+            content: AppLocalizations.t('No conference client'));
+      }
+      return;
+    }
+    ConferenceChatMessageController conferenceChatMessageController =
+        conferenceClient.conferenceChatMessageController;
+    var status = conferenceChatMessageController.status;
+    if (status == VideoChatStatus.calling ||
+        status == VideoChatStatus.chatting) {
+      await liveKitConferenceClientPool.disconnect(
+          conferenceId: conferenceChatMessageController.conferenceId!);
+    }
+    conferenceChatMessageController.status = VideoChatStatus.end;
+  }
+
+  Future<void> _onAction(int index, String name, {String? value}) async {
+    switch (name) {
+      case 'Video':
+        await _openMainPeerMediaStream();
+        break;
+      case 'Audio':
+        await _openMainPeerMediaStream(video: false);
+        break;
+      case 'Screen share':
+        await _openDisplayMedia();
+        break;
+      case 'Media play':
+        //await _openMediaStream(stream);
+        break;
+      case 'Close':
+        await _closeAll();
+        break;
+      default:
+        break;
+    }
   }
 
   ///选择会议参加人的界面，返回会议参加人
@@ -329,7 +448,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
         conferenceChatMessageController?.status = VideoChatStatus.end;
       }
     });
-    _updateLocalPeerMediaStream();
+    _updateView();
   }
 
   /// 当前会议存在的时候加入当前会议，即开始视频会议
@@ -358,130 +477,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
           content: AppLocalizations.t('Join conference:') +
               conferenceClient.conferenceChatMessageController.name!);
     }
-    _updateLocalPeerMediaStream();
-  }
-
-  ///关闭并且移除本地所有的视频，这时候还能看远程的视频
-  _closeAll() async {
-    LiveKitConferenceClient? conferenceClient =
-        liveKitConferenceClientPool.conferenceClient;
-    if (conferenceClient == null) {
-      if (mounted) {
-        DialogUtil.error(context,
-            content: AppLocalizations.t('No conference client'));
-      }
-      return;
-    }
-    await conferenceClient.closeAll();
-    _updateLocalPeerMediaStream();
-  }
-
-  ///如果正在呼叫calling，停止呼叫，关闭所有的本地视频，呼叫状态改为结束
-  ///如果正在通话chatting，挂断视频通话，关闭所有的本地视频和远程视频，呼叫状态改为结束
-  ///结束会议，这时候本地和远程的视频都应该被关闭
-  _disconnect() async {
-    LiveKitConferenceClient? conferenceClient =
-        liveKitConferenceClientPool.conferenceClient;
-    if (conferenceClient == null) {
-      if (mounted) {
-        DialogUtil.error(context,
-            content: AppLocalizations.t('No conference client'));
-      }
-      return;
-    }
-    ConferenceChatMessageController conferenceChatMessageController =
-        conferenceClient.conferenceChatMessageController;
-    var status = conferenceChatMessageController.status;
-    if (status == VideoChatStatus.calling ||
-        status == VideoChatStatus.chatting) {
-      await liveKitConferenceClientPool.disconnect(
-          conferenceId: conferenceChatMessageController.conferenceId!);
-    }
-    conferenceChatMessageController.status = VideoChatStatus.end;
-  }
-
-  ///创建本地的Video render，支持视频和音频的切换，设置当前videoChatRender，激活create。add和remove监听事件
-  Future<PeerMediaStream?> _openMainPeerMediaStream({bool video = true}) async {
-    ///本地视频不存在，可以直接创建，并发送视频邀请消息，否则根据情况觉得是否音视频切换
-    PeerMediaStream? mainPeerMediaStream =
-        localPeerMediaStreamController.mainPeerMediaStream;
-    if (mainPeerMediaStream != null) {
-      if (mainPeerMediaStream.video != video) {
-        await _close(mainPeerMediaStream);
-      } else {
-        return null;
-      }
-    }
-    if (video) {
-      mainPeerMediaStream = await localPeerMediaStreamController
-          .createMainPeerMediaStream(sfu: true);
-    } else {
-      mainPeerMediaStream = await localPeerMediaStreamController
-          .createMainPeerMediaStream(video: false, sfu: true);
-    }
-    await _publish(mainPeerMediaStream);
-    _updateLocalPeerMediaStream();
-
-    return mainPeerMediaStream;
-  }
-
-  Future<PeerMediaStream?> _openDisplayMedia() async {
-    DesktopCapturerSource? source;
-    if (!platformParams.ios) {
-      source = await DialogUtil.show<DesktopCapturerSource>(
-        context: context,
-        builder: (context) => Dialog(child: ScreenSelectDialog()),
-      );
-    }
-    PeerMediaStream peerMediaStream = await localPeerMediaStreamController
-        .createPeerDisplayStream(selectedSource: source, sfu: true);
-    await _publish(peerMediaStream);
-    _updateLocalPeerMediaStream();
-
-    return peerMediaStream;
-  }
-
-  /// 发布视频流
-  _publish(PeerMediaStream peerMediaStream) async {
-    LiveKitConferenceClient? conferenceClient =
-        liveKitConferenceClientPool.conferenceClient;
-    if (conferenceClient != null) {
-      await conferenceClient.publish(peerMediaStreams: [peerMediaStream]);
-    }
-  }
-
-  /// 退出发布并且关闭视频流
-  _close(PeerMediaStream peerMediaStream) async {
-    LiveKitConferenceClient? conferenceClient =
-        liveKitConferenceClientPool.conferenceClient;
-    if (conferenceClient != null) {
-      await conferenceClient.close([peerMediaStream]);
-    }
-    if (peerMediaStream.id != null) {
-      await localPeerMediaStreamController.close(peerMediaStream.id!);
-    }
-  }
-
-  Future<void> _onAction(int index, String name, {String? value}) async {
-    switch (name) {
-      case 'Video':
-        await _openMainPeerMediaStream();
-        break;
-      case 'Audio':
-        await _openMainPeerMediaStream(video: false);
-        break;
-      case 'Screen share':
-        await _openDisplayMedia();
-        break;
-      case 'Media play':
-        //await _openMediaStream(stream);
-        break;
-      case 'Close':
-        await _closeAll();
-        break;
-      default:
-        break;
-    }
+    _updateView();
   }
 
   Widget _buildActionCard(BuildContext context) {
@@ -742,7 +738,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
         liveKitConferenceClientPool.conferenceChatMessageController;
     conferenceChatMessageController?.removeListener(_updateVideoChatStatus);
     liveKitConferenceClientPool.removeListener(_updateConferenceClient);
-    localPeerMediaStreamController.removeListener(_updateLocalPeerMediaStream);
+    localPeerMediaStreamController.removeListener(_updateView);
     conferenceChatMessageController?.stopAudio();
     super.dispose();
   }

@@ -49,21 +49,12 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
   ///注册远程流到来或者关闭的监听器
   ///重新计算远程流的数量是否变化，决定是否重新渲染界面
   void _init() {
-    liveKitConferenceClientPool.addListener(_updateConferenceClient);
+    liveKitConferenceClientPool.addListener(_updateView);
     LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
     if (conferenceClient != null) {
-      conferenceClient.remotePeerMediaStreamController
-          .addListener(_updatePeerMediaStreamController);
+      conferenceClient.remotePeerMediaStreamController.addListener(_updateView);
     }
-  }
-
-  _updateConferenceClient() {
-    _updateView();
-  }
-
-  _updatePeerMediaStreamController() {
-    _updateView();
   }
 
   ///调整界面的显示
@@ -212,10 +203,9 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
   Future<void> _onClosedPeerMediaStream(PeerMediaStream peerMediaStream) async {
     LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
-    if (conferenceClient == null) {
-      return;
+    if (conferenceClient != null) {
+      await conferenceClient.close([peerMediaStream]);
     }
-    await conferenceClient.close([peerMediaStream]);
   }
 
   @override
@@ -228,12 +218,12 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
 
   @override
   void dispose() {
-    liveKitConferenceClientPool.removeListener(_updateConferenceClient);
+    liveKitConferenceClientPool.removeListener(_updateView);
     LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
     if (conferenceClient != null) {
       conferenceClient.remotePeerMediaStreamController
-          .removeListener(_updatePeerMediaStreamController);
+          .removeListener(_updateView);
     }
     super.dispose();
   }

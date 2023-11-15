@@ -262,16 +262,16 @@ class LiveKitConferenceClient {
   join() async {
     await roomClient.connect();
     roomClient
-        .onRoomEvent<ParticipantConnectedEvent>(onParticipantConnectedEvent);
+        .onRoomEvent<ParticipantConnectedEvent>(_onParticipantConnectedEvent);
     roomClient.onRoomEvent<ParticipantDisconnectedEvent>(
-        onParticipantDisconnectedEvent);
-    roomClient.onRoomEvent<TrackPublishedEvent>(onTrackPublishedEvent);
-    roomClient.onRoomEvent<TrackUnpublishedEvent>(onTrackUnpublishedEvent);
+        _onParticipantDisconnectedEvent);
+    roomClient.onRoomEvent<TrackPublishedEvent>(_onTrackPublishedEvent);
+    roomClient.onRoomEvent<TrackUnpublishedEvent>(_onTrackUnpublishedEvent);
     roomClient
-        .onRoomEvent<LocalTrackPublishedEvent>(onLocalTrackPublishedEvent);
+        .onRoomEvent<LocalTrackPublishedEvent>(_onLocalTrackPublishedEvent);
     roomClient
-        .onRoomEvent<LocalTrackUnpublishedEvent>(onLocalTrackUnpublishedEvent);
-    roomClient.onLocalParticipantEvent(onLocalParticipantEvent);
+        .onRoomEvent<LocalTrackUnpublishedEvent>(_onLocalTrackUnpublishedEvent);
+    roomClient.onLocalParticipantEvent(_onLocalParticipantEvent);
     await conferenceChatMessageController.join();
     joined = true;
   }
@@ -372,17 +372,17 @@ class LiveKitConferenceClient {
   }
 
   /// 远程参与者加入会议
-  FutureOr<void> onParticipantConnectedEvent(ParticipantConnectedEvent event) {
+  FutureOr<void> _onParticipantConnectedEvent(ParticipantConnectedEvent event) {
     log.logger.i('on ParticipantConnectedEvent');
   }
 
   /// 远程参与者退出会议
-  FutureOr<void> onParticipantDisconnectedEvent(
+  FutureOr<void> _onParticipantDisconnectedEvent(
       ParticipantDisconnectedEvent event) {
     log.logger.i('on ParticipantDisconnectedEvent');
   }
 
-  Future<FutureOr<void>> onTrackPublishedEvent(
+  Future<FutureOr<void>> _onTrackPublishedEvent(
       TrackPublishedEvent event) async {
     log.logger.i('on TrackPublishedEvent');
     RemoteTrack? track = event.publication.track;
@@ -411,7 +411,7 @@ class LiveKitConferenceClient {
     }
   }
 
-  Future<FutureOr<void>> onTrackUnpublishedEvent(
+  Future<FutureOr<void>> _onTrackUnpublishedEvent(
       TrackUnpublishedEvent event) async {
     log.logger.i('on TrackUnpublishedEvent');
     RemoteTrack? track = event.publication.track;
@@ -426,35 +426,18 @@ class LiveKitConferenceClient {
   }
 
   /// 本地发布事件，本地轨道发生变化
-  FutureOr<void> onLocalTrackPublishedEvent(LocalTrackPublishedEvent event) {
+  FutureOr<void> _onLocalTrackPublishedEvent(LocalTrackPublishedEvent event) {
     log.logger.i('on LocalTrackPublishedEvent');
-    LocalTrackPublication<LocalTrack> localTrackPublication = event.publication;
-    LocalTrack? track = localTrackPublication.track;
-    if (track != null) {
-      RTCRtpMediaType mediaType = track.mediaType;
-      if (mediaType == RTCRtpMediaType.RTCRtpMediaTypeVideo) {
-        localPeerMediaStreamController
-            .add(PeerMediaStream(videoTrack: track as LocalVideoTrack));
-      } else if (mediaType == RTCRtpMediaType.RTCRtpMediaTypeAudio) {
-        localPeerMediaStreamController
-            .add(PeerMediaStream(audioTrack: track as LocalAudioTrack));
-      }
-    }
   }
 
   /// 本地退出事件，本地轨道发生变化
-  FutureOr<void> onLocalTrackUnpublishedEvent(
+  FutureOr<void> _onLocalTrackUnpublishedEvent(
       LocalTrackUnpublishedEvent event) {
     log.logger.i('on LocalTrackUnpublishedEvent');
-    LocalTrackPublication<LocalTrack> localTrackPublication = event.publication;
-    LocalTrack? track = localTrackPublication.track;
-    if (track != null) {
-      localPeerMediaStreamController.remove(track.mediaStream.id);
-    }
   }
 
   /// 本地参与者事件
-  void onLocalParticipantEvent() {
+  void _onLocalParticipantEvent() {
     log.logger.i('on LocalParticipantEvent');
   }
 
