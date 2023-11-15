@@ -28,7 +28,7 @@ class LiveKitRoomClient {
   EventsListener<RoomEvent>? _listener;
 
   LiveKitRoomClient(
-      {this.uri = 'ws://localhost:7880',
+      {this.uri = 'ws://192.168.1.50:7880',
       required this.token,
       this.sharedKey,
       this.adaptiveStream = true,

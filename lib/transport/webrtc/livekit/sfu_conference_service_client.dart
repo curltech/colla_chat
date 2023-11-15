@@ -115,7 +115,7 @@ class LiveKitConferenceServiceClient {
 }
 
 class LiveKitConferenceServiceClientPool {
-  final String defaultHost = "http://localhost:7880";
+  final String defaultHost = "http://192.168.1.50:7880";
   final String defaultApiKey = "devkey";
   final String defaultApiSecret = "secret";
 
