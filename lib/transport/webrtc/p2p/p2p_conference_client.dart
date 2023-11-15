@@ -67,7 +67,7 @@ class P2pConferenceClient {
     return _joined;
   }
 
-  Map<String, PlatformParticipant> participants() {
+  Map<String, PlatformParticipant> remoteParticipants() {
     return _remoteParticipants;
   }
 

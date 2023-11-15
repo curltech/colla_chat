@@ -276,7 +276,7 @@ class LiveKitConferenceClient {
     joined = true;
   }
 
-  Map<String, RemoteParticipant> participants() {
+  Map<String, RemoteParticipant> remoteParticipants() {
     return roomClient.room.participants;
   }
 
