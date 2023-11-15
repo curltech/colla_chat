@@ -73,6 +73,14 @@ class P2pConferenceClient {
 
   /// 自己加入会议，在所有的连接中加上本地流
   join() async {
+    Conference? conference = conferenceChatMessageController.conference;
+    if (conference == null) {
+      return;
+    }
+    bool isValid = conferenceService.isValid(conference);
+    if (!isValid) {
+      return;
+    }
     _joined = true;
     List<AdvancedPeerConnection> pcs = await peerConnections;
     for (AdvancedPeerConnection peerConnection in pcs) {
