@@ -185,7 +185,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
                     },
                     icon: const Icon(
                       Icons.cancel,
-                      color: Colors.white,
+                      color: Colors.yellow,
                     ))
               ]),
               Expanded(child: chatMessageWidget)
