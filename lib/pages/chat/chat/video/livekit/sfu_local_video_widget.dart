@@ -222,15 +222,10 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
   _closeAll() async {
     LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
-    if (conferenceClient == null) {
-      if (mounted) {
-        DialogUtil.error(context,
-            content: AppLocalizations.t('No conference client'));
-      }
-      return;
+    if (conferenceClient != null) {
+      await conferenceClient.closeAll();
     }
-    await conferenceClient.closeAll();
-    _updateView();
+    await localPeerMediaStreamController.closeAll();
   }
 
   ///如果正在呼叫calling，停止呼叫，关闭所有的本地视频，呼叫状态改为结束
@@ -239,22 +234,17 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
   _disconnect() async {
     LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
-    if (conferenceClient == null) {
-      if (mounted) {
-        DialogUtil.error(context,
-            content: AppLocalizations.t('No conference client'));
+    if (conferenceClient != null) {
+      ConferenceChatMessageController conferenceChatMessageController =
+          conferenceClient.conferenceChatMessageController;
+      var status = conferenceChatMessageController.status;
+      if (status == VideoChatStatus.calling ||
+          status == VideoChatStatus.chatting) {
+        await liveKitConferenceClientPool.disconnect(
+            conferenceId: conferenceChatMessageController.conferenceId!);
       }
-      return;
+      conferenceChatMessageController.status = VideoChatStatus.end;
     }
-    ConferenceChatMessageController conferenceChatMessageController =
-        conferenceClient.conferenceChatMessageController;
-    var status = conferenceChatMessageController.status;
-    if (status == VideoChatStatus.calling ||
-        status == VideoChatStatus.chatting) {
-      await liveKitConferenceClientPool.disconnect(
-          conferenceId: conferenceChatMessageController.conferenceId!);
-    }
-    conferenceChatMessageController.status = VideoChatStatus.end;
   }
 
   Future<void> _onAction(int index, String name, {String? value}) async {

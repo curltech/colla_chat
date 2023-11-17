@@ -127,7 +127,7 @@ class PeerMediaStreamController with ChangeNotifier {
         _currentPeerMediaStream = null;
       }
       await peerMediaStream.close();
-      notifyListeners();
+      remove(streamId);
     }
   }
 
@@ -141,6 +141,7 @@ class PeerMediaStreamController with ChangeNotifier {
         await peerMediaStream.close();
       }
       _peerMediaStreams.clear();
+
       notifyListeners();
     });
   }
@@ -260,6 +261,7 @@ class LocalPeerMediaStreamController extends PeerMediaStreamController {
       _mainPeerMediaStream = null;
     }
     await super.close(streamId);
+
   }
 
   ///关闭本地所有的流

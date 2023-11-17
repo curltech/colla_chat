@@ -237,8 +237,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           conferenceChatMessageController.conference!.conferenceId;
       await p2pConferenceClientPool.close(conferenceId, [peerMediaStream]);
     }
-    //流关闭
-    await localPeerMediaStreamController.remove(peerMediaStream.id!);
     await localPeerMediaStreamController.close(peerMediaStream.id!);
   }
 
@@ -255,7 +253,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       await p2pConferenceClient?.close(peerMediaStreams);
     }
     await localPeerMediaStreamController.closeAll();
-    _updateView();
   }
 
   ///呼叫挂断，关闭音频和本地视频，设置结束状态
