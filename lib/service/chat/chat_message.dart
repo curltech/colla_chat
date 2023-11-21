@@ -982,7 +982,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         }
       }
     } else {
-      // logger.i('this is linkman chatMessage, will be not split');
+      chatMessages.add(chatMessage);
     }
     return chatMessages;
   }
