@@ -67,14 +67,15 @@ class _P2pLoginState extends State<P2pLogin> {
         return widget._children[index];
       },
       onIndexChanged: (int index) {
-        this.index = index;
+        setState(() {
+          this.index = index;
+        });
       },
       index: index,
     );
-    var appBar = AppBarWidget.buildAppBar(
-      context,
-      title: CommonAutoSizeText(AppLocalizations.t('Login')),
-      rightWidgets: [
+    List<Widget> rightWidgets = [];
+    if (index != 0) {
+      rightWidgets.addAll([
         IconTextButton(
           padding: const EdgeInsets.symmetric(vertical: 1.0),
           onPressed: () {
@@ -87,6 +88,10 @@ class _P2pLoginState extends State<P2pLogin> {
         const SizedBox(
           width: 10.0,
         ),
+      ]);
+    }
+    if (index != 1) {
+      rightWidgets.addAll([
         IconTextButton(
           padding: const EdgeInsets.symmetric(vertical: 1.0),
           onPressed: () {
@@ -99,6 +104,10 @@ class _P2pLoginState extends State<P2pLogin> {
         const SizedBox(
           width: 10.0,
         ),
+      ]);
+    }
+    if (index != 2) {
+      rightWidgets.add(
         IconTextButton(
           padding: const EdgeInsets.symmetric(vertical: 1.0),
           onPressed: () {
@@ -108,7 +117,12 @@ class _P2pLoginState extends State<P2pLogin> {
           label: AppLocalizations.t('Setting'),
           labelColor: Colors.white,
         ),
-      ],
+      );
+    }
+    PreferredSizeWidget appBar = AppBarWidget.buildAppBar(
+      context,
+      title: CommonAutoSizeText(AppLocalizations.t('Login')),
+      rightWidgets: rightWidgets,
     );
 
     var workspace = Center(

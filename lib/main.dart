@@ -25,6 +25,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
+import 'package:upgrader/upgrader.dart';
 import 'package:webview_win_floating/webview.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
@@ -163,7 +164,9 @@ class _CollaChatAppState extends State<CollaChatApp> {
       themeMode: myself.themeMode,
 
       ///Scaffold 是 Material 库中提供的一个 widget，它提供了默认的导航栏、标题和包含主屏幕 widget 树的 body 属性
-      home: widget.loginStatus ? indexView : p2pLogin,
+      home: UpgradeAlert(
+          upgrader: Upgrader(),
+          child: widget.loginStatus ? indexView : p2pLogin),
       onGenerateRoute: Application.router.generator,
       // 初始化FlutterSmartDialog
       navigatorObservers: [FlutterSmartDialog.observer],

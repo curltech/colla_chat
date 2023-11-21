@@ -49,7 +49,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
     final List<PlatformDataField> p2pLoginInputFieldDef = [];
     p2pLoginInputFieldDef.add(PlatformDataField(
       name: 'credential',
-      label: 'Credential(Mobile/Email/LoginName)',
+      label: 'Credential(Mobile/Email/Name)',
       readOnly: isAuth,
       cancel: !isAuth,
       prefixIcon: !isAuth

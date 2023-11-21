@@ -42,6 +42,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
   final FocusNode _focusNode = FocusNode();
   late Document doc;
   late final QuillController quillController;
+  final ScrollController scrollController = ScrollController();
 
   @override
   void initState() {
@@ -97,8 +98,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
               controller: quillEditorController,
             ),
             child: QuillEditor.basic(
-              readOnly: false,
-            ),
+                configurations: const QuillEditorConfigurations()),
           )),
     );
 
@@ -161,7 +161,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
 
   ///web平台选择图像文件
   Future<String?> _webImagePickImpl(
-      OnImagePickCallback onImagePickCallback) async {
+      Function(String) onImagePickCallback) async {
     final List<XFile> result = await FileUtil.pickFiles();
     if (result.isEmpty) {
       return null;
@@ -169,12 +169,12 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     final filename = result.first.name;
     final file = File(filename);
 
-    return onImagePickCallback(file);
+    return '';
   }
 
   ///web平台选择视频文件
   Future<String?> _webVideoPickImpl(
-      OnVideoPickCallback onVideoPickCallback) async {
+      Function(String) onVideoPickCallback) async {
     final List<XFile> result = await FileUtil.pickFiles();
     if (result.isEmpty) {
       return null;
@@ -182,14 +182,14 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     final filename = result.first.name;
     final file = File(filename);
 
-    return onVideoPickCallback(file);
+    return '';
   }
 
   /// 媒体来源的选择界面
   /// 从图片廊和link中选择
-  Future<MediaPickSetting?> _mediaPickSettingSelector(
+  Future<QuillMediaType?> _mediaPickSettingSelector(
       BuildContext context) async {
-    return await showDialog<MediaPickSetting>(
+    return await showDialog<QuillMediaType>(
       context: context,
       builder: (ctx) => AlertDialog(
         contentPadding: EdgeInsets.zero,
@@ -199,12 +199,12 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
             TextButton.icon(
               icon: const Icon(Icons.collections),
               label: Text(AppLocalizations.t('Gallery')),
-              onPressed: () => Navigator.pop(ctx, MediaPickSetting.Gallery),
+              onPressed: () => Navigator.pop(ctx, QuillMediaType.video),
             ),
             TextButton.icon(
               icon: const Icon(Icons.link),
               label: Text(AppLocalizations.t('Link')),
-              onPressed: () => Navigator.pop(ctx, MediaPickSetting.Link),
+              onPressed: () => Navigator.pop(ctx, QuillMediaType.image),
             )
           ],
         ),
@@ -213,9 +213,9 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
   }
 
   /// 相机模式选择，照相还是录制视频
-  Future<MediaPickSetting?> _cameraPickSettingSelector(
+  Future<QuillMediaType?> _cameraPickSettingSelector(
       BuildContext context) async {
-    return await showDialog<MediaPickSetting>(
+    return await showDialog<QuillMediaType>(
       context: context,
       builder: (ctx) => AlertDialog(
         contentPadding: EdgeInsets.zero,
@@ -225,12 +225,12 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
             TextButton.icon(
               icon: const Icon(Icons.camera),
               label: Text(AppLocalizations.t('Capture photo')),
-              onPressed: () => Navigator.pop(ctx, MediaPickSetting.Camera),
+              onPressed: () => Navigator.pop(ctx, QuillMediaType.image),
             ),
             TextButton.icon(
               icon: const Icon(Icons.video_call),
               label: Text(AppLocalizations.t('Capture video')),
-              onPressed: () => Navigator.pop(ctx, MediaPickSetting.Video),
+              onPressed: () => Navigator.pop(ctx, QuillMediaType.video),
             )
           ],
         ),
@@ -239,44 +239,95 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
   }
 
   Widget _buildQuillToolbar(BuildContext context) {
-    ///定制提交按钮
-    var customButtons = <QuillCustomButton>[];
-    List<
-            Widget Function(
-                QuillController, double, QuillIconTheme?, QuillDialogTheme?)>?
-        embedButtons;
-    if (widget.withMultiMedia) {
-      embedButtons = FlutterQuillEmbeds.buttons(
-        showImageButton: true,
-        showVideoButton: true,
-        showCameraButton: true,
-        showFormulaButton: false,
-        imageButtonTooltip: AppLocalizations.t('Image'),
-        videoButtonTooltip: AppLocalizations.t('Video'),
-        cameraButtonTooltip: AppLocalizations.t('Camera'),
-        formulaButtonTooltip: AppLocalizations.t('Image'),
-        //默认的实现是直接输入link
-        onImagePickCallback: _onImagePickCallback,
-        onVideoPickCallback: _onVideoPickCallback,
-        //选择是图片廊还是link
-        mediaPickSettingSelector: _mediaPickSettingSelector,
-        cameraPickSettingSelector: _cameraPickSettingSelector,
-        filePickImpl: _filePickImpl,
-        webImagePickImpl: _webImagePickImpl,
-        webVideoPickImpl: _webVideoPickImpl,
-      );
-    }
-    var toolbar = QuillToolbar.basic(
-      locale: myself.locale,
-      toolbarIconAlignment: WrapAlignment.start,
-      toolbarIconCrossAlignment: WrapCrossAlignment.start,
-      toolbarSectionSpacing: 1,
-      sectionDividerSpace: 1,
-      showLink: false,
-      embedButtons: embedButtons,
-      customButtons: customButtons,
-      showAlignmentButtons: true,
-      afterButtonPressed: _focusNode.requestFocus,
+    if (widget.withMultiMedia) {}
+
+    var toolbar = QuillToolbar(
+      configurations: QuillToolbarConfigurations(
+        showAlignmentButtons: true,
+        toolbarIconAlignment: WrapAlignment.start,
+        toolbarIconCrossAlignment: WrapCrossAlignment.start,
+        toolbarSectionSpacing: 1,
+        sectionDividerSpace: 1,
+        showLink: false,
+        buttonOptions: QuillToolbarButtonOptions(
+          base: QuillToolbarBaseButtonOptions(
+            // Request editor focus when any button is pressed
+            afterButtonPressed: _focusNode.requestFocus,
+          ),
+        ),
+        customButtons: [
+          QuillToolbarCustomButtonOptions(
+            icon: const Icon(Icons.add_alarm_rounded),
+            onPressed: () {
+              final controller = context.requireQuillController;
+              controller.document
+                  .insert(controller.selection.extentOffset, '\n');
+              controller.updateSelection(
+                TextSelection.collapsed(
+                  offset: controller.selection.extentOffset + 1,
+                ),
+                ChangeSource.local,
+              );
+
+              controller.document.insert(
+                controller.selection.extentOffset,
+                NotesBlockEmbed(
+                  DateTime.now().toString(),
+                ),
+              );
+
+              controller.updateSelection(
+                TextSelection.collapsed(
+                  offset: controller.selection.extentOffset + 1,
+                ),
+                ChangeSource.local,
+              );
+
+              controller.document
+                  .insert(controller.selection.extentOffset, ' ');
+              controller.updateSelection(
+                TextSelection.collapsed(
+                  offset: controller.selection.extentOffset + 1,
+                ),
+                ChangeSource.local,
+              );
+
+              controller.document
+                  .insert(controller.selection.extentOffset, '\n');
+              controller.updateSelection(
+                TextSelection.collapsed(
+                  offset: controller.selection.extentOffset + 1,
+                ),
+                ChangeSource.local,
+              );
+            },
+          ),
+          QuillToolbarCustomButtonOptions(
+            icon: const Icon(Icons.ac_unit),
+            onPressed: () {},
+          ),
+        ],
+        embedButtons: FlutterQuillEmbeds.toolbarButtons(
+          imageButtonOptions: QuillToolbarImageButtonOptions(
+            imageButtonConfigurations: QuillToolbarImageConfigurations(
+                onImageInsertCallback: (image, controller) async {}),
+          ),
+          videoButtonOptions: QuillToolbarVideoButtonOptions(
+            childBuilder: (QuillToolbarVideoButtonOptions,
+                QuillToolbarVideoButtonExtraOptions) {
+              return Container();
+            },
+            controller: quillController,
+            videoConfigurations: const QuillToolbarVideoConfigurations(),
+          ),
+          cameraButtonOptions: QuillToolbarCameraButtonOptions(),
+          mediaButtonOptions: QuillToolbarMediaButtonOptions(
+              type: QuillMediaType.video,
+              onMediaPickedCallback: (XFile file) async {
+                return '';
+              }),
+        ),
+      ),
     );
 
     return toolbar;
@@ -284,20 +335,23 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
 
   Widget _buildQuillEditor(BuildContext context) {
     Widget quillEditor = QuillEditor(
-      minHeight: 200,
-      maxHeight: widget.height,
-      scrollController: ScrollController(),
-      scrollable: true,
+      configurations: QuillEditorConfigurations(
+        minHeight: 200,
+        maxHeight: widget.height,
+        scrollable: true,
+        autoFocus: false,
+        enableSelectionToolbar: true,
+        expands: false,
+        padding: EdgeInsets.zero,
+        onImagePaste: _onImagePaste,
+        readOnly: false,
+        embedBuilders: [
+          ...FlutterQuillEmbeds.defaultEditorBuilders(),
+          NotesEmbedBuilder(addEditNote: _addEditNote)
+        ],
+      ),
+      scrollController: scrollController,
       focusNode: _focusNode,
-      autoFocus: false,
-      enableSelectionToolbar: true,
-      expands: false,
-      padding: EdgeInsets.zero,
-      onImagePaste: _onImagePaste,
-      embedBuilders: [
-        ...FlutterQuillEmbeds.builders(),
-        NotesEmbedBuilder(addEditNote: _addEditNote)
-      ], readOnly: false,
     );
 
     var toolbar = _buildQuillToolbar(context);
@@ -305,6 +359,15 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     return QuillProvider(
         configurations: QuillConfigurations(
           controller: quillController,
+          sharedConfigurations: QuillSharedConfigurations(
+            animationConfigurations: QuillAnimationConfigurations.disableAll(),
+            extraConfigurations: const {
+              QuillSharedExtensionsConfigurations.key:
+                  QuillSharedExtensionsConfigurations(
+                assetsPrefix: 'assets',
+              ),
+            },
+          ),
         ),
         child: Card(
             color: myself.getBackgroundColor(context).withOpacity(0.6),

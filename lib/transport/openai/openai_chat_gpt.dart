@@ -257,14 +257,14 @@ class ChatGPT {
   }
 
   ///生成图像的变种
-  Future<OpenAIImageVariationModel> imageVariation({
+  Future<OpenAIImageModel> imageVariation({
     required File image,
     int? n = 1,
     OpenAIImageSize? size = OpenAIImageSize.size1024,
     OpenAIImageResponseFormat? responseFormat = OpenAIImageResponseFormat.url,
     String? user,
   }) async {
-    OpenAIImageVariationModel imageVariation = await openAI.image.variation(
+    OpenAIImageModel imageVariation = await openAI.image.variation(
       image: image,
       n: n,
       size: size,
@@ -276,7 +276,7 @@ class ChatGPT {
   }
 
   ///根据文本修改图像
-  Future<OpenAiImageEditModel> imageEdit({
+  Future<OpenAIImageModel> imageEdit({
     required File image,
     File? mask,
     required String prompt,
@@ -285,7 +285,7 @@ class ChatGPT {
     OpenAIImageResponseFormat? responseFormat = OpenAIImageResponseFormat.url,
     String? user,
   }) async {
-    OpenAiImageEditModel imageEdit = await openAI.image.edit(
+    OpenAIImageModel imageEdit = await openAI.image.edit(
       image: image,
       mask: mask,
       prompt: prompt,

@@ -298,15 +298,20 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     if (streamChatCompletion.choices.isNotEmpty) {
       for (var choice in streamChatCompletion.choices) {
         String? finishReason = choice.finishReason;
-        String? role = choice.delta.role;
-        String? content = choice.delta.content;
-        if (content != null && finishReason != 'stop') {
-          if (content.startsWith('\n\n')) {
-            completionContent = completionContent + content.substring(2);
-          } else {
-            completionContent = completionContent + content;
+        OpenAIChatMessageRole? role = choice.delta.role;
+        List<OpenAIChatCompletionChoiceMessageContentItemModel>? contents =
+            choice.delta.content;
+        if (contents != null && finishReason != 'stop') {
+          for (OpenAIChatCompletionChoiceMessageContentItemModel content
+              in contents) {
+            String text = content.text ?? '';
+            if (text.startsWith('\n\n')) {
+              completionContent = completionContent + text.substring(2);
+            } else {
+              completionContent = completionContent + text;
+            }
+            logger.i(text);
           }
-          logger.i(content);
         } else {
           if (completionContent.isEmpty) {
             return;
