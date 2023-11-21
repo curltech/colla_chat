@@ -100,11 +100,13 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         }
       }
     } else {
-      actionData.add(ActionData(
-        label: 'Sfu video chat',
-        tooltip: 'Invite video chat',
-        icon: const Icon(Icons.missed_video_call_outlined),
-      ));
+      if (partyType == PartyType.group.name) {
+        actionData.add(ActionData(
+          label: 'Sfu video chat',
+          tooltip: 'Invite video chat',
+          icon: const Icon(Icons.missed_video_call_outlined),
+        ));
+      }
       actionData.add(ActionData(
         label: 'Video chat',
         tooltip: 'Invite video chat',
