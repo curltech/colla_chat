@@ -79,7 +79,7 @@ void main(List<String> args) async {
   _initWebView();
   await _initDesktopWindows();
   await localNotificationsService.init();
-  await firebaseMessagingService.init();
+  firebaseMessagingService.init();
 
   ///加载主应用组件
   runApp(MultiProvider(providers: [
