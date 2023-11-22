@@ -4,7 +4,6 @@ import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_edit_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
-import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';

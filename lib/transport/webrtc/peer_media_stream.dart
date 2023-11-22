@@ -1,8 +1,6 @@
 import 'package:colla_chat/constant/base.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/media_stream_util.dart';
-import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:livekit_client/livekit_client.dart';

@@ -148,7 +148,7 @@ class _ExtendedTextMessageInputWidgetState
     chatMessageViewController.changeExtendedTextHeight();
     //不随系统的字体大小变化
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
       child: ExtendedTextField(
         key: chatMessageViewController.extendedTextKey,
         minLines: 1,

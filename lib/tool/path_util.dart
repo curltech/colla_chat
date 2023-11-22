@@ -65,6 +65,7 @@ class PathUtil {
       final dir = await path.getExternalStorageDirectory();
       return dir;
     }
+    return null;
   }
 
   static Future<Directory?> getDownloadsDirectory() async {

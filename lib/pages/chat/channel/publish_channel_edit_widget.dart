@@ -10,7 +10,6 @@ import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/richtext/platform_editor_widget.dart';
 import 'package:colla_chat/widgets/webview/html_preview_widget.dart';

@@ -9,7 +9,6 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/performance.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/tool/date_util.dart';
-import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_paginated_data_table2.dart';

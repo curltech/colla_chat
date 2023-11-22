@@ -1,5 +1,5 @@
+import 'package:candlesticks/candlesticks.dart';
 import 'package:card_swiper/card_swiper.dart';
-import 'package:colla_chat/entity/stock/min_line.dart';
 import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
@@ -14,9 +14,7 @@ import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:candlesticks/candlesticks.dart';
 import 'package:graphic/graphic.dart';
 
 class StockLineController extends DataListController<dynamic> {
@@ -260,15 +258,15 @@ class _StockLineChartWidgetState extends State<StockLineChartWidget> {
     List<dynamic> data = dayLineController.data;
     for (int i = data.length - 1; i >= 0; i--) {
       Map<String, dynamic> map = JsonUtil.toJson(data[i]);
-      int trade_date = map['trade_date'];
-      DateTime tradeDate = DateUtil.toDateTime(trade_date.toString());
+      int tradeDate = map['trade_date'];
+      DateTime date = DateUtil.toDateTime(tradeDate.toString());
       num high = map['high'];
       num low = map['low'];
       num open = map['open'];
       num close = map['close'];
       num volume = map['vol'];
       Candle candle = Candle(
-          date: tradeDate,
+          date: date,
           high: high.toDouble(),
           low: low.toDouble(),
           open: open.toDouble(),

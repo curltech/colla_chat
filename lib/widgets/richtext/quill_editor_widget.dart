@@ -320,7 +320,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
             controller: quillController,
             videoConfigurations: const QuillToolbarVideoConfigurations(),
           ),
-          cameraButtonOptions: QuillToolbarCameraButtonOptions(),
+          cameraButtonOptions: const QuillToolbarCameraButtonOptions(),
           mediaButtonOptions: QuillToolbarMediaButtonOptions(
               type: QuillMediaType.video,
               onMediaPickedCallback: (XFile file) async {

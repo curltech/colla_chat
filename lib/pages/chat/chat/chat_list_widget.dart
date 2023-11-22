@@ -313,7 +313,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
     if (peerId != null) {
       List<AdvancedPeerConnection>? connections =
           peerConnectionPool.getConnected(peerId);
-      if (connections != null && connections.isNotEmpty) {
+      if (connections.isNotEmpty) {
         connectionNum = connections.length;
       }
     }
@@ -491,7 +491,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
             : '';
         if (subMessageType!=null) {
           subtitle = _buildSubtitle(
-              subMessageType: subMessageType!,
+              subMessageType: subMessageType,
               title: title,
               contentType: chatSummary.contentType,
               content: chatSummary.content);

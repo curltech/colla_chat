@@ -1,5 +1,4 @@
 import 'package:colla_chat/constant/base.dart';
-import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';

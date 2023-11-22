@@ -15,7 +15,6 @@ import 'package:colla_chat/transport/webrtc/livekit/sfu_conference_service_clien
 import 'package:colla_chat/widgets/common/combine_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
-import 'package:livekit_server_sdk/livekit_server_sdk.dart';
 import 'package:livekit_server_sdk/src/proto/livekit_models.pb.dart';
 
 class ConferenceService extends GeneralBaseService<Conference> {
