@@ -263,7 +263,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         p2pConferenceClientPool.conferenceClient;
     ConferenceChatMessageController? conferenceChatMessageController =
         p2pConferenceClient?.conferenceChatMessageController;
-    conferenceChatMessageController?.status = VideoChatStatus.end;
+    await conferenceChatMessageController?.terminate();
   }
 
   ///如果正在呼叫calling，停止呼叫，关闭所有的本地视频，呼叫状态改为结束
@@ -280,7 +280,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       await p2pConferenceClientPool.disconnect(
           conferenceId: conferenceChatMessageController?.conferenceId!);
     }
-    conferenceChatMessageController?.status = VideoChatStatus.end;
+    await conferenceChatMessageController?.exit();
   }
 
   Future<void> _onAction(int index, String name, {String? value}) async {
