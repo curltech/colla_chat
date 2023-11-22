@@ -280,7 +280,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       await p2pConferenceClientPool.disconnect(
           conferenceId: conferenceChatMessageController?.conferenceId!);
     }
-    await conferenceChatMessageController?.exit();
   }
 
   Future<void> _onAction(int index, String name, {String? value}) async {
