@@ -25,7 +25,7 @@
   "Password": "密码",
   "Mobile": "手机",
   "Email": "邮件",
-  "Credential(Mobile/Email/LoginName)": "凭证(手机/邮件/登录名)",
+  "Credential(Mobile/Email/Name)": "凭证(手机/邮件/登录名)",
   "LoginName": "登录名",
   "ConfirmPassword": "验证密码",
   "localhost": "本机",
