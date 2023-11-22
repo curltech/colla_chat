@@ -346,18 +346,20 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       var peerClient = PeerClient.fromJson(json);
       peerClient.activeStatus = ActiveStatus.Up.name;
       peerClient.clientId = myselfPeer.clientId;
-      //设置firebase token
-      String? fcmToken = await firebaseMessagingService.getToken();
-      logger.w('fcmToken:$fcmToken');
-      peerClient.deviceToken = fcmToken;
-      peerClient.deviceDesc = platformParams.operatingSystem;
-      if (platformParams.ios || platformParams.macos) {
-        String? apnsToken = await firebaseMessagingService.getAPNSToken();
-        logger.w('apnsToken:$apnsToken');
-      }
       bool success = await connectAction.connect(peerClient);
       if (success) {
         logger.i('login connect successfully,activeStatus up');
+        //设置firebase token
+        firebaseMessagingService.getToken().then((String? fcmToken) {
+          logger.w('fcmToken:$fcmToken');
+          peerClient.deviceToken = fcmToken;
+          peerClient.deviceDesc = platformParams.operatingSystem;
+          if (platformParams.ios || platformParams.macos) {
+            firebaseMessagingService.getAPNSToken().then((String? apnsToken) {
+              logger.w('apnsToken:$apnsToken');
+            });
+          }
+        });
       }
     }
   }
