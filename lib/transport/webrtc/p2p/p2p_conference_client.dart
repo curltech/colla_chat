@@ -78,7 +78,8 @@ class P2pConferenceClient {
     }
     bool isValid = conferenceService.isValid(conference);
     if (!isValid) {
-      return;
+      logger.e('conference ${conference.name} is invalid');
+      // return;
     }
     _joined = true;
     List<AdvancedPeerConnection> pcs = await peerConnections;
