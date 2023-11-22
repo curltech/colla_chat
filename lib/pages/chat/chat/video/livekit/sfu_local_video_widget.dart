@@ -672,6 +672,8 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
                   color: Colors.white,
                 ),
               );
+            } else {
+              logger.e('conference ${conference?.name} is invalid');
             }
           }
           List<Widget> children = [

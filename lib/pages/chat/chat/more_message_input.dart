@@ -11,6 +11,7 @@ import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/me/collection/collection_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/me/collection/collection_list_widget.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/plugin/macos_camera_widget.dart';
 import 'package:colla_chat/plugin/mobile_camera_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
@@ -97,6 +98,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
               icon: const Icon(Icons.video_call),
             ));
           }
+        } else {
+          logger.e('conference ${conference.name} is invalid');
         }
       }
     } else {
