@@ -269,16 +269,16 @@ class GlobalChatMessage {
     if (messageReceiptType == MessageReceiptType.ignored ||
         messageReceiptType == MessageReceiptType.busy ||
         messageReceiptType == MessageReceiptType.received ||
-        messageReceiptType == MessageReceiptType.rejected ||
-        messageReceiptType == MessageReceiptType.terminated ||
-        messageReceiptType == MessageReceiptType.exit) {}
+        messageReceiptType == MessageReceiptType.rejected) {}
 
     ConferenceChatMessageController? conferenceChatMessageController;
     /// 以下四种消息如果没有会议，需要创建会议
     if (messageReceiptType == MessageReceiptType.accepted ||
         messageReceiptType == MessageReceiptType.hold ||
         messageReceiptType == MessageReceiptType.join ||
-        messageReceiptType == MessageReceiptType.joined) {
+        messageReceiptType == MessageReceiptType.joined ||
+        messageReceiptType == MessageReceiptType.terminated ||
+        messageReceiptType == MessageReceiptType.exit) {
       //将发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
       ChatMessage? videoChatMessage =
           await chatMessageService.findVideoChatMessage(messageId: messageId);
@@ -289,9 +289,15 @@ class GlobalChatMessage {
           Map<String, dynamic> json = JsonUtil.toJson(content);
           Conference conference = Conference.fromJson(json);
           if (conference.sfu) {
-            LiveKitConferenceClient? conferenceClient =
-                await liveKitConferenceClientPool
-                    .createConferenceClient(videoChatMessage);
+            LiveKitConferenceClient? conferenceClient;
+            if (messageReceiptType == MessageReceiptType.terminated ||
+                messageReceiptType == MessageReceiptType.exit) {
+              conferenceClient = liveKitConferenceClientPool
+                  .getConferenceClient(conference.conferenceId);
+            } else {
+              conferenceClient = await liveKitConferenceClientPool
+                  .createConferenceClient(videoChatMessage);
+            }
             if (conferenceClient != null) {
               logger
                   .w('create liveKitConferenceClient:$messageId successfully');
@@ -299,16 +305,20 @@ class GlobalChatMessage {
                   conferenceClient.conferenceChatMessageController;
             }
           } else {
-            P2pConferenceClient? conferenceClient =
-                await p2pConferenceClientPool
-                    .createConferenceClient(videoChatMessage);
+            P2pConferenceClient? conferenceClient;
+            if (messageReceiptType == MessageReceiptType.terminated ||
+                messageReceiptType == MessageReceiptType.exit) {
+              conferenceClient = p2pConferenceClientPool
+                  .getConferenceClient(conference.conferenceId);
+            } else {
+              conferenceClient = await p2pConferenceClientPool
+                  .createConferenceClient(videoChatMessage);
+            }
             if (conferenceClient != null) {
               logger.w('create p2pConferenceClient:$messageId successfully');
               conferenceChatMessageController =
                   conferenceClient.conferenceChatMessageController;
             }
-            conferenceChatMessageController = p2pConferenceClientPool
-                .getConferenceChatMessageController(messageId);
           }
         }
       }
