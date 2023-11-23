@@ -246,7 +246,7 @@ class P2pConferenceClient {
     String peerId = platformParticipant.peerId;
     String clientId = platformParticipant.clientId!;
     var key = _getKey(peerId, clientId);
-    if (!_remoteParticipants.containsKey(key)) {
+    if (_remoteParticipants.containsKey(key)) {
       AdvancedPeerConnection? advancedPeerConnection =
           await peerConnectionPool.getOne(peerId, clientId: clientId);
       if (advancedPeerConnection != null) {
