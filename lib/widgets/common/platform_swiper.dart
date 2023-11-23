@@ -1,6 +1,6 @@
 import 'dart:async';
+
 import 'package:another_transformer_page_view/another_transformer_page_view.dart';
-import 'package:appinio_swiper/appinio_swiper.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/page_view_transformer.dart';
@@ -189,45 +189,6 @@ class _PlatformSwiperState extends State<PlatformSwiper> {
       numberOfCardsDisplayed: 2,
       //onUndo: onUndo,
       //backCardOffset: backCardOffset,
-    );
-  }
-
-  FutureOr<bool> onAppinioSwiper(int index, AppinioSwiperDirection direction) {
-    if (widget.onSwipe != null) {
-      PlatformSwiperDirection? platformSwiperDirection =
-          StringUtil.enumFromString(
-              PlatformSwiperDirection.values, direction.name);
-      widget.onSwipe!(index, null, platformSwiperDirection!);
-    }
-    return true;
-  }
-
-  AppinioSwiper _buildAppinioSwiper() {
-    return AppinioSwiper(
-      key: widget.key,
-      cardsBuilder: widget.itemBuilder,
-      cardsCount: widget.itemCount,
-      controller: AppinioSwiperController(),
-      padding: widget.padding,
-      duration: Duration(milliseconds: widget.duration),
-      maxAngle: widget.maxAngle,
-      threshold: widget.threshold,
-      isDisabled: widget.physics is NeverScrollableScrollPhysics,
-      //onTapDisabled: onTapDisabled,
-      onSwipe: onAppinioSwiper,
-      //onEnd: onEnd,
-      direction: widget.scrollDirection == Axis.horizontal
-          ? AppinioSwiperDirection.right
-          : AppinioSwiperDirection.bottom,
-      swipeOptions: const AppinioSwipeOptions.all(),
-      loop: widget.loop,
-      backgroundCardsCount: 1,
-      // allowUnswipe: allowUnswipe,
-      // unlimitedUnswipe: unlimitedUnswipe,
-      // onTapDisabled: onTapDisabled,
-      // onSwiping: onSwiping,
-      // onEnd: onEnd,
-      // unswipe: unswipe,
     );
   }
 
