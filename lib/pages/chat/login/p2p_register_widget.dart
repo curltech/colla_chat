@@ -106,7 +106,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
     }
   }
 
-  Future<void> _restore() async {
+  Future<void> _restore(Map<String, dynamic> values) async {
     String? backup;
     if (platformParams.desktop) {
       List<XFile> xfiles = await FileUtil.pickFiles();
@@ -121,6 +121,17 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
 
   @override
   Widget build(BuildContext context) {
+    List<FormButton>? formButtons = [];
+    formButtons.add(FormButton(
+        label: 'Register',
+        buttonStyle:
+            StyleUtil.buildButtonStyle(backgroundColor: myself.primary),
+        onTap: _onOk));
+    formButtons.add(FormButton(
+        label: 'Restore',
+        buttonStyle:
+            StyleUtil.buildButtonStyle(backgroundColor: myself.primary),
+        onTap: _restore));
     return ListView(
       children: <Widget>[
         Container(
@@ -202,27 +213,8 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
             child: FormInputWidget(
               height: appDataProvider.portraitSize.height * 0.6,
               spacing: 5.0,
-              onOk: _onOk,
-              okLabel: 'Register',
+              formButtons: formButtons,
               controller: controller,
-            )),
-        Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              style:
-                  StyleUtil.buildButtonStyle(backgroundColor: myself.primary),
-              label: CommonAutoSizeText(
-                AppLocalizations.t('Restore peer'),
-                style: const TextStyle(color: Colors.white),
-              ),
-              icon: const Icon(
-                Icons.restore,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                _restore();
-              },
             )),
       ],
     );
