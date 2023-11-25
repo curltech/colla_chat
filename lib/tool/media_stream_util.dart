@@ -88,7 +88,8 @@ class MediaStreamUtil {
   }
 
   ///获取本机音频流
-  static Future<MediaStream> createAudioMediaStream({bool replace = false}) async {
+  static Future<MediaStream> createAudioMediaStream(
+      {bool replace = false}) async {
     Map<String, dynamic> mediaConstraints = <String, dynamic>{
       'audio': true,
       'video': false,
@@ -125,7 +126,9 @@ class MediaStreamUtil {
   static Future<bool> switchCamera(MediaStream mediaStream) async {
     var tracks = mediaStream.getVideoTracks();
     if (tracks.isNotEmpty) {
-      return await Helper.switchCamera(tracks[0]);
+      for (MediaStreamTrack track in tracks) {
+        return await Helper.switchCamera(track);
+      }
     }
 
     return false;
@@ -135,7 +138,9 @@ class MediaStreamUtil {
   static Future<void> setZoom(MediaStream mediaStream, double zoomLevel) async {
     var tracks = mediaStream.getVideoTracks();
     if (tracks.isNotEmpty) {
-      return await Helper.setZoom(tracks[0], zoomLevel);
+      for (MediaStreamTrack track in tracks) {
+        return await Helper.setZoom(track, zoomLevel);
+      }
     }
   }
 
@@ -144,7 +149,9 @@ class MediaStreamUtil {
       MediaStream mediaStream, bool enable) async {
     var tracks = mediaStream.getAudioTracks();
     if (tracks.isNotEmpty) {
-      tracks[0].enableSpeakerphone(enable);
+      for (MediaStreamTrack track in tracks) {
+        track.enableSpeakerphone(enable);
+      }
     }
   }
 
@@ -161,23 +168,36 @@ class MediaStreamUtil {
   static Future<void> setTorch(MediaStream mediaStream, bool torch) async {
     var tracks = mediaStream.getVideoTracks();
     if (tracks.isNotEmpty) {
-      await tracks[0].setTorch(torch);
+      for (MediaStreamTrack track in tracks) {
+        await track.setTorch(torch);
+      }
     }
   }
 
   /// 对视频流的第一个音频轨道的输入设备设置静音设置
-  static Future<void> setMicrophoneMute(MediaStream mediaStream, bool mute) async {
+  static Future<void> setMicrophoneMute(
+      MediaStream mediaStream, bool mute) async {
     var tracks = mediaStream.getAudioTracks();
     if (tracks.isNotEmpty) {
-      await Helper.setMicrophoneMute(mute, tracks[0]);
+      for (MediaStreamTrack track in tracks) {
+        await Helper.setMicrophoneMute(mute, track);
+      }
     }
   }
 
   /// 打开或者关闭视频流的第一个视频轨道
-  static void turnTrack(MediaStream mediaStream, bool mute) {
+  static void turnTrack(MediaStream mediaStream, bool enabled) {
     var tracks = mediaStream.getVideoTracks();
     if (tracks.isNotEmpty) {
-      tracks[0].enabled = mute;
+      for (MediaStreamTrack track in tracks) {
+        track.enabled = enabled;
+      }
+    }
+    tracks = mediaStream.getAudioTracks();
+    if (tracks.isNotEmpty) {
+      for (MediaStreamTrack track in tracks) {
+        track.enabled = enabled;
+      }
     }
   }
 
@@ -185,7 +205,9 @@ class MediaStreamUtil {
   static Future<void> setVolume(MediaStream mediaStream, double volume) async {
     var tracks = mediaStream.getAudioTracks();
     if (tracks.isNotEmpty) {
-      await Helper.setVolume(volume, tracks[0]);
+      for (MediaStreamTrack track in tracks) {
+        await Helper.setVolume(volume, track);
+      }
     }
   }
 
