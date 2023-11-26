@@ -7,9 +7,12 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
+import 'package:synchronized/synchronized.dart';
 
 class ChatSummaryService extends GeneralBaseService<ChatSummary> {
   Map<String, ChatSummary> chatSummaries = {};
+
+  Lock _lock = Lock();
 
   ChatSummaryService({
     required super.tableName,
@@ -75,151 +78,159 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
 
   ///只保存新的联系人信息，名称
   Future<ChatSummary> upsertByLinkman(Linkman linkman) async {
-    ChatSummary? chatSummary = await findCachedOneByPeerId(linkman.peerId);
-    if (chatSummary == null) {
-      chatSummary = ChatSummary();
-      chatSummary.peerId = linkman.peerId;
-      chatSummary.partyType = PartyType.linkman.name;
-      chatSummary.status = linkman.status;
-      chatSummary.name = linkman.name;
-      if (myself.id == null) {
-        chatSummary.ownerPeerId = linkman.ownerPeerId;
+    return await _lock.synchronized(() async {
+      ChatSummary? chatSummary = await findCachedOneByPeerId(linkman.peerId);
+      if (chatSummary == null) {
+        chatSummary = ChatSummary();
+        chatSummary.peerId = linkman.peerId;
+        chatSummary.partyType = PartyType.linkman.name;
+        chatSummary.status = linkman.status;
+        chatSummary.name = linkman.name;
+        if (myself.id == null) {
+          chatSummary.ownerPeerId = linkman.ownerPeerId;
+        }
+        await insert(chatSummary);
+        chatSummaries[chatSummary.peerId!] = chatSummary;
+      } else {
+        chatSummary.name = linkman.name;
+        await update({'name': linkman.name},
+            where: 'peerId=?', whereArgs: [linkman.peerId]);
       }
-      await insert(chatSummary);
-      chatSummaries[chatSummary.peerId!] = chatSummary;
-    } else {
-      chatSummary.name = linkman.name;
-      await update({'name': linkman.name},
-          where: 'peerId=?', whereArgs: [linkman.peerId]);
-    }
 
-    return chatSummary;
+      return chatSummary;
+    });
   }
 
   Future<ChatSummary> upsertByGroup(Group group) async {
-    ChatSummary? chatSummary = await findCachedOneByPeerId(group.peerId);
-    if (chatSummary == null) {
-      chatSummary = ChatSummary();
-      chatSummary.peerId = group.peerId;
-      chatSummary.partyType = PartyType.group.name;
-      chatSummary.subPartyType = group.groupType;
-      chatSummary.status = group.status;
-      chatSummary.name = group.name;
-      await insert(chatSummary);
-      chatSummaries[chatSummary.peerId!] = chatSummary;
-    } else {
-      chatSummary.name = group.name;
-      await upsert(chatSummary);
-    }
-    return chatSummary;
+    return await _lock.synchronized(() async {
+      ChatSummary? chatSummary = await findCachedOneByPeerId(group.peerId);
+      if (chatSummary == null) {
+        chatSummary = ChatSummary();
+        chatSummary.peerId = group.peerId;
+        chatSummary.partyType = PartyType.group.name;
+        chatSummary.subPartyType = group.groupType;
+        chatSummary.status = group.status;
+        chatSummary.name = group.name;
+        await insert(chatSummary);
+        chatSummaries[chatSummary.peerId!] = chatSummary;
+      } else {
+        chatSummary.name = group.name;
+        await upsert(chatSummary);
+      }
+      return chatSummary;
+    });
   }
 
   Future<ChatSummary> upsertByConference(Conference conference) async {
-    ChatSummary? chatSummary =
-        await findCachedOneByPeerId(conference.conferenceId);
-    if (chatSummary == null) {
-      chatSummary = ChatSummary();
-      chatSummary.peerId = conference.conferenceId;
-      chatSummary.partyType = PartyType.conference.name;
-      chatSummary.subPartyType = conference.topic;
-      chatSummary.status = conference.status;
-      chatSummary.name = conference.name;
-      await insert(chatSummary);
-      chatSummaries[chatSummary.peerId!] = chatSummary;
-    } else {
-      chatSummary.name = conference.name;
-      chatSummary.subPartyType = conference.topic;
-      await upsert(chatSummary);
-    }
-    return chatSummary;
+    return await _lock.synchronized(() async {
+      ChatSummary? chatSummary =
+          await findCachedOneByPeerId(conference.conferenceId);
+      if (chatSummary == null) {
+        chatSummary = ChatSummary();
+        chatSummary.peerId = conference.conferenceId;
+        chatSummary.partyType = PartyType.conference.name;
+        chatSummary.subPartyType = conference.topic;
+        chatSummary.status = conference.status;
+        chatSummary.name = conference.name;
+        await insert(chatSummary);
+        chatSummaries[chatSummary.peerId!] = chatSummary;
+      } else {
+        chatSummary.name = conference.name;
+        chatSummary.subPartyType = conference.topic;
+        await upsert(chatSummary);
+      }
+      return chatSummary;
+    });
   }
 
   ///新的ChatMessage来了，更新ChatSummary
   Future<ChatSummary?> upsertByChatMessage(ChatMessage chatMessage,
       {bool unreadNumber = false}) async {
-    if (chatMessage.messageType == ChatMessageType.system.name ||
-        chatMessage.messageType == ChatMessageType.channel.name ||
-        chatMessage.messageType == ChatMessageType.collection.name) {
-      return null;
-    }
-    if (chatMessage.subMessageType == ChatMessageSubType.chatReceipt.name ||
-        chatMessage.subMessageType == ChatMessageSubType.signal.name ||
-        chatMessage.subMessageType == ChatMessageSubType.preKeyBundle.name) {
-      return null;
-    }
-    var groupId = chatMessage.groupId;
-    var senderPeerId = chatMessage.senderPeerId;
-    var receiverPeerId = chatMessage.receiverPeerId;
-    var senderClientId = chatMessage.senderClientId;
-    var receiverClientId = chatMessage.receiverClientId;
-    ChatSummary? chatSummary;
-    if (groupId != null) {
-      chatSummary = await findCachedOneByPeerId(groupId);
-      if (chatSummary == null) {
-        chatSummary = ChatSummary();
-        chatSummary.peerId = groupId;
-        chatSummary.partyType = chatMessage.groupType;
-        chatSummary.name = chatMessage.groupName;
+    return await _lock.synchronized(() async {
+      if (chatMessage.messageType == ChatMessageType.system.name ||
+          chatMessage.messageType == ChatMessageType.channel.name ||
+          chatMessage.messageType == ChatMessageType.collection.name) {
+        return null;
+      }
+      if (chatMessage.subMessageType == ChatMessageSubType.chatReceipt.name ||
+          chatMessage.subMessageType == ChatMessageSubType.signal.name ||
+          chatMessage.subMessageType == ChatMessageSubType.preKeyBundle.name) {
+        return null;
+      }
+      var groupId = chatMessage.groupId;
+      var senderPeerId = chatMessage.senderPeerId;
+      var receiverPeerId = chatMessage.receiverPeerId;
+      var senderClientId = chatMessage.senderClientId;
+      var receiverClientId = chatMessage.receiverClientId;
+      ChatSummary? chatSummary;
+      if (groupId != null) {
+        chatSummary = await findCachedOneByPeerId(groupId);
+        if (chatSummary == null) {
+          chatSummary = ChatSummary();
+          chatSummary.peerId = groupId;
+          chatSummary.partyType = chatMessage.groupType;
+          chatSummary.name = chatMessage.groupName;
+          chatSummary.sendReceiveTime = chatMessage.sendTime;
+        }
+      } else {
+        if (senderPeerId != null && senderPeerId != myself.peerId) {
+          chatSummary = await findCachedOneByPeerId(senderPeerId);
+          if (chatSummary == null) {
+            chatSummary = ChatSummary();
+            chatSummary.peerId = senderPeerId;
+            chatSummary.partyType = PartyType.linkman.name;
+            chatSummary.sendReceiveTime = chatMessage.sendTime;
+            Linkman? linkman =
+                await linkmanService.findCachedOneByPeerId(senderPeerId);
+            if (linkman != null) {
+              chatSummary.name = linkman.name;
+            }
+          }
+        } else if (receiverPeerId != null && receiverPeerId != myself.peerId) {
+          chatSummary = await findCachedOneByPeerId(receiverPeerId);
+          if (chatSummary == null) {
+            chatSummary = ChatSummary();
+            chatSummary.peerId = receiverPeerId;
+            chatSummary.partyType = PartyType.linkman.name;
+            chatSummary.sendReceiveTime = chatMessage.sendTime;
+            Linkman? linkman =
+                await linkmanService.findCachedOneByPeerId(receiverPeerId);
+            if (linkman != null) {
+              chatSummary.name = linkman.name;
+            }
+          }
+        }
+      }
+      if (chatSummary != null) {
+        chatSummary.messageId = chatMessage.messageId;
+        chatSummary.messageType = chatMessage.messageType;
+        chatSummary.subMessageType = chatMessage.subMessageType;
+        chatSummary.title = chatMessage.title;
+        chatSummary.receiptContent = chatMessage.receiptType;
+        chatSummary.thumbnail = chatMessage.thumbnail;
+        if (chatMessage.title == null &&
+            chatMessage.contentType != ChatMessageContentType.file.name &&
+            chatMessage.contentType != ChatMessageContentType.video.name &&
+            chatMessage.contentType != ChatMessageContentType.audio.name &&
+            chatMessage.contentType != ChatMessageContentType.rich.name &&
+            chatMessage.contentType != ChatMessageContentType.media.name &&
+            chatMessage.contentType != ChatMessageContentType.image.name) {
+          chatSummary.content = chatMessage.content;
+        }
+        chatSummary.contentType = chatMessage.contentType;
         chatSummary.sendReceiveTime = chatMessage.sendTime;
-      }
-    } else {
-      if (senderPeerId != null && senderPeerId != myself.peerId) {
-        chatSummary = await findCachedOneByPeerId(senderPeerId);
-        if (chatSummary == null) {
-          chatSummary = ChatSummary();
-          chatSummary.peerId = senderPeerId;
-          chatSummary.partyType = PartyType.linkman.name;
-          chatSummary.sendReceiveTime = chatMessage.sendTime;
-          Linkman? linkman =
-              await linkmanService.findCachedOneByPeerId(senderPeerId);
-          if (linkman != null) {
-            chatSummary.name = linkman.name;
+        if (unreadNumber) {
+          if (chatMessage.messageType == ChatMessageType.chat.name &&
+              chatMessage.subMessageType == ChatMessageSubType.chat.name) {
+            chatSummary.unreadNumber = chatSummary.unreadNumber + 1;
           }
         }
-      } else if (receiverPeerId != null && receiverPeerId != myself.peerId) {
-        chatSummary = await findCachedOneByPeerId(receiverPeerId);
-        if (chatSummary == null) {
-          chatSummary = ChatSummary();
-          chatSummary.peerId = receiverPeerId;
-          chatSummary.partyType = PartyType.linkman.name;
-          chatSummary.sendReceiveTime = chatMessage.sendTime;
-          Linkman? linkman =
-              await linkmanService.findCachedOneByPeerId(receiverPeerId);
-          if (linkman != null) {
-            chatSummary.name = linkman.name;
-          }
-        }
+        chatSummary.status = chatMessage.status;
+        await upsert(chatSummary);
+        chatSummaries[chatSummary.peerId!] = chatSummary;
       }
-    }
-    if (chatSummary != null) {
-      chatSummary.messageId = chatMessage.messageId;
-      chatSummary.messageType = chatMessage.messageType;
-      chatSummary.subMessageType = chatMessage.subMessageType;
-      chatSummary.title = chatMessage.title;
-      chatSummary.receiptContent = chatMessage.receiptType;
-      chatSummary.thumbnail = chatMessage.thumbnail;
-      if (chatMessage.title == null &&
-          chatMessage.contentType != ChatMessageContentType.file.name &&
-          chatMessage.contentType != ChatMessageContentType.video.name &&
-          chatMessage.contentType != ChatMessageContentType.audio.name &&
-          chatMessage.contentType != ChatMessageContentType.rich.name &&
-          chatMessage.contentType != ChatMessageContentType.media.name &&
-          chatMessage.contentType != ChatMessageContentType.image.name) {
-        chatSummary.content = chatMessage.content;
-      }
-      chatSummary.contentType = chatMessage.contentType;
-      chatSummary.sendReceiveTime = chatMessage.sendTime;
-      if (unreadNumber) {
-        if (chatMessage.messageType == ChatMessageType.chat.name &&
-            chatMessage.subMessageType == ChatMessageSubType.chat.name) {
-          chatSummary.unreadNumber = chatSummary.unreadNumber + 1;
-        }
-      }
-      chatSummary.status = chatMessage.status;
-      await upsert(chatSummary);
-      chatSummaries[chatSummary.peerId!] = chatSummary;
-    }
-    return chatSummary;
+      return chatSummary;
+    });
   }
 
   removeChatSummary(String peerId) async {
