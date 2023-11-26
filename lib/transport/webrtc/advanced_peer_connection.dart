@@ -182,6 +182,10 @@ class AdvancedPeerConnection {
     return result;
   }
 
+  Future<void> createDataChannel() async {
+    await basePeerConnection.createDataChannel();
+  }
+
   /// 在peerConnectionPool的webrtcEventType的流控制器中加入事件
   _addWebrtcEventType(WebrtcEventType webrtcEventType, dynamic data) async {
     StreamController<WebrtcEvent>? webrtcEventStreamController =

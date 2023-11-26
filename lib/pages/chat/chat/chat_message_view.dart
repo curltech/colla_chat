@@ -229,6 +229,22 @@ class _ChatMessageViewState extends State<ChatMessageView>
     }
   }
 
+  _createDataChannel() async {
+    var chatSummary = _chatSummary.value;
+    if (chatSummary == null) {
+      logger.e('chatSummary is null');
+      return;
+    }
+    String peerId = chatSummary.peerId!;
+    List<AdvancedPeerConnection> advancedPeerConnections =
+        await peerConnectionPool.get(peerId);
+    AdvancedPeerConnection? advancedPeerConnection =
+        advancedPeerConnections.firstOrNull;
+    if (advancedPeerConnection != null) {
+      await advancedPeerConnection.createDataChannel();
+    }
+  }
+
   _disconnectPeerConnection() async {
     var chatSummary = _chatSummary.value;
     if (chatSummary == null) {
@@ -568,7 +584,9 @@ class _ChatMessageViewState extends State<ChatMessageView>
               );
             } else {
               widget = IconButton(
-                onPressed: null,
+                onPressed: () {
+                  _createDataChannel();
+                },
                 icon: const Icon(
                   Icons.cloud_off,
                   color: Colors.red,
