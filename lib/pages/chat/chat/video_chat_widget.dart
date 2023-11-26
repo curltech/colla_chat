@@ -8,6 +8,7 @@ import 'package:colla_chat/pages/chat/chat/video/p2p/local_video_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/p2p/remote_video_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/p2p/video_conference_pool_widget.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
@@ -50,10 +51,6 @@ class VideoChatWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _VideoChatWidgetState extends State<VideoChatWidget> {
-  ValueNotifier<ConferenceChatMessageController?>
-      conferenceChatMessageController =
-      ValueNotifier<ConferenceChatMessageController?>(
-          p2pConferenceClientPool.conferenceChatMessageController);
   ChatSummary chatSummary = chatMessageController.chatSummary!;
   SwiperController swiperController = SwiperController();
   ValueNotifier<int> index = ValueNotifier<int>(0);
@@ -67,13 +64,14 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
         widget.overlayEntry!.dispose();
         widget.overlayEntry = null;
       }
-    } catch (e) {}
+    } catch (e) {
+      logger.e('overlayEntry dispose failure:$e');
+    }
     p2pConferenceClientPool.addListener(_update);
   }
 
   _update() {
-    conferenceChatMessageController.value =
-        p2pConferenceClientPool.conferenceChatMessageController;
+    setState(() {});
   }
 
   ///关闭最小化界面，把本界面显示
@@ -191,30 +189,26 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   }
 
   Widget _buildTitleWidget(BuildContext context) {
-    return ValueListenableBuilder(
-        valueListenable: conferenceChatMessageController,
-        builder: (BuildContext context,
-            ConferenceChatMessageController? videoChatMessageController,
-            Widget? child) {
-          String title = widget.title;
-          ChatSummary chatSummary = this.chatSummary;
-          String? peerName;
-          peerName = chatSummary.name;
-          peerName ??= '';
-          if (chatSummary.partyType == PartyType.conference.name) {
-            //title = 'VideoConference';
-          }
-          title = '${AppLocalizations.t(title)} - $peerName';
-          if (videoChatMessageController != null &&
-              videoChatMessageController.conferenceName != null &&
-              chatSummary.partyType != PartyType.conference.name) {
-            title = '$title\n${videoChatMessageController.conferenceName}';
-          }
+    ConferenceChatMessageController? conferenceChatMessageController =
+        p2pConferenceClientPool.conferenceChatMessageController;
+    String title = widget.title;
+    ChatSummary chatSummary = this.chatSummary;
+    String? peerName;
+    peerName = chatSummary.name;
+    peerName ??= '';
+    if (chatSummary.partyType == PartyType.conference.name) {
+      //title = 'VideoConference';
+    }
+    title = '${AppLocalizations.t(title)} - $peerName';
+    if (conferenceChatMessageController != null &&
+        conferenceChatMessageController.conferenceName != null &&
+        chatSummary.partyType != PartyType.conference.name) {
+      title = '$title\n${conferenceChatMessageController.conferenceName}';
+    }
 
-          Widget titleWidget = CommonAutoSizeText(title, maxLines: 2);
+    Widget titleWidget = CommonAutoSizeText(title, maxLines: 2);
 
-          return titleWidget;
-        });
+    return titleWidget;
   }
 
   @override

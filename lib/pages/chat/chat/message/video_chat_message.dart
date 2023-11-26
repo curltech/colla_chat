@@ -30,8 +30,6 @@ class VideoChatMessage extends StatelessWidget {
       required this.chatMessage})
       : super(key: key);
 
-
-
   _join(BuildContext context) async {
     ChatSummary? chatSummary = chatMessageController.chatSummary;
     if (chatSummary != null) {
@@ -72,7 +70,7 @@ class VideoChatMessage extends StatelessWidget {
     bool valid = true; //isValid(conference.startDate, conference.endDate);
     if (!valid) {
       String conferenceId = chatMessage.messageId!;
-      p2pConferenceClientPool.terminate(conferenceId);
+      p2pConferenceClientPool.terminate(conferenceId: conferenceId);
     }
     var video = conference.video
         ? ChatMessageContentType.video.name

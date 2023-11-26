@@ -149,12 +149,11 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             icon:
                 const Icon(Icons.closed_caption_disabled, color: Colors.white)),
       );
-    } else {
-      controlPanelVisible.value = true;
     }
     this.actionData.value = actionData;
     videoViewCount.value =
         localPeerMediaStreamController.peerMediaStreams.length;
+    controlPanelVisible.value = true;
   }
 
   _playAudio() {
@@ -259,11 +258,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   _hangup() async {
     _stopAudio();
     await localPeerMediaStreamController.closeAll();
-    P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.conferenceClient;
-    ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClient?.conferenceChatMessageController;
-    await conferenceChatMessageController?.terminate();
+    await p2pConferenceClientPool.terminate();
   }
 
   ///如果正在呼叫calling，停止呼叫，关闭所有的本地视频，呼叫状态改为结束
@@ -497,8 +492,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     Future.delayed(const Duration(seconds: 30)).then((value) {
       //时间到了后，如果还是呼叫状态，则修改状态为结束
       if (conferenceChatMessageController?.status == VideoChatStatus.calling) {
-        _stopAudio();
-        conferenceChatMessageController?.status = VideoChatStatus.end;
+        _hangup();
       }
     });
     _updateView();
@@ -649,11 +643,11 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             buttonWidget = CircleTextButton(
               label: label,
               tip: tip,
-              onPressed: () {
+              onPressed: () async {
                 if (value == VideoChatStatus.calling) {
-                  _hangup();
+                  await _hangup();
                 } else if (value == VideoChatStatus.chatting) {
-                  _disconnect();
+                  await _disconnect();
                   indexWidgetProvider.pop(context: context);
                 }
               },

@@ -75,8 +75,7 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
             title: 'Delete',
             prefix: Icons.playlist_remove_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
-              p2pConferenceClientPool.terminate(conferenceId);
-              p2pConferenceClientPool.conferenceId = null;
+              p2pConferenceClientPool.terminate(conferenceId: conferenceId);
               DialogUtil.info(context,
                   content:
                       '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is closed')}');

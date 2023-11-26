@@ -532,8 +532,9 @@ class P2pConferenceClientPool with ChangeNotifier {
 
   ///根据会议编号终止会议
   ///调用对应会议的终止方法，然后从会议池中删除，设置当前会议编号为null
-  terminate(String conferenceId) async {
+  terminate({String? conferenceId}) async {
     await _clientLock.synchronized(() async {
+      conferenceId ??= _conferenceId;
       P2pConferenceClient? p2pConferenceClient =
           _conferenceClients[conferenceId];
       if (p2pConferenceClient != null) {

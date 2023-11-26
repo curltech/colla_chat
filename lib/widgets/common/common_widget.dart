@@ -162,15 +162,17 @@ class IconTextButton extends StatelessWidget {
         const SizedBox(height: 2.0),
       );
       children.add(
-        Expanded(child: CommonAutoSizeText(
-          AppLocalizations.t(label ?? ''),
-          style: TextStyle(
-            color: labelColor,
-            fontSize: labelSize,
-          ),
-          overflow: TextOverflow.visible,
-          softWrap: false,
-        )),
+        Flexible(
+            fit: FlexFit.loose,
+            child: CommonAutoSizeText(
+              AppLocalizations.t(label ?? ''),
+              style: TextStyle(
+                color: labelColor,
+                fontSize: labelSize,
+              ),
+              overflow: TextOverflow.visible,
+              softWrap: false,
+            )),
       );
     }
     return IconButton(
@@ -181,6 +183,7 @@ class IconTextButton extends StatelessWidget {
         tooltip: tooltip != null ? AppLocalizations.t(tooltip ?? '') : null,
         icon: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: children,
         ));
   }

@@ -681,14 +681,15 @@ class ConferenceChatMessageController with ChangeNotifier {
     await _lock.synchronized(() {
       _close();
     });
+    notifyListeners();
   }
 
   void _close() {
-    _status = VideoChatStatus.end;
     _chatMessage = null;
     _chatSummary = null;
     _chatReceipts.clear();
     _conference = null;
     _current = null;
+    _status = VideoChatStatus.end;
   }
 }
