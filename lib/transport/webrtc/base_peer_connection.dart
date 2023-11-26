@@ -551,31 +551,33 @@ class BasePeerConnection {
   Future<void> createDataChannel() async {
     bool initiator = _initiator!;
     RTCPeerConnection peerConnection = _peerConnection!;
-    if (initiator && dataChannel == null) {
-      var dataChannelDict = RTCDataChannelInit();
-      //创建RTCDataChannel对象时设置的通道的唯一id
-      dataChannelDict.id = 1;
-      //表示通过RTCDataChannel的信息的到达顺序需要和发送顺序一致
-      dataChannelDict.ordered = true;
-      //最大重传时间
-      dataChannelDict.maxRetransmitTime = -1;
-      //最大重传次数
-      dataChannelDict.maxRetransmits = -1;
-      //传输协议
-      dataChannelDict.protocol = 'sctp';
-      //是否由用户代理或应用程序协商频道
-      dataChannelDict.negotiated = false;
-      //创建发送数据通道
-      var dataChannelLabel =
-          await cryptoGraphy.getRandomAsciiString(length: 20);
-      dataChannel = await peerConnection.createDataChannel(
-          dataChannelLabel, dataChannelDict);
+    if (initiator) {
+      if (dataChannel == null) {
+        var dataChannelDict = RTCDataChannelInit();
+        //创建RTCDataChannel对象时设置的通道的唯一id
+        dataChannelDict.id = 1;
+        //表示通过RTCDataChannel的信息的到达顺序需要和发送顺序一致
+        dataChannelDict.ordered = true;
+        //最大重传时间
+        dataChannelDict.maxRetransmitTime = -1;
+        //最大重传次数
+        dataChannelDict.maxRetransmits = -1;
+        //传输协议
+        dataChannelDict.protocol = 'sctp';
+        //是否由用户代理或应用程序协商频道
+        dataChannelDict.negotiated = false;
+        //创建发送数据通道
+        var dataChannelLabel =
+            await cryptoGraphy.getRandomAsciiString(length: 20);
+        dataChannel = await peerConnection.createDataChannel(
+            dataChannelLabel, dataChannelDict);
 
-      dataChannel!.onDataChannelState =
-          (RTCDataChannelState state) => {onDataChannelState(state)};
-      dataChannel!.onMessage =
-          (RTCDataChannelMessage message) => {onMessage(message)};
-      // logger.i('peerConnection createDataChannel end');
+        dataChannel!.onDataChannelState =
+            (RTCDataChannelState state) => {onDataChannelState(state)};
+        dataChannel!.onMessage =
+            (RTCDataChannelMessage message) => {onMessage(message)};
+        // logger.i('peerConnection createDataChannel end');
+      }
     } else {
       peerConnection.onDataChannel = (RTCDataChannel dataChannel) {
         this.dataChannel = dataChannel;
@@ -684,6 +686,9 @@ class BasePeerConnection {
     //数据通道关闭
     if (state == RTCDataChannelState.RTCDataChannelClosed) {
       logger.i('data channel close');
+      dataChannel?.onMessage = null;
+      dataChannel?.onDataChannelState = null;
+      dataChannel = null;
     }
     emit(WebrtcEventType.dataChannelState, state);
   }
