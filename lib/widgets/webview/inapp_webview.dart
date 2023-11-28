@@ -27,21 +27,6 @@ class FlutterInAppWebView extends StatelessWidget {
   }
 
   _getSetting() {
-    if (inAppWebViewVersion == 5) {
-      InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
-          crossPlatform: InAppWebViewOptions(
-            useShouldOverrideUrlLoading: true,
-            mediaPlaybackRequiresUserGesture: false,
-          ),
-          android: AndroidInAppWebViewOptions(
-            useHybridComposition: true,
-          ),
-          ios: IOSInAppWebViewOptions(
-            allowsInlineMediaPlayback: true,
-          ));
-
-      return options;
-    }
     if (inAppWebViewVersion == 6) {
       ///6.x.x
       InAppWebViewSettings settings = InAppWebViewSettings(
