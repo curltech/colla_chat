@@ -368,7 +368,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
 
     //对所有的成员发送组变更的消息
     if (currentGroup.id == null) {
-      await groupService.addGroup(current);
+      // await groupService.addGroup(current);
     } else {
       if (groupModified) {
         bool allowed = groupService.canModifyGroup(current);

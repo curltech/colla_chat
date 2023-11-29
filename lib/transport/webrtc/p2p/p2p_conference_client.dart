@@ -82,6 +82,7 @@ class P2pConferenceClient {
       // return;
     }
     _joined = true;
+    logger.w('i joined conference ${conference.name}');
     List<AdvancedPeerConnection> pcs = await peerConnections;
     for (AdvancedPeerConnection peerConnection in pcs) {
       await _onParticipantConnected(peerConnection);
@@ -157,6 +158,8 @@ class P2pConferenceClient {
     var name = platformParticipant.name;
     if (!_remoteParticipants.containsKey(key)) {
       _remoteParticipants[key] = platformParticipant;
+      logger.w(
+          '$key joined conference ${conferenceChatMessageController.conference?.name}');
     }
     AdvancedPeerConnection? advancedPeerConnection =
         await peerConnectionPool.getOne(
@@ -178,6 +181,8 @@ class P2pConferenceClient {
     if (!_remoteParticipants.containsKey(key)) {
       _remoteParticipants[key] =
           PlatformParticipant(peerId, clientId: clientId, name: name);
+      logger.w(
+          '$key joined conference ${conferenceChatMessageController.conference?.name}');
     }
     // 只有自己已经加入，才需要加本地流和远程流
     if (_joined) {
