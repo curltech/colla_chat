@@ -40,15 +40,17 @@ class Sqlite3 extends DataStore {
     }
 
     await localSharedPreferences.init();
+
     /// 删除新版本中有变化的表，重建
     String? existAppVersion = await localSharedPreferences.get('appVersion');
+    print('current appVersion:$existAppVersion');
     if (existAppVersion != null) {
       if (existAppVersion.compareTo(appVersion) < 0) {
         drop(conferenceService.tableName);
       }
     }
-    drop(conferenceService.tableName);
     await localSharedPreferences.save('appVersion', appVersion);
+    print('new appVersion:$appVersion');
 
     for (GeneralBaseService service in ServiceLocator.services.values) {
       try {
@@ -234,10 +236,7 @@ class Sqlite3 extends DataStore {
         offset: offset);
 
     Pagination page = Pagination(
-        data: results,
-        count: rowsNumber,
-        offset: offset,
-        limit: limit);
+        data: results, count: rowsNumber, offset: offset, limit: limit);
 
     return page;
   }
