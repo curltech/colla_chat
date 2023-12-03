@@ -47,6 +47,7 @@ class Sqlite3 extends DataStore {
         drop(conferenceService.tableName);
       }
     }
+    drop(conferenceService.tableName);
     await localSharedPreferences.save('appVersion', appVersion);
 
     for (GeneralBaseService service in ServiceLocator.services.values) {
