@@ -266,15 +266,16 @@ class GlobalChatMessage {
     String peerId = chatMessage.senderPeerId!;
     String clientId = chatMessage.senderClientId!;
     String messageId = chatMessage.messageId!;
-    if (messageReceiptType == MessageReceiptType.ignored ||
-        messageReceiptType == MessageReceiptType.busy ||
+    if (messageReceiptType == MessageReceiptType.busy ||
+        //messageReceiptType == MessageReceiptType.ignored ||
         messageReceiptType == MessageReceiptType.received ||
         messageReceiptType == MessageReceiptType.rejected) {}
 
     ConferenceChatMessageController? conferenceChatMessageController;
+
     /// 以下四种消息如果没有会议，需要创建会议
     if (messageReceiptType == MessageReceiptType.accepted ||
-        messageReceiptType == MessageReceiptType.hold ||
+        //messageReceiptType == MessageReceiptType.hold ||
         messageReceiptType == MessageReceiptType.join ||
         messageReceiptType == MessageReceiptType.joined ||
         messageReceiptType == MessageReceiptType.terminated ||

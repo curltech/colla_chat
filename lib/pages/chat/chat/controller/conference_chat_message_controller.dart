@@ -500,12 +500,12 @@ class ConferenceChatMessageController with ChangeNotifier {
       case MessageReceiptType.busy:
         await _onBusy(platformParticipant, messageId);
         break;
-      case MessageReceiptType.ignored:
-        await _onIgnored(platformParticipant, messageId);
-        break;
-      case MessageReceiptType.hold:
-        await _onHold(platformParticipant, messageId);
-        break;
+      // case MessageReceiptType.ignored:
+      //   await _onIgnored(platformParticipant, messageId);
+      //   break;
+      // case MessageReceiptType.hold:
+      //   await _onHold(platformParticipant, messageId);
+      //   break;
       case MessageReceiptType.join:
         await _onJoin(platformParticipant, messageId);
         break;

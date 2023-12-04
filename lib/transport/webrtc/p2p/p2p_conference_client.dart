@@ -400,6 +400,10 @@ class P2pConferenceClientPool with ChangeNotifier {
   Future<P2pConferenceClient?> createConferenceClient(ChatMessage chatMessage,
       {ChatSummary? chatSummary}) async {
     return await _clientLock.synchronized(() async {
+      if (chatMessage.id == null) {
+        logger.e('createConferenceClient chatMessage id is null');
+        return null;
+      }
       P2pConferenceClient? p2pConferenceClient;
       //创建基于当前聊天的视频消息控制器
       if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {

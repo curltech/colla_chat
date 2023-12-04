@@ -525,14 +525,14 @@ class _IndexViewState extends State<IndexView>
         onPressed: () async {
           conferenceChatMessageVisible.value = false;
           _stop();
-          P2pConferenceClient? p2pConferenceClient =
-              await p2pConferenceClientPool
-                  .createConferenceClient(conferenceChatMessage);
-          ConferenceChatMessageController? conferenceChatMessageController =
-              p2pConferenceClient?.conferenceChatMessageController;
-          await conferenceChatMessageController
-              ?.sendChatReceipt(MessageReceiptType.hold);
-          this.conferenceChatMessageController.close();
+          ChatSummary? chatSummary =
+              conferenceChatMessageController.chatSummary;
+          if (chatSummary != null) {
+            chatMessageController.chatSummary = chatSummary;
+            chatMessageController.current = chatMessage;
+            indexWidgetProvider.push('chat_message');
+          }
+          conferenceChatMessageController.close();
         },
         icon: const Icon(color: Colors.amber, size: 24, Icons.add_call));
     var acceptedButton = IconTextButton(
@@ -631,7 +631,7 @@ class _IndexViewState extends State<IndexView>
               if (conferenceChatMessageVisible.value) {
                 conferenceChatMessageVisible.value = false;
                 await conferenceChatMessageController
-                    .sendChatReceipt(MessageReceiptType.ignored);
+                    .sendChatReceipt(MessageReceiptType.received);
                 conferenceChatMessageController.close();
               }
             });
