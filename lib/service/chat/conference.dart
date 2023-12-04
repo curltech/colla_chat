@@ -226,6 +226,9 @@ class ConferenceService extends GeneralBaseService<Conference> {
   }
 
   bool isValid(Conference conference) {
+    if (appDebug) {
+      return true;
+    }
     String? startDate = conference.startDate;
     String? endDate = conference.endDate;
     bool valid = true;

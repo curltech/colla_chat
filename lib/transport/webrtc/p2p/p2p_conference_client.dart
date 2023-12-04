@@ -79,7 +79,7 @@ class P2pConferenceClient {
     bool isValid = conferenceService.isValid(conference);
     if (!isValid) {
       logger.e('conference ${conference.name} is invalid');
-      // return;
+      return;
     }
     _joined = true;
     logger.w('i joined conference ${conference.name}');

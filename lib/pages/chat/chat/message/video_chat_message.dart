@@ -10,6 +10,7 @@ import 'package:colla_chat/pages/chat/linkman/conference/conference_show_widget.
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_conference_client.dart';
@@ -67,7 +68,7 @@ class VideoChatMessage extends StatelessWidget {
 
     Map<String, dynamic> map = JsonUtil.toJson(content);
     Conference conference = Conference.fromJson(map);
-    bool valid = true; //isValid(conference.startDate, conference.endDate);
+    bool valid = conferenceService.isValid(conference);
     if (!valid) {
       String conferenceId = chatMessage.messageId!;
       p2pConferenceClientPool.terminate(conferenceId: conferenceId);
