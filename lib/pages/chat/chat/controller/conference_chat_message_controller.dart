@@ -325,6 +325,10 @@ class ConferenceChatMessageController with ChangeNotifier {
         }
         await join();
         return;
+      } else if (receiptType == MessageReceiptType.received) {
+        chatMessageController.chatSummary = _chatSummary;
+        chatMessageController.current = _chatMessage;
+        indexWidgetProvider.push('chat_message');
       }
     }
   }

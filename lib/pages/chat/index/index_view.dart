@@ -520,21 +520,27 @@ class _IndexViewState extends State<IndexView>
           conferenceChatMessageController.close();
         },
         icon: const Icon(color: Colors.red, size: 24, Icons.call_end));
-    var holdButton = IconTextButton(
-        label: AppLocalizations.t('Hold'),
+    var receivedButton = IconTextButton(
+        label: AppLocalizations.t('Received'),
         onPressed: () async {
           conferenceChatMessageVisible.value = false;
           _stop();
-          ChatSummary? chatSummary =
-              conferenceChatMessageController.chatSummary;
-          if (chatSummary != null) {
-            chatMessageController.chatSummary = chatSummary;
-            chatMessageController.current = chatMessage;
-            indexWidgetProvider.push('chat_message');
-          }
+          await conferenceChatMessageController
+              .sendChatReceipt(MessageReceiptType.received);
           conferenceChatMessageController.close();
         },
         icon: const Icon(color: Colors.amber, size: 24, Icons.add_call));
+    var ignoredButton = IconTextButton(
+        label: AppLocalizations.t('Ignored'),
+        onPressed: () async {
+          conferenceChatMessageVisible.value = false;
+          _stop();
+          await conferenceChatMessageController
+              .sendChatReceipt(MessageReceiptType.ignored);
+          conferenceChatMessageController.close();
+        },
+        icon: const Icon(
+            color: Colors.blue, size: 24, Icons.call_missed_outgoing));
     var acceptedButton = IconTextButton(
         label: AppLocalizations.t('Accept'),
         onPressed: () async {
@@ -551,25 +557,27 @@ class _IndexViewState extends State<IndexView>
         },
         icon: const Icon(color: Colors.green, size: 24, Icons.call));
     List<Widget> buttons = <Widget>[];
-    buttons.add(rejectedButton);
-    buttons.add(holdButton);
-
     List<Widget> children = [];
 
-    ///立即接听按钮只有当前不在会议中，而且是个人或者群模式才可以
-    if (p2pConferenceClientPool.conferenceId == null &&
-        conferenceChatMessage.groupType != PartyType.conference.name) {
+    ///立即接听按钮只有当前不在会议中，而且是个人才可以
+    if (conferenceChatMessage.groupId == null) {
+      buttons.add(rejectedButton);
       buttons.add(acceptedButton);
-    } else if (p2pConferenceClientPool.conferenceId != null) {
+    } else {
+      buttons.add(ignoredButton);
+      buttons.add(receivedButton);
+    }
+    if (p2pConferenceClientPool.conferenceId != null) {
       String? conferenceName = p2pConferenceClientPool
           .conferenceChatMessageController?.conference?.name;
-      conferenceName = conferenceName ?? '';
-      children.add(
-        CommonAutoSizeText(
-          AppLocalizations.t('You are in conference:') + conferenceName,
-          style: const TextStyle(color: Colors.amber),
-        ),
-      );
+      if (conferenceName != null) {
+        children.add(
+          CommonAutoSizeText(
+            AppLocalizations.t('You are in conference:') + conferenceName,
+            style: const TextStyle(color: Colors.amber),
+          ),
+        );
+      }
     }
     children.addAll([
       CommonAutoSizeText(name,
