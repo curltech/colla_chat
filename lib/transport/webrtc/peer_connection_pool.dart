@@ -365,11 +365,7 @@ class PeerConnectionPool {
       if (peerConnections != null && peerConnections.isNotEmpty) {
         for (AdvancedPeerConnection peerConnection in peerConnections.values) {
           if (peerConnection.connectionState ==
-                  RTCPeerConnectionState.RTCPeerConnectionStateClosed ||
-              peerConnection.connectionState ==
-                  RTCPeerConnectionState.RTCPeerConnectionStateFailed ||
-              peerConnection.connectionState ==
-                  RTCPeerConnectionState.RTCPeerConnectionStateDisconnected) {
+              RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
             var start = peerConnection.basePeerConnection.start;
             if (start == null) {
               removedPeerConnections.add(peerConnection);
