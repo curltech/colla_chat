@@ -364,8 +364,12 @@ class PeerConnectionPool {
           _peerConnections.get(peerId);
       if (peerConnections != null && peerConnections.isNotEmpty) {
         for (AdvancedPeerConnection peerConnection in peerConnections.values) {
-          if (peerConnection.connectionState !=
-              RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+          if (peerConnection.connectionState ==
+                  RTCPeerConnectionState.RTCPeerConnectionStateClosed ||
+              peerConnection.connectionState ==
+                  RTCPeerConnectionState.RTCPeerConnectionStateFailed ||
+              peerConnection.connectionState ==
+                  RTCPeerConnectionState.RTCPeerConnectionStateDisconnected) {
             var start = peerConnection.basePeerConnection.start;
             if (start == null) {
               removedPeerConnections.add(peerConnection);
@@ -376,7 +380,7 @@ class PeerConnectionPool {
               if (gap > limit.inMilliseconds) {
                 removedPeerConnections.add(peerConnection);
                 logger.e(
-                    'peerConnection peerId:${peerConnection.peerId},name:${peerConnection.name} is overtime unconnected');
+                    'peerConnection peerId:${peerConnection.peerId},name:${peerConnection.name} is overtime unconnected:${peerConnection.connectionState}');
               }
             }
           }
