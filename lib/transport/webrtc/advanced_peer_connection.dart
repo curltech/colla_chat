@@ -179,6 +179,10 @@ class AdvancedPeerConnection {
       _addWebrtcEventType(WebrtcEventType.error, err);
     });
 
+    if (initiator) {
+      renegotiate();
+    }
+
     return result;
   }
 

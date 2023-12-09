@@ -237,9 +237,6 @@ class PeerConnectionPool {
 
       await put(peerId, peerConnection, clientId: clientId);
 
-      ///在启动协商
-      await peerConnection.renegotiate();
-
       return peerConnection;
     });
 
