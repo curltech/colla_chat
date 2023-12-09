@@ -364,9 +364,7 @@ class PeerConnectionPool {
           _peerConnections.get(peerId);
       if (peerConnections != null && peerConnections.isNotEmpty) {
         for (AdvancedPeerConnection peerConnection in peerConnections.values) {
-          if (peerConnection.signalingState ==
-                  RTCSignalingState.RTCSignalingStateHaveLocalOffer ||
-              peerConnection.connectionState ==
+          if (peerConnection.connectionState ==
                   RTCPeerConnectionState.RTCPeerConnectionStateFailed ||
               peerConnection.connectionState ==
                   RTCPeerConnectionState.RTCPeerConnectionStateDisconnected ||
