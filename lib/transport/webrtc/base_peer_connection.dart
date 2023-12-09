@@ -1347,6 +1347,7 @@ class BasePeerConnection {
       MediaStreamTrack? oldTrack = sender.track;
       if (oldTrack != null) {
         await peerConnection.removeTrack(sender);
+        // await replaceTrack(stream, oldTrack, track);
       }
       trackSenders.remove(trackId);
       logger.w(
