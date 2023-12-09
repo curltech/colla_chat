@@ -135,7 +135,6 @@ enum RenegotiateType {
   request,
   toggle,
   agree,
-  disagree,
 }
 
 class WebrtcSignal {
@@ -1170,33 +1169,17 @@ class BasePeerConnection {
         logger.e('offer received renegotiate request');
       }
     } else if (RenegotiateType.toggle.name == webrtcSignal.renegotiate) {
-      if (!negotiating) {
-        initiator = false;
-        logger
-            .w('offer agree renegotiate toggle，will be initiator:$_initiator');
-        emit(
-            WebrtcEventType.signal,
-            WebrtcSignal('renegotiate',
-                renegotiate: RenegotiateType.agree.name, extension: extension));
-      } else {
-        initiator = true;
-        logger.w(
-            'offer disagree renegotiate toggle，will be initiator:$_initiator');
-        emit(
-            WebrtcEventType.signal,
-            WebrtcSignal('renegotiate',
-                renegotiate: RenegotiateType.disagree.name,
-                extension: extension));
-      }
+      initiator = false;
+      logger.w('offer agree renegotiate toggle，will be initiator:$_initiator');
+      emit(
+          WebrtcEventType.signal,
+          WebrtcSignal('renegotiate',
+              renegotiate: RenegotiateType.agree.name, extension: extension));
     } else if (RenegotiateType.agree.name == webrtcSignal.renegotiate) {
       initiator = true;
       logger
           .w('answer received agree renegotiate，will be initiator:$_initiator');
       await negotiate();
-    } else if (RenegotiateType.disagree.name == webrtcSignal.renegotiate) {
-      initiator = false;
-      logger.w(
-          'answer received disagree renegotiate，will be initiator:$_initiator');
     }
 
     return;
