@@ -1346,10 +1346,11 @@ class BasePeerConnection {
       RTCRtpSender sender = trackSenders[trackId]!;
       MediaStreamTrack? oldTrack = sender.track;
       if (oldTrack != null) {
-        await replaceTrack(stream, oldTrack, track);
+        await peerConnection.removeTrack(sender);
       }
+      trackSenders.remove(trackId);
       logger.w(
-          'addLocalTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id} is exist, replaceTrack');
+          'addLocalTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id} is exist, removeTrack');
 
       return true;
     }
