@@ -361,12 +361,17 @@ class PeerConnectionPool {
           _peerConnections.get(peerId);
       if (peerConnections != null && peerConnections.isNotEmpty) {
         for (AdvancedPeerConnection peerConnection in peerConnections.values) {
-          if (peerConnection.connectionState ==
+          bool removeNeeded = (peerConnection.connectionState == null &&
+                  peerConnection.signalingState ==
+                      RTCSignalingState.RTCSignalingStateHaveLocalOffer) ||
+              peerConnection.connectionState ==
                   RTCPeerConnectionState.RTCPeerConnectionStateFailed ||
               peerConnection.connectionState ==
                   RTCPeerConnectionState.RTCPeerConnectionStateDisconnected ||
               peerConnection.connectionState ==
-                  RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
+                  RTCPeerConnectionState.RTCPeerConnectionStateClosed;
+
+          if (removeNeeded) {
             var start = peerConnection.basePeerConnection.start;
             if (start == null) {
               removedPeerConnections.add(peerConnection);
