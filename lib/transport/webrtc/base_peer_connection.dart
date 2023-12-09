@@ -1201,13 +1201,13 @@ class BasePeerConnection {
         logger.e('offer received renegotiate request');
       }
     } else if (RenegotiateType.toggle.name == webrtcSignal.renegotiate) {
-      if (_initiator != null && _initiator!) {
+      if (_initiator != null && !_initiator!) {
         logger.e('received toggle signal:$_initiator');
       } else {
         toggleInitiator();
       }
     } else if (RenegotiateType.agree.name == webrtcSignal.renegotiate) {
-      if (_initiator != null && !_initiator!) {
+      if (_initiator != null && _initiator!) {
         logger.e('received agree signal:$_initiator');
       } else {
         toggleInitiator();
