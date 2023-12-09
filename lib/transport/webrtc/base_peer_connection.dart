@@ -1342,30 +1342,31 @@ class BasePeerConnection {
     String trackId = track.id!;
 
     ///加入重复轨道应用会崩溃
+    RTCRtpSender sender;
     if (trackSenders.containsKey(trackId)) {
-      RTCRtpSender sender = trackSenders[trackId]!;
+      sender = trackSenders[trackId]!;
       MediaStreamTrack? oldTrack = sender.track;
       if (oldTrack != null) {
-        await peerConnection.removeTrack(sender);
-        // await replaceTrack(stream, oldTrack, track);
+        await replaceTrack(stream, oldTrack, track);
       }
-      trackSenders.remove(trackId);
       logger.w(
-          'addLocalTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id} is exist, removeTrack');
+          'addLocalTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id} is exist, replaceTrack');
 
       return true;
-    }
+    } else {
+      sender = await peerConnection.addTrack(track, stream);
+      logger.w(
+          'addLocalTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id} is not exist, addTrack');
+      trackSenders[trackId] = sender;
+      try {
+        if (streamEncrypt) {
+          await enableEncryption(sender);
+        }
 
-    try {
-      RTCRtpSender streamSender = await peerConnection.addTrack(track, stream);
-      if (streamEncrypt) {
-        await enableEncryption(streamSender);
+        return true;
+      } catch (e) {
+        logger.e('peer connection addTrack failure, $e');
       }
-      trackSenders[trackId] = streamSender;
-
-      return true;
-    } catch (e) {
-      logger.e('peer connection addTrack failure, $e');
     }
 
     return false;
@@ -1404,21 +1405,17 @@ class BasePeerConnection {
     var kind = track.kind;
 
     if (trackSenders.containsKey(trackId)) {
-      RTCRtpSender? sender = trackSenders[trackId];
-      if (sender == null) {
-        logger.e('Cannot remove track that was never added.');
-      } else {
-        try {
-          RTCPeerConnection? peerConnection = _peerConnection;
-          if (peerConnection != null) {
-            await peerConnection.removeTrack(sender);
-          }
-        } catch (err) {
-          logger.e('removeTrack err $err');
-          await close();
+      RTCRtpSender sender = trackSenders[trackId]!;
+      try {
+        RTCPeerConnection? peerConnection = _peerConnection;
+        if (peerConnection != null) {
+          await peerConnection.removeTrack(sender);
         }
-        trackSenders.remove(trackId);
+      } catch (err) {
+        logger.e('removeTrack err $err');
+        await close();
       }
+      trackSenders.remove(trackId);
     }
     if (streamEncrypt) {
       String? participantId = '${kind}_${trackId}_sender';
@@ -1474,21 +1471,17 @@ class BasePeerConnection {
     String? oldParticipantId = '${oldTrack.kind}_${oldTrackId}_sender';
 
     if (trackSenders.containsKey(oldTrackId)) {
-      RTCRtpSender? sender = trackSenders[oldTrackId];
-      if (sender == null) {
-        logger.e('Cannot replace track that was never added.');
-      } else {
-        await sender.replaceTrack(newTrack);
-        trackSenders.remove(oldTrackId);
-        trackSenders[newTrackId!] = sender;
-        if (streamEncrypt) {
-          if (frameCyrptors.containsKey(oldParticipantId)) {
-            FrameCryptor? frameCryptor = frameCyrptors[oldParticipantId];
-            frameCryptor!.dispose();
-            frameCyrptors.remove(oldParticipantId);
-          }
-          await enableEncryption(sender);
+      RTCRtpSender sender = trackSenders[oldTrackId]!;
+      await sender.replaceTrack(newTrack);
+      trackSenders.remove(oldTrackId);
+      trackSenders[newTrackId!] = sender;
+      if (streamEncrypt) {
+        if (frameCyrptors.containsKey(oldParticipantId)) {
+          FrameCryptor? frameCryptor = frameCyrptors[oldParticipantId];
+          frameCryptor!.dispose();
+          frameCyrptors.remove(oldParticipantId);
         }
+        await enableEncryption(sender);
       }
     }
   }
