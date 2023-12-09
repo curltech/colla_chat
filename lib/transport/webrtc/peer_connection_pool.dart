@@ -363,6 +363,7 @@ class PeerConnectionPool {
         for (AdvancedPeerConnection peerConnection in peerConnections.values) {
           if (peerConnection.signalingState ==
                   RTCSignalingState.RTCSignalingStateHaveLocalOffer ||
+              peerConnection.connectionState == null ||
               peerConnection.connectionState ==
                   RTCPeerConnectionState.RTCPeerConnectionStateFailed ||
               peerConnection.connectionState ==
