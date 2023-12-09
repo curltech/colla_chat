@@ -299,7 +299,7 @@ class BasePeerConnection {
     ],
   };
 
-  ///从协商开始计时，连接成功结束，计算连接的时间
+  ///从init成功开始计时，连接成功结束，计算连接的时间
   ///如果一直未结束，根据当前状态，可以进行重连操作
   ///对主动方来说，发出candidate和offer后一直未得到answer回应，重发candidate和offer
   ///对被动方来说，收到candidate但一直未收到offer，只能等待，或者发出answer一直未连接，重发answer
@@ -785,7 +785,6 @@ class BasePeerConnection {
       renegotiationNeeded = true;
       return;
     }
-
     if (_initiator!) {
       await _negotiateOffer();
     } else {
@@ -1118,6 +1117,8 @@ class BasePeerConnection {
         await close();
         return;
       }
+      start = DateTime.now().millisecondsSinceEpoch;
+      end = null;
       logger.i('start setRemoteDescription sdp offer:${sdp.type}');
       RTCSignalingState? signalingState = _peerConnection?.signalingState;
       logger.i(

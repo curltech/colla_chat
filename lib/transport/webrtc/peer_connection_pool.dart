@@ -361,7 +361,9 @@ class PeerConnectionPool {
           _peerConnections.get(peerId);
       if (peerConnections != null && peerConnections.isNotEmpty) {
         for (AdvancedPeerConnection peerConnection in peerConnections.values) {
-          if (peerConnection.connectionState ==
+          if (peerConnection.signalingState ==
+                  RTCSignalingState.RTCSignalingStateHaveLocalOffer ||
+              peerConnection.connectionState ==
                   RTCPeerConnectionState.RTCPeerConnectionStateFailed ||
               peerConnection.connectionState ==
                   RTCPeerConnectionState.RTCPeerConnectionStateDisconnected ||
@@ -370,6 +372,8 @@ class PeerConnectionPool {
             var start = peerConnection.basePeerConnection.start;
             if (start == null) {
               removedPeerConnections.add(peerConnection);
+              logger.e(
+                  'peerConnection peerId:${peerConnection.peerId},name:${peerConnection.name} start time is null');
             } else {
               var now = DateTime.now().millisecondsSinceEpoch;
               var gap = now - start;
@@ -377,7 +381,7 @@ class PeerConnectionPool {
               if (gap > limit.inMilliseconds) {
                 removedPeerConnections.add(peerConnection);
                 logger.e(
-                    'peerConnection peerId:${peerConnection.peerId},name:${peerConnection.name} is overtime unconnected:${peerConnection.connectionState}');
+                    'peerConnection peerId:${peerConnection.peerId},name:${peerConnection.name} is overtime unconnected:${peerConnection.connectionState}:${peerConnection.signalingState}');
               }
             }
           }
