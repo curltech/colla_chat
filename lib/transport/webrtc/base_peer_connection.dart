@@ -272,8 +272,11 @@ class BasePeerConnection {
   //是否需要主动建立数据通道
   bool needDataChannel = true;
 
-  //是否有缓存的重新协商要求
+  //是否有延迟的重新协商要求
   bool renegotiationNeeded = false;
+
+  //是否有延迟的切换initiator要求
+  bool toggleInitiatorNeeded = false;
 
   //媒体流的轨道，发送者之间的关系，每增加一个本地轨道就产生一个sender
   Map<String, RTCRtpSender> trackSenders = {};
@@ -674,12 +677,17 @@ class BasePeerConnection {
     if (state == RTCSignalingState.RTCSignalingStateClosed) {
       logger.w('RTCSignalingState is closed');
       renegotiationNeeded = false;
+      toggleInitiatorNeeded = false;
     }
     if (state == RTCSignalingState.RTCSignalingStateStable) {
       logger.w('RTCSignalingState is stable');
       if (renegotiationNeeded) {
         renegotiationNeeded = false;
         await negotiate();
+      }
+      if (toggleInitiatorNeeded) {
+        toggleInitiatorNeeded = false;
+        await toggleInitiator();
       }
     }
     emit(WebrtcEventType.signalingState, state);
@@ -788,6 +796,30 @@ class BasePeerConnection {
       await _negotiateOffer();
     } else {
       await _negotiateAnswer(toggle: toggle);
+    }
+  }
+
+  toggleInitiator() async {
+    if (_initiator == null) {
+      logger.e('BasePeerConnection is not init');
+      return;
+    }
+    if (negotiating) {
+      logger.e('BasePeerConnection is negotiating');
+      toggleInitiatorNeeded = true;
+      return;
+    }
+    initiator = !_initiator!;
+    if (_initiator!) {
+      logger
+          .w('answer received agree renegotiate，will be initiator:$_initiator');
+      await negotiate();
+    } else {
+      logger.w('offer agree renegotiate toggle，will be initiator:$_initiator');
+      emit(
+          WebrtcEventType.signal,
+          WebrtcSignal('renegotiate',
+              renegotiate: RenegotiateType.agree.name, extension: extension));
     }
   }
 
@@ -948,7 +980,7 @@ class BasePeerConnection {
     //对主叫节点来说，sdp应该是answer，如果是offer，表示出错了
     //只能等待连接被清除
     else if (signalType == SignalType.sdp.name && sdp != null) {
-      if (_initiator! && sdp.type == 'offer') {
+      if (sdp.type == 'offer') {
         String? peerId = webrtcSignal.extension?.peerId;
         String? name = webrtcSignal.extension?.name;
         logger.e(
@@ -1002,7 +1034,7 @@ class BasePeerConnection {
     }
     //被叫发送重新协商的请求
     logger.w('send signal renegotiate toggle:$toggle');
-    if (toggle && !negotiating) {
+    if (toggle) {
       emit(
           WebrtcEventType.signal,
           WebrtcSignal('renegotiate',
@@ -1169,17 +1201,17 @@ class BasePeerConnection {
         logger.e('offer received renegotiate request');
       }
     } else if (RenegotiateType.toggle.name == webrtcSignal.renegotiate) {
-      initiator = false;
-      logger.w('offer agree renegotiate toggle，will be initiator:$_initiator');
-      emit(
-          WebrtcEventType.signal,
-          WebrtcSignal('renegotiate',
-              renegotiate: RenegotiateType.agree.name, extension: extension));
+      if (_initiator != null && _initiator!) {
+        logger.e('received toggle signal:$_initiator');
+      } else {
+        toggleInitiator();
+      }
     } else if (RenegotiateType.agree.name == webrtcSignal.renegotiate) {
-      initiator = true;
-      logger
-          .w('answer received agree renegotiate，will be initiator:$_initiator');
-      await negotiate();
+      if (_initiator != null && !_initiator!) {
+        logger.e('received agree signal:$_initiator');
+      } else {
+        toggleInitiator();
+      }
     }
 
     return;
