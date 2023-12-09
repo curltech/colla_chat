@@ -772,7 +772,7 @@ class BasePeerConnection {
     }
     if (negotiating) {
       logger.e('BasePeerConnection is negotiating');
-      // return;
+      return;
     }
 
     if (_initiator!) {
@@ -944,7 +944,7 @@ class BasePeerConnection {
         String? name = webrtcSignal.extension?.name;
         logger.e(
             'offer received peerId:$peerId, name:$name sdp type offer，will be closed');
-        //await close();
+        await close();
         return;
       }
       RTCSignalingState? signalingState = peerConnection.signalingState;
@@ -1104,7 +1104,7 @@ class BasePeerConnection {
         String? name = webrtcSignal.extension?.name;
         logger.e(
             'answer received peerId:$peerId,name:$name sdp type answer, will be closed');
-        //await close();
+        await close();
         return;
       }
       logger.i('start setRemoteDescription sdp offer:${sdp.type}');
