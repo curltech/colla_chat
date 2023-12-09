@@ -782,7 +782,8 @@ class BasePeerConnection {
     }
     if (negotiating) {
       logger.e('BasePeerConnection is negotiating');
-      // return;
+      renegotiationNeeded = true;
+      return;
     }
 
     if (_initiator!) {
@@ -1188,13 +1189,9 @@ class BasePeerConnection {
       }
     } else if (RenegotiateType.agree.name == webrtcSignal.renegotiate) {
       initiator = true;
-      if (!negotiating) {
-        logger.w(
-            'answer received agree renegotiate，will be initiator:$_initiator');
-        await negotiate();
-      } else {
-        renegotiationNeeded = true;
-      }
+      logger
+          .w('answer received agree renegotiate，will be initiator:$_initiator');
+      await negotiate();
     } else if (RenegotiateType.disagree.name == webrtcSignal.renegotiate) {
       initiator = false;
       logger.w(
