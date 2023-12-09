@@ -361,7 +361,10 @@ class PeerConnectionPool {
           _peerConnections.get(peerId);
       if (peerConnections != null && peerConnections.isNotEmpty) {
         for (AdvancedPeerConnection peerConnection in peerConnections.values) {
-          bool removeNeeded = (peerConnection.signalingState ==
+          bool removeNeeded = (peerConnection.dataChannelState == null ||
+                  peerConnection.dataChannelState ==
+                      RTCDataChannelState.RTCDataChannelClosed) ||
+              (peerConnection.signalingState ==
                   RTCSignalingState.RTCSignalingStateHaveRemoteOffer) ||
               (peerConnection.signalingState ==
                   RTCSignalingState.RTCSignalingStateHaveLocalOffer) ||
