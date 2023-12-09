@@ -273,6 +273,9 @@ class BasePeerConnection {
   //是否需要主动建立数据通道
   bool needDataChannel = true;
 
+  //是否有缓存的重新协商要求
+  bool renegotiationNeeded = false;
+
   //媒体流的轨道，发送者之间的关系，每增加一个本地轨道就产生一个sender
   Map<String, RTCRtpSender> trackSenders = {};
 
@@ -669,9 +672,16 @@ class BasePeerConnection {
   /// signal状态事件
   onSignalingState(RTCSignalingState state) async {
     logger.w('RTCSignalingState was changed to:$state');
-    if (state == RTCSignalingState.RTCSignalingStateStable ||
-        state == RTCSignalingState.RTCSignalingStateClosed) {
-      logger.w('RTCSignalingState is stable or closed:$state');
+    if (state == RTCSignalingState.RTCSignalingStateClosed) {
+      logger.w('RTCSignalingState is closed');
+      renegotiationNeeded = false;
+    }
+    if (state == RTCSignalingState.RTCSignalingStateStable) {
+      logger.w('RTCSignalingState is stable');
+      if (renegotiationNeeded) {
+        renegotiationNeeded = false;
+        await negotiate();
+      }
     }
     emit(WebrtcEventType.signalingState, state);
   }
@@ -1178,9 +1188,13 @@ class BasePeerConnection {
       }
     } else if (RenegotiateType.agree.name == webrtcSignal.renegotiate) {
       initiator = true;
-      logger
-          .w('answer received agree renegotiate，will be initiator:$_initiator');
-      await negotiate();
+      if (!negotiating) {
+        logger.w(
+            'answer received agree renegotiate，will be initiator:$_initiator');
+        await negotiate();
+      } else {
+        renegotiationNeeded = true;
+      }
     } else if (RenegotiateType.disagree.name == webrtcSignal.renegotiate) {
       initiator = false;
       logger.w(
