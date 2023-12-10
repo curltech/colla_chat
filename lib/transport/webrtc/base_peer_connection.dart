@@ -275,9 +275,6 @@ class BasePeerConnection {
   //是否有延迟的重新协商要求
   bool renegotiationNeeded = false;
 
-  //是否有延迟的请求切换initiator要求
-  bool toggleNeeded = false;
-
   //是否有延迟的切换initiator要求
   bool toggleInitiatorNeeded = false;
 
@@ -689,9 +686,6 @@ class BasePeerConnection {
       if (renegotiationNeeded) {
         renegotiationNeeded = false;
         await negotiate();
-      } else if (toggleNeeded) {
-        toggleNeeded = false;
-        await toggle();
       } else if (toggleInitiatorNeeded) {
         toggleInitiatorNeeded = false;
         await toggleInitiator();
@@ -789,7 +783,7 @@ class BasePeerConnection {
   ///实际开始执行协商过程
   ///被叫不能在第一次的时候主动发起协议过程，主叫或者被叫不在第一次的时候可以发起协商过程
   ///一般情况下系统
-  negotiate() async {
+  negotiate({bool toggle = false}) async {
     if (_initiator == null) {
       logger.e('BasePeerConnection is not init');
       return;
@@ -797,7 +791,7 @@ class BasePeerConnection {
 
     ///如果是从节点，直接发送协商请求，不用等待
     if (!_initiator!) {
-      await _negotiateAnswer(toggle: false);
+      await _negotiateAnswer(toggle: toggle);
       return;
     }
 
@@ -811,26 +805,6 @@ class BasePeerConnection {
     ///主节点协商开始
     if (_initiator!) {
       await _negotiateOffer();
-    }
-  }
-
-  toggle() async {
-    if (_initiator == null) {
-      logger.e('BasePeerConnection is not init');
-      return;
-    }
-
-    ///判断是否正在协商过程中，必要时缓存起来后续执行
-    if (makingOffer || negotiating) {
-      logger.e('BasePeerConnection is negotiating');
-      toggleNeeded = true;
-      return;
-    }
-
-    ///如果是从节点，发送切换请求
-    if (!_initiator!) {
-      await _negotiateAnswer(toggle: true);
-      return;
     }
   }
 

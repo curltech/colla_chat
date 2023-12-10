@@ -206,11 +206,7 @@ class AdvancedPeerConnection {
   }
 
   renegotiate({bool toggle = false}) async {
-    if (toggle) {
-      await basePeerConnection.toggle();
-    } else {
-      await basePeerConnection.negotiate();
-    }
+    await basePeerConnection.negotiate(toggle: toggle);
   }
 
   restartIce() async {
