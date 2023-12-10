@@ -28,6 +28,9 @@ class P2pConferenceClient {
   // 参与者的webrtc连接，如果连接为null，说明加入会议，但是连接还没有建立
   final Map<String, PlatformParticipant> _remoteParticipants = {};
 
+  // 已经加入本地流的webrtc连接
+  final Map<String, AdvancedPeerConnection> _peerConnections = {};
+
   // 参与者的webrtc连接的订阅事件
   final Map<String, List<StreamSubscription<WebrtcEvent>>>
       _streamSubscriptions = {};
@@ -66,6 +69,7 @@ class P2pConferenceClient {
     return _joined;
   }
 
+  /// 视频会议的参与者
   Map<String, PlatformParticipant> remoteParticipants() {
     return _remoteParticipants;
   }
@@ -101,6 +105,28 @@ class P2pConferenceClient {
     }
   }
 
+  addLocalStreams(AdvancedPeerConnection peerConnection,
+      List<PeerMediaStream> peerMediaStreams) async {
+    String peerId = peerConnection.peerId;
+    String clientId = peerConnection.clientId;
+    var key = _getKey(peerId, clientId);
+    if (!_peerConnections.containsKey(key)) {
+      _peerConnections[key] = peerConnection;
+      await peerConnection.addLocalStreams(peerMediaStreams);
+    }
+  }
+
+  removeLocalStreams(AdvancedPeerConnection peerConnection,
+      List<PeerMediaStream> peerMediaStreams) async {
+    String peerId = peerConnection.peerId;
+    String clientId = peerConnection.clientId;
+    var key = _getKey(peerId, clientId);
+    if (_peerConnections.containsKey(key)) {
+      _peerConnections.remove(key);
+      await peerConnection.removeLocalStreams(peerMediaStreams);
+    }
+  }
+
   /// 发布本地视频或者音频，如果参数的流为null，则创建本地主视频并发布
   /// 把本地新的peerMediaStream加入到会议的所有连接中，并且都重新协商
   publish({List<PeerMediaStream>? peerMediaStreams}) async {
@@ -120,10 +146,7 @@ class P2pConferenceClient {
     }
     List<AdvancedPeerConnection> pcs = await peerConnections;
     for (AdvancedPeerConnection peerConnection in pcs) {
-      for (var peerMediaStream in peerMediaStreams) {
-        await peerConnection.addLocalStream(peerMediaStream);
-      }
-      await renegotiate(peerConnection: peerConnection, toggle: true);
+      await addLocalStreams(peerConnection, peerMediaStreams);
     }
   }
 
@@ -132,14 +155,12 @@ class P2pConferenceClient {
     if (joined) {
       List<AdvancedPeerConnection> pcs = await peerConnections;
       for (AdvancedPeerConnection peerConnection in pcs) {
+        await removeLocalStreams(peerConnection, peerMediaStreams);
         for (PeerMediaStream peerMediaStream in peerMediaStreams) {
-          await peerConnection.removeStream(peerMediaStream);
-
           if (peerMediaStream.id != null) {
             await localPeerMediaStreamController.close(peerMediaStream.id!);
           }
         }
-        await renegotiate(peerConnection: peerConnection);
       }
     }
   }
@@ -155,7 +176,6 @@ class P2pConferenceClient {
     var peerId = platformParticipant.peerId;
     var clientId = platformParticipant.clientId!;
     var key = _getKey(peerId, clientId);
-    var name = platformParticipant.name;
     if (!_remoteParticipants.containsKey(key)) {
       _remoteParticipants[key] = platformParticipant;
       logger.w(
@@ -176,14 +196,7 @@ class P2pConferenceClient {
   _onParticipantConnected(AdvancedPeerConnection peerConnection) async {
     String peerId = peerConnection.peerId;
     String clientId = peerConnection.clientId;
-    String name = peerConnection.name;
     var key = _getKey(peerId, clientId);
-    if (!_remoteParticipants.containsKey(key)) {
-      _remoteParticipants[key] =
-          PlatformParticipant(peerId, clientId: clientId, name: name);
-      logger.w(
-          '$key joined conference ${conferenceChatMessageController.conference?.name}');
-    }
     // 只有自己已经加入，才需要加本地流和远程流
     if (_joined) {
       if (!_streamSubscriptions.containsKey(key)) {
@@ -211,13 +224,7 @@ class P2pConferenceClient {
 
       List<PeerMediaStream> peerMediaStreams =
           localPeerMediaStreamController.peerMediaStreams;
-      if (peerMediaStreams.isNotEmpty) {
-        for (var peerMediaStream in peerMediaStreams) {
-          await peerConnection.addLocalStream(peerMediaStream);
-        }
-        await renegotiate(peerConnection: peerConnection, toggle: true);
-      }
-
+      await addLocalStreams(peerConnection, peerMediaStreams);
       await _onStreamPublished(peerConnection);
     }
   }
@@ -277,12 +284,7 @@ class P2pConferenceClient {
     await _onParticipantUnpublish(peerConnection);
     List<PeerMediaStream> peerMediaStreams =
         localPeerMediaStreamController.peerMediaStreams;
-    if (peerMediaStreams.isNotEmpty) {
-      for (PeerMediaStream peerMediaStream in peerMediaStreams) {
-        await peerConnection.removeStream(peerMediaStream);
-      }
-      await renegotiate(peerConnection: peerConnection);
-    }
+    await removeLocalStreams(peerConnection, peerMediaStreams);
   }
 
   /// 从远程视频流的控制器中移除连接的远程视频操作
@@ -375,6 +377,7 @@ class P2pConferenceClient {
     }
     await _disconnect();
     _remoteParticipants.clear();
+    _peerConnections.clear();
     remotePeerMediaStreamController.peerMediaStreams.clear();
     conferenceChatMessageController.terminate();
   }

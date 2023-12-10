@@ -226,27 +226,41 @@ class AdvancedPeerConnection {
   }
 
   ///将本地渲染器包含的流加入连接中，在收到接受视频要求的时候调用
-  Future<bool> addLocalStream(PeerMediaStream peerMediaStream) async {
-    var stream = peerMediaStream.mediaStream;
-    if (stream != null) {
-      var success = await basePeerConnection.addLocalStream(stream);
-      return success;
+  Future<bool> addLocalStreams(List<PeerMediaStream> peerMediaStreams) async {
+    bool result = true;
+    if (peerMediaStreams.isNotEmpty) {
+      for (PeerMediaStream peerMediaStream in peerMediaStreams) {
+        var stream = peerMediaStream.mediaStream;
+        if (stream != null) {
+          bool success = await basePeerConnection.addLocalStream(stream);
+          if (!success) {
+            result = false;
+          }
+        }
+      }
+      await renegotiate(toggle: true);
     }
-    return false;
+
+    return result;
   }
 
   /// 主动从连接中移除本地媒体流，然后会激活onRemoveStream
-  removeStream(PeerMediaStream peerMediaStream) async {
+  removeLocalStreams(List<PeerMediaStream> peerMediaStreams) async {
     if (connectionState ==
         RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
       logger.e('PeerConnection closed');
       return;
     }
-    var streamId = peerMediaStream.id;
-    if (streamId != null) {
-      if (peerMediaStream.mediaStream != null) {
-        await basePeerConnection.removeStream(peerMediaStream.mediaStream!);
+    if (peerMediaStreams.isNotEmpty) {
+      for (PeerMediaStream peerMediaStream in peerMediaStreams) {
+        var streamId = peerMediaStream.id;
+        if (streamId != null) {
+          if (peerMediaStream.mediaStream != null) {
+            await basePeerConnection.removeStream(peerMediaStream.mediaStream!);
+          }
+        }
       }
+      await renegotiate(toggle: true);
     }
   }
 

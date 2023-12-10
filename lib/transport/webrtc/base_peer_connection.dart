@@ -784,52 +784,57 @@ class BasePeerConnection {
   ///被叫不能在第一次的时候主动发起协议过程，主叫或者被叫不在第一次的时候可以发起协商过程
   ///一般情况下系统
   negotiate({bool toggle = false}) async {
-    if (_initiator == null) {
-      logger.e('BasePeerConnection is not init');
-      return;
-    }
+    await _offerLock.synchronized(() async {
+      if (_initiator == null) {
+        logger.e('BasePeerConnection is not init');
+        return;
+      }
 
-    ///如果是从节点，直接发送协商请求，不用等待
-    if (!_initiator!) {
-      await _negotiateAnswer(toggle: toggle);
-      return;
-    }
+      ///如果是从节点，直接发送协商请求，不用等待
+      if (!_initiator!) {
+        await _negotiateAnswer(toggle: toggle);
+        return;
+      }
 
-    ///如果是主节点，判断是否正在协商过程中，必要时缓存起来后续执行
-    if (makingOffer || negotiating) {
-      logger.e('BasePeerConnection is negotiating');
-      renegotiationNeeded = true;
-      return;
-    }
+      ///如果是主节点，判断是否正在协商过程中，必要时缓存起来后续执行
+      if (makingOffer || negotiating) {
+        logger.e('BasePeerConnection is negotiating');
+        renegotiationNeeded = true;
+        return;
+      }
 
-    ///主节点协商开始
-    if (_initiator!) {
-      await _negotiateOffer();
-    }
+      ///主节点协商开始
+      if (_initiator!) {
+        await _negotiateOffer();
+      }
+    });
   }
 
   toggleInitiator() async {
-    if (_initiator == null) {
-      logger.e('BasePeerConnection is not init');
-      return;
-    }
-    if (makingOffer || negotiating) {
-      logger.e('BasePeerConnection is negotiating');
-      toggleInitiatorNeeded = true;
-      return;
-    }
-    initiator = !_initiator!;
-    if (_initiator!) {
-      logger
-          .w('answer received agree renegotiate，will be initiator:$_initiator');
-      await _negotiateOffer();
-    } else {
-      logger.w('offer agree renegotiate toggle，will be initiator:$_initiator');
-      emit(
-          WebrtcEventType.signal,
-          WebrtcSignal('renegotiate',
-              renegotiate: RenegotiateType.agree.name, extension: extension));
-    }
+    await _offerLock.synchronized(() async {
+      if (_initiator == null) {
+        logger.e('BasePeerConnection is not init');
+        return;
+      }
+      if (makingOffer || negotiating) {
+        logger.e('BasePeerConnection is negotiating');
+        toggleInitiatorNeeded = true;
+        return;
+      }
+      initiator = !_initiator!;
+      if (_initiator!) {
+        logger.w(
+            'answer received agree renegotiate，will be initiator:$_initiator');
+        await _negotiateOffer();
+      } else {
+        logger
+            .w('offer agree renegotiate toggle，will be initiator:$_initiator');
+        emit(
+            WebrtcEventType.signal,
+            WebrtcSignal('renegotiate',
+                renegotiate: RenegotiateType.agree.name, extension: extension));
+      }
+    });
   }
 
   ///重新连接，限于主叫，有次数的上限，用于连接被closed的情况下重新连接
