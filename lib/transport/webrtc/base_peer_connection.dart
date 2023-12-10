@@ -297,7 +297,7 @@ class BasePeerConnection {
     "mandatory": {},
     "optional": [
       //如果要与浏览器互通开启DtlsSrtpKeyAgreement,此处不开启
-      {"DtlsSrtpKeyAgreement": true},
+      {"DtlsSrtpKeyAgreement": true, "enableImplicitRollback": true},
     ],
   };
 
@@ -798,9 +798,10 @@ class BasePeerConnection {
 
       ///如果是主节点，判断是否正在协商过程中，必要时缓存起来后续执行
       if (makingOffer || negotiating) {
-        logger.e('BasePeerConnection is negotiating');
-        renegotiationNeeded = true;
-        return;
+        logger.e(
+            'BasePeerConnection is negotiating:${_peerConnection?.signalingState}');
+        // renegotiationNeeded = true;
+        // return;
       }
 
       ///主节点协商开始
@@ -817,7 +818,8 @@ class BasePeerConnection {
         return;
       }
       if (makingOffer || negotiating) {
-        logger.e('BasePeerConnection is negotiating');
+        logger.e(
+            'BasePeerConnection is negotiating:${_peerConnection?.signalingState}');
         toggleInitiatorNeeded = true;
         return;
       }
