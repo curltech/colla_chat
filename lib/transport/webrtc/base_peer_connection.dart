@@ -458,7 +458,7 @@ class BasePeerConnection {
   ///可输入的参数包括外部媒体流和定制扩展属性
   Future<bool> init(bool initiator, SignalExtension extension,
       {List<MediaStream> localStreams = const []}) async {
-    this.initiator = initiator;
+    _initiator = initiator;
     logger.i('init BasePeerConnection initiator:$initiator');
     id = await cryptoGraphy.getRandomAsciiString(length: 8);
     aesKey = extension.aesKey;
@@ -681,11 +681,12 @@ class BasePeerConnection {
     }
     if (state == RTCSignalingState.RTCSignalingStateStable) {
       logger.w('RTCSignalingState is stable');
+
+      ///先执行协商请求，切换操作放在最后
       if (renegotiationNeeded) {
         renegotiationNeeded = false;
         await negotiate();
-      }
-      if (toggleInitiatorNeeded) {
+      } else if (toggleInitiatorNeeded) {
         toggleInitiatorNeeded = false;
         await toggleInitiator();
       }
@@ -787,15 +788,23 @@ class BasePeerConnection {
       logger.e('BasePeerConnection is not init');
       return;
     }
-    if (negotiating) {
+
+    ///如果是从节点，直接发送协商请求，不用等待
+    if (!_initiator!) {
+      await _negotiateAnswer(toggle: toggle);
+      return;
+    }
+
+    ///如果是主节点，判断是否正在协商过程中，必要时缓存起来后续执行
+    if (makingOffer || negotiating) {
       logger.e('BasePeerConnection is negotiating');
       renegotiationNeeded = true;
       return;
     }
+
+    ///主节点协商开始
     if (_initiator!) {
       await _negotiateOffer();
-    } else {
-      await _negotiateAnswer(toggle: toggle);
     }
   }
 
@@ -804,7 +813,7 @@ class BasePeerConnection {
       logger.e('BasePeerConnection is not init');
       return;
     }
-    if (negotiating) {
+    if (makingOffer || negotiating) {
       logger.e('BasePeerConnection is negotiating');
       toggleInitiatorNeeded = true;
       return;
@@ -813,7 +822,7 @@ class BasePeerConnection {
     if (_initiator!) {
       logger
           .w('answer received agree renegotiate，will be initiator:$_initiator');
-      await negotiate();
+      await _negotiateOffer();
     } else {
       logger.w('offer agree renegotiate toggle，will be initiator:$_initiator');
       emit(
@@ -872,12 +881,11 @@ class BasePeerConnection {
       return;
     }
 
+    makingOffer = true;
     RTCPeerConnection peerConnection = _peerConnection!;
     RTCSignalingState? signalingState = _peerConnection?.signalingState;
     logger.i(
         'peerConnection signalingState:$signalingState before setLocalDescription');
-
-    makingOffer = true;
     RTCSessionDescription? offer;
     if (signalingState == null ||
         signalingState == RTCSignalingState.RTCSignalingStateStable) {
@@ -1201,12 +1209,14 @@ class BasePeerConnection {
         logger.e('offer received renegotiate request');
       }
     } else if (RenegotiateType.toggle.name == webrtcSignal.renegotiate) {
+      ///收到切换的请求发送同意的回复
       if (_initiator != null && !_initiator!) {
         logger.e('received toggle signal:$_initiator');
       } else {
         toggleInitiator();
       }
     } else if (RenegotiateType.agree.name == webrtcSignal.renegotiate) {
+      ///收到同意切换的回复
       if (_initiator != null && _initiator!) {
         logger.e('received agree signal:$_initiator');
       } else {
