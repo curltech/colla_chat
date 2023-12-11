@@ -177,7 +177,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
       emailServiceProvider =
           platformEmailServiceProvider.domainNameServiceProviders[domain];
     } else {
-      String? smtpServerHost = values['smtpServerHost'];
+      String smtpServerHost = values['smtpServerHost'];
       String? smtpServerPort = values['smtpServerPort'];
       if (StringUtil.isEmpty(smtpServerHost) ||
           StringUtil.isEmpty(smtpServerPort)) {
@@ -188,7 +188,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
         }
         return;
       }
-      String? imapServerHost = values['imapServerHost'];
+      String imapServerHost = values['imapServerHost']!;
       String? imapServerPort = values['imapServerPort'];
       if (StringUtil.isEmpty(imapServerHost) ||
           StringUtil.isEmpty(imapServerPort)) {
@@ -209,7 +209,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
         authentication: Authentication.plain,
         usernameType: UsernameType.emailAddress,
       );
-      String? popServerHost = values['popServerHost'];
+      String popServerHost = values['popServerHost']!;
       String? popServerPort = values['popServerPort'];
       ServerConfig? popServerConfig;
       if (StringUtil.isNotEmpty(popServerHost) ||
