@@ -644,7 +644,7 @@ class BasePeerConnection {
       onConnected();
     }
     if (state == RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
-      logger.e('Connection closed:$state');
+      logger.w('Connection closed:$state');
       close();
     }
     emit(WebrtcEventType.connectionState, state);
@@ -656,13 +656,13 @@ class BasePeerConnection {
       logger.e('Ice connection disconnected:$state');
 
       ///一般可以自动恢复，尝试重新协商
-      await negotiate();
+      //await negotiate();
     }
     if (state == RTCIceConnectionState.RTCIceConnectionStateFailed) {
       logger.e('Ice connection failure:$state');
 
       ///尝试重新协商
-      await negotiate();
+      //await negotiate();
     }
   }
 

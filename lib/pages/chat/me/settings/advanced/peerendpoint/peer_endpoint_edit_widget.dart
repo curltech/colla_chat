@@ -38,6 +38,7 @@ final List<PlatformDataField> peerEndpointColumnFieldDefs = [
   PlatformDataField(
       name: 'priority',
       label: 'Priority',
+      dataType: DataType.int,
       prefixIcon: Icon(
         Icons.low_priority,
         color: myself.primary,
