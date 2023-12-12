@@ -35,16 +35,15 @@ class PeerEndpointController extends DataListController<PeerEndpoint> {
   init() async {
     List<PeerEndpoint> peerEndpoints =
         await peerEndpointService.findAllPeerEndpoint();
-    clear();
+    data.clear();
     if (peerEndpoints.isNotEmpty) {
       addAll(peerEndpoints);
     } else {
       for (var peerEndpoint in nodeAddressOptions.values) {
         peerEndpointService.insert(peerEndpoint);
-        data.add(peerEndpoint);
+        add(peerEndpoint);
       }
     }
-    notifyListeners();
   }
 
   PeerEndpoint? find({String? peerId, String? address}) {
