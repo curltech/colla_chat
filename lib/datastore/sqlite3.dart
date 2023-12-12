@@ -9,6 +9,7 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/chat/conference.dart';
+import 'package:colla_chat/service/dht/peerendpoint.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/entity_util.dart';
@@ -49,6 +50,7 @@ class Sqlite3 extends DataStore {
         drop(conferenceService.tableName);
       }
     }
+    drop(peerEndpointService.tableName);
     await localSharedPreferences.save('appVersion', appVersion);
     print('new appVersion:$appVersion');
 
