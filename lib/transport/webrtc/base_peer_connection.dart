@@ -676,20 +676,9 @@ class BasePeerConnection {
     logger.w('RTCSignalingState was changed to:$state');
     if (state == RTCSignalingState.RTCSignalingStateClosed) {
       logger.w('RTCSignalingState is closed');
-      renegotiationNeeded = false;
-      toggleInitiatorNeeded = false;
     }
     if (state == RTCSignalingState.RTCSignalingStateStable) {
       logger.w('RTCSignalingState is stable');
-
-      ///先执行协商请求，切换操作放在最后
-      if (renegotiationNeeded) {
-        renegotiationNeeded = false;
-        await negotiate();
-      } else if (toggleInitiatorNeeded) {
-        toggleInitiatorNeeded = false;
-        await toggleInitiator();
-      }
     }
     emit(WebrtcEventType.signalingState, state);
   }
@@ -784,73 +773,55 @@ class BasePeerConnection {
   ///被叫不能在第一次的时候主动发起协议过程，主叫或者被叫不在第一次的时候可以发起协商过程
   ///一般情况下系统
   negotiate({bool toggle = false}) async {
-    await _offerLock.synchronized(() async {
-      if (_initiator == null) {
-        logger.e('BasePeerConnection is not init');
-        return;
-      }
+    if (_initiator == null) {
+      logger.e('BasePeerConnection is not init');
+      return;
+    }
 
-      ///如果是从节点，直接发送协商请求，不用等待
-      if (!_initiator!) {
-        await _negotiateAnswer(toggle: toggle);
-        return;
-      }
+    ///如果是主节点，判断是否正在协商过程中，必要时缓存起来后续执行
+    if (makingOffer || negotiating) {
+      logger.w(
+          'when negotiate, BasePeerConnection is negotiating:${_peerConnection?.signalingState}');
+    }
 
-      ///如果是主节点，判断是否正在协商过程中，必要时缓存起来后续执行
-      if (makingOffer || negotiating) {
-        logger.e(
-            'BasePeerConnection is negotiating:${_peerConnection?.signalingState}');
-        // renegotiationNeeded = true;
-        // return;
-      }
-
-      ///主节点协商开始
-      if (_initiator!) {
-        await _negotiateOffer();
-      }
-    });
+    ///主节点协商开始
+    if (_initiator!) {
+      await _negotiateOffer();
+    } else {
+      await _negotiateAnswer(toggle: toggle);
+    }
   }
 
   toggleInitiator() async {
-    await _offerLock.synchronized(() async {
-      if (_initiator == null) {
-        logger.e('BasePeerConnection is not init');
-        return;
-      }
-      if (makingOffer || negotiating) {
-        logger.e(
-            'BasePeerConnection is negotiating:${_peerConnection?.signalingState}');
-        toggleInitiatorNeeded = true;
-        return;
-      }
-      initiator = !_initiator!;
-      if (_initiator!) {
-        logger.w(
-            'answer received agree renegotiate，will be initiator:$_initiator');
-        await _negotiateOffer();
-      } else {
+    if (_initiator == null) {
+      logger.e('BasePeerConnection is not init');
+      return;
+    }
+    int delayTime = 0;
+    if (makingOffer || negotiating) {
+      delayTime = delayTime + 1;
+      logger.e(
+          'when toggleInitiator, BasePeerConnection is negotiating:${_peerConnection?.signalingState}, delayTime:$delayTime');
+    }
+    if (_initiator!) {
+      delayTime = delayTime + 1;
+      Future.delayed(Duration(seconds: delayTime), () async {
+        initiator = false;
         logger
             .w('offer agree renegotiate toggle，will be initiator:$_initiator');
         emit(
             WebrtcEventType.signal,
             WebrtcSignal('renegotiate',
                 renegotiate: RenegotiateType.agree.name, extension: extension));
-      }
-    });
-  }
-
-  ///重新连接，限于主叫，有次数的上限，用于连接被closed的情况下重新连接
-  ///当次数超过上限后连接将被关闭
-  reconnect() async {
-    if (_initiator == true && reconnectTimes > 0) {
-      logger.w('will be renegotiate');
-      reconnectTimes--;
-      // init(extension: extension!);
-      await negotiate();
-      // await negotiate();
+      });
     } else {
-      logger.w('will be close');
-      close();
+      Future.delayed(Duration(seconds: delayTime), () async {
+        initiator = true;
+        logger.w(
+            'answer received agree renegotiate，will be initiator:$_initiator');
+        toggleInitiatorNeeded = false;
+        await _negotiateOffer();
+      });
     }
   }
 
@@ -1054,6 +1025,7 @@ class BasePeerConnection {
           WebrtcEventType.signal,
           WebrtcSignal('renegotiate',
               renegotiate: RenegotiateType.toggle.name, extension: extension));
+      toggleInitiatorNeeded = true;
     } else {
       emit(
           WebrtcEventType.signal,

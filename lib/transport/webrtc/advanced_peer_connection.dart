@@ -18,6 +18,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 ///基础的PeerConnection之上加入了业务的编号，peerId和clientId，自动进行信号的协商
 class AdvancedPeerConnection {
   late BasePeerConnection basePeerConnection;
+  List<PeerMediaStream> localPeerMediaStreams = [];
 
   //对方的参数
   //主叫创建的时候，一般clientId为空，需要在后面填写
@@ -232,6 +233,7 @@ class AdvancedPeerConnection {
       for (PeerMediaStream peerMediaStream in peerMediaStreams) {
         var stream = peerMediaStream.mediaStream;
         if (stream != null) {
+          localPeerMediaStreams.add(peerMediaStream);
           bool success = await basePeerConnection.addLocalStream(stream);
           if (!success) {
             result = false;
@@ -256,6 +258,7 @@ class AdvancedPeerConnection {
         var streamId = peerMediaStream.id;
         if (streamId != null) {
           if (peerMediaStream.mediaStream != null) {
+            localPeerMediaStreams.remove(peerMediaStream);
             await basePeerConnection.removeStream(peerMediaStream.mediaStream!);
           }
         }

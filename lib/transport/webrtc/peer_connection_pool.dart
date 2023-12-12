@@ -217,7 +217,7 @@ class PeerConnectionPool {
       {String clientId = unknownClientId,
       Conference? conference,
       List<Map<String, String>>? iceServers,
-      List<PeerMediaStream> localRenders = const []}) async {
+      List<PeerMediaStream> localStreams = const []}) async {
     AdvancedPeerConnection? peerConnection =
         await _connLock.synchronized(() async {
       AdvancedPeerConnection? peerConnection =
@@ -229,7 +229,7 @@ class PeerConnectionPool {
       //创建新的主叫方
       peerConnection = AdvancedPeerConnection(peerId, clientId: clientId);
       bool result = await peerConnection.init(true,
-          iceServers: iceServers, localPeerMediaStreams: localRenders);
+          iceServers: iceServers, localPeerMediaStreams: localStreams);
       if (!result) {
         logger.e('webrtcPeer.init fail');
         return null;
@@ -343,7 +343,7 @@ class PeerConnectionPool {
     return peerConnections_;
   }
 
-  Future<List<AdvancedPeerConnection>> getAll() async {
+  List<AdvancedPeerConnection> get all {
     List<AdvancedPeerConnection> peerConnections = [];
     for (var peers in _peerConnections.all) {
       for (var peer in peers.values) {
@@ -355,47 +355,46 @@ class PeerConnectionPool {
 
   /// 清除过一段时间仍没有连接上的连接
   clear() async {
-    List<AdvancedPeerConnection> removedPeerConnections = [];
-    for (var peerId in _peerConnections.keys()) {
-      Map<String, AdvancedPeerConnection>? peerConnections =
-          _peerConnections.get(peerId);
-      if (peerConnections != null && peerConnections.isNotEmpty) {
-        for (AdvancedPeerConnection peerConnection in peerConnections.values) {
-          bool removeNeeded = (peerConnection.dataChannelState == null ||
-                  peerConnection.dataChannelState ==
-                      RTCDataChannelState.RTCDataChannelClosed) ||
-              // (peerConnection.signalingState ==
-              //     RTCSignalingState.RTCSignalingStateHaveRemoteOffer) ||
-              // (peerConnection.signalingState ==
-              //     RTCSignalingState.RTCSignalingStateHaveLocalOffer) ||
-              peerConnection.connectionState ==
-                  RTCPeerConnectionState.RTCPeerConnectionStateFailed ||
-              peerConnection.connectionState ==
-                  RTCPeerConnectionState.RTCPeerConnectionStateDisconnected ||
-              peerConnection.connectionState ==
-                  RTCPeerConnectionState.RTCPeerConnectionStateClosed;
-          if (removeNeeded) {
-            var start = peerConnection.basePeerConnection.start;
-            if (start == null) {
-              removedPeerConnections.add(peerConnection);
-              logger.e(
-                  'peerConnection peerId:${peerConnection.peerId},name:${peerConnection.name} start time is null');
-            } else {
-              var now = DateTime.now().millisecondsSinceEpoch;
-              var gap = now - start;
-              var limit = clearDuration;
-              if (gap > limit.inMilliseconds) {
-                removedPeerConnections.add(peerConnection);
-                logger.e(
-                    'peerConnection peerId:${peerConnection.peerId},name:${peerConnection.name} is overtime unconnected:${peerConnection.connectionState}:${peerConnection.signalingState}');
-              }
-            }
+    for (AdvancedPeerConnection peerConnection in all) {
+      bool removeNeeded = (peerConnection.dataChannelState == null ||
+              peerConnection.dataChannelState ==
+                  RTCDataChannelState.RTCDataChannelClosed) ||
+          // (peerConnection.signalingState ==
+          //     RTCSignalingState.RTCSignalingStateHaveRemoteOffer) ||
+          // (peerConnection.signalingState ==
+          //     RTCSignalingState.RTCSignalingStateHaveLocalOffer) ||
+          peerConnection.connectionState ==
+              RTCPeerConnectionState.RTCPeerConnectionStateFailed ||
+          peerConnection.connectionState ==
+              RTCPeerConnectionState.RTCPeerConnectionStateDisconnected ||
+          peerConnection.connectionState ==
+              RTCPeerConnectionState.RTCPeerConnectionStateClosed;
+      if (removeNeeded) {
+        var start = peerConnection.basePeerConnection.start;
+        if (start == null) {
+          close(peerConnection.peerId, clientId: peerConnection.clientId);
+          logger.e(
+              'peerConnection peerId:${peerConnection.peerId},name:${peerConnection.name} start time is null');
+        } else {
+          var now = DateTime.now().millisecondsSinceEpoch;
+          var gap = now - start;
+          var limit = clearDuration;
+          if (gap > limit.inMilliseconds) {
+            close(peerConnection.peerId, clientId: peerConnection.clientId);
+            logger.e(
+                'peerConnection peerId:${peerConnection.peerId},name:${peerConnection.name} is overtime unconnected:${peerConnection.connectionState}:${peerConnection.signalingState}');
           }
         }
       }
     }
-    for (var removedPeerConnection in removedPeerConnections) {
-      await removedPeerConnection.close();
+  }
+
+  ///重新连接
+  Future<AdvancedPeerConnection?> reconnect(AdvancedPeerConnection peerConnection) async {
+    bool? initiator = peerConnection.basePeerConnection.initiator;
+    if (initiator != null && initiator) {
+      await close(peerConnection.peerId, clientId: peerConnection.clientId);
+      return await createOffer(peerConnection.peerId, localStreams: peerConnection.localPeerMediaStreams);
     }
   }
 
