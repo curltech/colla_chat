@@ -804,7 +804,7 @@ class BasePeerConnection {
           'when toggleInitiator, BasePeerConnection is negotiating:${_peerConnection?.signalingState}, delayTime:$delayTime');
     }
     if (_initiator!) {
-      delayTime = delayTime + 1;
+      delayTime = delayTime + 3;
       Future.delayed(Duration(seconds: delayTime), () async {
         initiator = false;
         logger
