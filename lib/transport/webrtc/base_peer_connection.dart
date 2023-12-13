@@ -786,31 +786,32 @@ class BasePeerConnection {
       logger.e('BasePeerConnection is not init');
       return;
     }
-
-    if (!_initiator!) {
-      await _negotiateAnswer(toggle: toggle);
-      return;
-    }
-
-    ///如果是主节点，判断是否正在协商过程中，必要时缓存起来后续执行
-    if (makingOffer || negotiating) {
-      logger.w(
-          'when negotiate, BasePeerConnection is negotiating:${_peerConnection?.signalingState}');
-      if (_initiator! &&
-          RTCSignalingState.RTCSignalingStateHaveLocalOffer ==
-              _peerConnection?.signalingState) {
-        await _negotiateOffer();
-        return;
-      } else {
-        renegotiationNeeded = true;
+    await _offerLock.synchronized(() async {
+      if (!_initiator!) {
+        await _negotiateAnswer(toggle: toggle);
         return;
       }
-    }
 
-    ///主节点协商开始
-    if (_initiator!) {
-      await _negotiateOffer();
-    }
+      ///如果是主节点，判断是否正在协商过程中，必要时缓存起来后续执行
+      if (makingOffer || negotiating) {
+        logger.w(
+            'when negotiate, BasePeerConnection is negotiating:${_peerConnection?.signalingState}');
+        if (_initiator! &&
+            RTCSignalingState.RTCSignalingStateHaveLocalOffer ==
+                _peerConnection?.signalingState) {
+          await _negotiateOffer();
+          return;
+        } else {
+          renegotiationNeeded = true;
+          return;
+        }
+      }
+
+      ///主节点协商开始
+      if (_initiator!) {
+        await _negotiateOffer();
+      }
+    });
   }
 
   toggleInitiator() async {
@@ -818,26 +819,29 @@ class BasePeerConnection {
       logger.e('BasePeerConnection is not init');
       return;
     }
-    if (makingOffer || negotiating) {
-      logger.e(
-          'when toggleInitiator, BasePeerConnection is negotiating:${_peerConnection?.signalingState}');
-      toggleInitiatorNeeded = true;
-      return;
-    }
-    if (_initiator!) {
-      initiator = false;
-      logger.w('offer agree renegotiate toggle，will be initiator:$_initiator');
-      emit(
-          WebrtcEventType.signal,
-          WebrtcSignal('renegotiate',
-              renegotiate: RenegotiateType.agree.name, extension: extension));
-    } else {
-      initiator = true;
-      logger
-          .w('answer received agree renegotiate，will be initiator:$_initiator');
-      toggleInitiatorNeeded = false;
-      await _negotiateOffer();
-    }
+    await _offerLock.synchronized(() async {
+      if (makingOffer || negotiating) {
+        logger.e(
+            'when toggleInitiator, BasePeerConnection is negotiating:${_peerConnection?.signalingState}');
+        toggleInitiatorNeeded = true;
+        return;
+      }
+      if (_initiator!) {
+        initiator = false;
+        logger
+            .w('offer agree renegotiate toggle，will be initiator:$_initiator');
+        emit(
+            WebrtcEventType.signal,
+            WebrtcSignal('renegotiate',
+                renegotiate: RenegotiateType.agree.name, extension: extension));
+      } else {
+        initiator = true;
+        logger.w(
+            'answer received agree renegotiate，will be initiator:$_initiator');
+        toggleInitiatorNeeded = false;
+        await _negotiateOffer();
+      }
+    });
   }
 
   ///发起重新连接的请求，将激活onRenegotiationNeeded，从而调用negotiate进行协商
@@ -1041,7 +1045,6 @@ class BasePeerConnection {
           WebrtcEventType.signal,
           WebrtcSignal('renegotiate',
               renegotiate: RenegotiateType.toggle.name, extension: extension));
-      toggleInitiatorNeeded = true;
     } else {
       emit(
           WebrtcEventType.signal,
