@@ -622,7 +622,8 @@ class BasePeerConnection {
       return;
     }
     if (dataChannel != null &&
-        dataChannel!.state == RTCDataChannelState.RTCDataChannelOpen &&
+        (dataChannel!.state == null ||
+            dataChannel!.state == RTCDataChannelState.RTCDataChannelOpen) &&
         _peerConnection?.connectionState ==
             RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
       logger
