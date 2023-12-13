@@ -676,9 +676,18 @@ class BasePeerConnection {
     logger.w('RTCSignalingState was changed to:$state');
     if (state == RTCSignalingState.RTCSignalingStateClosed) {
       logger.w('RTCSignalingState is closed');
+      renegotiationNeeded = false;
+      toggleInitiatorNeeded = false;
     }
     if (state == RTCSignalingState.RTCSignalingStateStable) {
       logger.w('RTCSignalingState is stable');
+      if (renegotiationNeeded) {
+        renegotiationNeeded = false;
+        negotiate();
+      } else if (toggleInitiatorNeeded) {
+        toggleInitiatorNeeded = false;
+        toggleInitiator();
+      }
     }
     emit(WebrtcEventType.signalingState, state);
   }
@@ -778,17 +787,29 @@ class BasePeerConnection {
       return;
     }
 
+    if (!_initiator!) {
+      await _negotiateAnswer(toggle: toggle);
+      return;
+    }
+
     ///如果是主节点，判断是否正在协商过程中，必要时缓存起来后续执行
     if (makingOffer || negotiating) {
       logger.w(
           'when negotiate, BasePeerConnection is negotiating:${_peerConnection?.signalingState}');
+      if (_initiator! &&
+          RTCSignalingState.RTCSignalingStateHaveLocalOffer ==
+              _peerConnection?.signalingState) {
+        await _negotiateOffer();
+        return;
+      } else {
+        renegotiationNeeded = true;
+        return;
+      }
     }
 
     ///主节点协商开始
     if (_initiator!) {
       await _negotiateOffer();
-    } else {
-      await _negotiateAnswer(toggle: toggle);
     }
   }
 
@@ -797,31 +818,25 @@ class BasePeerConnection {
       logger.e('BasePeerConnection is not init');
       return;
     }
-    int delayTime = 0;
     if (makingOffer || negotiating) {
-      delayTime = delayTime + 1;
       logger.e(
-          'when toggleInitiator, BasePeerConnection is negotiating:${_peerConnection?.signalingState}, delayTime:$delayTime');
+          'when toggleInitiator, BasePeerConnection is negotiating:${_peerConnection?.signalingState}');
+      toggleInitiatorNeeded = true;
+      return;
     }
     if (_initiator!) {
-      delayTime = delayTime + 3;
-      Future.delayed(Duration(seconds: delayTime), () async {
-        initiator = false;
-        logger
-            .w('offer agree renegotiate toggle，will be initiator:$_initiator');
-        emit(
-            WebrtcEventType.signal,
-            WebrtcSignal('renegotiate',
-                renegotiate: RenegotiateType.agree.name, extension: extension));
-      });
+      initiator = false;
+      logger.w('offer agree renegotiate toggle，will be initiator:$_initiator');
+      emit(
+          WebrtcEventType.signal,
+          WebrtcSignal('renegotiate',
+              renegotiate: RenegotiateType.agree.name, extension: extension));
     } else {
-      Future.delayed(Duration(seconds: delayTime), () async {
-        initiator = true;
-        logger.w(
-            'answer received agree renegotiate，will be initiator:$_initiator');
-        toggleInitiatorNeeded = false;
-        await _negotiateOffer();
-      });
+      initiator = true;
+      logger
+          .w('answer received agree renegotiate，will be initiator:$_initiator');
+      toggleInitiatorNeeded = false;
+      await _negotiateOffer();
     }
   }
 
@@ -888,8 +903,8 @@ class BasePeerConnection {
         logger.e('PeerConnection getLocalDescription failure:$e');
       }
     } else {
-      logger
-          .e('PeerConnection create offer, but signalingState:$signalingState');
+      logger.e(
+          'when create offer, signalingState must be Stable or HaveLocalOffer,but signalingState:$signalingState');
     }
     if (offer != null) {
       try {
@@ -987,7 +1002,8 @@ class BasePeerConnection {
           logger.e('peerConnection setRemoteDescription failure:$e');
         }
       } else {
-        logger.e('setRemoteDescription signalingState:$signalingState error');
+        logger.e(
+            'when offer setRemoteDescription, signalingState must be HaveLocalOffer, but is $signalingState');
       }
       try {
         RTCSessionDescription? remoteDescription =
@@ -1052,7 +1068,13 @@ class BasePeerConnection {
 
     RTCSessionDescription? answer;
     try {
-      answer = await peerConnection.createAnswer(sdpConstraints);
+      if (signalingState ==
+          RTCSignalingState.RTCSignalingStateHaveRemoteOffer) {
+        answer = await peerConnection.createAnswer(sdpConstraints);
+      } else {
+        logger.e(
+            'when answer createAnswer, signalingState must be HaveRemoteOffer, but is $signalingState');
+      }
     } catch (e) {
       logger.e('peerConnection createAnswer: $e');
       answer = null;
@@ -1077,7 +1099,8 @@ class BasePeerConnection {
           logger.e('createAnswer failure:$e');
         }
       } else {
-        logger.e('setLocalDescription signalingState:$signalingState error');
+        logger.e(
+            'when answer setLocalDescription, signalingState must be HaveRemoteOffer, but is $signalingState');
       }
 
       await _sendAnswer(answer);
