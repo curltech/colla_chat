@@ -258,6 +258,8 @@ class BasePeerConnection {
   final List<RTCIceCandidate> _pendingIceCandidates = [];
   final List<RTCIceCandidate> _pendingRemoteIceCandidates = [];
 
+  bool negotiating = false;
+
   //完美协商过程需要的状态变量
   bool makingOffer = false; //主叫是否发出offer信号
   bool isSettingRemoteAnswerPending =
@@ -641,11 +643,17 @@ class BasePeerConnection {
   ///连接状态事件
   onConnectionState(RTCPeerConnectionState state) async {
     if (state == RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+      negotiating = false;
       onConnected();
     }
     if (state == RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
       logger.w('Connection closed:$state');
+      negotiating = false;
       close();
+    }
+    if (state == RTCPeerConnectionState.RTCPeerConnectionStateFailed ||
+        state == RTCPeerConnectionState.RTCPeerConnectionStateDisconnected) {
+      negotiating = false;
     }
     emit(WebrtcEventType.connectionState, state);
   }
@@ -678,9 +686,10 @@ class BasePeerConnection {
       logger.w('RTCSignalingState is closed');
       renegotiationNeeded = false;
       toggleInitiatorNeeded = false;
-    }
-    if (state == RTCSignalingState.RTCSignalingStateStable) {
+      negotiating = false;
+    } else if (state == RTCSignalingState.RTCSignalingStateStable) {
       logger.w('RTCSignalingState is stable');
+      negotiating = false;
       if (renegotiationNeeded) {
         renegotiationNeeded = false;
         negotiate();
@@ -688,6 +697,8 @@ class BasePeerConnection {
         toggleInitiatorNeeded = false;
         toggleInitiator();
       }
+    } else {
+      negotiating = true;
     }
     emit(WebrtcEventType.signalingState, state);
   }
@@ -768,16 +779,6 @@ class BasePeerConnection {
     }
   }
 
-  bool get negotiating {
-    RTCSignalingState? signalingState = _peerConnection?.signalingState;
-    if (signalingState == null ||
-        signalingState == RTCSignalingState.RTCSignalingStateStable ||
-        signalingState == RTCSignalingState.RTCSignalingStateClosed) {
-      return false;
-    }
-    return true;
-  }
-
   ///实际开始执行协商过程
   ///被叫不能在第一次的时候主动发起协议过程，主叫或者被叫不在第一次的时候可以发起协商过程
   ///一般情况下系统
@@ -793,7 +794,7 @@ class BasePeerConnection {
       }
 
       ///如果是主节点，判断是否正在协商过程中，必要时缓存起来后续执行
-      if (makingOffer || negotiating) {
+      if (negotiating) {
         logger.w(
             'when negotiate, BasePeerConnection is negotiating:${_peerConnection?.signalingState}');
         if (_initiator! &&
@@ -820,7 +821,7 @@ class BasePeerConnection {
       return;
     }
     await _offerLock.synchronized(() async {
-      if (makingOffer || negotiating) {
+      if (negotiating) {
         logger.e(
             'when toggleInitiator, BasePeerConnection is negotiating:${_peerConnection?.signalingState}');
         toggleInitiatorNeeded = true;
@@ -878,6 +879,7 @@ class BasePeerConnection {
       return;
     }
 
+    negotiating = true;
     makingOffer = true;
     RTCPeerConnection peerConnection = _peerConnection!;
     RTCSignalingState? signalingState = _peerConnection?.signalingState;
@@ -993,6 +995,8 @@ class BasePeerConnection {
         await close();
         return;
       }
+
+      negotiating = true;
       RTCSignalingState? signalingState = peerConnection.signalingState;
       logger.i(
           'peerConnection signalingState:$signalingState, setRemoteDescription want to set ${sdp.type}');
@@ -1163,6 +1167,7 @@ class BasePeerConnection {
       }
       start = DateTime.now().millisecondsSinceEpoch;
       end = null;
+      negotiating = true;
       logger.i('start setRemoteDescription sdp offer:${sdp.type}');
       RTCSignalingState? signalingState = _peerConnection?.signalingState;
       logger.i(
