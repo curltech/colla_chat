@@ -389,15 +389,6 @@ class PeerConnectionPool {
     }
   }
 
-  ///重新连接
-  Future<AdvancedPeerConnection?> reconnect(AdvancedPeerConnection peerConnection) async {
-    bool? initiator = peerConnection.basePeerConnection.initiator;
-    if (initiator != null && initiator) {
-      await close(peerConnection.peerId, clientId: peerConnection.clientId);
-      return await createOffer(peerConnection.peerId, localStreams: peerConnection.localPeerMediaStreams);
-    }
-  }
-
   ///如果不存在，创建被叫，如果存在直接返回
   Future<AdvancedPeerConnection?> createAnswer(String peerId,
       {required String clientId,

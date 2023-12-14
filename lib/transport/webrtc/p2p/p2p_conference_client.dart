@@ -493,7 +493,8 @@ class P2pConferenceClientPool with ChangeNotifier {
   /// 新的连接建立事件，如果各会议的连接中存在已经加入但是连接为建立的情况则更新连接
   onConnected(AdvancedPeerConnection peerConnection) async {
     for (P2pConferenceClient p2pConferenceClient in _conferenceClients.values) {
-      await p2pConferenceClient._onParticipantConnected(peerConnection);
+      // await p2pConferenceClient._onParticipantConnected(peerConnection);
+      await p2pConferenceClient.conferenceChatMessageController.join();
     }
   }
 
