@@ -1,3 +1,4 @@
+import 'package:colla_chat/pages/chat/chat/video/livekit/widget/livekit_sfu_participant_widget.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -54,7 +55,15 @@ class _LiveKitSfuRoomWidgetState extends State<LiveKitSfuRoomWidget>
         tile.endSlideActions = [
           TileData(
               title: 'Add participant',
-              onTap: (int index, String title, {String? subtitle}) {})
+              onTap: (int index, String title, {String? subtitle}) {}),
+          TileData(
+              title: 'Participant',
+              onTap: (int index, String title, {String? subtitle}) {
+                final LiveKitSfuParticipantWidget liveKitSfuParticipantWidget =
+                    LiveKitSfuParticipantWidget(
+                  roomName: name,
+                );
+              })
         ];
 
         tiles.add(tile);
