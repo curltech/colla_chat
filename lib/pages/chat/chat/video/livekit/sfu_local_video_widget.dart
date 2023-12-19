@@ -18,7 +18,7 @@ import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/media_stream_util.dart';
-import 'package:colla_chat/transport/webrtc/livekit/sfu_conference_client.dart';
+import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
@@ -415,8 +415,6 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     LiveKitConferenceClient? liveKitConferenceClient =
         await liveKitConferenceClientPool.createConferenceClient(
             chatSummary: chatSummary, chatMessage);
-    conferenceChatMessageController =
-        liveKitConferenceClient?.conferenceChatMessageController;
     if (liveKitConferenceClient == null ||
         conferenceChatMessageController == null) {
       logger.e('createLiveKitConferenceClient failure!');
@@ -427,6 +425,8 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
       }
       return;
     }
+    conferenceChatMessageController =
+        liveKitConferenceClient.conferenceChatMessageController;
     conferenceChatMessageController.status = VideoChatStatus.calling;
 
     _playAudio();

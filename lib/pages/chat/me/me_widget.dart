@@ -1,4 +1,4 @@
-import 'package:colla_chat/pages/chat/chat/video/livekit/widget/service_client_widget.dart';
+import 'package:colla_chat/pages/chat/chat/video/livekit/widget/livekit_sfu_room_widget.dart';
 import 'package:colla_chat/pages/chat/me/collection/collection_list_view.dart';
 import 'package:colla_chat/pages/chat/me/contact_widget.dart';
 import 'package:colla_chat/pages/chat/me/me_head_widget.dart';
@@ -29,7 +29,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   final ContactWidget contactWidget = const ContactWidget();
   final SystemAlertWindowWidget systemAlertWindowWidget =
       const SystemAlertWindowWidget();
-  final ServiceClientWidget serviceClientWidget = ServiceClientWidget();
+  final LiveKitSfuRoomWidget liveKitSfuRoomWidget = LiveKitSfuRoomWidget();
 
   late final List<TileData> meTileData;
 
@@ -47,7 +47,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
         indexWidgetProvider.define(systemAlertWindowWidget);
       }
     }
-    indexWidgetProvider.define(serviceClientWidget);
+    indexWidgetProvider.define(liveKitSfuRoomWidget);
     List<TileDataMixin> mixins = [
       settingWidget,
       collectionListView,
@@ -66,7 +66,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
         ]);
       }
     }
-    mixins.add(serviceClientWidget);
+    mixins.add(liveKitSfuRoomWidget);
     meTileData = TileData.from(mixins);
     for (var tile in meTileData) {
       tile.dense = false;

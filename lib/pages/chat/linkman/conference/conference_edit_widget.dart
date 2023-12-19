@@ -314,18 +314,18 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
           content: AppLocalizations.t('Must has conference topic'));
       return null;
     }
-    // if (currentConference.sfu) {
-    //   if (StringUtil.isEmpty(current.sfuUri)) {
-    //     DialogUtil.error(context,
-    //         content: AppLocalizations.t('Must has conference sfu uri'));
-    //     return null;
-    //   }
-    //   if (StringUtil.isEmpty(current.sfuToken)) {
-    //     DialogUtil.error(context,
-    //         content: AppLocalizations.t('Must has conference sfu token'));
-    //     return null;
-    //   }
-    // }
+    if (currentConference.sfu) {
+      if (StringUtil.isEmpty(currentConference.sfuUri)) {
+        DialogUtil.error(context,
+            content: AppLocalizations.t('Must has conference sfu uri'));
+        return null;
+      }
+      // if (StringUtil.isEmpty(currentConference.sfuToken)) {
+      //   DialogUtil.error(context,
+      //       content: AppLocalizations.t('Must has conference sfu token'));
+      //   return null;
+      // }
+    }
     if (currentConference.id == null) {
       var participants = conferenceMembers.value;
       if (!participants.contains(myself.peerId!)) {

@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/entity/p2p/chain_message.dart';
+import 'package:colla_chat/p2p/chain/action/manageroom.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_summary.dart';
 import 'package:colla_chat/service/chat/group.dart';
@@ -10,12 +14,174 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/transport/webrtc/livekit/sfu_conference_service_client.dart';
 import 'package:colla_chat/widgets/common/combine_grid_view.dart';
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
 import 'package:livekit_server_sdk/src/proto/livekit_models.pb.dart';
+import 'package:uuid/uuid.dart';
+
+class LiveKitManageRoom {
+  String? manageType;
+
+  int? emptyTimeout;
+
+  String? host;
+
+  String? roomName;
+
+  List<String>? identities;
+
+  List<String>? names;
+
+  List<String>? tokens;
+
+  List<LiveKitParticipant>? participants;
+
+  List<LiveKitRoom>? rooms;
+
+  LiveKitManageRoom() : super();
+
+  LiveKitManageRoom.fromJson(Map json) {
+    manageType = json['manageType'];
+    emptyTimeout = json['emptyTimeout'];
+    host = json['host'];
+    roomName = json['roomName'];
+    identities = json['identities'] != null
+        ? List<String>.from(json['identities'] as List<dynamic>)
+        : null;
+    names = json['names'] != null
+        ? List<String>.from(json['names'] as List<dynamic>)
+        : null;
+    tokens = json['tokens'] != null
+        ? List<String>.from(json['tokens'] as List<dynamic>)
+        : null;
+    List<dynamic>? participants = json['participants'];
+    if (participants != null) {
+      List<LiveKitParticipant> liveKitParticipants = [];
+      for (dynamic participant in participants) {
+        LiveKitParticipant liveKitParticipant =
+            LiveKitParticipant.fromJson(participant);
+        liveKitParticipants.add(liveKitParticipant);
+      }
+      this.participants = liveKitParticipants;
+    }
+    List<dynamic>? rooms = json['rooms'];
+    if (rooms != null) {
+      List<LiveKitRoom> liveKitRooms = [];
+      for (dynamic room in rooms) {
+        LiveKitRoom liveKitRoom = LiveKitRoom.fromJson(room);
+        liveKitRooms.add(liveKitRoom);
+      }
+      this.rooms = liveKitRooms;
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json.addAll({
+      'manageType': manageType,
+      'emptyTimeout': emptyTimeout,
+      'host': host,
+      'roomName': roomName,
+      'identities': identities,
+      'names': names,
+      'tokens': tokens,
+    });
+    if (participants != null) {
+      json['participants'] = JsonUtil.toJson(participants);
+    }
+    if (rooms != null) {
+      json['rooms'] = JsonUtil.toJson(rooms);
+    }
+
+    return json;
+  }
+}
+
+class LiveKitRoom {
+  String? sid;
+
+  int? emptyTimeout;
+
+  String? name;
+
+  DateTime? creationTime;
+
+  String? turnPassword;
+
+  List<String>? enabledCodecs;
+
+  LiveKitRoom() : super();
+
+  LiveKitRoom.fromJson(Map json) {
+    sid = json['sid'];
+    emptyTimeout = json['empty_timeout'];
+    name = json['name'];
+    creationTime = json['creation_time'] != null
+        ? DateTime.fromMillisecondsSinceEpoch(json['creation_time'] * 1000)
+        : null;
+    turnPassword = json['turn_password'];
+    List<dynamic>? enabledCodecs = json['enabled_codecs'];
+    if (enabledCodecs != null) {
+      this.enabledCodecs = [];
+      for (dynamic enabledCodec in enabledCodecs) {
+        this.enabledCodecs!.add(JsonUtil.toJsonString(enabledCodec));
+      }
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json.addAll({
+      'sid': sid,
+      'empty_timeout': emptyTimeout,
+      'name': name,
+      'creation_time': creationTime,
+      'turn_password': turnPassword,
+      'enabled_codes': JsonUtil.toJson(enabledCodecs),
+    });
+    return json;
+  }
+}
+
+class LiveKitParticipant {
+  String? sid;
+
+  int? emptyTimeout;
+
+  String? name;
+
+  DateTime? creationTime;
+
+  String? turnPassword;
+
+  List<String>? enabledCodes;
+
+  LiveKitParticipant() : super();
+
+  LiveKitParticipant.fromJson(Map json) {
+    sid = json['sid'];
+    emptyTimeout = json['emptyTimeout'];
+    name = json['name'];
+    creationTime = json['creationTime'];
+    turnPassword = json['turnPassword'];
+    enabledCodes = json['enabledCodes'];
+  }
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json.addAll({
+      'sid': sid,
+      'emptyTimeout': emptyTimeout,
+      'name': name,
+      'creationTime': creationTime,
+      'turnPassword': turnPassword,
+      'enabledCodes': JsonUtil.toJson(enabledCodes),
+    });
+    return json;
+  }
+}
 
 class ConferenceService extends GeneralBaseService<Conference> {
   Map<String, Conference> conferences = {};
@@ -252,7 +418,8 @@ class ConferenceService extends GeneralBaseService<Conference> {
   }
 
   /// 如果sfu为true，创建sfu的Room
-  Future<Room?> createRoom(Conference conference) async {
+  Future<LiveKitManageRoom?> createRoom(
+      Conference conference, List<String>? participants) async {
     String? startDate = conference.startDate;
     if (startDate == null) {
       startDate = DateUtil.currentDate();
@@ -268,20 +435,111 @@ class ConferenceService extends GeneralBaseService<Conference> {
     }
     bool sfu = conference.sfu;
     if (sfu) {
+      List<String> names = [];
+      if (participants != null) {
+        for (String participant in participants) {
+          String? name;
+          Linkman? linkman =
+              await linkmanService.findCachedOneByPeerId(participant);
+          if (linkman != null) {
+            name = linkman.name;
+            names.add(name);
+          }
+        }
+      }
       String? sfuUri = conference.sfuUri;
-      String? sfuToken = conference.sfuToken;
+      sfuUri ??= await _getHost();
+      conference.sfuUri = sfuUri;
       eDate = DateUtil.toDateTime(endDate);
       DateTime now = DateTime.now();
       Duration emptyTimeout = eDate.difference(now);
-      LiveKitConferenceServiceClient serviceClient =
-          liveKitConferenceServiceClientPool.createServiceClient();
-      Room room = await serviceClient.createRoom(
-          roomName: conference.conferenceId, emptyTimeout: emptyTimeout);
 
-      return room;
+      return await createSfuRoom(conference.conferenceId,
+          emptyTimeout: emptyTimeout, participants: participants, names: names);
     }
 
     return null;
+  }
+
+  Future<String?> _getHost() async {
+    Completer<String?> completer = Completer<String?>();
+    StreamSubscription<ChainMessage> streamSubscription =
+        manageRoomAction.responseStreamController.stream.listen(null);
+    streamSubscription.onData((ChainMessage chainMessage) {
+      LiveKitManageRoom liveKitManageRoom = chainMessage.payload;
+      String? manageType = liveKitManageRoom.manageType;
+      if (manageType == ManageType.get.name) {
+        String? host = liveKitManageRoom.host;
+        streamSubscription.cancel();
+        completer.complete(host);
+      }
+    });
+    manageRoomAction.manageRoom(ManageType.get);
+
+    return completer.future;
+  }
+
+  Future<LiveKitManageRoom> createSfuRoom(String roomName,
+      {Duration emptyTimeout = const Duration(days: 1),
+      List<String>? participants,
+      List<String>? names}) async {
+    Completer<LiveKitManageRoom> completer = Completer<LiveKitManageRoom>();
+    StreamSubscription<ChainMessage> streamSubscription =
+        manageRoomAction.responseStreamController.stream.listen(null);
+    streamSubscription.onData((ChainMessage chainMessage) {
+      LiveKitManageRoom liveKitManageRoom = chainMessage.payload;
+      String? manageType = liveKitManageRoom.manageType;
+      if (manageType == ManageType.create.name) {
+        String? name = liveKitManageRoom.roomName;
+        if (roomName == name) {
+          streamSubscription.cancel();
+          completer.complete(liveKitManageRoom);
+        }
+      }
+    });
+    manageRoomAction.manageRoom(ManageType.create,
+        roomName: roomName,
+        emptyTimeout: emptyTimeout.inSeconds,
+        identities: participants,
+        names: names);
+
+    return completer.future;
+  }
+
+  Future<LiveKitManageRoom> listSfuRoom() async {
+    Completer<LiveKitManageRoom> completer = Completer<LiveKitManageRoom>();
+    StreamSubscription<ChainMessage> streamSubscription =
+        manageRoomAction.responseStreamController.stream.listen(null);
+    streamSubscription.onData((ChainMessage chainMessage) {
+      LiveKitManageRoom liveKitManageRoom = chainMessage.payload;
+      String? manageType = liveKitManageRoom.manageType;
+      if (manageType == ManageType.list.name) {
+        streamSubscription.cancel();
+        completer.complete(liveKitManageRoom);
+      }
+    });
+    manageRoomAction.manageRoom(ManageType.list);
+
+    return completer.future;
+  }
+
+  Future<LiveKitManageRoom> listSfuParticipant(String roomName) async {
+    Completer<LiveKitManageRoom> completer = Completer<LiveKitManageRoom>();
+    StreamSubscription<ChainMessage> streamSubscription =
+        manageRoomAction.responseStreamController.stream.listen(null);
+    streamSubscription.onData((ChainMessage chainMessage) {
+      LiveKitManageRoom liveKitManageRoom = chainMessage.payload;
+      String? manageType = liveKitManageRoom.manageType;
+      if (manageType == ManageType.listParticipant.name) {
+        if (roomName == liveKitManageRoom.roomName) {
+          streamSubscription.cancel();
+          completer.complete(liveKitManageRoom);
+        }
+      }
+    });
+    manageRoomAction.manageRoom(ManageType.listParticipant, roomName: roomName);
+
+    return completer.future;
   }
 }
 

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/video/p2p/video_view_card.dart';
-import 'package:colla_chat/transport/webrtc/livekit/sfu_conference_client.dart';
+import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';

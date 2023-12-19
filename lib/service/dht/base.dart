@@ -8,7 +8,8 @@ abstract class PeerLocationService<T> extends GeneralBaseService<T> {
   PeerLocationService(
       {required super.tableName,
       required super.fields,
-      required super.indexFields});
+      required super.indexFields,
+      super.encryptFields = const []});
 
   Future<List<T>> findByPeerId(String peerId) async {
     var where = 'peerId = ?';
@@ -55,7 +56,8 @@ abstract class PeerEntityService<T> extends PeerLocationService<T> {
   PeerEntityService(
       {required super.tableName,
       required super.fields,
-      required super.indexFields});
+      required super.indexFields,
+      super.encryptFields = const []});
 
   Future<List<T>> findByMobile(String mobile) async {
     var where = 'mobile = ?';

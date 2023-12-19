@@ -3,10 +3,15 @@ import 'package:colla_chat/service/dht/base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 
 class PeerEndpointService extends PeerEntityService<PeerEndpoint> {
-  PeerEndpointService(
-      {required super.tableName,
-      required super.fields,
-      required super.indexFields}) {
+  PeerEndpointService({
+    required super.tableName,
+    required super.fields,
+    required super.indexFields,
+    super.encryptFields = const [
+      'uriKey',
+      'uriSecret',
+    ],
+  }) {
     post = (Map map) {
       return PeerEndpoint.fromJson(map);
     };

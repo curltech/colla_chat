@@ -251,6 +251,7 @@ abstract class CryptographySecurityContextService
         needEncrypt = false;
         securityContext.needEncrypt = false;
         result = false;
+        data = [];
         logger.e('pureEncrypt failure');
       }
     }
@@ -382,7 +383,10 @@ class LinkmanCryptographySecurityContextService
       logger.w("targetPeerId is null, will be set myself peerId encrypted!");
       targetPeerId = myself.peerId;
     }
-    SimplePublicKey? targetPublicKey = await findTargetPublicKey(targetPeerId!);
+    SimplePublicKey? targetPublicKey;
+    if (targetPeerId != null) {
+      targetPublicKey = await findTargetPublicKey(targetPeerId);
+    }
     if (targetPublicKey == null) {
       logger.e("TargetPublicKey is null, will not be encrypted!");
       return null;

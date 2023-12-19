@@ -33,11 +33,9 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/transport/smsclient.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
-import 'package:colla_chat/transport/webrtc/livekit/sfu_conference_service_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/websocket.dart';
 import 'package:uuid/uuid.dart';
-import 'package:livekit_server_sdk/src/proto/livekit_models.pb.dart';
 
 class ChatMessageService extends GeneralBaseService<ChatMessage> {
   Timer? timer;
@@ -477,28 +475,26 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     //   subMessageType: ChatMessageSubType.videoChat,
     // );
     //await store(chatMessage);
-
+    LiveKitManageRoom? liveKitManageRoom;
+    String? sfuUri;
+    List<String>? tokens;
     if (conference.sfu) {
-      Room? room = await conferenceService.createRoom(conference);
-      if (room == null) {
+      liveKitManageRoom =
+          await conferenceService.createRoom(conference, participants);
+      if (liveKitManageRoom == null) {
         logger.e('create Room failure');
+      } else {
+        sfuUri = liveKitManageRoom.host;
+        tokens = liveKitManageRoom.tokens;
       }
     }
     Map<String, dynamic> conferenceMap = JsonUtil.toJson(conference);
     List<ChatMessage> chatMessages = [];
+    int i = 0;
     for (String participant in participants) {
-      String? name;
-      Linkman? linkman =
-          await linkmanService.findCachedOneByPeerId(participant);
-      if (linkman != null) {
-        name = linkman.name;
-      }
-      LiveKitConferenceServiceClient serviceClient =
-          liveKitConferenceServiceClientPool.createServiceClient();
-      String token = serviceClient
-          .createToken(conference.conferenceId, participant, name: name);
+      String token = tokens![i];
       Conference conf = Conference.fromJson(conferenceMap);
-      conf.sfuUri = serviceClient.host;
+      conf.sfuUri = sfuUri;
       conf.sfuToken = token;
 
       ChatMessage chatMessage = await chatMessageService.buildChatMessage(
@@ -515,6 +511,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       );
       await chatMessageService.sendAndStore(chatMessage);
       chatMessages.add(chatMessage);
+      i++;
     }
 
     return chatMessages;

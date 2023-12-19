@@ -11,16 +11,22 @@ class PeerEndpoint extends PeerEntity {
   String? httpConnectAddress;
   String? libp2pConnectAddress;
   String? iceServers;
+  String? uriHost;
+  String? uriKey;
+  String? uriSecret;
 
-  PeerEndpoint(
-      {required String name,
-      required String peerId,
-      this.wsConnectAddress,
-      this.httpConnectAddress,
-      this.libp2pConnectAddress,
-      this.priority = 1,
-      List<Map<String, String>>? iceServers})
-      : super(peerId, name) {
+  PeerEndpoint({
+    required String name,
+    required String peerId,
+    this.wsConnectAddress,
+    this.httpConnectAddress,
+    this.libp2pConnectAddress,
+    this.priority = 1,
+    List<Map<String, String>>? iceServers,
+    this.uriHost,
+    this.uriKey,
+    this.uriSecret,
+  }) : super(peerId, name) {
     if (iceServers != null) {
       this.iceServers = JsonUtil.toJsonString(iceServers);
     }
@@ -35,6 +41,9 @@ class PeerEndpoint extends PeerEntity {
         httpConnectAddress = json['httpConnectAddress'],
         libp2pConnectAddress = json['libp2pConnectAddress'],
         iceServers = json['iceServers'],
+        uriHost = json['uriHost'],
+        uriKey = json['uriKey'],
+        uriSecret = json['uriSecret'],
         super.fromJson(json);
 
   @override
@@ -49,6 +58,9 @@ class PeerEndpoint extends PeerEntity {
       'httpConnectAddress': httpConnectAddress,
       'libp2pConnectAddress': libp2pConnectAddress,
       'iceServers': iceServers,
+      'uriHost': uriHost,
+      'uriKey': uriKey,
+      'uriSecret': uriSecret,
     });
     return json;
   }

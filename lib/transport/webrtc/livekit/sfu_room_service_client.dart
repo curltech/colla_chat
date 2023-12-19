@@ -1,14 +1,15 @@
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:livekit_server_sdk/livekit_server_sdk.dart';
 import 'package:livekit_server_sdk/src/proto/livekit_models.pb.dart';
 
-///创建LiveKit房间的连接客户端
-class LiveKitConferenceServiceClient {
+///创建直连LiveKit服务器的连接客户端，一般不用
+class LiveKitRoomServiceClient {
   String host;
   String apiKey;
   String apiSecret;
   late RoomServiceClient roomServiceClient;
 
-  LiveKitConferenceServiceClient(this.host, this.apiKey, this.apiSecret) {
+  LiveKitRoomServiceClient(this.host, this.apiKey, this.apiSecret) {
     roomServiceClient =
         RoomServiceClient(host: host, apiKey: apiKey, secret: apiSecret);
   }
@@ -54,20 +55,33 @@ class LiveKitConferenceServiceClient {
     return token;
   }
 
-  Future<Room> createRoom(
-      {required String roomName,
-      Duration? emptyTimeout,
-      int? maxParticipants,
-      String? nodeId}) async {
-    emptyTimeout ??= const Duration(hours: 4);
+  Future<List<String>?> createRoom({
+    required String roomName,
+    Duration? emptyTimeout,
+    int? maxParticipants,
+    String? nodeId,
+    List<String>? identities,
+    List<String>? names,
+  }) async {
+    emptyTimeout ??= const Duration(hours: 12);
     CreateOptions options = CreateOptions(
         name: roomName,
         emptyTimeout: emptyTimeout,
         maxParticipants: maxParticipants,
         nodeId: nodeId);
-    Room room = await roomServiceClient.createRoom(options);
+    try {
+      Room room = await roomServiceClient.createRoom(options);
+      if (identities != null) {
+        List<String> tokens = createTokens(
+            roomName: roomName, identities: identities, names: names);
 
-    return room;
+        return tokens;
+      }
+    } catch (e) {
+      logger.e('roomServiceClient createRoom failure:$e');
+    }
+
+    return null;
   }
 
   deleteRoom(String roomName) async {
@@ -91,19 +105,19 @@ class LiveKitConferenceServiceClient {
     await roomServiceClient.removeParticipant(roomName, participant);
   }
 
-  Future<ParticipantInfo> updateParticipant(String roomName, String identity,
+  Future<ParticipantInfo?> updateParticipant(String roomName, String identity,
       String? metadata, ParticipantPermission? permission) async {
     return await roomServiceClient.updateParticipant(
         roomName, identity, metadata, permission);
   }
 
-  Future<TrackInfo> mutePublishedTrack(
+  Future<TrackInfo?> mutePublishedTrack(
       String roomName, String participant, String trackSid, bool muted) async {
     return roomServiceClient.mutePublishedTrack(
         roomName, participant, trackSid, muted);
   }
 
-  Future<Room> updateRoomMetadata(String roomName, String metadata) async {
+  Future<Room?> updateRoomMetadata(String roomName, String metadata) async {
     return await roomServiceClient.updateRoomMetadata(roomName, metadata);
   }
 
@@ -113,38 +127,3 @@ class LiveKitConferenceServiceClient {
         roomName, identity, trackSids, subscribe);
   }
 }
-
-class LiveKitConferenceServiceClientPool {
-  final String defaultHost = "http://192.168.1.50:7880";
-  final String defaultApiKey = "devkey";
-  final String defaultApiSecret = "secret";
-
-  Map<String, LiveKitConferenceServiceClient> serviceClients = {};
-
-  LiveKitConferenceServiceClient createServiceClient(
-      {String? apiKey, String? apiSecret, String? host}) {
-    host ??= defaultHost;
-    apiKey ??= defaultApiKey;
-    apiSecret ??= defaultApiSecret;
-    LiveKitConferenceServiceClient? serviceClient = serviceClients[host];
-    if (serviceClient == null) {
-      serviceClient = LiveKitConferenceServiceClient(host, apiKey, apiSecret);
-      serviceClients[host] = serviceClient;
-    }
-
-    return serviceClient;
-  }
-
-  LiveKitConferenceServiceClient? getServiceClient({String? host}) {
-    host ??= defaultHost;
-    return serviceClients[host];
-  }
-
-  removeServiceClient({String? host}) {
-    host ??= defaultHost;
-    return serviceClients.remove(host);
-  }
-}
-
-final LiveKitConferenceServiceClientPool liveKitConferenceServiceClientPool =
-    LiveKitConferenceServiceClientPool();

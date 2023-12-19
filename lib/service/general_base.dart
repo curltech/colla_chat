@@ -161,10 +161,7 @@ abstract class GeneralBaseService<T> {
       }
     }
     Pagination<T> pagination = Pagination<T>(
-        data: os,
-        count: page.count,
-        offset: page.offset,
-        limit: page.limit);
+        data: os, count: page.count, offset: page.offset, limit: page.limit);
 
     return pagination;
   }
@@ -209,11 +206,11 @@ abstract class GeneralBaseService<T> {
       bool needSign = false}) async {
     Map<String, dynamic> json = JsonUtil.toJson(entity) as Map<String, dynamic>;
     if (encryptFields.isNotEmpty) {
-      SecurityContext securityContext = SecurityContext();
-      securityContext.needCompress = needCompress;
-      securityContext.needEncrypt = needEncrypt;
-      securityContext.needSign = needSign;
       for (var encryptField in encryptFields) {
+        SecurityContext securityContext = SecurityContext();
+        securityContext.needCompress = needCompress;
+        securityContext.needEncrypt = needEncrypt;
+        securityContext.needSign = needSign;
         String? value = json[encryptField];
         if (StringUtil.isNotEmpty(value)) {
           try {
@@ -243,12 +240,12 @@ abstract class GeneralBaseService<T> {
       bool needEncrypt = true,
       bool needSign = false}) async {
     Map<String, dynamic> json = JsonUtil.toJson(entity) as Map<String, dynamic>;
-    SecurityContext securityContext = SecurityContext();
-    securityContext.needCompress = needCompress;
-    securityContext.needEncrypt = needEncrypt;
-    securityContext.needSign = needSign;
     if (encryptFields.isNotEmpty) {
       for (var encryptField in encryptFields) {
+        SecurityContext securityContext = SecurityContext();
+        securityContext.needCompress = needCompress;
+        securityContext.needEncrypt = needEncrypt;
+        securityContext.needSign = needSign;
         String? value = json[encryptField];
         if (StringUtil.isNotEmpty(value)) {
           try {

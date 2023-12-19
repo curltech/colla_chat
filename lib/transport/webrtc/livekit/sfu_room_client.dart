@@ -28,7 +28,7 @@ class LiveKitRoomClient {
   EventsListener<RoomEvent>? _listener;
 
   LiveKitRoomClient(
-      {this.uri = 'ws://192.168.1.50:7880',
+      {required this.uri,
       required this.token,
       this.sharedKey,
       this.adaptiveStream = true,
@@ -508,12 +508,18 @@ class LiveKitConferenceClientPool with ChangeNotifier {
           await conferenceChatMessageController.setChatMessage(chatMessage,
               chatSummary: chatSummary);
           String? token = conferenceChatMessageController.conference?.sfuToken;
-          if (token != null) {
+          String? uri = conferenceChatMessageController.conference?.sfuUri;
+          if (uri != null && token != null) {
+            if (!uri.startsWith('ws://')) {
+              uri = 'ws://$uri';
+            }
             LiveKitRoomClient liveKitRoomClient =
-                LiveKitRoomClient(token: token);
+                LiveKitRoomClient(uri: uri, token: token);
             liveKitConferenceClient = LiveKitConferenceClient(
                 liveKitRoomClient, conferenceChatMessageController);
             _conferenceClients[conferenceId] = liveKitConferenceClient;
+          } else {
+            log.logger.e('createConferenceClient sfu uri or token is null');
           }
         } else {
           ConferenceChatMessageController conferenceChatMessageController =

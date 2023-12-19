@@ -178,6 +178,7 @@ enum MsgType {
   RESPONSE,
   // 消息被拒绝
   REJECT,
+  MANAGEROOM,
   // 可做心跳测试
   PING,
   // 发送聊天报文
