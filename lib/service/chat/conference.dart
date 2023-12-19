@@ -523,21 +523,21 @@ class ConferenceService extends GeneralBaseService<Conference> {
     return completer.future;
   }
 
-  Future<LiveKitManageRoom> listSfuParticipant(String roomName) async {
+  Future<LiveKitManageRoom> listSfuParticipants(String roomName) async {
     Completer<LiveKitManageRoom> completer = Completer<LiveKitManageRoom>();
     StreamSubscription<ChainMessage> streamSubscription =
         manageRoomAction.responseStreamController.stream.listen(null);
     streamSubscription.onData((ChainMessage chainMessage) {
       LiveKitManageRoom liveKitManageRoom = chainMessage.payload;
       String? manageType = liveKitManageRoom.manageType;
-      if (manageType == ManageType.listParticipant.name) {
+      if (manageType == ManageType.listParticipants.name) {
         if (roomName == liveKitManageRoom.roomName) {
           streamSubscription.cancel();
           completer.complete(liveKitManageRoom);
         }
       }
     });
-    manageRoomAction.manageRoom(ManageType.listParticipant, roomName: roomName);
+    manageRoomAction.manageRoom(ManageType.listParticipants, roomName: roomName);
 
     return completer.future;
   }

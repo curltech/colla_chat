@@ -2,7 +2,7 @@ import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 
-enum ManageType { get, create, delete, list, listParticipant }
+enum ManageType { get, create, delete, list, listParticipants }
 
 /// ManageRoom
 class ManageRoomAction extends BaseAction {
