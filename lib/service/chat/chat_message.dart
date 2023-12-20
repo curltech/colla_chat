@@ -475,16 +475,16 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     //   subMessageType: ChatMessageSubType.videoChat,
     // );
     //await store(chatMessage);
-    LiveKitManageRoom? liveKitManageRoom;
     String? sfuUri;
     List<String>? tokens;
     if (conference.sfu) {
-      liveKitManageRoom =
+      LiveKitManageRoom? liveKitManageRoom =
           await conferenceService.createRoom(conference, participants);
       if (liveKitManageRoom == null) {
         logger.e('create Room failure');
       } else {
         sfuUri = liveKitManageRoom.host;
+        conference.sfuUri = sfuUri;
         tokens = liveKitManageRoom.tokens;
       }
     }

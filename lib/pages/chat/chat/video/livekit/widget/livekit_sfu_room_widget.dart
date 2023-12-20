@@ -38,16 +38,15 @@ class _LiveKitSfuRoomWidgetState extends State<LiveKitSfuRoomWidget>
   }
 
   _init() async {
-    LiveKitManageRoom liveKitManageRoom = await conferenceService.listSfuRoom();
+    List<LiveKitRoom>? rooms = await conferenceService.listSfuRoom();
     List<TileData> tiles = [];
-    List<LiveKitRoom>? rooms = liveKitManageRoom.rooms;
     if (rooms != null && rooms.isNotEmpty) {
       for (var room in rooms) {
-        String? name = room.name;
+        String name = room.name ?? '';
         DateTime? creationTime = room.creationTime;
         int? emptyTimeout = room.emptyTimeout;
         TileData tile = TileData(
-          title: name!,
+          title: name,
           subtitle: creationTime.toString(),
           titleTail: emptyTimeout.toString(),
           selected: false,

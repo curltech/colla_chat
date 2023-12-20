@@ -40,10 +40,9 @@ class _LiveKitSfuParticipantWidgetState
   }
 
   _init() async {
-    LiveKitManageRoom liveKitManageRoom =
+    List<LiveKitParticipant>? participants =
         await conferenceService.listSfuParticipants(widget.roomName);
     List<TileData> tiles = [];
-    List<LiveKitParticipant>? participants = liveKitManageRoom.participants;
     if (participants != null && participants.isNotEmpty) {
       for (var participant in participants) {
         String? name = participant.name;

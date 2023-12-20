@@ -92,17 +92,19 @@ abstract class BaseAction {
       String? topic,
       String? targetClientId,
       PayloadType? payloadType}) async {
-    List<int> data;
-    if (payloadType == PayloadType.string) {
-      /// 字符串数据转换成utf-8二进制
-      data = CryptoUtil.stringToUtf8(msg);
-    } else if (payloadType == PayloadType.list) {
-      ///二进制数据直接使用
-      data = msg;
-    } else {
-      ///其他数据先转换成json字符串，然后转换成utf-8二进制
-      String payloadStr = JsonUtil.toJsonString(msg);
-      data = CryptoUtil.stringToUtf8(payloadStr);
+    List<int>? data;
+    if (msg != null) {
+      if (payloadType == PayloadType.string) {
+        /// 字符串数据转换成utf-8二进制
+        data = CryptoUtil.stringToUtf8(msg);
+      } else if (payloadType == PayloadType.list) {
+        ///二进制数据直接使用
+        data = msg;
+      } else {
+        ///其他数据先转换成json字符串，然后转换成utf-8二进制
+        String payloadStr = JsonUtil.toJsonString(msg);
+        data = CryptoUtil.stringToUtf8(payloadStr);
+      }
     }
     return chainMessageHandler.prepareSend(data, msgType,
         connectAddress: connectAddress,

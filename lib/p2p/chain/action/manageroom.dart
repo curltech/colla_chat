@@ -9,17 +9,10 @@ class ManageRoomAction extends BaseAction {
   ManageRoomAction(MsgType msgType) : super(msgType);
 
   Future<bool> manageRoom(ManageType manageType,
-      {String? roomName,
-      int emptyTimeout = 12 * 3600,
-      List<String>? identities,
-      List<String>? names}) async {
-    ChainMessage? chainMessage = await prepareSend({
-      'roomName': roomName,
-      'manageType': manageType.name,
-      'emptyTimeout': emptyTimeout,
-      'identities': identities,
-      'names': names
-    });
+      {LiveKitManageRoom? liveKitManageRoom}) async {
+    liveKitManageRoom ??= LiveKitManageRoom();
+    liveKitManageRoom.manageType = manageType.name;
+    ChainMessage? chainMessage = await prepareSend(liveKitManageRoom);
 
     return await send(chainMessage);
   }

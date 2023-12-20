@@ -461,85 +461,86 @@ class ConferenceService extends GeneralBaseService<Conference> {
     return null;
   }
 
-  Future<String?> _getHost() async {
-    Completer<String?> completer = Completer<String?>();
-    StreamSubscription<ChainMessage> streamSubscription =
+  Future<LiveKitManageRoom> manageRoom(ManageType manageType,
+      {LiveKitManageRoom? liveKitManageRoom}) async {
+    Completer<LiveKitManageRoom> completer = Completer<LiveKitManageRoom>();
+    StreamSubscription<ChainMessage>? streamSubscription =
         manageRoomAction.responseStreamController.stream.listen(null);
     streamSubscription.onData((ChainMessage chainMessage) {
-      LiveKitManageRoom liveKitManageRoom = chainMessage.payload;
-      String? manageType = liveKitManageRoom.manageType;
-      if (manageType == ManageType.get.name) {
-        String? host = liveKitManageRoom.host;
-        streamSubscription.cancel();
-        completer.complete(host);
+      LiveKitManageRoom manageRoom = chainMessage.payload;
+      String? type = manageRoom.manageType;
+      if (type == manageType.name) {
+        String? name = liveKitManageRoom?.roomName;
+        String? roomName = manageRoom.roomName;
+        if (name == null || roomName == name) {
+          streamSubscription?.cancel();
+          streamSubscription = null;
+          completer.complete(manageRoom);
+        }
       }
     });
-    manageRoomAction.manageRoom(ManageType.get);
+    streamSubscription?.onError((err) {
+      streamSubscription?.cancel();
+      streamSubscription = null;
+      completer.completeError(err);
+    });
+    manageRoomAction.manageRoom(manageType,
+        liveKitManageRoom: liveKitManageRoom);
+    Future.delayed(const Duration(seconds: 30), () {
+      if (streamSubscription != null) {
+        streamSubscription?.cancel();
+        streamSubscription = null;
+        completer.completeError('overtime error');
+      }
+    });
 
     return completer.future;
+  }
+
+  Future<String?> _getHost() async {
+    LiveKitManageRoom liveKitManageRoom = await manageRoom(ManageType.get);
+
+    return liveKitManageRoom.host;
   }
 
   Future<LiveKitManageRoom> createSfuRoom(String roomName,
       {Duration emptyTimeout = const Duration(days: 1),
       List<String>? participants,
       List<String>? names}) async {
-    Completer<LiveKitManageRoom> completer = Completer<LiveKitManageRoom>();
-    StreamSubscription<ChainMessage> streamSubscription =
-        manageRoomAction.responseStreamController.stream.listen(null);
-    streamSubscription.onData((ChainMessage chainMessage) {
-      LiveKitManageRoom liveKitManageRoom = chainMessage.payload;
-      String? manageType = liveKitManageRoom.manageType;
-      if (manageType == ManageType.create.name) {
-        String? name = liveKitManageRoom.roomName;
-        if (roomName == name) {
-          streamSubscription.cancel();
-          completer.complete(liveKitManageRoom);
-        }
-      }
-    });
-    manageRoomAction.manageRoom(ManageType.create,
-        roomName: roomName,
-        emptyTimeout: emptyTimeout.inSeconds,
-        identities: participants,
-        names: names);
+    LiveKitManageRoom liveKitManageRoom = LiveKitManageRoom();
+    liveKitManageRoom.roomName = roomName;
+    liveKitManageRoom.emptyTimeout = emptyTimeout.inSeconds;
+    liveKitManageRoom.identities = participants;
+    liveKitManageRoom.names = names;
+    liveKitManageRoom = await manageRoom(ManageType.create,
+        liveKitManageRoom: liveKitManageRoom);
 
-    return completer.future;
+    return liveKitManageRoom;
   }
 
-  Future<LiveKitManageRoom> listSfuRoom() async {
-    Completer<LiveKitManageRoom> completer = Completer<LiveKitManageRoom>();
-    StreamSubscription<ChainMessage> streamSubscription =
-        manageRoomAction.responseStreamController.stream.listen(null);
-    streamSubscription.onData((ChainMessage chainMessage) {
-      LiveKitManageRoom liveKitManageRoom = chainMessage.payload;
-      String? manageType = liveKitManageRoom.manageType;
-      if (manageType == ManageType.list.name) {
-        streamSubscription.cancel();
-        completer.complete(liveKitManageRoom);
-      }
-    });
-    manageRoomAction.manageRoom(ManageType.list);
-
-    return completer.future;
+  Future<bool> deleteRoom(String roomName) async {
+    LiveKitManageRoom liveKitManageRoom = LiveKitManageRoom();
+    liveKitManageRoom.roomName = roomName;
+    liveKitManageRoom = await manageRoom(ManageType.delete,
+        liveKitManageRoom: liveKitManageRoom);
+    String? name = liveKitManageRoom.roomName;
+    if (name == null) {
+      return false;
+    }
+    return name.isNotEmpty;
   }
 
-  Future<LiveKitManageRoom> listSfuParticipants(String roomName) async {
-    Completer<LiveKitManageRoom> completer = Completer<LiveKitManageRoom>();
-    StreamSubscription<ChainMessage> streamSubscription =
-        manageRoomAction.responseStreamController.stream.listen(null);
-    streamSubscription.onData((ChainMessage chainMessage) {
-      LiveKitManageRoom liveKitManageRoom = chainMessage.payload;
-      String? manageType = liveKitManageRoom.manageType;
-      if (manageType == ManageType.listParticipants.name) {
-        if (roomName == liveKitManageRoom.roomName) {
-          streamSubscription.cancel();
-          completer.complete(liveKitManageRoom);
-        }
-      }
-    });
-    manageRoomAction.manageRoom(ManageType.listParticipants, roomName: roomName);
+  Future<List<LiveKitRoom>?> listSfuRoom() async {
+    LiveKitManageRoom liveKitManageRoom = await manageRoom(ManageType.list);
 
-    return completer.future;
+    return liveKitManageRoom.rooms;
+  }
+
+  Future<List<LiveKitParticipant>?> listSfuParticipants(String roomName) async {
+    LiveKitManageRoom liveKitManageRoom =
+        await manageRoom(ManageType.listParticipants);
+
+    return liveKitManageRoom.participants;
   }
 }
 

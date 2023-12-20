@@ -315,11 +315,11 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
       return null;
     }
     if (currentConference.sfu) {
-      if (StringUtil.isEmpty(currentConference.sfuUri)) {
-        DialogUtil.error(context,
-            content: AppLocalizations.t('Must has conference sfu uri'));
-        return null;
-      }
+      // if (StringUtil.isEmpty(currentConference.sfuUri)) {
+      //   DialogUtil.error(context,
+      //       content: AppLocalizations.t('Must has conference sfu uri'));
+      //   return null;
+      // }
       // if (StringUtil.isEmpty(currentConference.sfuToken)) {
       //   DialogUtil.error(context,
       //       content: AppLocalizations.t('Must has conference sfu token'));
@@ -386,7 +386,6 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
       }
     }
     current.participants = conferenceMembers.value;
-    await conferenceService.store(current);
     conferenceNotifier.value = current;
     if (mounted) {
       DialogUtil.info(context,
@@ -428,7 +427,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
             cryptoOption: CryptoOption.group, peerIds: current.participants);
       }
     }
-
+    await conferenceService.store(current);
     if (conferenceController.current == null) {
       conferenceController.add(current);
     }

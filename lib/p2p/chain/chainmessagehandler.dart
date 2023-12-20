@@ -40,7 +40,7 @@ class ChainMessageHandler {
 
   ///发送前的预处理，设置消息的初始值
   ///如果targetPeerId不为空，指的是目标peerclient，否则是直接向connectPeerId的peerendpoint发送信息
-  Future<ChainMessage> prepareSend(List<int> data, MsgType msgType,
+  Future<ChainMessage> prepareSend(List<int>? data, MsgType msgType,
       {String? connectAddress,
       String? connectPeerId,
       String? targetPeerId,
@@ -327,11 +327,13 @@ class ChainMessageHandler {
   /// 如果消息太大，而且被要求分片的话
   /// @param chainMessage
   List<ChainMessage> slice(ChainMessage chainMessage) {
-    List<int> payload = chainMessage.payload as List<int>;
+    List<int>? payload = chainMessage.payload;
     var packSize = (chainMessage.messageType != MsgType.P2PCHAT.name)
         ? packetSize
         : webRtcPacketSize;
-    if (!chainMessage.needSlice || payload.length <= packSize) {
+    if (!chainMessage.needSlice ||
+        payload == null ||
+        payload.length <= packSize) {
       return [chainMessage];
     }
 
