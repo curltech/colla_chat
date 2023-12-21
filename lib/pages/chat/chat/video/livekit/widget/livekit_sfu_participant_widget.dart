@@ -6,12 +6,11 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
+ValueNotifier<String?> roomNameNotifier = ValueNotifier<String?>(null);
+
 /// 创建参与者和管理参与者的界面
 class LiveKitSfuParticipantWidget extends StatefulWidget with TileDataMixin {
-  final String roomName;
-
-  LiveKitSfuParticipantWidget({Key? key, required this.roomName})
-      : super(key: key);
+  LiveKitSfuParticipantWidget({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _LiveKitSfuParticipantWidgetState();
@@ -40,8 +39,12 @@ class _LiveKitSfuParticipantWidgetState
   }
 
   _init() async {
+    String? roomName = roomNameNotifier.value;
+    if (roomName == null) {
+      return;
+    }
     List<LiveKitParticipant>? participants =
-        await conferenceService.listSfuParticipants(widget.roomName);
+        await conferenceService.listSfuParticipants(roomName);
     List<TileData> tiles = [];
     if (participants != null && participants.isNotEmpty) {
       for (var participant in participants) {
@@ -88,7 +91,7 @@ class _LiveKitSfuParticipantWidgetState
           icon: const Icon(Icons.add)),
     ];
     return AppBarView(
-        title: widget.title,
+        title: roomNameNotifier.value,
         withLeading: true,
         rightWidgets: rightWidgets,
         child: _buildSearchRoomView(context));

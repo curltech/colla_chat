@@ -31,6 +31,8 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   final SystemAlertWindowWidget systemAlertWindowWidget =
       const SystemAlertWindowWidget();
   final LiveKitSfuRoomWidget liveKitSfuRoomWidget = LiveKitSfuRoomWidget();
+  final LiveKitSfuParticipantWidget liveKitSfuParticipantWidget =
+      LiveKitSfuParticipantWidget();
 
   late final List<TileData> meTileData;
 
@@ -49,6 +51,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
       }
     }
     indexWidgetProvider.define(liveKitSfuRoomWidget);
+    indexWidgetProvider.define(liveKitSfuParticipantWidget);
     List<TileDataMixin> mixins = [
       settingWidget,
       collectionListView,

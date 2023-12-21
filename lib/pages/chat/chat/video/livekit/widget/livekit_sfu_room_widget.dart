@@ -1,4 +1,5 @@
 import 'package:colla_chat/pages/chat/chat/video/livekit/widget/livekit_sfu_participant_widget.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -64,7 +65,8 @@ class _LiveKitSfuRoomWidgetState extends State<LiveKitSfuRoomWidget>
           TileData(
               title: 'Participant',
               onTap: (int index, String title, {String? subtitle}) {
-                conferenceService.listSfuParticipants(name);
+                roomNameNotifier.value = name;
+                indexWidgetProvider.push('sfu_participant');
               })
         ];
 
