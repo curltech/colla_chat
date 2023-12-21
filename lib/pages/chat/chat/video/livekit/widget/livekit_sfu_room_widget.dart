@@ -53,15 +53,18 @@ class _LiveKitSfuRoomWidgetState extends State<LiveKitSfuRoomWidget>
         );
         tile.endSlideActions = [
           TileData(
+              title: 'Delete',
+              onTap: (int index, String title, {String? subtitle}) {
+                conferenceService.deleteRoom(name);
+                _init();
+              }),
+          TileData(
               title: 'Add participant',
               onTap: (int index, String title, {String? subtitle}) {}),
           TileData(
               title: 'Participant',
               onTap: (int index, String title, {String? subtitle}) {
-                final LiveKitSfuParticipantWidget liveKitSfuParticipantWidget =
-                    LiveKitSfuParticipantWidget(
-                  roomName: name,
-                );
+                conferenceService.listSfuParticipants(name);
               })
         ];
 

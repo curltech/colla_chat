@@ -455,6 +455,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     try {
       await conferenceClient.join();
     } catch (e) {
+      logger.e('join failure:$e');
       if (mounted) {
         DialogUtil.error(context,
             content: AppLocalizations.t('Join conference failure:') +

@@ -114,13 +114,15 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
       inputType: InputType.text,
       dataType: DataType.string,
       prefixIcon: Icon(Icons.edit_location_outlined, color: myself.primary),
+      readOnly: true,
     ),
     PlatformDataField(
       name: 'sfuToken',
       label: 'SfuToken',
-      inputType: InputType.text,
+      inputType: InputType.textarea,
       dataType: DataType.string,
       prefixIcon: Icon(Icons.token, color: myself.primary),
+      readOnly: true,
     ),
   ];
   late final FormInputController controller =
@@ -386,11 +388,6 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
       }
     }
     current.participants = conferenceMembers.value;
-    conferenceNotifier.value = current;
-    if (mounted) {
-      DialogUtil.info(context,
-          content: AppLocalizations.t('Conference has stored completely'));
-    }
 
     ///1.发送视频通邀请话消息,此时消息必须有content,包含conference信息
     ///当前chatSummary可以不存在，因此不需要当前处于聊天场景下，因此是一个静态方法，创建永久conference的时候使用
@@ -409,6 +406,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
               DialogUtil.error(context,
                   content: 'build sfu conference failure');
             }
+            return null;
           }
         }
       } else {
@@ -427,7 +425,13 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
             cryptoOption: CryptoOption.group, peerIds: current.participants);
       }
     }
+
+    conferenceNotifier.value = current;
     await conferenceService.store(current);
+    if (mounted) {
+      DialogUtil.info(context,
+          content: AppLocalizations.t('Conference has stored completely'));
+    }
     if (conferenceController.current == null) {
       conferenceController.add(current);
     }

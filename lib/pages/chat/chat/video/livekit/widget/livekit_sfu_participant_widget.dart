@@ -46,19 +46,14 @@ class _LiveKitSfuParticipantWidgetState
     if (participants != null && participants.isNotEmpty) {
       for (var participant in participants) {
         String? name = participant.name;
-        DateTime? creationTime = participant.creationTime;
-        int? emptyTimeout = participant.emptyTimeout;
+        String? identity = participant.identity;
+        int? joinedAt = participant.joinedAt;
         TileData tile = TileData(
           title: name!,
-          subtitle: creationTime.toString(),
-          titleTail: emptyTimeout.toString(),
+          subtitle: identity.toString(),
+          titleTail: joinedAt.toString(),
           selected: false,
         );
-        tile.endSlideActions = [
-          TileData(
-              title: 'Add participant',
-              onTap: (int index, String title, {String? subtitle}) {})
-        ];
 
         tiles.add(tile);
       }

@@ -148,36 +148,46 @@ class LiveKitRoom {
 class LiveKitParticipant {
   String? sid;
 
-  int? emptyTimeout;
+  int? joinedAt;
+
+  String? identity;
 
   String? name;
 
-  DateTime? creationTime;
+  int? state;
 
-  String? turnPassword;
+  int? version;
 
-  List<String>? enabledCodes;
+  List<String>? permission;
 
   LiveKitParticipant() : super();
 
   LiveKitParticipant.fromJson(Map json) {
     sid = json['sid'];
-    emptyTimeout = json['emptyTimeout'];
+    joinedAt = json['joined_at'];
     name = json['name'];
-    creationTime = json['creationTime'];
-    turnPassword = json['turnPassword'];
-    enabledCodes = json['enabledCodes'];
+    identity = json['identity'];
+    state = json['state'];
+    version = json['version'];
+    Map? permission = json['permission'];
+    if (permission != null) {
+      this.permission = [];
+      for (var p in permission.keys) {
+        this.permission!.add(p.toString());
+      }
+    }
   }
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json.addAll({
       'sid': sid,
-      'emptyTimeout': emptyTimeout,
+      'joined_at': joinedAt,
       'name': name,
-      'creationTime': creationTime,
-      'turnPassword': turnPassword,
-      'enabledCodes': JsonUtil.toJson(enabledCodes),
+      'identity': identity,
+      'state': state,
+      'version': version,
+      'permission': JsonUtil.toJson(permission),
     });
     return json;
   }
@@ -454,8 +464,17 @@ class ConferenceService extends GeneralBaseService<Conference> {
       DateTime now = DateTime.now();
       Duration emptyTimeout = eDate.difference(now);
 
-      return await createSfuRoom(conference.conferenceId,
-          emptyTimeout: emptyTimeout, participants: participants, names: names);
+      LiveKitManageRoom liveKitManageRoom = await createSfuRoom(
+          conference.conferenceId,
+          emptyTimeout: emptyTimeout,
+          participants: participants,
+          names: names);
+      List<String>? tokens = liveKitManageRoom.tokens;
+      if (tokens != null) {
+        conference.sfuToken = JsonUtil.toJsonString(tokens);
+      }
+
+      return liveKitManageRoom;
     }
 
     return null;
@@ -467,15 +486,24 @@ class ConferenceService extends GeneralBaseService<Conference> {
     StreamSubscription<ChainMessage>? streamSubscription =
         manageRoomAction.responseStreamController.stream.listen(null);
     streamSubscription.onData((ChainMessage chainMessage) {
-      LiveKitManageRoom manageRoom = chainMessage.payload;
-      String? type = manageRoom.manageType;
-      if (type == manageType.name) {
-        String? name = liveKitManageRoom?.roomName;
-        String? roomName = manageRoom.roomName;
-        if (name == null || roomName == name) {
+      LiveKitManageRoom manageRoom;
+      if (chainMessage.payload != null) {
+        if (chainMessage.payload is LiveKitManageRoom) {
+          manageRoom = chainMessage.payload;
+          String? type = manageRoom.manageType;
+          if (type == manageType.name) {
+            String? name = liveKitManageRoom?.roomName;
+            String? roomName = manageRoom.roomName;
+            if (name == null || roomName == name) {
+              streamSubscription?.cancel();
+              streamSubscription = null;
+              completer.complete(manageRoom);
+            }
+          }
+        } else {
           streamSubscription?.cancel();
           streamSubscription = null;
-          completer.complete(manageRoom);
+          completer.completeError(chainMessage.payload);
         }
       }
     });
@@ -537,8 +565,10 @@ class ConferenceService extends GeneralBaseService<Conference> {
   }
 
   Future<List<LiveKitParticipant>?> listSfuParticipants(String roomName) async {
-    LiveKitManageRoom liveKitManageRoom =
-        await manageRoom(ManageType.listParticipants);
+    LiveKitManageRoom liveKitManageRoom = LiveKitManageRoom();
+    liveKitManageRoom.roomName = roomName;
+    liveKitManageRoom = await manageRoom(ManageType.listParticipants,
+        liveKitManageRoom: liveKitManageRoom);
 
     return liveKitManageRoom.participants;
   }

@@ -12,6 +12,7 @@ import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
@@ -654,6 +655,15 @@ class ConferenceChatMessageController with ChangeNotifier {
   joinConference() async {
     await openLocalMainPeerMediaStream();
     if (_conference!.sfu) {
+      LiveKitConferenceClient? liveKitConferenceClient =
+          liveKitConferenceClientPool
+              .getConferenceClient(_conference!.conferenceId);
+      if (liveKitConferenceClient != null) {
+        status = VideoChatStatus.chatting;
+      } else {
+        logger.e(
+            'liveKitConferenceClient:${_conference!.conferenceId} is not exist');
+      }
     } else {
       //创建新的视频会议控制器
       P2pConferenceClient? p2pConferenceClient = p2pConferenceClientPool
