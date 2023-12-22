@@ -206,15 +206,12 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     return peerMediaStream;
   }
 
-  /// 退出发布并且关闭视频流
+  /// 关闭单个本地视频窗口的流
   _close(PeerMediaStream peerMediaStream) async {
     LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
     if (conferenceClient != null) {
       await conferenceClient.close([peerMediaStream]);
-    }
-    if (peerMediaStream.id != null) {
-      await localPeerMediaStreamController.close(peerMediaStream.id!);
     }
   }
 
@@ -225,7 +222,6 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     if (conferenceClient != null) {
       await conferenceClient.closeAll();
     }
-    await localPeerMediaStreamController.closeAll();
   }
 
   ///如果正在呼叫calling，停止呼叫，关闭所有的本地视频，呼叫状态改为结束
@@ -240,6 +236,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
       var status = conferenceChatMessageController.status;
       if (status == VideoChatStatus.calling ||
           status == VideoChatStatus.chatting) {
+        await _closeAll();
         await liveKitConferenceClientPool.disconnect(
             conferenceId: conferenceChatMessageController.conferenceId!);
       }
@@ -443,30 +440,44 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
 
   /// 当前会议存在的时候加入当前会议，即开始视频会议
   Future<void> _join() async {
-    LiveKitConferenceClient? conferenceClient =
-        liveKitConferenceClientPool.conferenceClient;
-    if (conferenceClient == null) {
+    ConferenceChatMessageController? conferenceChatMessageController =
+        liveKitConferenceClientPool.conferenceChatMessageController;
+    if (conferenceChatMessageController == null) {
       if (mounted) {
         DialogUtil.error(context,
-            content: AppLocalizations.t('No conference client'));
+            content: AppLocalizations.t('No video chat message controller'));
+      }
+      return;
+    }
+    ChatMessage? chatMessage = conferenceChatMessageController.chatMessage;
+    if (chatMessage == null) {
+      if (mounted) {
+        DialogUtil.error(context,
+            content: AppLocalizations.t('No video chat message'));
+      }
+      return;
+    }
+    Conference? conference = conferenceChatMessageController.conference;
+    if (conference == null) {
+      if (mounted) {
+        DialogUtil.error(context, content: AppLocalizations.t('No conference'));
       }
       return;
     }
     try {
-      await conferenceClient.join();
+      await conferenceChatMessageController.join();
     } catch (e) {
       logger.e('join failure:$e');
       if (mounted) {
         DialogUtil.error(context,
             content: AppLocalizations.t('Join conference failure:') +
-                conferenceClient.conferenceChatMessageController.name!);
+                conferenceChatMessageController.name!);
       }
       return;
     }
     if (mounted) {
       DialogUtil.info(context,
-          content: AppLocalizations.t('Join conference:') +
-              conferenceClient.conferenceChatMessageController.name!);
+          content: AppLocalizations.t('Join conference:') + conference.name);
     }
     _updateView();
   }

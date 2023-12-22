@@ -20,9 +20,6 @@ final Map<String, PeerEndpoint> nodeAddressOptions = {
       // },
       //{"url": "stun:stun.l.google.com:19302"},
     ],
-    uriHost: '192.168.1.50:7880',
-    uriKey: 'devkey',
-    uriSecret: 'secret',
   ),
 };
 

@@ -270,7 +270,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     ConferenceChatMessageController? conferenceChatMessageController =
         p2pConferenceClient?.conferenceChatMessageController;
     var status = conferenceChatMessageController?.status;
-    if (status == VideoChatStatus.chatting) {
+    if (status == VideoChatStatus.calling ||
+        status == VideoChatStatus.chatting) {
       await _closeAll();
       await p2pConferenceClientPool.disconnect(
           conferenceId: conferenceChatMessageController?.conferenceId!);

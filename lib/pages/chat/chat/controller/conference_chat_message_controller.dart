@@ -659,6 +659,7 @@ class ConferenceChatMessageController with ChangeNotifier {
           liveKitConferenceClientPool
               .getConferenceClient(_conference!.conferenceId);
       if (liveKitConferenceClient != null) {
+        await liveKitConferenceClient.join();
         status = VideoChatStatus.chatting;
       } else {
         logger.e(

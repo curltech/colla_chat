@@ -6,6 +6,7 @@ import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart' as log;
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
@@ -260,6 +261,15 @@ class LiveKitConferenceClient {
   // TrackUnpublished	A RemoteParticipant has unpublished a track	x	x
   /// 初始化会议，先连接，然后注册事件
   join() async {
+    Conference? conference = conferenceChatMessageController.conference;
+    if (conference == null) {
+      return;
+    }
+    bool isValid = conferenceService.isValid(conference);
+    if (!isValid) {
+      log.logger.e('conference ${conference.name} is invalid');
+      return;
+    }
     await roomClient.connect();
     roomClient
         .onRoomEvent<ParticipantConnectedEvent>(_onParticipantConnectedEvent);
@@ -272,8 +282,10 @@ class LiveKitConferenceClient {
     roomClient
         .onRoomEvent<LocalTrackUnpublishedEvent>(_onLocalTrackUnpublishedEvent);
     roomClient.onLocalParticipantEvent(_onLocalParticipantEvent);
-    await conferenceChatMessageController.join();
     joined = true;
+    log.logger.w('i joined conference ${conference.name}');
+    await publish(
+        peerMediaStreams: localPeerMediaStreamController.peerMediaStreams);
   }
 
   Map<String, RemoteParticipant> remoteParticipants() {
