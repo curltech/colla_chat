@@ -12,7 +12,7 @@ import 'package:synchronized/synchronized.dart';
 class ChatSummaryService extends GeneralBaseService<ChatSummary> {
   Map<String, ChatSummary> chatSummaries = {};
 
-  Lock _lock = Lock();
+  final Lock _lock = Lock();
 
   ChatSummaryService({
     required super.tableName,

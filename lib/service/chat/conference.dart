@@ -18,7 +18,6 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/combine_grid_view.dart';
 import 'package:flutter/material.dart';
-import 'package:livekit_server_sdk/src/proto/livekit_models.pb.dart';
 import 'package:uuid/uuid.dart';
 
 class LiveKitManageRoom {

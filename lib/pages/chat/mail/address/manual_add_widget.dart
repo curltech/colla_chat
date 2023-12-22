@@ -244,7 +244,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
       clientConfig.addEmailProvider(configEmailProvider);
 
       emailServiceProvider =
-          EmailServiceProvider(domain, imapServerHost!, clientConfig);
+          EmailServiceProvider(domain, imapServerHost, clientConfig);
     }
 
     EmailAddress emailAddress = EmailMessageUtil.buildDiscoverEmailAddress(
