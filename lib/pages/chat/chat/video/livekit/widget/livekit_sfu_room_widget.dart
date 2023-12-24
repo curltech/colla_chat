@@ -45,7 +45,7 @@ class _LiveKitSfuRoomWidgetState extends State<LiveKitSfuRoomWidget>
       for (var room in rooms) {
         String name = room.name ?? '';
         DateTime? creationTime = room.creationTime;
-        int? emptyTimeout = room.emptyTimeout;
+        Duration emptyTimeout = Duration(seconds: room.emptyTimeout ?? 0);
         TileData tile = TileData(
           title: name,
           subtitle: creationTime.toString(),
