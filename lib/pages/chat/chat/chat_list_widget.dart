@@ -489,7 +489,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
         sendReceiveTime = sendReceiveTime != null
             ? DateUtil.formatEasyRead(sendReceiveTime)
             : '';
-        if (subMessageType!=null) {
+        if (subMessageType != null) {
           subtitle = _buildSubtitle(
               subMessageType: subMessageType,
               title: title,
@@ -676,12 +676,16 @@ class _ChatListWidgetState extends State<ChatListWidget>
     rightWidgets.add(const SizedBox(
       width: 10.0,
     ));
-
+    String tooltip = AppLocalizations.t('Websocket status');
+    Websocket? websocket = websocketPool.getDefault();
+    if (websocket != null) {
+      tooltip = websocket.address;
+    }
     var wssWidget = ValueListenableBuilder(
         valueListenable: _socketStatus,
         builder: (context, value, child) {
           return IconButton(
-              tooltip: AppLocalizations.t('Websocket status'),
+              tooltip: tooltip,
               onPressed: _socketStatus.value != SocketStatus.connected
                   ? () async {
                       //缺省的websocket如果不存在，尝试重连

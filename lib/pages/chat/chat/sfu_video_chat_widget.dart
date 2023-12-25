@@ -6,7 +6,7 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.da
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/video/livekit/sfu_local_video_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/livekit/sfu_remote_video_widget.dart';
-import 'package:colla_chat/pages/chat/chat/video/p2p/video_conference_pool_widget.dart';
+import 'package:colla_chat/pages/chat/chat/video/livekit/sfu_video_conference_pool_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -20,15 +20,15 @@ import 'package:flutter/material.dart';
 ///Sfu视频聊天窗口，分页显示本地视频和远程视频
 class SfuVideoChatWidget extends StatefulWidget with TileDataMixin {
   DragOverlay? overlayEntry;
-  final SfuLocalVideoWidget localVideoWidget = const SfuLocalVideoWidget();
-  final SfuRemoteVideoWidget remoteVideoWidget = const SfuRemoteVideoWidget();
-  final VideoConferencePoolWidget videoConferencePoolWidget =
-      VideoConferencePoolWidget();
+  final SfuLocalVideoWidget sfuLocalVideoWidget = const SfuLocalVideoWidget();
+  final SfuRemoteVideoWidget sfuRemoteVideoWidget = const SfuRemoteVideoWidget();
+  final SfuVideoConferencePoolWidget sfuVideoConferencePoolWidget =
+      SfuVideoConferencePoolWidget();
 
   SfuVideoChatWidget({
     Key? key,
   }) : super(key: key) {
-    indexWidgetProvider.define(videoConferencePoolWidget);
+    indexWidgetProvider.define(sfuVideoConferencePoolWidget);
   }
 
   @override
@@ -83,7 +83,7 @@ class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {
       widget.overlayEntry = null;
       indexWidgetProvider.currentMainIndex = 0;
       indexWidgetProvider.push('chat_message');
-      indexWidgetProvider.push('video_chat');
+      indexWidgetProvider.push('sfu_video_chat');
     }
   }
 
@@ -108,9 +108,9 @@ class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {
       itemCount: 2,
       index: index.value,
       itemBuilder: (BuildContext context, int index) {
-        Widget view = widget.localVideoWidget;
+        Widget view = widget.sfuLocalVideoWidget;
         if (index == 1) {
-          view = widget.remoteVideoWidget;
+          view = widget.sfuRemoteVideoWidget;
         }
         return view;
       },
@@ -159,7 +159,7 @@ class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {
     }
     rightWidgets.add(IconButton(
       onPressed: () {
-        indexWidgetProvider.push('video_conference_pool');
+        indexWidgetProvider.push('sfu_video_conference_pool');
       },
       icon: const Icon(Icons.list),
       tooltip: AppLocalizations.t('Conference pool'),

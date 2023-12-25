@@ -4,6 +4,7 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/video/livekit/widget/participant_stats.dart';
 import 'package:colla_chat/plugin/logger.dart' as log;
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/conference.dart';
@@ -252,6 +253,8 @@ class LiveKitConferenceClient {
   LiveKitConferenceClient(
       this.roomClient, this.conferenceChatMessageController);
 
+  Map<String, dynamic> stats = {};
+
   // ParticipantConnected	A RemoteParticipant joins after the local participant.	x
   // ParticipantDisconnected	A RemoteParticipant leaves	x
   // Reconnecting	The connection to the server has been interrupted and it's attempting to reconnect.	x
@@ -288,7 +291,11 @@ class LiveKitConferenceClient {
         peerMediaStreams: localPeerMediaStreamController.peerMediaStreams);
   }
 
-  Map<String, RemoteParticipant> remoteParticipants() {
+  LocalParticipant? get localParticipant {
+    return roomClient.room.localParticipant;
+  }
+
+  Map<String, RemoteParticipant> get remoteParticipants {
     return roomClient.room.participants;
   }
 
@@ -385,7 +392,11 @@ class LiveKitConferenceClient {
 
   /// 远程参与者加入会议
   FutureOr<void> _onParticipantConnectedEvent(ParticipantConnectedEvent event) {
-    log.logger.i('on ParticipantConnectedEvent');
+    List<RemoteTrackPublication<RemoteVideoTrack>> videoTracks =
+        event.participant.videoTracks;
+
+    log.logger.i(
+        'on ParticipantConnectedEvent videoTracks count:${videoTracks.length}');
   }
 
   /// 远程参与者退出会议
@@ -418,6 +429,8 @@ class LiveKitConferenceClient {
         }
         if (peerMediaStream != null) {
           remotePeerMediaStreamController.add(peerMediaStream);
+          log.logger.i(
+              'remotePeerMediaStreamController add peerMediaStream:${peerMediaStream.id}');
         }
       }
     }

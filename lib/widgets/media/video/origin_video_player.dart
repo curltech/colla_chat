@@ -34,7 +34,7 @@ class OriginMediaSource {
         }
       }
     } catch (e) {
-      logger.e("controller.initialize() failed");
+      logger.e("controller.initialize() failed:$e");
       videoPlayerController = null;
     }
 
