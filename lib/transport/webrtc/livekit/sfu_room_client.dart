@@ -52,6 +52,7 @@ class LiveKitRoomClient {
     await room.connect(
       uri,
       token,
+      connectOptions: const ConnectOptions(),
       roomOptions: RoomOptions(
         adaptiveStream: adaptiveStream,
         dynacast: dynacast,

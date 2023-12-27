@@ -399,12 +399,12 @@ class ConferenceChatMessageController with ChangeNotifier {
     if (chatMessage == null) {
       return;
     }
+    ConferenceChange conferenceChange =
+    await conferenceService.store(_conference!);
     //会议视频通话邀请
     //除了向发送方外，还需要向房间的各接收人发送回执，
     //首先检查接收人是否已经存在给自己的回执，不存在或者存在是accepted则发送回执
     //如果存在，如果是rejected或者terminated，则不发送回执
-    ConferenceChange conferenceChange =
-        await conferenceService.store(_conference!);
     var unknownPeerIds = conferenceChange.unknownPeerIds;
     if (unknownPeerIds != null && unknownPeerIds.isNotEmpty) {
       await linkmanService.findLinkman(
