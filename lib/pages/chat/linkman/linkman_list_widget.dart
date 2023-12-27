@@ -448,6 +448,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         var groupName = group.name;
         var peerId = group.peerId;
         var groupOwnerName = group.groupOwnerName;
+        var groupOwnerPeerId = group.groupOwnerPeerId;
         TileData tile = TileData(
             prefix: group.avatarImage ?? AppImage.mdAppImage,
             title: groupName,
@@ -458,24 +459,28 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             },
             routeName: 'group_edit');
         List<TileData> slideActions = [];
-        TileData deleteSlideAction = TileData(
-            title: 'Delete',
-            prefix: Icons.group_remove,
-            onTap: (int index, String label, {String? subtitle}) async {
-              groupController.currentIndex = index;
-              await groupService.removeByGroupId(peerId);
-              groupMemberService
-                  .delete(where: 'groupId=?', whereArgs: [peerId]);
-              await chatSummaryService.removeChatSummary(peerId);
-              await chatMessageService.removeByGroup(peerId);
-              groupController.delete();
-              if (mounted) {
-                DialogUtil.info(context,
-                    content:
-                        '${AppLocalizations.t('Group:')} ${group.name} ${AppLocalizations.t('is deleted')}');
-              }
-            });
-        slideActions.add(deleteSlideAction);
+        if (groupOwnerPeerId == myself.peerId) {
+          TileData deleteSlideAction = TileData(
+              title: 'Delete',
+              prefix: Icons.group_remove,
+              onTap: (int index, String label, {String? subtitle}) async {
+                groupController.currentIndex = index;
+                if (groupOwnerPeerId == myself.peerId) {
+                  await groupService.removeByGroupId(peerId);
+                  groupMemberService
+                      .delete(where: 'groupId=?', whereArgs: [peerId]);
+                  await chatSummaryService.removeChatSummary(peerId);
+                  await chatMessageService.removeByGroup(peerId);
+                  groupController.delete();
+                  if (mounted) {
+                    DialogUtil.info(context,
+                        content:
+                            '${AppLocalizations.t('Group:')} ${group.name} ${AppLocalizations.t('is deleted')}');
+                  }
+                }
+              });
+          slideActions.add(deleteSlideAction);
+        }
         TileData dismissSlideAction = TileData(
             title: 'Dismiss',
             prefix: Icons.group_off,
@@ -518,7 +523,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   }
 
   _buildConferenceTileData() {
-    var conferences = conferenceController.data;
+    List<Conference> conferences = conferenceController.data;
     List<TileData> tiles = [];
     if (conferences.isNotEmpty) {
       for (var conference in conferences) {
@@ -526,6 +531,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         var conferenceId = conference.conferenceId;
         var conferenceOwnerName = conference.conferenceOwnerName;
         var topic = conference.topic;
+        var conferenceOwnerPeerId = conference.conferenceOwnerPeerId;
         TileData tile = TileData(
             prefix: conference.avatarImage ?? AppImage.mdAppImage,
             title: conferenceName,
@@ -538,6 +544,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             },
             routeName: 'conference_edit');
         List<TileData> slideActions = [];
+
         TileData deleteSlideAction = TileData(
             title: 'Delete',
             prefix: Icons.playlist_remove_outlined,

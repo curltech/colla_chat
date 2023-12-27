@@ -4,7 +4,6 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/chat/video/livekit/widget/participant_stats.dart';
 import 'package:colla_chat/plugin/logger.dart' as log;
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/conference.dart';
@@ -124,7 +123,7 @@ class LiveKitRoomClient {
   }
 
   /// 订阅远程参与者的轨道
-  subscribe(List<String> participants) {
+  subscribe(List<String> participants) async {
     for (MapEntry<String, RemoteParticipant> entry
         in room.participants.entries) {
       String participantId = entry.key;
@@ -132,7 +131,28 @@ class LiveKitRoomClient {
         RemoteParticipant participant = entry.value;
         for (RemoteTrackPublication publication
             in participant.trackPublications.values) {
-          publication.subscribe();
+          await publication.subscribe();
+          // await publication.enable();
+          // await publication.disable();
+          // await publication.setVideoFPS(0);
+          // await publication.setVideoQuality(VideoQuality.HIGH);
+          // await publication.updateStreamState(StreamState.active);
+          // await publication.updateSubscriptionAllowed(true);
+        }
+      }
+    }
+  }
+
+  /// 解除订阅远程参与者的轨道
+  unsubscribe(List<String> participants) async {
+    for (MapEntry<String, RemoteParticipant> entry
+        in room.participants.entries) {
+      String participantId = entry.key;
+      if (participants.contains(participantId)) {
+        RemoteParticipant participant = entry.value;
+        for (RemoteTrackPublication publication
+            in participant.trackPublications.values) {
+          await publication.unsubscribe();
         }
       }
     }

@@ -132,6 +132,34 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
     return trackView;
   }
 
+  Widget _buildTrackPublicationWidget(
+      BuildContext context, livekit_client.TrackPublication trackPublication) {
+    List<Widget> children = [];
+    children.add(CommonAutoSizeText('name:${trackPublication.name}'));
+    children.add(CommonAutoSizeText(
+        'encryptionType:${trackPublication.encryptionType}'));
+    children.add(
+        CommonAutoSizeText('isScreenShare:${trackPublication.isScreenShare}'));
+    children.add(CommonAutoSizeText('mimeType:${trackPublication.mimeType}'));
+    children.add(CommonAutoSizeText('muted:${trackPublication.muted}'));
+    children
+        .add(CommonAutoSizeText('simulcasted:${trackPublication.simulcasted}'));
+    children
+        .add(CommonAutoSizeText('subscribed:${trackPublication.subscribed}'));
+
+    livekit_client.Track? track = trackPublication.track;
+    if (track != null) {
+      children.add(CommonAutoSizeText('sid:${track.sid}'));
+      children.add(CommonAutoSizeText('kind:${track.kind}'));
+      children.add(CommonAutoSizeText('muted:${track.muted}'));
+      children.add(CommonAutoSizeText('isActive:${track.isActive}'));
+      children.add(CommonAutoSizeText('mediaType:${track.mediaType}'));
+    }
+    return ListView(
+      children: children,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppBarView(

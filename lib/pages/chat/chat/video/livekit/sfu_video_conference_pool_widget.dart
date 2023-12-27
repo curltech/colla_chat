@@ -3,26 +3,25 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/video/livekit/sfu_video_conference_participant_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/conference/conference_edit_widget.dart';
-import 'package:colla_chat/pages/chat/chat/video/p2p/video_conference_connection_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
-import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
-import 'package:livekit_client/livekit_client.dart';
+import 'package:livekit_client/livekit_client.dart' as livekit_client;
 
 ///Sfu会议池的显示界面
 class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
-  final SfuVideoConferenceParticipantWidget sfuVideoConferenceConnectionWidget =
+  final SfuVideoConferenceParticipantWidget
+      sfuVideoConferenceParticipantWidget =
       SfuVideoConferenceParticipantWidget();
 
   SfuVideoConferencePoolWidget({Key? key}) : super(key: key) {
-    indexWidgetProvider.define(sfuVideoConferenceConnectionWidget);
+    indexWidgetProvider.define(sfuVideoConferenceParticipantWidget);
   }
 
   @override
@@ -62,7 +61,7 @@ class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
             selected: liveKitConferenceClientPool.conferenceId == conferenceId,
             isThreeLine: false,
             onTap: (int index, String title, {String? subtitle}) {},
-            routeName: 'video_conference_connection');
+            routeName: 'sfu_video_conference_participant');
         List<TileData> slideActions = [];
         if (liveKitConferenceClientPool.conferenceId != conferenceId) {
           TileData checkSlideAction = TileData(
@@ -128,15 +127,26 @@ class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
   }
 
   Widget _buildVideoConferenceListView(BuildContext context) {
-    var conferenceView = DataListView(
-      tileData: _buildConferenceTileData(context),
-    );
+    List<Widget> children = [];
+    var conferenceView = SizedBox(
+        height: 200,
+        child: DataListView(
+          tileData: _buildConferenceTileData(context),
+        ));
+    children.add(conferenceView);
+    children.add(Expanded(child: _buildRoomWidget(context)));
 
-    return conferenceView;
+    return Column(
+      children: children,
+    );
   }
 
-  Widget _buildLiveKitConferenceClientView(
-      LiveKitConferenceClient liveKitConferenceClient) {
+  Widget _buildRoomWidget(BuildContext context) {
+    LiveKitConferenceClient? liveKitConferenceClient =
+        liveKitConferenceClientPool.conferenceClient;
+    if (liveKitConferenceClient == null) {
+      return Container();
+    }
     List<Widget> children = [];
     LiveKitRoomClient roomClient = liveKitConferenceClient.roomClient;
     children.add(CommonAutoSizeText('uri:${roomClient.uri}'));
@@ -149,22 +159,25 @@ class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
     children.add(CommonAutoSizeText('simulcast:${roomClient.simulcast}'));
     children.add(CommonAutoSizeText('token:${roomClient.token}'));
     children.add(CommonAutoSizeText('dynacast:${roomClient.dynacast}'));
-    Room room = roomClient.room;
-    children.add(CommonAutoSizeText('name:${room.name}'));
-    children
-        .add(CommonAutoSizeText('canPlaybackAudio:${room.canPlaybackAudio}'));
-    children.add(CommonAutoSizeText('connectionState:${room.connectionState}'));
-    children.add(CommonAutoSizeText('connectOptions:${room.connectOptions}'));
-    children.add(CommonAutoSizeText('speakerOn:${room.speakerOn}'));
-    children.add(CommonAutoSizeText(
-        'selectedAudioInputDeviceId:${room.selectedAudioInputDeviceId}'));
-    children.add(CommonAutoSizeText(
-        'selectedAudioOutputDeviceId:${room.selectedAudioOutputDeviceId}'));
-    children.add(CommonAutoSizeText(
-        'selectedVideoInputDeviceId:${room.selectedVideoInputDeviceId}'));
-    children.add(CommonAutoSizeText('serverRegion:${room.serverRegion}'));
-    children.add(CommonAutoSizeText('serverVersion:${room.serverVersion}'));
-
+    livekit_client.Room room = roomClient.room;
+    if (room.connectionState == livekit_client.ConnectionState.connected) {
+      children.add(CommonAutoSizeText('name:${room.name}'));
+      children
+          .add(CommonAutoSizeText('canPlaybackAudio:${room.canPlaybackAudio}'));
+      children
+          .add(CommonAutoSizeText('connectionState:${room.connectionState}'));
+      // children.add(CommonAutoSizeText('connectOptions:${room.connectOptions.toString()}'));
+      // children.add(CommonAutoSizeText('roomOptions:${room.roomOptions}'));
+      children.add(CommonAutoSizeText('speakerOn:${room.speakerOn}'));
+      children.add(CommonAutoSizeText(
+          'selectedAudioInputDeviceId:${room.selectedAudioInputDeviceId}'));
+      children.add(CommonAutoSizeText(
+          'selectedAudioOutputDeviceId:${room.selectedAudioOutputDeviceId}'));
+      children.add(CommonAutoSizeText(
+          'selectedVideoInputDeviceId:${room.selectedVideoInputDeviceId}'));
+      children.add(CommonAutoSizeText('serverRegion:${room.serverRegion}'));
+      children.add(CommonAutoSizeText('serverVersion:${room.serverVersion}'));
+    }
     return ListView(
       children: children,
     );
