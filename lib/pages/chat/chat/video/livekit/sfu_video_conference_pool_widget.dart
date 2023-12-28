@@ -133,7 +133,9 @@ class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
         child: DataListView(
           tileData: _buildConferenceTileData(context),
         ));
+    children.add(CommonAutoSizeText(AppLocalizations.t('Room')));
     children.add(conferenceView);
+    children.add(CommonAutoSizeText(AppLocalizations.t('Room info')));
     children.add(Expanded(child: _buildRoomWidget(context)));
 
     return Column(
@@ -163,11 +165,14 @@ class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
     if (room.connectionState == livekit_client.ConnectionState.connected) {
       children.add(CommonAutoSizeText('name:${room.name}'));
       children
-          .add(CommonAutoSizeText('canPlaybackAudio:${room.canPlaybackAudio}'));
-      children
           .add(CommonAutoSizeText('connectionState:${room.connectionState}'));
-      // children.add(CommonAutoSizeText('connectOptions:${room.connectOptions.toString()}'));
-      // children.add(CommonAutoSizeText('roomOptions:${room.roomOptions}'));
+      children.add(CommonAutoSizeText(
+          'autoSubscribe:${room.connectOptions.autoSubscribe}'));
+      children.add(CommonAutoSizeText(
+          'encryptionType:${room.roomOptions.e2eeOptions?.encryptionType}'));
+      children
+          .add(CommonAutoSizeText('canPlaybackAudio:${room.canPlaybackAudio}'));
+
       children.add(CommonAutoSizeText('speakerOn:${room.speakerOn}'));
       children.add(CommonAutoSizeText(
           'selectedAudioInputDeviceId:${room.selectedAudioInputDeviceId}'));

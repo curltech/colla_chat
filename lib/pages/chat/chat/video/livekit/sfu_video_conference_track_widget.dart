@@ -9,12 +9,15 @@ import 'package:flutter/material.dart';
 import 'package:livekit_client/livekit_client.dart' as livekit_client;
 import 'package:webrtc_interface/webrtc_interface.dart';
 
-ValueNotifier<livekit_client.RemoteParticipant?> remoteParticipantNotifier =
-    ValueNotifier<livekit_client.RemoteParticipant?>(null);
+ValueNotifier<livekit_client.Participant?> participantNotifier =
+    ValueNotifier<livekit_client.Participant?>(null);
 
 ///Sfu会议池的会议的远程参与者的轨道列表显示界面
 class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
-  const SfuVideoConferenceTrackWidget({Key? key}) : super(key: key);
+  ValueNotifier<livekit_client.TrackPublication?> trackPublication =
+      ValueNotifier<livekit_client.TrackPublication?>(null);
+
+  SfuVideoConferenceTrackWidget({Key? key}) : super(key: key);
 
   @override
   bool get withLeading => true;
@@ -29,42 +32,41 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
   String get title => 'Sfu video conference track';
 
   List<TileData> _buildAudioTrackTileData(BuildContext context) {
-    livekit_client.RemoteParticipant? remoteParticipant =
-        remoteParticipantNotifier.value;
+    livekit_client.Participant? participant = participantNotifier.value;
     List<TileData> tiles = [];
-    if (remoteParticipant == null) {
+    if (participant == null) {
       return tiles;
     }
-    List<livekit_client.RemoteTrackPublication<livekit_client.RemoteAudioTrack>>
-        remoteAudioTrackPublications = remoteParticipant.audioTracks;
-    for (livekit_client.RemoteTrackPublication remoteAudioTrackPublication
-        in remoteAudioTrackPublications) {
-      livekit_client.RemoteTrack? remoteAudioTrack =
-          remoteAudioTrackPublication.track;
-      if (remoteAudioTrack == null) {
+    List<livekit_client.TrackPublication<livekit_client.Track>>
+        audioTrackPublications = participant.audioTracks;
+    for (livekit_client
+        .TrackPublication<livekit_client.Track> audioTrackPublication
+        in audioTrackPublications) {
+      livekit_client.Track? audioTrack = audioTrackPublication.track;
+      if (audioTrack == null) {
         continue;
       }
-      MediaStream stream = remoteAudioTrack.mediaStream;
-      MediaStreamTrack track = remoteAudioTrack.mediaStreamTrack;
+      MediaStream stream = audioTrack.mediaStream;
+      MediaStreamTrack track = audioTrack.mediaStreamTrack;
       String streamId = stream.id;
       String ownerTag = stream.ownerTag;
       var trackId = track.id;
       var kind = track.kind;
       var label = track.label;
       TileData tile = TileData(
-          prefix: kind == 'video'
-              ? const Icon(
-                  Icons.video_call_outlined,
-                )
-              : const Icon(
-                  Icons.audiotrack_outlined,
-                ),
-          title: streamId,
-          titleTail: platformParams.desktop ? ownerTag : null,
-          subtitle: trackId,
-          isThreeLine: false,
-          onTap: (int index, String title, {String? subtitle}) {},
-          routeName: 'peer_connection_show');
+        prefix: kind == 'video'
+            ? const Icon(
+                Icons.video_call_outlined,
+              )
+            : const Icon(
+                Icons.audiotrack_outlined,
+              ),
+        title: streamId,
+        titleTail: platformParams.desktop ? ownerTag : null,
+        subtitle: trackId,
+        isThreeLine: false,
+        onTap: (int index, String title, {String? subtitle}) {},
+      );
 
       tiles.add(tile);
     }
@@ -72,42 +74,40 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
   }
 
   List<TileData> _buildVideoTrackTileData(BuildContext context) {
-    livekit_client.RemoteParticipant? remoteParticipant =
-        remoteParticipantNotifier.value;
+    livekit_client.Participant? participant = participantNotifier.value;
     List<TileData> tiles = [];
-    if (remoteParticipant == null) {
+    if (participant == null) {
       return tiles;
     }
-    List<livekit_client.RemoteTrackPublication<livekit_client.RemoteVideoTrack>>
-        remoteVideoTrackPublications = remoteParticipant.videoTracks;
-    for (livekit_client.RemoteTrackPublication remoteVideoTrackPublication
-        in remoteVideoTrackPublications) {
-      livekit_client.RemoteTrack? remoteVideoTrack =
-          remoteVideoTrackPublication.track;
-      if (remoteVideoTrack == null) {
+    List<livekit_client.TrackPublication<livekit_client.Track>>
+        videoTrackPublications = participant.videoTracks;
+    for (livekit_client.TrackPublication videoTrackPublication
+        in videoTrackPublications) {
+      livekit_client.Track? videoTrack = videoTrackPublication.track;
+      if (videoTrack == null) {
         continue;
       }
-      MediaStream stream = remoteVideoTrack.mediaStream;
-      MediaStreamTrack track = remoteVideoTrack.mediaStreamTrack;
+      MediaStream stream = videoTrack.mediaStream;
+      MediaStreamTrack track = videoTrack.mediaStreamTrack;
       String streamId = stream.id;
       String ownerTag = stream.ownerTag;
       var trackId = track.id;
       var kind = track.kind;
       var label = track.label;
       TileData tile = TileData(
-          prefix: kind == 'video'
-              ? const Icon(
-                  Icons.video_call_outlined,
-                )
-              : const Icon(
-                  Icons.audiotrack_outlined,
-                ),
-          title: streamId,
-          titleTail: platformParams.desktop ? ownerTag : null,
-          subtitle: trackId,
-          isThreeLine: false,
-          onTap: (int index, String title, {String? subtitle}) {},
-          routeName: 'peer_connection_show');
+        prefix: kind == 'video'
+            ? const Icon(
+                Icons.video_call_outlined,
+              )
+            : const Icon(
+                Icons.audiotrack_outlined,
+              ),
+        title: 'streamId:$streamId',
+        titleTail: platformParams.desktop ? ownerTag : null,
+        subtitle: 'trackId:$trackId',
+        isThreeLine: false,
+        onTap: (int index, String title, {String? subtitle}) {},
+      );
 
       tiles.add(tile);
     }
@@ -126,38 +126,52 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
       CommonAutoSizeText(AppLocalizations.t('VideoTrack')),
       DataListView(
         tileData: _buildVideoTrackTileData(context),
-      )
+      ),
+      const SizedBox(
+        height: 15.0,
+      ),
+      _buildTrackPublicationWidget(context),
     ]);
 
     return trackView;
   }
 
-  Widget _buildTrackPublicationWidget(
-      BuildContext context, livekit_client.TrackPublication trackPublication) {
-    List<Widget> children = [];
-    children.add(CommonAutoSizeText('name:${trackPublication.name}'));
-    children.add(CommonAutoSizeText(
-        'encryptionType:${trackPublication.encryptionType}'));
-    children.add(
-        CommonAutoSizeText('isScreenShare:${trackPublication.isScreenShare}'));
-    children.add(CommonAutoSizeText('mimeType:${trackPublication.mimeType}'));
-    children.add(CommonAutoSizeText('muted:${trackPublication.muted}'));
-    children
-        .add(CommonAutoSizeText('simulcasted:${trackPublication.simulcasted}'));
-    children
-        .add(CommonAutoSizeText('subscribed:${trackPublication.subscribed}'));
+  Widget _buildTrackPublicationWidget(BuildContext context) {
+    return ValueListenableBuilder(
+        valueListenable: trackPublication,
+        builder: (BuildContext context,
+            livekit_client.TrackPublication<livekit_client.Track>?
+                trackPublication,
+            Widget? child) {
+          if (trackPublication == null) {
+            return Container();
+          }
+          List<Widget> children = [];
+          children.add(CommonAutoSizeText('name:${trackPublication.name}'));
+          children.add(CommonAutoSizeText(
+              'encryptionType:${trackPublication.encryptionType}'));
+          children.add(CommonAutoSizeText(
+              'isScreenShare:${trackPublication.isScreenShare}'));
+          children
+              .add(CommonAutoSizeText('mimeType:${trackPublication.mimeType}'));
+          children.add(CommonAutoSizeText('muted:${trackPublication.muted}'));
+          children.add(CommonAutoSizeText(
+              'simulcasted:${trackPublication.simulcasted}'));
+          children.add(
+              CommonAutoSizeText('subscribed:${trackPublication.subscribed}'));
 
-    livekit_client.Track? track = trackPublication.track;
-    if (track != null) {
-      children.add(CommonAutoSizeText('sid:${track.sid}'));
-      children.add(CommonAutoSizeText('kind:${track.kind}'));
-      children.add(CommonAutoSizeText('muted:${track.muted}'));
-      children.add(CommonAutoSizeText('isActive:${track.isActive}'));
-      children.add(CommonAutoSizeText('mediaType:${track.mediaType}'));
-    }
-    return ListView(
-      children: children,
-    );
+          livekit_client.Track? track = trackPublication.track;
+          if (track != null) {
+            children.add(CommonAutoSizeText('sid:${track.sid}'));
+            children.add(CommonAutoSizeText('kind:${track.kind}'));
+            children.add(CommonAutoSizeText('muted:${track.muted}'));
+            children.add(CommonAutoSizeText('isActive:${track.isActive}'));
+            children.add(CommonAutoSizeText('mediaType:${track.mediaType}'));
+          }
+          return ListView(
+            children: children,
+          );
+        });
   }
 
   @override

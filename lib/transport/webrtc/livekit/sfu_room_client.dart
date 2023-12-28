@@ -159,6 +159,39 @@ class LiveKitRoomClient {
     }
   }
 
+  /// 对远程参与者排序，排序的次序为：音量，最后说话的时间，是否视频，加入时间
+  List<RemoteParticipant> sort() {
+    List<RemoteParticipant> participants = room.participants.values.toList();
+    participants.sort((a, b) {
+      if (a.isSpeaking && b.isSpeaking) {
+        if (a.audioLevel > b.audioLevel) {
+          return -1;
+        } else {
+          return 1;
+        }
+      }
+
+      // last spoken at
+      final aSpokeAt = a.lastSpokeAt?.millisecondsSinceEpoch ?? 0;
+      final bSpokeAt = b.lastSpokeAt?.millisecondsSinceEpoch ?? 0;
+
+      if (aSpokeAt != bSpokeAt) {
+        return aSpokeAt > bSpokeAt ? -1 : 1;
+      }
+
+      // video on
+      if (a.hasVideo != b.hasVideo) {
+        return a.hasVideo ? -1 : 1;
+      }
+
+      // joinedAt
+      return a.joinedAt.millisecondsSinceEpoch -
+          b.joinedAt.millisecondsSinceEpoch;
+    });
+
+    return participants;
+  }
+
   ///发送数据
   Future<void> publishData(
     List<int> data, {
@@ -316,8 +349,8 @@ class LiveKitConferenceClient {
     return roomClient.room.localParticipant;
   }
 
-  Map<String, RemoteParticipant> get remoteParticipants {
-    return roomClient.room.participants;
+  List<RemoteParticipant> get remoteParticipants {
+    return roomClient.sort();
   }
 
   /// 发布本地视频或者音频，如果参数的流为null，则创建本地主视频并发布
@@ -473,7 +506,8 @@ class LiveKitConferenceClient {
 
   /// 本地发布事件，本地轨道发生变化
   FutureOr<void> _onLocalTrackPublishedEvent(LocalTrackPublishedEvent event) {
-    log.logger.i('on LocalTrackPublishedEvent');
+    log.logger.i(
+        'on LocalTrackPublishedEvent:${event.participant.identity}:${event.publication.subscribed}');
   }
 
   /// 本地退出事件，本地轨道发生变化

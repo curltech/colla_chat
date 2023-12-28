@@ -7,6 +7,7 @@ import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/p2p/chain/action/manageroom.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_summary.dart';
 import 'package:colla_chat/service/chat/group.dart';
@@ -493,6 +494,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
         if (chainMessage.payload is LiveKitManageRoom) {
           manageRoom = chainMessage.payload;
           String? type = manageRoom.manageType;
+          logger.i('manageRoom response payload:$type');
           if (type == manageType.name) {
             String? name = liveKitManageRoom?.roomName;
             String? roomName = manageRoom.roomName;
@@ -503,6 +505,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
             }
           }
         } else {
+          logger.e('manageRoom response payload is not LiveKitManageRoom');
           streamSubscription?.cancel();
           streamSubscription = null;
           completer.completeError(chainMessage.payload);
@@ -510,6 +513,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
       }
     });
     streamSubscription?.onError((err) {
+      logger.e('manageRoom response onError:$err');
       streamSubscription?.cancel();
       streamSubscription = null;
       completer.completeError(err);
@@ -520,7 +524,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
       if (streamSubscription != null) {
         streamSubscription?.cancel();
         streamSubscription = null;
-        completer.completeError('overtime error');
+        completer.completeError('manageRoom response overtime error');
       }
     });
 

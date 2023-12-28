@@ -1,5 +1,5 @@
-import 'package:colla_chat/pages/chat/chat/video/livekit/widget/livekit_sfu_participant_widget.dart';
-import 'package:colla_chat/pages/chat/chat/video/livekit/widget/livekit_sfu_room_widget.dart';
+import 'package:colla_chat/pages/chat/chat/video/livekit/livekit_sfu_participant_widget.dart';
+import 'package:colla_chat/pages/chat/chat/video/livekit/livekit_sfu_room_widget.dart';
 import 'package:colla_chat/pages/chat/me/collection/collection_list_view.dart';
 import 'package:colla_chat/pages/chat/me/contact_widget.dart';
 import 'package:colla_chat/pages/chat/me/me_head_widget.dart';

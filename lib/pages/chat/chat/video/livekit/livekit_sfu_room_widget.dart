@@ -1,4 +1,4 @@
-import 'package:colla_chat/pages/chat/chat/video/livekit/widget/livekit_sfu_participant_widget.dart';
+import 'package:colla_chat/pages/chat/chat/video/livekit/livekit_sfu_participant_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/dialog_util.dart';

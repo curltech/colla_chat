@@ -79,8 +79,8 @@ class ChainMessageHandler {
     }
     chainMessage.connectPeerId = connectPeerId;
     chainMessage.connectAddress = connectAddress;
-    if (connectPeerId != null) {
-      Websocket? websocket = await websocketPool.get(connectPeerId);
+    if (connectAddress != null) {
+      Websocket? websocket = await websocketPool.get(connectAddress);
       if (websocket != null) {
         chainMessage.connectSessionId = websocket.sessionId;
       }

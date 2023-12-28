@@ -1,3 +1,4 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/video/livekit/sfu_participant_stats.dart';
 import 'package:colla_chat/pages/chat/chat/video/livekit/sfu_video_conference_track_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -15,10 +16,7 @@ import 'package:livekit_client/livekit_client.dart' as livekit_client;
 class SfuVideoConferenceParticipantWidget extends StatelessWidget
     with TileDataMixin {
   final SfuVideoConferenceTrackWidget sfuVideoConferenceTrackWidget =
-      const SfuVideoConferenceTrackWidget();
-  final ValueNotifier<livekit_client.RemoteParticipant?>
-      remoteParticipantNotifier =
-      ValueNotifier<livekit_client.RemoteParticipant?>(null);
+      SfuVideoConferenceTrackWidget();
 
   SfuVideoConferenceParticipantWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(sfuVideoConferenceTrackWidget);
@@ -36,41 +34,16 @@ class SfuVideoConferenceParticipantWidget extends StatelessWidget
   @override
   String get title => 'Sfu video conference participant';
 
-  Future<List<TileData>> _buildRemoteParticipantTileData(
-      BuildContext context) async {
+  List<TileData> _buildRemoteParticipantTileData(BuildContext context) {
     LiveKitConferenceClient? liveKitConferenceClient =
         liveKitConferenceClientPool.conferenceClient;
     List<TileData> tiles = [];
     if (liveKitConferenceClient != null) {
       List<livekit_client.RemoteParticipant> remoteParticipants =
-          liveKitConferenceClient.remoteParticipants.values.toList();
+          liveKitConferenceClient.remoteParticipants;
       for (livekit_client.RemoteParticipant remoteParticipant
           in remoteParticipants) {
-        var identity = remoteParticipant.identity;
-        var name = remoteParticipant.name;
-        var joinedAt = remoteParticipant.joinedAt;
-        var connectionQuality = remoteParticipant.connectionQuality;
-        TileData tile = TileData(
-          prefix:
-              connectionQuality == livekit_client.ConnectionQuality.excellent ||
-                      connectionQuality == livekit_client.ConnectionQuality.good
-                  ? const Icon(
-                      Icons.light_mode,
-                      color: Colors.yellow,
-                    )
-                  : const Icon(
-                      Icons.light_mode,
-                      color: Colors.grey,
-                    ),
-          title: name,
-          titleTail: joinedAt.toIso8601String(),
-          subtitle: identity,
-          isThreeLine: false,
-          onTap: (int index, String title, {String? subtitle}) {
-            remoteParticipantNotifier.value = remoteParticipant;
-            // indexWidgetProvider.push('sfu_video_conference_track');
-          },
-        );
+        TileData tile = _buildTileData(remoteParticipant);
 
         tiles.add(tile);
       }
@@ -78,81 +51,96 @@ class SfuVideoConferenceParticipantWidget extends StatelessWidget
     return tiles;
   }
 
-  Widget _buildRemoteParticipantListView(BuildContext context) {
-    var remoteParticipantView = FutureBuilder(
-        future: _buildRemoteParticipantTileData(context),
-        builder:
-            (BuildContext context, AsyncSnapshot<List<TileData>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            List<TileData>? tileData = snapshot.data;
-            tileData ??= [];
-            return SizedBox(
-                height: 200, child: DataListView(tileData: tileData));
-          }
-          return LoadingUtil.buildLoadingIndicator();
+  TileData _buildTileData(livekit_client.Participant participant) {
+    var identity = participant.identity;
+    var name = participant.name;
+    var joinedAt = participant.joinedAt;
+    var connectionQuality = participant.connectionQuality;
+    TileData tile = TileData(
+      prefix: connectionQuality.name,
+      title: name,
+      titleTail: joinedAt.toIso8601String(),
+      subtitle: identity,
+      isThreeLine: false,
+      onTap: (int index, String title, {String? subtitle}) {
+        participantNotifier.value = participant;
+      },
+    );
+    List<TileData> slideActions = [];
+    TileData checkSlideAction = TileData(
+        title: 'Track',
+        prefix: Icons.multitrack_audio_outlined,
+        onTap: (int index, String label, {String? subtitle}) async {
+          participantNotifier.value = participant;
+          indexWidgetProvider.push('sfu_video_conference_track');
         });
-
-    return remoteParticipantView;
+    slideActions.add(checkSlideAction);
+    tile.slideActions = slideActions;
+    return tile;
   }
 
-  Widget _buildRemoteParticipantWidget(BuildContext context) {
-    return ValueListenableBuilder<livekit_client.RemoteParticipant?>(
-        valueListenable: remoteParticipantNotifier,
-        builder: (BuildContext context,
-            livekit_client.RemoteParticipant? remoteParticipant,
+  Widget _buildRemoteParticipantListView(BuildContext context) {
+    List<TileData> tileData = _buildRemoteParticipantTileData(context);
+    return SizedBox(height: 200, child: DataListView(tileData: tileData));
+  }
+
+  Widget _buildParticipantWidget(BuildContext context) {
+    return ValueListenableBuilder<livekit_client.Participant?>(
+        valueListenable: participantNotifier,
+        builder: (BuildContext context, livekit_client.Participant? participant,
             Widget? child) {
-          if (remoteParticipant == null) {
+          if (participant == null) {
             return Container();
           }
-          return _buildParticipantWidget(remoteParticipant);
+          List<Widget> children = [];
+          children.add(CommonAutoSizeText('name:${participant.name}'));
+          children.add(CommonAutoSizeText(
+              'connectionQuality:${participant.connectionQuality}'));
+          children.add(CommonAutoSizeText('joinedAt:${participant.joinedAt}'));
+          children.add(CommonAutoSizeText('identity:${participant.identity}'));
+          children
+              .add(CommonAutoSizeText('audioLevel:${participant.audioLevel}'));
+          children.add(CommonAutoSizeText(
+              'firstTrackEncryptionType:${participant.firstTrackEncryptionType}'));
+          children.add(CommonAutoSizeText('hasAudio:${participant.hasAudio}'));
+          children.add(CommonAutoSizeText('hashCode:${participant.hashCode}'));
+          children.add(CommonAutoSizeText('hasVideo:${participant.hasVideo}'));
+          children.add(
+              CommonAutoSizeText('isEncrypted:${participant.isEncrypted}'));
+          children.add(CommonAutoSizeText('isMuted:${participant.isMuted}'));
+          children.add(
+              CommonAutoSizeText('lastSpokeAt:${participant.lastSpokeAt}'));
+          children.add(
+              CommonAutoSizeText('permissions:${participant.permissions}'));
+          children.add(CommonAutoSizeText('sid:${participant.sid}'));
+          children.add(CommonAutoSizeText(
+              'isCameraEnabled:${participant.isCameraEnabled()}'));
+          children.add(CommonAutoSizeText(
+              'isMicrophoneEnabled:${participant.isMicrophoneEnabled()}'));
+          children.add(CommonAutoSizeText(
+              'isScreenShareEnabled:${participant.isScreenShareEnabled()}'));
+          children.add(SfuParticipantStatsWidget(
+            participant: participant,
+          ));
+          return ListView(
+            children: children,
+          );
         });
   }
 
   Widget _buildLocalParticipantWidget(BuildContext context) {
+    List<TileData> tileData = [];
     LiveKitConferenceClient? liveKitConferenceClient =
         liveKitConferenceClientPool.conferenceClient;
     if (liveKitConferenceClient != null) {
       livekit_client.LocalParticipant? localParticipant =
           liveKitConferenceClient.localParticipant;
       if (localParticipant != null) {
-        return SizedBox(
-            height: 200, child: _buildParticipantWidget(localParticipant));
+        tileData.add(_buildTileData(localParticipant));
       }
     }
 
-    return Container();
-  }
-
-  Widget _buildParticipantWidget(livekit_client.Participant participant) {
-    List<Widget> children = [];
-    children.add(CommonAutoSizeText('name:${participant.name}'));
-    children.add(CommonAutoSizeText(
-        'connectionQuality:${participant.connectionQuality}'));
-    children.add(CommonAutoSizeText('joinedAt:${participant.joinedAt}'));
-    children.add(CommonAutoSizeText('identity:${participant.identity}'));
-    children.add(CommonAutoSizeText('audioLevel:${participant.audioLevel}'));
-    children.add(CommonAutoSizeText(
-        'firstTrackEncryptionType:${participant.firstTrackEncryptionType}'));
-    children.add(CommonAutoSizeText('hasAudio:${participant.hasAudio}'));
-    children.add(CommonAutoSizeText('hashCode:${participant.hashCode}'));
-    children.add(CommonAutoSizeText('hasVideo:${participant.hasVideo}'));
-    children.add(CommonAutoSizeText('isEncrypted:${participant.isEncrypted}'));
-    children.add(CommonAutoSizeText('isMuted:${participant.isMuted}'));
-    children.add(CommonAutoSizeText('lastSpokeAt:${participant.lastSpokeAt}'));
-    children.add(CommonAutoSizeText('permissions:${participant.permissions}'));
-    children.add(CommonAutoSizeText('sid:${participant.sid}'));
-    children.add(
-        CommonAutoSizeText('isCameraEnabled:${participant.isCameraEnabled()}'));
-    children.add(CommonAutoSizeText(
-        'isMicrophoneEnabled:${participant.isMicrophoneEnabled()}'));
-    children.add(CommonAutoSizeText(
-        'isScreenShareEnabled:${participant.isScreenShareEnabled()}'));
-    children.add(SfuParticipantStatsWidget(
-      participant: participant,
-    ));
-    return ListView(
-      children: children,
-    );
+    return SizedBox(height: 200, child: DataListView(tileData: tileData));
   }
 
   @override
@@ -161,9 +149,18 @@ class SfuVideoConferenceParticipantWidget extends StatelessWidget
         title: title,
         withLeading: withLeading,
         child: Column(children: [
+          CommonAutoSizeText(AppLocalizations.t('LocalParticipant')),
           _buildLocalParticipantWidget(context),
+          const SizedBox(
+            height: 15.0,
+          ),
+          CommonAutoSizeText(AppLocalizations.t('RemoteParticipant')),
           _buildRemoteParticipantListView(context),
-          Expanded(child: _buildRemoteParticipantWidget(context)),
+          const SizedBox(
+            height: 15.0,
+          ),
+          CommonAutoSizeText(AppLocalizations.t('Participant info')),
+          Expanded(child: _buildParticipantWidget(context)),
         ]));
   }
 }
