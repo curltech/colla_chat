@@ -325,8 +325,6 @@ class LiveKitConferenceClient {
   LiveKitConferenceClient(
       this.roomClient, this.conferenceChatMessageController);
 
-  Map<String, dynamic> stats = {};
-
   // ParticipantConnected	A RemoteParticipant joins after the local participant.	x
   // ParticipantDisconnected	A RemoteParticipant leaves	x
   // Reconnecting	The connection to the server has been interrupted and it's attempting to reconnect.	x
@@ -407,8 +405,7 @@ class LiveKitConferenceClient {
               videoTrack: localTrackPublication.track! as VideoTrack,
               platformParticipant: platformParticipant,
             );
-            peerMediaStream.participant =
-                roomClient.room.localParticipant;
+            peerMediaStream.participant = roomClient.room.localParticipant;
             localPeerMediaStreamController.mainPeerMediaStream =
                 peerMediaStream;
           }
