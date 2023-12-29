@@ -4,6 +4,7 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/index/global_chat_message.dart';
 import 'package:colla_chat/plugin/logger.dart' as log;
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/conference.dart';
@@ -334,11 +335,14 @@ class LiveKitConferenceClient {
         _onParticipantDisconnectedEvent);
     roomClient.onRoomEvent<TrackPublishedEvent>(_onTrackPublishedEvent);
     roomClient.onRoomEvent<TrackUnpublishedEvent>(_onTrackUnpublishedEvent);
+    roomClient.onRoomEvent<TrackSubscribedEvent>(_onTrackSubscribedEvent);
+    roomClient.onRoomEvent<TrackUnsubscribedEvent>(_onTrackUnsubscribedEvent);
     roomClient
         .onRoomEvent<LocalTrackPublishedEvent>(_onLocalTrackPublishedEvent);
     roomClient
         .onRoomEvent<LocalTrackUnpublishedEvent>(_onLocalTrackUnpublishedEvent);
     roomClient.onLocalParticipantEvent(_onLocalParticipantEvent);
+    roomClient.onRoomEvent<DataReceivedEvent>(_onDataReceivedEvent);
     joined = true;
     log.logger.w('i joined conference ${conference.name}');
     await publish(
@@ -446,22 +450,27 @@ class LiveKitConferenceClient {
 
   /// 远程参与者加入会议
   FutureOr<void> _onParticipantConnectedEvent(ParticipantConnectedEvent event) {
-    List<RemoteTrackPublication<RemoteVideoTrack>> videoTracks =
-        event.participant.videoTracks;
-
     log.logger.i(
-        'on ParticipantConnectedEvent videoTracks count:${videoTracks.length}');
+        'on ParticipantConnectedEvent:${event.participant.identity}:${event.participant.name}');
   }
 
   /// 远程参与者退出会议
   FutureOr<void> _onParticipantDisconnectedEvent(
       ParticipantDisconnectedEvent event) {
-    log.logger.i('on ParticipantDisconnectedEvent');
+    log.logger.i(
+        'on ParticipantDisconnectedEvent:${event.participant.identity}:${event.participant.name}');
   }
 
   Future<FutureOr<void>> _onTrackPublishedEvent(
       TrackPublishedEvent event) async {
-    log.logger.i('on TrackPublishedEvent');
+    log.logger.i(
+        'on TrackPublishedEvent:${event.participant.identity}:${event.participant.name}');
+  }
+
+  Future<FutureOr<void>> _onTrackSubscribedEvent(
+      TrackSubscribedEvent event) async {
+    log.logger.i(
+        'on TrackSubscribedEvent:${event.participant.identity}:${event.participant.name}');
     RemoteTrack? track = event.publication.track;
     RemoteParticipant remoteParticipant = event.participant;
     if (track != null) {
@@ -487,12 +496,30 @@ class LiveKitConferenceClient {
               'remotePeerMediaStreamController add peerMediaStream:${peerMediaStream.id}');
         }
       }
+    } else {
+      log.logger.e('on TrackSubscribedEvent track is null');
     }
   }
 
   Future<FutureOr<void>> _onTrackUnpublishedEvent(
       TrackUnpublishedEvent event) async {
-    log.logger.i('on TrackUnpublishedEvent');
+    log.logger.i(
+        'on TrackUnpublishedEvent:${event.participant.identity}:${event.participant.name}');
+    RemoteTrack? track = event.publication.track;
+    if (track != null) {
+      String streamId = track.mediaStream.id;
+      PeerMediaStream? peerMediaStream =
+          await remotePeerMediaStreamController.getPeerMediaStream(streamId);
+      if (peerMediaStream != null) {
+        remotePeerMediaStreamController.close(streamId);
+      }
+    }
+  }
+
+  Future<FutureOr<void>> _onTrackUnsubscribedEvent(
+      TrackUnsubscribedEvent event) async {
+    log.logger.i(
+        'on TrackUnsubscribedEvent:${event.participant.identity}:${event.participant.name}');
     RemoteTrack? track = event.publication.track;
     if (track != null) {
       String streamId = track.mediaStream.id;
@@ -507,13 +534,14 @@ class LiveKitConferenceClient {
   /// 本地发布事件，本地轨道发生变化
   FutureOr<void> _onLocalTrackPublishedEvent(LocalTrackPublishedEvent event) {
     log.logger.i(
-        'on LocalTrackPublishedEvent:${event.participant.identity}:${event.publication.subscribed}');
+        'on LocalTrackPublishedEvent:${event.participant.identity}:${event.participant.name}');
   }
 
   /// 本地退出事件，本地轨道发生变化
   FutureOr<void> _onLocalTrackUnpublishedEvent(
       LocalTrackUnpublishedEvent event) {
-    log.logger.i('on LocalTrackUnpublishedEvent');
+    log.logger.i(
+        'on LocalTrackUnpublishedEvent:${event.participant.identity}:${event.participant.name}');
   }
 
   /// 本地参与者事件
@@ -553,6 +581,17 @@ class LiveKitConferenceClient {
     }
     await localPeerMediaStreamController.closeAll();
     joined = false;
+  }
+
+  FutureOr<void> _onDataReceivedEvent(DataReceivedEvent event) {
+    log.logger.i(
+        'on DataReceivedEvent:${event.participant?.identity}:${event.participant?.name}');
+    List<int> data = event.data;
+    globalChatMessage.onData(data, TransportType.sfu);
+  }
+
+  publishData(List<int> data) async {
+    await roomClient.publishData(data);
   }
 }
 

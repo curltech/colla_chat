@@ -119,9 +119,9 @@ class SfuVideoConferenceParticipantWidget extends StatelessWidget
               'isMicrophoneEnabled:${participant.isMicrophoneEnabled()}'));
           children.add(CommonAutoSizeText(
               'isScreenShareEnabled:${participant.isScreenShareEnabled()}'));
-          children.add(SfuParticipantStatsWidget(
-            participant: participant,
-          ));
+          // children.add(SfuParticipantStatsWidget(
+          //   participant: participant,
+          // ));
           return ListView(
             children: children,
           );

@@ -110,17 +110,24 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
     }
     double width = appDataProvider.secondaryBodyWidth * 0.8;
     // logger.w('secondaryBodyWidth width:${appDataProvider.secondaryBodyWidth}');
-    bool transportType =
-        widget.chatMessage.transportType == TransportType.webrtc.name;
+    String transportType = widget.chatMessage.transportType;
+    Color borderColor = myself.primary;
+    if (transportType == TransportType.websocket.name) {
+      borderColor = myself.primaryColor;
+    } else if (transportType == TransportType.sfu.name) {
+      borderColor = myself.secondary;
+    } else if (transportType == TransportType.chatGPT.name) {
+      borderColor = Colors.blueAccent;
+    }
     List<Widget> children = [
       Bubble(
           elevation: 0.0,
           stick: false,
           margin: const BubbleEdges.only(top: 1),
           nip: widget.isMyself ? BubbleNip.rightTop : BubbleNip.leftTop,
-          color: transportType
-              ? (widget.isMyself ? myself.primary : Colors.white)
-              : myself.primaryColor,
+          color: widget.isMyself ? myself.primary : Colors.white,
+          borderColor: borderColor,
+          borderWidth: 2.0,
           padding: const BubbleEdges.all(0),
           child: body)
     ];
@@ -241,8 +248,8 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
     var sendTime = widget.chatMessage.sendTime;
     sendTime = sendTime = DateUtil.formatEasyRead(sendTime!);
     int? id = widget.chatMessage.id;
-    Widget title = CommonAutoSizeText(sendTime,
-        style: const TextStyle(fontSize: 12));
+    Widget title =
+        CommonAutoSizeText(sendTime, style: const TextStyle(fontSize: 12));
     // CommonAutoSizeText('${widget.chatMessage.id}:${widget.chatMessage.senderName}');
     if (timer != null) {
       title = Row(
@@ -291,8 +298,8 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
     var sendTime = widget.chatMessage.sendTime;
     sendTime = sendTime = DateUtil.formatEasyRead(sendTime!);
     int? id = widget.chatMessage.id;
-    Widget title = CommonAutoSizeText(sendTime,
-        style: const TextStyle(fontSize: 12));
+    Widget title =
+        CommonAutoSizeText(sendTime, style: const TextStyle(fontSize: 12));
     if (timer != null) {
       title = Row(
         children: [

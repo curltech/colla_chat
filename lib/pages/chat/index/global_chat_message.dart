@@ -58,10 +58,14 @@ class GlobalChatMessage {
   /// 从AdvancedPeerConnection收到消息事件，先解密数据，然后转换成chatMessage
   onMessage(WebrtcEvent event) async {
     List<int> data = event.data;
+    await onData(data, TransportType.webrtc);
+  }
+
+  onData(List<int> data, TransportType transportType) async {
     ChatMessage? chatMessage = await chatMessageService.decrypt(data);
     if (chatMessage != null) {
-      chatMessage.transportType = TransportType.webrtc.name;
-      logger.w('got a webrtcEvent chatMessage from webrtc');
+      chatMessage.transportType = transportType.name;
+      logger.w('got data chatMessage from ${transportType.name}');
       _receiveChatMessage(chatMessage);
     } else {
       logger.e('Received chatMessage but decrypt failure');
