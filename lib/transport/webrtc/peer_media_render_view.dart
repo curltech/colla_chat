@@ -1,11 +1,12 @@
-import 'package:colla_chat/transport/webrtc/p2p/p2p_media_render_view.dart';
+import 'package:colla_chat/plugin/logger.dart' as log;
+import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:livekit_client/livekit_client.dart';
+import 'package:livekit_client/livekit_client.dart' as livekit_client;
 
 /// 媒体流绑定渲染器，并创建展示视图
-class LiveKitMediaRenderView extends StatefulWidget {
+class PeerMediaRenderView extends StatefulWidget {
   final PeerMediaStream peerMediaStream;
   final RTCVideoViewObjectFit objectFit;
   final bool mirror;
@@ -15,7 +16,7 @@ class LiveKitMediaRenderView extends StatefulWidget {
   final double? height;
   final Color? color;
 
-  const LiveKitMediaRenderView({
+  const PeerMediaRenderView({
     super.key,
     required this.peerMediaStream,
     this.objectFit = RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
@@ -28,13 +29,44 @@ class LiveKitMediaRenderView extends StatefulWidget {
   });
 
   @override
-  State createState() => _LiveKitMediaRenderViewState();
+  State createState() => _PeerMediaRenderViewState();
 }
 
-class _LiveKitMediaRenderViewState extends State<LiveKitMediaRenderView> {
+class _PeerMediaRenderViewState extends State<PeerMediaRenderView> {
+  RTCVideoRenderer? renderer;
+  ValueNotifier<bool> readyRenderer = ValueNotifier<bool>(false);
+
   @override
   initState() {
     super.initState();
+    bindRTCVideoRender();
+  }
+
+  //绑定视频流到渲染器
+  bindRTCVideoRender() async {
+    MediaStream? mediaStream = widget.peerMediaStream.mediaStream;
+    if (mediaStream == null) {
+      livekit_client.AudioTrack? audioTrack = widget.peerMediaStream.audioTrack;
+      if (audioTrack != null) {
+        mediaStream = audioTrack.mediaStream;
+      }
+    }
+    if (mediaStream != null) {
+      renderer = RTCVideoRenderer();
+      await renderer!.initialize();
+      renderer!.srcObject = mediaStream;
+    }
+    readyRenderer.value = true;
+  }
+
+  close() {
+    var renderer = this.renderer;
+    renderer?.srcObject = null;
+    try {
+      renderer?.dispose();
+    } catch (e) {
+      log.logger.e('renderer.dispose failure:$e');
+    }
   }
 
   Widget _buildVideoViewContainer(Widget? child,
@@ -60,15 +92,34 @@ class _LiveKitMediaRenderViewState extends State<LiveKitMediaRenderView> {
 
   /// 创建展示视图，纯音频显示图标
   Widget _buildVideoView() {
-    Widget? videoView = VideoTrackRenderer(widget.peerMediaStream.videoTrack!,
-        fit: widget.objectFit,
-        mirrorMode: widget.mirror
-            ? VideoViewMirrorMode.mirror
-            : VideoViewMirrorMode.off);
-    Widget? audioView = P2pMediaRenderView(
-        peerMediaStream: widget.peerMediaStream,
-        objectFit: widget.objectFit,
-        mirror: widget.mirror);
+    Widget? videoView;
+    var renderer = this.renderer;
+    videoView = ValueListenableBuilder(
+        valueListenable: readyRenderer,
+        builder: (BuildContext context, bool readyRenderer, Widget? child) {
+          if (readyRenderer) {
+            if (renderer != null) {
+              return RTCVideoView(renderer,
+                  objectFit: widget.objectFit,
+                  mirror: widget.mirror,
+                  filterQuality: widget.filterQuality);
+            } else {
+              livekit_client.VideoTrack? videoTrack =
+                  widget.peerMediaStream.videoTrack;
+              if (videoTrack != null) {
+                return livekit_client.VideoTrackRenderer(
+                  videoTrack,
+                  fit: widget.objectFit,
+                  mirrorMode: widget.mirror
+                      ? livekit_client.VideoViewMirrorMode.mirror
+                      : livekit_client.VideoViewMirrorMode.off,
+                );
+              }
+            }
+          }
+          return LoadingUtil.buildCircularLoadingWidget();
+        });
+
     bool audio = widget.peerMediaStream.audio;
     bool video = widget.peerMediaStream.video;
     if (audio && !video) {
@@ -110,6 +161,7 @@ class _LiveKitMediaRenderViewState extends State<LiveKitMediaRenderView> {
 
   @override
   void dispose() {
+    close();
     super.dispose();
   }
 }

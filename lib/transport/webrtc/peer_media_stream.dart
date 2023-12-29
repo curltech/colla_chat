@@ -34,19 +34,27 @@ class PlatformParticipant {
 /// 关联webrtc媒体流和peer的类，可以构造本地媒体流或者传入的媒体流
 class PeerMediaStream {
   String? id;
-  MediaStream? mediaStream;
-  VideoTrack? videoTrack;
-  AudioTrack? audioTrack;
-  Participant? livekitParticipant;
 
-  //业务相关的数据
+  ///直接设置的媒体流，或者livekit的audioTrack音频流
+  MediaStream? mediaStream;
+
+  ///直接设置的livekit的视频流
+  VideoTrack? videoTrack;
+
+  ///直接设置的livekit的音频流
+  AudioTrack? audioTrack;
+
+  ///流对应的livekit的参与者
+  Participant? participant;
+
+  ///平台的业务相关的参与者
   PlatformParticipant? platformParticipant;
 
   PeerMediaStream({
     this.mediaStream,
     this.videoTrack,
     this.audioTrack,
-    this.livekitParticipant,
+    this.participant,
     this.platformParticipant,
   }) {
     if (mediaStream != null) {

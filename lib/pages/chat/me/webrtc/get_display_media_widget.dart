@@ -2,7 +2,7 @@ import 'dart:core';
 
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/transport/webrtc/p2p/p2p_media_render_view.dart';
+import 'package:colla_chat/transport/webrtc/peer_media_render_view.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -108,7 +108,7 @@ class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
             width: width,
             height: height,
             decoration: const BoxDecoration(color: Colors.black),
-            child: P2pMediaRenderView(
+            child: PeerMediaRenderView(
               peerMediaStream: peerMediaStream,
               width: width,
               height: height,

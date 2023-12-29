@@ -559,9 +559,9 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
             tip: status ? 'On' : 'Off',
             onPressed: () async {
               speakerStatus.value = !speakerStatus.value;
-              var conferenceChatMessageController =
-                  liveKitConferenceClientPool.conferenceChatMessageController;
-              await MediaStreamUtil.setSpeakerphoneOn(status);
+              LiveKitConferenceClient? conferenceClient =
+                  liveKitConferenceClientPool.conferenceClient;
+              conferenceClient?.roomClient.setSpeakerphoneOn(speakerStatus.value);
               // await conferenceChatMessageController?.setAudioContext(
               //     route: status
               //         ? AudioContextConfigRoute.speaker

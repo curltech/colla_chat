@@ -295,6 +295,23 @@ class LiveKitRoomClient {
   disconnect() async {
     await room.disconnect();
   }
+
+  Future<void> setCameraPosition(CameraPosition position) async {
+    LocalTrackPublication<LocalVideoTrack>? videoTrackPublication =
+        room.localParticipant?.videoTracks.firstOrNull;
+    if (videoTrackPublication != null) {
+      var videoTrack = videoTrackPublication.track;
+      try {
+        await videoTrack?.setCameraPosition(position);
+      } catch (error) {
+        log.logger.e('switchCamera error: $error');
+      }
+    }
+  }
+
+  Future<void> setSpeakerphoneOn(bool enable) async {
+    await Hardware.instance.setSpeakerphoneOn(enable);
+  }
 }
 
 /// 会议客户端，包含有房间客户端和会议的消息控制器
@@ -372,6 +389,7 @@ class LiveKitConferenceClient {
           await roomClient.publishAudioTrack(
               peerMediaStream.audioTrack! as LocalAudioTrack);
         }
+        peerMediaStream.participant = roomClient.room.localParticipant;
       }
     } else {
       bool? video = conferenceChatMessageController.conference?.video;
@@ -389,6 +407,8 @@ class LiveKitConferenceClient {
               videoTrack: localTrackPublication.track! as VideoTrack,
               platformParticipant: platformParticipant,
             );
+            peerMediaStream.participant =
+                roomClient.room.localParticipant;
             localPeerMediaStreamController.mainPeerMediaStream =
                 peerMediaStream;
           }
@@ -409,6 +429,7 @@ class LiveKitConferenceClient {
             audioTrack: localTrackPublication.track! as AudioTrack,
             platformParticipant: platformParticipant,
           );
+          peerMediaStream.participant = roomClient.room.localParticipant;
           localPeerMediaStreamController.mainPeerMediaStream = peerMediaStream;
         }
       } catch (error) {
@@ -421,16 +442,13 @@ class LiveKitConferenceClient {
   close(List<PeerMediaStream> peerMediaStreams, {bool notify = true}) async {
     if (joined) {
       for (PeerMediaStream peerMediaStream in peerMediaStreams) {
-        List<MediaStreamTrack>? tracks =
-            peerMediaStream.mediaStream?.getTracks();
-        if (tracks == null) {
-          return;
+        String? trackId = peerMediaStream.videoTrack?.sid;
+        if (trackId != null) {
+          await roomClient.unpublish(trackId, notify: notify);
         }
-        for (MediaStreamTrack track in tracks) {
-          String? id = track.id;
-          if (id != null) {
-            await roomClient.unpublish(id, notify: notify);
-          }
+        trackId = peerMediaStream.audioTrack?.sid;
+        if (trackId != null) {
+          await roomClient.unpublish(trackId, notify: notify);
         }
 
         if (peerMediaStream.id != null) {
@@ -484,11 +502,15 @@ class LiveKitConferenceClient {
             PlatformParticipant(identity, name: name);
         if (track is RemoteVideoTrack) {
           peerMediaStream = PeerMediaStream(
-              videoTrack: track, platformParticipant: platformParticipant);
+              videoTrack: track,
+              platformParticipant: platformParticipant,
+              participant: remoteParticipant);
         }
         if (track is RemoteAudioTrack) {
           peerMediaStream = PeerMediaStream(
-              audioTrack: track, platformParticipant: platformParticipant);
+              audioTrack: track,
+              platformParticipant: platformParticipant,
+              participant: remoteParticipant);
         }
         if (peerMediaStream != null) {
           remotePeerMediaStreamController.add(peerMediaStream);
