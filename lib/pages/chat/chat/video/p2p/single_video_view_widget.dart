@@ -206,6 +206,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
       BuildContext context, double? height, double? width) {
     String name = widget.peerMediaStream.platformParticipant?.name ?? '';
     String streamId = widget.peerMediaStream.id ?? '';
+    String ownerTag = widget.peerMediaStream.ownerTag ?? '';
     bool video = widget.peerMediaStream.video;
     Widget mediaRenderView =
         Center(child: CommonAutoSizeText(AppLocalizations.t('No stream')));
@@ -259,6 +260,12 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
                     ),
                     CommonAutoSizeText(
                       streamId,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: AppFontSize.xsFontSize),
+                    ),
+                    CommonAutoSizeText(
+                      ownerTag,
                       style: const TextStyle(
                           color: Colors.white,
                           fontSize: AppFontSize.xsFontSize),

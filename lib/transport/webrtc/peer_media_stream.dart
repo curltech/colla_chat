@@ -35,6 +35,8 @@ class PlatformParticipant {
 class PeerMediaStream {
   String? id;
 
+  String? ownerTag;
+
   ///直接设置的媒体流，或者livekit的audioTrack音频流
   MediaStream? mediaStream;
 
@@ -59,10 +61,13 @@ class PeerMediaStream {
   }) {
     if (mediaStream != null) {
       id = mediaStream!.id;
+      ownerTag = mediaStream!.ownerTag;
     } else if (videoTrack != null) {
       id = videoTrack!.mediaStream.id;
+      ownerTag = videoTrack!.mediaStream.ownerTag;
     } else if (audioTrack != null) {
       id = audioTrack!.mediaStream.id;
+      ownerTag = audioTrack!.mediaStream.ownerTag;
     }
   }
 
@@ -205,16 +210,20 @@ class PeerMediaStream {
     if (mediaStream != null) {
       this.mediaStream = mediaStream;
       id = mediaStream.id;
+      ownerTag = mediaStream.ownerTag;
     } else if (videoTrack != null) {
       this.videoTrack = videoTrack;
       id = videoTrack.mediaStream.id;
+      ownerTag = videoTrack.mediaStream.ownerTag;
     } else if (audioTrack != null) {
       this.audioTrack = audioTrack;
       id = audioTrack.mediaStream.id;
+      ownerTag = audioTrack.mediaStream.ownerTag;
     } else {
       this.mediaStream = null;
       this.videoTrack = null;
       id = null;
+      ownerTag = null;
     }
   }
 
@@ -261,6 +270,7 @@ class PeerMediaStream {
       }
       this.mediaStream = null;
       id = null;
+      ownerTag = null;
     }
     if (videoTrack != null) {
       var mediaStream = videoTrack?.mediaStream;
@@ -273,6 +283,7 @@ class PeerMediaStream {
       }
       videoTrack = null;
       id = null;
+      ownerTag = null;
     }
     if (audioTrack != null) {
       var mediaStream = audioTrack?.mediaStream;
@@ -285,6 +296,7 @@ class PeerMediaStream {
       }
       audioTrack = null;
       id = null;
+      ownerTag = null;
     }
   }
 }
