@@ -88,7 +88,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
           if (conference.sfu) {
             actionData.add(ActionData(
               label: 'Sfu video chat',
-              tooltip: 'Invite video chat',
+              tooltip: 'Invite sfu video chat',
               icon: const Icon(Icons.missed_video_call_outlined),
             ));
           } else {
@@ -106,7 +106,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       if (partyType == PartyType.group.name) {
         actionData.add(ActionData(
           label: 'Sfu video chat',
-          tooltip: 'Invite video chat',
+          tooltip: 'Invite sfu video chat',
           icon: const Icon(Icons.missed_video_call_outlined),
         ));
       }

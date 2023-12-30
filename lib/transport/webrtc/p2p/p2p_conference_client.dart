@@ -91,6 +91,7 @@ class P2pConferenceClient {
     for (AdvancedPeerConnection peerConnection in pcs) {
       await _onParticipantConnected(peerConnection);
     }
+    p2pConferenceClientPool.join(conference.conferenceId);
   }
 
   renegotiate(
@@ -429,7 +430,6 @@ class P2pConferenceClientPool with ChangeNotifier {
           }
         }
         this.conferenceId = conferenceId;
-
         return p2pConferenceClient;
       }
 
@@ -454,6 +454,12 @@ class P2pConferenceClientPool with ChangeNotifier {
       } else {
         _conferenceId = conferenceId;
       }
+      notifyListeners();
+    }
+  }
+
+  join(String conferenceId) {
+    if (_conferenceId == conferenceId) {
       notifyListeners();
     }
   }

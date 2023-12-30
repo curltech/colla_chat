@@ -31,6 +31,7 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/notification_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/websocket.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -67,6 +68,7 @@ class _IndexViewState extends State<IndexView>
   final ValueNotifier<bool> conferenceChatMessageVisible =
       ValueNotifier<bool>(false);
   final ValueNotifier<bool> chatMessageVisible = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> conferenceJoined = ValueNotifier<bool>(false);
   final CustomSpecialTextSpanBuilder customSpecialTextSpanBuilder =
       CustomSpecialTextSpanBuilder();
   ChatMessage? chatMessage;
@@ -105,6 +107,8 @@ class _IndexViewState extends State<IndexView>
         .listen((WebrtcEvent event) {
       _onWebrtcErrorSignal(event);
     });
+    p2pConferenceClientPool.addListener(_updateConferenceJoined);
+    liveKitConferenceClientPool.addListener(_updateConferenceJoined);
 
     _initSystemTray();
     _initObserver();
@@ -314,6 +318,24 @@ class _IndexViewState extends State<IndexView>
     }
   }
 
+  _updateConferenceJoined() {
+    String? conferenceId = p2pConferenceClientPool.conferenceId;
+    conferenceId ??= liveKitConferenceClientPool.conferenceId;
+    if (conferenceId != null) {
+      P2pConferenceClient? conferenceClient =
+          p2pConferenceClientPool.conferenceClient;
+      if (conferenceClient != null) {
+        conferenceJoined.value = conferenceClient.joined;
+      } else {
+        LiveKitConferenceClient? liveKitConferenceClient =
+            liveKitConferenceClientPool.conferenceClient;
+        if (liveKitConferenceClient != null) {
+          conferenceJoined.value = liveKitConferenceClient.joined;
+        }
+      }
+    }
+  }
+
   _play() {
     conferenceChatMessageController.playAudio(
         'assets/medias/invitation.mp3', true);
@@ -403,6 +425,97 @@ class _IndexViewState extends State<IndexView>
         title: titleWidget, description: contentWidget, icon: icon);
   }
 
+  ///显示视频聊天或者视频会议
+  _buildVideoChatConferenceBanner(BuildContext context) {
+    return ValueListenableBuilder(
+        valueListenable: conferenceJoined,
+        builder: (BuildContext context, bool conferenceJoined, Widget? child) {
+          Widget banner = Container();
+          ConferenceChatMessageController? conferenceChatMessageController;
+          if (conferenceJoined) {
+            P2pConferenceClient? conferenceClient =
+                p2pConferenceClientPool.conferenceClient;
+            if (conferenceClient != null) {
+              conferenceChatMessageController =
+                  conferenceClient.conferenceChatMessageController;
+            } else {
+              LiveKitConferenceClient? liveKitConferenceClient =
+                  liveKitConferenceClientPool.conferenceClient;
+              if (liveKitConferenceClient != null) {
+                conferenceChatMessageController =
+                    liveKitConferenceClient.conferenceChatMessageController;
+              }
+            }
+            if (conferenceChatMessageController != null) {
+              List<Widget> children = <Widget>[];
+              String conferenceName =
+                  conferenceChatMessageController.conferenceName ?? '';
+              children.add(
+                CommonAutoSizeText(conferenceName,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w500)),
+              );
+              String conferenceId =
+                  conferenceChatMessageController.conferenceId ?? '';
+              children.add(
+                CommonAutoSizeText(
+                  conferenceId,
+                  style: const TextStyle(
+                      fontSize: 14.0, fontWeight: FontWeight.w400),
+                ),
+              );
+              String topic =
+                  conferenceChatMessageController.conference?.topic ?? '';
+              children.add(ExtendedText(
+                topic,
+                specialTextSpanBuilder: customSpecialTextSpanBuilder,
+              ));
+              bool sfu =
+                  conferenceChatMessageController.conference?.sfu ?? true;
+              banner = Column(children: [
+                Container(
+                    width: appDataProvider.totalSize.width,
+                    alignment: Alignment.topLeft,
+                    padding: const EdgeInsets.all(10.0),
+                    child: InkWell(
+                        onTap: () async {
+                          this.conferenceJoined.value = false;
+                          if (sfu) {
+                            indexWidgetProvider.push('sfu_video_chat');
+                          } else {
+                            indexWidgetProvider.push('video_chat');
+                          }
+                        },
+                        child: Card(
+                            elevation: 0.0,
+                            child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const SizedBox(
+                                    width: 15.0,
+                                  ),
+                                  Icon(
+                                    Icons.meeting_room,
+                                    color: myself.primary,
+                                  ),
+                                  const SizedBox(
+                                    width: 15.0,
+                                  ),
+                                  Expanded(
+                                      child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: children)),
+                                ])))),
+                const Spacer()
+              ]);
+            }
+          }
+          return Visibility(
+              visible: conferenceChatMessageController != null, child: banner);
+        });
+  }
+
   ///显示一般消息
   _buildChatMessageBanner(BuildContext context) {
     return ValueListenableBuilder(
@@ -443,17 +556,17 @@ class _IndexViewState extends State<IndexView>
                 ));
               }
 
-              banner = InkWell(
-                  onTap: () async {
-                    chatMessageVisible.value = false;
-                    chatMessage = null;
-                    await conferenceChatMessageController.close();
-                  },
-                  child: Column(children: [
-                    Container(
-                        width: appDataProvider.totalSize.width,
-                        alignment: Alignment.topLeft,
-                        padding: const EdgeInsets.all(10.0),
+              banner = Column(children: [
+                Container(
+                    width: appDataProvider.totalSize.width,
+                    alignment: Alignment.topLeft,
+                    padding: const EdgeInsets.all(10.0),
+                    child: InkWell(
+                        onTap: () async {
+                          chatMessageVisible.value = false;
+                          chatMessage = null;
+                          await conferenceChatMessageController.close();
+                        },
                         child: Card(
                             elevation: 0.0,
                             child: Row(
@@ -471,9 +584,9 @@ class _IndexViewState extends State<IndexView>
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: children)),
-                                ]))),
-                    const Spacer()
-                  ]));
+                                ])))),
+                const Spacer()
+              ]);
 
               //延时30秒后一般消息消失
               Future.delayed(const Duration(seconds: 15)).then((value) async {
@@ -617,6 +730,7 @@ class _IndexViewState extends State<IndexView>
     ]);
   }
 
+  ///显示视频邀请消息
   _buildVideoChatMessageBanner(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: conferenceChatMessageVisible,
@@ -755,6 +869,7 @@ class _IndexViewState extends State<IndexView>
                     height: height,
                     width: width)),
             Row(children: [
+              _buildVideoChatConferenceBanner(context),
               _buildChatMessageBanner(context),
               _buildVideoChatMessageBanner(context)
             ]),

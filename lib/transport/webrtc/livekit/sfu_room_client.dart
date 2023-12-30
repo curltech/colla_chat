@@ -362,6 +362,7 @@ class LiveKitConferenceClient {
     log.logger.w('i joined conference ${conference.name}');
     await publish(
         peerMediaStreams: localPeerMediaStreamController.peerMediaStreams);
+    liveKitConferenceClientPool.join(conference.conferenceId);
   }
 
   LocalParticipant? get localParticipant {
@@ -668,7 +669,6 @@ class LiveKitConferenceClientPool with ChangeNotifier {
           }
         }
         this.conferenceId = conferenceId;
-
         return liveKitConferenceClient;
       }
 
@@ -693,6 +693,12 @@ class LiveKitConferenceClientPool with ChangeNotifier {
       } else {
         _conferenceId = conferenceId;
       }
+      notifyListeners();
+    }
+  }
+
+  join(String conferenceId) {
+    if (_conferenceId == conferenceId) {
       notifyListeners();
     }
   }

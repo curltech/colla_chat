@@ -269,10 +269,6 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         }
       }
     } else {
-      if (type == PartyType.conference &&
-          chatSummary?.messageId == liveKitConferenceClientPool.conferenceId) {
-        transportType = TransportType.sfu;
-      }
       ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
           peerId, type,
           title: title,
