@@ -405,6 +405,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       conference.groupId = chatSummary.peerId;
       conference.groupName = chatSummary.name;
       conference.groupType = partyType;
+      conference.sfu = false;
     }
 
     return conference;

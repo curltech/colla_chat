@@ -23,7 +23,7 @@ class Conference extends StatusEntity {
   bool wait = true; // 自动等待
   bool advance = true; // 参会者可提前加入
   int upperNumber = 300; // 参会人数上限
-  bool sfu = false;
+  bool sfu = true;
   String? sfuUri;
   String? sfuToken;
   List<String>? participants; // 参与人peerId的集合

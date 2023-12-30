@@ -349,7 +349,6 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
       conference.groupName = chatSummary.name;
       conference.groupType = partyType;
       conference.sfu = true;
-      conference.sfuUri = '';
     }
     try {
       List<ChatMessage> chatMessages =
