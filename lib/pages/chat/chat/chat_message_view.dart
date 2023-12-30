@@ -675,11 +675,11 @@ class _ChatMessageViewState extends State<ChatMessageView>
 
   @override
   Widget build(BuildContext context) {
-    Widget chatMessageWidget = _buildChatMessageWidget(context);
     Widget appBarView = ValueListenableBuilder(
         valueListenable: _chatSummary,
         builder:
             (BuildContext context, ChatSummary? chatSummary, Widget? child) {
+          Widget chatMessageWidget = _buildChatMessageWidget(context);
           if (chatSummary != null) {
             String name = chatSummary.name!;
             String title = AppLocalizations.t(name);
