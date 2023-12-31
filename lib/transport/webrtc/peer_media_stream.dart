@@ -308,7 +308,9 @@ class PeerMediaStream {
         await track.setCameraPosition(position);
       }
     } else {
-      await MediaStreamUtil.switchCamera(mediaStream!);
+      if (mediaStream != null) {
+        await MediaStreamUtil.switchCamera(mediaStream!);
+      }
     }
   }
 
@@ -332,9 +334,11 @@ class PeerMediaStream {
   /// 是否静音
   bool? isMuted() {
     if (participant != null) {
-      return participant?.isMuted;
+      return participant!.isMuted;
     } else {
-      return MediaStreamUtil.isMuted(mediaStream!);
+      if (mediaStream != null) {
+        return MediaStreamUtil.isMuted(mediaStream!);
+      }
     }
   }
 
@@ -354,7 +358,9 @@ class PeerMediaStream {
         await localParticipant.setMicrophoneEnabled(enableMute);
       }
     } else {
-      await MediaStreamUtil.setMicrophoneMute(mediaStream!, enableMute);
+      if (mediaStream != null) {
+        await MediaStreamUtil.setMicrophoneMute(mediaStream!, enableMute);
+      }
     }
   }
 
@@ -371,7 +377,9 @@ class PeerMediaStream {
     if (participant != null) {
       participant?.audioLevel = volume;
     } else {
-      await MediaStreamUtil.setVolume(mediaStream!, volume);
+      if (mediaStream != null) {
+        await MediaStreamUtil.setVolume(mediaStream!, volume);
+      }
     }
   }
 
@@ -379,7 +387,9 @@ class PeerMediaStream {
   setZoom(double zoomLevel) async {
     if (participant != null) {
     } else {
-      await MediaStreamUtil.setZoom(mediaStream!, zoomLevel);
+      if (mediaStream != null) {
+        await MediaStreamUtil.setZoom(mediaStream!, zoomLevel);
+      }
     }
   }
 
