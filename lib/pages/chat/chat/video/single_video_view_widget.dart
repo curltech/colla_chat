@@ -97,45 +97,47 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
     List<ActionData> videoActionData = [];
     Participant<TrackPublication<Track>>? participant =
         widget.peerMediaStream.participant;
-    if (widget.peerMediaStreamController.currentPeerMediaStream != null) {
-      videoActionData.add(
-        ActionData(
-            label: 'Camera switch',
-            //actionType: ActionType.inkwell,
-            icon: const Icon(Icons.cameraswitch)),
-      );
-    }
     if (platformParams.mobile) {
-      if (enableSpeaker) {
+      if (widget.peerMediaStream.local) {
         videoActionData.add(
           ActionData(
-              label: 'Handset switch',
-              // actionType: ActionType.inkwell,
-              icon: const Icon(Icons.earbuds)),
-        );
-      } else {
-        videoActionData.add(
-          ActionData(
-              label: 'Speaker switch',
-              // actionType: ActionType.inkwell,
-              icon: const Icon(Icons.speaker_phone)),
+              label: 'Camera switch',
+              //actionType: ActionType.inkwell,
+              icon: const Icon(Icons.cameraswitch)),
         );
       }
     }
-    if (enableMute) {
+    if (enableSpeaker) {
       videoActionData.add(
         ActionData(
-            label: 'Microphone unmute',
+            label: 'Handset switch',
             // actionType: ActionType.inkwell,
-            icon: const Icon(Icons.mic)),
+            icon: const Icon(Icons.earbuds)),
       );
     } else {
       videoActionData.add(
         ActionData(
-            label: 'Microphone mute',
+            label: 'Speaker switch',
             // actionType: ActionType.inkwell,
-            icon: const Icon(Icons.mic_off)),
+            icon: const Icon(Icons.speaker_phone)),
       );
+    }
+    if (widget.peerMediaStream.local) {
+      if (enableMute) {
+        videoActionData.add(
+          ActionData(
+              label: 'Microphone unmute',
+              // actionType: ActionType.inkwell,
+              icon: const Icon(Icons.mic)),
+        );
+      } else {
+        videoActionData.add(
+          ActionData(
+              label: 'Microphone mute',
+              // actionType: ActionType.inkwell,
+              icon: const Icon(Icons.mic_off)),
+        );
+      }
     }
     if (participant == null) {
       if (volume > 0) {
