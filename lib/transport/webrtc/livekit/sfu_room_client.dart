@@ -696,7 +696,7 @@ class LiveKitConferenceClientPool with ChangeNotifier {
               uri = 'ws://$uri';
             }
             LiveKitRoomClient liveKitRoomClient = LiveKitRoomClient(
-                uri: uri, token: token, sharedKey: password, e2ee: true);
+                uri: uri, token: token, sharedKey: password, e2ee: false);
             liveKitConferenceClient = LiveKitConferenceClient(
                 liveKitRoomClient, conferenceChatMessageController);
             _conferenceClients[conferenceId] = liveKitConferenceClient;
