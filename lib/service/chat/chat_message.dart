@@ -486,6 +486,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         sfuUri = liveKitManageRoom.host;
         conference.sfuUri = sfuUri;
         tokens = liveKitManageRoom.tokens;
+        if (conference.password == null) {
+          CryptoGraphy cryptoGraphy = CryptoGraphy();
+          conference.password = await cryptoGraphy.getRandomAsciiString();
+        }
       }
     }
     Map<String, dynamic> conferenceMap = JsonUtil.toJson(conference);

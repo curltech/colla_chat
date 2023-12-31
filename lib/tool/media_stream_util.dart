@@ -174,6 +174,43 @@ class MediaStreamUtil {
     }
   }
 
+  static bool? isMuted(MediaStream mediaStream) {
+    bool? muted;
+    List<MediaStreamTrack> tracks = mediaStream.getAudioTracks();
+    if (tracks.isNotEmpty) {
+      for (MediaStreamTrack track in tracks) {
+        muted = track.muted;
+        if (muted == false) {
+          break;
+        }
+      }
+    }
+    return muted;
+  }
+
+  static bool enabled(MediaStream mediaStream) {
+    bool enabled = false;
+    List<MediaStreamTrack> tracks = mediaStream.getAudioTracks();
+    if (tracks.isNotEmpty) {
+      for (MediaStreamTrack track in tracks) {
+        enabled = track.enabled;
+        if (enabled) {
+          break;
+        }
+      }
+    }
+    tracks = mediaStream.getVideoTracks();
+    if (!enabled && tracks.isNotEmpty) {
+      for (MediaStreamTrack track in tracks) {
+        enabled = track.enabled;
+        if (enabled) {
+          break;
+        }
+      }
+    }
+    return enabled;
+  }
+
   /// 对视频流的第一个音频轨道的输入设备设置静音设置
   static Future<void> setMicrophoneMute(
       MediaStream mediaStream, bool mute) async {

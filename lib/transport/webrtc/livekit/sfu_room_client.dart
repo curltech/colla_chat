@@ -41,7 +41,7 @@ class LiveKitRoomClient {
   /// 连接服务器，根据token建立房间的连接
   Future<void> connect() async {
     E2EEOptions? e2eeOptions;
-    if (e2ee) {
+    if (e2ee && sharedKey != null) {
       final keyProvider = await BaseKeyProvider.create();
       e2eeOptions = E2EEOptions(keyProvider: keyProvider);
       await keyProvider.setKey(sharedKey!);
@@ -125,20 +125,12 @@ class LiveKitRoomClient {
 
   /// 订阅远程参与者的轨道
   subscribe(List<String> participants) async {
-    for (MapEntry<String, RemoteParticipant> entry
-        in room.participants.entries) {
-      String participantId = entry.key;
-      if (participants.contains(participantId)) {
-        RemoteParticipant participant = entry.value;
+    for (String participantId in participants) {
+      if (room.participants.containsKey(participantId)) {
+        RemoteParticipant participant = room.participants[participantId]!;
         for (RemoteTrackPublication publication
             in participant.trackPublications.values) {
           await publication.subscribe();
-          // await publication.enable();
-          // await publication.disable();
-          // await publication.setVideoFPS(0);
-          // await publication.setVideoQuality(VideoQuality.HIGH);
-          // await publication.updateStreamState(StreamState.active);
-          // await publication.updateSubscriptionAllowed(true);
         }
       }
     }
@@ -146,14 +138,64 @@ class LiveKitRoomClient {
 
   /// 解除订阅远程参与者的轨道
   unsubscribe(List<String> participants) async {
-    for (MapEntry<String, RemoteParticipant> entry
-        in room.participants.entries) {
-      String participantId = entry.key;
-      if (participants.contains(participantId)) {
-        RemoteParticipant participant = entry.value;
+    for (String participantId in participants) {
+      if (room.participants.containsKey(participantId)) {
+        RemoteParticipant participant = room.participants[participantId]!;
         for (RemoteTrackPublication publication
             in participant.trackPublications.values) {
           await publication.unsubscribe();
+        }
+      }
+    }
+  }
+
+  /// 激活参与者的轨道
+  enable(List<String> participants) async {
+    for (String participantId in participants) {
+      if (room.participants.containsKey(participantId)) {
+        RemoteParticipant participant = room.participants[participantId]!;
+        for (RemoteTrackPublication publication
+            in participant.trackPublications.values) {
+          await publication.enable();
+        }
+      }
+    }
+  }
+
+  /// 关闭参与者的轨道
+  disable(List<String> participants) async {
+    for (String participantId in participants) {
+      if (room.participants.containsKey(participantId)) {
+        RemoteParticipant participant = room.participants[participantId]!;
+        for (RemoteTrackPublication publication
+            in participant.trackPublications.values) {
+          await publication.disable();
+        }
+      }
+    }
+  }
+
+  /// 设置参与者的轨道的fps
+  setVideoFPS(List<String> participants, int fps) async {
+    for (String participantId in participants) {
+      if (room.participants.containsKey(participantId)) {
+        RemoteParticipant participant = room.participants[participantId]!;
+        for (RemoteTrackPublication publication
+            in participant.trackPublications.values) {
+          await publication.setVideoFPS(fps);
+        }
+      }
+    }
+  }
+
+  /// 设置参与者的轨道的质量
+  setVideoQuality(List<String> participants, VideoQuality videoQuality) async {
+    for (String participantId in participants) {
+      if (room.participants.containsKey(participantId)) {
+        RemoteParticipant participant = room.participants[participantId]!;
+        for (RemoteTrackPublication publication
+            in participant.trackPublications.values) {
+          await publication.setVideoQuality(videoQuality);
         }
       }
     }
@@ -647,12 +689,14 @@ class LiveKitConferenceClientPool with ChangeNotifier {
               chatSummary: chatSummary);
           String? token = conferenceChatMessageController.conference?.sfuToken;
           String? uri = conferenceChatMessageController.conference?.sfuUri;
+          String? password =
+              conferenceChatMessageController.conference?.password;
           if (uri != null && token != null) {
             if (!uri.startsWith('ws://')) {
               uri = 'ws://$uri';
             }
-            LiveKitRoomClient liveKitRoomClient =
-                LiveKitRoomClient(uri: uri, token: token);
+            LiveKitRoomClient liveKitRoomClient = LiveKitRoomClient(
+                uri: uri, token: token, sharedKey: password, e2ee: true);
             liveKitConferenceClient = LiveKitConferenceClient(
                 liveKitRoomClient, conferenceChatMessageController);
             _conferenceClients[conferenceId] = liveKitConferenceClient;

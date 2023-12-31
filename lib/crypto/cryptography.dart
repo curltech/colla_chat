@@ -7,10 +7,7 @@ import 'package:cryptography/cryptography.dart';
 import 'package:cryptography_flutter/cryptography_flutter.dart';
 
 class CryptoGraphy {
-  CryptoGraphy() {
-    ///目前在macos上不能使用，其功能是加速快加密的速度
-    FlutterCryptography.enable();
-  }
+  CryptoGraphy();
 
   /// 对消息进行hash处理，输入消息可以为字符串或者uintarray，
   Future<List<int>> hash(List<int> data) async {

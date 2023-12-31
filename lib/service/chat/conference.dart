@@ -200,7 +200,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
     required super.tableName,
     required super.fields,
     required super.indexFields,
-    super.encryptFields = const ['content', 'thumbnail'],
+    super.encryptFields = const ['content', 'thumbnail', 'password'],
   }) {
     post = (Map map) {
       return Conference.fromJson(map);
