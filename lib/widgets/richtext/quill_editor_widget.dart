@@ -14,6 +14,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
+import 'package:dart_quill_delta/src/delta/delta.dart';
 
 ///quill_editor的实现，用于IOS,LINUX,MACOS,WINDOWS桌面平台
 ///编辑的时候是quill可识别的json格式，完成后可转换成html格式，就不可以再编辑了
@@ -82,24 +83,21 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-          titlePadding: const EdgeInsets.only(left: 16, top: 8),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              CommonAutoSizeText('${isEditing ? 'Edit' : 'Add'} note'),
-              IconButton(
-                onPressed: () => Navigator.of(context).pop(),
-                icon: const Icon(Icons.close),
-              )
-            ],
-          ),
-          content: QuillProvider(
-            configurations: QuillConfigurations(
-              controller: quillEditorController,
-            ),
-            child: QuillEditor.basic(
-                configurations: const QuillEditorConfigurations()),
-          )),
+        titlePadding: const EdgeInsets.only(left: 16, top: 8),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            CommonAutoSizeText('${isEditing ? 'Edit' : 'Add'} note'),
+            IconButton(
+              onPressed: () => Navigator.of(context).pop(),
+              icon: const Icon(Icons.close),
+            )
+          ],
+        ),
+        content: QuillEditor.basic(
+            configurations:
+                QuillEditorConfigurations(controller: quillEditorController)),
+      ),
     );
 
     if (quillEditorController.document.isEmpty()) return;
@@ -241,94 +239,9 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
   Widget _buildQuillToolbar(BuildContext context) {
     if (widget.withMultiMedia) {}
 
-    var toolbar = QuillToolbar(
-      configurations: QuillToolbarConfigurations(
-        showAlignmentButtons: true,
-        toolbarIconAlignment: WrapAlignment.start,
-        toolbarIconCrossAlignment: WrapCrossAlignment.start,
-        toolbarSectionSpacing: 1,
-        sectionDividerSpace: 1,
-        showLink: false,
-        buttonOptions: QuillToolbarButtonOptions(
-          base: QuillToolbarBaseButtonOptions(
-            // Request editor focus when any button is pressed
-            afterButtonPressed: _focusNode.requestFocus,
-          ),
-        ),
-        customButtons: [
-          QuillToolbarCustomButtonOptions(
-            icon: const Icon(Icons.add_alarm_rounded),
-            onPressed: () {
-              final controller = context.requireQuillController;
-              controller.document
-                  .insert(controller.selection.extentOffset, '\n');
-              controller.updateSelection(
-                TextSelection.collapsed(
-                  offset: controller.selection.extentOffset + 1,
-                ),
-                ChangeSource.local,
-              );
-
-              controller.document.insert(
-                controller.selection.extentOffset,
-                NotesBlockEmbed(
-                  DateTime.now().toString(),
-                ),
-              );
-
-              controller.updateSelection(
-                TextSelection.collapsed(
-                  offset: controller.selection.extentOffset + 1,
-                ),
-                ChangeSource.local,
-              );
-
-              controller.document
-                  .insert(controller.selection.extentOffset, ' ');
-              controller.updateSelection(
-                TextSelection.collapsed(
-                  offset: controller.selection.extentOffset + 1,
-                ),
-                ChangeSource.local,
-              );
-
-              controller.document
-                  .insert(controller.selection.extentOffset, '\n');
-              controller.updateSelection(
-                TextSelection.collapsed(
-                  offset: controller.selection.extentOffset + 1,
-                ),
-                ChangeSource.local,
-              );
-            },
-          ),
-          QuillToolbarCustomButtonOptions(
-            icon: const Icon(Icons.ac_unit),
-            onPressed: () {},
-          ),
-        ],
-        embedButtons: FlutterQuillEmbeds.toolbarButtons(
-          imageButtonOptions: QuillToolbarImageButtonOptions(
-            imageButtonConfigurations: QuillToolbarImageConfigurations(
-                onImageInsertCallback: (image, controller) async {}),
-          ),
-          videoButtonOptions: QuillToolbarVideoButtonOptions(
-            childBuilder: (QuillToolbarVideoButtonOptions,
-                QuillToolbarVideoButtonExtraOptions) {
-              return Container();
-            },
-            controller: quillController,
-            videoConfigurations: const QuillToolbarVideoConfigurations(),
-          ),
-          cameraButtonOptions: const QuillToolbarCameraButtonOptions(),
-          mediaButtonOptions: QuillToolbarMediaButtonOptions(
-              type: QuillMediaType.video,
-              onMediaPickedCallback: (XFile file) async {
-                return '';
-              }),
-        ),
-      ),
-    );
+    var toolbar = QuillToolbar.simple(
+        configurations:
+            QuillSimpleToolbarConfigurations(controller: quillController));
 
     return toolbar;
   }
@@ -349,6 +262,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
           ...FlutterQuillEmbeds.defaultEditorBuilders(),
           NotesEmbedBuilder(addEditNote: _addEditNote)
         ],
+        controller: quillController,
       ),
       scrollController: scrollController,
       focusNode: _focusNode,
@@ -356,52 +270,39 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
 
     var toolbar = _buildQuillToolbar(context);
 
-    return QuillProvider(
-        configurations: QuillConfigurations(
-          controller: quillController,
-          sharedConfigurations: QuillSharedConfigurations(
-            animationConfigurations: QuillAnimationConfigurations.disableAll(),
-            extraConfigurations: const {
-              QuillSharedExtensionsConfigurations.key:
-                  QuillSharedExtensionsConfigurations(
-                assetsPrefix: 'assets',
-              ),
-            },
-          ),
-        ),
-        child: Card(
-            color: myself.getBackgroundColor(context).withOpacity(0.6),
-            elevation: 0.0,
-            margin: EdgeInsets.zero,
-            shape: const ContinuousRectangleBorder(),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    const SizedBox(
-                      height: 5.0,
-                    ),
-                    toolbar,
-                    const SizedBox(
-                      height: 5.0,
-                    ),
-                    Divider(
-                      height: 1.0,
-                      thickness: 1.0,
-                      color: myself.primary,
-                    ),
-                    const SizedBox(
-                      height: 5.0,
-                    ),
-                    Expanded(
-                        child: SizedBox(
-                      height: widget.height,
-                      child: quillEditor,
-                    )),
-                  ]),
-            )));
+    return Card(
+        color: myself.getBackgroundColor(context).withOpacity(0.6),
+        elevation: 0.0,
+        margin: EdgeInsets.zero,
+        shape: const ContinuousRectangleBorder(),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                const SizedBox(
+                  height: 5.0,
+                ),
+                toolbar,
+                const SizedBox(
+                  height: 5.0,
+                ),
+                Divider(
+                  height: 1.0,
+                  thickness: 1.0,
+                  color: myself.primary,
+                ),
+                const SizedBox(
+                  height: 5.0,
+                ),
+                Expanded(
+                    child: SizedBox(
+                  height: widget.height,
+                  child: quillEditor,
+                )),
+              ]),
+        ));
   }
 
   @override

@@ -13,7 +13,7 @@ class SmartDialogUtil {
     Widget? title,
     required Widget Function(BuildContext?) builder,
     SmartDialogController? controller,
-    AlignmentGeometry? alignment,
+    Alignment? alignment,
     bool? clickMaskDismiss,
     bool? usePenetrate,
     bool? useAnimation,
@@ -143,7 +143,7 @@ class SmartDialogUtil {
     Widget Function(Offset, Size, Offset, Size)? replaceBuilder,
     SmartDialogController? controller,
     Offset Function(Offset, Size)? targetBuilder,
-    AlignmentGeometry? alignment,
+    Alignment? alignment,
     bool? clickMaskDismiss,
     SmartAnimationType? animationType,
     List<SmartNonAnimationType>? nonAnimationTypes,
@@ -224,7 +224,7 @@ class SmartDialogUtil {
     Icon? icon,
     String title = 'Warning',
     String content = '',
-    AlignmentGeometry? alignment,
+    Alignment? alignment,
   }) {
     Icon i;
     if (icon == null) {
@@ -324,7 +324,7 @@ class SmartDialogUtil {
     String msg, {
     SmartDialogController? controller,
     Duration? displayTime,
-    AlignmentGeometry? alignment,
+    Alignment? alignment,
     bool? clickMaskDismiss,
     SmartAnimationType? animationType,
     Widget Function(AnimationController, Widget, AnimationParam)?

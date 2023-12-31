@@ -1,5 +1,5 @@
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:flutter_quill/flutter_quill.dart';
+import 'package:dart_quill_delta/src/delta/delta.dart';
 import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 
 class DocumentUtil {

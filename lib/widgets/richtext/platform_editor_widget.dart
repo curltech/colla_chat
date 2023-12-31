@@ -12,6 +12,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_rte/flutter_rte.dart' as rte;
 import 'package:html_editor_enhanced/html_editor.dart';
 import 'package:quill_html_editor/quill_html_editor.dart';
+import 'package:dart_quill_delta/src/delta/delta.dart';
 
 class PlatformEditorController with ChangeNotifier {
   dynamic originalController;
