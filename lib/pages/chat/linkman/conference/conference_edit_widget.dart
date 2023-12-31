@@ -300,12 +300,12 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
       return null;
     }
     bool conferenceModified = false;
-    Conference currentConference = Conference.fromJson(values);
-    if (StringUtil.isEmpty(currentConference.name)) {
+    if (StringUtil.isEmpty(values['name'])) {
       DialogUtil.error(context,
           content: AppLocalizations.t('Must has conference name'));
       return null;
     }
+    Conference currentConference = Conference.fromJson(values);
     if (StringUtil.isEmpty(current.conferenceOwnerPeerId)) {
       DialogUtil.error(context,
           content: AppLocalizations.t('Must has conference owner'));

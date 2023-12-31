@@ -49,7 +49,7 @@ class LiveKitManageRoom {
     emptyTimeout = json['emptyTimeout'];
     host = json['host'];
     roomName = json['roomName'];
-    maxParticipants = json['maxParticipants'];
+    maxParticipants = json['maxParticipants'] ?? 0;
     identities = json['identities'] != null
         ? List<String>.from(json['identities'] as List<dynamic>)
         : null;
