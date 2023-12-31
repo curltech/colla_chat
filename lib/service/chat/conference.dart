@@ -36,6 +36,8 @@ class LiveKitManageRoom {
 
   List<String>? tokens;
 
+  int maxParticipants = 0;
+
   List<LiveKitParticipant>? participants;
 
   List<LiveKitRoom>? rooms;
@@ -47,6 +49,7 @@ class LiveKitManageRoom {
     emptyTimeout = json['emptyTimeout'];
     host = json['host'];
     roomName = json['roomName'];
+    maxParticipants = json['maxParticipants'];
     identities = json['identities'] != null
         ? List<String>.from(json['identities'] as List<dynamic>)
         : null;
@@ -84,6 +87,7 @@ class LiveKitManageRoom {
       'emptyTimeout': emptyTimeout,
       'host': host,
       'roomName': roomName,
+      'maxParticipants': maxParticipants,
       'identities': identities,
       'names': names,
       'tokens': tokens,
@@ -470,6 +474,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
       LiveKitManageRoom liveKitManageRoom = await createSfuRoom(
           conference.conferenceId,
           emptyTimeout: emptyTimeout,
+          maxParticipants: conference.maxParticipants,
           participants: participants,
           names: names);
       List<String>? tokens = liveKitManageRoom.tokens;
@@ -539,10 +544,12 @@ class ConferenceService extends GeneralBaseService<Conference> {
 
   Future<LiveKitManageRoom> createSfuRoom(String roomName,
       {Duration emptyTimeout = const Duration(days: 1),
+      int maxParticipants = 0,
       List<String>? participants,
       List<String>? names}) async {
     LiveKitManageRoom liveKitManageRoom = LiveKitManageRoom();
     liveKitManageRoom.roomName = roomName;
+    liveKitManageRoom.maxParticipants = maxParticipants;
     liveKitManageRoom.emptyTimeout = emptyTimeout.inSeconds;
     liveKitManageRoom.identities = participants;
     liveKitManageRoom.names = names;

@@ -342,9 +342,12 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
           endDate: currentConference.endDate,
           participants: conferenceMembers.value);
       current.password = currentConference.password;
-      current.advance = currentConference.advance;
-      current.mute = currentConference.mute;
-      current.contact = currentConference.contact;
+      current.simulcast = currentConference.simulcast;
+      current.dynacast = currentConference.dynacast;
+      current.e2ee = currentConference.e2ee;
+      current.fastConnect = currentConference.fastConnect;
+      current.adaptiveStream = currentConference.adaptiveStream;
+      current.maxParticipants = currentConference.maxParticipants;
       current.sfu = currentConference.sfu;
       current.sfuToken = currentConference.sfuToken;
       current.sfuUri = currentConference.sfuUri;

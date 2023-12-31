@@ -319,6 +319,10 @@ class _IndexViewState extends State<IndexView>
   }
 
   _updateConferenceJoined() {
+    if (indexWidgetProvider.current == 'video_chat' ||
+        indexWidgetProvider.current == 'sfu_video_chat') {
+      return;
+    }
     String? conferenceId = p2pConferenceClientPool.conferenceId;
     conferenceId ??= liveKitConferenceClientPool.conferenceId;
     if (conferenceId != null) {
