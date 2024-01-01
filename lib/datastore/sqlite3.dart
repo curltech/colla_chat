@@ -9,6 +9,7 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/chat/conference.dart';
+import 'package:colla_chat/service/dht/peerendpoint.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/entity_util.dart';
@@ -25,7 +26,14 @@ class Sqlite3 extends DataStore {
   late CommonDatabase db;
 
   open({String name = dbname}) async {
-    db = await sqlite3_open.openSqlite3(name: name);
+    for (int i = 0; i < 3; i++) {
+      try {
+        db = await sqlite3_open.openSqlite3(name: name);
+        break;
+      } catch (e) {
+        await Future.delayed(Duration(milliseconds: (i + 1) * 100));
+      }
+    }
     //开发调试阶段，每次都重建数据库表
     //db.userVersion = 0;
     await init(db);
@@ -49,7 +57,8 @@ class Sqlite3 extends DataStore {
         drop(conferenceService.tableName);
       }
     }
-    // drop(peerEndpointService.tableName);
+    drop(conferenceService.tableName);
+    drop(peerEndpointService.tableName);
     await localSharedPreferences.save('appVersion', appVersion);
     print('new appVersion:$appVersion');
 
