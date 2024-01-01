@@ -60,7 +60,7 @@ dependencies:
   network_info_plus: ^4.0.1
   beamer: ^1.4.1+1
   sensors_plus: ^4.0.2
-  battery_plus: 4.0.1
+  battery_plus: ^5.0.2
   package_info_plus: ^5.0.1
   flutter_contacts: ^1.1.6
   fluttercontactpicker: ^4.7.0
@@ -83,7 +83,7 @@ dependencies:
   #网络
   dio: ^5.0.2
   dio_http2_adapter: ^2.1.0
-  web_socket_channel: ^2.4.0
+  web_socket_channel: ^2.4.1
   #cached_network_image: ^3.0.0
   #flutter_sms: ^2.3.3 #android compile failure
   #sms_advanced: ^1.0.2 #android版本有问题
@@ -103,8 +103,8 @@ dependencies:
   stacked_notification_cards: ^0.1.0-dev.4
   toastification: ^1.0.2
   cupertino_icons: ^1.0.2
-  icons_plus: ^4.0.0
-  simple_icons: ^7.10.0 #icon: Icon(SimpleIcons.github)
+  icons_plus: ^5.0.0
+  simple_icons: ^10.1.3 #icon: Icon(SimpleIcons.github)
   fluttericon: ^2.0.0
   flutter_animated_icons: ^1.0.0
   country_pickers: ^2.0.0
@@ -146,7 +146,7 @@ dependencies:
     git:
       url: https://github.com/den0206/Flutter-Neumorphic.git
       ref: feature/remoce_accentcolor
-  fl_chart: ^0.64.0
+  fl_chart: ^0.66.0
   k_chart: ^0.7.1
   extended_text: ^12.0.0 #文本扩展显示
   extended_text_field: ^13.0.0 #文字表情混入
@@ -240,7 +240,7 @@ dependencies:
   toggle_switch: ^2.0.1
   classic_logger: any
   #logging: ^1.0.2
-  cross_file: 0.3.3+6
+  cross_file: 0.3.3+8
   mobile_scanner: ^3.4.1
   qr_flutter:
     git:
@@ -249,7 +249,7 @@ dependencies:
   #barcode: ^2.2.3
   #barcode_image: ^2.0.2
   #barcode_widget: ^2.0.2
-  barcode_scan2: ^4.2.4
+  #  barcode_scan2: ^4.3.0
   #mobile_scanner: ^2.0.0  #macos有问题
   lpinyin: ^2.0.3 #拼音
   window_manager: ^0.3.7 #桌面应用的窗口管理
@@ -310,7 +310,7 @@ dependencies:
   #thumbnailer: ^2.2.0
   fc_native_video_thumbnail: ^0.7.0
   extended_image: ^8.2.0 #所有平台，官方软件，管理图像
-  extended_image_library: ^4.0.1
+  extended_image_library: ^4.0.2
   image_editor: ^1.3.0
   image: ^4.0.17 #所有平台，装载，保存，管理图像
   flutter_luban: ^0.1.13
@@ -322,7 +322,7 @@ dependencies:
 
   #应用
   #  flutter_filereader: 3.0.0 #引入x5浏览器
-  i18n_extension: ^9.0.2
+  i18n_extension: ^10.0.1
   quill_html_editor: ^2.2.7
   html_editor_enhanced: ^2.5.1
   #  visual_editor:
@@ -339,7 +339,7 @@ dependencies:
   google_maps_flutter: ^2.5.0 #谷歌地图，移动设备
   apple_maps_flutter: ^1.2.0
   map_launcher: ^3.0.1 #打开设备已安装的地图软件，移动设备
-  location_picker_flutter_map: ^1.2.1 #Open Street Map，需要翻墙
+  location_picker_flutter_map: ^2.1.0 #Open Street Map，需要翻墙
 
   #服务
   firebase_core: 2.24.2
@@ -353,14 +353,14 @@ dependencies:
   system_tray: ^2.0.3
   tray_manager: ^0.2.0
   chat_gpt_sdk: ^2.0.4
-  flutter_chatgpt_api: ^1.1.0
   whisper_dart: ^0.0.11
-  openai_dalle_wrapper: ^1.0.0
   dart_chatgpt: ^1.0.2
   livekit_client: ^1.5.3 #livekit sfu server flutter client
   livekit_server_sdk: ^1.0.0
 dependency_overrides:
-  uuid: ^4.1.0
+  uuid: ^4.3.1
+  meta: ^1.11.0
+  web: ^0.4.0
   logger: ^2.0.2+1
   flutter_math_fork: ^0.7.1
   photo_view: ^0.14.0
@@ -371,9 +371,9 @@ dependency_overrides:
   webrtc_interface: 1.1.2
   flutter_webrtc: ^0.9.47
   protobuf: ^3.1.0
-  analyzer: ^6.0.0
+  analyzer: ^6.3.0
   provider: ^6.0.1
-  geolocator: ^9.0.2
+  geolocator: ^10.1.0
   apple_maps_flutter: ^1.2.0
   http: ^1.1.0
   flutter_inappwebview: ^6.0.0
@@ -394,7 +394,7 @@ dependency_overrides:
   permission_handler: ^10.2.0
   file_picker: ^6.0.0
   #  file_picker_pro: ^1.4.0 #open_filex和open_file冲突
-  intl: ^0.18.0
+  intl: ^0.19.0
   image: ^4.0.12
   google_fonts: ^6.1.0
   material_design_icons_flutter: ^7.0.7296
@@ -423,14 +423,14 @@ dependency_overrides:
   focus_detector: ^2.0.1 #组建在界面上消失或者出现
   image_picker: ^1.0.1 #选取图库,移动从图像廊或者相机选，桌面实现采用file_selector，从文件系统选
   latlong2: ^0.9.0
-  flutter_map_location_marker: ^7.0.0 #^8.0.0
-  flutter_map: 5.0.0 #^6.0.1
+  flutter_map_location_marker: ^8.0.3
+  flutter_map: ^6.1.0
   win32: ^5.0.9
   markdown: ^7.1.1
   lottie: ^2.4.0
-  flutter_quill: 9.2.0 #8.1.3
+  flutter_quill: 9.2.1 #8.1.3
 #    git: https://github.com/singerdmx/flutter-quill.git
-  flutter_quill_extensions: ^9.2.0
+  flutter_quill_extensions: ^9.2.1
 #    git:
 #      url: https://github.com/singerdmx/flutter-quill.git
 #      path: flutter_quill_extensions
@@ -457,7 +457,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.1
   analyzer: ^6.0.0
   build_runner: ^2.1.10
   flutter_launcher_icons: ^0.13.1
