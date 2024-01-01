@@ -241,7 +241,7 @@ dependencies:
   classic_logger: any
   #logging: ^1.0.2
   cross_file: 0.3.3+8
-  mobile_scanner: ^3.4.1
+  mobile_scanner: ^3.5.5
   qr_flutter:
     git:
       url: https://github.com/theyakka/qr.flutter.git
@@ -249,7 +249,7 @@ dependencies:
   #barcode: ^2.2.3
   #barcode_image: ^2.0.2
   #barcode_widget: ^2.0.2
-  #  barcode_scan2: ^4.3.0
+  barcode_scan2: ^4.3.0
   #mobile_scanner: ^2.0.0  #macos有问题
   lpinyin: ^2.0.3 #拼音
   window_manager: ^0.3.7 #桌面应用的窗口管理
