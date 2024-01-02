@@ -112,8 +112,8 @@ dependencies:
   font_awesome_flutter: ^10.1.0
   #flushbar: ^1.10.4
   #share: ^0.6.5
-  flutter_emoji: ^2.4.0
-  emoji_picker_flutter: ^1.6.3
+  flutter_emoji: ^2.5.1
+  emoji_picker_flutter: ^2.0.0-dev.3
   fluro: ^2.0.3
   flutter_multi_formatter: ^2.5.1
   #flutter_awesome_select: ^6.5.0
@@ -249,7 +249,7 @@ dependencies:
   #barcode: ^2.2.3
   #barcode_image: ^2.0.2
   #barcode_widget: ^2.0.2
-  barcode_scan2: ^4.3.0
+#  barcode_scan2: ^4.3.0
   #mobile_scanner: ^2.0.0  #macos有问题
   lpinyin: ^2.0.3 #拼音
   window_manager: ^0.3.7 #桌面应用的窗口管理
@@ -377,7 +377,7 @@ dependency_overrides:
   apple_maps_flutter: ^1.2.0
   http: ^1.1.0
   flutter_inappwebview: ^6.0.0
-  connectivity_plus: ^5.0.1
+  connectivity_plus: ^5.0.2
   dart_openai: ^5.0.0
   masamune_ai_openai: ^2.1.3
   webview_flutter: ^4.4.2

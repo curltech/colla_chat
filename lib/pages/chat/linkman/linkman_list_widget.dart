@@ -1,3 +1,4 @@
+import 'package:badges/badges.dart' as badges;
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
@@ -34,7 +35,6 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
-import 'package:badges/badges.dart' as badges;
 
 final DataListController<Linkman> linkmanController =
     DataListController<Linkman>();
@@ -753,7 +753,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   }
 
   Future<void> scanQrcode(BuildContext context) async {
-    String content = await QrcodeUtil.scan();
+    String? content = await QrcodeUtil.mobileScan(context);
     var map = JsonUtil.toJson(content);
     PeerClient peerClient = PeerClient.fromJson(map);
     await peerClientService.store(peerClient);

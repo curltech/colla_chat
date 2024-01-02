@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 
-import 'package:barcode_scan2/barcode_scan2.dart';
+// import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/tool/image_util.dart';
@@ -126,28 +126,28 @@ class QrcodeUtil {
   // }
 
   ///使用barcode_scan2扫描二维码的功能，仅支持移动设备
-  static Future<String> scan(
-      {List<BarcodeFormat> restrictFormat = const [],
-      int useCamera = -1,
-      AndroidOptions android = const AndroidOptions(),
-      bool autoEnableFlash = false,
-      Map<String, String> strings = const {
-        'cancel': 'Cancel',
-        'flash_on': 'Flash on',
-        'flash_off': 'Flash off',
-      }}) async {
-    var options = ScanOptions(
-      restrictFormat: restrictFormat,
-      useCamera: useCamera,
-      android: android,
-      autoEnableFlash: autoEnableFlash,
-      strings: strings,
-    );
-
-    ScanResult result = await BarcodeScanner.scan(options: options);
-
-    return result.rawContent;
-  }
+  // static Future<String> scan(
+  //     {List<BarcodeFormat> restrictFormat = const [],
+  //     int useCamera = -1,
+  //     AndroidOptions android = const AndroidOptions(),
+  //     bool autoEnableFlash = false,
+  //     Map<String, String> strings = const {
+  //       'cancel': 'Cancel',
+  //       'flash_on': 'Flash on',
+  //       'flash_off': 'Flash off',
+  //     }}) async {
+  //   var options = ScanOptions(
+  //     restrictFormat: restrictFormat,
+  //     useCamera: useCamera,
+  //     android: android,
+  //     autoEnableFlash: autoEnableFlash,
+  //     strings: strings,
+  //   );
+  //
+  //   ScanResult result = await BarcodeScanner.scan(options: options);
+  //
+  //   return result.rawContent;
+  // }
 
   static Future<String?> mobileScan(BuildContext context) async {
     String? result;
