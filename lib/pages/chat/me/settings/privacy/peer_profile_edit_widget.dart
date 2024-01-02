@@ -139,7 +139,7 @@ class PeerProfileEditWidget extends StatefulWidget with TileDataMixin {
   IconData get iconData => Icons.room_preferences_outlined;
 
   @override
-  String get title => 'PeerProfileEdit';
+  String get title => 'Privacy Setting';
 }
 
 class _PeerProfileEditWidgetState extends State<PeerProfileEditWidget> {
