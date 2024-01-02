@@ -24,7 +24,7 @@ class PeerProfile extends StatusEntity {
   String? fontFamily;
   bool vpnSwitch = false; //是否提供vpn功能
   bool stockSwitch = false; //是否提供股票功能
-  bool emalSwitch = false; //是否提供email功能
+  bool emailSwitch = false; //是否提供email功能
   bool autoLogin = false;
   bool developerSwitch = false;
   String? logLevel;
@@ -38,42 +38,43 @@ class PeerProfile extends StatusEntity {
 
   PeerProfile(this.peerId, {this.clientId = unknownClientId}) : super();
 
-  PeerProfile.fromJson(Map json)
+  PeerProfile.fromJson(super.json)
       : peerId = json['peerId'],
         clientId = json['clientId'],
         clientDevice = json['clientDevice'],
         clientType = json['clientType'],
-        locale = json['locale'],
+        locale = json['locale'] ?? 'zh_CN',
         userId = json['userId'],
         username = json['username'],
         primaryColor = json['primaryColor'] ?? Colors.cyan.value,
         secondaryColor = json['secondaryColor'] ?? Colors.cyan.value,
         scheme = json['scheme'],
         darkScheme = json['darkScheme'],
-        themeMode = json['themeMode'],
+        themeMode = json['themeMode'] ?? ThemeMode.system.name,
         vpnSwitch =
-            json['udpSwitch'] == true || json['udpSwitch'] == 1 ? true : false,
-        stockSwitch =
-            json['downloadSwitch'] == true || json['downloadSwitch'] == 1
-                ? true
-                : false,
-        emalSwitch = json['localDataCryptoSwitch'] == true ||
-                json['localDataCryptoSwitch'] == 1
+            json['vpnSwitch'] == true || json['vpnSwitch'] == 1 ? true : false,
+        stockSwitch = json['stockSwitch'] == true || json['stockSwitch'] == 1
+            ? true
+            : false,
+        emailSwitch = json['emailSwitch'] == true || json['emailSwitch'] == 1
             ? true
             : false,
         autoLogin =
             json['autoLogin'] == true || json['autoLogin'] == 1 ? true : false,
         developerSwitch =
-            json['developerOption'] == true || json['developerOption'] == 1
+            json['developerSwitch'] == true || json['developerSwitch'] == 1
                 ? true
                 : false,
         logLevel = json['logLevel'],
         lastSyncTime = json['lastSyncTime'],
-        mobileVerified = json['mobileVerified'],
+        mobileVerified =
+            json['mobileVerified'] == true || json['developerOption'] == 1
+                ? true
+                : false,
         visibilitySetting = json['visibilitySetting'],
         creditScore = json['creditScore'] ?? 0,
         currency = json['currency'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {
@@ -91,11 +92,11 @@ class PeerProfile extends StatusEntity {
       'scheme': scheme,
       'darkScheme': darkScheme,
       'themeMode': themeMode,
-      'udpSwitch': vpnSwitch,
-      'downloadSwitch': stockSwitch,
-      'localDataCryptoSwitch': emalSwitch,
+      'vpnSwitch': vpnSwitch,
+      'stockSwitch': stockSwitch,
+      'emailSwitch': emailSwitch,
       'autoLogin': autoLogin,
-      'developerOption': developerSwitch,
+      'developerSwitch': developerSwitch,
       'logLevel': logLevel,
       'lastSyncTime': lastSyncTime,
       'mobileVerified': mobileVerified,

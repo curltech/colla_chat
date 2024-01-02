@@ -673,7 +673,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
         widget.controller.value = value;
         setState(() {});
       },
-      value: widget.controller.value,
+      value: widget.controller.value ?? false,
     );
     children.add(switcher);
 

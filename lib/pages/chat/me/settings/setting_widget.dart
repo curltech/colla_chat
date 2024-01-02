@@ -2,7 +2,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/login/p2p_login_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/advanced_setting_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/general/general_setting_widget.dart';
-import 'package:colla_chat/pages/chat/me/settings/privacy/privacy_setting_widget.dart';
+import 'package:colla_chat/pages/chat/me/settings/privacy/peer_profile_edit_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/security/security_setting_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -20,8 +20,8 @@ class SettingWidget extends StatefulWidget with TileDataMixin {
   final GeneralSettingWidget generalSettingWidget =
       const GeneralSettingWidget();
   final AdvancedSettingWidget advancedSettingWidget = AdvancedSettingWidget();
-  final PrivacySettingWidget privacySettingWidget =
-      const PrivacySettingWidget();
+  final PeerProfileEditWidget peerProfileEditWidget =
+      const PeerProfileEditWidget();
   final SecuritySettingWidget securitySettingWidget = SecuritySettingWidget();
   final AuthMethod authMethod = AuthMethod.app;
   late final List<TileData> settingTileData;
@@ -29,12 +29,12 @@ class SettingWidget extends StatefulWidget with TileDataMixin {
   SettingWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(generalSettingWidget);
     indexWidgetProvider.define(advancedSettingWidget);
-    indexWidgetProvider.define(privacySettingWidget);
+    indexWidgetProvider.define(peerProfileEditWidget);
     indexWidgetProvider.define(securitySettingWidget);
     List<TileDataMixin> mixins = [
       generalSettingWidget,
       advancedSettingWidget,
-      privacySettingWidget,
+      peerProfileEditWidget,
       securitySettingWidget
     ];
     settingTileData = TileData.from(mixins);
