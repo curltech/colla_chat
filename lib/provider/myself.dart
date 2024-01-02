@@ -52,7 +52,12 @@ class Myself with ChangeNotifier {
   }
 
   PeerProfile get peerProfile {
-    return myselfPeer.peerProfile!;
+    PeerProfile? peerProfile = myselfPeer.peerProfile;
+    peerProfile = peerProfile ??
+        PeerProfile(myselfPeer.peerId, clientId: myselfPeer.clientId);
+    myselfPeer.peerProfile = peerProfile;
+
+    return peerProfile;
   }
 
   set peerProfile(PeerProfile peerProfile) {
