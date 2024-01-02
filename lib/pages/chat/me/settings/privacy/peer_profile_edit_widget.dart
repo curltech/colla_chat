@@ -169,7 +169,7 @@ class _PeerProfileEditWidgetState extends State<PeerProfileEditWidget> {
 
   _onOk(Map<String, dynamic> values) {
     PeerProfile peerProfile = PeerProfile.fromJson(values);
-    peerProfileService.upsert(peerProfile).then((count) {
+    peerProfileService.upsert(peerProfile).then((count) async {
       PeerProfile? myselfPeerProfile = myself.myselfPeer.peerProfile;
       if (myselfPeerProfile != null) {
         myselfPeerProfile.vpnSwitch = peerProfile.vpnSwitch;
@@ -178,7 +178,8 @@ class _PeerProfileEditWidgetState extends State<PeerProfileEditWidget> {
         myselfPeerProfile.developerSwitch = peerProfile.developerSwitch;
         myselfPeerProfile.mobileVerified = peerProfile.mobileVerified;
         myselfPeerProfile.logLevel = peerProfile.logLevel;
-        peerProfileService.store(myselfPeerProfile);
+        await peerProfileService.store(myselfPeerProfile);
+        setState(() {});
       }
     });
   }
