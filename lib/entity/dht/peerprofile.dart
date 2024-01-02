@@ -17,7 +17,7 @@ class PeerProfile extends StatusEntity {
   // 个性化配置
   String locale = 'zh_CN';
   int primaryColor = Colors.cyan.value;
-  int? secondaryColor;
+  int secondaryColor = Colors.cyan.value;
   String? scheme;
   String? darkScheme;
   String themeMode = ThemeMode.system.name;
@@ -36,9 +36,9 @@ class PeerProfile extends StatusEntity {
   int creditScore = 0;
   String? currency;
 
-  PeerProfile(this.peerId, {this.clientId = unknownClientId}) : super();
+  PeerProfile(this.peerId, {this.clientId = unknownClientId});
 
-  PeerProfile.fromJson(super.json)
+  PeerProfile.fromJson(Map json)
       : peerId = json['peerId'],
         clientId = json['clientId'],
         clientDevice = json['clientDevice'],
@@ -74,7 +74,7 @@ class PeerProfile extends StatusEntity {
         visibilitySetting = json['visibilitySetting'],
         creditScore = json['creditScore'] ?? 0,
         currency = json['currency'],
-        super.fromJson();
+        super.fromJson(json);
 
   @override
   Map<String, dynamic> toJson() {

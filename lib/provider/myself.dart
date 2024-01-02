@@ -214,11 +214,8 @@ class Myself with ChangeNotifier {
     return Color(peerProfile.primaryColor);
   }
 
-  Color? get secondaryColor {
-    if (peerProfile.secondaryColor != null) {
-      return Color(peerProfile.secondaryColor!);
-    }
-    return null;
+  Color get secondaryColor {
+    return Color(peerProfile.secondaryColor);
   }
 
   set primaryColor(Color color) {
@@ -234,9 +231,9 @@ class Myself with ChangeNotifier {
     }
   }
 
-  set secondaryColor(Color? color) {
-    if (peerProfile.secondaryColor != color?.value) {
-      peerProfile.secondaryColor = color?.value;
+  set secondaryColor(Color color) {
+    if (peerProfile.secondaryColor != color.value) {
+      peerProfile.secondaryColor = color.value;
       if (peerProfile.id != null) {
         peerProfileService.update(
             {'secondaryColor': peerProfile.secondaryColor},
