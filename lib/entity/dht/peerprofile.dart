@@ -22,30 +22,19 @@ class PeerProfile extends StatusEntity {
   String? darkScheme;
   String themeMode = ThemeMode.system.name;
   String? fontFamily;
-  bool udpSwitch = false;
-  bool downloadSwitch = false;
-  bool localDataCryptoSwitch = false;
+  bool vpnSwitch = false; //是否提供vpn功能
+  bool stockSwitch = false; //是否提供股票功能
+  bool emalSwitch = false; //是否提供email功能
   bool autoLogin = false;
-  bool developerOption = false;
+  bool developerSwitch = false;
   String? logLevel;
   String? lastSyncTime;
-
-  /// 主发现地址，表示可信的，可以推荐你的peer地址
-  String? discoveryAddress;
-  String? lastFindNodeTime;
-
-  String? mobileVerified;
+  bool mobileVerified = false;
 
   // 可见性YYYYYY (peerId, mobileNumber, groupChat, qrCode, contactCard, name）
   String? visibilitySetting;
   int creditScore = 0;
-  String? preferenceScore;
-  String? badCount;
-  String? staleCount;
-  String? blockId;
-  String? balance;
   String? currency;
-  String? lastTransactionTime;
 
   PeerProfile(this.peerId, {this.clientId = unknownClientId}) : super();
 
@@ -62,36 +51,28 @@ class PeerProfile extends StatusEntity {
         scheme = json['scheme'],
         darkScheme = json['darkScheme'],
         themeMode = json['themeMode'],
-        udpSwitch =
+        vpnSwitch =
             json['udpSwitch'] == true || json['udpSwitch'] == 1 ? true : false,
-        downloadSwitch =
+        stockSwitch =
             json['downloadSwitch'] == true || json['downloadSwitch'] == 1
                 ? true
                 : false,
-        localDataCryptoSwitch = json['localDataCryptoSwitch'] == true ||
+        emalSwitch = json['localDataCryptoSwitch'] == true ||
                 json['localDataCryptoSwitch'] == 1
             ? true
             : false,
         autoLogin =
             json['autoLogin'] == true || json['autoLogin'] == 1 ? true : false,
-        developerOption =
+        developerSwitch =
             json['developerOption'] == true || json['developerOption'] == 1
                 ? true
                 : false,
         logLevel = json['logLevel'],
         lastSyncTime = json['lastSyncTime'],
-        discoveryAddress = json['discoveryAddress'],
-        lastFindNodeTime = json['lastFindNodeTime'],
         mobileVerified = json['mobileVerified'],
         visibilitySetting = json['visibilitySetting'],
         creditScore = json['creditScore'] ?? 0,
-        preferenceScore = json['preferenceScore'],
-        badCount = json['badCount'],
-        staleCount = json['staleCount'],
-        blockId = json['blockId'],
-        balance = json['balance'],
         currency = json['currency'],
-        lastTransactionTime = json['lastTransactionTime'],
         super.fromJson(json);
 
   @override
@@ -110,25 +91,17 @@ class PeerProfile extends StatusEntity {
       'scheme': scheme,
       'darkScheme': darkScheme,
       'themeMode': themeMode,
-      'udpSwitch': udpSwitch,
-      'downloadSwitch': downloadSwitch,
-      'localDataCryptoSwitch': localDataCryptoSwitch,
+      'udpSwitch': vpnSwitch,
+      'downloadSwitch': stockSwitch,
+      'localDataCryptoSwitch': emalSwitch,
       'autoLogin': autoLogin,
-      'developerOption': developerOption,
+      'developerOption': developerSwitch,
       'logLevel': logLevel,
       'lastSyncTime': lastSyncTime,
-      'discoveryAddress': discoveryAddress,
-      'lastFindNodeTime': lastFindNodeTime,
       'mobileVerified': mobileVerified,
       'visibilitySetting': visibilitySetting,
       'creditScore': creditScore,
-      'preferenceScore': preferenceScore,
-      'badCount': badCount,
-      'staleCount': staleCount,
-      'blockId': blockId,
-      'balance': balance,
       'currency': currency,
-      'lastTransactionTime': lastTransactionTime,
     });
     return json;
   }
