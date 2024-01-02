@@ -23,13 +23,19 @@ class EmojiMessageInputWidget extends StatefulWidget {
 }
 
 class _EmojiMessageInputWidgetState extends State<EmojiMessageInputWidget> {
+  final textEditingController = TextEditingController();
+  final scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
   }
 
-  _update() {
-    setState(() {});
+  _onBackspacePressed() {
+    textEditingController
+      ..text = textEditingController.text.characters.toString()
+      ..selection = TextSelection.fromPosition(
+          TextPosition(offset: textEditingController.text.length));
   }
 
   ///构造自定义的emoji的选择组件
@@ -66,37 +72,41 @@ class _EmojiMessageInputWidgetState extends State<EmojiMessageInputWidget> {
     return SizedBox(
         height: chatMessageViewController.emojiMessageInputHeight,
         child: EmojiPicker(
-            //textEditingController: TextEditingController(),
-            onEmojiSelected: (Category? category, Emoji emoji) {
-              if (widget.onTap != null) {
-                widget.onTap!(emoji.emoji);
-              }
-            },
-            config: Config(
-                columns: 10,
-                emojiSizeMax: 24 * (platformParams.ios ? 1.30 : 1.0),
-                verticalSpacing: 0,
-                horizontalSpacing: 0,
-                gridPadding: EdgeInsets.zero,
-                initCategory: Category.RECENT,
-                bgColor: Colors.white.withOpacity(0.0),
-                indicatorColor: primary,
-                iconColor: Colors.grey,
-                iconColorSelected: primary,
-                backspaceColor: primary,
-                skinToneDialogBgColor: Colors.white.withOpacity(0.0),
-                skinToneIndicatorColor: Colors.grey,
-                enableSkinTones: true,
-                recentsLimit: 28,
-                replaceEmojiOnLimitExceed: false,
-                noRecents: CommonAutoSizeText(
-                  AppLocalizations.t('No Recents'),
-                  style: const TextStyle(fontSize: 20, color: Colors.black),
-                  textAlign: TextAlign.center,
-                ),
-                tabIndicatorAnimDuration: kTabScrollDuration,
-                categoryIcons: const CategoryIcons(),
-                buttonMode: ButtonMode.MATERIAL)));
+          textEditingController: textEditingController,
+          onEmojiSelected: (Category? category, Emoji emoji) {
+            if (widget.onTap != null) {
+              widget.onTap!(emoji.emoji);
+            }
+          },
+          scrollController: scrollController,
+          onBackspacePressed: _onBackspacePressed,
+          config: Config(
+            height: 256,
+            checkPlatformCompatibility: true,
+            emojiViewConfig: EmojiViewConfig(
+              columns: 10,
+              emojiSizeMax: 24 * (platformParams.ios ? 1.30 : 1.0),
+              verticalSpacing: 0,
+              horizontalSpacing: 0,
+              backgroundColor: Colors.white.withOpacity(0.0),
+              gridPadding: EdgeInsets.zero,
+              recentsLimit: 28,
+              replaceEmojiOnLimitExceed: false,
+              loadingIndicator: const SizedBox.shrink(),
+              noRecents: CommonAutoSizeText(
+                AppLocalizations.t('No Recents'),
+                style: const TextStyle(fontSize: 20, color: Colors.black),
+                textAlign: TextAlign.center,
+              ),
+              buttonMode: ButtonMode.MATERIAL,
+            ),
+            swapCategoryAndBottomBar: false,
+            skinToneConfig: SkinToneConfig(indicatorColor: primary),
+            categoryViewConfig: const CategoryViewConfig(),
+            bottomActionBarConfig: const BottomActionBarConfig(),
+            searchViewConfig: const SearchViewConfig(),
+          ),
+        ));
   }
 
   @override
