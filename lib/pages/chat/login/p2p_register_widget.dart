@@ -242,30 +242,30 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
     // 检查密码的难度
     bool isPassword =
         RegVal.hasMatch(plainPassword, RegexPattern.passwordNormal1);
-    isPassword = Validate.isPassword(plainPassword);
+    // isPassword = Validate.isPassword(plainPassword);
     if (!isPassword) {
-      DialogUtil.error(context, content: 'password must be right password');
+      DialogUtil.error(context, content: 'password must be strong password');
+      return;
+    }
+    if (plainPassword != confirmPassword) {
+      logger.e('password is not matched');
+      DialogUtil.error(context, content: 'password is not matched');
       return;
     }
     String name = values['name'];
     String loginName = values['loginName'];
     String? email = values['email'];
-    if (plainPassword == confirmPassword) {
-      myselfPeerService
-          .register(name, loginName, plainPassword,
-              mobile: mobileController.text, email: email)
-          .then((myselfPeer) {
-        myself.myselfPeer = myselfPeer;
-        myselfPeerController.add(myselfPeer);
-        peerId.value = myselfPeer.peerId;
-        // Application.router
-        //     .navigateTo(context, Application.p2pLogin, replace: true);
-      }).onError((error, stackTrace) {
-        DialogUtil.error(context, content: error.toString());
-      });
-    } else {
-      logger.e('password is not matched');
-      DialogUtil.error(context, content: 'password is not matched');
-    }
+    myselfPeerService
+        .register(name, loginName, plainPassword,
+            mobile: mobileController.text, email: email)
+        .then((myselfPeer) {
+      myself.myselfPeer = myselfPeer;
+      myselfPeerController.add(myselfPeer);
+      peerId.value = myselfPeer.peerId;
+      // Application.router
+      //     .navigateTo(context, Application.p2pLogin, replace: true);
+    }).onError((error, stackTrace) {
+      DialogUtil.error(context, content: error.toString());
+    });
   }
 }
