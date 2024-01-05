@@ -38,6 +38,20 @@ class IndexWidgetProvider with ChangeNotifier {
     }
   }
 
+  addMainView(String routeName) {
+    if (!mainViews.contains(routeName) && allViews.containsKey(routeName)) {
+      mainViews.add(routeName);
+      notifyListeners();
+    }
+  }
+
+  removeMainView(String routeName) {
+    if (mainViews.contains(routeName)) {
+      mainViews.remove(routeName);
+      notifyListeners();
+    }
+  }
+
   ///增加新的视图，不能在initState和build构建方法中调用listen=true，
   ///因为本方法会引起整个pageview视图的重新构建
   define(TileDataMixin view, {bool listen = false}) {

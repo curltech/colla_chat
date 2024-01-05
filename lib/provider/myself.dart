@@ -53,9 +53,12 @@ class Myself with ChangeNotifier {
 
   PeerProfile get peerProfile {
     PeerProfile? peerProfile = myselfPeer.peerProfile;
-    peerProfile = peerProfile ??
-        PeerProfile(myselfPeer.peerId, clientId: myselfPeer.clientId);
-    myselfPeer.peerProfile = peerProfile;
+    if (peerProfile == null) {
+      peerProfile =
+          PeerProfile(myselfPeer.peerId, clientId: myselfPeer.clientId);
+      peerProfileService.insert(peerProfile);
+      myselfPeer.peerProfile = peerProfile;
+    }
 
     return peerProfile;
   }
@@ -348,13 +351,7 @@ class Myself with ChangeNotifier {
 
   /// locale操作
   Locale get locale {
-    if (peerProfile.id != null) {
-      return LocaleUtil.getLocale(peerProfile.locale);
-    } else if (platformParams.locale != null) {
-      return platformParams.locale!;
-    } else {
-      return LocaleUtil.getLocale(peerProfile.locale);
-    }
+    return LocaleUtil.getLocale(peerProfile.locale);
   }
 
   set locale(Locale locale) {

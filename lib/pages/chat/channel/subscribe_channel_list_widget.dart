@@ -33,11 +33,11 @@ class SubscribeChannelListWidget extends StatefulWidget with TileDataMixin {
       SubscribeChannelMessagePreview();
 
   SubscribeChannelListWidget({
-    Key? key,
+    super.key,
     this.onRefresh,
     this.onScrollMax,
     this.onScrollMin,
-  }) : super(key: key) {
+  }) {
     indexWidgetProvider.define(publishChannelListWidget);
     indexWidgetProvider.define(publishedChannelMessagePreview);
     indexWidgetProvider.define(subscribeChannelMessagePreview);
@@ -56,7 +56,7 @@ class SubscribeChannelListWidget extends StatefulWidget with TileDataMixin {
   IconData get iconData => Icons.my_library_books;
 
   @override
-  String get title => 'Subscribe channel';
+  String get title => 'Channel';
 }
 
 class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>

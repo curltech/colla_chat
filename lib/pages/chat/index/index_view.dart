@@ -52,7 +52,7 @@ class IndexView extends StatefulWidget {
   final String title;
   final AdaptiveLayoutIndex adaptiveLayoutIndex = AdaptiveLayoutIndex();
 
-  IndexView({Key? key, required this.title}) : super(key: key);
+  IndexView({super.key, required this.title});
 
   @override
   State<StatefulWidget> createState() {

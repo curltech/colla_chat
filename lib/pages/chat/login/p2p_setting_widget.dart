@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 /// 地址语言选择设置组件，一个card下的录入框和按钮组合
 class P2pSettingWidget extends StatefulWidget {
-  const P2pSettingWidget({Key? key}) : super(key: key);
+  const P2pSettingWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _P2pSettingWidgetState();

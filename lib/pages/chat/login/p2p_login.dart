@@ -23,7 +23,7 @@ class P2pLogin extends StatefulWidget {
   late final List<Widget> _children;
   late final SwiperController controller = SwiperController();
 
-  P2pLogin({Key? key}) : super(key: key) {
+  P2pLogin({super.key}) {
     // 初始化子项集合
     _children = [
       p2pLoginWidget,

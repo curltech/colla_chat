@@ -6,7 +6,7 @@ import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
 
 class LocalePicker extends StatefulWidget {
-  const LocalePicker({Key? key}) : super(key: key);
+  const LocalePicker({super.key});
 
   @override
   State<StatefulWidget> createState() {

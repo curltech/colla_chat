@@ -38,7 +38,7 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
   final QStatWidget qstatWidget = QStatWidget();
   final StatScoreWidget statScoreWidget = StatScoreWidget();
 
-  StockMainWidget({Key? key}) : super(key: key) {
+  StockMainWidget({super.key}) {
     indexWidgetProvider.define(shareSelectionWidget);
     indexWidgetProvider.define(addShareWidget);
     indexWidgetProvider.define(refreshStockWidget);

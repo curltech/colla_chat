@@ -9,6 +9,8 @@ import 'package:colla_chat/pages/chat/me/me_widget.dart';
 import 'package:colla_chat/pages/stock/stock_main_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:provider/provider.dart';
@@ -16,14 +18,21 @@ import 'package:provider/provider.dart';
 ///自动适配的主页面结构
 class AdaptiveLayoutIndex extends StatefulWidget {
   AdaptiveLayoutIndex({super.key}) {
-    indexWidgetProvider.initMainView(SwiperController(), [
+    List<TileDataMixin> views = [
       ChatListWidget(),
       LinkmanListWidget(),
       SubscribeChannelListWidget(),
-      MailWidget(),
-      StockMainWidget(),
       MeWidget()
-    ]);
+    ];
+    bool emailSwitch = myself.peerProfile.emailSwitch;
+    if (emailSwitch) {
+      views.add(MailWidget());
+    }
+    bool stockSwitch = myself.peerProfile.stockSwitch;
+    if (stockSwitch) {
+      views.add(StockMainWidget());
+    }
+    indexWidgetProvider.initMainView(SwiperController(), views);
   }
 
   @override

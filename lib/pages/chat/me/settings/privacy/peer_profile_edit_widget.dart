@@ -1,4 +1,5 @@
 import 'package:colla_chat/entity/dht/peerprofile.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -179,6 +180,16 @@ class _PeerProfileEditWidgetState extends State<PeerProfileEditWidget> {
         myselfPeerProfile.mobileVerified = peerProfile.mobileVerified;
         myselfPeerProfile.logLevel = peerProfile.logLevel;
         await peerProfileService.store(myselfPeerProfile);
+        if (peerProfile.stockSwitch) {
+          indexWidgetProvider.addMainView('stock_main');
+        } else {
+          indexWidgetProvider.removeMainView('stock_main');
+        }
+        if (peerProfile.emailSwitch) {
+          indexWidgetProvider.addMainView('mail');
+        } else {
+          indexWidgetProvider.removeMainView('mail');
+        }
         setState(() {});
       }
     });
