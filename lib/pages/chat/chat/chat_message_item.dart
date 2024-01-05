@@ -26,10 +26,10 @@ class ChatMessageItem extends StatefulWidget {
   bool isPredefine = false;
 
   ChatMessageItem({
-    Key? key,
+    super.key,
     required this.chatMessage,
     required this.index,
-  }) : super(key: key) {
+  }) {
     messageWidget = MessageWidget(chatMessage, index);
     isMyself = chatMessage.isMyself;
     isPredefine = chatMessage.isPredefine;

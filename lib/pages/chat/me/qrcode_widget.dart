@@ -74,7 +74,8 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
         break;
       case 'Save to image':
         Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
-        ImageUtil.saveImageGallery(bytes, myself.peerId!);
+        ImageUtil.saveImageGallery(bytes,
+            name: myself.peerId!, androidExistNotSave: true);
         //Uint8List? bytes = await screenshotController.capture();
         break;
       case 'Share':

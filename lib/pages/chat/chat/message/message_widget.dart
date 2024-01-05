@@ -26,6 +26,7 @@ import 'package:colla_chat/pages/chat/chat/message/url_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/video_chat_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/video_message.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/notification/firebase_messaging_service.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -35,6 +36,7 @@ import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/clipboard_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/pdf_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
@@ -44,41 +46,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
-
-final List<ActionData> messagePopActionData = [
-  ActionData(
-      label: 'Delete',
-      tooltip: 'Delete message',
-      icon: const Icon(Icons.delete)),
-  ActionData(
-      label: 'Cancel',
-      tooltip: 'Cancel message',
-      icon: const Icon(Icons.cancel)),
-  ActionData(
-    label: 'Refer',
-    tooltip: 'Refer message',
-    icon: const Icon(Icons.format_quote),
-  ),
-  ActionData(
-    label: 'Copy',
-    tooltip: 'Copy message',
-    icon: const Icon(Icons.copy),
-  ),
-  ActionData(
-      label: 'Forward',
-      tooltip: 'Forward message',
-      icon: const Icon(Icons.forward)),
-  ActionData(
-      label: 'Collect',
-      tooltip: 'Collect message',
-      icon: const Icon(Icons.collections)),
-  ActionData(
-      label: 'Share', tooltip: 'Share', icon: const Icon(Icons.share_outlined)),
-  ActionData(
-      label: 'Notify',
-      tooltip: 'Notify',
-      icon: const Icon(Icons.notifications)),
-];
+import 'package:path/path.dart' as p;
 
 ///每种消息的显示组件
 class MessageWidget {
@@ -168,6 +136,58 @@ class MessageWidget {
       body = buildChatReceiptMessageWidget(context, chatMessage);
     }
 
+    final List<ActionData> messagePopActionData = [];
+    if (subMessageType == ChatMessageSubType.chat) {
+      String contentType = chatMessage.contentType!;
+      if (contentType == ChatMessageContentType.file.name ||
+          contentType == ChatMessageContentType.video.name ||
+          contentType == ChatMessageContentType.audio.name ||
+          contentType == ChatMessageContentType.media.name ||
+          contentType == ChatMessageContentType.rich.name ||
+          contentType == ChatMessageContentType.image.name) {
+        messagePopActionData.add(ActionData(
+            label: 'Save',
+            tooltip: 'Save message',
+            icon: const Icon(Icons.save)));
+      }
+    }
+    messagePopActionData.addAll([
+      ActionData(
+          label: 'Delete',
+          tooltip: 'Delete message',
+          icon: const Icon(Icons.delete)),
+      ActionData(
+          label: 'Cancel',
+          tooltip: 'Cancel message',
+          icon: const Icon(Icons.cancel)),
+      ActionData(
+        label: 'Refer',
+        tooltip: 'Refer message',
+        icon: const Icon(Icons.format_quote),
+      ),
+      ActionData(
+        label: 'Copy',
+        tooltip: 'Copy message',
+        icon: const Icon(Icons.copy),
+      ),
+      ActionData(
+          label: 'Forward',
+          tooltip: 'Forward message',
+          icon: const Icon(Icons.forward)),
+      ActionData(
+          label: 'Collect',
+          tooltip: 'Collect message',
+          icon: const Icon(Icons.collections)),
+      ActionData(
+          label: 'Share',
+          tooltip: 'Share',
+          icon: const Icon(Icons.share_outlined)),
+      ActionData(
+          label: 'Notify',
+          tooltip: 'Notify',
+          icon: const Icon(Icons.notifications)),
+    ]);
+
     ///双击全屏
     if (!fullScreen) {
       body = InkWell(
@@ -205,6 +225,9 @@ class MessageWidget {
   _onMessagePopAction(BuildContext context, int index, String label,
       {String? value}) async {
     switch (label) {
+      case 'Save':
+        await _save(context);
+        break;
       case 'Delete':
         await chatMessageService
             .remove(where: 'id=?', whereArgs: [chatMessage.id!]);
@@ -265,6 +288,50 @@ class MessageWidget {
         break;
 
       default:
+    }
+  }
+
+  Future<void> _save(BuildContext context) async {
+    String subMessageType = chatMessage.subMessageType;
+    if (subMessageType == ChatMessageSubType.chat.name) {
+      String contentType = chatMessage.contentType!;
+      if (contentType == ChatMessageContentType.file.name ||
+          contentType == ChatMessageContentType.video.name ||
+          contentType == ChatMessageContentType.audio.name ||
+          contentType == ChatMessageContentType.media.name ||
+          contentType == ChatMessageContentType.rich.name ||
+          contentType == ChatMessageContentType.image.name) {
+        String? messageId = chatMessage.messageId;
+        String? title = chatMessage.title;
+        if (messageId == null) {
+          DialogUtil.error(context, content: 'No source messageId');
+          return;
+        }
+        String? filename;
+        if (title != null) {
+          filename = title;
+        } else {
+          filename = messageId;
+        }
+        Uint8List? bytes =
+            await messageAttachmentService.findContent(messageId, title);
+        if (bytes == null) {
+          DialogUtil.error(context, content: 'No source file data');
+          return;
+        }
+        if (platformParams.mobile) {
+          await ImageUtil.saveImageGallery(bytes,
+              name: filename, androidExistNotSave: true);
+          DialogUtil.info(context, content: 'save to gallery: ${filename}');
+        } else {
+          String? dir = await FileUtil.directoryPathPicker();
+          if (dir != null) {
+            String path = p.join(dir, filename);
+            await FileUtil.writeFileAsBytes(bytes, path);
+            DialogUtil.info(context, content: 'save to file: ${path}');
+          }
+        }
+      }
     }
   }
 

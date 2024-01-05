@@ -18,8 +18,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_luban/flutter_luban.dart';
 import 'package:image/image.dart' as platform_image;
-import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
+import 'package:saver_gallery/saver_gallery.dart';
 
 ///image_gallery_saver,extended_image
 class ImageUtil {
@@ -167,14 +167,36 @@ class ImageUtil {
     return bytes;
   }
 
-  static Future<bool> saveImageGallery(Uint8List bytes, String name) async {
-    final result = await ImageGallerySaver.saveImage(bytes,
-        quality: 100, name: name + DateTime.now().toString());
-    if (result['isSuccess'].toString() == 'true') {
-      return true;
-    } else {
-      return false;
-    }
+  ///保存图片到图片廊
+  static Future<dynamic> saveImageGallery(
+    Uint8List imageBytes, {
+    int quality = 100,
+    String? fileExtension,
+    required String name,
+    String androidRelativePath = "Pictures",
+    required bool androidExistNotSave,
+  }) async {
+    final result = await SaverGallery.saveImage(imageBytes,
+        quality: quality,
+        name: name,
+        androidRelativePath: androidRelativePath,
+        androidExistNotSave: androidExistNotSave);
+    return result;
+  }
+
+  ///保存其他数据到图片廊，数据在文件中
+  static Future<dynamic> saveFileGallery({
+    required String file,
+    required String name,
+    String androidRelativePath = "Download",
+    required bool androidExistNotSave,
+  }) async {
+    final result = await SaverGallery.saveFile(
+        file: file,
+        name: name,
+        androidRelativePath: androidRelativePath,
+        androidExistNotSave: androidExistNotSave);
+    return result;
   }
 
   ///以下时extendedImage的功能

@@ -237,7 +237,7 @@ class FileUtil {
     return selectedDirectory;
   }
 
-  ///保存文件对话框，适用于所有的平台
+  ///保存文件对话框，适用于Linux, macOS & Windows平台
   static Future<String?> saveFilePicker({
     String? dialogTitle,
     String? fileName,
@@ -257,7 +257,7 @@ class FileUtil {
     return outputFile;
   }
 
-  ///保存文件
+  ///保存文件,macOS, iOS, Android, Windows, Web, Linux.
   static Future<String> saveFile(
     String name,
     Uint8List bytes,
@@ -268,7 +268,7 @@ class FileUtil {
         .saveFile(bytes: bytes, ext: ext, mimeType: mimeType, name: name);
   }
 
-  ///仅支持ios,android，另存为文件
+  ///仅支持macOS,ios,android，另存为文件
   static Future<String?> saveAsFile(
     String name,
     Uint8List bytes,

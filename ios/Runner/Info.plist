@@ -75,7 +75,9 @@
 	<key>NSMotionUsageDescription</key>
 	<string>motion</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Replace with your permission description.</string>
+	<string>Get photo library usage</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+    <string>Get photo library usage<</string>
 	<key>NSRemindersUsageDescription</key>
 	<string>reminders</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
@@ -141,5 +143,9 @@
     <array>
         <string>io.curltech.colla.task.identifier</string>
     </array>
+    <key>LSSupportsOpeningDocumentsInPlace</key>
+    <true/>
+    <key>UIFileSharingEnabled</key>
+    <true/>
 </dict>
 </plist>
