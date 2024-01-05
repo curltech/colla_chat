@@ -14,13 +14,17 @@ import 'package:webview_flutter/webview_flutter.dart' as webview;
 class PlatformWebViewController with ChangeNotifier {
   inapp.InAppWebViewController? inAppWebViewController;
   webview.WebViewController? webViewController;
-  final inapp.InAppBrowser browser = inapp.InAppBrowser();
+  inapp.InAppBrowser? browser;
 
   ///包装两种webview的实现
   PlatformWebViewController({
     this.webViewController,
     this.inAppWebViewController,
-  });
+  }) {
+    if (platformParams.mobile || platformParams.macos) {
+      browser = inapp.InAppBrowser();
+    }
+  }
 
   static PlatformWebViewController from(dynamic controller) {
     PlatformWebViewController platformWebViewController =
@@ -58,7 +62,7 @@ class PlatformWebViewController with ChangeNotifier {
     } else {
       if (platformParams.macos) {
         var settings = _getSettings();
-        browser.openData(data: html, settings: settings);
+        browser?.openData(data: html, settings: settings);
       }
     }
   }
@@ -73,7 +77,7 @@ class PlatformWebViewController with ChangeNotifier {
       } else {
         if (platformParams.macos) {
           var settings = _getSettings();
-          browser.openData(data: html, settings: settings);
+          browser?.openData(data: html, settings: settings);
         }
       }
     }
@@ -85,7 +89,7 @@ class PlatformWebViewController with ChangeNotifier {
       } else {
         if (platformParams.macos) {
           var settings = _getSettings();
-          browser.openFile(
+          browser?.openFile(
             assetFilePath: filename,
             settings: settings,
           );
@@ -103,7 +107,7 @@ class PlatformWebViewController with ChangeNotifier {
           inapp.URLRequest urlRequest =
               inapp.URLRequest(url: inapp.WebUri(filename));
           var settings = _getSettings();
-          browser.openUrlRequest(urlRequest: urlRequest, settings: settings);
+          browser?.openUrlRequest(urlRequest: urlRequest, settings: settings);
         }
       }
     } else {
@@ -118,7 +122,7 @@ class PlatformWebViewController with ChangeNotifier {
           inapp.URLRequest urlRequest =
               inapp.URLRequest(url: inapp.WebUri('file:$filename'));
           var settings = _getSettings();
-          browser.openUrlRequest(urlRequest: urlRequest, settings: settings);
+          browser?.openUrlRequest(urlRequest: urlRequest, settings: settings);
         }
       }
     }

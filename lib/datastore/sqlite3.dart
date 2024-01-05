@@ -60,7 +60,7 @@ class Sqlite3 extends DataStore {
     }
     // drop(conferenceService.tableName);
     // drop(peerEndpointService.tableName);
-    // drop(peerProfileService.tableName);
+    drop(peerProfileService.tableName);
     await localSharedPreferences.save('appVersion', appVersion);
     print('new appVersion:$appVersion');
 
