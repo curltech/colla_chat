@@ -210,7 +210,7 @@ class MessageWidget {
                         },
                         crossAxisCount: 4,
                         actions: messagePopActionData,
-                        height: 180,
+                        height: 200,
                         width: 380,
                         iconSize: 30));
               },
