@@ -6,8 +6,8 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:fl_video/fl_video.dart';
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
 import 'package:video_player_control_panel/video_player_control_panel.dart';
 
 class OriginMediaSource {
@@ -95,6 +95,119 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     }
   }
 
+  FlVideoPlayer _buildCupertinoControl(
+    VideoPlayerController videoPlayerController, {
+    bool showClosedCaptionButton = true,
+    bool showFullscreenButton = true,
+    bool showVolumeButton = true,
+  }) {
+    FlVideoPlayerController controller = FlVideoPlayerController(
+        videoPlayerController: videoPlayerController,
+        autoPlay: true,
+        looping: true,
+        overlay: const IgnorePointer(
+            child: Center(
+                child: Text('overlay',
+                    style: TextStyle(color: Colors.lightBlue, fontSize: 20)))),
+        placeholder: const Center(
+            child: Text('placeholder',
+                style: TextStyle(color: Colors.red, fontSize: 20))),
+        controls: CupertinoControls(
+            hideDuration: const Duration(seconds: 5),
+            enableSpeed: true,
+            enableSkip: true,
+            enableSubtitle: true,
+            enableFullscreen: showFullscreenButton,
+            enableVolume: showVolumeButton,
+            enablePlay: true,
+            enableBottomBar: true,
+            onTap: (FlVideoTapEvent event, FlVideoPlayerController controller) {
+              debugPrint(event.toString());
+            },
+            onDragProgress:
+                (FlVideoDragProgressEvent event, Duration duration) {
+              debugPrint('$event===$duration');
+            },
+            remainingBuilder: (String position) {
+              return Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 6, 6, 6),
+                  child: Text(position,
+                      style: const TextStyle(fontSize: 16, color: Colors.red)));
+            },
+            positionBuilder: (String position) {
+              return Padding(
+                  padding: const EdgeInsets.fromLTRB(6, 6, 0, 6),
+                  child: Text(position,
+                      style: const TextStyle(
+                          fontSize: 16, color: Colors.lightBlue)));
+            }));
+    return FlVideoPlayer(controller: controller);
+  }
+
+  FlVideoPlayer _buildMaterialControl(
+    VideoPlayerController videoPlayerController, {
+    bool showClosedCaptionButton = true,
+    bool showFullscreenButton = true,
+    bool showVolumeButton = true,
+  }) {
+    bool isInitialized = videoPlayerController.value.isInitialized;
+    FlVideoPlayerController controller = FlVideoPlayerController(
+        videoPlayerController: videoPlayerController,
+        autoPlay: true,
+        looping: true,
+        overlay: const IgnorePointer(
+            child: Center(
+                child: Text('overlay',
+                    style: TextStyle(color: Colors.lightBlue, fontSize: 20)))),
+        placeholder: const Center(
+            child: Text('placeholder',
+                style: TextStyle(color: Colors.red, fontSize: 20))),
+        controls: MaterialControls(
+            hideDuration: const Duration(seconds: 5),
+            enablePlay: true,
+            enableFullscreen: showFullscreenButton,
+            enableSpeed: true,
+            enableVolume: showVolumeButton,
+            enableSubtitle: true,
+            enablePosition: true,
+            enableBottomBar: true,
+            onTap: (FlVideoTapEvent event, FlVideoPlayerController controller) {
+              debugPrint(event.toString());
+            },
+            onDragProgress:
+                (FlVideoDragProgressEvent event, Duration duration) {
+              debugPrint('$event===$duration');
+            }));
+
+    return FlVideoPlayer(controller: controller);
+  }
+
+  JkVideoControlPanel _buildJkVideoControlPanel(
+    VideoPlayerController videoPlayerController, {
+    bool showClosedCaptionButton = true,
+    bool showFullscreenButton = true,
+    bool showVolumeButton = true,
+  }) {
+    return JkVideoControlPanel(
+      key: key,
+      videoPlayerController,
+      showClosedCaptionButton: showClosedCaptionButton,
+      showFullscreenButton: showFullscreenButton,
+      showVolumeButton: showVolumeButton,
+      onPrevClicked: (currentIndex <= 0)
+          ? null
+          : () {
+              previous();
+            },
+      onNextClicked: (currentIndex == -1 || currentIndex >= playlist.length - 1)
+          ? null
+          : () {
+              next();
+            },
+      onPlayEnded: next,
+    );
+  }
+
   @override
   Widget buildMediaPlayer({
     Key? key,
@@ -108,25 +221,10 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
         builder: (BuildContext context,
             VideoPlayerController? videoPlayerController, Widget? child) {
           if (videoPlayerController != null) {
-            return JkVideoControlPanel(
-              key: key,
-              videoPlayerController,
-              showClosedCaptionButton: showClosedCaptionButton,
-              showFullscreenButton: showFullscreenButton,
-              showVolumeButton: showVolumeButton,
-              onPrevClicked: (currentIndex <= 0)
-                  ? null
-                  : () {
-                      previous();
-                    },
-              onNextClicked:
-                  (currentIndex == -1 || currentIndex >= playlist.length - 1)
-                      ? null
-                      : () {
-                          next();
-                        },
-              onPlayEnded: next,
-            );
+            return _buildMaterialControl(videoPlayerController,
+                showClosedCaptionButton: showClosedCaptionButton,
+                showFullscreenButton: showFullscreenButton,
+                showVolumeButton: showVolumeButton);
           }
           return Center(
               child: CommonAutoSizeText(
@@ -141,7 +239,6 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   @override
   close() {
     if (videoPlayerController.value != null) {
-      super.setCurrentIndex(-1);
       videoPlayerController.value!.dispose();
       videoPlayerController.value = null;
     }

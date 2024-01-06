@@ -112,6 +112,11 @@ class JustAudioPlayer {
   setLoopMode(bool mode) async {
     await player.setLoopMode(mode ? LoopMode.all : LoopMode.off);
   }
+
+  @override
+  close() async {
+    await stop();
+  }
 }
 
 final JustAudioPlayer globalJustAudioPlayer = JustAudioPlayer();

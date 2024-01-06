@@ -275,10 +275,10 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     return mediaSources;
   }
 
-  clear() {
-    close();
+  clear() async {
     playlist.clear();
-    _currentIndex = -1;
+    await close();
+    setCurrentIndex(-1);
   }
 
   Future<PlatformMediaSource?> insert(int index,

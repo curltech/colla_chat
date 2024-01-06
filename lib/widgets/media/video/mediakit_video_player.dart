@@ -179,7 +179,6 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
   @override
   close() {
     stop();
-    super.setCurrentIndex(-1);
   }
 
   ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频

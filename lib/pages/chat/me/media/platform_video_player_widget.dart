@@ -18,8 +18,8 @@ class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
   final SwiperController swiperController = SwiperController();
 
   PlatformVideoPlayerWidget({
-    Key? key,
-  }) : super(key: key) {
+    super.key,
+  }) {
     if (platformParams.windows) {
       WindowsVideoPlayer.registerWith();
     }
@@ -42,16 +42,13 @@ class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
-  ValueNotifier<int> index = ValueNotifier<int>(0);
-
   @override
   void initState() {
-    widget.swiperController.addListener(_update);
     super.initState();
   }
 
-  _update() {
-    index.value = widget.swiperController.index;
+  onIndexChanged(int? index) {
+    setState(() {});
   }
 
   List<Widget>? _buildRightWidgets() {
@@ -73,6 +70,7 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
         if (newIndex == 0) {
           setState(() {
             widget.mediaPlayerController = globalWebViewVideoPlayerController;
+            widget.mediaPlayerController.clear();
           });
         } else if (newIndex == 1) {
           setState(() {
@@ -81,10 +79,12 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
         } else if (newIndex == 2) {
           setState(() {
             widget.mediaPlayerController = globalMediaKitVideoPlayerController;
+            widget.mediaPlayerController.clear();
           });
         } else if (newIndex == 3) {
           setState(() {
             widget.mediaPlayerController = globalOriginVideoPlayerController;
+            widget.mediaPlayerController.clear();
           });
         }
       },
@@ -116,29 +116,21 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
       ],
     );
     List<Widget> children = [
-      ValueListenableBuilder(
-          valueListenable: index,
-          builder: (BuildContext context, int index, Widget? child) {
-            if (index == 0) {
-              return IconButton(
-                tooltip: AppLocalizations.t('Video player'),
-                onPressed: () {
-                  widget.swiperController.move(1);
-                  this.index.value = 1;
-                },
-                icon: const Icon(Icons.video_call),
-              );
-            } else {
-              return IconButton(
-                tooltip: AppLocalizations.t('Playlist'),
-                onPressed: () {
-                  widget.swiperController.move(0);
-                  this.index.value = 0;
-                },
-                icon: const Icon(Icons.featured_play_list_outlined),
-              );
-            }
-          }),
+      widget.swiperController.index == 0
+          ? IconButton(
+              tooltip: AppLocalizations.t('Video player'),
+              onPressed: () async {
+                await widget.swiperController.move(1);
+              },
+              icon: const Icon(Icons.video_call),
+            )
+          : IconButton(
+              tooltip: AppLocalizations.t('Playlist'),
+              onPressed: () async {
+                await widget.swiperController.move(0);
+              },
+              icon: const Icon(Icons.featured_play_list_outlined),
+            ),
       toggleWidget,
       const SizedBox(
         width: 5.0,
@@ -149,13 +141,14 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget>? rightWidgets = _buildRightWidgets();
     PlatformMediaPlayer platformMediaPlayer = PlatformMediaPlayer(
-      key: UniqueKey(),
       showPlaylist: true,
       mediaPlayerController: widget.mediaPlayerController,
       swiperController: widget.swiperController,
+      onIndexChanged: onIndexChanged,
     );
+    List<Widget>? rightWidgets = _buildRightWidgets();
+
     return AppBarView(
       title: widget.title,
       withLeading: true,
@@ -166,7 +159,6 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
 
   @override
   void dispose() {
-    widget.swiperController.removeListener(_update);
     widget.mediaPlayerController.close();
     super.dispose();
   }
