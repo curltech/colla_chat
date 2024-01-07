@@ -17,7 +17,8 @@ class OriginMediaSource {
     if (filename.startsWith('assets/')) {
       videoPlayerController = VideoPlayerController.asset(filename);
     } else if (filename.startsWith('http')) {
-      videoPlayerController = VideoPlayerController.network(filename);
+      videoPlayerController =
+          VideoPlayerController.networkUrl(Uri(path: filename));
     } else {
       File file = File(filename);
       bool exists = file.existsSync();
@@ -36,6 +37,7 @@ class OriginMediaSource {
     } catch (e) {
       logger.e("controller.initialize() failed:$e");
       videoPlayerController = null;
+      throw 'controller.initialize() failed';
     }
 
     return videoPlayerController;

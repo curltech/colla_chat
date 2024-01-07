@@ -9,6 +9,7 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
@@ -194,8 +195,14 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
 
   ///选择文件加入播放列表
   _addMediaSource() async {
-    List<PlatformMediaSource> mediaSources =
-        await widget.mediaPlayerController.sourceFilePicker();
+    try {
+      List<PlatformMediaSource> mediaSources =
+          await widget.mediaPlayerController.sourceFilePicker();
+    } catch (e) {
+      if (mounted) {
+        DialogUtil.error(context, content: 'add media file failure:$e');
+      }
+    }
   }
 
   _removeFromCollect(int index) async {

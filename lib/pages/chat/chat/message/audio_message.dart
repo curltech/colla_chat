@@ -13,13 +13,13 @@ class AudioMessage extends StatefulWidget {
   final bool fullScreen;
 
   const AudioMessage({
-    Key? key,
+    super.key,
     required this.id,
     required this.messageId,
     required this.isMyself,
     this.title,
     this.fullScreen = false,
-  }) : super(key: key);
+  });
 
   @override
   State<StatefulWidget> createState() => _AudioMessageState();
