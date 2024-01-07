@@ -77,7 +77,7 @@
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Get photo library usage</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-    <string>Get photo library usage<</string>
+    <string>Get photo library usage</string>
 	<key>NSRemindersUsageDescription</key>
 	<string>reminders</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
