@@ -753,7 +753,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   }
 
   Future<void> scanQrcode(BuildContext context) async {
-    String? content = await QrcodeUtil.mobileScan(context);
+    String? content = await QrcodeUtil.scan();
     var map = JsonUtil.toJson(content);
     PeerClient peerClient = PeerClient.fromJson(map);
     await peerClientService.store(peerClient);
