@@ -146,9 +146,15 @@ class MessageWidget {
           contentType == ChatMessageContentType.rich.name ||
           contentType == ChatMessageContentType.image.name) {
         messagePopActionData.add(ActionData(
-            label: 'Save',
-            tooltip: 'Save message',
+            label: 'Save to file',
+            tooltip: 'Save message attachment to file',
             icon: const Icon(Icons.save)));
+        if (platformParams.mobile) {
+          messagePopActionData.add(ActionData(
+              label: 'Save to gallery',
+              tooltip: 'Save message attachment to gallery',
+              icon: const Icon(Icons.browse_gallery_outlined)));
+        }
       }
     }
     messagePopActionData.addAll([
@@ -225,8 +231,10 @@ class MessageWidget {
   _onMessagePopAction(BuildContext context, int index, String label,
       {String? value}) async {
     switch (label) {
-      case 'Save':
-        await _save(context);
+      case 'Save to file':
+        await _saveFile(context);
+      case 'Save to gallery':
+        await _saveFile(context, isFile: false);
         break;
       case 'Delete':
         await chatMessageService
@@ -291,7 +299,7 @@ class MessageWidget {
     }
   }
 
-  Future<void> _save(BuildContext context) async {
+  Future<void> _saveFile(BuildContext context, {bool isFile = true}) async {
     String subMessageType = chatMessage.subMessageType;
     if (subMessageType == ChatMessageSubType.chat.name) {
       String contentType = chatMessage.contentType!;
@@ -319,7 +327,7 @@ class MessageWidget {
           DialogUtil.error(context, content: 'No source file data');
           return;
         }
-        if (platformParams.mobile) {
+        if (!isFile) {
           await ImageUtil.saveImageGallery(bytes,
               name: filename, androidExistNotSave: true);
           DialogUtil.info(context, content: 'save to gallery: ${filename}');
