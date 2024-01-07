@@ -14,7 +14,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
-import 'package:dart_quill_delta/src/delta/delta.dart';
 
 ///quill_editor的实现，用于IOS,LINUX,MACOS,WINDOWS桌面平台
 ///编辑的时候是quill可识别的json格式，完成后可转换成html格式，就不可以再编辑了
@@ -27,13 +26,13 @@ class QuillEditorWidget extends StatefulWidget {
   final Function(QuillController controller)? onCreateController;
 
   const QuillEditorWidget({
-    Key? key,
+    super.key,
     this.height,
     this.initialText,
     this.onCreateController,
     this.withMultiMedia = true,
     this.base64 = true,
-  }) : super(key: key);
+  });
 
   @override
   State createState() => _QuillEditorWidgetState();

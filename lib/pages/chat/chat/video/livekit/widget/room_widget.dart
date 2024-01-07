@@ -26,8 +26,8 @@ class RoomWidget extends StatefulWidget {
   const RoomWidget(
     this.room,
     this.listener, {
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<StatefulWidget> createState() => _RoomWidgetState();

@@ -21,7 +21,7 @@ class Share extends StatusEntity {
   Share();
 
   /// 从服务器端获取的map转换成share对象
-  Share.fromRemoteJson(Map json)
+  Share.fromRemoteJson(super.json)
       : tsCode = json['ts_code'],
         symbol = json['symbol'],
         name = json['name'],
@@ -38,9 +38,9 @@ class Share extends StatusEntity {
         delistDate = json['delist_date'],
         isHs = json['is_hs'],
         pinyin = json['pin_yin'],
-        super.fromJson(json);
+        super.fromJson();
 
-  Share.fromJson(Map json)
+  Share.fromJson(super.json)
       : tsCode = json['tsCode'],
         symbol = json['symbol'],
         name = json['name'],
@@ -57,7 +57,7 @@ class Share extends StatusEntity {
         delistDate = json['delistDate'],
         isHs = json['isHs'],
         pinyin = json['pinyin'],
-        super.fromJson(json);
+        super.fromJson();
 
   Map<String, dynamic> toRemoteJson() {
     var json = super.toJson();

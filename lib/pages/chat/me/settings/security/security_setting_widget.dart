@@ -36,7 +36,7 @@ class SecuritySettingWidget extends StatefulWidget with TileDataMixin {
   final LoggerConsoleView loggerConsoleView = const LoggerConsoleView();
   late final List<TileData> securitySettingTileData;
 
-  SecuritySettingWidget({Key? key}) : super(key: key) {
+  SecuritySettingWidget({super.key}) {
     indexWidgetProvider.define(passwordWidget);
     indexWidgetProvider.define(loggerConsoleView);
     List<TileDataMixin> mixins = [

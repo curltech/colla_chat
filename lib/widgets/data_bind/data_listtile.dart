@@ -121,7 +121,7 @@ class DataListTile extends StatelessWidget {
   final Function(int index, String title, {String? subtitle})? onTap;
 
   const DataListTile({
-    Key? key,
+    super.key,
     this.dataListViewController,
     required this.tileData,
     this.index = 0,
@@ -130,7 +130,7 @@ class DataListTile extends StatelessWidget {
     this.horizontalTitleGap,
     this.minVerticalPadding,
     this.minLeadingWidth,
-  }) : super(key: key);
+  });
 
   Widget _buildListTile(BuildContext context) {
     bool selected = false;
@@ -195,6 +195,7 @@ class DataListTile extends StatelessWidget {
               : null,
           softWrap: true,
           overflow: TextOverflow.ellipsis,
+          maxLines: 2,
         ),
       ]);
     }

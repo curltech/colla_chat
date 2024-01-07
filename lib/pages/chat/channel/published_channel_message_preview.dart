@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 
 /// 发布频道消息的展示页面
 class PublishedChannelMessagePreview extends StatefulWidget with TileDataMixin {
-  PublishedChannelMessagePreview({Key? key}) : super(key: key);
+  PublishedChannelMessagePreview({super.key});
 
   @override
   State createState() => _PublishedChannelMessagePreviewState();

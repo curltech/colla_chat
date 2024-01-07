@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 /// 远程登录页面，一个Scaffold，IndexStack下的远程登录组件，注册组件和配置组件
 class RemoteLogin extends StatefulWidget {
-  const RemoteLogin({Key? key}) : super(key: key);
+  const RemoteLogin({super.key});
 
   @override
   State<StatefulWidget> createState() => _RemoteLoginState();

@@ -24,8 +24,7 @@ class PlatformAudioRecorderWidget extends StatefulWidget with TileDataMixin {
       globalRecordAudioRecorderController;
 
   PlatformAudioRecorderWidget(
-      {Key? key, AbstractAudioRecorderController? controller})
-      : super(key: key);
+      {super.key, AbstractAudioRecorderController? controller});
 
   @override
   State createState() => _PlatformAudioRecorderWidgetState();

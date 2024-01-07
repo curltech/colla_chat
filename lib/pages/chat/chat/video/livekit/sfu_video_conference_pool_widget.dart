@@ -20,7 +20,7 @@ class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
       sfuVideoConferenceParticipantWidget =
       SfuVideoConferenceParticipantWidget();
 
-  SfuVideoConferencePoolWidget({Key? key}) : super(key: key) {
+  SfuVideoConferencePoolWidget({super.key}) {
     indexWidgetProvider.define(sfuVideoConferenceParticipantWidget);
   }
 

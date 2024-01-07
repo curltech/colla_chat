@@ -26,9 +26,9 @@ abstract class PeerParty extends PeerEntity {
   String? pyTag; //: 标签拼音
   List<Tag> tags = [];
 
-  PeerParty(String peerId, String name) : super(peerId, name);
+  PeerParty(super.peerId, super.name);
 
-  PeerParty.fromJson(Map json)
+  PeerParty.fromJson(super.json)
       : alias = json['alias'],
         pyName = json['pyName'],
         givenName = json['givenName'],
@@ -58,7 +58,7 @@ abstract class PeerParty extends PeerEntity {
             json['myselfRecallAlert'] == true || json['myselfRecallAlert'] == 1
                 ? true
                 : false,
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {
@@ -89,9 +89,9 @@ class Tag extends BaseEntity {
   String? tag; // 标签名称
   Tag();
 
-  Tag.fromJson(Map json)
+  Tag.fromJson(super.json)
       : tag = json['tag'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {
@@ -111,11 +111,11 @@ class PartyTag extends BaseEntity {
   String? partyType; // party type:linkman,group,channel,contact
   PartyTag();
 
-  PartyTag.fromJson(Map json)
+  PartyTag.fromJson(super.json)
       : tag = json['tag'],
         partyPeerId = json['partyPeerId'],
         partyType = json['partyType'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

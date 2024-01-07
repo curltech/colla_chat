@@ -19,7 +19,7 @@ final DataListController<Linkman> groupLinkmanController =
 
 /// 群或者会议中的联系人的信息和webrtc连接状态
 class LinkmanWebrtcConnectionWidget extends StatefulWidget with TileDataMixin {
-  const LinkmanWebrtcConnectionWidget({Key? key}) : super(key: key);
+  const LinkmanWebrtcConnectionWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _LinkmanWebrtcConnectionWidgetState();

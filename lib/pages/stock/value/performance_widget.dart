@@ -33,7 +33,7 @@ final PerformanceDataPageController performanceDataPageController =
 
 ///自选股和分组的查询界面
 class PerformanceWidget extends StatefulWidget with TileDataMixin {
-  PerformanceWidget({Key? key}) : super(key: key);
+  PerformanceWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _PerformanceWidgetState();

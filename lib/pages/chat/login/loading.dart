@@ -83,8 +83,7 @@ class Loading extends StatefulWidget {
 
   final SwiperController controller = SwiperController();
 
-  Loading({Key? key, required this.title, this.autoPlay = true})
-      : super(key: key);
+  Loading({super.key, required this.title, this.autoPlay = true});
 
   @override
   State<StatefulWidget> createState() {

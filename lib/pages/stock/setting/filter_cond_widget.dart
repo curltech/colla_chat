@@ -19,7 +19,7 @@ final DataListController<FilterCond> filterCondController =
 
 ///自选股和分组的查询界面
 class FilterCondWidget extends StatefulWidget with TileDataMixin {
-  FilterCondWidget({Key? key}) : super(key: key);
+  FilterCondWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _FilterCondWidgetState();

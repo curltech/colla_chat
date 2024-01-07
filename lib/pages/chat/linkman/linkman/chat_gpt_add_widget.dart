@@ -65,7 +65,7 @@ final List<PlatformDataField> chatGPTColumnFieldDefs = [
 
 //联系人信息页面
 class ChatGPTAddWidget extends StatefulWidget with TileDataMixin {
-  const ChatGPTAddWidget({Key? key}) : super(key: key);
+  const ChatGPTAddWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _ChatGPTAddWidgetState();
@@ -151,7 +151,7 @@ class _ChatGPTAddWidgetState extends State<ChatGPTAddWidget> {
     linkman!.email = currentLinkman.email;
     linkman!.publicKey = currentLinkman.publicKey;
     linkman!.peerPublicKey = currentLinkman.peerPublicKey;
-    linkman!.linkmanStatus = LinkmanStatus.chatGPT.name;
+    linkman!.linkmanStatus = LinkmanStatus.G.name;
     linkman!.status ??= EntityStatus.effective.name;
     linkman!.startDate ??= DateUtil.currentDate();
     linkman!.endDate ??= DateUtil.maxDate();

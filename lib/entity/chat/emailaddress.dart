@@ -38,7 +38,7 @@ class EmailAddress extends BaseEntity {
     domain = emails[1];
   }
 
-  EmailAddress.fromJson(Map json)
+  EmailAddress.fromJson(super.json)
       : name = json['name'],
         username = json['username'],
         password = json['password'],
@@ -67,7 +67,7 @@ class EmailAddress extends BaseEntity {
         smtpServerConfig = json['smtpServerConfig'],
         isDefault =
             json['isDefault'] == true || json['isDefault'] == 1 ? true : false,
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

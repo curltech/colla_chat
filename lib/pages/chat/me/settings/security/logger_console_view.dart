@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 /// 日志显示
 class LoggerConsoleView extends StatefulWidget with TileDataMixin {
-  const LoggerConsoleView({Key? key}) : super(key: key);
+  const LoggerConsoleView({super.key});
 
   @override
   State<StatefulWidget> createState() => _LoggerConsoleViewState();

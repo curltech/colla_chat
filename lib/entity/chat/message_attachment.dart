@@ -9,11 +9,11 @@ class MessageAttachment extends BaseEntity {
 
   MessageAttachment();
 
-  MessageAttachment.fromJson(Map json)
+  MessageAttachment.fromJson(super.json)
       : messageId = json['messageId'],
         title = json['title'],
         content = json['content'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

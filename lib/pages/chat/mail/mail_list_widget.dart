@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 
 ///邮件列表子视图
 class MailListWidget extends StatefulWidget {
-  const MailListWidget({Key? key}) : super(key: key);
+  const MailListWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _MailListWidgetState();

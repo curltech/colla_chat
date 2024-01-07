@@ -4,7 +4,7 @@ import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 
 ///这是webrtc信号服务器的客户端实现，可以发送和接收信号服务器的数据
 class SignalAction extends BaseAction {
-  SignalAction(MsgType msgType) : super(msgType);
+  SignalAction(super.msgType);
 
   ///发送webrtc信号
   Future<bool> signal(WebrtcSignal signal, String targetPeerId,

@@ -24,8 +24,7 @@ class DocumentTile extends StatelessWidget {
   //图标
   late final DocumentData _documentData;
 
-  DocumentTile({Key? key, required DocumentData documentData})
-      : super(key: key) {
+  DocumentTile({super.key, required DocumentData documentData}) {
     _documentData = documentData;
   }
 

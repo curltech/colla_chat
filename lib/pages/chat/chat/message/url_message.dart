@@ -7,10 +7,10 @@ class UrlMessage extends StatelessWidget {
   final bool isMyself;
 
   const UrlMessage({
-    Key? key,
+    super.key,
     required this.url,
     required this.isMyself,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

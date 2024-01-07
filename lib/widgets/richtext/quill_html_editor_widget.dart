@@ -15,14 +15,14 @@ class QuillHtmlEditorWidget extends StatefulWidget {
   final Function(QuillEditorController controller)? onCreateController;
 
   const QuillHtmlEditorWidget({
-    Key? key,
+    super.key,
     this.height,
     this.initialText,
     this.mimeType = ChatMessageMimeType.html,
     this.onCreateController,
     this.withMultiMedia = true,
     this.base64 = true,
-  }) : super(key: key);
+  });
 
   @override
   State createState() => _QuillHtmlEditorWidgetState();

@@ -12,8 +12,7 @@ class AddGroupMessage extends StatelessWidget {
   final bool isMyself;
 
   const AddGroupMessage(
-      {Key? key, required this.content, required this.isMyself})
-      : super(key: key);
+      {super.key, required this.content, required this.isMyself});
 
   @override
   Widget build(BuildContext context) {

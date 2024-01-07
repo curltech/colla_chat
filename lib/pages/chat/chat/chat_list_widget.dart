@@ -112,7 +112,7 @@ final ConferenceChatSummaryController conferenceChatSummaryController =
 /// 聊天的主页面，展示可以聊天的目标对象，可以是一个人，或者是一个群，或者是一个会议
 /// 选择好目标点击进入具体的聊天页面ChatMessage
 class ChatListWidget extends StatefulWidget with TileDataMixin {
-  ChatListWidget({Key? key}) : super(key: key) {
+  ChatListWidget({super.key}) {
     websocketPool.getDefault();
     indexWidgetProvider.define(ChatMessageView());
     indexWidgetProvider.define(const LinkmanInfoWidget());
@@ -260,7 +260,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
   ///所有的friend的webrtc重连
   _reconnectWebrtc() async {
     List<Linkman> linkmen = await linkmanService
-        .find(where: 'linkmanStatus=?', whereArgs: [LinkmanStatus.friend.name]);
+        .find(where: 'linkmanStatus=?', whereArgs: [LinkmanStatus.F.name]);
     if (linkmen.isNotEmpty) {
       for (Linkman linkman in linkmen) {
         String peerId = linkman.peerId;
@@ -385,14 +385,14 @@ class _ChatListWidgetState extends State<ChatListWidget>
           continue;
         }
         var linkmanStatus =
-            linkman.linkmanStatus ?? LinkmanStatus.stranger.name;
+            linkman.linkmanStatus ?? LinkmanStatus.S.name;
         linkmanStatus = AppLocalizations.t(linkmanStatus);
         if (peerId == myself.peerId) {
-          linkmanStatus = AppLocalizations.t('Me');
+          linkmanStatus = AppLocalizations.t(LinkmanStatus.M.name);
         }
         name = '$name($linkmanStatus)';
         var avatarImage = linkman.avatarImage;
-        if (linkmanStatus == LinkmanStatus.chatGPT.name) {
+        if (linkmanStatus == LinkmanStatus.G.name) {
           avatarImage = avatarImage ??
               ImageUtil.buildImageWidget(
                   image: 'assets/images/openai.png',
@@ -424,7 +424,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
         subtitle: subtitle,
         dense: true,
         selected: false,
-        isThreeLine: false,
+        isThreeLine: true,
         routeName: 'chat_message');
     List<TileData> slideActions = [];
     TileData deleteSlideAction = TileData(

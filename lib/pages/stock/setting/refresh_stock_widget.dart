@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 
 /// 运行后台批处理，刷新数据
 class RefreshStockWidget extends StatefulWidget with TileDataMixin {
-  RefreshStockWidget({Key? key}) : super(key: key);
+  RefreshStockWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _RefreshStockWidgetState();

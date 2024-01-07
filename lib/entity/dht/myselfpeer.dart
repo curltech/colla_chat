@@ -10,10 +10,10 @@ class MyselfPeer extends PeerClient {
   String? loginStatus;
   String? password;
 
-  MyselfPeer(String peerId, String name, String clientId, this.loginName)
-      : super(peerId, name, clientId: clientId);
+  MyselfPeer(super.peerId, super.name, String clientId, this.loginName)
+      : super(clientId: clientId);
 
-  MyselfPeer.fromJson(Map json)
+  MyselfPeer.fromJson(super.json)
       : loginName = json['loginName'],
         privateKey = json['privateKey'],
         peerPrivateKey = json['peerPrivateKey'],
@@ -21,7 +21,7 @@ class MyselfPeer extends PeerClient {
         signalPrivateKey = json['signalPrivateKey'],
         loginStatus = json['loginStatus'],
         password = json['password'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

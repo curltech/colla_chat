@@ -19,7 +19,7 @@ class FilterCond extends StatusEntity {
 
   FilterCond(this.condCode, this.condType, this.name);
 
-  FilterCond.fromRemoteJson(Map json)
+  FilterCond.fromRemoteJson(super.json)
       : condCode = json['cond_code'],
         name = json['name'],
         condType = json['cond_type'],
@@ -27,9 +27,9 @@ class FilterCond extends StatusEntity {
         condParas = json['cond_paras'],
         score = json['score'],
         descr = json['descr'],
-        super.fromJson(json);
+        super.fromJson();
 
-  FilterCond.fromJson(Map json)
+  FilterCond.fromJson(super.json)
       : condCode = json['condCode'],
         name = json['name'],
         condType = json['condType'],
@@ -37,7 +37,7 @@ class FilterCond extends StatusEntity {
         condParas = json['condParas'],
         score = json['score'],
         descr = json['descr'],
-        super.fromJson(json);
+        super.fromJson();
 
   Map<String, dynamic> toRemoteJson() {
     var json = super.toJson();

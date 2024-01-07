@@ -7,8 +7,7 @@ class RichTextMessage extends StatelessWidget {
   final bool isMyself;
 
   const RichTextMessage(
-      {Key? key, required this.messageId, required this.isMyself, this.title})
-      : super(key: key);
+      {super.key, required this.messageId, required this.isMyself, this.title});
 
   @override
   Widget build(BuildContext context) {

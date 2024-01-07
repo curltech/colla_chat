@@ -156,7 +156,7 @@ class FormInputWidget extends StatefulWidget {
   final List<Widget>? tails;
 
   const FormInputWidget({
-    Key? key,
+    super.key,
     required this.controller,
     this.formButtons,
     this.onOk,
@@ -167,7 +167,7 @@ class FormInputWidget extends StatefulWidget {
     this.buttonSpacing = 10.0,
     this.heads,
     this.tails,
-  }) : super(key: key);
+  });
 
   @override
   State createState() => _FormInputWidgetState();

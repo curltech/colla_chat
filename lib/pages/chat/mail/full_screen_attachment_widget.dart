@@ -26,7 +26,7 @@ final MimeMessageAttachmentController mimeMessageAttachmentController =
     MimeMessageAttachmentController();
 
 class FullScreenAttachmentWidget extends StatefulWidget with TileDataMixin {
-  const FullScreenAttachmentWidget({Key? key}) : super(key: key);
+  const FullScreenAttachmentWidget({super.key});
 
   @override
   State<StatefulWidget> createState() {

@@ -17,7 +17,7 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
   final VideoConferenceConnectionWidget videoConferenceConnectionWidget =
       VideoConferenceConnectionWidget();
 
-  VideoConferencePoolWidget({Key? key}) : super(key: key) {
+  VideoConferencePoolWidget({super.key}) {
     indexWidgetProvider.define(videoConferenceConnectionWidget);
   }
 

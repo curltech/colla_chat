@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 
 class MessangerChatHead extends StatefulWidget {
-  const MessangerChatHead({Key? key}) : super(key: key);
+  const MessangerChatHead({super.key});
 
   @override
   State<MessangerChatHead> createState() => _MessangerChatHeadState();

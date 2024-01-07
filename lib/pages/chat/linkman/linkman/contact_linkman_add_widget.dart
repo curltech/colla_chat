@@ -29,7 +29,7 @@ class ContactLinkmanAddWidget extends StatefulWidget with TileDataMixin {
       DataListController<TileData>();
   late final DataListView dataListView;
 
-  ContactLinkmanAddWidget({Key? key}) : super(key: key) {
+  ContactLinkmanAddWidget({super.key}) {
     dataListView = DataListView(
       controller: controller,
     );
@@ -108,7 +108,7 @@ class _ContactLinkmanAddWidgetState extends State<ContactLinkmanAddWidget> {
         if (StringUtil.isNotEmpty(peerId)) {
           subtitle = peerId;
           Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
-          if (linkman != null && linkman.status == LinkmanStatus.friend.name) {
+          if (linkman != null && linkman.status == LinkmanStatus.F.name) {
             isFriend = true;
           }
         }
@@ -151,10 +151,10 @@ class _ContactLinkmanAddWidgetState extends State<ContactLinkmanAddWidget> {
                 await linkmanService.storeByPeerEntity(peerClient);
             await linkmanService.update({
               'id': linkman.id,
-              'status': LinkmanStatus.friend.name
+              'status': LinkmanStatus.F.name
             }).then((value) {
-              contact.status = LinkmanStatus.friend.name;
-              peerClient.status = LinkmanStatus.friend.name;
+              contact.status = LinkmanStatus.F.name;
+              peerClient.status = LinkmanStatus.F.name;
               contactService.update(contact);
               peerClientService.store(peerClient, mobile: true, email: false);
               DialogUtil.info(context,

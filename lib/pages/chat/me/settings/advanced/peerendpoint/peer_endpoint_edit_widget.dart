@@ -87,8 +87,7 @@ final List<PlatformDataField> peerEndpointColumnFieldDefs = [
 class PeerEndpointEditWidget extends StatefulWidget with TileDataMixin {
   final PeerEndpointController controller;
 
-  PeerEndpointEditWidget({Key? key, required this.controller})
-      : super(key: key);
+  PeerEndpointEditWidget({super.key, required this.controller});
 
   @override
   State<StatefulWidget> createState() => _PeerEndpointEditWidgetState();

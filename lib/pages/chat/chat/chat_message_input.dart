@@ -20,7 +20,7 @@ class ChatMessageInputWidget extends StatefulWidget {
   final Future<void> Function(int index, String name, {String? value})?
       onAction;
 
-  ChatMessageInputWidget({Key? key, this.onAction}) : super(key: key);
+  ChatMessageInputWidget({super.key, this.onAction});
 
   @override
   State createState() => _ChatMessageInputWidgetState();

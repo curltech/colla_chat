@@ -19,7 +19,7 @@ class StockLine extends BaseEntity {
   num? largeNetInflow;
   num? superNetInflow;
 
-  StockLine.fromJson(Map json)
+  StockLine.fromJson(super.json)
       : tsCode = json['ts_code'],
         name = json['name'],
         tradeDate = json['trade_date'],
@@ -37,7 +37,7 @@ class StockLine extends BaseEntity {
         middleNetInflow = json['middle_net_inflow'],
         largeNetInflow = json['large_net_inflow'],
         superNetInflow = json['super_net_inflow'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {
@@ -185,7 +185,7 @@ class DayLine extends StockLine {
   num? future233PctChgClose;
   num? future240PctChgClose;
 
-  DayLine.fromJson(Map json)
+  DayLine.fromJson(super.json)
       : pctMainNetInflow = json['pct_main_net_inflow'],
         pctSmallNetInflow = json['pct_small_net_inflow'],
         pctMiddleNetInflow = json['pct_middle_net_inflow'],
@@ -304,7 +304,7 @@ class DayLine extends StockLine {
         future144PctChgClose = json['future144_pct_chg_close'],
         future233PctChgClose = json['future233_pct_chg_close'],
         future240PctChgClose = json['future240_pct_chg_close'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

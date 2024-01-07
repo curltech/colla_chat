@@ -35,7 +35,7 @@ final QStatDataPageController qstatDataPageController =
 
 ///自选股和分组的查询界面
 class QStatWidget extends StatefulWidget with TileDataMixin {
-  QStatWidget({Key? key}) : super(key: key);
+  QStatWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _QStatWidgetState();

@@ -79,7 +79,7 @@ class StatScore extends BaseEntity {
   num? percentileOperationScore;
   num? percentileTotalScore;
 
-  StatScore.fromJson(Map json)
+  StatScore.fromJson(super.json)
       : tsCode = json['ts_code'],
         securityName = json['security_name'],
         startDate = json['start_date'],
@@ -157,7 +157,7 @@ class StatScore extends BaseEntity {
         percentileTrendScore = json['percentile_trend_score'],
         percentileOperationScore = json['percentile_operation_score'],
         percentileTotalScore = json['percentile_total_score'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

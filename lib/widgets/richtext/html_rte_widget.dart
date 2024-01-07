@@ -13,11 +13,11 @@ class HtmlRteWidget extends StatefulWidget {
   final Function(HtmlEditorController controller)? onCreateController;
 
   const HtmlRteWidget({
-    Key? key,
+    super.key,
     this.height,
     this.initialText,
     this.onCreateController,
-  }) : super(key: key);
+  });
 
   @override
   State createState() => _HtmlRteWidgetState();

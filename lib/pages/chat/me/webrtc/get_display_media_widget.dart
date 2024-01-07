@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 class GetDisplayMediaWidget extends StatefulWidget with TileDataMixin {
-  const GetDisplayMediaWidget({Key? key}) : super(key: key);
+  const GetDisplayMediaWidget({super.key});
 
   @override
   State createState() => _GetDisplayMediaWidgetState();

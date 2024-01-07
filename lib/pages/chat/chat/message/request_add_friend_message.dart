@@ -16,12 +16,11 @@ class RequestAddFriendMessage extends StatelessWidget {
   final String? title;
 
   const RequestAddFriendMessage(
-      {Key? key,
+      {super.key,
       required this.senderPeerId,
       required this.isMyself,
       required this.isFriend,
-      this.title})
-      : super(key: key);
+      this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +37,7 @@ class RequestAddFriendMessage extends StatelessWidget {
                   content: AppLocalizations.t('Do you add all as friend?'));
               if (confirm != null && confirm) {
                 await linkmanService.update(
-                    {'linkmanStatus': LinkmanStatus.friend.name},
+                    {'linkmanStatus': LinkmanStatus.F.name},
                     where: 'peerId=?',
                     whereArgs: [senderPeerId]);
               }

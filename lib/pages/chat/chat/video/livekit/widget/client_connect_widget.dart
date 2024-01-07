@@ -12,8 +12,8 @@ import 'package:permission_handler/permission_handler.dart';
 class ClientConnectWidget extends StatefulWidget with TileDataMixin {
   //
   const ClientConnectWidget({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   bool get withLeading => true;

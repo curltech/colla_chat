@@ -48,7 +48,7 @@ final InoutEventController inoutEventController = InoutEventController();
 
 /// 加自选股和分组的查询界面
 class InoutEventWidget extends StatefulWidget with TileDataMixin {
-  InoutEventWidget({Key? key}) : super(key: key);
+  InoutEventWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _InoutEventWidgetState();

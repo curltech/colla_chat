@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 
 /// 把go代码转换成dart
 class GoCodeWidget extends StatefulWidget with TileDataMixin {
-  GoCodeWidget({Key? key}) : super(key: key);
+  GoCodeWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _GoCodeWidgetState();

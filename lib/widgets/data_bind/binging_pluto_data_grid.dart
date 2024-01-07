@@ -22,7 +22,7 @@ class BindingPlutoDataGrid<T> extends StatefulWidget {
   final Function(int index)? onLongPress;
 
   const BindingPlutoDataGrid({
-    Key? key,
+    super.key,
     required this.platformDataColumns,
     this.onTap,
     this.onSelectChanged,
@@ -35,7 +35,7 @@ class BindingPlutoDataGrid<T> extends StatefulWidget {
     this.horizontalMargin,
     this.columnSpacing,
     this.fixedLeftColumns = 0,
-  }) : super(key: key);
+  });
 
   @override
   State<StatefulWidget> createState() {

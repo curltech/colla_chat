@@ -15,7 +15,7 @@ import 'package:flutter/material.dart';
 
 ///粘贴linkman的json字符串增加
 class JsonLinkmanAddWidget extends StatefulWidget with TileDataMixin {
-  JsonLinkmanAddWidget({Key? key}) : super(key: key);
+  JsonLinkmanAddWidget({super.key});
 
   @override
   IconData get iconData => Icons.add_link;
@@ -109,7 +109,7 @@ class _JsonLinkmanAddWidgetState extends State<JsonLinkmanAddWidget> {
             onPressed: () async {
               PeerClient peerClient = await _addLinkman();
               await linkmanService.update(
-                  {'linkmanStatus': LinkmanStatus.friend.name},
+                  {'linkmanStatus': LinkmanStatus.F.name},
                   where: 'peerId=?',
                   whereArgs: [peerClient.peerId]);
               if (mounted) {

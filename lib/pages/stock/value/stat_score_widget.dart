@@ -33,7 +33,7 @@ final StatScoreDataPageController statScoreDataPageController =
 
 ///自选股和分组的查询界面
 class StatScoreWidget extends StatefulWidget with TileDataMixin {
-  StatScoreWidget({Key? key}) : super(key: key);
+  StatScoreWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _StatScoreWidgetState();

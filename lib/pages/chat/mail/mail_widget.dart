@@ -1,4 +1,3 @@
-import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/emailaddress.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/mail/address/email_service_provider.dart';
@@ -24,7 +23,7 @@ class MailWidget extends StatefulWidget with TileDataMixin {
   final MailContentWidget mailContentWidget = MailContentWidget();
   final NewMailWidget newMailWidget = const NewMailWidget();
 
-  MailWidget({Key? key}) : super(key: key) {
+  MailWidget({super.key}) {
     platformEmailServiceProvider.init();
     indexWidgetProvider.define(mailContentWidget);
     indexWidgetProvider.define(newMailWidget);
@@ -155,7 +154,9 @@ class _MailWidgetState extends State<MailWidget> {
         builder: (BuildContext context, String mailboxName, Widget? child) {
           return CommonAutoSizeText(
             AppLocalizations.t(mailboxName),
-            style: const TextStyle(fontSize: AppFontSize.smFontSize),
+            softWrap: true,
+            maxLines: 2,
+            overflow: TextOverflow.visible,
           );
         });
     var appBarView = AppBarView(

@@ -3,9 +3,9 @@ import 'package:colla_chat/entity/stock/day_line.dart';
 class MinLine extends StockLine {
   int? tradeMinute;
 
-  MinLine.fromJson(Map json)
+  MinLine.fromJson(super.json)
       : tradeMinute = json['trade_minute'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

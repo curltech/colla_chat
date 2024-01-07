@@ -15,7 +15,6 @@ import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/websocket.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart' as inapp;
@@ -140,7 +139,7 @@ Future<void> _initDesktopWindows() async {
 class CollaChatApp extends StatefulWidget {
   final bool loginStatus;
 
-  const CollaChatApp({Key? key, required this.loginStatus}) : super(key: key);
+  const CollaChatApp({super.key, required this.loginStatus});
 
   @override
   State<StatefulWidget> createState() {

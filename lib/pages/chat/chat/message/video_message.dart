@@ -17,14 +17,14 @@ class VideoMessage extends StatefulWidget {
   final bool fullScreen;
 
   const VideoMessage({
-    Key? key,
+    super.key,
     required this.id,
     required this.messageId,
     required this.isMyself,
     this.thumbnail,
     this.title,
     this.fullScreen = false,
-  }) : super(key: key);
+  });
 
   @override
   State<StatefulWidget> createState() => _VideoMessageState();

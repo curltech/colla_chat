@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 
 class ContactWidget extends StatefulWidget with TileDataMixin {
-  const ContactWidget({Key? key}) : super(key: key);
+  const ContactWidget({super.key});
 
   @override
   bool get withLeading => true;
@@ -16,14 +16,16 @@ class ContactWidget extends StatefulWidget with TileDataMixin {
   @override
   String get routeName => 'contact';
 
-  @override
-  State<StatefulWidget> createState() => _ContactWidgetState();
+
 
   @override
   IconData get iconData => Icons.contact_phone;
 
   @override
   String get title => 'Contact';
+
+  @override
+  State<StatefulWidget> createState() => _ContactWidgetState();
 }
 
 class _ContactWidgetState extends State<ContactWidget> {

@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 
 /// 邮件地址手工注册组件，录入框和按钮组合
 class ManualAddWidget extends StatefulWidget with TileDataMixin {
-  const ManualAddWidget({Key? key}) : super(key: key);
+  const ManualAddWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _ManualAddWidgetState();

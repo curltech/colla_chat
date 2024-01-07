@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 
 /// 一般设置组件，包括颜色，亮度，语言
 class GeneralSettingWidget extends StatefulWidget with TileDataMixin {
-  const GeneralSettingWidget({Key? key}) : super(key: key);
+  const GeneralSettingWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _GeneralSettingWidgetState();

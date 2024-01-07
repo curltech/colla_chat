@@ -38,7 +38,7 @@ class PeerProfile extends StatusEntity {
 
   PeerProfile(this.peerId, {this.clientId = unknownClientId});
 
-  PeerProfile.fromJson(Map json)
+  PeerProfile.fromJson(super.json)
       : peerId = json['peerId'],
         clientId = json['clientId'],
         clientDevice = json['clientDevice'],
@@ -74,7 +74,7 @@ class PeerProfile extends StatusEntity {
         visibilitySetting = json['visibilitySetting'],
         creditScore = json['creditScore'] ?? 0,
         currency = json['currency'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

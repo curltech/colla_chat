@@ -31,7 +31,7 @@ final ValueNotifier<Group?> groupNotifier = ValueNotifier<Group?>(null);
 
 ///创建和修改群，填写群的基本信息，选择群成员和群主
 class GroupEditWidget extends StatefulWidget with TileDataMixin {
-  const GroupEditWidget({Key? key}) : super(key: key);
+  const GroupEditWidget({super.key});
 
   @override
   IconData get iconData => Icons.group;

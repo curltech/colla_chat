@@ -19,7 +19,7 @@ class BindingPaginatedDataTable2<T> extends StatefulWidget {
   final Function(int index)? onLongPress;
 
   const BindingPaginatedDataTable2({
-    Key? key,
+    super.key,
     required this.platformDataColumns,
     this.onTap,
     this.onSelectChanged,
@@ -32,7 +32,7 @@ class BindingPaginatedDataTable2<T> extends StatefulWidget {
     this.horizontalMargin = 24.0,
     this.columnSpacing = 56.0,
     this.fixedLeftColumns = 0,
-  }) : super(key: key);
+  });
 
   @override
   State<StatefulWidget> createState() {

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class WebViewWidget extends StatefulWidget {
   final String url;
 
-  const WebViewWidget({Key? key, required this.url}) : super(key: key);
+  const WebViewWidget({super.key, required this.url});
 
   @override
   State createState() => _WebViewWidgetState();

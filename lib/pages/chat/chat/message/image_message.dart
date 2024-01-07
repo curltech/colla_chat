@@ -15,14 +15,14 @@ class ImageMessage extends StatelessWidget {
   final bool fullScreen;
 
   const ImageMessage({
-    Key? key,
+    super.key,
     this.thumbnail,
     required this.messageId,
     required this.isMyself,
     this.title,
     this.content,
     this.fullScreen = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

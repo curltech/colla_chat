@@ -36,7 +36,7 @@ class QrcodeWidget extends StatefulWidget with TileDataMixin {
     )
   ];
 
-  QrcodeWidget({Key? key}) : super(key: key);
+  QrcodeWidget({super.key});
 
   @override
   bool get withLeading => true;

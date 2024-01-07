@@ -7,7 +7,7 @@ import 'package:colla_chat/tool/string_util.dart';
 
 ///根据目标peerclient的peerid，电话和名称搜索，异步返回
 class FindClientAction extends BaseAction {
-  FindClientAction(MsgType msgType) : super(msgType);
+  FindClientAction(super.msgType);
 
   Future<bool> findClient(
       String targetPeerId, String mobile, String email, String name) async {

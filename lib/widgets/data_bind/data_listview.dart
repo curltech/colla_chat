@@ -23,7 +23,7 @@ class DataListView extends StatefulWidget {
   })? onTap;
 
   DataListView(
-      {Key? key,
+      {super.key,
       List<TileData> tileData = const [],
       int? currentIndex,
       DataListController<TileData>? controller,
@@ -32,8 +32,7 @@ class DataListView extends StatefulWidget {
       this.onScrollMax,
       this.onScrollMin,
       this.onRefresh,
-      this.onTap})
-      : super(key: key) {
+      this.onTap}) {
     if (controller != null) {
       this.controller = controller;
     } else {

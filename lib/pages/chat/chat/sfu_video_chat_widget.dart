@@ -26,8 +26,8 @@ class SfuVideoChatWidget extends StatefulWidget with TileDataMixin {
       SfuVideoConferencePoolWidget();
 
   SfuVideoChatWidget({
-    Key? key,
-  }) : super(key: key) {
+    super.key,
+  }) {
     indexWidgetProvider.define(sfuVideoConferencePoolWidget);
   }
 

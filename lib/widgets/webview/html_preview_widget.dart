@@ -56,7 +56,7 @@ class HtmlPreviewController with ChangeNotifier {
 final HtmlPreviewController htmlPreviewController = HtmlPreviewController();
 
 class HtmlPreviewWidget extends StatefulWidget with TileDataMixin {
-  const HtmlPreviewWidget({Key? key}) : super(key: key);
+  const HtmlPreviewWidget({super.key});
 
   @override
   bool get withLeading => true;

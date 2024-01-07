@@ -24,7 +24,7 @@ class NearbyGroupAddWidget extends StatefulWidget with TileDataMixin {
       DataListController<TileData>();
   late final DataListView dataListView;
 
-  NearbyGroupAddWidget({Key? key}) : super(key: key) {
+  NearbyGroupAddWidget({super.key}) {
     dataListView = DataListView(
       controller: controller,
     );
@@ -104,7 +104,7 @@ class _NearbyGroupAddWidgetState extends State<NearbyGroupAddWidget> {
                   Linkman linkman =
                       await linkmanService.storeByPeerEntity(peerClient);
                   await linkmanService.update(
-                      {'id': linkman.id, 'status': LinkmanStatus.friend.name});
+                      {'id': linkman.id, 'status': LinkmanStatus.F.name});
                 },
               ));
           tiles.add(tile);

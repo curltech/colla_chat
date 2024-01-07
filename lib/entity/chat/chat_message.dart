@@ -178,7 +178,7 @@ class ChatMessage extends StatusEntity {
 
   ChatMessage();
 
-  ChatMessage.fromJson(Map json)
+  ChatMessage.fromJson(super.json)
       : transportType = json['transportType'] ?? TransportType.webrtc.name,
         direct = json['direct'],
         receiverPeerId = json['receiverPeerId'],
@@ -216,7 +216,7 @@ class ChatMessage extends StatusEntity {
             json['needReadReceipt'] == true || json['needReadReceipt'] == 1
                 ? true
                 : false,
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {
@@ -285,10 +285,10 @@ class MergedMessage extends BaseEntity {
 
   MergedMessage();
 
-  MergedMessage.fromJson(Map json)
+  MergedMessage.fromJson(super.json)
       : messageId = json['messageId'],
         mergedMessageId = json['mergedMessageId'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {
@@ -312,7 +312,7 @@ class Receive extends BaseEntity {
   String? readTime; // 阅读时间
   Receive();
 
-  Receive.fromJson(Map json)
+  Receive.fromJson(super.json)
       : targetType = json['targetType'],
         targetPeerId = json['targetPeerId'],
         messageType = json['messageType'],
@@ -320,7 +320,7 @@ class Receive extends BaseEntity {
         receiverPeerId = json['receiverPeerId'],
         receiveTime = json['receiveTime'],
         readTime = json['readTime'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

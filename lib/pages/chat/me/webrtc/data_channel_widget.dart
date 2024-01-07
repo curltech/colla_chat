@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 
 /// 连接建立示例
 class DataChannelWidget extends StatefulWidget with TileDataMixin {
-  DataChannelWidget({Key? key}) : super(key: key);
+  DataChannelWidget({super.key});
 
   @override
   State createState() => _DataChannelWidgetState();

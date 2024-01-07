@@ -13,12 +13,12 @@ class GroupLinkmanWidget extends StatefulWidget {
   final String groupId;
 
   const GroupLinkmanWidget({
-    Key? key,
+    super.key,
     required this.onSelected,
     required this.selected,
     this.selectType = SelectType.chipMultiSelect,
     required this.groupId,
-  }) : super(key: key);
+  });
 
   @override
   State<StatefulWidget> createState() => _GroupLinkmanWidgetState();

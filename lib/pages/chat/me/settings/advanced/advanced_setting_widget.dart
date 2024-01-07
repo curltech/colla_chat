@@ -19,7 +19,7 @@ class AdvancedSettingWidget extends StatefulWidget with TileDataMixin {
   final MyselfPeerListWidget myselfPeerListWidget = const MyselfPeerListWidget();
   late final List<TileData> advancedSettingTileData;
 
-  AdvancedSettingWidget({Key? key}) : super(key: key) {
+  AdvancedSettingWidget({super.key}) {
     indexWidgetProvider.define(peerEndpointListWidget);
     indexWidgetProvider.define(peerClientListWidget);
     indexWidgetProvider.define(myselfPeerListWidget);

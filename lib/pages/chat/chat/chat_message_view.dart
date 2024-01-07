@@ -56,8 +56,8 @@ class ChatMessageView extends StatefulWidget with TileDataMixin {
       ChatMessageInputWidget();
 
   ChatMessageView({
-    Key? key,
-  }) : super(key: key) {
+    super.key,
+  }) {
     indexWidgetProvider.define(fullScreenChatMessageWidget);
     indexWidgetProvider.define(videoChatWidget);
     indexWidgetProvider.define(sfuVideoChatWidget);
@@ -275,7 +275,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
       _initiator.value = null;
       return;
     }
-    if (linkman.linkmanStatus == LinkmanStatus.chatGPT.name) {
+    if (linkman.linkmanStatus == LinkmanStatus.G.name) {
       ChatGPT chatGPT = ChatGPT(linkman.peerId);
       if (StringUtil.isNotEmpty(linkman.peerPublicKey)) {
         chatGPT.model = linkman.peerPublicKey!;
@@ -332,7 +332,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
     if (linkman == null) {
       return;
     }
-    if (linkman.linkmanStatus != LinkmanStatus.chatGPT.name) {
+    if (linkman.linkmanStatus != LinkmanStatus.G.name) {
       List<AdvancedPeerConnection> advancedPeerConnections =
           await peerConnectionPool.get(peerId);
       //如果连接存在，则关闭连接

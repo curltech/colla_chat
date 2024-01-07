@@ -24,7 +24,7 @@ class FaceGroupAddWidget extends StatefulWidget with TileDataMixin {
       DataListController<TileData>();
   late final DataListView dataListView;
 
-  FaceGroupAddWidget({Key? key}) : super(key: key) {
+  FaceGroupAddWidget({super.key}) {
     dataListView = DataListView(
       controller: controller,
     );
@@ -104,7 +104,7 @@ class _FaceGroupAddWidgetState extends State<FaceGroupAddWidget> {
                   Linkman linkman =
                       await linkmanService.storeByPeerEntity(peerClient);
                   await linkmanService.update(
-                      {'id': linkman.id, 'status': LinkmanStatus.friend.name});
+                      {'id': linkman.id, 'status': LinkmanStatus.F.name});
                 },
               ));
           tiles.add(tile);

@@ -22,8 +22,7 @@ class ExtendedTextMessageInputWidget extends StatefulWidget {
   final TextEditingController textEditingController;
 
   const ExtendedTextMessageInputWidget(
-      {Key? key, required this.textEditingController})
-      : super(key: key);
+      {super.key, required this.textEditingController});
 
   @override
   State createState() => _ExtendedTextMessageInputWidgetState();

@@ -37,7 +37,7 @@ class Performance extends BaseEntity {
   String? eITime;
   String? secuCode;
 
-  Performance.fromJson(Map json)
+  Performance.fromJson(super.json)
       : securityCode = json['security_code'],
         securityNameAbbr = json['security_name_abbr'],
         tradeMarketCode = json['trade_market_code'],
@@ -73,7 +73,7 @@ class Performance extends BaseEntity {
         dateMmDd = json['date_mm_dd'],
         eITime = json['ei_time'],
         secuCode = json['secu_code'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

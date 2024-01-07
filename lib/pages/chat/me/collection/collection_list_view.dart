@@ -14,8 +14,7 @@ class CollectionListView extends StatefulWidget with TileDataMixin {
   final CollectionItemWidget collectionItemWidget = CollectionItemWidget();
 
   CollectionListView(
-      {Key? key, this.onRefresh, this.onScrollMax, this.onScrollMin})
-      : super(key: key) {
+      {super.key, this.onRefresh, this.onScrollMax, this.onScrollMin}) {
     indexWidgetProvider.define(collectionItemWidget);
   }
 

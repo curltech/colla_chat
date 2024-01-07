@@ -61,7 +61,7 @@ class ChannelChatMessageService {
     if (linkman == null) {
       return null;
     }
-    if (linkman.subscriptStatus != LinkmanStatus.subscript.name) {
+    if (linkman.subscriptStatus != LinkmanStatus.C.name) {
       return null;
     }
     List<ChatMessage> chatMessages =

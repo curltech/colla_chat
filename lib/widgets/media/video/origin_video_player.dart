@@ -99,7 +99,6 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
 
   FlVideoPlayer _buildCupertinoControl(
     VideoPlayerController videoPlayerController, {
-    bool showClosedCaptionButton = true,
     bool showFullscreenButton = true,
     bool showVolumeButton = true,
   }) {

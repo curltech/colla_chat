@@ -14,7 +14,7 @@ import 'package:flutter/material.dart';
 class WebrtcWidget extends StatelessWidget with TileDataMixin {
   late final Widget child;
 
-  WebrtcWidget({Key? key}) : super(key: key) {
+  WebrtcWidget({super.key}) {
     GetUserMediaWidget getUserMediaWidget = const GetUserMediaWidget();
     indexWidgetProvider.define(getUserMediaWidget);
     GetDisplayMediaWidget getDisplayMediaWidget = const GetDisplayMediaWidget();

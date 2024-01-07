@@ -5,7 +5,7 @@ import 'package:colla_chat/p2p/chain/baseaction.dart';
 ///  Ping只是一个演示，适合点对点的通信，这种方式灵活度高，但是需要自己实现全网遍历的功能
 ///  chat就可以采用这种方式
 class PingAction extends BaseAction {
-  PingAction(MsgType msgType) : super(msgType);
+  PingAction(super.msgType);
 
   Future<bool> ping(dynamic data, {String? targetPeerId}) async {
     ChainMessage chainMessage =

@@ -3,14 +3,12 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/media_stream_util.dart';
 import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_render_view.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:livekit_client/livekit_client.dart';
 
 ///单个小视频窗口，显示一个视频流的PeerpeerMediaStream，长按出现更大的窗口，带有操作按钮
@@ -22,13 +20,13 @@ class SingleVideoViewWidget extends StatefulWidget {
   final Function(PeerMediaStream peerMediaStream) onClosed;
 
   const SingleVideoViewWidget({
-    Key? key,
+    super.key,
     required this.peerMediaStreamController,
     required this.onClosed,
     required this.peerMediaStream,
     this.height,
     this.width,
-  }) : super(key: key);
+  });
 
   @override
   State createState() => _SingleVideoViewWidgetState();
@@ -395,7 +393,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
 
 // This a widget to implement the image scale animation, and background grey out effect.
 class AnimatedContain extends StatefulWidget {
-  const AnimatedContain({Key? key, required this.child}) : super(key: key);
+  const AnimatedContain({super.key, required this.child});
 
   final Widget child;
 

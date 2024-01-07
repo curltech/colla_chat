@@ -53,7 +53,7 @@ class DataActionCard extends StatelessWidget {
   final Function(int index, String label, {String? value})? onPressed;
 
   DataActionCard({
-    Key? key,
+    super.key,
     required this.actions,
     this.onPressed,
     this.height,
@@ -67,7 +67,7 @@ class DataActionCard extends StatelessWidget {
     this.showTooltip = true,
     this.labelColor,
     this.width,
-  }) : super(key: key) {
+  }) {
     var mod = actions.length % crossAxisCount;
     int lines = (actions.length / crossAxisCount).floor();
     if (mod > 0) {

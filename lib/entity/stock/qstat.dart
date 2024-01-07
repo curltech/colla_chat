@@ -37,7 +37,7 @@ class QStat extends BaseEntity {
   num? cfps;
   num? dividendYieldRatio;
 
-  QStat.fromJson(Map json)
+  QStat.fromJson(super.json)
       : tsCode = json['ts_code'],
         securityName = json['security_name'],
         industry = json['industry,omitempty'],
@@ -72,7 +72,7 @@ class QStat extends BaseEntity {
         yoyDeduNp = json['yoy_dedu_np'],
         cfps = json['cfps'],
         dividendYieldRatio = json['dividend_yield_ratio'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

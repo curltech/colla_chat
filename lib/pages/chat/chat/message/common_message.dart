@@ -7,10 +7,10 @@ class CommonMessage extends StatelessWidget {
   final Widget? child;
 
   const CommonMessage({
-    Key? key,
+    super.key,
     this.tileData,
     this.child,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

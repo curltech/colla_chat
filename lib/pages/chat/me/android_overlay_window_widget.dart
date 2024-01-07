@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 
 class AndroidOverlayWindowWidget extends StatefulWidget with TileDataMixin {
-  const AndroidOverlayWindowWidget({Key? key}) : super(key: key);
+  const AndroidOverlayWindowWidget({super.key});
 
   @override
   bool get withLeading => true;

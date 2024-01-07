@@ -3,7 +3,7 @@ import 'package:colla_chat/p2p/chain/baseaction.dart';
 
 ///查询服务器的交易信息
 class QueryPeerTransAction extends BaseAction {
-  QueryPeerTransAction(MsgType msgType) : super(msgType);
+  QueryPeerTransAction(super.msgType);
 
   Future<bool> queryPeerTrans(dynamic data) async {
     ChainMessage chainMessage = await prepareSend(data);

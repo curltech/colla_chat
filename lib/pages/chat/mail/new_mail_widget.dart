@@ -46,7 +46,7 @@ class PlatformAttachmentInfo {
 
 ///邮件内容子视图
 class NewMailWidget extends StatefulWidget with TileDataMixin {
-  const NewMailWidget({Key? key}) : super(key: key);
+  const NewMailWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _NewMailWidgetState();

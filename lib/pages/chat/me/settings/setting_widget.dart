@@ -26,7 +26,7 @@ class SettingWidget extends StatefulWidget with TileDataMixin {
   final AuthMethod authMethod = AuthMethod.app;
   late final List<TileData> settingTileData;
 
-  SettingWidget({Key? key}) : super(key: key) {
+  SettingWidget({super.key}) {
     indexWidgetProvider.define(generalSettingWidget);
     indexWidgetProvider.define(advancedSettingWidget);
     indexWidgetProvider.define(peerProfileEditWidget);

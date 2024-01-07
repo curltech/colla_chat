@@ -19,9 +19,9 @@ class LocalParticipantWidget extends StatefulWidget {
     this.videoTrack,
     this.isScreenShare,
     this.showStatsLayer, {
-    Key? key,
+    super.key,
     this.quality = VideoQuality.MEDIUM,
-  }) : super(key: key);
+  });
 
   @override
   State<StatefulWidget> createState() => _LocalParticipantWidgetState();

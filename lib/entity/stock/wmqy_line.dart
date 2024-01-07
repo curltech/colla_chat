@@ -23,7 +23,7 @@ class WmqyLine extends BaseEntity {
   num? pctChgVol;
   int? lineType;
 
-  WmqyLine.fromJson(Map json)
+  WmqyLine.fromJson(super.json)
       : tsCode = json['ts_code'],
         name = json['name'],
         tradeDate = json['trade_date'],
@@ -45,7 +45,7 @@ class WmqyLine extends BaseEntity {
         pctChgAmount = json['pct_chg_amount'],
         pctChgVol = json['pct_chg_vol'],
         lineType = json['line_type'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

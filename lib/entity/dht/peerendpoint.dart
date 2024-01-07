@@ -32,7 +32,7 @@ class PeerEndpoint extends PeerEntity {
     }
   }
 
-  PeerEndpoint.fromJson(Map json)
+  PeerEndpoint.fromJson(super.json)
       : endpointType = json['endpointType'],
         discoveryAddress = json['discoveryAddress'],
         priority = json['priority'] ?? 0,
@@ -44,7 +44,7 @@ class PeerEndpoint extends PeerEntity {
         uriHost = json['uriHost'],
         uriKey = json['uriKey'],
         uriSecret = json['uriSecret'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

@@ -8,8 +8,7 @@ class CancelMessage extends StatelessWidget {
   final String content;
   final bool isMyself;
 
-  const CancelMessage({Key? key, required this.content, required this.isMyself})
-      : super(key: key);
+  const CancelMessage({super.key, required this.content, required this.isMyself});
 
   @override
   Widget build(BuildContext context) {

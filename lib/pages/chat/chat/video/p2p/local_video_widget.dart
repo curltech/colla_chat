@@ -45,7 +45,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 ///本地视频通话显示和拨出的窗口，显示多个本地视频，音频和屏幕共享的小视频窗口
 ///各种功能按钮，可以切换视频和音频，添加屏幕共享视频，此时需要发起重新协商
 class LocalVideoWidget extends StatefulWidget {
-  const LocalVideoWidget({Key? key}) : super(key: key);
+  const LocalVideoWidget({super.key});
 
   @override
   State<StatefulWidget> createState() {

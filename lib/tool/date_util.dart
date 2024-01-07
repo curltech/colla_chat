@@ -35,10 +35,10 @@ class DateUtil {
     Duration diff = c.difference(t);
     switch (diff.inDays) {
       case -3:
-        strDay = AppLocalizations.t('Three days from now');
+        strDay = AppLocalizations.t('3 DFN.');
         break;
       case -2:
-        strDay = AppLocalizations.t('Day after tomorrow');
+        strDay = AppLocalizations.t('Overmorrow');
         break;
       case -1:
         strDay = AppLocalizations.t('Tomorrow');
@@ -50,13 +50,13 @@ class DateUtil {
         strDay = AppLocalizations.t('Yesterday');
         break;
       case 2:
-        strDay = AppLocalizations.t('Day before yesterday');
+        strDay = AppLocalizations.t('Ereyesterday');
         break;
       case 3:
-        strDay = AppLocalizations.t('Three days ago');
+        strDay = AppLocalizations.t('3 DA.');
         break;
       case 4:
-        strDay = AppLocalizations.t('Four days ago');
+        strDay = AppLocalizations.t('4 DA.');
         break;
       default:
         break;

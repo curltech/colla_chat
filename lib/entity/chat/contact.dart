@@ -5,13 +5,13 @@ class Contact extends PeerParty {
   String? formattedName;
   bool linkman = false;
 
-  Contact(String peerId, String name) : super(peerId, name);
+  Contact(super.peerId, super.name);
 
-  Contact.fromJson(Map json)
+  Contact.fromJson(super.json)
       : formattedName = json['formattedName'],
         linkman =
             json['linkman'] == true || json['linkman'] == 1 ? true : false,
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

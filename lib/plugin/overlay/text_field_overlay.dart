@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 
 class TextFieldOverlay extends StatefulWidget {
-  const TextFieldOverlay({Key? key}) : super(key: key);
+  const TextFieldOverlay({super.key});
 
   @override
   State<TextFieldOverlay> createState() => _TextFieldOverlayState();

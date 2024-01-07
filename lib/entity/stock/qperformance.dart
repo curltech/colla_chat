@@ -33,7 +33,7 @@ class QPerformance extends BaseEntity {
   num? cfps;
   num? dividendYieldRatio;
 
-  QPerformance.fromJson(Map json)
+  QPerformance.fromJson(super.json)
       : tsCode = json['ts_code'],
         securityName = json['security_name'],
         industry = json['industry,omitempty'],
@@ -65,7 +65,7 @@ class QPerformance extends BaseEntity {
         yoyDeduNp = json['yoy_dedu_np'],
         cfps = json['cfps'],
         dividendYieldRatio = json['dividend_yield_ratio'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

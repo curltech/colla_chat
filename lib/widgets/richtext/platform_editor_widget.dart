@@ -74,11 +74,11 @@ class PlatformEditorWidget extends StatefulWidget {
   final PlatformEditorController platformEditorController;
 
   const PlatformEditorWidget({
-    Key? key,
+    super.key,
     this.initialText,
     this.height,
     required this.platformEditorController,
-  }) : super(key: key);
+  });
 
   @override
   State createState() => _PlatformEditorWidgetState();

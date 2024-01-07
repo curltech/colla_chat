@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 
 /// 远程登录组件，一个card下的录入框和按钮组合
 class RemoteLoginWidget extends StatefulWidget {
-  const RemoteLoginWidget({Key? key}) : super(key: key);
+  const RemoteLoginWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _RemoteLoginWidgetState();

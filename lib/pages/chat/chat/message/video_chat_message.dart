@@ -25,11 +25,10 @@ class VideoChatMessage extends StatelessWidget {
   final ChatMessage chatMessage;
 
   const VideoChatMessage(
-      {Key? key,
+      {super.key,
       required this.isMyself,
       this.fullScreen = false,
-      required this.chatMessage})
-      : super(key: key);
+      required this.chatMessage});
 
   _join(BuildContext context) async {
     ChatSummary? chatSummary = chatMessageController.chatSummary;

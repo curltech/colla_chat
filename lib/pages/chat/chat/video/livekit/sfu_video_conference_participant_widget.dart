@@ -16,7 +16,7 @@ class SfuVideoConferenceParticipantWidget extends StatelessWidget
   final SfuVideoConferenceTrackWidget sfuVideoConferenceTrackWidget =
       SfuVideoConferenceTrackWidget();
 
-  SfuVideoConferenceParticipantWidget({Key? key}) : super(key: key) {
+  SfuVideoConferenceParticipantWidget({super.key}) {
     indexWidgetProvider.define(sfuVideoConferenceTrackWidget);
   }
 

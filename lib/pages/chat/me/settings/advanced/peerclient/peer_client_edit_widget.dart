@@ -94,7 +94,7 @@ final List<PlatformDataField> peerClientColumnFieldDefs = [
 
 ///客户端
 class PeerClientEditWidget extends StatefulWidget with TileDataMixin {
-  const PeerClientEditWidget({Key? key}) : super(key: key);
+  const PeerClientEditWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _PeerClientEditWidgetState();

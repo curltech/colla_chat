@@ -80,7 +80,7 @@ class GmailProvider extends EmailServiceProvider {
                 displayName: 'Google Mail',
                 displayShortName: 'Gmail',
               )
-                ..addIncomingServer(ServerConfig(
+                ..addIncomingServer(const ServerConfig(
                   type: ServerType.imap,
                   hostname: 'imap.gmail.com',
                   port: 993,
@@ -88,7 +88,7 @@ class GmailProvider extends EmailServiceProvider {
                   authentication: Authentication.oauth2,
                   usernameType: UsernameType.emailAddress,
                 ))
-                ..addIncomingServer(ServerConfig(
+                ..addIncomingServer(const ServerConfig(
                   type: ServerType.pop,
                   hostname: 'pop.gmail.com',
                   port: 995,
@@ -96,7 +96,7 @@ class GmailProvider extends EmailServiceProvider {
                   authentication: Authentication.oauth2,
                   usernameType: UsernameType.emailAddress,
                 ))
-                ..addOutgoingServer(ServerConfig(
+                ..addOutgoingServer(const ServerConfig(
                   type: ServerType.smtp,
                   hostname: 'smtp.gmail.com',
                   port: 465, //587 for tls
@@ -123,7 +123,7 @@ class OutlookProvider extends EmailServiceProvider {
                 displayName: 'Outlook.com',
                 displayShortName: 'Outlook',
               )
-                ..addIncomingServer(ServerConfig(
+                ..addIncomingServer(const ServerConfig(
                   type: ServerType.imap,
                   hostname: 'outlook.office365.com',
                   port: 993,
@@ -131,7 +131,7 @@ class OutlookProvider extends EmailServiceProvider {
                   authentication: Authentication.oauth2,
                   usernameType: UsernameType.emailAddress,
                 ))
-                ..addOutgoingServer(ServerConfig(
+                ..addOutgoingServer(const ServerConfig(
                   type: ServerType.smtp,
                   hostname: 'smtp.office365.com',
                   port: 587,
@@ -261,7 +261,7 @@ class YahooProvider extends EmailServiceProvider {
                 displayName: 'Yahoo! Mail',
                 displayShortName: 'Yahoo',
               )
-                ..addIncomingServer(ServerConfig(
+                ..addIncomingServer(const ServerConfig(
                   type: ServerType.imap,
                   hostname: 'imap.mail.yahoo.com',
                   port: 993,
@@ -269,7 +269,7 @@ class YahooProvider extends EmailServiceProvider {
                   authentication: Authentication.passwordClearText,
                   usernameType: UsernameType.emailAddress,
                 ))
-                ..addOutgoingServer(ServerConfig(
+                ..addOutgoingServer(const ServerConfig(
                   type: ServerType.smtp,
                   hostname: 'smtp.mail.yahoo.com',
                   port: 465,
@@ -313,7 +313,7 @@ class AolProvider extends EmailServiceProvider {
                 displayName: 'AOL Mail',
                 displayShortName: 'AOL',
               )
-                ..addIncomingServer(ServerConfig(
+                ..addIncomingServer(const ServerConfig(
                   type: ServerType.imap,
                   hostname: 'imap.aol.com',
                   port: 993,
@@ -321,7 +321,7 @@ class AolProvider extends EmailServiceProvider {
                   authentication: Authentication.passwordClearText,
                   usernameType: UsernameType.emailAddress,
                 ))
-                ..addOutgoingServer(ServerConfig(
+                ..addOutgoingServer(const ServerConfig(
                   type: ServerType.smtp,
                   hostname: 'smtp.aol.com',
                   port: 465,
@@ -367,7 +367,7 @@ class AppleProvider extends EmailServiceProvider {
                 displayName: 'Apple iCloud',
                 displayShortName: 'Apple',
               )
-                ..addIncomingServer(ServerConfig(
+                ..addIncomingServer(const ServerConfig(
                   type: ServerType.imap,
                   hostname: 'imap.mail.me.com',
                   port: 993,
@@ -375,7 +375,7 @@ class AppleProvider extends EmailServiceProvider {
                   authentication: Authentication.passwordClearText,
                   usernameType: UsernameType.emailAddress,
                 ))
-                ..addOutgoingServer(ServerConfig(
+                ..addOutgoingServer(const ServerConfig(
                   type: ServerType.smtp,
                   hostname: 'smtp.mail.me.com',
                   port: 587,
@@ -401,7 +401,7 @@ class GmxProvider extends EmailServiceProvider {
                 displayName: 'GMX Freemail',
                 displayShortName: 'GMX',
               )
-                ..addIncomingServer(ServerConfig(
+                ..addIncomingServer(const ServerConfig(
                   type: ServerType.imap,
                   hostname: 'imap.gmx.net',
                   port: 993,
@@ -409,7 +409,7 @@ class GmxProvider extends EmailServiceProvider {
                   authentication: Authentication.passwordClearText,
                   usernameType: UsernameType.emailAddress,
                 ))
-                ..addOutgoingServer(ServerConfig(
+                ..addOutgoingServer(const ServerConfig(
                   type: ServerType.smtp,
                   hostname: 'mail.gmx.net',
                   port: 465,
@@ -444,7 +444,7 @@ class MailboxOrgProvider extends EmailServiceProvider {
                 displayName: 'mailbox.org',
                 displayShortName: 'mailbox',
               )
-                ..addIncomingServer(ServerConfig(
+                ..addIncomingServer(const ServerConfig(
                   type: ServerType.imap,
                   hostname: 'imap.mailbox.org',
                   port: 993,
@@ -452,7 +452,7 @@ class MailboxOrgProvider extends EmailServiceProvider {
                   authentication: Authentication.passwordClearText,
                   usernameType: UsernameType.emailAddress,
                 ))
-                ..addOutgoingServer(ServerConfig(
+                ..addOutgoingServer(const ServerConfig(
                   type: ServerType.smtp,
                   hostname: 'smtp.mailbox.org',
                   port: 465,
@@ -476,7 +476,7 @@ class Mail163Provider extends EmailServiceProvider {
                 displayName: '163.com',
                 displayShortName: '163',
               )
-                ..addIncomingServer(ServerConfig(
+                ..addIncomingServer(const ServerConfig(
                   type: ServerType.imap,
                   hostname: 'imap.163.com',
                   port: 993,
@@ -484,7 +484,7 @@ class Mail163Provider extends EmailServiceProvider {
                   authentication: Authentication.passwordClearText,
                   usernameType: UsernameType.emailAddress,
                 ))
-                ..addIncomingServer(ServerConfig(
+                ..addIncomingServer(const ServerConfig(
                   type: ServerType.pop,
                   hostname: 'pop.163.com',
                   port: 995,
@@ -492,7 +492,7 @@ class Mail163Provider extends EmailServiceProvider {
                   authentication: Authentication.passwordClearText,
                   usernameType: UsernameType.emailAddress,
                 ))
-                ..addOutgoingServer(ServerConfig(
+                ..addOutgoingServer(const ServerConfig(
                   type: ServerType.smtp,
                   hostname: 'smtp.163.com',
                   port: 465,

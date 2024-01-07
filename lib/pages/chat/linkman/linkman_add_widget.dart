@@ -28,7 +28,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
   final ConferenceEditWidget conferenceEditWidget =
       const ConferenceEditWidget();
 
-  LinkmanAddWidget({Key? key}) : super(key: key) {
+  LinkmanAddWidget({super.key}) {
     indexWidgetProvider.define(p2pLinkmanAddWidget);
     indexWidgetProvider.define(contactLinkmanAddWidget);
     indexWidgetProvider.define(jsonLinkmanAddWidget);

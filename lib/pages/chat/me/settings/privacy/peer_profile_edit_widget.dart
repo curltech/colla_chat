@@ -176,7 +176,10 @@ class _PeerProfileEditWidgetState extends State<PeerProfileEditWidget> {
         myselfPeerProfile.vpnSwitch = peerProfile.vpnSwitch;
         myselfPeerProfile.stockSwitch = peerProfile.stockSwitch;
         myselfPeerProfile.emailSwitch = peerProfile.emailSwitch;
-        myselfPeerProfile.developerSwitch = peerProfile.developerSwitch;
+        if (myselfPeerProfile.developerSwitch != peerProfile.developerSwitch) {
+          myselfPeerProfile.developerSwitch = peerProfile.developerSwitch;
+          myself.peerProfile = myselfPeerProfile;
+        }
         myselfPeerProfile.mobileVerified = peerProfile.mobileVerified;
         myselfPeerProfile.logLevel = peerProfile.logLevel;
         await peerProfileService.store(myselfPeerProfile);

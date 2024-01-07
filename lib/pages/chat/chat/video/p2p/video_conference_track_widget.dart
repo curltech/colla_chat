@@ -15,7 +15,7 @@ ValueNotifier<AdvancedPeerConnection?> peerConnectionNotifier =
 
 ///会议池的会议的连接的轨道列表显示界面
 class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
-  const VideoConferenceTrackWidget({Key? key}) : super(key: key);
+  const VideoConferenceTrackWidget({super.key});
 
   @override
   bool get withLeading => true;

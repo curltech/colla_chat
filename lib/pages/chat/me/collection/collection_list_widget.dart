@@ -20,8 +20,7 @@ class CollectionListWidget extends StatefulWidget {
   final CollectionItemWidget collectionItemWidget = CollectionItemWidget();
 
   CollectionListWidget(
-      {Key? key, this.onRefresh, this.onScrollMax, this.onScrollMin})
-      : super(key: key) {
+      {super.key, this.onRefresh, this.onScrollMax, this.onScrollMin}) {
     indexWidgetProvider.define(collectionItemWidget);
   }
 

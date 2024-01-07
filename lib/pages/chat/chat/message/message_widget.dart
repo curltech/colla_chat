@@ -330,13 +330,13 @@ class MessageWidget {
         if (!isFile) {
           await ImageUtil.saveImageGallery(bytes,
               name: filename, androidExistNotSave: true);
-          DialogUtil.info(context, content: 'save to gallery: ${filename}');
+          DialogUtil.info(context, content: 'save to gallery: $filename');
         } else {
           String? dir = await FileUtil.directoryPathPicker();
           if (dir != null) {
             String path = p.join(dir, filename);
             await FileUtil.writeFileAsBytes(bytes, path);
-            DialogUtil.info(context, content: 'save to file: ${path}');
+            DialogUtil.info(context, content: 'save to file: $path');
           }
         }
       }
@@ -408,7 +408,7 @@ class MessageWidget {
     var senderPeerId = chatMessage.senderPeerId!;
     bool isFriend = false;
     Linkman? linkman = await linkmanService.findCachedOneByPeerId(senderPeerId);
-    if (linkman != null && linkman.linkmanStatus == LinkmanStatus.friend.name) {
+    if (linkman != null && linkman.linkmanStatus == LinkmanStatus.F.name) {
       isFriend = true;
     }
     return RequestAddFriendMessage(

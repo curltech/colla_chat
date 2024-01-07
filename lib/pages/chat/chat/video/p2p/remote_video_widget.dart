@@ -12,8 +12,8 @@ import 'package:flutter/material.dart';
 ///以及各种功能按钮
 class RemoteVideoWidget extends StatefulWidget {
   const RemoteVideoWidget({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<StatefulWidget> createState() {

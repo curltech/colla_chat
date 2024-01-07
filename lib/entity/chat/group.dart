@@ -18,9 +18,9 @@ class Group extends PeerParty {
   String? signalPrivateKey;
   List<String>? participants;
 
-  Group(String peerId, String name) : super(peerId, name);
+  Group(super.peerId, super.name);
 
-  Group.fromJson(Map json)
+  Group.fromJson(super.json)
       : groupCategory = json['groupCategory'],
         groupType = json['groupType'],
         description = json['description'],
@@ -32,7 +32,7 @@ class Group extends PeerParty {
         privateKey = json['privateKey'],
         signalPublicKey = json['signalPublicKey'],
         signalPrivateKey = json['signalPrivateKey'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {
@@ -101,12 +101,12 @@ class GroupMember extends StatusEntity {
     memberType ??= MemberType.member.name;
   }
 
-  GroupMember.fromJson(Map json)
+  GroupMember.fromJson(super.json)
       : groupId = json['groupId'],
         memberPeerId = json['memberPeerId'],
         memberAlias = json['memberAlias'],
         memberType = json['memberType'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

@@ -81,11 +81,10 @@ class DataDropdownButton extends StatefulWidget {
   final String? title;
 
   const DataDropdownButton(
-      {Key? key,
+      {super.key,
       required this.optionController,
       this.title,
-      required this.onChanged})
-      : super(key: key);
+      required this.onChanged});
 
   @override
   State<StatefulWidget> createState() => _DataDropdownButtonState();
@@ -145,12 +144,11 @@ class DataListSingleSelect extends StatefulWidget {
   final Function(String? selected) onChanged;
 
   const DataListSingleSelect(
-      {Key? key,
+      {super.key,
       required this.optionController,
       this.title,
       this.onSearch,
-      required this.onChanged})
-      : super(key: key);
+      required this.onChanged});
 
   @override
   State<StatefulWidget> createState() => _DataListSingleSelectState();
@@ -309,7 +307,7 @@ class CustomSingleSelectField extends StatefulWidget {
   final Function(String?) onChanged;
 
   const CustomSingleSelectField({
-    Key? key,
+    super.key,
     required this.optionController,
     required this.title,
     this.prefix,
@@ -317,7 +315,7 @@ class CustomSingleSelectField extends StatefulWidget {
     this.selectType = SelectType.chipMultiSelect,
     this.onSearch,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   State<StatefulWidget> createState() => _CustomSingleSelectFieldState();
@@ -418,13 +416,13 @@ class CustomMultiSelect extends StatefulWidget {
   final SelectType selectType;
 
   const CustomMultiSelect({
-    Key? key,
+    super.key,
     required this.optionController,
     required this.onConfirm,
     this.onSearch,
     this.title,
     this.selectType = SelectType.chipMultiSelect,
-  }) : super(key: key);
+  });
 
   @override
   State<StatefulWidget> createState() => _CustomMultiSelectState();
@@ -664,7 +662,7 @@ class CustomMultiSelectField extends StatefulWidget {
   final double? height;
 
   const CustomMultiSelectField(
-      {Key? key,
+      {super.key,
       required this.optionController,
       required this.onSearch,
       this.onConfirm,
@@ -672,8 +670,7 @@ class CustomMultiSelectField extends StatefulWidget {
       this.prefix,
       this.suffix,
       this.height = 40,
-      this.selectType = SelectType.chipMultiSelect})
-      : super(key: key);
+      this.selectType = SelectType.chipMultiSelect});
 
   @override
   State<StatefulWidget> createState() => _CustomMultiSelectFieldState();

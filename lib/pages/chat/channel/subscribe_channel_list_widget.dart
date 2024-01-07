@@ -168,7 +168,7 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
       IconButton(
         onPressed: () async {
           List<Linkman> linkmen =
-              await linkmanService.findSubscript(LinkmanStatus.subscript);
+              await linkmanService.findSubscript(LinkmanStatus.C);
           if (linkmen.isNotEmpty) {
             for (Linkman linkman in linkmen) {
               channelChatMessageService.updateSubscript(linkman.peerId,

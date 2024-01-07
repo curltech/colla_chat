@@ -13,12 +13,12 @@ class HtmlEditorWidget extends StatefulWidget {
   final Function(HtmlEditorController controller)? onCreateController;
 
   const HtmlEditorWidget({
-    Key? key,
+    super.key,
     this.height,
     this.initialText,
     this.onCreateController,
     this.withMultiMedia = false,
-  }) : super(key: key);
+  });
 
   @override
   State createState() => _HtmlEditorWidgetState();

@@ -12,9 +12,9 @@ class EmojiMessageInputWidget extends StatefulWidget {
   final Function(String text)? onTap;
 
   const EmojiMessageInputWidget({
-    Key? key,
+    super.key,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   State<StatefulWidget> createState() {

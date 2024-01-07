@@ -66,11 +66,10 @@ class GroupDataListView extends StatefulWidget {
       onTap;
 
   GroupDataListView(
-      {Key? key,
+      {super.key,
       GroupDataListController? controller,
       Map<TileData, List<TileData>> tileData = const {},
-      this.onTap})
-      : super(key: key) {
+      this.onTap}) {
     if (controller != null) {
       this.controller = controller;
     } else {

@@ -9,7 +9,7 @@ final List<String> peerClientFields = ['id', 'name', 'peerId'];
 
 //邮件内容组件
 class PeerClientViewWidget extends StatefulWidget with TileDataMixin {
-  const PeerClientViewWidget({Key? key}) : super(key: key);
+  const PeerClientViewWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _PeerClientViewWidgetState();

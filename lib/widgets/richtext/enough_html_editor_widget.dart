@@ -11,11 +11,11 @@ class EnoughHtmlEditorWidget extends StatefulWidget {
   final Function(HtmlEditorApi controller)? onCreateController;
 
   const EnoughHtmlEditorWidget({
-    Key? key,
+    super.key,
     this.height,
     this.initialText,
     this.onCreateController,
-  }) : super(key: key);
+  });
 
   @override
   State createState() => _EnoughHtmlEditorWidgetState();

@@ -11,14 +11,14 @@ class StockAccount extends StatusEntity {
 
   StockAccount();
 
-  StockAccount.fromJson(Map json)
+  StockAccount.fromJson(super.json)
       : accountId = json['accountId'],
         accountName = json['accountName'],
         name = json['name'],
         subscription = json['subscription'],
         lastLoginDate = json['lastLoginDate'],
         roles = json['roles'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

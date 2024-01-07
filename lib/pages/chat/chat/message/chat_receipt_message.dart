@@ -11,8 +11,7 @@ class ChatReceiptMessage extends StatelessWidget {
   final bool isMyself;
 
   const ChatReceiptMessage(
-      {Key? key, required this.chatMessage, required this.isMyself})
-      : super(key: key);
+      {super.key, required this.chatMessage, required this.isMyself});
 
   @override
   Widget build(BuildContext context) {

@@ -32,11 +32,11 @@ class PublishChannelListWidget extends StatefulWidget with TileDataMixin {
       PublishChannelEditWidget();
 
   PublishChannelListWidget({
-    Key? key,
+    super.key,
     this.onRefresh,
     this.onScrollMax,
     this.onScrollMin,
-  }) : super(key: key) {
+  }) {
     indexWidgetProvider.define(publishChannelEditWidget);
   }
 

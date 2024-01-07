@@ -4,7 +4,7 @@ import 'package:colla_chat/p2p/chain/baseaction.dart';
 
 /// 根据目标peerpoint的peerid搜索
 class FindPeerAction extends BaseAction {
-  FindPeerAction(MsgType msgType) : super(msgType);
+  FindPeerAction(super.msgType);
 
   Future<bool> findPeer(String targetPeerId) async {
     ChainMessage? chainMessage = await prepareSend({'peerId': targetPeerId});

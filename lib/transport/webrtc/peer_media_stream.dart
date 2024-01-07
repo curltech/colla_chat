@@ -340,6 +340,7 @@ class PeerMediaStream {
         return MediaStreamUtil.isMuted(mediaStream!);
       }
     }
+    return null;
   }
 
   /// 判断麦克风设备是否被发布，用于sfu模式

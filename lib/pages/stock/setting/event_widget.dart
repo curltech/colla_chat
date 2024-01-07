@@ -21,7 +21,7 @@ final DataListController<Event> eventController = DataListController<Event>();
 
 ///自选股和分组的查询界面
 class EventWidget extends StatefulWidget with TileDataMixin {
-  EventWidget({Key? key}) : super(key: key);
+  EventWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _EventWidgetState();

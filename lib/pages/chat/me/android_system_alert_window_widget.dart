@@ -4,7 +4,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
 class SystemAlertWindowWidget extends StatefulWidget with TileDataMixin {
-  const SystemAlertWindowWidget({Key? key}) : super(key: key);
+  const SystemAlertWindowWidget({super.key});
 
   @override
   State<StatefulWidget> createState() {

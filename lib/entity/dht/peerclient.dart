@@ -1,4 +1,3 @@
-import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 
 import 'base.dart';
 
@@ -14,16 +13,15 @@ class PeerClient extends PeerEntity {
   String? connectAddress;
   String? connectSessionId;
 
-  PeerClient(String peerId, String name, {String clientId = unknownClientId})
-      : super(peerId, name, clientId: clientId);
+  PeerClient(super.peerId, super.name, {super.clientId});
 
-  PeerClient.fromJson(Map json)
+  PeerClient.fromJson(super.json)
       : deviceToken = json['deviceToken'],
         deviceDesc = json['deviceDesc'],
         connectPeerId = json['connectPeerId'],
         connectAddress = json['connectAddress'],
         connectSessionId = json['connectSessionId'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

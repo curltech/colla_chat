@@ -1,4 +1,5 @@
 /// webclient代表httpclient或者websocketclient
+library;
 import 'package:colla_chat/transport/httpclient.dart';
 import 'package:colla_chat/transport/websocket.dart';
 

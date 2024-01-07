@@ -18,7 +18,7 @@ class MediaWidget extends StatelessWidget with TileDataMixin {
       PlatformAudioRecorderWidget();
   late final List<TileData> mediaTileData;
 
-  MediaWidget({Key? key}) : super(key: key) {
+  MediaWidget({super.key}) {
     indexWidgetProvider.define(videoPlayerWidget);
     indexWidgetProvider.define(audioPlayerWidget);
     indexWidgetProvider.define(audioRecorderWidget);

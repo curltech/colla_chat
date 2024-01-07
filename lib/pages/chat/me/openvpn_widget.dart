@@ -16,7 +16,7 @@ import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 /// OpenVpn设置
 class OpenVpnWidget extends StatefulWidget with TileDataMixin {
-  const OpenVpnWidget({Key? key}) : super(key: key);
+  const OpenVpnWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _OpenVpnWidgetState();

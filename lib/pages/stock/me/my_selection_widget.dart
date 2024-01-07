@@ -24,7 +24,7 @@ class ShareSelectionWidget extends StatefulWidget with TileDataMixin {
   final StockLineChartWidget stockLineChartWidget =
       const StockLineChartWidget();
 
-  ShareSelectionWidget({Key? key}) : super(key: key) {
+  ShareSelectionWidget({super.key}) {
     indexWidgetProvider.define(stockLineChartWidget);
   }
 

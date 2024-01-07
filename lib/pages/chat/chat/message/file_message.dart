@@ -13,12 +13,11 @@ class FileMessage extends StatelessWidget {
   final bool isMyself;
 
   const FileMessage(
-      {Key? key,
+      {super.key,
       required this.messageId,
       required this.isMyself,
       required this.title,
-      required this.mimeType})
-      : super(key: key);
+      required this.mimeType});
 
   @override
   Widget build(BuildContext context) {

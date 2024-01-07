@@ -6,7 +6,7 @@ import 'package:image_picker/image_picker.dart';
 
 ///通过选择相册或者拍照选择背景图
 class BackgroundPicker extends StatelessWidget {
-  const BackgroundPicker({Key? key}) : super(key: key);
+  const BackgroundPicker({super.key});
 
   @override
   Widget build(BuildContext context) {

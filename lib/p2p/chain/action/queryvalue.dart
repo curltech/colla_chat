@@ -3,7 +3,7 @@ import 'package:colla_chat/p2p/chain/baseaction.dart';
 
 ///查询服务器的数据
 class QueryValueAction extends BaseAction {
-  QueryValueAction(MsgType msgType) : super(msgType);
+  QueryValueAction(super.msgType);
 
   Future<bool> queryValue(dynamic data) async {
     ChainMessage chainMessage = await prepareSend(data);

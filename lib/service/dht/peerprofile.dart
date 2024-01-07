@@ -7,10 +7,9 @@ class PeerProfileService extends PeerEntityService<PeerProfile> {
   Map<String, Map<String, PeerProfile>> peerProfiles = {};
 
   PeerProfileService(
-      {required String tableName,
-      required List<String> fields,
-      required List<String> indexFields})
-      : super(tableName: tableName, fields: fields, indexFields: indexFields) {
+      {required super.tableName,
+      required super.fields,
+      required super.indexFields}) {
     post = (Map map) {
       return PeerProfile.fromJson(map);
     };
@@ -73,7 +72,7 @@ class PeerProfileService extends PeerEntityService<PeerProfile> {
   }
 }
 
-final peerProfileService = PeerProfileService(
+final PeerProfileService peerProfileService = PeerProfileService(
     tableName: "blc_peerprofile",
     fields: ServiceLocator.buildFields(PeerProfile(''), []),
     indexFields: ['peerId', 'clientId']);

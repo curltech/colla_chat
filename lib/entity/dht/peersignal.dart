@@ -12,13 +12,13 @@ class PeerSignal extends StatusEntity {
 
   PeerSignal(this.peerId, this.clientId, this.signalType);
 
-  PeerSignal.fromJson(Map json)
+  PeerSignal.fromJson(super.json)
       : peerId = json['peerId'],
         clientId = json['clientId'],
         signalType = json['signalType'],
         content = json['content'],
         title = json['title'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

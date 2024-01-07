@@ -17,7 +17,7 @@ import 'package:flutter/material.dart';
 
 ///自己发布频道消息编辑页面
 class PublishChannelEditWidget extends StatefulWidget with TileDataMixin {
-  PublishChannelEditWidget({Key? key}) : super(key: key);
+  PublishChannelEditWidget({super.key});
 
   @override
   State createState() => _PublishChannelEditWidgetState();

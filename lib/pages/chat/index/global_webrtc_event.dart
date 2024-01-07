@@ -37,10 +37,10 @@ class GlobalWebrtcEvent {
     Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
     if (linkman != null) {
       ///呼叫者本地存在
-      if (linkman.linkmanStatus == LinkmanStatus.friend.name) {
+      if (linkman.linkmanStatus == LinkmanStatus.F.name) {
         ///如果是好友，则直接接受
         return true;
-      } else if (linkman.linkmanStatus == LinkmanStatus.blacklist.name) {
+      } else if (linkman.linkmanStatus == LinkmanStatus.B.name) {
         ///如果是黑名单，则直接拒绝
         return false;
       }

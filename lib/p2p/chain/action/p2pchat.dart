@@ -4,7 +4,7 @@ import 'package:colla_chat/p2p/chain/baseaction.dart';
 
 ///服务进行消息推送
 class P2pChatAction extends ChatAction {
-  P2pChatAction(MsgType msgType) : super(msgType);
+  P2pChatAction(super.msgType);
 
   @override
   Future<void> transferPayload(ChainMessage chainMessage) async {

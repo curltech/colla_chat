@@ -10,10 +10,10 @@ class VideoViewCard extends StatefulWidget {
   final Function(PeerMediaStream peerMediaStream) onClosed;
 
   const VideoViewCard({
-    Key? key,
+    super.key,
     required this.peerMediaStreamController,
     required this.onClosed,
-  }) : super(key: key);
+  });
 
   @override
   State createState() => _VideoViewCardState();

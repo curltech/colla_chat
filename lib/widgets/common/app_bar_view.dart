@@ -25,7 +25,7 @@ class AppBarView extends StatefulWidget {
   final Widget child;
 
   const AppBarView({
-    Key? key,
+    super.key,
     this.withLeading = false,
     this.leadingCallBack,
     this.title,
@@ -35,7 +35,7 @@ class AppBarView extends StatefulWidget {
     this.rightPopupMenus,
     this.bottom,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   State<StatefulWidget> createState() {
@@ -57,7 +57,8 @@ class _AppBarViewState extends State<AppBarView> {
   @override
   Widget build(BuildContext context) {
     Widget titleWidget = widget.titleWidget ??
-        CommonAutoSizeText(AppLocalizations.t(widget.title ?? ''));
+        CommonAutoSizeText(AppLocalizations.t(widget.title ?? ''),
+            softWrap: true, overflow: TextOverflow.visible, maxLines: 2);
     return Consumer<IndexWidgetProvider>(
         builder: (context, indexWidgetProvider, child) {
       return Column(children: [

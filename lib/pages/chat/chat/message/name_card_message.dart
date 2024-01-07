@@ -21,13 +21,12 @@ class NameCardMessage extends StatelessWidget {
   final String? mimeType;
 
   const NameCardMessage(
-      {Key? key,
+      {super.key,
       this.linkmen,
       this.groups,
       required this.isMyself,
       this.fullScreen = false,
-      this.mimeType})
-      : super(key: key);
+      this.mimeType});
 
   Widget _buildLinkmanWidget(List<Linkman> linkmen) {
     final List<TileData> linkmanInfoTileData = [];
@@ -96,7 +95,7 @@ class NameCardMessage extends StatelessWidget {
               if (confirm != null && confirm) {
                 for (Linkman linkman in linkmen!) {
                   linkmanService.update(
-                      {'linkmanStatus': LinkmanStatus.friend.name},
+                      {'linkmanStatus': LinkmanStatus.F.name},
                       where: 'peerId=?',
                       whereArgs: [linkman.peerId]);
                 }

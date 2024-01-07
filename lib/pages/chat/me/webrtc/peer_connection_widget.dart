@@ -14,8 +14,7 @@ class PeerConnectionWidget extends StatefulWidget with TileDataMixin {
   final String? clientId;
   final Conference? conference;
 
-  PeerConnectionWidget({Key? key, this.conference, this.peerId, this.clientId})
-      : super(key: key);
+  PeerConnectionWidget({super.key, this.conference, this.peerId, this.clientId});
 
   @override
   State createState() => _PeerConnectionWidgetState();

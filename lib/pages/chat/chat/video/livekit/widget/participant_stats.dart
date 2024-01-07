@@ -12,8 +12,7 @@ enum StatsType {
 
 /// 显示参与者的信息
 class ParticipantStatsWidget extends StatefulWidget {
-  const ParticipantStatsWidget({Key? key, required this.participant})
-      : super(key: key);
+  const ParticipantStatsWidget({super.key, required this.participant});
   final Participant participant;
   @override
   State<StatefulWidget> createState() => _ParticipantStatsWidgetState();

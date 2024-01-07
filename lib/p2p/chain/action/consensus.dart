@@ -3,7 +3,7 @@ import 'package:colla_chat/p2p/chain/baseaction.dart';
 
 ///
 class ConsensusAction extends BaseAction {
-  ConsensusAction(MsgType msgType) : super(msgType);
+  ConsensusAction(super.msgType);
 
   Future<bool> consensus(dynamic dataBlock, {String? msgType}) async {
     ChainMessage chainMessage = await prepareSend(dataBlock);

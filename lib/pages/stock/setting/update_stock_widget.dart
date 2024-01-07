@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 
 /// 运行后台批处理，更新数据
 class UpdateStockWidget extends StatefulWidget with TileDataMixin {
-  UpdateStockWidget({Key? key}) : super(key: key);
+  UpdateStockWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _UpdateStockWidgetState();

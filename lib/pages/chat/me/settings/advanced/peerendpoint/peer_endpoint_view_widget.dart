@@ -11,8 +11,7 @@ final List<String> peerEndpointFields = ['id', 'name', 'peerId'];
 class PeerEndpointViewWidget extends StatefulWidget with TileDataMixin {
   final PeerEndpointController controller;
 
-  const PeerEndpointViewWidget({Key? key, required this.controller})
-      : super(key: key);
+  const PeerEndpointViewWidget({super.key, required this.controller});
 
   @override
   State<StatefulWidget> createState() => _PeerEndpointViewWidgetState();

@@ -300,10 +300,10 @@ class DataFieldWidget extends StatefulWidget {
   final FocusNode? focusNode;
 
   const DataFieldWidget({
-    Key? key,
+    super.key,
     required this.controller,
     this.focusNode,
-  }) : super(key: key);
+  });
 
   @override
   State<StatefulWidget> createState() {

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 ///从assets目录下背景图片选择器
 class BackgroundSelector extends StatelessWidget {
-  const BackgroundSelector({Key? key}) : super(key: key);
+  const BackgroundSelector({super.key});
 
   Widget buildBackground(String item) {
     double size = (appDataProvider.totalSize.width - 30) / 3;

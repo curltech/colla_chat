@@ -7,7 +7,7 @@ import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
 
 class BrightnessPicker extends StatefulWidget {
-  const BrightnessPicker({Key? key}) : super(key: key);
+  const BrightnessPicker({super.key});
 
   @override
   State<StatefulWidget> createState() {

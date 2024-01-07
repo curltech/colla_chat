@@ -18,13 +18,12 @@ class LinkmanGroupSearchWidget extends StatefulWidget {
   final bool includeGroup;
 
   const LinkmanGroupSearchWidget(
-      {Key? key,
+      {super.key,
       required this.onSelected,
       required this.selected,
       this.selectType = SelectType.chipMultiSelect,
       this.includeLinkman = true,
-      this.includeGroup = true})
-      : super(key: key);
+      this.includeGroup = true});
 
   @override
   State<StatefulWidget> createState() => _LinkmanGroupSearchWidgetState();

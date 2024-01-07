@@ -24,7 +24,6 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
 import 'package:phone_numbers_parser/phone_numbers_parser.dart'
     as phone_numbers_parser;
-import 'package:validation_pro/validate.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:regexpattern/regexpattern.dart';
 
@@ -71,7 +70,7 @@ final List<PlatformDataField> p2pRegisterInputFieldDef = [
 
 /// 用户注册组件，一个card下的录入框和按钮组合
 class P2pRegisterWidget extends StatefulWidget {
-  const P2pRegisterWidget({Key? key}) : super(key: key);
+  const P2pRegisterWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _P2pRegisterWidgetState();

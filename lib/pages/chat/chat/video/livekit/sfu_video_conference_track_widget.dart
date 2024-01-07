@@ -17,7 +17,7 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
   ValueNotifier<livekit_client.TrackPublication?> trackPublication =
       ValueNotifier<livekit_client.TrackPublication?>(null);
 
-  SfuVideoConferenceTrackWidget({Key? key}) : super(key: key);
+  SfuVideoConferenceTrackWidget({super.key});
 
   @override
   bool get withLeading => true;

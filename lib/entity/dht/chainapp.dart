@@ -13,7 +13,7 @@ class ChainApp extends StatusEntity {
 
   ChainApp();
 
-  ChainApp.fromJson(Map json)
+  ChainApp.fromJson(super.json)
       : peerId = json['peerId'],
         appType = json['appType'],
         registPeerId = json['registPeerId'],
@@ -22,7 +22,7 @@ class ChainApp extends StatusEntity {
         codePackage = json['codePackage'],
         appHash = json['appHash'],
         appSignature = json['appSignature'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

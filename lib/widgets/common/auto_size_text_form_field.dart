@@ -444,7 +444,7 @@ class AutoSizeTextFormField extends StatefulWidget {
   /// If the [style] argument is null, the text will use the style from the
   /// closest enclosing [DefaultTextStyle].
   const AutoSizeTextFormField({
-    Key? key,
+    super.key,
     this.fullwidth = true,
     this.textFieldKey,
     this.style,
@@ -523,8 +523,7 @@ class AutoSizeTextFormField extends StatefulWidget {
             maxLength == TextField.noMaxLength ||
             maxLength > 0),
         keyboardType = keyboardType ??
-            (maxLines == 1 ? TextInputType.text : TextInputType.multiline),
-        super(key: key);
+            (maxLines == 1 ? TextInputType.text : TextInputType.multiline);
 
   /// The text to display.
   ///

@@ -22,7 +22,7 @@ import 'package:flutter/material.dart';
 
 ///p2p网络节点搜索增加
 class P2pLinkmanAddWidget extends StatefulWidget with TileDataMixin {
-  P2pLinkmanAddWidget({Key? key}) : super(key: key);
+  P2pLinkmanAddWidget({super.key});
 
   @override
   IconData get iconData => Icons.add_link;
@@ -130,16 +130,16 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
           );
         } else {
           //加好友
-          if (linkman.linkmanStatus != LinkmanStatus.friend.name) {
+          if (linkman.linkmanStatus != LinkmanStatus.F.name) {
             suffix = IconButton(
               iconSize: 24.0,
               icon: Icon(Icons.person_add_outlined, color: myself.primary),
               onPressed: () async {
                 await linkmanService.update(
-                    {'linkmanStatus': LinkmanStatus.friend.name},
+                    {'linkmanStatus': LinkmanStatus.F.name},
                     where: 'peerId=?',
                     whereArgs: [peerClient.peerId]);
-                linkman.linkmanStatus = LinkmanStatus.friend.name;
+                linkman.linkmanStatus = LinkmanStatus.F.name;
                 _buildTiles(peerClients);
                 if (mounted) {
                   DialogUtil.info(context,

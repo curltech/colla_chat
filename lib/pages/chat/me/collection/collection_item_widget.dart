@@ -9,7 +9,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
 class CollectionItemWidget extends StatefulWidget with TileDataMixin {
-  CollectionItemWidget({Key? key}) : super(key: key);
+  CollectionItemWidget({super.key});
 
   @override
   State createState() => _CollectionItemWidgetState();

@@ -61,11 +61,11 @@ abstract class StatusEntity extends BaseEntity {
 
   StatusEntity() : super();
 
-  StatusEntity.fromJson(Map json)
+  StatusEntity.fromJson(super.json)
       : status = json['status'],
         statusReason = json['statusReason'],
         statusDate = json['statusDate'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

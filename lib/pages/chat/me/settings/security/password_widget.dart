@@ -30,7 +30,7 @@ final List<PlatformDataField> passwordInputFieldDef = [
 
 /// 修改用户密码
 class PasswordWidget extends StatefulWidget with TileDataMixin {
-  const PasswordWidget({Key? key}) : super(key: key);
+  const PasswordWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _PasswordWidgetState();

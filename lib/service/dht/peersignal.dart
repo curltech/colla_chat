@@ -10,10 +10,9 @@ class PeerSignalService extends GeneralBaseService<PeerSignal> {
   Map<String, Map<String, PeerProfile>> peerProfiles = {};
 
   PeerSignalService(
-      {required String tableName,
-      required List<String> fields,
-      required List<String> indexFields})
-      : super(tableName: tableName, fields: fields, indexFields: indexFields) {
+      {required super.tableName,
+      required super.fields,
+      required super.indexFields}) {
     post = (Map map) {
       return PeerSignal.fromJson(map);
     };

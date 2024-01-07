@@ -6,7 +6,7 @@ enum ManageType { get, create, delete, list, listParticipants }
 
 /// ManageRoom
 class ManageRoomAction extends BaseAction {
-  ManageRoomAction(MsgType msgType) : super(msgType);
+  ManageRoomAction(super.msgType);
 
   Future<bool> manageRoom(ManageType manageType,
       {LiveKitManageRoom? liveKitManageRoom}) async {

@@ -33,12 +33,12 @@ class TextMessageInputWidget extends StatefulWidget {
   final void Function()? onMorePressed;
 
   const TextMessageInputWidget({
-    Key? key,
+    super.key,
     required this.textEditingController,
     this.onSendPressed,
     this.onEmojiPressed,
     this.onMorePressed,
-  }) : super(key: key);
+  });
 
   @override
   State<StatefulWidget> createState() {

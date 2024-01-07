@@ -9,7 +9,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
 class FullScreenChatMessageWidget extends StatefulWidget with TileDataMixin {
-  const FullScreenChatMessageWidget({Key? key}) : super(key: key);
+  const FullScreenChatMessageWidget({super.key});
 
   @override
   State<StatefulWidget> createState() {

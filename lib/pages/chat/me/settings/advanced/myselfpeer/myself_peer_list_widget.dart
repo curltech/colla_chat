@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 
 ///自己的本地账号组件
 class MyselfPeerListWidget extends StatefulWidget with TileDataMixin {
-  const MyselfPeerListWidget({Key? key}) : super(key: key);
+  const MyselfPeerListWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _MyselfPeerListWidgetState();

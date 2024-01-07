@@ -49,7 +49,7 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
   final ConferenceShowWidget conferenceShowWidget = ConferenceShowWidget();
   late final List<TileData> linkmanTileData;
 
-  LinkmanListWidget({Key? key}) : super(key: key) {
+  LinkmanListWidget({super.key}) {
     indexWidgetProvider.define(linkmanEditWidget);
     indexWidgetProvider.define(linkmanAddWidget);
     indexWidgetProvider.define(conferenceShowWidget);
@@ -258,14 +258,14 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         var name = linkman.name;
         var peerId = linkman.peerId;
         String? linkmanStatus =
-            linkman.linkmanStatus ?? LinkmanStatus.stranger.name;
+            linkman.linkmanStatus ?? LinkmanStatus.S.name;
         linkmanStatus = AppLocalizations.t(linkmanStatus);
         if (peerId == myself.peerId) {
           linkmanStatus = AppLocalizations.t('Me');
         }
         Widget? prefix = linkman.avatarImage;
         String routeName = 'linkman_edit';
-        if (linkmanStatus == LinkmanStatus.chatGPT.name) {
+        if (linkmanStatus == LinkmanStatus.G.name) {
           // prefix = prefix ??
           //     ImageUtil.buildImageWidget(
           //         image: 'assets/images/openai.png',
@@ -309,7 +309,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           slideActions.add(deleteSlideAction);
         }
         if (peerId != myself.peerId &&
-            linkmanStatus != LinkmanStatus.chatGPT.name) {
+            linkmanStatus != LinkmanStatus.G.name) {
           TileData requestSlideAction = TileData(
               title: 'Request add friend',
               prefix: Icons.request_quote_outlined,
@@ -347,13 +347,13 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
 
         List<TileData> endSlideActions = [];
         if (peerId != myself.peerId &&
-            linkmanStatus != LinkmanStatus.chatGPT.name) {
-          if (linkman.linkmanStatus == LinkmanStatus.friend.name) {
+            linkmanStatus != LinkmanStatus.G.name) {
+          if (linkman.linkmanStatus == LinkmanStatus.F.name) {
             endSlideActions.add(TileData(
                 title: 'Remove friend',
                 prefix: Icons.person_remove_outlined,
                 onTap: (int index, String title, {String? subtitle}) async {
-                  await _changeLinkmanStatus(linkman, LinkmanStatus.stranger);
+                  await _changeLinkmanStatus(linkman, LinkmanStatus.S);
                   if (mounted) {
                     DialogUtil.info(context,
                         content:
@@ -362,13 +362,13 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 }));
           }
           if (linkman.linkmanStatus == null ||
-              linkman.linkmanStatus == LinkmanStatus.none.name ||
-              linkman.linkmanStatus == LinkmanStatus.stranger.name) {
+              linkman.linkmanStatus == LinkmanStatus.N.name ||
+              linkman.linkmanStatus == LinkmanStatus.S.name) {
             endSlideActions.add(TileData(
                 title: 'Add friend',
                 prefix: Icons.person_add_outlined,
                 onTap: (int index, String title, {String? subtitle}) async {
-                  await _changeLinkmanStatus(linkman, LinkmanStatus.friend);
+                  await _changeLinkmanStatus(linkman, LinkmanStatus.F);
                   if (mounted) {
                     DialogUtil.info(context,
                         content:
@@ -376,13 +376,13 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                   }
                 }));
           }
-          if (linkman.linkmanStatus == LinkmanStatus.blacklist.name) {
+          if (linkman.linkmanStatus == LinkmanStatus.B.name) {
             endSlideActions.add(
               TileData(
                   title: 'Remove blacklist',
                   prefix: Icons.person_outlined,
                   onTap: (int index, String title, {String? subtitle}) async {
-                    await _changeLinkmanStatus(linkman, LinkmanStatus.stranger);
+                    await _changeLinkmanStatus(linkman, LinkmanStatus.S);
                     if (mounted) {
                       DialogUtil.info(context,
                           content:
@@ -395,7 +395,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 title: 'Add blacklist',
                 prefix: Icons.person_off,
                 onTap: (int index, String title, {String? subtitle}) async {
-                  await _changeLinkmanStatus(linkman, LinkmanStatus.blacklist);
+                  await _changeLinkmanStatus(linkman, LinkmanStatus.B);
                   if (mounted) {
                     DialogUtil.info(context,
                         content:
@@ -403,13 +403,13 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                   }
                 }));
           }
-          if (linkman.subscriptStatus == LinkmanStatus.subscript.name) {
+          if (linkman.subscriptStatus == LinkmanStatus.C.name) {
             endSlideActions.add(
               TileData(
                   title: 'Remove subscript',
                   prefix: Icons.unsubscribe,
                   onTap: (int index, String title, {String? subtitle}) async {
-                    await _changeSubscriptStatus(linkman, LinkmanStatus.none);
+                    await _changeSubscriptStatus(linkman, LinkmanStatus.N);
                     if (mounted) {
                       DialogUtil.info(context,
                           content:
@@ -423,7 +423,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 prefix: Icons.subscriptions,
                 onTap: (int index, String title, {String? subtitle}) async {
                   await _changeSubscriptStatus(
-                      linkman, LinkmanStatus.subscript);
+                      linkman, LinkmanStatus.C);
                   if (mounted) {
                     DialogUtil.info(context,
                         content:
@@ -758,14 +758,14 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     PeerClient peerClient = PeerClient.fromJson(map);
     await peerClientService.store(peerClient);
     Linkman linkman = await linkmanService.storeByPeerEntity(peerClient);
-    if (linkman.linkmanStatus == LinkmanStatus.friend.name) {
+    if (linkman.linkmanStatus == LinkmanStatus.F.name) {
       return;
     }
     if (mounted) {
       bool? confirm = await DialogUtil.confirm(context,
           content: 'You confirm add ${linkman.name} as friend?');
       if (confirm != null && confirm) {
-        await _changeLinkmanStatus(linkman, LinkmanStatus.friend);
+        await _changeLinkmanStatus(linkman, LinkmanStatus.F);
         if (mounted) {
           DialogUtil.info(context,
               content: 'You add ${linkman.name} as friend successfully');

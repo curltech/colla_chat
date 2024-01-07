@@ -1,13 +1,14 @@
 import 'package:colla_chat/entity/chat/peer_party.dart';
 
 enum LinkmanStatus {
-  none,
-  stranger, //陌生人
-  bot, //机器人
-  chatGPT, //chatGPT聊天机器人
-  friend, //好友
-  blacklist, //黑名单
-  subscript, //订阅
+  N,
+  M,
+  S, //陌生人
+  R, //机器人
+  G, //chatGPT聊天机器人
+  F, //好友
+  B, //黑名单
+  C, //订阅
 }
 
 /// 联系人，和设备绑定登录成为PeerClient，可能是好友（friend）或者普通联系人
@@ -23,13 +24,13 @@ class Linkman extends PeerParty {
   //订阅状态
   String? subscriptStatus;
 
-  Linkman(String peerId, String name) : super(peerId, name);
+  Linkman(super.peerId, super.name);
 
-  Linkman.fromJson(Map json)
+  Linkman.fromJson(super.json)
       : myStatus = json['myStatus'],
         linkmanStatus = json['linkmanStatus'],
         subscriptStatus = json['subscriptStatus'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

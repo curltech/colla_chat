@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 class SlideTransitionX extends AnimatedWidget {
   SlideTransitionX({
-    Key? key,
+    super.key,
     required Animation<double> position,
     this.transformHitTests = true,
     this.direction = AxisDirection.down,
     required this.child,
-  }) : super(key: key, listenable: position) {
+  }) : super(listenable: position) {
     switch (direction) {
       case AxisDirection.up:
         _tween = Tween(begin: const Offset(0, 1), end: const Offset(0, 0));

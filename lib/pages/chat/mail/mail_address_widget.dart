@@ -15,7 +15,7 @@ class MailAddressWidget extends StatefulWidget {
   final AutoDiscoverWidget autoDiscoverWidget = const AutoDiscoverWidget();
   final ManualAddWidget manualAddWidget = const ManualAddWidget();
 
-  MailAddressWidget({Key? key}) : super(key: key) {
+  MailAddressWidget({super.key}) {
     indexWidgetProvider.define(autoDiscoverWidget);
     indexWidgetProvider.define(manualAddWidget);
   }

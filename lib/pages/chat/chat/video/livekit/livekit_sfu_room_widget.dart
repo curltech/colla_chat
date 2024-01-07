@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 
 /// 创建房间和管理房间的界面
 class LiveKitSfuRoomWidget extends StatefulWidget with TileDataMixin {
-  LiveKitSfuRoomWidget({Key? key}) : super(key: key);
+  LiveKitSfuRoomWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _LiveKitSfuRoomWidgetState();

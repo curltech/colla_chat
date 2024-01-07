@@ -34,7 +34,7 @@ final QPerformanceDataPageController qperformanceDataPageController =
 
 ///自选股和分组的查询界面
 class QPerformanceWidget extends StatefulWidget with TileDataMixin {
-  QPerformanceWidget({Key? key}) : super(key: key);
+  QPerformanceWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _QPerformanceWidgetState();

@@ -6,7 +6,7 @@ import '../../../l10n/localization.dart';
 
 /// 远程登录组件，一个card下的录入框和按钮组合
 class RemoteRegisterWidget extends StatefulWidget {
-  const RemoteRegisterWidget({Key? key}) : super(key: key);
+  const RemoteRegisterWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _RemoteRegisterWidgetState();

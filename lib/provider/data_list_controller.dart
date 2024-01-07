@@ -252,9 +252,9 @@ class DataPageController<T> extends DataListController<T> {
 ///支持通过more方法往数组中添加更多的数据
 abstract class DataMoreController<T> extends DataListController<T> {
   DataMoreController({
-    List<T>? data,
-    int? currentIndex,
-  }) : super(data: data, currentIndex: currentIndex);
+    super.data,
+    super.currentIndex,
+  });
 
   ///取更多旧的数据，添加
   Future<int> previous({int? limit});

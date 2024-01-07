@@ -32,7 +32,7 @@ ValueNotifier<Conference?> conferenceNotifier =
 
 ///创建和修改群，填写群的基本信息，选择群成员和群主
 class ConferenceEditWidget extends StatefulWidget with TileDataMixin {
-  const ConferenceEditWidget({Key? key}) : super(key: key);
+  const ConferenceEditWidget({super.key});
 
   @override
   IconData get iconData => Icons.meeting_room_outlined;

@@ -60,7 +60,7 @@ final ValueNotifier<Linkman?> linkmanNotifier = ValueNotifier<Linkman?>(null);
 
 //联系人信息页面
 class LinkmanEditWidget extends StatefulWidget with TileDataMixin {
-  LinkmanEditWidget({Key? key}) : super(key: key);
+  LinkmanEditWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _LinkmanEditWidgetState();

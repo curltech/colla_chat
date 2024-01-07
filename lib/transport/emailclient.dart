@@ -182,7 +182,7 @@ class EmailMessageUtil {
           clientConfig.preferredIncomingServer == null) {
         return null;
       }
-      final hostName = clientConfig.preferredIncomingServer!.hostname!;
+      final hostName = clientConfig.preferredIncomingServer!.hostname;
       final providerHostName =
           platformEmailServiceProvider.domainNameServiceProviders[hostName];
       if (providerHostName != null) {
@@ -208,10 +208,8 @@ class EmailMessageUtil {
       if (imapServerConfig != null) {
         mailAddress.imapServerSecure = imapServerConfig.isSecureSocket;
         int? port = imapServerConfig.port;
-        if (port != null) {
-          mailAddress.imapServerPort = port;
-        }
-        mailAddress.imapServerHost = imapServerConfig.hostname;
+        mailAddress.imapServerPort = port;
+              mailAddress.imapServerHost = imapServerConfig.hostname;
         Map<String, dynamic> attributes = imapServerConfig.toJson();
         mailAddress.imapServerConfig = JsonUtil.toJsonString(attributes);
       }
@@ -219,10 +217,8 @@ class EmailMessageUtil {
       if (popServerConfig != null) {
         mailAddress.popServerSecure = popServerConfig.isSecureSocket;
         int? port = popServerConfig.port;
-        if (port != null) {
-          mailAddress.popServerPort = port;
-        }
-        mailAddress.popServerHost = popServerConfig.hostname;
+        mailAddress.popServerPort = port;
+              mailAddress.popServerHost = popServerConfig.hostname;
         Map<String, dynamic> attributes = popServerConfig.toJson();
         mailAddress.popServerConfig = JsonUtil.toJsonString(attributes);
       }
@@ -230,10 +226,8 @@ class EmailMessageUtil {
       if (smtpServerConfig != null) {
         mailAddress.smtpServerSecure = smtpServerConfig.isSecureSocket;
         int? port = smtpServerConfig.port;
-        if (port != null) {
-          mailAddress.smtpServerPort = port;
-        }
-        mailAddress.smtpServerHost = smtpServerConfig.hostname;
+        mailAddress.smtpServerPort = port;
+              mailAddress.smtpServerHost = smtpServerConfig.hostname;
         Map<String, dynamic> attributes = smtpServerConfig.toJson();
         mailAddress.smtpServerConfig = JsonUtil.toJsonString(attributes);
       }

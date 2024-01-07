@@ -22,7 +22,7 @@ import 'package:mimecon/mimecon.dart';
 
 ///邮件内容子视图
 class MailContentWidget extends StatefulWidget with TileDataMixin {
-  MailContentWidget({Key? key}) : super(key: key) {
+  MailContentWidget({super.key}) {
     FullScreenAttachmentWidget fullScreenAttachmentWidget =
         const FullScreenAttachmentWidget();
     indexWidgetProvider.define(fullScreenAttachmentWidget);

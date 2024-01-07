@@ -49,7 +49,7 @@ final LocalEventFilterController localEventFilterController =
 
 ///自选股和分组的查询界面
 class LocalEventFilterWidget extends StatefulWidget with TileDataMixin {
-  LocalEventFilterWidget({Key? key}) : super(key: key);
+  LocalEventFilterWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _LocalEventFilterWidgetState();

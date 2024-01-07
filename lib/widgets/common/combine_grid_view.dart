@@ -15,7 +15,7 @@ class CombineGridView extends StatelessWidget {
   final double childAspectRatio;
 
   CombineGridView({
-    Key? key,
+    super.key,
     required this.widgets,
     this.height,
     this.width,
@@ -25,7 +25,7 @@ class CombineGridView extends StatelessWidget {
     this.crossAxisSpacing = 0.0,
     this.mainAxisExtent,
     this.childAspectRatio = 1,
-  }) : super(key: key) {
+  }) {
     if (widgets.length <= 4) {
       crossAxisCount = 2;
     }

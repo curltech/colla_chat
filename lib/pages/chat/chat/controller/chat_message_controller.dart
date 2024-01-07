@@ -51,7 +51,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         var peerId = _chatSummary!.peerId;
         linkmanService.findCachedOneByPeerId(peerId!).then((Linkman? linkman) {
           if (linkman != null) {
-            if (linkman.linkmanStatus == LinkmanStatus.chatGPT.name) {
+            if (linkman.linkmanStatus == LinkmanStatus.G.name) {
               ChatGPT chatGPT = ChatGPT(linkman.peerId);
               chatGPT = chatGPT;
             } else {

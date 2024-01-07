@@ -15,7 +15,7 @@ class VideoConferenceConnectionWidget extends StatelessWidget
   final VideoConferenceTrackWidget videoConferenceTrackWidget =
       const VideoConferenceTrackWidget();
 
-  VideoConferenceConnectionWidget({Key? key}) : super(key: key) {
+  VideoConferenceConnectionWidget({super.key}) {
     indexWidgetProvider.define(videoConferenceTrackWidget);
   }
 

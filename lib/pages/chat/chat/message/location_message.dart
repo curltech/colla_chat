@@ -17,12 +17,11 @@ class LocationMessage extends StatelessWidget {
   final bool fullScreen;
 
   const LocationMessage(
-      {Key? key,
+      {super.key,
       required this.content,
       required this.isMyself,
       this.thumbnail,
-      required this.fullScreen})
-      : super(key: key);
+      required this.fullScreen});
 
   @override
   Widget build(BuildContext context) {

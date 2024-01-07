@@ -27,8 +27,8 @@ class VideoChatWidget extends StatefulWidget with TileDataMixin {
       VideoConferencePoolWidget();
 
   VideoChatWidget({
-    Key? key,
-  }) : super(key: key) {
+    super.key,
+  }) {
     indexWidgetProvider.define(videoConferencePoolWidget);
   }
 

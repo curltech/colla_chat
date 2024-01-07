@@ -10,7 +10,7 @@ ValueNotifier<String?> roomNameNotifier = ValueNotifier<String?>(null);
 
 /// 创建参与者和管理参与者的界面
 class LiveKitSfuParticipantWidget extends StatefulWidget with TileDataMixin {
-  LiveKitSfuParticipantWidget({Key? key}) : super(key: key);
+  LiveKitSfuParticipantWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _LiveKitSfuParticipantWidgetState();

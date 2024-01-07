@@ -19,7 +19,7 @@ import 'package:flutter/material.dart';
 
 /// 自动邮件发现视图，一个card下的录入框和按钮组合
 class AutoDiscoverWidget extends StatefulWidget with TileDataMixin {
-  const AutoDiscoverWidget({Key? key}) : super(key: key);
+  const AutoDiscoverWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _AutoDiscoverWidgetState();

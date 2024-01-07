@@ -27,8 +27,7 @@ class P2pLoginWidget extends StatefulWidget {
   //当指定用户做验证的时候不为空
   final void Function(bool result)? onAuthenticate;
 
-  const P2pLoginWidget({Key? key, this.credential, this.onAuthenticate})
-      : super(key: key);
+  const P2pLoginWidget({super.key, this.credential, this.onAuthenticate});
 
   @override
   State<StatefulWidget> createState() => _P2pLoginWidgetState();

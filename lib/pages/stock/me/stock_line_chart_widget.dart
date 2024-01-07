@@ -125,7 +125,7 @@ final MultiStockLineController multiStockLineController =
     MultiStockLineController();
 
 class StockLineChartWidget extends StatefulWidget with TileDataMixin {
-  const StockLineChartWidget({Key? key}) : super(key: key);
+  const StockLineChartWidget({super.key});
 
   @override
   State createState() => _StockLineChartWidgetState();

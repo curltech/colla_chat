@@ -14,11 +14,10 @@ class ExtendedTextMessage extends StatelessWidget {
       CustomSpecialTextSpanBuilder();
 
   ExtendedTextMessage(
-      {Key? key,
+      {super.key,
       required this.content,
       required this.isMyself,
-      this.fullScreen = false})
-      : super(key: key);
+      this.fullScreen = false});
 
   Widget _buildMessageWidget(BuildContext context) {
     return Padding(

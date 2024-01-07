@@ -6,10 +6,10 @@ class ShareGroup extends StatusEntity {
 
   ShareGroup(this.groupName, {this.subscription = ''});
 
-  ShareGroup.fromJson(Map json)
+  ShareGroup.fromJson(super.json)
       : subscription = json['subscription'],
         groupName = json['groupName'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

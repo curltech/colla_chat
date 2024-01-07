@@ -5,7 +5,7 @@ import 'package:flex_color_picker/flex_color_picker.dart' as flex;
 import 'package:flutter/material.dart';
 
 class ColorPicker extends StatefulWidget {
-  const ColorPicker({Key? key}) : super(key: key);
+  const ColorPicker({super.key});
 
   @override
   State<StatefulWidget> createState() {

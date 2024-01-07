@@ -15,7 +15,7 @@ class EventFilter extends StatusEntity {
 
   EventFilter(this.eventCode, this.eventName);
 
-  EventFilter.fromRemoteJson(Map json)
+  EventFilter.fromRemoteJson(super.json)
       : eventCode = json['event_code'],
         eventName = json['event_name'],
         condCode = json['cond_code'],
@@ -26,9 +26,9 @@ class EventFilter extends StatusEntity {
         condParas = json['cond_paras'],
         score = json['score'],
         descr = json['descr'],
-        super.fromJson(json);
+        super.fromJson();
 
-  EventFilter.fromJson(Map json)
+  EventFilter.fromJson(super.json)
       : eventCode = json['eventCode'],
         eventName = json['eventName'],
         condCode = json['condCode'],
@@ -39,7 +39,7 @@ class EventFilter extends StatusEntity {
         condParas = json['condParas'],
         score = json['score'],
         descr = json['descr'],
-        super.fromJson(json);
+        super.fromJson();
 
   Map<String, dynamic> toRemoteJson() {
     var json = super.toJson();

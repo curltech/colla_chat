@@ -46,7 +46,7 @@ class ChainMessage extends SecurityContext {
 
   ChainMessage();
 
-  ChainMessage.fromJson(Map json)
+  ChainMessage.fromJson(super.json)
       : uuid = json['uuid'] ?? '',
         topic = json['topic'],
         targetConnectPeerId = json['targetConnectPeerId'],
@@ -70,7 +70,7 @@ class ChainMessage extends SecurityContext {
         sliceNumber = json['sliceNumber'] ?? 0,
         statusCode = json['statusCode'] ?? 0,
         transportPayload = json['transportPayload'] ?? '',
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

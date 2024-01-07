@@ -21,7 +21,7 @@ class ChatSummary extends StatusEntity {
 
   ChatSummary();
 
-  ChatSummary.fromJson(Map json)
+  ChatSummary.fromJson(super.json)
       : peerId = json['peerId'],
         //clientId = json['clientId'],
         partyType = json['partyType'],
@@ -37,7 +37,7 @@ class ChatSummary extends StatusEntity {
         contentType = json['contentType'],
         sendReceiveTime = json['sendReceiveTime'],
         unreadNumber = json['unreadNumber'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

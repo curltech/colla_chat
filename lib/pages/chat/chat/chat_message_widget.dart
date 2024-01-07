@@ -21,12 +21,12 @@ class ChatMessageWidget extends StatefulWidget {
       notificationPredicate;
 
   ChatMessageWidget({
-    Key? key,
+    super.key,
     this.onScrollMax,
     this.onScrollMin,
     this.onRefresh,
     this.notificationPredicate,
-  }) : super(key: key);
+  });
 
   @override
   State<StatefulWidget> createState() {

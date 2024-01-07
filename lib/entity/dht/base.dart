@@ -50,7 +50,7 @@ abstract class PeerEntity extends StatusEntity {
     peerProfile = PeerProfile(peerId, clientId: clientId);
   }
 
-  PeerEntity.fromJson(Map json)
+  PeerEntity.fromJson(super.json)
       : peerId = json['peerId'],
         name = json['name'] ?? '',
         clientId = json['clientId'] ?? unknownClientId,
@@ -70,7 +70,7 @@ abstract class PeerEntity extends StatusEntity {
         signatureData = json['signatureData'],
         expireDate = json['expireDate'],
         trustLevel = json['trustLevel'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {

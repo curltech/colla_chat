@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class PersonalInfoWidget extends StatefulWidget with TileDataMixin {
-  const PersonalInfoWidget({Key? key}) : super(key: key);
+  const PersonalInfoWidget({super.key});
 
   @override
   State<StatefulWidget> createState() {

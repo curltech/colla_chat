@@ -45,7 +45,7 @@ class MoreMessageInput extends StatefulWidget {
   final Future<void> Function(int index, String name, {String? value})?
       onAction;
 
-  const MoreMessageInput({Key? key, this.onAction}) : super(key: key);
+  const MoreMessageInput({super.key, this.onAction});
 
   @override
   State createState() => _MoreMessageInputState();

@@ -81,7 +81,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
       }
     }
     if (linkman.avatarImage == null &&
-        linkman.linkmanStatus == LinkmanStatus.chatGPT.name) {
+        linkman.linkmanStatus == LinkmanStatus.G.name) {
       linkman.avatarImage = ImageUtil.buildImageWidget(
           image: 'assets/images/openai.png',
           width: AppIconSize.lgSize,

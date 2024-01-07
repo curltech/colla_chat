@@ -7,7 +7,7 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
 class LinkmanInfoWidget extends StatefulWidget with TileDataMixin {
-  const LinkmanInfoWidget({Key? key}) : super(key: key);
+  const LinkmanInfoWidget({super.key});
 
   @override
   State<StatefulWidget> createState() {

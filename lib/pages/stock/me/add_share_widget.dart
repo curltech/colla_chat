@@ -17,7 +17,7 @@ final DataListController<Share> searchShareController =
 
 /// 加自选股和分组的查询界面
 class AddShareWidget extends StatefulWidget with TileDataMixin {
-  AddShareWidget({Key? key}) : super(key: key);
+  AddShareWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _AddShareWidgetState();

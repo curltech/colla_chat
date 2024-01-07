@@ -7,9 +7,9 @@ class ValueListView extends StatelessWidget {
   final Map<String, dynamic> values;
 
   const ValueListView({
-    Key? key,
+    super.key,
     required this.values,
-  }) : super(key: key);
+  });
 
   Widget _buildDataListView(BuildContext context) {
     List<TileData> tiles = [];

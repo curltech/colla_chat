@@ -178,7 +178,7 @@ class LoggerController with ChangeNotifier {
 final LoggerController loggerController = LoggerController();
 
 class LoggerConsoleWidget extends StatefulWidget {
-  const LoggerConsoleWidget({Key? key}) : super(key: key);
+  const LoggerConsoleWidget({super.key});
 
   @override
   State<LoggerConsoleWidget> createState() => _LoggerConsoleWidgetState();

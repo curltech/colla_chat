@@ -79,7 +79,7 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
       FormInputController(readOnlyConferenceDataField);
   final bool hasTitle;
 
-  ConferenceShowWidget({Key? key, this.hasTitle = true}) : super(key: key);
+  ConferenceShowWidget({super.key, this.hasTitle = true});
 
   @override
   IconData get iconData => Icons.meeting_room_outlined;
