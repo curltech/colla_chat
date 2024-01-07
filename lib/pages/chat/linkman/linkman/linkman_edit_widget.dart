@@ -18,9 +18,19 @@ import 'package:share_plus/share_plus.dart';
 
 final List<PlatformDataField> linkmanDataField = [
   PlatformDataField(
+      name: 'id',
+      label: 'Id',
+      inputType: InputType.label,
+      readOnly: true,
+      prefixIcon: Icon(
+        Icons.numbers_outlined,
+        color: myself.primary,
+      )),
+  PlatformDataField(
       name: 'peerId',
       label: 'PeerId',
       inputType: InputType.label,
+      readOnly: true,
       prefixIcon: Icon(
         Icons.perm_identity,
         color: myself.primary,
@@ -52,6 +62,20 @@ final List<PlatformDataField> linkmanDataField = [
       label: 'Mobile',
       prefixIcon: Icon(
         Icons.mobile_friendly,
+        color: myself.primary,
+      )),
+  PlatformDataField(
+      name: 'linkmanStatus',
+      label: 'LinkmanStatus',
+      prefixIcon: Icon(
+        Icons.child_friendly_outlined,
+        color: myself.primary,
+      )),
+  PlatformDataField(
+      name: 'subscriptStatus',
+      label: 'SubscriptStatus',
+      prefixIcon: Icon(
+        Icons.subscript_outlined,
         color: myself.primary,
       )),
 ];
@@ -128,10 +152,13 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
       linkmanNotifier.value = linkman;
     }
     Linkman currentLinkman = Linkman.fromJson(values);
+    linkman.id = currentLinkman.id;
     linkman.name = currentLinkman.name;
     linkman.alias = currentLinkman.alias;
     linkman.mobile = currentLinkman.mobile;
     linkman.email = currentLinkman.email;
+    linkman.linkmanStatus = currentLinkman.linkmanStatus;
+    linkman.subscriptStatus = currentLinkman.subscriptStatus;
     await linkmanService.store(linkman);
     linkmanChatSummaryController.refresh();
     if (mounted) {

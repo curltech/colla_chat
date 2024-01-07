@@ -261,7 +261,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             linkman.linkmanStatus ?? LinkmanStatus.S.name;
         linkmanStatus = AppLocalizations.t(linkmanStatus);
         if (peerId == myself.peerId) {
-          linkmanStatus = AppLocalizations.t('Me');
+          linkmanStatus = AppLocalizations.t(LinkmanStatus.M.name);
         }
         Widget? prefix = linkman.avatarImage;
         String routeName = 'linkman_edit';
