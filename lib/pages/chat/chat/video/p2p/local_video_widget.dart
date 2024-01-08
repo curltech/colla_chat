@@ -400,12 +400,13 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         participants: participants);
 
     var partyType = chatSummary.partyType;
-    if (partyType == PartyType.group.name ||
-        partyType == PartyType.conference.name) {
+    if (partyType == PartyType.linkman.name) {
+      conference.sfu = false;
+    } else {
       conference.groupId = chatSummary.peerId;
       conference.groupName = chatSummary.name;
       conference.groupType = partyType;
-      conference.sfu = false;
+      conference.sfu = true;
     }
 
     return conference;
