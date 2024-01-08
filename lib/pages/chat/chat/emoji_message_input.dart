@@ -1,10 +1,5 @@
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controller.dart';
-import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/special_text/emoji_text.dart';
-import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 
 ///Emoji文本消息的输入面板
@@ -67,47 +62,47 @@ class _EmojiMessageInputWidgetState extends State<EmojiMessageInputWidget> {
     );
   }
 
-  Widget _buildEmojiPicker(BuildContext context) {
-    Color primary = myself.primary;
-    return SizedBox(
-        height: chatMessageViewController.emojiMessageInputHeight,
-        child: EmojiPicker(
-          textEditingController: textEditingController,
-          onEmojiSelected: (Category? category, Emoji emoji) {
-            if (widget.onTap != null) {
-              widget.onTap!(emoji.emoji);
-            }
-          },
-          scrollController: scrollController,
-          onBackspacePressed: _onBackspacePressed,
-          config: Config(
-            height: 256,
-            checkPlatformCompatibility: true,
-            emojiViewConfig: EmojiViewConfig(
-              columns: 10,
-              emojiSizeMax: 24 * (platformParams.ios ? 1.30 : 1.0),
-              verticalSpacing: 0,
-              horizontalSpacing: 0,
-              backgroundColor: Colors.white.withOpacity(0.0),
-              gridPadding: EdgeInsets.zero,
-              recentsLimit: 28,
-              replaceEmojiOnLimitExceed: false,
-              loadingIndicator: const SizedBox.shrink(),
-              noRecents: CommonAutoSizeText(
-                AppLocalizations.t('No Recents'),
-                style: const TextStyle(fontSize: 20, color: Colors.black),
-                textAlign: TextAlign.center,
-              ),
-              buttonMode: ButtonMode.MATERIAL,
-            ),
-            swapCategoryAndBottomBar: false,
-            skinToneConfig: SkinToneConfig(indicatorColor: primary),
-            categoryViewConfig: const CategoryViewConfig(),
-            bottomActionBarConfig: const BottomActionBarConfig(),
-            searchViewConfig: const SearchViewConfig(),
-          ),
-        ));
-  }
+  // Widget _buildEmojiPicker(BuildContext context) {
+  //   Color primary = myself.primary;
+  //   return SizedBox(
+  //       height: chatMessageViewController.emojiMessageInputHeight,
+  //       child: EmojiPicker(
+  //         textEditingController: textEditingController,
+  //         onEmojiSelected: (Category? category, Emoji emoji) {
+  //           if (widget.onTap != null) {
+  //             widget.onTap!(emoji.emoji);
+  //           }
+  //         },
+  //         scrollController: scrollController,
+  //         onBackspacePressed: _onBackspacePressed,
+  //         config: Config(
+  //           height: 256,
+  //           checkPlatformCompatibility: true,
+  //           emojiViewConfig: EmojiViewConfig(
+  //             columns: 10,
+  //             emojiSizeMax: 24 * (platformParams.ios ? 1.30 : 1.0),
+  //             verticalSpacing: 0,
+  //             horizontalSpacing: 0,
+  //             backgroundColor: Colors.white.withOpacity(0.0),
+  //             gridPadding: EdgeInsets.zero,
+  //             recentsLimit: 28,
+  //             replaceEmojiOnLimitExceed: false,
+  //             loadingIndicator: const SizedBox.shrink(),
+  //             noRecents: CommonAutoSizeText(
+  //               AppLocalizations.t('No Recents'),
+  //               style: const TextStyle(fontSize: 20, color: Colors.black),
+  //               textAlign: TextAlign.center,
+  //             ),
+  //             buttonMode: ButtonMode.MATERIAL,
+  //           ),
+  //           swapCategoryAndBottomBar: false,
+  //           skinToneConfig: SkinToneConfig(indicatorColor: primary),
+  //           categoryViewConfig: const CategoryViewConfig(),
+  //           bottomActionBarConfig: const BottomActionBarConfig(),
+  //           searchViewConfig: const SearchViewConfig(),
+  //         ),
+  //       ));
+  // }
 
   @override
   Widget build(BuildContext context) {
