@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:ui' as ui;
 
-import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart' as mobile_scanner;
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class QrcodeUtil {
@@ -126,48 +126,145 @@ class QrcodeUtil {
   // }
 
   ///使用barcode_scan2扫描二维码的功能，仅支持移动设备
-  static Future<String> scan(
-      {List<BarcodeFormat> restrictFormat = const [],
-      int useCamera = -1,
-      AndroidOptions android = const AndroidOptions(),
-      bool autoEnableFlash = false,
-      Map<String, String> strings = const {
-        'cancel': 'Cancel',
-        'flash_on': 'Flash on',
-        'flash_off': 'Flash off',
-      }}) async {
-    var options = ScanOptions(
-      restrictFormat: restrictFormat,
-      useCamera: useCamera,
-      android: android,
-      autoEnableFlash: autoEnableFlash,
-      strings: strings,
-    );
-
-    ScanResult result = await BarcodeScanner.scan(options: options);
-
-    return result.rawContent;
-  }
+  // static Future<String> scan(
+  //     {List<BarcodeFormat> restrictFormat = const [],
+  //     int useCamera = -1,
+  //     AndroidOptions android = const AndroidOptions(),
+  //     bool autoEnableFlash = false,
+  //     Map<String, String> strings = const {
+  //       'cancel': 'Cancel',
+  //       'flash_on': 'Flash on',
+  //       'flash_off': 'Flash off',
+  //     }}) async {
+  //   var options = ScanOptions(
+  //     restrictFormat: restrictFormat,
+  //     useCamera: useCamera,
+  //     android: android,
+  //     autoEnableFlash: autoEnableFlash,
+  //     strings: strings,
+  //   );
+  //
+  //   ScanResult result = await BarcodeScanner.scan(options: options);
+  //
+  //   return result.rawContent;
+  // }
 
   static Future<String?> mobileScan(BuildContext context) async {
     String? result;
+    ValueNotifier<bool> isStarted = ValueNotifier<bool>(true);
     mobile_scanner.MobileScannerController cameraController =
-        mobile_scanner.MobileScannerController();
+        mobile_scanner.MobileScannerController(
+      torchEnabled: true,
+      formats: [BarcodeFormat.qrCode],
+      facing: CameraFacing.front,
+      detectionSpeed: DetectionSpeed.normal,
+      detectionTimeoutMs: 1000,
+      returnImage: false,
+    );
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) {
-          return mobile_scanner.MobileScanner(
-              controller: cameraController,
-              onDetect: (mobile_scanner.BarcodeCapture capture) {
-                final List<mobile_scanner.Barcode> barcodes = capture.barcodes;
-                for (final barcode in barcodes) {
-                  result = barcode.rawValue;
-                  if (result != null) {
-                    return;
+          return Stack(children: [
+            mobile_scanner.MobileScanner(
+                fit: BoxFit.contain,
+                controller: cameraController,
+                onDetect: (mobile_scanner.BarcodeCapture capture) {
+                  final List<mobile_scanner.Barcode> barcodes =
+                      capture.barcodes;
+                  for (final barcode in barcodes) {
+                    result = barcode.rawValue;
+                    if (result != null) {
+                      break;
+                    }
                   }
-                }
-                Navigator.of(context).pop();
-              });
+                  Navigator.of(context).pop();
+                }),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                alignment: Alignment.bottomCenter,
+                height: 100,
+                color: Colors.black.withOpacity(0.4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    IconButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        icon: const Icon(Icons.arrow_back_ios_new)),
+                    ValueListenableBuilder(
+                      valueListenable: cameraController.hasTorchState,
+                      builder: (context, state, child) {
+                        if (state != true) {
+                          return const SizedBox.shrink();
+                        }
+                        return IconButton(
+                          color: Colors.white,
+                          icon: ValueListenableBuilder<TorchState>(
+                            valueListenable: cameraController.torchState,
+                            builder: (context, state, child) {
+                              switch (state) {
+                                case TorchState.off:
+                                  return const Icon(
+                                    Icons.flash_off,
+                                    color: Colors.grey,
+                                  );
+                                case TorchState.on:
+                                  return const Icon(
+                                    Icons.flash_on,
+                                    color: Colors.yellow,
+                                  );
+                              }
+                            },
+                          ),
+                          iconSize: 32.0,
+                          onPressed: () => cameraController.toggleTorch(),
+                        );
+                      },
+                    ),
+                    ValueListenableBuilder(
+                        valueListenable: isStarted,
+                        builder: (context, started, child) {
+                          return IconButton(
+                            color: Colors.white,
+                            icon: started
+                                ? const Icon(Icons.stop)
+                                : const Icon(Icons.play_arrow),
+                            iconSize: 32.0,
+                            onPressed: () {
+                              if (started) {
+                                cameraController.stop();
+                                isStarted.value = false;
+                              } else {
+                                cameraController.start();
+                                isStarted.value = true;
+                              }
+                            },
+                          );
+                        }),
+                    const Center(),
+                    IconButton(
+                      color: Colors.white,
+                      icon: ValueListenableBuilder<CameraFacing>(
+                        valueListenable: cameraController.cameraFacingState,
+                        builder: (context, state, child) {
+                          switch (state) {
+                            case CameraFacing.front:
+                              return const Icon(Icons.camera_front);
+                            case CameraFacing.back:
+                              return const Icon(Icons.camera_rear);
+                          }
+                        },
+                      ),
+                      iconSize: 32.0,
+                      onPressed: () => cameraController.switchCamera(),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ]);
         },
       ),
     );

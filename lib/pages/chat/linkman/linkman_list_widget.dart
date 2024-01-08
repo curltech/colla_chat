@@ -257,8 +257,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
       for (var linkman in linkmen) {
         var name = linkman.name;
         var peerId = linkman.peerId;
-        String? linkmanStatus =
-            linkman.linkmanStatus ?? LinkmanStatus.S.name;
+        String? linkmanStatus = linkman.linkmanStatus ?? LinkmanStatus.S.name;
         linkmanStatus = AppLocalizations.t(linkmanStatus);
         if (peerId == myself.peerId) {
           linkmanStatus = AppLocalizations.t(LinkmanStatus.M.name);
@@ -308,8 +307,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
               });
           slideActions.add(deleteSlideAction);
         }
-        if (peerId != myself.peerId &&
-            linkmanStatus != LinkmanStatus.G.name) {
+        if (peerId != myself.peerId && linkmanStatus != LinkmanStatus.G.name) {
           TileData requestSlideAction = TileData(
               title: 'Request add friend',
               prefix: Icons.request_quote_outlined,
@@ -346,8 +344,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         tile.slideActions = slideActions;
 
         List<TileData> endSlideActions = [];
-        if (peerId != myself.peerId &&
-            linkmanStatus != LinkmanStatus.G.name) {
+        if (peerId != myself.peerId && linkmanStatus != LinkmanStatus.G.name) {
           if (linkman.linkmanStatus == LinkmanStatus.F.name) {
             endSlideActions.add(TileData(
                 title: 'Remove friend',
@@ -422,8 +419,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 title: 'Add subscript',
                 prefix: Icons.subscriptions,
                 onTap: (int index, String title, {String? subtitle}) async {
-                  await _changeSubscriptStatus(
-                      linkman, LinkmanStatus.C);
+                  await _changeSubscriptStatus(linkman, LinkmanStatus.C);
                   if (mounted) {
                     DialogUtil.info(context,
                         content:
@@ -737,7 +733,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         icon: const Icon(Icons.add_circle_outline),
       ),
     ];
-    if (platformParams.mobile) {
+    if (platformParams.mobile || platformParams.macos || platformParams.web) {
       rightWidgets.add(IconButton(
         tooltip: AppLocalizations.t('Scan qrcode'),
         onPressed: () async {
@@ -753,12 +749,18 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   }
 
   Future<void> scanQrcode(BuildContext context) async {
-    String? content = await QrcodeUtil.scan();
+    String? content = await QrcodeUtil.mobileScan(context);
+    if (content == null) {
+      return;
+    }
     var map = JsonUtil.toJson(content);
     PeerClient peerClient = PeerClient.fromJson(map);
     await peerClientService.store(peerClient);
     Linkman linkman = await linkmanService.storeByPeerEntity(peerClient);
     if (linkman.linkmanStatus == LinkmanStatus.F.name) {
+      if (mounted) {
+        DialogUtil.info(context, content: '${linkman.name} was friend');
+      }
       return;
     }
     if (mounted) {
