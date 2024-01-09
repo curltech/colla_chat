@@ -285,6 +285,7 @@
   "Volume decrease": "减少音量",
   "Volume increase": "扩大音量",
   "Qrcode scan": "二维码",
+  "Scan qrcode": "扫描二维码",
   "Websocket status was changed to:": "Websocket状态：",
   "myself": "我",
   "No current chatSummary": "没有当前消息汇总",
