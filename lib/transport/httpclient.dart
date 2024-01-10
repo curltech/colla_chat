@@ -54,15 +54,15 @@ class DioHttpClient implements IWebClient {
   }
 
   @override
-  Future<Response> send(String url, dynamic data) {
-    var response = _client.post(url, data: data);
+  Future<Response> send(String url, dynamic data) async {
+    var response = await _client.post(url, data: data);
 
     return response;
   }
 
   @override
-  Future<Response> get(String url) {
-    var response = _client.get(url);
+  Future<Response> get(String url) async {
+    var response = await _client.get(url);
     return response;
   }
 
