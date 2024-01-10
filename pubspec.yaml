@@ -300,9 +300,9 @@ dependencies:
   just_audio_windows: ^0.2.0
   just_audio_mpv: ^0.1.4
   just_waveform: ^0.0.4
-  audio_service: ^0.18.9
-  just_audio_background: ^0.0.1-beta.9
-  audio_session: ^0.1.16
+  audio_service: ^0.18.12
+  just_audio_background: ^0.0.1-beta.11
+  audio_session: ^0.1.18
   flutter_tts: ^3.5.3
   speech_to_text: any
   flutter_image_compress: ^2.0.4

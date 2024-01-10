@@ -54,7 +54,7 @@ class ConferenceChatMessageController with ChangeNotifier {
 
   final Lock _lock = Lock();
 
-  final BlueFireAudioPlayer _audioPlayer = BlueFireAudioPlayer();
+  final BlueFireAudioPlayer _audioPlayer = globalBlueFireAudioPlayer;
 
   ConferenceChatMessageController();
 

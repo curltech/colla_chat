@@ -12,6 +12,7 @@ import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
+import 'package:colla_chat/widgets/media/audio/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:synchronized/synchronized.dart';
@@ -92,6 +93,7 @@ class P2pConferenceClient {
       await _onParticipantConnected(peerConnection);
     }
     p2pConferenceClientPool.join(conference.conferenceId);
+    await globalAudioSession.initSpeech();
   }
 
   renegotiate(

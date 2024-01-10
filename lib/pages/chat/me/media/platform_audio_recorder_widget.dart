@@ -209,7 +209,7 @@ class _PlatformAudioRecorderWidgetState
                       content:
                           '${AppLocalizations.t('Need you play record audio filename')} $filename?');
                   if (confirm != null && confirm) {
-                    BlueFireAudioPlayer audioPlayer = BlueFireAudioPlayer();
+                    BlueFireAudioPlayer audioPlayer = globalBlueFireAudioPlayer;
                     audioPlayer.play(filename);
                   }
                 }

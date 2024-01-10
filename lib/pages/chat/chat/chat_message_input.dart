@@ -27,7 +27,7 @@ class ChatMessageInputWidget extends StatefulWidget {
 }
 
 class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
-  BlueFireAudioPlayer audioPlayer = BlueFireAudioPlayer();
+  BlueFireAudioPlayer audioPlayer = globalBlueFireAudioPlayer;
 
   @override
   void initState() {

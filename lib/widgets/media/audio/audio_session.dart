@@ -1,12 +1,12 @@
 import 'package:audio_session/audio_session.dart';
+import 'package:colla_chat/plugin/logger.dart';
 
-///音频会话的初始化服务
+///代表本应用的全局音频会话，用于本应用有声音的时候通知其他应用，或者其他应用有声音的时候本应用的处理
+///类构建的时候进行初始化
 class GlobalAudioSession {
   AudioSession? _session;
 
-  GlobalAudioSession() {
-    init();
-  }
+  GlobalAudioSession();
 
   AudioSession? get session {
     return _session;
@@ -31,23 +31,21 @@ class GlobalAudioSession {
       androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
       androidWillPauseWhenDucked: true,
     ));
-    await _session?.setActive(true);
   }
 
+  ///初始化成播放音乐的配置
   initMusic() async {
-    _session ??= await AudioSession.instance;
     await _session?.configure(const AudioSessionConfiguration.music());
   }
 
+  ///初始化成说话的配置
   initSpeech() async {
-    _session ??= await AudioSession.instance;
     await _session?.configure(const AudioSessionConfiguration.speech());
   }
 
-  ///判断是否激活
-  Future<bool> setActive() async {
-    _session ??= await AudioSession.instance;
-    return await _session!.setActive(true);
+  ///激活或者钝化会话，一般情况下不用直接调用
+  Future<bool> setActive(bool active) async {
+    return await _session!.setActive(active);
   }
 
   Future<void> handleInterruptions(
@@ -58,6 +56,8 @@ class GlobalAudioSession {
       //音频设备改变的处理
       Function(AudioDevicesChangedEvent)? devicesChangedEventStream) async {
     _session ??= await AudioSession.instance;
+
+    /// 用户打开外置播放，进入吵杂环境
     _session?.becomingNoisyEventStream.listen((_) {
       if (becomingNoisyEventStream != null) {
         becomingNoisyEventStream();
@@ -69,30 +69,40 @@ class GlobalAudioSession {
       if (interruptionEventStream != null) {
         interruptionEventStream(event);
       } else {
-        ///例子，begin表示中断开始
+        ///begin表示另一个app开始播放声音
         if (event.begin) {
           switch (event.type) {
             case AudioInterruptionType.duck:
+              //自己应该降低音量
               break;
             case AudioInterruptionType.pause:
+              //自己应该暂停播放
               break;
             case AudioInterruptionType.unknown:
+              //自己应该暂停播放
               break;
           }
         } else {
-          ///表示中断结束
+          ///表示另一个app播放声音结束
           switch (event.type) {
             case AudioInterruptionType.duck:
+              //自己应该恢复音量
               break;
             case AudioInterruptionType.pause:
+              //自己应该继续播放
               break;
             case AudioInterruptionType.unknown:
+              //自己不应该继续播放
               break;
           }
         }
       }
     });
+
+    ///设备改变事件，比如换了耳机和外置播放
     _session?.devicesChangedEventStream.listen((event) {
+      logger.i('Devices added:   ${event.devicesAdded}');
+      logger.i('Devices removed: ${event.devicesRemoved}');
       if (devicesChangedEventStream != null) {
         devicesChangedEventStream(event);
       }

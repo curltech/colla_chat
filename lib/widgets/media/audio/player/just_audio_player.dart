@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:audio_session/audio_session.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/service/audio_session.dart';
+import 'package:colla_chat/widgets/media/audio/audio_session.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/audio/abstract_audio_player_controller.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -30,11 +30,16 @@ class JustAudioPlayer {
         audioLoadConfiguration: audioLoadConfiguration,
         audioPipeline: audioPipeline,
         androidOffloadSchedulingEnabled: androidOffloadSchedulingEnabled);
-    initAudioSession();
+
+    ///如果想定制音频会话的处理
+    if (!handleInterruptions) {
+      _initAudioSession();
+    }
   }
 
-  initAudioSession() async {
-    await globalAudioSession.init();
+  ///定制音频会话的处理
+  _initAudioSession() async {
+    await globalAudioSession.initMusic();
     await globalAudioSession.handleInterruptions(() {
       player.pause();
     }, (event) {

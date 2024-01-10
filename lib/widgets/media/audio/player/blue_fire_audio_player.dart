@@ -13,25 +13,17 @@ import 'package:flutter/material.dart';
 class BlueFireAudioPlayer {
   AudioPlayer player = AudioPlayer();
 
-  static GlobalAudioScope get _global => AudioPlayer.global;
+  BlueFireAudioPlayer();
 
-  // Set config for all platforms
-  AudioContextConfig audioContextConfig = AudioContextConfig();
-
-  // Set config for each platform individually
-  AudioContext audioContext = const AudioContext();
-
-  BlueFireAudioPlayer() {
-    _global.setAudioContext(audioContextConfig.build());
-  }
-
+  ///所有的音频播放器的配置
   setGlobalAudioContext({
     AudioContextConfigRoute? route,
     bool? duckAudio,
     bool? respectSilence,
     bool? stayAwake,
   }) async {
-    await _global.setAudioContext(_buildAudioContextConfig(
+    GlobalAudioScope global = AudioPlayer.global;
+    await global.setAudioContext(_buildAudioContextConfig(
         route: route,
         duckAudio: duckAudio,
         respectSilence: respectSilence,
@@ -44,7 +36,7 @@ class BlueFireAudioPlayer {
     bool? respectSilence,
     bool? stayAwake,
   }) async {
-    audioContext = _buildAudioContextConfig(
+    AudioContext audioContext = _buildAudioContextConfig(
         route: route,
         duckAudio: duckAudio,
         respectSilence: respectSilence,
@@ -60,6 +52,7 @@ class BlueFireAudioPlayer {
     bool? respectSilence,
     bool? stayAwake,
   }) {
+    AudioContextConfig audioContextConfig = AudioContextConfig();
     AudioContextConfig config = audioContextConfig.copy(
         route: route,
         duckAudio: duckAudio,
@@ -67,17 +60,6 @@ class BlueFireAudioPlayer {
         stayAwake: stayAwake);
 
     return config.build();
-    audioContext.android.copy(
-      isSpeakerphoneOn: route == AudioContextConfigRoute.speaker,
-      stayAwake: stayAwake,
-      audioMode: AndroidAudioMode.normal,
-      contentType: AndroidContentType.unknown,
-      usageType: AndroidUsageType.unknown,
-      audioFocus: AndroidAudioFocus.none,
-    );
-    audioContext.iOS.copy(
-        category: AVAudioSessionCategory.playback,
-        options: [AVAudioSessionOptions.defaultToSpeaker]);
   }
 
   play(
