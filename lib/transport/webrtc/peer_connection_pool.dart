@@ -223,7 +223,7 @@ class PeerConnectionPool {
       AdvancedPeerConnection? peerConnection =
           _getOne(peerId, clientId: clientId);
       if (peerConnection != null) {
-        logger.e('peerId:$peerId clientId:$clientId is exist!');
+        logger.e('peerId:$peerId,name:${peerConnection.name} clientId:$clientId is exist!');
         return null;
       }
       //创建新的主叫方
@@ -283,7 +283,7 @@ class PeerConnectionPool {
           removePeerConnections[advancedPeerConnection.clientId] =
               advancedPeerConnection;
         }
-        logger.w('remove peerConnection peerId:$peerId,clientId:$clientId');
+        logger.w('remove peerConnection peerId:$peerId,name:${advancedPeerConnection?.name} clientId:$clientId');
       }
       if (peerConnections.isEmpty) {
         _peerConnections.remove(peerId);
@@ -302,7 +302,7 @@ class PeerConnectionPool {
       for (var entry in removePeerConnections.entries) {
         if (clientId == entry.value.clientId) {
           await entry.value.close();
-          logger.i('peerId:$peerId clientId:$clientId is closed!');
+          logger.i('peerId:$peerId name:${entry.value.name} clientId:$clientId is closed!');
         }
       }
       return true;

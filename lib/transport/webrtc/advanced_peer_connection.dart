@@ -36,7 +36,7 @@ class AdvancedPeerConnection {
     this.name = unknownName,
   }) {
     logger
-        .w('advancedPeerConnection peerId:$peerId, clientId:$clientId create');
+        .w('advancedPeerConnection peerId:$peerId name:$name clientId:$clientId create');
     if (StringUtil.isEmpty(clientId)) {
       logger.e('SlavePeerConnection clientId must be value');
     }
@@ -305,7 +305,7 @@ class AdvancedPeerConnection {
       return await basePeerConnection.send(data);
     } else {
       logger.e(
-          'send failed , peerId:$peerId clientId:$clientId webrtc connection state is not connected');
+          'send failed , peerId:$peerId name:$name clientId:$clientId webrtc connection state is not connected');
       return false;
     }
   }
