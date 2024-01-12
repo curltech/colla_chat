@@ -359,10 +359,10 @@ class PeerConnectionPool {
       bool removeNeeded = (peerConnection.dataChannelState == null ||
               peerConnection.dataChannelState ==
                   RTCDataChannelState.RTCDataChannelClosed) ||
-          (peerConnection.signalingState ==
-              RTCSignalingState.RTCSignalingStateHaveRemoteOffer) ||
-          (peerConnection.signalingState ==
-              RTCSignalingState.RTCSignalingStateHaveLocalOffer) ||
+          // (peerConnection.signalingState ==
+          //     RTCSignalingState.RTCSignalingStateHaveRemoteOffer) ||
+          // (peerConnection.signalingState ==
+          //     RTCSignalingState.RTCSignalingStateHaveLocalOffer) ||
           peerConnection.connectionState ==
               RTCPeerConnectionState.RTCPeerConnectionStateFailed ||
           peerConnection.connectionState ==
