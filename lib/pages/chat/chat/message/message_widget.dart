@@ -249,13 +249,13 @@ class MessageWidget {
       case 'Cancel':
         String? messageId = chatMessage.messageId;
         if (messageId != null) {
+          chatMessageService.delete(
+              where: 'messageId=?', whereArgs: [chatMessage.messageId!]);
+          chatMessageController.delete(index: this.index);
           await chatMessageController.sendText(
             message: messageId,
             subMessageType: ChatMessageSubType.cancel,
           );
-          chatMessageService.delete(
-              where: 'messageId=?', whereArgs: [chatMessage.messageId!]);
-          chatMessageController.delete(index: this.index);
         }
         break;
       case 'Copy':

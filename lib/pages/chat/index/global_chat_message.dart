@@ -199,9 +199,8 @@ class GlobalChatMessage {
         linkmanService.receiveModifyLinkman(chatMessage);
         break;
       case ChatMessageSubType.cancel:
-        //接收到删除消息的消息
-        String? messageId = content;
-        if (messageId != null) {
+        if (content != null) {
+          String messageId = chatMessageService.recoverContent(content);
           chatMessageService
               .delete(where: 'messageId=?', whereArgs: [messageId]);
         }
