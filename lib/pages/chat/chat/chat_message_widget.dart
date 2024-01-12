@@ -54,15 +54,16 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
       securityTip.value = false;
     });
     chatMessageController.latest();
+
     ///滚到指定的位置
     // widget.scrollController.animateTo(offset,
     //     duration: const Duration(milliseconds: 1000), curve: Curves.ease);
   }
 
   _update() {
-    setState(() {
+    setState(() async {
       int start = DateTime.now().microsecondsSinceEpoch;
-      chatMessageController.latest();
+      await chatMessageController.latest();
       int end = DateTime.now().microsecondsSinceEpoch;
       logger.w('find chat message latest time: ${end - start} microsecond');
     });

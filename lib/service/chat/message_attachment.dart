@@ -163,7 +163,8 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
         data = await encryptContent(data);
         if (data != null) {
           await FileUtil.writeFileAsBytes(data, filename);
-          logger.i('message attachment writeFile filename:$filename');
+          logger.i(
+              'message attachment writeFile filename:$filename length:${data.length}');
         }
       }
     } else {
