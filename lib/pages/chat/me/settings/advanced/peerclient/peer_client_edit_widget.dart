@@ -93,6 +93,7 @@ final List<PlatformDataField> peerClientColumnFieldDefs = [
   PlatformDataField(
       name: 'publicKey',
       label: 'PublicKey',
+      readOnly : true,
       prefixIcon: Icon(
         Icons.vpn_key,
         color: myself.primary,

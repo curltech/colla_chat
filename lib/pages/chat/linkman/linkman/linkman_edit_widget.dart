@@ -81,6 +81,7 @@ final List<PlatformDataField> linkmanDataField = [
   PlatformDataField(
       name: 'publicKey',
       label: 'PublicKey',
+      readOnly : true,
       prefixIcon: Icon(
         Icons.vpn_key,
         color: myself.primary,
