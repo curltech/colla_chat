@@ -87,7 +87,7 @@ class MessageSlice {
           }
         }
         var end = DateTime.now().millisecondsSinceEpoch;
-        logger.i('merge size:$sliceBufferSize time:${end - start}');
+        logger.i('merge size:$sliceBufferSize sliceCount:$sliceCount time:${end - start}');
         sliceBufferId = 0;
         sliceBuffer = {};
         return slices;
