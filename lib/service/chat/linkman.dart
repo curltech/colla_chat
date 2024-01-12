@@ -195,6 +195,8 @@ class LinkmanService extends PeerPartyService<Linkman> {
       linkman.address = peerEntity.address;
       linkman.startDate = peerEntity.startDate;
       linkman.endDate = peerEntity.endDate;
+      linkman.peerPublicKey = peerEntity.peerPublicKey;
+      linkman.publicKey = peerEntity.publicKey;
       await update(linkman);
     }
     linkmen.remove(linkman.peerId);
