@@ -78,6 +78,13 @@ final List<PlatformDataField> linkmanDataField = [
         Icons.subscript_outlined,
         color: myself.primary,
       )),
+  PlatformDataField(
+      name: 'publicKey',
+      label: 'PublicKey',
+      prefixIcon: Icon(
+        Icons.vpn_key,
+        color: myself.primary,
+      )),
 ];
 
 final ValueNotifier<Linkman?> linkmanNotifier = ValueNotifier<Linkman?>(null);

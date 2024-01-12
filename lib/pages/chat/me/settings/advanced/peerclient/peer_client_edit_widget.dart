@@ -90,6 +90,13 @@ final List<PlatformDataField> peerClientColumnFieldDefs = [
         Icons.thermostat,
         color: myself.primary,
       )),
+  PlatformDataField(
+      name: 'publicKey',
+      label: 'PublicKey',
+      prefixIcon: Icon(
+        Icons.vpn_key,
+        color: myself.primary,
+      )),
 ];
 
 ///客户端
