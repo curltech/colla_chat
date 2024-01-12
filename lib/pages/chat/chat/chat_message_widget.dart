@@ -61,10 +61,10 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   }
 
   _update() {
-    setState(() async {
-      int start = DateTime.now().microsecondsSinceEpoch;
-      await chatMessageController.latest();
-      int end = DateTime.now().microsecondsSinceEpoch;
+    setState(() {
+      int start = DateTime.now().millisecondsSinceEpoch;
+      chatMessageController.latest();
+      int end = DateTime.now().millisecondsSinceEpoch;
       logger.w('find chat message latest time: ${end - start} microsecond');
     });
   }
