@@ -612,5 +612,7 @@
   "TsCode": "股票代码",
   "Keyword": "关键值",
   "Terms": "年份",
-  "Source": "指标"
+  "Source": "指标",
+  "Message": "消息",
+  "was canceled": "被撤销"
 }

@@ -45,8 +45,8 @@ import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:path/path.dart' as p;
+import 'package:share_plus/share_plus.dart';
 
 ///每种消息的显示组件
 class MessageWidget {
@@ -157,15 +157,20 @@ class MessageWidget {
         }
       }
     }
+    if (myself.peerId == chatMessage.senderPeerId &&
+        subMessageType != ChatMessageSubType.cancel) {
+      messagePopActionData.add(
+        ActionData(
+            label: 'Cancel',
+            tooltip: 'Cancel message',
+            icon: const Icon(Icons.cancel)),
+      );
+    }
     messagePopActionData.addAll([
       ActionData(
           label: 'Delete',
           tooltip: 'Delete message',
           icon: const Icon(Icons.delete)),
-      ActionData(
-          label: 'Cancel',
-          tooltip: 'Cancel message',
-          icon: const Icon(Icons.cancel)),
       ActionData(
         label: 'Refer',
         tooltip: 'Refer message',
@@ -556,6 +561,7 @@ class MessageWidget {
   }
 
   CancelMessage buildCancelMessageWidget(BuildContext context, String content) {
+    content = chatMessageService.recoverContent(content);
     return CancelMessage(
       key: UniqueKey(),
       isMyself: isMyself,
