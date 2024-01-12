@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/tool/message_slice.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:cryptography/cryptography.dart';
 
 class CryptoGraphy {
@@ -116,10 +117,13 @@ class CryptoGraphy {
   /// 将base64的密钥字符串导入转换成私钥，passphrase必须有值用于解密私钥
   Future<SimplePublicKey> importPublicKey(String base58PublicKey,
       {KeyPairType type = KeyPairType.ed25519}) async {
-    Uint8List rawText = CryptoUtil.decodeBase58(base58PublicKey);
-    SimplePublicKey publicKey = SimplePublicKey(rawText, type: type);
+    if (StringUtil.isNotEmpty(base58PublicKey)) {
+      Uint8List rawText = CryptoUtil.decodeBase58(base58PublicKey);
+      SimplePublicKey publicKey = SimplePublicKey(rawText, type: type);
 
-    return publicKey;
+      return publicKey;
+    }
+    throw 'publicKey error';
   }
 
   static const signatureLength = 64;
