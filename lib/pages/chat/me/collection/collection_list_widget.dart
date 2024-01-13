@@ -133,7 +133,7 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
         title: 'Delete',
         prefix: Icons.bookmark_remove,
         onTap: (int index, String label, {String? subtitle}) async {
-          await chatMessageService.remove(where: 'id=?', whereArgs: [id!]);
+          await chatMessageService.remove(chatMessage);
           collectionChatMessageController.delete();
         });
     slideActions.add(deleteSlideAction);

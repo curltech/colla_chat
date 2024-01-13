@@ -242,8 +242,7 @@ class MessageWidget {
         await _saveFile(context, isFile: false);
         break;
       case 'Delete':
-        await chatMessageService
-            .remove(where: 'id=?', whereArgs: [chatMessage.id!]);
+        await chatMessageService.remove(chatMessage);
         chatMessageController.delete(index: this.index);
         break;
       case 'Cancel':

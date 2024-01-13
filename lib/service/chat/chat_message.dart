@@ -1127,29 +1127,23 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     }
   }
 
-  Future<int> remove({String? where, List<Object>? whereArgs}) async {
-    List<ChatMessage> chatMessages =
-        await find(where: where, whereArgs: whereArgs);
-    if (chatMessages.isNotEmpty) {
-      for (ChatMessage chatMessage in chatMessages) {
-        String? content = chatMessage.content;
-        String? title = chatMessage.title;
-        String? contentType = chatMessage.contentType;
-        String? messageId = chatMessage.messageId;
-        if (contentType != null &&
-            (contentType == ChatMessageContentType.file.name ||
-                contentType == ChatMessageContentType.image.name ||
-                contentType == ChatMessageContentType.video.name ||
-                contentType == ChatMessageContentType.audio.name ||
-                contentType == ChatMessageContentType.rich.name)) {
-          if (!platformParams.web) {
-            final filename =
-                await messageAttachmentService.remove(messageId!, title);
-          }
-        }
+  Future<int> remove(ChatMessage chatMessage) async {
+    String? content = chatMessage.content;
+    String? title = chatMessage.title;
+    String? contentType = chatMessage.contentType;
+    String? messageId = chatMessage.messageId;
+    if (contentType != null &&
+        (contentType == ChatMessageContentType.file.name ||
+            contentType == ChatMessageContentType.image.name ||
+            contentType == ChatMessageContentType.video.name ||
+            contentType == ChatMessageContentType.audio.name ||
+            contentType == ChatMessageContentType.rich.name)) {
+      if (!platformParams.web) {
+        final filename =
+            await messageAttachmentService.remove(messageId!, title);
       }
     }
-    int count = super.delete(where: where, whereArgs: whereArgs);
+    int count = super.delete(where: 'id=?', whereArgs: [chatMessage.id!]);
 
     return Future.value(count);
   }
@@ -1223,7 +1217,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         int leftDeleteTime = deleteTime - duration.inSeconds;
         if (leftDeleteTime <= 0) {
           chatMessageService
-              .remove(where: 'id=?', whereArgs: [chatMessage.id!]);
+              .remove(chatMessage);
         }
       }
     }
@@ -1261,20 +1255,9 @@ final chatMessageService = ChatMessageService(
       'messageId',
       'messageType',
       'subMessageType',
-      'direct',
       'receiverPeerId',
-      'receiverType',
-      'receiverAddress',
       'senderPeerId',
-      'senderType',
-      'senderAddress',
-      'createDate',
       'sendTime',
-      'receiveTime',
-      'receiptTime',
-      'readTime',
-      'deleteTime',
-      'title',
     ],
     fields: ServiceLocator.buildFields(ChatMessage(), []));
 

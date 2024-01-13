@@ -107,11 +107,14 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     List<ChatMessage>? chatMessages;
     if (_chatSummary != null) {
       if (_chatSummary!.partyType == PartyType.linkman.name) {
+        int start = DateTime.now().millisecondsSinceEpoch;
         chatMessages = await chatMessageService.findByPeerId(
             peerId: _chatSummary!.peerId!,
             messageType: ChatMessageType.chat.name,
             offset: data.length,
             limit: limit);
+        int end = DateTime.now().millisecondsSinceEpoch;
+        logger.i('chatMessageService.findByPeerId time:${end - start}');
       } else if (_chatSummary!.partyType == PartyType.group.name) {
         chatMessages = await chatMessageService.findByPeerId(
             groupId: _chatSummary!.peerId!,

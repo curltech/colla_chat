@@ -211,7 +211,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
                 content: 'Do you confirm delete?');
             if (confirm != null && confirm) {
               await chatMessageService
-                  .remove(where: 'id=?', whereArgs: [chatMessage.id!]);
+                  .remove(chatMessage);
               myChannelChatMessageController.delete(index: index);
             }
           },
