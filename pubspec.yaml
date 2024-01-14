@@ -83,7 +83,7 @@ dependencies:
   #网络
   dio: ^5.0.2
   dio_http2_adapter: ^2.1.0
-  web_socket_channel: ^2.4.1
+  web_socket_channel: ^2.4.3
   #cached_network_image: ^3.0.0
   #flutter_sms: ^2.3.3 #android compile failure
   #sms_advanced: ^1.0.2 #android版本有问题
