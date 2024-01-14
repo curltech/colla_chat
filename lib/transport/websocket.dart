@@ -10,6 +10,7 @@ import 'package:colla_chat/transport/webclient.dart';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:web_socket_channel/status.dart' as SinkStatus;
 
 import './condition_import/unsupport.dart'
     if (dart.library.html) './condition_import/web.dart'
@@ -74,6 +75,7 @@ class Websocket extends IWebClient {
       logger.e('wss address:$address connect failure');
       return;
     }
+    await channel!.ready;
     channel!.stream.listen((dynamic data) {
       onData(data);
     }, onError: onError, onDone: onDone, cancelOnError: false);
@@ -215,7 +217,7 @@ class Websocket extends IWebClient {
       if (channel != null) {
         try {
           var sink = channel!.sink;
-          sink.close();
+          sink.close(SinkStatus.goingAway);
         } catch (e) {
           logger.e('wss address:$address websocket channel!.sink.close error');
         }
