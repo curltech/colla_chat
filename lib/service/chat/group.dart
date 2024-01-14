@@ -328,9 +328,9 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   ///向群成员发送散群的消息
-  dismissGroup(Group group) async {
+  Future<bool> dismissGroup(Group group) async {
     if (!canDismissGroup(group)) {
-      return;
+      return false;
     }
     groupMemberService.delete(where: 'groupId=?', whereArgs: [group.peerId]);
     removeByGroupId(group.peerId);
@@ -344,6 +344,8 @@ class GroupService extends PeerPartyService<Group> {
 
     await chatMessageService.sendAndStore(chatMessage,
         cryptoOption: CryptoOption.group, peerIds: group.participants);
+
+    return true;
   }
 
   receiveDismissGroup(ChatMessage chatMessage) async {

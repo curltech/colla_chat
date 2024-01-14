@@ -481,21 +481,27 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             title: 'Dismiss',
             prefix: Icons.group_off,
             onTap: (int index, String label, {String? subtitle}) async {
-              if (group.ownerPeerId == myself.peerId) {
-                groupController.currentIndex = index;
-                await groupService.dismissGroup(group);
-                groupController.delete();
-                groupController.delete();
-                if (mounted) {
-                  DialogUtil.info(context,
-                      content:
-                          '${AppLocalizations.t('Group:')} ${group.name} ${AppLocalizations.t('is dismiss')}');
+              if (group.groupOwnerPeerId == myself.peerId) {
+                bool success = await groupService.dismissGroup(group);
+                if (success) {
+                  groupController.delete(index: index);
+                  if (mounted) {
+                    DialogUtil.info(context,
+                        content:
+                            '${AppLocalizations.t('Group:')} ${group.name} ${AppLocalizations.t('is dismiss')}');
+                  }
+                } else {
+                  if (mounted) {
+                    DialogUtil.error(context, content: 'Must be group owner');
+                  }
                 }
               } else {
                 DialogUtil.error(context, content: 'Must be group owner');
               }
             });
-        slideActions.add(dismissSlideAction);
+        if (group.groupOwnerPeerId == myself.peerId) {
+          slideActions.add(dismissSlideAction);
+        }
         tile.slideActions = slideActions;
 
         List<TileData> endSlideActions = [];
@@ -545,20 +551,23 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             title: 'Delete',
             prefix: Icons.playlist_remove_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
-              conferenceController.currentIndex = index;
-              await conferenceService.removeByConferenceId(conferenceId);
-              groupMemberService
-                  .delete(where: 'groupId=?', whereArgs: [conferenceId]);
-              await chatSummaryService.removeChatSummary(conferenceId);
-              await chatMessageService.removeByGroup(conferenceId);
-              conferenceController.delete();
-              if (mounted) {
-                DialogUtil.info(context,
-                    content:
-                        '${AppLocalizations.t('Conference:')} ${conference.name} ${AppLocalizations.t('is deleted')}');
+              if (conference.conferenceOwnerPeerId == myself.peerId) {
+                await conferenceService.removeByConferenceId(conferenceId);
+                groupMemberService
+                    .delete(where: 'groupId=?', whereArgs: [conferenceId]);
+                await chatSummaryService.removeChatSummary(conferenceId);
+                await chatMessageService.removeByGroup(conferenceId);
+                conferenceController.delete(index: index);
+                if (mounted) {
+                  DialogUtil.info(context,
+                      content:
+                          '${AppLocalizations.t('Conference:')} ${conference.name} ${AppLocalizations.t('is deleted')}');
+                }
               }
             });
-        slideActions.add(deleteSlideAction);
+        if (conference.conferenceOwnerPeerId == myself.peerId) {
+          slideActions.add(deleteSlideAction);
+        }
         tile.slideActions = slideActions;
 
         List<TileData> endSlideActions = [];
