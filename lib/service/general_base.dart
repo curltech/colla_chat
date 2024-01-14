@@ -2,6 +2,7 @@ import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
@@ -248,20 +249,23 @@ abstract class GeneralBaseService<T> {
         securityContext.needSign = needSign;
         String? value = json[encryptField];
         if (StringUtil.isNotEmpty(value)) {
+          List<int> data = CryptoUtil.decodeBase64(value!);
+          securityContext.payload = data;
+          bool result = false;
           try {
-            List<int> data = CryptoUtil.decodeBase64(value!);
-            securityContext.payload = data;
-            var result = await linkmanCryptographySecurityContextService
+            result = await linkmanCryptographySecurityContextService
                 .decrypt(securityContext);
-            if (!result) {
-              logger.e(
-                  'linkmanCryptographySecurityContextService encryptField:$encryptField decrypt failure');
-            }
-            data = securityContext.payload;
-            json[encryptField] = CryptoUtil.utf8ToString(data);
           } catch (e) {
             logger
                 .e('SecurityContextService decrypt field:$encryptField err:$e');
+          }
+          if (result) {
+            data = securityContext.payload;
+            json[encryptField] = CryptoUtil.utf8ToString(data);
+          } else {
+            json[encryptField] = AppLocalizations.t('decrypt failure');
+            logger.e(
+                'linkmanCryptographySecurityContextService encryptField:$encryptField decrypt failure');
           }
         }
       }
