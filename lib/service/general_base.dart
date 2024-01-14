@@ -260,7 +260,8 @@ abstract class GeneralBaseService<T> {
             data = securityContext.payload;
             json[encryptField] = CryptoUtil.utf8ToString(data);
           } catch (e) {
-            logger.e('SecurityContextService decrypt err:$e');
+            logger
+                .e('SecurityContextService decrypt field:$encryptField err:$e');
           }
         }
       }
