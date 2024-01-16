@@ -614,5 +614,7 @@
   "Terms": "年份",
   "Source": "指标",
   "Message": "消息",
-  "was canceled": "被撤销"
+  "was canceled": "被撤销",
+  "MapLauncher": "地图应用",
+  "Current position": "当前位置"
 }

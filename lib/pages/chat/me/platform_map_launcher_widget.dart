@@ -1,3 +1,4 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
@@ -54,7 +55,7 @@ class _PlatformMapLauncherWidgetState extends State<PlatformMapLauncherWidget> {
             Position position = await GeolocatorUtil.currentPosition();
             GeolocatorUtil.showMarker(
                 map, Coords(position.latitude, position.longitude),
-                title: title);
+                title: AppLocalizations.t('Current position'));
           });
       tiles.add(tile);
     }
@@ -82,8 +83,8 @@ class _PlatformMapLauncherWidgetState extends State<PlatformMapLauncherWidget> {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
               Position position = snapshot.data!;
-              GeolocatorUtil.launchCoordinates(
-                  position.latitude, position.longitude);
+              GeolocatorUtil.launchCoordinates(position.latitude,
+                  position.longitude, AppLocalizations.t('Current position'));
             }
           }
           return LoadingUtil.buildLoadingIndicator();
