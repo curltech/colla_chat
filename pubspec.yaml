@@ -341,7 +341,7 @@ dependencies:
   apple_maps_flutter: ^1.2.0
   map_launcher: ^3.1.0 #打开设备已安装的地图软件，移动设备
   maps_launcher: ^2.2.0
-  location_picker_flutter_map: ^2.1.0 #Open Street Map，需要翻墙
+  location_picker_flutter_map: ^3.0.0 #Open Street Map，需要翻墙
 
   #服务
   firebase_core: 2.24.2
