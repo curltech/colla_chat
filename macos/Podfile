@@ -1,3 +1,4 @@
+source 'https://github.com/CocoaPods/Specs.git'
 platform :osx, '12.4'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.

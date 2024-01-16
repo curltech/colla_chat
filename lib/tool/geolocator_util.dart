@@ -10,6 +10,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart' as google_maps;
 import 'package:latlong2/latlong.dart' as latlong2;
 import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 import 'package:map_launcher/map_launcher.dart' as map_launcher;
+import 'package:maps_launcher/maps_launcher.dart';
 
 class LocationPosition {
   double latitude;
@@ -245,6 +246,20 @@ class GeolocatorUtil {
         description: description,
       );
     }
+  }
+
+  /// 适用于所有平台的地图，非移动平台采用Google Maps
+  static Future<bool> launchQuery(String address) {
+    return MapsLauncher.launchQuery(address);
+  }
+
+  /// 适用于所有平台的地图，非移动平台采用Google Maps
+  static Future<bool> launchCoordinates(
+    double latitude,
+    double longitude, [
+    String? label,
+  ]) {
+    return MapsLauncher.launchCoordinates(latitude, longitude, label);
   }
 
   /// 谷歌地图，需要price key
