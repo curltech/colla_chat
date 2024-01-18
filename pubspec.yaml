@@ -316,7 +316,7 @@ dependencies:
   image: ^4.0.17 #所有平台，装载，保存，管理图像
   flutter_luban: ^0.1.13
   #image_cropping: ^0.0.13 #裁剪图片
-  crop_your_image: ^0.7.4
+  crop_your_image: ^0.7.5
   #chatview: ^1.2.1
   dismissible_page: ^1.0.2
   infinite_scroll_pagination: ^4.0.0
@@ -400,7 +400,8 @@ dependency_overrides:
   image: ^4.0.12
   google_fonts: ^6.1.0
   material_design_icons_flutter: ^7.0.7296
-  image_cropper: ^5.0.0
+#  image_cropper: ^5.0.1
+  crop_image: ^1.0.11
   full_picker: ^1.3.3 #和最新版的record5不兼容,Recorder被AudioRecorder替换，需要修改源码
   collection: ^1.17.0
   video_player_platform_interface: ^6.2.1
