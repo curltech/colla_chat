@@ -6,7 +6,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/camera_file_widget.dart';
+import 'package:colla_chat/plugin/media_file_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -251,7 +251,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
 
   /// 图片显示区
   Widget _buildMediaPreviewData(BuildContext context) {
-    return CameraFileWidget(mediaFileController: mediaFileController);
+    return MediaFileWidget(mediaFileController: mediaFileController);
   }
 
   /// 闪光，曝光，旋转开关的工具按钮，只有移动设备才会显示

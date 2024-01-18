@@ -45,10 +45,11 @@ dependencies:
   path_provider: ^2.0.11
   url_launcher: ^6.1.11 #打开系统浏览器
   open_file: ^3.2.1 #打开文件, 和最新device_info有版本冲突
-  camera: ^0.10.5+2 #调用相机
-  camera_windows: ^0.2.1+7
+  camera: ^0.10.5+9 #调用相机
+  camera_windows: ^0.2.1+9
+  camera_linux: ^0.0.8
   camera_web: ^0.3.1+4
-  camera_macos: ^0.0.6+5
+  camera_macos: ^0.0.8
   wechat_camera_picker: ^4.2.0-dev.3 #移动平台，wechat_assets_picker的扩展，照相，录像
   photo_manager: ^3.0.0-dev.2 #移动平台，图像等媒体的抽象，wechat_assets_picker使用
   screenshot: ^2.1.0
@@ -315,8 +316,6 @@ dependencies:
   image_editor: ^1.3.0
   image: ^4.0.17 #所有平台，装载，保存，管理图像
   flutter_luban: ^0.1.13
-  #image_cropping: ^0.0.13 #裁剪图片
-#  crop_your_image: ^0.7.5
   #chatview: ^1.2.1
   dismissible_page: ^1.0.2
   infinite_scroll_pagination: ^4.0.0
@@ -400,6 +399,8 @@ dependency_overrides:
   image: ^4.0.12
   google_fonts: ^6.1.0
   material_design_icons_flutter: ^7.0.7296
+  #image_cropping: ^0.0.13 #裁剪图片
+  #  crop_your_image: ^0.7.5
 #  image_cropper: ^5.0.1
 #  crop_image: ^1.0.11
 #  full_picker: ^1.3.6 #和最新版的record5不兼容,Recorder被AudioRecorder替换，需要修改源码
@@ -424,7 +425,7 @@ dependency_overrides:
   record_darwin: 1.0.1
   visibility_detector: ^0.4.0+2 #组建可见性的大小发生变化
   focus_detector: ^2.0.1 #组建在界面上消失或者出现
-  image_picker: ^1.0.1 #选取图库,移动从图像廊或者相机选，桌面实现采用file_selector，从文件系统选
+  image_picker: ^1.0.7 #选取图库,移动从图像廊或者相机选，桌面实现采用file_selector，从文件系统选
   latlong2: ^0.9.0
   flutter_map_location_marker: ^8.0.3
   flutter_map: ^6.1.0

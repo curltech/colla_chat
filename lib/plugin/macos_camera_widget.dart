@@ -8,7 +8,7 @@ import 'package:camera_macos/exceptions.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/plugin/camera_file_widget.dart';
+import 'package:colla_chat/plugin/media_file_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -133,7 +133,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
 
   /// 图片显示区
   Widget _buildMediaPreviewData(BuildContext context) {
-    return CameraFileWidget(mediaFileController: mediaFileController);
+    return MediaFileWidget(mediaFileController: mediaFileController);
   }
 
   void _toggleAudioMode() {

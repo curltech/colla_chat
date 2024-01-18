@@ -11,6 +11,7 @@ import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/me/collection/collection_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/me/collection/collection_list_widget.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/linux_camera_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/plugin/macos_camera_widget.dart';
 import 'package:colla_chat/plugin/mobile_camera_widget.dart';
@@ -281,6 +282,16 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     String? mimeType = ChatMessageMimeType.jpg.name;
     ChatMessageContentType contentType = ChatMessageContentType.image;
     if (platformParams.linux) {
+      await DialogUtil.show<String?>(
+          context: context,
+          builder: (BuildContext context) {
+            return Center(child: LinuxCameraWidget(
+              onData: (Uint8List bytes, String type) {
+                data = bytes;
+                mimeType = type;
+              },
+            ));
+          });
       // List<Uint8List>? bytes = await FileUtil.fullSelectBytes(
       //   context: context,
       //   file: true,

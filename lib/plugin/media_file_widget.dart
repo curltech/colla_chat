@@ -7,16 +7,17 @@ import 'package:colla_chat/tool/video_util.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 
-class CameraFileWidget extends StatefulWidget {
+/// 媒体文件，比如图片或者视频文件的展示
+class MediaFileWidget extends StatefulWidget {
   final DataListController<XFile> mediaFileController;
 
-  const CameraFileWidget({super.key, required this.mediaFileController});
+  const MediaFileWidget({super.key, required this.mediaFileController});
 
   @override
-  CameraFileWidgetState createState() => CameraFileWidgetState();
+  MediaFileWidgetState createState() => MediaFileWidgetState();
 }
 
-class CameraFileWidgetState extends State<CameraFileWidget> {
+class MediaFileWidgetState extends State<MediaFileWidget> {
   @override
   void initState() {
     super.initState();
