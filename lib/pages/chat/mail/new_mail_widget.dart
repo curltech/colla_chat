@@ -109,25 +109,25 @@ class _NewMailWidgetState extends State<NewMailWidget> {
 
   ///加附件信息
   void _addAttachmentInfo() {
-    FileUtil.fullPicker(
-        context: context,
-        file: true,
-        onSelectedFilenames: (filenames) async {
-          if (filenames.isNotEmpty) {
-            List<PlatformAttachmentInfo> infos = [];
-            for (var filename in filenames) {
-              File file = File(filename);
-              int size = await file.length();
-              PlatformAttachmentInfo info = PlatformAttachmentInfo(
-                  mediaType: MediaType.guessFromFileName(filename),
-                  filename: filename,
-                  name: FileUtil.filename(filename),
-                  size: size);
-              infos.add(info);
-            }
-            attachmentInfos.value = infos;
-          }
-        });
+    // FileUtil.fullPicker(
+    //     context: context,
+    //     file: true,
+    //     onSelectedFilenames: (filenames) async {
+    //       if (filenames.isNotEmpty) {
+    //         List<PlatformAttachmentInfo> infos = [];
+    //         for (var filename in filenames) {
+    //           File file = File(filename);
+    //           int size = await file.length();
+    //           PlatformAttachmentInfo info = PlatformAttachmentInfo(
+    //               mediaType: MediaType.guessFromFileName(filename),
+    //               filename: filename,
+    //               name: FileUtil.filename(filename),
+    //               size: size);
+    //           infos.add(info);
+    //         }
+    //         attachmentInfos.value = infos;
+    //       }
+    //     });
   }
 
   ///删除附件信息

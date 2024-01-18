@@ -281,16 +281,16 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     String? mimeType = ChatMessageMimeType.jpg.name;
     ChatMessageContentType contentType = ChatMessageContentType.image;
     if (platformParams.linux) {
-      List<Uint8List>? bytes = await FileUtil.fullSelectBytes(
-        context: context,
-        file: true,
-        image: true,
-        imageCamera: true,
-        videoCamera: true,
-      );
-      if (bytes != null && bytes.isNotEmpty) {
-        data = bytes.first;
-      }
+      // List<Uint8List>? bytes = await FileUtil.fullSelectBytes(
+      //   context: context,
+      //   file: true,
+      //   image: true,
+      //   imageCamera: true,
+      //   videoCamera: true,
+      // );
+      // if (bytes != null && bytes.isNotEmpty) {
+      //   data = bytes.first;
+      // }
     } else if (platformParams.macos) {
       await DialogUtil.show<String?>(
           context: context,
