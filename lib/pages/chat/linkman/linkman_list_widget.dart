@@ -455,26 +455,27 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             },
             routeName: 'group_edit');
         List<TileData> slideActions = [];
-        if (groupOwnerPeerId == myself.peerId) {
-          TileData deleteSlideAction = TileData(
-              title: 'Delete',
-              prefix: Icons.group_remove,
-              onTap: (int index, String label, {String? subtitle}) async {
-                groupController.currentIndex = index;
-                if (groupOwnerPeerId == myself.peerId) {
-                  await groupService.removeByGroupId(peerId);
-                  groupMemberService
-                      .delete(where: 'groupId=?', whereArgs: [peerId]);
-                  await chatSummaryService.removeChatSummary(peerId);
-                  await chatMessageService.removeByGroup(peerId);
-                  groupController.delete();
-                  if (mounted) {
-                    DialogUtil.info(context,
-                        content:
-                            '${AppLocalizations.t('Group:')} ${group.name} ${AppLocalizations.t('is deleted')}');
-                  }
+
+        TileData deleteSlideAction = TileData(
+            title: 'Delete',
+            prefix: Icons.group_remove,
+            onTap: (int index, String label, {String? subtitle}) async {
+              groupController.currentIndex = index;
+              if (groupOwnerPeerId == myself.peerId) {
+                await groupService.removeByGroupId(peerId);
+                groupMemberService
+                    .delete(where: 'groupId=?', whereArgs: [peerId]);
+                await chatSummaryService.removeChatSummary(peerId);
+                await chatMessageService.removeByGroup(peerId);
+                groupController.delete();
+                if (mounted) {
+                  DialogUtil.info(context,
+                      content:
+                          '${AppLocalizations.t('Group:')} ${group.name} ${AppLocalizations.t('is deleted')}');
                 }
-              });
+              }
+            });
+        if (groupOwnerPeerId != myself.peerId) {
           slideActions.add(deleteSlideAction);
         }
         TileData dismissSlideAction = TileData(
