@@ -62,7 +62,7 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
       return;
     }
     List<PeerMediaStream> peerMediaStreams =
-        conferenceClient.remotePeerMediaStreams;
+        await conferenceClient.remotePeerMediaStreams;
     if (peerMediaStreams.isNotEmpty) {
       // actionData.add(
       //   ActionData(
@@ -117,12 +117,11 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
   }
 
   ///切换显示按钮面板
-  void _toggleActionCard() {
+  Future<void> _toggleActionCard() async {
     int count = 0;
     var conferenceClient = liveKitConferenceClientPool.conferenceClient;
     if (conferenceClient != null) {
-      count = conferenceClient
-          .remotePeerMediaStreams.length;
+      count = (await conferenceClient.remotePeerMediaStreams).length;
     }
     if (count == 0) {
       controlPanelVisible.value = true;
@@ -162,8 +161,8 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
   Widget _buildGestureDetector(BuildContext context) {
     return GestureDetector(
       child: _buildVideoChatView(context),
-      onDoubleTap: () {
-        _toggleActionCard();
+      onDoubleTap: () async {
+        await _toggleActionCard();
       },
     );
   }
