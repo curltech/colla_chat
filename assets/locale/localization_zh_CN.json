@@ -616,5 +616,16 @@
   "Message": "消息",
   "was canceled": "被撤销",
   "MapLauncher": "地图应用",
-  "Current position": "当前位置"
+  "Current position": "当前位置",
+  "AppName": "应用名称",
+  "AppVersion": "应用版本",
+  "AppVendor": "应用开发者",
+  "VendorUrl": "开发者网址",
+  "LocalHostname": "主机名",
+  "OperatingSystem": "操作系统",
+  "OperatingSystemVersion": "操作系统版本",
+  "Environment Version": "运行环境版本",
+  "DeviceData": "设备信息",
+  "Sqlite3Path": "数据位置",
+  "Platform Information": "平台信息"
 }

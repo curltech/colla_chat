@@ -30,7 +30,7 @@ class PersonalInfoWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'personal_info';
 
   @override
-  IconData get iconData => Icons.personal_video;
+  IconData get iconData => Icons.personal_injury_outlined;
 
   @override
   String get title => 'Personal Information';
@@ -110,6 +110,10 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
       TileData(
         title: 'Mobile',
         suffix: myself.myselfPeer.mobile,
+      ),
+      TileData(
+        title: 'StartDate',
+        suffix: myself.myselfPeer.startDate,
       ),
       TileData(
         title: 'Qrcode',
