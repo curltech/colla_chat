@@ -526,39 +526,66 @@ class LiveKitConferenceClient {
         'on TrackPublishedEvent:${event.participant.identity}:${event.participant.name}');
   }
 
+  List<PeerMediaStream> get remotePeerMediaStreams {
+    for (RemoteParticipant remoteParticipant in remoteParticipants) {
+      for (RemoteTrackPublication<RemoteAudioTrack> audioTrack
+          in remoteParticipant.audioTracks) {
+        RemoteTrack? remoteTrack = audioTrack.track;
+        if (remoteTrack == null) {
+          continue;
+        }
+        _updateRemoteTrack(remoteTrack, remoteParticipant);
+      }
+      for (RemoteTrackPublication<RemoteVideoTrack> videoTrack
+          in remoteParticipant.videoTracks) {
+        RemoteTrack? remoteTrack = videoTrack.track;
+        if (remoteTrack == null) {
+          continue;
+        }
+        _updateRemoteTrack(remoteTrack, remoteParticipant);
+      }
+    }
+    return remotePeerMediaStreamController.peerMediaStreams;
+  }
+
+  Future<void> _updateRemoteTrack(
+      RemoteTrack track, RemoteParticipant remoteParticipant) async {
+    String streamId = track.mediaStream.id;
+    PeerMediaStream? peerMediaStream =
+        await remotePeerMediaStreamController.getPeerMediaStream(streamId);
+    if (peerMediaStream == null) {
+      String identity = remoteParticipant.identity;
+      String name = remoteParticipant.name;
+      PlatformParticipant platformParticipant =
+          PlatformParticipant(identity, name: name);
+      if (track is RemoteVideoTrack) {
+        peerMediaStream = PeerMediaStream(
+            videoTrack: track,
+            platformParticipant: platformParticipant,
+            participant: remoteParticipant);
+      }
+      if (track is RemoteAudioTrack) {
+        peerMediaStream = PeerMediaStream(
+            audioTrack: track,
+            platformParticipant: platformParticipant,
+            participant: remoteParticipant);
+      }
+      if (peerMediaStream != null) {
+        remotePeerMediaStreamController.add(peerMediaStream);
+        log.logger.i(
+            'remotePeerMediaStreamController add peerMediaStream:${peerMediaStream.id}');
+      }
+    }
+  }
+
   Future<FutureOr<void>> _onTrackSubscribedEvent(
       TrackSubscribedEvent event) async {
     log.logger.i(
         'on TrackSubscribedEvent:${event.participant.identity}:${event.participant.name}');
     RemoteTrack? track = event.publication.track;
-    RemoteParticipant remoteParticipant = event.participant;
     if (track != null) {
-      String streamId = track.mediaStream.id;
-      PeerMediaStream? peerMediaStream =
-          await remotePeerMediaStreamController.getPeerMediaStream(streamId);
-      if (peerMediaStream == null) {
-        String identity = remoteParticipant.identity;
-        String name = remoteParticipant.name;
-        PlatformParticipant platformParticipant =
-            PlatformParticipant(identity, name: name);
-        if (track is RemoteVideoTrack) {
-          peerMediaStream = PeerMediaStream(
-              videoTrack: track,
-              platformParticipant: platformParticipant,
-              participant: remoteParticipant);
-        }
-        if (track is RemoteAudioTrack) {
-          peerMediaStream = PeerMediaStream(
-              audioTrack: track,
-              platformParticipant: platformParticipant,
-              participant: remoteParticipant);
-        }
-        if (peerMediaStream != null) {
-          remotePeerMediaStreamController.add(peerMediaStream);
-          log.logger.i(
-              'remotePeerMediaStreamController add peerMediaStream:${peerMediaStream.id}');
-        }
-      }
+      RemoteParticipant remoteParticipant = event.participant;
+      await _updateRemoteTrack(track, remoteParticipant);
     } else {
       log.logger.e('on TrackSubscribedEvent track is null');
     }

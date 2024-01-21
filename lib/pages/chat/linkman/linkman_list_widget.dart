@@ -289,45 +289,47 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
               linkmanNotifier.value = linkman;
             });
         List<TileData> slideActions = [];
+        TileData deleteSlideAction = TileData(
+            title: 'Delete',
+            prefix: Icons.person_remove,
+            onTap: (int index, String label, {String? subtitle}) async {
+              linkmanController.currentIndex = index;
+              await linkmanService.removeByPeerId(linkman.peerId);
+              await chatSummaryService.removeChatSummary(linkman.peerId);
+              await chatMessageService.removeByLinkman(linkman.peerId);
+              linkmanController.delete();
+              if (mounted) {
+                DialogUtil.info(context,
+                    content:
+                        '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is deleted')}');
+              }
+            });
+
         if (peerId != myself.peerId) {
-          TileData deleteSlideAction = TileData(
-              title: 'Delete',
-              prefix: Icons.person_remove,
-              onTap: (int index, String label, {String? subtitle}) async {
-                linkmanController.currentIndex = index;
-                await linkmanService.removeByPeerId(linkman.peerId);
-                await chatSummaryService.removeChatSummary(linkman.peerId);
-                await chatMessageService.removeByLinkman(linkman.peerId);
-                linkmanController.delete();
-                if (mounted) {
-                  DialogUtil.info(context,
-                      content:
-                          '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is deleted')}');
-                }
-              });
           slideActions.add(deleteSlideAction);
         }
-        if (peerId != myself.peerId && linkmanStatus != LinkmanStatus.G.name) {
-          TileData requestSlideAction = TileData(
-              title: 'Request add friend',
-              prefix: Icons.request_quote_outlined,
-              onTap: (int index, String title, {String? subtitle}) async {
-                if (mounted) {
-                  String? tip = await DialogUtil.showTextFormField(context,
-                      title: AppLocalizations.t('Request add friend'),
-                      tip: AppLocalizations.t('I am ') + myself.name!,
-                      content: AppLocalizations.t(
-                          'Please input request add friend tip'));
-                  if (tip != null) {
-                    await linkmanService.addFriend(linkman.peerId, tip);
-                    if (mounted) {
-                      DialogUtil.info(context,
-                          content:
-                              '${AppLocalizations.t('Linkman:')} ${linkman.name} ${AppLocalizations.t('is requested add me as friend')}');
-                    }
+
+        TileData requestSlideAction = TileData(
+            title: 'Request add friend',
+            prefix: Icons.request_quote_outlined,
+            onTap: (int index, String title, {String? subtitle}) async {
+              if (mounted) {
+                String? tip = await DialogUtil.showTextFormField(context,
+                    title: AppLocalizations.t('Request add friend'),
+                    tip: AppLocalizations.t('I am ') + myself.name!,
+                    content: AppLocalizations.t(
+                        'Please input request add friend tip'));
+                if (tip != null) {
+                  await linkmanService.addFriend(linkman.peerId, tip);
+                  if (mounted) {
+                    DialogUtil.info(context,
+                        content:
+                            '${AppLocalizations.t('Linkman:')} ${linkman.name} ${AppLocalizations.t('is requested add me as friend')}');
                   }
                 }
-              });
+              }
+            });
+        if (peerId != myself.peerId && linkmanStatus != LinkmanStatus.G.name) {
           slideActions.add(requestSlideAction);
         }
         TileData chatSlideAction = TileData(
@@ -460,19 +462,16 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             title: 'Delete',
             prefix: Icons.group_remove,
             onTap: (int index, String label, {String? subtitle}) async {
-              groupController.currentIndex = index;
-              if (groupOwnerPeerId == myself.peerId) {
-                await groupService.removeByGroupId(peerId);
-                groupMemberService
-                    .delete(where: 'groupId=?', whereArgs: [peerId]);
-                await chatSummaryService.removeChatSummary(peerId);
-                await chatMessageService.removeByGroup(peerId);
-                groupController.delete();
-                if (mounted) {
-                  DialogUtil.info(context,
-                      content:
-                          '${AppLocalizations.t('Group:')} ${group.name} ${AppLocalizations.t('is deleted')}');
-                }
+              await groupService.removeByGroupId(peerId);
+              groupMemberService
+                  .delete(where: 'groupId=?', whereArgs: [peerId]);
+              await chatSummaryService.removeChatSummary(peerId);
+              await chatMessageService.removeByGroup(peerId);
+              groupController.delete(index: index);
+              if (mounted) {
+                DialogUtil.info(context,
+                    content:
+                        '${AppLocalizations.t('Group:')} ${group.name} ${AppLocalizations.t('is deleted')}');
               }
             });
         if (groupOwnerPeerId != myself.peerId) {
@@ -482,22 +481,22 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             title: 'Dismiss',
             prefix: Icons.group_off,
             onTap: (int index, String label, {String? subtitle}) async {
-              if (group.groupOwnerPeerId == myself.peerId) {
-                bool success = await groupService.dismissGroup(group);
-                if (success) {
-                  groupController.delete(index: index);
-                  if (mounted) {
-                    DialogUtil.info(context,
-                        content:
-                            '${AppLocalizations.t('Group:')} ${group.name} ${AppLocalizations.t('is dismiss')}');
-                  }
-                } else {
-                  if (mounted) {
-                    DialogUtil.error(context, content: 'Must be group owner');
-                  }
+              bool success = await groupService.dismissGroup(group);
+              if (success) {
+                groupMemberService
+                    .delete(where: 'groupId=?', whereArgs: [peerId]);
+                await chatSummaryService.removeChatSummary(peerId);
+                await chatMessageService.removeByGroup(peerId);
+                groupController.delete(index: index);
+                if (mounted) {
+                  DialogUtil.info(context,
+                      content:
+                          '${AppLocalizations.t('Group:')} ${group.name} ${AppLocalizations.t('is dismiss')}');
                 }
               } else {
-                DialogUtil.error(context, content: 'Must be group owner');
+                if (mounted) {
+                  DialogUtil.error(context, content: 'Must be group owner');
+                }
               }
             });
         if (group.groupOwnerPeerId == myself.peerId) {
@@ -566,9 +565,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 }
               }
             });
-        if (conference.conferenceOwnerPeerId == myself.peerId) {
-          slideActions.add(deleteSlideAction);
-        }
+        slideActions.add(deleteSlideAction);
         tile.slideActions = slideActions;
 
         List<TileData> endSlideActions = [];

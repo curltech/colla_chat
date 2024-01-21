@@ -62,7 +62,7 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
       return;
     }
     List<PeerMediaStream> peerMediaStreams =
-        conferenceClient.remotePeerMediaStreamController.peerMediaStreams;
+        conferenceClient.remotePeerMediaStreams;
     if (peerMediaStreams.isNotEmpty) {
       // actionData.add(
       //   ActionData(
@@ -122,7 +122,7 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
     var conferenceClient = liveKitConferenceClientPool.conferenceClient;
     if (conferenceClient != null) {
       count = conferenceClient
-          .remotePeerMediaStreamController.peerMediaStreams.length;
+          .remotePeerMediaStreams.length;
     }
     if (count == 0) {
       controlPanelVisible.value = true;
