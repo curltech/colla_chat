@@ -194,7 +194,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
           Option<String> option = Option<String>(linkman.name, linkman.peerId,
               checked: checked,
               leading: linkman.avatarImage,
-              hint: linkman.email!);
+              hint: linkman.email);
           conferenceOwnerOptions.add(option);
         } else {
           logger.e('Conference member $conferenceMemberId is not linkman');
