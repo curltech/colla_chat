@@ -79,7 +79,7 @@ class _PlatformInfoWidgetState extends State<PlatformInfoWidget>
       ),
       TileData(
         title: 'Environment Version',
-        suffix: platformParams.version,
+        subtitle: platformParams.version,
       ),
       TileData(
         title: 'DeviceData',
