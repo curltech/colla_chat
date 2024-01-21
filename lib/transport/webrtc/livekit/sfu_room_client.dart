@@ -526,6 +526,7 @@ class LiveKitConferenceClient {
         'on TrackPublishedEvent:${event.participant.identity}:${event.participant.name}');
   }
 
+  /// 获取所有的远程参与者的所有流
   Future<List<PeerMediaStream>> get remotePeerMediaStreams async {
     /// 遍历所有的参与者的所有流
     Map<String, PeerMediaStream> peerMediaStreams = {};
