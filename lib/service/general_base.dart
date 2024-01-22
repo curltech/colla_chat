@@ -217,8 +217,12 @@ abstract class GeneralBaseService<T> {
           try {
             List<int> raw = CryptoUtil.stringToUtf8(value!);
             securityContext.payload = raw;
+            int start = DateTime.now().millisecondsSinceEpoch;
             var result = await linkmanCryptographySecurityContextService
                 .encrypt(securityContext);
+            int end = DateTime.now().millisecondsSinceEpoch;
+            logger.i(
+                'encryptField $encryptField time: ${end - start} milliseconds');
             if (!result) {
               logger.e(
                   'linkmanCryptographySecurityContextService encrypt encryptField:$encryptField failure');
@@ -253,8 +257,13 @@ abstract class GeneralBaseService<T> {
           securityContext.payload = data;
           bool result = false;
           try {
+            int start = DateTime.now().millisecondsSinceEpoch;
             result = await linkmanCryptographySecurityContextService
                 .decrypt(securityContext);
+            int end = DateTime.now().millisecondsSinceEpoch;
+            logger.i(
+                'decryptField $encryptField time: ${end - start} milliseconds');
+
           } catch (e) {
             logger
                 .e('SecurityContextService decrypt field:$encryptField err:$e');

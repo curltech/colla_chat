@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/message_slice.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:cryptography/cryptography.dart';
@@ -302,6 +303,7 @@ class CryptoGraphy {
     MessageSlice messageSlice = MessageSlice();
     messageSlice.sliceSize = messageSlice.sliceSize + macLength + nonceLength;
     Map<int, List<int>> slices = messageSlice.slice(message, withPrefix: false);
+    logger.i('message slices length:${slices.length}');
     List<int> decrypted = [];
     for (var slice in slices.values) {
       final SecretBox secretBox = SecretBox.fromConcatenation(slice,
