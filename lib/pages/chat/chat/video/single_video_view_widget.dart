@@ -37,7 +37,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   bool enableMute = false;
   bool enableSpeaker = false;
   bool enableTorch = false;
-  double volume = 0;
+  double volume = 1;
   double zoomLevel = 1;
 
   late OverlayEntry _popupDialog;
@@ -46,7 +46,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   initState() {
     super.initState();
     widget.peerMediaStreamController.addListener(_updateSelected);
-    volume = widget.peerMediaStream.getVolume() ?? 0;
+    volume = widget.peerMediaStream.getVolume() ?? 1;
     enableMute = widget.peerMediaStream.isMuted() ?? false;
   }
 

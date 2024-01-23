@@ -71,7 +71,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       ValueNotifier<VideoChatStatus>(VideoChatStatus.end);
 
   //Speaker状态
-  ValueNotifier<bool> speakerStatus = ValueNotifier<bool>(true);
+  ValueNotifier<bool> speakerStatus = ValueNotifier<bool>(false);
 
   //控制面板可见性的计时器
   Timer? _hideControlPanelTimer;
@@ -607,12 +607,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             label: 'Speaker',
             tip: status ? 'On' : 'Off',
             onPressed: () async {
-              speakerStatus.value = !speakerStatus.value;
-              await MediaStreamUtil.setSpeakerphoneOn(speakerStatus.value);
-              // await conferenceChatMessageController?.setAudioContext(
-              //     route: status
-              //         ? AudioContextConfigRoute.speaker
-              //         : AudioContextConfigRoute.system);
+              await MediaStreamUtil.setSpeakerphoneOn(!status);
+              speakerStatus.value = !status;
             },
             backgroundColor: status ? Colors.green : Colors.white,
             child: Icon(

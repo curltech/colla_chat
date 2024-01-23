@@ -104,6 +104,12 @@ class MediaStreamUtil {
     return await navigator.mediaDevices.enumerateDevices();
   }
 
+  static Future<List<MediaDeviceInfo>> get cameras =>
+      Helper.enumerateDevices('videoinput');
+
+  static Future<List<MediaDeviceInfo>> get audiooutputs =>
+      Helper.enumerateDevices('audiooutput');
+
   ///获取媒体轨道支持的参数
   static MediaTrackSupportedConstraints getSupportedConstraints() {
     var mediaTrackSupportedConstraints =
@@ -142,6 +148,10 @@ class MediaStreamUtil {
         return await Helper.setZoom(track, zoomLevel);
       }
     }
+  }
+
+  static Future<void> selectAudioOutput(String deviceId) async {
+    await Helper.selectAudioOutput(deviceId);
   }
 
   /// 对视频流的第一个音频轨道切换音频播放设备，对手机来说就是耳机还是喇叭
