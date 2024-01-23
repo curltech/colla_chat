@@ -15,7 +15,7 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/transport/openai/openai_chat_gpt.dart';
+import 'package:colla_chat/transport/openai/openai_client.dart';
 import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
@@ -30,7 +30,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   TransportType transportType = TransportType.webrtc;
 
   //是否是chatGPT聊天和chatGPT方式
-  ChatGPT? chatGPT;
+  OpenAIClient? chatGPT;
   ChatGPTAction chatGPTAction = ChatGPTAction.chat;
 
   //调度删除时间
@@ -52,7 +52,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         linkmanService.findCachedOneByPeerId(peerId!).then((Linkman? linkman) {
           if (linkman != null) {
             if (linkman.linkmanStatus == LinkmanStatus.G.name) {
-              ChatGPT chatGPT = ChatGPT(linkman.peerId);
+              OpenAIClient chatGPT = OpenAIClient(linkman.peerId);
               chatGPT = chatGPT;
             } else {
               chatGPT = null;

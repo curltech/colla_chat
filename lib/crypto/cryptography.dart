@@ -7,6 +7,8 @@ import 'package:colla_chat/tool/message_slice.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:cryptography/cryptography.dart';
 
+enum AlgoType { gcm, ctr, cbc, chacha20, xchacha20 }
+
 class CryptoGraphy {
   CryptoGraphy();
 
@@ -85,7 +87,8 @@ class CryptoGraphy {
   Future<String> export(SimpleKeyPair keyPair, List<int> passphrase) async {
     SimpleKeyPairData simpleKeyPairData = await keyPair.extract();
     List<int> keyPairBytes = simpleKeyPairData.bytes;
-    List<int> encryptText = await aesEncrypt(keyPairBytes, passphrase);
+    List<int> encryptText =
+        await aesEncrypt(keyPairBytes, passphrase, algoType: AlgoType.gcm);
     String baseStr = CryptoUtil.encodeBase64(encryptText);
 
     return baseStr;
@@ -97,7 +100,8 @@ class CryptoGraphy {
       {KeyPairType type = KeyPairType.ed25519}) async {
     if (passphrase.isNotEmpty) {
       Uint8List rawText = CryptoUtil.decodeBase64(base64KeyPair);
-      var clearText = await aesDecrypt(rawText, passphrase);
+      var clearText =
+          await aesDecrypt(rawText, passphrase, algoType: AlgoType.gcm);
       SimpleKeyPair simpleKeyPair =
           SimpleKeyPairData(clearText, publicKey: publicKey, type: type);
 
@@ -191,7 +195,9 @@ class CryptoGraphy {
   /// ecc加密是采用公钥加密，私钥解密，
   /// 加密后结果的前32位是本地公钥，后面是密文
   Future<List<int>> eccEncrypt(List<int> message,
-      {String? base64PublicKey, PublicKey? remotePublicKey}) async {
+      {String? base64PublicKey,
+      PublicKey? remotePublicKey,
+      AlgoType algoType = AlgoType.gcm}) async {
     if (remotePublicKey == null) {
       if (base64PublicKey != null) {
         remotePublicKey = importPublicKey(base64PublicKey) as PublicKey;
@@ -202,7 +208,8 @@ class CryptoGraphy {
           await generateSessionKey(remotePublicKey: remotePublicKey);
       var localPublicKeyBytes = passphrase.sublist(0, publicKeyLength);
       var sharedSecretBytes = passphrase.sublist(publicKeyLength);
-      var result = await aesEncrypt(message, sharedSecretBytes);
+      var result =
+          await aesEncrypt(message, sharedSecretBytes, algoType: AlgoType.gcm);
 
       return CryptoUtil.concat(localPublicKeyBytes, result);
     }
@@ -212,7 +219,7 @@ class CryptoGraphy {
   /// 结合x25519密钥交换和aes进行ecc加解密,里面涉及的密钥对是x25519协议
   /// ecc加密是采用公钥加密，私钥解密，
   Future<List<int>> eccDecrypt(List<int> message,
-      {required SimpleKeyPair localKeyPair}) async {
+      {required SimpleKeyPair localKeyPair, algoType = AlgoType.gcm}) async {
     var remotePublicKeyBytes = message.sublist(0, publicKeyLength);
     var msg = message.sublist(publicKeyLength);
     SimplePublicKey remotePublicKey =
@@ -221,30 +228,30 @@ class CryptoGraphy {
         localKeyPair: localKeyPair, remotePublicKey: remotePublicKey);
     var localPublicKeyBytes = passphrase.sublist(0, publicKeyLength);
     var sharedSecretBytes = passphrase.sublist(publicKeyLength);
-    var result = await aesDecrypt(msg, sharedSecretBytes);
+    var result = await aesDecrypt(msg, sharedSecretBytes, algoType: algoType);
 
     return result;
   }
 
   Future<List<int>> aesEncrypt(List<int> message, List<int> passphrase,
-      {String type = 'gcm'}) async {
+      {AlgoType algoType = AlgoType.gcm}) async {
     // Choose the cipher
     var hashPassphrase = await hash(passphrase);
     Cipher algorithm;
-    switch (type) {
-      case 'gcm':
+    switch (algoType) {
+      case AlgoType.gcm:
         algorithm = AesGcm.with256bits();
         break;
-      case 'ctr':
+      case AlgoType.ctr:
         algorithm = AesCtr.with256bits(macAlgorithm: Hmac.sha256());
         break;
-      case 'cbc':
+      case AlgoType.cbc:
         algorithm = AesCbc.with256bits(macAlgorithm: Hmac.sha256());
         break;
-      case 'chacha20':
+      case AlgoType.chacha20:
         algorithm = Chacha20.poly1305Aead();
         break;
-      case 'xchacha20':
+      case AlgoType.xchacha20:
         algorithm = Xchacha20.poly1305Aead();
         break;
       default:
@@ -252,7 +259,6 @@ class CryptoGraphy {
         break;
     }
     final secretKey = SecretKey(hashPassphrase);
-    List<int>? encryptedData;
 
     ///数据分片处理器
     MessageSlice messageSlice = MessageSlice();
@@ -273,23 +279,23 @@ class CryptoGraphy {
   static const nonceLength = 12;
 
   Future<List<int>> aesDecrypt(List<int> message, List<int> passphrase,
-      {String type = 'gcm'}) async {
+      {AlgoType algoType = AlgoType.gcm}) async {
     var hashPassphrase = await hash(passphrase);
     Cipher algorithm;
-    switch (type) {
-      case 'gcm':
+    switch (algoType) {
+      case AlgoType.gcm:
         algorithm = AesGcm.with256bits();
         break;
-      case 'ctr':
+      case AlgoType.ctr:
         algorithm = AesCtr.with256bits(macAlgorithm: Hmac.sha256());
         break;
-      case 'cbc':
+      case AlgoType.cbc:
         algorithm = AesCbc.with256bits(macAlgorithm: Hmac.sha256());
         break;
-      case 'chacha20':
+      case AlgoType.chacha20:
         algorithm = Chacha20.poly1305Aead();
         break;
-      case 'xchacha20':
+      case AlgoType.xchacha20:
         algorithm = Xchacha20.poly1305Aead();
         break;
       default:
@@ -323,13 +329,15 @@ class CryptoGraphy {
   /// @param {*} msg
   /// @param {*} receivers
   /// @param {*} options privateKey私钥
-  Future<Map<String, Object>> encrypt(List<int> msg, SimpleKeyPair privateKey,
-      List<SimplePublicKey> receivers) async {
+  Future<Map<String, Object>> encrypt(
+      List<int> msg, SimpleKeyPair privateKey, List<SimplePublicKey> receivers,
+      {AlgoType algoType = AlgoType.gcm}) async {
     List<int> key = await getRandomBytes();
-    List<int> encrypted = await aesEncrypt(msg, key);
+    List<int> encrypted = await aesEncrypt(msg, key, algoType: algoType);
     List<List<int>> encryptedKeys = [];
     for (var receiver in receivers) {
-      var encryptedKey = await eccEncrypt(key, remotePublicKey: receiver);
+      var encryptedKey =
+          await eccEncrypt(key, remotePublicKey: receiver, algoType: algoType);
       encryptedKeys.add(encryptedKey);
     }
 
@@ -342,9 +350,11 @@ class CryptoGraphy {
   /// @param {*} receiver
   /// @param {*} options
   Future<List<int>> decrypt(List<int> msg, List<int> encryptedKey,
-      SimpleKeyPair privateKey, SimplePublicKey senderPublicKey) async {
-    var key = await eccDecrypt(encryptedKey, localKeyPair: privateKey);
-    var decrypted = aesDecrypt(msg, key);
+      SimpleKeyPair privateKey, SimplePublicKey senderPublicKey,
+      {AlgoType algoType = AlgoType.gcm}) async {
+    var key = await eccDecrypt(encryptedKey,
+        localKeyPair: privateKey, algoType: algoType);
+    var decrypted = aesDecrypt(msg, key, algoType: algoType);
 
     return decrypted;
   }

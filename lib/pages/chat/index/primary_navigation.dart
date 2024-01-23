@@ -158,10 +158,12 @@ class PrimaryNavigation {
               indexWidgetProvider.push(routeName);
             },
             icon: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-              Icon(
-                view.iconData,
-                color: myself.secondary,
-              ),
+              view.iconData is IconData
+                  ? Icon(
+                      view.iconData,
+                      color: myself.secondary,
+                    )
+                  : view.iconData,
               const SizedBox(
                 width: 10.0,
               ),

@@ -16,7 +16,7 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/transport/openai/openai_chat_gpt.dart';
+import 'package:colla_chat/transport/openai/openai_client.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
@@ -302,7 +302,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
         ));
 
     ///长按弹出式菜单
-    ChatGPT? chatGPT = chatMessageController.chatGPT;
+    OpenAIClient? chatGPT = chatMessageController.chatGPT;
     CustomPopupMenuController menuController = CustomPopupMenuController();
     Widget menu = MenuUtil.buildPopupMenu(
         child: sendButton,

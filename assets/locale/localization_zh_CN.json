@@ -627,5 +627,8 @@
   "Environment Version": "运行环境版本",
   "DeviceData": "设备信息",
   "Sqlite3Path": "数据位置",
-  "Platform Information": "平台信息"
+  "Platform Information": "平台信息",
+  "ApiKey": "令牌",
+  "Model": "模型",
+  "Organization": "组织"
 }

@@ -2,8 +2,9 @@ import 'dart:io';
 
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:dart_openai/dart_openai.dart';
+import 'package:http/http.dart' as http;
 
-///提供ChatGpt完整的功能，包括聊天，翻译，训练，优化，设置规则，图像生成，语音识别
+///dart_openai, 提供ChatGpt完整的功能，包括聊天，翻译，训练，优化，设置规则，图像生成，语音识别
 ///
 ///  'text-davinci-003';
 ///  'text-davinci-002';
@@ -13,18 +14,22 @@ import 'package:dart_openai/dart_openai.dart';
 ///  gpt-4, gpt-4-0314, gpt-4-32k, gpt-4-32k-0314，
 ///  whisper-1
 ///  davinci, curie, babbage, ada
-class ChatGPT {
+class OpenAIClient {
   static String translate =
       'Translate this into 1. French, 2. Spanish and 3. Japanese:\n\n';
   static String extract = 'Extract keywords from this text:\n\n';
   late OpenAI openAI;
-  late String model;
+  String model;
 
-  ChatGPT(String apiKey,
-      {String? organization, this.model = 'gpt-3.5-turbo-0301'}) {
+  OpenAIClient(String apiKey,
+      {String? organization, this.model = 'gpt-3.5-turbo-1106'}) {
     OpenAI.apiKey = apiKey;
     OpenAI.organization = organization;
+    OpenAI.requestsTimeOut = const Duration(seconds: 60);
+    // OpenAI.baseUrl = "https://api.openai.com/v1";
     openAI = OpenAI.instance;
+    OpenAI.showLogs = true;
+    OpenAI.showResponsesLogs = true;
   }
 
   ///列出模型
@@ -41,7 +46,14 @@ class ChatGPT {
     return model;
   }
 
-  ///发起completion
+  ///删除模型
+  Future<bool> deleteModel(String fineTuneId) async {
+    bool success = await openAI.model.delete(fineTuneId);
+
+    return success;
+  }
+
+  ///发起通用的completion
   Future<OpenAICompletionModel> completion({
     required String model,
     dynamic prompt,
@@ -71,39 +83,44 @@ class ChatGPT {
     Map<String, dynamic>? logitBias,
     //A unique identifier representing your end-user
     String? user,
+    http.Client? client,
+    int? seed,
   }) async {
     OpenAICompletionModel completion = await openAI.completion.create(
-      //"text-davinci-003",
-      model: model,
-      //"Dart is a progr",
-      prompt: prompt,
-      suffix: suffix,
-      //20,
-      maxTokens: maxTokens,
-      //0.5,
-      temperature: temperature,
-      topP: topP,
-      //1,
-      n: n,
-      logprobs: logprobs,
-      //["\n"],
-      stop: stop,
-      //true,
-      echo: echo,
-      presencePenalty: presencePenalty,
-      frequencyPenalty: frequencyPenalty,
-      bestOf: bestOf,
-      logitBias: logitBias,
-      user: user,
-    );
+        //"gpt-3.5-turbo-1106",
+        model: model,
+        //"Dart is a progr",
+        prompt: prompt,
+        suffix: suffix,
+        //20,
+        maxTokens: maxTokens,
+        //0.5,
+        temperature: temperature,
+        topP: topP,
+        //1,
+        n: n,
+        logprobs: logprobs,
+        //["\n"],
+        stop: stop,
+        //true,
+        echo: echo,
+        presencePenalty: presencePenalty,
+        frequencyPenalty: frequencyPenalty,
+        bestOf: bestOf,
+        logitBias: logitBias,
+        user: user,
+        client: client,
+        seed: seed);
 
     return completion;
   }
 
-  ///流的方式发起completion，回答在onChoices回调函数中处理
+  ///流的方式发起通用的completion，回答在onChoices回调函数中处理
   completionStream({
     required String model,
     dynamic prompt,
+    required Function(List<OpenAIStreamCompletionModelChoice> choices)
+        onChoices,
     String? suffix,
     int? maxTokens,
     double? temperature,
@@ -117,34 +134,35 @@ class ChatGPT {
     int? bestOf,
     Map<String, dynamic>? logitBias,
     String? user,
-    required Function(List<OpenAIStreamCompletionModelChoice> choices)
-        onChoices,
+    http.Client? client,
+    int? seed,
   }) {
     Stream<OpenAIStreamCompletionModel> completionStream =
         openAI.completion.createStream(
-      model: model,
-      //"text-davinci-003",
-      prompt: prompt,
-      //"Dart is a progr",
-      suffix: suffix,
-      maxTokens: maxTokens,
-      //20,
-      temperature: temperature,
-      //0.5,
-      topP: topP,
-      n: n,
-      //1,
-      logprobs: logprobs,
-      stop: stop,
-      //["\n"],
-      echo: echo,
-      //true,
-      presencePenalty: presencePenalty,
-      frequencyPenalty: frequencyPenalty,
-      bestOf: bestOf,
-      logitBias: logitBias,
-      user: user,
-    );
+            model: model,
+            //"gpt-3.5-turbo-1106",
+            prompt: prompt,
+            //"Dart is a progr",
+            suffix: suffix,
+            maxTokens: maxTokens,
+            //20,
+            temperature: temperature,
+            //0.5,
+            topP: topP,
+            n: n,
+            //1,
+            logprobs: logprobs,
+            stop: stop,
+            //["\n"],
+            echo: echo,
+            //true,
+            presencePenalty: presencePenalty,
+            frequencyPenalty: frequencyPenalty,
+            bestOf: bestOf,
+            logitBias: logitBias,
+            user: user,
+            client: client,
+            seed: seed);
 
     completionStream.listen((event) {
       onChoices(event.choices);
@@ -163,21 +181,26 @@ class ChatGPT {
     double? frequencyPenalty,
     Map<String, dynamic>? logitBias,
     String? user,
+    Map<String, String>? responseFormat,
+    int? seed,
+    http.Client? client,
   }) async {
-    OpenAIChatCompletionModel chatCompletion =
-        await OpenAI.instance.chat.create(
-      model: model,
-      messages: messages,
-      maxTokens: maxTokens,
-      temperature: temperature,
-      topP: topP,
-      n: n,
-      stop: stop,
-      presencePenalty: presencePenalty,
-      frequencyPenalty: frequencyPenalty,
-      logitBias: logitBias,
-      user: user,
-    );
+    OpenAIChatCompletionModel chatCompletion = await OpenAI.instance.chat
+        .create(
+            model: model,
+            messages: messages,
+            maxTokens: maxTokens,
+            temperature: temperature,
+            topP: topP,
+            n: n,
+            stop: stop,
+            presencePenalty: presencePenalty,
+            frequencyPenalty: frequencyPenalty,
+            logitBias: logitBias,
+            user: user,
+            responseFormat: responseFormat,
+            client: client,
+            seed: seed);
 
     return chatCompletion;
   }
@@ -225,15 +248,16 @@ class ChatGPT {
     int? n,
     double? temperature,
     double? topP,
+    http.Client? client,
   }) async {
     OpenAIEditModel edit = await openAI.edit.create(
-      model: model,
-      instruction: instruction,
-      input: input,
-      n: n,
-      temperature: temperature,
-      topP: topP,
-    );
+        model: model,
+        instruction: instruction,
+        input: input,
+        n: n,
+        temperature: temperature,
+        topP: topP,
+        client: client);
     return edit;
   }
 
@@ -244,14 +268,15 @@ class ChatGPT {
     OpenAIImageSize? size = OpenAIImageSize.size256,
     OpenAIImageResponseFormat? responseFormat = OpenAIImageResponseFormat.url,
     String? user = 'user',
+    http.Client? client,
   }) async {
     OpenAIImageModel image = await openAI.image.create(
-      prompt: prompt,
-      n: n,
-      size: size,
-      responseFormat: responseFormat,
-      user: user,
-    );
+        prompt: prompt,
+        n: n,
+        size: size,
+        responseFormat: responseFormat,
+        user: user,
+        client: client);
 
     return image;
   }
@@ -302,14 +327,38 @@ class ChatGPT {
   Future<OpenAIEmbeddingsModel> createEmbeddings({
     required String model,
     required dynamic input,
-    String? user,
+    String? user = 'user',
+    http.Client? client,
   }) async {
-    OpenAIEmbeddingsModel embeddings = await openAI.embedding.create(
-      model: model,
-      input: input,
-    );
+    OpenAIEmbeddingsModel embeddings = await openAI.embedding
+        .create(model: model, input: input, user: user, client: client);
 
     return embeddings;
+  }
+
+  ///语音转录
+  /// responseFormat:json, text, srt, verbose_json, or vtt
+  Future<File> createSpeech({
+    required String model, //"tts-1"
+    required String input,
+    required String voice, //"nova",
+    OpenAIAudioSpeechResponseFormat? responseFormat =
+        OpenAIAudioSpeechResponseFormat.mp3,
+    double? speed,
+    String outputFileName = "output",
+    Directory? outputDirectory,
+  }) async {
+    File file = await openAI.audio.createSpeech(
+      model: model,
+      input: input,
+      voice: voice,
+      responseFormat: responseFormat,
+      speed: speed,
+      outputFileName: outputFileName,
+      outputDirectory: outputDirectory,
+    );
+
+    return file;
   }
 
   ///语音转录
@@ -318,7 +367,7 @@ class ChatGPT {
     required File file,
     String model = "whisper-1",
     String? prompt,
-    OpenAIAudioResponseFormat? responseFormat,
+    OpenAIAudioResponseFormat? responseFormat = OpenAIAudioResponseFormat.json,
     double? temperature,
     String? language,
   }) async {
@@ -340,7 +389,7 @@ class ChatGPT {
     required File file,
     String model = "whisper-1",
     String? prompt,
-    OpenAIAudioResponseFormat? responseFormat,
+    OpenAIAudioResponseFormat? responseFormat = OpenAIAudioResponseFormat.text,
     double? temperature,
   }) async {
     OpenAIAudioModel translation = await openAI.audio.createTranslation(
@@ -412,6 +461,7 @@ class ChatGPT {
     int? classificationPositiveClass,
     int? classificationBetas,
     String? suffix,
+    http.Client? client,
   }) async {
     OpenAIFineTuneModel fineTune = await openAI.fineTune.create(
       trainingFile: trainingFile,
@@ -425,46 +475,63 @@ class ChatGPT {
       classificationPositiveClass: classificationPositiveClass,
       classificationBetas: classificationBetas,
       suffix: suffix,
+      client: client,
     );
 
     return fineTune;
   }
 
   ///列出fine tune任务
-  Future<List<OpenAIFineTuneModel>> listFineTunes() async {
-    List<OpenAIFineTuneModel> fineTunes = await openAI.fineTune.list();
+  Future<List<OpenAIFineTuneModel>> listFineTunes({
+    http.Client? client,
+  }) async {
+    List<OpenAIFineTuneModel> fineTunes =
+        await openAI.fineTune.list(client: client);
 
     return fineTunes;
   }
 
   ///获取fine tune任务
-  Future<OpenAIFineTuneModel> retrieveFineTune(String fineTuneId) async {
-    OpenAIFineTuneModel fineTune = await openAI.fineTune.retrieve(fineTuneId);
+  Future<OpenAIFineTuneModel> retrieveFineTune(
+    String fineTuneId, {
+    http.Client? client,
+  }) async {
+    OpenAIFineTuneModel fineTune =
+        await openAI.fineTune.retrieve(fineTuneId, client: client);
 
     return fineTune;
   }
 
   ///撤销fine tune任务
-  Future<OpenAIFineTuneModel> cancelFineTune(String fineTuneId) async {
+  Future<OpenAIFineTuneModel> cancelFineTune(
+    String fineTuneId, {
+    http.Client? client,
+  }) async {
     OpenAIFineTuneModel cancelledFineTune =
-        await openAI.fineTune.cancel(fineTuneId);
+        await openAI.fineTune.cancel(fineTuneId, client: client);
 
     return cancelledFineTune;
   }
 
   ///列出fine tune任务的事件
-  Future<List<OpenAIFineTuneEventModel>> listEvent(String fineTuneId) async {
+  Future<List<OpenAIFineTuneEventModel>> listEvent(
+    String fineTuneId, {
+    http.Client? client,
+  }) async {
     List<OpenAIFineTuneEventModel> events =
-        await openAI.fineTune.listEvents(fineTuneId);
+        await openAI.fineTune.listEvents(fineTuneId, client: client);
 
     return events;
   }
 
   ///流模式列出fine tune任务的事件
   listEventStream(
-      String fineTuneId, Function(OpenAIFineTuneEventStreamModel) onEvent) {
+    String fineTuneId,
+    Function(OpenAIFineTuneEventStreamModel) onEvent, {
+    http.Client? client,
+  }) {
     Stream<OpenAIFineTuneEventStreamModel> eventsStream =
-        openAI.fineTune.listEventsStream(fineTuneId);
+        openAI.fineTune.listEventsStream(fineTuneId, client: client);
 
     eventsStream.listen(onEvent).onError((err) {
       logger.e('$err');
@@ -472,18 +539,24 @@ class ChatGPT {
   }
 
   ///删除fine tune任务
-  Future<bool> deleteFineTune(String fineTuneId) async {
-    bool deleted = await openAI.fineTune.delete(fineTuneId);
+  Future<bool> deleteFineTune(
+    String fineTuneId, {
+    http.Client? client,
+  }) async {
+    bool deleted = await openAI.fineTune.delete(fineTuneId, client: client);
 
     return deleted;
   }
 
   ///创建适合的规则
-  Future<OpenAIModerationModel> createModeration(
-      {required String input, String? model}) async {
+  Future<OpenAIModerationModel> createModeration({
+    required String input,
+    String? model,
+    http.Client? client,
+  }) async {
     try {
-      OpenAIModerationModel moderation =
-          await openAI.moderation.create(input: input, model: model);
+      OpenAIModerationModel moderation = await openAI.moderation
+          .create(input: input, model: model, client: client);
 
       return moderation;
     } on Exception catch (e) {

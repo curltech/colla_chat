@@ -28,7 +28,7 @@ import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/transport/openai/openai_chat_gpt.dart';
+import 'package:colla_chat/transport/openai/openai_client.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
@@ -276,7 +276,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
       return;
     }
     if (linkman.linkmanStatus == LinkmanStatus.G.name) {
-      ChatGPT chatGPT = ChatGPT(linkman.peerId);
+      OpenAIClient chatGPT = OpenAIClient(linkman.peerId);
       if (StringUtil.isNotEmpty(linkman.peerPublicKey)) {
         chatGPT.model = linkman.peerPublicKey!;
       }

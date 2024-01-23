@@ -353,9 +353,8 @@ dependencies:
   flutter_native_splash: ^2.2.19
   system_tray: ^2.0.3
   tray_manager: ^0.2.0
-  chat_gpt_sdk: ^2.0.4
-  whisper_dart: ^0.0.11
-  dart_chatgpt: ^1.0.2
+  chat_gpt_sdk: ^2.2.8
+  dart_openai: ^5.0.0
   livekit_client: ^1.5.3 #livekit sfu server flutter client
   livekit_server_sdk: ^1.0.0
 dependency_overrides:

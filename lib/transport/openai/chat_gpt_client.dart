@@ -1,10 +1,10 @@
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 
-///提供ChatGpt简单的文本聊天和翻译功能
-class ChatGPTChat {
+///chat_gpt_sdk, 提供ChatGpt client功能
+class ChatGPTClient {
   late final OpenAI openAI;
 
-  ChatGPTChat(String apiKey) {
+  ChatGPTClient(String apiKey) {
     openAI = OpenAI.instance.build(
         token: apiKey,
         baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 5)),

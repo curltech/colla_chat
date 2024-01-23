@@ -16,53 +16,6 @@ import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-final List<PlatformDataField> chatGPTColumnFieldDefs = [
-  PlatformDataField(
-      name: 'peerId',
-      label: 'ApiKey',
-      prefixIcon: Icon(
-        Icons.key,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'peerPublicKey',
-      label: 'Model',
-      prefixIcon: Icon(
-        Icons.model_training,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'name',
-      label: 'LoginName',
-      prefixIcon: Icon(
-        Icons.person,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'alias',
-      label: 'Organization',
-      prefixIcon: Icon(
-        Icons.person_pin,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'email',
-      label: 'Email',
-      prefixIcon: Icon(
-        Icons.email,
-        color: myself.primary,
-      ),
-      inputType: InputType.text),
-  PlatformDataField(
-      name: 'publicKey',
-      label: 'Password',
-      inputType: InputType.password,
-      prefixIcon: Icon(
-        Icons.password,
-        color: myself.primary,
-      )),
-];
-
 //联系人信息页面
 class ChatGPTAddWidget extends StatefulWidget with TileDataMixin {
   const ChatGPTAddWidget({super.key});
@@ -87,8 +40,55 @@ class ChatGPTAddWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _ChatGPTAddWidgetState extends State<ChatGPTAddWidget> {
-  final FormInputController controller =
-      FormInputController(chatGPTColumnFieldDefs);
+  final List<PlatformDataField> chatGPTDataFields = [
+    PlatformDataField(
+        name: 'peerId',
+        label: 'ApiKey',
+        prefixIcon: Icon(
+          Icons.key,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'peerPublicKey',
+        label: 'Model',
+        prefixIcon: Icon(
+          Icons.model_training,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'name',
+        label: 'LoginName',
+        prefixIcon: Icon(
+          Icons.person,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'alias',
+        label: 'Organization',
+        prefixIcon: Icon(
+          Icons.person_pin,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'email',
+        label: 'Email',
+        prefixIcon: Icon(
+          Icons.email,
+          color: myself.primary,
+        ),
+        inputType: InputType.text),
+    PlatformDataField(
+        name: 'publicKey',
+        label: 'Password',
+        inputType: InputType.password,
+        prefixIcon: Icon(
+          Icons.password,
+          color: myself.primary,
+        )),
+  ];
+
+  late final FormInputController controller =
+      FormInputController(chatGPTDataFields);
   Linkman? linkman;
 
   @override
