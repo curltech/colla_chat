@@ -26,6 +26,7 @@ import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/connectivity_util.dart';
 import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
@@ -432,6 +433,12 @@ class _ChatListWidgetState extends State<ChatListWidget>
         title: 'Delete',
         prefix: Icons.bookmark_remove,
         onTap: (int index, String label, {String? subtitle}) async {
+          bool? confirm = await DialogUtil.confirm(context,
+              content:
+              '${AppLocalizations.t('Do you want delete chat messages of ')} $name');
+          if (confirm != true) {
+            return;
+          }
           chatSummaryController.currentIndex = index;
           await chatSummaryService.removeChatSummary(peerId);
           await chatMessageService.removeByLinkman(peerId);

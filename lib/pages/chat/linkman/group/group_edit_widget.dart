@@ -394,7 +394,11 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     //处理删除的成员
     if (oldMembers is List<GroupMember> && oldMembers.isNotEmpty) {
       //对所有的成员发送组员删除的消息
-      bool allowed = groupService.canRemoveGroupMember(current, oldMembers);
+      List<String> oldMemberIds = [];
+      for (var oldMember in oldMembers) {
+        oldMemberIds.add(oldMember.memberPeerId!);
+      }
+      bool allowed = groupService.canRemoveGroupMember(current, oldMemberIds);
       if (!allowed) {
         if (mounted) {
           DialogUtil.error(context,
@@ -402,7 +406,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
                   'Not group owner or myself, can not remove group member');
         }
       } else {
-        await groupService.removeGroupMember(current, oldMembers);
+        await groupService.removeGroupMember(current, oldMemberIds);
       }
     }
     if (currentGroup.id == null || groupModified) {

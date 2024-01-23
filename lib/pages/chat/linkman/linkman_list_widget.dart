@@ -293,6 +293,12 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             title: 'Delete',
             prefix: Icons.person_remove,
             onTap: (int index, String label, {String? subtitle}) async {
+              bool? confirm = await DialogUtil.confirm(context,
+                  content:
+                      '${AppLocalizations.t('Do you want delete linkman')} ${linkman.name}');
+              if (confirm != true) {
+                return;
+              }
               linkmanController.currentIndex = index;
               await linkmanService.removeByPeerId(linkman.peerId);
               await chatSummaryService.removeChatSummary(linkman.peerId);
@@ -352,6 +358,12 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 title: 'Remove friend',
                 prefix: Icons.person_remove_outlined,
                 onTap: (int index, String title, {String? subtitle}) async {
+                  bool? confirm = await DialogUtil.confirm(context,
+                      content:
+                          '${AppLocalizations.t('Do you want remove friend')} ${linkman.name}');
+                  if (confirm != true) {
+                    return;
+                  }
                   await _changeLinkmanStatus(linkman, LinkmanStatus.S);
                   if (mounted) {
                     DialogUtil.info(context,
@@ -367,6 +379,12 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 title: 'Add friend',
                 prefix: Icons.person_add_outlined,
                 onTap: (int index, String title, {String? subtitle}) async {
+                  bool? confirm = await DialogUtil.confirm(context,
+                      content:
+                          '${AppLocalizations.t('Do you want add friend')} ${linkman.name}');
+                  if (confirm != true) {
+                    return;
+                  }
                   await _changeLinkmanStatus(linkman, LinkmanStatus.F);
                   if (mounted) {
                     DialogUtil.info(context,
@@ -381,6 +399,12 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                   title: 'Remove blacklist',
                   prefix: Icons.person_outlined,
                   onTap: (int index, String title, {String? subtitle}) async {
+                    bool? confirm = await DialogUtil.confirm(context,
+                        content:
+                            '${AppLocalizations.t('Do you want remove blacklist')} ${linkman.name}');
+                    if (confirm != true) {
+                      return;
+                    }
                     await _changeLinkmanStatus(linkman, LinkmanStatus.S);
                     if (mounted) {
                       DialogUtil.info(context,
@@ -394,6 +418,12 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 title: 'Add blacklist',
                 prefix: Icons.person_off,
                 onTap: (int index, String title, {String? subtitle}) async {
+                  bool? confirm = await DialogUtil.confirm(context,
+                      content:
+                          '${AppLocalizations.t('Do you want add blacklist')} ${linkman.name}');
+                  if (confirm != true) {
+                    return;
+                  }
                   await _changeLinkmanStatus(linkman, LinkmanStatus.B);
                   if (mounted) {
                     DialogUtil.info(context,
@@ -408,6 +438,12 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                   title: 'Remove subscript',
                   prefix: Icons.unsubscribe,
                   onTap: (int index, String title, {String? subtitle}) async {
+                    bool? confirm = await DialogUtil.confirm(context,
+                        content:
+                            '${AppLocalizations.t('Do you want remove subscript')} ${linkman.name}');
+                    if (confirm != true) {
+                      return;
+                    }
                     await _changeSubscriptStatus(linkman, LinkmanStatus.N);
                     if (mounted) {
                       DialogUtil.info(context,
@@ -421,6 +457,12 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 title: 'Add subscript',
                 prefix: Icons.subscriptions,
                 onTap: (int index, String title, {String? subtitle}) async {
+                  bool? confirm = await DialogUtil.confirm(context,
+                      content:
+                          '${AppLocalizations.t('Do you want add subscript')} ${linkman.name}');
+                  if (confirm != true) {
+                    return;
+                  }
                   await _changeSubscriptStatus(linkman, LinkmanStatus.C);
                   if (mounted) {
                     DialogUtil.info(context,
@@ -462,6 +504,13 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             title: 'Delete',
             prefix: Icons.group_remove,
             onTap: (int index, String label, {String? subtitle}) async {
+              bool? confirm = await DialogUtil.confirm(context,
+                  content:
+                      '${AppLocalizations.t('Do you want delete group')} ${group.name}');
+              if (confirm != true) {
+                return;
+              }
+              await groupService.removeGroupMember(group, [myself.peerId!]);
               await groupService.removeByGroupId(peerId);
               groupMemberService
                   .delete(where: 'groupId=?', whereArgs: [peerId]);
@@ -481,6 +530,12 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             title: 'Dismiss',
             prefix: Icons.group_off,
             onTap: (int index, String label, {String? subtitle}) async {
+              bool? confirm = await DialogUtil.confirm(context,
+                  content:
+                      '${AppLocalizations.t('Do you want dismiss group')} ${group.name}');
+              if (confirm != true) {
+                return;
+              }
               bool success = await groupService.dismissGroup(group);
               if (success) {
                 groupMemberService
@@ -551,6 +606,12 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             title: 'Delete',
             prefix: Icons.playlist_remove_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
+              bool? confirm = await DialogUtil.confirm(context,
+                  content:
+                      '${AppLocalizations.t('Do you want delete conference')} ${conference.name}');
+              if (confirm != true) {
+                return;
+              }
               if (conference.conferenceOwnerPeerId == myself.peerId) {
                 await conferenceService.removeByConferenceId(conferenceId);
                 groupMemberService

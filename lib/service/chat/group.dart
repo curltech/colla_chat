@@ -427,10 +427,10 @@ class GroupService extends PeerPartyService<Group> {
         cryptoOption: CryptoOption.linkman);
   }
 
-  bool canRemoveGroupMember(Group group, List<GroupMember> groupMembers) {
-    if (groupMembers.isNotEmpty) {
-      for (var groupMember in groupMembers) {
-        if (groupMember.memberPeerId == myself.peerId) {
+  bool canRemoveGroupMember(Group group, List<String> groupMemberIds) {
+    if (groupMemberIds.isNotEmpty) {
+      for (var groupMemberId in groupMemberIds) {
+        if (groupMemberId == myself.peerId) {
           return true;
         }
       }
@@ -445,15 +445,15 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   ///向群成员发送删群成员的消息
-  removeGroupMember(Group group, List<GroupMember> groupMembers,
+  removeGroupMember(Group group, List<String> groupMemberIds,
       {List<String>? peerIds}) async {
-    if (!canRemoveGroupMember(group, groupMembers)) {
+    if (!canRemoveGroupMember(group, groupMemberIds)) {
       return;
     }
     ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
       group.peerId,
       PartyType.group,
-      content: groupMembers,
+      content: groupMemberIds,
       subMessageType: ChatMessageSubType.removeGroupMember,
     );
 
@@ -466,9 +466,9 @@ class GroupService extends PeerPartyService<Group> {
         peerIds.addAll(g.participants!);
       }
     }
-    for (var groupMember in groupMembers) {
-      if (!peerIds.contains(groupMember.memberPeerId)) {
-        peerIds.add(groupMember.memberPeerId!);
+    for (var groupMemberId in groupMemberIds) {
+      if (!peerIds.contains(groupMemberId)) {
+        peerIds.add(groupMemberId);
       }
     }
     await chatMessageService.sendAndStore(
@@ -482,9 +482,16 @@ class GroupService extends PeerPartyService<Group> {
     String json = chatMessageService.recoverContent(chatMessage.content!);
     List<dynamic> maps = JsonUtil.toJson(json);
     for (var map in maps) {
-      GroupMember groupMember = GroupMember.fromJson(map);
-      var memberPeerId = groupMember.memberPeerId;
-      var groupId = groupMember.groupId;
+      String? memberPeerId;
+      if (map is String) {
+        memberPeerId = map;
+      }
+      if (map is Map) {
+        GroupMember groupMember = GroupMember.fromJson(map);
+        memberPeerId = groupMember.memberPeerId;
+      }
+
+      String? groupId = chatMessage.groupId;
       if (memberPeerId == myself.peerId) {
         groupMemberService.delete(entity: {
           'groupId': groupId,
@@ -492,10 +499,8 @@ class GroupService extends PeerPartyService<Group> {
         removeByGroupId(groupId!);
         break;
       } else {
-        groupMemberService.delete(entity: {
-          'memberPeerId': groupMember.memberPeerId,
-          'groupId': groupMember.groupId
-        });
+        groupMemberService
+            .delete(entity: {'memberPeerId': memberPeerId, 'groupId': groupId});
       }
     }
 
