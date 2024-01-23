@@ -339,9 +339,9 @@ class OpenAIClient {
   ///语音转录
   /// responseFormat:json, text, srt, verbose_json, or vtt
   Future<File> createSpeech({
-    required String model, //"tts-1"
     required String input,
-    required String voice, //"nova",
+    String model = 'tts-1', //"tts-1"
+    String voice = 'nova', //"nova",
     OpenAIAudioSpeechResponseFormat? responseFormat =
         OpenAIAudioSpeechResponseFormat.mp3,
     double? speed,

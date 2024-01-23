@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
@@ -255,20 +257,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       } else {
         await chatMessageService.store(chatMessage);
         returnChatMessage = chatMessage;
-        if (chatGPTAction == ChatGPTAction.chat) {
-          chatGPT!.chatCompletionStream(
-            messages: [
-              OpenAIChatCompletionChoiceMessageModel(
-                  role: OpenAIChatMessageRole.user, content: content)
-            ],
-            onCompletion: onChatCompletion,
-          );
-        } else if (chatGPTAction == ChatGPTAction.image) {
-          OpenAIImageModel openAIImageModel = await chatGPT!.createImage(
-            prompt: content,
-          );
-          onImageCompletion(openAIImageModel);
-        }
+        await _chatGPTAction(content);
       }
     } else {
       ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
@@ -293,6 +282,36 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     notifyListeners();
 
     return returnChatMessage;
+  }
+
+  Future<void> _chatGPTAction(String content) async {
+    if (chatGPTAction == ChatGPTAction.chat) {
+      chatGPT!.chatCompletionStream(
+        messages: [
+          OpenAIChatCompletionChoiceMessageModel(
+              role: OpenAIChatMessageRole.user,
+              content: [
+                OpenAIChatCompletionChoiceMessageContentItemModel.text(content)
+              ])
+        ],
+        onCompletion: onChatCompletion,
+      );
+    } else if (chatGPTAction == ChatGPTAction.image) {
+      OpenAIImageModel openAIImageModel = await chatGPT!.createImage(
+        prompt: content,
+      );
+      onImageCompletion(openAIImageModel);
+    } else if (chatGPTAction == ChatGPTAction.translate) {
+      OpenAIAudioModel translation = await chatGPT!.createTranslation(
+        file: File(''),
+        prompt: content,
+      );
+      translation.text;
+    } else if (chatGPTAction == ChatGPTAction.audio) {
+      File file = await chatGPT!.createSpeech(
+        input: content,
+      );
+    }
   }
 
   String completionContent = '';
