@@ -209,12 +209,13 @@ dependencies:
   cryptography: ^2.7.0 #ecc,aes
   #在macos上不能使用，error: cannot call value of non-function type 'FlutterBinaryMessenger'
   cryptography_flutter: ^2.3.2
-  bs58: ^1.0.2
-  pinenacl: ^0.5.1
-  encrypt: ^5.0.1 #aes
+  webcrypto: ^0.5.4
+  pointycastle: ^3.7.4
+  encrypt: ^5.0.3 #aes
   openpgp: ^3.7.0 #rsa,sha
   libsignal_protocol_dart: ^0.7.1
-  crypto: ^3.0.1 #sha
+  crypto: ^3.0.3 #sha
+  bs58: ^1.0.2
   archive: ^3.3.7
   local_auth: ^2.1.6
 
