@@ -630,5 +630,16 @@
   "Platform Information": "平台信息",
   "ApiKey": "令牌",
   "Model": "模型",
-  "Organization": "组织"
+  "Organization": "组织",
+  "Do you want delete chat messages of ": "确认删除聊天消息",
+  "Do you want delete linkman": "确认删除联系人",
+  "Do you want remove friend": "确认移除好友",
+  "Do you want add friend": "确认加为好友",
+  "Do you want remove blacklist": "确认移除黑名单",
+  "Do you want add blacklist": "确认加入黑名单",
+  "Do you want remove subscript": "确认移除订阅",
+  "Do you want add subscript": "确认订阅",
+  "Do you want delete group": "确认删除群",
+  "Do you want dismiss group": "确认解散群",
+  "Do you want delete conference": "确认删除会议"
 }
