@@ -209,7 +209,7 @@ dependencies:
   cryptography: ^2.7.0 #ecc,aes
   #在macos上不能使用，error: cannot call value of non-function type 'FlutterBinaryMessenger'
   cryptography_flutter: ^2.3.2
-  webcrypto: ^0.5.4
+#  webcrypto: ^0.5.4
   pointycastle: ^3.7.4
   encrypt: ^5.0.3 #aes
   openpgp: ^3.7.0 #rsa,sha
