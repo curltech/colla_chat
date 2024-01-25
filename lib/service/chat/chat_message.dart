@@ -462,7 +462,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   /// 创建SFU会议的消息，加上自己，每个参与者一条消息
   Future<List<ChatMessage>> sendSfuConferenceMessage(
       Conference conference, List<String> participants) async {
-    List<String>? tokens = JsonUtil.toJson(conference.sfuToken);
+    List<dynamic>? tokens = JsonUtil.toJson(conference.sfuToken);
     String? sfuUri = conference.sfuUri;
     Map<String, dynamic> conferenceMap = JsonUtil.toJson(conference);
     List<ChatMessage> chatMessages = [];
@@ -887,9 +887,6 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
 
     String? thumbnail = chatMessage.thumbnail!;
     Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
-    // ChatMessageMimeType? chatMessageMimeType =
-    //     StringUtil.enumFromString<ChatMessageMimeType>(
-    //         ChatMessageMimeType.values, chatMessage.mimeType);
     if (linkman != null) {
       ChatMessage? message = await buildChatMessage(
         receiverPeerId: peerId,

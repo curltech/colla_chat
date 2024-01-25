@@ -612,18 +612,16 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
               if (confirm != true) {
                 return;
               }
-              if (conference.conferenceOwnerPeerId == myself.peerId) {
-                await conferenceService.removeByConferenceId(conferenceId);
-                groupMemberService
-                    .delete(where: 'groupId=?', whereArgs: [conferenceId]);
-                await chatSummaryService.removeChatSummary(conferenceId);
-                await chatMessageService.removeByGroup(conferenceId);
-                conferenceController.delete(index: index);
-                if (mounted) {
-                  DialogUtil.info(context,
-                      content:
-                          '${AppLocalizations.t('Conference:')} ${conference.name} ${AppLocalizations.t('is deleted')}');
-                }
+              await conferenceService.removeByConferenceId(conferenceId);
+              groupMemberService
+                  .delete(where: 'groupId=?', whereArgs: [conferenceId]);
+              await chatSummaryService.removeChatSummary(conferenceId);
+              await chatMessageService.removeByGroup(conferenceId);
+              conferenceController.delete(index: index);
+              if (mounted) {
+                DialogUtil.info(context,
+                    content:
+                        '${AppLocalizations.t('Conference:')} ${conference.name} ${AppLocalizations.t('is deleted')}');
               }
             });
         slideActions.add(deleteSlideAction);

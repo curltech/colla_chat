@@ -336,7 +336,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     var current = DateTime.now();
     var dateName = current.toLocal().toIso8601String();
     Conference conference = await conferenceService.createConference(
-        'video-chat-$dateName', video,
+        'video-conference-$dateName', video,
         startDate: current.toUtc().toIso8601String(),
         endDate:
             current.add(const Duration(hours: 2)).toUtc().toIso8601String(),
@@ -371,7 +371,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     }
     List<String> participants = await _selectParticipants();
     if (!participants.contains(myself.peerId!)) {
-      participants.add(myself.peerId!);
+      participants.insert(0, myself.peerId!);
     }
     if (participants.length < 2) {
       if (mounted) {

@@ -232,10 +232,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         type = PartyType.group;
       }
     }
-    ChatMessage returnChatMessage;
-    // ChatMessageMimeType? chatMessageMimeType =
-    //     StringUtil.enumFromString<ChatMessageMimeType>(
-    //         ChatMessageMimeType.values, mimeType);
+    ChatMessage? returnChatMessage;
     if (type == PartyType.linkman) {
       ChatMessage chatMessage = await chatMessageService.buildChatMessage(
           receiverPeerId: peerId,
@@ -253,7 +250,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       if (chatGPT == null) {
         List<ChatMessage> returnChatMessages = await chatMessageService
             .sendAndStore(chatMessage, peerIds: peerIds);
-        returnChatMessage = returnChatMessages.first;
+        returnChatMessage = returnChatMessages.firstOrNull;
       } else {
         await chatMessageService.store(chatMessage);
         returnChatMessage = chatMessage;
@@ -272,9 +269,10 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
           transportType: transportType,
           deleteTime: _deleteTime,
           parentMessageId: _parentMessageId);
-      await chatMessageService.sendAndStore(chatMessage,
-          cryptoOption: CryptoOption.group, peerIds: peerIds);
-      returnChatMessage = chatMessage;
+      List<ChatMessage> returnChatMessages =
+          await chatMessageService.sendAndStore(chatMessage,
+              cryptoOption: CryptoOption.group, peerIds: peerIds);
+      returnChatMessage = returnChatMessages.firstOrNull;
     }
     _deleteTime = 0;
     _parentMessageId = null;

@@ -49,11 +49,14 @@ class VideoChatMessage extends StatelessWidget {
           }
 
           return;
+        } else {
+          await p2pConferenceClientPool.createConferenceClient(
+              chatSummary: chatSummary, chatMessage);
+          indexWidgetProvider.push('video_chat');
+
+          return;
         }
       }
-      await p2pConferenceClientPool.createConferenceClient(
-          chatSummary: chatSummary, chatMessage);
-      indexWidgetProvider.push('video_chat');
     }
   }
 
@@ -91,7 +94,9 @@ class VideoChatMessage extends StatelessWidget {
         subtitle = '$subtitle\n${conference.topic}';
       }
       var tileData = TileData(
-          title: '$video chat invitation',
+          title: conference.sfu
+              ? '$video conference invitation'
+              : '$video chat invitation',
           subtitle: subtitle,
           dense: false,
           prefix: IconButton(

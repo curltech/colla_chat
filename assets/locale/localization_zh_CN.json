@@ -310,8 +310,10 @@
   "Minute": "分钟",
   "Inviting you video chat ": "邀请你参加视频会议：",
   "Inviting you audio chat ": "邀请你参加音频会议：",
-  "video chat invitation": "视频会议邀请",
-  "audio chat invitation": "音频会议邀请",
+  "video chat invitation": "视频聊天邀请",
+  "audio chat invitation": "音频聊天邀请",
+  "video conference invitation": "视频会议邀请",
+  "audio conference invitation": "音频会议邀请",
   "No video view in current conference": "当前视频会议无活动远程视频窗口",
   "No active conference in pool": "会议池中无活动视频会议",
   "Join conference:": "加入会议：",
@@ -641,5 +643,6 @@
   "Do you want add subscript": "确认订阅",
   "Do you want delete group": "确认删除群",
   "Do you want dismiss group": "确认解散群",
-  "Do you want delete conference": "确认删除会议"
+  "Do you want delete conference": "确认删除会议",
+  "Do you open video chat?": "打开视频通话？"
 }

@@ -430,7 +430,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
     List<String> participants = await _selectParticipants();
     if (!participants.contains(myself.peerId!)) {
-      participants.add(myself.peerId!);
+      participants.insert(0, myself.peerId!);
     }
     if (participants.length < 2) {
       if (mounted) {
