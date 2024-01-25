@@ -13,7 +13,7 @@ CollaChat is an open source private and decentralized messaging app owned by no 
 
 CollaChat is a Colla DApp running on the Colla Network (connects to it via [Colla Node](https://github.com/curltech/go-colla-node)), which is an unstoppable Web3 decentralized peer-to-peer communication and storage network.
 
-Learn more at https://43.155.159.73/.
+Learn more at https://43.135.164.104/.
 
 # License
 Copyright 2020-2024 CURL TECH PTE. LTD.
