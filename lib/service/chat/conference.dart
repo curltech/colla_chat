@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/group.dart';
@@ -434,7 +435,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
     return valid;
   }
 
-  /// 如果sfu为true，创建sfu的Room
+  /// 如果sfu为true，创建sfu的Room，并填充conference的uri，token和password
   Future<LiveKitManageRoom?> createRoom(
       Conference conference, List<String>? participants) async {
     String? startDate = conference.startDate;
@@ -480,6 +481,10 @@ class ConferenceService extends GeneralBaseService<Conference> {
       List<String>? tokens = liveKitManageRoom.tokens;
       if (tokens != null) {
         conference.sfuToken = JsonUtil.toJsonString(tokens);
+      }
+      if (conference.password == null) {
+        CryptoGraphy cryptoGraphy = CryptoGraphy();
+        conference.password = await cryptoGraphy.getRandomAsciiString();
       }
 
       return liveKitManageRoom;

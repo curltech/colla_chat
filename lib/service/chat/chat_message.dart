@@ -459,39 +459,11 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return groupChatMessage;
   }
 
-  /// 创建会议的消息，加上自己，每个参与者一条消息
-  Future<List<ChatMessage>> buildSfuConference(
+  /// 创建SFU会议的消息，加上自己，每个参与者一条消息
+  Future<List<ChatMessage>> sendSfuConferenceMessage(
       Conference conference, List<String> participants) async {
-    // ChatMessage chatMessage = await chatMessageService.buildChatMessage(
-    //   groupId: conference.conferenceId,
-    //   groupName: conference.name,
-    //   groupType: PartyType.conference,
-    //   transportType: TransportType.none,
-    //   title: conference.video
-    //       ? ChatMessageContentType.video.name
-    //       : ChatMessageContentType.audio.name,
-    //   content: conference,
-    //   messageId: conference.conferenceId,
-    //   subMessageType: ChatMessageSubType.videoChat,
-    // );
-    //await store(chatMessage);
-    String? sfuUri;
-    List<String>? tokens;
-    if (conference.sfu) {
-      LiveKitManageRoom? liveKitManageRoom =
-          await conferenceService.createRoom(conference, participants);
-      if (liveKitManageRoom == null) {
-        logger.e('create Room failure');
-      } else {
-        sfuUri = liveKitManageRoom.host;
-        conference.sfuUri = sfuUri;
-        tokens = liveKitManageRoom.tokens;
-        if (conference.password == null) {
-          CryptoGraphy cryptoGraphy = CryptoGraphy();
-          conference.password = await cryptoGraphy.getRandomAsciiString();
-        }
-      }
-    }
+    List<String>? tokens = JsonUtil.toJson(conference.sfuToken);
+    String? sfuUri = conference.sfuUri;
     Map<String, dynamic> conferenceMap = JsonUtil.toJson(conference);
     List<ChatMessage> chatMessages = [];
     int i = 0;
@@ -500,12 +472,13 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       Conference conf = Conference.fromJson(conferenceMap);
       conf.sfuUri = sfuUri;
       conf.sfuToken = token;
-
+      PartyType? partyType =
+          StringUtil.enumFromString(PartyType.values, conf.groupType);
       ChatMessage chatMessage = await chatMessageService.buildChatMessage(
         receiverPeerId: participant,
-        groupId: conf.conferenceId,
-        groupName: conf.name,
-        groupType: PartyType.conference,
+        groupId: conf.groupId,
+        groupName: conf.groupName,
+        groupType: partyType,
         title: conf.video
             ? ChatMessageContentType.video.name
             : ChatMessageContentType.audio.name,
@@ -1216,8 +1189,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         Duration duration = now.difference(readTime);
         int leftDeleteTime = deleteTime - duration.inSeconds;
         if (leftDeleteTime <= 0) {
-          chatMessageService
-              .remove(chatMessage);
+          chatMessageService.remove(chatMessage);
         }
       }
     }

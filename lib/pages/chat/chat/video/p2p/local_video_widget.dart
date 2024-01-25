@@ -388,6 +388,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     return true;
   }
 
+  /// 创建分布式会议，linkman和group类型下可用
   Future<Conference> _buildConference(
       {required bool video, required List<String> participants}) async {
     var current = DateTime.now();
@@ -402,11 +403,11 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     var partyType = chatSummary.partyType;
     if (partyType == PartyType.linkman.name) {
       conference.sfu = false;
-    } else {
+    } else if (partyType == PartyType.group.name) {
       conference.groupId = chatSummary.peerId;
       conference.groupName = chatSummary.name;
       conference.groupType = partyType;
-      conference.sfu = true;
+      conference.sfu = false;
     }
 
     return conference;
@@ -414,6 +415,15 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   ///选择会议参与者，发送会议邀请消息，然后将新会议加入会议池，成为当前会议
   Future<void> _invite() async {
+    var partyType = chatSummary.partyType;
+    if (partyType == PartyType.conference.name) {
+      if (mounted) {
+        DialogUtil.error(context,
+            content: AppLocalizations.t(
+                'PartyType is conference, cannot create p2p conference'));
+      }
+      return;
+    }
     var status = _checkWebrtcStatus();
     if (!status) {
       return;

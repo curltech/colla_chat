@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
@@ -329,8 +330,8 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     return participants;
   }
 
-  /// 邀请的时候，在group模式下创建新的会议
-  Future<List<ChatMessage>> _buildSfuConference(
+  /// 创建SFU会议，group类型下可用
+  Future<Conference?> _buildSfuConference(
       {required bool video, required List<String> participants}) async {
     var current = DateTime.now();
     var dateName = current.toLocal().toIso8601String();
@@ -342,30 +343,32 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
         participants: participants);
 
     var partyType = chatSummary.partyType;
-    if (partyType == PartyType.group.name ||
-        partyType == PartyType.conference.name) {
+    if (partyType == PartyType.group.name) {
       conference.groupId = chatSummary.peerId;
       conference.groupName = chatSummary.name;
       conference.groupType = partyType;
-      conference.sfu = true;
     }
-    try {
-      List<ChatMessage> chatMessages =
-          await chatMessageService.buildSfuConference(conference, participants);
-
-      return chatMessages;
-    } catch (e) {
-      logger.e('buildSfuConference failure:$e');
-      if (mounted) {
-        DialogUtil.error(context, content: 'build sfu conference failure');
-      }
+    conference.sfu = true;
+    LiveKitManageRoom? liveKitManageRoom =
+        await conferenceService.createRoom(conference, participants);
+    if (liveKitManageRoom != null) {
+      return conference;
     }
 
-    return <ChatMessage>[];
+    return null;
   }
 
   /// 在group模式下创建会议，选择会议参与者，发送会议邀请消息，然后将新会议加入会议池，成为当前会议
   Future<void> _invite() async {
+    var partyType = chatSummary.partyType;
+    if (partyType != PartyType.group.name) {
+      if (mounted) {
+        DialogUtil.error(context,
+            content: AppLocalizations.t(
+                'PartyType is not group, cannot create sfu conference'));
+      }
+      return;
+    }
     List<String> participants = await _selectParticipants();
     if (!participants.contains(myself.peerId!)) {
       participants.add(myself.peerId!);
@@ -397,8 +400,34 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
           cancelLabel: 'Audio');
     }
     video ??= false;
-    List<ChatMessage> chatMessages =
+    Conference? conference =
         await _buildSfuConference(video: video, participants: participants);
+    if (conference == null) {
+      if (mounted) {
+        DialogUtil.error(context, content: 'build sfu conference failure');
+      }
+      return;
+    }
+    List<ChatMessage> chatMessages;
+    try {
+      chatMessages = await chatMessageService.sendSfuConferenceMessage(
+          conference, participants);
+      if (chatMessages.isEmpty) {
+        logger.e('send sfu conference message failure');
+        if (mounted) {
+          DialogUtil.error(context,
+              content: 'send sfu conference message failure');
+        }
+        return;
+      }
+    } catch (e) {
+      logger.e('send sfu conference message failure:$e');
+      if (mounted) {
+        DialogUtil.error(context,
+            content: 'send sfu conference message failure');
+      }
+      return;
+    }
     ChatMessage chatMessage = chatMessages.first;
     if (mounted) {
       DialogUtil.info(context,
@@ -410,8 +439,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     LiveKitConferenceClient? liveKitConferenceClient =
         await liveKitConferenceClientPool.createConferenceClient(
             chatSummary: chatSummary, chatMessage);
-    if (liveKitConferenceClient == null ||
-        conferenceChatMessageController == null) {
+    if (liveKitConferenceClient == null) {
       logger.e('createLiveKitConferenceClient failure!');
       if (mounted) {
         DialogUtil.error(context,
