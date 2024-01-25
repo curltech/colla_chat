@@ -1,16 +1,21 @@
-# CollaChat
+### A Colla DApp, an open source private and decentralized messaging app owned by no one and everyone.
 
-A Collaboration Chat Flutter project.
+[![use](https://avatars.githubusercontent.com/u/50282063?s=48&v=4)](https://github.com/flutter-webrtc/flutter-webrtc)
+[![use](https://avatars.githubusercontent.com/u/69438833?s=48&v=4)](https://github.com/livekit/client-sdk-flutter)
+[![use](https://avatars.githubusercontent.com/u/33363991?s=48&v=4)](https://github.com/MixinNetwork/libsignal_protocol_dart)
 
-## Getting Started
+# Table of Contents
+- [Introduction](#introduction)
+- [License](#license)
 
-This project is a starting point for a Flutter application.
+# Introduction
+CollaChat is an open source private and decentralized messaging app owned by no one and everyone. It is aimed to leverage blockchain technology to put users back in control of their digital communication, while preserve user experiences that they know and love.
 
-A few resources to get you started if this is your first Flutter project:
+CollaChat is a Colla DApp running on the Colla Network (connects to it via [Colla Node](https://github.com/curltech/go-colla-node)), which is an unstoppable Web3 decentralized peer-to-peer communication and storage network.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Learn more at https://43.155.159.73/.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# License
+Copyright 2020-2024 CURL TECH PTE. LTD.
+
+Licensed under the AGPLv3: https://www.gnu.org/licenses/agpl-3.0.html
