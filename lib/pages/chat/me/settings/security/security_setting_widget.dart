@@ -126,8 +126,12 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
     }
   }
 
-  _vacuum() {
+  _vacuum() async {
     sqlite3.vacuum();
+    File file = File(appDataProvider.sqlite3Path);
+    if (file.existsSync()) {
+      appDataProvider.dataLength = await file.length();
+    }
   }
 
   ///备份整个colla.db文件

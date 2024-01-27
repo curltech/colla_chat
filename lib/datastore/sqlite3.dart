@@ -175,7 +175,7 @@ class Sqlite3 extends DataStore {
   }
 
   vacuum() {
-    db.execute('vacuum');
+    db.execute('VACUUM');
   }
 
   @override

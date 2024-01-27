@@ -34,11 +34,11 @@ class SingleVideoViewWidget extends StatefulWidget {
 
 class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   bool enableFullScreen = false;
-  bool enableMute = false;
-  bool enableSpeaker = false;
-  bool enableTorch = false;
-  double volume = 1;
-  double zoomLevel = 1;
+  ValueNotifier<bool> enableMute = ValueNotifier<bool>(false);
+  ValueNotifier<bool> enableSpeaker = ValueNotifier<bool>(false);
+  ValueNotifier<bool> enableTorch = ValueNotifier<bool>(false);
+  ValueNotifier<double> volume = ValueNotifier<double>(1);
+  ValueNotifier<double> zoomLevel = ValueNotifier<double>(1);
 
   late OverlayEntry _popupDialog;
 
@@ -46,8 +46,8 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   initState() {
     super.initState();
     widget.peerMediaStreamController.addListener(_updateSelected);
-    volume = widget.peerMediaStream.getVolume() ?? 1;
-    enableMute = widget.peerMediaStream.isMuted() ?? false;
+    volume.value = widget.peerMediaStream.getVolume() ?? 1;
+    enableMute.value = widget.peerMediaStream.isMuted() ?? false;
   }
 
   Future<void> _updateSelected() async {
@@ -105,7 +105,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         );
       }
     }
-    if (enableSpeaker) {
+    if (enableSpeaker.value) {
       videoActionData.add(
         ActionData(
             label: 'Handset switch',
@@ -121,7 +121,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
       );
     }
     if (widget.peerMediaStream.local) {
-      if (enableMute) {
+      if (enableMute.value) {
         videoActionData.add(
           ActionData(
               label: 'Microphone unmute',
@@ -137,7 +137,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         );
       }
     }
-    if (volume > 0) {
+    if (volume.value > 0) {
       videoActionData.add(
         ActionData(
             label: 'Volume mute',
@@ -145,7 +145,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
             icon: const Icon(Icons.volume_mute)),
       );
     }
-    if (volume > 0) {
+    if (volume.value > 0) {
       videoActionData.add(
         ActionData(
             label: 'Volume decrease',
@@ -278,16 +278,26 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
                     //       color: Colors.white,
                     //       fontSize: AppFontSize.xsFontSize),
                     // ),
-                    CommonAutoSizeText(
-                      '$volume',
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: AppFontSize.xsFontSize),
-                    ),
-                    Icon(
-                      enableMute ? Icons.mic_off : Icons.mic,
-                      color: Colors.white,
-                    ),
+                    ValueListenableBuilder(
+                        valueListenable: volume,
+                        builder: (BuildContext context, double volume,
+                            Widget? child) {
+                          return CommonAutoSizeText(
+                            '$volume',
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: AppFontSize.xsFontSize),
+                          );
+                        }),
+                    ValueListenableBuilder(
+                        valueListenable: enableMute,
+                        builder: (BuildContext context, bool enableMute,
+                            Widget? child) {
+                          return Icon(
+                            enableMute ? Icons.mic_off : Icons.mic,
+                            color: Colors.white,
+                          );
+                        }),
                   ])),
         ],
       ),
@@ -299,71 +309,56 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
     PeerMediaStream peerMediaStream = widget.peerMediaStream;
     switch (name) {
       case 'Camera switch':
-        setState(() async {
-          await peerMediaStream.switchCamera();
-        });
+        await peerMediaStream.switchCamera();
         break;
       case 'Handset switch':
-        enableSpeaker = false;
-        setState(() async {
-          await peerMediaStream.switchSpeaker(enableSpeaker);
-        });
+        enableSpeaker.value = false;
+        await peerMediaStream.switchSpeaker(enableSpeaker.value);
         break;
       case 'Speaker switch':
-        enableSpeaker = true;
-        setState(() async {
-          await peerMediaStream.switchSpeaker(enableSpeaker);
-        });
+        enableSpeaker.value = true;
+        await peerMediaStream.switchSpeaker(enableSpeaker.value);
         break;
       case 'Microphone unmute':
-        enableMute = false;
-        setState(() async {
-          await peerMediaStream.setMicrophoneMute(enableMute);
-        });
+        enableMute.value = false;
+        await peerMediaStream.setMicrophoneMute(enableMute.value);
         break;
       case 'Microphone mute':
-        enableMute = true;
-        setState(() async {
-          await peerMediaStream.setMicrophoneMute(enableMute);
-        });
+        enableMute.value = true;
+        await peerMediaStream.setMicrophoneMute(enableMute.value);
         break;
       case 'Volume increase':
-        volume = volume + 0.1;
-        volume = volume > 1 ? 1 : volume;
-        setState(() async {
-          await peerMediaStream.setVolume(volume);
-        });
+        double val = volume.value + 0.1;
+        val = val > 1 ? 1 : val;
+        volume.value = val;
+        await peerMediaStream.setVolume(val);
         break;
       case 'Volume decrease':
-        volume = volume - 0.1;
-        volume = volume < 0 ? 0 : volume;
-
-        setState(() async {
-          await peerMediaStream.setVolume(volume);
-        });
+        double val = volume.value - 0.1;
+        val = val < 0 ? 0 : val;
+        volume.value = val;
+        await peerMediaStream.setVolume(val);
         break;
       case 'Volume mute':
-        if (volume == 0) {
-          volume = 1;
+        double val = volume.value;
+        if (val == 0) {
+          volume.value = 1;
         } else {
-          volume = 0;
+          volume.value = 0;
         }
-        setState(() {
-          peerMediaStream.setVolume(volume);
-        });
+        peerMediaStream.setVolume(volume.value);
         break;
       case 'Zoom out':
-        zoomLevel = zoomLevel + 0.1;
-        //zoomLevel = zoomLevel > 1 ? 1 : zoomLevel;
-        await peerMediaStream.setZoom(zoomLevel);
-        setState(() {});
+        double val = zoomLevel.value + 0.1;
+        //val = val > 1 ? 1 : val;
+        zoomLevel.value = val;
+        await peerMediaStream.setZoom(val);
         break;
       case 'Zoom in':
-        zoomLevel = zoomLevel - 0.1;
-        //zoomLevel = zoomLevel < 0 ? 0 : zoomLevel;
-        setState(() async {
-          await peerMediaStream.setZoom(zoomLevel);
-        });
+        double val = zoomLevel.value - 0.1;
+        //val = val < 0 ? 0 : val;
+        zoomLevel.value = val;
+        await peerMediaStream.setZoom(val);
         break;
       case 'Close':
         await _close();
