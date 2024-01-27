@@ -155,14 +155,12 @@ class P2pConferenceClient {
 
   /// 从会议的所有连接中退出发布并且关闭本地的多个视频流，并且都重新协商
   close(List<PeerMediaStream> peerMediaStreams) async {
-    if (joined) {
-      List<AdvancedPeerConnection> pcs = await peerConnections;
-      for (AdvancedPeerConnection peerConnection in pcs) {
-        await removeLocalStreams(peerConnection, peerMediaStreams);
-        for (PeerMediaStream peerMediaStream in peerMediaStreams) {
-          if (peerMediaStream.id != null) {
-            await localPeerMediaStreamController.close(peerMediaStream.id!);
-          }
+    List<AdvancedPeerConnection> pcs = await peerConnections;
+    for (AdvancedPeerConnection peerConnection in pcs) {
+      await removeLocalStreams(peerConnection, peerMediaStreams);
+      for (PeerMediaStream peerMediaStream in peerMediaStreams) {
+        if (peerMediaStream.id != null) {
+          await localPeerMediaStreamController.close(peerMediaStream.id!);
         }
       }
     }

@@ -459,6 +459,7 @@ class ConferenceChatMessageController with ChangeNotifier {
   ///在多个接收人的场景下，首先检查自己是否已经发过回执，存在是accepted则继续处理
   ///如果不存在，则发送自己的决定，如果存在是rejected或者terminated，则不处理
   onReceivedChatReceipt(ChatMessage chatReceipt) async {
+    await stopAudio();
     //当前的视频通话邀请消息不为空
     if (_chatMessage == null) {
       logger.e('Video chatMessage is null');
@@ -541,6 +542,8 @@ class ConferenceChatMessageController with ChangeNotifier {
     if (_status == VideoChatStatus.calling) {
       status = VideoChatStatus.end;
     }
+    p2pConferenceClientPool.disconnect(conferenceId: messageId);
+    liveKitConferenceClientPool.disconnect(conferenceId: messageId);
   }
 
   ///对方立即接受邀请，并且加入会议，自己也要立即加入
@@ -558,6 +561,8 @@ class ConferenceChatMessageController with ChangeNotifier {
     if (_status == VideoChatStatus.calling) {
       status = VideoChatStatus.end;
     }
+    p2pConferenceClientPool.disconnect(conferenceId: messageId);
+    liveKitConferenceClientPool.disconnect(conferenceId: messageId);
   }
 
   ///对方终止，把对方移除会议
@@ -584,6 +589,8 @@ class ConferenceChatMessageController with ChangeNotifier {
     if (_status == VideoChatStatus.calling) {
       status = VideoChatStatus.end;
     }
+    p2pConferenceClientPool.disconnect(conferenceId: messageId);
+    liveKitConferenceClientPool.disconnect(conferenceId: messageId);
   }
 
   ///对方没响应，自己什么都不用做
@@ -592,6 +599,8 @@ class ConferenceChatMessageController with ChangeNotifier {
     if (_status == VideoChatStatus.calling) {
       status = VideoChatStatus.end;
     }
+    p2pConferenceClientPool.disconnect(conferenceId: messageId);
+    liveKitConferenceClientPool.disconnect(conferenceId: messageId);
   }
 
   ///对方保持，自己可以先加入，等待对方后续加入

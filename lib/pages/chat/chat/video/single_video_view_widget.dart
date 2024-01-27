@@ -194,6 +194,9 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
           child: DataActionCard(
               onPressed: (int index, String label, {String? value}) {
                 _onAction(context, index, label, value: value);
+                if (mounted) {
+                  Navigator.pop(context);
+                }
               },
               showLabel: true,
               showTooltip: true,
@@ -367,10 +370,6 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         break;
       default:
         break;
-    }
-
-    if (mounted) {
-      Navigator.pop(context);
     }
   }
 

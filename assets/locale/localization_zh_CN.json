@@ -647,5 +647,6 @@
   "Do you open video chat?": "打开视频通话？",
   "Receive": "接收",
   "Ignore": "忽略",
-  "DataLength": "数据文件大小"
+  "DataLength": "数据文件大小",
+  "Vacuum": "压缩"
 }

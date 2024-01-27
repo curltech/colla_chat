@@ -78,6 +78,7 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
 
   Widget _buildBackupTileWidget() {
     List<TileData> tiles = [
+      TileData(title: 'Vacuum', prefix: Icons.compress_outlined),
       TileData(title: 'Backup', prefix: Icons.backup),
       TileData(title: 'Restore', prefix: Icons.restore),
       TileData(title: 'Backup peer', prefix: Icons.backup_table),
@@ -93,6 +94,9 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
 
   _onTap(int index, String title, {TileData? group, String? subtitle}) {
     switch (title) {
+      case 'Vacuum':
+        _vacuum();
+        break;
       case 'Backup':
         _backup();
         break;
@@ -120,6 +124,10 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
       default:
         break;
     }
+  }
+
+  _vacuum() {
+    sqlite3.vacuum();
   }
 
   ///备份整个colla.db文件

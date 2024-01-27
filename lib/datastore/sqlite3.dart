@@ -174,6 +174,10 @@ class Sqlite3 extends DataStore {
     return run(Sql(query));
   }
 
+  vacuum() {
+    db.execute('vacuum');
+  }
+
   @override
   Object? get(String table, dynamic id) {
     return findOne(table, where: 'id=?', whereArgs: [id]);
