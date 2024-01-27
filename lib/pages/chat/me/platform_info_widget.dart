@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:colla_chat/constant/base.dart';
@@ -89,7 +90,12 @@ class _PlatformInfoWidgetState extends State<PlatformInfoWidget>
         title: 'Sqlite3Path',
         subtitle: appDataProvider.sqlite3Path,
       ),
+      TileData(
+        title: 'DataLength',
+        subtitle: appDataProvider.dataLength.toString(),
+      ),
     ];
+
     var platformInfo = AppBarView(
       title: widget.title,
       withLeading: widget.withLeading,

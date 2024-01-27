@@ -30,6 +30,7 @@ class AppDataProvider with ChangeNotifier {
   double bottomPadding = 0;
   double textScaleFactor = 1.0;
   String sqlite3Path = '';
+  int dataLength = 0;
   bool _autoLogin = false;
 
   AppDataProvider();
