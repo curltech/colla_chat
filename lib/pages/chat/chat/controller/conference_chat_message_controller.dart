@@ -145,7 +145,6 @@ class ConferenceChatMessageController with ChangeNotifier {
   Future<ChatSummary?> _findChatSummary() async {
     ChatSummary? chatSummary;
 
-    ///个人的消息receiverPeerId不为空
     if (_chatMessage!.groupType == null) {
       if (_chatMessage!.direct == ChatDirect.send.name) {
         chatSummary = await chatSummaryService
@@ -154,6 +153,9 @@ class ConferenceChatMessageController with ChangeNotifier {
         chatSummary = await chatSummaryService
             .findCachedOneByPeerId(_chatMessage!.senderPeerId!);
       }
+    } else if (_chatMessage!.groupType == PartyType.group.name) {
+      chatSummary = await chatSummaryService
+          .findCachedOneByPeerId(_chatMessage!.messageId!);
     } else {
       chatSummary = await chatSummaryService
           .findCachedOneByPeerId(_chatMessage!.messageId!);
@@ -169,14 +171,22 @@ class ConferenceChatMessageController with ChangeNotifier {
       ChatSummary? chatSummary = await _findChatSummary();
       _chatSummary = chatSummary;
     } else if (_chatSummary != null && _chatMessage != null) {
-      if (_chatMessage!.direct == ChatDirect.send.name) {
-        if (_chatSummary!.peerId != _chatMessage!.receiverPeerId) {
-          var chatSummary = await _findChatSummary();
-          _chatSummary = chatSummary;
+      if (_chatMessage!.groupType == null) {
+        if (_chatMessage!.direct == ChatDirect.send.name) {
+          if (_chatSummary!.peerId != _chatMessage!.receiverPeerId) {
+            var chatSummary = await _findChatSummary();
+            _chatSummary = chatSummary;
+          }
         }
-      }
-      if (_chatMessage!.direct == ChatDirect.receive.name) {
-        if (_chatSummary!.peerId != _chatMessage!.senderPeerId!) {
+        if (_chatMessage!.direct == ChatDirect.receive.name) {
+          if (_chatSummary!.peerId != _chatMessage!.senderPeerId!) {
+            _chatSummary = null;
+            var chatSummary = await _findChatSummary();
+            _chatSummary = chatSummary;
+          }
+        }
+      } else {
+        if (_chatSummary!.peerId != _chatMessage!.messageId!) {
           _chatSummary = null;
           var chatSummary = await _findChatSummary();
           _chatSummary = chatSummary;
@@ -400,7 +410,7 @@ class ConferenceChatMessageController with ChangeNotifier {
       return;
     }
     ConferenceChange conferenceChange =
-    await conferenceService.store(_conference!);
+        await conferenceService.store(_conference!);
     //会议视频通话邀请
     //除了向发送方外，还需要向房间的各接收人发送回执，
     //首先检查接收人是否已经存在给自己的回执，不存在或者存在是accepted则发送回执

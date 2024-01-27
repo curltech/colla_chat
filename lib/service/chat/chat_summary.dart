@@ -3,6 +3,7 @@ import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/general_base.dart';
@@ -132,6 +133,9 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
         chatSummary.subPartyType = conference.topic;
         chatSummary.status = conference.status;
         chatSummary.name = conference.name;
+        chatSummary.messageId = conference.conferenceId;
+        chatSummary.messageType = ChatMessageType.chat.name;
+        chatSummary.subMessageType = ChatMessageSubType.videoChat.name;
         await insert(chatSummary);
         chatSummaries[chatSummary.peerId!] = chatSummary;
       } else {
@@ -226,6 +230,9 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
           }
         }
         chatSummary.status = chatMessage.status;
+        if (chatSummary.messageId == null) {
+          logger.e('chatSummary messageId is null');
+        }
         await upsert(chatSummary);
         chatSummaries[chatSummary.peerId!] = chatSummary;
       }

@@ -343,6 +343,8 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
         participants: participants);
 
     var partyType = chatSummary.partyType;
+
+    /// 如果是在群中创建会议，则会议信息中有群信息
     if (partyType == PartyType.group.name) {
       conference.groupId = chatSummary.peerId;
       conference.groupName = chatSummary.name;

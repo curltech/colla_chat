@@ -78,11 +78,15 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
           icon: const Icon(Icons.camera))
     ]);
     ChatSummary? chatSummary = chatMessageController.chatSummary;
-    String? partyType = chatSummary?.partyType;
+    if (chatSummary == null) {
+      logger.e('chatSummary is null');
+      return actionData;
+    }
+    String? partyType = chatSummary.partyType;
     if (partyType == PartyType.conference.name) {
       /// 会议模式下会议是否有效
       Conference? conference = await conferenceService
-          .findCachedOneByConferenceId(chatSummary!.messageId!);
+          .findCachedOneByConferenceId(chatSummary.peerId!);
       if (conference != null) {
         bool valid = conferenceService.isValid(conference);
         if (valid) {
@@ -238,9 +242,9 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       indexWidgetProvider.push('sfu_video_chat');
     } else if (partyType == PartyType.conference.name) {
       if (chatSummary != null) {
-        String groupId = chatSummary.peerId!;
+        String messageId = chatSummary.peerId!;
         ChatMessage? chatMessage =
-            await chatMessageService.findVideoChatMessage(groupId: groupId);
+            await chatMessageService.findVideoChatMessage(messageId: messageId);
         if (chatMessage != null) {
           LiveKitConferenceClient? conferenceClient =
               await liveKitConferenceClientPool.createConferenceClient(
@@ -248,6 +252,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
           if (conferenceClient != null) {
             indexWidgetProvider.push('sfu_video_chat');
           }
+        } else {
+          logger.e('videoChat chatMessage messageId:$messageId is null');
         }
       }
     }

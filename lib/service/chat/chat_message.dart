@@ -411,6 +411,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   Future<ChatMessage> buildGroupChatMessage(
     String groupId,
     PartyType groupType, {
+    String? groupName,
     dynamic content,
     ChatMessageType messageType = ChatMessageType.chat,
     ChatMessageSubType subMessageType = ChatMessageSubType.chat,
@@ -424,18 +425,19 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     int deleteTime = 0,
     String? parentMessageId,
   }) async {
-    String? groupName;
-    if (groupType == PartyType.group) {
-      Group? group = await groupService.findCachedOneByPeerId(groupId);
-      if (group != null) {
-        groupName = group.name;
+    if (groupName == null) {
+      if (groupType == PartyType.group) {
+        Group? group = await groupService.findCachedOneByPeerId(groupId);
+        if (group != null) {
+          groupName = group.name;
+        }
       }
-    }
-    if (groupType == PartyType.conference) {
-      Conference? conference =
-          await conferenceService.findCachedOneByConferenceId(groupId);
-      if (conference != null) {
-        groupName = conference.name;
+      if (groupType == PartyType.conference) {
+        Conference? conference =
+            await conferenceService.findCachedOneByConferenceId(groupId);
+        if (conference != null) {
+          groupName = conference.name;
+        }
       }
     }
 
@@ -472,13 +474,15 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       Conference conf = Conference.fromJson(conferenceMap);
       conf.sfuUri = sfuUri;
       conf.sfuToken = token;
+
+      /// 分为群中创建的会议和单独创建的会议，单独的会议中消息的群信息为会议信息
       PartyType? partyType =
           StringUtil.enumFromString(PartyType.values, conf.groupType);
       ChatMessage chatMessage = await chatMessageService.buildChatMessage(
         receiverPeerId: participant,
-        groupId: conf.groupId,
-        groupName: conf.groupName,
-        groupType: partyType,
+        groupId: conf.groupId ?? conf.conferenceId,
+        groupName: conf.groupName ?? conf.name,
+        groupType: partyType ?? PartyType.conference,
         title: conf.video
             ? ChatMessageContentType.video.name
             : ChatMessageContentType.audio.name,

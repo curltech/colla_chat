@@ -404,6 +404,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (partyType == PartyType.linkman.name) {
       conference.sfu = false;
     } else if (partyType == PartyType.group.name) {
+      /// 如果是在群中创建会议，则会议信息中有群信息
       conference.groupId = chatSummary.peerId;
       conference.groupName = chatSummary.name;
       conference.groupType = partyType;
