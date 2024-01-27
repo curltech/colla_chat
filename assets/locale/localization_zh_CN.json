@@ -646,5 +646,6 @@
   "Do you want delete conference": "确认删除会议",
   "Do you open video chat?": "打开视频通话？",
   "Receive": "接收",
-  "Ignore": "忽略"
+  "Ignore": "忽略",
+  "DataLength": "数据文件大小"
 }
