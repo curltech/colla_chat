@@ -638,7 +638,7 @@ class _IndexViewState extends State<IndexView>
         },
         icon: const Icon(color: Colors.red, size: 24, Icons.call_end));
     var receivedButton = IconTextButton(
-        label: AppLocalizations.t('Received'),
+        label: AppLocalizations.t('Receive'),
         onPressed: () async {
           conferenceChatMessageVisible.value = false;
           _stop();
@@ -648,7 +648,7 @@ class _IndexViewState extends State<IndexView>
         },
         icon: const Icon(color: Colors.amber, size: 24, Icons.add_call));
     var ignoredButton = IconTextButton(
-        label: AppLocalizations.t('Ignored'),
+        label: AppLocalizations.t('Ignore'),
         onPressed: () async {
           conferenceChatMessageVisible.value = false;
           _stop();
@@ -704,7 +704,7 @@ class _IndexViewState extends State<IndexView>
             (conferenceChatMessage.senderName ?? ''),
       ),
       CommonAutoSizeText(
-        '${AppLocalizations.t('Topic:')} ${topic ?? ''}',
+        '${AppLocalizations.t('Topic')}: ${topic ?? ''}',
       ),
       ButtonBar(alignment: MainAxisAlignment.end, children: buttons),
     ]);

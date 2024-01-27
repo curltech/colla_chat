@@ -644,5 +644,7 @@
   "Do you want delete group": "确认删除群",
   "Do you want dismiss group": "确认解散群",
   "Do you want delete conference": "确认删除会议",
-  "Do you open video chat?": "打开视频通话？"
+  "Do you open video chat?": "打开视频通话？",
+  "Receive": "接收",
+  "Ignore": "忽略"
 }

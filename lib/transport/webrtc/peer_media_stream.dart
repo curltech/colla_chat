@@ -368,7 +368,7 @@ class PeerMediaStream {
   /// 获取参与者的音量，用于sfu模式
   double? getVolume() {
     if (participant != null) {
-      return participant!.audioLevel;
+      return 1-participant!.audioLevel;
     }
     return null;
   }
@@ -376,7 +376,7 @@ class PeerMediaStream {
   /// 设置参与者或者流的音量
   setVolume(double volume) async {
     if (participant != null) {
-      participant?.audioLevel = volume;
+      participant?.audioLevel = 1-volume;
     } else {
       if (mediaStream != null) {
         await MediaStreamUtil.setVolume(mediaStream!, volume);

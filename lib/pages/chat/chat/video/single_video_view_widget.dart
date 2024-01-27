@@ -137,44 +137,43 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         );
       }
     }
-    if (participant == null) {
-      if (volume > 0) {
-        videoActionData.add(
-          ActionData(
-              label: 'Volume mute',
-              // actionType: ActionType.inkwell,
-              icon: const Icon(Icons.volume_mute)),
-        );
-      }
-      if (volume > 0) {
-        videoActionData.add(
-          ActionData(
-              label: 'Volume decrease',
-              // actionType: ActionType.inkwell,
-              icon: const Icon(Icons.volume_down)),
-        );
-      }
+    if (volume > 0) {
       videoActionData.add(
         ActionData(
-            label: 'Volume increase',
+            label: 'Volume mute',
             // actionType: ActionType.inkwell,
-            icon: const Icon(Icons.volume_up)),
+            icon: const Icon(Icons.volume_mute)),
       );
-      if (platformParams.mobile) {
-        videoActionData.add(
-          ActionData(
-              label: 'Zoom in',
-              // actionType: ActionType.inkwell,
-              icon: const Icon(Icons.zoom_in_map)),
-        );
-        videoActionData.add(
-          ActionData(
-              label: 'Zoom out',
-              // actionType: ActionType.inkwell,
-              icon: const Icon(Icons.zoom_out_map)),
-        );
-      }
     }
+    if (volume > 0) {
+      videoActionData.add(
+        ActionData(
+            label: 'Volume decrease',
+            // actionType: ActionType.inkwell,
+            icon: const Icon(Icons.volume_down)),
+      );
+    }
+    videoActionData.add(
+      ActionData(
+          label: 'Volume increase',
+          // actionType: ActionType.inkwell,
+          icon: const Icon(Icons.volume_up)),
+    );
+    if (platformParams.mobile) {
+      videoActionData.add(
+        ActionData(
+            label: 'Zoom in',
+            // actionType: ActionType.inkwell,
+            icon: const Icon(Icons.zoom_in_map)),
+      );
+      videoActionData.add(
+        ActionData(
+            label: 'Zoom out',
+            // actionType: ActionType.inkwell,
+            icon: const Icon(Icons.zoom_out_map)),
+      );
+    }
+
     if (widget.peerMediaStream.local) {
       videoActionData.add(
         ActionData(
@@ -327,7 +326,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         break;
       case 'Volume increase':
         volume = volume + 0.1;
-        //volume = volume > 1 ? 1 : volume;
+        volume = volume > 1 ? 1 : volume;
         setState(() async {
           await peerMediaStream.setVolume(volume);
         });
