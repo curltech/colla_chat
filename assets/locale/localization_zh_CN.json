@@ -407,6 +407,7 @@
   "Successfully restore peer filename": "成功恢复账户文件",
   "Successfully backup attachment filename": "成功备份当前账户附件",
   "Successfully restore attachment path": "成功恢复附件到目录",
+  "Successfully vacuum colla.db": "成功压缩数据库colla.db",
   "Successfully backup colla.db": "成功备份数据库colla.db",
   "Successfully restore colla.db and reopen": "成功恢复数据库colla.db并重新打开",
   "Authenticate failure": "账户验证失败",
