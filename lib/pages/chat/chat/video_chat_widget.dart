@@ -155,13 +155,15 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
       );
       rightWidgets.add(remote);
     }
-    rightWidgets.add(IconButton(
-      onPressed: () {
-        indexWidgetProvider.push('video_conference_pool');
-      },
-      icon: const Icon(Icons.list),
-      tooltip: AppLocalizations.t('Conference pool'),
-    ));
+    if (myself.peerProfile.developerSwitch) {
+      rightWidgets.add(IconButton(
+        onPressed: () {
+          indexWidgetProvider.push('video_conference_pool');
+        },
+        icon: const Icon(Icons.list),
+        tooltip: AppLocalizations.t('Conference pool'),
+      ));
+    }
 
     rightWidgets.add(IconButton(
       onPressed: () {

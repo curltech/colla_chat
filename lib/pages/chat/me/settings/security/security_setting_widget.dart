@@ -131,6 +131,11 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
     File file = File(appDataProvider.sqlite3Path);
     if (file.existsSync()) {
       appDataProvider.dataLength = await file.length();
+      if (mounted) {
+        DialogUtil.info(context,
+            content:
+                '${AppLocalizations.t('Successfully vacuum colla.db length:')} ${appDataProvider.dataLength}');
+      }
     }
   }
 

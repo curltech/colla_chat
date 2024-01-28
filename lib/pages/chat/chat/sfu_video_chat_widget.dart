@@ -21,7 +21,8 @@ import 'package:flutter/material.dart';
 class SfuVideoChatWidget extends StatefulWidget with TileDataMixin {
   DragOverlay? overlayEntry;
   final SfuLocalVideoWidget sfuLocalVideoWidget = const SfuLocalVideoWidget();
-  final SfuRemoteVideoWidget sfuRemoteVideoWidget = const SfuRemoteVideoWidget();
+  final SfuRemoteVideoWidget sfuRemoteVideoWidget =
+      const SfuRemoteVideoWidget();
   final SfuVideoConferencePoolWidget sfuVideoConferencePoolWidget =
       SfuVideoConferencePoolWidget();
 
@@ -157,14 +158,15 @@ class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {
       );
       rightWidgets.add(remote);
     }
-    rightWidgets.add(IconButton(
-      onPressed: () {
-        indexWidgetProvider.push('sfu_video_conference_pool');
-      },
-      icon: const Icon(Icons.list),
-      tooltip: AppLocalizations.t('Conference pool'),
-    ));
-
+    if (myself.peerProfile.developerSwitch) {
+      rightWidgets.add(IconButton(
+        onPressed: () {
+          indexWidgetProvider.push('sfu_video_conference_pool');
+        },
+        icon: const Icon(Icons.list),
+        tooltip: AppLocalizations.t('Conference pool'),
+      ));
+    }
     rightWidgets.add(IconButton(
       onPressed: () {
         _minimize(context);

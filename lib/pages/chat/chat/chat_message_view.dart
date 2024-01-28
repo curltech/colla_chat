@@ -602,31 +602,34 @@ class _ChatMessageViewState extends State<ChatMessageView>
       rightWidgets.add(const SizedBox(
         width: 5,
       ));
-      rightWidgets.add(ValueListenableBuilder(
-          valueListenable: _initiator,
-          builder: (context, initiator, child) {
-            if (initiator != null) {
-              if (initiator) {
-                return Tooltip(
-                    message: AppLocalizations.t('Leader'),
-                    child: const Icon(
-                      Icons.light_mode,
-                      color: Colors.yellow,
-                    ));
-              } else {
-                return Tooltip(
-                    message: AppLocalizations.t('Follower'),
-                    child: const Icon(
-                      Icons.light_mode,
-                      color: Colors.grey,
-                    ));
+      if (myself.peerProfile.developerSwitch) {
+        rightWidgets.add(ValueListenableBuilder(
+            valueListenable: _initiator,
+            builder: (context, initiator, child) {
+              if (initiator != null) {
+                if (initiator) {
+                  return Tooltip(
+                      message: AppLocalizations.t('Leader'),
+                      child: const Icon(
+                        Icons.light_mode,
+                        color: Colors.yellow,
+                      ));
+                } else {
+                  return Tooltip(
+                      message: AppLocalizations.t('Follower'),
+                      child: const Icon(
+                        Icons.light_mode,
+                        color: Colors.grey,
+                      ));
+                }
               }
-            }
-            return Container();
-          }));
-      rightWidgets.add(const SizedBox(
-        width: 15,
-      ));
+              return Container();
+            }));
+
+        rightWidgets.add(const SizedBox(
+          width: 15,
+        ));
+      }
     }
     if (partyType == PartyType.group.name) {
       rightWidgets.add(IconButton(
