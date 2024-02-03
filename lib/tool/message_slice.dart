@@ -11,7 +11,7 @@ class MessageSlice {
   Map<int, List<int>> sliceBuffer = {};
   int sliceBufferId = 0;
 
-  MessageSlice({this.sliceSize = 128 * 1024});
+  MessageSlice({this.sliceSize = 196 * 1024});
 
   /// 返回分片的数据，每一个分片的索引为map的键值，withPrefix表示是否带有12位的前缀
   Map<int, List<int>> slice(List<int> message, {bool withPrefix = true}) {
