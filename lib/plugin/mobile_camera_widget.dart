@@ -100,10 +100,10 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
         }
         if (cameras.isEmpty) {
           cameraIndex = -1;
-          logger.i('No available cameras');
+          logger.e('No available cameras');
         } else {
           cameraIndex = 0;
-          logger.e('Found camera: ${cameras[0].name}');
+          logger.i('Found camera: ${cameras[0].name}');
         }
       } on PlatformException catch (e) {
         logger.e('Failed to fetch cameras: ${e.code}: ${e.message}');

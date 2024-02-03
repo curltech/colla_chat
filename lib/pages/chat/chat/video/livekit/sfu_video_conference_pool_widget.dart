@@ -95,31 +95,6 @@ class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
             });
         slideActions.add(conferenceSlideAction);
         tile.slideActions = slideActions;
-
-        List<TileData> endSlideActions = [];
-        TileData renegotiateSlideAction = TileData(
-            title: 'Renegotiate',
-            prefix: Icons.repeat_one_outlined,
-            onTap: (int index, String label, {String? subtitle}) async {
-              // liveKitConferenceClientPool.conferenceClient?.renegotiate();
-              DialogUtil.info(context,
-                  content:
-                      '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is renegotiate')}');
-            });
-        endSlideActions.add(renegotiateSlideAction);
-        TileData toggleIceSlideAction = TileData(
-            title: 'Toggle',
-            prefix: Icons.recycling_outlined,
-            onTap: (int index, String label, {String? subtitle}) async {
-              // liveKitConferenceClientPool.conferenceClient
-              //     ?.renegotiate(toggle: true);
-              DialogUtil.info(context,
-                  content:
-                      '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is toggle renegotiate')}');
-            });
-        endSlideActions.add(toggleIceSlideAction);
-        tile.endSlideActions = endSlideActions;
-
         tiles.add(tile);
       }
     }

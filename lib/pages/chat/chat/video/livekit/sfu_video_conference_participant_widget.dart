@@ -138,7 +138,7 @@ class SfuVideoConferenceParticipantWidget extends StatelessWidget
       }
     }
 
-    return SizedBox(height: 200, child: DataListView(tileData: tileData));
+    return SizedBox(height: 80, child: DataListView(tileData: tileData));
   }
 
   @override
