@@ -38,7 +38,7 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
       return tiles;
     }
     List<livekit_client.TrackPublication<livekit_client.Track>>
-        audioTrackPublications = participant.audioTracks;
+        audioTrackPublications = participant.audioTrackPublications;
     for (livekit_client
         .TrackPublication<livekit_client.Track> audioTrackPublication
         in audioTrackPublications) {
@@ -80,7 +80,7 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
       return tiles;
     }
     List<livekit_client.TrackPublication<livekit_client.Track>>
-        videoTrackPublications = participant.videoTracks;
+        videoTrackPublications = participant.videoTrackPublications;
     for (livekit_client.TrackPublication videoTrackPublication
         in videoTrackPublications) {
       livekit_client.Track? videoTrack = videoTrackPublication.track;

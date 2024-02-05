@@ -193,8 +193,8 @@ class _RoomWidgetState extends State<RoomWidget> {
   void _sortParticipants() {
     List<ParticipantTrack> userMediaTracks = [];
     List<ParticipantTrack> screenTracks = [];
-    for (var participant in widget.room.participants.values) {
-      for (var t in participant.videoTracks) {
+    for (var participant in widget.room.remoteParticipants.values) {
+      for (var t in participant.videoTrackPublications) {
         if (t.isScreenShare) {
           screenTracks.add(ParticipantTrack(
             participant: participant,
@@ -239,7 +239,8 @@ class _RoomWidgetState extends State<RoomWidget> {
           b.participant.joinedAt.millisecondsSinceEpoch;
     });
 
-    final localParticipantTracks = widget.room.localParticipant?.videoTracks;
+    final localParticipantTracks =
+        widget.room.localParticipant?.videoTrackPublications;
     if (localParticipantTracks != null) {
       for (var t in localParticipantTracks) {
         if (t.isScreenShare) {

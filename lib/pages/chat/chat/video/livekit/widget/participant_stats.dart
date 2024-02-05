@@ -9,11 +9,12 @@ enum StatsType {
   kRemoteVideoReceiver,
 }
 
-
 /// 显示参与者的信息
 class ParticipantStatsWidget extends StatefulWidget {
   const ParticipantStatsWidget({super.key, required this.participant});
+
   final Participant participant;
+
   @override
   State<StatefulWidget> createState() => _ParticipantStatsWidgetState();
 }
@@ -96,8 +97,8 @@ class _ParticipantStatsWidgetState extends State<ParticipantStatsWidget> {
     }
     listeners.clear();
     for (var track in [
-      ...widget.participant.videoTracks,
-      ...widget.participant.audioTracks
+      ...widget.participant.videoTrackPublications,
+      ...widget.participant.audioTrackPublications
     ]) {
       if (track.track != null) {
         _setUpListener(track.track!);

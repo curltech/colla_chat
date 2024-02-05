@@ -1,5 +1,4 @@
 import 'package:colla_chat/pages/chat/chat/video/livekit/widget/no_video.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:livekit_client/livekit_client.dart';
@@ -32,12 +31,12 @@ class _LocalParticipantWidgetState<T extends LocalParticipantWidget>
   bool _visible = true;
 
   LocalTrackPublication<LocalVideoTrack>? get videoPublication =>
-      widget.participant.videoTracks
+      widget.participant.videoTrackPublications
           .where((element) => element.sid == widget.videoTrack?.sid)
           .firstOrNull;
 
   LocalTrackPublication<LocalAudioTrack>? get firstAudioPublication =>
-      widget.participant.audioTracks.firstOrNull;
+      widget.participant.audioTrackPublications.firstOrNull;
 
   VideoTrack? get activeVideoTrack => widget.videoTrack;
 

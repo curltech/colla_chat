@@ -303,7 +303,8 @@ class PeerMediaStream {
   /// 切换第一个视频轨道的摄像头，对sfu模式来说，必须指定position
   switchCamera({CameraPosition? position}) async {
     if (participant != null) {
-      final Track? track = participant!.videoTracks.firstOrNull?.track;
+      final Track? track =
+          participant!.videoTrackPublications.firstOrNull?.track;
       if (track != null && track is LocalVideoTrack && position != null) {
         await track.setCameraPosition(position);
       }
@@ -368,7 +369,7 @@ class PeerMediaStream {
   /// 获取参与者的音量，用于sfu模式
   double? getVolume() {
     if (participant != null) {
-      return 1-participant!.audioLevel;
+      return 1 - participant!.audioLevel;
     }
     return null;
   }
@@ -376,7 +377,7 @@ class PeerMediaStream {
   /// 设置参与者或者流的音量
   setVolume(double volume) async {
     if (participant != null) {
-      participant?.audioLevel = 1-volume;
+      participant?.audioLevel = 1 - volume;
     } else {
       if (mediaStream != null) {
         await MediaStreamUtil.setVolume(mediaStream!, volume);

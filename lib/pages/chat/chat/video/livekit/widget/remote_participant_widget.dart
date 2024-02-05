@@ -32,12 +32,12 @@ class _RemoteParticipantWidgetState<T extends RemoteParticipantWidget>
   bool _visible = true;
 
   RemoteTrackPublication<RemoteVideoTrack>? get videoPublication =>
-      widget.participant.videoTracks
+      widget.participant.videoTrackPublications
           .where((element) => element.sid == widget.videoTrack?.sid)
           .firstOrNull;
 
   RemoteTrackPublication<RemoteAudioTrack>? get firstAudioPublication =>
-      widget.participant.audioTracks.firstOrNull;
+      widget.participant.audioTrackPublications.firstOrNull;
 
   VideoTrack? get activeVideoTrack => widget.videoTrack;
 

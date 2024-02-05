@@ -355,7 +355,7 @@ dependencies:
   tray_manager: ^0.2.0
   chat_gpt_sdk: ^2.2.8
   dart_openai: ^5.0.0
-  livekit_client: ^1.5.3 #livekit sfu server flutter client
+  livekit_client: ^2.0.0 #livekit sfu server flutter client
   livekit_server_sdk: ^1.0.0
 dependency_overrides:
   uuid: ^4.3.1

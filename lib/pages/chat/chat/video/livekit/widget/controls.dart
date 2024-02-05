@@ -4,13 +4,11 @@ import 'dart:io';
 
 import 'package:colla_chat/pages/chat/chat/video/livekit/widget/room_widget.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_background/flutter_background.dart';
 import 'package:livekit_client/livekit_client.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-
 
 /// 本地视频的控制组件
 class ControlsWidget extends StatefulWidget {
@@ -125,7 +123,7 @@ class _ControlsWidgetState extends State<ControlsWidget> {
 
   void _toggleCamera() async {
     //
-    final track = participant.videoTracks.firstOrNull?.track;
+    final track = participant.videoTrackPublications.firstOrNull?.track;
     if (track == null) return;
 
     try {

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
@@ -127,8 +128,10 @@ class LiveKitRoomClient {
   /// 订阅远程参与者的轨道
   subscribe(List<String> participants) async {
     for (String participantId in participants) {
-      if (room.participants.containsKey(participantId)) {
-        RemoteParticipant participant = room.participants[participantId]!;
+      Map<String, RemoteParticipant> remoteParticipants =
+          room.remoteParticipants;
+      if (remoteParticipants.containsKey(participantId)) {
+        RemoteParticipant participant = remoteParticipants[participantId]!;
         for (RemoteTrackPublication publication
             in participant.trackPublications.values) {
           await publication.subscribe();
@@ -140,8 +143,10 @@ class LiveKitRoomClient {
   /// 解除订阅远程参与者的轨道
   unsubscribe(List<String> participants) async {
     for (String participantId in participants) {
-      if (room.participants.containsKey(participantId)) {
-        RemoteParticipant participant = room.participants[participantId]!;
+      Map<String, RemoteParticipant> remoteParticipants =
+          room.remoteParticipants;
+      if (remoteParticipants.containsKey(participantId)) {
+        RemoteParticipant participant = remoteParticipants[participantId]!;
         for (RemoteTrackPublication publication
             in participant.trackPublications.values) {
           await publication.unsubscribe();
@@ -153,8 +158,10 @@ class LiveKitRoomClient {
   /// 激活参与者的轨道
   enable(List<String> participants) async {
     for (String participantId in participants) {
-      if (room.participants.containsKey(participantId)) {
-        RemoteParticipant participant = room.participants[participantId]!;
+      Map<String, RemoteParticipant> remoteParticipants =
+          room.remoteParticipants;
+      if (remoteParticipants.containsKey(participantId)) {
+        RemoteParticipant participant = remoteParticipants[participantId]!;
         for (RemoteTrackPublication publication
             in participant.trackPublications.values) {
           await publication.enable();
@@ -166,8 +173,10 @@ class LiveKitRoomClient {
   /// 关闭参与者的轨道
   disable(List<String> participants) async {
     for (String participantId in participants) {
-      if (room.participants.containsKey(participantId)) {
-        RemoteParticipant participant = room.participants[participantId]!;
+      Map<String, RemoteParticipant> remoteParticipants =
+          room.remoteParticipants;
+      if (remoteParticipants.containsKey(participantId)) {
+        RemoteParticipant participant = remoteParticipants[participantId]!;
         for (RemoteTrackPublication publication
             in participant.trackPublications.values) {
           await publication.disable();
@@ -179,8 +188,10 @@ class LiveKitRoomClient {
   /// 设置参与者的轨道的fps
   setVideoFPS(List<String> participants, int fps) async {
     for (String participantId in participants) {
-      if (room.participants.containsKey(participantId)) {
-        RemoteParticipant participant = room.participants[participantId]!;
+      Map<String, RemoteParticipant> remoteParticipants =
+          room.remoteParticipants;
+      if (remoteParticipants.containsKey(participantId)) {
+        RemoteParticipant participant = remoteParticipants[participantId]!;
         for (RemoteTrackPublication publication
             in participant.trackPublications.values) {
           await publication.setVideoFPS(fps);
@@ -192,8 +203,10 @@ class LiveKitRoomClient {
   /// 设置参与者的轨道的质量
   setVideoQuality(List<String> participants, VideoQuality videoQuality) async {
     for (String participantId in participants) {
-      if (room.participants.containsKey(participantId)) {
-        RemoteParticipant participant = room.participants[participantId]!;
+      Map<String, RemoteParticipant> remoteParticipants =
+          room.remoteParticipants;
+      if (remoteParticipants.containsKey(participantId)) {
+        RemoteParticipant participant = remoteParticipants[participantId]!;
         for (RemoteTrackPublication publication
             in participant.trackPublications.values) {
           await publication.setVideoQuality(videoQuality);
@@ -204,7 +217,8 @@ class LiveKitRoomClient {
 
   /// 对远程参与者排序，排序的次序为：音量，最后说话的时间，是否视频，加入时间
   List<RemoteParticipant> sort() {
-    List<RemoteParticipant> participants = room.participants.values.toList();
+    Map<String, RemoteParticipant> remoteParticipants = room.remoteParticipants;
+    List<RemoteParticipant> participants = remoteParticipants.values.toList();
     participants.sort((a, b) {
       if (a.isSpeaking && b.isSpeaking) {
         if (a.audioLevel > b.audioLevel) {
@@ -238,13 +252,13 @@ class LiveKitRoomClient {
   ///发送数据
   Future<void> publishData(
     List<int> data, {
-    Reliability reliability = Reliability.reliable,
-    List<String>? destinationSids,
+    bool? reliable,
+    List<String>? destinationIdentities,
     String? topic,
   }) async {
     await room.localParticipant?.publishData(data,
-        reliability: reliability,
-        destinationSids: destinationSids,
+        reliable: reliable,
+        destinationIdentities: destinationIdentities,
         topic: topic);
   }
 
@@ -323,8 +337,8 @@ class LiveKitRoomClient {
   }
 
   /// 关闭本地的某个轨道或者流
-  unpublish(String trackSid, {bool notify = true}) async {
-    await room.localParticipant?.unpublishTrack(trackSid, notify: notify);
+  removePublishedTrack(String trackSid, {bool notify = true}) async {
+    await room.localParticipant?.removePublishedTrack(trackSid, notify: notify);
   }
 
   /// 关闭本地的所有的轨道或者流
@@ -340,7 +354,7 @@ class LiveKitRoomClient {
 
   Future<void> setCameraPosition(CameraPosition position) async {
     LocalTrackPublication<LocalVideoTrack>? videoTrackPublication =
-        room.localParticipant?.videoTracks.firstOrNull;
+        room.localParticipant?.videoTrackPublications.firstOrNull;
     if (videoTrackPublication != null) {
       var videoTrack = videoTrackPublication.track;
       try {
@@ -485,11 +499,11 @@ class LiveKitConferenceClient {
       for (PeerMediaStream peerMediaStream in peerMediaStreams) {
         String? trackId = peerMediaStream.videoTrack?.sid;
         if (trackId != null) {
-          await roomClient.unpublish(trackId, notify: notify);
+          await roomClient.removePublishedTrack(trackId, notify: notify);
         }
         trackId = peerMediaStream.audioTrack?.sid;
         if (trackId != null) {
-          await roomClient.unpublish(trackId, notify: notify);
+          await roomClient.removePublishedTrack(trackId, notify: notify);
         }
 
         if (peerMediaStream.id != null) {
@@ -532,7 +546,7 @@ class LiveKitConferenceClient {
     Map<String, PeerMediaStream> peerMediaStreams = {};
     for (RemoteParticipant remoteParticipant in remoteParticipants) {
       for (RemoteTrackPublication<RemoteAudioTrack> audioTrack
-          in remoteParticipant.audioTracks) {
+          in remoteParticipant.audioTrackPublications) {
         RemoteTrack? remoteTrack = audioTrack.track;
         if (remoteTrack == null) {
           continue;
@@ -552,7 +566,7 @@ class LiveKitConferenceClient {
         }
       }
       for (RemoteTrackPublication<RemoteVideoTrack> videoTrack
-          in remoteParticipant.videoTracks) {
+          in remoteParticipant.videoTrackPublications) {
         RemoteTrack? remoteTrack = videoTrack.track;
         if (remoteTrack == null) {
           continue;
