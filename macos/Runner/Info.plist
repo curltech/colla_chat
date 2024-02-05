@@ -54,6 +54,8 @@
 	<string>motion</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>photos</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>photos</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>NSRemindersUsageDescription</key>
