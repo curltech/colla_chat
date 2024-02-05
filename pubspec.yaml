@@ -441,6 +441,7 @@ dependency_overrides:
 #  image_gallery_saver: #^2.0.3
 #    git: https://github.com/hui-z/image_gallery_saver.git
   saver_gallery: ^3.0.1
+  gal: ^2.3.0
   enough_mail:
     git: https://github.com/Enough-Software/enough_mail.git
   enough_media: #^2.2.0
