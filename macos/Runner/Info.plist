@@ -53,9 +53,9 @@
 	<key>NSMotionUsageDescription</key>
 	<string>motion</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>photos</string>
+    <string>Get chat photo from library</string>
     <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>photos</string>
+    <string>Save chat photo to library</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>NSRemindersUsageDescription</key>
