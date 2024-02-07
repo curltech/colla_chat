@@ -91,9 +91,12 @@ abstract class PeerEntityService<T> extends PeerLocationService<T> {
     return peer;
   }
 
-  Future<String> updateAvatar(String peerId, List<int> avatar) async {
-    String data = CryptoUtil.encodeBase64(avatar);
-    data = ImageUtil.base64Img(data);
+  Future<String?> updateAvatar(String peerId, List<int>? avatar) async {
+    String? data;
+    if (avatar != null) {
+      data = CryptoUtil.encodeBase64(avatar);
+      data = ImageUtil.base64Img(data);
+    }
     await update({'avatar': data}, where: 'peerId=?', whereArgs: [peerId]);
 
     return data;

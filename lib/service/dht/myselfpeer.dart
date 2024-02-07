@@ -429,23 +429,26 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
   }
 
   @override
-  Future<String> updateAvatar(String peerId, List<int> avatar) async {
-    String data = await super.updateAvatar(peerId, avatar);
-    final myselfPeer = myself.myselfPeer;
-    myselfPeer.avatar = data;
-    var avatarImage = ImageUtil.buildImageWidget(
-        image: data,
-        height: AppIconSize.lgSize,
-        width: AppIconSize.lgSize,
-        fit: BoxFit.contain);
-    myselfPeer.avatarImage = avatarImage;
-    var avatarIcon = ImageIcon(
-      AssetImage(
-        data,
-      ),
-      size: AppIconSize.lgSize,
-    );
-    myselfPeer.avatarIcon = avatarIcon;
+  Future<String?> updateAvatar(String peerId, List<int>? avatar) async {
+    String? data = await super.updateAvatar(peerId, avatar);
+    if (data != null) {
+      final myselfPeer = myself.myselfPeer;
+      myselfPeer.avatar = data;
+      var avatarImage = ImageUtil.buildImageWidget(
+          image: data,
+          height: AppIconSize.lgSize,
+          width: AppIconSize.lgSize,
+          fit: BoxFit.contain);
+      myselfPeer.avatarImage = avatarImage;
+      var avatarIcon = ImageIcon(
+        AssetImage(
+          data,
+        ),
+        size: AppIconSize.lgSize,
+      );
+
+      myselfPeer.avatarIcon = avatarIcon;
+    }
     await peerClientService.updateAvatar(peerId, avatar);
     await linkmanService.updateAvatar(peerId, avatar);
 

@@ -397,7 +397,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     bool? video = false;
     if (mounted) {
       video = await DialogUtil.confirm(context,
-          content: 'Do you open video chat?',
+          content: 'Do you open video conference?',
           okLabel: 'Video',
           cancelLabel: 'Audio');
     }

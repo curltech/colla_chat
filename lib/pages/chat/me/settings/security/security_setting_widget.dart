@@ -317,7 +317,7 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
       children: <Widget>[
         securitySettingTile,
         autoLoginTile,
-        _buildBackupTileWidget()
+        Expanded(child: _buildBackupTileWidget())
       ],
     );
   }

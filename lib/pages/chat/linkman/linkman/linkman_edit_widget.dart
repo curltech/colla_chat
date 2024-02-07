@@ -1,13 +1,17 @@
+import 'dart:typed_data';
+
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/clipboard_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -15,78 +19,6 @@ import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
-
-final List<PlatformDataField> linkmanDataField = [
-  PlatformDataField(
-      name: 'id',
-      label: 'Id',
-      inputType: InputType.label,
-      readOnly: true,
-      prefixIcon: Icon(
-        Icons.numbers_outlined,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'peerId',
-      label: 'PeerId',
-      inputType: InputType.label,
-      readOnly: true,
-      prefixIcon: Icon(
-        Icons.perm_identity,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'name',
-      label: 'Name',
-      prefixIcon: Icon(
-        Icons.person,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'alias',
-      label: 'Alias',
-      prefixIcon: Icon(
-        Icons.person_pin,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'email',
-      label: 'Email',
-      prefixIcon: Icon(
-        Icons.email,
-        color: myself.primary,
-      ),
-      textInputType: TextInputType.emailAddress),
-  PlatformDataField(
-      name: 'mobile',
-      label: 'Mobile',
-      prefixIcon: Icon(
-        Icons.mobile_friendly,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'linkmanStatus',
-      label: 'LinkmanStatus',
-      prefixIcon: Icon(
-        Icons.child_friendly_outlined,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'subscriptStatus',
-      label: 'SubscriptStatus',
-      prefixIcon: Icon(
-        Icons.subscript_outlined,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'publicKey',
-      label: 'PublicKey',
-      readOnly : true,
-      prefixIcon: Icon(
-        Icons.vpn_key,
-        color: myself.primary,
-      )),
-];
 
 final ValueNotifier<Linkman?> linkmanNotifier = ValueNotifier<Linkman?>(null);
 
@@ -111,11 +43,88 @@ class LinkmanEditWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
-  final FormInputController controller = FormInputController(linkmanDataField);
+  final List<PlatformDataField> linkmanDataField = [
+    PlatformDataField(
+        name: 'id',
+        label: 'Id',
+        inputType: InputType.label,
+        readOnly: true,
+        prefixIcon: Icon(
+          Icons.numbers_outlined,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'peerId',
+        label: 'PeerId',
+        inputType: InputType.label,
+        readOnly: true,
+        prefixIcon: Icon(
+          Icons.perm_identity,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'name',
+        label: 'Name',
+        prefixIcon: Icon(
+          Icons.person,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'alias',
+        label: 'Alias',
+        prefixIcon: Icon(
+          Icons.person_pin,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'email',
+        label: 'Email',
+        prefixIcon: Icon(
+          Icons.email,
+          color: myself.primary,
+        ),
+        textInputType: TextInputType.emailAddress),
+    PlatformDataField(
+        name: 'mobile',
+        label: 'Mobile',
+        prefixIcon: Icon(
+          Icons.mobile_friendly,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'linkmanStatus',
+        label: 'LinkmanStatus',
+        prefixIcon: Icon(
+          Icons.child_friendly_outlined,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'subscriptStatus',
+        label: 'SubscriptStatus',
+        prefixIcon: Icon(
+          Icons.subscript_outlined,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'publicKey',
+        label: 'PublicKey',
+        readOnly: true,
+        prefixIcon: Icon(
+          Icons.vpn_key,
+          color: myself.primary,
+        )),
+  ];
+  late final FormInputController controller =
+      FormInputController(linkmanDataField);
 
   @override
   initState() {
     super.initState();
+    linkmanNotifier.addListener(_update);
+  }
+
+  _update() {
+    setState(() {});
   }
 
   Widget _buildFormInputWidget(BuildContext context) {
@@ -140,7 +149,21 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
             _onCopy(values);
           }),
     ];
-
+    List<Widget> heads = [];
+    if (linkman != null) {
+      heads.add(ListTile(
+          title: Text(AppLocalizations.t('Avatar')),
+          trailing: linkman.avatarImage,
+          onTap: () async {
+            await _pickAvatar(
+              context,
+              linkman.peerId,
+            );
+            linkmanNotifier.value =
+                await linkmanService.findCachedOneByPeerId(linkman.peerId);
+            linkmanController.current = linkmanNotifier.value;
+          }));
+    }
     var formInputWidget = Container(
         padding: const EdgeInsets.all(10.0),
         child: FormInputWidget(
@@ -148,9 +171,19 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
           spacing: 5.0,
           formButtons: formButtons,
           controller: controller,
+          heads: heads,
         ));
 
     return formInputWidget;
+  }
+
+  Future<void> _pickAvatar(
+    BuildContext context,
+    String peerId,
+  ) async {
+    Uint8List? avatar = await ImageUtil.pickAvatar(context);
+    await linkmanService.updateAvatar(peerId, avatar);
+    await peerClientService.updateAvatar(peerId, avatar);
   }
 
   _onOk(Map<String, dynamic> values) async {
@@ -218,6 +251,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
 
   @override
   void dispose() {
+    linkmanNotifier.removeListener(_update);
     super.dispose();
   }
 }

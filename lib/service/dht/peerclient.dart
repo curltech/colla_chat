@@ -156,8 +156,8 @@ class PeerClientService extends PeerEntityService<PeerClient> {
   }
 
   @override
-  Future<String> updateAvatar(String peerId, List<int> avatar) async {
-    String data = await super.updateAvatar(peerId, avatar);
+  Future<String?> updateAvatar(String peerId, List<int>? avatar) async {
+    String? data = await super.updateAvatar(peerId, avatar);
     refresh(peerId);
 
     return data;

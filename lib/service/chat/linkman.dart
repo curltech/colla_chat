@@ -334,8 +334,8 @@ class LinkmanService extends PeerPartyService<Linkman> {
 
   ///更新头像
   @override
-  Future<String> updateAvatar(String peerId, List<int> avatar) async {
-    String data = await super.updateAvatar(peerId, avatar);
+  Future<String?> updateAvatar(String peerId, List<int>? avatar) async {
+    String? data = await super.updateAvatar(peerId, avatar);
     linkmen.remove(peerId);
 
     return data;

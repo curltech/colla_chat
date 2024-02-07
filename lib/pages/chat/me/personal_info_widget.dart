@@ -140,9 +140,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
     String peerId,
   ) async {
     Uint8List? avatar = await ImageUtil.pickAvatar(context);
-    if (avatar != null) {
-      await myselfPeerService.updateAvatar(peerId, avatar);
-      setState(() {});
-    }
+    await myselfPeerService.updateAvatar(peerId, avatar);
+    setState(() {});
   }
 }
