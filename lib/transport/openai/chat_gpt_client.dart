@@ -34,7 +34,7 @@ class ChatGPTClient {
       Function(dynamic)? onComplete}) {
     final request = CompleteText(
       prompt: prompt,
-      model: TextDavinci3Model(),
+      model: Gpt3TurboInstruct(),
       temperature: temperature,
       maxTokens: maxTokens,
       topP: topP,
@@ -48,7 +48,7 @@ class ChatGPTClient {
 
   Future<List<dynamic>> chatCompletion({
     required ChatModel model,
-    required List<Messages> messages,
+    required List<Map<String, dynamic>> messages,
     double? temperature = .3,
     double? topP = 1.0,
     int? n = 1,
@@ -80,7 +80,7 @@ class ChatGPTClient {
 
   void chatCompletionStream(
       {required ChatModel model,
-        required List<Messages> messages,
+      required List<Map<String, dynamic>> messages,
       double? temperature = .3,
       double? topP = 1.0,
       int? n = 1,

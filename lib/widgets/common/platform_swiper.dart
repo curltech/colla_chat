@@ -181,9 +181,6 @@ class _PlatformSwiperState extends State<PlatformSwiper> {
       //onTapDisabled: onTapDisabled,
       onSwipe: onCardSwipe,
       //onEnd: onEnd,
-      direction: widget.scrollDirection == Axis.horizontal
-          ? CardSwiperDirection.right
-          : CardSwiperDirection.bottom,
       allowedSwipeDirection: const AllowedSwipeDirection.all(),
       isLoop: widget.loop,
       numberOfCardsDisplayed: 2,
