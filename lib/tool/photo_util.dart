@@ -4,7 +4,7 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
-///photo_view,photo_view_gallery
+///通过相册的抽象 API 对设备中的资源（图片、视频、音频）进行管理
 class PhotoUtil {
   static Future<bool> requestPermissionExtend() async {
     final PermissionState ps = await PhotoManager.requestPermissionExtend();

@@ -182,6 +182,13 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     String peerId,
   ) async {
     Uint8List? avatar = await ImageUtil.pickAvatar(context);
+    if (avatar == null) {
+      bool? confirm = await DialogUtil.confirm(context,
+          content: 'Do you want delete avatar?');
+      if (confirm == null || !confirm) {
+        return;
+      }
+    }
     await linkmanService.updateAvatar(peerId, avatar);
     await peerClientService.updateAvatar(peerId, avatar);
   }

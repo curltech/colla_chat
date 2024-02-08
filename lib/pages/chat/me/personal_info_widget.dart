@@ -6,6 +6,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -140,6 +141,13 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
     String peerId,
   ) async {
     Uint8List? avatar = await ImageUtil.pickAvatar(context);
+    if (avatar == null) {
+      bool? confirm = await DialogUtil.confirm(context,
+          content: 'Do you want delete avatar?');
+      if (confirm == null || !confirm) {
+        return;
+      }
+    }
     await myselfPeerService.updateAvatar(peerId, avatar);
     setState(() {});
   }

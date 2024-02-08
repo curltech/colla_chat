@@ -10,6 +10,7 @@ import 'package:colla_chat/pages/chat/me/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_map_launcher_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_webview_widget.dart';
+import 'package:colla_chat/pages/chat/me/poem/poem_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/webrtc_widget.dart';
 import 'package:colla_chat/platform.dart';
@@ -39,6 +40,7 @@ class MeWidget extends StatefulWidget with TileDataMixin {
   final PlatformMapLauncherWidget platformMapLauncherWidget =
       PlatformMapLauncherWidget();
   final PlatformInfoWidget platformInfoWidget = const PlatformInfoWidget();
+  final PoemWidget poemWidget = const PoemWidget();
 
   MeWidget({super.key}) {
     indexWidgetProvider.define(collectionListView);
@@ -54,6 +56,7 @@ class MeWidget extends StatefulWidget with TileDataMixin {
     indexWidgetProvider.define(liveKitSfuParticipantWidget);
     indexWidgetProvider.define(platformMapLauncherWidget);
     indexWidgetProvider.define(platformInfoWidget);
+    indexWidgetProvider.define(poemWidget);
   }
 
   @override
@@ -105,16 +108,17 @@ class _MeWidgetState extends State<MeWidget> {
         }
       }
     }
+    mixins.add(widget.platformMapLauncherWidget);
+    mixins.add(widget.platformInfoWidget);
     if (developerSwitch.value) {
       mixins.addAll([
         widget.webrtcWidget,
         widget.webViewWidget,
         widget.mediaWidget,
         widget.liveKitSfuRoomWidget,
+        widget.poemWidget,
       ]);
     }
-    mixins.add(widget.platformMapLauncherWidget);
-    mixins.add(widget.platformInfoWidget);
     List<TileData> meTileData = TileData.from(mixins);
     for (var tile in meTileData) {
       tile.dense = false;

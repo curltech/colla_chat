@@ -6,7 +6,7 @@ import 'package:colla_chat/tool/photo_util.dart';
 import 'package:flutter/material.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
-///资产选择器，类似微信，可以选择图片和其他资产
+///基于微信UI的Flutter图片选择器（同时支持视频和音频）
 class AssetUtil {
   static Future<List<AssetEntity>?> pickAssets(
     BuildContext context, {
@@ -15,28 +15,15 @@ class AssetUtil {
     bool useRootNavigator = true,
     AssetPickerPageRoute<List<AssetEntity>> Function(Widget)? pageRouteBuilder,
   }) async {
-    // pickerConfig = AssetPickerConfig(
-    //   maxAssets: 9,
-    //   pageSize: 320,
-    //   pathThumbnailSize: const ThumbnailSize(80, 80),
-    //   gridCount: 4,
-    //   selectedAssets: [],
-    //   themeColor: myself.primary,
-    // );
-    bool auth = await PhotoUtil.requestPermissionExtend();
-    if (auth) {
-      final List<AssetEntity>? result = await AssetPicker.pickAssets(
-        context,
-        key: key,
-        pickerConfig: pickerConfig,
-        useRootNavigator: useRootNavigator,
-        pageRouteBuilder: pageRouteBuilder,
-      );
+    final List<AssetEntity>? result = await AssetPicker.pickAssets(
+      context,
+      key: key,
+      pickerConfig: pickerConfig,
+      useRootNavigator: useRootNavigator,
+      pageRouteBuilder: pageRouteBuilder,
+    );
 
-      return result;
-    }
-
-    return null;
+    return result;
   }
 
   /// AssetEntityImage

@@ -668,5 +668,6 @@
   "build sfu conference failure": "创建视频会议失败",
   "send sfu conference message failure": "发送视频会议消息失败",
   "Build sfu conference:": "创建视频会议",
-  "CreateLiveKitConferenceClient failure": "创建视频会议客户端失败"
+  "CreateLiveKitConferenceClient failure": "创建视频会议客户端失败",
+  "Do you want delete avatar?": "有确定删除头像吗？"
 }

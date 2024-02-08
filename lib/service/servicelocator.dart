@@ -25,6 +25,7 @@ import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/service/dht/peersignal.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
+import 'package:colla_chat/service/poem/poem.dart';
 import 'package:colla_chat/service/stock/event.dart';
 import 'package:colla_chat/service/stock/event_filter.dart';
 import 'package:colla_chat/service/stock/filter_cond.dart';
@@ -71,6 +72,7 @@ class ServiceLocator {
     services['eventService'] = eventService;
     services['eventFilterService'] = eventFilterService;
     services['filterCondService'] = filterCondService;
+    services['poemService'] = poemService;
 
     securityContextServices[CryptoOption.none.index] =
         noneSecurityContextService;
