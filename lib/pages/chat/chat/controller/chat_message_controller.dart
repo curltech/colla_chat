@@ -20,6 +20,7 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/openai/openai_client.dart';
 import 'package:dart_openai/dart_openai.dart';
 import 'package:flutter/foundation.dart';
+import 'package:synchronized/synchronized.dart';
 import 'package:uuid/uuid.dart';
 
 enum ChatGPTAction { chat, image, audio, translate, extract }
@@ -40,6 +41,8 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
 
   //引用的消息
   String? _parentMessageId;
+
+  Lock _lock = Lock();
 
   ChatSummary? get chatSummary {
     return _chatSummary;
@@ -97,95 +100,99 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   ///访问数据库获取比当前数据更老的消息，如果当前数据为空，从最新的开始
   @override
   Future<int> previous({int? limit}) async {
-    var chatSummary = _chatSummary;
-    if (chatSummary == null) {
-      clear(notify: false);
-      return 0;
-    }
-    if (chatSummary.peerId == null) {
-      clear(notify: false);
-      return 0;
-    }
-    List<ChatMessage>? chatMessages;
-    if (_chatSummary != null) {
-      if (_chatSummary!.partyType == PartyType.linkman.name) {
-        int start = DateTime.now().millisecondsSinceEpoch;
-        chatMessages = await chatMessageService.findByPeerId(
-            peerId: _chatSummary!.peerId!,
-            messageType: ChatMessageType.chat.name,
-            offset: data.length,
-            limit: limit);
-        int end = DateTime.now().millisecondsSinceEpoch;
-        logger.i('chatMessageService.findByPeerId time:${end - start}');
-      } else if (_chatSummary!.partyType == PartyType.group.name) {
-        chatMessages = await chatMessageService.findByPeerId(
-            groupId: _chatSummary!.peerId!,
-            messageType: ChatMessageType.chat.name,
-            offset: data.length,
-            limit: limit);
-      } else if (_chatSummary!.partyType == PartyType.conference.name) {
-        chatMessages = await chatMessageService.findByPeerId(
-            groupId: _chatSummary!.peerId!,
-            messageType: ChatMessageType.chat.name,
-            offset: data.length,
-            limit: limit);
+    return _lock.synchronized(() async {
+      var chatSummary = _chatSummary;
+      if (chatSummary == null) {
+        clear(notify: false);
+        return 0;
       }
-      if (chatMessages != null && chatMessages.isNotEmpty) {
-        addAll(chatMessages);
-
-        return chatMessages.length;
+      if (chatSummary.peerId == null) {
+        clear(notify: false);
+        return 0;
       }
-    }
+      List<ChatMessage>? chatMessages;
+      if (_chatSummary != null) {
+        if (_chatSummary!.partyType == PartyType.linkman.name) {
+          int start = DateTime.now().millisecondsSinceEpoch;
+          chatMessages = await chatMessageService.findByPeerId(
+              peerId: _chatSummary!.peerId!,
+              messageType: ChatMessageType.chat.name,
+              offset: data.length,
+              limit: limit);
+          int end = DateTime.now().millisecondsSinceEpoch;
+          logger.i('chatMessageService.findByPeerId time:${end - start}');
+        } else if (_chatSummary!.partyType == PartyType.group.name) {
+          chatMessages = await chatMessageService.findByPeerId(
+              groupId: _chatSummary!.peerId!,
+              messageType: ChatMessageType.chat.name,
+              offset: data.length,
+              limit: limit);
+        } else if (_chatSummary!.partyType == PartyType.conference.name) {
+          chatMessages = await chatMessageService.findByPeerId(
+              groupId: _chatSummary!.peerId!,
+              messageType: ChatMessageType.chat.name,
+              offset: data.length,
+              limit: limit);
+        }
+        if (chatMessages != null && chatMessages.isNotEmpty) {
+          addAll(chatMessages);
 
-    return 0;
+          return chatMessages.length;
+        }
+      }
+
+      return 0;
+    });
   }
 
   ///访问数据库获取比当前的最新的消息更新的消息
   @override
   Future<int> latest({int? limit}) async {
-    var chatSummary = _chatSummary;
-    if (chatSummary == null) {
-      clear(notify: false);
-      return 0;
-    }
-    if (chatSummary.peerId == null) {
-      clear(notify: false);
-      return 0;
-    }
-    String? sendTime;
-    if (data.isNotEmpty) {
-      sendTime = data[0].sendTime;
-    }
-    List<ChatMessage>? chatMessages;
-    if (_chatSummary != null) {
-      if (_chatSummary!.partyType == PartyType.linkman.name) {
-        chatMessages = await chatMessageService.findByGreaterId(
-            peerId: _chatSummary!.peerId!,
-            messageType: ChatMessageType.chat.name,
-            sendTime: sendTime,
-            limit: limit);
-      } else if (_chatSummary!.partyType == PartyType.group.name) {
-        chatMessages = await chatMessageService.findByGreaterId(
-            groupId: _chatSummary!.peerId!,
-            messageType: ChatMessageType.chat.name,
-            sendTime: sendTime,
-            limit: limit);
-      } else if (_chatSummary!.partyType == PartyType.conference.name) {
-        chatMessages = await chatMessageService.findByGreaterId(
-            groupId: _chatSummary!.peerId!,
-            messageType: ChatMessageType.chat.name,
-            sendTime: sendTime,
-            limit: limit);
+    return _lock.synchronized(() async {
+      var chatSummary = _chatSummary;
+      if (chatSummary == null) {
+        clear(notify: false);
+        return 0;
       }
-      if (chatMessages != null && chatMessages.isNotEmpty) {
-        data.insertAll(0, chatMessages);
-        notifyListeners();
-
-        return chatMessages.length;
+      if (chatSummary.peerId == null) {
+        clear(notify: false);
+        return 0;
       }
-    }
+      String? sendTime;
+      if (data.isNotEmpty) {
+        sendTime = data[0].sendTime;
+      }
+      List<ChatMessage>? chatMessages;
+      if (_chatSummary != null) {
+        if (_chatSummary!.partyType == PartyType.linkman.name) {
+          chatMessages = await chatMessageService.findByGreaterId(
+              peerId: _chatSummary!.peerId!,
+              messageType: ChatMessageType.chat.name,
+              sendTime: sendTime,
+              limit: limit);
+        } else if (_chatSummary!.partyType == PartyType.group.name) {
+          chatMessages = await chatMessageService.findByGreaterId(
+              groupId: _chatSummary!.peerId!,
+              messageType: ChatMessageType.chat.name,
+              sendTime: sendTime,
+              limit: limit);
+        } else if (_chatSummary!.partyType == PartyType.conference.name) {
+          chatMessages = await chatMessageService.findByGreaterId(
+              groupId: _chatSummary!.peerId!,
+              messageType: ChatMessageType.chat.name,
+              sendTime: sendTime,
+              limit: limit);
+        }
+        if (chatMessages != null && chatMessages.isNotEmpty) {
+          data.insertAll(0, chatMessages);
+          notifyListeners();
 
-    return 0;
+          return chatMessages.length;
+        }
+      }
+
+      return 0;
+    });
   }
 
   ///发送文本消息,发送命令消息目标可以是linkman，也可以是群，取决于当前chatSummary
