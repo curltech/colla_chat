@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:colla_chat/entity/dht/peerendpoint.dart';
 import 'package:colla_chat/p2p/chain/chainmessagehandler.dart';
@@ -53,7 +54,10 @@ class Websocket extends IWebClient {
   Timer? heartBeat; // 心跳定时器
   int heartTimes = 3000; // 心跳间隔(毫秒)
   int reconnectTimes = 5;
-  Function(Websocket websocket, SocketStatus status)? onStatusChange;
+  StreamController<SocketStatus> statusStreamController =
+      StreamController<SocketStatus>.broadcast();
+
+  //Function(Websocket websocket, SocketStatus status)? onStatusChange;
 
   Websocket(this.address, Function() postConnected, {this.peerId}) {
     key = UniqueKey();
@@ -63,7 +67,7 @@ class Websocket extends IWebClient {
     this.postConnected = postConnected;
   }
 
-  Future<void> connect() async {
+  Future<bool> connect() async {
     await close();
     try {
       channel = websocket_connect.websocketConnect(address,
@@ -73,14 +77,24 @@ class Websocket extends IWebClient {
     }
     if (channel == null) {
       logger.e('wss address:$address connect failure');
-      return;
+      return false;
     }
-    await channel!.ready;
-    channel!.stream.listen((dynamic data) {
-      onData(data);
-    }, onError: onError, onDone: onDone, cancelOnError: false);
-    status = SocketStatus.connecting;
-    logger.i('wss address:$address websocket connecting');
+    try {
+      await channel!.ready;
+      status = SocketStatus.connected;
+      logger.i('wss address:$address websocket connected');
+      channel!.stream.listen((dynamic data) {
+        onData(data);
+      }, onError: onError, onDone: onDone, cancelOnError: false);
+
+      return true;
+    } on SocketException catch (e) {
+      logger.e('wss address:$address websocket socketException:$e');
+    } on WebSocketChannelException catch (e) {
+      logger.e('wss address:$address websocket webSocketChannelException:$e');
+    }
+
+    return false;
   }
 
   onData(dynamic data) async {
@@ -139,9 +153,7 @@ class Websocket extends IWebClient {
     if (_status != status) {
       logger.w('websocket $address status changed from $_status to $status');
       _status = status;
-      if (onStatusChange != null) {
-        onStatusChange!(this, status);
-      }
+      statusStreamController.add(status);
       //当状态变为连接的时候，发送缓存的消息
       if (status == SocketStatus.connected) {
         lock.synchronized(() {
@@ -260,42 +272,8 @@ class WebsocketPool {
   var websockets = <String, Websocket>{};
   Websocket? _default;
 
-  Map<String, List<Function(String address, SocketStatus status)>> fnsm = {};
-
   WebsocketPool() {
     connect();
-  }
-
-  registerStatusChanged(
-      String address, Function(String address, SocketStatus status) fn) {
-    List<Function(String address, SocketStatus status)>? fns = fnsm[address];
-    if (fns == null) {
-      fns = [];
-      fnsm[address] = fns;
-    }
-    fns.add(fn);
-  }
-
-  unregisterStatusChanged(
-      String address, Function(String address, SocketStatus status) fn) {
-    List<Function(String address, SocketStatus status)>? fns = fnsm[address];
-    if (fns == null) {
-      return;
-    }
-    fns.remove(fn);
-    if (fns.isEmpty) {
-      fnsm.remove(address);
-    }
-  }
-
-  onStatusChanged(Websocket websocket, SocketStatus status) {
-    String address = websocket.address;
-    List<Function(String address, SocketStatus status)>? fns = fnsm[address];
-    if (fns != null) {
-      for (var fn in fns) {
-        fn(address, status);
-      }
-    }
   }
 
   Future<Websocket?> connect() async {
@@ -340,10 +318,11 @@ class WebsocketPool {
         if (defaultAddress != null && defaultAddress.startsWith('ws')) {
           websocket = Websocket(defaultAddress, myselfPeerService.connect,
               peerId: defaultPeerId);
-          await websocket.connect();
-          websockets[defaultAddress] = websocket;
-          _default = websocket;
-          websocket.onStatusChange = onStatusChanged;
+          bool success = await websocket.connect();
+          if (success) {
+            websockets[defaultAddress] = websocket;
+            _default = websocket;
+          }
         }
       }
     } else {
@@ -406,7 +385,6 @@ class WebsocketPool {
         }
         websocket =
             Websocket(address, myselfPeerService.connect, peerId: peerId);
-        websocket.onStatusChange = onStatusChanged;
         await websocket.connect();
         websockets[address] = websocket;
         if (isDefault) {

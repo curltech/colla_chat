@@ -173,18 +173,22 @@ class _ChatListWidgetState extends State<ChatListWidget>
     // conferenceChatSummaryController.refresh();
 
     connectivityController.addListener(_updateConnectivity);
+    _initStatusStreamController();
+    localNotificationsService.isAndroidPermissionGranted();
+    localNotificationsService.requestPermissions();
+    _initDelete();
+  }
 
+  _initStatusStreamController() {
     Websocket? websocket = websocketPool.defaultWebsocket;
     if (websocket != null) {
-      websocketPool.registerStatusChanged(
-          websocket.address, _updateWebsocketStatus);
+      websocket.statusStreamController.stream.listen((event) {
+        _updateWebsocketStatus(websocket.address, event);
+      });
       _socketStatus.value = websocket.status;
     } else {
       _socketStatus.value = SocketStatus.closed;
     }
-    localNotificationsService.isAndroidPermissionGranted();
-    localNotificationsService.requestPermissions();
-    _initDelete();
   }
 
   _initDelete() {
@@ -200,6 +204,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
       Websocket? websocket = websocketPool.getDefault();
       if (websocket == null) {
         await websocketPool.connect();
+        _initStatusStreamController();
       }
     }
   }
@@ -740,11 +745,6 @@ class _ChatListWidgetState extends State<ChatListWidget>
     groupChatSummaryController.removeListener(_updateGroupChatSummary);
     conferenceChatSummaryController
         .removeListener(_updateConferenceChatSummary);
-    Websocket? websocket = websocketPool.getDefault();
-    if (websocket != null) {
-      websocketPool.unregisterStatusChanged(
-          websocket.address, _updateWebsocketStatus);
-    }
     super.dispose();
   }
 }

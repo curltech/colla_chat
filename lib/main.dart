@@ -74,7 +74,7 @@ void main(List<String> args) async {
     }
     return msg;
   });
-
+  websocketPool.connect();
   _initWebView();
   await _initDesktopWindows();
   await localNotificationsService.init();
