@@ -24,6 +24,7 @@ import 'package:colla_chat/service/chat/chat_summary.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/connectivity_util.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -386,8 +387,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
           //chatSummaryService.delete(entity: chatSummary);
           continue;
         }
-        var linkmanStatus =
-            linkman.linkmanStatus ?? LinkmanStatus.S.name;
+        var linkmanStatus = linkman.linkmanStatus ?? LinkmanStatus.S.name;
         linkmanStatus = AppLocalizations.t(linkmanStatus);
         if (peerId == myself.peerId) {
           linkmanStatus = AppLocalizations.t(LinkmanStatus.M.name);
@@ -435,7 +435,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
         onTap: (int index, String label, {String? subtitle}) async {
           bool? confirm = await DialogUtil.confirm(context,
               content:
-              '${AppLocalizations.t('Do you want delete chat messages of ')} $name');
+                  '${AppLocalizations.t('Do you want delete chat messages of ')} $name');
           if (confirm != true) {
             return;
           }
@@ -700,6 +700,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
                       Websocket? websocket = websocketPool.getDefault();
                       if (websocket == null) {
                         await _reconnect();
+                        myselfPeerService.connect();
                       } else {
                         //缺省的websocket如果存在，尝试重连
                         if (websocket.status != SocketStatus.connected) {

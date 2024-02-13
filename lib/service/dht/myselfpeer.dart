@@ -263,6 +263,11 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       if (StringUtil.isNotEmpty(credential) &&
           StringUtil.isNotEmpty(password)) {
         bool loginStatus = await login(credential!, password!);
+        if (loginStatus) {
+          ///连接篇p2p的节点，把自己的信息注册上去
+          myselfPeerService.connect();
+          myselfPeerService.postLogin();
+        }
         return loginStatus;
       }
     }
@@ -328,9 +333,6 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       //   }
       // }
 
-      ///3.连接篇p2p的节点，把自己的信息注册上去
-      await connect();
-      await postLogin();
       return true;
     } else {
       logger.e('$credential is not exist');

@@ -302,7 +302,7 @@ class WebsocketPool {
     return await lock.synchronized(() async {
       Websocket? websocket = getDefault();
       if (websocket == null) {
-        return _connect();
+        return await _connect();
       }
 
       return websocket;
