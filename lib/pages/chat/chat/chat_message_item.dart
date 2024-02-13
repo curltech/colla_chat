@@ -245,11 +245,14 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
 
   ///其他人的消息，从左到右，头像，时间，名称，消息容器
   Widget _buildOther(BuildContext context) {
-    var sendTime = widget.chatMessage.sendTime;
-    sendTime = sendTime = DateUtil.formatEasyRead(sendTime!);
-    int? id = widget.chatMessage.id;
-    Widget title = CommonAutoSizeText('$id:$sendTime',
-        style: const TextStyle(fontSize: 12));
+    String? sendTime = widget.chatMessage.sendTime;
+    sendTime = DateUtil.formatEasyRead(sendTime!);
+    if (myself.peerProfile.developerSwitch) {
+      int? id = widget.chatMessage.id;
+      sendTime = '$id:$sendTime';
+    }
+    Widget title =
+        CommonAutoSizeText(sendTime, style: const TextStyle(fontSize: 12));
     if (timer != null) {
       title = Row(
         children: [
@@ -294,11 +297,14 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
 
   ///我的消息，从右到左，头像，时间，名称，消息容器
   Widget _buildMe(BuildContext context) {
-    var sendTime = widget.chatMessage.sendTime;
-    sendTime = sendTime = DateUtil.formatEasyRead(sendTime!);
-    int? id = widget.chatMessage.id;
-    Widget title = CommonAutoSizeText('$id:$sendTime',
-        style: const TextStyle(fontSize: 12));
+    String? sendTime = widget.chatMessage.sendTime;
+    sendTime = DateUtil.formatEasyRead(sendTime!);
+    if (myself.peerProfile.developerSwitch) {
+      int? id = widget.chatMessage.id;
+      sendTime = '$id:$sendTime';
+    }
+    Widget title =
+        CommonAutoSizeText(sendTime, style: const TextStyle(fontSize: 12));
     if (timer != null) {
       title = Row(
         children: [
