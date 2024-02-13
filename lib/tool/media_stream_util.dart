@@ -154,6 +154,10 @@ class MediaStreamUtil {
     await Helper.selectAudioOutput(deviceId);
   }
 
+  static Future<void> selectAudioInput(String deviceId) async {
+    await Helper.selectAudioInput(deviceId);
+  }
+
   /// 对视频流的第一个音频轨道切换音频播放设备，对手机来说就是耳机还是喇叭
   static Future<void> switchSpeaker(
       MediaStream mediaStream, bool enable) async {
