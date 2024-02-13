@@ -65,9 +65,18 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
     if (mediaDeviceInfos != null) {
       for (var mediaDeviceInfo in mediaDeviceInfos) {
         tiles.add(TileData(
-            title: mediaDeviceInfo.label,
-            subtitle: mediaDeviceInfo.deviceId,
-            titleTail: mediaDeviceInfo.groupId));
+          title: mediaDeviceInfo.label,
+          subtitle: mediaDeviceInfo.deviceId,
+          titleTail: mediaDeviceInfo.kind,
+          onTap: (int index, String title, {String? subtitle}) async {
+            if (mediaDeviceInfo.kind == 'audiooutput') {
+              await MediaStreamUtil.selectAudioOutput(mediaDeviceInfo.deviceId);
+            }
+            if (mediaDeviceInfo.kind == 'audioinput') {
+              await MediaStreamUtil.selectAudioInput(mediaDeviceInfo.deviceId);
+            }
+          },
+        ));
       }
     }
 
@@ -226,6 +235,14 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
     );
     videoActionData.add(
       ActionData(
+          label: 'Speaker toggle',
+          icon: Icon(
+            Icons.speaker_phone,
+            color: _isSpeakerOn ? Colors.blue : Colors.grey,
+          )),
+    );
+    videoActionData.add(
+      ActionData(
           label: 'Microphone mute switch',
           icon: Icon(
             _isMicrophoneOn ? Icons.mic : Icons.mic_off,
@@ -290,6 +307,10 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
         _isSpeakerOn = !_isSpeakerOn;
         await MediaStreamUtil.setSpeakerphoneOn(_isSpeakerOn);
         break;
+      case 'Speaker toggle':
+        _isSpeakerOn = !_isSpeakerOn;
+        await peerMediaStream?.switchSpeaker(_isSpeakerOn);
+        break;
       case 'Microphone mute switch':
         _isMicrophoneOn = !_isMicrophoneOn;
         await peerMediaStream?.setMicrophoneMute(_isMicrophoneOn);
@@ -350,11 +371,12 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
               },
               showLabel: true,
               showTooltip: true,
-              crossAxisCount: 4,
+              crossAxisCount: 3,
               actions: actions,
               mainAxisSpacing: 20,
               crossAxisSpacing: 20,
               height: height,
+              width: 350,
               iconSize: 30));
     });
   }
