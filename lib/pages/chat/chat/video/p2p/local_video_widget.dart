@@ -618,35 +618,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             label: 'Speaker',
             tip: status ? 'On' : 'Off',
             onPressed: () async {
-              // List<MediaDeviceInfo> mediaDeviceInfos =
-              //     await MediaStreamUtil.audiooutputs;
-              // if (mediaDeviceInfos.isNotEmpty) {
-              //   await DialogUtil.popModalBottomSheet(context,
-              //       builder: (BuildContext context) {
-              //     List<Widget> children = [];
-              //     for (var mediaDeviceInfo in mediaDeviceInfos) {
-              //       children.add(TextButton(
-              //         child: Text(mediaDeviceInfo.label),
-              //         onPressed: () async {
-              //           await MediaStreamUtil.selectAudioOutput(
-              //               mediaDeviceInfo.deviceId);
-              //           Navigator.of(context).pop();
-              //         },
-              //       ));
-              //     }
-              //     return ButtonBar(
-              //       children: children,
-              //     );
-              //   });
-              // }
-              // PeerMediaStream? peerMediaStream =
-              //     localPeerMediaStreamController.mainPeerMediaStream;
-              // if (peerMediaStream != null) {
-              //   var mediaStream = peerMediaStream.mediaStream;
-              //   if (mediaStream != null) {
-              //     MediaStreamUtil.switchSpeaker(mediaStream, !status);
-              //   }
-              // }
               await MediaStreamUtil.setSpeakerphoneOn(!status);
               speakerStatus.value = !status;
             },
