@@ -326,8 +326,10 @@ class PeerMediaStream {
   /// 切换设备的麦克风是否打开
   switchSpeaker(bool enableSpeaker) async {
     if (participant != null) {
+      await Hardware.instance.setPreferSpeakerOutput(false);
       await Hardware.instance.setSpeakerphoneOn(enableSpeaker);
     } else {
+      await Hardware.instance.setPreferSpeakerOutput(false);
       MediaStreamUtil.setSpeakerphoneOn(!enableSpeaker);
     }
   }

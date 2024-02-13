@@ -618,8 +618,12 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             label: 'Speaker',
             tip: status ? 'On' : 'Off',
             onPressed: () async {
-              await MediaStreamUtil.setSpeakerphoneOn(!status);
-              speakerStatus.value = !status;
+              PeerMediaStream? peerMediaStream =
+                  localPeerMediaStreamController.mainPeerMediaStream;
+              if (peerMediaStream != null) {
+                await peerMediaStream.switchSpeaker(!status);
+                speakerStatus.value = !status;
+              }
             },
             backgroundColor: status ? Colors.green : Colors.white,
             child: Icon(

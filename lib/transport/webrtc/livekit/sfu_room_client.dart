@@ -366,6 +366,7 @@ class LiveKitRoomClient {
   }
 
   Future<void> setSpeakerphoneOn(bool enable) async {
+    await Hardware.instance.setPreferSpeakerOutput(false);
     await Hardware.instance.setSpeakerphoneOn(enable);
   }
 }
