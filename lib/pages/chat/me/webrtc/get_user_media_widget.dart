@@ -235,14 +235,6 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
     );
     videoActionData.add(
       ActionData(
-          label: 'Speaker toggle',
-          icon: Icon(
-            Icons.speaker_phone,
-            color: _isSpeakerOn ? Colors.blue : Colors.grey,
-          )),
-    );
-    videoActionData.add(
-      ActionData(
           label: 'Microphone mute switch',
           icon: Icon(
             _isMicrophoneOn ? Icons.mic : Icons.mic_off,
@@ -304,10 +296,6 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
         _isRec ? _stopRecording() : _startRecording();
         break;
       case 'Speaker switch':
-        _isSpeakerOn = !_isSpeakerOn;
-        await MediaStreamUtil.setSpeakerphoneOn(_isSpeakerOn);
-        break;
-      case 'Speaker toggle':
         _isSpeakerOn = !_isSpeakerOn;
         await peerMediaStream?.switchSpeaker(_isSpeakerOn);
         break;
