@@ -174,10 +174,9 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
         DialogUtil.loadingHide(context);
       }
 
-      ///连接篇p2p的节点，把自己的信息注册上去
-      myselfPeerService.connect();
-      myselfPeerService.postLogin();
       if (loginStatus) {
+        ///连接篇p2p的节点，把自己的信息注册上去
+        myselfPeerService.connect();
         if (myself.autoLogin) {
           myselfPeerService.saveAutoCredential(credential, password);
         }

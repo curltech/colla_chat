@@ -266,7 +266,6 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
         if (loginStatus) {
           ///连接篇p2p的节点，把自己的信息注册上去
           myselfPeerService.connect();
-          myselfPeerService.postLogin();
         }
         return loginStatus;
       }
@@ -332,6 +331,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       //     logger.e('backgroundService start failure:$e');
       //   }
       // }
+      postLogin();
 
       return true;
     } else {
