@@ -74,9 +74,7 @@ void main(List<String> args) async {
     if (msg == AppLifecycleState.resumed.toString()) {
       //logger.w('system channel switch to foreground');
       await websocketPool.connect();
-    } else if (msg == AppLifecycleState.paused.toString() ||
-        msg == AppLifecycleState.inactive.toString() ||
-        msg == AppLifecycleState.hidden.toString()) {
+    } else if (msg == AppLifecycleState.inactive.toString()) {
       //logger.w('system channel switch to $msg');
       localNotificationsService.showNotification(
           'CollaChat', AppLocalizations.t('CollaChat App inactive'));
@@ -85,7 +83,8 @@ void main(List<String> args) async {
           await AndroidOverlayWindowUtil.showOverlay();
         }
       }
-    }
+    } else if (msg == AppLifecycleState.paused.toString() ||
+        msg == AppLifecycleState.hidden.toString()) {}
     return msg;
   });
   websocketPool.connect();

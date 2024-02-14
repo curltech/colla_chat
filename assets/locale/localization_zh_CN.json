@@ -669,5 +669,6 @@
   "send sfu conference message failure": "发送视频会议消息失败",
   "Build sfu conference:": "创建视频会议",
   "CreateLiveKitConferenceClient failure": "创建视频会议客户端失败",
-  "Do you want delete avatar?": "有确定删除头像吗？"
+  "Do you want delete avatar?": "有确定删除头像吗？",
+  "CollaChat App inactive": "CollaChat应用进入后台"
 }
