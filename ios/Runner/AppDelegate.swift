@@ -3,6 +3,8 @@ import flutter_sharing_intent
 import Flutter
 import flutter_local_notifications
 import flutter_background_service_ios
+//import awesome_notifications
+//import shared_preferences_ios
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
@@ -22,12 +24,12 @@ import flutter_background_service_ios
         UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
       }
       // This function registers the desired plugins to be used within a notification background action
-      SwiftAwesomeNotificationsPlugin.setPluginRegistrantCallback { registry in
-         SwiftAwesomeNotificationsPlugin.register(
-           with: registry.registrar(forPlugin: "io.flutter.plugins.awesomenotifications.AwesomeNotificationsPlugin")!)
-         FLTSharedPreferencesPlugin.register(
-           with: registry.registrar(forPlugin: "io.flutter.plugins.sharedpreferences.SharedPreferencesPlugin")!)
-      }
+//      SwiftAwesomeNotificationsPlugin.setPluginRegistrantCallback { registry in
+//         SwiftAwesomeNotificationsPlugin.register(
+//           with: registry.registrar(forPlugin: "io.flutter.plugins.awesomenotifications.AwesomeNotificationsPlugin")!)
+//         FLTSharedPreferencesPlugin.register(
+//           with: registry.registrar(forPlugin: "io.flutter.plugins.sharedpreferences.SharedPreferencesPlugin")!)
+//      }
       GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
