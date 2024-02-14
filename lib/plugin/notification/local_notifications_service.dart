@@ -31,13 +31,13 @@ class ReceivedNotification {
   final String? payload;
 }
 
-///本地通知消息
+/// 本地通知消息
 class LocalNotificationsService {
   int id = 0;
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  ///apple下的通知的类别设置，没有按钮和输入框，仅仅显示消息
+  /// apple下的通知的类别设置，没有按钮和输入框，仅仅显示消息
   final List<DarwinNotificationCategory> darwinNotificationCategories =
       <DarwinNotificationCategory>[
     const DarwinNotificationCategory(
@@ -48,9 +48,9 @@ class LocalNotificationsService {
     )
   ];
 
-  ///runApp前调用
+  /// 初始化local notification，runApp前调用
   init() async {
-    //ios,macos的初始化设置
+    // ios,macos的初始化设置
     final DarwinInitializationSettings initializationSettingsDarwin =
         DarwinInitializationSettings(
       requestAlertPermission: false,
@@ -88,7 +88,7 @@ class LocalNotificationsService {
       macOS: initializationSettingsDarwin,
       linux: initializationSettingsLinux,
     );
-    //初始化，定义通知的响应函数，包括通知选择本身和通知的按钮
+    // 初始化，定义通知的响应函数，包括通知选择本身和通知的按钮
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
       //用户选择或者点击了通知
@@ -102,12 +102,12 @@ class LocalNotificationsService {
             break;
         }
       },
-      //应用处于后台时，点击通知的响应函数
+      // 应用处于后台时，点击通知的响应函数
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
   }
 
-  ///android平台是否有权限
+  /// android平台是否有权限
   Future<bool> isAndroidPermissionGranted() async {
     if (platformParams.android) {
       final bool granted = await flutterLocalNotificationsPlugin
@@ -122,7 +122,7 @@ class LocalNotificationsService {
     return false;
   }
 
-  ///申请通知的权限
+  /// 申请通知的权限
   Future<bool?> requestPermissions() async {
     bool? granted = false;
     if (platformParams.ios) {
@@ -165,7 +165,7 @@ class LocalNotificationsService {
     String? payload = notificationResponse.payload;
   }
 
-  ///显示通知
+  /// 显示本地通知
   Future<void> showNotification(
     String title,
     String body, {

@@ -24,20 +24,7 @@ class FirebaseMessagingService {
 
   FirebaseMessagingService();
 
-  Future<AuthorizationStatus> requestPermission() async {
-    settings ??= await FirebaseMessaging.instance.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
-    return settings!.authorizationStatus;
-  }
-
-  ///在main的runApp之前调用，用于初始化
+  /// 在main的runApp之前调用，用于初始化
   init() async {
     if (platformParams.mobile || platformParams.macos) {
       await Firebase.initializeApp(
@@ -70,6 +57,19 @@ class FirebaseMessagingService {
       badge: true,
       sound: true,
     );
+  }
+
+  Future<AuthorizationStatus> requestPermission() async {
+    settings ??= await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+    return settings!.authorizationStatus;
   }
 
   Future<String?> getToken() async {

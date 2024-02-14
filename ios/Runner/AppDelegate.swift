@@ -21,6 +21,13 @@ import flutter_background_service_ios
       if #available(iOS 10.0, *) {
         UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
       }
+      // This function registers the desired plugins to be used within a notification background action
+      SwiftAwesomeNotificationsPlugin.setPluginRegistrantCallback { registry in
+         SwiftAwesomeNotificationsPlugin.register(
+           with: registry.registrar(forPlugin: "io.flutter.plugins.awesomenotifications.AwesomeNotificationsPlugin")!)
+         FLTSharedPreferencesPlugin.register(
+           with: registry.registrar(forPlugin: "io.flutter.plugins.sharedpreferences.SharedPreferencesPlugin")!)
+      }
       GeneratedPluginRegistrant.register(with: self)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }

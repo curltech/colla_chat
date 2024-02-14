@@ -2,7 +2,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:elegant_notification/elegant_notification.dart';
 import 'package:elegant_notification/resources/arrays.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:stacked_notification_cards/stacked_notification_cards.dart';
 
 class NotificationUtil {
