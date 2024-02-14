@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/plugin/notification/firebase_messaging_service.dart';
 import 'package:colla_chat/plugin/notification/local_notifications_service.dart';
 import 'package:colla_chat/plugin/overlay/android_overlay_window_util.dart';
@@ -71,11 +72,11 @@ void main(List<String> args) async {
   bool loginStatus = await ServiceLocator.init();
 
   SystemChannels.lifecycle.setMessageHandler((msg) async {
+    logger.w('system channel switch to $msg');
     if (msg == AppLifecycleState.resumed.toString()) {
-      //logger.w('system channel switch to foreground');
       await websocketPool.connect();
-    } else if (msg == AppLifecycleState.hidden.toString()) {
-      //logger.w('system channel switch to $msg');
+    } else if (msg == AppLifecycleState.paused.toString() ||
+        msg == AppLifecycleState.hidden.toString()) {
       localNotificationsService.showNotification(
           'CollaChat', AppLocalizations.t('CollaChat App inactive'));
       if (platformParams.android) {
@@ -83,8 +84,7 @@ void main(List<String> args) async {
           await AndroidOverlayWindowUtil.showOverlay();
         }
       }
-    } else if (msg == AppLifecycleState.paused.toString() ||
-        msg == AppLifecycleState.inactive.toString()) {}
+    } else if (msg == AppLifecycleState.inactive.toString()) {}
     return msg;
   });
   websocketPool.connect();
