@@ -7,13 +7,11 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 ///应用处于后台时，点击通知的响应函数
 @pragma('vm:entry-point')
 void notificationTapBackground(NotificationResponse notificationResponse) {
-  logger.i('notification(${notificationResponse.id}) action tapped: '
-      '${notificationResponse.actionId} with'
-      ' payload: ${notificationResponse.payload}');
-  if (notificationResponse.input?.isNotEmpty ?? false) {
-    logger.i(
-        'notification action tapped with input: ${notificationResponse.input}');
-  }
+  NotificationResponseType type = notificationResponse.notificationResponseType;
+  String? input = notificationResponse.input;
+  String? payload = notificationResponse.payload;
+  logger.i(
+      'onSelectNotification type:${type.name}, input:$input, payload:$payload');
 }
 
 ///接收的本地通知消息的结构类
@@ -53,9 +51,9 @@ class LocalNotificationsService {
     // ios,macos的初始化设置
     final DarwinInitializationSettings initializationSettingsDarwin =
         DarwinInitializationSettings(
-      requestAlertPermission: false,
-      requestBadgePermission: false,
-      requestSoundPermission: false,
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
 
       ///只用于ios10之前的版本，应用处于前台收到本地通知
       onDidReceiveLocalNotification:
@@ -160,9 +158,9 @@ class LocalNotificationsService {
     String? payload = receivedNotification.payload;
   }
 
-  ///用户选择或者点击了通知
+  /// 用户选择或者点击了通知
   void onSelectNotification(NotificationResponse notificationResponse) {
-    String? payload = notificationResponse.payload;
+    notificationTapBackground(notificationResponse);
   }
 
   /// 显示本地通知

@@ -1,32 +1,26 @@
-import 'package:colla_chat/constant/base.dart';
-import 'package:flutter/material.dart';
+import 'dart:isolate';
+import 'dart:ui';
+
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 
-/// android下的系统窗口
-class AndroidOverlayWindow {
-  /// 启动overlay的界面，必须放在main.dart文件中
-  void overlayMain() {
-    runApp(const MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Material(child: Text("$appName overlay"))));
-  }
-
+/// android下的系统级窗口的方法
+/// 在main文件里设置overlayMain方法，当调用show方法的时候，便打开其中定义的系统级窗口
+class AndroidOverlayWindowUtil {
   /// 检查权限
-  Future<bool> isPermissionGranted() async {
+  static Future<bool> isPermissionGranted() async {
     final bool status = await FlutterOverlayWindow.isPermissionGranted();
 
     return status;
   }
 
   /// 请求权限，打开权限设置页面
-  Future<bool?> requestPermission() async {
+  static Future<bool?> requestPermission() async {
     final bool? status = await FlutterOverlayWindow.requestPermission();
 
     return status;
   }
 
-  /// 打开系统窗口
-  ///
+  /// 打开系统级窗口
   /// - Optional arguments:
   /// `height` the overlay height and default is [overlaySizeFill]
   /// `width` the overlay width and default is [overlaySizeFill]
@@ -36,16 +30,16 @@ class AndroidOverlayWindow {
   /// `overlayContent` the notification message
   /// `enableDrag` to enable/disable dragging the overlay over the screen and default is "false"
   /// `positionGravity` the overlay postion after drag and default is [PositionGravity.none]
-  show({
+  static showOverlay({
     int height = WindowSize.fullCover,
     int width = WindowSize.matchParent,
     OverlayAlignment alignment = OverlayAlignment.center,
     NotificationVisibility visibility = NotificationVisibility.visibilitySecret,
     OverlayFlag flag = OverlayFlag.defaultFlag,
-    String overlayTitle = "overlay activated",
+    String overlayTitle = "CollaChat",
     String? overlayContent,
-    bool enableDrag = false,
-    PositionGravity positionGravity = PositionGravity.none,
+    bool enableDrag = true,
+    PositionGravity positionGravity = PositionGravity.auto,
   }) async {
     return await FlutterOverlayWindow.showOverlay(
         height: height,
@@ -59,18 +53,18 @@ class AndroidOverlayWindow {
         positionGravity: positionGravity);
   }
 
-  /// 关闭系统窗口
-  closeOverlay() async {
+  /// 关闭系统级窗口
+  static closeOverlay() async {
     return await FlutterOverlayWindow.closeOverlay();
   }
 
   /// 主线程和系统窗口线程之间发送数据
-  Future<dynamic> shareData(dynamic data) async {
+  static Future<dynamic> shareData(dynamic data) async {
     return await FlutterOverlayWindow.shareData(data);
   }
 
   /// 主线程和系统窗口线程监听发送来数据
-  listen(
+  static listen(
     void Function(dynamic)? onData, {
     Function? onError,
     void Function()? onDone,
@@ -81,22 +75,31 @@ class AndroidOverlayWindow {
   }
 
   /// 更新系统窗口的标志，是否接收点击事件
-  updateFlag(OverlayFlag flag) async {
+  static updateFlag(OverlayFlag flag) async {
     await FlutterOverlayWindow.updateFlag(flag);
   }
 
   /// 更新系统窗口的大小
-  resizeOverlay(int width, int height) async {
+  static resizeOverlay(int width, int height) async {
     await FlutterOverlayWindow.resizeOverlay(width, height);
   }
 
-  Future<bool> isActive() async {
+  static Future<bool> isActive() async {
     return await FlutterOverlayWindow.isActive();
   }
 
-  disposeOverlayListener() {
+  static disposeOverlayListener() {
     FlutterOverlayWindow.disposeOverlayListener();
   }
-}
 
-final AndroidOverlayWindow androidOverlayWindow = AndroidOverlayWindow();
+  static const String portNameOverlay = 'CollaChatOverlay';
+  static const String portNameHome = 'CollaChatHome';
+
+  static bool registerPortWithName(SendPort port, String name) {
+    return IsolateNameServer.registerPortWithName(port, name);
+  }
+
+  static SendPort? lookupPortByName(String name) {
+    return IsolateNameServer.lookupPortByName(name);
+  }
+}

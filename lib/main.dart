@@ -6,7 +6,8 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/notification/firebase_messaging_service.dart';
 import 'package:colla_chat/plugin/notification/local_notifications_service.dart';
-import 'package:colla_chat/plugin/overlay/android_overlay_window.dart';
+import 'package:colla_chat/plugin/overlay/android_overlay_window_util.dart';
+import 'package:colla_chat/plugin/overlay/chat_message_overlay.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -47,11 +48,17 @@ Future<void> setCert() async {
       .setTrustedCertificatesBytes(data.buffer.asUint8List());
 }
 
-/// 启动android的系统窗口
+/// android平台下应用的系统级窗口，可以是一个按钮
 @pragma("vm:entry-point")
 void overlayMain() {
   if (platformParams.android) {
-    androidOverlayWindow.overlayMain();
+    WidgetsFlutterBinding.ensureInitialized();
+    runApp(
+      const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: ChatMessageOverlay(),
+      ),
+    );
   }
 }
 
@@ -71,6 +78,13 @@ void main(List<String> args) async {
         msg == AppLifecycleState.inactive.toString() ||
         msg == AppLifecycleState.hidden.toString()) {
       //logger.w('system channel switch to $msg');
+      localNotificationsService.showNotification(
+          'CollaChat', AppLocalizations.t('CollaChat App inactive'));
+      if (platformParams.android) {
+        if (!await AndroidOverlayWindowUtil.isActive()) {
+          await AndroidOverlayWindowUtil.showOverlay();
+        }
+      }
     }
     return msg;
   });
