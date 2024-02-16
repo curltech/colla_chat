@@ -1,21 +1,12 @@
-import 'dart:typed_data';
 
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/me/qrcode_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/routers/routes.dart';
-import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/service/poem/poem.dart';
-import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
-import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class PoemWidget extends StatefulWidget with TileDataMixin {
   const PoemWidget({super.key});

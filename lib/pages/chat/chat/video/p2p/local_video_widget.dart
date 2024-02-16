@@ -16,7 +16,6 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/media_stream_util.dart';
 import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';

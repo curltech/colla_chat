@@ -42,7 +42,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   //引用的消息
   String? _parentMessageId;
 
-  Lock _lock = Lock();
+  final Lock _lock = Lock();
 
   ChatSummary? get chatSummary {
     return _chatSummary;
