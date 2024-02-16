@@ -1,7 +1,9 @@
 import 'package:colla_chat/entity/dht/peerprofile.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -159,8 +161,8 @@ class _PeerProfileEditWidgetState extends State<PeerProfileEditWidget> {
     }
     var formInputWidget = FormInputWidget(
       height: 500,
-      onOk: (Map<String, dynamic> values) {
-        _onOk(values);
+      onOk: (Map<String, dynamic> values) async {
+        await _onOk(values);
       },
       controller: controller,
     );
@@ -168,34 +170,38 @@ class _PeerProfileEditWidgetState extends State<PeerProfileEditWidget> {
     return formInputWidget;
   }
 
-  _onOk(Map<String, dynamic> values) {
+  _onOk(Map<String, dynamic> values) async {
     PeerProfile peerProfile = PeerProfile.fromJson(values);
-    peerProfileService.upsert(peerProfile).then((count) async {
-      PeerProfile? myselfPeerProfile = myself.myselfPeer.peerProfile;
-      if (myselfPeerProfile != null) {
-        myselfPeerProfile.vpnSwitch = peerProfile.vpnSwitch;
-        myselfPeerProfile.stockSwitch = peerProfile.stockSwitch;
-        myselfPeerProfile.emailSwitch = peerProfile.emailSwitch;
-        if (myselfPeerProfile.developerSwitch != peerProfile.developerSwitch) {
-          myselfPeerProfile.developerSwitch = peerProfile.developerSwitch;
-          myself.peerProfile = myselfPeerProfile;
-        }
-        myselfPeerProfile.mobileVerified = peerProfile.mobileVerified;
-        myselfPeerProfile.logLevel = peerProfile.logLevel;
-        await peerProfileService.store(myselfPeerProfile);
-        if (peerProfile.stockSwitch) {
-          indexWidgetProvider.addMainView('stock_main');
-        } else {
-          indexWidgetProvider.removeMainView('stock_main');
-        }
-        if (peerProfile.emailSwitch) {
-          indexWidgetProvider.addMainView('mail');
-        } else {
-          indexWidgetProvider.removeMainView('mail');
-        }
-        setState(() {});
+    int count = await peerProfileService.upsert(peerProfile);
+    PeerProfile? myselfPeerProfile = myself.myselfPeer.peerProfile;
+    if (myselfPeerProfile != null) {
+      myselfPeerProfile.vpnSwitch = peerProfile.vpnSwitch;
+      myselfPeerProfile.stockSwitch = peerProfile.stockSwitch;
+      myselfPeerProfile.emailSwitch = peerProfile.emailSwitch;
+      if (myselfPeerProfile.developerSwitch != peerProfile.developerSwitch) {
+        myselfPeerProfile.developerSwitch = peerProfile.developerSwitch;
+        myself.peerProfile = myselfPeerProfile;
       }
-    });
+      myselfPeerProfile.mobileVerified = peerProfile.mobileVerified;
+      myselfPeerProfile.logLevel = peerProfile.logLevel;
+      await peerProfileService.store(myselfPeerProfile);
+      if (mounted) {
+        DialogUtil.info(context,
+            content:
+                AppLocalizations.t('myself peerProfile has stored completely'));
+      }
+      if (peerProfile.stockSwitch) {
+        indexWidgetProvider.addMainView('stock_main');
+      } else {
+        indexWidgetProvider.removeMainView('stock_main');
+      }
+      if (peerProfile.emailSwitch) {
+        indexWidgetProvider.addMainView('mail');
+      } else {
+        indexWidgetProvider.removeMainView('mail');
+      }
+      setState(() {});
+    }
   }
 
   @override

@@ -537,6 +537,7 @@ class P2pConferenceClientPool with ChangeNotifier {
           _conferenceClients[conferenceId];
       if (p2pConferenceClient != null) {
         await p2pConferenceClient._disconnect();
+        _conferenceClients.remove(conferenceId);
         if (conferenceId == _conferenceId) {
           _conferenceId = null;
         }
