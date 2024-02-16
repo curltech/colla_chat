@@ -236,7 +236,7 @@
                  android:enabled="true"
                  android:exported="false"
                  android:stopWithTask="true"
-                 android:foregroundServiceType="mediaProjection"/>
+                 android:foregroundServiceType="phoneCall"/>
         <receiver
                 android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver"
                 android:exported="false"/>
