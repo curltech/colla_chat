@@ -107,7 +107,6 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
-
     <application
             android:name="${applicationName}"
             android:allowBackup="false"
@@ -209,7 +208,6 @@
                 android:name="flutterEmbedding"
                 android:value="2"/>
 
-
         <service
                 android:name="de.julianassmann.flutter_background.IsolateHolderService"
                 android:enabled="true"
@@ -231,6 +229,7 @@
                  android:exported="false"
                  android:stopWithTask="true"
                  android:foregroundServiceType="phoneCall"/>
+        <service android:name="com.gdelataillade.alarm.services.NotificationOnKillService" />
         <receiver
                 android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver"
                 android:exported="false"/>
