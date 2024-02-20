@@ -243,7 +243,7 @@ class RecognitionResultsWidget extends StatelessWidget {
           child: Stack(
             children: <Widget>[
               Container(
-                color: Theme.of(context).selectedRowColor,
+                color: Theme.of(context).primaryColor,
                 child: Center(
                   child: CommonAutoSizeText(
                     lastWords,

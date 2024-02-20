@@ -471,10 +471,10 @@ class DialogUtil {
   }
 
   /// 底部弹出全屏，返回的controller可以关闭
-  static PersistentBottomSheetController<T> popBottomSheet<T>(
+  static PersistentBottomSheetController popBottomSheet(
       BuildContext context,
       {required Widget Function(BuildContext) builder}) {
-    return showBottomSheet<T>(context: context, builder: builder);
+    return showBottomSheet(context: context, builder: builder);
   }
 
 // static showToast(String msg, {int duration = 1, int gravity = 0}) {

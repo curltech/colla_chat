@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.5.0
 
 environment:
-  sdk: '>=3.2.0 <4.0.0'
+  sdk: '>=3.3.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -150,8 +150,8 @@ dependencies:
       ref: feature/remoce_accentcolor
   fl_chart: ^0.66.0
   k_chart: ^0.7.1
-  extended_text: ^12.0.0 #文本扩展显示
-  extended_text_field: ^13.0.0 #文字表情混入
+  extended_text: ^13.0.0 #文本扩展显示
+  extended_text_field: ^14.0.0 #文字表情混入
   extended_text_library: ^12.0.0
   extended_masked_text: ^2.3.1
   azlistview: ^2.0.0 #特殊列表滑动

@@ -1255,7 +1255,7 @@ class MaterialWidgetFactory extends WidgetFactory {
   }
 
   /// 底部弹出全屏，返回的controller可以关闭
-  PersistentBottomSheetController<T> popBottomSheet<T>({
+  PersistentBottomSheetController popBottomSheet({
     required BuildContext context,
     required Widget Function(BuildContext) builder,
     Color? backgroundColor,
@@ -1266,7 +1266,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     bool? enableDrag,
     AnimationController? transitionAnimationController,
   }) {
-    return showBottomSheet<T>(
+    return showBottomSheet(
       context: context,
       builder: builder,
       backgroundColor: backgroundColor,
