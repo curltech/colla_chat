@@ -14,14 +14,18 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 /// 远程登录页面，一个Scaffold，IndexStack下的远程登录组件，注册组件和配置组件
 class P2pLogin extends StatefulWidget {
+  final SwiperController swiperController = SwiperController();
   final P2pLoginWidget p2pLoginWidget = const P2pLoginWidget();
-  final P2pRegisterWidget p2pRegisterWidget = const P2pRegisterWidget();
-  final P2pSettingWidget p2pSettingWidget = const P2pSettingWidget();
+  late final P2pRegisterWidget p2pRegisterWidget = P2pRegisterWidget(
+    swiperController: swiperController,
+  );
+  late final P2pSettingWidget p2pSettingWidget = P2pSettingWidget(
+    swiperController: swiperController,
+  );
 
   // final MyselfPeerViewWidget myselfPeerViewWidget =
   //     const MyselfPeerViewWidget();
   late final List<Widget> _children;
-  late final SwiperController controller = SwiperController();
 
   P2pLogin({super.key}) {
     // 初始化子项集合
@@ -54,14 +58,14 @@ class _P2pLoginState extends State<P2pLogin> {
   }
 
   _animateToPage(int index) {
-    widget.controller.move(index);
+    widget.swiperController.move(index);
   }
 
   @override
   Widget build(BuildContext context) {
     appDataProvider.changeSize(context);
     var pageView = Swiper(
-      controller: widget.controller,
+      controller: widget.swiperController,
       itemCount: widget._children.length,
       itemBuilder: (BuildContext context, int index) {
         return widget._children[index];

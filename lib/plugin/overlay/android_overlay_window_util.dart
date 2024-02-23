@@ -1,23 +1,33 @@
 import 'dart:isolate';
 import 'dart:ui';
 
+import 'package:colla_chat/platform.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 /// android下的系统级窗口的方法
 /// 在main文件里设置overlayMain方法，当调用show方法的时候，便打开其中定义的系统级窗口
 class AndroidOverlayWindowUtil {
   /// 检查权限
   static Future<bool> isPermissionGranted() async {
-    final bool status = await FlutterOverlayWindow.isPermissionGranted();
+    if (platformParams.android) {
+      final bool status = await FlutterOverlayWindow.isPermissionGranted();
 
-    return status;
+      return status;
+    }
+
+    return true;
   }
 
   /// 请求权限，打开权限设置页面
   static Future<bool?> requestPermission() async {
-    final bool? status = await FlutterOverlayWindow.requestPermission();
+    if (platformParams.android) {
+      final bool? status = await FlutterOverlayWindow.requestPermission();
 
-    return status;
+      return status;
+    }
+
+    return true;
   }
 
   /// 打开系统级窗口
@@ -41,6 +51,9 @@ class AndroidOverlayWindowUtil {
     bool enableDrag = true,
     PositionGravity positionGravity = PositionGravity.auto,
   }) async {
+    if (!platformParams.android) {
+      return;
+    }
     return await FlutterOverlayWindow.showOverlay(
         height: height,
         width: width,
@@ -55,11 +68,17 @@ class AndroidOverlayWindowUtil {
 
   /// 关闭系统级窗口
   static closeOverlay() async {
+    if (!platformParams.android) {
+      return;
+    }
     return await FlutterOverlayWindow.closeOverlay();
   }
 
   /// 主线程和系统窗口线程之间发送数据
   static Future<dynamic> shareData(dynamic data) async {
+    if (!platformParams.android) {
+      return;
+    }
     return await FlutterOverlayWindow.shareData(data);
   }
 
@@ -70,25 +89,40 @@ class AndroidOverlayWindowUtil {
     void Function()? onDone,
     bool? cancelOnError,
   }) async {
+    if (!platformParams.android) {
+      return;
+    }
     FlutterOverlayWindow.overlayListener.listen(onData,
         onDone: onDone, onError: onError, cancelOnError: cancelOnError);
   }
 
   /// 更新系统窗口的标志，是否接收点击事件
   static updateFlag(OverlayFlag flag) async {
+    if (!platformParams.android) {
+      return;
+    }
     await FlutterOverlayWindow.updateFlag(flag);
   }
 
   /// 更新系统窗口的大小
   static resizeOverlay(int width, int height) async {
+    if (!platformParams.android) {
+      return;
+    }
     await FlutterOverlayWindow.resizeOverlay(width, height);
   }
 
   static Future<bool> isActive() async {
+    if (!platformParams.android) {
+      return false;
+    }
     return await FlutterOverlayWindow.isActive();
   }
 
   static disposeOverlayListener() {
+    if (!platformParams.android) {
+      return;
+    }
     FlutterOverlayWindow.disposeOverlayListener();
   }
 
@@ -96,10 +130,16 @@ class AndroidOverlayWindowUtil {
   static const String portNameHome = 'CollaChatHome';
 
   static bool registerPortWithName(SendPort port, String name) {
+    if (!platformParams.android) {
+      return false;
+    }
     return IsolateNameServer.registerPortWithName(port, name);
   }
 
   static SendPort? lookupPortByName(String name) {
+    if (!platformParams.android) {
+      return null;
+    }
     return IsolateNameServer.lookupPortByName(name);
   }
 }

@@ -52,8 +52,8 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
       readOnly: isAuth,
       cancel: !isAuth,
       prefixIcon: !isAuth
-          ? IconButton(
-              icon: Icon(Icons.person, color: myself.primary),
+          ? TextButton.icon(
+              icon: const Icon(Icons.person, color: Colors.yellowAccent),
               onPressed: () async {
                 await DialogUtil.show(
                     context: context, builder: _buildMyselfPeers);
@@ -65,6 +65,10 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
                   }
                 }
               },
+              label: CommonAutoSizeText(
+                AppLocalizations.t('Select'),
+                style: const TextStyle(color: Colors.yellowAccent),
+              ),
             )
           : null,
     ));

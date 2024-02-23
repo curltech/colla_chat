@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 
+import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/entity/dht/myselfpeer.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/myselfpeer/myself_peer_controller.dart';
 import 'package:colla_chat/platform.dart';
@@ -27,50 +29,11 @@ import 'package:phone_numbers_parser/phone_numbers_parser.dart'
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:regexpattern/regexpattern.dart';
 
-final List<PlatformDataField> p2pRegisterInputFieldDef = [
-  PlatformDataField(
-      name: 'name',
-      label: 'Name',
-      prefixIcon: Icon(
-        Icons.person,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'loginName',
-      label: 'LoginName',
-      prefixIcon: Icon(
-        Icons.mobile_friendly,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'email',
-      label: 'Email',
-      prefixIcon: Icon(
-        Icons.email,
-        color: myself.primary,
-      ),
-      textInputType: TextInputType.emailAddress),
-  PlatformDataField(
-      name: 'plainPassword',
-      label: 'PlainPassword',
-      inputType: InputType.password,
-      prefixIcon: Icon(
-        Icons.password,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'confirmPassword',
-      label: 'ConfirmPassword',
-      inputType: InputType.password,
-      prefixIcon: Icon(
-        Icons.confirmation_num,
-        color: myself.primary,
-      ))
-];
-
 /// 用户注册组件，一个card下的录入框和按钮组合
 class P2pRegisterWidget extends StatefulWidget {
-  const P2pRegisterWidget({super.key});
+  final SwiperController? swiperController;
+
+  const P2pRegisterWidget({super.key, this.swiperController});
 
   @override
   State<StatefulWidget> createState() => _P2pRegisterWidgetState();
@@ -81,8 +44,49 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
   TextEditingController mobileController = TextEditingController();
   ValueNotifier<String?> peerId = ValueNotifier<String?>(null);
   ValueNotifier<Uint8List?> avatar = ValueNotifier<Uint8List?>(null);
-  final FormInputController controller =
-      FormInputController(p2pRegisterInputFieldDef);
+  final List<PlatformDataField> p2pRegisterDataFields = [
+    PlatformDataField(
+        name: 'name',
+        label: 'Name',
+        prefixIcon: Icon(
+          Icons.person,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+      name: 'loginName',
+      label: 'LoginName',
+      prefixIcon: Icon(
+        Icons.mobile_friendly,
+        color: myself.primary,
+      ),
+    ),
+    PlatformDataField(
+        name: 'email',
+        label: 'Email',
+        prefixIcon: Icon(
+          Icons.email,
+          color: myself.primary,
+        ),
+        textInputType: TextInputType.emailAddress),
+    PlatformDataField(
+        name: 'plainPassword',
+        label: 'PlainPassword',
+        inputType: InputType.password,
+        prefixIcon: Icon(
+          Icons.password,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'confirmPassword',
+        label: 'ConfirmPassword',
+        inputType: InputType.password,
+        prefixIcon: Icon(
+          Icons.confirmation_num,
+          color: myself.primary,
+        ))
+  ];
+  late final FormInputController controller =
+      FormInputController(p2pRegisterDataFields);
 
   @override
   void initState() {
@@ -219,21 +223,43 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
     );
   }
 
-  _onOk(Map<String, dynamic> values) {
-    if (!values.containsKey('plainPassword')) {
-      DialogUtil.error(context, content: 'plainPassword must be not empty');
-      return;
-    }
-    if (!values.containsKey('confirmPassword')) {
-      DialogUtil.error(context, content: 'confirmPassword must be not empty');
-      return;
-    }
+  _onOk(Map<String, dynamic> values) async {
     if (!values.containsKey('name')) {
       DialogUtil.error(context, content: 'name must be not empty');
       return;
     }
     if (!values.containsKey('loginName')) {
       DialogUtil.error(context, content: 'loginName must be not empty');
+      return;
+    }
+    String name = values['name'];
+    var peer = await myselfPeerService.findOneByName(name);
+    if (peer != null) {
+      bool? confirm = await DialogUtil.confirm(context,
+          title: 'same name account exist',
+          content: 'Do you want to login using exist account?');
+      if (confirm == true) {
+        widget.swiperController?.move(0);
+      }
+      return;
+    }
+    String loginName = values['loginName'];
+    peer = await myselfPeerService.findOneByLoginName(loginName);
+    if (peer != null) {
+      bool? confirm = await DialogUtil.confirm(context,
+          title: 'same loginName account exist',
+          content: 'Do you want to login using exist account?');
+      if (confirm == true) {
+        widget.swiperController?.move(0);
+      }
+      return;
+    }
+    if (!values.containsKey('plainPassword')) {
+      DialogUtil.error(context, content: 'plainPassword must be not empty');
+      return;
+    }
+    if (!values.containsKey('confirmPassword')) {
+      DialogUtil.error(context, content: 'confirmPassword must be not empty');
       return;
     }
     String plainPassword = values['plainPassword'];
@@ -251,20 +277,21 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
       DialogUtil.error(context, content: 'password is not matched');
       return;
     }
-    String name = values['name'];
-    String loginName = values['loginName'];
+
     String? email = values['email'];
-    myselfPeerService
-        .register(name, loginName, plainPassword,
-            mobile: mobileController.text, email: email)
-        .then((myselfPeer) {
+    try {
+      MyselfPeer myselfPeer = await myselfPeerService.register(
+          name, loginName, plainPassword,
+          mobile: mobileController.text, email: email);
       myself.myselfPeer = myselfPeer;
       myselfPeerController.add(myselfPeer);
       peerId.value = myselfPeer.peerId;
-      // Application.router
-      //     .navigateTo(context, Application.p2pLogin, replace: true);
-    }).onError((error, stackTrace) {
-      DialogUtil.error(context, content: error.toString());
-    });
+    } catch (e) {
+      DialogUtil.error(context, content: e.toString());
+    }
+    DialogUtil.info(context,
+        content:
+            '${AppLocalizations.t('Successfully')} ${AppLocalizations.t('create account name')}:$name, ${AppLocalizations.t('loginName')}:$loginName');
+    widget.swiperController?.move(0);
   }
 }

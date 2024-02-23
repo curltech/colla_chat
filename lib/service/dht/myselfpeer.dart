@@ -152,7 +152,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
         isPhoneNumberValid = PhoneNumberUtil.validate(phoneNumber);
 
         if (!isPhoneNumberValid) {
-          throw 'Invalid mobile number';
+          throw 'invalid mobile number';
         }
         mobile = PhoneNumberUtil.format(phoneNumber, isoCode: isoCode);
       } catch (e) {
@@ -161,11 +161,11 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     }
     var peer = await findOneByName(name);
     if (peer != null) {
-      throw 'Same name account exist';
+      throw 'same name account exist';
     }
     peer = await findOneByLoginName(loginName);
     if (peer != null) {
-      throw 'Same loginName account exist';
+      throw 'same loginName account exist';
     }
     var deviceData = platformParams.deviceData;
     var clientDevice = JsonUtil.toJsonString(deviceData);

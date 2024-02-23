@@ -671,5 +671,19 @@
   "CreateLiveKitConferenceClient failure": "创建视频会议客户端失败",
   "Do you want delete avatar?": "有确定删除头像吗？",
   "CollaChat App inactive": "CollaChat应用进入后台",
-  "myself peerProfile has stored completely": "新的配置被保存"
+  "myself peerProfile has stored completely": "新的配置被保存",
+  "password is not matched": "密码不一致",
+  "name must be not empty": "名字不可为空",
+  "loginName must be not empty": "登录名不可为空",
+  "plainPassword must be not empty": "密码不可为空",
+  "confirmPassword must be not empty": "验证密码不可为空",
+  "password must be strong password": "密码必须包含字母和数字",
+  "same name account exist": "存在同名的账户",
+  "same loginName account exist": "存在同样登录名的账户",
+  "invalid mobile number": "无效的移动电话号码",
+  "Create account name": "创建账户名称",
+  "loginName": "登录名",
+  "Successfully": "成功地",
+  "Do you want to login using exist account?": "你想用存在的账户登录吗？",
+  "Select": "选择"
 }

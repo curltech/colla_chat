@@ -7,6 +7,7 @@ import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
@@ -109,9 +110,15 @@ class PlatformDataField {
 
   final bool enableColumnFilter = false;
 
-  final Function(dynamic value)? formatter;
+  final List<TextInputFormatter>? inputFormatters;
 
-  final Function(String value)? validator;
+  final String? Function(String?)? validator;
+
+  final void Function(String)? onChanged;
+
+  final void Function()? onEditingComplete;
+
+  final dynamic Function(String)? onFieldSubmitted;
 
   final bool autoValidate;
 
@@ -137,8 +144,11 @@ class PlatformDataField {
     this.readOnly = false,
     this.options,
     this.groupName,
-    this.formatter,
+    this.inputFormatters,
     this.validator,
+    this.onChanged,
+    this.onEditingComplete,
+    this.onFieldSubmitted,
     this.autoValidate = false,
     this.onSort,
     this.customWidget,
@@ -418,6 +428,11 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
       suffixIcon: suffixIcon,
       suffix: suffix,
       hintText: dataFieldDef.hintText,
+      inputFormatters: dataFieldDef.inputFormatters,
+      validator: dataFieldDef.validator,
+      onChanged: dataFieldDef.onChanged,
+      onEditingComplete: dataFieldDef.onEditingComplete,
+      onFieldSubmitted: dataFieldDef.onFieldSubmitted,
     );
 
     return textFormField;
@@ -474,6 +489,9 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
       ),
       suffix: suffix,
       hintText: dataFieldDef.hintText,
+      onChanged: dataFieldDef.onChanged,
+      onEditingComplete: dataFieldDef.onEditingComplete,
+      onFieldSubmitted: dataFieldDef.onFieldSubmitted,
     );
     return textFormField;
   }
