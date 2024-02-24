@@ -75,7 +75,7 @@
 	<key>NSMotionUsageDescription</key>
 	<string>motion</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Select the photo from photo library and send other peers</string>
+	<string>Select the photo from photo library and send them to other peers</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
     <string>The photo which other peers send to this peer can be saved to photo library</string>
 	<key>NSRemindersUsageDescription</key>
