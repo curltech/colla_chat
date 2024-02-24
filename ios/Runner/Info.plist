@@ -75,9 +75,9 @@
 	<key>NSMotionUsageDescription</key>
 	<string>motion</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Get chat photo from library</string>
+	<string>Select the photo from photo library and send other peers</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-    <string>Save chat photo to library</string>
+    <string>The photo which other peers send to this peer can be saved to library</string>
 	<key>NSRemindersUsageDescription</key>
 	<string>reminders</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
