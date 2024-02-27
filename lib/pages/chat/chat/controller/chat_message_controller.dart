@@ -326,12 +326,12 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       for (var choice in streamChatCompletion.choices) {
         String? finishReason = choice.finishReason;
         OpenAIChatMessageRole? role = choice.delta.role;
-        List<OpenAIChatCompletionChoiceMessageContentItemModel>? contents =
+        List<OpenAIChatCompletionChoiceMessageContentItemModel?>? contents =
             choice.delta.content;
         if (contents != null && finishReason != 'stop') {
-          for (OpenAIChatCompletionChoiceMessageContentItemModel content
+          for (OpenAIChatCompletionChoiceMessageContentItemModel? content
               in contents) {
-            String text = content.text ?? '';
+            String text = content!.text ?? '';
             if (text.startsWith('\n\n')) {
               completionContent = completionContent + text.substring(2);
             } else {

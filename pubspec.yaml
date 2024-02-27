@@ -219,7 +219,7 @@ dependencies:
   crypto: ^3.0.3 #sha
   bs58: ^1.0.2
   archive: ^3.3.7
-  local_auth: ^2.1.6
+  local_auth: ^2.2.0
 
   #基本开发工具
   xml: ^6.0.1
@@ -233,12 +233,12 @@ dependencies:
   easy_refresh: ^3.3.2+1
   percent_indicator: ^4.2.3
   share_plus: 7.2.2
-  flutter_sharing_intent: #^1.1.1
-    git:
-      url: https://github.com/bhagat-techind/flutter_sharing_intent
-  receive_sharing_intent: #^1.6.7 #gradle版本低的问题
-    git:
-      url: https://github.com/AyushmanG26/receive_sharing_intent.git
+  flutter_sharing_intent: ^1.1.1
+#    git:
+#      url: https://github.com/bhagat-techind/flutter_sharing_intent
+  receive_sharing_intent: ^1.6.7 #gradle版本低的问题
+#    git:
+#      url: https://github.com/AyushmanG26/receive_sharing_intent.git
   date_format: ^2.0.6
   omni_datetime_picker: ^1.0.1
   toggle_switch: ^2.0.1
