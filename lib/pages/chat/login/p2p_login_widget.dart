@@ -212,6 +212,16 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
         height: AppImageSize.xlSize,
         width: AppImageSize.xlSize,
       ),
+      CommonAutoSizeText(
+        AppLocalizations.t('Secure your collaboration'),
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          color: Colors.cyan,
+          fontStyle: FontStyle.italic,
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+        ),
+      ),
       SizedBox(
         height: appDataProvider.portraitSize.height * 0.1,
       ),
