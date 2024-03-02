@@ -809,6 +809,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         } else {
           transportType = TransportType.websocket.name;
         }
+      } else {
+        transportType = TransportType.websocket.name;
       }
     }
     if (factTransportType == null &&
