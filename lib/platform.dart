@@ -3,6 +3,7 @@ import 'dart:io' as io;
 import 'dart:io';
 
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/tool/locale_util.dart';
 import 'package:colla_chat/tool/path_util.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/cupertino.dart';
@@ -21,7 +22,7 @@ class PlatformParams {
   bool linux = false;
   bool macos = false;
   bool windows = false;
-  Locale? locale;
+  Locale locale = LocaleUtil.getLocale('en_US');
   String? localHostname;
   String? operatingSystem;
   String? operatingSystemVersion;
@@ -63,19 +64,7 @@ class PlatformParams {
     }
 
     try {
-      var locales = io.Platform.localeName.split('_');
-      if (locales.length == 3) {
-        locale = Locale.fromSubtags(
-            languageCode: locales[0],
-            scriptCode: locales[1],
-            countryCode: locales[2]);
-      }
-      if (locales.length == 2) {
-        locale = Locale(locales[0], locales[1]);
-      }
-      if (locales.length == 1) {
-        locale = Locale(locales[0]);
-      }
+      locale = LocaleUtil.getLocale(io.Platform.localeName);
       localHostname = io.Platform.localHostname;
       operatingSystem = io.Platform.operatingSystem;
       operatingSystemVersion = io.Platform.operatingSystemVersion;

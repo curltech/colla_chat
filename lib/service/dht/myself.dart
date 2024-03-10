@@ -2,6 +2,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/entity/dht/myselfpeer.dart';
 import 'package:colla_chat/entity/dht/peerprofile.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/conference.dart';
@@ -11,6 +12,7 @@ import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
+import 'package:colla_chat/tool/locale_util.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter/material.dart';
 
@@ -125,6 +127,9 @@ class MyselfService {
     var peerId = myselfPeer.peerId;
     var peerProfile = await peerProfileService.findOneByPeerId(peerId);
     if (peerProfile != null) {
+      if (myself.locale == platformParams.locale) {
+        myself.locale = LocaleUtil.getLocale(peerProfile.locale);
+      }
       myself.peerProfile = peerProfile;
       String? avatar = myselfPeer.avatar;
       if (avatar != null) {
@@ -151,6 +156,9 @@ class MyselfService {
   bool logout() {
     myself.myselfPeer = MyselfPeer('', '', '', '');
     myself.peerProfile = PeerProfile('');
+    if (myself.locale != platformParams.locale) {
+      myself.locale = platformParams.locale;
+    }
     myself.id = null;
     myself.peerId = null;
     myself.name = null;

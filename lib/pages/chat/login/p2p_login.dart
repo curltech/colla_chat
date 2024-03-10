@@ -4,6 +4,7 @@ import 'package:colla_chat/pages/chat/login/loading.dart';
 import 'package:colla_chat/pages/chat/login/p2p_login_widget.dart';
 import 'package:colla_chat/pages/chat/login/p2p_register_widget.dart';
 import 'package:colla_chat/pages/chat/login/p2p_setting_widget.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';

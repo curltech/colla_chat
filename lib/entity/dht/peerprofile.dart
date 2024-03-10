@@ -15,7 +15,7 @@ class PeerProfile extends StatusEntity {
   String? username;
 
   // 个性化配置
-  String locale = 'zh_CN';
+  String locale = 'en_US';
   int primaryColor = Colors.cyan.value;
   int secondaryColor = Colors.cyan.value;
   String? scheme;

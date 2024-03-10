@@ -174,7 +174,6 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
   @override
   void dispose() {
     appDataProvider.removeListener(_update);
-    primaryNavigation.dispose();
     super.dispose();
   }
 }

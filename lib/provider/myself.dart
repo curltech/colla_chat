@@ -22,6 +22,7 @@ class Myself with ChangeNotifier {
   String? peerId;
   String? name;
   String? clientId;
+  late Locale _locale;
 
   // peer是ed25519,英语身份认证
   SimplePublicKey? peerPublicKey;
@@ -49,6 +50,7 @@ class Myself with ChangeNotifier {
   Myself() {
     _buildThemeData();
     _buildDarkThemeData();
+    _locale = platformParams.locale;
   }
 
   PeerProfile get peerProfile {
@@ -64,8 +66,10 @@ class Myself with ChangeNotifier {
   }
 
   set peerProfile(PeerProfile peerProfile) {
-    myselfPeer.peerProfile = peerProfile;
-    notifyListeners();
+    if (myselfPeer.peerProfile != peerProfile) {
+      myselfPeer.peerProfile = peerProfile;
+      notifyListeners();
+    }
   }
 
   _buildThemeData() {
@@ -350,17 +354,28 @@ class Myself with ChangeNotifier {
   }
 
   /// locale操作
-  Locale get locale {
-    return LocaleUtil.getLocale(peerProfile.locale);
+  Locale get profileLocale {
+    return LocaleUtil.getLocale(peerProfile.locale!);
   }
 
-  set locale(Locale locale) {
+  set profileLocale(Locale locale) {
     if (peerProfile.locale != locale.toString()) {
       peerProfile.locale = locale.toString();
       if (peerProfile.id != null) {
         peerProfileService.update({'locale': peerProfile.locale},
             where: 'id=?', whereArgs: [peerProfile.id!]);
       }
+    }
+  }
+
+  /// locale操作
+  Locale get locale {
+    return _locale;
+  }
+
+  set locale(Locale locale) {
+    if (locale != _locale) {
+      _locale = locale;
       notifyListeners();
     }
   }
