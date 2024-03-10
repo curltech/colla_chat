@@ -382,4 +382,4 @@ class Myself with ChangeNotifier {
 }
 
 ///全集唯一的当前用户，存放在内存中，当前重新登录时里面的值会钱换到新的值
-final myself = Myself();
+final Myself myself = Myself();
