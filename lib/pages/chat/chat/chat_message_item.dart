@@ -111,11 +111,11 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
     double width = appDataProvider.secondaryBodyWidth * 0.8;
     // logger.w('secondaryBodyWidth width:${appDataProvider.secondaryBodyWidth}');
     String transportType = widget.chatMessage.transportType;
-    Color borderColor = myself.primary;
+    Color borderColor = widget.isMyself ? myself.primary : Colors.white;
     if (transportType == TransportType.websocket.name) {
-      borderColor = myself.primaryColor;
+      borderColor = Colors.cyanAccent;
     } else if (transportType == TransportType.sfu.name) {
-      borderColor = myself.secondary;
+      borderColor = Colors.greenAccent;
     } else if (transportType == TransportType.chatGPT.name) {
       borderColor = Colors.blueAccent;
     }
@@ -125,9 +125,10 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
           stick: false,
           margin: const BubbleEdges.only(top: 1),
           nip: widget.isMyself ? BubbleNip.rightTop : BubbleNip.leftTop,
+          nipOffset: 0.0,
           color: widget.isMyself ? myself.primary : Colors.white,
           borderColor: borderColor,
-          borderWidth: 2.0,
+          borderWidth: 1.0,
           padding: const BubbleEdges.all(0),
           child: body)
     ];

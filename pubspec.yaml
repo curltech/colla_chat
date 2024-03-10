@@ -99,6 +99,7 @@ dependencies:
 
   #界面
   bubble: ^1.2.1
+  #  chat_bubbles: ^1.6.0
   fluttertoast: ^8.2.1
   flutter_local_notifications: ^16.3.2
   alarm: ^3.0.11
