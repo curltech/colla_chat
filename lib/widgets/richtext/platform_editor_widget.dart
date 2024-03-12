@@ -6,13 +6,13 @@ import 'package:colla_chat/widgets/richtext/html_editor_widget.dart';
 import 'package:colla_chat/widgets/richtext/html_rte_widget.dart';
 import 'package:colla_chat/widgets/richtext/quill_editor_widget.dart';
 import 'package:colla_chat/widgets/richtext/quill_html_editor_widget.dart';
+import 'package:dart_quill_delta/src/delta/delta.dart';
 import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_rte/flutter_rte.dart' as rte;
 import 'package:html_editor_enhanced/html_editor.dart';
 import 'package:quill_html_editor/quill_html_editor.dart';
-import 'package:dart_quill_delta/src/delta/delta.dart';
 
 class PlatformEditorController with ChangeNotifier {
   dynamic originalController;
@@ -108,16 +108,14 @@ class _PlatformEditorWidgetState extends State<PlatformEditorWidget> {
         initialText: widget.initialText,
         onCreateController: _onCreateController,
       );
-    }
-    if (platformParams.mobile || platformParams.web) {
+    } else if (platformParams.mobile || platformParams.web) {
       editor = QuillHtmlEditorWidget(
         height: widget.height,
         initialText: widget.initialText,
         mimeType: ChatMessageMimeType.html,
         onCreateController: _onCreateController,
       );
-    }
-    if (platformParams.windows) {
+    } else if (platformParams.windows) {
       editor = HtmlRteWidget(
         height: widget.height,
         initialText: widget.initialText,
