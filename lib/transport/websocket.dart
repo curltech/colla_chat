@@ -43,6 +43,7 @@ class Websocket extends IWebClient {
   String? peerId;
   late String address;
   WebSocketChannel? channel;
+  StreamSubscription<dynamic>? streamSubscription;
   String? sessionId;
   SocketStatus _status = SocketStatus.closed;
 
@@ -83,7 +84,12 @@ class Websocket extends IWebClient {
       await channel!.ready;
       status = SocketStatus.connected;
       logger.i('wss address:$address websocket connected');
-      channel!.stream.listen((dynamic data) {
+
+      if (streamSubscription != null) {
+        await streamSubscription!.cancel();
+        streamSubscription = null;
+      }
+      streamSubscription = channel!.stream.listen((dynamic data) {
         onData(data);
       }, onError: onError, onDone: onDone, cancelOnError: false);
 

@@ -219,7 +219,9 @@ class DataListTile extends StatelessWidget {
       trailing: trailingWidget,
       isThreeLine: tileData.isThreeLine,
       dense: tileData.dense,
-      onTap: onTap != null || tileData.routeName != null
+      onTap: onTap != null ||
+              tileData.onTap != null ||
+              tileData.routeName != null
           ? () async {
               if (dataListViewController != null) {
                 dataListViewController!.currentIndex = index;
