@@ -12,11 +12,15 @@ import 'package:colla_chat/pages/chat/channel/subscribe_channel_message_preview.
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/channel_chat_message.dart';
+import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 
 //频道的页面,展示自己订阅的频道消息列表
@@ -235,28 +239,45 @@ class ChannelChatMessageItem extends StatelessWidget {
     }
     String title = chatMessage.title!;
     String? thumbnail = chatMessage.thumbnail;
-
-    List<Widget> children = [
-      Row(
-        children: [
-          avatarImage,
-          CommonAutoSizeText(name),
-        ],
-      ),
-      CommonAutoSizeText(title),
-    ];
     Widget? thumbnailWidget;
     if (thumbnail != null) {
       thumbnailWidget = ImageUtil.buildImageWidget(image: thumbnail);
-      children.add(thumbnailWidget);
     }
-    Widget chatMessageItem = InkWell(
-        onTap: () {
+
+    var sendTime = chatMessage.sendTime;
+    sendTime = sendTime != null ? DateUtil.formatEasyRead(sendTime) : '';
+    TileData tile = TileData(
+        prefix: avatarImage,
+        title: title,
+        titleTail: sendTime,
+        subtitle: name,
+        dense: true,
+        selected: false,
+        isThreeLine: true,
+        onTap: (int index, String title, {String? subtitle}) {
           channelChatMessageController.current = chatMessage;
           indexWidgetProvider.push('subscribe_channel_message_preview');
-        },
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start, children: children));
+        });
+    List<TileData> slideActions = [];
+    TileData deleteSlideAction = TileData(
+        title: 'Delete',
+        prefix: Icons.bookmark_remove,
+        onTap: (int index, String label, {String? subtitle}) async {
+          bool? confirm = await DialogUtil.confirm(context,
+              content:
+                  '${AppLocalizations.t('Do you want delete subscribe chat messages of ')} $name');
+          if (confirm != true) {
+            return;
+          }
+          channelChatMessageController.currentIndex = index;
+          await chatMessageService.remove(chatMessage);
+        });
+    slideActions.add(deleteSlideAction);
+    tile.slideActions = slideActions;
+
+    Widget chatMessageItem = DataListTile(
+      tileData: tile,
+    );
 
     return chatMessageItem;
   }
