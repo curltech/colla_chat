@@ -1,5 +1,4 @@
 import 'package:colla_chat/widgets/style/glass/glass_kit_widget_factory.dart';
-import 'package:colla_chat/widgets/style/glass/glassmorphism_widget_factory.dart';
 import 'package:flutter/material.dart';
 
 import 'package:colla_chat/widgets/style/neumorphic/neumorphic_widget_factory.dart';

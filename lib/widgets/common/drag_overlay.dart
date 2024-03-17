@@ -78,13 +78,13 @@ class DragOverlay {
         left: left,
         right: right,
         child: DragTarget(
-          onWillAccept: (data) {
+          onWillAcceptWithDetails: (data) {
             logger.i('onWillAccept:$data');
 
             ///返回true 会将data数据添加到candidateData列表中，false时会将data添加到rejectData
             return true;
           },
-          onAccept: (data) {
+          onAcceptWithDetails: (data) {
             logger.i('onAccept : $data');
           },
           onLeave: (data) {

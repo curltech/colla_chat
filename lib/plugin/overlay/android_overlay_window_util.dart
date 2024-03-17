@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:colla_chat/platform.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 
 /// android下的系统级窗口的方法
 /// 在main文件里设置overlayMain方法，当调用show方法的时候，便打开其中定义的系统级窗口

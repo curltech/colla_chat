@@ -355,7 +355,7 @@ class Myself with ChangeNotifier {
 
   /// locale操作
   Locale get profileLocale {
-    return LocaleUtil.getLocale(peerProfile.locale!);
+    return LocaleUtil.getLocale(peerProfile.locale);
   }
 
   set profileLocale(Locale locale) {
