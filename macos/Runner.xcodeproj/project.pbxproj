@@ -26,11 +26,10 @@
 		33CC10F32044A3C60003C045 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 33CC10F22044A3C60003C045 /* Assets.xcassets */; };
 		33CC10F62044A3C60003C045 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 33CC10F42044A3C60003C045 /* MainMenu.xib */; };
 		33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33CC11122044BFA00003C045 /* MainFlutterWindow.swift */; };
+		A382AB8AD55365D249F4517B /* Pods_ImageNotification.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41BC6B2C2B98F7103DE895C8 /* Pods_ImageNotification.framework */; };
 		AFA546760A0D63F130E8C387 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 00B681B8D6806FA953DDE886 /* GoogleService-Info.plist */; };
+		BBDBB61FC045310DB86C44D7 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DD206433D6FDBBC0FE22664 /* Pods_Runner.framework */; };
 		F40D64AB2ABED36D0088D39C /* NotificationService.m in Sources */ = {isa = PBXBuildFile; fileRef = F40D64AA2ABED36D0088D39C /* NotificationService.m */; };
-		F45EA9EF2BA9FD2A00E73315 /* CollaChat.app in Resources */ = {isa = PBXBuildFile; fileRef = 33CC10ED2044A3C60003C045 /* CollaChat.app */; };
-		F45EA9F22BA9FDEC00E73315 /* CoreAudioTypes.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F492E8AD2B90004A0062E08F /* CoreAudioTypes.framework */; };
-		F492E8AB2B8FFF9D0062E08F /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DD206433D6FDBBC0FE22664 /* Pods_Runner.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -102,8 +101,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F45EA9F22BA9FDEC00E73315 /* CoreAudioTypes.framework in Frameworks */,
-				F492E8AB2B8FFF9D0062E08F /* Pods_Runner.framework in Frameworks */,
+				BBDBB61FC045310DB86C44D7 /* Pods_Runner.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -111,6 +109,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A382AB8AD55365D249F4517B /* Pods_ImageNotification.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -319,7 +318,6 @@
 				33CC10F32044A3C60003C045 /* Assets.xcassets in Resources */,
 				33CC10F62044A3C60003C045 /* MainMenu.xib in Resources */,
 				AFA546760A0D63F130E8C387 /* GoogleService-Info.plist in Resources */,
-				F45EA9EF2BA9FD2A00E73315 /* CollaChat.app in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
