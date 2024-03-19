@@ -11,6 +11,7 @@ import 'package:colla_chat/entity/dht/myselfpeer.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/dht/peerprofile.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/p2p/chain/action/connect.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/platform.dart';
@@ -255,59 +256,65 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
   }
 
   ///获取最后一次登录的用户名和密码，如果都存在，快捷登录
-  Future<bool> autoLogin() async {
+  Future<String?> autoLogin() async {
     Map<String, dynamic>? autoLogin = await autoCredential();
     if (autoLogin != null) {
       String? credential = autoLogin[credentialName];
       String? password = autoLogin[passwordName];
-      if (StringUtil.isNotEmpty(credential) &&
-          StringUtil.isNotEmpty(password)) {
-        bool loginStatus = await login(credential!, password!);
-        if (loginStatus) {
-          ///连接篇p2p的节点，把自己的信息注册上去
-          myselfPeerService.connect();
-        }
-        return loginStatus;
+      if (StringUtil.isEmpty(credential)) {
+        return 'credential is empty';
       }
+      if (StringUtil.isEmpty(password)) {
+        return 'password is empty';
+      }
+      String? loginStatus = await login(credential!, password!);
+      if (loginStatus == null) {
+        ///连接篇p2p的节点，把自己的信息注册上去
+        myselfPeerService.connect();
+      }
+      return loginStatus;
     }
 
-    return false;
+    return 'autoLogin flag is empty';
   }
 
   /// 验证本地账户
-  Future<bool> auth(String credential, String password) async {
+  Future<String?> auth(String credential, String password) async {
     ///本地查找账户
     MyselfPeer? myselfPeer = await myselfPeerService.findOneByLogin(credential);
     if (myselfPeer != null) {
       /// 1.验证账户与密码匹配
       try {
-        var loginStatus = await myselfService.auth(myselfPeer, password);
+        String? loginStatus = await myselfService.auth(myselfPeer, password);
 
         return loginStatus;
       } catch (err) {
         logger.e('login err:$err');
-        return false;
+        return err.toString();
       }
+    } else {
+      logger.e('$credential is not exist');
+
+      return '$credential ${AppLocalizations.t('is not exist')}';
     }
-    return false;
   }
 
   /// 登录，验证本地账户，连接p2p服务节点，注册成功
-  Future<bool> login(String credential, String password) async {
+  Future<String?> login(String credential, String password) async {
     ///本地查找账户
     MyselfPeer? myselfPeer = await myselfPeerService.findOneByLogin(credential);
     if (myselfPeer != null) {
       /// 1.验证账户与密码匹配
       try {
-        var loginStatus = await myselfService.login(myselfPeer, password);
-        if (!loginStatus) {
-          return false;
+        String? loginStatus = await myselfService.login(myselfPeer, password);
+        if (loginStatus != null) {
+          return loginStatus;
         } else {
           await saveLastCredentialName(credential);
         }
       } catch (err) {
         logger.e('login err:$err');
-        return false;
+        return 'Password is wrong';
       }
 
       ///2.启动android后台服务
@@ -316,6 +323,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
           androidBackgroundService.start();
         } catch (e) {
           logger.e('androidForegroundService start failure:$e');
+          return e.toString();
         }
       }
 
@@ -333,12 +341,12 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       // }
       postLogin();
 
-      return true;
+      return null;
     } else {
       logger.e('$credential is not exist');
-    }
 
-    return false;
+      return '$credential ${AppLocalizations.t('is not exist')}';
+    }
   }
 
   Future<void> connect() async {

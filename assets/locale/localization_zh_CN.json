@@ -685,5 +685,7 @@
   "loginName": "登录名",
   "Successfully": "成功地",
   "Do you want to login using exist account?": "你想用存在的账户登录吗？",
-  "Select": "选择"
+  "Select": "选择",
+  "is not exist": "不存在",
+  "Password is wrong": "密码错误"
 }

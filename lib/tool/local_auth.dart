@@ -7,7 +7,7 @@ enum AuthMethod { local, app, none }
 class LocalAuthUtil {
   static final LocalAuthentication auth = LocalAuthentication();
 
-  static Future<bool> authenticate({
+  static Future<String?> authenticate({
     required String localizedReason,
     bool useErrorDialogs = true,
     bool stickyAuth = false,
@@ -27,9 +27,10 @@ class LocalAuthUtil {
       );
     } on PlatformException catch (e) {
       logger.e('local authenticate failure:$e');
+      return e.toString();
     }
 
-    return authenticated;
+    return authenticated ? null : 'local authenticate failure';
   }
 
   static Future<List<BiometricType>> getAvailableBiometrics() async {

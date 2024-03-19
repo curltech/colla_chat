@@ -62,7 +62,7 @@ class SettingWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _SettingWidgetState extends State<SettingWidget> {
-  bool? loginStatus;
+  String? loginStatus;
 
   @override
   void initState() {
@@ -82,7 +82,7 @@ class _SettingWidgetState extends State<SettingWidget> {
     if (widget.authMethod == AuthMethod.app) {
       P2pLoginWidget p2pLoginWidget = P2pLoginWidget(
           credential: myself.myselfPeer.loginName,
-          onAuthenticate: (bool data) {
+          onAuthenticate: (String? data) {
             loginStatus = data;
             setState(() {});
           });
@@ -102,11 +102,11 @@ class _SettingWidgetState extends State<SettingWidget> {
               index: (loginStatus == null) ? 0 : 1,
               children: [
                 _buildAppAuthenticate(),
-                (loginStatus != null && loginStatus!)
+                (loginStatus == null)
                     ? child
                     : Center(
                         child: CommonAutoSizeText(
-                        AppLocalizations.t('Authenticate failure'),
+                        AppLocalizations.t(loginStatus!),
                         style: const TextStyle(color: Colors.white),
                       )),
               ],

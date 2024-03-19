@@ -95,14 +95,15 @@ class ServiceLocator {
     Map<String, dynamic>? autoLogin = await myselfPeerService.autoCredential();
     if (autoLogin != null) {
       appDataProvider.autoLogin = true;
+      String? loginStatus = await myselfPeerService.autoLogin();
+      logger.i(
+          'AutoLogin setting:${appDataProvider.autoLogin},AutoLogin status:$loginStatus');
+      return loginStatus == null ? true : false;
     } else {
       appDataProvider.autoLogin = false;
     }
-    bool loginStatus = await myselfPeerService.autoLogin();
-    logger.i(
-        'AutoLogin setting:${appDataProvider.autoLogin},AutoLogin status:$loginStatus');
 
-    return loginStatus;
+    return false;
   }
 
   /// entity包含所有的字段，假设是字符串类型，fields是需要特别说明的字段，比如不是字符串类型
