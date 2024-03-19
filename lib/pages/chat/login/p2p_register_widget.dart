@@ -288,6 +288,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
       peerId.value = myselfPeer.peerId;
     } catch (e) {
       DialogUtil.error(context, content: e.toString());
+      return;
     }
     DialogUtil.info(context,
         content:
