@@ -471,19 +471,20 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   Future<void> _onActionFile() async {
     List<XFile> xfiles = await FileUtil.pickFiles();
     if (xfiles.isNotEmpty) {
-      XFile xfile = xfiles[0];
-      Uint8List data = await xfile.readAsBytes();
-      // Uint8List? thumbnail = await ImageUtil.compressThumbnail(xfile: xfile);
-      String filename = xfile.name;
-      String? mimeType = xfile.mimeType;
-      mimeType = FileUtil.mimeType(filename);
-      mimeType = mimeType ?? 'text/plain';
-      await chatMessageController.send(
-          title: filename,
-          content: data,
-          // thumbnail: thumbnail,
-          contentType: ChatMessageContentType.file,
-          mimeType: mimeType);
+      for (var xfile in xfiles) {
+        Uint8List data = await xfile.readAsBytes();
+        // Uint8List? thumbnail = await ImageUtil.compressThumbnail(xfile: xfile);
+        String filename = xfile.name;
+        String? mimeType = xfile.mimeType;
+        mimeType = FileUtil.mimeType(filename);
+        mimeType = mimeType ?? 'text/plain';
+        await chatMessageController.send(
+            title: filename,
+            content: data,
+            // thumbnail: thumbnail,
+            contentType: ChatMessageContentType.file,
+            mimeType: mimeType);
+      }
     }
   }
 
