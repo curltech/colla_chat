@@ -73,7 +73,7 @@ class PhotoUtil {
   }
 
   static Future<XFile?> pickImage({
-    required ImageSource source,
+    ImageSource source = ImageSource.gallery,
     double? maxWidth,
     double? maxHeight,
     int? imageQuality,
@@ -92,7 +92,7 @@ class PhotoUtil {
   }
 
   static Future<XFile?> pickVideo({
-    required ImageSource source,
+    ImageSource source = ImageSource.gallery,
     CameraDevice preferredCameraDevice = CameraDevice.rear,
     Duration? maxDuration,
   }) async {

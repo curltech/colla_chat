@@ -27,6 +27,7 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
+import 'package:colla_chat/tool/media_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
@@ -60,7 +61,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   Future<List<ActionData>> _buildActionData() async {
     List<ActionData> actionData = [];
-    if (platformParams.mobile) {
+    if (platformParams.mobile || platformParams.macos) {
       var albumActionData = ActionData(
           label: 'Album',
           tooltip: 'Photo album',
@@ -261,23 +262,46 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   ///相册
   _onActionAlbum() async {
-    final List<AssetEntity>? result = await AssetUtil.pickAssets(
-      context,
-    );
-    if (result != null && result.isNotEmpty) {
-      Uint8List? data = await result[0].originBytes;
-      String? mimeType = await result[0].mimeTypeAsync;
-      String title = await result[0].titleAsync;
-      mimeType = mimeType ?? FileUtil.mimeType(title);
-      String mainMimeType = FileUtil.mainMimeType(mimeType!);
-      ChatMessageContentType? contentType = StringUtil.enumFromString(
-          ChatMessageContentType.values, mainMimeType);
-      contentType ??= ChatMessageContentType.image;
-      await chatMessageController.send(
-          title: title,
-          content: data,
-          contentType: contentType,
-          mimeType: mimeType);
+    if (platformParams.mobile) {
+      final List<AssetEntity>? assets = await AssetUtil.pickAssets(
+        context,
+      );
+      if (assets != null && assets.isNotEmpty) {
+        for (var asset in assets) {
+          Uint8List? data = await asset.originBytes;
+          String? mimeType = await asset.mimeTypeAsync;
+          String title = await asset.titleAsync;
+          mimeType = mimeType ?? FileUtil.mimeType(title);
+          String mainMimeType = FileUtil.mainMimeType(mimeType!);
+          ChatMessageContentType? contentType = StringUtil.enumFromString(
+              ChatMessageContentType.values, mainMimeType);
+          contentType ??= ChatMessageContentType.image;
+          await chatMessageController.send(
+              title: title,
+              content: data,
+              contentType: contentType,
+              mimeType: mimeType);
+        }
+      }
+    } else if (platformParams.macos) {
+      final List<XFile> xfiles = await MediaUtil.pickMultipleMedia();
+      if (xfiles.isNotEmpty) {
+        for (var xfile in xfiles) {
+          Uint8List? data = await xfile.readAsBytes();
+          String? mimeType = xfile.mimeType;
+          String title = xfile.name;
+          mimeType = mimeType ?? FileUtil.mimeType(title);
+          String mainMimeType = FileUtil.mainMimeType(mimeType!);
+          ChatMessageContentType? contentType = StringUtil.enumFromString(
+              ChatMessageContentType.values, mainMimeType);
+          contentType ??= ChatMessageContentType.image;
+          await chatMessageController.send(
+              title: title,
+              content: data,
+              contentType: contentType,
+              mimeType: mimeType);
+        }
+      }
     }
   }
 
