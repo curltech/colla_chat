@@ -33,29 +33,29 @@
 	<key>NSCalendarsUsageDescription</key>
 	<string>Calendars</string>
 	<key>NSCameraUsageDescription</key>
-	<string>camera</string>
+	<string>Need take photo using camera to send to other peer</string>
 	<key>NSContactsUsageDescription</key>
-	<string>contacts</string>
+	<string>Need find your contact mobile to search other peer</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>$(PRODUCT_COPYRIGHT)</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Always and when in use!</string>
+	<string>Need send your location to other peer</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Can I have location always?</string>
+	<string>Need send your location to other peer</string>
 	<key>NSLocationUsageDescription</key>
-	<string>Older devices need location.</string>
+	<string>Need send your location to other peer</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Need location when in use</string>
+	<string>Need send your location to other peer</string>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>microphone</string>
+	<string>Need record your voice and send to other peer</string>
 	<key>NSMotionUsageDescription</key>
 	<string>motion</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-    <string>Get chat photo from library</string>
+    <string>Select the photo from photo library and send them to other peers</string>
     <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>Save chat photo to library</string>
+    <string>The photo which other peers send to this peer can be saved to photo library</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>NSRemindersUsageDescription</key>

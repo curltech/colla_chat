@@ -59,19 +59,19 @@
 	<key>NSCalendarsUsageDescription</key>
 	<string>Calendars</string>
 	<key>NSCameraUsageDescription</key>
-	<string>camera</string>
+	<string>Need take photo using camera to send to other peer</string>
 	<key>NSContactsUsageDescription</key>
-	<string>contacts</string>
+	<string>Need find your contact mobile to search other peer</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Always and when in use!</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Can I have location always?</string>
 	<key>NSLocationUsageDescription</key>
-	<string>Older devices need location.</string>
+	<string>Need send your location to other peer</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Need location when in use</string>
+	<string>Need send your location to other peer</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>microphone</string>
+	<string>Need record your voice and send to other peer</string>
 	<key>NSMotionUsageDescription</key>
 	<string>motion</string>
 	<key>NSPhotoLibraryUsageDescription</key>
