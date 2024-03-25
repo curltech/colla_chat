@@ -7,7 +7,16 @@ import 'package:colla_chat/pages/chat/me/settings/advanced/myselfpeer/myself_pee
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/routers/routes.dart';
+import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/service/chat/chat_summary.dart';
+import 'package:colla_chat/service/chat/conference.dart';
+import 'package:colla_chat/service/chat/group.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
+import 'package:colla_chat/service/dht/peerclient.dart';
+import 'package:colla_chat/service/dht/peerendpoint.dart';
+import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
@@ -119,6 +128,31 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
           prefix: myselfPeer.avatarImage,
           suffix: IconButton(
             onPressed: () async {
+              bool? confirm = await DialogUtil.confirm(context,
+                  content: 'Do you want delete peer');
+              if (confirm == null || confirm == false) {
+                return;
+              }
+              chatMessageService.delete(
+                  where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
+              messageAttachmentService.delete(
+                  where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
+              peerProfileService.delete(
+                  where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
+              chatSummaryService.delete(
+                  where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
+              linkmanService.delete(
+                  where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
+              groupService.delete(
+                  where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
+              groupMemberService.delete(
+                  where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
+              conferenceService.delete(
+                  where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
+              peerClientService.delete(
+                  where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
+              peerEndpointService.delete(
+                  where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
               myselfPeerService
                   .delete(where: 'peerId=?', whereArgs: [myselfPeer.peerId]);
               await myselfPeerController.delete(index: i);
