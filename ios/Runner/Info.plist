@@ -40,7 +40,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NFCReaderUsageDescription</key>
-	<string>Read NFC Tags</string>
+	<string>Add peer as friend by read NFC tags</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -96,6 +96,10 @@
 		<string>remote-notification</string>
 		<string>voip</string>
 	</array>
+	<key>UIRequiredDeviceCapabilities</key>
+    <array>
+        <string>nfc</string>
+    </array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen.storyboard</string>
 	<key>UIMainStoryboardFile</key>
