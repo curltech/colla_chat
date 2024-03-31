@@ -62,6 +62,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
       contactLinkmanAddWidget,
       jsonLinkmanAddWidget,
       //nearbyLinkmanAddWidget,
+      nfcLinkmanAddWidget,
       chatGPTAddWidget,
     ]);
     for (var tile in linkmanTileData) {
