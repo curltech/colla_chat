@@ -108,7 +108,7 @@ class AndroidOverlayWindowUtil {
     if (!platformParams.android) {
       return;
     }
-    await FlutterOverlayWindow.resizeOverlay(width, height);
+    await FlutterOverlayWindow.resizeOverlay(width, height, true);
   }
 
   static Future<bool> isActive() async {
