@@ -274,14 +274,14 @@ class ConferenceChatMessageController with ChangeNotifier {
 
   setAudioContext({
     AudioContextConfigRoute? route,
-    bool? duckAudio,
+    AudioContextConfigFocus? focus,
     bool? respectSilence,
     bool? stayAwake,
   }) async {
     try {
       await _audioPlayer.setAudioContext(
           route: route,
-          duckAudio: duckAudio,
+          focus: focus,
           respectSilence: respectSilence,
           stayAwake: stayAwake);
     } catch (e) {

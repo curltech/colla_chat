@@ -18,27 +18,27 @@ class BlueFireAudioPlayer {
   ///所有的音频播放器的配置
   setGlobalAudioContext({
     AudioContextConfigRoute? route,
-    bool? duckAudio,
+    AudioContextConfigFocus? focus,
     bool? respectSilence,
     bool? stayAwake,
   }) async {
     GlobalAudioScope global = AudioPlayer.global;
     await global.setAudioContext(_buildAudioContextConfig(
         route: route,
-        duckAudio: duckAudio,
+        focus: focus,
         respectSilence: respectSilence,
         stayAwake: stayAwake));
   }
 
   setAudioContext({
     AudioContextConfigRoute? route,
-    bool? duckAudio,
+    AudioContextConfigFocus? focus,
     bool? respectSilence,
     bool? stayAwake,
   }) async {
     AudioContext audioContext = _buildAudioContextConfig(
         route: route,
-        duckAudio: duckAudio,
+        focus: focus,
         respectSilence: respectSilence,
         stayAwake: stayAwake);
     if (platformParams.mobile) {
@@ -48,14 +48,14 @@ class BlueFireAudioPlayer {
 
   AudioContext _buildAudioContextConfig({
     AudioContextConfigRoute? route,
-    bool? duckAudio,
+    AudioContextConfigFocus? focus,
     bool? respectSilence,
     bool? stayAwake,
   }) {
     AudioContextConfig audioContextConfig = AudioContextConfig();
     AudioContextConfig config = audioContextConfig.copy(
         route: route,
-        duckAudio: duckAudio,
+        focus: focus,
         respectSilence: respectSilence,
         stayAwake: stayAwake);
 
@@ -274,10 +274,6 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
 
   setReleaseMode(ReleaseMode releaseMode) async {
     await player!.player.setReleaseMode(releaseMode); // half speed
-  }
-
-  setGlobalAudioContext(AudioContext ctx) async {
-    AudioPlayer.global.setGlobalAudioContext(ctx);
   }
 
   setAudioContext(AudioContext ctx) async {

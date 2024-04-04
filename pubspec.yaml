@@ -40,7 +40,7 @@ dependencies:
   system_alert_window: ^2.0.0
   flutter_overlay_window: ^0.4.3
   flutter_floating: ^1.0.8
-  upgrader: ^9.0.0
+  upgrader: ^10.1.0
 #  app_to_foreground: ^0.0.3
   path_provider: ^2.0.11
   url_launcher: ^6.1.11 #打开系统浏览器
@@ -58,11 +58,10 @@ dependencies:
   orientation: ^1.2.0 # 控制屏幕旋转
   geolocator: ^10.1.0
   device_info_plus: ^9.1.2
-  network_info_plus: ^4.0.1
+  network_info_plus: ^5.0.2
   beamer: ^1.4.1+1
-  sensors_plus: ^4.0.2
-  battery_plus: ^5.0.1
-  package_info_plus: ^5.0.1
+  battery_plus: ^6.0.0
+  package_info_plus: ^6.0.0
   flutter_contacts: ^1.1.6
   fluttercontactpicker: ^5.0.0
   #fast_contacts: ^3.0.3
@@ -185,7 +184,7 @@ dependencies:
   flutter_card_swiper: ^7.0.0 #不错的swiper的组件
   another_transformer_page_view: ^2.0.1
   appinio_swiper: ^2.0.2 #不错的swiper的组件，可定制动画的角度
-  flutter_drawing_board: ^0.5.0 #绘画工具
+  flutter_drawing_board: ^0.7.0+2 #绘画工具
   custom_pop_up_menu: ^1.2.4
   #popup_menu: ^1.0.5
   star_menu: ^4.0.0
@@ -233,7 +232,7 @@ dependencies:
   provider: ^6.0.1 #状态管理
   easy_refresh: ^3.3.2+1
   percent_indicator: ^4.2.3
-  share_plus: ^7.2.2
+  share_plus: ^8.0.2
   flutter_sharing_intent: 1.1.0
 #    git:
 #      url: https://github.com/bhagat-techind/flutter_sharing_intent
@@ -272,13 +271,13 @@ dependencies:
   #-lc++
   #-lstd++
   flutter_sound: ^9.4.6
-  audioplayers: ^5.2.0 #音频处理,所有平台
-  audioplayers_platform_interface: ^6.1.0
-  audioplayers_windows: ^3.1.0
-  audioplayers_darwin: ^5.0.2
-  audioplayers_linux: ^3.1.0
-  audioplayers_web: ^4.1.0
-  audioplayers_android: ^4.0.2
+  audioplayers: ^6.0.0 #音频处理,所有平台
+  audioplayers_platform_interface: ^7.0.0
+  audioplayers_windows: ^4.0.0
+  audioplayers_darwin: ^6.0.0
+  audioplayers_linux: ^4.0.0
+  audioplayers_web: ^5.0.0
+  audioplayers_android: ^5.0.0
   #  another_audio_recorder: ^1.0.1
 #  assets_audio_player: ^3.0.6
 #  audiofileplayer: ^2.1.1
@@ -328,7 +327,7 @@ dependencies:
   #应用
   #  flutter_filereader: 3.0.0 #引入x5浏览器
   i18n_extension: ^11.0.12
-  quill_html_editor: ^2.2.7
+  quill_html_editor: ^2.2.8
   html_editor_enhanced: ^2.5.1
   #  visual_editor:
   #    git: https://github.com/visual-space/visual-editor.git
@@ -365,12 +364,14 @@ dependencies:
 dependency_overrides:
   uuid: ^4.3.1
   meta: ^1.11.0
+  pointer_interceptor: ^0.10.1
   js: ^0.7.1
   web: ^0.4.0
   logger: ^2.0.2+1
   flutter_math_fork: ^0.7.1
+  sensors_plus: ^5.0.0
   photo_view: ^0.14.0
-  device_info_plus: ^9.0.2
+  device_info_plus: ^10.0.1
   flutter_keyboard_visibility: ^6.0.0
   ffi: 2.1.0
   http: 1.2.0
