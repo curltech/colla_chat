@@ -2,10 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>com.apple.security.app-sandbox</key>
-	<false/>
-	<key>com.apple.developer.push-to-talk</key>
-	<true/>
 	<key>aps-environment</key>
 	<string>development</string>
 	<key>com.apple.developer.default-data-protection</key>
@@ -14,6 +10,10 @@
 	<array>
 		<string>allow-vpn</string>
 	</array>
+	<key>com.apple.developer.push-to-talk</key>
+	<true/>
+	<key>com.apple.security.app-sandbox</key>
+	<false/>
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>group.io.curltech.colla</string>
@@ -22,10 +22,5 @@
 	<array>
 		<string>$(AppIdentifierPrefix)io.curltech.colla</string>
 	</array>
-	<key>com.apple.developer.nfc.readersession.formats</key>
-    <array>
-        <string>TAG</string>
-        <string>NDEF</string>
-    </array>
 </dict>
 </plist>
