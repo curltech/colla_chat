@@ -28,7 +28,8 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
   final FaceGroupAddWidget faceGroupAddWidget = FaceGroupAddWidget();
   final ConferenceEditWidget conferenceEditWidget =
       const ConferenceEditWidget();
-  final NfcLinkmanAddWidget nfcLinkmanAddWidget = NfcLinkmanAddWidget();
+
+  //final NfcLinkmanAddWidget nfcLinkmanAddWidget = NfcLinkmanAddWidget();
 
   LinkmanAddWidget({super.key}) {
     indexWidgetProvider.define(p2pLinkmanAddWidget);
@@ -39,7 +40,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(nearbyGroupAddWidget);
     indexWidgetProvider.define(faceGroupAddWidget);
     indexWidgetProvider.define(conferenceEditWidget);
-    indexWidgetProvider.define(nfcLinkmanAddWidget);
+    //indexWidgetProvider.define(nfcLinkmanAddWidget);
   }
 
   @override
@@ -62,7 +63,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
       contactLinkmanAddWidget,
       jsonLinkmanAddWidget,
       //nearbyLinkmanAddWidget,
-      nfcLinkmanAddWidget,
+      //nfcLinkmanAddWidget,
       chatGPTAddWidget,
     ]);
     for (var tile in linkmanTileData) {
