@@ -39,8 +39,23 @@
 	<string>1.5.1</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<!--
 	<key>NFCReaderUsageDescription</key>
 	<string>Add peer as friend by read NFC tags</string>
+	<key>com.apple.developer.nfc.readersession.felica.systemcodes</key>
+    <array>
+        <string>0000</string>
+    </array>
+    <key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
+    <array>
+        <string>A00000000386980701</string>
+    </array>
+
+	<key>UIRequiredDeviceCapabilities</key>
+    <array>
+        <string>nfc</string>
+    </array>
+	 -->
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -96,10 +111,6 @@
 		<string>remote-notification</string>
 		<string>voip</string>
 	</array>
-	<key>UIRequiredDeviceCapabilities</key>
-    <array>
-        <string>nfc</string>
-    </array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen.storyboard</string>
 	<key>UIMainStoryboardFile</key>
@@ -127,14 +138,6 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>com.apple.developer.nfc.readersession.felica.systemcodes</key>
-	<array>
-		<string>0000</string>
-	</array>
-	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
-	<array>
-		<string>A00000000386980701</string>
-	</array>
 	<key>kTCCServiceMediaLibrary</key>
 	<string>media</string>
 	<key>NSAppTransportSecurity</key>
