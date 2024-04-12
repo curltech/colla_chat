@@ -139,11 +139,13 @@ Future<void> initializeAndroidAudioSettings() async {
 
 ///初始化桌面平台的窗口管理
 Future<void> _initDesktopWindows() async {
-  if (platformParams.windows || platformParams.macos || platformParams.linux) {
+  if (platformParams.desktop) {
     await windowManager.ensureInitialized();
     WindowOptions windowOptions = const WindowOptions(
       title: appName,
+      size: Size(1024, 768),
       center: true,
+      backgroundColor: Colors.transparent,
       titleBarStyle: TitleBarStyle.normal,
       windowButtonVisibility: true,
     );
@@ -151,6 +153,7 @@ Future<void> _initDesktopWindows() async {
       await windowManager.show();
       await windowManager.focus();
     });
+    windowManager.setMinimumSize(const Size(398.0, 768.0));
   }
 }
 

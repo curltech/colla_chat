@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
@@ -15,27 +16,9 @@ import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:path/path.dart' as p;
 
 class QrcodeWidget extends StatefulWidget with TileDataMixin {
-  final List<ActionData> actionData = [
-    ActionData(
-      label: 'Save to file',
-      icon: Icon(Icons.save, color: myself.primary),
-    ),
-    ActionData(
-      label: 'Save to image',
-      icon: Icon(Icons.image, color: myself.primary),
-    ),
-    ActionData(
-      label: 'Share',
-      icon: Icon(Icons.share, color: myself.primary),
-    ),
-    ActionData(
-      label: 'Reset qrcode',
-      icon: Icon(Icons.lock_reset, color: myself.primary),
-    )
-  ];
-
   QrcodeWidget({super.key});
 
   @override
@@ -59,10 +42,36 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
   String? content;
   Widget? qrImage;
   ScreenshotController screenshotController = ScreenshotController();
+  final List<ActionData> actionData = [];
 
   @override
   void initState() {
     super.initState();
+    _init();
+  }
+
+  _init() {
+    actionData.clear();
+    actionData.add(ActionData(
+      label: 'Save to file',
+      icon: Icon(Icons.save, color: myself.primary),
+    ));
+    if (platformParams.mobile) {
+      actionData.add(ActionData(
+        label: 'Save to image',
+        icon: Icon(Icons.image, color: myself.primary),
+      ));
+    }
+    if (platformParams.mobile) {
+      actionData.add(ActionData(
+        label: 'Share',
+        icon: Icon(Icons.share, color: myself.primary),
+      ));
+    }
+    actionData.add(ActionData(
+      label: 'Reset qrcode',
+      icon: Icon(Icons.lock_reset, color: myself.primary),
+    ));
   }
 
   _onPopAction(BuildContext context, int index, String label,
@@ -70,18 +79,16 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
     switch (label) {
       case 'Save to file':
         Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
-        FileUtil.writeFileAsBytes(bytes, myself.peerId!);
+        await _saveFile(bytes, myself.peerId!);
         break;
       case 'Save to image':
         Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
-        ImageUtil.saveImageGallery(bytes,
-            name: myself.peerId!, androidExistNotSave: true);
-        //Uint8List? bytes = await screenshotController.capture();
+        await _saveFile(bytes, myself.peerId!, isFile: false);
         break;
       case 'Share':
         Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
         var path = await FileUtil.writeFileAsBytes(bytes, myself.peerId!);
-        Share.shareXFiles([XFileUtil.open(path)]);
+        _share(path);
         break;
       case 'Reset qrcode':
         setState(() {
@@ -91,6 +98,30 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
       default:
         break;
     }
+  }
+
+  Future<void> _saveFile(Uint8List bytes, String filename,
+      {bool isFile = true}) async {
+    if (!isFile) {
+      await ImageUtil.saveImageGallery(bytes,
+          name: filename, androidExistNotSave: true);
+      DialogUtil.info(context, content: 'save to gallery: $filename');
+    } else {
+      String? dir = await FileUtil.directoryPathPicker();
+      if (dir != null) {
+        String path = p.join(dir, filename);
+        await FileUtil.writeFileAsBytes(bytes, path);
+        DialogUtil.info(context, content: 'save to file: $path');
+      }
+    }
+  }
+
+  Future<void> _share(String filename) async {
+    final box = context.findRenderObject() as RenderBox?;
+    Share.shareXFiles(
+      [XFile(filename)],
+      sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+    );
   }
 
   @override
@@ -149,7 +180,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
                           _onPopAction(context, index, label, value: value);
                         },
                         crossAxisCount: 2,
-                        actions: widget.actionData,
+                        actions: actionData,
                         height: 140,
                         width: 220,
                         iconSize: 20));
