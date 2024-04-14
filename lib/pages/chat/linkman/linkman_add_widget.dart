@@ -5,7 +5,6 @@ import 'package:colla_chat/pages/chat/linkman/group/nearby_group_add_widget.dart
 import 'package:colla_chat/pages/chat/linkman/linkman/chat_gpt_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/contact_linkman_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/json_linkman_add_widget.dart';
-import 'package:colla_chat/pages/chat/linkman/linkman/nfc_linkman_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/p2p_linkman_add_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';

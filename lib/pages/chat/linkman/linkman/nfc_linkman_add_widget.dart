@@ -96,7 +96,7 @@ class _NfcLinkmanAddWidgetState extends State<NfcLinkmanAddWidget> {
       } else {
         _result = 'error: NDEF not supported: ${_tag!.type}';
       }
-    } catch (e, stacktrace) {
+    } catch (e) {
       _result = 'error: $e';
     } finally {
       await NfcUtil.finish();
@@ -109,7 +109,7 @@ class _NfcLinkmanAddWidgetState extends State<NfcLinkmanAddWidget> {
         Text(
             'Running on: ${platformParams.operatingSystem}\nNFC: $_availability'),
         ElevatedButton(
-          child: Text('Start polling'),
+          child: const Text('Start polling'),
           onPressed: () async {
             _result = await read();
             setState(() {});
@@ -133,7 +133,7 @@ class _NfcLinkmanAddWidgetState extends State<NfcLinkmanAddWidget> {
         child: Column(children: [
           _buildReadWidget(),
           ElevatedButton(
-            child: Text('Start writting'),
+            child: const Text('Start writting'),
             onPressed: () async {
               await write('write data');
               setState(() {});

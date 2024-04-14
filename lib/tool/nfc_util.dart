@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
