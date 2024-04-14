@@ -143,7 +143,7 @@ Future<void> _initDesktopWindows() async {
     await windowManager.ensureInitialized();
     WindowOptions windowOptions = const WindowOptions(
       title: appName,
-      size: Size(1024, 768),
+      size: Size(800, 600),
       center: true,
       backgroundColor: Colors.transparent,
       titleBarStyle: TitleBarStyle.normal,
