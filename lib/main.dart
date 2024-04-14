@@ -145,7 +145,7 @@ Future<void> _initDesktopWindows() async {
       title: appName,
       size: Size(800, 600),
       center: true,
-      backgroundColor: Colors.transparent,
+      // backgroundColor: Colors.transparent,
       titleBarStyle: TitleBarStyle.normal,
       windowButtonVisibility: true,
     );
@@ -153,7 +153,7 @@ Future<void> _initDesktopWindows() async {
       await windowManager.show();
       await windowManager.focus();
     });
-    windowManager.setMinimumSize(const Size(398.0, 768.0));
+    windowManager.setMinimumSize(const Size(398.0, 600.0));
   }
 }
 
