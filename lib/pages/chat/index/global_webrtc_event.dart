@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:synchronized/synchronized.dart';
@@ -42,9 +43,11 @@ class GlobalWebrtcEvent {
         return true;
       } else if (linkman.linkmanStatus == LinkmanStatus.B.name) {
         ///如果是黑名单，则直接拒绝
+        logger.e('chat message sender is blacklist');
         return false;
       }
     } else {
+      logger.w('chat message sender is stranger or linkmanStatus is null');
       // Linkman linkman = Linkman(peerId, name);
       // linkman.clientId = clientId;
       // linkman.peerPublicKey = peerId;

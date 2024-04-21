@@ -208,12 +208,14 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     int id = linkman.id!;
     await linkmanService.update({'id': id, 'linkmanStatus': status.name});
     linkmanService.linkmen.remove(linkman.peerId);
+    linkman.linkmanStatus = status.name;
   }
 
   _changeSubscriptStatus(Linkman linkman, LinkmanStatus status) async {
     int id = linkman.id!;
     await linkmanService.update({'id': id, 'subscriptStatus': status.name});
     linkmanService.linkmen.remove(linkman.peerId);
+    linkman.subscriptStatus = status.name;
   }
 
   Widget _buildBadge(int connectionNum, {Widget? avatarImage}) {
@@ -262,9 +264,13 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         if (peerId == myself.peerId) {
           linkmanStatus = AppLocalizations.t(LinkmanStatus.M.name);
         }
+        if (linkman.subscriptStatus == LinkmanStatus.C.name) {
+          linkmanStatus =
+              '$linkmanStatus/${AppLocalizations.t(LinkmanStatus.C.name)}';
+        }
         Widget? prefix = linkman.avatarImage;
         String routeName = 'linkman_edit';
-        if (linkmanStatus == LinkmanStatus.G.name) {
+        if (linkman.linkmanStatus == LinkmanStatus.G.name) {
           // prefix = prefix ??
           //     ImageUtil.buildImageWidget(
           //         image: 'assets/images/openai.png',
@@ -365,6 +371,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                     return;
                   }
                   await _changeLinkmanStatus(linkman, LinkmanStatus.S);
+                  linkmanController.notifyListeners();
                   if (mounted) {
                     DialogUtil.info(context,
                         content:
@@ -386,6 +393,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                     return;
                   }
                   await _changeLinkmanStatus(linkman, LinkmanStatus.F);
+                  linkmanController.notifyListeners();
                   if (mounted) {
                     DialogUtil.info(context,
                         content:
@@ -406,6 +414,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                       return;
                     }
                     await _changeLinkmanStatus(linkman, LinkmanStatus.S);
+                    linkmanController.notifyListeners();
                     if (mounted) {
                       DialogUtil.info(context,
                           content:
@@ -425,6 +434,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                     return;
                   }
                   await _changeLinkmanStatus(linkman, LinkmanStatus.B);
+                  linkmanController.notifyListeners();
                   if (mounted) {
                     DialogUtil.info(context,
                         content:
@@ -445,6 +455,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                       return;
                     }
                     await _changeSubscriptStatus(linkman, LinkmanStatus.N);
+                    linkmanController.notifyListeners();
                     if (mounted) {
                       DialogUtil.info(context,
                           content:
@@ -464,6 +475,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                     return;
                   }
                   await _changeSubscriptStatus(linkman, LinkmanStatus.C);
+                  linkmanController.notifyListeners();
                   if (mounted) {
                     DialogUtil.info(context,
                         content:

@@ -168,14 +168,32 @@ class GlobalChatMessage {
 
   ///跟踪影响全局的消息到来，对不同类型的消息进行分派
   Future<void> _receiveChatMessage(ChatMessage chatMessage) async {
+    String? peerId = chatMessage.senderPeerId;
+    if (peerId == null) {
+      logger.e('chat message sender is null');
+      return;
+    }
+    Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+    if (linkman != null) {
+      ///呼叫者本地存在
+      if (linkman.linkmanStatus == LinkmanStatus.B.name) {
+        ///如果是黑名单，则直接拒绝
+        logger.e('chat message sender is blacklist');
+        return;
+      }
+      if (linkman.linkmanStatus == LinkmanStatus.S.name) {
+        logger.w('chat message sender is stranger');
+      }
+    }
+
     ///保存消息
     ChatMessage? savedChatMessage =
         await chatMessageService.receiveChatMessage(chatMessage);
     if (savedChatMessage == null) {
       logger.e('new or original chatMessage save fail');
     }
+
     String messageId = chatMessage.messageId!;
-    String peerId = chatMessage.senderPeerId!;
     String? title = chatMessage.title;
     String? content = chatMessage.content;
     ChatMessageSubType? subMessageType = StringUtil.enumFromString(

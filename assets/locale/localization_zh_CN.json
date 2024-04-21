@@ -688,5 +688,13 @@
   "Do you want to login using exist account?": "你想用存在的账户登录吗？",
   "Select": "选择",
   "is not exist": "不存在",
-  "Password is wrong": "密码错误"
+  "Password is wrong": "密码错误",
+  "N": "未知",
+  "M": "我",
+  "S": "陌生人",
+  "R": "机器人",
+  "G": "chatGPT聊天机器人",
+  "F": "好友",
+  "B": "黑名单",
+  "C": "订阅"
 }
