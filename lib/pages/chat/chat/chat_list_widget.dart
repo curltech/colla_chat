@@ -43,15 +43,15 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 
 class ConnectivityController with ChangeNotifier {
-  late StreamSubscription<ConnectivityResult> subscription;
-  ConnectivityResult connectivityResult = ConnectivityResult.none;
+  late StreamSubscription<List<ConnectivityResult>> subscription;
+  List<ConnectivityResult> connectivityResult = [];
 
   ConnectivityController() {
     subscription =
         ConnectivityUtil.onConnectivityChanged(_onConnectivityChanged);
   }
 
-  _onConnectivityChanged(ConnectivityResult result) {
+  _onConnectivityChanged(List<ConnectivityResult> result) {
     if (result != connectivityResult) {
       connectivityResult = result;
       notifyListeners();
@@ -142,8 +142,8 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
 
 class _ChatListWidgetState extends State<ChatListWidget>
     with TickerProviderStateMixin {
-  final ValueNotifier<ConnectivityResult> _connectivityResult =
-      ValueNotifier<ConnectivityResult>(
+  final ValueNotifier<List<ConnectivityResult>> _connectivityResult =
+      ValueNotifier<List<ConnectivityResult>>(
           connectivityController.connectivityResult);
   final ValueNotifier<SocketStatus> _socketStatus =
       ValueNotifier<SocketStatus>(SocketStatus.none);
@@ -226,9 +226,9 @@ class _ChatListWidgetState extends State<ChatListWidget>
   }
 
   _updateConnectivity() {
-    var result = connectivityController.connectivityResult;
-    if (result == ConnectivityResult.none) {
-      // if (mounted) {
+    List<ConnectivityResult> result = connectivityController.connectivityResult;
+    if (result.contains(ConnectivityResult.none)) {
+      // if (mounted) {/**/
       //   DialogUtil.error(context,
       //       content: AppLocalizations.t('Connectivity were break down'));
       // }
@@ -668,11 +668,13 @@ class _ChatListWidgetState extends State<ChatListWidget>
     var connectivityWidget = ValueListenableBuilder(
         valueListenable: _connectivityResult,
         builder: (context, value, child) {
+          ConnectivityResult connectivityResult =
+              ConnectivityUtil.getMainResult(value);
           return Tooltip(
               message: AppLocalizations.t('Network status'),
               child:
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                _connectivityResult.value == ConnectivityResult.none
+                connectivityResult == ConnectivityResult.none
                     ? const Icon(
                         Icons.wifi_off,
                         color: Colors.red,
@@ -681,7 +683,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
                         Icons.wifi,
                         //color: Colors.green,
                       ),
-                CommonAutoSizeText(_connectivityResult.value.name,
+                CommonAutoSizeText(connectivityResult.name,
                     style: const TextStyle(fontSize: 12)),
               ]));
         });
