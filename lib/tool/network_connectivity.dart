@@ -6,12 +6,12 @@ import 'package:network_info_plus/network_info_plus.dart';
 
 class NetworkConnectivity {
   final Connectivity _connectivity = Connectivity();
-  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
-  ConnectivityResult connectivityResult = ConnectivityResult.none;
+  late StreamSubscription<List<ConnectivityResult>> _connectivitySubscription;
+  List<ConnectivityResult> connectivityResult = [];
 
   ///当前的网络连接状态，null:未连接;mobile:wifi:
   Future<String?> connective() async {
-    ConnectivityResult connectivityResult =
+    List<ConnectivityResult> connectivityResult =
         await _connectivity.checkConnectivity();
 
     if (connectivityResult == ConnectivityResult.mobile) {
@@ -24,7 +24,7 @@ class NetworkConnectivity {
   }
 
   /// 注册连接状态监听器
-  register([Function(ConnectivityResult result)? fn]) {
+  register([Function(List<ConnectivityResult> result)? fn]) {
     if (fn == null) {
       _connectivitySubscription =
           _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
@@ -34,7 +34,7 @@ class NetworkConnectivity {
     }
   }
 
-  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+  Future<void> _updateConnectionStatus(List<ConnectivityResult> result) async {
     connectivityResult = result;
   }
 }

@@ -3,17 +3,17 @@ import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 class ConnectivityUtil {
-  static Future<ConnectivityResult> checkConnectivity() async {
-    var connectivityResult = await (Connectivity().checkConnectivity());
+  static Future<List<ConnectivityResult>> checkConnectivity() async {
+    List<ConnectivityResult> connectivityResult = await (Connectivity().checkConnectivity());
 
     return connectivityResult;
   }
 
-  static StreamSubscription<ConnectivityResult> onConnectivityChanged(
-      Function(ConnectivityResult result) onConnectivityChanged) {
+  static StreamSubscription<List<ConnectivityResult>> onConnectivityChanged(
+      Function(List<ConnectivityResult> result) onConnectivityChanged) {
     var subscription = Connectivity()
         .onConnectivityChanged
-        .listen((ConnectivityResult result) {
+        .listen((List<ConnectivityResult> result) {
       onConnectivityChanged(result);
     });
 
