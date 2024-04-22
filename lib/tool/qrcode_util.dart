@@ -151,8 +151,7 @@ class QrcodeUtil {
 
   static Future<String?> mobileScan(BuildContext context) async {
     String? result;
-    ValueNotifier<bool> isStarted = ValueNotifier<bool>(true);
-    mobile_scanner.MobileScannerController cameraController =
+    mobile_scanner.MobileScannerController mobileScannerController =
         mobile_scanner.MobileScannerController(
       torchEnabled: true,
       formats: [BarcodeFormat.qrCode],
@@ -161,24 +160,25 @@ class QrcodeUtil {
       detectionTimeoutMs: 1000,
       returnImage: false,
     );
+    StreamSubscription<Object?>? subscription = mobileScannerController.barcodes
+        .listen((mobile_scanner.BarcodeCapture capture) {
+      final List<mobile_scanner.Barcode> barcodes = capture.barcodes;
+      for (final barcode in barcodes) {
+        result = barcode.rawValue;
+        if (result != null) {
+          break;
+        }
+      }
+      Navigator.of(context).pop();
+    });
+    unawaited(mobileScannerController.start());
+    ValueNotifier<bool> isStarted = ValueNotifier<bool>(true);
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) {
           return Stack(children: [
             mobile_scanner.MobileScanner(
-                fit: BoxFit.contain,
-                controller: cameraController,
-                onDetect: (mobile_scanner.BarcodeCapture capture) {
-                  final List<mobile_scanner.Barcode> barcodes =
-                      capture.barcodes;
-                  for (final barcode in barcodes) {
-                    result = barcode.rawValue;
-                    if (result != null) {
-                      break;
-                    }
-                  }
-                  Navigator.of(context).pop();
-                }),
+                fit: BoxFit.contain, controller: mobileScannerController),
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
@@ -190,36 +190,31 @@ class QrcodeUtil {
                   children: [
                     IconButton(
                         onPressed: () {
+                          unawaited(subscription.cancel());
+                          mobileScannerController.dispose();
                           Navigator.of(context).pop();
                         },
                         icon: const Icon(Icons.arrow_back_ios_new)),
                     ValueListenableBuilder(
-                      valueListenable: cameraController.hasTorchState,
+                      valueListenable: mobileScannerController,
                       builder: (context, state, child) {
-                        if (state != true) {
+                        if (!state.isInitialized || !state.isRunning) {
                           return const SizedBox.shrink();
                         }
                         return IconButton(
                           color: Colors.white,
-                          icon: ValueListenableBuilder<TorchState>(
-                            valueListenable: cameraController.torchState,
-                            builder: (context, state, child) {
-                              switch (state) {
-                                case TorchState.off:
-                                  return const Icon(
-                                    Icons.flash_off,
-                                    color: Colors.grey,
-                                  );
-                                case TorchState.on:
-                                  return const Icon(
-                                    Icons.flash_on,
-                                    color: Colors.yellow,
-                                  );
-                              }
-                            },
-                          ),
+                          icon: state.torchState == TorchState.off
+                              ? const Icon(
+                                  Icons.flash_off,
+                                  color: Colors.grey,
+                                )
+                              : const Icon(
+                                  Icons.flash_on,
+                                  color: Colors.yellow,
+                                ),
                           iconSize: 32.0,
-                          onPressed: () => cameraController.toggleTorch(),
+                          onPressed: () =>
+                              mobileScannerController.toggleTorch(),
                         );
                       },
                     ),
@@ -234,10 +229,10 @@ class QrcodeUtil {
                             iconSize: 32.0,
                             onPressed: () {
                               if (started) {
-                                cameraController.stop();
+                                mobileScannerController.stop();
                                 isStarted.value = false;
                               } else {
-                                cameraController.start();
+                                mobileScannerController.start();
                                 isStarted.value = true;
                               }
                             },
@@ -246,10 +241,13 @@ class QrcodeUtil {
                     const Center(),
                     IconButton(
                       color: Colors.white,
-                      icon: ValueListenableBuilder<CameraFacing>(
-                        valueListenable: cameraController.cameraFacingState,
+                      icon: ValueListenableBuilder(
+                        valueListenable: mobileScannerController,
                         builder: (context, state, child) {
-                          switch (state) {
+                          if (!state.isInitialized || !state.isRunning) {
+                            return const SizedBox.shrink();
+                          }
+                          switch (state.cameraDirection) {
                             case CameraFacing.front:
                               return const Icon(Icons.camera_front);
                             case CameraFacing.back:
@@ -258,7 +256,7 @@ class QrcodeUtil {
                         },
                       ),
                       iconSize: 32.0,
-                      onPressed: () => cameraController.switchCamera(),
+                      onPressed: () => mobileScannerController.switchCamera(),
                     ),
                   ],
                 ),
