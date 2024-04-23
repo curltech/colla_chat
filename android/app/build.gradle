@@ -72,7 +72,7 @@ android {
         applicationId "io.curltech.colla_chat"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion 29//flutter.minSdkVersion
+        minSdkVersion 30//flutter.minSdkVersion
         targetSdkVersion 33//flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -118,10 +118,26 @@ dependencies {
             exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
         }
     }
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    //implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
+//    constraints {
+//        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
+//            because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
+//        }
+//        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.21") {
+//            because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
+//        }
+//    }
+    modules {
+        module("org.jetbrains.kotlin:kotlin-stdlib-jdk7") {
+            replacedBy("org.jetbrains.kotlin:kotlin-stdlib", "kotlin-stdlib-jdk7 is now part of kotlin-stdlib")
+        }
+        module("org.jetbrains.kotlin:kotlin-stdlib-jdk8") {
+            replacedBy("org.jetbrains.kotlin:kotlin-stdlib", "kotlin-stdlib-jdk8 is now part of kotlin-stdlib")
+        }
+    }
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.9.23"
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.9.23"))
     implementation 'androidx.window:window:1.2.0'
     implementation 'androidx.window:window-java:1.2.0'
     implementation("androidx.multidex:multidex:2.0.1")
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.2'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
 }
