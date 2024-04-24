@@ -1,4 +1,3 @@
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/login/p2p_login_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/advanced_setting_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/general/general_setting_widget.dart';
@@ -8,7 +7,6 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/local_auth.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -62,7 +60,8 @@ class SettingWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _SettingWidgetState extends State<SettingWidget> {
-  String? loginStatus;
+  //登录状态，null表示登录成功，否则表示登录失败原因，初始化的为init表示未开始登录
+  String? loginStatus = 'init';
 
   @override
   void initState() {
@@ -72,9 +71,10 @@ class _SettingWidgetState extends State<SettingWidget> {
 
   void _buildLocalAuthenticate() async {
     if (widget.authMethod == AuthMethod.local) {
-      loginStatus =
-          await LocalAuthUtil.authenticate(localizedReason: 'Authenticate');
-      setState(() {});
+      setState(() async {
+        loginStatus =
+            await LocalAuthUtil.authenticate(localizedReason: 'Authenticate');
+      });
     }
   }
 
@@ -83,8 +83,9 @@ class _SettingWidgetState extends State<SettingWidget> {
       P2pLoginWidget p2pLoginWidget = P2pLoginWidget(
           credential: myself.myselfPeer.loginName,
           onAuthenticate: (String? data) {
-            loginStatus = data;
-            setState(() {});
+            setState(() {
+              loginStatus = data;
+            });
           });
       return p2pLoginWidget;
     }
@@ -98,19 +99,7 @@ class _SettingWidgetState extends State<SettingWidget> {
         child: AppBarView(
             title: widget.title,
             withLeading: widget.withLeading,
-            child: IndexedStack(
-              index: (loginStatus == null) ? 0 : 1,
-              children: [
-                _buildAppAuthenticate(),
-                (loginStatus == null)
-                    ? child
-                    : Center(
-                        child: CommonAutoSizeText(
-                        AppLocalizations.t(loginStatus!),
-                        style: const TextStyle(color: Colors.white),
-                      )),
-              ],
-            )));
+            child: (loginStatus != null) ? _buildAppAuthenticate() : child));
     return setting;
   }
 }
