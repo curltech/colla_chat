@@ -92,10 +92,7 @@ dependencies:
   #sms_advanced: ^1.0.2 #android版本有问题
   #flutter_sms_plus: ^1.0.1 #不支持ios
   #telephony: ^0.2.0
-  telephony: #不再维护了
-    git:
-      url: https://github.com/suhardik/s_telephony.git
-      ref: develop
+  another_telephony: ^0.2.4
   openvpn_flutter: ^1.2.2
   flutter_web_auth_2: ^3.0.3
 
