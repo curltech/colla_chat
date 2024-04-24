@@ -209,6 +209,11 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
       if (mounted) {
         DialogUtil.loadingHide(context);
       }
+      if (loginStatus != null) {
+        if (mounted) {
+          DialogUtil.error(context, content: AppLocalizations.t(loginStatus));
+        }
+      }
       if (widget.onAuthenticate != null) {
         widget.onAuthenticate!(loginStatus);
       }
