@@ -1,5 +1,5 @@
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:another_telephony/telephony.dart';
+import 'package:telephony/telephony.dart';
 
 class TelephonyUtil {
   static Telephony telephony = Telephony.backgroundInstance;

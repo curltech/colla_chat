@@ -29,7 +29,7 @@ import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
-import 'package:another_telephony/telephony.dart';
+import 'package:telephony/telephony.dart';
 
 ///跟踪影响全局的消息到来，对不同类型的消息进行分派
 class GlobalChatMessage {
