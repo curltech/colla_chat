@@ -35,7 +35,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(contactLinkmanAddWidget);
     indexWidgetProvider.define(jsonLinkmanAddWidget);
     //indexWidgetProvider.define(nearbyLinkmanAddWidget);
-    indexWidgetProvider.define(chatGPTAddWidget);
+    // indexWidgetProvider.define(chatGPTAddWidget);
     indexWidgetProvider.define(nearbyGroupAddWidget);
     indexWidgetProvider.define(faceGroupAddWidget);
     indexWidgetProvider.define(conferenceEditWidget);
@@ -63,7 +63,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
       jsonLinkmanAddWidget,
       //nearbyLinkmanAddWidget,
       //nfcLinkmanAddWidget,
-      chatGPTAddWidget,
+      // chatGPTAddWidget,
     ]);
     for (var tile in linkmanTileData) {
       tile.dense = false;
