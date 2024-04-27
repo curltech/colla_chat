@@ -83,7 +83,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
     if (linkman.avatarImage == null &&
         linkman.linkmanStatus == LinkmanStatus.G.name) {
       linkman.avatarImage = ImageUtil.buildImageWidget(
-          image: 'assets/images/openai.png',
+          image: 'assets/images/ollama.png',
           width: AppIconSize.lgSize,
           height: AppIconSize.lgSize);
     }

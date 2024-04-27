@@ -5,7 +5,7 @@ enum LinkmanStatus {
   M,
   S, //陌生人
   R, //机器人
-  G, //chatGPT聊天机器人
+  G, //聊天机器人
   F, //好友
   B, //黑名单
   C, //订阅

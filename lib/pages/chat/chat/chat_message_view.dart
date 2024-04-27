@@ -28,7 +28,7 @@ import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/transport/openai/openai_client.dart';
+import 'package:colla_chat/transport/langchain/langchain_client.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
@@ -217,7 +217,6 @@ class _ChatMessageViewState extends State<ChatMessageView>
       logger.e('chatSummary is null');
       return;
     }
-    chatMessageController.chatGPT = null;
     String peerId = chatSummary.peerId!;
     String partyType = chatSummary.partyType!;
     if (partyType == PartyType.linkman.name) {
@@ -251,7 +250,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
       logger.e('chatSummary is null');
       return;
     }
-    chatMessageController.chatGPT = null;
+    chatMessageController.langChainClient = null;
     String peerId = chatSummary.peerId!;
     String partyType = chatSummary.partyType!;
     if (partyType == PartyType.linkman.name) {
@@ -276,11 +275,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
       return;
     }
     if (linkman.linkmanStatus == LinkmanStatus.G.name) {
-      OpenAIClient chatGPT = OpenAIClient(linkman.peerId);
-      if (StringUtil.isNotEmpty(linkman.peerPublicKey)) {
-        chatGPT.model = linkman.peerPublicKey!;
-      }
-      chatMessageController.chatGPT = chatGPT;
+      chatMessageController.langChainClient =
+          langChainClientPool.get(linkman.peerId);
     } else {
       AdvancedPeerConnection? advancedPeerConnection;
       List<AdvancedPeerConnection> advancedPeerConnections =

@@ -273,10 +273,10 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         if (linkman.linkmanStatus == LinkmanStatus.G.name) {
           // prefix = prefix ??
           //     ImageUtil.buildImageWidget(
-          //         image: 'assets/images/openai.png',
+          //         image: 'assets/images/ollama.png',
           //         width: AppIconSize.lgSize,
           //         height: AppIconSize.lgSize);
-          routeName = 'chat_gpt_add';
+          // routeName = 'llm_chat_add';
         }
         prefix = prefix ?? AppImage.mdAppImage;
         int connectionNum = 0;

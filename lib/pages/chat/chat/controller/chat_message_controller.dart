@@ -17,13 +17,13 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/transport/openai/openai_client.dart';
-import 'package:dart_openai/dart_openai.dart';
+import 'package:colla_chat/transport/langchain/langchain_client.dart';
 import 'package:flutter/foundation.dart';
+import 'package:langchain/langchain.dart' as langchain;
 import 'package:synchronized/synchronized.dart';
 import 'package:uuid/uuid.dart';
 
-enum ChatGPTAction { chat, image, audio, translate, extract }
+enum LangChainAction { chat, image, audio, translate, extract }
 
 ///好友或者群的消息控制器，包含某个连接的所有消息
 class ChatMessageController extends DataMoreController<ChatMessage> {
@@ -32,9 +32,9 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   //发送方式
   TransportType transportType = TransportType.webrtc;
 
-  //是否是chatGPT聊天和chatGPT方式
-  OpenAIClient? chatGPT;
-  ChatGPTAction chatGPTAction = ChatGPTAction.chat;
+  //是否是llm聊天和chat方式
+  LangChainClient? langChainClient;
+  LangChainAction langChainAction = LangChainAction.chat;
 
   //调度删除时间
   int _deleteTime = 0;
@@ -57,15 +57,14 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         linkmanService.findCachedOneByPeerId(peerId!).then((Linkman? linkman) {
           if (linkman != null) {
             if (linkman.linkmanStatus == LinkmanStatus.G.name) {
-              OpenAIClient chatGPT = OpenAIClient(linkman.peerId);
-              chatGPT = chatGPT;
+              langChainClient = langChainClientPool.get(linkman.peerId);
             } else {
-              chatGPT = null;
+              langChainClient = null;
             }
           }
         });
       } else {
-        chatGPT = null;
+        langChainClient = null;
       }
       clear(notify: false);
       previous(limit: defaultLimit).then((int count) {
@@ -254,14 +253,14 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
           transportType: transportType,
           deleteTime: _deleteTime,
           parentMessageId: _parentMessageId);
-      if (chatGPT == null) {
+      if (langChainClient == null) {
         List<ChatMessage> returnChatMessages = await chatMessageService
             .sendAndStore(chatMessage, peerIds: peerIds);
         returnChatMessage = returnChatMessages.firstOrNull;
       } else {
         await chatMessageService.store(chatMessage);
         returnChatMessage = chatMessage;
-        await _chatGPTAction(content);
+        await _llmChatAction(content);
       }
     } else {
       ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
@@ -289,73 +288,40 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     return returnChatMessage;
   }
 
-  Future<void> _chatGPTAction(String content) async {
-    if (chatGPTAction == ChatGPTAction.chat) {
-      chatGPT!.chatCompletionStream(
-        messages: [
-          OpenAIChatCompletionChoiceMessageModel(
-              role: OpenAIChatMessageRole.user,
-              content: [
-                OpenAIChatCompletionChoiceMessageContentItemModel.text(content)
-              ])
-        ],
-        onCompletion: onChatCompletion,
+  Future<void> _llmChatAction(String content) async {
+    if (langChainAction == LangChainAction.chat) {
+      langchain.ChatResult chatResult = await langChainClient!.prompt(content);
+      await onChatCompletion(chatResult);
+    } else if (langChainAction == LangChainAction.image) {
+      String image = await langChainClient!.createImage(
+        content,
       );
-    } else if (chatGPTAction == ChatGPTAction.image) {
-      OpenAIImageModel openAIImageModel = await chatGPT!.createImage(
-        prompt: content,
-      );
-      onImageCompletion(openAIImageModel);
-    } else if (chatGPTAction == ChatGPTAction.translate) {
-      OpenAIAudioModel translation = await chatGPT!.createTranslation(
-        file: File(''),
-        prompt: content,
-      );
-      translation.text;
-    } else if (chatGPTAction == ChatGPTAction.audio) {
-      File file = await chatGPT!.createSpeech(
-        input: content,
-      );
+      onImageCompletion(image);
     }
+    // else if (langChainAction == LangChainAction.translate) {
+    //   OpenAIAudioModel translation = await chatGPT!.createTranslation(
+    //     file: File(''),
+    //     prompt: content,
+    //   );
+    //   translation.text;
+    // } else if (langChainAction == LangChainAction.audio) {
+    //   File file = await chatGPT!.createSpeech(
+    //     input: content,
+    //   );
+    // }
   }
 
-  String completionContent = '';
-
-  onChatCompletion(OpenAIStreamChatCompletionModel streamChatCompletion) async {
-    if (streamChatCompletion.choices.isNotEmpty) {
-      for (var choice in streamChatCompletion.choices) {
-        String? finishReason = choice.finishReason;
-        OpenAIChatMessageRole? role = choice.delta.role;
-        List<OpenAIChatCompletionChoiceMessageContentItemModel?>? contents =
-            choice.delta.content;
-        if (contents != null && finishReason != 'stop') {
-          for (OpenAIChatCompletionChoiceMessageContentItemModel? content
-              in contents) {
-            String text = content!.text ?? '';
-            if (text.startsWith('\n\n')) {
-              completionContent = completionContent + text.substring(2);
-            } else {
-              completionContent = completionContent + text;
-            }
-            logger.i(text);
-          }
-        } else {
-          if (completionContent.isEmpty) {
-            return;
-          }
-          ChatMessage chatMessage = buildChatGPTMessage(completionContent,
-              senderPeerId: _chatSummary!.peerId,
-              senderName: _chatSummary!.name);
-          await chatMessageService.store(chatMessage);
-          completionContent = '';
-          notifyListeners();
-        }
-      }
-    }
+  onChatCompletion(langchain.ChatResult chatResult) async {
+    String content = chatResult.output.contentAsString;
+    String finishReason = chatResult.finishReason.name;
+    ChatMessage chatMessage = buildLlmChatMessage(content,
+        senderPeerId: _chatSummary!.peerId, senderName: _chatSummary!.name);
+    await chatMessageService.store(chatMessage);
+    notifyListeners();
   }
 
   ///接收到chatGPT的消息回复
-  ChatMessage buildChatGPTMessage(
+  ChatMessage buildLlmChatMessage(
     dynamic content, {
     String? senderPeerId,
     String? senderName,
@@ -400,23 +366,15 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     return chatMessage;
   }
 
-  onImageCompletion(OpenAIImageModel openAIImageModel) async {
-    if (openAIImageModel.data.isNotEmpty) {
-      for (var openAIImageData in openAIImageModel.data) {
-        String? url = openAIImageData.url;
-        if (url == null) {
-          return;
-        }
-        Uint8List content = await ImageUtil.loadUrlImage(url);
-        ChatMessage chatMessage = buildChatGPTMessage(content,
-            senderPeerId: _chatSummary!.peerId,
-            senderName: _chatSummary!.name,
-            contentType: ChatMessageContentType.image,
-            mimeType: ChatMessageMimeType.png);
-        await chatMessageService.store(chatMessage);
-      }
-      notifyListeners();
-    }
+  onImageCompletion(String url) async {
+    Uint8List content = await ImageUtil.loadUrlImage(url);
+    ChatMessage chatMessage = buildLlmChatMessage(content,
+        senderPeerId: _chatSummary!.peerId,
+        senderName: _chatSummary!.name,
+        contentType: ChatMessageContentType.image,
+        mimeType: ChatMessageMimeType.png);
+    await chatMessageService.store(chatMessage);
+    notifyListeners();
   }
 
   Future<void> sendNameCard(List<String> peerIds) async {
