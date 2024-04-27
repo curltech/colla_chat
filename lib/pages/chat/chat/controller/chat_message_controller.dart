@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
@@ -17,13 +15,12 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/transport/langchain/langchain_client.dart';
+import 'package:colla_chat/transport/ollama/ollama_dart_client.dart';
 import 'package:flutter/foundation.dart';
-import 'package:langchain/langchain.dart' as langchain;
 import 'package:synchronized/synchronized.dart';
 import 'package:uuid/uuid.dart';
 
-enum LangChainAction { chat, image, audio, translate, extract }
+enum LlmAction { chat, image, audio, translate, extract }
 
 ///好友或者群的消息控制器，包含某个连接的所有消息
 class ChatMessageController extends DataMoreController<ChatMessage> {
@@ -33,8 +30,8 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   TransportType transportType = TransportType.webrtc;
 
   //是否是llm聊天和chat方式
-  LangChainClient? langChainClient;
-  LangChainAction langChainAction = LangChainAction.chat;
+  OllamaDartClient? ollamaDartClient;
+  LlmAction llmAction = LlmAction.chat;
 
   //调度删除时间
   int _deleteTime = 0;
@@ -57,14 +54,14 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         linkmanService.findCachedOneByPeerId(peerId!).then((Linkman? linkman) {
           if (linkman != null) {
             if (linkman.linkmanStatus == LinkmanStatus.G.name) {
-              langChainClient = langChainClientPool.get(linkman.peerId);
+              ollamaDartClient = ollamaClientPool.get(linkman.peerId);
             } else {
-              langChainClient = null;
+              ollamaDartClient = null;
             }
           }
         });
       } else {
-        langChainClient = null;
+        ollamaDartClient = null;
       }
       clear(notify: false);
       previous(limit: defaultLimit).then((int count) {
@@ -253,14 +250,14 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
           transportType: transportType,
           deleteTime: _deleteTime,
           parentMessageId: _parentMessageId);
-      if (langChainClient == null) {
+      if (ollamaDartClient == null) {
         List<ChatMessage> returnChatMessages = await chatMessageService
             .sendAndStore(chatMessage, peerIds: peerIds);
         returnChatMessage = returnChatMessages.firstOrNull;
       } else {
         await chatMessageService.store(chatMessage);
         returnChatMessage = chatMessage;
-        await _llmChatAction(content);
+        _llmChatAction(content);
       }
     } else {
       ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
@@ -289,15 +286,16 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   }
 
   Future<void> _llmChatAction(String content) async {
-    if (langChainAction == LangChainAction.chat) {
-      langchain.ChatResult chatResult = await langChainClient!.prompt(content);
-      await onChatCompletion(chatResult);
-    } else if (langChainAction == LangChainAction.image) {
-      String image = await langChainClient!.createImage(
-        content,
-      );
-      onImageCompletion(image);
+    if (llmAction == LlmAction.chat) {
+      String? chatResponse = await ollamaDartClient!.chat([content]);
+      await onChatCompletion(chatResponse);
     }
+    // else if (llmAction == LlmAction.image) {
+    //   String image = await langChainClient!.createImage(
+    //     content,
+    //   );
+    //   onImageCompletion(image);
+    // }
     // else if (langChainAction == LangChainAction.translate) {
     //   OpenAIAudioModel translation = await chatGPT!.createTranslation(
     //     file: File(''),
@@ -311,10 +309,8 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     // }
   }
 
-  onChatCompletion(langchain.ChatResult chatResult) async {
-    String content = chatResult.output.contentAsString;
-    String finishReason = chatResult.finishReason.name;
-    ChatMessage chatMessage = buildLlmChatMessage(content,
+  onChatCompletion(String? chatResponse) async {
+    ChatMessage chatMessage = buildLlmChatMessage(chatResponse,
         senderPeerId: _chatSummary!.peerId, senderName: _chatSummary!.name);
     await chatMessageService.store(chatMessage);
     notifyListeners();

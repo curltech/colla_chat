@@ -29,6 +29,7 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/langchain/langchain_client.dart';
+import 'package:colla_chat/transport/ollama/ollama_dart_client.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
@@ -250,7 +251,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
       logger.e('chatSummary is null');
       return;
     }
-    chatMessageController.langChainClient = null;
+    chatMessageController.ollamaDartClient = null;
     String peerId = chatSummary.peerId!;
     String partyType = chatSummary.partyType!;
     if (partyType == PartyType.linkman.name) {
@@ -275,8 +276,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
       return;
     }
     if (linkman.linkmanStatus == LinkmanStatus.G.name) {
-      chatMessageController.langChainClient =
-          langChainClientPool.get(linkman.peerId);
+      chatMessageController.ollamaDartClient =
+          ollamaClientPool.get(linkman.peerId);
     } else {
       AdvancedPeerConnection? advancedPeerConnection;
       List<AdvancedPeerConnection> advancedPeerConnections =

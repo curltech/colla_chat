@@ -21,7 +21,7 @@ class LangChainClient {
     String peerId, {
     String? apiKey,
     String? organization,
-    String baseUrl = 'https://api.openai.com/ v1',
+    String baseUrl = 'https://api.openai.com/v1',
     Map<String, String>? headers,
     Map<String, dynamic>? queryParams,
     http.Client? client,
@@ -128,15 +128,19 @@ class LangChainClient {
     return langChainClient;
   }
 
-  Future<ChatResult> prompt(String input, {ChatModelOptions? options}) async {
-    PromptValue prompt = PromptValue.string(input);
+  Future<ChatResult> prompt(String content, {ChatModelOptions? options}) async {
+    PromptValue prompt = PromptValue.string(content);
     ChatResult result = await chatModel!.invoke(prompt);
 
     return result;
   }
 
-  Future<ChatResult> chat(List<ChatMessage> messages,
+  Future<ChatResult> chat(List<String> contents,
       {ChatModelOptions? options}) async {
+    List<ChatMessage> messages = [];
+    for (String content in contents) {
+      messages.add(ChatMessage.humanText(content));
+    }
     PromptValue prompt = PromptValue.chat(messages);
     ChatResult result = await chatModel!.invoke(prompt);
 

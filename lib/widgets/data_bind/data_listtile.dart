@@ -214,6 +214,7 @@ class DataListTile extends StatelessWidget {
       subtitle: tileData.subtitle != null
           ? CommonAutoSizeText(
               tileData.subtitle!,
+              maxLines: 2,
             )
           : null,
       trailing: trailingWidget,

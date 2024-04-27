@@ -16,7 +16,7 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/transport/langchain/langchain_client.dart';
+import 'package:colla_chat/transport/ollama/ollama_dart_client.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
@@ -113,51 +113,51 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   }
 
   List<ActionData> _buildLlmChatSendAction() {
-    LangChainAction langChainAction = chatMessageController.langChainAction;
+    LlmAction langChainAction = chatMessageController.llmAction;
     final List<ActionData> chatGPTPopActions = [
       ActionData(
-          label: LangChainAction.chat.name,
+          label: LlmAction.chat.name,
           tooltip: 'Chat message',
           icon: Icon(
             Icons.chat,
-            color: LangChainAction.chat == langChainAction
+            color: LlmAction.chat == langChainAction
                 ? myself.primary
                 : myself.secondary,
           )),
       ActionData(
-          label: LangChainAction.translate.name,
+          label: LlmAction.translate.name,
           tooltip: 'Translate message',
           icon: Icon(
             Icons.translate,
-            color: LangChainAction.translate == langChainAction
+            color: LlmAction.translate == langChainAction
                 ? myself.primary
                 : myself.secondary,
           )),
       ActionData(
-          label: LangChainAction.extract.name,
+          label: LlmAction.extract.name,
           tooltip: 'Extract message',
           icon: Icon(
             Icons.summarize_outlined,
-            color: LangChainAction.extract == langChainAction
+            color: LlmAction.extract == langChainAction
                 ? myself.primary
                 : myself.secondary,
           )),
       ActionData(
-        label: LangChainAction.image.name,
+        label: LlmAction.image.name,
         tooltip: 'Create image',
         icon: Icon(
           Icons.image_outlined,
-          color: LangChainAction.image == langChainAction
+          color: LlmAction.image == langChainAction
               ? myself.primary
               : myself.secondary,
         ),
       ),
       ActionData(
-        label: LangChainAction.audio.name,
+        label: LlmAction.audio.name,
         tooltip: 'Transcription audio',
         icon: Icon(
           Icons.multitrack_audio,
-          color: LangChainAction.audio == langChainAction
+          color: LlmAction.audio == langChainAction
               ? myself.primary
               : myself.secondary,
         ),
@@ -239,12 +239,12 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   ///比如文本聊天，翻译，提取摘要，文本生成图片
   _onChatGPTSend(BuildContext context, int index, String label,
       {String? value}) async {
-    LangChainAction? chatGPTAction =
-        StringUtil.enumFromString(LangChainAction.values, label);
+    LlmAction? chatGPTAction =
+        StringUtil.enumFromString(LlmAction.values, label);
     if (chatGPTAction == null) {
       return null;
     }
-    chatMessageController.langChainAction = chatGPTAction;
+    chatMessageController.llmAction = chatGPTAction;
     // this.chatGPTAction.value = chatGPTAction;
     _send();
   }
@@ -302,7 +302,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
         ));
 
     ///长按弹出式菜单
-    LangChainClient? langChainClient = chatMessageController.langChainClient;
+    OllamaDartClient? ollamaDartClient = chatMessageController.ollamaDartClient;
     CustomPopupMenuController menuController = CustomPopupMenuController();
     Widget menu = MenuUtil.buildPopupMenu(
         child: sendButton,
@@ -312,14 +312,14 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
             child: DataActionCard(
                 onPressed: (int index, String label, {String? value}) {
                   menuController.hideMenu();
-                  if (langChainClient == null) {
+                  if (ollamaDartClient == null) {
                     _onTransportSend(context, index, label, value: value);
                   } else {
                     _onChatGPTSend(context, index, label, value: value);
                   }
                 },
                 crossAxisCount: 4,
-                actions: langChainClient != null
+                actions: ollamaDartClient != null
                     ? _buildLlmChatSendAction()
                     : _buildTransportTypeSendAction(),
                 height: 140,
