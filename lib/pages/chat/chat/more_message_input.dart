@@ -550,7 +550,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
             if (actionData != null) {
               return DataActionCard(
                 actions: actionData,
-                width: appDataProvider.secondaryBodyWidth * 0.9,
+                width: appDataProvider.secondaryBodyWidth,
                 height: chatMessageViewController.moreMessageInputHeight,
                 onPressed: _onAction,
                 mainAxisSpacing: 10,
