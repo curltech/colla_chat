@@ -152,7 +152,7 @@ class FileUtil {
   static Future<List<XFile>> pickFiles({
     String? dialogTitle,
     String? initialDirectory,
-    FileType type = FileType.any,
+    FileType type = FileType.custom,
     List<String>? allowedExtensions,
     dynamic Function(FilePickerStatus)? onFileLoading,
     bool allowCompression = true,
