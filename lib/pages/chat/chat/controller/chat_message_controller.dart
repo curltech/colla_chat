@@ -15,7 +15,7 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/transport/ollama/ollama_dart_client.dart';
+import 'package:colla_chat/transport/ollama/dart_ollama_client.dart';
 import 'package:flutter/foundation.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:uuid/uuid.dart';
@@ -30,7 +30,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   TransportType transportType = TransportType.webrtc;
 
   //是否是llm聊天和chat方式
-  OllamaDartClient? ollamaDartClient;
+  DartOllamaClient? dartOllamaClient;
   LlmAction llmAction = LlmAction.chat;
 
   //调度删除时间
@@ -54,14 +54,14 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         linkmanService.findCachedOneByPeerId(peerId!).then((Linkman? linkman) {
           if (linkman != null) {
             if (linkman.linkmanStatus == LinkmanStatus.G.name) {
-              ollamaDartClient = ollamaClientPool.get(linkman.peerId);
+              dartOllamaClient = dartOllamaClientPool.get(linkman.peerId);
             } else {
-              ollamaDartClient = null;
+              dartOllamaClient = null;
             }
           }
         });
       } else {
-        ollamaDartClient = null;
+        dartOllamaClient = null;
       }
       clear(notify: false);
       previous(limit: defaultLimit).then((int count) {
@@ -250,7 +250,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
           transportType: transportType,
           deleteTime: _deleteTime,
           parentMessageId: _parentMessageId);
-      if (ollamaDartClient == null) {
+      if (dartOllamaClient == null) {
         List<ChatMessage> returnChatMessages = await chatMessageService
             .sendAndStore(chatMessage, peerIds: peerIds);
         returnChatMessage = returnChatMessages.firstOrNull;
@@ -287,7 +287,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
 
   Future<void> _llmChatAction(String content) async {
     if (llmAction == LlmAction.chat) {
-      String? chatResponse = await ollamaDartClient!.chat([content]);
+      String? chatResponse = await dartOllamaClient!.prompt(content);
       await onChatCompletion(chatResponse);
     }
     // else if (llmAction == LlmAction.image) {

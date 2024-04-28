@@ -3,12 +3,13 @@ import 'package:ollama_dart/ollama_dart.dart';
 import 'package:synchronized/synchronized.dart';
 
 /// langchain, 提供ollama完整的功能，包括聊天，翻译，训练，优化，设置规则，图像生成，语音识别
-class OllamaDartClient {
+class DartOllamaClient {
   late final String baseUrl;
   late final OllamaClient _client;
   final String _model = 'llama3';
+  List<int>? _context;
 
-  OllamaDartClient({
+  DartOllamaClient({
     String? baseUrl,
     Map<String, String>? headers,
     Map<String, dynamic>? queryParams,
@@ -19,15 +20,15 @@ class OllamaDartClient {
         headers: headers,
         queryParams: queryParams,
         client: client);
-    baseUrl = _client.baseUrl;
+    this.baseUrl = _client.baseUrl!;
   }
 
   close() {
     _client.endSession();
   }
 
-  Future<String?> prompt({
-    required String prompt,
+  Future<String?> prompt(
+    String prompt, {
     List<String>? images,
     String? system,
     String? template,
@@ -38,7 +39,9 @@ class OllamaDartClient {
     bool stream = false,
     int? keepAlive,
   }) async {
-    final generated = await _client.generateCompletion(
+    context = context ?? _context;
+    final GenerateCompletionResponse generated =
+        await _client.generateCompletion(
       request: GenerateCompletionRequest(
           model: _model,
           prompt: prompt,
@@ -52,11 +55,13 @@ class OllamaDartClient {
           stream: stream,
           keepAlive: keepAlive),
     );
+    _context = generated.context;
+
     return generated.response;
   }
 
-  Future<String> promptStream({
-    required String prompt,
+  Future<String> promptStream(
+    String prompt, {
     List<String>? images,
     String? system,
     String? template,
@@ -67,6 +72,7 @@ class OllamaDartClient {
     bool stream = false,
     int? keepAlive,
   }) async {
+    context = context ?? _context;
     final Stream<GenerateCompletionResponse> completionStream =
         _client.generateCompletionStream(
       request: GenerateCompletionRequest(
@@ -84,8 +90,10 @@ class OllamaDartClient {
     );
     String text = '';
     await for (final res in completionStream) {
+      _context = res.context;
       text += res.response?.trim() ?? '';
     }
+
     return text;
   }
 
@@ -268,19 +276,19 @@ class OllamaDartClient {
   }
 }
 
-class OllamaClientPool {
+class DartOllamaClientPool {
   Lock lock = Lock();
-  final _clients = <String, OllamaDartClient>{};
+  final _clients = <String, DartOllamaClient>{};
 
-  OllamaClientPool();
+  DartOllamaClientPool();
 
   ///获取或者连接指定地址的websocket的连接，并可以根据参数是否设置为缺省
-  OllamaDartClient? get(String url) {
-    OllamaDartClient? ollamaDartClient;
+  DartOllamaClient? get(String url) {
+    DartOllamaClient? ollamaDartClient;
     if (_clients.containsKey(url)) {
       ollamaDartClient = _clients[url];
     } else {
-      ollamaDartClient = OllamaDartClient(baseUrl: url);
+      ollamaDartClient = DartOllamaClient(baseUrl: url);
       _clients[url] = ollamaDartClient;
     }
 
@@ -296,4 +304,4 @@ class OllamaClientPool {
   }
 }
 
-final OllamaClientPool ollamaClientPool = OllamaClientPool();
+final DartOllamaClientPool dartOllamaClientPool = DartOllamaClientPool();

@@ -16,7 +16,7 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/transport/ollama/ollama_dart_client.dart';
+import 'package:colla_chat/transport/ollama/dart_ollama_client.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
@@ -302,7 +302,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
         ));
 
     ///长按弹出式菜单
-    OllamaDartClient? ollamaDartClient = chatMessageController.ollamaDartClient;
+    DartOllamaClient? dartOllamaClient = chatMessageController.dartOllamaClient;
     CustomPopupMenuController menuController = CustomPopupMenuController();
     Widget menu = MenuUtil.buildPopupMenu(
         child: sendButton,
@@ -312,14 +312,14 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
             child: DataActionCard(
                 onPressed: (int index, String label, {String? value}) {
                   menuController.hideMenu();
-                  if (ollamaDartClient == null) {
+                  if (dartOllamaClient == null) {
                     _onTransportSend(context, index, label, value: value);
                   } else {
                     _onChatGPTSend(context, index, label, value: value);
                   }
                 },
                 crossAxisCount: 4,
-                actions: ollamaDartClient != null
+                actions: dartOllamaClient != null
                     ? _buildLlmChatSendAction()
                     : _buildTransportTypeSendAction(),
                 height: 140,
