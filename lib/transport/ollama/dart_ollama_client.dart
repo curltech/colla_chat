@@ -104,12 +104,7 @@ class DartOllamaClient {
     bool stream = false,
     int? keepAlive,
   }) async {
-    List<Message> messages = [
-      const Message(
-        role: MessageRole.user,
-        content: '我们用中文聊天吧',
-      )
-    ];
+    List<Message> messages = [];
     for (String content in contents) {
       messages.add(Message(
         role: MessageRole.user,
