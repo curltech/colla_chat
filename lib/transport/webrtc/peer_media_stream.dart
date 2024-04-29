@@ -340,7 +340,14 @@ class PeerMediaStream {
   /// 是否静音
   bool? isMuted() {
     if (participant != null) {
-      return participant!.isMuted;
+      for (TrackPublication<Track> audioTrackPublication
+          in participant!.audioTrackPublications) {
+        return audioTrackPublication.muted;
+      }
+      for (TrackPublication<Track> videoTrackPublication
+          in participant!.videoTrackPublications) {
+        return videoTrackPublication.muted;
+      }
     } else {
       if (mediaStream != null) {
         return MediaStreamUtil.isMuted(mediaStream!);
@@ -352,10 +359,18 @@ class PeerMediaStream {
   /// 设置音频流的麦克风是否静音，用于本地参与者或者本地流
   setMicrophoneMute(bool enableMute) async {
     if (participant != null) {
-      for (TrackPublication<Track> audioTrackPublications
+      for (TrackPublication<Track> audioTrackPublication
           in participant!.audioTrackPublications) {
         LocalTrackPublication localTrackPublication =
-            audioTrackPublications as LocalTrackPublication;
+            audioTrackPublication as LocalTrackPublication;
+        enableMute
+            ? localTrackPublication.mute()
+            : localTrackPublication.unmute();
+      }
+      for (TrackPublication<Track> videoTrackPublication
+          in participant!.videoTrackPublications) {
+        LocalTrackPublication localTrackPublication =
+            videoTrackPublication as LocalTrackPublication;
         enableMute
             ? localTrackPublication.mute()
             : localTrackPublication.unmute();
