@@ -449,36 +449,39 @@ class LiveKitConferenceClient {
         peerMediaStream.participant = roomClient.room.localParticipant;
       }
     } else {
+      LocalTrackPublication<LocalTrack>? localVideoTrackPublication;
+      bool? video = conferenceChatMessageController.conference?.video;
       LocalTrackPublication<LocalTrack>? localAudioTrackPublication;
-      try {
-        localAudioTrackPublication = await setMicrophoneEnabled(true);
-      } catch (error) {
-        log.logger.e('could not publish audio: $error');
-      }
-      if (localAudioTrackPublication != null) {
-        PlatformParticipant platformParticipant = PlatformParticipant(
-            myself.peerId!,
-            clientId: myself.clientId,
-            name: myself.name);
-        LocalTrackPublication<LocalTrack>? localVideoTrackPublication;
-        bool? video = conferenceChatMessageController.conference?.video;
-        if (video != null && video) {
-          try {
-            localVideoTrackPublication = await setCameraEnabled(true);
-          } catch (error) {
-            log.logger.e('could not publish video: $error');
-          }
+      if (video != null && video) {
+        try {
+          localVideoTrackPublication = await setCameraEnabled(true);
+        } catch (error) {
+          log.logger.e('could not publish video: $error');
         }
-        PeerMediaStream peerMediaStream =
-            await PeerMediaStream.createPeerMediaStream(
-          videoTrack: localVideoTrackPublication?.track as VideoTrack,
-          audioTrack: localAudioTrackPublication.track! as AudioTrack,
-          platformParticipant: platformParticipant,
-        );
-        peerMediaStream.participant = roomClient.room.localParticipant;
-        localPeerMediaStreamController.mainPeerMediaStream = peerMediaStream;
-        localPeerMediaStreamController.add(peerMediaStream);
+      } else {
+        try {
+          localAudioTrackPublication = await setMicrophoneEnabled(true);
+        } catch (error) {
+          log.logger.e('could not publish audio: $error');
+        }
       }
+      PlatformParticipant platformParticipant = PlatformParticipant(
+          myself.peerId!,
+          clientId: myself.clientId,
+          name: myself.name);
+      PeerMediaStream peerMediaStream =
+          await PeerMediaStream.createPeerMediaStream(
+        videoTrack: localVideoTrackPublication != null
+            ? localVideoTrackPublication.track as VideoTrack
+            : null,
+        audioTrack: localAudioTrackPublication != null
+            ? localAudioTrackPublication.track as AudioTrack
+            : null,
+        platformParticipant: platformParticipant,
+      );
+      peerMediaStream.participant = roomClient.room.localParticipant;
+      localPeerMediaStreamController.mainPeerMediaStream = peerMediaStream;
+      localPeerMediaStreamController.add(peerMediaStream);
     }
   }
 

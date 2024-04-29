@@ -103,9 +103,9 @@ class PeerMediaStream {
         clientId: myself.clientId,
         name: myself.name);
     LocalAudioTrack? localAudio;
-    if (audio) {
-      localAudio = await LocalAudioTrack.create(audioOptions);
-    }
+    // if (audio) {
+    //   localAudio = await LocalAudioTrack.create(audioOptions);
+    // }
 
     return PeerMediaStream(
         videoTrack: localVideo,
@@ -349,28 +349,16 @@ class PeerMediaStream {
     return null;
   }
 
-  /// 判断麦克风设备是否被发布，用于sfu模式
-  /// 如果非sfu模式，则有一个轨道muted，则返回true
-  bool isMicrophoneEnabled() {
-    if (participant != null) {
-      return participant!.isMicrophoneEnabled();
-    } else {
-      if (mediaStream != null) {
-        bool? isMuted = MediaStreamUtil.isMuted(mediaStream!);
-        isMuted = isMuted ?? false;
-
-        return isMuted;
-      }
-    }
-    return false;
-  }
-
   /// 设置音频流的麦克风是否静音，用于本地参与者或者本地流
   setMicrophoneMute(bool enableMute) async {
     if (participant != null) {
-      if (participant is LocalParticipant) {
-        LocalParticipant localParticipant = participant as LocalParticipant;
-        await localParticipant.setMicrophoneEnabled(enableMute);
+      for (TrackPublication<Track> audioTrackPublications
+          in participant!.audioTrackPublications) {
+        LocalTrackPublication localTrackPublication =
+            audioTrackPublications as LocalTrackPublication;
+        enableMute
+            ? localTrackPublication.mute()
+            : localTrackPublication.unmute();
       }
     } else {
       if (mediaStream != null) {
