@@ -672,7 +672,6 @@ class ConferenceChatMessageController with ChangeNotifier {
 
   ///自己主动加入
   joinConference() async {
-    await openLocalMainPeerMediaStream();
     if (_conference!.sfu) {
       LiveKitConferenceClient? liveKitConferenceClient =
           liveKitConferenceClientPool
@@ -685,6 +684,7 @@ class ConferenceChatMessageController with ChangeNotifier {
             'liveKitConferenceClient:${_conference!.conferenceId} is not exist');
       }
     } else {
+      await openLocalMainPeerMediaStream();
       //创建新的视频会议控制器
       P2pConferenceClient? p2pConferenceClient = p2pConferenceClientPool
           .getConferenceClient(_conference!.conferenceId);

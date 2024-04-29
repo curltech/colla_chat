@@ -82,7 +82,7 @@ class PeerMediaStream {
         clientId: myself.clientId,
         name: myself.name);
     var mediaStream = await MediaStreamUtil.createVideoMediaStream(
-        width: width, height: height, frameRate: frameRate);
+        audio: audio, width: width, height: height, frameRate: frameRate);
 
     return PeerMediaStream(
         mediaStream: mediaStream, platformParticipant: platformParticipant);
@@ -90,19 +90,27 @@ class PeerMediaStream {
 
   /// 创建本地视频
   static Future<PeerMediaStream> createLocalVideoTrack(
-      {CameraCaptureOptions options = const CameraCaptureOptions(
+      {CameraCaptureOptions videoOptions = const CameraCaptureOptions(
         cameraPosition: CameraPosition.front,
         params: VideoParametersPresets.h720_169,
-      )}) async {
+      ),
+      bool audio = true,
+      AudioCaptureOptions audioOptions = const AudioCaptureOptions()}) async {
     LocalVideoTrack localVideo =
-        await LocalVideoTrack.createCameraTrack(options);
+        await LocalVideoTrack.createCameraTrack(videoOptions);
     PlatformParticipant platformParticipant = PlatformParticipant(
         myself.peerId!,
         clientId: myself.clientId,
         name: myself.name);
+    LocalAudioTrack? localAudio;
+    if (audio) {
+      localAudio = await LocalAudioTrack.create(audioOptions);
+    }
 
     return PeerMediaStream(
-        videoTrack: localVideo, platformParticipant: platformParticipant);
+        videoTrack: localVideo,
+        audioTrack: localAudio,
+        platformParticipant: platformParticipant);
   }
 
   ///获取本机音频流
@@ -171,10 +179,10 @@ class PeerMediaStream {
     bool a = false;
     if (mediaStream != null) {
       a = mediaStream!.getAudioTracks().isNotEmpty;
-    } else if (videoTrack != null) {
-      a = videoTrack!.mediaStream.getAudioTracks().isNotEmpty;
     } else if (audioTrack != null) {
       a = audioTrack!.mediaStream.getAudioTracks().isNotEmpty;
+    } else if (videoTrack != null) {
+      a = videoTrack!.mediaStream.getAudioTracks().isNotEmpty;
     }
 
     return a;
@@ -233,19 +241,14 @@ class PeerMediaStream {
     VideoTrack? videoTrack,
     AudioTrack? audioTrack,
   }) async {
-    if (videoTrack != null) {
-      return PeerMediaStream(
-          videoTrack: videoTrack, platformParticipant: platformParticipant);
-    }
-    if (audioTrack != null) {
-      return PeerMediaStream(
-          audioTrack: audioTrack, platformParticipant: platformParticipant);
-    }
     if (mediaStream != null) {
       return PeerMediaStream(
           mediaStream: mediaStream, platformParticipant: platformParticipant);
     }
-    throw 'Must have mediaStream or videoTrack';
+    return PeerMediaStream(
+        videoTrack: videoTrack,
+        audioTrack: audioTrack,
+        platformParticipant: platformParticipant);
   }
 
   bool get local {
@@ -347,14 +350,22 @@ class PeerMediaStream {
   }
 
   /// 判断麦克风设备是否被发布，用于sfu模式
-  bool? isMicrophoneEnabled() {
+  /// 如果非sfu模式，则有一个轨道muted，则返回true
+  bool isMicrophoneEnabled() {
     if (participant != null) {
       return participant!.isMicrophoneEnabled();
+    } else {
+      if (mediaStream != null) {
+        bool? isMuted = MediaStreamUtil.isMuted(mediaStream!);
+        isMuted = isMuted ?? false;
+
+        return isMuted;
+      }
     }
-    return null;
+    return false;
   }
 
-  /// 设置音频流的麦克风是否静音，用于本地参与者
+  /// 设置音频流的麦克风是否静音，用于本地参与者或者本地流
   setMicrophoneMute(bool enableMute) async {
     if (participant != null) {
       if (participant is LocalParticipant) {
