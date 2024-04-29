@@ -358,7 +358,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       peerClient.clientId = myselfPeer.clientId;
       bool success = await connectAction.connect(peerClient);
       if (success) {
-        logger.i('login connect successfully,activeStatus up');
+        logger.i('push local peer connect action successfully,activeStatus up');
         //设置firebase token
         firebaseMessagingService.getToken().then((String? fcmToken) {
           logger.w('fcmToken:$fcmToken');
