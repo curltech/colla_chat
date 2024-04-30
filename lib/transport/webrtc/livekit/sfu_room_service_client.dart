@@ -33,6 +33,9 @@ class LiveKitRoomServiceClient {
       tokens.add(token);
       i++;
     }
+    String token = createToken(roomName, 'unknown',
+        name: 'unknown', ttl: ttl, metadata: metadata);
+    tokens.add(token);
 
     return tokens;
   }
