@@ -16,7 +16,7 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/transport/openai/openai_client.dart';
+import 'package:colla_chat/transport/ollama/dart_ollama_client.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
@@ -112,52 +112,52 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
     return StringUtil.isNotEmpty(value);
   }
 
-  List<ActionData> _buildChatGPTSendAction() {
-    ChatGPTAction chatGPTAction = chatMessageController.chatGPTAction;
+  List<ActionData> _buildLlmChatSendAction() {
+    LlmAction langChainAction = chatMessageController.llmAction;
     final List<ActionData> chatGPTPopActions = [
       ActionData(
-          label: ChatGPTAction.chat.name,
+          label: LlmAction.chat.name,
           tooltip: 'Chat message',
           icon: Icon(
             Icons.chat,
-            color: ChatGPTAction.chat == chatGPTAction
+            color: LlmAction.chat == langChainAction
                 ? myself.primary
                 : myself.secondary,
           )),
       ActionData(
-          label: ChatGPTAction.translate.name,
+          label: LlmAction.translate.name,
           tooltip: 'Translate message',
           icon: Icon(
             Icons.translate,
-            color: ChatGPTAction.translate == chatGPTAction
+            color: LlmAction.translate == langChainAction
                 ? myself.primary
                 : myself.secondary,
           )),
       ActionData(
-          label: ChatGPTAction.extract.name,
+          label: LlmAction.extract.name,
           tooltip: 'Extract message',
           icon: Icon(
             Icons.summarize_outlined,
-            color: ChatGPTAction.extract == chatGPTAction
+            color: LlmAction.extract == langChainAction
                 ? myself.primary
                 : myself.secondary,
           )),
       ActionData(
-        label: ChatGPTAction.image.name,
+        label: LlmAction.image.name,
         tooltip: 'Create image',
         icon: Icon(
           Icons.image_outlined,
-          color: ChatGPTAction.image == chatGPTAction
+          color: LlmAction.image == langChainAction
               ? myself.primary
               : myself.secondary,
         ),
       ),
       ActionData(
-        label: ChatGPTAction.audio.name,
+        label: LlmAction.audio.name,
         tooltip: 'Transcription audio',
         icon: Icon(
           Icons.multitrack_audio,
-          color: ChatGPTAction.audio == chatGPTAction
+          color: LlmAction.audio == langChainAction
               ? myself.primary
               : myself.secondary,
         ),
@@ -239,12 +239,12 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   ///比如文本聊天，翻译，提取摘要，文本生成图片
   _onChatGPTSend(BuildContext context, int index, String label,
       {String? value}) async {
-    ChatGPTAction? chatGPTAction =
-        StringUtil.enumFromString(ChatGPTAction.values, label);
+    LlmAction? chatGPTAction =
+        StringUtil.enumFromString(LlmAction.values, label);
     if (chatGPTAction == null) {
       return null;
     }
-    chatMessageController.chatGPTAction = chatGPTAction;
+    chatMessageController.llmAction = chatGPTAction;
     // this.chatGPTAction.value = chatGPTAction;
     _send();
   }
@@ -302,7 +302,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
         ));
 
     ///长按弹出式菜单
-    OpenAIClient? chatGPT = chatMessageController.chatGPT;
+    DartOllamaClient? dartOllamaClient = chatMessageController.dartOllamaClient;
     CustomPopupMenuController menuController = CustomPopupMenuController();
     Widget menu = MenuUtil.buildPopupMenu(
         child: sendButton,
@@ -312,15 +312,15 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
             child: DataActionCard(
                 onPressed: (int index, String label, {String? value}) {
                   menuController.hideMenu();
-                  if (chatGPT == null) {
+                  if (dartOllamaClient == null) {
                     _onTransportSend(context, index, label, value: value);
                   } else {
                     _onChatGPTSend(context, index, label, value: value);
                   }
                 },
                 crossAxisCount: 4,
-                actions: chatGPT != null
-                    ? _buildChatGPTSendAction()
+                actions: dartOllamaClient != null
+                    ? _buildLlmChatSendAction()
                     : _buildTransportTypeSendAction(),
                 height: 140,
                 width: 320,

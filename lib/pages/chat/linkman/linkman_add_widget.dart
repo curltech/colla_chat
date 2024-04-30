@@ -2,9 +2,9 @@ import 'package:colla_chat/pages/chat/linkman/conference/conference_edit_widget.
 import 'package:colla_chat/pages/chat/linkman/group/face_group_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/group/group_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/group/nearby_group_add_widget.dart';
-import 'package:colla_chat/pages/chat/linkman/linkman/chat_gpt_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/contact_linkman_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/json_linkman_add_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman/llm_chat_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/p2p_linkman_add_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -22,7 +22,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
 
   // final NearbyLinkmanAddWidget nearbyLinkmanAddWidget =
   //     NearbyLinkmanAddWidget();
-  final ChatGPTAddWidget chatGPTAddWidget = const ChatGPTAddWidget();
+  final LlmChatAddWidget llmChatAddWidget = const LlmChatAddWidget();
   final NearbyGroupAddWidget nearbyGroupAddWidget = NearbyGroupAddWidget();
   final FaceGroupAddWidget faceGroupAddWidget = FaceGroupAddWidget();
   final ConferenceEditWidget conferenceEditWidget =
@@ -35,7 +35,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(contactLinkmanAddWidget);
     indexWidgetProvider.define(jsonLinkmanAddWidget);
     //indexWidgetProvider.define(nearbyLinkmanAddWidget);
-    // indexWidgetProvider.define(chatGPTAddWidget);
+    indexWidgetProvider.define(llmChatAddWidget);
     indexWidgetProvider.define(nearbyGroupAddWidget);
     indexWidgetProvider.define(faceGroupAddWidget);
     indexWidgetProvider.define(conferenceEditWidget);
@@ -63,7 +63,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
       jsonLinkmanAddWidget,
       //nearbyLinkmanAddWidget,
       //nfcLinkmanAddWidget,
-      // chatGPTAddWidget,
+      llmChatAddWidget,
     ]);
     for (var tile in linkmanTileData) {
       tile.dense = false;

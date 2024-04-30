@@ -73,7 +73,7 @@ void main(List<String> args) async {
   bool loginStatus = await ServiceLocator.init();
 
   SystemChannels.lifecycle.setMessageHandler((msg) async {
-    logger.w('system channel switch to $msg');
+    //logger.w('system channel switch to $msg');
     if (msg == AppLifecycleState.resumed.toString()) {
       bool? allowed = await AndroidOverlayWindowUtil.isPermissionGranted();
       if (!allowed) {

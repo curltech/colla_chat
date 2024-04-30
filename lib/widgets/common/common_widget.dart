@@ -150,7 +150,7 @@ class IconTextButton extends StatelessWidget {
                 fontSize: labelSize,
               ),
               overflow: TextOverflow.visible,
-              softWrap: false,
+              softWrap: true,
             )),
       );
     }

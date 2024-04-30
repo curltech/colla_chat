@@ -163,8 +163,10 @@ class _ChatListWidgetState extends State<ChatListWidget>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _tabController!.addListener(_updateCurrentTab);
-    _reconnect();
-
+    if (_socketStatus.value != SocketStatus.connected ||
+        _socketStatus.value != SocketStatus.connecting) {
+      _reconnect();
+    }
     linkmanChatSummaryController.addListener(_updateLinkmanChatSummary);
     linkmanChatSummaryController.refresh();
     groupChatSummaryController.addListener(_updateGroupChatSummary);
@@ -196,16 +198,17 @@ class _ChatListWidgetState extends State<ChatListWidget>
     chatMessageService.deleteSystem();
   }
 
-  ///网络连通的情况下，如果没有缺省的websocket，尝试重连websocket
+  ///网络连通的情况下，如果没有缺省的websocket，尝试创建新的缺省websocket，如果有，则重连缺省的websocket
   _reconnect() async {
-    if (_connectivityResult.value != ConnectivityResult.none &&
-        (_socketStatus.value != SocketStatus.connected ||
-            _socketStatus.value != SocketStatus.reconnecting)) {
+    if (ConnectivityUtil.getMainResult(_connectivityResult.value) !=
+        ConnectivityResult.none) {
       Websocket? websocket = websocketPool.getDefault();
       if (websocket == null) {
         await websocketPool.connect();
-        _initStatusStreamController();
+      } else {
+        await websocket.connect();
       }
+      _initStatusStreamController();
     }
   }
 
@@ -402,7 +405,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
         if (linkmanStatus == LinkmanStatus.G.name) {
           avatarImage = avatarImage ??
               ImageUtil.buildImageWidget(
-                  image: 'assets/images/openai.png',
+                  image: 'assets/images/ollama.png',
                   width: AppImageSize.mdSize,
                   height: AppImageSize.mdSize);
         }
@@ -701,23 +704,10 @@ class _ChatListWidgetState extends State<ChatListWidget>
         builder: (context, value, child) {
           return IconButton(
               tooltip: tooltip,
-              onPressed: _socketStatus.value != SocketStatus.connected
-                  ? () async {
-                      //缺省的websocket如果不存在，尝试重连
-                      Websocket? websocket = websocketPool.getDefault();
-                      if (websocket == null) {
-                        await _reconnect();
-                        myselfPeerService.connect();
-                      } else {
-                        //缺省的websocket如果存在，尝试重连
-                        if (websocket.status != SocketStatus.connected) {
-                          await websocket.reconnect();
-                        } else {
-                          _socketStatus.value = SocketStatus.connected;
-                        }
-                      }
-                    }
-                  : null,
+              onPressed: () async {
+                await _reconnect();
+                myselfPeerService.connect();
+              },
               icon: _socketStatus.value == SocketStatus.connected
                   ? const Icon(
                       Icons.cloud_done,

@@ -93,9 +93,9 @@ class HttpClientPool {
     }
   }
 
-  DioHttpClient? get(String address) {
+  DioHttpClient get(String address) {
     if (_httpClients.containsKey(address)) {
-      return _httpClients[address];
+      return _httpClients[address]!;
     } else {
       var httpClient = DioHttpClient(address);
       _httpClients[address] = httpClient;

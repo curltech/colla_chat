@@ -188,13 +188,14 @@ class MediaStreamUtil {
     }
   }
 
+  /// 有一个轨道muted则返回muted
   static bool? isMuted(MediaStream mediaStream) {
     bool? muted;
     List<MediaStreamTrack> tracks = mediaStream.getAudioTracks();
     if (tracks.isNotEmpty) {
       for (MediaStreamTrack track in tracks) {
         muted = track.muted;
-        if (muted == false) {
+        if (muted == true) {
           break;
         }
       }

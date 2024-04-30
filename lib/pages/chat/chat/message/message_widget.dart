@@ -28,6 +28,7 @@ import 'package:colla_chat/pages/chat/chat/message/video_message.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/notification/firebase_messaging_service.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
@@ -222,7 +223,7 @@ class MessageWidget {
                         crossAxisCount: 4,
                         actions: messagePopActionData,
                         height: 200,
-                        width: 380,
+                        width: appDataProvider.secondaryBodyWidth,
                         iconSize: 30));
               },
             );

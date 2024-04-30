@@ -1,6 +1,7 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.dart';
@@ -188,7 +189,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   Future<dynamic> _showActionCard(BuildContext context) {
     return DialogUtil.popModalBottomSheet(context, builder: (context) {
       List<ActionData> actions = _buildVideoActionData();
-      int level = (actions.length / 4).ceil();
+      int level = (actions.length / 3).ceil();
       double height = 100.0 * level;
       return Card(
           child: DataActionCard(
@@ -200,11 +201,12 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
               },
               showLabel: true,
               showTooltip: true,
-              crossAxisCount: 4,
+              crossAxisCount: 3,
               actions: actions,
               mainAxisSpacing: 20,
               crossAxisSpacing: 20,
               height: height,
+              width: appDataProvider.secondaryBodyWidth,
               iconSize: 30));
     });
   }

@@ -34,5 +34,8 @@
     "G": "chatGPT",
     "F": "Friend",
     "B": "Blacklist",
-    "C": "Subscript"
+    "C": "Subscript",
+    "ConferenceOwnerPeer": "Owner",
+    "ConferenceId": "Conf.",
+    "ConferenceOwnerPeerId": "Owner"
 }
