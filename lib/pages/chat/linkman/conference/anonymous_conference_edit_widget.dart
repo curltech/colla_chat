@@ -29,7 +29,7 @@ class AnonymousConferenceEditWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'anonymous_conference_edit';
 
   @override
-  String get title => 'Anonymous Conference edit';
+  String get title => 'Anonymous conference edit';
 
   @override
   bool get withLeading => true;
