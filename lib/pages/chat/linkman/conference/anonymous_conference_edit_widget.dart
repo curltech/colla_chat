@@ -23,7 +23,7 @@ class AnonymousConferenceEditWidget extends StatefulWidget with TileDataMixin {
   const AnonymousConferenceEditWidget({super.key});
 
   @override
-  IconData get iconData => Icons.meeting_room_outlined;
+  IconData get iconData => Icons.panorama_wide_angle_outlined;
 
   @override
   String get routeName => 'anonymous_conference_edit';
