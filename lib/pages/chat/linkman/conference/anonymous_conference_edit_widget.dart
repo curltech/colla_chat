@@ -1,3 +1,4 @@
+import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -55,6 +56,16 @@ class _AnonymousConferenceEditWidgetState
       dataType: DataType.string,
       prefixIcon: Icon(Icons.token, color: myself.primary),
     ),
+    PlatformDataField(
+      name: 'name',
+      label: 'Name',
+      prefixIcon: Icon(Icons.person, color: myself.primary),
+    ),
+    PlatformDataField(
+      name: 'topic',
+      label: 'Topic',
+      prefixIcon: Icon(Icons.topic, color: myself.primary),
+    ),
   ];
   late final FormInputController controller =
       FormInputController(conferenceDataField);
@@ -110,7 +121,10 @@ class _AnonymousConferenceEditWidgetState
     if (current!.id == null) {
       var uuid = const Uuid();
       String conferenceId = uuid.v4();
-      current = Conference(conferenceId, name: AppLocalizations.t('anonymous'));
+      current = Conference(conferenceId, name: '');
+      current.conferenceOwnerPeerId = myself.peerId;
+      current.conferenceOwnerName = myself.name;
+      current.status = EntityStatus.effective.name;
       conferenceNotifier.value = current;
       conferenceModified = false;
     }
@@ -125,8 +139,12 @@ class _AnonymousConferenceEditWidgetState
           content: AppLocalizations.t('Must has conference sfuToken'));
       return null;
     }
+    if (StringUtil.isEmpty(values['name'])) {
+      current.name = AppLocalizations.t('anonymous');
+    }
     current.sfuUri = values['sfuUri'];
     current.sfuToken = values['sfuToken'];
+    current.topic = values['topic'];
     current.sfu = true;
     await conferenceService.store(current);
     if (mounted) {
