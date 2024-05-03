@@ -141,6 +141,8 @@ class _AnonymousConferenceEditWidgetState
     }
     if (StringUtil.isEmpty(values['name'])) {
       current.name = AppLocalizations.t('anonymous');
+    } else {
+      current.name = values['name'];
     }
     current.sfuUri = values['sfuUri'];
     current.sfuToken = values['sfuToken'];
