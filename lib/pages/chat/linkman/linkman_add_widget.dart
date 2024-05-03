@@ -1,3 +1,4 @@
+import 'package:colla_chat/pages/chat/linkman/conference/anonymous_conference_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/conference/conference_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/group/face_group_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/group/group_edit_widget.dart';
@@ -27,6 +28,8 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
   final FaceGroupAddWidget faceGroupAddWidget = FaceGroupAddWidget();
   final ConferenceEditWidget conferenceEditWidget =
       const ConferenceEditWidget();
+  final AnonymousConferenceEditWidget anonymousConferenceEditWidget =
+      const AnonymousConferenceEditWidget();
 
   //final NfcLinkmanAddWidget nfcLinkmanAddWidget = NfcLinkmanAddWidget();
 
@@ -39,6 +42,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(nearbyGroupAddWidget);
     indexWidgetProvider.define(faceGroupAddWidget);
     indexWidgetProvider.define(conferenceEditWidget);
+    indexWidgetProvider.define(anonymousConferenceEditWidget);
     //indexWidgetProvider.define(nfcLinkmanAddWidget);
   }
 
@@ -83,6 +87,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
     }
     final List<TileData> conferenceTileData = TileData.from([
       conferenceEditWidget,
+      anonymousConferenceEditWidget,
     ]);
     conferenceTileData.first.onTap =
         (int index, String title, {String? subtitle}) {

@@ -11,13 +11,11 @@ class StockLineService {
       String? httpConnectAddress = defaultPeerEndpoint.httpConnectAddress;
       if (httpConnectAddress != null) {
         DioHttpClient? client = httpClientPool.get(httpConnectAddress);
-        if (client != null) {
-          Response<dynamic> response = await client.send(url, data);
-          if (response.statusCode == 200) {
-            return response.data;
-          }
+        Response<dynamic> response = await client.send(url, data);
+        if (response.statusCode == 200) {
+          return response.data;
         }
-      }
+            }
     }
   }
 

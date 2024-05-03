@@ -98,21 +98,17 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
     if (peerEndpoint.httpConnectAddress != null) {
       DioHttpClient? dioHttpClient =
           httpClientPool.get(peerEndpoint.httpConnectAddress!);
-      if (dioHttpClient == null) {
-        httpLight = grey;
-      } else {
-        try {
-          Response<dynamic> response = await dioHttpClient.get('\\');
-          if (response.statusCode != 200) {
-            httpLight = green;
-          } else {
-            httpLight = red;
-          }
-        } catch (e) {
-          return httpLight;
+      try {
+        Response<dynamic> response = await dioHttpClient.get('\\');
+        if (response.statusCode != 200) {
+          httpLight = green;
+        } else {
+          httpLight = red;
         }
+      } catch (e) {
+        return httpLight;
       }
-    }
+        }
     return httpLight;
   }
 

@@ -190,13 +190,11 @@ class ChainMessageHandler {
           connectAddress != null &&
           connectAddress.startsWith('http')) {
         var httpClient = httpClientPool.get(connectAddress);
-        if (httpClient != null) {
-          var data = JsonUtil.toJsonString(chainMessage);
-          Response response = await httpClient.send('/receive', data);
-          result = response.data;
-          success = true;
-        }
-      }
+        var data = JsonUtil.toJsonString(chainMessage);
+        Response response = await httpClient.send('/receive', data);
+        result = response.data;
+        success = true;
+            }
     } catch (err) {
       logger.e('send message:$err');
     }

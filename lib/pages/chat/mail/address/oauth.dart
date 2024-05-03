@@ -81,7 +81,7 @@ class GmailOAuthClient extends OauthClient {
     // Use this code to get an access token
     DioHttpClient? dioHttpClient =
         httpClientPool.get('https://oauth2.googleapis.com');
-    final response = await dioHttpClient!.send(
+    final response = await dioHttpClient.send(
       '/token',
       {
         'client_id': clientId,
@@ -106,7 +106,7 @@ class GmailOAuthClient extends OauthClient {
     final callbackUrlScheme = clientId.split('.').reversed.join('.');
     DioHttpClient? dioHttpClient =
         httpClientPool.get('https://oauth2.googleapis.com');
-    final response = await dioHttpClient!.send('/token', {
+    final response = await dioHttpClient.send('/token', {
       'client_id': clientId,
       'redirect_uri': '$callbackUrlScheme:/',
       'refresh_token': token.refreshToken,
@@ -159,7 +159,7 @@ class OutlookOAuthClient extends OauthClient {
     // Use this code to get an access token
     DioHttpClient? dioHttpClient =
         httpClientPool.get('https://login.microsoftonline.com');
-    final response = await dioHttpClient!.send('/common/oauth2/v2.0/token', {
+    final response = await dioHttpClient.send('/common/oauth2/v2.0/token', {
       'client_id': clientId,
       'redirect_uri': callbackUrlScheme,
       'grant_type': 'authorization_code',
@@ -180,7 +180,7 @@ class OutlookOAuthClient extends OauthClient {
     final clientId = oauthClientId!.id;
     DioHttpClient? dioHttpClient =
         httpClientPool.get('https://login.microsoftonline.com');
-    final response = await dioHttpClient!.send('/common/oauth2/v2.0/token', {
+    final response = await dioHttpClient.send('/common/oauth2/v2.0/token', {
       'client_id': clientId,
       'scope': _scope,
       'refresh_token': token.refreshToken,
