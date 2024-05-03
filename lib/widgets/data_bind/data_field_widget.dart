@@ -183,6 +183,7 @@ class DataFieldController with ChangeNotifier {
     var controller = _controller;
     if (controller != null) {
       if (dataField.inputType == InputType.text ||
+          dataField.inputType == InputType.textarea ||
           dataField.inputType == InputType.password) {
         String valueStr = (controller as TextEditingController).text;
         if (valueStr.isNotEmpty) {
@@ -1086,6 +1087,9 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
         dataFieldWidget = _buildLabel(context);
         break;
       case InputType.text:
+        dataFieldWidget = _buildTextFormField(context);
+        break;
+      case InputType.textarea:
         dataFieldWidget = _buildTextFormField(context);
         break;
       case InputType.password:

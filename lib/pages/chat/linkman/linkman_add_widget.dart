@@ -18,7 +18,7 @@ import 'package:flutter/material.dart';
 class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
   final P2pLinkmanAddWidget p2pLinkmanAddWidget = P2pLinkmanAddWidget();
   final ContactLinkmanAddWidget contactLinkmanAddWidget =
-      ContactLinkmanAddWidget();
+  ContactLinkmanAddWidget();
   final JsonLinkmanAddWidget jsonLinkmanAddWidget = JsonLinkmanAddWidget();
 
   // final NearbyLinkmanAddWidget nearbyLinkmanAddWidget =
@@ -27,9 +27,9 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
   final NearbyGroupAddWidget nearbyGroupAddWidget = NearbyGroupAddWidget();
   final FaceGroupAddWidget faceGroupAddWidget = FaceGroupAddWidget();
   final ConferenceEditWidget conferenceEditWidget =
-      const ConferenceEditWidget();
+  const ConferenceEditWidget();
   final AnonymousConferenceEditWidget anonymousConferenceEditWidget =
-      const AnonymousConferenceEditWidget();
+  const AnonymousConferenceEditWidget();
 
   //final NfcLinkmanAddWidget nfcLinkmanAddWidget = NfcLinkmanAddWidget();
 
@@ -89,10 +89,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
       conferenceEditWidget,
       anonymousConferenceEditWidget,
     ]);
-    conferenceTileData.first.onTap =
-        (int index, String title, {String? subtitle}) {
-      conferenceNotifier.value = null;
-    };
+    conferenceNotifier.value = null;
     for (var tile in conferenceTileData) {
       tile.dense = false;
       tile.selected = false;

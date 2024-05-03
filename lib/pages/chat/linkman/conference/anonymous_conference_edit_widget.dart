@@ -47,7 +47,6 @@ class _AnonymousConferenceEditWidgetState
       inputType: InputType.text,
       dataType: DataType.string,
       prefixIcon: Icon(Icons.edit_location_outlined, color: myself.primary),
-      readOnly: true,
     ),
     PlatformDataField(
       name: 'sfuToken',
@@ -55,7 +54,6 @@ class _AnonymousConferenceEditWidgetState
       inputType: InputType.textarea,
       dataType: DataType.string,
       prefixIcon: Icon(Icons.token, color: myself.primary),
-      readOnly: true,
     ),
   ];
   late final FormInputController controller =
