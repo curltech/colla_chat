@@ -163,19 +163,18 @@ class _ChatListWidgetState extends State<ChatListWidget>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _tabController!.addListener(_updateCurrentTab);
-    if (_socketStatus.value != SocketStatus.connected ||
-        _socketStatus.value != SocketStatus.connecting) {
-      _reconnect();
-    }
     linkmanChatSummaryController.addListener(_updateLinkmanChatSummary);
     linkmanChatSummaryController.refresh();
     groupChatSummaryController.addListener(_updateGroupChatSummary);
     // groupChatSummaryController.refresh();
     conferenceChatSummaryController.addListener(_updateConferenceChatSummary);
     // conferenceChatSummaryController.refresh();
-
     connectivityController.addListener(_updateConnectivity);
     _initStatusStreamController();
+    if (_socketStatus.value != SocketStatus.connected &&
+        _socketStatus.value != SocketStatus.connecting) {
+      _reconnect();
+    }
     localNotificationsService.isAndroidPermissionGranted();
     localNotificationsService.requestPermissions();
     _initDelete();
