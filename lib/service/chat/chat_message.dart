@@ -964,10 +964,14 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   ///如果chatMessage的groupType不为空，则是群消息，支持群发
   ///群发的时候peerIds不为空，有值
   Future<List<ChatMessage>> sendAndStore(ChatMessage chatMessage,
-      {CryptoOption? cryptoOption, List<String>? peerIds}) async {
+      {CryptoOption? cryptoOption,
+      List<String>? peerIds,
+      bool updateSummary = true,
+      bool unreadNumber = false}) async {
     if (chatMessage.receiverPeerId == myself.peerId) {
       chatMessage.transportType = TransportType.none.name;
-      await chatMessageService.store(chatMessage);
+      await chatMessageService.store(chatMessage,
+          updateSummary: updateSummary, unreadNumber: unreadNumber);
 
       return [chatMessage];
     }
@@ -978,7 +982,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         if (msg.receiverPeerId == myself.peerId) {
           msg.transportType = TransportType.none.name;
         }
-        await chatMessageService.store(msg);
+        await chatMessageService.store(msg,
+            updateSummary: updateSummary, unreadNumber: unreadNumber);
       }
     }
     return chatMessages;

@@ -153,11 +153,17 @@ class _AnonymousConferenceEditWidgetState
     }
     ChatMessage chatMessage = await chatMessageService.buildChatMessage(
       receiverPeerId: myself.peerId,
+      groupId: current.conferenceId,
+      groupName: current.name,
+      groupType: PartyType.conference,
+      title: current.video
+          ? ChatMessageContentType.video.name
+          : ChatMessageContentType.audio.name,
       content: current,
       messageId: current.conferenceId,
       subMessageType: ChatMessageSubType.videoChat,
     );
-    await chatMessageService.store(chatMessage);
+    await chatMessageService.sendAndStore(chatMessage, updateSummary: false);
     if (conferenceController.current == null) {
       conferenceController.add(current);
     }
