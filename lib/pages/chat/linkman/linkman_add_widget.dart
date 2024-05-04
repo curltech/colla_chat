@@ -1,3 +1,4 @@
+import 'package:colla_chat/pages/chat/linkman/conference/anonymous_conference_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/conference/conference_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/group/face_group_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/group/group_edit_widget.dart';
@@ -17,7 +18,7 @@ import 'package:flutter/material.dart';
 class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
   final P2pLinkmanAddWidget p2pLinkmanAddWidget = P2pLinkmanAddWidget();
   final ContactLinkmanAddWidget contactLinkmanAddWidget =
-      ContactLinkmanAddWidget();
+  ContactLinkmanAddWidget();
   final JsonLinkmanAddWidget jsonLinkmanAddWidget = JsonLinkmanAddWidget();
 
   // final NearbyLinkmanAddWidget nearbyLinkmanAddWidget =
@@ -26,7 +27,9 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
   final NearbyGroupAddWidget nearbyGroupAddWidget = NearbyGroupAddWidget();
   final FaceGroupAddWidget faceGroupAddWidget = FaceGroupAddWidget();
   final ConferenceEditWidget conferenceEditWidget =
-      const ConferenceEditWidget();
+  const ConferenceEditWidget();
+  final AnonymousConferenceEditWidget anonymousConferenceEditWidget =
+  const AnonymousConferenceEditWidget();
 
   //final NfcLinkmanAddWidget nfcLinkmanAddWidget = NfcLinkmanAddWidget();
 
@@ -39,6 +42,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(nearbyGroupAddWidget);
     indexWidgetProvider.define(faceGroupAddWidget);
     indexWidgetProvider.define(conferenceEditWidget);
+    indexWidgetProvider.define(anonymousConferenceEditWidget);
     //indexWidgetProvider.define(nfcLinkmanAddWidget);
   }
 
@@ -83,11 +87,9 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
     }
     final List<TileData> conferenceTileData = TileData.from([
       conferenceEditWidget,
+      anonymousConferenceEditWidget,
     ]);
-    conferenceTileData.first.onTap =
-        (int index, String title, {String? subtitle}) {
-      conferenceNotifier.value = null;
-    };
+    conferenceNotifier.value = null;
     for (var tile in conferenceTileData) {
       tile.dense = false;
       tile.selected = false;

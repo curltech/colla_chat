@@ -438,7 +438,9 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
           subMessageType: ChatMessageSubType.videoChat,
         );
         await chatMessageService.sendAndStore(chatMessage,
-            cryptoOption: CryptoOption.group, peerIds: current.participants);
+            cryptoOption: CryptoOption.group,
+            peerIds: current.participants,
+            updateSummary: false);
       }
     }
 
