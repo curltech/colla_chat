@@ -415,6 +415,8 @@ class LiveKitConferenceClient {
         .onRoomEvent<LocalTrackUnpublishedEvent>(_onLocalTrackUnpublishedEvent);
     roomClient.onLocalParticipantEvent(_onLocalParticipantEvent);
     roomClient.onRoomEvent<DataReceivedEvent>(_onDataReceivedEvent);
+    roomClient
+        .onRoomEvent<AudioPlaybackStatusChanged>(_onAudioPlaybackStatusChanged);
     joined = true;
     log.logger.w('i joined conference ${conference.name}');
     await publish(
@@ -458,12 +460,11 @@ class LiveKitConferenceClient {
         } catch (error) {
           log.logger.e('could not publish video: $error');
         }
-      } else {
-        try {
-          localAudioTrackPublication = await setMicrophoneEnabled(true);
-        } catch (error) {
-          log.logger.e('could not publish audio: $error');
-        }
+      }
+      try {
+        localAudioTrackPublication = await setMicrophoneEnabled(true);
+      } catch (error) {
+        log.logger.e('could not publish audio: $error');
       }
       PlatformParticipant platformParticipant = PlatformParticipant(
           myself.peerId!,
@@ -723,6 +724,12 @@ class LiveKitConferenceClient {
         'on DataReceivedEvent:${event.participant?.identity}:${event.participant?.name}');
     List<int> data = event.data;
     globalChatMessage.onData(data, TransportType.sfu);
+  }
+
+  FutureOr<void> _onAudioPlaybackStatusChanged(
+      AudioPlaybackStatusChanged event) {
+    log.logger.i('on AudioPlaybackStatusChanged isPlaying:${event.isPlaying}');
+    // roomClient.room.startAudio();
   }
 
   publishData(List<int> data) async {
