@@ -191,8 +191,8 @@ class QrcodeUtil {
                     IconButton(
                         onPressed: () {
                           unawaited(subscription.cancel());
-                          mobileScannerController.dispose();
                           Navigator.of(context).pop();
+                          mobileScannerController.dispose();
                         },
                         icon: const Icon(Icons.arrow_back_ios_new)),
                     ValueListenableBuilder(

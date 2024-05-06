@@ -25,6 +25,7 @@ import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
+import 'package:colla_chat/widgets/qrcode_widget.dart';
 import 'package:flutter/material.dart';
 
 ValueNotifier<Conference?> conferenceNotifier =
@@ -274,16 +275,54 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
           return FormInputWidget(
             spacing: 5.0,
             height: appDataProvider.portraitSize.height * 0.6,
-            onOk: (Map<String, dynamic> values) {
-              _onOk(values).then((conference) {
-                if (conference != null) {
-                  DialogUtil.info(context,
-                      content: AppLocalizations.t('Built conference ') +
-                          conference.name);
-                }
-              });
-            },
             controller: controller,
+            formButtons: [
+              FormButton(
+                  label: 'Ok',
+                  onTap: (Map<String, dynamic> values) async {
+                    _onOk(values).then((conference) {
+                      if (conference != null) {
+                        DialogUtil.info(context,
+                            content: AppLocalizations.t('Built conference ') +
+                                conference.name);
+                      }
+                    });
+                  }),
+              FormButton(
+                  label: 'Qrcode',
+                  onTap: (Map<String, dynamic> values) async {
+                    Conference? current = conferenceNotifier.value;
+                    if (current == null) {
+                      return null;
+                    }
+                    List<dynamic> tokens = JsonUtil.toJson(current.sfuToken);
+                    String content = JsonUtil.toJsonString({
+                      'sfuUri': current.sfuUri,
+                      'sfuToken': tokens.last,
+                      'name': current.name,
+                      'topic': current.topic,
+                      'conferenceId': current.conferenceId,
+                      'conferenceOwnerPeerId': current.conferenceOwnerPeerId,
+                      'conferenceOwnerName': current.conferenceOwnerName,
+                    });
+                    await DialogUtil.show(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Dialog(
+                          elevation: 0.0,
+                          insetPadding: EdgeInsets.zero,
+                          child: SizedBox(
+                              width: 320,
+                              height: 320,
+                              child: QrcodeWidget(
+                                content: content,
+                                width: 320,
+                              )),
+                        );
+                      },
+                    );
+                  })
+            ],
           );
         });
     children.add(formInputWidget);

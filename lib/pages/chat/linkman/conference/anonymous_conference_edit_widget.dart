@@ -4,6 +4,7 @@ import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/conference/conference_edit_widget.dart';
+import 'package:colla_chat/tool/qrcode_util.dart';
 import 'package:uuid/uuid.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
@@ -43,27 +44,45 @@ class _AnonymousConferenceEditWidgetState
     extends State<AnonymousConferenceEditWidget> {
   final List<PlatformDataField> conferenceDataField = [
     PlatformDataField(
+      name: 'conferenceId',
+      label: 'ConferenceId',
+      inputType: InputType.label,
+      prefixIcon: Icon(Icons.meeting_room, color: myself.primary),
+    ),
+    PlatformDataField(
+      name: 'conferenceOwnerPeerId',
+      label: 'ConferenceOwnerPeerId',
+      inputType: InputType.label,
+      prefixIcon: Icon(Icons.perm_identity, color: myself.primary),
+    ),
+    PlatformDataField(
+      name: 'conferenceOwnerName',
+      label: 'ConferenceOwnerName',
+      inputType: InputType.label,
+      prefixIcon: Icon(Icons.open_with, color: myself.primary),
+    ),
+    PlatformDataField(
       name: 'sfuUri',
       label: 'SfuUri',
-      inputType: InputType.text,
-      dataType: DataType.string,
+      inputType: InputType.label,
       prefixIcon: Icon(Icons.edit_location_outlined, color: myself.primary),
     ),
     PlatformDataField(
       name: 'sfuToken',
       label: 'SfuToken',
-      inputType: InputType.textarea,
-      dataType: DataType.string,
+      inputType: InputType.label,
       prefixIcon: Icon(Icons.token, color: myself.primary),
     ),
     PlatformDataField(
       name: 'name',
       label: 'Name',
+      inputType: InputType.label,
       prefixIcon: Icon(Icons.person, color: myself.primary),
     ),
     PlatformDataField(
       name: 'topic',
       label: 'Topic',
+      inputType: InputType.label,
       prefixIcon: Icon(Icons.topic, color: myself.primary),
     ),
   ];
@@ -72,13 +91,8 @@ class _AnonymousConferenceEditWidgetState
 
   @override
   initState() {
-    Conference? current = conferenceNotifier.value;
-    if (current == null) {
-      current = Conference('', name: '');
-      conferenceNotifier.value = current;
-    }
-    conferenceController.addListener(_update);
     super.initState();
+    conferenceController.addListener(_update);
   }
 
   _update() {
@@ -96,16 +110,14 @@ class _AnonymousConferenceEditWidgetState
           return FormInputWidget(
             spacing: 5.0,
             height: appDataProvider.portraitSize.height * 0.6,
-            onOk: (Map<String, dynamic> values) {
-              _onOk(values).then((conference) {
-                if (conference != null) {
-                  DialogUtil.info(context,
-                      content: AppLocalizations.t('Built conference ') +
-                          conference.name);
-                }
-              });
-            },
             controller: controller,
+            formButtons: [
+              FormButton(
+                  label: 'Qrcode',
+                  onTap: (Map<String, dynamic> values) {
+                    scanQrcode(context);
+                  })
+            ],
           );
         });
 
@@ -114,68 +126,45 @@ class _AnonymousConferenceEditWidgetState
         child: formInputWidget);
   }
 
-  //修改提交
-  Future<Conference?> _onOk(Map<String, dynamic> values) async {
-    bool conferenceModified = true;
-    Conference? current = conferenceNotifier.value;
-    if (current!.id == null) {
-      var uuid = const Uuid();
-      String conferenceId = uuid.v4();
-      current = Conference(conferenceId, name: '');
-      current.conferenceOwnerPeerId = myself.peerId;
-      current.conferenceOwnerName = myself.name;
-      current.status = EntityStatus.effective.name;
-      conferenceNotifier.value = current;
-      conferenceModified = false;
+  Future<void> scanQrcode(BuildContext context) async {
+    String? content = await QrcodeUtil.mobileScan(context);
+    if (content == null) {
+      return;
     }
-
-    if (StringUtil.isEmpty(values['sfuUri'])) {
-      DialogUtil.error(context,
-          content: AppLocalizations.t('Must has conference sfuUri'));
-      return null;
-    }
-    if (StringUtil.isEmpty(values['sfuToken'])) {
-      DialogUtil.error(context,
-          content: AppLocalizations.t('Must has conference sfuToken'));
-      return null;
-    }
-    if (StringUtil.isEmpty(values['name'])) {
-      current.name = AppLocalizations.t('anonymous');
-    } else {
-      current.name = values['name'];
-    }
-    current.sfuUri = values['sfuUri'];
-    current.sfuToken = values['sfuToken'];
-    current.topic = values['topic'];
-    current.sfu = true;
-    await conferenceService.store(current);
+    var map = JsonUtil.toJson(content);
+    Conference conference = Conference.fromJson(map);
     if (mounted) {
-      DialogUtil.info(context,
-          content: AppLocalizations.t('Conference has stored completely'));
+      bool? confirm = await DialogUtil.confirm(context,
+          content: 'You confirm add anonymous conference ${conference.name}?');
+      if (confirm != null && confirm) {
+        conference.status = EntityStatus.effective.name;
+        conference.sfu = true;
+        await conferenceService.store(conference);
+        conferenceNotifier.value = conference;
+        ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+          receiverPeerId: myself.peerId,
+          groupId: conference.conferenceId,
+          groupName: conference.name,
+          groupType: PartyType.conference,
+          title: conference.video
+              ? ChatMessageContentType.video.name
+              : ChatMessageContentType.audio.name,
+          content: conference,
+          messageId: conference.conferenceId,
+          subMessageType: ChatMessageSubType.videoChat,
+        );
+        await chatMessageService.sendAndStore(chatMessage,
+            updateSummary: false);
+        if (conferenceController.current == null) {
+          conferenceController.add(conference);
+        }
+        if (mounted) {
+          DialogUtil.info(context,
+              content:
+                  'You add anonymous conference ${conference.name} successfully');
+        }
+      }
     }
-    ChatMessage chatMessage = await chatMessageService.buildChatMessage(
-      receiverPeerId: myself.peerId,
-      groupId: current.conferenceId,
-      groupName: current.name,
-      groupType: PartyType.conference,
-      title: current.video
-          ? ChatMessageContentType.video.name
-          : ChatMessageContentType.audio.name,
-      content: current,
-      messageId: current.conferenceId,
-      subMessageType: ChatMessageSubType.videoChat,
-    );
-    await chatMessageService.sendAndStore(chatMessage, updateSummary: false);
-    if (conferenceController.current == null) {
-      conferenceController.add(current);
-    }
-    if (conferenceModified) {
-      conferenceChatSummaryController.refresh();
-    } else {
-      setState(() {});
-    }
-
-    return current;
   }
 
   @override
