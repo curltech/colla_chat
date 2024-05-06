@@ -102,14 +102,14 @@ class PeerMediaStream {
         myself.peerId!,
         clientId: myself.clientId,
         name: myself.name);
-    //LocalAudioTrack? localAudio;
-    // if (audio) {
-    //   localAudio = await LocalAudioTrack.create(audioOptions);
-    // }
+    LocalAudioTrack? localAudio;
+    if (audio) {
+      localAudio = await LocalAudioTrack.create(audioOptions);
+    }
 
     return PeerMediaStream(
         videoTrack: localVideo,
-        //audioTrack: localAudio,
+        audioTrack: localAudio,
         platformParticipant: platformParticipant);
   }
 

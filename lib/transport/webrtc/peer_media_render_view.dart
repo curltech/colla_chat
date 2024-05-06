@@ -45,12 +45,6 @@ class _PeerMediaRenderViewState extends State<PeerMediaRenderView> {
   //绑定视频流到渲染器
   bindRTCVideoRender() async {
     MediaStream? mediaStream = widget.peerMediaStream.mediaStream;
-    if (mediaStream == null) {
-      livekit_client.AudioTrack? audioTrack = widget.peerMediaStream.audioTrack;
-      if (audioTrack != null) {
-        mediaStream = audioTrack.mediaStream;
-      }
-    }
     if (mediaStream != null) {
       renderer = RTCVideoRenderer();
       await renderer!.initialize();
@@ -106,6 +100,8 @@ class _PeerMediaRenderViewState extends State<PeerMediaRenderView> {
             } else {
               livekit_client.VideoTrack? videoTrack =
                   widget.peerMediaStream.videoTrack;
+              livekit_client.AudioTrack? audioTrack =
+                  widget.peerMediaStream.audioTrack;
               if (videoTrack != null) {
                 return livekit_client.VideoTrackRenderer(
                   videoTrack,
@@ -114,25 +110,19 @@ class _PeerMediaRenderViewState extends State<PeerMediaRenderView> {
                       ? livekit_client.VideoViewMirrorMode.mirror
                       : livekit_client.VideoViewMirrorMode.off,
                 );
+              } else if (audioTrack != null) {
+                return const Center(
+                    child: Icon(
+                  Icons.multitrack_audio_outlined,
+                  color: Colors.white,
+                  size: 60,
+                ));
               }
             }
           }
           return LoadingUtil.buildCircularLoadingWidget();
         });
 
-    bool audio = widget.peerMediaStream.audio;
-    bool video = widget.peerMediaStream.video;
-    if (audio && !video) {
-      videoView = Stack(children: [
-        const Center(
-            child: Icon(
-          Icons.multitrack_audio_outlined,
-          color: Colors.white,
-          size: 60,
-        )),
-        videoView,
-      ]);
-    }
     Widget container = _buildVideoViewContainer(videoView,
         width: widget.width, height: widget.height);
     if (!widget.fitScreen) {
