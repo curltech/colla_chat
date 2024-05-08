@@ -55,6 +55,7 @@ class AppBarWidget {
     PreferredSizeWidget appBar = AppBar(
       title: title,
       centerTitle: centerTitle,
+      titleSpacing: 10.0,
       leading: leading,
       actions: actions,
       automaticallyImplyLeading: false,
