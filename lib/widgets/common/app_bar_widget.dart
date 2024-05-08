@@ -53,8 +53,7 @@ class AppBarWidget {
     // backgroundColor ??= myself.primary;
     // foregroundColor ??= Colors.white;
     PreferredSizeWidget appBar = AppBar(
-      title: Container(
-          padding: const EdgeInsets.symmetric(vertical: 5.0), child: title),
+      title: title,
       centerTitle: centerTitle,
       leading: leading,
       actions: actions,
