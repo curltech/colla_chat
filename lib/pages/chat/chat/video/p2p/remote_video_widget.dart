@@ -83,7 +83,8 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
     P2pConferenceClient? conferenceClient =
         p2pConferenceClientPool.conferenceClient;
     if (conferenceClient != null) {
-      conferenceClient.closeAll();
+      conferenceClient.remotePeerMediaStreamController.closeAll();
+      conferenceClient.remoteParticipants().clear();
     }
   }
 
@@ -190,18 +191,8 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
               child: VideoViewCard(
                 peerMediaStreamController:
                     conferenceClient.remotePeerMediaStreamController,
-                onClosed: _onClosedPeerMediaStream,
               ));
         });
-  }
-
-  ///关闭单个远程视频窗口的流
-  Future<void> _onClosedPeerMediaStream(PeerMediaStream peerMediaStream) async {
-    P2pConferenceClient? conferenceClient =
-        p2pConferenceClientPool.conferenceClient;
-    if (conferenceClient != null) {
-      await conferenceClient.close([peerMediaStream]);
-    }
   }
 
   @override

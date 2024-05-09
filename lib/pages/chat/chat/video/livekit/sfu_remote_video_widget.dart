@@ -83,7 +83,7 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
     LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
     if (conferenceClient != null) {
-      conferenceClient.closeAll();
+      conferenceClient.remotePeerMediaStreamController.closeAll();
     }
   }
 
@@ -189,18 +189,8 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
               child: VideoViewCard(
                 peerMediaStreamController:
                     conferenceClient.remotePeerMediaStreamController,
-                onClosed: _onClosedPeerMediaStream,
               ));
         });
-  }
-
-  /// 关闭单个远程视频窗口的流
-  Future<void> _onClosedPeerMediaStream(PeerMediaStream peerMediaStream) async {
-    LiveKitConferenceClient? conferenceClient =
-        liveKitConferenceClientPool.conferenceClient;
-    if (conferenceClient != null) {
-      await conferenceClient.close([peerMediaStream]);
-    }
   }
 
   @override

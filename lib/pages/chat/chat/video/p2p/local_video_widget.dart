@@ -7,9 +7,9 @@ import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
 import 'package:colla_chat/pages/chat/linkman/group_linkman_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
-import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -248,7 +248,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     Conference? conference = conferenceChatMessageController?.conference;
     //从webrtc连接中移除流
     if (conference != null) {
-      await p2pConferenceClient?.close(peerMediaStreams);
+      await p2pConferenceClient?.closeLocal(peerMediaStreams);
     }
     await localPeerMediaStreamController.closeAll();
   }
@@ -755,10 +755,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         });
   }
 
-  Future<void> _onClosedPeerMediaStream(PeerMediaStream peerMediaStream) async {
-    await _close(peerMediaStream);
-  }
-
   @override
   Widget build(BuildContext context) {
     var videoViewCard = ValueListenableBuilder<int>(
@@ -769,7 +765,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                 p2pConferenceClientPool.conferenceChatMessageController;
             return VideoViewCard(
               peerMediaStreamController: localPeerMediaStreamController,
-              onClosed: _onClosedPeerMediaStream,
             );
           } else {
             var size = MediaQuery.of(context).size;

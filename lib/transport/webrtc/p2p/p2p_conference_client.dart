@@ -154,7 +154,7 @@ class P2pConferenceClient {
   }
 
   /// 从会议的所有连接中退出发布并且关闭本地的多个视频流，并且都重新协商
-  close(List<PeerMediaStream> peerMediaStreams) async {
+  closeLocal(List<PeerMediaStream> peerMediaStreams) async {
     List<AdvancedPeerConnection> pcs = await peerConnections;
     for (AdvancedPeerConnection peerConnection in pcs) {
       await removeLocalStreams(peerConnection, peerMediaStreams);
@@ -167,8 +167,8 @@ class P2pConferenceClient {
   }
 
   /// 退出发布并且关闭本地的所有的轨道或者流
-  closeAll({bool notify = true}) async {
-    close(localPeerMediaStreamController.peerMediaStreams);
+  closeAllLocal({bool notify = true}) async {
+    closeLocal(localPeerMediaStreamController.peerMediaStreams);
   }
 
   /// 远程参与者加入会议事件，此时连接未必已经建立
@@ -359,7 +359,7 @@ class P2pConferenceClient {
     List<PeerMediaStream> peerMediaStreams =
         localPeerMediaStreamController.peerMediaStreams;
     if (peerMediaStreams.isNotEmpty) {
-      await close(peerMediaStreams);
+      await closeLocal(peerMediaStreams);
     }
     List<AdvancedPeerConnection> pcs = await peerConnections;
     for (AdvancedPeerConnection peerConnection in pcs) {
@@ -512,7 +512,7 @@ class P2pConferenceClientPool with ChangeNotifier {
   close(String conferenceId, List<PeerMediaStream> peerMediaStreams) async {
     P2pConferenceClient? p2pConferenceClient = _conferenceClients[conferenceId];
     if (p2pConferenceClient != null) {
-      await p2pConferenceClient.close(peerMediaStreams);
+      await p2pConferenceClient.closeLocal(peerMediaStreams);
     }
   }
 
@@ -522,7 +522,7 @@ class P2pConferenceClientPool with ChangeNotifier {
     await _clientLock.synchronized(() async {
       P2pConferenceClient? conferenceClient = _conferenceClients[conferenceId];
       if (conferenceClient != null) {
-        await conferenceClient.closeAll();
+        await conferenceClient.closeAllLocal();
         notifyListeners();
       }
     });

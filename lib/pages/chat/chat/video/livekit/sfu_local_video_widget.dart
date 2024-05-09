@@ -7,9 +7,9 @@ import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
 import 'package:colla_chat/pages/chat/linkman/group_linkman_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
-import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -210,16 +210,21 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
     if (conferenceClient != null) {
-      await conferenceClient.close([peerMediaStream]);
+      await conferenceClient.closeLocal([peerMediaStream]);
+    }
+    var streamId = peerMediaStream.id;
+    if (streamId != null) {
+      await localPeerMediaStreamController.close(streamId);
     }
   }
 
   ///关闭并且移除本地所有的视频，这时候还能看远程的视频
   _closeAll() async {
+    await localPeerMediaStreamController.closeAll();
     LiveKitConferenceClient? conferenceClient =
         liveKitConferenceClientPool.conferenceClient;
     if (conferenceClient != null) {
-      await conferenceClient.closeAll();
+      await conferenceClient.closeAllLocal();
     }
   }
 
@@ -727,11 +732,6 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
         });
   }
 
-  ///关闭单个本地视频窗口的流
-  Future<void> _onClosedPeerMediaStream(PeerMediaStream peerMediaStream) async {
-    await _close(peerMediaStream);
-  }
-
   @override
   Widget build(BuildContext context) {
     var videoViewCard = ValueListenableBuilder<int>(
@@ -740,7 +740,6 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
           if (value > 0) {
             return VideoViewCard(
               peerMediaStreamController: localPeerMediaStreamController,
-              onClosed: _onClosedPeerMediaStream,
             );
           } else {
             var size = MediaQuery.of(context).size;
