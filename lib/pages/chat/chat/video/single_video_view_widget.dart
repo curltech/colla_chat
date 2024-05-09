@@ -18,12 +18,10 @@ class SingleVideoViewWidget extends StatefulWidget {
   final PeerMediaStream peerMediaStream;
   final double? height;
   final double? width;
-  final Function(PeerMediaStream peerMediaStream) onClosed;
 
   const SingleVideoViewWidget({
     super.key,
     required this.peerMediaStreamController,
-    required this.onClosed,
     required this.peerMediaStream,
     this.height,
     this.width,
@@ -363,15 +361,14 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         await peerMediaStream.setZoom(val);
         break;
       case 'Close':
-        await _close();
+        var streamId = peerMediaStream.id;
+        if (streamId != null) {
+          await widget.peerMediaStreamController.close(streamId);
+        }
         break;
       default:
         break;
     }
-  }
-
-  Future<void> _close() async {
-    widget.onClosed(widget.peerMediaStream);
   }
 
   @override

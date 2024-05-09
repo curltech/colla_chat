@@ -487,7 +487,7 @@ class LiveKitConferenceClient {
   }
 
   /// 退出发布并且关闭本地的某个轨道或者流
-  close(List<PeerMediaStream> peerMediaStreams, {bool notify = true}) async {
+  closeLocal(List<PeerMediaStream> peerMediaStreams, {bool notify = true}) async {
     if (joined) {
       for (PeerMediaStream peerMediaStream in peerMediaStreams) {
         String? trackId = peerMediaStream.videoTrack?.sid;
@@ -507,7 +507,7 @@ class LiveKitConferenceClient {
   }
 
   /// 退出发布并且关闭本地的所有的轨道或者流
-  closeAll({bool notify = true}) async {
+  closeAllLocal({bool notify = true}) async {
     if (joined) {
       await roomClient.unpublishAll(notify: notify, stopOnUnpublish: true);
     }
@@ -874,7 +874,7 @@ class LiveKitConferenceClientPool with ChangeNotifier {
     LiveKitConferenceClient? conferenceClient =
         _conferenceClients[conferenceId];
     if (conferenceClient != null) {
-      await conferenceClient.close(peerMediaStreams);
+      await conferenceClient.closeLocal(peerMediaStreams);
     }
   }
 
@@ -885,7 +885,7 @@ class LiveKitConferenceClientPool with ChangeNotifier {
       LiveKitConferenceClient? conferenceClient =
           _conferenceClients[conferenceId];
       if (conferenceClient != null) {
-        await conferenceClient.closeAll();
+        await conferenceClient.closeAllLocal();
         notifyListeners();
       }
     });
