@@ -14,6 +14,8 @@ class ColorPicker extends StatefulWidget {
 }
 
 class _ColorPickerState extends State<ColorPicker> {
+  Color primaryColor = myself.primaryColor;
+
   @override
   void initState() {
     super.initState();
@@ -28,9 +30,9 @@ class _ColorPickerState extends State<ColorPicker> {
   Future<bool> colorPickerDialog() async {
     ThemeData themeData = myself.themeData;
     return flex.ColorPicker(
-      color: myself.primaryColor,
+      color: primaryColor,
       onColorChanged: (Color color) {
-        myself.primaryColor = color;
+        primaryColor = color;
       },
       width: 32,
       height: 32,
@@ -86,8 +88,8 @@ class _ColorPickerState extends State<ColorPicker> {
       color: myself.primaryColor,
       onSelectFocus: false,
       onSelect: () async {
-        Color primaryColor = myself.primaryColor;
-        if (!(await colorPickerDialog())) {
+        var ok = await colorPickerDialog();
+        if (ok) {
           myself.primaryColor = primaryColor;
         }
       },

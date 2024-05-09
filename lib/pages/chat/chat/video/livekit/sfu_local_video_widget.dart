@@ -521,8 +521,9 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
               return DataActionCard(
                 actions: value,
                 height: height,
+                iconSize: 36,
                 mainAxisSpacing: 20,
-                crossAxisSpacing: 20,
+                crossAxisSpacing: 60,
                 onPressed: _onAction,
                 crossAxisCount: value.length,
                 labelColor: Colors.white,

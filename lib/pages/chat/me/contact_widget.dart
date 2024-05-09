@@ -16,8 +16,6 @@ class ContactWidget extends StatefulWidget with TileDataMixin {
   @override
   String get routeName => 'contact';
 
-
-
   @override
   IconData get iconData => Icons.contact_phone;
 
@@ -57,7 +55,7 @@ class _ContactWidgetState extends State<ContactWidget> {
       for (Contact contact in contacts) {
         final phones = contact.phones.map((e) => e.number).join(', ');
         final emails = contact.emails.map((e) => e.address).join(', ');
-        final name = contact.name.toString();
+        final name = contact.name.first + contact.name.last;
         TileData tile = TileData(title: name, subtitle: phones);
         _tileData.add(tile);
       }

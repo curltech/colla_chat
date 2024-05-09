@@ -1,36 +1,25 @@
 import 'dart:typed_data';
 
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
-import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/qrcode_util.dart';
-import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
-import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
 import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:path/path.dart' as p;
 
-class QrcodeWidget extends StatefulWidget with TileDataMixin {
-  QrcodeWidget({super.key});
+class QrcodeWidget extends StatefulWidget {
+  final String content;
+  final double? width;
+  final double? height;
 
-  @override
-  bool get withLeading => true;
-
-  @override
-  String get routeName => 'qrcode';
-
-  @override
-  IconData get iconData => Icons.qr_code;
-
-  @override
-  String get title => 'Qrcode';
+  const QrcodeWidget(
+      {super.key, required this.content, this.width, this.height});
 
   @override
   State<StatefulWidget> createState() => _QrcodeWidgetState();
@@ -38,7 +27,6 @@ class QrcodeWidget extends StatefulWidget with TileDataMixin {
 
 class _QrcodeWidgetState extends State<QrcodeWidget> {
   GlobalKey? globalKey;
-  String? content;
   Widget? qrImage;
   ScreenshotController screenshotController = ScreenshotController();
   final List<ActionData> actionData = [];
@@ -91,7 +79,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
         break;
       case 'Reset qrcode':
         setState(() {
-          qrImage = QrcodeUtil.create(content!);
+          qrImage = QrcodeUtil.create(widget.content);
         });
         break;
       default:
@@ -125,77 +113,41 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var peerId = myself.peerId ?? '';
-    var name = myself.myselfPeer.name ?? '';
-    content = JsonUtil.toJsonString({
-      'peerId': myself.myselfPeer.peerId,
-      'name': myself.myselfPeer.name,
-      'clientId': myself.myselfPeer.clientId,
-      'mobile': myself.myselfPeer.mobile,
-      'email': myself.myselfPeer.email,
-      'peerPublicKey': myself.myselfPeer.peerPublicKey,
-      'publicKey': myself.myselfPeer.publicKey,
-    });
-    qrImage = QrcodeUtil.create(content!);
+    qrImage = QrcodeUtil.create(widget.content);
     globalKey = GlobalKey();
-    var children = <Widget>[
-      ListTile(
-          leading: myself.avatarImage,
-          title: CommonAutoSizeText(name),
-          subtitle: CommonAutoSizeText(peerId)),
-      const SizedBox(
-        height: 40.0,
-      ),
-      Screenshot(
-          controller: screenshotController,
-          child: Center(
-              child: Container(
-            key: globalKey,
-            alignment: Alignment.center,
-            width: 320,
-            color: Colors.white,
-            padding: const EdgeInsets.all(5.0),
-            child: qrImage,
-          ))),
-      const Spacer(),
-      CommonAutoSizeText(
-        AppLocalizations.t('Scan qrcode, add linkman'),
-        style: const TextStyle(color: Colors.white),
-      ),
-      const SizedBox(height: 30),
-    ];
-    List<Widget>? rightWidgets = [
-      IconButton(
-          onPressed: () async {
-            await DialogUtil.show(
-              context: context,
-              builder: (BuildContext context) {
-                return Dialog(
-                    elevation: 0.0,
-                    insetPadding: EdgeInsets.zero,
-                    child: DataActionCard(
-                        onPressed: (int index, String label, {String? value}) {
-                          Navigator.pop(context);
-                          _onPopAction(context, index, label, value: value);
-                        },
-                        crossAxisCount: 2,
-                        actions: actionData,
-                        height: 140,
-                        width: 220,
-                        iconSize: 20));
-              },
-            );
-          },
-          icon: const Icon(
-            Icons.more_horiz,
-            color: Colors.white,
-          ))
-    ];
-    return AppBarView(
-      title: widget.title,
-      withLeading: widget.withLeading,
-      rightWidgets: rightWidgets,
-      child: Column(children: children),
-    );
+    double width = widget.width ?? appDataProvider.secondaryBodyWidth;
+    var qrcodeWidget = Screenshot(
+        controller: screenshotController,
+        child: Center(
+            child: Container(
+          key: globalKey,
+          alignment: Alignment.center,
+          width: width,
+          color: Colors.white,
+          padding: const EdgeInsets.all(5.0),
+          child: qrImage,
+        )));
+    return InkWell(
+        child: qrcodeWidget,
+        onLongPress: () async {
+          await DialogUtil.show(
+            context: context,
+            builder: (BuildContext context) {
+              return Dialog(
+                  elevation: 0.0,
+                  insetPadding: EdgeInsets.zero,
+                  child: DataActionCard(
+                      onPressed: (int index, String label, {String? value}) {
+                        Navigator.pop(context);
+                        _onPopAction(context, index, label, value: value);
+                      },
+                      crossAxisCount: 2,
+                      actions: actionData,
+                      height: 140,
+                      width: appDataProvider.secondaryBodyWidth,
+                      iconSize: 20));
+            },
+          );
+        });
   }
 }

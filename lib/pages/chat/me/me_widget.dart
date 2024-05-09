@@ -108,10 +108,11 @@ class _MeWidgetState extends State<MeWidget> {
         }
       }
     }
-    mixins.add(widget.platformMapLauncherWidget);
+
     mixins.add(widget.platformInfoWidget);
     if (developerSwitch.value) {
       mixins.addAll([
+        widget.platformMapLauncherWidget,
         widget.webrtcWidget,
         widget.webViewWidget,
         widget.mediaWidget,

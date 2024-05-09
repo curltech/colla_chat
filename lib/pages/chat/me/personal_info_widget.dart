@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/me/qrcode_widget.dart';
+import 'package:colla_chat/pages/chat/me/myself_qrcode_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/routers/routes.dart';
@@ -44,7 +44,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
     super.initState();
     var indexWidgetProvider =
         Provider.of<IndexWidgetProvider>(context, listen: false);
-    final QrcodeWidget qrcodeWidget = QrcodeWidget();
+    final MyselfQrcodeWidget qrcodeWidget = MyselfQrcodeWidget();
     indexWidgetProvider.define(qrcodeWidget);
   }
 
@@ -117,8 +117,8 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
         suffix: myself.myselfPeer.startDate,
       ),
       TileData(
-        title: 'Qrcode',
-        routeName: 'qrcode',
+        title: 'Myself Qrcode',
+        routeName: 'myself_qrcode',
       ),
     ];
     var personalInfo = AppBarView(
