@@ -693,19 +693,26 @@ class _ChatListWidgetState extends State<ChatListWidget>
     rightWidgets.add(const SizedBox(
       width: 10.0,
     ));
-    String tooltip = AppLocalizations.t('Websocket status');
+    String messageNum = '0';
+    String address = AppLocalizations.t('Websocket status');
+
     Websocket? websocket = websocketPool.getDefault();
     if (websocket != null) {
-      tooltip = websocket.address;
+      address = websocket.address;
+      messageNum = '${websocket.messages.length}';
     }
     var wssWidget = ValueListenableBuilder(
         valueListenable: _socketStatus,
         builder: (context, value, child) {
           return IconButton(
-              tooltip: tooltip,
+              tooltip: messageNum,
               onPressed: () async {
-                await _reconnect();
-                myselfPeerService.connect();
+                bool? confirm = await DialogUtil.confirm(context,
+                    content:
+                        'Do you want to reconnect $address, status:$value');
+                if (confirm == true) {
+                  await _reconnect();
+                }
               },
               icon: _socketStatus.value == SocketStatus.connected
                   ? const Icon(
