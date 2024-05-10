@@ -20,6 +20,8 @@ class AppBarWidget {
     BuildContext context, {
     Color? backgroundColor,
     Color? foregroundColor,
+    double? toolbarHeight,
+    double? elevation,
     bool withLeading = false, //是否有缺省的回退按钮
     Function? leadingCallBack, //回退按钮的回调
     Widget? title = const CommonAutoSizeText(''),
@@ -59,7 +61,8 @@ class AppBarWidget {
       leading: leading,
       actions: actions,
       automaticallyImplyLeading: false,
-      elevation: 0,
+      toolbarHeight: toolbarHeight,
+      elevation: elevation,
       backgroundColor: backgroundColor,
       foregroundColor: foregroundColor,
       bottom: bottom,
