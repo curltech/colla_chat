@@ -333,7 +333,7 @@ class PeerMediaStream {
       await Hardware.instance.setSpeakerphoneOn(enableSpeaker);
     } else {
       await Hardware.instance.setPreferSpeakerOutput(false);
-      MediaStreamUtil.setSpeakerphoneOn(!enableSpeaker);
+      MediaStreamUtil.setSpeakerphoneOn(enableSpeaker);
     }
   }
 

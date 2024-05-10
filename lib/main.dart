@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/plugin/notification/firebase_messaging_service.dart';
 import 'package:colla_chat/plugin/notification/local_notifications_service.dart';
 import 'package:colla_chat/plugin/overlay/android_overlay_window_util.dart';
@@ -172,6 +173,11 @@ class _CollaChatAppState extends State<CollaChatApp> {
   @override
   void initState() {
     super.initState();
+    myself.addListener(_update);
+  }
+
+  _update() {
+    setState(() {});
   }
 
   Widget _buildMaterialApp(BuildContext context, Widget? child) {
@@ -255,6 +261,7 @@ class _CollaChatAppState extends State<CollaChatApp> {
 
   @override
   void dispose() {
+    myself.removeListener(_update);
     super.dispose();
   }
 }

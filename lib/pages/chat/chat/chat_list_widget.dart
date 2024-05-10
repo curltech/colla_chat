@@ -683,10 +683,10 @@ class _ChatListWidgetState extends State<ChatListWidget>
                       )
                     : const Icon(
                         Icons.wifi,
-                        //color: Colors.green,
+                        color: Colors.white,
                       ),
                 CommonAutoSizeText(connectivityResult.name,
-                    style: const TextStyle(fontSize: 12)),
+                    style: const TextStyle(fontSize: 12, color: Colors.white)),
               ]));
         });
     rightWidgets.add(connectivityWidget);

@@ -50,8 +50,8 @@ class AppBarWidget {
         foregroundColor: foregroundColor,
         withLeading: withLeading,
         leadingCallBack: leadingCallBack);
-    // backgroundColor ??= myself.primary;
-    // foregroundColor ??= Colors.white;
+    backgroundColor ??= myself.primary;
+    foregroundColor ??= Colors.white;
     PreferredSizeWidget appBar = AppBar(
       title: title,
       centerTitle: centerTitle,

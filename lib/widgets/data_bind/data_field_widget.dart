@@ -9,6 +9,7 @@ import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
+import 'package:pinput/pinput.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 
 ///指定路由样式，不指定则系统判断，系统判断的方法是如果是移动则走全局路由，否则走工作区路由
@@ -28,7 +29,8 @@ enum InputType {
   datetime,
   datetimerange,
   calendar,
-  custom
+  custom,
+  pinput
 }
 
 enum DataType {
@@ -495,6 +497,34 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
       onFieldSubmitted: dataFieldDef.onFieldSubmitted,
     );
     return textFormField;
+  }
+
+  Widget _buildPinputField(BuildContext context) {
+    TextEditingController? controller =
+        widget.controller.controller as TextEditingController?;
+    controller ??= TextEditingController();
+    final value = widget.controller.value;
+    final valueStr = value == null ? '' : value.toString();
+    controller.value = TextEditingValue(
+        text: valueStr,
+        selection: TextSelection.fromPosition(TextPosition(
+            offset: valueStr.length, affinity: TextAffinity.downstream)));
+    widget.controller.controller = controller;
+
+    var dataFieldDef = widget.controller.dataField;
+    String label = AppLocalizations.t(dataFieldDef.label);
+    var pinputField = Pinput(
+      controller: controller,
+      focusNode: widget.focusNode,
+      keyboardType: dataFieldDef.textInputType!,
+      readOnly: dataFieldDef.readOnly,
+      inputFormatters: dataFieldDef.inputFormatters!,
+      validator: dataFieldDef.validator,
+      onChanged: dataFieldDef.onChanged,
+      onSubmitted: dataFieldDef.onFieldSubmitted,
+    );
+
+    return pinputField;
   }
 
   ///多个字符串选择一个，对应的字段是字符串
@@ -1094,6 +1124,9 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
         break;
       case InputType.password:
         dataFieldWidget = _buildPasswordField(context);
+        break;
+      case InputType.pinput:
+        dataFieldWidget = _buildPinputField(context);
         break;
       case InputType.togglebuttons:
         dataFieldWidget = _buildToggleButtonsField(context);

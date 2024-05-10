@@ -198,6 +198,8 @@ dependencies:
   auto_size_text: ^3.0.0
   auto_size_text_field: ^2.2.1
   responsive_sizer: ^3.1.1
+  introduction_screen: ^3.1.14
+  pinput: ^4.0.0
 
   #界面效果动画
   flutter_adaptive_scaffold: ^0.1.5
@@ -403,7 +405,7 @@ dependency_overrides:
   #    desktop_webview_window: ^0.2.0
   flutter_widget_from_html: ^0.14.11
   sprintf: ^7.0.0
-  flex_color_picker: ^3.3.0
+  flex_color_picker: ^3.4.1
   permission_handler: ^11.2.0
   file_picker: ^6.0.0
   #  file_picker_pro: ^1.4.0 #open_filex和open_file冲突

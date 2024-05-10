@@ -132,6 +132,7 @@ class PrimaryNavigation {
           selectedIcon: Icon(
             view.iconData,
             size: AppIconSize.mdSize,
+            color: myself.primary,
           ),
           begin: -index,
           controller: _slideControllers[index.toInt()],
@@ -161,7 +162,7 @@ class PrimaryNavigation {
               view.iconData is IconData
                   ? Icon(
                       view.iconData,
-                      color: myself.secondary,
+                      color: myself.primary,
                     )
                   : view.iconData,
               const SizedBox(
