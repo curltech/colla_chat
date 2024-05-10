@@ -165,7 +165,9 @@ class Myself with ChangeNotifier {
     final ColorScheme colorScheme = SeedColorScheme.fromSeeds(
       brightness: Brightness.dark,
       primaryKey: primaryColor,
+      primary: primaryColor,
       secondaryKey: secondaryColor,
+      secondary: secondaryColor,
       neutralKey: primaryColor,
       tertiaryKey: primaryColor,
       tones: FlexTones.vivid(Brightness.dark),
