@@ -86,7 +86,7 @@ dependencies:
   #网络
   dio: ^5.4.3+1
   dio_http2_adapter: ^2.1.0
-  web_socket_channel: ^2.4.3
+  web_socket_client: ^0.1.2
   #cached_network_image: ^3.0.0
   #flutter_sms: ^2.3.3 #android compile failure
   #sms_advanced: ^1.0.2 #android版本有问题
@@ -377,6 +377,7 @@ dependency_overrides:
   js: ^0.7.1
   web: ^0.4.0
   logger: ^2.0.2+1
+  web_socket_channel: ^3.0.0
   flutter_math_fork: ^0.7.1
   sensors_plus: ^5.0.0
   photo_view: ^0.15.0
@@ -478,8 +479,8 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^3.0.1
   analyzer: ^6.0.0
-  build_runner: ^2.1.10
   flutter_launcher_icons: ^0.13.1
+  build_runner: ^2.4.9
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

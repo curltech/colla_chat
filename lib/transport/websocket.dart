@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as SinkStatus;
+import 'package:web_socket_client/web_socket_client.dart' as web_socket_client;
 
 import './condition_import/unsupport.dart'
     if (dart.library.html) './condition_import/web.dart'
@@ -43,6 +44,7 @@ class Websocket extends IWebClient {
   String? peerId;
   late String address;
   WebSocketChannel? channel;
+  web_socket_client.WebSocket? _client;
   StreamSubscription<dynamic>? streamSubscription;
   String? sessionId;
   SocketStatus _status = SocketStatus.closed;
@@ -69,10 +71,34 @@ class Websocket extends IWebClient {
   }
 
   Future<bool> connect() async {
+    logger.i('connect websocket wss address:$address');
     await close();
     try {
       channel = websocket_connect.websocketConnect(address,
           headers: headers, pingInterval: pingInterval);
+
+      // const backoff = web_socket_client.ConstantBackoff(Duration(seconds: 1));
+      // _client =
+      //     web_socket_client.WebSocket(Uri.parse(address), backoff: backoff);
+      // _client!.connection.listen(
+      //     (web_socket_client.ConnectionState connectionState) {
+      //   if (connectionState is web_socket_client.Connected) {
+      //     status = SocketStatus.connected;
+      //   } else if (connectionState is web_socket_client.Connecting) {
+      //     status = SocketStatus.connecting;
+      //   } else if (connectionState is web_socket_client.Reconnected) {
+      //     status = SocketStatus.connected;
+      //   } else if (connectionState is web_socket_client.Reconnecting) {
+      //     status = SocketStatus.reconnecting;
+      //   } else if (connectionState is web_socket_client.Disconnected) {
+      //     status = SocketStatus.closed;
+      //   } else if (connectionState is web_socket_client.Disconnecting) {
+      //     status = SocketStatus.failed;
+      //   }
+      // }, onError: onError, onDone: onDone, cancelOnError: true);
+      // _client!.messages.listen((message) {
+      //   onData(message);
+      // }, onError: onError, onDone: onDone, cancelOnError: true);
     } catch (e) {
       logger.e('wss address:$address connect failure:$e');
     }
@@ -91,7 +117,7 @@ class Websocket extends IWebClient {
       }
       streamSubscription = channel!.stream.listen((dynamic data) {
         onData(data);
-      }, onError: onError, onDone: onDone, cancelOnError: false);
+      }, onError: onError, onDone: onDone, cancelOnError: true);
 
       return true;
     } on SocketException catch (e) {
