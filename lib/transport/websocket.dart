@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/status.dart' as SinkStatus;
-import 'package:web_socket_client/web_socket_client.dart' as web_socket_client;
+// import 'package:web_socket_client/web_socket_client.dart' as web_socket_client;
 
 import './condition_import/unsupport.dart'
     if (dart.library.html) './condition_import/web.dart'
@@ -44,7 +44,8 @@ class Websocket extends IWebClient {
   String? peerId;
   late String address;
   WebSocketChannel? channel;
-  web_socket_client.WebSocket? _client;
+
+  // web_socket_client.WebSocket? _client;
   StreamSubscription<dynamic>? streamSubscription;
   String? sessionId;
   SocketStatus _status = SocketStatus.closed;
@@ -119,6 +120,10 @@ class Websocket extends IWebClient {
         onData(data);
       }, onError: onError, onDone: onDone, cancelOnError: true);
 
+      if (postConnected != null) {
+        postConnected!();
+      }
+
       return true;
     } on SocketException catch (e) {
       logger.e('wss address:$address websocket socketException:$e');
@@ -133,9 +138,6 @@ class Websocket extends IWebClient {
     if (status != SocketStatus.connected) {
       logger.i('wss address:$address websocket from $status to connected');
       status = SocketStatus.connected;
-      if (postConnected != null) {
-        postConnected!();
-      }
     }
     var msg = String.fromCharCodes(data);
     if (msg.startsWith('heartbeat:')) {
@@ -261,7 +263,7 @@ class Websocket extends IWebClient {
       if (channel != null) {
         try {
           var sink = channel!.sink;
-          sink.close(SinkStatus.goingAway);
+          sink.close();
         } catch (e) {
           logger.e('wss address:$address websocket channel!.sink.close error');
         }
