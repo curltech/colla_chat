@@ -671,6 +671,7 @@
   "Join conference failure:": "加入视频会议失败",
   "PartyType is not group, cannot create sfu conference": "不是群，不能创建视频会议",
   "Do you open video conference?": "你向打开视频会议吗？",
+  "Do you want to reconnect": "你确定想重连",
   "build sfu conference failure": "创建视频会议失败",
   "send sfu conference message failure": "发送视频会议消息失败",
   "Build sfu conference:": "创建视频会议",
@@ -702,5 +703,6 @@
   "F": "好友",
   "B": "黑名单",
   "C": "订阅",
-  "anonymous": "匿名"
+  "anonymous": "匿名",
+  "status": "状态"
 }

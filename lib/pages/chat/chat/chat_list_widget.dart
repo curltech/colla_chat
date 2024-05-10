@@ -709,7 +709,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
               onPressed: () async {
                 bool? confirm = await DialogUtil.confirm(context,
                     content:
-                        'Do you want to reconnect $address, status:$value');
+                        '${AppLocalizations.t('Do you want to reconnect')} $address, ${AppLocalizations.t('status')}:$value');
                 if (confirm == true) {
                   await _reconnect();
                 }
