@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:classic_logger/classic_logger.dart' as classic_logger;
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
@@ -202,6 +203,8 @@ class _LoggerConsoleWidgetState extends State<LoggerConsoleWidget> {
   Widget build(BuildContext context) {
     return InkWell(
         onDoubleTap: () {
+          final int length = loggerController.logs.length;
+          DialogUtil.info(context, content: 'logs length:$length');
           setState(() {
             loggerController.logs.clear();
           });
