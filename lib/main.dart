@@ -81,8 +81,8 @@ void main(List<String> args) async {
       await websocketPool.connect();
     } else if (msg == AppLifecycleState.paused.toString() ||
         msg == AppLifecycleState.hidden.toString()) {
-      localNotificationsService.showNotification(
-          'CollaChat', AppLocalizations.t('CollaChat App inactive'));
+      // localNotificationsService.showNotification(
+      //     'CollaChat', AppLocalizations.t('CollaChat App inactive'));
       // if (platformParams.android) {
       //   if (!await AndroidOverlayWindowUtil.isActive()) {
       //     bool allowed = await AndroidOverlayWindowUtil.isPermissionGranted();

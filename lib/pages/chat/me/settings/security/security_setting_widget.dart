@@ -297,9 +297,6 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
         value: appDataProvider.autoLogin,
         onChanged: (bool? autoLogin) async {
           autoLogin = autoLogin ?? false;
-          if (myself.autoLogin == autoLogin) {
-            return;
-          }
           myself.autoLogin = autoLogin;
           if (autoLogin) {
             var loginName = myself.myselfPeer.loginName;

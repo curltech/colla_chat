@@ -30,7 +30,7 @@ class CommonMessage extends StatelessWidget {
     return Card(
         elevation: 0,
         shape: const ContinuousRectangleBorder(),
-        margin: const EdgeInsets.all(5.0),
+        margin: const EdgeInsets.all(3.0),
         child: actionWidget);
   }
 }

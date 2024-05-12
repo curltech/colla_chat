@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:classic_logger/classic_logger.dart' as classic_logger;
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:path/path.dart' as p;
@@ -210,12 +211,13 @@ class _LoggerConsoleWidgetState extends State<LoggerConsoleWidget> {
             margin: EdgeInsets.zero,
             shape: const ContinuousRectangleBorder(),
             child: ListView.builder(
-              reverse: true,
+              reverse: false,
               shrinkWrap: true,
               itemCount: loggerController.logs.length,
               itemBuilder: (context, index) {
                 final log = loggerController.logs.elementAt(index);
-                return Text(log);
+                final int length = log.length;
+                return CommonAutoSizeText(log.substring(11, length - 4));
               },
             )));
   }
