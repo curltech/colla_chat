@@ -700,6 +700,10 @@ class _ChatListWidgetState extends State<ChatListWidget>
     if (websocket != null) {
       address = websocket.address;
       messageNum = '${websocket.messages.length}';
+      if (websocket.status != SocketStatus.connected &&
+          websocket.status != SocketStatus.connecting) {
+        _reconnect();
+      }
     }
     var wssWidget = ValueListenableBuilder(
         valueListenable: _socketStatus,
