@@ -117,7 +117,7 @@ class _AnonymousConferenceEditWidgetState
           }
           return FormInputWidget(
             spacing: 5.0,
-            height: appDataProvider.portraitSize.height * 0.6,
+            height: appDataProvider.portraitSize.height * 0.7,
             controller: controller,
             formButtons: [
               FormButton(
