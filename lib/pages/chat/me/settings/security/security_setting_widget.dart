@@ -34,21 +34,10 @@ import 'package:flutter/material.dart';
 class SecuritySettingWidget extends StatefulWidget with TileDataMixin {
   final PasswordWidget passwordWidget = const PasswordWidget();
   final LoggerConsoleView loggerConsoleView = const LoggerConsoleView();
-  late final List<TileData> securitySettingTileData;
 
   SecuritySettingWidget({super.key}) {
     indexWidgetProvider.define(passwordWidget);
     indexWidgetProvider.define(loggerConsoleView);
-    List<TileDataMixin> mixins = [
-      passwordWidget,
-    ];
-    if (myself.peerProfile.developerSwitch) {
-      mixins.add(loggerConsoleView);
-    }
-    securitySettingTileData = TileData.from(mixins);
-    for (var tile in securitySettingTileData) {
-      tile.dense = true;
-    }
   }
 
   @override
@@ -68,10 +57,22 @@ class SecuritySettingWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
+  late final List<TileData> securitySettingTileData;
+
   @override
   void initState() {
     super.initState();
     appDataProvider.addListener(_update);
+    List<TileDataMixin> mixins = [
+      widget.passwordWidget,
+    ];
+    if (myself.peerProfile.developerSwitch) {
+      mixins.add(widget.loggerConsoleView);
+    }
+    securitySettingTileData = TileData.from(mixins);
+    for (var tile in securitySettingTileData) {
+      tile.dense = true;
+    }
   }
 
   _update() {
@@ -286,7 +287,7 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
 
   Widget _buildSettingWidget(BuildContext context) {
     Widget securitySettingTile =
-        DataListView(tileData: widget.securitySettingTileData);
+        DataListView(tileData: securitySettingTileData);
     var autoLoginTile = CheckboxListTile(
         title: Row(children: [
           Icon(

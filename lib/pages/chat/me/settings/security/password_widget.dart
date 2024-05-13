@@ -60,7 +60,7 @@ class _PasswordWidgetState extends State<PasswordWidget> {
         Container(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
             child: FormInputWidget(
-              height: 200,
+              height: 250,
               onOk: _onOk,
               okLabel: 'Ok',
               controller: controller,
