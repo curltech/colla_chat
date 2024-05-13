@@ -144,6 +144,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
   final ValueNotifier<List<ConnectivityResult>> _connectivityResult =
       ValueNotifier<List<ConnectivityResult>>(
           connectivityController.connectivityResult);
+  StreamSubscription<SocketStatus>? _socketStatusStreamSubscription;
   final ValueNotifier<SocketStatus> _socketStatus =
       ValueNotifier<SocketStatus>(SocketStatus.none);
 
@@ -170,19 +171,20 @@ class _ChatListWidgetState extends State<ChatListWidget>
     // conferenceChatSummaryController.refresh();
     connectivityController.addListener(_updateConnectivity);
     _initStatusStreamController();
-    if (_socketStatus.value != SocketStatus.connected &&
-        _socketStatus.value != SocketStatus.connecting) {
-      _reconnect();
-    }
     localNotificationsService.isAndroidPermissionGranted();
     localNotificationsService.requestPermissions();
     _initDelete();
   }
 
-  _initStatusStreamController() {
-    Websocket? websocket = websocketPool.defaultWebsocket;
+  _initStatusStreamController() async {
+    Websocket? websocket = await websocketPool.connect();
     if (websocket != null) {
-      websocket.statusStreamController.stream.listen((event) {
+      if (_socketStatusStreamSubscription != null) {
+        _socketStatusStreamSubscription!.cancel();
+        _socketStatusStreamSubscription = null;
+      }
+      _socketStatusStreamSubscription =
+          websocket.statusStreamController.stream.listen((event) {
         _updateWebsocketStatus(websocket.address, event);
       });
       _socketStatus.value = websocket.status;
@@ -201,12 +203,10 @@ class _ChatListWidgetState extends State<ChatListWidget>
     if (ConnectivityUtil.getMainResult(_connectivityResult.value) !=
         ConnectivityResult.none) {
       Websocket? websocket = websocketPool.getDefault();
-      if (websocket == null) {
-        await websocketPool.connect();
-      } else {
+      if (websocket != null) {
         await websocket.connect();
       }
-      _initStatusStreamController();
+      await _initStatusStreamController();
     }
   }
 
@@ -692,23 +692,17 @@ class _ChatListWidgetState extends State<ChatListWidget>
     rightWidgets.add(const SizedBox(
       width: 10.0,
     ));
-    String messageNum = '0';
-    String address = AppLocalizations.t('Websocket status');
 
-    Websocket? websocket = websocketPool.getDefault();
-    if (websocket != null) {
-      address = websocket.address;
-      messageNum = '${websocket.messages.length}';
-      if (websocket.status != SocketStatus.connected &&
-          websocket.status != SocketStatus.connecting) {
-        _reconnect();
-      }
-    }
     var wssWidget = ValueListenableBuilder(
         valueListenable: _socketStatus,
         builder: (context, value, child) {
+          String address = AppLocalizations.t('Websocket status');
+          Websocket? websocket = websocketPool.getDefault();
+          if (websocket != null) {
+            address = websocket.address;
+          }
           return IconButton(
-              tooltip: messageNum,
+              tooltip: address,
               onPressed: () async {
                 bool? confirm = await DialogUtil.confirm(context,
                     content:
@@ -746,6 +740,10 @@ class _ChatListWidgetState extends State<ChatListWidget>
     groupChatSummaryController.removeListener(_updateGroupChatSummary);
     conferenceChatSummaryController
         .removeListener(_updateConferenceChatSummary);
+    if (_socketStatusStreamSubscription != null) {
+      _socketStatusStreamSubscription!.cancel();
+      _socketStatusStreamSubscription = null;
+    }
     super.dispose();
   }
 }

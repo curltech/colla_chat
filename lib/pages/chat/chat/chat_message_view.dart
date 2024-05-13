@@ -207,10 +207,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
   ///在初始化，窗口恢复，背景恢复都会调用，因此需要能够重复调用
   ///如果ChatGPT，则设置
   _createPeerConnection() async {
-    Websocket? websocket = websocketPool.getDefault();
-    if (websocket == null) {
-      await websocketPool.connect();
-    }
+    await websocketPool.connect();
     var chatSummary = _chatSummary.value;
     if (chatSummary == null) {
       logger.e('chatSummary is null');
