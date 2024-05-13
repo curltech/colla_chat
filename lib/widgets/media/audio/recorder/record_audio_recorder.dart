@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/media/abstract_audio_recorder_controller.dart';
 import 'package:record/record.dart';
@@ -37,7 +37,7 @@ class RecordAudioRecorderController extends AbstractAudioRecorderController {
         _amplitude = amp;
       });
     } catch (e) {
-      logger.e(e);
+      logger.e(e.toString());
     }
     //设置开始的计时提示
     duration = 0;

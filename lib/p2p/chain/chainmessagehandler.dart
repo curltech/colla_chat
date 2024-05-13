@@ -7,7 +7,7 @@ import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';

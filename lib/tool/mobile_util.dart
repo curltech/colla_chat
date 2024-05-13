@@ -1,4 +1,4 @@
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:mobile_number/mobile_number.dart';
 import 'package:phone_number/phone_number.dart';
 

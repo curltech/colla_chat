@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
@@ -41,11 +41,11 @@ class DioHttpClient implements IWebClient {
     _client.interceptors
         .add(InterceptorsWrapper(onResponse: (response, handler) {
       if (response.statusCode != 200) {
-        logger.e(response.statusCode);
+        logger.e(response.statusCode.toString());
       }
       return handler.next(response);
     }, onError: (DioException e, handler) {
-      logger.e(e.message);
+      logger.e(e.message.toString());
       var statusCode = e.response?.statusCode;
       if (statusCode == 401) {
       } else if (statusCode == 500) {}

@@ -1,6 +1,6 @@
 import 'dart:isolate';
 import 'package:colla_chat/constant/base.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/plugin/overlay/android_overlay_window_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';

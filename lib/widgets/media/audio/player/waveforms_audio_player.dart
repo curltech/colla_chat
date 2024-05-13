@@ -1,5 +1,5 @@
 import 'package:audio_waveforms/audio_waveforms.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/audio/abstract_audio_player_controller.dart';
 import 'package:fluent_ui/fluent_ui.dart';

@@ -237,7 +237,7 @@ dependencies:
   provider: ^6.0.1 #状态管理
   easy_refresh: ^3.3.2+1
   percent_indicator: ^4.2.3
-  share_plus: ^8.0.2
+  share_plus: ^9.0.0
   flutter_sharing_intent: 1.1.0
 #    git:
 #      url: https://github.com/bhagat-techind/flutter_sharing_intent
@@ -247,8 +247,8 @@ dependencies:
   date_format: ^2.0.6
   omni_datetime_picker: ^1.0.1
   toggle_switch: ^2.0.1
-  classic_logger: any
-  #logging: ^1.0.2
+  talker: ^4.2.0
+  talker_flutter: ^4.2.0
   cross_file: ^0.3.4+1
   mobile_scanner: ^5.0.0
   qr_flutter:
@@ -376,7 +376,7 @@ dependency_overrides:
   pointer_interceptor: ^0.10.1
   js: ^0.7.1
   web: ^0.4.0
-  logger: ^2.0.2+1
+  logger: ^2.3.0
   web_socket_channel: ^3.0.0
   flutter_math_fork: ^0.7.1
   sensors_plus: ^5.0.0

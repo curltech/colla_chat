@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/service/servicelocator.dart';
@@ -24,7 +24,7 @@ class SmsClient extends IWebClient {
 
   SmsClient() {
     listener = (SendStatus status) {
-      logger.i(status);
+      logger.i(status.toString());
     };
     telephony.listenIncomingSms(
         onNewMessage: (SmsMessage message) {
@@ -46,7 +46,7 @@ class SmsClient extends IWebClient {
           message: message,
           isMultipart: true,
           statusListener: (SendStatus status) {
-            logger.i(status);
+            logger.i(status.toString());
           });
 
       return Future.value(true);

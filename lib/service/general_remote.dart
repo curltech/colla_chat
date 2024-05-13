@@ -1,7 +1,7 @@
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/dht/peerendpoint.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/httpclient.dart';

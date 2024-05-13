@@ -4,14 +4,13 @@ import 'dart:io';
 import 'package:colla_chat/entity/dht/peerendpoint.dart';
 import 'package:colla_chat/p2p/chain/chainmessagehandler.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-import 'package:web_socket_channel/status.dart' as SinkStatus;
 // import 'package:web_socket_client/web_socket_client.dart' as web_socket_client;
 
 import './condition_import/unsupport.dart'

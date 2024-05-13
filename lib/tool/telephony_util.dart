@@ -1,4 +1,4 @@
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:telephony/telephony.dart';
 
 class TelephonyUtil {
@@ -10,7 +10,7 @@ class TelephonyUtil {
         message: data,
         isMultipart: true,
         statusListener: (SendStatus status) {
-          logger.i(status);
+          logger.i(status.toString());
         });
     return result;
   }

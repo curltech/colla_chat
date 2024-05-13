@@ -1,5 +1,5 @@
 import 'package:audio_session/audio_session.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 
 ///代表本应用的全局音频会话，用于本应用有声音的时候通知其他应用，或者其他应用有声音的时候本应用的处理
 ///类构建的时候进行初始化

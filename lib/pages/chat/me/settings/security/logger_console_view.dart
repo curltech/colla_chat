@@ -1,4 +1,4 @@
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +34,7 @@ class _LoggerConsoleViewState extends State<LoggerConsoleView> {
     return AppBarView(
         withLeading: true,
         title: widget.title,
-        child: const LoggerConsoleWidget());
+        child: const TalkerLoggerScreenWidget());
   }
 
   @override

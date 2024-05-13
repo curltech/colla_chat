@@ -9,7 +9,7 @@ import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.da
 import 'package:colla_chat/pages/chat/channel/publish_channel_list_widget.dart';
 import 'package:colla_chat/pages/chat/channel/published_channel_message_preview.dart';
 import 'package:colla_chat/pages/chat/channel/subscribe_channel_message_preview.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/channel_chat_message.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';

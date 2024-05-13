@@ -1,6 +1,6 @@
 import 'package:colla_chat/firebase_options.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';

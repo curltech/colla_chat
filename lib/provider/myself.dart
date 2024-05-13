@@ -3,15 +3,11 @@ import 'package:colla_chat/entity/dht/myselfpeer.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/dht/peerprofile.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/tool/locale_util.dart';
-import 'package:colla_chat/tool/string_util.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:path/path.dart' as p;
 
 /// 单例本节点对象，包含公私钥，本节点配置，密码和过往的节点信息

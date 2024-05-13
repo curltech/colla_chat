@@ -4,7 +4,7 @@ import 'dart:core';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/p2p/chain/chainmessagehandler.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
 
 enum PayloadType {

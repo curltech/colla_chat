@@ -5,7 +5,7 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/emailaddress.dart' as entity;
 import 'package:colla_chat/entity/chat/message_attachment.dart';
 import 'package:colla_chat/pages/chat/mail/address/email_service_provider.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:enough_mail/enough_mail.dart';
@@ -358,7 +358,7 @@ class EmailClient {
     if (mailClient != null) {
       final mailboxes = await mailClient.listMailboxesAsTree(
           createIntermediate: createIntermediate, order: order);
-      logger.i(mailboxes);
+      logger.i(mailboxes.toString());
       return mailboxes;
     }
     return null;
@@ -817,7 +817,7 @@ class EmailClient {
     //client.enable([ImapServerInfo.capabilityUtf8Accept]);
     if (client.serverInfo.supportsId) {
       final serverId = await client.id(clientId: EmailMessageUtil.clientId);
-      logger.i(serverId);
+      logger.i(serverId.toString());
     }
     try {
       if (emailAddress.imapServerHost != null) {

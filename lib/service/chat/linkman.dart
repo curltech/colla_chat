@@ -9,7 +9,7 @@ import 'package:colla_chat/entity/chat/peer_party.dart';
 import 'package:colla_chat/entity/dht/base.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/chat_summary.dart';

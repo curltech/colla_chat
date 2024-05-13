@@ -1,4 +1,4 @@
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -71,8 +71,8 @@ class _HtmlEditorWidgetState extends State<HtmlEditorWidget> {
       },
       mediaUploadInterceptor: (PlatformFile file, InsertFileType type) async {
         logger.i(file.name); //filename
-        logger.i(file.size); //size in bytes
-        logger.i(file.extension); //file extension (eg jpeg or mp4)
+        logger.i(file.size.toString()); //size in bytes
+        logger.i(file.extension.toString()); //file extension (eg jpeg or mp4)
         return true;
       },
     );

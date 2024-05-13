@@ -14,7 +14,7 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.da
 import 'package:colla_chat/pages/chat/linkman/group/group_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_info_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_webrtc_connection_widget.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/plugin/notification/local_notifications_service.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -24,7 +24,6 @@ import 'package:colla_chat/service/chat/chat_summary.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
-import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/connectivity_util.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';

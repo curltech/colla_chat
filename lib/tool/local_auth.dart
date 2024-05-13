@@ -1,4 +1,4 @@
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 

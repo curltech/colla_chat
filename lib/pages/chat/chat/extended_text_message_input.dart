@@ -5,7 +5,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/group_linkman_widget.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';

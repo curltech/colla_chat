@@ -5,7 +5,7 @@ import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/message_slice.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -1287,7 +1287,7 @@ class BasePeerConnection {
       await peerConnection.addTransceiver(track: track, kind: kind, init: init);
       //negotiate();
     } catch (err) {
-      logger.e(err);
+      logger.e(err.toString());
       await close();
     }
   }

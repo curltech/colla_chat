@@ -1,4 +1,4 @@
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:livekit_server_sdk/livekit_server_sdk.dart';
 import 'package:livekit_server_sdk/src/proto/livekit_models.pb.dart';
 

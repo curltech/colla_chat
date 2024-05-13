@@ -3,7 +3,7 @@ import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/tool/entity_util.dart';

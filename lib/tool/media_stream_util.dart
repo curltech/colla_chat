@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:uuid/uuid.dart';

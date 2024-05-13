@@ -1,5 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -62,7 +62,7 @@ class BackgroundPicker extends StatelessWidget {
     if (files != null) {
       for (final XFile file in files) {}
     } else {
-      logger.e(response.exception);
+      logger.e(response.exception.toString());
     }
   }
 }

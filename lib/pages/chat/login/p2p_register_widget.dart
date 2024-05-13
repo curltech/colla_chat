@@ -6,7 +6,7 @@ import 'package:colla_chat/entity/dht/myselfpeer.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/myselfpeer/myself_peer_controller.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';

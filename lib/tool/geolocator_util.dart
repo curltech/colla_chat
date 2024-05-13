@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:apple_maps_flutter/apple_maps_flutter.dart' as apple_maps;
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -184,7 +184,7 @@ class GeolocatorUtil {
     final num distanceInMeter = (6378 * latlong2.pi / 4).round();
     final p = distance.offset(x, distanceInMeter, 180);
     // LatLng(latitude:-45.219848, longitude:0.0)
-    logger.i(p.round());
+    logger.i(p.round().toString());
     // 45° 13' 11.45" S, 0° 0' 0.00" O
     logger.i(p.toSexagesimal());
 

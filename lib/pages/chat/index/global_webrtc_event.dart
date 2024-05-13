@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:colla_chat/entity/chat/linkman.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:synchronized/synchronized.dart';

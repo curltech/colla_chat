@@ -2,7 +2,7 @@ import 'dart:core';
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';

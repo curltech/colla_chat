@@ -1,6 +1,6 @@
 import 'dart:core';
 
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_render_view.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';

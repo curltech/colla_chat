@@ -41,8 +41,10 @@ class SecuritySettingWidget extends StatefulWidget with TileDataMixin {
     indexWidgetProvider.define(loggerConsoleView);
     List<TileDataMixin> mixins = [
       passwordWidget,
-      loggerConsoleView,
     ];
+    if (myself.peerProfile.developerSwitch) {
+      mixins.add(loggerConsoleView);
+    }
     securitySettingTileData = TileData.from(mixins);
     for (var tile in securitySettingTileData) {
       tile.dense = true;
@@ -86,8 +88,12 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
       TileData(title: 'Restore peer', prefix: Icons.restore_page),
       TileData(title: 'Backup attachment', prefix: Icons.copy),
       TileData(title: 'Restore attachment', prefix: Icons.paste),
-      TileData(title: 'Clean log', prefix: Icons.cleaning_services),
     ];
+    if (myself.peerProfile.developerSwitch) {
+      tiles.add(
+        TileData(title: 'Clean log', prefix: Icons.cleaning_services),
+      );
+    }
 
     return DataListView(tileData: tiles, onTap: _onTap);
   }

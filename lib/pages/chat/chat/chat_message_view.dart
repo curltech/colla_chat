@@ -18,7 +18,7 @@ import 'package:colla_chat/pages/chat/chat/video_chat_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/conference/conference_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/group/group_edit_widget.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';

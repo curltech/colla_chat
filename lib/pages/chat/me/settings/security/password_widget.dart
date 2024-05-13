@@ -1,5 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/dht/myself.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';

@@ -1,11 +1,11 @@
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'logger.dart';
 
 ///在操作系统层面的安全存储
 class LocalSecurityStorage {

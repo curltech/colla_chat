@@ -1,4 +1,4 @@
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/contact_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';

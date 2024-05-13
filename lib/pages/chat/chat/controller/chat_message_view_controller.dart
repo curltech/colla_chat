@@ -1,4 +1,4 @@
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';

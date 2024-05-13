@@ -13,7 +13,7 @@ import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/channel_chat_message.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';

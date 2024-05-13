@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_audio_recorder_controller.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
@@ -79,7 +79,7 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
       }
       await widget.audioRecorderController.start();
     } catch (e) {
-      logger.e(e);
+      logger.e(e.toString());
     }
   }
 

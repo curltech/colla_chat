@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/widgets/media/audio/audio_session.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_sound/flutter_sound.dart';

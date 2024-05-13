@@ -10,7 +10,7 @@ import 'package:colla_chat/pages/chat/chat/extended_text_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/message/message_widget.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/file_util.dart';

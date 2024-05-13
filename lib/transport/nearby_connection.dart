@@ -4,7 +4,7 @@
 // import 'package:colla_chat/entity/chat/chat_message.dart';
 // import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 // import 'package:colla_chat/platform.dart';
-// import 'package:colla_chat/plugin/logger.dart';
+// import 'package:colla_chat/plugin/talker_logger.dart';
 // import 'package:colla_chat/tool/json_util.dart';
 // import 'package:device_info_plus/device_info_plus.dart';
 // import 'package:flutter/material.dart';

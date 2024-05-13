@@ -12,7 +12,7 @@ import 'package:colla_chat/pages/chat/me/collection/collection_chat_message_cont
 import 'package:colla_chat/pages/chat/me/collection/collection_list_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/linux_camera_widget.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/plugin/macos_camera_widget.dart';
 import 'package:colla_chat/plugin/mobile_camera_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';

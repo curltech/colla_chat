@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 ///应用处于后台时，点击通知的响应函数

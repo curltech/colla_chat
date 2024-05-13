@@ -16,7 +16,7 @@ import 'package:colla_chat/p2p/chain/action/connect.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/background/android_backgroud_service.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/plugin/notification/firebase_messaging_service.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -157,7 +157,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
         }
         mobile = PhoneNumberUtil.format(phoneNumber, isoCode: isoCode);
       } catch (e) {
-        logger.e(e);
+        logger.e(e.toString());
       }
     }
     var peer = await findOneByName(name);

@@ -1,7 +1,7 @@
 import 'dart:core';
 
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/media_stream_util.dart';
