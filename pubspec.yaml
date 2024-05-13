@@ -175,9 +175,9 @@ dependencies:
   easy_stepper: ^0.8.1
   flex_color_scheme: ^7.3.1
   flex_seed_scheme: ^1.4.0
-  file_selector: ^1.0.0
-  filesystem_picker: ^4.0.0
-  wechat_assets_picker: ^9.0.2 #移动平台，选择图像，视频等媒体并展示
+  file_selector: ^1.0.3
+  filesystem_picker: ^4.1.0
+  wechat_assets_picker: ^9.0.3 #移动平台，选择图像，视频等媒体并展示
   #insta_assets_picker: ^2.3.0-dev.3
   flutter_slidable: ^3.0.1 #滑动的按钮
   #下面是各种轮播图组件
@@ -396,7 +396,7 @@ dependency_overrides:
   apple_maps_flutter: ^1.2.0
   flutter_inappwebview: ^6.0.0
   connectivity_plus: ^6.0.2
-  webview_flutter: ^4.4.2
+  webview_flutter: ^4.7.0
   webview_flutter_android: ^3.13.1
   webview_flutter_wkwebview: ^3.10.0
   webview_flutter_web: ^0.2.2+3
@@ -408,7 +408,7 @@ dependency_overrides:
   sprintf: ^7.0.0
   flex_color_picker: ^3.4.1
   permission_handler: ^11.2.0
-  file_picker: ^6.0.0
+  file_picker: ^8.0.3
   #  file_picker_pro: ^1.4.0 #open_filex和open_file冲突
   intl: ^0.19.0
   image: ^4.0.12
@@ -439,7 +439,7 @@ dependency_overrides:
   record_darwin: 1.0.1
   visibility_detector: ^0.4.0+2 #组建可见性的大小发生变化
   focus_detector: ^2.0.1 #组建在界面上消失或者出现
-  image_picker: ^1.0.7 #选取图库,移动从图像廊或者相机选，桌面实现采用file_selector，从文件系统选
+  image_picker: ^1.1.1 #选取图库,移动从图像廊或者相机选，桌面实现采用file_selector，从文件系统选
   latlong2: ^0.9.0
   flutter_map_location_marker: ^8.0.3
   flutter_map: ^6.1.0
