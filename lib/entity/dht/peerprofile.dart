@@ -1,4 +1,5 @@
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 
 import '../base.dart';
@@ -16,8 +17,8 @@ class PeerProfile extends StatusEntity {
 
   // 个性化配置
   String locale = 'en_US';
-  int primaryColor = Colors.cyan.value;
-  int secondaryColor = Colors.cyan.value;
+  int primaryColor = Colors.cyan.darken().value;
+  int secondaryColor = Colors.cyan.darken().value;
   String? scheme;
   String? darkScheme;
   String themeMode = ThemeMode.system.name;

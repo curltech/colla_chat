@@ -5,12 +5,9 @@ import 'package:colla_chat/entity/dht/peerprofile.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/tool/locale_util.dart';
-import 'package:colla_chat/tool/string_util.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:path/path.dart' as p;
 
 /// 单例本节点对象，包含公私钥，本节点配置，密码和过往的节点信息
@@ -73,148 +70,154 @@ class Myself with ChangeNotifier {
   }
 
   _buildThemeData() {
-    FlexScheme? scheme;
-    if (peerProfile.scheme != null) {
-      scheme =
-          StringUtil.enumFromString(FlexScheme.values, peerProfile.scheme!);
-    }
-
-    if (scheme != null) {
-      _themeData = FlexThemeData.light(
-        scheme: scheme,
-      );
-      return;
-    }
+    // FlexScheme? scheme;
+    // if (peerProfile.scheme != null) {
+    //   scheme =
+    //       StringUtil.enumFromString(FlexScheme.values, peerProfile.scheme!);
+    // }
+    //
+    // if (scheme != null) {
+    //   _themeData = FlexThemeData.light(
+    //     scheme: scheme,
+    //   );
+    //   return;
+    // }
     TextTheme textTheme = const TextTheme();
-    // final ColorScheme colorScheme = SeedColorScheme.fromSeeds(
+    final ColorScheme colorScheme = SeedColorScheme.fromSeeds(
+      brightness: Brightness.light,
+      primaryKey: primaryColor,
+      primary: primaryColor,
+      secondaryKey: secondaryColor,
+      secondary: secondaryColor,
+      neutralKey: primaryColor,
+      tertiaryKey: primaryColor,
+      tones: FlexTones.vivid(Brightness.light),
+    );
+    _themeData = ThemeData.from(
+        colorScheme: colorScheme, textTheme: textTheme, useMaterial3: true);
+    // FlexSchemeColor lightColor = FlexSchemeColor.from(
+    //   primary: primaryColor,
+    //   secondary: secondaryColor,
     //   brightness: Brightness.light,
-    //   primaryKey: primaryColor,
-    //   secondaryKey: secondaryColor,
-    //   neutralKey: primaryColor,
-    //   tertiaryKey: primaryColor,
-    //   tones: FlexTones.vivid(Brightness.light),
     // );
-    // _themeData = ThemeData.from(
-    //   colorScheme: colorScheme,
+    // logger
+    //     .i('build themeData colorScheme primary color:${lightColor.primary.value}');
+    // _themeData = FlexThemeData.light(
+    //   colors: scheme == null ? lightColor : null,
+    //   scheme: scheme,
+    //   swapColors: true,
+    //   usedColors: 6,
+    //   lightIsWhite: false,
+    //   subThemesData: FlexSubThemesData(
+    //     defaultRadius: 8,
+    //     inputDecoratorRadius: 2,
+    //     inputDecoratorSchemeColor: SchemeColor.primary,
+    //     inputDecoratorIsFilled: false,
+    //     inputDecoratorFillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
+    //     inputDecoratorBorderType: FlexInputBorderType.underline,
+    //     inputDecoratorUnfocusedHasBorder: false,
+    //     inputDecoratorUnfocusedBorderIsColored: false,
+    //     inputDecoratorBorderWidth: 0,
+    //     inputDecoratorFocusedBorderWidth: 0,
+    //   ),
+    //   appBarStyle: FlexAppBarStyle.primary,
+    //   appBarOpacity: 1,
+    //   transparentStatusBar: false,
+    //   tabBarStyle: FlexTabBarStyle.forAppBar,
+    //   tooltipsMatchBackground: true,
+    //   surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
+    //   blendLevel: 2,
+    //   appBarElevation: 0.5,
+    //   //FlexColorScheme.comfortablePlatformDensity
+    //   visualDensity: VisualDensity.standard,
+    //   fontFamily: peerProfile.fontFamily ?? GoogleFonts.notoSans().fontFamily,
     //   textTheme: textTheme,
+    //   primaryTextTheme: textTheme,
+    //   tones: FlexTones.material(Brightness.light),
+    //   typography: Typography.material2021(
+    //     platform: defaultTargetPlatform,
+    //   ),
+    //   keyColors: const FlexKeyColors(),
+    //   useMaterial3ErrorColors: true,
     //   useMaterial3: true,
     // );
-    FlexSchemeColor lightColor = FlexSchemeColor.from(
-      primary: primaryColor,
-      secondary: secondaryColor,
-      brightness: Brightness.light,
-    );
-    _themeData = FlexThemeData.light(
-      colors: scheme == null ? lightColor : null,
-      scheme: scheme,
-      swapColors: true,
-      usedColors: 6,
-      lightIsWhite: false,
-      subThemesData: FlexSubThemesData(
-        defaultRadius: 8,
-        inputDecoratorRadius: 2,
-        inputDecoratorSchemeColor: SchemeColor.primary,
-        inputDecoratorIsFilled: false,
-        inputDecoratorFillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
-        inputDecoratorBorderType: FlexInputBorderType.underline,
-        inputDecoratorUnfocusedHasBorder: false,
-        inputDecoratorUnfocusedBorderIsColored: false,
-        inputDecoratorBorderWidth: 0,
-        inputDecoratorFocusedBorderWidth: 0,
-      ),
-      appBarStyle: FlexAppBarStyle.primary,
-      appBarOpacity: 1,
-      transparentStatusBar: false,
-      tabBarStyle: FlexTabBarStyle.forAppBar,
-      tooltipsMatchBackground: true,
-      surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
-      blendLevel: 2,
-      appBarElevation: 0.5,
-      //FlexColorScheme.comfortablePlatformDensity
-      visualDensity: VisualDensity.standard,
-      fontFamily: peerProfile.fontFamily ?? GoogleFonts.notoSans().fontFamily,
-      textTheme: textTheme,
-      primaryTextTheme: textTheme,
-      tones: FlexTones.material(Brightness.light),
-      typography: Typography.material2021(
-        platform: defaultTargetPlatform,
-      ),
-      keyColors: const FlexKeyColors(),
-      useMaterial3ErrorColors: true,
-      useMaterial3: true,
-    );
+    // logger
+    //     .i('themeData primary color:${myself.primary.value}');
   }
 
   _buildDarkThemeData() {
-    FlexScheme? darkScheme;
-    if (peerProfile.darkScheme != null) {
-      darkScheme =
-          StringUtil.enumFromString(FlexScheme.values, peerProfile.darkScheme!);
-    }
-    if (darkScheme != null) {
-      _themeData = FlexThemeData.dark(
-        scheme: darkScheme,
-      );
-      return;
-    }
+    // FlexScheme? darkScheme;
+    // if (peerProfile.darkScheme != null) {
+    //   darkScheme =
+    //       StringUtil.enumFromString(FlexScheme.values, peerProfile.darkScheme!);
+    // }
+    // if (darkScheme != null) {
+    //   _themeData = FlexThemeData.dark(
+    //     scheme: darkScheme,
+    //   );
+    //   return;
+    // }
     TextTheme textTheme = const TextTheme();
-    // final ColorScheme colorScheme = SeedColorScheme.fromSeeds(
-    //   brightness: Brightness.dark,
-    //   primaryKey: primaryColor,
-    //   secondaryKey: secondaryColor,
-    //   neutralKey: primaryColor,
-    //   tertiaryKey: primaryColor,
-    //   tones: FlexTones.vivid(Brightness.dark),
-    // );
-    // _darkThemeData = ThemeData.from(
-    //   colorScheme: colorScheme,
-    //   textTheme: textTheme,
-    //   useMaterial3: true,
-    // );
-    FlexSchemeColor darkColor = FlexSchemeColor.from(
-      primary: primaryColor,
-      secondary: secondaryColor,
+    final ColorScheme colorScheme = SeedColorScheme.fromSeeds(
       brightness: Brightness.dark,
+      primaryKey: primaryColor,
+      primary: primaryColor,
+      secondaryKey: secondaryColor,
+      secondary: secondaryColor,
+      neutralKey: primaryColor,
+      tertiaryKey: primaryColor,
+      tones: FlexTones.vivid(Brightness.dark),
     );
-    _darkThemeData = FlexThemeData.dark(
-      colors: darkScheme == null ? darkColor : null,
-      scheme: darkScheme,
-      swapColors: true,
-      usedColors: 6,
-      darkIsTrueBlack: false,
-      subThemesData: FlexSubThemesData(
-        defaultRadius: 8,
-        inputDecoratorRadius: 2,
-        inputDecoratorSchemeColor: SchemeColor.primary,
-        inputDecoratorIsFilled: false,
-        inputDecoratorFillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
-        inputDecoratorBorderType: FlexInputBorderType.underline,
-        inputDecoratorUnfocusedHasBorder: false,
-        inputDecoratorUnfocusedBorderIsColored: false,
-        inputDecoratorBorderWidth: 0,
-        inputDecoratorFocusedBorderWidth: 0,
-      ),
-      appBarStyle: FlexAppBarStyle.background,
-      appBarOpacity: 1,
-      transparentStatusBar: false,
-      tabBarStyle: FlexTabBarStyle.forAppBar,
-      tooltipsMatchBackground: true,
-      surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
-      blendLevel: 2,
-      appBarElevation: 0.5,
-      //FlexColorScheme.comfortablePlatformDensity
-      visualDensity: VisualDensity.standard,
-      fontFamily: peerProfile.fontFamily ?? GoogleFonts.notoSans().fontFamily,
+    _darkThemeData = ThemeData.from(
+      colorScheme: colorScheme,
       textTheme: textTheme,
-      primaryTextTheme: textTheme,
-      tones: FlexTones.material(Brightness.dark),
-      typography: Typography.material2021(
-        platform: defaultTargetPlatform,
-      ),
-      keyColors: const FlexKeyColors(),
-      useMaterial3ErrorColors: true,
       useMaterial3: true,
     );
+    // FlexSchemeColor darkColor = FlexSchemeColor.from(
+    //   primary: primaryColor,
+    //   secondary: secondaryColor,
+    //   brightness: Brightness.dark,
+    // );
+    // _darkThemeData = FlexThemeData.dark(
+    //   colors: darkScheme == null ? darkColor : null,
+    //   scheme: darkScheme,
+    //   colorScheme: colorScheme,
+    //   swapColors: true,
+    //   usedColors: 6,
+    //   darkIsTrueBlack: false,
+    //   subThemesData: FlexSubThemesData(
+    //     defaultRadius: 8,
+    //     inputDecoratorRadius: 2,
+    //     inputDecoratorSchemeColor: SchemeColor.primary,
+    //     inputDecoratorIsFilled: false,
+    //     inputDecoratorFillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
+    //     inputDecoratorBorderType: FlexInputBorderType.underline,
+    //     inputDecoratorUnfocusedHasBorder: false,
+    //     inputDecoratorUnfocusedBorderIsColored: false,
+    //     inputDecoratorBorderWidth: 0,
+    //     inputDecoratorFocusedBorderWidth: 0,
+    //   ),
+    //   appBarStyle: FlexAppBarStyle.background,
+    //   appBarOpacity: 1,
+    //   transparentStatusBar: false,
+    //   tabBarStyle: FlexTabBarStyle.forAppBar,
+    //   tooltipsMatchBackground: true,
+    //   surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
+    //   blendLevel: 2,
+    //   appBarElevation: 0.5,
+    //   //FlexColorScheme.comfortablePlatformDensity
+    //   visualDensity: VisualDensity.standard,
+    //   fontFamily: peerProfile.fontFamily ?? GoogleFonts.notoSans().fontFamily,
+    //   textTheme: textTheme,
+    //   primaryTextTheme: textTheme,
+    //   tones: FlexTones.material(Brightness.dark),
+    //   typography: Typography.material2021(
+    //     platform: defaultTargetPlatform,
+    //   ),
+    //   keyColors: const FlexKeyColors(),
+    //   useMaterial3ErrorColors: true,
+    //   useMaterial3: true,
+    // );
   }
 
   Color get primaryColor {

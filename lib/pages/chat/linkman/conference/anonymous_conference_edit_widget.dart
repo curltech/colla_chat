@@ -1,11 +1,8 @@
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
-import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/conference/conference_edit_widget.dart';
 import 'package:colla_chat/tool/qrcode_util.dart';
-import 'package:uuid/uuid.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -13,7 +10,6 @@ import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
@@ -85,6 +81,18 @@ class _AnonymousConferenceEditWidgetState
       inputType: InputType.label,
       prefixIcon: Icon(Icons.topic, color: myself.primary),
     ),
+    PlatformDataField(
+      name: 'startDate',
+      label: 'StartDate',
+      inputType: InputType.label,
+      prefixIcon: Icon(Icons.start, color: myself.primary),
+    ),
+    PlatformDataField(
+      name: 'endDate',
+      label: 'EndDate',
+      inputType: InputType.label,
+      prefixIcon: Icon(Icons.pin_end, color: myself.primary),
+    ),
   ];
   late final FormInputController controller =
       FormInputController(conferenceDataField);
@@ -109,7 +117,7 @@ class _AnonymousConferenceEditWidgetState
           }
           return FormInputWidget(
             spacing: 5.0,
-            height: appDataProvider.portraitSize.height * 0.6,
+            height: appDataProvider.portraitSize.height * 0.7,
             controller: controller,
             formButtons: [
               FormButton(

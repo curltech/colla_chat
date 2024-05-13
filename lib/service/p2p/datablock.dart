@@ -2,7 +2,7 @@ import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/p2p/datablock.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/base.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
@@ -376,7 +376,7 @@ class DataBlockService extends BaseService {
               secretKey = await cryptoGraphy.eccDecrypt(payloadKey.codeUnits,
                   localKeyPair: privateKey);
             } catch (e) {
-              logger.e(e);
+              logger.e(e.toString());
             }
             var i = 0;
             while (secretKey == null && i < myself.expiredKeys.length) {
@@ -384,7 +384,7 @@ class DataBlockService extends BaseService {
                 secretKey = await cryptoGraphy.eccDecrypt(payloadKey.codeUnits,
                     localKeyPair: myself.expiredKeys[i]);
               } catch (e) {
-                logger.e(e);
+                logger.e(e.toString());
               } finally {
                 i++;
               }

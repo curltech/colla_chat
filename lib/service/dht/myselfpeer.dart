@@ -16,7 +16,7 @@ import 'package:colla_chat/p2p/chain/action/connect.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/background/android_backgroud_service.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/plugin/notification/firebase_messaging_service.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -157,7 +157,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
         }
         mobile = PhoneNumberUtil.format(phoneNumber, isoCode: isoCode);
       } catch (e) {
-        logger.e(e);
+        logger.e(e.toString());
       }
     }
     var peer = await findOneByName(name);
@@ -228,7 +228,8 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
 
   ///获取自动登录的用户名和密码
   Future<Map<String, dynamic>?> autoCredential() async {
-    String? autoLoginStr = await localSecurityStorage.get(autoLoginName);
+    String? autoLoginStr =
+        await localSecurityStorage.get(autoLoginName, userKey: false);
     if (StringUtil.isNotEmpty(autoLoginStr)) {
       Map<String, dynamic> autoLogin = JsonUtil.toJson(autoLoginStr);
       return autoLogin;
@@ -239,14 +240,14 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
 
   ///获取最后一次登录的用户名和密码，如果都存在，快捷登录
   Future<void> removeAutoCredential() async {
-    await localSecurityStorage.remove(autoLoginName);
+    await localSecurityStorage.remove(autoLoginName, userKey: false);
   }
 
   Future<void> saveAutoCredential(String credential, String password) async {
     //记录最后成功登录的用户名和密码
     String skipLogin = JsonUtil.toJsonString(
         {credentialName: credential, passwordName: password});
-    await localSecurityStorage.save(autoLoginName, skipLogin);
+    await localSecurityStorage.save(autoLoginName, skipLogin, userKey: false);
   }
 
   Future<void> saveLastCredentialName(String credential) async {

@@ -1,11 +1,11 @@
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'logger.dart';
 
 ///在操作系统层面的安全存储
 class LocalSecurityStorage {
@@ -32,7 +32,9 @@ class LocalSecurityStorage {
   String _getKey(String key, {bool userKey = true}) {
     if (userKey) {
       String? peerId = myself.peerId;
-      peerId = peerId ?? '';
+      if (peerId == null) {
+        return key;
+      }
 
       return '$peerId-$key';
     }
@@ -72,14 +74,14 @@ class LocalSecurityStorage {
 
   Future<String?> get(String key, {bool userKey = true}) async {
     try {
-      return await _secureStorage.read(
-        key: _getKey(key, userKey: userKey),
+      Map<String, String> values = await _secureStorage.readAll(
         iOptions: iOptions,
         aOptions: aOptions,
         wOptions: wOptions,
         mOptions: mOptions,
         lOptions: lOptions,
       );
+      return values[_getKey(key, userKey: userKey)];
     } catch (e) {
       logger.e('LocalSecurityStorage get:$e');
     }

@@ -1,7 +1,8 @@
 import 'dart:io';
 
-import 'package:classic_logger/classic_logger.dart' as classic_logger;
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:path/path.dart' as p;
@@ -109,47 +110,7 @@ class FileOutput extends LogOutput {
 
 final customLogger = CustomLogger();
 
-//var log = easylogger.Logger;
 
-class ClassicLogger {
-  late classic_logger.Logger logger;
-
-  ClassicLogger(String filename) {
-    logger = classic_logger.Logger.fromConfig(classic_logger.LogConfig(
-      baseLevel: classic_logger.LogLevel.info,
-      output: classic_logger.MultiOutput([
-        classic_logger.ConsoleOutput(),
-        classic_logger.FileOutput(filename),
-      ]),
-    ));
-  }
-
-  t(String msg) {
-    logger.trace(msg);
-  }
-
-  d(String msg) {
-    logger.debug(msg);
-  }
-
-  i(String msg) {
-    logger.info(msg);
-  }
-
-  w(String msg) {
-    logger.warn(msg);
-  }
-
-  e(String msg) {
-    logger.error(msg);
-  }
-
-  f(String msg) {
-    logger.fatal(msg);
-  }
-}
-
-final logger = customLogger;
 
 class LoggerController with ChangeNotifier {
   int total = 100;
@@ -201,6 +162,8 @@ class _LoggerConsoleWidgetState extends State<LoggerConsoleWidget> {
   Widget build(BuildContext context) {
     return InkWell(
         onDoubleTap: () {
+          final int length = loggerController.logs.length;
+          DialogUtil.info(context, content: 'logs length:$length');
           setState(() {
             loggerController.logs.clear();
           });
@@ -210,12 +173,13 @@ class _LoggerConsoleWidgetState extends State<LoggerConsoleWidget> {
             margin: EdgeInsets.zero,
             shape: const ContinuousRectangleBorder(),
             child: ListView.builder(
-              reverse: true,
+              reverse: false,
               shrinkWrap: true,
               itemCount: loggerController.logs.length,
               itemBuilder: (context, index) {
                 final log = loggerController.logs.elementAt(index);
-                return Text(log);
+                final int length = log.length;
+                return CommonAutoSizeText(log.substring(11, length - 4));
               },
             )));
   }

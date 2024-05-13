@@ -1,6 +1,6 @@
 import 'package:any_link_preview/any_link_preview.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -28,8 +28,8 @@ class _LinkPreviewState extends State<LinkPreview> {
         link: url,
         cache: const Duration(days: 7), // Needed for web app
       );
-      logger.i(metadata?.title);
-      logger.i(metadata?.desc);
+      logger.i(metadata!.title!);
+      logger.i(metadata.desc!);
     } else {
       logger.e("URL is not valid");
     }

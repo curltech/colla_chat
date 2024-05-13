@@ -1,4 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/dht/myself.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
@@ -9,6 +10,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:regexpattern/regexpattern.dart';
 
 final List<PlatformDataField> passwordInputFieldDef = [
   PlatformDataField(
@@ -58,7 +60,7 @@ class _PasswordWidgetState extends State<PasswordWidget> {
         Container(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
             child: FormInputWidget(
-              height: 200,
+              height: 250,
               onOk: _onOk,
               okLabel: 'Ok',
               controller: controller,
@@ -87,23 +89,31 @@ class _PasswordWidgetState extends State<PasswordWidget> {
             content: AppLocalizations.t('Please input confirm password'));
         return;
       }
-      if (plainPassword == confirmPassword) {
-        String loginName = myself.myselfPeer.loginName;
-        await myselfService.updateMyselfPassword(
-            myself.myselfPeer, plainPassword);
-        if (myself.peerProfile.autoLogin) {
-          await myselfPeerService.saveAutoCredential(loginName, plainPassword);
-        }
-        String peerPrivateKey = myself.myselfPeer.peerPrivateKey;
-        String privateKey = myself.myselfPeer.privateKey;
-        await myselfPeerService.update(
-            {'peerPrivateKey': peerPrivateKey, 'privateKey': privateKey},
-            where: 'loginName=?',
-            whereArgs: [loginName]);
-      } else {
-        DialogUtil.error(context,
-            content: AppLocalizations.t('new password is not matched'));
+      // 检查密码的难度
+      bool isPassword =
+          RegVal.hasMatch(plainPassword, RegexPattern.passwordNormal1);
+      // isPassword = Validate.isPassword(plainPassword);
+      if (!isPassword) {
+        DialogUtil.error(context, content: 'password must be strong password');
+        return;
       }
+      if (plainPassword != confirmPassword) {
+        logger.e('new password is not matched');
+        DialogUtil.error(context, content: 'password is not matched');
+        return;
+      }
+      String loginName = myself.myselfPeer.loginName;
+      await myselfService.updateMyselfPassword(
+          myself.myselfPeer, plainPassword);
+      if (myself.peerProfile.autoLogin) {
+        await myselfPeerService.saveAutoCredential(loginName, plainPassword);
+      }
+      String peerPrivateKey = myself.myselfPeer.peerPrivateKey;
+      String privateKey = myself.myselfPeer.privateKey;
+      await myselfPeerService.update(
+          {'peerPrivateKey': peerPrivateKey, 'privateKey': privateKey},
+          where: 'loginName=?',
+          whereArgs: [loginName]);
     } else {
       DialogUtil.error(context,
           content: AppLocalizations.t('old password is not matched'));

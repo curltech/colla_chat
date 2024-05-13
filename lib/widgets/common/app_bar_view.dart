@@ -57,17 +57,20 @@ class _AppBarViewState extends State<AppBarView> {
   @override
   Widget build(BuildContext context) {
     Widget titleWidget = widget.titleWidget ??
-        CommonAutoSizeText(AppLocalizations.t(widget.title ?? ''),
-            //softWrap: true,
-            wrapWords: false,
-            overflow: TextOverflow.visible,
-            //maxLines: 2
+        CommonAutoSizeText(
+          AppLocalizations.t(widget.title ?? ''),
+          style: const TextStyle(color: Colors.white),
+          //softWrap: true,
+          wrapWords: false,
+          overflow: TextOverflow.visible,
+          //maxLines: 2
         );
     return Consumer<IndexWidgetProvider>(
         builder: (context, indexWidgetProvider, child) {
       return Column(children: [
         AppBarWidget.buildAppBar(
           context,
+          backgroundColor: myself.primary,
           withLeading: widget.withLeading,
           leadingCallBack: widget.leadingCallBack,
           title: titleWidget,

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:card_swiper/card_swiper.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -111,7 +111,7 @@ class _LoadingState extends State<Loading> {
             widget.controller.move(loadingBackgroundImage.currentIndex);
           }
         } catch (e) {
-          logger.e(e);
+          logger.e(e.toString());
         }
       });
     }

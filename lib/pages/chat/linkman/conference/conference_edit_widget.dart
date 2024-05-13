@@ -8,7 +8,7 @@ import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_webrtc_connection_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -304,6 +304,8 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
                       'conferenceId': current.conferenceId,
                       'conferenceOwnerPeerId': current.conferenceOwnerPeerId,
                       'conferenceOwnerName': current.conferenceOwnerName,
+                      'startDate': current.startDate,
+                      'endDate': current.endDate,
                     });
                     await DialogUtil.show(
                       context: context,

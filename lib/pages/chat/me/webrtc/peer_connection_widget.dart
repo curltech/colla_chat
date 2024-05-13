@@ -1,7 +1,7 @@
 import 'dart:core';
 
 import 'package:colla_chat/entity/chat/conference.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -127,12 +127,12 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
 
   //本地Ice连接状态
   _onLocalIceConnectionState(RTCIceConnectionState state) {
-    logger.i(state);
+    logger.i(state.toString());
   }
 
   //远端Ice连接状态
   _onRemoteIceConnectionState(RTCIceConnectionState state) {
-    logger.i(state);
+    logger.i(state.toString());
   }
 
   //远端流添加成功回调

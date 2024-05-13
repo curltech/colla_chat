@@ -18,7 +18,7 @@ import 'package:colla_chat/pages/chat/chat/video_chat_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/conference/conference_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/group/group_edit_widget.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
@@ -207,10 +207,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
   ///在初始化，窗口恢复，背景恢复都会调用，因此需要能够重复调用
   ///如果ChatGPT，则设置
   _createPeerConnection() async {
-    Websocket? websocket = websocketPool.getDefault();
-    if (websocket == null) {
-      await websocketPool.connect();
-    }
+    await websocketPool.connect();
     var chatSummary = _chatSummary.value;
     if (chatSummary == null) {
       logger.e('chatSummary is null');

@@ -4,7 +4,7 @@ import 'package:colla_chat/tool/media_stream_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:livekit_client/livekit_client.dart';
-import 'package:colla_chat/plugin/logger.dart' as log;
+import 'package:colla_chat/plugin/talker_logger.dart' as log;
 
 final emptyVideoView = Center(
   child: AppImage.mdAppImage,
@@ -333,7 +333,7 @@ class PeerMediaStream {
       await Hardware.instance.setSpeakerphoneOn(enableSpeaker);
     } else {
       await Hardware.instance.setPreferSpeakerOutput(false);
-      MediaStreamUtil.setSpeakerphoneOn(!enableSpeaker);
+      MediaStreamUtil.setSpeakerphoneOn(enableSpeaker);
     }
   }
 

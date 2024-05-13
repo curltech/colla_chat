@@ -2,7 +2,7 @@ import 'dart:core';
 import 'dart:io' as io;
 import 'dart:io';
 
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/locale_util.dart';
 import 'package:colla_chat/tool/path_util.dart';
 import 'package:device_info_plus/device_info_plus.dart';

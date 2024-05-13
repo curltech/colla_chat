@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:dart_openai/dart_openai.dart';
 import 'package:http/http.dart' as http;
 

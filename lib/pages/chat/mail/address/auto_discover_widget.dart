@@ -1,6 +1,6 @@
 import 'package:colla_chat/entity/chat/emailaddress.dart';
 import 'package:colla_chat/pages/chat/mail/address/email_service_provider.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/emailaddress.dart';

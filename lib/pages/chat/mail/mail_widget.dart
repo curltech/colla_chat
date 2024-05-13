@@ -115,21 +115,24 @@ class _MailWidgetState extends State<MailWidget> {
             setState(() {});
           },
           icon: addressVisible.value
-              ? const Icon(Icons.toggle_off)
-              : const Icon(Icons.toggle_on)),
+              ? const Icon(
+                  Icons.toggle_off,
+                  color: Colors.white,
+                )
+              : const Icon(Icons.toggle_on, color: Colors.white)),
     ];
     if (addressVisible.value) {
       rightWidgets.add(IconButton(
           onPressed: () {
             indexWidgetProvider.push('mail_address_auto_discover');
           },
-          icon: const Icon(Icons.auto_mode),
+          icon: const Icon(Icons.auto_mode, color: Colors.white),
           tooltip: AppLocalizations.t('Auto discover address')));
       rightWidgets.add(IconButton(
           onPressed: () {
             indexWidgetProvider.push('mail_address_manual_add');
           },
-          icon: const Icon(Icons.handyman),
+          icon: const Icon(Icons.handyman, color: Colors.white),
           tooltip: AppLocalizations.t('Manual add address')));
     } else {
       rightWidgets.add(IconButton(
@@ -137,13 +140,13 @@ class _MailWidgetState extends State<MailWidget> {
             mailMimeMessageController.currentMimeMessages?.clear();
             mailMimeMessageController.findMoreMimeMessages();
           },
-          icon: const Icon(Icons.refresh),
+          icon: const Icon(Icons.refresh, color: Colors.white),
           tooltip: AppLocalizations.t('Refresh')));
       rightWidgets.add(IconButton(
           onPressed: () {
             indexWidgetProvider.push('new_mail');
           },
-          icon: const Icon(Icons.note_add),
+          icon: const Icon(Icons.note_add, color: Colors.white),
           tooltip: AppLocalizations.t('New mail')));
     }
     rightWidgets.add(const SizedBox(
@@ -154,6 +157,7 @@ class _MailWidgetState extends State<MailWidget> {
         builder: (BuildContext context, String mailboxName, Widget? child) {
           return CommonAutoSizeText(
             AppLocalizations.t(mailboxName),
+            style: const TextStyle(color: Colors.white),
             softWrap: true,
             maxLines: 2,
             overflow: TextOverflow.visible,

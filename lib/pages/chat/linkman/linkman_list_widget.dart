@@ -808,7 +808,10 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           conferenceController.currentIndex = -1;
           indexWidgetProvider.push('linkman_add');
         },
-        icon: const Icon(Icons.add_circle_outline),
+        icon: const Icon(
+          Icons.add_circle_outline,
+          color: Colors.white,
+        ),
       ),
     ];
     if (platformParams.mobile || platformParams.macos || platformParams.web) {
@@ -817,7 +820,10 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         onPressed: () async {
           await scanQrcode(context);
         },
-        icon: const Icon(Icons.qr_code),
+        icon: const Icon(
+          Icons.qr_code,
+          color: Colors.white,
+        ),
       ));
     }
     return AppBarView(

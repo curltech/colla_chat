@@ -14,7 +14,7 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.da
 import 'package:colla_chat/pages/chat/linkman/group/group_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_info_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_webrtc_connection_widget.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/plugin/notification/local_notifications_service.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -24,7 +24,6 @@ import 'package:colla_chat/service/chat/chat_summary.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
-import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/connectivity_util.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -145,6 +144,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
   final ValueNotifier<List<ConnectivityResult>> _connectivityResult =
       ValueNotifier<List<ConnectivityResult>>(
           connectivityController.connectivityResult);
+  StreamSubscription<SocketStatus>? _socketStatusStreamSubscription;
   final ValueNotifier<SocketStatus> _socketStatus =
       ValueNotifier<SocketStatus>(SocketStatus.none);
 
@@ -171,19 +171,20 @@ class _ChatListWidgetState extends State<ChatListWidget>
     // conferenceChatSummaryController.refresh();
     connectivityController.addListener(_updateConnectivity);
     _initStatusStreamController();
-    if (_socketStatus.value != SocketStatus.connected &&
-        _socketStatus.value != SocketStatus.connecting) {
-      _reconnect();
-    }
     localNotificationsService.isAndroidPermissionGranted();
     localNotificationsService.requestPermissions();
     _initDelete();
   }
 
-  _initStatusStreamController() {
-    Websocket? websocket = websocketPool.defaultWebsocket;
+  _initStatusStreamController() async {
+    Websocket? websocket = await websocketPool.connect();
     if (websocket != null) {
-      websocket.statusStreamController.stream.listen((event) {
+      if (_socketStatusStreamSubscription != null) {
+        _socketStatusStreamSubscription!.cancel();
+        _socketStatusStreamSubscription = null;
+      }
+      _socketStatusStreamSubscription =
+          websocket.statusStreamController.stream.listen((event) {
         _updateWebsocketStatus(websocket.address, event);
       });
       _socketStatus.value = websocket.status;
@@ -202,12 +203,10 @@ class _ChatListWidgetState extends State<ChatListWidget>
     if (ConnectivityUtil.getMainResult(_connectivityResult.value) !=
         ConnectivityResult.none) {
       Websocket? websocket = websocketPool.getDefault();
-      if (websocket == null) {
-        await websocketPool.connect();
-      } else {
+      if (websocket != null) {
         await websocket.connect();
       }
-      _initStatusStreamController();
+      await _initStatusStreamController();
     }
   }
 
@@ -683,29 +682,34 @@ class _ChatListWidgetState extends State<ChatListWidget>
                       )
                     : const Icon(
                         Icons.wifi,
-                        //color: Colors.green,
+                        color: Colors.white,
                       ),
                 CommonAutoSizeText(connectivityResult.name,
-                    style: const TextStyle(fontSize: 12)),
+                    style: const TextStyle(fontSize: 12, color: Colors.white)),
               ]));
         });
     rightWidgets.add(connectivityWidget);
     rightWidgets.add(const SizedBox(
       width: 10.0,
     ));
-    String tooltip = AppLocalizations.t('Websocket status');
-    Websocket? websocket = websocketPool.getDefault();
-    if (websocket != null) {
-      tooltip = websocket.address;
-    }
+
     var wssWidget = ValueListenableBuilder(
         valueListenable: _socketStatus,
         builder: (context, value, child) {
+          String address = AppLocalizations.t('Websocket status');
+          Websocket? websocket = websocketPool.getDefault();
+          if (websocket != null) {
+            address = websocket.address;
+          }
           return IconButton(
-              tooltip: tooltip,
+              tooltip: address,
               onPressed: () async {
-                await _reconnect();
-                myselfPeerService.connect();
+                bool? confirm = await DialogUtil.confirm(context,
+                    content:
+                        '${AppLocalizations.t('Do you want to reconnect')} $address, ${AppLocalizations.t('status')}:$value');
+                if (confirm == true) {
+                  await _reconnect();
+                }
               },
               icon: _socketStatus.value == SocketStatus.connected
                   ? const Icon(
@@ -736,6 +740,10 @@ class _ChatListWidgetState extends State<ChatListWidget>
     groupChatSummaryController.removeListener(_updateGroupChatSummary);
     conferenceChatSummaryController
         .removeListener(_updateConferenceChatSummary);
+    if (_socketStatusStreamSubscription != null) {
+      _socketStatusStreamSubscription!.cancel();
+      _socketStatusStreamSubscription = null;
+    }
     super.dispose();
   }
 }

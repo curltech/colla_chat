@@ -34,19 +34,10 @@ import 'package:flutter/material.dart';
 class SecuritySettingWidget extends StatefulWidget with TileDataMixin {
   final PasswordWidget passwordWidget = const PasswordWidget();
   final LoggerConsoleView loggerConsoleView = const LoggerConsoleView();
-  late final List<TileData> securitySettingTileData;
 
   SecuritySettingWidget({super.key}) {
     indexWidgetProvider.define(passwordWidget);
     indexWidgetProvider.define(loggerConsoleView);
-    List<TileDataMixin> mixins = [
-      passwordWidget,
-      loggerConsoleView,
-    ];
-    securitySettingTileData = TileData.from(mixins);
-    for (var tile in securitySettingTileData) {
-      tile.dense = true;
-    }
   }
 
   @override
@@ -66,10 +57,22 @@ class SecuritySettingWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
+  late final List<TileData> securitySettingTileData;
+
   @override
   void initState() {
     super.initState();
     appDataProvider.addListener(_update);
+    List<TileDataMixin> mixins = [
+      widget.passwordWidget,
+    ];
+    if (myself.peerProfile.developerSwitch) {
+      mixins.add(widget.loggerConsoleView);
+    }
+    securitySettingTileData = TileData.from(mixins);
+    for (var tile in securitySettingTileData) {
+      tile.dense = true;
+    }
   }
 
   _update() {
@@ -86,8 +89,12 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
       TileData(title: 'Restore peer', prefix: Icons.restore_page),
       TileData(title: 'Backup attachment', prefix: Icons.copy),
       TileData(title: 'Restore attachment', prefix: Icons.paste),
-      TileData(title: 'Clean log', prefix: Icons.cleaning_services),
     ];
+    if (myself.peerProfile.developerSwitch) {
+      tiles.add(
+        TileData(title: 'Clean log', prefix: Icons.cleaning_services),
+      );
+    }
 
     return DataListView(tileData: tiles, onTap: _onTap);
   }
@@ -280,7 +287,7 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
 
   Widget _buildSettingWidget(BuildContext context) {
     Widget securitySettingTile =
-        DataListView(tileData: widget.securitySettingTileData);
+        DataListView(tileData: securitySettingTileData);
     var autoLoginTile = CheckboxListTile(
         title: Row(children: [
           Icon(
@@ -297,9 +304,6 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
         value: appDataProvider.autoLogin,
         onChanged: (bool? autoLogin) async {
           autoLogin = autoLogin ?? false;
-          if (myself.autoLogin == autoLogin) {
-            return;
-          }
           myself.autoLogin = autoLogin;
           if (autoLogin) {
             var loginName = myself.myselfPeer.loginName;

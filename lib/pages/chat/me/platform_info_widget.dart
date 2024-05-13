@@ -65,7 +65,7 @@ class _PlatformInfoWidgetState extends State<PlatformInfoWidget>
       ),
       TileData(
         title: 'OperatingSystemVersion',
-        suffix: platformParams.operatingSystemVersion,
+        subtitle: platformParams.operatingSystemVersion,
       ),
       TileData(
         title: 'Environment Version',

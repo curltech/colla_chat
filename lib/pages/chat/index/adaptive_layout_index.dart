@@ -44,6 +44,7 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
   @override
   void initState() {
     appDataProvider.addListener(_update);
+    myself.addListener(_update);
     primaryNavigation.initController(this);
     primaryNavigation.forward();
     super.initState();
@@ -174,6 +175,7 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
   @override
   void dispose() {
     appDataProvider.removeListener(_update);
+    myself.removeListener(_update);
     super.dispose();
   }
 }
