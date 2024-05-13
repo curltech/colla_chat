@@ -81,6 +81,18 @@ class _AnonymousConferenceEditWidgetState
       inputType: InputType.label,
       prefixIcon: Icon(Icons.topic, color: myself.primary),
     ),
+    PlatformDataField(
+      name: 'startDate',
+      label: 'StartDate',
+      inputType: InputType.label,
+      prefixIcon: Icon(Icons.start, color: myself.primary),
+    ),
+    PlatformDataField(
+      name: 'endDate',
+      label: 'EndDate',
+      inputType: InputType.label,
+      prefixIcon: Icon(Icons.pin_end, color: myself.primary),
+    ),
   ];
   late final FormInputController controller =
       FormInputController(conferenceDataField);

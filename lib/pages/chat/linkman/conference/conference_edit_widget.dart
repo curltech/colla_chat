@@ -304,6 +304,8 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
                       'conferenceId': current.conferenceId,
                       'conferenceOwnerPeerId': current.conferenceOwnerPeerId,
                       'conferenceOwnerName': current.conferenceOwnerName,
+                      'startDate': current.startDate,
+                      'endDate': current.endDate,
                     });
                     await DialogUtil.show(
                       context: context,
