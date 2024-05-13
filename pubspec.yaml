@@ -33,6 +33,7 @@ dependencies:
   # 尝试使用的功能
   get: ^5.0.0-release-candidate-5
   bonsoir: ^5.1.9
+  network_tools: ^5.0.2
   network_tools_flutter: ^2.0.2
   # 系统功能，获取系统信息和操作，需要调用插件才能完成
   flutter_background: ^1.2.0  #android,后台运行，可以保持网络连接
