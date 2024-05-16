@@ -8,7 +8,7 @@ import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_end
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/dht/peerendpoint.dart';
 import 'package:colla_chat/transport/httpclient.dart';
-import 'package:colla_chat/transport/websocket.dart';
+import 'package:colla_chat/transport/websocket/common_websocket.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -122,7 +122,7 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
       wsLight = grey;
     } else {
       Websocket? websocket =
-          await websocketPool.get(peerEndpoint.wsConnectAddress!);
+          (await websocketPool.get(peerEndpoint.wsConnectAddress!)) as Websocket?;
       if (websocket == null) {
         wsLight = grey;
       } else {

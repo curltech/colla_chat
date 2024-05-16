@@ -1,7 +1,8 @@
 /// webclient代表httpclient或者websocketclient
 library;
+
 import 'package:colla_chat/transport/httpclient.dart';
-import 'package:colla_chat/transport/websocket.dart';
+import 'package:colla_chat/transport/websocket/common_websocket.dart';
 
 abstract class IWebClient {
   Function()? postConnected;
@@ -9,6 +10,16 @@ abstract class IWebClient {
   dynamic send(String url, dynamic data);
 
   dynamic get(String url);
+}
+
+abstract class IWebSocket extends IWebClient {
+  dynamic get status;
+
+  Future<bool> connect();
+
+  sendMsg(dynamic data);
+
+  close();
 }
 
 class WebClient extends IWebClient {
@@ -47,6 +58,9 @@ class WebClient extends IWebClient {
   dynamic get(String url) {
     return send(url, {});
   }
+
+  @override
+  get status => throw UnimplementedError();
 }
 
 final WebClient webClient = WebClient();

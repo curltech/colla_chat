@@ -11,11 +11,10 @@ import 'package:colla_chat/transport/webclient.dart';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-// import 'package:web_socket_client/web_socket_client.dart' as web_socket_client;
 
-import './condition_import/unsupport.dart'
-    if (dart.library.html) './condition_import/web.dart'
-    if (dart.library.io) './condition_import/desktop.dart' as websocket_connect;
+import '../condition_import/unsupport.dart'
+    if (dart.library.html) '../condition_import/web.dart'
+    if (dart.library.io) '../condition_import/desktop.dart' as websocket_connect;
 
 enum SocketStatus {
   none,
@@ -38,7 +37,7 @@ class WebsocketData {
   WebsocketData(this.peerId, this.address, this.sessionId, this.data);
 }
 
-class Websocket extends IWebClient {
+class Websocket extends IWebSocket {
   Key? key;
   String? peerId;
   late String address;
@@ -60,8 +59,6 @@ class Websocket extends IWebClient {
   StreamController<SocketStatus> statusStreamController =
       StreamController<SocketStatus>.broadcast();
 
-  //Function(Websocket websocket, SocketStatus status)? onStatusChange;
-
   Websocket(this.address, Function() postConnected, {this.peerId}) {
     key = UniqueKey();
     if (!address.startsWith(prefix)) {
@@ -70,35 +67,13 @@ class Websocket extends IWebClient {
     this.postConnected = postConnected;
   }
 
+  @override
   Future<bool> connect() async {
     logger.i('connect websocket wss address:$address');
     await close();
     try {
       channel = websocket_connect.websocketConnect(address,
           headers: headers, pingInterval: pingInterval);
-
-      // const backoff = web_socket_client.ConstantBackoff(Duration(seconds: 1));
-      // _client =
-      //     web_socket_client.WebSocket(Uri.parse(address), backoff: backoff);
-      // _client!.connection.listen(
-      //     (web_socket_client.ConnectionState connectionState) {
-      //   if (connectionState is web_socket_client.Connected) {
-      //     status = SocketStatus.connected;
-      //   } else if (connectionState is web_socket_client.Connecting) {
-      //     status = SocketStatus.connecting;
-      //   } else if (connectionState is web_socket_client.Reconnected) {
-      //     status = SocketStatus.connected;
-      //   } else if (connectionState is web_socket_client.Reconnecting) {
-      //     status = SocketStatus.reconnecting;
-      //   } else if (connectionState is web_socket_client.Disconnected) {
-      //     status = SocketStatus.closed;
-      //   } else if (connectionState is web_socket_client.Disconnecting) {
-      //     status = SocketStatus.failed;
-      //   }
-      // }, onError: onError, onDone: onDone, cancelOnError: true);
-      // _client!.messages.listen((message) {
-      //   onData(message);
-      // }, onError: onError, onDone: onDone, cancelOnError: true);
     } catch (e) {
       logger.e('wss address:$address connect failure:$e');
     }
@@ -178,6 +153,7 @@ class Websocket extends IWebClient {
     await _reconnect();
   }
 
+  @override
   SocketStatus get status {
     return _status;
   }
@@ -229,13 +205,13 @@ class Websocket extends IWebClient {
       channel!.sink.add(data);
       return true;
     } else {
-      if (_status == SocketStatus.closed) {
-        return false;
-      }
       logger.e('status is not connected，cached');
       lock.synchronized(() {
         messages.add(data);
       });
+      if (_status == SocketStatus.closed) {
+        return false;
+      }
       if (_status != SocketStatus.connecting &&
           _status != SocketStatus.reconnecting) {
         await reconnect();
@@ -257,6 +233,7 @@ class Websocket extends IWebClient {
     return send(url, {});
   }
 
+  @override
   Future<void> close() async {
     if (_status != SocketStatus.closed) {
       if (channel != null) {
@@ -302,16 +279,24 @@ class Websocket extends IWebClient {
 
 class WebsocketPool {
   Lock lock = Lock();
-  var websockets = <String, Websocket>{};
-  Websocket? _default;
+  var websockets = <String, IWebSocket>{};
+  IWebSocket? _default;
 
   WebsocketPool() {
     connect();
   }
 
-  Future<Websocket?> connect() async {
+  IWebSocket create(
+    String address,
+    dynamic Function() postConnected, {
+    String? peerId,
+  }) {
+    return Websocket(address, myselfPeerService.connect, peerId: peerId);
+  }
+
+  Future<IWebSocket?> connect() async {
     return await lock.synchronized(() async {
-      Websocket? websocket = getDefault();
+      IWebSocket? websocket = getDefault();
       if (websocket == null) {
         return await _connect();
       }
@@ -321,12 +306,12 @@ class WebsocketPool {
   }
 
   ///初始化缺省websocket的连接，尝试连接缺省socket
-  Future<Websocket?> _connect() async {
+  Future<IWebSocket?> _connect() async {
     var defaultPeerEndpoint = peerEndpointController.defaultPeerEndpoint;
     if (defaultPeerEndpoint != null) {
       var defaultAddress = defaultPeerEndpoint.wsConnectAddress;
       var defaultPeerId = defaultPeerEndpoint.peerId;
-      Websocket? websocket;
+      IWebSocket? websocket;
       //如果已经存在，且是连接或者在连接中，直接返回
       if (websockets.containsKey(defaultAddress)) {
         websocket = websockets[defaultAddress];
@@ -365,12 +350,12 @@ class WebsocketPool {
   }
 
   ///获取缺省websocket
-  Websocket? get defaultWebsocket {
+  IWebSocket? get defaultWebsocket {
     return _default;
   }
 
   ///获取连接的缺省websocket
-  Websocket? getDefault() {
+  IWebSocket? getDefault() {
     if (_default != null &&
         (_default!.status == SocketStatus.connected ||
             _default!.status == SocketStatus.reconnecting ||
@@ -380,15 +365,15 @@ class WebsocketPool {
     return null;
   }
 
-  Future<Websocket?> get(String address, {bool isDefault = false}) async {
+  Future<IWebSocket?> get(String address, {bool isDefault = false}) async {
     return await lock.synchronized(() async {
       return _get(address, isDefault: isDefault);
     });
   }
 
   ///获取或者连接指定地址的websocket的连接，并可以根据参数是否设置为缺省
-  Future<Websocket?> _get(String address, {bool isDefault = false}) async {
-    Websocket? websocket;
+  Future<IWebSocket?> _get(String address, {bool isDefault = false}) async {
+    IWebSocket? websocket;
     if (websockets.containsKey(address)) {
       websocket = websockets[address];
       // logger.i('wss address:$address websocket is exist:${websocket!.status}');

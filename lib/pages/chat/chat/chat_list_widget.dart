@@ -31,7 +31,7 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
-import 'package:colla_chat/transport/websocket.dart';
+import 'package:colla_chat/transport/websocket/common_websocket.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -177,7 +177,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
   }
 
   _initStatusStreamController() async {
-    Websocket? websocket = await websocketPool.connect();
+    Websocket? websocket = (await websocketPool.connect()) as Websocket?;
     if (websocket != null) {
       if (_socketStatusStreamSubscription != null) {
         _socketStatusStreamSubscription!.cancel();
@@ -202,7 +202,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
   _reconnect() async {
     if (ConnectivityUtil.getMainResult(_connectivityResult.value) !=
         ConnectivityResult.none) {
-      Websocket? websocket = websocketPool.getDefault();
+      Websocket? websocket = websocketPool.getDefault() as Websocket?;
       if (websocket != null) {
         await websocket.connect();
       }
@@ -697,7 +697,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
         valueListenable: _socketStatus,
         builder: (context, value, child) {
           String address = AppLocalizations.t('Websocket status');
-          Websocket? websocket = websocketPool.getDefault();
+          Websocket? websocket = websocketPool.getDefault() as Websocket?;
           if (websocket != null) {
             address = websocket.address;
           }
