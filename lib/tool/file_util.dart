@@ -152,7 +152,7 @@ class FileUtil {
   static Future<List<XFile>> pickFiles({
     String? dialogTitle,
     String? initialDirectory,
-    FileType type = FileType.custom,
+    FileType type = FileType.any,
     List<String>? allowedExtensions,
     dynamic Function(FilePickerStatus)? onFileLoading,
     bool allowCompression = true,
@@ -194,7 +194,31 @@ class FileUtil {
     return xfiles;
   }
 
-  ///选择文件对话框,android不适用
+  static Future<XFile?> selectFile({
+    String? initialDirectory,
+    List<String>? allowedExtensions,
+    String? confirmButtonText,
+  }) async {
+    if (initialDirectory == null) {
+      Directory? dir = await PathUtil.getApplicationDirectory();
+      initialDirectory = dir?.path;
+    }
+    List<XTypeGroup> acceptedTypeGroups = [];
+    if (allowedExtensions != null) {
+      XTypeGroup typeGroup = XTypeGroup(
+        extensions: allowedExtensions,
+      );
+      acceptedTypeGroups.add(typeGroup);
+    }
+    final XFile? file = await openFile(
+        initialDirectory: initialDirectory,
+        confirmButtonText: confirmButtonText,
+        acceptedTypeGroups: acceptedTypeGroups);
+
+    return file;
+  }
+
+  ///选择文件对话框
   static Future<List<XFile>> selectFiles({
     String? initialDirectory,
     List<String>? allowedExtensions,
@@ -204,20 +228,17 @@ class FileUtil {
       Directory? dir = await PathUtil.getApplicationDirectory();
       initialDirectory = dir?.path;
     }
-    if (platformParams.android) {
-      return await pickFiles(
-          initialDirectory: initialDirectory,
-          type: FileType.custom,
-          allowedExtensions: allowedExtensions);
+    List<XTypeGroup> acceptedTypeGroups = [];
+    if (allowedExtensions != null) {
+      XTypeGroup typeGroup = XTypeGroup(
+        extensions: allowedExtensions,
+      );
+      acceptedTypeGroups.add(typeGroup);
     }
-    XTypeGroup typeGroup = XTypeGroup(
-      extensions: allowedExtensions,
-    );
     final List<XFile> files = await openFiles(
         initialDirectory: initialDirectory,
-        acceptedTypeGroups: <XTypeGroup>[
-          typeGroup,
-        ]);
+        confirmButtonText: confirmButtonText,
+        acceptedTypeGroups: acceptedTypeGroups);
 
     return files;
   }

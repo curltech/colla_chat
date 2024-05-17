@@ -469,7 +469,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   ///文件
   Future<void> _onActionFile() async {
-    List<XFile> xfiles = await FileUtil.pickFiles();
+    List<XFile> xfiles = await FileUtil.selectFiles();
     if (xfiles.isNotEmpty) {
       for (var xfile in xfiles) {
         Uint8List data = await xfile.readAsBytes();
