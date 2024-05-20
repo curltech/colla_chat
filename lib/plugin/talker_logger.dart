@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'package:talker_flutter/talker_flutter.dart';
 import 'package:talker_flutter/talker_flutter.dart' as talker_logger;
+import 'package:logger/logger.dart';
 
 class FileTalkerObserver extends TalkerObserver {
   File? file;
@@ -31,7 +32,6 @@ class FileTalkerObserver extends TalkerObserver {
     }
   }
 
-
   @override
   void onException(TalkerException exception) {
     super.onException(exception);
@@ -50,8 +50,13 @@ class FileTalkerObserver extends TalkerObserver {
 }
 
 class TalkerLogger {
-  late Talker _logger;
+  late Talker _talkerLogger;
   Talker? _myLogger;
+  final Logger _logger = Logger(
+    printer: PrettyPrinter(printTime: true),
+    level: Level.info,
+  );
+
   TalkerSettings settings = TalkerSettings(
     /// You can enable/disable all talker processes with this field
     enabled: true,
@@ -63,11 +68,12 @@ class TalkerLogger {
     maxHistoryItems: 100,
 
     /// You can enable/disable console logs
-    useConsoleLogs: true,
+    useConsoleLogs: false,
   );
 
   TalkerLogger() {
-    _logger = TalkerFlutter.init(
+    _talkerLogger = TalkerFlutter.init(
+        settings: settings,
         logger: talker_logger.TalkerLogger(
             output: log, settings: TalkerLoggerSettings()),
         observer: FileTalkerObserver());
@@ -79,6 +85,7 @@ class TalkerLogger {
     }
     if (myself.id != null) {
       _myLogger = TalkerFlutter.init(
+          settings: settings,
           logger: talker_logger.TalkerLogger(
               output: log, settings: TalkerLoggerSettings()),
           observer: FileTalkerObserver());
@@ -86,32 +93,38 @@ class TalkerLogger {
     if (_myLogger != null) {
       return _myLogger!;
     } else {
-      return _logger;
+      return _talkerLogger;
     }
   }
 
   t(String msg) {
-    logger.verbose(msg);
+    _talkerLogger.verbose(msg);
+    _logger.t(msg);
   }
 
   d(String msg) {
-    logger.debug(msg);
+    _talkerLogger.debug(msg);
+    _logger.d(msg);
   }
 
   i(String msg) {
-    logger.info(msg);
+    _talkerLogger.info(msg);
+    _logger.i(msg);
   }
 
   w(String msg) {
-    logger.warning(msg);
+    _talkerLogger.warning(msg);
+    _logger.w(msg);
   }
 
   e(String msg) {
-    logger.error(msg);
+    _talkerLogger.error(msg);
+    _logger.e(msg);
   }
 
   f(String msg) {
-    logger.critical(msg);
+    _talkerLogger.critical(msg);
+    _logger.f(msg);
   }
 
   clearMyLogger() {
@@ -144,7 +157,7 @@ class _TalkerLoggerScreenWidgetState extends State<TalkerLoggerScreenWidget> {
         margin: EdgeInsets.zero,
         shape: const ContinuousRectangleBorder(),
         child: TalkerScreen(
-            talker: talkerLogger.logger,
+            talker: talkerLogger._talkerLogger,
             appBarTitle: AppLocalizations.t('Logger'),
             theme: const TalkerScreenTheme(
               logColors: {

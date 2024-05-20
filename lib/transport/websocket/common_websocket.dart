@@ -1,40 +1,22 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:colla_chat/entity/dht/peerendpoint.dart';
 import 'package:colla_chat/p2p/chain/chainmessagehandler.dart';
-import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
-import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webclient.dart';
+import 'package:colla_chat/transport/websocket/universal_websocket.dart';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-
-import '../condition_import/unsupport.dart'
-    if (dart.library.html) '../condition_import/web.dart'
-    if (dart.library.io) '../condition_import/desktop.dart' as websocket_connect;
 
 enum SocketStatus {
   none,
   connecting,
   connected, // 已连接
-  failed, // 失败
-  closed, // 连接关闭
+  disconnected, // 连接关闭
+  disconnecting,
   reconnecting,
-}
-
-const String prefix = 'wss://';
-
-/// websocket接收到的原始数据
-class WebsocketData {
-  String peerId;
-  String address;
-  String sessionId;
-  dynamic data;
-
-  WebsocketData(this.peerId, this.address, this.sessionId, this.data);
 }
 
 class Websocket extends IWebSocket {
@@ -46,16 +28,18 @@ class Websocket extends IWebSocket {
   // web_socket_client.WebSocket? _client;
   StreamSubscription<dynamic>? streamSubscription;
   String? sessionId;
-  SocketStatus _status = SocketStatus.closed;
+  SocketStatus _status = SocketStatus.disconnected;
 
   // 连接没有完成时的消息缓存和缓存的锁
   final List<dynamic> messages = [];
   Lock lock = Lock();
-  Duration pingInterval = const Duration(seconds: 30);
   Map<String, dynamic> headers = {};
-  Timer? heartBeat; // 心跳定时器
-  int heartTimes = 3000; // 心跳间隔(毫秒)
+  DateTime? lastHeartBeatTime;
+  Duration heartBeatTime = const Duration(milliseconds: 40000);
+  Timer? heartBeat;
   int reconnectTimes = 5;
+  Duration reconnectTime = const Duration(milliseconds: 3000);
+  Timer? reconnectTimer;
   StreamController<SocketStatus> statusStreamController =
       StreamController<SocketStatus>.broadcast();
 
@@ -69,11 +53,10 @@ class Websocket extends IWebSocket {
 
   @override
   Future<bool> connect() async {
+    status = SocketStatus.connecting;
     logger.i('connect websocket wss address:$address');
-    await close();
     try {
-      channel = websocket_connect.websocketConnect(address,
-          headers: headers, pingInterval: pingInterval);
+      channel = WebSocketChannel.connect(Uri.parse(address));
     } catch (e) {
       logger.e('wss address:$address connect failure:$e');
     }
@@ -94,6 +77,8 @@ class Websocket extends IWebSocket {
         onData(data);
       }, onError: onError, onDone: onDone, cancelOnError: true);
 
+      initHeartBeat();
+
       if (postConnected != null) {
         postConnected!();
       }
@@ -109,6 +94,7 @@ class Websocket extends IWebSocket {
   }
 
   onData(dynamic data) async {
+    lastHeartBeatTime = DateTime.now();
     if (status != SocketStatus.connected) {
       logger.i('wss address:$address websocket from $status to connected');
       status = SocketStatus.connected;
@@ -139,18 +125,18 @@ class Websocket extends IWebSocket {
     }
     logger.w(
         "wss address:$address websocket onDone. closeCode:$closeCode;closeReason:$closeReason");
-    if (status != SocketStatus.closed) {
-      status = SocketStatus.closed;
+    if (status != SocketStatus.disconnected) {
+      status = SocketStatus.disconnected;
     }
-    _reconnect();
+    reconnect();
   }
 
   onError(err) async {
     logger.e("wss address:$address websocket onError, $err");
-    if (status != SocketStatus.failed) {
-      status = SocketStatus.failed;
+    if (status != SocketStatus.disconnecting) {
+      status = SocketStatus.disconnecting;
     }
-    await _reconnect();
+    await reconnect();
   }
 
   @override
@@ -182,14 +168,14 @@ class Websocket extends IWebSocket {
   /// 初始化心跳
   void initHeartBeat() {
     destroyHeartBeat();
-    heartBeat = Timer.periodic(Duration(milliseconds: heartTimes), (timer) {
-      sentHeart();
+    heartBeat = Timer.periodic(heartBeatTime, (timer) {
+      DateTime current = DateTime.now();
+      if (lastHeartBeatTime == null ||
+          current.difference(lastHeartBeatTime!).inMilliseconds >
+              heartBeatTime.inMilliseconds) {
+        reconnect();
+      }
     });
-  }
-
-  /// 心跳
-  void sentHeart() {
-    sendMsg('heartbeat');
   }
 
   /// 销毁心跳
@@ -200,6 +186,7 @@ class Websocket extends IWebSocket {
     }
   }
 
+  @override
   FutureOr<bool> sendMsg(dynamic data) async {
     if (channel != null && _status == SocketStatus.connected) {
       channel!.sink.add(data);
@@ -209,7 +196,7 @@ class Websocket extends IWebSocket {
       lock.synchronized(() {
         messages.add(data);
       });
-      if (_status == SocketStatus.closed) {
+      if (_status == SocketStatus.disconnected) {
         return false;
       }
       if (_status != SocketStatus.connecting &&
@@ -225,210 +212,55 @@ class Websocket extends IWebSocket {
     var message = {url: url, data: data};
     var json = JsonUtil.toJsonString(message);
 
-    return sendMsg(json);
+    return await sendMsg(json);
   }
 
   @override
-  dynamic get(String url) {
-    return send(url, {});
+  dynamic get(String url) async {
+    return await send(url, {});
   }
 
   @override
   Future<void> close() async {
-    if (_status != SocketStatus.closed) {
+    if (_status != SocketStatus.disconnected) {
       if (channel != null) {
         try {
           var sink = channel!.sink;
-          sink.close();
+          await sink.close();
         } catch (e) {
           logger.e('wss address:$address websocket channel!.sink.close error');
         }
         channel = null;
         destroyHeartBeat();
-        status = SocketStatus.closed;
+        status = SocketStatus.disconnected;
       }
     }
   }
 
+  /// 重连机制，每隔一段时间连接一次，重复n次
   Future<void> reconnect() async {
-    if (_status == SocketStatus.closed || _status == SocketStatus.failed) {
-      reconnectTimes = 5;
-      _reconnect();
-    }
-  }
-
-  /// 重连机制
-  Future<void> _reconnect() async {
-    Timer.periodic(Duration(milliseconds: heartTimes), (timer) async {
-      if (_status == SocketStatus.connected) {
-        timer.cancel();
-        return;
-      }
-      if (reconnectTimes <= 0) {
-        timer.cancel();
-        websocketPool.close(address);
-        return;
-      }
-      reconnectTimes--;
+    await close();
+    if (reconnectTimer == null) {
       status = SocketStatus.reconnecting;
-      logger.i('wss address:$address $reconnectTimes websocket reconnecting');
-      await connect();
-    });
-  }
-}
-
-class WebsocketPool {
-  Lock lock = Lock();
-  var websockets = <String, IWebSocket>{};
-  IWebSocket? _default;
-
-  WebsocketPool() {
-    connect();
-  }
-
-  IWebSocket create(
-    String address,
-    dynamic Function() postConnected, {
-    String? peerId,
-  }) {
-    return Websocket(address, myselfPeerService.connect, peerId: peerId);
-  }
-
-  Future<IWebSocket?> connect() async {
-    return await lock.synchronized(() async {
-      IWebSocket? websocket = getDefault();
-      if (websocket == null) {
-        return await _connect();
-      }
-
-      return websocket;
-    });
-  }
-
-  ///初始化缺省websocket的连接，尝试连接缺省socket
-  Future<IWebSocket?> _connect() async {
-    var defaultPeerEndpoint = peerEndpointController.defaultPeerEndpoint;
-    if (defaultPeerEndpoint != null) {
-      var defaultAddress = defaultPeerEndpoint.wsConnectAddress;
-      var defaultPeerId = defaultPeerEndpoint.peerId;
-      IWebSocket? websocket;
-      //如果已经存在，且是连接或者在连接中，直接返回
-      if (websockets.containsKey(defaultAddress)) {
-        websocket = websockets[defaultAddress];
-        logger.w(
-            'wss defaultAddress:$defaultAddress websocket is exist:${websocket!.status}');
-        _default = websocket;
-        if (websocket.status == SocketStatus.connected ||
-            websocket.status == SocketStatus.reconnecting ||
-            websocket.status == SocketStatus.connecting) {
-          return _default;
+      reconnectTimes = 5;
+      reconnectTimer = Timer.periodic(reconnectTime, (timer) async {
+        if (_status == SocketStatus.connected) {
+          reconnectTimer?.cancel();
+          reconnectTimer = null;
+          reconnectTimes = 0;
+          return;
         }
-        //如果已经关闭，从池中移除
-        if (websocket.status == SocketStatus.closed ||
-            websocket.status == SocketStatus.none ||
-            websocket.status == SocketStatus.failed) {
-          websockets.remove(defaultAddress);
-          websocket = null;
+        if (reconnectTimes <= 0) {
+          reconnectTimer?.cancel();
+          reconnectTimer = null;
+          reconnectTimes = 0;
+          websocketPool.close(address);
+          return;
         }
-      }
-      //如果不存在或者已经关闭，创建新的连接
-      if (websocket == null) {
-        if (defaultAddress != null && defaultAddress.startsWith('ws')) {
-          websocket = Websocket(defaultAddress, myselfPeerService.connect,
-              peerId: defaultPeerId);
-          bool success = await websocket.connect();
-          if (success) {
-            websockets[defaultAddress] = websocket;
-            _default = websocket;
-          }
-        }
-      }
-    } else {
-      logger.e('defaultPeerEndpoint is not exist');
-    }
-    return _default;
-  }
-
-  ///获取缺省websocket
-  IWebSocket? get defaultWebsocket {
-    return _default;
-  }
-
-  ///获取连接的缺省websocket
-  IWebSocket? getDefault() {
-    if (_default != null &&
-        (_default!.status == SocketStatus.connected ||
-            _default!.status == SocketStatus.reconnecting ||
-            _default!.status == SocketStatus.connecting)) {
-      return _default;
-    }
-    return null;
-  }
-
-  Future<IWebSocket?> get(String address, {bool isDefault = false}) async {
-    return await lock.synchronized(() async {
-      return _get(address, isDefault: isDefault);
-    });
-  }
-
-  ///获取或者连接指定地址的websocket的连接，并可以根据参数是否设置为缺省
-  Future<IWebSocket?> _get(String address, {bool isDefault = false}) async {
-    IWebSocket? websocket;
-    if (websockets.containsKey(address)) {
-      websocket = websockets[address];
-      // logger.i('wss address:$address websocket is exist:${websocket!.status}');
-      if (websocket!.status == SocketStatus.connected ||
-          websocket.status == SocketStatus.reconnecting ||
-          websocket.status == SocketStatus.connecting) {
-        if (isDefault) {
-          _default = websocket;
-        }
-        return websocket;
-      }
-      //如果已经关闭，从池中移除
-      if (websocket.status == SocketStatus.closed ||
-          websocket.status == SocketStatus.none ||
-          websocket.status == SocketStatus.failed) {
-        websockets.remove(address);
-        websocket = null;
-      }
-    }
-    if (websocket == null) {
-      if (address.startsWith('ws')) {
-        String? peerId;
-        PeerEndpoint? peerEndpoint =
-            peerEndpointController.find(address: address);
-        if (peerEndpoint != null) {
-          peerId = peerEndpoint.peerId;
-        }
-        websocket =
-            Websocket(address, myselfPeerService.connect, peerId: peerId);
-        await websocket.connect();
-        websockets[address] = websocket;
-        if (isDefault) {
-          _default = websocket;
-        }
-      }
-    }
-
-    return websocket;
-  }
-
-  Future<Websocket?> close(String address) async {
-    return await lock.synchronized(() async {
-      return _close(address);
-    });
-  }
-
-  _close(String address) {
-    if (websockets.containsKey(address)) {
-      var websocket = websockets[address];
-      if (websocket != null) {
-        websocket.close();
-      }
-      websockets.remove(address);
+        reconnectTimes--;
+        logger.i('wss address:$address $reconnectTimes websocket reconnecting');
+        await connect();
+      });
     }
   }
 }
-
-final WebsocketPool websocketPool = WebsocketPool();

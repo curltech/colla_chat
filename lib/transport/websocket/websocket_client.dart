@@ -4,7 +4,7 @@ import 'package:colla_chat/p2p/chain/chainmessagehandler.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webclient.dart';
-import 'package:colla_chat/transport/websocket/common_websocket.dart';
+import 'package:colla_chat/transport/websocket/universal_websocket.dart';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:web_socket_client/web_socket_client.dart' as web_socket_client;

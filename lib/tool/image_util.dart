@@ -20,6 +20,7 @@ import 'package:flutter_luban/flutter_luban.dart';
 import 'package:image/image.dart' as platform_image;
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:saver_gallery/saver_gallery.dart';
+import 'package:file_picker/file_picker.dart';
 
 ///image_gallery_saver,extended_image
 class ImageUtil {
@@ -474,6 +475,7 @@ class ImageUtil {
     Uint8List? avatar;
     if (platformParams.desktop) {
       List<XFile> xfiles = await FileUtil.pickFiles(
+          type: FileType.custom,
           allowedExtensions: ['png', 'jpg', 'jpeg', 'webp', 'gif']);
       if (xfiles.isNotEmpty) {
         avatar = await compressThumbnail(xfile: xfiles[0]);

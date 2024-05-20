@@ -29,6 +29,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 
 /// 安全设置组件，包括修改密码，登录选项（免登录设置），加密选项（加密算法，signal）
 class SecuritySettingWidget extends StatefulWidget with TileDataMixin {
@@ -216,7 +217,7 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
   ///从备份的peer的登录信息json文件恢复到数据库
   Future<void> _restorePeer() async {
     List<XFile> xfiles = await FileUtil.pickFiles(
-        initialDirectory: platformParams.path, allowedExtensions: ['json']);
+        initialDirectory: platformParams.path, type: FileType.custom,allowedExtensions: ['json']);
     if (xfiles.isNotEmpty) {
       String backup = await xfiles.first.readAsString();
       await myselfPeerService.restore(backup);
@@ -248,7 +249,7 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
     String? peerId = myself.peerId;
     if (peerId != null) {
       List<XFile> xfiles = await FileUtil.pickFiles(
-          initialDirectory: platformParams.path, allowedExtensions: ['tgz']);
+          initialDirectory: platformParams.path, type: FileType.custom,allowedExtensions: ['tgz']);
       if (xfiles.isNotEmpty) {
         String? path =
             await messageAttachmentService.restore(peerId, xfiles.first.path);

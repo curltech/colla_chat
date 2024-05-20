@@ -17,6 +17,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/httpclient.dart';
 import 'package:colla_chat/transport/websocket/common_websocket.dart';
+import 'package:colla_chat/transport/websocket/universal_websocket.dart';
 import 'package:dio/dio.dart';
 import 'package:uuid/uuid.dart';
 
@@ -80,7 +81,7 @@ class ChainMessageHandler {
     chainMessage.connectPeerId = connectPeerId;
     chainMessage.connectAddress = connectAddress;
     if (connectAddress != null) {
-      Websocket? websocket = (await websocketPool.get(connectAddress)) as Websocket?;
+      UniversalWebsocket? websocket = (await websocketPool.get(connectAddress));
       if (websocket != null) {
         chainMessage.connectSessionId = websocket.sessionId;
       }
@@ -92,8 +93,8 @@ class ChainMessageHandler {
     if (defaultPeerEndpoint != null) {
       chainMessage.srcConnectAddress = defaultPeerEndpoint.wsConnectAddress;
       chainMessage.srcConnectPeerId = defaultPeerEndpoint.peerId;
-      Websocket? websocket =
-          (await websocketPool.get(defaultPeerEndpoint.wsConnectAddress!)) as Websocket?;
+      UniversalWebsocket? websocket =
+          (await websocketPool.get(defaultPeerEndpoint.wsConnectAddress!));
       if (websocket != null) {
         chainMessage.srcConnectSessionId = websocket.sessionId;
       }

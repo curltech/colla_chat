@@ -15,7 +15,7 @@ import 'package:colla_chat/routers/router_handler.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/transport/websocket/common_websocket.dart';
+import 'package:colla_chat/transport/websocket/universal_websocket.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart' as inapp;
