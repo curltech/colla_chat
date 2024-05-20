@@ -182,7 +182,7 @@ class ChainMessageHandler {
         // if (websocket == null || websocket.status != SocketStatus.connected) {
         //   Future.delayed(const Duration(seconds: 1));
         // }
-        if (websocket != null && websocket.status == SocketStatus.connected) {
+        if (websocket != null) {
           var data = MessageSerializer.marshal(chainMessage);
           success = await websocket.sendMsg(data);
         }
@@ -195,7 +195,7 @@ class ChainMessageHandler {
         Response response = await httpClient.send('/receive', data);
         result = response.data;
         success = true;
-            }
+      }
     } catch (err) {
       logger.e('send message:$err');
     }

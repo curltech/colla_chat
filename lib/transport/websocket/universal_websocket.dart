@@ -118,7 +118,7 @@ class UniversalWebsocket extends IWebClient {
       }
       outMessageStreamSubscription =
           _client!.outgoingMessagesStream.listen((outMsg) {
-        logger.i('> webSocket sent bytes message to server: "$outMsg"');
+
       });
 
       final isConnected = await _client!.connect();

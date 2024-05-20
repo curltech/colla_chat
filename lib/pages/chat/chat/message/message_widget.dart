@@ -138,6 +138,14 @@ class MessageWidget {
     }
 
     final List<ActionData> messagePopActionData = [];
+    if (chatMessage.status == MessageStatus.unsent.name) {
+      messagePopActionData.add(
+        ActionData(
+            label: 'Resend',
+            tooltip: 'Resend message',
+            icon: const Icon(Icons.redo_outlined)),
+      );
+    }
     if (subMessageType == ChatMessageSubType.chat) {
       String contentType = chatMessage.contentType!;
       if (contentType == ChatMessageContentType.file.name ||
@@ -237,6 +245,8 @@ class MessageWidget {
   _onMessagePopAction(BuildContext context, int index, String label,
       {String? value}) async {
     switch (label) {
+      case 'Resend':
+        await _resend(context);
       case 'Save to file':
         await _saveFile(context);
       case 'Save to gallery':
@@ -302,6 +312,11 @@ class MessageWidget {
 
       default:
     }
+  }
+
+  Future<void> _resend(BuildContext context) async {
+    await chatMessageService.sendAndStore(chatMessage);
+    chatMessageController.notifyListeners();
   }
 
   Future<void> _saveFile(BuildContext context, {bool isFile = true}) async {
