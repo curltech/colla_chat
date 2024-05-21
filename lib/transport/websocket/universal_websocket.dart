@@ -117,9 +117,7 @@ class UniversalWebsocket extends IWebClient {
         outMessageStreamSubscription = null;
       }
       outMessageStreamSubscription =
-          _client!.outgoingMessagesStream.listen((outMsg) {
-
-      });
+          _client!.outgoingMessagesStream.listen((outMsg) {});
 
       final isConnected = await _client!.connect();
       if (!isConnected) {
@@ -141,6 +139,9 @@ class UniversalWebsocket extends IWebClient {
   }
 
   onData(dynamic data) async {
+    if (lastHeartBeatTime == null && _client != null) {
+      statusStreamController.add(_client!.socketHandlerState.status);
+    }
     lastHeartBeatTime = DateTime.now();
     logger.i('wss address:$address websocket received data');
     var msg = String.fromCharCodes(data);
