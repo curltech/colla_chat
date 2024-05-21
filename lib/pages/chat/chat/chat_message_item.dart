@@ -110,9 +110,12 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
     }
     double width = appDataProvider.secondaryBodyWidth * 0.8;
     // logger.w('secondaryBodyWidth width:${appDataProvider.secondaryBodyWidth}');
+
     String transportType = widget.chatMessage.transportType;
     Color borderColor = widget.isMyself ? myself.primary : Colors.white;
-    if (transportType == TransportType.websocket.name) {
+    if (widget.chatMessage.status == MessageStatus.unsent.name) {
+      borderColor = Colors.redAccent;
+    } else if (transportType == TransportType.websocket.name) {
       borderColor = Colors.cyanAccent;
     } else if (transportType == TransportType.sfu.name) {
       borderColor = Colors.greenAccent;
