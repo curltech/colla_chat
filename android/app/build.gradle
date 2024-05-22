@@ -35,7 +35,7 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 android {
     namespace "io.curltech.colla_chat"
     compileSdk 34//flutter.compileSdkVersion
-    ndkVersion "25.2.9519653"
+    ndkVersion '26.3.11579264'
     buildToolsVersion '34.0.0'
 
     java {
