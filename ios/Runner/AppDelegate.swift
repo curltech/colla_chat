@@ -13,7 +13,7 @@ import QMapKit
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-      QMapServices.shared().apiKey = "YOUR KEY HERE"
+      QMapServices.shared().apiKey = "QFSBZ-ZTGCT-JS2XU-LERCR-ISRAQ-EEFJA"
       // This is required to make any communication available in the action isolate.
       FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { (registry) in
         GeneratedPluginRegistrant.register(with: registry)
