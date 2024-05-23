@@ -1,8 +1,14 @@
 import 'dart:async';
 
 import 'package:apple_maps_flutter/apple_maps_flutter.dart' as apple_maps;
+import 'package:apple_maps_flutter/apple_maps_flutter.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/apple_map_widget.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/plugin/tencent_map_widget.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/loading_util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -10,7 +16,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart' as google_maps;
 import 'package:latlong2/latlong.dart' as latlong2;
 import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 import 'package:map_launcher/map_launcher.dart' as map_launcher;
-import 'package:maps_launcher/maps_launcher.dart';
+import 'package:tencent_map_flutter/tencent_map_flutter.dart' as tencent_map;
 
 class LocationPosition {
   double latitude;
@@ -248,20 +254,6 @@ class GeolocatorUtil {
     }
   }
 
-  /// 适用于所有平台的地图，非移动平台采用Google Maps
-  static Future<bool> launchQuery(String address) {
-    return MapsLauncher.launchQuery(address);
-  }
-
-  /// 适用于所有平台的地图，非移动平台采用Google Maps
-  static Future<bool> launchCoordinates(
-    double latitude,
-    double longitude, [
-    String? label,
-  ]) {
-    return MapsLauncher.launchCoordinates(latitude, longitude, label);
-  }
-
   /// 谷歌地图，需要price key
   static google_maps.GoogleMap buildGoogleMap({
     Key? key,
@@ -316,7 +308,7 @@ class GeolocatorUtil {
   }
 
   /// 使用Open Street Map，需要翻墙，支持所有的平台
-  static FlutterLocationPicker buildLocationPicker({
+  static FlutterLocationPicker buildOpenStreetLocationPicker({
     Key? key,
     double? latitude,
     double? longitude,
@@ -326,7 +318,7 @@ class GeolocatorUtil {
     double initZoom = 17,
     double minZoomLevel = 2,
     double maxZoomLevel = 18.4,
-    String urlTemplate = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    String urlTemplate = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     String mapLanguage = 'cn',
     String selectLocationButtonText = 'Set Current Location',
     Duration mapAnimationDuration = const Duration(milliseconds: 2000),
@@ -389,5 +381,122 @@ class GeolocatorUtil {
       markerIcon: markerIcon,
       loadingWidget: loadingWidget,
     );
+  }
+
+  static TencentMapWidget buildTencentLocationPicker(
+      {Key? key,
+      double? latitude,
+      double? longitude,
+      required void Function(latlong2.LatLng) onLocation}) {
+    return TencentMapWidget(
+        androidTexture: true,
+        myLocationEnabled: true,
+        userLocationType: tencent_map.UserLocationType.trackingLocationRotate,
+        onLocation: (tencent_map.Location location) {
+          onLocation(latlong2.LatLng(
+              location.position.latitude, location.position.longitude));
+        });
+  }
+
+  static Widget buildAppleLocationPicker(
+      {Key? key,
+      double? latitude,
+      double? longitude,
+      required void Function(latlong2.LatLng) onLocation}) {
+    if (latitude != null || longitude != null) {
+      AppleMapWidget appleMapWidget = AppleMapWidget(
+        initialCameraPosition:
+            CameraPosition(target: LatLng(latitude!, longitude!)),
+        myLocationEnabled: true,
+        onLongPress: (LatLng latLng) {
+          onLocation(latlong2.LatLng(latLng.latitude, latLng.longitude));
+        },
+      );
+      return appleMapWidget;
+    }
+    return FutureBuilder(
+        future: GeolocatorUtil.currentPosition(),
+        builder: (BuildContext context, AsyncSnapshot<Position> snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            Position? position = snapshot.data;
+            if (position != null) {
+              return AppleMapWidget(
+                initialCameraPosition: CameraPosition(
+                    target: LatLng(position.latitude, position.longitude)),
+                myLocationEnabled: true,
+                onLongPress: (LatLng latLng) {
+                  onLocation(
+                      latlong2.LatLng(latLng.latitude, latLng.longitude));
+                },
+              );
+            }
+          }
+          return LoadingUtil.buildCircularLoadingWidget();
+        });
+  }
+
+  static Widget showPosition(String title, double latitude, double longitude,
+      {BuildContext? context}) {
+    if (platformParams.mobile) {
+      GeolocatorUtil.mapLauncher(
+          title: AppLocalizations.t('Current position'),
+          latitude: latitude,
+          longitude: longitude);
+    } else {
+      if (context != null) {
+        DialogUtil.show(
+            context: context,
+            builder: (BuildContext? context) {
+              return Card(
+                  elevation: 0.0,
+                  margin: EdgeInsets.zero,
+                  shape: const ContinuousRectangleBorder(),
+                  child: Column(children: [
+                    Text(title),
+                    Expanded(
+                        child: GeolocatorUtil.buildOpenStreetLocationPicker(
+                            latitude: latitude,
+                            longitude: longitude,
+                            onPicked: (PickedData data) {
+                              Navigator.pop(context!);
+                            }))
+                  ]));
+            });
+      } else {
+        return GeolocatorUtil.buildOpenStreetLocationPicker(
+            latitude: latitude, longitude: longitude, onPicked: (data) {});
+      }
+    }
+    return Container();
+  }
+
+  static Widget buildLocationPicker(
+      {Key? key,
+      double? latitude,
+      double? longitude,
+      required void Function(latlong2.LatLng, {String? addr}) onLocation}) {
+    if (platformParams.ios) {
+      return buildAppleLocationPicker(
+        latitude: latitude,
+        longitude: longitude,
+        onLocation: onLocation,
+      );
+    } else if (platformParams.android) {
+      return buildTencentLocationPicker(
+        latitude: latitude,
+        longitude: longitude,
+        onLocation: onLocation,
+      );
+    } else {
+      return GeolocatorUtil.buildOpenStreetLocationPicker(
+          latitude: latitude,
+          longitude: longitude,
+          onPicked: (PickedData data) {
+            longitude = data.latLong.longitude;
+            latitude = data.latLong.latitude;
+            String address = data.address;
+            onLocation(latlong2.LatLng(latitude!, longitude!), addr: address);
+          });
+    }
   }
 }

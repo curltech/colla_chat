@@ -208,6 +208,10 @@
                 android:name="flutterEmbedding"
                 android:value="2"/>
 
+        <meta-data
+            android:name="TencentMapSDK"
+            android:value="QFSBZ-ZTGCT-JS2XU-LERCR-ISRAQ-EEFJA"/>
+
         <service
                 android:name="de.julianassmann.flutter_background.IsolateHolderService"
                 android:enabled="true"

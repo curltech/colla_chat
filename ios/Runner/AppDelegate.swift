@@ -3,6 +3,7 @@ import flutter_sharing_intent
 import Flutter
 import flutter_local_notifications
 import flutter_background_service_ios
+import QMapKit
 //import awesome_notifications
 //import shared_preferences_ios
 
@@ -12,6 +13,7 @@ import flutter_background_service_ios
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
+      QMapServices.shared().apiKey = "YOUR KEY HERE"
       // This is required to make any communication available in the action isolate.
       FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { (registry) in
         GeneratedPluginRegistrant.register(with: registry)

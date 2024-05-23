@@ -175,3 +175,5 @@ class AppImage {
 }
 
 const double dialogSizeIndex = 0.8;
+
+const String tencentMapKey = 'QFSBZ-ZTGCT-JS2XU-LERCR-ISRAQ-EEFJA';

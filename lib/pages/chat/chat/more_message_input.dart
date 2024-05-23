@@ -411,13 +411,13 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
                 child: Column(children: [
                   title,
                   Expanded(
-                      child: GeolocatorUtil.buildLocationPicker(
+                      child:  GeolocatorUtil.buildLocationPicker(
                           latitude: latitude,
                           longitude: longitude,
-                          onPicked: (PickedData data) {
-                            longitude = data.latLong.longitude;
-                            latitude = data.latLong.latitude;
-                            address = data.address;
+                          onLocation: (latLng, {String? addr}) {
+                            longitude = latLng.longitude;
+                            latitude = latLng.latitude;
+                            address = addr;
                             Navigator.pop(context!);
                           }))
                 ]));

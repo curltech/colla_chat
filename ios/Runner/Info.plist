@@ -171,5 +171,7 @@
         <string>copilot</string>
         <string>com.sygic.aura</string>
     </array>
+    <key>io.flutter.embedded_views_preview</key>
+    <true/>
 </dict>
 </plist>

@@ -37,16 +37,13 @@ class LocationMessage extends StatelessWidget {
     var heading = locationPosition.heading; //
     var address = locationPosition.address; //
     Widget headingWidget = Icon(Icons.location_on, color: myself.secondary);
-    if (platformParams.mobile) {
-      headingWidget = IconButton(
-        icon: Icon(Icons.location_on, color: myself.primary),
-        color: myself.primary,
-        onPressed: () {
-          GeolocatorUtil.mapLauncher(
-              latitude: latitude, longitude: longitude, title: address!);
-        },
-      );
-    }
+    headingWidget = IconButton(
+      icon: Icon(Icons.location_on, color: myself.primary),
+      color: myself.primary,
+      onPressed: () {
+        GeolocatorUtil.showPosition(address!, latitude, longitude);
+      },
+    );
     if (thumbnail != null) {
       headingWidget = ImageUtil.buildImageWidget(image: thumbnail);
     }
@@ -76,10 +73,10 @@ class LocationMessage extends StatelessWidget {
 
       return CommonMessage(child: child);
     } else {
-      child = GeolocatorUtil.buildLocationPicker(
-        latitude: latitude,
-        longitude: longitude,
-        onPicked: (PickedData data) {},
+      child = GeolocatorUtil.showPosition(
+        AppLocalizations.t('Location'),
+        latitude,
+        longitude,
       );
 
       return Card(

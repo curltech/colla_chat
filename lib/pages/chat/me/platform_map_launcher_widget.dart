@@ -80,8 +80,11 @@ class _PlatformMapLauncherWidgetState extends State<PlatformMapLauncherWidget> {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
               Position position = snapshot.data!;
-              GeolocatorUtil.launchCoordinates(position.latitude,
-                  position.longitude, AppLocalizations.t('Current position'));
+
+              return GeolocatorUtil.showPosition(
+                  AppLocalizations.t('Current position'),
+                  position.latitude,
+                  position.longitude);
             }
           }
           return LoadingUtil.buildLoadingIndicator();
