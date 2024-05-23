@@ -391,6 +391,7 @@ dependency_overrides:
   device_info_plus: ^10.0.1
   flutter_keyboard_visibility: ^6.0.0
   ffi: 2.1.0
+  win32: 5.5.0
   http: 1.2.0
   dart_webrtc: ^1.4.5
   webrtc_interface: 1.2.0
@@ -446,15 +447,15 @@ dependency_overrides:
   visibility_detector: ^0.4.0+2 #组建可见性的大小发生变化
   focus_detector: ^2.0.1 #组建在界面上消失或者出现
   image_picker: ^1.1.1 #选取图库,移动从图像廊或者相机选，桌面实现采用file_selector，从文件系统选
-  win32: ^5.0.9
   markdown: ^7.1.1
   lottie: ^2.4.0
-  flutter_quill: #9.3.1
-    git: https://github.com/singerdmx/flutter-quill.git
-  flutter_quill_extensions: #^9.3.1
-    git:
-      url: https://github.com/singerdmx/flutter-quill.git
-      path: flutter_quill_extensions
+  flutter_quill: ^9.3.20
+#  flutter_quill: #9.3.1
+#    git: https://github.com/singerdmx/flutter-quill.git
+  flutter_quill_extensions: ^9.3.20
+#    git:
+#      url: https://github.com/singerdmx/flutter-quill.git
+#      path: flutter_quill_extensions
 #  image_gallery_saver: #^2.0.3
 #    git: https://github.com/hui-z/image_gallery_saver.git
   saver_gallery: 3.0.1
