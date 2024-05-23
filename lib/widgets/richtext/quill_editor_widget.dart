@@ -256,7 +256,6 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
         expands: false,
         padding: EdgeInsets.zero,
         onImagePaste: _onImagePaste,
-        readOnly: false,
         embedBuilders: [
           ...FlutterQuillEmbeds.defaultEditorBuilders(),
           NotesEmbedBuilder(addEditNote: _addEditNote)
