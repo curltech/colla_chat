@@ -32,6 +32,8 @@ dependencies:
     sdk: flutter
   # 尝试使用的功能
   get: ^5.0.0-release-candidate-5
+  go_router: ^14.1.3
+  flutter_riverpod: ^2.5.1
   bonsoir: ^5.1.9
   network_tools: ^5.0.2
   network_tools_flutter: ^2.0.2
