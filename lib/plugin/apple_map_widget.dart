@@ -1,6 +1,4 @@
 import 'dart:core';
-import 'dart:math';
-import 'dart:ui';
 
 import 'package:apple_maps_flutter/apple_maps_flutter.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -13,7 +11,6 @@ import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart' as geocoding;
 
 /// 调用apple地图，用于IOS设备，

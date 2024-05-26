@@ -55,10 +55,10 @@ class CircleTextButton extends StatelessWidget {
   build(BuildContext context) {
     Widget button = TextButton(
       style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(backgroundColor),
-        padding: MaterialStateProperty.all(padding),
-        elevation: MaterialStateProperty.all(elevation),
-        shape: MaterialStateProperty.all(
+        backgroundColor: WidgetStateProperty.all(backgroundColor),
+        padding: WidgetStateProperty.all(padding),
+        elevation: WidgetStateProperty.all(elevation),
+        shape: WidgetStateProperty.all(
           const CircleBorder(),
         ),
       ),
@@ -244,18 +244,18 @@ class StyleUtil {
     textStyle = textStyle ?? const TextStyle(color: Colors.white);
     elevation = elevation ?? 0.0;
     ButtonStyle style = ButtonStyle(
-      backgroundColor: MaterialStateProperty.all(backgroundColor),
-      foregroundColor: MaterialStateProperty.all(foregroundColor),
-      textStyle: MaterialStateProperty.all(textStyle),
-      elevation: MaterialStateProperty.all(elevation),
-      shape: MaterialStateProperty.all(
+      backgroundColor: WidgetStateProperty.all(backgroundColor),
+      foregroundColor: WidgetStateProperty.all(foregroundColor),
+      textStyle: WidgetStateProperty.all(textStyle),
+      elevation: WidgetStateProperty.all(elevation),
+      shape: WidgetStateProperty.all(
         RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius),
         ),
       ),
-      padding: MaterialStateProperty.all(padding),
-      minimumSize: MaterialStateProperty.all(minimumSize),
-      maximumSize: MaterialStateProperty.all(maximumSize),
+      padding: WidgetStateProperty.all(padding),
+      minimumSize: WidgetStateProperty.all(minimumSize),
+      maximumSize: WidgetStateProperty.all(maximumSize),
     );
 
     return style;

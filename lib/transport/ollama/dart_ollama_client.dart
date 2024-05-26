@@ -168,23 +168,23 @@ class DartOllamaClient {
   }
 
   Future<CreateModelStatus?> createModel(
-    String name,
+    String model,
     String modelfile, {
     bool stream = false,
   }) async {
     final CreateModelResponse res = await _client.createModel(
       request:
-          CreateModelRequest(name: name, modelfile: modelfile, stream: stream),
+          CreateModelRequest(model: model, modelfile: modelfile, stream: stream),
     );
     return res.status;
   }
 
   Future<List<CreateModelStatus?>> createModelStream(
-      String name, String modelfile,
+      String model, String modelfile,
       {bool stream = false}) async {
     final modelStream = _client.createModelStream(
       request:
-          CreateModelRequest(name: name, modelfile: modelfile, stream: stream),
+          CreateModelRequest(model: model, modelfile: modelfile, stream: stream),
     );
     List<CreateModelStatus?> status = [];
     await for (final res in modelStream) {
@@ -200,33 +200,33 @@ class DartOllamaClient {
     return res.models;
   }
 
-  Future<ModelInfo> showModelInfo(String name) async {
+  Future<ModelInfo> showModelInfo(String model) async {
     final res = await _client.showModelInfo(
-      request: ModelInfoRequest(name: name),
+      request: ModelInfoRequest(model: model),
     );
 
     return res;
   }
 
   Future<PullModelStatus?> pullModel(
-    String name, {
+    String model, {
     bool insecure = false,
     bool stream = false,
   }) async {
     final PullModelResponse res = await _client.pullModel(
-      request: PullModelRequest(name: name, insecure: insecure, stream: stream),
+      request: PullModelRequest(model: model, insecure: insecure, stream: stream),
     );
 
     return res.status;
   }
 
   Future<List<PullModelStatus?>> pullModelStream(
-    String name, {
+    String model, {
     bool insecure = false,
     bool stream = false,
   }) async {
     final modelStream = _client.pullModelStream(
-      request: PullModelRequest(name: name, insecure: insecure, stream: stream),
+      request: PullModelRequest(model: model, insecure: insecure, stream: stream),
     );
     List<PullModelStatus?> status = [];
     await for (final res in modelStream) {
@@ -237,24 +237,24 @@ class DartOllamaClient {
   }
 
   Future<PushModelStatus?> pushModel(
-    String name, {
+    String model, {
     bool insecure = false,
     bool stream = false,
   }) async {
     final PushModelResponse res = await _client.pushModel(
-      request: PushModelRequest(name: name, insecure: insecure, stream: stream),
+      request: PushModelRequest(model: model, insecure: insecure, stream: stream),
     );
 
     return res.status;
   }
 
   Future<List<PushModelStatus?>> pushModelStream(
-    String name, {
+    String model, {
     bool insecure = false,
     bool stream = false,
   }) async {
     final modelStream = _client.pushModelStream(
-      request: PushModelRequest(name: name, insecure: insecure, stream: stream),
+      request: PushModelRequest(model: model, insecure: insecure, stream: stream),
     );
     List<PushModelStatus?> status = [];
     await for (final res in modelStream) {
@@ -264,9 +264,9 @@ class DartOllamaClient {
     return status;
   }
 
-  Future<void> checkBlob(String name) async {
+  Future<void> checkBlob(String digest) async {
     await _client.checkBlob(
-      name: name,
+      digest: digest,
     );
   }
 }

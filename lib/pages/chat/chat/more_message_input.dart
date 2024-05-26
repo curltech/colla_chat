@@ -40,7 +40,6 @@ import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
-import 'package:latlong2/latlong.dart' as latlong2;
 
 ///非文本的其他多种格式输入面板，包括照片等
 class MoreMessageInput extends StatefulWidget {

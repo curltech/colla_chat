@@ -212,12 +212,12 @@ class _BindingDataTable2State<T> extends State<BindingDataTable2> {
       sortArrowIcon: Icons.keyboard_arrow_up,
       headingCheckboxTheme: CheckboxThemeData(
         side: BorderSide(color: myself.primary),
-        fillColor: MaterialStateColor.resolveWith((states) => myself.primary),
+        fillColor: WidgetStateColor.resolveWith((states) => myself.primary),
         // checkColor: MaterialStateColor.resolveWith((states) => Colors.white)
       ),
       datarowCheckboxTheme: CheckboxThemeData(
         side: BorderSide(color: myself.primary),
-        fillColor: MaterialStateColor.resolveWith((states) => myself.primary),
+        fillColor: WidgetStateColor.resolveWith((states) => myself.primary),
         // checkColor: MaterialStateColor.resolveWith((states) => Colors.white)
       ),
       sortColumnIndex: widget.controller.sortColumnIndex,

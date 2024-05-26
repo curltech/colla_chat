@@ -1,6 +1,5 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/widgets/style/glass/glassmorphism_widget_factory.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:flutter/material.dart';
 import 'package:glass_kit/glass_kit.dart';
@@ -236,6 +235,39 @@ class GlassKitWidgetFactory extends WidgetFactory {
     });
   }
 
+  _buildGlassWidget({required Widget child}) {
+    return GlassContainer(
+      isFrostedGlass: true,
+      frostedOpacity: 0.05,
+      blur: 20,
+      gradient: LinearGradient(
+        colors: [
+          Colors.white.withOpacity(0.25),
+          Colors.white.withOpacity(0.05),
+        ],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      borderGradient: LinearGradient(
+        colors: [
+          Colors.white.withOpacity(0.60),
+          Colors.white.withOpacity(0.0),
+          Colors.white.withOpacity(0.0),
+          Colors.white.withOpacity(0.60),
+        ],
+        stops: const [0.0, 0.45, 0.55, 1.0],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      boxShadow: [
+        BoxShadow(color: Colors.black.withOpacity(0.10), blurRadius: 20.0)
+      ],
+      borderRadius: BorderRadius.circular(25.0),
+      padding: const EdgeInsets.all(16.0),
+      child: child,
+    );
+  }
+
   @override
   PreferredSizeWidget appBar(
       {Key? key,
@@ -243,12 +275,13 @@ class GlassKitWidgetFactory extends WidgetFactory {
       Widget? title,
       bool? centerTitle,
       List<Widget>? actions}) {
-    return glassmorphismWidgetFactory.appBar(
-        key: key,
-        leading: leading,
-        title: title,
-        centerTitle: centerTitle,
-        actions: actions);
+    return _buildGlassWidget(
+        child: appBar(
+            key: key,
+            leading: leading,
+            title: title,
+            centerTitle: centerTitle,
+            actions: actions));
   }
 
   @override
@@ -261,7 +294,8 @@ class GlassKitWidgetFactory extends WidgetFactory {
     Color? unselectedItemColor,
     double? selectedColorOpacity,
   }) {
-    return glassmorphismWidgetFactory.bottomNavigationBar(
+    return _buildGlassWidget(
+        child: bottomNavigationBar(
       key: key,
       items: items,
       currentIndex: currentIndex,
@@ -269,7 +303,7 @@ class GlassKitWidgetFactory extends WidgetFactory {
       selectedColorOpacity: selectedColorOpacity,
       onTap: onTap,
       unselectedItemColor: unselectedItemColor,
-    );
+    ));
   }
 
   @override
@@ -278,18 +312,19 @@ class GlassKitWidgetFactory extends WidgetFactory {
       Widget? child,
       void Function()? onPressed,
       void Function()? onLongPressed}) {
-    return glassmorphismWidgetFactory.button(
-        key: key,
-        onPressed: onPressed,
-        child: child,
-        onLongPressed: onLongPressed);
+    return _buildGlassWidget(
+        child: button(
+            key: key,
+            onPressed: onPressed,
+            child: child,
+            onLongPressed: onLongPressed));
   }
 
   @override
   icon(IconData icon,
       {Key? key, double? size, Color? color, double opacity = 0.5}) {
-    return glassmorphismWidgetFactory.icon(icon,
-        key: key, size: size, color: color, opacity: opacity);
+    return _buildGlassWidget(
+        child: Icon(icon, key: key, size: size, color: color));
   }
 
   @override
@@ -300,13 +335,14 @@ class GlassKitWidgetFactory extends WidgetFactory {
       Widget? subtitle,
       Widget? trailing,
       void Function()? onTap}) {
-    return glassmorphismWidgetFactory.listTile(
-        key: key,
-        leading: leading,
-        title: title,
-        subtitle: subtitle,
-        trailing: trailing,
-        onTap: onTap);
+    return _buildGlassWidget(
+        child: ListTile(
+            key: key,
+            leading: leading,
+            title: title,
+            subtitle: subtitle,
+            trailing: trailing,
+            onTap: onTap));
   }
 
   @override
@@ -317,13 +353,12 @@ class GlassKitWidgetFactory extends WidgetFactory {
       double opacity = 0.5,
       double? fontSize,
       FontWeight fontWeight = FontWeight.bold}) {
-    return glassmorphismWidgetFactory.text(data,
-        key: key,
-        style: style,
-        color: color,
-        opacity: opacity,
-        fontSize: fontSize,
-        fontWeight: fontWeight);
+    return _buildGlassWidget(
+        child: Text(
+      data,
+      key: key,
+      style: style,
+    ));
   }
 }
 

@@ -1,44 +1,44 @@
-import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/routers/routes.dart';
-import 'package:colla_chat/widgets/common/common_text_form_field.dart';
-import 'package:colla_chat/widgets/style/neumorphic/neumorphic_container_widget.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:material_neumorphic/material_neumorphic.dart';
 
 class NeumorphicWidgetFactory extends WidgetFactory {
-  NeumorphicTheme buildTheme(Widget child) {
-    ThemeMode themeMode = myself.themeMode;
-    var theme = NeumorphicTheme(
-        themeMode: themeMode, //or dark / system
-        darkTheme: neumorphicConstants.darkThemeData,
-        theme: neumorphicConstants.themeData,
-        child: child);
-    return theme;
+  ThemeData buildThemeData(
+      {Color seedColor = NeumorphicTheme.defaultSeedColor,
+      Brightness brightness = Brightness.light}) {
+    final colorScheme =
+        ColorScheme.fromSeed(brightness: brightness, seedColor: seedColor);
+    return ThemeData(
+      colorScheme: colorScheme,
+      useMaterial3: true,
+    ).copyWith(
+      extensions: <ThemeExtension<dynamic>>[
+        const NeumorphicTheme().fitWithColorSchema(colorScheme),
+      ],
+    );
   }
 
   @override
   Widget container({
     Key? key,
     Widget? child,
-    Duration duration = Neumorphic.DEFAULT_DURATION,
-    Curve curve = Neumorphic.DEFAULT_CURVE,
+    Color? color,
     NeumorphicStyle? style,
-    TextStyle? textStyle,
-    EdgeInsets margin = const EdgeInsets.all(0),
-    EdgeInsets padding = const EdgeInsets.all(0),
+    EdgeInsets? margin,
+    EdgeInsets? padding,
+    Duration duration = NeumorphicTheme.defaultDuration,
+    Curve curve = NeumorphicTheme.defaultCurve,
     bool drawSurfaceAboveChild = true,
   }) {
     return Neumorphic(
       key: key,
-      duration: duration,
-      curve: curve,
+      color: color,
       style: style,
-      textStyle: textStyle,
       margin: margin,
       padding: padding,
+      duration: duration,
+      curve: curve,
       drawSurfaceAboveChild: drawSurfaceAboveChild,
       child: child,
     );
@@ -50,12 +50,12 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     required double width,
     required double height,
     Widget? child,
-    Duration duration = Neumorphic.DEFAULT_DURATION,
-    Curve curve = Neumorphic.DEFAULT_CURVE,
+    Color? color,
     NeumorphicStyle? style,
-    TextStyle? textStyle,
-    EdgeInsets margin = const EdgeInsets.all(0),
-    EdgeInsets padding = const EdgeInsets.all(0),
+    EdgeInsets? margin,
+    EdgeInsets? padding,
+    Duration duration = NeumorphicTheme.defaultDuration,
+    Curve curve = NeumorphicTheme.defaultCurve,
     bool drawSurfaceAboveChild = true,
   }) {
     return SizedBox(
@@ -66,7 +66,6 @@ class NeumorphicWidgetFactory extends WidgetFactory {
           duration: duration,
           curve: curve,
           style: style,
-          textStyle: textStyle,
           margin: margin,
           padding: padding,
           drawSurfaceAboveChild: drawSurfaceAboveChild,
@@ -144,11 +143,9 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     bool enableIMEPersonalizedLearning = true,
     MouseCursor? mouseCursor,
   }) {
-    return Neumorphic(
-        child: CommonTextFormField(
+    return NeumorphicTextField(
       key: key,
       controller: controller,
-      initialValue: initialValue,
       focusNode: focusNode,
       decoration: decoration,
       keyboardType: keyboardType,
@@ -176,9 +173,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
       onChanged: onChanged,
       onTap: onTap,
       onEditingComplete: onEditingComplete,
-      onFieldSubmitted: onFieldSubmitted,
-      onSaved: onSaved,
-      validator: validator,
+      onSubmitted: onFieldSubmitted,
       inputFormatters: inputFormatters,
       enabled: enabled,
       cursorWidth: cursorWidth,
@@ -192,12 +187,11 @@ class NeumorphicWidgetFactory extends WidgetFactory {
       buildCounter: buildCounter,
       scrollPhysics: scrollPhysics,
       autofillHints: autofillHints,
-      autovalidateMode: autovalidateMode,
       scrollController: scrollController,
       restorationId: restorationId,
       enableIMEPersonalizedLearning: enableIMEPersonalizedLearning,
       mouseCursor: mouseCursor,
-    ));
+    );
   }
 
   Widget textField({
@@ -314,8 +308,8 @@ class NeumorphicWidgetFactory extends WidgetFactory {
       margin: EdgeInsets.zero,
       drawSurfaceAboveChild: true,
       pressed: onPressed != null,
-      duration: Neumorphic.DEFAULT_DURATION,
-      curve: Neumorphic.DEFAULT_CURVE,
+      duration: NeumorphicTheme.defaultDuration,
+      curve: NeumorphicTheme.defaultCurve,
       onPressed: onPressed,
       minDistance: 0,
       style: const NeumorphicStyle(),
@@ -328,8 +322,8 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     Widget? child,
     NeumorphicRadioStyle style = const NeumorphicRadioStyle(),
     dynamic value,
-    Curve curve = Neumorphic.DEFAULT_CURVE,
-    Duration duration = Neumorphic.DEFAULT_DURATION,
+    Curve curve = NeumorphicTheme.defaultCurve,
+    Duration duration = NeumorphicTheme.defaultDuration,
     EdgeInsets padding = EdgeInsets.zero,
     dynamic groupValue,
     void Function(dynamic)? onChanged,
@@ -352,8 +346,8 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     NeumorphicCheckboxStyle style = const NeumorphicCheckboxStyle(),
     required bool value,
     required void Function(dynamic) onChanged,
-    Curve curve = Neumorphic.DEFAULT_CURVE,
-    Duration duration = Neumorphic.DEFAULT_DURATION,
+    Curve curve = NeumorphicTheme.defaultCurve,
+    Duration duration = NeumorphicTheme.defaultDuration,
     EdgeInsets padding =
         const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
     EdgeInsets margin = const EdgeInsets.all(0),
@@ -380,16 +374,16 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     double? fontSize,
     FontWeight fontWeight = FontWeight.bold,
     TextAlign textAlign = TextAlign.center,
+    TextStyle? textStyle,
   }) {
     return NeumorphicText(
       data,
       key: key,
-      duration: Neumorphic.DEFAULT_DURATION,
+      duration: NeumorphicTheme.defaultDuration,
       style: NeumorphicStyle(color: color),
-      curve: Neumorphic.DEFAULT_CURVE,
+      curve: NeumorphicTheme.defaultCurve,
       textAlign: textAlign,
-      textStyle:
-          NeumorphicTextStyle(fontSize: fontSize, fontWeight: fontWeight),
+      textStyle: textStyle,
     );
   }
 
@@ -404,9 +398,9 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     return NeumorphicIcon(
       icon,
       key: key,
-      duration: Neumorphic.DEFAULT_DURATION,
+      duration: NeumorphicTheme.defaultDuration,
       style: NeumorphicStyle(color: color),
-      curve: Neumorphic.DEFAULT_CURVE,
+      curve: NeumorphicTheme.defaultCurve,
       size: size ?? 20,
     );
   }
@@ -414,8 +408,8 @@ class NeumorphicWidgetFactory extends WidgetFactory {
   Widget switchButton({
     NeumorphicSwitchStyle style = const NeumorphicSwitchStyle(),
     Key? key,
-    Curve curve = Neumorphic.DEFAULT_CURVE,
-    Duration duration = const Duration(milliseconds: 200),
+    Curve curve = NeumorphicTheme.defaultCurve,
+    Duration duration = NeumorphicTheme.defaultDuration,
     bool value = false,
     void Function(bool)? onChanged,
     double height = 40,
@@ -500,7 +494,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     Key? key,
     double? percent,
     double height = 10,
-    Duration duration = const Duration(milliseconds: 300),
+    Duration duration = NeumorphicTheme.defaultDuration,
     ProgressStyle style = const ProgressStyle(),
     Curve curve = Curves.easeOutCubic,
   }) {
@@ -529,102 +523,6 @@ class NeumorphicWidgetFactory extends WidgetFactory {
       curve: curve,
       reverse: reverse,
       height: height,
-    );
-  }
-
-  Widget app(
-    BuildContext context, {
-    Key? key,
-    String title = '',
-    Color? color,
-    String? initialRoute,
-    Map<String, Widget Function(BuildContext)> routes = const {},
-    Widget? home,
-    bool debugShowCheckedModeBanner = false,
-    GlobalKey<NavigatorState>? navigatorKey,
-    List<NavigatorObserver> navigatorObservers = const [],
-    Route? Function(RouteSettings)? onGenerateRoute,
-    String Function(BuildContext)? onGenerateTitle,
-    List<Route<dynamic>> Function(String)? onGenerateInitialRoutes,
-    Route? Function(RouteSettings)? onUnknownRoute,
-    NeumorphicThemeData? theme,
-    NeumorphicThemeData? darkTheme,
-    Locale? locale,
-    Iterable<LocalizationsDelegate<dynamic>>? localizationsDelegates,
-    Iterable<Locale>? supportedLocales,
-    ThemeMode? themeMode,
-    ThemeData? materialDarkTheme,
-    ThemeData? materialTheme,
-    Widget Function(BuildContext, Widget?)? builder,
-    Locale? Function(Locale?, Iterable)? localeResolutionCallback,
-    ThemeData? highContrastTheme,
-    ThemeData? highContrastDarkTheme,
-    Locale? Function(List?, Iterable)? localeListResolutionCallback,
-    bool showPerformanceOverlay = false,
-    bool checkerboardRasterCacheImages = false,
-    bool checkerboardOffscreenLayers = false,
-    bool showSemanticsDebugger = false,
-    bool debugShowMaterialGrid = false,
-    Map<LogicalKeySet, Intent>? shortcuts,
-    Map<Type, Action<Intent>>? actions,
-  }) {
-    onGenerateTitle = onGenerateTitle ??
-        (context) {
-          return AppLocalizations.t('Welcome to CollaChat');
-        };
-    themeMode = themeMode ?? neumorphicConstants.themeMode;
-    theme = theme ?? neumorphicConstants.themeData;
-    darkTheme = darkTheme ?? neumorphicConstants.darkThemeData;
-    onGenerateRoute = onGenerateRoute ?? Application.router.generator;
-    // AppLocalizations.localizationsDelegates,
-    localizationsDelegates = const [
-      AppLocalizationsDelegate(),
-      GlobalMaterialLocalizations.delegate,
-      GlobalWidgetsLocalizations.delegate,
-      GlobalCupertinoLocalizations.delegate,
-    ];
-    supportedLocales = const [
-      Locale('zh', 'CN'),
-      Locale('en', 'US'),
-      Locale('zh', 'TW'),
-      Locale('ja', 'JP'),
-      Locale('ko', 'KR'),
-    ];
-    locale = locale ?? myself.locale;
-    return NeumorphicApp(
-      key: key,
-      title: title,
-      color: color,
-      initialRoute: initialRoute,
-      routes: routes,
-      home: home,
-      debugShowCheckedModeBanner: debugShowCheckedModeBanner = true,
-      navigatorKey: navigatorKey,
-      navigatorObservers: navigatorObservers,
-      onGenerateRoute: onGenerateRoute,
-      onGenerateTitle: onGenerateTitle,
-      onGenerateInitialRoutes: onGenerateInitialRoutes,
-      onUnknownRoute: onUnknownRoute,
-      theme: theme,
-      darkTheme: darkTheme,
-      locale: locale,
-      localizationsDelegates: localizationsDelegates,
-      supportedLocales: supportedLocales,
-      themeMode: themeMode,
-      materialDarkTheme: materialDarkTheme,
-      materialTheme: materialTheme,
-      builder: builder,
-      localeResolutionCallback: localeResolutionCallback,
-      highContrastTheme: highContrastTheme,
-      highContrastDarkTheme: highContrastDarkTheme,
-      localeListResolutionCallback: localeListResolutionCallback,
-      showPerformanceOverlay: showPerformanceOverlay,
-      checkerboardRasterCacheImages: checkerboardRasterCacheImages,
-      checkerboardOffscreenLayers: checkerboardOffscreenLayers,
-      showSemanticsDebugger: showSemanticsDebugger,
-      debugShowMaterialGrid: debugShowMaterialGrid,
-      shortcuts: shortcuts,
-      actions: actions,
     );
   }
 

@@ -1,4 +1,3 @@
-
 import 'package:http/http.dart' as http;
 import 'package:langchain/langchain.dart';
 import 'package:langchain_openai/langchain_openai.dart';
@@ -141,13 +140,6 @@ class LangChainClient {
     }
     PromptValue prompt = PromptValue.chat(messages);
     ChatResult result = await chatModel!.invoke(prompt);
-
-    return result;
-  }
-
-  Future<String> createImage(String toolInput,
-      {OpenAIDallEToolOptions? options}) async {
-    String result = await tool!.runInternalString(toolInput, options: options);
 
     return result;
   }
