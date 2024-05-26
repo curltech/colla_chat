@@ -198,7 +198,7 @@ class _IndexViewState extends State<IndexView>
     super.didChangeMetrics();
     Size size =
         WidgetsBinding.instance.platformDispatcher.views.first.physicalSize;
-    logger.i("didChangeMetrics  ：宽：${size.width} 高：${size.height}");
+    // logger.i("didChangeMetrics  ：宽：${size.width} 高：${size.height}");
   }
 
   @override

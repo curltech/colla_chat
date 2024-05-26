@@ -35,13 +35,13 @@ class LocationMessage extends StatelessWidget {
     var accuracy = locationPosition.accuracy; //精度
     var floor = locationPosition.floor; //精度
     var heading = locationPosition.heading; //
-    var address = locationPosition.address; //
+    String? address = locationPosition.address; //
     Widget headingWidget = Icon(Icons.location_on, color: myself.secondary);
     headingWidget = IconButton(
       icon: Icon(Icons.location_on, color: myself.primary),
       color: myself.primary,
       onPressed: () {
-        GeolocatorUtil.showPosition(address!, latitude, longitude);
+        GeolocatorUtil.showPosition(latitude, longitude, title: address);
       },
     );
     if (thumbnail != null) {
@@ -65,7 +65,7 @@ class LocationMessage extends StatelessWidget {
                   CommonAutoSizeText(
                       '${AppLocalizations.t('Longitude')}:$longitude\n${AppLocalizations.t('Latitude')}:$latitude'),
                   CommonAutoSizeText(
-                      '${AppLocalizations.t('Address')}:$address')
+                      '${AppLocalizations.t('Address')}:${address ?? ''}')
                 ])),
           ]),
         ),
@@ -74,7 +74,7 @@ class LocationMessage extends StatelessWidget {
       return CommonMessage(child: child);
     } else {
       child = GeolocatorUtil.showPosition(
-        AppLocalizations.t('Location'),
+        title: AppLocalizations.t('Location'),
         latitude,
         longitude,
       );

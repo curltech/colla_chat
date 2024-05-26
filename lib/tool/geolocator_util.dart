@@ -8,9 +8,9 @@ import 'package:colla_chat/plugin/apple_map_widget.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/plugin/tencent_map_widget.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/loading_util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart' as geocoding;
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as google_maps;
 import 'package:latlong2/latlong.dart' as latlong2;
@@ -28,6 +28,7 @@ class LocationPosition {
   double? speed;
   double? speedAccuracy;
   bool? isMocked;
+  String? name;
   String? address;
   Map<String, dynamic>? addressData;
 
@@ -39,6 +40,7 @@ class LocationPosition {
     this.heading,
     this.speed,
     this.speedAccuracy,
+    this.name,
     this.address,
     this.addressData,
     this.floor,
@@ -55,6 +57,7 @@ class LocationPosition {
         speed = json['speed'] ?? 0.0,
         speedAccuracy = json['speed_accuracy'] ?? 0.0,
         isMocked = json['is_mocked'] ?? false,
+        name = json['name'],
         address = json['address'];
 
   Map<String, dynamic> toJson() => {
@@ -67,69 +70,62 @@ class LocationPosition {
         'speed': speed,
         'speed_accuracy': speedAccuracy,
         'is_mocked': isMocked,
+        'name': name,
         'address': address,
       };
 }
 
 class GeolocatorUtil {
-  static Future<Position?> checkPermission() async {
+  ///以下是基本的定位服务提供的功能，主要是经纬度的获取
+  static Future<LocationPermission> checkPermission() async {
     bool serviceEnabled;
     LocationPermission permission;
 
-    // Test if location services are enabled.
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      return Future.error('Location services are disabled.');
+      return LocationPermission.denied;
     }
 
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        return Future.error('Location permissions are denied');
+        return LocationPermission.denied;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
+      return permission;
     }
-    return null;
+    return permission;
   }
 
-  static Future<Position> currentPosition({
-    LocationAccuracy desiredAccuracy = LocationAccuracy.best,
+  static Future<Position?> currentPosition({
+    LocationAccuracy desiredAccuracy = LocationAccuracy.bestForNavigation,
     bool forceAndroidLocationManager = false,
     Duration? timeLimit,
   }) async {
-    var permission = await checkPermission();
-    if (permission == null) {
+    LocationPermission permission = await checkPermission();
+    if (permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse) {
       return await Geolocator.getCurrentPosition(
           desiredAccuracy: desiredAccuracy,
           forceAndroidLocationManager: forceAndroidLocationManager,
           timeLimit: timeLimit);
     }
-    return permission;
+    return null;
   }
 
   static Future<Position?> lastKnownPosition(
       {bool forceAndroidLocationManager = false}) async {
-    var permission = await checkPermission();
-    if (permission == null) {
+    LocationPermission permission = await checkPermission();
+    if (permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse) {
       return await Geolocator.getLastKnownPosition(
         forceAndroidLocationManager: forceAndroidLocationManager,
       );
     }
-    return permission;
+    return null;
   }
 
   static StreamSubscription<Position> positionStream() {
@@ -177,7 +173,47 @@ class GeolocatorUtil {
     return positionStream;
   }
 
-  ///计算地图距离
+  /// 以下是经纬度与地址之间的转换查询，采用apple和google的地图服务
+  static Future<List<geocoding.Location>> locationFromAddress(
+      String address) async {
+    if (await isPresent()) {
+      try {
+        List<geocoding.Location> locations =
+            await geocoding.locationFromAddress(address);
+
+        return locations;
+      } catch (e) {
+        logger.e('locationFromAddress error:$e');
+      }
+    }
+    return [];
+  }
+
+  static Future<List<geocoding.Placemark>> placemarkFromCoordinates(
+      double latitude, double longitude) async {
+    if (await isPresent()) {
+      try {
+        List<geocoding.Placemark> placemarks =
+            await geocoding.placemarkFromCoordinates(latitude, longitude);
+
+        return placemarks;
+      } catch (e) {
+        logger.e('placemarkFromCoordinates error:$e');
+      }
+    }
+    return [];
+  }
+
+  //设置语言国家，en_US，zh_CN
+  static setLocaleIdentifier(String localeIdentifier) async {
+    await geocoding.setLocaleIdentifier(localeIdentifier);
+  }
+
+  static Future<bool> isPresent() async {
+    return await geocoding.isPresent();
+  }
+
+  ///以下是计算经纬度，计算地图距离
   static double distance(latlong2.LatLng x, latlong2.LatLng y) {
     const latlong2.Distance distance = latlong2.Distance();
     final double meter = distance(x, y);
@@ -385,63 +421,47 @@ class GeolocatorUtil {
 
   static TencentMapWidget buildTencentLocationPicker(
       {Key? key,
-      double? latitude,
-      double? longitude,
-      required void Function(latlong2.LatLng) onLocation}) {
+      required double latitude,
+      required double longitude,
+      required void Function({LocationPosition? locationPosition})
+          onSelectedMarker}) {
     return TencentMapWidget(
         androidTexture: true,
         myLocationEnabled: true,
+        latitude: latitude,
+        longitude: longitude,
         userLocationType: tencent_map.UserLocationType.trackingLocationRotate,
-        onLocation: (tencent_map.Location location) {
-          onLocation(latlong2.LatLng(
-              location.position.latitude, location.position.longitude));
+        onSelectedMarker: ({LocationPosition? locationPosition}) {
+          onSelectedMarker(locationPosition: locationPosition);
         });
   }
 
   static Widget buildAppleLocationPicker(
       {Key? key,
-      double? latitude,
-      double? longitude,
-      required void Function(latlong2.LatLng) onLocation}) {
-    if (latitude != null || longitude != null) {
-      AppleMapWidget appleMapWidget = AppleMapWidget(
-        initialCameraPosition:
-            CameraPosition(target: LatLng(latitude!, longitude!)),
-        myLocationEnabled: true,
-        onLongPress: (LatLng latLng) {
-          onLocation(latlong2.LatLng(latLng.latitude, latLng.longitude));
-        },
-      );
-      return appleMapWidget;
-    }
-    return FutureBuilder(
-        future: GeolocatorUtil.currentPosition(),
-        builder: (BuildContext context, AsyncSnapshot<Position> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            Position? position = snapshot.data;
-            if (position != null) {
-              return AppleMapWidget(
-                initialCameraPosition: CameraPosition(
-                    target: LatLng(position.latitude, position.longitude)),
-                myLocationEnabled: true,
-                onLongPress: (LatLng latLng) {
-                  onLocation(
-                      latlong2.LatLng(latLng.latitude, latLng.longitude));
-                },
-              );
-            }
-          }
-          return LoadingUtil.buildCircularLoadingWidget();
-        });
+      required double latitude,
+      required double longitude,
+      required void Function({LocationPosition? locationPosition})
+          onSelectedMarker}) {
+    Widget appleMapWidget = AppleMapWidget(
+      initialCameraPosition: CameraPosition(
+        target: LatLng(latitude, longitude),
+        zoom: 11,
+      ),
+      myLocationEnabled: true,
+      onSelectedMarker: ({LocationPosition? locationPosition}) {
+        onSelectedMarker(locationPosition: locationPosition);
+      },
+    );
+
+    return appleMapWidget;
   }
 
-  static Widget showPosition(String title, double latitude, double longitude,
-      {BuildContext? context}) {
+  static Widget showPosition(double latitude, double longitude,
+      {BuildContext? context, String? title}) {
+    title ??= AppLocalizations.t('Current position');
     if (platformParams.mobile) {
       GeolocatorUtil.mapLauncher(
-          title: AppLocalizations.t('Current position'),
-          latitude: latitude,
-          longitude: longitude);
+          title: title, latitude: latitude, longitude: longitude);
     } else {
       if (context != null) {
         DialogUtil.show(
@@ -452,7 +472,7 @@ class GeolocatorUtil {
                   margin: EdgeInsets.zero,
                   shape: const ContinuousRectangleBorder(),
                   child: Column(children: [
-                    Text(title),
+                    Text(title!),
                     Expanded(
                         child: GeolocatorUtil.buildOpenStreetLocationPicker(
                             latitude: latitude,
@@ -472,20 +492,23 @@ class GeolocatorUtil {
 
   static Widget buildLocationPicker(
       {Key? key,
-      double? latitude,
-      double? longitude,
-      required void Function(latlong2.LatLng, {String? addr}) onLocation}) {
+      required double latitude,
+      required double longitude,
+      required void Function({LocationPosition? locationPosition})
+          onSelectedMarker}) {
     if (platformParams.ios) {
       return buildAppleLocationPicker(
         latitude: latitude,
         longitude: longitude,
-        onLocation: onLocation,
+        onSelectedMarker: onSelectedMarker,
       );
     } else if (platformParams.android) {
       return buildTencentLocationPicker(
         latitude: latitude,
         longitude: longitude,
-        onLocation: onLocation,
+        onSelectedMarker: ({LocationPosition? locationPosition}) {
+          onSelectedMarker(locationPosition: locationPosition);
+        },
       );
     } else {
       return GeolocatorUtil.buildOpenStreetLocationPicker(
@@ -495,7 +518,9 @@ class GeolocatorUtil {
             longitude = data.latLong.longitude;
             latitude = data.latLong.latitude;
             String address = data.address;
-            onLocation(latlong2.LatLng(latitude!, longitude!), addr: address);
+            LocationPosition? locationPosition = LocationPosition(
+                latitude: latitude, longitude: longitude, address: address);
+            onSelectedMarker(locationPosition: locationPosition);
           });
     }
   }

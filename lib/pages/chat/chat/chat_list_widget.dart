@@ -399,7 +399,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
         if (peerId == myself.peerId) {
           linkmanStatus = AppLocalizations.t(LinkmanStatus.M.name);
         }
-        name = '$name($linkmanStatus)';
+        // name = '$name($linkmanStatus)';
         var avatarImage = linkman.avatarImage;
         if (linkmanStatus == LinkmanStatus.G.name) {
           avatarImage = avatarImage ??

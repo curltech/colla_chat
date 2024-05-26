@@ -39,8 +39,8 @@ import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
+import 'package:latlong2/latlong.dart' as latlong2;
 
 ///非文本的其他多种格式输入面板，包括照片等
 class MoreMessageInput extends StatefulWidget {
@@ -377,10 +377,13 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   ///位置
   void _onActionLocation(BuildContext context) async {
-    Position position = await GeolocatorUtil.currentPosition();
+    Position? position = await GeolocatorUtil.currentPosition();
+    if (position == null) {
+      return;
+    }
+    logger.i('currentPosition:${position.latitude},${position.longitude}');
     double latitude = position.latitude;
     double longitude = position.longitude;
-    String? address;
     List<Widget>? rightWidgets = [
       IconButton(
           onPressed: () {
@@ -401,7 +404,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         ),
         rightWidgets: rightWidgets,
       );
-      await DialogUtil.show(
+      LocationPosition? locationPosition = await DialogUtil.show(
           context: context,
           builder: (BuildContext? context) {
             return Card(
@@ -411,34 +414,22 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
                 child: Column(children: [
                   title,
                   Expanded(
-                      child:  GeolocatorUtil.buildLocationPicker(
+                      child: GeolocatorUtil.buildLocationPicker(
                           latitude: latitude,
                           longitude: longitude,
-                          onLocation: (latLng, {String? addr}) {
-                            longitude = latLng.longitude;
-                            latitude = latLng.latitude;
-                            address = addr;
-                            Navigator.pop(context!);
+                          onSelectedMarker: (
+                              {LocationPosition? locationPosition}) {
+                            Navigator.pop(context!, locationPosition);
                           }))
                 ]));
           });
-      if (address == null) {
-        return;
+      if (locationPosition != null) {
+        Map<String, dynamic> map = locationPosition.toJson();
+        EntityUtil.removeNull(map);
+        String content = JsonUtil.toJsonString(map);
+        await chatMessageController.sendText(
+            message: content, contentType: ChatMessageContentType.location);
       }
-      LocationPosition locationPosition;
-      if (address != null) {
-        locationPosition = LocationPosition(
-            longitude: longitude, latitude: latitude, address: address);
-      } else {
-        var json = position.toJson();
-        locationPosition = LocationPosition.fromJson(json);
-      }
-      Map<String, dynamic> map = locationPosition.toJson();
-      EntityUtil.removeNull(map);
-      JsonUtil.toJsonString(map);
-      String content = JsonUtil.toJsonString(map);
-      await chatMessageController.sendText(
-          message: content, contentType: ChatMessageContentType.location);
     }
   }
 

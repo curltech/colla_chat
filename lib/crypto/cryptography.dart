@@ -309,7 +309,7 @@ class CryptoGraphy {
     MessageSlice messageSlice = MessageSlice();
     messageSlice.sliceSize = messageSlice.sliceSize + macLength + nonceLength;
     Map<int, List<int>> slices = messageSlice.slice(message, withPrefix: false);
-    logger.i('message slices length:${slices.length}');
+    // logger.i('message slices length:${slices.length}');
     List<int> decrypted = [];
     for (var slice in slices.values) {
       final SecretBox secretBox = SecretBox.fromConcatenation(slice,

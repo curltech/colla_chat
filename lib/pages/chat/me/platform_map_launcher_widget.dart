@@ -49,10 +49,12 @@ class _PlatformMapLauncherWidgetState extends State<PlatformMapLauncherWidget> {
           ),
           subtitle: map.mapType.name,
           onTap: (int index, String title, {String? subtitle}) async {
-            Position position = await GeolocatorUtil.currentPosition();
-            GeolocatorUtil.showMarker(
-                map, Coords(position.latitude, position.longitude),
-                title: AppLocalizations.t('Current position'));
+            Position? position = await GeolocatorUtil.currentPosition();
+            if (position != null) {
+              GeolocatorUtil.showMarker(
+                  map, Coords(position.latitude, position.longitude),
+                  title: AppLocalizations.t('Current position'));
+            }
           });
       tiles.add(tile);
     }
@@ -76,15 +78,16 @@ class _PlatformMapLauncherWidgetState extends State<PlatformMapLauncherWidget> {
     }
     return FutureBuilder(
         future: GeolocatorUtil.currentPosition(),
-        builder: (BuildContext context, AsyncSnapshot<Position> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<Position?> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
-              Position position = snapshot.data!;
-
-              return GeolocatorUtil.showPosition(
-                  AppLocalizations.t('Current position'),
-                  position.latitude,
-                  position.longitude);
+              Position? position = snapshot.data;
+              if (position != null) {
+                return GeolocatorUtil.showPosition(
+                    title: AppLocalizations.t('Current position'),
+                    position.latitude,
+                    position.longitude);
+              }
             }
           }
           return LoadingUtil.buildLoadingIndicator();

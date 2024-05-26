@@ -60,7 +60,8 @@ dependencies:
   no_screenshot: ^0.0.1+6
   screenshot_callback: ^3.0.1
   orientation: ^1.2.0 # 控制屏幕旋转
-  geolocator: ^10.1.0
+  geolocator: ^12.0.0
+  geocoding: ^3.0.0
   device_info_plus: ^9.1.2
   network_info_plus: ^5.0.2
   beamer: ^1.4.1+1
