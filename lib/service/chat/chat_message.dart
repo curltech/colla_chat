@@ -463,7 +463,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
 
   /// 创建SFU会议的消息，加上自己，每个参与者一条消息
   Future<List<ChatMessage>> sendSfuConferenceMessage(
-      Conference conference, List<String> participants) async {
+      Conference conference, List<String> participants,
+      {bool store = true}) async {
     List<dynamic>? tokens = JsonUtil.toJson(conference.sfuToken);
     String? sfuUri = conference.sfuUri;
     Map<String, dynamic> conferenceMap = JsonUtil.toJson(conference);
@@ -490,7 +491,11 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         messageId: conf.conferenceId,
         subMessageType: ChatMessageSubType.videoChat,
       );
-      await chatMessageService.sendAndStore(chatMessage);
+      if (store) {
+        await chatMessageService.sendAndStore(chatMessage);
+      } else {
+        await chatMessageService.send(chatMessage);
+      }
       chatMessages.add(chatMessage);
       i++;
     }

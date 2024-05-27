@@ -42,6 +42,11 @@ class LlmChatAddWidget extends StatefulWidget with TileDataMixin {
 class _LlmChatAddWidgetState extends State<LlmChatAddWidget> {
   final List<PlatformDataField> llmChatDataFields = [
     PlatformDataField(
+        name: 'id',
+        label: 'Id',
+        inputType: InputType.label,
+        prefixIcon: Icon(Icons.numbers_outlined, color: myself.primary)),
+    PlatformDataField(
         name: 'peerId',
         label: 'Url',
         prefixIcon: Icon(

@@ -54,6 +54,11 @@ class ConferenceEditWidget extends StatefulWidget with TileDataMixin {
 class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
   final List<PlatformDataField> conferenceDataField = [
     PlatformDataField(
+        name: 'id',
+        label: 'Id',
+        inputType: InputType.label,
+        prefixIcon: Icon(Icons.numbers_outlined, color: myself.primary)),
+    PlatformDataField(
       name: 'conferenceId',
       label: 'ConferenceId',
       inputType: InputType.label,
@@ -136,14 +141,19 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
 
   @override
   initState() {
+    _initConference();
+    conferenceController.addListener(_update);
+    _buildConferenceData();
+    super.initState();
+  }
+
+  Conference _initConference() {
     Conference? current = conferenceNotifier.value;
     if (current == null) {
       current = Conference('', name: '');
       conferenceNotifier.value = current;
     }
-    conferenceController.addListener(_update);
-    _buildConferenceData();
-    super.initState();
+    return current;
   }
 
   _update() {
@@ -280,13 +290,12 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
               FormButton(
                   label: 'Ok',
                   onTap: (Map<String, dynamic> values) async {
-                    _onOk(values).then((conference) {
-                      if (conference != null) {
-                        DialogUtil.info(context,
-                            content: AppLocalizations.t('Built conference ') +
-                                conference.name);
-                      }
-                    });
+                    Conference? conference = await _onOk(values);
+                    if (conference != null) {
+                      DialogUtil.info(context,
+                          content: AppLocalizations.t('Built conference ') +
+                              conference.name);
+                    }
                   }),
               FormButton(
                   label: 'Qrcode',
@@ -334,22 +343,20 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
         child: ListView(children: children));
   }
 
-  //修改提交
+  /// 修改提交
   Future<Conference?> _onOk(Map<String, dynamic> values) async {
-    Conference? current = conferenceNotifier.value;
-    if (current == null) {
-      return null;
-    }
+    Conference? current = _initConference();
     bool conferenceModified = false;
-    if (StringUtil.isEmpty(values['name'])) {
-      DialogUtil.error(context,
-          content: AppLocalizations.t('Must has conference name'));
-      return null;
-    }
+
     Conference currentConference = Conference.fromJson(values);
     if (StringUtil.isEmpty(current.conferenceOwnerPeerId)) {
       DialogUtil.error(context,
           content: AppLocalizations.t('Must has conference owner'));
+      return null;
+    }
+    if (StringUtil.isEmpty(values['name'])) {
+      DialogUtil.error(context,
+          content: AppLocalizations.t('Must has conference name'));
       return null;
     }
     if (StringUtil.isEmpty(currentConference.topic)) {
@@ -357,19 +364,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
           content: AppLocalizations.t('Must has conference topic'));
       return null;
     }
-    if (currentConference.sfu) {
-      // if (StringUtil.isEmpty(currentConference.sfuUri)) {
-      //   DialogUtil.error(context,
-      //       content: AppLocalizations.t('Must has conference sfu uri'));
-      //   return null;
-      // }
-      // if (StringUtil.isEmpty(currentConference.sfuToken)) {
-      //   DialogUtil.error(context,
-      //       content: AppLocalizations.t('Must has conference sfu token'));
-      //   return null;
-      // }
-    }
-    if (currentConference.id == null) {
+    if (current.id == null) {
       var participants = conferenceMembers.value;
       if (!participants.contains(myself.peerId!)) {
         participants.add(myself.peerId!);
@@ -437,7 +432,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     ///当前chatSummary可以不存在，因此不需要当前处于聊天场景下，因此是一个静态方法，创建永久conference的时候使用
     ///对linkman模式下，conference是临时的，不保存数据库
     ///对group和conference模式下，conference是永久的，保存数据库，可以以后重新加入
-    if (currentConference.id == null) {
+    if (current.id == null) {
       bool sfu = current.sfu;
       if (sfu) {
         List<String>? participants = current.participants;
@@ -485,8 +480,9 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
       }
     }
 
-    conferenceNotifier.value = current;
     await conferenceService.store(current);
+    conferenceNotifier.value = current;
+
     if (mounted) {
       DialogUtil.info(context,
           content: AppLocalizations.t('Conference has stored completely'));
@@ -502,6 +498,44 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     }
 
     return current;
+  }
+
+  _resend() async {
+    Conference? current = conferenceNotifier.value;
+    if (current == null) {
+      return null;
+    }
+    bool sfu = current.sfu;
+    if (sfu) {
+      List<String>? participants = current.participants;
+      if (participants != null) {
+        try {
+          await chatMessageService
+              .sendSfuConferenceMessage(current, participants, store: false);
+        } catch (e) {
+          logger.e('sendSfuConferenceMessage failure:$e');
+          if (mounted) {
+            DialogUtil.error(context,
+                content: 'send sfu conference message failure');
+          }
+          return null;
+        }
+      }
+    } else {
+      ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
+        current.conferenceId,
+        PartyType.conference,
+        groupName: current.name,
+        title: current.video
+            ? ChatMessageContentType.video.name
+            : ChatMessageContentType.audio.name,
+        content: current,
+        messageId: current.conferenceId,
+        subMessageType: ChatMessageSubType.videoChat,
+      );
+      await chatMessageService.send(chatMessage,
+          cryptoOption: CryptoOption.group, peerIds: current.participants);
+    }
   }
 
   @override

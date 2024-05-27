@@ -52,6 +52,11 @@ class GroupEditWidget extends StatefulWidget with TileDataMixin {
 class _GroupEditWidgetState extends State<GroupEditWidget> {
   final List<PlatformDataField> groupDataField = [
     PlatformDataField(
+        name: 'id',
+        label: 'Id',
+        inputType: InputType.label,
+        prefixIcon: Icon(Icons.numbers_outlined, color: myself.primary)),
+    PlatformDataField(
         name: 'peerId',
         label: 'PeerId',
         inputType: InputType.label,

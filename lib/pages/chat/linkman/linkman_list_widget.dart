@@ -611,7 +611,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             onTap: (int index, String title, {String? subtitle}) {
               conferenceNotifier.value = conference;
             },
-            routeName: 'conference_edit');
+            routeName: 'conference_show');
         List<TileData> slideActions = [];
 
         TileData deleteSlideAction = TileData(
