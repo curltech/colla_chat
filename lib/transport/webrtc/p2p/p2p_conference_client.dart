@@ -160,7 +160,7 @@ class P2pConferenceClient {
       await removeLocalStreams(peerConnection, peerMediaStreams);
       for (PeerMediaStream peerMediaStream in peerMediaStreams) {
         if (peerMediaStream.id != null) {
-          await localPeerMediaStreamController.close(peerMediaStream.id!);
+          await localPeerMediaStreamController.close(peerMediaStream);
         }
       }
     }
@@ -168,7 +168,10 @@ class P2pConferenceClient {
 
   /// 退出发布并且关闭本地的所有的轨道或者流
   closeAllLocal({bool notify = true}) async {
-    closeLocal(localPeerMediaStreamController.peerMediaStreams);
+    for (var peerMediaStreams
+        in localPeerMediaStreamController.peerMediaStreams.values) {
+      closeLocal(peerMediaStreams);
+    }
   }
 
   /// 远程参与者加入会议事件，此时连接未必已经建立
@@ -222,11 +225,14 @@ class P2pConferenceClient {
         String key = _getKey(peerConnection.peerId, peerConnection.clientId);
         _streamSubscriptions[key] = streamSubscriptions;
       }
-
-      List<PeerMediaStream> peerMediaStreams =
-          localPeerMediaStreamController.peerMediaStreams;
-      await addLocalStreams(peerConnection, peerMediaStreams);
-      await _onStreamPublished(peerConnection);
+      for (var key in localPeerMediaStreamController.peerMediaStreams.keys) {
+        List<PeerMediaStream> peerMediaStreams =
+            localPeerMediaStreamController.getPeerMediaStreams(key).toList();
+        if (peerMediaStreams.isNotEmpty) {
+          await addLocalStreams(peerConnection, peerMediaStreams);
+          await _onStreamPublished(peerConnection);
+        }
+      }
     }
   }
 
@@ -283,20 +289,23 @@ class P2pConferenceClient {
       _streamSubscriptions.remove(key);
     }
     await _onParticipantUnpublish(peerConnection);
-    List<PeerMediaStream> peerMediaStreams =
-        localPeerMediaStreamController.peerMediaStreams;
-    await removeLocalStreams(peerConnection, peerMediaStreams);
+    for (var key in localPeerMediaStreamController.peerMediaStreams.keys) {
+      List<PeerMediaStream> peerMediaStreams =
+          localPeerMediaStreamController.getPeerMediaStreams(key).toList();
+      if (peerMediaStreams.isNotEmpty) {
+        await removeLocalStreams(peerConnection, peerMediaStreams);
+      }
+    }
   }
 
   /// 从远程视频流的控制器中移除连接的远程视频操作
   _onParticipantUnpublish(AdvancedPeerConnection peerConnection) async {
     var peerId = peerConnection.peerId;
-    var clientId = peerConnection.clientId;
-    List<PeerMediaStream> peerMediaStreams = remotePeerMediaStreamController
-        .getPeerMediaStreams(peerId, clientId: clientId);
+    List<PeerMediaStream> peerMediaStreams =
+        remotePeerMediaStreamController.getPeerMediaStreams(peerId).toList();
     if (peerMediaStreams.isNotEmpty) {
       for (var peerMediaStream in peerMediaStreams) {
-        await remotePeerMediaStreamController.close(peerMediaStream.id!);
+        await remotePeerMediaStreamController.close(peerMediaStream);
       }
     }
   }
@@ -321,25 +330,35 @@ class P2pConferenceClient {
   Future<void> _onStreamPublishedEvent(
       MediaStream stream, PlatformParticipant platformParticipant) async {
     String streamId = stream.id;
-    PeerMediaStream? peerMediaStream =
-        await remotePeerMediaStreamController.getPeerMediaStream(streamId);
-    if (peerMediaStream != null) {
-      return;
+    List<PeerMediaStream> peerMediaStreams = remotePeerMediaStreamController
+        .getPeerMediaStreams(platformParticipant.peerId);
+    if (peerMediaStreams.isNotEmpty) {
+      for (var peerMediaStream in peerMediaStreams) {
+        if (peerMediaStream.contain(streamId)) {
+          return;
+        }
+      }
     }
-    peerMediaStream = await PeerMediaStream.createPeerMediaStream(
-        platformParticipant: platformParticipant, mediaStream: stream);
+    PeerMediaStream peerMediaStream =
+        await PeerMediaStream.createPeerMediaStream(
+            platformParticipant: platformParticipant, mediaStream: stream);
     remotePeerMediaStreamController.add(peerMediaStream);
   }
 
   /// 远程关闭流事件触发，激活remove事件
   Future<void> _onTrackUnpublishedEvent(WebrtcEvent webrtcEvent) async {
     Map<String, dynamic> data = webrtcEvent.data;
+    String? peerId = data['peerId'];
     MediaStream? stream = data['stream'];
     if (stream != null) {
-      PeerMediaStream? peerMediaStream =
-          await remotePeerMediaStreamController.getPeerMediaStream(stream.id);
-      if (peerMediaStream != null) {
-        await remotePeerMediaStreamController.close(peerMediaStream.id!);
+      List<PeerMediaStream> peerMediaStreams =
+          remotePeerMediaStreamController.getPeerMediaStreams(peerId!).toList();
+      if (peerMediaStreams.isNotEmpty) {
+        for (var peerMediaStream in peerMediaStreams) {
+          if (peerMediaStream.contain(stream.id)) {
+            await remotePeerMediaStreamController.close(peerMediaStream);
+          }
+        }
       }
     } else {
       logger.e('onAddRemoteTrack stream is null');
@@ -356,10 +375,12 @@ class P2pConferenceClient {
   _disconnect() async {
     _joined = false;
     await conferenceChatMessageController.exit();
-    List<PeerMediaStream> peerMediaStreams =
-        localPeerMediaStreamController.peerMediaStreams;
-    if (peerMediaStreams.isNotEmpty) {
-      await closeLocal(peerMediaStreams);
+    for (var key in localPeerMediaStreamController.peerMediaStreams.keys) {
+      List<PeerMediaStream> peerMediaStreams =
+          localPeerMediaStreamController.getPeerMediaStreams(key).toList();
+      if (peerMediaStreams.isNotEmpty) {
+        await closeLocal(peerMediaStreams);
+      }
     }
     List<AdvancedPeerConnection> pcs = await peerConnections;
     for (AdvancedPeerConnection peerConnection in pcs) {
@@ -370,7 +391,7 @@ class P2pConferenceClient {
   ///终止会议，移除所有的webrtc连接
   ///激活exit事件
   terminate() async {
-    remotePeerMediaStreamController.currentPeerMediaStream = null;
+    remotePeerMediaStreamController.currentPeerId = null;
     if (conferenceChatMessageController.conferenceId != null) {
       conferenceService.update({'status': EntityStatus.expired.name},
           where: 'conferenceId=?',

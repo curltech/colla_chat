@@ -1,7 +1,8 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/video/single_video_view_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.dart';
-import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 
 ///多个小视频窗口的排列
@@ -31,44 +32,45 @@ class _VideoViewCardState extends State<VideoViewCard> {
   }
 
   Widget _buildVideoViews(BuildContext context, BoxConstraints constraints) {
-    List<PeerMediaStream> peerMediaStreams =
-        widget.peerMediaStreamController.peerMediaStreams;
+    List<String>? peerIds =
+        widget.peerMediaStreamController.peerMediaStreams.keys.toList();
     int crossAxisCount = 1;
     double secondaryBodyWidth = appDataProvider.secondaryBodyWidth;
     double smallBreakpointLimit = AppDataProvider.smallBreakpointLimit;
     double largeBreakpointLimit = AppDataProvider.largeBreakpointLimit;
     if (secondaryBodyWidth < smallBreakpointLimit) {
-      if (peerMediaStreams.length > 4) {
+      if (peerIds.length > 4) {
         crossAxisCount = 3;
-      } else if (peerMediaStreams.length > 2) {
+      } else if (peerIds.length > 2) {
         crossAxisCount = 2;
       }
     } else if (secondaryBodyWidth >= smallBreakpointLimit &&
         secondaryBodyWidth < largeBreakpointLimit) {
-      if (peerMediaStreams.length > 3) {
+      if (peerIds.length > 3) {
         crossAxisCount = 3;
       } else {
-        crossAxisCount = peerMediaStreams.length;
+        crossAxisCount = peerIds.length;
       }
     } else if (secondaryBodyWidth >= largeBreakpointLimit) {
-      if (peerMediaStreams.length > 4) {
+      if (peerIds.length > 4) {
         crossAxisCount = 4;
       } else {
-        crossAxisCount = peerMediaStreams.length;
+        crossAxisCount = peerIds.length;
       }
     }
     List<Widget> videoViews = [];
-    for (var peerMediaStream in peerMediaStreams) {
+    for (var peerId in peerIds) {
       Widget videoView = SingleVideoViewWidget(
         peerMediaStreamController: widget.peerMediaStreamController,
-        peerMediaStream: peerMediaStream,
+        peerId: peerId,
         // width: size.width,
         // height: size.height,
       );
       videoViews.add(videoView);
     }
     if (videoViews.isEmpty) {
-      return Container();
+      return Center(
+          child: CommonAutoSizeText(AppLocalizations.t('No media stream')));
     }
     return GridView.builder(
         itemCount: videoViews.length,

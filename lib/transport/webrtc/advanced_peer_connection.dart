@@ -35,8 +35,8 @@ class AdvancedPeerConnection {
     this.clientId = unknownClientId,
     this.name = unknownName,
   }) {
-    logger
-        .w('advancedPeerConnection peerId:$peerId name:$name clientId:$clientId create');
+    logger.w(
+        'advancedPeerConnection peerId:$peerId name:$name clientId:$clientId create');
     if (StringUtil.isEmpty(clientId)) {
       logger.e('SlavePeerConnection clientId must be value');
     }
@@ -255,7 +255,7 @@ class AdvancedPeerConnection {
     }
     if (peerMediaStreams.isNotEmpty) {
       for (PeerMediaStream peerMediaStream in peerMediaStreams) {
-        var streamId = peerMediaStream.id;
+        var streamId = peerMediaStream.mediaStream?.id;
         if (streamId != null) {
           if (peerMediaStream.mediaStream != null) {
             localPeerMediaStreams.remove(peerMediaStream);
@@ -279,7 +279,7 @@ class AdvancedPeerConnection {
       logger.e('PeerConnection closed');
       return null;
     }
-    var streamId = peerMediaStream.id;
+    var streamId = peerMediaStream.mediaStream?.id;
     if (streamId != null) {
       if (peerMediaStream.mediaStream != null) {
         return await basePeerConnection

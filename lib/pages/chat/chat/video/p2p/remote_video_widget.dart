@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
-import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
@@ -61,9 +60,10 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
     if (conferenceClient == null) {
       return;
     }
-    List<PeerMediaStream> peerMediaStreams =
-        conferenceClient.remotePeerMediaStreamController.peerMediaStreams;
-    if (peerMediaStreams.isNotEmpty) {
+    List<String> keys = conferenceClient
+        .remotePeerMediaStreamController.peerMediaStreams.keys
+        .toList();
+    if (keys.isNotEmpty) {
       // actionData.add(
       //   ActionData(
       //       label: 'Close',
@@ -75,7 +75,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
       controlPanelVisible.value = true;
     }
     this.actionData.value = actionData;
-    videoViewCount.value = peerMediaStreams.length;
+    videoViewCount.value = keys.length;
   }
 
   ///移除远程所有的视频

@@ -105,9 +105,9 @@ dependencies:
   bubble: ^1.2.1
   #  chat_bubbles: ^1.6.0
   fluttertoast: ^8.2.1
-  flutter_local_notifications: ^17.0.0
+  flutter_local_notifications: ^17.1.2
   alarm: ^3.1.2
-  stacked_notification_cards: ^0.1.0-dev.4
+  stacked_notification_cards: ^0.1.0-dev.5
   toastification: ^2.0.0
   cupertino_icons: ^1.0.2
   icons_plus: ^5.0.0
@@ -391,7 +391,7 @@ dependency_overrides:
   http: 1.2.0
   dart_webrtc: ^1.4.5
   webrtc_interface: 1.2.0
-  flutter_webrtc: ^0.10.6
+  flutter_webrtc: ^0.10.7
   #flutter_callkit_incoming: ^2.0.1+2
   protobuf: ^3.1.0
   analyzer: ^6.5.0

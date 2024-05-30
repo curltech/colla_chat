@@ -1,34 +1,37 @@
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:elegant_notification/elegant_notification.dart';
 import 'package:elegant_notification/resources/arrays.dart';
+import 'package:elegant_notification/resources/colors.dart';
+import 'package:elegant_notification/resources/constants.dart';
+import 'package:elegant_notification/resources/stacked_options.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked_notification_cards/stacked_notification_cards.dart';
+import 'package:toastification/toastification.dart';
 
 class NotificationUtil {
-  static show(
+  static ElegantNotification show(
     BuildContext context, {
     Key? key,
     Widget? title,
     required Widget description,
-    required Widget icon,
-    Color shadowColor = Colors.grey,
+    required Widget? icon,
     Color background = Colors.white,
-    double radius = 5.0,
-    bool enableShadow = true,
+    BorderRadius? borderRadius,
+    BoxBorder? border,
     bool showProgressIndicator = true,
     Widget Function(void Function())? closeButton,
-    Color? progressIndicatorColor,
+    StackedOptions? stackedOptions,
+    double notificationMargin = 20,
+    Color progressIndicatorColor = Colors.blue,
     Duration toastDuration = const Duration(milliseconds: 3000),
     bool displayCloseButton = true,
-    dynamic Function()? onCloseButtonPressed,
-    dynamic Function()? onProgressFinished,
+    void Function()? onCloseButtonPressed,
+    void Function()? onProgressFinished,
     Alignment position = Alignment.topRight,
     AnimationType animation = AnimationType.fromRight,
     Duration animationDuration = const Duration(milliseconds: 600),
-    double iconSize = 20,
+    double iconSize = defaultIconSize,
     Widget? action,
-    dynamic Function()? onActionPressed,
     bool autoDismiss = true,
     double? height,
     double? width,
@@ -36,16 +39,25 @@ class NotificationUtil {
     double? progressBarWidth,
     EdgeInsetsGeometry? progressBarPadding,
     dynamic Function()? onDismiss,
-    Color progressIndicatorBackground = Colors.grey,
+    bool isDismissable = true,
+    DismissDirection dismissDirection = DismissDirection.horizontal,
+    Color progressIndicatorBackground = greyColor,
+    void Function()? onNotificationPressed,
+    Curve animationCurve = Curves.ease,
+    BoxShadow? shadow,
   }) {
-    ElegantNotification(
+    ElegantNotification elegantNotification = ElegantNotification(
       key: key,
       title: title,
       description: description,
       icon: icon,
       background: background,
+      borderRadius: borderRadius,
+      border: border,
       showProgressIndicator: showProgressIndicator,
       closeButton: closeButton,
+      stackedOptions: stackedOptions,
+      notificationMargin: notificationMargin,
       progressIndicatorColor: progressIndicatorColor ?? myself.primary,
       toastDuration: toastDuration,
       displayCloseButton: displayCloseButton,
@@ -63,27 +75,37 @@ class NotificationUtil {
       progressBarWidth: progressBarWidth,
       progressBarPadding: progressBarPadding,
       onDismiss: onDismiss,
+      isDismissable: isDismissable,
+      dismissDirection: dismissDirection,
       progressIndicatorBackground: progressIndicatorBackground,
-    ).show(context);
+      onNotificationPressed: onNotificationPressed,
+      animationCurve: animationCurve,
+      shadow: shadow,
+    );
+    elegantNotification.show(context);
+
+    return elegantNotification;
   }
 
-  static info(
+  static ElegantNotification info(
     BuildContext context, {
     Key? key,
     Widget? title,
     required Widget description,
-    bool showProgressIndicator = true,
+    Color background = Colors.white,
     Widget Function(void Function())? closeButton,
+    StackedOptions? stackedOptions,
+    double notificationMargin = 20,
     Duration toastDuration = const Duration(milliseconds: 3000),
     bool displayCloseButton = true,
-    dynamic Function()? onCloseButtonPressed,
-    dynamic Function()? onProgressFinished,
+    void Function()? onCloseButtonPressed,
+    void Function()? onProgressFinished,
+    double iconSize = defaultIconSize,
     Alignment position = Alignment.topRight,
     AnimationType animation = AnimationType.fromRight,
     Duration animationDuration = const Duration(milliseconds: 600),
-    double iconSize = 20,
+    bool showProgressIndicator = true,
     Widget? action,
-    dynamic Function()? onActionPressed,
     bool autoDismiss = true,
     double? height,
     double? width,
@@ -91,14 +113,26 @@ class NotificationUtil {
     double? progressBarWidth,
     EdgeInsetsGeometry? progressBarPadding,
     dynamic Function()? onDismiss,
-    Color progressIndicatorBackground = Colors.grey,
+    bool isDismissable = true,
+    DismissDirection dismissDirection = DismissDirection.horizontal,
+    Color progressIndicatorBackground = greyColor,
+    void Function()? onNotificationPressed,
+    Curve animationCurve = Curves.ease,
+    BoxShadow? shadow,
+    BorderRadius? borderRadius,
+    BoxBorder? border,
   }) {
-    ElegantNotification.info(
+    ElegantNotification elegantNotification = ElegantNotification.info(
       key: key,
       title: title,
       description: description,
+      background: background,
+      borderRadius: borderRadius,
+      border: border,
       showProgressIndicator: showProgressIndicator,
       closeButton: closeButton,
+      stackedOptions: stackedOptions,
+      notificationMargin: notificationMargin,
       toastDuration: toastDuration,
       displayCloseButton: displayCloseButton,
       onCloseButtonPressed: onCloseButtonPressed,
@@ -115,27 +149,37 @@ class NotificationUtil {
       progressBarWidth: progressBarWidth,
       progressBarPadding: progressBarPadding,
       onDismiss: onDismiss,
+      isDismissable: isDismissable,
+      dismissDirection: dismissDirection,
       progressIndicatorBackground: progressIndicatorBackground,
-    ).show(context);
+      onNotificationPressed: onNotificationPressed,
+      animationCurve: animationCurve,
+      shadow: shadow,
+    );
+    elegantNotification.show(context);
+
+    return elegantNotification;
   }
 
-  static success(
+  static ElegantNotification success(
     BuildContext context, {
     Key? key,
     Widget? title,
     required Widget description,
-    bool showProgressIndicator = true,
+    Color background = Colors.white,
     Widget Function(void Function())? closeButton,
+    StackedOptions? stackedOptions,
+    double notificationMargin = 20,
     Duration toastDuration = const Duration(milliseconds: 3000),
     bool displayCloseButton = true,
-    dynamic Function()? onCloseButtonPressed,
-    dynamic Function()? onProgressFinished,
+    void Function()? onCloseButtonPressed,
+    void Function()? onProgressFinished,
+    double iconSize = defaultIconSize,
     Alignment position = Alignment.topRight,
     AnimationType animation = AnimationType.fromRight,
     Duration animationDuration = const Duration(milliseconds: 600),
-    double iconSize = 20,
+    bool showProgressIndicator = true,
     Widget? action,
-    dynamic Function()? onActionPressed,
     bool autoDismiss = true,
     double? height,
     double? width,
@@ -143,14 +187,26 @@ class NotificationUtil {
     double? progressBarWidth,
     EdgeInsetsGeometry? progressBarPadding,
     dynamic Function()? onDismiss,
-    Color progressIndicatorBackground = Colors.grey,
+    bool isDismissable = true,
+    DismissDirection dismissDirection = DismissDirection.horizontal,
+    Color progressIndicatorBackground = greyColor,
+    void Function()? onNotificationPressed,
+    Curve animationCurve = Curves.ease,
+    BoxShadow? shadow,
+    BorderRadius? borderRadius,
+    BoxBorder? border,
   }) {
-    ElegantNotification.success(
+    ElegantNotification elegantNotification = ElegantNotification.success(
       key: key,
       title: title,
       description: description,
+      background: background,
+      borderRadius: borderRadius,
+      border: border,
       showProgressIndicator: showProgressIndicator,
       closeButton: closeButton,
+      stackedOptions: stackedOptions,
+      notificationMargin: notificationMargin,
       toastDuration: toastDuration,
       displayCloseButton: displayCloseButton,
       onCloseButtonPressed: onCloseButtonPressed,
@@ -167,27 +223,37 @@ class NotificationUtil {
       progressBarWidth: progressBarWidth,
       progressBarPadding: progressBarPadding,
       onDismiss: onDismiss,
+      isDismissable: isDismissable,
+      dismissDirection: dismissDirection,
       progressIndicatorBackground: progressIndicatorBackground,
-    ).show(context);
+      onNotificationPressed: onNotificationPressed,
+      animationCurve: animationCurve,
+      shadow: shadow,
+    );
+    elegantNotification.show(context);
+
+    return elegantNotification;
   }
 
-  static error(
+  static ElegantNotification error(
     BuildContext context, {
     Key? key,
     Widget? title,
     required Widget description,
-    bool showProgressIndicator = true,
+    Color background = Colors.white,
     Widget Function(void Function())? closeButton,
+    StackedOptions? stackedOptions,
+    double notificationMargin = 20,
     Duration toastDuration = const Duration(milliseconds: 3000),
     bool displayCloseButton = true,
-    dynamic Function()? onCloseButtonPressed,
-    dynamic Function()? onProgressFinished,
+    void Function()? onCloseButtonPressed,
+    void Function()? onProgressFinished,
+    double iconSize = defaultIconSize,
     Alignment position = Alignment.topRight,
     AnimationType animation = AnimationType.fromRight,
     Duration animationDuration = const Duration(milliseconds: 600),
-    double iconSize = 20,
+    bool showProgressIndicator = true,
     Widget? action,
-    dynamic Function()? onActionPressed,
     bool autoDismiss = true,
     double? height,
     double? width,
@@ -195,14 +261,26 @@ class NotificationUtil {
     double? progressBarWidth,
     EdgeInsetsGeometry? progressBarPadding,
     dynamic Function()? onDismiss,
-    Color progressIndicatorBackground = Colors.grey,
+    bool isDismissable = true,
+    DismissDirection dismissDirection = DismissDirection.horizontal,
+    Color progressIndicatorBackground = greyColor,
+    void Function()? onNotificationPressed,
+    Curve animationCurve = Curves.ease,
+    BoxShadow? shadow,
+    BorderRadius? borderRadius,
+    BoxBorder? border,
   }) {
-    ElegantNotification.error(
+    ElegantNotification elegantNotification = ElegantNotification.error(
       key: key,
       title: title,
       description: description,
+      background: background,
+      borderRadius: borderRadius,
+      border: border,
       showProgressIndicator: showProgressIndicator,
       closeButton: closeButton,
+      stackedOptions: stackedOptions,
+      notificationMargin: notificationMargin,
       toastDuration: toastDuration,
       displayCloseButton: displayCloseButton,
       onCloseButtonPressed: onCloseButtonPressed,
@@ -219,19 +297,115 @@ class NotificationUtil {
       progressBarWidth: progressBarWidth,
       progressBarPadding: progressBarPadding,
       onDismiss: onDismiss,
+      isDismissable: isDismissable,
+      dismissDirection: dismissDirection,
       progressIndicatorBackground: progressIndicatorBackground,
-    ).show(context);
+      onNotificationPressed: onNotificationPressed,
+      animationCurve: animationCurve,
+      shadow: shadow,
+    );
+    elegantNotification.show(context);
+
+    return elegantNotification;
   }
 
-  NotificationCard buildNotificationCard(DateTime date, TileData tileData) {
-    return NotificationCard(
-        date: date,
-        leading: tileData.prefix,
-        title: tileData.title,
-        subtitle: tileData.subtitle ?? '');
+  static ToastificationItem toast({
+    BuildContext? context,
+    AlignmentGeometry? alignment,
+    Duration? autoCloseDuration,
+    OverlayState? overlayState,
+    Widget Function(BuildContext, Animation<double>, Alignment, Widget)?
+        animationBuilder,
+    ToastificationType? type,
+    ToastificationStyle? style,
+    Widget? title,
+    Duration? animationDuration,
+    Widget? description,
+    Widget? icon,
+    Color? primaryColor,
+    Color? backgroundColor,
+    Color? foregroundColor,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? margin,
+    BorderRadiusGeometry? borderRadius,
+    BorderSide? borderSide,
+    List<BoxShadow>? boxShadow,
+    TextDirection? direction,
+    bool? showProgressBar,
+    ProgressIndicatorThemeData? progressBarTheme,
+    CloseButtonShowType? closeButtonShowType,
+    bool? closeOnClick,
+    bool? dragToClose,
+    DismissDirection? dismissDirection,
+    bool? pauseOnHover,
+    bool? applyBlurEffect,
+    ToastificationCallbacks callbacks = const ToastificationCallbacks(),
+  }) {
+    ToastificationItem item = toastification.show(
+      context: context,
+      alignment: alignment,
+      autoCloseDuration: autoCloseDuration,
+      overlayState: overlayState,
+      animationBuilder: animationBuilder,
+      type: type,
+      style: style,
+      title: title,
+      animationDuration: animationDuration,
+      description: description,
+      icon: icon,
+      primaryColor: primaryColor,
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
+      padding: padding,
+      margin: margin,
+      borderRadius: borderRadius,
+      borderSide: borderSide,
+      boxShadow: boxShadow,
+      direction: direction,
+      showProgressBar: showProgressBar,
+      progressBarTheme: progressBarTheme,
+      closeButtonShowType: closeButtonShowType,
+      closeOnClick: closeOnClick,
+      dragToClose: dragToClose,
+      dismissDirection: dismissDirection,
+      pauseOnHover: pauseOnHover,
+      applyBlurEffect: applyBlurEffect,
+      callbacks: callbacks,
+    );
+
+    return item;
   }
 
-  StackedNotificationCards buildStackedNotificationCards({
+  static ToastificationItem toastCustom({
+    BuildContext? context,
+    AlignmentGeometry? alignment,
+    TextDirection? direction,
+    required Widget Function(BuildContext, ToastificationItem) builder,
+    Widget Function(BuildContext, Animation<double>, Alignment, Widget)?
+        animationBuilder,
+    Duration? animationDuration,
+    Duration? autoCloseDuration,
+    OverlayState? overlayState,
+    DismissDirection? dismissDirection,
+    ToastificationCallbacks callbacks = const ToastificationCallbacks(),
+  }) {
+    ToastificationItem item = toastification.showCustom(
+      context: context,
+      alignment: alignment,
+      autoCloseDuration: autoCloseDuration,
+      overlayState: overlayState,
+      animationBuilder: animationBuilder,
+      animationDuration: animationDuration,
+      direction: direction,
+      dismissDirection: dismissDirection,
+      callbacks: callbacks,
+      builder: builder,
+    );
+
+    return item;
+  }
+
+  static StackedNotificationCards buildStackedNotificationCards({
     Key? key,
     required List<NotificationCard> notificationCards,
     required Color cardColor,

@@ -33,17 +33,14 @@ class PlatformParticipant {
 
 /// 关联webrtc媒体流和peer的类，可以构造本地媒体流或者传入的媒体流
 class PeerMediaStream {
-  String? id;
-
-  String? ownerTag;
-
-  ///直接设置的媒体流，或者livekit的audioTrack音频流
+  ///直接设置的媒体流，不为空的时候，视频和音频轨道都为空
   MediaStream? mediaStream;
 
-  ///直接设置的livekit的视频流
+  ///直接设置的单独的livekit的视频轨道
+  ///视频和音频轨道的流id可能不同，但是platformParticipant相同
   VideoTrack? videoTrack;
 
-  ///直接设置的livekit的音频流
+  ///直接设置的单独livekit的音频轨道
   AudioTrack? audioTrack;
 
   ///流对应的livekit的参与者
@@ -58,17 +55,30 @@ class PeerMediaStream {
     this.audioTrack,
     this.participant,
     this.platformParticipant,
-  }) {
+  });
+
+  String? get id {
     if (mediaStream != null) {
-      id = mediaStream!.id;
-      ownerTag = mediaStream!.ownerTag;
+      return mediaStream!.id;
     } else if (videoTrack != null) {
-      id = videoTrack!.mediaStream.id;
-      ownerTag = videoTrack!.mediaStream.ownerTag;
+      return videoTrack!.mediaStream.id;
     } else if (audioTrack != null) {
-      id = audioTrack!.mediaStream.id;
-      ownerTag = audioTrack!.mediaStream.ownerTag;
+      return audioTrack!.mediaStream.id;
     }
+    return null;
+  }
+
+  bool contain(String streamId) {
+    if (streamId == mediaStream?.id ||
+        streamId == videoTrack?.mediaStream.id ||
+        streamId == audioTrack?.mediaStream.id) {
+      return true;
+    }
+    return false;
+  }
+
+  String? get peerId {
+    return platformParticipant?.peerId;
   }
 
   /// 创建本机视频流，并且设置peer信息
@@ -217,21 +227,13 @@ class PeerMediaStream {
     await close();
     if (mediaStream != null) {
       this.mediaStream = mediaStream;
-      id = mediaStream.id;
-      ownerTag = mediaStream.ownerTag;
     } else if (videoTrack != null) {
       this.videoTrack = videoTrack;
-      id = videoTrack.mediaStream.id;
-      ownerTag = videoTrack.mediaStream.ownerTag;
     } else if (audioTrack != null) {
       this.audioTrack = audioTrack;
-      id = audioTrack.mediaStream.id;
-      ownerTag = audioTrack.mediaStream.ownerTag;
     } else {
       this.mediaStream = null;
       this.videoTrack = null;
-      id = null;
-      ownerTag = null;
     }
   }
 
@@ -272,8 +274,6 @@ class PeerMediaStream {
         log.logger.e('mediaStream.close failure:$e');
       }
       this.mediaStream = null;
-      id = null;
-      ownerTag = null;
     }
     if (videoTrack != null) {
       var mediaStream = videoTrack?.mediaStream;
@@ -285,8 +285,6 @@ class PeerMediaStream {
         log.logger.e('videoTrack.close failure:$e');
       }
       videoTrack = null;
-      id = null;
-      ownerTag = null;
     }
     if (audioTrack != null) {
       var mediaStream = audioTrack?.mediaStream;
@@ -298,8 +296,6 @@ class PeerMediaStream {
         log.logger.e('audioTrack.close failure:$e');
       }
       audioTrack = null;
-      id = null;
-      ownerTag = null;
     }
   }
 

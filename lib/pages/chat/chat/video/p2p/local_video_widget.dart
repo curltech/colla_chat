@@ -225,7 +225,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///关闭单个本地视频窗口的流
   Future<void> _close(PeerMediaStream peerMediaStream) async {
     //从map中移除
-    localPeerMediaStreamController.remove(peerMediaStream.id!);
+    localPeerMediaStreamController.remove(peerMediaStream);
     ConferenceChatMessageController? conferenceChatMessageController =
         p2pConferenceClientPool.conferenceChatMessageController;
     if (conferenceChatMessageController != null &&
@@ -235,12 +235,13 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           conferenceChatMessageController.conference!.conferenceId;
       await p2pConferenceClientPool.close(conferenceId, [peerMediaStream]);
     }
-    await localPeerMediaStreamController.close(peerMediaStream.id!);
+    await localPeerMediaStreamController.close(peerMediaStream);
   }
 
   ///关闭并且移除本地所有的视频，这时候还能看远程的视频
   _closeAll() async {
-    var peerMediaStreams = localPeerMediaStreamController.peerMediaStreams;
+    var peerMediaStreams =
+        localPeerMediaStreamController.peerMediaStreams.values.first;
     P2pConferenceClient? p2pConferenceClient =
         p2pConferenceClientPool.conferenceClient;
     ConferenceChatMessageController? conferenceChatMessageController =

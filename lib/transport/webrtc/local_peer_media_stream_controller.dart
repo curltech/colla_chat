@@ -1,8 +1,6 @@
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:livekit_client/livekit_client.dart';
 import 'package:synchronized/synchronized.dart';
 
 ///媒体控制器，内部是PeerMediaStream的集合，以流的id为key
@@ -11,10 +9,10 @@ import 'package:synchronized/synchronized.dart';
 ///后者代表远程的视频，包含所有的远程视频流的PeerMediaStream
 class PeerMediaStreamController with ChangeNotifier {
   //当前选择的界面渲染器
-  PeerMediaStream? _currentPeerMediaStream;
+  String? _currentPeerId;
 
-  //媒体流集合，所有的视频流，包括本地和远程
-  final Map<String, PeerMediaStream> _peerMediaStreams = {};
+  //媒体流集合，所有的视频流，包括本地和远程，映射的键值peerId
+  final Map<String, List<PeerMediaStream>> _peerMediaStreams = {};
 
   //媒体流集合的操作锁
   final Lock _streamLock = Lock();
@@ -29,48 +27,39 @@ class PeerMediaStreamController with ChangeNotifier {
   }
 
   ///获取当前媒体流
-  PeerMediaStream? get currentPeerMediaStream {
-    return _currentPeerMediaStream;
+  String? get currentPeerId {
+    return _currentPeerId;
+  }
+
+  List<PeerMediaStream>? get currentPeerMediaStreams {
+    return _peerMediaStreams[_currentPeerId];
   }
 
   ///设置当前媒体流
-  set currentPeerMediaStream(PeerMediaStream? currentPeerMediaStream) {
-    if (_currentPeerMediaStream != currentPeerMediaStream) {
-      _currentPeerMediaStream = currentPeerMediaStream;
+  set currentPeerId(String? currentPeerId) {
+    if (_currentPeerId != currentPeerId) {
+      _currentPeerId = currentPeerId;
       notifyListeners();
     }
   }
 
   ///获取所有的remote媒体流的列表
-  List<PeerMediaStream> get peerMediaStreams {
-    return [..._peerMediaStreams.values];
+  Map<String, List<PeerMediaStream>> get peerMediaStreams {
+    return _peerMediaStreams;
   }
 
   ///根据peerId筛选，获取相应的Peer媒体流的集合
-  List<PeerMediaStream> getPeerMediaStreams(String peerId, {String? clientId}) {
-    List<PeerMediaStream> peerMediaStreams = [];
-    for (var peerMediaStream in _peerMediaStreams.values) {
-      if (peerId == peerMediaStream.platformParticipant?.peerId) {
-        if (clientId != null) {
-          if (clientId == peerMediaStream.platformParticipant?.clientId) {
-            if (peerMediaStream.id != null) {
-              peerMediaStreams.add(peerMediaStream);
-            }
-          }
-        } else {
-          if (peerMediaStream.id != null) {
-            peerMediaStreams.add(peerMediaStream);
-          }
-        }
-      }
+  List<PeerMediaStream> getPeerMediaStreams(String peerId) {
+    List<PeerMediaStream>? peerMediaStreams = _peerMediaStreams[peerId];
+    if (peerMediaStreams != null) {
+      return peerMediaStreams;
     }
-    return peerMediaStreams;
+    return [];
   }
 
   ///根据peerId筛选，获取相应的原生的媒体流的集合
-  List<MediaStream> getMediaStreams(String peerId, {String? clientId}) {
-    List<PeerMediaStream> peerMediaStreams =
-        getPeerMediaStreams(peerId, clientId: clientId);
+  List<MediaStream> getMediaStreams(String peerId) {
+    List<PeerMediaStream> peerMediaStreams = getPeerMediaStreams(peerId);
     List<MediaStream> streams = [];
     if (peerMediaStreams.isNotEmpty) {
       for (var stream in peerMediaStreams) {
@@ -83,74 +72,74 @@ class PeerMediaStreamController with ChangeNotifier {
     return streams;
   }
 
-  ///根据流编号获取相应的媒体流
-  Future<PeerMediaStream?> getPeerMediaStream(String streamId) async {
-    return await _streamLock.synchronized(() {
-      return _peerMediaStreams[streamId];
-    });
-  }
-
   ///如果不存在，增加peerMediaStream，激活add事件
   add(PeerMediaStream peerMediaStream) async {
     await _streamLock.synchronized(() {
-      var id = peerMediaStream.id;
-      if (id != null && !_peerMediaStreams.containsKey(id)) {
-        _peerMediaStreams[id] = peerMediaStream;
+      var peerId = peerMediaStream.platformParticipant?.peerId;
+      if (peerId != null) {
+        String streamId = peerMediaStream.id!;
+        if (!_peerMediaStreams.containsKey(peerId)) {
+          _peerMediaStreams[peerId] = [peerMediaStream];
+        } else {
+          List<PeerMediaStream> peerMediaStreams = _peerMediaStreams[peerId]!;
+          if (peerMediaStreams.isNotEmpty) {
+            for (var peerMediaStream in peerMediaStreams) {
+              if (peerMediaStream.contain(streamId)) {
+                return;
+              }
+            }
+          }
+
+          peerMediaStreams.add(peerMediaStream);
+        }
         notifyListeners();
       }
     });
   }
 
   ///移除媒体流，如果是当前媒体流，则设置当前的媒体流为null，激活remove事件
-  Future<PeerMediaStream?> remove(String streamId) async {
+  Future<bool> remove(PeerMediaStream peerMediaStream) async {
     return await _streamLock.synchronized(() async {
-      PeerMediaStream? peerMediaStream = _peerMediaStreams[streamId];
-      if (peerMediaStream != null) {
-        _peerMediaStreams.remove(streamId);
-        if (_currentPeerMediaStream != null &&
-            _currentPeerMediaStream!.id == streamId) {
-          _currentPeerMediaStream = null;
+      String? peerId = peerMediaStream.peerId;
+      List<PeerMediaStream>? peerMediaStreams = _peerMediaStreams[peerId];
+      if (peerMediaStreams != null) {
+        bool success = peerMediaStreams.remove(peerMediaStream);
+        if (success) {
+          if (peerMediaStreams.isEmpty) {
+            _peerMediaStreams.remove(peerId);
+            if (_currentPeerId != null && _currentPeerId == peerId) {
+              _currentPeerId = null;
+            }
+          }
+          notifyListeners();
         }
-        notifyListeners();
+        return success;
       }
-      return peerMediaStream;
+      return false;
     });
   }
 
   ///关闭指定流并且从集合中删除
-  close(String streamId) async {
-    PeerMediaStream? peerMediaStream = await remove(streamId);
-    if (peerMediaStream != null) {
-      //在windows平台上关闭远程流似乎会崩溃，可以注释后进行测试
-      if (_currentPeerMediaStream != null &&
-          _currentPeerMediaStream!.id == streamId) {
-        _currentPeerMediaStream = null;
-      }
+  Future<bool> close(PeerMediaStream peerMediaStream) async {
+    bool success = await remove(peerMediaStream);
+    if (success) {
       await peerMediaStream.close();
-      remove(streamId);
     }
+
+    return success;
   }
 
   ///移除并且关闭控制器所有的媒体流，激活exit事件
   closeAll() async {
     await _streamLock.synchronized(() async {
-      _currentPeerMediaStream = null;
-      //先移除，后关闭
-      List<PeerMediaStream> peerMediaStreams = [..._peerMediaStreams.values];
-      for (var peerMediaStream in peerMediaStreams) {
-        await peerMediaStream.close();
+      _currentPeerId = null;
+      for (var peerMediaStreams in _peerMediaStreams.values) {
+        for (var peerMediaStream in peerMediaStreams) {
+          await peerMediaStream.close();
+        }
       }
       _peerMediaStreams.clear();
 
-      notifyListeners();
-    });
-  }
-
-  replace(Map<String, PeerMediaStream> peerMediaStreams) async {
-    await _streamLock.synchronized(() async {
-      _currentPeerMediaStream = null;
-      _peerMediaStreams.clear();
-      _peerMediaStreams.addAll(peerMediaStreams);
       notifyListeners();
     });
   }
@@ -224,44 +213,14 @@ class LocalPeerMediaStreamController extends PeerMediaStreamController {
     return peerMediaStream;
   }
 
-  ///创建本地的Stream，激活add监听事件
-  Future<PeerMediaStream> createPeerMediaStream({
-    MediaStream? mediaStream,
-    VideoTrack? videoTrack,
-  }) async {
-    String streamId = '';
-    if (mediaStream != null) {
-      streamId = mediaStream.id;
-    }
-    if (videoTrack != null) {
-      streamId = videoTrack.mediaStream.id;
-    }
-    PeerMediaStream? peerMediaStream = _peerMediaStreams[streamId];
-    if (peerMediaStream != null) {
-      return peerMediaStream;
-    }
-    PlatformParticipant platformParticipant = PlatformParticipant(
-        myself.peerId!,
-        clientId: myself.clientId,
-        name: myself.name);
-    peerMediaStream = await PeerMediaStream.createPeerMediaStream(
-      platformParticipant: platformParticipant,
-      mediaStream: mediaStream,
-      videoTrack: videoTrack,
-    );
-    add(peerMediaStream);
-
-    return peerMediaStream;
-  }
-
   ///关闭本地特定的流
   @override
-  close(String streamId) async {
-    if (_mainPeerMediaStream != null && streamId == _mainPeerMediaStream!.id) {
+  Future<bool> close(PeerMediaStream peerMediaStream) async {
+    if (_mainPeerMediaStream != null &&
+        _mainPeerMediaStream!.contain(peerMediaStream.id!)) {
       _mainPeerMediaStream = null;
     }
-    await super.close(streamId);
-
+    return await super.close(peerMediaStream);
   }
 
   ///关闭本地所有的流

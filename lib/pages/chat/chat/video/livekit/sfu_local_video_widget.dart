@@ -214,7 +214,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     }
     var streamId = peerMediaStream.id;
     if (streamId != null) {
-      await localPeerMediaStreamController.close(streamId);
+      await localPeerMediaStreamController.close(peerMediaStream);
     }
   }
 

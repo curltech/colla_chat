@@ -2,6 +2,7 @@ import 'dart:core';
 
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/media_stream_util.dart';
@@ -102,8 +103,8 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   void _makeCall() async {
     try {
       await localPeerMediaStreamController.createMainPeerMediaStream();
-      List<PeerMediaStream> renders =
-          localPeerMediaStreamController.peerMediaStreams;
+      List<PeerMediaStream> renders = localPeerMediaStreamController
+          .getPeerMediaStreams(myself.peerId!).toList();
       if (renders.isNotEmpty) {
         peerMediaStream = renders[0];
       }

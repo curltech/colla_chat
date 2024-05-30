@@ -1,3 +1,4 @@
+import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
@@ -10,19 +11,19 @@ import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
-import 'package:livekit_client/livekit_client.dart';
 
-///单个小视频窗口，显示一个视频流的PeerpeerMediaStream，长按出现更大的窗口，带有操作按钮
+///单个小视频窗口，把相同的peerId的一组媒体流显示在一个滑动的窗口中swiper，
+///长按出现更大的窗口，带有操作按钮
 class SingleVideoViewWidget extends StatefulWidget {
   final PeerMediaStreamController peerMediaStreamController;
-  final PeerMediaStream peerMediaStream;
+  final String peerId;
   final double? height;
   final double? width;
 
   const SingleVideoViewWidget({
     super.key,
     required this.peerMediaStreamController,
-    required this.peerMediaStream,
+    required this.peerId,
     this.height,
     this.width,
   });
@@ -40,21 +41,34 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   ValueNotifier<double> zoomLevel = ValueNotifier<double>(1);
 
   late OverlayEntry _popupDialog;
+  int index = 0;
+  SwiperController swiperController = SwiperController();
+  late List<PeerMediaStream> peerMediaStreams;
 
   @override
   initState() {
     super.initState();
     widget.peerMediaStreamController.addListener(_updateSelected);
-    volume.value = widget.peerMediaStream.getVolume() ?? 1;
-    enableMute.value = widget.peerMediaStream.isMuted() ?? false;
+    peerMediaStreams = widget.peerMediaStreamController
+        .getPeerMediaStreams(widget.peerId)
+        .toList();
+    if (peerMediaStreams.isNotEmpty) {
+      volume.value = peerMediaStreams.first.getVolume() ?? 1;
+      enableMute.value = peerMediaStreams.first.isMuted() ?? false;
+    }
   }
 
   Future<void> _updateSelected() async {
-    PeerMediaStream? peerMediaStream =
-        widget.peerMediaStreamController.currentPeerMediaStream;
-    if (widget.peerMediaStream.id != null &&
-        peerMediaStream != null &&
-        peerMediaStream.id == widget.peerMediaStream.id) {
+    String? currentPeerId = widget.peerMediaStreamController.currentPeerId;
+    if (this.peerMediaStreams.isNotEmpty) {
+      String? peerId = this.peerMediaStreams.first.platformParticipant?.peerId;
+      if (peerId != null && currentPeerId != null && peerId == currentPeerId) {
+        setState(() {});
+      }
+    }
+    List<PeerMediaStream> peerMediaStreams =
+        widget.peerMediaStreamController.getPeerMediaStreams(widget.peerId);
+    if (peerMediaStreams.length != this.peerMediaStreams.length) {
       setState(() {});
     }
   }
@@ -68,10 +82,15 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   }
 
   Widget _buildPopupVideoView() {
+    Widget mediaRenderView = Center(
+        child: CommonAutoSizeText(AppLocalizations.t('No media stream')));
+    if (peerMediaStreams.isEmpty) {
+      return mediaRenderView;
+    }
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    Widget mediaRenderView = PeerMediaRenderView(
-        peerMediaStream: widget.peerMediaStream, height: height, width: width);
+    mediaRenderView = PeerMediaRenderView(
+        peerMediaStream: peerMediaStreams[index], height: height, width: width);
     Widget singleVideoView = Builder(
       builder: (context) => InkWell(
         onLongPress: () async {
@@ -91,102 +110,85 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   }
 
   List<ActionData> _buildVideoActionData() {
+    if (peerMediaStreams.isEmpty) {
+      return [];
+    }
+    PeerMediaStream peerMediaStream;
+    if (peerMediaStreams.length == 1) {
+      peerMediaStream = peerMediaStreams.first;
+    } else if (index < peerMediaStreams.length) {
+      peerMediaStream = peerMediaStreams[index];
+    } else {
+      return [];
+    }
     List<ActionData> videoActionData = [];
-    Participant<TrackPublication<Track>>? participant =
-        widget.peerMediaStream.participant;
     if (platformParams.mobile) {
-      if (widget.peerMediaStream.local) {
+      if (peerMediaStream.local) {
         videoActionData.add(
           ActionData(
-              label: 'Camera switch',
-              //actionType: ActionType.inkwell,
-              icon: const Icon(Icons.cameraswitch)),
+              label: 'Camera switch', icon: const Icon(Icons.cameraswitch)),
         );
       }
     }
     if (enableSpeaker.value) {
       videoActionData.add(
-        ActionData(
-            label: 'Handset switch',
-            // actionType: ActionType.inkwell,
-            icon: const Icon(Icons.earbuds)),
+        ActionData(label: 'Handset switch', icon: const Icon(Icons.earbuds)),
       );
     } else {
       videoActionData.add(
         ActionData(
-            label: 'Speaker switch',
-            // actionType: ActionType.inkwell,
-            icon: const Icon(Icons.speaker_phone)),
+            label: 'Speaker switch', icon: const Icon(Icons.speaker_phone)),
       );
     }
-    if (widget.peerMediaStream.local) {
+    if (peerMediaStream.local) {
       if (enableMute.value) {
         videoActionData.add(
-          ActionData(
-              label: 'Microphone unmute',
-              // actionType: ActionType.inkwell,
-              icon: const Icon(Icons.mic)),
+          ActionData(label: 'Microphone unmute', icon: const Icon(Icons.mic)),
         );
       } else {
         videoActionData.add(
-          ActionData(
-              label: 'Microphone mute',
-              // actionType: ActionType.inkwell,
-              icon: const Icon(Icons.mic_off)),
+          ActionData(label: 'Microphone mute', icon: const Icon(Icons.mic_off)),
         );
       }
     }
     if (volume.value > 0) {
       videoActionData.add(
-        ActionData(
-            label: 'Volume mute',
-            // actionType: ActionType.inkwell,
-            icon: const Icon(Icons.volume_mute)),
+        ActionData(label: 'Volume mute', icon: const Icon(Icons.volume_mute)),
       );
     }
     if (volume.value > 0) {
       videoActionData.add(
         ActionData(
-            label: 'Volume decrease',
-            // actionType: ActionType.inkwell,
-            icon: const Icon(Icons.volume_down)),
+            label: 'Volume decrease', icon: const Icon(Icons.volume_down)),
       );
     }
     videoActionData.add(
-      ActionData(
-          label: 'Volume increase',
-          // actionType: ActionType.inkwell,
-          icon: const Icon(Icons.volume_up)),
+      ActionData(label: 'Volume increase', icon: const Icon(Icons.volume_up)),
     );
     if (platformParams.mobile) {
       videoActionData.add(
-        ActionData(
-            label: 'Zoom in',
-            // actionType: ActionType.inkwell,
-            icon: const Icon(Icons.zoom_in_map)),
+        ActionData(label: 'Zoom in', icon: const Icon(Icons.zoom_in_map)),
       );
       videoActionData.add(
-        ActionData(
-            label: 'Zoom out',
-            // actionType: ActionType.inkwell,
-            icon: const Icon(Icons.zoom_out_map)),
+        ActionData(label: 'Zoom out', icon: const Icon(Icons.zoom_out_map)),
       );
     }
 
-    if (widget.peerMediaStream.local) {
+    if (peerMediaStream.local) {
       videoActionData.add(
         ActionData(
-            label: 'Close',
-            // actionType: ActionType.inkwell,
-            icon: const Icon(Icons.closed_caption_disabled)),
+            label: 'Close', icon: const Icon(Icons.closed_caption_disabled)),
       );
     }
     return videoActionData;
   }
 
-  Future<dynamic> _showActionCard(BuildContext context) {
+  Future<dynamic> _showActionCard(BuildContext context) async {
+    List<ActionData> actions = _buildVideoActionData();
+    if (actions.isEmpty) {
+      return null;
+    }
     return DialogUtil.popModalBottomSheet(context, builder: (context) {
-      List<ActionData> actions = _buildVideoActionData();
       int level = (actions.length / 3).ceil();
       double height = 100.0 * level;
       return Card(
@@ -212,39 +214,61 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   ///单个视频窗口
   Widget _buildSingleVideoView(
       BuildContext context, double? height, double? width) {
-    String name = widget.peerMediaStream.platformParticipant?.name ?? '';
-    String streamId = widget.peerMediaStream.id ?? '';
-    String ownerTag = widget.peerMediaStream.ownerTag ?? '';
-    bool video = widget.peerMediaStream.video;
-    Widget mediaRenderView =
-        Center(child: CommonAutoSizeText(AppLocalizations.t('No stream')));
-    var peerMediaStream = widget.peerMediaStream;
-    mediaRenderView = PeerMediaRenderView(
-        peerMediaStream: peerMediaStream, height: height, width: width);
-
+    Widget mediaRenderView = Center(
+        child: CommonAutoSizeText(AppLocalizations.t('No media stream')));
+    if (peerMediaStreams.isEmpty) {
+      return mediaRenderView;
+    }
+    String name = peerMediaStreams.first.platformParticipant?.name ?? '';
+    if (peerMediaStreams.length == 1) {
+      index = 0;
+      mediaRenderView = PeerMediaRenderView(
+          peerMediaStream: peerMediaStreams.first,
+          height: height,
+          width: width);
+    } else {
+      List<Widget> views = [];
+      for (PeerMediaStream peerMediaStream in peerMediaStreams) {
+        mediaRenderView = PeerMediaRenderView(
+            peerMediaStream: peerMediaStream, height: height, width: width);
+        views.add(mediaRenderView);
+      }
+      mediaRenderView = Swiper(
+        controller: swiperController,
+        itemCount: views.length,
+        itemBuilder: (BuildContext context, int index) {
+          return views[index];
+        },
+        onIndexChanged: (int index) {
+          this.index = index;
+        },
+        index: index,
+      );
+    }
     Widget singleVideoView = Builder(
       builder: (context) => InkWell(
         onTap: () async {
-          setState(() {
-            widget.peerMediaStreamController.currentPeerMediaStream =
-                widget.peerMediaStream;
-          });
+          widget.peerMediaStreamController.currentPeerId =
+              peerMediaStreams.first.platformParticipant?.peerId;
+        },
+        onDoubleTap: () async {
+          if (peerMediaStreams.length > 1) {
+            swiperController.next();
+          }
         },
         onLongPress: () async {
-          setState(() {
-            widget.peerMediaStreamController.currentPeerMediaStream =
-                widget.peerMediaStream;
-          });
+          widget.peerMediaStreamController.currentPeerId =
+              peerMediaStreams.first.platformParticipant?.peerId;
           await _showActionCard(context);
         },
         child: mediaRenderView,
       ),
     );
-    var selected = false;
-    if (widget.peerMediaStream.id != null &&
-        widget.peerMediaStreamController.currentPeerMediaStream != null) {
-      selected = widget.peerMediaStream.id ==
-          widget.peerMediaStreamController.currentPeerMediaStream!.id;
+    bool selected = false;
+    if (peerMediaStreams.first.platformParticipant?.peerId != null &&
+        widget.peerMediaStreamController.currentPeerId != null) {
+      selected = peerMediaStreams.first.platformParticipant?.peerId ==
+          widget.peerMediaStreamController.currentPeerId;
     }
     return Container(
       decoration: selected
@@ -266,18 +290,6 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
                           color: Colors.white,
                           fontSize: AppFontSize.xsFontSize),
                     ),
-                    // CommonAutoSizeText(
-                    //   streamId,
-                    //   style: const TextStyle(
-                    //       color: Colors.white,
-                    //       fontSize: AppFontSize.xsFontSize),
-                    // ),
-                    // CommonAutoSizeText(
-                    //   ownerTag,
-                    //   style: const TextStyle(
-                    //       color: Colors.white,
-                    //       fontSize: AppFontSize.xsFontSize),
-                    // ),
                     ValueListenableBuilder(
                         valueListenable: volume,
                         builder: (BuildContext context, double volume,
@@ -306,7 +318,16 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
 
   Future<void> _onAction(BuildContext context, int index, String name,
       {String? value}) async {
-    PeerMediaStream peerMediaStream = widget.peerMediaStream;
+    PeerMediaStream peerMediaStream;
+    if (peerMediaStreams.isEmpty) {
+      return;
+    } else if (peerMediaStreams.length == 1) {
+      peerMediaStream = peerMediaStreams.first;
+    } else if (this.index < peerMediaStreams.length) {
+      peerMediaStream = peerMediaStreams[this.index];
+    } else {
+      peerMediaStream = peerMediaStreams.first;
+    }
     switch (name) {
       case 'Camera switch':
         await peerMediaStream.switchCamera();
@@ -361,10 +382,10 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         await peerMediaStream.setZoom(val);
         break;
       case 'Close':
-        var streamId = peerMediaStream.id;
-        if (streamId != null) {
-          await widget.peerMediaStreamController.close(streamId);
+        if (peerMediaStreams.length > 1) {
+          swiperController.next();
         }
+        await widget.peerMediaStreamController.close(peerMediaStream);
         break;
       default:
         break;
@@ -373,6 +394,9 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
 
   @override
   Widget build(BuildContext context) {
+    peerMediaStreams = widget.peerMediaStreamController
+        .getPeerMediaStreams(widget.peerId)
+        .toList();
     return _buildSingleVideoView(context, widget.height, widget.width);
   }
 
