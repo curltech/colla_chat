@@ -15,6 +15,7 @@ import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/widgets/media/audio/audio_session.dart';
 import 'package:flutter/material.dart';
 import 'package:livekit_client/livekit_client.dart';
+import 'package:livekit_client/livekit_client.dart' as livekit_client;
 import 'package:synchronized/synchronized.dart';
 
 /// LiveKit的房间连接客户端,ws协议
@@ -51,6 +52,10 @@ class LiveKitRoomClient {
 
     // Create a Listener before connecting
     _listener = room.createListener();
+    livekit_client.ConnectionState state = room.connectionState;
+    if (state != livekit_client.ConnectionState.disconnected) {
+      return;
+    }
     await room.connect(
       uri,
       token,
@@ -421,7 +426,7 @@ class LiveKitConferenceClient {
     log.logger.w('i joined conference ${conference.name}');
     await publish(
         peerMediaStreams:
-            localPeerMediaStreamController.peerMediaStreams.values.first);
+            localPeerMediaStreamController.peerMediaStreams.values.firstOrNull);
     liveKitConferenceClientPool.join(conference.conferenceId);
     await globalAudioSession.initSpeech();
   }

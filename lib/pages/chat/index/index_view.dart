@@ -645,20 +645,18 @@ class _IndexViewState extends State<IndexView>
       String? conferenceName = p2pConferenceClientPool
           .conferenceChatMessageController?.conference?.name;
       if (conferenceName != null) {
-        children.add(
-          CommonAutoSizeText(
-            AppLocalizations.t('You are in conference:') + conferenceName,
-            style: const TextStyle(color: Colors.amber),
-          ),
-        );
+        // children.add(
+        //   CommonAutoSizeText(
+        //     AppLocalizations.t('You are in conference:') + conferenceName,
+        //     style: const TextStyle(color: Colors.amber),
+        //   ),
+        // );
       }
     }
     children.addAll([
-      CommonAutoSizeText(name,
+      CommonAutoSizeText(conferenceChatMessage.senderName ?? '',
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-      CommonAutoSizeText(
-          AppLocalizations.t('Inviting you $title chat ') +
-              (conferenceChatMessage.senderName ?? ''),
+      CommonAutoSizeText('$name\n$title',
           style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
     ]);
     _play();
@@ -671,11 +669,10 @@ class _IndexViewState extends State<IndexView>
       progressIndicatorColor: myself.primary,
       borderRadius: BorderRadius.circular(8.0),
       toastDuration: const Duration(milliseconds: 30000),
-      title: Column(
-        children: children,
-      ),
+      title: CommonAutoSizeText(conferenceChatMessage.senderName ?? '',
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
       description: ExtendedText(
-        topic ?? '',
+        name + (topic ?? ''),
         specialTextSpanBuilder: customSpecialTextSpanBuilder,
       ),
       // action: ButtonBar(alignment: MainAxisAlignment.end, children: buttons),
