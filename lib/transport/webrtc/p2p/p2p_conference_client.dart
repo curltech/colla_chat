@@ -158,7 +158,7 @@ class P2pConferenceClient {
     List<AdvancedPeerConnection> pcs = await peerConnections;
     for (AdvancedPeerConnection peerConnection in pcs) {
       await removeLocalStreams(peerConnection, peerMediaStreams);
-      for (PeerMediaStream peerMediaStream in peerMediaStreams) {
+      for (PeerMediaStream peerMediaStream in [...peerMediaStreams]) {
         if (peerMediaStream.id != null) {
           await localPeerMediaStreamController.close(peerMediaStream);
         }

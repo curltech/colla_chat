@@ -240,16 +240,18 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   ///关闭并且移除本地所有的视频，这时候还能看远程的视频
   _closeAll() async {
-    var peerMediaStreams =
-        localPeerMediaStreamController.peerMediaStreams.values.first;
-    P2pConferenceClient? p2pConferenceClient =
-        p2pConferenceClientPool.conferenceClient;
-    ConferenceChatMessageController? conferenceChatMessageController =
-        p2pConferenceClient?.conferenceChatMessageController;
-    Conference? conference = conferenceChatMessageController?.conference;
-    //从webrtc连接中移除流
-    if (conference != null) {
-      await p2pConferenceClient?.closeLocal(peerMediaStreams);
+    var peerMediaStreamMap = localPeerMediaStreamController.peerMediaStreams;
+    if (peerMediaStreamMap.isNotEmpty) {
+      var peerMediaStreams = peerMediaStreamMap.values.first;
+      P2pConferenceClient? p2pConferenceClient =
+          p2pConferenceClientPool.conferenceClient;
+      ConferenceChatMessageController? conferenceChatMessageController =
+          p2pConferenceClient?.conferenceChatMessageController;
+      Conference? conference = conferenceChatMessageController?.conference;
+      //从webrtc连接中移除流
+      if (conference != null) {
+        await p2pConferenceClient?.closeLocal(peerMediaStreams);
+      }
     }
     await localPeerMediaStreamController.closeAll();
   }
