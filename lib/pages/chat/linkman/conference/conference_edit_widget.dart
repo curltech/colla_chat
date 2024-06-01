@@ -500,43 +500,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     return current;
   }
 
-  _resend() async {
-    Conference? current = conferenceNotifier.value;
-    if (current == null) {
-      return null;
-    }
-    bool sfu = current.sfu;
-    if (sfu) {
-      List<String>? participants = current.participants;
-      if (participants != null) {
-        try {
-          await chatMessageService
-              .sendSfuConferenceMessage(current, participants, store: false);
-        } catch (e) {
-          logger.e('sendSfuConferenceMessage failure:$e');
-          if (mounted) {
-            DialogUtil.error(context,
-                content: 'send sfu conference message failure');
-          }
-          return null;
-        }
-      }
-    } else {
-      ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
-        current.conferenceId,
-        PartyType.conference,
-        groupName: current.name,
-        title: current.video
-            ? ChatMessageContentType.video.name
-            : ChatMessageContentType.audio.name,
-        content: current,
-        messageId: current.conferenceId,
-        subMessageType: ChatMessageSubType.videoChat,
-      );
-      await chatMessageService.send(chatMessage,
-          cryptoOption: CryptoOption.group, peerIds: current.participants);
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {

@@ -518,10 +518,11 @@ class _IndexViewState extends State<IndexView>
 
       ElegantNotification elegantNotification = NotificationUtil.show(context,
           icon: bannerAvatarImage,
-          position: Alignment.topLeft,
+          position: Alignment.topCenter,
           animation: AnimationType.fromTop,
           displayCloseButton: true,
           progressIndicatorColor: myself.primary,
+          borderRadius: BorderRadius.circular(8.0),
           toastDuration: const Duration(milliseconds: 30000),
           title: Column(
             children: children,
@@ -654,20 +655,21 @@ class _IndexViewState extends State<IndexView>
     }
     children.addAll([
       CommonAutoSizeText(name,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
       CommonAutoSizeText(
-        AppLocalizations.t('Inviting you $title chat ') +
-            (conferenceChatMessage.senderName ?? ''),
-      ),
+          AppLocalizations.t('Inviting you $title chat ') +
+              (conferenceChatMessage.senderName ?? ''),
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
     ]);
     _play();
     ElegantNotification elegantNotification = NotificationUtil.show(
       context,
       icon: bannerAvatarImage,
-      position: Alignment.bottomLeft,
+      position: Alignment.topCenter,
       animation: AnimationType.fromTop,
       displayCloseButton: true,
       progressIndicatorColor: myself.primary,
+      borderRadius: BorderRadius.circular(8.0),
       toastDuration: const Duration(milliseconds: 30000),
       title: Column(
         children: children,

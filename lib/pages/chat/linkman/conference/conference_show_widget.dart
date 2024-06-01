@@ -1,11 +1,15 @@
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/conference/conference_edit_widget.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -145,6 +149,42 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
         });
   }
 
+  _resend(BuildContext context) async {
+    Conference? current = conferenceNotifier.value;
+    if (current == null) {
+      return null;
+    }
+    bool sfu = current.sfu;
+    if (sfu) {
+      List<String>? participants = current.participants;
+      if (participants != null) {
+        try {
+          await chatMessageService
+              .sendSfuConferenceMessage(current, participants, store: false);
+        } catch (e) {
+          logger.e('sendSfuConferenceMessage failure:$e');
+          DialogUtil.error(context,
+              content: 'send sfu conference message failure');
+          return null;
+        }
+      }
+    } else {
+      ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
+        current.conferenceId,
+        PartyType.conference,
+        groupName: current.name,
+        title: current.video
+            ? ChatMessageContentType.video.name
+            : ChatMessageContentType.audio.name,
+        content: current,
+        messageId: current.conferenceId,
+        subMessageType: ChatMessageSubType.videoChat,
+      );
+      await chatMessageService.send(chatMessage,
+          cryptoOption: CryptoOption.group, peerIds: current.participants);
+    }
+  }
+
   //会议信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
     final Conference? conference = conferenceNotifier.value;
@@ -155,6 +195,10 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
               padding: const EdgeInsets.all(10.0),
               child: FormInputWidget(
                 height: 400,
+                okLabel: 'Resend',
+                onOk: (Map<String, dynamic> values) {
+                  _resend(context);
+                },
                 controller: controller,
               )));
 

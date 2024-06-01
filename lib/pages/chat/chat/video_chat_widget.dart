@@ -94,8 +94,9 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
           onPressed: () {
             _closeOverlayEntry();
           },
-          label: 'Conference',
-          child: const Icon(size: 32, color: Colors.white, Icons.zoom_out_map)),
+          label: AppLocalizations.t('Conference'),
+          child: const Icon(
+              size: 32, color: Colors.redAccent, Icons.zoom_out_map)),
     );
     widget.overlayEntry!.show(context: context);
   }

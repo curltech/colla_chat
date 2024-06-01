@@ -251,11 +251,6 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
           widget.peerMediaStreamController.currentPeerId =
               peerMediaStreams.first.platformParticipant?.peerId;
         },
-        onDoubleTap: () async {
-          if (peerMediaStreams.length > 1) {
-            swiperController.next();
-          }
-        },
         onLongPress: () async {
           widget.peerMediaStreamController.currentPeerId =
               peerMediaStreams.first.platformParticipant?.peerId;
@@ -270,48 +265,56 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
       selected = peerMediaStreams.first.platformParticipant?.peerId ==
           widget.peerMediaStreamController.currentPeerId;
     }
+    List<Widget> children = [
+      singleVideoView,
+      Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            CommonAutoSizeText(
+              name,
+              style: const TextStyle(
+                  color: Colors.white, fontSize: AppFontSize.xsFontSize),
+            ),
+            ValueListenableBuilder(
+                valueListenable: volume,
+                builder: (BuildContext context, double volume, Widget? child) {
+                  return CommonAutoSizeText(
+                    '$volume',
+                    style: const TextStyle(
+                        color: Colors.white, fontSize: AppFontSize.xsFontSize),
+                  );
+                }),
+            ValueListenableBuilder(
+                valueListenable: enableMute,
+                builder:
+                    (BuildContext context, bool enableMute, Widget? child) {
+                  return Icon(
+                    enableMute ? Icons.mic_off : Icons.mic,
+                    color: Colors.white,
+                  );
+                }),
+          ])),
+    ];
+    if (peerMediaStreams.length > 1) {
+      children.add(Align(
+          alignment: Alignment.topRight,
+          child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: IconButton(
+                onPressed: () {
+                  swiperController.next();
+                },
+                icon: const Icon(size: 36.0, Icons.navigate_next_outlined),
+              ))));
+    }
     return Container(
       decoration: selected
           ? BoxDecoration(border: Border.all(width: 1, color: myself.primary))
           : null,
       padding: const EdgeInsets.symmetric(horizontal: 0.0),
       child: Stack(
-        children: [
-          singleVideoView,
-          Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CommonAutoSizeText(
-                      name,
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: AppFontSize.xsFontSize),
-                    ),
-                    ValueListenableBuilder(
-                        valueListenable: volume,
-                        builder: (BuildContext context, double volume,
-                            Widget? child) {
-                          return CommonAutoSizeText(
-                            '$volume',
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: AppFontSize.xsFontSize),
-                          );
-                        }),
-                    ValueListenableBuilder(
-                        valueListenable: enableMute,
-                        builder: (BuildContext context, bool enableMute,
-                            Widget? child) {
-                          return Icon(
-                            enableMute ? Icons.mic_off : Icons.mic,
-                            color: Colors.white,
-                          );
-                        }),
-                  ])),
-        ],
+        children: children,
       ),
     );
   }
