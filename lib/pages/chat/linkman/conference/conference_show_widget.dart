@@ -26,6 +26,11 @@ import 'package:flutter/material.dart';
 class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
   final List<PlatformDataField> readOnlyConferenceDataField = [
     PlatformDataField(
+        name: 'id',
+        label: 'Id',
+        inputType: InputType.label,
+        prefixIcon: Icon(Icons.numbers_outlined, color: myself.primary)),
+    PlatformDataField(
         name: 'conferenceId',
         label: 'ConferenceId',
         inputType: InputType.label,

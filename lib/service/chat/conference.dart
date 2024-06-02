@@ -482,10 +482,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
           maxParticipants: conference.maxParticipants,
           participants: participants,
           names: names);
-      List<String>? tokens = liveKitManageRoom.tokens;
-      if (tokens != null) {
-        conference.sfuToken = JsonUtil.toJsonString(tokens);
-      }
+      conference.sfuToken = liveKitManageRoom.tokens;
       if (conference.password == null) {
         CryptoGraphy cryptoGraphy = CryptoGraphy();
         conference.password = await cryptoGraphy.getRandomAsciiString();

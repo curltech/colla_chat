@@ -779,7 +779,8 @@ class LiveKitConferenceClientPool with ChangeNotifier {
               ConferenceChatMessageController();
           await conferenceChatMessageController.setChatMessage(chatMessage,
               chatSummary: chatSummary);
-          String? token = conferenceChatMessageController.conference?.sfuToken;
+          String? token =
+              conferenceChatMessageController.conference?.sfuToken?.firstOrNull;
           String? uri = conferenceChatMessageController.conference?.sfuUri;
           String? password =
               conferenceChatMessageController.conference?.password;

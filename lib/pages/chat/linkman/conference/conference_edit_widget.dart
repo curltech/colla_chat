@@ -304,10 +304,10 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
                     if (current == null) {
                       return null;
                     }
-                    List<dynamic> tokens = JsonUtil.toJson(current.sfuToken);
+                    List<String>? tokens = current.sfuToken;
                     String content = JsonUtil.toJsonString({
                       'sfuUri': current.sfuUri,
-                      'sfuToken': tokens.last,
+                      'sfuToken': tokens?.lastOrNull,
                       'name': current.name,
                       'topic': current.topic,
                       'conferenceId': current.conferenceId,
@@ -499,8 +499,6 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
 
     return current;
   }
-
-
 
   @override
   Widget build(BuildContext context) {

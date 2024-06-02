@@ -24,7 +24,7 @@ class Conference extends StatusEntity {
   int maxParticipants = 0; // 参会人数上限
   bool sfu = true;
   String? sfuUri;
-  String? sfuToken;
+  List<String>? sfuToken;
   List<String>? participants; // 参与人peerId的集合
   Widget? avatarImage; //类似群的图标，几个参加者的图标的混合
 
@@ -68,7 +68,6 @@ class Conference extends StatusEntity {
         maxParticipants = json['maxParticipants'] ?? 0,
         sfu = json['sfu'] == true || json['sfu'] == 1 ? true : false,
         sfuUri = json['sfuUri'],
-        sfuToken = json['sfuToken'],
         super.fromJson(json) {
     var participants = json['participants'] != null
         ? JsonUtil.toJson(json['participants'])
@@ -77,6 +76,14 @@ class Conference extends StatusEntity {
       this.participants = <String>[];
       for (var participant in participants) {
         this.participants!.add(participant.toString());
+      }
+    }
+    var sfuToken =
+        json['sfuToken'] != null ? JsonUtil.toJson(json['sfuToken']) : null;
+    if (sfuToken != null && sfuToken is List) {
+      this.sfuToken = <String>[];
+      for (var token in sfuToken) {
+        this.sfuToken!.add(token.toString());
       }
     }
   }
@@ -105,7 +112,7 @@ class Conference extends StatusEntity {
       'maxParticipants': maxParticipants,
       'sfu': sfu,
       'sfuUri': sfuUri,
-      'sfuToken': sfuToken,
+      'sfuToken': sfuToken == null ? null : JsonUtil.toJsonString(sfuToken),
       'participants':
           participants == null ? null : JsonUtil.toJsonString(participants),
     });

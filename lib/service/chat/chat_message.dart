@@ -465,7 +465,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   Future<List<ChatMessage>> sendSfuConferenceMessage(
       Conference conference, List<String> participants,
       {bool store = true}) async {
-    List<dynamic>? tokens = JsonUtil.toJson(conference.sfuToken);
+    List<dynamic>? tokens = conference.sfuToken;
     String? sfuUri = conference.sfuUri;
     Map<String, dynamic> conferenceMap = JsonUtil.toJson(conference);
     List<ChatMessage> chatMessages = [];
@@ -474,7 +474,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       String token = tokens![i];
       Conference conf = Conference.fromJson(conferenceMap);
       conf.sfuUri = sfuUri;
-      conf.sfuToken = token;
+      conf.sfuToken = [token];
 
       /// 分为群中创建的会议和单独创建的会议，单独的会议中消息的群信息为会议信息
       PartyType? partyType =
