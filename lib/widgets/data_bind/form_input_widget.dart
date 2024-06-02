@@ -147,6 +147,8 @@ class FormInputWidget extends StatefulWidget {
   final FormInputController controller;
   final List<FormButton>? formButtons;
   final Function(Map<String, dynamic> values)? onOk;
+  final Function(Map<String, dynamic> values)? onReset;
+  final bool showResetButton;
   final String okLabel;
   final double height; //高度
   final MainAxisAlignment mainAxisAlignment;
@@ -160,6 +162,8 @@ class FormInputWidget extends StatefulWidget {
     required this.controller,
     this.formButtons,
     this.onOk,
+    this.onReset,
+    this.showResetButton = true,
     this.okLabel = 'Ok',
     required this.height,
     this.mainAxisAlignment = MainAxisAlignment.start,
@@ -241,8 +245,7 @@ class _FormInputWidgetState extends State<FormInputWidget> {
           dataField,
           value: value,
         );
-        widget.controller
-            .setController(dataField.name, dataFieldController);
+        widget.controller.setController(dataField.name, dataFieldController);
       } else {
         dataFieldController.value = value;
       }
@@ -275,16 +278,22 @@ class _FormInputWidgetState extends State<FormInputWidget> {
     ButtonStyle style = StyleUtil.buildButtonStyle();
     ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);
-    List<Widget> btns = [
-      TextButton(
+    List<Widget> btns = [];
+    if (widget.showResetButton) {
+      btns.add(TextButton(
         style: style,
         child: CommonAutoSizeText(AppLocalizations.t('Reset')),
         onPressed: () {
-          widget.controller.clear();
+          if (widget.onReset != null) {
+            var values = widget.controller.getValues();
+            widget.onReset!(values);
+          } else {
+            widget.controller.clear();
+          }
         },
-      )
-    ];
-    if (widget.formButtons == null) {
+      ));
+    }
+    if (widget.formButtons == null && widget.onOk != null) {
       btns.add(TextButton(
         style: mainStyle,
         child: CommonAutoSizeText(AppLocalizations.t(widget.okLabel)),

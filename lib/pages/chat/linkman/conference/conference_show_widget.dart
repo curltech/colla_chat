@@ -195,18 +195,28 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
 
   //会议信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
+    ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
+        backgroundColor: myself.primary, elevation: 10.0);
     final Conference? conference = conferenceNotifier.value;
     if (conference != null) {
       controller.setValues(JsonUtil.toJson(conference));
+      List<FormButton> formButtons = [];
+      if (conference.conferenceOwnerPeerId == myself.peerId) {
+        formButtons.add(FormButton(
+          buttonStyle: mainStyle,
+          onTap: (Map<String, dynamic> values) {
+            _resend(context);
+          },
+          label: AppLocalizations.t('Resend'),
+        ));
+      }
       var formInputWidget = SingleChildScrollView(
           child: Container(
               padding: const EdgeInsets.all(10.0),
               child: FormInputWidget(
                 height: 400,
-                okLabel: 'Resend',
-                onOk: (Map<String, dynamic> values) {
-                  _resend(context);
-                },
+                showResetButton: false,
+                formButtons: formButtons,
                 controller: controller,
               )));
 
