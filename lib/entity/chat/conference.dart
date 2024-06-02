@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/group.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:flutter/material.dart';
 
@@ -69,22 +70,30 @@ class Conference extends StatusEntity {
         sfu = json['sfu'] == true || json['sfu'] == 1 ? true : false,
         sfuUri = json['sfuUri'],
         super.fromJson(json) {
-    var participants = json['participants'] != null
-        ? JsonUtil.toJson(json['participants'])
-        : null;
-    if (participants != null && participants is List) {
-      this.participants = <String>[];
-      for (var participant in participants) {
-        this.participants!.add(participant.toString());
+    try {
+      var participants = json['participants'] != null
+          ? JsonUtil.toJson(json['participants'])
+          : null;
+      if (participants != null && participants is List) {
+        this.participants = <String>[];
+        for (var participant in participants) {
+          this.participants!.add(participant.toString());
+        }
       }
+    } catch (e) {
+      logger.e('participants toJson error:$e');
     }
-    var sfuToken =
-        json['sfuToken'] != null ? JsonUtil.toJson(json['sfuToken']) : null;
-    if (sfuToken != null && sfuToken is List) {
-      this.sfuToken = <String>[];
-      for (var token in sfuToken) {
-        this.sfuToken!.add(token.toString());
+    try {
+      var sfuToken =
+          json['sfuToken'] != null ? JsonUtil.toJson(json['sfuToken']) : null;
+      if (sfuToken != null && sfuToken is List) {
+        this.sfuToken = <String>[];
+        for (var token in sfuToken) {
+          this.sfuToken!.add(token.toString());
+        }
       }
+    } catch (e) {
+      logger.e('sfuToken toJson error:$e');
     }
   }
 
