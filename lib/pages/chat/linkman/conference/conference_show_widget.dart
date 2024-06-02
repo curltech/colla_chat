@@ -159,6 +159,9 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
     if (current == null) {
       return null;
     }
+    if (current.conferenceOwnerPeerId != myself.peerId) {
+      return null;
+    }
     bool sfu = current.sfu;
     if (sfu) {
       List<String>? participants = current.participants;
