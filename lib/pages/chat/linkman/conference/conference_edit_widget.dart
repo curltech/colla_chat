@@ -282,58 +282,61 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
           if (conference != null) {
             controller.setValues(JsonUtil.toJson(conference));
           }
+          List<FormButton> formButtons = [
+            FormButton(
+                label: 'Ok',
+                onTap: (Map<String, dynamic> values) async {
+                  Conference? conference = await _onOk(values);
+                  if (conference != null) {
+                    DialogUtil.info(context,
+                        content: AppLocalizations.t('Built conference ') +
+                            conference.name);
+                  }
+                })
+          ];
+          if (conference!.conferenceOwnerPeerId == myself.peerId) {
+            formButtons.add(FormButton(
+                label: 'Qrcode',
+                onTap: (Map<String, dynamic> values) async {
+                  Conference? current = conferenceNotifier.value;
+                  if (current == null) {
+                    return null;
+                  }
+                  List<String>? tokens = current.sfuToken;
+                  String content = JsonUtil.toJsonString({
+                    'sfuUri': current.sfuUri,
+                    'sfuToken': tokens?.lastOrNull,
+                    'name': current.name,
+                    'topic': current.topic,
+                    'conferenceId': current.conferenceId,
+                    'conferenceOwnerPeerId': current.conferenceOwnerPeerId,
+                    'conferenceOwnerName': current.conferenceOwnerName,
+                    'startDate': current.startDate,
+                    'endDate': current.endDate,
+                  });
+                  await DialogUtil.show(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Dialog(
+                        elevation: 0.0,
+                        insetPadding: EdgeInsets.zero,
+                        child: SizedBox(
+                            width: 320,
+                            height: 320,
+                            child: QrcodeWidget(
+                              content: content,
+                              width: 320,
+                            )),
+                      );
+                    },
+                  );
+                }));
+          }
           return FormInputWidget(
             spacing: 5.0,
             height: appDataProvider.portraitSize.height * 0.6,
             controller: controller,
-            formButtons: [
-              FormButton(
-                  label: 'Ok',
-                  onTap: (Map<String, dynamic> values) async {
-                    Conference? conference = await _onOk(values);
-                    if (conference != null) {
-                      DialogUtil.info(context,
-                          content: AppLocalizations.t('Built conference ') +
-                              conference.name);
-                    }
-                  }),
-              FormButton(
-                  label: 'Qrcode',
-                  onTap: (Map<String, dynamic> values) async {
-                    Conference? current = conferenceNotifier.value;
-                    if (current == null) {
-                      return null;
-                    }
-                    List<String>? tokens = current.sfuToken;
-                    String content = JsonUtil.toJsonString({
-                      'sfuUri': current.sfuUri,
-                      'sfuToken': tokens?.lastOrNull,
-                      'name': current.name,
-                      'topic': current.topic,
-                      'conferenceId': current.conferenceId,
-                      'conferenceOwnerPeerId': current.conferenceOwnerPeerId,
-                      'conferenceOwnerName': current.conferenceOwnerName,
-                      'startDate': current.startDate,
-                      'endDate': current.endDate,
-                    });
-                    await DialogUtil.show(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return Dialog(
-                          elevation: 0.0,
-                          insetPadding: EdgeInsets.zero,
-                          child: SizedBox(
-                              width: 320,
-                              height: 320,
-                              child: QrcodeWidget(
-                                content: content,
-                                width: 320,
-                              )),
-                        );
-                      },
-                    );
-                  })
-            ],
+            formButtons: formButtons,
           );
         });
     children.add(formInputWidget);

@@ -655,7 +655,11 @@ class _ChatMessageViewState extends State<ChatMessageView>
                   .findCachedOneByConferenceId(messageId);
               if (conference != null) {
                 conferenceNotifier.value = conference;
-                indexWidgetProvider.push('conference_edit');
+                if (conference.conferenceOwnerPeerId == myself.peerId) {
+                  indexWidgetProvider.push('conference_edit');
+                } else {
+                  indexWidgetProvider.push('conference_show');
+                }
               }
             }
           }
