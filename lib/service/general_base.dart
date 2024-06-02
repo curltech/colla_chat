@@ -9,6 +9,7 @@ import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:synchronized/synchronized.dart';
 
 /// 本地sqlite3的通用访问类，所有的表访问服务都是这个类的实例
 abstract class GeneralBaseService<T> {
@@ -18,6 +19,7 @@ abstract class GeneralBaseService<T> {
   final List<String> encryptFields;
   late final DataStore dataStore;
   late final T Function(Map) post;
+  Lock lock = Lock();
 
   GeneralBaseService(
       {required this.tableName,
@@ -263,7 +265,6 @@ abstract class GeneralBaseService<T> {
             int end = DateTime.now().millisecondsSinceEpoch;
             logger.i(
                 'decryptField $encryptField time: ${end - start} milliseconds');
-
           } catch (e) {
             logger
                 .e('SecurityContextService decrypt field:$encryptField err:$e');

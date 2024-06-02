@@ -672,7 +672,7 @@ class _IndexViewState extends State<IndexView>
       title: CommonAutoSizeText(conferenceChatMessage.senderName ?? '',
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
       description: ExtendedText(
-        name + (topic ?? ''),
+        '$name:${topic ?? ''}',
         specialTextSpanBuilder: customSpecialTextSpanBuilder,
       ),
       // action: ButtonBar(alignment: MainAxisAlignment.end, children: buttons),

@@ -328,84 +328,88 @@ class ConferenceService extends GeneralBaseService<Conference> {
 
   /// 保存会议以及成员，成员根据participants,conferenceOwnerPeerId决定成员表的身份
   Future<ConferenceChange> store(Conference conference) async {
-    ConferenceChange conferenceChange;
-    Conference? old = await findOneByConferenceId(conference.conferenceId);
-    if (old != null) {
-      conference.id = old.id;
-      conference.createDate = old.createDate;
-      if (old.sfuToken != null) {
-        conference.sfuToken = old.sfuToken;
-      }
-    } else {
-      conference.id = null;
-    }
-    await upsert(conference);
-    var conferenceId = conference.conferenceId;
-    var participants = conference.participants;
-    if (participants == null || participants.isEmpty) {
-      conferenceChange = ConferenceChange(
-          conference: conference, addGroupMembers: [], removeGroupMembers: []);
-    } else {
-      List<GroupMember> members =
-          await groupMemberService.findByGroupId(conferenceId);
-      Map<String, GroupMember> oldMembers = {};
-      //所有的现有成员
-      if (members.isNotEmpty) {
-        for (GroupMember member in members) {
-          oldMembers[member.memberPeerId!] = member;
+    return await lock.synchronized(() async {
+      ConferenceChange conferenceChange;
+      Conference? old = await findOneByConferenceId(conference.conferenceId);
+      if (old != null) {
+        conference.id = old.id;
+        conference.createDate = old.createDate;
+        if (old.sfuToken != null) {
+          conference.sfuToken = old.sfuToken;
         }
+      } else {
+        conference.id = null;
       }
-      //新增加的成员
-      List<GroupMember> newMembers = [];
-      List<String> unknownPeerIds = [];
-      for (var memberPeerId in participants) {
-        var member = oldMembers[memberPeerId];
-        if (member == null) {
-          GroupMember groupMember = GroupMember(conferenceId, memberPeerId);
-          Linkman? linkman =
-              await linkmanService.findCachedOneByPeerId(memberPeerId);
-          if (linkman != null) {
-            if (linkman.peerId == conference.conferenceOwnerPeerId) {
-              groupMember.memberType = MemberType.owner.name;
+      await upsert(conference);
+      var conferenceId = conference.conferenceId;
+      var participants = conference.participants;
+      if (participants == null || participants.isEmpty) {
+        conferenceChange = ConferenceChange(
+            conference: conference,
+            addGroupMembers: [],
+            removeGroupMembers: []);
+      } else {
+        List<GroupMember> members =
+            await groupMemberService.findByGroupId(conferenceId);
+        Map<String, GroupMember> oldMembers = {};
+        //所有的现有成员
+        if (members.isNotEmpty) {
+          for (GroupMember member in members) {
+            oldMembers[member.memberPeerId!] = member;
+          }
+        }
+        //新增加的成员
+        List<GroupMember> newMembers = [];
+        List<String> unknownPeerIds = [];
+        for (var memberPeerId in participants) {
+          var member = oldMembers[memberPeerId];
+          if (member == null) {
+            GroupMember groupMember = GroupMember(conferenceId, memberPeerId);
+            Linkman? linkman =
+                await linkmanService.findCachedOneByPeerId(memberPeerId);
+            if (linkman != null) {
+              if (linkman.peerId == conference.conferenceOwnerPeerId) {
+                groupMember.memberType = MemberType.owner.name;
+              } else {
+                groupMember.memberType = MemberType.member.name;
+              }
+              if (StringUtil.isEmpty(linkman.alias)) {
+                groupMember.memberAlias = linkman.name;
+              } else {
+                groupMember.memberAlias = linkman.alias;
+              }
+              if (linkman.publicKey == null) {
+                unknownPeerIds.add(memberPeerId);
+              }
             } else {
-              groupMember.memberType = MemberType.member.name;
-            }
-            if (StringUtil.isEmpty(linkman.alias)) {
-              groupMember.memberAlias = linkman.name;
-            } else {
-              groupMember.memberAlias = linkman.alias;
-            }
-            if (linkman.publicKey == null) {
               unknownPeerIds.add(memberPeerId);
             }
+            groupMember.status = EntityStatus.effective.name;
+            await groupMemberService.store(groupMember);
+            newMembers.add(groupMember);
           } else {
-            unknownPeerIds.add(memberPeerId);
+            oldMembers.remove(memberPeerId);
           }
-          groupMember.status = EntityStatus.effective.name;
-          await groupMemberService.store(groupMember);
-          newMembers.add(groupMember);
-        } else {
-          oldMembers.remove(memberPeerId);
         }
-      }
 
-      //处理删除的成员
-      if (oldMembers.isNotEmpty) {
-        for (GroupMember member in oldMembers.values) {
-          groupMemberService.delete(entity: {'id': member.id});
+        //处理删除的成员
+        if (oldMembers.isNotEmpty) {
+          for (GroupMember member in oldMembers.values) {
+            groupMemberService.delete(entity: {'id': member.id});
+          }
         }
+
+        conferenceChange = ConferenceChange(
+            conference: conference,
+            addGroupMembers: newMembers,
+            removeGroupMembers: oldMembers.values.toList(),
+            unknownPeerIds: unknownPeerIds);
       }
+      conferences[conference.conferenceId] = conference;
+      await chatSummaryService.upsertByConference(conference);
 
-      conferenceChange = ConferenceChange(
-          conference: conference,
-          addGroupMembers: newMembers,
-          removeGroupMembers: oldMembers.values.toList(),
-          unknownPeerIds: unknownPeerIds);
-    }
-    conferences[conference.conferenceId] = conference;
-    await chatSummaryService.upsertByConference(conference);
-
-    return conferenceChange;
+      return conferenceChange;
+    });
   }
 
   removeByConferenceId(String conferenceId) async {
