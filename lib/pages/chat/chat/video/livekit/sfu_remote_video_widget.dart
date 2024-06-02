@@ -116,12 +116,14 @@ class _SfuRemoteVideoWidgetState extends State<SfuRemoteVideoWidget> {
     );
   }
 
-  ///切换显示按钮面板
+  /// 切换显示按钮面板
   Future<void> _toggleActionCard() async {
     int count = 0;
     var conferenceClient = liveKitConferenceClientPool.conferenceClient;
     if (conferenceClient != null) {
-      count = (await conferenceClient.sortedRemotePeerMediaStreams).length;
+      count =
+          (conferenceClient.remotePeerMediaStreamController.peerMediaStreams)
+              .length;
     }
     if (count == 0) {
       controlPanelVisible.value = true;

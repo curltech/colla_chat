@@ -1,3 +1,4 @@
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -73,7 +74,7 @@ class PeerMediaStreamController with ChangeNotifier {
   }
 
   ///如果不存在，增加peerMediaStream，激活add事件
-  add(PeerMediaStream peerMediaStream) async {
+  add(PeerMediaStream peerMediaStream, {bool notify = true}) async {
     await _streamLock.synchronized(() {
       var peerId = peerMediaStream.platformParticipant?.peerId;
       if (peerId != null) {
@@ -83,22 +84,30 @@ class PeerMediaStreamController with ChangeNotifier {
         } else {
           List<PeerMediaStream> peerMediaStreams = _peerMediaStreams[peerId]!;
           if (peerMediaStreams.isNotEmpty) {
-            for (var peerMediaStream in peerMediaStreams) {
+            int i = 0;
+            for (var peerMediaStream in [...peerMediaStreams]) {
               if (peerMediaStream.contain(streamId)) {
-                return;
+                logger.w(
+                    'add peerMediaStream peerId:$peerId, streamId:$streamId is exist');
+                peerMediaStreams.removeAt(i);
+                break;
               }
+              i++;
             }
           }
 
           peerMediaStreams.add(peerMediaStream);
         }
-        notifyListeners();
+        if (notify) {
+          notifyListeners();
+        }
       }
     });
   }
 
   ///移除媒体流，如果是当前媒体流，则设置当前的媒体流为null，激活remove事件
-  Future<bool> remove(PeerMediaStream peerMediaStream) async {
+  Future<bool> remove(PeerMediaStream peerMediaStream,
+      {bool notify = true}) async {
     return await _streamLock.synchronized(() async {
       String? peerId = peerMediaStream.peerId;
       List<PeerMediaStream>? peerMediaStreams = _peerMediaStreams[peerId];
@@ -111,11 +120,31 @@ class PeerMediaStreamController with ChangeNotifier {
               _currentPeerId = null;
             }
           }
-          notifyListeners();
+          if (notify) {
+            notifyListeners();
+          }
         }
         return success;
       }
       return false;
+    });
+  }
+
+  Future<void> removeAll({String? peerId, bool notify = true}) async {
+    return await _streamLock.synchronized(() async {
+      if (peerId == null) {
+        _peerMediaStreams.clear();
+        if (notify) {
+          notifyListeners();
+        }
+      } else {
+        if (_peerMediaStreams.containsKey(peerId)) {
+          _peerMediaStreams.remove(peerId);
+          if (notify) {
+            notifyListeners();
+          }
+        }
+      }
     });
   }
 

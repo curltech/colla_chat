@@ -429,6 +429,7 @@ class LiveKitConferenceClient {
             localPeerMediaStreamController.peerMediaStreams.values.firstOrNull);
     liveKitConferenceClientPool.join(conference.conferenceId);
     await globalAudioSession.initSpeech();
+    await sortRemotePeerMediaStreams();
   }
 
   LocalParticipant? get localParticipant {
@@ -527,16 +528,19 @@ class LiveKitConferenceClient {
   }
 
   /// 远程参与者加入会议
-  FutureOr<void> _onParticipantConnectedEvent(ParticipantConnectedEvent event) {
+  Future<FutureOr<void>> _onParticipantConnectedEvent(
+      ParticipantConnectedEvent event) async {
     log.logger.i(
         'on ParticipantConnectedEvent:${event.participant.identity}:${event.participant.name}');
+    await addRemoteParticipant(event.participant);
   }
 
   /// 远程参与者退出会议
-  FutureOr<void> _onParticipantDisconnectedEvent(
-      ParticipantDisconnectedEvent event) {
+  Future<FutureOr<void>> _onParticipantDisconnectedEvent(
+      ParticipantDisconnectedEvent event) async {
     log.logger.i(
         'on ParticipantDisconnectedEvent:${event.participant.identity}:${event.participant.name}');
+    await removeRemoteParticipant(event.participant);
   }
 
   Future<FutureOr<void>> _onTrackPublishedEvent(
@@ -545,66 +549,53 @@ class LiveKitConferenceClient {
         'on TrackPublishedEvent:${event.participant.identity}:${event.participant.name}');
   }
 
-  /// 获取所有的远程参与者的所有流
-  Future<Map<String, List<PeerMediaStream>>>
-      get sortedRemotePeerMediaStreams async {
-    /// 遍历所有的参与者的所有流
-    Map<String, List<PeerMediaStream>> peerMediaStreamMap = {};
-    for (RemoteParticipant remoteParticipant in remoteParticipants) {
-      String peerId = remoteParticipant.identity;
-      peerMediaStreamMap[peerId] = [];
-      List<PeerMediaStream> peerMediaStreams = peerMediaStreamMap[peerId]!;
-      for (RemoteTrackPublication<RemoteAudioTrack> audioTrack
-          in remoteParticipant.audioTrackPublications) {
-        RemoteTrack? remoteTrack = audioTrack.track;
-        if (remoteTrack == null) {
-          continue;
-        }
-        String streamId = remoteTrack.mediaStream.id;
-        bool exist = false;
-        if (peerMediaStreams.isNotEmpty) {
-          for (var peerMediaStream in peerMediaStreams) {
-            if (peerMediaStream.contain(streamId)) {
-              exist = true;
-              break;
-            }
-          }
-        }
-        if (!exist) {
-          PeerMediaStream? peerMediaStream =
-              await _buildRemotePeerMediaStream(remoteTrack, remoteParticipant);
-          if (peerMediaStream != null) {
-            peerMediaStreams.add(peerMediaStream);
-          }
-        }
+  Future<void> addRemoteParticipant(RemoteParticipant remoteParticipant,
+      {bool notify = true}) async {
+    for (RemoteTrackPublication<RemoteAudioTrack> audioTrack
+        in remoteParticipant.audioTrackPublications) {
+      RemoteTrack? remoteTrack = audioTrack.track;
+      if (remoteTrack == null) {
+        continue;
       }
-      for (RemoteTrackPublication<RemoteVideoTrack> videoTrack
-          in remoteParticipant.videoTrackPublications) {
-        RemoteTrack? remoteTrack = videoTrack.track;
-        if (remoteTrack == null) {
-          continue;
-        }
-        String streamId = remoteTrack.mediaStream.id;
-        bool exist = false;
-        if (peerMediaStreams.isNotEmpty) {
-          for (var peerMediaStream in peerMediaStreams) {
-            if (peerMediaStream.contain(streamId)) {
-              exist = true;
-              break;
-            }
-          }
-        }
-        if (!exist) {
-          PeerMediaStream? peerMediaStream =
-              await _buildRemotePeerMediaStream(remoteTrack, remoteParticipant);
-          if (peerMediaStream != null) {
-            peerMediaStreams.add(peerMediaStream);
-          }
-        }
+      PeerMediaStream? peerMediaStream =
+          await _buildRemotePeerMediaStream(remoteTrack, remoteParticipant);
+      if (peerMediaStream != null) {
+        remotePeerMediaStreamController.add(peerMediaStream, notify: false);
       }
     }
+    for (RemoteTrackPublication<RemoteVideoTrack> videoTrack
+        in remoteParticipant.videoTrackPublications) {
+      RemoteTrack? remoteTrack = videoTrack.track;
+      if (remoteTrack == null) {
+        continue;
+      }
+      PeerMediaStream? peerMediaStream =
+          await _buildRemotePeerMediaStream(remoteTrack, remoteParticipant);
+      if (peerMediaStream != null) {
+        remotePeerMediaStreamController.add(peerMediaStream, notify: false);
+      }
+    }
+    if (notify) {
+      remotePeerMediaStreamController.notifyListeners();
+    }
+  }
 
-    return peerMediaStreamMap;
+  Future<void> removeRemoteParticipant(
+      RemoteParticipant remoteParticipant) async {
+    await remotePeerMediaStreamController.removeAll(
+        peerId: remoteParticipant.identity, notify: false);
+    remotePeerMediaStreamController.notifyListeners();
+  }
+
+  /// 获取所有的远程参与者的所有流并且排序
+  Future<void> sortRemotePeerMediaStreams() async {
+    await remotePeerMediaStreamController.removeAll(notify: false);
+
+    /// 遍历每个远程参与者
+    for (RemoteParticipant remoteParticipant in remoteParticipants) {
+      await addRemoteParticipant(remoteParticipant, notify: false);
+    }
+    remotePeerMediaStreamController.notifyListeners();
   }
 
   Future<PeerMediaStream?> _buildRemotePeerMediaStream(
@@ -641,17 +632,6 @@ class LiveKitConferenceClient {
       RemoteParticipant remoteParticipant = event.participant;
       String identity = remoteParticipant.identity;
       String name = remoteParticipant.name;
-      List<PeerMediaStream> peerMediaStreams =
-          remotePeerMediaStreamController.getPeerMediaStreams(identity);
-      if (peerMediaStreams.isNotEmpty) {
-        for (PeerMediaStream peerMediaStream in peerMediaStreams) {
-          if (peerMediaStream.contain(streamId)) {
-            log.logger.w(
-                'peerId:$identity, name:$name streamId:$streamId remote peerMediaStream is exist');
-            return null;
-          }
-        }
-      }
       PeerMediaStream? peerMediaStream =
           await _buildRemotePeerMediaStream(track, remoteParticipant);
       if (peerMediaStream != null) {
@@ -713,7 +693,7 @@ class LiveKitConferenceClient {
 
   /// 本地参与者事件
   void _onLocalParticipantEvent() {
-    log.logger.i('on LocalParticipantEvent');
+    // log.logger.i('on LocalParticipantEvent');
   }
 
   /// 创建并且发布本地视频的快捷方法，必须room已经连接上

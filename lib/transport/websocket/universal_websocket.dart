@@ -143,7 +143,7 @@ class UniversalWebsocket extends IWebClient {
       statusStreamController.add(_client!.socketHandlerState.status);
     }
     lastHeartBeatTime = DateTime.now();
-    logger.i('wss address:$address websocket received data');
+    // logger.i('wss address:$address websocket received data');
     var msg = String.fromCharCodes(data);
     if (msg.startsWith('heartbeat:')) {
       var sessionId = msg.substring(10);
