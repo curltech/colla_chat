@@ -228,7 +228,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
         builder: (BuildContext context, List<String> conferenceMembers,
             Widget? child) {
           if (!this.conferenceMembers.value.contains(myself.peerId)) {
-            this.conferenceMembers.value.add(myself.peerId!);
+            this.conferenceMembers.value.insert(0, myself.peerId!);
           }
           return Container(
               padding: const EdgeInsets.symmetric(horizontal: 0.0),

@@ -461,9 +461,11 @@ class ConferenceService extends GeneralBaseService<Conference> {
     }
     bool sfu = conference.sfu;
     if (sfu) {
+      int i = 0;
       List<String> names = [];
       if (participants != null) {
         for (String participant in participants) {
+          if (participant == myself.peerId) {}
           String? name;
           Linkman? linkman =
               await linkmanService.findCachedOneByPeerId(participant);
@@ -471,6 +473,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
             name = linkman.name;
             names.add(name);
           }
+          i++;
         }
       }
       String? sfuUri = conference.sfuUri;
