@@ -1,45 +1,156 @@
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/style/glass/glass_kit_widget_factory.dart';
 import 'package:flutter/material.dart';
 
 import 'package:colla_chat/widgets/style/neumorphic/neumorphic_widget_factory.dart';
+import 'package:flutter/services.dart';
 
 enum WidgetStyle { material, glass, neumorphic, fluent }
 
-///不同样式的widget的抽象工厂
+/// 不同样式的widget的抽象工厂
 abstract class WidgetFactory {
   ///容器
   Widget container({
     Key? key,
+    AlignmentGeometry? alignment,
+    EdgeInsetsGeometry? padding,
+    Color? color,
+    Decoration? decoration,
+    Decoration? foregroundDecoration,
+    double? width,
+    double? height,
+    BoxConstraints? constraints,
+    EdgeInsetsGeometry? margin,
+    Matrix4? transform,
+    AlignmentGeometry? transformAlignment,
     Widget? child,
-  });
+    Clip clipBehavior = Clip.none,
+  }) {
+    return Container(
+      key: key,
+      alignment: alignment,
+      padding: padding,
+      color: color,
+      decoration: decoration,
+      foregroundDecoration: foregroundDecoration,
+      width: width,
+      height: height,
+      constraints: constraints,
+      margin: margin,
+      transform: transform,
+      transformAlignment: transformAlignment,
+      clipBehavior: clipBehavior,
+      child: child,
+    );
+  }
 
   ///尺寸容器
   Widget sizedBox({
     Key? key,
-    required double width,
-    required double height,
+    double? width,
+    double? height,
     Widget? child,
-  });
+  }) {
+    return SizedBox(
+      key: key,
+      width: width,
+      height: height,
+      child: child,
+    );
+  }
 
   ///文本
   Widget text(
     String data, {
     Key? key,
-    TextStyle? style,
-    Color color = Colors.white,
-    double opacity = 0.5,
-    double? fontSize,
-    FontWeight fontWeight = FontWeight.bold,
-  });
+    TextAlign? textAlign,
+    TextStyle? textStyle,
+    bool wrapWords = true,
+    TextOverflow? overflow,
+    Widget? overflowReplacement,
+    double? textScaleFactor,
+    int? maxLines,
+  }) {
+    return CommonAutoSizeText(
+      data,
+      key: key,
+      textAlign: textAlign,
+      style: textStyle,
+      wrapWords: wrapWords,
+      overflow: overflow,
+      overflowReplacement: overflowReplacement,
+      textScaleFactor: textScaleFactor,
+      maxLines: maxLines,
+    );
+  }
 
   ///标题栏
   PreferredSizeWidget appBar({
     Key? key,
     Widget? leading,
+    bool automaticallyImplyLeading = true,
     Widget? title,
-    bool? centerTitle,
     List<Widget>? actions,
-  });
+    Widget? flexibleSpace,
+    PreferredSizeWidget? bottom,
+    double? elevation,
+    double? scrolledUnderElevation,
+    bool Function(ScrollNotification) notificationPredicate =
+        defaultScrollNotificationPredicate,
+    Color? shadowColor,
+    Color? surfaceTintColor,
+    ShapeBorder? shape,
+    Color? backgroundColor,
+    Color? foregroundColor,
+    IconThemeData? iconTheme,
+    IconThemeData? actionsIconTheme,
+    bool primary = true,
+    bool? centerTitle,
+    bool excludeHeaderSemantics = false,
+    double? titleSpacing,
+    double toolbarOpacity = 1.0,
+    double bottomOpacity = 1.0,
+    double? toolbarHeight,
+    double? leadingWidth,
+    TextStyle? toolbarTextStyle,
+    TextStyle? titleTextStyle,
+    SystemUiOverlayStyle? systemOverlayStyle,
+    bool forceMaterialTransparency = false,
+    Clip? clipBehavior,
+  }) {
+    return AppBar(
+      key: key,
+      leading: leading,
+      automaticallyImplyLeading: automaticallyImplyLeading,
+      title: title,
+      actions: actions,
+      flexibleSpace: flexibleSpace,
+      bottom: bottom,
+      elevation: elevation,
+      scrolledUnderElevation: scrolledUnderElevation,
+      notificationPredicate: notificationPredicate,
+      shadowColor: shadowColor,
+      surfaceTintColor: surfaceTintColor,
+      shape: shape,
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
+      iconTheme: iconTheme,
+      actionsIconTheme: actionsIconTheme,
+      primary: primary,
+      centerTitle: centerTitle,
+      excludeHeaderSemantics: excludeHeaderSemantics,
+      titleSpacing: titleSpacing,
+      toolbarOpacity: toolbarOpacity,
+      bottomOpacity: bottomOpacity,
+      toolbarHeight: toolbarHeight,
+      leadingWidth: leadingWidth,
+      toolbarTextStyle: toolbarTextStyle,
+      titleTextStyle: titleTextStyle,
+      systemOverlayStyle: systemOverlayStyle,
+      forceMaterialTransparency: forceMaterialTransparency,
+      clipBehavior: clipBehavior,
+    );
+  }
 
   ///列表行
   Widget listTile({
@@ -56,7 +167,6 @@ abstract class WidgetFactory {
     Key? key,
     Widget? child,
     void Function()? onPressed,
-    void Function()? onLongPressed,
   });
 
   Widget bottomNavigationBar({
@@ -116,19 +226,15 @@ class PlatformWidgetFactory {
 
   Widget text(
     String data, {
-    TextStyle? style,
-    Color color = Colors.white,
-    double opacity = 0.5,
-    double? fontSize,
-    FontWeight fontWeight = FontWeight.bold,
+    TextAlign? textAlign,
+    TextStyle? textStyle,
     Key? key,
   }) {
-    return widgetFactory.text(data,
-        style: style,
-        color: color,
-        opacity: opacity,
-        fontSize: fontSize,
-        fontWeight: fontWeight);
+    return widgetFactory.text(
+      data,
+      textStyle: textStyle,
+      textAlign: textAlign,
+    );
   }
 
   icon(
@@ -181,13 +287,12 @@ class PlatformWidgetFactory {
     Key? key,
     Widget? child,
     void Function()? onPressed,
-    void Function()? onLongPressed,
   }) {
     return widgetFactory.button(
-        key: key,
-        child: child,
-        onPressed: onPressed,
-        onLongPressed: onLongPressed);
+      key: key,
+      child: child,
+      onPressed: onPressed,
+    );
   }
 
   Widget bottomNavigationBar({

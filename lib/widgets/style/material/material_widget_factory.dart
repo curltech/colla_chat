@@ -570,16 +570,24 @@ class MaterialWidgetFactory extends WidgetFactory {
   Widget text(
     String data, {
     Key? key,
-    TextStyle? style,
-    Color color = Colors.white,
-    double opacity = 0.5,
-    double? fontSize,
-    FontWeight fontWeight = FontWeight.bold,
+    TextAlign? textAlign,
+    TextStyle? textStyle,
+    bool wrapWords = true,
+    TextOverflow? overflow,
+    Widget? overflowReplacement,
+    double? textScaleFactor,
+    int? maxLines,
   }) {
     return CommonAutoSizeText(
       data,
       key: key,
-      style: style,
+      textAlign: textAlign,
+      style: textStyle,
+      wrapWords: wrapWords,
+      overflow: overflow,
+      overflowReplacement: overflowReplacement,
+      textScaleFactor: textScaleFactor,
+      maxLines: maxLines,
     );
   }
 
@@ -1506,50 +1514,6 @@ class MaterialWidgetFactory extends WidgetFactory {
   }) {
     return Scaffold(
       key: key,
-    );
-  }
-
-  @override
-  PreferredSizeWidget appBar({
-    Key? key,
-    Widget? leading,
-    bool automaticallyImplyLeading = true,
-    Widget? title,
-    List? actions,
-    Widget? flexibleSpace,
-    PreferredSizeWidget? bottom,
-    double? elevation,
-    double? scrolledUnderElevation,
-    Color? shadowColor,
-    Color? surfaceTintColor,
-    ShapeBorder? shape,
-    Color? backgroundColor,
-    Color? foregroundColor,
-    Brightness? brightness,
-    IconThemeData? iconTheme,
-    IconThemeData? actionsIconTheme,
-    TextTheme? textTheme,
-    bool primary = true,
-    bool? centerTitle,
-    bool excludeHeaderSemantics = false,
-    double? titleSpacing,
-    double toolbarOpacity = 1.0,
-    double bottomOpacity = 1.0,
-    double? toolbarHeight,
-    double? leadingWidth,
-    bool? backwardsCompatibility,
-    TextStyle? toolbarTextStyle,
-    TextStyle? titleTextStyle,
-    SystemUiOverlayStyle? systemOverlayStyle,
-  }) {
-    return AppBar(
-      key: key,
-      title: title,
-      iconTheme: iconTheme,
-      leading: leading,
-      automaticallyImplyLeading: automaticallyImplyLeading,
-      centerTitle: centerTitle,
-      titleSpacing: titleSpacing,
     );
   }
 

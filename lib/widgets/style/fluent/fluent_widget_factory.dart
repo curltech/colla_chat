@@ -38,26 +38,14 @@ class FluentWidgetFactory extends WidgetFactory {
   @override
   Widget sizedBox({
     Key? key,
-    AlignmentGeometry? alignment,
-    EdgeInsetsGeometry? padding,
-    Color? color,
-    Decoration? decoration,
-    Decoration? foregroundDecoration,
-    required double width,
-    required double height,
-    BoxConstraints? constraints,
-    EdgeInsetsGeometry? margin,
-    Matrix4? transform,
-    AlignmentGeometry? transformAlignment,
+    double? width,
+    double? height,
     Widget? child,
-    Clip clipBehavior = Clip.none,
   }) {
-    return Container(
+    return SizedBox(
       key: key,
       width: width,
       height: height,
-      margin: margin,
-      padding: padding,
       child: child,
     );
   }
@@ -320,16 +308,24 @@ class FluentWidgetFactory extends WidgetFactory {
   Widget text(
     String data, {
     Key? key,
-    TextStyle? style,
-    Color color = Colors.white,
-    double opacity = 0.5,
-    double? fontSize,
-    FontWeight fontWeight = FontWeight.bold,
+    TextAlign? textAlign,
+    TextStyle? textStyle,
+    bool wrapWords = true,
+    TextOverflow? overflow,
+    Widget? overflowReplacement,
+    double? textScaleFactor,
+    int? maxLines,
   }) {
     return CommonAutoSizeText(
       data,
       key: key,
-      style: style,
+      textAlign: textAlign,
+      style: textStyle,
+      wrapWords: wrapWords,
+      overflow: overflow,
+      overflowReplacement: overflowReplacement,
+      textScaleFactor: textScaleFactor,
+      maxLines: maxLines,
     );
   }
 
@@ -593,17 +589,6 @@ class FluentWidgetFactory extends WidgetFactory {
     return NavigationPane(
       key: key,
     );
-  }
-
-  @override
-  PreferredSizeWidget appBar({
-    Key? key,
-    Widget? leading,
-    Widget? title,
-    bool? centerTitle,
-    List<Widget>? actions,
-  }) {
-    return material.AppBar();
   }
 
   @override

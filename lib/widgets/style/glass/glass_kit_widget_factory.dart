@@ -1,7 +1,9 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:glass_kit/glass_kit.dart';
 
 final defaultLinearGradient = LinearGradient(
@@ -139,48 +141,20 @@ class GlassKitWidgetFactory extends WidgetFactory {
   @override
   Widget sizedBox({
     Key? key,
-    required double height,
-    required double width,
-    AlignmentGeometry? alignment,
-    Matrix4? transform,
-    AlignmentGeometry? transformAlignment,
-    EdgeInsetsGeometry? padding,
-    EdgeInsetsGeometry? margin,
-    Color? color,
-    Gradient? gradient,
-    BorderRadius? borderRadius = borderRadius,
-    double? borderWidth,
-    Color? borderColor,
-    Gradient? borderGradient,
-    double? blur = blur,
-    bool isFrostedGlass = false,
-    double? frostedOpacity,
-    double? elevation,
-    Color? shadowColor,
-    BoxShape shape = BoxShape.rectangle,
+    double? width,
+    double? height,
     Widget? child,
   }) {
     return GlassContainer(
       key: key,
-      width: width,
       height: height,
-      alignment: alignment,
-      transform: transform,
-      transformAlignment: transformAlignment,
-      padding: padding,
-      margin: margin,
-      color: color,
-      gradient: gradient ?? defaultLinearGradient,
+      width: width,
+      gradient: defaultLinearGradient,
       borderRadius: borderRadius,
-      borderWidth: borderWidth,
-      borderColor: borderColor,
-      borderGradient: borderGradient ?? defaultBorderGradient,
+      borderGradient: defaultBorderGradient,
       blur: blur,
-      isFrostedGlass: isFrostedGlass,
-      frostedOpacity: frostedOpacity,
-      elevation: elevation,
-      shadowColor: shadowColor,
-      shape: shape,
+      isFrostedGlass: false,
+      shape: BoxShape.rectangle,
       child: child,
     );
   }
@@ -189,23 +163,18 @@ class GlassKitWidgetFactory extends WidgetFactory {
   Widget container({
     Key? key,
     AlignmentGeometry? alignment,
+    EdgeInsetsGeometry? padding,
+    Color? color,
+    Decoration? decoration,
+    Decoration? foregroundDecoration,
+    double? width,
+    double? height,
+    BoxConstraints? constraints,
+    EdgeInsetsGeometry? margin,
     Matrix4? transform,
     AlignmentGeometry? transformAlignment,
-    EdgeInsetsGeometry? padding,
-    EdgeInsetsGeometry? margin,
-    Color? color,
-    Gradient? gradient,
-    BorderRadius? borderRadius = borderRadius,
-    double? borderWidth,
-    Color? borderColor,
-    Gradient? borderGradient,
-    double? blur = blur,
-    bool? isFrostedGlass = false,
-    double? frostedOpacity,
-    double? elevation,
-    Color? shadowColor,
-    BoxShape shape = BoxShape.rectangle,
     Widget? child,
+    Clip clipBehavior = Clip.none,
   }) {
     return LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
@@ -219,17 +188,12 @@ class GlassKitWidgetFactory extends WidgetFactory {
         padding: padding,
         margin: margin,
         color: color,
-        gradient: gradient ?? defaultLinearGradient,
+        gradient: defaultLinearGradient,
         borderRadius: borderRadius,
-        borderWidth: borderWidth,
-        borderColor: borderColor,
-        borderGradient: borderGradient ?? defaultBorderGradient,
+        borderGradient: defaultBorderGradient,
         blur: blur,
-        isFrostedGlass: isFrostedGlass,
-        frostedOpacity: frostedOpacity,
-        elevation: elevation,
-        shadowColor: shadowColor,
-        shape: shape,
+        isFrostedGlass: false,
+        shape: BoxShape.rectangle,
         child: child,
       );
     });
@@ -269,19 +233,72 @@ class GlassKitWidgetFactory extends WidgetFactory {
   }
 
   @override
-  PreferredSizeWidget appBar(
-      {Key? key,
-      Widget? leading,
-      Widget? title,
-      bool? centerTitle,
-      List<Widget>? actions}) {
+  PreferredSizeWidget appBar({
+    Key? key,
+    Widget? leading,
+    bool automaticallyImplyLeading = true,
+    Widget? title,
+    List<Widget>? actions,
+    Widget? flexibleSpace,
+    PreferredSizeWidget? bottom,
+    double? elevation,
+    double? scrolledUnderElevation,
+    bool Function(ScrollNotification) notificationPredicate =
+        defaultScrollNotificationPredicate,
+    Color? shadowColor,
+    Color? surfaceTintColor,
+    ShapeBorder? shape,
+    Color? backgroundColor,
+    Color? foregroundColor,
+    IconThemeData? iconTheme,
+    IconThemeData? actionsIconTheme,
+    bool primary = true,
+    bool? centerTitle,
+    bool excludeHeaderSemantics = false,
+    double? titleSpacing,
+    double toolbarOpacity = 1.0,
+    double bottomOpacity = 1.0,
+    double? toolbarHeight,
+    double? leadingWidth,
+    TextStyle? toolbarTextStyle,
+    TextStyle? titleTextStyle,
+    SystemUiOverlayStyle? systemOverlayStyle,
+    bool forceMaterialTransparency = false,
+    Clip? clipBehavior,
+  }) {
     return _buildGlassWidget(
-        child: appBar(
-            key: key,
-            leading: leading,
-            title: title,
-            centerTitle: centerTitle,
-            actions: actions));
+        child: super.appBar(
+      key: key,
+      leading: leading,
+      automaticallyImplyLeading: automaticallyImplyLeading,
+      title: title,
+      actions: actions,
+      flexibleSpace: flexibleSpace,
+      bottom: bottom,
+      elevation: elevation,
+      scrolledUnderElevation: scrolledUnderElevation,
+      notificationPredicate: notificationPredicate,
+      shadowColor: shadowColor,
+      surfaceTintColor: surfaceTintColor,
+      shape: shape,
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
+      iconTheme: iconTheme,
+      actionsIconTheme: actionsIconTheme,
+      primary: primary,
+      centerTitle: centerTitle,
+      excludeHeaderSemantics: excludeHeaderSemantics,
+      titleSpacing: titleSpacing,
+      toolbarOpacity: toolbarOpacity,
+      bottomOpacity: bottomOpacity,
+      toolbarHeight: toolbarHeight,
+      leadingWidth: leadingWidth,
+      toolbarTextStyle: toolbarTextStyle,
+      titleTextStyle: titleTextStyle,
+      systemOverlayStyle: systemOverlayStyle,
+      forceMaterialTransparency: forceMaterialTransparency,
+      clipBehavior: clipBehavior,
+    ));
   }
 
   @override
@@ -307,17 +324,17 @@ class GlassKitWidgetFactory extends WidgetFactory {
   }
 
   @override
-  Widget button(
-      {Key? key,
-      Widget? child,
-      void Function()? onPressed,
-      void Function()? onLongPressed}) {
+  Widget button({
+    Key? key,
+    Widget? child,
+    void Function()? onPressed,
+  }) {
     return _buildGlassWidget(
         child: button(
-            key: key,
-            onPressed: onPressed,
-            child: child,
-            onLongPressed: onLongPressed));
+      key: key,
+      onPressed: onPressed,
+      child: child,
+    ));
   }
 
   @override
@@ -346,18 +363,28 @@ class GlassKitWidgetFactory extends WidgetFactory {
   }
 
   @override
-  Widget text(String data,
-      {Key? key,
-      TextStyle? style,
-      Color color = Colors.white,
-      double opacity = 0.5,
-      double? fontSize,
-      FontWeight fontWeight = FontWeight.bold}) {
+  Widget text(
+    String data, {
+    Key? key,
+    TextAlign? textAlign,
+    TextStyle? textStyle,
+    bool wrapWords = true,
+    TextOverflow? overflow,
+    Widget? overflowReplacement,
+    double? textScaleFactor,
+    int? maxLines,
+  }) {
     return _buildGlassWidget(
-        child: Text(
+        child: CommonAutoSizeText(
       data,
       key: key,
-      style: style,
+      style: textStyle,
+      textAlign: textAlign,
+      wrapWords: wrapWords,
+      overflow: overflow,
+      overflowReplacement: overflowReplacement,
+      textScaleFactor: textScaleFactor,
+      maxLines: maxLines,
     ));
   }
 }
