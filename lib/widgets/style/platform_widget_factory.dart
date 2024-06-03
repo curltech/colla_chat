@@ -165,9 +165,21 @@ abstract class WidgetFactory {
   ///按钮
   Widget button({
     Key? key,
-    Widget? child,
-    void Function()? onPressed,
-  });
+    required void Function()? onPressed,
+    void Function()? onLongPress,
+    void Function(bool)? onHover,
+    void Function(bool)? onFocusChange,
+    ButtonStyle? style,
+    FocusNode? focusNode,
+    bool autofocus = false,
+    Clip? clipBehavior,
+    WidgetStatesController? statesController,
+    bool? isSemanticButton = true,
+    required Widget child,
+    IconAlignment iconAlignment = IconAlignment.start,
+  }) {
+    return TextButton(onPressed: onPressed, child: child);
+  }
 
   Widget bottomNavigationBar({
     Key? key,
@@ -183,9 +195,31 @@ abstract class WidgetFactory {
     IconData icon, {
     Key? key,
     double? size,
+    double? fill,
+    double? weight,
+    double? grade,
+    double? opticalSize,
     Color? color,
-    double opacity = 0.5,
-  });
+    List<Shadow>? shadows,
+    String? semanticLabel,
+    TextDirection? textDirection,
+    bool? applyTextScaling,
+  }) {
+    return Icon(
+      icon,
+      key: key,
+      size: size,
+      fill: fill,
+      weight: weight,
+      grade: grade,
+      opticalSize: opticalSize,
+      color: color,
+      shadows: shadows,
+      semanticLabel: semanticLabel,
+      textDirection: textDirection,
+      applyTextScaling: applyTextScaling,
+    );
+  }
 }
 
 ///平台使用的widget样式的工厂
@@ -241,11 +275,30 @@ class PlatformWidgetFactory {
     IconData icon, {
     Key? key,
     double? size,
+    double? fill,
+    double? weight,
+    double? grade,
+    double? opticalSize,
     Color? color,
-    double opacity = 0.5,
+    List<Shadow>? shadows,
+    String? semanticLabel,
+    TextDirection? textDirection,
+    bool? applyTextScaling,
   }) {
-    return widgetFactory.icon(icon,
-        key: key, size: size, color: color, opacity: opacity);
+    return widgetFactory.icon(
+      icon,
+      key: key,
+      size: size,
+      fill: fill,
+      weight: weight,
+      grade: grade,
+      opticalSize: opticalSize,
+      color: color,
+      shadows: shadows,
+      semanticLabel: semanticLabel,
+      textDirection: textDirection,
+      applyTextScaling: applyTextScaling,
+    );
   }
 
   ///平台选择的标题栏
@@ -285,8 +338,18 @@ class PlatformWidgetFactory {
   ///按钮
   Widget button({
     Key? key,
-    Widget? child,
-    void Function()? onPressed,
+    required void Function()? onPressed,
+    void Function()? onLongPress,
+    void Function(bool)? onHover,
+    void Function(bool)? onFocusChange,
+    ButtonStyle? style,
+    FocusNode? focusNode,
+    bool autofocus = false,
+    Clip? clipBehavior,
+    WidgetStatesController? statesController,
+    bool? isSemanticButton = true,
+    required Widget child,
+    IconAlignment iconAlignment = IconAlignment.start,
   }) {
     return widgetFactory.button(
       key: key,

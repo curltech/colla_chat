@@ -596,14 +596,29 @@ class MaterialWidgetFactory extends WidgetFactory {
     IconData icon, {
     Key? key,
     double? size,
+    double? fill,
+    double? weight,
+    double? grade,
+    double? opticalSize,
     Color? color,
-    double opacity = 0.5,
+    List<Shadow>? shadows,
+    String? semanticLabel,
+    TextDirection? textDirection,
+    bool? applyTextScaling,
   }) {
     return Icon(
       icon,
       key: key,
       size: size,
+      fill: fill,
+      weight: weight,
+      grade: grade,
+      opticalSize: opticalSize,
       color: color,
+      shadows: shadows,
+      semanticLabel: semanticLabel,
+      textDirection: textDirection,
+      applyTextScaling: applyTextScaling,
     );
   }
 
@@ -1602,11 +1617,21 @@ class MaterialWidgetFactory extends WidgetFactory {
   }
 
   @override
-  Widget button(
-      {Key? key,
-      Widget? child,
-      void Function()? onPressed,
-      void Function()? onLongPressed}) {
+  Widget button({
+    Key? key,
+    required void Function()? onPressed,
+    void Function()? onLongPress,
+    void Function(bool)? onHover,
+    void Function(bool)? onFocusChange,
+    ButtonStyle? style,
+    FocusNode? focusNode,
+    bool autofocus = false,
+    Clip? clipBehavior,
+    WidgetStatesController? statesController,
+    bool? isSemanticButton = true,
+    required Widget child,
+    IconAlignment iconAlignment = IconAlignment.start,
+  }) {
     // TODO: implement button
     throw UnimplementedError();
   }

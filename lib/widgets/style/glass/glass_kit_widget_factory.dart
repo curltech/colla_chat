@@ -326,8 +326,18 @@ class GlassKitWidgetFactory extends WidgetFactory {
   @override
   Widget button({
     Key? key,
-    Widget? child,
-    void Function()? onPressed,
+    required void Function()? onPressed,
+    void Function()? onLongPress,
+    void Function(bool)? onHover,
+    void Function(bool)? onFocusChange,
+    ButtonStyle? style,
+    FocusNode? focusNode,
+    bool autofocus = false,
+    Clip? clipBehavior,
+    WidgetStatesController? statesController,
+    bool? isSemanticButton = true,
+    required Widget child,
+    IconAlignment iconAlignment = IconAlignment.start,
   }) {
     return _buildGlassWidget(
         child: button(
@@ -338,10 +348,35 @@ class GlassKitWidgetFactory extends WidgetFactory {
   }
 
   @override
-  icon(IconData icon,
-      {Key? key, double? size, Color? color, double opacity = 0.5}) {
+  icon(
+    IconData icon, {
+    Key? key,
+    double? size,
+    double? fill,
+    double? weight,
+    double? grade,
+    double? opticalSize,
+    Color? color,
+    List<Shadow>? shadows,
+    String? semanticLabel,
+    TextDirection? textDirection,
+    bool? applyTextScaling,
+  }) {
     return _buildGlassWidget(
-        child: Icon(icon, key: key, size: size, color: color));
+        child: Icon(
+      icon,
+      key: key,
+      size: size,
+      fill: fill,
+      weight: weight,
+      grade: grade,
+      opticalSize: opticalSize,
+      color: color,
+      shadows: shadows,
+      semanticLabel: semanticLabel,
+      textDirection: textDirection,
+      applyTextScaling: applyTextScaling,
+    ));
   }
 
   @override
