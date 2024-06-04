@@ -342,9 +342,6 @@ class AdvancedPeerConnection {
   ///webrtc连接完成后首先交换最新的联系人信息，然后请求新的订阅渠道消息
   ///然后交换棘轮加密的密钥
   onConnected(WebrtcEvent event) async {
-    globalChatMessage.sendModifyLinkman(event.peerId, clientId: event.clientId);
-    globalChatMessage.sendPreKeyBundle(event.peerId, clientId: event.clientId);
-    chatMessageService.sendUnsent(receiverPeerId: event.peerId);
     p2pConferenceClientPool.onConnected(this);
   }
 
@@ -359,7 +356,19 @@ class AdvancedPeerConnection {
 
   onSignalingState(WebrtcEvent event) async {}
 
-  onDataChannelState(WebrtcEvent event) async {}
+  onDataChannelState(WebrtcEvent event) async {
+    logger.i('data channel event:${event.peerId}');
+    if (event.eventType == WebrtcEventType.dataChannelState) {
+      RTCDataChannelState state = event.data as RTCDataChannelState;
+      if (state == RTCDataChannelState.RTCDataChannelOpen) {
+        await globalChatMessage.sendModifyLinkman(event.peerId,
+            clientId: event.clientId);
+        await globalChatMessage.sendPreKeyBundle(event.peerId,
+            clientId: event.clientId);
+        await chatMessageService.sendUnsent(receiverPeerId: event.peerId);
+      }
+    }
+  }
 
   onError(WebrtcEvent event) async {}
 

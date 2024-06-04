@@ -608,10 +608,8 @@ class BasePeerConnection {
 
   ///连接状态为连接，而且数据通道打开
   bool get connected {
-    if (dataChannel != null &&
-        dataChannel!.state == RTCDataChannelState.RTCDataChannelOpen &&
-        _peerConnection?.connectionState ==
-            RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+    if (_peerConnection?.connectionState ==
+        RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
       return true;
     }
     return false;
@@ -621,11 +619,8 @@ class BasePeerConnection {
     if (end != null) {
       return;
     }
-    if (dataChannel != null &&
-        (dataChannel!.state == null ||
-            dataChannel!.state == RTCDataChannelState.RTCDataChannelOpen) &&
-        _peerConnection?.connectionState ==
-            RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+    if (_peerConnection?.connectionState ==
+        RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
       logger
           .w('PeerConnectionStatus connected, webrtc connection is completed');
       end = DateTime.now().millisecondsSinceEpoch;
@@ -643,6 +638,7 @@ class BasePeerConnection {
 
   ///连接状态事件
   onConnectionState(RTCPeerConnectionState state) async {
+    logger.w('RTCPeerConnectionState:$state');
     if (state == RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
       negotiating = false;
       onConnected();
@@ -710,6 +706,11 @@ class BasePeerConnection {
     //数据通道打开
     if (state == RTCDataChannelState.RTCDataChannelOpen) {
       logger.i('data channel open');
+      int end = DateTime.now().millisecondsSinceEpoch;
+      if (start != null) {
+        var interval = end - start!;
+        logger.i('id:$id data channel open time:$interval');
+      }
     }
     //数据通道关闭
     if (state == RTCDataChannelState.RTCDataChannelClosed) {

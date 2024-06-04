@@ -61,14 +61,22 @@ class MyselfService {
   /// 获取自己节点的记录，并解开私钥，进行验证
   Future<String?> auth(MyselfPeer myselfPeer, String password) async {
     //解开身份公钥和加密公钥
-    SimplePublicKey publicKey = await cryptoGraphy
+    SimplePublicKey? publicKey = await cryptoGraphy
         .importPublicKey(myselfPeer.publicKey!, type: KeyPairType.x25519);
-    SimplePublicKey peerPublicKey =
+    SimplePublicKey? peerPublicKey =
         await cryptoGraphy.importPublicKey(myselfPeer.peerPublicKey!);
     //解开身份密钥对和加密密钥对
+    if (publicKey == null) {
+      logger.e('publicKey is null');
+      return 'publicKey is null';
+    }
     SimpleKeyPair privateKey = await cryptoGraphy.import(
         myselfPeer.privateKey, password.codeUnits, publicKey,
         type: KeyPairType.x25519);
+    if (peerPublicKey == null) {
+      logger.e('peerPublicKey is null');
+      return 'peerPublicKey is null';
+    }
     SimpleKeyPair peerPrivateKey = await cryptoGraphy.import(
         myselfPeer.peerPrivateKey, password.codeUnits, peerPublicKey);
 
@@ -91,17 +99,24 @@ class MyselfService {
   /// 一般发生在登录后重新设置当前的账户
   Future<String?> login(MyselfPeer myselfPeer, String password) async {
     //解开身份公钥和加密公钥
-    SimplePublicKey publicKey = await cryptoGraphy
+    SimplePublicKey? publicKey = await cryptoGraphy
         .importPublicKey(myselfPeer.publicKey!, type: KeyPairType.x25519);
-    SimplePublicKey peerPublicKey =
+    SimplePublicKey? peerPublicKey =
         await cryptoGraphy.importPublicKey(myselfPeer.peerPublicKey!);
     //解开身份密钥对和加密密钥对
-    SimpleKeyPair privateKey = await cryptoGraphy.import(
+    if (publicKey == null) {
+      logger.e('publicKey is null');
+      return 'publicKey is null';
+    }
+    SimpleKeyPair? privateKey = await cryptoGraphy.import(
         myselfPeer.privateKey, password.codeUnits, publicKey,
         type: KeyPairType.x25519);
-    SimpleKeyPair peerPrivateKey = await cryptoGraphy.import(
+    if (peerPublicKey == null) {
+      logger.e('peerPublicKey is null');
+      return 'peerPublicKey is null';
+    }
+    SimpleKeyPair? peerPrivateKey = await cryptoGraphy.import(
         myselfPeer.peerPrivateKey, password.codeUnits, peerPublicKey);
-
     //检查身份密钥对，如果通过，设置本地myself的属性
     var timestamp_ = DateUtil.currentDate();
     var random_ = await cryptoGraphy.getRandomAsciiString();

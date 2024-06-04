@@ -393,7 +393,7 @@ class GlobalChatMessage {
 
   ///发送新的联系人信息
   sendModifyLinkman(String peerId, {String? clientId}) async {
-    linkmanService.modifyLinkman(peerId, clientId: clientId);
+    await linkmanService.modifyLinkman(peerId, clientId: clientId);
   }
 
   ///发送PreKeyBundle

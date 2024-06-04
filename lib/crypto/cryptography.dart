@@ -119,7 +119,7 @@ class CryptoGraphy {
   }
 
   /// 将base64的密钥字符串导入转换成私钥，passphrase必须有值用于解密私钥
-  Future<SimplePublicKey> importPublicKey(String base58PublicKey,
+  Future<SimplePublicKey?> importPublicKey(String base58PublicKey,
       {KeyPairType type = KeyPairType.ed25519}) async {
     if (StringUtil.isNotEmpty(base58PublicKey)) {
       Uint8List rawText = CryptoUtil.decodeBase58(base58PublicKey);
@@ -127,7 +127,7 @@ class CryptoGraphy {
 
       return publicKey;
     }
-    throw 'publicKey error';
+    return null;
   }
 
   static const signatureLength = 64;

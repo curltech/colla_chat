@@ -110,14 +110,20 @@ class LinkmanService extends PeerPartyService<Linkman> {
       publicKey = linkman.publicKey;
     }
     if (simplePublicKey == null) {
-      simplePublicKey = await peerClientService.getCachedPublicKey(peerId);
-      if (simplePublicKey == null) {
-        if (StringUtil.isEmpty(publicKey)) {
-          logger.e('linkman $peerId has no publicKey');
-          return null;
-        }
+      if (StringUtil.isNotEmpty(publicKey)) {
         simplePublicKey = await cryptoGraphy.importPublicKey(publicKey!,
             type: KeyPairType.x25519);
+        if (simplePublicKey != null) {
+          publicKeys[peerId] = simplePublicKey;
+        }
+      } else {
+        logger.e('linkman $peerId has no publicKey');
+        return null;
+      }
+    }
+    if (simplePublicKey == null) {
+      simplePublicKey = await peerClientService.getCachedPublicKey(peerId);
+      if (simplePublicKey != null) {
         publicKeys[peerId] = simplePublicKey;
       }
     }
@@ -160,6 +166,13 @@ class LinkmanService extends PeerPartyService<Linkman> {
       old.address = linkman.address;
       old.startDate = linkman.startDate;
       old.endDate = linkman.endDate;
+      if (linkman.peerPublicKey != null &&
+          linkman.peerPublicKey != old.peerPublicKey) {
+        old.peerPublicKey = linkman.peerPublicKey;
+      }
+      if (linkman.publicKey != null && linkman.publicKey != old.publicKey) {
+        old.publicKey = linkman.publicKey;
+      }
       await update(old);
     }
     linkmen[linkman.peerId] = linkman;
