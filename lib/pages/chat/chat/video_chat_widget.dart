@@ -11,6 +11,7 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -18,9 +19,79 @@ import 'package:colla_chat/widgets/common/drag_overlay.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
+/// 可以浮动的按钮，激活当前视频会议，全局唯一，没有当前视频会议的时候不显示
+class VideoChatDragOverlay {
+  DragOverlay? overlayEntry;
+
+  dispose() {
+    if (overlayEntry != null) {
+      overlayEntry!.dispose();
+      overlayEntry = null;
+    }
+  }
+
+  ///关闭最小化界面，把本界面显示
+  hide() {
+    if (overlayEntry != null) {
+      String? target;
+      ConferenceChatMessageController? conferenceChatMessageController =
+          liveKitConferenceClientPool.conferenceChatMessageController;
+      if (conferenceChatMessageController != null) {
+        target = 'sfu_video_chat';
+      } else {
+        conferenceChatMessageController =
+            p2pConferenceClientPool.conferenceChatMessageController;
+        if (conferenceChatMessageController != null) {
+          target = 'video_chat';
+        }
+      }
+      if (conferenceChatMessageController != null) {
+        ChatSummary? chatSummary = conferenceChatMessageController.chatSummary;
+        if (chatSummary != null) {
+          chatMessageController.chatSummary = chatSummary;
+        }
+      }
+      if (target != null) {
+        indexWidgetProvider.currentMainIndex = 0;
+        indexWidgetProvider.push('chat_message');
+        indexWidgetProvider.push(target);
+      }
+    }
+  }
+
+  ///最小化界面，将overlay按钮压入，本界面被弹出
+  show(BuildContext context) {
+    bool? joined = liveKitConferenceClientPool.conferenceClient?.joined;
+    if (joined == null || !joined) {
+      joined = p2pConferenceClientPool.conferenceClient?.joined;
+    }
+    if (joined != null && joined) {
+      if (overlayEntry != null) {
+        overlayEntry!.show(context: context);
+      } else {
+        overlayEntry = DragOverlay(
+          child: CircleTextButton(
+              padding: const EdgeInsets.all(15.0),
+              backgroundColor: myself.primary,
+              onPressed: () {
+                hide();
+              },
+              label: AppLocalizations.t('Conference'),
+              child: const Icon(
+                  size: 32, color: Colors.redAccent, Icons.zoom_out_map)),
+        );
+        overlayEntry!.show(context: context);
+      }
+    } else {
+      dispose();
+    }
+  }
+}
+
+final VideoChatDragOverlay videoChatDragOverlay = VideoChatDragOverlay();
+
 ///视频聊天窗口，分页显示本地视频和远程视频
 class VideoChatWidget extends StatefulWidget with TileDataMixin {
-  DragOverlay? overlayEntry;
   final LocalVideoWidget localVideoWidget = const LocalVideoWidget();
   final RemoteVideoWidget remoteVideoWidget = const RemoteVideoWidget();
   final VideoConferencePoolWidget videoConferencePoolWidget =
@@ -58,47 +129,12 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   @override
   void initState() {
     super.initState();
-    try {
-      //如果此时overlay界面存在
-      if (widget.overlayEntry != null) {
-        widget.overlayEntry!.dispose();
-        widget.overlayEntry = null;
-      }
-    } catch (e) {
-      logger.e('overlayEntry dispose failure:$e');
-    }
     p2pConferenceClientPool.addListener(_update);
+    videoChatDragOverlay.dispose();
   }
 
   _update() {
     setState(() {});
-  }
-
-  ///关闭最小化界面，把本界面显示
-  _closeOverlayEntry() {
-    if (widget.overlayEntry != null) {
-      widget.overlayEntry!.dispose();
-      widget.overlayEntry = null;
-      indexWidgetProvider.currentMainIndex = 0;
-      indexWidgetProvider.push('chat_message');
-      indexWidgetProvider.push('video_chat');
-    }
-  }
-
-  ///最小化界面，将overlay按钮压入，本界面被弹出
-  _minimize(BuildContext context) {
-    widget.overlayEntry = DragOverlay(
-      child: CircleTextButton(
-          padding: const EdgeInsets.all(15.0),
-          backgroundColor: myself.primary,
-          onPressed: () {
-            _closeOverlayEntry();
-          },
-          label: AppLocalizations.t('Conference'),
-          child: const Icon(
-              size: 32, color: Colors.redAccent, Icons.zoom_out_map)),
-    );
-    widget.overlayEntry!.show(context: context);
   }
 
   Widget _buildVideoChatView(BuildContext context) {
@@ -168,7 +204,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
 
     rightWidgets.add(IconButton(
       onPressed: () {
-        _minimize(context);
+        videoChatDragOverlay.show(context);
         indexWidgetProvider.pop();
       },
       icon: const Icon(Icons.zoom_in_map),
@@ -184,7 +220,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
       leadingCallBack: () {
         bool? joined = p2pConferenceClientPool.conferenceClient?.joined;
         if (joined != null && joined) {
-          _minimize(context);
+          videoChatDragOverlay.show(context);
         }
       },
       child: videoChatView,

@@ -12,6 +12,7 @@ import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/video_chat_widget.dart';
 import 'package:colla_chat/pages/chat/index/adaptive_layout_index.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message.dart';
 import 'package:colla_chat/pages/chat/index/global_webrtc_event.dart';
@@ -326,22 +327,18 @@ class _IndexViewState extends State<IndexView>
   _updateConferenceJoined() {
     if (indexWidgetProvider.current == 'video_chat' ||
         indexWidgetProvider.current == 'sfu_video_chat') {
+      videoChatDragOverlay.dispose();
       return;
     }
-    String? conferenceId = p2pConferenceClientPool.conferenceId;
-    conferenceId ??= liveKitConferenceClientPool.conferenceId;
-    if (conferenceId != null) {
-      P2pConferenceClient? conferenceClient =
-          p2pConferenceClientPool.conferenceClient;
-      if (conferenceClient != null) {
-        conferenceJoined.value = conferenceClient.joined;
-      } else {
-        LiveKitConferenceClient? liveKitConferenceClient =
-            liveKitConferenceClientPool.conferenceClient;
-        if (liveKitConferenceClient != null) {
-          conferenceJoined.value = liveKitConferenceClient.joined;
-        }
-      }
+    bool? joined = liveKitConferenceClientPool.conferenceClient?.joined;
+    if (joined == null || !joined) {
+      joined = p2pConferenceClientPool.conferenceClient?.joined;
+    }
+    conferenceJoined.value = joined ?? false;
+    if (conferenceJoined.value) {
+      videoChatDragOverlay.show(context);
+    } else {
+      videoChatDragOverlay.dispose();
     }
   }
 
@@ -383,97 +380,6 @@ class _IndexViewState extends State<IndexView>
       await conferenceChatMessageController.setChatMessage(chatMessage);
       _showVideoChatMessageBanner(context);
     }
-  }
-
-  ///显示视频聊天或者视频会议
-  _buildVideoChatConferenceBanner(BuildContext context) {
-    return ValueListenableBuilder(
-        valueListenable: conferenceJoined,
-        builder: (BuildContext context, bool conferenceJoined, Widget? child) {
-          Widget banner = Container();
-          ConferenceChatMessageController? conferenceChatMessageController;
-          if (conferenceJoined) {
-            P2pConferenceClient? conferenceClient =
-                p2pConferenceClientPool.conferenceClient;
-            if (conferenceClient != null) {
-              conferenceChatMessageController =
-                  conferenceClient.conferenceChatMessageController;
-            } else {
-              LiveKitConferenceClient? liveKitConferenceClient =
-                  liveKitConferenceClientPool.conferenceClient;
-              if (liveKitConferenceClient != null) {
-                conferenceChatMessageController =
-                    liveKitConferenceClient.conferenceChatMessageController;
-              }
-            }
-            if (conferenceChatMessageController != null) {
-              List<Widget> children = <Widget>[];
-              String conferenceName =
-                  conferenceChatMessageController.conferenceName ?? '';
-              children.add(
-                CommonAutoSizeText(conferenceName,
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w500)),
-              );
-              String conferenceId =
-                  conferenceChatMessageController.conferenceId ?? '';
-              children.add(
-                CommonAutoSizeText(
-                  conferenceId,
-                  style: const TextStyle(
-                      fontSize: 14.0, fontWeight: FontWeight.w400),
-                ),
-              );
-              String topic =
-                  conferenceChatMessageController.conference?.topic ?? '';
-              children.add(ExtendedText(
-                topic,
-                specialTextSpanBuilder: customSpecialTextSpanBuilder,
-              ));
-              bool sfu =
-                  conferenceChatMessageController.conference?.sfu ?? true;
-              banner = Column(children: [
-                Container(
-                    width: appDataProvider.totalSize.width,
-                    alignment: Alignment.topLeft,
-                    padding: const EdgeInsets.all(10.0),
-                    child: InkWell(
-                        onTap: () async {
-                          this.conferenceJoined.value = false;
-                          if (sfu) {
-                            indexWidgetProvider.push('sfu_video_chat');
-                          } else {
-                            indexWidgetProvider.push('video_chat');
-                          }
-                        },
-                        child: Card(
-                            elevation: 0.0,
-                            child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  const SizedBox(
-                                    width: 15.0,
-                                  ),
-                                  Icon(
-                                    Icons.meeting_room,
-                                    color: myself.primary,
-                                  ),
-                                  const SizedBox(
-                                    width: 15.0,
-                                  ),
-                                  Expanded(
-                                      child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: children)),
-                                ])))),
-                const Spacer()
-              ]);
-            }
-          }
-          return Visibility(
-              visible: conferenceChatMessageController != null, child: banner);
-        });
   }
 
   ///显示一般消息
@@ -827,7 +733,6 @@ class _IndexViewState extends State<IndexView>
                     child: widget.adaptiveLayoutIndex,
                     height: height,
                     width: width)),
-            _buildVideoChatConferenceBanner(context),
           ]))),
     );
 

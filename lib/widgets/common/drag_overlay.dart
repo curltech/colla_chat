@@ -9,6 +9,7 @@ class DragOverlay {
   DragOverlay({required this.child});
 
   void show({required BuildContext context}) {
+    dispose();
     overlayEntry = OverlayEntry(
         maintainState: true,
         builder: (context) {
@@ -42,7 +43,7 @@ class DragOverlay {
   void createDragTarget(
       {required BuildContext context, required Offset offset}) {
     if (overlayEntry != null) {
-      overlayEntry!.remove();
+      dispose();
     }
     var size = MediaQuery.of(context).size;
     overlayEntry = OverlayEntry(builder: (context) {
@@ -102,6 +103,7 @@ class DragOverlay {
   void dispose() {
     if (overlayEntry != null) {
       overlayEntry!.remove();
+      overlayEntry!.dispose();
       overlayEntry = null;
     }
   }

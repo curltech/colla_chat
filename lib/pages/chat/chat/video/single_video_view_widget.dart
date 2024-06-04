@@ -49,13 +49,27 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   initState() {
     super.initState();
     widget.peerMediaStreamController.addListener(_updateSelected);
-    peerMediaStreams = widget.peerMediaStreamController
-        .getPeerMediaStreams(widget.peerId)
-        .toList();
+    peerMediaStreams = _sortedPeerMediaStreams();
     if (peerMediaStreams.isNotEmpty) {
       volume.value = peerMediaStreams.first.getVolume() ?? 1;
       enableMute.value = peerMediaStreams.first.isMuted() ?? false;
     }
+  }
+
+  List<PeerMediaStream> _sortedPeerMediaStreams() {
+    List<PeerMediaStream> peerMediaStreams =
+        widget.peerMediaStreamController.getPeerMediaStreams(widget.peerId);
+    List<PeerMediaStream> sortedPeerMediaStreams = [];
+    for (PeerMediaStream peerMediaStream in peerMediaStreams) {
+      if (peerMediaStream.mediaStream != null ||
+          peerMediaStream.videoTrack != null) {
+        sortedPeerMediaStreams.insert(0, peerMediaStream);
+      } else {
+        sortedPeerMediaStreams.add(peerMediaStream);
+      }
+    }
+
+    return sortedPeerMediaStreams;
   }
 
   Future<void> _updateSelected() async {
@@ -66,10 +80,11 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         setState(() {});
       }
     }
-    List<PeerMediaStream> peerMediaStreams =
-        widget.peerMediaStreamController.getPeerMediaStreams(widget.peerId);
+    List<PeerMediaStream> peerMediaStreams = _sortedPeerMediaStreams();
     if (peerMediaStreams.length != this.peerMediaStreams.length) {
-      setState(() {});
+      setState(() {
+        this.peerMediaStreams = peerMediaStreams;
+      });
     }
   }
 

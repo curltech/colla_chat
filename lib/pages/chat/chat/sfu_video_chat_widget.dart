@@ -7,6 +7,7 @@ import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_co
 import 'package:colla_chat/pages/chat/chat/video/livekit/sfu_local_video_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/livekit/sfu_remote_video_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/livekit/sfu_video_conference_pool_widget.dart';
+import 'package:colla_chat/pages/chat/chat/video_chat_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -19,7 +20,6 @@ import 'package:flutter/material.dart';
 
 ///Sfu视频聊天窗口，分页显示本地视频和远程视频
 class SfuVideoChatWidget extends StatefulWidget with TileDataMixin {
-  DragOverlay? overlayEntry;
   final SfuLocalVideoWidget sfuLocalVideoWidget = const SfuLocalVideoWidget();
   final SfuRemoteVideoWidget sfuRemoteVideoWidget =
       const SfuRemoteVideoWidget();
@@ -62,45 +62,13 @@ class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {
   @override
   void initState() {
     super.initState();
-    try {
-      //如果此时overlay界面存在
-      if (widget.overlayEntry != null) {
-        widget.overlayEntry!.dispose();
-        widget.overlayEntry = null;
-      }
-    } catch (e) {}
     liveKitConferenceClientPool.addListener(_update);
+    videoChatDragOverlay.dispose();
   }
 
   _update() {
     conferenceChatMessageController.value =
         liveKitConferenceClientPool.conferenceChatMessageController;
-  }
-
-  ///关闭最小化界面，把本界面显示
-  _closeOverlayEntry() {
-    if (widget.overlayEntry != null) {
-      widget.overlayEntry!.dispose();
-      widget.overlayEntry = null;
-      indexWidgetProvider.currentMainIndex = 0;
-      indexWidgetProvider.push('chat_message');
-      indexWidgetProvider.push('sfu_video_chat');
-    }
-  }
-
-  ///最小化界面，将overlay按钮压入，本界面被弹出
-  _minimize(BuildContext context) {
-    widget.overlayEntry = DragOverlay(
-      child: CircleTextButton(
-          padding: const EdgeInsets.all(15.0),
-          backgroundColor: myself.primary,
-          onPressed: () {
-            _closeOverlayEntry();
-          },
-          label: 'Conference',
-          child: const Icon(size: 32, color: Colors.white, Icons.zoom_out_map)),
-    );
-    widget.overlayEntry!.show(context: context);
   }
 
   Widget _buildVideoChatView(BuildContext context) {
@@ -169,7 +137,7 @@ class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {
     }
     rightWidgets.add(IconButton(
       onPressed: () {
-        _minimize(context);
+        videoChatDragOverlay.show(context);
         indexWidgetProvider.pop();
       },
       icon: const Icon(Icons.zoom_in_map),
@@ -183,10 +151,10 @@ class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {
       withLeading: true,
       rightWidgets: rightWidgets,
       leadingCallBack: () {
-        // bool? joined = liveKitConferenceClientPool.liveKitConferenceClient?.joined;
-        // if (joined != null && joined) {
-        //   _minimize(context);
-        // }
+        bool? joined = liveKitConferenceClientPool.conferenceClient?.joined;
+        if (joined != null && joined) {
+          videoChatDragOverlay.show(context);
+        }
       },
       child: videoChatView,
     );
