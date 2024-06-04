@@ -356,6 +356,7 @@ class AdvancedPeerConnection {
 
   onSignalingState(WebrtcEvent event) async {}
 
+  /// 对被叫方，数据通道的打开时间比连接的建立时间要晚很多
   onDataChannelState(WebrtcEvent event) async {
     logger.i('data channel event:${event.peerId}');
     if (event.eventType == WebrtcEventType.dataChannelState) {
