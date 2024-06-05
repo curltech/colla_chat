@@ -8,24 +8,23 @@ import 'package:colla_chat/pages/chat/chat/video/p2p/local_video_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/p2p/remote_video_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/p2p/video_conference_pool_widget.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
-import 'package:colla_chat/widgets/common/drag_overlay.dart';
+import 'package:colla_chat/plugin/overlay/platform_overlay.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
 /// 可以浮动的按钮，激活当前视频会议，全局唯一，没有当前视频会议的时候不显示
 class VideoChatDragOverlay {
-  DragOverlay? overlayEntry;
+  PlatformOverlay? overlayEntry;
 
   dispose() {
     if (overlayEntry != null) {
-      overlayEntry!.dispose();
+      overlayEntry!.disposeAll();
       overlayEntry = null;
     }
   }
@@ -67,9 +66,10 @@ class VideoChatDragOverlay {
     }
     if (joined != null && joined) {
       if (overlayEntry != null) {
-        overlayEntry!.show(context: context);
+        overlayEntry!.show(context);
       } else {
-        overlayEntry = DragOverlay(
+        overlayEntry = PlatformOverlay(
+          isDraggable: true,
           child: CircleTextButton(
               padding: const EdgeInsets.all(15.0),
               backgroundColor: myself.primary,
@@ -80,7 +80,7 @@ class VideoChatDragOverlay {
               child: const Icon(
                   size: 32, color: Colors.redAccent, Icons.zoom_out_map)),
         );
-        overlayEntry!.show(context: context);
+        overlayEntry!.show(context);
       }
     } else {
       dispose();
