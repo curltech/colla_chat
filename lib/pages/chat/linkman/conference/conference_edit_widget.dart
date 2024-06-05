@@ -20,6 +20,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
@@ -267,6 +268,93 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     return selector;
   }
 
+  _resend(BuildContext context) async {
+    Conference? current = conferenceNotifier.value;
+    if (current == null) {
+      return null;
+    }
+    if (current.conferenceOwnerPeerId != myself.peerId) {
+      return null;
+    }
+    bool sfu = current.sfu;
+    if (sfu) {
+      List<String>? participants = current.participants;
+      if (participants != null) {
+        try {
+          await chatMessageService
+              .sendSfuConferenceMessage(current, participants, store: false);
+        } catch (e) {
+          logger.e('sendSfuConferenceMessage failure:$e');
+          DialogUtil.error(context,
+              content: 'send sfu conference message failure');
+          return null;
+        }
+      }
+    } else {
+      ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
+        current.conferenceId,
+        PartyType.conference,
+        groupName: current.name,
+        title: current.video
+            ? ChatMessageContentType.video.name
+            : ChatMessageContentType.audio.name,
+        content: current,
+        messageId: current.conferenceId,
+        subMessageType: ChatMessageSubType.videoChat,
+      );
+      await chatMessageService.send(chatMessage,
+          cryptoOption: CryptoOption.group, peerIds: current.participants);
+    }
+  }
+
+  _qrcode() async {
+    Conference? current = conferenceNotifier.value;
+    if (current == null) {
+      return null;
+    }
+    List<String>? tokens = current.sfuToken;
+    List<String>? token;
+    if (tokens != null && tokens.isNotEmpty) {
+      token = [tokens.last];
+    }
+    String content = JsonUtil.toJsonString({
+      'sfuUri': current.sfuUri,
+      'sfuToken': token,
+      'sfu': current.sfu,
+      'name': current.name,
+      'topic': current.topic,
+      'conferenceId': current.conferenceId,
+      'video': current.video,
+      'adaptiveStream': current.adaptiveStream,
+      'dynacast': current.dynacast,
+      'simulcast': current.simulcast,
+      'fastConnect': current.fastConnect,
+      'e2ee': current.e2ee,
+      'password': current.password,
+      'conferenceOwnerPeerId': current.conferenceOwnerPeerId,
+      'conferenceOwnerName': current.conferenceOwnerName,
+      'startDate': current.startDate,
+      'endDate': current.endDate,
+      'participants': current.participants,
+    });
+    await DialogUtil.show(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          elevation: 0.0,
+          insetPadding: EdgeInsets.zero,
+          child: SizedBox(
+              width: 320,
+              height: 320,
+              child: QrcodeWidget(
+                content: content,
+                width: 320,
+              )),
+        );
+      },
+    );
+  }
+
   //会议信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
     var children = [
@@ -276,6 +364,8 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
       ),
       _buildConferenceOwnerWidget(context),
     ];
+    ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
+        backgroundColor: myself.primary, elevation: 10.0);
     var formInputWidget = ValueListenableBuilder(
         valueListenable: conferenceNotifier,
         builder: (BuildContext context, Conference? conference, Widget? child) {
@@ -298,52 +388,14 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
             formButtons.add(FormButton(
                 label: 'Qrcode',
                 onTap: (Map<String, dynamic> values) async {
-                  Conference? current = conferenceNotifier.value;
-                  if (current == null) {
-                    return null;
-                  }
-                  List<String>? tokens = current.sfuToken;
-                  List<String>? token;
-                  if (tokens != null && tokens.isNotEmpty) {
-                    token = [tokens.last];
-                  }
-                  String content = JsonUtil.toJsonString({
-                    'sfuUri': current.sfuUri,
-                    'sfuToken': token,
-                    'sfu': current.sfu,
-                    'name': current.name,
-                    'topic': current.topic,
-                    'conferenceId': current.conferenceId,
-                    'video': current.video,
-                    'adaptiveStream': current.adaptiveStream,
-                    'dynacast': current.dynacast,
-                    'simulcast': current.simulcast,
-                    'fastConnect': current.fastConnect,
-                    'e2ee': current.e2ee,
-                    'password': current.password,
-                    'conferenceOwnerPeerId': current.conferenceOwnerPeerId,
-                    'conferenceOwnerName': current.conferenceOwnerName,
-                    'startDate': current.startDate,
-                    'endDate': current.endDate,
-                    'participants': current.participants,
-                  });
-                  await DialogUtil.show(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return Dialog(
-                        elevation: 0.0,
-                        insetPadding: EdgeInsets.zero,
-                        child: SizedBox(
-                            width: 320,
-                            height: 320,
-                            child: QrcodeWidget(
-                              content: content,
-                              width: 320,
-                            )),
-                      );
-                    },
-                  );
+                  await _qrcode();
                 }));
+            formButtons.add(FormButton(
+              onTap: (Map<String, dynamic> values) {
+                _resend(context);
+              },
+              label: AppLocalizations.t('Resend'),
+            ));
           }
           return FormInputWidget(
             spacing: 5.0,

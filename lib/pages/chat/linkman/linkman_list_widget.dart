@@ -601,6 +601,12 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         var conferenceOwnerName = conference.conferenceOwnerName;
         var topic = conference.topic;
         var conferenceOwnerPeerId = conference.conferenceOwnerPeerId;
+        String routeName;
+        if (conferenceOwnerPeerId == myself.peerId) {
+          routeName = 'conference_edit';
+        } else {
+          routeName = 'conference_show';
+        }
         TileData tile = TileData(
             prefix: conference.avatarImage ?? AppImage.mdAppImage,
             title: conferenceName,
@@ -611,7 +617,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             onTap: (int index, String title, {String? subtitle}) {
               conferenceNotifier.value = conference;
             },
-            routeName: 'conference_show');
+            routeName: routeName);
         List<TileData> slideActions = [];
 
         TileData deleteSlideAction = TileData(

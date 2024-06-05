@@ -334,7 +334,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
       if (old != null) {
         conference.id = old.id;
         conference.createDate = old.createDate;
-        if (old.sfuToken != null) {
+        if (old.sfuToken != null && conference.sfuToken == null) {
           conference.sfuToken = old.sfuToken;
         }
       } else {
