@@ -303,16 +303,29 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
                     return null;
                   }
                   List<String>? tokens = current.sfuToken;
+                  List<String>? token;
+                  if (tokens != null && tokens.isNotEmpty) {
+                    token = [tokens.last];
+                  }
                   String content = JsonUtil.toJsonString({
                     'sfuUri': current.sfuUri,
-                    'sfuToken': tokens?.lastOrNull,
+                    'sfuToken': token,
+                    'sfu': current.sfu,
                     'name': current.name,
                     'topic': current.topic,
                     'conferenceId': current.conferenceId,
+                    'video': current.video,
+                    'adaptiveStream': current.adaptiveStream,
+                    'dynacast': current.dynacast,
+                    'simulcast': current.simulcast,
+                    'fastConnect': current.fastConnect,
+                    'e2ee': current.e2ee,
+                    'password': current.password,
                     'conferenceOwnerPeerId': current.conferenceOwnerPeerId,
                     'conferenceOwnerName': current.conferenceOwnerName,
                     'startDate': current.startDate,
                     'endDate': current.endDate,
+                    'participants': current.participants,
                   });
                   await DialogUtil.show(
                     context: context,
