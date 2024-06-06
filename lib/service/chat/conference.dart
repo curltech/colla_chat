@@ -307,7 +307,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
     conferenceOwnerPeerId = conferenceOwnerPeerId ?? myself.peerId;
     startDate ??= DateUtil.currentDate();
     endDate ??= DateUtil.currentDateTime()
-        .add(const Duration(days: 1))
+        .add(const Duration(days: 2))
         .toIso8601String();
     var conference = Conference(conferenceId,
         name: name,
@@ -455,7 +455,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
     DateTime? eDate;
     if (endDate == null) {
       DateTime sDate = DateUtil.toDateTime(startDate);
-      eDate = sDate.add(const Duration(days: 1));
+      eDate = sDate.add(const Duration(days: 2));
       endDate = eDate.toUtc().toIso8601String();
       conference.endDate = endDate;
     }

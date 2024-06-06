@@ -8,23 +8,23 @@ import 'package:colla_chat/pages/chat/chat/video/p2p/local_video_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/p2p/remote_video_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/p2p/video_conference_pool_widget.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/overlay/drag_overlay.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
-import 'package:colla_chat/plugin/overlay/platform_overlay.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
 /// 可以浮动的按钮，激活当前视频会议，全局唯一，没有当前视频会议的时候不显示
 class VideoChatDragOverlay {
-  PlatformOverlay? overlayEntry;
+  DragOverlay? overlayEntry;
 
   dispose() {
     if (overlayEntry != null) {
-      overlayEntry!.disposeAll();
+      overlayEntry!.close();
       overlayEntry = null;
     }
   }
@@ -68,8 +68,7 @@ class VideoChatDragOverlay {
       if (overlayEntry != null) {
         overlayEntry!.show(context);
       } else {
-        overlayEntry = PlatformOverlay(
-          isDraggable: true,
+        overlayEntry = DragOverlay(
           child: CircleTextButton(
               padding: const EdgeInsets.all(15.0),
               backgroundColor: myself.primary,
@@ -78,7 +77,7 @@ class VideoChatDragOverlay {
               },
               label: AppLocalizations.t('Conference'),
               child: const Icon(
-                  size: 32, color: Colors.redAccent, Icons.zoom_out_map)),
+                  size: 32, color: Colors.yellow, Icons.zoom_out_map)),
         );
         overlayEntry!.show(context);
       }

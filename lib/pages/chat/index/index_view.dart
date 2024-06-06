@@ -19,6 +19,7 @@ import 'package:colla_chat/pages/chat/index/global_webrtc_event.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/login/loading.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/overlay/platform_overlay.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -40,9 +41,6 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
-import 'package:elegant_notification/elegant_notification.dart';
-import 'package:elegant_notification/resources/arrays.dart';
-import 'package:elegant_notification/resources/stacked_options.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -383,7 +381,7 @@ class _IndexViewState extends State<IndexView>
   }
 
   ///显示一般消息
-  Future<ElegantNotification?> _showChatMessageBanner(
+  Future<PlatformOverlayWidget?> _showChatMessageBanner(
       BuildContext context) async {
     if (chatMessage != null &&
         chatMessage!.subMessageType == ChatMessageSubType.chat.name) {
@@ -399,6 +397,7 @@ class _IndexViewState extends State<IndexView>
       if (name != null) {
         children.add(
           CommonAutoSizeText(name,
+              maxLines: 1,
               style:
                   const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
         );
@@ -408,6 +407,7 @@ class _IndexViewState extends State<IndexView>
         children.add(
           CommonAutoSizeText(
             title,
+            maxLines: 1,
             style: const TextStyle(fontSize: 14.0, fontWeight: FontWeight.w400),
           ),
         );
@@ -422,7 +422,7 @@ class _IndexViewState extends State<IndexView>
         content = '';
       }
 
-      ElegantNotification elegantNotification = NotificationUtil.show(context,
+      PlatformOverlayWidget elegantNotification = NotificationUtil.show(context,
           icon: bannerAvatarImage,
           position: Alignment.topCenter,
           animation: AnimationType.fromTop,
@@ -444,16 +444,16 @@ class _IndexViewState extends State<IndexView>
           ),
           dismissDirection: DismissDirection.horizontal,
           isDismissable: true,
-          autoDismiss: true, onDismiss: () async {
+          autoDismiss: true, onDismiss: (PlatformOverlayWidget self) async {
         chatMessage = null;
         await conferenceChatMessageController.close();
-      }, onNotificationPressed: () async {
+      }, onNotificationPressed: (PlatformOverlayWidget self) async {
         chatMessage = null;
         await conferenceChatMessageController.close();
-      }, onProgressFinished: () async {
+      }, onProgressFinished: (PlatformOverlayWidget self) async {
         chatMessage = null;
         await conferenceChatMessageController.close();
-      }, onCloseButtonPressed: () async {
+      }, onCloseButtonPressed: (PlatformOverlayWidget self) async {
         chatMessage = null;
         await conferenceChatMessageController.close();
       });
@@ -464,7 +464,7 @@ class _IndexViewState extends State<IndexView>
   }
 
   ///显示视频邀请消息组件
-  Future<ElegantNotification?> _showVideoChatMessageBanner(
+  Future<PlatformOverlayWidget?> _showVideoChatMessageBanner(
       BuildContext context) async {
     ChatMessage? conferenceChatMessage =
         conferenceChatMessageController.chatMessage;
@@ -566,7 +566,7 @@ class _IndexViewState extends State<IndexView>
           style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
     ]);
     _play();
-    ElegantNotification elegantNotification = NotificationUtil.show(
+    PlatformOverlayWidget elegantNotification = NotificationUtil.show(
       context,
       icon: bannerAvatarImage,
       position: Alignment.topCenter,
@@ -590,19 +590,19 @@ class _IndexViewState extends State<IndexView>
       isDismissable: true,
       dismissDirection: DismissDirection.horizontal,
       autoDismiss: true,
-      onCloseButtonPressed: () async {
+      onCloseButtonPressed: (PlatformOverlayWidget self) async {
         _stop();
         await conferenceChatMessageController
             .sendChatReceipt(MessageReceiptType.rejected);
         conferenceChatMessageController.close();
       },
-      onDismiss: () async {
+      onDismiss: (PlatformOverlayWidget self) async {
         _stop();
         await conferenceChatMessageController
             .sendChatReceipt(MessageReceiptType.received);
         conferenceChatMessageController.close();
       },
-      onNotificationPressed: () async {
+      onNotificationPressed: (PlatformOverlayWidget self) async {
         _stop();
         if (conferenceChatMessage.groupId == null) {
           P2pConferenceClient? p2pConferenceClient =
@@ -619,7 +619,7 @@ class _IndexViewState extends State<IndexView>
           conferenceChatMessageController.close();
         }
       },
-      onProgressFinished: () async {
+      onProgressFinished: (PlatformOverlayWidget self) async {
         _stop();
         await conferenceChatMessageController
             .sendChatReceipt(MessageReceiptType.received);
