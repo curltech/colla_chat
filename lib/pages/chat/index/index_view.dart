@@ -425,12 +425,8 @@ class _IndexViewState extends State<IndexView>
 
       OverlayNotification overlayNotification = NotificationUtil.show(context,
           icon: bannerAvatarImage,
-          position: Alignment.topCenter,
-          animation: AnimationType.fromTop,
           displayCloseButton: true,
-          progressIndicatorColor: myself.primary,
-          borderRadius: BorderRadius.circular(8.0),
-          toastDuration: const Duration(milliseconds: 30000),
+          toastDuration: const Duration(milliseconds: 10000),
           title: Column(
             children: children,
           ),
@@ -442,10 +438,7 @@ class _IndexViewState extends State<IndexView>
             key: 'topRight',
             type: StackedType.below,
             itemOffset: const Offset(0, 5),
-          ),
-          dismissDirection: DismissDirection.horizontal,
-          isDismissable: true,
-          autoDismiss: true, onDismiss: (OverlayNotification self) async {
+          ), onDismiss: (OverlayNotification self) async {
         chatMessage = null;
         await conferenceChatMessageController.close();
       }, onNotificationPressed: (OverlayNotification self) async {
@@ -570,12 +563,7 @@ class _IndexViewState extends State<IndexView>
     OverlayNotification overlayNotification = NotificationUtil.show(
       context,
       icon: bannerAvatarImage,
-      position: Alignment.topCenter,
-      animation: AnimationType.fromTop,
-      displayCloseButton: true,
-      progressIndicatorColor: myself.primary,
-      borderRadius: BorderRadius.circular(8.0),
-      toastDuration: const Duration(milliseconds: 30000),
+      toastDuration: const Duration(milliseconds: 10000),
       title: CommonAutoSizeText(conferenceChatMessage.senderName ?? '',
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
       description: ExtendedText(
@@ -588,9 +576,6 @@ class _IndexViewState extends State<IndexView>
         type: StackedType.below,
         itemOffset: const Offset(0, 5),
       ),
-      isDismissable: true,
-      dismissDirection: DismissDirection.horizontal,
-      autoDismiss: true,
       onCloseButtonPressed: (OverlayNotification self) async {
         _stop();
         await conferenceChatMessageController
