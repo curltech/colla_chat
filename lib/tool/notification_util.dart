@@ -25,7 +25,7 @@ class NotificationUtil {
       void Function(OverlayNotification self)? onCloseButtonPressed,
       void Function(OverlayNotification self)? onProgressFinished,
       Alignment position = Alignment.topCenter,
-      AnimationType animation = AnimationType.fromRight,
+      AnimationType animation = AnimationType.fromTop,
       Duration animationDuration = const Duration(milliseconds: 600),
       double iconSize = 24,
       Widget? action,

@@ -159,7 +159,7 @@ class OverlayNotification extends StatefulWidget {
       this.onCloseButtonPressed,
       this.onProgressFinished,
       this.position = Alignment.topRight,
-      this.animation = AnimationType.fromRight,
+      this.animation = AnimationType.fromTop,
       this.animationDuration = const Duration(milliseconds: 600),
       this.iconSize = 24.0,
       this.action,
