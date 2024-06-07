@@ -19,7 +19,8 @@ import 'package:colla_chat/pages/chat/index/global_webrtc_event.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/login/loading.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/overlay/platform_overlay.dart';
+import 'package:colla_chat/plugin/overlay/overlay_notification.dart';
+
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -381,7 +382,7 @@ class _IndexViewState extends State<IndexView>
   }
 
   ///显示一般消息
-  Future<PlatformOverlayWidget?> _showChatMessageBanner(
+  Future<OverlayNotification?> _showChatMessageBanner(
       BuildContext context) async {
     if (chatMessage != null &&
         chatMessage!.subMessageType == ChatMessageSubType.chat.name) {
@@ -422,7 +423,7 @@ class _IndexViewState extends State<IndexView>
         content = '';
       }
 
-      PlatformOverlayWidget elegantNotification = NotificationUtil.show(context,
+      OverlayNotification overlayNotification = NotificationUtil.show(context,
           icon: bannerAvatarImage,
           position: Alignment.topCenter,
           animation: AnimationType.fromTop,
@@ -444,27 +445,27 @@ class _IndexViewState extends State<IndexView>
           ),
           dismissDirection: DismissDirection.horizontal,
           isDismissable: true,
-          autoDismiss: true, onDismiss: (PlatformOverlayWidget self) async {
+          autoDismiss: true, onDismiss: (OverlayNotification self) async {
         chatMessage = null;
         await conferenceChatMessageController.close();
-      }, onNotificationPressed: (PlatformOverlayWidget self) async {
+      }, onNotificationPressed: (OverlayNotification self) async {
         chatMessage = null;
         await conferenceChatMessageController.close();
-      }, onProgressFinished: (PlatformOverlayWidget self) async {
+      }, onProgressFinished: (OverlayNotification self) async {
         chatMessage = null;
         await conferenceChatMessageController.close();
-      }, onCloseButtonPressed: (PlatformOverlayWidget self) async {
+      }, onCloseButtonPressed: (OverlayNotification self) async {
         chatMessage = null;
         await conferenceChatMessageController.close();
       });
 
-      return elegantNotification;
+      return overlayNotification;
     }
     return null;
   }
 
   ///显示视频邀请消息组件
-  Future<PlatformOverlayWidget?> _showVideoChatMessageBanner(
+  Future<OverlayNotification?> _showVideoChatMessageBanner(
       BuildContext context) async {
     ChatMessage? conferenceChatMessage =
         conferenceChatMessageController.chatMessage;
@@ -566,7 +567,7 @@ class _IndexViewState extends State<IndexView>
           style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400)),
     ]);
     _play();
-    PlatformOverlayWidget elegantNotification = NotificationUtil.show(
+    OverlayNotification overlayNotification = NotificationUtil.show(
       context,
       icon: bannerAvatarImage,
       position: Alignment.topCenter,
@@ -590,19 +591,19 @@ class _IndexViewState extends State<IndexView>
       isDismissable: true,
       dismissDirection: DismissDirection.horizontal,
       autoDismiss: true,
-      onCloseButtonPressed: (PlatformOverlayWidget self) async {
+      onCloseButtonPressed: (OverlayNotification self) async {
         _stop();
         await conferenceChatMessageController
             .sendChatReceipt(MessageReceiptType.rejected);
         conferenceChatMessageController.close();
       },
-      onDismiss: (PlatformOverlayWidget self) async {
+      onDismiss: (OverlayNotification self) async {
         _stop();
         await conferenceChatMessageController
             .sendChatReceipt(MessageReceiptType.received);
         conferenceChatMessageController.close();
       },
-      onNotificationPressed: (PlatformOverlayWidget self) async {
+      onNotificationPressed: (OverlayNotification self) async {
         _stop();
         if (conferenceChatMessage.groupId == null) {
           P2pConferenceClient? p2pConferenceClient =
@@ -619,7 +620,7 @@ class _IndexViewState extends State<IndexView>
           conferenceChatMessageController.close();
         }
       },
-      onProgressFinished: (PlatformOverlayWidget self) async {
+      onProgressFinished: (OverlayNotification self) async {
         _stop();
         await conferenceChatMessageController
             .sendChatReceipt(MessageReceiptType.received);
@@ -627,7 +628,7 @@ class _IndexViewState extends State<IndexView>
       },
     );
 
-    return elegantNotification;
+    return overlayNotification;
   }
 
   Future<void> _shareChatMessage(SharedFile file) async {

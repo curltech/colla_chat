@@ -1,28 +1,30 @@
-import 'package:colla_chat/plugin/overlay/platform_overlay.dart';
+import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/plugin/overlay/overlay_notification.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked_notification_cards/stacked_notification_cards.dart';
 import 'package:toastification/toastification.dart';
 
 class NotificationUtil {
-  static PlatformOverlayWidget show(
+  static OverlayNotification show(
     BuildContext context, {
     Key? key,
     Widget? title,
     required Widget description,
-    required Widget? icon,
-    Color background = Colors.white,
+    Widget? icon,
+    Color? background,
     BorderRadius? borderRadius,
     BoxBorder? border,
     bool showProgressIndicator = true,
-    Widget Function(void Function(PlatformOverlayWidget self))? closeButton,
+    Widget Function(void Function(OverlayNotification self))? closeButton,
     StackedOptions? stackedOptions,
     double notificationMargin = 20,
-    Color progressIndicatorColor = Colors.blue,
+    Color? progressIndicatorColor,
     Duration toastDuration = const Duration(milliseconds: 3000),
     bool displayCloseButton = true,
-    void Function(PlatformOverlayWidget self)? onCloseButtonPressed,
-    void Function(PlatformOverlayWidget self)? onProgressFinished,
+    void Function(OverlayNotification self)? onCloseButtonPressed,
+    void Function(OverlayNotification self)? onProgressFinished,
     Alignment position = Alignment.topRight,
     AnimationType animation = AnimationType.fromRight,
     Duration animationDuration = const Duration(milliseconds: 600),
@@ -34,15 +36,15 @@ class NotificationUtil {
     double? progressBarHeight,
     double? progressBarWidth,
     EdgeInsetsGeometry? progressBarPadding,
-    dynamic Function(PlatformOverlayWidget self)? onDismiss,
+    dynamic Function(OverlayNotification self)? onDismiss,
     bool isDismissable = true,
     DismissDirection dismissDirection = DismissDirection.horizontal,
-    Color progressIndicatorBackground = Colors.grey,
-    void Function(PlatformOverlayWidget self)? onNotificationPressed,
+    Color? progressIndicatorBackground,
+    void Function(OverlayNotification self)? onNotificationPressed,
     Curve animationCurve = Curves.ease,
     BoxShadow? shadow,
   }) {
-    PlatformOverlayWidget elegantNotification = PlatformOverlayWidget(
+    OverlayNotification overlayNotification = OverlayNotification(
       key: key,
       title: title,
       description: description,
@@ -78,9 +80,85 @@ class NotificationUtil {
       animationCurve: animationCurve,
       shadow: shadow,
     );
-    elegantNotification.show(context);
+    overlayNotification.show(context);
 
-    return elegantNotification;
+    return overlayNotification;
+  }
+
+  static OverlayNotification info(
+    BuildContext context, {
+    String? title,
+    required String description,
+    Widget? icon,
+    bool showProgressIndicator = false,
+  }) {
+    OverlayNotification overlayNotification = OverlayNotification(
+      title: CommonAutoSizeText(AppLocalizations.t(title ?? '')),
+      description: CommonAutoSizeText(AppLocalizations.t(description)),
+      icon: icon,
+      showProgressIndicator: showProgressIndicator,
+      notificationType: NotificationType.info,
+    );
+    overlayNotification.show(context);
+
+    return overlayNotification;
+  }
+
+  static OverlayNotification success(
+    BuildContext context, {
+    String? title,
+    required String description,
+    Widget? icon,
+    bool showProgressIndicator = false,
+  }) {
+    OverlayNotification overlayNotification = OverlayNotification(
+      title: CommonAutoSizeText(AppLocalizations.t(title ?? '')),
+      description: CommonAutoSizeText(AppLocalizations.t(description)),
+      icon: icon,
+      showProgressIndicator: showProgressIndicator,
+      notificationType: NotificationType.success,
+    );
+    overlayNotification.show(context);
+
+    return overlayNotification;
+  }
+
+  static OverlayNotification error(
+    BuildContext context, {
+    String? title,
+    required String description,
+    Widget? icon,
+    bool showProgressIndicator = false,
+  }) {
+    OverlayNotification overlayNotification = OverlayNotification(
+      title: CommonAutoSizeText(AppLocalizations.t(title ?? '')),
+      description: CommonAutoSizeText(AppLocalizations.t(description)),
+      icon: icon,
+      showProgressIndicator: showProgressIndicator,
+      notificationType: NotificationType.error,
+    );
+    overlayNotification.show(context);
+
+    return overlayNotification;
+  }
+
+  static OverlayNotification warning(
+    BuildContext context, {
+    String? title,
+    required String description,
+    Widget? icon,
+    bool showProgressIndicator = false,
+  }) {
+    OverlayNotification overlayNotification = OverlayNotification(
+      title: CommonAutoSizeText(AppLocalizations.t(title ?? '')),
+      description: CommonAutoSizeText(AppLocalizations.t(description)),
+      icon: icon,
+      showProgressIndicator: showProgressIndicator,
+      notificationType: NotificationType.warning,
+    );
+    overlayNotification.show(context);
+
+    return overlayNotification;
   }
 
   static ToastificationItem toast({

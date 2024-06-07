@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 enum NotificationType {
   success,
+  warning,
   error,
   info,
   custom,
@@ -52,8 +53,8 @@ enum StackedType {
 
 /// 平台定制的overlay浮动框
 // ignore: must_be_immutable
-class PlatformOverlayWidget extends StatefulWidget {
-  static final Map<String, PlatformOverlayWidget> _platformOverlays = {};
+class OverlayNotification extends StatefulWidget {
+  static final Map<String, OverlayNotification> _platformOverlays = {};
 
   late Widget? child;
   final double top;
@@ -107,16 +108,15 @@ class PlatformOverlayWidget extends StatefulWidget {
   final bool displayCloseButton;
 
   final Widget Function(
-          void Function(PlatformOverlayWidget self) dismissNotification)?
-      closeButton;
+      void Function(OverlayNotification self) dismissNotification)? closeButton;
 
-  final void Function(PlatformOverlayWidget self)? onCloseButtonPressed;
+  final void Function(OverlayNotification self)? onCloseButtonPressed;
 
-  final void Function(PlatformOverlayWidget self)? onProgressFinished;
+  final void Function(OverlayNotification self)? onProgressFinished;
 
-  final void Function(PlatformOverlayWidget self)? onNotificationPressed;
+  final void Function(OverlayNotification self)? onNotificationPressed;
 
-  final Function(PlatformOverlayWidget self)? onDismiss;
+  final Function(OverlayNotification self)? onDismiss;
 
   final bool autoDismiss;
 
@@ -134,14 +134,14 @@ class PlatformOverlayWidget extends StatefulWidget {
 
   final StackedOptions? stackedOptions;
 
-  late NotificationType _notificationType;
+  final NotificationType notificationType;
   OverlayEntry? overlayEntry;
   String? id;
   late Timer _closeTimer;
   late Animation<Offset> _offsetAnimation;
   late AnimationController _slideController;
 
-  PlatformOverlayWidget(
+  OverlayNotification(
       {super.key,
       this.title,
       this.description,
@@ -178,9 +178,8 @@ class PlatformOverlayWidget extends StatefulWidget {
       this.shadow,
       this.top = 20.0,
       this.isDraggable = false,
-      this.child}) {
-    _notificationType = NotificationType.custom;
-  }
+      this.notificationType = NotificationType.custom,
+      this.child});
 
   /// overlay的数目
   int get _overlaysLength {
@@ -391,13 +390,18 @@ class PlatformOverlayWidget extends StatefulWidget {
   }
 
   Widget _getNotificationIcon() {
-    switch (_notificationType) {
+    switch (notificationType) {
       case NotificationType.success:
-        return const Icon(Icons.check_circle);
+        return const Icon(Icons.check_circle, color: Colors.blue);
       case NotificationType.error:
-        return const Icon(Icons.error);
+        return const Icon(Icons.error, color: Colors.red);
+      case NotificationType.warning:
+        return const Icon(
+          Icons.error,
+          color: Colors.yellow,
+        );
       case NotificationType.info:
-        return const Icon(Icons.info);
+        return const Icon(Icons.info, color: Colors.green);
       default:
         return icon!;
     }
@@ -497,10 +501,10 @@ class PlatformOverlayWidget extends StatefulWidget {
   }
 
   @override
-  State createState() => PlatformOverlayWidgetState();
+  State createState() => OverlayNotificationState();
 }
 
-class PlatformOverlayWidgetState extends State<PlatformOverlayWidget>
+class OverlayNotificationState extends State<OverlayNotification>
     with SingleTickerProviderStateMixin {
   @override
   void initState() {
