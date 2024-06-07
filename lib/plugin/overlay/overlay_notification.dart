@@ -152,7 +152,7 @@ class OverlayNotification extends StatefulWidget {
       this.showProgressIndicator = true,
       this.closeButton,
       this.stackedOptions,
-      this.notificationMargin = 20,
+      this.notificationMargin = 30,
       this.progressIndicatorColor,
       this.toastDuration = const Duration(milliseconds: 3000),
       this.displayCloseButton = true,
