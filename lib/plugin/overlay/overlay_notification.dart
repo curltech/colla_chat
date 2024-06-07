@@ -152,7 +152,7 @@ class OverlayNotification extends StatefulWidget {
       this.showProgressIndicator = true,
       this.closeButton,
       this.stackedOptions,
-      this.notificationMargin = 30,
+      this.notificationMargin = 20,
       this.progressIndicatorColor,
       this.toastDuration = const Duration(milliseconds: 3000),
       this.displayCloseButton = true,
@@ -241,12 +241,14 @@ class OverlayNotification extends StatefulWidget {
     if (position.y == 1) {
       return MediaQuery.of(context).size.height -
           _height(context) -
-          notificationMargin;
+          notificationMargin +
+          30;
     } else if (position.y == -1) {
-      return notificationMargin;
+      return notificationMargin + 30;
     } else {
       return ((position.y + 1) / 2) * MediaQuery.of(context).size.height -
-          (_height(context) / 2);
+          (_height(context) / 2) +
+          30;
     }
   }
 
