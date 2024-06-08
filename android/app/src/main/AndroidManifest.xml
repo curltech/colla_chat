@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="io.curltech.colla_chat">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-feature android:name="android.hardware.camera"/>
     <uses-feature android:name="android.hardware.camera.autofocus"/>
@@ -74,10 +74,8 @@
     <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES"/>
     <uses-permission android:name="android.permission.NFC"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <!-- Permissions options for the `manage external storage` group -->
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
@@ -110,6 +108,7 @@
     <application
             android:name="${applicationName}"
             android:allowBackup="false"
+            tools:replace="android:allowBackup"
             android:icon="@mipmap/ic_launcher"
             android:label="CollaChat"
             android:largeHeap="true"
