@@ -7,6 +7,7 @@ import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart' as geocoding;
+import 'package:latlong2/latlong.dart';
 import 'package:tencent_map_flutter/tencent_map_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -54,12 +55,12 @@ class TencentMapWidget extends StatefulWidget {
   final void Function(CameraPosition)? onCameraMoveStart;
   final void Function(CameraPosition)? onCameraMove;
   final void Function(CameraPosition)? onCameraMoveEnd;
-  final void Function(String, Position)? onMarkerDragStart;
-  final void Function(String, Position)? onMarkerDrag;
-  final void Function(String, Position)? onMarkerDragEnd;
-  final void Function(Position)? onLongPress;
+  final void Function(String, LatLng)? onMarkerDragStart;
+  final void Function(String, LatLng)? onMarkerDrag;
+  final void Function(String, LatLng)? onMarkerDragEnd;
+  final void Function(LatLng)? onLongPress;
   final void Function(Location)? onLocation;
-  final void Function(Position)? onUserLocationClick;
+  final void Function(LatLng)? onUserLocationClick;
   final void Function({LocationPosition? locationPosition})? onSelectedMarker;
 
   final double latitude;
@@ -134,9 +135,7 @@ class TencentMapWidgetState extends State<TencentMapWidget> {
     controller.removeMarker(selectedMarkerId);
     selectedMarker = Marker(
       id: selectedMarkerId,
-      position: Position(
-          latitude: locationPosition.latitude,
-          longitude: locationPosition.longitude),
+      position: LatLng(locationPosition.latitude, locationPosition.longitude),
       icon: Bitmap(asset: 'assets/images/marker.png'),
       anchor: Anchor(x: 0.5, y: 1),
       draggable: true,
@@ -186,8 +185,7 @@ class TencentMapWidgetState extends State<TencentMapWidget> {
         _add(locationPosition);
         controller.moveCamera(
           CameraPosition(
-            position: Position(
-                latitude: widget.latitude, longitude: widget.longitude),
+            position: LatLng(widget.latitude, widget.longitude),
             zoom: 14,
           ),
         );
