@@ -160,6 +160,8 @@ class GlassKitWidgetFactory extends WidgetFactory {
       blur: blur,
       isFrostedGlass: false,
       shape: BoxShape.rectangle,
+      shadowColor: Colors.black.withOpacity(0.20),
+      frostedOpacity: 0.12,
       child: child,
     );
   }
@@ -198,6 +200,8 @@ class GlassKitWidgetFactory extends WidgetFactory {
         borderGradient: defaultBorderGradient,
         blur: blur,
         isFrostedGlass: false,
+        shadowColor: Colors.black.withOpacity(0.20),
+        frostedOpacity: 0.12,
         shape: BoxShape.rectangle,
         child: child,
       );
