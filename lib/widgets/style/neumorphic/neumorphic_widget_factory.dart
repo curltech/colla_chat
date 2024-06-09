@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -48,8 +50,8 @@ class NeumorphicWidgetFactory extends WidgetFactory {
           vertical: margin?.vertical ?? 0.0,
           horizontal: margin?.horizontal ?? 0.0),
       padding: EdgeInsets.symmetric(
-          vertical: margin?.vertical ?? 0.0,
-          horizontal: margin?.horizontal ?? 0.0),
+          vertical: padding?.vertical ?? 0.0,
+          horizontal: padding?.horizontal ?? 0.0),
       duration: NeumorphicTheme.defaultDuration,
       curve: NeumorphicTheme.defaultCurve,
       drawSurfaceAboveChild: true,
@@ -76,34 +78,149 @@ class NeumorphicWidgetFactory extends WidgetFactory {
         ));
   }
 
+  @override
   Widget card({
+    Key? key,
+    Color? color,
+    Color? shadowColor,
+    Color? surfaceTintColor,
+    double? elevation,
+    ShapeBorder? shape,
+    bool borderOnForeground = true,
+    EdgeInsetsGeometry? margin,
+    Clip? clipBehavior,
     Widget? child,
-    EdgeInsets? padding,
-    EdgeInsets? margin,
-    BorderRadius? borderRadius,
-    Color backendColor = const Color(0xFF000000),
+    bool semanticContainer = true,
   }) {
     return NeumorphicBackground(
-      padding: padding,
-      margin: margin,
-      backendColor: backendColor,
-      borderRadius: borderRadius,
+      margin: margin?.resolve(null),
+      backendColor: color ?? const Color(0xFF000000),
       child: child,
     );
   }
 
-  Widget textFormField({
+  @override
+  PreferredSizeWidget appBar({
     Key? key,
-    NeumorphicStyle? neumorphicStyle,
-    EdgeInsets? margin,
-    EdgeInsets? padding,
-    Color? color,
-    double? depth,
-    BorderRadius borderRadius = const BorderRadius.all(Radius.circular(8.0)),
+    Widget? leading,
+    bool automaticallyImplyLeading = true,
+    Widget? title,
+    List<Widget>? actions,
+    Widget? flexibleSpace,
+    PreferredSizeWidget? bottom,
+    double? elevation,
+    double? scrolledUnderElevation,
+    bool Function(ScrollNotification) notificationPredicate =
+        defaultScrollNotificationPredicate,
+    Color? shadowColor,
+    Color? surfaceTintColor,
+    ShapeBorder? shape,
+    Color? backgroundColor,
+    Color? foregroundColor,
+    IconThemeData? iconTheme,
+    IconThemeData? actionsIconTheme,
+    bool primary = true,
+    bool? centerTitle,
+    bool excludeHeaderSemantics = false,
+    double? titleSpacing,
+    double toolbarOpacity = 1.0,
+    double bottomOpacity = 1.0,
+    double? toolbarHeight,
+    double? leadingWidth,
+    TextStyle? toolbarTextStyle,
+    TextStyle? titleTextStyle,
+    SystemUiOverlayStyle? systemOverlayStyle,
+    bool forceMaterialTransparency = false,
+    Clip? clipBehavior,
+  }) {
+    return NeumorphicAppBar(
+      key: key,
+      title: title,
+      iconTheme: iconTheme,
+      color: backgroundColor,
+      actions: actions,
+      textStyle: titleTextStyle,
+      leading: leading,
+      automaticallyImplyLeading: true,
+      centerTitle: centerTitle,
+      titleSpacing: NavigationToolbar.kMiddleSpacing,
+      actionSpacing: NeumorphicAppBar.defaultSpacing,
+      padding: 16,
+    );
+  }
+
+  @override
+  Widget text(
+    String data, {
+    Key? key,
+    TextStyle? style,
+    StrutStyle? strutStyle,
+    TextAlign? textAlign,
+    TextDirection? textDirection,
+    Locale? locale,
+    bool? softWrap,
+    TextOverflow? overflow,
+    double? textScaleFactor,
+    TextScaler? textScaler,
+    int? maxLines,
+    String? semanticsLabel,
+    TextWidthBasis? textWidthBasis,
+    TextHeightBehavior? textHeightBehavior,
+    Color? selectionColor,
+  }) {
+    return NeumorphicText(
+      data,
+      key: key,
+      duration: NeumorphicTheme.defaultDuration,
+      style: NeumorphicStyle(color: style?.color),
+      curve: NeumorphicTheme.defaultCurve,
+      textAlign: textAlign,
+      textStyle: style,
+    );
+  }
+
+  ///自适应文本
+  @override
+  Widget commonAutoSizeText(
+    String data, {
+    Key? key,
+    Key? textKey,
+    TextStyle? style,
+    StrutStyle? strutStyle,
+    double minFontSize = AppFontSize.minFontSize,
+    double maxFontSize = AppFontSize.maxFontSize,
+    double stepGranularity = 1,
+    List<double>? presetFontSizes,
+    AutoSizeGroup? group,
+    TextAlign? textAlign,
+    TextDirection? textDirection,
+    Locale? locale,
+    bool? softWrap,
+    bool wrapWords = true,
+    TextOverflow? overflow,
+    Widget? overflowReplacement,
+    double? textScaleFactor,
+    int? maxLines,
+    String? semanticsLabel,
+  }) {
+    return NeumorphicText(
+      data,
+      key: key,
+      duration: NeumorphicTheme.defaultDuration,
+      style: NeumorphicStyle(color: style?.color),
+      curve: NeumorphicTheme.defaultCurve,
+      textAlign: textAlign,
+      textStyle: style,
+    );
+  }
+
+  ///输入框
+  Widget textField({
+    Key? key,
     TextEditingController? controller,
     FocusNode? focusNode,
     UndoHistoryController? undoController,
-    InputDecoration? decoration,
+    InputDecoration? decoration = const InputDecoration(),
     TextInputType? keyboardType,
     TextInputAction? textInputAction,
     TextCapitalization textCapitalization = TextCapitalization.none,
@@ -116,6 +233,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     ToolbarOptions? toolbarOptions,
     bool? showCursor,
     bool autofocus = false,
+    WidgetStatesController? statesController,
     String obscuringCharacter = '•',
     bool obscureText = false,
     bool autocorrect = true,
@@ -133,11 +251,13 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     void Function(String, Map<String, dynamic>)? onAppPrivateCommand,
     List<TextInputFormatter>? inputFormatters,
     bool? enabled,
+    bool? ignorePointers,
     double cursorWidth = 2.0,
     double? cursorHeight,
     Radius? cursorRadius,
     bool? cursorOpacityAnimates,
     Color? cursorColor,
+    Color? cursorErrorColor,
     BoxHeightStyle selectionHeightStyle = BoxHeightStyle.tight,
     BoxWidthStyle selectionWidthStyle = BoxWidthStyle.tight,
     Brightness? keyboardAppearance,
@@ -146,6 +266,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     bool? enableInteractiveSelection,
     TextSelectionControls? selectionControls,
     void Function()? onTap,
+    bool onTapAlwaysCalled = false,
     void Function(PointerDownEvent)? onTapOutside,
     MouseCursor? mouseCursor,
     Widget? Function(BuildContext,
@@ -217,9 +338,11 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
-  Widget textField({
+  @override
+  Widget textFormField({
     Key? key,
     TextEditingController? controller,
+    String? initialValue,
     FocusNode? focusNode,
     InputDecoration? decoration = const InputDecoration(),
     TextInputType? keyboardType,
@@ -245,29 +368,54 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     int? minLines,
     bool expands = false,
     int? maxLength,
-    ValueChanged<String>? onChanged,
-    GestureTapCallback? onTap,
-    VoidCallback? onEditingComplete,
+    void Function(String)? onChanged,
+    void Function()? onTap,
+    bool onTapAlwaysCalled = false,
+    void Function(PointerDownEvent)? onTapOutside,
+    void Function()? onEditingComplete,
+    void Function(String)? onFieldSubmitted,
+    void Function(String?)? onSaved,
+    String? Function(String?)? validator,
     List<TextInputFormatter>? inputFormatters,
     bool? enabled,
+    bool? ignorePointers,
     double cursorWidth = 2.0,
     double? cursorHeight,
     Radius? cursorRadius,
     Color? cursorColor,
+    Color? cursorErrorColor,
     Brightness? keyboardAppearance,
     EdgeInsets scrollPadding = const EdgeInsets.all(20.0),
     bool? enableInteractiveSelection,
     TextSelectionControls? selectionControls,
-    InputCounterWidgetBuilder? buildCounter,
+    Widget? Function(BuildContext,
+            {required int currentLength,
+            required bool isFocused,
+            required int? maxLength})?
+        buildCounter,
     ScrollPhysics? scrollPhysics,
     Iterable<String>? autofillHints,
+    AutovalidateMode? autovalidateMode,
     ScrollController? scrollController,
     String? restorationId,
     bool enableIMEPersonalizedLearning = true,
     MouseCursor? mouseCursor,
+    Widget Function(BuildContext, EditableTextState)? contextMenuBuilder,
+    SpellCheckConfiguration? spellCheckConfiguration,
+    TextMagnifierConfiguration? magnifierConfiguration,
+    UndoHistoryController? undoController,
+    void Function(String, Map<String, dynamic>)? onAppPrivateCommand,
+    bool? cursorOpacityAnimates,
+    BoxHeightStyle selectionHeightStyle = BoxHeightStyle.tight,
+    BoxWidthStyle selectionWidthStyle = BoxWidthStyle.tight,
+    DragStartBehavior dragStartBehavior = DragStartBehavior.start,
+    ContentInsertionConfiguration? contentInsertionConfiguration,
+    WidgetStatesController? statesController,
+    Clip clipBehavior = Clip.hardEdge,
+    bool scribbleEnabled = true,
+    bool canRequestFocus = true,
   }) {
-    return Neumorphic(
-        child: TextField(
+    return NeumorphicTextField(
       key: key,
       controller: controller,
       focusNode: focusNode,
@@ -282,7 +430,6 @@ class NeumorphicWidgetFactory extends WidgetFactory {
       textAlignVertical: textAlignVertical,
       autofocus: autofocus,
       readOnly: readOnly,
-      toolbarOptions: toolbarOptions,
       showCursor: showCursor,
       obscuringCharacter: obscuringCharacter = '•',
       obscureText: obscureText,
@@ -298,6 +445,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
       onChanged: onChanged,
       onTap: onTap,
       onEditingComplete: onEditingComplete,
+      onSubmitted: onFieldSubmitted,
       inputFormatters: inputFormatters,
       enabled: enabled,
       cursorWidth: cursorWidth,
@@ -315,7 +463,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
       restorationId: restorationId,
       enableIMEPersonalizedLearning: enableIMEPersonalizedLearning,
       mouseCursor: mouseCursor,
-    ));
+    );
   }
 
   @override
@@ -345,72 +493,64 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
+  @override
   Widget radio({
-    Widget? child,
-    NeumorphicRadioStyle style = const NeumorphicRadioStyle(),
-    Object? value,
-    Curve curve = NeumorphicTheme.defaultCurve,
-    Duration duration = NeumorphicTheme.defaultDuration,
-    EdgeInsets padding = EdgeInsets.zero,
-    Object? groupValue,
-    void Function(Object?)? onChanged,
-    bool isEnabled = true,
+    Key? key,
+    required dynamic value,
+    required dynamic groupValue,
+    required void Function(dynamic)? onChanged,
+    MouseCursor? mouseCursor,
+    bool toggleable = false,
+    Color? activeColor,
+    WidgetStateProperty<Color?>? fillColor,
+    Color? focusColor,
+    Color? hoverColor,
+    WidgetStateProperty<Color?>? overlayColor,
+    double? splashRadius,
+    MaterialTapTargetSize? materialTapTargetSize,
+    VisualDensity? visualDensity,
+    FocusNode? focusNode,
+    bool autofocus = false,
   }) {
     return NeumorphicRadio(
-      style: style,
+      style: NeumorphicRadioStyle(selectedColor: activeColor),
       onChanged: onChanged,
       value: value,
-      curve: curve,
-      duration: duration,
-      padding: padding,
       groupValue: groupValue,
-      isEnabled: isEnabled,
-      child: child,
     );
   }
 
+  @override
   Widget checkbox({
-    NeumorphicCheckboxStyle style = const NeumorphicCheckboxStyle(),
-    required bool value,
-    required void Function(bool) onChanged,
-    Curve curve = NeumorphicTheme.defaultCurve,
-    Duration duration = NeumorphicTheme.defaultDuration,
-    EdgeInsets padding =
-        const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-    EdgeInsets margin = const EdgeInsets.all(0),
-    bool isEnabled = true,
+    Key? key,
+    required bool? value,
+    bool tristate = false,
+    required void Function(bool?)? onChanged,
+    MouseCursor? mouseCursor,
+    Color? activeColor,
+    WidgetStateProperty<Color?>? fillColor,
+    Color? checkColor,
+    Color? focusColor,
+    Color? hoverColor,
+    WidgetStateProperty<Color?>? overlayColor,
+    double? splashRadius,
+    MaterialTapTargetSize? materialTapTargetSize,
+    VisualDensity? visualDensity,
+    FocusNode? focusNode,
+    bool autofocus = false,
+    OutlinedBorder? shape,
+    BorderSide? side,
+    bool isError = false,
+    String? semanticLabel,
   }) {
     return NeumorphicCheckbox(
-        style: style,
-        onChanged: onChanged,
-        value: value,
-        curve: curve,
-        duration: duration,
-        padding: padding,
-        margin: margin,
-        isEnabled: isEnabled);
-  }
-
-  @override
-  Widget text(
-    String data, {
-    Key? key,
-    TextAlign? textAlign,
-    TextStyle? textStyle,
-    bool wrapWords = true,
-    TextOverflow? overflow,
-    Widget? overflowReplacement,
-    double? textScaleFactor,
-    int? maxLines,
-  }) {
-    return NeumorphicText(
-      data,
-      key: key,
-      duration: NeumorphicTheme.defaultDuration,
-      style: NeumorphicStyle(color: textStyle?.color),
-      curve: NeumorphicTheme.defaultCurve,
-      textAlign: textAlign,
-      textStyle: textStyle,
+      style: NeumorphicCheckboxStyle(
+        selectedColor: checkColor,
+      ),
+      onChanged: (value) {
+        onChanged!(value);
+      },
+      value: value ?? false,
     );
   }
 
@@ -439,249 +579,217 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
+  @override
   Widget switchButton({
-    NeumorphicSwitchStyle style = const NeumorphicSwitchStyle(),
     Key? key,
-    Curve curve = NeumorphicTheme.defaultCurve,
-    Duration duration = const Duration(milliseconds: 200),
-    bool value = false,
-    void Function(bool)? onChanged,
-    double height = 40,
-    bool isEnabled = true,
+    required bool value,
+    required void Function(bool)? onChanged,
+    Color? activeColor,
+    Color? activeTrackColor,
+    Color? inactiveThumbColor,
+    Color? inactiveTrackColor,
+    ImageProvider<Object>? activeThumbImage,
+    void Function(Object, StackTrace?)? onActiveThumbImageError,
+    ImageProvider<Object>? inactiveThumbImage,
+    void Function(Object, StackTrace?)? onInactiveThumbImageError,
+    WidgetStateProperty<Color?>? thumbColor,
+    WidgetStateProperty<Color?>? trackColor,
+    WidgetStateProperty<Color?>? trackOutlineColor,
+    WidgetStateProperty<double?>? trackOutlineWidth,
+    WidgetStateProperty<Icon?>? thumbIcon,
+    MaterialTapTargetSize? materialTapTargetSize,
+    DragStartBehavior dragStartBehavior = DragStartBehavior.start,
+    MouseCursor? mouseCursor,
+    Color? focusColor,
+    Color? hoverColor,
+    WidgetStateProperty<Color?>? overlayColor,
+    double? splashRadius,
+    FocusNode? focusNode,
+    void Function(bool)? onFocusChange,
+    bool autofocus = false,
   }) {
     return NeumorphicSwitch(
-        key: key,
-        duration: duration,
-        style: style,
-        curve: curve,
-        value: value,
-        onChanged: onChanged,
-        height: height,
-        isEnabled: isEnabled);
+      key: key,
+      style: NeumorphicSwitchStyle(
+        activeTrackColor: activeTrackColor,
+        inactiveTrackColor: inactiveTrackColor,
+        inactiveThumbColor: inactiveThumbColor,
+      ),
+      value: value,
+      onChanged: onChanged,
+    );
   }
 
+  @override
   Widget toggle({
-    NeumorphicToggleStyle? style = const NeumorphicToggleStyle(),
     Key? key,
-    required List<ToggleElement> children,
-    required Widget thumb,
-    EdgeInsets padding = const EdgeInsets.all(4),
-    Duration duration = const Duration(milliseconds: 200),
-    int selectedIndex = 0,
-    Curve alphaAnimationCurve = Curves.linear,
-    Curve movingCurve = Curves.linear,
-    dynamic Function(int)? onAnimationChangedFinished,
-    void Function(int)? onChanged,
-    double height = 40,
-    double? width,
-    bool isEnabled = true,
-    bool displayForegroundOnlyIfSelected = true,
+    required List children,
+    required List isSelected,
+    void Function(int)? onPressed,
+    MouseCursor? mouseCursor,
+    MaterialTapTargetSize? tapTargetSize,
+    TextStyle? textStyle,
+    BoxConstraints? constraints,
+    Color? color,
+    Color? selectedColor,
+    Color? disabledColor,
+    Color? fillColor,
+    Color? focusColor,
+    Color? highlightColor,
+    Color? hoverColor,
+    Color? splashColor,
+    List? focusNodes,
+    bool renderBorder = true,
+    Color? borderColor,
+    Color? selectedBorderColor,
+    Color? disabledBorderColor,
+    BorderRadius? borderRadius,
+    double? borderWidth,
+    Axis direction = Axis.horizontal,
+    VerticalDirection verticalDirection = VerticalDirection.down,
   }) {
     return NeumorphicToggle(
       key: key,
-      duration: duration,
-      style: style,
-      thumb: thumb,
-      padding: padding,
-      onChanged: onChanged,
-      height: height,
-      width: width,
-      isEnabled: isEnabled,
-      selectedIndex: selectedIndex,
-      alphaAnimationCurve: alphaAnimationCurve,
-      movingCurve: movingCurve,
-      onAnimationChangedFinished: onAnimationChangedFinished,
-      displayForegroundOnlyIfSelected: displayForegroundOnlyIfSelected,
-      children: children,
+      style: NeumorphicToggleStyle(),
+      thumb: Container(),
+      children: [],
     );
   }
 
+  @override
   Widget slider({
     Key? key,
-    SliderStyle style = const SliderStyle(),
-    double min = 0,
-    double value = 0,
-    double max = 10,
-    double height = 15,
-    void Function(double)? onChanged,
+    required double value,
+    required void Function(double)? onChanged,
     void Function(double)? onChangeStart,
     void Function(double)? onChangeEnd,
-    Widget? thumb,
-    double? sliderHeight,
+    double min = 0.0,
+    double max = 1.0,
+    int? divisions,
+    String? label,
+    Color? activeColor,
+    Color? inactiveColor,
+    Color? thumbColor,
+    MouseCursor? mouseCursor,
+    String Function(double)? semanticFormatterCallback,
+    FocusNode? focusNode,
+    bool autofocus = false,
+    SliderInteraction? allowedInteraction,
   }) {
     return NeumorphicSlider(
       key: key,
-      style: style,
+      style: SliderStyle(accent: activeColor, variant: inactiveColor),
       min: min,
       value: value,
       max: max,
-      height: height,
       onChanged: onChanged,
       onChangeStart: onChangeStart,
       onChangeEnd: onChangeEnd,
-      thumb: thumb,
-      sliderHeight: sliderHeight,
     );
   }
 
+  @override
   Widget progress({
     Key? key,
-    double? percent,
-    double height = 10,
-    Duration duration = const Duration(milliseconds: 300),
-    ProgressStyle style = const ProgressStyle(),
-    Curve curve = Curves.easeOutCubic,
+    double? value,
+    Color? backgroundColor,
+    Color? color,
+    Animation<Color?>? valueColor,
+    double? minHeight,
+    String? semanticsLabel,
+    String? semanticsValue,
+    BorderRadiusGeometry borderRadius = BorderRadius.zero,
   }) {
     return NeumorphicProgress(
       key: key,
-      duration: duration,
-      style: style,
-      curve: curve,
-      percent: percent,
-      height: height,
+      style: ProgressStyle(
+          accent: backgroundColor,
+          variant: color,
+          borderRadius: borderRadius.resolve(null)),
+      height: minHeight ?? 10,
     );
   }
 
-  Widget progressIndeterminate({
+  @override
+  Widget progressIndicator({
     Key? key,
-    double height = 10,
-    ProgressStyle style = const ProgressStyle(),
-    Duration duration = const Duration(seconds: 3),
-    bool reverse = false,
-    Curve curve = Curves.easeInOut,
+    double? value,
+    Color? backgroundColor,
+    Color? color,
+    Animation<Color?>? valueColor,
+    double? minHeight,
+    String? semanticsLabel,
+    String? semanticsValue,
+    BorderRadiusGeometry borderRadius = BorderRadius.zero,
   }) {
     return NeumorphicProgressIndeterminate(
       key: key,
-      duration: duration,
-      style: style,
-      curve: curve,
-      reverse: reverse,
-      height: height,
+      style: ProgressStyle(
+          accent: backgroundColor,
+          variant: color,
+          borderRadius: borderRadius.resolve(null)),
+      height: minHeight ?? 10,
     );
   }
 
-  @override
-  PreferredSizeWidget appBar({
+  ///下拉按钮
+  Widget dropdownButton({
     Key? key,
-    Widget? leading,
-    bool automaticallyImplyLeading = true,
-    Widget? title,
-    List<Widget>? actions,
-    Widget? flexibleSpace,
-    PreferredSizeWidget? bottom,
-    double? elevation,
-    double? scrolledUnderElevation,
-    bool Function(ScrollNotification) notificationPredicate =
-        defaultScrollNotificationPredicate,
-    Color? shadowColor,
-    Color? surfaceTintColor,
-    ShapeBorder? shape,
-    Color? backgroundColor,
-    Color? foregroundColor,
-    IconThemeData? iconTheme,
-    IconThemeData? actionsIconTheme,
-    bool primary = true,
-    bool? centerTitle,
-    bool excludeHeaderSemantics = false,
-    double? titleSpacing,
-    double toolbarOpacity = 1.0,
-    double bottomOpacity = 1.0,
-    double? toolbarHeight,
-    double? leadingWidth,
-    TextStyle? toolbarTextStyle,
-    TextStyle? titleTextStyle,
-    SystemUiOverlayStyle? systemOverlayStyle,
-    bool forceMaterialTransparency = false,
-    Clip? clipBehavior,
-  }) {
-    return NeumorphicAppBar(
-      key: key,
-      title: title,
-      iconTheme: iconTheme,
-      color: backgroundColor,
-      actions: actions,
-      textStyle: titleTextStyle,
-      leading: leading,
-      automaticallyImplyLeading: true,
-      centerTitle: centerTitle,
-      titleSpacing: NavigationToolbar.kMiddleSpacing,
-      actionSpacing: NeumorphicAppBar.defaultSpacing,
-      padding: 16,
-    );
-  }
-
-  @override
-  Widget bottomNavigationBar({
-    Key? key,
-    required List<BottomNavigationBarItem> items,
-    int currentIndex = 0,
-    Function(int p1)? onTap,
-    Color? selectedItemColor,
-    Color? unselectedItemColor,
-    double? selectedColorOpacity,
-  }) {
-    return Neumorphic(
-        margin: const EdgeInsets.all(8),
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeOutQuint,
-        child: BottomNavigationBar(
-          items: items,
-          currentIndex: currentIndex,
-          onTap: onTap,
-          selectedItemColor: selectedItemColor,
-          unselectedItemColor: unselectedItemColor,
-        ));
-  }
-
-  @override
-  Widget listTile({
-    Key? key,
-    Widget? leading,
-    Widget? title,
-    Widget? subtitle,
-    Widget? trailing,
-    bool isThreeLine = false,
-    bool? dense,
-    VisualDensity? visualDensity,
-    ShapeBorder? shape,
-    ListTileStyle? style,
-    Color? selectedColor,
-    Color? iconColor,
-    Color? textColor,
-    TextStyle? titleTextStyle,
-    TextStyle? subtitleTextStyle,
-    TextStyle? leadingAndTrailingTextStyle,
-    EdgeInsetsGeometry? contentPadding,
-    bool enabled = true,
+    required List<DropdownMenuItem<double>>? items,
+    List<Widget> Function(BuildContext)? selectedItemBuilder,
+    double? value,
+    Widget? hint,
+    Widget? disabledHint,
+    required void Function(double?)? onChanged,
     void Function()? onTap,
-    void Function()? onLongPress,
-    void Function(bool)? onFocusChange,
-    MouseCursor? mouseCursor,
-    bool selected = false,
+    int elevation = 8,
+    TextStyle? style,
+    Widget? underline,
+    Widget? icon,
+    Color? iconDisabledColor,
+    Color? iconEnabledColor,
+    double iconSize = 24.0,
+    bool isDense = false,
+    bool isExpanded = false,
+    double? itemHeight = kMinInteractiveDimension,
     Color? focusColor,
-    Color? hoverColor,
-    Color? splashColor,
     FocusNode? focusNode,
     bool autofocus = false,
-    Color? tileColor,
-    Color? selectedTileColor,
+    Color? dropdownColor,
+    double? menuMaxHeight,
     bool? enableFeedback,
-    double? horizontalTitleGap,
-    double? minVerticalPadding,
-    double? minLeadingWidth,
-    double? minTileHeight,
-    ListTileTitleAlignment? titleAlignment,
+    AlignmentGeometry alignment = AlignmentDirectional.centerStart,
+    BorderRadius? borderRadius,
+    EdgeInsetsGeometry? padding,
   }) {
-    return Neumorphic(
-        child: ListTile(
-      key: key,
-      leading: leading,
-      title: title,
-      subtitle: subtitle,
-      trailing: trailing,
-      onTap: onTap,
-    ));
+    return NeumorphicDropdownButton(
+        neumorphicStyle: NeumorphicStyle(color: iconEnabledColor),
+        borderRadius:
+            borderRadius ?? const BorderRadius.all(Radius.circular(8.0)),
+        icon: icon,
+        iconDisabledColor: iconDisabledColor,
+        iconEnabledColor: iconEnabledColor,
+        iconSize: iconSize,
+        isExpanded: isExpanded,
+        isDense: isDense,
+        focusNode: focusNode,
+        focusColor: focusColor,
+        dropdownColor: dropdownColor,
+        disabledHint: disabledHint,
+        value: value,
+        elevation: elevation,
+        autofocus: autofocus,
+        menuMaxHeight: menuMaxHeight,
+        enableFeedback: enableFeedback,
+        padding: padding?.resolve(null),
+        alignment: alignment,
+        itemHeight: itemHeight,
+        underline: underline,
+        hint: hint,
+        items: items,
+        onChanged: onChanged,
+        onTap: onTap,
+        selectedItemBuilder: selectedItemBuilder);
   }
 }
 
