@@ -38,6 +38,7 @@ class P2pLogin extends StatefulWidget {
       p2pSettingWidget,
       // myselfPeerViewWidget,
     ];
+    List<MyselfPeer> myselfPeers = myselfPeerController.data;
   }
 
   @override
