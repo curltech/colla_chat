@@ -68,7 +68,7 @@ dependencies:
   beamer: ^1.4.1+1
   battery_plus: ^6.0.0
   package_info_plus: ^8.0.0
-  flutter_contacts: ^1.1.6
+  flutter_contacts: ^1.1.8
   fluttercontactpicker: ^5.0.0
   #fast_contacts: ^3.0.3
   #flutter_nearby_connections: ^1.1.1  #ANDROID，IOS，目前不支持ios和android之间通信，而且gradle版本配置低，需要修改
