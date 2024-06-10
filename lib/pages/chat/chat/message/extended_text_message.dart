@@ -20,11 +20,11 @@ class ExtendedTextMessage extends StatelessWidget {
       this.fullScreen = false});
 
   Widget _buildMessageWidget(BuildContext context) {
-    return Padding(
+    return Container(
         padding: const EdgeInsets.all(5),
         child: ExtendedText(
-          key: UniqueKey(),
           content,
+          key: UniqueKey(),
           style: TextStyle(
             color: isMyself ? Colors.white : Colors.black,
             //fontSize: 16.0,
