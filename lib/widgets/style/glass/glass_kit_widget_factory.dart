@@ -183,29 +183,26 @@ class GlassKitWidgetFactory extends WidgetFactory {
     Widget? child,
     Clip clipBehavior = Clip.none,
   }) {
-    return LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-      return GlassContainer(
-        key: key,
-        height: constraints.maxHeight,
-        width: constraints.maxWidth,
-        alignment: alignment,
-        transform: transform,
-        transformAlignment: transformAlignment,
-        padding: padding,
-        margin: margin,
-        color: color,
-        gradient: defaultLinearGradient,
-        borderRadius: borderRadius,
-        borderGradient: defaultBorderGradient,
-        blur: blur,
-        isFrostedGlass: false,
-        shadowColor: Colors.black.withOpacity(0.20),
-        frostedOpacity: 0.12,
-        shape: BoxShape.rectangle,
-        child: child,
-      );
-    });
+    return GlassContainer(
+      key: key,
+      height: height,
+      width: width,
+      alignment: alignment,
+      transform: transform,
+      transformAlignment: transformAlignment,
+      padding: padding,
+      margin: margin,
+      color: color,
+      gradient: defaultLinearGradient,
+      borderRadius: borderRadius,
+      borderGradient: defaultBorderGradient,
+      blur: blur,
+      isFrostedGlass: false,
+      shadowColor: Colors.black.withOpacity(0.20),
+      frostedOpacity: 0.12,
+      shape: BoxShape.rectangle,
+      child: child,
+    );
   }
 
   _buildGlassWidget({required Widget child}) {
@@ -433,6 +430,7 @@ class GlassKitWidgetFactory extends WidgetFactory {
   }
 
   ///输入框
+  @override
   Widget textField({
     Key? key,
     TextEditingController? controller,
@@ -577,6 +575,7 @@ class GlassKitWidgetFactory extends WidgetFactory {
   }
 
   ///表格输入框
+  @override
   Widget textFormField({
     Key? key,
     TextEditingController? controller,
@@ -725,6 +724,7 @@ class GlassKitWidgetFactory extends WidgetFactory {
   }
 
   ///自适应表格输入框
+  @override
   Widget commonAutoSizeTextFormField({
     Key? key,
     Key? textFormFieldKey,
@@ -857,6 +857,7 @@ class GlassKitWidgetFactory extends WidgetFactory {
   }
 
   ///按钮
+  @override
   Widget button({
     Key? key,
     required void Function()? onPressed,
@@ -890,6 +891,7 @@ class GlassKitWidgetFactory extends WidgetFactory {
   }
 
   ///图标
+  @override
   icon(
     IconData icon, {
     Key? key,
@@ -922,6 +924,7 @@ class GlassKitWidgetFactory extends WidgetFactory {
   }
 
   ///单选
+  @override
   Widget radio({
     Key? key,
     required dynamic value,
@@ -962,6 +965,7 @@ class GlassKitWidgetFactory extends WidgetFactory {
   }
 
   ///复选
+  @override
   Widget checkbox({
     Key? key,
     required bool? value,
@@ -1010,6 +1014,7 @@ class GlassKitWidgetFactory extends WidgetFactory {
   }
 
   ///切换按钮
+  @override
   Widget switchButton({
     Key? key,
     required bool value,
@@ -1069,6 +1074,7 @@ class GlassKitWidgetFactory extends WidgetFactory {
     ));
   }
 
+  @override
   Widget toggle({
     Key? key,
     required List<Widget> children,
@@ -1099,7 +1105,6 @@ class GlassKitWidgetFactory extends WidgetFactory {
     return _buildGlassWidget(
         child: ToggleButtons(
       key: key,
-      children: children,
       isSelected: isSelected,
       onPressed: onPressed,
       mouseCursor: mouseCursor,
@@ -1123,9 +1128,11 @@ class GlassKitWidgetFactory extends WidgetFactory {
       borderWidth: borderWidth,
       direction: direction,
       verticalDirection: verticalDirection,
+      children: children,
     ));
   }
 
+  @override
   Widget slider({
     Key? key,
     required double value,
@@ -1167,6 +1174,7 @@ class GlassKitWidgetFactory extends WidgetFactory {
     ));
   }
 
+  @override
   Widget progress({
     Key? key,
     double? value,
@@ -1191,6 +1199,7 @@ class GlassKitWidgetFactory extends WidgetFactory {
             borderRadius: borderRadius));
   }
 
+  @override
   Widget progressIndicator({
     Key? key,
     double? value,
@@ -1216,6 +1225,7 @@ class GlassKitWidgetFactory extends WidgetFactory {
   }
 
   ///下拉按钮
+  @override
   Widget dropdownButton({
     Key? key,
     required List<DropdownMenuItem<double>>? items,

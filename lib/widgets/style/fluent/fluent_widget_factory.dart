@@ -1,11 +1,8 @@
 import 'dart:ui';
 
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/routers/routes.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/gestures.dart';
