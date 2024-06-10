@@ -376,7 +376,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   ///位置
   void _onActionLocation(BuildContext context) async {
-    Position? position = await GeolocatorUtil.currentPosition();
+    Position? position = await GeolocatorUtil.currentPosition(context);
     if (position == null) {
       return;
     }

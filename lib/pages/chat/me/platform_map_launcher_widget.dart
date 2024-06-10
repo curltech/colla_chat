@@ -49,7 +49,7 @@ class _PlatformMapLauncherWidgetState extends State<PlatformMapLauncherWidget> {
           ),
           subtitle: map.mapType.name,
           onTap: (int index, String title, {String? subtitle}) async {
-            Position? position = await GeolocatorUtil.currentPosition();
+            Position? position = await GeolocatorUtil.currentPosition(context);
             if (position != null) {
               GeolocatorUtil.showMarker(
                   map, Coords(position.latitude, position.longitude),
@@ -77,7 +77,7 @@ class _PlatformMapLauncherWidgetState extends State<PlatformMapLauncherWidget> {
           });
     }
     return FutureBuilder(
-        future: GeolocatorUtil.currentPosition(),
+        future: GeolocatorUtil.currentPosition(context),
         builder: (BuildContext context, AsyncSnapshot<Position?> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {

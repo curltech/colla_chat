@@ -77,7 +77,8 @@ class LocationPosition {
 
 class GeolocatorUtil {
   ///以下是基本的定位服务提供的功能，主要是经纬度的获取
-  static Future<LocationPermission> checkPermission() async {
+  static Future<LocationPermission> checkPermission(
+      BuildContext context) async {
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -87,25 +88,29 @@ class GeolocatorUtil {
     }
 
     permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return LocationPermission.denied;
+    if (permission == LocationPermission.deniedForever) {
+      bool? confirm = await DialogUtil.confirm(context,
+          content:
+              'The app has no location permission, do you want to set it?');
+      if (confirm != null && confirm) {
+        // await Geolocator.openAppSettings();
+        await Geolocator.openLocationSettings();
       }
     }
-
-    if (permission == LocationPermission.deniedForever) {
-      return permission;
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
     }
     return permission;
   }
 
-  static Future<Position?> currentPosition({
+  static Future<Position?> currentPosition(
+    BuildContext context, {
     LocationAccuracy desiredAccuracy = LocationAccuracy.bestForNavigation,
     bool forceAndroidLocationManager = false,
     Duration? timeLimit,
   }) async {
-    LocationPermission permission = await checkPermission();
+    LocationPermission permission = await checkPermission(context);
     if (permission == LocationPermission.always ||
         permission == LocationPermission.whileInUse) {
       return await Geolocator.getCurrentPosition(
@@ -116,9 +121,9 @@ class GeolocatorUtil {
     return null;
   }
 
-  static Future<Position?> lastKnownPosition(
+  static Future<Position?> lastKnownPosition(BuildContext context,
       {bool forceAndroidLocationManager = false}) async {
-    LocationPermission permission = await checkPermission();
+    LocationPermission permission = await checkPermission(context);
     if (permission == LocationPermission.always ||
         permission == LocationPermission.whileInUse) {
       return await Geolocator.getLastKnownPosition(
