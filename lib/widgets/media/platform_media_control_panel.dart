@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/audio/abstract_audio_player_controller.dart';
@@ -18,9 +19,9 @@ SliderThemeData buildSliderTheme(BuildContext context) {
       trackHeight: 2,
       //trackHeight：滑轨的高度
 
-      //activeTrackColor: Colors.blue,
+      activeTrackColor: myself.primary,
       //已滑过轨道的颜色
-      //inactiveTrackColor: Colors.greenAccent,
+      inactiveTrackColor: Colors.grey,
       //未滑过轨道的颜色
 
       //thumbColor: Colors.red,

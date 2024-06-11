@@ -45,6 +45,7 @@ class MediaKitMediaSource {
 class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
   late final Player player;
   late final VideoController videoController;
+
   // ValueNotifier<MeeduPlayerController?> meeduPlayerController =
   //     ValueNotifier<MeeduPlayerController?>(null);
 
@@ -137,8 +138,11 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
       player = Video(
         controller: videoController,
       );
-      // player = MeeduVideoPlayer(
-      //   controller: meeduPlayerController,
+
+      // player = MaterialVideoControlsTheme(
+      //   normal: const MaterialVideoControlsThemeData(),
+      //   fullscreen: const MaterialVideoControlsThemeData(),
+      //   child: player,
       // );
 
       Widget playerControlPanel = ValueListenableBuilder(
