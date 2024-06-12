@@ -44,53 +44,50 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
 
   @override
   void initState() {
-    widget.swiperController.addListener(_update);
     super.initState();
   }
 
-  _update() {
-    index.value = widget.swiperController.index;
-  }
-
   List<Widget>? _buildRightWidgets() {
-    List<Widget> children = [
-      ValueListenableBuilder(
-          valueListenable: index,
-          builder: (BuildContext context, int index, Widget? child) {
-            if (index == 0) {
-              return IconButton(
-                tooltip: AppLocalizations.t('Video player'),
-                onPressed: () async {
-                  await widget.swiperController.move(1);
-                  this.index.value = 1;
-                },
-                icon: const Icon(Icons.video_call),
-              );
-            } else {
-              return IconButton(
-                tooltip: AppLocalizations.t('Playlist'),
-                onPressed: () async {
-                  await widget.swiperController.move(0);
-                  this.index.value = 0;
-                },
-                icon: const Icon(Icons.featured_play_list_outlined),
-              );
-            }
-          }),
-      const SizedBox(
-        width: 5.0,
-      )
-    ];
+    List<Widget> children = [];
+    Widget btn = ValueListenableBuilder(
+        valueListenable: index,
+        builder: (BuildContext context, int index, Widget? child) {
+          if (index == 0) {
+            // widget.mediaPlayerController
+            return IconButton(
+              tooltip: AppLocalizations.t('Video player'),
+              onPressed: () async {
+                await widget.swiperController.move(1);
+              },
+              icon: const Icon(Icons.video_call),
+            );
+          } else {
+            return IconButton(
+              tooltip: AppLocalizations.t('Playlist'),
+              onPressed: () async {
+                await widget.swiperController.move(0);
+              },
+              icon: const Icon(Icons.featured_play_list_outlined),
+            );
+          }
+        });
+    children.add(btn);
+    children.add(const SizedBox(
+      width: 5.0,
+    ));
+
     return children;
   }
 
   @override
   Widget build(BuildContext context) {
     PlatformMediaPlayer platformMediaPlayer = PlatformMediaPlayer(
-      showPlaylist: true,
-      mediaPlayerController: widget.mediaPlayerController,
-      swiperController: widget.swiperController,
-    );
+        showPlaylist: true,
+        mediaPlayerController: widget.mediaPlayerController,
+        swiperController: widget.swiperController,
+        onIndexChanged: (int index) {
+          this.index.value = index;
+        });
     List<Widget>? rightWidgets = _buildRightWidgets();
 
     return AppBarView(
@@ -104,7 +101,6 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
   @override
   void dispose() {
     widget.mediaPlayerController.close();
-    widget.swiperController.removeListener(_update);
     super.dispose();
   }
 }

@@ -58,6 +58,8 @@ class PlatformMediaPlayer extends StatefulWidget {
 }
 
 class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
+  int index = 0;
+
   @override
   void initState() {
     super.initState();
@@ -76,10 +78,10 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
     if (widget.showPlaylist && widget.swiperController != null) {
       mediaView = Swiper(
         itemCount: 2,
-        index: widget.swiperController?.index,
+        index: index,
         controller: widget.swiperController,
         onIndexChanged: (int index) {
-          widget.swiperController?.index = index;
+          this.index = index;
           if (widget.onIndexChanged != null) {
             widget.onIndexChanged!(index);
           }

@@ -194,10 +194,11 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
   }
 
   ///选择文件加入播放列表
-  _addMediaSource() async {
+  _addMediaSource({bool directory = false}) async {
     try {
-      List<PlatformMediaSource> mediaSources =
-          await widget.mediaPlayerController.sourceFilePicker();
+      List<PlatformMediaSource> mediaSources = await widget
+          .mediaPlayerController
+          .sourceFilePicker(directory: directory);
     } catch (e) {
       if (mounted) {
         DialogUtil.error(context, content: 'add media file failure:$e');
@@ -249,6 +250,17 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
   Widget _buildPlaylistButton(BuildContext context) {
     return ButtonBar(
       children: [
+        IconButton(
+          color: myself.primary,
+          icon: const Icon(
+            Icons.featured_play_list_outlined,
+            color: Colors.white,
+          ),
+          onPressed: () async {
+            _addMediaSource(directory: true);
+          },
+          tooltip: AppLocalizations.t('Add video directory'),
+        ),
         IconButton(
           color: myself.primary,
           icon: const Icon(

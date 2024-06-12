@@ -83,11 +83,13 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
   Widget build(BuildContext context) {
     List<Widget>? rightWidgets = _buildRightWidgets();
     PlatformMediaPlayer platformMediaPlayer = PlatformMediaPlayer(
-      key: UniqueKey(),
-      showPlaylist: true,
-      mediaPlayerController: widget.mediaPlayerController,
-      swiperController: widget.swiperController,
-    );
+        key: UniqueKey(),
+        showPlaylist: true,
+        mediaPlayerController: widget.mediaPlayerController,
+        swiperController: widget.swiperController,
+        onIndexChanged: (int index) {
+          this.index.value = index;
+        });
     return AppBarView(
       titleWidget: CommonAutoSizeText(AppLocalizations.t(widget.title),
           style: const TextStyle(fontSize: AppFontSize.mdFontSize)),

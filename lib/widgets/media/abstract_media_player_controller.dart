@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
@@ -314,6 +315,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
 
   Future<List<PlatformMediaSource>> sourceFilePicker({
     String? dialogTitle,
+    bool directory = false,
     String? initialDirectory,
     List<String>? allowedExtensions,
     dynamic Function(FilePickerStatus)? onFileLoading,
@@ -324,15 +326,40 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     bool lockParentWindow = false,
   }) async {
     List<PlatformMediaSource> mediaSources = [];
-    final xfiles = await FileUtil.pickFiles(
-        allowMultiple: allowMultiple,
-        type: fileType,
-        allowedExtensions: this.allowedExtensions);
-    if (xfiles.isNotEmpty) {
-      for (var xfile in xfiles) {
-        PlatformMediaSource? mediaSource = await add(filename: xfile.path);
-        if (mediaSource != null) {
-          mediaSources.add(mediaSource);
+    if (directory) {
+      String? path = await FileUtil.directoryPathPicker(
+          dialogTitle: dialogTitle, initialDirectory: initialDirectory);
+      if (path != null) {
+        Directory dir = Directory(path);
+        List<FileSystemEntity> entries = dir.listSync();
+        if (entries.isNotEmpty) {
+          for (FileSystemEntity entry in entries) {
+            String? extension = FileUtil.extension(entry.path);
+            if (extension == null) {
+              continue;
+            }
+            bool? contain = this.allowedExtensions?.contains(extension);
+            if (contain != null && contain) {
+              PlatformMediaSource? mediaSource =
+                  await add(filename: entry.path);
+              if (mediaSource != null) {
+                mediaSources.add(mediaSource);
+              }
+            }
+          }
+        }
+      }
+    } else {
+      final xfiles = await FileUtil.pickFiles(
+          allowMultiple: allowMultiple,
+          type: fileType,
+          allowedExtensions: this.allowedExtensions);
+      if (xfiles.isNotEmpty) {
+        for (var xfile in xfiles) {
+          PlatformMediaSource? mediaSource = await add(filename: xfile.path);
+          if (mediaSource != null) {
+            mediaSources.add(mediaSource);
+          }
         }
       }
     }

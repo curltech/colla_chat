@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:file_picker/file_picker.dart';
@@ -53,6 +54,7 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
   double speed = 1.0;
 
   ValueNotifier<bool> playing = ValueNotifier<bool>(false);
+  ValueNotifier<bool> hovering = ValueNotifier<bool>(false);
 
   MediaKitVideoPlayerController() {
     fileType = FileType.custom;
@@ -135,39 +137,54 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
     var currentMediaSource = this.currentMediaSource;
     Widget player;
     if (currentMediaSource != null) {
-      player = Video(
-        controller: videoController,
-      );
+      player = Material(
+          child: InkWell(
+              onHover: (bool hover) {
+                hovering.value = hover;
+              },
+              onDoubleTap: () {
+                if (playing.value) {
+                  pause();
+                } else {
+                  play();
+                }
+              },
+              child: Video(
+                controller: videoController,
+              )));
 
       // player = MaterialVideoControlsTheme(
-      //   normal: const MaterialVideoControlsThemeData(),
+      //   normal: MaterialVideoControlsThemeData(
+      //     seekBarColor: Colors.green,
+      //     seekBarPositionColor: Colors.blue,
+      //     seekBarBufferColor: Colors.yellow,
+      //   ),
       //   fullscreen: const MaterialVideoControlsThemeData(),
       //   child: player,
       // );
 
       Widget playerControlPanel = ValueListenableBuilder(
-          valueListenable: playing,
-          builder: (BuildContext context, bool playing, Widget? child) {
-            return Container(
-                alignment: Alignment.center,
-                child: IconButton(
-                    iconSize: AppIconSize.lgSize,
-                    color: Colors.white,
-                    onPressed: () {
-                      if (playing) {
-                        pause();
-                      } else {
-                        play();
-                      }
-                    },
-                    icon: playing
-                        ? const Icon(Icons.pause)
-                        : const Icon(Icons.play_arrow)));
+          valueListenable: hovering,
+          builder: (BuildContext context, bool hovering, Widget? child) {
+            if (hovering) {
+              return Container(
+                  alignment: Alignment.center,
+                  child: IconButton(
+                      iconSize: AppIconSize.lgSize,
+                      color: Colors.white,
+                      onPressed: () {
+                        next();
+                      },
+                      icon: hovering
+                          ? const Icon(Icons.pause)
+                          : const Icon(Icons.play_arrow)));
+            }
+            return Container();
           });
       player = Stack(
         children: [
           player,
-          playerControlPanel,
+          // playerControlPanel,
         ],
       );
     } else {
