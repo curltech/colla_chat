@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:file_picker/file_picker.dart';
@@ -151,16 +152,28 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
               },
               child: Video(
                 controller: videoController,
+                // controls: MaterialDesktopVideoControls,
               )));
 
       // player = MaterialVideoControlsTheme(
       //   normal: MaterialVideoControlsThemeData(
-      //     seekBarColor: Colors.green,
-      //     seekBarPositionColor: Colors.blue,
-      //     seekBarBufferColor: Colors.yellow,
-      //   ),
-      //   fullscreen: const MaterialVideoControlsThemeData(),
-      //   child: player,
+          // seekBarColor: myself.primary,
+          // seekBarPositionColor: myself.primary,
+          // seekBarBufferColor: Colors.grey,
+          // volumeGesture: true,
+          // brightnessGesture: true,
+          // primaryButtonBar: const [
+          //   Spacer(flex: 2),
+          //   MaterialSkipPreviousButton(),
+          //   Spacer(),
+          //   MaterialPlayOrPauseButton(iconSize: 48.0),
+          //   Spacer(),
+          //   MaterialSkipNextButton(),
+          //   Spacer(flex: 2)
+          // ],
+        // ),
+        // fullscreen: const MaterialVideoControlsThemeData(),
+        // child: player,
       // );
 
       Widget playerControlPanel = ValueListenableBuilder(
@@ -168,7 +181,7 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
           builder: (BuildContext context, bool hovering, Widget? child) {
             if (hovering) {
               return Container(
-                  alignment: Alignment.center,
+                  alignment: Alignment.centerRight,
                   child: IconButton(
                       iconSize: AppIconSize.lgSize,
                       color: Colors.white,
@@ -184,7 +197,7 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
       player = Stack(
         children: [
           player,
-          // playerControlPanel,
+          playerControlPanel,
         ],
       );
     } else {
