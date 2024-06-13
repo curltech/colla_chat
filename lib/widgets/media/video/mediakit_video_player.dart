@@ -197,7 +197,7 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
       player = Stack(
         children: [
           player,
-          playerControlPanel,
+          // playerControlPanel,
         ],
       );
     } else {
