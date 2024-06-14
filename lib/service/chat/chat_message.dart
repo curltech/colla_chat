@@ -892,7 +892,6 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     ChatMessageContentType? contentType = StringUtil.enumFromString(
         ChatMessageContentType.values, chatMessage.contentType);
 
-    String? thumbnail = chatMessage.thumbnail!;
     Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
     if (linkman != null) {
       ChatMessage? message = await buildChatMessage(
@@ -905,8 +904,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         receiverName: linkman.name,
         title: title,
         receiptType: chatMessage.receiptType,
-        thumbnail: thumbnail,
+        thumbnail: chatMessage.thumbnail,
       );
+      message.content = content;
       return await sendAndStore(message, cryptoOption: cryptoOption);
     } else {
       Group? group = await groupService.findCachedOneByPeerId(peerId);
@@ -921,8 +921,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           mimeType: chatMessage.mimeType,
           title: title,
           receiptType: chatMessage.receiptType,
-          thumbnail: thumbnail,
+          thumbnail: chatMessage.thumbnail,
         );
+        groupMessage.content = content;
         return await sendAndStore(groupMessage, cryptoOption: cryptoOption);
       }
     }

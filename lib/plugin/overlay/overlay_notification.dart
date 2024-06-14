@@ -146,7 +146,7 @@ class OverlayNotification extends StatefulWidget {
       this.title,
       this.description,
       this.icon,
-      this.background = Colors.white,
+      this.background,
       this.borderRadius,
       this.border,
       this.showProgressIndicator = true,
@@ -339,7 +339,7 @@ class OverlayNotification extends StatefulWidget {
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               if (title != null) ...[
                 title!,

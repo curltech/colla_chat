@@ -287,6 +287,7 @@ class MessageWidget {
                   if (selected != null) {
                     selects = selected;
                   }
+                  Navigator.pop(context, selected);
                 },
                 selected: const [],
               );
