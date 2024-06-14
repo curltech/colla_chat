@@ -906,7 +906,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         receiptType: chatMessage.receiptType,
         thumbnail: chatMessage.thumbnail,
       );
-      message.content = content;
+      if (content is String) {
+        message.content = content;
+      }
       return await sendAndStore(message, cryptoOption: cryptoOption);
     } else {
       Group? group = await groupService.findCachedOneByPeerId(peerId);
@@ -923,7 +925,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           receiptType: chatMessage.receiptType,
           thumbnail: chatMessage.thumbnail,
         );
-        groupMessage.content = content;
+        if (content is String) {
+          groupMessage.content = content;
+        }
         return await sendAndStore(groupMessage, cryptoOption: cryptoOption);
       }
     }

@@ -296,6 +296,7 @@ class MessageWidget {
         for (var selected in selects) {
           await chatMessageService.forward(chatMessage, selected);
         }
+        chatMessageController.notifyListeners();
         break;
       case 'Collect':
         chatMessageService.collect(chatMessage);
