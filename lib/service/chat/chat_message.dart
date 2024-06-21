@@ -909,7 +909,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       if (content is String) {
         message.content = content;
       }
-      return await sendAndStore(message, cryptoOption: cryptoOption);
+      return await sendAndStore(message, cryptoOption: CryptoOption.linkman);
     } else {
       Group? group = await groupService.findCachedOneByPeerId(peerId);
       if (group != null) {
@@ -928,7 +928,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         if (content is String) {
           groupMessage.content = content;
         }
-        return await sendAndStore(groupMessage, cryptoOption: cryptoOption);
+        return await sendAndStore(groupMessage,
+            cryptoOption: CryptoOption.group);
       }
     }
 
