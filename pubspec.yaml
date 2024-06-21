@@ -367,7 +367,7 @@ dependencies:
   flutter_native_splash: ^2.2.19
   system_tray: ^2.0.3
   tray_manager: ^0.2.0
-  livekit_client: ^2.1.6 #livekit sfu server flutter client
+  livekit_client: ^2.2.0 #livekit sfu server flutter client
   livekit_server_sdk: ^1.0.0
   langchain: ^0.7.1
   langchain_ollama: ^0.2.1+1
@@ -395,7 +395,7 @@ dependency_overrides:
   http: 1.2.0
   dart_webrtc: ^1.4.6+hotfix.1
   webrtc_interface: 1.2.0
-  flutter_webrtc: ^0.11.1
+  flutter_webrtc: ^0.10.8
   #flutter_callkit_incoming: ^2.0.1+2
   protobuf: ^3.1.0
   analyzer: ^6.5.0
