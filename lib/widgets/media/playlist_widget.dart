@@ -275,6 +275,17 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
         IconButton(
           color: myself.primary,
           icon: const Icon(
+            Icons.bookmark_remove,
+            color: Colors.white,
+          ),
+          onPressed: () async {
+            await widget.mediaPlayerController.clear();
+          },
+          tooltip: AppLocalizations.t('Remove all video file'),
+        ),
+        IconButton(
+          color: myself.primary,
+          icon: const Icon(
             Icons.playlist_remove,
             color: Colors.white, //myself.primary,
           ),

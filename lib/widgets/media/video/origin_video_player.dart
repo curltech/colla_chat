@@ -60,7 +60,7 @@ class OriginMediaSource {
 ///基于VideoPlayerControlPanel实现的媒体播放器
 class OriginVideoPlayerController extends AbstractMediaPlayerController {
   ValueNotifier<VideoPlayerController?> videoPlayerController =
-      ValueNotifier<VideoPlayerController?>(null);
+  ValueNotifier<VideoPlayerController?>(null);
 
   OriginVideoPlayerController() {
     fileType = FileType.custom;
@@ -98,10 +98,10 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   FlVideoPlayer _buildCupertinoControl(
-    VideoPlayerController videoPlayerController, {
-    bool showFullscreenButton = true,
-    bool showVolumeButton = true,
-  }) {
+      VideoPlayerController videoPlayerController, {
+        bool showFullscreenButton = true,
+        bool showVolumeButton = true,
+      }) {
     FlVideoPlayerController controller = FlVideoPlayerController(
         videoPlayerController: videoPlayerController,
         autoPlay: true,
@@ -146,11 +146,11 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   FlVideoPlayer _buildMaterialControl(
-    VideoPlayerController videoPlayerController, {
-    bool showClosedCaptionButton = true,
-    bool showFullscreenButton = true,
-    bool showVolumeButton = true,
-  }) {
+      VideoPlayerController videoPlayerController, {
+        bool showClosedCaptionButton = true,
+        bool showFullscreenButton = true,
+        bool showVolumeButton = true,
+      }) {
     bool isInitialized = videoPlayerController.value.isInitialized;
     FlVideoPlayerController controller = FlVideoPlayerController(
         videoPlayerController: videoPlayerController,
@@ -184,11 +184,11 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   JkVideoControlPanel _buildJkVideoControlPanel(
-    VideoPlayerController videoPlayerController, {
-    bool showClosedCaptionButton = true,
-    bool showFullscreenButton = true,
-    bool showVolumeButton = true,
-  }) {
+      VideoPlayerController videoPlayerController, {
+        bool showClosedCaptionButton = true,
+        bool showFullscreenButton = true,
+        bool showVolumeButton = true,
+      }) {
     return JkVideoControlPanel(
       key: key,
       videoPlayerController,
@@ -198,13 +198,13 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
       onPrevClicked: (currentIndex <= 0)
           ? null
           : () {
-              previous();
-            },
+        previous();
+      },
       onNextClicked: (currentIndex == -1 || currentIndex >= playlist.length - 1)
           ? null
           : () {
-              next();
-            },
+        next();
+      },
       onPlayEnded: next,
     );
   }
@@ -229,16 +229,17 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
           }
           return Center(
               child: CommonAutoSizeText(
-            AppLocalizations.t('Please select a media file'),
-            style: const TextStyle(color: Colors.white),
-          ));
+                AppLocalizations.t('Please select a media file'),
+                style: const TextStyle(color: Colors.white),
+              ));
         });
 
     return player;
   }
 
   @override
-  close() {
+  close() async {
+    await stop();
     if (videoPlayerController.value != null) {
       videoPlayerController.value!.dispose();
       videoPlayerController.value = null;
@@ -246,6 +247,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频
+  @override
   play() async {
     var controller = videoPlayerController.value;
     if (controller != null) {
@@ -253,6 +255,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     }
   }
 
+  @override
   pause() async {
     var controller = videoPlayerController.value;
     if (controller != null) {
@@ -260,6 +263,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     }
   }
 
+  @override
   resume() async {
     var controller = videoPlayerController.value;
     if (controller != null) {
@@ -267,6 +271,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     }
   }
 
+  @override
   stop() async {
     var controller = videoPlayerController.value;
     if (controller != null) {
@@ -325,4 +330,4 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
 }
 
 final OriginVideoPlayerController globalOriginVideoPlayerController =
-    OriginVideoPlayerController();
+OriginVideoPlayerController();

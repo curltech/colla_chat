@@ -367,7 +367,27 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     return mediaSources;
   }
 
-  close() {}
+  play() async {}
+
+  pause() async {}
+
+  resume() async {}
+
+  /// 停止播放
+  stop() async {}
+
+  /// 停止播放，关闭播放器
+  close() async {
+    await stop();
+  }
+
+  /// 停止播放，关闭播放器，清除播放器
+  @override
+  void dispose() {
+    close();
+    super.dispose();
+    clear();
+  }
 
   Widget buildMediaPlayer({
     Key? key,
@@ -378,11 +398,5 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
 
   String get progressText {
     return '${StringUtil.durationText(mediaPlayerState.position)}/${StringUtil.durationText(mediaPlayerState.duration)}';
-  }
-
-  @override
-  void dispose() {
-    close();
-    super.dispose();
   }
 }

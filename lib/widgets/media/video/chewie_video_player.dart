@@ -80,3 +80,6 @@ class ChewieVideoPlayerController extends OriginVideoPlayerController {
     return player;
   }
 }
+
+final ChewieVideoPlayerController globalChewieVideoPlayerController =
+    ChewieVideoPlayerController();

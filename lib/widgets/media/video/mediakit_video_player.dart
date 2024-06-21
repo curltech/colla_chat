@@ -107,8 +107,6 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
     });
     player.stream.pitch.listen((e) {});
     player.stream.buffering.listen((e) {});
-
-    // meeduPlayerController.value = MeeduPlayerController();
   }
 
   @override
@@ -157,23 +155,23 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
 
       // player = MaterialVideoControlsTheme(
       //   normal: MaterialVideoControlsThemeData(
-          // seekBarColor: myself.primary,
-          // seekBarPositionColor: myself.primary,
-          // seekBarBufferColor: Colors.grey,
-          // volumeGesture: true,
-          // brightnessGesture: true,
-          // primaryButtonBar: const [
-          //   Spacer(flex: 2),
-          //   MaterialSkipPreviousButton(),
-          //   Spacer(),
-          //   MaterialPlayOrPauseButton(iconSize: 48.0),
-          //   Spacer(),
-          //   MaterialSkipNextButton(),
-          //   Spacer(flex: 2)
-          // ],
-        // ),
-        // fullscreen: const MaterialVideoControlsThemeData(),
-        // child: player,
+      // seekBarColor: myself.primary,
+      // seekBarPositionColor: myself.primary,
+      // seekBarBufferColor: Colors.grey,
+      // volumeGesture: true,
+      // brightnessGesture: true,
+      // primaryButtonBar: const [
+      //   Spacer(flex: 2),
+      //   MaterialSkipPreviousButton(),
+      //   Spacer(),
+      //   MaterialPlayOrPauseButton(iconSize: 48.0),
+      //   Spacer(),
+      //   MaterialSkipNextButton(),
+      //   Spacer(flex: 2)
+      // ],
+      // ),
+      // fullscreen: const MaterialVideoControlsThemeData(),
+      // child: player,
       // );
 
       Widget playerControlPanel = ValueListenableBuilder(
@@ -211,25 +209,27 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  close() {
-    stop();
+  close() async {
+    await player.stop();
+    await player.dispose();
   }
 
+  @override
   ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频
   play() async {
     await player.play();
   }
-
+  @override
   pause() async {
     await player.pause();
   }
-
+  @override
   resume() async {
     await player.play();
   }
-
+  @override
   stop() async {
-    await player.pause();
+    await player.stop();
   }
 
   seek(Duration position, {int? index}) async {
