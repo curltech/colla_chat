@@ -254,7 +254,6 @@ class Websocket extends IWebSocket {
           reconnectTimer?.cancel();
           reconnectTimer = null;
           reconnectTimes = 0;
-          websocketPool.close(address);
           return;
         }
         reconnectTimes--;

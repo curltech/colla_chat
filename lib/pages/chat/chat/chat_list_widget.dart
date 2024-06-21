@@ -42,31 +42,6 @@ import 'package:colla_chat/widgets/webview/html_preview_widget.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 
-class ConnectivityController with ChangeNotifier {
-  late StreamSubscription<List<ConnectivityResult>> subscription;
-  List<ConnectivityResult> connectivityResult = [];
-
-  ConnectivityController() {
-    subscription =
-        ConnectivityUtil.onConnectivityChanged(_onConnectivityChanged);
-  }
-
-  _onConnectivityChanged(List<ConnectivityResult> result) {
-    if (result != connectivityResult) {
-      connectivityResult = result;
-      notifyListeners();
-    }
-  }
-
-  @override
-  void dispose() {
-    ConnectivityUtil.cancel(subscription);
-    super.dispose();
-  }
-}
-
-ConnectivityController connectivityController = ConnectivityController();
-
 ///好友的汇总控制器，每当消息汇总表的数据有变化时更新控制器
 class LinkmanChatSummaryController extends DataListController<ChatSummary> {
   Future<void> refresh() async {

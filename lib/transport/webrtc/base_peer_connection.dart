@@ -8,6 +8,7 @@ import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_end
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/message_slice.dart';
+import 'package:colla_chat/transport/websocket/universal_websocket.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:synchronized/synchronized.dart';
 
@@ -1666,10 +1667,16 @@ class BasePeerConnection {
   }
 
   Future<bool> _send(List<int> message) async {
+    if (!connectivityController.connected) {
+      logger.e('network connectivity disconnected');
+
+      return false;
+    }
     if (_peerConnection == null ||
         connectionState ==
             RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
       logger.e('PeerConnection closed');
+
       return false;
     }
     final dataChannel = this.dataChannel;

@@ -5,11 +5,46 @@ import 'package:colla_chat/p2p/chain/chainmessagehandler.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
+import 'package:colla_chat/tool/connectivity_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:websocket_universal/websocket_universal.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+
+class ConnectivityController with ChangeNotifier {
+  late StreamSubscription<List<ConnectivityResult>> subscription;
+  List<ConnectivityResult> connectivityResult = [];
+  bool connected = false;
+
+  ConnectivityController() {
+    subscription =
+        ConnectivityUtil.onConnectivityChanged(_onConnectivityChanged);
+  }
+
+  _onConnectivityChanged(List<ConnectivityResult> result) {
+    if (result != connectivityResult) {
+      connectivityResult = result;
+      if (ConnectivityUtil.getMainResult(
+              connectivityController.connectivityResult) !=
+          ConnectivityResult.none) {
+        connected = true;
+      } else {
+        connected = false;
+      }
+      notifyListeners();
+    }
+  }
+
+  @override
+  void dispose() {
+    ConnectivityUtil.cancel(subscription);
+    super.dispose();
+  }
+}
+
+ConnectivityController connectivityController = ConnectivityController();
 
 const String prefix = 'wss://';
 
@@ -65,7 +100,6 @@ class UniversalWebsocket extends IWebClient {
 
   Future<bool> connect() async {
     logger.i('connect websocket wss address:$address');
-    // await close();
     try {
       final IMessageProcessor<List<int>, List<int>> bytesSocketProcessor =
           SocketSimpleBytesProcessor();
@@ -87,7 +121,10 @@ class UniversalWebsocket extends IWebClient {
             if (messages.isNotEmpty) {
               for (var message in messages) {
                 if (_client != null) {
-                  _client!.sendMessage(message);
+                  bool success = _client!.sendMessage(message);
+                  if (!success) {
+                    logger.e('send pool messages error');
+                  }
                 }
               }
               messages.clear();
@@ -198,19 +235,22 @@ class UniversalWebsocket extends IWebClient {
   }
 
   FutureOr<bool> sendMsg(dynamic data) async {
-    if (_client != null && status == SocketStatus.connected) {
-      _client!.sendMessage(data);
-      return true;
-    } else {
-      logger.e('status is not connected，cached');
-      lock.synchronized(() {
-        messages.add(data);
-      });
-      if (status == null || status == SocketStatus.disconnected) {
-        connect();
+    if (connectivityController.connected) {
+      if (_client != null && status == SocketStatus.connected) {
+        bool success = _client!.sendMessage(data);
+        if (success) {
+          return true;
+        }
       }
-      return false;
     }
+    logger.e('status is not connected，cached');
+    lock.synchronized(() {
+      messages.add(data);
+    });
+    if (status == null || status == SocketStatus.disconnected) {
+      connect();
+    }
+    return false;
   }
 
   @override
@@ -266,7 +306,6 @@ class UniversalWebsocket extends IWebClient {
           reconnectTimer?.cancel();
           reconnectTimer = null;
           reconnectTimes = 0;
-          websocketPool.close(address);
           return;
         }
         reconnectTimes--;
@@ -326,8 +365,9 @@ class WebsocketPool {
         //如果已经关闭，从池中移除
         if (websocket.status == null ||
             websocket.status == SocketStatus.disconnected) {
-          websockets.remove(defaultAddress);
-          websocket = null;
+          await websocket.close();
+          await websocket.connect();
+          return _default;
         }
       }
       //如果不存在或者已经关闭，创建新的连接
@@ -389,8 +429,10 @@ class WebsocketPool {
       //如果已经关闭，从池中移除
       if (websocket.status == null ||
           websocket.status == SocketStatus.disconnected) {
-        websockets.remove(address);
-        websocket = null;
+        await websocket.close();
+        await websocket.connect();
+
+        return websocket;
       }
     }
     if (websocket == null) {
