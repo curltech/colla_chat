@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:file_picker/file_picker.dart';
@@ -60,7 +61,7 @@ class OriginMediaSource {
 ///基于VideoPlayerControlPanel实现的媒体播放器
 class OriginVideoPlayerController extends AbstractMediaPlayerController {
   ValueNotifier<VideoPlayerController?> videoPlayerController =
-  ValueNotifier<VideoPlayerController?>(null);
+      ValueNotifier<VideoPlayerController?>(null);
 
   OriginVideoPlayerController() {
     fileType = FileType.custom;
@@ -97,10 +98,10 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   FlVideoPlayer _buildCupertinoControl(
-      VideoPlayerController videoPlayerController, {
-        bool showFullscreenButton = true,
-        bool showVolumeButton = true,
-      }) {
+    VideoPlayerController videoPlayerController, {
+    bool showFullscreenButton = true,
+    bool showVolumeButton = true,
+  }) {
     FlVideoPlayerController controller = FlVideoPlayerController(
         videoPlayerController: videoPlayerController,
         autoPlay: true,
@@ -145,24 +146,26 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   FlVideoPlayer _buildMaterialControl(
-      VideoPlayerController videoPlayerController, {
-        bool showClosedCaptionButton = true,
-        bool showFullscreenButton = true,
-        bool showVolumeButton = true,
-      }) {
+    VideoPlayerController videoPlayerController, {
+    bool showClosedCaptionButton = true,
+    bool showFullscreenButton = true,
+    bool showVolumeButton = true,
+  }) {
     bool isInitialized = videoPlayerController.value.isInitialized;
     FlVideoPlayerController controller = FlVideoPlayerController(
         videoPlayerController: videoPlayerController,
         autoPlay: true,
         looping: true,
-        overlay: const IgnorePointer(
-            child: Center(
-                child: Text('overlay',
-                    style: TextStyle(color: Colors.lightBlue, fontSize: 20)))),
-        placeholder: const Center(
-            child: Text('placeholder',
-                style: TextStyle(color: Colors.red, fontSize: 20))),
+        // overlay: const IgnorePointer(
+        //     child: Center(
+        //         child: Text('overlay',
+        //             style: TextStyle(color: Colors.lightBlue, fontSize: 20)))),
+        placeholder: Center(
+            child: Text(AppLocalizations.t('Waiting'),
+                style: TextStyle(color: myself.primary, fontSize: 20))),
         controls: MaterialControls(
+            progressColors: FlVideoPlayerProgressColors(
+                played: myself.primary, buffered: Colors.grey),
             hideDuration: const Duration(seconds: 5),
             enablePlay: true,
             enableFullscreen: showFullscreenButton,
@@ -183,11 +186,11 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   JkVideoControlPanel _buildJkVideoControlPanel(
-      VideoPlayerController videoPlayerController, {
-        bool showClosedCaptionButton = true,
-        bool showFullscreenButton = true,
-        bool showVolumeButton = true,
-      }) {
+    VideoPlayerController videoPlayerController, {
+    bool showClosedCaptionButton = true,
+    bool showFullscreenButton = true,
+    bool showVolumeButton = true,
+  }) {
     return JkVideoControlPanel(
       key: key,
       videoPlayerController,
@@ -197,13 +200,13 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
       onPrevClicked: (currentIndex <= 0)
           ? null
           : () {
-        previous();
-      },
+              previous();
+            },
       onNextClicked: (currentIndex == -1 || currentIndex >= playlist.length - 1)
           ? null
           : () {
-        next();
-      },
+              next();
+            },
       onPlayEnded: next,
     );
   }
@@ -228,9 +231,9 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
           }
           return Center(
               child: CommonAutoSizeText(
-                AppLocalizations.t('Please select a media file'),
-                style: const TextStyle(color: Colors.white),
-              ));
+            AppLocalizations.t('Please select a media file'),
+            style: const TextStyle(color: Colors.white),
+          ));
         });
 
     return player;
@@ -329,4 +332,4 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
 }
 
 final OriginVideoPlayerController globalOriginVideoPlayerController =
-OriginVideoPlayerController();
+    OriginVideoPlayerController();
