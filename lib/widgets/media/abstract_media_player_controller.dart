@@ -379,6 +379,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   /// 停止播放，关闭播放器
   close() async {
     await stop();
+    clear();
   }
 
   /// 停止播放，关闭播放器，清除播放器
@@ -386,7 +387,6 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   void dispose() {
     close();
     super.dispose();
-    clear();
   }
 
   Widget buildMediaPlayer({

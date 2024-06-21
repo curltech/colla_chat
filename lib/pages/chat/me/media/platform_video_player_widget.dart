@@ -81,7 +81,7 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
       IconButton(
         tooltip: AppLocalizations.t('Close'),
         onPressed: () async {
-          widget.mediaPlayerController.dispose();
+          widget.mediaPlayerController.close();
         },
         icon: const Icon(Icons.close),
       ),
