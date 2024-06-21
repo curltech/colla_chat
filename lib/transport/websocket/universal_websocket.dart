@@ -4,6 +4,7 @@ import 'package:colla_chat/entity/dht/peerendpoint.dart';
 import 'package:colla_chat/p2p/chain/chainmessagehandler.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/connectivity_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -130,6 +131,7 @@ class UniversalWebsocket extends IWebClient {
               messages.clear();
             }
           });
+          chatMessageService.sendUnsent();
         }
       });
       if (logStreamSubscription != null) {
