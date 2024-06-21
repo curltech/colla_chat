@@ -395,7 +395,7 @@ dependency_overrides:
   http: 1.2.0
   dart_webrtc: ^1.4.6+hotfix.1
   webrtc_interface: 1.2.0
-  flutter_webrtc: ^0.10.8
+  flutter_webrtc: ^0.11.1
   #flutter_callkit_incoming: ^2.0.1+2
   protobuf: ^3.1.0
   analyzer: ^6.5.0
@@ -412,7 +412,7 @@ dependency_overrides:
   webview_win_floating: #2.0.0 #webView for
     git: https://github.com/jakky1/webview_win_floating.git
   #    desktop_webview_window: ^0.2.0
-  flutter_widget_from_html: ^0.14.11
+  flutter_widget_from_html: ^0.15.1
   sprintf: ^7.0.0
   flex_color_picker: ^3.5.0
   permission_handler: ^11.2.0
