@@ -150,7 +150,7 @@ class VideoUtil {
     String? videoFile,
     List<int>? data,
     int quality = 10,
-    int position = -1,
+    int position = 30,
   }) async {
     if (platformParams.windows) {
       final thumbnail =

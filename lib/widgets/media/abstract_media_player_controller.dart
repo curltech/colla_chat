@@ -276,9 +276,9 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     return mediaSources;
   }
 
+  /// 清除播放列表
   clear() async {
     playlist.clear();
-    await close();
     await setCurrentIndex(-1);
   }
 
@@ -376,7 +376,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   /// 停止播放
   stop() async {}
 
-  /// 停止播放，关闭播放器
+  /// 停止播放，关闭播放器，清除播放列表
   close() async {
     await stop();
     clear();

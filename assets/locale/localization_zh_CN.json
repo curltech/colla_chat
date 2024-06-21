@@ -710,5 +710,6 @@
   "anonymous": "匿名",
   "status": "状态",
   "No media stream": "没有媒体流",
-  "The app has no location permission, do you want to set it?": "应用没有定位权限，你想设置吗？"
+  "The app has no location permission, do you want to set it?": "应用没有定位权限，你想设置吗？",
+  "Toggle grid mode": "切换网格模式"
 }

@@ -111,8 +111,7 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   setCurrentIndex(int index) async {
-    if (index >= -1 && index < playlist.length && currentIndex != index) {
-      close();
+    if (index >= -1 && index < playlist.length) {
       await super.setCurrentIndex(index);
       notifyListeners();
       var currentMediaSource = this.currentMediaSource;
@@ -215,18 +214,22 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
+
   ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频
   play() async {
     await player.play();
   }
+
   @override
   pause() async {
     await player.pause();
   }
+
   @override
   resume() async {
     await player.play();
   }
+
   @override
   stop() async {
     await player.stop();

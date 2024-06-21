@@ -18,6 +18,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:material_neumorphic/material_neumorphic.dart';
 
 ///媒体文件播放列表
 class PlaylistWidget extends StatefulWidget {
@@ -33,6 +34,7 @@ class PlaylistWidget extends StatefulWidget {
 
 class _PlaylistWidgetState extends State<PlaylistWidget> {
   ValueNotifier<List<TileData>> tileData = ValueNotifier<List<TileData>>([]);
+  bool gridMode = false;
 
   @override
   void initState() {
@@ -119,7 +121,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           }
           int crossAxisCount = 3;
           List<Widget> thumbnails = [];
-          if (platformParams.mobile || platformParams.windows) {
+          if (gridMode) {
             for (var tile in tileData) {
               List<Widget> children = [];
               children.add(const Spacer());
@@ -176,6 +178,9 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                       child: thumbnails[index],
                       onTap: () {
                         widget.mediaPlayerController.setCurrentIndex(index);
+                        if (widget.onSelected != null) {
+                          widget.onSelected!(index, tileData[index].title);
+                        }
                       });
                 });
           } else {
@@ -250,6 +255,19 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
   Widget _buildPlaylistButton(BuildContext context) {
     return ButtonBar(
       children: [
+        IconButton(
+          color: myself.primary,
+          icon: Icon(
+            gridMode ? Icons.grid_on : Icons.list,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            setState(() {
+              gridMode = !gridMode;
+            });
+          },
+          tooltip: AppLocalizations.t('Toggle grid mode'),
+        ),
         IconButton(
           color: myself.primary,
           icon: const Icon(

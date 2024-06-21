@@ -82,8 +82,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   setCurrentIndex(int index) async {
-    if (index >= -1 && index < playlist.length && currentIndex != index) {
-      close();
+    if (index >= -1 && index < playlist.length) {
       await super.setCurrentIndex(index);
       notifyListeners();
       var currentMediaSource = this.currentMediaSource;
