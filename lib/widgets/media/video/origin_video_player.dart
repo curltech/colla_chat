@@ -239,7 +239,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   close() async {
-    await stop();
+    await super.close();
     if (videoPlayerController.value != null) {
       videoPlayerController.value!.dispose();
       videoPlayerController.value = null;
