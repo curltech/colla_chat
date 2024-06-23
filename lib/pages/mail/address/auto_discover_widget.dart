@@ -1,5 +1,5 @@
 import 'package:colla_chat/entity/mail/email_address.dart';
-import 'package:colla_chat/pages/chat/mail/address/email_service_provider.dart';
+import 'package:colla_chat/pages/mail/address/email_service_provider.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';

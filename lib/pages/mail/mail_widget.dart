@@ -1,11 +1,11 @@
 import 'package:colla_chat/entity/mail/email_address.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/mail/address/email_service_provider.dart';
-import 'package:colla_chat/pages/chat/mail/mail_mime_message_controller.dart';
-import 'package:colla_chat/pages/chat/mail/mail_address_widget.dart';
-import 'package:colla_chat/pages/chat/mail/mail_content_widget.dart';
-import 'package:colla_chat/pages/chat/mail/mail_list_widget.dart';
-import 'package:colla_chat/pages/chat/mail/new_mail_widget.dart';
+import 'package:colla_chat/pages/mail/address/email_service_provider.dart';
+import 'package:colla_chat/pages/mail/mail_mime_message_controller.dart';
+import 'package:colla_chat/pages/mail/mail_address_widget.dart';
+import 'package:colla_chat/pages/mail/mail_content_widget.dart';
+import 'package:colla_chat/pages/mail/mail_list_widget.dart';
+import 'package:colla_chat/pages/mail/new_mail_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';

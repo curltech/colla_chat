@@ -2,8 +2,8 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/mail/full_screen_attachment_widget.dart';
-import 'package:colla_chat/pages/chat/mail/mail_mime_message_controller.dart';
+import 'package:colla_chat/pages/mail/full_screen_attachment_widget.dart';
+import 'package:colla_chat/pages/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';

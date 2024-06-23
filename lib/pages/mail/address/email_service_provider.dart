@@ -1,4 +1,4 @@
-import 'package:colla_chat/pages/chat/mail/address/oauth.dart';
+import 'package:colla_chat/pages/mail/address/oauth.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:enough_mail/discover.dart';
 import 'package:flutter/material.dart';
