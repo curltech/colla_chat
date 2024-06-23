@@ -1,5 +1,5 @@
 import 'package:colla_chat/crypto/util.dart';
-import 'package:colla_chat/entity/chat/emailaddress.dart';
+import 'package:colla_chat/entity/mail/email_address.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';

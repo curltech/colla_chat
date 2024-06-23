@@ -8,7 +8,7 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/mail/emailaddress.dart';
+import 'package:colla_chat/service/mail/email_address.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -116,7 +116,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
             List<int>? data = await emailAddressService.decrypt(
                 CryptoUtil.stringToUtf8(text),
                 payloadKey: decryptedMimeMessage.payloadKey);
-            text = CryptoUtil.utf8ToString(data);
+            text = CryptoUtil.utf8ToString(data!);
                     } catch (e) {
             logger.e('filename:$filename decrypt failure:$e');
           }

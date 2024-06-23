@@ -2,14 +2,14 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
-import 'package:colla_chat/entity/chat/emailaddress.dart';
+import 'package:colla_chat/entity/mail/email_address.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/mail/emailaddress.dart';
+import 'package:colla_chat/service/mail/email_address.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -263,7 +263,7 @@ class _NewMailWidgetState extends State<NewMailWidget> {
     if (needEncrypt) {
       PlatformEncryptData? encryptedSubject = await emailAddressService.encrypt(
           CryptoUtil.stringToUtf8(subjectController.text), receipts.value);
-      String subject = CryptoUtil.encodeBase64(encryptedSubject.data);
+      String subject = CryptoUtil.encodeBase64(encryptedSubject!.data);
       //加前后缀表示加密
 
       secretKey = encryptedSubject.secretKey;
@@ -285,8 +285,8 @@ class _NewMailWidgetState extends State<NewMailWidget> {
         PlatformEncryptData? encryptedHtml = await emailAddressService.encrypt(
             CryptoUtil.stringToUtf8(html), receipts.value,
             secretKey: secretKey);
-        builder.addText(CryptoUtil.encodeBase64(encryptedHtml.data));
-            } else {
+        builder.addText(CryptoUtil.encodeBase64(encryptedHtml!.data));
+      } else {
         builder.addTextHtml(html);
       }
     }
@@ -301,10 +301,10 @@ class _NewMailWidgetState extends State<NewMailWidget> {
         if (needEncrypt) {
           PlatformEncryptData? encryptedAttachment = await emailAddressService
               .encrypt(bytes, receipts.value, secretKey: secretKey);
-          builder.addBinary(Uint8List.fromList(encryptedAttachment.data),
+          builder.addBinary(Uint8List.fromList(encryptedAttachment!.data),
               MediaType.guessFromFileName(filename),
               filename: filename);
-                } else {
+        } else {
           builder.addBinary(bytes, MediaType.guessFromFileName(filename));
         }
       }

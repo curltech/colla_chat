@@ -1,4 +1,4 @@
-import 'package:colla_chat/entity/chat/emailaddress.dart';
+import 'package:colla_chat/entity/mail/email_address.dart';
 import 'package:colla_chat/entity/dht/peerendpoint.dart';
 
 /// 配置文件的定位器

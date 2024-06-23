@@ -1,4 +1,4 @@
-import 'package:colla_chat/entity/chat/emailaddress.dart';
+import 'package:colla_chat/entity/mail/email_address.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/mail/address/email_service_provider.dart';
 import 'package:colla_chat/pages/chat/mail/mail_mime_message_controller.dart';

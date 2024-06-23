@@ -15,7 +15,7 @@ import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/mail/email_message.dart';
-import 'package:colla_chat/service/mail/emailaddress.dart';
+import 'package:colla_chat/service/mail/email_address.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/service/chat/peer_party.dart';
 import 'package:colla_chat/service/dht/chainapp.dart';
@@ -92,14 +92,16 @@ class ServiceLocator {
     var defaultPeerEndpoint = peerEndpointController.defaultPeerEndpoint;
     if (defaultPeerEndpoint != null) {
       logger.i(
-          'Default PeerEndpoint websocket address:${defaultPeerEndpoint.wsConnectAddress}');
+          'Default PeerEndpoint websocket address:${defaultPeerEndpoint
+              .wsConnectAddress}');
     }
     Map<String, dynamic>? autoLogin = await myselfPeerService.autoCredential();
     if (autoLogin != null) {
       appDataProvider.autoLogin = true;
       String? loginStatus = await myselfPeerService.autoLogin();
       logger.i(
-          'AutoLogin setting:${appDataProvider.autoLogin},AutoLogin status:$loginStatus');
+          'AutoLogin setting:${appDataProvider
+              .autoLogin},AutoLogin status:$loginStatus');
       return loginStatus == null ? true : false;
     } else {
       appDataProvider.autoLogin = false;
@@ -134,8 +136,7 @@ class ServiceLocator {
           field = key + ' TEXT';
         } else if (value is String) {
           field = key + ' TEXT';
-        } else if (value is List) {
-        } else {
+        } else if (value is List) {} else {
           field = key + ' CLOB';
         }
       } else {

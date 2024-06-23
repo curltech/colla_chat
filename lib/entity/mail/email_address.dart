@@ -1,4 +1,6 @@
-import '../base.dart';
+
+
+import 'package:colla_chat/entity/base.dart';
 
 /// 邮件地址
 class EmailAddress extends BaseEntity {
