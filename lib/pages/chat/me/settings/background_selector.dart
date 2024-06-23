@@ -1,4 +1,4 @@
-import 'package:colla_chat/pages/chat/login/loading.dart';
+import 'package:colla_chat/pages/login/loading.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
 

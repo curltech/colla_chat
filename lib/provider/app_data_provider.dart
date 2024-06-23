@@ -1,4 +1,4 @@
-import 'package:colla_chat/pages/chat/index/platform_breakpoint.dart';
+import 'package:colla_chat/pages/index/platform_breakpoint.dart';
 import 'package:colla_chat/tool/locale_util.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';

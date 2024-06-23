@@ -1,5 +1,5 @@
-import 'package:colla_chat/pages/chat/index/index_view.dart';
-import 'package:colla_chat/pages/chat/login/p2p_login.dart';
+import 'package:colla_chat/pages/index/index_view.dart';
+import 'package:colla_chat/pages/login/p2p_login.dart';
 import 'package:colla_chat/pages/stock/login/remote_login.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';

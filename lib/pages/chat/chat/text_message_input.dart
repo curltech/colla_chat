@@ -8,7 +8,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/extended_text_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/message/message_widget.dart';
-import 'package:colla_chat/pages/chat/index/global_chat_message.dart';
+import 'package:colla_chat/pages/index/global_chat_message.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';

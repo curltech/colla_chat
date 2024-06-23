@@ -5,7 +5,7 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/index/global_chat_message.dart';
+import 'package:colla_chat/pages/index/global_chat_message.dart';
 import 'package:colla_chat/plugin/talker_logger.dart' as log;
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/conference.dart';

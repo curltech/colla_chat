@@ -13,11 +13,11 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/video_chat_widget.dart';
-import 'package:colla_chat/pages/chat/index/adaptive_layout_index.dart';
-import 'package:colla_chat/pages/chat/index/global_chat_message.dart';
-import 'package:colla_chat/pages/chat/index/global_webrtc_event.dart';
+import 'package:colla_chat/pages/index/adaptive_layout_index.dart';
+import 'package:colla_chat/pages/index/global_chat_message.dart';
+import 'package:colla_chat/pages/index/global_webrtc_event.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
-import 'package:colla_chat/pages/chat/login/loading.dart';
+import 'package:colla_chat/pages/login/loading.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/overlay/overlay_notification.dart';
 

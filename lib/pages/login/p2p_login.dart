@@ -1,10 +1,11 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/entity/dht/myselfpeer.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/login/loading.dart';
-import 'package:colla_chat/pages/chat/login/p2p_login_widget.dart';
-import 'package:colla_chat/pages/chat/login/p2p_register_widget.dart';
-import 'package:colla_chat/pages/chat/login/p2p_setting_widget.dart';
+import 'package:colla_chat/pages/login/loading.dart';
+import 'package:colla_chat/pages/login/p2p_login_widget.dart';
+import 'package:colla_chat/pages/login/p2p_register_widget.dart';
+import 'package:colla_chat/pages/login/p2p_setting_widget.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/myselfpeer/myself_peer_controller.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
@@ -12,8 +13,6 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-
-import '../me/settings/advanced/myselfpeer/myself_peer_controller.dart';
 
 /// 远程登录页面，一个Scaffold，IndexStack下的远程登录组件，注册组件和配置组件
 class P2pLogin extends StatefulWidget {
