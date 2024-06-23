@@ -9,7 +9,7 @@ import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/chat/emailaddress.dart';
+import 'package:colla_chat/service/mail/emailaddress.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -263,9 +263,6 @@ class _NewMailWidgetState extends State<NewMailWidget> {
     if (needEncrypt) {
       PlatformEncryptData? encryptedSubject = await emailAddressService.encrypt(
           CryptoUtil.stringToUtf8(subjectController.text), receipts.value);
-      if (encryptedSubject == null) {
-        return null;
-      }
       String subject = CryptoUtil.encodeBase64(encryptedSubject.data);
       //加前后缀表示加密
 
@@ -288,10 +285,8 @@ class _NewMailWidgetState extends State<NewMailWidget> {
         PlatformEncryptData? encryptedHtml = await emailAddressService.encrypt(
             CryptoUtil.stringToUtf8(html), receipts.value,
             secretKey: secretKey);
-        if (encryptedHtml != null) {
-          builder.addText(CryptoUtil.encodeBase64(encryptedHtml.data));
-        }
-      } else {
+        builder.addText(CryptoUtil.encodeBase64(encryptedHtml.data));
+            } else {
         builder.addTextHtml(html);
       }
     }
@@ -306,12 +301,10 @@ class _NewMailWidgetState extends State<NewMailWidget> {
         if (needEncrypt) {
           PlatformEncryptData? encryptedAttachment = await emailAddressService
               .encrypt(bytes, receipts.value, secretKey: secretKey);
-          if (encryptedAttachment != null) {
-            builder.addBinary(Uint8List.fromList(encryptedAttachment.data),
-                MediaType.guessFromFileName(filename),
-                filename: filename);
-          }
-        } else {
+          builder.addBinary(Uint8List.fromList(encryptedAttachment.data),
+              MediaType.guessFromFileName(filename),
+              filename: filename);
+                } else {
           builder.addBinary(bytes, MediaType.guessFromFileName(filename));
         }
       }

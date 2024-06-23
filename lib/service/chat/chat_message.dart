@@ -1234,7 +1234,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 }
 
-final chatMessageService = ChatMessageService(
+final ChatMessageService chatMessageService = ChatMessageService(
     tableName: "chat_message",
     indexFields: [
       'ownerPeerId',

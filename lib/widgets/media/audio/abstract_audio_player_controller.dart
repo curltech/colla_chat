@@ -14,12 +14,16 @@ abstract class AbstractAudioPlayerController
   bool _closedCaptionFile = false;
 
   ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频
+  @override
   play();
 
+  @override
   pause();
 
+  @override
   resume();
 
+  @override
   stop();
 
   seek(Duration position, {int? index});

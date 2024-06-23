@@ -4,7 +4,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/chat/emailaddress.dart';
+import 'package:colla_chat/service/mail/emailaddress.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
@@ -427,10 +427,8 @@ class MailMimeMessageController
           data = CryptoUtil.decodeBase64(subject);
           data = await emailAddressService.decrypt(data,
               payloadKey: decryptedData.payloadKey);
-          if (data != null) {
-            decryptedData.subject = CryptoUtil.utf8ToString(data);
-          }
-        } catch (e) {
+          decryptedData.subject = CryptoUtil.utf8ToString(data);
+                } catch (e) {
           logger.e('subject decrypt failure:$e');
         }
       }
@@ -442,10 +440,8 @@ class MailMimeMessageController
           data = CryptoUtil.decodeBase64(text);
           data = await emailAddressService.decrypt(data,
               payloadKey: decryptedData.payloadKey);
-          if (data != null) {
-            text = CryptoUtil.utf8ToString(data);
-          }
-          decryptedData.html = EmailMessageUtil.convertToMimeMessageHtml(text);
+          text = CryptoUtil.utf8ToString(data);
+                  decryptedData.html = EmailMessageUtil.convertToMimeMessageHtml(text);
         } catch (e) {
           logger.e('text decrypt failure:$e');
         }

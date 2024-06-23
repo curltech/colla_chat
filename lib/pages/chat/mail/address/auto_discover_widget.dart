@@ -3,7 +3,7 @@ import 'package:colla_chat/pages/chat/mail/address/email_service_provider.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/chat/emailaddress.dart';
+import 'package:colla_chat/service/mail/emailaddress.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
@@ -256,11 +256,9 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
           await DialogUtil.confirm(context, content: 'Save new mail address?');
       if (result != null && result) {
         EmailAddress? old = await emailAddressService.findByMailAddress(email);
-        if (old != null) {
-          emailAddress.id = old.id;
-          emailAddress.createDate = old.createDate;
-        }
-        emailAddress.name = name;
+        emailAddress.id = old.id;
+        emailAddress.createDate = old.createDate;
+              emailAddress.name = name;
         emailAddress.password = password;
 
         ///保存地址
