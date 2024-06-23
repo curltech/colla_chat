@@ -22,15 +22,19 @@ class AdaptiveLayoutIndex extends StatefulWidget {
       ChatListWidget(),
       LinkmanListWidget(),
       SubscribeChannelListWidget(),
-      MeWidget()
+      MeWidget(),
     ];
     bool emailSwitch = myself.peerProfile.emailSwitch;
     if (emailSwitch) {
-      views.add(MailWidget());
+      MailWidget mailWidget = MailWidget();
+      views.add(mailWidget);
+      indexWidgetProvider.define(mailWidget);
     }
     bool stockSwitch = myself.peerProfile.stockSwitch;
     if (stockSwitch) {
-      views.add(StockMainWidget());
+      StockMainWidget stockMainWidget = StockMainWidget();
+      views.add(stockMainWidget);
+      indexWidgetProvider.define(stockMainWidget);
     }
     indexWidgetProvider.initMainView(SwiperController(), views);
   }
