@@ -2,14 +2,14 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
-import 'package:colla_chat/entity/mail/email_address.dart';
+import 'package:colla_chat/entity/mail/mail_address.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/mail/email_address.dart';
+import 'package:colla_chat/service/mail/mail_address.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -21,7 +21,7 @@ import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/richtext/platform_editor_widget.dart';
-import 'package:enough_mail/highlevel.dart';
+import 'package:enough_mail/highlevel.dart' as enough_mail;
 import 'package:flutter/material.dart';
 import 'package:mimecon/mimecon.dart';
 
@@ -41,7 +41,7 @@ class PlatformAttachmentInfo {
   final int size;
 
   /// The media type
-  final MediaType mediaType;
+  final enough_mail.MediaType mediaType;
 }
 
 ///邮件内容子视图
@@ -119,7 +119,7 @@ class _NewMailWidgetState extends State<NewMailWidget> {
               File file = File(filename);
               int size = await file.length();
               PlatformAttachmentInfo info = PlatformAttachmentInfo(
-                  mediaType: MediaType.guessFromFileName(filename),
+                  mediaType: enough_mail.MediaType.guessFromFileName(filename),
                   filename: filename,
                   name: FileUtil.filename(filename),
                   size: size);
@@ -174,7 +174,7 @@ class _NewMailWidgetState extends State<NewMailWidget> {
               for (var attachmentInfo in attachmentInfos) {
                 String name = attachmentInfo.name;
                 int? size = attachmentInfo.size;
-                MediaType mediaType = attachmentInfo.mediaType;
+                enough_mail.MediaType mediaType = attachmentInfo.mediaType;
                 String? mimeType = FileUtil.mimeType(name);
                 Widget icon = Mimecon(
                   mimetype: mimeType!,
@@ -229,21 +229,21 @@ class _NewMailWidgetState extends State<NewMailWidget> {
   /// 发送前的准备，准备数据和地址，加密
   /// 发送到目标的peerId对应的linkman的邮件地址，加密采用对方的peerId进行加密
   /// 对方需要解密的话，需要绑定正确的邮件地址和登录peerId
-  Future<String?> _preSend(MessageBuilder builder,
+  Future<String?> _preSend(enough_mail.MessageBuilder builder,
       {bool needEncrypt = true}) async {
-    List<MailAddress> from = [];
-    MailAddress? sender;
-    EmailAddress? current = mailMimeMessageController.current;
+    List<enough_mail.MailAddress> from = [];
+    enough_mail.MailAddress? sender;
+    MailAddress? current = mailMimeMessageController.current;
     String? email;
     if (current != null) {
       email = current.email;
-      sender = MailAddress(null, email);
+      sender = enough_mail.MailAddress(null, email);
       from.add(sender);
     }
     builder.from = from;
     builder.sender = sender;
 
-    List<MailAddress> to = [];
+    List<enough_mail.MailAddress> to = [];
     List<String> peerIds = receipts.value;
     if (peerIds.isNotEmpty) {
       for (String peerId in peerIds) {
@@ -252,7 +252,7 @@ class _NewMailWidgetState extends State<NewMailWidget> {
           String name = linkman.name;
           String? email = linkman.email;
           if (email != null) {
-            to.add(MailAddress(null, email));
+            to.add(enough_mail.MailAddress(null, email));
           }
         }
       }
@@ -261,7 +261,7 @@ class _NewMailWidgetState extends State<NewMailWidget> {
 
     List<int>? secretKey;
     if (needEncrypt) {
-      PlatformEncryptData? encryptedSubject = await emailAddressService.encrypt(
+      PlatformEncryptData? encryptedSubject = await mailAddressService.encrypt(
           CryptoUtil.stringToUtf8(subjectController.text), receipts.value);
       String subject = CryptoUtil.encodeBase64(encryptedSubject!.data);
       //加前后缀表示加密
@@ -282,7 +282,7 @@ class _NewMailWidgetState extends State<NewMailWidget> {
     String? html = await platformEditorController.html;
     if (html != null) {
       if (needEncrypt) {
-        PlatformEncryptData? encryptedHtml = await emailAddressService.encrypt(
+        PlatformEncryptData? encryptedHtml = await mailAddressService.encrypt(
             CryptoUtil.stringToUtf8(html), receipts.value,
             secretKey: secretKey);
         builder.addText(CryptoUtil.encodeBase64(encryptedHtml!.data));
@@ -299,13 +299,14 @@ class _NewMailWidgetState extends State<NewMailWidget> {
         Uint8List bytes = file.readAsBytesSync();
 
         if (needEncrypt) {
-          PlatformEncryptData? encryptedAttachment = await emailAddressService
+          PlatformEncryptData? encryptedAttachment = await mailAddressService
               .encrypt(bytes, receipts.value, secretKey: secretKey);
           builder.addBinary(Uint8List.fromList(encryptedAttachment!.data),
-              MediaType.guessFromFileName(filename),
+              enough_mail.MediaType.guessFromFileName(filename),
               filename: filename);
         } else {
-          builder.addBinary(bytes, MediaType.guessFromFileName(filename));
+          builder.addBinary(
+              bytes, enough_mail.MediaType.guessFromFileName(filename));
         }
       }
     }
@@ -317,18 +318,19 @@ class _NewMailWidgetState extends State<NewMailWidget> {
     DialogUtil.loadingShow(context);
 
     ///邮件消息的构造器
-    MessageBuilder builder =
-        MessageBuilder.prepareMultipartAlternativeMessage();
+    enough_mail.MessageBuilder builder =
+        enough_mail.MessageBuilder.prepareMultipartAlternativeMessage();
     String? email = await _preSend(builder, needEncrypt: true);
     if (email != null) {
-      MimeMessage mimeMessage = builder.buildMimeMessage();
+      enough_mail.MimeMessage mimeMessage = builder.buildMimeMessage();
 
       EmailClient? emailClient = emailClientPool.get(email);
       if (emailClient != null) {
         bool success = false;
-        Mailbox? drafts = emailClient.getMailbox(MailboxFlag.drafts);
+        enough_mail.Mailbox? drafts =
+            emailClient.getMailbox(enough_mail.MailboxFlag.drafts);
         if (drafts != null) {
-          UidResponseCode? responseCode = await emailClient
+          enough_mail.UidResponseCode? responseCode = await emailClient
               .saveDraftMessage(mimeMessage, draftsMailbox: drafts);
           if (responseCode != null) {
             success = true;
@@ -355,11 +357,11 @@ class _NewMailWidgetState extends State<NewMailWidget> {
     DialogUtil.loadingShow(context);
 
     ///邮件消息的构造器
-    MessageBuilder builder =
-        MessageBuilder.prepareMultipartAlternativeMessage();
+    enough_mail.MessageBuilder builder =
+        enough_mail.MessageBuilder.prepareMultipartAlternativeMessage();
     String? email = await _preSend(builder, needEncrypt: true);
     if (email != null) {
-      MimeMessage mimeMessage = builder.buildMimeMessage();
+      enough_mail.MimeMessage mimeMessage = builder.buildMimeMessage();
 
       EmailClient? emailClient = emailClientPool.get(email);
       if (emailClient != null) {

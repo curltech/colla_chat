@@ -8,7 +8,7 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/mail/email_address.dart';
+import 'package:colla_chat/service/mail/mail_address.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -113,7 +113,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
       if (text != null) {
         if (decryptedMimeMessage.needDecrypt) {
           try {
-            List<int>? data = await emailAddressService.decrypt(
+            List<int>? data = await mailAddressService.decrypt(
                 CryptoUtil.stringToUtf8(text),
                 payloadKey: decryptedMimeMessage.payloadKey);
             text = CryptoUtil.utf8ToString(data!);
@@ -129,7 +129,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
       if (data != null) {
         if (decryptedMimeMessage.needDecrypt) {
           try {
-            data = await emailAddressService.decrypt(data,
+            data = await mailAddressService.decrypt(data,
                 payloadKey: decryptedMimeMessage.payloadKey);
           } catch (e) {
             logger.e('filename:$filename decrypt failure:$e');
@@ -148,7 +148,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     MimeMessage? mimeMessage = mailMimeMessageController.currentMimeMessage;
     if (mimeMessage != null) {
       try {
-        await mailMimeMessageController.fetchMessageContents();
+        await mailMimeMessageController.fetchMessageContents(mimeMessage);
         mimeMessage = mailMimeMessageController.currentMimeMessage;
       } catch (e) {
         logger.e('updateMimeMessageContent failure:$e');

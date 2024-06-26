@@ -1038,7 +1038,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
 
   /// 保存单条消息，对于复杂消息，存储附件
   /// 如果content为空，不用考虑附件，有可能title就是文件名
-  store(ChatMessage chatMessage,
+  Future<bool> store(ChatMessage chatMessage,
       {bool updateSummary = true, bool unreadNumber = false}) async {
     if (chatMessage.receiverPeerId == myself.peerId) {
       chatMessage.status = MessageStatus.sent.name;
@@ -1047,14 +1047,21 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String subMessageType = chatMessage.subMessageType;
     //signal消息暂时不保存
     if (subMessageType == ChatMessageSubType.signal.name) {
-      return;
+      return false;
     }
     int? id = chatMessage.id;
+    if (id != null) {
+      ChatMessage? old = await findOne(where: 'id=?', whereArgs: [id]);
+      if (old != null) {
+        logger.e('id: $id chat message exist');
+        return false;
+      }
+    }
+    String? messageId = chatMessage.messageId;
     String? content = chatMessage.content;
     String? title = chatMessage.title;
     String? contentType = chatMessage.contentType;
     String? mimeType = chatMessage.mimeType;
-    String? messageId;
     // 内容是否需要以附件形式保存
     bool attachment = false;
     if (content != null) {
@@ -1073,7 +1080,6 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         //保存的时候，设置内容为空
         chatMessage.content = null;
         attachment = true;
-        messageId = chatMessage.messageId;
       }
     }
 
@@ -1112,7 +1118,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     } catch (err) {
       logger.e(
           'chatMessage ${chatMessage.messageId} store fail,${err.toString()}');
+      return false;
     }
+
+    return true;
   }
 
   Future<int> remove(ChatMessage chatMessage) async {

@@ -1,5 +1,5 @@
 import 'package:colla_chat/crypto/util.dart';
-import 'package:colla_chat/entity/mail/email_address.dart';
+import 'package:colla_chat/entity/mail/mail_address.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
@@ -8,7 +8,7 @@ import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 
-class EmailAddressService extends GeneralBaseService<EmailAddress> {
+class EmailAddressService extends GeneralBaseService<MailAddress> {
   EmailAddressService({
     required super.tableName,
     required super.fields,
@@ -18,16 +18,16 @@ class EmailAddressService extends GeneralBaseService<EmailAddress> {
     ],
   }) {
     post = (Map map) {
-      return EmailAddress.fromJson(map);
+      return MailAddress.fromJson(map);
     };
   }
 
-  Future<List<EmailAddress>> findAllMailAddress() async {
+  Future<List<MailAddress>> findAllMailAddress() async {
     var mailAddress = await find();
     return mailAddress;
   }
 
-  Future<EmailAddress?> findByMailAddress(String email) async {
+  Future<MailAddress?> findByMailAddress(String email) async {
     var mailAddress = await findOne(
       where: 'email=?',
       whereArgs: [email],
@@ -35,8 +35,8 @@ class EmailAddressService extends GeneralBaseService<EmailAddress> {
     return mailAddress;
   }
 
-  store(EmailAddress mailAddress) async {
-    EmailAddress? old = await findByMailAddress(mailAddress.email);
+  store(MailAddress mailAddress) async {
+    MailAddress? old = await findByMailAddress(mailAddress.email);
     if (old != null) {
       mailAddress.id = old.id;
       await update(mailAddress);
@@ -166,7 +166,7 @@ class EmailAddressService extends GeneralBaseService<EmailAddress> {
   }
 }
 
-final emailAddressService = EmailAddressService(
+final EmailAddressService mailAddressService = EmailAddressService(
     tableName: "chat_mailaddress",
     indexFields: ['ownerPeerId', 'email', 'name'],
-    fields: ServiceLocator.buildFields(EmailAddress(name: '', email: '@'), []));
+    fields: ServiceLocator.buildFields(MailAddress(name: '', email: '@'), []));

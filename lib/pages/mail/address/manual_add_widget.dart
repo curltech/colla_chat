@@ -1,9 +1,9 @@
-import 'package:colla_chat/entity/mail/email_address.dart';
+import 'package:colla_chat/entity/mail/mail_address.dart';
 import 'package:colla_chat/pages/mail/address/email_service_provider.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/mail/email_address.dart';
+import 'package:colla_chat/service/mail/mail_address.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
@@ -11,7 +11,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
-import 'package:enough_mail/enough_mail.dart';
+import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:flutter/material.dart';
 
 /// 邮件地址手工注册组件，录入框和按钮组合
@@ -201,38 +201,39 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
       }
       String? displayName = domain;
       String? displayShortName = name;
-      ServerConfig imapServerConfig = ServerConfig(
-        type: ServerType.imap,
+      enough_mail.ServerConfig imapServerConfig = enough_mail.ServerConfig(
+        type: enough_mail.ServerType.imap,
         hostname: imapServerHost,
         port: int.parse(imapServerPort!),
-        socketType: SocketType.ssl,
-        authentication: Authentication.plain,
-        usernameType: UsernameType.emailAddress,
+        socketType: enough_mail.SocketType.ssl,
+        authentication: enough_mail.Authentication.plain,
+        usernameType: enough_mail.UsernameType.emailAddress,
       );
       String popServerHost = values['popServerHost']!;
       String? popServerPort = values['popServerPort'];
-      ServerConfig? popServerConfig;
+      enough_mail.ServerConfig? popServerConfig;
       if (StringUtil.isNotEmpty(popServerHost) ||
           StringUtil.isNotEmpty(popServerPort)) {
-        popServerConfig = ServerConfig(
-          type: ServerType.pop,
+        popServerConfig = enough_mail.ServerConfig(
+          type: enough_mail.ServerType.pop,
           hostname: popServerHost,
           port: int.parse(popServerPort!),
-          socketType: SocketType.ssl,
-          authentication: Authentication.plain,
-          usernameType: UsernameType.emailAddress,
+          socketType: enough_mail.SocketType.ssl,
+          authentication: enough_mail.Authentication.plain,
+          usernameType: enough_mail.UsernameType.emailAddress,
         );
       }
-      ServerConfig smtpServerConfig = ServerConfig(
-        type: ServerType.smtp,
+      enough_mail.ServerConfig smtpServerConfig = enough_mail.ServerConfig(
+        type: enough_mail.ServerType.smtp,
         hostname: smtpServerHost,
         port: int.parse(smtpServerPort!),
-        socketType: SocketType.ssl,
-        authentication: Authentication.plain,
-        usernameType: UsernameType.emailAddress,
+        socketType: enough_mail.SocketType.ssl,
+        authentication: enough_mail.Authentication.plain,
+        usernameType: enough_mail.UsernameType.emailAddress,
       );
-      ClientConfig clientConfig = ClientConfig();
-      ConfigEmailProvider configEmailProvider = ConfigEmailProvider(
+      enough_mail.ClientConfig clientConfig = enough_mail.ClientConfig();
+      enough_mail.ConfigEmailProvider configEmailProvider =
+          enough_mail.ConfigEmailProvider(
         displayName: displayName,
         displayShortName: displayShortName,
       );
@@ -247,7 +248,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
           EmailServiceProvider(domain, imapServerHost, clientConfig);
     }
 
-    EmailAddress emailAddress = EmailMessageUtil.buildDiscoverEmailAddress(
+    MailAddress emailAddress = EmailMessageUtil.buildDiscoverEmailAddress(
         email, name!, emailServiceProvider!.clientConfig);
     DialogUtil.loadingShow(context,
         tip: 'Manual connecting email server,\n please waiting...');
@@ -272,14 +273,14 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
       bool? result =
           await DialogUtil.confirm(context, content: 'Save new mail address?');
       if (result != null && result) {
-        EmailAddress? old = await emailAddressService.findByMailAddress(email);
+        MailAddress? old = await mailAddressService.findByMailAddress(email);
         emailAddress.id = old?.id;
         emailAddress.createDate = old?.createDate;
         emailAddress.name = name;
         emailAddress.password = password;
 
         ///保存地址
-        await emailAddressService.store(emailAddress);
+        await mailAddressService.store(emailAddress);
       }
     }
   }

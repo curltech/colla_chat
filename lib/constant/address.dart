@@ -1,5 +1,5 @@
-import 'package:colla_chat/entity/mail/email_address.dart';
 import 'package:colla_chat/entity/dht/peerendpoint.dart';
+import 'package:colla_chat/entity/mail/mail_address.dart';
 
 /// 配置文件的定位器
 final Map<String, PeerEndpoint> nodeAddressOptions = {
@@ -24,8 +24,8 @@ final Map<String, PeerEndpoint> nodeAddressOptions = {
 };
 
 /// 地址选择框的选项
-final Map<String, EmailAddress> emailAddressOptions = {
-  'hujs@colla.cc': EmailAddress(
+final Map<String, MailAddress> emailAddressOptions = {
+  'hujs@colla.cc': MailAddress(
     email: 'hujs@colla.cc',
     name: 'hujs',
     domain: 'colla.cc',
@@ -34,7 +34,7 @@ final Map<String, EmailAddress> emailAddressOptions = {
     popServerHost: 'pophz.qiye.163.com',
     smtpServerHost: 'smtphz.qiye.163.com',
   ),
-  'hujs@curltech.io': EmailAddress(
+  'hujs@curltech.io': MailAddress(
       email: 'hujs@curltech.io',
       name: 'hujs',
       domain: 'curltech.io',
@@ -42,7 +42,7 @@ final Map<String, EmailAddress> emailAddressOptions = {
       imapServerHost: 'imaphz.qiye.163.com',
       popServerHost: 'pophz.qiye.163.com',
       smtpServerHost: 'smtphz.qiye.163.com'),
-  '13609619603@163.com': EmailAddress(
+  '13609619603@163.com': MailAddress(
       email: '13609619603@163.com',
       name: 'hujs',
       domain: '163.com',
@@ -50,7 +50,7 @@ final Map<String, EmailAddress> emailAddressOptions = {
       imapServerHost: 'imap.163.com',
       popServerHost: 'pop.163.com',
       smtpServerHost: 'smtp.163.com'),
-  'hujs06@163.com': EmailAddress(
+  'hujs06@163.com': MailAddress(
       email: 'hujs06@163.com',
       name: 'hujs',
       domain: '163.com',

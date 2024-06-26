@@ -1,10 +1,10 @@
-import 'package:colla_chat/entity/mail/email_address.dart';
+import 'package:colla_chat/entity/mail/mail_address.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/mail/address/auto_discover_widget.dart';
 import 'package:colla_chat/pages/mail/address/manual_add_widget.dart';
 import 'package:colla_chat/pages/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/service/mail/email_address.dart';
+import 'package:colla_chat/service/mail/mail_address.dart';
 import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
@@ -27,8 +27,8 @@ class MailAddressWidget extends StatefulWidget {
 class _MailAddressWidgetState extends State<MailAddressWidget> {
   @override
   initState() {
-    mailMimeMessageController.addListener(_update);
     super.initState();
+    mailMimeMessageController.addListener(_update);
   }
 
   _update() {
@@ -37,14 +37,14 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
 
   _onTap(int index, String title, {String? subtitle, TileData? group}) {
     int i = 0;
-    for (EmailAddress emailAddress in mailMimeMessageController.data) {
+    for (MailAddress emailAddress in mailMimeMessageController.data) {
       if (emailAddress.email == group!.title) {
         mailMimeMessageController.currentIndex = i;
         break;
       }
       i++;
     }
-    mailMimeMessageController.currentMailboxName = title;
+    mailMimeMessageController.setCurrentMailbox(title);
   }
 
   Widget _buildMailAddressWidget(BuildContext context) {
@@ -60,7 +60,7 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
               onPressed: () {
                 int? id = mailAddress.id;
                 if (id != null) {
-                  emailAddressService.delete(where: 'id=?', whereArgs: [id]);
+                  mailAddressService.delete(where: 'id=?', whereArgs: [id]);
                   mailMimeMessageController.delete(index: i);
                 }
               },
@@ -69,22 +69,20 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
             ),
             selected: mailMimeMessageController.currentIndex == i);
         List<TileData> tiles = [];
-        List<enough_mail.Mailbox?>? mailboxes =
-            mailMimeMessageController.getMailboxes(mailAddress.email);
-        if (mailboxes != null && mailboxes.isNotEmpty) {
+        List<String>? mailboxNames =
+            mailMimeMessageController.getMailboxNames(mailAddress.email);
+        if (mailboxNames != null && mailboxNames.isNotEmpty) {
           String? currentMailboxName =
               mailMimeMessageController.currentMailboxName;
-          for (var mailbox in mailboxes) {
-            if (mailbox != null) {
-              Icon icon = Icon(
-                  mailMimeMessageController.findDirectoryIcon(mailbox.name));
-              TileData tile = TileData(
-                  title: mailbox.name,
-                  prefix: icon,
-                  selected: mailMimeMessageController.currentIndex == i &&
-                      currentMailboxName == mailbox.name);
-              tiles.add(tile);
-            }
+          for (var mailboxName in mailboxNames) {
+            Icon icon =
+                Icon(mailMimeMessageController.findDirectoryIcon(mailboxName));
+            TileData tile = TileData(
+                title: mailboxName,
+                prefix: icon,
+                selected: mailMimeMessageController.currentIndex == i &&
+                    currentMailboxName == mailboxName);
+            tiles.add(tile);
           }
         }
         mailAddressTileData[groupTile] = tiles;

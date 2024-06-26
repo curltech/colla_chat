@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:colla_chat/crypto/util.dart';
-import 'package:colla_chat/entity/mail/email_address.dart' as entity;
+import 'package:colla_chat/entity/mail/mail_address.dart' as entity;
+import 'package:colla_chat/entity/mail/mail_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/mail/email_address.dart';
+import 'package:colla_chat/service/mail/mail_address.dart';
+import 'package:colla_chat/service/mail/mail_message.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
@@ -28,12 +32,8 @@ class DecryptedMimeMessage {
 }
 
 /// 邮件地址控制器，每个地址有多个邮箱，每个邮箱包含多个邮件
-class MailMimeMessageController
-    extends DataListController<entity.EmailAddress> {
+class MailMimeMessageController extends DataListController<entity.MailAddress> {
   Lock lock = Lock();
-
-  ///缺省的邮件地址
-  entity.EmailAddress? defaultMailAddress;
 
   ///邮件地址，邮箱名称和邮箱的映射
   final Map<String, Map<String, enough_mail.Mailbox>> _addressMailboxes = {};
@@ -42,8 +42,13 @@ class MailMimeMessageController
   final Map<String, Map<String, List<enough_mail.MimeMessage>>>
       _addressMimeMessages = {};
 
-  ///当前的邮箱名称
-  String? _currentMailboxName;
+  ///缺省的邮件地址
+  entity.MailAddress? defaultMailAddress;
+
+  String? _currentMailboxName = 'INBOX';
+
+  ///当前的邮箱名称,
+  enough_mail.Mailbox? _currentMailbox;
 
   ///当前的邮件
   int _currentMailIndex = -1;
@@ -55,6 +60,7 @@ class MailMimeMessageController
     _addressMailboxes.clear();
     _addressMimeMessages.clear();
     _currentMailboxName = null;
+    _currentMailbox = null;
     return super.clear(notify: notify);
   }
 
@@ -89,122 +95,41 @@ class MailMimeMessageController
     return iconData ?? Icons.folder;
   }
 
-  ///以下是与邮件地址相关的部分
-  ///重新获取所有的邮件地址实体，对没有连接的进行连接，设置缺省邮件地址
-  connectAllMailAddress() async {
-    data = await emailAddressService.findAllMailAddress();
+  initAllMailAddress() async {
+    data = await mailAddressService.findAllMailAddress();
     if (data.isNotEmpty) {
       for (var emailAddress in data) {
         String email = emailAddress.email;
         if (!_addressMimeMessages.containsKey(email)) {
-          connectMailAddress(emailAddress).then((isConnected) {
-            if (isConnected) {
-              if (emailAddress.isDefault) {
-                defaultMailAddress = emailAddress;
-              }
+          Map<String, List<enough_mail.MimeMessage>> addressMimeMessages = {};
+          _addressMimeMessages[email] = addressMimeMessages;
+          for (var mailBoxeIcon in mailBoxeIcons.entries) {
+            String name = mailBoxeIcon.key;
+            if (!addressMimeMessages.containsKey(name)) {
+              addressMimeMessages[name] = <enough_mail.MimeMessage>[];
             }
-          });
+          }
         }
       }
-    }
-    if (data.isNotEmpty) {
       currentIndex = 0;
     } else {
       currentIndex = -1;
     }
   }
 
-  ///以下是与邮件邮箱相关的部分
-
-  ///当前邮箱名称
+  ///当前邮箱
   String? get currentMailboxName {
     return _currentMailboxName;
   }
 
-  ///设置当前邮箱名称
-  set currentMailboxName(String? currentMailboxName) {
-    if (_currentMailboxName != currentMailboxName) {
-      _currentMailboxName = currentMailboxName;
-      notifyListeners();
-    }
-  }
-
-  ///连接特定的邮件地址服务器，获取地址的所有的邮箱
-  Future<bool> connectMailAddress(entity.EmailAddress emailAddress,
-      {bool listen = true}) async {
-    var password = emailAddress.password;
-    if (password != null) {
-      EmailClient? emailClient =
-          await emailClientPool.create(emailAddress, password);
-      if (emailClient != null) {
-        List<enough_mail.Mailbox>? mailboxes =
-            await emailClient.listMailboxes();
-        if (mailboxes != null) {
-          _setMailboxes(emailAddress.email, mailboxes, listen: listen);
-
-          return true;
-        }
-      }
-    } else {
-      logger.e('email address:${emailAddress.email} password is empty');
-    }
-    return false;
-  }
-
-  ///获取邮件地址的邮箱
-  List<enough_mail.Mailbox>? getMailboxes(String email) {
-    Map<String, enough_mail.Mailbox>? mailboxMap = _addressMailboxes[email];
-    if (mailboxMap != null && mailboxMap.isNotEmpty) {
-      return mailboxMap.values.toList();
-    }
-    return null;
-  }
-
-  ///设置邮件地址的邮箱
-  _setMailboxes(String email, List<enough_mail.Mailbox?> mailboxes,
-      {bool listen = true}) {
-    Map<String, List<enough_mail.MimeMessage>>? addressMimeMessages =
+  List<String>? getMailboxNames(String email) {
+    Map<String, List<enough_mail.MimeMessage>>? mimeMessageMap =
         _addressMimeMessages[email];
-    if (addressMimeMessages == null) {
-      addressMimeMessages = {};
-      _addressMimeMessages[email] = addressMimeMessages;
-    }
-    Map<String, enough_mail.Mailbox> mailboxMap = {};
-    if (mailboxes.isNotEmpty) {
-      for (var mailbox in mailboxes) {
-        if (mailbox != null) {
-          mailboxMap[mailbox.name] = mailbox;
-          if (!addressMimeMessages.containsKey(mailbox.name)) {
-            addressMimeMessages[mailbox.name] = <enough_mail.MimeMessage>[];
-          }
-        }
-      }
-      _currentMailboxName = mailboxes.first?.name;
-    } else {
-      _currentMailboxName = null;
-    }
-    _addressMailboxes[email] = mailboxMap;
-    if (listen) {
-      notifyListeners();
-    }
-  }
-
-  ///当前地址的当前邮箱
-  enough_mail.Mailbox? get currentMailbox {
-    if (current == null) {
-      return null;
-    }
-    String email = current!.email;
-    var mailboxes = _addressMailboxes[email];
-    if (mailboxes != null && mailboxes.isNotEmpty) {
-      enough_mail.Mailbox? mailbox = mailboxes[currentMailboxName];
-
-      return mailbox;
+    if (mimeMessageMap != null && mimeMessageMap.isNotEmpty) {
+      return mimeMessageMap.keys.toList();
     }
     return null;
   }
-
-  ///以下是与邮件的部分
 
   ///当前邮件位置
   int get currentMailIndex {
@@ -231,7 +156,7 @@ class MailMimeMessageController
       return null;
     }
     List<enough_mail.MimeMessage>? mimeMessages =
-        mailboxMimeMessages[currentMailboxName];
+        mailboxMimeMessages[_currentMailboxName];
 
     return mimeMessages;
   }
@@ -256,6 +181,173 @@ class MailMimeMessageController
     }
   }
 
+  ///以下是从数据库取邮件的部分
+  findMoreMailMessages() async {
+    lock.synchronized(_findMoreMailMessages);
+    return await lock.synchronized(() async {
+      return await _findMoreMailMessages();
+    });
+  }
+
+  _findMoreMailMessages() async {
+    if (current == null) {
+      return;
+    }
+    String? currentMailboxName = this.currentMailboxName;
+    if (currentMailboxName == null) {
+      return;
+    }
+
+    var currentMimeMessages = this.currentMimeMessages;
+    List<MailMessage> emailMessages;
+    if (currentMimeMessages == null || currentMimeMessages.isEmpty) {
+      emailMessages = await mailMessageService.fetchMessages(
+          current!.email, currentMailboxName);
+    } else {
+      String? sendTime =
+          currentMimeMessages.first.decodeDate()?.toIso8601String();
+      sendTime ??= currentMimeMessages.first.envelope?.date?.toIso8601String();
+      emailMessages = await mailMessageService.fetchMessages(
+          current!.email, currentMailboxName,
+          sendTime: sendTime);
+    }
+    if (emailMessages.isNotEmpty) {
+      for (var emailMessage in emailMessages) {
+        String? content = emailMessage.content;
+        if (content != null) {
+          MimeMessage mimeMessage = MimeMessage.parseFromText(content);
+          mimeMessage.removeHeader('Subject');
+          mimeMessage.addHeader('Subject', emailMessage.title);
+          mimeMessage.sender = emailMessage.senderAddress?.firstOrNull;
+          if (currentMimeMessages != null) {
+            currentMimeMessages.add(mimeMessage);
+          }
+        }
+      }
+      if (currentMailIndex != 0) {
+        currentMailIndex = 0;
+      } else {
+        notifyListeners();
+      }
+    }
+  }
+
+  ///以下是与邮件服务器相关的部分
+
+  ///以下是与邮件地址相关的部分
+  ///重新获取所有的邮件地址实体，对没有连接的进行连接，设置缺省邮件地址
+  connectAllMailAddress() async {
+    if (data.isEmpty) {
+      initAllMailAddress();
+    }
+    if (data.isNotEmpty) {
+      for (var emailAddress in data) {
+        bool isConnected = await _connectMailAddress(emailAddress);
+        if (isConnected) {
+          if (emailAddress.isDefault) {
+            defaultMailAddress = emailAddress;
+          }
+        }
+      }
+    }
+  }
+
+  ///连接特定的邮件地址服务器，获取地址的所有的邮箱
+  Future<bool> _connectMailAddress(entity.MailAddress emailAddress,
+      {bool listen = true}) async {
+    var password = emailAddress.password;
+    if (password != null) {
+      EmailClient? emailClient =
+          await emailClientPool.create(emailAddress, password);
+      if (emailClient != null) {
+        List<enough_mail.Mailbox>? mailboxes =
+            await emailClient.listMailboxes();
+        if (mailboxes != null) {
+          emailClient.startPolling(_onMessage);
+          _setMailboxes(emailAddress.email, mailboxes, listen: listen);
+          await findMoreMimeMessages();
+          Timer.periodic(const Duration(minutes: 2), (timer) {
+            findMoreMimeMessages();
+          });
+
+          return true;
+        }
+      }
+    } else {
+      logger.e('email address:${emailAddress.email} password is empty');
+    }
+    return false;
+  }
+
+  enough_mail.Mailbox? get currentMailbox {
+    return _currentMailbox;
+  }
+
+  ///设置当前邮箱名称
+  setCurrentMailbox(String? name) {
+    if (current == null) {
+      return;
+    }
+    if (_currentMailboxName != name) {
+      _currentMailboxName = name;
+      Map<String, enough_mail.Mailbox>? mailboxMap =
+          _addressMailboxes[current!.email];
+      if (mailboxMap != null && mailboxMap.isNotEmpty) {
+        if (_currentMailbox?.name != name) {
+          _currentMailbox = mailboxMap[name];
+        }
+      }
+
+      notifyListeners();
+    }
+  }
+
+  _onMessage(MimeMessage mimeMessage) {
+    logger.i('Received mimeMessage:${mimeMessage.decodeSubject() ?? ''}');
+  }
+
+  ///获取邮件地址的邮箱
+  List<enough_mail.Mailbox>? getMailboxes(String email) {
+    Map<String, enough_mail.Mailbox>? mailboxMap = _addressMailboxes[email];
+    if (mailboxMap != null && mailboxMap.isNotEmpty) {
+      return mailboxMap.values.toList();
+    }
+    return null;
+  }
+
+  ///设置邮件地址的邮箱
+  _setMailboxes(String email, List<enough_mail.Mailbox?> mailboxes,
+      {bool listen = true}) {
+    Map<String, List<enough_mail.MimeMessage>>? addressMimeMessages =
+        _addressMimeMessages[email];
+    if (addressMimeMessages == null) {
+      return;
+    }
+    Map<String, enough_mail.Mailbox>? mailboxMap = _addressMailboxes[email];
+    if (mailboxMap == null) {
+      mailboxMap = {};
+      _addressMailboxes[email] = mailboxMap;
+    }
+    if (mailboxes.isNotEmpty) {
+      for (var mailbox in mailboxes) {
+        if (mailbox != null) {
+          mailboxMap[mailbox.name] = mailbox;
+          if (!addressMimeMessages.containsKey(mailbox.name)) {
+            addressMimeMessages[mailbox.name] = <enough_mail.MimeMessage>[];
+          }
+        }
+      }
+      _currentMailboxName = mailboxes.first?.name;
+      _currentMailbox = mailboxes.first;
+    } else {
+      _currentMailboxName = null;
+      _currentMailbox = null;
+    }
+    if (listen) {
+      notifyListeners();
+    }
+  }
+
   EmailClient? get currentEmailClient {
     if (current == null) {
       return null;
@@ -264,8 +356,6 @@ class MailMimeMessageController
 
     return emailClientPool.get(email);
   }
-
-  ///以下是从数据库取邮件的部分
 
   ///从邮件服务器中取当前地址当前邮箱的下一页的邮件数据，放入数据提供者的数组中
   findMoreMimeMessages({
@@ -310,49 +400,37 @@ class MailMimeMessageController
           fetchPreference: fetchPreference);
     }
     if (mimeMessages != null && mimeMessages.isNotEmpty) {
-      mimeMessages.sort((a, b) {
-        DateTime? aDate = a.envelope?.date;
-        DateTime? bDate = b.envelope?.date;
-        if (aDate == null && bDate == null) {
-          return 0;
-        } else if (aDate != null && bDate != null) {
-          return bDate.compareTo(aDate);
-        } else if (aDate == null) {
-          return 1;
-        }
-        return -1;
-      });
-      if (currentMimeMessages != null) {
-        currentMimeMessages.addAll(mimeMessages);
-        if (currentMailIndex != 0) {
-          currentMailIndex = 0;
-        } else {
-          notifyListeners();
+      for (var mimeMessage in mimeMessages) {
+        if (_currentMailbox != null) {
+          await mailMessageService.storeMimeMessage(
+              _currentMailbox!, mimeMessage, fetchPreference);
+          fetchMessageContents(mimeMessage);
         }
       }
     }
   }
 
   ///当前邮件获取全部内容，包括附件
-  Future<void> fetchMessageContents() async {
+  Future<enough_mail.MimeMessage?> fetchMessageContents(
+      enough_mail.MimeMessage mimeMessage) async {
     EmailClient? emailClient = currentEmailClient;
     if (emailClient == null) {
-      return;
+      return null;
     }
 
-    enough_mail.MimeMessage? mimeMessage = currentMimeMessage;
-    if (mimeMessage != null) {
-      MimeMessage? mimeMessageContent = mimeMessage.decodeContentMessage();
-      if (mimeMessageContent == null) {
-        enough_mail.MimeMessage? mimeMsg =
-            await emailClient.fetchMessageContents(mimeMessage);
-        if (mimeMsg != null) {
-          mimeMsg.envelope = mimeMessage.envelope;
-          currentMimeMessage = mimeMsg;
-          notifyListeners();
-        }
+    MimeMessage? mimeMessageContent = mimeMessage.decodeContentMessage();
+    if (mimeMessageContent == null) {
+      enough_mail.MimeMessage? mimeMsg =
+          await emailClient.fetchMessageContents(mimeMessage);
+      if (mimeMsg != null) {
+        await mailMessageService.storeMimeMessage(
+            _currentMailbox!, mimeMsg, FetchPreference.full);
+
+        return mimeMsg;
       }
     }
+
+    return mimeMessage;
   }
 
   ///当前邮件根据fetchId获取附件
@@ -425,7 +503,7 @@ class MailMimeMessageController
       if (subject != null) {
         try {
           data = CryptoUtil.decodeBase64(subject);
-          data = await emailAddressService.decrypt(data,
+          data = await mailAddressService.decrypt(data,
               payloadKey: decryptedData.payloadKey);
           decryptedData.subject = CryptoUtil.utf8ToString(data!);
         } catch (e) {
@@ -438,7 +516,7 @@ class MailMimeMessageController
           text = text.replaceAll(' ', '');
           text = text.replaceAll('\r\n', '');
           data = CryptoUtil.decodeBase64(text);
-          data = await emailAddressService.decrypt(data,
+          data = await mailAddressService.decrypt(data,
               payloadKey: decryptedData.payloadKey);
           text = CryptoUtil.utf8ToString(data!);
           decryptedData.html = EmailMessageUtil.convertToMimeMessageHtml(text);

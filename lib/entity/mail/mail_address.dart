@@ -1,9 +1,7 @@
-
-
 import 'package:colla_chat/entity/base.dart';
 
 /// 邮件地址
-class EmailAddress extends BaseEntity {
+class MailAddress extends BaseEntity {
   String name;
   String email;
   String? username;
@@ -23,7 +21,7 @@ class EmailAddress extends BaseEntity {
   String? smtpServerConfig;
   bool isDefault = false;
 
-  EmailAddress(
+  MailAddress(
       {required this.name,
       required this.email,
       this.username,
@@ -40,7 +38,7 @@ class EmailAddress extends BaseEntity {
     domain = emails[1];
   }
 
-  EmailAddress.fromJson(super.json)
+  MailAddress.fromJson(super.json)
       : name = json['name'],
         username = json['username'],
         password = json['password'],

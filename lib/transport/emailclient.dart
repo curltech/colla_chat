@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
-import 'package:colla_chat/entity/mail/email_address.dart' as entity;
+import 'package:colla_chat/entity/mail/mail_address.dart' as entity;
 import 'package:colla_chat/entity/chat/message_attachment.dart';
 import 'package:colla_chat/pages/mail/address/email_service_provider.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
@@ -127,7 +127,7 @@ class EmailMessageUtil {
 
   ///转换邮件地址实体信息到邮件地址配置
   static enough_mail.ClientConfig? buildDiscoverConfig(
-      entity.EmailAddress mailAddress) {
+      entity.MailAddress mailAddress) {
     enough_mail.ClientConfig config = enough_mail.ClientConfig();
     bool incoming = false;
     bool outcoming = false;
@@ -198,10 +198,10 @@ class EmailMessageUtil {
   }
 
   ///传入email，name和邮件地址配置参数，产生新的邮件地址实体
-  static entity.EmailAddress buildDiscoverEmailAddress(
+  static entity.MailAddress buildDiscoverEmailAddress(
       String email, String name, ClientConfig config) {
-    entity.EmailAddress mailAddress =
-        entity.EmailAddress(email: email, name: name);
+    entity.MailAddress mailAddress =
+        entity.MailAddress(email: email, name: name);
 
     for (final provider in config.emailProviders!) {
       ServerConfig? imapServerConfig = provider.preferredIncomingImapServer;
@@ -209,7 +209,7 @@ class EmailMessageUtil {
         mailAddress.imapServerSecure = imapServerConfig.isSecureSocket;
         int? port = imapServerConfig.port;
         mailAddress.imapServerPort = port;
-              mailAddress.imapServerHost = imapServerConfig.hostname;
+        mailAddress.imapServerHost = imapServerConfig.hostname;
         Map<String, dynamic> attributes = imapServerConfig.toJson();
         mailAddress.imapServerConfig = JsonUtil.toJsonString(attributes);
       }
@@ -218,7 +218,7 @@ class EmailMessageUtil {
         mailAddress.popServerSecure = popServerConfig.isSecureSocket;
         int? port = popServerConfig.port;
         mailAddress.popServerPort = port;
-              mailAddress.popServerHost = popServerConfig.hostname;
+        mailAddress.popServerHost = popServerConfig.hostname;
         Map<String, dynamic> attributes = popServerConfig.toJson();
         mailAddress.popServerConfig = JsonUtil.toJsonString(attributes);
       }
@@ -227,7 +227,7 @@ class EmailMessageUtil {
         mailAddress.smtpServerSecure = smtpServerConfig.isSecureSocket;
         int? port = smtpServerConfig.port;
         mailAddress.smtpServerPort = port;
-              mailAddress.smtpServerHost = smtpServerConfig.hostname;
+        mailAddress.smtpServerHost = smtpServerConfig.hostname;
         Map<String, dynamic> attributes = smtpServerConfig.toJson();
         mailAddress.smtpServerConfig = JsonUtil.toJsonString(attributes);
       }
@@ -266,7 +266,7 @@ class EmailMessageUtil {
 }
 
 class EmailClient {
-  entity.EmailAddress emailAddress;
+  entity.MailAddress emailAddress;
   Lock lock = Lock();
 
   ///mailClient是自动发现产生的客户端
@@ -287,7 +287,7 @@ class EmailClient {
     }
     bool success = false;
     if (mailClient == null) {
-      success = await mailClientConnect(password: password, config: config);
+      success = await _mailClientConnect(password: password, config: config);
       if (!success) {
         success = await imapConnect();
         logger.i('imapConnect $success');
@@ -308,7 +308,7 @@ class EmailClient {
   }
 
   ///邮件客户端连接，可以传入密码和邮件地址参数，如果没有则使用当前邮件客户端的数据
-  Future<bool> mailClientConnect(
+  Future<bool> _mailClientConnect(
       {String? password, ClientConfig? config}) async {
     if (password != null && emailAddress.password != password) {
       emailAddress.password = password;
@@ -675,33 +675,15 @@ class EmailClient {
     return null;
   }
 
-  ///用邮件客户端监听消息
-  bool listen(
-    Function(MimeMessage message)? onMessage, {
-    Function? onError,
-    void Function()? onDone,
-    bool? cancelOnError,
-  }) {
-    final enough_mail.MailClient? mailClient = this.mailClient;
-    if (mailClient != null) {
-      mailClient.eventBus.on<enough_mail.MailLoadEvent>().listen((event) {
-        logger.i('New message at ${DateTime.now()}:');
-        if (onMessage != null) {
-          onMessage(event.message);
-        }
-      }, onError: onError, onDone: onDone, cancelOnError: cancelOnError);
-      return true;
-    }
-
-    return false;
-  }
-
   ///用邮件客户端开始监听消息
-  Future<bool> startPolling(
+  Future<bool> startPolling(Function(enough_mail.MimeMessage) callback,
       [Duration duration =
           enough_mail.MailClient.defaultPollingDuration]) async {
     final enough_mail.MailClient? mailClient = this.mailClient;
     if (mailClient != null) {
+      mailClient.eventBus.on<MailLoadEvent>().listen((event) {
+        callback(event.message);
+      });
       await mailClient.startPolling(duration);
       return true;
     }
@@ -1091,7 +1073,7 @@ class EmailClientPool {
 
   ///在连接池中创建一个邮件的连接，必须连接成功才能创建
   ///传入的邮件地址实体参数必须含有email字段，或者有自动发现的配置，或者有imap和smtp的配置
-  Future<EmailClient?> create(entity.EmailAddress mailAddress, String password,
+  Future<EmailClient?> create(entity.MailAddress mailAddress, String password,
       {ClientConfig? config}) async {
     var emails = mailAddress.email.split('@');
     if (emails.length != 2) {

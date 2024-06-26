@@ -1,4 +1,4 @@
-import 'package:colla_chat/entity/mail/email_address.dart';
+import 'package:colla_chat/entity/mail/mail_address.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/mail/address/email_service_provider.dart';
 import 'package:colla_chat/pages/mail/mail_mime_message_controller.dart';
@@ -51,19 +51,20 @@ class _MailWidgetState extends State<MailWidget> {
 
   @override
   initState() {
-    mailMimeMessageController.addListener(_update);
     super.initState();
-    mailMimeMessageController.connectAllMailAddress();
+    mailMimeMessageController.addListener(_update);
+    mailMimeMessageController.initAllMailAddress();
+    // mailMimeMessageController.connectAllMailAddress();
   }
 
   _update() {
-    EmailAddress? current = mailMimeMessageController.current;
+    MailAddress? current = mailMimeMessageController.current;
     String email = current?.email ?? '';
     String? name = mailMimeMessageController.currentMailboxName;
     if (name == null) {
       mailboxName.value = email;
     } else {
-      mailboxName.value = '$email($name)';
+      mailboxName.value = '$email(${AppLocalizations.t(name)})';
     }
   }
 
@@ -156,10 +157,10 @@ class _MailWidgetState extends State<MailWidget> {
         valueListenable: mailboxName,
         builder: (BuildContext context, String mailboxName, Widget? child) {
           return CommonAutoSizeText(
-            AppLocalizations.t(mailboxName),
+            mailboxName,
             style: const TextStyle(color: Colors.white),
             softWrap: true,
-            maxLines: 2,
+            maxLines: 1,
             overflow: TextOverflow.visible,
           );
         });
