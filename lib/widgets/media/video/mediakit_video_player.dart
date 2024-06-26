@@ -171,28 +171,10 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
       // child: player,
       // );
 
-      Widget playerControlPanel = ValueListenableBuilder(
-          valueListenable: hovering,
-          builder: (BuildContext context, bool hovering, Widget? child) {
-            if (hovering) {
-              return Container(
-                  alignment: Alignment.centerRight,
-                  child: IconButton(
-                      iconSize: AppIconSize.lgSize,
-                      color: Colors.white,
-                      onPressed: () {
-                        next();
-                      },
-                      icon: hovering
-                          ? const Icon(Icons.pause)
-                          : const Icon(Icons.play_arrow)));
-            }
-            return Container();
-          });
       player = Stack(
         children: [
           player,
-          // playerControlPanel,
+          buildPlaylistController(),
         ],
       );
     } else {

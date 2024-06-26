@@ -64,10 +64,13 @@ class ChewieVideoPlayerController extends OriginVideoPlayerController {
           if (videoPlayerController != null) {
             ChewieController? chewieController = _buildChewieController();
             if (chewieController != null) {
-              return Chewie(
-                key: key,
-                controller: chewieController,
-              );
+              return Stack(children: [
+                Chewie(
+                  key: key,
+                  controller: chewieController,
+                ),
+                buildPlaylistController()
+              ]);
             }
           }
           return Center(

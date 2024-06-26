@@ -7,7 +7,6 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/mail/mail_address.dart';
 import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
-import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:flutter/material.dart';
 
 ///邮件地址子视图

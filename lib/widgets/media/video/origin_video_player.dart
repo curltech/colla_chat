@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:file_picker/file_picker.dart';
@@ -174,13 +175,10 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
             enableSubtitle: true,
             enablePosition: true,
             enableBottomBar: true,
-            onTap: (FlVideoTapEvent event, FlVideoPlayerController controller) {
-              debugPrint(event.toString());
-            },
+            onTap:
+                (FlVideoTapEvent event, FlVideoPlayerController controller) {},
             onDragProgress:
-                (FlVideoDragProgressEvent event, Duration duration) {
-              debugPrint('$event===$duration');
-            }));
+                (FlVideoDragProgressEvent event, Duration duration) {}));
 
     return FlVideoPlayer(controller: controller);
   }
@@ -224,10 +222,15 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
         builder: (BuildContext context,
             VideoPlayerController? videoPlayerController, Widget? child) {
           if (videoPlayerController != null) {
-            return _buildMaterialControl(videoPlayerController,
-                showClosedCaptionButton: showClosedCaptionButton,
-                showFullscreenButton: showFullscreenButton,
-                showVolumeButton: showVolumeButton);
+            return Stack(
+              children: [
+                _buildMaterialControl(videoPlayerController,
+                    showClosedCaptionButton: showClosedCaptionButton,
+                    showFullscreenButton: showFullscreenButton,
+                    showVolumeButton: showVolumeButton),
+                buildPlaylistController(),
+              ],
+            );
           }
           return Center(
               child: CommonAutoSizeText(

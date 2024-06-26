@@ -4,10 +4,12 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
@@ -395,6 +397,65 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     bool showFullscreenButton = true,
     bool showVolumeButton = true,
   });
+
+  Widget buildPlaylistController() {
+    List<Widget> children = [];
+    if (currentIndex > 0) {
+      children.add(
+        IconButton(
+            hoverColor: myself.primary,
+            onPressed: () {
+              previous();
+            },
+            icon: const Icon(
+              Icons.skip_previous,
+              color: Colors.white,
+            )),
+      );
+    } else {
+      children.add(
+        const IconButton(
+            onPressed: null,
+            icon: Icon(
+              Icons.skip_previous,
+              color: Colors.grey,
+            )),
+      );
+    }
+    if (currentIndex >= 0 && currentIndex < playlist.length) {
+      PlatformMediaSource platformMediaSource = playlist[currentIndex];
+      String name = FileUtil.filename(platformMediaSource.filename);
+      children.add(CommonAutoSizeText(
+        name,
+        style: const TextStyle(color: Colors.white),
+        maxLines: 1,
+      ));
+    }
+    if (currentIndex > -1 && currentIndex < playlist.length - 1) {
+      children.add(
+        IconButton(
+            hoverColor: myself.primary,
+            onPressed: () {
+              next();
+            },
+            icon: const Icon(Icons.skip_next, color: Colors.white)),
+      );
+    } else {
+      children.add(
+        const IconButton(
+            onPressed: null,
+            icon: Icon(
+              Icons.skip_next,
+              color: Colors.grey,
+            )),
+      );
+    }
+
+    return ButtonBar(
+      alignment: MainAxisAlignment.spaceBetween,
+      children: children,
+    );
+  }
 
   String get progressText {
     return '${StringUtil.durationText(mediaPlayerState.position)}/${StringUtil.durationText(mediaPlayerState.duration)}';
