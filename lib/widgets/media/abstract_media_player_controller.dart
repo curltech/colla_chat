@@ -190,7 +190,20 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   bool _playlistVisible = true;
   int _currentIndex = -1;
   FileType fileType = FileType.custom;
-  List<String>? allowedExtensions;
+  List<String>? allowedExtensions = [
+    'mp3',
+    'wav',
+    'mp4',
+    'm4a',
+    'mov',
+    'mpeg',
+    'aac',
+    'rmvb',
+    'avi',
+    'wmv',
+    'mkv',
+    'mpg'
+  ];
   MediaPlayerState mediaPlayerState = MediaPlayerState();
   bool autoplay = false;
 
@@ -282,7 +295,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   /// 清除播放列表
   clear() async {
     playlist.clear();
-    _currentIndex = -1;
+    await setCurrentIndex(-1);
   }
 
   Future<PlatformMediaSource?> insert(int index,
@@ -365,6 +378,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
             mediaSources.add(mediaSource);
           }
         }
+        await setCurrentIndex(playlist.length - 1);
       }
     }
 

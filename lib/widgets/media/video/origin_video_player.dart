@@ -6,10 +6,10 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:fl_video/fl_video.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player_control_panel/video_player_control_panel.dart';
+import 'package:video_player_media_kit/video_player_media_kit.dart';
 
 class OriginMediaSource {
   static Future<VideoPlayerController?> media(
@@ -64,21 +64,13 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
       ValueNotifier<VideoPlayerController?>(null);
 
   OriginVideoPlayerController() {
-    fileType = FileType.custom;
-    allowedExtensions = [
-      'mp3',
-      'wav',
-      'mp4',
-      'm4a',
-      'mov',
-      'mpeg',
-      'aac',
-      'rmvb',
-      'avi',
-      'wmv',
-      'mkv',
-      'mpg'
-    ];
+    VideoPlayerMediaKit.ensureInitialized(
+      android: true,
+      iOS: true,
+      macOS: true,
+      windows: true,
+      linux: true,
+    );
   }
 
   @override
@@ -104,7 +96,24 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     return success;
   }
 
-  FlVideoPlayer _buildCupertinoControl(
+  Widget _buildMediaKitVideoPlayer() {
+    return AspectRatio(
+        aspectRatio: videoPlayerController.value!.value.aspectRatio,
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: <Widget>[
+            VideoPlayer(videoPlayerController.value!),
+            VideoProgressIndicator(videoPlayerController.value!,
+                allowScrubbing: true,
+                colors: VideoProgressColors(
+                    playedColor: myself.primary,
+                    bufferedColor: Colors.grey,
+                    backgroundColor: Colors.white)),
+          ],
+        ));
+  }
+
+  Widget _buildCupertinoControl(
     VideoPlayerController videoPlayerController, {
     bool showFullscreenButton = true,
     bool showVolumeButton = true,
@@ -149,10 +158,15 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
                       style: const TextStyle(
                           fontSize: 16, color: Colors.lightBlue)));
             }));
-    return FlVideoPlayer(controller: controller);
+    return Stack(
+      children: [
+        FlVideoPlayer(controller: controller),
+        buildPlaylistController(),
+      ],
+    );
   }
 
-  FlVideoPlayer _buildMaterialControl(
+  Widget _buildMaterialControl(
     VideoPlayerController videoPlayerController, {
     bool showClosedCaptionButton = true,
     bool showFullscreenButton = true,
@@ -163,16 +177,14 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
         videoPlayerController: videoPlayerController,
         autoPlay: true,
         looping: true,
-        // overlay: const IgnorePointer(
-        //     child: Center(
-        //         child: Text('overlay',
-        //             style: TextStyle(color: Colors.lightBlue, fontSize: 20)))),
         placeholder: Center(
             child: Text(AppLocalizations.t('Waiting'),
                 style: TextStyle(color: myself.primary, fontSize: 20))),
         controls: MaterialControls(
             progressColors: FlVideoPlayerProgressColors(
-                played: myself.primary, buffered: Colors.grey),
+                played: myself.primary,
+                buffered: Colors.grey,
+                background: Colors.white),
             hideDuration: const Duration(seconds: 5),
             enablePlay: true,
             enableFullscreen: showFullscreenButton,
@@ -186,9 +198,15 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
             onDragProgress:
                 (FlVideoDragProgressEvent event, Duration duration) {}));
 
-    return FlVideoPlayer(controller: controller);
+    return Stack(
+      children: [
+        FlVideoPlayer(controller: controller),
+        buildPlaylistController(),
+      ],
+    );
   }
 
+  ///支持windows
   JkVideoControlPanel _buildJkVideoControlPanel(
     VideoPlayerController videoPlayerController, {
     bool showClosedCaptionButton = true,
@@ -222,21 +240,15 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     bool showFullscreenButton = true,
     bool showVolumeButton = true,
   }) {
-    // Widget player = VideoPlayer(videoPlayerController!);
     Widget player = ValueListenableBuilder(
         valueListenable: videoPlayerController,
         builder: (BuildContext context,
             VideoPlayerController? videoPlayerController, Widget? child) {
           if (videoPlayerController != null) {
-            return Stack(
-              children: [
-                _buildMaterialControl(videoPlayerController,
-                    showClosedCaptionButton: showClosedCaptionButton,
-                    showFullscreenButton: showFullscreenButton,
-                    showVolumeButton: showVolumeButton),
-                buildPlaylistController(),
-              ],
-            );
+            return _buildMaterialControl(videoPlayerController,
+                showClosedCaptionButton: showClosedCaptionButton,
+                showFullscreenButton: showFullscreenButton,
+                showVolumeButton: showVolumeButton);
           }
           return Center(
               child: CommonAutoSizeText(
@@ -339,6 +351,3 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     return null;
   }
 }
-
-final OriginVideoPlayerController globalOriginVideoPlayerController =
-    OriginVideoPlayerController();

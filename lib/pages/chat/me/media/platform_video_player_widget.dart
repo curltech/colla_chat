@@ -5,14 +5,12 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
-import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
+import 'package:colla_chat/widgets/media/video/flick_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player_win/video_player_win_plugin.dart';
 
 ///平台标准的video_player的实现，缺省采用webview
 class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
-  AbstractMediaPlayerController mediaPlayerController =
-      globalOriginVideoPlayerController;
   final SwiperController swiperController = SwiperController();
 
   PlatformVideoPlayerWidget({
@@ -41,6 +39,8 @@ class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
 
 class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
   ValueNotifier<int> index = ValueNotifier<int>(0);
+  AbstractMediaPlayerController mediaPlayerController =
+      FlickVideoPlayerController();
 
   @override
   void initState() {
@@ -81,7 +81,8 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
       IconButton(
         tooltip: AppLocalizations.t('Close'),
         onPressed: () async {
-          widget.mediaPlayerController.close();
+          mediaPlayerController.close();
+          mediaPlayerController.clear();
         },
         icon: const Icon(Icons.close),
       ),
@@ -94,7 +95,7 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
   Widget build(BuildContext context) {
     PlatformMediaPlayer platformMediaPlayer = PlatformMediaPlayer(
         showPlaylist: true,
-        mediaPlayerController: widget.mediaPlayerController,
+        mediaPlayerController: mediaPlayerController,
         swiperController: widget.swiperController,
         onIndexChanged: (int index) {
           this.index.value = index;
@@ -111,7 +112,7 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
 
   @override
   void dispose() {
-    widget.mediaPlayerController.stop();
+    mediaPlayerController.dispose();
     super.dispose();
   }
 }

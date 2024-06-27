@@ -1,11 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
@@ -56,23 +54,6 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
   ValueNotifier<bool> hovering = ValueNotifier<bool>(false);
 
   MediaKitVideoPlayerController() {
-    fileType = FileType.custom;
-    allowedExtensions = [
-      'mp3',
-      'wav',
-      'mp4',
-      'm4a',
-      'mov',
-      'mpeg',
-      'aac',
-      'rmvb',
-      'avi',
-      'wmv',
-      'mkv',
-      'mpg'
-    ];
-
-    MediaKit.ensureInitialized();
     player = Player();
     videoController = VideoController(player);
     player.stream.playlist.listen((e) {});
@@ -244,6 +225,3 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
     await player.setVolume(volume);
   }
 }
-
-final MediaKitVideoPlayerController globalMediaKitVideoPlayerController =
-    MediaKitVideoPlayerController();

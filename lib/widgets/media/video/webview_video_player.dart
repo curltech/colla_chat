@@ -98,6 +98,3 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
   @override
   close() {}
 }
-
-final WebViewVideoPlayerController globalWebViewVideoPlayerController =
-    WebViewVideoPlayerController();

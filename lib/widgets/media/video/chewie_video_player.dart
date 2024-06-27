@@ -3,23 +3,22 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 ///基于Chewie实现的媒体播放器和记录器，
 class ChewieVideoPlayerController extends OriginVideoPlayerController {
-  ChewieVideoPlayerController() {
-    fileType = FileType.any;
-    allowedExtensions = ['mp3', 'wav', 'mp4', 'm4a', 'mov', 'mpeg', 'aac'];
-  }
+  ChewieController? chewieController;
 
-  ChewieController? _buildChewieController() {
+  ChewieVideoPlayerController();
+
+  void _buildChewieController() {
     var controller = videoPlayerController.value;
     if (controller == null) {
-      return null;
+      chewieController = null;
+      return;
     }
-    ChewieController chewieController = ChewieController(
+    chewieController = ChewieController(
       videoPlayerController: controller,
       autoPlay: true,
       looping: true,
@@ -46,8 +45,6 @@ class ChewieVideoPlayerController extends OriginVideoPlayerController {
       ),
       autoInitialize: true,
     );
-
-    return chewieController;
   }
 
   @override
@@ -62,12 +59,12 @@ class ChewieVideoPlayerController extends OriginVideoPlayerController {
         builder: (BuildContext context,
             VideoPlayerController? videoPlayerController, Widget? child) {
           if (videoPlayerController != null) {
-            ChewieController? chewieController = _buildChewieController();
+            _buildChewieController();
             if (chewieController != null) {
               return Stack(children: [
                 Chewie(
                   key: key,
-                  controller: chewieController,
+                  controller: chewieController!,
                 ),
                 buildPlaylistController()
               ]);
@@ -82,7 +79,13 @@ class ChewieVideoPlayerController extends OriginVideoPlayerController {
 
     return player;
   }
-}
 
-final ChewieVideoPlayerController globalChewieVideoPlayerController =
-    ChewieVideoPlayerController();
+  @override
+  void close() {
+    super.close();
+    if (chewieController != null) {
+      chewieController!.dispose();
+      chewieController = null;
+    }
+  }
+}

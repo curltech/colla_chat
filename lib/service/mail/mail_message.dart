@@ -4,7 +4,6 @@ import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
-import 'package:enough_mail_html/enough_mail_html.dart';
 
 class EmailMessageService extends GeneralBaseService<MailMessage> {
   EmailMessageService({
