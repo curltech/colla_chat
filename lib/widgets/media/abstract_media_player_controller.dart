@@ -252,7 +252,6 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     if (mediaSource != null) {
       mediaSource.messageId = messageId;
       playlist.add(mediaSource);
-      await setCurrentIndex(playlist.length - 1);
     }
 
     return mediaSource;
@@ -283,7 +282,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   /// 清除播放列表
   clear() async {
     playlist.clear();
-    await setCurrentIndex(-1);
+    _currentIndex = -1;
   }
 
   Future<PlatformMediaSource?> insert(int index,
@@ -351,6 +350,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
               }
             }
           }
+          await setCurrentIndex(playlist.length - 1);
         }
       }
     } else {
@@ -380,16 +380,16 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   /// 停止播放
   stop() async {}
 
-  /// 停止播放，关闭播放器，清除播放列表
+  /// 停止播放，关闭当前播放资源
   close() async {
     await stop();
-    clear();
   }
 
   /// 停止播放，关闭播放器，清除播放器
   @override
   void dispose() {
     close();
+    clear();
     super.dispose();
   }
 

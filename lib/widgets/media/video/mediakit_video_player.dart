@@ -196,12 +196,9 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
   @override
   close() async {
     await player.stop();
-    await player.dispose();
   }
 
   @override
-
-  ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频
   play() async {
     await player.play();
   }
