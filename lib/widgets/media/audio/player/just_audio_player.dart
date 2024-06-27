@@ -234,15 +234,19 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
 
   ///设置当前的通用MediaSource，并转换成特定实现的媒体源，并进行设置
   @override
-  setCurrentIndex(int index) async {
+  Future<bool> setCurrentIndex(int index) async {
+    bool success = false;
     if (index >= -1 && index < playlist.length && currentIndex != index) {
-      close();
-      await super.setCurrentIndex(index);
-      notifyListeners();
-      if (autoplay) {
-        play();
+      success = await super.setCurrentIndex(index);
+      if (success) {
+        await close();
+        if (autoplay) {
+          play();
+        }
+        notifyListeners();
       }
     }
+    return success;
   }
 
   @override

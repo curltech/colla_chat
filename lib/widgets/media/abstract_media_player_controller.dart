@@ -209,10 +209,12 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     return _currentIndex;
   }
 
-  setCurrentIndex(int index) async {
+  Future<bool> setCurrentIndex(int index) async {
     if (index >= -1 && index < playlist.length && _currentIndex != index) {
       _currentIndex = index;
+      return true;
     }
+    return false;
   }
 
   PlatformMediaSource? get currentMediaSource {

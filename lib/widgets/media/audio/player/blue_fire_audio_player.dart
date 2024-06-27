@@ -182,19 +182,24 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
   }
 
   @override
-  setCurrentIndex(int index) async {
+  Future<bool> setCurrentIndex(int index) async {
+    bool success = false;
     if (index >= -1 && index < playlist.length && currentIndex != index) {
-      close();
-      await super.setCurrentIndex(index);
-      notifyListeners();
-      if (autoplay) {
-        play();
+      success = await super.setCurrentIndex(index);
+      if (success) {
+        await close();
+        if (autoplay) {
+          play();
+        }
+
+        notifyListeners();
       }
     }
+    return false;
   }
 
   @override
-  close() {
+  close() async {
     player!.stop();
     player!.release();
   }

@@ -117,7 +117,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
                 CryptoUtil.stringToUtf8(text),
                 payloadKey: decryptedMimeMessage.payloadKey);
             text = CryptoUtil.utf8ToString(data!);
-                    } catch (e) {
+          } catch (e) {
             logger.e('filename:$filename decrypt failure:$e');
           }
         }
@@ -199,7 +199,8 @@ class _MailContentWidgetState extends State<MailContentWidget> {
             }
             Widget webView = Container();
             try {
-              webView = PlatformWebView(html: decryptedMimeMessage.html);
+              webView = Center(
+                  child: PlatformWebView(html: decryptedMimeMessage.html));
             } catch (e) {
               logger.e('PlatformWebView failure:$e');
             }

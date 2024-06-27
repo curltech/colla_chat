@@ -108,19 +108,25 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  setCurrentIndex(int index) async {
+  Future<bool> setCurrentIndex(int index) async {
+    bool success = false;
     if (index >= -1 && index < playlist.length) {
-      await super.setCurrentIndex(index);
-      notifyListeners();
-      var currentMediaSource = this.currentMediaSource;
-      if (currentMediaSource != null) {
-        Media? media =
-            MediaKitMediaSource.media(filename: currentMediaSource.filename);
-        if (media != null) {
-          player.open(media);
+      success = await super.setCurrentIndex(index);
+      if (success) {
+        player.stop();
+        var currentMediaSource = this.currentMediaSource;
+        if (currentMediaSource != null) {
+          Media? media =
+              MediaKitMediaSource.media(filename: currentMediaSource.filename);
+          if (media != null) {
+            player.open(media);
+          }
         }
+        notifyListeners();
       }
     }
+
+    return success;
   }
 
   @override

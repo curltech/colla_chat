@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:file_picker/file_picker.dart';
@@ -83,19 +82,26 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  setCurrentIndex(int index) async {
+  Future<bool> setCurrentIndex(int index) async {
+    bool success = false;
     if (index >= -1 && index < playlist.length) {
-      await super.setCurrentIndex(index);
-      notifyListeners();
-      var currentMediaSource = this.currentMediaSource;
-      if (currentMediaSource != null) {
-        videoPlayerController.value = await OriginMediaSource.media(
-            filename: currentMediaSource.filename);
-        if (autoplay && videoPlayerController.value != null) {
-          play();
+      success = await super.setCurrentIndex(index);
+      if (success) {
+        if (videoPlayerController.value != null) {
+          await close();
         }
+        var currentMediaSource = this.currentMediaSource;
+        if (currentMediaSource != null) {
+          videoPlayerController.value = await OriginMediaSource.media(
+              filename: currentMediaSource.filename);
+          if (autoplay && videoPlayerController.value != null) {
+            play();
+          }
+        }
+        notifyListeners();
       }
     }
+    return success;
   }
 
   FlVideoPlayer _buildCupertinoControl(

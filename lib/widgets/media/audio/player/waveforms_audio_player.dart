@@ -18,18 +18,23 @@ class WaveformsAudioPlayerController extends AbstractAudioPlayerController {
 
   ///设置当前的通用MediaSource，并转换成特定实现的媒体源，并进行设置
   @override
-  setCurrentIndex(int index) async {
+  Future<bool> setCurrentIndex(int index) async {
+    bool success = false;
     if (index >= -1 && index < playlist.length && currentIndex != index) {
-      super.setCurrentIndex(index);
-      notifyListeners();
-      if (currentIndex >= 0) {
-        PlatformMediaSource? currentMediaSource = this.currentMediaSource;
-        if (currentMediaSource != null) {
-          playerController.preparePlayer(
-              path: currentMediaSource.filename, volume: _volume);
+      success = await super.setCurrentIndex(index);
+      if (success) {
+        await close();
+        if (currentIndex >= 0) {
+          PlatformMediaSource? currentMediaSource = this.currentMediaSource;
+          if (currentMediaSource != null) {
+            playerController.preparePlayer(
+                path: currentMediaSource.filename, volume: _volume);
+          }
         }
+        notifyListeners();
       }
     }
+    return success;
   }
 
   @override
