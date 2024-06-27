@@ -91,6 +91,7 @@ class FlickVideoPlayerController extends OriginVideoPlayerController {
     super.close();
     if (flickManager != null) {
       flickManager!.dispose();
+      videoPlayerController.value = null;
       flickManager = null;
     }
   }
