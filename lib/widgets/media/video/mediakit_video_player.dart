@@ -153,7 +153,6 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
               },
               child: Video(
                 controller: videoController,
-                // controls: MaterialDesktopVideoControls,
               )));
 
       // player = MaterialVideoControlsTheme(
