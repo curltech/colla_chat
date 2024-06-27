@@ -113,7 +113,7 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
     if (index >= -1 && index < playlist.length) {
       success = await super.setCurrentIndex(index);
       if (success) {
-        player.stop();
+        await player.stop();
         var currentMediaSource = this.currentMediaSource;
         if (currentMediaSource != null) {
           Media? media =
@@ -195,6 +195,13 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
   @override
   close() async {
     await player.stop();
+  }
+
+  @override
+  dispose() async {
+    await close();
+    await player.dispose();
+    super.dispose();
   }
 
   @override
