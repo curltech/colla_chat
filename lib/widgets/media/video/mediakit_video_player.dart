@@ -145,7 +145,7 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
                 seekBarColor: Colors.white,
                 seekBarPositionColor: myself.primary,
                 seekBarBufferColor: Colors.grey,
-                seekBarThumbSize: 8.0,
+                seekBarThumbSize: 15.0,
                 seekBarThumbColor: myself.primary,
               ),
               fullscreen: MaterialVideoControlsThemeData(
@@ -159,7 +159,7 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
                 seekBarColor: Colors.white,
                 seekBarPositionColor: myself.primary,
                 seekBarBufferColor: Colors.grey,
-                seekBarThumbSize: 8.0,
+                seekBarThumbSize: 15.0,
                 seekBarThumbColor: myself.primary,
               ),
               child: player,
