@@ -148,42 +148,45 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
   StreamSubscription? _playerStateChangeSubscription;
 
   BlueFireAudioPlayerController(super.playlistController, {this.player}) {
-    _initStreams();
+    _init();
   }
 
-  void _initStreams() {
-    this.player ??= BlueFireAudioPlayer();
-    var player = this.player!.player;
-    _durationSubscription = player.onDurationChanged.listen((duration) {
-      mediaPlayerState.duration = duration;
-    });
+  void _init() {
+    if (player == null) {
+      this.player = BlueFireAudioPlayer();
+      var player = this.player!.player;
+      _durationSubscription = player.onDurationChanged.listen((duration) {
+        mediaPlayerState.duration = duration;
+      });
 
-    _positionSubscription = player.onPositionChanged.listen((position) {
-      mediaPlayerState.position = position;
-      notifyListeners();
-    });
+      _positionSubscription = player.onPositionChanged.listen((position) {
+        mediaPlayerState.position = position;
+        notifyListeners();
+      });
 
-    _playerCompleteSubscription = player.onPlayerComplete.listen((event) {
-      mediaPlayerState.position = mediaPlayerState.duration;
-      mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.completed;
-    });
-
-    _playerStateChangeSubscription =
-        player.onPlayerStateChanged.listen((state) {
-      if (state == PlayerState.completed) {
+      _playerCompleteSubscription = player.onPlayerComplete.listen((event) {
+        mediaPlayerState.position = mediaPlayerState.duration;
         mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.completed;
-      } else if (state == PlayerState.playing) {
-        mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.playing;
-      } else if (state == PlayerState.paused) {
-        mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.pause;
-      } else if (state == PlayerState.stopped) {
-        mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.stop;
-      }
-    });
+      });
+
+      _playerStateChangeSubscription =
+          player.onPlayerStateChanged.listen((state) {
+        if (state == PlayerState.completed) {
+          mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.completed;
+        } else if (state == PlayerState.playing) {
+          mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.playing;
+        } else if (state == PlayerState.paused) {
+          mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.pause;
+        } else if (state == PlayerState.stopped) {
+          mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.stop;
+        }
+      });
+    }
   }
 
   @override
   Future<void> playMediaSource(PlatformMediaSource mediaSource) async {
+    _init();
     await close();
     if (autoplay) {
       try {
@@ -196,14 +199,15 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
 
   @override
   close() async {
-    player!.stop();
-    player!.release();
+    player?.stop();
+    player?.release();
   }
 
   @override
   dispose() async {
     super.dispose();
-    await player!.player.dispose();
+    await player?.player.dispose();
+    player = null;
   }
 
   ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频

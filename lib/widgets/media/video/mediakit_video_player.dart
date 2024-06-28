@@ -99,7 +99,7 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
   @override
   Future<void> playMediaSource(PlatformMediaSource mediaSource) async {
     _init();
-    await player!.stop();
+    await stop();
     Media? media = MediaKitMediaSource.media(filename: mediaSource.filename);
     if (media != null) {
       player!.open(media);

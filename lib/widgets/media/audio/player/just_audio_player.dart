@@ -199,7 +199,7 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
     bool androidOffloadSchedulingEnabled = false,
     this.player,
   }) {
-    this.player ??= JustAudioPlayer(
+    _init(
         userAgent: userAgent,
         handleInterruptions: handleInterruptions,
         androidApplyAudioAttributes: androidApplyAudioAttributes,
@@ -207,36 +207,58 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
         audioLoadConfiguration: audioLoadConfiguration,
         audioPipeline: audioPipeline,
         androidOffloadSchedulingEnabled: androidOffloadSchedulingEnabled);
-    AudioPlayer player = this.player!.player;
-    player.playerStateStream.listen((state) {
-      logger.i('player state:${state.processingState.name}');
-    });
-    player.bufferedPositionStream.listen((duration) {
-      logger.i('player state:$duration');
-    });
-    player.androidAudioSessionIdStream.listen((duration) {
-      logger.i('player state:$duration');
-    });
-    player.createPositionStream().listen((duration) {
-      logger.i('player state:$duration');
-    });
-    player.currentIndexStream.listen((duration) {
-      logger.i('player state:$duration');
-    });
-    player.durationStream.listen((duration) {
-      logger.i('player state:$duration');
-    });
-    player.playbackEventStream.listen((duration) {
-      logger.i('player state:$duration');
-    });
-    player.processingStateStream.listen((duration) {
-      logger.i('player state:$duration');
-    });
+  }
+
+  _init({
+    String? userAgent,
+    bool handleInterruptions = true,
+    bool androidApplyAudioAttributes = true,
+    bool handleAudioSessionActivation = true,
+    AudioLoadConfiguration? audioLoadConfiguration,
+    AudioPipeline? audioPipeline,
+    bool androidOffloadSchedulingEnabled = false,
+  }) {
+    if (player == null) {
+      this.player = JustAudioPlayer(
+          userAgent: userAgent,
+          handleInterruptions: handleInterruptions,
+          androidApplyAudioAttributes: androidApplyAudioAttributes,
+          handleAudioSessionActivation: handleAudioSessionActivation,
+          audioLoadConfiguration: audioLoadConfiguration,
+          audioPipeline: audioPipeline,
+          androidOffloadSchedulingEnabled: androidOffloadSchedulingEnabled);
+      AudioPlayer player = this.player!.player;
+      player.playerStateStream.listen((state) {
+        logger.i('player state:${state.processingState.name}');
+      });
+      player.bufferedPositionStream.listen((duration) {
+        logger.i('player state:$duration');
+      });
+      player.androidAudioSessionIdStream.listen((duration) {
+        logger.i('player state:$duration');
+      });
+      player.createPositionStream().listen((duration) {
+        logger.i('player state:$duration');
+      });
+      player.currentIndexStream.listen((duration) {
+        logger.i('player state:$duration');
+      });
+      player.durationStream.listen((duration) {
+        logger.i('player state:$duration');
+      });
+      player.playbackEventStream.listen((duration) {
+        logger.i('player state:$duration');
+      });
+      player.processingStateStream.listen((duration) {
+        logger.i('player state:$duration');
+      });
+    }
   }
 
   ///设置当前的通用MediaSource，并转换成特定实现的媒体源，并进行设置
   @override
   Future<void> playMediaSource(PlatformMediaSource mediaSource) async {
+    _init();
     await close();
     if (autoplay) {
       try {
@@ -265,7 +287,7 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
   @override
   dispose() async {
     super.dispose();
-    await player!.player.dispose();
+    await player?.player.dispose();
     player = null;
   }
 

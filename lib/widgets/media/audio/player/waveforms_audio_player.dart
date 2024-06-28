@@ -7,42 +7,51 @@ import 'package:fluent_ui/fluent_ui.dart';
 ///WaveformsAudio音频播放器，Android, iOS, Linux, macOS, Windows, and web.
 ///还可以产生音频播放的波形图形组件
 class WaveformsAudioPlayerController extends AbstractAudioPlayerController {
-  late PlayerController playerController;
+  PlayerController? playerController;
   double _volume = 1.0;
 
   WaveformsAudioPlayerController(super.playlistController) {
-    playerController = PlayerController();
-    playerController.onCurrentDurationChanged.listen((event) {});
-    playerController.onPlayerStateChanged.listen((state) {});
+    _init();
+  }
+
+  _init() {
+    if (playerController == null) {
+      playerController = PlayerController();
+      playerController!.onCurrentDurationChanged.listen((event) {});
+      playerController!.onPlayerStateChanged.listen((state) {});
+    }
   }
 
   ///设置当前的通用MediaSource，并转换成特定实现的媒体源，并进行设置
   @override
   Future<void> playMediaSource(PlatformMediaSource mediaSource) async {
+    _init();
     await close();
-    playerController.preparePlayer(path: mediaSource.filename, volume: _volume);
-    await playerController.startPlayer();
+    playerController!
+        .preparePlayer(path: mediaSource.filename, volume: _volume);
+    await playerController!.startPlayer();
   }
 
   @override
   pause() async {
-    await playerController.pausePlayer();
+    await playerController?.pausePlayer();
   }
 
   @override
   stop() async {
-    await playerController.stopPlayer();
+    await playerController?.stopPlayer();
   }
 
   @override
   resume() async {
-    await playerController.startPlayer();
+    await playerController?.startPlayer();
   }
 
   @override
   dispose() async {
     super.dispose();
-    playerController.dispose();
+    playerController?.dispose();
+    playerController = null;
   }
 
   @override
@@ -51,20 +60,21 @@ class WaveformsAudioPlayerController extends AbstractAudioPlayerController {
       playlistController.currentIndex = index;
     }
     try {
-      await playerController.seekTo(position.inMilliseconds);
+      await playerController!.seekTo(position.inMilliseconds);
     } catch (e) {
       logger.e('seek failure:$e');
     }
   }
 
   Future<Duration?> getDuration() async {
-    int milliseconds = await playerController.getDuration(DurationType.max);
+    int milliseconds = await playerController!.getDuration(DurationType.max);
 
     return Duration(milliseconds: milliseconds);
   }
 
   Future<Duration?> getPosition() async {
-    int milliseconds = await playerController.getDuration(DurationType.current);
+    int milliseconds =
+        await playerController!.getDuration(DurationType.current);
 
     return Duration(milliseconds: milliseconds);
   }
@@ -81,7 +91,7 @@ class WaveformsAudioPlayerController extends AbstractAudioPlayerController {
   @override
   setVolume(double volume) async {
     if (_volume != volume) {
-      bool success = await playerController.setVolume(volume);
+      bool success = await playerController!.setVolume(volume);
       if (success) {
         _volume = volume;
       }
@@ -108,7 +118,7 @@ class WaveformsAudioPlayerController extends AbstractAudioPlayerController {
   }) {
     return AudioFileWaveforms(
       key: key,
-      playerController: playerController,
+      playerController: playerController!,
       size: const Size(0, 0),
     );
   }
