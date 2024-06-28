@@ -80,7 +80,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     }
 
     videoPlayerController =
-        await OriginMediaSource.media(filename: mediaSource.filename);
+    await OriginMediaSource.media(filename: mediaSource.filename);
     if (autoplay && videoPlayerController != null) {
       var controller = videoPlayerController;
       if (controller != null) {
@@ -124,8 +124,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
         ));
   }
 
-  Widget _buildCupertinoControl(
-    VideoPlayerController videoPlayerController, {
+  Widget _buildCupertinoControl(VideoPlayerController videoPlayerController, {
     bool showFullscreenButton = true,
     bool showVolumeButton = true,
   }) {
@@ -177,8 +176,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     );
   }
 
-  Widget _buildMaterialControl(
-    VideoPlayerController videoPlayerController, {
+  Widget _buildMaterialControl(VideoPlayerController videoPlayerController, {
     bool showClosedCaptionButton = true,
     bool showFullscreenButton = true,
     bool showVolumeButton = true,
@@ -219,11 +217,11 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
 
   ///支持windows
   JkVideoControlPanel _buildJkVideoControlPanel(
-    VideoPlayerController videoPlayerController, {
-    bool showClosedCaptionButton = true,
-    bool showFullscreenButton = true,
-    bool showVolumeButton = true,
-  }) {
+      VideoPlayerController videoPlayerController, {
+        bool showClosedCaptionButton = true,
+        bool showFullscreenButton = true,
+        bool showVolumeButton = true,
+      }) {
     int currentIndex = playlistController.currentIndex;
     return JkVideoControlPanel(
         key: key,
@@ -234,19 +232,20 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
         onPrevClicked: (currentIndex <= 0)
             ? null
             : () {
-                playlistController.previous();
-                playMediaSource(playlistController.current!);
-              },
+          playlistController.previous();
+          playMediaSource(playlistController.current!);
+        },
         onNextClicked: (currentIndex == -1 ||
-                currentIndex >= playlistController.length - 1)
+            currentIndex >= playlistController.length - 1)
             ? null
             : () {
-                playlistController.next();
-                playMediaSource(playlistController.current!);
-              }, onPlayEnded: () {
-      playlistController.next;
-      playMediaSource(playlistController.current!);
-    });
+          playlistController.next();
+          playMediaSource(playlistController.current!);
+        },
+        onPlayEnded: () {
+          playlistController.next;
+          playMediaSource(playlistController.current!);
+        });
   }
 
   @override
@@ -270,9 +269,9 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
           }
           return Center(
               child: CommonAutoSizeText(
-            AppLocalizations.t('Please select a media file'),
-            style: const TextStyle(color: Colors.white),
-          ));
+                AppLocalizations.t('Please select a media file'),
+                style: const TextStyle(color: Colors.white),
+              ));
         });
 
     return player;
@@ -286,6 +285,12 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
       videoPlayerController = null;
       filename.value = null;
     }
+  }
+
+  @override
+  dispose() async {
+    await close();
+    super.dispose();
   }
 
   ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频

@@ -190,7 +190,6 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   dispose() async {
-    await close();
     await player.dispose();
     super.dispose();
   }

@@ -237,7 +237,6 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   /// 停止播放，关闭播放器，清除播放器
   @override
   void dispose() {
-    close();
     playlistController.clear();
     super.dispose();
   }
