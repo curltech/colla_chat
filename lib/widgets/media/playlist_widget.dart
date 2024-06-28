@@ -397,102 +397,111 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
 
   ///播放列表按钮
   Widget _buildPlaylistButton(BuildContext context) {
-    return ButtonBar(
-      buttonAlignedDropdown: true,
+    return Column(
       children: [
-        IconButton(
-          color: myself.primary,
-          icon: Icon(
-            gridMode ? Icons.list : Icons.grid_on,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            setState(() {
-              gridMode = !gridMode;
-            });
-          },
-          tooltip: AppLocalizations.t('Toggle grid mode'),
+        ButtonBar(
+          alignment: MainAxisAlignment.start,
+          children: [
+            IconButton(
+              color: myself.primary,
+              icon: Icon(
+                gridMode ? Icons.list : Icons.grid_on,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                setState(() {
+                  gridMode = !gridMode;
+                });
+              },
+              tooltip: AppLocalizations.t('Toggle grid mode'),
+            ),
+            IconButton(
+              color: myself.primary,
+              icon: const Icon(
+                Icons.featured_play_list_outlined,
+                color: Colors.white,
+              ),
+              onPressed: () async {
+                _addMediaSource(directory: true);
+              },
+              tooltip: AppLocalizations.t('Add video directory'),
+            ),
+            IconButton(
+              color: myself.primary,
+              icon: const Icon(
+                Icons.playlist_add,
+                color: Colors.white,
+              ),
+              onPressed: () async {
+                _addMediaSource();
+              },
+              tooltip: AppLocalizations.t('Add video file'),
+            ),
+            IconButton(
+              color: myself.primary,
+              icon: const Icon(
+                Icons.bookmark_remove,
+                color: Colors.white,
+              ),
+              onPressed: () async {
+                await widget.playlistController.clear();
+              },
+              tooltip: AppLocalizations.t('Remove all video file'),
+            ),
+            IconButton(
+              color: myself.primary,
+              icon: const Icon(
+                Icons.playlist_remove,
+                color: Colors.white, //myself.primary,
+              ),
+              onPressed: () async {
+                var currentIndex = widget.playlistController.currentIndex;
+                await widget.playlistController.delete(index: currentIndex);
+              },
+              tooltip: AppLocalizations.t('Remove video file'),
+            ),
+          ],
         ),
-        IconButton(
-          color: myself.primary,
-          icon: const Icon(
-            Icons.featured_play_list_outlined,
-            color: Colors.white,
-          ),
-          onPressed: () async {
-            _addMediaSource(directory: true);
-          },
-          tooltip: AppLocalizations.t('Add video directory'),
-        ),
-        IconButton(
-          color: myself.primary,
-          icon: const Icon(
-            Icons.playlist_add,
-            color: Colors.white,
-          ),
-          onPressed: () async {
-            _addMediaSource();
-          },
-          tooltip: AppLocalizations.t('Add video file'),
-        ),
-        IconButton(
-          color: myself.primary,
-          icon: const Icon(
-            Icons.bookmark_remove,
-            color: Colors.white,
-          ),
-          onPressed: () async {
-            await widget.playlistController.clear();
-          },
-          tooltip: AppLocalizations.t('Remove all video file'),
-        ),
-        IconButton(
-          color: myself.primary,
-          icon: const Icon(
-            Icons.playlist_remove,
-            color: Colors.white, //myself.primary,
-          ),
-          onPressed: () async {
-            var currentIndex = widget.playlistController.currentIndex;
-            await widget.playlistController.delete(index: currentIndex);
-          },
-          tooltip: AppLocalizations.t('Remove video file'),
-        ),
-        IconButton(
-          color: myself.primary,
-          icon: const Icon(
-            Icons.video_collection,
-            color: Colors.white, //myself.primary,
-          ),
-          onPressed: () async {
-            await _collect();
-          },
-          tooltip: AppLocalizations.t('Select collect file'),
-        ),
-        IconButton(
-          color: myself.primary,
-          icon: const Icon(
-            Icons.collections,
-            color: Colors.white, //myself.primary,
-          ),
-          onPressed: () async {
-            var currentIndex = widget.playlistController.currentIndex;
-            await _collectMediaSource(currentIndex);
-          },
-          tooltip: AppLocalizations.t('Collect video file'),
-        ),
-        IconButton(
-          color: myself.primary,
-          icon: const Icon(
-            Icons.bookmark_remove,
-            color: Colors.white, //myself.primary,
-          ),
-          onPressed: () async {
-            var currentIndex = widget.playlistController.currentIndex;
-            await _removeFromCollect(currentIndex);
-          },
-          tooltip: AppLocalizations.t('Remove collect file'),
-        ),
+        ButtonBar(
+          alignment: MainAxisAlignment.end,
+          children: [
+            IconButton(
+              color: myself.primary,
+              icon: const Icon(
+                Icons.video_collection,
+                color: Colors.white, //myself.primary,
+              ),
+              onPressed: () async {
+                await _collect();
+              },
+              tooltip: AppLocalizations.t('Select collect file'),
+            ),
+            IconButton(
+              color: myself.primary,
+              icon: const Icon(
+                Icons.collections,
+                color: Colors.white, //myself.primary,
+              ),
+              onPressed: () async {
+                var currentIndex = widget.playlistController.currentIndex;
+                await _collectMediaSource(currentIndex);
+              },
+              tooltip: AppLocalizations.t('Collect video file'),
+            ),
+            IconButton(
+              color: myself.primary,
+              icon: const Icon(
+                Icons.bookmark_remove,
+                color: Colors.white, //myself.primary,
+              ),
+              onPressed: () async {
+                var currentIndex = widget.playlistController.currentIndex;
+                await _removeFromCollect(currentIndex);
+              },
+              tooltip: AppLocalizations.t('Remove collect file'),
+            ),
+          ],
+        )
       ],
     );
   }
