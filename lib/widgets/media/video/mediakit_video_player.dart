@@ -42,8 +42,8 @@ class MediaKitMediaSource {
 
 ///基于MediaKit实现的媒体播放器
 class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
-  late final Player player;
-  late final VideoController videoController;
+  Player? player;
+  VideoController? videoController;
 
   // ValueNotifier<MeeduPlayerController?> meeduPlayerController =
   //     ValueNotifier<MeeduPlayerController?>(null);
@@ -56,53 +56,60 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
 
   MediaKitVideoPlayerController(super.playlistController) {
     MediaKit.ensureInitialized();
-    player = Player();
-    videoController = VideoController(player);
-    player.stream.playlist.listen((e) {});
-    player.stream.playing.listen((e) {
-      if (e) {
-        mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.playing;
-        playing.value = true;
-      } else {
-        mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.stop;
-        playing.value = false;
-      }
-    });
-    player.stream.completed.listen((e) {
-      if (e) {
-        mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.completed;
-        playing.value = false;
-      }
-    });
-    player.stream.position.listen((e) {
-      mediaPlayerState.position = e;
-    });
-    player.stream.duration.listen((e) {
-      mediaPlayerState.duration = e;
-    });
-    player.stream.volume.listen((e) {
-      volume = e;
-    });
-    player.stream.rate.listen((e) {
-      speed = e;
-    });
-    player.stream.pitch.listen((e) {});
-    player.stream.buffering.listen((e) {});
+    _init();
+  }
+
+  _init() {
+    if (player == null) {
+      player = Player();
+      videoController = VideoController(player!);
+      player!.stream.playlist.listen((e) {});
+      player!.stream.playing.listen((e) {
+        if (e) {
+          mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.playing;
+          playing.value = true;
+        } else {
+          mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.stop;
+          playing.value = false;
+        }
+      });
+      player!.stream.completed.listen((e) {
+        if (e) {
+          mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.completed;
+          playing.value = false;
+        }
+      });
+      player!.stream.position.listen((e) {
+        mediaPlayerState.position = e;
+      });
+      player!.stream.duration.listen((e) {
+        mediaPlayerState.duration = e;
+      });
+      player!.stream.volume.listen((e) {
+        volume = e;
+      });
+      player!.stream.rate.listen((e) {
+        speed = e;
+      });
+      player!.stream.pitch.listen((e) {});
+      player!.stream.buffering.listen((e) {});
+    }
   }
 
   @override
   Future<void> playMediaSource(PlatformMediaSource mediaSource) async {
-    await player.stop();
+    _init();
+    await player!.stop();
     Media? media = MediaKitMediaSource.media(filename: mediaSource.filename);
     if (media != null) {
-      player.open(media);
+      player!.open(media);
     }
     filename.value = mediaSource.filename;
   }
 
   @override
   play() {
-    if (player.state.completed || player.state.playlist.medias.isEmpty) {
+    if (player!.state.completed || player!.state.playlist.medias.isEmpty) {
       if (playlistController.current != null) {
         playMediaSource(playlistController.current!);
       }
@@ -129,7 +136,7 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
         builder: (BuildContext context, String? filename, Widget? child) {
           if (filename != null) {
             Widget player = Video(
-              controller: videoController,
+              controller: videoController!,
               controls: MaterialVideoControls,
             );
 
@@ -184,33 +191,30 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  close() async {
-    await player.stop();
-  }
-
-  @override
   dispose() async {
-    await player.dispose();
     super.dispose();
+    await player?.dispose();
+    player = null;
+    videoController = null;
   }
 
   @override
   pause() async {
-    await player.pause();
+    await player?.pause();
   }
 
   @override
   resume() async {
-    await player.play();
+    await player?.play();
   }
 
   @override
   stop() async {
-    await player.stop();
+    await player?.stop();
   }
 
   seek(Duration position, {int? index}) async {
-    await player.seek(position);
+    await player?.seek(position);
   }
 
   Future<double> getSpeed() async {
@@ -218,7 +222,7 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   setSpeed(double speed) async {
-    await player.setRate(speed);
+    await player?.setRate(speed);
   }
 
   Future<double> getVolume() async {
@@ -226,6 +230,6 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   setVolume(double volume) async {
-    await player.setVolume(volume);
+    await player?.setVolume(volume);
   }
 }

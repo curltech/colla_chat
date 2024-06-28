@@ -283,14 +283,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     if (videoPlayerController != null) {
       videoPlayerController!.dispose();
       videoPlayerController = null;
-      filename.value = null;
     }
-  }
-
-  @override
-  dispose() async {
-    await close();
-    super.dispose();
   }
 
   ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频

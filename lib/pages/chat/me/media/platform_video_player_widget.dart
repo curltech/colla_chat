@@ -55,7 +55,6 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
         valueListenable: index,
         builder: (BuildContext context, int index, Widget? child) {
           if (index == 0) {
-            // widget.mediaPlayerController
             return IconButton(
               tooltip: AppLocalizations.t('Video player'),
               onPressed: () async {

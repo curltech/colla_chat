@@ -264,8 +264,9 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
 
   @override
   dispose() async {
-    await player!.player.dispose();
     super.dispose();
+    await player!.player.dispose();
+    player = null;
   }
 
   @override

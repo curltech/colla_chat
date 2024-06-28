@@ -200,6 +200,12 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
     player!.release();
   }
 
+  @override
+  dispose() async {
+    super.dispose();
+    await player!.player.dispose();
+  }
+
   ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频
   @override
   pause() async {
@@ -217,12 +223,6 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
   resume() async {
     await player!.resume();
     notifyListeners();
-  }
-
-  @override
-  dispose() async {
-    await player!.release();
-    super.dispose();
   }
 
   Future<Duration?> getDuration() async {

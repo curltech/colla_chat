@@ -232,12 +232,14 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   /// 停止播放，关闭当前播放资源
   close() async {
     await stop();
+    playlistController.clear();
+    filename.value = null;
   }
 
   /// 停止播放，关闭播放器，清除播放器
   @override
   void dispose() {
-    playlistController.clear();
+    close();
     super.dispose();
   }
 
