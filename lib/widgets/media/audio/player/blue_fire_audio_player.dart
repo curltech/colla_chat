@@ -7,6 +7,7 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/audio/abstract_audio_player_controller.dart';
+import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:flutter/material.dart';
 
 ///简单地播放音频文件，没有控制器按钮和状态
@@ -146,7 +147,7 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
   StreamSubscription? _playerCompleteSubscription;
   StreamSubscription? _playerStateChangeSubscription;
 
-  BlueFireAudioPlayerController({this.player}) : super() {
+  BlueFireAudioPlayerController(super.playlistController, {this.player}) {
     _initStreams();
   }
 
@@ -182,20 +183,15 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
   }
 
   @override
-  Future<bool> setCurrentIndex(int index) async {
-    bool success = false;
-    if (index >= -1 && index < playlist.length && currentIndex != index) {
-      success = await super.setCurrentIndex(index);
-      if (success) {
-        await close();
-        if (autoplay) {
-          play();
-        }
-
-        notifyListeners();
+  Future<void> playMediaSource(PlatformMediaSource mediaSource) async {
+    await close();
+    if (autoplay) {
+      try {
+        await player!.play(mediaSource.filename);
+      } catch (e) {
+        logger.e('$e');
       }
     }
-    return false;
   }
 
   @override
@@ -205,20 +201,6 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
   }
 
   ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频
-  @override
-  play() async {
-    if (currentIndex >= 0 && currentIndex < playlist.length) {
-      PlatformMediaSource? currentMediaSource = this.currentMediaSource;
-      if (currentMediaSource != null) {
-        try {
-          await player!.play(currentMediaSource.filename);
-        } catch (e) {
-          logger.e('$e');
-        }
-      }
-    }
-  }
-
   @override
   pause() async {
     await player!.pause();
@@ -257,7 +239,9 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
 
   @override
   seek(Duration position, {int? index}) async {
-    await setCurrentIndex(index!);
+    if (index != null) {
+      playlistController.currentIndex = index;
+    }
     await player!.player.seek(position);
   }
 
@@ -319,4 +303,4 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
 }
 
 final BlueFireAudioPlayerController globalBlueFireAudioPlayerController =
-    BlueFireAudioPlayerController();
+    BlueFireAudioPlayerController(PlaylistController());

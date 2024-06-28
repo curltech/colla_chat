@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:fl_video/fl_video.dart';
@@ -60,10 +61,9 @@ class OriginMediaSource {
 
 ///基于VideoPlayerControlPanel实现的媒体播放器
 class OriginVideoPlayerController extends AbstractMediaPlayerController {
-  ValueNotifier<VideoPlayerController?> videoPlayerController =
-      ValueNotifier<VideoPlayerController?>(null);
+  VideoPlayerController? videoPlayerController;
 
-  OriginVideoPlayerController() {
+  OriginVideoPlayerController(super.playlistController) {
     VideoPlayerMediaKit.ensureInitialized(
       android: true,
       iOS: true,
@@ -74,36 +74,47 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  Future<bool> setCurrentIndex(int index) async {
-    bool success = false;
-    if (index >= -1 && index < playlist.length) {
-      success = await super.setCurrentIndex(index);
-      if (success) {
-        if (videoPlayerController.value != null) {
-          await close();
-        }
-        var currentMediaSource = this.currentMediaSource;
-        if (currentMediaSource != null) {
-          videoPlayerController.value = await OriginMediaSource.media(
-              filename: currentMediaSource.filename);
-          if (autoplay && videoPlayerController.value != null) {
-            play();
-          }
-        }
-        notifyListeners();
+  Future<void> playMediaSource(PlatformMediaSource mediaSource) async {
+    if (videoPlayerController != null) {
+      await close();
+    }
+
+    videoPlayerController =
+        await OriginMediaSource.media(filename: mediaSource.filename);
+    if (autoplay && videoPlayerController != null) {
+      var controller = videoPlayerController;
+      if (controller != null) {
+        controller.play();
       }
     }
-    return success;
+    filename.value = mediaSource.filename;
+  }
+
+  @override
+  play() {
+    if (videoPlayerController == null) {
+      if (playlistController.current != null) {
+        playMediaSource(playlistController.current!);
+      }
+    } else {
+      if (playlistController.current != null) {
+        if (filename.value == playlistController.current!.filename) {
+          resume();
+        } else {
+          playMediaSource(playlistController.current!);
+        }
+      }
+    }
   }
 
   Widget _buildMediaKitVideoPlayer() {
     return AspectRatio(
-        aspectRatio: videoPlayerController.value!.value.aspectRatio,
+        aspectRatio: videoPlayerController!.value.aspectRatio,
         child: Stack(
           alignment: Alignment.bottomCenter,
           children: <Widget>[
-            VideoPlayer(videoPlayerController.value!),
-            VideoProgressIndicator(videoPlayerController.value!,
+            VideoPlayer(videoPlayerController!),
+            VideoProgressIndicator(videoPlayerController!,
                 allowScrubbing: true,
                 colors: VideoProgressColors(
                     playedColor: myself.primary,
@@ -213,24 +224,29 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     bool showFullscreenButton = true,
     bool showVolumeButton = true,
   }) {
+    int currentIndex = playlistController.currentIndex;
     return JkVideoControlPanel(
-      key: key,
-      videoPlayerController,
-      showClosedCaptionButton: showClosedCaptionButton,
-      showFullscreenButton: showFullscreenButton,
-      showVolumeButton: showVolumeButton,
-      onPrevClicked: (currentIndex <= 0)
-          ? null
-          : () {
-              previous();
-            },
-      onNextClicked: (currentIndex == -1 || currentIndex >= playlist.length - 1)
-          ? null
-          : () {
-              next();
-            },
-      onPlayEnded: next,
-    );
+        key: key,
+        videoPlayerController,
+        showClosedCaptionButton: showClosedCaptionButton,
+        showFullscreenButton: showFullscreenButton,
+        showVolumeButton: showVolumeButton,
+        onPrevClicked: (currentIndex <= 0)
+            ? null
+            : () {
+                playlistController.previous();
+                playMediaSource(playlistController.current!);
+              },
+        onNextClicked: (currentIndex == -1 ||
+                currentIndex >= playlistController.length - 1)
+            ? null
+            : () {
+                playlistController.next();
+                playMediaSource(playlistController.current!);
+              }, onPlayEnded: () {
+      playlistController.next;
+      playMediaSource(playlistController.current!);
+    });
   }
 
   @override
@@ -241,14 +257,16 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     bool showVolumeButton = true,
   }) {
     Widget player = ValueListenableBuilder(
-        valueListenable: videoPlayerController,
-        builder: (BuildContext context,
-            VideoPlayerController? videoPlayerController, Widget? child) {
+        valueListenable: filename,
+        builder: (BuildContext context, String? filename, Widget? child) {
           if (videoPlayerController != null) {
-            return _buildMaterialControl(videoPlayerController,
+            return _buildMaterialControl(videoPlayerController!,
                 showClosedCaptionButton: showClosedCaptionButton,
                 showFullscreenButton: showFullscreenButton,
                 showVolumeButton: showVolumeButton);
+          }
+          if (playlistController.current != null) {
+            return LoadingUtil.buildCircularLoadingWidget();
           }
           return Center(
               child: CommonAutoSizeText(
@@ -263,24 +281,17 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   @override
   close() async {
     await super.close();
-    if (videoPlayerController.value != null) {
-      videoPlayerController.value!.dispose();
-      videoPlayerController.value = null;
+    if (videoPlayerController != null) {
+      videoPlayerController!.dispose();
+      videoPlayerController = null;
+      filename.value = null;
     }
   }
 
   ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频
   @override
-  play() async {
-    var controller = videoPlayerController.value;
-    if (controller != null) {
-      controller.play();
-    }
-  }
-
-  @override
   pause() async {
-    var controller = videoPlayerController.value;
+    var controller = videoPlayerController;
     if (controller != null) {
       controller.pause();
     }
@@ -288,7 +299,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   resume() async {
-    var controller = videoPlayerController.value;
+    var controller = videoPlayerController;
     if (controller != null) {
       controller.play();
     }
@@ -296,14 +307,14 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   stop() async {
-    var controller = videoPlayerController.value;
+    var controller = videoPlayerController;
     if (controller != null) {
       controller.pause();
     }
   }
 
   seek(Duration position, {int? index}) async {
-    var controller = videoPlayerController.value;
+    var controller = videoPlayerController;
     if (controller != null) {
       controller.seekTo(position);
     }
@@ -311,7 +322,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
 
   Future<double> getSpeed() async {
     double speed = 1.0;
-    var controller = videoPlayerController.value;
+    var controller = videoPlayerController;
     if (controller != null) {
       speed = controller.value.playbackSpeed;
     }
@@ -319,7 +330,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   setSpeed(double speed) async {
-    var controller = videoPlayerController.value;
+    var controller = videoPlayerController;
     if (controller != null) {
       controller.setPlaybackSpeed(speed);
     }
@@ -327,7 +338,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
 
   Future<double> getVolume() async {
     double volume = 1.0;
-    var controller = videoPlayerController.value;
+    var controller = videoPlayerController;
     if (controller != null) {
       volume = controller.value.volume;
     }
@@ -335,14 +346,14 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   setVolume(double volume) async {
-    var controller = videoPlayerController.value;
+    var controller = videoPlayerController;
     if (controller != null) {
       controller.setVolume(volume);
     }
   }
 
   VideoPlayerValue? get value {
-    var controller = videoPlayerController.value;
+    var controller = videoPlayerController;
     if (controller != null) {
       VideoPlayerValue value = controller.value;
 

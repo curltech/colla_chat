@@ -5,7 +5,8 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
-import 'package:colla_chat/widgets/media/video/flick_video_player.dart';
+import 'package:colla_chat/widgets/media/playlist_widget.dart';
+import 'package:colla_chat/widgets/media/video/mediakit_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player_win/video_player_win_plugin.dart';
 
@@ -39,8 +40,9 @@ class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
 
 class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
   ValueNotifier<int> index = ValueNotifier<int>(0);
-  AbstractMediaPlayerController mediaPlayerController =
-      FlickVideoPlayerController();
+  PlaylistController playlistController = PlaylistController();
+  late AbstractMediaPlayerController mediaPlayerController =
+      MediaKitVideoPlayerController(playlistController);
 
   @override
   void initState() {
@@ -82,7 +84,7 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
         tooltip: AppLocalizations.t('Close'),
         onPressed: () async {
           mediaPlayerController.close();
-          mediaPlayerController.clear();
+          playlistController.clear();
         },
         icon: const Icon(Icons.close),
       ),

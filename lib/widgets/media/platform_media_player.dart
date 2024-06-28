@@ -85,12 +85,16 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
           if (widget.onIndexChanged != null) {
             widget.onIndexChanged!(index);
           }
+          if (index == 1) {
+            widget.mediaPlayerController.play();
+          }
         },
         itemBuilder: (BuildContext context, int index) {
           if (index == 0) {
             return PlaylistWidget(
-              mediaPlayerController: widget.mediaPlayerController,
               onSelected: widget._onSelected,
+              playlistController:
+                  widget.mediaPlayerController.playlistController,
             );
           }
           if (index == 1) {

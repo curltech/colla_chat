@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:flutter/material.dart';
@@ -53,7 +54,8 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
   ValueNotifier<bool> playing = ValueNotifier<bool>(false);
   ValueNotifier<bool> hovering = ValueNotifier<bool>(false);
 
-  MediaKitVideoPlayerController() {
+  MediaKitVideoPlayerController(super.playlistController) {
+    MediaKit.ensureInitialized();
     player = Player();
     videoController = VideoController(player);
     player.stream.playlist.listen((e) {});
@@ -89,25 +91,30 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  Future<bool> setCurrentIndex(int index) async {
-    bool success = false;
-    if (index >= -1 && index < playlist.length) {
-      success = await super.setCurrentIndex(index);
-      if (success) {
-        await player.stop();
-        var currentMediaSource = this.currentMediaSource;
-        if (currentMediaSource != null) {
-          Media? media =
-              MediaKitMediaSource.media(filename: currentMediaSource.filename);
-          if (media != null) {
-            player.open(media);
-          }
+  Future<void> playMediaSource(PlatformMediaSource mediaSource) async {
+    await player.stop();
+    Media? media = MediaKitMediaSource.media(filename: mediaSource.filename);
+    if (media != null) {
+      player.open(media);
+    }
+    filename.value = mediaSource.filename;
+  }
+
+  @override
+  play() {
+    if (player.state.completed || player.state.playlist.medias.isEmpty) {
+      if (playlistController.current != null) {
+        playMediaSource(playlistController.current!);
+      }
+    } else {
+      if (playlistController.current != null) {
+        if (filename.value == playlistController.current!.filename) {
+          resume();
+        } else {
+          playMediaSource(playlistController.current!);
         }
-        notifyListeners();
       }
     }
-
-    return success;
   }
 
   @override
@@ -117,59 +124,62 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
     bool showFullscreenButton = true,
     bool showVolumeButton = true,
   }) {
-    var currentMediaSource = this.currentMediaSource;
-    Widget player;
-    if (currentMediaSource != null) {
-      player = Material(
-          child: InkWell(
-              onHover: (bool hover) {
-                hovering.value = hover;
-              },
-              onDoubleTap: () {
-                if (playing.value) {
-                  pause();
-                } else {
-                  play();
-                }
-              },
-              child: Video(
-                controller: videoController,
-              )));
+    Widget player = ValueListenableBuilder(
+        valueListenable: filename,
+        builder: (BuildContext context, String? filename, Widget? child) {
+          if (filename != null) {
+            Widget player = Video(
+              controller: videoController,
+              controls: MaterialVideoControls,
+            );
 
-      // player = MaterialVideoControlsTheme(
-      //   normal: MaterialVideoControlsThemeData(
-      // seekBarColor: myself.primary,
-      // seekBarPositionColor: myself.primary,
-      // seekBarBufferColor: Colors.grey,
-      // volumeGesture: true,
-      // brightnessGesture: true,
-      // primaryButtonBar: const [
-      //   Spacer(flex: 2),
-      //   MaterialSkipPreviousButton(),
-      //   Spacer(),
-      //   MaterialPlayOrPauseButton(iconSize: 48.0),
-      //   Spacer(),
-      //   MaterialSkipNextButton(),
-      //   Spacer(flex: 2)
-      // ],
-      // ),
-      // fullscreen: const MaterialVideoControlsThemeData(),
-      // child: player,
-      // );
+            player = MaterialVideoControlsTheme(
+              normal: MaterialVideoControlsThemeData(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 15.0, horizontal: 10.0),
+                volumeGesture: true,
+                brightnessGesture: true,
+                seekBarMargin: EdgeInsets.zero,
+                seekBarHeight: 2.4,
+                seekBarContainerHeight: 36.0,
+                seekBarColor: Colors.white,
+                seekBarPositionColor: myself.primary,
+                seekBarBufferColor: Colors.grey,
+                seekBarThumbSize: 8.0,
+                seekBarThumbColor: myself.primary,
+              ),
+              fullscreen: MaterialVideoControlsThemeData(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 15.0, horizontal: 10.0),
+                volumeGesture: true,
+                brightnessGesture: true,
+                seekBarMargin: EdgeInsets.zero,
+                seekBarHeight: 2.4,
+                seekBarContainerHeight: 36.0,
+                seekBarColor: Colors.white,
+                seekBarPositionColor: myself.primary,
+                seekBarBufferColor: Colors.grey,
+                seekBarThumbSize: 8.0,
+                seekBarThumbColor: myself.primary,
+              ),
+              child: player,
+            );
+            player = Stack(
+              children: [
+                player,
+                buildPlaylistController(),
+              ],
+            );
+            return player;
+          } else {
+            return Center(
+                child: CommonAutoSizeText(
+              AppLocalizations.t('Please select a media file'),
+              style: const TextStyle(color: Colors.white),
+            ));
+          }
+        });
 
-      player = Stack(
-        children: [
-          player,
-          buildPlaylistController(),
-        ],
-      );
-    } else {
-      player = Center(
-          child: CommonAutoSizeText(
-        AppLocalizations.t('Please select a media file'),
-        style: const TextStyle(color: Colors.white),
-      ));
-    }
     return player;
   }
 
@@ -183,11 +193,6 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
     await close();
     await player.dispose();
     super.dispose();
-  }
-
-  @override
-  play() async {
-    await player.play();
   }
 
   @override

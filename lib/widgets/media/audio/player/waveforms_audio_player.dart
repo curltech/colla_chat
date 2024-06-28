@@ -10,7 +10,7 @@ class WaveformsAudioPlayerController extends AbstractAudioPlayerController {
   late PlayerController playerController;
   double _volume = 1.0;
 
-  WaveformsAudioPlayerController() : super() {
+  WaveformsAudioPlayerController(super.playlistController) {
     playerController = PlayerController();
     playerController.onCurrentDurationChanged.listen((event) {});
     playerController.onPlayerStateChanged.listen((state) {});
@@ -18,30 +18,10 @@ class WaveformsAudioPlayerController extends AbstractAudioPlayerController {
 
   ///设置当前的通用MediaSource，并转换成特定实现的媒体源，并进行设置
   @override
-  Future<bool> setCurrentIndex(int index) async {
-    bool success = false;
-    if (index >= -1 && index < playlist.length && currentIndex != index) {
-      success = await super.setCurrentIndex(index);
-      if (success) {
-        await close();
-        if (currentIndex >= 0) {
-          PlatformMediaSource? currentMediaSource = this.currentMediaSource;
-          if (currentMediaSource != null) {
-            playerController.preparePlayer(
-                path: currentMediaSource.filename, volume: _volume);
-          }
-        }
-        notifyListeners();
-      }
-    }
-    return success;
-  }
-
-  @override
-  play() async {
-    if (currentIndex >= 0) {
-      await playerController.startPlayer();
-    }
+  Future<void> playMediaSource(PlatformMediaSource mediaSource) async {
+    await close();
+    playerController.preparePlayer(path: mediaSource.filename, volume: _volume);
+    await playerController.startPlayer();
   }
 
   @override
@@ -68,7 +48,7 @@ class WaveformsAudioPlayerController extends AbstractAudioPlayerController {
   @override
   seek(Duration position, {int? index}) async {
     if (index != null) {
-      setCurrentIndex(index);
+      playlistController.currentIndex = index;
     }
     try {
       await playerController.seekTo(position.inMilliseconds);
@@ -133,6 +113,3 @@ class WaveformsAudioPlayerController extends AbstractAudioPlayerController {
     );
   }
 }
-
-final WaveformsAudioPlayerController globalWaveformsAudioPlayerController =
-    WaveformsAudioPlayerController();

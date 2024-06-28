@@ -7,12 +7,11 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
+import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:flutter/material.dart';
 
 ///平台标准的AudioPlayer的实现，支持标准的audioplayers，just_audio和webview
 class PlatformAudioPlayerWidget extends StatefulWidget with TileDataMixin {
-  AbstractMediaPlayerController mediaPlayerController =
-      globalBlueFireAudioPlayerController;
   final SwiperController swiperController = SwiperController();
 
   PlatformAudioPlayerWidget({super.key});
@@ -36,6 +35,9 @@ class PlatformAudioPlayerWidget extends StatefulWidget with TileDataMixin {
 class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
   AudioPlayerType audioPlayerType = AudioPlayerType.audioplayers;
   ValueNotifier<int> index = ValueNotifier<int>(0);
+  PlaylistController playlistController = PlaylistController();
+  late AbstractMediaPlayerController mediaPlayerController =
+      BlueFireAudioPlayerController(playlistController);
 
   @override
   void initState() {
@@ -85,7 +87,7 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
     PlatformMediaPlayer platformMediaPlayer = PlatformMediaPlayer(
         key: UniqueKey(),
         showPlaylist: true,
-        mediaPlayerController: widget.mediaPlayerController,
+        mediaPlayerController: mediaPlayerController,
         swiperController: widget.swiperController,
         onIndexChanged: (int index) {
           this.index.value = index;
@@ -102,7 +104,7 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
   @override
   void dispose() {
     widget.swiperController.removeListener(_update);
-    widget.mediaPlayerController.close();
+    mediaPlayerController.close();
     super.dispose();
   }
 }

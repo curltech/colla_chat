@@ -1,20 +1,20 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 ///基于Flick实现的媒体播放器和记录器，
 class FlickVideoPlayerController extends OriginVideoPlayerController {
   FlickManager? flickManager;
 
-  FlickVideoPlayerController();
+  FlickVideoPlayerController(super.playlistController);
 
   void _buildFlickManager() {
-    var controller = videoPlayerController.value;
+    var controller = videoPlayerController;
     if (controller == null) {
       flickManager = null;
       return;
@@ -34,9 +34,8 @@ class FlickVideoPlayerController extends OriginVideoPlayerController {
     bool showVolumeButton = true,
   }) {
     Widget player = ValueListenableBuilder(
-        valueListenable: videoPlayerController,
-        builder: (BuildContext context,
-            VideoPlayerController? videoPlayerController, Widget? child) {
+        valueListenable: filename,
+        builder: (BuildContext context, String? filename, Widget? child) {
           if (videoPlayerController != null) {
             _buildFlickManager();
             if (flickManager != null) {
@@ -76,6 +75,9 @@ class FlickVideoPlayerController extends OriginVideoPlayerController {
               );
             }
           }
+          if (playlistController.current != null) {
+            return LoadingUtil.buildLoadingIndicator();
+          }
           return Center(
               child: CommonAutoSizeText(
             AppLocalizations.t('Please select a media file'),
@@ -91,7 +93,6 @@ class FlickVideoPlayerController extends OriginVideoPlayerController {
     super.close();
     if (flickManager != null) {
       flickManager!.dispose();
-      videoPlayerController.value = null;
       flickManager = null;
     }
   }

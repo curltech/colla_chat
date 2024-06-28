@@ -1,15 +1,11 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 abstract class AbstractAudioPlayerController
     extends AbstractMediaPlayerController {
-  AbstractAudioPlayerController() : super() {
-    fileType = FileType.custom;
-    allowedExtensions = ['mp3', 'wav', 'opus', 'aac', 'm4a'];
-  }
+  AbstractAudioPlayerController(super.playlistController);
 
   bool _closedCaptionFile = false;
 

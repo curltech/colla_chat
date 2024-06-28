@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
@@ -10,7 +9,7 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:flutter/material.dart';
 
 enum MediaPlayerStatus {
@@ -79,7 +78,7 @@ enum MediaSourceType {
 ///平台定义的媒体源
 class PlatformMediaSource {
   final String filename;
-  final ChatMessageMimeType? mediaFormat;
+  final String? mediaFormat;
   final MediaSourceType mediaSourceType;
 
   //下面两个字段用于媒体收藏功能
@@ -110,32 +109,28 @@ class PlatformMediaSource {
   static Future<PlatformMediaSource?> media(
       {required String filename, ChatMessageMimeType? mediaFormat}) async {
     PlatformMediaSource mediaSource;
+    String? extension = FileUtil.extension(filename);
     if (mediaFormat == null) {
-      String? extension = FileUtil.extension(filename);
       if (extension != null) {
         mediaFormat =
             StringUtil.enumFromString(ChatMessageMimeType.values, extension);
       }
     }
-    if (mediaFormat == null) {
-      logger.e('filename:$filename has no mediaFormat');
-      return null;
-    }
     if (filename.startsWith('assets')) {
       mediaSource = PlatformMediaSource(
           filename: filename,
           mediaSourceType: MediaSourceType.asset,
-          mediaFormat: mediaFormat);
+          mediaFormat: mediaFormat == null ? extension : mediaFormat.name);
     } else if (filename.startsWith('http')) {
       mediaSource = PlatformMediaSource(
           filename: filename,
           mediaSourceType: MediaSourceType.network,
-          mediaFormat: mediaFormat);
+          mediaFormat: mediaFormat == null ? extension : mediaFormat.name);
     } else {
       mediaSource = PlatformMediaSource(
           filename: filename,
           mediaSourceType: MediaSourceType.file,
-          mediaFormat: mediaFormat);
+          mediaFormat: mediaFormat == null ? extension : mediaFormat.name);
       String? mimeType = FileUtil.mimeType(filename);
       if (mimeType != null && mimeType.startsWith('video')) {
         try {
@@ -186,28 +181,13 @@ class PositionData {
 ///选择文件的功能，媒体窗口的产生方法接口
 abstract class AbstractMediaPlayerController with ChangeNotifier {
   Key key = UniqueKey();
-  List<PlatformMediaSource> playlist = [];
+  final PlaylistController playlistController;
+  ValueNotifier<String?> filename = ValueNotifier<String?>(null);
   bool _playlistVisible = true;
-  int _currentIndex = -1;
-  FileType fileType = FileType.custom;
-  List<String>? allowedExtensions = [
-    'mp3',
-    'wav',
-    'mp4',
-    'm4a',
-    'mov',
-    'mpeg',
-    'aac',
-    'rmvb',
-    'avi',
-    'wmv',
-    'mkv',
-    'mpg'
-  ];
   MediaPlayerState mediaPlayerState = MediaPlayerState();
   bool autoplay = false;
 
-  AbstractMediaPlayerController();
+  AbstractMediaPlayerController(this.playlistController);
 
   bool get playlistVisible {
     return _playlistVisible;
@@ -218,181 +198,36 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     notifyListeners();
   }
 
-  int get currentIndex {
-    return _currentIndex;
-  }
+  /// 播放新的媒体文件
+  Future<void> playMediaSource(PlatformMediaSource mediaSource);
 
-  Future<bool> setCurrentIndex(int index) async {
-    if (index >= -1 && index < playlist.length && _currentIndex != index) {
-      _currentIndex = index;
-      return true;
-    }
-    return false;
-  }
-
-  PlatformMediaSource? get currentMediaSource {
-    if (_currentIndex >= 0 && currentIndex < playlist.length) {
-      return playlist[_currentIndex];
-    }
-    return null;
-  }
-
-  previous() async {
-    if (currentIndex <= 0) {
-      return;
-    }
-    await setCurrentIndex(_currentIndex - 1);
-  }
-
-  next() async {
-    if (currentIndex == -1 || currentIndex >= playlist.length - 1) {
-      return;
-    }
-    await setCurrentIndex(_currentIndex + 1);
-  }
-
-  Future<PlatformMediaSource?> add(
-      {required String filename, String? messageId, Widget? thumbnail}) async {
-    for (var mediaSource in playlist) {
-      var name = mediaSource.filename;
-      if (name == filename) {
-        notifyListeners();
-        return null;
-      }
-    }
-    PlatformMediaSource? mediaSource =
-        await PlatformMediaSource.media(filename: filename);
-    if (mediaSource != null) {
-      mediaSource.messageId = messageId;
-      playlist.add(mediaSource);
-    }
-
-    return mediaSource;
-  }
-
-  Future<List<PlatformMediaSource>> addAll(
-      {required List<String> filenames,
-      List<String?>? messageIds,
-      List<Widget?>? thumbnails}) async {
-    List<PlatformMediaSource> mediaSources =
-        await PlatformMediaSource.playlist(filenames);
-    if (messageIds != null && messageIds.isNotEmpty) {
-      for (var i = 0; i < mediaSources.length; i++) {
-        var mediaSource = mediaSources[i];
-        if (messageIds.length > i) {
-          mediaSource.messageId = messageIds[i];
-        }
-      }
-    }
-    playlist.addAll(mediaSources);
-    if (playlist.isNotEmpty) {
-      await setCurrentIndex(playlist.length - 1);
-    }
-
-    return mediaSources;
-  }
-
-  /// 清除播放列表
-  clear() async {
-    playlist.clear();
-    await setCurrentIndex(-1);
-  }
-
-  Future<PlatformMediaSource?> insert(int index,
-      {required String filename}) async {
-    for (var mediaSource in playlist) {
-      var name = mediaSource.filename;
-      if (name == filename) {
-        return null;
-      }
-    }
-    PlatformMediaSource? mediaSource =
-        await PlatformMediaSource.media(filename: filename);
-    if (mediaSource != null) {
-      playlist.insert(index, mediaSource);
-      await setCurrentIndex(index);
-    }
-
-    return mediaSource;
-  }
-
-  remove(int index) async {
-    if (index >= 0 && index < playlist.length) {
-      playlist.removeAt(index);
-      await setCurrentIndex(index - 1);
+  /// 如果没有播放，则播放当前文件
+  play() {
+    if (playlistController.current != null) {
+      playMediaSource(playlistController.current!);
     }
   }
 
-  move(int initialIndex, int finalIndex) {
-    var mediaSource = playlist[initialIndex];
-    playlist[initialIndex] = playlist[finalIndex];
-    playlist[finalIndex] = mediaSource;
-  }
+  pause();
 
-  Future<List<PlatformMediaSource>> sourceFilePicker({
-    String? dialogTitle,
-    bool directory = false,
-    String? initialDirectory,
-    List<String>? allowedExtensions,
-    dynamic Function(FilePickerStatus)? onFileLoading,
-    bool allowCompression = true,
-    bool allowMultiple = true,
-    bool withData = false,
-    bool withReadStream = false,
-    bool lockParentWindow = false,
-  }) async {
-    List<PlatformMediaSource> mediaSources = [];
-    if (directory) {
-      String? path = await FileUtil.directoryPathPicker(
-          dialogTitle: dialogTitle, initialDirectory: initialDirectory);
-      if (path != null) {
-        Directory dir = Directory(path);
-        List<FileSystemEntity> entries = dir.listSync();
-        if (entries.isNotEmpty) {
-          for (FileSystemEntity entry in entries) {
-            String? extension = FileUtil.extension(entry.path);
-            if (extension == null) {
-              continue;
-            }
-            bool? contain = this.allowedExtensions?.contains(extension);
-            if (contain != null && contain) {
-              PlatformMediaSource? mediaSource =
-                  await add(filename: entry.path);
-              if (mediaSource != null) {
-                mediaSources.add(mediaSource);
-              }
-            }
-          }
-          await setCurrentIndex(playlist.length - 1);
-        }
-      }
-    } else {
-      final xfiles = await FileUtil.pickFiles(
-          allowMultiple: allowMultiple,
-          type: fileType,
-          allowedExtensions: this.allowedExtensions);
-      if (xfiles.isNotEmpty) {
-        for (var xfile in xfiles) {
-          PlatformMediaSource? mediaSource = await add(filename: xfile.path);
-          if (mediaSource != null) {
-            mediaSources.add(mediaSource);
-          }
-        }
-        await setCurrentIndex(playlist.length - 1);
-      }
+  resume();
+
+  next() {
+    playlistController.next();
+    if (playlistController.current != null) {
+      playMediaSource(playlistController.current!);
     }
-
-    return mediaSources;
   }
 
-  play() async {}
-
-  pause() async {}
-
-  resume() async {}
+  previous() {
+    playlistController.previous();
+    if (playlistController.current != null) {
+      playMediaSource(playlistController.current!);
+    }
+  }
 
   /// 停止播放
-  stop() async {}
+  stop();
 
   /// 停止播放，关闭当前播放资源
   close() async {
@@ -403,7 +238,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   @override
   void dispose() {
     close();
-    clear();
+    playlistController.clear();
     super.dispose();
   }
 
@@ -416,7 +251,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
 
   Widget buildPlaylistController() {
     List<Widget> children = [];
-    if (currentIndex > 0) {
+    if (playlistController.currentIndex > 0) {
       children.add(
         IconButton(
             hoverColor: myself.primary,
@@ -438,8 +273,10 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
             )),
       );
     }
-    if (currentIndex >= 0 && currentIndex < playlist.length) {
-      PlatformMediaSource platformMediaSource = playlist[currentIndex];
+    int currentIndex = playlistController.currentIndex;
+    if (currentIndex >= 0 && currentIndex < playlistController.length) {
+      PlatformMediaSource platformMediaSource =
+          playlistController.get(currentIndex);
       String name = FileUtil.filename(platformMediaSource.filename);
       children.add(CommonAutoSizeText(
         name,
@@ -447,7 +284,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
         maxLines: 1,
       ));
     }
-    if (currentIndex > -1 && currentIndex < playlist.length - 1) {
+    if (currentIndex > -1 && currentIndex < playlistController.length - 1) {
       children.add(
         IconButton(
             hoverColor: myself.primary,

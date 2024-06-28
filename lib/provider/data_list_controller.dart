@@ -140,6 +140,12 @@ class DataListController<T> with ChangeNotifier {
     notifyListeners();
   }
 
+  move(int initialIndex, int finalIndex) {
+    var mediaSource = data[initialIndex];
+    data[initialIndex] = data[finalIndex];
+    data[finalIndex] = mediaSource;
+  }
+
   int get length => data.length;
 
   sort<S>(Comparable<S>? Function(T t) getFieldValue, int columnIndex,
@@ -239,7 +245,7 @@ class DataPageController<T> extends DataListController<T> {
     }
   }
 
-  move(int index) {
+  movePage(int index) {
     int currentPage = PaginationUtil.getCurrentPage(offset, limit);
     if (currentPage != index) {
       offset = index * limit;

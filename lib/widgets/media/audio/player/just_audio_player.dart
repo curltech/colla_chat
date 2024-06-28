@@ -2,9 +2,10 @@ import 'dart:math';
 
 import 'package:audio_session/audio_session.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
-import 'package:colla_chat/widgets/media/audio/audio_session.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/audio/abstract_audio_player_controller.dart';
+import 'package:colla_chat/widgets/media/audio/audio_session.dart';
+import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
@@ -187,7 +188,8 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
   //   children: [],
   // );
 
-  JustAudioPlayerController({
+  JustAudioPlayerController(
+    super.playlistController, {
     String? userAgent,
     bool handleInterruptions = true,
     bool androidApplyAudioAttributes = true,
@@ -234,31 +236,13 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
 
   ///设置当前的通用MediaSource，并转换成特定实现的媒体源，并进行设置
   @override
-  Future<bool> setCurrentIndex(int index) async {
-    bool success = false;
-    if (index >= -1 && index < playlist.length && currentIndex != index) {
-      success = await super.setCurrentIndex(index);
-      if (success) {
-        await close();
-        if (autoplay) {
-          play();
-        }
-        notifyListeners();
-      }
-    }
-    return success;
-  }
-
-  @override
-  play() async {
-    if (currentIndex >= 0 && currentIndex < playlist.length) {
-      PlatformMediaSource? currentMediaSource = this.currentMediaSource;
-      if (currentMediaSource != null) {
-        try {
-          await player!.play(currentMediaSource.filename);
-        } catch (e) {
-          logger.e('$e');
-        }
+  Future<void> playMediaSource(PlatformMediaSource mediaSource) async {
+    await close();
+    if (autoplay) {
+      try {
+        await player!.play(mediaSource.filename);
+      } catch (e) {
+        logger.e('$e');
       }
     }
   }
@@ -287,7 +271,7 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
   @override
   seek(Duration? position, {int? index}) async {
     if (index != null) {
-      setCurrentIndex(index);
+      playlistController.currentIndex = index;
     }
     if (position != null) {
       try {
@@ -361,4 +345,4 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
 }
 
 final JustAudioPlayerController globalJustAudioPlayerController =
-    JustAudioPlayerController();
+    JustAudioPlayerController(PlaylistController());

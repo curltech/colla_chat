@@ -2,6 +2,7 @@ import 'package:colla_chat/pages/chat/chat/message/common_message.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
+import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:flutter/material.dart';
 
 ///消息体：声音消息
@@ -27,7 +28,7 @@ class AudioMessage extends StatefulWidget {
 
 class _AudioMessageState extends State<AudioMessage> {
   final BlueFireAudioPlayerController audioMessagePlayerController =
-      BlueFireAudioPlayerController();
+      BlueFireAudioPlayerController(PlaylistController());
   late final PlatformMediaPlayer audioMessagePlayer;
   ValueNotifier<String?> filename = ValueNotifier<String?>(null);
 
@@ -55,8 +56,9 @@ class _AudioMessageState extends State<AudioMessage> {
             if (widget.fullScreen) {
               audioMessagePlayerController.autoplay = true;
             }
-            audioMessagePlayerController.clear();
-            audioMessagePlayerController.addAll(filenames: [filename]);
+            audioMessagePlayerController.playlistController.clear();
+            audioMessagePlayerController.playlistController
+                .addMediaFiles(filenames: [filename]);
 
             return audioMessagePlayer;
           }

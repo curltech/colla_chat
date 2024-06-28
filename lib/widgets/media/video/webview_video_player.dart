@@ -1,38 +1,13 @@
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/webview/platform_webview.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 ///基于WebView实现的媒体播放器和记录器，
 class WebViewVideoPlayerController extends AbstractMediaPlayerController {
   PlatformWebViewController? platformWebViewController;
 
-  WebViewVideoPlayerController() {
-    fileType = FileType.custom;
-    allowedExtensions = [
-      'mp3',
-      'wav',
-      'mp4',
-      'm4a',
-      'mov',
-      'mpeg',
-      'aac',
-      'opus'
-    ];
-  }
-
-  @override
-  next() {
-    super.next();
-    play();
-  }
-
-  @override
-  previous() {
-    super.previous();
-    play();
-  }
+  WebViewVideoPlayerController(super.playlistController);
 
   String getMediaHtml(String filename, {bool autoplay = false}) {
     String autoplayStr = autoplay ? 'autoplay' : '';
@@ -48,32 +23,16 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
     return html;
   }
 
-  @override
-  play() {
-    var currentMediaSource = this.currentMediaSource;
-    if (platformWebViewController != null && currentMediaSource != null) {
-      platformWebViewController!.load(currentMediaSource.filename);
-    }
-  }
-
   void _onWebViewCreated(PlatformWebViewController platformWebViewController) {
     this.platformWebViewController = platformWebViewController;
     // play();
   }
 
   @override
-  Future<bool> setCurrentIndex(int index) async {
-    bool success = false;
-    if (index >= -1 && index < playlist.length) {
-      success = await super.setCurrentIndex(index);
-      if (success) {
-        if (autoplay && platformWebViewController != null) {
-          play();
-        }
-        notifyListeners();
-      }
+  Future<void> playMediaSource(PlatformMediaSource mediaSource) async {
+    if (autoplay && platformWebViewController != null) {
+      platformWebViewController!.load(mediaSource.filename);
     }
-    return false;
   }
 
   @override
@@ -84,8 +43,9 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
     bool showVolumeButton = true,
   }) {
     String? initialFilename;
+    var currentMediaSource = playlistController.current;
     if (currentMediaSource != null) {
-      initialFilename = currentMediaSource!.filename;
+      initialFilename = currentMediaSource.filename;
     }
     var platformWebView = PlatformWebView(
       key: key,
@@ -97,4 +57,13 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   close() {}
+
+  @override
+  pause() {}
+
+  @override
+  resume() {}
+
+  @override
+  stop() {}
 }

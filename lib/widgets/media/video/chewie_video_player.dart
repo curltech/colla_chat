@@ -1,19 +1,19 @@
 import 'package:chewie/chewie.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
 
 ///基于Chewie实现的媒体播放器和记录器，
 class ChewieVideoPlayerController extends OriginVideoPlayerController {
   ChewieController? chewieController;
 
-  ChewieVideoPlayerController();
+  ChewieVideoPlayerController(super.playlistController);
 
   void _buildChewieController() {
-    var controller = videoPlayerController.value;
+    var controller = videoPlayerController;
     if (controller == null) {
       chewieController = null;
       return;
@@ -55,9 +55,8 @@ class ChewieVideoPlayerController extends OriginVideoPlayerController {
     bool showVolumeButton = true,
   }) {
     Widget player = ValueListenableBuilder(
-        valueListenable: videoPlayerController,
-        builder: (BuildContext context,
-            VideoPlayerController? videoPlayerController, Widget? child) {
+        valueListenable: filename,
+        builder: (BuildContext context, String? filename, Widget? child) {
           if (videoPlayerController != null) {
             _buildChewieController();
             if (chewieController != null) {
@@ -69,6 +68,9 @@ class ChewieVideoPlayerController extends OriginVideoPlayerController {
                 buildPlaylistController()
               ]);
             }
+          }
+          if (playlistController.current != null) {
+            return LoadingUtil.buildCircularLoadingWidget();
           }
           return Center(
               child: CommonAutoSizeText(

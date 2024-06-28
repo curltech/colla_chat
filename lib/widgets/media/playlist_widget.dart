@@ -5,6 +5,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
@@ -16,15 +17,164 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+
+class PlaylistController extends DataListController<PlatformMediaSource> {
+  FileType fileType = FileType.custom;
+  Set<String> allowedExtensions = {
+    'mp3',
+    'wav',
+    'mp4',
+    '3gp',
+    'm4a',
+    'mov',
+    'mpeg',
+    'aac',
+    'rmvb',
+    'avi',
+    'wmv',
+    'mkv',
+    'mpg'
+  };
+
+  previous() async {
+    if (currentIndex <= 0) {
+      return;
+    }
+    currentIndex = currentIndex - 1;
+  }
+
+  next() async {
+    if (currentIndex == -1 || currentIndex >= data.length - 1) {
+      return;
+    }
+    currentIndex = currentIndex + 1;
+  }
+
+  Future<PlatformMediaSource?> addMediaFile(
+      {required String filename, String? messageId, Widget? thumbnail}) async {
+    for (var mediaSource in data) {
+      var name = mediaSource.filename;
+      if (name == filename) {
+        notifyListeners();
+        return null;
+      }
+    }
+    PlatformMediaSource? mediaSource =
+        await PlatformMediaSource.media(filename: filename);
+    if (mediaSource != null) {
+      mediaSource.messageId = messageId;
+      add(mediaSource);
+    }
+
+    return mediaSource;
+  }
+
+  Future<List<PlatformMediaSource>> addMediaFiles(
+      {required List<String> filenames,
+      List<String?>? messageIds,
+      List<Widget?>? thumbnails}) async {
+    List<PlatformMediaSource> mediaSources =
+        await PlatformMediaSource.playlist(filenames);
+    if (messageIds != null && messageIds.isNotEmpty) {
+      for (var i = 0; i < mediaSources.length; i++) {
+        var mediaSource = mediaSources[i];
+        if (messageIds.length > i) {
+          mediaSource.messageId = messageIds[i];
+        }
+      }
+    }
+    addAll(mediaSources);
+    if (data.isNotEmpty) {
+      currentIndex = data.length - 1;
+    }
+
+    return mediaSources;
+  }
+
+  Future<PlatformMediaSource?> insertMediaFile(int index,
+      {required String filename}) async {
+    for (var mediaSource in data) {
+      var name = mediaSource.filename;
+      if (name == filename) {
+        return null;
+      }
+    }
+    PlatformMediaSource? mediaSource =
+        await PlatformMediaSource.media(filename: filename);
+    if (mediaSource != null) {
+      insert(index, mediaSource);
+    }
+
+    return mediaSource;
+  }
+
+  Future<List<PlatformMediaSource>> sourceFilePicker({
+    String? dialogTitle,
+    bool directory = false,
+    String? initialDirectory,
+    List<String>? allowedExtensions,
+    dynamic Function(FilePickerStatus)? onFileLoading,
+    bool allowCompression = true,
+    bool allowMultiple = true,
+    bool withData = false,
+    bool withReadStream = false,
+    bool lockParentWindow = false,
+  }) async {
+    List<PlatformMediaSource> mediaSources = [];
+    if (directory) {
+      String? path = await FileUtil.directoryPathPicker(
+          dialogTitle: dialogTitle, initialDirectory: initialDirectory);
+      if (path != null) {
+        Directory dir = Directory(path);
+        List<FileSystemEntity> entries = dir.listSync();
+        if (entries.isNotEmpty) {
+          for (FileSystemEntity entry in entries) {
+            String? extension = FileUtil.extension(entry.path);
+            if (extension == null) {
+              continue;
+            }
+            bool? contain = this.allowedExtensions.contains(extension);
+            if (contain != null && contain) {
+              PlatformMediaSource? mediaSource =
+                  await addMediaFile(filename: entry.path);
+              if (mediaSource != null) {
+                mediaSources.add(mediaSource);
+              }
+            }
+          }
+          currentIndex = data.length - 1;
+        }
+      }
+    } else {
+      final xfiles = await FileUtil.pickFiles(
+          allowMultiple: allowMultiple,
+          type: fileType,
+          allowedExtensions: this.allowedExtensions.toList());
+      if (xfiles.isNotEmpty) {
+        for (var xfile in xfiles) {
+          PlatformMediaSource? mediaSource =
+              await addMediaFile(filename: xfile.path);
+          if (mediaSource != null) {
+            mediaSources.add(mediaSource);
+          }
+        }
+        currentIndex = data.length - 1;
+      }
+    }
+
+    return mediaSources;
+  }
+}
 
 ///媒体文件播放列表
 class PlaylistWidget extends StatefulWidget {
-  final AbstractMediaPlayerController mediaPlayerController;
   final Function(int index, String filename)? onSelected;
+  final PlaylistController playlistController;
 
   const PlaylistWidget(
-      {super.key, required this.mediaPlayerController, this.onSelected});
+      {super.key, this.onSelected, required this.playlistController});
 
   @override
   State createState() => _PlaylistWidgetState();
@@ -37,7 +187,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
   @override
   void initState() {
     super.initState();
-    widget.mediaPlayerController.addListener(_update);
+    widget.playlistController.addListener(_update);
     _update();
   }
 
@@ -47,7 +197,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
 
   ///从收藏的文件中加入播放列表
   _collect() async {
-    String fileType = widget.mediaPlayerController.fileType.name;
+    String fileType = widget.playlistController.fileType.name;
     ChatMessageContentType? contentType =
         StringUtil.enumFromString(ChatMessageContentType.values, fileType);
     contentType = contentType ?? ChatMessageContentType.media;
@@ -55,7 +205,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       ChatMessageType.collection.name,
       contentType: contentType.name,
     );
-    widget.mediaPlayerController.playlist.clear();
+    widget.playlistController.clear();
     List<String> filenames = [];
     for (var chatMessage in chatMessages) {
       var title = chatMessage.title!;
@@ -71,12 +221,11 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
         filenames.add(filename);
       }
     }
-    widget.mediaPlayerController.addAll(filenames: filenames);
+    widget.playlistController.addMediaFiles(filenames: filenames);
   }
 
   Future<void> _buildTileData() async {
-    List<PlatformMediaSource> mediaSources =
-        widget.mediaPlayerController.playlist;
+    List<PlatformMediaSource> mediaSources = widget.playlistController.data;
     List<TileData> tileData = [];
     for (var mediaSource in mediaSources) {
       var filename = mediaSource.filename;
@@ -87,8 +236,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       }
       var length = file.lengthSync();
       bool selected = false;
-      PlatformMediaSource? current =
-          widget.mediaPlayerController.currentMediaSource;
+      PlatformMediaSource? current = widget.playlistController.current;
       if (current != null) {
         if (current.filename == filename) {
           selected = true;
@@ -175,7 +323,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                   return InkWell(
                       child: thumbnails[index],
                       onTap: () {
-                        widget.mediaPlayerController.setCurrentIndex(index);
+                        widget.playlistController.currentIndex = index;
                         if (widget.onSelected != null) {
                           widget.onSelected!(index, tileData[index].title);
                         }
@@ -186,7 +334,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
               tileData: tileData,
               onTap: (int index, String title,
                   {TileData? group, String? subtitle}) {
-                widget.mediaPlayerController.setCurrentIndex(index);
+                widget.playlistController.currentIndex = index;
                 if (widget.onSelected != null) {
                   widget.onSelected!(index, title);
                 }
@@ -199,8 +347,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
   ///选择文件加入播放列表
   _addMediaSource({bool directory = false}) async {
     try {
-      List<PlatformMediaSource> mediaSources = await widget
-          .mediaPlayerController
+      List<PlatformMediaSource> mediaSources = await widget.playlistController
           .sourceFilePicker(directory: directory);
     } catch (e) {
       if (mounted) {
@@ -211,7 +358,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
 
   _removeFromCollect(int index) async {
     PlatformMediaSource mediaSource =
-        widget.mediaPlayerController.playlist[index];
+        widget.playlistController.delete(index: index);
     var messageId = mediaSource.messageId;
     if (messageId != null) {
       chatMessageService.delete(where: 'messageId=?', whereArgs: [messageId]);
@@ -220,10 +367,9 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
 
   ///将播放列表的文件加入收藏
   _collectMediaSource(int index) async {
-    PlatformMediaSource mediaSource =
-        widget.mediaPlayerController.playlist[index];
+    PlatformMediaSource mediaSource = widget.playlistController.get(index);
     var filename = mediaSource.filename;
-    var mediaFormat = mediaSource.mediaFormat!.name;
+    String mediaFormat = mediaSource.mediaFormat!;
     File file = File(filename);
     bool exist = file.existsSync();
     if (!exist) {
@@ -234,7 +380,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
     // ChatMessageMimeType? chatMessageMimeType =
     //     StringUtil.enumFromString<ChatMessageMimeType>(
     //         ChatMessageMimeType.values, mediaFormat);
-    String fileType = widget.mediaPlayerController.fileType.name;
+    String fileType = widget.playlistController.fileType.name;
     ChatMessageContentType? contentType =
         StringUtil.enumFromString(ChatMessageContentType.values, fileType);
     contentType = contentType ?? ChatMessageContentType.media;
@@ -295,7 +441,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
             color: Colors.white,
           ),
           onPressed: () async {
-            await widget.mediaPlayerController.clear();
+            await widget.playlistController.clear();
           },
           tooltip: AppLocalizations.t('Remove all video file'),
         ),
@@ -306,8 +452,8 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
             color: Colors.white, //myself.primary,
           ),
           onPressed: () async {
-            var currentIndex = widget.mediaPlayerController.currentIndex;
-            await widget.mediaPlayerController.remove(currentIndex);
+            var currentIndex = widget.playlistController.currentIndex;
+            await widget.playlistController.delete(index: currentIndex);
           },
           tooltip: AppLocalizations.t('Remove video file'),
         ),
@@ -329,7 +475,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
             color: Colors.white, //myself.primary,
           ),
           onPressed: () async {
-            var currentIndex = widget.mediaPlayerController.currentIndex;
+            var currentIndex = widget.playlistController.currentIndex;
             await _collectMediaSource(currentIndex);
           },
           tooltip: AppLocalizations.t('Collect video file'),
@@ -341,7 +487,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
             color: Colors.white, //myself.primary,
           ),
           onPressed: () async {
-            var currentIndex = widget.mediaPlayerController.currentIndex;
+            var currentIndex = widget.playlistController.currentIndex;
             await _removeFromCollect(currentIndex);
           },
           tooltip: AppLocalizations.t('Remove collect file'),
@@ -372,7 +518,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
 
   @override
   void dispose() {
-    widget.mediaPlayerController.removeListener(_update);
+    widget.playlistController.removeListener(_update);
     super.dispose();
   }
 }
