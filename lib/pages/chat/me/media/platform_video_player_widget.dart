@@ -13,6 +13,7 @@ import 'package:video_player_win/video_player_win_plugin.dart';
 ///平台标准的video_player的实现，缺省采用webview
 class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
   final SwiperController swiperController = SwiperController();
+  final PlaylistController playlistController = PlaylistController();
 
   PlatformVideoPlayerWidget({
     super.key,
@@ -40,9 +41,8 @@ class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
 
 class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
   ValueNotifier<int> index = ValueNotifier<int>(0);
-  PlaylistController playlistController = PlaylistController();
   late AbstractMediaPlayerController mediaPlayerController =
-      MediaKitVideoPlayerController(playlistController);
+      MediaKitVideoPlayerController(widget.playlistController);
 
   @override
   void initState() {
@@ -83,7 +83,7 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
         tooltip: AppLocalizations.t('Close'),
         onPressed: () async {
           mediaPlayerController.close();
-          playlistController.clear();
+          widget.playlistController.clear();
         },
         icon: const Icon(Icons.close),
       ),

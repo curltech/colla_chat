@@ -398,11 +398,12 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
   ///播放列表按钮
   Widget _buildPlaylistButton(BuildContext context) {
     return ButtonBar(
+      buttonAlignedDropdown: true,
       children: [
         IconButton(
           color: myself.primary,
           icon: Icon(
-            gridMode ? Icons.grid_on : Icons.list,
+            gridMode ? Icons.list : Icons.grid_on,
             color: Colors.white,
           ),
           onPressed: () {
