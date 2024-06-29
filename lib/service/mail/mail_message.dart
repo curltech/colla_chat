@@ -25,12 +25,23 @@ class EmailMessageService extends GeneralBaseService<MailMessage> {
   }
 
   Future<bool> store(MailMessage emailMessage) async {
-    int guid = emailMessage.guid;
-    MailMessage? old = await findOne(where: 'guid=?', whereArgs: [guid]);
+    int uid = emailMessage.uid;
+    MailMessage? old = await findOne(where: 'uid=?', whereArgs: [uid]);
     if (old != null) {
-      emailMessage.id = old.id;
-      emailMessage.createDate = old.createDate;
-      await update(emailMessage);
+      String? oldStatus = old.status;
+      if (oldStatus == enough_mail.FetchPreference.full.name) {
+        return false;
+      }
+      String? newStatus = emailMessage.status;
+      if (newStatus == oldStatus) {
+        return false;
+      }
+      if (newStatus == enough_mail.FetchPreference.full.name ||
+          newStatus == enough_mail.FetchPreference.bodystructure.name) {
+        emailMessage.id = old.id;
+        emailMessage.createDate = old.createDate;
+        await update(emailMessage);
+      }
     } else {
       await insert(emailMessage);
     }
@@ -44,13 +55,20 @@ class EmailMessageService extends GeneralBaseService<MailMessage> {
     MailMessage emailMessage = MailMessage();
     emailMessage.emailAddress = myself.myselfPeer.email;
     mimeMessage.parse();
-    emailMessage.title = mimeMessage.decodeSubject();
-    emailMessage.senderAddress = mimeMessage.from;
-    emailMessage.receiverAddress = mimeMessage.to;
+    emailMessage.subject = mimeMessage.decodeSubject();
+    emailMessage.senders = mimeMessage.from;
+    emailMessage.receivers = mimeMessage.to;
+    emailMessage.sender = mimeMessage.sender;
+    emailMessage.cc = mimeMessage.cc;
+    emailMessage.bcc = mimeMessage.bcc;
+    emailMessage.replyTo = mimeMessage.replyTo;
     emailMessage.sendTime = mimeMessage.decodeDate()?.toIso8601String();
     emailMessage.sendTime ??= mimeMessage.envelope?.date?.toIso8601String();
     emailMessage.uid = mimeMessage.uid ?? 0;
     emailMessage.guid = mimeMessage.guid ?? 0;
+    emailMessage.sequenceId = mimeMessage.sequenceId ?? 0;
+    emailMessage.messageId = mimeMessage.envelope?.messageId;
+    emailMessage.inReplyTo = mimeMessage.envelope?.inReplyTo;
     emailMessage.mailboxName = mailbox.name;
     emailMessage.flags = mimeMessage.flags;
     emailMessage.status = fetchPreference.name;
@@ -60,12 +78,35 @@ class EmailMessageService extends GeneralBaseService<MailMessage> {
     return await store(emailMessage);
   }
 
-  Future<List<MailMessage>> fetchMessages(
+  Future<List<MailMessage>> findMessages(
     String emailAddress,
     String mailboxName, {
     String? sendTime,
-    int? limit,
-    int? offset,
+    int limit = 30,
+    int offset = 0,
+  }) async {
+    String where = 'emailAddress=? and mailboxName=?';
+    List<Object> whereArgs = [emailAddress, mailboxName];
+    if (sendTime != null) {
+      where = '$where and sendTime<?';
+      whereArgs.add(sendTime);
+    }
+    List<MailMessage> emailMessages = await find(
+        where: where,
+        whereArgs: whereArgs,
+        orderBy: 'sendTime desc',
+        limit: limit,
+        offset: offset);
+
+    return emailMessages;
+  }
+
+  Future<List<MailMessage>> findLatestMessages(
+    String emailAddress,
+    String mailboxName, {
+    String? sendTime,
+    int limit = 30,
+    int offset = 0,
   }) async {
     String where = 'emailAddress=? and mailboxName=?';
     List<Object> whereArgs = [emailAddress, mailboxName];
@@ -89,7 +130,7 @@ final EmailMessageService mailMessageService = EmailMessageService(
     indexFields: [
       'ownerPeerId',
       'emailAddress',
-      'guid',
+      'uid',
       'mailboxName',
       'senderPeerId',
       'sendTime',

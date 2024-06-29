@@ -1,3 +1,4 @@
+import 'package:colla_chat/entity/mail/mail_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -23,7 +24,7 @@ class _MailListWidgetState extends State<MailListWidget> {
   initState() {
     super.initState();
     mailMimeMessageController.addListener(_update);
-    mailMimeMessageController.findMoreMailMessages();
+    mailMimeMessageController.findMailMessages();
   }
 
   _update() {
@@ -32,47 +33,43 @@ class _MailListWidgetState extends State<MailListWidget> {
 
   ///当前邮箱邮件消息转换成tileData，如果为空则返回空列表
   Future<List<TileData>> findMoreMimeMessageTiles() async {
-    List<MimeMessage>? currentMimeMessages =
-        mailMimeMessageController.currentMimeMessages;
-    if (currentMimeMessages == null || currentMimeMessages.isEmpty) {
-      await mailMimeMessageController.findMoreMailMessages();
+    List<MailMessage>? currentMailMessages =
+        mailMimeMessageController.currentMailMessages;
+    if (currentMailMessages == null || currentMailMessages.isEmpty) {
+      await mailMimeMessageController.findMailMessages();
     }
-    currentMimeMessages = mailMimeMessageController.currentMimeMessages;
-    if (currentMimeMessages == null) {
+    currentMailMessages = mailMimeMessageController.currentMailMessages;
+    if (currentMailMessages == null) {
       return [];
     }
 
-    return await _convertMimeMessage(currentMimeMessages);
+    return await _convertMimeMessage(currentMailMessages);
   }
 
   Future<List<TileData>> _convertMimeMessage(
-      List<MimeMessage> mimeMessages) async {
+      List<MailMessage> mailMessages) async {
     List<TileData> tiles = [];
-    if (mimeMessages.isNotEmpty) {
+    if (mailMessages.isNotEmpty) {
       int i = 0;
-      for (var mimeMessage in mimeMessages) {
+      for (var mailMessage in mailMessages) {
+        MimeMessage mimeMessage =
+            mailMimeMessageController.convert(mailMessage)!;
         DecryptedMimeMessage decryptedMimeMessage =
             await mailMimeMessageController.decryptMimeMessage(mimeMessage);
-        var title = decryptedMimeMessage.subject;
-        Envelope? envelope = mimeMessage.envelope;
-        if (envelope == null) {
-          //logger.e('');
-          // continue;
-        }
-        title ??= mimeMessage.decodeSubject();
-        var subtitle = mimeMessage.decodeSender().firstOrNull?.personalName;
-        subtitle = subtitle ?? '';
-        var email = mimeMessage.decodeSender().firstOrNull?.email;
+        var subtitle = decryptedMimeMessage.subject;
+        var title = mailMessage.sender?.personalName;
+        title = title ?? '';
+        var email = mailMessage.sender?.email;
         email = email ?? '';
-        subtitle = '$subtitle[$email]';
-        var sendDate = mimeMessage.decodeDate();
+        title = '$title[$email]';
+        var sendDate = mailMessage.sendTime;
         var titleTail = '';
         if (sendDate != null) {
-          titleTail = DateUtil.formatEasyRead(sendDate.toIso8601String());
+          titleTail = DateUtil.formatEasyRead(sendDate);
         }
         TileData tile = TileData(
             prefix: decryptedMimeMessage.needDecrypt ? Icons.mail_lock : null,
-            title: title ?? '',
+            title: title,
             titleTail: titleTail,
             subtitle: subtitle.toString(),
             selected: mailMimeMessageController.currentMailIndex == i);
@@ -153,23 +150,37 @@ class _MailListWidgetState extends State<MailListWidget> {
 
   _onTap(int index, String title, {String? subtitle, TileData? group}) async {
     mailMimeMessageController.currentMailIndex = index;
-    if (mailMimeMessageController.currentMimeMessage != null) {
-      await mailMimeMessageController
-          .fetchMessageContents(mailMimeMessageController.currentMimeMessage!);
+    if (mailMimeMessageController.currentMailMessage != null) {
+      MimeMessage? mimeMessage = mailMimeMessageController
+          .convert(mailMimeMessageController.currentMailMessage!);
+      if (mimeMessage != null) {
+        await mailMimeMessageController.fetchMessageContents(mimeMessage);
+      }
     }
     indexWidgetProvider.push('mail_content');
   }
 
   Future<void> _onScrollMax() async {
-    await mailMimeMessageController.findMoreMailMessages();
+    await mailMimeMessageController.fetchMessages();
+    await mailMimeMessageController.findLatestMailMessages();
   }
 
   Future<void> _onScrollMin() async {
-    // await mailAddressController.findMoreMailMessages();
+    List<MailMessage>? currentMailMessages =
+        mailMimeMessageController.currentMailMessages;
+    if (currentMailMessages != null && currentMailMessages.isNotEmpty) {
+      MimeMessage? mimeMessage =
+          mailMimeMessageController.convert(currentMailMessages.last);
+      if (mimeMessage != null) {
+        await mailMimeMessageController.fetchMessagesNextPage(mimeMessage);
+      }
+    }
+    await mailMimeMessageController.findMailMessages();
   }
 
   Future<void> _onRefresh() async {
-    await mailMimeMessageController.findMoreMailMessages();
+    await mailMimeMessageController.fetchMessages();
+    await mailMimeMessageController.findLatestMailMessages();
   }
 
   Widget _buildMailListWidget(BuildContext context) {

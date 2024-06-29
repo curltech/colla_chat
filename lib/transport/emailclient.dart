@@ -434,33 +434,82 @@ class EmailClient {
     return null;
   }
 
-  ///按照指定的页号获取消息
+  /// 获取从接收的时间开始的特定数目的消息
+  Future<List<enough_mail.MimeMessage>?> fetchThreads({
+    required DateTime since,
+    Mailbox? mailbox,
+    ThreadPreference threadPreference = ThreadPreference.latest,
+    FetchPreference fetchPreference = FetchPreference.envelope,
+    int pageSize = 30,
+    Duration? responseTimeout,
+  }) async {
+    return await lock.synchronized(() async {
+      return await _fetchThreads(
+        since: since,
+        pageSize: pageSize,
+        fetchPreference: fetchPreference,
+        threadPreference: threadPreference,
+        mailbox: mailbox,
+        responseTimeout: responseTimeout,
+      );
+    });
+  }
+
+  Future<List<enough_mail.MimeMessage>?> _fetchThreads({
+    required DateTime since,
+    Mailbox? mailbox,
+    ThreadPreference threadPreference = ThreadPreference.latest,
+    FetchPreference fetchPreference = FetchPreference.envelope,
+    int pageSize = 30,
+    Duration? responseTimeout,
+  }) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null && mailbox != null) {
+      try {
+        ThreadResult threadResult = await mailClient.fetchThreads(
+          since: since,
+          pageSize: pageSize,
+          fetchPreference: fetchPreference,
+          threadPreference: threadPreference,
+          mailbox: mailbox,
+          responseTimeout: responseTimeout,
+        );
+        List<MimeMessage> messages =
+            await mailClient.fetchThreadsNextPage(threadResult);
+
+        return messages;
+      } catch (e) {
+        logger.e('fetch messages failure:$e');
+      }
+    }
+    return null;
+  }
+
+  /// 按照指定的页号获取消息
   Future<List<enough_mail.MimeMessage>?> fetchMessages(
-      {int limit = 20,
-      FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
+      {int count = 30,
+      FetchPreference fetchPreference = FetchPreference.envelope,
       Mailbox? mailbox,
       int page = 1}) async {
     return await lock.synchronized(() async {
       return await _fetchMessages(
-          limit: limit,
+          count: count,
           fetchPreference: fetchPreference,
           mailbox: mailbox,
           page: page);
     });
   }
 
-  ///用邮件客户端获取消息，可以设定完全获取，或者部分获取
-  ///默认是在尺寸内的完全获取，或者只获取封面
   Future<List<enough_mail.MimeMessage>?> _fetchMessages(
-      {int limit = 20,
-      FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
+      {int count = 30,
+      FetchPreference fetchPreference = FetchPreference.envelope,
       Mailbox? mailbox,
       int page = 1}) async {
     final enough_mail.MailClient? mailClient = this.mailClient;
     if (mailClient != null && mailbox != null) {
       try {
         final messages = await mailClient.fetchMessages(
-            count: limit,
+            count: count,
             fetchPreference: fetchPreference,
             mailbox: mailbox,
             page: page);
@@ -493,32 +542,35 @@ class EmailClient {
     return null;
   }
 
+  /// 取某消息更旧的一页消息
   Future<List<enough_mail.MimeMessage>?> fetchMessagesNextPage(
     enough_mail.MimeMessage mimeMessage, {
     Mailbox? mailbox,
-    FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
+    FetchPreference fetchPreference = FetchPreference.envelope,
     bool markAsSeen = false,
+    int pageSize = 30,
   }) async {
     return await lock.synchronized(() async {
       return await _fetchMessagesNextPage(mimeMessage,
           fetchPreference: fetchPreference,
           mailbox: mailbox,
+          pageSize: pageSize,
           markAsSeen: markAsSeen);
     });
   }
 
-  ///取给定的页号的下一页
   Future<List<enough_mail.MimeMessage>?> _fetchMessagesNextPage(
     enough_mail.MimeMessage mimeMessage, {
     Mailbox? mailbox,
-    FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
+    FetchPreference fetchPreference = FetchPreference.envelope,
     bool markAsSeen = false,
+    int pageSize = 30,
   }) async {
     final enough_mail.MailClient? mailClient = this.mailClient;
     if (mailClient != null) {
-      var pagedSequence = PagedMessageSequence(
+      PagedMessageSequence pagedSequence = PagedMessageSequence(
           MessageSequence.fromMessage(mimeMessage),
-          pageSize: 20);
+          pageSize: pageSize);
       return await mailClient.fetchMessagesNextPage(pagedSequence,
           mailbox: mailbox,
           fetchPreference: fetchPreference,
@@ -539,6 +591,77 @@ class EmailClient {
           responseTimeout: responseTimeout);
     }
     return null;
+  }
+
+  /// 根据消息的序列号获取对应的消息
+  Future<List<enough_mail.MimeMessage>?> fetchMessageSequence(
+    MessageSequence sequence, {
+    Mailbox? mailbox,
+    FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
+    bool markAsSeen = false,
+  }) async {
+    return await lock.synchronized(() async {
+      return await _fetchMessageSequence(sequence,
+          fetchPreference: fetchPreference,
+          mailbox: mailbox,
+          markAsSeen: markAsSeen);
+    });
+  }
+
+  Future<List<enough_mail.MimeMessage>?> _fetchMessageSequence(
+    MessageSequence sequence, {
+    Mailbox? mailbox,
+    FetchPreference fetchPreference = FetchPreference.envelope,
+    bool markAsSeen = false,
+  }) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      return await mailClient.fetchMessageSequence(sequence,
+          mailbox: mailbox,
+          fetchPreference: fetchPreference,
+          markAsSeen: markAsSeen);
+    }
+    return null;
+  }
+
+  /// 根据搜索条件获取邮件消息
+  Future<List<enough_mail.MimeMessage>?> searchMessages(
+      MailSearch search) async {
+    return await lock.synchronized(() async {
+      return await _searchMessages(search);
+    });
+  }
+
+  Future<List<enough_mail.MimeMessage>?> _searchMessages(
+      MailSearch search) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      enough_mail.MailSearchResult mailSearchResult =
+          await mailClient.searchMessages(search);
+      return await mailClient.searchMessagesNextPage(mailSearchResult);
+    }
+    return null;
+  }
+
+  Future<void> flagMessage(
+    MimeMessage message, {
+    bool? isSeen,
+    bool? isFlagged,
+    bool? isAnswered,
+    bool? isForwarded,
+    bool? isDeleted,
+    bool? isReadReceiptSent,
+  }) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      return await mailClient.flagMessage(message,
+          isSeen: isSeen,
+          isFlagged: isFlagged,
+          isAnswered: isAnswered,
+          isForwarded: isForwarded,
+          isDeleted: isDeleted,
+          isReadReceiptSent: isReadReceiptSent);
+    }
   }
 
   ///删除邮件
@@ -566,89 +689,6 @@ class EmailClient {
     final enough_mail.MailClient? mailClient = this.mailClient;
     if (mailClient != null) {
       return await mailClient.deleteAllMessages(mailbox, expunge: expunge);
-    }
-    return null;
-  }
-
-  Future<List<enough_mail.MimeMessage>?> fetchMessageSequence(
-    MessageSequence sequence, {
-    Mailbox? mailbox,
-    FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
-    bool markAsSeen = false,
-  }) async {
-    return await lock.synchronized(() async {
-      return await _fetchMessageSequence(sequence,
-          fetchPreference: fetchPreference,
-          mailbox: mailbox,
-          markAsSeen: markAsSeen);
-    });
-  }
-
-  Future<List<enough_mail.MimeMessage>?> _fetchMessageSequence(
-    MessageSequence sequence, {
-    Mailbox? mailbox,
-    FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
-    bool markAsSeen = false,
-  }) async {
-    final enough_mail.MailClient? mailClient = this.mailClient;
-    if (mailClient != null) {
-      return await mailClient.fetchMessageSequence(sequence,
-          mailbox: mailbox,
-          fetchPreference: fetchPreference,
-          markAsSeen: markAsSeen);
-    }
-    return null;
-  }
-
-  Future<void> flagMessage(
-    MimeMessage message, {
-    bool? isSeen,
-    bool? isFlagged,
-    bool? isAnswered,
-    bool? isForwarded,
-    bool? isDeleted,
-    bool? isReadReceiptSent,
-  }) async {
-    final enough_mail.MailClient? mailClient = this.mailClient;
-    if (mailClient != null) {
-      return await mailClient.flagMessage(message,
-          isSeen: isSeen,
-          isFlagged: isFlagged,
-          isAnswered: isAnswered,
-          isForwarded: isForwarded,
-          isDeleted: isDeleted,
-          isReadReceiptSent: isReadReceiptSent);
-    }
-  }
-
-  Future<List<enough_mail.MimeMessage>?> searchMessagesNextPage(
-      MailSearchResult searchResult) async {
-    return await lock.synchronized(() async {
-      return await _searchMessagesNextPage(searchResult);
-    });
-  }
-
-  Future<List<enough_mail.MimeMessage>?> _searchMessagesNextPage(
-      MailSearchResult searchResult) async {
-    final enough_mail.MailClient? mailClient = this.mailClient;
-    if (mailClient != null) {
-      return await mailClient.searchMessagesNextPage(searchResult);
-    }
-    return null;
-  }
-
-  Future<enough_mail.MailSearchResult?> searchMessages(
-      MailSearch search) async {
-    return await lock.synchronized(() async {
-      return await _searchMessages(search);
-    });
-  }
-
-  Future<enough_mail.MailSearchResult?> _searchMessages(
-      MailSearch search) async {
-    final enough_mail.MailClient? mailClient = this.mailClient;
-    if (mailClient != null) {
-      return await mailClient.searchMessages(search);
     }
     return null;
   }
@@ -800,6 +840,9 @@ class EmailClient {
     if (client.serverInfo.supportsId) {
       final serverId = await client.id(clientId: EmailMessageUtil.clientId);
       logger.i(serverId.toString());
+    }
+    if (client.serverInfo.supportsThreading) {
+      logger.i('Imap supportsThreading');
     }
     try {
       if (emailAddress.imapServerHost != null) {

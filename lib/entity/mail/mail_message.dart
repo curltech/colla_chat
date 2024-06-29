@@ -12,20 +12,24 @@ class MailMessage extends StatusEntity {
   String? mailboxName;
   int uid = 0;
   int guid = 0;
+  int sequenceId = 0;
   List<String>? flags;
   String? direct; //对自己而言，消息是属于发送或者接受
+  enough_mail.MailAddress? sender;
   String? senderPeerId; // 消息发送方（作者）peerId
   String? senderClientId;
-  String? senderType;
-  String? senderName;
-  List<enough_mail.MailAddress>? senderAddress;
+  List<enough_mail.MailAddress>? senders;
+  List<enough_mail.MailAddress>? replyTo;
+  String? inReplyTo;
+  String? messageId;
   String? sendTime; // 发送时间
-  String? receiverName;
-  List<enough_mail.MailAddress>? receiverAddress;
+  List<enough_mail.MailAddress>? receivers;
+  List<enough_mail.MailAddress>? cc;
+  List<enough_mail.MailAddress>? bcc;
   String? receiveTime; // 接收时间
   String? receiptTime; // 发送回执时间
   String? readTime; // 阅读时间
-  String? title; // 消息标题
+  String? subject; // 消息标题
   String? thumbnail; // 预览缩略图（base64图片，适用需预览的content，如笔记、联系人名片）
   String? content; // 消息内容
   String? receiptType; // 回执的内容
@@ -44,17 +48,17 @@ class MailMessage extends StatusEntity {
         mailboxName = json['mailboxName'],
         uid = json['uid'],
         guid = json['guid'],
+        sequenceId = json['sequenceId'],
+        inReplyTo = json['inReplyTo'],
+        messageId = json['messageId'],
         direct = json['direct'],
-        receiverName = json['receiverName'],
         senderPeerId = json['senderPeerId'],
         senderClientId = json['senderClientId'],
-        senderName = json['senderName'],
-        senderType = json['senderType'],
         sendTime = json['sendTime'],
         receiveTime = json['receiveTime'],
         receiptTime = json['receiptTime'],
         readTime = json['readTime'],
-        title = json['title'],
+        subject = json['subject'],
         receiptType = json['receiptType'],
         thumbnail = json['thumbnail'],
         content = json['content'],
@@ -80,32 +84,77 @@ class MailMessage extends StatusEntity {
       logger.e('flags toJson error:$e');
     }
     try {
-      var receiverAddress = json['receiverAddress'] != null
-          ? JsonUtil.toJson(json['receiverAddress'])
-          : null;
-      if (receiverAddress != null && receiverAddress is List) {
-        this.receiverAddress = <enough_mail.MailAddress>[];
-        for (var receiverAddr in receiverAddress) {
-          this.receiverAddress!.add(
-              enough_mail.MailAddress.fromJson(JsonUtil.toJson(receiverAddr)));
+      var senders =
+          json['senders'] != null ? JsonUtil.toJson(json['senders']) : null;
+      if (senders != null && senders is List) {
+        this.senders = <enough_mail.MailAddress>[];
+        for (var sender in senders) {
+          this
+              .senders!
+              .add(enough_mail.MailAddress.fromJson(JsonUtil.toJson(sender)));
         }
       }
     } catch (e) {
-      logger.e('receiverAddress toJson error:$e');
+      logger.e('from toJson error:$e');
     }
     try {
-      var senderAddress = json['senderAddress'] != null
-          ? JsonUtil.toJson(json['senderAddress'])
-          : null;
-      if (senderAddress != null && senderAddress is List) {
-        this.senderAddress = <enough_mail.MailAddress>[];
-        for (var senderAddr in senderAddress) {
-          this.senderAddress!.add(
-              enough_mail.MailAddress.fromJson(JsonUtil.toJson(senderAddr)));
+      var receivers =
+          json['receivers'] != null ? JsonUtil.toJson(json['receivers']) : null;
+      if (receivers != null && receivers is List) {
+        this.receivers = <enough_mail.MailAddress>[];
+        for (var receiver in receivers) {
+          this
+              .receivers!
+              .add(enough_mail.MailAddress.fromJson(JsonUtil.toJson(receiver)));
         }
       }
     } catch (e) {
-      logger.e('senderAddress toJson error:$e');
+      logger.e('from toJson error:$e');
+    }
+    try {
+      var cc = json['cc'] != null ? JsonUtil.toJson(json['cc']) : null;
+      if (cc != null && cc is List) {
+        this.cc = <enough_mail.MailAddress>[];
+        for (var c in cc) {
+          this.cc!.add(enough_mail.MailAddress.fromJson(JsonUtil.toJson(c)));
+        }
+      }
+    } catch (e) {
+      logger.e('cc toJson error:$e');
+    }
+    try {
+      var bcc = json['bcc'] != null ? JsonUtil.toJson(json['bcc']) : null;
+      if (bcc != null && bcc is List) {
+        this.bcc = <enough_mail.MailAddress>[];
+        for (var c in bcc) {
+          this.bcc!.add(enough_mail.MailAddress.fromJson(JsonUtil.toJson(c)));
+        }
+      }
+    } catch (e) {
+      logger.e('bcc toJson error:$e');
+    }
+    try {
+      var replyTo =
+          json['replyTo'] != null ? JsonUtil.toJson(json['replyTo']) : null;
+      if (replyTo != null && replyTo is List) {
+        this.replyTo = <enough_mail.MailAddress>[];
+        for (var c in replyTo) {
+          this
+              .replyTo!
+              .add(enough_mail.MailAddress.fromJson(JsonUtil.toJson(c)));
+        }
+      }
+    } catch (e) {
+      logger.e('replyTo toJson error:$e');
+    }
+    try {
+      var sender =
+          json['sender'] != null ? JsonUtil.toJson(json['sender']) : null;
+      if (sender != null) {
+        this.sender = enough_mail.MailAddress.fromJson(JsonUtil.toJson(sender));
+      }
+    } catch (e) {
+      logger.e('sender toJson error:$e');
     }
   }
 
@@ -117,23 +166,24 @@ class MailMessage extends StatusEntity {
       'mailboxName': mailboxName,
       'uid': uid,
       'guid': guid,
+      'sequenceId': sequenceId,
+      'inReplyTo': inReplyTo,
+      'messageId': messageId,
       'direct': direct,
       'flags': flags == null ? null : JsonUtil.toJsonString(flags),
-      'receiverName': receiverName,
-      'receiverAddress': receiverAddress == null
-          ? null
-          : JsonUtil.toJsonString(receiverAddress),
+      'receivers': receivers == null ? null : JsonUtil.toJsonString(receivers),
       'senderPeerId': senderPeerId,
       'senderClientId': senderClientId,
-      'senderType': senderType,
-      'senderName': senderName,
-      'senderAddress':
-          senderAddress == null ? null : JsonUtil.toJsonString(senderAddress),
+      'sender': sender == null ? null : JsonUtil.toJsonString(sender),
+      'senders': senders == null ? null : JsonUtil.toJsonString(senders),
+      'cc': senders == null ? null : JsonUtil.toJsonString(cc),
+      'bcc': senders == null ? null : JsonUtil.toJsonString(bcc),
+      'replyTo': senders == null ? null : JsonUtil.toJsonString(replyTo),
       'sendTime': sendTime,
       'receiveTime': receiveTime,
       'receiptTime': receiptTime,
       'readTime': readTime,
-      'title': title,
+      'subject': subject,
       'receiptType': receiptType,
       'thumbnail': thumbnail,
       'content': content,

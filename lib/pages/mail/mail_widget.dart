@@ -54,7 +54,6 @@ class _MailWidgetState extends State<MailWidget> {
     super.initState();
     mailMimeMessageController.addListener(_update);
     mailMimeMessageController.initAllMailAddress();
-    // mailMimeMessageController.connectAllMailAddress();
   }
 
   _update() {
@@ -138,8 +137,7 @@ class _MailWidgetState extends State<MailWidget> {
     } else {
       rightWidgets.add(IconButton(
           onPressed: () {
-            mailMimeMessageController.currentMimeMessages?.clear();
-            mailMimeMessageController.findMoreMimeMessages();
+            mailMimeMessageController.fetchMessages();
           },
           icon: const Icon(Icons.refresh, color: Colors.white),
           tooltip: AppLocalizations.t('Refresh')));

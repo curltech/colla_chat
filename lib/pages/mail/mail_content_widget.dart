@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/entity/mail/mail_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/mail/full_screen_attachment_widget.dart';
 import 'package:colla_chat/pages/mail/mail_mime_message_controller.dart';
@@ -78,7 +79,11 @@ class _MailContentWidgetState extends State<MailContentWidget> {
 
   ///获取当前邮件的附件目录信息，用于展示
   List<ContentInfo>? findContentInfos() {
-    MimeMessage? mimeMessage = mailMimeMessageController.currentMimeMessage;
+    MailMessage? mailMessage = mailMimeMessageController.currentMailMessage;
+    if (mailMessage == null) {
+      return null;
+    }
+    MimeMessage? mimeMessage = mailMimeMessageController.convert(mailMessage);
     if (mimeMessage == null) {
       return null;
     }
@@ -94,7 +99,11 @@ class _MailContentWidgetState extends State<MailContentWidget> {
 
   ///根据fetchId获取当前邮件的特定附件数据
   Future<MediaProvider?> findAttachmentMediaProvider(String fetchId) async {
-    MimeMessage? mimeMessage = mailMimeMessageController.currentMimeMessage;
+    MailMessage? mailMessage = mailMimeMessageController.currentMailMessage;
+    if (mailMessage == null) {
+      return null;
+    }
+    MimeMessage? mimeMessage = mailMimeMessageController.convert(mailMessage);
     if (mimeMessage == null) {
       return null;
     }
@@ -145,20 +154,28 @@ class _MailContentWidgetState extends State<MailContentWidget> {
 
   ///当前的邮件发生变化，如果没有获取内容，则获取内容
   Future<MimeMessage?> findMimeMessage() async {
-    MimeMessage? mimeMessage = mailMimeMessageController.currentMimeMessage;
-    if (mimeMessage != null) {
-      try {
-        await mailMimeMessageController.fetchMessageContents(mimeMessage);
-        mimeMessage = mailMimeMessageController.currentMimeMessage;
-      } catch (e) {
-        logger.e('updateMimeMessageContent failure:$e');
-      }
-      if (mimeMessage != null) {
-        decryptedMimeMessage =
-            await mailMimeMessageController.decryptMimeMessage(mimeMessage);
-        subject.value = decryptedMimeMessage.subject;
-      }
+    MailMessage? mailMessage = mailMimeMessageController.currentMailMessage;
+    if (mailMessage == null) {
+      return null;
     }
+    MimeMessage? mimeMessage = mailMimeMessageController.convert(mailMessage);
+    if (mimeMessage == null) {
+      return null;
+    }
+    try {
+      if (mailMessage.status != FetchPreference.full.name) {
+        mimeMessage =
+            await mailMimeMessageController.fetchMessageContents(mimeMessage);
+      }
+    } catch (e) {
+      logger.e('updateMimeMessageContent failure:$e');
+    }
+    if (mimeMessage != null) {
+      decryptedMimeMessage =
+          await mailMimeMessageController.decryptMimeMessage(mimeMessage);
+      subject.value = decryptedMimeMessage.subject;
+    }
+
     if (mimeMessage == null) {
       decryptedMimeMessage.subject = null;
       subject.value = null;
