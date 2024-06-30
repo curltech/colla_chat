@@ -57,9 +57,11 @@ class _MailListWidgetState extends State<MailListWidget> {
         DecryptedMimeMessage decryptedMimeMessage =
             await mailMimeMessageController.decryptMimeMessage(mimeMessage);
         var subtitle = decryptedMimeMessage.subject;
-        var title = mailMessage.sender?.personalName;
+        MailAddress? sender = mailMessage.sender;
+        sender ??= mailMessage.senders?.firstOrNull;
+        var title = sender?.personalName;
         title = title ?? '';
-        var email = mailMessage.sender?.email;
+        var email = sender?.email;
         email = email ?? '';
         title = '$title[$email]';
         var sendDate = mailMessage.sendTime;
@@ -150,13 +152,18 @@ class _MailListWidgetState extends State<MailListWidget> {
 
   _onTap(int index, String title, {String? subtitle, TileData? group}) async {
     mailMimeMessageController.currentMailIndex = index;
-    if (mailMimeMessageController.currentMailMessage != null) {
-      MimeMessage? mimeMessage = mailMimeMessageController
-          .convert(mailMimeMessageController.currentMailMessage!);
+    MailMessage? mailMessage = mailMimeMessageController.currentMailMessage;
+    if (mailMessage == null) {
+      return null;
+    }
+    if (mailMessage.status != FetchPreference.full.name) {
+      MimeMessage? mimeMessage = mailMimeMessageController.convert(mailMessage);
       if (mimeMessage != null) {
-        await mailMimeMessageController.fetchMessageContents(mimeMessage);
+        // await mailMimeMessageController.fetchMessageContents(mimeMessage);
+        await mailMimeMessageController.fetchMessagesNextPage(mimeMessage);
       }
     }
+
     indexWidgetProvider.push('mail_content');
   }
 
@@ -166,15 +173,6 @@ class _MailListWidgetState extends State<MailListWidget> {
   }
 
   Future<void> _onScrollMin() async {
-    List<MailMessage>? currentMailMessages =
-        mailMimeMessageController.currentMailMessages;
-    if (currentMailMessages != null && currentMailMessages.isNotEmpty) {
-      MimeMessage? mimeMessage =
-          mailMimeMessageController.convert(currentMailMessages.last);
-      if (mimeMessage != null) {
-        await mailMimeMessageController.fetchMessagesNextPage(mimeMessage);
-      }
-    }
     await mailMimeMessageController.findMailMessages();
   }
 

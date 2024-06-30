@@ -127,21 +127,24 @@ class EmailMessageUtil {
 
   ///转换邮件地址实体信息到邮件地址配置
   static enough_mail.ClientConfig? buildDiscoverConfig(
-      entity.MailAddress mailAddress) {
+      entity.MailAddress mailAddress,
+      {bool preferredPop = false}) {
     enough_mail.ClientConfig config = enough_mail.ClientConfig();
     bool incoming = false;
     bool outcoming = false;
-    var imapServerConfigStr = mailAddress.imapServerConfig;
     ConfigEmailProvider provider =
         ConfigEmailProvider(displayName: mailAddress.name);
     config.addEmailProvider(provider);
-    if (imapServerConfigStr != null) {
-      Map<String, dynamic> imapServerConfigMap =
-          JsonUtil.toJson(imapServerConfigStr) as Map<String, dynamic>;
-      ServerConfig imapServerConfig =
-          ServerConfig.fromJson(imapServerConfigMap);
-      provider.addIncomingServer(imapServerConfig);
-      incoming = true;
+    if (preferredPop) {
+      var imapServerConfigStr = mailAddress.imapServerConfig;
+      if (imapServerConfigStr != null) {
+        Map<String, dynamic> imapServerConfigMap =
+            JsonUtil.toJson(imapServerConfigStr) as Map<String, dynamic>;
+        ServerConfig imapServerConfig =
+            ServerConfig.fromJson(imapServerConfigMap);
+        provider.addIncomingServer(imapServerConfig);
+        incoming = true;
+      }
     }
     var popServerConfigStr = mailAddress.popServerConfig;
     if (popServerConfigStr != null) {
@@ -150,6 +153,9 @@ class EmailMessageUtil {
       ServerConfig popServerConfig = ServerConfig.fromJson(popServerConfigMap);
       provider.addIncomingServer(popServerConfig);
       incoming = true;
+      if (preferredPop) {
+        provider.preferredIncomingServer = popServerConfig;
+      }
     }
     var smtpServerConfigStr = mailAddress.smtpServerConfig;
     if (smtpServerConfigStr != null) {
@@ -318,7 +324,8 @@ class EmailClient {
     }
     config = this.config;
     if (config == null) {
-      this.config = EmailMessageUtil.buildDiscoverConfig(emailAddress);
+      this.config = EmailMessageUtil.buildDiscoverConfig(emailAddress,
+          preferredPop: false);
       config = this.config;
       if (config == null) {
         logger.e('no discover config');
@@ -516,6 +523,7 @@ class EmailClient {
         return messages;
       } catch (e) {
         logger.e('fetch messages failure:$e');
+        rethrow;
       }
     }
     return null;

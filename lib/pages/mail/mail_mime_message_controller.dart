@@ -279,9 +279,24 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
       notifyListeners();
 
       return true;
+    } else {
+      int page = getPage(currentMailMessages?.length ?? 0);
+      await _fetchMessages(page: page);
     }
 
     return false;
+  }
+
+  int getPage(int offset) {
+    int mod = offset % 20;
+    int page = offset ~/ 20;
+    if (mod == 0) {
+      page++;
+    } else {
+      page += 2;
+    }
+
+    return page;
   }
 
   ///以下是与邮件服务器相关的部分
@@ -403,21 +418,32 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     }
     String email = current!.email;
 
-    return emailClientPool.get(email);
+    EmailClient? emailClient = emailClientPool.get(email);
+    if (emailClient == null) {
+      _connectMailAddress(current!);
+    }
+
+    return emailClient;
   }
 
   ///从邮件服务器中取当前地址当前邮箱的所有未取的最新邮件数据，放入数据提供者的数组中
   Future<void> fetchMessages({
+    int count = 30,
+    int page = 1,
     FetchPreference fetchPreference = FetchPreference.envelope,
   }) async {
     return await lock.synchronized(() async {
       return await _fetchMessages(
+        count: count,
+        page: page,
         fetchPreference: fetchPreference,
       );
     });
   }
 
   Future<void> _fetchMessages({
+    int count = 30,
+    int page = 1,
     FetchPreference fetchPreference = FetchPreference.envelope,
   }) async {
     EmailClient? emailClient = currentEmailClient;
@@ -430,21 +456,29 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     }
     bool isMore = true;
     while (isMore) {
-      List<enough_mail.MimeMessage>? mimeMessages =
-          await emailClient.fetchMessages(
-              mailbox: currentMailbox, fetchPreference: fetchPreference);
-      if (mimeMessages != null && mimeMessages.isNotEmpty) {
-        for (var mimeMessage in mimeMessages) {
-          bool success = await mailMessageService.storeMimeMessage(
-              currentMailbox, mimeMessage, fetchPreference);
-          if (!success) {
+      try {
+        List<enough_mail.MimeMessage>? mimeMessages =
+            await emailClient.fetchMessages(
+                mailbox: currentMailbox,
+                count: count,
+                page: page,
+                fetchPreference: fetchPreference);
+        if (mimeMessages != null && mimeMessages.isNotEmpty) {
+          for (var mimeMessage in mimeMessages) {
+            bool success = await mailMessageService.storeMimeMessage(
+                currentMailbox, mimeMessage, fetchPreference);
+            if (!success) {
+              isMore = false;
+              break;
+            }
+          }
+          if (mimeMessages.length < count) {
             isMore = false;
-            break;
           }
         }
-        if (mimeMessages.length < 20) {
-          isMore = false;
-        }
+      } catch (e) {
+        isMore = false;
+        break;
       }
     }
   }
