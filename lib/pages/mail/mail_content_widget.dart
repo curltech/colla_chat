@@ -269,7 +269,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
         icon = await _buildMediaProviderWidget(mediaProvider);
         mediaProviders.add(mediaProvider);
       }
-      icon ??= Column(children: [
+      icon ??= Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         Mimecon(
           mimetype: mimeType ?? 'bin',
           color: myself.primary,
