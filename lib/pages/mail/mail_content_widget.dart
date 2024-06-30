@@ -11,6 +11,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/mail/mail_address.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -221,7 +222,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
             } catch (e) {
               logger.e('PlatformWebView failure:$e');
             }
-            Widget? attachWidget = _buildAttachmentChips(context);
+            Widget? attachWidget = _buildAttachmentWidget(context);
             if (attachWidget == null) {
               return webView;
             }
@@ -237,13 +238,23 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     return mimeMessageViewer;
   }
 
-  /// 附件显示区
-  Widget? _buildAttachmentChips(BuildContext context) {
-    List<Widget> chips = [];
-    List<ContentInfo>? contentInfos = findContentInfos();
-    if (contentInfos == null) {
-      return null;
+  Future<Widget?> _buildMediaProviderWidget(MediaProvider mediaProvider) async {
+    if (mediaProvider.isImage) {
+      MemoryMediaProvider memoryMediaProvider =
+          await mediaProvider.toMemoryProvider();
+      Widget image = ImageUtil.buildMemoryImageWidget(memoryMediaProvider.data);
+
+      return Center(child: image);
     }
+
+    return null;
+  }
+
+  /// 附件显示区
+  Future<List<Widget>?> _buildAttachmentChips(
+      BuildContext context, List<ContentInfo> contentInfos) async {
+    List<Widget> chips = [];
+    List<MediaProvider> mediaProviders = [];
     for (ContentInfo contentInfo in contentInfos) {
       String? fileName = contentInfo.fileName;
       fileName = fileName ?? AppLocalizations.t('Unknown filename');
@@ -251,21 +262,33 @@ class _MailContentWidgetState extends State<MailContentWidget> {
       int? size = contentInfo.size;
       MediaType? mediaType = contentInfo.mediaType;
       String? mimeType = FileUtil.mimeType(fileName);
-      Widget icon = Mimecon(
-        mimetype: mimeType ?? 'bin',
-        color: myself.primary,
-        size: 32,
-        isOutlined: true,
-      );
+      Widget? icon;
       String fetchId = contentInfo.fetchId;
+      MediaProvider? mediaProvider = await findAttachmentMediaProvider(fetchId);
+      if (mediaProvider != null) {
+        icon = await _buildMediaProviderWidget(mediaProvider);
+        mediaProviders.add(mediaProvider);
+      }
+      icon ??= Column(children: [
+        Mimecon(
+          mimetype: mimeType ?? 'bin',
+          color: myself.primary,
+          size: 32,
+          isOutlined: true,
+        ),
+        CommonAutoSizeText(
+          fileName,
+          softWrap: true,
+          overflow: TextOverflow.fade,
+          maxLines: 3,
+        ),
+        CommonAutoSizeText(size == null ? '' : '$size'),
+      ]);
+
       var chip = GestureDetector(
           onDoubleTap: () async {
-            MediaProvider? mediaProvider =
-                await findAttachmentMediaProvider(fetchId);
-            if (mediaProvider != null) {
-              mimeMessageAttachmentController.mediaProvider = mediaProvider;
-              indexWidgetProvider.push('full_screen_attachment');
-            }
+            mimeMessageAttachmentController.mediaProvider = mediaProvider;
+            indexWidgetProvider.push('full_screen_attachment');
           },
           child: Card(
             elevation: 0.0,
@@ -273,34 +296,39 @@ class _MailContentWidgetState extends State<MailContentWidget> {
                 side: BorderSide(color: myself.primary)),
             //margin: const EdgeInsets.all(10.0),
             child: Container(
-                padding: const EdgeInsets.all(5.0),
-                width: 150,
-                child: Column(children: [
-                  icon,
-                  Text(
-                    fileName,
-                    softWrap: true,
-                    overflow: TextOverflow.fade,
-                    maxLines: 3,
-                  ),
-                  Text(size == null ? '' : '$size'),
-                ])),
+                padding: const EdgeInsets.all(0.0),
+                height: 100,
+                width: 120,
+                child: icon),
           ));
       chips.add(chip);
     }
-    if (chips.isNotEmpty) {
-      return Container(
-          // height: 100,
-          alignment: Alignment.centerLeft,
-          color: myself.getBackgroundColor(context).withOpacity(0.6),
-          child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: chips,
-              )));
-    } else {
+    return chips;
+  }
+
+  Widget? _buildAttachmentWidget(BuildContext context) {
+    List<ContentInfo>? contentInfos = findContentInfos();
+    if (contentInfos == null || contentInfos.isEmpty) {
       return null;
     }
+    return FutureBuilder(
+        future: _buildAttachmentChips(context, contentInfos),
+        builder: (BuildContext context, AsyncSnapshot<List<Widget>?> snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return LoadingUtil.buildLoadingIndicator();
+          }
+          List<Widget>? chips = snapshot.data;
+          if (chips != null && chips.isNotEmpty) {
+            return Container(
+                alignment: Alignment.centerLeft,
+                color: myself.getBackgroundColor(context).withOpacity(0.6),
+                child: Wrap(
+                  direction: Axis.horizontal,
+                  children: chips,
+                ));
+          }
+          return Container();
+        });
   }
 
   @override
