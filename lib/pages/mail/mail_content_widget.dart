@@ -254,7 +254,6 @@ class _MailContentWidgetState extends State<MailContentWidget> {
   Future<List<Widget>?> _buildAttachmentChips(
       BuildContext context, List<ContentInfo> contentInfos) async {
     List<Widget> chips = [];
-    List<MediaProvider> mediaProviders = [];
     for (ContentInfo contentInfo in contentInfos) {
       String? fileName = contentInfo.fileName;
       fileName = fileName ?? AppLocalizations.t('Unknown filename');
@@ -267,7 +266,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
       MediaProvider? mediaProvider = await findAttachmentMediaProvider(fetchId);
       if (mediaProvider != null) {
         icon = await _buildMediaProviderWidget(mediaProvider);
-        mediaProviders.add(mediaProvider);
+        size = mediaProvider.size;
       }
       icon ??= Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         Mimecon(
