@@ -135,16 +135,14 @@ class EmailMessageUtil {
     ConfigEmailProvider provider =
         ConfigEmailProvider(displayName: mailAddress.name);
     config.addEmailProvider(provider);
-    if (preferredPop) {
-      var imapServerConfigStr = mailAddress.imapServerConfig;
-      if (imapServerConfigStr != null) {
-        Map<String, dynamic> imapServerConfigMap =
-            JsonUtil.toJson(imapServerConfigStr) as Map<String, dynamic>;
-        ServerConfig imapServerConfig =
-            ServerConfig.fromJson(imapServerConfigMap);
-        provider.addIncomingServer(imapServerConfig);
-        incoming = true;
-      }
+    var imapServerConfigStr = mailAddress.imapServerConfig;
+    if (imapServerConfigStr != null) {
+      Map<String, dynamic> imapServerConfigMap =
+          JsonUtil.toJson(imapServerConfigStr) as Map<String, dynamic>;
+      ServerConfig imapServerConfig =
+          ServerConfig.fromJson(imapServerConfigMap);
+      provider.addIncomingServer(imapServerConfig);
+      incoming = true;
     }
     var popServerConfigStr = mailAddress.popServerConfig;
     if (popServerConfigStr != null) {

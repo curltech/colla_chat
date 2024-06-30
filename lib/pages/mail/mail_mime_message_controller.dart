@@ -183,6 +183,25 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
   }
 
   ///以下是从数据库取邮件的部分
+
+  findCurrent() async {
+    if (current == null) {
+      return false;
+    }
+    String? currentMailboxName = this.currentMailboxName;
+    if (currentMailboxName == null) {
+      return false;
+    }
+    int? uid = currentMailMessage?.uid;
+    if (uid != null) {
+      MailMessage? mailMessage =
+          await mailMessageService.findOne(where: 'uid=?', whereArgs: [uid]);
+      if (mailMessage != null) {
+        currentMailMessage = mailMessage;
+      }
+    }
+  }
+
   Future<bool> findLatestMailMessages() async {
     return await lock.synchronized(() async {
       return await _findLatestMailMessages();
@@ -454,6 +473,7 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     if (currentMailbox == null) {
       return;
     }
+    bool notify = false;
     bool isMore = true;
     while (isMore) {
       try {
@@ -464,10 +484,13 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
                 page: page,
                 fetchPreference: fetchPreference);
         if (mimeMessages != null && mimeMessages.isNotEmpty) {
-          for (var mimeMessage in mimeMessages) {
+          for (int i = mimeMessages.length - 1; i >= 0; i--) {
+            var mimeMessage = mimeMessages[i];
             bool success = await mailMessageService.storeMimeMessage(
                 currentMailbox, mimeMessage, fetchPreference);
-            if (!success) {
+            if (success) {
+              notify = true;
+            } else {
               isMore = false;
               break;
             }
@@ -480,6 +503,9 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
         isMore = false;
         break;
       }
+    }
+    if (notify) {
+      notifyListeners();
     }
   }
 

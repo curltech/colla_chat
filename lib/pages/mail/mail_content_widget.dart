@@ -277,28 +277,27 @@ class _MailContentWidgetState extends State<MailContentWidget> {
                 width: 150,
                 child: Column(children: [
                   icon,
-                  Expanded(
-                      child: Text(
+                  Text(
                     fileName,
                     softWrap: true,
                     overflow: TextOverflow.fade,
                     maxLines: 3,
-                  )),
-                  Text('$size'),
+                  ),
+                  Text(size == null ? '' : '$size'),
                 ])),
           ));
       chips.add(chip);
     }
     if (chips.isNotEmpty) {
       return Container(
+          // height: 100,
           alignment: Alignment.centerLeft,
           color: myself.getBackgroundColor(context).withOpacity(0.6),
           child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Expanded(
-                  child: Row(
+              child: Row(
                 children: chips,
-              ))));
+              )));
     } else {
       return null;
     }

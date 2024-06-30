@@ -159,8 +159,8 @@ class _MailListWidgetState extends State<MailListWidget> {
     if (mailMessage.status != FetchPreference.full.name) {
       MimeMessage? mimeMessage = mailMimeMessageController.convert(mailMessage);
       if (mimeMessage != null) {
-        // await mailMimeMessageController.fetchMessageContents(mimeMessage);
-        await mailMimeMessageController.fetchMessagesNextPage(mimeMessage);
+        await mailMimeMessageController.fetchMessageContents(mimeMessage);
+        await mailMimeMessageController.findCurrent();
       }
     }
 
@@ -168,12 +168,12 @@ class _MailListWidgetState extends State<MailListWidget> {
   }
 
   Future<void> _onScrollMax() async {
-    await mailMimeMessageController.fetchMessages();
-    await mailMimeMessageController.findLatestMailMessages();
+    await mailMimeMessageController.findMailMessages();
   }
 
   Future<void> _onScrollMin() async {
-    await mailMimeMessageController.findMailMessages();
+    await mailMimeMessageController.fetchMessages();
+    await mailMimeMessageController.findLatestMailMessages();
   }
 
   Future<void> _onRefresh() async {
