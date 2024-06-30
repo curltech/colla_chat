@@ -281,7 +281,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
           overflow: TextOverflow.fade,
           maxLines: 3,
         ),
-        CommonAutoSizeText(size == null ? '' : '$size'),
+        CommonAutoSizeText(size == null ? '' : '${size % 1024}KB'),
       ]);
 
       var chip = GestureDetector(
