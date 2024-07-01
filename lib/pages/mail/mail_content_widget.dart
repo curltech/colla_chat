@@ -10,11 +10,13 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/mail/mail_address.dart';
+import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/webview/platform_webview.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:enough_mail/highlevel.dart';
@@ -185,6 +187,28 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     return mimeMessage;
   }
 
+  Widget _buildSubjectWidget(DecryptedMimeMessage decryptedMimeMessage) {
+    var subtitle = decryptedMimeMessage.subject;
+    MailAddress? sender = decryptedMimeMessage.sender;
+    var title = sender?.personalName;
+    title = title ?? '';
+    var email = sender?.email;
+    email = email ?? '';
+    title = '$title[$email]';
+    var sendTime = decryptedMimeMessage.sendTime;
+    var titleTail = '';
+    if (sendTime != null) {
+      titleTail = DateUtil.formatEasyRead(sendTime);
+    }
+    TileData tileData = TileData(
+        prefix: decryptedMimeMessage.needDecrypt ? Icons.mail_lock : null,
+        title: title,
+        titleTail: titleTail,
+        subtitle: subtitle.toString());
+
+    return DataListTile(tileData: tileData);
+  }
+
   ///邮件内容发生变化时，移动平台将重新创建mimeMessageViewer
   ///桌面平台将利用现有的webview重新装载html内容
   Widget _buildMimeMessageViewer(BuildContext context) {
@@ -227,6 +251,8 @@ class _MailContentWidgetState extends State<MailContentWidget> {
               return webView;
             }
             return Column(mainAxisSize: MainAxisSize.min, children: [
+              _buildSubjectWidget(decryptedMimeMessage),
+              const Divider(),
               Expanded(child: webView),
               attachWidget,
             ]);

@@ -64,10 +64,10 @@ class _MailListWidgetState extends State<MailListWidget> {
         var email = sender?.email;
         email = email ?? '';
         title = '$title[$email]';
-        var sendDate = mailMessage.sendTime;
+        var sendTime = mailMessage.sendTime;
         var titleTail = '';
-        if (sendDate != null) {
-          titleTail = DateUtil.formatEasyRead(sendDate);
+        if (sendTime != null) {
+          titleTail = DateUtil.formatEasyRead(sendTime);
         }
         TileData tile = TileData(
             prefix: decryptedMimeMessage.needDecrypt ? Icons.mail_lock : null,

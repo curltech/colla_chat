@@ -23,13 +23,20 @@ class DecryptedMimeMessage {
 
   //解密后的标题
   String? subject;
+  MailAddress? sender;
+  String? sendTime;
 
   //解密后的html
   String? html;
   bool needDecrypt;
 
   DecryptedMimeMessage(
-      {this.needDecrypt = false, this.payloadKey, this.subject, this.html});
+      {this.needDecrypt = false,
+      this.payloadKey,
+      this.subject,
+      this.sender,
+      this.sendTime,
+      this.html});
 }
 
 /// 邮件地址控制器，每个地址有多个邮箱，每个邮箱包含多个邮件
@@ -596,7 +603,11 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
       MimeMessage mimeMessage) async {
     String? subjects = mimeMessage.decodeSubject();
     String? text = mimeMessage.decodeTextPlainPart();
-    DecryptedMimeMessage decryptedData = DecryptedMimeMessage();
+    MailAddress? sender = mimeMessage.sender;
+    sender ??= mimeMessage.from?.firstOrNull;
+    String? sendTime = mimeMessage.decodeDate()?.toIso8601String();
+    DecryptedMimeMessage decryptedData =
+        DecryptedMimeMessage(sender: sender, sendTime: sendTime);
     String? keys;
     String? subject = subjects;
     if (subjects != null) {
