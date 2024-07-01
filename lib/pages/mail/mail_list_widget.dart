@@ -57,8 +57,7 @@ class _MailListWidgetState extends State<MailListWidget> {
         DecryptedMimeMessage decryptedMimeMessage =
             await mailMimeMessageController.decryptMimeMessage(mimeMessage);
         var subtitle = decryptedMimeMessage.subject;
-        MailAddress? sender = mailMessage.sender;
-        sender ??= mailMessage.senders?.firstOrNull;
+        MailAddress? sender = mailMessage.decodeSender();
         var title = sender?.personalName;
         title = title ?? '';
         var email = sender?.email;

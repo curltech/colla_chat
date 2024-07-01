@@ -17,6 +17,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
+import 'package:full_picker/full_picker.dart';
 
 class FileUtil {
   ///写内容到文件
@@ -595,71 +596,71 @@ class FileUtil {
     void Function(List<Uint8List>)? onSelectedBytes,
     void Function(int)? onError,
   }) {
-    // FullPickerLanguage language = FullPickerLanguage.copy(
-    //   camera: AppLocalizations.t('Camera'),
-    //   selectFile: AppLocalizations.t('SelectFile'),
-    //   file: AppLocalizations.t('File'),
-    //   voiceRecorder: AppLocalizations.t('VoiceRecorder'),
-    //   gallery: AppLocalizations.t('Gallery'),
-    //   cropper: AppLocalizations.t('Cropper'),
-    //   url: AppLocalizations.t('Url'),
-    //   enterURL: AppLocalizations.t('EnterURL'),
-    //   ok: AppLocalizations.t('Ok'),
-    //   cancel: AppLocalizations.t('Cancel'),
-    //   on: AppLocalizations.t('On'),
-    //   off: AppLocalizations.t('Off'),
-    //   auto: AppLocalizations.t('Auto'),
-    //   onCompressing: AppLocalizations.t('OnCompressing'),
-    //   tapForPhotoHoldForVideo: AppLocalizations.t('TapForPhotoHoldForVideo'),
-    //   cameraNotFound: AppLocalizations.t('CameraNotFound'),
-    //   noVoiceRecorded: AppLocalizations.t('NoVoiceRecorded'),
-    //   denyAccessPermission: AppLocalizations.t('DenyAccessPermission'),
-    // );
-    // FullPicker(
-    //   context: context,
-    //   language: language,
-    //   prefixName: prefixName,
-    //   file: file,
-    //   image: image,
-    //   video: video,
-    //   videoCamera: videoCamera,
-    //   imageCamera: imageCamera,
-    //   voiceRecorder: voiceRecorder,
-    //   videoCompressor: videoCompressor,
-    //   imageCropper: imageCropper,
-    //   multiFile: multiFile,
-    //   onError: (int error) {
-    //     if (onError != null) {
-    //       onError(error);
-    //     }
-    //   },
-    //   onSelected: (FullPickerOutput fileOut) {
-    //     if (onSelectedFilenames != null) {
-    //       List<File?> files = fileOut.file;
-    //       if (files.isNotEmpty) {
-    //         List<String> filenames = [];
-    //         for (File? file in files) {
-    //           if (file != null) {
-    //             filenames.add(file.path);
-    //           }
-    //         }
-    //         onSelectedFilenames(filenames);
-    //       }
-    //     }
-    //     if (onSelectedBytes != null) {
-    //       List<Uint8List?> fileBytes = fileOut.bytes;
-    //       if (fileBytes.isNotEmpty) {
-    //         List<Uint8List> bytes = [];
-    //         for (Uint8List? byte in fileBytes) {
-    //           if (byte != null) {
-    //             bytes.add(byte);
-    //           }
-    //         }
-    //         onSelectedBytes(bytes);
-    //       }
-    //     }
-    //   },
-    // );
+    FullPickerLanguage language = FullPickerLanguage.copy(
+      camera: AppLocalizations.t('Camera'),
+      selectFile: AppLocalizations.t('SelectFile'),
+      file: AppLocalizations.t('File'),
+      voiceRecorder: AppLocalizations.t('VoiceRecorder'),
+      gallery: AppLocalizations.t('Gallery'),
+      cropper: AppLocalizations.t('Cropper'),
+      url: AppLocalizations.t('Url'),
+      enterURL: AppLocalizations.t('EnterURL'),
+      ok: AppLocalizations.t('Ok'),
+      cancel: AppLocalizations.t('Cancel'),
+      on: AppLocalizations.t('On'),
+      off: AppLocalizations.t('Off'),
+      auto: AppLocalizations.t('Auto'),
+      onCompressing: AppLocalizations.t('OnCompressing'),
+      tapForPhotoHoldForVideo: AppLocalizations.t('TapForPhotoHoldForVideo'),
+      cameraNotFound: AppLocalizations.t('CameraNotFound'),
+      noVoiceRecorded: AppLocalizations.t('NoVoiceRecorded'),
+      denyAccessPermission: AppLocalizations.t('DenyAccessPermission'),
+    );
+    FullPicker(
+      context: context,
+      language: language,
+      prefixName: prefixName,
+      file: file,
+      image: image,
+      video: video,
+      videoCamera: videoCamera,
+      imageCamera: imageCamera,
+      voiceRecorder: voiceRecorder,
+      videoCompressor: videoCompressor,
+      imageCropper: imageCropper,
+      multiFile: multiFile,
+      onError: (int error) {
+        if (onError != null) {
+          onError(error);
+        }
+      },
+      onSelected: (FullPickerOutput fileOut) {
+        if (onSelectedFilenames != null) {
+          List<File?> files = fileOut.file;
+          if (files.isNotEmpty) {
+            List<String> filenames = [];
+            for (File? file in files) {
+              if (file != null) {
+                filenames.add(file.path);
+              }
+            }
+            onSelectedFilenames(filenames);
+          }
+        }
+        if (onSelectedBytes != null) {
+          List<Uint8List?> fileBytes = fileOut.bytes;
+          if (fileBytes.isNotEmpty) {
+            List<Uint8List> bytes = [];
+            for (Uint8List? byte in fileBytes) {
+              if (byte != null) {
+                bytes.add(byte);
+              }
+            }
+            onSelectedBytes(bytes);
+          }
+        }
+      },
+    );
   }
 
   static Future<Map<String, dynamic>> toJson(XFile file) async {

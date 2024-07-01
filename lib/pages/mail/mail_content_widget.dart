@@ -80,81 +80,6 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     setState(() {});
   }
 
-  ///获取当前邮件的附件目录信息，用于展示
-  List<ContentInfo>? findContentInfos() {
-    MailMessage? mailMessage = mailMimeMessageController.currentMailMessage;
-    if (mailMessage == null) {
-      return null;
-    }
-    MimeMessage? mimeMessage = mailMimeMessageController.convert(mailMessage);
-    if (mimeMessage == null) {
-      return null;
-    }
-    bool hasAttachment = mimeMessage.hasAttachmentsOrInlineNonTextualParts();
-    if (!hasAttachment) {
-      return null;
-    }
-    final List<ContentInfo> infos =
-        mimeMessage.findContentInfo(disposition: ContentDisposition.attachment);
-
-    return infos;
-  }
-
-  ///根据fetchId获取当前邮件的特定附件数据
-  Future<MediaProvider?> findAttachmentMediaProvider(String fetchId) async {
-    MailMessage? mailMessage = mailMimeMessageController.currentMailMessage;
-    if (mailMessage == null) {
-      return null;
-    }
-    MimeMessage? mimeMessage = mailMimeMessageController.convert(mailMessage);
-    if (mimeMessage == null) {
-      return null;
-    }
-    MimePart? mimePart = mimeMessage.getPart(fetchId);
-    //如果附件还未获取，则获取
-    mimePart ??= await mailMimeMessageController.fetchMessagePart(fetchId);
-    if (mimePart == null) {
-      return null;
-    }
-
-    ///获取附件的内容，文本内容或者二进制内容
-    final filename = mimePart.decodeFileName();
-    final mediaType = mimePart.mediaType.text;
-    if (mimePart.mediaType.isText) {
-      String? text = mimePart.decodeContentText();
-      if (text != null) {
-        if (decryptedMimeMessage.needDecrypt) {
-          try {
-            List<int>? data = await mailAddressService.decrypt(
-                CryptoUtil.stringToUtf8(text),
-                payloadKey: decryptedMimeMessage.payloadKey);
-            text = CryptoUtil.utf8ToString(data!);
-          } catch (e) {
-            logger.e('filename:$filename decrypt failure:$e');
-          }
-        }
-        return TextMediaProvider(filename!, mediaType, text!,
-            description: decryptedMimeMessage.subject);
-      }
-    } else {
-      List<int>? data = mimePart.decodeContentBinary();
-      if (data != null) {
-        if (decryptedMimeMessage.needDecrypt) {
-          try {
-            data = await mailAddressService.decrypt(data,
-                payloadKey: decryptedMimeMessage.payloadKey);
-          } catch (e) {
-            logger.e('filename:$filename decrypt failure:$e');
-          }
-        }
-        return MemoryMediaProvider(
-            filename!, mediaType, Uint8List.fromList(data!),
-            description: decryptedMimeMessage.subject);
-      }
-    }
-    return null;
-  }
-
   ///当前的邮件发生变化，如果没有获取内容，则获取内容
   Future<MimeMessage?> findMimeMessage() async {
     MailMessage? mailMessage = mailMimeMessageController.currentMailMessage;
@@ -246,15 +171,15 @@ class _MailContentWidgetState extends State<MailContentWidget> {
             } catch (e) {
               logger.e('PlatformWebView failure:$e');
             }
-            Widget? attachWidget = _buildAttachmentWidget(context);
-            if (attachWidget == null) {
-              return webView;
-            }
+            Widget mailAttachmentWidget = MailAttachmentWidget(
+              decryptedMimeMessage: decryptedMimeMessage,
+            );
+
             return Column(mainAxisSize: MainAxisSize.min, children: [
               _buildSubjectWidget(decryptedMimeMessage),
               const Divider(),
               Expanded(child: webView),
-              attachWidget,
+              mailAttachmentWidget,
             ]);
           }
           return Center(
@@ -264,15 +189,123 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     return mimeMessageViewer;
   }
 
+  @override
+  Widget build(BuildContext context) {
+    var appBarView = AppBarView(
+        titleWidget: ValueListenableBuilder(
+          valueListenable: subject,
+          builder: (BuildContext context, subject, Widget? child) {
+            return CommonAutoSizeText(subject ?? '');
+          },
+        ),
+        withLeading: widget.withLeading,
+        child: Card(
+            elevation: 0.0,
+            shape: const ContinuousRectangleBorder(),
+            margin: EdgeInsets.zero,
+            child: SizedBox(
+                width: double.infinity,
+                child: _buildMimeMessageViewer(context))));
+    return appBarView;
+  }
+
+  @override
+  void dispose() {
+    mailMimeMessageController.removeListener(_update);
+    super.dispose();
+  }
+}
+
+class MailAttachmentWidget extends StatelessWidget {
+  final DecryptedMimeMessage decryptedMimeMessage;
+
+  const MailAttachmentWidget({super.key, required this.decryptedMimeMessage});
+
   Future<Widget?> _buildMediaProviderWidget(MediaProvider mediaProvider) async {
     if (mediaProvider.isImage) {
       MemoryMediaProvider memoryMediaProvider =
           await mediaProvider.toMemoryProvider();
-      Widget image = ImageUtil.buildMemoryImageWidget(memoryMediaProvider.data);
+      Widget image = ImageUtil.buildMemoryImageWidget(
+          height: 100, width: 100, memoryMediaProvider.data);
 
       return Center(child: image);
     }
 
+    return null;
+  }
+
+  ///获取当前邮件的附件目录信息，用于展示
+  List<ContentInfo>? findContentInfos() {
+    MailMessage? mailMessage = mailMimeMessageController.currentMailMessage;
+    if (mailMessage == null) {
+      return null;
+    }
+    MimeMessage? mimeMessage = mailMimeMessageController.convert(mailMessage);
+    if (mimeMessage == null) {
+      return null;
+    }
+    bool hasAttachment = mimeMessage.hasAttachmentsOrInlineNonTextualParts();
+    if (!hasAttachment) {
+      return null;
+    }
+    final List<ContentInfo> infos =
+        mimeMessage.findContentInfo(disposition: ContentDisposition.attachment);
+
+    return infos;
+  }
+
+  ///根据fetchId获取当前邮件的特定附件数据
+  Future<MediaProvider?> findAttachmentMediaProvider(String fetchId) async {
+    MailMessage? mailMessage = mailMimeMessageController.currentMailMessage;
+    if (mailMessage == null) {
+      return null;
+    }
+    MimeMessage? mimeMessage = mailMimeMessageController.convert(mailMessage);
+    if (mimeMessage == null) {
+      return null;
+    }
+    MimePart? mimePart = mimeMessage.getPart(fetchId);
+    //如果附件还未获取，则获取
+    mimePart ??= await mailMimeMessageController.fetchMessagePart(fetchId);
+    if (mimePart == null) {
+      return null;
+    }
+
+    ///获取附件的内容，文本内容或者二进制内容
+    final filename = mimePart.decodeFileName();
+    final mediaType = mimePart.mediaType.text;
+    if (mimePart.mediaType.isText) {
+      String? text = mimePart.decodeContentText();
+      if (text != null) {
+        if (decryptedMimeMessage.needDecrypt) {
+          try {
+            List<int>? data = await mailAddressService.decrypt(
+                CryptoUtil.stringToUtf8(text),
+                payloadKey: decryptedMimeMessage.payloadKey);
+            text = CryptoUtil.utf8ToString(data!);
+          } catch (e) {
+            logger.e('filename:$filename decrypt failure:$e');
+          }
+        }
+        return TextMediaProvider(filename!, mediaType, text!,
+            description: decryptedMimeMessage.subject);
+      }
+    } else {
+      List<int>? data = mimePart.decodeContentBinary();
+      if (data != null) {
+        if (decryptedMimeMessage.needDecrypt) {
+          try {
+            data = await mailAddressService.decrypt(data,
+                payloadKey: decryptedMimeMessage.payloadKey);
+          } catch (e) {
+            logger.e('filename:$filename decrypt failure:$e');
+          }
+        }
+        return MemoryMediaProvider(
+            filename!, mediaType, Uint8List.fromList(data!),
+            description: decryptedMimeMessage.subject);
+      }
+    }
     return null;
   }
 
@@ -317,9 +350,8 @@ class _MailContentWidgetState extends State<MailContentWidget> {
           },
           child: Card(
             elevation: 0.0,
-            shape: ContinuousRectangleBorder(
-                side: BorderSide(color: myself.primary)),
-            //margin: const EdgeInsets.all(10.0),
+            color: Colors.grey.withOpacity(0.2),
+            shape: const ContinuousRectangleBorder(),
             child: Container(
                 padding: const EdgeInsets.all(0.0),
                 height: 100,
@@ -331,10 +363,10 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     return chips;
   }
 
-  Widget? _buildAttachmentWidget(BuildContext context) {
+  Widget _buildAttachmentWidget(BuildContext context) {
     List<ContentInfo>? contentInfos = findContentInfos();
     if (contentInfos == null || contentInfos.isEmpty) {
-      return null;
+      return Container();
     }
     return FutureBuilder(
         future: _buildAttachmentChips(context, contentInfos),
@@ -358,27 +390,6 @@ class _MailContentWidgetState extends State<MailContentWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var appBarView = AppBarView(
-        titleWidget: ValueListenableBuilder(
-          valueListenable: subject,
-          builder: (BuildContext context, subject, Widget? child) {
-            return CommonAutoSizeText(subject ?? '');
-          },
-        ),
-        withLeading: widget.withLeading,
-        child: Card(
-            elevation: 0.0,
-            shape: const ContinuousRectangleBorder(),
-            margin: EdgeInsets.zero,
-            child: SizedBox(
-                width: double.infinity,
-                child: _buildMimeMessageViewer(context))));
-    return appBarView;
-  }
-
-  @override
-  void dispose() {
-    mailMimeMessageController.removeListener(_update);
-    super.dispose();
+    return _buildAttachmentWidget(context);
   }
 }

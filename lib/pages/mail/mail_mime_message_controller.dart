@@ -110,12 +110,6 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
         if (!_addressMailMessages.containsKey(email)) {
           Map<String, List<MailMessage>> addressMailMessages = {};
           _addressMailMessages[email] = addressMailMessages;
-          for (var mailBoxeIcon in mailBoxeIcons.entries) {
-            String name = mailBoxeIcon.key;
-            if (!addressMailMessages.containsKey(name)) {
-              addressMailMessages[name] = <MailMessage>[];
-            }
-          }
         }
       }
 
@@ -132,10 +126,9 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
   }
 
   List<String>? getMailboxNames(String email) {
-    Map<String, List<MailMessage>>? mailMessageMap =
-        _addressMailMessages[email];
-    if (mailMessageMap != null && mailMessageMap.isNotEmpty) {
-      return mailMessageMap.keys.toList();
+    Map<String, enough_mail.Mailbox>? mailboxMap = _addressMailboxes[email];
+    if (mailboxMap != null && mailboxMap.isNotEmpty) {
+      return mailboxMap.keys.toList();
     }
     return null;
   }
@@ -505,6 +498,8 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
           if (mimeMessages.length < count) {
             isMore = false;
           }
+        } else {
+          isMore = false;
         }
       } catch (e) {
         isMore = false;

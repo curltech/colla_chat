@@ -14,10 +14,13 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/richtext/platform_editor_widget.dart';
@@ -30,12 +33,15 @@ class PlatformAttachmentInfo {
       {required this.filename,
       required this.mediaType,
       required this.name,
+      required this.data,
       required this.size});
 
   final String filename;
 
   /// The name of the attachment
   final String name;
+
+  final Uint8List data;
 
   /// The size of the attachment in bytes
   final int size;
@@ -118,10 +124,12 @@ class _NewMailWidgetState extends State<NewMailWidget> {
             for (var filename in filenames) {
               File file = File(filename);
               int size = await file.length();
+              Uint8List data = file.readAsBytesSync();
               PlatformAttachmentInfo info = PlatformAttachmentInfo(
                   mediaType: enough_mail.MediaType.guessFromFileName(filename),
                   filename: filename,
                   name: FileUtil.filename(filename),
+                  data: data,
                   size: size);
               infos.add(info);
             }
@@ -161,8 +169,70 @@ class _NewMailWidgetState extends State<NewMailWidget> {
     return platformEditorWidget;
   }
 
+  Future<Widget?> _buildAttachmentInfoWidget(
+      PlatformAttachmentInfo attachmentInfo) async {
+    if (attachmentInfo.mediaType.isImage) {
+      Widget image = ImageUtil.buildMemoryImageWidget(
+          height: 100, width: 100, attachmentInfo.data);
+
+      return Center(child: image);
+    }
+
+    return null;
+  }
+
+  Future<List<Widget>?> _buildAttachmentChips(BuildContext context,
+      List<PlatformAttachmentInfo> attachmentInfos) async {
+    List<Widget> chips = [];
+    for (var attachmentInfo in attachmentInfos) {
+      String name = attachmentInfo.name;
+      int? size = attachmentInfo.size;
+      enough_mail.MediaType mediaType = attachmentInfo.mediaType;
+      String? mimeType = FileUtil.mimeType(name);
+      Widget? icon = await _buildAttachmentInfoWidget(attachmentInfo);
+      size = attachmentInfo.size;
+      icon ??= Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Mimecon(
+          mimetype: mimeType ?? 'bin',
+          color: myself.primary,
+          size: 32,
+          isOutlined: true,
+        ),
+        CommonAutoSizeText(
+          name,
+          softWrap: true,
+          overflow: TextOverflow.fade,
+          maxLines: 3,
+        ),
+        CommonAutoSizeText('${size % 1024}KB'),
+      ]);
+      var chip = Card(
+        elevation: 0.0,
+        shape: const ContinuousRectangleBorder(),
+        color: Colors.grey.withOpacity(0.2),
+        child: Container(
+            padding: const EdgeInsets.all(0.0),
+            height: 100,
+            width: 120,
+            child: Stack(
+              children: [
+                icon,
+                InkWell(
+                    onTap: () {
+                      _removeAttachment(attachmentInfo);
+                    },
+                    child: Icon(Icons.cancel, size: 18, color: myself.primary)),
+              ],
+            )),
+      );
+      chips.add(chip);
+    }
+
+    return chips;
+  }
+
   /// 附件显示区
-  Widget _buildAttachmentChips(BuildContext context) {
+  Widget _buildAttachmentWidget(BuildContext context) {
     return Container(
         alignment: Alignment.centerLeft,
         color: myself.getBackgroundColor(context).withOpacity(0.6),
@@ -170,59 +240,27 @@ class _NewMailWidgetState extends State<NewMailWidget> {
             valueListenable: attachmentInfos,
             builder: (BuildContext context,
                 List<PlatformAttachmentInfo> attachmentInfos, Widget? child) {
-              List<Widget> chips = [];
-              for (var attachmentInfo in attachmentInfos) {
-                String name = attachmentInfo.name;
-                int? size = attachmentInfo.size;
-                enough_mail.MediaType mediaType = attachmentInfo.mediaType;
-                String? mimeType = FileUtil.mimeType(name);
-                Widget icon = Mimecon(
-                  mimetype: mimeType!,
-                  color: myself.primary,
-                  size: 32,
-                  isOutlined: true,
-                );
-                var chip = Card(
-                  elevation: 0.0,
-                  //margin: const EdgeInsets.all(10.0),
-                  child: Container(
-                      padding: const EdgeInsets.all(5.0),
-                      width: 150,
-                      child: Column(children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            icon,
-                            const Spacer(),
-                            InkWell(
-                                onTap: () {
-                                  _removeAttachment(attachmentInfo);
-                                },
-                                child: Icon(Icons.cancel,
-                                    size: 18, color: myself.primary)),
-                          ],
-                        ),
-                        Text(
-                          name ?? '',
-                          softWrap: true,
-                          overflow: TextOverflow.fade,
-                          maxLines: 3,
-                        ),
-                        Text('$size'),
-                      ])),
-                );
-                chips.add(chip);
-              }
-              if (chips.isNotEmpty) {
-                return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Expanded(
-                        child: Row(
-                      children: chips,
-                    )));
-              } else {
-                return Container();
-              }
+              return FutureBuilder(
+                  future: _buildAttachmentChips(context, attachmentInfos),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Widget>?> snapshot) {
+                    if (snapshot.connectionState != ConnectionState.done) {
+                      return LoadingUtil.buildLoadingIndicator();
+                    }
+                    List<Widget>? chips = snapshot.data;
+                    if (chips != null && chips.isNotEmpty) {
+                      return Container(
+                          alignment: Alignment.centerLeft,
+                          color: myself
+                              .getBackgroundColor(context)
+                              .withOpacity(0.6),
+                          child: Wrap(
+                            direction: Axis.horizontal,
+                            children: chips,
+                          ));
+                    }
+                    return Container();
+                  });
             }));
   }
 
@@ -235,9 +273,11 @@ class _NewMailWidgetState extends State<NewMailWidget> {
     enough_mail.MailAddress? sender;
     MailAddress? current = mailMimeMessageController.current;
     String? email;
+    String? name;
     if (current != null) {
       email = current.email;
-      sender = enough_mail.MailAddress(null, email);
+      name = current.name;
+      sender = enough_mail.MailAddress(name, email);
       from.add(sender);
     }
     builder.from = from;
@@ -252,7 +292,7 @@ class _NewMailWidgetState extends State<NewMailWidget> {
           String name = linkman.name;
           String? email = linkman.email;
           if (email != null) {
-            to.add(enough_mail.MailAddress(null, email));
+            to.add(enough_mail.MailAddress(name, email));
           }
         }
       }
@@ -261,6 +301,7 @@ class _NewMailWidgetState extends State<NewMailWidget> {
 
     List<int>? secretKey;
     if (needEncrypt) {
+      builder.addHeader('encrypted', true.toString());
       PlatformEncryptData? encryptedSubject = await mailAddressService.encrypt(
           CryptoUtil.stringToUtf8(subjectController.text), receipts.value);
       String subject = CryptoUtil.encodeBase64(encryptedSubject!.data);
@@ -419,7 +460,7 @@ class _NewMailWidgetState extends State<NewMailWidget> {
         child: Column(children: [
           _buildMailSubjectWidget(),
           Expanded(child: _buildEnoughHtmlEditorWidget(context)),
-          _buildAttachmentChips(context),
+          _buildAttachmentWidget(context),
         ]));
     return appBarView;
   }

@@ -205,4 +205,12 @@ class MailMessage extends StatusEntity {
     }
     return isMyself;
   }
+
+  enough_mail.MailAddress? decodeSender() {
+    enough_mail.MailAddress? sender = senders?.firstOrNull;
+    sender ??= replyTo?.firstOrNull;
+    sender ??= this.sender;
+
+    return sender;
+  }
 }
