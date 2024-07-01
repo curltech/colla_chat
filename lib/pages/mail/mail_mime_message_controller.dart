@@ -640,7 +640,7 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
         }
       } else {
         /// 如果没有key，则是自己发送给自己
-        logger.e('needEncrypt but no keys');
+        logger.e('needEncrypt but no keys, self send');
         decryptedData.payloadKey = null;
       }
 
