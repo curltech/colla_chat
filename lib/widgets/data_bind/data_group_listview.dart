@@ -133,7 +133,13 @@ class _GroupDataListViewState extends State<GroupDataListView> {
     }
 
     Widget dataListView = DataListView(
-        onTap: _onTap, group: tileData, controller: dataListController);
+      onTap: _onTap,
+      group: tileData,
+      itemCount: dataListController.length,
+      itemBuilder: (BuildContext context, int index) {
+        return dataListController.get(index);
+      },
+    );
     bool selected = tileData.selected ?? false;
 
     /// 未来不使用ListTile，因为高度固定，不够灵活

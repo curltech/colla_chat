@@ -103,10 +103,14 @@ class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
 
   Widget _buildVideoConferenceListView(BuildContext context) {
     List<Widget> children = [];
+    var tileData = _buildConferenceTileData(context);
     var conferenceView = SizedBox(
         height: 200,
         child: DataListView(
-          tileData: _buildConferenceTileData(context),
+          itemCount: tileData.length,
+          itemBuilder: (BuildContext context, int index) {
+            return tileData[index];
+          },
         ));
     children.add(CommonAutoSizeText(AppLocalizations.t('Room')));
     children.add(conferenceView);

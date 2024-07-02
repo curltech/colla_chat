@@ -252,16 +252,24 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
         inReplyTo: emailMessage.inReplyTo,
         messageId: emailMessage.messageId,
       );
-      mimeMessage = MimeMessage.fromEnvelope(envelope,
-          uid: emailMessage.uid,
-          guid: emailMessage.guid,
-          sequenceId: emailMessage.sequenceId,
-          flags: emailMessage.flags);
+      try {
+        mimeMessage = MimeMessage.fromEnvelope(envelope,
+            uid: emailMessage.uid,
+            guid: emailMessage.guid,
+            sequenceId: emailMessage.sequenceId,
+            flags: emailMessage.flags);
+      } catch (e) {
+        logger.e('fromEnvelope mimeMessage failure:$e');
+      }
     } else {
       String? content = emailMessage.content;
       if (content != null) {
-        mimeMessage = MimeMessage.parseFromText(content);
-        mimeMessage.sender = emailMessage.sender;
+        try {
+          mimeMessage = MimeMessage.parseFromText(content);
+          mimeMessage.sender = emailMessage.decodeSender();
+        } catch (e) {
+          logger.e('parseFromText mimeMessage failure:$e');
+        }
       }
     }
 
@@ -614,6 +622,8 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
         keys = subjects.substring(pos + 2, subjects.length - 1);
         subject = subject.replaceAll(' ', '');
         subject = subject.replaceAll('\r\n', '');
+        keys = keys.replaceAll(' ', '');
+        keys = keys.replaceAll('\r\n', '');
       }
     }
     if (decryptedData.needDecrypt) {

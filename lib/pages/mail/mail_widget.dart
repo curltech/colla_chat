@@ -67,36 +67,39 @@ class _MailWidgetState extends State<MailWidget> {
     }
   }
 
+  Widget _buildAddressBook() {
+    return ValueListenableBuilder(
+        valueListenable: addressVisible,
+        builder: (BuildContext context, bool addressVisible, Widget? child) {
+          return Visibility(
+              visible: addressVisible,
+              child:
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Card(
+                    elevation: 0.0,
+                    shape: const ContinuousRectangleBorder(),
+                    margin: EdgeInsets.zero,
+                    child: SizedBox(
+                        width: 280,
+                        height: double.infinity,
+                        child: widget.mailAddressWidget)),
+                Expanded(
+                    child: GestureDetector(
+                        onTap: () {
+                          this.addressVisible.value = false;
+                          setState(() {});
+                        },
+                        child: Container(
+                          color: Colors.black.withOpacity(0.4),
+                        ))),
+              ]));
+        });
+  }
+
   Widget _buildPlatformDrawer() {
     Widget view = Stack(children: [
       widget.mailListWidget,
-      ValueListenableBuilder(
-          valueListenable: addressVisible,
-          builder: (BuildContext context, bool addressVisible, Widget? child) {
-            return Visibility(
-                visible: addressVisible,
-                child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Card(
-                          elevation: 0.0,
-                          shape: const ContinuousRectangleBorder(),
-                          margin: EdgeInsets.zero,
-                          child: SizedBox(
-                              width: 280,
-                              height: double.infinity,
-                              child: widget.mailAddressWidget)),
-                      Expanded(
-                          child: GestureDetector(
-                              onTap: () {
-                                this.addressVisible.value = false;
-                                setState(() {});
-                              },
-                              child: Container(
-                                color: Colors.black.withOpacity(0.4),
-                              ))),
-                    ]));
-          }),
+      _buildAddressBook(),
     ]);
 
     return view;

@@ -46,7 +46,12 @@ class NameCardMessage extends StatelessWidget {
 
     return Container(
         alignment: Alignment.topLeft,
-        child: DataListView(tileData: linkmanInfoTileData));
+        child: DataListView(
+          itemCount: linkmanInfoTileData.length,
+          itemBuilder: (BuildContext context, int index) {
+            return linkmanInfoTileData[index];
+          },
+        ));
   }
 
   Widget _buildGroupWidget(List<Group> groups) {
@@ -73,7 +78,11 @@ class NameCardMessage extends StatelessWidget {
       ));
     }
 
-    return DataListView(tileData: groupInfoTileData);
+    return DataListView(
+        itemCount: groupInfoTileData.length,
+        itemBuilder: (BuildContext context, int index) {
+          return groupInfoTileData[index];
+        });
   }
 
   @override
@@ -94,10 +103,8 @@ class NameCardMessage extends StatelessWidget {
                   content: 'Do you add all as friend?');
               if (confirm != null && confirm) {
                 for (Linkman linkman in linkmen!) {
-                  linkmanService.update(
-                      {'linkmanStatus': LinkmanStatus.F.name},
-                      where: 'peerId=?',
-                      whereArgs: [linkman.peerId]);
+                  linkmanService.update({'linkmanStatus': LinkmanStatus.F.name},
+                      where: 'peerId=?', whereArgs: [linkman.peerId]);
                 }
               }
             },

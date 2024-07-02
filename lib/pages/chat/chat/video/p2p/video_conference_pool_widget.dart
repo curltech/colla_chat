@@ -125,8 +125,12 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
   }
 
   Widget _buildVideoConferenceListView(BuildContext context) {
+    List<TileData> tileData = _buildConferenceTileData(context);
     var conferenceView = DataListView(
-      tileData: _buildConferenceTileData(context),
+      itemCount: tileData.length,
+      itemBuilder: (BuildContext context, int index) {
+        return tileData[index];
+      },
     );
 
     return conferenceView;

@@ -31,7 +31,10 @@ class ContactLinkmanAddWidget extends StatefulWidget with TileDataMixin {
 
   ContactLinkmanAddWidget({super.key}) {
     dataListView = DataListView(
-      controller: controller,
+      itemCount: controller.data.length,
+      itemBuilder: (BuildContext context, int index) {
+        return controller.data[index];
+      },
     );
   }
 

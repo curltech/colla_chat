@@ -47,7 +47,12 @@ class MediaWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    Widget child = DataListView(tileData: mediaTileData);
+    Widget child = DataListView(
+      itemCount: mediaTileData.length,
+      itemBuilder: (BuildContext context, int index) {
+        return mediaTileData[index];
+      },
+    );
     var media = AppBarView(withLeading: true, title: title, child: child);
     return media;
   }

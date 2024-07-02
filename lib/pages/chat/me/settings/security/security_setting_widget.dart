@@ -97,7 +97,12 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
       );
     }
 
-    return DataListView(tileData: tiles, onTap: _onTap);
+    return DataListView(
+        itemCount: tiles.length,
+        itemBuilder: (BuildContext context, int index) {
+          return tiles[index];
+        },
+        onTap: _onTap);
   }
 
   _onTap(int index, String title, {TileData? group, String? subtitle}) {
@@ -217,7 +222,9 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
   ///从备份的peer的登录信息json文件恢复到数据库
   Future<void> _restorePeer() async {
     List<XFile> xfiles = await FileUtil.pickFiles(
-        initialDirectory: platformParams.path, type: FileType.custom,allowedExtensions: ['json']);
+        initialDirectory: platformParams.path,
+        type: FileType.custom,
+        allowedExtensions: ['json']);
     if (xfiles.isNotEmpty) {
       String backup = await xfiles.first.readAsString();
       await myselfPeerService.restore(backup);
@@ -249,7 +256,9 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
     String? peerId = myself.peerId;
     if (peerId != null) {
       List<XFile> xfiles = await FileUtil.pickFiles(
-          initialDirectory: platformParams.path, type: FileType.custom,allowedExtensions: ['tgz']);
+          initialDirectory: platformParams.path,
+          type: FileType.custom,
+          allowedExtensions: ['tgz']);
       if (xfiles.isNotEmpty) {
         String? path =
             await messageAttachmentService.restore(peerId, xfiles.first.path);
@@ -287,8 +296,12 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
   }
 
   Widget _buildSettingWidget(BuildContext context) {
-    Widget securitySettingTile =
-        DataListView(tileData: securitySettingTileData);
+    Widget securitySettingTile = DataListView(
+      itemCount: securitySettingTileData.length,
+      itemBuilder: (BuildContext context, int index) {
+        return securitySettingTileData[index];
+      },
+    );
     var autoLoginTile = CheckboxListTile(
         title: Row(children: [
           Icon(

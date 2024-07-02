@@ -26,7 +26,10 @@ class FaceGroupAddWidget extends StatefulWidget with TileDataMixin {
 
   FaceGroupAddWidget({super.key}) {
     dataListView = DataListView(
-      controller: controller,
+      itemCount: controller.data.length,
+      itemBuilder: (BuildContext context, int index) {
+        return controller.data[index];
+      },
     );
   }
 

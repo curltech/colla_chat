@@ -109,7 +109,7 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
       } catch (e) {
         return httpLight;
       }
-        }
+    }
     return httpLight;
   }
 
@@ -223,7 +223,12 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
     var currentIndex = peerEndpointController.currentIndex;
     var dataListView = KeepAliveWrapper(
         child: DataListView(
-            onTap: _onTap, tileData: tiles, currentIndex: currentIndex));
+            onTap: _onTap,
+            itemCount: tiles.length,
+            itemBuilder: (BuildContext context, int index) {
+              return tiles[index];
+            },
+            currentIndex: currentIndex));
     var peerEndpointWidget = AppBarView(
       title: widget.title,
       withLeading: widget.withLeading,

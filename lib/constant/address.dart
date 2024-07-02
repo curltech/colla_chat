@@ -1,5 +1,4 @@
 import 'package:colla_chat/entity/dht/peerendpoint.dart';
-import 'package:colla_chat/entity/mail/mail_address.dart';
 
 /// 配置文件的定位器
 final Map<String, PeerEndpoint> nodeAddressOptions = {

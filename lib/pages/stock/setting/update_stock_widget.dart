@@ -278,7 +278,13 @@ class _UpdateStockWidgetState extends State<UpdateStockWidget>
               controller: _startDateTextController,
               keyboardType: TextInputType.number,
               labelText: AppLocalizations.t('startDate'))),
-      Expanded(child: DataListView(tileData: tileData)),
+      Expanded(
+          child: DataListView(
+        itemCount: tileData.length,
+        itemBuilder: (BuildContext context, int index) {
+          return tileData[index];
+        },
+      )),
     ]);
   }
 

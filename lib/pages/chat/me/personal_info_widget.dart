@@ -125,7 +125,12 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
       title: widget.title,
       withLeading: widget.withLeading,
       child: Column(children: [
-        DataListView(tileData: personalInfoTileData),
+        DataListView(
+          itemCount: personalInfoTileData.length,
+          itemBuilder: (BuildContext context, int index) {
+            return personalInfoTileData[index];
+          },
+        ),
         const SizedBox(
           height: 15.0,
         ),

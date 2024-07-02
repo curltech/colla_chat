@@ -136,7 +136,7 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
               continue;
             }
             bool? contain = this.allowedExtensions.contains(extension);
-            if (contain != null && contain) {
+            if (contain) {
               PlatformMediaSource? mediaSource =
                   await addMediaFile(filename: entry.path);
               if (mediaSource != null) {
@@ -331,13 +331,16 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                 });
           } else {
             return DataListView(
-              tileData: tileData,
               onTap: (int index, String title,
                   {TileData? group, String? subtitle}) {
                 widget.playlistController.currentIndex = index;
                 if (widget.onSelected != null) {
                   widget.onSelected!(index, title);
                 }
+              },
+              itemCount: tileData.length,
+              itemBuilder: (BuildContext context, int index) {
+                return tileData[index];
               },
             );
           }
@@ -367,7 +370,10 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
 
   ///将播放列表的文件加入收藏
   _collectMediaSource(int index) async {
-    PlatformMediaSource mediaSource = widget.playlistController.get(index);
+    PlatformMediaSource? mediaSource = widget.playlistController.get(index);
+    if (mediaSource == null) {
+      return;
+    }
     var filename = mediaSource.filename;
     String mediaFormat = mediaSource.mediaFormat!;
     File file = File(filename);

@@ -31,49 +31,53 @@ class PlatformMapLauncherWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _PlatformMapLauncherWidgetState extends State<PlatformMapLauncherWidget> {
+  ValueNotifier<List<AvailableMap>> maps =
+      ValueNotifier<List<AvailableMap>>([]);
+
   @override
   void initState() {
     super.initState();
+    _init();
   }
 
-  Future<List<TileData>> buildMapTileData(BuildContext context) async {
-    List<TileData> tiles = [];
-    List<AvailableMap> maps = await GeolocatorUtil.installedMaps();
-    for (AvailableMap map in maps) {
-      TileData tile = TileData(
-          title: map.mapName,
-          prefix: SvgPicture.asset(
-            map.icon,
-            height: 30.0,
-            width: 30.0,
-          ),
-          subtitle: map.mapType.name,
-          onTap: (int index, String title, {String? subtitle}) async {
-            Position? position = await GeolocatorUtil.currentPosition(context);
-            if (position != null) {
-              GeolocatorUtil.showMarker(
-                  map, Coords(position.latitude, position.longitude),
-                  title: AppLocalizations.t('Current position'));
-            }
-          });
-      tiles.add(tile);
-    }
+  _init() async {
+    maps.value = await GeolocatorUtil.installedMaps();
+  }
 
-    return tiles;
+  TileData? buildMapTileData(BuildContext context, int index) {
+    AvailableMap map = maps.value[index];
+    TileData tile = TileData(
+        title: map.mapName,
+        prefix: SvgPicture.asset(
+          map.icon,
+          height: 30.0,
+          width: 30.0,
+        ),
+        subtitle: map.mapType.name,
+        onTap: (int index, String title, {String? subtitle}) async {
+          Position? position = await GeolocatorUtil.currentPosition(context);
+          if (position != null) {
+            GeolocatorUtil.showMarker(
+                map, Coords(position.latitude, position.longitude),
+                title: AppLocalizations.t('Current position'));
+          }
+        });
+
+    return tile;
   }
 
   Widget buildMapLauncher(BuildContext context) {
     if (platformParams.mobile) {
-      return FutureBuilder(
-          future: buildMapTileData(context),
+      return ValueListenableBuilder(
+          valueListenable: maps,
           builder:
-              (BuildContext context, AsyncSnapshot<List<TileData>> snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              if (snapshot.hasData) {
-                return DataListView(tileData: snapshot.data!);
-              }
-            }
-            return LoadingUtil.buildLoadingIndicator();
+              (BuildContext context, List<AvailableMap> maps, Widget? child) {
+            return DataListView(
+              itemCount: maps.length,
+              itemBuilder: (BuildContext context, int index) {
+                return buildMapTileData(context, index);
+              },
+            );
           });
     }
     return FutureBuilder(

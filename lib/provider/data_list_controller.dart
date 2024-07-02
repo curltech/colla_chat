@@ -72,8 +72,12 @@ class DataListController<T> with ChangeNotifier {
     notifyListeners();
   }
 
-  T get(int index) {
-    return data[index];
+  T? get(int index) {
+    if (index >= 0 && index < data.length) {
+      return data[index];
+    }
+
+    return null;
   }
 
   insert(int index, T d) {

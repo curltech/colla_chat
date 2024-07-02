@@ -65,10 +65,14 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget>
       ];
 
       linkmanInfo = AppBarView(
-        title: widget.title,
-        withLeading: widget.withLeading,
-        child: DataListView(tileData: linkmanInfoTileData),
-      );
+          title: widget.title,
+          withLeading: widget.withLeading,
+          child: DataListView(
+            itemCount: linkmanInfoTileData.length,
+            itemBuilder: (BuildContext context, int index) {
+              return linkmanInfoTileData[index];
+            },
+          ));
     }
 
     return linkmanInfo;

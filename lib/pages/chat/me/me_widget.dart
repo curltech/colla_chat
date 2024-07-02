@@ -135,7 +135,12 @@ class _MeWidgetState extends State<MeWidget> {
         valueListenable: developerSwitch,
         builder: (BuildContext context, bool developerSwitch, Widget? child) {
           List<TileData> meTileData = _buildMeTileData(context);
-          return DataListView(tileData: meTileData);
+          return DataListView(
+            itemCount: meTileData.length,
+            itemBuilder: (BuildContext context, int index) {
+              return meTileData[index];
+            },
+          );
         });
 
     var me = AppBarView(

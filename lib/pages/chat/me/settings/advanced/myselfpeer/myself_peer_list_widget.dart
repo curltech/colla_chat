@@ -52,8 +52,12 @@ class _MyselfPeerListWidgetState extends State<MyselfPeerListWidget> {
 
   @override
   Widget build(BuildContext context) {
+    List<TileData> tiles = _buildMyselfPeerTileData();
     var myselfPeers = DataListView(
-      tileData: _buildMyselfPeerTileData(),
+      itemCount: tiles.length,
+      itemBuilder: (BuildContext context, int index) {
+        return tiles[index];
+      },
       currentIndex: myselfPeerController.currentIndex,
       onTap: (int index, String title, {TileData? group, String? subtitle}) {
         myselfPeerController.currentIndex = index;

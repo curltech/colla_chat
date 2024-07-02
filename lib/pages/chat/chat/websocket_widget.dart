@@ -41,7 +41,12 @@ class _WebSocketWidgetState extends State<WebSocketWidget> {
   @override
   Widget build(BuildContext context) {
     List<TileData> meTileData = _buildMeTileData(context);
-    Widget child = DataListView(tileData: meTileData);
+    Widget child = DataListView(
+      itemCount: meTileData.length,
+      itemBuilder: (BuildContext context, int index) {
+        return meTileData[index];
+      },
+    );
 
     var me = AppBarView(title: widget.title, child: child);
     return me;

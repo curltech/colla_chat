@@ -306,7 +306,6 @@ class _NewMailWidgetState extends State<NewMailWidget> {
           CryptoUtil.stringToUtf8(subjectController.text), receipts.value);
       String subject = CryptoUtil.encodeBase64(encryptedSubject!.data);
       //加前后缀表示加密
-
       secretKey = encryptedSubject.secretKey;
       Map<String, String>? payloadKeys = encryptedSubject.payloadKeys;
       //表示群加密

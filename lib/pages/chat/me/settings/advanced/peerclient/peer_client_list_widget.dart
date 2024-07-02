@@ -109,7 +109,12 @@ class _PeerClientListWidgetState extends State<PeerClientListWidget> {
             builder:
                 (BuildContext context, List<TileData> tiles, Widget? child) {
               return DataListView(
-                  onTap: _onTap, tileData: tiles, currentIndex: currentIndex);
+                  onTap: _onTap,
+                  itemCount: tiles.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return tiles[index];
+                  },
+                  currentIndex: currentIndex);
             }));
 
     var peerClientWidget = AppBarView(

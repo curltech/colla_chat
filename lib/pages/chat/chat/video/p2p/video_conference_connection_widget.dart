@@ -80,7 +80,12 @@ class VideoConferenceConnectionWidget extends StatelessWidget
           if (snapshot.connectionState == ConnectionState.done) {
             List<TileData>? tileData = snapshot.data;
             tileData ??= [];
-            return DataListView(tileData: tileData);
+            return DataListView(
+              itemCount: tileData.length,
+              itemBuilder: (BuildContext context, int index) {
+                return tileData?[index];
+              },
+            );
           }
           return LoadingUtil.buildLoadingIndicator();
         });

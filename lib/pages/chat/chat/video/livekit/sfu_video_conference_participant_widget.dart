@@ -79,7 +79,14 @@ class SfuVideoConferenceParticipantWidget extends StatelessWidget
 
   Widget _buildRemoteParticipantListView(BuildContext context) {
     List<TileData> tileData = _buildRemoteParticipantTileData(context);
-    return SizedBox(height: 200, child: DataListView(tileData: tileData));
+    return SizedBox(
+        height: 200,
+        child: DataListView(
+          itemCount: tileData.length,
+          itemBuilder: (BuildContext context, int index) {
+            return tileData[index];
+          },
+        ));
   }
 
   Widget _buildParticipantWidget(BuildContext context) {
@@ -138,7 +145,13 @@ class SfuVideoConferenceParticipantWidget extends StatelessWidget
       }
     }
 
-    return SizedBox(height: 80, child: DataListView(tileData: tileData));
+    return SizedBox(
+        height: 80,
+        child: DataListView(
+            itemCount: tileData.length,
+            itemBuilder: (BuildContext context, int index) {
+              return tileData[index];
+            }));
   }
 
   @override

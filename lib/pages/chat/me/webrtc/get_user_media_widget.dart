@@ -91,7 +91,13 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
             (BuildContext context, AsyncSnapshot<List<TileData>> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
-              return DataListView(tileData: snapshot.data!);
+              List<TileData> tiles = snapshot.data!;
+              return DataListView(
+                itemCount: tiles.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return tiles[index];
+                },
+              );
             }
           }
 
@@ -104,7 +110,8 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
     try {
       await localPeerMediaStreamController.createMainPeerMediaStream();
       List<PeerMediaStream> renders = localPeerMediaStreamController
-          .getPeerMediaStreams(myself.peerId!).toList();
+          .getPeerMediaStreams(myself.peerId!)
+          .toList();
       if (renders.isNotEmpty) {
         peerMediaStream = renders[0];
       }

@@ -71,77 +71,71 @@ class _RefreshStockWidgetState extends State<RefreshStockWidget>
             }
           }),
       TileData(
-        title: '分钟线',
-        subtitle: '刷新所有股票的分钟线数据',
-        onTap: (int index, String title, {String? subtitle}) async {
-          bool? confirm =
-              await DialogUtil.confirm(context, content: subtitle!);
-          if (confirm == null || !confirm) {
-            return;
-          }
-          stockLineService.refreshMinLine();
-        }
-      ),
+          title: '分钟线',
+          subtitle: '刷新所有股票的分钟线数据',
+          onTap: (int index, String title, {String? subtitle}) async {
+            bool? confirm =
+                await DialogUtil.confirm(context, content: subtitle!);
+            if (confirm == null || !confirm) {
+              return;
+            }
+            stockLineService.refreshMinLine();
+          }),
       TileData(
-        title: '所有股票今天分钟线',
-        subtitle: '刷新所有股票今天的分钟线数据',
-        onTap: (int index, String title, {String? subtitle}) async {
-          bool? confirm =
-              await DialogUtil.confirm(context, content: subtitle!);
-          if (confirm == null || !confirm) {
-            return;
-          }
-          stockLineService.refreshTodayMinLine();
-        }
-      ),
+          title: '所有股票今天分钟线',
+          subtitle: '刷新所有股票今天的分钟线数据',
+          onTap: (int index, String title, {String? subtitle}) async {
+            bool? confirm =
+                await DialogUtil.confirm(context, content: subtitle!);
+            if (confirm == null || !confirm) {
+              return;
+            }
+            stockLineService.refreshTodayMinLine();
+          }),
       TileData(
-        title: '季度业绩汇总',
-        subtitle: '汇总所有股票的季度业绩数据',
-        onTap: (int index, String title, {String? subtitle}) async {
-          bool? confirm =
-              await DialogUtil.confirm(context, content: subtitle!);
-          if (confirm == null || !confirm) {
-            return;
-          }
-          stockLineService.refreshQPerformance();
-        }
-      ),
+          title: '季度业绩汇总',
+          subtitle: '汇总所有股票的季度业绩数据',
+          onTap: (int index, String title, {String? subtitle}) async {
+            bool? confirm =
+                await DialogUtil.confirm(context, content: subtitle!);
+            if (confirm == null || !confirm) {
+              return;
+            }
+            stockLineService.refreshQPerformance();
+          }),
       TileData(
-        title: '季度业绩统计汇总',
-        subtitle: '汇总所有股票的季度业绩统计数据',
-        onTap: (int index, String title, {String? subtitle}) async {
-          bool? confirm =
-              await DialogUtil.confirm(context, content: subtitle!);
-          if (confirm == null || !confirm) {
-            return;
-          }
-          stockLineService.refreshQStat();
-        }
-      ),
+          title: '季度业绩统计汇总',
+          subtitle: '汇总所有股票的季度业绩统计数据',
+          onTap: (int index, String title, {String? subtitle}) async {
+            bool? confirm =
+                await DialogUtil.confirm(context, content: subtitle!);
+            if (confirm == null || !confirm) {
+              return;
+            }
+            stockLineService.refreshQStat();
+          }),
       TileData(
-        title: '季度业绩评分汇总',
-        subtitle: '汇总所有股票的季度业绩评分数据',
-        onTap: (int index, String title, {String? subtitle}) async {
-          bool? confirm =
-              await DialogUtil.confirm(context, content: subtitle!);
-          if (confirm == null || !confirm) {
-            return;
-          }
-          stockLineService.refreshStatScore();
-        }
-      ),
+          title: '季度业绩评分汇总',
+          subtitle: '汇总所有股票的季度业绩评分数据',
+          onTap: (int index, String title, {String? subtitle}) async {
+            bool? confirm =
+                await DialogUtil.confirm(context, content: subtitle!);
+            if (confirm == null || !confirm) {
+              return;
+            }
+            stockLineService.refreshStatScore();
+          }),
       TileData(
-        title: '季度业绩分位评分汇总',
-        subtitle: '汇总所有股票的季度业绩分位评分数据',
-        onTap: (int index, String title, {String? subtitle}) async {
-          bool? confirm =
-              await DialogUtil.confirm(context, content: subtitle!);
-          if (confirm == null || !confirm) {
-            return;
-          }
-          stockLineService.createScorePercentile();
-        }
-      ),
+          title: '季度业绩分位评分汇总',
+          subtitle: '汇总所有股票的季度业绩分位评分数据',
+          onTap: (int index, String title, {String? subtitle}) async {
+            bool? confirm =
+                await DialogUtil.confirm(context, content: subtitle!);
+            if (confirm == null || !confirm) {
+              return;
+            }
+            stockLineService.createScorePercentile();
+          }),
       TileData(
           title: '日线统计',
           subtitle: '计算所有股票的日线统计数据',
@@ -171,29 +165,27 @@ class _RefreshStockWidgetState extends State<RefreshStockWidget>
             }
           }),
       TileData(
-        title: '计算所有股票的买卖点事件',
-        subtitle: '计算所有股票的买卖点事件',
-        onTap: (int index, String title, {String? subtitle}) async {
-          bool? confirm =
-              await DialogUtil.confirm(context, content: subtitle!);
-          if (confirm == null || !confirm) {
-            return;
-          }
-          stockLineService.refreshEventCond();
-        }
-      ),
+          title: '计算所有股票的买卖点事件',
+          subtitle: '计算所有股票的买卖点事件',
+          onTap: (int index, String title, {String? subtitle}) async {
+            bool? confirm =
+                await DialogUtil.confirm(context, content: subtitle!);
+            if (confirm == null || !confirm) {
+              return;
+            }
+            stockLineService.refreshEventCond();
+          }),
       TileData(
-        title: '更新股票信息',
-        subtitle: '更新股票信息',
-        onTap: (int index, String title, {String? subtitle}) async {
-          bool? confirm =
-              await DialogUtil.confirm(context, content: subtitle!);
-          if (confirm == null || !confirm) {
-            return;
-          }
-          stockLineService.updateShares();
-        }
-      ),
+          title: '更新股票信息',
+          subtitle: '更新股票信息',
+          onTap: (int index, String title, {String? subtitle}) async {
+            bool? confirm =
+                await DialogUtil.confirm(context, content: subtitle!);
+            if (confirm == null || !confirm) {
+              return;
+            }
+            stockLineService.updateShares();
+          }),
       TileData(
           title: '创建模型数据文件',
           subtitle: '创建模型数据文件',
@@ -219,7 +211,13 @@ class _RefreshStockWidgetState extends State<RefreshStockWidget>
               controller: _startDateTextController,
               keyboardType: TextInputType.number,
               labelText: AppLocalizations.t('startDate'))),
-      Expanded(child: DataListView(tileData: tileData)),
+      Expanded(
+          child: DataListView(
+        itemCount: tileData.length,
+        itemBuilder: (BuildContext context, int index) {
+          return tileData[index];
+        },
+      )),
     ]);
   }
 

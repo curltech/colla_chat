@@ -274,7 +274,10 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
               (BuildContext context, AsyncSnapshot<List<TileData>> snapshot) {
             if (snapshot.hasData && snapshot.data != null) {
               return DataListView(
-                tileData: snapshot.data!,
+                itemCount: snapshot.data!.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return snapshot.data![index];
+                },
               );
             }
             return Container();

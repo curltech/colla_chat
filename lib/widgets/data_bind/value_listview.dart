@@ -32,7 +32,26 @@ class ValueListView extends StatelessWidget {
         ));
       }
     }
-    return DataListView(tileData: tiles);
+    return DataListView(
+      itemCount: values.keys.length,
+      itemBuilder: (BuildContext context, int index) {
+        List<String> keys = values.keys.toList();
+        String? key = keys[index];
+        String value = values[key] == null ? '' : values[key].toString();
+        var length = value.length;
+        if (length < 30) {
+          return TileData(
+            title: key,
+            suffix: value,
+          );
+        } else {
+          return TileData(
+            title: key,
+            subtitle: value,
+          );
+        }
+      },
+    );
   }
 
   @override

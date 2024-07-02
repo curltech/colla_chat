@@ -16,7 +16,8 @@ class AdvancedSettingWidget extends StatefulWidget with TileDataMixin {
   final PeerEndpointListWidget peerEndpointListWidget =
       PeerEndpointListWidget();
   final PeerClientListWidget peerClientListWidget = PeerClientListWidget();
-  final MyselfPeerListWidget myselfPeerListWidget = const MyselfPeerListWidget();
+  final MyselfPeerListWidget myselfPeerListWidget =
+      const MyselfPeerListWidget();
   late final List<TileData> advancedSettingTileData;
 
   AdvancedSettingWidget({super.key}) {
@@ -62,7 +63,12 @@ class _AdvancedSettingWidgetState extends State<AdvancedSettingWidget> {
   }
 
   Widget _buildSettingWidget(BuildContext context) {
-    Widget child = DataListView(tileData: widget.advancedSettingTileData);
+    Widget child = DataListView(
+      itemCount: widget.advancedSettingTileData.length,
+      itemBuilder: (BuildContext context, int index) {
+        return widget.advancedSettingTileData[index];
+      },
+    );
     var padding = const EdgeInsets.symmetric(horizontal: AppPadding.mdPadding);
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,

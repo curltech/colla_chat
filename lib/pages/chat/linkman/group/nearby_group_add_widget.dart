@@ -26,7 +26,10 @@ class NearbyGroupAddWidget extends StatefulWidget with TileDataMixin {
 
   NearbyGroupAddWidget({super.key}) {
     dataListView = DataListView(
-      controller: controller,
+      itemCount: controller.data.length,
+      itemBuilder: (BuildContext context, int index) {
+        return controller.data[index];
+      },
     );
   }
 

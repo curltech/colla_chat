@@ -125,6 +125,7 @@ class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
   }
 
   Widget _buildTrackListView(BuildContext context) {
+    var tileData = _buildTrackTileData(context);
     var trackView = Column(children: [
       CommonAutoSizeText(AppLocalizations.t('TrackSender')),
       FutureBuilder(
@@ -135,7 +136,10 @@ class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
               List<TileData>? tiles = snapshot.data;
               if (tiles != null) {
                 return DataListView(
-                  tileData: tiles,
+                  itemCount: tiles.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return tiles[index];
+                  },
                 );
               }
             }
@@ -146,7 +150,10 @@ class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
       ),
       CommonAutoSizeText(AppLocalizations.t('Track')),
       DataListView(
-        tileData: _buildTrackTileData(context),
+        itemCount: tileData.length,
+        itemBuilder: (BuildContext context, int index) {
+          return tileData[index];
+        },
       )
     ]);
 

@@ -127,7 +127,12 @@ class _AddShareWidgetState extends State<AddShareWidget>
               valueListenable: tileData,
               builder:
                   (BuildContext context, List<TileData> value, Widget? child) {
-                return DataListView(tileData: value);
+                return DataListView(
+                  itemCount: value.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return value[index];
+                  },
+                );
               })),
     ]);
   }

@@ -124,7 +124,10 @@ class _LinkmanWebrtcConnectionWidgetState
         builder:
             (BuildContext context, List<TileData> tileData, Widget? child) {
           return DataListView(
-            tileData: tileData,
+            itemCount: tileData.length,
+            itemBuilder: (BuildContext context, int index) {
+              return tileData[index];
+            },
           );
         });
 

@@ -115,17 +115,25 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
   }
 
   Widget _buildTrackListView(BuildContext context) {
+    var audioTileData = _buildAudioTrackTileData(context);
+    var videoTileData = _buildVideoTrackTileData(context);
     var trackView = Column(children: [
       CommonAutoSizeText(AppLocalizations.t('AudioTrack')),
       DataListView(
-        tileData: _buildAudioTrackTileData(context),
+        itemCount: audioTileData.length,
+        itemBuilder: (BuildContext context, int index) {
+          return audioTileData[index];
+        },
       ),
       const SizedBox(
         height: 15.0,
       ),
       CommonAutoSizeText(AppLocalizations.t('VideoTrack')),
       DataListView(
-        tileData: _buildVideoTrackTileData(context),
+        itemCount: videoTileData.length,
+        itemBuilder: (BuildContext context, int index) {
+          return videoTileData[index];
+        },
       ),
       const SizedBox(
         height: 15.0,

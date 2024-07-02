@@ -94,7 +94,12 @@ class _SettingWidgetState extends State<SettingWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Widget child = DataListView(tileData: widget.settingTileData);
+    Widget child = DataListView(
+      itemCount: widget.settingTileData.length,
+      itemBuilder: (BuildContext context, int index) {
+        return widget.settingTileData[index];
+      },
+    );
     var setting = KeepAliveWrapper(
         child: AppBarView(
             title: widget.title,

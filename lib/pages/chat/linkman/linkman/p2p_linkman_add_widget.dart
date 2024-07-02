@@ -51,7 +51,10 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
   initState() {
     super.initState();
     dataListView = DataListView(
-      controller: tileDataController,
+      itemCount: tileDataController.data.length,
+      itemBuilder: (BuildContext context, int index) {
+        return tileDataController.data[index];
+      },
     );
     //tileDataController.addListener(_update);
     chainMessageListen = findClientAction.responseStreamController.stream

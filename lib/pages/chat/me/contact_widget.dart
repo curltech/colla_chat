@@ -75,7 +75,11 @@ class _ContactWidgetState extends State<ContactWidget> {
             },
             icon: const Icon(Icons.refresh))
       ],
-      child: DataListView(tileData: _tileData),
+      child: DataListView(
+          itemCount: _tileData.length,
+          itemBuilder: (BuildContext context, int index) {
+            return _tileData[index];
+          }),
     );
   }
 }

@@ -114,57 +114,53 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
     }
   }
 
-  List<TileData> _buildMyselfPeerTiles() {
-    List<TileData> tiles = [];
+  TileData? _buildMyselfPeerTile(int index) {
+    TileData? tileData;
     List<MyselfPeer> myselfPeers = myselfPeerController.data;
     if (myselfPeers.isNotEmpty) {
-      int index = 0;
-      for (var myselfPeer in myselfPeers) {
-        int i = index;
-        var tile = TileData(
-          title: myselfPeer.loginName,
-          subtitle: myselfPeer.peerId,
-          titleTail: myselfPeer.name,
-          prefix: myselfPeer.avatarImage,
-          suffix: IconButton(
-            onPressed: () async {
-              bool? confirm = await DialogUtil.confirm(context,
-                  content: 'Do you want delete peer');
-              if (confirm == null || confirm == false) {
-                return;
-              }
-              chatMessageService.delete(
-                  where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
-              messageAttachmentService.delete(
-                  where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
-              peerProfileService.delete(
-                  where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
-              chatSummaryService.delete(
-                  where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
-              linkmanService.delete(
-                  where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
-              groupService.delete(
-                  where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
-              groupMemberService.delete(
-                  where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
-              conferenceService.delete(
-                  where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
-              peerClientService.delete(
-                  where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
-              peerEndpointService.delete(
-                  where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
-              myselfPeerService
-                  .delete(where: 'peerId=?', whereArgs: [myselfPeer.peerId]);
-              await myselfPeerController.delete(index: i);
-            },
-            icon: const Icon(Icons.clear),
-          ),
-        );
-        tiles.add(tile);
-        index++;
-      }
+      MyselfPeer myselfPeer = myselfPeers[index];
+      tileData = TileData(
+        title: myselfPeer.loginName,
+        subtitle: myselfPeer.peerId,
+        titleTail: myselfPeer.name,
+        prefix: myselfPeer.avatarImage,
+        suffix: IconButton(
+          onPressed: () async {
+            bool? confirm = await DialogUtil.confirm(context,
+                content: 'Do you want delete peer');
+            if (confirm == null || confirm == false) {
+              return;
+            }
+            chatMessageService
+                .delete(where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
+            messageAttachmentService
+                .delete(where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
+            peerProfileService
+                .delete(where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
+            chatSummaryService
+                .delete(where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
+            linkmanService
+                .delete(where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
+            groupService
+                .delete(where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
+            groupMemberService
+                .delete(where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
+            conferenceService
+                .delete(where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
+            peerClientService
+                .delete(where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
+            peerEndpointService
+                .delete(where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
+            myselfPeerService
+                .delete(where: 'peerId=?', whereArgs: [myselfPeer.peerId]);
+            await myselfPeerController.delete(index: index);
+          },
+          icon: const Icon(Icons.clear),
+        ),
+      );
     }
-    return tiles;
+
+    return tileData;
   }
 
   Widget _buildMyselfPeers(BuildContext context) {
@@ -179,12 +175,15 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
           builder:
               (BuildContext context, bool myselfPeerChange, Widget? child) {
             return DataListView(
-              tileData: _buildMyselfPeerTiles(),
               currentIndex: myselfPeerController.currentIndex,
               onTap: (int index, String title,
                   {TileData? group, String? subtitle}) {
                 myselfPeerController.currentIndex = index;
                 Navigator.pop(context);
+              },
+              itemCount: myselfPeerController.data.length,
+              itemBuilder: (BuildContext context, int index) {
+                return _buildMyselfPeerTile(index);
               },
             );
           })

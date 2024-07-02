@@ -1,5 +1,4 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/image_util.dart';
@@ -107,7 +106,8 @@ class TileData {
 
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
 class DataListTile extends StatelessWidget {
-  final DataListController<TileData>? dataListViewController;
+  // final DataListController<TileData>? dataListViewController;
+  final bool selected;
   final TileData tileData;
   final int index;
   final EdgeInsets? contentPadding;
@@ -122,7 +122,8 @@ class DataListTile extends StatelessWidget {
 
   const DataListTile({
     super.key,
-    this.dataListViewController,
+    // this.dataListViewController,
+    this.selected = false,
     required this.tileData,
     this.index = 0,
     this.onTap,
@@ -134,10 +135,7 @@ class DataListTile extends StatelessWidget {
 
   Widget _buildListTile(BuildContext context) {
     bool selected = false;
-    if (tileData.selected == true ||
-        (tileData.selected == null &&
-            dataListViewController != null &&
-            dataListViewController!.currentIndex == index)) {
+    if (tileData.selected == true || (tileData.selected == null && this.selected)) {
       selected = true;
     }
 
@@ -224,9 +222,6 @@ class DataListTile extends StatelessWidget {
               tileData.onTap != null ||
               tileData.routeName != null
           ? () async {
-              if (dataListViewController != null) {
-                dataListViewController!.currentIndex = index;
-              }
               var fn = onTap;
               if (fn != null) {
                 await fn(index, tileData.title, subtitle: tileData.subtitle);

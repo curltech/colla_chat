@@ -1,6 +1,7 @@
+import 'dart:async';
+
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
-import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,10 @@ import 'package:flutter/material.dart';
 class DataListView extends StatefulWidget {
   final TileData? group;
   final bool reverse;
-  late final DataListController<TileData> controller;
+  int currentIndex;
+  final int itemCount;
+  TileData? Function(BuildContext, int)? itemBuilder;
+  Future<TileData?> Function(BuildContext, int)? futureItemBuilder;
   final Future<void> Function()? onScrollMax;
   final Future<void> Function()? onScrollMin;
   final Future<void> Function()? onRefresh;
@@ -24,22 +28,25 @@ class DataListView extends StatefulWidget {
 
   DataListView(
       {super.key,
-      List<TileData> tileData = const [],
-      int? currentIndex,
-      DataListController<TileData>? controller,
+      this.currentIndex = -1,
+      required this.itemCount,
+      this.itemBuilder,
+      this.futureItemBuilder,
       this.group,
       this.reverse = false,
       this.onScrollMax,
       this.onScrollMin,
       this.onRefresh,
-      this.onTap}) {
-    if (controller != null) {
-      this.controller = controller;
-    } else {
-      this.controller = DataListController<TileData>(
-          data: tileData, currentIndex: currentIndex);
-    }
-  }
+      this.onTap});
+
+  // {
+  //   if (controller != null) {
+  //     this.controller = controller;
+  //   } else {
+  //     this.controller = DataListController<TileData>(
+  //         data: tileData, currentIndex: currentIndex);
+  //   }
+  // }
 
   @override
   State<StatefulWidget> createState() {
@@ -50,12 +57,10 @@ class DataListView extends StatefulWidget {
 class _DataListViewState extends State<DataListView> {
   final ScrollController scrollController = ScrollController();
 
-  // late final EasyRefreshController easyRefreshController;
-
   @override
   initState() {
     super.initState();
-    widget.controller.addListener(_update);
+    // widget.controller.addListener(_update);
     myself.addListener(_update);
     scrollController.addListener(_onScroll);
 
@@ -105,6 +110,7 @@ class _DataListViewState extends State<DataListView> {
   _onTap(int index, String title, {String? subtitle}) {
     var onTap = widget.onTap;
     if (onTap != null) {
+      widget.currentIndex = index;
       onTap(index, title, subtitle: subtitle, group: widget.group);
     }
   }
@@ -128,22 +134,43 @@ class _DataListViewState extends State<DataListView> {
         // 当 ListView 嵌在一个无限长的容器组件中时， shrinkWrap 必须为true
         shrinkWrap: true,
         reverse: widget.reverse,
-        itemCount: widget.controller.length,
+        itemCount: widget.itemCount,
         //physics: const NeverScrollableScrollPhysics(),
         controller: scrollController,
         itemBuilder: (BuildContext context, int index) {
-          TileData tile = widget.controller.get(index);
-
-          Widget tileWidget = _buildListTile(
-              context,
-              DataListTile(
-                dataListViewController: widget.controller,
-                tileData: tile,
-                index: index,
-                onTap: _onTap,
-              ));
-
-          return tileWidget;
+          if (widget.itemBuilder != null) {
+            TileData? tileData = widget.itemBuilder!(context, index);
+            if (tileData != null) {
+              return _buildListTile(
+                  context,
+                  DataListTile(
+                    selected: widget.currentIndex == index,
+                    tileData: tileData,
+                    index: index,
+                    onTap: _onTap,
+                  ));
+            }
+          }
+          if (widget.futureItemBuilder != null) {
+            return FutureBuilder(
+                future: widget.futureItemBuilder!(context, index),
+                builder:
+                    (BuildContext context, AsyncSnapshot<TileData?> snapshot) {
+                  TileData? tileData = snapshot.data;
+                  if (tileData != null) {
+                    return _buildListTile(
+                        context,
+                        DataListTile(
+                          selected: widget.currentIndex == index,
+                          tileData: tileData,
+                          index: index,
+                          onTap: _onTap,
+                        ));
+                  }
+                  return Container();
+                });
+          }
+          return null;
         });
 
     if (widget.onRefresh == null) {
@@ -163,7 +190,7 @@ class _DataListViewState extends State<DataListView> {
 
   @override
   void dispose() {
-    widget.controller.removeListener(_update);
+    // widget.controller.removeListener(_update);
     scrollController.removeListener(_onScroll);
     myself.removeListener(_update);
     super.dispose();

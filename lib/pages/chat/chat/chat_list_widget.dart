@@ -605,7 +605,10 @@ class _ChatListWidgetState extends State<ChatListWidget>
         valueListenable: _linkmanTileData,
         builder: (context, value, child) {
           return DataListView(
-            tileData: value,
+            itemCount: value.length,
+            itemBuilder: (BuildContext context, int index) {
+              return value[index];
+            },
             onTap: _onTapLinkman,
           );
         });
@@ -614,7 +617,10 @@ class _ChatListWidgetState extends State<ChatListWidget>
         valueListenable: _groupTileData,
         builder: (context, value, child) {
           return DataListView(
-            tileData: value,
+            itemCount: value.length,
+            itemBuilder: (BuildContext context, int index) {
+              return value[index];
+            },
             onTap: _onTapGroup,
           );
         });
@@ -623,7 +629,10 @@ class _ChatListWidgetState extends State<ChatListWidget>
         valueListenable: _conferenceTileData,
         builder: (context, value, child) {
           return DataListView(
-            tileData: value,
+            itemCount: value.length,
+            itemBuilder: (BuildContext context, int index) {
+              return value[index];
+            },
             onTap: _onTapConference,
           );
         });

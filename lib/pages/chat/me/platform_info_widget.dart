@@ -1,4 +1,3 @@
-
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
@@ -88,7 +87,12 @@ class _PlatformInfoWidgetState extends State<PlatformInfoWidget>
     var platformInfo = AppBarView(
       title: widget.title,
       withLeading: widget.withLeading,
-      child: DataListView(tileData: platformInfoTileData),
+      child: DataListView(
+        itemCount: platformInfoTileData.length,
+        itemBuilder: (BuildContext context, int index) {
+          return platformInfoTileData[index];
+        },
+      ),
     );
 
     return platformInfo;
