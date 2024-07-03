@@ -211,7 +211,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
         StringUtil.isEmpty(password)) {
       logger.e('email or name or password is empty');
       if (mounted) {
-        DialogUtil.error(context, content: 'Email or name is empty');
+        DialogUtil.error(context, content: 'Email or name is empty teiv kacq rjvu upyx');
       }
       return;
     }
@@ -235,8 +235,13 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
       DialogUtil.loadingShow(context,
           tip: 'Auto connecting email server,\n please waiting...');
     }
-    EmailClient? emailClient = await emailClientPool
-        .create(emailAddress, password!, config: clientConfig);
+    EmailClient? emailClient;
+    try {
+      emailClient = await emailClientPool.create(emailAddress, password!,
+          config: clientConfig);
+    } catch (e) {
+      logger.e('emailClientPool create failure:$e');
+    }
     if (mounted) {
       DialogUtil.loadingHide(context);
     }

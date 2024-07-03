@@ -486,6 +486,9 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     int page = 1,
     FetchPreference fetchPreference = FetchPreference.envelope,
   }) async {
+    if (current == null) {
+      return;
+    }
     EmailClient? emailClient = currentEmailClient;
     if (emailClient == null) {
       return;
@@ -508,7 +511,7 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
           for (int i = mimeMessages.length - 1; i >= 0; i--) {
             var mimeMessage = mimeMessages[i];
             bool success = await mailMessageService.storeMimeMessage(
-                currentMailbox, mimeMessage, fetchPreference);
+                current!.email, currentMailbox, mimeMessage, fetchPreference);
             if (success) {
               notify = true;
             } else {
@@ -569,6 +572,9 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     enough_mail.MimeMessage mimeMessage, {
     FetchPreference fetchPreference = FetchPreference.envelope,
   }) async {
+    if (current != null) {
+      return;
+    }
     EmailClient? emailClient = currentEmailClient;
     if (emailClient == null) {
       return;
@@ -583,7 +589,7 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     if (mimeMessages != null && mimeMessages.isNotEmpty) {
       for (var mimeMessage in mimeMessages) {
         bool success = await mailMessageService.storeMimeMessage(
-            currentMailbox, mimeMessage, fetchPreference);
+            current!.email, currentMailbox, mimeMessage, fetchPreference);
         if (!success) {
           break;
         }
@@ -598,14 +604,16 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     if (emailClient == null) {
       return null;
     }
-
+    if (current != null) {
+      return null;
+    }
     MimeMessage? mimeMessageContent = mimeMessage.decodeContentMessage();
     if (mimeMessageContent == null) {
       enough_mail.MimeMessage? mimeMsg =
           await emailClient.fetchMessageContents(mimeMessage);
       if (mimeMsg != null) {
         await mailMessageService.storeMimeMessage(
-            _currentMailbox!, mimeMsg, FetchPreference.full);
+            current!.email, _currentMailbox!, mimeMsg, FetchPreference.full);
 
         return mimeMsg;
       }

@@ -58,12 +58,13 @@ class EmailMessageService extends GeneralBaseService<MailMessage> {
   }
 
   Future<bool> storeMimeMessage(
+      String email,
       enough_mail.Mailbox mailbox,
       enough_mail.MimeMessage mimeMessage,
       enough_mail.FetchPreference fetchPreference,
       {bool force = false}) async {
     MailMessage emailMessage = MailMessage();
-    emailMessage.emailAddress = myself.myselfPeer.email;
+    emailMessage.emailAddress = email;
     mimeMessage.parse();
     emailMessage.subject = mimeMessage.decodeSubject();
     emailMessage.senders = mimeMessage.from;

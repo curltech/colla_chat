@@ -23,6 +23,7 @@ import 'package:enough_mail/highlevel.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:mimecon/mimecon.dart';
+import 'package:colla_chat/service/mail/mail_message.dart';
 
 ///邮件内容子视图
 class MailContentWidget extends StatefulWidget with TileDataMixin {
@@ -86,30 +87,33 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     if (mailMessage == null) {
       return null;
     }
-    MimeMessage? mimeMessage =
-        await mailMimeMessageController.convert(mailMessage);
-    if (mimeMessage == null) {
-      return null;
-    }
-    try {
-      if (mailMessage.status != FetchPreference.full.name) {
-        mimeMessage =
-            await mailMimeMessageController.fetchMessageContents(mimeMessage);
+    MimeMessage? mimeMessage;
+    if (mailMessage.status != FetchPreference.full.name) {
+      List<MimeMessage>? mimeMessages = await mailMimeMessageController
+          .fetchMessageSequence([mailMessage.uid]);
+      if (mimeMessages == null || mimeMessages.isEmpty) {
+        return null;
       }
-    } catch (e) {
-      logger.e('updateMimeMessageContent failure:$e');
+      mimeMessage = mimeMessages.first;
+      mailMessageService.storeMimeMessage(
+          mailMimeMessageController.current!.email,
+          mailMimeMessageController.currentMailbox!,
+          mimeMessage,
+          FetchPreference.full,
+          force: true);
+    } else {
+      mimeMessage = await mailMimeMessageController.convert(mailMessage);
     }
-    if (mimeMessage != null) {
+    if (mimeMessage == null) {
+      decryptedMimeMessage.subject = null;
+      subject.value = null;
+      decryptedMimeMessage.html = null;
+    } else {
       decryptedMimeMessage =
           await mailMimeMessageController.decryptMimeMessage(mimeMessage);
       subject.value = decryptedMimeMessage.subject;
     }
 
-    if (mimeMessage == null) {
-      decryptedMimeMessage.subject = null;
-      subject.value = null;
-      decryptedMimeMessage.html = null;
-    }
     return mimeMessage;
   }
 
