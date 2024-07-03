@@ -24,10 +24,17 @@ class EmailMessageService extends GeneralBaseService<MailMessage> {
     // });
   }
 
-  Future<bool> store(MailMessage emailMessage) async {
+  Future<bool> store(MailMessage emailMessage, {bool force = false}) async {
     int uid = emailMessage.uid;
     MailMessage? old = await findOne(where: 'uid=?', whereArgs: [uid]);
     if (old != null) {
+      if (force) {
+        emailMessage.id = old.id;
+        emailMessage.createDate = old.createDate;
+        await update(emailMessage);
+
+        return true;
+      }
       String? oldStatus = old.status;
       if (oldStatus == enough_mail.FetchPreference.full.name) {
         return false;
@@ -41,6 +48,8 @@ class EmailMessageService extends GeneralBaseService<MailMessage> {
         emailMessage.id = old.id;
         emailMessage.createDate = old.createDate;
         await update(emailMessage);
+
+        return true;
       }
     } else {
       await insert(emailMessage);
@@ -51,7 +60,8 @@ class EmailMessageService extends GeneralBaseService<MailMessage> {
   Future<bool> storeMimeMessage(
       enough_mail.Mailbox mailbox,
       enough_mail.MimeMessage mimeMessage,
-      enough_mail.FetchPreference fetchPreference) async {
+      enough_mail.FetchPreference fetchPreference,
+      {bool force = false}) async {
     MailMessage emailMessage = MailMessage();
     emailMessage.emailAddress = myself.myselfPeer.email;
     mimeMessage.parse();
@@ -75,7 +85,7 @@ class EmailMessageService extends GeneralBaseService<MailMessage> {
     emailMessage.statusDate = DateUtil.currentDate();
     emailMessage.content = mimeMessage.renderMessage();
 
-    return await store(emailMessage);
+    return await store(emailMessage, force: force);
   }
 
   Future<List<MailMessage>> findMessages(

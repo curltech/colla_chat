@@ -721,6 +721,88 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
 
     return decryptedData;
   }
+
+  deleteMessage(int index, {bool expunge = false}) async {
+    EmailClient? emailClient = currentEmailClient;
+    if (emailClient == null) {
+      return null;
+    }
+    List<MailMessage>? currentMailMessages = this.currentMailMessages;
+    if (currentMailMessages != null && currentMailMessages.isNotEmpty) {
+      if (index >= 0 && index < currentMailMessages.length) {
+        MailMessage mailMessage = currentMailMessages[index];
+        currentMailMessages.removeAt(index);
+        int uid = mailMessage.uid;
+        MessageSequence sequence = MessageSequence.fromIds([uid], isUid: true);
+        mailMessageService.delete(where: 'id=?', whereArgs: [mailMessage.id!]);
+        emailClient.deleteMessages(sequence, expunge: expunge);
+
+        notifyListeners();
+      }
+    }
+  }
+
+  flagMessage(
+    int index, {
+    bool? isSeen,
+    bool? isFlagged,
+    bool? isAnswered,
+    bool? isForwarded,
+    bool? isDeleted,
+    bool? isReadReceiptSent,
+  }) async {
+    EmailClient? emailClient = currentEmailClient;
+    if (emailClient == null) {
+      return null;
+    }
+    List<MailMessage>? currentMailMessages = this.currentMailMessages;
+    if (currentMailMessages != null && currentMailMessages.isNotEmpty) {
+      if (index >= 0 && index < currentMailMessages.length) {
+        MailMessage mailMessage = currentMailMessages[index];
+        MimeMessage? mimeMessage = await convert(mailMessage);
+        if (mimeMessage != null) {
+          await emailClient.flagMessage(mimeMessage,
+              isSeen: isSeen,
+              isFlagged: isFlagged,
+              isAnswered: isAnswered,
+              isForwarded: isForwarded,
+              isDeleted: isDeleted,
+              isReadReceiptSent: isReadReceiptSent);
+          String flags = JsonUtil.toJsonString(mimeMessage.flags);
+          mailMessage.flags = mimeMessage.flags;
+          mailMessageService.update({'flags': flags},
+              where: 'id=?', whereArgs: [mailMessage.id!]);
+
+          notifyListeners();
+        }
+      }
+    }
+  }
+
+  Future<MoveResult?> junkMessage(int index) async {
+    EmailClient? emailClient = currentEmailClient;
+    if (emailClient == null) {
+      return null;
+    }
+    List<MailMessage>? currentMailMessages = this.currentMailMessages;
+    if (currentMailMessages != null && currentMailMessages.isNotEmpty) {
+      if (index >= 0 && index < currentMailMessages.length) {
+        MailMessage mailMessage = currentMailMessages[index];
+        MimeMessage? mimeMessage = await convert(mailMessage);
+        if (mimeMessage != null) {
+          MoveResult? moveResult = await emailClient.junkMessage(mimeMessage);
+          if (moveResult != null) {
+            mailMessageService.update(
+                {'mailboxName': moveResult.targetMailbox?.name},
+                where: 'id=?',
+                whereArgs: [mailMessage.id!]);
+
+            notifyListeners();
+          }
+        }
+      }
+    }
+  }
 }
 
 final MailMimeMessageController mailMimeMessageController =

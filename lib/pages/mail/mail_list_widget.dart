@@ -89,51 +89,31 @@ class _MailListWidgetState extends State<MailListWidget> {
           prefix: Icons.delete,
           title: 'Delete',
           onTap: (int index, String title, {String? subtitle}) async {
-            EmailClient? emailClient =
-                mailMimeMessageController.currentEmailClient;
-            if (emailClient != null && mimeMessage != null) {
-              emailClient.deleteMessage(mimeMessage, expunge: false);
-            }
+            mailMimeMessageController.deleteMessage(index, expunge: false);
           }),
       TileData(
           prefix: Icons.mark_email_unread,
           title: 'Unread',
           onTap: (int index, String title, {String? subtitle}) async {
-            EmailClient? emailClient =
-                mailMimeMessageController.currentEmailClient;
-            if (emailClient != null && mimeMessage != null) {
-              emailClient.flagMessage(mimeMessage, isSeen: false);
-            }
+            mailMimeMessageController.flagMessage(index, isSeen: false);
           }),
       TileData(
           prefix: Icons.mark_email_read,
           title: 'Read',
           onTap: (int index, String title, {String? subtitle}) async {
-            EmailClient? emailClient =
-                mailMimeMessageController.currentEmailClient;
-            if (emailClient != null && mimeMessage != null) {
-              emailClient.flagMessage(mimeMessage, isSeen: true);
-            }
+            mailMimeMessageController.flagMessage(index, isSeen: true);
           }),
       TileData(
           prefix: Icons.flag,
           title: 'Flag',
           onTap: (int index, String title, {String? subtitle}) async {
-            EmailClient? emailClient =
-                mailMimeMessageController.currentEmailClient;
-            if (emailClient != null && mimeMessage != null) {
-              emailClient.flagMessage(mimeMessage, isFlagged: true);
-            }
+            mailMimeMessageController.flagMessage(index, isFlagged: true);
           }),
       TileData(
           prefix: Icons.restore_from_trash,
           title: 'Junk',
           onTap: (int index, String title, {String? subtitle}) async {
-            EmailClient? emailClient =
-                mailMimeMessageController.currentEmailClient;
-            if (emailClient != null && mimeMessage != null) {
-              emailClient.junkMessage(mimeMessage);
-            }
+            mailMimeMessageController.junkMessage(index);
           }),
     ];
     tile.endSlideActions = [
