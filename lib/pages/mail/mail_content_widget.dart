@@ -60,8 +60,8 @@ class _MailContentWidgetState extends State<MailContentWidget> {
 
   @override
   initState() {
-    mailMimeMessageController.addListener(_update);
     super.initState();
+    mailMimeMessageController.addListener(_update);
 
     ///windows桌面环境下用webview显示html文件方式的邮件内容，后面用load方式装载
     if (!platformParams.mobile && !platformParams.macos) {
@@ -127,7 +127,12 @@ class _MailContentWidgetState extends State<MailContentWidget> {
       titleTail = DateUtil.formatEasyRead(sendTime);
     }
     TileData tileData = TileData(
-        prefix: decryptedMimeMessage.needDecrypt ? Icons.mail_lock : null,
+        prefix: decryptedMimeMessage.needDecrypt
+            ? const Icon(
+                Icons.mail_lock,
+                color: Colors.yellow,
+              )
+            : null,
         title: title,
         titleTail: titleTail,
         subtitle: subtitle.toString());

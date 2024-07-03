@@ -57,7 +57,8 @@ class _MailListWidgetState extends State<MailListWidget> {
       titleTail = DateUtil.formatEasyRead(sendTime);
     }
     var subtitle = mailMessage.subject;
-    MimeMessage? mimeMessage = await mailMimeMessageController.convert(mailMessage);
+    MimeMessage? mimeMessage =
+        await mailMimeMessageController.convert(mailMessage);
     DecryptedMimeMessage? decryptedMimeMessage;
     dynamic prefix;
     if (mimeMessage != null) {
@@ -65,7 +66,10 @@ class _MailListWidgetState extends State<MailListWidget> {
           await mailMimeMessageController.decryptMimeMessage(mimeMessage);
       subtitle = decryptedMimeMessage.subject;
       if (decryptedMimeMessage.needDecrypt) {
-        prefix = Icons.mail_lock;
+        prefix = const Icon(
+          Icons.mail_lock,
+          color: Colors.yellow,
+        );
       }
     } else {
       logger.e('convert mailMessage failure');
@@ -157,7 +161,8 @@ class _MailListWidgetState extends State<MailListWidget> {
       return null;
     }
     if (mailMessage.status != FetchPreference.full.name) {
-      MimeMessage? mimeMessage = await mailMimeMessageController.convert(mailMessage);
+      MimeMessage? mimeMessage =
+          await mailMimeMessageController.convert(mailMessage);
       if (mimeMessage != null) {
         await mailMimeMessageController.fetchMessageContents(mimeMessage);
         await mailMimeMessageController.findCurrent();
