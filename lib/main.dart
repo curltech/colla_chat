@@ -23,12 +23,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:upgrader/upgrader.dart';
 import 'package:webview_win_floating/webview.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 
 ///全局处理证书问题
 class PlatformHttpOverrides extends HttpOverrides {
