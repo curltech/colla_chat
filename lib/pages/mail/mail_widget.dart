@@ -53,7 +53,6 @@ class _MailWidgetState extends State<MailWidget> {
   initState() {
     super.initState();
     mailMimeMessageController.addListener(_update);
-    mailMimeMessageController.initAllMailAddress();
   }
 
   _update() {

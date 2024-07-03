@@ -86,7 +86,8 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     if (mailMessage == null) {
       return null;
     }
-    MimeMessage? mimeMessage = mailMimeMessageController.convert(mailMessage);
+    MimeMessage? mimeMessage =
+        await mailMimeMessageController.convert(mailMessage);
     if (mimeMessage == null) {
       return null;
     }
@@ -235,12 +236,13 @@ class MailAttachmentWidget extends StatelessWidget {
   }
 
   ///获取当前邮件的附件目录信息，用于展示
-  List<ContentInfo>? findContentInfos() {
+  Future<List<ContentInfo>?> findContentInfos() async {
     MailMessage? mailMessage = mailMimeMessageController.currentMailMessage;
     if (mailMessage == null) {
       return null;
     }
-    MimeMessage? mimeMessage = mailMimeMessageController.convert(mailMessage);
+    MimeMessage? mimeMessage =
+        await mailMimeMessageController.convert(mailMessage);
     if (mimeMessage == null) {
       return null;
     }
@@ -260,7 +262,8 @@ class MailAttachmentWidget extends StatelessWidget {
     if (mailMessage == null) {
       return null;
     }
-    MimeMessage? mimeMessage = mailMimeMessageController.convert(mailMessage);
+    MimeMessage? mimeMessage =
+        await mailMimeMessageController.convert(mailMessage);
     if (mimeMessage == null) {
       return null;
     }
@@ -310,8 +313,11 @@ class MailAttachmentWidget extends StatelessWidget {
   }
 
   /// 附件显示区
-  Future<List<Widget>?> _buildAttachmentChips(
-      BuildContext context, List<ContentInfo> contentInfos) async {
+  Future<List<Widget>?> _buildAttachmentChips(BuildContext context) async {
+    List<ContentInfo>? contentInfos = await findContentInfos();
+    if (contentInfos == null || contentInfos.isEmpty) {
+      return null;
+    }
     List<Widget> chips = [];
     for (ContentInfo contentInfo in contentInfos) {
       String? fileName = contentInfo.fileName;
@@ -364,12 +370,8 @@ class MailAttachmentWidget extends StatelessWidget {
   }
 
   Widget _buildAttachmentWidget(BuildContext context) {
-    List<ContentInfo>? contentInfos = findContentInfos();
-    if (contentInfos == null || contentInfos.isEmpty) {
-      return Container();
-    }
     return FutureBuilder(
-        future: _buildAttachmentChips(context, contentInfos),
+        future: _buildAttachmentChips(context),
         builder: (BuildContext context, AsyncSnapshot<List<Widget>?> snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return LoadingUtil.buildLoadingIndicator();

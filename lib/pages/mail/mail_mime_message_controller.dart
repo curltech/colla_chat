@@ -52,7 +52,7 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
   ///缺省的邮件地址
   entity.MailAddress? defaultMailAddress;
 
-  String? _currentMailboxName = 'INBOX';
+  String? _currentMailboxName;
 
   ///当前的邮箱名称,
   enough_mail.Mailbox? _currentMailbox;
@@ -93,6 +93,7 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
       _mailBoxIcons[name] = mailBoxeIcon.value;
       _mailBoxIcons[localeName] = mailBoxeIcon.value;
     }
+    _initAllMailAddress();
   }
 
   ///创建邮件地址的目录的图标
@@ -102,19 +103,22 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     return iconData ?? Icons.folder;
   }
 
-  initAllMailAddress() async {
+  _initAllMailAddress() async {
     data = await mailAddressService.findAllMailAddress();
     if (data.isNotEmpty) {
+      _currentMailboxName = _mailBoxIcons.keys.firstOrNull;
       for (var emailAddress in data) {
         String email = emailAddress.email;
         if (!_addressMailMessages.containsKey(email)) {
-          Map<String, List<MailMessage>> addressMailMessages = {};
+          Map<String, List<MailMessage>> addressMailMessages = {
+            _currentMailboxName!: []
+          };
           _addressMailMessages[email] = addressMailMessages;
         }
       }
-
-      connectAllMailAddress();
       currentIndex = 0;
+      connectAllMailAddress();
+      findMailMessages();
     } else {
       currentIndex = -1;
     }
@@ -129,6 +133,9 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     Map<String, enough_mail.Mailbox>? mailboxMap = _addressMailboxes[email];
     if (mailboxMap != null && mailboxMap.isNotEmpty) {
       return mailboxMap.keys.toList();
+    }
+    if (_currentMailboxName != null) {
+      return [_currentMailboxName!];
     }
     return null;
   }
@@ -237,7 +244,7 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     return false;
   }
 
-  MimeMessage? convert(MailMessage emailMessage) {
+  Future<enough_mail.MimeMessage?> convert(MailMessage emailMessage) async {
     MimeMessage? mimeMessage;
     if (emailMessage.status == FetchPreference.envelope.name) {
       Envelope envelope = Envelope(
@@ -269,6 +276,11 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
           mimeMessage.sender = emailMessage.decodeSender();
         } catch (e) {
           logger.e('parseFromText mimeMessage failure:$e');
+          int uid = emailMessage.uid;
+          List<MimeMessage>? mimeMessages = await fetchMessageSequence([uid]);
+          if (mimeMessages != null && mimeMessages.isNotEmpty) {
+            mimeMessage = mimeMessages[0];
+          }
         }
       }
     }
@@ -388,8 +400,9 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
           _currentMailbox = mailboxMap[name];
         }
       }
-
       notifyListeners();
+      //修改邮箱，抓取数据
+      findMailMessages();
     }
   }
 
@@ -519,6 +532,26 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     }
   }
 
+  Future<List<MimeMessage>?> fetchMessageSequence(
+    List<int> ids, {
+    Mailbox? mailbox,
+    FetchPreference fetchPreference = FetchPreference.full,
+    bool markAsSeen = false,
+  }) async {
+    EmailClient? emailClient = currentEmailClient;
+    if (emailClient == null) {
+      return null;
+    }
+    MessageSequence sequence = MessageSequence.fromIds(ids, isUid: true);
+    List<enough_mail.MimeMessage>? mimeMessages =
+        await emailClient.fetchMessageSequence(sequence,
+            mailbox: currentMailbox,
+            fetchPreference: fetchPreference,
+            markAsSeen: markAsSeen);
+
+    return mimeMessages;
+  }
+
   ///从邮件服务器中取当前地址当前邮箱的比指定消息更旧的消息，放入数据提供者的数组中
   Future<void> fetchMessagesNextPage(
     enough_mail.MimeMessage mimeMessage, {
@@ -592,7 +625,7 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     }
 
     if (currentMailMessage != null) {
-      enough_mail.MimeMessage? mimeMessage = convert(currentMailMessage!);
+      enough_mail.MimeMessage? mimeMessage = await convert(currentMailMessage!);
       if (mimeMessage != null) {
         return await emailClient.fetchMessagePart(mimeMessage, fetchId,
             responseTimeout: responseTimeout);

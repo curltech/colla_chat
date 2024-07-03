@@ -22,7 +22,6 @@ class _MailListWidgetState extends State<MailListWidget> {
   initState() {
     super.initState();
     mailMimeMessageController.addListener(_update);
-    mailMimeMessageController.findMailMessages();
   }
 
   _update() {
@@ -30,7 +29,7 @@ class _MailListWidgetState extends State<MailListWidget> {
   }
 
   ///当前邮箱邮件消息转换成tileData，如果为空则返回空列表
-  Future<TileData?> findMoreMimeMessageTile(int index) async {
+  Future<TileData?> findMailMessageTile(int index) async {
     List<MailMessage>? currentMailMessages =
         mailMimeMessageController.currentMailMessages;
     if (currentMailMessages == null || currentMailMessages.isEmpty) {
@@ -58,7 +57,7 @@ class _MailListWidgetState extends State<MailListWidget> {
       titleTail = DateUtil.formatEasyRead(sendTime);
     }
     var subtitle = mailMessage.subject;
-    MimeMessage? mimeMessage = mailMimeMessageController.convert(mailMessage);
+    MimeMessage? mimeMessage = await mailMimeMessageController.convert(mailMessage);
     DecryptedMimeMessage? decryptedMimeMessage;
     dynamic prefix;
     if (mimeMessage != null) {
@@ -158,7 +157,7 @@ class _MailListWidgetState extends State<MailListWidget> {
       return null;
     }
     if (mailMessage.status != FetchPreference.full.name) {
-      MimeMessage? mimeMessage = mailMimeMessageController.convert(mailMessage);
+      MimeMessage? mimeMessage = await mailMimeMessageController.convert(mailMessage);
       if (mimeMessage != null) {
         await mailMimeMessageController.fetchMessageContents(mimeMessage);
         await mailMimeMessageController.findCurrent();
@@ -193,7 +192,7 @@ class _MailListWidgetState extends State<MailListWidget> {
         onRefresh: _onRefresh,
         itemCount: currentMailMessages.length,
         futureItemBuilder: (BuildContext context, int index) {
-          return findMoreMimeMessageTile(index);
+          return findMailMessageTile(index);
         });
 
     return dataListView;

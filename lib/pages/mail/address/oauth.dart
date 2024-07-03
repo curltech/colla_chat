@@ -1,63 +1,116 @@
-import 'package:colla_chat/transport/httpclient.dart';
+import 'dart:convert';
+
 import 'package:enough_mail/enough_mail.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
+import 'package:http/http.dart' as http;
+import 'package:colla_chat/plugin/talker_logger.dart';
 
+/// Defines the ID and secret of an OAuth client
 class OauthClientId {
-  final String id;
-  final String? secret;
-
+  /// Creates a new [OauthClientId]
   const OauthClientId(this.id, this.secret);
+
+  /// The ID of the OAuth client
+  final String id;
+
+  /// The secret of the OAuth client
+  final String? secret;
 }
 
+/// Provides means to authenticate with an OAuth provider
+/// and to refresh the access token
 abstract class OauthClient {
-  final String incomingHostName;
-
-  bool get isEnabled => (oauthClientId != null);
-
-  OauthClientId? get oauthClientId {
-    return null;
-  
-    // incomingHostName
-  }
-
+  /// Creates a new [OauthClient]
   OauthClient(this.incomingHostName);
 
-  Future<OauthToken?> authenticate(String email) async {
+  /// The hostname of the incoming mail server
+  final String incomingHostName;
+
+  /// Whether this client is enabled
+  bool get isEnabled => oauthClientId != null;
+
+  /// The [OauthClientId] for this client
+  OauthClientId? oauthClientId;
+
+  /// Authenticates with the given [email] address
+  Future<OauthToken?> authenticate(
+      String email, String id, String secret) async {
     try {
-      final token = await _authenticate(email, incomingHostName);
+      oauthClientId = OauthClientId(id, secret);
+      if (oauthClientId == null) {
+        logger.d('no oauth client id for $incomingHostName');
+
+        return Future.value();
+      }
+      final token =
+          await _authenticate(oauthClientId!, email, incomingHostName);
+      logger.d(
+        'authenticated $email and received refresh '
+        'token  ${token.refreshToken}',
+      );
+
       return token;
     } catch (e, s) {
-      if (kDebugMode) {
-        print('Unable to authenticate: $e $s');
-      }
+      logger.e('Unable to authenticate: $e');
+
       return Future.value();
     }
   }
 
+  /// Refreshes the given [token]
   Future<OauthToken?> refresh(OauthToken token) async {
+    final oauthClientId = this.oauthClientId;
+    if (oauthClientId == null) {
+      logger.d('no oauth client id for $incomingHostName');
+
+      return Future.value();
+    }
     try {
-      final refreshedToken = await _refresh(token, incomingHostName);
+      final refreshedToken = await _refresh(
+        oauthClientId,
+        token,
+        incomingHostName,
+      );
+      logger.d(
+        'refreshed token and received  refresh token '
+        '${refreshedToken.refreshToken}',
+      );
+
       return refreshedToken;
     } catch (e, s) {
-      if (kDebugMode) {
-        print('Unable to refresh tokens: $e $s');
-      }
+      logger.e('Unable to refresh tokens: $e');
+
       return Future.value();
     }
   }
 
-  Future<OauthToken> _authenticate(String email, String provider);
+  /// Subclasses have to implement the actual authentication
+  Future<OauthToken> _authenticate(
+    OauthClientId oauthClientId,
+    String email,
+    String provider,
+  );
 
-  Future<OauthToken> _refresh(OauthToken token, String provider);
+  /// Subclasses have to implement the actual token refresh
+  Future<OauthToken> _refresh(
+    OauthClientId oauthClientId,
+    OauthToken token,
+    String provider,
+  );
 }
 
+/// Provide Gmail OAuth authentication
 class GmailOAuthClient extends OauthClient {
+  /// Creates a new [GmailOAuthClient]
   GmailOAuthClient() : super('imap.gmail.com');
 
   @override
-  Future<OauthToken> _authenticate(String email, String provider) async {
-    final clientId = oauthClientId!.id;
+  Future<OauthToken> _authenticate(
+    OauthClientId oauthClientId,
+    String email,
+    String provider,
+  ) async {
+    final clientId = oauthClientId.id;
     final callbackUrlScheme = clientId.split('.').reversed.join('.');
 
     // Construct the url
@@ -79,11 +132,9 @@ class GmailOAuthClient extends OauthClient {
     final code = Uri.parse(result).queryParameters['code'];
 
     // Use this code to get an access token
-    DioHttpClient? dioHttpClient =
-        httpClientPool.get('https://oauth2.googleapis.com');
-    final response = await dioHttpClient.send(
-      '/token',
-      {
+    final response = await http.post(
+      Uri.parse('https://oauth2.googleapis.com/token'),
+      body: {
         'client_id': clientId,
         'redirect_uri': '$callbackUrlScheme:/',
         'grant_type': 'authorization_code',
@@ -92,60 +143,89 @@ class GmailOAuthClient extends OauthClient {
     );
 
     // Get the access token from the response
-    final text = response.data;
+    utf8.decode(response.bodyBytes);
+    final text = response.body;
     if (response.statusCode != 200 || text == null) {
+      logger.e('received status code ${response.statusCode} with $text');
       throw StateError(
-          'Unable to get Google OAuth token with code $code, status code=${response.statusCode}, response=$text');
+        'Unable to get Google OAuth token with code $code, '
+        'status code=${response.statusCode}, response=$text',
+      );
     }
+
     return OauthToken.fromText(text, provider: provider);
   }
 
   @override
-  Future<OauthToken> _refresh(OauthToken token, String provider) async {
-    final clientId = oauthClientId!.id;
+  Future<OauthToken> _refresh(
+    OauthClientId oauthClientId,
+    OauthToken token,
+    String provider,
+  ) async {
+    final clientId = oauthClientId.id;
     final callbackUrlScheme = clientId.split('.').reversed.join('.');
-    DioHttpClient? dioHttpClient =
-        httpClientPool.get('https://oauth2.googleapis.com');
-    final response = await dioHttpClient.send('/token', {
-      'client_id': clientId,
-      'redirect_uri': '$callbackUrlScheme:/',
-      'refresh_token': token.refreshToken,
-      'grant_type': 'refresh_token',
-    });
-    final text = response.data;
+    final response = await http.post(
+      Uri.parse('https://oauth2.googleapis.com/token'),
+      body: {
+        'client_id': clientId,
+        'redirect_uri': '$callbackUrlScheme:/',
+        'refresh_token': token.refreshToken,
+        'grant_type': 'refresh_token',
+      },
+    );
+    final text = response.body;
     if (response.statusCode != 200 || text == null) {
+      logger.e(
+        'refresh: received status code ${response.statusCode} with $text',
+      );
       throw StateError(
-          'Unable to refresh Google OAuth token $token, status code=${response.statusCode}, response=$text');
+        'Unable to refresh Google OAuth token $token, '
+        'status code=${response.statusCode}, response=$text',
+      );
     }
-    return OauthToken.fromText(text, provider: provider);
+
+    return OauthToken.fromText(
+      text,
+      provider: provider,
+      refreshToken: token.refreshToken,
+    );
   }
 }
 
+/// Provide Outlook OAuth authentication
 class OutlookOAuthClient extends OauthClient {
-  // source: https://docs.microsoft.com/en-us/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth
-  static const String _scope =
-      'https://outlook.office.com/IMAP.AccessAsUser.All https://outlook.office.com/SMTP.Send offline_access';
-
+  /// Creates a new [OutlookOAuthClient]
   OutlookOAuthClient() : super('outlook.office365.com');
 
+  // source: https://docs.microsoft.com/en-us/exchange/client-developer/legacy-protocols/how-to-authenticate-an-imap-pop-smtp-application-by-using-oauth
+  static const String _scope =
+      'https://outlook.office.com/IMAP.AccessAsUser.All '
+      'https://outlook.office.com/SMTP.Send offline_access';
+
   @override
-  Future<OauthToken> _authenticate(String email, String provider) async {
-    final clientId = oauthClientId!.id;
-    final clientSecret = oauthClientId!.secret;
-    const callbackUrlScheme =
-        //'https://login.microsoftonline.com/common/oauth2/nativeclient';
-        'maily://oauth';
+  Future<OauthToken> _authenticate(
+    OauthClientId oauthClientId,
+    String email,
+    String provider,
+  ) async {
+    final clientId = oauthClientId.id;
+    final clientSecret = oauthClientId.secret;
+    const callbackUrlScheme = 'maily://oauth';
 
     // Construct the url
     final uri = Uri.https(
-        'login.microsoftonline.com', '/common/oauth2/v2.0/authorize', {
-      'response_type': 'code',
-      'client_id': clientId,
-      'client_secret': clientSecret,
-      'redirect_uri': callbackUrlScheme,
-      'scope': _scope,
-      'login_hint': email,
-    }).toString();
+      // cSpell: disable-next-line
+      'login.microsoftonline.com',
+      '/common/oauth2/v2.0/authorize',
+      {
+        'response_type': 'code',
+        'client_id': clientId,
+        'client_secret': clientSecret,
+        'redirect_uri': callbackUrlScheme,
+        'scope': _scope,
+        'login_hint': email,
+      },
+    ).toString();
     // print('authenticate URL: $uri');
 
     // Present the dialog to the user
@@ -157,40 +237,56 @@ class OutlookOAuthClient extends OauthClient {
     // Extract code from resulting url
     final code = Uri.parse(result).queryParameters['code'];
     // Use this code to get an access token
-    DioHttpClient? dioHttpClient =
-        httpClientPool.get('https://login.microsoftonline.com');
-    final response = await dioHttpClient.send('/common/oauth2/v2.0/token', {
-      'client_id': clientId,
-      'redirect_uri': callbackUrlScheme,
-      'grant_type': 'authorization_code',
-      'code': code,
-    });
+    final response = await http.post(
+      Uri.parse('https://login.microsoftonline.com/common/oauth2/v2.0/token'),
+      body: {
+        'client_id': clientId,
+        'redirect_uri': callbackUrlScheme,
+        'grant_type': 'authorization_code',
+        'code': code,
+      },
+    );
 
     // Get the access token from the response
-    final responseText = response.data;
+    final responseText = response.body;
     if (responseText == null) {
       throw StateError(
-          'no response from https://login.microsoftonline.com/common/oauth2/v2.0/token');
+        'no response from '
+        'https://login.microsoftonline.com/common/oauth2/v2.0/token',
+      );
     }
+
     return OauthToken.fromText(responseText, provider: provider);
   }
 
   @override
-  Future<OauthToken> _refresh(OauthToken token, String provider) async {
-    final clientId = oauthClientId!.id;
-    DioHttpClient? dioHttpClient =
-        httpClientPool.get('https://login.microsoftonline.com');
-    final response = await dioHttpClient.send('/common/oauth2/v2.0/token', {
-      'client_id': clientId,
-      'scope': _scope,
-      'refresh_token': token.refreshToken,
-      'grant_type': 'refresh_token',
-    });
-    final text = response.data;
+  Future<OauthToken> _refresh(
+    OauthClientId oauthClientId,
+    OauthToken token,
+    String provider,
+  ) async {
+    final clientId = oauthClientId.id;
+    final http.Response response = await http.post(
+      Uri.parse('https://login.microsoftonline.com/common/oauth2/v2.0/token'),
+      body: {
+        'client_id': clientId,
+        'scope': _scope,
+        'refresh_token': token.refreshToken,
+        'grant_type': 'refresh_token',
+      },
+    );
+    final text = response.body;
     if (response.statusCode != 200 || text == null) {
-      throw StateError('Unable to refresh Outlook OAuth token $token, '
-          'status code=${response.statusCode}, response=$text');
+      throw StateError(
+        'Unable to refresh Outlook OAuth token $token, '
+        'status code=${response.statusCode}, response=$text',
+      );
     }
-    return OauthToken.fromText(text, provider: provider);
+
+    return OauthToken.fromText(
+      text,
+      provider: provider,
+      refreshToken: token.refreshToken,
+    );
   }
 }

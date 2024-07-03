@@ -5,6 +5,7 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/mail/mail_address.dart' as entity;
 import 'package:colla_chat/entity/chat/message_attachment.dart';
 import 'package:colla_chat/pages/mail/address/email_service_provider.dart';
+import 'package:colla_chat/pages/mail/address/oauth.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
@@ -249,19 +250,37 @@ class EmailMessageUtil {
       nonStandardFields: {'support-email': 'hujs@curltech.io'});
 
   ///用邮件地址配置创建邮件客户端
-  static enough_mail.MailClient createMailClient(
+  static Future<enough_mail.MailClient> createMailClient(
       {required String name,
       required String email,
       required String password,
-      required enough_mail.ClientConfig config}) {
-    final account = enough_mail.MailAccount.fromDiscoveredSettings(
+      required enough_mail.ClientConfig config}) async {
+    MailAccount? account;
+    final domainName = email.substring(email.lastIndexOf('@') + 1);
+    EmailServiceProvider? emailServiceProvider =
+        platformEmailServiceProvider.domainNameServiceProviders[domainName];
+    if (emailServiceProvider != null) {
+      OauthClient? oauthClient = emailServiceProvider.oauthClient;
+      if (oauthClient != null) {
+        final token = await oauthClient.authenticate(email, name, password);
+        if (token != null) {
+          account = enough_mail.MailAccount.fromDiscoveredSettingsWithAuth(
+              name: name,
+              email: email,
+              auth: OauthAuthentication(email, token),
+              config: config,
+              outgoingClientDomain: 'curltech.io',
+              userName: email);
+        }
+      }
+    }
+    account ??= enough_mail.MailAccount.fromDiscoveredSettings(
         name: name,
         email: email,
         password: password,
         config: config,
         outgoingClientDomain: 'curltech.io',
         userName: email);
-
     final mailClient =
         enough_mail.MailClient(account, isLogEnabled: true, clientId: clientId);
 
@@ -335,11 +354,12 @@ class EmailClient {
       logger.e('no password');
       return false;
     }
-    final enough_mail.MailClient mailClient = EmailMessageUtil.createMailClient(
-        name: emailAddress.name,
-        email: emailAddress.email,
-        password: password,
-        config: config);
+    final enough_mail.MailClient mailClient =
+        await EmailMessageUtil.createMailClient(
+            name: emailAddress.name,
+            email: emailAddress.email,
+            password: password,
+            config: config);
     try {
       await mailClient.connect();
       bool supports8BitEncoding = await mailClient.supports8BitEncoding();
