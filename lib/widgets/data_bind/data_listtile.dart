@@ -135,7 +135,7 @@ class DataListTile extends StatelessWidget {
 
   Widget _buildListTile(BuildContext context) {
     bool selected = false;
-    if (tileData.selected == true || (tileData.selected == null && this.selected)) {
+    if (tileData.selected == true || this.selected) {
       selected = true;
     }
 

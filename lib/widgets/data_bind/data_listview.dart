@@ -39,15 +39,6 @@ class DataListView extends StatefulWidget {
       this.onRefresh,
       this.onTap});
 
-  // {
-  //   if (controller != null) {
-  //     this.controller = controller;
-  //   } else {
-  //     this.controller = DataListController<TileData>(
-  //         data: tileData, currentIndex: currentIndex);
-  //   }
-  // }
-
   @override
   State<StatefulWidget> createState() {
     return _DataListViewState();
@@ -190,7 +181,6 @@ class _DataListViewState extends State<DataListView> {
 
   @override
   void dispose() {
-    // widget.controller.removeListener(_update);
     scrollController.removeListener(_onScroll);
     myself.removeListener(_update);
     super.dispose();
