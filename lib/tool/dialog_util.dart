@@ -355,16 +355,13 @@ class DialogUtil {
   }
 
   static Future<String?> showTextFormField(BuildContext context,
-      {Icon? icon,
-      String title = '',
-      String content = '',
-      String tip = ''}) async {
+      {Icon? icon, String title = '', String content = '', String? tip}) async {
     ButtonStyle style = StyleUtil.buildButtonStyle();
     ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);
     String? result;
     TextEditingController controller = TextEditingController();
-    controller.text = tip;
+    controller.text = tip ?? '';
     await showDialog(
       context: context,
       builder: (context) {
@@ -372,6 +369,7 @@ class DialogUtil {
           title: AppBarWidget.buildTitleBar(
               title: Text(
             AppLocalizations.t(title),
+            style: const TextStyle(color: Colors.white),
           )),
           titlePadding: EdgeInsets.zero,
           content: CommonTextFormField(
@@ -392,7 +390,7 @@ class DialogUtil {
               style: mainStyle,
               onPressed: () {
                 result = controller.text;
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(result);
               },
               child: Text(AppLocalizations.t('Ok')),
             ),
@@ -471,8 +469,7 @@ class DialogUtil {
   }
 
   /// 底部弹出全屏，返回的controller可以关闭
-  static PersistentBottomSheetController popBottomSheet(
-      BuildContext context,
+  static PersistentBottomSheetController popBottomSheet(BuildContext context,
       {required Widget Function(BuildContext) builder}) {
     return showBottomSheet(context: context, builder: builder);
   }

@@ -9,80 +9,6 @@ import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-final List<PlatformDataField> peerEndpointColumnFieldDefs = [
-  PlatformDataField(
-      name: 'id',
-      label: 'Id',
-      dataType: DataType.int,
-      readOnly: true,
-      prefixIcon: Icon(
-        Icons.perm_identity,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'name',
-      label: 'Name',
-      readOnly: true,
-      prefixIcon: Icon(
-        Icons.person,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'peerId',
-      label: 'PeerId',
-      readOnly: true,
-      prefixIcon: Icon(
-        Icons.perm_identity,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'priority',
-      label: 'Priority',
-      dataType: DataType.int,
-      prefixIcon: Icon(
-        Icons.low_priority,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-    name: 'wsConnectAddress',
-    label: 'wsConnectAddress',
-    prefixIcon: Icon(
-      Icons.web,
-      color: myself.primary,
-    ),
-  ),
-  PlatformDataField(
-      name: 'httpConnectAddress',
-      label: 'httpConnectAddress',
-      prefixIcon: Icon(
-        Icons.http,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-    name: 'libp2pConnectAddress',
-    label: 'libp2pConnectAddress',
-    prefixIcon: Icon(
-      Icons.device_hub,
-      color: myself.primary,
-    ),
-  ),
-  PlatformDataField(
-      name: 'iceServers',
-      label: 'iceServers',
-      prefixIcon: Icon(
-        Icons.record_voice_over,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'status',
-      label: 'Status',
-      readOnly: true,
-      prefixIcon: Icon(
-        Icons.thermostat,
-        color: myself.primary,
-      )),
-];
-
 //邮件内容组件
 class PeerEndpointEditWidget extends StatefulWidget with TileDataMixin {
   final PeerEndpointController controller;
@@ -106,8 +32,81 @@ class PeerEndpointEditWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _PeerEndpointEditWidgetState extends State<PeerEndpointEditWidget> {
-  final FormInputController controller =
-      FormInputController(peerEndpointColumnFieldDefs);
+  final List<PlatformDataField> peerEndpointColumnField = [
+    PlatformDataField(
+        name: 'id',
+        label: 'Id',
+        dataType: DataType.int,
+        readOnly: true,
+        prefixIcon: Icon(
+          Icons.perm_identity,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'name',
+        label: 'Name',
+        readOnly: true,
+        prefixIcon: Icon(
+          Icons.person,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'peerId',
+        label: 'PeerId',
+        readOnly: true,
+        prefixIcon: Icon(
+          Icons.perm_identity,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'priority',
+        label: 'Priority',
+        dataType: DataType.int,
+        prefixIcon: Icon(
+          Icons.low_priority,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+      name: 'wsConnectAddress',
+      label: 'wsConnectAddress',
+      prefixIcon: Icon(
+        Icons.web,
+        color: myself.primary,
+      ),
+    ),
+    PlatformDataField(
+        name: 'httpConnectAddress',
+        label: 'httpConnectAddress',
+        prefixIcon: Icon(
+          Icons.http,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+      name: 'libp2pConnectAddress',
+      label: 'libp2pConnectAddress',
+      prefixIcon: Icon(
+        Icons.device_hub,
+        color: myself.primary,
+      ),
+    ),
+    PlatformDataField(
+        name: 'iceServers',
+        label: 'iceServers',
+        prefixIcon: Icon(
+          Icons.record_voice_over,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'status',
+        label: 'Status',
+        readOnly: true,
+        prefixIcon: Icon(
+          Icons.thermostat,
+          color: myself.primary,
+        )),
+  ];
+  late final FormInputController controller =
+      FormInputController(peerEndpointColumnField);
 
   @override
   initState() {

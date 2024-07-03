@@ -50,7 +50,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
   @override
   void initState() {
     super.initState();
-    controller = FormInputController(_getAutoDiscoveryColumnFieldDefs());
+    controller = FormInputController(_getAutoDiscoveryColumnField());
     _updateEmailServiceProviderOptions();
   }
 
@@ -112,8 +112,8 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
         child: emailServiceProvider);
   }
 
-  List<PlatformDataField> _getAutoDiscoveryColumnFieldDefs() {
-    final List<PlatformDataField> autoDiscoveryColumnFieldDefs = [
+  List<PlatformDataField> _getAutoDiscoveryColumnField() {
+    final List<PlatformDataField> autoDiscoveryColumnField = [
       PlatformDataField(
           name: 'name',
           label: 'Name',
@@ -140,7 +140,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
           inputType: InputType.password),
     ];
 
-    return autoDiscoveryColumnFieldDefs;
+    return autoDiscoveryColumnField;
   }
 
   Widget _buildFormInputWidget(BuildContext context) {

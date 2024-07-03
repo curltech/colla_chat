@@ -44,11 +44,19 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
   @override
   initState() {
     super.initState();
-    controller = FormInputController(_getManualDiscoveryColumnFieldDefs());
+    controller = FormInputController(_getManualDiscoveryColumnField());
   }
 
-  List<PlatformDataField> _getManualDiscoveryColumnFieldDefs() {
-    final List<PlatformDataField> manualDiscoveryColumnFieldDefs = [
+  List<PlatformDataField> _getManualDiscoveryColumnField() {
+    final List<PlatformDataField> manualDiscoveryColumnField = [
+      PlatformDataField(
+          name: 'id',
+          label: 'Id',
+          readOnly: true,
+          prefixIcon: Icon(
+            Icons.numbers_outlined,
+            color: myself.primary,
+          )),
       PlatformDataField(
           name: 'name',
           label: 'Name',
@@ -129,7 +137,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
       )
     ];
 
-    return manualDiscoveryColumnFieldDefs;
+    return manualDiscoveryColumnField;
   }
 
   Widget _buildFormInputWidget(BuildContext context) {

@@ -39,6 +39,8 @@ class PersonalInfoWidget extends StatefulWidget with TileDataMixin {
 
 class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
     with SingleTickerProviderStateMixin {
+  List<TileData> personalInfoTileData = [];
+
   @override
   void initState() {
     super.initState();
@@ -46,6 +48,101 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
         Provider.of<IndexWidgetProvider>(context, listen: false);
     final MyselfQrcodeWidget qrcodeWidget = MyselfQrcodeWidget();
     indexWidgetProvider.define(qrcodeWidget);
+  }
+
+  _init() {
+    personalInfoTileData = [
+      TileData(
+          title: 'Avatar',
+          suffix: myself.avatarImage,
+          onTap: (
+            int index,
+            String label, {
+            String? subtitle,
+          }) async {
+            await _pickAvatar(
+              context,
+              myself.peerId!,
+            );
+          }),
+      TileData(
+        title: 'Id',
+        subtitle: myself.myselfPeer.id?.toString(),
+      ),
+      TileData(
+        title: 'PeerId',
+        subtitle: myself.peerId,
+      ),
+      TileData(
+          title: 'Name',
+          suffix: myself.myselfPeer.name,
+          onTap: (
+            int index,
+            String label, {
+            String? subtitle,
+          }) async {
+            String? name = await DialogUtil.showTextFormField(context,
+                title: 'Update name',
+                content: 'Name',
+                tip: myself.myselfPeer.name);
+            if (name != null) {
+              myself.myselfPeer.name = name;
+              myselfPeerService.update({'name': name},
+                  where: 'id=?', whereArgs: [myself.myselfPeer.id!]);
+              setState(() {});
+            }
+          }),
+      TileData(
+        title: 'LoginName',
+        suffix: myself.myselfPeer.loginName,
+      ),
+      TileData(
+          title: 'Email',
+          suffix: myself.myselfPeer.email,
+          onTap: (
+            int index,
+            String label, {
+            String? subtitle,
+          }) async {
+            String? email = await DialogUtil.showTextFormField(context,
+                title: 'Update email',
+                content: 'Email',
+                tip: myself.myselfPeer.email);
+            if (email != null) {
+              myself.myselfPeer.email = email;
+              myselfPeerService.update({'email': email},
+                  where: 'id=?', whereArgs: [myself.myselfPeer.id!]);
+              setState(() {});
+            }
+          }),
+      TileData(
+          title: 'Mobile',
+          suffix: myself.myselfPeer.mobile,
+          onTap: (
+            int index,
+            String label, {
+            String? subtitle,
+          }) async {
+            String? mobile = await DialogUtil.showTextFormField(context,
+                title: 'Update mobile',
+                content: 'Mobile',
+                tip: myself.myselfPeer.mobile);
+            if (mobile != null) {
+              myself.myselfPeer.mobile = mobile;
+              myselfPeerService.update({'mobile': mobile},
+                  where: 'id=?', whereArgs: [myself.myselfPeer.id!]);
+              setState(() {});
+            }
+          }),
+      TileData(
+        title: 'StartDate',
+        suffix: myself.myselfPeer.startDate,
+      ),
+      TileData(
+        title: 'Myself Qrcode',
+        routeName: 'myself_qrcode',
+      ),
+    ];
   }
 
   Widget _buildLogout(BuildContext context) {
@@ -70,57 +167,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
 
   @override
   Widget build(BuildContext context) {
-    String name;
-    var peerId = myself.peerId;
-    if (peerId == null) {
-      peerId = '';
-      name = '';
-    } else {
-      name = myself.myselfPeer.name;
-    }
-    final List<TileData> personalInfoTileData = [
-      TileData(
-          title: 'Avatar',
-          suffix: myself.avatarImage,
-          onTap: (
-            int index,
-            String label, {
-            String? subtitle,
-          }) async {
-            await _pickAvatar(
-              context,
-              peerId!,
-            );
-          }),
-      TileData(
-        title: 'PeerId',
-        subtitle: peerId,
-      ),
-      TileData(
-        title: 'Name',
-        suffix: name,
-      ),
-      TileData(
-        title: 'LoginName',
-        suffix: myself.myselfPeer.loginName,
-      ),
-      TileData(
-        title: 'Email',
-        suffix: myself.myselfPeer.email,
-      ),
-      TileData(
-        title: 'Mobile',
-        suffix: myself.myselfPeer.mobile,
-      ),
-      TileData(
-        title: 'StartDate',
-        suffix: myself.myselfPeer.startDate,
-      ),
-      TileData(
-        title: 'Myself Qrcode',
-        routeName: 'myself_qrcode',
-      ),
-    ];
+    _init();
     var personalInfo = AppBarView(
       title: widget.title,
       withLeading: widget.withLeading,

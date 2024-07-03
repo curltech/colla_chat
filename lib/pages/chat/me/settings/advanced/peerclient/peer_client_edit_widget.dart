@@ -9,97 +9,6 @@ import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-final List<PlatformDataField> peerClientColumnFieldDefs = [
-  PlatformDataField(
-      name: 'id',
-      label: 'Id',
-      dataType: DataType.int,
-      readOnly: true,
-      prefixIcon: Icon(
-        Icons.perm_identity,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'name',
-      label: 'Name',
-      readOnly: true,
-      prefixIcon: Icon(
-        Icons.person,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'peerId',
-      label: 'PeerId',
-      readOnly: true,
-      prefixIcon: Icon(
-        Icons.location_history,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'clientId',
-      label: 'ClientId',
-      readOnly: true,
-      prefixIcon: Icon(
-        Icons.token,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'connectPeerId',
-      label: 'ConnectPeerId',
-      readOnly: true,
-      prefixIcon: Icon(
-        Icons.location_history_rounded,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'connectAddress',
-      label: 'ConnectAddress',
-      readOnly: true,
-      prefixIcon: Icon(
-        Icons.location_searching,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'connectSessionId',
-      label: 'ConnectSessionId',
-      readOnly: true,
-      prefixIcon: Icon(
-        Icons.connected_tv,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-    name: 'email',
-    label: 'Email',
-    prefixIcon: Icon(
-      Icons.email,
-      color: myself.primary,
-    ),
-    textInputType: TextInputType.emailAddress,
-  ),
-  PlatformDataField(
-      name: 'mobile',
-      label: 'Mobile',
-      prefixIcon: Icon(
-        Icons.mobile_friendly,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'status',
-      label: 'Status',
-      prefixIcon: Icon(
-        Icons.thermostat,
-        color: myself.primary,
-      )),
-  PlatformDataField(
-      name: 'publicKey',
-      label: 'PublicKey',
-      readOnly : true,
-      prefixIcon: Icon(
-        Icons.vpn_key,
-        color: myself.primary,
-      )),
-];
-
 ///客户端
 class PeerClientEditWidget extends StatefulWidget with TileDataMixin {
   const PeerClientEditWidget({super.key});
@@ -121,8 +30,98 @@ class PeerClientEditWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _PeerClientEditWidgetState extends State<PeerClientEditWidget> {
-  final FormInputController controller =
-      FormInputController(peerClientColumnFieldDefs);
+  final List<PlatformDataField> peerClientColumnField = [
+    PlatformDataField(
+        name: 'id',
+        label: 'Id',
+        dataType: DataType.int,
+        readOnly: true,
+        prefixIcon: Icon(
+          Icons.perm_identity,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'name',
+        label: 'Name',
+        readOnly: true,
+        prefixIcon: Icon(
+          Icons.person,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'peerId',
+        label: 'PeerId',
+        readOnly: true,
+        prefixIcon: Icon(
+          Icons.location_history,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'clientId',
+        label: 'ClientId',
+        readOnly: true,
+        prefixIcon: Icon(
+          Icons.token,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'connectPeerId',
+        label: 'ConnectPeerId',
+        readOnly: true,
+        prefixIcon: Icon(
+          Icons.location_history_rounded,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'connectAddress',
+        label: 'ConnectAddress',
+        readOnly: true,
+        prefixIcon: Icon(
+          Icons.location_searching,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'connectSessionId',
+        label: 'ConnectSessionId',
+        readOnly: true,
+        prefixIcon: Icon(
+          Icons.connected_tv,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+      name: 'email',
+      label: 'Email',
+      prefixIcon: Icon(
+        Icons.email,
+        color: myself.primary,
+      ),
+      textInputType: TextInputType.emailAddress,
+    ),
+    PlatformDataField(
+        name: 'mobile',
+        label: 'Mobile',
+        prefixIcon: Icon(
+          Icons.mobile_friendly,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'status',
+        label: 'Status',
+        prefixIcon: Icon(
+          Icons.thermostat,
+          color: myself.primary,
+        )),
+    PlatformDataField(
+        name: 'publicKey',
+        label: 'PublicKey',
+        readOnly: true,
+        prefixIcon: Icon(
+          Icons.vpn_key,
+          color: myself.primary,
+        )),
+  ];
+  late final FormInputController controller =
+      FormInputController(peerClientColumnField);
 
   @override
   initState() {
