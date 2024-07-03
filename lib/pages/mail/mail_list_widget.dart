@@ -127,7 +127,7 @@ class _MailListWidgetState extends State<MailListWidget> {
           onTap: (int index, String title, {String? subtitle}) async {}),
       TileData(
           prefix: Icons.forward,
-          title: 'Reply',
+          title: 'Forward',
           onTap: (int index, String title, {String? subtitle}) async {}),
     ];
 
