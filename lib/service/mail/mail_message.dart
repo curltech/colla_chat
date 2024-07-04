@@ -1,5 +1,4 @@
 import 'package:colla_chat/entity/mail/mail_message.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/date_util.dart';
@@ -26,7 +25,11 @@ class EmailMessageService extends GeneralBaseService<MailMessage> {
 
   Future<bool> store(MailMessage emailMessage, {bool force = false}) async {
     int uid = emailMessage.uid;
-    MailMessage? old = await findOne(where: 'uid=?', whereArgs: [uid]);
+    String? mailboxName = emailMessage.mailboxName;
+    String? emailAddress = emailMessage.emailAddress;
+    MailMessage? old = await findOne(
+        where: 'emailAddress=? and mailboxName=? and uid=?',
+        whereArgs: [emailAddress!, mailboxName!, uid]);
     if (old != null) {
       if (force) {
         emailMessage.id = old.id;
