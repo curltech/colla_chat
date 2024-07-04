@@ -301,9 +301,13 @@ class _NewMailWidgetState extends State<NewMailWidget> {
 
     List<int>? secretKey;
     if (needEncrypt) {
-      builder.addHeader('encrypted', true.toString());
+      builder.addHeader('Encrypted', true.toString());
+      peerIds = [...peerIds];
+      if (!peerIds.contains(myself.peerId)) {
+        peerIds.add(myself.peerId!);
+      }
       PlatformEncryptData? encryptedSubject = await mailAddressService.encrypt(
-          CryptoUtil.stringToUtf8(subjectController.text), receipts.value);
+          CryptoUtil.stringToUtf8(subjectController.text), peerIds);
       String subject = CryptoUtil.encodeBase64(encryptedSubject!.data);
       //加前后缀表示加密
       secretKey = encryptedSubject.secretKey;
@@ -323,7 +327,7 @@ class _NewMailWidgetState extends State<NewMailWidget> {
     if (html != null) {
       if (needEncrypt) {
         PlatformEncryptData? encryptedHtml = await mailAddressService.encrypt(
-            CryptoUtil.stringToUtf8(html), receipts.value,
+            CryptoUtil.stringToUtf8(html), peerIds,
             secretKey: secretKey);
         builder.addText(CryptoUtil.encodeBase64(encryptedHtml!.data));
       } else {
@@ -340,7 +344,7 @@ class _NewMailWidgetState extends State<NewMailWidget> {
 
         if (needEncrypt) {
           PlatformEncryptData? encryptedAttachment = await mailAddressService
-              .encrypt(bytes, receipts.value, secretKey: secretKey);
+              .encrypt(bytes, peerIds, secretKey: secretKey);
           builder.addBinary(Uint8List.fromList(encryptedAttachment!.data),
               enough_mail.MediaType.guessFromFileName(filename),
               filename: filename);

@@ -8,6 +8,7 @@ import 'package:colla_chat/service/mail/mail_address.dart';
 import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
+import 'package:enough_mail/enough_mail.dart' as enough_mail;
 
 ///邮件地址子视图
 class MailAddressWidget extends StatefulWidget {
@@ -70,15 +71,24 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
         List<TileData> tiles = [];
         List<String>? mailboxNames =
             mailMimeMessageController.getMailboxNames(mailAddress.email);
+
         if (mailboxNames != null && mailboxNames.isNotEmpty) {
           String? currentMailboxName =
               mailMimeMessageController.currentMailboxName;
           for (var mailboxName in mailboxNames) {
             Icon icon =
                 Icon(mailMimeMessageController.findDirectoryIcon(mailboxName));
+            enough_mail.Mailbox? mailbox = mailMimeMessageController.getMailbox(
+                mailAddress.email, mailboxName);
+            String titleTail = '';
+            if (mailbox != null) {
+              titleTail =
+                  '${mailbox.messagesUnseen}/${mailbox.messagesExists}';
+            }
             TileData tile = TileData(
                 title: mailboxName,
                 prefix: icon,
+                titleTail: titleTail,
                 selected: mailMimeMessageController.currentIndex == i &&
                     currentMailboxName == mailboxName);
             tiles.add(tile);

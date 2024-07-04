@@ -157,7 +157,7 @@ class _GroupDataListViewState extends State<GroupDataListView> {
             )
           : null,
       trailing: trailingWidget,
-      initiallyExpanded: true,
+      initiallyExpanded: selected,
       children: [dataListView],
     );
 

@@ -419,6 +419,14 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     return null;
   }
 
+  enough_mail.Mailbox? getMailbox(String email, String mailboxName) {
+    Map<String, enough_mail.Mailbox>? mailboxMap = _addressMailboxes[email];
+    if (mailboxMap != null && mailboxMap.isNotEmpty) {
+      return mailboxMap[mailboxName];
+    }
+    return null;
+  }
+
   ///设置邮件地址的邮箱
   _setMailboxes(String email, List<enough_mail.Mailbox?> mailboxes,
       {bool listen = true}) {
@@ -508,6 +516,20 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
                 page: page,
                 fetchPreference: fetchPreference);
         if (mimeMessages != null && mimeMessages.isNotEmpty) {
+          mimeMessages.sort((a, b) {
+            DateTime? aDate = a.decodeDate();
+            DateTime? bDate = b.decodeDate();
+            if (aDate == null) {
+              return -1;
+            }
+            if (bDate == null) {
+              return 1;
+            }
+            if (aDate.isAfter(bDate)) {
+              return 1;
+            }
+            return -1;
+          });
           for (int i = mimeMessages.length - 1; i >= 0; i--) {
             var mimeMessage = mimeMessages[i];
             bool success = await mailMessageService.storeMimeMessage(
