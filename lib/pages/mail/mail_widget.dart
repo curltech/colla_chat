@@ -1,10 +1,10 @@
 import 'package:colla_chat/entity/mail/mail_address.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/mail/address/email_service_provider.dart';
-import 'package:colla_chat/pages/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/pages/mail/mail_address_widget.dart';
 import 'package:colla_chat/pages/mail/mail_content_widget.dart';
 import 'package:colla_chat/pages/mail/mail_list_widget.dart';
+import 'package:colla_chat/pages/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/pages/mail/new_mail_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -47,7 +47,8 @@ class MailWidget extends StatefulWidget with TileDataMixin {
 
 class _MailWidgetState extends State<MailWidget> {
   ValueNotifier<bool> addressVisible = ValueNotifier<bool>(false);
-  ValueNotifier<String> mailboxName = ValueNotifier<String>('Mail');
+
+  // ValueNotifier<String> mailboxName = ValueNotifier<String>('Mail');
 
   @override
   initState() {
@@ -56,13 +57,17 @@ class _MailWidgetState extends State<MailWidget> {
   }
 
   _update() {
+    setState(() {});
+  }
+
+  String getMailboxName() {
     MailAddress? current = mailMimeMessageController.current;
-    String email = current?.email ?? '';
+    String email = current?.email ?? 'Mail';
     String? name = mailMimeMessageController.currentMailboxName;
     if (name == null) {
-      mailboxName.value = email;
+      return email;
     } else {
-      mailboxName.value = '$email(${AppLocalizations.t(name)})';
+      return '$email(${AppLocalizations.t(name)})';
     }
   }
 
@@ -153,17 +158,13 @@ class _MailWidgetState extends State<MailWidget> {
     rightWidgets.add(const SizedBox(
       width: 10.0,
     ));
-    Widget titleWidget = ValueListenableBuilder(
-        valueListenable: mailboxName,
-        builder: (BuildContext context, String mailboxName, Widget? child) {
-          return CommonAutoSizeText(
-            mailboxName,
-            style: const TextStyle(color: Colors.white),
-            softWrap: true,
-            maxLines: 1,
-            overflow: TextOverflow.visible,
-          );
-        });
+    Widget titleWidget = CommonAutoSizeText(
+      getMailboxName(),
+      style: const TextStyle(color: Colors.white),
+      softWrap: true,
+      maxLines: 1,
+      overflow: TextOverflow.visible,
+    );
     var appBarView = AppBarView(
         titleWidget: titleWidget,
         withLeading: widget.withLeading,
