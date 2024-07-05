@@ -77,7 +77,7 @@ dependencies:
   flutter_nfc_kit: ^3.4.2 #mobile
   #  flutter_blue_plus: ^1.5.2 #ANDROID，IOS，MACOS
   mimecon: ^1.0.1
-  wakelock_plus: ^1.1.1 #让系统不会睡眠
+  wakelock_plus: ^1.2.5 #让系统不会睡眠
 
   # 存储
   shared_preferences: ^2.2.2
@@ -265,6 +265,7 @@ dependencies:
   any_link_preview: ^3.0.1 #预览link
 
   # 多媒体
+  ffmpeg_kit_flutter: ^6.0.3 #Android, iOS and macOS
   #flutter_audio_waveforms: any
   photo_view: ^0.14.0 #图片显示
   #音频处理 ios:Just add those 2 flags in XCode > Build Settings > Other Linker Flags :
@@ -377,6 +378,10 @@ dependencies:
   langchain_google: ^0.5.0
   ollama_dart: ^0.1.0+1
   dart_openai: ^5.1.0
+
+  #系统
+  system_status: ^1.0.7
+  system_resources: ^1.6.0
 dependency_overrides:
   uuid: ^4.3.1
   meta: ^1.11.0
