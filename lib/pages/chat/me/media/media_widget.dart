@@ -1,3 +1,4 @@
+import 'package:colla_chat/pages/chat/me/media/ffmpeg_video_widget.dart';
 import 'package:colla_chat/pages/chat/me/media/platform_audio_player_widget.dart';
 import 'package:colla_chat/pages/chat/me/media/platform_audio_recorder_widget.dart';
 import 'package:colla_chat/pages/chat/me/media/platform_video_player_widget.dart';
@@ -16,16 +17,19 @@ class MediaWidget extends StatelessWidget with TileDataMixin {
       PlatformAudioPlayerWidget();
   final PlatformAudioRecorderWidget audioRecorderWidget =
       PlatformAudioRecorderWidget();
+  final FfmpegVideoWidget ffmpegVideoWidget = FfmpegVideoWidget();
   late final List<TileData> mediaTileData;
 
   MediaWidget({super.key}) {
     indexWidgetProvider.define(videoPlayerWidget);
     indexWidgetProvider.define(audioPlayerWidget);
     indexWidgetProvider.define(audioRecorderWidget);
+    indexWidgetProvider.define(ffmpegVideoWidget);
     List<TileDataMixin> mixins = [
       videoPlayerWidget,
       audioPlayerWidget,
       audioRecorderWidget,
+      ffmpegVideoWidget,
     ];
     mediaTileData = TileData.from(mixins);
     for (var tile in mediaTileData) {

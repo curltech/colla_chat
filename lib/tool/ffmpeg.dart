@@ -10,7 +10,28 @@ import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'package:ffmpeg_kit_flutter/statistics.dart';
 
 class FfmpegUtil {
-  static Future<ReturnCode?> execute(String command,
+  static Future<String?> encoders() async {
+    final FFmpegSession session = await execute('configure -encoders');
+    final String? output = await session.getOutput();
+
+    return output;
+  }
+
+  static Future<String?> decoders() async {
+    final FFmpegSession session = await execute('configure -decoders');
+    final String? output = await session.getOutput();
+
+    return output;
+  }
+
+  static Future<String?> help() async {
+    final FFmpegSession session = await execute('configure --help');
+    final String? output = await session.getOutput();
+
+    return output;
+  }
+
+  static Future<FFmpegSession> execute(String command,
       {void Function(FFmpegSession session)? sessionComplete,
       void Function(Log log)? logCallback,
       void Function(Statistics stat)? statisticsCallback}) async {
@@ -57,14 +78,14 @@ class FfmpegUtil {
     // The list of statistics generated for this execution (only available on FFmpegSession)
     final statistics = await session.getStatistics();
 
-    return returnCode;
+    return session;
   }
 
   /// 转换媒体文件，包括视频和图片格式的转换，最简单的使用是只有输入和输出文件，自动识别格式
   /// 容器格式：MP4，MKV，WebM，AVI
   /// 视频格式 libx264，libx265，H.262，H.264，H.265，VP8，VP9，AV1，NVENC，libvpx，libaom
   /// 音频格式 MP3，AAC，libfdk-aac
-  static Future<ReturnCode?> convert(
+  static Future<FFmpegSession> convert(
       {String? input,
       String? output,
       String? inputCv,

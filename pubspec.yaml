@@ -67,7 +67,6 @@ dependencies:
   network_info_plus: ^5.0.2
   beamer: ^1.4.1+1
   battery_plus: ^6.0.0
-  package_info_plus: ^8.0.0
   flutter_contacts: ^1.1.8
   fluttercontactpicker: ^5.0.0
   #fast_contacts: ^3.0.3
@@ -266,6 +265,7 @@ dependencies:
 
   # 多媒体
   ffmpeg_kit_flutter: ^6.0.3 #Android, iOS and macOS
+  #  ffmpeg_helper: ^1.0.1
   #flutter_audio_waveforms: any
   photo_view: ^0.14.0 #图片显示
   #音频处理 ios:Just add those 2 flags in XCode > Build Settings > Other Linker Flags :
@@ -396,6 +396,7 @@ dependency_overrides:
   sensors_plus: ^5.0.0
   photo_view: ^0.15.0
   device_info_plus: ^10.1.0
+  package_info_plus: ^8.0.0
   flutter_keyboard_visibility: ^6.0.0
   ffi: 2.1.0
   win32: 5.5.0
