@@ -711,5 +711,9 @@
   "status": "状态",
   "No media stream": "没有媒体流",
   "The app has no location permission, do you want to set it?": "应用没有定位权限，你想设置吗？",
-  "Toggle grid mode": "切换网格模式"
+  "Toggle grid mode": "切换网格模式",
+  "encoders": "编码器",
+  "decoders": "解码器",
+  "help": "帮助",
+  "FfmpegVideo": "Ffmpeg媒体工具"
 }
