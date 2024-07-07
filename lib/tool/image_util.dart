@@ -21,6 +21,7 @@ import 'package:image/image.dart' as platform_image;
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:saver_gallery/saver_gallery.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:image_editor_plus/utils.dart';
 
 ///image_gallery_saver,extended_image
 class ImageUtil {
@@ -488,5 +489,13 @@ class ImageUtil {
     }
 
     return avatar;
+  }
+
+  static convert(){
+    final convertedImage = await ImageUtils.convert(
+      image: data, // <-- Uint8List/path of image
+      format: 'jpg',
+      quality: 80,
+    );
   }
 }

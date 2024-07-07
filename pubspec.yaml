@@ -268,6 +268,8 @@ dependencies:
   #  ffmpeg_helper: ^1.0.1
   #flutter_audio_waveforms: any
   photo_view: ^0.14.0 #图片显示
+  image_editor_plus: ^1.0.6
+  pro_image_editor: ^4.2.5
   #音频处理 ios:Just add those 2 flags in XCode > Build Settings > Other Linker Flags :
   #-lc++
   #-lstd++
@@ -326,7 +328,7 @@ dependencies:
   fc_native_video_thumbnail: ^0.8.0
   extended_image: ^8.2.0 #所有平台，官方软件，管理图像
   extended_image_library: ^4.0.2
-  image_editor: ^1.3.0
+  image_editor: ^1.5.1
   image: ^4.0.17 #所有平台，装载，保存，管理图像
   flutter_luban: ^0.1.13
   #chatview: ^1.2.1
