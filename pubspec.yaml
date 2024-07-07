@@ -268,7 +268,7 @@ dependencies:
   #  ffmpeg_helper: ^1.0.1
   #flutter_audio_waveforms: any
   photo_view: ^0.14.0 #图片显示
-  image_editor_plus: ^1.0.6
+  #  image_editor_plus: ^1.0.6
   pro_image_editor: ^4.2.5
   #音频处理 ios:Just add those 2 flags in XCode > Build Settings > Other Linker Flags :
   #-lc++
@@ -285,7 +285,7 @@ dependencies:
   #  assets_audio_player: ^3.0.6
   #  audiofileplayer: ^2.1.1
   #  record_mp3: ^3.0.0
-  audio_waveforms: 1.0.4
+  audio_waveforms: 1.0.5
   #  video_player_media_kit: ^1.0.5
   video_player_web: ^2.3.1
   flick_video_player: ^0.8.0 #video_player的封装
@@ -319,7 +319,7 @@ dependencies:
   audio_service: ^0.18.12
   just_audio_background: ^0.0.1-beta.11
   audio_session: ^0.1.18
-  flutter_tts: ^4.0.1
+  flutter_tts: ^4.0.2
   speech_to_text: ^6.6.2
   flutter_image_compress: ^2.2.0
   video_thumbnail: ^0.5.2

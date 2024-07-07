@@ -21,7 +21,7 @@ import 'package:image/image.dart' as platform_image;
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:saver_gallery/saver_gallery.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:image_editor_plus/utils.dart';
+import 'package:image/image.dart' as img;
 
 ///image_gallery_saver,extended_image
 class ImageUtil {
@@ -491,11 +491,28 @@ class ImageUtil {
     return avatar;
   }
 
-  static convert(){
-    final convertedImage = await ImageUtils.convert(
-      image: data, // <-- Uint8List/path of image
-      format: 'jpg',
-      quality: 80,
-    );
+  static Future<Uint8List?> convert(
+      {Uint8List? indata,
+      String? infile,
+      String? format,
+      int? width,
+      String? outfile}) async {
+    if (infile != null) {
+      indata = File(infile).readAsBytesSync();
+    }
+    img.Image? image = img.decodeImage(indata!);
+    if (image == null) {
+      return null;
+    }
+    if (width != null) {
+      image = img.copyResize(image, width: width);
+    }
+    if (outfile != null) {
+      await img.encodeImageFile(outfile, image);
+    } else if (format != null) {
+      format = '.$format';
+      return img.encodeNamedImage(format, image);
+    }
+    return null;
   }
 }

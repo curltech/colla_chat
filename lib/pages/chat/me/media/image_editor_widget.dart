@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/ffmpeg.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -18,6 +18,8 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:pro_image_editor/models/editor_callbacks/pro_image_editor_callbacks.dart';
+import 'package:pro_image_editor/modules/main_editor/main_editor.dart';
 
 class ImageEditorWidget extends StatefulWidget with TileDataMixin {
   ImageEditorWidget({
@@ -51,6 +53,7 @@ class _ImageEditorWidgetState extends State<ImageEditorWidget> {
   };
   String? output;
   bool gridMode = false;
+  int index = 0;
   ValueNotifier<List<TileData>> tileData = ValueNotifier<List<TileData>>([]);
   DataListController<String> fileController = DataListController<String>();
 
@@ -110,50 +113,23 @@ class _ImageEditorWidgetState extends State<ImageEditorWidget> {
   List<Widget>? _buildRightWidgets() {
     List<Widget> children = [];
     children.add(IconButton(
-      tooltip: AppLocalizations.t('encoders'),
+      tooltip: AppLocalizations.t('file'),
       onPressed: () async {
-        output = await FfmpegUtil.encoders();
-        show(context, 'encoders');
+        index = 0;
+        setState(() {});
       },
-      icon: const Icon(Icons.qr_code),
+      icon: const Icon(Icons.file_copy_outlined),
     ));
     children.add(IconButton(
-      tooltip: AppLocalizations.t('decoders'),
+      tooltip: AppLocalizations.t('editor'),
       onPressed: () async {
-        output = await FfmpegUtil.decoders();
-        show(context, 'decoders');
+        index = 1;
+        setState(() {});
       },
-      icon: const Icon(Icons.qr_code_scanner),
+      icon: const Icon(Icons.edit),
     ));
-    children.add(
-      IconButton(
-        tooltip: AppLocalizations.t('help'),
-        onPressed: () async {
-          output = await FfmpegUtil.help();
-          show(context, 'help');
-        },
-        icon: const Icon(Icons.help_outline),
-      ),
-    );
 
     return children;
-  }
-
-  show(BuildContext context, String title) {
-    DialogUtil.show(
-        context: context,
-        builder: (BuildContext context) {
-          return Dialog(
-              child: Column(children: [
-            AppBarWidget.buildAppBar(
-              context,
-              title: CommonAutoSizeText(AppLocalizations.t(title)),
-            ),
-            Expanded(
-                child: SingleChildScrollView(
-                    child: CommonAutoSizeText(output ?? ''))),
-          ]));
-        });
   }
 
   Future<void> filePicker({
@@ -390,6 +366,29 @@ class _ImageEditorWidgetState extends State<ImageEditorWidget> {
     ]);
   }
 
+  _buildImageEditor(BuildContext context) {
+    return Swiper(
+        itemCount: 2,
+        index: index,
+        onIndexChanged: (int index) {
+          this.index = index;
+        },
+        itemBuilder: (BuildContext context, int index) {
+          if (this.index == 0) {
+            return _buildConvertFilesWidget(context);
+          }
+          if (this.index == 1) {
+            ///所有平台
+            return ProImageEditor.file(File(fileController.current!),
+                callbacks: ProImageEditorCallbacks(
+                  onImageEditingComplete: (Uint8List bytes) async {},
+                ));
+          }
+
+          return Container();
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget>? rightWidgets = _buildRightWidgets();
@@ -398,7 +397,7 @@ class _ImageEditorWidgetState extends State<ImageEditorWidget> {
       title: widget.title,
       withLeading: true,
       rightWidgets: rightWidgets,
-      child: _buildConvertFilesWidget(context),
+      child: _buildImageEditor(context),
     );
   }
 

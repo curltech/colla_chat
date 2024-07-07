@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -15,8 +16,12 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
+import 'package:ffmpeg_kit_flutter/ffmpeg_session.dart';
+import 'package:ffmpeg_kit_flutter/media_information.dart';
+import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -43,9 +48,7 @@ class FfmpegVideoWidget extends StatefulWidget with TileDataMixin {
 
 class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
   final FileType fileType = FileType.custom;
-  final Set<String> allowedExtensions = {
-    'mp3',
-    'wav',
+  final Set<String> videoExtensions = {
     'mp4',
     '3gp',
     'm4a',
@@ -56,25 +59,121 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
     'avi',
     'wmv',
     'mkv',
-    'mpg'
+    'mpg',
+  };
+  final Set<String> audioExtensions = {
+    'mp3',
+    'wav',
+    'mp4',
+    'm4a',
+  };
+  final Set<String> imageExtensions = {
+    'jpg',
+    'JPG',
+    'png',
+    'PNG',
+    'bmp',
+    'BMP',
+    'webp',
   };
   String? output;
   bool gridMode = false;
   ValueNotifier<List<TileData>> tileData = ValueNotifier<List<TileData>>([]);
   DataListController<String> fileController = DataListController<String>();
+  final Set<String> allowedExtensions = {};
 
   @override
   void initState() {
     super.initState();
     fileController.addListener(_update);
+    allowedExtensions.addAll(videoExtensions);
+    allowedExtensions.addAll(audioExtensions);
+    allowedExtensions.addAll(imageExtensions);
   }
 
   _update() {
     _buildTileData();
   }
 
+  _onSelectFile(int index, String filename, {String? subtitle}) async {
+    List<ActionData> filePopActionData = [];
+    String? mimeType = FileUtil.mimeType(filename);
+    if (mimeType != null) {
+      if (mimeType.startsWith('video')) {
+        for (var videoExtension in videoExtensions) {
+          filePopActionData.add(
+            ActionData(
+                label: videoExtension,
+                tooltip: 'convert to $videoExtension',
+                icon: const Icon(Icons.change_circle_outlined)),
+          );
+        }
+      } else if (mimeType.startsWith('audio')) {
+        if (mimeType.startsWith('audio')) {
+          for (var videoExtension in videoExtensions) {
+            filePopActionData.add(
+              ActionData(
+                  label: videoExtension,
+                  tooltip: 'convert to $videoExtension',
+                  icon: const Icon(Icons.change_circle_outlined)),
+            );
+          }
+        } else if (mimeType.startsWith('image')) {
+          if (mimeType.startsWith('image')) {
+            for (var videoExtension in videoExtensions) {
+              filePopActionData.add(
+                ActionData(
+                    label: videoExtension,
+                    tooltip: 'convert to $videoExtension',
+                    icon: const Icon(Icons.change_circle_outlined)),
+              );
+            }
+          }
+        }
+      }
+      await DialogUtil.show(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+              elevation: 0.0,
+              insetPadding: EdgeInsets.zero,
+              child: DataActionCard(
+                  onPressed: (int index, String label, {String? value}) {
+                    Navigator.pop(context);
+                    _onFilePopAction(context, index, label, value: value);
+                  },
+                  crossAxisCount: 4,
+                  actions: filePopActionData,
+                  height: 200,
+                  width: appDataProvider.secondaryBodyWidth,
+                  iconSize: 30));
+        },
+      );
+    }
+  }
+
+  Future<String?> _onFilePopAction(
+      BuildContext context, int index, String label,
+      {String? value}) async {
+    String? filename = fileController.current;
+    if (filename == null) {
+      return null;
+    }
+    int pos = filename.lastIndexOf('.');
+    String output = '${filename.substring(0, pos)}.$label';
+    FFmpegSession session =
+        await FfmpegUtil.convert(input: filename, output: output);
+    ReturnCode? returnCode = await session.getReturnCode();
+    bool? success = returnCode?.isValueSuccess();
+    if (success != null && success) {
+      return output;
+    }
+
+    return null;
+  }
+
   Future<void> _buildTileData() async {
-    List<String> filenames = fileController.data;
+    List<String> filenames = fileController.data.toList();
     List<TileData> tileData = [];
     for (var filename in filenames) {
       File file = File(filename);
@@ -92,25 +191,38 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
       }
       Widget? thumbnailWidget;
       String? mimeType = FileUtil.mimeType(filename);
-      if (mimeType != null && mimeType.startsWith('video')) {
-        try {
-          Uint8List? data =
-              await VideoUtil.getByteThumbnail(videoFile: filename);
+      if (mimeType != null) {
+        if (mimeType.startsWith('video')) {
+          try {
+            Uint8List? data =
+                await VideoUtil.getByteThumbnail(videoFile: filename);
+            if (data != null) {
+              thumbnailWidget = ImageUtil.buildMemoryImageWidget(
+                data,
+                fit: BoxFit.cover,
+              );
+            }
+          } catch (e) {
+            logger.e('thumbnailData failure:$e');
+          }
+        } else if (mimeType.startsWith('audio')) {
+        } else if (mimeType.startsWith('image')) {
+          Uint8List? data = await FileUtil.readFileAsBytes(filename);
           if (data != null) {
             thumbnailWidget = ImageUtil.buildMemoryImageWidget(
               data,
               fit: BoxFit.cover,
             );
           }
-        } catch (e) {
-          logger.e('thumbnailData failure:$e');
         }
       }
       TileData tile = TileData(
-          prefix: thumbnailWidget,
-          title: FileUtil.filename(filename),
-          subtitle: '$length',
-          selected: selected);
+        prefix: thumbnailWidget,
+        title: FileUtil.filename(filename),
+        subtitle: '$length',
+        selected: selected,
+        onTap: _onSelectFile,
+      );
       tileData.add(tile);
     }
 
@@ -119,6 +231,21 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
 
   List<Widget>? _buildRightWidgets() {
     List<Widget> children = [];
+    children.add(IconButton(
+      tooltip: AppLocalizations.t('information'),
+      onPressed: () async {
+        String? current = fileController.current;
+        if (current != null) {
+          MediaInformation? info =
+              await FfmpegUtil.getMediaInformation(current);
+          if (info != null) {
+            output = info.getAllProperties()!.toString();
+            show(context, 'information');
+          }
+        }
+      },
+      icon: const Icon(Icons.info_outline),
+    ));
     children.add(IconButton(
       tooltip: AppLocalizations.t('encoders'),
       onPressed: () async {
@@ -252,7 +379,7 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
               onPressed: () async {
                 _addFiles(directory: true);
               },
-              tooltip: AppLocalizations.t('Add video directory'),
+              tooltip: AppLocalizations.t('Add media directory'),
             ),
             IconButton(
               color: myself.primary,
@@ -263,7 +390,7 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
               onPressed: () async {
                 _addFiles();
               },
-              tooltip: AppLocalizations.t('Add video file'),
+              tooltip: AppLocalizations.t('Add media file'),
             ),
             IconButton(
               color: myself.primary,
@@ -274,7 +401,7 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
               onPressed: () async {
                 await fileController.clear();
               },
-              tooltip: AppLocalizations.t('Remove all video file'),
+              tooltip: AppLocalizations.t('Remove all media file'),
             ),
             IconButton(
               color: myself.primary,
@@ -286,7 +413,7 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
                 var currentIndex = fileController.currentIndex;
                 await fileController.delete(index: currentIndex);
               },
-              tooltip: AppLocalizations.t('Remove video file'),
+              tooltip: AppLocalizations.t('Remove media file'),
             ),
           ],
         ),

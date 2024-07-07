@@ -92,8 +92,8 @@ class FfmpegUtil {
       String? inputCa,
       String? outputCv,
       String? outputCa,
-      String? preset =
-          'faster', //ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow
+      String?
+          preset, //ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow
       String? minrate,
       String? maxrate,
       String? bufsize,
@@ -106,20 +106,20 @@ class FfmpegUtil {
       void Function(Statistics stat)? statisticsCallback}) {
     String command = '-y';
 
-    command += ss ?? ' -ss $ss';
-    command += preset ?? ' -preset $preset';
-    command += vframes ?? ' -vframes $vframes';
-    command += qv ?? ' -q:v $qv';
-    command += scale ?? ' -vf scale=$scale:-1';
-    command += minrate ?? ' -minrate $minrate';
-    command += maxrate ?? ' -maxrate $maxrate';
-    command += bufsize ?? ' -bufsize $bufsize';
-    command += inputCa ?? ' -c:a $inputCa';
-    command += inputCv ?? ' -c:v $inputCv';
-    command += input ?? ' -i $input';
-    command += outputCv ?? ' -c:v $outputCv';
-    command += outputCa ?? ' -c:a $outputCa';
-    command += output ?? ' $output';
+    command += ss == null ? '' : ' -ss $ss';
+    command += preset == null ? '' : ' -preset $preset';
+    command += vframes == null ? '' : ' -vframes $vframes';
+    command += qv == null ? '' : ' -q:v $qv';
+    command += scale == null ? '' : ' -vf scale=$scale:-1';
+    command += minrate == null ? '' : ' -minrate $minrate';
+    command += maxrate == null ? '' : ' -maxrate $maxrate';
+    command += bufsize == null ? '' : ' -bufsize $bufsize';
+    command += inputCa == null ? '' : ' -c:a $inputCa';
+    command += inputCv == null ? '' : ' -c:v $inputCv';
+    command += input == null ? '' : ' -i \'$input\'';
+    command += outputCv == null ? '' : ' -c:v $outputCv';
+    command += outputCa == null ? '' : ' -c:a $outputCa';
+    command += output == null ? '' : ' \'$output\'';
 
     return execute(command,
         sessionComplete: sessionComplete,
