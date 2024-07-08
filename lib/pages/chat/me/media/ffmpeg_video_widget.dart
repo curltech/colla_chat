@@ -11,19 +11,24 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/ffmpeg.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
+import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
+import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
+import 'package:ffmpeg_kit_flutter/abstract_session.dart';
 import 'package:ffmpeg_kit_flutter/ffmpeg_session.dart';
 import 'package:ffmpeg_kit_flutter/media_information.dart';
 import 'package:ffmpeg_kit_flutter/return_code.dart';
+import 'package:ffmpeg_kit_flutter/session_state.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:get/state_manager.dart';
 
 class FfmpegVideoWidget extends StatefulWidget with TileDataMixin {
   FfmpegVideoWidget({
@@ -81,6 +86,7 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
   ValueNotifier<List<TileData>> tileData = ValueNotifier<List<TileData>>([]);
   DataListController<String> fileController = DataListController<String>();
   final Set<String> allowedExtensions = {};
+  Map<String, FFmpegSession> ffmpegSessions = {};
 
   @override
   void initState() {
@@ -161,8 +167,14 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
     }
     int pos = filename.lastIndexOf('.');
     String output = '${filename.substring(0, pos)}.$label';
-    FFmpegSession session =
-        await FfmpegUtil.convert(input: filename, output: output);
+    FFmpegSession session = await FfmpegUtil.convert(
+        input: filename,
+        output: output,
+        completeCallback: (FFmpegSession session) async {
+          _buildTileData();
+        });
+    ffmpegSessions[filename] = session;
+    _buildTileData();
     ReturnCode? returnCode = await session.getReturnCode();
     bool? success = returnCode?.isValueSuccess();
     if (success != null && success) {
@@ -194,8 +206,12 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
       if (mimeType != null) {
         if (mimeType.startsWith('video')) {
           try {
-            Uint8List? data =
-                await VideoUtil.getByteThumbnail(videoFile: filename);
+            Uint8List? data;
+            if (filename.endsWith('mp4')) {
+              data = await VideoUtil.getByteThumbnail(videoFile: filename);
+            } else {
+              data = await FfmpegUtil.thumbnail(videoFile: filename);
+            }
             if (data != null) {
               thumbnailWidget = ImageUtil.buildMemoryImageWidget(
                 data,
@@ -216,11 +232,33 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
           }
         }
       }
+      FFmpegSession? session = ffmpegSessions[filename];
+      Widget? suffix;
+      if (session != null) {
+        SessionState state = await session.getState();
+        if (state == SessionState.running) {
+          suffix = IconButton(
+              onPressed: () {
+                session.cancel();
+              },
+              icon: const Icon(
+                Icons.run_circle_outlined,
+                color: Colors.yellow,
+              ));
+        }
+        if (state == SessionState.completed) {
+          suffix = const Icon(
+            Icons.check_circle_outline,
+            color: Colors.green,
+          );
+        }
+      }
       TileData tile = TileData(
         prefix: thumbnailWidget,
         title: FileUtil.filename(filename),
         subtitle: '$length',
         selected: selected,
+        suffix: suffix,
         onTap: _onSelectFile,
       );
       tileData.add(tile);
@@ -245,6 +283,14 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
         }
       },
       icon: const Icon(Icons.info_outline),
+    ));
+    children.add(IconButton(
+      tooltip: AppLocalizations.t('formats'),
+      onPressed: () async {
+        output = await FfmpegUtil.formats();
+        show(context, 'formats');
+      },
+      icon: const Icon(Icons.format_align_center_outlined),
     ));
     children.add(IconButton(
       tooltip: AppLocalizations.t('encoders'),
@@ -317,12 +363,16 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
             if (extension == null) {
               continue;
             }
+            if (fileController.data.contains(entry.path)) {
+              continue;
+            }
             bool? contain = this.allowedExtensions.contains(extension);
             if (contain) {
-              fileController.add(entry.path);
+              fileController.add(entry.path, notify: false);
             }
           }
           fileController.currentIndex = fileController.data.length - 1;
+          fileController.notifyListeners();
         }
       }
     } else {
@@ -332,7 +382,10 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
           allowedExtensions: this.allowedExtensions.toList());
       if (xfiles.isNotEmpty) {
         for (var xfile in xfiles) {
-          fileController.add(xfile.path);
+          if (fileController.data.contains(xfile.path)) {
+            continue;
+          }
+          fileController.add(xfile.path, notify: false);
         }
         fileController.currentIndex = fileController.data.length - 1;
       }
@@ -399,6 +452,7 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
                 color: Colors.white,
               ),
               onPressed: () async {
+                ffmpegSessions.clear();
                 await fileController.clear();
               },
               tooltip: AppLocalizations.t('Remove all media file'),
@@ -411,7 +465,10 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
               ),
               onPressed: () async {
                 var currentIndex = fileController.currentIndex;
-                await fileController.delete(index: currentIndex);
+                if (currentIndex != -1) {
+                  ffmpegSessions.remove(fileController.current);
+                  await fileController.delete(index: currentIndex);
+                }
               },
               tooltip: AppLocalizations.t('Remove media file'),
             ),
@@ -429,8 +486,7 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
           if (tileData.isEmpty) {
             return Container(
                 alignment: Alignment.center,
-                child: CommonAutoSizeText(
-                    AppLocalizations.t('Playlist is empty')));
+                child: CommonAutoSizeText(AppLocalizations.t('file is empty')));
           }
           int crossAxisCount = 3;
           List<Widget> thumbnails = [];
@@ -491,6 +547,11 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
                       child: thumbnails[index],
                       onTap: () {
                         fileController.currentIndex = index;
+                        var title = tileData[index].title;
+                        var fn = tileData[index].onTap;
+                        if (fn != null) {
+                          fn(index, title);
+                        }
                       });
                 });
           } else {

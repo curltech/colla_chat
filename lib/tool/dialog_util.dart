@@ -1,5 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/login/loading.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
@@ -261,7 +262,11 @@ class DialogUtil {
         const SizedBox(
           height: 20,
         ),
-        const CircularProgressIndicator(),
+        InkWell(
+            child: const CircularProgressIndicator(),
+            onTap: () {
+              loadingHide(context!);
+            }),
         const SizedBox(
           height: 20,
         ),
@@ -304,7 +309,11 @@ class DialogUtil {
 
   /// 关闭loading框
   static loadingHide(BuildContext context) {
-    Navigator.of(context).pop(true);
+    try {
+      Navigator.of(context).pop(true);
+    } catch (e) {
+      logger.e('pop failure:$e');
+    }
   }
 
   ///返回为true，代表按的确认

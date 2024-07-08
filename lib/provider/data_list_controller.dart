@@ -58,18 +58,22 @@ class DataListController<T> with ChangeNotifier {
     }
   }
 
-  addAll(List<T> ds) {
+  addAll(List<T> ds, {bool notify = true}) {
     if (ds.isNotEmpty) {
       _currentIndex = data.length;
       data.addAll(ds);
-      notifyListeners();
+      if (notify) {
+        notifyListeners();
+      }
     }
   }
 
-  add(T d) {
+  add(T d, {bool notify = true}) {
     data.add(d);
     _currentIndex = data.length - 1;
-    notifyListeners();
+    if (notify) {
+      notifyListeners();
+    }
   }
 
   T? get(int index) {
@@ -119,10 +123,10 @@ class DataListController<T> with ChangeNotifier {
     }
   }
 
-  clear({bool? notify}) {
+  clear({bool notify = true}) {
     data.clear();
     _currentIndex = -1;
-    if (notify == null || notify) {
+    if (notify) {
       notifyListeners();
     }
   }

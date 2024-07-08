@@ -63,7 +63,7 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
   final Map<String, IconData> _mailBoxIcons = {};
 
   @override
-  clear({bool? notify}) {
+  clear({bool notify = true}) {
     _addressMailboxes.clear();
     _addressMailMessages.clear();
     _currentMailboxName = null;
