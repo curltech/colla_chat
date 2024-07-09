@@ -35,6 +35,7 @@ dependencies:
   #  go_router: ^14.1.3
   #  flutter_riverpod: ^2.5.1
   bonsoir: ^5.1.9
+  process_runner: ^4.2.0
   network_tools: ^5.0.2
   network_tools_flutter: ^2.0.2
   # 系统功能，获取系统信息和操作，需要调用插件才能完成

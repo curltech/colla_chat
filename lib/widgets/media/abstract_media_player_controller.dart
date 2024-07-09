@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/tool/ffmpeg.dart';
+import 'package:colla_chat/tool/ffmpeg_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
@@ -139,7 +139,7 @@ class PlatformMediaSource {
           if (filename.endsWith('mp4')) {
             data = await VideoUtil.getByteThumbnail(videoFile: filename);
           } else {
-            data = await FfmpegUtil.thumbnail(videoFile: filename);
+            data = await FFMpegUtil.thumbnail(videoFile: filename);
           }
           if (data != null) {
             mediaSource.thumbnail ??= data;

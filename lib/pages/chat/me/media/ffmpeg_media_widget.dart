@@ -6,52 +6,52 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/ffmpeg.dart';
+import 'package:colla_chat/tool/ffmpeg/ffmpeg_helper.dart';
+import 'package:colla_chat/tool/ffmpeg/ffmpeg_install_widget.dart';
+import 'package:colla_chat/tool/ffmpeg_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
-import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
-import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
-import 'package:ffmpeg_kit_flutter/abstract_session.dart';
-import 'package:ffmpeg_kit_flutter/ffmpeg_session.dart';
 import 'package:ffmpeg_kit_flutter/media_information.dart';
 import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'package:ffmpeg_kit_flutter/session_state.dart';
-import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:get/state_manager.dart';
+import 'package:flutter/material.dart';
 
-class FfmpegVideoWidget extends StatefulWidget with TileDataMixin {
-  FfmpegVideoWidget({
+DataListController<String> mediaFileController = DataListController<String>();
+
+class FFMpegMediaWidget extends StatefulWidget with TileDataMixin {
+  FFMpegMediaWidget({
     super.key,
   });
 
   @override
-  State createState() => _FfmpegVideoWidgetState();
+  State createState() => _FFMpegMediaWidgetState();
 
   @override
-  String get routeName => 'ffmpeg_video';
+  String get routeName => 'ffmpeg_media';
 
   @override
   IconData get iconData => Icons.video_camera_back_outlined;
 
   @override
-  String get title => 'FfmpegVideo';
+  String get title => 'FFMpegMedia';
 
   @override
   bool get withLeading => true;
 }
 
-class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
+class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
   final FileType fileType = FileType.custom;
   final Set<String> videoExtensions = {
     'mp4',
@@ -81,24 +81,32 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
     'BMP',
     'webp',
   };
+  ValueNotifier<bool> ffmpegPresent = ValueNotifier<bool>(false);
   String? output;
   bool gridMode = false;
   ValueNotifier<List<TileData>> tileData = ValueNotifier<List<TileData>>([]);
-  DataListController<String> fileController = DataListController<String>();
+
   final Set<String> allowedExtensions = {};
-  Map<String, FFmpegSession> ffmpegSessions = {};
+  Map<String, FFMpegHelperSession> ffmpegSessions = {};
 
   @override
   void initState() {
     super.initState();
-    fileController.addListener(_update);
+    mediaFileController.addListener(_update);
     allowedExtensions.addAll(videoExtensions);
     allowedExtensions.addAll(audioExtensions);
     allowedExtensions.addAll(imageExtensions);
+    checkFFMpeg();
   }
 
   _update() {
     _buildTileData();
+  }
+
+  Future<bool> checkFFMpeg() async {
+    ffmpegPresent.value = await FFMpegHelper.initialize();
+
+    return ffmpegPresent.value;
   }
 
   _onSelectFile(int index, String filename, {String? subtitle}) async {
@@ -115,28 +123,25 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
           );
         }
       } else if (mimeType.startsWith('audio')) {
-        if (mimeType.startsWith('audio')) {
-          for (var videoExtension in videoExtensions) {
-            filePopActionData.add(
-              ActionData(
-                  label: videoExtension,
-                  tooltip: 'convert to $videoExtension',
-                  icon: const Icon(Icons.change_circle_outlined)),
-            );
-          }
-        } else if (mimeType.startsWith('image')) {
-          if (mimeType.startsWith('image')) {
-            for (var videoExtension in videoExtensions) {
-              filePopActionData.add(
-                ActionData(
-                    label: videoExtension,
-                    tooltip: 'convert to $videoExtension',
-                    icon: const Icon(Icons.change_circle_outlined)),
-              );
-            }
-          }
+        for (var videoExtension in audioExtensions) {
+          filePopActionData.add(
+            ActionData(
+                label: videoExtension,
+                tooltip: 'convert to $videoExtension',
+                icon: const Icon(Icons.change_circle_outlined)),
+          );
+        }
+      } else if (mimeType.startsWith('image')) {
+        for (var videoExtension in imageExtensions) {
+          filePopActionData.add(
+            ActionData(
+                label: videoExtension,
+                tooltip: 'convert to $videoExtension',
+                icon: const Icon(Icons.change_circle_outlined)),
+          );
         }
       }
+
       await DialogUtil.show(
         context: context,
         builder: (BuildContext context) {
@@ -161,22 +166,22 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
   Future<String?> _onFilePopAction(
       BuildContext context, int index, String label,
       {String? value}) async {
-    String? filename = fileController.current;
+    String? filename = mediaFileController.current;
     if (filename == null) {
       return null;
     }
     int pos = filename.lastIndexOf('.');
     String output = '${filename.substring(0, pos)}.$label';
-    FFmpegSession session = await FfmpegUtil.convert(
+    FFMpegHelperSession session = await FFMpegHelper.convertAsync(
         input: filename,
         output: output,
-        completeCallback: (FFmpegSession session) async {
+        completeCallback: (FFMpegHelperSession session) async {
           _buildTileData();
         });
     ffmpegSessions[filename] = session;
     _buildTileData();
-    ReturnCode? returnCode = await session.getReturnCode();
-    bool? success = returnCode?.isValueSuccess();
+    List<ReturnCode?> returnCode = await session.getReturnCode();
+    bool? success = returnCode.firstOrNull?.isValueSuccess();
     if (success != null && success) {
       return output;
     }
@@ -185,7 +190,7 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
   }
 
   Future<void> _buildTileData() async {
-    List<String> filenames = fileController.data.toList();
+    List<String> filenames = mediaFileController.data.toList();
     List<TileData> tileData = [];
     for (var filename in filenames) {
       File file = File(filename);
@@ -195,7 +200,7 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
       }
       var length = file.lengthSync();
       bool selected = false;
-      String? current = fileController.current;
+      String? current = mediaFileController.current;
       if (current != null) {
         if (current == filename) {
           selected = true;
@@ -210,7 +215,7 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
             if (filename.endsWith('mp4')) {
               data = await VideoUtil.getByteThumbnail(videoFile: filename);
             } else {
-              data = await FfmpegUtil.thumbnail(videoFile: filename);
+              data = await FFMpegUtil.thumbnail(videoFile: filename);
             }
             if (data != null) {
               thumbnailWidget = ImageUtil.buildMemoryImageWidget(
@@ -232,14 +237,14 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
           }
         }
       }
-      FFmpegSession? session = ffmpegSessions[filename];
+      FFMpegHelperSession? session = ffmpegSessions[filename];
       Widget? suffix;
       if (session != null) {
         SessionState state = await session.getState();
         if (state == SessionState.running) {
           suffix = IconButton(
               onPressed: () {
-                session.cancel();
+                session.cancelSession();
               },
               icon: const Icon(
                 Icons.run_circle_outlined,
@@ -252,6 +257,16 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
             color: Colors.green,
           );
         }
+        if (state == SessionState.failed) {
+          suffix = IconButton(
+              onPressed: () {
+                session.cancelSession();
+              },
+              icon: const Icon(
+                Icons.remove_circle_outline,
+                color: Colors.red,
+              ));
+        }
       }
       TileData tile = TileData(
         prefix: thumbnailWidget,
@@ -262,6 +277,15 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
         onTap: _onSelectFile,
       );
       tileData.add(tile);
+      tile.endSlideActions = [
+        TileData(
+          title: 'Edit',
+          prefix: Icons.edit,
+          onTap: (int index, String title, {String? subtitle}) {
+            indexWidgetProvider.push('image_editor');
+          },
+        )
+      ];
     }
 
     this.tileData.value = tileData;
@@ -272,10 +296,10 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
     children.add(IconButton(
       tooltip: AppLocalizations.t('information'),
       onPressed: () async {
-        String? current = fileController.current;
+        String? current = mediaFileController.current;
         if (current != null) {
           MediaInformation? info =
-              await FfmpegUtil.getMediaInformation(current);
+              await FFMpegUtil.getMediaInformation(current);
           if (info != null) {
             output = info.getAllProperties()!.toString();
             show(context, 'information');
@@ -287,7 +311,7 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
     children.add(IconButton(
       tooltip: AppLocalizations.t('formats'),
       onPressed: () async {
-        output = await FfmpegUtil.formats();
+        output = await FFMpegUtil.formats();
         show(context, 'formats');
       },
       icon: const Icon(Icons.format_align_center_outlined),
@@ -295,7 +319,7 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
     children.add(IconButton(
       tooltip: AppLocalizations.t('encoders'),
       onPressed: () async {
-        output = await FfmpegUtil.encoders();
+        output = await FFMpegUtil.encoders();
         show(context, 'encoders');
       },
       icon: const Icon(Icons.qr_code),
@@ -303,7 +327,7 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
     children.add(IconButton(
       tooltip: AppLocalizations.t('decoders'),
       onPressed: () async {
-        output = await FfmpegUtil.decoders();
+        output = await FFMpegUtil.decoders();
         show(context, 'decoders');
       },
       icon: const Icon(Icons.qr_code_scanner),
@@ -312,7 +336,7 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
       IconButton(
         tooltip: AppLocalizations.t('help'),
         onPressed: () async {
-          output = await FfmpegUtil.help();
+          output = await FFMpegUtil.help();
           show(context, 'help');
         },
         icon: const Icon(Icons.help_outline),
@@ -334,7 +358,9 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
             ),
             Expanded(
                 child: SingleChildScrollView(
-                    child: CommonAutoSizeText(output ?? ''))),
+                    child: Container(
+                        padding: const EdgeInsets.all(15.0),
+                        child: CommonAutoSizeText(output ?? '')))),
           ]));
         });
   }
@@ -363,16 +389,17 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
             if (extension == null) {
               continue;
             }
-            if (fileController.data.contains(entry.path)) {
+            if (mediaFileController.data.contains(entry.path)) {
               continue;
             }
             bool? contain = this.allowedExtensions.contains(extension);
             if (contain) {
-              fileController.add(entry.path, notify: false);
+              mediaFileController.add(entry.path, notify: false);
             }
           }
-          fileController.currentIndex = fileController.data.length - 1;
-          fileController.notifyListeners();
+          mediaFileController.currentIndex =
+              mediaFileController.data.length - 1;
+          mediaFileController.notifyListeners();
         }
       }
     } else {
@@ -382,12 +409,13 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
           allowedExtensions: this.allowedExtensions.toList());
       if (xfiles.isNotEmpty) {
         for (var xfile in xfiles) {
-          if (fileController.data.contains(xfile.path)) {
+          if (mediaFileController.data.contains(xfile.path)) {
             continue;
           }
-          fileController.add(xfile.path, notify: false);
+          mediaFileController.add(xfile.path, notify: false);
         }
-        fileController.currentIndex = fileController.data.length - 1;
+        mediaFileController.currentIndex = mediaFileController.data.length - 1;
+        mediaFileController.notifyListeners();
       }
     }
   }
@@ -453,7 +481,7 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
               ),
               onPressed: () async {
                 ffmpegSessions.clear();
-                await fileController.clear();
+                await mediaFileController.clear();
               },
               tooltip: AppLocalizations.t('Remove all media file'),
             ),
@@ -464,10 +492,10 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
                 color: Colors.white, //myself.primary,
               ),
               onPressed: () async {
-                var currentIndex = fileController.currentIndex;
+                var currentIndex = mediaFileController.currentIndex;
                 if (currentIndex != -1) {
-                  ffmpegSessions.remove(fileController.current);
-                  await fileController.delete(index: currentIndex);
+                  ffmpegSessions.remove(mediaFileController.current);
+                  await mediaFileController.delete(index: currentIndex);
                 }
               },
               tooltip: AppLocalizations.t('Remove media file'),
@@ -546,7 +574,7 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
                   return InkWell(
                       child: thumbnails[index],
                       onTap: () {
-                        fileController.currentIndex = index;
+                        mediaFileController.currentIndex = index;
                         var title = tileData[index].title;
                         var fn = tileData[index].onTap;
                         if (fn != null) {
@@ -558,7 +586,7 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
             return DataListView(
               onTap: (int index, String title,
                   {TileData? group, String? subtitle}) {
-                fileController.currentIndex = index;
+                mediaFileController.currentIndex = index;
               },
               itemCount: tileData.length,
               itemBuilder: (BuildContext context, int index) {
@@ -596,13 +624,25 @@ class _FfmpegVideoWidgetState extends State<FfmpegVideoWidget> {
       title: widget.title,
       withLeading: true,
       rightWidgets: rightWidgets,
-      child: _buildConvertFilesWidget(context),
+      child: ValueListenableBuilder(
+        valueListenable: ffmpegPresent,
+        builder: (BuildContext context, value, Widget? child) {
+          if (value) {
+            return _buildConvertFilesWidget(context);
+          }
+          return FFMpegInstallWidget(
+            onDownloadComplete: () {
+              checkFFMpeg();
+            },
+          );
+        },
+      ),
     );
   }
 
   @override
   void dispose() {
-    fileController.removeListener(_update);
+    mediaFileController.removeListener(_update);
     super.dispose();
   }
 }
