@@ -74,11 +74,8 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
   };
   final Set<String> imageExtensions = {
     'jpg',
-    'JPG',
     'png',
-    'PNG',
     'bmp',
-    'BMP',
     'webp',
   };
   ValueNotifier<bool> ffmpegPresent = ValueNotifier<bool>(false);
@@ -172,12 +169,16 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
     }
     int pos = filename.lastIndexOf('.');
     String output = '${filename.substring(0, pos)}.$label';
-    FFMpegHelperSession session = await FFMpegHelper.convertAsync(
-        input: filename,
-        output: output,
+    String command = FFMpegHelper.buildCommand(
+      input: filename,
+      vframes: '1',
+      update: true,
+      output: output,
+    );
+    FFMpegHelperSession session = await FFMpegHelper.runAsync([command],
         completeCallback: (FFMpegHelperSession session) async {
-          _buildTileData();
-        });
+      _buildTileData();
+    });
     ffmpegSessions[filename] = session;
     _buildTileData();
     List<ReturnCode?> returnCode = await session.getReturnCode();
@@ -279,12 +280,19 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
       tileData.add(tile);
       tile.endSlideActions = [
         TileData(
-          title: 'Edit',
-          prefix: Icons.edit,
-          onTap: (int index, String title, {String? subtitle}) {
-            indexWidgetProvider.push('image_editor');
-          },
-        )
+            title: 'Edit',
+            prefix: Icons.edit,
+            onTap: (int index, String title, {String? subtitle}) {
+              String? mimeType = FileUtil.mimeType(filename);
+              if (mimeType != null) {
+                if (mimeType.startsWith('image')) {
+                  indexWidgetProvider.push('image_editor');
+                }
+                if (mimeType.startsWith('video')) {
+                  indexWidgetProvider.push('video_editor');
+                }
+              }
+            })
       ];
     }
 
@@ -618,6 +626,7 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
 
   @override
   Widget build(BuildContext context) {
+    _buildTileData();
     List<Widget>? rightWidgets = _buildRightWidgets();
 
     return AppBarView(

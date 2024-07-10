@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:colla_chat/pages/chat/me/media/ffmpeg_media_widget.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,7 @@ class ImageEditorWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'image_editor';
 
   @override
-  IconData get iconData => Icons.video_camera_back_outlined;
+  IconData get iconData => Icons.image_outlined;
 
   @override
   String get title => 'ImageEditor';
@@ -44,6 +45,9 @@ class _ImageEditorWidgetState extends State<ImageEditorWidget> {
     return ProImageEditor.file(File(mediaFileController.current!),
         callbacks: ProImageEditorCallbacks(
           onImageEditingComplete: (Uint8List bytes) async {},
+          onCloseEditor: () {
+            indexWidgetProvider.pop(context: context);
+          },
         ));
   }
 

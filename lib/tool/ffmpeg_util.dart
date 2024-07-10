@@ -45,27 +45,29 @@ class FFMpegUtil {
 
   static Future<Uint8List?> thumbnail({
     String? videoFile,
-    int quality = 10,
+    int quality = 1,
     int position = 30,
   }) async {
     Completer<Uint8List?> data = Completer<Uint8List?>();
     String filename = await FileUtil.getTempFilename(extension: 'jpg');
-    await FFMpegHelper.convertAsync(
-        input: videoFile,
-        output: filename,
-        ss: '00:00:30',
-        vframes: '1',
-        qv: '$quality',
+    String command = FFMpegHelper.buildCommand(
+      input: videoFile,
+      output: filename,
+      ss: '00:00:30',
+      vframes: '1',
+      qv: '$quality',
+    );
+    await FFMpegHelper.runAsync([command],
         completeCallback: (FFMpegHelperSession session) {
-          File file = File(filename);
-          if (file.existsSync()) {
-            Uint8List d = file.readAsBytesSync();
-            file.delete();
-            data.complete(d);
-          } else {
-            data.complete();
-          }
-        });
+      File file = File(filename);
+      if (file.existsSync()) {
+        Uint8List d = file.readAsBytesSync();
+        file.delete();
+        data.complete(d);
+      } else {
+        data.complete();
+      }
+    });
     return data.future;
   }
 

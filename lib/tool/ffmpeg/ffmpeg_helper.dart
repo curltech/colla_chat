@@ -22,6 +22,7 @@ import 'package:process_runner/process_runner.dart';
 
 class FFMpegHelperSession {
   final List<FFmpegSession>? ffmpegSessions;
+  Completer? completer;
   Stream<WorkerJob>? unfinishedJobs;
   final List<WorkerJob>? finishedJobs;
   SessionState state = SessionState.running;
@@ -30,11 +31,25 @@ class FFMpegHelperSession {
 
   FFMpegHelperSession({
     this.ffmpegSessions,
+    this.completer,
     this.unfinishedJobs,
     this.finishedJobs,
     this.completeCallback,
     this.statisticsCallback,
   }) {
+    if (ffmpegSessions != null) {
+      completer?.future.then((value) async {
+        for (var ffmpegSession in ffmpegSessions!) {
+          ReturnCode? rc = await ffmpegSession.getReturnCode();
+          if (rc != null && rc.isValueError()) {
+            state = SessionState.failed;
+          }
+        }
+        completeCallback?.call(this);
+      }).onError((err, trace) {
+        state = SessionState.failed;
+      });
+    }
     if (unfinishedJobs != null) {
       unfinishedJobs = unfinishedJobs!.asBroadcastStream();
       StreamSubscription<WorkerJob> sub =
@@ -121,7 +136,8 @@ class FFMpegHelperSession {
     List<ReturnCode?> returnCodes = [];
     if (ffmpegSessions != null) {
       for (var ffmpegSession in ffmpegSessions!) {
-        returnCodes.add(await ffmpegSession.getReturnCode());
+        ReturnCode? rc = await ffmpegSession.getReturnCode();
+        returnCodes.add(rc);
       }
     }
     if (finishedJobs != null) {
@@ -418,25 +434,25 @@ class FFMpegHelper {
   /// 容器格式：MP4，MKV，WebM，AVI
   /// 视频格式 libx264，libx265，H.262，H.264，H.265，VP8，VP9，AV1，NVENC，libvpx，libaom
   /// 音频格式 MP3，AAC，libfdk-aac
-  static Future<FFMpegHelperSession> convertAsync(
-      {String? input,
-      String? output,
-      String? inputCv,
-      String? inputCa,
-      String? outputCv,
-      String? outputCa,
-      String?
-          preset, //ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow
-      String? minrate,
-      String? maxrate,
-      String? bufsize,
-      String? scale,
-      String? ss, //截取图片时间
-      String? vframes, //截取图片帧数
-      String? qv, //截取图片质量，1到5
-      void Function(FFMpegHelperSession session)? completeCallback,
-      void Function(Log log)? logCallback,
-      void Function(Statistics stat)? statisticsCallback}) {
+  static String buildCommand({
+    String? input,
+    String? output,
+    String? inputCv,
+    String? inputCa,
+    String? outputCv,
+    String? outputCa,
+    String?
+        preset, //ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow
+    String? minrate,
+    String? maxrate,
+    String? bufsize,
+    String? scale,
+    String? ss, //截取图片时间
+    String? vframes, //截取图片帧数
+    bool? update,
+    String? qv,
+  } //截取图片质量，1到5x
+      ) {
     List<String> args = ['-y'];
 
     if (ss != null) args.add('-ss $ss');
@@ -457,6 +473,7 @@ class FFMpegHelper {
     if (outputCv != null) args.add('-c:v $outputCv');
     if (outputCa != null) args.add('-c:a $outputCa');
     if (vframes != null) args.add('-frames:v $vframes');
+    if (update != null) args.add('-update $update');
     if (qv != null) args.add('-q:v $qv');
     if (output != null) {
       if (!output.contains(' ')) {
@@ -466,10 +483,7 @@ class FFMpegHelper {
       }
     }
 
-    return runAsync([args.join(' ')],
-        completeCallback: completeCallback,
-        logCallback: logCallback,
-        statisticsCallback: statisticsCallback);
+    return args.join(' ');
   }
 
   /// 在windows环境异步运行ffmpeg，完成时回调
@@ -496,9 +510,26 @@ class FFMpegHelper {
     void Function(Statistics)? statisticsCallback,
   }) async {
     List<FFmpegSession> sessions = [];
+    Completer completer = Completer();
     for (var command in commands) {
       FFmpegSession session = await BaseFFMpegUtil.executeAsync(
         command,
+        completeCallback: (FFmpegSession session) async {
+          ReturnCode? rc = await session.getReturnCode();
+          FFmpegSession? delete;
+          for (var s in sessions) {
+            int? sid = s.getSessionId();
+            int? sessionId = session.getSessionId();
+            if (sid == sessionId) {
+              delete = s;
+              break;
+            }
+          }
+          if (delete != null) sessions.remove(delete);
+          if (sessions.isEmpty) {
+            completer.complete();
+          }
+        },
         logCallback: logCallback,
         statisticsCallback: statisticsCallback,
       );
@@ -506,7 +537,8 @@ class FFMpegHelper {
     }
 
     return FFMpegHelperSession(
-        ffmpegSessions: sessions,
+        ffmpegSessions: [...sessions],
+        completer: completer,
         completeCallback: completeCallback,
         statisticsCallback: statisticsCallback);
   }

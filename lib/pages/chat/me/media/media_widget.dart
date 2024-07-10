@@ -3,6 +3,7 @@ import 'package:colla_chat/pages/chat/me/media/image_editor_widget.dart';
 import 'package:colla_chat/pages/chat/me/media/platform_audio_player_widget.dart';
 import 'package:colla_chat/pages/chat/me/media/platform_audio_recorder_widget.dart';
 import 'package:colla_chat/pages/chat/me/media/platform_video_player_widget.dart';
+import 'package:colla_chat/pages/chat/me/media/video_editor_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -20,6 +21,7 @@ class MediaWidget extends StatelessWidget with TileDataMixin {
       PlatformAudioRecorderWidget();
   final FFMpegMediaWidget ffmpegMediaWidget = FFMpegMediaWidget();
   final ImageEditorWidget imageEditorWidget = ImageEditorWidget();
+  final VideoEditorWidget videoEditorWidget = VideoEditorWidget();
   late final List<TileData> mediaTileData;
 
   MediaWidget({super.key}) {
@@ -28,6 +30,7 @@ class MediaWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(audioRecorderWidget);
     indexWidgetProvider.define(ffmpegMediaWidget);
     indexWidgetProvider.define(imageEditorWidget);
+    indexWidgetProvider.define(videoEditorWidget);
     List<TileDataMixin> mixins = [
       videoPlayerWidget,
       audioPlayerWidget,
