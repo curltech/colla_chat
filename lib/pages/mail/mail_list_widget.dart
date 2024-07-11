@@ -3,7 +3,6 @@ import 'package:colla_chat/pages/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/date_util.dart';
-import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:enough_mail/enough_mail.dart';

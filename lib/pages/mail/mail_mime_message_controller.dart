@@ -832,6 +832,7 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
         }
       }
     }
+    return null;
   }
 }
 

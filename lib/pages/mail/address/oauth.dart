@@ -50,7 +50,7 @@ abstract class OauthClient {
       );
 
       return token;
-    } catch (e, s) {
+    } catch (e) {
       logger.e('Unable to authenticate: $e');
 
       return Future.value();
@@ -77,7 +77,7 @@ abstract class OauthClient {
       );
 
       return refreshedToken;
-    } catch (e, s) {
+    } catch (e) {
       logger.e('Unable to refresh tokens: $e');
 
       return Future.value();
@@ -145,7 +145,7 @@ class GmailOAuthClient extends OauthClient {
     // Get the access token from the response
     utf8.decode(response.bodyBytes);
     final text = response.body;
-    if (response.statusCode != 200 || text == null) {
+    if (response.statusCode != 200) {
       logger.e('received status code ${response.statusCode} with $text');
       throw StateError(
         'Unable to get Google OAuth token with code $code, '
@@ -174,7 +174,7 @@ class GmailOAuthClient extends OauthClient {
       },
     );
     final text = response.body;
-    if (response.statusCode != 200 || text == null) {
+    if (response.statusCode != 200) {
       logger.e(
         'refresh: received status code ${response.statusCode} with $text',
       );
@@ -249,12 +249,6 @@ class OutlookOAuthClient extends OauthClient {
 
     // Get the access token from the response
     final responseText = response.body;
-    if (responseText == null) {
-      throw StateError(
-        'no response from '
-        'https://login.microsoftonline.com/common/oauth2/v2.0/token',
-      );
-    }
 
     return OauthToken.fromText(responseText, provider: provider);
   }
@@ -276,7 +270,7 @@ class OutlookOAuthClient extends OauthClient {
       },
     );
     final text = response.body;
-    if (response.statusCode != 200 || text == null) {
+    if (response.statusCode != 200) {
       throw StateError(
         'Unable to refresh Outlook OAuth token $token, '
         'status code=${response.statusCode}, response=$text',
