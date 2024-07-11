@@ -112,30 +112,36 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
     if (mimeType != null) {
       if (mimeType.startsWith('video')) {
         for (var videoExtension in videoExtensions) {
-          filePopActionData.add(
-            ActionData(
-                label: videoExtension,
-                tooltip: 'convert to $videoExtension',
-                icon: const Icon(Icons.change_circle_outlined)),
-          );
+          if (videoExtension != mimeType) {
+            filePopActionData.add(
+              ActionData(
+                  label: videoExtension,
+                  tooltip: 'convert to $videoExtension',
+                  icon: const Icon(Icons.change_circle_outlined)),
+            );
+          }
         }
       } else if (mimeType.startsWith('audio')) {
-        for (var videoExtension in audioExtensions) {
-          filePopActionData.add(
-            ActionData(
-                label: videoExtension,
-                tooltip: 'convert to $videoExtension',
-                icon: const Icon(Icons.change_circle_outlined)),
-          );
+        for (var audioExtension in audioExtensions) {
+          if (audioExtensions != mimeType) {
+            filePopActionData.add(
+              ActionData(
+                  label: audioExtension,
+                  tooltip: 'convert to $audioExtension',
+                  icon: const Icon(Icons.change_circle_outlined)),
+            );
+          }
         }
       } else if (mimeType.startsWith('image')) {
-        for (var videoExtension in imageExtensions) {
-          filePopActionData.add(
-            ActionData(
-                label: videoExtension,
-                tooltip: 'convert to $videoExtension',
-                icon: const Icon(Icons.change_circle_outlined)),
-          );
+        for (var imageExtension in imageExtensions) {
+          if (imageExtension != mimeType) {
+            filePopActionData.add(
+              ActionData(
+                  label: imageExtension,
+                  tooltip: 'convert to $imageExtension',
+                  icon: const Icon(Icons.change_circle_outlined)),
+            );
+          }
         }
       }
 

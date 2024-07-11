@@ -203,6 +203,7 @@ class FFMpegHelperSession {
         logger.e('statisticsCallback failure:$e');
       }
     }
+    return null;
   }
 }
 
