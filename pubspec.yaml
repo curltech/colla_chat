@@ -458,6 +458,7 @@ dependency_overrides:
   pdf: ^3.10.4 #所有平台，创建pdf
   record: 5.1.1
   record_darwin: 1.1.0
+  secure_application: ^4.0.1
   visibility_detector: ^0.4.0+2 #组建可见性的大小发生变化
   focus_detector: ^2.0.1 #组建在界面上消失或者出现
   image_picker: ^1.1.1 #选取图库,移动从图像廊或者相机选，桌面实现采用file_selector，从文件系统选
