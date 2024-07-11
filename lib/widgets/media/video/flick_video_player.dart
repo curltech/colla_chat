@@ -5,7 +5,6 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 
 ///基于Flick实现的媒体播放器和记录器，
 class FlickVideoPlayerController extends OriginVideoPlayerController {
@@ -39,32 +38,21 @@ class FlickVideoPlayerController extends OriginVideoPlayerController {
           if (videoPlayerController != null) {
             _buildFlickManager();
             if (flickManager != null) {
-              Widget flickVideoPlayer = VisibilityDetector(
-                key: ObjectKey(flickManager),
-                onVisibilityChanged: (VisibilityInfo info) {
-                  if (info.visibleFraction == 0) {
-                    flickManager?.flickControlManager?.autoPause();
-                  } else if (info.visibleFraction == 1) {
-                    flickManager?.flickControlManager?.autoResume();
-                  }
-                },
-                child: FlickVideoPlayer(
-                  key: key,
-                  flickManager: flickManager!,
-                  flickVideoWithControls: FlickVideoWithControls(
-                    videoFit: BoxFit.contain,
-                    controls: FlickPortraitControls(
-                      progressBarSettings: FlickProgressBarSettings(
-                          playedColor: myself.primary,
-                          bufferedColor: Colors.grey,
-                          backgroundColor: Colors.white),
-                    ),
+              Widget flickVideoPlayer = FlickVideoPlayer(
+                key: key,
+                flickManager: flickManager!,
+                flickVideoWithControls: FlickVideoWithControls(
+                  videoFit: BoxFit.contain,
+                  controls: FlickPortraitControls(
+                    progressBarSettings: FlickProgressBarSettings(
+                        playedColor: myself.primary,
+                        bufferedColor: Colors.grey,
+                        backgroundColor: Colors.white),
                   ),
-                  flickVideoWithControlsFullscreen:
-                      const FlickVideoWithControls(
-                    videoFit: BoxFit.contain,
-                    controls: FlickLandscapeControls(),
-                  ),
+                ),
+                flickVideoWithControlsFullscreen: const FlickVideoWithControls(
+                  videoFit: BoxFit.contain,
+                  controls: FlickLandscapeControls(),
                 ),
               );
               return Stack(

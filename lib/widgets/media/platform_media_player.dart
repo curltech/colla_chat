@@ -2,6 +2,7 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 enum VideoPlayerType {
   dart_vlc,
@@ -74,6 +75,18 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
 
   Widget _buildMediaPlayer(BuildContext context) {
     Widget player = widget.mediaPlayerController.buildMediaPlayer();
+    player = VisibilityDetector(
+      key: ObjectKey(player),
+      onVisibilityChanged: (VisibilityInfo info) {
+        if (info.visibleFraction == 0) {
+          widget.mediaPlayerController.pause();
+        } else if (info.visibleFraction == 1) {
+          widget.mediaPlayerController.resume();
+        }
+      },
+      child: player,
+    );
+
     Widget mediaView;
     if (widget.showPlaylist && widget.swiperController != null) {
       mediaView = Swiper(
