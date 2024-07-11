@@ -1,4 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -38,37 +39,36 @@ class BrightnessPicker extends StatelessWidget {
       myself.themeMode == ThemeMode.system,
       myself.themeMode == ThemeMode.dark,
     ];
-    var toggleWidget = ListenableBuilder(
-      listenable: myself,
-      builder: (BuildContext context, Widget? child) {
-        return ToggleButtons(
-          isSelected: isSelected,
-          onPressed: (int newIndex) {
-            if (newIndex == 0) {
-              myself.themeMode = ThemeMode.light;
-            } else if (newIndex == 1) {
-              myself.themeMode = ThemeMode.system;
-            } else {
-              myself.themeMode = ThemeMode.dark;
-            }
-          },
-          children: const <Widget>[
-            Icon(Icons.wb_sunny),
-            Icon(Icons.phone_iphone),
-            Icon(Icons.bedtime),
-          ],
-        );
+    var toggleWidget = ToggleButtons(
+      isSelected: isSelected,
+      onPressed: (int newIndex) {
+        if (newIndex == 0) {
+          myself.themeMode = ThemeMode.light;
+        } else if (newIndex == 1) {
+          myself.themeMode = ThemeMode.system;
+        } else {
+          myself.themeMode = ThemeMode.dark;
+        }
       },
+      children: const <Widget>[
+        Icon(Icons.wb_sunny),
+        Icon(Icons.phone_iphone),
+        Icon(Icons.bedtime),
+      ],
     );
 
-    return Row(children: [
-      CommonAutoSizeText(AppLocalizations.t('Brightness')),
-      const Spacer(),
-      toggleWidget,
-      const SizedBox(
-        width: 10,
-      )
-    ]);
+    return ListenableBuilder(
+        listenable: myself,
+        builder: (BuildContext context, Widget? child) {
+          return Row(children: [
+            CommonAutoSizeText(AppLocalizations.t('Brightness')),
+            const Spacer(),
+            toggleWidget,
+            const SizedBox(
+              width: 10,
+            )
+          ]);
+        });
   }
 
   @override

@@ -9,13 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:pro_image_editor/models/editor_callbacks/pro_image_editor_callbacks.dart';
 import 'package:pro_image_editor/modules/main_editor/main_editor.dart';
 
-class ImageEditorWidget extends StatefulWidget with TileDataMixin {
+class ImageEditorWidget extends StatelessWidget with TileDataMixin {
   ImageEditorWidget({
     super.key,
   });
-
-  @override
-  State createState() => _ImageEditorWidgetState();
 
   @override
   String get routeName => 'image_editor';
@@ -28,41 +25,28 @@ class ImageEditorWidget extends StatefulWidget with TileDataMixin {
 
   @override
   bool get withLeading => true;
-}
-
-class _ImageEditorWidgetState extends State<ImageEditorWidget> {
-  @override
-  void initState() {
-    super.initState();
-    mediaFileController.addListener(_update);
-  }
-
-  _update() {
-    setState(() {});
-  }
 
   _buildImageEditor(BuildContext context) {
-    return ProImageEditor.file(File(mediaFileController.current!),
-        callbacks: ProImageEditorCallbacks(
-          onImageEditingComplete: (Uint8List bytes) async {},
-          onCloseEditor: () {
-            indexWidgetProvider.pop(context: context);
-          },
-        ));
+    return ListenableBuilder(
+      listenable: mediaFileController,
+      builder: (BuildContext context, Widget? child) {
+        return ProImageEditor.file(File(mediaFileController.current!),
+            callbacks: ProImageEditorCallbacks(
+              onImageEditingComplete: (Uint8List bytes) async {},
+              onCloseEditor: () {
+                indexWidgetProvider.pop(context: context);
+              },
+            ));
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-      title: widget.title,
+      title: title,
       withLeading: true,
       child: _buildImageEditor(context),
     );
-  }
-
-  @override
-  void dispose() {
-    mediaFileController.removeListener(_update);
-    super.dispose();
   }
 }
