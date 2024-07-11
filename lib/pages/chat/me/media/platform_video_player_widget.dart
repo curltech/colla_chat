@@ -10,18 +10,11 @@ import 'package:colla_chat/widgets/media/video/mediakit_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player_win/video_player_win_plugin.dart';
 
-///平台标准的video_player的实现，缺省采用webview
+///平台标准的video_player的实现，缺省采用MediaKit
 class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
-  final SwiperController swiperController = SwiperController();
-  final PlaylistController playlistController = PlaylistController();
-
   PlatformVideoPlayerWidget({
     super.key,
-  }) {
-    if (platformParams.windows) {
-      WindowsVideoPlayer.registerWith();
-    }
-  }
+  });
 
   @override
   State createState() => _PlatformVideoPlayerWidgetState();
@@ -41,12 +34,26 @@ class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
 
 class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
   ValueNotifier<int> index = ValueNotifier<int>(0);
-  late AbstractMediaPlayerController mediaPlayerController =
-      MediaKitVideoPlayerController(widget.playlistController);
+  late final PlatformVideoPlayer platformVideoPlayer = PlatformVideoPlayer(
+    onInitialized: onInitialized,
+    onIndexChanged: (index) {
+      this.index.value = index;
+    },
+  );
+  SwiperController? swiperController;
+  PlaylistController? playlistController;
+  AbstractMediaPlayerController? mediaPlayerController;
 
   @override
   void initState() {
     super.initState();
+  }
+
+  onInitialized(AbstractMediaPlayerController mediaPlayerController,
+      SwiperController swiperController) {
+    this.swiperController = swiperController;
+    this.mediaPlayerController = mediaPlayerController;
+    playlistController = mediaPlayerController.playlistController;
   }
 
   List<Widget>? _buildRightWidgets() {
@@ -58,7 +65,7 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
             return IconButton(
               tooltip: AppLocalizations.t('Video player'),
               onPressed: () async {
-                await widget.swiperController.move(1);
+                await swiperController?.move(1);
               },
               icon: const Icon(Icons.video_call),
             );
@@ -66,7 +73,7 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
             return IconButton(
               tooltip: AppLocalizations.t('Playlist'),
               onPressed: () async {
-                await widget.swiperController.move(0);
+                await swiperController?.move(0);
               },
               icon: const Icon(Icons.featured_play_list_outlined),
             );
@@ -82,8 +89,8 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
       IconButton(
         tooltip: AppLocalizations.t('Close'),
         onPressed: () async {
-          mediaPlayerController.close();
-          widget.playlistController.clear();
+          mediaPlayerController?.close();
+          playlistController?.clear();
         },
         icon: const Icon(Icons.close),
       ),
@@ -94,25 +101,76 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    PlatformMediaPlayer platformMediaPlayer = PlatformMediaPlayer(
-        showPlaylist: true,
-        mediaPlayerController: mediaPlayerController,
-        swiperController: widget.swiperController,
-        onIndexChanged: (int index) {
-          this.index.value = index;
-        });
     List<Widget>? rightWidgets = _buildRightWidgets();
 
     return AppBarView(
       title: widget.title,
       withLeading: true,
       rightWidgets: rightWidgets,
-      child: platformMediaPlayer,
+      child: platformVideoPlayer,
     );
   }
 
   @override
   void dispose() {
+    super.dispose();
+  }
+}
+
+class PlatformVideoPlayer extends StatefulWidget {
+  bool showPlaylist;
+  List<String>? filenames;
+  void Function(int index)? onIndexChanged;
+  void Function(AbstractMediaPlayerController mediaPlayerController,
+      SwiperController swiperController)? onInitialized;
+
+  PlatformVideoPlayer(
+      {super.key,
+      this.filenames,
+      this.showPlaylist = true,
+      this.onIndexChanged,
+      this.onInitialized}) {
+    if (platformParams.windows) {
+      WindowsVideoPlayer.registerWith();
+    }
+  }
+
+  @override
+  State createState() => _PlatformVideoPlayerState();
+}
+
+class _PlatformVideoPlayerState extends State<PlatformVideoPlayer> {
+  final SwiperController swiperController = SwiperController();
+  final PlaylistController playlistController = PlaylistController();
+  late final AbstractMediaPlayerController mediaPlayerController =
+      MediaKitVideoPlayerController(playlistController);
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.filenames != null) {
+      playlistController.addMediaFiles(filenames: widget.filenames!);
+    }
+    widget.onInitialized?.call(mediaPlayerController, swiperController);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    PlatformMediaPlayer platformMediaPlayer = PlatformMediaPlayer(
+        showPlaylist: widget.showPlaylist,
+        mediaPlayerController: mediaPlayerController,
+        swiperController: swiperController,
+        onIndexChanged: (int index) {
+          widget.onIndexChanged?.call(index);
+        });
+
+    return platformMediaPlayer;
+  }
+
+  @override
+  void dispose() {
+    swiperController.dispose();
+    playlistController.dispose();
     mediaPlayerController.dispose();
     super.dispose();
   }

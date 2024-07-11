@@ -15,6 +15,7 @@ import 'package:colla_chat/routers/router_handler.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/ffmpeg/ffmpeg_helper.dart';
 import 'package:colla_chat/transport/websocket/universal_websocket.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -69,6 +70,8 @@ void main(List<String> args) async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   bool loginStatus = await ServiceLocator.init();
+
+  await FFMpegHelper.initialize();
 
   SystemChannels.lifecycle.setMessageHandler((msg) async {
     //logger.w('system channel switch to $msg');
