@@ -237,7 +237,6 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   /// 停止播放，关闭当前播放资源
   close() async {
     await stop();
-    playlistController.clear();
     filename.value = null;
   }
 
