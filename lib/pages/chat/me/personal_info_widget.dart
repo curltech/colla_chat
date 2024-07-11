@@ -13,15 +13,18 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class PersonalInfoWidget extends StatefulWidget with TileDataMixin {
-  const PersonalInfoWidget({super.key});
+class PersonalInfoWidget extends StatelessWidget with TileDataMixin {
+  ValueNotifier<List<TileData>> personalInfoTileData =
+      ValueNotifier<List<TileData>>([]);
 
-  @override
-  State<StatefulWidget> createState() {
-    return _PersonalInfoWidgetState();
+  final MyselfQrcodeWidget qrcodeWidget = MyselfQrcodeWidget();
+
+  PersonalInfoWidget({super.key}) {
+    indexWidgetProvider.define(qrcodeWidget);
   }
 
   @override
@@ -35,23 +38,9 @@ class PersonalInfoWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'Personal Information';
-}
 
-class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
-    with SingleTickerProviderStateMixin {
-  List<TileData> personalInfoTileData = [];
-
-  @override
-  void initState() {
-    super.initState();
-    var indexWidgetProvider =
-        Provider.of<IndexWidgetProvider>(context, listen: false);
-    final MyselfQrcodeWidget qrcodeWidget = MyselfQrcodeWidget();
-    indexWidgetProvider.define(qrcodeWidget);
-  }
-
-  _init() {
-    personalInfoTileData = [
+  _buildPersonalInfo(BuildContext context) {
+    personalInfoTileData.value = [
       TileData(
           title: 'Avatar',
           suffix: myself.avatarImage,
@@ -89,7 +78,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
               myself.myselfPeer.name = name;
               myselfPeerService.update({'name': name},
                   where: 'id=?', whereArgs: [myself.myselfPeer.id!]);
-              setState(() {});
+              _buildPersonalInfo(context);
             }
           }),
       TileData(
@@ -112,7 +101,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
               myself.myselfPeer.email = email;
               myselfPeerService.update({'email': email},
                   where: 'id=?', whereArgs: [myself.myselfPeer.id!]);
-              setState(() {});
+              _buildPersonalInfo(context);
             }
           }),
       TileData(
@@ -131,7 +120,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
               myself.myselfPeer.mobile = mobile;
               myselfPeerService.update({'mobile': mobile},
                   where: 'id=?', whereArgs: [myself.myselfPeer.id!]);
-              setState(() {});
+              _buildPersonalInfo(context);
             }
           }),
       TileData(
@@ -165,29 +154,6 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    _init();
-    var personalInfo = AppBarView(
-      title: widget.title,
-      withLeading: widget.withLeading,
-      child: Column(children: [
-        DataListView(
-          itemCount: personalInfoTileData.length,
-          itemBuilder: (BuildContext context, int index) {
-            return personalInfoTileData[index];
-          },
-        ),
-        const SizedBox(
-          height: 15.0,
-        ),
-        _buildLogout(context)
-      ]),
-    );
-
-    return personalInfo;
-  }
-
   Future<void> _pickAvatar(
     BuildContext context,
     String peerId,
@@ -201,6 +167,34 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
       }
     }
     await myselfPeerService.updateAvatar(peerId, avatar);
-    setState(() {});
+    _buildPersonalInfo(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    _buildPersonalInfo(context);
+    Widget personalInfo = AppBarView(
+      title: title,
+      withLeading: withLeading,
+      child: Column(children: [
+        ValueListenableBuilder(
+            valueListenable: personalInfoTileData,
+            builder: (BuildContext context, List<TileData> personalInfoTileData,
+                Widget? child) {
+              return DataListView(
+                itemCount: personalInfoTileData.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return personalInfoTileData[index];
+                },
+              );
+            }),
+        const SizedBox(
+          height: 15.0,
+        ),
+        _buildLogout(context)
+      ]),
+    );
+
+    return personalInfo;
   }
 }

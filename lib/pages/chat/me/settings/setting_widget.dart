@@ -11,15 +11,15 @@ import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
 
 //设置页面，带有回退回调函数
-class SettingWidget extends StatefulWidget with TileDataMixin {
+class SettingWidget extends StatelessWidget with TileDataMixin {
   final GeneralSettingWidget generalSettingWidget =
       const GeneralSettingWidget();
   final AdvancedSettingWidget advancedSettingWidget = AdvancedSettingWidget();
-  final PeerProfileEditWidget peerProfileEditWidget =
-      const PeerProfileEditWidget();
+  final PeerProfileEditWidget peerProfileEditWidget = PeerProfileEditWidget();
   final SecuritySettingWidget securitySettingWidget = SecuritySettingWidget();
   final AuthMethod authMethod = AuthMethod.app;
   late final List<TileData> settingTileData;
@@ -42,11 +42,6 @@ class SettingWidget extends StatefulWidget with TileDataMixin {
   }
 
   @override
-  State<StatefulWidget> createState() {
-    return _SettingWidgetState();
-  }
-
-  @override
   bool get withLeading => true;
 
   @override
@@ -57,35 +52,23 @@ class SettingWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'Setting';
-}
 
-class _SettingWidgetState extends State<SettingWidget> {
   //登录状态，null表示登录成功，否则表示登录失败原因，初始化的为init表示未开始登录
-  String? loginStatus = 'init';
-
-  @override
-  void initState() {
-    super.initState();
-    _buildLocalAuthenticate();
-  }
+  ValueNotifier<String?> loginStatus = ValueNotifier<String?>('init');
 
   void _buildLocalAuthenticate() async {
-    if (widget.authMethod == AuthMethod.local) {
-      setState(() async {
-        loginStatus =
-            await LocalAuthUtil.authenticate(localizedReason: 'Authenticate');
-      });
+    if (authMethod == AuthMethod.local) {
+      loginStatus.value =
+          await LocalAuthUtil.authenticate(localizedReason: 'Authenticate');
     }
   }
 
   Widget _buildAppAuthenticate() {
-    if (widget.authMethod == AuthMethod.app) {
+    if (authMethod == AuthMethod.app) {
       P2pLoginWidget p2pLoginWidget = P2pLoginWidget(
           credential: myself.myselfPeer.loginName,
           onAuthenticate: (String? data) {
-            setState(() {
-              loginStatus = data;
-            });
+            loginStatus.value = data;
           });
       return p2pLoginWidget;
     }
@@ -94,17 +77,24 @@ class _SettingWidgetState extends State<SettingWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Widget child = DataListView(
-      itemCount: widget.settingTileData.length,
+    Widget settingWidget = DataListView(
+      itemCount: settingTileData.length,
       itemBuilder: (BuildContext context, int index) {
-        return widget.settingTileData[index];
+        return settingTileData[index];
       },
     );
-    var setting = KeepAliveWrapper(
-        child: AppBarView(
-            title: widget.title,
-            withLeading: widget.withLeading,
-            child: (loginStatus != null) ? _buildAppAuthenticate() : child));
+    var setting = AppBarView(
+        title: title,
+        withLeading: withLeading,
+        child: ValueListenableBuilder(
+          valueListenable: loginStatus,
+          builder: (BuildContext context, loginStatus, Widget? child) {
+            return loginStatus != null
+                ? _buildAppAuthenticate()
+                : settingWidget;
+          },
+        ));
+
     return setting;
   }
 }

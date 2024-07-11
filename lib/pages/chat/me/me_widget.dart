@@ -23,15 +23,15 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
 //我的页面，带有路由回调函数
-class MeWidget extends StatefulWidget with TileDataMixin {
-  final PersonalInfoWidget personalInfoWidget = const PersonalInfoWidget();
+class MeWidget extends StatelessWidget with TileDataMixin {
+  final PersonalInfoWidget personalInfoWidget = PersonalInfoWidget();
   final CollectionListView collectionListView = CollectionListView();
   final SettingWidget settingWidget = SettingWidget();
   final WebrtcWidget webrtcWidget = WebrtcWidget();
   final MediaWidget mediaWidget = MediaWidget();
   final PlatformWebViewWidget webViewWidget = PlatformWebViewWidget();
   final OpenVpnWidget openVpnWidget = const OpenVpnWidget();
-  final ContactWidget contactWidget = const ContactWidget();
+  final ContactWidget contactWidget = ContactWidget();
   final SystemAlertWindowWidget systemAlertWindowWidget =
       const SystemAlertWindowWidget();
   final LiveKitSfuRoomWidget liveKitSfuRoomWidget = LiveKitSfuRoomWidget();
@@ -41,6 +41,9 @@ class MeWidget extends StatefulWidget with TileDataMixin {
       PlatformMapLauncherWidget();
   final PlatformInfoWidget platformInfoWidget = const PlatformInfoWidget();
   final PoemWidget poemWidget = const PoemWidget();
+
+  final ValueNotifier<bool> developerSwitch =
+      ValueNotifier<bool>(myself.peerProfile.developerSwitch);
 
   MeWidget({super.key}) {
     indexWidgetProvider.define(collectionListView);
@@ -57,6 +60,7 @@ class MeWidget extends StatefulWidget with TileDataMixin {
     indexWidgetProvider.define(platformMapLauncherWidget);
     indexWidgetProvider.define(platformInfoWidget);
     indexWidgetProvider.define(poemWidget);
+    myself.addListener(_update);
   }
 
   @override
@@ -71,53 +75,39 @@ class MeWidget extends StatefulWidget with TileDataMixin {
   @override
   String get title => 'Me';
 
-  @override
-  State<StatefulWidget> createState() => _MeWidgetState();
-}
-
-class _MeWidgetState extends State<MeWidget> {
-  final ValueNotifier<bool> developerSwitch =
-      ValueNotifier<bool>(myself.peerProfile.developerSwitch);
-
-  @override
-  void initState() {
-    super.initState();
-    myself.addListener(_update);
-  }
-
   _update() {
     developerSwitch.value = myself.peerProfile.developerSwitch;
   }
 
   List<TileData> _buildMeTileData(BuildContext context) {
     List<TileDataMixin> mixins = [
-      widget.settingWidget,
-      widget.collectionListView,
+      settingWidget,
+      collectionListView,
     ];
 
     if (platformParams.mobile) {
-      mixins.add(widget.contactWidget);
+      mixins.add(contactWidget);
       if (myself.peerProfile.vpnSwitch) {
-        mixins.add(widget.openVpnWidget);
+        mixins.add(openVpnWidget);
       }
       if (platformParams.android) {
         if (developerSwitch.value) {
           mixins.addAll([
-            widget.systemAlertWindowWidget,
+            systemAlertWindowWidget,
           ]);
         }
       }
     }
 
-    mixins.add(widget.platformInfoWidget);
+    mixins.add(platformInfoWidget);
     if (developerSwitch.value) {
       mixins.addAll([
-        widget.platformMapLauncherWidget,
-        widget.webrtcWidget,
-        widget.webViewWidget,
-        widget.mediaWidget,
-        widget.liveKitSfuRoomWidget,
-        widget.poemWidget,
+        platformMapLauncherWidget,
+        webrtcWidget,
+        webViewWidget,
+        mediaWidget,
+        liveKitSfuRoomWidget,
+        poemWidget,
       ]);
     }
     List<TileData> meTileData = TileData.from(mixins);
@@ -144,15 +134,9 @@ class _MeWidgetState extends State<MeWidget> {
         });
 
     var me = AppBarView(
-        title: widget.title,
+        title: title,
         child: Column(
             children: <Widget>[const MeHeadWidget(), Expanded(child: child)]));
     return me;
-  }
-
-  @override
-  void dispose() {
-    myself.removeListener(_update);
-    super.dispose();
   }
 }

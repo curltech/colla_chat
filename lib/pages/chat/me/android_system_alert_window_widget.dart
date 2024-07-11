@@ -3,13 +3,8 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
-class SystemAlertWindowWidget extends StatefulWidget with TileDataMixin {
+class SystemAlertWindowWidget extends StatelessWidget with TileDataMixin {
   const SystemAlertWindowWidget({super.key});
-
-  @override
-  State<StatefulWidget> createState() {
-    return _SystemAlertWindowWidgetState();
-  }
 
   @override
   bool get withLeading => true;
@@ -22,20 +17,12 @@ class SystemAlertWindowWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'System alert window';
-}
-
-class _SystemAlertWindowWidgetState extends State<SystemAlertWindowWidget>
-    with SingleTickerProviderStateMixin {
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
     var overlayApp = AppBarView(
-        title: widget.title,
-        withLeading: widget.withLeading,
+        title: title,
+        withLeading: withLeading,
         child: Center(
           child: Column(
             children: <Widget>[

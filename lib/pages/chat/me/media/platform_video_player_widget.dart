@@ -11,13 +11,9 @@ import 'package:flutter/material.dart';
 import 'package:video_player_win/video_player_win_plugin.dart';
 
 ///平台标准的video_player的实现，缺省采用MediaKit
-class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
-  PlatformVideoPlayerWidget({
-    super.key,
-  });
-
-  @override
-  State createState() => _PlatformVideoPlayerWidgetState();
+class PlatformVideoPlayerWidget extends StatelessWidget with TileDataMixin {
+  final PlaylistController playlistController = PlaylistController();
+  late final PlatformVideoPlayer platformVideoPlayer;
 
   @override
   String get routeName => 'video_player';
@@ -30,42 +26,24 @@ class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
 
   @override
   bool get withLeading => true;
-}
 
-class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
-  ValueNotifier<int> index = ValueNotifier<int>(0);
-  late final PlatformVideoPlayer platformVideoPlayer = PlatformVideoPlayer(
-    onInitialized: onInitialized,
-    onIndexChanged: (index) {
-      this.index.value = index;
-    },
-  );
-  SwiperController? swiperController;
-  PlaylistController? playlistController;
-  AbstractMediaPlayerController? mediaPlayerController;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  onInitialized(AbstractMediaPlayerController mediaPlayerController,
-      SwiperController swiperController) {
-    this.swiperController = swiperController;
-    this.mediaPlayerController = mediaPlayerController;
-    playlistController = mediaPlayerController.playlistController;
+  PlatformVideoPlayerWidget({
+    super.key,
+  }) {
+    platformVideoPlayer =
+        PlatformVideoPlayer(playlistController: playlistController);
   }
 
   List<Widget>? _buildRightWidgets() {
     List<Widget> children = [];
     Widget btn = ValueListenableBuilder(
-        valueListenable: index,
+        valueListenable: platformVideoPlayer.platformMediaPlayer.index,
         builder: (BuildContext context, int index, Widget? child) {
           if (index == 0) {
             return IconButton(
               tooltip: AppLocalizations.t('Video player'),
               onPressed: () async {
-                await swiperController?.move(1);
+                await platformVideoPlayer.swiperController.move(1);
               },
               icon: const Icon(Icons.video_call),
             );
@@ -73,7 +51,7 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
             return IconButton(
               tooltip: AppLocalizations.t('Playlist'),
               onPressed: () async {
-                await swiperController?.move(0);
+                await platformVideoPlayer.swiperController.move(0);
               },
               icon: const Icon(Icons.featured_play_list_outlined),
             );
@@ -89,8 +67,8 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
       IconButton(
         tooltip: AppLocalizations.t('Close'),
         onPressed: () async {
-          mediaPlayerController?.close();
-          playlistController?.clear();
+          platformVideoPlayer.mediaPlayerController.close();
+          playlistController.clear();
         },
         icon: const Icon(Icons.close),
       ),
@@ -104,74 +82,45 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
     List<Widget>? rightWidgets = _buildRightWidgets();
 
     return AppBarView(
-      title: widget.title,
+      title: title,
       withLeading: true,
       rightWidgets: rightWidgets,
       child: platformVideoPlayer,
     );
   }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
 }
 
-class PlatformVideoPlayer extends StatefulWidget {
+class PlatformVideoPlayer extends StatelessWidget {
+  final SwiperController swiperController = SwiperController();
+  late final AbstractMediaPlayerController mediaPlayerController;
   bool showPlaylist;
   List<String>? filenames;
-  void Function(int index)? onIndexChanged;
-  void Function(AbstractMediaPlayerController mediaPlayerController,
-      SwiperController swiperController)? onInitialized;
+  PlaylistController? playlistController;
+  late final PlatformMediaPlayer platformMediaPlayer;
 
-  PlatformVideoPlayer(
-      {super.key,
-      this.filenames,
-      this.showPlaylist = true,
-      this.onIndexChanged,
-      this.onInitialized}) {
+  PlatformVideoPlayer({
+    super.key,
+    this.filenames,
+    this.showPlaylist = true,
+    this.playlistController,
+  }) {
     if (platformParams.windows) {
       WindowsVideoPlayer.registerWith();
     }
-  }
-
-  @override
-  State createState() => _PlatformVideoPlayerState();
-}
-
-class _PlatformVideoPlayerState extends State<PlatformVideoPlayer> {
-  final SwiperController swiperController = SwiperController();
-  final PlaylistController playlistController = PlaylistController();
-  late final AbstractMediaPlayerController mediaPlayerController =
-      MediaKitVideoPlayerController(playlistController);
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.filenames != null) {
-      playlistController.addMediaFiles(filenames: widget.filenames!);
+    playlistController ??= PlaylistController();
+    if (filenames != null) {
+      playlistController!.addMediaFiles(filenames: filenames!);
     }
-    widget.onInitialized?.call(mediaPlayerController, swiperController);
+    mediaPlayerController = MediaKitVideoPlayerController(playlistController!);
+    platformMediaPlayer = PlatformMediaPlayer(
+      showPlaylist: showPlaylist,
+      mediaPlayerController: mediaPlayerController,
+      swiperController: swiperController,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    PlatformMediaPlayer platformMediaPlayer = PlatformMediaPlayer(
-        showPlaylist: widget.showPlaylist,
-        mediaPlayerController: mediaPlayerController,
-        swiperController: swiperController,
-        onIndexChanged: (int index) {
-          widget.onIndexChanged?.call(index);
-        });
-
     return platformMediaPlayer;
-  }
-
-  @override
-  void dispose() {
-    swiperController.dispose();
-    playlistController.dispose();
-    mediaPlayerController.dispose();
-    super.dispose();
   }
 }

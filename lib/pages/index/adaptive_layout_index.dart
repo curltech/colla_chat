@@ -62,14 +62,13 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
 
   ///Body视图
   Widget _buildBodyView() {
-    //return indexWidgetProvider.views[indexWidgetProvider.currentMainIndex];
+    TileDataMixin mixin =
+        indexWidgetProvider.views[indexWidgetProvider.currentMainIndex];
     return Row(children: [
       const VerticalDivider(
         width: 1.0,
       ),
-      Expanded(
-          child:
-              indexWidgetProvider.views[indexWidgetProvider.currentMainIndex]),
+      Expanded(child: mixin),
     ]);
   }
 

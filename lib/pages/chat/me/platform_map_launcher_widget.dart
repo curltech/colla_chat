@@ -11,11 +11,13 @@ import 'package:flutter_svg/svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:map_launcher/map_launcher.dart';
 
-class PlatformMapLauncherWidget extends StatefulWidget with TileDataMixin {
-  PlatformMapLauncherWidget({super.key});
+class PlatformMapLauncherWidget extends StatelessWidget with TileDataMixin {
+  ValueNotifier<List<AvailableMap>> maps =
+      ValueNotifier<List<AvailableMap>>([]);
 
-  @override
-  State createState() => _PlatformMapLauncherWidgetState();
+  PlatformMapLauncherWidget({super.key}) {
+    _init();
+  }
 
   @override
   bool get withLeading => true;
@@ -28,17 +30,6 @@ class PlatformMapLauncherWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'MapLauncher';
-}
-
-class _PlatformMapLauncherWidgetState extends State<PlatformMapLauncherWidget> {
-  ValueNotifier<List<AvailableMap>> maps =
-      ValueNotifier<List<AvailableMap>>([]);
-
-  @override
-  void initState() {
-    super.initState();
-    _init();
-  }
 
   _init() async {
     maps.value = await GeolocatorUtil.installedMaps();
@@ -101,13 +92,6 @@ class _PlatformMapLauncherWidgetState extends State<PlatformMapLauncherWidget> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        title: widget.title,
-        withLeading: true,
-        child: buildMapLauncher(context));
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
+        title: title, withLeading: true, child: buildMapLauncher(context));
   }
 }

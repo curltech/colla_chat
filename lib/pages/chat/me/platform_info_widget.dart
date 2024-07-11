@@ -7,13 +7,8 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
-class PlatformInfoWidget extends StatefulWidget with TileDataMixin {
+class PlatformInfoWidget extends StatelessWidget with TileDataMixin {
   const PlatformInfoWidget({super.key});
-
-  @override
-  State<StatefulWidget> createState() {
-    return _PlatformInfoWidgetState();
-  }
 
   @override
   bool get withLeading => true;
@@ -26,14 +21,6 @@ class PlatformInfoWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'Platform Information';
-}
-
-class _PlatformInfoWidgetState extends State<PlatformInfoWidget>
-    with SingleTickerProviderStateMixin {
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,8 +72,8 @@ class _PlatformInfoWidgetState extends State<PlatformInfoWidget>
     ];
 
     var platformInfo = AppBarView(
-      title: widget.title,
-      withLeading: widget.withLeading,
+      title: title,
+      withLeading: withLeading,
       child: DataListView(
         itemCount: platformInfoTileData.length,
         itemBuilder: (BuildContext context, int index) {

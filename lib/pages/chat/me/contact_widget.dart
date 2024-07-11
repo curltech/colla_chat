@@ -7,8 +7,10 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 
-class ContactWidget extends StatefulWidget with TileDataMixin {
-  const ContactWidget({super.key});
+class ContactWidget extends StatelessWidget with TileDataMixin {
+  List<TileData> _tileData = [];
+
+  ContactWidget({super.key});
 
   @override
   bool get withLeading => true;
@@ -21,18 +23,6 @@ class ContactWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'Contact';
-
-  @override
-  State<StatefulWidget> createState() => _ContactWidgetState();
-}
-
-class _ContactWidgetState extends State<ContactWidget> {
-  List<TileData> _tileData = [];
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   Future<List<Contact>?> loadContacts() async {
     try {
@@ -60,14 +50,13 @@ class _ContactWidgetState extends State<ContactWidget> {
         _tileData.add(tile);
       }
     }
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-      title: widget.title,
-      withLeading: widget.withLeading,
+      title: title,
+      withLeading: withLeading,
       rightWidgets: [
         IconButton(
             onPressed: () async {

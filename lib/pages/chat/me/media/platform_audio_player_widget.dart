@@ -11,14 +11,15 @@ import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:flutter/material.dart';
 
 ///平台标准的AudioPlayer的实现，支持标准的audioplayers，just_audio和webview
-class PlatformAudioPlayerWidget extends StatefulWidget with TileDataMixin {
-  final SwiperController swiperController = SwiperController();
+class PlatformAudioPlayerWidget extends StatelessWidget with TileDataMixin {
   final PlaylistController playlistController = PlaylistController();
+  late final PlatformAudioPlayer platformAudioPlayer;
 
-  PlatformAudioPlayerWidget({super.key});
-
-  @override
-  State createState() => _PlatformAudioPlayerWidgetState();
+  PlatformAudioPlayerWidget({super.key}) {
+    platformAudioPlayer = PlatformAudioPlayer(
+      playlistController: playlistController,
+    );
+  }
 
   @override
   String get routeName => 'audio_player';
@@ -31,35 +32,17 @@ class PlatformAudioPlayerWidget extends StatefulWidget with TileDataMixin {
 
   @override
   bool get withLeading => true;
-}
-
-class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
-  AudioPlayerType audioPlayerType = AudioPlayerType.audioplayers;
-  ValueNotifier<int> index = ValueNotifier<int>(0);
-  late AbstractMediaPlayerController mediaPlayerController =
-      BlueFireAudioPlayerController(widget.playlistController);
-
-  @override
-  void initState() {
-    widget.swiperController.addListener(_update);
-    super.initState();
-  }
-
-  _update() {
-    index.value = widget.swiperController.index;
-  }
 
   List<Widget>? _buildRightWidgets() {
     List<Widget> children = [
       ValueListenableBuilder(
-          valueListenable: index,
+          valueListenable: platformAudioPlayer.platformMediaPlayer.index,
           builder: (BuildContext context, int index, Widget? child) {
             if (index == 0) {
               return IconButton(
                 tooltip: AppLocalizations.t('Audio player'),
                 onPressed: () {
-                  widget.swiperController.move(1);
-                  this.index.value = 1;
+                  platformAudioPlayer.swiperController.move(1);
                 },
                 icon: const Icon(Icons.audiotrack),
               );
@@ -67,8 +50,7 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
               return IconButton(
                 tooltip: AppLocalizations.t('Playlist'),
                 onPressed: () {
-                  widget.swiperController.move(0);
-                  this.index.value = 0;
+                  platformAudioPlayer.swiperController.move(0);
                 },
                 icon: const Icon(Icons.featured_play_list_outlined),
               );
@@ -80,8 +62,8 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
       IconButton(
         tooltip: AppLocalizations.t('Close'),
         onPressed: () async {
-          mediaPlayerController.close();
-          widget.playlistController.clear();
+          platformAudioPlayer.mediaPlayerController.close();
+          playlistController.clear();
         },
         icon: const Icon(Icons.close),
       ),
@@ -92,27 +74,45 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
   @override
   Widget build(BuildContext context) {
     List<Widget>? rightWidgets = _buildRightWidgets();
-    PlatformMediaPlayer platformMediaPlayer = PlatformMediaPlayer(
-        key: UniqueKey(),
-        showPlaylist: true,
-        mediaPlayerController: mediaPlayerController,
-        swiperController: widget.swiperController,
-        onIndexChanged: (int index) {
-          this.index.value = index;
-        });
+
     return AppBarView(
-      titleWidget: CommonAutoSizeText(AppLocalizations.t(widget.title),
+      titleWidget: CommonAutoSizeText(AppLocalizations.t(title),
           style: const TextStyle(fontSize: AppFontSize.mdFontSize)),
       withLeading: true,
       rightWidgets: rightWidgets,
-      child: platformMediaPlayer,
+      child: platformAudioPlayer,
+    );
+  }
+}
+
+class PlatformAudioPlayer extends StatelessWidget {
+  final SwiperController swiperController = SwiperController();
+  PlaylistController? playlistController;
+  List<String>? filenames;
+  late final PlatformMediaPlayer platformMediaPlayer;
+  AudioPlayerType audioPlayerType = AudioPlayerType.audioplayers;
+  late AbstractMediaPlayerController mediaPlayerController;
+
+  PlatformAudioPlayer({
+    super.key,
+    this.filenames,
+    this.playlistController,
+  }) {
+    playlistController ??= PlaylistController();
+    if (filenames != null) {
+      playlistController!.addMediaFiles(filenames: filenames!);
+    }
+    mediaPlayerController = BlueFireAudioPlayerController(playlistController!);
+    platformMediaPlayer = PlatformMediaPlayer(
+      key: UniqueKey(),
+      showPlaylist: true,
+      mediaPlayerController: mediaPlayerController,
+      swiperController: swiperController,
     );
   }
 
   @override
-  void dispose() {
-    widget.swiperController.removeListener(_update);
-    mediaPlayerController.close();
-    super.dispose();
+  Widget build(BuildContext context) {
+    return platformMediaPlayer;
   }
 }

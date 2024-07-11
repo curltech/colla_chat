@@ -32,17 +32,25 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
 /// 安全设置组件，包括修改密码，登录选项（免登录设置），加密选项（加密算法，signal）
-class SecuritySettingWidget extends StatefulWidget with TileDataMixin {
-  final PasswordWidget passwordWidget = const PasswordWidget();
+class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
+  final PasswordWidget passwordWidget = PasswordWidget();
   final LoggerConsoleView loggerConsoleView = const LoggerConsoleView();
+  late final List<TileData> securitySettingTileData;
 
   SecuritySettingWidget({super.key}) {
     indexWidgetProvider.define(passwordWidget);
     indexWidgetProvider.define(loggerConsoleView);
+    List<TileDataMixin> mixins = [
+      passwordWidget,
+    ];
+    if (myself.peerProfile.developerSwitch) {
+      mixins.add(loggerConsoleView);
+    }
+    securitySettingTileData = TileData.from(mixins);
+    for (var tile in securitySettingTileData) {
+      tile.dense = true;
+    }
   }
-
-  @override
-  State<StatefulWidget> createState() => _SecuritySettingWidgetState();
 
   @override
   bool get withLeading => true;
@@ -55,32 +63,8 @@ class SecuritySettingWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'Security Setting';
-}
 
-class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
-  late final List<TileData> securitySettingTileData;
-
-  @override
-  void initState() {
-    super.initState();
-    appDataProvider.addListener(_update);
-    List<TileDataMixin> mixins = [
-      widget.passwordWidget,
-    ];
-    if (myself.peerProfile.developerSwitch) {
-      mixins.add(widget.loggerConsoleView);
-    }
-    securitySettingTileData = TileData.from(mixins);
-    for (var tile in securitySettingTileData) {
-      tile.dense = true;
-    }
-  }
-
-  _update() {
-    setState(() {});
-  }
-
-  Widget _buildBackupTileWidget() {
+  Widget _buildBackupTileWidget(BuildContext context) {
     List<TileData> tiles = [
       TileData(title: 'Vacuum', prefix: Icons.compress_outlined),
       TileData(title: 'Backup', prefix: Icons.backup),
@@ -102,95 +86,90 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
         itemBuilder: (BuildContext context, int index) {
           return tiles[index];
         },
-        onTap: _onTap);
+        onTap: (int index, String title, {TileData? group, String? subtitle}) {
+          _onTap(context, index, title, group: group, subtitle: subtitle);
+        });
   }
 
-  _onTap(int index, String title, {TileData? group, String? subtitle}) {
+  _onTap(BuildContext context, int index, String title,
+      {TileData? group, String? subtitle}) {
     switch (title) {
       case 'Vacuum':
-        _vacuum();
+        _vacuum(context);
         break;
       case 'Backup':
-        _backup();
+        _backup(context);
         break;
       case 'Restore':
-        _restore();
+        _restore(context);
         break;
       case 'Backup peer':
-        _backupPeer();
+        _backupPeer(context);
         break;
       case 'Delete peer':
-        _deletePeer();
+        _deletePeer(context);
         break;
       case 'Restore peer':
-        _restorePeer();
+        _restorePeer(context);
         break;
       case 'Backup attachment':
-        _backupAttachment();
+        _backupAttachment(context);
         break;
       case 'Restore attachment':
-        _restoreAttachment();
+        _restoreAttachment(context);
         break;
       case 'Clean log':
-        _cleanLog();
+        _cleanLog(context);
         break;
       default:
         break;
     }
   }
 
-  _vacuum() async {
+  _vacuum(BuildContext context) async {
     sqlite3.vacuum();
     File file = File(appDataProvider.sqlite3Path);
     if (file.existsSync()) {
       appDataProvider.dataLength = await file.length();
-      if (mounted) {
-        DialogUtil.info(context,
-            content:
-                '${AppLocalizations.t('Successfully vacuum colla.db length:')} ${appDataProvider.dataLength}');
-      }
+      DialogUtil.info(context,
+          content:
+              '${AppLocalizations.t('Successfully vacuum colla.db length:')} ${appDataProvider.dataLength}');
     }
   }
 
   ///备份整个colla.db文件
-  _backup() {
+  _backup(BuildContext context) {
     File? file = sqlite3.backup();
     if (file != null) {
-      if (mounted) {
-        DialogUtil.info(context,
-            content:
-                '${AppLocalizations.t('Successfully backup colla.db')} ${file.path}');
-      }
+      DialogUtil.info(context,
+          content:
+              '${AppLocalizations.t('Successfully backup colla.db')} ${file.path}');
     }
   }
 
   ///从备份的colla.db.bak文件恢复
-  void _restore() {
+  void _restore(BuildContext context) {
     sqlite3.restore();
-    if (mounted) {
-      DialogUtil.info(context,
-          content:
-              AppLocalizations.t('Successfully restore colla.db and reopen'));
-    }
+    DialogUtil.info(context,
+        content:
+            AppLocalizations.t('Successfully restore colla.db and reopen'));
   }
 
   ///备份当前的peer的登录信息到json文件
-  Future<void> _backupPeer() async {
+  Future<void> _backupPeer(BuildContext context) async {
     String? peerId = myself.peerId;
     if (peerId != null) {
       String? filename = await myselfPeerService.backup(peerId);
       if (filename != null) {
-        if (mounted) {
-          DialogUtil.info(context,
-              content:
-                  '${AppLocalizations.t('Successfully backup peer filename')} $filename');
-        }
+        DialogUtil.info(context,
+            content:
+                '${AppLocalizations.t('Successfully backup peer filename')} $filename');
       }
     }
   }
 
   ///删除当前的peer和所拥有的信息
-  Future<void> _deletePeer() async {
+  Future<void> _deletePeer(BuildContext context) async {
     String? peerId = myself.peerId;
     if (peerId != null) {
       bool? confirm = await DialogUtil.confirm(context,
@@ -209,18 +188,16 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
         groupMemberService.delete();
 
         myselfPeerService.logout();
-        if (mounted) {
-          indexWidgetProvider.pop(context: context);
-          indexWidgetProvider.currentMainIndex = 0;
-          Application.router
-              .navigateTo(context, Application.p2pLogin, replace: true);
-        }
+        indexWidgetProvider.pop(context: context);
+        indexWidgetProvider.currentMainIndex = 0;
+        Application.router
+            .navigateTo(context, Application.p2pLogin, replace: true);
       }
     }
   }
 
   ///从备份的peer的登录信息json文件恢复到数据库
-  Future<void> _restorePeer() async {
+  Future<void> _restorePeer(BuildContext context) async {
     List<XFile> xfiles = await FileUtil.pickFiles(
         initialDirectory: platformParams.path,
         type: FileType.custom,
@@ -228,31 +205,27 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
     if (xfiles.isNotEmpty) {
       String backup = await xfiles.first.readAsString();
       await myselfPeerService.restore(backup);
-      if (mounted) {
-        DialogUtil.info(context,
-            content:
-                '${AppLocalizations.t('Successfully restore peer filename')} ${xfiles.first.path}');
-      }
+      DialogUtil.info(context,
+          content:
+              '${AppLocalizations.t('Successfully restore peer filename')} ${xfiles.first.path}');
     }
   }
 
   ///备份当前的peer的附件
-  Future<void> _backupAttachment() async {
+  Future<void> _backupAttachment(BuildContext context) async {
     String? peerId = myself.peerId;
     if (peerId != null) {
       String? filename = await messageAttachmentService.backup(peerId);
       if (filename != null) {
-        if (mounted) {
-          DialogUtil.info(context,
-              content:
-                  '${AppLocalizations.t('Successfully backup attachment filename')} $filename');
-        }
+        DialogUtil.info(context,
+            content:
+                '${AppLocalizations.t('Successfully backup attachment filename')} $filename');
       }
     }
   }
 
   ///从备份的peer的附件文件恢复
-  Future<String?> _restoreAttachment() async {
+  Future<String?> _restoreAttachment(BuildContext context) async {
     String? peerId = myself.peerId;
     if (peerId != null) {
       List<XFile> xfiles = await FileUtil.pickFiles(
@@ -263,11 +236,9 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
         String? path =
             await messageAttachmentService.restore(peerId, xfiles.first.path);
         if (path != null) {
-          if (mounted) {
-            DialogUtil.info(context,
-                content:
-                    '${AppLocalizations.t('Successfully restore attachment path')} $path');
-          }
+          DialogUtil.info(context,
+              content:
+                  '${AppLocalizations.t('Successfully restore attachment path')} $path');
         }
       }
     }
@@ -275,7 +246,7 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
   }
 
   ///清楚当前账户的日志
-  void _cleanLog() {
+  void _cleanLog(BuildContext context) {
     List<FileSystemEntity> files =
         PathUtil.listFile(platformParams.path, end: '.log');
     if (files.isNotEmpty) {
@@ -289,10 +260,8 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
         file.deleteSync();
       }
     }
-    if (mounted) {
-      DialogUtil.info(context,
-          content: AppLocalizations.t('Successfully clean all log files'));
-    }
+    DialogUtil.info(context,
+        content: AppLocalizations.t('Successfully clean all log files'));
   }
 
   Widget _buildSettingWidget(BuildContext context) {
@@ -335,7 +304,7 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
       children: <Widget>[
         securitySettingTile,
         autoLoginTile,
-        Expanded(child: _buildBackupTileWidget())
+        Expanded(child: _buildBackupTileWidget(context))
       ],
     );
   }
@@ -343,14 +312,6 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        withLeading: true,
-        title: widget.title,
-        child: _buildSettingWidget(context));
-  }
-
-  @override
-  void dispose() {
-    appDataProvider.removeListener(_update);
-    super.dispose();
+        withLeading: true, title: title, child: _buildSettingWidget(context));
   }
 }

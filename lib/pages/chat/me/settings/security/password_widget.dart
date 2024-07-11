@@ -31,11 +31,8 @@ final List<PlatformDataField> passwordInputFieldDef = [
 ];
 
 /// 修改用户密码
-class PasswordWidget extends StatefulWidget with TileDataMixin {
-  const PasswordWidget({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _PasswordWidgetState();
+class PasswordWidget extends StatelessWidget with TileDataMixin {
+  PasswordWidget({super.key});
 
   @override
   bool get withLeading => true;
@@ -48,9 +45,7 @@ class PasswordWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'Password';
-}
 
-class _PasswordWidgetState extends State<PasswordWidget> {
   final FormInputController controller =
       FormInputController(passwordInputFieldDef);
 
@@ -61,7 +56,9 @@ class _PasswordWidgetState extends State<PasswordWidget> {
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
             child: FormInputWidget(
               height: 250,
-              onOk: _onOk,
+              onOk: (Map<String, dynamic> values) {
+                _onOk(context, values);
+              },
               okLabel: 'Ok',
               controller: controller,
             )),
@@ -69,7 +66,7 @@ class _PasswordWidgetState extends State<PasswordWidget> {
     );
   }
 
-  _onOk(Map<String, dynamic> values) async {
+  _onOk(BuildContext context, Map<String, dynamic> values) async {
     String oldPassword = values['oldPassword'];
     String plainPassword = values['plainPassword'];
     String confirmPassword = values['confirmPassword'];
@@ -123,8 +120,6 @@ class _PasswordWidgetState extends State<PasswordWidget> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        withLeading: true,
-        title: widget.title,
-        child: _buildPasswordWidget(context));
+        withLeading: true, title: title, child: _buildPasswordWidget(context));
   }
 }

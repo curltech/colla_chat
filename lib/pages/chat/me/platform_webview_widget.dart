@@ -5,11 +5,8 @@ import 'package:colla_chat/widgets/webview/platform_webview.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
-class PlatformWebViewWidget extends StatefulWidget with TileDataMixin {
+class PlatformWebViewWidget extends StatelessWidget with TileDataMixin {
   PlatformWebViewWidget({super.key});
-
-  @override
-  State createState() => _PlatformWebViewWidgetState();
 
   @override
   bool get withLeading => true;
@@ -22,9 +19,7 @@ class PlatformWebViewWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'WebView';
-}
 
-class _PlatformWebViewWidgetState extends State<PlatformWebViewWidget> {
   final urlTextController = TextEditingController();
 
   PlatformWebViewController platformWebViewController =
@@ -32,12 +27,7 @@ class _PlatformWebViewWidgetState extends State<PlatformWebViewWidget> {
 
   bool fullScreen = false;
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  Widget buildTextField() {
+  Widget buildTextField(BuildContext context) {
     return Row(children: [
       const SizedBox(
         width: 10,
@@ -112,7 +102,7 @@ class _PlatformWebViewWidgetState extends State<PlatformWebViewWidget> {
 
   Widget buildWebView(BuildContext context) {
     return Column(children: <Widget>[
-      buildTextField(),
+      buildTextField(context),
       Expanded(child: PlatformWebView(
           onWebViewCreated: (PlatformWebViewController controller) {
         platformWebViewController.inAppWebViewController =
@@ -126,14 +116,9 @@ class _PlatformWebViewWidgetState extends State<PlatformWebViewWidget> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-      title: widget.title,
+      title: title,
       withLeading: true,
       child: buildWebView(context),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 }

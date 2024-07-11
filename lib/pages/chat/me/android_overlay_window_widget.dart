@@ -4,11 +4,19 @@ import 'dart:ui';
 
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 
-class AndroidOverlayWindowWidget extends StatefulWidget with TileDataMixin {
-  const AndroidOverlayWindowWidget({super.key});
+class AndroidOverlayWindowWidget extends StatelessWidget with TileDataMixin {
+  static const String _kPortNameOverlay = 'OVERLAY';
+  static const String _kPortNameHome = 'UI';
+  final _receivePort = ReceivePort();
+  SendPort? homePort;
+  ValueNotifier<String?> latestMessageFromOverlay =
+      ValueNotifier<String?>(null);
+
+  AndroidOverlayWindowWidget({super.key});
 
   @override
   bool get withLeading => true;
@@ -22,22 +30,7 @@ class AndroidOverlayWindowWidget extends StatefulWidget with TileDataMixin {
   @override
   String get title => 'Android overlay window';
 
-  @override
-  State<AndroidOverlayWindowWidget> createState() =>
-      _AndroidOverlayWindowWidgetState();
-}
-
-class _AndroidOverlayWindowWidgetState
-    extends State<AndroidOverlayWindowWidget> {
-  static const String _kPortNameOverlay = 'OVERLAY';
-  static const String _kPortNameHome = 'UI';
-  final _receivePort = ReceivePort();
-  SendPort? homePort;
-  String? latestMessageFromOverlay;
-
-  @override
-  void initState() {
-    super.initState();
+  void init() {
     if (homePort != null) return;
     final res = IsolateNameServer.registerPortWithName(
       _receivePort.sendPort,
@@ -46,17 +39,15 @@ class _AndroidOverlayWindowWidgetState
     log("$res: OVERLAY");
     _receivePort.listen((message) {
       log("message from OVERLAY: $message");
-      setState(() {
-        latestMessageFromOverlay = 'Latest Message From Overlay: $message';
-      });
+      latestMessageFromOverlay.value = 'Latest Message From Overlay: $message';
     });
   }
 
   @override
   Widget build(BuildContext context) {
     var overlayApp = AppBarView(
-      title: widget.title,
-      withLeading: widget.withLeading,
+      title: title,
+      withLeading: withLeading,
       child: Center(
         child: Column(
           children: [
@@ -127,7 +118,7 @@ class _AndroidOverlayWindowWidgetState
               child: const Text("Send message to overlay"),
             ),
             const SizedBox(height: 20),
-            Text(latestMessageFromOverlay ?? ''),
+            Text(latestMessageFromOverlay.value ?? ''),
           ],
         ),
       ),

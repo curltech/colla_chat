@@ -1,33 +1,14 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:flex_color_picker/flex_color_picker.dart' as flex;
 import 'package:flutter/material.dart';
 
-class ColorPicker extends StatefulWidget {
-  const ColorPicker({super.key});
+class ColorPicker extends StatelessWidget {
+  ColorPicker({super.key});
 
-  @override
-  State<StatefulWidget> createState() {
-    return _ColorPickerState();
-  }
-}
-
-class _ColorPickerState extends State<ColorPicker> {
   Color primaryColor = myself.primaryColor;
 
-  @override
-  void initState() {
-    super.initState();
-    appDataProvider.addListener(_update);
-    myself.addListener(_update);
-  }
-
-  _update() {
-    setState(() {});
-  }
-
-  Future<bool> colorPickerDialog() async {
+  Future<bool> colorPickerDialog(BuildContext context) async {
     ThemeData themeData = myself.themeData;
     return flex.ColorPicker(
       color: primaryColor,
@@ -81,38 +62,36 @@ class _ColorPickerState extends State<ColorPicker> {
 
   //群主选择界面
   Widget _buildColorPicker(BuildContext context) {
-    Widget indicator = flex.ColorIndicator(
-      width: 32,
-      height: 32,
-      borderRadius: 4,
-      color: myself.primaryColor,
-      onSelectFocus: false,
-      onSelect: () async {
-        var ok = await colorPickerDialog();
-        if (ok) {
-          myself.primaryColor = primaryColor;
-        }
+    return ListenableBuilder(
+      listenable: myself,
+      builder: (BuildContext context, Widget? child) {
+        Widget indicator = flex.ColorIndicator(
+          width: 32,
+          height: 32,
+          borderRadius: 4,
+          color: myself.primaryColor,
+          onSelectFocus: false,
+          onSelect: () async {
+            var ok = await colorPickerDialog(context);
+            if (ok) {
+              myself.primaryColor = primaryColor;
+            }
+          },
+        );
+        return Row(children: [
+          Text(AppLocalizations.t('Seed color')),
+          const Spacer(),
+          indicator,
+          const SizedBox(
+            width: 10,
+          ),
+        ]);
       },
     );
-    return Row(children: [
-      Text(AppLocalizations.t('Seed color')),
-      const Spacer(),
-      indicator,
-      const SizedBox(
-        width: 10,
-      ),
-    ]);
   }
 
   @override
   Widget build(BuildContext context) {
     return _buildColorPicker(context);
-  }
-
-  @override
-  void dispose() {
-    appDataProvider.removeListener(_update);
-    myself.removeListener(_update);
-    super.dispose();
   }
 }

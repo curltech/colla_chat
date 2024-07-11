@@ -20,7 +20,7 @@ enum AudioPlayerType {
 }
 
 ///平台的媒体播放器组件
-class PlatformMediaPlayer extends StatefulWidget {
+class PlatformMediaPlayer extends StatelessWidget {
   final bool showClosedCaptionButton;
   final bool showFullscreenButton;
   final bool showVolumeButton;
@@ -32,7 +32,7 @@ class PlatformMediaPlayer extends StatefulWidget {
   final List<int>? data;
   final SwiperController? swiperController;
   AbstractMediaPlayerController mediaPlayerController;
-  void Function(int)? onIndexChanged;
+  final ValueNotifier<int> index = ValueNotifier<int>(0);
 
   PlatformMediaPlayer({
     super.key,
@@ -47,67 +47,43 @@ class PlatformMediaPlayer extends StatefulWidget {
     this.width,
     this.height,
     this.data,
-    this.onIndexChanged,
   });
 
   _onSelected(int index, String filename) {
     swiperController!.move(1);
   }
 
-  @override
-  State createState() => _PlatformMediaPlayerState();
-}
-
-class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
-  int index = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    widget.mediaPlayerController.addListener(_update);
-  }
-
-  _update() {
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
   Widget _buildMediaPlayer(BuildContext context) {
-    Widget player = widget.mediaPlayerController.buildMediaPlayer();
+    Widget player = mediaPlayerController.buildMediaPlayer();
     player = VisibilityDetector(
       key: ObjectKey(player),
       onVisibilityChanged: (VisibilityInfo info) {
         if (info.visibleFraction == 0) {
-          widget.mediaPlayerController.pause();
+          mediaPlayerController.pause();
         } else if (info.visibleFraction == 1) {
-          widget.mediaPlayerController.resume();
+          mediaPlayerController.resume();
         }
       },
       child: player,
     );
 
     Widget mediaView;
-    if (widget.showPlaylist && widget.swiperController != null) {
+    if (showPlaylist && swiperController != null) {
       mediaView = Swiper(
         itemCount: 2,
-        index: index,
-        controller: widget.swiperController,
+        index: index.value,
+        controller: swiperController,
         onIndexChanged: (int index) {
-          this.index = index;
-          if (widget.onIndexChanged != null) {
-            widget.onIndexChanged!(index);
-          }
+          this.index.value = index;
           if (index == 1) {
-            widget.mediaPlayerController.play();
+            mediaPlayerController.play();
           }
         },
         itemBuilder: (BuildContext context, int index) {
           if (index == 0) {
             return PlaylistWidget(
-              onSelected: widget._onSelected,
-              playlistController:
-                  widget.mediaPlayerController.playlistController,
+              onSelected: _onSelected,
+              playlistController: mediaPlayerController.playlistController,
             );
           }
           if (index == 1) {
@@ -121,9 +97,9 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
     }
     return Container(
       margin: const EdgeInsets.all(0.0),
-      width: widget.width,
-      height: widget.height,
-      decoration: BoxDecoration(color: widget.color),
+      width: width,
+      height: height,
+      decoration: BoxDecoration(color: color),
       child: Center(
         child: mediaView,
       ),
@@ -133,11 +109,5 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
   @override
   Widget build(BuildContext context) {
     return _buildMediaPlayer(context);
-  }
-
-  @override
-  void dispose() {
-    widget.mediaPlayerController.removeListener(_update);
-    super.dispose();
   }
 }

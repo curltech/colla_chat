@@ -126,11 +126,8 @@ final List<PlatformDataField> peerProfileDataFields = [
 ];
 
 ///客户端
-class PeerProfileEditWidget extends StatefulWidget with TileDataMixin {
-  const PeerProfileEditWidget({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _PeerProfileEditWidgetState();
+class PeerProfileEditWidget extends StatelessWidget with TileDataMixin {
+  PeerProfileEditWidget({super.key});
 
   @override
   String get routeName => 'peer_profile_edit';
@@ -143,16 +140,9 @@ class PeerProfileEditWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'Privacy Setting';
-}
 
-class _PeerProfileEditWidgetState extends State<PeerProfileEditWidget> {
   final FormInputController controller =
       FormInputController(peerProfileDataFields);
-
-  @override
-  initState() {
-    super.initState();
-  }
 
   Widget _buildFormInputWidget(BuildContext context) {
     PeerProfile? peerProfile = myself.myselfPeer.peerProfile;
@@ -162,7 +152,7 @@ class _PeerProfileEditWidgetState extends State<PeerProfileEditWidget> {
     var formInputWidget = FormInputWidget(
       height: 500,
       onOk: (Map<String, dynamic> values) async {
-        await _onOk(values);
+        await _onOk(context, values);
       },
       controller: controller,
     );
@@ -170,7 +160,7 @@ class _PeerProfileEditWidgetState extends State<PeerProfileEditWidget> {
     return formInputWidget;
   }
 
-  _onOk(Map<String, dynamic> values) async {
+  _onOk(BuildContext context, Map<String, dynamic> values) async {
     PeerProfile peerProfile = PeerProfile.fromJson(values);
     int count = await peerProfileService.upsert(peerProfile);
     PeerProfile? myselfPeerProfile = myself.myselfPeer.peerProfile;
@@ -185,11 +175,10 @@ class _PeerProfileEditWidgetState extends State<PeerProfileEditWidget> {
       myselfPeerProfile.mobileVerified = peerProfile.mobileVerified;
       myselfPeerProfile.logLevel = peerProfile.logLevel;
       await peerProfileService.store(myselfPeerProfile);
-      if (mounted) {
-        DialogUtil.info(context,
-            content:
-                AppLocalizations.t('myself peerProfile has stored completely'));
-      }
+      DialogUtil.info(context,
+          content:
+              AppLocalizations.t('myself peerProfile has stored completely'));
+
       if (peerProfile.stockSwitch) {
         indexWidgetProvider.addMainView('stock_main');
       } else {
@@ -200,15 +189,14 @@ class _PeerProfileEditWidgetState extends State<PeerProfileEditWidget> {
       } else {
         indexWidgetProvider.removeMainView('mail');
       }
-      setState(() {});
     }
   }
 
   @override
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
-        title: widget.title,
-        withLeading: widget.withLeading,
+        title: title,
+        withLeading: withLeading,
         child: _buildFormInputWidget(context));
     return appBarView;
   }
