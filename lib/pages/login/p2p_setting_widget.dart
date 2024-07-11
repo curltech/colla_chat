@@ -41,7 +41,7 @@ class _P2pSettingWidgetState extends State<P2pSettingWidget> {
         const SizedBox(height: 10.0),
         Container(
           padding: padding,
-          child: const WsAddressPicker(),
+          child: WsAddressPicker(),
         ),
         const SizedBox(height: 10.0),
         Container(

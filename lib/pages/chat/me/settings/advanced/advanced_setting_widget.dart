@@ -12,7 +12,7 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
 /// 高级设置组件，包括定位器配置
-class AdvancedSettingWidget extends StatefulWidget with TileDataMixin {
+class AdvancedSettingWidget extends StatelessWidget with TileDataMixin {
   final PeerEndpointListWidget peerEndpointListWidget =
       PeerEndpointListWidget();
   final PeerClientListWidget peerClientListWidget = PeerClientListWidget();
@@ -36,9 +36,6 @@ class AdvancedSettingWidget extends StatefulWidget with TileDataMixin {
   }
 
   @override
-  State<StatefulWidget> createState() => _AdvancedSettingWidgetState();
-
-  @override
   bool get withLeading => true;
 
   @override
@@ -49,24 +46,12 @@ class AdvancedSettingWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'Advanced Setting';
-}
-
-class _AdvancedSettingWidgetState extends State<AdvancedSettingWidget> {
-  @override
-  void initState() {
-    super.initState();
-    appDataProvider.addListener(_update);
-  }
-
-  _update() {
-    setState(() {});
-  }
 
   Widget _buildSettingWidget(BuildContext context) {
     Widget child = DataListView(
-      itemCount: widget.advancedSettingTileData.length,
+      itemCount: advancedSettingTileData.length,
       itemBuilder: (BuildContext context, int index) {
-        return widget.advancedSettingTileData[index];
+        return advancedSettingTileData[index];
       },
     );
     var padding = const EdgeInsets.symmetric(horizontal: AppPadding.mdPadding);
@@ -77,7 +62,7 @@ class _AdvancedSettingWidgetState extends State<AdvancedSettingWidget> {
         const SizedBox(height: AppPadding.mdPadding),
         Padding(
           padding: padding,
-          child: const WsAddressPicker(),
+          child: WsAddressPicker(),
         ),
         const SizedBox(height: AppPadding.mdPadding),
         child
@@ -88,14 +73,6 @@ class _AdvancedSettingWidgetState extends State<AdvancedSettingWidget> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        withLeading: true,
-        title: widget.title,
-        child: _buildSettingWidget(context));
-  }
-
-  @override
-  void dispose() {
-    appDataProvider.removeListener(_update);
-    super.dispose();
+        withLeading: true, title: title, child: _buildSettingWidget(context));
   }
 }

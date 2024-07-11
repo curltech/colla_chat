@@ -7,11 +7,8 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
 ///自己的本地账号组件
-class MyselfPeerListWidget extends StatefulWidget with TileDataMixin {
+class MyselfPeerListWidget extends StatelessWidget with TileDataMixin {
   const MyselfPeerListWidget({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _MyselfPeerListWidgetState();
 
   @override
   String get routeName => 'myself_peer';
@@ -24,13 +21,6 @@ class MyselfPeerListWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'MyselfPeer';
-}
-
-class _MyselfPeerListWidgetState extends State<MyselfPeerListWidget> {
-  @override
-  initState() {
-    super.initState();
-  }
 
   List<TileData> _buildMyselfPeerTileData() {
     List<TileData> tiles = [];
@@ -63,10 +53,8 @@ class _MyselfPeerListWidgetState extends State<MyselfPeerListWidget> {
         myselfPeerController.currentIndex = index;
       },
     );
-    var appBarView = AppBarView(
-        title: widget.title,
-        withLeading: widget.withLeading,
-        child: myselfPeers);
+    var appBarView =
+        AppBarView(title: title, withLeading: withLeading, child: myselfPeers);
 
     return appBarView;
   }

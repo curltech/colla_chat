@@ -5,30 +5,20 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class WsAddressPicker extends StatefulWidget {
-  const WsAddressPicker({super.key});
-
-  @override
-  State<StatefulWidget> createState() {
-    return _WsAddressPickerState();
+class WsAddressPicker extends StatelessWidget {
+  WsAddressPicker({super.key}) {
+    _init();
   }
-}
 
-class _WsAddressPickerState extends State<WsAddressPicker> {
   String _peerId = '';
-  List<Option<String>> addressOptions = [];
+  ValueNotifier<List<Option<String>>> addressOptions =
+      ValueNotifier<List<Option<String>>>([]);
   String _wsConnectAddress = '';
   final TextEditingController _wsConnectAddressController =
       TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    peerEndpointController.addListener(_update);
-    _init();
-  }
 
   _init() {
     var defaultPeerEndpoint = peerEndpointController.defaultPeerEndpoint;
@@ -50,35 +40,34 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
       }
       addressOptions.add(option);
     }
-    this.addressOptions = addressOptions;
-  }
-
-  _update() {
-    setState(() {
-      _init();
-    });
+    this.addressOptions.value = addressOptions;
   }
 
   //群主选择界面
   Widget _buildSelectWidget(BuildContext context) {
-    return CustomSingleSelectField(
-      title: 'Address',
-      optionController: OptionController(options: addressOptions),
-      onChanged: (selected) {
-        if (selected != null) {
-          var peerEndpoints = peerEndpointController.data;
-          int i = 0;
-          for (var peerEndpoint in peerEndpoints) {
-            if (peerEndpoint.peerId == selected) {
-              var wsConnectAddress = peerEndpoint.wsConnectAddress;
-              wsConnectAddress ??= '';
-              _wsConnectAddressController.text = wsConnectAddress;
-              peerEndpointController.defaultIndex = i;
-              break;
+    return ValueListenableBuilder(
+      valueListenable: addressOptions,
+      builder: (BuildContext context, addressOptions, Widget? child) {
+        return CustomSingleSelectField(
+          title: 'Address',
+          optionController: OptionController(options: addressOptions),
+          onChanged: (selected) {
+            if (selected != null) {
+              var peerEndpoints = peerEndpointController.data;
+              int i = 0;
+              for (var peerEndpoint in peerEndpoints) {
+                if (peerEndpoint.peerId == selected) {
+                  var wsConnectAddress = peerEndpoint.wsConnectAddress;
+                  wsConnectAddress ??= '';
+                  _wsConnectAddressController.text = wsConnectAddress;
+                  peerEndpointController.defaultIndex = i;
+                  break;
+                }
+                ++i;
+              }
             }
-            ++i;
-          }
-        }
+          },
+        );
       },
     );
   }
@@ -108,11 +97,5 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
             onFieldSubmitted: (String val) {},
           )),
     ]);
-  }
-
-  @override
-  void dispose() {
-    peerEndpointController.removeListener(_update);
-    super.dispose();
   }
 }
