@@ -21,14 +21,14 @@ import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
+import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:ffmpeg_kit_flutter/media_information.dart';
 import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'package:ffmpeg_kit_flutter/session_state.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-DataListController<PlatformMediaSource> mediaFileController =
-    DataListController<PlatformMediaSource>();
+PlaylistController mediaFileController = PlaylistController();
 
 class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
   FFMpegMediaWidget({
@@ -345,72 +345,13 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
         });
   }
 
-  Future<void> filePicker(
+  Future<void> _addMediaSource(
     BuildContext context, {
-    String? dialogTitle,
     bool directory = false,
-    String? initialDirectory,
-    List<String>? allowedExtensions,
-    dynamic Function(FilePickerStatus)? onFileLoading,
-    bool allowCompression = true,
-    bool allowMultiple = true,
-    bool withData = false,
-    bool withReadStream = false,
-    bool lockParentWindow = false,
   }) async {
-    if (directory) {
-      String? path = await FileUtil.directoryPathPicker(
-          dialogTitle: dialogTitle, initialDirectory: initialDirectory);
-      if (path != null) {
-        Directory dir = Directory(path);
-        List<FileSystemEntity> entries = dir.listSync();
-        if (entries.isNotEmpty) {
-          for (FileSystemEntity entry in entries) {
-            String? extension = FileUtil.extension(entry.path);
-            if (extension == null) {
-              continue;
-            }
-            if (mediaFileController.data.contains(entry.path)) {
-              continue;
-            }
-            bool? contain = this.allowedExtensions.contains(extension);
-            if (contain) {
-              PlatformMediaSource? mediaSource =
-                  await PlatformMediaSource.media(filename: entry.path);
-              if (mediaSource != null) {
-                mediaFileController.add(mediaSource, notify: false);
-              }
-            }
-          }
-          mediaFileController.currentIndex =
-              mediaFileController.data.length - 1;
-        }
-      }
-    } else {
-      final xfiles = await FileUtil.pickFiles(
-          allowMultiple: allowMultiple,
-          type: fileType,
-          allowedExtensions: this.allowedExtensions.toList());
-      if (xfiles.isNotEmpty) {
-        for (var xfile in xfiles) {
-          if (mediaFileController.data.contains(xfile.path)) {
-            continue;
-          }
-          PlatformMediaSource? mediaSource =
-              await PlatformMediaSource.media(filename: xfile.path);
-          if (mediaSource != null) {
-            mediaFileController.add(mediaSource, notify: false);
-          }
-        }
-        mediaFileController.currentIndex = mediaFileController.data.length - 1;
-      }
-    }
-  }
-
-  ///选择文件加入播放列表
-  _addFiles(BuildContext context, {bool directory = false}) async {
     try {
-      await filePicker(context, directory: directory);
+      List<PlatformMediaSource> mediaSources =
+          await mediaFileController.sourceFilePicker(directory: directory);
     } catch (e) {
       DialogUtil.error(context, content: 'add media file failure:$e');
     }
@@ -446,7 +387,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
                 color: Colors.white,
               ),
               onPressed: () async {
-                await _addFiles(context, directory: true);
+                await _addMediaSource(context, directory: true);
                 _buildTileData(context);
               },
               tooltip: AppLocalizations.t('Add media directory'),
@@ -458,7 +399,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
                 color: Colors.white,
               ),
               onPressed: () async {
-                await _addFiles(context);
+                await _addMediaSource(context);
                 _buildTileData(context);
               },
               tooltip: AppLocalizations.t('Add media file'),
