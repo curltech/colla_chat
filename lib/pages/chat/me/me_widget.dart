@@ -10,7 +10,7 @@ import 'package:colla_chat/pages/chat/me/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_map_launcher_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_webview_widget.dart';
-import 'package:colla_chat/pages/chat/me/poem/poem_widget.dart';
+import 'package:colla_chat/pages/poem/poem_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/webrtc_widget.dart';
 import 'package:colla_chat/platform.dart';
@@ -40,7 +40,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   final PlatformMapLauncherWidget platformMapLauncherWidget =
       PlatformMapLauncherWidget();
   final PlatformInfoWidget platformInfoWidget = const PlatformInfoWidget();
-  final PoemWidget poemWidget = const PoemWidget();
+  final PoemWidget poemWidget = PoemWidget();
 
   final ValueNotifier<bool> developerSwitch =
       ValueNotifier<bool>(myself.peerProfile.developerSwitch);

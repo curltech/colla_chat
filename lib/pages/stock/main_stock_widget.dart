@@ -21,7 +21,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 
 /// 股票功能主页面，带有路由回调函数
-class StockMainWidget extends StatelessWidget with TileDataMixin {
+class MainStockWidget extends StatelessWidget with TileDataMixin {
   final ShareSelectionWidget shareSelectionWidget = ShareSelectionWidget();
   final AddShareWidget addShareWidget = AddShareWidget();
   final RefreshStockWidget refreshStockWidget = RefreshStockWidget();
@@ -38,7 +38,7 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
   final QStatWidget qstatWidget = QStatWidget();
   final StatScoreWidget statScoreWidget = StatScoreWidget();
 
-  StockMainWidget({super.key}) {
+  MainStockWidget({super.key}) {
     indexWidgetProvider.define(shareSelectionWidget);
     indexWidgetProvider.define(addShareWidget);
     indexWidgetProvider.define(refreshStockWidget);
