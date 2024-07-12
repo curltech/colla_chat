@@ -30,7 +30,7 @@ class ImageEditorWidget extends StatelessWidget with TileDataMixin {
     return ListenableBuilder(
       listenable: mediaFileController,
       builder: (BuildContext context, Widget? child) {
-        return ProImageEditor.file(File(mediaFileController.current!),
+        return ProImageEditor.file(File(mediaFileController.current!.filename),
             callbacks: ProImageEditorCallbacks(
               onImageEditingComplete: (Uint8List bytes) async {},
               onCloseEditor: () {

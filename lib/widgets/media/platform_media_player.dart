@@ -33,6 +33,7 @@ class PlatformMediaPlayer extends StatelessWidget {
   final SwiperController? swiperController;
   AbstractMediaPlayerController mediaPlayerController;
   final ValueNotifier<int> index = ValueNotifier<int>(0);
+  Widget? player;
 
   PlatformMediaPlayer({
     super.key,
@@ -55,6 +56,10 @@ class PlatformMediaPlayer extends StatelessWidget {
 
   Widget _buildMediaPlayer(BuildContext context) {
     Widget player = mediaPlayerController.buildMediaPlayer();
+    Widget playlistWidget = PlaylistWidget(
+      onSelected: _onSelected,
+      playlistController: mediaPlayerController.playlistController,
+    );
     player = VisibilityDetector(
       key: ObjectKey(player),
       onVisibilityChanged: (VisibilityInfo info) {
@@ -81,10 +86,7 @@ class PlatformMediaPlayer extends StatelessWidget {
         },
         itemBuilder: (BuildContext context, int index) {
           if (index == 0) {
-            return PlaylistWidget(
-              onSelected: _onSelected,
-              playlistController: mediaPlayerController.playlistController,
-            );
+            return playlistWidget;
           }
           if (index == 1) {
             return player;
@@ -108,6 +110,8 @@ class PlatformMediaPlayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _buildMediaPlayer(context);
+    player ??= _buildMediaPlayer(context);
+
+    return player!;
   }
 }

@@ -86,7 +86,7 @@ class _VideoEditorWidgetState extends State<VideoEditorWidget> {
       filenames.add(filename);
       Duration frameTime = Duration(seconds: startTime.inSeconds + i + 1);
       String command = FFMpegHelper.buildCommand(
-        input: mediaFileController.current!,
+        input: mediaFileController.current!.filename,
         output: filename,
         ss: frameTime.toString(),
         vframes: '1',

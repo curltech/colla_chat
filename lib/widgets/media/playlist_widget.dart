@@ -169,35 +169,19 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
 }
 
 ///媒体文件播放列表
-class PlaylistWidget extends StatefulWidget {
+class PlaylistWidget extends StatelessWidget {
   final Function(int index, String filename)? onSelected;
   final PlaylistController playlistController;
 
-  const PlaylistWidget(
+  PlaylistWidget(
       {super.key, this.onSelected, required this.playlistController});
 
-  @override
-  State createState() => _PlaylistWidgetState();
-}
-
-class _PlaylistWidgetState extends State<PlaylistWidget> {
   ValueNotifier<List<TileData>> tileData = ValueNotifier<List<TileData>>([]);
-  bool gridMode = false;
-
-  @override
-  void initState() {
-    super.initState();
-    widget.playlistController.addListener(_update);
-    _update();
-  }
-
-  _update() {
-    _buildTileData();
-  }
+  ValueNotifier<bool> gridMode = ValueNotifier<bool>(false);
 
   ///从收藏的文件中加入播放列表
   _collect() async {
-    String fileType = widget.playlistController.fileType.name;
+    String fileType = playlistController.fileType.name;
     ChatMessageContentType? contentType =
         StringUtil.enumFromString(ChatMessageContentType.values, fileType);
     contentType = contentType ?? ChatMessageContentType.media;
@@ -205,7 +189,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       ChatMessageType.collection.name,
       contentType: contentType.name,
     );
-    widget.playlistController.clear();
+    playlistController.clear();
     List<String> filenames = [];
     for (var chatMessage in chatMessages) {
       var title = chatMessage.title!;
@@ -221,11 +205,11 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
         filenames.add(filename);
       }
     }
-    widget.playlistController.addMediaFiles(filenames: filenames);
+    playlistController.addMediaFiles(filenames: filenames);
   }
 
-  Future<void> _buildTileData() async {
-    List<PlatformMediaSource> mediaSources = widget.playlistController.data;
+  Future<void> _buildTileData(BuildContext context) async {
+    List<PlatformMediaSource> mediaSources = playlistController.data;
     List<TileData> tileData = [];
     for (var mediaSource in mediaSources) {
       var filename = mediaSource.filename;
@@ -236,7 +220,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       }
       var length = file.lengthSync();
       bool selected = false;
-      PlatformMediaSource? current = widget.playlistController.current;
+      PlatformMediaSource? current = playlistController.current;
       if (current != null) {
         if (current.filename == filename) {
           selected = true;
@@ -244,10 +228,15 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       }
       Widget? thumbnailWidget = mediaSource.thumbnailWidget;
       TileData tile = TileData(
-          prefix: thumbnailWidget,
-          title: FileUtil.filename(filename),
-          subtitle: '$length',
-          selected: selected);
+        prefix: thumbnailWidget,
+        title: FileUtil.filename(filename),
+        subtitle: '$length',
+        selected: selected,
+        onTap: (int index, String title, {String? subtitle}) {
+          playlistController.currentIndex = index;
+          _buildTileData(context);
+        },
+      );
       tileData.add(tile);
     }
 
@@ -267,101 +256,101 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           }
           int crossAxisCount = 3;
           List<Widget> thumbnails = [];
-          if (gridMode) {
-            for (var tile in tileData) {
-              List<Widget> children = [];
-              children.add(const Spacer());
+          for (var tile in tileData) {
+            List<Widget> children = [];
+            children.add(const Spacer());
+            children.add(CommonAutoSizeText(
+              tile.title,
+              style: const TextStyle(fontSize: AppFontSize.minFontSize),
+            ));
+            if (tile.subtitle != null) {
+              children.add(const SizedBox(
+                height: 2.0,
+              ));
               children.add(CommonAutoSizeText(
-                tile.title,
+                tile.subtitle!,
                 style: const TextStyle(fontSize: AppFontSize.minFontSize),
               ));
-              if (tile.subtitle != null) {
-                children.add(const SizedBox(
-                  height: 2.0,
-                ));
-                children.add(CommonAutoSizeText(
-                  tile.subtitle!,
-                  style: const TextStyle(fontSize: AppFontSize.minFontSize),
-                ));
-              }
-              var thumbnail = Container(
-                  decoration: tile.selected ?? false
-                      ? BoxDecoration(
-                          border: Border.all(width: 2, color: myself.primary))
-                      : null,
-                  padding: EdgeInsets.zero,
-                  child: Card(
-                      elevation: 0.0,
-                      margin: EdgeInsets.zero,
-                      shape: const ContinuousRectangleBorder(),
-                      child: Stack(
-                        children: [
-                          tile.prefix ?? Container(),
-                          Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: children)
-                        ],
-                      )));
-              thumbnails.add(thumbnail);
             }
-
-            return GridView.builder(
-                itemCount: tileData.length,
-                //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    //横轴元素个数
-                    crossAxisCount: crossAxisCount,
-                    //纵轴间距
-                    mainAxisSpacing: 4.0,
-                    //横轴间距
-                    crossAxisSpacing: 4.0,
-                    //子组件宽高长度比例
-                    childAspectRatio: 1),
-                itemBuilder: (BuildContext context, int index) {
-                  //Widget Function(BuildContext context, int index)
-                  return InkWell(
-                      child: thumbnails[index],
-                      onTap: () {
-                        widget.playlistController.currentIndex = index;
-                        if (widget.onSelected != null) {
-                          widget.onSelected!(index, tileData[index].title);
-                        }
-                      });
-                });
-          } else {
-            return DataListView(
-              onTap: (int index, String title,
-                  {TileData? group, String? subtitle}) {
-                widget.playlistController.currentIndex = index;
-                if (widget.onSelected != null) {
-                  widget.onSelected!(index, title);
-                }
-              },
-              itemCount: tileData.length,
-              itemBuilder: (BuildContext context, int index) {
-                return tileData[index];
-              },
-            );
+            var thumbnail = Container(
+                decoration: tile.selected ?? false
+                    ? BoxDecoration(
+                        border: Border.all(width: 2, color: myself.primary))
+                    : null,
+                padding: EdgeInsets.zero,
+                child: Card(
+                    elevation: 0.0,
+                    margin: EdgeInsets.zero,
+                    shape: const ContinuousRectangleBorder(),
+                    child: Stack(
+                      children: [
+                        tile.prefix ?? Container(),
+                        Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: children)
+                      ],
+                    )));
+            thumbnails.add(thumbnail);
           }
+          return ValueListenableBuilder(
+              valueListenable: gridMode,
+              builder: (BuildContext context, gridMode, Widget? child) {
+                if (gridMode) {
+                  return GridView.builder(
+                      itemCount: tileData.length,
+                      //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          //横轴元素个数
+                          crossAxisCount: crossAxisCount,
+                          //纵轴间距
+                          mainAxisSpacing: 4.0,
+                          //横轴间距
+                          crossAxisSpacing: 4.0,
+                          //子组件宽高长度比例
+                          childAspectRatio: 1),
+                      itemBuilder: (BuildContext context, int index) {
+                        //Widget Function(BuildContext context, int index)
+                        return InkWell(
+                            child: thumbnails[index],
+                            onTap: () {
+                              playlistController.currentIndex = index;
+                              if (onSelected != null) {
+                                onSelected!(index, tileData[index].title);
+                              }
+                            });
+                      });
+                } else {
+                  return DataListView(
+                    onTap: (int index, String title,
+                        {TileData? group, String? subtitle}) {
+                      playlistController.currentIndex = index;
+                      if (onSelected != null) {
+                        onSelected!(index, title);
+                      }
+                    },
+                    itemCount: tileData.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return tileData[index];
+                    },
+                  );
+                }
+              });
         });
   }
 
   ///选择文件加入播放列表
-  _addMediaSource({bool directory = false}) async {
+  _addMediaSource(BuildContext context, {bool directory = false}) async {
     try {
-      List<PlatformMediaSource> mediaSources = await widget.playlistController
-          .sourceFilePicker(directory: directory);
+      List<PlatformMediaSource> mediaSources =
+          await playlistController.sourceFilePicker(directory: directory);
     } catch (e) {
-      if (mounted) {
-        DialogUtil.error(context, content: 'add media file failure:$e');
-      }
+      DialogUtil.error(context, content: 'add media file failure:$e');
     }
   }
 
   _removeFromCollect(int index) async {
-    PlatformMediaSource mediaSource =
-        widget.playlistController.delete(index: index);
+    PlatformMediaSource mediaSource = playlistController.delete(index: index);
     var messageId = mediaSource.messageId;
     if (messageId != null) {
       chatMessageService.delete(where: 'messageId=?', whereArgs: [messageId]);
@@ -370,7 +359,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
 
   ///将播放列表的文件加入收藏
   _collectMediaSource(int index) async {
-    PlatformMediaSource? mediaSource = widget.playlistController.get(index);
+    PlatformMediaSource? mediaSource = playlistController.get(index);
     if (mediaSource == null) {
       return;
     }
@@ -386,7 +375,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
     // ChatMessageMimeType? chatMessageMimeType =
     //     StringUtil.enumFromString<ChatMessageMimeType>(
     //         ChatMessageMimeType.values, mediaFormat);
-    String fileType = widget.playlistController.fileType.name;
+    String fileType = playlistController.fileType.name;
     ChatMessageContentType? contentType =
         StringUtil.enumFromString(ChatMessageContentType.values, fileType);
     contentType = contentType ?? ChatMessageContentType.media;
@@ -410,14 +399,16 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           children: [
             IconButton(
               color: myself.primary,
-              icon: Icon(
-                gridMode ? Icons.list : Icons.grid_on,
-                color: Colors.white,
-              ),
+              icon: ValueListenableBuilder(
+                  valueListenable: gridMode,
+                  builder: (BuildContext context, gridMode, Widget? child) {
+                    return Icon(
+                      gridMode ? Icons.list : Icons.grid_on,
+                      color: Colors.white,
+                    );
+                  }),
               onPressed: () {
-                setState(() {
-                  gridMode = !gridMode;
-                });
+                gridMode.value = !gridMode.value;
               },
               tooltip: AppLocalizations.t('Toggle grid mode'),
             ),
@@ -428,7 +419,8 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                 color: Colors.white,
               ),
               onPressed: () async {
-                _addMediaSource(directory: true);
+                await _addMediaSource(context, directory: true);
+                _buildTileData(context);
               },
               tooltip: AppLocalizations.t('Add video directory'),
             ),
@@ -439,7 +431,8 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                 color: Colors.white,
               ),
               onPressed: () async {
-                _addMediaSource();
+                await _addMediaSource(context);
+                _buildTileData(context);
               },
               tooltip: AppLocalizations.t('Add video file'),
             ),
@@ -450,7 +443,8 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                 color: Colors.white,
               ),
               onPressed: () async {
-                await widget.playlistController.clear();
+                await playlistController.clear();
+                _buildTileData(context);
               },
               tooltip: AppLocalizations.t('Remove all video file'),
             ),
@@ -461,8 +455,9 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                 color: Colors.white, //myself.primary,
               ),
               onPressed: () async {
-                var currentIndex = widget.playlistController.currentIndex;
-                await widget.playlistController.delete(index: currentIndex);
+                var currentIndex = playlistController.currentIndex;
+                await playlistController.delete(index: currentIndex);
+                _buildTileData(context);
               },
               tooltip: AppLocalizations.t('Remove video file'),
             ),
@@ -489,7 +484,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                 color: Colors.white, //myself.primary,
               ),
               onPressed: () async {
-                var currentIndex = widget.playlistController.currentIndex;
+                var currentIndex = playlistController.currentIndex;
                 await _collectMediaSource(currentIndex);
               },
               tooltip: AppLocalizations.t('Collect video file'),
@@ -501,7 +496,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                 color: Colors.white, //myself.primary,
               ),
               onPressed: () async {
-                var currentIndex = widget.playlistController.currentIndex;
+                var currentIndex = playlistController.currentIndex;
                 await _removeFromCollect(currentIndex);
               },
               tooltip: AppLocalizations.t('Remove collect file'),
@@ -514,6 +509,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
 
   @override
   Widget build(BuildContext context) {
+    _buildTileData(context);
     return Column(children: [
       _buildPlaylistButton(context),
       Expanded(
@@ -530,11 +526,5 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                 return playlist;
               })),
     ]);
-  }
-
-  @override
-  void dispose() {
-    widget.playlistController.removeListener(_update);
-    super.dispose();
   }
 }

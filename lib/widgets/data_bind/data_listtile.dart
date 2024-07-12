@@ -30,6 +30,7 @@ class TileData {
 
   //缺省行为，为空的时候，是打上选择标志，颜色变化
   Function(int index, String title, {String? subtitle})? onTap;
+  Function(int index, String title, {String? subtitle})? onLongPress;
 
   List<TileData>? slideActions;
   List<TileData>? endSlideActions;
@@ -44,7 +45,8 @@ class TileData {
       this.dense = true,
       this.selected = false,
       this.isThreeLine = false,
-      this.onTap});
+      this.onTap,
+      this.onLongPress});
 
   static TileData of(TileDataMixin mixin, {bool dense = false}) {
     return TileData(
@@ -119,6 +121,7 @@ class DataListTile extends StatelessWidget {
   ///回调函数有两个，一个构造函数传入的成员变量，用于处理高亮显示
   ///二是数据项里面定义的，用于自定义的后续任务
   final Function(int index, String title, {String? subtitle})? onTap;
+  final Function(int index, String title, {String? subtitle})? onLongPress;
 
   const DataListTile({
     super.key,
@@ -127,6 +130,7 @@ class DataListTile extends StatelessWidget {
     required this.tileData,
     this.index = 0,
     this.onTap,
+    this.onLongPress,
     this.contentPadding,
     this.horizontalTitleGap,
     this.minVerticalPadding,
@@ -234,6 +238,18 @@ class DataListTile extends StatelessWidget {
               ///如果路由名称存在，点击会调用路由
               if (tileData.routeName != null) {
                 indexWidgetProvider.push(tileData.routeName!, context: context);
+              }
+            }
+          : null,
+      onLongPress: onLongPress != null || tileData.onLongPress != null
+          ? () async {
+              var fn = onLongPress;
+              if (fn != null) {
+                await fn(index, tileData.title, subtitle: tileData.subtitle);
+              }
+              fn = tileData.onLongPress;
+              if (fn != null) {
+                await fn(index, tileData.title, subtitle: tileData.subtitle);
               }
             }
           : null,

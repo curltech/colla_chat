@@ -13,8 +13,6 @@ import 'package:colla_chat/tool/ffmpeg/ffmpeg_helper.dart';
 import 'package:colla_chat/tool/ffmpeg/ffmpeg_install_widget.dart';
 import 'package:colla_chat/tool/ffmpeg_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/tool/image_util.dart';
-import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -22,21 +20,25 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
+import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:ffmpeg_kit_flutter/media_information.dart';
 import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'package:ffmpeg_kit_flutter/session_state.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-DataListController<String> mediaFileController = DataListController<String>();
+DataListController<PlatformMediaSource> mediaFileController =
+    DataListController<PlatformMediaSource>();
 
-class FFMpegMediaWidget extends StatefulWidget with TileDataMixin {
+class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
   FFMpegMediaWidget({
     super.key,
-  });
-
-  @override
-  State createState() => _FFMpegMediaWidgetState();
+  }) {
+    allowedExtensions.addAll(videoExtensions);
+    allowedExtensions.addAll(audioExtensions);
+    allowedExtensions.addAll(imageExtensions);
+    checkFFMpeg();
+  }
 
   @override
   String get routeName => 'ffmpeg_media';
@@ -49,9 +51,7 @@ class FFMpegMediaWidget extends StatefulWidget with TileDataMixin {
 
   @override
   bool get withLeading => true;
-}
 
-class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
   final FileType fileType = FileType.custom;
   final Set<String> videoExtensions = {
     'mp4',
@@ -80,25 +80,11 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
   };
   ValueNotifier<bool> ffmpegPresent = ValueNotifier<bool>(false);
   String? output;
-  bool gridMode = false;
+  ValueNotifier<bool> gridMode = ValueNotifier<bool>(false);
   ValueNotifier<List<TileData>> tileData = ValueNotifier<List<TileData>>([]);
 
   final Set<String> allowedExtensions = {};
   Map<String, FFMpegHelperSession> ffmpegSessions = {};
-
-  @override
-  void initState() {
-    super.initState();
-    mediaFileController.addListener(_update);
-    allowedExtensions.addAll(videoExtensions);
-    allowedExtensions.addAll(audioExtensions);
-    allowedExtensions.addAll(imageExtensions);
-    checkFFMpeg();
-  }
-
-  _update() {
-    _buildTileData();
-  }
 
   Future<bool> checkFFMpeg() async {
     ffmpegPresent.value = await FFMpegHelper.initialize();
@@ -106,7 +92,8 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
     return ffmpegPresent.value;
   }
 
-  _onSelectFile(int index, String filename, {String? subtitle}) async {
+  _onSelectFile(BuildContext context, int index, String filename,
+      {String? subtitle}) async {
     List<ActionData> filePopActionData = [];
     String? mimeType = FileUtil.mimeType(filename);
     if (mimeType != null) {
@@ -123,7 +110,7 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
         }
       } else if (mimeType.startsWith('audio')) {
         for (var audioExtension in audioExtensions) {
-          if (audioExtensions != mimeType) {
+          if (audioExtension != mimeType) {
             filePopActionData.add(
               ActionData(
                   label: audioExtension,
@@ -169,7 +156,7 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
   Future<String?> _onFilePopAction(
       BuildContext context, int index, String label,
       {String? value}) async {
-    String? filename = mediaFileController.current;
+    String? filename = mediaFileController.current?.filename;
     if (filename == null) {
       return null;
     }
@@ -183,10 +170,10 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
     );
     FFMpegHelperSession session = await FFMpegHelper.runAsync([command],
         completeCallback: (FFMpegHelperSession session) async {
-      _buildTileData();
+      _buildTileData(context);
     });
     ffmpegSessions[filename] = session;
-    _buildTileData();
+    _buildTileData(context);
     List<ReturnCode?> returnCode = await session.getReturnCode();
     bool? success = returnCode.firstOrNull?.isValueSuccess();
     if (success != null && success) {
@@ -196,10 +183,11 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
     return null;
   }
 
-  Future<void> _buildTileData() async {
-    List<String> filenames = mediaFileController.data.toList();
+  Future<void> _buildTileData(BuildContext context) async {
+    List<PlatformMediaSource> mediaSources = mediaFileController.data.toList();
     List<TileData> tileData = [];
-    for (var filename in filenames) {
+    for (var mediaSource in mediaSources) {
+      String filename = mediaSource.filename;
       File file = File(filename);
       bool exist = file.existsSync();
       if (!exist) {
@@ -207,43 +195,13 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
       }
       var length = file.lengthSync();
       bool selected = false;
-      String? current = mediaFileController.current;
+      String? current = mediaFileController.current?.filename;
       if (current != null) {
         if (current == filename) {
           selected = true;
         }
       }
-      Widget? thumbnailWidget;
-      String? mimeType = FileUtil.mimeType(filename);
-      if (mimeType != null) {
-        if (mimeType.startsWith('video')) {
-          try {
-            Uint8List? data;
-            if (filename.endsWith('mp4')) {
-              data = await VideoUtil.getByteThumbnail(videoFile: filename);
-            } else {
-              data = await FFMpegUtil.thumbnail(videoFile: filename);
-            }
-            if (data != null) {
-              thumbnailWidget = ImageUtil.buildMemoryImageWidget(
-                data,
-                fit: BoxFit.cover,
-              );
-            }
-          } catch (e) {
-            logger.e('thumbnailData failure:$e');
-          }
-        } else if (mimeType.startsWith('audio')) {
-        } else if (mimeType.startsWith('image')) {
-          Uint8List? data = await FileUtil.readFileAsBytes(filename);
-          if (data != null) {
-            thumbnailWidget = ImageUtil.buildMemoryImageWidget(
-              data,
-              fit: BoxFit.cover,
-            );
-          }
-        }
-      }
+      Widget? thumbnailWidget = mediaSource.thumbnailWidget;
       FFMpegHelperSession? session = ffmpegSessions[filename];
       Widget? suffix;
       if (session != null) {
@@ -281,7 +239,15 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
         subtitle: '$length',
         selected: selected,
         suffix: suffix,
-        onTap: _onSelectFile,
+        onTap: (int index, String title, {String? subtitle}) {
+          mediaFileController.currentIndex = index;
+          _buildTileData(context);
+        },
+        onLongPress: (int index, String title, {String? subtitle}) {
+          mediaFileController.currentIndex = index;
+          _buildTileData(context);
+          _onSelectFile(context, index, title, subtitle: subtitle);
+        },
       );
       tileData.add(tile);
       tile.endSlideActions = [
@@ -305,12 +271,12 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
     this.tileData.value = tileData;
   }
 
-  List<Widget>? _buildRightWidgets() {
+  List<Widget>? _buildRightWidgets(BuildContext context) {
     List<Widget> children = [];
     children.add(IconButton(
       tooltip: AppLocalizations.t('information'),
       onPressed: () async {
-        String? current = mediaFileController.current;
+        String? current = mediaFileController.current?.filename;
         if (current != null) {
           MediaInformation? info =
               await FFMpegUtil.getMediaInformation(current);
@@ -379,7 +345,8 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
         });
   }
 
-  Future<void> filePicker({
+  Future<void> filePicker(
+    BuildContext context, {
     String? dialogTitle,
     bool directory = false,
     String? initialDirectory,
@@ -408,12 +375,15 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
             }
             bool? contain = this.allowedExtensions.contains(extension);
             if (contain) {
-              mediaFileController.add(entry.path, notify: false);
+              PlatformMediaSource? mediaSource =
+                  await PlatformMediaSource.media(filename: entry.path);
+              if (mediaSource != null) {
+                mediaFileController.add(mediaSource, notify: false);
+              }
             }
           }
           mediaFileController.currentIndex =
               mediaFileController.data.length - 1;
-          mediaFileController.notifyListeners();
         }
       }
     } else {
@@ -426,22 +396,23 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
           if (mediaFileController.data.contains(xfile.path)) {
             continue;
           }
-          mediaFileController.add(xfile.path, notify: false);
+          PlatformMediaSource? mediaSource =
+              await PlatformMediaSource.media(filename: xfile.path);
+          if (mediaSource != null) {
+            mediaFileController.add(mediaSource, notify: false);
+          }
         }
         mediaFileController.currentIndex = mediaFileController.data.length - 1;
-        mediaFileController.notifyListeners();
       }
     }
   }
 
   ///选择文件加入播放列表
-  _addFiles({bool directory = false}) async {
+  _addFiles(BuildContext context, {bool directory = false}) async {
     try {
-      await filePicker(directory: directory);
+      await filePicker(context, directory: directory);
     } catch (e) {
-      if (mounted) {
-        DialogUtil.error(context, content: 'add media file failure:$e');
-      }
+      DialogUtil.error(context, content: 'add media file failure:$e');
     }
   }
 
@@ -454,14 +425,17 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
           children: [
             IconButton(
               color: myself.primary,
-              icon: Icon(
-                gridMode ? Icons.list : Icons.grid_on,
-                color: Colors.white,
+              icon: ValueListenableBuilder(
+                valueListenable: gridMode,
+                builder: (BuildContext context, value, Widget? child) {
+                  return Icon(
+                    gridMode.value ? Icons.list : Icons.grid_on,
+                    color: Colors.white,
+                  );
+                },
               ),
               onPressed: () {
-                setState(() {
-                  gridMode = !gridMode;
-                });
+                gridMode.value = !gridMode.value;
               },
               tooltip: AppLocalizations.t('Toggle grid mode'),
             ),
@@ -472,7 +446,8 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
                 color: Colors.white,
               ),
               onPressed: () async {
-                _addFiles(directory: true);
+                await _addFiles(context, directory: true);
+                _buildTileData(context);
               },
               tooltip: AppLocalizations.t('Add media directory'),
             ),
@@ -483,7 +458,8 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
                 color: Colors.white,
               ),
               onPressed: () async {
-                _addFiles();
+                await _addFiles(context);
+                _buildTileData(context);
               },
               tooltip: AppLocalizations.t('Add media file'),
             ),
@@ -496,6 +472,7 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
               onPressed: () async {
                 ffmpegSessions.clear();
                 await mediaFileController.clear();
+                _buildTileData(context);
               },
               tooltip: AppLocalizations.t('Remove all media file'),
             ),
@@ -510,6 +487,7 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
                 if (currentIndex != -1) {
                   ffmpegSessions.remove(mediaFileController.current);
                   await mediaFileController.delete(index: currentIndex);
+                  _buildTileData(context);
                 }
               },
               tooltip: AppLocalizations.t('Remove media file'),
@@ -532,82 +510,94 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
           }
           int crossAxisCount = 3;
           List<Widget> thumbnails = [];
-          if (gridMode) {
-            for (var tile in tileData) {
-              List<Widget> children = [];
-              children.add(const Spacer());
+          for (var tile in tileData) {
+            List<Widget> children = [];
+            children.add(const Spacer());
+            children.add(CommonAutoSizeText(
+              tile.title,
+              style: const TextStyle(fontSize: AppFontSize.minFontSize),
+            ));
+            if (tile.subtitle != null) {
+              children.add(const SizedBox(
+                height: 2.0,
+              ));
               children.add(CommonAutoSizeText(
-                tile.title,
+                tile.subtitle!,
                 style: const TextStyle(fontSize: AppFontSize.minFontSize),
               ));
-              if (tile.subtitle != null) {
-                children.add(const SizedBox(
-                  height: 2.0,
-                ));
-                children.add(CommonAutoSizeText(
-                  tile.subtitle!,
-                  style: const TextStyle(fontSize: AppFontSize.minFontSize),
-                ));
-              }
-              var thumbnail = Container(
-                  decoration: tile.selected ?? false
-                      ? BoxDecoration(
-                          border: Border.all(width: 2, color: myself.primary))
-                      : null,
-                  padding: EdgeInsets.zero,
-                  child: Card(
-                      elevation: 0.0,
-                      margin: EdgeInsets.zero,
-                      shape: const ContinuousRectangleBorder(),
-                      child: Stack(
-                        children: [
-                          tile.prefix ?? Container(),
-                          Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: children)
-                        ],
-                      )));
-              thumbnails.add(thumbnail);
             }
-
-            return GridView.builder(
-                itemCount: tileData.length,
-                //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    //横轴元素个数
-                    crossAxisCount: crossAxisCount,
-                    //纵轴间距
-                    mainAxisSpacing: 4.0,
-                    //横轴间距
-                    crossAxisSpacing: 4.0,
-                    //子组件宽高长度比例
-                    childAspectRatio: 1),
-                itemBuilder: (BuildContext context, int index) {
-                  //Widget Function(BuildContext context, int index)
-                  return InkWell(
-                      child: thumbnails[index],
-                      onTap: () {
-                        mediaFileController.currentIndex = index;
-                        var title = tileData[index].title;
-                        var fn = tileData[index].onTap;
-                        if (fn != null) {
-                          fn(index, title);
-                        }
-                      });
-                });
-          } else {
-            return DataListView(
-              onTap: (int index, String title,
-                  {TileData? group, String? subtitle}) {
-                mediaFileController.currentIndex = index;
-              },
-              itemCount: tileData.length,
-              itemBuilder: (BuildContext context, int index) {
-                return tileData[index];
-              },
-            );
+            var thumbnail = Container(
+                decoration: tile.selected ?? false
+                    ? BoxDecoration(
+                        border: Border.all(width: 2, color: myself.primary))
+                    : null,
+                padding: EdgeInsets.zero,
+                child: Card(
+                    elevation: 0.0,
+                    margin: EdgeInsets.zero,
+                    shape: const ContinuousRectangleBorder(),
+                    child: Stack(
+                      children: [
+                        tile.prefix ?? Container(),
+                        Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: children)
+                      ],
+                    )));
+            thumbnails.add(thumbnail);
           }
+          return ValueListenableBuilder(
+            valueListenable: gridMode,
+            builder: (BuildContext context, gridMode, Widget? child) {
+              if (gridMode) {
+                return GridView.builder(
+                    itemCount: tileData.length,
+                    //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        //横轴元素个数
+                        crossAxisCount: crossAxisCount,
+                        //纵轴间距
+                        mainAxisSpacing: 4.0,
+                        //横轴间距
+                        crossAxisSpacing: 4.0,
+                        //子组件宽高长度比例
+                        childAspectRatio: 1),
+                    itemBuilder: (BuildContext context, int index) {
+                      //Widget Function(BuildContext context, int index)
+                      return InkWell(
+                          child: thumbnails[index],
+                          onTap: () {
+                            mediaFileController.currentIndex = index;
+                            var title = tileData[index].title;
+                            var fn = tileData[index].onTap;
+                            if (fn != null) {
+                              fn(index, title);
+                            }
+                          },
+                          onLongPress: () {
+                            mediaFileController.currentIndex = index;
+                            var title = tileData[index].title;
+                            var fn = tileData[index].onLongPress;
+                            if (fn != null) {
+                              fn(index, title);
+                            }
+                          });
+                    });
+              } else {
+                return DataListView(
+                  onTap: (int index, String title,
+                      {TileData? group, String? subtitle}) {
+                    mediaFileController.currentIndex = index;
+                  },
+                  itemCount: tileData.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return tileData[index];
+                  },
+                );
+              }
+            },
+          );
         });
   }
 
@@ -632,11 +622,11 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
 
   @override
   Widget build(BuildContext context) {
-    _buildTileData();
-    List<Widget>? rightWidgets = _buildRightWidgets();
+    _buildTileData(context);
+    List<Widget>? rightWidgets = _buildRightWidgets(context);
 
     return AppBarView(
-      title: widget.title,
+      title: title,
       withLeading: true,
       rightWidgets: rightWidgets,
       child: ValueListenableBuilder(
@@ -653,11 +643,5 @@ class _FFMpegMediaWidgetState extends State<FFMpegMediaWidget> {
         },
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    mediaFileController.removeListener(_update);
-    super.dispose();
   }
 }

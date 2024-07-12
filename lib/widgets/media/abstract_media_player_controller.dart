@@ -133,24 +133,33 @@ class PlatformMediaSource {
           mediaSourceType: MediaSourceType.file,
           mediaFormat: mediaFormat == null ? extension : mediaFormat.name);
       String? mimeType = FileUtil.mimeType(filename);
-      if (mimeType != null && mimeType.startsWith('video')) {
-        try {
-          Uint8List? data;
-          if (filename.endsWith('mp4')) {
-            data = await VideoUtil.getByteThumbnail(videoFile: filename);
-          } else {
-            data = await FFMpegUtil.thumbnail(videoFile: filename);
+      if (mimeType != null) {
+        if (mimeType.startsWith('video')) {
+          try {
+            Uint8List? data;
+            if (filename.endsWith('mp4')) {
+              data = await VideoUtil.getByteThumbnail(videoFile: filename);
+            } else {
+              data = await FFMpegUtil.thumbnail(videoFile: filename);
+            }
+            if (data != null) {
+              mediaSource.thumbnailWidget = ImageUtil.buildMemoryImageWidget(
+                data,
+                fit: BoxFit.cover,
+              );
+            }
+          } catch (e) {
+            logger.e('thumbnailData failure:$e');
           }
+        } else if (mimeType.startsWith('audio')) {
+        } else if (mimeType.startsWith('image')) {
+          Uint8List? data = await FileUtil.readFileAsBytes(filename);
           if (data != null) {
-            mediaSource.thumbnail ??= data;
-            Widget? thumbnailWidget = ImageUtil.buildMemoryImageWidget(
+            mediaSource.thumbnailWidget = ImageUtil.buildMemoryImageWidget(
               data,
               fit: BoxFit.cover,
             );
-            mediaSource.thumbnailWidget ??= thumbnailWidget;
           }
-        } catch (e) {
-          logger.e('thumbnailData failure:$e');
         }
       }
     }
