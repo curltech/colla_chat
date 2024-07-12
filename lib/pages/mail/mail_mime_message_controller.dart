@@ -664,7 +664,7 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     return null;
   }
 
-  ///解密标题和文本
+  /// 解密标题和文本
   Future<DecryptedMimeMessage> decryptMimeMessage(
       MimeMessage mimeMessage) async {
     String? subjects = mimeMessage.decodeSubject();

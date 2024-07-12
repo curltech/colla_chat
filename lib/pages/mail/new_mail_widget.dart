@@ -301,7 +301,6 @@ class _NewMailWidgetState extends State<NewMailWidget> {
 
     List<int>? secretKey;
     if (needEncrypt) {
-      builder.addHeader('Encrypted', true.toString());
       peerIds = [...peerIds];
       if (!peerIds.contains(myself.peerId)) {
         peerIds.add(myself.peerId!);

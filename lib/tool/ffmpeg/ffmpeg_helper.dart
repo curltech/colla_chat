@@ -435,30 +435,40 @@ class FFMpegHelper {
   /// 容器格式：MP4，MKV，WebM，AVI
   /// 视频格式 libx264，libx265，H.262，H.264，H.265，VP8，VP9，AV1，NVENC，libvpx，libaom
   /// 音频格式 MP3，AAC，libfdk-aac
+  /// 视频拼接：-i 1.mp4 -i 2.mp4 -i 3.mp4 -filter_complex '[0:0][0:1] [1:0][1:1] [2:0][2:1] concat=n=3:v=1:a=1 [v][a]' -map '[v]' -map '[a]’  output.mp4
+  /// [0:0][0:1] [1:0][1:1] [2:0][2:1] 输入文件的视频、音频
+  /// 4个视频2x2方式排列 -i 0.mp4 -i 1.mp4 -i 2.mp4 -i 3.mp4 -filter_complex "[0:v]pad=iw*2:ih*2[a];[a][1:v]overlay=w[b];[b][2:v]overlay=0:h[c];[c][3:v]overlay=w:h" out.mp4
+  /// 竖向拼接2个视频 -i 0.mp4 -i 1.mp4 -filter_complex "[0:v]pad=iw:ih*2[a];[a][1:v]overlay=0:h" out_2.mp4
+  /// 横向拼接3个视频 -i 0.mp4 -i 1.mp4 -i 2.mp4 -filter_complex "[0:v]pad=iw*3:ih*1[a];[a][1:v]overlay=w[b];[b][2:v]overlay=2.0*w" out_v3.mp4
   static String buildCommand({
-    String? input,
-    String? output,
-    String? inputCv,
-    String? inputCa,
+    String? input, //输入文件，-i
+    String? output, //输出文件
+    String? inputCv, //输入视频编码器libx264，libx265，H.262，H.264，H.265
+    String? inputCa, //输入音频编码器
     String? outputCv,
     String? outputCa,
     String?
         preset, //ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow
-    String? minrate,
-    String? maxrate,
-    String? bufsize,
-    String? scale,
-    String? ss, //截取图片时间
+    String? minrate, //最小码率为964K
+    String? maxrate, //最大为3856K
+    String? bufsize, //缓冲区大小2000K
+    String? scale, //改变分辨率，640:-2 640宽，高度-2表示自动计算；iw/2:ih/2缩小一半；iw*0.9:ih*0.9原大小的0.9
+    String? ss, //截取图片视频的开始时间
+    String? to,//截取视频的结束时间
     String? vframes, //截取图片帧数
     bool? update,
-    String? qv,
+    String? crf, //控制转码，取值范围为 0~51，其中0为无损模式，18~28是一个合理的范围，数值越大，画质越差
+    String? qv, //图片质量
+    String? aspect, //16:9视频屏宽比
+    String? vcodec, //输出的编码h264，mpeg4，copy不重新编码
+    String? s, //-s 320x240, 视频分辨率
   } //截取图片质量，1到5x
       ) {
     List<String> args = ['-y'];
 
     if (ss != null) args.add('-ss $ss');
+    if (to != null) args.add('-to $to');
     if (preset != null) args.add('-pre $preset');
-    if (scale != null) args.add('-vf scale=$scale:-1');
     if (minrate != null) args.add('-minrate $minrate');
     if (maxrate != null) args.add('-maxrate $maxrate');
     if (bufsize != null) args.add('-bufsize $bufsize');
@@ -476,6 +486,11 @@ class FFMpegHelper {
     if (vframes != null) args.add('-frames:v $vframes');
     if (update != null) args.add('-update $update');
     if (qv != null) args.add('-q:v $qv');
+    if (crf != null) args.add('-crf $crf');
+    if (scale != null) args.add('-vf scale=$scale');
+    if (aspect != null) args.add('-aspect $aspect');
+    if (vcodec != null) args.add('-vcodec $vcodec');
+    if (s != null) args.add('-s $s');
     if (output != null) {
       if (!output.contains(' ')) {
         args.add(output);

@@ -22,9 +22,7 @@ import 'package:flutter/material.dart';
 
 class PlaylistController extends DataListController<PlatformMediaSource> {
   FileType fileType = FileType.custom;
-  Set<String> allowedExtensions = {
-    'mp3',
-    'wav',
+  final Set<String> videoExtensions = {
     'mp4',
     '3gp',
     'm4a',
@@ -35,8 +33,27 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
     'avi',
     'wmv',
     'mkv',
-    'mpg'
+    'mpg',
   };
+  final Set<String> audioExtensions = {
+    'mp3',
+    'wav',
+    'mp4',
+    'm4a',
+  };
+  final Set<String> imageExtensions = {
+    'jpg',
+    'png',
+    'bmp',
+    'webp',
+  };
+  final Set<String> allowedExtensions = {};
+
+  PlaylistController() {
+    allowedExtensions.addAll(videoExtensions);
+    allowedExtensions.addAll(audioExtensions);
+    allowedExtensions.addAll(imageExtensions);
+  }
 
   previous() async {
     if (currentIndex <= 0) {
@@ -122,6 +139,11 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
     bool withReadStream = false,
     bool lockParentWindow = false,
   }) async {
+    Set<String> allowedExtensions = {};
+    allowedExtensions.addAll(this.allowedExtensions);
+    for (var allowedExtension in this.allowedExtensions) {
+      allowedExtensions.add(allowedExtension.toUpperCase());
+    }
     List<PlatformMediaSource> mediaSources = [];
     if (directory) {
       String? path = await FileUtil.directoryPathPicker(
@@ -135,7 +157,7 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
             if (extension == null) {
               continue;
             }
-            bool? contain = this.allowedExtensions.contains(extension);
+            bool? contain = allowedExtensions.contains(extension);
             if (contain) {
               PlatformMediaSource? mediaSource =
                   await addMediaFile(filename: entry.path);
@@ -151,7 +173,7 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
       final xfiles = await FileUtil.pickFiles(
           allowMultiple: allowMultiple,
           type: fileType,
-          allowedExtensions: this.allowedExtensions.toList());
+          allowedExtensions: allowedExtensions.toList());
       if (xfiles.isNotEmpty) {
         for (var xfile in xfiles) {
           PlatformMediaSource? mediaSource =

@@ -34,9 +34,6 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
   FFMpegMediaWidget({
     super.key,
   }) {
-    allowedExtensions.addAll(videoExtensions);
-    allowedExtensions.addAll(audioExtensions);
-    allowedExtensions.addAll(imageExtensions);
     checkFFMpeg();
   }
 
@@ -53,37 +50,11 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
   bool get withLeading => true;
 
   final FileType fileType = FileType.custom;
-  final Set<String> videoExtensions = {
-    'mp4',
-    '3gp',
-    'm4a',
-    'mov',
-    'mpeg',
-    'aac',
-    'rmvb',
-    'avi',
-    'wmv',
-    'mkv',
-    'mpg',
-  };
-  final Set<String> audioExtensions = {
-    'mp3',
-    'wav',
-    'mp4',
-    'm4a',
-  };
-  final Set<String> imageExtensions = {
-    'jpg',
-    'png',
-    'bmp',
-    'webp',
-  };
+
   ValueNotifier<bool> ffmpegPresent = ValueNotifier<bool>(false);
   String? output;
   ValueNotifier<bool> gridMode = ValueNotifier<bool>(false);
   ValueNotifier<List<TileData>> tileData = ValueNotifier<List<TileData>>([]);
-
-  final Set<String> allowedExtensions = {};
   Map<String, FFMpegHelperSession> ffmpegSessions = {};
 
   Future<bool> checkFFMpeg() async {
@@ -98,7 +69,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
     String? mimeType = FileUtil.mimeType(filename);
     if (mimeType != null) {
       if (mimeType.startsWith('video')) {
-        for (var videoExtension in videoExtensions) {
+        for (var videoExtension in mediaFileController.videoExtensions) {
           if (videoExtension != mimeType) {
             filePopActionData.add(
               ActionData(
@@ -109,7 +80,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
           }
         }
       } else if (mimeType.startsWith('audio')) {
-        for (var audioExtension in audioExtensions) {
+        for (var audioExtension in mediaFileController.audioExtensions) {
           if (audioExtension != mimeType) {
             filePopActionData.add(
               ActionData(
@@ -120,7 +91,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
           }
         }
       } else if (mimeType.startsWith('image')) {
-        for (var imageExtension in imageExtensions) {
+        for (var imageExtension in mediaFileController.imageExtensions) {
           if (imageExtension != mimeType) {
             filePopActionData.add(
               ActionData(
