@@ -6,6 +6,7 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/ffmpeg/ffmpeg_helper.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
@@ -189,20 +190,27 @@ class _VideoEditorWidgetState extends State<VideoEditorWidget> {
   }
 
   _buildVideoEditor(BuildContext context) {
-    String? current = imageFileController.current;
-    if (current == null) {
+    String? filename = imageFileController.current;
+    if (filename == null) {
       return Container();
     }
     return Column(children: [
       Expanded(
           child: ProImageEditor.file(
               key: UniqueKey(),
-              File(imageFileController.current!),
+              File(filename),
               callbacks: ProImageEditorCallbacks(
-                  onImageEditingComplete: (Uint8List bytes) async {},
-                  onCloseEditor: () {
-                    indexWidgetProvider.pop();
-                  }))),
+                  onImageEditingComplete: (Uint8List bytes) async {
+                String? name = await DialogUtil.showTextFormField(context,
+                    title: 'Save as', content: 'Filename', tip: filename);
+                if (name != null) {
+                  await FileUtil.writeFileAsBytes(bytes, name);
+                  DialogUtil.info(context,
+                      content: 'Save file:$name successfully');
+                }
+              }, onCloseEditor: () {
+                indexWidgetProvider.pop();
+              }))),
       _buildSeekBar(context),
       _buildImageSlide(context),
     ]);

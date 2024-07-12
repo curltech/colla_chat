@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
@@ -44,10 +45,6 @@ class MediaKitMediaSource {
 class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
   Player? player;
   VideoController? videoController;
-
-  // ValueNotifier<MeeduPlayerController?> meeduPlayerController =
-  //     ValueNotifier<MeeduPlayerController?>(null);
-
   double volume = 1.0;
   double speed = 1.0;
 
@@ -62,6 +59,8 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
   _init() {
     if (player == null) {
       player = Player();
+      // List<PlatformMediaSource> mediaSources=playlistController.data;
+      // Playlist playlist=MediaKitMediaSource.fromMediaSource(mediaSources);
       videoController = VideoController(player!);
       player!.stream.playlist.listen((e) {});
       player!.stream.playing.listen((e) {
@@ -137,40 +136,86 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
           if (filename != null) {
             Widget player = Video(
               controller: videoController!,
-              controls: MaterialVideoControls,
+              controls: AdaptiveVideoControls,
             );
-
-            player = MaterialVideoControlsTheme(
-              normal: MaterialVideoControlsThemeData(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 15.0, horizontal: 10.0),
-                volumeGesture: true,
-                brightnessGesture: true,
-                seekBarMargin: EdgeInsets.zero,
-                seekBarHeight: 2.4,
-                seekBarContainerHeight: 36.0,
-                seekBarColor: Colors.white,
-                seekBarPositionColor: myself.primary,
-                seekBarBufferColor: Colors.grey,
-                seekBarThumbSize: 15.0,
-                seekBarThumbColor: myself.primary,
-              ),
-              fullscreen: MaterialVideoControlsThemeData(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 15.0, horizontal: 10.0),
-                volumeGesture: true,
-                brightnessGesture: true,
-                seekBarMargin: EdgeInsets.zero,
-                seekBarHeight: 2.4,
-                seekBarContainerHeight: 36.0,
-                seekBarColor: Colors.white,
-                seekBarPositionColor: myself.primary,
-                seekBarBufferColor: Colors.grey,
-                seekBarThumbSize: 15.0,
-                seekBarThumbColor: myself.primary,
-              ),
-              child: player,
-            );
+            if (platformParams.desktop) {
+              player = MaterialDesktopVideoControlsTheme(
+                normal: MaterialDesktopVideoControlsThemeData(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 15.0, horizontal: 10.0),
+                  displaySeekBar: true,
+                  //搜索可见
+                  automaticallyImplySkipNextButton: true,
+                  automaticallyImplySkipPreviousButton: true,
+                  //左右双击搜索
+                  visibleOnMount: true,
+                  //刚开始可见
+                  seekBarMargin: EdgeInsets.zero,
+                  seekBarHeight: 2,
+                  seekBarContainerHeight: 36.0,
+                  seekBarColor: Colors.white,
+                  seekBarPositionColor: myself.primary,
+                  seekBarBufferColor: Colors.grey,
+                  seekBarThumbSize: 15.0,
+                  seekBarThumbColor: myself.primary,
+                ),
+                fullscreen: MaterialDesktopVideoControlsThemeData(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 15.0, horizontal: 10.0),
+                  seekBarMargin: EdgeInsets.zero,
+                  seekBarHeight: 2,
+                  seekBarContainerHeight: 36.0,
+                  seekBarColor: Colors.white,
+                  seekBarPositionColor: myself.primary,
+                  seekBarBufferColor: Colors.grey,
+                  seekBarThumbSize: 15.0,
+                  seekBarThumbColor: myself.primary,
+                ),
+                child: player,
+              );
+            } else {
+              player = MaterialVideoControlsTheme(
+                normal: MaterialVideoControlsThemeData(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 15.0, horizontal: 10.0),
+                  displaySeekBar: true,
+                  //搜索可见
+                  automaticallyImplySkipNextButton: true,
+                  automaticallyImplySkipPreviousButton: true,
+                  volumeGesture: true,
+                  //右边上下调音量
+                  brightnessGesture: true,
+                  //左边上下调亮度
+                  seekOnDoubleTap: true,
+                  //左右双击搜索
+                  visibleOnMount: true,
+                  //刚开始可见
+                  seekBarMargin: EdgeInsets.zero,
+                  seekBarHeight: 2,
+                  seekBarContainerHeight: 36.0,
+                  seekBarColor: Colors.white,
+                  seekBarPositionColor: myself.primary,
+                  seekBarBufferColor: Colors.grey,
+                  seekBarThumbSize: 15.0,
+                  seekBarThumbColor: myself.primary,
+                ),
+                fullscreen: MaterialVideoControlsThemeData(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 15.0, horizontal: 10.0),
+                  volumeGesture: true,
+                  brightnessGesture: true,
+                  seekBarMargin: EdgeInsets.zero,
+                  seekBarHeight: 2,
+                  seekBarContainerHeight: 36.0,
+                  seekBarColor: Colors.white,
+                  seekBarPositionColor: myself.primary,
+                  seekBarBufferColor: Colors.grey,
+                  seekBarThumbSize: 15.0,
+                  seekBarThumbColor: myself.primary,
+                ),
+                child: player,
+              );
+            }
             player = Stack(
               children: [
                 player,
