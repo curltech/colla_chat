@@ -715,5 +715,11 @@
   "encoders": "编码器",
   "decoders": "解码器",
   "help": "帮助",
-  "FfmpegVideo": "Ffmpeg媒体工具"
+  "FFMpegMedia": "Ffmpeg媒体工具",
+  "Poem": "诗词",
+  "Search condition": "搜索条件",
+  "Author": "作者",
+  "Rhythmic": "词牌",
+  "Dynasty": "朝代",
+  "Paragraphs": "内容"
 }

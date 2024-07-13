@@ -51,7 +51,7 @@ dependencies:
   #  app_to_foreground: ^0.0.3
   path_provider: ^2.0.11
   url_launcher: ^6.1.11 #打开系统浏览器
-  open_file: ^3.2.1 #打开文件, 和最新device_info有版本冲突
+  open_filex: ^4.4.0 #打开文件,
   camera_windows: ^0.2.1+9
   camera_linux: ^0.0.8
   camera_web: ^0.3.1+4
@@ -373,7 +373,7 @@ dependencies:
   flutter_native_splash: ^2.2.19
   system_tray: ^2.0.3
   tray_manager: ^0.2.0
-  livekit_client: ^2.2.0 #livekit sfu server flutter client
+  livekit_client: ^2.2.1 #livekit sfu server flutter client
   livekit_server_sdk: ^1.0.0
   langchain: ^0.7.1
   langchain_ollama: ^0.2.1+1
@@ -406,7 +406,7 @@ dependency_overrides:
   http: 1.2.0
   dart_webrtc: ^1.4.6+hotfix.1
   webrtc_interface: 1.2.0
-  flutter_webrtc: ^0.10.8
+  flutter_webrtc: ^0.11.3
   #flutter_callkit_incoming: ^2.0.1+2
   protobuf: ^3.1.0
   analyzer: ^6.5.0
@@ -427,8 +427,7 @@ dependency_overrides:
   sprintf: ^7.0.0
   flex_color_picker: ^3.5.0
   permission_handler: ^11.2.0
-  file_picker: ^8.0.3
-  #  file_picker_pro: ^1.4.0 #open_filex和open_file冲突
+  file_picker: ^8.0.6
   intl: ^0.19.0
   image: ^4.0.12
   camera: ^0.11.0 #调用相机
@@ -456,7 +455,7 @@ dependency_overrides:
   #      ref: master
   #      path: printing
   pdf: ^3.10.4 #所有平台，创建pdf
-  record: 5.1.1
+  record: 5.1.2
   record_darwin: 1.1.0
   secure_application: ^4.0.1
   visibility_detector: ^0.4.0+2 #组建可见性的大小发生变化

@@ -46,7 +46,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
     return filename;
   }
 
-  ///获取获取的解密数据在临时目录下附件的文件名称，
+  ///获取的解密数据在临时目录下附件的文件名称，
   Future<String?> getDecryptFilename(String messageId, String? title) async {
     String? filename;
     if (title != null) {

@@ -5,6 +5,7 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
+import 'package:colla_chat/widgets/media/video/mediakit_video_player.dart';
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
 import 'package:flutter/material.dart';
 
@@ -33,8 +34,8 @@ class VideoMessage extends StatefulWidget {
 
 class _VideoMessageState extends State<VideoMessage> {
   ///视频消息中用于播放视频的控制器和播放器
-  final OriginVideoPlayerController videoMessagePlayerController =
-      OriginVideoPlayerController(PlaylistController());
+  final MediaKitVideoPlayerController videoMessagePlayerController =
+      MediaKitVideoPlayerController(PlaylistController());
   late final PlatformMediaPlayer videoMessagePlayer;
   ValueNotifier<String?> filename = ValueNotifier<String?>(null);
 

@@ -4,6 +4,7 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/entity/poem/poem.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/poem/poem.dart';
@@ -236,8 +237,8 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
         }
         i++;
       }
-
-      List<String> paragraphs = poem.paragraphs!.split('。');
+      final reg = RegExp(r'[。|？|；|！|：]');
+      List<String> paragraphs = poem.paragraphs!.split(reg);
       List<Widget> paragraphWidgets = [];
       for (var paragraph in paragraphs) {
         paragraphWidgets.add(CommonAutoSizeText(
@@ -251,13 +252,15 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
             alignment: MainAxisAlignment.start,
             children: [
               IconButton(
+                  hoverColor: myself.primary,
                   onPressed: () {
                     swiperController.move(0);
                   },
                   icon: const Icon(Icons.keyboard_arrow_left))
             ],
           ),
-          Column(
+          Expanded(
+              child: Column(
             children: [
               ...titleWidgets,
               const SizedBox(
@@ -267,9 +270,17 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
               const SizedBox(
                 height: 15,
               ),
-              ...paragraphWidgets,
+              Expanded(
+                  child: SingleChildScrollView(
+                      child: SizedBox(
+                          width: appDataProvider.secondaryBodyWidth,
+                          child: Column(
+                            children: [
+                              ...paragraphWidgets,
+                            ],
+                          )))),
             ],
-          ),
+          )),
         ],
       );
     }
