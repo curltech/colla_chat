@@ -6,6 +6,7 @@ import 'package:archive/archive_io.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/tool/compress_file_util.dart';
 import 'package:colla_chat/tool/ffmpeg/base_ffmpeg_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:dio/dio.dart';
@@ -286,19 +287,6 @@ class FFMpegHelper {
     return exist;
   }
 
-  /// 解压缩安装文件
-  static Future<void> extractZipFileIsolate(Map data) async {
-    try {
-      String? zipFilePath = data['zipFile'];
-      String? targetPath = data['targetPath'];
-      if ((zipFilePath != null) && (targetPath != null)) {
-        await extractFileToDisk(zipFilePath, targetPath);
-      }
-    } catch (e) {
-      return;
-    }
-  }
-
   /// 在windows下安装ffmpeg
   static Future<bool> setupFFMpegOnWindows({
     CancelToken? cancelToken,
@@ -344,7 +332,7 @@ class FFMpegHelper {
               fileSize: 0,
               phase: DownloadProgressPhase.decompressing,
             ));
-            await compute(extractZipFileIsolate, {
+            await compute(CompressFileUtil.extractZipFileIsolate, {
               'zipFile': tempZipFile.path,
               'targetPath': _ffmpegInstallationPath,
             });
@@ -377,7 +365,7 @@ class FFMpegHelper {
           phase: DownloadProgressPhase.decompressing,
         ));
         try {
-          await compute(extractZipFileIsolate, {
+          await compute(CompressFileUtil.extractZipFileIsolate, {
             'zipFile': tempZipFile.path,
             'targetPath': _ffmpegInstallationPath,
           });

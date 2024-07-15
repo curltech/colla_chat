@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:archive/archive_io.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
+import 'package:colla_chat/tool/compress_file_util.dart';
 import 'package:colla_chat/tool/ffmpeg/ffmpeg_helper.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:dio/dio.dart';
@@ -167,19 +168,6 @@ class SherpaConfigUtil {
     return exist;
   }
 
-  /// 解压缩安装文件
-  static Future<void> extractZipFileIsolate(Map data) async {
-    try {
-      String? zipFilePath = data['zipFile'];
-      String? targetPath = data['targetPath'];
-      if ((zipFilePath != null) && (targetPath != null)) {
-        await extractFileToDisk(zipFilePath, targetPath);
-      }
-    } catch (e) {
-      return;
-    }
-  }
-
   static Future<bool> setupTtsModel({
     CancelToken? cancelToken,
     void Function(DownloadProgress progress)? onProgress,
@@ -224,7 +212,7 @@ class SherpaConfigUtil {
             fileSize: 0,
             phase: DownloadProgressPhase.decompressing,
           ));
-          await compute(extractZipFileIsolate, {
+          await compute(CompressFileUtil.extractZipFileIsolate, {
             'zipFile': tempZipFile.path,
             'targetPath': _ttsModelInstallationPath,
           });
@@ -257,7 +245,7 @@ class SherpaConfigUtil {
         phase: DownloadProgressPhase.decompressing,
       ));
       try {
-        await compute(extractZipFileIsolate, {
+        await compute(CompressFileUtil.extractZipFileIsolate, {
           'zipFile': tempZipFile.path,
           'targetPath': _ttsModelInstallationPath,
         });
