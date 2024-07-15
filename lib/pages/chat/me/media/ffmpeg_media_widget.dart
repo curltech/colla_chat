@@ -135,8 +135,6 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
     String output = '${filename.substring(0, pos)}.$label';
     String command = FFMpegHelper.buildCommand(
       input: filename,
-      vframes: '1',
-      update: true,
       output: output,
     );
     FFMpegHelperSession session = await FFMpegHelper.runAsync([command],

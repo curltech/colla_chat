@@ -452,9 +452,10 @@ class FFMpegHelper {
     String? minrate, //最小码率为964K
     String? maxrate, //最大为3856K
     String? bufsize, //缓冲区大小2000K
-    String? scale, //改变分辨率，640:-2 640宽，高度-2表示自动计算；iw/2:ih/2缩小一半；iw*0.9:ih*0.9原大小的0.9
+    String?
+        scale, //改变分辨率，640:-2 640宽，高度-2表示自动计算；iw/2:ih/2缩小一半；iw*0.9:ih*0.9原大小的0.9
     String? ss, //截取图片视频的开始时间
-    String? to,//截取视频的结束时间
+    String? to, //截取视频的结束时间
     String? vframes, //截取图片帧数
     bool? update,
     String? crf, //控制转码，取值范围为 0~51，其中0为无损模式，18~28是一个合理的范围，数值越大，画质越差
@@ -594,6 +595,11 @@ class FFMpegHelper {
       WorkerJob job = WorkerJob([ffmpeg, ...args],
           workingDirectory: Directory(_ffmpegBinDirectory!));
       jobs.add(job);
+    }
+    if (processPool.inProgressJobs > 0) {
+      logger
+          .e('Have inProgressJobs:${processPool.inProgressJobs}, wait and try');
+      throw 'Have inProgressJobs:${processPool.inProgressJobs}, wait and try';
     }
     Stream<WorkerJob> stream = processPool.startWorkers(jobs);
 

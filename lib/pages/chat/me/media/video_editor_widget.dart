@@ -94,11 +94,14 @@ class _VideoEditorWidgetState extends State<VideoEditorWidget> {
       );
       commands.add(command);
     }
-
-    await FFMpegHelper.runAsync(commands,
-        completeCallback: (FFMpegHelperSession session) async {
-      imageFileController.addAll(filenames, notify: true);
-    });
+    try {
+      await FFMpegHelper.runAsync(commands,
+          completeCallback: (FFMpegHelperSession session) async {
+        imageFileController.addAll(filenames, notify: true);
+      });
+    } catch (e) {
+      DialogUtil.error(context, content: '$e');
+    }
   }
 
   SliderThemeData _buildSliderTheme(BuildContext context) {
