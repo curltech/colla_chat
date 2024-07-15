@@ -59,6 +59,7 @@ class FFMpegHelperSession {
           state = SessionState.completed;
         } else {
           state = SessionState.failed;
+          logger.e(job.result.output);
         }
         completeCallback?.call(this);
       });

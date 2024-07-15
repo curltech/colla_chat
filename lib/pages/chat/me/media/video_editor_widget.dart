@@ -91,6 +91,7 @@ class _VideoEditorWidgetState extends State<VideoEditorWidget> {
         output: filename,
         ss: frameTime.toString(),
         vframes: '1',
+        update: true,
       );
       commands.add(command);
     }
