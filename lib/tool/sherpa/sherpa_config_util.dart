@@ -1,12 +1,21 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:archive/archive_io.dart';
+import 'package:colla_chat/plugin/security_storage.dart';
+import 'package:colla_chat/tool/ffmpeg/ffmpeg_helper.dart';
+import 'package:colla_chat/tool/string_util.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sherpa_onnx/sherpa_onnx.dart';
+import 'package:path/path.dart' as path;
 
 class SherpaConfigUtil {
+  static String? _ttsModelInstallationPath;
+
   /// 产生波形wav文件名
   static Future<String> generateWaveFilename([String suffix = '']) async {
     final Directory directory = await getApplicationDocumentsDirectory();
@@ -136,11 +145,142 @@ class SherpaConfigUtil {
     }
   }
 
+  /// 初始化tts模型的安装目录
+  static Future<bool> initializeTtsModel() async {
+    bool exist = false;
+    String? ttsModelInstallationPath =
+        await localSecurityStorage.get('ttsModelInstallationPath');
+    if (StringUtil.isEmpty(ttsModelInstallationPath)) {
+      Directory appDir = await getApplicationDocumentsDirectory();
+      _ttsModelInstallationPath =
+          path.join(appDir.path, 'sherpa-onnx-vits-zh-ll');
+      await localSecurityStorage.save(
+          'ffmpegInstallationPath', _ttsModelInstallationPath!);
+    } else {
+      _ttsModelInstallationPath = ttsModelInstallationPath;
+    }
+    File model = File(path.join(_ttsModelInstallationPath!, 'model.onnx'));
+    if ((await model.exists())) {
+      exist = true;
+    }
+
+    return exist;
+  }
+
+  /// 解压缩安装文件
+  static Future<void> extractZipFileIsolate(Map data) async {
+    try {
+      String? zipFilePath = data['zipFile'];
+      String? targetPath = data['targetPath'];
+      if ((zipFilePath != null) && (targetPath != null)) {
+        await extractFileToDisk(zipFilePath, targetPath);
+      }
+    } catch (e) {
+      return;
+    }
+  }
+
+  static Future<bool> setupTtsModel({
+    CancelToken? cancelToken,
+    void Function(DownloadProgress progress)? onProgress,
+    Map<String, dynamic>? queryParameters,
+  }) async {
+    bool exist = await initializeTtsModel();
+    if (exist) {
+      return true;
+    }
+    Directory tempDir = await getTemporaryDirectory();
+    String tempFolderPath = path.join(tempDir.path, 'sherpa-onnx-vits-zh-ll');
+    tempDir = Directory(tempFolderPath);
+    if (await tempDir.exists() == false) {
+      await tempDir.create(recursive: true);
+    }
+    Directory installationDir = Directory(_ttsModelInstallationPath!);
+    if (await installationDir.exists() == false) {
+      await installationDir.create(recursive: true);
+    }
+    final String ttsModelZipPath =
+        path.join(tempFolderPath, "sherpa-onnx-vits-zh-ll.tar.bz2");
+    final File tempZipFile = File(ttsModelZipPath);
+    if (await tempZipFile.exists() == false) {
+      try {
+        Dio dio = Dio();
+        Response response = await dio.download(
+          'https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/sherpa-onnx-vits-zh-ll.tar.bz2',
+          ttsModelZipPath,
+          cancelToken: cancelToken,
+          onReceiveProgress: (int received, int total) {
+            onProgress?.call(DownloadProgress(
+              downloaded: received,
+              fileSize: total,
+              phase: DownloadProgressPhase.downloading,
+            ));
+          },
+          queryParameters: queryParameters,
+        );
+        if (response.statusCode == HttpStatus.ok) {
+          onProgress?.call(DownloadProgress(
+            downloaded: 0,
+            fileSize: 0,
+            phase: DownloadProgressPhase.decompressing,
+          ));
+          await compute(extractZipFileIsolate, {
+            'zipFile': tempZipFile.path,
+            'targetPath': _ttsModelInstallationPath,
+          });
+          onProgress?.call(DownloadProgress(
+            downloaded: 0,
+            fileSize: 0,
+            phase: DownloadProgressPhase.inactive,
+          ));
+          return true;
+        } else {
+          onProgress?.call(DownloadProgress(
+            downloaded: 0,
+            fileSize: 0,
+            phase: DownloadProgressPhase.inactive,
+          ));
+          return false;
+        }
+      } catch (e) {
+        onProgress?.call(DownloadProgress(
+          downloaded: 0,
+          fileSize: 0,
+          phase: DownloadProgressPhase.inactive,
+        ));
+        return false;
+      }
+    } else {
+      onProgress?.call(DownloadProgress(
+        downloaded: 0,
+        fileSize: 0,
+        phase: DownloadProgressPhase.decompressing,
+      ));
+      try {
+        await compute(extractZipFileIsolate, {
+          'zipFile': tempZipFile.path,
+          'targetPath': _ttsModelInstallationPath,
+        });
+        onProgress?.call(DownloadProgress(
+          downloaded: 0,
+          fileSize: 0,
+          phase: DownloadProgressPhase.inactive,
+        ));
+        return true;
+      } catch (e) {
+        onProgress?.call(DownloadProgress(
+          downloaded: 0,
+          fileSize: 0,
+          phase: DownloadProgressPhase.inactive,
+        ));
+        return false;
+      }
+    }
+  }
+
   /// 创建离线的TTS,以sherpa-onnx-vits-zh-ll为中文例子
   static Future<OfflineTts> createOfflineTts() async {
-    await copyAllAssetFiles();
     initBindings();
-    String modelDir = 'sherpa-onnx-vits-zh-ll';
     String modelName = 'model.onnx';
     String ruleFsts =
         'sherpa-onnx-vits-zh-ll/phone.fst,sherpa-onnx-vits-zh-ll/date.fst,./sherpa-onnx-vits-zh-ll/number.fst';
@@ -188,23 +328,18 @@ class SherpaConfigUtil {
     // modelName = 'en_US-libritts_r-medium.onnx';
     // dataDir = 'vits-piper-en_US-libritts_r-medium/espeak-ng-data';
 
-    // ============================================================
-    // Please don't change the remaining part of this function
-    // ============================================================
-
     if (modelName == '') {
       throw Exception(
           'You are supposed to select a model by changing the code before you run the app');
     }
 
-    final Directory directory = await getApplicationDocumentsDirectory();
-    modelName = p.join(directory.path, modelDir, modelName);
+    modelName = p.join(_ttsModelInstallationPath!, modelName);
 
     if (ruleFsts != '') {
       final all = ruleFsts.split(',');
       var tmp = <String>[];
       for (final f in all) {
-        tmp.add(p.join(directory.path, f));
+        tmp.add(p.join(_ttsModelInstallationPath!, f));
       }
       ruleFsts = tmp.join(',');
     }
@@ -213,24 +348,24 @@ class SherpaConfigUtil {
       final all = ruleFars.split(',');
       var tmp = <String>[];
       for (final f in all) {
-        tmp.add(p.join(directory.path, f));
+        tmp.add(p.join(_ttsModelInstallationPath!, f));
       }
       ruleFars = tmp.join(',');
     }
 
     if (lexicon != '') {
-      lexicon = p.join(directory.path, modelDir, lexicon);
+      lexicon = p.join(_ttsModelInstallationPath!, lexicon);
     }
 
     if (dataDir != '') {
-      dataDir = p.join(directory.path, dataDir);
+      dataDir = p.join(_ttsModelInstallationPath!, dataDir);
     }
 
     if (dictDir != '') {
-      dictDir = p.join(directory.path, dictDir);
+      dictDir = p.join(_ttsModelInstallationPath!, dictDir);
     }
 
-    final String tokens = p.join(directory.path, modelDir, 'tokens.txt');
+    final String tokens = p.join(_ttsModelInstallationPath!, 'tokens.txt');
 
     final vits = OfflineTtsVitsModelConfig(
       model: modelName,

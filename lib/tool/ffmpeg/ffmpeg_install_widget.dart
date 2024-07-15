@@ -16,11 +16,11 @@ class FFMpegInstallWidget extends StatefulWidget {
 
 class _FFMpegInstallWidgetState extends State<FFMpegInstallWidget> {
   ValueNotifier<bool> ffmpegPresent = ValueNotifier<bool>(false);
-  ValueNotifier<FFMpegProgress> downloadProgress =
-      ValueNotifier<FFMpegProgress>(FFMpegProgress(
+  ValueNotifier<DownloadProgress> downloadProgress =
+      ValueNotifier<DownloadProgress>(DownloadProgress(
     downloaded: 0,
     fileSize: 0,
-    phase: FFMpegProgressPhase.inactive,
+    phase: DownloadProgressPhase.inactive,
   ));
   TextEditingController controller = TextEditingController();
 
@@ -33,7 +33,7 @@ class _FFMpegInstallWidgetState extends State<FFMpegInstallWidget> {
   Future<void> setupFFMpeg() async {
     if (platformParams.windows) {
       bool success = await FFMpegHelper.setupFFMpegOnWindows(
-        onProgress: (FFMpegProgress progress) {
+        onProgress: (DownloadProgress progress) {
           downloadProgress.value = progress;
         },
       );
@@ -61,17 +61,17 @@ class _FFMpegInstallWidgetState extends State<FFMpegInstallWidget> {
             width: 360,
             child: ValueListenableBuilder(
               valueListenable: downloadProgress,
-              builder: (BuildContext context, FFMpegProgress value, _) {
+              builder: (BuildContext context, DownloadProgress value, _) {
                 double? prog;
                 if ((value.downloaded != 0) && (value.fileSize != 0)) {
                   prog = value.downloaded / value.fileSize;
                 } else {
                   prog = 0;
                 }
-                if (value.phase == FFMpegProgressPhase.decompressing) {
+                if (value.phase == DownloadProgressPhase.decompressing) {
                   prog = null;
                 }
-                if (value.phase == FFMpegProgressPhase.inactive) {
+                if (value.phase == DownloadProgressPhase.inactive) {
                   return const SizedBox.shrink();
                 }
                 return Column(

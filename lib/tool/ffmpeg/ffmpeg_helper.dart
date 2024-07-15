@@ -208,19 +208,19 @@ class FFMpegHelperSession {
   }
 }
 
-class FFMpegProgress {
-  FFMpegProgressPhase phase;
+class DownloadProgress {
+  DownloadProgressPhase phase;
   int fileSize;
   int downloaded;
 
-  FFMpegProgress({
+  DownloadProgress({
     required this.phase,
     required this.fileSize,
     required this.downloaded,
   });
 }
 
-enum FFMpegProgressPhase {
+enum DownloadProgressPhase {
   downloading,
   decompressing,
   inactive,
@@ -230,7 +230,6 @@ class FFMpegHelper {
   static ProcessPool processPool = ProcessPool(numWorkers: 10, encoding: utf8);
   static const String _ffmpegUrl =
       "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip";
-  static String? _tempFolderPath;
   static String? _ffmpegBinDirectory;
   static String? _ffmpegInstallationPath;
 
@@ -255,8 +254,8 @@ class FFMpegHelper {
       String? ffmpegInstallationPath =
           await localSecurityStorage.get('ffmpegInstallationPath');
       if (StringUtil.isEmpty(ffmpegInstallationPath)) {
-        Directory ffmpegInstallDir = await getApplicationDocumentsDirectory();
-        _ffmpegInstallationPath = path.join(ffmpegInstallDir.path, "ffmpeg");
+        Directory appDir = await getApplicationDocumentsDirectory();
+        _ffmpegInstallationPath = path.join(appDir.path, "ffmpeg");
         await localSecurityStorage.save(
             'ffmpegInstallationPath', _ffmpegInstallationPath!);
       } else {
@@ -269,10 +268,6 @@ class FFMpegHelper {
       File ffprobe = File(path.join(_ffmpegBinDirectory!, "ffprobe.exe"));
       if ((await ffmpeg.exists()) && (await ffprobe.exists())) {
         exist = true;
-      }
-      if (!exist) {
-        Directory tempDir = await getTemporaryDirectory();
-        _tempFolderPath = path.join(tempDir.path, "ffmpeg");
       }
     } else if (platformParams.linux) {
       try {
@@ -307,7 +302,7 @@ class FFMpegHelper {
   /// 在windows下安装ffmpeg
   static Future<bool> setupFFMpegOnWindows({
     CancelToken? cancelToken,
-    void Function(FFMpegProgress progress)? onProgress,
+    void Function(DownloadProgress progress)? onProgress,
     Map<String, dynamic>? queryParameters,
   }) async {
     if (platformParams.windows) {
@@ -315,7 +310,9 @@ class FFMpegHelper {
       if (exist) {
         return true;
       }
-      Directory tempDir = Directory(_tempFolderPath!);
+      Directory tempDir = await getTemporaryDirectory();
+      String tempFolderPath = path.join(tempDir.path, "ffmpeg");
+      tempDir = Directory(tempFolderPath);
       if (await tempDir.exists() == false) {
         await tempDir.create(recursive: true);
       }
@@ -323,7 +320,7 @@ class FFMpegHelper {
       if (await installationDir.exists() == false) {
         await installationDir.create(recursive: true);
       }
-      final String ffmpegZipPath = path.join(_tempFolderPath!, "ffmpeg.zip");
+      final String ffmpegZipPath = path.join(tempFolderPath, "ffmpeg.zip");
       final File tempZipFile = File(ffmpegZipPath);
       if (await tempZipFile.exists() == false) {
         try {
@@ -333,77 +330,77 @@ class FFMpegHelper {
             ffmpegZipPath,
             cancelToken: cancelToken,
             onReceiveProgress: (int received, int total) {
-              onProgress?.call(FFMpegProgress(
+              onProgress?.call(DownloadProgress(
                 downloaded: received,
                 fileSize: total,
-                phase: FFMpegProgressPhase.downloading,
+                phase: DownloadProgressPhase.downloading,
               ));
             },
             queryParameters: queryParameters,
           );
           if (response.statusCode == HttpStatus.ok) {
-            onProgress?.call(FFMpegProgress(
+            onProgress?.call(DownloadProgress(
               downloaded: 0,
               fileSize: 0,
-              phase: FFMpegProgressPhase.decompressing,
+              phase: DownloadProgressPhase.decompressing,
             ));
             await compute(extractZipFileIsolate, {
               'zipFile': tempZipFile.path,
               'targetPath': _ffmpegInstallationPath,
             });
-            onProgress?.call(FFMpegProgress(
+            onProgress?.call(DownloadProgress(
               downloaded: 0,
               fileSize: 0,
-              phase: FFMpegProgressPhase.inactive,
+              phase: DownloadProgressPhase.inactive,
             ));
             return true;
           } else {
-            onProgress?.call(FFMpegProgress(
+            onProgress?.call(DownloadProgress(
               downloaded: 0,
               fileSize: 0,
-              phase: FFMpegProgressPhase.inactive,
+              phase: DownloadProgressPhase.inactive,
             ));
             return false;
           }
         } catch (e) {
-          onProgress?.call(FFMpegProgress(
+          onProgress?.call(DownloadProgress(
             downloaded: 0,
             fileSize: 0,
-            phase: FFMpegProgressPhase.inactive,
+            phase: DownloadProgressPhase.inactive,
           ));
           return false;
         }
       } else {
-        onProgress?.call(FFMpegProgress(
+        onProgress?.call(DownloadProgress(
           downloaded: 0,
           fileSize: 0,
-          phase: FFMpegProgressPhase.decompressing,
+          phase: DownloadProgressPhase.decompressing,
         ));
         try {
           await compute(extractZipFileIsolate, {
             'zipFile': tempZipFile.path,
             'targetPath': _ffmpegInstallationPath,
           });
-          onProgress?.call(FFMpegProgress(
+          onProgress?.call(DownloadProgress(
             downloaded: 0,
             fileSize: 0,
-            phase: FFMpegProgressPhase.inactive,
+            phase: DownloadProgressPhase.inactive,
           ));
           return true;
         } catch (e) {
-          onProgress?.call(FFMpegProgress(
+          onProgress?.call(DownloadProgress(
             downloaded: 0,
             fileSize: 0,
-            phase: FFMpegProgressPhase.inactive,
+            phase: DownloadProgressPhase.inactive,
           ));
           return false;
         }
       }
     } else {
-      onProgress?.call(FFMpegProgress(
+      onProgress?.call(DownloadProgress(
         downloaded: 0,
         fileSize: 0,
-        phase: FFMpegProgressPhase.inactive,
+        phase: DownloadProgressPhase.inactive,
       ));
       return true;
     }
