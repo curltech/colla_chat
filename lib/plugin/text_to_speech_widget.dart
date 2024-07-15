@@ -2,9 +2,12 @@ import 'dart:async';
 
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 enum TtsState { playing, stopped, paused, continued }
@@ -146,7 +149,16 @@ class TextToSpeechWidget extends StatelessWidget {
     var items = <DropdownMenuItem<String>>[];
     for (dynamic type in languages) {
       items.add(DropdownMenuItem(
-          value: type as String?, child: Text((type as String))));
+          value: type as String?,
+          child: Row(children: [
+            const SizedBox(
+              width: 50,
+            ),
+            Text((type as String)),
+            const SizedBox(
+              width: 50,
+            ),
+          ])));
     }
     return items;
   }
@@ -182,53 +194,21 @@ class TextToSpeechWidget extends StatelessWidget {
   }
 
   Widget _buildLanguageOptionWidget() {
-    return FutureBuilder<dynamic>(
-        future: _getLanguages(),
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          if (snapshot.hasData) {
-            return _buildLanguageOption(snapshot.data as List<dynamic>);
-          } else if (snapshot.hasError) {
-            return CommonAutoSizeText(
-                AppLocalizations.t('Error loading languages...'));
-          } else {
-            return CommonAutoSizeText(
-                AppLocalizations.t('Loading Languages...'));
-          }
-        });
-  }
-
-  Widget _buildBtnWidget() {
-    return Container(
-      padding: const EdgeInsets.only(top: 10.0),
-      child: ButtonBar(
-        children: [
-          IconButton(
-            onPressed: () {
-              speak('');
-            },
-            icon: const Icon(Icons.play_arrow),
-            color: Colors.green,
-            splashColor: Colors.greenAccent,
-          ),
-          IconButton(
-            onPressed: stop,
-            icon: const Icon(
-              Icons.stop,
-            ),
-            color: Colors.red,
-            splashColor: Colors.redAccent,
-          ),
-          IconButton(
-            onPressed: pause,
-            icon: const Icon(
-              Icons.pause,
-            ),
-            color: Colors.blue,
-            splashColor: Colors.blueAccent,
-          ),
-        ],
-      ),
-    );
+    return Column(children: [
+      FutureBuilder<dynamic>(
+          future: _getLanguages(),
+          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+            if (snapshot.hasData) {
+              return _buildLanguageOption(snapshot.data as List<dynamic>);
+            } else if (snapshot.hasError) {
+              return CommonAutoSizeText(
+                  AppLocalizations.t('Error loading languages...'));
+            } else {
+              return CommonAutoSizeText(
+                  AppLocalizations.t('Loading Languages...'));
+            }
+          }),
+    ]);
   }
 
   Widget _enginesDropDownSection(List<dynamic> engines) {
@@ -245,100 +225,150 @@ class TextToSpeechWidget extends StatelessWidget {
 
   /// 选择语言
   Widget _buildLanguageOption(List<dynamic> languages) {
-    return Container(
-        padding: const EdgeInsets.only(top: 10.0),
-        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          ValueListenableBuilder(
-            valueListenable: language,
-            builder: (BuildContext context, language, Widget? child) {
-              return DropdownButton(
-                  value: language,
-                  items: getLanguageOptions(languages),
-                  onChanged: (Object? item) {
-                    changeLanguage(item?.toString());
-                  });
-            },
-          ),
-          Visibility(
-            visible: platformParams.android,
-            child: CommonAutoSizeText(
-                "${AppLocalizations.t("Is installed")}: $isCurrentLanguageInstalled"),
-          ),
-        ]));
+    return Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+      CommonAutoSizeText(AppLocalizations.t('Language')),
+      const SizedBox(
+        width: 15.0,
+      ),
+      ValueListenableBuilder(
+        valueListenable: language,
+        builder: (BuildContext context, language, Widget? child) {
+          return DropdownButton(
+              value: language,
+              items: getLanguageOptions(languages),
+              onChanged: (Object? item) {
+                changeLanguage(item?.toString());
+              });
+        },
+      ),
+      Visibility(
+        visible: platformParams.android,
+        child: CommonAutoSizeText(
+            "${AppLocalizations.t("Is installed")}: $isCurrentLanguageInstalled"),
+      ),
+    ]);
   }
 
   /// 音量
   Widget _buildVolumeWidget() {
-    return ValueListenableBuilder(
-      valueListenable: volume,
-      builder: (BuildContext context, volume, Widget? child) {
-        return Slider(
-            value: volume,
-            onChanged: (newVolume) {
-              this.volume.value = newVolume;
-            },
-            min: 0.0,
-            max: 1.0,
-            divisions: 10,
-            label: "${AppLocalizations.t("Volume")}: $volume");
-      },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CommonAutoSizeText(AppLocalizations.t('Volume')),
+        const SizedBox(
+          height: 5.0,
+        ),
+        ValueListenableBuilder(
+          valueListenable: volume,
+          builder: (BuildContext context, volume, Widget? child) {
+            return Slider(
+              value: volume,
+              onChanged: (newVolume) {
+                this.volume.value = newVolume;
+              },
+              min: 0.0,
+              max: 1.0,
+              divisions: 10,
+              label: "${AppLocalizations.t("Volume")}: $volume",
+              activeColor: myself.primary,
+              inactiveColor: Colors.grey,
+              secondaryActiveColor: Colors.yellow,
+              thumbColor: myself.primary,
+            );
+          },
+        ),
+      ],
     );
   }
 
   /// 音高
   Widget _buildPitchWidget() {
-    return ValueListenableBuilder(
-        valueListenable: pitch,
-        builder: (BuildContext context, pitch, Widget? child) {
-          return Slider(
-            value: pitch,
-            onChanged: (newPitch) {
-              this.pitch.value = newPitch;
-            },
-            min: 0.5,
-            max: 2.0,
-            divisions: 15,
-            label: "${AppLocalizations.t("Pitch")}: $pitch",
-            activeColor: Colors.red,
-          );
-        });
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      CommonAutoSizeText(AppLocalizations.t('Pitch')),
+      const SizedBox(
+        height: 5.0,
+      ),
+      ValueListenableBuilder(
+          valueListenable: pitch,
+          builder: (BuildContext context, pitch, Widget? child) {
+            return Slider(
+              value: pitch,
+              onChanged: (newPitch) {
+                this.pitch.value = newPitch;
+              },
+              min: 0.5,
+              max: 2.0,
+              divisions: 15,
+              label: "${AppLocalizations.t("Pitch")}: $pitch",
+              activeColor: myself.primary,
+              inactiveColor: Colors.grey,
+              secondaryActiveColor: Colors.yellow,
+              thumbColor: myself.primary,
+            );
+          }),
+    ]);
   }
 
   /// 速度
   Widget _buildRateWidget() {
-    return ValueListenableBuilder(
-        valueListenable: rate,
-        builder: (BuildContext context, rate, Widget? child) {
-          return Slider(
-            value: rate,
-            onChanged: (newRate) {
-              this.rate.value = newRate;
-            },
-            min: 0.0,
-            max: 1.0,
-            divisions: 10,
-            label: "${AppLocalizations.t("Rate")}: $rate",
-            activeColor: Colors.green,
-          );
-        });
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      CommonAutoSizeText(AppLocalizations.t('Rate')),
+      const SizedBox(
+        height: 5.0,
+      ),
+      ValueListenableBuilder(
+          valueListenable: rate,
+          builder: (BuildContext context, rate, Widget? child) {
+            return Slider(
+              value: rate,
+              onChanged: (newRate) {
+                this.rate.value = newRate;
+              },
+              min: 0.0,
+              max: 1.0,
+              divisions: 10,
+              label: "${AppLocalizations.t("Rate")}: $rate",
+              activeColor: myself.primary,
+              inactiveColor: Colors.grey,
+              secondaryActiveColor: Colors.yellow,
+              thumbColor: myself.primary,
+            );
+          }),
+    ]);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _buildBtnWidget(),
-        _buildEngineOptionWidget(),
-        _buildLanguageOptionWidget(),
-        Column(
+    return Container(
+        padding: const EdgeInsets.all(15.0),
+        child: Column(
           children: [
-            _buildVolumeWidget(),
-            _buildPitchWidget(),
-            _buildRateWidget()
+            const SizedBox(
+              height: 5.0,
+            ),
+            _buildEngineOptionWidget(),
+            const SizedBox(
+              height: 5.0,
+            ),
+            _buildLanguageOptionWidget(),
+            const SizedBox(
+              height: 10.0,
+            ),
+            Column(
+              children: [
+                _buildVolumeWidget(),
+                const SizedBox(
+                  height: 5.0,
+                ),
+                _buildPitchWidget(),
+                const SizedBox(
+                  height: 5.0,
+                ),
+                _buildRateWidget()
+              ],
+            ),
           ],
-        ),
-      ],
-    );
+        ));
   }
 
   void dispose() {
