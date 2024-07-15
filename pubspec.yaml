@@ -322,6 +322,7 @@ dependencies:
   audio_session: ^0.1.18
   flutter_tts: ^4.0.2
   speech_to_text: ^6.6.2
+  sherpa_onnx: ^1.10.14
   flutter_image_compress: ^2.2.0
   video_thumbnail: ^0.5.2
   video_compress: ^3.1.2
