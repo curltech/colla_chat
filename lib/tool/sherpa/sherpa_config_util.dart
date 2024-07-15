@@ -1,10 +1,8 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:archive/archive_io.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
-import 'package:colla_chat/tool/compress_file_util.dart';
-import 'package:colla_chat/tool/ffmpeg/ffmpeg_helper.dart';
+import 'package:colla_chat/tool/download_file_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -212,7 +210,7 @@ class SherpaConfigUtil {
             fileSize: 0,
             phase: DownloadProgressPhase.decompressing,
           ));
-          await compute(CompressFileUtil.extractZipFileIsolate, {
+          await compute(DownloadFileUtil.extractZipFileIsolate, {
             'zipFile': tempZipFile.path,
             'targetPath': _ttsModelInstallationPath,
           });
@@ -245,7 +243,7 @@ class SherpaConfigUtil {
         phase: DownloadProgressPhase.decompressing,
       ));
       try {
-        await compute(CompressFileUtil.extractZipFileIsolate, {
+        await compute(DownloadFileUtil.extractZipFileIsolate, {
           'zipFile': tempZipFile.path,
           'targetPath': _ttsModelInstallationPath,
         });

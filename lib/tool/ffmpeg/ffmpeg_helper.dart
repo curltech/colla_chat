@@ -2,11 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:archive/archive_io.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
-import 'package:colla_chat/tool/compress_file_util.dart';
+import 'package:colla_chat/tool/download_file_util.dart';
 import 'package:colla_chat/tool/ffmpeg/base_ffmpeg_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:dio/dio.dart';
@@ -209,24 +208,6 @@ class FFMpegHelperSession {
   }
 }
 
-class DownloadProgress {
-  DownloadProgressPhase phase;
-  int fileSize;
-  int downloaded;
-
-  DownloadProgress({
-    required this.phase,
-    required this.fileSize,
-    required this.downloaded,
-  });
-}
-
-enum DownloadProgressPhase {
-  downloading,
-  decompressing,
-  inactive,
-}
-
 class FFMpegHelper {
   static ProcessPool processPool = ProcessPool(numWorkers: 10, encoding: utf8);
   static const String _ffmpegUrl =
@@ -332,7 +313,7 @@ class FFMpegHelper {
               fileSize: 0,
               phase: DownloadProgressPhase.decompressing,
             ));
-            await compute(CompressFileUtil.extractZipFileIsolate, {
+            await compute(DownloadFileUtil.extractZipFileIsolate, {
               'zipFile': tempZipFile.path,
               'targetPath': _ffmpegInstallationPath,
             });
@@ -365,7 +346,7 @@ class FFMpegHelper {
           phase: DownloadProgressPhase.decompressing,
         ));
         try {
-          await compute(CompressFileUtil.extractZipFileIsolate, {
+          await compute(DownloadFileUtil.extractZipFileIsolate, {
             'zipFile': tempZipFile.path,
             'targetPath': _ffmpegInstallationPath,
           });

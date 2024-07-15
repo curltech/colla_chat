@@ -1,5 +1,6 @@
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/download_file_util.dart';
 import 'package:colla_chat/tool/ffmpeg/ffmpeg_helper.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
