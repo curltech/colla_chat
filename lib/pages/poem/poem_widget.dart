@@ -103,6 +103,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
           okLabel: 'Search',
           controller: formInputController,
           onOk: (Map<String, dynamic> values) {
+            poemController.clear(notify: false);
             _onOk(context, values);
           },
         ));
@@ -120,7 +121,8 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
     return expansionTile;
   }
 
-  _onOk(BuildContext context, Map<String, dynamic> values) async {
+  _onOk(BuildContext context, Map<String, dynamic> values,
+      {int from = 0, int limit = 10}) async {
     String? title = values['title'];
     String? author = values['author'];
     String? rhythmic = values['rhythmic'];
@@ -147,13 +149,13 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
           author: author,
           rhythmic: rhythmic,
           paragraphs: paragraphs,
-          from: 0,
-          limit: 100);
+          from: from,
+          limit: limit);
     } catch (e) {
       logger.e('sendSearchPoem failure:$e');
     }
     DialogUtil.loadingHide(context);
-    poemController.replaceAll(poems);
+    poemController.addAll(poems);
   }
 
   Future<List<TileData>> _buildJsonFiles(String path) async {
@@ -193,6 +195,12 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
   OfflineTextToSpeechWidget offlineTextToSpeechWidget =
       OfflineTextToSpeechWidget();
 
+  Future<void> _onRefresh(BuildContext context) async {
+    int length = poemController.data.length;
+    Map<String, dynamic> values = formInputController.getValues();
+    _onOk(context, values, from: length);
+  }
+
   Widget _buildPoemListWidget(BuildContext context) {
     return Column(children: [
       const SizedBox(
@@ -225,6 +233,12 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
               itemCount: tiles.length,
               itemBuilder: (BuildContext context, int index) {
                 return tiles[index];
+              },
+              onScrollMax: () async {
+                return await _onRefresh(context);
+              },
+              onRefresh: () async {
+                return await _onRefresh(context);
               },
             );
           }
