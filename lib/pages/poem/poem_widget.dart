@@ -321,6 +321,19 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
                             });
                       },
                       icon: const Icon(Icons.settings)),
+                  IconButton(
+                      color: Colors.white,
+                      hoverColor: myself.primary,
+                      onPressed: () async {
+                        await DialogUtil.show(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Dialog(
+                                child: offlineTextToSpeechWidget,
+                              );
+                            });
+                      },
+                      icon: const Icon(Icons.precision_manufacturing_outlined)),
                 ],
               ),
               Expanded(

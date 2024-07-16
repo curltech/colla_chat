@@ -10,10 +10,23 @@ import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sherpa_onnx/sherpa_onnx.dart';
-import 'package:path/path.dart' as path;
 
 class SherpaConfigUtil {
   static String? _ttsModelInstallationPath;
+
+  static String? get ttsModelInstallationPath {
+    return _ttsModelInstallationPath;
+  }
+
+  static set ttsModelInstallationPath(String? ttsModelInstallationPath) {
+    _ttsModelInstallationPath = ttsModelInstallationPath;
+    if (StringUtil.isNotEmpty(ttsModelInstallationPath)) {
+      localSecurityStorage.save(
+          'ttsModelInstallationPath', ttsModelInstallationPath!);
+    } else {
+      localSecurityStorage.remove('ttsModelInstallationPath');
+    }
+  }
 
   /// 产生波形wav文件名
   static Future<String> generateWaveFilename([String suffix = '']) async {
@@ -151,14 +164,13 @@ class SherpaConfigUtil {
         await localSecurityStorage.get('ttsModelInstallationPath');
     if (StringUtil.isEmpty(ttsModelInstallationPath)) {
       Directory appDir = await getApplicationDocumentsDirectory();
-      _ttsModelInstallationPath =
-          path.join(appDir.path, 'sherpa-onnx-vits-zh-ll');
+      _ttsModelInstallationPath = p.join(appDir.path, 'sherpa-onnx-vits-zh-ll');
       await localSecurityStorage.save(
           'ffmpegInstallationPath', _ttsModelInstallationPath!);
     } else {
       _ttsModelInstallationPath = ttsModelInstallationPath;
     }
-    File model = File(path.join(_ttsModelInstallationPath!, 'model.onnx'));
+    File model = File(p.join(_ttsModelInstallationPath!, 'model.onnx'));
     if ((await model.exists())) {
       exist = true;
     }
@@ -176,7 +188,7 @@ class SherpaConfigUtil {
       return true;
     }
     Directory tempDir = await getTemporaryDirectory();
-    String tempFolderPath = path.join(tempDir.path, 'sherpa-onnx-vits-zh-ll');
+    String tempFolderPath = p.join(tempDir.path, 'sherpa-onnx-vits-zh-ll');
     tempDir = Directory(tempFolderPath);
     if (await tempDir.exists() == false) {
       await tempDir.create(recursive: true);
@@ -186,7 +198,7 @@ class SherpaConfigUtil {
       await installationDir.create(recursive: true);
     }
     final String ttsModelZipPath =
-        path.join(tempFolderPath, "sherpa-onnx-vits-zh-ll.tar.bz2");
+        p.join(tempFolderPath, "sherpa-onnx-vits-zh-ll.tar.bz2");
     final File tempZipFile = File(ttsModelZipPath);
     if (await tempZipFile.exists() == false) {
       try {

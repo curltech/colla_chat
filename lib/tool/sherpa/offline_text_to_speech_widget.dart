@@ -7,6 +7,7 @@ import 'package:colla_chat/plugin/text_to_speech_widget.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/sherpa/sherpa_config_util.dart';
+import 'package:colla_chat/tool/sherpa/sherpa_install_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -21,8 +22,15 @@ class OfflineTextToSpeechWidget extends StatelessWidget {
   final ValueNotifier<int> _maxSpeakerId = ValueNotifier<int>(0);
   final ValueNotifier<double> speed = ValueNotifier<double>(1.0);
   ValueNotifier<TtsState> ttsState = ValueNotifier<TtsState>(TtsState.stopped);
+  ValueNotifier<bool> sherpaPresent = ValueNotifier<bool>(false);
 
   OfflineTts? offlineTts;
+
+  Future<bool> checkSherpa() async {
+    sherpaPresent.value = await SherpaConfigUtil.initializeTtsModel();
+
+    return sherpaPresent.value;
+  }
 
   OfflineTextToSpeechWidget({super.key}) {
     _init();
@@ -30,6 +38,7 @@ class OfflineTextToSpeechWidget extends StatelessWidget {
 
   Future<void> _init() async {
     if (!isInitialized) {
+      checkSherpa();
       initBindings();
       offlineTts?.free();
       offlineTts = await SherpaConfigUtil.createOfflineTts();
@@ -135,10 +144,22 @@ class OfflineTextToSpeechWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(15),
-      child: Column(
-        children: <Widget>[
-          _buildSpeedWidget(),
-        ],
+      child: ValueListenableBuilder(
+        valueListenable: sherpaPresent,
+        builder: (BuildContext context, value, Widget? child) {
+          if (value) {
+            return Column(
+              children: <Widget>[
+                _buildSpeedWidget(),
+              ],
+            );
+          }
+          return SherpaInstallWidget(
+            onDownloadComplete: () {
+              checkSherpa();
+            },
+          );
+        },
       ),
     );
   }
