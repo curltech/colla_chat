@@ -13,11 +13,14 @@ class LoadingUtil {
   static Widget buildLoadingIndicator() {
     return Center(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-      const SizedBox(
+      SizedBox(
           height: 80,
           width: 80,
           child: LoadingIndicator(
             indicatorType: Indicator.ballRotateChase,
+            colors: [
+              myself.primary,
+            ],
           )),
       const SizedBox(
         height: 10,

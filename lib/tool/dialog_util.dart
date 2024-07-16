@@ -263,13 +263,17 @@ class DialogUtil {
         const SizedBox(
           height: 20,
         ),
-        InkWell(
-            child: const LoadingIndicator(
-              indicatorType: Indicator.ballRotateChase,
-            ),
-            onTap: () {
-              loadingHide(context!);
-            }),
+        SizedBox(
+            height: 80,
+            width: 80,
+            child: InkWell(
+                child: LoadingIndicator(
+                  indicatorType: Indicator.ballRotateChase,
+                  colors: [myself.primary,],
+                ),
+                onTap: () {
+                  loadingHide(context!);
+                })),
         const SizedBox(
           height: 20,
         ),
