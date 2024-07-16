@@ -70,7 +70,7 @@ class ChewieVideoPlayerController extends OriginVideoPlayerController {
             }
           }
           if (playlistController.current != null) {
-            return LoadingUtil.buildCircularLoadingWidget();
+            return LoadingUtil.buildLoadingIndicator();
           }
           return Center(
               child: CommonAutoSizeText(

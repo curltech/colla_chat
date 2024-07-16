@@ -1,3 +1,4 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/download_file_util.dart';
 import 'package:colla_chat/tool/sherpa/sherpa_config_util.dart';
@@ -72,7 +73,7 @@ class SherpaInstallWidget extends StatelessWidget {
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(value.phase.name),
+                    Text(AppLocalizations.t(value.phase.name)),
                     const SizedBox(height: 5),
                     LinearProgressIndicator(value: prog),
                   ],

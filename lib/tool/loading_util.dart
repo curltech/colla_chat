@@ -37,24 +37,24 @@ class LoadingUtil {
     ]));
   }
 
-  static Widget buildCircularLoadingWidget() {
-    return Center(
-        child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        CircularProgressIndicator(
-            semanticsLabel: AppLocalizations.t("Loading, please waiting..."),
-            color: myself.primary,
-            backgroundColor: myself.secondary),
-        const SizedBox(
-          height: 10,
-        ),
-        Expanded(
-            child: CommonAutoSizeText(
-                AppLocalizations.t("Loading, please waiting..."))),
-      ],
-    ));
-  }
+  // static Widget buildCircularLoadingWidget() {
+  //   return Center(
+  //       child: Column(
+  //     mainAxisSize: MainAxisSize.min,
+  //     children: [
+  //       CircularProgressIndicator(
+  //           semanticsLabel: AppLocalizations.t("Loading, please waiting..."),
+  //           color: myself.primary,
+  //           backgroundColor: myself.secondary),
+  //       const SizedBox(
+  //         height: 10,
+  //       ),
+  //       Expanded(
+  //           child: CommonAutoSizeText(
+  //               AppLocalizations.t("Loading, please waiting..."))),
+  //     ],
+  //   ));
+  // }
 
   static LinearProgressIndicator buildLinearProgressIndicator() {
     return LinearProgressIndicator(

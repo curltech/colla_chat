@@ -721,5 +721,10 @@
   "Author": "作者",
   "Rhythmic": "词牌",
   "Dynasty": "朝代",
-  "Paragraphs": "内容"
+  "Paragraphs": "内容",
+  "No poem": "没有诗词",
+  "Setup Sherpa": "安装Sherpa",
+  "downloading": "下载中...",
+  "decompressing": "解压中...",
+  "inactive": "未激活"
 }

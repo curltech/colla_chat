@@ -263,7 +263,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
                 showVolumeButton: showVolumeButton);
           }
           if (playlistController.current != null) {
-            return LoadingUtil.buildCircularLoadingWidget();
+            return LoadingUtil.buildLoadingIndicator();
           }
           return Center(
               child: CommonAutoSizeText(

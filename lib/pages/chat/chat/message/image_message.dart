@@ -76,7 +76,7 @@ class ImageMessage extends StatelessWidget {
               );
             }
           }
-          return LoadingUtil.buildCircularLoadingWidget();
+          return LoadingUtil.buildLoadingIndicator();
         });
 
     return imageWidget;

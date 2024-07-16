@@ -120,7 +120,7 @@ class _PeerMediaRenderViewState extends State<PeerMediaRenderView> {
               }
             }
           }
-          return LoadingUtil.buildCircularLoadingWidget();
+          return LoadingUtil.buildLoadingIndicator();
         });
 
     Widget container = _buildVideoViewContainer(videoView,

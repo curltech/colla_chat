@@ -170,9 +170,10 @@ class SherpaConfigUtil {
     } else {
       _ttsModelInstallationPath = ttsModelInstallationPath;
     }
-    File model = File(p.join(_ttsModelInstallationPath!, 'model.onnx'));
-    if ((await model.exists())) {
-      exist = true;
+    Directory dir = Directory(_ttsModelInstallationPath!);
+    List<FileSystemEntity> entities = dir.listSync();
+    if (entities.isNotEmpty) {
+      return true;
     }
 
     return exist;
