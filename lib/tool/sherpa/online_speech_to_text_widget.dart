@@ -34,7 +34,7 @@ class OnlineSpeechToText {
   init() async {
     if (!_isInitialized) {
       initBindings();
-      _recognizer = await SherpaConfigUtil.createOnlineRecognizer();
+      _recognizer = await SherpaConfigUtil.createOnlineRecognizer('');
       _stream = _recognizer?.createStream();
 
       _isInitialized = true;

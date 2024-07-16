@@ -14,8 +14,10 @@ import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:sherpa_onnx/sherpa_onnx.dart';
 
+/// Sherpa的离线TTS配置和安装界面
 class OfflineTextToSpeechWidget extends StatelessWidget {
   final AudioPlayer player = AudioPlayer();
+  late Stream<PlayerState> playerStateStream = player.onPlayerStateChanged;
   String? filename;
   String? text;
   bool isInitialized = false;
@@ -27,22 +29,35 @@ class OfflineTextToSpeechWidget extends StatelessWidget {
   OfflineTts? offlineTts;
 
   Future<bool> checkSherpa() async {
-    sherpaPresent.value = await SherpaConfigUtil.initializeTtsModel();
+    sherpaPresent.value = await SherpaConfigUtil.initializeSherpaModel();
 
     return sherpaPresent.value;
   }
 
   OfflineTextToSpeechWidget({super.key}) {
+    playerStateStream.listen((PlayerState playerState) {
+      if (playerState == PlayerState.stopped ||
+          playerState == PlayerState.completed) {
+        ttsState.value = TtsState.stopped;
+      } else if (playerState == PlayerState.playing) {
+        ttsState.value = TtsState.playing;
+      } else if (playerState == PlayerState.paused) {
+        ttsState.value = TtsState.paused;
+      }
+    });
     _init();
   }
 
   Future<void> _init() async {
     if (!isInitialized) {
-      checkSherpa();
+      await checkSherpa();
       initBindings();
       offlineTts?.free();
-      offlineTts = await SherpaConfigUtil.createOfflineTts();
-      isInitialized = true;
+      if (sherpaPresent.value) {
+        offlineTts = await SherpaConfigUtil.createOfflineTts();
+        isInitialized = true;
+        logger.i('create offlineTts successfully');
+      }
     }
   }
 
@@ -126,18 +141,15 @@ class OfflineTextToSpeechWidget extends StatelessWidget {
     await player.stop();
     if (filename != null) {
       await player.play(DeviceFileSource(filename!));
-      ttsState.value = TtsState.playing;
     }
   }
 
   pause() async {
     await player.pause();
-    ttsState.value = TtsState.paused;
   }
 
   stop() async {
     await player.stop();
-    ttsState.value = TtsState.stopped;
   }
 
   @override
@@ -165,6 +177,7 @@ class OfflineTextToSpeechWidget extends StatelessWidget {
   }
 
   void dispose() {
+    player.dispose();
     offlineTts?.free();
     text = null;
     if (filename != null) {

@@ -7,6 +7,7 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 
 class SherpaInstallWidget extends StatelessWidget {
+  String modelName = 'sherpa-onnx-vits-zh-ll';
   Function()? onDownloadComplete;
 
   SherpaInstallWidget({super.key, this.onDownloadComplete}) {
@@ -23,13 +24,14 @@ class SherpaInstallWidget extends StatelessWidget {
   TextEditingController controller = TextEditingController();
 
   Future<bool> checkSherpa() async {
-    sherpaPresent.value = await SherpaConfigUtil.initializeTtsModel();
+    sherpaPresent.value = await SherpaConfigUtil.initializeSherpaModel();
 
     return sherpaPresent.value;
   }
 
-  Future<void> setupSherpa() async {
-    bool success = await SherpaConfigUtil.setupTtsModel(
+  Future<void> setupSherpaModel() async {
+    bool success = await SherpaConfigUtil.setupSherpaModel(
+      modelName,
       onProgress: (DownloadProgress progress) {
         downloadProgress.value = progress;
       },
@@ -48,9 +50,9 @@ class SherpaInstallWidget extends StatelessWidget {
         children: [
           TextButton.icon(
             style: style,
-            label: const Text('Setup Sherpa'),
+            label: Text(AppLocalizations.t('Setup Sherpa')),
             icon: const Icon(Icons.download),
-            onPressed: setupSherpa,
+            onPressed: setupSherpaModel,
           ),
           const SizedBox(height: 20),
           SizedBox(
@@ -90,7 +92,7 @@ class SherpaInstallWidget extends StatelessWidget {
       valueListenable: sherpaPresent,
       builder: (BuildContext context, bool sherpaPresent, Widget? child) {
         List<Widget> children = [];
-        controller.text = SherpaConfigUtil.ttsModelInstallationPath ?? '';
+        controller.text = SherpaConfigUtil.sherpaModelInstallationPath ?? '';
         children.add(
           CommonAutoSizeTextFormField(
               labelText: 'Sherpa installation path',
@@ -98,7 +100,8 @@ class SherpaInstallWidget extends StatelessWidget {
               hintText: 'Sherpa installation path',
               suffix: IconButton(
                   onPressed: () {
-                    SherpaConfigUtil.ttsModelInstallationPath = controller.text;
+                    SherpaConfigUtil.sherpaModelInstallationPath =
+                        controller.text;
                   },
                   icon: Icon(
                     Icons.save,

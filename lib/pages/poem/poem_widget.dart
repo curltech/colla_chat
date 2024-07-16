@@ -191,7 +191,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
 
   int index = 0;
 
-  TextToSpeechWidget textToSpeechWidget = TextToSpeechWidget();
+  // TextToSpeechWidget textToSpeechWidget = TextToSpeechWidget();
   OfflineTextToSpeechWidget offlineTextToSpeechWidget =
       OfflineTextToSpeechWidget();
 
@@ -293,20 +293,20 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
                       },
                       icon: const Icon(Icons.keyboard_arrow_left)),
                   ValueListenableBuilder(
-                    valueListenable: textToSpeechWidget.ttsState,
+                    valueListenable: offlineTextToSpeechWidget.ttsState,
                     builder: (BuildContext context, ttsState, Widget? child) {
                       return IconButton(
                           color: Colors.white,
                           hoverColor: myself.primary,
                           onPressed: () {
                             if (ttsState == TtsState.stopped) {
-                              textToSpeechWidget.speak(poem.paragraphs!);
+                              offlineTextToSpeechWidget.speak(poem.paragraphs!);
                             }
                             if (ttsState == TtsState.paused) {
-                              textToSpeechWidget.speak(poem.paragraphs!);
+                              offlineTextToSpeechWidget.speak(poem.paragraphs!);
                             }
                             if (ttsState == TtsState.playing) {
-                              textToSpeechWidget.pause();
+                              offlineTextToSpeechWidget.pause();
                             }
                           },
                           icon: ttsState == TtsState.stopped ||
@@ -319,7 +319,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
                       color: Colors.white,
                       hoverColor: myself.primary,
                       onPressed: () {
-                        textToSpeechWidget.stop();
+                        offlineTextToSpeechWidget.stop();
                       },
                       icon: const Icon(Icons.stop)),
                   IconButton(
@@ -330,7 +330,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
                             context: context,
                             builder: (BuildContext context) {
                               return Dialog(
-                                child: textToSpeechWidget,
+                                child: offlineTextToSpeechWidget,
                               );
                             });
                       },
