@@ -1,22 +1,17 @@
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/download_file_util.dart';
-import 'package:colla_chat/tool/ffmpeg/ffmpeg_helper.dart';
 import 'package:colla_chat/tool/sherpa/sherpa_config_util.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 
-class SherpaInstallWidget extends StatefulWidget {
+class SherpaInstallWidget extends StatelessWidget {
   Function()? onDownloadComplete;
 
-  SherpaInstallWidget({super.key, this.onDownloadComplete});
+  SherpaInstallWidget({super.key, this.onDownloadComplete}) {
+    checkSherpa();
+  }
 
-  @override
-  State<SherpaInstallWidget> createState() => _SherpaInstallWidgetState();
-}
-
-class _SherpaInstallWidgetState extends State<SherpaInstallWidget> {
   ValueNotifier<bool> sherpaPresent = ValueNotifier<bool>(false);
   ValueNotifier<DownloadProgress> downloadProgress =
       ValueNotifier<DownloadProgress>(DownloadProgress(
@@ -33,15 +28,13 @@ class _SherpaInstallWidgetState extends State<SherpaInstallWidget> {
   }
 
   Future<void> setupSherpa() async {
-    if (platformParams.windows) {
-      bool success = await SherpaConfigUtil.setupTtsModel(
-        onProgress: (DownloadProgress progress) {
-          downloadProgress.value = progress;
-        },
-      );
-      sherpaPresent.value = success;
-      widget.onDownloadComplete?.call();
-    }
+    bool success = await SherpaConfigUtil.setupTtsModel(
+      onProgress: (DownloadProgress progress) {
+        downloadProgress.value = progress;
+      },
+    );
+    sherpaPresent.value = success;
+    onDownloadComplete?.call();
   }
 
   Widget _buildInstallWidget(BuildContext context) {
@@ -94,9 +87,9 @@ class _SherpaInstallWidgetState extends State<SherpaInstallWidget> {
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: sherpaPresent,
-      builder: (BuildContext context, bool ffmpegPresent, Widget? child) {
+      builder: (BuildContext context, bool sherpaPresent, Widget? child) {
         List<Widget> children = [];
-        controller.text = FFMpegHelper.ffmpegInstallationPath ?? '';
+        controller.text = SherpaConfigUtil.ttsModelInstallationPath ?? '';
         children.add(
           CommonAutoSizeTextFormField(
               labelText: 'Sherpa installation path',
@@ -112,17 +105,11 @@ class _SherpaInstallWidgetState extends State<SherpaInstallWidget> {
                   ))),
         );
 
-        if (!ffmpegPresent) {
-          if (platformParams.windows) {
-            children.addAll([
-              const SizedBox(height: 20),
-              _buildInstallWidget(context),
-            ]);
-          }
-          if (platformParams.linux) {
-            children.add(const CommonAutoSizeText(
-                'FFmpeg installation required by user.\nsudo apt-get install ffmpeg\nsudo snap install ffmpeg'));
-          }
+        if (!sherpaPresent) {
+          children.addAll([
+            const SizedBox(height: 20),
+            _buildInstallWidget(context),
+          ]);
         }
         return Container(
           padding: const EdgeInsets.all(15.0),

@@ -164,9 +164,9 @@ class SherpaConfigUtil {
         await localSecurityStorage.get('ttsModelInstallationPath');
     if (StringUtil.isEmpty(ttsModelInstallationPath)) {
       Directory appDir = await getApplicationDocumentsDirectory();
-      _ttsModelInstallationPath = p.join(appDir.path, 'sherpa-onnx-vits-zh-ll');
+      _ttsModelInstallationPath = p.join(appDir.path, 'sherpa-onnx');
       await localSecurityStorage.save(
-          'ffmpegInstallationPath', _ttsModelInstallationPath!);
+          'ttsModelInstallationPath', _ttsModelInstallationPath!);
     } else {
       _ttsModelInstallationPath = ttsModelInstallationPath;
     }
@@ -188,7 +188,7 @@ class SherpaConfigUtil {
       return true;
     }
     Directory tempDir = await getTemporaryDirectory();
-    String tempFolderPath = p.join(tempDir.path, 'sherpa-onnx-vits-zh-ll');
+    String tempFolderPath = p.join(tempDir.path, 'sherpa-onnx');
     tempDir = Directory(tempFolderPath);
     if (await tempDir.exists() == false) {
       await tempDir.create(recursive: true);
