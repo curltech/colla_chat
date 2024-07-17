@@ -16,6 +16,7 @@ import 'package:colla_chat/pages/chat/me/webrtc/webrtc_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/sherpa/sherpa_install_widget.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -41,6 +42,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
       PlatformMapLauncherWidget();
   final PlatformInfoWidget platformInfoWidget = const PlatformInfoWidget();
   final PoemWidget poemWidget = PoemWidget();
+  final SherpaInstallWidget sherpaInstallWidget = SherpaInstallWidget();
 
   final ValueNotifier<bool> developerSwitch =
       ValueNotifier<bool>(myself.peerProfile.developerSwitch);
@@ -60,6 +62,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(platformMapLauncherWidget);
     indexWidgetProvider.define(platformInfoWidget);
     indexWidgetProvider.define(poemWidget);
+    indexWidgetProvider.define(sherpaInstallWidget);
     myself.addListener(_update);
   }
 
@@ -100,6 +103,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     }
 
     mixins.add(platformInfoWidget);
+    mixins.add(sherpaInstallWidget);
     if (developerSwitch.value) {
       mixins.addAll([
         platformMapLauncherWidget,

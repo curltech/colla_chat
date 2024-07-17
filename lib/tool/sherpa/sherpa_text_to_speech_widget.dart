@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
-import 'package:colla_chat/plugin/text_to_speech_widget.dart';
+import 'package:colla_chat/plugin/platform_text_to_speech_widget.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/sherpa/sherpa_config_util.dart';
@@ -166,10 +166,8 @@ class SherpaTextToSpeechWidget extends StatelessWidget {
               ],
             );
           }
-          return SherpaInstallWidget(
-            onDownloadComplete: () {
-              checkSherpa();
-            },
+          return Center(
+            child: Text(AppLocalizations.t('Sherpa is not uninstalled')),
           );
         },
       ),

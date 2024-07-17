@@ -12,7 +12,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 
 enum TtsState { playing, stopped, paused, continued }
 
-class TextToSpeechWidget extends StatelessWidget {
+class PlatformTextToSpeechWidget extends StatelessWidget {
   late FlutterTts flutterTts;
   ValueNotifier<String?> language = ValueNotifier<String?>(null);
   ValueNotifier<String?> engine = ValueNotifier<String?>(null);
@@ -23,7 +23,7 @@ class TextToSpeechWidget extends StatelessWidget {
 
   ValueNotifier<TtsState> ttsState = ValueNotifier<TtsState>(TtsState.stopped);
 
-  TextToSpeechWidget({super.key}) {
+  PlatformTextToSpeechWidget({super.key}) {
     initTts();
   }
 
