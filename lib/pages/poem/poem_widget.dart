@@ -11,7 +11,8 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/poem/poem.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/tool/sherpa/offline_text_to_speech_widget.dart';
+import 'package:colla_chat/tool/sherpa/sherpa_text_to_speech_widget.dart';
+
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -192,8 +193,8 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
   int index = 0;
 
   // TextToSpeechWidget textToSpeechWidget = TextToSpeechWidget();
-  OfflineTextToSpeechWidget offlineTextToSpeechWidget =
-      OfflineTextToSpeechWidget();
+  SherpaTextToSpeechWidget sherpaTextToSpeechWidget =
+      SherpaTextToSpeechWidget();
 
   Future<void> _onRefresh(BuildContext context) async {
     int length = poemController.data.length;
@@ -293,20 +294,20 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
                       },
                       icon: const Icon(Icons.keyboard_arrow_left)),
                   ValueListenableBuilder(
-                    valueListenable: offlineTextToSpeechWidget.ttsState,
+                    valueListenable: sherpaTextToSpeechWidget.ttsState,
                     builder: (BuildContext context, ttsState, Widget? child) {
                       return IconButton(
                           color: Colors.white,
                           hoverColor: myself.primary,
                           onPressed: () {
                             if (ttsState == TtsState.stopped) {
-                              offlineTextToSpeechWidget.speak(poem.paragraphs!);
+                              sherpaTextToSpeechWidget.speak(poem.paragraphs!);
                             }
                             if (ttsState == TtsState.paused) {
-                              offlineTextToSpeechWidget.speak(poem.paragraphs!);
+                              sherpaTextToSpeechWidget.speak(poem.paragraphs!);
                             }
                             if (ttsState == TtsState.playing) {
-                              offlineTextToSpeechWidget.pause();
+                              sherpaTextToSpeechWidget.pause();
                             }
                           },
                           icon: ttsState == TtsState.stopped ||
@@ -319,7 +320,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
                       color: Colors.white,
                       hoverColor: myself.primary,
                       onPressed: () {
-                        offlineTextToSpeechWidget.stop();
+                        sherpaTextToSpeechWidget.stop();
                       },
                       icon: const Icon(Icons.stop)),
                   IconButton(
@@ -330,7 +331,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
                             context: context,
                             builder: (BuildContext context) {
                               return Dialog(
-                                child: offlineTextToSpeechWidget,
+                                child: sherpaTextToSpeechWidget,
                               );
                             });
                       },
@@ -343,7 +344,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
                             context: context,
                             builder: (BuildContext context) {
                               return Dialog(
-                                child: offlineTextToSpeechWidget,
+                                child: sherpaTextToSpeechWidget,
                               );
                             });
                       },

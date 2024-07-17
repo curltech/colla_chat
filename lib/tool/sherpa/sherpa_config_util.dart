@@ -116,7 +116,7 @@ class SherpaConfigUtil {
     return exist;
   }
 
-  static Map<String, String> sherpaModelDownloadUrl = {
+  static Map<String, String> sherpaTtsModelDownloadUrl = {
     'sherpa-onnx-vits-zh-ll':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/sherpa-onnx-vits-zh-ll.tar.bz2',
     'vits-zh-aishell3':
@@ -147,41 +147,43 @@ class SherpaConfigUtil {
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-zh-hf-theresa.tar.bz2',
     'vits-zh-hf-zenyatta':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-zh-hf-zenyatta.tar.bz2',
-    'sherpa-onnx-conformer-zh-2023-05-23':
+  };
+  static Map<String, String> sherpaAsrModelDownloadUrl = {
+    'sherpa-onnx-conformer-zh':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-conformer-zh-2023-05-23.tar.bz2',
-    'sherpa-onnx-conformer-zh-stateless2-2023-05-23':
+    'sherpa-onnx-conformer-zh-stateless2':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-conformer-zh-stateless2-2023-05-23.tar.bz2',
-    'sherpa-onnx-lstm-zh-2023-02-20':
+    'sherpa-onnx-lstm-zh':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-lstm-zh-2023-02-20.tar.bz2',
-    'sherpa-onnx-paraformer-zh-2023-03-28':
+    'sherpa-onnx-paraformer-zh':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-paraformer-zh-2023-03-28.tar.bz2',
-    'sherpa-onnx-paraformer-zh-2023-09-14':
+    'sherpa-onnx-paraformer-zh':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-paraformer-zh-2023-09-14.tar.bz2',
-    'sherpa-onnx-paraformer-zh-2024-03-09':
+    'sherpa-onnx-paraformer-zh':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-paraformer-zh-2024-03-09.tar.bz2',
-    'sherpa-onnx-paraformer-zh-small-2024-03-09':
+    'sherpa-onnx-paraformer-zh-small':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-paraformer-zh-small-2024-03-09.tar.bz2',
-    'sherpa-onnx-streaming-conformer-zh-2023-05-23':
+    'sherpa-onnx-streaming-conformer-zh':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-conformer-zh-2023-05-23.tar.bz2',
     'sherpa-onnx-streaming-paraformer-bilingual-zh-en':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-paraformer-bilingual-zh-en.tar.bz2',
     'sherpa-onnx-streaming-paraformer-trilingual-zh-cantonese-en':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-paraformer-trilingual-zh-cantonese-en.tar.bz2',
-    'sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20':
+    'sherpa-onnx-streaming-zipformer-bilingual-zh-en':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20.tar.bz2',
-    'sherpa-onnx-streaming-zipformer-ctc-multi-zh-hans-2023-12-13':
+    'sherpa-onnx-streaming-zipformer-ctc-multi-zh-hans':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-ctc-multi-zh-hans-2023-12-13.tar.bz2',
-    'sherpa-onnx-streaming-zipformer-multi-zh-hans-2023-12-12':
+    'sherpa-onnx-streaming-zipformer-multi-zh-hans':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-multi-zh-hans-2023-12-12.tar.bz2',
-    'sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16':
+    'sherpa-onnx-streaming-zipformer-small-bilingual-zh-en':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-small-bilingual-zh-en-2023-02-16.tar.bz2',
-    'sherpa-onnx-streaming-zipformer-zh-14M-2023-02-23':
+    'sherpa-onnx-streaming-zipformer-zh-14M':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-zh-14M-2023-02-23.tar.bz2',
-    'sherpa-onnx-telespeech-ctc-zh-2024-06-04':
+    'sherpa-onnx-telespeech-ctc-zh':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-telespeech-ctc-zh-2024-06-04.tar.bz2',
   };
 
-  /// 下载并安装中文tts模型
+  /// 下载并安装中文asr或者tts模型
   static Future<bool> setupSherpaModel(
     String modelName, {
     CancelToken? cancelToken,
@@ -203,9 +205,14 @@ class SherpaConfigUtil {
       await installationDir.create(recursive: true);
     }
     String? modelFilename;
-    String? downloadUrl = sherpaModelDownloadUrl[modelName];
+    String? downloadUrl = sherpaAsrModelDownloadUrl[modelName];
     if (downloadUrl != null) {
       modelFilename = FileUtil.filename(downloadUrl);
+    } else {
+      downloadUrl = sherpaTtsModelDownloadUrl[modelName];
+      if (downloadUrl != null) {
+        modelFilename = FileUtil.filename(downloadUrl);
+      }
     }
     if (modelFilename == null) {
       logger.e('modelFilename is not exist');
@@ -351,7 +358,7 @@ class SherpaConfigUtil {
   }
 
   static Future<OnlineRecognizer> createOnlineRecognizer(
-      String modelPath) async {
+      {String modelPath = 'sherpa-onnx-conformer-zh'}) async {
     final String encoder =
         p.join(_sherpaModelInstallationPath!, modelPath, 'encoder.onnx');
     final String decoder =
@@ -385,7 +392,7 @@ class SherpaConfigUtil {
   }
 
   static Future<OfflineRecognizer> createOfflineRecognizer(
-      String modelPath) async {
+      {String modelPath = 'sherpa-onnx-conformer-zh'}) async {
     final String encoder =
         p.join(_sherpaModelInstallationPath!, modelPath, 'encoder.onnx');
     final String decoder =

@@ -9,22 +9,26 @@ import 'package:record/record.dart';
 
 import 'package:sherpa_onnx/sherpa_onnx.dart';
 
-class OnlineSpeechToText {
+/// 支持在线的录音识别，也支持单独的音频字节识别
+class SherpaSpeechToText {
+  bool isOffline = true;
   String? text;
   final AudioRecorder audioRecorder = AudioRecorder();
   String _last = '';
   int _index = 0;
   bool _isInitialized = false;
 
-  OnlineRecognizer? _recognizer;
-  OnlineStream? _stream;
+  OnlineRecognizer? _onlineRecognizer;
+  OfflineRecognizer? _offlineRecognizer;
+  OnlineStream? _onlineStream;
+  OfflineStream? _offlineStream;
   final int _sampleRate = 16000;
 
   StreamSubscription<RecordState>? _recordSub;
   final ValueNotifier<RecordState> recordState =
       ValueNotifier<RecordState>(RecordState.stop);
 
-  OnlineSpeechToText() {
+  SherpaSpeechToText() {
     _recordSub = audioRecorder.onStateChanged().listen((recordState) {
       _updateRecordState(recordState);
     });
@@ -34,37 +38,70 @@ class OnlineSpeechToText {
   init() async {
     if (!_isInitialized) {
       initBindings();
-      _recognizer = await SherpaConfigUtil.createOnlineRecognizer('');
-      _stream = _recognizer?.createStream();
-
+      if (isOffline) {
+        _offlineRecognizer = await SherpaConfigUtil.createOfflineRecognizer();
+        _offlineStream = _offlineRecognizer?.createStream();
+      } else {
+        _onlineRecognizer = await SherpaConfigUtil.createOnlineRecognizer();
+        _onlineStream = _onlineRecognizer?.createStream();
+      }
       _isInitialized = true;
     }
   }
 
   /// 识别音频字节
-  recognize(List<int> audioData) async {
+  recognize({List<int>? audioData, String? wavFilename}) async {
     await init();
-    final samplesFloat32 =
-        SherpaConfigUtil.convertBytesToFloat32(Uint8List.fromList(audioData));
-
-    _stream!.acceptWaveform(samples: samplesFloat32, sampleRate: _sampleRate);
-    while (_recognizer!.isReady(_stream!)) {
-      _recognizer!.decode(_stream!);
+    Float32List? samples;
+    if (wavFilename != null) {
+      final WaveData waveData = readWave(wavFilename);
+      samples = waveData.samples;
+    } else if (audioData != null) {
+      samples =
+          SherpaConfigUtil.convertBytesToFloat32(Uint8List.fromList(audioData));
+    } else {
+      return;
     }
+    if (_onlineStream != null) {
+      _onlineStream!.acceptWaveform(samples: samples, sampleRate: _sampleRate);
+      while (_onlineRecognizer!.isReady(_onlineStream!)) {
+        _onlineRecognizer!.decode(_onlineStream!);
+      }
 
-    /// 识别录入的音频流
-    final String text = _recognizer!.getResult(_stream!).text;
-    this.text = _last;
-    if (text != '') {
-      if (_last == '') {
-        this.text = '$_index: $text';
-      } else {
-        this.text = '$_index: $text\n$_last';
+      /// 识别录入的音频流
+      final String text = _onlineRecognizer!.getResult(_onlineStream!).text;
+      this.text = _last;
+      if (text != '') {
+        if (_last == '') {
+          this.text = '$_index: $text';
+        } else {
+          this.text = '$_index: $text\n$_last';
+        }
+      }
+
+      if (_onlineRecognizer!.isEndpoint(_onlineStream!)) {
+        _onlineRecognizer!.reset(_onlineStream!);
+        if (text != '') {
+          _last = this.text!;
+          _index += 1;
+        }
       }
     }
+    if (_offlineStream != null) {
+      _offlineStream!.acceptWaveform(samples: samples, sampleRate: _sampleRate);
+      _offlineRecognizer!.decode(_offlineStream!);
 
-    if (_recognizer!.isEndpoint(_stream!)) {
-      _recognizer!.reset(_stream!);
+      /// 识别录入的音频流
+      final String text = _offlineRecognizer!.getResult(_offlineStream!).text;
+      this.text = _last;
+      if (text != '') {
+        if (_last == '') {
+          this.text = '$_index: $text';
+        } else {
+          this.text = '$_index: $text\n$_last';
+        }
+      }
+
       if (text != '') {
         _last = this.text!;
         _index += 1;
@@ -97,7 +134,7 @@ class OnlineSpeechToText {
 
         stream.listen(
           (data) {
-            recognize(data);
+            recognize(audioData: data);
           },
           onDone: () {
             logger.i('stream stopped.');
@@ -111,8 +148,8 @@ class OnlineSpeechToText {
 
   /// 停止音频录制
   Future<void> stop() async {
-    _stream!.free();
-    _stream = _recognizer!.createStream();
+    _onlineStream?.free();
+    _onlineStream = _onlineRecognizer?.createStream();
 
     await audioRecorder.stop();
   }
@@ -153,7 +190,9 @@ class OnlineSpeechToText {
   void dispose() {
     _recordSub?.cancel();
     audioRecorder.dispose();
-    _stream?.free();
-    _recognizer?.free();
+    _onlineStream?.free();
+    _onlineRecognizer?.free();
+    _offlineStream?.free();
+    _offlineRecognizer?.free();
   }
 }

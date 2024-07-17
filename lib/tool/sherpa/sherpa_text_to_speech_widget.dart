@@ -15,7 +15,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:sherpa_onnx/sherpa_onnx.dart';
 
 /// Sherpa的离线TTS配置和安装界面
-class OfflineTextToSpeechWidget extends StatelessWidget {
+class SherpaTextToSpeechWidget extends StatelessWidget {
   final AudioPlayer player = AudioPlayer();
   late Stream<PlayerState> playerStateStream = player.onPlayerStateChanged;
   String? filename;
@@ -34,7 +34,7 @@ class OfflineTextToSpeechWidget extends StatelessWidget {
     return sherpaPresent.value;
   }
 
-  OfflineTextToSpeechWidget({super.key}) {
+  SherpaTextToSpeechWidget({super.key}) {
     playerStateStream.listen((PlayerState playerState) {
       if (playerState == PlayerState.stopped ||
           playerState == PlayerState.completed) {
