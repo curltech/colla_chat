@@ -7,7 +7,6 @@ import 'package:colla_chat/plugin/platform_text_to_speech_widget.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/sherpa/sherpa_config_util.dart';
-import 'package:colla_chat/tool/sherpa/sherpa_install_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
