@@ -152,18 +152,21 @@ class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
                 SherpaConfigUtil.sherpaModelInstallationPath ?? '';
             children.add(
               CommonAutoSizeTextFormField(
-                  labelText: AppLocalizations.t('Sherpa installation path'),
-                  controller: controller,
-                  hintText: AppLocalizations.t('Sherpa installation path'),
-                  suffix: IconButton(
-                      onPressed: () {
-                        SherpaConfigUtil.sherpaModelInstallationPath =
-                            controller.text;
-                      },
-                      icon: Icon(
-                        Icons.save,
-                        color: myself.primary,
-                      ))),
+                labelText: AppLocalizations.t('Sherpa installation path'),
+                controller: controller,
+                hintText: AppLocalizations.t('Sherpa installation path'),
+                suffix: IconButton(
+                  onPressed: () {
+                    SherpaConfigUtil.sherpaModelInstallationPath =
+                        controller.text;
+                  },
+                  icon: Icon(
+                    Icons.save,
+                    color: myself.primary,
+                  ),
+                  tooltip: AppLocalizations.t('Save'),
+                ),
+              ),
             );
             children.add(_buildModelWidget());
             children.addAll([
