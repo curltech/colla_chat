@@ -1,7 +1,9 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/download_file_util.dart';
 import 'package:colla_chat/tool/sherpa/sherpa_config_util.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -9,7 +11,7 @@ import 'package:flutter/material.dart';
 
 class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
   //'sherpa-onnx-conformer-zh','sherpa-onnx-vits-zh-ll'
-  String? modelName;
+  ValueNotifier<String?> modelName = ValueNotifier<String?>(null);
   Function()? onDownloadComplete;
 
   SherpaInstallWidget({super.key, this.onDownloadComplete}) {
@@ -45,7 +47,7 @@ class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
 
   Future<void> setupSherpaModel() async {
     bool success = await SherpaConfigUtil.setupSherpaModel(
-      modelName!,
+      modelName.value!,
       onProgress: (DownloadProgress progress) {
         downloadProgress.value = progress;
       },
@@ -58,9 +60,8 @@ class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
     ButtonStyle style = StyleUtil.buildButtonStyle(
         maximumSize: const Size(200.0, 56.0), backgroundColor: myself.primary);
     return Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           TextButton.icon(
             style: style,
@@ -70,7 +71,7 @@ class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
           ),
           const SizedBox(height: 20),
           SizedBox(
-            width: 360,
+            width: appDataProvider.secondaryBodyWidth,
             child: ValueListenableBuilder(
               valueListenable: downloadProgress,
               builder: (BuildContext context, DownloadProgress value, _) {
@@ -111,73 +112,74 @@ class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
     var items = <DropdownMenuItem<String>>[];
     for (String modelName in modelNames) {
       items.add(DropdownMenuItem(
-          value: modelName,
-          child: Row(children: [
-            const SizedBox(
-              width: 50,
-            ),
-            Text(modelName),
-            const SizedBox(
-              width: 50,
-            ),
-          ])));
+        value: modelName,
+        child: Text(modelName),
+      ));
     }
-    return Row(
+    return Column(
       mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CommonAutoSizeText(AppLocalizations.t('Sherpa model')),
         const SizedBox(
-          width: 15.0,
+          height: 15.0,
         ),
-        DropdownButton(
-            value: modelName,
-            items: items,
-            onChanged: (Object? item) {
-              modelName = item.toString();
-            })
+        CommonAutoSizeText(AppLocalizations.t('Sherpa model')),
+        ValueListenableBuilder(
+          valueListenable: modelName,
+          builder: (BuildContext context, value, Widget? child) {
+            return DropdownButton(
+                value: modelName.value,
+                items: items,
+                onChanged: (Object? item) {
+                  modelName.value = item.toString();
+                });
+          },
+        )
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: sherpaPresent,
-      builder: (BuildContext context, bool sherpaPresent, Widget? child) {
-        List<Widget> children = [];
-        controller.text = SherpaConfigUtil.sherpaModelInstallationPath ?? '';
-        children.add(
-          CommonAutoSizeTextFormField(
-              labelText: 'Sherpa installation path',
-              controller: controller,
-              hintText: 'Sherpa installation path',
-              suffix: IconButton(
-                  onPressed: () {
-                    SherpaConfigUtil.sherpaModelInstallationPath =
-                        controller.text;
-                  },
-                  icon: Icon(
-                    Icons.save,
-                    color: myself.primary,
-                  ))),
-        );
-        children.add(_buildModelWidget());
-        if (!sherpaPresent) {
-          children.addAll([
-            const SizedBox(height: 20),
-            _buildInstallWidget(context),
-          ]);
-        }
-        return Container(
-          padding: const EdgeInsets.all(15.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: children,
-          ),
-        );
-      },
-    );
+    return AppBarView(
+        withLeading: true,
+        title: title,
+        child: ValueListenableBuilder(
+          valueListenable: sherpaPresent,
+          builder: (BuildContext context, bool sherpaPresent, Widget? child) {
+            List<Widget> children = [];
+            controller.text =
+                SherpaConfigUtil.sherpaModelInstallationPath ?? '';
+            children.add(
+              CommonAutoSizeTextFormField(
+                  labelText: 'Sherpa installation path',
+                  controller: controller,
+                  hintText: 'Sherpa installation path',
+                  suffix: IconButton(
+                      onPressed: () {
+                        SherpaConfigUtil.sherpaModelInstallationPath =
+                            controller.text;
+                      },
+                      icon: Icon(
+                        Icons.save,
+                        color: myself.primary,
+                      ))),
+            );
+            children.add(_buildModelWidget());
+            children.addAll([
+              const SizedBox(height: 20),
+              Expanded(child: _buildInstallWidget(context)),
+            ]);
+
+            return Container(
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: children,
+              ),
+            );
+          },
+        ));
   }
 }

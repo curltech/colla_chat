@@ -722,12 +722,17 @@
   "Rhythmic": "词牌",
   "Dynasty": "朝代",
   "Paragraphs": "内容",
-  "No poem": "没有诗词",
+  "No poem": "没有查询到诗词",
   "Setup Sherpa": "安装Sherpa",
   "downloading": "下载中...",
   "decompressing": "解压中...",
   "inactive": "未激活",
   "Volume": "音量",
   "Pitch": "音高",
-  "Rate": "播放速度"
+  "Rate": "播放速度",
+  "SherpaInstall": "Sherpa安装",
+  "Sherpa installation path": "Sherpa安装目录",
+  "Sherpa model": "Sherpa模型",
+  "Setup sherpa": "安装sherpa",
+  "Sherpa is not uninstalled": "Sherpa未被安装"
 }

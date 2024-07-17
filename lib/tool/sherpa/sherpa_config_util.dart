@@ -156,10 +156,6 @@ class SherpaConfigUtil {
     'sherpa-onnx-lstm-zh':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-lstm-zh-2023-02-20.tar.bz2',
     'sherpa-onnx-paraformer-zh':
-        'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-paraformer-zh-2023-03-28.tar.bz2',
-    'sherpa-onnx-paraformer-zh':
-        'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-paraformer-zh-2023-09-14.tar.bz2',
-    'sherpa-onnx-paraformer-zh':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-paraformer-zh-2024-03-09.tar.bz2',
     'sherpa-onnx-paraformer-zh-small':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-paraformer-zh-small-2024-03-09.tar.bz2',
@@ -169,8 +165,6 @@ class SherpaConfigUtil {
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-paraformer-bilingual-zh-en.tar.bz2',
     'sherpa-onnx-streaming-paraformer-trilingual-zh-cantonese-en':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-paraformer-trilingual-zh-cantonese-en.tar.bz2',
-    'sherpa-onnx-streaming-zipformer-bilingual-zh-en':
-        'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20.tar.bz2',
     'sherpa-onnx-streaming-zipformer-ctc-multi-zh-hans':
         'https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-ctc-multi-zh-hans-2023-12-13.tar.bz2',
     'sherpa-onnx-streaming-zipformer-multi-zh-hans':
