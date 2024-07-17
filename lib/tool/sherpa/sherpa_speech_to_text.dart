@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/sherpa/sherpa_config_util.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:record/record.dart';
 
 import 'package:sherpa_onnx/sherpa_onnx.dart';
