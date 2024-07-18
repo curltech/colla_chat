@@ -16,17 +16,6 @@ final List<Option> outEventOption = [
   Option('石破天惊', 'StoneSky', hint: '阴线，最高价低于昨日最低价'),
 ];
 
-class RemoteEventFilterService extends GeneralRemoteService<EventFilter> {
-  RemoteEventFilterService({required super.name}) {
-    post = (Map map) {
-      return EventFilter.fromRemoteJson(map);
-    };
-  }
-}
-
-final RemoteEventFilterService remoteEventFilterService =
-    RemoteEventFilterService(name: 'eventfilter');
-
 class EventFilterService extends GeneralBaseService<EventFilter> {
   EventFilterService(
       {required super.tableName,
