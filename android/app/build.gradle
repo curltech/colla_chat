@@ -115,19 +115,10 @@ dependencies {
     //去除重复的类
     configurations {
         all {
-            exclude group: 'com.github.yalantis', module: 'ucrop'
             exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk8'
             exclude group: 'org.jetbrains.kotlin', module: 'kotlin-stdlib-jdk7'
         }
     }
-//    constraints {
-//        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0") {
-//            because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
-//        }
-//        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.21") {
-//            because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
-//        }
-//    }
     modules {
         module("org.jetbrains.kotlin:kotlin-stdlib-jdk7") {
             replacedBy("org.jetbrains.kotlin:kotlin-stdlib", "kotlin-stdlib-jdk7 is now part of kotlin-stdlib")

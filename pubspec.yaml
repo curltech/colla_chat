@@ -437,7 +437,7 @@ dependency_overrides:
   #  crop_your_image: ^0.7.5
   #  crop_image: ^1.0.11
   full_picker: ^2.1.0
-  #image_cropper: ^7.1.0
+  image_cropper: ^7.1.0
   light_compressor: ^2.2.0
   collection: ^1.17.0
   path: ^1.8.3
