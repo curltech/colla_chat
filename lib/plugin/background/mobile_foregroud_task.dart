@@ -24,15 +24,6 @@ class MobileForegroundTask {
         AppLocalizations.t('CollaChat foreground service is running'),
     channelImportance: NotificationChannelImportance.HIGH,
     priority: NotificationPriority.MAX,
-    iconData: const NotificationIconData(
-      resType: ResourceType.mipmap,
-      resPrefix: ResourcePrefix.ic,
-      name: 'launcher',
-    ),
-    buttons: [
-      const NotificationButton(id: 'sendButton', text: 'Send'),
-      const NotificationButton(id: 'testButton', text: 'Test'),
-    ],
   );
   IOSNotificationOptions iosNotificationOptions = const IOSNotificationOptions(
     showNotification: true,
@@ -85,7 +76,7 @@ class MobileForegroundTask {
   }
 
   /// 手工启动任务
-  Future<bool> start({void Function()? onRepeatEvent}) async {
+  Future<Object> start({void Function()? onRepeatEvent}) async {
     this.onRepeatEvent = onRepeatEvent;
     await _init();
 
@@ -99,7 +90,7 @@ class MobileForegroundTask {
 
     if (await FlutterForegroundTask.isRunningService) {
       print('FlutterForegroundTask restartService');
-      return FlutterForegroundTask.restartService();
+      return await FlutterForegroundTask.restartService();
     } else {
       print('FlutterForegroundTask startService');
       return FlutterForegroundTask.startService(
@@ -129,7 +120,7 @@ class MobileForegroundTask {
   }
 
   /// 更新服务任务参数
-  Future<bool> updateService() {
+  Future<ServiceRequestResult> updateService() {
     return FlutterForegroundTask.updateService(
       foregroundTaskOptions: foregroundTaskOptions,
       notificationTitle: notificationTitle,
@@ -139,7 +130,7 @@ class MobileForegroundTask {
   }
 
   /// 停止任务
-  Future<bool> stop() {
+  Future<ServiceRequestResult> stop() {
     receivePort?.close();
     receivePort = null;
     return FlutterForegroundTask.stopService();

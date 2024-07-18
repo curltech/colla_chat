@@ -41,7 +41,7 @@ dependencies:
   # 系统功能，获取系统信息和操作，需要调用插件才能完成
   flutter_background: ^1.2.0  #android,后台运行，可以保持网络连接
   flutter_foreground_service: ^0.4.1 #android,后台运行，可以保持网络连接，和flutter_background功能一样
-  flutter_foreground_task: ^6.1.3
+  flutter_foreground_task: ^7.4.2
   flutter_background_service: ^5.0.5
   flutter_background_executor: ^1.0.0
   system_alert_window: ^2.0.0
@@ -355,7 +355,7 @@ dependencies:
   flutter_svg: ^2.0.3
   latlong2: ^0.9.0
   flutter_map_location_marker: 8.0.8
-  flutter_map: ^6.1.0 #Open Street Map，需要翻墙
+  flutter_map: ^6.2.1 #Open Street Map，需要翻墙
   apple_maps_flutter: ^1.3.0
   google_maps_flutter: ^2.6.1 #谷歌地图，移动设备
   tencent_map_flutter: ^0.1.0
@@ -434,12 +434,10 @@ dependency_overrides:
   camera: ^0.11.0 #调用相机
   google_fonts: ^6.1.0
   material_design_icons_flutter: ^7.0.7296
-  #image_cropping: ^0.0.13 #裁剪图片
   #  crop_your_image: ^0.7.5
-  #  image_cropper: ^5.0.1
   #  crop_image: ^1.0.11
   full_picker: ^2.1.0
-  image_cropper: ^7.1.0
+  #image_cropper: ^7.1.0
   light_compressor: ^2.2.0
   collection: ^1.17.0
   path: ^1.8.3
@@ -464,7 +462,7 @@ dependency_overrides:
   image_picker: ^1.1.1 #选取图库,移动从图像廊或者相机选，桌面实现采用file_selector，从文件系统选
   markdown: ^7.1.1
   lottie: ^2.4.0
-  flutter_quill: ^9.3.20
+  flutter_quill: ^10.0.1
   #  flutter_quill: #9.3.1
   #    git: https://github.com/singerdmx/flutter-quill.git
   flutter_quill_extensions: ^9.3.20
