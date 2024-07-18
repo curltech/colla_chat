@@ -465,7 +465,7 @@ dependency_overrides:
   flutter_quill: ^10.0.1
   #  flutter_quill: #9.3.1
   #    git: https://github.com/singerdmx/flutter-quill.git
-  flutter_quill_extensions: ^9.3.20
+  flutter_quill_extensions: ^10.0.1
   #    git:
   #      url: https://github.com/singerdmx/flutter-quill.git
   #      path: flutter_quill_extensions
