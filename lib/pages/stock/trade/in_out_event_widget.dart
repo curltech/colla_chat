@@ -3,6 +3,7 @@ import 'package:colla_chat/entity/stock/event_filter.dart';
 import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/stock/me/stock_line_chart_widget.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -274,11 +275,9 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
                 : null);
       }
     } else {
-      dayLines = await remoteDayLineService.sendFindInout(eventCode,
-          tsCode: tsCode,
-          tradeDate: tradeDate,
-          startDate: startDate,
-          endDate: endDate);
+      logger.e('eventCode has no filters');
+
+      return;
     }
     inoutEventController.replaceAll(dayLines);
     List<String> tsCodes = [];

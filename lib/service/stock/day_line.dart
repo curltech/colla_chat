@@ -109,42 +109,6 @@ class RemoteDayLineService extends GeneralRemoteService<DayLine> {
   }
 
   /// 查询股票的买卖点
-  Future<List<DayLine>> sendFindInout(String eventCode,
-      {String? tsCode, int? tradeDate, int? startDate, int? endDate}) async {
-    Map<String, dynamic> params = {
-      'event_code': eventCode,
-    };
-    if (tsCode != null) {
-      params['ts_code'] = tsCode;
-    }
-    if (tradeDate != null) {
-      params['trade_date'] = tradeDate;
-    }
-    if (startDate != null) {
-      params['start_date'] = startDate;
-    }
-    if (endDate != null) {
-      params['end_date'] = endDate;
-    }
-    var responseData = await send('/dayline/FindInOutEvent', data: params);
-    List<DayLine> dayLines = [];
-    if (responseData != null) {
-      List ms = responseData['data'];
-      for (var m in ms) {
-        var o = post(m);
-        dayLines.add(o);
-        String tsCode = o.tsCode;
-        Share? share = await shareService.findShare(tsCode);
-        if (share != null) {
-          o.name = share.name;
-        }
-      }
-    }
-
-    return dayLines;
-  }
-
-  /// 查询股票的买卖点
   Future<List<DayLine>> sendFindFlexPoint(String filterContent,
       {String? tsCode,
       int? tradeDate,
