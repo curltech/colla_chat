@@ -265,6 +265,7 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
         }
       }
       if (filterContents != null) {
+        DateTime start = DateTime.now();
         dayLines = await remoteDayLineService.sendFindFlexPoint(filterContents,
             tsCode: tsCode,
             tradeDate: tradeDate,
@@ -273,6 +274,8 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
             filterParas: filterParas != null
                 ? JsonUtil.toJsonString(filterParas)
                 : null);
+        DateTime end = DateTime.now();
+        logger.i('find more data duration:${end.difference(start).inMilliseconds}');
       }
     } else {
       logger.e('eventCode has no filters');

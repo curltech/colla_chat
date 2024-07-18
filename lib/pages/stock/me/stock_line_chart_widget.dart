@@ -2,6 +2,7 @@ import 'package:candlesticks/candlesticks.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/day_line.dart';
@@ -233,7 +234,7 @@ class _StockLineChartWidgetState extends State<StockLineChartWidget> {
     String tsCode = dayLineController.tsCode;
     int length = dayLineController.data.length;
     Map<String, dynamic> response;
-
+    DateTime start = DateTime.now();
     if (lineType == 101) {
       response = await remoteDayLineService.sendFindPreceding(tsCode,
           from: length, limit: 100);
@@ -241,6 +242,8 @@ class _StockLineChartWidgetState extends State<StockLineChartWidget> {
       response = await remoteWmqyLineService.sendFindLinePreceding(tsCode,
           lineType: lineType, from: length, limit: 100);
     }
+    DateTime end = DateTime.now();
+    logger.i('find more data duration:${end.difference(start).inMilliseconds}');
     List<dynamic> data = response['data'];
     int count = response['count'];
     dayLineController.count = count;
