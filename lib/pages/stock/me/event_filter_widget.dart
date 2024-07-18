@@ -15,7 +15,7 @@ import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-class LocalEventFilterController extends DataListController<EventFilter> {
+class EventFilterController extends DataListController<EventFilter> {
   String? _eventCode;
   String? _eventName;
 
@@ -44,30 +44,29 @@ class LocalEventFilterController extends DataListController<EventFilter> {
 }
 
 /// 自选股的控制器
-final LocalEventFilterController localEventFilterController =
-    LocalEventFilterController();
+final EventFilterController eventFilterController = EventFilterController();
 
 ///自选股和分组的查询界面
-class LocalEventFilterWidget extends StatefulWidget with TileDataMixin {
-  LocalEventFilterWidget({super.key});
+class EventFilterWidget extends StatefulWidget with TileDataMixin {
+  EventFilterWidget({super.key});
 
   @override
-  State<StatefulWidget> createState() => _LocalEventFilterWidgetState();
+  State<StatefulWidget> createState() => _EventFilterWidgetState();
 
   @override
   bool get withLeading => true;
 
   @override
-  String get routeName => 'local_event_filter';
+  String get routeName => 'event_filter';
 
   @override
   IconData get iconData => Icons.filter;
 
   @override
-  String get title => 'LocalEventFilter';
+  String get title => 'EventFilter';
 }
 
-class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
+class _EventFilterWidgetState extends State<EventFilterWidget>
     with TickerProviderStateMixin {
   final List<PlatformDataField> eventFilterDataField = [
     PlatformDataField(
@@ -92,20 +91,6 @@ class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
           Icons.person,
           color: myself.primary,
         )),
-    // PlatformDataField(
-    //     name: 'condCode',
-    //     label: 'CondCode',
-    //     prefixIcon: Icon(
-    //       Icons.control_point_duplicate_outlined,
-    //       color: myself.primary,
-    //     )),
-    // PlatformDataField(
-    //     name: 'condName',
-    //     label: 'CondName',
-    //     prefixIcon: Icon(
-    //       Icons.person,
-    //       color: myself.primary,
-    //     )),
     PlatformDataField(
         name: 'condContent',
         label: 'CondContent',
@@ -144,26 +129,11 @@ class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
       name: 'eventName',
       width: 100,
     ),
-    // PlatformDataColumn(
-    //   label: '条件代码',
-    //   name: 'condCode',
-    //   width: 130,
-    // ),
-    // PlatformDataColumn(
-    //   label: '条件名',
-    //   name: 'condName',
-    //   width: 180,
-    // ),
     PlatformDataColumn(
       label: '条件内容',
       name: 'condContent',
       width: 270,
     ),
-    // PlatformDataColumn(
-    //   label: '条件参数',
-    //   name: 'condParas',
-    //   width: 100,
-    // ),
     PlatformDataColumn(
         label: '',
         name: 'action',
@@ -173,7 +143,7 @@ class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
 
   @override
   initState() {
-    localEventFilterController.addListener(_update);
+    eventFilterController.addListener(_update);
     super.initState();
   }
 
@@ -190,7 +160,7 @@ class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
                 content: 'Do you confirm to delete event filter?');
             if (confirm == true) {
               eventFilterService.delete(entity: eventFilter);
-              localEventFilterController.delete(index: index);
+              eventFilterController.delete(index: index);
             }
           },
           icon: const Icon(
@@ -218,7 +188,7 @@ class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
   }
 
   _onDoubleTap(int index) {
-    localEventFilterController.currentIndex = index;
+    eventFilterController.currentIndex = index;
     swiperController.move(1);
   }
 
@@ -231,18 +201,18 @@ class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
       fixedLeftColumns: 1,
       dataRowHeight: 100,
       platformDataColumns: eventFilterColumns,
-      controller: localEventFilterController,
+      controller: eventFilterController,
       onDoubleTap: _onDoubleTap,
     );
   }
 
   _buildEventFilterEditView(BuildContext context) {
-    EventFilter? eventFilter = localEventFilterController.current;
+    EventFilter? eventFilter = eventFilterController.current;
     if (eventFilter != null) {
       controller.setValues(eventFilter.toJson());
     } else {
-      String? eventCode = localEventFilterController.eventCode;
-      String? eventName = localEventFilterController.eventName;
+      String? eventCode = eventFilterController.eventCode;
+      String? eventName = eventFilterController.eventName;
       Map<String, dynamic> json = {};
       if (eventCode != null && eventName != null) {
         json['eventCode'] = eventCode;
@@ -251,11 +221,6 @@ class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
       controller.setValues(json);
     }
     List<FormButton> formButtonDefs = [
-      FormButton(
-          label: 'Cancel',
-          onTap: (Map<String, dynamic> values) {
-            _onCancel(values);
-          }),
       FormButton(
           label: 'Copy',
           onTap: (Map<String, dynamic> values) {
@@ -276,7 +241,22 @@ class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
           formButtons: formButtonDefs,
         ));
 
-    return formInputWidget;
+    return Column(
+      children: [
+        ButtonBar(
+          alignment: MainAxisAlignment.start,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.chevron_left),
+              onPressed: () {
+                _onCancel();
+              },
+            ),
+          ],
+        ),
+        formInputWidget,
+      ],
+    );
   }
 
   _onOk(Map<String, dynamic> values) async {
@@ -284,7 +264,7 @@ class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
     if (currentFilterCond.id == null) {
       await eventFilterService.insert(currentFilterCond);
       if (currentFilterCond.id != null) {
-        localEventFilterController.insert(0, currentFilterCond);
+        eventFilterController.insert(0, currentFilterCond);
       }
     } else {
       await eventFilterService.update(currentFilterCond);
@@ -297,10 +277,10 @@ class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
 
   _onCopy(Map<String, dynamic> values) async {
     controller.setValue('id', null);
-    localEventFilterController.currentIndex = -1;
+    eventFilterController.currentIndex = -1;
   }
 
-  _onCancel(Map<String, dynamic> values) async {
+  _onCancel() async {
     swiperController.move(0);
   }
 
@@ -310,7 +290,7 @@ class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
       IconButton(
         tooltip: AppLocalizations.t('Add'),
         onPressed: () {
-          localEventFilterController.currentIndex = -1;
+          eventFilterController.currentIndex = -1;
           swiperController.move(1);
         },
         icon: const Icon(Icons.add_circle_outline),
@@ -318,14 +298,14 @@ class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
       IconButton(
         tooltip: AppLocalizations.t('Refresh'),
         onPressed: () async {
-          if (localEventFilterController.eventCode != null) {
+          if (eventFilterController.eventCode != null) {
             List<EventFilter> value = await eventFilterService.find(
                 where: 'eventCode=?',
-                whereArgs: [localEventFilterController.eventCode!]);
-            localEventFilterController.replaceAll(value);
+                whereArgs: [eventFilterController.eventCode!]);
+            eventFilterController.replaceAll(value);
           } else {
             List<EventFilter> value = await eventFilterService.findAll();
-            localEventFilterController.replaceAll(value);
+            eventFilterController.replaceAll(value);
           }
         },
         icon: const Icon(Icons.refresh_outlined),
@@ -354,7 +334,7 @@ class _LocalEventFilterWidgetState extends State<LocalEventFilterWidget>
 
   @override
   void dispose() {
-    localEventFilterController.removeListener(_update);
+    eventFilterController.removeListener(_update);
     super.dispose();
   }
 }

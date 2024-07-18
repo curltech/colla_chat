@@ -27,9 +27,7 @@ import 'package:colla_chat/service/mail/mail_address.dart';
 import 'package:colla_chat/service/mail/mail_message.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/service/poem/poem.dart';
-import 'package:colla_chat/service/stock/event.dart';
 import 'package:colla_chat/service/stock/event_filter.dart';
-import 'package:colla_chat/service/stock/filter_cond.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/service/stock/share_group.dart';
 import 'package:colla_chat/service/stock/stock_account.dart';
@@ -71,9 +69,7 @@ class ServiceLocator {
     services['conferenceService'] = conferenceService;
     services['shareService'] = shareService;
     services['shareGroupService'] = shareGroupService;
-    services['eventService'] = eventService;
     services['eventFilterService'] = eventFilterService;
-    services['filterCondService'] = filterCondService;
     services['poemService'] = poemService;
 
     securityContextServices[CryptoOption.none.index] =

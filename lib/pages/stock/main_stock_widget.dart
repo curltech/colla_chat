@@ -1,10 +1,6 @@
 import 'package:colla_chat/pages/stock/me/add_share_widget.dart';
-import 'package:colla_chat/pages/stock/me/local_event_filter_widget.dart';
+import 'package:colla_chat/pages/stock/me/event_filter_widget.dart';
 import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
-import 'package:colla_chat/pages/stock/setting/event_filter_widget.dart';
-import 'package:colla_chat/pages/stock/setting/event_widget.dart';
-import 'package:colla_chat/pages/stock/setting/filter_cond_widget.dart';
-import 'package:colla_chat/pages/stock/setting/go_code_widget.dart';
 import 'package:colla_chat/pages/stock/setting/refresh_stock_widget.dart';
 import 'package:colla_chat/pages/stock/setting/update_stock_widget.dart';
 import 'package:colla_chat/pages/stock/trade/in_out_event_widget.dart';
@@ -12,7 +8,6 @@ import 'package:colla_chat/pages/stock/value/performance_widget.dart';
 import 'package:colla_chat/pages/stock/value/qperformance_widget.dart';
 import 'package:colla_chat/pages/stock/value/qstat_widget.dart';
 import 'package:colla_chat/pages/stock/value/stat_score_widget.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -26,13 +21,8 @@ class MainStockWidget extends StatelessWidget with TileDataMixin {
   final AddShareWidget addShareWidget = AddShareWidget();
   final RefreshStockWidget refreshStockWidget = RefreshStockWidget();
   final UpdateStockWidget updateStockWidget = UpdateStockWidget();
-  final EventWidget eventWidget = EventWidget();
-  final FilterCondWidget filterCondWidget = FilterCondWidget();
-  final EventFilterWidget eventFilterWidget = EventFilterWidget();
-  final GoCodeWidget goCodeWidget = GoCodeWidget();
   final InoutEventWidget inoutEventWidget = InoutEventWidget();
-  final LocalEventFilterWidget localEventFilterWidget =
-      LocalEventFilterWidget();
+  final EventFilterWidget eventFilterWidget = EventFilterWidget();
   final PerformanceWidget performanceWidget = PerformanceWidget();
   final QPerformanceWidget qperformanceWidget = QPerformanceWidget();
   final QStatWidget qstatWidget = QStatWidget();
@@ -43,12 +33,8 @@ class MainStockWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(addShareWidget);
     indexWidgetProvider.define(refreshStockWidget);
     indexWidgetProvider.define(updateStockWidget);
-    indexWidgetProvider.define(eventWidget);
-    indexWidgetProvider.define(filterCondWidget);
-    indexWidgetProvider.define(eventFilterWidget);
-    indexWidgetProvider.define(goCodeWidget);
     indexWidgetProvider.define(inoutEventWidget);
-    indexWidgetProvider.define(localEventFilterWidget);
+    indexWidgetProvider.define(eventFilterWidget);
     indexWidgetProvider.define(performanceWidget);
     indexWidgetProvider.define(qperformanceWidget);
     indexWidgetProvider.define(qstatWidget);
@@ -73,7 +59,7 @@ class MainStockWidget extends StatelessWidget with TileDataMixin {
     final List<TileData> meTileData = TileData.from([
       shareSelectionWidget,
       addShareWidget,
-      localEventFilterWidget,
+      eventFilterWidget,
     ]);
     for (var tile in meTileData) {
       tile.dense = false;
@@ -96,12 +82,7 @@ class MainStockWidget extends StatelessWidget with TileDataMixin {
     List<TileDataMixin> mixins = [
       refreshStockWidget,
       updateStockWidget,
-      eventWidget,
-      filterCondWidget,
     ];
-    if (platformParams.desktop) {
-      mixins.add(goCodeWidget);
-    }
 
     final List<TileData> settingTileData = TileData.from(mixins);
     for (var tile in settingTileData) {
