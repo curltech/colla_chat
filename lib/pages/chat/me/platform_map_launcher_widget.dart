@@ -1,5 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -32,7 +33,11 @@ class PlatformMapLauncherWidget extends StatelessWidget with TileDataMixin {
   String get title => 'MapLauncher';
 
   _init() async {
-    maps.value = await GeolocatorUtil.installedMaps();
+    try {
+      maps.value = await GeolocatorUtil.installedMaps();
+    } catch (e) {
+      logger.e('find installed maps failure:e');
+    }
   }
 
   TileData? buildMapTileData(BuildContext context, int index) {

@@ -360,7 +360,7 @@ dependencies:
   google_maps_flutter: ^2.6.1 #谷歌地图，移动设备
   tencent_map_flutter: ^0.1.0
   platform_maps_flutter: ^1.0.2 #融合谷歌地图和苹果地图
-  map_launcher: ^3.3.0 #打开设备已安装的地图软件，移动设备
+  map_launcher: ^3.3.1 #打开设备已安装的地图软件，移动设备
   location_picker_flutter_map: ^3.0.1 #Open Street Map，需要翻墙
 
   #服务
