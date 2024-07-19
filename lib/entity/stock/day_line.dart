@@ -19,6 +19,8 @@ class StockLine extends BaseEntity {
   num? largeNetInflow;
   num? superNetInflow;
 
+  StockLine(this.tsCode, this.tradeDate);
+
   StockLine.fromJson(super.json)
       : tsCode = json['ts_code'],
         name = json['name'],
@@ -184,6 +186,8 @@ class DayLine extends StockLine {
   num? future144PctChgClose;
   num? future233PctChgClose;
   num? future240PctChgClose;
+
+  DayLine(super.tsCode, super.tradeDate);
 
   DayLine.fromJson(super.json)
       : pctMainNetInflow = json['pct_main_net_inflow'],
