@@ -14,7 +14,7 @@ class DayLineRequestParam {
   String? fields2; //
   int?
       klt; //每隔时长获取一次记录，1代表一分，5代表5分钟，101代表每天，102代表每周，103代表每月，104代表每季度，105代表每半年，106代表每年
-  int? fqt; //
+  int fqt = 1; //
   String? smplmt; //
   int? lmt; //获取记录数
   int? beg; //开始日期
@@ -25,25 +25,53 @@ class DayLineRequestParam {
   int? invt; //
 
   DayLineRequestParam(this.cb, this.ut);
+
+  Map<String, dynamic> toJson() {
+    return {
+      'cb': cb,
+      'secId': secId,
+      'ut': ut,
+      'fields1': fields1,
+      'fields2': fields2,
+      'klt': klt,
+      'fqt': fqt,
+      'smplmt': smplmt,
+      'lmt': lmt,
+      'beg': beg,
+      'end': end,
+      'underscore': underscore,
+      'fields': fields,
+      'fltt': fltt,
+      'invt': invt
+    };
+  }
 }
 
 class DayLineResponseData {
   String? code;
-  String? market;
+  int? market;
   String? name;
   int? decimal; //小数位
   int? dktotal; //总记录数
   double? preKPrice;
   List<String>? klines; //数据
 
-  DayLineResponseData.fromJson(Map json)
-      : code = json['code'],
-        market = json['market'],
-        name = json['name'],
-        decimal = json['decimal'],
-        dktotal = json['dktotal'],
-        preKPrice = json['preKPrice'],
-        klines = JsonUtil.toJson(json['klines']);
+  DayLineResponseData.fromJson(Map json) {
+    code = json['code'];
+    market = json['market'];
+    name = json['name'];
+    decimal = json['decimal'];
+    dktotal = json['dktotal'];
+    preKPrice = json['preKPrice'];
+    List<dynamic>? klines =
+        json['klines'] != null ? JsonUtil.toJson(json['klines']) : null;
+    if (klines != null) {
+      this.klines = [];
+      for (var kline in klines) {
+        this.klines!.add(kline.toString());
+      }
+    }
+  }
 }
 
 class CurrentResponseData {
@@ -82,12 +110,15 @@ class DayLineResponseResult {
         svr = json['svr'],
         lt = json['lt'],
         full = json['full'],
-        data = DayLineResponseData.fromJson(json['data']);
+        data = json['data'] != null
+            ? DayLineResponseData.fromJson(json['data'])
+            : null;
 }
 
 class CrawlerUtil {
   static DioHttpClient client =
       httpClientPool.get('http://push2his.eastmoney.com');
+  static String dayLineUrl = '/api/qt/stock/kline/get';
   static String dayLineCallback = "jQuery112401201342267983887_1638513559390";
   static String dayLineToken = "fa5fd1943c7b386f172d6893dbfba10b";
   static String dayLineType = "1638513559443";
@@ -113,7 +144,7 @@ class CrawlerUtil {
 
   static Future<String?> httpGet(String url, dynamic param) async {
     String args = toHttpArgs(param);
-    Response<dynamic> response = await client.get('url$args');
+    Response<dynamic> response = await client.get('$url$args');
     if (response.statusCode == 200) {
       return response.data;
     } else {
@@ -125,9 +156,9 @@ class CrawlerUtil {
 
   static Future<String?> httpGetDayLine(
       DayLineRequestParam requestParam) async {
-    String? resp = await httpGet('api/qt/stock/kline/get', requestParam);
+    String? resp = await httpGet(dayLineUrl, requestParam);
     if (resp != null) {
-      resp.substring(requestParam.cb.length, resp.length - 2);
+      resp = resp.substring(requestParam.cb.length + 1, resp.length - 2);
     }
 
     return resp;
@@ -144,13 +175,17 @@ class CrawlerUtil {
     return "0.$secId";
   }
 
-  static Future<List<String>?> getKLine(
-      String secId, int beg, int end, int limit, int klt) async {
+  static Future<DayLineResponseData?> getKLine(String secId,
+      {int beg = 19900101,
+      int end = 20500101,
+      int limit = 10000,
+      int klt = 101}) async {
     DayLineRequestParam dayLineRequestParam =
         DayLineRequestParam(dayLineCallback, dayLineToken);
     dayLineRequestParam.secId = await getSecId(secId);
-    dayLineRequestParam.fields1 = "f1,f2,f3,f4,f5,f6";
-    dayLineRequestParam.fields2 = "f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61";
+    dayLineRequestParam.fields1 = "f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6";
+    dayLineRequestParam.fields2 =
+        "f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61";
     dayLineRequestParam.klt = klt;
     dayLineRequestParam.beg = beg;
     if (end <= 0) {
@@ -168,7 +203,7 @@ class CrawlerUtil {
     DayLineResponseResult dayLineResponseResult =
         DayLineResponseResult.fromJson(JsonUtil.toJson(resp));
 
-    return dayLineResponseResult.data?.klines;
+    return dayLineResponseResult.data;
   }
 
   static DayLine strToDayLine(String secId, String kline) {
@@ -189,12 +224,22 @@ class CrawlerUtil {
     return dayLine;
   }
 
-  static Future<List<DayLine>?> getDayLine(
-      String secId, int beg, int end, int limit,
-      {DayLine? previous}) async {
-    List<String>? klines = await getKLine(secId, beg, end, limit, 101);
+  static Future<Map<String, dynamic>?> getDayLine(String secId,
+      {int beg = 19900101,
+      int end = 20500101,
+      int limit = 10000,
+      DayLine? previous}) async {
+    DayLineResponseData? data =
+        await getKLine(secId, beg: beg, end: end, limit: limit, klt: 101);
+    if (data == null) {
+      return null;
+    }
+    List<String>? klines = data.klines;
+    if (klines == null) {
+      return null;
+    }
     List<DayLine> dayLines = [];
-    for (var kline in klines!) {
+    for (var kline in klines) {
       DayLine dayLine = strToDayLine(secId, kline);
 
       if (previous != null && previous.open != 0.0) {
@@ -222,6 +267,6 @@ class CrawlerUtil {
       dayLines.add(dayLine);
     }
 
-    return dayLines;
+    return {'count': data.dktotal, 'data': dayLines};
   }
 }

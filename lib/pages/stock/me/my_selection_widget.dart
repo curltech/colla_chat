@@ -21,8 +21,7 @@ final DataListController<DayLine> dayLineController =
 
 ///自选股和分组的查询界面
 class ShareSelectionWidget extends StatefulWidget with TileDataMixin {
-  final StockLineChartWidget stockLineChartWidget =
-      const StockLineChartWidget();
+  final StockLineChartWidget stockLineChartWidget = StockLineChartWidget();
 
   ShareSelectionWidget({super.key}) {
     indexWidgetProvider.define(stockLineChartWidget);
