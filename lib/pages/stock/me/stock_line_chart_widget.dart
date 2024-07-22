@@ -18,7 +18,6 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
-import 'package:graphic/graphic.dart';
 
 class StockLineController extends DataListController<dynamic> {
   String tsCode;
@@ -81,6 +80,7 @@ class MultiStockLineController extends DataListController<String> {
         stockLineControllers[tsCode]?[106] =
             StockLineController(tsCode, name, lineType: 106);
       }
+      _lineType = 100;
       current = tsCode;
     }
   }
@@ -163,11 +163,22 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
     ),
   ];
   ValueNotifier<List<Candle>?> candles = ValueNotifier<List<Candle>?>(null);
-  SwiperController swiperController = SwiperController();
-  ValueNotifier<int> index = ValueNotifier<int>(0);
+  ValueNotifier<bool> online = ValueNotifier<bool>(true);
+  ValueNotifier<String?> tsCode = ValueNotifier<String?>(null);
+  ValueNotifier<int?> lineType = ValueNotifier<int?>(null);
 
   _update() {
-    reload();
+    StockLineController? stockLineController =
+        multiStockLineController.stockLineController;
+    if (stockLineController == null) {
+      return;
+    }
+    if (tsCode.value != stockLineController.tsCode ||
+        lineType.value != stockLineController.lineType) {
+      reload();
+    }
+    tsCode.value = stockLineController.tsCode;
+    lineType.value = stockLineController.lineType;
   }
 
   /// 在tsCode和lineType改变，也就是当前数据控制器改变的情况下，加载数据，
@@ -179,26 +190,17 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
       return;
     }
 
-    int lineType = stockLineController.lineType;
-    if (lineType == 100) {
-      int tradeDate = DateUtil.formatDateInt(DateUtil.currentDateTime());
-      String tsCode = stockLineController.tsCode;
-      List<dynamic> minLines =
-          await remoteMinLineService.sendFindMinLines(tsCode);
-      stockLineController.insertAll(0, minLines);
-    } else {
-      int length = stockLineController.data.length;
-      int? count = stockLineController.count;
-      // 判断是否有更多的数据可以加载
-      List<dynamic>? data = stockLineController.data;
-      if (count == null || length == 0 || length < count) {
-        data = await _findMoreData();
-      }
-      if (data != null && data.isNotEmpty) {
-        List<Candle> candles = _buildCandles(data);
-        if (candles.isNotEmpty) {
-          this.candles.value = candles;
-        }
+    int length = stockLineController.data.length;
+    int? count = stockLineController.count;
+    // 判断是否有更多的数据可以加载
+    List<dynamic>? data = stockLineController.data;
+    if (count == null || length == 0 || length < count) {
+      data = await _findMoreData();
+    }
+    if (data != null && data.isNotEmpty) {
+      List<Candle> candles = _buildCandles(data);
+      if (candles.isNotEmpty) {
+        this.candles.value = candles;
       }
     }
   }
@@ -212,30 +214,60 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
     }
 
     int lineType = stockLineController.lineType;
-    if (lineType == 100) {
-      return null;
-    }
     String tsCode = stockLineController.tsCode;
     int length = stockLineController.data.length;
     Map<String, dynamic>? response;
     DateTime start = DateTime.now();
-    if (lineType == 101) {
-      int? tradeDate;
-      if (stockLineController.data.isNotEmpty) {
-        Map map = JsonUtil.toJson(stockLineController.data[0]);
-        tradeDate = map['tradeDate'];
-      }
-      if (tradeDate != null) {
-        response =
-            await CrawlerUtil.getDayLine(tsCode, end: tradeDate);
+    if (lineType == 100) {
+      if (online.value) {
+        int? tradeDate;
+        if (stockLineController.data.isNotEmpty) {
+          Map map = JsonUtil.toJson(stockLineController.data[0]);
+          tradeDate = map['tradeDate'];
+        }
+        if (tradeDate != null) {
+          response = await CrawlerUtil.getMinLine(tsCode, beg: tradeDate);
+        } else {
+          response = await CrawlerUtil.getMinLine(tsCode);
+        }
       } else {
-        response = await CrawlerUtil.getDayLine(tsCode, limit: 100);
+        response = {};
+        response['data'] = await remoteMinLineService.sendFindMinLines(tsCode);
+        response['count'] = 900;
       }
-      // response = await remoteDayLineService.sendFindPreceding(tsCode,
-      //     from: length, limit: 100);
+    } else if (lineType == 101) {
+      if (online.value) {
+        int? tradeDate;
+        if (stockLineController.data.isNotEmpty) {
+          Map map = JsonUtil.toJson(stockLineController.data[0]);
+          tradeDate = map['tradeDate'];
+        }
+        if (tradeDate != null) {
+          response = await CrawlerUtil.getDayLine(tsCode, end: tradeDate);
+        } else {
+          response = await CrawlerUtil.getDayLine(tsCode);
+        }
+      } else {
+        response = await remoteDayLineService.sendFindPreceding(tsCode,
+            from: length, limit: 100);
+      }
     } else {
-      response = await remoteWmqyLineService.sendFindLinePreceding(tsCode,
-          lineType: lineType, from: length, limit: 100);
+      if (online.value) {
+        int? tradeDate;
+        if (stockLineController.data.isNotEmpty) {
+          Map map = JsonUtil.toJson(stockLineController.data[0]);
+          tradeDate = map['tradeDate'];
+        }
+        if (tradeDate != null) {
+          response = await CrawlerUtil.getWmqyLine(tsCode,
+              end: tradeDate, klt: lineType);
+        } else {
+          response = await CrawlerUtil.getWmqyLine(tsCode, klt: lineType);
+        }
+      } else {
+        response = await remoteWmqyLineService.sendFindLinePreceding(tsCode,
+            lineType: lineType, from: length, limit: 100);
+      }
     }
     DateTime end = DateTime.now();
     logger.i('find more data duration:${end.difference(start).inMilliseconds}');
@@ -282,14 +314,27 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
     for (int i = data.length - 1; i >= 0; i--) {
       Map<String, dynamic> map = JsonUtil.toJson(data[i]);
       int tradeDate = map['trade_date'];
+      int hour = 0;
+      int minute = 0;
+      int? tradeMinute = map['trade_minute'];
+      if (tradeMinute != null) {
+        hour = tradeMinute ~/ 60;
+        minute = tradeMinute % 60;
+      }
       DateTime date = DateUtil.toDateTime(tradeDate.toString());
+      DateTime time = date.copyWith(
+          year: date.year,
+          month: date.month,
+          day: date.day,
+          hour: hour,
+          minute: minute);
       num high = map['high'];
       num low = map['low'];
       num open = map['open'];
       num close = map['close'];
       num volume = map['vol'];
       Candle candle = Candle(
-          date: date,
+          date: time,
           high: high.toDouble(),
           low: low.toDouble(),
           open: open.toDouble(),
@@ -330,9 +375,23 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
         }
         return Candlesticks(
           key: UniqueKey(),
-          indicators: indicators,
+          indicators:
+              multiStockLineController.lineType == 100 ? null : indicators,
           loadingWidget: LoadingUtil.buildLoadingIndicator(),
           actions: <ToolBarAction>[
+            ToolBarAction(
+              onPressed: () {
+                multiStockLineController.lineType = 100;
+              },
+              child: Icon(
+                Icons.lock_clock,
+                color: multiStockLineController.lineType == 100
+                    ? myself.primary
+                    : isDark
+                        ? Colors.white
+                        : Colors.grey,
+              ),
+            ),
             ToolBarAction(
               onPressed: () {
                 multiStockLineController.lineType = 101;
@@ -377,6 +436,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
                 multiStockLineController.lineType = 104;
               },
               child: Icon(
+                size: 22,
                 Icons.perm_contact_calendar,
                 color: multiStockLineController.lineType == 104
                     ? myself.primary
@@ -390,6 +450,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
                 multiStockLineController.lineType = 105;
               },
               child: Icon(
+                size: 22,
                 Icons.calendar_month_outlined,
                 color: multiStockLineController.lineType == 105
                     ? myself.primary
@@ -403,6 +464,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
                 multiStockLineController.lineType = 106;
               },
               child: Icon(
+                size: 20,
                 Icons.calendar_today_outlined,
                 color: multiStockLineController.lineType == 106
                     ? myself.primary
@@ -425,245 +487,64 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
     );
   }
 
-  Future<List> _buildMinLineData() async {
-    StockLineController? dayLineController =
-        multiStockLineController.stockLineController;
-    if (dayLineController == null) {
-      return [];
-    }
-    int lineType = dayLineController.lineType;
-    if (lineType == 100) {
-      List<dynamic> minLines = dayLineController.data;
-      if (minLines.isEmpty) {
-        int tradeDate = DateUtil.formatDateInt(DateUtil.currentDateTime());
-        String tsCode = dayLineController.tsCode;
-        List<dynamic> minLines =
-            await remoteMinLineService.sendFindMinLines(tsCode);
-        dayLineController.insertAll(0, minLines);
-      }
-
-      return minLines;
-    }
-    return [];
-  }
-
-  /// 股票分时图
-  Widget _buildMinLineChart() {
-    StockLineController? dayLineController =
-        multiStockLineController.stockLineController;
-    if (dayLineController == null) {
-      return Container();
-    }
-    int lineType = dayLineController.lineType;
-    if (lineType != 100) {
-      return Container();
-    }
-    return FutureBuilder(
-      future: _buildMinLineData(),
-      builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return LoadingUtil.buildLoadingIndicator();
-        }
-        List<dynamic>? minLines = snapshot.data;
-        if (minLines == null || minLines.isEmpty) {
-          return Center(
-            child: CommonAutoSizeText(AppLocalizations.t('No data')),
-          );
-        }
-
-        return Card(
-            elevation: 0.0,
-            margin: EdgeInsets.zero,
-            shape: const ContinuousRectangleBorder(),
-            child: Column(children: [
-              SizedBox(
-                  // width: 350,
-                  height: 300,
-                  child: Chart<dynamic>(
-                    data: minLines,
-                    variables: {
-                      'TradeMinute': Variable(
-                        accessor: (dynamic data) {
-                          int tradeMinute = data['trade_minute'] as int;
-                          int hour = tradeMinute ~/ 60;
-                          int minute = tradeMinute % 60;
-                          return '$hour:$minute';
-                        },
-                        scale: OrdinalScale(tickCount: 5),
-                      ),
-                      'Close': Variable(
-                        accessor: (dynamic data) {
-                          return (data['close']) as num;
-                        },
-                      ),
-                    },
-                    marks: [
-                      // AreaMark(
-                      //   shape: ShapeEncode(value: BasicAreaShape(smooth: true)),
-                      //   color: ColorEncode(value: Colors.white.withOpacity(0.5)),
-                      // ),
-                      LineMark(
-                        //shape: ShapeEncode(value: BasicLineShape(smooth: true)),
-                        size: SizeEncode(value: 1),
-                        color: ColorEncode(value: myself.primary),
-                      ),
-                    ],
-                    axes: [
-                      Defaults.horizontalAxis,
-                      Defaults.verticalAxis,
-                    ],
-                    selections: {
-                      'touchMove': PointSelection(
-                        on: {
-                          GestureType.scaleUpdate,
-                          GestureType.tapDown,
-                          GestureType.longPressMoveUpdate
-                        },
-                        dim: Dim.x,
-                      )
-                    },
-                    tooltip: TooltipGuide(
-                      followPointer: [false, true],
-                      align: Alignment.topLeft,
-                      offset: const Offset(-20, -20),
-                    ),
-                    crosshair: CrosshairGuide(followPointer: [false, true]),
-                  )),
-              SizedBox(
-                  // width: 350,
-                  height: 300,
-                  child: Chart(
-                    data: minLines,
-                    variables: {
-                      'TradeMinute': Variable(
-                        accessor: (dynamic data) {
-                          int tradeMinute = data['trade_minute'] as int;
-                          int hour = tradeMinute ~/ 60;
-                          int minute = tradeMinute % 60;
-                          return '$hour:$minute';
-                        },
-                        scale: OrdinalScale(tickCount: 5),
-                      ),
-                      'Vol': Variable(
-                        accessor: (dynamic data) {
-                          return (data['vol']) as num;
-                        },
-                      ),
-                    },
-                    marks: [
-                      IntervalMark(
-                        size: SizeEncode(value: 1),
-                      )
-                    ],
-                    axes: [
-                      Defaults.horizontalAxis,
-                    ],
-                    selections: {
-                      'touchMove': PointSelection(
-                        on: {
-                          GestureType.scaleUpdate,
-                          GestureType.tapDown,
-                          GestureType.longPressMoveUpdate
-                        },
-                        dim: Dim.x,
-                      )
-                    },
-                    crosshair: CrosshairGuide(
-                      followPointer: [true, false],
-                      styles: [
-                        PaintStyle(
-                            strokeColor: const Color(0xffbfbfbf), dash: [4, 2]),
-                        PaintStyle(
-                            strokeColor: const Color(0xffbfbfbf), dash: [4, 2]),
-                      ],
-                    ),
-                  )),
-            ]));
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    StockLineController? stockLineController =
-        multiStockLineController.stockLineController;
-    String title = this.title;
-    if (stockLineController != null) {
-      title = '${stockLineController.tsCode}-${stockLineController.name}';
-    }
-    int? lineType = stockLineController?.lineType;
+    Widget titleWidget = ValueListenableBuilder(
+      valueListenable: tsCode,
+      builder: (BuildContext context, String? tsCode, Widget? child) {
+        StockLineController? stockLineController =
+            multiStockLineController.stockLineController;
+        if (stockLineController == null) {
+          return CommonAutoSizeText(title);
+        }
+        return CommonAutoSizeText('$tsCode-${stockLineController.name}');
+      },
+    );
     List<Widget> rightWidgets = [];
-    Widget minLine = ValueListenableBuilder(
-      valueListenable: index,
-      builder: (BuildContext context, int value, Widget? child) {
-        if (value == 0) {
-          return IconButton(
-              tooltip: AppLocalizations.t('DayLine'),
-              onPressed: () async {
-                multiStockLineController.lineType = 101;
-                swiperController.move(1);
-                index.value = 1;
-              },
-              icon: const Icon(Icons.calendar_view_day_outlined));
-        }
-        return Container();
-      },
-    );
-    rightWidgets.add(minLine);
-    Widget dayLine = ValueListenableBuilder(
-      valueListenable: index,
-      builder: (BuildContext context, int value, Widget? child) {
-        if (value == 1) {
-          return IconButton(
-              tooltip: AppLocalizations.t('MinLine'),
-              onPressed: () async {
-                multiStockLineController.lineType = 100;
-                swiperController.move(0);
-                index.value = 0;
-              },
-              icon: const Icon(Icons.timer_outlined));
-        }
-        return Container();
-      },
-    );
-    rightWidgets.add(dayLine);
+    Widget onlineWidget = ValueListenableBuilder(
+        valueListenable: online,
+        builder: (BuildContext context, bool online, Widget? child) {
+          return ToggleButtons(
+            onPressed: (int value) {
+              this.online.value = value == 0 ? true : false;
+            },
+            isSelected: [online, !online],
+            children: [
+              Text(AppLocalizations.t('online')),
+              Text(AppLocalizations.t('offline'))
+            ],
+          );
+        });
+    rightWidgets.add(onlineWidget);
 
     rightWidgets.addAll([
       IconButton(
           tooltip: AppLocalizations.t('Previous'),
           onPressed: () async {
             await multiStockLineController.previous();
+            StockLineController? stockLineController =
+                multiStockLineController.stockLineController;
+            tsCode.value = stockLineController?.tsCode;
+            lineType.value = stockLineController?.lineType;
           },
           icon: const Icon(Icons.skip_previous_outlined)),
       IconButton(
           tooltip: AppLocalizations.t('Next'),
           onPressed: () async {
             await multiStockLineController.next();
+            StockLineController? stockLineController =
+                multiStockLineController.stockLineController;
+            tsCode.value = stockLineController?.tsCode;
+            lineType.value = stockLineController?.lineType;
           },
           icon: const Icon(Icons.skip_next_outlined)),
     ]);
     return AppBarView(
-      title: title,
+      titleWidget: titleWidget,
       withLeading: true,
       rightWidgets: rightWidgets,
       child: Center(
-        child: Swiper(
-          controller: swiperController,
-          index: index.value,
-          itemCount: 2,
-          onIndexChanged: (int index) {
-            this.index.value = index;
-          },
-          itemBuilder: (BuildContext context, int index) {
-            if (index == 0) {
-              return _buildMinLineChart();
-            } else if (index == 1) {
-              return _buildCandlesticks(context);
-            }
-
-            return Container();
-          },
-        ),
+        child: _buildCandlesticks(context),
       ),
     );
   }

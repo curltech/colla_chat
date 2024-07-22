@@ -1,7 +1,10 @@
 import 'package:colla_chat/entity/stock/day_line.dart';
+import 'package:colla_chat/entity/stock/min_line.dart';
 import 'package:colla_chat/entity/stock/share.dart';
+import 'package:colla_chat/entity/stock/wmqy_line.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/service/stock/share.dart';
+import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/httpclient.dart';
 import 'package:dio/dio.dart';
@@ -224,6 +227,52 @@ class CrawlerUtil {
     return dayLine;
   }
 
+  static MinLine? strToMinLine(String secId, String kline) {
+    List<String> kls = kline.split(',');
+    List<String> tradeDates = kls[0].split(" ");
+    int tradeDate = int.parse(tradeDates[0].replaceAll("-", ""));
+    MinLine minLine = MinLine(secId, tradeDate);
+    //"trade_date,open,close,high,low,vol,amount,nil"
+    List<String> tradeMinutes;
+    if (tradeDates.length > 1) {
+      tradeMinutes = tradeDates[1].split(":");
+      if (tradeMinutes.length > 1) {
+        int hour = int.parse(tradeMinutes[0]);
+        int minute = int.parse(tradeMinutes[1]);
+        minLine.tradeMinute = hour * 60 + minute;
+        minLine.open = double.parse(kls[1]);
+        minLine.close = double.parse(kls[2]);
+        minLine.high = double.parse(kls[3]);
+        minLine.low = double.parse(kls[4]);
+        minLine.vol = double.parse(kls[5]);
+        minLine.amount = double.parse(kls[6]);
+        minLine.turnover = double.parse(kls[10]);
+
+        return minLine;
+      }
+    }
+
+    return null;
+  }
+
+  static WmqyLine? strToWmqyLine(String secId, String kline) {
+    List<String> kls = kline.split(',');
+    int tradeDate = int.parse(kls[0].replaceAll("-", ""));
+    WmqyLine wmqyLine = WmqyLine(secId, tradeDate);
+    wmqyLine.open = double.parse(kls[1]);
+    wmqyLine.close = double.parse(kls[2]);
+    wmqyLine.high = double.parse(kls[3]);
+    wmqyLine.low = double.parse(kls[4]);
+    wmqyLine.vol = double.parse(kls[5]);
+    wmqyLine.amount = double.parse(kls[6]);
+    wmqyLine.pctChgClose = double.parse(kls[8]);
+    wmqyLine.chgClose = double.parse(kls[9]);
+    wmqyLine.turnover = double.parse(kls[10]);
+
+    return wmqyLine;
+  }
+
+  /// 获取日线数据
   static Future<Map<String, dynamic>?> getDayLine(String secId,
       {int beg = 19900101,
       int end = 20500101,
@@ -268,5 +317,138 @@ class CrawlerUtil {
     }
 
     return {'count': data.dktotal, 'data': dayLines};
+  }
+
+  /// 获取分钟数据
+  static Future<Map<String, dynamic>?> getMinLine(
+    String secId, {
+    int? beg,
+    int limit = 10000,
+  }) async {
+    beg ??= DateUtil.formatDateInt(DateUtil.currentDateTime());
+    DayLineResponseData? data =
+        await getKLine(secId, beg: beg, end: 0, limit: limit, klt: 1);
+    if (data == null) {
+      return null;
+    }
+    List<String>? klines = data.klines;
+    if (klines == null) {
+      return null;
+    }
+    List<MinLine> minLines = [];
+    for (var kline in klines) {
+      MinLine? minLine = strToMinLine(secId, kline);
+      if (minLine == null) {
+        continue;
+      }
+
+      minLines.add(minLine);
+    }
+
+    return {'count': 240, 'data': minLines};
+  }
+
+  static String getQTradeDate(int tradeDate) {
+    String qDate;
+    if (tradeDate <= 0) {
+      DateTime t = DateTime.now();
+      int year = t.year;
+      int month = t.month;
+      qDate = '$year"Q"${(month + 2) / 3}';
+    } else {
+      int year = tradeDate % 10000;
+      int month = tradeDate % 100 - year * 100;
+      qDate = '$year"Q"${(month + 2) / 3}';
+    }
+
+    return qDate;
+  }
+
+  static String getWTradeDate(int tradeDate) {
+    DateTime t;
+    if (tradeDate <= 0) {
+      t = DateTime.now();
+    } else {
+      t = DateUtil.toDateTime(tradeDate.toString());
+    }
+    int year = t.year;
+    int week = DateUtil.weekNumber(t);
+    String wDate;
+    if (week < 10) {
+      wDate = '${year}W0$week';
+    } else {
+      wDate = '${year}W$week';
+    }
+
+    return wDate;
+  }
+
+  static Future<Map<String, dynamic>?> getWmqyLine(String secId,
+      {int beg = 19900101,
+      int end = 20500101,
+      int limit = 10000,
+      int klt = 102,
+      WmqyLine? previous}) async {
+    DayLineResponseData? data =
+        await getKLine(secId, beg: beg, end: end, limit: limit, klt: klt);
+    if (data == null) {
+      return null;
+    }
+    List<String>? klines = data.klines;
+    if (klines == null) {
+      return null;
+    }
+    List<WmqyLine> wmqyLines = [];
+    for (var kline in klines) {
+      WmqyLine? wmqyLine = strToWmqyLine(secId, kline);
+      if (wmqyLine == null) {
+        continue;
+      }
+
+      wmqyLine.lineType = klt;
+      if (klt == 104) {
+        wmqyLine.qDate = getQTradeDate(wmqyLine.tradeDate);
+      } else if (klt == 105) {
+        int year = wmqyLine.tradeDate % 10000;
+        int month = wmqyLine.tradeDate - year * 10000;
+        month = month % 100;
+        if (month < 7) {
+          wmqyLine.qDate = '${year}06';
+        } else {
+          wmqyLine.qDate = '${year}12';
+        }
+      } else if (klt == 106) {
+        wmqyLine.qDate = '${wmqyLine.tradeDate / 10000}';
+      } else if (klt == 103) {
+        wmqyLine.qDate = '${wmqyLine.tradeDate / 100}';
+      } else if (klt == 102) {
+        wmqyLine.qDate = getWTradeDate(wmqyLine.tradeDate);
+      }
+      if (previous != null && previous.open != 0.0) {
+        wmqyLine.pctChgOpen = wmqyLine.open! / previous.open! - 1;
+      }
+      if (previous != null && previous.high != 0.0) {
+        wmqyLine.pctChgHigh = wmqyLine.high! / previous.high! - 1;
+      }
+      if (previous != null && previous.low != 0.0) {
+        wmqyLine.pctChgLow = wmqyLine.low! / previous.low! - 1;
+      }
+      if (previous != null && previous.close != 0.0) {
+        wmqyLine.pctChgClose = wmqyLine.close! / previous.close! - 1;
+      }
+      if (previous != null && previous.amount != 0.0) {
+        wmqyLine.pctChgAmount = wmqyLine.amount! / previous.amount! - 1;
+      }
+      if (previous != null && previous.vol != 0.0) {
+        wmqyLine.pctChgVol = wmqyLine.vol! / previous.vol! - 1;
+      }
+      if (previous != null) {
+        wmqyLine.preClose = previous.close;
+      }
+      previous = wmqyLine;
+      wmqyLines.add(wmqyLine);
+    }
+
+    return {'count': data.dktotal, 'data': wmqyLines};
   }
 }

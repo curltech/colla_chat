@@ -1,19 +1,8 @@
 import 'package:colla_chat/entity/base.dart';
+import 'package:colla_chat/entity/stock/day_line.dart';
 
-class WmqyLine extends BaseEntity {
-  String tsCode;
-  int? tradeDate;
-  String? name;
+class WmqyLine extends StockLine {
   String? qDate;
-  num? shareNumber;
-  num? open;
-  num? high;
-  num? low;
-  num? close;
-  num? vol;
-  num? amount;
-  num? turnover;
-  num? preClose;
   num? chgClose;
   num? pctChgOpen;
   num? pctChgHigh;
@@ -23,20 +12,10 @@ class WmqyLine extends BaseEntity {
   num? pctChgVol;
   int? lineType;
 
+  WmqyLine(super.tsCode, super.tradeDate);
+
   WmqyLine.fromJson(super.json)
-      : tsCode = json['ts_code'],
-        name = json['name'],
-        tradeDate = json['trade_date'],
-        qDate = json['qdate'],
-        shareNumber = json['share_number'],
-        open = json['open'],
-        high = json['high'],
-        low = json['low'],
-        close = json['close'],
-        vol = json['vol'],
-        amount = json['amount'],
-        turnover = json['turnover'],
-        preClose = json['pre_close'],
+      : qDate = json['qdate'],
         chgClose = json['chg_close'],
         pctChgOpen = json['pct_chg_open'],
         pctChgHigh = json['pct_chg_high'],
