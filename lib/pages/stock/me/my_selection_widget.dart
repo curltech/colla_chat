@@ -21,15 +21,15 @@ final DataListController<DayLine> dayLineController =
     DataListController<DayLine>();
 
 ///自选股和分组的查询界面
-class ShareSelectionWidget extends StatefulWidget with TileDataMixin {
+class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
   final StockLineChartWidget stockLineChartWidget = StockLineChartWidget();
 
   ShareSelectionWidget({super.key}) {
     indexWidgetProvider.define(stockLineChartWidget);
+    _buildGroupSubscription().then((dynamic) {
+      _refresh(groupName.value);
+    });
   }
-
-  @override
-  State<StatefulWidget> createState() => _ShareSelectionWidgetState();
 
   @override
   bool get withLeading => true;
@@ -42,82 +42,12 @@ class ShareSelectionWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'MySelection';
-}
 
-class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
-    with TickerProviderStateMixin {
-  late final List<PlatformDataColumn> dayLineDataColumns = [
-    PlatformDataColumn(
-      label: '股票代码',
-      name: 'ts_code',
-      width: 80,
-    ),
-    PlatformDataColumn(
-      label: '股票名',
-      name: 'name',
-      width: 80,
-    ),
-    PlatformDataColumn(
-      label: '交易日期',
-      name: 'trade_date',
-      width: 90,
-    ),
-    PlatformDataColumn(
-      label: '收盘价',
-      name: 'close',
-      dataType: DataType.double,
-      align: TextAlign.right,
-      width: 70,
-    ),
-    PlatformDataColumn(
-      label: '涨幅',
-      name: 'pct_chg_close',
-      dataType: DataType.percentage,
-      positiveColor: Colors.red,
-      negativeColor: Colors.green,
-      align: TextAlign.right,
-      width: 70,
-    ),
-    PlatformDataColumn(
-      label: '量变化',
-      name: 'pct_chg_vol',
-      dataType: DataType.percentage,
-      positiveColor: Colors.red,
-      negativeColor: Colors.green,
-      align: TextAlign.right,
-      width: 70,
-    ),
-    PlatformDataColumn(
-      label: '换手率',
-      name: 'turnover',
-      dataType: DataType.double,
-      align: TextAlign.right,
-      width: 70,
-    ),
-    PlatformDataColumn(
-        label: '',
-        name: 'action',
-        inputType: InputType.custom,
-        buildSuffix: _buildActionWidget),
-  ];
   ValueNotifier<String> groupName = ValueNotifier<String>(
       AppLocalizations.t(shareGroupService.defaultGroupName));
 
   ValueNotifier<Map<String, String>> groupSubscription =
       ValueNotifier<Map<String, String>>({});
-
-  @override
-  initState() {
-    dayLineController.addListener(_updateDayLine);
-    super.initState();
-    _buildGroupSubscription().then((dynamic) {
-      _refresh(groupName.value);
-    });
-  }
-
-  _updateDayLine() {
-    setState(() {});
-  }
 
   _buildGroupSubscription() async {
     Map<String, String> groupSubscription = {};
@@ -129,7 +59,7 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
     return this.groupSubscription.value = groupSubscription;
   }
 
-  Widget _buildActionWidget(int index, dynamic dayLine) {
+  Widget _buildActionWidget(BuildContext context, int index, dynamic dayLine) {
     Widget actionWidget = Row(
       children: [
         const SizedBox(
@@ -210,14 +140,75 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
   }
 
   Widget _buildShareListView(BuildContext context) {
-    return BindingDataTable2<DayLine>(
-      key: UniqueKey(),
-      showCheckboxColumn: true,
-      horizontalMargin: 10.0,
-      columnSpacing: 0.0,
-      platformDataColumns: dayLineDataColumns,
-      controller: dayLineController,
-      fixedLeftColumns: 2,
+    final List<PlatformDataColumn> dayLineDataColumns = [
+      PlatformDataColumn(
+        label: '股票代码',
+        name: 'ts_code',
+        width: 80,
+      ),
+      PlatformDataColumn(
+        label: '股票名',
+        name: 'name',
+        width: 80,
+      ),
+      PlatformDataColumn(
+        label: '交易日期',
+        name: 'trade_date',
+        width: 90,
+      ),
+      PlatformDataColumn(
+        label: '收盘价',
+        name: 'close',
+        dataType: DataType.double,
+        align: TextAlign.right,
+        width: 70,
+      ),
+      PlatformDataColumn(
+        label: '涨幅',
+        name: 'pct_chg_close',
+        dataType: DataType.percentage,
+        positiveColor: Colors.red,
+        negativeColor: Colors.green,
+        align: TextAlign.right,
+        width: 70,
+      ),
+      PlatformDataColumn(
+        label: '量变化',
+        name: 'pct_chg_vol',
+        dataType: DataType.percentage,
+        positiveColor: Colors.red,
+        negativeColor: Colors.green,
+        align: TextAlign.right,
+        width: 70,
+      ),
+      PlatformDataColumn(
+        label: '换手率',
+        name: 'turnover',
+        dataType: DataType.double,
+        align: TextAlign.right,
+        width: 70,
+      ),
+      PlatformDataColumn(
+          label: '',
+          name: 'action',
+          inputType: InputType.custom,
+          buildSuffix: (int index, dynamic dayLine) {
+            return _buildActionWidget(context, index, dayLine);
+          }),
+    ];
+    return ListenableBuilder(
+      listenable: dayLineController,
+      builder: (BuildContext context, Widget? child) {
+        return BindingDataTable2<DayLine>(
+          key: UniqueKey(),
+          showCheckboxColumn: true,
+          horizontalMargin: 10.0,
+          columnSpacing: 0.0,
+          platformDataColumns: dayLineDataColumns,
+          controller: dayLineController,
+          fixedLeftColumns: 2,
+        );
+      },
     );
   }
 
@@ -269,7 +260,7 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
       ),
     ];
     return AppBarView(
-      title: widget.title,
+      title: title,
       withLeading: true,
       rightWidgets: rightWidgets,
       child: Column(
@@ -279,11 +270,5 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    dayLineController.removeListener(_updateDayLine);
-    super.dispose();
   }
 }

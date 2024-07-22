@@ -60,6 +60,11 @@ class _PerformanceWidgetState extends State<PerformanceWidget>
       width: 80,
     ),
     PlatformDataColumn(
+      label: '业绩日期',
+      name: 'qdate',
+      width: 60,
+    ),
+    PlatformDataColumn(
       label: '年营收增长',
       name: 'yoy_sales',
       dataType: DataType.double,
@@ -169,11 +174,6 @@ class _PerformanceWidgetState extends State<PerformanceWidget>
       name: 'security_code',
       align: TextAlign.right,
       width: 120,
-    ),
-    PlatformDataColumn(
-      label: '业绩日期',
-      name: 'qdate',
-      width: 90,
     ),
     PlatformDataColumn(
       label: '业绩类型',
