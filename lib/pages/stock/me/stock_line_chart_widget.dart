@@ -348,19 +348,19 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
 
   CandleSticksStyle dark() {
     return CandleSticksStyle.dark(
-      primaryBull: const Color(0xFFEF5350),
-      secondaryBull: const Color(0xFF82122B),
-      primaryBear: const Color(0xFF26A69A),
-      secondaryBear: const Color(0xFF005940),
+      primaryBull: Colors.red,
+      secondaryBull: Colors.redAccent,
+      primaryBear: Colors.green,
+      secondaryBear: Colors.greenAccent,
     );
   }
 
   CandleSticksStyle light() {
     return CandleSticksStyle.light(
-      primaryBull: const Color(0xFFEF5350),
-      secondaryBull: const Color(0xFFF1A3A1),
-      primaryBear: const Color(0xff026a69a),
-      secondaryBear: const Color(0xFF8CCCC6),
+      primaryBull: Colors.red,
+      secondaryBull: Colors.redAccent,
+      primaryBear: Colors.green,
+      secondaryBear: Colors.greenAccent,
     );
   }
 
@@ -505,13 +505,17 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
         valueListenable: online,
         builder: (BuildContext context, bool online, Widget? child) {
           return ToggleButtons(
+            color: Colors.grey,
+            selectedColor: Colors.white,
+            fillColor: myself.primary,
+            borderRadius: BorderRadius.circular(16.0),
             onPressed: (int value) {
               this.online.value = value == 0 ? true : false;
             },
             isSelected: [online, !online],
-            children: [
-              Text(AppLocalizations.t('online')),
-              Text(AppLocalizations.t('offline'))
+            children: const [
+              Icon(Icons.book_online_outlined),
+              Icon(Icons.offline_bolt_outlined)
             ],
           );
         });
