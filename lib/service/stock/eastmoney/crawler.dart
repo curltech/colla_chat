@@ -409,18 +409,18 @@ class CrawlerUtil {
       if (klt == 104) {
         wmqyLine.qDate = getQTradeDate(wmqyLine.tradeDate);
       } else if (klt == 105) {
-        int year = wmqyLine.tradeDate % 10000;
+        int year = wmqyLine.tradeDate ~/ 10000;
         int month = wmqyLine.tradeDate - year * 10000;
-        month = month % 100;
+        month = month ~/ 100;
         if (month < 7) {
           wmqyLine.qDate = '${year}06';
         } else {
           wmqyLine.qDate = '${year}12';
         }
       } else if (klt == 106) {
-        wmqyLine.qDate = '${wmqyLine.tradeDate / 10000}';
+        wmqyLine.qDate = '${wmqyLine.tradeDate ~/ 10000}';
       } else if (klt == 103) {
-        wmqyLine.qDate = '${wmqyLine.tradeDate / 100}';
+        wmqyLine.qDate = '${wmqyLine.tradeDate ~/ 100}';
       } else if (klt == 102) {
         wmqyLine.qDate = getWTradeDate(wmqyLine.tradeDate);
       }
@@ -449,6 +449,6 @@ class CrawlerUtil {
       wmqyLines.add(wmqyLine);
     }
 
-    return {'count': data.dktotal, 'data': wmqyLines};
+    return {'count': wmqyLines.length, 'data': wmqyLines};
   }
 }

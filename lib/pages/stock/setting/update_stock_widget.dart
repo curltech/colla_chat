@@ -8,12 +8,9 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
-/// 运行后台批处理，更新数据
-class UpdateStockWidget extends StatefulWidget with TileDataMixin {
+/// 运行后台批处理，更新数据，支持单个股票的数据更新
+class UpdateStockWidget extends StatelessWidget with TileDataMixin {
   UpdateStockWidget({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _UpdateStockWidgetState();
 
   @override
   bool get withLeading => true;
@@ -26,22 +23,14 @@ class UpdateStockWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'UpdateStock';
-}
 
-class _UpdateStockWidgetState extends State<UpdateStockWidget>
-    with TickerProviderStateMixin {
   final TextEditingController _startDateTextController =
       TextEditingController();
   final TextEditingController _tsCodeTextController = TextEditingController();
   List<TileData> tileData = [];
 
-  @override
-  initState() {
-    _initTileData();
-    super.initState();
-  }
-
-  _initTileData() {
+  _initTileData(BuildContext context) {
+    tileData.clear();
     tileData.addAll([
       TileData(
           title: '预测',
@@ -290,9 +279,8 @@ class _UpdateStockWidgetState extends State<UpdateStockWidget>
 
   @override
   Widget build(BuildContext context) {
+    _initTileData(context);
     return AppBarView(
-        title: widget.title,
-        withLeading: true,
-        child: _buildUpdateStockView(context));
+        title: title, withLeading: true, child: _buildUpdateStockView(context));
   }
 }

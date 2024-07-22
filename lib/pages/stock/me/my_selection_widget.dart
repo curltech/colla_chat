@@ -8,6 +8,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/stock/day_line.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/service/stock/share_group.dart';
+import 'package:colla_chat/service/stock/stock_line.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -201,6 +202,9 @@ class _ShareSelectionWidgetState extends State<ShareSelectionWidget>
     List<String> tsCodes = [];
     for (var dayLine in dayLines) {
       tsCodes.add(dayLine.tsCode);
+
+      /// 更新股票的日线的数据
+      stockLineService.getUpdateDayLine(dayLine.tsCode);
     }
     multiStockLineController.replaceAll(tsCodes);
   }

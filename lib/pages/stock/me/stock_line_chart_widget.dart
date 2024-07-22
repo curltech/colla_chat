@@ -173,12 +173,16 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
     if (stockLineController == null) {
       return;
     }
+    bool update = false;
     if (tsCode.value != stockLineController.tsCode ||
         lineType.value != stockLineController.lineType) {
-      reload();
+      update = true;
     }
     tsCode.value = stockLineController.tsCode;
     lineType.value = stockLineController.lineType;
+    if (update) {
+      reload();
+    }
   }
 
   /// 在tsCode和lineType改变，也就是当前数据控制器改变的情况下，加载数据，
@@ -189,14 +193,10 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
     if (stockLineController == null) {
       return;
     }
-
-    int length = stockLineController.data.length;
-    int? count = stockLineController.count;
+    stockLineController.clear(notify: false);
+    stockLineController.count = null;
     // 判断是否有更多的数据可以加载
-    List<dynamic>? data = stockLineController.data;
-    if (count == null || length == 0 || length < count) {
-      data = await _findMoreData();
-    }
+    List<dynamic>? data = await _findMoreData();
     if (data != null && data.isNotEmpty) {
       List<Candle> candles = _buildCandles(data);
       if (candles.isNotEmpty) {
