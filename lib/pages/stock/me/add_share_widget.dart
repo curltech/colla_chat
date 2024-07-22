@@ -11,16 +11,9 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
-/// 增加自选股的查询结果控制器
-final DataListController<Share> searchShareController =
-    DataListController<Share>();
-
 /// 加自选股和分组的查询界面
-class AddShareWidget extends StatefulWidget with TileDataMixin {
+class AddShareWidget extends StatelessWidget with TileDataMixin {
   AddShareWidget({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _AddShareWidgetState();
 
   @override
   bool get withLeading => true;
@@ -33,27 +26,15 @@ class AddShareWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'AddShare';
-}
 
-class _AddShareWidgetState extends State<AddShareWidget>
-    with TickerProviderStateMixin {
   final TextEditingController _searchTextController = TextEditingController();
+
+  /// 增加自选股的查询结果
+  List<Share> shares = [];
   ValueNotifier<List<TileData>> tileData = ValueNotifier<List<TileData>>([]);
-
-  @override
-  initState() {
-    super.initState();
-    searchShareController.clear();
-    searchShareController.addListener(_updateShare);
-  }
-
-  _updateShare() {
-    _buildShareTileData();
-  }
 
   //将linkman和group数据转换从列表显示数据
   _buildShareTileData() async {
-    List<Share> shares = searchShareController.data;
     List<TileData> tiles = [];
     if (shares.isNotEmpty) {
       for (var share in shares) {
@@ -75,7 +56,7 @@ class _AddShareWidgetState extends State<AddShareWidget>
                 suffix: IconButton(
                   onPressed: () async {
                     await shareService.add(share);
-                    _updateShare();
+                    _buildShareTileData();
                   },
                   icon: const Icon(
                     Icons.add_box_outlined,
@@ -100,8 +81,8 @@ class _AddShareWidgetState extends State<AddShareWidget>
 
   _searchShare(String keyword) async {
     if (keyword.isNotEmpty) {
-      List<Share> shares = await remoteShareService.sendSearchShare(keyword);
-      searchShareController.replaceAll(shares);
+      shares = await remoteShareService.sendSearchShare(keyword);
+      await _buildShareTileData();
     }
   }
 
@@ -140,14 +121,6 @@ class _AddShareWidgetState extends State<AddShareWidget>
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        title: widget.title,
-        withLeading: true,
-        child: _buildSearchShareView(context));
-  }
-
-  @override
-  void dispose() {
-    searchShareController.removeListener(_updateShare);
-    super.dispose();
+        title: title, withLeading: true, child: _buildSearchShareView(context));
   }
 }

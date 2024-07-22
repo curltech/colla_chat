@@ -148,19 +148,19 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
   List<Indicator> indicators = [
     MovingAverageIndicator(
       length: 5,
-      color: Colors.blue.shade600,
+      color: Colors.blue,
     ),
     MovingAverageIndicator(
       length: 10,
-      color: Colors.yellow.shade600,
+      color: Colors.yellowAccent,
     ),
     MovingAverageIndicator(
       length: 20,
-      color: Colors.purple.shade600,
+      color: Colors.purpleAccent,
     ),
     MovingAverageIndicator(
       length: 30,
-      color: Colors.green.shade600,
+      color: Colors.cyanAccent,
     ),
   ];
   ValueNotifier<List<Candle>?> candles = ValueNotifier<List<Candle>?>(null);
