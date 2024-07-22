@@ -130,6 +130,7 @@ final MultiStockLineController multiStockLineController =
 class StockLineChartWidget extends StatelessWidget with TileDataMixin {
   StockLineChartWidget({super.key}) {
     multiStockLineController.addListener(_update);
+    online.addListener(reload);
   }
 
   @override
