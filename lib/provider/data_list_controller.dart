@@ -100,10 +100,10 @@ class DataListController<T> with ChangeNotifier {
     }
   }
 
-  delete({int? index}) {
+  T? delete({int? index}) {
     index = index ?? _currentIndex;
     if (index >= 0 && index < data.length) {
-      data.removeAt(index);
+      T t = data.removeAt(index);
       if (data.isEmpty) {
         _currentIndex = -1;
       } else if (index == 0) {
@@ -112,7 +112,10 @@ class DataListController<T> with ChangeNotifier {
         _currentIndex = index - 1;
       }
       notifyListeners();
+      return t;
     }
+
+    return null;
   }
 
   update(T d, {int? index}) {

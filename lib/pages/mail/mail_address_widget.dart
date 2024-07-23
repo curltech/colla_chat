@@ -5,6 +5,7 @@ import 'package:colla_chat/pages/mail/address/manual_add_widget.dart';
 import 'package:colla_chat/pages/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/mail/mail_address.dart';
+import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
@@ -58,10 +59,12 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
             subtitle: mailAddress.name,
             prefix: IconButton(
               onPressed: () {
+                int index = i;
                 int? id = mailAddress.id;
                 if (id != null) {
                   mailAddressService.delete(where: 'id=?', whereArgs: [id]);
-                  mailMimeMessageController.delete(index: i);
+                  mailMimeMessageController.delete(index: index);
+                  emailClientPool.close(email: mailAddress.email);
                 }
               },
               icon: const Icon(Icons.delete_outline),
@@ -82,8 +85,7 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
                 mailAddress.email, mailboxName);
             String titleTail = '';
             if (mailbox != null) {
-              titleTail =
-                  '${mailbox.messagesUnseen}/${mailbox.messagesExists}';
+              titleTail = '${mailbox.messagesUnseen}/${mailbox.messagesExists}';
             }
             TileData tile = TileData(
                 title: mailboxName,

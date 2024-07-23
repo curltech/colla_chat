@@ -234,7 +234,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
       } else {
         response = {};
         response['data'] = await remoteMinLineService.sendFindMinLines(tsCode);
-        response['count'] = 900;
+        response['count'] = 240;
       }
     } else if (lineType == 101) {
       if (online.value) {

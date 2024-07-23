@@ -372,8 +372,8 @@ class PlaylistWidget extends StatelessWidget {
   }
 
   _removeFromCollect(int index) async {
-    PlatformMediaSource mediaSource = playlistController.delete(index: index);
-    var messageId = mediaSource.messageId;
+    PlatformMediaSource? mediaSource = playlistController.delete(index: index);
+    var messageId = mediaSource?.messageId;
     if (messageId != null) {
       chatMessageService.delete(where: 'messageId=?', whereArgs: [messageId]);
     }

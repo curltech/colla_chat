@@ -71,6 +71,24 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     return super.clear(notify: notify);
   }
 
+  @override
+  entity.MailAddress? delete({int? index}) {
+    if (index == null) {
+      return clear();
+    }
+    if (index >= 0 && index < data.length) {
+      entity.MailAddress mailAddress = data[index];
+      String email = mailAddress.email;
+      _addressMailboxes.remove(email);
+      _addressMailMessages.remove(email);
+      _currentMailboxName = null;
+      _currentMailbox = null;
+      return super.delete(index: index);
+    }
+
+    return null;
+  }
+
   ///常用的邮箱名称
   static const Map<String, IconData> mailBoxeIcons = {
     'INBOX': Icons.inbox,
