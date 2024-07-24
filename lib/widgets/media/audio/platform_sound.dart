@@ -41,7 +41,7 @@ class PlatformSoundRecorder {
   StreamSubscription? recordingDataSubscription;
 
   //录音数据控制器
-  StreamController<Food>? recordingDataController;
+  StreamController<Uint8List>? recordingDataController;
 
   IOSink? sink;
 
@@ -62,7 +62,7 @@ class PlatformSoundRecorder {
         throw RecordingPermissionException('Microphone permission not granted');
       }
     }
-    recordingDataController = StreamController<Food>();
+    recordingDataController = StreamController<Uint8List>();
 
     encoderSupported = await recorder.isEncoderSupported(codec);
 
@@ -123,18 +123,15 @@ class PlatformSoundRecorder {
       if (filename == null) {
         //录音数据写入流
         sink = await createTemporarySink();
-        recordingDataController = StreamController<Food>();
+        recordingDataController = StreamController<Uint8List>();
         recordingDataSubscription =
             recordingDataController!.stream.listen((buffer) {
-          if (buffer is FoodData) {
-            sink!.add(buffer.data!);
-          }
+          sink!.add(buffer);
         });
         await recorder.startRecorder(
           toStream: recordingDataController!.sink,
           codec: codec,
           numChannels: 1,
-          sampleRate: 44000,
         );
       } else {
         //录音数据写入指定文件

@@ -140,43 +140,6 @@ class MobileForegroundTask {
     return await FlutterForegroundTask.isRunningService;
   }
 
-  ///创建WillStartForegroundTask组件，MaterialApp的home，用于包裹Scaffold
-  ///当应用最小化或者终止的时候，这个组件能够启动前台服务，这是自动启动方式的时候使用
-  WillStartForegroundTask willStartForegroundTask({
-    Key? key,
-    Future<bool> Function()? onWillStart,
-    AndroidNotificationOptions? androidNotificationOptions,
-    IOSNotificationOptions? iosNotificationOptions,
-    ForegroundTaskOptions? foregroundTaskOptions,
-    String? notificationTitle,
-    String? notificationText,
-    Function? callback,
-    void Function(dynamic)? onData,
-    required Widget child,
-  }) {
-    onWillStart ??= () async {
-      return true;
-    };
-    androidNotificationOptions ??= this.androidNotificationOptions;
-    iosNotificationOptions ??= this.iosNotificationOptions;
-    foregroundTaskOptions ??= this.foregroundTaskOptions;
-    notificationTitle ??= this.notificationTitle;
-    notificationText ??= this.notificationText;
-    callback ??= onStart;
-    onData ??= this.onData;
-    return WillStartForegroundTask(
-      onWillStart: onWillStart,
-      androidNotificationOptions: androidNotificationOptions,
-      iosNotificationOptions: iosNotificationOptions,
-      foregroundTaskOptions: foregroundTaskOptions,
-      notificationTitle: notificationTitle,
-      notificationText: notificationText,
-      callback: callback,
-      onData: onData,
-      child: child,
-    );
-  }
-
   ///前台服务任务发来数据事件
   void onData(dynamic data) async {
     print('received foreground service data:$data');
