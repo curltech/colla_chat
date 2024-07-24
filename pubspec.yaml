@@ -386,6 +386,60 @@ dependencies:
   #系统
   system_status: ^1.0.7
   system_resources: ^1.6.0
+  websocket_universal: any
+  connectivity_plus: any
+  web_socket_channel: any
+  web_socket_client: any
+  http: any
+  flutter_cache_manager: any
+  enough_mail: any
+  enough_mail_html: any
+  event_bus: any
+  flutter_webrtc: any
+  camera: any
+  permission_handler: any
+  local_auth_android: any
+  local_auth_darwin: any
+  uuid: any
+  path: any
+  logger: any
+  flutter_inappwebview: any
+  flutter_localizations: any
+  webview_win_floating: any
+  file_picker: any
+  flutter_keyboard_visibility_web: any
+  flutter_secure_storage_web: any
+  flutter_web_plugins: any
+  geolocator_web: any
+  image_picker_for_web: any
+  shared_preferences_web: any
+  url_launcher_web: any
+  webrtc_interface: any
+  collection: any
+  record: any
+  visibility_detector: any
+  image_picker: any
+  flex_color_picker: any
+  enough_mail_flutter: any
+  flutter_keyboard_visibility: any
+  html: any
+  webview_flutter: any
+  flutter_widget_from_html: any
+  vector_math: any
+  dart_quill_delta: any
+  enough_html_editor: any
+  flutter_quill: any
+  flutter_quill_extensions: any
+  enough_platform_widgets: any
+  intl: any
+  rxdart: any
+  fullscreen_window: any
+  sprintf: any
+  saver_gallery: any
+  ndef: any
+  pdfx: any
+  full_picker: any
+  sensors_plus: any
 dependency_overrides:
   uuid: ^4.3.1
   meta: ^1.11.0

@@ -153,7 +153,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
                 .delete(where: 'ownerpeerId=?', whereArgs: [myselfPeer.peerId]);
             myselfPeerService
                 .delete(where: 'peerId=?', whereArgs: [myselfPeer.peerId]);
-            await myselfPeerController.delete(index: index);
+            myselfPeerController.delete(index: index);
           },
           icon: const Icon(Icons.clear),
         ),

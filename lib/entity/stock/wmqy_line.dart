@@ -1,4 +1,3 @@
-import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/stock/day_line.dart';
 
 class WmqyLine extends StockLine {

@@ -1,6 +1,5 @@
 import 'package:colla_chat/entity/stock/event_filter.dart';
 import 'package:colla_chat/service/general_base.dart';
-import 'package:colla_chat/service/general_remote.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 

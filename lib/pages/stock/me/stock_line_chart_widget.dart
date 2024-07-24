@@ -1,6 +1,4 @@
 import 'package:candlesticks/candlesticks.dart';
-import 'package:card_swiper/card_swiper.dart';
-import 'package:colla_chat/entity/stock/day_line.dart';
 import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';

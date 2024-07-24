@@ -393,7 +393,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
                 var currentIndex = mediaFileController.currentIndex;
                 if (currentIndex != -1) {
                   ffmpegSessions.remove(mediaFileController.current);
-                  await mediaFileController.delete(index: currentIndex);
+                  mediaFileController.delete(index: currentIndex);
                   _buildTileData(context);
                 }
               },

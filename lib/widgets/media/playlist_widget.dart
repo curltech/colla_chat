@@ -478,7 +478,7 @@ class PlaylistWidget extends StatelessWidget {
               ),
               onPressed: () async {
                 var currentIndex = playlistController.currentIndex;
-                await playlistController.delete(index: currentIndex);
+                playlistController.delete(index: currentIndex);
                 _buildTileData(context);
               },
               tooltip: AppLocalizations.t('Remove video file'),
