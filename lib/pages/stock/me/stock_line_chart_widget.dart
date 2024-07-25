@@ -10,6 +10,7 @@ import 'package:colla_chat/service/stock/min_line.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/service/stock/wmqy_line.dart';
 import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -195,7 +196,12 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
     stockLineController.clear(notify: false);
     stockLineController.count = null;
     // 判断是否有更多的数据可以加载
-    List<dynamic>? data = await _findMoreData();
+    List<dynamic>? data=await _findMoreData();
+    // try {
+    //   data = await _findMoreData();
+    // } catch (e) {
+    //   logger.e('find more data failure:$e');
+    // }
     if (data != null && data.isNotEmpty) {
       List<Candle> candles = _buildCandles(data);
       if (candles.isNotEmpty) {

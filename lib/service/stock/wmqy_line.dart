@@ -30,6 +30,9 @@ class RemoteWmqyLineService extends GeneralRemoteService<WmqyLine> {
     List ms = responseData['data'];
     List<WmqyLine> wmqyLines = [];
     for (var m in ms) {
+      if (m == null) {
+        continue;
+      }
       var o = post(m);
       wmqyLines.add(o);
       String tsCode = o.tsCode;
