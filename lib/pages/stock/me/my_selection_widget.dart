@@ -222,14 +222,20 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
           List<Widget> children = [];
           for (String key in groupSubscription.keys) {
             children.add(TextButton(
-                onPressed: () {
-                  _addMember(key);
-                  groupName.value = key;
-                  _refresh(key);
-                },
-                child: Text(key,
-                    style: TextStyle(
-                        color: groupName.value != key ? Colors.white : null))));
+              onPressed: () {
+                _addMember(key);
+                groupName.value = key;
+                _refresh(key);
+              },
+              child: ValueListenableBuilder(
+                  valueListenable: groupName,
+                  builder:
+                      (BuildContext context, String groupName, Widget? child) {
+                    return Text(key,
+                        style: TextStyle(
+                            color: groupName != key ? Colors.white : null));
+                  }),
+            ));
           }
           return SingleChildScrollView(
               scrollDirection: Axis.horizontal,
