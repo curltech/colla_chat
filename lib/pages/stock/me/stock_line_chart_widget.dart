@@ -196,7 +196,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
     stockLineController.clear(notify: false);
     stockLineController.count = null;
     // 判断是否有更多的数据可以加载
-    List<dynamic>? data=await _findMoreData();
+    List<dynamic>? data = await _findMoreData();
     // try {
     //   data = await _findMoreData();
     // } catch (e) {
@@ -283,8 +283,11 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
     int? count = response['count'];
     stockLineController.count = count;
     if (data != null && data.isNotEmpty) {
-      stockLineController.insertAll(0, data);
-
+      if (online.value) {
+        stockLineController.replaceAll(data);
+      } else {
+        stockLineController.insertAll(0, data);
+      }
       return data;
     }
 
@@ -306,7 +309,9 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
       if (data != null && data.isNotEmpty) {
         List<Candle> candles = _buildCandles(data);
         if (candles.isNotEmpty && this.candles.value != null) {
-          candles.addAll(this.candles.value!);
+          if (!online.value) {
+            candles.addAll(this.candles.value!);
+          }
           this.candles.value = candles;
         }
       }

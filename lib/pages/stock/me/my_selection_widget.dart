@@ -126,15 +126,17 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
       multiStockLineController.replaceAll([]);
       return;
     }
+    List<String> tsCodes = subscription.split(',');
+    for (var tsCode in tsCodes) {
+      /// 更新股票的日线的数据
+      stockLineService.getUpdateDayLine(tsCode);
+    }
     List<DayLine> dayLines =
         await remoteDayLineService.sendFindLatest(subscription);
     dayLineController.replaceAll(dayLines);
-    List<String> tsCodes = [];
+    tsCodes.clear();
     for (var dayLine in dayLines) {
       tsCodes.add(dayLine.tsCode);
-
-      /// 更新股票的日线的数据
-      stockLineService.getUpdateDayLine(dayLine.tsCode);
     }
     multiStockLineController.replaceAll(tsCodes);
   }
@@ -257,6 +259,13 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
           }
         },
         icon: const Icon(Icons.group),
+      ),
+      IconButton(
+        tooltip: AppLocalizations.t('Refresh'),
+        onPressed: () {
+          _refresh(groupName.value);
+        },
+        icon: const Icon(Icons.refresh),
       ),
     ];
     return AppBarView(
