@@ -106,6 +106,9 @@ class SherpaConfigUtil {
       _sherpaModelInstallationPath = sherpaModelInstallationPath;
     }
     Directory dir = Directory(_sherpaModelInstallationPath!);
+    if (!dir.existsSync()) {
+      dir.createSync(recursive: true);
+    }
     List<FileSystemEntity> entities = dir.listSync();
     if (entities.isNotEmpty) {
       logger.i('initialize sherpa model successfully');
