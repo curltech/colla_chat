@@ -1,17 +1,20 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/download_file_util.dart';
 import 'package:colla_chat/tool/sherpa/sherpa_config_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 
 class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
   //'sherpa-onnx-conformer-zh','sherpa-onnx-vits-zh-ll'
-  ValueNotifier<String?> modelName = ValueNotifier<String?>(null);
+  TextEditingController modelNameController = TextEditingController();
   Function()? onDownloadComplete;
 
   SherpaInstallWidget({super.key, this.onDownloadComplete}) {
@@ -47,7 +50,7 @@ class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
 
   Future<void> setupSherpaModel() async {
     bool success = await SherpaConfigUtil.setupSherpaModel(
-      modelName.value!,
+      modelNameController.text,
       onProgress: (DownloadProgress progress) {
         downloadProgress.value = progress;
       },
@@ -101,21 +104,37 @@ class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
         ]);
   }
 
-  Widget _buildModelWidget() {
+  Widget _buildModelWidget(BuildContext context) {
+    List<TileData> tiles = [];
     List<String> asrModelNames =
         SherpaConfigUtil.sherpaAsrModelDownloadUrl.keys.toList();
+    for (String modelName in asrModelNames) {
+      tiles.add(TileData(
+          title: modelName,
+          selected: modelNameController.text == title,
+          onTap: (int index, String title, {String? subtitle}) {
+            modelNameController.text = title;
+            Navigator.pop(context);
+          }));
+    }
+    Map<TileData, List<TileData>> groupTileData = {};
+    groupTileData[TileData(title: 'asr')] = tiles;
+
     List<String> ttsModelNames =
         SherpaConfigUtil.sherpaTtsModelDownloadUrl.keys.toList();
-    List<String> modelNames = [];
-    modelNames.addAll(asrModelNames);
-    modelNames.addAll(ttsModelNames);
-    var items = <DropdownMenuItem<String>>[];
-    for (String modelName in modelNames) {
-      items.add(DropdownMenuItem(
-        value: modelName,
-        child: Text(modelName),
-      ));
+    for (String modelName in ttsModelNames) {
+      tiles.add(TileData(
+          title: modelName,
+          selected: modelNameController.text == title,
+          onTap: (int index, String title, {String? subtitle}) {
+            modelNameController.text = title;
+            Navigator.pop(context);
+          }));
     }
+    groupTileData[TileData(title: 'tts')] = tiles;
+
+    Widget child = GroupDataListView(tileData: groupTileData);
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,18 +142,22 @@ class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
         const SizedBox(
           height: 15.0,
         ),
-        CommonAutoSizeText(AppLocalizations.t('Sherpa model')),
-        ValueListenableBuilder(
-          valueListenable: modelName,
-          builder: (BuildContext context, value, Widget? child) {
-            return DropdownButton(
-                value: modelName.value,
-                items: items,
-                onChanged: (Object? item) {
-                  modelName.value = item.toString();
-                });
-          },
-        )
+        CommonAutoSizeTextFormField(
+            controller: modelNameController,
+            labelText: AppLocalizations.t('Sherpa model'),
+            suffix: IconButton(
+                onPressed: () {
+                  DialogUtil.show(
+                      title: Text(AppLocalizations.t('Select')),
+                      context: context,
+                      builder: (BuildContext context) {
+                        return Dialog(child: child);
+                      });
+                },
+                icon: Icon(
+                  Icons.select_all_outlined,
+                  color: myself.primary,
+                ))),
       ],
     );
   }
@@ -168,7 +191,7 @@ class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
                 ),
               ),
             );
-            children.add(_buildModelWidget());
+            children.add(_buildModelWidget(context));
             children.addAll([
               const SizedBox(height: 20),
               Expanded(child: _buildInstallWidget(context)),

@@ -734,5 +734,7 @@
   "Sherpa installation path": "Sherpa安装目录",
   "Sherpa model": "Sherpa模型",
   "Setup sherpa": "安装sherpa",
-  "Sherpa is not uninstalled": "Sherpa未被安装"
+  "Sherpa is not uninstalled": "Sherpa未被安装",
+  "asr": "语音转文字",
+  "tts": "文字转语音"
 }

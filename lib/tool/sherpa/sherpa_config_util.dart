@@ -110,7 +110,7 @@ class SherpaConfigUtil {
       dir.createSync(recursive: true);
     }
     List<FileSystemEntity> entities = dir.listSync();
-    if (entities.isNotEmpty) {
+    if (entities.length > 1) {
       logger.i('initialize sherpa model successfully');
       return true;
     }
