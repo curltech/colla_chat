@@ -11,6 +11,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/poem/poem.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/sherpa/sherpa_text_to_speech_widget.dart';
 
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -193,8 +194,10 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
   PlatformTextToSpeechWidget platformTextToSpeechWidget =
       PlatformTextToSpeechWidget();
 
-  // SherpaTextToSpeechWidget sherpaTextToSpeechWidget =
-  //     SherpaTextToSpeechWidget();
+  SherpaTextToSpeechWidget sherpaTextToSpeechWidget =
+      SherpaTextToSpeechWidget();
+
+  ValueNotifier<bool> platformTextToSpeech = ValueNotifier<bool>(true);
 
   Future<void> _onRefresh(BuildContext context) async {
     int length = poemController.data.length;
@@ -250,6 +253,47 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
     ]);
   }
 
+  speak() {
+    var platformTextToSpeech = this.platformTextToSpeech.value;
+    if (platformTextToSpeech) {
+      var ttsState = platformTextToSpeechWidget.ttsState.value;
+
+      if (ttsState == TtsState.stopped || ttsState == TtsState.paused) {
+        platformTextToSpeechWidget.speak(poem.value!.paragraphs!);
+      }
+    } else {
+      var ttsState = sherpaTextToSpeechWidget.ttsState.value;
+
+      if (ttsState == TtsState.stopped || ttsState == TtsState.paused) {
+        sherpaTextToSpeechWidget.speak(poem.value!.paragraphs!);
+      }
+    }
+  }
+
+  pause() {
+    var platformTextToSpeech = this.platformTextToSpeech.value;
+    if (platformTextToSpeech) {
+      var ttsState = platformTextToSpeechWidget.ttsState.value;
+      if (ttsState == TtsState.playing) {
+        platformTextToSpeechWidget.pause();
+      }
+    } else {
+      var ttsState = sherpaTextToSpeechWidget.ttsState.value;
+      if (ttsState == TtsState.playing) {
+        sherpaTextToSpeechWidget.pause();
+      }
+    }
+  }
+
+  stop() {
+    var platformTextToSpeech = this.platformTextToSpeech.value;
+    if (platformTextToSpeech) {
+      platformTextToSpeechWidget.stop();
+    } else {
+      sherpaTextToSpeechWidget.stop();
+    }
+  }
+
   Widget _buildPoemContent(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: poem,
@@ -287,70 +331,99 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
                 alignment: MainAxisAlignment.start,
                 children: [
                   IconButton(
-                      color: Colors.white,
-                      hoverColor: myself.primary,
-                      onPressed: () {
-                        swiperController.move(0);
-                      },
-                      icon: const Icon(Icons.keyboard_arrow_left)),
+                    color: Colors.white,
+                    hoverColor: myself.primary,
+                    onPressed: () {
+                      swiperController.move(0);
+                    },
+                    icon: const Icon(Icons.keyboard_arrow_left),
+                    tooltip: AppLocalizations.t('Back'),
+                  ),
                   ValueListenableBuilder(
                     valueListenable: platformTextToSpeechWidget.ttsState,
                     builder: (BuildContext context, ttsState, Widget? child) {
                       return IconButton(
-                          color: Colors.white,
-                          hoverColor: myself.primary,
-                          onPressed: () {
-                            if (ttsState == TtsState.stopped) {
-                              platformTextToSpeechWidget
-                                  .speak(poem.paragraphs!);
-                            }
-                            if (ttsState == TtsState.paused) {
-                              platformTextToSpeechWidget
-                                  .speak(poem.paragraphs!);
-                            }
-                            if (ttsState == TtsState.playing) {
-                              platformTextToSpeechWidget.pause();
-                            }
-                          },
-                          icon: ttsState == TtsState.stopped ||
-                                  ttsState == TtsState.paused
-                              ? const Icon(Icons.play_arrow)
-                              : const Icon(Icons.pause));
+                        color: Colors.white,
+                        hoverColor: myself.primary,
+                        onPressed: () {
+                          if (ttsState == TtsState.stopped ||
+                              ttsState == TtsState.paused) {
+                            speak();
+                          }
+                          if (ttsState == TtsState.playing) {
+                            pause();
+                          }
+                        },
+                        icon: ttsState == TtsState.stopped ||
+                                ttsState == TtsState.paused
+                            ? const Icon(Icons.play_arrow)
+                            : const Icon(Icons.pause),
+                        tooltip: ttsState == TtsState.stopped ||
+                                ttsState == TtsState.paused
+                            ? AppLocalizations.t('Play')
+                            : AppLocalizations.t('Pause'),
+                      );
                     },
                   ),
                   IconButton(
-                      color: Colors.white,
-                      hoverColor: myself.primary,
-                      onPressed: () {
-                        platformTextToSpeechWidget.stop();
-                      },
-                      icon: const Icon(Icons.stop)),
+                    color: Colors.white,
+                    hoverColor: myself.primary,
+                    onPressed: () {
+                      stop();
+                    },
+                    icon: const Icon(Icons.stop),
+                    tooltip: AppLocalizations.t('Stop'),
+                  ),
                   IconButton(
-                      color: Colors.white,
-                      hoverColor: myself.primary,
-                      onPressed: () async {
-                        await DialogUtil.show(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Dialog(
-                                child: platformTextToSpeechWidget,
-                              );
-                            });
-                      },
-                      icon: const Icon(Icons.settings)),
-                  IconButton(
-                      color: Colors.white,
-                      hoverColor: myself.primary,
-                      onPressed: () async {
-                        await DialogUtil.show(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return Dialog(
-                                child: platformTextToSpeechWidget,
-                              );
-                            });
-                      },
-                      icon: const Icon(Icons.precision_manufacturing_outlined)),
+                    color: Colors.white,
+                    hoverColor: myself.primary,
+                    onPressed: () async {
+                      await DialogUtil.show(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Dialog(
+                              child: platformTextToSpeechWidget,
+                            );
+                          });
+                    },
+                    icon: const Icon(Icons.settings),
+                    tooltip: AppLocalizations.t('Setting'),
+                  ),
+                  ValueListenableBuilder(
+                    valueListenable: platformTextToSpeech,
+                    builder: (BuildContext context, value, Widget? child) {
+                      return ToggleButtons(
+                        borderWidth: 2.0,
+                        fillColor: Colors.white,
+                        selectedBorderColor: myself.primary,
+                        selectedColor: myself.primary,
+                        borderColor: Colors.grey,
+                        borderRadius: BorderRadius.circular(16.0),
+                        isSelected: value ? [true, false] : [false, true],
+                        onPressed: (int newIndex) {
+                          if (newIndex == 0) {
+                            platformTextToSpeech.value = true;
+                          } else if (newIndex == 1) {
+                            platformTextToSpeech.value = false;
+                          }
+                        },
+                        children: <Widget>[
+                          Tooltip(
+                              message: AppLocalizations.t('Platform'),
+                              child: Icon(
+                                Icons.record_voice_over_outlined,
+                                color: value ? myself.primary : Colors.white,
+                              )),
+                          Tooltip(
+                              message: AppLocalizations.t('Sherpa'),
+                              child: Icon(
+                                Icons.multitrack_audio,
+                                color: value ? Colors.white : myself.primary,
+                              )),
+                        ],
+                      );
+                    },
+                  ),
                 ],
               ),
               Expanded(

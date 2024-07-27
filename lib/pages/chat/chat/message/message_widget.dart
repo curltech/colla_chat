@@ -40,6 +40,7 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/pdf_util.dart';
+import 'package:colla_chat/tool/sherpa/sherpa_speech_to_text.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -105,13 +106,13 @@ class MessageWidget {
         default:
           if (chatMessage.mimeType != null) {
             String mainMimeType = FileUtil.mainMimeType(chatMessage.mimeType!);
-            ChatMessageContentType? contentType = StringUtil.enumFromString(
+            ChatMessageContentType? mimeType = StringUtil.enumFromString(
                 ChatMessageContentType.values, mainMimeType);
-            if (contentType == ChatMessageContentType.image) {
+            if (mimeType == ChatMessageContentType.image) {
               body = buildImageMessageWidget(context);
-            } else if (contentType == ChatMessageContentType.audio) {
+            } else if (mimeType == ChatMessageContentType.audio) {
               body = buildAudioMessageWidget(context);
-            } else if (contentType == ChatMessageContentType.video) {
+            } else if (mimeType == ChatMessageContentType.video) {
               body = buildVideoMessageWidget(context);
             }
           }
@@ -147,13 +148,12 @@ class MessageWidget {
       );
     }
     if (subMessageType == ChatMessageSubType.chat) {
-      String contentType = chatMessage.contentType!;
-      if (contentType == ChatMessageContentType.file.name ||
-          contentType == ChatMessageContentType.video.name ||
-          contentType == ChatMessageContentType.audio.name ||
-          contentType == ChatMessageContentType.media.name ||
-          contentType == ChatMessageContentType.rich.name ||
-          contentType == ChatMessageContentType.image.name) {
+      if (contentType == ChatMessageContentType.file ||
+          contentType == ChatMessageContentType.video ||
+          contentType == ChatMessageContentType.audio ||
+          contentType == ChatMessageContentType.media ||
+          contentType == ChatMessageContentType.rich ||
+          contentType == ChatMessageContentType.image) {
         messagePopActionData.add(ActionData(
             label: 'Save to file',
             tooltip: 'Save message attachment to file',
@@ -164,6 +164,12 @@ class MessageWidget {
               tooltip: 'Save message attachment to gallery',
               icon: const Icon(Icons.browse_gallery_outlined)));
         }
+      }
+      if (contentType == ChatMessageContentType.audio) {
+        messagePopActionData.add(ActionData(
+            label: 'Speech to text',
+            tooltip: 'Transfer voice to text',
+            icon: const Icon(Icons.text_snippet_outlined)));
       }
     }
     if (myself.peerId == chatMessage.senderPeerId &&
@@ -251,6 +257,9 @@ class MessageWidget {
         await _saveFile(context);
       case 'Save to gallery':
         await _saveFile(context, isFile: false);
+        break;
+      case 'Speech to text':
+        await _asr(context);
         break;
       case 'Delete':
         await chatMessageService.remove(chatMessage);
@@ -361,6 +370,41 @@ class MessageWidget {
             DialogUtil.info(context, content: 'save to file: $path');
           }
         }
+      }
+    }
+  }
+
+  Future<void> _asr(BuildContext context) async {
+    String subMessageType = chatMessage.subMessageType;
+    if (subMessageType == ChatMessageSubType.chat.name) {
+      String contentType = chatMessage.contentType!;
+      if (contentType == ChatMessageContentType.audio.name) {
+        String? messageId = chatMessage.messageId;
+        String? title = chatMessage.title;
+        if (messageId == null) {
+          DialogUtil.error(context, content: 'No source messageId');
+          return;
+        }
+        String? filename;
+        if (title != null) {
+          filename = title;
+        } else {
+          filename = messageId;
+        }
+        Uint8List? bytes =
+            await messageAttachmentService.findContent(messageId, title);
+        if (bytes == null) {
+          DialogUtil.error(context, content: 'No source file data');
+          return;
+        }
+        SherpaSpeechToText sherpaSpeechToText = SherpaSpeechToText();
+        await sherpaSpeechToText.recognize(audioData: bytes);
+        DialogUtil.show(
+            context: context,
+            builder: (context) {
+              return Dialog(
+                  child: CommonAutoSizeText(sherpaSpeechToText.text!));
+            });
       }
     }
   }
