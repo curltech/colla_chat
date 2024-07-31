@@ -5,7 +5,7 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/controller/llm_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/extended_text_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/message/message_widget.dart';
 import 'package:colla_chat/pages/index/global_chat_message.dart';
@@ -52,14 +52,11 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   bool moreVisible = false;
   bool voiceRecording = false;
 
-  // ValueNotifier<ChatGPTAction> chatGPTAction =
-  //     ValueNotifier<ChatGPTAction>(ChatGPTAction.chat);
-
   @override
   void initState() {
     super.initState();
     widget.textEditingController.addListener(_update);
-    chatMessageController.addListener(_update);
+    llmChatMessageController.addListener(_update);
   }
 
   _update() {
@@ -75,7 +72,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
       }
       logger.i('record audio file: $filename length: ${data.length}');
       String? mimeType = FileUtil.mimeType(filename);
-      await chatMessageController.send(
+      await llmChatMessageController.send(
           content: data,
           title: FileUtil.filename(filename),
           contentType: ChatMessageContentType.audio,
@@ -112,8 +109,63 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
     return StringUtil.isNotEmpty(value);
   }
 
+  List<ActionData> _buildLlmChatSendAction() {
+    LlmAction langChainAction = llmChatMessageController.llmAction;
+    final List<ActionData> chatGPTPopActions = [
+      ActionData(
+          label: LlmAction.chat.name,
+          tooltip: 'Chat message',
+          icon: Icon(
+            Icons.chat,
+            color: LlmAction.chat == langChainAction
+                ? myself.primary
+                : myself.secondary,
+          )),
+      ActionData(
+          label: LlmAction.translate.name,
+          tooltip: 'Translate message',
+          icon: Icon(
+            Icons.translate,
+            color: LlmAction.translate == langChainAction
+                ? myself.primary
+                : myself.secondary,
+          )),
+      ActionData(
+          label: LlmAction.extract.name,
+          tooltip: 'Extract message',
+          icon: Icon(
+            Icons.summarize_outlined,
+            color: LlmAction.extract == langChainAction
+                ? myself.primary
+                : myself.secondary,
+          )),
+      ActionData(
+        label: LlmAction.image.name,
+        tooltip: 'Create image',
+        icon: Icon(
+          Icons.image_outlined,
+          color: LlmAction.image == langChainAction
+              ? myself.primary
+              : myself.secondary,
+        ),
+      ),
+      ActionData(
+        label: LlmAction.audio.name,
+        tooltip: 'Transcription audio',
+        icon: Icon(
+          Icons.multitrack_audio,
+          color: LlmAction.audio == langChainAction
+              ? myself.primary
+              : myself.secondary,
+        ),
+      ),
+    ];
+
+    return chatGPTPopActions;
+  }
+
   List<ActionData> _buildTransportTypeSendAction() {
-    TransportType transportType = chatMessageController.transportType;
+    TransportType transportType = llmChatMessageController.transportType;
     final List<ActionData> transportTypeActions = [
       ActionData(
           label: TransportType.webrtc.name,
@@ -180,6 +232,20 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
     return transportTypeActions;
   }
 
+  ///各种不同的ChatGPT的prompt的消息发送命令
+  ///比如文本聊天，翻译，提取摘要，文本生成图片
+  _onChatGPTSend(BuildContext context, int index, String label,
+      {String? value}) async {
+    LlmAction? chatGPTAction =
+        StringUtil.enumFromString(LlmAction.values, label);
+    if (chatGPTAction == null) {
+      return null;
+    }
+    llmChatMessageController.llmAction = chatGPTAction;
+    // this.chatGPTAction.value = chatGPTAction;
+    _send();
+  }
+
   _onTransportSend(BuildContext context, int index, String label,
       {String? value}) async {
     if (label == 'SMS receive') {
@@ -190,7 +256,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
       if (transportType == null) {
         return null;
       }
-      chatMessageController.transportType = transportType;
+      llmChatMessageController.transportType = transportType;
       _send();
     }
   }
@@ -204,7 +270,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
 
   ///接收到加密短信
   _onActionReceiveSms() async {
-    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    ChatSummary? chatSummary = llmChatMessageController.chatSummary;
     if (chatSummary == null) {
       return;
     }
@@ -233,6 +299,8 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
         ));
 
     ///长按弹出式菜单
+    DartOllamaClient? dartOllamaClient =
+        llmChatMessageController.dartOllamaClient;
     CustomPopupMenuController menuController = CustomPopupMenuController();
     Widget menu = MenuUtil.buildPopupMenu(
         child: sendButton,
@@ -242,10 +310,16 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
             child: DataActionCard(
                 onPressed: (int index, String label, {String? value}) {
                   menuController.hideMenu();
-                  _onTransportSend(context, index, label, value: value);
+                  if (dartOllamaClient == null) {
+                    _onTransportSend(context, index, label, value: value);
+                  } else {
+                    _onChatGPTSend(context, index, label, value: value);
+                  }
                 },
                 crossAxisCount: 4,
-                actions: _buildTransportTypeSendAction(),
+                actions: dartOllamaClient != null
+                    ? _buildLlmChatSendAction()
+                    : _buildTransportTypeSendAction(),
                 height: 140,
                 width: 320,
                 iconSize: 20),
@@ -344,7 +418,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   @override
   void dispose() {
     widget.textEditingController.removeListener(_update);
-    chatMessageController.removeListener(_update);
+    llmChatMessageController.removeListener(_update);
     super.dispose();
   }
 }

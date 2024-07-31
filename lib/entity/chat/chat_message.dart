@@ -122,7 +122,7 @@ enum PartyType { linkman, group, peerClient, contact, channel, conference }
 
 enum ChatDirect { receive, send }
 
-enum TransportType { none, chatGPT, websocket, webrtc, sfu, email, sms, nearby }
+enum TransportType { none, llm, websocket, webrtc, sfu, email, sms, nearby }
 
 // 消息，泛指一切社交复合文档，最简单的是一句话，最复杂可以是非常复杂的混合文本，图片，视频的文档
 class ChatMessage extends StatusEntity {

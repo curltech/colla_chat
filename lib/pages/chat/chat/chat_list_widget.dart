@@ -11,6 +11,7 @@ import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_view.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/llm/llm_chat_message_view.dart';
 import 'package:colla_chat/pages/chat/linkman/group/group_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_info_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_webrtc_connection_widget.dart';
@@ -93,6 +94,7 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
   ChatListWidget({super.key}) {
     websocketPool.getDefault();
     indexWidgetProvider.define(ChatMessageView());
+    indexWidgetProvider.define(LlmChatMessageView());
     indexWidgetProvider.define(const LinkmanInfoWidget());
     indexWidgetProvider.define(const HtmlPreviewWidget());
     indexWidgetProvider.define(const LinkmanWebrtcConnectionWidget());
@@ -409,7 +411,14 @@ class _ChatListWidgetState extends State<ChatListWidget>
         dense: true,
         selected: false,
         isThreeLine: true,
-        routeName: 'chat_message');
+        onTap: (int index, String title, {String? subtitle}) async {
+          Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+          if (linkman?.linkmanStatus == LinkmanStatus.G.name) {
+            indexWidgetProvider.push('llm_chat_message');
+          } else {
+            indexWidgetProvider.push('chat_message');
+          }
+        });
     List<TileData> slideActions = [];
     TileData deleteSlideAction = TileData(
         title: 'Delete',

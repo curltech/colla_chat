@@ -20,18 +20,12 @@ import 'package:flutter/foundation.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:uuid/uuid.dart';
 
-enum LlmAction { chat, image, audio, translate, extract }
-
 ///好友或者群的消息控制器，包含某个连接的所有消息
 class ChatMessageController extends DataMoreController<ChatMessage> {
   ChatSummary? _chatSummary;
 
   //发送方式
   TransportType transportType = TransportType.webrtc;
-
-  //是否是llm聊天和chat方式
-  DartOllamaClient? dartOllamaClient;
-  LlmAction llmAction = LlmAction.chat;
 
   //调度删除时间
   int _deleteTime = 0;
@@ -49,20 +43,6 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   set chatSummary(ChatSummary? chatSummary) {
     if (_chatSummary != chatSummary) {
       _chatSummary = chatSummary;
-      if (_chatSummary != null) {
-        var peerId = _chatSummary!.peerId;
-        linkmanService.findCachedOneByPeerId(peerId!).then((Linkman? linkman) {
-          if (linkman != null) {
-            if (linkman.linkmanStatus == LinkmanStatus.G.name) {
-              dartOllamaClient = dartOllamaClientPool.get(linkman.peerId);
-            } else {
-              dartOllamaClient = null;
-            }
-          }
-        });
-      } else {
-        dartOllamaClient = null;
-      }
       clear(notify: false);
       previous(limit: defaultLimit).then((int count) {
         if (count == 0) {
@@ -250,15 +230,10 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
           transportType: transportType,
           deleteTime: _deleteTime,
           parentMessageId: _parentMessageId);
-      if (dartOllamaClient == null) {
-        List<ChatMessage> returnChatMessages = await chatMessageService
-            .sendAndStore(chatMessage, peerIds: peerIds);
-        returnChatMessage = returnChatMessages.firstOrNull;
-      } else {
-        await chatMessageService.store(chatMessage);
-        returnChatMessage = chatMessage;
-        _llmChatAction(content);
-      }
+
+      List<ChatMessage> returnChatMessages =
+          await chatMessageService.sendAndStore(chatMessage, peerIds: peerIds);
+      returnChatMessage = returnChatMessages.firstOrNull;
     } else {
       ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
           peerId, type,
@@ -283,94 +258,6 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     notifyListeners();
 
     return returnChatMessage;
-  }
-
-  Future<void> _llmChatAction(String content) async {
-    if (llmAction == LlmAction.chat) {
-      String? chatResponse = await dartOllamaClient!.prompt(content);
-      await onChatCompletion(chatResponse);
-    }
-    // else if (llmAction == LlmAction.image) {
-    //   String image = await langChainClient!.createImage(
-    //     content,
-    //   );
-    //   onImageCompletion(image);
-    // }
-    // else if (langChainAction == LangChainAction.translate) {
-    //   OpenAIAudioModel translation = await chatGPT!.createTranslation(
-    //     file: File(''),
-    //     prompt: content,
-    //   );
-    //   translation.text;
-    // } else if (langChainAction == LangChainAction.audio) {
-    //   File file = await chatGPT!.createSpeech(
-    //     input: content,
-    //   );
-    // }
-  }
-
-  onChatCompletion(String? chatResponse) async {
-    ChatMessage chatMessage = buildLlmChatMessage(chatResponse,
-        senderPeerId: _chatSummary!.peerId, senderName: _chatSummary!.name);
-    await chatMessageService.store(chatMessage);
-    notifyListeners();
-  }
-
-  ///接收到chatGPT的消息回复
-  ChatMessage buildLlmChatMessage(
-    dynamic content, {
-    String? senderPeerId,
-    String? senderName,
-    ChatMessageContentType contentType = ChatMessageContentType.text,
-    ChatMessageMimeType mimeType = ChatMessageMimeType.text,
-    String? parentMessageId,
-  }) {
-    ChatMessage chatMessage = ChatMessage();
-    var uuid = const Uuid();
-    chatMessage.messageId = uuid.v4();
-    chatMessage.messageType = ChatMessageType.chat.name;
-    chatMessage.subMessageType = ChatMessageSubType.chat.name;
-    chatMessage.direct = ChatDirect.receive.name; //对自己而言，消息是属于发送或者接受
-    chatMessage.senderPeerId = senderPeerId;
-    chatMessage.senderType = PartyType.linkman.name;
-    chatMessage.senderName = senderName;
-    var current = DateUtil.currentDate();
-    chatMessage.sendTime = current;
-    chatMessage.readTime = current;
-
-    ///把消息的接收者填写成自己myself
-    chatMessage.receiverPeerId = myself.peerId;
-    chatMessage.receiverType = PartyType.linkman.name;
-    chatMessage.receiverClientId = myself.clientId;
-    chatMessage.receiverName = myself.name;
-    if (content is String) {
-      chatMessage.content =
-          CryptoUtil.encodeBase64(CryptoUtil.stringToUtf8(content));
-    } else if (content is Uint8List) {
-      chatMessage.content = CryptoUtil.encodeBase64(content);
-    } else {
-      chatMessage.content = content;
-    }
-    chatMessage.contentType = contentType.name;
-    chatMessage.mimeType = mimeType.name;
-    chatMessage.status = MessageStatus.received.name;
-    chatMessage.transportType = TransportType.chatGPT.name;
-    chatMessage.deleteTime = deleteTime;
-    chatMessage.parentMessageId = parentMessageId;
-    chatMessage.id = null;
-
-    return chatMessage;
-  }
-
-  onImageCompletion(String url) async {
-    Uint8List content = await ImageUtil.loadUrlImage(url);
-    ChatMessage chatMessage = buildLlmChatMessage(content,
-        senderPeerId: _chatSummary!.peerId,
-        senderName: _chatSummary!.name,
-        contentType: ChatMessageContentType.image,
-        mimeType: ChatMessageMimeType.png);
-    await chatMessageService.store(chatMessage);
-    notifyListeners();
   }
 
   Future<void> sendNameCard(List<String> peerIds) async {
