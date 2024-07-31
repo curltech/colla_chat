@@ -16,10 +16,21 @@ enum LlmAction { chat, image, audio, translate, extract }
 
 class LlmChatMessageController extends ChatMessageController {
   DartOllamaClient? dartOllamaClient;
-  LlmAction llmAction = LlmAction.chat;
+  LlmAction _llmAction = LlmAction.chat;
 
   LlmChatMessageController() {
     transportType = TransportType.llm;
+  }
+
+  LlmAction get llmAction {
+    return _llmAction;
+  }
+
+  set llmAction(LlmAction llmAction) {
+    if (_llmAction != llmAction) {
+      _llmAction = llmAction;
+      notifyListeners();
+    }
   }
 
   ///更新chatSummary，清空原数据，查询新数据

@@ -2,25 +2,16 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
-import 'package:colla_chat/entity/chat/chat_summary.dart';
-import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/llm_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/extended_text_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/message/message_widget.dart';
-import 'package:colla_chat/pages/index/global_chat_message.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/transport/ollama/dart_ollama_client.dart';
-import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
-import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:record/record.dart';
 
@@ -109,182 +100,65 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
     return StringUtil.isNotEmpty(value);
   }
 
-  List<ActionData> _buildLlmChatSendAction() {
-    LlmAction langChainAction = llmChatMessageController.llmAction;
-    final List<ActionData> chatGPTPopActions = [
-      ActionData(
-          label: LlmAction.chat.name,
-          tooltip: 'Chat message',
-          icon: Icon(
-            Icons.chat,
-            color: LlmAction.chat == langChainAction
-                ? myself.primary
-                : myself.secondary,
-          )),
-      ActionData(
-          label: LlmAction.translate.name,
-          tooltip: 'Translate message',
-          icon: Icon(
-            Icons.translate,
-            color: LlmAction.translate == langChainAction
-                ? myself.primary
-                : myself.secondary,
-          )),
-      ActionData(
-          label: LlmAction.extract.name,
-          tooltip: 'Extract message',
-          icon: Icon(
-            Icons.summarize_outlined,
-            color: LlmAction.extract == langChainAction
-                ? myself.primary
-                : myself.secondary,
-          )),
-      ActionData(
-        label: LlmAction.image.name,
-        tooltip: 'Create image',
-        icon: Icon(
-          Icons.image_outlined,
-          color: LlmAction.image == langChainAction
-              ? myself.primary
-              : myself.secondary,
-        ),
-      ),
-      ActionData(
-        label: LlmAction.audio.name,
-        tooltip: 'Transcription audio',
-        icon: Icon(
-          Icons.multitrack_audio,
-          color: LlmAction.audio == langChainAction
-              ? myself.primary
-              : myself.secondary,
-        ),
-      ),
-    ];
-
-    return chatGPTPopActions;
-  }
-
-  List<ActionData> _buildTransportTypeSendAction() {
-    TransportType transportType = llmChatMessageController.transportType;
-    final List<ActionData> transportTypeActions = [
-      ActionData(
-          label: TransportType.webrtc.name,
-          tooltip: 'Webrtc send',
-          icon: Icon(
-            Icons.webhook_rounded,
-            color: TransportType.webrtc == transportType
-                ? myself.primary
-                : myself.secondary,
-          )),
-      ActionData(
-          label: TransportType.email.name,
-          tooltip: 'Email send',
-          icon: Icon(
-            Icons.email,
-            color: TransportType.email == transportType
-                ? myself.primary
-                : myself.secondary,
-          )),
-      ActionData(
-        label: TransportType.sfu.name,
-        tooltip: 'SFU send',
-        icon: Icon(
-          Icons.center_focus_strong,
-          color: TransportType.sfu == transportType
-              ? myself.primary
-              : myself.secondary,
-        ),
-      ),
-      ActionData(
-        label: TransportType.nearby.name,
-        tooltip: 'Nearby send',
-        icon: Icon(
-          Icons.near_me_outlined,
-          color: TransportType.nearby == transportType
-              ? myself.primary
-              : myself.secondary,
-        ),
-      ),
-    ];
-
-    if (platformParams.mobile) {
-      transportTypeActions.add(
-        ActionData(
-            label: TransportType.sms.name,
-            tooltip: 'SMS send',
-            icon: Icon(
-              Icons.sms,
-              color: TransportType.sms == transportType
-                  ? myself.primary
-                  : myself.secondary,
-            )),
-      );
+  Widget _buildLlmActionButton() {
+    LlmAction llmAction = llmChatMessageController.llmAction;
+    List<bool> isSelected = [];
+    for (var ele in LlmAction.values) {
+      if (ele == llmAction) {
+        isSelected.add(true);
+      } else {
+        isSelected.add(false);
+      }
     }
+    final List<Widget> children = [
+      Tooltip(
+          message: LlmAction.chat.name,
+          child: const Icon(
+            Icons.chat,
+          )),
+      Tooltip(
+          message: LlmAction.translate.name,
+          child: const Icon(
+            Icons.translate,
+          )),
+      Tooltip(
+          message: LlmAction.extract.name,
+          child: const Icon(
+            Icons.summarize_outlined,
+          )),
+      Tooltip(
+        message: LlmAction.image.name,
+        child: const Icon(
+          Icons.image_outlined,
+        ),
+      ),
+      Tooltip(
+        message: LlmAction.audio.name,
+        child: const Icon(
+          Icons.multitrack_audio,
+        ),
+      ),
+    ];
 
-    transportTypeActions.add(ActionData(
-        label: 'SMS receive',
-        tooltip: 'SMS receive',
-        icon: Icon(
-          Icons.try_sms_star,
-          color: myself.primary,
-        )));
-
-    return transportTypeActions;
+    return ToggleButtons(
+        isSelected: isSelected,
+        children: children,
+        onPressed: (int index) {
+          llmChatMessageController.llmAction = LlmAction.values[index];
+        });
   }
 
   ///各种不同的ChatGPT的prompt的消息发送命令
   ///比如文本聊天，翻译，提取摘要，文本生成图片
-  _onChatGPTSend(BuildContext context, int index, String label,
-      {String? value}) async {
-    LlmAction? chatGPTAction =
-        StringUtil.enumFromString(LlmAction.values, label);
-    if (chatGPTAction == null) {
-      return null;
-    }
-    llmChatMessageController.llmAction = chatGPTAction;
-    // this.chatGPTAction.value = chatGPTAction;
-    _send();
-  }
-
-  _onTransportSend(BuildContext context, int index, String label,
-      {String? value}) async {
-    if (label == 'SMS receive') {
-      _onActionReceiveSms();
-    } else {
-      TransportType? transportType =
-          StringUtil.enumFromString(TransportType.values, label);
-      if (transportType == null) {
-        return null;
-      }
-      llmChatMessageController.transportType = transportType;
-      _send();
-    }
-  }
-
-  _send() {
+  _onSend(BuildContext context, {LlmAction llmAction = LlmAction.chat}) async {
+    llmChatMessageController.llmAction = llmAction;
     if (widget.onSendPressed != null) {
       widget.onSendPressed!();
       widget.textEditingController.clear();
     }
   }
 
-  ///接收到加密短信
-  _onActionReceiveSms() async {
-    ChatSummary? chatSummary = llmChatMessageController.chatSummary;
-    if (chatSummary == null) {
-      return;
-    }
-    Linkman? linkman =
-        await linkmanService.findCachedOneByPeerId(chatSummary.peerId!);
-    String text = widget.textEditingController.text;
-    if (linkman != null && text.isNotEmpty) {
-      await globalChatMessage.onLinkmanSmsMessage(linkman, text);
-    }
-    widget.textEditingController.clear();
-  }
-
-  ///弹出ChatGPT的命令菜单
-  _buildChatGPTMenu(BuildContext context) {
+  Widget _buildSendButton(BuildContext context) {
     Widget sendButton = Visibility(
         visible: _hasValue(),
         child: Container(
@@ -293,41 +167,11 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
             tooltip: AppLocalizations.t('Send'),
             icon: Icon(Icons.send_outlined, color: myself.primary),
             onPressed: () {
-              _send();
+              _onSend(context);
             },
           ),
         ));
-
-    ///长按弹出式菜单
-    DartOllamaClient? dartOllamaClient =
-        llmChatMessageController.dartOllamaClient;
-    CustomPopupMenuController menuController = CustomPopupMenuController();
-    Widget menu = MenuUtil.buildPopupMenu(
-        child: sendButton,
-        controller: menuController,
-        menuBuilder: () {
-          return Card(
-            child: DataActionCard(
-                onPressed: (int index, String label, {String? value}) {
-                  menuController.hideMenu();
-                  if (dartOllamaClient == null) {
-                    _onTransportSend(context, index, label, value: value);
-                  } else {
-                    _onChatGPTSend(context, index, label, value: value);
-                  }
-                },
-                crossAxisCount: 4,
-                actions: dartOllamaClient != null
-                    ? _buildLlmChatSendAction()
-                    : _buildTransportTypeSendAction(),
-                height: 140,
-                width: 320,
-                iconSize: 20),
-          );
-        },
-        pressType: PressType.longPress);
-
-    return menu;
+    return sendButton;
   }
 
   ///文本，录音，其他消息，ChatGPT消息命令和发送按钮
@@ -386,7 +230,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
                   },
                 ),
               )),
-          _buildChatGPTMenu(context),
+          _buildSendButton(context),
         ]));
   }
 

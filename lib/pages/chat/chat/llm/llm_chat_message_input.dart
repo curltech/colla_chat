@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/llm_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/emoji_message_input.dart';
-import 'package:colla_chat/pages/chat/chat/more_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/text_message_input.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
@@ -126,11 +125,11 @@ class _LlmChatMessageInputWidgetState extends State<LlmChatMessageInputWidget> {
         onTap: _onEmojiTap,
       ));
     }
-    if (chatMessageViewController.moreMessageInputHeight > 0) {
-      children.add(MoreMessageInput(
-        onAction: widget.onAction,
-      ));
-    }
+    // if (chatMessageViewController.moreMessageInputHeight > 0) {
+    //   children.add(MoreMessageInput(
+    //     onAction: widget.onAction,
+    //   ));
+    // }
     return Column(
         mainAxisAlignment: MainAxisAlignment.start, children: children);
   }
