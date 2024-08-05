@@ -34,6 +34,7 @@ import 'package:colla_chat/transport/websocket/universal_websocket.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:no_screenshot/no_screenshot.dart';
 import 'package:screenshot_callback/screenshot_callback.dart';
@@ -46,7 +47,7 @@ import 'package:window_manager/window_manager.dart';
 /// 支持群聊
 class ChatMessageView extends StatefulWidget with TileDataMixin {
   final FullScreenChatMessageWidget fullScreenChatMessageWidget =
-      const FullScreenChatMessageWidget();
+      FullScreenChatMessageWidget();
   final VideoChatWidget videoChatWidget = VideoChatWidget();
   final SfuVideoChatWidget sfuVideoChatWidget = SfuVideoChatWidget();
   final ChatMessageWidget chatMessageWidget = ChatMessageWidget();
@@ -81,14 +82,11 @@ class ChatMessageView extends StatefulWidget with TileDataMixin {
 
 class _ChatMessageViewState extends State<ChatMessageView>
     with WidgetsBindingObserver, WindowListener {
-  final ValueNotifier<RTCPeerConnectionState?> _peerConnectionState =
-      ValueNotifier<RTCPeerConnectionState?>(null);
-  final ValueNotifier<RTCDataChannelState?> _dataChannelState =
-      ValueNotifier<RTCDataChannelState?>(null);
-  final ValueNotifier<ChatSummary?> _chatSummary =
-      ValueNotifier<ChatSummary?>(chatMessageController.chatSummary);
-  final ValueNotifier<double> chatMessageHeight = ValueNotifier<double>(0);
-  final ValueNotifier<bool?> _initiator = ValueNotifier<bool?>(null);
+  final Rx<RTCPeerConnectionState?> _peerConnectionState =
+      Rx<RTCPeerConnectionState?>(null);
+  final Rx<RTCDataChannelState?> _dataChannelState =
+      Rx<RTCDataChannelState?>(null);
+  final Rx<bool?> _initiator = Rx<bool?>(null);
   StreamSubscription<WebrtcEvent>? connectionStateStreamSubscription;
   StreamSubscription<WebrtcEvent>? dataChannelStateStreamSubscription;
   StreamSubscription<WebrtcEvent>? signalingStateStreamSubscription;
@@ -104,8 +102,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     windowManager.addListener(this);
-    chatMessageController.addListener(_updateChatMessage);
-    chatMessageViewController.addListener(_updateChatMessageView);
+    chatMessageController.getChatSummary().addListener(_updateChatSummary);
     WakelockPlus.enable();
 
     ///不准截屏
@@ -123,9 +120,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
     }
 
     ///初始化数据
-    _createPeerConnection();
-    _buildReadStatus();
-    _updateChatMessageView();
+    _updateChatSummary();
   }
 
   /// 消息窗口恢复的时候，恢复webrtc的连接
@@ -153,24 +148,15 @@ class _ChatMessageViewState extends State<ChatMessageView>
     //logger.i('[WindowManager] chat message view onWindowEvent: $eventName');
   }
 
-  _updateChatMessageView() {
-    chatMessageHeight.value = chatMessageViewController.chatMessageHeight;
-  }
-
-  _updateChatMessage() {
-    if (_chatSummary.value != chatMessageController.chatSummary) {
-      _chatSummary.value = chatMessageController.chatSummary;
-
-      ///初始化数据
-      _createPeerConnection();
-      _buildReadStatus();
-      _updateChatMessageView();
-    }
+  _updateChatSummary() {
+    ///初始化数据
+    _createPeerConnection();
+    _buildReadStatus();
   }
 
   ///更新为已读状态
   Future<void> _buildReadStatus() async {
-    var chatSummary = _chatSummary.value;
+    var chatSummary = chatMessageController.chatSummary;
     if (chatSummary == null) {
       logger.e('chatSummary is null');
       return;
@@ -207,7 +193,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
   ///如果ChatGPT，则设置
   _createPeerConnection() async {
     await websocketPool.connect();
-    var chatSummary = _chatSummary.value;
+    var chatSummary = chatMessageController.chatSummary;
     if (chatSummary == null) {
       logger.e('chatSummary is null');
       return;
@@ -224,7 +210,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
   }
 
   _createDataChannel() async {
-    var chatSummary = _chatSummary.value;
+    var chatSummary = chatMessageController.chatSummary;
     if (chatSummary == null) {
       logger.e('chatSummary is null');
       return;
@@ -240,7 +226,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
   }
 
   _disconnectPeerConnection() async {
-    var chatSummary = _chatSummary.value;
+    var chatSummary = chatMessageController.chatSummary;
     if (chatSummary == null) {
       logger.e('chatSummary is null');
       return;
@@ -371,7 +357,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
   }
 
   Future<void> _updatePeerConnectionState(WebrtcEvent event) async {
-    var chatSummary = _chatSummary.value;
+    var chatSummary = chatMessageController.chatSummary;
     if (chatSummary == null) {
       logger.e('chatSummary is null');
       return;
@@ -385,7 +371,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
     if (eventType == WebrtcEventType.signalingState) {
       RTCSignalingState? state = event.data;
       // if (mounted) {
-      //   DialogUtil.info(context,
+      //   DialogUtil.info(
       //       content: AppLocalizations.t(
       //               'PeerConnection signalingState was changed to ') +
       //           AppLocalizations.t(state.toString().substring(21)));
@@ -396,7 +382,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
       _dataChannelState.value = RTCDataChannelState.RTCDataChannelClosed;
       _initiator.value = null;
       // if (mounted) {
-      //   DialogUtil.info(context,
+      //   DialogUtil.info(
       //       content: AppLocalizations.t('PeerConnection was closed'));
       // }
     } else if (eventType == WebrtcEventType.connectionState) {
@@ -411,14 +397,14 @@ class _ChatMessageViewState extends State<ChatMessageView>
           //   if (state != null) {
           //     stateText = state.name.substring(22);
           //   }
-          //   DialogUtil.info(context,
+          //   DialogUtil.info(
           //       content:
           //           AppLocalizations.t('PeerConnection state was changed to ') +
           //               AppLocalizations.t(stateText));
           // }
         } else {
           // if (mounted) {
-          //   DialogUtil.info(context,
+          //   DialogUtil.info(
           //       content: AppLocalizations.t('PeerConnection was closed'));
           // }
         }
@@ -427,7 +413,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
       RTCDataChannelState? state = event.data;
       _dataChannelState.value = state;
       // if (mounted) {
-      //   DialogUtil.info(context,
+      //   DialogUtil.info(
       //       content:
       //           AppLocalizations.t('PeerConnection initiator was changed to ') +
       //               _initiator.value.toString());
@@ -435,7 +421,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
     } else if (eventType == WebrtcEventType.initiator) {
       _initiator.value = event.data;
       // if (mounted) {
-      //   DialogUtil.info(context,
+      //   DialogUtil.info(
       //       content:
       //           AppLocalizations.t('PeerConnection initiator was changed to ') +
       //               _initiator.value.toString());
@@ -470,36 +456,32 @@ class _ChatMessageViewState extends State<ChatMessageView>
 
   ///创建消息显示面板，包含消息的输入框
   Widget _buildChatMessageWidget(BuildContext context) {
-    final Widget chatMessageView = ValueListenableBuilder(
-        valueListenable: chatMessageHeight,
-        builder: (BuildContext context, double value, Widget? child) {
-          var height = chatMessageViewController.chatMessageHeight;
-          Widget chatMessageWidget =
-              SizedBox(height: height, child: widget.chatMessageWidget);
-          return VisibilityDetector(
-              key: UniqueKey(),
-              onVisibilityChanged: (VisibilityInfo visibilityInfo) {
-                if (visibleFraction == 0.0 &&
-                    visibilityInfo.visibleFraction > 0) {
-                  // logger.i(
-                  //     'ChatMessageView visibleFraction from 0 to ${visibilityInfo.visibleFraction}');
-                  _createPeerConnection();
-                }
-                visibleFraction = visibilityInfo.visibleFraction;
-              },
-              child: KeyboardActions(
-                  autoScroll: true,
-                  config: _buildKeyboardActionsConfig(context),
-                  child: Column(children: <Widget>[
-                    chatMessageWidget,
-                    Divider(
-                      color: Colors.white.withOpacity(AppOpacity.xlOpacity),
-                      height: 1.0,
-                    ),
-                    widget.chatMessageInputWidget
-                  ])));
-        });
-
+    final Widget chatMessageView = Obx(() {
+      var height = chatMessageViewController.chatMessageHeight;
+      Widget chatMessageWidget =
+          SizedBox(height: height, child: widget.chatMessageWidget);
+      return VisibilityDetector(
+          key: UniqueKey(),
+          onVisibilityChanged: (VisibilityInfo visibilityInfo) {
+            if (visibleFraction == 0.0 && visibilityInfo.visibleFraction > 0) {
+              // logger.i(
+              //     'ChatMessageView visibleFraction from 0 to ${visibilityInfo.visibleFraction}');
+              _createPeerConnection();
+            }
+            visibleFraction = visibilityInfo.visibleFraction;
+          },
+          child: KeyboardActions(
+              autoScroll: true,
+              config: _buildKeyboardActionsConfig(context),
+              child: Column(children: <Widget>[
+                chatMessageWidget,
+                Divider(
+                  color: Colors.white.withOpacity(AppOpacity.xlOpacity),
+                  height: 1.0,
+                ),
+                widget.chatMessageInputWidget
+              ])));
+    });
     return chatMessageView;
   }
 
@@ -508,115 +490,97 @@ class _ChatMessageViewState extends State<ChatMessageView>
     String partyType = chatSummary.partyType!;
     List<Widget> rightWidgets = [];
     if (partyType == PartyType.linkman.name) {
-      var peerConnectionStatusWidget = ValueListenableBuilder(
-          valueListenable: _peerConnectionState,
-          builder: (context, value, child) {
-            RTCPeerConnectionState? peerConnectionState =
-                _peerConnectionState.value;
-            String? stateText = peerConnectionState?.name;
-            stateText = stateText?.substring(22);
-            stateText ??= 'Unknown';
-            Widget widget;
-            if (_peerConnectionState.value ==
-                RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
-              widget = IconButton(
-                onPressed: () {
-                  _disconnectPeerConnection();
-                },
-                icon: const Icon(
-                  Icons.wifi,
-                  color: Colors.white,
-                ),
-                // label: stateText,
-                tooltip: AppLocalizations.t('Disconnect'),
-              );
-            } else {
-              widget = IconButton(
-                onPressed: () {
-                  _createPeerConnection();
-                },
-                icon: const Icon(
-                  Icons.wifi_off,
-                  color: Colors.red,
-                ),
-                // label: stateText,
-                tooltip: AppLocalizations.t('Reconnect'),
-              );
-            }
-
-            return widget;
-          });
-      rightWidgets.add(peerConnectionStatusWidget);
+      RTCPeerConnectionState? peerConnectionState = _peerConnectionState.value;
+      String? stateText = peerConnectionState?.name;
+      stateText = stateText?.substring(22);
+      stateText ??= 'Unknown';
+      Widget widget;
+      if (_peerConnectionState.value ==
+          RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+        widget = IconButton(
+          onPressed: () {
+            _disconnectPeerConnection();
+          },
+          icon: const Icon(
+            Icons.wifi,
+            color: Colors.white,
+          ),
+          // label: stateText,
+          tooltip: AppLocalizations.t('Disconnect'),
+        );
+      } else {
+        widget = IconButton(
+          onPressed: () {
+            _createPeerConnection();
+          },
+          icon: const Icon(
+            Icons.wifi_off,
+            color: Colors.red,
+          ),
+          // label: stateText,
+          tooltip: AppLocalizations.t('Reconnect'),
+        );
+      }
+      rightWidgets.add(widget);
       rightWidgets.add(const SizedBox(
         width: 5,
       ));
-      var dataChannelStatusWidget = ValueListenableBuilder(
-          valueListenable: _dataChannelState,
-          builder: (context, value, child) {
-            RTCDataChannelState? dataChannelState = _dataChannelState.value;
-            String? stateText = dataChannelState?.name;
-            stateText = stateText?.substring(14);
-            stateText ??= 'Unknown';
-            Widget widget;
-            if (_dataChannelState.value ==
-                RTCDataChannelState.RTCDataChannelOpen) {
-              widget = IconButton(
-                onPressed: null,
-                icon: const Icon(
-                  Icons.wb_cloudy_outlined,
-                  color: Colors.white,
-                ),
-                // label: stateText,
-                tooltip: AppLocalizations.t('DataChannel'),
-              );
-            } else {
-              widget = IconButton(
-                onPressed: () {
-                  _createDataChannel();
-                },
-                icon: const Icon(
-                  Icons.cloud_off,
-                  color: Colors.red,
-                ),
-                // label: stateText,
-                tooltip: AppLocalizations.t('DataChannel'),
-              );
-            }
 
-            return widget;
-          });
-      rightWidgets.add(dataChannelStatusWidget);
+      RTCDataChannelState? dataChannelState = _dataChannelState.value;
+      stateText = dataChannelState?.name;
+      stateText = stateText?.substring(14);
+      stateText ??= 'Unknown';
+      if (_dataChannelState.value == RTCDataChannelState.RTCDataChannelOpen) {
+        widget = IconButton(
+          onPressed: null,
+          icon: const Icon(
+            Icons.wb_cloudy_outlined,
+            color: Colors.white,
+          ),
+          // label: stateText,
+          tooltip: AppLocalizations.t('DataChannel'),
+        );
+      } else {
+        widget = IconButton(
+          onPressed: () {
+            _createDataChannel();
+          },
+          icon: const Icon(
+            Icons.cloud_off,
+            color: Colors.red,
+          ),
+          // label: stateText,
+          tooltip: AppLocalizations.t('DataChannel'),
+        );
+      }
+      rightWidgets.add(widget);
       rightWidgets.add(const SizedBox(
         width: 5,
       ));
       if (myself.peerProfile.developerSwitch) {
-        rightWidgets.add(ValueListenableBuilder(
-            valueListenable: _initiator,
-            builder: (context, initiator, child) {
-              if (initiator != null) {
-                if (initiator) {
-                  return Tooltip(
-                      message: AppLocalizations.t('Leader'),
-                      child: const Icon(
-                        Icons.light_mode,
-                        color: Colors.yellow,
-                      ));
-                } else {
-                  return Tooltip(
-                      message: AppLocalizations.t('Follower'),
-                      child: const Icon(
-                        Icons.light_mode,
-                        color: Colors.grey,
-                      ));
-                }
-              }
-              return Container();
-            }));
-
-        rightWidgets.add(const SizedBox(
-          width: 15,
-        ));
+        if (_initiator.value != null) {
+          if (_initiator.value!) {
+            widget = Tooltip(
+                message: AppLocalizations.t('Leader'),
+                child: const Icon(
+                  Icons.light_mode,
+                  color: Colors.yellow,
+                ));
+          } else {
+            widget = Tooltip(
+                message: AppLocalizations.t('Follower'),
+                child: const Icon(
+                  Icons.light_mode,
+                  color: Colors.grey,
+                ));
+          }
+        }
       }
+      rightWidgets.add(widget);
+
+      rightWidgets.add(const SizedBox(
+        width: 15,
+      ));
     }
     if (partyType == PartyType.group.name) {
       rightWidgets.add(IconButton(
@@ -669,34 +633,32 @@ class _ChatMessageViewState extends State<ChatMessageView>
 
   @override
   Widget build(BuildContext context) {
-    Widget appBarView = ValueListenableBuilder(
-        valueListenable: _chatSummary,
-        builder:
-            (BuildContext context, ChatSummary? chatSummary, Widget? child) {
-          Widget chatMessageWidget = _buildChatMessageWidget(context);
-          if (chatSummary != null) {
-            String name = chatSummary.name!;
-            String title = AppLocalizations.t(name);
-            return AppBarView(
-                title: title,
-                withLeading: widget.withLeading,
-                rightWidgets: _buildRightWidgets(context, chatSummary),
-                child: chatMessageWidget);
-          }
-          return AppBarView(
-              title: AppLocalizations.t('No current chatSummary'),
-              withLeading: widget.withLeading,
-              child: chatMessageWidget);
-        });
+    Widget appBarView = Obx(() {
+      Widget chatMessageWidget = _buildChatMessageWidget(context);
+      var chatSummary = chatMessageController.chatSummary;
+      if (chatSummary != null) {
+        String name = chatSummary.name!;
+        String title = AppLocalizations.t(name);
+        List<Widget> rightWidgets = _buildRightWidgets(context, chatSummary);
+        return AppBarView(
+            title: title,
+            withLeading: widget.withLeading,
+            rightWidgets: rightWidgets,
+            child: chatMessageWidget);
+      }
+      return AppBarView(
+          title: AppLocalizations.t('No current chatSummary'),
+          withLeading: widget.withLeading,
+          child: chatMessageWidget);
+    });
 
     return appBarView;
   }
 
   @override
   void dispose() {
-    chatMessageController.removeListener(_updateChatMessage);
-    chatMessageViewController.removeListener(_updateChatMessageView);
-    var chatSummary = _chatSummary.value;
+    chatMessageController.getChatSummary().removeListener(_updateChatSummary);
+    var chatSummary = chatMessageController.chatSummary;
     if (chatSummary != null) {
       connectionStateStreamSubscription?.cancel();
       connectionStateStreamSubscription = null;

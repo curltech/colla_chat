@@ -13,6 +13,8 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -299,7 +301,6 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
           return Dialog(
               child: Column(children: [
             AppBarWidget.buildAppBar(
-              context,
               title: CommonAutoSizeText(AppLocalizations.t(title)),
             ),
             Expanded(
@@ -319,7 +320,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
       List<PlatformMediaSource> mediaSources =
           await mediaFileController.sourceFilePicker(directory: directory);
     } catch (e) {
-      DialogUtil.error(context, content: 'add media file failure:$e');
+      DialogUtil.error(content: 'add media file failure:$e');
     }
   }
 
@@ -445,7 +446,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
                     shape: const ContinuousRectangleBorder(),
                     child: Stack(
                       children: [
-                        tile.prefix ?? Container(),
+                        tile.prefix ?? nil,
                         Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -512,17 +513,10 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
     return Column(children: [
       _buildConvertFilesButton(context),
       Expanded(
-          child: FutureBuilder(
+          child: PlatformFutureBuilder(
               future: _buildThumbnailView(context),
-              builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
-                if (!snapshot.hasData) {
-                  return Container();
-                }
-                Widget? fileWidgets = snapshot.data;
-                if (fileWidgets == null) {
-                  return Container();
-                }
-                return fileWidgets;
+              builder: (BuildContext context, Widget fileWidget) {
+                return fileWidget;
               })),
     ]);
   }

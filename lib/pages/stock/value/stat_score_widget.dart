@@ -9,21 +9,22 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/service/stock/stat_score.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class StatScoreDataPageController extends DataPageController<StatScore> {
   @override
   sort<S>(Comparable<S>? Function(StatScore t) getFieldValue, int columnIndex,
       String columnName, bool ascending) {
-    sortColumnIndex = columnIndex;
-    sortColumnName = columnName;
-    sortAscending = ascending;
-    notifyListeners();
+    sortColumnIndex(columnIndex);
+    sortColumnName(columnName);
+    sortAscending(ascending);
   }
 }
 
@@ -32,11 +33,8 @@ final StatScoreDataPageController statScoreDataPageController =
     StatScoreDataPageController();
 
 ///自选股和分组的查询界面
-class StatScoreWidget extends StatefulWidget with TileDataMixin {
+class StatScoreWidget extends StatelessWidget with TileDataMixin {
   StatScoreWidget({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _StatScoreWidgetState();
 
   @override
   bool get withLeading => true;
@@ -49,146 +47,14 @@ class StatScoreWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'StatScore';
-}
 
-class _StatScoreWidgetState extends State<StatScoreWidget>
-    with TickerProviderStateMixin {
-  late final List<PlatformDataColumn> statScoreDataColumns = [
-    PlatformDataColumn(
-      label: '股票名',
-      name: 'security_name',
-      width: 80,
-    ),
-    PlatformDataColumn(
-      label: '风险',
-      name: 'risk_score',
-      width: 50,
-      dataType: DataType.double,
-      align: TextAlign.right,
-      onSort: (int index, bool ascending) => statScoreDataPageController.sort(
-          (t) => t.riskScore, index, 'riskScore', ascending),
-    ),
-    PlatformDataColumn(
-      label: '稳定',
-      name: 'stable_score',
-      width: 70,
-      dataType: DataType.double,
-      align: TextAlign.right,
-      onSort: (int index, bool ascending) => statScoreDataPageController.sort(
-          (t) => t.stableScore, index, 'stableScore', ascending),
-    ),
-    PlatformDataColumn(
-      label: '增长',
-      name: 'increase_score',
-      dataType: DataType.double,
-      align: TextAlign.right,
-      width: 80,
-      onSort: (int index, bool ascending) => statScoreDataPageController.sort(
-          (t) => t.increaseScore, index, 'increaseScore', ascending),
-    ),
-    PlatformDataColumn(
-      label: '累计业绩',
-      name: 'acc_score',
-      dataType: DataType.double,
-      align: TextAlign.right,
-      width: 80,
-      onSort: (int index, bool ascending) => statScoreDataPageController.sort(
-          (t) => t.accScore, index, 'accScore', ascending),
-    ),
-    PlatformDataColumn(
-      label: '相关性',
-      name: 'corr_score',
-      dataType: DataType.double,
-      align: TextAlign.right,
-      width: 100,
-      onSort: (int index, bool ascending) => statScoreDataPageController.sort(
-          (t) => t.corrScore, index, 'corrScore', ascending),
-    ),
-    PlatformDataColumn(
-      label: '最新业绩',
-      name: 'pros_score',
-      dataType: DataType.double,
-      align: TextAlign.right,
-      width: 110,
-      onSort: (int index, bool ascending) => statScoreDataPageController.sort(
-          (t) => t.prosScore, index, 'prosScore', ascending),
-    ),
-    PlatformDataColumn(
-      label: '趋势',
-      name: 'trend_score',
-      dataType: DataType.double,
-      align: TextAlign.right,
-      width: 110,
-      onSort: (int index, bool ascending) => statScoreDataPageController.sort(
-          (t) => t.trendScore, index, 'trendScore', ascending),
-    ),
-    PlatformDataColumn(
-      label: '运营',
-      name: 'operation_score',
-      dataType: DataType.double,
-      align: TextAlign.right,
-      width: 130,
-      onSort: (int index, bool ascending) => statScoreDataPageController.sort(
-          (t) => t.operationScore, index, 'operationScore', ascending),
-    ),
-    PlatformDataColumn(
-      label: '总分',
-      name: 'total_score',
-      dataType: DataType.double,
-      align: TextAlign.right,
-      width: 100,
-      onSort: (int index, bool ascending) => statScoreDataPageController.sort(
-          (t) => t.totalScore, index, 'totalScore', ascending),
-    ),
-    PlatformDataColumn(
-      label: '总分分位数',
-      name: 'percentile_total_score',
-      dataType: DataType.double,
-      align: TextAlign.right,
-      width: 100,
-      onSort: (int index, bool ascending) => statScoreDataPageController.sort(
-          (t) => t.percentileTotalScore,
-          index,
-          'percentileTotalScore',
-          ascending),
-    ),
-    PlatformDataColumn(
-        label: '',
-        name: 'action',
-        inputType: InputType.custom,
-        width: 20,
-        buildSuffix: (int index, dynamic data) {
-          return Container();
-        }),
-    PlatformDataColumn(
-      label: '股票代码',
-      name: 'ts_code',
-      width: 100,
-    ),
-    PlatformDataColumn(
-      label: '年份',
-      name: 'term',
-      width: 90,
-    ),
-    PlatformDataColumn(
-      label: '交易日期',
-      name: 'trade_date',
-      width: 80,
-    ),
-    PlatformDataColumn(
-        label: '',
-        name: 'action',
-        inputType: InputType.custom,
-        buildSuffix: _buildActionWidget),
-  ];
   late final List<PlatformDataField> searchDataField;
   late final FormInputController searchController;
   ExpansionTileController expansionTileController = ExpansionTileController();
-  int offset = statScoreDataPageController.offset;
-  String? sortColumnName = statScoreDataPageController.sortColumnName;
-  bool sortAscending = statScoreDataPageController.sortAscending;
+  RxInt offset = statScoreDataPageController.offset;
+  Rx<String?> sortColumnName = statScoreDataPageController.sortColumnName;
+  RxBool sortAscending = statScoreDataPageController.sortAscending;
 
-  @override
   initState() {
     searchDataField = [
       PlatformDataField(
@@ -234,8 +100,6 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
           )),
     ];
     searchController = FormInputController(searchDataField);
-    statScoreDataPageController.addListener(_updateStatScore);
-    super.initState();
   }
 
   _updateStatScore() {
@@ -246,15 +110,15 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
       sortColumnName = statScoreDataPageController.sortColumnName;
       sortAscending = statScoreDataPageController.sortAscending;
       String? orderBy;
-      if (sortColumnName != null) {
-        orderBy = '$sortColumnName ${sortAscending ? 'asc' : 'desc'}';
+      if (sortColumnName.value != null) {
+        orderBy = '$sortColumnName ${sortAscending.value ? 'asc' : 'desc'}';
       }
       Map<String, dynamic> values = searchController.getValues();
       String? tsCode = values['tsCode'];
       Set<dynamic>? terms = values['terms'];
       _refresh(tsCode: tsCode, terms: terms?.toList(), orderBy: orderBy);
     } else {
-      setState(() {});
+      // setState(() {});
     }
   }
 
@@ -284,17 +148,17 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
   }
 
   _refresh({String? tsCode, List<dynamic>? terms, String? orderBy}) async {
-    int offset = statScoreDataPageController.offset;
-    int count = statScoreDataPageController.count;
+    RxInt offset = statScoreDataPageController.offset;
+    RxInt count = statScoreDataPageController.count;
     Map<String, dynamic> responseData = await remoteStatScoreService.sendSearch(
         tsCode: tsCode,
         terms: terms,
-        from: offset,
+        from: offset.value,
         orderBy: orderBy,
-        count: count);
-    count = responseData['count'];
+        count: count.value);
+    count(responseData['count']);
     List<StatScore> statScores = responseData['data'];
-    statScoreDataPageController.count = count;
+    statScoreDataPageController.count(count.value);
     statScoreDataPageController.replaceAll(statScores);
   }
 
@@ -339,6 +203,134 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
   }
 
   Widget _buildStatScoreListView(BuildContext context) {
+    final List<PlatformDataColumn> statScoreDataColumns = [
+      PlatformDataColumn(
+        label: '股票名',
+        name: 'security_name',
+        width: 80,
+      ),
+      PlatformDataColumn(
+        label: '风险',
+        name: 'risk_score',
+        width: 50,
+        dataType: DataType.double,
+        align: TextAlign.right,
+        onSort: (int index, bool ascending) => statScoreDataPageController.sort(
+            (t) => t.riskScore, index, 'riskScore', ascending),
+      ),
+      PlatformDataColumn(
+        label: '稳定',
+        name: 'stable_score',
+        width: 70,
+        dataType: DataType.double,
+        align: TextAlign.right,
+        onSort: (int index, bool ascending) => statScoreDataPageController.sort(
+            (t) => t.stableScore, index, 'stableScore', ascending),
+      ),
+      PlatformDataColumn(
+        label: '增长',
+        name: 'increase_score',
+        dataType: DataType.double,
+        align: TextAlign.right,
+        width: 80,
+        onSort: (int index, bool ascending) => statScoreDataPageController.sort(
+            (t) => t.increaseScore, index, 'increaseScore', ascending),
+      ),
+      PlatformDataColumn(
+        label: '累计业绩',
+        name: 'acc_score',
+        dataType: DataType.double,
+        align: TextAlign.right,
+        width: 80,
+        onSort: (int index, bool ascending) => statScoreDataPageController.sort(
+            (t) => t.accScore, index, 'accScore', ascending),
+      ),
+      PlatformDataColumn(
+        label: '相关性',
+        name: 'corr_score',
+        dataType: DataType.double,
+        align: TextAlign.right,
+        width: 100,
+        onSort: (int index, bool ascending) => statScoreDataPageController.sort(
+            (t) => t.corrScore, index, 'corrScore', ascending),
+      ),
+      PlatformDataColumn(
+        label: '最新业绩',
+        name: 'pros_score',
+        dataType: DataType.double,
+        align: TextAlign.right,
+        width: 110,
+        onSort: (int index, bool ascending) => statScoreDataPageController.sort(
+            (t) => t.prosScore, index, 'prosScore', ascending),
+      ),
+      PlatformDataColumn(
+        label: '趋势',
+        name: 'trend_score',
+        dataType: DataType.double,
+        align: TextAlign.right,
+        width: 110,
+        onSort: (int index, bool ascending) => statScoreDataPageController.sort(
+            (t) => t.trendScore, index, 'trendScore', ascending),
+      ),
+      PlatformDataColumn(
+        label: '运营',
+        name: 'operation_score',
+        dataType: DataType.double,
+        align: TextAlign.right,
+        width: 130,
+        onSort: (int index, bool ascending) => statScoreDataPageController.sort(
+            (t) => t.operationScore, index, 'operationScore', ascending),
+      ),
+      PlatformDataColumn(
+        label: '总分',
+        name: 'total_score',
+        dataType: DataType.double,
+        align: TextAlign.right,
+        width: 100,
+        onSort: (int index, bool ascending) => statScoreDataPageController.sort(
+            (t) => t.totalScore, index, 'totalScore', ascending),
+      ),
+      PlatformDataColumn(
+        label: '总分分位数',
+        name: 'percentile_total_score',
+        dataType: DataType.double,
+        align: TextAlign.right,
+        width: 100,
+        onSort: (int index, bool ascending) => statScoreDataPageController.sort(
+            (t) => t.percentileTotalScore,
+            index,
+            'percentileTotalScore',
+            ascending),
+      ),
+      PlatformDataColumn(
+          label: '',
+          name: 'action',
+          inputType: InputType.custom,
+          width: 20,
+          buildSuffix: (int index, dynamic data) {
+            return nil;
+          }),
+      PlatformDataColumn(
+        label: '股票代码',
+        name: 'ts_code',
+        width: 100,
+      ),
+      PlatformDataColumn(
+        label: '年份',
+        name: 'term',
+        width: 90,
+      ),
+      PlatformDataColumn(
+        label: '交易日期',
+        name: 'trade_date',
+        width: 80,
+      ),
+      PlatformDataColumn(
+          label: '',
+          name: 'action',
+          inputType: InputType.custom,
+          buildSuffix: _buildActionWidget),
+    ];
     return BindingDataTable2<StatScore>(
       key: UniqueKey(),
       showCheckboxColumn: false,
@@ -354,7 +346,7 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
   Widget build(BuildContext context) {
     List<Widget> rightWidgets = [];
     return AppBarView(
-      title: widget.title,
+      title: title,
       withLeading: true,
       rightWidgets: rightWidgets,
       child: Column(
@@ -364,11 +356,5 @@ class _StatScoreWidgetState extends State<StatScoreWidget>
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    statScoreDataPageController.removeListener(_updateStatScore);
-    super.dispose();
   }
 }

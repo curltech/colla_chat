@@ -93,7 +93,7 @@ class _JsonLinkmanAddWidgetState extends State<JsonLinkmanAddWidget> {
             onPressed: () async {
               PeerClient peerClient = await _addLinkman();
               if (mounted) {
-                DialogUtil.info(context,
+                DialogUtil.info(
                     content:
                         '${AppLocalizations.t('Add linkman ')}:${peerClient.peerId}');
               }
@@ -113,7 +113,7 @@ class _JsonLinkmanAddWidgetState extends State<JsonLinkmanAddWidget> {
                   where: 'peerId=?',
                   whereArgs: [peerClient.peerId]);
               if (mounted) {
-                DialogUtil.info(context,
+                DialogUtil.info(
                     content:
                         '${AppLocalizations.t('Add linkman as friend')}:${peerClient.peerId}');
               }

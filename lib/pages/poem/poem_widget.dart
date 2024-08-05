@@ -16,12 +16,14 @@ import 'package:colla_chat/tool/sherpa/sherpa_text_to_speech_widget.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:path/path.dart' as p;
 
 class PoemWidget extends StatelessWidget with TileDataMixin {
@@ -133,7 +135,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
         StringUtil.isEmpty(rhythmic) &&
         StringUtil.isEmpty(dynasty) &&
         StringUtil.isEmpty(paragraphs)) {
-      DialogUtil.error(context, content: 'Please input search key');
+      DialogUtil.error(content: 'Please input search key');
       return;
     }
     try {
@@ -142,7 +144,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
       logger.e('collapse failure:$e');
     }
     List<Poem> poems = [];
-    DialogUtil.loadingShow(context);
+    DialogUtil.loadingShow();
     try {
       poems = await poemService.sendSearchPoem(
           title: title,
@@ -154,7 +156,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
     } catch (e) {
       logger.e('sendSearchPoem failure:$e');
     }
-    DialogUtil.loadingHide(context);
+    DialogUtil.loadingHide();
     poemController.addAll(poems);
   }
 
@@ -211,12 +213,10 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
         height: 5,
       ),
       _buildFormInputWidget(context),
-      Expanded(
-          child: ListenableBuilder(
-        listenable: poemController,
-        builder: (BuildContext context, Widget? child) {
+      Expanded(child: Obx(
+        () {
           List<TileData> tiles = [];
-          List<Poem> poems = poemController.data;
+          RxList<Poem> poems = poemController.data;
           if (poems.isNotEmpty) {
             int i = 0;
             for (var poem in poems) {
@@ -451,7 +451,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
             ],
           );
         }
-        return Container();
+        return nil;
       },
     );
   }
@@ -476,7 +476,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
             return _buildPoemContent(context);
           }
 
-          return Container();
+          return nil;
         },
       ),
     );

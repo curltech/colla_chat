@@ -129,7 +129,7 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
         config.value = await xfiles[0].readAsString();
       }
     } else if (platformParams.mobile) {
-      List<AssetEntity>? assets = await AssetUtil.pickAssets(context);
+      List<AssetEntity>? assets = await AssetUtil.pickAssets();
       if (assets != null && assets.isNotEmpty) {
         Uint8List? bytes = await assets[0].originBytes;
         config.value = String.fromCharCodes(bytes!);

@@ -15,6 +15,7 @@ import 'package:colla_chat/transport/emailclient.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:synchronized/synchronized.dart';
 
 class DecryptedMimeMessage {
@@ -44,21 +45,23 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
   Lock lock = Lock();
 
   ///邮件地址，邮箱名称和邮箱的映射
-  final Map<String, Map<String, enough_mail.Mailbox>> _addressMailboxes = {};
+  final RxMap<String, Map<String, enough_mail.Mailbox>> _addressMailboxes =
+      RxMap<String, Map<String, enough_mail.Mailbox>>({});
 
   ///邮件地址，邮箱名称和邮件列表的映射
-  final Map<String, Map<String, List<MailMessage>>> _addressMailMessages = {};
+  final RxMap<String, Map<String, List<MailMessage>>> _addressMailMessages =
+      RxMap<String, Map<String, List<MailMessage>>>({});
 
   ///缺省的邮件地址
-  entity.MailAddress? defaultMailAddress;
+  Rx<entity.MailAddress?> defaultMailAddress = Rx<entity.MailAddress?>(null);
 
-  String? _currentMailboxName;
+  final Rx<String?> _currentMailboxName = Rx<String?>(null);
 
   ///当前的邮箱名称,
-  enough_mail.Mailbox? _currentMailbox;
+  final Rx<enough_mail.Mailbox?> _currentMailbox = Rx<enough_mail.Mailbox?>(null);
 
   ///当前的邮件
-  int _currentMailIndex = -1;
+  final RxInt _currentMailIndex = (-1).obs;
 
   final Map<String, IconData> _mailBoxIcons = {};
 
@@ -66,8 +69,6 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
   clear({bool notify = true}) {
     _addressMailboxes.clear();
     _addressMailMessages.clear();
-    _currentMailboxName = null;
-    _currentMailbox = null;
     return super.clear(notify: notify);
   }
 
@@ -81,8 +82,8 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
       String email = mailAddress.email;
       _addressMailboxes.remove(email);
       _addressMailMessages.remove(email);
-      _currentMailboxName = null;
-      _currentMailbox = null;
+      _currentMailboxName(null);
+      _currentMailbox(null);
       return super.delete(index: index);
     }
 
@@ -122,14 +123,14 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
   }
 
   _initAllMailAddress() async {
-    data = await mailAddressService.findAllMailAddress();
+    data.assignAll(await mailAddressService.findAllMailAddress());
     if (data.isNotEmpty) {
-      _currentMailboxName = _mailBoxIcons.keys.firstOrNull;
+      _currentMailboxName(_mailBoxIcons.keys.firstOrNull);
       for (var emailAddress in data) {
         String email = emailAddress.email;
         if (!_addressMailMessages.containsKey(email)) {
           Map<String, List<MailMessage>> addressMailMessages = {
-            _currentMailboxName!: []
+            _currentMailboxName.value!: []
           };
           _addressMailMessages[email] = addressMailMessages;
         }
@@ -144,7 +145,7 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
 
   ///当前邮箱
   String? get currentMailboxName {
-    return _currentMailboxName;
+    return _currentMailboxName.value;
   }
 
   List<String>? getMailboxNames(String email) {
@@ -152,23 +153,20 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     if (mailboxMap != null && mailboxMap.isNotEmpty) {
       return mailboxMap.keys.toList();
     }
-    if (_currentMailboxName != null) {
-      return [_currentMailboxName!];
+    if (_currentMailboxName.value != null) {
+      return [_currentMailboxName.value!];
     }
     return null;
   }
 
   ///当前邮件位置
   int get currentMailIndex {
-    return _currentMailIndex;
+    return _currentMailIndex.value;
   }
 
   ///设置当前邮件位置
   set currentMailIndex(int currentMailIndex) {
-    if (_currentMailIndex != currentMailIndex) {
-      _currentMailIndex = currentMailIndex;
-      notifyListeners();
-    }
+    _currentMailIndex(currentMailIndex);
   }
 
   ///获取当前地址的当前邮箱的邮件
@@ -182,7 +180,8 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     if (mailboxMailMessages == null) {
       return null;
     }
-    List<MailMessage>? mailMessages = mailboxMailMessages[_currentMailboxName];
+    List<MailMessage>? mailMessages =
+        mailboxMailMessages[_currentMailboxName.value];
 
     return mailMessages;
   }
@@ -192,7 +191,7 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     if (currentMailMessages != null &&
         _currentMailIndex >= 0 &&
         _currentMailIndex < currentMailMessages.length) {
-      return currentMailMessages[_currentMailIndex];
+      return currentMailMessages[_currentMailIndex.value];
     }
 
     return null;
@@ -203,7 +202,7 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     if (currentMailMessages != null &&
         _currentMailIndex >= 0 &&
         _currentMailIndex < currentMailMessages.length) {
-      currentMailMessages[_currentMailIndex] = mailMessage!;
+      currentMailMessages[_currentMailIndex.value] = mailMessage!;
     }
   }
 
@@ -255,7 +254,6 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     }
     if (emailMessages.isNotEmpty) {
       currentMailMessages?.insertAll(0, emailMessages);
-      notifyListeners();
       return true;
     }
 
@@ -333,7 +331,6 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     }
     if (emailMessages.isNotEmpty) {
       currentMailMessages?.insertAll(0, emailMessages);
-      notifyListeners();
 
       return true;
     } else {
@@ -366,7 +363,7 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
         bool isConnected = await _connectMailAddress(emailAddress);
         if (isConnected) {
           if (emailAddress.isDefault) {
-            defaultMailAddress = emailAddress;
+            defaultMailAddress(emailAddress);
           }
         }
       }
@@ -401,7 +398,7 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
   }
 
   enough_mail.Mailbox? get currentMailbox {
-    return _currentMailbox;
+    return _currentMailbox.value;
   }
 
   ///设置当前邮箱名称
@@ -409,19 +406,14 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     if (current == null) {
       return;
     }
-    if (_currentMailboxName != name) {
-      _currentMailboxName = name;
-      Map<String, enough_mail.Mailbox>? mailboxMap =
-          _addressMailboxes[current!.email];
-      if (mailboxMap != null && mailboxMap.isNotEmpty) {
-        if (_currentMailbox?.name != name) {
-          _currentMailbox = mailboxMap[name];
-        }
-      }
-      notifyListeners();
-      //修改邮箱，抓取数据
-      findMailMessages();
+    _currentMailboxName(name);
+    Map<String, enough_mail.Mailbox>? mailboxMap =
+        _addressMailboxes[current!.email];
+    if (mailboxMap != null && mailboxMap.isNotEmpty) {
+      _currentMailbox(mailboxMap[name]);
     }
+    //修改邮箱，抓取数据
+    findMailMessages();
   }
 
   _onMessage(MimeMessage mimeMessage) {
@@ -467,14 +459,11 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
           }
         }
       }
-      _currentMailboxName = mailboxes.first?.name;
-      _currentMailbox = mailboxes.first;
+      _currentMailboxName(mailboxes.first?.name);
+      _currentMailbox(mailboxes.first);
     } else {
-      _currentMailboxName = null;
-      _currentMailbox = null;
-    }
-    if (listen) {
-      notifyListeners();
+      _currentMailboxName(null);
+      _currentMailbox(null);
     }
   }
 
@@ -570,9 +559,6 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
         break;
       }
     }
-    if (notify) {
-      notifyListeners();
-    }
   }
 
   Future<List<MimeMessage>?> fetchMessageSequence(
@@ -652,8 +638,8 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
       enough_mail.MimeMessage? mimeMsg =
           await emailClient.fetchMessageContents(mimeMessage);
       if (mimeMsg != null) {
-        await mailMessageService.storeMimeMessage(
-            current!.email, _currentMailbox!, mimeMsg, FetchPreference.full);
+        await mailMessageService.storeMimeMessage(current!.email,
+            _currentMailbox.value!, mimeMsg, FetchPreference.full);
 
         return mimeMsg;
       }
@@ -784,8 +770,6 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
         MessageSequence sequence = MessageSequence.fromIds([uid], isUid: true);
         mailMessageService.delete(where: 'id=?', whereArgs: [mailMessage.id!]);
         emailClient.deleteMessages(sequence, expunge: expunge);
-
-        notifyListeners();
       }
     }
   }
@@ -820,8 +804,6 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
           mailMessage.flags = mimeMessage.flags;
           mailMessageService.update({'flags': flags},
               where: 'id=?', whereArgs: [mailMessage.id!]);
-
-          notifyListeners();
         }
       }
     }
@@ -844,8 +826,6 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
                 {'mailboxName': moveResult.targetMailbox?.name},
                 where: 'id=?',
                 whereArgs: [mailMessage.id!]);
-
-            notifyListeners();
           }
         }
       }

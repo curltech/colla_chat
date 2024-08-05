@@ -11,6 +11,7 @@ import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_view.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/controller/llm_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/llm/llm_chat_message_view.dart';
 import 'package:colla_chat/pages/chat/linkman/group/group_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_info_widget.dart';
@@ -33,6 +34,8 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/websocket/universal_websocket.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
+import 'package:get/get.dart';
 import 'package:websocket_universal/websocket_universal.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -97,7 +100,7 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
     indexWidgetProvider.define(LlmChatMessageView());
     indexWidgetProvider.define(const LinkmanInfoWidget());
     indexWidgetProvider.define(const HtmlPreviewWidget());
-    indexWidgetProvider.define(const LinkmanWebrtcConnectionWidget());
+    indexWidgetProvider.define(LinkmanWebrtcConnectionWidget());
     indexWidgetProvider.define(groupEditWidget);
   }
 
@@ -119,35 +122,16 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
 
 class _ChatListWidgetState extends State<ChatListWidget>
     with TickerProviderStateMixin {
-  final ValueNotifier<List<ConnectivityResult>> _connectivityResult =
-      ValueNotifier<List<ConnectivityResult>>(
-          connectivityController.connectivityResult);
   StreamSubscription<SocketStatus>? _socketStatusStreamSubscription;
-  final ValueNotifier<SocketStatus?> _socketStatus =
-      ValueNotifier<SocketStatus?>(null);
-
-  final ValueNotifier<List<TileData>> _linkmanTileData =
-      ValueNotifier<List<TileData>>([]);
-  final ValueNotifier<List<TileData>> _groupTileData =
-      ValueNotifier<List<TileData>>([]);
-  final ValueNotifier<List<TileData>> _conferenceTileData =
-      ValueNotifier<List<TileData>>([]);
-  final ValueNotifier<int> _currentTab = ValueNotifier<int>(0);
-
-  TabController? _tabController;
+  final Rx<SocketStatus?> _socketStatus = Rx<SocketStatus?>(null);
+  late final TabController _tabController =
+      TabController(length: 3, vsync: this);
 
   @override
   initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-    _tabController!.addListener(_updateCurrentTab);
-    linkmanChatSummaryController.addListener(_updateLinkmanChatSummary);
+    connectivityController.connected.addListener(_updateConnectivity);
     linkmanChatSummaryController.refresh();
-    groupChatSummaryController.addListener(_updateGroupChatSummary);
-    // groupChatSummaryController.refresh();
-    conferenceChatSummaryController.addListener(_updateConferenceChatSummary);
-    // conferenceChatSummaryController.refresh();
-    connectivityController.addListener(_updateConnectivity);
     _initStatusStreamController();
     localNotificationsService.isAndroidPermissionGranted();
     localNotificationsService.requestPermissions();
@@ -178,7 +162,8 @@ class _ChatListWidgetState extends State<ChatListWidget>
 
   ///网络连通的情况下，如果没有缺省的websocket，尝试创建新的缺省websocket，如果有，则重连缺省的websocket
   _reconnect() async {
-    if (ConnectivityUtil.getMainResult(_connectivityResult.value) !=
+    if (ConnectivityUtil.getMainResult(
+            connectivityController.connectivityResult.value) !=
         ConnectivityResult.none) {
       UniversalWebsocket? websocket = websocketPool.getDefault();
       if (websocket != null) {
@@ -188,38 +173,12 @@ class _ChatListWidgetState extends State<ChatListWidget>
     }
   }
 
-  _updateCurrentTab() {
-    _currentTab.value = _tabController!.index;
-  }
-
-  _updateLinkmanChatSummary() {
-    _buildLinkmanTileData();
-  }
-
-  _updateGroupChatSummary() {
-    _buildGroupTileData();
-  }
-
-  _updateConferenceChatSummary() {
-    _buildConferenceTileData();
-  }
-
   _updateConnectivity() {
     List<ConnectivityResult> result = connectivityController.connectivityResult;
     if (result.contains(ConnectivityResult.none)) {
-      // if (mounted) {/**/
-      //   DialogUtil.error(context,
-      //       content: AppLocalizations.t('Connectivity were break down'));
-      // }
     } else {
       _reconnect();
-      // if (mounted) {
-      //   DialogUtil.info(context,
-      //       content: AppLocalizations.t('Connectivity status was changed to:') +
-      //           result.name);
-      // }
     }
-    _connectivityResult.value = result;
   }
 
   _updateWebsocketStatus(String address, SocketStatus socketStatus) {
@@ -230,13 +189,13 @@ class _ChatListWidgetState extends State<ChatListWidget>
       if (_socketStatus.value == SocketStatus.connected) {
         // _reconnectWebrtc(); //在ios下会死机
         // if (mounted) {
-        //   DialogUtil.info(context,
+        //   DialogUtil.info(
         //       content:
         //           '$address ${AppLocalizations.t('Websocket status was changed to:')}${_socketStatus.value.name}');
         // }
       } else {
         // if (mounted) {
-        // DialogUtil.error(context,
+        // DialogUtil.error(
         //     content:
         //         '$address ${AppLocalizations.t('Websocket status was changed to:')}${_socketStatus.value.name}');
         // }
@@ -343,8 +302,8 @@ class _ChatListWidgetState extends State<ChatListWidget>
     return badge;
   }
 
-  _buildLinkmanTileData() async {
-    var linkmenChatSummary = linkmanChatSummaryController.data;
+  Future<List<TileData>> _buildLinkmanTileData() async {
+    RxList<ChatSummary> linkmenChatSummary = linkmanChatSummaryController.data;
     List<TileData> tiles = [];
     if (linkmenChatSummary.isNotEmpty) {
       for (var chatSummary in linkmenChatSummary) {
@@ -393,7 +352,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
         tiles.add(tile);
       }
     }
-    _linkmanTileData.value = tiles;
+    return tiles;
   }
 
   TileData _buildTile(
@@ -413,9 +372,13 @@ class _ChatListWidgetState extends State<ChatListWidget>
         isThreeLine: true,
         onTap: (int index, String title, {String? subtitle}) async {
           Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+          chatSummaryController.currentIndex = index;
+          ChatSummary? current = chatSummaryController.current;
           if (linkman?.linkmanStatus == LinkmanStatus.G.name) {
+            llmChatMessageController.chatSummary = current;
             indexWidgetProvider.push('llm_chat_message');
           } else {
+            chatMessageController.chatSummary = current;
             indexWidgetProvider.push('chat_message');
           }
         });
@@ -424,7 +387,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
         title: 'Delete',
         prefix: Icons.bookmark_remove,
         onTap: (int index, String label, {String? subtitle}) async {
-          bool? confirm = await DialogUtil.confirm(context,
+          bool? confirm = await DialogUtil.confirm(
               content:
                   '${AppLocalizations.t('Do you want delete chat messages of ')} $name');
           if (confirm != true) {
@@ -441,8 +404,8 @@ class _ChatListWidgetState extends State<ChatListWidget>
     return tile;
   }
 
-  _buildGroupTileData() async {
-    var groupChatSummary = groupChatSummaryController.data;
+  Future<List<TileData>> _buildGroupTileData() async {
+    RxList<ChatSummary> groupChatSummary = groupChatSummaryController.data;
     List<TileData> tiles = [];
     if (groupChatSummary.isNotEmpty) {
       for (var chatSummary in groupChatSummary) {
@@ -471,11 +434,12 @@ class _ChatListWidgetState extends State<ChatListWidget>
         tiles.add(tile);
       }
     }
-    _groupTileData.value = tiles;
+    return tiles;
   }
 
-  _buildConferenceTileData() async {
-    var conferenceChatSummary = conferenceChatSummaryController.data;
+  Future<List<TileData>> _buildConferenceTileData() async {
+    RxList<ChatSummary> conferenceChatSummary =
+        conferenceChatSummaryController.data;
     List<TileData> tiles = [];
     if (conferenceChatSummary.isNotEmpty) {
       for (var chatSummary in conferenceChatSummary) {
@@ -509,144 +473,113 @@ class _ChatListWidgetState extends State<ChatListWidget>
         tiles.add(tile);
       }
     }
-    _conferenceTileData.value = tiles;
-  }
-
-  _onTapLinkman(int index, String title, {String? subtitle, TileData? group}) {
-    linkmanChatSummaryController.currentIndex = index;
-    ChatSummary? current = linkmanChatSummaryController.current;
-
-    ///更新消息控制器的当前消息汇总，从而确定拥有消息的好友或者群
-    chatMessageController.chatSummary = current;
-  }
-
-  _onTapGroup(int index, String title, {String? subtitle, TileData? group}) {
-    groupChatSummaryController.currentIndex = index;
-    ChatSummary? current = groupChatSummaryController.current;
-
-    ///更新消息控制器的当前消息汇总，从而确定拥有消息的好友或者群
-    chatMessageController.chatSummary = current;
-  }
-
-  _onTapConference(int index, String title,
-      {String? subtitle, TileData? group}) {
-    conferenceChatSummaryController.currentIndex = index;
-    ChatSummary? current = conferenceChatSummaryController.current;
-
-    ///更新消息控制器的当前消息汇总，从而确定拥有消息的好友或者群
-    chatMessageController.chatSummary = current;
+    return tiles;
   }
 
   Widget _buildChatListView(BuildContext context) {
-    final List<Widget> tabs = <Widget>[
-      ValueListenableBuilder(
-          valueListenable: _currentTab,
-          builder: (context, value, child) {
-            return Tab(
+    final tabBar = ListenableBuilder(
+        listenable: _tabController,
+        builder: (context, child) {
+          final List<Widget> tabs = <Widget>[
+            Tab(
               icon: Tooltip(
                   message: AppLocalizations.t('Linkman'),
-                  child: value == 0
+                  child: _tabController.index == 0
                       ? Icon(
                           Icons.person,
                           color: myself.primary,
                           size: AppIconSize.mdSize,
                         )
                       : const Icon(Icons.person, color: Colors.white)),
-              //text: AppLocalizations.t('Linkman'),
+              text: AppLocalizations.t('Linkman'),
               iconMargin: const EdgeInsets.all(0.0),
-            );
-          }),
-      ValueListenableBuilder(
-          valueListenable: _currentTab,
-          builder: (context, value, child) {
-            return Tab(
+            ),
+            Tab(
               icon: Tooltip(
                   message: AppLocalizations.t('Group'),
-                  child: value == 1
+                  child: _tabController.index == 1
                       ? Icon(
                           Icons.group,
                           color: myself.primary,
                           size: AppIconSize.mdSize,
                         )
                       : const Icon(Icons.group, color: Colors.white)),
-              //text: AppLocalizations.t('Group'),
+              text: AppLocalizations.t('Group'),
               iconMargin: const EdgeInsets.all(0.0),
-            );
-          }),
-      ValueListenableBuilder(
-          valueListenable: _currentTab,
-          builder: (context, value, child) {
-            return Tab(
+            ),
+            Tab(
               icon: Tooltip(
                   message: AppLocalizations.t('Conference'),
-                  child: value == 2
+                  child: _tabController.index == 2
                       ? Icon(
                           Icons.video_chat,
                           color: myself.primary,
                           size: AppIconSize.mdSize,
                         )
                       : const Icon(Icons.video_chat, color: Colors.white)),
-              //text: AppLocalizations.t('Conference'),
+              text: AppLocalizations.t('Conference'),
               iconMargin: const EdgeInsets.all(0.0),
+            ),
+          ];
+          return TabBar(
+            tabs: tabs,
+            controller: _tabController,
+            isScrollable: false,
+            indicatorColor: myself.primary,
+            dividerColor: Colors.white.withOpacity(0),
+            padding: const EdgeInsets.all(0.0),
+            labelPadding: const EdgeInsets.all(0.0),
+            onTap: (int index) {
+              if (index == 0) {
+                linkmanChatSummaryController.refresh();
+              } else if (index == 1) {
+                groupChatSummaryController.refresh();
+              } else if (index == 2) {
+                conferenceChatSummaryController.refresh();
+              }
+            },
+          );
+        });
+
+    Widget linkmanView = Obx(() {
+      return PlatformFutureBuilder(
+        future: _buildLinkmanTileData(),
+        builder: (BuildContext context, List<TileData> tiles) {
+          return DataListView(
+            itemCount: tiles.length,
+            itemBuilder: (BuildContext context, int index) {
+              return tiles[index];
+            },
+          );
+        },
+      );
+    });
+
+    Widget groupView = Obx(() {
+      return PlatformFutureBuilder(
+          future: _buildGroupTileData(),
+          builder: (BuildContext context, List<TileData> tiles) {
+            return DataListView(
+              itemCount: tiles.length,
+              itemBuilder: (BuildContext context, int index) {
+                return tiles[index];
+              },
             );
-          }),
-    ];
-    final tabBar = TabBar(
-      tabs: tabs,
-      controller: _tabController,
-      isScrollable: false,
-      indicatorColor: myself.primary,
-      dividerColor: Colors.white.withOpacity(0),
-      padding: const EdgeInsets.all(0.0),
-      labelPadding: const EdgeInsets.all(0.0),
-      onTap: (int index) {
-        if (index == 0) {
-          linkmanChatSummaryController.refresh();
-        } else if (index == 1) {
-          groupChatSummaryController.refresh();
-        } else if (index == 2) {
-          conferenceChatSummaryController.refresh();
-        }
-      },
-    );
-
-    var linkmanView = ValueListenableBuilder(
-        valueListenable: _linkmanTileData,
-        builder: (context, value, child) {
-          return DataListView(
-            itemCount: value.length,
-            itemBuilder: (BuildContext context, int index) {
-              return value[index];
-            },
-            onTap: _onTapLinkman,
-          );
-        });
-
-    var groupView = ValueListenableBuilder(
-        valueListenable: _groupTileData,
-        builder: (context, value, child) {
-          return DataListView(
-            itemCount: value.length,
-            itemBuilder: (BuildContext context, int index) {
-              return value[index];
-            },
-            onTap: _onTapGroup,
-          );
-        });
-
-    var conferenceView = ValueListenableBuilder(
-        valueListenable: _conferenceTileData,
-        builder: (context, value, child) {
-          return DataListView(
-            itemCount: value.length,
-            itemBuilder: (BuildContext context, int index) {
-              return value[index];
-            },
-            onTap: _onTapConference,
-          );
-        });
-
-    final tabBarView = TabBarView(
+          });
+    });
+    Widget conferenceView = Obx(() {
+      return PlatformFutureBuilder(
+          future: _buildConferenceTileData(),
+          builder: (BuildContext context, List<TileData> tiles) {
+            return DataListView(
+              itemCount: tiles.length,
+              itemBuilder: (BuildContext context, int index) {
+                return tiles[index];
+              },
+            );
+          });
+    });
+    final Widget tabBarView = TabBarView(
       controller: _tabController,
       children: [linkmanView, groupView, conferenceView],
     );
@@ -660,61 +593,56 @@ class _ChatListWidgetState extends State<ChatListWidget>
   Widget build(BuildContext context) {
     String title = AppLocalizations.t(widget.title);
     List<Widget> rightWidgets = [];
-    var connectivityWidget = ValueListenableBuilder(
-        valueListenable: _connectivityResult,
-        builder: (context, value, child) {
-          ConnectivityResult connectivityResult =
-              ConnectivityUtil.getMainResult(value);
-          return Tooltip(
-              message: AppLocalizations.t('Network status'),
-              child:
-                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                connectivityResult == ConnectivityResult.none
-                    ? const Icon(
-                        Icons.wifi_off,
-                        color: Colors.red,
-                      )
-                    : const Icon(
-                        Icons.wifi,
-                        color: Colors.white,
-                      ),
-                CommonAutoSizeText(connectivityResult.name,
-                    style: const TextStyle(fontSize: 12, color: Colors.white)),
-              ]));
-        });
+    var connectivityWidget = Obx(() {
+      ConnectivityResult connectivityResult = ConnectivityUtil.getMainResult(
+          connectivityController.connectivityResult.value);
+      return Tooltip(
+          message: AppLocalizations.t('Network status'),
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            connectivityResult == ConnectivityResult.none
+                ? const Icon(
+                    Icons.wifi_off,
+                    color: Colors.red,
+                  )
+                : const Icon(
+                    Icons.wifi,
+                    color: Colors.white,
+                  ),
+            CommonAutoSizeText(connectivityResult.name,
+                style: const TextStyle(fontSize: 12, color: Colors.white)),
+          ]));
+    });
     rightWidgets.add(connectivityWidget);
     rightWidgets.add(const SizedBox(
       width: 10.0,
     ));
 
-    var wssWidget = ValueListenableBuilder(
-        valueListenable: _socketStatus,
-        builder: (context, value, child) {
-          String address = AppLocalizations.t('Websocket status');
-          UniversalWebsocket? websocket = websocketPool.getDefault();
-          if (websocket != null) {
-            address = websocket.address;
-          }
-          return IconButton(
-              tooltip: address,
-              onPressed: () async {
-                bool? confirm = await DialogUtil.confirm(context,
-                    content:
-                        '${AppLocalizations.t('Do you want to reconnect')} $address, ${AppLocalizations.t('status')}:$value');
-                if (confirm == true) {
-                  await _reconnect();
-                }
-              },
-              icon: _socketStatus.value == SocketStatus.connected
-                  ? const Icon(
-                      Icons.cloud_done,
-                      color: Colors.white,
-                    )
-                  : const Icon(
-                      Icons.cloud_off,
-                      color: Colors.red,
-                    ));
-        });
+    var wssWidget = Obx(() {
+      String address = AppLocalizations.t('Websocket status');
+      UniversalWebsocket? websocket = websocketPool.getDefault();
+      if (websocket != null) {
+        address = websocket.address;
+      }
+      return IconButton(
+          tooltip: address,
+          onPressed: () async {
+            bool? confirm = await DialogUtil.confirm(
+                content:
+                    '${AppLocalizations.t('Do you want to reconnect')} $address, ${AppLocalizations.t('status')}:${_socketStatus.value}');
+            if (confirm == true) {
+              await _reconnect();
+            }
+          },
+          icon: _socketStatus.value == SocketStatus.connected
+              ? const Icon(
+                  Icons.cloud_done,
+                  color: Colors.white,
+                )
+              : const Icon(
+                  Icons.cloud_off,
+                  color: Colors.red,
+                ));
+    });
     rightWidgets.add(wssWidget);
     rightWidgets.add(const SizedBox(
       width: 10.0,
@@ -728,12 +656,8 @@ class _ChatListWidgetState extends State<ChatListWidget>
 
   @override
   void dispose() {
-    _tabController!.removeListener(_updateCurrentTab);
-    _tabController!.dispose();
-    linkmanChatSummaryController.removeListener(_updateLinkmanChatSummary);
-    groupChatSummaryController.removeListener(_updateGroupChatSummary);
-    conferenceChatSummaryController
-        .removeListener(_updateConferenceChatSummary);
+    connectivityController.connected.removeListener(_updateConnectivity);
+    _tabController.dispose();
     if (_socketStatusStreamSubscription != null) {
       _socketStatusStreamSubscription!.cancel();
       _socketStatusStreamSubscription = null;

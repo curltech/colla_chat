@@ -103,7 +103,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (conferenceChatMessageController != null) {
       videoChatStatus.value = conferenceChatMessageController.status;
       if (mounted) {
-        DialogUtil.info(context,
+        DialogUtil.info(
             content: AppLocalizations.t('Video chat status:') +
                 AppLocalizations.t(videoChatStatus.value.name));
       }
@@ -380,7 +380,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           peerConnectionPool.connectionState(peerId);
       if (state == RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
         if (mounted) {
-          DialogUtil.error(context,
+          DialogUtil.error(
               content:
                   '$name ${AppLocalizations.t('has no webrtc connected peerConnection')}');
         }
@@ -421,7 +421,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     var partyType = chatSummary.partyType;
     if (partyType == PartyType.conference.name) {
       if (mounted) {
-        DialogUtil.error(context,
+        DialogUtil.error(
             content: AppLocalizations.t(
                 'PartyType is conference, cannot create p2p conference'));
       }
@@ -437,7 +437,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
     if (participants.length < 2) {
       if (mounted) {
-        DialogUtil.error(context,
+        DialogUtil.error(
             content: AppLocalizations.t('Please select participants'));
       }
       return;
@@ -447,7 +447,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         p2pConferenceClientPool.conferenceChatMessageController;
     if (conferenceChatMessageController != null) {
       if (mounted) {
-        DialogUtil.error(context,
+        DialogUtil.error(
             content: AppLocalizations.t('Current conference is exist'));
       }
       return;
@@ -475,13 +475,13 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (chatMessage == null) {
       logger.e('send video chatMessage failure!');
       if (mounted) {
-        DialogUtil.error(context,
+        DialogUtil.error(
             content: AppLocalizations.t('Send videoChat chatMessage failure'));
       }
       return;
     }
     if (mounted) {
-      DialogUtil.info(context,
+      DialogUtil.info(
           content:
               '${AppLocalizations.t('Send videoChat chatMessage')} ${chatMessage.messageId}');
     }
@@ -495,7 +495,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         conferenceChatMessageController == null) {
       logger.e('createP2pConferenceClient failure!');
       if (mounted) {
-        DialogUtil.error(context,
+        DialogUtil.error(
             content: AppLocalizations.t('CreateP2pConferenceClient failure'));
       }
       return;
@@ -524,7 +524,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         p2pConferenceClientPool.conferenceChatMessageController;
     if (conferenceChatMessageController == null) {
       if (mounted) {
-        DialogUtil.error(context,
+        DialogUtil.error(
             content: AppLocalizations.t('No video chat message controller'));
       }
       return;
@@ -532,7 +532,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     ChatMessage? chatMessage = conferenceChatMessageController.chatMessage;
     if (chatMessage == null) {
       if (mounted) {
-        DialogUtil.error(context,
+        DialogUtil.error(
             content: AppLocalizations.t('No video chat message'));
       }
       return;
@@ -540,13 +540,13 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     Conference? conference = conferenceChatMessageController.conference;
     if (conference == null) {
       if (mounted) {
-        DialogUtil.error(context, content: AppLocalizations.t('No conference'));
+        DialogUtil.error( content: AppLocalizations.t('No conference'));
       }
       return;
     }
     await conferenceChatMessageController.join();
     if (mounted) {
-      DialogUtil.info(context,
+      DialogUtil.info(
           content: AppLocalizations.t('Join conference:') + conference.name);
     }
     _updateView();
@@ -770,7 +770,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               peerMediaStreamController: localPeerMediaStreamController,
             );
           } else {
-            var size = MediaQuery.of(context).size;
+            var size = MediaQuery.sizeOf(context);
             return SizedBox(
               width: size.width,
               height: size.height,

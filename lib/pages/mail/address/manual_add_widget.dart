@@ -173,7 +173,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
         StringUtil.isEmpty(password)) {
       logger.e('email or name or password is empty');
       if (mounted) {
-        DialogUtil.error(context, content: 'Email or name is empty');
+        DialogUtil.error( content: 'Email or name is empty');
       }
       return;
     }
@@ -191,7 +191,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
           StringUtil.isEmpty(smtpServerPort)) {
         logger.e('smtpServerHost or smtpServerPort  is empty');
         if (mounted) {
-          DialogUtil.error(context,
+          DialogUtil.error(
               content: 'smtpServerHost or smtpServerPort is empty');
         }
         return;
@@ -202,7 +202,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
           StringUtil.isEmpty(imapServerPort)) {
         logger.e('imapServerHost or imapServerPort  is empty');
         if (mounted) {
-          DialogUtil.error(context,
+          DialogUtil.error(
               content: 'imapServerHost or imapServerPort is empty');
         }
         return;
@@ -258,28 +258,28 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
 
     MailAddress emailAddress = EmailMessageUtil.buildDiscoverEmailAddress(
         email, name!, emailServiceProvider!.clientConfig);
-    DialogUtil.loadingShow(context,
+    DialogUtil.loadingShow(
         tip: 'Manual connecting email server,\n please waiting...');
     EmailClient? emailClient = await emailClientPool.create(
         emailAddress, password!,
         config: emailServiceProvider.clientConfig);
     if (mounted) {
-      DialogUtil.loadingHide(context);
+      DialogUtil.loadingHide();
     }
     if (emailClient == null) {
       logger.e('Connect fail to $name.');
       if (mounted) {
-        DialogUtil.info(context, content: 'Connect failure');
+        DialogUtil.info( content: 'Connect failure');
       }
       return;
     }
     if (mounted) {
-      DialogUtil.info(context, content: 'Connect successfully');
+      DialogUtil.info( content: 'Connect successfully');
     }
     logger.i('create (or connect) success to $name.');
     if (mounted) {
       bool? result =
-          await DialogUtil.confirm(context, content: 'Save new mail address?');
+          await DialogUtil.confirm( content: 'Save new mail address?');
       if (result != null && result) {
         MailAddress? old = await mailAddressService.findByMailAddress(email);
         emailAddress.id = old?.id;

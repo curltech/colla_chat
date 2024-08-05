@@ -6,8 +6,10 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pro_image_editor/models/editor_callbacks/pro_image_editor_callbacks.dart';
 import 'package:pro_image_editor/modules/main_editor/main_editor.dart';
 
@@ -29,21 +31,20 @@ class ImageEditorWidget extends StatelessWidget with TileDataMixin {
   bool get withLeading => true;
 
   _buildImageEditor(BuildContext context) {
-    return ListenableBuilder(
-      listenable: mediaFileController,
-      builder: (BuildContext context, Widget? child) {
+    return Obx(
+      () {
         String? filename = mediaFileController.current?.filename;
         if (filename == null) {
-          return Container();
+          return nil;
         }
         return ProImageEditor.file(File(filename),
             callbacks: ProImageEditorCallbacks(
               onImageEditingComplete: (Uint8List bytes) async {
-                String? name = await DialogUtil.showTextFormField(context,
+                String? name = await DialogUtil.showTextFormField(
                     title: 'Save as', content: 'Filename', tip: filename);
                 if (name != null) {
                   await FileUtil.writeFileAsBytes(bytes, name);
-                  DialogUtil.info(context,
+                  DialogUtil.info(
                       content: 'Save file:$name successfully');
                 }
               },

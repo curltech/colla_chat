@@ -229,7 +229,7 @@ class TencentMapWidgetState extends State<TencentMapWidget> {
           children: [
             TextButton(
                 onPressed: () async {
-                  bool? confirm = await DialogUtil.confirm(context,
+                  bool? confirm = await DialogUtil.confirm(
                       content:
                           'Selected position:${locationPosition.value?.latitude},${locationPosition.value?.longitude}, name:${locationPosition.value?.name}, address:${locationPosition.value?.address}, and selected?');
                   if (confirm == true) {

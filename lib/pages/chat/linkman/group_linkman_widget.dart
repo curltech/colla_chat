@@ -1,6 +1,7 @@
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
@@ -63,18 +64,10 @@ class _GroupLinkmanWidgetState extends State<GroupLinkmanWidget> {
 
   /// 简单多选对话框的形式，内含一个搜索字段和多选，使用时外部用对话框包裹
   Widget _buildChipMultiSelect(BuildContext context) {
-    var selector = FutureBuilder(
+    var selector = PlatformFutureBuilder(
         future: _buildOptions(),
         builder: (BuildContext context,
-            AsyncSnapshot<List<Option<String>>> snapshot) {
-          var hasData = snapshot.hasData;
-          if (!hasData) {
-            return Container();
-          }
-          List<Option<String>>? options = snapshot.data;
-          if (options == null) {
-            return Container();
-          }
+            List<Option<String>> options) {
           optionController.options = options;
           return CustomMultiSelect(
             title: title,
@@ -92,18 +85,10 @@ class _GroupLinkmanWidgetState extends State<GroupLinkmanWidget> {
   }
 
   Widget _buildDataListMultiSelect(BuildContext context) {
-    var selector = FutureBuilder(
+    var selector = PlatformFutureBuilder(
         future: _buildOptions(),
         builder: (BuildContext context,
-            AsyncSnapshot<List<Option<String>>> snapshot) {
-          var hasData = snapshot.hasData;
-          if (!hasData) {
-            return Container();
-          }
-          List<Option<String>>? options = snapshot.data;
-          if (options == null) {
-            return Container();
-          }
+            List<Option<String>> options) {
           optionController.options = options;
           return CustomMultiSelect(
             title: title,
@@ -118,18 +103,10 @@ class _GroupLinkmanWidgetState extends State<GroupLinkmanWidget> {
 
   /// DataListSingleSelect的单选对话框，一个搜索字段和单选的组合，使用时外部用对话框包裹
   Widget _buildDataListSingleSelect(BuildContext context) {
-    var dataListView = FutureBuilder(
+    var dataListView = PlatformFutureBuilder(
         future: _buildOptions(),
         builder: (BuildContext context,
-            AsyncSnapshot<List<Option<String>>> snapshot) {
-          var hasData = snapshot.hasData;
-          if (!hasData) {
-            return Container();
-          }
-          List<Option<String>>? options = snapshot.data;
-          if (options == null) {
-            return Container();
-          }
+            List<Option<String>> options) {
           optionController.options = options;
           return DataListSingleSelect(
             title: title,

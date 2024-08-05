@@ -1667,7 +1667,7 @@ class BasePeerConnection {
   }
 
   Future<bool> _send(List<int> message) async {
-    if (!connectivityController.connected) {
+    if (!connectivityController.connected.value) {
       logger.e('network connectivity disconnected');
 
       return false;

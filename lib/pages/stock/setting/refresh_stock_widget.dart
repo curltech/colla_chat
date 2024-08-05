@@ -36,7 +36,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
           subtitle: '获取数据，汇总，计算评分',
           onTap: (int index, String title, {String? subtitle}) async {
             bool? confirm =
-                await DialogUtil.confirm(context, content: subtitle!);
+                await DialogUtil.confirm( content: subtitle!);
             if (confirm == null || !confirm) {
               return;
             }
@@ -47,7 +47,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
           subtitle: '刷新所有股票今天的日线数据',
           onTap: (int index, String title, {String? subtitle}) async {
             bool? confirm =
-                await DialogUtil.confirm(context, content: subtitle!);
+                await DialogUtil.confirm( content: subtitle!);
             if (confirm == null || !confirm) {
               return;
             }
@@ -64,7 +64,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
           subtitle: '刷新所有股票的分钟线数据',
           onTap: (int index, String title, {String? subtitle}) async {
             bool? confirm =
-                await DialogUtil.confirm(context, content: subtitle!);
+                await DialogUtil.confirm( content: subtitle!);
             if (confirm == null || !confirm) {
               return;
             }
@@ -75,7 +75,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
           subtitle: '刷新所有股票今天的分钟线数据',
           onTap: (int index, String title, {String? subtitle}) async {
             bool? confirm =
-                await DialogUtil.confirm(context, content: subtitle!);
+                await DialogUtil.confirm( content: subtitle!);
             if (confirm == null || !confirm) {
               return;
             }
@@ -86,7 +86,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
           subtitle: '汇总所有股票的季度业绩数据',
           onTap: (int index, String title, {String? subtitle}) async {
             bool? confirm =
-                await DialogUtil.confirm(context, content: subtitle!);
+                await DialogUtil.confirm( content: subtitle!);
             if (confirm == null || !confirm) {
               return;
             }
@@ -97,7 +97,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
           subtitle: '汇总所有股票的季度业绩统计数据',
           onTap: (int index, String title, {String? subtitle}) async {
             bool? confirm =
-                await DialogUtil.confirm(context, content: subtitle!);
+                await DialogUtil.confirm( content: subtitle!);
             if (confirm == null || !confirm) {
               return;
             }
@@ -108,7 +108,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
           subtitle: '汇总所有股票的季度业绩评分数据',
           onTap: (int index, String title, {String? subtitle}) async {
             bool? confirm =
-                await DialogUtil.confirm(context, content: subtitle!);
+                await DialogUtil.confirm( content: subtitle!);
             if (confirm == null || !confirm) {
               return;
             }
@@ -119,7 +119,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
           subtitle: '汇总所有股票的季度业绩分位评分数据',
           onTap: (int index, String title, {String? subtitle}) async {
             bool? confirm =
-                await DialogUtil.confirm(context, content: subtitle!);
+                await DialogUtil.confirm( content: subtitle!);
             if (confirm == null || !confirm) {
               return;
             }
@@ -130,7 +130,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
           subtitle: '计算所有股票的日线统计数据',
           onTap: (int index, String title, {String? subtitle}) async {
             bool? confirm =
-                await DialogUtil.confirm(context, content: subtitle!);
+                await DialogUtil.confirm( content: subtitle!);
             if (confirm == null || !confirm) {
               return;
             }
@@ -144,7 +144,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
           subtitle: '计算所有股票的过去1,3,5日线均线统计数据',
           onTap: (int index, String title, {String? subtitle}) async {
             bool? confirm =
-                await DialogUtil.confirm(context, content: subtitle!);
+                await DialogUtil.confirm( content: subtitle!);
             if (confirm == null || !confirm) {
               return;
             }
@@ -158,7 +158,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
           subtitle: '计算所有股票的买卖点事件',
           onTap: (int index, String title, {String? subtitle}) async {
             bool? confirm =
-                await DialogUtil.confirm(context, content: subtitle!);
+                await DialogUtil.confirm( content: subtitle!);
             if (confirm == null || !confirm) {
               return;
             }
@@ -169,7 +169,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
           subtitle: '更新股票信息',
           onTap: (int index, String title, {String? subtitle}) async {
             bool? confirm =
-                await DialogUtil.confirm(context, content: subtitle!);
+                await DialogUtil.confirm( content: subtitle!);
             if (confirm == null || !confirm) {
               return;
             }
@@ -180,7 +180,7 @@ class RefreshStockWidget extends StatelessWidget with TileDataMixin {
           subtitle: '创建模型数据文件',
           onTap: (int index, String title, {String? subtitle}) async {
             bool? confirm =
-                await DialogUtil.confirm(context, content: subtitle!);
+                await DialogUtil.confirm( content: subtitle!);
             if (confirm == null || !confirm) {
               return;
             }

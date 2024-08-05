@@ -99,7 +99,7 @@ class _LiveKitSfuRoomWidgetState extends State<LiveKitSfuRoomWidget>
     List<Widget>? rightWidgets = [
       IconButton(
           onPressed: () async {
-            String? roomName = await DialogUtil.showTextFormField(context,
+            String? roomName = await DialogUtil.showTextFormField(
                 title: 'Add room', content: 'roomName');
             if (roomName != null && roomName.isNotEmpty) {
               _createRoom(roomName);

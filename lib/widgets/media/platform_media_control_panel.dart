@@ -4,6 +4,7 @@ import 'dart:math' as math;
 
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/audio/abstract_audio_player_controller.dart';
 import 'package:flutter/foundation.dart';
@@ -548,7 +549,7 @@ class _PlatformMediaControlPanelState extends State<PlatformMediaControlPanel>
               ),
             );
           } else {
-            return Container();
+            return nil;
           }
         });
   }

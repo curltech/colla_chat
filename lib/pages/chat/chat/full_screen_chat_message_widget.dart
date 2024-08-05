@@ -5,16 +5,13 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.da
 import 'package:colla_chat/pages/chat/chat/message/message_widget.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class FullScreenChatMessageWidget extends StatefulWidget with TileDataMixin {
-  const FullScreenChatMessageWidget({super.key});
-
-  @override
-  State<StatefulWidget> createState() {
-    return _FullScreenChatMessageWidgetState();
-  }
+class FullScreenChatMessageWidget extends StatelessWidget with TileDataMixin {
+  FullScreenChatMessageWidget({super.key});
 
   @override
   bool get withLeading => true;
@@ -27,22 +24,8 @@ class FullScreenChatMessageWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'FullScreenChatMessage';
-}
 
-class _FullScreenChatMessageWidgetState
-    extends State<FullScreenChatMessageWidget> {
   SwiperController swiperController = SwiperController();
-  final index = ValueNotifier<int>(chatMessageController.currentIndex);
-
-  @override
-  void initState() {
-    super.initState();
-    chatMessageController.addListener(_update);
-  }
-
-  _update() {
-    index.value = chatMessageController.currentIndex;
-  }
 
   Future<Widget> _buildMessageWidget(BuildContext context, int index) async {
     ChatMessage chatMessage = chatMessageController.data[index];
@@ -55,19 +38,17 @@ class _FullScreenChatMessageWidgetState
   }
 
   Widget _buildTitleWidget() {
-    return ValueListenableBuilder<int>(
-        valueListenable: index,
-        builder: (context, value, child) {
-          ChatMessage? chatMessage = chatMessageController.current;
-          var title = AppLocalizations.t(widget.title);
-          if (chatMessage != null) {
-            title = '${chatMessage.receiverName} - ${chatMessage.senderName}';
-          }
-          return CommonAutoSizeText(
-            title,
-            style: TextStyle(fontSize: title.length > 12 ? 20 : 24),
-          );
-        });
+    return Obx(() {
+      ChatMessage? chatMessage = chatMessageController.current;
+      var title = AppLocalizations.t(this.title);
+      if (chatMessage != null) {
+        title = '${chatMessage.receiverName} - ${chatMessage.senderName}';
+      }
+      return CommonAutoSizeText(
+        title,
+        style: TextStyle(fontSize: title.length > 12 ? 20 : 24),
+      );
+    });
   }
 
   Widget _buildFullScreenWidget(BuildContext context) {
@@ -75,11 +56,10 @@ class _FullScreenChatMessageWidgetState
       controller: swiperController,
       itemBuilder: (BuildContext context, int index) {
         return Center(
-            child: FutureBuilder(
+            child: PlatformFutureBuilder(
           future: _buildMessageWidget(context, index),
-          builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
-            Widget widget = snapshot.data ?? Container();
-            return widget;
+          builder: (BuildContext context, Widget child) {
+            return child;
           },
         ));
       },
@@ -106,11 +86,5 @@ class _FullScreenChatMessageWidgetState
               icon: const Icon(Icons.more_horiz_outlined))
         ],
         child: _buildFullScreenWidget(context));
-  }
-
-  @override
-  void dispose() {
-    chatMessageController.removeListener(_update);
-    super.dispose();
   }
 }

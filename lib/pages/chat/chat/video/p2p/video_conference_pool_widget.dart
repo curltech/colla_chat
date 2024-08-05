@@ -68,7 +68,7 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
               prefix: Icons.playlist_add_check_outlined,
               onTap: (int index, String label, {String? subtitle}) async {
                 p2pConferenceClientPool.conferenceId = conferenceId;
-                DialogUtil.info(context,
+                DialogUtil.info(
                     content:
                         '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is set current')}');
               });
@@ -79,7 +79,7 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
             prefix: Icons.playlist_remove_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
               p2pConferenceClientPool.terminate(conferenceId: conferenceId);
-              DialogUtil.info(context,
+              DialogUtil.info(
                   content:
                       '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is closed')}');
             });
@@ -100,7 +100,7 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
             prefix: Icons.repeat_one_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
               p2pConferenceClientPool.conferenceClient?.renegotiate();
-              DialogUtil.info(context,
+              DialogUtil.info(
                   content:
                       '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is renegotiate')}');
             });
@@ -111,7 +111,7 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
             onTap: (int index, String label, {String? subtitle}) async {
               p2pConferenceClientPool.conferenceClient
                   ?.renegotiate(toggle: true);
-              DialogUtil.info(context,
+              DialogUtil.info(
                   content:
                       '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is toggle renegotiate')}');
             });

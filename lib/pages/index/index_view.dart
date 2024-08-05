@@ -53,10 +53,9 @@ import 'package:system_tray/system_tray.dart';
 import 'package:window_manager/window_manager.dart';
 
 class IndexView extends StatefulWidget {
-  final String title;
   final AdaptiveLayoutIndex adaptiveLayoutIndex = AdaptiveLayoutIndex();
 
-  IndexView({super.key, required this.title});
+  IndexView({super.key});
 
   @override
   State<StatefulWidget> createState() {
@@ -65,14 +64,7 @@ class IndexView extends StatefulWidget {
 }
 
 class _IndexViewState extends State<IndexView>
-    with
-        SingleTickerProviderStateMixin,
-        WidgetsBindingObserver,
-        WindowListener {
-  // final ValueNotifier<bool> conferenceChatMessageVisible =
-  //     ValueNotifier<bool>(false);
-
-  // final ValueNotifier<bool> chatMessageVisible = ValueNotifier<bool>(false);
+    with WidgetsBindingObserver, WindowListener {
   final ValueNotifier<bool> conferenceJoined = ValueNotifier<bool>(false);
   final CustomSpecialTextSpanBuilder customSpecialTextSpanBuilder =
       CustomSpecialTextSpanBuilder();
@@ -81,7 +73,6 @@ class _IndexViewState extends State<IndexView>
   ConferenceChatMessageController conferenceChatMessageController =
       ConferenceChatMessageController();
 
-  //JustAudioPlayer audioPlayer = JustAudioPlayer();
   Widget bannerAvatarImage = AppImage.mdAppImage;
 
   StreamSubscription? _intentDataStreamSubscription;
@@ -104,8 +95,6 @@ class _IndexViewState extends State<IndexView>
         .listen((ChatMessage chatMessage) {
       _updateGlobalChatMessage(context, chatMessage);
     });
-    myself.addListener(_update);
-    appDataProvider.addListener(_update);
     globalWebrtcEvent.onWebrtcSignal = _onWebrtcSignal;
     errorWebrtcEventStreamSubscription = globalWebrtcEvent
         .errorWebrtcEventStreamController.stream
@@ -226,7 +215,7 @@ class _IndexViewState extends State<IndexView>
 
   Future<bool?> _onWebrtcSignal(WebrtcEvent webrtcEvent) async {
     String name = webrtcEvent.name;
-    return await DialogUtil.confirm(context,
+    return await DialogUtil.confirm(
         content: name +
             AppLocalizations.t(
                 ' is a stranger, want to chat with you, are you agree?'));
@@ -238,7 +227,7 @@ class _IndexViewState extends State<IndexView>
     if (eventType == WebrtcEventType.signal) {
       WebrtcSignal signal = webrtcEvent.data;
       if (signal.signalType == SignalType.error.name) {
-        DialogUtil.error(context,
+        DialogUtil.error(
             content: name +
                 AppLocalizations.t(' response error:') +
                 (signal.error ?? ''));
@@ -314,13 +303,6 @@ class _IndexViewState extends State<IndexView>
         _shareChatMessage(_sharedFiles!.first);
       }
     });
-  }
-
-  ///myself和appDataProvider发生变化后刷新整个界面
-  _update() async {
-    if (mounted) {
-      setState(() {});
-    }
   }
 
   _updateConferenceJoined() {
@@ -693,8 +675,7 @@ class _IndexViewState extends State<IndexView>
         });
   }
 
-  Widget _createScaffold(
-      BuildContext context, IndexWidgetProvider indexWidgetProvider) {
+  Widget _createScaffold(BuildContext context) {
     double width = appDataProvider.totalSize.width;
     double height = appDataProvider.totalSize.height;
     if (!appDataProvider.landscape) {
@@ -704,8 +685,8 @@ class _IndexViewState extends State<IndexView>
     Scaffold scaffold = Scaffold(
       resizeToAvoidBottomInset: true,
       primary: true,
-      appBar:
-          AppBarWidget.buildAppBar(context, toolbarHeight: 0.0, elevation: 0.0),
+      appBar: AppBarWidget.buildAppBar(
+          context: context, toolbarHeight: 0.0, elevation: 0.0),
       body: KeyboardDismissOnTap(
           dismissOnCapturedTaps: false,
           child: SafeArea(
@@ -731,7 +712,7 @@ class _IndexViewState extends State<IndexView>
     var provider = Consumer3<AppDataProvider, IndexWidgetProvider, Myself>(
         builder:
             (context, appDataProvider, indexWidgetProvider, myself, child) {
-      return _createScaffold(context, indexWidgetProvider);
+      return _createScaffold(context);
     });
     return provider;
   }
@@ -740,8 +721,6 @@ class _IndexViewState extends State<IndexView>
   void dispose() {
     chatMessageStreamSubscription?.cancel();
     chatMessageStreamSubscription = null;
-    myself.removeListener(_update);
-    appDataProvider.removeListener(_update);
     _intentDataStreamSubscription?.cancel();
     _intentDataStreamSubscription = null;
     globalWebrtcEvent.onWebrtcSignal = null;

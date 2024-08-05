@@ -6,10 +6,10 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/richtext/platform_editor_widget.dart';
 import 'package:colla_chat/widgets/webview/html_preview_widget.dart';
@@ -78,13 +78,12 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
   Future<void> _save() async {
     String title = textEditingController.text;
     if (StringUtil.isEmpty(title)) {
-      DialogUtil.error(context, content: AppLocalizations.t('Must have title'));
+      DialogUtil.error(content: AppLocalizations.t('Must have title'));
       return;
     }
     String? content = await platformEditorController.content;
     if (mounted && StringUtil.isEmpty(content)) {
-      DialogUtil.error(context,
-          content: AppLocalizations.t('Must have content'));
+      DialogUtil.error(content: AppLocalizations.t('Must have content'));
       return;
     }
     ChatMessage? chatMessage = myChannelChatMessageController.current;
@@ -97,7 +96,7 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
         chatMessage.thumbnail = thumbnail.value;
       } else {
         if (mounted) {
-          DialogUtil.info(context,
+          DialogUtil.info(
               content: 'Document already was published, can not be updated');
         }
         return;
@@ -115,7 +114,7 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
       //myChannelChatMessageController.add(chatMessage);
     }
     if (mounted) {
-      DialogUtil.info(context,
+      DialogUtil.info(
           content: AppLocalizations.t('Save draft content successfully'));
     }
   }
@@ -133,13 +132,9 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
     Widget titleWidget = Container(
         padding: const EdgeInsets.all(5.0),
         child: _buildTitleTextField(context));
-    Widget view = FutureBuilder(
+    Widget view = PlatformFutureBuilder(
         future: _findContent(),
-        builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-          if (snapshot.connectionState != ConnectionState.done) {
-            return LoadingUtil.buildLoadingIndicator();
-          }
-          String? content = snapshot.data;
+        builder: (BuildContext context, String? content) {
           return Column(children: [
             titleWidget,
             Expanded(

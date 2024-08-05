@@ -14,6 +14,8 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
@@ -121,36 +123,31 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
 
   //字段的数据使用控制器数据，直接修改，optionsChanged用于表示控制器数据改变了
   Widget _buildChips(BuildContext context) {
-    return FutureBuilder(
+    return PlatformFutureBuilder(
         future: _buildConferenceOptions(),
-        builder: (BuildContext context,
-            AsyncSnapshot<List<Option<String>>> snapshot) {
-          if (snapshot.hasData && snapshot.data != null) {
-            var options = snapshot.data!;
-            List<Chip> chips = [];
-            for (var option in options) {
-              var chip = Chip(
-                label: CommonAutoSizeText(
-                  option.label,
-                  style: const TextStyle(color: Colors.black),
-                ),
-                avatar: option.leading,
-                backgroundColor: Colors.white,
-                deleteIconColor: myself.primary,
-              );
-              chips.add(chip);
-            }
-            if (chips.isNotEmpty) {
-              return Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: chips,
-              );
-            } else {
-              return Container();
-            }
+        builder: (BuildContext context, List<Option<String>> options) {
+          List<Chip> chips = [];
+          for (var option in options) {
+            var chip = Chip(
+              label: CommonAutoSizeText(
+                option.label,
+                style: const TextStyle(color: Colors.black),
+              ),
+              avatar: option.leading,
+              backgroundColor: Colors.white,
+              deleteIconColor: myself.primary,
+            );
+            chips.add(chip);
           }
-          return Container();
+          if (chips.isNotEmpty) {
+            return Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: chips,
+            );
+          } else {
+            return nil;
+          }
         });
   }
 
@@ -171,8 +168,7 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
               .sendSfuConferenceMessage(current, participants, store: false);
         } catch (e) {
           logger.e('sendSfuConferenceMessage failure:$e');
-          DialogUtil.error(context,
-              content: 'send sfu conference message failure');
+          DialogUtil.error(content: 'send sfu conference message failure');
           return null;
         }
       }
@@ -280,7 +276,7 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
                 },
               );
             }
-            return Container();
+            return nil;
           },
         )),
       ],

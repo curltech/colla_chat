@@ -1,4 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
+
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/image_util.dart';
@@ -108,7 +109,6 @@ class TileData {
 
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
 class DataListTile extends StatelessWidget {
-  // final DataListController<TileData>? dataListViewController;
   final bool selected;
   final TileData tileData;
   final int index;
@@ -125,7 +125,6 @@ class DataListTile extends StatelessWidget {
 
   const DataListTile({
     super.key,
-    // this.dataListViewController,
     this.selected = false,
     required this.tileData,
     this.index = 0,
@@ -331,19 +330,21 @@ class DataListTile extends StatelessWidget {
         tileData.endSlideActions!.isNotEmpty) {
       endActionPane = _buildActionPane(tileData.endSlideActions);
     }
-
-    Slidable slidable = Slidable(
+    return Slidable(
       key: UniqueKey(),
       startActionPane: startActionPane,
       endActionPane: endActionPane,
       child: _buildListTile(context),
     );
-
-    return slidable;
   }
 
   @override
   Widget build(BuildContext context) {
-    return _buildSlideActionListTile(context);
+    return ListenableBuilder(
+      listenable: myself,
+      builder: (BuildContext context, Widget? child) {
+        return _buildSlideActionListTile(context);
+      },
+    );
   }
 }

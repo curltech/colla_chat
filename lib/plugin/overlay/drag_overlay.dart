@@ -1,4 +1,5 @@
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -32,14 +33,14 @@ class DragOverlay {
         _createDragTarget(context, detail.offset);
       },
       //当拖拽的时候就展示空
-      childWhenDragging: Container(),
+      childWhenDragging: nil,
       ignoringFeedbackSemantics: false,
       child: child,
     );
   }
 
   void _createDragTarget(BuildContext context, Offset offset) {
-    var size = MediaQuery.of(context).size;
+    var size = MediaQuery.sizeOf(context);
     //最大的高度是离底部100px
     double maxY = size.height - 80;
     //如果目标高度小于top，则取top，如果大于最大高度，则取最大高度，否则就是拖拽的目标高度

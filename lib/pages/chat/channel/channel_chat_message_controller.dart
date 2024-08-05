@@ -3,20 +3,18 @@ import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/channel_chat_message.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/tool/date_util.dart';
+import 'package:get/get.dart';
 
 ///频道消息的消息控制器,自己订阅的,其他人发布的频道消息
 class ChannelChatMessageController extends DataMoreController<ChatMessage> {
-  String? _parentMessageId;
+  final Rx<String?> _parentMessageId = Rx<String?>(null);
 
   String? get parentMessageId {
-    return _parentMessageId;
+    return _parentMessageId.value;
   }
 
   set parentMessageId(String? parentMessageId) {
-    if (_parentMessageId != parentMessageId) {
-      _parentMessageId = parentMessageId;
-      notifyListeners();
-    }
+    _parentMessageId(parentMessageId);
   }
 
   ///访问数据库获取更老的消息
@@ -41,7 +39,6 @@ class ChannelChatMessageController extends DataMoreController<ChatMessage> {
         .findOthersByPeerId(sendTime: sendTime, limit: limit);
     if (chatMessages.isNotEmpty) {
       data.insertAll(0, chatMessages);
-      notifyListeners();
     }
     return chatMessages.length;
   }
@@ -53,17 +50,14 @@ final ChannelChatMessageController channelChatMessageController =
 
 ///自己发布的频道消息,消息的接收者是空的,在发送的时候填充接收者
 class MyChannelChatMessageController extends DataMoreController<ChatMessage> {
-  String? _parentMessageId;
+  final Rx<String?> _parentMessageId = Rx<String?>(null);
 
   String? get parentMessageId {
-    return _parentMessageId;
+    return _parentMessageId.value;
   }
 
   set parentMessageId(String? parentMessageId) {
-    if (_parentMessageId != parentMessageId) {
-      _parentMessageId = parentMessageId;
-      notifyListeners();
-    }
+    _parentMessageId(parentMessageId);
   }
 
   ///访问数据库获取更老的消息
@@ -89,7 +83,6 @@ class MyChannelChatMessageController extends DataMoreController<ChatMessage> {
         .findMyselfByPeerId(status: status, sendTime: sendTime, limit: limit);
     if (chatMessages.isNotEmpty) {
       data.insertAll(0, chatMessages);
-      notifyListeners();
     }
     return chatMessages.length;
   }

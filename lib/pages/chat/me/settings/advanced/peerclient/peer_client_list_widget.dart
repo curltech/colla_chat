@@ -9,21 +9,19 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 //设置页面，带有回退回调函数
-class PeerClientListWidget extends StatefulWidget with TileDataMixin {
-  final PeerClientViewWidget peerClientViewWidget =
-      const PeerClientViewWidget();
-  final PeerClientEditWidget peerClientEditWidget =
-      const PeerClientEditWidget();
+class PeerClientListWidget extends StatelessWidget with TileDataMixin {
+  final PeerClientViewWidget peerClientViewWidget = PeerClientViewWidget();
+  final PeerClientEditWidget peerClientEditWidget = PeerClientEditWidget();
 
   PeerClientListWidget({super.key}) {
     indexWidgetProvider.define(peerClientViewWidget);
     indexWidgetProvider.define(peerClientEditWidget);
+    peerClientController.clear(notify: false);
+    peerClientController.more();
   }
-
-  @override
-  State<StatefulWidget> createState() => _PeerClientListWidgetState();
 
   @override
   bool get withLeading => true;
@@ -36,25 +34,9 @@ class PeerClientListWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'PeerClient';
-}
 
-class _PeerClientListWidgetState extends State<PeerClientListWidget> {
-  final ValueNotifier<List<TileData>> tiles = ValueNotifier<List<TileData>>([]);
-
-  @override
-  initState() {
-    super.initState();
-    peerClientController.clear(notify: false);
-    _more();
-  }
-
-  _more() async {
-    await peerClientController.more();
-    _buildPeerClientTileData();
-  }
-
-  void _buildPeerClientTileData() {
-    List<PeerClient> peerClients = peerClientController.data;
+  List<TileData> _buildPeerClientTileData() {
+    List<PeerClient> peerClients = peerClientController.data.value;
     List<TileData> tiles = [];
     if (peerClients.isNotEmpty) {
       for (var peerClient in peerClients) {
@@ -87,11 +69,11 @@ class _PeerClientListWidgetState extends State<PeerClientListWidget> {
         tiles.add(tile);
       }
     }
-    this.tiles.value = tiles;
+    return tiles;
   }
 
   Future<void> _onRefresh() async {
-    await _more();
+    await peerClientController.more();
   }
 
   _onTap(int index, String title, {String? subtitle, TileData? group}) {
@@ -104,29 +86,20 @@ class _PeerClientListWidgetState extends State<PeerClientListWidget> {
     var peerClientView = RefreshIndicator(
         onRefresh: _onRefresh,
         //notificationPredicate: _notificationPredicate,
-        child: ValueListenableBuilder(
-            valueListenable: tiles,
-            builder:
-                (BuildContext context, List<TileData> tiles, Widget? child) {
-              return DataListView(
-                  onTap: _onTap,
-                  itemCount: tiles.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return tiles[index];
-                  },
-                  currentIndex: currentIndex);
-            }));
+        child: Obx(() {
+          var tiles = _buildPeerClientTileData();
+          return DataListView(
+              onTap: _onTap,
+              itemCount: tiles.length,
+              itemBuilder: (BuildContext context, int index) {
+                return tiles[index];
+              },
+              currentIndex: currentIndex);
+        }));
 
     var peerClientWidget = AppBarView(
-        title: widget.title,
-        withLeading: widget.withLeading,
-        child: peerClientView);
+        title: title, withLeading: withLeading, child: peerClientView);
 
     return peerClientWidget;
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 }

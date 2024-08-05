@@ -8,6 +8,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -69,7 +70,7 @@ class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
               prefix: Icons.playlist_add_check_outlined,
               onTap: (int index, String label, {String? subtitle}) async {
                 liveKitConferenceClientPool.conferenceId = conferenceId;
-                DialogUtil.info(context,
+                DialogUtil.info(
                     content:
                         '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is set current')}');
               });
@@ -81,7 +82,7 @@ class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
             onTap: (int index, String label, {String? subtitle}) async {
               liveKitConferenceClientPool.disconnect(
                   conferenceId: conferenceId);
-              DialogUtil.info(context,
+              DialogUtil.info(
                   content:
                       '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is closed')}');
             });
@@ -126,7 +127,7 @@ class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
     LiveKitConferenceClient? liveKitConferenceClient =
         liveKitConferenceClientPool.conferenceClient;
     if (liveKitConferenceClient == null) {
-      return Container();
+      return nil;
     }
     List<Widget> children = [];
     LiveKitRoomClient roomClient = liveKitConferenceClient.roomClient;

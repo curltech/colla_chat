@@ -1,6 +1,7 @@
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -37,7 +38,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget>
   @override
   Widget build(BuildContext context) {
     Linkman? linkman = linkmanController.current;
-    Widget linkmanInfo = Container();
+    Widget linkmanInfo = nil;
     if (linkman != null) {
       String name = linkman.name;
       var peerId = linkman.peerId;

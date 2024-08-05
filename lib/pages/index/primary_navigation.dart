@@ -4,6 +4,7 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
@@ -66,7 +67,7 @@ class PrimaryNavigation {
 
   Widget _buildAppBar(BuildContext context) {
     if (appDataProvider.smallBreakpoint.isActive(context)) {
-      return Container();
+      return nil;
     }
 
     Widget avatarImage = myself.avatarImage ?? AppImage.mdAppImage;
@@ -118,13 +119,13 @@ class PrimaryNavigation {
   }
 
   ///大屏幕的primaryNavigation
-  List<NavigationRailDestination> _buildNavigationRailDestination(
-      IndexWidgetProvider indexWidgetProvider) {
+  List<NavigationRailDestination> _buildNavigationRailDestination() {
     List<NavigationRailDestination> destinations = [];
     double index = 0;
     for (String mainView in indexWidgetProvider.mainViews) {
       TileDataMixin? view = indexWidgetProvider.allViews[mainView];
       if (view != null) {
+        AnimationController slideController = _slideControllers[index.toInt()];
         destinations.add(slideInNavigationRailDestination(
           label: Text(AppLocalizations.t(view.title)),
           icon: Icon(view.iconData),
@@ -135,7 +136,7 @@ class PrimaryNavigation {
             color: myself.primary,
           ),
           begin: -index,
-          controller: _slideControllers[index.toInt()],
+          controller: slideController,
         ));
       }
       index++;
@@ -178,13 +179,13 @@ class PrimaryNavigation {
       return Column(
           mainAxisAlignment: MainAxisAlignment.start, children: children);
     }
-    return Container();
+    return nilBox;
   }
 
   /// Primary navigation，侧边栏，在小屏幕时为空， 中屏幕时为只有图标的菜单，大屏幕时为带文字的图标，且有附加菜单项
-  SlotLayout build(IndexWidgetProvider indexWidgetProvider) {
+  SlotLayout build() {
     final List<NavigationRailDestination> destinations =
-        _buildNavigationRailDestination(indexWidgetProvider);
+        _buildNavigationRailDestination();
     final Widget trailingNavRail = _buildTrailingNavRail();
     return SlotLayout(
       config: <Breakpoint, SlotLayoutConfig>{
@@ -267,7 +268,6 @@ class PrimaryNavigation {
     for (var slideController in _slideControllers) {
       slideController.dispose();
     }
+    _slideControllers.clear();
   }
 }
-
-final PrimaryNavigation primaryNavigation = PrimaryNavigation();

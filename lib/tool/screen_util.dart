@@ -4,31 +4,31 @@ import 'package:flutter/material.dart';
 
 class ScreenUtil {
   static double winWidth(BuildContext context) {
-    return MediaQuery.of(context).size.width;
+    return MediaQuery.sizeOf(context).width;
   }
 
   static double winHeight(BuildContext context) {
-    return MediaQuery.of(context).size.height;
+    return MediaQuery.sizeOf(context).height;
   }
 
   static double winTop(BuildContext context) {
-    return MediaQuery.of(context).padding.top;
+    return MediaQuery.paddingOf(context).top;
   }
 
   static double winBottom(BuildContext context) {
-    return MediaQuery.of(context).padding.bottom;
+    return MediaQuery.paddingOf(context).bottom;
   }
 
   static double winLeft(BuildContext context) {
-    return MediaQuery.of(context).padding.left;
+    return MediaQuery.paddingOf(context).left;
   }
 
   static double winRight(BuildContext context) {
-    return MediaQuery.of(context).padding.right;
+    return MediaQuery.paddingOf(context).right;
   }
 
   static double winKeyHeight(BuildContext context) {
-    return MediaQuery.of(context).viewInsets.bottom;
+    return MediaQuery.viewInsetsOf(context).bottom;
   }
 
   static double statusBarHeight(BuildContext context) {

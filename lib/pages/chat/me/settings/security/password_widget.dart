@@ -71,18 +71,18 @@ class PasswordWidget extends StatelessWidget with TileDataMixin {
     String plainPassword = values['plainPassword'];
     String confirmPassword = values['confirmPassword'];
     if (StringUtil.isEmpty(oldPassword)) {
-      DialogUtil.error(context,
+      DialogUtil.error(
           content: AppLocalizations.t('Please input old password'));
       return;
     }
     if (myself.password == oldPassword) {
       if (StringUtil.isEmpty(plainPassword)) {
-        DialogUtil.error(context,
+        DialogUtil.error(
             content: AppLocalizations.t('Please input plain password'));
         return;
       }
       if (StringUtil.isEmpty(confirmPassword)) {
-        DialogUtil.error(context,
+        DialogUtil.error(
             content: AppLocalizations.t('Please input confirm password'));
         return;
       }
@@ -91,12 +91,12 @@ class PasswordWidget extends StatelessWidget with TileDataMixin {
           RegVal.hasMatch(plainPassword, RegexPattern.passwordNormal1);
       // isPassword = Validate.isPassword(plainPassword);
       if (!isPassword) {
-        DialogUtil.error(context, content: 'password must be strong password');
+        DialogUtil.error( content: 'password must be strong password');
         return;
       }
       if (plainPassword != confirmPassword) {
         logger.e('new password is not matched');
-        DialogUtil.error(context, content: 'password is not matched');
+        DialogUtil.error( content: 'password is not matched');
         return;
       }
       String loginName = myself.myselfPeer.loginName;
@@ -112,7 +112,7 @@ class PasswordWidget extends StatelessWidget with TileDataMixin {
           where: 'loginName=?',
           whereArgs: [loginName]);
     } else {
-      DialogUtil.error(context,
+      DialogUtil.error(
           content: AppLocalizations.t('old password is not matched'));
     }
   }

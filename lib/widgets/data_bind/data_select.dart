@@ -6,6 +6,7 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
 
@@ -120,7 +121,7 @@ class _DataDropdownButtonState extends State<DataDropdownButton> {
         child: Row(children: [
           DropdownButton<String>(
             dropdownColor: Colors.grey.withOpacity(0.7),
-            underline: Container(),
+            underline: nil,
             elevation: 0,
             value: selected,
             items: menuItems,
@@ -239,7 +240,7 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
     children.add(
       Expanded(child: selector),
     );
-    var size = MediaQuery.of(context).size;
+    var size = MediaQuery.sizeOf(context);
     selector = Center(
         child: SizedBox(
       width: size.width * dialogSizeIndex,
@@ -590,7 +591,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
     children.add(
       Expanded(child: selector),
     );
-    var size = MediaQuery.of(context).size;
+    var size = MediaQuery.sizeOf(context);
     selector = Center(
         child: SizedBox(
       width: size.width * dialogSizeIndex,
@@ -721,7 +722,7 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
             children: chips,
           ));
     } else {
-      return Container();
+      return nil;
     }
   }
 

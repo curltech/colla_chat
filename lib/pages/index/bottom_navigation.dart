@@ -34,8 +34,7 @@ class BottomNavigation {
   }
 
   ///小屏幕的bottomNavigation
-  List<NavigationDestination> _buildNavigationDestination(
-      IndexWidgetProvider indexWidgetProvider) {
+  List<NavigationDestination> _buildNavigationDestination() {
     List<NavigationDestination> destinations = [];
     for (String mainView in indexWidgetProvider.mainViews) {
       TileDataMixin? view = indexWidgetProvider.allViews[mainView];
@@ -54,9 +53,9 @@ class BottomNavigation {
     return destinations;
   }
 
-  SlotLayout build(IndexWidgetProvider indexWidgetProvider) {
+  SlotLayout build() {
     final List<NavigationDestination> destinations =
-        _buildNavigationDestination(indexWidgetProvider);
+        _buildNavigationDestination();
     return SlotLayout(
       config: <Breakpoint, SlotLayoutConfig>{
         appDataProvider.smallBreakpoint: SlotLayout.from(
@@ -77,5 +76,3 @@ class BottomNavigation {
     );
   }
 }
-
-final BottomNavigation bottomNavigation = BottomNavigation();

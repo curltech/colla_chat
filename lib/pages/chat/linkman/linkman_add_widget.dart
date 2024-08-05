@@ -18,18 +18,17 @@ import 'package:flutter/material.dart';
 class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
   final P2pLinkmanAddWidget p2pLinkmanAddWidget = P2pLinkmanAddWidget();
   final ContactLinkmanAddWidget contactLinkmanAddWidget =
-  ContactLinkmanAddWidget();
+      ContactLinkmanAddWidget();
   final JsonLinkmanAddWidget jsonLinkmanAddWidget = JsonLinkmanAddWidget();
 
   // final NearbyLinkmanAddWidget nearbyLinkmanAddWidget =
   //     NearbyLinkmanAddWidget();
-  final LlmChatAddWidget llmChatAddWidget = const LlmChatAddWidget();
+  final LlmChatAddWidget llmChatAddWidget = LlmChatAddWidget();
   final NearbyGroupAddWidget nearbyGroupAddWidget = NearbyGroupAddWidget();
   final FaceGroupAddWidget faceGroupAddWidget = FaceGroupAddWidget();
-  final ConferenceEditWidget conferenceEditWidget =
-  const ConferenceEditWidget();
+  final ConferenceEditWidget conferenceEditWidget = ConferenceEditWidget();
   final AnonymousConferenceEditWidget anonymousConferenceEditWidget =
-  const AnonymousConferenceEditWidget();
+      AnonymousConferenceEditWidget();
 
   //final NfcLinkmanAddWidget nfcLinkmanAddWidget = NfcLinkmanAddWidget();
 

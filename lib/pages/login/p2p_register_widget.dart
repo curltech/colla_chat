@@ -17,6 +17,7 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/mobile_util.dart';
 import 'package:colla_chat/tool/phone_number_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:cross_file/cross_file.dart';
@@ -30,16 +31,17 @@ import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:regexpattern/regexpattern.dart';
 
 /// 用户注册组件，一个card下的录入框和按钮组合
-class P2pRegisterWidget extends StatefulWidget {
+class P2pRegisterWidget extends StatelessWidget {
   final SwiperController? swiperController;
 
-  const P2pRegisterWidget({super.key, this.swiperController});
+  P2pRegisterWidget({super.key, this.swiperController}) {
+    if (platformParams.mobile) {
+      MobileUtil.carrierRegionCode().then((value) {
+        countryCode.value = value;
+      });
+    }
+  }
 
-  @override
-  State<StatefulWidget> createState() => _P2pRegisterWidgetState();
-}
-
-class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
   ValueNotifier<String> countryCode = ValueNotifier<String>('CN');
   TextEditingController mobileController = TextEditingController();
   ValueNotifier<String?> peerId = ValueNotifier<String?>(null);
@@ -85,24 +87,14 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
           color: myself.primary,
         ))
   ];
-  late final FormInputController controller =
+  late final FormInputController formInputController =
       FormInputController(p2pRegisterDataFields);
-
-  @override
-  void initState() {
-    super.initState();
-    if (platformParams.mobile) {
-      MobileUtil.carrierRegionCode().then((value) {
-        countryCode.value = value;
-      });
-    }
-  }
 
   Future<void> _pickAvatar(
     BuildContext context,
     String peerId,
   ) async {
-    Uint8List? avatar = await ImageUtil.pickAvatar(context);
+    Uint8List? avatar = await ImageUtil.pickAvatar(context: context);
     if (avatar != null) {
       await myselfPeerService.updateAvatar(peerId, avatar);
       this.avatar.value = avatar;
@@ -117,7 +109,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
         backup = await xfiles[0].readAsString();
       }
     } else if (platformParams.mobile) {
-      List<AssetEntity>? assets = await AssetUtil.pickAssets(context);
+      List<AssetEntity>? assets = await AssetUtil.pickAssets();
       if (assets != null && assets.isNotEmpty) {}
     }
   }
@@ -209,7 +201,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
                       );
                     });
               }
-              return Container();
+              return nil;
             }),
         Container(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -217,7 +209,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
               height: appDataProvider.portraitSize.height * 0.6,
               spacing: 5.0,
               formButtons: formButtons,
-              controller: controller,
+              controller: formInputController,
             )),
       ],
     );
@@ -225,41 +217,41 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
 
   _onOk(Map<String, dynamic> values) async {
     if (!values.containsKey('name')) {
-      DialogUtil.error(context, content: 'name must be not empty');
+      DialogUtil.error(content: 'name must be not empty');
       return;
     }
     if (!values.containsKey('loginName')) {
-      DialogUtil.error(context, content: 'loginName must be not empty');
+      DialogUtil.error(content: 'loginName must be not empty');
       return;
     }
     String name = values['name'];
     var peer = await myselfPeerService.findOneByName(name);
     if (peer != null) {
-      bool? confirm = await DialogUtil.confirm(context,
+      bool? confirm = await DialogUtil.confirm(
           title: 'same name account exist',
           content: 'Do you want to login using exist account?');
       if (confirm == true) {
-        widget.swiperController?.move(0);
+        swiperController?.move(0);
       }
       return;
     }
     String loginName = values['loginName'];
     peer = await myselfPeerService.findOneByLoginName(loginName);
     if (peer != null) {
-      bool? confirm = await DialogUtil.confirm(context,
+      bool? confirm = await DialogUtil.confirm(
           title: 'same loginName account exist',
           content: 'Do you want to login using exist account?');
       if (confirm == true) {
-        widget.swiperController?.move(0);
+        swiperController?.move(0);
       }
       return;
     }
     if (!values.containsKey('plainPassword')) {
-      DialogUtil.error(context, content: 'plainPassword must be not empty');
+      DialogUtil.error(content: 'plainPassword must be not empty');
       return;
     }
     if (!values.containsKey('confirmPassword')) {
-      DialogUtil.error(context, content: 'confirmPassword must be not empty');
+      DialogUtil.error(content: 'confirmPassword must be not empty');
       return;
     }
     String plainPassword = values['plainPassword'];
@@ -269,12 +261,12 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
         RegVal.hasMatch(plainPassword, RegexPattern.passwordNormal1);
     // isPassword = Validate.isPassword(plainPassword);
     if (!isPassword) {
-      DialogUtil.error(context, content: 'password must be strong password');
+      DialogUtil.error(content: 'password must be strong password');
       return;
     }
     if (plainPassword != confirmPassword) {
       logger.e('password is not matched');
-      DialogUtil.error(context, content: 'password is not matched');
+      DialogUtil.error(content: 'password is not matched');
       return;
     }
 
@@ -287,12 +279,12 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
       myselfPeerController.add(myselfPeer);
       peerId.value = myselfPeer.peerId;
     } catch (e) {
-      DialogUtil.error(context, content: e.toString());
+      DialogUtil.error(content: e.toString());
       return;
     }
-    DialogUtil.info(context,
+    DialogUtil.info(
         content:
             '${AppLocalizations.t('Successfully')} ${AppLocalizations.t('create account name')}:$name, ${AppLocalizations.t('loginName')}:$loginName');
-    widget.swiperController?.move(0);
+    swiperController?.move(0);
   }
 }

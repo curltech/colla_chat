@@ -44,7 +44,7 @@ class VideoChatMessage extends StatelessWidget {
                 chatSummary: chatSummary, chatMessage);
             indexWidgetProvider.push('sfu_video_chat');
           } catch (e) {
-            DialogUtil.error(context,
+            DialogUtil.error(
                 content: 'createLiveKitConferenceClient failure:$e');
           }
 

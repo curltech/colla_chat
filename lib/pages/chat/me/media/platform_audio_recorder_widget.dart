@@ -205,7 +205,7 @@ class _PlatformAudioRecorderWidgetState
             PlatformAudioRecorder(
               onStop: (String filename) async {
                 if (mounted) {
-                  bool? confirm = await DialogUtil.confirm(context,
+                  bool? confirm = await DialogUtil.confirm(
                       content:
                           '${AppLocalizations.t('Need you play record audio filename')} $filename?');
                   if (confirm != null && confirm) {

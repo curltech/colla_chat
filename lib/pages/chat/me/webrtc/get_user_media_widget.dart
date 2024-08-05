@@ -11,6 +11,7 @@ import 'package:colla_chat/transport/webrtc/peer_media_render_view.dart';
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -212,10 +213,10 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
 
   Widget _buildVideoView(BuildContext context) {
     if (peerMediaStream == null) {
-      return Container();
+      return nil;
     }
-    var width = MediaQuery.of(context).size.width;
-    var height = MediaQuery.of(context).size.height * 0.6;
+    var width = MediaQuery.sizeOf(context).width;
+    var height = MediaQuery.sizeOf(context).height * 0.6;
     return PeerMediaRenderView(
       peerMediaStream: peerMediaStream!,
       width: width,
@@ -353,7 +354,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   }
 
   Future<dynamic> _showActionCard(BuildContext context) {
-    return DialogUtil.popModalBottomSheet(context, builder: (context) {
+    return DialogUtil.popModalBottomSheet( builder: (context) {
       List<ActionData> actions = _buildVideoActionData();
       int level = (actions.length / 4).ceil();
       double height = 100.0 * level;

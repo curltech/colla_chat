@@ -46,7 +46,7 @@ class FileMessage extends StatelessWidget {
             if (resultType != ResultType.done) {
               logger.e(
                   'open file $filename failure:$resultType.name, ${result.message}');
-              DialogUtil.error(context,
+              DialogUtil.error(
                   content:
                       'open file $filename failure:$resultType.name, ${result.message}');
             }

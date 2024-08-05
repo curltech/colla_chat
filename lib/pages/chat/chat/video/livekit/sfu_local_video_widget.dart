@@ -22,6 +22,7 @@ import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.d
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
@@ -91,7 +92,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     if (conferenceChatMessageController != null) {
       videoChatStatus.value = conferenceChatMessageController.status;
       if (mounted) {
-        DialogUtil.info(context,
+        DialogUtil.info(
             content: AppLocalizations.t('Video chat status:') +
                 AppLocalizations.t(videoChatStatus.value.name));
       }
@@ -369,7 +370,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     var partyType = chatSummary.partyType;
     if (partyType != PartyType.group.name) {
       if (mounted) {
-        DialogUtil.error(context,
+        DialogUtil.error(
             content: AppLocalizations.t(
                 'PartyType is not group, cannot create sfu conference'));
       }
@@ -381,7 +382,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     }
     if (participants.length < 2) {
       if (mounted) {
-        DialogUtil.error(context,
+        DialogUtil.error(
             content: AppLocalizations.t('Please select participants'));
       }
       return;
@@ -391,7 +392,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
         liveKitConferenceClientPool.conferenceChatMessageController;
     if (conferenceChatMessageController != null) {
       if (mounted) {
-        DialogUtil.error(context,
+        DialogUtil.error(
             content: AppLocalizations.t('Current conference is exist'));
       }
       return;
@@ -400,7 +401,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     ///根据本地视频决定音视频选项，如果没有则认为是音频
     bool? video = false;
     if (mounted) {
-      video = await DialogUtil.confirm(context,
+      video = await DialogUtil.confirm(
           content: 'Do you open video conference?',
           okLabel: 'Video',
           cancelLabel: 'Audio');
@@ -410,7 +411,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
         await _buildSfuConference(video: video, participants: participants);
     if (conference == null) {
       if (mounted) {
-        DialogUtil.error(context, content: 'build sfu conference failure');
+        DialogUtil.error( content: 'build sfu conference failure');
       }
       return;
     }
@@ -421,7 +422,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
       if (chatMessages.isEmpty) {
         logger.e('send sfu conference message failure');
         if (mounted) {
-          DialogUtil.error(context,
+          DialogUtil.error(
               content: 'send sfu conference message failure');
         }
         return;
@@ -429,14 +430,14 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     } catch (e) {
       logger.e('send sfu conference message failure:$e');
       if (mounted) {
-        DialogUtil.error(context,
+        DialogUtil.error(
             content: 'send sfu conference message failure');
       }
       return;
     }
     ChatMessage chatMessage = chatMessages.first;
     if (mounted) {
-      DialogUtil.info(context,
+      DialogUtil.info(
           content:
               '${AppLocalizations.t('Build sfu conference:')} ${chatMessage.messageId}');
     }
@@ -448,7 +449,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     if (liveKitConferenceClient == null) {
       logger.e('createLiveKitConferenceClient failure!');
       if (mounted) {
-        DialogUtil.error(context,
+        DialogUtil.error(
             content:
                 AppLocalizations.t('CreateLiveKitConferenceClient failure'));
       }
@@ -476,7 +477,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
         liveKitConferenceClientPool.conferenceChatMessageController;
     if (conferenceChatMessageController == null) {
       if (mounted) {
-        DialogUtil.error(context,
+        DialogUtil.error(
             content: AppLocalizations.t('No video chat message controller'));
       }
       return;
@@ -484,7 +485,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     ChatMessage? chatMessage = conferenceChatMessageController.chatMessage;
     if (chatMessage == null) {
       if (mounted) {
-        DialogUtil.error(context,
+        DialogUtil.error(
             content: AppLocalizations.t('No video chat message'));
       }
       return;
@@ -492,7 +493,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     Conference? conference = conferenceChatMessageController.conference;
     if (conference == null) {
       if (mounted) {
-        DialogUtil.error(context, content: AppLocalizations.t('No conference'));
+        DialogUtil.error( content: AppLocalizations.t('No conference'));
       }
       return;
     }
@@ -501,14 +502,14 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     } catch (e) {
       logger.e('join failure:$e');
       if (mounted) {
-        DialogUtil.error(context,
+        DialogUtil.error(
             content:
                 '${AppLocalizations.t('Join conference failure:')}${conferenceChatMessageController.name!}\n$e');
       }
       return;
     }
     if (mounted) {
-      DialogUtil.info(context,
+      DialogUtil.info(
           content: AppLocalizations.t('Join conference:') + conference.name);
     }
     _updateView();
@@ -534,7 +535,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
                 labelColor: Colors.white,
               );
             }
-            return Container();
+            return nil;
           }),
     );
   }
@@ -742,7 +743,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
               peerMediaStreamController: localPeerMediaStreamController,
             );
           } else {
-            var size = MediaQuery.of(context).size;
+            var size = MediaQuery.sizeOf(context);
             return SizedBox(
               width: size.width,
               height: size.height,

@@ -3,28 +3,16 @@ import 'package:colla_chat/widgets/special_text/emoji_text.dart';
 import 'package:flutter/material.dart';
 
 ///Emoji文本消息的输入面板
-class EmojiMessageInputWidget extends StatefulWidget {
+class EmojiMessageInputWidget extends StatelessWidget {
   final Function(String text)? onTap;
 
-  const EmojiMessageInputWidget({
+  EmojiMessageInputWidget({
     super.key,
     required this.onTap,
   });
 
-  @override
-  State<StatefulWidget> createState() {
-    return _EmojiMessageInputWidgetState();
-  }
-}
-
-class _EmojiMessageInputWidgetState extends State<EmojiMessageInputWidget> {
   final textEditingController = TextEditingController();
   final scrollController = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   _onBackspacePressed() {
     textEditingController
@@ -46,8 +34,8 @@ class _EmojiMessageInputWidgetState extends State<EmojiMessageInputWidget> {
             return GestureDetector(
               behavior: HitTestBehavior.translucent,
               onTap: () {
-                if (widget.onTap != null) {
-                  widget.onTap!("[${index + 1}]");
+                if (onTap != null) {
+                  onTap!("[${index + 1}]");
                 }
               },
               child:
@@ -107,10 +95,5 @@ class _EmojiMessageInputWidgetState extends State<EmojiMessageInputWidget> {
   @override
   Widget build(BuildContext context) {
     return _buildEmojiWidget(context);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 }

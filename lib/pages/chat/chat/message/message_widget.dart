@@ -43,6 +43,7 @@ import 'package:colla_chat/tool/pdf_util.dart';
 import 'package:colla_chat/tool/sherpa/sherpa_speech_to_text.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
@@ -216,11 +217,25 @@ class MessageWidget {
 
     ///双击全屏
     if (!fullScreen) {
+      bool canFullScreen = true;
+      Linkman? linkman =
+          await linkmanService.findCachedOneByPeerId(chatMessage.senderPeerId!);
+      if (linkman?.linkmanStatus == LinkmanStatus.G.name) {
+        canFullScreen = false;
+      } else {
+        linkman = await linkmanService
+            .findCachedOneByPeerId(chatMessage.receiverPeerId!);
+        if (linkman?.linkmanStatus == LinkmanStatus.G.name) {
+          canFullScreen = false;
+        }
+      }
       body = InkWell(
-          onDoubleTap: () {
-            chatMessageController.currentIndex = index;
-            indexWidgetProvider.push('full_screen_chat_message');
-          },
+          onDoubleTap: canFullScreen
+              ? () {
+                  chatMessageController.currentIndex = index;
+                  indexWidgetProvider.push('full_screen_chat_message');
+                }
+              : null,
           onLongPress: () async {
             await DialogUtil.show(
               context: context,
@@ -305,7 +320,7 @@ class MessageWidget {
         for (var selected in selects) {
           await chatMessageService.forward(chatMessage, selected);
         }
-        chatMessageController.notifyListeners();
+        chatMessageController.latest();
         break;
       case 'Collect':
         chatMessageService.collect(chatMessage);
@@ -327,7 +342,7 @@ class MessageWidget {
 
   Future<void> _resend(BuildContext context) async {
     await chatMessageService.sendAndStore(chatMessage);
-    chatMessageController.notifyListeners();
+    chatMessageController.latest();
   }
 
   Future<void> _saveFile(BuildContext context, {bool isFile = true}) async {
@@ -343,7 +358,7 @@ class MessageWidget {
         String? messageId = chatMessage.messageId;
         String? title = chatMessage.title;
         if (messageId == null) {
-          DialogUtil.error(context, content: 'No source messageId');
+          DialogUtil.error(content: 'No source messageId');
           return;
         }
         String? filename;
@@ -355,19 +370,19 @@ class MessageWidget {
         Uint8List? bytes =
             await messageAttachmentService.findContent(messageId, title);
         if (bytes == null) {
-          DialogUtil.error(context, content: 'No source file data');
+          DialogUtil.error(content: 'No source file data');
           return;
         }
         if (!isFile) {
           await ImageUtil.saveImageGallery(bytes,
               name: filename, androidExistNotSave: true);
-          DialogUtil.info(context, content: 'save to gallery: $filename');
+          DialogUtil.info(content: 'save to gallery: $filename');
         } else {
           String? dir = await FileUtil.directoryPathPicker();
           if (dir != null) {
             String path = p.join(dir, filename);
             await FileUtil.writeFileAsBytes(bytes, path);
-            DialogUtil.info(context, content: 'save to file: $path');
+            DialogUtil.info(content: 'save to file: $path');
           }
         }
       }
@@ -382,7 +397,7 @@ class MessageWidget {
         String? messageId = chatMessage.messageId;
         String? title = chatMessage.title;
         if (messageId == null) {
-          DialogUtil.error(context, content: 'No source messageId');
+          DialogUtil.error(content: 'No source messageId');
           return;
         }
         String? filename;
@@ -394,7 +409,7 @@ class MessageWidget {
         Uint8List? bytes =
             await messageAttachmentService.findContent(messageId, title);
         if (bytes == null) {
-          DialogUtil.error(context, content: 'No source file data');
+          DialogUtil.error(content: 'No source file data');
           return;
         }
         SherpaSpeechToText sherpaSpeechToText = SherpaSpeechToText();
@@ -828,56 +843,50 @@ class MessageWidget {
     if (parentMessageId == null) {
       return null;
     }
-    return FutureBuilder(
+    return PlatformFutureBuilder(
       future: chatMessageService.findOriginByMessageId(parentMessageId),
-      builder: (BuildContext context, AsyncSnapshot<ChatMessage?> snapshot) {
-        if (snapshot.hasData) {
-          ChatMessage? chatMessage = snapshot.data;
-          if (chatMessage != null) {
-            var senderName = chatMessage.senderName ?? '';
-            var subMessageType = chatMessage.subMessageType;
-            var contentType = chatMessage.contentType;
-            String data = '$senderName: ';
-            if (subMessageType == ChatMessageSubType.chat.name &&
-                contentType == ChatMessageContentType.text.name) {
-              var title = chatMessage.title;
-              var content = chatMessage.content ?? '';
-              content = chatMessageService.recoverContent(content);
-              if (title != null) {
-                data = data + title;
-              } else {
-                var length = content.length;
-                length = length > maxLength ? maxLength : length;
-                data = '$data${content.substring(0, length)}...';
-              }
-            } else {
-              data = data + AppLocalizations.t(contentType!);
-            }
-            return Card(
-                elevation: 0,
-                margin: EdgeInsets.zero,
-                color: Colors.grey.withOpacity(0.2),
-                child: Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    child: Row(children: [
-                      Expanded(child: CommonAutoSizeText(data)),
-                      readOnly
-                          ? Container()
-                          : InkWell(
-                              child: Icon(
-                                //size: 16,
-                                Icons.cancel,
-                                color: myself.primary,
-                              ),
-                              onTap: () {
-                                chatMessageController.parentMessageId = null;
-                              },
-                            )
-                    ])));
+      builder: (BuildContext context, ChatMessage? chatMessage) {
+        var senderName = chatMessage?.senderName ?? '';
+        var subMessageType = chatMessage?.subMessageType;
+        var contentType = chatMessage?.contentType;
+        String data = '$senderName: ';
+        if (subMessageType == ChatMessageSubType.chat.name &&
+            contentType == ChatMessageContentType.text.name) {
+          var title = chatMessage?.title;
+          var content = chatMessage?.content ?? '';
+          content = chatMessageService.recoverContent(content);
+          if (title != null) {
+            data = data + title;
+          } else {
+            var length = content.length;
+            length = length > maxLength ? maxLength : length;
+            data = '$data${content.substring(0, length)}...';
           }
+        } else {
+          data = data + AppLocalizations.t(contentType!);
         }
-        return Container();
+        return Card(
+            elevation: 0,
+            margin: EdgeInsets.zero,
+            color: Colors.grey.withOpacity(0.2),
+            child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                child: Row(children: [
+                  Expanded(child: CommonAutoSizeText(data)),
+                  readOnly
+                      ? Container()
+                      : InkWell(
+                          child: Icon(
+                            //size: 16,
+                            Icons.cancel,
+                            color: myself.primary,
+                          ),
+                          onTap: () {
+                            chatMessageController.parentMessageId = null;
+                          },
+                        )
+                ])));
       },
     );
   }

@@ -10,14 +10,16 @@ import 'package:colla_chat/tool/connectivity_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:websocket_universal/websocket_universal.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
-class ConnectivityController with ChangeNotifier {
+class ConnectivityController {
   late StreamSubscription<List<ConnectivityResult>> subscription;
-  List<ConnectivityResult> connectivityResult = [];
-  bool connected = false;
+  final RxList<ConnectivityResult> connectivityResult =
+      <ConnectivityResult>[].obs;
+  final RxBool connected = false.obs;
 
   ConnectivityController() {
     subscription =
@@ -25,23 +27,18 @@ class ConnectivityController with ChangeNotifier {
   }
 
   _onConnectivityChanged(List<ConnectivityResult> result) {
-    if (result != connectivityResult) {
-      connectivityResult = result;
-      if (ConnectivityUtil.getMainResult(
-              connectivityController.connectivityResult) !=
-          ConnectivityResult.none) {
-        connected = true;
-      } else {
-        connected = false;
-      }
-      notifyListeners();
+    connectivityResult(result);
+    if (ConnectivityUtil.getMainResult(
+            connectivityController.connectivityResult) !=
+        ConnectivityResult.none) {
+      connected(true);
+    } else {
+      connected(false);
     }
   }
 
-  @override
   void dispose() {
     ConnectivityUtil.cancel(subscription);
-    super.dispose();
   }
 }
 
@@ -237,7 +234,7 @@ class UniversalWebsocket extends IWebClient {
   }
 
   FutureOr<bool> sendMsg(dynamic data) async {
-    if (connectivityController.connected) {
+    if (connectivityController.connected.value) {
       if (_client != null && status == SocketStatus.connected) {
         bool success = _client!.sendMessage(data);
         if (success) {

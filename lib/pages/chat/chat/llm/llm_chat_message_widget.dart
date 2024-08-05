@@ -2,12 +2,11 @@ import 'dart:async';
 
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_item.dart';
 import 'package:colla_chat/pages/chat/chat/controller/llm_chat_message_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 /// 消息发送和接受展示的界面组件
 /// 此界面展示特定的目标对象的收到的消息，并且可以发送消息
@@ -37,36 +36,21 @@ class LlmChatMessageWidget extends StatefulWidget {
 class _LlmChatMessageWidgetState extends State<LlmChatMessageWidget>
     with TickerProviderStateMixin {
   FocusNode textFocusNode = FocusNode();
-  late final AnimationController animateController;
-  ValueNotifier<bool> securityTip = ValueNotifier<bool>(true);
+  late final AnimationController animateController = AnimationController(
+      vsync: this, duration: const Duration(milliseconds: 500));
 
   @override
   void initState() {
     super.initState();
     //不能同时监听chatMessageController和globalChatMessageController
     //因为globalChatMessageController会通知chatMessageController的新消息
-    llmChatMessageController.addListener(_update);
     var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
-    animateController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 500));
-    Future.delayed(const Duration(seconds: 30), () {
-      securityTip.value = false;
-    });
     llmChatMessageController.latest();
 
     ///滚到指定的位置
     // widget.scrollController.animateTo(offset,
     //     duration: const Duration(milliseconds: 1000), curve: Curves.ease);
-  }
-
-  _update() {
-    setState(() {
-      int start = DateTime.now().millisecondsSinceEpoch;
-      llmChatMessageController.latest();
-      int end = DateTime.now().millisecondsSinceEpoch;
-      logger.w('find chat message latest time: ${end - start} microsecond');
-    });
   }
 
   void _onScroll() {
@@ -149,58 +133,28 @@ class _LlmChatMessageWidgetState extends State<LlmChatMessageWidget>
     return RefreshIndicator(
         onRefresh: _onRefresh,
         //notificationPredicate: _notificationPredicate,
-        child: ListView.builder(
-          controller: widget.scrollController,
-          padding: const EdgeInsets.all(8.0),
-          reverse: true,
-          //消息组件渲染
-          itemBuilder: _buildChatMessageItem,
-          //消息条目数
-          itemCount: llmChatMessageController.data.length,
-        ));
+        child: Obx(() {
+          return ListView.builder(
+            controller: widget.scrollController,
+            padding: const EdgeInsets.all(8.0),
+            reverse: true,
+            //消息组件渲染
+            itemBuilder: _buildChatMessageItem,
+            //消息条目数
+            itemCount: llmChatMessageController.length,
+          );
+        }));
   }
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-        valueListenable: securityTip,
-        builder: (BuildContext context, bool securityTip, Widget? child) {
-          var chatMessageWidget = _buildChatMessageWidget(context);
-          if (securityTip) {
-            return Column(children: [
-              Row(children: [
-                const SizedBox(
-                  width: 10.0,
-                ),
-                const Icon(
-                  Icons.security,
-                  color: Colors.yellow,
-                ),
-                const SizedBox(
-                  width: 10.0,
-                ),
-                Expanded(
-                    child: CommonAutoSizeText(AppLocalizations.t(
-                        'This is E2E encrypt communication, nobody can peek your chat content'))),
-                IconButton(
-                    onPressed: () {
-                      this.securityTip.value = false;
-                    },
-                    icon: const Icon(
-                      Icons.cancel,
-                      color: Colors.yellow,
-                    ))
-              ]),
-              Expanded(child: chatMessageWidget)
-            ]);
-          }
-          return chatMessageWidget;
-        });
+    var chatMessageWidget = _buildChatMessageWidget(context);
+
+    return chatMessageWidget;
   }
 
   @override
   void dispose() {
-    llmChatMessageController.removeListener(_update);
     widget.scrollController.removeListener(_onScroll);
     animateController.dispose();
     super.dispose();

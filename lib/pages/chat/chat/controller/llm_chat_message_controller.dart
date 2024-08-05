@@ -10,32 +10,21 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/transport/ollama/dart_ollama_client.dart';
 import 'package:flutter/foundation.dart';
+import 'package:get/state_manager.dart';
 import 'package:uuid/uuid.dart';
 
 enum LlmAction { chat, image, audio, translate, extract }
 
 class LlmChatMessageController extends ChatMessageController {
   DartOllamaClient? dartOllamaClient;
-  LlmAction _llmAction = LlmAction.chat;
+  Rx<LlmAction> llmAction = LlmAction.chat.obs;
 
-  LlmChatMessageController() {
-    transportType = TransportType.llm;
-  }
-
-  LlmAction get llmAction {
-    return _llmAction;
-  }
-
-  set llmAction(LlmAction llmAction) {
-    if (_llmAction != llmAction) {
-      _llmAction = llmAction;
-      notifyListeners();
-    }
-  }
+  LlmChatMessageController();
 
   ///更新chatSummary，清空原数据，查询新数据
   @override
   set chatSummary(ChatSummary? chatSummary) {
+    super.chatSummary = chatSummary;
     if (this.chatSummary != chatSummary) {
       if (chatSummary != null) {
         var peerId = chatSummary.peerId;
@@ -52,11 +41,10 @@ class LlmChatMessageController extends ChatMessageController {
         dartOllamaClient = null;
       }
     }
-    super.chatSummary = chatSummary;
   }
 
   Future<void> _llmChatAction(String content) async {
-    if (llmAction == LlmAction.chat) {
+    if (llmAction.value == LlmAction.chat) {
       String? chatResponse = await dartOllamaClient!.prompt(content);
       await onChatCompletion(chatResponse);
     }
@@ -83,7 +71,6 @@ class LlmChatMessageController extends ChatMessageController {
     ChatMessage chatMessage = buildLlmChatMessage(chatResponse,
         senderPeerId: chatSummary!.peerId, senderName: chatSummary!.name);
     await chatMessageService.store(chatMessage);
-    notifyListeners();
   }
 
   ///接收到chatGPT的消息回复
@@ -140,7 +127,6 @@ class LlmChatMessageController extends ChatMessageController {
         contentType: ChatMessageContentType.image,
         mimeType: ChatMessageMimeType.png);
     await chatMessageService.store(chatMessage);
-    notifyListeners();
   }
 }
 

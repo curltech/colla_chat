@@ -10,6 +10,7 @@ import 'package:colla_chat/pages/stock/main_stock_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
@@ -17,6 +18,9 @@ import 'package:provider/provider.dart';
 
 ///自动适配的主页面结构
 class AdaptiveLayoutIndex extends StatefulWidget {
+  final PrimaryNavigation primaryNavigation = PrimaryNavigation();
+  final BottomNavigation bottomNavigation = BottomNavigation();
+
   AdaptiveLayoutIndex({super.key}) {
     List<TileDataMixin> views = [
       ChatListWidget(),
@@ -47,17 +51,9 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
     with TickerProviderStateMixin {
   @override
   void initState() {
-    appDataProvider.addListener(_update);
-    myself.addListener(_update);
-    primaryNavigation.initController(this);
-    primaryNavigation.forward();
+    widget.primaryNavigation.initController(this);
+    widget.primaryNavigation.forward();
     super.initState();
-  }
-
-  _update() {
-    if (mounted) {
-      setState(() {});
-    }
   }
 
   ///Body视图
@@ -90,41 +86,38 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
 
   ///SecondaryBody视图
   Widget _buildSecondaryBodyView(BuildContext context) {
-    var pageView = Consumer<IndexWidgetProvider>(
-        builder: (context, indexWidgetProvider, child) {
-      ScrollPhysics? physics = const NeverScrollableScrollPhysics();
-      // if (!indexWidgetProvider.bottomBarVisible) {
-      //   physics = null;
-      // }
-      return Swiper(
-        physics: physics,
-        controller: indexWidgetProvider.controller,
-        onIndexChanged: (int index) {
-          //logger.i('PageChanged:$index');
-          //indexWidgetProvider.pop(context: context);
-        },
-        itemCount: indexWidgetProvider.views.length,
-        itemBuilder: (BuildContext context, int index) {
-          if (appDataProvider.smallBreakpoint.isActive(context)) {
-            return indexWidgetProvider.views[index];
-          }
-          Widget view;
-          if (index >= indexWidgetProvider.mainViews.length) {
-            view = indexWidgetProvider.views[index];
-          } else {
-            view = Container();
-          }
-          return Row(
-            children: [
-              const VerticalDivider(
-                width: 1.0,
-              ),
-              Expanded(child: view)
-            ],
-          );
-        },
-      );
-    });
+    ScrollPhysics? physics = const NeverScrollableScrollPhysics();
+    // if (!indexWidgetProvider.bottomBarVisible) {
+    //   physics = null;
+    // }
+    var pageView = Swiper(
+      physics: physics,
+      controller: indexWidgetProvider.controller,
+      onIndexChanged: (int index) {
+        //logger.i('PageChanged:$index');
+        //indexWidgetProvider.pop(context: context);
+      },
+      itemCount: indexWidgetProvider.views.length,
+      itemBuilder: (BuildContext context, int index) {
+        if (appDataProvider.smallBreakpoint.isActive(context)) {
+          return indexWidgetProvider.views[index];
+        }
+        Widget view;
+        if (index >= indexWidgetProvider.mainViews.length) {
+          view = indexWidgetProvider.views[index];
+        } else {
+          view = nilBox;
+        }
+        return Row(
+          children: [
+            const VerticalDivider(
+              width: 1.0,
+            ),
+            Expanded(child: view)
+          ],
+        );
+      },
+    );
 
     return pageView;
   }
@@ -154,20 +147,20 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
 
   @override
   Widget build(BuildContext context) {
-    // 自动适配的布局，由六个SlotLayout组成，有Top navigation，Body和Bottom navigation三个SlotLayout
-    // Body SlotLayout有Primary navigation，Body，Secondary body和Secondary navigation四个SlotLayout
-    double? bodyRatio = appDataProvider.smallBreakpoint.isActive(context)
-        ? 0.0
-        : appDataProvider.bodyRatio;
+    return Consumer3<AppDataProvider, IndexWidgetProvider, Myself>(builder:
+        (context, appDataProvider, indexWidgetProvider, myself, child) {
+      // 自动适配的布局，由六个SlotLayout组成，有Top navigation，Body和Bottom navigation三个SlotLayout
+      // Body SlotLayout有Primary navigation，Body，Secondary body和Secondary navigation四个SlotLayout
+      double? bodyRatio = appDataProvider.smallBreakpoint.isActive(context)
+          ? 0.0
+          : appDataProvider.bodyRatio;
 
-    return Consumer<IndexWidgetProvider>(
-        builder: (context, indexWidgetProvider, child) {
       SlotLayout? bottomSlotLayout;
       if (indexWidgetProvider.bottomBarVisible && !appDataProvider.landscape) {
-        bottomSlotLayout = bottomNavigation.build(indexWidgetProvider);
+        bottomSlotLayout = widget.bottomNavigation.build();
       }
       return AdaptiveLayout(
-          primaryNavigation: primaryNavigation.build(indexWidgetProvider),
+          primaryNavigation: widget.primaryNavigation.build(),
           body: _buildBody(),
           secondaryBody: _buildSecondaryBody(context),
           bodyRatio: bodyRatio,
@@ -177,8 +170,7 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
 
   @override
   void dispose() {
-    appDataProvider.removeListener(_update);
-    myself.removeListener(_update);
+    widget.primaryNavigation.dispose();
     super.dispose();
   }
 }

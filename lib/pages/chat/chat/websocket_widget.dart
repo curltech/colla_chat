@@ -1,4 +1,3 @@
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -6,7 +5,7 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
 //我的页面，带有路由回调函数
-class WebSocketWidget extends StatefulWidget with TileDataMixin {
+class WebSocketWidget extends StatelessWidget with TileDataMixin {
   WebSocketWidget({super.key});
 
   @override
@@ -20,19 +19,6 @@ class WebSocketWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'WebSocket';
-
-  @override
-  State<StatefulWidget> createState() => _WebSocketWidgetState();
-}
-
-class _WebSocketWidgetState extends State<WebSocketWidget> {
-  @override
-  void initState() {
-    super.initState();
-    myself.addListener(_update);
-  }
-
-  _update() {}
 
   List<TileData> _buildMeTileData(BuildContext context) {
     return [];
@@ -48,13 +34,7 @@ class _WebSocketWidgetState extends State<WebSocketWidget> {
       },
     );
 
-    var me = AppBarView(title: widget.title, child: child);
+    var me = AppBarView(title: title, child: child);
     return me;
-  }
-
-  @override
-  void dispose() {
-    myself.removeListener(_update);
-    super.dispose();
   }
 }

@@ -83,7 +83,7 @@ class _ChatMessageOverlayState extends State<ChatMessageOverlay> {
       buttonIcon = message == null ? AppImage.mdAppImage : Text(message ?? '');
     }
     return Container(
-      height: MediaQuery.of(context).size.height,
+      height: MediaQuery.sizeOf(context).height,
       decoration: BoxDecoration(
         color: Colors.white,
         shape: currentShape,

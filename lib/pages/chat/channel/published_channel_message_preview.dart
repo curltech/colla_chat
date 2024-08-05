@@ -3,8 +3,9 @@ import 'dart:typed_data';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
-import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/webview/platform_webview.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -57,24 +58,17 @@ class _PublishedChannelMessagePreviewState
   Widget build(BuildContext context) {
     var chatMessage = myChannelChatMessageController.current;
     if (chatMessage == null) {
-      return Container();
+      return nil;
     }
 
     return AppBarView(
       centerTitle: false,
       withLeading: true,
       title: chatMessage.title,
-      child: FutureBuilder(
+      child: PlatformFutureBuilder(
           future: _buildHtml(),
-          builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-            if (snapshot.connectionState != ConnectionState.done) {
-              return LoadingUtil.buildLoadingIndicator();
-            }
-            String? html = snapshot.data;
-            if (html != null) {
-              return PlatformWebView(html: html);
-            }
-            return Container();
+          builder: (BuildContext context, String? html) {
+            return PlatformWebView(html: html);
           }),
     );
   }

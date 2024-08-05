@@ -13,6 +13,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -143,8 +144,8 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
   Widget _buildCameraController(BuildContext context) {
     return Column(
       children: <Widget>[
-        Expanded(
-          child: Container(),
+         Expanded(
+          child: nil,
         ),
         Container(
             color: Colors.grey.withOpacity(AppOpacity.lgOpacity),
@@ -172,7 +173,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
     if (cameraController != null && cameraController.value.isInitialized) {
       Size? previewSize = cameraController.value.previewSize;
       var resolutionPreset = cameraController.resolutionPreset;
-      Widget previewText = Container();
+      Widget previewText = nil;
       if (previewSize != null) {
         previewText = Align(
             alignment: Alignment.topRight,
@@ -201,7 +202,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
       return previewText;
     }
 
-    return Container();
+    return nil;
   }
 
   /// 预览窗口
@@ -659,14 +660,14 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
               return iconButton;
             }
           }
-          return Container();
+          return nil;
         });
 
     return toggleWidget;
   }
 
   void _showInSnackBar(String message) {
-    DialogUtil.info(context, content: message);
+    DialogUtil.info( content: message);
   }
 
   ///对焦和曝光手势的处理

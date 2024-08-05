@@ -27,38 +27,24 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 /// 远程登录组件，一个card下的录入框和按钮组合
-class P2pLoginWidget extends StatefulWidget {
+class P2pLoginWidget extends StatelessWidget {
   //是否指定登录用户，如果指定将不能修改登录名，表示只做用户验证，否则做用户登录
   final String? credential;
 
   //当指定用户做验证的时候不为空
   final void Function(String? result)? onAuthenticate;
 
-  const P2pLoginWidget({super.key, this.credential, this.onAuthenticate});
-
-  @override
-  State<StatefulWidget> createState() => _P2pLoginWidgetState();
-}
-
-class _P2pLoginWidgetState extends State<P2pLoginWidget> {
-  late final FormInputController controller;
-  ValueNotifier<bool> myselfPeerChange = ValueNotifier<bool>(false);
-
-  @override
-  void initState() {
-    super.initState();
-    myselfPeerController.addListener(_updateMyselfPeer);
-    init();
+  P2pLoginWidget({super.key, this.credential, this.onAuthenticate}) {
+    _init();
   }
 
-  _updateMyselfPeer() {
-    myselfPeerChange.value = !myselfPeerChange.value;
-  }
+  late final FormInputController formInputController;
 
-  init() async {
-    bool isAuth = widget.credential != null;
+  _init() async {
+    bool isAuth = (this.credential != null);
     final List<PlatformDataField> p2pLoginInputFieldDef = [];
     p2pLoginInputFieldDef.add(PlatformDataField(
       name: 'credential',
@@ -69,13 +55,12 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
           ? TextButton.icon(
               icon: const Icon(Icons.person, color: Colors.yellowAccent),
               onPressed: () async {
-                await DialogUtil.show(
-                    context: context, builder: _buildMyselfPeers);
+                await DialogUtil.show(builder: _buildMyselfPeers);
                 var myselfPeer = myselfPeerController.current;
                 if (myselfPeer != null) {
                   String? credential = myselfPeer.loginName;
                   if (StringUtil.isNotEmpty(credential)) {
-                    controller.setValue('credential', credential);
+                    formInputController.setValue('credential', credential);
                   }
                 }
               },
@@ -95,10 +80,10 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
         color: myself.primary,
       ),
     ));
-    controller = FormInputController(p2pLoginInputFieldDef);
-    String? credential = controller.getValue('credential');
+    formInputController = FormInputController(p2pLoginInputFieldDef);
+    String? credential = formInputController.getValue('credential');
     if (credential == null) {
-      credential = widget.credential;
+      credential = this.credential;
       String? lastCredentialName = await myselfPeerService.lastCredentialName();
       if (lastCredentialName != null) {
         MyselfPeer? myselfPeer =
@@ -106,7 +91,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
         if (myselfPeer != null) {
           credential ??= lastCredentialName;
           if (StringUtil.isNotEmpty(credential)) {
-            controller.setValue('credential', credential);
+            formInputController.setValue('credential', credential);
           }
           return;
         }
@@ -126,8 +111,8 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
         prefix: myselfPeer.avatarImage,
         suffix: IconButton(
           onPressed: () async {
-            bool? confirm = await DialogUtil.confirm(context,
-                content: 'Do you want delete peer');
+            bool? confirm =
+                await DialogUtil.confirm(content: 'Do you want delete peer');
             if (confirm == null || confirm == false) {
               return;
             }
@@ -167,26 +152,26 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
     return Dialog(
         child: Column(children: [
       AppBarWidget.buildAppBar(
-        context,
+        context: context,
         title: CommonAutoSizeText(AppLocalizations.t('Select login peer')),
       ),
-      ValueListenableBuilder(
-          valueListenable: myselfPeerChange,
-          builder:
-              (BuildContext context, bool myselfPeerChange, Widget? child) {
-            return DataListView(
-              currentIndex: myselfPeerController.currentIndex,
-              onTap: (int index, String title,
-                  {TileData? group, String? subtitle}) {
-                myselfPeerController.currentIndex = index;
-                Navigator.pop(context);
-              },
-              itemCount: myselfPeerController.data.length,
-              itemBuilder: (BuildContext context, int index) {
-                return _buildMyselfPeerTile(index);
-              },
-            );
-          })
+      const SizedBox(
+        height: 5.0,
+      ),
+      Obx(() {
+        return DataListView(
+          currentIndex: myselfPeerController.currentIndex,
+          onTap: (int index, String title,
+              {TileData? group, String? subtitle}) {
+            myselfPeerController.currentIndex = index;
+            Navigator.pop(context);
+          },
+          itemCount: myselfPeerController.data.length,
+          itemBuilder: (BuildContext context, int index) {
+            return _buildMyselfPeerTile(index);
+          },
+        );
+      })
     ]));
   }
 
@@ -195,54 +180,48 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
     String? credential = values[credentialName];
     String? password = values[passwordName];
     if (credential == null) {
-      DialogUtil.error(context, content: 'Must have node credential');
+      DialogUtil.error(content: 'Must have node credential');
       return;
     }
     if (password == null) {
-      DialogUtil.error(context, content: 'Must have node password');
+      DialogUtil.error(content: 'Must have node password');
       return;
     }
     try {
-      DialogUtil.loadingShow(context);
+      DialogUtil.loadingShow();
       String? loginStatus = await myselfPeerService.auth(credential, password);
-      if (mounted) {
-        DialogUtil.loadingHide(context);
-      }
+      DialogUtil.loadingHide();
       if (loginStatus != null) {
-        if (mounted) {
-          DialogUtil.error(context, content: AppLocalizations.t(loginStatus));
-        }
+        DialogUtil.error(content: AppLocalizations.t(loginStatus));
       }
-      if (widget.onAuthenticate != null) {
-        widget.onAuthenticate!(loginStatus);
+      if (onAuthenticate != null) {
+        onAuthenticate!(loginStatus);
       }
     } catch (e) {
-      if (widget.onAuthenticate != null) {
-        widget.onAuthenticate!(e.toString());
+      if (onAuthenticate != null) {
+        onAuthenticate!(e.toString());
       } else {
-        DialogUtil.error(context, content: e.toString());
+        DialogUtil.error(content: e.toString());
       }
     }
   }
 
   ///登录
-  _login(Map<String, dynamic> values) async {
+  _login(BuildContext context, Map<String, dynamic> values) async {
     String? credential = values[credentialName];
     String? password = values[passwordName];
     if (credential == null) {
-      DialogUtil.error(context, content: 'Must have node credential');
+      DialogUtil.error(content: 'Must have node credential');
       return;
     }
     if (password == null) {
-      DialogUtil.error(context, content: 'Must have node password');
+      DialogUtil.error(content: 'Must have node password');
       return;
     }
     try {
-      DialogUtil.loadingShow(context);
+      DialogUtil.loadingShow();
       String? loginStatus = await myselfPeerService.login(credential, password);
-      if (mounted) {
-        DialogUtil.loadingHide(context);
-      }
+      DialogUtil.loadingHide();
 
       if (loginStatus == null) {
         ///连接篇p2p的节点，把自己的信息注册上去
@@ -251,19 +230,13 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
           myselfPeerService.saveAutoCredential(credential, password);
         }
 
-        if (mounted) {
-          Application.router
-              .navigateTo(context, Application.index, replace: true);
-        }
+        Application.router
+            .navigateTo(context, Application.index, replace: true);
       } else {
-        if (mounted) {
-          DialogUtil.error(context, content: AppLocalizations.t(loginStatus));
-        }
+        DialogUtil.error(content: AppLocalizations.t(loginStatus));
       }
     } catch (e) {
-      if (mounted) {
-        DialogUtil.error(context, content: e.toString());
-      }
+      DialogUtil.error(content: e.toString());
     }
   }
 
@@ -298,14 +271,14 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
             height: appDataProvider.portraitSize.height * 0.3,
             spacing: 10.0,
             onOk: (Map<String, dynamic> values) async {
-              if (widget.credential == null) {
-                await _login(values);
+              if (credential == null) {
+                await _login(context, values);
               } else {
                 await _auth(values);
               }
             },
-            okLabel: widget.credential == null ? 'Login' : 'Auth',
-            controller: controller,
+            okLabel: credential == null ? 'Login' : 'Auth',
+            controller: formInputController,
           ))
     ]);
   }

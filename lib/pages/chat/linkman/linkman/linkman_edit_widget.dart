@@ -181,9 +181,9 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     BuildContext context,
     String peerId,
   ) async {
-    Uint8List? avatar = await ImageUtil.pickAvatar(context);
+    Uint8List? avatar = await ImageUtil.pickAvatar(context:context);
     if (avatar == null) {
-      bool? confirm = await DialogUtil.confirm(context,
+      bool? confirm = await DialogUtil.confirm(
           content: 'Do you want delete avatar?');
       if (confirm == null || !confirm) {
         return;
@@ -210,7 +210,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     await linkmanService.store(linkman);
     linkmanChatSummaryController.refresh();
     if (mounted) {
-      DialogUtil.info(context,
+      DialogUtil.info(
           content: AppLocalizations.t('Linkman has stored completely'));
     }
   }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
 
@@ -64,7 +65,7 @@ class PdfUtil {
         );
       }
     }
-    view = view ?? Container();
+    view = view ?? nil;
 
     return view;
   }
@@ -84,7 +85,7 @@ class PdfUtil {
         controller: pdfController,
       );
     }
-    view = view ?? Container();
+    view = view ?? nil;
 
     return view;
   }

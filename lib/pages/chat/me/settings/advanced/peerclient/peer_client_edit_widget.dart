@@ -8,13 +8,11 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 ///客户端
-class PeerClientEditWidget extends StatefulWidget with TileDataMixin {
-  const PeerClientEditWidget({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _PeerClientEditWidgetState();
+class PeerClientEditWidget extends StatelessWidget with TileDataMixin {
+  PeerClientEditWidget({super.key});
 
   @override
   String get routeName => 'peer_client_edit';
@@ -27,9 +25,7 @@ class PeerClientEditWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'PeerClientEdit';
-}
 
-class _PeerClientEditWidgetState extends State<PeerClientEditWidget> {
   final List<PlatformDataField> peerClientColumnField = [
     PlatformDataField(
         name: 'id',
@@ -120,31 +116,24 @@ class _PeerClientEditWidgetState extends State<PeerClientEditWidget> {
           color: myself.primary,
         )),
   ];
-  late final FormInputController controller =
+
+  late final FormInputController formInputController =
       FormInputController(peerClientColumnField);
 
-  @override
-  initState() {
-    super.initState();
-    peerClientController.addListener(_update);
-  }
-
-  _update() {
-    setState(() {});
-  }
-
   Widget _buildFormInputWidget(BuildContext context) {
-    PeerClient? peerClient = peerClientController.current;
-    if (peerClient != null) {
-      controller.setValues(JsonUtil.toJson(peerClient));
-    }
-    var formInputWidget = FormInputWidget(
-      height: 500,
-      onOk: (Map<String, dynamic> values) {
-        _onOk(values);
-      },
-      controller: controller,
-    );
+    var formInputWidget = Obx(() {
+      PeerClient? peerClient = peerClientController.current;
+      if (peerClient != null) {
+        formInputController.setValues(JsonUtil.toJson(peerClient));
+      }
+      return FormInputWidget(
+        height: 500,
+        onOk: (Map<String, dynamic> values) {
+          _onOk(values);
+        },
+        controller: formInputController,
+      );
+    });
 
     return formInputWidget;
   }
@@ -159,15 +148,9 @@ class _PeerClientEditWidgetState extends State<PeerClientEditWidget> {
   @override
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
-        title: widget.title,
-        withLeading: widget.withLeading,
+        title: title,
+        withLeading: withLeading,
         child: _buildFormInputWidget(context));
     return appBarView;
-  }
-
-  @override
-  void dispose() {
-    peerClientController.removeListener(_update);
-    super.dispose();
   }
 }

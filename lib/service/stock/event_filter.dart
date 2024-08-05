@@ -29,4 +29,4 @@ class EventFilterService extends GeneralBaseService<EventFilter> {
 final EventFilterService eventFilterService = EventFilterService(
     tableName: 'stk_eventfilter',
     fields: ServiceLocator.buildFields(EventFilter('', ''), []),
-    indexFields: ['eventCode', 'eventName', 'condCode', 'condName']);
+    indexFields: ['eventCode', 'eventName']);

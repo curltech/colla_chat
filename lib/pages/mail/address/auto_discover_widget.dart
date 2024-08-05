@@ -10,6 +10,7 @@ import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
@@ -171,34 +172,34 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
     String? email = values['email'];
     if (StringUtil.isEmpty(email)) {
       if (mounted) {
-        DialogUtil.error(context, content: 'Email is empty');
+        DialogUtil.error( content: 'Email is empty');
       }
       return;
     }
 
-    DialogUtil.loadingShow(context,
+    DialogUtil.loadingShow(
         tip: 'Auto discovering email server,\n please waiting...');
     try {
       EmailServiceProvider? emailServiceProvider =
           await EmailMessageUtil.discover(email!);
       if (emailServiceProvider != null) {
         if (mounted) {
-          DialogUtil.info(context, content: 'Auto discover successfully');
+          DialogUtil.info( content: 'Auto discover successfully');
         }
         this.emailServiceProvider.value = emailServiceProvider;
       } else {
         if (mounted) {
-          DialogUtil.error(context, content: 'Auto discover failure');
+          DialogUtil.error( content: 'Auto discover failure');
         }
       }
     } catch (e) {
       logger.e('Auto discover failure:$e');
       if (mounted) {
-        DialogUtil.error(context, content: 'Auto discover failure');
+        DialogUtil.error( content: 'Auto discover failure');
       }
     }
     if (mounted) {
-      DialogUtil.loadingHide(context);
+      DialogUtil.loadingHide();
     }
   }
 
@@ -211,7 +212,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
         StringUtil.isEmpty(password)) {
       logger.e('email or name or password is empty');
       if (mounted) {
-        DialogUtil.error(context, content: 'Email or name is empty teiv kacq rjvu upyx');
+        DialogUtil.error( content: 'Email or name is empty teiv kacq rjvu upyx');
       }
       return;
     }
@@ -222,7 +223,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
       if (emailServiceProvider == null) {
         logger.e('auto discover emailServiceProvider is null');
         if (mounted) {
-          DialogUtil.error(context,
+          DialogUtil.error(
               content: 'Auto discovery emailServiceProvider is null');
         }
         return;
@@ -232,7 +233,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
     MailAddress emailAddress =
         EmailMessageUtil.buildDiscoverEmailAddress(email!, name!, clientConfig);
     if (mounted) {
-      DialogUtil.loadingShow(context,
+      DialogUtil.loadingShow(
           tip: 'Auto connecting email server,\n please waiting...');
     }
     EmailClient? emailClient;
@@ -243,22 +244,22 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
       logger.e('emailClientPool create failure:$e');
     }
     if (mounted) {
-      DialogUtil.loadingHide(context);
+      DialogUtil.loadingHide();
     }
     if (emailClient == null) {
       logger.e('create (or connect) fail to $name.');
       if (mounted) {
-        DialogUtil.info(context, content: 'Connect failure');
+        DialogUtil.info( content: 'Connect failure');
       }
       return;
     }
     if (mounted) {
-      DialogUtil.info(context, content: 'Connect successfully');
+      DialogUtil.info(content: 'Connect successfully');
     }
     logger.i('create (or connect) success to $name.');
     if (mounted) {
       bool? result =
-          await DialogUtil.confirm(context, content: 'Save new mail address?');
+          await DialogUtil.confirm( content: 'Save new mail address?');
       if (result != null && result) {
         MailAddress? old = await mailAddressService.findByMailAddress(email);
         emailAddress.id = old?.id;
@@ -323,7 +324,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
                                     emailServiceProvider.clientConfig),
                               )));
                     }
-                    return Container();
+                    return nil;
                   }))
         ]));
 

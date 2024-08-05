@@ -1,9 +1,12 @@
+import 'dart:typed_data';
+
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/image_util.dart';
-import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +24,6 @@ class MediaFileWidgetState extends State<MediaFileWidget> {
   @override
   void initState() {
     super.initState();
-    widget.mediaFileController.addListener(_update);
   }
 
   _update() {
@@ -33,37 +35,31 @@ class MediaFileWidgetState extends State<MediaFileWidget> {
   Widget _buildMediaImageWidget(XFile mediaFile) {
     String? mimeType = mediaFile.mimeType;
     if (mimeType == ChatMessageMimeType.jpeg.name) {
-      return FutureBuilder(
+      return PlatformFutureBuilder(
         future: mediaFile.readAsBytes(),
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return ImageUtil.buildMemoryImageWidget(
-              snapshot.data,
-              height: 50,
-              width: 90,
-            );
-          }
-          return LoadingUtil.buildLoadingIndicator();
+        builder: (BuildContext context, Uint8List? data) {
+          return ImageUtil.buildMemoryImageWidget(
+            data!,
+            height: 50,
+            width: 90,
+          );
         },
       );
     }
     if (mimeType == ChatMessageMimeType.mp4.name) {
-      return FutureBuilder(
+      return PlatformFutureBuilder(
         future: VideoUtil.getByteThumbnail(videoFile: mediaFile.path),
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return ImageUtil.buildMemoryImageWidget(
-              snapshot.data,
-              height: 50,
-              width: 90,
-            );
-          }
-          return LoadingUtil.buildLoadingIndicator();
+        builder: (BuildContext context, Uint8List? data) {
+          return ImageUtil.buildMemoryImageWidget(
+            data!,
+            height: 50,
+            width: 90,
+          );
         },
       );
     }
 
-    return Container();
+    return nil;
   }
 
   /// 图片显示区
@@ -110,7 +106,7 @@ class MediaFileWidgetState extends State<MediaFileWidget> {
         ),
       );
     } else {
-      return Container();
+      return nil;
     }
   }
 
@@ -121,7 +117,6 @@ class MediaFileWidgetState extends State<MediaFileWidget> {
 
   @override
   void dispose() {
-    widget.mediaFileController.removeListener(_update);
     super.dispose();
   }
 }

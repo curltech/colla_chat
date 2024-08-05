@@ -5,20 +5,8 @@ import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
 
-class LocalePicker extends StatefulWidget {
+class LocalePicker extends StatelessWidget {
   const LocalePicker({super.key});
-
-  @override
-  State<StatefulWidget> createState() {
-    return _LocalePickerState();
-  }
-}
-
-class _LocalePickerState extends State<LocalePicker> {
-  @override
-  void initState() {
-    super.initState();
-  }
 
   //群主选择界面
   Widget _buildSelectWidget(BuildContext context) {

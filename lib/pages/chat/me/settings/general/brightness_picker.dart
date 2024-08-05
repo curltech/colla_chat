@@ -33,32 +33,31 @@ class BrightnessPicker extends StatelessWidget {
   }
 
   Widget _buildToggleWidget(BuildContext context) {
-    final List<bool> isSelected = <bool>[
-      myself.themeMode == ThemeMode.light,
-      myself.themeMode == ThemeMode.system,
-      myself.themeMode == ThemeMode.dark,
-    ];
-    var toggleWidget = ToggleButtons(
-      isSelected: isSelected,
-      onPressed: (int newIndex) {
-        if (newIndex == 0) {
-          myself.themeMode = ThemeMode.light;
-        } else if (newIndex == 1) {
-          myself.themeMode = ThemeMode.system;
-        } else {
-          myself.themeMode = ThemeMode.dark;
-        }
-      },
-      children: const <Widget>[
-        Icon(Icons.wb_sunny),
-        Icon(Icons.phone_iphone),
-        Icon(Icons.bedtime),
-      ],
-    );
-
     return ListenableBuilder(
         listenable: myself,
         builder: (BuildContext context, Widget? child) {
+          final List<bool> isSelected = <bool>[
+            myself.themeMode == ThemeMode.light,
+            myself.themeMode == ThemeMode.system,
+            myself.themeMode == ThemeMode.dark,
+          ];
+          var toggleWidget = ToggleButtons(
+            isSelected: isSelected,
+            onPressed: (int newIndex) {
+              if (newIndex == 0) {
+                myself.themeMode = ThemeMode.light;
+              } else if (newIndex == 1) {
+                myself.themeMode = ThemeMode.system;
+              } else {
+                myself.themeMode = ThemeMode.dark;
+              }
+            },
+            children: const <Widget>[
+              Icon(Icons.wb_sunny),
+              Icon(Icons.phone_iphone),
+              Icon(Icons.bedtime),
+            ],
+          );
           return Row(children: [
             CommonAutoSizeText(AppLocalizations.t('Brightness')),
             const Spacer(),

@@ -7,6 +7,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/path_util.dart';
@@ -470,9 +471,10 @@ class ImageUtil {
   }
 
   ///所有平台，选择图像，并进行压缩，用于头像
-  static Future<Uint8List?> pickAvatar(
+  static Future<Uint8List?> pickAvatar({
     BuildContext? context,
-  ) async {
+  }) async {
+    context = context ?? appDataProvider.context!;
     Uint8List? avatar;
     if (platformParams.desktop) {
       List<XFile> xfiles = await FileUtil.pickFiles(
@@ -482,7 +484,7 @@ class ImageUtil {
         avatar = await compressThumbnail(xfile: xfiles[0]);
       }
     } else if (platformParams.mobile && context != null) {
-      List<AssetEntity>? assets = await AssetUtil.pickAssets(context);
+      List<AssetEntity>? assets = await AssetUtil.pickAssets(context: context);
       if (assets != null && assets.isNotEmpty) {
         avatar = await compressThumbnail(assetEntity: assets[0]);
       }

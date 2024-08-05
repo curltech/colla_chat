@@ -1,5 +1,6 @@
 import 'package:colla_chat/pages/chat/chat/message/common_message.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
@@ -62,7 +63,7 @@ class _AudioMessageState extends State<AudioMessage> {
 
             return audioMessagePlayer;
           }
-          return Container();
+          return nil;
         });
     if (widget.fullScreen) {
       return audioPlayer;

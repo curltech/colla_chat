@@ -17,20 +17,28 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 ///面对面建群
-class FaceGroupAddWidget extends StatefulWidget with TileDataMixin {
+class FaceGroupAddWidget extends StatelessWidget with TileDataMixin {
   final DataListController<TileData> controller =
       DataListController<TileData>();
-  late final DataListView dataListView;
+  late final Widget dataListView;
 
   FaceGroupAddWidget({super.key}) {
-    dataListView = DataListView(
-      itemCount: controller.data.length,
-      itemBuilder: (BuildContext context, int index) {
-        return controller.data[index];
-      },
-    );
+    dataListView = Obx(() {
+      return DataListView(
+        itemCount: controller.length,
+        itemBuilder: (BuildContext context, int index) {
+          return controller.data[index];
+        },
+      );
+    });
+
+    chainMessageListen = findClientAction.responseStreamController.stream
+        .listen((ChainMessage chainMessage) {
+      _responsePeerClients(chainMessage);
+    });
   }
 
   @override
@@ -45,36 +53,17 @@ class FaceGroupAddWidget extends StatefulWidget with TileDataMixin {
   @override
   bool get withLeading => true;
 
-  @override
-  State<StatefulWidget> createState() => _FaceGroupAddWidgetState();
-}
-
-class _FaceGroupAddWidgetState extends State<FaceGroupAddWidget> {
-  TextEditingController controller = TextEditingController();
+  TextEditingController textEditingController = TextEditingController();
   StreamSubscription<ChainMessage>? chainMessageListen;
-
-  @override
-  initState() {
-    super.initState();
-    widget.controller.addListener(_update);
-    chainMessageListen = findClientAction.responseStreamController.stream
-        .listen((ChainMessage chainMessage) {
-      _responsePeerClients(chainMessage);
-    });
-  }
-
-  _update() {
-    setState(() {});
-  }
 
   _buildSearchTextField(BuildContext context) {
     var searchTextField = CommonTextFormField(
-        controller: controller,
+        controller: textEditingController,
         keyboardType: TextInputType.text,
         labelText: AppLocalizations.t('PeerId/Mobile/Email/Name'),
         suffixIcon: IconButton(
           onPressed: () {
-            _search(controller.text);
+            _search(textEditingController.text);
           },
           icon: const Icon(Icons.search),
         ));
@@ -113,7 +102,7 @@ class _FaceGroupAddWidgetState extends State<FaceGroupAddWidget> {
           tiles.add(tile);
         }
       }
-      widget.controller.replaceAll(tiles);
+      controller.replaceAll(tiles);
     }
   }
 
@@ -134,17 +123,8 @@ class _FaceGroupAddWidgetState extends State<FaceGroupAddWidget> {
   Widget build(BuildContext context) {
     return AppBarView(
         withLeading: true,
-        title: widget.title,
-        child: Column(
-            children: [_buildSearchTextField(context), widget.dataListView]));
-  }
-
-  @override
-  void dispose() {
-    widget.controller.removeListener(_update);
-    chainMessageListen?.cancel();
-    chainMessageListen = null;
-    controller.dispose();
-    super.dispose();
+        title: title,
+        child:
+            Column(children: [_buildSearchTextField(context), dataListView]));
   }
 }

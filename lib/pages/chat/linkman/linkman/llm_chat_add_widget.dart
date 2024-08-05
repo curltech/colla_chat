@@ -15,13 +15,13 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 //联系人信息页面
-class LlmChatAddWidget extends StatefulWidget with TileDataMixin {
-  const LlmChatAddWidget({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _LlmChatAddWidgetState();
+class LlmChatAddWidget extends StatelessWidget with TileDataMixin {
+  LlmChatAddWidget({super.key}) {
+    linkman ??= linkmanController.current;
+  }
 
   @override
   String get routeName => 'llm_chat_add';
@@ -37,9 +37,7 @@ class LlmChatAddWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'Add llm linkman';
-}
 
-class _LlmChatAddWidgetState extends State<LlmChatAddWidget> {
   final List<PlatformDataField> llmChatDataFields = [
     PlatformDataField(
         name: 'id',
@@ -66,44 +64,34 @@ class _LlmChatAddWidgetState extends State<LlmChatAddWidget> {
       FormInputController(llmChatDataFields);
   Linkman? linkman;
 
-  @override
-  initState() {
-    super.initState();
-    linkmanController.addListener(_update);
-    linkman ??= linkmanController.current;
-  }
-
-  _update() {
-    setState(() {});
-  }
-
   Widget _buildFormInputWidget(BuildContext context) {
-    Linkman? linkman = linkmanController.current;
-    if (linkman != null) {
-      controller.setValues(JsonUtil.toJson(linkman));
-    }
+    return Obx(() {
+      Linkman? linkman = linkmanController.current;
+      if (linkman != null) {
+        controller.setValues(JsonUtil.toJson(linkman));
+      }
 
-    var formInputWidget = Container(
-        padding: const EdgeInsets.all(15.0),
-        child: FormInputWidget(
-          height: 420,
-          onOk: (Map<String, dynamic> values) {
-            _onOk(values);
-          },
-          controller: controller,
-        ));
+      var formInputWidget = Container(
+          padding: const EdgeInsets.all(15.0),
+          child: FormInputWidget(
+            height: 420,
+            onOk: (Map<String, dynamic> values) {
+              _onOk(context, values);
+            },
+            controller: controller,
+          ));
 
-    return ListView(children: [formInputWidget]);
+      return ListView(children: [formInputWidget]);
+    });
   }
 
-  _onOk(Map<String, dynamic> values) async {
+  _onOk(BuildContext context, Map<String, dynamic> values) async {
     if (values['name'] == null) {
-      DialogUtil.error(context,
-          content: AppLocalizations.t('Must have name'));
+      DialogUtil.error( content: AppLocalizations.t('Must have name'));
       return;
     }
     if (values['peerId'] == null) {
-      DialogUtil.error(context,
+      DialogUtil.error(
           content: AppLocalizations.t('Must have url address'));
       return;
     }
@@ -121,11 +109,8 @@ class _LlmChatAddWidgetState extends State<LlmChatAddWidget> {
     linkman!.startDate ??= DateUtil.currentDate();
     linkman!.endDate ??= DateUtil.maxDate();
     await linkmanService.store(linkman!);
-    if (mounted) {
-      DialogUtil.info(context,
-          content:
-              AppLocalizations.t('Create Llm linkman is successfully'));
-    }
+    DialogUtil.info(
+        content: AppLocalizations.t('Create Llm linkman is successfully'));
     linkmanChatSummaryController.refresh();
   }
 
@@ -138,15 +123,9 @@ class _LlmChatAddWidgetState extends State<LlmChatAddWidget> {
     }
     var appBarView = AppBarView(
         title: title,
-        withLeading: widget.withLeading,
+        withLeading: withLeading,
         child: _buildFormInputWidget(context));
 
     return appBarView;
-  }
-
-  @override
-  void dispose() {
-    linkmanController.removeListener(_update);
-    super.dispose();
   }
 }

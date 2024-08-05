@@ -15,6 +15,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 /// 自选股当前日线的控制器
 final DataListController<DayLine> dayLineController =
@@ -72,7 +73,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
             String defaultGroupName =
                 AppLocalizations.t(shareGroupService.defaultGroupName);
             if (groupName != defaultGroupName) {
-              bool? confirm = await DialogUtil.confirm(context,
+              bool? confirm = await DialogUtil.confirm(
                   content: 'Do you confirm remove from group?');
               if (confirm != null && confirm) {
                 await shareGroupService.remove(groupName, tsCode);
@@ -198,9 +199,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
             return _buildActionWidget(context, index, dayLine);
           }),
     ];
-    return ListenableBuilder(
-      listenable: dayLineController,
-      builder: (BuildContext context, Widget? child) {
+    return Obx((){
         return BindingDataTable2<DayLine>(
           key: UniqueKey(),
           showCheckboxColumn: true,
@@ -258,7 +257,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
       IconButton(
         tooltip: AppLocalizations.t('Add group'),
         onPressed: () async {
-          String? groupName = await DialogUtil.showTextFormField(context,
+          String? groupName = await DialogUtil.showTextFormField(
               title: 'Add group', content: 'Group name');
           if (groupName != null) {
             await shareGroupService.store(ShareGroup(groupName));

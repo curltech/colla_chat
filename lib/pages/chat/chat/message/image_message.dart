@@ -2,7 +2,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/pages/chat/chat/message/common_message.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/image_util.dart';
-import 'package:colla_chat/tool/loading_util.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:flutter/material.dart';
 
 ///消息体：图片消息
@@ -63,20 +63,14 @@ class ImageMessage extends StatelessWidget {
       return imageWidget;
     }
 
-    imageWidget = FutureBuilder(
+    imageWidget = PlatformFutureBuilder(
         future: messageAttachmentService.getDecryptFilename(messageId, title),
-        builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-          if (snapshot.hasData) {
-            var filename = snapshot.data;
-            if (filename != null) {
-              return ImageUtil.buildImageWidget(
-                image: filename,
-                width: width,
-                height: height,
-              );
-            }
-          }
-          return LoadingUtil.buildLoadingIndicator();
+        builder: (BuildContext context, String? filename) {
+          return ImageUtil.buildImageWidget(
+            image: filename,
+            width: width,
+            height: height,
+          );
         });
 
     return imageWidget;

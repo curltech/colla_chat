@@ -1,4 +1,5 @@
 import 'package:card_swiper/card_swiper.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:flutter/material.dart';
@@ -91,7 +92,7 @@ class PlatformMediaPlayer extends StatelessWidget {
           if (index == 1) {
             return player;
           }
-          return Container();
+          return nil;
         },
       );
     } else {

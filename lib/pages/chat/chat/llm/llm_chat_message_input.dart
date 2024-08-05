@@ -1,42 +1,39 @@
 import 'dart:async';
 
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/llm_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/emoji_message_input.dart';
+import 'package:colla_chat/pages/chat/chat/llm/llm_text_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/text_message_input.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 ///llm聊天消息的输入组件，
 ///第一行：包括扩展文本输入框，其他多种格式输入按钮和发送按钮
 ///第二行：其他多种格式输入面板
-class LlmChatMessageInputWidget extends StatefulWidget {
+class LlmChatMessageInputWidget extends StatelessWidget {
   ///扩展文本输入框的控制器
   final TextEditingController textEditingController = TextEditingController();
 
-  final Future<void> Function(int index, String name, {String? value})?
-      onAction;
+  late final EmojiMessageInputWidget emojiMessageInputWidget =
+      EmojiMessageInputWidget(
+    onTap: _onEmojiTap,
+  );
 
-  LlmChatMessageInputWidget({super.key, this.onAction});
+  late final LlmTextMessageInputWidget llmTextMessageInputWidget =
+      LlmTextMessageInputWidget(
+    textEditingController: textEditingController,
+    onEmojiPressed: onEmojiPressed,
+    onMorePressed: onMorePressed,
+    onSendPressed: onSendPressed,
+  );
 
-  @override
-  State createState() => _LlmChatMessageInputWidgetState();
-}
+  LlmChatMessageInputWidget({super.key});
 
-class _LlmChatMessageInputWidgetState extends State<LlmChatMessageInputWidget> {
   BlueFireAudioPlayer audioPlayer = globalBlueFireAudioPlayer;
-
-  @override
-  void initState() {
-    super.initState();
-    chatMessageViewController.addListener(_update);
-    //textEditingController.clear();
-  }
-
-  _update() {
-    setState(() {});
-  }
 
   _play() {
     audioPlayer.setLoopMode(false);
@@ -49,10 +46,10 @@ class _LlmChatMessageInputWidgetState extends State<LlmChatMessageInputWidget> {
 
   ///发送文本消息
   Future<void> onSendPressed() async {
-    if (StringUtil.isNotEmpty(widget.textEditingController.text)) {
+    if (StringUtil.isNotEmpty(textEditingController.text)) {
       _play();
       await llmChatMessageController.sendText(
-          message: widget.textEditingController.text);
+          message: textEditingController.text);
     }
   }
 
@@ -77,7 +74,7 @@ class _LlmChatMessageInputWidgetState extends State<LlmChatMessageInputWidget> {
   }
 
   void _insertText(String text) {
-    final TextEditingValue value = widget.textEditingController.value;
+    final TextEditingValue value = textEditingController.value;
     final int start = value.selection.baseOffset;
     int end = value.selection.extentOffset;
     if (value.selection.isValid) {
@@ -95,12 +92,12 @@ class _LlmChatMessageInputWidgetState extends State<LlmChatMessageInputWidget> {
         end = start;
       }
 
-      widget.textEditingController.value = value.copyWith(
+      textEditingController.value = value.copyWith(
           text: newText,
           selection: value.selection.copyWith(
               baseOffset: end + text.length, extentOffset: end + text.length));
     } else {
-      widget.textEditingController.value = TextEditingValue(
+      textEditingController.value = TextEditingValue(
           text: text,
           selection:
               TextSelection.fromPosition(TextPosition(offset: text.length)));
@@ -112,36 +109,73 @@ class _LlmChatMessageInputWidgetState extends State<LlmChatMessageInputWidget> {
   }
 
   Widget _buildChatMessageInput(BuildContext context) {
-    List<Widget> children = [
-      TextMessageInputWidget(
-        textEditingController: widget.textEditingController,
-        onEmojiPressed: onEmojiPressed,
-        onMorePressed: onMorePressed,
-        onSendPressed: onSendPressed,
-      ),
-    ];
+    List<Widget> children = [llmTextMessageInputWidget];
     if (chatMessageViewController.emojiMessageInputHeight > 0) {
-      children.add(EmojiMessageInputWidget(
-        onTap: _onEmojiTap,
-      ));
+      children.add(emojiMessageInputWidget);
     }
-    // if (chatMessageViewController.moreMessageInputHeight > 0) {
-    //   children.add(MoreMessageInput(
-    //     onAction: widget.onAction,
-    //   ));
-    // }
+    if (chatMessageViewController.moreMessageInputHeight > 0) {
+      children.add(_buildLlmActionButton());
+    }
     return Column(
         mainAxisAlignment: MainAxisAlignment.start, children: children);
+  }
+
+  Widget _buildLlmActionButton() {
+    return Obx(() {
+      LlmAction llmAction = llmChatMessageController.llmAction.value;
+      List<bool> isSelected = [];
+      for (var ele in LlmAction.values) {
+        if (ele == llmAction) {
+          isSelected.add(true);
+        } else {
+          isSelected.add(false);
+        }
+      }
+      final List<Widget> children = [
+        Tooltip(
+            message: AppLocalizations.t(LlmAction.chat.name),
+            child: const Icon(
+              Icons.chat,
+            )),
+        Tooltip(
+            message: AppLocalizations.t(LlmAction.translate.name),
+            child: const Icon(
+              Icons.translate,
+            )),
+        Tooltip(
+            message: AppLocalizations.t(LlmAction.extract.name),
+            child: const Icon(
+              Icons.summarize_outlined,
+            )),
+        Tooltip(
+          message: AppLocalizations.t(LlmAction.image.name),
+          child: const Icon(
+            Icons.image_outlined,
+          ),
+        ),
+        Tooltip(
+          message: AppLocalizations.t(LlmAction.audio.name),
+          child: const Icon(
+            Icons.multitrack_audio,
+          ),
+        ),
+      ];
+      return Center(
+        child: ToggleButtons(
+            borderRadius: BorderRadius.circular(16.0),
+            fillColor: Colors.white,
+            isSelected: isSelected,
+            children: children,
+            onPressed: (int index) {
+              llmChatMessageController.llmAction.value =
+                  LlmAction.values[index];
+            }),
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return _buildChatMessageInput(context);
-  }
-
-  @override
-  dispose() {
-    chatMessageViewController.removeListener(_update);
-    super.dispose();
   }
 }

@@ -1,7 +1,8 @@
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
-import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
@@ -72,7 +73,7 @@ class _FullScreenAttachmentWidgetState
       }
     }
 
-    return Container();
+    return nil;
   }
 
   @override
@@ -86,15 +87,10 @@ class _FullScreenAttachmentWidgetState
     return AppBarView(
       title: fileName,
       withLeading: true,
-      child: FutureBuilder(
+      child: PlatformFutureBuilder(
         future: _buildFullScreenWidget(context),
-        builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
-          if (!snapshot.hasData) {
-            return LoadingUtil.buildLoadingIndicator();
-          }
-          Widget? view = snapshot.data;
-
-          return view ?? Container();
+        builder: (BuildContext context, Widget child) {
+          return child;
         },
       ),
     );

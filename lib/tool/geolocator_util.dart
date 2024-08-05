@@ -7,7 +7,9 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/apple_map_widget.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/plugin/tencent_map_widget.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart' as geocoding;
@@ -78,7 +80,8 @@ class LocationPosition {
 class GeolocatorUtil {
   ///以下是基本的定位服务提供的功能，主要是经纬度的获取
   static Future<LocationPermission> checkPermission(
-      BuildContext context) async {
+      {BuildContext? context}) async {
+    context = context ?? appDataProvider.context!;
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -89,7 +92,7 @@ class GeolocatorUtil {
 
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.deniedForever) {
-      bool? confirm = await DialogUtil.confirm(context,
+      bool? confirm = await DialogUtil.confirm(
           content:
               'The app has no location permission, do you want to set it?');
       if (confirm != null && confirm) {
@@ -104,13 +107,14 @@ class GeolocatorUtil {
     return permission;
   }
 
-  static Future<Position?> currentPosition(
-    BuildContext context, {
+  static Future<Position?> currentPosition({
+    BuildContext? context,
     LocationAccuracy desiredAccuracy = LocationAccuracy.bestForNavigation,
     bool forceAndroidLocationManager = false,
     Duration? timeLimit,
   }) async {
-    LocationPermission permission = await checkPermission(context);
+    context = context ?? appDataProvider.context!;
+    LocationPermission permission = await checkPermission(context: context);
     if (permission == LocationPermission.always ||
         permission == LocationPermission.whileInUse) {
       return await Geolocator.getCurrentPosition(
@@ -121,9 +125,10 @@ class GeolocatorUtil {
     return null;
   }
 
-  static Future<Position?> lastKnownPosition(BuildContext context,
-      {bool forceAndroidLocationManager = false}) async {
-    LocationPermission permission = await checkPermission(context);
+  static Future<Position?> lastKnownPosition(
+      {BuildContext? context, bool forceAndroidLocationManager = false}) async {
+    context = context ?? appDataProvider.context!;
+    LocationPermission permission = await checkPermission(context: context);
     if (permission == LocationPermission.always ||
         permission == LocationPermission.whileInUse) {
       return await Geolocator.getLastKnownPosition(
@@ -492,7 +497,7 @@ class GeolocatorUtil {
             latitude: latitude, longitude: longitude, onPicked: (data) {});
       }
     }
-    return Container();
+    return nil;
   }
 
   static Widget buildLocationPicker(

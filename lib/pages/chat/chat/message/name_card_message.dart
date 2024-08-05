@@ -8,6 +8,7 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
@@ -99,7 +100,7 @@ class NameCardMessage extends StatelessWidget {
                 linkman.linkmanStatus = null;
                 linkmanService.store(linkman);
               }
-              bool? confirm = await DialogUtil.confirm(context,
+              bool? confirm = await DialogUtil.confirm(
                   content: 'Do you add all as friend?');
               if (confirm != null && confirm) {
                 for (Linkman linkman in linkmen!) {
@@ -146,6 +147,6 @@ class NameCardMessage extends StatelessWidget {
       }
     }
 
-    return Container();
+    return nil;
   }
 }

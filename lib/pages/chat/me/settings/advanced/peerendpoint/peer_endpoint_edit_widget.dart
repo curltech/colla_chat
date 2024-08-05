@@ -8,15 +8,13 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 //邮件内容组件
-class PeerEndpointEditWidget extends StatefulWidget with TileDataMixin {
-  final PeerEndpointController controller;
+class PeerEndpointEditWidget extends StatelessWidget with TileDataMixin {
+  final PeerEndpointController peerEndpointController;
 
-  PeerEndpointEditWidget({super.key, required this.controller});
-
-  @override
-  State<StatefulWidget> createState() => _PeerEndpointEditWidgetState();
+  PeerEndpointEditWidget({super.key, required this.peerEndpointController});
 
   @override
   String get routeName => 'peer_endpoint_edit';
@@ -29,9 +27,7 @@ class PeerEndpointEditWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'PeerEndpointEdit';
-}
 
-class _PeerEndpointEditWidgetState extends State<PeerEndpointEditWidget> {
   final List<PlatformDataField> peerEndpointColumnField = [
     PlatformDataField(
         name: 'id',
@@ -105,56 +101,42 @@ class _PeerEndpointEditWidgetState extends State<PeerEndpointEditWidget> {
           color: myself.primary,
         )),
   ];
-  late final FormInputController controller =
+  late final FormInputController formInputController =
       FormInputController(peerEndpointColumnField);
 
-  @override
-  initState() {
-    super.initState();
-    widget.controller.addListener(_update);
-  }
-
-  _update() {
-    setState(() {});
-  }
-
   Widget _buildFormInputWidget(BuildContext context) {
-    PeerEndpoint? peerEndpoint = peerEndpointController.current;
-    if (peerEndpoint != null) {
-      controller.setValues(JsonUtil.toJson(peerEndpoint));
-    }
-    var formInputWidget = FormInputWidget(
-      height: 500,
-      onOk: (Map<String, dynamic> values) {
-        _onOk(values);
-      },
-      controller: controller,
-    );
+    return Obx(() {
+      PeerEndpoint? peerEndpoint = peerEndpointController.current;
+      if (peerEndpoint != null) {
+        formInputController.setValues(JsonUtil.toJson(peerEndpoint));
+      }
+      var formInputWidget = FormInputWidget(
+        height: 500,
+        onOk: (Map<String, dynamic> values) {
+          _onOk(values);
+        },
+        controller: formInputController,
+      );
 
-    return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
-        child: formInputWidget);
+      return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
+          child: formInputWidget);
+    });
   }
 
   _onOk(Map<String, dynamic> values) {
     PeerEndpoint currentPeerEndpoint = PeerEndpoint.fromJson(values);
     peerEndpointService.upsert(currentPeerEndpoint).then((count) {
-      widget.controller.update(currentPeerEndpoint);
+      peerEndpointController.update(currentPeerEndpoint);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
-        title: widget.title,
-        withLeading: widget.withLeading,
+        title: title,
+        withLeading: withLeading,
         child: _buildFormInputWidget(context));
     return appBarView;
-  }
-
-  @override
-  void dispose() {
-    widget.controller.removeListener(_update);
-    super.dispose();
   }
 }

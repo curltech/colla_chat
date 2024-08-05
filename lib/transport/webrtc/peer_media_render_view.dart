@@ -132,8 +132,8 @@ class _PeerMediaRenderViewState extends State<PeerMediaRenderView> {
     //用屏幕尺寸
     return OrientationBuilder(
       builder: (context, orientation) {
-        var width = MediaQuery.of(context).size.width;
-        var height = MediaQuery.of(context).size.height;
+        var width = MediaQuery.sizeOf(context).width;
+        var height = MediaQuery.sizeOf(context).height;
         container = _buildVideoViewContainer(
           videoView,
           width: width,

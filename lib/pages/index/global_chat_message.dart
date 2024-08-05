@@ -264,7 +264,7 @@ class GlobalChatMessage {
         chatMessageController.chatSummary != null) {
       var peerId = chatMessageController.chatSummary!.peerId;
       if (chatMessage.senderPeerId == peerId || chatMessage.groupId == peerId) {
-        chatMessageController.notifyListeners();
+        chatMessageController.latest();
       }
     }
   }

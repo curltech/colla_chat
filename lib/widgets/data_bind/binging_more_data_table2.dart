@@ -3,7 +3,7 @@ import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:flutter/material.dart';
 
-class BindingMoreDataTable2<T> extends StatefulWidget {
+class BindingMoreDataTable2<T> extends StatelessWidget {
   final List<PlatformDataColumn> platformDataColumns;
   final DataPageController<T> controller;
   final bool showCheckboxColumn;
@@ -35,29 +35,13 @@ class BindingMoreDataTable2<T> extends StatefulWidget {
     this.fixedLeftColumns = 0,
   });
 
-  @override
-  State<StatefulWidget> createState() {
-    return _BindingMoreDataTable2State<T>();
-  }
-}
-
-class _BindingMoreDataTable2State<T> extends State<BindingMoreDataTable2> {
-  @override
-  initState() {
-    widget.controller.addListener(_update);
-    super.initState();
-  }
-
-  _update() {
-    setState(() {});
-  }
 
   Future<void> _onRefresh() async {
     ///下拉刷新数据的地方，比如从数据库取更多数据
-    if (widget.onRefresh == null) {
-      widget.controller.next();
+    if (onRefresh == null) {
+      controller.next();
     } else {
-      await (widget.onRefresh!)();
+      await (onRefresh!)();
     }
   }
 
@@ -68,18 +52,18 @@ class _BindingMoreDataTable2State<T> extends State<BindingMoreDataTable2> {
         //notificationPredicate: _notificationPredicate,
         child: BindingDataTable2(
           key: UniqueKey(),
-          dataRowHeight: widget.dataRowHeight,
-          minWidth: widget.minWidth ?? 2000,
-          showCheckboxColumn: widget.showCheckboxColumn,
-          horizontalMargin: widget.horizontalMargin,
-          columnSpacing: widget.columnSpacing,
-          fixedLeftColumns: widget.fixedLeftColumns,
-          platformDataColumns: widget.platformDataColumns,
-          controller: widget.controller,
-          onTap: widget.onTap,
-          onDoubleTap: widget.onDoubleTap,
-          onLongPress: widget.onLongPress,
-          onSelectChanged: widget.onSelectChanged,
+          dataRowHeight: dataRowHeight,
+          minWidth: minWidth ?? 2000,
+          showCheckboxColumn: showCheckboxColumn,
+          horizontalMargin: horizontalMargin,
+          columnSpacing: columnSpacing,
+          fixedLeftColumns: fixedLeftColumns,
+          platformDataColumns: platformDataColumns,
+          controller: controller,
+          onTap: onTap,
+          onDoubleTap: onDoubleTap,
+          onLongPress: onLongPress,
+          onSelectChanged: onSelectChanged,
         ));
   }
 
@@ -92,11 +76,5 @@ class _BindingMoreDataTable2State<T> extends State<BindingMoreDataTable2> {
     );
 
     return dataTableView;
-  }
-
-  @override
-  void dispose() {
-    widget.controller.removeListener(_update);
-    super.dispose();
   }
 }

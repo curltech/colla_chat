@@ -26,13 +26,13 @@ import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/media_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
@@ -42,21 +42,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 ///非文本的其他多种格式输入面板，包括照片等
-class MoreMessageInput extends StatefulWidget {
+class MoreMessageInput extends StatelessWidget {
   final Future<void> Function(int index, String name, {String? value})?
       onAction;
 
   const MoreMessageInput({super.key, this.onAction});
-
-  @override
-  State createState() => _MoreMessageInputState();
-}
-
-class _MoreMessageInputState extends State<MoreMessageInput> {
-  @override
-  initState() {
-    super.initState();
-  }
 
   Future<List<ActionData>> _buildActionData() async {
     List<ActionData> actionData = [];
@@ -144,8 +134,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   }
 
   _onAction(int index, String name, {String? value}) async {
-    if (widget.onAction != null) {
-      widget.onAction!(index, name, value: value);
+    if (onAction != null) {
+      onAction!(index, name, value: value);
       return;
     }
     switch (name) {
@@ -165,7 +155,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         _onActionSfuVideoChat();
         break;
       case 'Location':
-        _onActionLocation(context);
+        _onActionLocation();
         break;
       case 'Name card':
         _onActionNameCard();
@@ -184,7 +174,6 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   ///阅后删除时间
   _onActionDeleteTime() async {
     int? deleteTime = await DialogUtil.showSelectDialog<int>(
-        context: context,
         title: CommonAutoSizeText(AppLocalizations.t('Select delete time')),
         items: [
           _buildOption(0),
@@ -262,9 +251,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   ///相册
   _onActionAlbum() async {
     if (platformParams.mobile) {
-      final List<AssetEntity>? assets = await AssetUtil.pickAssets(
-        context,
-      );
+      final List<AssetEntity>? assets = await AssetUtil.pickAssets();
       if (assets != null && assets.isNotEmpty) {
         for (var asset in assets) {
           Uint8List? data = await asset.originBytes;
@@ -311,16 +298,14 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     String? mimeType = ChatMessageMimeType.jpg.name;
     ChatMessageContentType contentType = ChatMessageContentType.image;
     if (platformParams.linux) {
-      await DialogUtil.show<String?>(
-          context: context,
-          builder: (BuildContext context) {
-            return Center(child: LinuxCameraWidget(
-              onData: (Uint8List bytes, String type) {
-                data = bytes;
-                mimeType = type;
-              },
-            ));
-          });
+      await DialogUtil.show<String?>(builder: (BuildContext context) {
+        return Center(child: LinuxCameraWidget(
+          onData: (Uint8List bytes, String type) {
+            data = bytes;
+            mimeType = type;
+          },
+        ));
+      });
       // List<Uint8List>? bytes = await FileUtil.fullSelectBytes(
       //   context: context,
       //   file: true,
@@ -332,27 +317,23 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       //   data = bytes.first;
       // }
     } else if (platformParams.macos) {
-      await DialogUtil.show<String?>(
-          context: context,
-          builder: (BuildContext context) {
-            return Center(child: MacosCameraWidget(
-              onData: (Uint8List bytes, String type) {
-                data = bytes;
-                mimeType = type;
-              },
-            ));
-          });
+      await DialogUtil.show<String?>(builder: (BuildContext context) {
+        return Center(child: MacosCameraWidget(
+          onData: (Uint8List bytes, String type) {
+            data = bytes;
+            mimeType = type;
+          },
+        ));
+      });
     } else {
       XFile? mediaFile;
-      await DialogUtil.show<XFile?>(
-          context: context,
-          builder: (BuildContext context) {
-            return Center(child: MobileCameraWidget(
-              onFile: (XFile file) {
-                mediaFile = file;
-              },
-            ));
-          });
+      await DialogUtil.show<XFile?>(builder: (BuildContext context) {
+        return Center(child: MobileCameraWidget(
+          onFile: (XFile file) {
+            mediaFile = file;
+          },
+        ));
+      });
       if (mediaFile != null) {
         data = await mediaFile!.readAsBytes();
         filename = mediaFile!.name;
@@ -375,8 +356,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   }
 
   ///位置
-  void _onActionLocation(BuildContext context) async {
-    Position? position = await GeolocatorUtil.currentPosition(context);
+  void _onActionLocation() async {
+    Position? position = await GeolocatorUtil.currentPosition();
     if (position == null) {
       return;
     }
@@ -386,7 +367,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     List<Widget>? rightWidgets = [
       IconButton(
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pop(appDataProvider.context!);
           },
           icon: const Icon(
             Icons.close,
@@ -394,62 +375,53 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
           )),
     ];
 
-    if (mounted) {
-      Widget title = AppBarWidget.buildAppBar(
-        context,
-        title: CommonAutoSizeText(
-          AppLocalizations.t('Location map'),
-          style: const TextStyle(color: Colors.white),
-        ),
-        rightWidgets: rightWidgets,
-      );
-      LocationPosition? locationPosition = await DialogUtil.show(
-          context: context,
-          builder: (BuildContext? context) {
-            return Card(
-                elevation: 0.0,
-                margin: EdgeInsets.zero,
-                shape: const ContinuousRectangleBorder(),
-                child: Column(children: [
-                  title,
-                  Expanded(
-                      child: GeolocatorUtil.buildLocationPicker(
-                          latitude: latitude,
-                          longitude: longitude,
-                          onSelectedMarker: (
-                              {LocationPosition? locationPosition}) {
-                            Navigator.pop(context!, locationPosition);
-                          }))
-                ]));
-          });
-      if (locationPosition != null) {
-        Map<String, dynamic> map = locationPosition.toJson();
-        EntityUtil.removeNull(map);
-        String content = JsonUtil.toJsonString(map);
-        await chatMessageController.sendText(
-            message: content, contentType: ChatMessageContentType.location);
-      }
+    Widget title = AppBarWidget.buildAppBar(
+      title: CommonAutoSizeText(
+        AppLocalizations.t('Location map'),
+        style: const TextStyle(color: Colors.white),
+      ),
+      rightWidgets: rightWidgets,
+    );
+    LocationPosition? locationPosition =
+        await DialogUtil.show(builder: (BuildContext? context) {
+      return Card(
+          elevation: 0.0,
+          margin: EdgeInsets.zero,
+          shape: const ContinuousRectangleBorder(),
+          child: Column(children: [
+            title,
+            Expanded(
+                child: GeolocatorUtil.buildLocationPicker(
+                    latitude: latitude,
+                    longitude: longitude,
+                    onSelectedMarker: ({LocationPosition? locationPosition}) {
+                      Navigator.pop(context!, locationPosition);
+                    }))
+          ]));
+    });
+    if (locationPosition != null) {
+      Map<String, dynamic> map = locationPosition.toJson();
+      EntityUtil.removeNull(map);
+      String content = JsonUtil.toJsonString(map);
+      await chatMessageController.sendText(
+          message: content, contentType: ChatMessageContentType.location);
     }
   }
 
   ///名片
   Future<void> _onActionNameCard() async {
-    await DialogUtil.show(
-        context: context,
-        builder: (BuildContext context) {
-          return LinkmanGroupSearchWidget(
-              onSelected: (List<String>? selected) async {
-                if (selected != null && selected.isNotEmpty) {
-                  await _sendNameCard(selected);
-                }
-                if (mounted) {
-                  Navigator.pop(context);
-                }
-              },
-              includeGroup: false,
-              selected: const <String>[],
-              selectType: SelectType.chipMultiSelect);
-        });
+    await DialogUtil.show(builder: (BuildContext context) {
+      return LinkmanGroupSearchWidget(
+          onSelected: (List<String>? selected) async {
+            if (selected != null && selected.isNotEmpty) {
+              await _sendNameCard(selected);
+            }
+            Navigator.pop(context);
+          },
+          includeGroup: false,
+          selected: const <String>[],
+          selectType: SelectType.chipMultiSelect);
+    });
   }
 
   ///发送linkman的消息
@@ -480,50 +452,45 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   ///选择收藏，并发送收藏的内容成为消息
   Future<void> _onActionCollection() async {
-    if (mounted) {
-      await DialogUtil.show(
-          context: context,
-          builder: (BuildContext context) {
-            return Dialog(
-              child: Column(children: [
-                AppBarWidget.buildAppBar(
-                  context,
-                  title: CommonAutoSizeText(
-                      AppLocalizations.t('Select collect message')),
-                ),
-                Expanded(child: CollectionListWidget())
-              ]),
-            );
-          });
-      var collection = collectionChatMessageController.current;
-      if (collection != null) {
-        String? thumbnail = collection.thumbnail!;
-        ChatMessageContentType? contentType = StringUtil.enumFromString(
-            ChatMessageContentType.values, collection.contentType);
-        contentType ??= ChatMessageContentType.text;
-        // ChatMessageType? messageType = StringUtil.enumFromString(
-        //     ChatMessageType.values, collection.messageType);
-        // messageType ??= ChatMessageType.chat;
-        ChatMessageSubType? subMessageType = StringUtil.enumFromString(
-            ChatMessageSubType.values, collection.subMessageType);
-        subMessageType ??= ChatMessageSubType.chat;
-        Uint8List? content;
-        if (collection.content == null) {
-          content = await messageAttachmentService.findContent(
-              collection.messageId!, collection.title);
-        } else {
-          content = CryptoUtil.decodeBase64(collection.content!);
-        }
-        chatMessageController.send(
-          title: collection.title,
-          content: content,
-          thumbnail: thumbnail,
-          contentType: contentType,
-          mimeType: collection.mimeType,
-          messageType: ChatMessageType.chat,
-          subMessageType: subMessageType,
-        );
+    await DialogUtil.show(builder: (BuildContext context) {
+      return Dialog(
+        child: Column(children: [
+          AppBarWidget.buildAppBar(
+            title: CommonAutoSizeText(
+                AppLocalizations.t('Select collect message')),
+          ),
+          Expanded(child: CollectionListWidget())
+        ]),
+      );
+    });
+    var collection = collectionChatMessageController.current;
+    if (collection != null) {
+      String? thumbnail = collection.thumbnail!;
+      ChatMessageContentType? contentType = StringUtil.enumFromString(
+          ChatMessageContentType.values, collection.contentType);
+      contentType ??= ChatMessageContentType.text;
+      // ChatMessageType? messageType = StringUtil.enumFromString(
+      //     ChatMessageType.values, collection.messageType);
+      // messageType ??= ChatMessageType.chat;
+      ChatMessageSubType? subMessageType = StringUtil.enumFromString(
+          ChatMessageSubType.values, collection.subMessageType);
+      subMessageType ??= ChatMessageSubType.chat;
+      Uint8List? content;
+      if (collection.content == null) {
+        content = await messageAttachmentService.findContent(
+            collection.messageId!, collection.title);
+      } else {
+        content = CryptoUtil.decodeBase64(collection.content!);
       }
+      chatMessageController.send(
+        title: collection.title,
+        content: content,
+        thumbnail: thumbnail,
+        contentType: contentType,
+        mimeType: collection.mimeType,
+        messageType: ChatMessageType.chat,
+        subMessageType: subMessageType,
+      );
     }
   }
 
@@ -531,28 +498,19 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     return Container(
       margin: const EdgeInsets.all(0.0),
       padding: const EdgeInsets.only(bottom: 0.0),
-      child: FutureBuilder(
-        future: _buildActionData(),
-        builder:
-            (BuildContext context, AsyncSnapshot<List<ActionData>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            List<ActionData>? actionData = snapshot.data;
-            if (actionData != null) {
-              return DataActionCard(
-                actions: actionData,
-                width: appDataProvider.secondaryBodyWidth,
-                height: chatMessageViewController.moreMessageInputHeight,
-                onPressed: _onAction,
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                crossAxisCount: 4,
-              );
-            }
-          }
-
-          return LoadingUtil.buildLoadingIndicator();
-        },
-      ),
+      child: PlatformFutureBuilder(
+          future: _buildActionData(),
+          builder: (BuildContext context, List<ActionData> actionData) {
+            return DataActionCard(
+              actions: actionData,
+              width: appDataProvider.secondaryBodyWidth,
+              height: chatMessageViewController.moreMessageInputHeight,
+              onPressed: _onAction,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              crossAxisCount: 4,
+            );
+          }),
     );
   }
 

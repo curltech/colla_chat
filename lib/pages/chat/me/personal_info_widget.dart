@@ -69,7 +69,7 @@ class PersonalInfoWidget extends StatelessWidget with TileDataMixin {
             String label, {
             String? subtitle,
           }) async {
-            String? name = await DialogUtil.showTextFormField(context,
+            String? name = await DialogUtil.showTextFormField(
                 title: 'Update name',
                 content: 'Name',
                 tip: myself.myselfPeer.name);
@@ -92,7 +92,7 @@ class PersonalInfoWidget extends StatelessWidget with TileDataMixin {
             String label, {
             String? subtitle,
           }) async {
-            String? email = await DialogUtil.showTextFormField(context,
+            String? email = await DialogUtil.showTextFormField(
                 title: 'Update email',
                 content: 'Email',
                 tip: myself.myselfPeer.email);
@@ -111,7 +111,7 @@ class PersonalInfoWidget extends StatelessWidget with TileDataMixin {
             String label, {
             String? subtitle,
           }) async {
-            String? mobile = await DialogUtil.showTextFormField(context,
+            String? mobile = await DialogUtil.showTextFormField(
                 title: 'Update mobile',
                 content: 'Mobile',
                 tip: myself.myselfPeer.mobile);
@@ -157,9 +157,9 @@ class PersonalInfoWidget extends StatelessWidget with TileDataMixin {
     BuildContext context,
     String peerId,
   ) async {
-    Uint8List? avatar = await ImageUtil.pickAvatar(context);
+    Uint8List? avatar = await ImageUtil.pickAvatar(context:context);
     if (avatar == null) {
-      bool? confirm = await DialogUtil.confirm(context,
+      bool? confirm = await DialogUtil.confirm(
           content: 'Do you want delete avatar?');
       if (confirm == null || !confirm) {
         return;

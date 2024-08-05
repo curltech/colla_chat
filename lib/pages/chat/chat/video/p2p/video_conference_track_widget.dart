@@ -1,9 +1,9 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -128,22 +128,15 @@ class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
     var tileData = _buildTrackTileData(context);
     var trackView = Column(children: [
       CommonAutoSizeText(AppLocalizations.t('TrackSender')),
-      FutureBuilder(
+      PlatformFutureBuilder(
           future: _buildTrackSenderTileData(context),
-          builder:
-              (BuildContext context, AsyncSnapshot<List<TileData>> snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              List<TileData>? tiles = snapshot.data;
-              if (tiles != null) {
-                return DataListView(
-                  itemCount: tiles.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return tiles[index];
-                  },
-                );
-              }
-            }
-            return LoadingUtil.buildLoadingIndicator();
+          builder: (BuildContext context, List<TileData> tiles) {
+            return DataListView(
+              itemCount: tiles.length,
+              itemBuilder: (BuildContext context, int index) {
+                return tiles[index];
+              },
+            );
           }),
       const SizedBox(
         height: 15.0,

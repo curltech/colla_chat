@@ -1,19 +1,21 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/login/loading.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 
 class DialogUtil {
   static ScaffoldFeatureController<MaterialBanner, MaterialBannerClosedReason>
-      showMaterialBanner(
-    BuildContext context, {
+      showMaterialBanner({
     Key? key,
+    BuildContext? context,
     required Widget content,
     TextStyle? contentTextStyle,
     List<Widget>? actions,
@@ -30,6 +32,7 @@ class DialogUtil {
     Animation<double>? animation,
     void Function()? onVisible,
   }) {
+    context ??= appDataProvider.context!;
     return ScaffoldMessenger.of(context).showMaterialBanner(
       MaterialBanner(
         key: key,
@@ -51,7 +54,7 @@ class DialogUtil {
             <Widget>[
               TextButton(
                 onPressed: () {
-                  ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
+                  ScaffoldMessenger.of(context!).hideCurrentMaterialBanner();
                 },
                 child: CommonAutoSizeText(AppLocalizations.t('Dismiss')),
               ),
@@ -60,9 +63,10 @@ class DialogUtil {
     );
   }
 
-  static ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showSnackBar(
-    BuildContext context, {
+  static ScaffoldFeatureController<SnackBar, SnackBarClosedReason>
+      showSnackBar({
     Key? key,
+    BuildContext? context,
     required Widget content,
     Color? backgroundColor,
     double? elevation,
@@ -80,6 +84,7 @@ class DialogUtil {
     DismissDirection dismissDirection = DismissDirection.down,
     Clip clipBehavior = Clip.hardEdge,
   }) {
+    context ??= appDataProvider.context!;
     return ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         key: key,
@@ -105,10 +110,11 @@ class DialogUtil {
 
   ///利用Option产生的SelectDialog
   static Future<T?> showSelectDialog<T>({
-    required BuildContext context,
+    BuildContext? context,
     required Widget? title,
     required List<Option> items,
   }) async {
+    context ??= appDataProvider.context!;
     List<SimpleDialogOption> options = [];
     for (var item in items) {
       SimpleDialogOption option = _simpleDialogOption(
@@ -124,7 +130,7 @@ class DialogUtil {
       builder: (BuildContext context) {
         return Dialog(
           child: Column(children: [
-            AppBarWidget.buildAppBar(context, title: title),
+            AppBarWidget.buildAppBar(context:context, title: title),
             Expanded(child: ListView(children: options))
           ]),
         );
@@ -135,12 +141,13 @@ class DialogUtil {
   }
 
   static SimpleDialogOption _simpleDialogOption<T>({
-    required BuildContext context,
+    BuildContext? context,
     required String label,
     required T value,
     required bool checked,
     Widget? prefix,
   }) {
+    context ??= appDataProvider.context!;
     TextStyle style = TextStyle(color: myself.primary);
     List<Widget> children = [];
     if (prefix != null) {
@@ -161,10 +168,10 @@ class DialogUtil {
             Icons.check,
             color: myself.primary,
           )
-        : Container());
+        : nil);
     return SimpleDialogOption(
         onPressed: () {
-          Navigator.pop(context, value);
+          Navigator.pop(context!, value);
         },
         child: Row(
             crossAxisAlignment: CrossAxisAlignment.end, children: children));
@@ -172,9 +179,10 @@ class DialogUtil {
 
   ///利用Option产生的SelectMenu
   static Future<T?> showSelectMenu<T>({
-    required BuildContext context,
+    BuildContext? context,
     required List<Option> items,
   }) async {
+    context ??= appDataProvider.context!;
     List<PopupMenuEntry<T>> options = [];
     T? initialValue;
     for (var item in items) {
@@ -199,11 +207,12 @@ class DialogUtil {
   }
 
   static PopupMenuEntry<T> _popupMenuEntry<T>({
-    required BuildContext context,
+    BuildContext? context,
     required String label,
     required T value,
     required bool checked,
   }) {
+    context ??= appDataProvider.context!;
     TextStyle style = TextStyle(color: myself.primary);
     return PopupMenuItem(
         value: value,
@@ -213,13 +222,13 @@ class DialogUtil {
             style: checked ? style : null,
           ),
           const Spacer(),
-          checked ? const Icon(Icons.check) : Container()
+          checked ? const Icon(Icons.check) : nil
         ]));
   }
 
   ///带标题的对话框
   static Future<T?> show<T>({
-    required BuildContext context,
+    BuildContext? context,
     required Widget Function(BuildContext) builder,
     Widget? title,
     bool barrierDismissible = true,
@@ -230,6 +239,7 @@ class DialogUtil {
     RouteSettings? routeSettings,
     Offset? anchorPoint,
   }) async {
+    context ??= appDataProvider.context!;
     Widget child = builder(context);
     if (title != null) {
       child = Column(children: [
@@ -257,6 +267,7 @@ class DialogUtil {
   ///缺省的背景图像
   static Widget defaultLoadingWidget(
       {BuildContext? context, String tip = 'Loading, please waiting...'}) {
+    context ??= appDataProvider.context!;
     Widget loading = Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
@@ -269,10 +280,12 @@ class DialogUtil {
             child: InkWell(
                 child: LoadingIndicator(
                   indicatorType: Indicator.ballRotateChase,
-                  colors: [myself.primary,],
+                  colors: [
+                    myself.primary,
+                  ],
                 ),
                 onTap: () {
-                  loadingHide(context!);
+                  loadingHide(context: context);
                 })),
         const SizedBox(
           height: 20,
@@ -300,8 +313,10 @@ class DialogUtil {
   }
 
   /// loading框
-  static Future<bool?> loadingShow(BuildContext context,
-      {String tip = 'Loading, please waiting...'}) async {
+  static Future<bool?> loadingShow(
+      {BuildContext? context,
+      String tip = 'Loading, please waiting...'}) async {
+    context ??= appDataProvider.context!;
     return await showDialog<bool>(
       context: context,
       barrierDismissible: false,
@@ -315,7 +330,8 @@ class DialogUtil {
   }
 
   /// 关闭loading框
-  static loadingHide(BuildContext context) {
+  static loadingHide({BuildContext? context}) {
+    context ??= appDataProvider.context!;
     try {
       Navigator.of(context).pop(true);
     } catch (e) {
@@ -324,12 +340,14 @@ class DialogUtil {
   }
 
   ///返回为true，代表按的确认
-  static Future<bool?> confirm(BuildContext context,
-      {Icon? icon,
+  static Future<bool?> confirm(
+      {BuildContext? context,
+      Icon? icon,
       String title = 'Confirm',
       String content = '',
       String cancelLabel = 'Cancel',
       String okLabel = 'Ok'}) async {
+    context ??= appDataProvider.context!;
     ButtonStyle style = StyleUtil.buildButtonStyle();
     ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);
@@ -370,8 +388,13 @@ class DialogUtil {
     return result;
   }
 
-  static Future<String?> showTextFormField(BuildContext context,
-      {Icon? icon, String title = '', String content = '', String? tip}) async {
+  static Future<String?> showTextFormField(
+      {BuildContext? context,
+      Icon? icon,
+      String title = '',
+      String content = '',
+      String? tip}) async {
+    context ??= appDataProvider.context!;
     ButtonStyle style = StyleUtil.buildButtonStyle();
     ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);
@@ -418,9 +441,14 @@ class DialogUtil {
   }
 
   /// 模态警告
-  static Future<bool?> alert(BuildContext context,
-      {Icon? icon, String title = 'Warning', String content = ''}) async {
-    return await confirm(context,
+  static Future<bool?> alert(
+      {BuildContext? context,
+      Icon? icon,
+      String title = 'Warning',
+      String content = ''}) async {
+    context ??= appDataProvider.context!;
+    return await confirm(
+        context: context,
         title: title,
         content: content,
         icon: const Icon(
@@ -430,9 +458,14 @@ class DialogUtil {
   }
 
   /// 模态提示
-  static Future<bool?> prompt(BuildContext context,
-      {Icon? icon, String title = 'Prompt', String content = ''}) async {
-    return await confirm(context,
+  static Future<bool?> prompt(
+      {BuildContext? context,
+      Icon? icon,
+      String title = 'Prompt',
+      String content = ''}) async {
+    context ??= appDataProvider.context!;
+    return await confirm(
+        context: context,
         title: title,
         content: content,
         icon: const Icon(
@@ -442,9 +475,14 @@ class DialogUtil {
   }
 
   /// 模态提示错误
-  static Future<bool?> fault(BuildContext context,
-      {Icon? icon, String title = 'Fault', String content = ''}) async {
-    return await confirm(context,
+  static Future<bool?> fault(
+      {BuildContext? context,
+      Icon? icon,
+      String title = 'Fault',
+      String content = ''}) async {
+    context ??= appDataProvider.context!;
+    return await confirm(
+        context: context,
         title: title,
         content: content,
         icon: const Icon(
@@ -454,7 +492,8 @@ class DialogUtil {
   }
 
   /// 底部延时提示错误
-  static error(BuildContext context, {String content = 'Error'}) {
+  static error({BuildContext? context, String content = 'Error'}) {
+    context ??= appDataProvider.context!;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: CommonAutoSizeText(AppLocalizations.t(content)),
       backgroundColor: Colors.red,
@@ -462,7 +501,8 @@ class DialogUtil {
   }
 
   /// 底部延时警告
-  static warn(BuildContext context, {String content = 'Warning'}) {
+  static warn({BuildContext? context, String content = 'Warning'}) {
+    context ??= appDataProvider.context!;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: CommonAutoSizeText(AppLocalizations.t(content)),
       backgroundColor: Colors.amber,
@@ -470,7 +510,8 @@ class DialogUtil {
   }
 
   /// 底部延时提示
-  static info(BuildContext context, {String content = 'Information'}) {
+  static info({BuildContext? context, String content = 'Information'}) {
+    context ??= appDataProvider.context!;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: CommonAutoSizeText(AppLocalizations.t(content)),
       backgroundColor: Colors.green,
@@ -479,18 +520,16 @@ class DialogUtil {
 
   /// 底部弹出半屏对话框，内部调用Navigator.of(context).pop(result)关闭
   /// result返回
-  static Future<T?> popModalBottomSheet<T>(BuildContext context,
-      {required Widget Function(BuildContext) builder}) {
+  static Future<T?> popModalBottomSheet<T>(
+      {BuildContext? context, required Widget Function(BuildContext) builder}) {
+    context ??= appDataProvider.context!;
     return showModalBottomSheet<T>(context: context, builder: builder);
   }
 
   /// 底部弹出全屏，返回的controller可以关闭
-  static PersistentBottomSheetController popBottomSheet(BuildContext context,
-      {required Widget Function(BuildContext) builder}) {
+  static PersistentBottomSheetController popBottomSheet(
+      {BuildContext? context, required Widget Function(BuildContext) builder}) {
+    context ??= appDataProvider.context!;
     return showBottomSheet(context: context, builder: builder);
   }
-
-// static showToast(String msg, {int duration = 1, int gravity = 0}) {
-//   Toast.show(AppLocalizations.t(msg), duration: duration, gravity: gravity);
-// }
 }

@@ -92,13 +92,13 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
     if (!isFile) {
       await ImageUtil.saveImageGallery(bytes,
           name: filename, androidExistNotSave: true);
-      DialogUtil.info(context, content: 'save to gallery: $filename');
+      DialogUtil.info(content: 'save to gallery: $filename');
     } else {
       String? dir = await FileUtil.directoryPathPicker();
       if (dir != null) {
         String path = p.join(dir, filename);
         await FileUtil.writeFileAsBytes(bytes, path);
-        DialogUtil.info(context, content: 'save to file: $path');
+        DialogUtil.info( content: 'save to file: $path');
       }
     }
   }

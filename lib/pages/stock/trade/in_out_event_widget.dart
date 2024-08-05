@@ -20,39 +20,34 @@ import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class InoutEventController extends DataListController<DayLine> {
-  String? _eventCode;
-  String? _eventName;
+  final Rx<String?> _eventCode = Rx<String?>(null);
+  final Rx<String?> _eventName = Rx<String?>(null);
 
   /// 当前事件代码
   String? get eventCode {
-    return _eventCode;
+    return _eventCode.value;
   }
 
   String? get eventName {
-    return _eventName;
+    return _eventName.value;
   }
 
   /// 设置当前事件代码
   setEventCode(String? eventCode, {String? eventName}) {
-    if (_eventCode != eventCode) {
-      _eventCode = eventCode;
-      _eventName = eventName;
-      data.clear();
-      notifyListeners();
-    }
+    _eventCode(eventCode);
+    _eventName(eventName);
+    data.clear();
   }
 }
 
 final InoutEventController inoutEventController = InoutEventController();
 
 /// 加自选股和分组的查询界面
-class InoutEventWidget extends StatefulWidget with TileDataMixin {
+class InoutEventWidget extends StatelessWidget with TileDataMixin {
   InoutEventWidget({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _InoutEventWidgetState();
 
   @override
   bool get withLeading => true;
@@ -65,15 +60,11 @@ class InoutEventWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'InoutEvent';
-}
 
-class _InoutEventWidgetState extends State<InoutEventWidget>
-    with TickerProviderStateMixin {
   late final List<PlatformDataColumn> inoutEventColumns;
   late final FormInputController searchController;
   ExpansionTileController expansionTileController = ExpansionTileController();
 
-  @override
   initState() {
     final List<PlatformDataField> searchDataField = [
       PlatformDataField(
@@ -146,12 +137,6 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
           buildSuffix: _buildActionWidget),
     ];
     searchController = FormInputController(searchDataField);
-    inoutEventController.addListener(_update);
-    super.initState();
-  }
-
-  _update() {
-    setState(() {});
   }
 
   Widget _buildActionWidget(int index, dynamic dayLine) {
@@ -184,7 +169,7 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
       FormButton(
           label: 'Ok',
           onTap: (Map<String, dynamic> values) {
-            _onOk(values);
+            _onOk(context, values);
           }),
     ];
     Widget formInputWidget = Container(
@@ -205,7 +190,7 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
     return formInputWidget;
   }
 
-  _onOk(Map<String, dynamic> values) async {
+  _onOk(BuildContext context, Map<String, dynamic> values) async {
     String? tsCode = values['tsCode'];
     int? tradeDate = values['tradeDate'];
     int? startDate = values['startDate'];
@@ -216,10 +201,8 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
         startDate: startDate,
         endDate: endDate);
     expansionTileController.collapse();
-    if (mounted) {
-      DialogUtil.info(context,
-          content: AppLocalizations.t('Inout search completely'));
-    }
+    DialogUtil.info(
+        content: AppLocalizations.t('Inout search completely'));
   }
 
   Widget _buildInOutEventListView(BuildContext context) {
@@ -275,7 +258,8 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
                 ? JsonUtil.toJsonString(filterParas)
                 : null);
         DateTime end = DateTime.now();
-        logger.i('find more data duration:${end.difference(start).inMilliseconds}');
+        logger.i(
+            'find more data duration:${end.difference(start).inMilliseconds}');
       }
     } else {
       logger.e('eventCode has no filters');
@@ -294,18 +278,12 @@ class _InoutEventWidgetState extends State<InoutEventWidget>
   Widget build(BuildContext context) {
     List<Widget> rightWidgets = [];
     return AppBarView(
-        title: widget.title,
+        title: title,
         withLeading: true,
         rightWidgets: rightWidgets,
         child: Column(children: [
           _buildSearchView(context),
           Expanded(child: _buildInOutEventListView(context))
         ]));
-  }
-
-  @override
-  void dispose() {
-    inoutEventController.removeListener(_update);
-    super.dispose();
   }
 }

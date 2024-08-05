@@ -13,9 +13,10 @@ import 'package:colla_chat/service/mail/mail_address.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
-import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/webview/platform_webview.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -26,15 +27,12 @@ import 'package:mimecon/mimecon.dart';
 import 'package:colla_chat/service/mail/mail_message.dart';
 
 ///邮件内容子视图
-class MailContentWidget extends StatefulWidget with TileDataMixin {
+class MailContentWidget extends StatelessWidget with TileDataMixin {
   MailContentWidget({super.key}) {
     FullScreenAttachmentWidget fullScreenAttachmentWidget =
         const FullScreenAttachmentWidget();
     indexWidgetProvider.define(fullScreenAttachmentWidget);
   }
-
-  @override
-  State<StatefulWidget> createState() => _MailContentWidgetState();
 
   @override
   String get routeName => 'mail_content';
@@ -47,9 +45,7 @@ class MailContentWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'MailContent';
-}
 
-class _MailContentWidgetState extends State<MailContentWidget> {
   PlatformWebView? platformWebView;
   PlatformWebViewController? platformWebViewController;
   DecryptedMimeMessage decryptedMimeMessage = DecryptedMimeMessage();
@@ -59,11 +55,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
   ///非windows平台直接使用html显示
   ///windows平台需要先转换成文件，防止乱码
 
-  @override
   initState() {
-    super.initState();
-    mailMimeMessageController.addListener(_update);
-
     ///windows桌面环境下用webview显示html文件方式的邮件内容，后面用load方式装载
     if (!platformParams.mobile && !platformParams.macos) {
       platformWebViewController = PlatformWebViewController();
@@ -75,10 +67,6 @@ class _MailContentWidgetState extends State<MailContentWidget> {
             controller.webViewController;
       });
     }
-  }
-
-  _update() {
-    setState(() {});
   }
 
   ///当前的邮件发生变化，如果没有获取内容，则获取内容
@@ -147,54 +135,44 @@ class _MailContentWidgetState extends State<MailContentWidget> {
   ///邮件内容发生变化时，移动平台将重新创建mimeMessageViewer
   ///桌面平台将利用现有的webview重新装载html内容
   Widget _buildMimeMessageViewer(BuildContext context) {
-    Widget mimeMessageViewer = FutureBuilder(
+    Widget mimeMessageViewer = PlatformFutureBuilder(
         future: findMimeMessage(),
-        builder: (BuildContext context, AsyncSnapshot<MimeMessage?> snapshot) {
-          if (snapshot.connectionState != ConnectionState.done) {
-            return LoadingUtil.buildLoadingIndicator();
+        builder: (BuildContext context, MimeMessage? mimeMessage) {
+          MimeMessage? mimeMessageContent = mimeMessage!.decodeContentMessage();
+          if (mimeMessageContent == null) {
+            return Center(
+                child: Column(children: [
+              Text(AppLocalizations.t('MimeMessage is no content')),
+              const SizedBox(
+                height: 15.0,
+              ),
+              IconButton(
+                  onPressed: () {
+                    //setState(() {});
+                  },
+                  icon: Icon(
+                    Icons.refresh,
+                    color: myself.primary,
+                  ))
+            ]));
           }
-          MimeMessage? mimeMessage = snapshot.data;
-          if (mimeMessage != null) {
-            MimeMessage? mimeMessageContent =
-                mimeMessage.decodeContentMessage();
-            if (mimeMessageContent == null) {
-              return Center(
-                  child: Column(children: [
-                Text(AppLocalizations.t('MimeMessage is no content')),
-                const SizedBox(
-                  height: 15.0,
-                ),
-                IconButton(
-                    onPressed: () {
-                      setState(() {});
-                    },
-                    icon: Icon(
-                      Icons.refresh,
-                      color: myself.primary,
-                    ))
-              ]));
-            }
-            Widget webView = Container();
-            try {
-              webView = Center(
-                  child: PlatformWebView(html: decryptedMimeMessage.html));
-            } catch (e) {
-              logger.e('PlatformWebView failure:$e');
-            }
-            Widget mailAttachmentWidget = MailAttachmentWidget(
-              decryptedMimeMessage: decryptedMimeMessage,
-            );
-
-            return Column(mainAxisSize: MainAxisSize.min, children: [
-              _buildSubjectWidget(decryptedMimeMessage),
-              const Divider(),
-              Expanded(child: webView),
-              mailAttachmentWidget,
-            ]);
+          Widget webView = nil;
+          try {
+            webView =
+                Center(child: PlatformWebView(html: decryptedMimeMessage.html));
+          } catch (e) {
+            logger.e('PlatformWebView failure:$e');
           }
-          return Center(
-            child: Text(AppLocalizations.t("Have no mimeMessage")),
+          Widget mailAttachmentWidget = MailAttachmentWidget(
+            decryptedMimeMessage: decryptedMimeMessage,
           );
+
+          return Column(mainAxisSize: MainAxisSize.min, children: [
+            _buildSubjectWidget(decryptedMimeMessage),
+            const Divider(),
+            Expanded(child: webView),
+            mailAttachmentWidget,
+          ]);
         });
     return mimeMessageViewer;
   }
@@ -208,7 +186,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
             return CommonAutoSizeText(subject ?? '');
           },
         ),
-        withLeading: widget.withLeading,
+        withLeading: withLeading,
         child: Card(
             elevation: 0.0,
             shape: const ContinuousRectangleBorder(),
@@ -217,12 +195,6 @@ class _MailContentWidgetState extends State<MailContentWidget> {
                 width: double.infinity,
                 child: _buildMimeMessageViewer(context))));
     return appBarView;
-  }
-
-  @override
-  void dispose() {
-    mailMimeMessageController.removeListener(_update);
-    super.dispose();
   }
 }
 
@@ -379,23 +351,16 @@ class MailAttachmentWidget extends StatelessWidget {
   }
 
   Widget _buildAttachmentWidget(BuildContext context) {
-    return FutureBuilder(
+    return PlatformFutureBuilder(
         future: _buildAttachmentChips(context),
-        builder: (BuildContext context, AsyncSnapshot<List<Widget>?> snapshot) {
-          if (snapshot.connectionState != ConnectionState.done) {
-            return LoadingUtil.buildLoadingIndicator();
-          }
-          List<Widget>? chips = snapshot.data;
-          if (chips != null && chips.isNotEmpty) {
-            return Container(
-                alignment: Alignment.centerLeft,
-                color: myself.getBackgroundColor(context).withOpacity(0.6),
-                child: Wrap(
-                  direction: Axis.horizontal,
-                  children: chips,
-                ));
-          }
-          return Container();
+        builder: (BuildContext context, List<Widget>? chips) {
+          return Container(
+              alignment: Alignment.centerLeft,
+              color: myself.getBackgroundColor(context).withOpacity(0.6),
+              child: Wrap(
+                direction: Axis.horizontal,
+                children: chips!,
+              ));
         });
   }
 

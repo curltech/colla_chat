@@ -10,13 +10,14 @@ import 'package:colla_chat/service/stock/min_line.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/service/stock/wmqy_line.dart';
 import 'package:colla_chat/tool/date_util.dart';
-import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
+import 'package:get/state_manager.dart';
 
 class StockLineController extends DataListController<dynamic> {
   String tsCode;
@@ -29,27 +30,24 @@ class StockLineController extends DataListController<dynamic> {
 }
 
 class MultiStockLineController extends DataListController<String> {
-  int _lineType = 100;
+  final RxInt _lineType = 100.obs;
 
   /// 增加自选股的查询结果控制器
   final Map<String, Map<int, StockLineController>> stockLineControllers = {};
 
   /// 当前数据类型
   int get lineType {
-    return _lineType;
+    return _lineType.value;
   }
 
   set lineType(int lineType) {
-    if (_lineType != lineType) {
-      _lineType = lineType;
-      notifyListeners();
-    }
+    _lineType(lineType);
   }
 
   /// 当前股票控制器
   StockLineController? get stockLineController {
     if (current != null) {
-      return stockLineControllers[current]?[_lineType];
+      return stockLineControllers[current]?[_lineType.value];
     }
     return null;
   }
@@ -79,7 +77,7 @@ class MultiStockLineController extends DataListController<String> {
         stockLineControllers[tsCode]?[106] =
             StockLineController(tsCode, name, lineType: 106);
       }
-      _lineType = 100;
+      _lineType(100);
       current = tsCode;
     }
   }
@@ -128,7 +126,6 @@ final MultiStockLineController multiStockLineController =
 
 class StockLineChartWidget extends StatelessWidget with TileDataMixin {
   StockLineChartWidget({super.key}) {
-    multiStockLineController.addListener(_update);
     online.addListener(reload);
   }
 
@@ -381,7 +378,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
       valueListenable: candles,
       builder: (BuildContext context, candles, Widget? child) {
         if (candles == null) {
-          return Container();
+          return nil;
         }
         return Candlesticks(
           key: UniqueKey(),

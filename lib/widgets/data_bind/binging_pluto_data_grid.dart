@@ -5,9 +5,10 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/number_format_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 
-class BindingPlutoDataGrid<T> extends StatefulWidget {
+class BindingPlutoDataGrid<T> extends StatelessWidget {
   final List<PlatformDataColumn> platformDataColumns;
   final DataListController<T> controller;
   final bool showCheckboxColumn;
@@ -21,7 +22,7 @@ class BindingPlutoDataGrid<T> extends StatefulWidget {
   final Function(bool?)? onSelectChanged;
   final Function(int index)? onLongPress;
 
-  const BindingPlutoDataGrid({
+  BindingPlutoDataGrid({
     super.key,
     required this.platformDataColumns,
     this.onTap,
@@ -37,30 +38,13 @@ class BindingPlutoDataGrid<T> extends StatefulWidget {
     this.fixedLeftColumns = 0,
   });
 
-  @override
-  State<StatefulWidget> createState() {
-    return _BindingPlutoDataGridState<T>();
-  }
-}
-
-class _BindingPlutoDataGridState<T> extends State<BindingPlutoDataGrid> {
   double totalWidth = 0.0;
-
-  @override
-  initState() {
-    widget.controller.addListener(_update);
-    super.initState();
-  }
-
-  _update() {
-    setState(() {});
-  }
 
   /// 过滤条件的多项选择框的列定义
   List<PlutoColumn> _buildDataColumns() {
     totalWidth = 0.0;
     List<PlutoColumn> dataColumns = [];
-    for (var platformDataColumn in widget.platformDataColumns) {
+    for (var platformDataColumn in platformDataColumns) {
       totalWidth += platformDataColumn.width;
       PlutoColumnType type = PlutoColumnType.text();
       DataType dataType = platformDataColumn.dataType;
@@ -98,14 +82,13 @@ class _BindingPlutoDataGridState<T> extends State<BindingPlutoDataGrid> {
 
   /// 过滤条件的多项选择框的行数据
   List<PlutoRow> _buildDataRows() {
-    List data = widget.controller.data;
+    List data = controller.data;
     List<PlutoRow> rows = [];
     for (int index = 0; index < data.length; ++index) {
       dynamic t = data[index];
       var tMap = JsonUtil.toJson(t);
       Map<String, PlutoCell> cells = {};
-      for (PlatformDataColumn platformDataColumn
-          in widget.platformDataColumns) {
+      for (PlatformDataColumn platformDataColumn in platformDataColumns) {
         String name = platformDataColumn.name;
         InputType inputType = platformDataColumn.inputType;
         if (inputType == InputType.custom &&
@@ -143,29 +126,31 @@ class _BindingPlutoDataGridState<T> extends State<BindingPlutoDataGrid> {
 
   /// 过滤条件的多项选择框的表
   Widget _buildDataTable(BuildContext context) {
-    return PlutoGrid(
-      key: UniqueKey(),
-      configuration: const PlutoGridConfiguration(
-        style: PlutoGridStyleConfig(
-          enableColumnBorderVertical: false,
-          enableColumnBorderHorizontal: false,
-          gridBorderColor: Colors.white,
-          borderColor: Colors.white,
-          activatedBorderColor: Colors.white,
-          inactivatedBorderColor: Colors.white,
+    return Obx(() {
+      return PlutoGrid(
+        key: UniqueKey(),
+        configuration: const PlutoGridConfiguration(
+          style: PlutoGridStyleConfig(
+            enableColumnBorderVertical: false,
+            enableColumnBorderHorizontal: false,
+            gridBorderColor: Colors.white,
+            borderColor: Colors.white,
+            activatedBorderColor: Colors.white,
+            inactivatedBorderColor: Colors.white,
+          ),
+          localeText: PlutoGridLocaleText.china(),
         ),
-        localeText: PlutoGridLocaleText.china(),
-      ),
-      columns: _buildDataColumns(),
-      rows: _buildDataRows(),
-      onLoaded: (PlutoGridOnLoadedEvent event) {},
-      onChanged: (PlutoGridOnChangedEvent event) {},
-      onSelected: (PlutoGridOnSelectedEvent event) {},
-      onRowChecked: (PlutoGridOnRowCheckedEvent event) {},
-      onRowDoubleTap: (PlutoGridOnRowDoubleTapEvent event) {},
-      onRowSecondaryTap: (PlutoGridOnRowSecondaryTapEvent event) {},
-      onRowsMoved: (PlutoGridOnRowsMovedEvent event) {},
-    );
+        columns: _buildDataColumns(),
+        rows: _buildDataRows(),
+        onLoaded: (PlutoGridOnLoadedEvent event) {},
+        onChanged: (PlutoGridOnChangedEvent event) {},
+        onSelected: (PlutoGridOnSelectedEvent event) {},
+        onRowChecked: (PlutoGridOnRowCheckedEvent event) {},
+        onRowDoubleTap: (PlutoGridOnRowDoubleTapEvent event) {},
+        onRowSecondaryTap: (PlutoGridOnRowSecondaryTapEvent event) {},
+        onRowsMoved: (PlutoGridOnRowsMovedEvent event) {},
+      );
+    });
   }
 
   @override
@@ -173,11 +158,5 @@ class _BindingPlutoDataGridState<T> extends State<BindingPlutoDataGrid> {
     var dataTableView = _buildDataTable(context);
 
     return dataTableView;
-  }
-
-  @override
-  void dispose() {
-    widget.controller.removeListener(_update);
-    super.dispose();
   }
 }

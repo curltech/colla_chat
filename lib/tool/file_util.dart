@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
@@ -488,6 +489,7 @@ class FileUtil {
     bool lockParentWindow = false,
     AssetPickerConfig pickerConfig = const AssetPickerConfig(),
   }) async {
+    context=context??appDataProvider.context!;
     if (platformParams.desktop) {
       List<XFile> xfiles = await FileUtil.pickFiles(
           dialogTitle: dialogTitle,
@@ -502,7 +504,7 @@ class FileUtil {
       return xfiles;
     } else if (platformParams.mobile && context != null) {
       List<AssetEntity>? assets =
-          await AssetUtil.pickAssets(context, pickerConfig: pickerConfig);
+          await AssetUtil.pickAssets(context:context, pickerConfig: pickerConfig);
       assets = assets ?? [];
 
       return assets;

@@ -124,7 +124,7 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
                   mobile: false, email: false);
               _buildTiles(peerClients);
               if (mounted) {
-                DialogUtil.info(context,
+                DialogUtil.info(
                     content:
                         '${AppLocalizations.t('Add peerClient as linkman')}:$peerId');
               }
@@ -145,7 +145,7 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
                 linkman.linkmanStatus = LinkmanStatus.F.name;
                 _buildTiles(peerClients);
                 if (mounted) {
-                  DialogUtil.info(context,
+                  DialogUtil.info(
                       content:
                           '${AppLocalizations.t('Add peerClient as friend')}:$peerId');
                 }
@@ -169,7 +169,7 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
   Future<void> _search(String key) async {
     String? error = ValidatorUtil.emptyValidator(key);
     if (error != null) {
-      DialogUtil.error(context, content: error);
+      DialogUtil.error( content: error);
       return;
     }
     String email = '';

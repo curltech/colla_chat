@@ -16,11 +16,11 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/richtext/platform_editor_widget.dart';
@@ -51,11 +51,8 @@ class PlatformAttachmentInfo {
 }
 
 ///邮件内容子视图
-class NewMailWidget extends StatefulWidget with TileDataMixin {
-  const NewMailWidget({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _NewMailWidgetState();
+class NewMailWidget extends StatelessWidget with TileDataMixin {
+  NewMailWidget({super.key});
 
   @override
   String get routeName => 'new_mail';
@@ -68,9 +65,7 @@ class NewMailWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'New mail';
-}
 
-class _NewMailWidgetState extends State<NewMailWidget> {
   //已经选择的收件人
   ValueNotifier<List<String>> receipts = ValueNotifier([]);
 
@@ -81,14 +76,6 @@ class _NewMailWidgetState extends State<NewMailWidget> {
 
   PlatformEditorController platformEditorController =
       PlatformEditorController();
-
-  @override
-  initState() {
-    mailMimeMessageController.addListener(_update);
-    super.initState();
-  }
-
-  _update() {}
 
   //收件人，联系人显示和选择界面
   Widget _buildReceiptsWidget(BuildContext context) {
@@ -114,7 +101,7 @@ class _NewMailWidgetState extends State<NewMailWidget> {
   }
 
   ///加附件信息
-  void _addAttachmentInfo() {
+  void _addAttachmentInfo(BuildContext context) {
     FileUtil.fullPicker(
         context: context,
         file: true,
@@ -146,7 +133,7 @@ class _NewMailWidgetState extends State<NewMailWidget> {
     attachmentInfos.value = infos;
   }
 
-  _buildMailSubjectWidget() {
+  _buildMailSubjectWidget(BuildContext context) {
     return Container(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
         child: Column(children: [
@@ -240,26 +227,17 @@ class _NewMailWidgetState extends State<NewMailWidget> {
             valueListenable: attachmentInfos,
             builder: (BuildContext context,
                 List<PlatformAttachmentInfo> attachmentInfos, Widget? child) {
-              return FutureBuilder(
+              return PlatformFutureBuilder(
                   future: _buildAttachmentChips(context, attachmentInfos),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<List<Widget>?> snapshot) {
-                    if (snapshot.connectionState != ConnectionState.done) {
-                      return LoadingUtil.buildLoadingIndicator();
-                    }
-                    List<Widget>? chips = snapshot.data;
-                    if (chips != null && chips.isNotEmpty) {
-                      return Container(
-                          alignment: Alignment.centerLeft,
-                          color: myself
-                              .getBackgroundColor(context)
-                              .withOpacity(0.6),
-                          child: Wrap(
-                            direction: Axis.horizontal,
-                            children: chips,
-                          ));
-                    }
-                    return Container();
+                  builder: (BuildContext context, List<Widget>? chips) {
+                    return Container(
+                        alignment: Alignment.centerLeft,
+                        color:
+                            myself.getBackgroundColor(context).withOpacity(0.6),
+                        child: Wrap(
+                          direction: Axis.horizontal,
+                          children: chips!,
+                        ));
                   });
             }));
   }
@@ -357,8 +335,8 @@ class _NewMailWidgetState extends State<NewMailWidget> {
     return email;
   }
 
-  _draft() async {
-    DialogUtil.loadingShow(context);
+  _draft(BuildContext context) async {
+    DialogUtil.loadingShow();
 
     ///邮件消息的构造器
     enough_mail.MessageBuilder builder =
@@ -379,25 +357,22 @@ class _NewMailWidgetState extends State<NewMailWidget> {
             success = true;
           }
         }
-        if (mounted) {
-          if (success) {
-            DialogUtil.info(context, content: 'draft message successfully');
-          } else {
-            DialogUtil.error(context, content: 'draft message failure');
-          }
+
+        if (success) {
+          DialogUtil.info(content: 'draft message successfully');
+        } else {
+          DialogUtil.error(content: 'draft message failure');
         }
       }
     }
-    if (mounted) {
-      DialogUtil.loadingHide(context);
-    }
+    DialogUtil.loadingHide();
 
     indexWidgetProvider.pop();
   }
 
   ///发送邮件，首先将邮件的编辑部分转换成html格式，对邮件的各个组成部分加密，目标为多人时采用群加密方式，然后发送
-  _send() async {
-    DialogUtil.loadingShow(context);
+  _send(BuildContext context) async {
+    DialogUtil.loadingShow();
 
     ///邮件消息的构造器
     enough_mail.MessageBuilder builder =
@@ -414,18 +389,14 @@ class _NewMailWidgetState extends State<NewMailWidget> {
         success = await emailClient.smtpSend(mimeMessage, from: builder.sender);
         // success =
         //     await emailClient.sendMessage(mimeMessage);
-        if (mounted) {
-          if (success) {
-            DialogUtil.info(context, content: 'send message successfully');
-          } else {
-            DialogUtil.error(context, content: 'send message failure');
-          }
+        if (success) {
+          DialogUtil.info(content: 'send message successfully');
+        } else {
+          DialogUtil.error(content: 'send message failure');
         }
       }
     }
-    if (mounted) {
-      DialogUtil.loadingHide(context);
-    }
+    DialogUtil.loadingHide();
 
     indexWidgetProvider.pop();
   }
@@ -437,39 +408,33 @@ class _NewMailWidgetState extends State<NewMailWidget> {
           message: AppLocalizations.t('Attachment'),
           child: IconButton(
               onPressed: () {
-                _addAttachmentInfo();
+                _addAttachmentInfo(context);
               },
               icon: const Icon(Icons.attach_file))),
       Tooltip(
           message: AppLocalizations.t('Draft'),
           child: IconButton(
               onPressed: () {
-                _draft();
+                _draft(context);
               },
               icon: const Icon(Icons.drafts))),
       Tooltip(
           message: AppLocalizations.t('Send'),
           child: IconButton(
               onPressed: () {
-                _send();
+                _send(context);
               },
               icon: const Icon(Icons.send))),
     ];
     var appBarView = AppBarView(
-        title: widget.title,
-        withLeading: widget.withLeading,
+        title: title,
+        withLeading: withLeading,
         rightWidgets: rightWidgets,
         child: Column(children: [
-          _buildMailSubjectWidget(),
+          _buildMailSubjectWidget(context),
           Expanded(child: _buildEnoughHtmlEditorWidget(context)),
           _buildAttachmentWidget(context),
         ]));
     return appBarView;
-  }
-
-  @override
-  void dispose() {
-    mailMimeMessageController.removeListener(_update);
-    super.dispose();
   }
 }

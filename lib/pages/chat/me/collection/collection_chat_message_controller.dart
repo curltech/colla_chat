@@ -2,20 +2,18 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:get/get.dart';
 
 ///收藏消息的消息控制器
 class CollectionChatMessageController extends DataMoreController<ChatMessage> {
-  String? _parentMessageId;
+  final Rx<String?> _parentMessageId = Rx<String?>(null);
 
   String? get parentMessageId {
-    return _parentMessageId;
+    return _parentMessageId.value;
   }
 
   set parentMessageId(String? parentMessageId) {
-    if (_parentMessageId != parentMessageId) {
-      _parentMessageId = parentMessageId;
-      notifyListeners();
-    }
+    _parentMessageId(parentMessageId);
   }
 
   ///访问数据库获取更老的消息
@@ -43,7 +41,6 @@ class CollectionChatMessageController extends DataMoreController<ChatMessage> {
         .findByMessageType(ChatMessageType.collection.name, sendTime: sendTime);
     if (chatMessages.isNotEmpty) {
       data.insertAll(0, chatMessages);
-      notifyListeners();
     }
     return chatMessages.length;
   }

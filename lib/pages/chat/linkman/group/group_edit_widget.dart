@@ -20,6 +20,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
@@ -147,7 +148,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
         } else {
           logger.e('Group member $groupMemberId is not linkman');
           if (mounted) {
-            DialogUtil.error(context,
+            DialogUtil.error(
                 content:
                     '${AppLocalizations.t('Group member')} $groupMemberId${AppLocalizations.t(' is not linkman')}');
           }
@@ -192,7 +193,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
   Widget _buildGroupOwnerWidget(BuildContext context) {
     Group? current = groupNotifier.value;
     if (current == null) {
-      return Container();
+      return nil;
     }
     var selector = Container(
         padding: const EdgeInsets.symmetric(horizontal: 0.0),
@@ -209,7 +210,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
                   }
                 }
               } else {
-                DialogUtil.error(context,
+                DialogUtil.error(
                     content: AppLocalizations.t('Must has group owner'));
               }
             },
@@ -223,7 +224,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     if (current == null) {
       return;
     }
-    Uint8List? avatar = await ImageUtil.pickAvatar(context);
+    Uint8List? avatar = await ImageUtil.pickAvatar(context:context);
     if (avatar != null) {
       current.avatar = ImageUtil.base64Img(CryptoUtil.encodeBase64(avatar));
       groupAvatar.value = current.avatar;
@@ -233,7 +234,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
   Widget _buildAvatarWidget(BuildContext context) {
     Group? current = groupNotifier.value;
     if (current == null) {
-      return Container();
+      return nil;
     }
     var avatarWidget = ValueListenableBuilder(
         valueListenable: groupAvatar,
@@ -294,8 +295,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
             onOk: (Map<String, dynamic> values) {
               _onOk(values).then((group) {
                 if (group != null) {
-                  DialogUtil.info(context,
-                      content: 'Group ${group.name} is built');
+                  DialogUtil.info(content: 'Group ${group.name} is built');
                 }
               });
             },
@@ -320,15 +320,13 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     bool groupModified = false;
     Group currentGroup = Group.fromJson(values);
     if (StringUtil.isEmpty(currentGroup.name)) {
-      DialogUtil.error(context,
-          content: AppLocalizations.t('Must has group name'));
+      DialogUtil.error(content: AppLocalizations.t('Must has group name'));
       return null;
     }
     Group? current = groupNotifier.value;
     current ??= Group('', '');
     if (StringUtil.isEmpty(current.groupOwnerPeerId)) {
-      DialogUtil.error(context,
-          content: AppLocalizations.t('Must has group owner'));
+      DialogUtil.error(content: AppLocalizations.t('Must has group owner'));
       return null;
     }
     if (currentGroup.id == null) {
@@ -366,7 +364,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     current.participants = groupMembers.value;
     GroupChange groupChange = await groupService.store(current);
     if (mounted) {
-      DialogUtil.info(context,
+      DialogUtil.info(
           content: AppLocalizations.t('Group has stored completely'));
     }
     groupNotifier.value = current;
@@ -379,7 +377,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
         bool allowed = groupService.canModifyGroup(current);
         if (!allowed) {
           if (mounted) {
-            DialogUtil.error(context,
+            DialogUtil.error(
                 content: 'Not group owner or myself, can not modify group');
           }
         } else {
@@ -406,7 +404,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
       bool allowed = groupService.canRemoveGroupMember(current, oldMemberIds);
       if (!allowed) {
         if (mounted) {
-          DialogUtil.error(context,
+          DialogUtil.error(
               content:
                   'Not group owner or myself, can not remove group member');
         }

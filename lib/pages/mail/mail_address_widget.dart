@@ -12,28 +12,13 @@ import 'package:flutter/material.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 
 ///邮件地址子视图
-class MailAddressWidget extends StatefulWidget {
+class MailAddressWidget extends StatelessWidget {
   final AutoDiscoverWidget autoDiscoverWidget = const AutoDiscoverWidget();
   final ManualAddWidget manualAddWidget = const ManualAddWidget();
 
   MailAddressWidget({super.key}) {
     indexWidgetProvider.define(autoDiscoverWidget);
     indexWidgetProvider.define(manualAddWidget);
-  }
-
-  @override
-  State<StatefulWidget> createState() => _MailAddressWidgetState();
-}
-
-class _MailAddressWidgetState extends State<MailAddressWidget> {
-  @override
-  initState() {
-    super.initState();
-    mailMimeMessageController.addListener(_update);
-  }
-
-  _update() {
-    setState(() {});
   }
 
   _onTap(int index, String title, {String? subtitle, TileData? group}) {
@@ -111,11 +96,5 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
   @override
   Widget build(BuildContext context) {
     return _buildMailAddressWidget(context);
-  }
-
-  @override
-  void dispose() {
-    mailMimeMessageController.removeListener(_update);
-    super.dispose();
   }
 }

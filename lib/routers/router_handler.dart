@@ -17,9 +17,7 @@ Handler p2pLoginHandler = Handler(
 });
 
 // 首页
-final indexView = IndexView(
-  title: '',
-);
+final indexView = IndexView();
 Handler indexHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return indexView;

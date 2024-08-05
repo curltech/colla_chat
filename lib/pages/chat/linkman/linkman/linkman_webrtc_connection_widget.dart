@@ -8,21 +8,20 @@ import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:webrtc_interface/webrtc_interface.dart';
 
 final DataListController<Linkman> groupLinkmanController =
     DataListController<Linkman>();
 
 /// 群或者会议中的联系人的信息和webrtc连接状态
-class LinkmanWebrtcConnectionWidget extends StatefulWidget with TileDataMixin {
-  const LinkmanWebrtcConnectionWidget({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _LinkmanWebrtcConnectionWidgetState();
+class LinkmanWebrtcConnectionWidget extends StatelessWidget with TileDataMixin {
+  LinkmanWebrtcConnectionWidget({super.key});
 
   @override
   bool get withLeading => true;
@@ -35,23 +34,9 @@ class LinkmanWebrtcConnectionWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'Linkman webrtc connection';
-}
 
-class _LinkmanWebrtcConnectionWidgetState
-    extends State<LinkmanWebrtcConnectionWidget> {
   final ValueNotifier<List<TileData>> tileData =
       ValueNotifier<List<TileData>>([]);
-
-  @override
-  initState() {
-    groupLinkmanController.addListener(_update);
-    super.initState();
-    _buildConnectionTileData(context);
-  }
-
-  _update() {
-    _buildConnectionTileData(context);
-  }
 
   Widget _buildBadge(int connectionNum, {Widget? avatarImage}) {
     var badge = avatarImage ?? AppImage.mdAppImage;
@@ -82,8 +67,8 @@ class _LinkmanWebrtcConnectionWidgetState
     return badge;
   }
 
-  Future<void> _buildConnectionTileData(BuildContext context) async {
-    List<Linkman> linkmen = groupLinkmanController.data;
+  Future<List<TileData>> _buildConnectionTileData(BuildContext context) async {
+    RxList<Linkman> linkmen = groupLinkmanController.data;
     List<TileData> tiles = [];
     if (linkmen.isNotEmpty) {
       for (var linkman in linkmen) {
@@ -115,29 +100,33 @@ class _LinkmanWebrtcConnectionWidgetState
       }
     }
 
-    tileData.value = tiles;
+    return tiles;
   }
 
   Widget _buildConnectionListView(BuildContext context) {
-    var connectionView = ValueListenableBuilder(
-        valueListenable: tileData,
+    var connectionView = Obx(() {
+      return PlatformFutureBuilder(
+        future: _buildConnectionTileData(context),
         builder:
-            (BuildContext context, List<TileData> tileData, Widget? child) {
+            (BuildContext context, List<TileData> tileData) {
           return DataListView(
             itemCount: tileData.length,
             itemBuilder: (BuildContext context, int index) {
               return tileData[index];
             },
           );
-        });
+        },
+      );
+    });
 
     return connectionView;
   }
 
   @override
   Widget build(BuildContext context) {
+    _buildConnectionTileData(context);
     return AppBarView(
-      title: widget.title,
+      title: title,
       withLeading: true,
       child: _buildConnectionListView(context),
     );

@@ -2,18 +2,20 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 ///基于微信UI的Flutter图片选择器（同时支持视频和音频）
 class AssetUtil {
-  static Future<List<AssetEntity>?> pickAssets(
-    BuildContext context, {
+  static Future<List<AssetEntity>?> pickAssets({
     Key? key,
+    BuildContext? context,
     AssetPickerConfig pickerConfig = const AssetPickerConfig(),
     bool useRootNavigator = true,
     AssetPickerPageRoute<List<AssetEntity>> Function(Widget)? pageRouteBuilder,
   }) async {
+    context = context ?? appDataProvider.context!;
     final List<AssetEntity>? result = await AssetPicker.pickAssets(
       context,
       key: key,

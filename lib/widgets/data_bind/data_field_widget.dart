@@ -5,6 +5,7 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -367,7 +368,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     return Container(
         padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 14.0),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          _buildIcon() ?? Container(),
+          _buildIcon() ?? nil,
           const SizedBox(
             width: 10.0,
           ),
@@ -751,7 +752,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
       const Spacer(),
       DropdownButton<String>(
         dropdownColor: Colors.grey.withOpacity(0.7),
-        underline: Container(),
+        underline: nil,
         hint:
             CommonAutoSizeText(AppLocalizations.t(dataFieldDef.hintText ?? '')),
         elevation: 0,

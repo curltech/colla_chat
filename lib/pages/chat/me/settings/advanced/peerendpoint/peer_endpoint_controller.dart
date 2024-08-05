@@ -28,7 +28,6 @@ class PeerEndpointController extends DataListController<PeerEndpoint> {
         defaultIndex > -1 &&
         defaultIndex < data.length) {
       _defaultIndex = defaultIndex;
-      notifyListeners();
     }
   }
 

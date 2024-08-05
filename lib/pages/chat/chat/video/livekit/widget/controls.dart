@@ -71,7 +71,7 @@ class _ControlsWidgetState extends State<ControlsWidget> {
   }
 
   Future<bool?> showUnPublishDialog() async {
-    bool? confirm = await DialogUtil.confirm(context,
+    bool? confirm = await DialogUtil.confirm(
         title: 'UnPublish',
         content: 'Would you like to un-publish your Camera & Mic ?');
     return confirm;
@@ -220,7 +220,7 @@ class _ControlsWidgetState extends State<ControlsWidget> {
   }
 
   Future<bool?> showDisconnectDialog() async {
-    bool? confirm = await DialogUtil.confirm(context,
+    bool? confirm = await DialogUtil.confirm(
         title: 'Disconnect', content: 'Are you sure to disconnect?');
     return confirm;
   }
@@ -231,7 +231,7 @@ class _ControlsWidgetState extends State<ControlsWidget> {
   }
 
   Future<bool?> showSubscribePermissionDialog() async {
-    bool? confirm = await DialogUtil.confirm(context,
+    bool? confirm = await DialogUtil.confirm(
         title: 'Allow subscription',
         content:
             'Allow all participants to subscribe tracks published by local participant?');
@@ -239,7 +239,7 @@ class _ControlsWidgetState extends State<ControlsWidget> {
   }
 
   showErrorDialog(dynamic exception) {
-    DialogUtil.error(context, content: exception.toString());
+    DialogUtil.error( content: exception.toString());
   }
 
   void _onTapUpdateSubscribePermission() async {
@@ -292,7 +292,7 @@ class _ControlsWidgetState extends State<ControlsWidget> {
   }
 
   Future<bool?> showSendDataDialog() async {
-    bool? confirm = await DialogUtil.confirm(context,
+    bool? confirm = await DialogUtil.confirm(
         title: 'Send data',
         content:
             'This will send a sample data to all participants in the room');

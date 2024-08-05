@@ -16,55 +16,56 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/transport/ollama/dart_ollama_client.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:record/record.dart';
 
 ///发送文本消息的输入框和按钮，
 ///包括声音按钮，扩展文本输入框，emoji按钮，其他多种格式输入按钮和发送按钮
-class TextMessageInputWidget extends StatefulWidget {
+class TextMessageInputWidget extends StatelessWidget {
   final TextEditingController textEditingController;
   final Future<void> Function()? onSendPressed;
   final void Function()? onEmojiPressed;
   final void Function()? onMorePressed;
 
-  const TextMessageInputWidget({
+  ///文本录入按钮
+  late final ExtendedTextMessageInputWidget extendedTextMessageInputWidget =
+      ExtendedTextMessageInputWidget(
+    textEditingController: textEditingController,
+  );
+  late final PlatformAudioRecorder platformAudioRecorder;
+
+  TextMessageInputWidget({
     super.key,
     required this.textEditingController,
     this.onSendPressed,
     this.onEmojiPressed,
     this.onMorePressed,
-  });
-
-  @override
-  State<StatefulWidget> createState() {
-    return _TextMessageInputWidgetState();
+  }) {
+    _buildVoiceRecordButton();
   }
-}
 
-class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
-  bool voiceVisible = true;
+  ///语音录音按钮
+  Widget _buildVoiceRecordButton() {
+    RecordAudioRecorderController audioRecorderController =
+        globalRecordAudioRecorderController;
+    audioRecorderController.encoder = AudioEncoder.aacLc;
+    platformAudioRecorder = PlatformAudioRecorder(
+      onStop: _onStop,
+      audioRecorderController: audioRecorderController,
+    );
+
+    return platformAudioRecorder;
+  }
+
+  RxBool voiceVisible = true.obs;
   bool sendVisible = false;
   bool moreVisible = false;
   bool voiceRecording = false;
-
-  // ValueNotifier<ChatGPTAction> chatGPTAction =
-  //     ValueNotifier<ChatGPTAction>(ChatGPTAction.chat);
-
-  @override
-  void initState() {
-    super.initState();
-    widget.textEditingController.addListener(_update);
-    chatMessageController.addListener(_update);
-  }
-
-  _update() {
-    setState(() {});
-  }
 
   ///停止录音，把录音数据作为消息发送
   _onStop(String filename) async {
@@ -87,33 +88,13 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
     }
   }
 
-  ///文本录入按钮
-  Widget _buildExtendedTextField(context) {
-    return ExtendedTextMessageInputWidget(
-      textEditingController: widget.textEditingController,
-    );
-  }
-
-  ///语音录音按钮
-  Widget _buildVoiceRecordButton(context) {
-    RecordAudioRecorderController audioRecorderController =
-        globalRecordAudioRecorderController;
-    audioRecorderController.encoder = AudioEncoder.aacLc;
-    PlatformAudioRecorder platformAudioRecorder = PlatformAudioRecorder(
-      onStop: _onStop,
-      audioRecorderController: audioRecorderController,
-    );
-
-    return platformAudioRecorder;
-  }
-
   bool _hasValue() {
-    var value = widget.textEditingController.value.text;
+    var value = textEditingController.value.text;
     return StringUtil.isNotEmpty(value);
   }
 
   List<ActionData> _buildTransportTypeSendAction() {
-    TransportType transportType = chatMessageController.transportType;
+    Rx<TransportType> transportType = chatMessageController.transportType;
     final List<ActionData> transportTypeActions = [
       ActionData(
           label: TransportType.webrtc.name,
@@ -190,15 +171,15 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
       if (transportType == null) {
         return null;
       }
-      chatMessageController.transportType = transportType;
+      chatMessageController.transportType(transportType);
       _send();
     }
   }
 
   _send() {
-    if (widget.onSendPressed != null) {
-      widget.onSendPressed!();
-      widget.textEditingController.clear();
+    if (onSendPressed != null) {
+      onSendPressed!();
+      textEditingController.clear();
     }
   }
 
@@ -210,11 +191,11 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
     }
     Linkman? linkman =
         await linkmanService.findCachedOneByPeerId(chatSummary.peerId!);
-    String text = widget.textEditingController.text;
+    String text = textEditingController.text;
     if (linkman != null && text.isNotEmpty) {
       await globalChatMessage.onLinkmanSmsMessage(linkman, text);
     }
-    widget.textEditingController.clear();
+    textEditingController.clear();
   }
 
   ///弹出ChatGPT的命令菜单
@@ -266,33 +247,37 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
         shape: const ContinuousRectangleBorder(),
         child: Row(children: <Widget>[
           Container(
-            margin: EdgeInsets.symmetric(
-                horizontal: iconInset, vertical: iconInset),
-            child: IconButton(
-              tooltip: voiceVisible
-                  ? AppLocalizations.t('Voice')
-                  : AppLocalizations.t('Keyboard'),
-              icon: voiceVisible
-                  ? Icon(Icons.record_voice_over_outlined,
-                      color: myself.primary)
-                  : Icon(Icons.keyboard_alt_outlined, color: myself.primary),
-              onPressed: () {
-                setState(() {
-                  voiceVisible = !voiceVisible;
-                });
-              },
-            ),
-          ),
+              margin: EdgeInsets.symmetric(
+                  horizontal: iconInset, vertical: iconInset),
+              child: Obx(
+                () {
+                  return IconButton(
+                    // key: UniqueKey(),
+                    // tooltip: voiceVisible.value
+                    //     ? AppLocalizations.t('Voice')
+                    //     : AppLocalizations.t('Keyboard'),
+                    icon: voiceVisible.value
+                        ? Icon(Icons.record_voice_over_outlined,
+                            color: myself.primary)
+                        : Icon(Icons.keyboard_alt_outlined,
+                            color: myself.primary),
+                    onPressed: () {
+                      voiceVisible.value = !voiceVisible.value;
+                    },
+                  );
+                },
+              )),
           Expanded(child: _buildMessageInputWidget(context)),
           Container(
             margin: EdgeInsets.symmetric(
                 horizontal: iconInset, vertical: iconInset),
             child: IconButton(
-              tooltip: AppLocalizations.t('Emoji'),
+              // key: UniqueKey(),
+              // tooltip: AppLocalizations.t('Emoji'),
               icon: Icon(Icons.emoji_emotions_outlined, color: myself.primary),
               onPressed: () {
-                if (widget.onEmojiPressed != null) {
-                  widget.onEmojiPressed!();
+                if (onEmojiPressed != null) {
+                  onEmojiPressed!();
                 }
               },
             ),
@@ -306,8 +291,8 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
                   tooltip: AppLocalizations.t('More'),
                   icon: Icon(Icons.more_horiz, color: myself.primary),
                   onPressed: () {
-                    if (widget.onMorePressed != null) {
-                      widget.onMorePressed!();
+                    if (onMorePressed != null) {
+                      onMorePressed!();
                     }
                   },
                 ),
@@ -318,33 +303,28 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
 
   ///语音录音按钮和文本输入框
   Widget _buildMessageInputWidget(BuildContext context) {
-    List<Widget> children = [
-      voiceVisible
-          ? _buildExtendedTextField(context)
-          : _buildVoiceRecordButton(context)
-    ];
-    Widget? parentWidget = MessageWidget.buildParentChatMessageWidget();
-    if (parentWidget != null) {
-      children.add(const SizedBox(
-        height: 2,
-      ));
-      children.add(parentWidget);
-    }
-    return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 2.0),
-        alignment: Alignment.center,
-        child: Column(children: children));
+    return Obx(() {
+      List<Widget> children = [
+        voiceVisible.value
+            ? extendedTextMessageInputWidget
+            : platformAudioRecorder
+      ];
+      Widget? parentWidget = MessageWidget.buildParentChatMessageWidget();
+      if (parentWidget != null) {
+        children.add(const SizedBox(
+          height: 2,
+        ));
+        children.add(parentWidget);
+      }
+      return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 2.0),
+          alignment: Alignment.center,
+          child: Column(children: children));
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return _buildTextMessageInput(context);
-  }
-
-  @override
-  void dispose() {
-    widget.textEditingController.removeListener(_update);
-    chatMessageController.removeListener(_update);
-    super.dispose();
   }
 }

@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 class LoadingBackgroundImage {
-  final List<String> darkBackgroundImages = [
+  static const List<String> darkBackgroundImages = [
     'assets/images/bg/login-bg-wd-1.webp',
     'assets/images/bg/login-bg-wd-2.webp',
     'assets/images/bg/login-bg-wd-3.webp',
@@ -23,7 +23,7 @@ class LoadingBackgroundImage {
     'assets/images/bg/login-bg-wd-12.webp',
   ];
 
-  final List<String> lightBackgroundImages = [
+  static const List<String> lightBackgroundImages = [
     'assets/images/bg/login-bg-wl-1.webp',
     'assets/images/bg/login-bg-wl-2.webp',
     'assets/images/bg/login-bg-wl-3.webp',
@@ -75,40 +75,31 @@ class LoadingBackgroundImage {
   }
 }
 
-LoadingBackgroundImage loadingBackgroundImage = LoadingBackgroundImage();
+final LoadingBackgroundImage loadingBackgroundImage = LoadingBackgroundImage();
 
-class Loading extends StatefulWidget {
-  final String title;
-  final bool autoPlay;
+class Loading extends StatelessWidget {
+  final bool autoPlay = true;
 
-  final SwiperController controller = SwiperController();
+  final SwiperController swiperController = SwiperController();
 
-  Loading({super.key, required this.title, this.autoPlay = true});
-
-  @override
-  State<StatefulWidget> createState() {
-    return _LoadingState();
+  Loading({super.key}) {
+    init();
   }
-}
 
-class _LoadingState extends State<Loading> {
-  @override
-  void initState() {
-    super.initState();
-    myself.addListener(_update);
-    int count = loadingBackgroundImage.lightBackgroundImages.length;
+  void init() {
+    int count = LoadingBackgroundImage.lightBackgroundImages.length;
 
     ///在initState中调用context出错
     // if (myself.getBrightness(context) == Brightness.dark) {
     //   count = loadingBackgroundImage.darkBackgroudImages.length;
     // }
-    if (widget.autoPlay) {
+    if (autoPlay) {
       Timer.periodic(const Duration(seconds: 60), (timer) {
         var random = Random.secure();
         loadingBackgroundImage.currentIndex = random.nextInt(count);
         try {
           if (loadingBackgroundImage.currentIndex < count) {
-            widget.controller.move(loadingBackgroundImage.currentIndex);
+            swiperController.move(loadingBackgroundImage.currentIndex);
           }
         } catch (e) {
           logger.e(e.toString());
@@ -117,37 +108,29 @@ class _LoadingState extends State<Loading> {
     }
   }
 
-  _update() {
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
-    List<Widget> children = [];
-    if (myself.getBrightness(context) == Brightness.light) {
-      children = loadingBackgroundImage.lightChildren;
-    }
-    if (myself.getBrightness(context) == Brightness.dark) {
-      children = loadingBackgroundImage.darkChildren;
-    }
-    return Swiper(
-      controller: widget.controller,
-      onIndexChanged: (int index) {
-        loadingBackgroundImage.currentIndex = index;
+    return ListenableBuilder(
+      listenable: myself,
+      builder: (BuildContext context, Widget? child) {
+        List<Widget> children = loadingBackgroundImage.lightChildren;
+        if (myself.getBrightness(context) == Brightness.dark) {
+          children = loadingBackgroundImage.darkChildren;
+        }
+        return Swiper(
+          controller: swiperController,
+          onIndexChanged: (int index) {
+            loadingBackgroundImage.currentIndex = index;
+          },
+          itemCount: children.length,
+          itemBuilder: (BuildContext context, int index) {
+            return children[index];
+          },
+          index: 0,
+        );
       },
-      itemCount: children.length,
-      itemBuilder: (BuildContext context, int index) {
-        return children[index];
-      },
-      index: 0,
     );
-  }
-
-  @override
-  void dispose() {
-    myself.removeListener(_update);
-    super.dispose();
   }
 }
 
-var loadingWidget = Loading(title: '');
+final Loading loadingWidget = Loading();

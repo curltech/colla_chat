@@ -22,6 +22,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 //我的页面，带有路由回调函数
 class MeWidget extends StatelessWidget with TileDataMixin {
@@ -44,9 +45,6 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   final PoemWidget poemWidget = PoemWidget();
   final SherpaInstallWidget sherpaInstallWidget = SherpaInstallWidget();
 
-  final ValueNotifier<bool> developerSwitch =
-      ValueNotifier<bool>(myself.peerProfile.developerSwitch);
-
   MeWidget({super.key}) {
     indexWidgetProvider.define(collectionListView);
     indexWidgetProvider.define(settingWidget);
@@ -63,7 +61,6 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(platformInfoWidget);
     indexWidgetProvider.define(poemWidget);
     indexWidgetProvider.define(sherpaInstallWidget);
-    myself.addListener(_update);
   }
 
   @override
@@ -78,11 +75,8 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Me';
 
-  _update() {
-    developerSwitch.value = myself.peerProfile.developerSwitch;
-  }
-
   List<TileData> _buildMeTileData(BuildContext context) {
+    final bool developerSwitch = myself.peerProfile.developerSwitch;
     List<TileDataMixin> mixins = [
       settingWidget,
       collectionListView,
@@ -94,7 +88,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
         mixins.add(openVpnWidget);
       }
       if (platformParams.android) {
-        if (developerSwitch.value) {
+        if (developerSwitch) {
           mixins.addAll([
             systemAlertWindowWidget,
           ]);
@@ -104,7 +98,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
 
     mixins.add(platformInfoWidget);
     mixins.add(sherpaInstallWidget);
-    if (developerSwitch.value) {
+    if (developerSwitch) {
       mixins.addAll([
         platformMapLauncherWidget,
         webrtcWidget,
@@ -125,17 +119,13 @@ class MeWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    Widget child = ValueListenableBuilder(
-        valueListenable: developerSwitch,
-        builder: (BuildContext context, bool developerSwitch, Widget? child) {
-          List<TileData> meTileData = _buildMeTileData(context);
-          return DataListView(
-            itemCount: meTileData.length,
-            itemBuilder: (BuildContext context, int index) {
-              return meTileData[index];
-            },
-          );
-        });
+    List<TileData> meTileData = _buildMeTileData(context);
+    Widget child = DataListView(
+      itemCount: meTileData.length,
+      itemBuilder: (BuildContext context, int index) {
+        return meTileData[index];
+      },
+    );
 
     var me = AppBarView(
         title: title,

@@ -10,8 +10,8 @@ class PlatformBreakpoint extends Breakpoint {
 
   @override
   bool isActive(BuildContext context) {
-    final double width = MediaQuery.of(context).size.width;
-    final double height = MediaQuery.of(context).size.height;
+    final double width = MediaQuery.sizeOf(context).width;
+    final double height = MediaQuery.sizeOf(context).height;
 
     ///中等横屏
     if (begin != null && end != null) {

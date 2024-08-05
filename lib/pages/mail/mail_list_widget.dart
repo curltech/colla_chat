@@ -9,23 +9,8 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/material.dart';
 
 ///邮件列表子视图
-class MailListWidget extends StatefulWidget {
+class MailListWidget extends StatelessWidget {
   const MailListWidget({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _MailListWidgetState();
-}
-
-class _MailListWidgetState extends State<MailListWidget> {
-  @override
-  initState() {
-    super.initState();
-    mailMimeMessageController.addListener(_update);
-  }
-
-  _update() {
-    setState(() {});
-  }
 
   ///当前邮箱邮件消息转换成tileData，如果为空则返回空列表
   Future<TileData?> findMailMessageTile(int index) async {
@@ -185,11 +170,5 @@ class _MailListWidgetState extends State<MailListWidget> {
   @override
   Widget build(BuildContext context) {
     return _buildMailListWidget(context);
-  }
-
-  @override
-  void dispose() {
-    mailMimeMessageController.removeListener(_update);
-    super.dispose();
   }
 }

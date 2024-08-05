@@ -63,18 +63,11 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
   @override
   void initState() {
     super.initState();
-    myChannelChatMessageController.addListener(_update);
     var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
     animateController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 500));
     myChannelChatMessageController.latest();
-  }
-
-  _update() {
-    setState(() {
-      myChannelChatMessageController.latest();
-    });
   }
 
   void _onScroll() {
@@ -138,7 +131,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
     }
 
     if (mounted) {
-      DialogUtil.info(context,
+      DialogUtil.info(
           content: AppLocalizations.t('Publish document successfully'));
     }
   }
@@ -191,7 +184,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
         SlidableAction(
           padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 0),
           onPressed: (context) async {
-            bool? confirm = await DialogUtil.confirm(context,
+            bool? confirm = await DialogUtil.confirm(
                 content: 'Do you confirm publish?');
             if (confirm != null && confirm) {
               _publish(chatMessage);
@@ -207,11 +200,10 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
         SlidableAction(
           padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 0),
           onPressed: (context) async {
-            bool? confirm = await DialogUtil.confirm(context,
+            bool? confirm = await DialogUtil.confirm(
                 content: 'Do you confirm delete?');
             if (confirm != null && confirm) {
-              await chatMessageService
-                  .remove(chatMessage);
+              await chatMessageService.remove(chatMessage);
               myChannelChatMessageController.delete(index: index);
             }
           },
@@ -266,6 +258,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
 
   @override
   Widget build(BuildContext context) {
+    myChannelChatMessageController.latest();
     var channelChatMessageWidget = _buildChannelChatMessageWidget(context);
     List<Widget>? rightWidgets = [
       IconButton(
@@ -294,7 +287,6 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
 
   @override
   void dispose() {
-    myChannelChatMessageController.removeListener(_update);
     widget.scrollController.removeListener(_onScroll);
     animateController.dispose();
     super.dispose();

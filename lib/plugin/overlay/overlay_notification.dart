@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/animated_progress_bar.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
 
 enum NotificationType {
@@ -200,12 +201,12 @@ class OverlayNotification extends StatefulWidget {
 
   /// 高度
   double _height(BuildContext context) {
-    return height ?? MediaQuery.of(context).size.height * 0.12;
+    return height ?? MediaQuery.sizeOf(context).height * 0.12;
   }
 
   /// 宽度
   double _width(BuildContext context) {
-    return width ?? MediaQuery.of(context).size.width * 0.9;
+    return width ?? MediaQuery.sizeOf(context).width * 0.9;
   }
 
   /// 第x个距离顶部高度的偏移量
@@ -225,13 +226,13 @@ class OverlayNotification extends StatefulWidget {
   /// 距离左边的宽度
   double _left(BuildContext context) {
     if (position.x == 1) {
-      return MediaQuery.of(context).size.width -
+      return MediaQuery.sizeOf(context).width -
           _width(context) -
           notificationMargin;
     } else if (position.x == -1) {
       return notificationMargin;
     } else {
-      return ((position.x + 1) / 2) * MediaQuery.of(context).size.width -
+      return ((position.x + 1) / 2) * MediaQuery.sizeOf(context).width -
           (_width(context) / 2);
     }
   }
@@ -239,14 +240,14 @@ class OverlayNotification extends StatefulWidget {
   /// 第一个组件距离顶部高度
   double _firstTop(BuildContext context) {
     if (position.y == 1) {
-      return MediaQuery.of(context).size.height -
+      return MediaQuery.sizeOf(context).height -
           _height(context) -
           notificationMargin +
           30;
     } else if (position.y == -1) {
       return notificationMargin + 30;
     } else {
-      return ((position.y + 1) / 2) * MediaQuery.of(context).size.height -
+      return ((position.y + 1) / 2) * MediaQuery.sizeOf(context).height -
           (_height(context) / 2) +
           30;
     }
@@ -347,7 +348,7 @@ class OverlayNotification extends StatefulWidget {
                   height: 5,
                 ),
               ],
-              Expanded(child: description ?? Container()),
+              Expanded(child: description ?? nil),
               if (action != null) ...[
                 const SizedBox(
                   height: 5,

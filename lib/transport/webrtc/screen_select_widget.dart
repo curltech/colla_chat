@@ -5,6 +5,7 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -244,8 +245,8 @@ class ScreenSelectDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var width = MediaQuery.of(context).size.width;
-    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.sizeOf(context).width;
+    var height = MediaQuery.sizeOf(context).height;
     return Material(
       type: MaterialType.transparency,
       child: Center(
@@ -334,7 +335,7 @@ class _ThumbnailWidgetState extends State<ThumbnailWidget> {
                     gaplessPlayback: true,
                     alignment: Alignment.center,
                   )
-                : Container(),
+                : nil,
           ),
         )),
         CommonAutoSizeText(

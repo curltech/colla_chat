@@ -1,4 +1,3 @@
-import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
@@ -8,76 +7,67 @@ import 'package:colla_chat/entity/chat/peer_party.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
-import 'package:colla_chat/tool/date_util.dart';
-import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/transport/ollama/dart_ollama_client.dart';
-import 'package:flutter/foundation.dart';
+import 'package:get/get.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:uuid/uuid.dart';
 
 ///好友或者群的消息控制器，包含某个连接的所有消息
 class ChatMessageController extends DataMoreController<ChatMessage> {
-  ChatSummary? _chatSummary;
+  final Rx<ChatSummary?> _chatSummary = Rx<ChatSummary?>(null);
 
   //发送方式
-  TransportType transportType = TransportType.webrtc;
+  final Rx<TransportType> transportType =
+      Rx<TransportType>(TransportType.webrtc);
 
   //调度删除时间
-  int _deleteTime = 0;
+  final RxInt _deleteTime = 0.obs;
 
   //引用的消息
-  String? _parentMessageId;
+  final Rx<String?> _parentMessageId = Rx<String?>(null);
 
   final Lock _lock = Lock();
 
   ChatSummary? get chatSummary {
-    return _chatSummary;
+    return _chatSummary.value;
   }
 
   ///更新chatSummary，清空原数据，查询新数据
   set chatSummary(ChatSummary? chatSummary) {
-    if (_chatSummary != chatSummary) {
-      _chatSummary = chatSummary;
+    if (_chatSummary.value != chatSummary) {
+      _chatSummary(chatSummary);
       clear(notify: false);
-      previous(limit: defaultLimit).then((int count) {
-        if (count == 0) {
-          notifyListeners();
-        }
-      });
+      previous(limit: defaultLimit);
     }
+  }
+
+  Rx<ChatSummary?> getChatSummary() {
+    return _chatSummary;
   }
 
   int get deleteTime {
-    return _deleteTime;
+    return _deleteTime.value;
   }
 
   set deleteTime(int deleteTime) {
-    if (_deleteTime != deleteTime) {
-      _deleteTime = deleteTime;
-    }
+    _deleteTime(deleteTime);
   }
 
   String? get parentMessageId {
-    return _parentMessageId;
+    return _parentMessageId.value;
   }
 
   set parentMessageId(String? parentMessageId) {
-    if (_parentMessageId != parentMessageId) {
-      _parentMessageId = parentMessageId;
-      notifyListeners();
-    }
+    _parentMessageId(parentMessageId);
   }
 
   ///访问数据库获取比当前数据更老的消息，如果当前数据为空，从最新的开始
   @override
   Future<int> previous({int? limit}) async {
     return _lock.synchronized(() async {
-      var chatSummary = _chatSummary;
+      ChatSummary? chatSummary = _chatSummary.value;
       if (chatSummary == null) {
         clear(notify: false);
         return 0;
@@ -87,34 +77,32 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         return 0;
       }
       List<ChatMessage>? chatMessages;
-      if (_chatSummary != null) {
-        if (_chatSummary!.partyType == PartyType.linkman.name) {
-          int start = DateTime.now().millisecondsSinceEpoch;
-          chatMessages = await chatMessageService.findByPeerId(
-              peerId: _chatSummary!.peerId!,
-              messageType: ChatMessageType.chat.name,
-              offset: data.length,
-              limit: limit);
-          int end = DateTime.now().millisecondsSinceEpoch;
-          logger.i('chatMessageService.findByPeerId time:${end - start}');
-        } else if (_chatSummary!.partyType == PartyType.group.name) {
-          chatMessages = await chatMessageService.findByPeerId(
-              groupId: _chatSummary!.peerId!,
-              messageType: ChatMessageType.chat.name,
-              offset: data.length,
-              limit: limit);
-        } else if (_chatSummary!.partyType == PartyType.conference.name) {
-          chatMessages = await chatMessageService.findByPeerId(
-              groupId: _chatSummary!.peerId!,
-              messageType: ChatMessageType.chat.name,
-              offset: data.length,
-              limit: limit);
-        }
-        if (chatMessages != null && chatMessages.isNotEmpty) {
-          addAll(chatMessages);
+      if (chatSummary.partyType == PartyType.linkman.name) {
+        int start = DateTime.now().millisecondsSinceEpoch;
+        chatMessages = await chatMessageService.findByPeerId(
+            peerId: chatSummary.peerId!,
+            messageType: ChatMessageType.chat.name,
+            offset: data.length,
+            limit: limit);
+        int end = DateTime.now().millisecondsSinceEpoch;
+        logger.i('chatMessageService.findByPeerId time:${end - start}');
+      } else if (chatSummary.partyType == PartyType.group.name) {
+        chatMessages = await chatMessageService.findByPeerId(
+            groupId: chatSummary.peerId!,
+            messageType: ChatMessageType.chat.name,
+            offset: data.length,
+            limit: limit);
+      } else if (chatSummary.partyType == PartyType.conference.name) {
+        chatMessages = await chatMessageService.findByPeerId(
+            groupId: chatSummary.peerId!,
+            messageType: ChatMessageType.chat.name,
+            offset: data.length,
+            limit: limit);
+      }
+      if (chatMessages != null && chatMessages.isNotEmpty) {
+        addAll(chatMessages);
 
-          return chatMessages.length;
-        }
+        return chatMessages.length;
       }
 
       return 0;
@@ -125,7 +113,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   @override
   Future<int> latest({int? limit}) async {
     return _lock.synchronized(() async {
-      var chatSummary = _chatSummary;
+      var chatSummary = this.chatSummary;
       if (chatSummary == null) {
         clear(notify: false);
         return 0;
@@ -139,32 +127,29 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         sendTime = data[0].sendTime;
       }
       List<ChatMessage>? chatMessages;
-      if (_chatSummary != null) {
-        if (_chatSummary!.partyType == PartyType.linkman.name) {
-          chatMessages = await chatMessageService.findByGreaterId(
-              peerId: _chatSummary!.peerId!,
-              messageType: ChatMessageType.chat.name,
-              sendTime: sendTime,
-              limit: limit);
-        } else if (_chatSummary!.partyType == PartyType.group.name) {
-          chatMessages = await chatMessageService.findByGreaterId(
-              groupId: _chatSummary!.peerId!,
-              messageType: ChatMessageType.chat.name,
-              sendTime: sendTime,
-              limit: limit);
-        } else if (_chatSummary!.partyType == PartyType.conference.name) {
-          chatMessages = await chatMessageService.findByGreaterId(
-              groupId: _chatSummary!.peerId!,
-              messageType: ChatMessageType.chat.name,
-              sendTime: sendTime,
-              limit: limit);
-        }
-        if (chatMessages != null && chatMessages.isNotEmpty) {
-          data.insertAll(0, chatMessages);
-          notifyListeners();
+      if (chatSummary.partyType == PartyType.linkman.name) {
+        chatMessages = await chatMessageService.findByGreaterId(
+            peerId: chatSummary.peerId!,
+            messageType: ChatMessageType.chat.name,
+            sendTime: sendTime,
+            limit: limit);
+      } else if (chatSummary.partyType == PartyType.group.name) {
+        chatMessages = await chatMessageService.findByGreaterId(
+            groupId: chatSummary.peerId!,
+            messageType: ChatMessageType.chat.name,
+            sendTime: sendTime,
+            limit: limit);
+      } else if (chatSummary.partyType == PartyType.conference.name) {
+        chatMessages = await chatMessageService.findByGreaterId(
+            groupId: chatSummary.peerId!,
+            messageType: ChatMessageType.chat.name,
+            sendTime: sendTime,
+            limit: limit);
+      }
+      if (chatMessages != null && chatMessages.isNotEmpty) {
+        data.insertAll(0, chatMessages);
 
-          return chatMessages.length;
-        }
+        return chatMessages.length;
       }
 
       return 0;
@@ -202,11 +187,12 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       ChatMessageType messageType = ChatMessageType.chat,
       ChatMessageSubType subMessageType = ChatMessageSubType.chat,
       List<String>? peerIds}) async {
-    if (_chatSummary == null) {
+    var chatSummary = this.chatSummary;
+    if (chatSummary == null) {
       return null;
     }
-    String peerId = _chatSummary!.peerId!;
-    String partyType = _chatSummary!.partyType!;
+    String peerId = chatSummary.peerId!;
+    String partyType = chatSummary.partyType!;
     PartyType? type = StringUtil.enumFromString(PartyType.values, partyType);
     if (type == null) {
       if (peerIds == null) {
@@ -227,9 +213,9 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
           messageId: messageId,
           messageType: messageType,
           subMessageType: subMessageType,
-          transportType: transportType,
-          deleteTime: _deleteTime,
-          parentMessageId: _parentMessageId);
+          transportType: transportType.value,
+          deleteTime: _deleteTime.value,
+          parentMessageId: _parentMessageId.value);
 
       List<ChatMessage> returnChatMessages =
           await chatMessageService.sendAndStore(chatMessage, peerIds: peerIds);
@@ -244,18 +230,17 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
           messageId: messageId,
           messageType: messageType,
           subMessageType: subMessageType,
-          transportType: transportType,
-          deleteTime: _deleteTime,
-          parentMessageId: _parentMessageId);
+          transportType: transportType.value,
+          deleteTime: _deleteTime.value,
+          parentMessageId: _parentMessageId.value);
       List<ChatMessage> returnChatMessages =
           await chatMessageService.sendAndStore(chatMessage,
               cryptoOption: CryptoOption.group, peerIds: peerIds);
       returnChatMessage = returnChatMessages.firstOrNull;
     }
-    _deleteTime = 0;
-    _parentMessageId = null;
-    transportType = TransportType.webrtc;
-    notifyListeners();
+    _deleteTime(0);
+    _parentMessageId(null);
+    transportType(TransportType.webrtc);
 
     return returnChatMessage;
   }

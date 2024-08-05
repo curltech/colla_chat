@@ -1,9 +1,9 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class AppBarPopupMenu {
   Widget? icon;
@@ -16,8 +16,8 @@ class AppBarPopupMenu {
 ///工作区的顶部栏AppBar，定义了前导组件，比如回退按钮
 ///定义了尾部组件和下拉按钮
 class AppBarWidget {
-  static PreferredSizeWidget buildAppBar(
-    BuildContext context, {
+  static PreferredSizeWidget buildAppBar({
+    BuildContext? context,
     Color? backgroundColor,
     Color? foregroundColor,
     double? toolbarHeight,
@@ -30,6 +30,8 @@ class AppBarWidget {
     List<AppBarPopupMenu>? rightPopupMenus, //右边的下拉菜单组件
     PreferredSizeWidget? bottom, //底部组件
   }) {
+    context = context ?? appDataProvider.context!;
+
     ///右边排列的按钮组件，最后一个是下拉按钮组件
     var actions = <Widget>[];
 
@@ -40,15 +42,16 @@ class AppBarWidget {
 
     ///然后加上右边的下拉组件
     var action = popMenuButton(
-        foregroundColor: foregroundColor,
-        rightPopupMenus: rightPopupMenus,
-        rightWidgets: rightWidgets);
+      foregroundColor: foregroundColor,
+      rightPopupMenus: rightPopupMenus,
+    );
     if (action != null) {
       actions.add(action);
     }
 
     ///左边的回退按钮
-    var leading = backButton(context,
+    var leading = backButton(
+        context: context,
         foregroundColor: foregroundColor,
         withLeading: withLeading,
         leadingCallBack: leadingCallBack);
@@ -88,9 +91,9 @@ class AppBarWidget {
       actions.addAll(rightWidgets);
     }
     var action = popMenuButton(
-        foregroundColor: foregroundColor,
-        rightPopupMenus: rightPopupMenus,
-        rightWidgets: rightWidgets);
+      foregroundColor: foregroundColor,
+      rightPopupMenus: rightPopupMenus,
+    );
     if (action != null) {
       actions.add(action);
     }
@@ -108,12 +111,13 @@ class AppBarWidget {
     );
   }
 
-  static Widget? backButton(
-    BuildContext context, {
+  static Widget? backButton({
+    BuildContext? context,
     bool withLeading = false,
     final Function? leadingCallBack,
     Color? foregroundColor,
   }) {
+    context = context ?? appDataProvider.context!;
     Widget? leadingButton;
     // foregroundColor ??= Colors.white;
 
@@ -126,8 +130,6 @@ class AppBarWidget {
           if (leadingCallBack != null) {
             await leadingCallBack();
           }
-          var indexWidgetProvider =
-              Provider.of<IndexWidgetProvider>(context, listen: false);
           indexWidgetProvider.pop(context: context);
         },
       );
@@ -138,7 +140,6 @@ class AppBarWidget {
   static PopupMenuButton<int>? popMenuButton({
     Color? foregroundColor,
     List<AppBarPopupMenu>? rightPopupMenus,
-    List<Widget>? rightWidgets,
   }) {
     PopupMenuButton<int>? popMenuButton;
     // foregroundColor ??= Colors.white;

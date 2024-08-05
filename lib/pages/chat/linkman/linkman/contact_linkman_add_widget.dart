@@ -22,20 +22,23 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 ///Contact增加联系人
-class ContactLinkmanAddWidget extends StatefulWidget with TileDataMixin {
+class ContactLinkmanAddWidget extends StatelessWidget with TileDataMixin {
   final DataListController<TileData> controller =
       DataListController<TileData>();
-  late final DataListView dataListView;
+  late final Widget dataListView;
 
   ContactLinkmanAddWidget({super.key}) {
-    dataListView = DataListView(
-      itemCount: controller.data.length,
-      itemBuilder: (BuildContext context, int index) {
-        return controller.data[index];
-      },
-    );
+    dataListView = Obx(() {
+      return DataListView(
+        itemCount: controller.length,
+        itemBuilder: (BuildContext context, int index) {
+          return controller.data[index];
+        },
+      );
+    });
   }
 
   @override
@@ -50,37 +53,18 @@ class ContactLinkmanAddWidget extends StatefulWidget with TileDataMixin {
   @override
   bool get withLeading => true;
 
-  @override
-  State<StatefulWidget> createState() => _ContactLinkmanAddWidgetState();
-}
-
-class _ContactLinkmanAddWidgetState extends State<ContactLinkmanAddWidget> {
-  TextEditingController controller = TextEditingController();
+  TextEditingController textEditingController = TextEditingController();
   var contactMap = {};
   StreamSubscription<ChainMessage>? chainMessageListen;
 
-  @override
-  initState() {
-    super.initState();
-    widget.controller.addListener(_update);
-    chainMessageListen = findClientAction.responseStreamController.stream
-        .listen((ChainMessage chainMessage) {
-      _responsePeerClients(chainMessage);
-    });
-  }
-
-  _update() {
-    setState(() {});
-  }
-
   _buildSearchTextField(BuildContext context) {
     var searchTextField = CommonTextFormField(
-        controller: controller,
+        controller: textEditingController,
         keyboardType: TextInputType.text,
         labelText: AppLocalizations.t('PeerId/Mobile/Email/Name'),
         suffixIcon: IconButton(
           onPressed: () {
-            _search(controller.text);
+            _search(textEditingController.text);
           },
           icon: const Icon(Icons.search),
         ));
@@ -135,10 +119,11 @@ class _ContactLinkmanAddWidgetState extends State<ContactLinkmanAddWidget> {
         tiles.add(tile);
       }
     }
-    widget.controller.replaceAll(tiles);
+    controller.replaceAll(tiles);
   }
 
-  Future<void> _responsePeerClients(ChainMessage chainMessage) async {
+  Future<void> _responsePeerClients(
+      BuildContext context, ChainMessage chainMessage) async {
     if (chainMessage.payloadType == PayloadType.peerClients.name) {
       List<PeerClient> peerClients = chainMessage.payload;
       if (peerClients.isNotEmpty) {
@@ -160,7 +145,7 @@ class _ContactLinkmanAddWidgetState extends State<ContactLinkmanAddWidget> {
               peerClient.status = LinkmanStatus.F.name;
               contactService.update(contact);
               peerClientService.store(peerClient, mobile: true, email: false);
-              DialogUtil.info(context,
+              DialogUtil.info(
                   content:
                       AppLocalizations.t('Add contact as linkman:') + peerId);
             });
@@ -172,19 +157,14 @@ class _ContactLinkmanAddWidgetState extends State<ContactLinkmanAddWidget> {
 
   @override
   Widget build(BuildContext context) {
+    chainMessageListen = findClientAction.responseStreamController.stream
+        .listen((ChainMessage chainMessage) {
+      _responsePeerClients(context, chainMessage);
+    });
     return AppBarView(
         withLeading: true,
-        title: widget.title,
-        child: Column(
-            children: [_buildSearchTextField(context), widget.dataListView]));
-  }
-
-  @override
-  void dispose() {
-    widget.controller.removeListener(_update);
-    chainMessageListen?.cancel();
-    chainMessageListen = null;
-    controller.dispose();
-    super.dispose();
+        title: title,
+        child:
+            Column(children: [_buildSearchTextField(context), dataListView]));
   }
 }

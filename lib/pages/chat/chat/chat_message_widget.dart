@@ -8,6 +8,7 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.da
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 /// 消息发送和接受展示的界面组件
 /// 此界面展示特定的目标对象的收到的消息，并且可以发送消息
@@ -37,19 +38,18 @@ class ChatMessageWidget extends StatefulWidget {
 class _ChatMessageWidgetState extends State<ChatMessageWidget>
     with TickerProviderStateMixin {
   FocusNode textFocusNode = FocusNode();
-  late final AnimationController animateController;
-  ValueNotifier<bool> securityTip = ValueNotifier<bool>(true);
+  late final AnimationController animateController = AnimationController(
+      vsync: this, duration: const Duration(milliseconds: 500));
+  RxBool securityTip = true.obs;
 
   @override
   void initState() {
     super.initState();
     //不能同时监听chatMessageController和globalChatMessageController
     //因为globalChatMessageController会通知chatMessageController的新消息
-    chatMessageController.addListener(_update);
     var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
-    animateController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 500));
+
     Future.delayed(const Duration(seconds: 30), () {
       securityTip.value = false;
     });
@@ -58,15 +58,6 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     ///滚到指定的位置
     // widget.scrollController.animateTo(offset,
     //     duration: const Duration(milliseconds: 1000), curve: Curves.ease);
-  }
-
-  _update() {
-    setState(() {
-      int start = DateTime.now().millisecondsSinceEpoch;
-      chatMessageController.latest();
-      int end = DateTime.now().millisecondsSinceEpoch;
-      logger.w('find chat message latest time: ${end - start} microsecond');
-    });
   }
 
   void _onScroll() {
@@ -156,51 +147,48 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
           //消息组件渲染
           itemBuilder: _buildChatMessageItem,
           //消息条目数
-          itemCount: chatMessageController.data.length,
+          itemCount: chatMessageController.length,
         ));
   }
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-        valueListenable: securityTip,
-        builder: (BuildContext context, bool securityTip, Widget? child) {
-          var chatMessageWidget = _buildChatMessageWidget(context);
-          if (securityTip) {
-            return Column(children: [
-              Row(children: [
-                const SizedBox(
-                  width: 10.0,
-                ),
-                const Icon(
-                  Icons.security,
+    return Obx(() {
+      var chatMessageWidget = _buildChatMessageWidget(context);
+      if (securityTip.value) {
+        return Column(children: [
+          Row(children: [
+            const SizedBox(
+              width: 10.0,
+            ),
+            const Icon(
+              Icons.security,
+              color: Colors.yellow,
+            ),
+            const SizedBox(
+              width: 10.0,
+            ),
+            Expanded(
+                child: CommonAutoSizeText(AppLocalizations.t(
+                    'This is E2E encrypt communication, nobody can peek your chat content'))),
+            IconButton(
+                onPressed: () {
+                  securityTip.value = false;
+                },
+                icon: const Icon(
+                  Icons.cancel,
                   color: Colors.yellow,
-                ),
-                const SizedBox(
-                  width: 10.0,
-                ),
-                Expanded(
-                    child: CommonAutoSizeText(AppLocalizations.t(
-                        'This is E2E encrypt communication, nobody can peek your chat content'))),
-                IconButton(
-                    onPressed: () {
-                      this.securityTip.value = false;
-                    },
-                    icon: const Icon(
-                      Icons.cancel,
-                      color: Colors.yellow,
-                    ))
-              ]),
-              Expanded(child: chatMessageWidget)
-            ]);
-          }
-          return chatMessageWidget;
-        });
+                ))
+          ]),
+          Expanded(child: chatMessageWidget)
+        ]);
+      }
+      return chatMessageWidget;
+    });
   }
 
   @override
   void dispose() {
-    chatMessageController.removeListener(_update);
     widget.scrollController.removeListener(_onScroll);
     animateController.dispose();
     super.dispose();

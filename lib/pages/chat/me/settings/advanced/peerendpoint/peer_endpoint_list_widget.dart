@@ -11,24 +11,24 @@ import 'package:colla_chat/transport/httpclient.dart';
 import 'package:colla_chat/transport/websocket/common_websocket.dart';
 import 'package:colla_chat/transport/websocket/universal_websocket.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
-import 'package:dio/dio.dart';
+import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 //定位器列表
-class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
+class PeerEndpointListWidget extends StatelessWidget with TileDataMixin {
   late final List<Widget> rightWidgets;
   late final PeerEndpointViewWidget peerEndpointViewWidget;
   late final PeerEndpointEditWidget peerEndpointEditWidget;
 
   PeerEndpointListWidget({super.key}) {
     peerEndpointViewWidget =
-        PeerEndpointViewWidget(controller: peerEndpointController);
+        PeerEndpointViewWidget(peerEndpointController: peerEndpointController);
     peerEndpointEditWidget =
-        PeerEndpointEditWidget(controller: peerEndpointController);
+        PeerEndpointEditWidget(peerEndpointController: peerEndpointController);
     indexWidgetProvider.define(peerEndpointViewWidget);
     indexWidgetProvider.define(peerEndpointEditWidget);
     rightWidgets = [
@@ -50,9 +50,6 @@ class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
   }
 
   @override
-  State<StatefulWidget> createState() => _PeerEndpointListWidgetState();
-
-  @override
   bool get withLeading => true;
 
   @override
@@ -63,9 +60,7 @@ class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'PeerEndpoint';
-}
 
-class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
   var red = const Icon(
     Icons.light_mode,
     color: Colors.red,
@@ -79,17 +74,6 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
     color: Colors.grey,
   );
 
-  @override
-  initState() {
-    super.initState();
-    peerEndpointController.addListener(_update);
-    peerEndpointController.init();
-  }
-
-  _update() {
-    _buildTileData();
-  }
-
   Future<Icon> _httpLight() async {
     PeerEndpoint? peerEndpoint = peerEndpointController.current;
     if (peerEndpoint == null) {
@@ -100,7 +84,7 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
       DioHttpClient? dioHttpClient =
           httpClientPool.get(peerEndpoint.httpConnectAddress!);
       try {
-        Response<dynamic> response = await dioHttpClient.get('\\');
+        dio.Response<dynamic> response = await dioHttpClient.get('\\');
         if (response.statusCode != 200) {
           httpLight = green;
         } else {
@@ -219,29 +203,25 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var tiles = _buildTileData();
-    var currentIndex = peerEndpointController.currentIndex;
-    var dataListView = KeepAliveWrapper(
-        child: DataListView(
-            onTap: _onTap,
-            itemCount: tiles.length,
-            itemBuilder: (BuildContext context, int index) {
-              return tiles[index];
-            },
-            currentIndex: currentIndex));
-    var peerEndpointWidget = AppBarView(
-      title: widget.title,
-      withLeading: widget.withLeading,
-      rightWidgets: widget.rightWidgets,
+    Widget dataListView = Obx(() {
+      var tiles = _buildTileData();
+      var currentIndex = peerEndpointController.currentIndex;
+      var dataListView = DataListView(
+          onTap: _onTap,
+          itemCount: tiles.length,
+          itemBuilder: (BuildContext context, int index) {
+            return tiles[index];
+          },
+          currentIndex: currentIndex);
+      return dataListView;
+    });
+    Widget peerEndpointWidget = AppBarView(
+      title: title,
+      withLeading: withLeading,
+      rightWidgets: rightWidgets,
       child: dataListView,
     );
 
     return peerEndpointWidget;
-  }
-
-  @override
-  void dispose() {
-    peerEndpointController.removeListener(_update);
-    super.dispose();
   }
 }

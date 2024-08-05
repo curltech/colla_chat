@@ -14,6 +14,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
@@ -104,7 +105,7 @@ class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {
               tooltip: AppLocalizations.t('Local'),
             );
           }
-          return Container();
+          return nil;
         },
       );
       rightWidgets.add(local);
@@ -120,7 +121,7 @@ class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {
               tooltip: AppLocalizations.t('Remote'),
             );
           }
-          return Container();
+          return nil;
         },
       );
       rightWidgets.add(remote);

@@ -11,18 +11,19 @@ import 'package:colla_chat/tool/ffmpeg/ffmpeg_helper.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
+import 'package:get/state_manager.dart';
 import 'package:pro_image_editor/models/editor_callbacks/pro_image_editor_callbacks.dart';
 import 'package:pro_image_editor/modules/main_editor/main_editor.dart';
 
-class VideoEditorWidget extends StatefulWidget with TileDataMixin {
+class VideoEditorWidget extends StatelessWidget with TileDataMixin {
   VideoEditorWidget({
     super.key,
-  });
-
-  @override
-  State createState() => _VideoEditorWidgetState();
+  }) {
+    scrollController.addListener(_onScroll);
+  }
 
   @override
   String get routeName => 'video_editor';
@@ -35,30 +36,11 @@ class VideoEditorWidget extends StatefulWidget with TileDataMixin {
 
   @override
   bool get withLeading => true;
-}
 
-class _VideoEditorWidgetState extends State<VideoEditorWidget> {
   ///视频文件拆分成图像文件
   DataListController<String> imageFileController = DataListController<String>();
   ScrollController scrollController = ScrollController();
-  final ValueNotifier<int> displayPosition = ValueNotifier<int>(0);
-
-  @override
-  void initState() {
-    super.initState();
-    imageFileController.addListener(_update);
-    scrollController.addListener(_onScroll);
-    displayPosition.addListener(_updateDisplayPosition);
-    _splitImageFiles();
-  }
-
-  _update() {
-    setState(() {});
-  }
-
-  _updateDisplayPosition() {
-    _splitImageFiles();
-  }
+  final RxInt displayPosition = 0.obs;
 
   _onScroll() {
     double offset = scrollController.offset;
@@ -75,7 +57,7 @@ class _VideoEditorWidgetState extends State<VideoEditorWidget> {
     }
   }
 
-  _splitImageFiles() async {
+  _splitImageFiles(BuildContext context) async {
     imageFileController.clear();
     int pos = displayPosition.value;
     Duration startTime = Duration(minutes: pos);
@@ -101,7 +83,7 @@ class _VideoEditorWidgetState extends State<VideoEditorWidget> {
         imageFileController.addAll(filenames, notify: true);
       });
     } catch (e) {
-      DialogUtil.error(context, content: '$e');
+      DialogUtil.error( content: '$e');
     }
   }
 
@@ -134,22 +116,21 @@ class _VideoEditorWidgetState extends State<VideoEditorWidget> {
   }
 
   Widget _buildSeekBar(BuildContext context) {
-    Widget seekBar = ValueListenableBuilder<int>(
-      valueListenable: displayPosition,
-      builder: (context, value, child) {
+    Widget seekBar = Obx(
+      () {
         return Slider(
           value:
               displayPosition.value < 0 ? 0 : displayPosition.value.toDouble(),
           min: 0,
           max: 100,
           divisions: 100,
-          label: '$value',
+          label: '${displayPosition.value}',
           activeColor: myself.primary,
           inactiveColor: Colors.grey,
           secondaryActiveColor: myself.primary,
           thumbColor: myself.primary,
           onChanged: (double value) {
-            displayPosition.value = value.toInt();
+            displayPosition(value.toInt());
           },
         );
       },
@@ -193,37 +174,40 @@ class _VideoEditorWidgetState extends State<VideoEditorWidget> {
         ));
   }
 
-  _buildVideoEditor(BuildContext context) {
-    String? filename = imageFileController.current;
-    if (filename == null) {
-      return Container();
-    }
-    return Column(children: [
-      Expanded(
-          child: ProImageEditor.file(
-              key: UniqueKey(),
-              File(filename),
-              callbacks: ProImageEditorCallbacks(
-                  onImageEditingComplete: (Uint8List bytes) async {
-                String? name = await DialogUtil.showTextFormField(context,
-                    title: 'Save as', content: 'Filename', tip: filename);
-                if (name != null) {
-                  await FileUtil.writeFileAsBytes(bytes, name);
-                  DialogUtil.info(context,
-                      content: 'Save file:$name successfully');
-                }
-              }, onCloseEditor: () {
-                indexWidgetProvider.pop();
-              }))),
-      _buildSeekBar(context),
-      _buildImageSlide(context),
-    ]);
+  Widget _buildVideoEditor(BuildContext context) {
+    return Obx(() {
+      String? filename = imageFileController.current;
+      if (filename == null) {
+        return nil;
+      }
+      return Column(children: [
+        Expanded(
+            child: ProImageEditor.file(
+                key: UniqueKey(),
+                File(filename),
+                callbacks: ProImageEditorCallbacks(
+                    onImageEditingComplete: (Uint8List bytes) async {
+                  String? name = await DialogUtil.showTextFormField(
+                      title: 'Save as', content: 'Filename', tip: filename);
+                  if (name != null) {
+                    await FileUtil.writeFileAsBytes(bytes, name);
+                    DialogUtil.info(
+                        content: 'Save file:$name successfully');
+                  }
+                }, onCloseEditor: () {
+                  indexWidgetProvider.pop();
+                }))),
+        _buildSeekBar(context),
+        _buildImageSlide(context),
+      ]);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    _splitImageFiles(context);
     return AppBarView(
-      title: widget.title,
+      title: title,
       withLeading: true,
       child: _buildVideoEditor(context),
     );
@@ -234,12 +218,5 @@ class _VideoEditorWidgetState extends State<VideoEditorWidget> {
     for (var filename in filenames) {
       File(filename).delete();
     }
-  }
-
-  @override
-  void dispose() {
-    _delete();
-    imageFileController.removeListener(_update);
-    super.dispose();
   }
 }

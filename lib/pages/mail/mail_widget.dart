@@ -17,20 +17,17 @@ import 'package:flutter/material.dart';
 ///第二个是邮件列表视图，列出邮件地址目录下的邮件列表，在窄屏时的缺省进入视图
 ///第一个和第二个视图合用一个视图展示，宽屏时在body部分展示，邮件列表视图的左上角有按钮，弹出邮件地址视图对话框
 ///第三个是邮件内容视图，显示邮件的具体内容，在secondary body部分展示
-class MailWidget extends StatefulWidget with TileDataMixin {
+class MailWidget extends StatelessWidget with TileDataMixin {
   final MailAddressWidget mailAddressWidget = MailAddressWidget();
   final MailListWidget mailListWidget = const MailListWidget();
   final MailContentWidget mailContentWidget = MailContentWidget();
-  final NewMailWidget newMailWidget = const NewMailWidget();
+  final NewMailWidget newMailWidget = NewMailWidget();
 
   MailWidget({super.key}) {
     platformEmailServiceProvider.init();
     indexWidgetProvider.define(mailContentWidget);
     indexWidgetProvider.define(newMailWidget);
   }
-
-  @override
-  State<StatefulWidget> createState() => _MailWidgetState();
 
   @override
   String get routeName => 'mail';
@@ -43,22 +40,10 @@ class MailWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'Mail';
-}
 
-class _MailWidgetState extends State<MailWidget> {
   ValueNotifier<bool> addressVisible = ValueNotifier<bool>(false);
 
   // ValueNotifier<String> mailboxName = ValueNotifier<String>('Mail');
-
-  @override
-  initState() {
-    super.initState();
-    mailMimeMessageController.addListener(_update);
-  }
-
-  _update() {
-    setState(() {});
-  }
 
   String getMailboxName() {
     MailAddress? current = mailMimeMessageController.current;
@@ -86,12 +71,12 @@ class _MailWidgetState extends State<MailWidget> {
                     child: SizedBox(
                         width: 280,
                         height: double.infinity,
-                        child: widget.mailAddressWidget)),
+                        child: mailAddressWidget)),
                 Expanded(
                     child: GestureDetector(
                         onTap: () {
                           this.addressVisible.value = false;
-                          setState(() {});
+                          //setState(() {});
                         },
                         child: Container(
                           color: Colors.black.withOpacity(0.4),
@@ -102,7 +87,7 @@ class _MailWidgetState extends State<MailWidget> {
 
   Widget _buildPlatformDrawer() {
     Widget view = Stack(children: [
-      widget.mailListWidget,
+      mailListWidget,
       _buildAddressBook(),
     ]);
 
@@ -119,7 +104,7 @@ class _MailWidgetState extends State<MailWidget> {
               : AppLocalizations.t('Mail list'),
           onPressed: () {
             addressVisible.value = !addressVisible.value;
-            setState(() {});
+            //setState(() {});
           },
           icon: addressVisible.value
               ? const Icon(
@@ -167,16 +152,10 @@ class _MailWidgetState extends State<MailWidget> {
     );
     var appBarView = AppBarView(
         titleWidget: titleWidget,
-        withLeading: widget.withLeading,
+        withLeading: withLeading,
         rightWidgets: rightWidgets,
         child: body);
 
     return appBarView;
-  }
-
-  @override
-  void dispose() {
-    mailMimeMessageController.removeListener(_update);
-    super.dispose();
   }
 }

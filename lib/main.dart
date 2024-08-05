@@ -103,9 +103,7 @@ void main(List<String> args) async {
   firebaseMessagingService.init();
 
   ///加载主应用组件
-  runApp(MultiProvider(providers: [
-    ChangeNotifierProvider(create: (context) => appDataProvider),
-  ], child: CollaChatApp(loginStatus: loginStatus)));
+  runApp(CollaChatApp(loginStatus: loginStatus));
 }
 
 ///初始化内置浏览器，webview_flutter和inapp两个实现
@@ -119,12 +117,6 @@ void _initWebView() {
     ///6.x.x
     if (platformParams.android) {
       inapp.InAppWebViewController.setWebContentsDebuggingEnabled(true);
-    }
-  }
-  if (inAppWebViewVersion == 5) {
-    ///5.x.x
-    if (platformParams.android) {
-      inapp.AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
     }
   }
 }
@@ -160,110 +152,72 @@ Future<void> _initDesktopWindows() async {
 }
 
 ///应用是一个无态的组件
-class CollaChatApp extends StatefulWidget {
+class CollaChatApp extends StatelessWidget {
   final bool loginStatus;
 
   const CollaChatApp({super.key, required this.loginStatus});
 
-  @override
-  State<StatefulWidget> createState() {
-    return _CollaChatAppState();
-  }
-}
-
-class _CollaChatAppState extends State<CollaChatApp> {
-  @override
-  void initState() {
-    super.initState();
-    myself.addListener(_update);
-  }
-
-  _update() {
-    setState(() {});
-  }
-
-  Widget _buildMaterialApp(BuildContext context, Widget? child) {
-    return MaterialApp(
-      onGenerateTitle: (context) {
-        return AppLocalizations.t('Welcome to CollaChat');
-      },
-      debugShowCheckedModeBanner: false,
-      theme: myself.themeData,
-      darkTheme: myself.darkThemeData,
-      themeMode: myself.themeMode,
-
-      ///Scaffold 是 Material 库中提供的一个 widget，它提供了默认的导航栏、标题和包含主屏幕 widget 树的 body 属性
-      home: UpgradeAlert(
-          upgrader: Upgrader(),
-          child: widget.loginStatus ? indexView : p2pLogin),
-      onGenerateRoute: Application.router.generator,
-      // 初始化FlutterSmartDialog
-      navigatorObservers: [FlutterSmartDialog.observer],
-      // builder:  (context, widget) {
-      // return MediaQuery(
-      //   //设置全局的文字的textScaleFactor为1.0，文字不再随系统设置改变
-      //   data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
-      //   child: widget,
-      // );
-      builder: FlutterSmartDialog.init(
-        //default toast widget
-        toastBuilder: (String msg) => DialogUtil.defaultLoadingWidget(),
-        //default loading widget
-        loadingBuilder: (String msg) => DialogUtil.defaultLoadingWidget(),
-      ),
-      // themeMode: StringUtil.enumFromString(
-      //     ThemeMode.values, appDataProvider.brightness),
-      // AppLocalizations.localizationsDelegates,
-      localizationsDelegates: const [
-        AppLocalizationsDelegate(),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: supportedLocales,
-      // localeResolutionCallback:
-      //     (Locale? locale, Iterable<Locale> supportedLocales) {
-      //   if (localeDataProvider.getLocale() != null) {
-      //     return localeDataProvider.getLocale();
-      //   } else {
-      //     Locale? _locale;
-      //     if (supportedLocales.contains(locale)) {
-      //       _locale = locale;
-      //       Provider.of<LocaleDataProvider>(context, listen: false)
-      //           .setLocale(_locale);
-      //     } else {
-      //       _locale =
-      //           Provider.of<LocaleDataProvider>(context).getLocale();
-      //     }
-      //     return _locale;
-      //   }
-      // },
-      locale: myself.locale,
-    );
-  }
-
-  ///widget 的主要工作是提供一个 build() 方法来描述如何根据其他较低级别的 widgets 来显示自己
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildMaterialApp(BuildContext context) {
     return MultiProvider(
         providers: <SingleChildWidget>[
           ChangeNotifierProvider.value(value: appDataProvider),
           ChangeNotifierProvider.value(value: indexWidgetProvider),
           ChangeNotifierProvider.value(value: myself),
         ],
-        child: Consumer<Myself>(
-            builder: (BuildContext context, myself, Widget? child) {
-          return ScreenUtilInit(
-              designSize: appDataProvider.designSize,
-              minTextAdapt: true,
-              splitScreenMode: true,
-              builder: _buildMaterialApp);
+        child: Consumer3<AppDataProvider, IndexWidgetProvider, Myself>(builder:
+            (BuildContext context, appDataProvider, indexWidgetProvider, myself,
+                Widget? child) {
+          return MaterialApp(
+            onGenerateTitle: (context) {
+              return AppLocalizations.t('Welcome to CollaChat');
+            },
+            debugShowCheckedModeBanner: false,
+            theme: myself.themeData,
+            darkTheme: myself.darkThemeData,
+            themeMode: myself.themeMode,
+            home: HomeWidget(loginStatus: loginStatus),
+            onGenerateRoute: Application.router.generator,
+            // 初始化FlutterSmartDialog
+            navigatorObservers: [FlutterSmartDialog.observer],
+            builder: FlutterSmartDialog.init(
+              toastBuilder: (String msg) => DialogUtil.defaultLoadingWidget(),
+              loadingBuilder: (String msg) => DialogUtil.defaultLoadingWidget(),
+            ),
+            localizationsDelegates: const [
+              AppLocalizationsDelegate(),
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: supportedLocales,
+            locale: myself.locale,
+          );
         }));
   }
 
+  ///widget 的主要工作是提供一个 build() 方法来描述如何根据其他较低级别的 widgets 来显示自己
   @override
-  void dispose() {
-    myself.removeListener(_update);
-    super.dispose();
+  Widget build(BuildContext context) {
+    return _buildMaterialApp(context);
+  }
+}
+
+class HomeWidget extends StatelessWidget {
+  final bool loginStatus;
+
+  const HomeWidget({super.key, required this.loginStatus});
+
+  @override
+  Widget build(BuildContext context) {
+    appDataProvider.context = context;
+    return UpgradeAlert(
+        upgrader: Upgrader(),
+        child: ScreenUtilInit(
+            designSize: appDataProvider.designSize,
+            minTextAdapt: true,
+            splitScreenMode: true,
+            builder: (BuildContext context, Widget? child) {
+              return Material(child: loginStatus ? indexView : p2pLogin);
+            }));
   }
 }

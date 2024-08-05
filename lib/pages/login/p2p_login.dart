@@ -13,152 +13,144 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:get/get.dart';
 
 /// 远程登录页面，一个Scaffold，IndexStack下的远程登录组件，注册组件和配置组件
-class P2pLogin extends StatefulWidget {
+class P2pLogin extends StatelessWidget {
   final SwiperController swiperController = SwiperController();
-  final P2pLoginWidget p2pLoginWidget = const P2pLoginWidget();
+  final P2pLoginWidget p2pLoginWidget = P2pLoginWidget();
   late final P2pRegisterWidget p2pRegisterWidget = P2pRegisterWidget(
     swiperController: swiperController,
   );
-  late final P2pSettingWidget p2pSettingWidget = P2pSettingWidget(
-    swiperController: swiperController,
-  );
-
-  // final MyselfPeerViewWidget myselfPeerViewWidget =
-  //     const MyselfPeerViewWidget();
+  late final P2pSettingWidget p2pSettingWidget = const P2pSettingWidget();
   late final List<Widget> _children;
 
   P2pLogin({super.key}) {
-    // 初始化子项集合
     _children = [
       p2pLoginWidget,
       p2pRegisterWidget,
       p2pSettingWidget,
-      // myselfPeerViewWidget,
     ];
-    List<MyselfPeer> myselfPeers = myselfPeerController.data;
+    init();
   }
 
-  @override
-  State<StatefulWidget> createState() => _P2pLoginState();
-}
+  RxInt index = 0.obs;
 
-class _P2pLoginState extends State<P2pLogin> {
-  int index = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    myself.addListener(_update);
-    appDataProvider.addListener(_update);
+  void init() async {
+    await myselfPeerController.init();
     List<MyselfPeer> myselfPeers = myselfPeerController.data;
     if (myselfPeers.isEmpty) {
-      index = 1;
-    }
-  }
-
-  _update() {
-    if (mounted) {
-      setState(() {});
+      index.value = 1;
     }
   }
 
   _animateToPage(int index) {
-    widget.swiperController.move(index);
+    swiperController.move(index);
+  }
+
+  Widget _buildRightWidget(BuildContext context) {
+    return Obx(() {
+      List<Widget> rightWidgets = [];
+      if (index.value != 0) {
+        rightWidgets.addAll([
+          IconTextButton(
+            padding: const EdgeInsets.symmetric(vertical: 1.0),
+            onPressed: () {
+              _animateToPage(0);
+            },
+            icon: const Icon(Icons.login, color: Colors.white),
+            label: AppLocalizations.t('Login'),
+            labelColor: Colors.white,
+          ),
+          const SizedBox(
+            width: 10.0,
+          ),
+        ]);
+      }
+      if (index.value != 1) {
+        rightWidgets.addAll([
+          IconTextButton(
+            padding: const EdgeInsets.symmetric(vertical: 1.0),
+            onPressed: () {
+              _animateToPage(1);
+            },
+            icon: const Icon(Icons.app_registration, color: Colors.white),
+            label: AppLocalizations.t('Register'),
+            labelColor: Colors.white,
+          ),
+          const SizedBox(
+            width: 10.0,
+          ),
+        ]);
+      }
+      if (index.value != 2) {
+        rightWidgets.add(
+          IconTextButton(
+            padding: const EdgeInsets.symmetric(vertical: 1.0),
+            onPressed: () {
+              _animateToPage(2);
+            },
+            icon: const Icon(Icons.settings, color: Colors.white),
+            label: AppLocalizations.t('Setting'),
+            labelColor: Colors.white,
+          ),
+        );
+      }
+
+      return ButtonBar(
+        children: rightWidgets,
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    appDataProvider.changeSize(context);
-    var pageView = Swiper(
-      controller: widget.swiperController,
-      itemCount: widget._children.length,
-      itemBuilder: (BuildContext context, int index) {
-        return widget._children[index];
-      },
-      onIndexChanged: (int index) {
-        setState(() {
-          this.index = index;
+    var workspace = ListenableBuilder(
+      listenable: appDataProvider,
+      builder: (BuildContext context, Widget? child) {
+        appDataProvider.changeSize(context);
+        var pageView = Obx(() {
+          return Swiper(
+            controller: swiperController,
+            itemCount: _children.length,
+            itemBuilder: (BuildContext context, int index) {
+              return _children[index];
+            },
+            onIndexChanged: (int index) {
+              this.index(index);
+            },
+            index: index.value,
+          );
         });
+        return Center(
+            child: platformWidgetFactory.sizedBox(
+          height: appDataProvider.portraitSize.height,
+          width: appDataProvider.portraitSize.width,
+          child: pageView,
+        ));
       },
-      index: index,
-    );
-    List<Widget> rightWidgets = [];
-    if (index != 0) {
-      rightWidgets.addAll([
-        IconTextButton(
-          padding: const EdgeInsets.symmetric(vertical: 1.0),
-          onPressed: () {
-            _animateToPage(0);
-          },
-          icon: const Icon(Icons.login, color: Colors.white),
-          label: AppLocalizations.t('Login'),
-          labelColor: Colors.white,
-        ),
-        const SizedBox(
-          width: 10.0,
-        ),
-      ]);
-    }
-    if (index != 1) {
-      rightWidgets.addAll([
-        IconTextButton(
-          padding: const EdgeInsets.symmetric(vertical: 1.0),
-          onPressed: () {
-            _animateToPage(1);
-          },
-          icon: const Icon(Icons.app_registration, color: Colors.white),
-          label: AppLocalizations.t('Register'),
-          labelColor: Colors.white,
-        ),
-        const SizedBox(
-          width: 10.0,
-        ),
-      ]);
-    }
-    if (index != 2) {
-      rightWidgets.add(
-        IconTextButton(
-          padding: const EdgeInsets.symmetric(vertical: 1.0),
-          onPressed: () {
-            _animateToPage(2);
-          },
-          icon: const Icon(Icons.settings, color: Colors.white),
-          label: AppLocalizations.t('Setting'),
-          labelColor: Colors.white,
-        ),
-      );
-    }
-    PreferredSizeWidget appBar = AppBarWidget.buildAppBar(
-      context,
-      title: CommonAutoSizeText(AppLocalizations.t('Login')),
-      rightWidgets: rightWidgets,
     );
 
-    var workspace = Center(
-        child: platformWidgetFactory.sizedBox(
-      height: appDataProvider.portraitSize.height,
-      width: appDataProvider.portraitSize.width,
-      child: pageView,
-    ));
-    return Scaffold(
-        appBar: appBar,
-        body: KeyboardDismissOnTap(
-            dismissOnCapturedTaps: false,
-            child: Stack(children: <Widget>[
-              Opacity(
-                opacity: 1,
-                child: loadingWidget,
-              ),
-              workspace
-            ])));
-  }
+    return ListenableBuilder(
+        listenable: myself,
+        builder: (BuildContext context, Widget? child) {
+          PreferredSizeWidget appBar = AppBarWidget.buildAppBar(
+            context: context,
+            title: CommonAutoSizeText(AppLocalizations.t('Login')),
+            rightWidgets: [_buildRightWidget(context)],
+          );
 
-  @override
-  void dispose() {
-    myself.removeListener(_update);
-    appDataProvider.removeListener(_update);
-    super.dispose();
+          return Scaffold(
+              appBar: appBar,
+              body: KeyboardDismissOnTap(
+                  dismissOnCapturedTaps: false,
+                  child: Stack(children: <Widget>[
+                    Opacity(
+                      opacity: 1,
+                      child: loadingWidget,
+                    ),
+                    workspace
+                  ])));
+        });
   }
 }

@@ -33,7 +33,7 @@ class RequestAddFriendMessage extends StatelessWidget {
       onPressed: isMyself || isFriend
           ? null
           : () async {
-              bool? confirm = await DialogUtil.confirm(context,
+              bool? confirm = await DialogUtil.confirm(
                   content: AppLocalizations.t('Do you add all as friend?'));
               if (confirm != null && confirm) {
                 await linkmanService.update(

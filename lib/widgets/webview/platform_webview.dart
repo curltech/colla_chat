@@ -2,8 +2,9 @@ import 'dart:io';
 
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/webview/flutter_webview.dart';
 import 'package:colla_chat/widgets/webview/html_webview.dart';
 import 'package:colla_chat/widgets/webview/inapp_webview.dart';
@@ -245,22 +246,15 @@ class PlatformWebView extends StatelessWidget {
           html: html!,
         );
       } else if (initialFilename != null) {
-        platformWebView = FutureBuilder(
+        platformWebView = PlatformFutureBuilder(
             future: readHtml(initialFilename!),
-            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-              if (snapshot.connectionState != ConnectionState.done) {
-                return LoadingUtil.buildLoadingIndicator();
-              }
-              String? html = snapshot.data;
-              if (html != null) {
-                return HtmlWebView(
-                  html: html,
-                );
-              }
-              return Container();
+            builder: (BuildContext context, String? html) {
+              return HtmlWebView(
+                html: html!,
+              );
             });
       } else {
-        platformWebView = Container();
+        platformWebView = nil;
       }
     } else {
       platformWebView = FlutterInAppWebView(

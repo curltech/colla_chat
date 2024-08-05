@@ -98,8 +98,8 @@ class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
   }
 
   Widget _buildVideoView(BuildContext context) {
-    var width = MediaQuery.of(context).size.width;
-    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.sizeOf(context).width;
+    var height = MediaQuery.sizeOf(context).height;
     return OrientationBuilder(
       builder: (context, orientation) {
         return Center(

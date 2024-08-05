@@ -2,8 +2,8 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
-import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -51,7 +51,7 @@ class PlatformMapLauncherWidget extends StatelessWidget with TileDataMixin {
         ),
         subtitle: map.mapType.name,
         onTap: (int index, String title, {String? subtitle}) async {
-          Position? position = await GeolocatorUtil.currentPosition(context);
+          Position? position = await GeolocatorUtil.currentPosition();
           if (position != null) {
             GeolocatorUtil.showMarker(
                 map, Coords(position.latitude, position.longitude),
@@ -76,21 +76,13 @@ class PlatformMapLauncherWidget extends StatelessWidget with TileDataMixin {
             );
           });
     }
-    return FutureBuilder(
-        future: GeolocatorUtil.currentPosition(context),
-        builder: (BuildContext context, AsyncSnapshot<Position?> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasData) {
-              Position? position = snapshot.data;
-              if (position != null) {
-                return GeolocatorUtil.showPosition(
-                    title: AppLocalizations.t('Current position'),
-                    position.latitude,
-                    position.longitude);
-              }
-            }
-          }
-          return LoadingUtil.buildLoadingIndicator();
+    return PlatformFutureBuilder(
+        future: GeolocatorUtil.currentPosition(),
+        builder: (BuildContext context, Position? position) {
+          return GeolocatorUtil.showPosition(
+              title: AppLocalizations.t('Current position'),
+              position!.latitude,
+              position.longitude);
         });
   }
 

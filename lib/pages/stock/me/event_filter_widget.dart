@@ -14,31 +14,29 @@ import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class EventFilterController extends DataListController<EventFilter> {
-  String? _eventCode;
-  String? _eventName;
+  final Rx<String?> _eventCode = Rx<String?>(null);
+  final Rx<String?> _eventName = Rx<String?>(null);
 
   String? get eventCode {
-    return _eventCode;
+    return _eventCode.value;
   }
 
   String? get eventName {
-    return _eventName;
+    return _eventName.value;
   }
 
   setEventCode(String? eventCode, {String? eventName}) async {
-    if (_eventCode != eventCode) {
-      _eventCode = eventCode;
-      _eventName = eventName;
-      if (_eventCode != null) {
-        List<EventFilter> eventFilters = await eventFilterService
-            .find(where: 'eventCode=?', whereArgs: [_eventCode!]);
-        replaceAll(eventFilters);
-      } else {
-        data.clear();
-      }
-      notifyListeners();
+    _eventCode(eventCode);
+    _eventName(eventName);
+    if (eventCode != null) {
+      List<EventFilter> eventFilters = await eventFilterService
+          .find(where: 'eventCode=?', whereArgs: [_eventCode.value!]);
+      replaceAll(eventFilters);
+    } else {
+      data.clear();
     }
   }
 }
@@ -47,11 +45,8 @@ class EventFilterController extends DataListController<EventFilter> {
 final EventFilterController eventFilterController = EventFilterController();
 
 ///自选股和分组的查询界面
-class EventFilterWidget extends StatefulWidget with TileDataMixin {
+class EventFilterWidget extends StatelessWidget with TileDataMixin {
   EventFilterWidget({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _EventFilterWidgetState();
 
   @override
   bool get withLeading => true;
@@ -64,10 +59,7 @@ class EventFilterWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'EventFilter';
-}
 
-class _EventFilterWidgetState extends State<EventFilterWidget>
-    with TickerProviderStateMixin {
   final List<PlatformDataField> eventFilterDataField = [
     PlatformDataField(
         name: 'id',
@@ -118,45 +110,14 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
       FormInputController(eventFilterDataField);
   SwiperController swiperController = SwiperController();
   int index = 0;
-  late final List<PlatformDataColumn> eventFilterColumns = [
-    PlatformDataColumn(
-      label: '事件代码',
-      name: 'eventCode',
-      width: 80,
-    ),
-    PlatformDataColumn(
-      label: '事件名',
-      name: 'eventName',
-      width: 100,
-    ),
-    PlatformDataColumn(
-      label: '条件内容',
-      name: 'condContent',
-      width: 270,
-    ),
-    PlatformDataColumn(
-        label: '',
-        name: 'action',
-        inputType: InputType.custom,
-        buildSuffix: _buildActionWidget),
-  ];
 
-  @override
-  initState() {
-    eventFilterController.addListener(_update);
-    super.initState();
-  }
-
-  _update() {
-    setState(() {});
-  }
-
-  Widget _buildActionWidget(int index, dynamic eventFilter) {
+  Widget _buildActionWidget(
+      BuildContext context, int index, dynamic eventFilter) {
     Widget actionWidget = Row(
       children: [
         IconButton(
           onPressed: () async {
-            bool? confirm = await DialogUtil.confirm(context,
+            bool? confirm = await DialogUtil.confirm(
                 content: 'Do you confirm to delete event filter?');
             if (confirm == true) {
               eventFilterService.delete(entity: eventFilter);
@@ -193,6 +154,30 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
   }
 
   Widget _buildEventFilterListView(BuildContext context) {
+    final List<PlatformDataColumn> eventFilterColumns = [
+      PlatformDataColumn(
+        label: '事件代码',
+        name: 'eventCode',
+        width: 80,
+      ),
+      PlatformDataColumn(
+        label: '事件名',
+        name: 'eventName',
+        width: 100,
+      ),
+      PlatformDataColumn(
+        label: '条件内容',
+        name: 'condContent',
+        width: 270,
+      ),
+      PlatformDataColumn(
+          label: '',
+          name: 'action',
+          inputType: InputType.custom,
+          buildSuffix: (int index, dynamic eventFilter) {
+            return _buildActionWidget(context, index, eventFilter);
+          }),
+    ];
     return BindingDataTable2<EventFilter>(
       key: UniqueKey(),
       showCheckboxColumn: false,
@@ -229,7 +214,7 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
       FormButton(
           label: 'Ok',
           onTap: (Map<String, dynamic> values) {
-            _onOk(values);
+            _onOk(context, values);
           }),
     ];
     var formInputWidget = Container(
@@ -259,7 +244,7 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
     );
   }
 
-  _onOk(Map<String, dynamic> values) async {
+  _onOk(BuildContext context, Map<String, dynamic> values) async {
     EventFilter currentFilterCond = EventFilter.fromJson(values);
     if (currentFilterCond.id == null) {
       await eventFilterService.insert(currentFilterCond);
@@ -269,10 +254,8 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
     } else {
       await eventFilterService.update(currentFilterCond);
     }
-    if (mounted) {
-      DialogUtil.info(context,
-          content: AppLocalizations.t('EventFilter has save completely'));
-    }
+    DialogUtil.info(
+        content: AppLocalizations.t('EventFilter has save completely'));
   }
 
   _onCopy(Map<String, dynamic> values) async {
@@ -312,7 +295,7 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
       ),
     ];
     return AppBarView(
-        title: widget.title,
+        title: title,
         withLeading: true,
         rightWidgets: rightWidgets,
         child: Swiper(
@@ -330,11 +313,5 @@ class _EventFilterWidgetState extends State<EventFilterWidget>
             this.index = index;
           },
         ));
-  }
-
-  @override
-  void dispose() {
-    eventFilterController.removeListener(_update);
-    super.dispose();
   }
 }

@@ -18,6 +18,7 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
@@ -69,7 +70,6 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
   @override
   void initState() {
     super.initState();
-    channelChatMessageController.addListener(_update);
     var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
     animateController = AnimationController(
@@ -215,7 +215,6 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
 
   @override
   void dispose() {
-    channelChatMessageController.removeListener(_update);
     widget.scrollController.removeListener(_onScroll);
     animateController.dispose();
     super.dispose();
@@ -262,7 +261,7 @@ class ChannelChatMessageItem extends StatelessWidget {
         title: 'Delete',
         prefix: Icons.bookmark_remove,
         onTap: (int index, String label, {String? subtitle}) async {
-          bool? confirm = await DialogUtil.confirm(context,
+          bool? confirm = await DialogUtil.confirm(
               content:
                   '${AppLocalizations.t('Do you want delete subscribe chat messages of ')} $name');
           if (confirm != true) {
@@ -283,16 +282,9 @@ class ChannelChatMessageItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    return PlatformFutureBuilder(
         future: _buildChannelChatMessageItem(context),
-        builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
-          if (!snapshot.hasData) {
-            return Container();
-          }
-          Widget? child = snapshot.data;
-          if (child == null) {
-            return Container();
-          }
+        builder: (BuildContext context, Widget child) {
           return child;
         });
   }

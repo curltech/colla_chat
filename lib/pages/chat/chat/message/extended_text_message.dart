@@ -52,11 +52,11 @@ class ExtendedTextMessage extends StatelessWidget {
               try {
                 UrlUtil.launch(val).then((bool success) {
                   if (!success) {
-                    DialogUtil.error(context, content: 'URI launch fail');
+                    DialogUtil.error( content: 'URI launch fail');
                   }
                 });
               } catch (e) {
-                DialogUtil.error(context, content: 'URI launch fail');
+                DialogUtil.error( content: 'URI launch fail');
               }
             }
           },

@@ -5,6 +5,7 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
@@ -347,7 +348,7 @@ class _FormInputWidgetState extends State<FormInputWidget> {
     } else if (views.length == 1) {
       return SizedBox(height: widget.height, child: views[0]);
     } else {
-      return Container();
+      return nil;
     }
   }
 

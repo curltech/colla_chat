@@ -163,7 +163,7 @@ class _LoggerConsoleWidgetState extends State<LoggerConsoleWidget> {
     return InkWell(
         onDoubleTap: () {
           final int length = loggerController.logs.length;
-          DialogUtil.info(context, content: 'logs length:$length');
+          DialogUtil.info(content: 'logs length:$length');
           setState(() {
             loggerController.logs.clear();
           });

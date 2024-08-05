@@ -6,6 +6,7 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.da
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/group_linkman_widget.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -18,25 +19,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 ///发送文本消息的输入框
-class ExtendedTextMessageInputWidget extends StatefulWidget {
+class ExtendedTextMessageInputWidget extends StatelessWidget {
   final TextEditingController textEditingController;
+  final GlobalKey<ExtendedTextFieldState> extendedTextKey =
+      GlobalKey<ExtendedTextFieldState>();
 
-  const ExtendedTextMessageInputWidget(
+  ExtendedTextMessageInputWidget(
       {super.key, required this.textEditingController});
 
-  @override
-  State createState() => _ExtendedTextMessageInputWidgetState();
-}
-
-class _ExtendedTextMessageInputWidgetState
-    extends State<ExtendedTextMessageInputWidget> {
   final CustomTextSelectionControls extendedMaterialTextSelectionControls =
       CustomTextSelectionControls();
   final CustomSpecialTextSpanBuilder specialTextSpanBuilder =
       CustomSpecialTextSpanBuilder();
 
   void _insertText(String text) {
-    final TextEditingValue value = widget.textEditingController.value;
+    final TextEditingValue value = textEditingController.value;
     final int start = value.selection.baseOffset;
     int end = value.selection.extentOffset;
     if (value.selection.isValid) {
@@ -54,26 +51,26 @@ class _ExtendedTextMessageInputWidgetState
         end = start;
       }
 
-      widget.textEditingController.value = value.copyWith(
+      textEditingController.value = value.copyWith(
           text: newText,
           selection: value.selection.copyWith(
               baseOffset: end + text.length, extentOffset: end + text.length));
     } else {
-      widget.textEditingController.value = TextEditingValue(
+      textEditingController.value = TextEditingValue(
           text: text,
           selection:
               TextSelection.fromPosition(TextPosition(offset: text.length)));
     }
 
     SchedulerBinding.instance.addPostFrameCallback((Duration timeStamp) {
-      chatMessageViewController.extendedTextKey.currentState
-          ?.bringIntoView(widget.textEditingController.selection.base);
+      extendedTextKey.currentState
+          ?.bringIntoView(textEditingController.selection.base);
     });
   }
 
   void _deleteText() {
     //delete by code
-    final TextEditingValue value = widget.textEditingController.value;
+    final TextEditingValue value = textEditingController.value;
     final TextSelection selection = value.selection;
     if (!selection.isValid) {
       return;
@@ -98,15 +95,14 @@ class _ExtendedTextMessageInputWidgetState
     // textEditingValue =
     //     handleSpecialTextSpanDelete(textEditingValue, value, oldTextSpan, null);
 
-    widget.textEditingController.value = textEditingValue;
+    textEditingController.value = textEditingValue;
   }
 
   void _clearText() {
-    widget.textEditingController.value = widget.textEditingController.value
-        .copyWith(
-            text: '',
-            selection: const TextSelection.collapsed(offset: 0),
-            composing: TextRange.empty);
+    textEditingController.value = textEditingController.value.copyWith(
+        text: '',
+        selection: const TextSelection.collapsed(offset: 0),
+        composing: TextRange.empty);
   }
 
   _onSelected(List<String> selected) {
@@ -115,12 +111,12 @@ class _ExtendedTextMessageInputWidgetState
           .findCachedOneByPeerId(selected[0])
           .then((Linkman? linkman) {
         if (linkman != null) {
-          widget.textEditingController.text =
-              widget.textEditingController.text + linkman.name;
+          textEditingController.text =
+              textEditingController.text + linkman.name;
         }
       });
     }
-    Navigator.pop(context, selected);
+    Navigator.pop(appDataProvider.context!, selected);
   }
 
   _selectGroupLinkman() async {
@@ -128,35 +124,34 @@ class _ExtendedTextMessageInputWidgetState
     if (chatSummary != null) {
       if (chatSummary.partyType == PartyType.group.name) {
         var groupId = chatSummary.peerId;
-        await DialogUtil.show(
-            context: context,
-            builder: (BuildContext context) {
-              return GroupLinkmanWidget(
-                selectType: SelectType.singleSelect,
-                onSelected: _onSelected,
-                selected: const <String>[],
-                groupId: groupId!,
-              );
-            });
+        await DialogUtil.show(builder: (BuildContext context) {
+          return GroupLinkmanWidget(
+            selectType: SelectType.singleSelect,
+            onSelected: _onSelected,
+            selected: const <String>[],
+            groupId: groupId!,
+          );
+        });
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    chatMessageViewController.changeExtendedTextHeight();
+    chatMessageViewController.changeExtendedTextHeight(extendedTextKey);
     //不随系统的字体大小变化
     return MediaQuery(
-      data: MediaQuery.of(context).copyWith(textScaler: const TextScaler.linear(1.0)),
+      data: MediaQuery.of(context)
+          .copyWith(textScaler: const TextScaler.linear(1.0)),
       child: ExtendedTextField(
-        key: chatMessageViewController.extendedTextKey,
+        key: extendedTextKey,
         minLines: 1,
         maxLines: 8,
         style: const TextStyle(fontSize: AppFontSize.mdFontSize),
         specialTextSpanBuilder: CustomSpecialTextSpanBuilder(
           showAtBackground: true,
         ),
-        controller: widget.textEditingController,
+        controller: textEditingController,
         selectionControls: extendedMaterialTextSelectionControls,
         focusNode: chatMessageViewController.focusNode,
         onChanged: (String value) async {
@@ -175,10 +170,10 @@ class _ExtendedTextMessageInputWidgetState
           disabledBorder: textFormFieldBorder,
           focusedErrorBorder: textFormFieldBorder,
           hintText: AppLocalizations.t('Please input message'),
-          suffixIcon: widget.textEditingController.text.isNotEmpty
+          suffixIcon: textEditingController.text.isNotEmpty
               ? InkWell(
                   onTap: () {
-                    widget.textEditingController.clear();
+                    textEditingController.clear();
                   },
                   child: Icon(
                     Icons.clear_rounded,

@@ -17,8 +17,8 @@ import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
 ///根据token创建匿名的SFU会议
-class AnonymousConferenceEditWidget extends StatefulWidget with TileDataMixin {
-  const AnonymousConferenceEditWidget({super.key});
+class AnonymousConferenceEditWidget extends StatelessWidget with TileDataMixin {
+  AnonymousConferenceEditWidget({super.key});
 
   @override
   IconData get iconData => Icons.panorama_wide_angle_outlined;
@@ -32,12 +32,6 @@ class AnonymousConferenceEditWidget extends StatefulWidget with TileDataMixin {
   @override
   bool get withLeading => true;
 
-  @override
-  State<StatefulWidget> createState() => _AnonymousConferenceEditWidgetState();
-}
-
-class _AnonymousConferenceEditWidgetState
-    extends State<AnonymousConferenceEditWidget> {
   final List<PlatformDataField> conferenceDataField = [
     PlatformDataField(
         name: 'id',
@@ -99,18 +93,8 @@ class _AnonymousConferenceEditWidgetState
       prefixIcon: Icon(Icons.pin_end, color: myself.primary),
     ),
   ];
-  late final FormInputController controller =
+  late final FormInputController formInputController =
       FormInputController(conferenceDataField);
-
-  @override
-  initState() {
-    super.initState();
-    conferenceController.addListener(_update);
-  }
-
-  _update() {
-    if (mounted) {}
-  }
 
   //会议信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
@@ -118,12 +102,12 @@ class _AnonymousConferenceEditWidgetState
         valueListenable: conferenceNotifier,
         builder: (BuildContext context, Conference? conference, Widget? child) {
           if (conference != null) {
-            controller.setValues(JsonUtil.toJson(conference));
+            formInputController.setValues(JsonUtil.toJson(conference));
           }
           return FormInputWidget(
             spacing: 5.0,
             height: appDataProvider.portraitSize.height * 0.7,
-            controller: controller,
+            controller: formInputController,
             formButtons: [
               FormButton(
                   label: 'Qrcode',
@@ -146,37 +130,32 @@ class _AnonymousConferenceEditWidgetState
     }
     var map = JsonUtil.toJson(content);
     Conference conference = Conference.fromJson(map);
-    if (mounted) {
-      bool? confirm = await DialogUtil.confirm(context,
-          content: 'You confirm add anonymous conference ${conference.name}?');
-      if (confirm != null && confirm) {
-        conference.status = EntityStatus.effective.name;
-        conference.sfu = true;
-        await conferenceService.store(conference);
-        conferenceNotifier.value = conference;
-        ChatMessage chatMessage = await chatMessageService.buildChatMessage(
-          receiverPeerId: myself.peerId,
-          groupId: conference.conferenceId,
-          groupName: conference.name,
-          groupType: PartyType.conference,
-          title: conference.video
-              ? ChatMessageContentType.video.name
-              : ChatMessageContentType.audio.name,
-          content: conference,
-          messageId: conference.conferenceId,
-          subMessageType: ChatMessageSubType.videoChat,
-        );
-        await chatMessageService.sendAndStore(chatMessage,
-            updateSummary: false);
-        if (conferenceController.current == null) {
-          conferenceController.add(conference);
-        }
-        if (mounted) {
-          DialogUtil.info(context,
-              content:
-                  'You add anonymous conference ${conference.name} successfully');
-        }
+    bool? confirm = await DialogUtil.confirm(
+        content: 'You confirm add anonymous conference ${conference.name}?');
+    if (confirm != null && confirm) {
+      conference.status = EntityStatus.effective.name;
+      conference.sfu = true;
+      await conferenceService.store(conference);
+      conferenceNotifier.value = conference;
+      ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+        receiverPeerId: myself.peerId,
+        groupId: conference.conferenceId,
+        groupName: conference.name,
+        groupType: PartyType.conference,
+        title: conference.video
+            ? ChatMessageContentType.video.name
+            : ChatMessageContentType.audio.name,
+        content: conference,
+        messageId: conference.conferenceId,
+        subMessageType: ChatMessageSubType.videoChat,
+      );
+      await chatMessageService.sendAndStore(chatMessage, updateSummary: false);
+      if (conferenceController.current == null) {
+        conferenceController.add(conference);
       }
+      DialogUtil.info(
+          content:
+              'You add anonymous conference ${conference.name} successfully');
     }
   }
 
@@ -189,14 +168,8 @@ class _AnonymousConferenceEditWidgetState
 
     var appBarView = AppBarView(
         title: title,
-        withLeading: widget.withLeading,
+        withLeading: withLeading,
         child: _buildFormInputWidget(context));
     return appBarView;
-  }
-
-  @override
-  void dispose() {
-    conferenceNotifier.removeListener(_update);
-    super.dispose();
   }
 }

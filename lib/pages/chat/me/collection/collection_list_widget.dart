@@ -10,6 +10,7 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 //收藏的清单组件
 class CollectionListWidget extends StatefulWidget {
@@ -37,18 +38,11 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
   @override
   void initState() {
     super.initState();
-    collectionChatMessageController.addListener(_update);
     var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
     animateController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 500));
     collectionChatMessageController.latest();
-  }
-
-  _update() {
-    setState(() {
-      collectionChatMessageController.latest();
-    });
   }
 
   void _onScroll() {
@@ -176,27 +170,30 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
 
   ///创建收藏信息的列表
   Widget _buildCollectionWidget(BuildContext context) {
-    return Column(children: <Widget>[
-      Flexible(
-        //使用列表渲染消息
-        child: RefreshIndicator(
-            onRefresh: _onRefresh,
-            //notificationPredicate: _notificationPredicate,
-            child: ListView.builder(
-              controller: widget.scrollController,
-              padding: const EdgeInsets.all(8.0),
-              reverse: false,
-              //消息组件渲染
-              itemBuilder: _buildCollectionItem,
-              //消息条目数
-              itemCount: collectionChatMessageController.data.length,
-            )),
-      ),
-    ]);
+    return Obx(() {
+      return Column(children: <Widget>[
+        Flexible(
+          //使用列表渲染消息
+          child: RefreshIndicator(
+              onRefresh: _onRefresh,
+              //notificationPredicate: _notificationPredicate,
+              child: ListView.builder(
+                controller: widget.scrollController,
+                padding: const EdgeInsets.all(8.0),
+                reverse: false,
+                //消息组件渲染
+                itemBuilder: _buildCollectionItem,
+                //消息条目数
+                itemCount: collectionChatMessageController.length,
+              )),
+        ),
+      ]);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    collectionChatMessageController.latest();
     var collectionWidget = _buildCollectionWidget(context);
 
     return collectionWidget;
@@ -204,7 +201,6 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
 
   @override
   void dispose() {
-    collectionChatMessageController.removeListener(_update);
     widget.scrollController.removeListener(_onScroll);
     animateController.dispose();
     super.dispose();

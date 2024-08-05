@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
-import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 
@@ -51,17 +51,11 @@ class _DataListViewState extends State<DataListView> {
   @override
   initState() {
     super.initState();
-    // widget.controller.addListener(_update);
-    myself.addListener(_update);
     scrollController.addListener(_onScroll);
 
     ///滚到指定的位置
     // widget.scrollController.animateTo(offset,
     //     duration: const Duration(milliseconds: 1000), curve: Curves.ease);
-  }
-
-  _update() {
-    setState(() {});
   }
 
   Future<void> _onScroll() async {
@@ -126,7 +120,6 @@ class _DataListViewState extends State<DataListView> {
         shrinkWrap: true,
         reverse: widget.reverse,
         itemCount: widget.itemCount,
-        //physics: const NeverScrollableScrollPhysics(),
         controller: scrollController,
         itemBuilder: (BuildContext context, int index) {
           if (widget.itemBuilder != null) {
@@ -143,22 +136,17 @@ class _DataListViewState extends State<DataListView> {
             }
           }
           if (widget.futureItemBuilder != null) {
-            return FutureBuilder(
+            return PlatformFutureBuilder(
                 future: widget.futureItemBuilder!(context, index),
-                builder:
-                    (BuildContext context, AsyncSnapshot<TileData?> snapshot) {
-                  TileData? tileData = snapshot.data;
-                  if (tileData != null) {
-                    return _buildListTile(
-                        context,
-                        DataListTile(
-                          selected: widget.currentIndex == index,
-                          tileData: tileData,
-                          index: index,
-                          onTap: _onTap,
-                        ));
-                  }
-                  return Container();
+                builder: (BuildContext context, TileData? tileData) {
+                  return _buildListTile(
+                      context,
+                      DataListTile(
+                        selected: widget.currentIndex == index,
+                        tileData: tileData!,
+                        index: index,
+                        onTap: _onTap,
+                      ));
                 });
           }
           return null;
@@ -182,7 +170,6 @@ class _DataListViewState extends State<DataListView> {
   @override
   void dispose() {
     scrollController.removeListener(_onScroll);
-    myself.removeListener(_update);
     super.dispose();
   }
 }

@@ -6,6 +6,7 @@ import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:typed_data';
 
@@ -55,7 +56,7 @@ class _LinuxCameraWidgetState extends State<LinuxCameraWidget> {
         XFile.fromData(bytes, mimeType: ChatMessageMimeType.jpeg.name);
     mediaFileController.add(xfile);
     if (mounted) {
-      DialogUtil.info(context,
+      DialogUtil.info(
           content: AppLocalizations.t('Picture saved at ') + (filename));
     }
   }
@@ -143,8 +144,8 @@ class _LinuxCameraWidgetState extends State<LinuxCameraWidget> {
   Widget _buildCameraController(BuildContext context) {
     return Column(
       children: <Widget>[
-        Expanded(
-          child: Container(),
+         Expanded(
+          child: nil,
         ),
         Container(
             color: Colors.grey.withOpacity(AppOpacity.lgOpacity),

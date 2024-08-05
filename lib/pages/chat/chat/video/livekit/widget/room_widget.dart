@@ -6,6 +6,7 @@ import 'package:colla_chat/pages/chat/chat/video/livekit/widget/local_participan
 import 'package:colla_chat/pages/chat/chat/video/livekit/widget/participant_info.dart';
 import 'package:colla_chat/pages/chat/chat/video/livekit/widget/remote_participant_widget.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
 import 'package:livekit_client/livekit_client.dart';
 
@@ -71,7 +72,7 @@ class _RoomWidgetState extends State<RoomWidget> {
   }
 
   Future<bool?> showPublishDialog() async {
-    bool? confirm = await DialogUtil.confirm(context,
+    bool? confirm = await DialogUtil.confirm(
         title: 'Publish',
         content: 'Would you like to publish your Camera & Mic ?');
     return confirm;
@@ -79,7 +80,6 @@ class _RoomWidgetState extends State<RoomWidget> {
 
   Future<bool?> showPlayAudioManuallyDialog() async {
     bool? confirm = await DialogUtil.confirm(
-      context,
       title: 'Play Audio',
       content: 'You need to manually activate audio PlayBack for iOS Safari !',
       okLabel: 'Play Audio',
@@ -90,27 +90,27 @@ class _RoomWidgetState extends State<RoomWidget> {
   }
 
   showErrorDialog(dynamic exception) {
-    DialogUtil.error(context, content: exception.toString());
+    DialogUtil.error(content: exception.toString());
   }
 
   Future<bool?> showReconnectDialog() async {
-    bool? confirm = await DialogUtil.confirm(context,
+    bool? confirm = await DialogUtil.confirm(
         title: 'Reconnect', content: 'This will force a reconnection');
     return confirm;
   }
 
   showReconnectSuccessDialog() {
-    DialogUtil.info(context, content: 'Reconnection was successful.');
+    DialogUtil.info(content: 'Reconnection was successful.');
   }
 
   Future<bool?> showDataReceivedDialog(String data) async {
-    bool? confirm = await DialogUtil.confirm(context,
-        title: 'Received data', content: data);
+    bool? confirm =
+        await DialogUtil.confirm(title: 'Received data', content: data);
     return confirm;
   }
 
   Future<bool?> showRecordingStatusChangedDialog(bool isActiveRecording) async {
-    bool? confirm = await DialogUtil.confirm(context,
+    bool? confirm = await DialogUtil.confirm(
         title: 'Room recording reminder',
         content: isActiveRecording
             ? 'Room recording is active.'
@@ -277,7 +277,7 @@ class _RoomWidgetState extends State<RoomWidget> {
                             participantTracks.first.videoTrack,
                             participantTracks.first.isScreenShare,
                             true)
-                        : Container()),
+                        : nil),
                 if (widget.room.localParticipant != null)
                   SafeArea(
                     top: false,

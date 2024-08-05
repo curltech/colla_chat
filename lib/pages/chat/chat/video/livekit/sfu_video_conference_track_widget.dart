@@ -2,6 +2,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -152,7 +153,7 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
                 trackPublication,
             Widget? child) {
           if (trackPublication == null) {
-            return Container();
+            return nil;
           }
           List<Widget> children = [];
           children.add(CommonAutoSizeText('name:${trackPublication.name}'));

@@ -1,9 +1,9 @@
 import 'package:colla_chat/pages/chat/chat/video/p2p/video_conference_track_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -73,21 +73,15 @@ class VideoConferenceConnectionWidget extends StatelessWidget
   }
 
   Widget _buildConnectionListView(BuildContext context) {
-    var connectionView = FutureBuilder(
+    var connectionView = PlatformFutureBuilder(
         future: _buildConnectionTileData(context),
-        builder:
-            (BuildContext context, AsyncSnapshot<List<TileData>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            List<TileData>? tileData = snapshot.data;
-            tileData ??= [];
-            return DataListView(
-              itemCount: tileData.length,
-              itemBuilder: (BuildContext context, int index) {
-                return tileData?[index];
-              },
-            );
-          }
-          return LoadingUtil.buildLoadingIndicator();
+        builder: (BuildContext context, List<TileData> tileData) {
+          return DataListView(
+            itemCount: tileData.length,
+            itemBuilder: (BuildContext context, int index) {
+              return tileData[index];
+            },
+          );
         });
 
     return connectionView;

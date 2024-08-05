@@ -5,9 +5,11 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class GroupDataListController with ChangeNotifier {
-  final Map<TileData, DataListController<TileData>> controllers = {};
+class GroupDataListController {
+  final RxMap<TileData, DataListController<TileData>> controllers =
+      <TileData, DataListController<TileData>>{}.obs;
 
   GroupDataListController({Map<TileData, List<TileData>> tileData = const {}}) {
     _addAll(tileData: tileData);
@@ -36,7 +38,6 @@ class GroupDataListController with ChangeNotifier {
   addAll({required Map<TileData, List<TileData>> tileData}) {
     if (tileData.isNotEmpty) {
       _addAll(tileData: tileData);
-      notifyListeners();
     }
   }
 
@@ -49,19 +50,17 @@ class GroupDataListController with ChangeNotifier {
     dataListController = DataListController<TileData>(
         data: tileData, currentIndex: currentIndex);
     controllers[tile] = dataListController;
-    notifyListeners();
   }
 
   remove(TileData tile) {
     if (controllers.containsKey(tile)) {
       controllers.remove(tile);
-      notifyListeners();
     }
   }
 }
 
-class GroupDataListView extends StatefulWidget {
-  late final GroupDataListController controller;
+class GroupDataListView extends StatelessWidget {
+  late final GroupDataListController groupDataListController;
   final Function(int index, String title, {String? subtitle, TileData? group})?
       onTap;
 
@@ -71,40 +70,21 @@ class GroupDataListView extends StatefulWidget {
       Map<TileData, List<TileData>> tileData = const {},
       this.onTap}) {
     if (controller != null) {
-      this.controller = controller;
+      groupDataListController = controller;
     } else {
-      this.controller = GroupDataListController(tileData: tileData);
+      groupDataListController = GroupDataListController(tileData: tileData);
     }
   }
 
-  @override
-  State<StatefulWidget> createState() {
-    return _GroupDataListViewState();
-  }
-}
-
-class _GroupDataListViewState extends State<GroupDataListView> {
-  @override
-  initState() {
-    super.initState();
-    widget.controller.addListener(_update);
-    myself.addListener(_update);
-  }
-
-  _update() {
-    setState(() {});
-  }
-
   _onTap(int index, String title, {String? subtitle, TileData? group}) {
-    //logger.w('index: $index, title: $title,onTap GroupDataListView');
-    var onTap = widget.onTap;
+    var onTap = this.onTap;
     if (onTap != null) {
       onTap(index, title, subtitle: subtitle, group: group);
     }
   }
 
   Widget? _buildExpansionTile(TileData tileData) {
-    var dataListController = widget.controller.get(tileData);
+    var dataListController = groupDataListController.get(tileData);
     if (dataListController == null) {
       return null;
     }
@@ -143,30 +123,34 @@ class _GroupDataListViewState extends State<GroupDataListView> {
     bool selected = tileData.selected ?? false;
 
     /// 未来不使用ListTile，因为高度固定，不够灵活
-    ExpansionTile expansionTile = ExpansionTile(
-      childrenPadding: const EdgeInsets.all(0),
-      maintainState: true,
-      leading: leading,
-      textColor: selected ? myself.primary : null,
-      title: CommonAutoSizeText(
-        AppLocalizations.t(tileData.title),
-      ),
-      subtitle: tileData.subtitle != null
-          ? CommonAutoSizeText(
-              tileData.subtitle!,
-            )
-          : null,
-      trailing: trailingWidget,
-      initiallyExpanded: selected,
-      children: [dataListView],
+    Widget expansionTile = ListenableBuilder(
+      listenable: myself,
+      builder: (BuildContext context, Widget? child) {
+        return ExpansionTile(
+          childrenPadding: const EdgeInsets.all(0),
+          maintainState: true,
+          leading: leading,
+          textColor: selected ? myself.primary : null,
+          title: CommonAutoSizeText(
+            AppLocalizations.t(tileData.title),
+          ),
+          subtitle: tileData.subtitle != null
+              ? CommonAutoSizeText(
+                  tileData.subtitle!,
+                )
+              : null,
+          trailing: trailingWidget,
+          initiallyExpanded: selected,
+          children: [dataListView],
+        );
+      },
     );
-
     return expansionTile;
   }
 
   Widget _buildListView(BuildContext context) {
     List<Widget> groups = [];
-    var controllers = widget.controller.controllers;
+    var controllers = groupDataListController.controllers;
     if (controllers.isNotEmpty) {
       for (var entry in controllers.entries) {
         Widget? groupExpansionTile = _buildExpansionTile(
@@ -184,13 +168,8 @@ class _GroupDataListViewState extends State<GroupDataListView> {
 
   @override
   Widget build(BuildContext context) {
-    return _buildListView(context);
-  }
-
-  @override
-  void dispose() {
-    widget.controller.removeListener(_update);
-    myself.removeListener(_update);
-    super.dispose();
+    return Obx(() {
+      return _buildListView(context);
+    });
   }
 }

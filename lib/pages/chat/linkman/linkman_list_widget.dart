@@ -35,9 +35,27 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-final DataListController<Linkman> linkmanController =
-    DataListController<Linkman>();
+class LinkmanController extends DataListController<Linkman> {
+  changeLinkmanStatus(Linkman linkman, LinkmanStatus status) async {
+    int id = linkman.id!;
+    await linkmanService.update({'id': id, 'linkmanStatus': status.name});
+    linkmanService.linkmen.remove(linkman.peerId);
+    linkman.linkmanStatus = status.name;
+    data.assignAll(data);
+  }
+
+  changeSubscriptStatus(Linkman linkman, LinkmanStatus status) async {
+    int id = linkman.id!;
+    await linkmanService.update({'id': id, 'subscriptStatus': status.name});
+    linkmanService.linkmen.remove(linkman.peerId);
+    linkman.subscriptStatus = status.name;
+    data.assignAll(data);
+  }
+}
+
+final LinkmanController linkmanController = LinkmanController();
 final DataListController<Group> groupController = DataListController<Group>();
 final DataListController<Conference> conferenceController =
     DataListController<Conference>();
@@ -87,43 +105,14 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   final TextEditingController _groupTextController = TextEditingController();
   final TextEditingController _conferenceTextController =
       TextEditingController();
-  final ValueNotifier<List<TileData>> _linkmanTileData =
-      ValueNotifier<List<TileData>>([]);
-  final ValueNotifier<List<TileData>> _groupTileData =
-      ValueNotifier<List<TileData>>([]);
-  final ValueNotifier<List<TileData>> _conferenceTileData =
-      ValueNotifier<List<TileData>>([]);
-  final ValueNotifier<int> _currentTab = ValueNotifier<int>(0);
 
-  late TabController _tabController;
+  late final TabController _tabController =
+      TabController(length: 3, vsync: this);
 
   @override
   initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
-    _tabController.addListener(_updateCurrentTab);
-    linkmanController.addListener(_updateLinkman);
-    groupController.addListener(_updateGroup);
-    conferenceController.addListener(_updateConference);
     _searchLinkman(_linkmanTextController.text);
-    // _searchGroup(_groupTextController.text);
-    // _searchConference(_conferenceTextController.text);
-  }
-
-  _updateCurrentTab() {
-    _currentTab.value = _tabController.index;
-  }
-
-  _updateLinkman() {
-    _buildLinkmanTileData();
-  }
-
-  _updateGroup() {
-    _buildGroupTileData();
-  }
-
-  _updateConference() {
-    _buildConferenceTileData();
   }
 
   _searchLinkman(String key) async {
@@ -204,20 +193,6 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     return searchTextField;
   }
 
-  _changeLinkmanStatus(Linkman linkman, LinkmanStatus status) async {
-    int id = linkman.id!;
-    await linkmanService.update({'id': id, 'linkmanStatus': status.name});
-    linkmanService.linkmen.remove(linkman.peerId);
-    linkman.linkmanStatus = status.name;
-  }
-
-  _changeSubscriptStatus(Linkman linkman, LinkmanStatus status) async {
-    int id = linkman.id!;
-    await linkmanService.update({'id': id, 'subscriptStatus': status.name});
-    linkmanService.linkmen.remove(linkman.peerId);
-    linkman.subscriptStatus = status.name;
-  }
-
   Widget _buildBadge(int connectionNum, {Widget? avatarImage}) {
     var badge = avatarImage ?? AppImage.mdAppImage;
     Widget? child;
@@ -252,7 +227,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   }
 
   //将linkman和group数据转换从列表显示数据
-  _buildLinkmanTileData() {
+  List<TileData> _buildLinkmanTileData() {
     var linkmen = linkmanController.data;
     List<TileData> tiles = [];
     if (linkmen.isNotEmpty) {
@@ -299,7 +274,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             title: 'Delete',
             prefix: Icons.person_remove,
             onTap: (int index, String label, {String? subtitle}) async {
-              bool? confirm = await DialogUtil.confirm(context,
+              bool? confirm = await DialogUtil.confirm(
                   content:
                       '${AppLocalizations.t('Do you want delete linkman')} ${linkman.name}');
               if (confirm != true) {
@@ -311,7 +286,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
               await chatMessageService.removeByLinkman(linkman.peerId);
               linkmanController.delete();
               if (mounted) {
-                DialogUtil.info(context,
+                DialogUtil.info(
                     content:
                         '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is deleted')}');
               }
@@ -326,7 +301,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             prefix: Icons.request_quote_outlined,
             onTap: (int index, String title, {String? subtitle}) async {
               if (mounted) {
-                String? tip = await DialogUtil.showTextFormField(context,
+                String? tip = await DialogUtil.showTextFormField(
                     title: AppLocalizations.t('Request add friend'),
                     tip: AppLocalizations.t('I am ') + myself.name!,
                     content: AppLocalizations.t(
@@ -334,7 +309,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 if (tip != null) {
                   await linkmanService.addFriend(linkman.peerId, tip);
                   if (mounted) {
-                    DialogUtil.info(context,
+                    DialogUtil.info(
                         content:
                             '${AppLocalizations.t('Linkman:')} ${linkman.name} ${AppLocalizations.t('is requested add me as friend')}');
                   }
@@ -364,16 +339,16 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 title: 'Remove friend',
                 prefix: Icons.person_remove_outlined,
                 onTap: (int index, String title, {String? subtitle}) async {
-                  bool? confirm = await DialogUtil.confirm(context,
+                  bool? confirm = await DialogUtil.confirm(
                       content:
                           '${AppLocalizations.t('Do you want remove friend')} ${linkman.name}');
                   if (confirm != true) {
                     return;
                   }
-                  await _changeLinkmanStatus(linkman, LinkmanStatus.S);
-                  linkmanController.notifyListeners();
+                  linkmanController.changeLinkmanStatus(
+                      linkman, LinkmanStatus.S);
                   if (mounted) {
-                    DialogUtil.info(context,
+                    DialogUtil.info(
                         content:
                             '${AppLocalizations.t('Linkman:')} ${linkman.name} ${AppLocalizations.t('is removed friend')}');
                   }
@@ -386,16 +361,16 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 title: 'Add friend',
                 prefix: Icons.person_add_outlined,
                 onTap: (int index, String title, {String? subtitle}) async {
-                  bool? confirm = await DialogUtil.confirm(context,
+                  bool? confirm = await DialogUtil.confirm(
                       content:
                           '${AppLocalizations.t('Do you want add friend')} ${linkman.name}');
                   if (confirm != true) {
                     return;
                   }
-                  await _changeLinkmanStatus(linkman, LinkmanStatus.F);
-                  linkmanController.notifyListeners();
+                  linkmanController.changeLinkmanStatus(
+                      linkman, LinkmanStatus.F);
                   if (mounted) {
-                    DialogUtil.info(context,
+                    DialogUtil.info(
                         content:
                             '${AppLocalizations.t('Linkman:')} ${linkman.name} ${AppLocalizations.t('is added friend')}');
                   }
@@ -407,16 +382,16 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                   title: 'Remove blacklist',
                   prefix: Icons.person_outlined,
                   onTap: (int index, String title, {String? subtitle}) async {
-                    bool? confirm = await DialogUtil.confirm(context,
+                    bool? confirm = await DialogUtil.confirm(
                         content:
                             '${AppLocalizations.t('Do you want remove blacklist')} ${linkman.name}');
                     if (confirm != true) {
                       return;
                     }
-                    await _changeLinkmanStatus(linkman, LinkmanStatus.S);
-                    linkmanController.notifyListeners();
+                    linkmanController.changeLinkmanStatus(
+                        linkman, LinkmanStatus.S);
                     if (mounted) {
-                      DialogUtil.info(context,
+                      DialogUtil.info(
                           content:
                               '${AppLocalizations.t('Linkman:')} ${linkman.name} ${AppLocalizations.t('is removed blacklist')}');
                     }
@@ -427,16 +402,16 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 title: 'Add blacklist',
                 prefix: Icons.person_off,
                 onTap: (int index, String title, {String? subtitle}) async {
-                  bool? confirm = await DialogUtil.confirm(context,
+                  bool? confirm = await DialogUtil.confirm(
                       content:
                           '${AppLocalizations.t('Do you want add blacklist')} ${linkman.name}');
                   if (confirm != true) {
                     return;
                   }
-                  await _changeLinkmanStatus(linkman, LinkmanStatus.B);
-                  linkmanController.notifyListeners();
+                  linkmanController.changeLinkmanStatus(
+                      linkman, LinkmanStatus.B);
                   if (mounted) {
-                    DialogUtil.info(context,
+                    DialogUtil.info(
                         content:
                             '${AppLocalizations.t('Linkman:')} ${linkman.name} ${AppLocalizations.t('is added blacklist')}');
                   }
@@ -448,16 +423,16 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                   title: 'Remove subscript',
                   prefix: Icons.unsubscribe,
                   onTap: (int index, String title, {String? subtitle}) async {
-                    bool? confirm = await DialogUtil.confirm(context,
+                    bool? confirm = await DialogUtil.confirm(
                         content:
                             '${AppLocalizations.t('Do you want remove subscript')} ${linkman.name}');
                     if (confirm != true) {
                       return;
                     }
-                    await _changeSubscriptStatus(linkman, LinkmanStatus.N);
-                    linkmanController.notifyListeners();
+                    linkmanController.changeSubscriptStatus(
+                        linkman, LinkmanStatus.N);
                     if (mounted) {
-                      DialogUtil.info(context,
+                      DialogUtil.info(
                           content:
                               '${AppLocalizations.t('Linkman:')} ${linkman.name} ${AppLocalizations.t('is removed subscript')}');
                     }
@@ -468,16 +443,16 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 title: 'Add subscript',
                 prefix: Icons.subscriptions,
                 onTap: (int index, String title, {String? subtitle}) async {
-                  bool? confirm = await DialogUtil.confirm(context,
+                  bool? confirm = await DialogUtil.confirm(
                       content:
                           '${AppLocalizations.t('Do you want add subscript')} ${linkman.name}');
                   if (confirm != true) {
                     return;
                   }
-                  await _changeSubscriptStatus(linkman, LinkmanStatus.C);
-                  linkmanController.notifyListeners();
+                  linkmanController.changeSubscriptStatus(
+                      linkman, LinkmanStatus.C);
                   if (mounted) {
-                    DialogUtil.info(context,
+                    DialogUtil.info(
                         content:
                             '${AppLocalizations.t('Linkman:')} ${linkman.name} ${AppLocalizations.t('is added subscript')}');
                   }
@@ -489,10 +464,10 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         tiles.add(tile);
       }
     }
-    _linkmanTileData.value = tiles;
+    return tiles;
   }
 
-  _buildGroupTileData() {
+  List<TileData> _buildGroupTileData() {
     var groups = groupController.data;
     List<TileData> tiles = [];
     if (groups.isNotEmpty) {
@@ -516,7 +491,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             title: 'Delete',
             prefix: Icons.group_remove,
             onTap: (int index, String label, {String? subtitle}) async {
-              bool? confirm = await DialogUtil.confirm(context,
+              bool? confirm = await DialogUtil.confirm(
                   content:
                       '${AppLocalizations.t('Do you want delete group')} ${group.name}');
               if (confirm != true) {
@@ -530,7 +505,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
               await chatMessageService.removeByGroup(peerId);
               groupController.delete(index: index);
               if (mounted) {
-                DialogUtil.info(context,
+                DialogUtil.info(
                     content:
                         '${AppLocalizations.t('Group:')} ${group.name} ${AppLocalizations.t('is deleted')}');
               }
@@ -542,7 +517,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             title: 'Dismiss',
             prefix: Icons.group_off,
             onTap: (int index, String label, {String? subtitle}) async {
-              bool? confirm = await DialogUtil.confirm(context,
+              bool? confirm = await DialogUtil.confirm(
                   content:
                       '${AppLocalizations.t('Do you want dismiss group')} ${group.name}');
               if (confirm != true) {
@@ -556,13 +531,13 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 await chatMessageService.removeByGroup(peerId);
                 groupController.delete(index: index);
                 if (mounted) {
-                  DialogUtil.info(context,
+                  DialogUtil.info(
                       content:
                           '${AppLocalizations.t('Group:')} ${group.name} ${AppLocalizations.t('is dismiss')}');
                 }
               } else {
                 if (mounted) {
-                  DialogUtil.error(context, content: 'Must be group owner');
+                  DialogUtil.error(content: 'Must be group owner');
                 }
               }
             });
@@ -588,10 +563,10 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         tiles.add(tile);
       }
     }
-    _groupTileData.value = tiles;
+    return tiles;
   }
 
-  _buildConferenceTileData() {
+  List<TileData> _buildConferenceTileData() {
     List<Conference> conferences = conferenceController.data;
     List<TileData> tiles = [];
     if (conferences.isNotEmpty) {
@@ -624,7 +599,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             title: 'Delete',
             prefix: Icons.playlist_remove_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
-              bool? confirm = await DialogUtil.confirm(context,
+              bool? confirm = await DialogUtil.confirm(
                   content:
                       '${AppLocalizations.t('Do you want delete conference')} ${conference.name}');
               if (confirm != true) {
@@ -637,7 +612,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
               await chatMessageService.removeByGroup(conferenceId);
               conferenceController.delete(index: index);
               if (mounted) {
-                DialogUtil.info(context,
+                DialogUtil.info(
                     content:
                         '${AppLocalizations.t('Conference:')} ${conference.name} ${AppLocalizations.t('is deleted')}');
               }
@@ -663,7 +638,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         tiles.add(tile);
       }
     }
-    _conferenceTileData.value = tiles;
+    return tiles;
   }
 
   _onTapLinkman(int index, String title, {String? subtitle, TileData? group}) {
@@ -681,57 +656,45 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
 
   Widget _buildLinkmanListView(BuildContext context) {
     final List<Widget> tabs = <Widget>[
-      ValueListenableBuilder(
-          valueListenable: _currentTab,
-          builder: (context, value, child) {
-            return Tab(
-              icon: Tooltip(
-                  message: AppLocalizations.t('Linkman'),
-                  child: value == 0
-                      ? Icon(
-                          Icons.person,
-                          color: myself.primary,
-                          size: AppIconSize.mdSize,
-                        )
-                      : const Icon(Icons.person, color: Colors.white)),
-              //text: AppLocalizations.t('Linkman'),
-              iconMargin: const EdgeInsets.all(0.0),
-            );
-          }),
-      ValueListenableBuilder(
-          valueListenable: _currentTab,
-          builder: (context, value, child) {
-            return Tab(
-              icon: Tooltip(
-                  message: AppLocalizations.t('Group'),
-                  child: value == 1
-                      ? Icon(
-                          Icons.group,
-                          color: myself.primary,
-                          size: AppIconSize.mdSize,
-                        )
-                      : const Icon(Icons.group, color: Colors.white)),
-              //text: AppLocalizations.t('Group'),
-              iconMargin: const EdgeInsets.all(0.0),
-            );
-          }),
-      ValueListenableBuilder(
-          valueListenable: _currentTab,
-          builder: (context, value, child) {
-            return Tab(
-              icon: Tooltip(
-                  message: AppLocalizations.t('Conference'),
-                  child: value == 2
-                      ? Icon(
-                          Icons.video_chat,
-                          color: myself.primary,
-                          size: AppIconSize.mdSize,
-                        )
-                      : const Icon(Icons.video_chat, color: Colors.white)),
-              //text: AppLocalizations.t('Conference'),
-              iconMargin: const EdgeInsets.all(0.0),
-            );
-          }),
+      Tab(
+        icon: Tooltip(
+            message: AppLocalizations.t('Linkman'),
+            child: _tabController.index == 0
+                ? Icon(
+                    Icons.person,
+                    color: myself.primary,
+                    size: AppIconSize.mdSize,
+                  )
+                : const Icon(Icons.person, color: Colors.white)),
+        text: AppLocalizations.t('Linkman'),
+        iconMargin: const EdgeInsets.all(0.0),
+      ),
+      Tab(
+        icon: Tooltip(
+            message: AppLocalizations.t('Group'),
+            child: _tabController.index == 1
+                ? Icon(
+                    Icons.group,
+                    color: myself.primary,
+                    size: AppIconSize.mdSize,
+                  )
+                : const Icon(Icons.group, color: Colors.white)),
+        text: AppLocalizations.t('Group'),
+        iconMargin: const EdgeInsets.all(0.0),
+      ),
+      Tab(
+        icon: Tooltip(
+            message: AppLocalizations.t('Conference'),
+            child: _tabController.index == 2
+                ? Icon(
+                    Icons.video_chat,
+                    color: myself.primary,
+                    size: AppIconSize.mdSize,
+                  )
+                : const Icon(Icons.video_chat, color: Colors.white)),
+        text: AppLocalizations.t('Conference'),
+        iconMargin: const EdgeInsets.all(0.0),
+      ),
     ];
     final tabBar = TabBar(
       tabs: tabs,
@@ -752,53 +715,46 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         }
       },
     );
-
     var linkmanView = Column(children: [
       _buildLinkmanSearchTextField(context),
-      Expanded(
-          child: ValueListenableBuilder(
-              valueListenable: _linkmanTileData,
-              builder: (context, value, child) {
-                return DataListView(
-                  itemCount: value.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return value[index];
-                  },
-                  onTap: _onTapLinkman,
-                );
-              }))
+      Expanded(child: Obx(() {
+        List<TileData> tiles = _buildLinkmanTileData();
+        return DataListView(
+          itemCount: tiles.length,
+          itemBuilder: (BuildContext context, int index) {
+            return tiles[index];
+          },
+          onTap: _onTapLinkman,
+        );
+      }))
     ]);
 
     var groupView = Column(children: [
       _buildGroupSearchTextField(context),
-      Expanded(
-          child: ValueListenableBuilder(
-              valueListenable: _groupTileData,
-              builder: (context, value, child) {
-                return DataListView(
-                  itemCount: value.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return value[index];
-                  },
-                  onTap: _onTapGroup,
-                );
-              }))
+      Expanded(child: Obx(() {
+        List<TileData> tiles = _buildGroupTileData();
+        return DataListView(
+          itemCount: tiles.length,
+          itemBuilder: (BuildContext context, int index) {
+            return tiles[index];
+          },
+          onTap: _onTapGroup,
+        );
+      }))
     ]);
 
     var conferenceView = Column(children: [
       _buildConferenceSearchTextField(context),
-      Expanded(
-          child: ValueListenableBuilder(
-              valueListenable: _conferenceTileData,
-              builder: (context, value, child) {
-                return DataListView(
-                  itemCount: value.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return value[index];
-                  },
-                  onTap: _onTapConference,
-                );
-              }))
+      Expanded(child: Obx(() {
+        List<TileData> tiles = _buildConferenceTileData();
+        return DataListView(
+          itemCount: tiles.length,
+          itemBuilder: (BuildContext context, int index) {
+            return tiles[index];
+          },
+          onTap: _onTapConference,
+        );
+      }))
     ]);
 
     final tabBarView = KeepAliveWrapper(
@@ -858,37 +814,27 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     Linkman linkman = await linkmanService.storeByPeerEntity(peerClient);
     if (linkman.linkmanStatus == LinkmanStatus.F.name) {
       if (mounted) {
-        DialogUtil.info(context, content: '${linkman.name} was friend');
+        DialogUtil.info(content: '${linkman.name} was friend');
       }
       return;
     }
     if (mounted) {
-      bool? confirm = await DialogUtil.confirm(context,
+      bool? confirm = await DialogUtil.confirm(
           content: 'You confirm add ${linkman.name} as friend?');
       if (confirm != null && confirm) {
-        await _changeLinkmanStatus(linkman, LinkmanStatus.F);
+        await linkmanController.changeLinkmanStatus(linkman, LinkmanStatus.F);
         if (mounted) {
-          DialogUtil.info(context,
+          DialogUtil.info(
               content: 'You add ${linkman.name} as friend successfully');
         }
       }
     }
     if (mounted) {
-      String? content = await DialogUtil.showTextFormField(context,
+      String? content = await DialogUtil.showTextFormField(
           content: 'tip', title: AppLocalizations.t('Request add friend'));
       if (content != null) {
         await linkmanService.addFriend(peerClient.peerId, content);
       }
     }
-  }
-
-  @override
-  void dispose() {
-    _tabController.removeListener(_updateCurrentTab);
-    _tabController.dispose();
-    linkmanController.removeListener(_updateLinkman);
-    groupController.removeListener(_updateGroup);
-    groupController.removeListener(_updateConference);
-    super.dispose();
   }
 }

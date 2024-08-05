@@ -15,6 +15,7 @@ final localeOptions = [
 /// 本应用的参数状态管理器，与操作系统系统和硬件无关
 /// 在系统启动的对象初始化从本地存储中加载
 class AppDataProvider with ChangeNotifier {
+  BuildContext? context;
   List<String> topics = [];
 
   //屏幕宽高
@@ -28,7 +29,7 @@ class AppDataProvider with ChangeNotifier {
   double dividerWidth = 1;
   double topPadding = 0;
   double bottomPadding = 0;
-  double textScaleFactor = 1.0;
+  TextScaler textScaler = TextScaler.noScaling;
   String sqlite3Path = '';
   int dataLength = 0;
   bool _autoLogin = false;
@@ -176,7 +177,7 @@ class AppDataProvider with ChangeNotifier {
 
   ///当外部改变屏幕大小的时候引起index页面的重建，从而调用这个方法改变size
   changeSize(BuildContext context) {
-    var totalSize = MediaQuery.of(context).size;
+    var totalSize = MediaQuery.sizeOf(context);
     if (totalSize.width != _totalSize.width ||
         totalSize.height != _totalSize.height) {
       _totalSize = totalSize;
@@ -189,7 +190,7 @@ class AppDataProvider with ChangeNotifier {
       }
       // logger.i('Total size: $_totalSize');
     }
-    var bottom = MediaQuery.of(context).viewInsets.bottom;
+    var bottom = MediaQuery.viewInsetsOf(context).bottom;
     if (_keyboardHeight == 270.0 && bottom != 0) {
       _keyboardHeight = bottom;
       // logger.i('KeyboardHeight: $_keyboardHeight');
@@ -197,14 +198,14 @@ class AppDataProvider with ChangeNotifier {
     // logger.i('bottomBarHeight: $bottomBarHeight');
     // logger.i('toolbarHeight: $toolbarHeight');
     // 上下边距 （主要用于 刘海  和  内置导航键）
-    topPadding = MediaQuery.of(context).padding.top;
+    topPadding = MediaQuery.paddingOf(context).top;
     // logger.i('topPadding: $topPadding');
-    bottomPadding = MediaQuery.of(context).padding.bottom;
+    bottomPadding = MediaQuery.paddingOf(context).bottom;
     // logger.i('bottomPadding: $bottomPadding');
 
-    textScaleFactor = MediaQuery.of(context).textScaleFactor;
+    textScaler = MediaQuery.textScalerOf(context);
     // logger.i('textScaleFactor: $textScaleFactor');
   }
 }
 
-var appDataProvider = AppDataProvider();
+final AppDataProvider appDataProvider = AppDataProvider();

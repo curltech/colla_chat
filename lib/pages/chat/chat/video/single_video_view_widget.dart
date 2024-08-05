@@ -102,8 +102,8 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
     if (peerMediaStreams.isEmpty) {
       return mediaRenderView;
     }
-    var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.sizeOf(context).height;
+    var width = MediaQuery.sizeOf(context).width;
     mediaRenderView = PeerMediaRenderView(
         peerMediaStream: peerMediaStreams[index], height: height, width: width);
     Widget singleVideoView = Builder(
@@ -203,7 +203,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
     if (actions.isEmpty) {
       return null;
     }
-    return DialogUtil.popModalBottomSheet(context, builder: (context) {
+    return DialogUtil.popModalBottomSheet(builder: (context) {
       int level = (actions.length / 3).ceil();
       double height = 100.0 * level;
       return Card(

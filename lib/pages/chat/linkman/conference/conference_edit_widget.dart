@@ -21,6 +21,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
@@ -28,13 +29,13 @@ import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:colla_chat/widgets/qrcode_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-ValueNotifier<Conference?> conferenceNotifier =
-    ValueNotifier<Conference?>(null);
+Rx<Conference?> conferenceNotifier = Rx<Conference?>(null);
 
 ///创建和修改群，填写群的基本信息，选择群成员和群主
-class ConferenceEditWidget extends StatefulWidget with TileDataMixin {
-  const ConferenceEditWidget({super.key});
+class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
+  ConferenceEditWidget({super.key});
 
   @override
   IconData get iconData => Icons.meeting_room_outlined;
@@ -48,11 +49,6 @@ class ConferenceEditWidget extends StatefulWidget with TileDataMixin {
   @override
   bool get withLeading => true;
 
-  @override
-  State<StatefulWidget> createState() => _ConferenceEditWidgetState();
-}
-
-class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
   final List<PlatformDataField> conferenceDataField = [
     PlatformDataField(
         name: 'id',
@@ -132,21 +128,13 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
       readOnly: true,
     ),
   ];
-  late final FormInputController controller =
+  late final FormInputController formInputController =
       FormInputController(conferenceDataField);
 
   OptionController conferenceOwnerController = OptionController();
 
   //选择的会议成员
-  ValueNotifier<List<String>> conferenceMembers = ValueNotifier([]);
-
-  @override
-  initState() {
-    _initConference();
-    conferenceController.addListener(_update);
-    _buildConferenceData();
-    super.initState();
-  }
+  RxList<String> conferenceMembers = RxList<String>([]);
 
   Conference _initConference() {
     Conference? current = conferenceNotifier.value;
@@ -157,14 +145,8 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     return current;
   }
 
-  _update() {
-    if (mounted) {
-      _buildConferenceData();
-    }
-  }
-
   //当当前会议改变后，更新数据，局部刷新
-  _buildConferenceData() async {
+  _buildConferenceData(BuildContext context) async {
     Conference? current = conferenceNotifier.value;
     if (current == null) {
       return;
@@ -178,13 +160,14 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
           conferenceMembers.add(member.memberPeerId!);
         }
       }
-      await _buildConferenceOwnerOptions(conferenceMembers);
+      await _buildConferenceOwnerOptions(context, conferenceMembers);
       this.conferenceMembers.value = conferenceMembers;
     }
   }
 
   //更新ConferenceOwnerOptions，从会议成员中选择
-  _buildConferenceOwnerOptions(List<String> selected) async {
+  _buildConferenceOwnerOptions(
+      BuildContext context, List<String> selected) async {
     Conference? current = conferenceNotifier.value;
     if (current == null) {
       return;
@@ -210,12 +193,11 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
           conferenceOwnerOptions.add(option);
         } else {
           logger.e('Conference member $conferenceMemberId is not linkman');
-          if (mounted) {
-            DialogUtil.error(context,
-                content: AppLocalizations.t('Conference member ') +
-                    conferenceMemberId +
-                    AppLocalizations.t(' is not linkman'));
-          }
+
+          DialogUtil.error(
+              content: AppLocalizations.t('Conference member ') +
+                  conferenceMemberId +
+                  AppLocalizations.t(' is not linkman'));
         }
       }
     }
@@ -224,28 +206,25 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
 
   //会议成员显示和编辑界面，从所有的联系人中选择会议成员
   Widget _buildConferenceMembersWidget(BuildContext context) {
-    var selector = ValueListenableBuilder(
-        valueListenable: conferenceMembers,
-        builder: (BuildContext context, List<String> conferenceMembers,
-            Widget? child) {
-          if (!this.conferenceMembers.value.contains(myself.peerId)) {
-            this.conferenceMembers.value.insert(0, myself.peerId!);
-          }
-          return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 0.0),
-              child: LinkmanGroupSearchWidget(
-                key: UniqueKey(),
-                selectType: SelectType.chipMultiSelectField,
-                onSelected: (List<String>? selected) async {
-                  if (selected != null) {
-                    this.conferenceMembers.value = selected;
-                    await _buildConferenceOwnerOptions(selected);
-                  }
-                },
-                selected: conferenceMembers,
-                includeGroup: false,
-              ));
-        });
+    var selector = Obx(() {
+      if (!conferenceMembers.value.contains(myself.peerId)) {
+        conferenceMembers.insert(0, myself.peerId!);
+      }
+      return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 0.0),
+          child: LinkmanGroupSearchWidget(
+            key: UniqueKey(),
+            selectType: SelectType.chipMultiSelectField,
+            onSelected: (List<String>? selected) async {
+              if (selected != null) {
+                conferenceMembers.value = selected;
+                await _buildConferenceOwnerOptions(context, selected);
+              }
+            },
+            selected: conferenceMembers,
+            includeGroup: false,
+          ));
+    });
 
     return selector;
   }
@@ -254,7 +233,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
   Widget _buildConferenceOwnerWidget(BuildContext context) {
     Conference? current = conferenceNotifier.value;
     if (current == null) {
-      return Container();
+      return nil;
     }
     var selector = Container(
         padding: const EdgeInsets.symmetric(horizontal: 0.0),
@@ -285,7 +264,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
               .sendSfuConferenceMessage(current, participants, store: false);
         } catch (e) {
           logger.e('sendSfuConferenceMessage failure:$e');
-          DialogUtil.error(context,
+          DialogUtil.error(
               content: 'send sfu conference message failure');
           return null;
         }
@@ -307,7 +286,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     }
   }
 
-  _qrcode() async {
+  _qrcode(BuildContext context) async {
     Conference? current = conferenceNotifier.value;
     if (current == null) {
       return null;
@@ -366,44 +345,43 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     ];
     ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);
-    var formInputWidget = ValueListenableBuilder(
-        valueListenable: conferenceNotifier,
-        builder: (BuildContext context, Conference? conference, Widget? child) {
-          if (conference != null) {
-            controller.setValues(JsonUtil.toJson(conference));
-          }
-          List<FormButton> formButtons = [
-            FormButton(
-                label: 'Ok',
-                onTap: (Map<String, dynamic> values) async {
-                  Conference? conference = await _onOk(values);
-                  if (conference != null) {
-                    DialogUtil.info(context,
-                        content: AppLocalizations.t('Built conference ') +
-                            conference.name);
-                  }
-                })
-          ];
-          if (conference!.conferenceOwnerPeerId == myself.peerId) {
-            formButtons.add(FormButton(
-                label: 'Qrcode',
-                onTap: (Map<String, dynamic> values) async {
-                  await _qrcode();
-                }));
-            formButtons.add(FormButton(
-              onTap: (Map<String, dynamic> values) {
-                _resend(context);
-              },
-              label: AppLocalizations.t('Resend'),
-            ));
-          }
-          return FormInputWidget(
-            spacing: 5.0,
-            height: appDataProvider.portraitSize.height * 0.6,
-            controller: controller,
-            formButtons: formButtons,
-          );
-        });
+    var formInputWidget = Obx(() {
+      var conference = conferenceNotifier.value;
+      if (conference != null) {
+        formInputController.setValues(JsonUtil.toJson(conference));
+      }
+      List<FormButton> formButtons = [
+        FormButton(
+            label: 'Ok',
+            onTap: (Map<String, dynamic> values) async {
+              Conference? conference = await _onOk(context, values);
+              if (conference != null) {
+                DialogUtil.info(
+                    content: AppLocalizations.t('Built conference ') +
+                        conference.name);
+              }
+            })
+      ];
+      if (conference!.conferenceOwnerPeerId == myself.peerId) {
+        formButtons.add(FormButton(
+            label: 'Qrcode',
+            onTap: (Map<String, dynamic> values) async {
+              await _qrcode(context);
+            }));
+        formButtons.add(FormButton(
+          onTap: (Map<String, dynamic> values) {
+            _resend(context);
+          },
+          label: AppLocalizations.t('Resend'),
+        ));
+      }
+      return FormInputWidget(
+        spacing: 5.0,
+        height: appDataProvider.portraitSize.height * 0.6,
+        controller: formInputController,
+        formButtons: formButtons,
+      );
+    });
     children.add(formInputWidget);
 
     return Container(
@@ -412,23 +390,24 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
   }
 
   /// 修改提交
-  Future<Conference?> _onOk(Map<String, dynamic> values) async {
+  Future<Conference?> _onOk(
+      BuildContext context, Map<String, dynamic> values) async {
     Conference? current = _initConference();
     bool conferenceModified = false;
 
     Conference currentConference = Conference.fromJson(values);
     if (StringUtil.isEmpty(current.conferenceOwnerPeerId)) {
-      DialogUtil.error(context,
+      DialogUtil.error(
           content: AppLocalizations.t('Must has conference owner'));
       return null;
     }
     if (StringUtil.isEmpty(values['name'])) {
-      DialogUtil.error(context,
+      DialogUtil.error(
           content: AppLocalizations.t('Must has conference name'));
       return null;
     }
     if (StringUtil.isEmpty(currentConference.topic)) {
-      DialogUtil.error(context,
+      DialogUtil.error(
           content: AppLocalizations.t('Must has conference topic'));
       return null;
     }
@@ -513,18 +492,13 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
                   current, participants);
             } catch (e) {
               logger.e('buildSfuConference failure:$e');
-              if (mounted) {
-                DialogUtil.error(context,
-                    content: 'build sfu conference failure');
-              }
+              DialogUtil.error(
+                  content: 'build sfu conference failure');
               return null;
             }
           } else {
             logger.e('buildSfuConference failure:');
-            if (mounted) {
-              DialogUtil.error(context,
-                  content: 'build sfu conference failure');
-            }
+            DialogUtil.error( content: 'build sfu conference failure');
             return null;
           }
         }
@@ -550,11 +524,8 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
 
     await conferenceService.store(current);
     conferenceNotifier.value = current;
-
-    if (mounted) {
-      DialogUtil.info(context,
-          content: AppLocalizations.t('Conference has stored completely'));
-    }
+    DialogUtil.info(
+        content: AppLocalizations.t('Conference has stored completely'));
     if (conferenceController.current == null) {
       conferenceController.add(current);
     }
@@ -562,7 +533,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
       conferenceChatSummaryController.refresh();
     }
     if (currentConference.id == null) {
-      setState(() {});
+      //setState(() {});
     }
 
     return current;
@@ -570,6 +541,8 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
 
   @override
   Widget build(BuildContext context) {
+    _initConference();
+    _buildConferenceData(context);
     String title = 'Add conference';
     if (conferenceNotifier.value?.id != null) {
       title = 'Edit conference';
@@ -600,15 +573,9 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     ];
     var appBarView = AppBarView(
         title: title,
-        withLeading: widget.withLeading,
+        withLeading: withLeading,
         rightWidgets: rightWidgets,
         child: _buildFormInputWidget(context));
     return appBarView;
-  }
-
-  @override
-  void dispose() {
-    conferenceNotifier.removeListener(_update);
-    super.dispose();
   }
 }

@@ -2,33 +2,33 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 ///聊天界面的控制器
-class ChatMessageViewController with ChangeNotifier {
+class ChatMessageViewController {
   static const double defaultChatMessageInputHeight = 48;
   static const double defaultEmojiMessageInputHeight = 270;
   static const double defaultMoreMessageInputHeight = 230;
 
   //输入消息的焦点
   final FocusNode focusNode = FocusNode();
-  final GlobalKey<ExtendedTextFieldState> extendedTextKey =
-      GlobalKey<ExtendedTextFieldState>();
-  double _chatMessageInputHeight = defaultChatMessageInputHeight;
-  double _emojiMessageInputHeight = 0;
-  double _moreMessageInputHeight = 0;
+
+  final RxDouble _chatMessageInputHeight = defaultChatMessageInputHeight.obs;
+  final RxDouble _emojiMessageInputHeight = 0.0.obs;
+  final RxDouble _moreMessageInputHeight = 0.0.obs;
 
   ///消息显示部分的高度
   double get chatMessageHeight {
-    double bottomHeight = _chatMessageInputHeight + 8;
-    if (chatMessageViewController.emojiMessageInputHeight > 0) {
-      bottomHeight = bottomHeight + _emojiMessageInputHeight;
+    double bottomHeight = _chatMessageInputHeight.value + 8;
+    if (emojiMessageInputHeight > 0) {
+      bottomHeight = bottomHeight + _emojiMessageInputHeight.value;
     }
-    if (chatMessageViewController.moreMessageInputHeight > 0) {
-      bottomHeight = bottomHeight + _moreMessageInputHeight;
+    if (moreMessageInputHeight > 0) {
+      bottomHeight = bottomHeight + _moreMessageInputHeight.value;
     }
     double totalHeight = appDataProvider.portraitSize.height;
     if (appDataProvider.landscape) {
-      totalHeight = totalHeight = appDataProvider.totalSize.height;
+      totalHeight = appDataProvider.totalSize.height;
     }
     double chatMessageHeight = totalHeight -
         appDataProvider.toolbarHeight -
@@ -41,49 +41,43 @@ class ChatMessageViewController with ChangeNotifier {
   }
 
   ///输入框的高度可能发生变化，延时进行计算消息输入部分的高度
-  changeExtendedTextHeight() {
-    Future.delayed(const Duration(milliseconds: 200), () {
+  changeExtendedTextHeight(GlobalKey<ExtendedTextFieldState> extendedTextKey) {
+    Future.delayed(const Duration(milliseconds: 1), () {
       double? chatMessageInputHeight =
           extendedTextKey.currentContext?.size?.height;
       if (chatMessageInputHeight != null &&
-          _chatMessageInputHeight != chatMessageInputHeight) {
-        _chatMessageInputHeight = chatMessageInputHeight;
+          chatMessageInputHeight != chatMessageInputHeight) {
+        _chatMessageInputHeight(chatMessageInputHeight);
         logger.i('chatMessageInputHeight: $_chatMessageInputHeight');
       }
     });
   }
 
   double get chatMessageInputHeight {
-    return _chatMessageInputHeight;
+    return _chatMessageInputHeight.value;
   }
 
   double get emojiMessageInputHeight {
-    return _emojiMessageInputHeight;
+    return _emojiMessageInputHeight.value;
   }
 
   set emojiMessageInputHeight(double emojiMessageInputHeight) {
-    if (_emojiMessageInputHeight != emojiMessageInputHeight) {
-      _emojiMessageInputHeight = emojiMessageInputHeight;
-      logger.i('emojiMessageInputHeight: $_emojiMessageInputHeight');
-      if (_emojiMessageInputHeight > 0) {
-        _moreMessageInputHeight = 0;
-      }
-      notifyListeners();
+    _emojiMessageInputHeight(emojiMessageInputHeight);
+    logger.i('emojiMessageInputHeight: $_emojiMessageInputHeight');
+    if (_emojiMessageInputHeight.value > 0) {
+      _moreMessageInputHeight(0);
     }
   }
 
   double get moreMessageInputHeight {
-    return _moreMessageInputHeight;
+    return _moreMessageInputHeight.value;
   }
 
   set moreMessageInputHeight(double moreMessageInputHeight) {
-    if (_moreMessageInputHeight != moreMessageInputHeight) {
-      _moreMessageInputHeight = moreMessageInputHeight;
-      logger.i('moreMessageInputHeight: $_moreMessageInputHeight');
-      if (_moreMessageInputHeight > 0) {
-        _emojiMessageInputHeight = 0;
-      }
-      notifyListeners();
+    _moreMessageInputHeight(moreMessageInputHeight);
+    logger.i('moreMessageInputHeight: $_moreMessageInputHeight');
+    if (_moreMessageInputHeight.value > 0) {
+      _emojiMessageInputHeight(0);
     }
   }
 }

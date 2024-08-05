@@ -14,6 +14,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -80,7 +81,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
         selectedVideoIndex = 0;
       }
     } catch (e) {
-      DialogUtil.error(context, content: e.toString());
+      DialogUtil.error( content: e.toString());
     }
   }
 
@@ -93,7 +94,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
         selectedAudioIndex = 0;
       }
     } catch (e) {
-      DialogUtil.error(context, content: e.toString());
+      DialogUtil.error( content: e.toString());
     }
   }
 
@@ -174,8 +175,8 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
   Widget _buildCameraController(BuildContext context) {
     return Column(
       children: <Widget>[
-        Expanded(
-          child: Container(),
+         Expanded(
+          child: nil,
         ),
         Container(
             color: Colors.grey.withOpacity(AppOpacity.lgOpacity),
@@ -303,16 +304,16 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
           onVideoRecordingFinished:
               (CameraMacOSFile? result, CameraMacOSException? exception) {
             if (exception != null) {
-              DialogUtil.error(context, content: exception.toString());
+              DialogUtil.error(content: exception.toString());
             } else if (result != null) {
-              DialogUtil.info(context,
+              DialogUtil.info(
                   content: AppLocalizations.t('Video saved at ') +
                       (result.url ?? ''));
             }
           },
         );
       } catch (e) {
-        DialogUtil.error(context, content: e.toString());
+        DialogUtil.error( content: e.toString());
       }
     }
   }
@@ -327,7 +328,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
               mimeType: ChatMessageMimeType.mp4.name);
           mediaFileController.add(xfile);
           if (mounted) {
-            DialogUtil.info(context,
+            DialogUtil.info(
                 content: AppLocalizations.t('Video saved at ') +
                     (videoData.url ?? ''));
           }
@@ -361,7 +362,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
             mimeType: ChatMessageMimeType.jpeg.name);
         mediaFileController.add(xfile);
         if (mounted) {
-          DialogUtil.info(context,
+          DialogUtil.info(
               content: AppLocalizations.t('Picture saved at ') +
                   (imageData.url ?? ''));
         }
@@ -417,7 +418,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
   //   if (macOSController != null && macOSController.value.isInitialized) {
   //     Size? previewSize = controller!.value.previewSize;
   //     var resolutionPreset = controller!.resolutionPreset;
-  //     Widget previewText = Container();
+  //     Widget previewText = nil;
   //     if (previewSize != null) {
   //       previewText = Align(
   //           alignment: Alignment.topRight,
@@ -446,7 +447,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
   //     return previewText;
   //   }
   //
-  //   return Container();
+  //   return nil;
   // }
 
   @override
