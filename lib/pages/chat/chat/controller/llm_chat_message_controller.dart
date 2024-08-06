@@ -8,6 +8,7 @@ import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/ollama/dart_ollama_client.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/state_manager.dart';
@@ -25,55 +26,59 @@ class LlmChatMessageController extends ChatMessageController {
   @override
   set chatSummary(ChatSummary? chatSummary) {
     super.chatSummary = chatSummary;
-    if (this.chatSummary != chatSummary) {
-      if (chatSummary != null) {
-        var peerId = chatSummary.peerId;
-        linkmanService.findCachedOneByPeerId(peerId!).then((Linkman? linkman) {
-          if (linkman != null) {
-            if (linkman.linkmanStatus == LinkmanStatus.G.name) {
-              dartOllamaClient = dartOllamaClientPool.get(linkman.peerId);
-            } else {
-              dartOllamaClient = null;
-            }
+
+    if (chatSummary != null) {
+      var peerId = chatSummary.peerId;
+      linkmanService.findCachedOneByPeerId(peerId!).then((Linkman? linkman) {
+        if (linkman != null) {
+          if (linkman.linkmanStatus == LinkmanStatus.G.name) {
+            dartOllamaClient = dartOllamaClientPool.get(linkman.peerId);
+          } else {
+            dartOllamaClient = null;
           }
-        });
-      } else {
-        dartOllamaClient = null;
-      }
+        }
+      });
+    } else {
+      dartOllamaClient = null;
     }
   }
 
-  Future<void> _llmChatAction(String content) async {
-    if (llmAction.value == LlmAction.chat) {
-      String? chatResponse = await dartOllamaClient!.prompt(content);
-      await onChatCompletion(chatResponse);
+  Future<void> llmChatAction(String content) async {
+    var chatSummary = this.chatSummary;
+    if (chatSummary == null) {
+      return;
     }
-    // else if (llmAction == LlmAction.image) {
-    //   String image = await langChainClient!.createImage(
-    //     content,
-    //   );
-    //   onImageCompletion(image);
-    // }
-    // else if (langChainAction == LangChainAction.translate) {
-    //   OpenAIAudioModel translation = await chatGPT!.createTranslation(
-    //     file: File(''),
-    //     prompt: content,
-    //   );
-    //   translation.text;
-    // } else if (langChainAction == LangChainAction.audio) {
-    //   File file = await chatGPT!.createSpeech(
-    //     input: content,
-    //   );
-    // }
+    String peerId = chatSummary.peerId!;
+    String partyType = chatSummary.partyType!;
+    PartyType? type = StringUtil.enumFromString(PartyType.values, partyType);
+    type ??= PartyType.linkman;
+    if (type == PartyType.linkman) {
+      ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+          receiverPeerId: peerId,
+          content: content,
+          messageType: ChatMessageType.chat,
+          contentType: ChatMessageContentType.text,
+          subMessageType: ChatMessageSubType.chat,
+          transportType: TransportType.llm);
+      if (dartOllamaClient != null) {
+        await chatMessageService.store(chatMessage);
+        latest();
+        if (llmAction.value == LlmAction.chat) {
+          String? chatResponse = await dartOllamaClient!.prompt(content);
+          await onChatCompletion(chatResponse);
+        }
+      }
+    }
   }
 
   onChatCompletion(String? chatResponse) async {
     ChatMessage chatMessage = buildLlmChatMessage(chatResponse,
         senderPeerId: chatSummary!.peerId, senderName: chatSummary!.name);
     await chatMessageService.store(chatMessage);
+    latest();
   }
 
-  ///接收到chatGPT的消息回复
+  ///接收到llm的消息回复
   ChatMessage buildLlmChatMessage(
     dynamic content, {
     String? senderPeerId,

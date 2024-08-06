@@ -43,8 +43,7 @@ class LlmTextMessageInputWidget extends StatelessWidget {
   Future<void> onSendPressed() async {
     if (StringUtil.isNotEmpty(textEditingController.text)) {
       _play();
-      await llmChatMessageController.sendText(
-          message: textEditingController.text);
+      await llmChatMessageController.llmChatAction(textEditingController.text);
     }
   }
 

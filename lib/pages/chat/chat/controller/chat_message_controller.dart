@@ -219,6 +219,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
 
       List<ChatMessage> returnChatMessages =
           await chatMessageService.sendAndStore(chatMessage, peerIds: peerIds);
+      latest();
       returnChatMessage = returnChatMessages.firstOrNull;
     } else {
       ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
@@ -236,6 +237,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       List<ChatMessage> returnChatMessages =
           await chatMessageService.sendAndStore(chatMessage,
               cryptoOption: CryptoOption.group, peerIds: peerIds);
+      latest();
       returnChatMessage = returnChatMessages.firstOrNull;
     }
     _deleteTime(0);
@@ -260,7 +262,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         }
       }
     }
-    await chatMessageController.send(
+    await send(
         content: peers,
         contentType: ChatMessageContentType.card,
         mimeType: mimeType);
