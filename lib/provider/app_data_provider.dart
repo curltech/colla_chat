@@ -205,7 +205,7 @@ class AppDataProvider with ChangeNotifier {
         }
       }
       // logger.i('Total size: $_totalSize');
-      notifyListeners();
+      // notifyListeners();
     }
   }
 }
