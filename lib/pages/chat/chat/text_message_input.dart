@@ -6,6 +6,7 @@ import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controller.dart';
 import 'package:colla_chat/pages/chat/chat/extended_text_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/message/message_widget.dart';
 import 'package:colla_chat/pages/index/global_chat_message.dart';
@@ -17,6 +18,7 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
+import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
@@ -27,10 +29,8 @@ import 'package:record/record.dart';
 ///发送文本消息的输入框和按钮，
 ///包括声音按钮，扩展文本输入框，emoji按钮，其他多种格式输入按钮和发送按钮
 class TextMessageInputWidget extends StatelessWidget {
-  final TextEditingController textEditingController;
-  final Future<void> Function()? onSendPressed;
-  final void Function()? onEmojiPressed;
-  final void Function()? onMorePressed;
+  ///扩展文本输入框的控制器
+  final TextEditingController textEditingController = TextEditingController();
 
   ///文本录入按钮
   late final ExtendedTextMessageInputWidget extendedTextMessageInputWidget =
@@ -41,10 +41,6 @@ class TextMessageInputWidget extends StatelessWidget {
 
   TextMessageInputWidget({
     super.key,
-    required this.textEditingController,
-    this.onSendPressed,
-    this.onEmojiPressed,
-    this.onMorePressed,
   }) {
     _buildVoiceRecordButton();
   }
@@ -176,11 +172,79 @@ class TextMessageInputWidget extends StatelessWidget {
     }
   }
 
-  _send() {
-    if (onSendPressed != null) {
-      onSendPressed!();
-      textEditingController.clear();
+  BlueFireAudioPlayer audioPlayer = globalBlueFireAudioPlayer;
+
+  _play() {
+    audioPlayer.setLoopMode(false);
+    audioPlayer.play('assets/medias/send.mp3');
+  }
+
+  _stop() {
+    audioPlayer.stop();
+  }
+
+  ///发送文本消息
+  Future<void> onSendPressed() async {
+    if (StringUtil.isNotEmpty(textEditingController.text)) {
+      _play();
+      await chatMessageController.sendText(message: textEditingController.text);
     }
+  }
+
+  void onEmojiPressed() {
+    var height = chatMessageViewController.emojiMessageInputHeight;
+    if (height == 0.0) {
+      chatMessageViewController.emojiMessageInputHeight =
+          ChatMessageViewController.defaultEmojiMessageInputHeight;
+    } else {
+      chatMessageViewController.emojiMessageInputHeight = 0.0;
+    }
+  }
+
+  void onMorePressed() {
+    var height = chatMessageViewController.moreMessageInputHeight;
+    if (height == 0.0) {
+      chatMessageViewController.moreMessageInputHeight =
+          ChatMessageViewController.defaultMoreMessageInputHeight;
+    } else {
+      chatMessageViewController.moreMessageInputHeight = 0.0;
+    }
+  }
+
+  void insertText(String text) {
+    final TextEditingValue value = textEditingController.value;
+    final int start = value.selection.baseOffset;
+    int end = value.selection.extentOffset;
+    if (value.selection.isValid) {
+      String newText = '';
+      if (value.selection.isCollapsed) {
+        if (end > 0) {
+          newText += value.text.substring(0, end);
+        }
+        newText += text;
+        if (value.text.length > end) {
+          newText += value.text.substring(end, value.text.length);
+        }
+      } else {
+        newText = value.text.replaceRange(start, end, text);
+        end = start;
+      }
+
+      textEditingController.value = value.copyWith(
+          text: newText,
+          selection: value.selection.copyWith(
+              baseOffset: end + text.length, extentOffset: end + text.length));
+    } else {
+      textEditingController.value = TextEditingValue(
+          text: text,
+          selection:
+              TextSelection.fromPosition(TextPosition(offset: text.length)));
+    }
+  }
+
+  _send() {
+    onSendPressed();
+    textEditingController.clear();
   }
 
   ///接收到加密短信
@@ -198,20 +262,25 @@ class TextMessageInputWidget extends StatelessWidget {
     textEditingController.clear();
   }
 
-  ///弹出ChatGPT的命令菜单
-  _buildChatGPTMenu(BuildContext context) {
-    Widget sendButton = Visibility(
-        visible: _hasValue(),
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
-          child: IconButton(
-            tooltip: AppLocalizations.t('Send'),
-            icon: Icon(Icons.send_outlined, color: myself.primary),
-            onPressed: () {
-              _send();
-            },
-          ),
-        ));
+  ///弹出不同发送方式的命令菜单
+  _buildTransportMenu(BuildContext context) {
+    Widget sendButton = ListenableBuilder(
+        listenable: textEditingController,
+        builder: (BuildContext context, Widget? child) {
+          return Visibility(
+              visible: _hasValue(),
+              child: Container(
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
+                child: IconButton(
+                  tooltip: AppLocalizations.t('Send'),
+                  icon: Icon(Icons.send_outlined, color: myself.primary),
+                  onPressed: () {
+                    _send();
+                  },
+                ),
+              ));
+        });
 
     ///长按弹出式菜单
     CustomPopupMenuController menuController = CustomPopupMenuController();
@@ -237,7 +306,7 @@ class TextMessageInputWidget extends StatelessWidget {
     return menu;
   }
 
-  ///文本，录音，其他消息，ChatGPT消息命令和发送按钮
+  ///文本，录音，其他消息，和发送按钮
   Widget _buildTextMessageInput(BuildContext context) {
     double iconInset = 0.0;
     return Card(
@@ -276,28 +345,28 @@ class TextMessageInputWidget extends StatelessWidget {
               // tooltip: AppLocalizations.t('Emoji'),
               icon: Icon(Icons.emoji_emotions_outlined, color: myself.primary),
               onPressed: () {
-                if (onEmojiPressed != null) {
-                  onEmojiPressed!();
-                }
+                onEmojiPressed();
               },
             ),
           ),
-          Visibility(
-              visible: !_hasValue(),
-              child: Container(
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
-                child: IconButton(
-                  tooltip: AppLocalizations.t('More'),
-                  icon: Icon(Icons.more_horiz, color: myself.primary),
-                  onPressed: () {
-                    if (onMorePressed != null) {
-                      onMorePressed!();
-                    }
-                  },
-                ),
-              )),
-          _buildChatGPTMenu(context),
+          ListenableBuilder(
+              listenable: textEditingController,
+              builder: (BuildContext context, Widget? child) {
+                return Visibility(
+                    visible: !_hasValue(),
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 0.0, vertical: 0.0),
+                      child: IconButton(
+                        tooltip: AppLocalizations.t('More'),
+                        icon: Icon(Icons.more_horiz, color: myself.primary),
+                        onPressed: () {
+                          onMorePressed();
+                        },
+                      ),
+                    ));
+              }),
+          _buildTransportMenu(context),
         ]));
   }
 
