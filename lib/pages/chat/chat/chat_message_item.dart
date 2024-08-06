@@ -94,7 +94,7 @@ class ChatMessageItem extends StatelessWidget {
       crossAxisAlignment = CrossAxisAlignment.end;
     }
     double width = appDataProvider.secondaryBodyWidth * 0.8;
-    logger.w('secondaryBodyWidth width:${appDataProvider.secondaryBodyWidth}');
+    // logger.w('chat message bubble width:$width');
 
     String transportType = chatMessage.transportType;
     Color borderColor = isMyself ? myself.primary : Colors.white;
@@ -129,7 +129,7 @@ class ChatMessageItem extends StatelessWidget {
       children.add(parentWidget);
     }
     return SizedBox(
-        width: width,
+        // width: width,
         child:
             Column(crossAxisAlignment: crossAxisAlignment, children: children));
   }
@@ -153,7 +153,7 @@ class ChatMessageItem extends StatelessWidget {
       children.add(parentWidget);
     }
     double width = appDataProvider.secondaryBodyWidth * 0.8;
-    logger.w('secondaryBodyWidth width:${appDataProvider.secondaryBodyWidth}');
+    logger.w('chat message bubble width:$width');
     return Row(
       mainAxisAlignment:
           isMyself ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -261,9 +261,13 @@ class ChatMessageItem extends StatelessWidget {
               const SizedBox(
                 width: 5,
               ),
-              Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: children),
+              Expanded(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: children)),
+              const SizedBox(
+                width: 25,
+              ),
             ]));
   }
 
@@ -291,16 +295,17 @@ class ChatMessageItem extends StatelessWidget {
         child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Expanded(
-                child: Container(),
+              const SizedBox(
+                width: 25,
               ),
-              Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[
+              Expanded(
+                  child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
                     title,
                     _buildMessageBubble(context),
-                  ]),
+                  ])),
               const SizedBox(
                 width: 5,
               ),
@@ -311,7 +316,10 @@ class ChatMessageItem extends StatelessWidget {
                     builder: (BuildContext context, Widget? child) {
                       return child!;
                     },
-                  ))
+                  )),
+              const SizedBox(
+                width: 5,
+              ),
             ]));
   }
 
