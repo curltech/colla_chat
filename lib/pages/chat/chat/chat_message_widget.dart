@@ -7,6 +7,7 @@ import 'package:colla_chat/pages/chat/chat/chat_message_item.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -138,9 +139,10 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   ///创建消息显示面板
   Widget _buildChatMessageWidget(BuildContext context) {
     return RefreshIndicator(
-        onRefresh: _onRefresh,
-        //notificationPredicate: _notificationPredicate,
-        child: ListView.builder(
+      onRefresh: _onRefresh,
+      //notificationPredicate: _notificationPredicate,
+      child: Obx(() {
+        return ListView.builder(
           controller: widget.scrollController,
           padding: const EdgeInsets.all(8.0),
           reverse: true,
@@ -148,43 +150,44 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
           itemBuilder: _buildChatMessageItem,
           //消息条目数
           itemCount: chatMessageController.length,
-        ));
+        );
+      }),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      var chatMessageWidget = _buildChatMessageWidget(context);
+    var chatMessageWidget = _buildChatMessageWidget(context);
+    var securityTipWidget = Obx(() {
       if (securityTip.value) {
-        return Column(children: [
-          Row(children: [
-            const SizedBox(
-              width: 10.0,
-            ),
-            const Icon(
-              Icons.security,
-              color: Colors.yellow,
-            ),
-            const SizedBox(
-              width: 10.0,
-            ),
-            Expanded(
-                child: CommonAutoSizeText(AppLocalizations.t(
-                    'This is E2E encrypt communication, nobody can peek your chat content'))),
-            IconButton(
-                onPressed: () {
-                  securityTip.value = false;
-                },
-                icon: const Icon(
-                  Icons.cancel,
-                  color: Colors.yellow,
-                ))
-          ]),
-          Expanded(child: chatMessageWidget)
+        return Row(children: [
+          const SizedBox(
+            width: 10.0,
+          ),
+          const Icon(
+            Icons.security,
+            color: Colors.yellow,
+          ),
+          const SizedBox(
+            width: 10.0,
+          ),
+          Expanded(
+              child: CommonAutoSizeText(AppLocalizations.t(
+                  'This is E2E encrypt communication, nobody can peek your chat content'))),
+          IconButton(
+              onPressed: () {
+                securityTip.value = false;
+              },
+              icon: const Icon(
+                Icons.cancel,
+                color: Colors.yellow,
+              ))
         ]);
       }
-      return chatMessageWidget;
+      return nil;
     });
+    return Column(
+        children: [securityTipWidget, Expanded(child: chatMessageWidget)]);
   }
 
   @override
