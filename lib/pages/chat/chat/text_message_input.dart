@@ -273,7 +273,7 @@ class TextMessageInputWidget extends StatelessWidget {
                 margin:
                     const EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
                 child: IconButton(
-                  tooltip: AppLocalizations.t('Send'),
+                  // tooltip: AppLocalizations.t('Send'),
                   icon: Icon(Icons.send_outlined, color: myself.primary),
                   onPressed: () {
                     _send();
@@ -358,7 +358,7 @@ class TextMessageInputWidget extends StatelessWidget {
                       margin: const EdgeInsets.symmetric(
                           horizontal: 0.0, vertical: 0.0),
                       child: IconButton(
-                        tooltip: AppLocalizations.t('More'),
+                        // tooltip: AppLocalizations.t('More'),
                         icon: Icon(Icons.more_horiz, color: myself.primary),
                         onPressed: () {
                           onMorePressed();
