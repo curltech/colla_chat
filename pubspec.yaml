@@ -119,8 +119,7 @@ dependencies:
   font_awesome_flutter: ^10.1.0
   #flushbar: ^1.10.4
   #share: ^0.6.5
-  flutter_emoji: ^2.5.1
-  #  emoji_picker_flutter: ^2.0.0-dev.5
+  unicode_emojis: ^0.4.0
   fluro: ^2.0.3
   flutter_multi_formatter: ^2.5.1
   #flutter_awesome_select: ^6.5.0
@@ -542,7 +541,6 @@ flutter:
     - assets/icons/
     - assets/images/
     - assets/images/bg/
-    - assets/images/emoji/
     - assets/images/email/
     - assets/medias/
 

@@ -1,5 +1,4 @@
 import 'package:colla_chat/widgets/special_text/at_text.dart';
-import 'package:colla_chat/widgets/special_text/emoji_text.dart';
 import 'package:colla_chat/widgets/special_text/image_text.dart';
 import 'package:colla_chat/widgets/special_text/link_text.dart';
 import 'package:colla_chat/widgets/special_text/special_color_text.dart';
@@ -9,15 +8,13 @@ import 'package:flutter/material.dart';
 class CustomSpecialTextSpanBuilder extends SpecialTextSpanBuilder {
   /// whether show background for @somebody
   final bool showAtBackground;
-  final bool showEmojiText;
   final bool showLinkText;
   final bool showSpecialColorText;
   final bool showAtText;
   final bool showImageText;
 
   CustomSpecialTextSpanBuilder(
-      {this.showEmojiText = true,
-      this.showLinkText = true,
+      {this.showLinkText = true,
       this.showSpecialColorText = true,
       this.showAtText = true,
       this.showImageText = false,
@@ -33,9 +30,7 @@ class CustomSpecialTextSpanBuilder extends SpecialTextSpanBuilder {
     }
 
     ///index is end index of start flag, so text start index should be index-(flag.length-1)
-    if (showEmojiText && isStart(flag, EmojiText.flag)) {
-      return EmojiText(textStyle, start: index! - (EmojiText.flag.length - 1));
-    } else if (showSpecialColorText && isStart(flag, SpecialColorText.flag)) {
+    if (showSpecialColorText && isStart(flag, SpecialColorText.flag)) {
       return SpecialColorText(textStyle, onTap,
           start: index! - (SpecialColorText.flag.length - 1));
     } else if (showLinkText && isStart(flag, LinkText.flag)) {

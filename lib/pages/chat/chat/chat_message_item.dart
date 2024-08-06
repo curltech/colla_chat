@@ -104,8 +104,6 @@ class ChatMessageItem extends StatelessWidget {
       borderColor = Colors.cyanAccent;
     } else if (transportType == TransportType.sfu.name) {
       borderColor = Colors.greenAccent;
-    } else if (transportType == TransportType.llm.name) {
-      borderColor = Colors.blueAccent;
     }
     List<Widget> children = [
       Bubble(

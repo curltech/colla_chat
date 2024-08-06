@@ -736,5 +736,14 @@
   "Setup sherpa": "安装sherpa",
   "Sherpa is not uninstalled": "Sherpa未被安装",
   "asr": "语音转文字",
-  "tts": "文字转语音"
+  "tts": "文字转语音",
+  "Smileys & Emotion": "表情",
+  "People & Body": "手势",
+  "Animals & Nature": "自然",
+  "Food & Drink": "食物",
+  "Travel & Places": "地方",
+  "Activities": "活动",
+  "Objects": "物体",
+  "Symbols": "符号",
+  "Flags": "旗帜"
 }
