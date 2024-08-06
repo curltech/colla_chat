@@ -47,7 +47,7 @@ class P2pLogin extends StatelessWidget with WindowListener {
 
   @override
   onWindowResized() {
-    appDataProvider.changeSize(appDataProvider.context!);
+    // appDataProvider.changeSize(appDataProvider.context!);
   }
 
   _animateToPage(int index) {
@@ -111,6 +111,7 @@ class P2pLogin extends StatelessWidget with WindowListener {
 
   @override
   Widget build(BuildContext context) {
+    appDataProvider.changeSize(context);
     var workspace = ListenableBuilder(
       listenable: appDataProvider,
       builder: (BuildContext context, Widget? child) {
