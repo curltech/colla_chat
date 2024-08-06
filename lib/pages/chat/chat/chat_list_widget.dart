@@ -627,6 +627,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
           tooltip: address,
           onPressed: () async {
             bool? confirm = await DialogUtil.confirm(
+                context: context,
                 content:
                     '${AppLocalizations.t('Do you want to reconnect')} $address, ${AppLocalizations.t('status')}:${_socketStatus.value}');
             if (confirm == true) {
