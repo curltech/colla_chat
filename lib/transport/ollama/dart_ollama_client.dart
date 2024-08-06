@@ -2,11 +2,16 @@ import 'package:http/http.dart' as http;
 import 'package:ollama_dart/ollama_dart.dart';
 import 'package:synchronized/synchronized.dart';
 
-/// langchain, 提供ollama完整的功能，包括聊天，翻译，训练，优化，设置规则，图像生成，语音识别
+/// Ollama, 提供ollama完整的功能，包括聊天，翻译，训练，优化，设置规则，图像生成，语音识别
+/// "请将英语文字 'Hello, how are you?' 翻译为中文"
+/// "请将 'Hello, how are you?' 转换为语音，使用标准男性音"
+/// "请将 'audio file.mp3' 转换为文本，使用英语"
 class DartOllamaClient {
   late final String baseUrl;
   late final OllamaClient _client;
   final String _model = 'llama3';
+
+  ///会话的上下文，作为参数时可以指定保持上下文
   List<int>? _context;
 
   DartOllamaClient({
@@ -173,8 +178,8 @@ class DartOllamaClient {
     bool stream = false,
   }) async {
     final CreateModelResponse res = await _client.createModel(
-      request:
-          CreateModelRequest(model: model, modelfile: modelfile, stream: stream),
+      request: CreateModelRequest(
+          model: model, modelfile: modelfile, stream: stream),
     );
     return res.status;
   }
@@ -183,8 +188,8 @@ class DartOllamaClient {
       String model, String modelfile,
       {bool stream = false}) async {
     final modelStream = _client.createModelStream(
-      request:
-          CreateModelRequest(model: model, modelfile: modelfile, stream: stream),
+      request: CreateModelRequest(
+          model: model, modelfile: modelfile, stream: stream),
     );
     List<CreateModelStatus?> status = [];
     await for (final res in modelStream) {
@@ -214,7 +219,8 @@ class DartOllamaClient {
     bool stream = false,
   }) async {
     final PullModelResponse res = await _client.pullModel(
-      request: PullModelRequest(model: model, insecure: insecure, stream: stream),
+      request:
+          PullModelRequest(model: model, insecure: insecure, stream: stream),
     );
 
     return res.status;
@@ -226,7 +232,8 @@ class DartOllamaClient {
     bool stream = false,
   }) async {
     final modelStream = _client.pullModelStream(
-      request: PullModelRequest(model: model, insecure: insecure, stream: stream),
+      request:
+          PullModelRequest(model: model, insecure: insecure, stream: stream),
     );
     List<PullModelStatus?> status = [];
     await for (final res in modelStream) {
@@ -242,7 +249,8 @@ class DartOllamaClient {
     bool stream = false,
   }) async {
     final PushModelResponse res = await _client.pushModel(
-      request: PushModelRequest(model: model, insecure: insecure, stream: stream),
+      request:
+          PushModelRequest(model: model, insecure: insecure, stream: stream),
     );
 
     return res.status;
@@ -254,7 +262,8 @@ class DartOllamaClient {
     bool stream = false,
   }) async {
     final modelStream = _client.pushModelStream(
-      request: PushModelRequest(model: model, insecure: insecure, stream: stream),
+      request:
+          PushModelRequest(model: model, insecure: insecure, stream: stream),
     );
     List<PushModelStatus?> status = [];
     await for (final res in modelStream) {
