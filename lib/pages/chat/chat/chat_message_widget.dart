@@ -70,16 +70,17 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
         widget.scrollController.position.maxScrollExtent) {
       logger.i('scrolled to max');
       chatMessageController.previous(limit: defaultLimit);
-      if (widget.onScrollMax != null) {
-        widget.onScrollMax!();
-      }
-    }
-    if (widget.scrollController.position.pixels ==
-        widget.scrollController.position.minScrollExtent) {
-      logger.i('scrolled to min');
-      chatMessageController.latest(limit: defaultLimit);
+
       if (widget.onScrollMin != null) {
         widget.onScrollMin!();
+      }
+      if (widget.scrollController.position.pixels ==
+          widget.scrollController.position.minScrollExtent) {
+        logger.i('scrolled to min');
+        chatMessageController.latest(limit: defaultLimit);
+        if (widget.onScrollMax != null) {
+          widget.onScrollMax!();
+        }
       }
     }
   }

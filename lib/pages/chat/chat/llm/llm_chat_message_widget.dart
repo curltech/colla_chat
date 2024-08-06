@@ -62,16 +62,16 @@ class _LlmChatMessageWidgetState extends State<LlmChatMessageWidget>
         widget.scrollController.position.maxScrollExtent) {
       logger.i('scrolled to max');
       llmChatMessageController.previous(limit: defaultLimit);
-      if (widget.onScrollMax != null) {
-        widget.onScrollMax!();
+      if (widget.onScrollMin != null) {
+        widget.onScrollMin!();
       }
     }
     if (widget.scrollController.position.pixels ==
         widget.scrollController.position.minScrollExtent) {
       logger.i('scrolled to min');
       llmChatMessageController.latest(limit: defaultLimit);
-      if (widget.onScrollMin != null) {
-        widget.onScrollMin!();
+      if (widget.onScrollMax != null) {
+        widget.onScrollMax!();
       }
     }
   }
