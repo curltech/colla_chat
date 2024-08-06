@@ -177,19 +177,6 @@ class AppDataProvider with ChangeNotifier {
 
   ///当外部改变屏幕大小的时候引起index页面的重建，从而调用这个方法改变size
   changeSize(BuildContext context) {
-    var totalSize = MediaQuery.sizeOf(context);
-    if (totalSize.width != _totalSize.width ||
-        totalSize.height != _totalSize.height) {
-      _totalSize = totalSize;
-      if (_bodyRatio > 0) {
-        if (_totalSize.width >= largeBreakpointLimit) {
-          _bodyRatio = 40;
-        } else if (_totalSize.width >= smallBreakpointLimit) {
-          _bodyRatio = 50;
-        }
-      }
-      // logger.i('Total size: $_totalSize');
-    }
     var bottom = MediaQuery.viewInsetsOf(context).bottom;
     if (_keyboardHeight == 270.0 && bottom != 0) {
       _keyboardHeight = bottom;
@@ -205,6 +192,21 @@ class AppDataProvider with ChangeNotifier {
 
     textScaler = MediaQuery.textScalerOf(context);
     // logger.i('textScaleFactor: $textScaleFactor');
+
+    var totalSize = MediaQuery.sizeOf(context);
+    if (totalSize.width != _totalSize.width ||
+        totalSize.height != _totalSize.height) {
+      _totalSize = totalSize;
+      if (_bodyRatio > 0) {
+        if (_totalSize.width >= largeBreakpointLimit) {
+          _bodyRatio = 40;
+        } else if (_totalSize.width >= smallBreakpointLimit) {
+          _bodyRatio = 50;
+        }
+      }
+      // logger.i('Total size: $_totalSize');
+      notifyListeners();
+    }
   }
 }
 

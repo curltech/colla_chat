@@ -14,9 +14,10 @@ import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:get/get.dart';
+import 'package:window_manager/window_manager.dart';
 
 /// 远程登录页面，一个Scaffold，IndexStack下的远程登录组件，注册组件和配置组件
-class P2pLogin extends StatelessWidget {
+class P2pLogin extends StatelessWidget with WindowListener {
   final SwiperController swiperController = SwiperController();
   final P2pLoginWidget p2pLoginWidget = P2pLoginWidget();
   late final P2pRegisterWidget p2pRegisterWidget = P2pRegisterWidget(
@@ -42,6 +43,11 @@ class P2pLogin extends StatelessWidget {
     if (myselfPeers.isEmpty) {
       index.value = 1;
     }
+  }
+
+  @override
+  onWindowResized() {
+    appDataProvider.changeSize(appDataProvider.context!);
   }
 
   _animateToPage(int index) {
@@ -108,7 +114,6 @@ class P2pLogin extends StatelessWidget {
     var workspace = ListenableBuilder(
       listenable: appDataProvider,
       builder: (BuildContext context, Widget? child) {
-        appDataProvider.changeSize(context);
         var pageView = Obx(() {
           return Swiper(
             controller: swiperController,

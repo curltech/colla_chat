@@ -213,6 +213,11 @@ class _IndexViewState extends State<IndexView>
     //logger.i('[WindowManager] index view onWindowEvent: $eventName');
   }
 
+  @override
+  onWindowResized() {
+    appDataProvider.changeSize(context);
+  }
+
   Future<bool?> _onWebrtcSignal(WebrtcEvent webrtcEvent) async {
     String name = webrtcEvent.name;
     return await DialogUtil.confirm(
@@ -708,7 +713,6 @@ class _IndexViewState extends State<IndexView>
 
   @override
   Widget build(BuildContext context) {
-    appDataProvider.changeSize(context);
     var provider = Consumer3<AppDataProvider, IndexWidgetProvider, Myself>(
         builder:
             (context, appDataProvider, indexWidgetProvider, myself, child) {
