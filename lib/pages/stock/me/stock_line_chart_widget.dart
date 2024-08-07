@@ -159,10 +159,10 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
       color: Colors.cyanAccent,
     ),
   ];
-  ValueNotifier<List<Candle>?> candles = ValueNotifier<List<Candle>?>(null);
-  ValueNotifier<bool> online = ValueNotifier<bool>(true);
-  ValueNotifier<String?> tsCode = ValueNotifier<String?>(null);
-  ValueNotifier<int?> lineType = ValueNotifier<int?>(null);
+  Rx<List<Candle>?> candles = Rx<List<Candle>?>(null);
+  RxBool online = true.obs;
+  Rx<String?> tsCode = Rx<String?>(null);
+  Rx<int?> lineType = Rx<int?>(null);
 
   _update() {
     StockLineController? stockLineController =
@@ -194,11 +194,6 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
     stockLineController.count = null;
     // 判断是否有更多的数据可以加载
     List<dynamic>? data = await _findMoreData();
-    // try {
-    //   data = await _findMoreData();
-    // } catch (e) {
-    //   logger.e('find more data failure:$e');
-    // }
     if (data != null && data.isNotEmpty) {
       List<Candle> candles = _buildCandles(data);
       if (candles.isNotEmpty) {
@@ -374,10 +369,9 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
   Widget _buildCandlesticks(BuildContext context) {
     final bool isDark = myself.getBrightness(context) == Brightness.dark;
     final style = isDark ? dark() : light();
-    return ValueListenableBuilder(
-      valueListenable: candles,
-      builder: (BuildContext context, candles, Widget? child) {
-        if (candles == null) {
+    return Obx(
+      () {
+        if (candles.value == null) {
           return nil;
         }
         return Candlesticks(
@@ -481,7 +475,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
               ),
             ),
           ],
-          candles: candles,
+          candles: candles.value!,
           style: style,
           chartAdjust: ChartAdjust.visibleRange,
           onLoadMoreCandles: loadMoreCandles,
@@ -496,9 +490,8 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    Widget titleWidget = ValueListenableBuilder(
-      valueListenable: tsCode,
-      builder: (BuildContext context, String? tsCode, Widget? child) {
+    Widget titleWidget = Obx(
+      () {
         StockLineController? stockLineController =
             multiStockLineController.stockLineController;
         if (stockLineController == null) {
@@ -508,24 +501,22 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
       },
     );
     List<Widget> rightWidgets = [];
-    Widget onlineWidget = ValueListenableBuilder(
-        valueListenable: online,
-        builder: (BuildContext context, bool online, Widget? child) {
-          return ToggleButtons(
-            color: Colors.grey,
-            selectedColor: Colors.white,
-            fillColor: myself.primary,
-            borderRadius: BorderRadius.circular(16.0),
-            onPressed: (int value) {
-              this.online.value = value == 0 ? true : false;
-            },
-            isSelected: [online, !online],
-            children: const [
-              Icon(Icons.book_online_outlined),
-              Icon(Icons.offline_bolt_outlined)
-            ],
-          );
-        });
+    Widget onlineWidget = Obx(() {
+      return ToggleButtons(
+        color: Colors.grey,
+        selectedColor: Colors.white,
+        fillColor: myself.primary,
+        borderRadius: BorderRadius.circular(16.0),
+        onPressed: (int value) {
+          online.value = value == 0 ? true : false;
+        },
+        isSelected: [online.value, !online.value],
+        children: const [
+          Icon(Icons.book_online_outlined),
+          Icon(Icons.offline_bolt_outlined)
+        ],
+      );
+    });
     rightWidgets.add(onlineWidget);
 
     rightWidgets.addAll([
@@ -537,6 +528,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
                 multiStockLineController.stockLineController;
             tsCode.value = stockLineController?.tsCode;
             lineType.value = stockLineController?.lineType;
+            _update();
           },
           icon: const Icon(Icons.skip_previous_outlined)),
       IconButton(
@@ -547,6 +539,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
                 multiStockLineController.stockLineController;
             tsCode.value = stockLineController?.tsCode;
             lineType.value = stockLineController?.lineType;
+            _update();
           },
           icon: const Icon(Icons.skip_next_outlined)),
     ]);

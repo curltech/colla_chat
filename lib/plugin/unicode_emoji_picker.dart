@@ -21,6 +21,8 @@ class UnicodeEmojiPicker extends StatefulWidget {
 
 class _UnicodeEmojiPickerState extends State<UnicodeEmojiPicker>
     with SingleTickerProviderStateMixin {
+  late final Widget unicodeEmojiWidget = _buildUnicodeEmojiWidget(context);
+
   Widget _buildUnicodeEmojiWidget(BuildContext context) {
     Map<Category, List<Emoji>> allEmojis = EmojiUtil.emojis;
     List<Tab> tabs = [];
@@ -78,6 +80,6 @@ class _UnicodeEmojiPickerState extends State<UnicodeEmojiPicker>
 
   @override
   Widget build(BuildContext context) {
-    return _buildUnicodeEmojiWidget(context);
+    return unicodeEmojiWidget;
   }
 }

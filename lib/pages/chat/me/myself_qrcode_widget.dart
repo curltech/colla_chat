@@ -7,7 +7,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/qrcode_widget.dart';
 import 'package:flutter/material.dart';
 
-class MyselfQrcodeWidget extends StatefulWidget with TileDataMixin {
+class MyselfQrcodeWidget extends StatelessWidget with TileDataMixin {
   MyselfQrcodeWidget({super.key});
 
   @override
@@ -22,17 +22,7 @@ class MyselfQrcodeWidget extends StatefulWidget with TileDataMixin {
   @override
   String get title => 'Myself Qrcode';
 
-  @override
-  State<StatefulWidget> createState() => _MyselfQrcodeWidgetState();
-}
-
-class _MyselfQrcodeWidgetState extends State<MyselfQrcodeWidget> {
   String? content;
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,8 +57,8 @@ class _MyselfQrcodeWidgetState extends State<MyselfQrcodeWidget> {
       const SizedBox(height: 30),
     ];
     return AppBarView(
-      title: widget.title,
-      withLeading: widget.withLeading,
+      title: title,
+      withLeading: withLeading,
       child: Column(children: children),
     );
   }

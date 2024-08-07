@@ -184,11 +184,12 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
   late final List<PlatformDataField> searchDataField;
   late final FormInputController searchController;
   ExpansionTileController expansionTileController = ExpansionTileController();
-  RxInt offset = performanceDataPageController.offset;
-  Rx<String?> sortColumnName = performanceDataPageController.sortColumnName;
-  RxBool sortAscending = performanceDataPageController.sortAscending;
 
   initState() {
+    performanceDataPageController.offset.addListener(_updatePerformance);
+    performanceDataPageController.sortColumnName
+        .addListener(_updatePerformance);
+    performanceDataPageController.sortAscending.addListener(_updatePerformance);
     searchDataField = [
       PlatformDataField(
         name: 'securityCode',
@@ -219,24 +220,18 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
   }
 
   _updatePerformance() {
-    if (offset != performanceDataPageController.offset ||
-        sortColumnName != performanceDataPageController.sortColumnName ||
-        sortAscending != performanceDataPageController.sortAscending) {
-      offset = performanceDataPageController.offset;
-      sortColumnName = performanceDataPageController.sortColumnName;
-      sortAscending = performanceDataPageController.sortAscending;
-      String? orderBy;
-      if (sortColumnName.value != null) {
-        orderBy = '$sortColumnName ${sortAscending.value ? 'asc' : 'desc'}';
-      }
-      Map<String, dynamic> values = searchController.getValues();
-      String? securityCode = values['securityCode'];
-      String? startDate = values['startDate'];
-      _refresh(
-          securityCode: securityCode, startDate: startDate, orderBy: orderBy);
-    } else {
-      // setState(() {});
+    var offset = performanceDataPageController.offset;
+    var sortColumnName = performanceDataPageController.sortColumnName;
+    var sortAscending = performanceDataPageController.sortAscending;
+    String? orderBy;
+    if (sortColumnName.value != null) {
+      orderBy = '$sortColumnName ${sortAscending.value ? 'asc' : 'desc'}';
     }
+    Map<String, dynamic> values = searchController.getValues();
+    String? securityCode = values['securityCode'];
+    String? startDate = values['startDate'];
+    _refresh(
+        securityCode: securityCode, startDate: startDate, orderBy: orderBy);
   }
 
   Widget _buildActionWidget(int index, dynamic performance) {
@@ -323,15 +318,17 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
   }
 
   Widget _buildPerformanceListView(BuildContext context) {
-    return BindingPaginatedDataTable2<Performance>(
-      key: UniqueKey(),
-      showCheckboxColumn: false,
-      horizontalMargin: 10.0,
-      columnSpacing: 0.0,
-      platformDataColumns: performanceDataColumns,
-      controller: performanceDataPageController,
-      fixedLeftColumns: 1,
-    );
+    return Obx(() {
+      return BindingPaginatedDataTable2<Performance>(
+        key: UniqueKey(),
+        showCheckboxColumn: false,
+        horizontalMargin: 10.0,
+        columnSpacing: 0.0,
+        platformDataColumns: performanceDataColumns,
+        controller: performanceDataPageController,
+        fixedLeftColumns: 1,
+      );
+    });
   }
 
   @override

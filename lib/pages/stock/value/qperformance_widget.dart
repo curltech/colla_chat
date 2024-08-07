@@ -52,11 +52,13 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
   late final List<PlatformDataField> searchDataField;
   late final FormInputController searchController;
   ExpansionTileController expansionTileController = ExpansionTileController();
-  RxInt offset = qperformanceDataPageController.offset;
-  Rx<String?> sortColumnName = qperformanceDataPageController.sortColumnName;
-  RxBool sortAscending = qperformanceDataPageController.sortAscending;
 
   initState() {
+    qperformanceDataPageController.offset.addListener(_updateQPerformance);
+    qperformanceDataPageController.sortColumnName
+        .addListener(_updateQPerformance);
+    qperformanceDataPageController.sortAscending
+        .addListener(_updateQPerformance);
     searchDataField = [
       PlatformDataField(
         name: 'tsCode',
@@ -86,23 +88,17 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
   }
 
   _updateQPerformance() {
-    if (offset != qperformanceDataPageController.offset ||
-        sortColumnName != qperformanceDataPageController.sortColumnName ||
-        sortAscending != qperformanceDataPageController.sortAscending) {
-      offset = qperformanceDataPageController.offset;
-      sortColumnName = qperformanceDataPageController.sortColumnName;
-      sortAscending = qperformanceDataPageController.sortAscending;
-      String? orderBy;
-      if (sortColumnName.value != null) {
-        orderBy = '$sortColumnName ${sortAscending.value ? 'asc' : 'desc'}';
-      }
-      Map<String, dynamic> values = searchController.getValues();
-      String? securityCode = values['securityCode'];
-      String? startDate = values['startDate'];
-      _refresh(tsCode: securityCode, startDate: startDate, orderBy: orderBy);
-    } else {
-      // setState(() {});
+    var offset = qperformanceDataPageController.offset;
+    var sortColumnName = qperformanceDataPageController.sortColumnName;
+    var sortAscending = qperformanceDataPageController.sortAscending;
+    String? orderBy;
+    if (sortColumnName.value != null) {
+      orderBy = '$sortColumnName ${sortAscending.value ? 'asc' : 'desc'}';
     }
+    Map<String, dynamic> values = searchController.getValues();
+    String? securityCode = values['securityCode'];
+    String? startDate = values['startDate'];
+    _refresh(tsCode: securityCode, startDate: startDate, orderBy: orderBy);
   }
 
   Widget _buildActionWidget(int index, dynamic qperformance) {
@@ -335,15 +331,17 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
             return _buildActionWidget(index, qperformance);
           }),
     ];
-    return BindingPaginatedDataTable2<QPerformance>(
-      key: UniqueKey(),
-      showCheckboxColumn: false,
-      horizontalMargin: 10.0,
-      columnSpacing: 0.0,
-      platformDataColumns: qperformanceDataColumns,
-      controller: qperformanceDataPageController,
-      fixedLeftColumns: 1,
-    );
+    return Obx(() {
+      return BindingPaginatedDataTable2<QPerformance>(
+        key: UniqueKey(),
+        showCheckboxColumn: false,
+        horizontalMargin: 10.0,
+        columnSpacing: 0.0,
+        platformDataColumns: qperformanceDataColumns,
+        controller: qperformanceDataPageController,
+        fixedLeftColumns: 1,
+      );
+    });
   }
 
   @override

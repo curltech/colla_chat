@@ -31,8 +31,6 @@ class CollectionListWidget extends StatefulWidget {
 
 class _CollectionListWidgetState extends State<CollectionListWidget>
     with TickerProviderStateMixin {
-  final _scrollController = ScrollController();
-  final _focusNode = FocusNode();
   late final AnimationController animateController;
 
   @override

@@ -5,15 +5,16 @@ import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 ///在群的成员中选择联系人的多选或者单选对话框
-class GroupLinkmanWidget extends StatefulWidget {
+class GroupLinkmanWidget extends StatelessWidget {
   final Function(List<String>) onSelected; //获取返回的选择
   final List<String> selected;
   final SelectType selectType;
   final String groupId;
 
-  const GroupLinkmanWidget({
+  GroupLinkmanWidget({
     super.key,
     required this.onSelected,
     required this.selected,
@@ -21,21 +22,11 @@ class GroupLinkmanWidget extends StatefulWidget {
     required this.groupId,
   });
 
-  @override
-  State<StatefulWidget> createState() => _GroupLinkmanWidgetState();
-}
-
-class _GroupLinkmanWidgetState extends State<GroupLinkmanWidget> {
-  String? title;
-  OptionController optionController = OptionController();
-
-  @override
-  initState() {
-    super.initState();
-  }
+  final Rx<String?> title = Rx<String?>(null);
+  final OptionController optionController = OptionController();
 
   Future<String?> _findGroupName() async {
-    Group? group = await groupService.findCachedOneByPeerId(widget.groupId);
+    Group? group = await groupService.findCachedOneByPeerId(groupId);
     if (group != null) {
       return group.name;
     }
@@ -44,14 +35,14 @@ class _GroupLinkmanWidgetState extends State<GroupLinkmanWidget> {
 
   ///查询群的成员，并生成群成员的选项
   Future<List<Option<String>>> _buildOptions() async {
-    title = await _findGroupName();
-    var groupMembers = await groupMemberService.findByGroupId(widget.groupId);
+    title.value = await _findGroupName();
+    var groupMembers = await groupMemberService.findByGroupId(groupId);
     List<Option<String>> options = [];
     for (GroupMember groupMember in groupMembers) {
       String? memberPeerId = groupMember.memberPeerId;
       if (memberPeerId != null) {
         var avatar = await linkmanService.findAvatarImageWidget(memberPeerId);
-        bool checked = widget.selected.contains(memberPeerId);
+        bool checked = selected.contains(memberPeerId);
         Option<String> item = Option<String>(
             groupMember.memberAlias!, memberPeerId,
             leading: avatar, checked: checked, hint: '');
@@ -66,16 +57,15 @@ class _GroupLinkmanWidgetState extends State<GroupLinkmanWidget> {
   Widget _buildChipMultiSelect(BuildContext context) {
     var selector = PlatformFutureBuilder(
         future: _buildOptions(),
-        builder: (BuildContext context,
-            List<Option<String>> options) {
+        builder: (BuildContext context, List<Option<String>> options) {
           optionController.options = options;
           return CustomMultiSelect(
-            title: title,
+            title: title.value,
             onConfirm: (selected) {
               if (selected == null) {
-                widget.onSelected([]);
+                onSelected([]);
               } else {
-                widget.onSelected(selected);
+                onSelected(selected);
               }
             },
             optionController: optionController,
@@ -87,13 +77,12 @@ class _GroupLinkmanWidgetState extends State<GroupLinkmanWidget> {
   Widget _buildDataListMultiSelect(BuildContext context) {
     var selector = PlatformFutureBuilder(
         future: _buildOptions(),
-        builder: (BuildContext context,
-            List<Option<String>> options) {
+        builder: (BuildContext context, List<Option<String>> options) {
           optionController.options = options;
           return CustomMultiSelect(
-            title: title,
+            title: title.value,
             onConfirm: (selected) {
-              widget.onSelected(selected!);
+              onSelected(selected!);
             },
             optionController: optionController,
           );
@@ -105,14 +94,13 @@ class _GroupLinkmanWidgetState extends State<GroupLinkmanWidget> {
   Widget _buildDataListSingleSelect(BuildContext context) {
     var dataListView = PlatformFutureBuilder(
         future: _buildOptions(),
-        builder: (BuildContext context,
-            List<Option<String>> options) {
+        builder: (BuildContext context, List<Option<String>> options) {
           optionController.options = options;
           return DataListSingleSelect(
-            title: title,
+            title: title.value,
             optionController: optionController,
             onChanged: (String? value) {
-              widget.onSelected([value!]);
+              onSelected([value!]);
             },
           );
         });
@@ -122,7 +110,7 @@ class _GroupLinkmanWidgetState extends State<GroupLinkmanWidget> {
   @override
   Widget build(BuildContext context) {
     Widget selector;
-    switch (widget.selectType) {
+    switch (selectType) {
       case SelectType.dataListMultiSelect:
         selector = _buildDataListMultiSelect(context);
         break;

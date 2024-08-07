@@ -201,19 +201,20 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
         startDate: startDate,
         endDate: endDate);
     expansionTileController.collapse();
-    DialogUtil.info(
-        content: AppLocalizations.t('Inout search completely'));
+    DialogUtil.info(content: AppLocalizations.t('Inout search completely'));
   }
 
   Widget _buildInOutEventListView(BuildContext context) {
-    return BindingDataTable2<DayLine>(
-      key: UniqueKey(),
-      showCheckboxColumn: false,
-      horizontalMargin: 10.0,
-      columnSpacing: 0.0,
-      platformDataColumns: inoutEventColumns,
-      controller: inoutEventController,
-    );
+    return Obx(() {
+      return BindingDataTable2<DayLine>(
+        key: UniqueKey(),
+        showCheckboxColumn: false,
+        horizontalMargin: 10.0,
+        columnSpacing: 0.0,
+        platformDataColumns: inoutEventColumns,
+        controller: inoutEventController,
+      );
+    });
   }
 
   refresh(

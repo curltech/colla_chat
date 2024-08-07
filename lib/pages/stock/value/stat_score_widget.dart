@@ -51,11 +51,11 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
   late final List<PlatformDataField> searchDataField;
   late final FormInputController searchController;
   ExpansionTileController expansionTileController = ExpansionTileController();
-  RxInt offset = statScoreDataPageController.offset;
-  Rx<String?> sortColumnName = statScoreDataPageController.sortColumnName;
-  RxBool sortAscending = statScoreDataPageController.sortAscending;
 
   initState() {
+    statScoreDataPageController.offset.addListener(_updateStatScore);
+    statScoreDataPageController.sortColumnName.addListener(_updateStatScore);
+    statScoreDataPageController.sortAscending.addListener(_updateStatScore);
     searchDataField = [
       PlatformDataField(
         name: 'keyword',
@@ -103,23 +103,17 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
   }
 
   _updateStatScore() {
-    if (offset != statScoreDataPageController.offset ||
-        sortColumnName != statScoreDataPageController.sortColumnName ||
-        sortAscending != statScoreDataPageController.sortAscending) {
-      offset = statScoreDataPageController.offset;
-      sortColumnName = statScoreDataPageController.sortColumnName;
-      sortAscending = statScoreDataPageController.sortAscending;
-      String? orderBy;
-      if (sortColumnName.value != null) {
-        orderBy = '$sortColumnName ${sortAscending.value ? 'asc' : 'desc'}';
-      }
-      Map<String, dynamic> values = searchController.getValues();
-      String? tsCode = values['tsCode'];
-      Set<dynamic>? terms = values['terms'];
-      _refresh(tsCode: tsCode, terms: terms?.toList(), orderBy: orderBy);
-    } else {
-      // setState(() {});
+    var offset = statScoreDataPageController.offset;
+    var sortColumnName = statScoreDataPageController.sortColumnName;
+    var sortAscending = statScoreDataPageController.sortAscending;
+    String? orderBy;
+    if (sortColumnName.value != null) {
+      orderBy = '$sortColumnName ${sortAscending.value ? 'asc' : 'desc'}';
     }
+    Map<String, dynamic> values = searchController.getValues();
+    String? tsCode = values['tsCode'];
+    Set<dynamic>? terms = values['terms'];
+    _refresh(tsCode: tsCode, terms: terms?.toList(), orderBy: orderBy);
   }
 
   Widget _buildActionWidget(int index, dynamic qstat) {
@@ -331,15 +325,17 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
           inputType: InputType.custom,
           buildSuffix: _buildActionWidget),
     ];
-    return BindingDataTable2<StatScore>(
-      key: UniqueKey(),
-      showCheckboxColumn: false,
-      horizontalMargin: 10.0,
-      columnSpacing: 0.0,
-      platformDataColumns: statScoreDataColumns,
-      controller: statScoreDataPageController,
-      fixedLeftColumns: 1,
-    );
+    return Obx(() {
+      return BindingDataTable2<StatScore>(
+        key: UniqueKey(),
+        showCheckboxColumn: false,
+        horizontalMargin: 10.0,
+        columnSpacing: 0.0,
+        platformDataColumns: statScoreDataColumns,
+        controller: statScoreDataPageController,
+        fixedLeftColumns: 1,
+      );
+    });
   }
 
   @override

@@ -53,11 +53,11 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
   late final List<PlatformDataField> searchDataField;
   late final FormInputController searchController;
   ExpansionTileController expansionTileController = ExpansionTileController();
-  RxInt offset = qstatDataPageController.offset;
-  Rx<String?> sortColumnName = qstatDataPageController.sortColumnName;
-  RxBool sortAscending = qstatDataPageController.sortAscending;
 
   initState() {
+    qstatDataPageController.offset.addListener(_updateQStat);
+    qstatDataPageController.sortColumnName.addListener(_updateQStat);
+    qstatDataPageController.sortAscending.addListener(_updateQStat);
     searchDataField = [
       PlatformDataField(
         name: 'tsCode',
@@ -119,28 +119,22 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
   }
 
   _updateQStat() {
-    if (offset != qstatDataPageController.offset ||
-        sortColumnName != qstatDataPageController.sortColumnName ||
-        sortAscending != qstatDataPageController.sortAscending) {
-      offset = qstatDataPageController.offset;
-      sortColumnName = qstatDataPageController.sortColumnName;
-      sortAscending = qstatDataPageController.sortAscending;
-      String? orderBy;
-      if (sortColumnName.value != null) {
-        orderBy = '$sortColumnName ${sortAscending.value ? 'asc' : 'desc'}';
-      }
-      Map<String, dynamic> values = searchController.getValues();
-      String? tsCode = values['tsCode'];
-      Set<dynamic>? terms = values['terms'];
-      Set<dynamic>? source = values['source'];
-      _refresh(
-          tsCode: tsCode,
-          terms: terms?.toList(),
-          source: source?.toList(),
-          orderBy: orderBy);
-    } else {
-      // setState(() {});
+    var offset = qstatDataPageController.offset;
+    var sortColumnName = qstatDataPageController.sortColumnName;
+    var sortAscending = qstatDataPageController.sortAscending;
+    String? orderBy;
+    if (sortColumnName.value != null) {
+      orderBy = '$sortColumnName ${sortAscending.value ? 'asc' : 'desc'}';
     }
+    Map<String, dynamic> values = searchController.getValues();
+    String? tsCode = values['tsCode'];
+    Set<dynamic>? terms = values['terms'];
+    Set<dynamic>? source = values['source'];
+    _refresh(
+        tsCode: tsCode,
+        terms: terms?.toList(),
+        source: source?.toList(),
+        orderBy: orderBy);
   }
 
   Widget _buildActionWidget(int index, dynamic qstat) {
@@ -381,15 +375,17 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
           inputType: InputType.custom,
           buildSuffix: _buildActionWidget),
     ];
-    return BindingDataTable2<QStat>(
-      key: UniqueKey(),
-      showCheckboxColumn: false,
-      horizontalMargin: 10.0,
-      columnSpacing: 0.0,
-      platformDataColumns: qstatDataColumns,
-      controller: qstatDataPageController,
-      fixedLeftColumns: 1,
-    );
+    return Obx(() {
+      return BindingDataTable2<QStat>(
+        key: UniqueKey(),
+        showCheckboxColumn: false,
+        horizontalMargin: 10.0,
+        columnSpacing: 0.0,
+        platformDataColumns: qstatDataColumns,
+        controller: qstatDataPageController,
+        fixedLeftColumns: 1,
+      );
+    });
   }
 
   @override

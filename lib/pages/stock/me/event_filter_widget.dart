@@ -106,10 +106,10 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
           color: myself.primary,
         )),
   ];
-  late final FormInputController controller =
+  late final FormInputController formInputController =
       FormInputController(eventFilterDataField);
   SwiperController swiperController = SwiperController();
-  int index = 0;
+  RxInt index = 0.obs;
 
   Widget _buildActionWidget(
       BuildContext context, int index, dynamic eventFilter) {
@@ -194,7 +194,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
   _buildEventFilterEditView(BuildContext context) {
     EventFilter? eventFilter = eventFilterController.current;
     if (eventFilter != null) {
-      controller.setValues(eventFilter.toJson());
+      formInputController.setValues(eventFilter.toJson());
     } else {
       String? eventCode = eventFilterController.eventCode;
       String? eventName = eventFilterController.eventName;
@@ -203,7 +203,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
         json['eventCode'] = eventCode;
         json['eventName'] = eventName;
       }
-      controller.setValues(json);
+      formInputController.setValues(json);
     }
     List<FormButton> formButtonDefs = [
       FormButton(
@@ -222,7 +222,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
         child: FormInputWidget(
           height: appDataProvider.portraitSize.height * 0.7,
           spacing: 5.0,
-          controller: controller,
+          controller: formInputController,
           formButtons: formButtonDefs,
         ));
 
@@ -259,7 +259,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
   }
 
   _onCopy(Map<String, dynamic> values) async {
-    controller.setValue('id', null);
+    formInputController.setValue('id', null);
     eventFilterController.currentIndex = -1;
   }
 
@@ -295,13 +295,14 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
       ),
     ];
     return AppBarView(
-        title: title,
-        withLeading: true,
-        rightWidgets: rightWidgets,
-        child: Swiper(
+      title: title,
+      withLeading: true,
+      rightWidgets: rightWidgets,
+      child: Obx(() {
+        return Swiper(
           controller: swiperController,
           itemCount: 2,
-          index: index,
+          index: index.value,
           itemBuilder: (BuildContext context, int index) {
             Widget view = _buildEventFilterListView(context);
             if (index == 1) {
@@ -310,8 +311,10 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
             return view;
           },
           onIndexChanged: (int index) {
-            this.index = index;
+            this.index.value = index;
           },
-        ));
+        );
+      }),
+    );
   }
 }

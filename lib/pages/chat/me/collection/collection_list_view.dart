@@ -6,7 +6,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
 //收藏的页面
-class CollectionListView extends StatefulWidget with TileDataMixin {
+class CollectionListView extends StatelessWidget with TileDataMixin {
   final Future<void> Function()? onRefresh;
   final Function()? onScrollMax;
   final Function()? onScrollMin;
@@ -19,9 +19,6 @@ class CollectionListView extends StatefulWidget with TileDataMixin {
   }
 
   @override
-  State createState() => _CollectionListViewState();
-
-  @override
   bool get withLeading => true;
 
   @override
@@ -32,15 +29,13 @@ class CollectionListView extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'Collection';
-}
 
-class _CollectionListViewState extends State<CollectionListView> {
   @override
   Widget build(BuildContext context) {
     final CollectionListWidget collectionListWidget = CollectionListWidget();
     var appBarView = AppBarView(
-      title: widget.title,
-      withLeading: widget.withLeading,
+      title: title,
+      withLeading: withLeading,
       child: collectionListWidget,
     );
 

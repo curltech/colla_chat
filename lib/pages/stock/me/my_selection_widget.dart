@@ -44,11 +44,10 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'MySelection';
 
-  ValueNotifier<String> groupName = ValueNotifier<String>(
-      AppLocalizations.t(shareGroupService.defaultGroupName));
+  RxString groupName =
+      AppLocalizations.t(shareGroupService.defaultGroupName).obs;
 
-  ValueNotifier<Map<String, String>> groupSubscription =
-      ValueNotifier<Map<String, String>>({});
+  RxMap<String, String> groupSubscription = <String, String>{}.obs;
 
   _buildGroupSubscription() async {
     Map<String, String> groupSubscription = {};
@@ -199,7 +198,8 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
             return _buildActionWidget(context, index, dayLine);
           }),
     ];
-    return Obx((){
+    return Obx(
+      () {
         return BindingDataTable2<DayLine>(
           key: UniqueKey(),
           showCheckboxColumn: true,
@@ -214,34 +214,30 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
   }
 
   Widget _buildShareGroupWidget() {
-    return ValueListenableBuilder(
-        valueListenable: groupSubscription,
-        builder: (BuildContext context, Map<String, String> groupSubscription,
-            Widget? child) {
-          List<Widget> children = [];
-          for (String key in groupSubscription.keys) {
-            children.add(TextButton(
-              onPressed: () {
-                _addMember(key);
-                groupName.value = key;
-                _refresh(key);
-              },
-              child: ValueListenableBuilder(
-                  valueListenable: groupName,
-                  builder:
-                      (BuildContext context, String groupName, Widget? child) {
-                    return Text(key,
-                        style: TextStyle(
-                            color: groupName != key ? Colors.white : null));
-                  }),
-            ));
-          }
-          return SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: children));
-        });
+    return Obx(() {
+      List<Widget> children = [];
+      for (String key in groupSubscription.keys) {
+        children.add(TextButton(
+          onPressed: () {
+            _addMember(key);
+            groupName.value = key;
+            _refresh(key);
+          },
+          child: ValueListenableBuilder(
+              valueListenable: groupName,
+              builder: (BuildContext context, String groupName, Widget? child) {
+                return Text(key,
+                    style: TextStyle(
+                        color: groupName != key ? Colors.white : null));
+              }),
+        ));
+      }
+      return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: children));
+    });
   }
 
   @override

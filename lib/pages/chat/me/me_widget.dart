@@ -22,7 +22,6 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 //我的页面，带有路由回调函数
 class MeWidget extends StatelessWidget with TileDataMixin {
