@@ -67,7 +67,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
     List<ActionData> filePopActionData = [];
     String? mimeType = FileUtil.mimeType(filename);
     if (mimeType != null) {
-      if (mimeType.startsWith('video')) {
+      if (mimeType.startsWith('video') || filename.endsWith('rmvb')) {
         for (var videoExtension in mediaFileController.videoExtensions) {
           if (videoExtension != mimeType) {
             filePopActionData.add(

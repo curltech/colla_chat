@@ -191,7 +191,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
 
   SwiperController swiperController = SwiperController();
 
-  int index = 0;
+  RxInt index = 0.obs;
 
   PlatformTextToSpeechWidget platformTextToSpeechWidget =
       PlatformTextToSpeechWidget();
@@ -199,7 +199,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
   SherpaTextToSpeechWidget sherpaTextToSpeechWidget =
       SherpaTextToSpeechWidget();
 
-  ValueNotifier<bool> platformTextToSpeech = ValueNotifier<bool>(true);
+  RxBool platformTextToSpeech = true.obs;
 
   Future<void> _onRefresh(BuildContext context) async {
     int length = poemController.data.length;
@@ -461,24 +461,26 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
     var poemWidget = AppBarView(
       title: title,
       withLeading: withLeading,
-      child: Swiper(
-        itemCount: 2,
-        controller: swiperController,
-        onIndexChanged: (index) {
-          this.index = index;
-        },
-        index: index,
-        itemBuilder: (BuildContext context, int index) {
-          if (index == 0) {
-            return _buildPoemListWidget(context);
-          }
-          if (index == 1) {
-            return _buildPoemContent(context);
-          }
+      child: Obx(() {
+        return Swiper(
+          itemCount: 2,
+          controller: swiperController,
+          onIndexChanged: (index) {
+            this.index.value = index;
+          },
+          index: index.value,
+          itemBuilder: (BuildContext context, int index) {
+            if (index == 0) {
+              return _buildPoemListWidget(context);
+            }
+            if (index == 1) {
+              return _buildPoemContent(context);
+            }
 
-          return nil;
-        },
-      ),
+            return nil;
+          },
+        );
+      }),
     );
 
     return poemWidget;
