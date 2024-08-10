@@ -36,7 +36,9 @@ final QStatDataPageController qstatDataPageController =
 
 ///自选股和分组的查询界面
 class QStatWidget extends StatelessWidget with TileDataMixin {
-  QStatWidget({super.key});
+  QStatWidget({super.key}) {
+    _init();
+  }
 
   @override
   bool get withLeading => true;
@@ -54,7 +56,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
   late final FormInputController searchController;
   ExpansionTileController expansionTileController = ExpansionTileController();
 
-  initState() {
+  _init() {
     qstatDataPageController.offset.addListener(_updateQStat);
     qstatDataPageController.sortColumnName.addListener(_updateQStat);
     qstatDataPageController.sortAscending.addListener(_updateQStat);
@@ -375,17 +377,16 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
           inputType: InputType.custom,
           buildSuffix: _buildActionWidget),
     ];
-    return Obx(() {
-      return BindingDataTable2<QStat>(
-        key: UniqueKey(),
-        showCheckboxColumn: false,
-        horizontalMargin: 10.0,
-        columnSpacing: 0.0,
-        platformDataColumns: qstatDataColumns,
-        controller: qstatDataPageController,
-        fixedLeftColumns: 1,
-      );
-    });
+
+    return BindingDataTable2<QStat>(
+      key: UniqueKey(),
+      showCheckboxColumn: false,
+      horizontalMargin: 10.0,
+      columnSpacing: 0.0,
+      platformDataColumns: qstatDataColumns,
+      controller: qstatDataPageController,
+      fixedLeftColumns: 1,
+    );
   }
 
   @override

@@ -35,7 +35,9 @@ final QPerformanceDataPageController qperformanceDataPageController =
 
 ///自选股和分组的查询界面
 class QPerformanceWidget extends StatelessWidget with TileDataMixin {
-  QPerformanceWidget({super.key});
+  QPerformanceWidget({super.key}) {
+    _init();
+  }
 
   @override
   bool get withLeading => true;
@@ -53,7 +55,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
   late final FormInputController searchController;
   ExpansionTileController expansionTileController = ExpansionTileController();
 
-  initState() {
+  _init() {
     qperformanceDataPageController.offset.addListener(_updateQPerformance);
     qperformanceDataPageController.sortColumnName
         .addListener(_updateQPerformance);
@@ -331,17 +333,16 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
             return _buildActionWidget(index, qperformance);
           }),
     ];
-    return Obx(() {
-      return BindingPaginatedDataTable2<QPerformance>(
-        key: UniqueKey(),
-        showCheckboxColumn: false,
-        horizontalMargin: 10.0,
-        columnSpacing: 0.0,
-        platformDataColumns: qperformanceDataColumns,
-        controller: qperformanceDataPageController,
-        fixedLeftColumns: 1,
-      );
-    });
+
+    return BindingPaginatedDataTable2<QPerformance>(
+      key: UniqueKey(),
+      showCheckboxColumn: false,
+      horizontalMargin: 10.0,
+      columnSpacing: 0.0,
+      platformDataColumns: qperformanceDataColumns,
+      controller: qperformanceDataPageController,
+      fixedLeftColumns: 1,
+    );
   }
 
   @override

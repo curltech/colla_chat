@@ -34,7 +34,9 @@ final StatScoreDataPageController statScoreDataPageController =
 
 ///自选股和分组的查询界面
 class StatScoreWidget extends StatelessWidget with TileDataMixin {
-  StatScoreWidget({super.key});
+  StatScoreWidget({super.key}) {
+    _init();
+  }
 
   @override
   bool get withLeading => true;
@@ -52,7 +54,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
   late final FormInputController searchController;
   ExpansionTileController expansionTileController = ExpansionTileController();
 
-  initState() {
+  _init() {
     statScoreDataPageController.offset.addListener(_updateStatScore);
     statScoreDataPageController.sortColumnName.addListener(_updateStatScore);
     statScoreDataPageController.sortAscending.addListener(_updateStatScore);
@@ -325,17 +327,15 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
           inputType: InputType.custom,
           buildSuffix: _buildActionWidget),
     ];
-    return Obx(() {
-      return BindingDataTable2<StatScore>(
-        key: UniqueKey(),
-        showCheckboxColumn: false,
-        horizontalMargin: 10.0,
-        columnSpacing: 0.0,
-        platformDataColumns: statScoreDataColumns,
-        controller: statScoreDataPageController,
-        fixedLeftColumns: 1,
-      );
-    });
+    return BindingDataTable2<StatScore>(
+      key: UniqueKey(),
+      showCheckboxColumn: false,
+      horizontalMargin: 10.0,
+      columnSpacing: 0.0,
+      platformDataColumns: statScoreDataColumns,
+      controller: statScoreDataPageController,
+      fixedLeftColumns: 1,
+    );
   }
 
   @override

@@ -34,7 +34,9 @@ final PerformanceDataPageController performanceDataPageController =
 
 ///自选股和分组的查询界面
 class PerformanceWidget extends StatelessWidget with TileDataMixin {
-  PerformanceWidget({super.key});
+  PerformanceWidget({super.key}) {
+    _init();
+  }
 
   @override
   bool get withLeading => true;
@@ -185,7 +187,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
   late final FormInputController searchController;
   ExpansionTileController expansionTileController = ExpansionTileController();
 
-  initState() {
+  _init() {
     performanceDataPageController.offset.addListener(_updatePerformance);
     performanceDataPageController.sortColumnName
         .addListener(_updatePerformance);
@@ -318,17 +320,15 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
   }
 
   Widget _buildPerformanceListView(BuildContext context) {
-    return Obx(() {
-      return BindingPaginatedDataTable2<Performance>(
-        key: UniqueKey(),
-        showCheckboxColumn: false,
-        horizontalMargin: 10.0,
-        columnSpacing: 0.0,
-        platformDataColumns: performanceDataColumns,
-        controller: performanceDataPageController,
-        fixedLeftColumns: 1,
-      );
-    });
+    return BindingPaginatedDataTable2<Performance>(
+      key: UniqueKey(),
+      showCheckboxColumn: false,
+      horizontalMargin: 10.0,
+      columnSpacing: 0.0,
+      platformDataColumns: performanceDataColumns,
+      controller: performanceDataPageController,
+      fixedLeftColumns: 1,
+    );
   }
 
   @override

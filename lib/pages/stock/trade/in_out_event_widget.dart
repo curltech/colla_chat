@@ -47,7 +47,9 @@ final InoutEventController inoutEventController = InoutEventController();
 
 /// 加自选股和分组的查询界面
 class InoutEventWidget extends StatelessWidget with TileDataMixin {
-  InoutEventWidget({super.key});
+  InoutEventWidget({super.key}) {
+    _init();
+  }
 
   @override
   bool get withLeading => true;
@@ -65,7 +67,7 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
   late final FormInputController searchController;
   ExpansionTileController expansionTileController = ExpansionTileController();
 
-  initState() {
+  _init() {
     final List<PlatformDataField> searchDataField = [
       PlatformDataField(
           name: 'tsCode',
@@ -107,8 +109,9 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
         label: '股票代码',
         name: 'ts_code',
         width: 100,
-        onSort: (int index, bool ascending) => inoutEventController.sort(
-            (t) => t.tsCode, index, 'tsCode', ascending),
+        onSort: (int index, bool ascending) =>
+            inoutEventController.sort(
+                    (t) => t.tsCode, index, 'tsCode', ascending),
       ),
       PlatformDataColumn(
         label: '股票名',
@@ -260,7 +263,9 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
                 : null);
         DateTime end = DateTime.now();
         logger.i(
-            'find more data duration:${end.difference(start).inMilliseconds}');
+            'find more data duration:${end
+                .difference(start)
+                .inMilliseconds}');
       }
     } else {
       logger.e('eventCode has no filters');

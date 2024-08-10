@@ -9,7 +9,7 @@ class DataListController<T> {
   Key key = UniqueKey();
   final RxList<T> data = <T>[].obs;
   final RxInt _currentIndex = (-1).obs;
-  final RxInt sortColumnIndex = (-1).obs;
+  final Rx<int?> sortColumnIndex = Rx<int?>(null);
   final Rx<String?> sortColumnName = Rx<String?>(null);
   final RxBool sortAscending = true.obs;
 
