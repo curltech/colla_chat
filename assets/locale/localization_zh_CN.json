@@ -765,5 +765,6 @@
   "VpnSwitch": "Vpn开关",
   "StockSwitch": "股票开关",
   "EmailSwitch": "邮件开关",
-  "DeveloperSwitch": "开发者开关"
+  "DeveloperSwitch": "开发者开关",
+  "LlmChatMessage": "Llm聊天"
 }
