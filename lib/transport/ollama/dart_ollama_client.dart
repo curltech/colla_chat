@@ -243,7 +243,7 @@ class DartOllamaClient {
     return status;
   }
 
-  Future<PushModelStatus?> pushModel(
+  Future<String?> pushModel(
     String model, {
     bool insecure = false,
     bool stream = false,
@@ -256,7 +256,7 @@ class DartOllamaClient {
     return res.status;
   }
 
-  Future<List<PushModelStatus?>> pushModelStream(
+  Future<List<String?>> pushModelStream(
     String model, {
     bool insecure = false,
     bool stream = false,
@@ -265,7 +265,7 @@ class DartOllamaClient {
       request:
           PushModelRequest(model: model, insecure: insecure, stream: stream),
     );
-    List<PushModelStatus?> status = [];
+    List<String?> status = [];
     await for (final res in modelStream) {
       status.add(res.status);
     }

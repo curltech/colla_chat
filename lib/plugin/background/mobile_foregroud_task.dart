@@ -1,21 +1,15 @@
 import 'dart:async';
-import 'dart:isolate';
-import 'dart:ui';
 
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
 ///支持android和ios，在单独线程中执行一些前台任务
 ///只要前台任务运行，则应用不会被关闭
 /// iOS有一些限制：app被强制终止时，设备重启时，任务不会工作，onRepeatEvent可能不能正常工作
-class MobileForegroundTask {
-  void Function()? onRepeatEvent;
-
+class MobileForegroundTaskHandler extends TaskHandler {
   ///接收数据端口，接收前台服务任务发送来的数据
-  ReceivePort? receivePort;
   AndroidNotificationOptions androidNotificationOptions =
       AndroidNotificationOptions(
     channelId: 'CollaChat foreground',
@@ -33,6 +27,7 @@ class MobileForegroundTask {
     interval: 5000,
     isOnceEvent: false,
     autoRunOnBoot: true,
+    autoRunOnMyPackageReplaced: true,
     allowWakeLock: true,
     allowWifiLock: true,
   );
@@ -77,16 +72,7 @@ class MobileForegroundTask {
 
   /// 手工启动任务
   Future<Object> start({void Function()? onRepeatEvent}) async {
-    this.onRepeatEvent = onRepeatEvent;
     await _init();
-
-    /// 启动前台任务前注册接收端口
-    final ReceivePort? receivePort = FlutterForegroundTask.receivePort;
-    final bool isRegistered = _registerReceivePort(receivePort);
-    if (!isRegistered) {
-      logger.e('Failed to register receivePort!');
-      return false;
-    }
 
     if (await FlutterForegroundTask.isRunningService) {
       print('FlutterForegroundTask restartService');
@@ -96,27 +82,14 @@ class MobileForegroundTask {
       return FlutterForegroundTask.startService(
         notificationTitle: notificationTitle,
         notificationText: notificationText,
+        serviceId: 256,
+        notificationIcon: null,
+        notificationButtons: [
+          const NotificationButton(id: 'btn_hello', text: 'hello'),
+        ],
         callback: onStart,
       );
     }
-  }
-
-  /// 注册接收端口
-  bool _registerReceivePort(ReceivePort? newReceivePort) {
-    newReceivePort ??= FlutterForegroundTask.receivePort;
-    if (newReceivePort == receivePort) {
-      return false;
-    }
-
-    receivePort?.close();
-    receivePort = null;
-
-    receivePort = newReceivePort;
-    receivePort?.listen((data) {
-      onData(data);
-    });
-
-    return receivePort != null;
   }
 
   /// 更新服务任务参数
@@ -131,8 +104,6 @@ class MobileForegroundTask {
 
   /// 停止任务
   Future<ServiceRequestResult> stop() {
-    receivePort?.close();
-    receivePort = null;
     return FlutterForegroundTask.stopService();
   }
 
@@ -141,7 +112,8 @@ class MobileForegroundTask {
   }
 
   ///前台服务任务发来数据事件
-  void onData(dynamic data) async {
+  @override
+  void onReceiveData(dynamic data) async {
     print('received foreground service data:$data');
   }
 
@@ -188,60 +160,28 @@ class MobileForegroundTask {
   saveData(String key, Object value) async {
     await FlutterForegroundTask.saveData(key: key, value: value);
   }
-}
 
-final MobileForegroundTask mobileForegroundTask = MobileForegroundTask();
-
-/// 实际的前台任务处理器
-class MobileForegroundTaskHandler extends TaskHandler {
-  //启动后的发送端口
-  SendPort? _sendPort;
-
-  /// 任务开始的时候调用
   @override
-  void onStart(DateTime timestamp, SendPort? sendPort) async {
-    _sendPort = sendPort;
-    print('MobileForegroundTask started');
-    Timer.periodic(const Duration(seconds: 1), (timer) {
-      print('MobileForegroundTask periodic running');
-    });
+  void onDestroy(DateTime timestamp) {
+    // TODO: implement onDestroy
   }
 
-  // 周期任务调用 [ForegroundTaskOptions].
   @override
-  void onRepeatEvent(DateTime timestamp, SendPort? sendPort) async {
-    print('onRepeatEvent started');
-    if (mobileForegroundTask.onRepeatEvent != null) {
-      mobileForegroundTask.onRepeatEvent!();
-    }
+  void onStart(DateTime timestamp) {
+    // TODO: implement onStart
   }
 
-  /// 通知按钮被按的时候调用，android平台
   @override
-  void onDestroy(DateTime timestamp, SendPort? sendPort) async {
-    print('MobileForegroundTask onDestroy');
-  }
-
-  /// 通知按钮被按的时候调用，android平台
-  @override
-  void onNotificationButtonPressed(String id) {
-    print('MobileForegroundTask onNotificationButtonPressed');
-  }
-
-  /// 通知被按的时候调用，android平台
-  /// 必须有"android.permission.SYSTEM_ALERT_WINDOW"权限
-  @override
-  void onNotificationPressed() {
-    print('MobileForegroundTask onNotificationPressed');
-    // 应用退出的时候重启应用，并且发送数据到应用
-    FlutterForegroundTask.launchApp();
+  void onRepeatEvent(DateTime timestamp) {
+    // TODO: implement onRepeatEvent
   }
 }
+
+final MobileForegroundTaskHandler mobileForegroundTaskHandler =
+    MobileForegroundTaskHandler();
 
 ///服务线程启动，在单独的服务线程中执行的代码
 @pragma('vm:entry-point')
 void onStart() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  DartPluginRegistrant.ensureInitialized();
-  FlutterForegroundTask.setTaskHandler(MobileForegroundTaskHandler());
+  FlutterForegroundTask.setTaskHandler(mobileForegroundTaskHandler);
 }

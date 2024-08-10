@@ -19,6 +19,7 @@ import 'package:colla_chat/tool/ffmpeg/ffmpeg_helper.dart';
 import 'package:colla_chat/transport/websocket/universal_websocket.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart' as inapp;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -101,6 +102,7 @@ void main(List<String> args) async {
   await _initDesktopWindows();
   await localNotificationsService.init();
   firebaseMessagingService.init();
+  FlutterForegroundTask.initCommunicationPort();
 
   ///加载主应用组件
   runApp(CollaChatApp(loginStatus: loginStatus));

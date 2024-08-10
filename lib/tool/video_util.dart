@@ -75,7 +75,6 @@ class VideoUtil {
     List<int>? data,
     int width = 1024,
     int height = 768,
-    bool keepAspectRatio = true,
     String? format,
     int quality = 10,
   }) async {
@@ -86,7 +85,6 @@ class VideoUtil {
         thumbnailPath: thumbnailPath,
         width: width,
         height: height,
-        keepAspectRatio: keepAspectRatio,
         format: format,
         quality: quality);
     Uint8List? bytes = await FileUtil.readFileAsBytes(thumbnailPath);
@@ -101,7 +99,6 @@ class VideoUtil {
     List<int>? data,
     int width = 1024,
     int height = 768,
-    bool keepAspectRatio = true,
     String? format,
     int quality = 10,
   }) async {
@@ -117,7 +114,6 @@ class VideoUtil {
         destFile: thumbnailPath,
         width: width,
         height: height,
-        keepAspectRatio: keepAspectRatio,
         format: format,
         quality: quality);
   }
