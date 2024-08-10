@@ -37,29 +37,33 @@ class AppBarView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget titleWidget = this.titleWidget ??
-        CommonAutoSizeText(
-          AppLocalizations.t(title ?? ''),
-          style: const TextStyle(color: Colors.white),
-          //softWrap: true,
-          wrapWords: false,
-          overflow: TextOverflow.visible,
-          //maxLines: 2
-        );
-
-    return Column(children: [
-      AppBarWidget.buildAppBar(
-        context:context,
-        backgroundColor: myself.primary,
-        withLeading: withLeading,
-        leadingCallBack: leadingCallBack,
-        title: titleWidget,
-        centerTitle: centerTitle,
-        rightWidgets: rightWidgets,
-        rightPopupMenus: rightPopupMenus,
-        bottom: bottom,
-      ),
-      Expanded(child: child),
-    ]);
+    return ListenableBuilder(
+      listenable: myself,
+      builder: (BuildContext context, Widget? child) {
+        Widget titleWidget = this.titleWidget ??
+            CommonAutoSizeText(
+              AppLocalizations.t(title ?? ''),
+              style: const TextStyle(color: Colors.white),
+              //softWrap: true,
+              wrapWords: false,
+              overflow: TextOverflow.visible,
+              //maxLines: 2
+            );
+        return Column(children: [
+          AppBarWidget.buildAppBar(
+            context: context,
+            backgroundColor: myself.primary,
+            withLeading: withLeading,
+            leadingCallBack: leadingCallBack,
+            title: titleWidget,
+            centerTitle: centerTitle,
+            rightWidgets: rightWidgets,
+            rightPopupMenus: rightPopupMenus,
+            bottom: bottom,
+          ),
+          Expanded(child: this.child),
+        ]);
+      },
+    );
   }
 }

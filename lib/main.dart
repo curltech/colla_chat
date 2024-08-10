@@ -209,7 +209,6 @@ class HomeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    appDataProvider.context = context;
     return UpgradeAlert(
         upgrader: Upgrader(),
         child: ScreenUtilInit(

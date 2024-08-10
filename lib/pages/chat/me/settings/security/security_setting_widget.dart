@@ -132,6 +132,7 @@ class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
     if (file.existsSync()) {
       appDataProvider.dataLength = await file.length();
       DialogUtil.info(
+          context: context,
           content:
               '${AppLocalizations.t('Successfully vacuum colla.db length:')} ${appDataProvider.dataLength}');
     }
@@ -142,6 +143,7 @@ class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
     File? file = sqlite3.backup();
     if (file != null) {
       DialogUtil.info(
+          context: context,
           content:
               '${AppLocalizations.t('Successfully backup colla.db')} ${file.path}');
     }
@@ -151,6 +153,7 @@ class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
   void _restore(BuildContext context) {
     sqlite3.restore();
     DialogUtil.info(
+        context: context,
         content:
             AppLocalizations.t('Successfully restore colla.db and reopen'));
   }
@@ -162,6 +165,7 @@ class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
       String? filename = await myselfPeerService.backup(peerId);
       if (filename != null) {
         DialogUtil.info(
+            context: context,
             content:
                 '${AppLocalizations.t('Successfully backup peer filename')} $filename');
       }
@@ -172,8 +176,8 @@ class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
   Future<void> _deletePeer(BuildContext context) async {
     String? peerId = myself.peerId;
     if (peerId != null) {
-      bool? confirm = await DialogUtil.confirm(
-          content: 'Confirm delete current peer?');
+      bool? confirm =
+          await DialogUtil.confirm(content: 'Confirm delete current peer?');
       if (confirm == true) {
         myselfPeerService.delete();
         peerClientService.delete();
@@ -206,6 +210,7 @@ class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
       String backup = await xfiles.first.readAsString();
       await myselfPeerService.restore(backup);
       DialogUtil.info(
+          context: context,
           content:
               '${AppLocalizations.t('Successfully restore peer filename')} ${xfiles.first.path}');
     }
@@ -218,6 +223,7 @@ class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
       String? filename = await messageAttachmentService.backup(peerId);
       if (filename != null) {
         DialogUtil.info(
+            context: context,
             content:
                 '${AppLocalizations.t('Successfully backup attachment filename')} $filename');
       }
@@ -237,6 +243,7 @@ class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
             await messageAttachmentService.restore(peerId, xfiles.first.path);
         if (path != null) {
           DialogUtil.info(
+              context: context,
               content:
                   '${AppLocalizations.t('Successfully restore attachment path')} $path');
         }
@@ -261,6 +268,7 @@ class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
       }
     }
     DialogUtil.info(
+        context: context,
         content: AppLocalizations.t('Successfully clean all log files'));
   }
 

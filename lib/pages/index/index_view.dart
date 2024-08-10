@@ -713,6 +713,7 @@ class _IndexViewState extends State<IndexView>
 
   @override
   Widget build(BuildContext context) {
+    appDataProvider.context = context;
     appDataProvider.changeSize(context);
     var provider = Consumer3<AppDataProvider, IndexWidgetProvider, Myself>(
         builder:

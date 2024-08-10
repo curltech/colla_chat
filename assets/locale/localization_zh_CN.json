@@ -749,5 +749,21 @@
   "Activities": "活动",
   "Objects": "物体",
   "Symbols": "符号",
-  "Flags": "旗帜"
+  "Flags": "旗帜",
+  "VideoEditor": "视频编辑",
+  "file is empty": "无文件",
+  "information": "信息",
+  "formats": "格式",
+  "PublicKey": "公钥",
+  "ClientId": "客户端编号",
+  "ConnectPeerId": "定位器编号",
+  "ConnectAddress": "定位器地址",
+  "ConnectSessionId": "定位器会话",
+  "ClientDevice": "客户端设备",
+  "ClientType": "客户端类型",
+  "UserId": "用户编号",
+  "VpnSwitch": "Vpn开关",
+  "StockSwitch": "股票开关",
+  "EmailSwitch": "邮件开关",
+  "DeveloperSwitch": "开发者开关"
 }

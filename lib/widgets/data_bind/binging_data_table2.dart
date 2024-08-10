@@ -183,41 +183,39 @@ class BindingDataTable2<T> extends StatelessWidget {
 
   /// 过滤条件的多项选择框的表
   Widget _buildDataTable(BuildContext context) {
-    return Obx(() {
-      return DataTable2(
-        key: UniqueKey(),
-        dataRowHeight: dataRowHeight,
-        minWidth: minWidth ?? 2000,
-        dividerThickness: 0.0,
-        showCheckboxColumn: showCheckboxColumn,
-        horizontalMargin: horizontalMargin,
-        columnSpacing: columnSpacing,
-        fixedLeftColumns: fixedLeftColumns,
-        sortArrowIcon: Icons.keyboard_arrow_up,
-        headingCheckboxTheme: CheckboxThemeData(
-          side: BorderSide(color: myself.primary),
-          fillColor: WidgetStateColor.resolveWith((states) => myself.primary),
-          // checkColor: MaterialStateColor.resolveWith((states) => Colors.white)
-        ),
-        datarowCheckboxTheme: CheckboxThemeData(
-          side: BorderSide(color: myself.primary),
-          fillColor: WidgetStateColor.resolveWith((states) => myself.primary),
-          // checkColor: MaterialStateColor.resolveWith((states) => Colors.white)
-        ),
-        sortColumnIndex: controller.sortColumnIndex.value,
-        sortAscending: controller.sortAscending.value,
-        columns: _buildDataColumns(),
-        rows: _buildDataRows(),
-        onSelectAll: (val) {
-          if (val != null) {
-            List<dynamic> data = controller.data;
-            for (dynamic t in data) {
-              EntityUtil.setChecked(t, val);
-            }
+    return DataTable2(
+      key: UniqueKey(),
+      dataRowHeight: dataRowHeight,
+      minWidth: minWidth ?? 2000,
+      dividerThickness: 0.0,
+      showCheckboxColumn: showCheckboxColumn,
+      horizontalMargin: horizontalMargin,
+      columnSpacing: columnSpacing,
+      fixedLeftColumns: fixedLeftColumns,
+      sortArrowIcon: Icons.keyboard_arrow_up,
+      headingCheckboxTheme: CheckboxThemeData(
+        side: BorderSide(color: myself.primary),
+        fillColor: WidgetStateColor.resolveWith((states) => myself.primary),
+        // checkColor: MaterialStateColor.resolveWith((states) => Colors.white)
+      ),
+      datarowCheckboxTheme: CheckboxThemeData(
+        side: BorderSide(color: myself.primary),
+        fillColor: WidgetStateColor.resolveWith((states) => myself.primary),
+        // checkColor: MaterialStateColor.resolveWith((states) => Colors.white)
+      ),
+      sortColumnIndex: controller.sortColumnIndex.value,
+      sortAscending: controller.sortAscending.value,
+      columns: _buildDataColumns(),
+      rows: _buildDataRows(),
+      onSelectAll: (val) {
+        if (val != null) {
+          List<dynamic> data = controller.data;
+          for (dynamic t in data) {
+            EntityUtil.setChecked(t, val);
           }
-        },
-      );
-    });
+        }
+      },
+    );
   }
 
   @override

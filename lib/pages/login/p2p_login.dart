@@ -111,6 +111,7 @@ class P2pLogin extends StatelessWidget with WindowListener {
 
   @override
   Widget build(BuildContext context) {
+    appDataProvider.context = context;
     appDataProvider.changeSize(context);
     var workspace = ListenableBuilder(
       listenable: appDataProvider,

@@ -198,18 +198,15 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
             return _buildActionWidget(context, index, dayLine);
           }),
     ];
-    return Obx(
-      () {
-        return BindingDataTable2<DayLine>(
-          key: UniqueKey(),
-          showCheckboxColumn: true,
-          horizontalMargin: 10.0,
-          columnSpacing: 0.0,
-          platformDataColumns: dayLineDataColumns,
-          controller: dayLineController,
-          fixedLeftColumns: 2,
-        );
-      },
+
+    return BindingDataTable2<DayLine>(
+      key: UniqueKey(),
+      showCheckboxColumn: true,
+      horizontalMargin: 10.0,
+      columnSpacing: 0.0,
+      platformDataColumns: dayLineDataColumns,
+      controller: dayLineController,
+      fixedLeftColumns: 2,
     );
   }
 
