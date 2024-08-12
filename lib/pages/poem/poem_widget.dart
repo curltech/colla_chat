@@ -87,14 +87,15 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
 
   ExpansionTileController expansionTileController = ExpansionTileController();
 
-  bool isExpanded() {
-    try {
-      return expansionTileController.isExpanded;
-    } catch (e) {
-      logger.e('expansionTileController.isExpanded failure:$e');
-    }
-    return false;
-  }
+  //
+  // bool isExpanded() {
+  //   try {
+  //     return expansionTileController.isExpanded;
+  //   } catch (e) {
+  //     logger.e('expansionTileController.isExpanded failure:$e');
+  //   }
+  //   return false;
+  // }
 
   Widget _buildFormInputWidget(BuildContext context) {
     var formInputWidget = Container(
@@ -116,7 +117,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
       title: CommonAutoSizeText(
         AppLocalizations.t('Search condition'),
       ),
-      initiallyExpanded: isExpanded(),
+      initiallyExpanded: true,
       children: [formInputWidget],
     );
 
