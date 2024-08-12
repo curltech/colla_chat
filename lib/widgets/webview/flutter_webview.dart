@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 /// FlutterWebView，打开一个内部的浏览器窗口，可以用来观看网页，音频，视频文件，office文件
+/// 支持移动和windows平台
 class FlutterWebView extends StatelessWidget {
   final String? initialUrl;
   final String? html;

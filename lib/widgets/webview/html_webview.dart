@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 /// flutter_widget_from_html，简单地渲染html，不用浏览器实现
-class HtmlWebView extends StatefulWidget {
+class HtmlWebView extends StatelessWidget {
   final String html;
 
   const HtmlWebView({
@@ -11,19 +11,9 @@ class HtmlWebView extends StatefulWidget {
   });
 
   @override
-  State createState() => _HtmlWebViewState();
-}
-
-class _HtmlWebViewState extends State<HtmlWebView> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(context) {
     HtmlWidget htmlWidget = HtmlWidget(
-      widget.html,
+      html,
       onErrorBuilder: (context, element, error) {
         return Text(
           '$element error: $error',
@@ -32,7 +22,7 @@ class _HtmlWebViewState extends State<HtmlWebView> {
       },
       onLoadingBuilder: (context, element, loadingProgress) {
         return null;
-      
+
         // return LoadingUtil.buildCircularLoadingWidget();
       },
       renderMode: RenderMode.listView,

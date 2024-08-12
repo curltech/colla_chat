@@ -103,13 +103,8 @@ class PlatformWebViewWidget extends StatelessWidget with TileDataMixin {
   Widget buildWebView(BuildContext context) {
     return Column(children: <Widget>[
       buildTextField(context),
-      Expanded(child: PlatformWebView(
-          onWebViewCreated: (PlatformWebViewController controller) {
-        platformWebViewController.inAppWebViewController =
-            controller.inAppWebViewController;
-        platformWebViewController.webViewController =
-            controller.webViewController;
-      }))
+      Expanded(
+          child: PlatformWebView(webViewController: platformWebViewController))
     ]);
   }
 

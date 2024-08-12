@@ -91,6 +91,7 @@ class _HtmlPreviewWidgetState extends State<HtmlPreviewWidget> {
         title: htmlPreviewController.title,
         withLeading: widget.withLeading,
         child: PlatformWebView(
+            webViewController: PlatformWebViewController(),
             initialUrl: htmlPreviewController.initialUrl,
             html: htmlPreviewController.html,
             initialFilename: htmlPreviewController.initialFilename));

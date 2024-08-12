@@ -58,7 +58,10 @@ class SubscribeChannelMessagePreview extends StatelessWidget
       child: PlatformFutureBuilder(
           future: _buildHtml(),
           builder: (BuildContext context, String? html) {
-            return PlatformWebView(html: html);
+            return PlatformWebView(
+                html: html,
+                inline: true,
+                webViewController: PlatformWebViewController());
           }),
     );
   }

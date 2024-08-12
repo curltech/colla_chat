@@ -7,13 +7,13 @@ class OpenFileUtil {
     String? type,
     String? uti,
     String linuxDesktopName = "xdg",
-    bool linuxByProcess = false,
   }) async {
-    final OpenResult result = await OpenFilex.open(filename,
-        type: type,
-        uti: uti,
-        linuxDesktopName: linuxDesktopName,
-        linuxByProcess: linuxByProcess);
+    final OpenResult result = await OpenFilex.open(
+      filename,
+      type: type,
+      uti: uti,
+      linuxDesktopName: linuxDesktopName,
+    );
 
     return result;
   }

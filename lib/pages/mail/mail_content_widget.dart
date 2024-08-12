@@ -32,6 +32,7 @@ class MailContentWidget extends StatelessWidget with TileDataMixin {
     FullScreenAttachmentWidget fullScreenAttachmentWidget =
         const FullScreenAttachmentWidget();
     indexWidgetProvider.define(fullScreenAttachmentWidget);
+    _init();
   }
 
   @override
@@ -47,7 +48,8 @@ class MailContentWidget extends StatelessWidget with TileDataMixin {
   String get title => 'MailContent';
 
   PlatformWebView? platformWebView;
-  PlatformWebViewController? platformWebViewController;
+  PlatformWebViewController platformWebViewController =
+      PlatformWebViewController();
   DecryptedMimeMessage decryptedMimeMessage = DecryptedMimeMessage();
   ValueNotifier<String?> subject = ValueNotifier<String?>(null);
 
@@ -55,17 +57,11 @@ class MailContentWidget extends StatelessWidget with TileDataMixin {
   ///非windows平台直接使用html显示
   ///windows平台需要先转换成文件，防止乱码
 
-  initState() {
+  _init() {
     ///windows桌面环境下用webview显示html文件方式的邮件内容，后面用load方式装载
     if (!platformParams.mobile && !platformParams.macos) {
-      platformWebViewController = PlatformWebViewController();
-      platformWebView = PlatformWebView(
-          onWebViewCreated: (PlatformWebViewController controller) {
-        platformWebViewController!.inAppWebViewController =
-            controller.inAppWebViewController;
-        platformWebViewController!.webViewController =
-            controller.webViewController;
-      });
+      platformWebView =
+          PlatformWebView(webViewController: platformWebViewController);
     }
   }
 
@@ -158,8 +154,12 @@ class MailContentWidget extends StatelessWidget with TileDataMixin {
           }
           Widget webView = nil;
           try {
-            webView =
-                Center(child: PlatformWebView(html: decryptedMimeMessage.html));
+            webView = Center(
+                child: PlatformWebView(
+              html: decryptedMimeMessage.html,
+              inline: true,
+              webViewController: platformWebViewController,
+            ));
           } catch (e) {
             logger.e('PlatformWebView failure:$e');
           }
