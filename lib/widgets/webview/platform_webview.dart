@@ -214,7 +214,7 @@ class PlatformWebView extends StatelessWidget {
     return SizedBox(
       width: width,
       height: height,
-      child: _buildPlatformWebView(context),
+      child: Center(child: _buildPlatformWebView(context)),
     );
   }
 }
