@@ -494,7 +494,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
                 message: option.hint,
                 child: FilterChip(
                   avatar: option.leading,
-                  label: CommonAutoSizeText(
+                  label: Text(
                     option.label,
                     style: TextStyle(
                         color: option.checked ? Colors.white : Colors.black),
@@ -618,23 +618,27 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
     ButtonStyle style = StyleUtil.buildButtonStyle();
     ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);
-    children.add(ButtonBar(
-      children: [
-        TextButton(
-            style: style,
-            onPressed: () {
-              widget.onConfirm(null);
-            },
-            child: CommonAutoSizeText(AppLocalizations.t('Cancel'))),
-        TextButton(
-            style: mainStyle,
-            onPressed: () {
-              widget.optionController.options = options.value;
-              widget.onConfirm(widget.optionController.selected);
-            },
-            child: CommonAutoSizeText(AppLocalizations.t('Ok'))),
-      ],
-    ));
+    children.add(Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: OverflowBar(
+          spacing: 10.0,
+          alignment: MainAxisAlignment.end,
+          children: [
+            TextButton(
+                style: style,
+                onPressed: () {
+                  widget.onConfirm(null);
+                },
+                child: CommonAutoSizeText(AppLocalizations.t('Cancel'))),
+            TextButton(
+                style: mainStyle,
+                onPressed: () {
+                  widget.optionController.options = options.value;
+                  widget.onConfirm(widget.optionController.selected);
+                },
+                child: CommonAutoSizeText(AppLocalizations.t('Ok'))),
+          ],
+        )));
     return _buildDialogWidget(
         context,
         Container(
@@ -700,7 +704,7 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
             child: Chip(
               //labelPadding: EdgeInsets.zero,
               padding: const EdgeInsets.all(2.0),
-              label: CommonAutoSizeText(
+              label: Text(
                 option.label,
                 //style: const TextStyle(color: Colors.black),
               ),
@@ -722,7 +726,7 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
             children: chips,
           ));
     } else {
-      return nil;
+      return nilBox;
     }
   }
 

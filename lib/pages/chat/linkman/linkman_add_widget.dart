@@ -32,6 +32,8 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
 
   //final NfcLinkmanAddWidget nfcLinkmanAddWidget = NfcLinkmanAddWidget();
 
+  Map<TileData, List<TileData>> tileData = {};
+
   LinkmanAddWidget({super.key}) {
     indexWidgetProvider.define(p2pLinkmanAddWidget);
     indexWidgetProvider.define(contactLinkmanAddWidget);
@@ -43,23 +45,11 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(conferenceEditWidget);
     indexWidgetProvider.define(anonymousConferenceEditWidget);
     //indexWidgetProvider.define(nfcLinkmanAddWidget);
+
+    _init();
   }
 
-  @override
-  bool get withLeading => true;
-
-  @override
-  String get routeName => 'linkman_add';
-
-  @override
-  IconData get iconData => Icons.person;
-
-  @override
-  String get title => 'Add linkman';
-
-  @override
-  Widget build(BuildContext context) {
-    Map<TileData, List<TileData>> tileData = {};
+  _init() {
     final List<TileData> linkmanTileData = TileData.from([
       p2pLinkmanAddWidget,
       contactLinkmanAddWidget,
@@ -93,9 +83,26 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
       tile.dense = false;
       tile.selected = false;
     }
-    tileData[TileData(title: 'Linkman')] = linkmanTileData;
-    tileData[TileData(title: 'Group')] = groupTileData;
-    tileData[TileData(title: 'Conference')] = conferenceTileData;
+    tileData[TileData(title: 'Linkman', selected: true)] = linkmanTileData;
+    tileData[TileData(title: 'Group', selected: true)] = groupTileData;
+    tileData[TileData(title: 'Conference', selected: true)] =
+        conferenceTileData;
+  }
+
+  @override
+  bool get withLeading => true;
+
+  @override
+  String get routeName => 'linkman_add';
+
+  @override
+  IconData get iconData => Icons.person;
+
+  @override
+  String get title => 'Add linkman';
+
+  @override
+  Widget build(BuildContext context) {
     Widget child = GroupDataListView(tileData: tileData);
     var linkmanView = AppBarView(title: title, withLeading: true, child: child);
 

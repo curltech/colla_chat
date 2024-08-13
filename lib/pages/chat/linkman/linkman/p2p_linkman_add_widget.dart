@@ -15,14 +15,18 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/validator_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
+import 'package:colla_chat/widgets/common/platform_stream_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 ///p2p网络节点搜索增加
-class P2pLinkmanAddWidget extends StatefulWidget with TileDataMixin {
-  P2pLinkmanAddWidget({super.key});
+class P2pLinkmanAddWidget extends StatelessWidget with TileDataMixin {
+  P2pLinkmanAddWidget({super.key}) {
+    _init();
+  }
 
   @override
   IconData get iconData => Icons.add_link;
@@ -36,35 +40,25 @@ class P2pLinkmanAddWidget extends StatefulWidget with TileDataMixin {
   @override
   bool get withLeading => true;
 
-  @override
-  State<StatefulWidget> createState() => _P2pLinkmanAddWidgetState();
-}
-
-class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
   TextEditingController controller = TextEditingController();
   final DataListController<TileData> tileDataController =
       DataListController<TileData>();
-  late final DataListView dataListView;
+  late final Widget dataListView;
   StreamSubscription<ChainMessage>? chainMessageListen;
 
-  @override
-  initState() {
-    super.initState();
-    dataListView = DataListView(
-      itemCount: tileDataController.data.length,
-      itemBuilder: (BuildContext context, int index) {
-        return tileDataController.data[index];
-      },
-    );
-    //tileDataController.addListener(_update);
+  _init() {
+    dataListView = Obx(() {
+      return DataListView(
+        itemCount: tileDataController.length,
+        itemBuilder: (BuildContext context, int index) {
+          return tileDataController.data[index];
+        },
+      );
+    });
     chainMessageListen = findClientAction.responseStreamController.stream
         .listen((ChainMessage chainMessage) {
       _responsePeerClients(chainMessage);
     });
-  }
-
-  _update() {
-    setState(() {});
   }
 
   _buildSearchTextField(BuildContext context) {
@@ -123,11 +117,9 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
               await peerClientService.store(peerClient,
                   mobile: false, email: false);
               _buildTiles(peerClients);
-              if (mounted) {
-                DialogUtil.info(
-                    content:
-                        '${AppLocalizations.t('Add peerClient as linkman')}:$peerId');
-              }
+              DialogUtil.info(
+                  content:
+                      '${AppLocalizations.t('Add peerClient as linkman')}:$peerId');
             },
             tooltip: AppLocalizations.t('Add peerClient as linkman'),
           );
@@ -144,11 +136,9 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
                     whereArgs: [peerClient.peerId]);
                 linkman.linkmanStatus = LinkmanStatus.F.name;
                 _buildTiles(peerClients);
-                if (mounted) {
-                  DialogUtil.info(
-                      content:
-                          '${AppLocalizations.t('Add peerClient as friend')}:$peerId');
-                }
+                DialogUtil.info(
+                    content:
+                        '${AppLocalizations.t('Add peerClient as friend')}:$peerId');
               },
               tooltip: AppLocalizations.t('Add peerClient as friend'),
             );
@@ -169,7 +159,7 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
   Future<void> _search(String key) async {
     String? error = ValidatorUtil.emptyValidator(key);
     if (error != null) {
-      DialogUtil.error( content: error);
+      DialogUtil.error(content: error);
       return;
     }
     String email = '';
@@ -190,7 +180,7 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
   Widget build(BuildContext context) {
     return AppBarView(
         withLeading: true,
-        title: widget.title,
+        title: title,
         child: Column(children: [
           const SizedBox(
             height: 15,
@@ -198,14 +188,5 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
           _buildSearchTextField(context),
           dataListView
         ]));
-  }
-
-  @override
-  void dispose() {
-    //tileDataController.removeListener(_update);
-    chainMessageListen?.cancel();
-    chainMessageListen = null;
-    controller.dispose();
-    super.dispose();
   }
 }

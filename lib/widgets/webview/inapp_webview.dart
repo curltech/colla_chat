@@ -9,7 +9,6 @@ class FlutterInAppWebView extends StatelessWidget {
   final String? initialUrl;
   final String? html;
   final String? initialFilename;
-  final int inAppWebViewVersion = 6;
   final void Function(InAppWebViewController controller)? onWebViewCreated;
 
   PullToRefreshController pullToRefreshController = PullToRefreshController();
@@ -27,17 +26,14 @@ class FlutterInAppWebView extends StatelessWidget {
   }
 
   _getSetting() {
-    if (inAppWebViewVersion == 6) {
-      ///6.x.x
-      InAppWebViewSettings settings = InAppWebViewSettings(
-          useShouldOverrideUrlLoading: true,
-          mediaPlaybackRequiresUserGesture: false,
-          allowsInlineMediaPlayback: true,
-          iframeAllow: "camera; microphone",
-          iframeAllowFullscreen: true);
+    InAppWebViewSettings settings = InAppWebViewSettings(
+        useShouldOverrideUrlLoading: true,
+        mediaPlaybackRequiresUserGesture: false,
+        allowsInlineMediaPlayback: true,
+        iframeAllow: "camera; microphone",
+        iframeAllowFullscreen: true);
 
-      return settings;
-    }
+    return settings;
   }
 
   _onWebViewCreated(InAppWebViewController controller) {
@@ -57,16 +53,10 @@ class FlutterInAppWebView extends StatelessWidget {
       inAppWebView = InAppWebView(
         initialUrlRequest: urlRequest,
         initialFile: initialFilename,
-        // 5.x.x initialOptions: settings,
         initialSettings: settings,
         onWebViewCreated: _onWebViewCreated,
         pullToRefreshController: pullToRefreshController,
         onLoadStart: (controller, url) {},
-        // 5.x.x androidOnPermissionRequest: (controller, origin, resources) async {
-        //   return PermissionRequestResponse(
-        //       resources: resources,
-        //       action: PermissionRequestResponseAction.GRANT);
-        // },
         onPermissionRequest: (controller, origin) async {
           return PermissionResponse(
               resources: [], action: PermissionResponseAction.DENY);
@@ -77,9 +67,6 @@ class FlutterInAppWebView extends StatelessWidget {
         onLoadStop: (controller, url) async {
           pullToRefreshController.endRefreshing();
         },
-        // 5.x.x onLoadError: (controller, url, code, message) {
-        //   pullToRefreshController.endRefreshing();
-        // },
         onReceivedError: (controller, url, err) {
           pullToRefreshController.endRefreshing();
         },
