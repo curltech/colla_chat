@@ -14,7 +14,7 @@ class AndroidBackgroundService {
     notificationText: AppLocalizations.t(
         'Keeping the CollaChat app running in the background'),
     notificationIcon: const AndroidResource(name: 'background_icon'),
-    notificationImportance: AndroidNotificationImportance.Max,
+    notificationImportance: AndroidNotificationImportance.max,
     enableWifiLock: true,
     showBadge: true,
   );
