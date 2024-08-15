@@ -46,7 +46,7 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
     super.initState();
   }
 
-  Future<String?> _findContent() async {
+  Future<String> _findContent() async {
     ChatMessage? chatMessage = myChannelChatMessageController.current;
     if (chatMessage != null) {
       String mimeType = chatMessage.mimeType!;
@@ -65,7 +65,7 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
       }
     }
 
-    return null;
+    return '';
   }
 
   _onPreview() async {

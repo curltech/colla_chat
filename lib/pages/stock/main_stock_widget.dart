@@ -65,7 +65,7 @@ class MainStockWidget extends StatelessWidget with TileDataMixin {
       tile.dense = false;
       tile.selected = false;
     }
-    tileData[TileData(title: 'Me')] = meTileData;
+    tileData[TileData(title: 'Me', selected: true)] = meTileData;
 
     final List<TileData> valueTileData = TileData.from([
       performanceWidget,
@@ -77,7 +77,7 @@ class MainStockWidget extends StatelessWidget with TileDataMixin {
       tile.dense = false;
       tile.selected = false;
     }
-    tileData[TileData(title: 'Value')] = valueTileData;
+    tileData[TileData(title: 'Value', selected: true)] = valueTileData;
 
     List<TileDataMixin> mixins = [
       refreshStockWidget,
@@ -89,7 +89,10 @@ class MainStockWidget extends StatelessWidget with TileDataMixin {
       tile.dense = false;
       tile.selected = false;
     }
-    tileData[TileData(title: 'Setting')] = settingTileData;
+    tileData[TileData(
+      title: 'Setting',
+      selected: true,
+    )] = settingTileData;
 
     Widget child = GroupDataListView(tileData: tileData);
     var stockMain = AppBarView(title: title, child: child);
