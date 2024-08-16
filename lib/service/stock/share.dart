@@ -1,10 +1,12 @@
 import 'package:colla_chat/entity/stock/share.dart';
+import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
 
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/general_remote.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/service/stock/stock_line.dart';
+import 'package:get/get.dart';
 
 class RemoteShareService extends GeneralRemoteService<Share> {
   RemoteShareService({required super.name}) {
@@ -15,8 +17,8 @@ class RemoteShareService extends GeneralRemoteService<Share> {
 
   /// 查询自选股的详细信息
   Future<List<dynamic>> sendFindMine() async {
-    List<dynamic> data = await stockLineService
-        .send('/share/GetMine', data: {'ts_code': shareService.subscription});
+    List<dynamic> data = await stockLineService.send('/share/GetMine',
+        data: {'ts_code': myShareController.subscription});
 
     return data;
   }
@@ -40,7 +42,7 @@ final RemoteShareService remoteShareService = RemoteShareService(name: 'share');
 
 class ShareService extends GeneralBaseService<Share> {
   /// 存储在本地存储中
-  String _subscription = '';
+
   Map<String, Share> shares = {};
 
   ShareService(
@@ -50,16 +52,6 @@ class ShareService extends GeneralBaseService<Share> {
     post = (Map map) {
       return Share.fromJson(map);
     };
-  }
-
-  String get subscription {
-    return _subscription;
-  }
-
-  init() async {
-    String? value =
-        await localSharedPreferences.get('subscription', encrypt: true);
-    _subscription = value ?? '';
   }
 
   Future<Share?> findShare(String tsCode) async {
@@ -87,24 +79,6 @@ class ShareService extends GeneralBaseService<Share> {
       share.id = old.id;
     }
     await upsert(share);
-  }
-
-  Future<void> add(Share share) async {
-    await store(share);
-    String tsCode = share.tsCode!;
-    if (!_subscription.contains(tsCode)) {
-      _subscription += '$tsCode,';
-      await localSharedPreferences.save('subscription', _subscription,
-          encrypt: true);
-    }
-  }
-
-  Future<void> remove(String tsCode) async {
-    if (_subscription.contains(tsCode)) {
-      _subscription.replaceAll('$tsCode,', '');
-      await localSharedPreferences.save('subscription', _subscription,
-          encrypt: true);
-    }
   }
 }
 

@@ -161,26 +161,6 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
   ];
   Rx<List<Candle>?> candles = Rx<List<Candle>?>(null);
   RxBool online = true.obs;
-  Rx<String?> tsCode = Rx<String?>(null);
-  Rx<int?> lineType = Rx<int?>(null);
-
-  _update() {
-    StockLineController? stockLineController =
-        multiStockLineController.stockLineController;
-    if (stockLineController == null) {
-      return;
-    }
-    bool update = false;
-    if (tsCode.value != stockLineController.tsCode ||
-        lineType.value != stockLineController.lineType) {
-      update = true;
-    }
-    tsCode.value = stockLineController.tsCode;
-    lineType.value = stockLineController.lineType;
-    if (update) {
-      reload();
-    }
-  }
 
   /// 在tsCode和lineType改变，也就是当前数据控制器改变的情况下，加载数据，
   Future<void> reload() async {
@@ -212,7 +192,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
 
     int lineType = stockLineController.lineType;
     String tsCode = stockLineController.tsCode;
-    int length = stockLineController.data.length;
+    int length = stockLineController.length;
     Map<String, dynamic>? response;
     DateTime start = DateTime.now();
     if (lineType == 100) {
@@ -383,6 +363,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
             ToolBarAction(
               onPressed: () {
                 multiStockLineController.lineType = 100;
+                reload();
               },
               child: Icon(
                 Icons.lock_clock,
@@ -396,6 +377,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
             ToolBarAction(
               onPressed: () {
                 multiStockLineController.lineType = 101;
+                reload();
               },
               child: Icon(
                 Icons.calendar_view_day_outlined,
@@ -409,6 +391,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
             ToolBarAction(
               onPressed: () {
                 multiStockLineController.lineType = 102;
+                reload();
               },
               child: Icon(
                 Icons.calendar_view_week_outlined,
@@ -422,6 +405,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
             ToolBarAction(
               onPressed: () {
                 multiStockLineController.lineType = 103;
+                reload();
               },
               child: Icon(
                 Icons.calendar_view_month_outlined,
@@ -435,6 +419,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
             ToolBarAction(
               onPressed: () {
                 multiStockLineController.lineType = 104;
+                reload();
               },
               child: Icon(
                 size: 22,
@@ -449,6 +434,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
             ToolBarAction(
               onPressed: () {
                 multiStockLineController.lineType = 105;
+                reload();
               },
               child: Icon(
                 size: 22,
@@ -463,6 +449,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
             ToolBarAction(
               onPressed: () {
                 multiStockLineController.lineType = 106;
+                reload();
               },
               child: Icon(
                 size: 20,
@@ -490,6 +477,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
+    reload();
     Widget titleWidget = Obx(
       () {
         StockLineController? stockLineController =
@@ -497,7 +485,8 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
         if (stockLineController == null) {
           return CommonAutoSizeText(title);
         }
-        return CommonAutoSizeText('$tsCode-${stockLineController.name}');
+        return CommonAutoSizeText(
+            '${stockLineController.tsCode}-${stockLineController.name}');
       },
     );
     List<Widget> rightWidgets = [];
@@ -526,9 +515,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
             await multiStockLineController.previous();
             StockLineController? stockLineController =
                 multiStockLineController.stockLineController;
-            tsCode.value = stockLineController?.tsCode;
-            lineType.value = stockLineController?.lineType;
-            _update();
+            reload();
           },
           icon: const Icon(Icons.skip_previous_outlined)),
       IconButton(
@@ -537,9 +524,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
             await multiStockLineController.next();
             StockLineController? stockLineController =
                 multiStockLineController.stockLineController;
-            tsCode.value = stockLineController?.tsCode;
-            lineType.value = stockLineController?.lineType;
-            _update();
+            reload();
           },
           icon: const Icon(Icons.skip_next_outlined)),
     ]);

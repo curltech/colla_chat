@@ -380,7 +380,6 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     var peerId = peerConnectionPool.peerId;
     logger.i('peerConnectionPool init: $peerId');
     signalSessionPool.init();
-    shareService.init();
   }
 
   Future<bool> logout() async {

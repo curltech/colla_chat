@@ -3,6 +3,7 @@ import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/entity/stock/share_group.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/stock/me/stock_line_chart_widget.dart';
+import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/stock/day_line.dart';
@@ -17,6 +18,138 @@ import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+class MyShareController {
+  final RxString subscription = ''.obs;
+
+  final RxString groupName =
+      AppLocalizations.t(ShareGroupService.defaultGroupName).obs;
+
+  final RxMap<String, String> groupSubscription = <String, String>{}.obs;
+
+  MyShareController() {
+    _init();
+  }
+
+  _init() async {
+    String? value =
+        await localSharedPreferences.get('subscription', encrypt: true);
+    subscription.value = value ?? '';
+
+    await assignGroupSubscription();
+  }
+
+  Future<void> add(Share share) async {
+    await shareService.store(share);
+    String tsCode = share.tsCode!;
+    if (!subscription.contains(tsCode)) {
+      subscription.value += '$tsCode,';
+      await localSharedPreferences.save('subscription', subscription.value,
+          encrypt: true);
+    }
+    String defaultGroupName =
+    AppLocalizations.t(ShareGroupService.defaultGroupName);
+    await addShareGroup(defaultGroupName, [tsCode]);
+  }
+
+  Future<void> remove(String tsCode) async {
+    if (subscription.contains(tsCode)) {
+      subscription.replaceAll('$tsCode,', '');
+      await localSharedPreferences.save('subscription', subscription.value,
+          encrypt: true);
+    }
+  }
+
+  Future<void> assignGroupSubscription() async {
+    Map<String, String> groupSubscription = {};
+    String defaultGroupName =
+        AppLocalizations.t(ShareGroupService.defaultGroupName);
+    groupSubscription[defaultGroupName] = subscription.value;
+    List<ShareGroup> shareGroups = await shareGroupService.findAll();
+    for (var shareGroup in shareGroups) {
+      groupSubscription[shareGroup.groupName] = shareGroup.subscription;
+    }
+
+    this.groupSubscription.assignAll(groupSubscription);
+  }
+
+  Future<String?> findSubscription(String groupName) async {
+    String? subscription = groupSubscription[groupName];
+    if (subscription == null) {
+      if (ShareGroupService.defaultGroupName == groupName) {
+        subscription = myShareController.subscription.value;
+        groupSubscription[groupName] = subscription;
+      } else {
+        List<ShareGroup> shareGroups = await shareGroupService
+            .find(where: 'groupName=?', whereArgs: [groupName]);
+        if (shareGroups.isNotEmpty) {
+          subscription = '';
+          for (ShareGroup shareGroup in shareGroups) {
+            subscription = '${shareGroup.subscription}${subscription!},';
+          }
+          groupSubscription[groupName] = subscription!;
+        }
+      }
+    }
+    return subscription;
+  }
+
+  removeGroup(String groupName) async {
+    groupSubscription.remove(groupName);
+    shareGroupService.delete(where: 'groupName=?', whereArgs: [groupName]);
+  }
+
+  Future<bool> addShareGroup(String groupName, List<String> tsCodes) async {
+    String? subscription = groupSubscription[groupName];
+    subscription ??= '';
+    bool result = false;
+    for (String tsCode in tsCodes) {
+      if (!subscription!.contains(tsCode)) {
+        subscription = '$subscription$tsCode,';
+        groupSubscription[groupName] = subscription;
+        result = true;
+      }
+    }
+    if (result) {
+      ShareGroup shareGroup =
+          ShareGroup(groupName, subscription: subscription!);
+      await shareGroupService.store(shareGroup);
+
+      return true;
+    }
+    return false;
+  }
+
+  Future<bool> removeShareGroup(String groupName, String tsCode) async {
+    String? subscription = groupSubscription[groupName];
+    if (subscription != null) {
+      if (subscription.contains(tsCode)) {
+        subscription = subscription.replaceAll('$tsCode,', '');
+        groupSubscription[groupName] = subscription;
+        ShareGroup shareGroup =
+            ShareGroup(groupName, subscription: subscription);
+        await shareGroupService.store(shareGroup);
+
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Future<bool> canBeAdd(String groupName, String tsCode) async {
+    String? subscription = groupSubscription[groupName];
+    if (subscription != null && subscription.isNotEmpty) {
+      return !subscription.contains(tsCode);
+    }
+    return true;
+  }
+
+  Future<bool> canBeRemove(String groupName, String tsCode) async {
+    return !(await canBeAdd(groupName, tsCode));
+  }
+}
+
+MyShareController myShareController = MyShareController();
+
 /// 自选股当前日线的控制器
 final DataListController<DayLine> dayLineController =
     DataListController<DayLine>();
@@ -27,9 +160,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
 
   ShareSelectionWidget({super.key}) {
     indexWidgetProvider.define(stockLineChartWidget);
-    _buildGroupSubscription().then((dynamic) {
-      _refresh(groupName.value);
-    });
+    _refresh(myShareController.groupName.value);
   }
 
   @override
@@ -44,21 +175,6 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'MySelection';
 
-  RxString groupName =
-      AppLocalizations.t(shareGroupService.defaultGroupName).obs;
-
-  RxMap<String, String> groupSubscription = <String, String>{}.obs;
-
-  _buildGroupSubscription() async {
-    Map<String, String> groupSubscription = {};
-    String defaultGroupName =
-        AppLocalizations.t(shareGroupService.defaultGroupName);
-    groupSubscription[defaultGroupName] = shareService.subscription;
-    groupSubscription.addAll(await shareGroupService.groupSubscription);
-
-    return this.groupSubscription.value = groupSubscription;
-  }
-
   Widget _buildActionWidget(BuildContext context, int index, dynamic dayLine) {
     Widget actionWidget = Row(
       children: [
@@ -68,15 +184,14 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
         IconButton(
           onPressed: () async {
             String tsCode = dayLine.tsCode;
-            String groupName = this.groupName.value;
+            String groupName = myShareController.groupName.value;
             String defaultGroupName =
-                AppLocalizations.t(shareGroupService.defaultGroupName);
+                AppLocalizations.t(ShareGroupService.defaultGroupName);
             if (groupName != defaultGroupName) {
               bool? confirm = await DialogUtil.confirm(
                   content: 'Do you confirm remove from group?');
               if (confirm != null && confirm) {
-                await shareGroupService.remove(groupName, tsCode);
-                _buildGroupSubscription();
+                await myShareController.removeShareGroup(groupName, tsCode);
                 dayLineController.delete(index: index);
               }
             }
@@ -114,13 +229,12 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
       for (DayLine dayLine in checked) {
         tsCodes.add(dayLine.tsCode);
       }
-      await shareGroupService.add(groupName, tsCodes);
-      _buildGroupSubscription();
+      await myShareController.addShareGroup(groupName, tsCodes);
     }
   }
 
   _refresh(String groupName) async {
-    String? subscription = groupSubscription.value[groupName];
+    String? subscription = myShareController.groupSubscription.value[groupName];
     if (subscription == null || subscription.isEmpty) {
       dayLineController.replaceAll([]);
       multiStockLineController.replaceAll([]);
@@ -213,20 +327,18 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
   Widget _buildShareGroupWidget() {
     return Obx(() {
       List<Widget> children = [];
-      for (String key in groupSubscription.keys) {
+      for (String key in myShareController.groupSubscription.keys) {
         children.add(TextButton(
           onPressed: () {
             _addMember(key);
-            groupName.value = key;
+            myShareController.groupName.value = key;
             _refresh(key);
           },
-          child: ValueListenableBuilder(
-              valueListenable: groupName,
-              builder: (BuildContext context, String groupName, Widget? child) {
-                return Text(key,
-                    style: TextStyle(
-                        color: groupName != key ? Colors.white : null));
-              }),
+          child: Text(key,
+              style: TextStyle(
+                  color: myShareController.groupName.value != key
+                      ? Colors.white
+                      : null)),
         ));
       }
       return SingleChildScrollView(
@@ -261,7 +373,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
       IconButton(
         tooltip: AppLocalizations.t('Refresh'),
         onPressed: () {
-          _refresh(groupName.value);
+          _refresh(myShareController.groupName.value);
         },
         icon: const Icon(Icons.refresh),
       ),

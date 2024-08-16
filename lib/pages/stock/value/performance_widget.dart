@@ -1,6 +1,7 @@
 import 'package:colla_chat/entity/stock/performance.dart';
 import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
 import 'package:colla_chat/pages/stock/me/stock_line_chart_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
@@ -200,7 +201,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
         prefixIcon: IconButton(
           onPressed: () {
             searchController.setValue(
-                'securityCode', shareService.subscription);
+                'securityCode', myShareController.subscription.value);
           },
           icon: Icon(
             Icons.perm_identity_outlined,

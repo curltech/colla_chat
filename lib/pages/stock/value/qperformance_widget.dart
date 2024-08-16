@@ -1,6 +1,7 @@
 import 'package:colla_chat/entity/stock/qperformance.dart';
 import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
 import 'package:colla_chat/pages/stock/me/stock_line_chart_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
@@ -68,7 +69,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         cancel: true,
         prefixIcon: IconButton(
           onPressed: () {
-            searchController.setValue('tsCode', shareService.subscription);
+            searchController.setValue('tsCode', myShareController.subscription.value);
           },
           icon: Icon(
             Icons.perm_identity_outlined,

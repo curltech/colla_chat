@@ -1,4 +1,5 @@
 import 'package:colla_chat/entity/stock/share.dart';
+import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
 import 'package:colla_chat/pages/stock/me/stock_line_chart_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -45,7 +46,7 @@ class AddShareWidget extends StatelessWidget with TileDataMixin {
           subtitle: tsCode,
           selected: false,
         );
-        String subscription = shareService.subscription;
+        String subscription = myShareController.subscription.value;
         if (tsCode != null) {
           bool contain = subscription.contains(tsCode);
           if (!contain) {
@@ -55,11 +56,12 @@ class AddShareWidget extends StatelessWidget with TileDataMixin {
                 selected: false,
                 suffix: IconButton(
                   onPressed: () async {
-                    await shareService.add(share);
+                    await myShareController.add(share);
                     _buildShareTileData();
                   },
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.add_box_outlined,
+                    color: myself.primary,
                   ),
                 ),
                 onTap: (int index, String title, {String? subtitle}) async {

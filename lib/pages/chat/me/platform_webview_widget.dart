@@ -20,12 +20,14 @@ class PlatformWebViewWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'WebView';
 
-  final urlTextController = TextEditingController();
+  late final urlTextController = TextEditingController(text: initialUrl);
 
   PlatformWebViewController platformWebViewController =
       PlatformWebViewController();
 
   bool fullScreen = false;
+
+  final String initialUrl = 'http://43.135.164.104/';
 
   Widget buildTextField(BuildContext context) {
     return Row(children: [
@@ -104,7 +106,9 @@ class PlatformWebViewWidget extends StatelessWidget with TileDataMixin {
     return Column(children: <Widget>[
       buildTextField(context),
       Expanded(
-          child: PlatformWebView(webViewController: platformWebViewController))
+          child: PlatformWebView(
+              initialUrl: initialUrl,
+              webViewController: platformWebViewController))
     ]);
   }
 
