@@ -59,17 +59,17 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
   }
 
   previous() async {
-    if (currentIndex <= 0) {
+    if (currentIndex == null || currentIndex == 0) {
       return;
     }
-    currentIndex = currentIndex - 1;
+    currentIndex = currentIndex! - 1;
   }
 
   next() async {
-    if (currentIndex == -1 || currentIndex >= data.length - 1) {
+    if (currentIndex == null || currentIndex! >= data.length - 1) {
       return;
     }
-    currentIndex = currentIndex + 1;
+    currentIndex = currentIndex! + 1;
   }
 
   Future<PlatformMediaSource?> addMediaFile(
@@ -499,8 +499,10 @@ class PlaylistWidget extends StatelessWidget {
                 color: Colors.white, //myself.primary,
               ),
               onPressed: () async {
-                var currentIndex = playlistController.currentIndex;
-                await _collectMediaSource(currentIndex);
+                int? currentIndex = playlistController.currentIndex;
+                if (currentIndex != null) {
+                  await _collectMediaSource(currentIndex);
+                }
               },
               tooltip: AppLocalizations.t('Collect video file'),
             ),
@@ -512,7 +514,9 @@ class PlaylistWidget extends StatelessWidget {
               ),
               onPressed: () async {
                 var currentIndex = playlistController.currentIndex;
-                await _removeFromCollect(currentIndex);
+                if (currentIndex != null) {
+                  await _removeFromCollect(currentIndex);
+                }
               },
               tooltip: AppLocalizations.t('Remove collect file'),
             ),

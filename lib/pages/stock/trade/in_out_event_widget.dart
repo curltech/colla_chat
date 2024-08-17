@@ -109,9 +109,8 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
         label: '股票代码',
         name: 'ts_code',
         width: 100,
-        onSort: (int index, bool ascending) =>
-            inoutEventController.sort(
-                    (t) => t.tsCode, index, 'tsCode', ascending),
+        onSort: (int index, bool ascending) => inoutEventController.sort(
+            (t) => t.tsCode, index, 'tsCode', ascending),
       ),
       PlatformDataColumn(
         label: '股票名',
@@ -208,16 +207,14 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
   }
 
   Widget _buildInOutEventListView(BuildContext context) {
-    return Obx(() {
-      return BindingDataTable2<DayLine>(
-        key: UniqueKey(),
-        showCheckboxColumn: false,
-        horizontalMargin: 10.0,
-        columnSpacing: 0.0,
-        platformDataColumns: inoutEventColumns,
-        controller: inoutEventController,
-      );
-    });
+    return BindingDataTable2<DayLine>(
+      key: UniqueKey(),
+      showCheckboxColumn: false,
+      horizontalMargin: 10.0,
+      columnSpacing: 0.0,
+      platformDataColumns: inoutEventColumns,
+      controller: inoutEventController,
+    );
   }
 
   refresh(
@@ -263,9 +260,7 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
                 : null);
         DateTime end = DateTime.now();
         logger.i(
-            'find more data duration:${end
-                .difference(start)
-                .inMilliseconds}');
+            'find more data duration:${end.difference(start).inMilliseconds}');
       }
     } else {
       logger.e('eventCode has no filters');

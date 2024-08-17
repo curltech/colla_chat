@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 class DataListController<T> {
   Key key = UniqueKey();
   final RxList<T> data = <T>[].obs;
-  final RxInt _currentIndex = (-1).obs;
+  final Rx<int?> _currentIndex = Rx<int?>(null);
   final Rx<int?> sortColumnIndex = Rx<int?>(null);
   final Rx<String?> sortColumnName = Rx<String?>(null);
   final RxBool sortAscending = true.obs;
@@ -29,27 +29,28 @@ class DataListController<T> {
   }
 
   T? get current {
-    if (_currentIndex > -1 && data.isNotEmpty) {
-      return data[_currentIndex.value];
+    if (_currentIndex.value != null && data.isNotEmpty) {
+      return data[_currentIndex.value!];
     }
     return null;
   }
 
   set current(T? element) {
     if (element == null) {
-      currentIndex = -1;
+      currentIndex = null;
     } else {
       _currentIndex(data.indexOf(element));
     }
   }
 
-  int get currentIndex {
+  int? get currentIndex {
     return _currentIndex.value;
   }
 
   ///设置当前数据索引
-  set currentIndex(int index) {
-    if (index < -1 || index > data.length - 1) {
+  set currentIndex(int? index) {
+    if (index == null || index > data.length - 1) {
+      _currentIndex(null);
       return;
     }
     if (_currentIndex.value != index) {
@@ -93,10 +94,10 @@ class DataListController<T> {
 
   T? delete({int? index}) {
     index = index ?? _currentIndex.value;
-    if (index >= 0 && index < data.length) {
+    if (index != null && index < data.length) {
       T t = data.removeAt(index);
       if (data.isEmpty) {
-        _currentIndex(-1);
+        _currentIndex(null);
       } else if (index == 0) {
         _currentIndex(0);
       } else {
@@ -110,20 +111,20 @@ class DataListController<T> {
 
   update(T d, {int? index}) {
     index = index ?? _currentIndex.value;
-    if (index >= 0 && index < data.length) {
+    if (index != null && index < data.length) {
       data[index] = d;
     }
   }
 
   clear({bool notify = true}) {
     data.clear();
-    _currentIndex(-1);
+    _currentIndex(null);
   }
 
   ///替换了当前的对象
   replace(T d) {
-    if (_currentIndex > -1 && data.isNotEmpty) {
-      data[_currentIndex.value] = d;
+    if (_currentIndex.value != null && data.isNotEmpty) {
+      data[_currentIndex.value!] = d;
     }
   }
 
@@ -201,7 +202,7 @@ class DataPageController<T> extends DataListController<T> {
 
   reset() {
     sortColumnName(null);
-    sortColumnIndex(-1);
+    sortColumnIndex(null);
     sortAscending(true);
     count(0);
     offset(defaultOffset);

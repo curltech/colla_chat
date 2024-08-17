@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 class DataListView extends StatefulWidget {
   final TileData? group;
   final bool reverse;
-  int currentIndex;
+  int? currentIndex;
   final int itemCount;
   TileData? Function(BuildContext, int)? itemBuilder;
   Future<TileData?> Function(BuildContext, int)? futureItemBuilder;
@@ -28,7 +28,7 @@ class DataListView extends StatefulWidget {
 
   DataListView(
       {super.key,
-      this.currentIndex = -1,
+      this.currentIndex,
       required this.itemCount,
       this.itemBuilder,
       this.futureItemBuilder,

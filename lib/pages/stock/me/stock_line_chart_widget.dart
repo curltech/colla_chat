@@ -89,7 +89,15 @@ class MultiStockLineController extends DataListController<String> {
   }
 
   previous() async {
-    int currentIndex = this.currentIndex - 1;
+    if (data.isEmpty) {
+      this.currentIndex = null;
+    }
+    if (this.currentIndex == null ||
+        this.currentIndex == 0 ||
+        this.currentIndex == 1) {
+      this.currentIndex = 0;
+    }
+    int currentIndex = this.currentIndex! - 1;
     if (currentIndex >= 0 && currentIndex < data.length) {
       String tsCode = data[currentIndex];
       if (!stockLineControllers.containsKey(tsCode)) {
@@ -105,7 +113,15 @@ class MultiStockLineController extends DataListController<String> {
   }
 
   next() async {
-    int currentIndex = this.currentIndex + 1;
+    if (data.isEmpty) {
+      this.currentIndex = null;
+    }
+    if (this.currentIndex == null ||
+        this.currentIndex == data.length - 1 ||
+        this.currentIndex == data.length - 2) {
+      this.currentIndex = data.length - 1;
+    }
+    int currentIndex = this.currentIndex! + 1;
     if (currentIndex >= 0 && currentIndex < data.length) {
       String tsCode = data[currentIndex];
       if (!stockLineControllers.containsKey(tsCode)) {

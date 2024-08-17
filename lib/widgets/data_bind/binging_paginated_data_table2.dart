@@ -54,10 +54,13 @@ class BindingPaginatedDataTable2<T> extends StatelessWidget {
   }
 
   Widget _buildPageNumber() {
-    int currentPage =
-        ((controller.currentIndex + 1) / controller.limit.value)
-                .floor() +
-            1;
+    int currentPage;
+    if (controller.currentIndex == null) {
+      currentPage = 0;
+    } else {
+      currentPage =
+          ((controller.currentIndex! + 1) / controller.limit.value).floor() + 1;
+    }
     int totalPage = (controller.limit.value).ceil();
 
     return Text('${AppLocalizations.t('Page:')}$currentPage/$totalPage');
@@ -83,7 +86,6 @@ class BindingPager extends StatelessWidget {
   final DataPageController controller;
 
   static const List<int> _availableSizes = [3, 5, 10, 20];
-
 
   @override
   Widget build(BuildContext context) {

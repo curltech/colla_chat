@@ -47,7 +47,7 @@ class MyShareController {
           encrypt: true);
     }
     String defaultGroupName =
-    AppLocalizations.t(ShareGroupService.defaultGroupName);
+        AppLocalizations.t(ShareGroupService.defaultGroupName);
     await addShareGroup(defaultGroupName, [tsCode]);
   }
 
@@ -336,6 +336,9 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
           },
           child: Text(key,
               style: TextStyle(
+                  backgroundColor: myShareController.groupName.value == key
+                      ? Colors.white
+                      : null,
                   color: myShareController.groupName.value != key
                       ? Colors.white
                       : null)),
@@ -366,6 +369,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
               title: 'Add group', content: 'Group name');
           if (groupName != null) {
             await shareGroupService.store(ShareGroup(groupName));
+            myShareController.groupSubscription[groupName] = '';
           }
         },
         icon: const Icon(Icons.group),

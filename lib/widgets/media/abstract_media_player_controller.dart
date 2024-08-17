@@ -265,7 +265,8 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
 
   Widget buildPlaylistController() {
     List<Widget> children = [];
-    if (playlistController.currentIndex > 0) {
+    if (playlistController.currentIndex != null &&
+        playlistController.currentIndex! > 0) {
       children.add(
         IconButton(
             hoverColor: myself.primary,
@@ -287,8 +288,10 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
             )),
       );
     }
-    int currentIndex = playlistController.currentIndex;
-    if (currentIndex >= 0 && currentIndex < playlistController.length) {
+    int? currentIndex = playlistController.currentIndex;
+    if (currentIndex != null &&
+        currentIndex >= 0 &&
+        currentIndex < playlistController.length) {
       PlatformMediaSource? platformMediaSource =
           playlistController.get(currentIndex);
       String name = FileUtil.filename(platformMediaSource!.filename);
@@ -298,7 +301,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
         maxLines: 1,
       ));
     }
-    if (currentIndex > -1 && currentIndex < playlistController.length - 1) {
+    if (currentIndex != null && currentIndex < playlistController.length - 1) {
       children.add(
         IconButton(
             hoverColor: myself.primary,
