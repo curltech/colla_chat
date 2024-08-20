@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/file_util.dart';
@@ -94,8 +95,8 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
           ],
         ),
         content: QuillEditor.basic(
-            configurations:
-                QuillEditorConfigurations(controller: quillEditorController)),
+            controller: quillEditorController,
+            configurations: QuillEditorConfigurations()),
       ),
     );
 
@@ -184,9 +185,9 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
 
   /// 媒体来源的选择界面
   /// 从图片廊和link中选择
-  Future<QuillMediaType?> _mediaPickSettingSelector(
+  Future<ChatMessageContentType?> _mediaPickSettingSelector(
       BuildContext context) async {
-    return await showDialog<QuillMediaType>(
+    return await showDialog<ChatMessageContentType>(
       context: context,
       builder: (ctx) => AlertDialog(
         contentPadding: EdgeInsets.zero,
@@ -196,12 +197,12 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
             TextButton.icon(
               icon: const Icon(Icons.collections),
               label: Text(AppLocalizations.t('Gallery')),
-              onPressed: () => Navigator.pop(ctx, QuillMediaType.video),
+              onPressed: () => Navigator.pop(ctx, ChatMessageContentType.video),
             ),
             TextButton.icon(
               icon: const Icon(Icons.link),
               label: Text(AppLocalizations.t('Link')),
-              onPressed: () => Navigator.pop(ctx, QuillMediaType.image),
+              onPressed: () => Navigator.pop(ctx, ChatMessageContentType.image),
             )
           ],
         ),
@@ -210,9 +211,9 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
   }
 
   /// 相机模式选择，照相还是录制视频
-  Future<QuillMediaType?> _cameraPickSettingSelector(
+  Future<ChatMessageContentType?> _cameraPickSettingSelector(
       BuildContext context) async {
-    return await showDialog<QuillMediaType>(
+    return await showDialog<ChatMessageContentType>(
       context: context,
       builder: (ctx) => AlertDialog(
         contentPadding: EdgeInsets.zero,
@@ -222,12 +223,12 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
             TextButton.icon(
               icon: const Icon(Icons.camera),
               label: Text(AppLocalizations.t('Capture photo')),
-              onPressed: () => Navigator.pop(ctx, QuillMediaType.image),
+              onPressed: () => Navigator.pop(ctx, ChatMessageContentType.image),
             ),
             TextButton.icon(
               icon: const Icon(Icons.video_call),
               label: Text(AppLocalizations.t('Capture video')),
-              onPressed: () => Navigator.pop(ctx, QuillMediaType.video),
+              onPressed: () => Navigator.pop(ctx, ChatMessageContentType.video),
             )
           ],
         ),
@@ -247,6 +248,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
 
   Widget _buildQuillEditor(BuildContext context) {
     Widget quillEditor = QuillEditor(
+      controller: quillController,
       configurations: QuillEditorConfigurations(
         minHeight: 200,
         maxHeight: widget.height,
@@ -260,7 +262,6 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
           ...FlutterQuillEmbeds.defaultEditorBuilders(),
           NotesEmbedBuilder(addEditNote: _addEditNote)
         ],
-        controller: quillController,
       ),
       scrollController: scrollController,
       focusNode: _focusNode,

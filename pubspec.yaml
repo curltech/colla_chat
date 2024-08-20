@@ -148,7 +148,7 @@ dependencies:
   fl_chart: ^0.68.0
   k_chart: ^0.7.1
   extended_text: ^14.0.1 #文本扩展显示
-  extended_text_field: ^15.0.0 #文字表情混入
+  extended_text_field: ^16.0.0 #文字表情混入
   extended_text_library: ^12.0.0
   extended_masked_text: ^3.0.1
   azlistview: ^2.0.0 #特殊列表滑动
@@ -180,7 +180,7 @@ dependencies:
   flutter_card_swiper: ^7.0.0 #不错的swiper的组件
   another_transformer_page_view: ^2.0.1
   appinio_swiper: ^2.0.2 #不错的swiper的组件，可定制动画的角度
-  flutter_drawing_board: ^0.8.1 #绘画工具
+  flutter_drawing_board: ^0.9.2 #绘画工具
   custom_pop_up_menu: ^1.2.4
   #popup_menu: ^1.0.5
   star_menu: ^4.0.0
@@ -195,7 +195,7 @@ dependencies:
   pinput: ^5.0.0
 
   #界面效果动画
-  flutter_adaptive_scaffold: ^0.1.5
+  flutter_adaptive_scaffold: ^0.2.1
   simple_animations: ^5.0.2
   flutter_animate: ^4.2.0
   auto_animated: ^3.1.0 #对滚动视图内的元素定义动画
@@ -320,7 +320,7 @@ dependencies:
   just_audio_background: ^0.0.1-beta.11
   audio_session: ^0.1.18
   flutter_tts: ^4.0.2
-  speech_to_text: ^6.6.2
+  speech_to_text: ^7.0.0
   sherpa_onnx: ^1.10.14
   flutter_image_compress: ^2.2.0
   video_thumbnail: ^0.5.2
@@ -344,8 +344,7 @@ dependencies:
   #  visual_editor:
   #    git: https://github.com/visual-space/visual-editor.git
   #youtube_player_flutter_quill: ^8.2.2
-  vsc_quill_delta_to_html: ^1.0.3
-  flutter_rte: ^1.0.0
+  vsc_quill_delta_to_html: ^1.0.5
   #  appflowy_editor: ^1.0.3
   flutter_platform_widgets: 7.0.0
   universal_html: ^2.0.8
@@ -466,10 +465,10 @@ dependency_overrides:
   image_picker: ^1.1.1 #选取图库,移动从图像廊或者相机选，桌面实现采用file_selector，从文件系统选
   markdown: ^7.1.1
   lottie: ^3.1.2
-  flutter_quill: ^10.0.1
+  flutter_quill: ^10.4.0
   #  flutter_quill: #9.3.1
   #    git: https://github.com/singerdmx/flutter-quill.git
-  flutter_quill_extensions: ^10.0.1
+  flutter_quill_extensions: ^10.4.0
   #    git:
   #      url: https://github.com/singerdmx/flutter-quill.git
   #      path: flutter_quill_extensions
