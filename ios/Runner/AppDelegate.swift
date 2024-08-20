@@ -7,7 +7,7 @@ import QMapKit
 //import awesome_notifications
 //import shared_preferences_ios
 
-@UIApplicationMain
+@main
 @objc class AppDelegate: FlutterAppDelegate {
   override func application(
     _ application: UIApplication,

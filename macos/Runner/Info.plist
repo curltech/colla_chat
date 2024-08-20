@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>LSApplicationCategoryType</key>
-	<string>public.app-category.social-networking</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
@@ -22,8 +20,15 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleVersion</key>
 	<string>1.6.1</string>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.social-networking</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
 	<key>NSAppleMusicUsageDescription</key>
 	<string>Music!</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
@@ -52,10 +57,10 @@
 	<string>Need record your voice and send to other peer</string>
 	<key>NSMotionUsageDescription</key>
 	<string>motion</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>The photo which other peers send to this peer can be saved to photo library</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-    <string>Select the photo from photo library and send them to other peers</string>
-    <key>NSPhotoLibraryAddUsageDescription</key>
-    <string>The photo which other peers send to this peer can be saved to photo library</string>
+	<string>Select the photo from photo library and send them to other peers</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>NSRemindersUsageDescription</key>
@@ -64,12 +69,14 @@
 	<string>speech</string>
 	<key>UILaunchStoryboardName</key>
 	<string>MainMenu.xib</string>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
 	<key>kTCCServiceMediaLibrary</key>
 	<string>media</string>
-	<key>NSAppTransportSecurity</key>
-    <dict>
-        <key>NSAllowsArbitraryLoads</key>
-        <true/>
-    </dict>
 </dict>
 </plist>
