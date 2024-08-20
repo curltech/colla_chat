@@ -36,13 +36,13 @@
 	<true/>
 	<key>com.apple.security.personal-information.location</key>
 	<true/>
+	<key>com.apple.security.personal-information.photos-library</key>
+	<true/>
 	<key>com.apple.security.print</key>
 	<true/>
 	<key>keychain-access-groups</key>
 	<array>
 		<string>$(AppIdentifierPrefix)io.curltech.colla</string>
 	</array>
-	<key>com.apple.security.files.downloads.read-write</key>
-    <true/>
 </dict>
 </plist>
