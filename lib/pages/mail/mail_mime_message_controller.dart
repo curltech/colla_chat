@@ -40,55 +40,81 @@ class DecryptedMimeMessage {
       this.html});
 }
 
-/// 邮件地址控制器，每个地址有多个邮箱，每个邮箱包含多个邮件
-class MailMimeMessageController extends DataListController<entity.MailAddress> {
-  Lock lock = Lock();
-
-  ///邮件地址，邮箱名称和邮箱的映射
-  final RxMap<String, Map<String, enough_mail.Mailbox>> _addressMailboxes =
-      RxMap<String, Map<String, enough_mail.Mailbox>>({});
-
-  ///邮件地址，邮箱名称和邮件列表的映射
-  final RxMap<String, Map<String, List<MailMessage>>> _addressMailMessages =
-      RxMap<String, Map<String, List<MailMessage>>>({});
-
+class MailAddressController extends DataListController<entity.MailAddress> {
   ///缺省的邮件地址
   Rx<entity.MailAddress?> defaultMailAddress = Rx<entity.MailAddress?>(null);
 
+  MailAddressController() {
+    _initAllMailAddress();
+  }
+
+  _initAllMailAddress() async {
+    data.assignAll(await mailAddressService.findAllMailAddress());
+    if (data.isNotEmpty) {
+      mailboxController.currentMailboxName = mailboxController.init();
+      for (var emailAddress in data) {
+        String email = emailAddress.email;
+        mailMimeMessageController.init(email);
+      }
+      currentIndex = 0;
+      connectAllMailAddress();
+      mailMimeMessageController.findMailMessages();
+    } else {
+      currentIndex = null;
+    }
+  }
+
+  connectAllMailAddress() async {
+    if (data.isNotEmpty) {
+      for (var emailAddress in data) {
+        EmailClient? emailClient = await connectMailAddress(emailAddress);
+        if (emailClient != null) {
+          if (emailAddress.isDefault) {
+            defaultMailAddress(emailAddress);
+          }
+        }
+      }
+    }
+  }
+
+  Future<EmailClient?> connectMailAddress(
+      entity.MailAddress emailAddress) async {
+    var password = emailAddress.password;
+    if (password != null) {
+      EmailClient? emailClient =
+          await emailClientPool.create(emailAddress, password);
+      if (emailClient != null) {
+        List<enough_mail.Mailbox>? mailboxes =
+            await emailClient.listMailboxes();
+        if (mailboxes != null) {
+          emailClient.startPolling(mailMimeMessageController._onMessage);
+          mailboxController.setMailboxes(emailAddress.email, mailboxes);
+          await mailMimeMessageController.fetchMessages();
+          Timer.periodic(const Duration(minutes: 2), (timer) {
+            mailMimeMessageController.fetchMessages();
+          });
+
+          return emailClient;
+        }
+      }
+    } else {
+      logger.e('email address:${emailAddress.email} password is empty');
+    }
+    return null;
+  }
+}
+
+final MailAddressController mailAddressController = MailAddressController();
+
+class MailboxController {
+  ///邮件地址，邮箱名称和邮箱的映射
+  final RxMap<String, Map<String, enough_mail.Mailbox>> _addressMailboxes =
+      RxMap<String, Map<String, enough_mail.Mailbox>>({});
   final Rx<String?> _currentMailboxName = Rx<String?>(null);
 
   ///当前的邮箱名称,
-  final Rx<enough_mail.Mailbox?> _currentMailbox = Rx<enough_mail.Mailbox?>(null);
-
-  ///当前的邮件
-  final RxInt _currentMailIndex = (-1).obs;
-
-  final Map<String, IconData> _mailBoxIcons = {};
-
-  @override
-  clear({bool notify = true}) {
-    _addressMailboxes.clear();
-    _addressMailMessages.clear();
-    return super.clear(notify: notify);
-  }
-
-  @override
-  entity.MailAddress? delete({int? index}) {
-    if (index == null) {
-      return clear();
-    }
-    if (index >= 0 && index < data.length) {
-      entity.MailAddress mailAddress = data[index];
-      String email = mailAddress.email;
-      _addressMailboxes.remove(email);
-      _addressMailMessages.remove(email);
-      _currentMailboxName(null);
-      _currentMailbox(null);
-      return super.delete(index: index);
-    }
-
-    return null;
-  }
+  final Rx<enough_mail.Mailbox?> _currentMailbox =
+      Rx<enough_mail.Mailbox?>(null);
 
   ///常用的邮箱名称
   static const Map<String, IconData> mailBoxeIcons = {
@@ -104,15 +130,19 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     'SUBSCRIPT': Icons.subscript,
   };
 
-  ///构造函数从数据库获取所有的邮件地址，初始化邮箱数据
-  MailMimeMessageController() {
+  final Map<String, IconData> _mailBoxIcons = {};
+
+  MailboxController() {
     for (var mailBoxeIcon in mailBoxeIcons.entries) {
       String name = mailBoxeIcon.key;
       String localeName = AppLocalizations.t(name);
       _mailBoxIcons[name] = mailBoxeIcon.value;
       _mailBoxIcons[localeName] = mailBoxeIcon.value;
     }
-    _initAllMailAddress();
+  }
+
+  init() {
+    currentMailboxName = _mailBoxIcons.keys.firstOrNull;
   }
 
   ///创建邮件地址的目录的图标
@@ -120,32 +150,6 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     IconData? iconData = _mailBoxIcons[name];
 
     return iconData ?? Icons.folder;
-  }
-
-  _initAllMailAddress() async {
-    data.assignAll(await mailAddressService.findAllMailAddress());
-    if (data.isNotEmpty) {
-      _currentMailboxName(_mailBoxIcons.keys.firstOrNull);
-      for (var emailAddress in data) {
-        String email = emailAddress.email;
-        if (!_addressMailMessages.containsKey(email)) {
-          Map<String, List<MailMessage>> addressMailMessages = {
-            _currentMailboxName.value!: []
-          };
-          _addressMailMessages[email] = addressMailMessages;
-        }
-      }
-      currentIndex = 0;
-      connectAllMailAddress();
-      findMailMessages();
-    } else {
-      currentIndex = -1;
-    }
-  }
-
-  ///当前邮箱
-  String? get currentMailboxName {
-    return _currentMailboxName.value;
   }
 
   List<String>? getMailboxNames(String email) {
@@ -159,60 +163,168 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     return null;
   }
 
+  String? get currentMailboxName {
+    return _currentMailboxName.value;
+  }
+
+  set currentMailboxName(String? currentMailboxName) {
+    _currentMailboxName(currentMailboxName);
+  }
+
+  enough_mail.Mailbox? get currentMailbox {
+    return _currentMailbox.value;
+  }
+
+  ///设置当前邮箱名称
+  setCurrentMailbox(String? name) {
+    if (mailAddressController.current == null) {
+      return;
+    }
+    _currentMailboxName(name);
+    Map<String, enough_mail.Mailbox>? mailboxMap =
+        _addressMailboxes[mailAddressController.current!.email];
+    if (mailboxMap != null && mailboxMap.isNotEmpty) {
+      _currentMailbox(mailboxMap[name]);
+    }
+    //修改邮箱，抓取数据
+    mailMimeMessageController.findMailMessages();
+  }
+
+  ///获取邮件地址的邮箱
+  List<enough_mail.Mailbox>? getMailboxes(String email) {
+    Map<String, enough_mail.Mailbox>? mailboxMap = _addressMailboxes[email];
+    if (mailboxMap != null && mailboxMap.isNotEmpty) {
+      return mailboxMap.values.toList();
+    }
+    return null;
+  }
+
+  enough_mail.Mailbox? getMailbox(String email, String mailboxName) {
+    Map<String, enough_mail.Mailbox>? mailboxMap = _addressMailboxes[email];
+    if (mailboxMap != null && mailboxMap.isNotEmpty) {
+      return mailboxMap[mailboxName];
+    }
+    return null;
+  }
+
+  ///设置邮件地址的邮箱
+  setMailboxes(String email, List<enough_mail.Mailbox?> mailboxes) {
+    Map<String, List<MailMessage>>? addressMailMessages =
+        mailMimeMessageController._addressMailMessages[email];
+    if (addressMailMessages == null) {
+      return;
+    }
+    Map<String, enough_mail.Mailbox>? mailboxMap = _addressMailboxes[email];
+    if (mailboxMap == null) {
+      mailboxMap = {};
+      _addressMailboxes[email] = mailboxMap;
+    }
+    if (mailboxes.isNotEmpty) {
+      for (var mailbox in mailboxes) {
+        if (mailbox != null) {
+          mailboxMap[mailbox.name] = mailbox;
+          if (!addressMailMessages.containsKey(mailbox.name)) {
+            addressMailMessages[mailbox.name] = <MailMessage>[];
+          }
+        }
+      }
+      _currentMailboxName(mailboxes.first?.name);
+      _currentMailbox(mailboxes.first);
+    } else {
+      _currentMailboxName(null);
+      _currentMailbox(null);
+    }
+  }
+}
+
+final MailboxController mailboxController = MailboxController();
+
+/// 邮件地址控制器，每个地址有多个邮箱，每个邮箱包含多个邮件
+class MailMimeMessageController {
+  Lock lock = Lock();
+
+  ///邮件地址，邮箱名称和邮件列表的映射
+  final RxMap<String, Map<String, List<MailMessage>>> _addressMailMessages =
+      RxMap<String, Map<String, List<MailMessage>>>({});
+
+  ///当前的邮件
+  final Rx<int?> _currentMailIndex = Rx<int?>(null);
+
+  ///构造函数从数据库获取所有的邮件地址，初始化邮箱数据
+  MailMimeMessageController();
+
+  init(String email) {
+    var currentMailboxName = mailboxController.currentMailboxName;
+    if (!_addressMailMessages.containsKey(email) &&
+        currentMailboxName != null) {
+      Map<String, List<MailMessage>> addressMailMessages = {
+        currentMailboxName: []
+      };
+      mailMimeMessageController._addressMailMessages[email] =
+          addressMailMessages;
+    }
+  }
+
   ///当前邮件位置
-  int get currentMailIndex {
+  int? get currentMailIndex {
     return _currentMailIndex.value;
   }
 
   ///设置当前邮件位置
-  set currentMailIndex(int currentMailIndex) {
+  set currentMailIndex(int? currentMailIndex) {
     _currentMailIndex(currentMailIndex);
   }
 
   ///获取当前地址的当前邮箱的邮件
   List<MailMessage>? get currentMailMessages {
+    var current = mailAddressController.current;
     if (current == null) {
       return null;
     }
-    var email = current!.email;
+    var email = current.email;
     Map<String, List<MailMessage>>? mailboxMailMessages =
         _addressMailMessages[email];
     if (mailboxMailMessages == null) {
       return null;
     }
     List<MailMessage>? mailMessages =
-        mailboxMailMessages[_currentMailboxName.value];
+        mailboxMailMessages[mailboxController._currentMailboxName.value];
 
     return mailMessages;
   }
 
   MailMessage? get currentMailMessage {
+    var currentMailIndex = this.currentMailIndex;
     var currentMailMessages = this.currentMailMessages;
     if (currentMailMessages != null &&
-        _currentMailIndex >= 0 &&
-        _currentMailIndex < currentMailMessages.length) {
-      return currentMailMessages[_currentMailIndex.value];
+        currentMailIndex != null &&
+        currentMailIndex >= 0 &&
+        currentMailIndex < currentMailMessages.length) {
+      return currentMailMessages[currentMailIndex];
     }
 
     return null;
   }
 
   set currentMailMessage(MailMessage? mailMessage) {
+    var currentMailIndex = this.currentMailIndex;
     var currentMailMessages = this.currentMailMessages;
     if (currentMailMessages != null &&
-        _currentMailIndex >= 0 &&
-        _currentMailIndex < currentMailMessages.length) {
-      currentMailMessages[_currentMailIndex.value] = mailMessage!;
+        currentMailIndex != null &&
+        currentMailIndex >= 0 &&
+        currentMailIndex < currentMailMessages.length) {
+      currentMailMessages[currentMailIndex] = mailMessage!;
     }
   }
 
   ///以下是从数据库取邮件的部分
 
   findCurrent() async {
+    var current = mailAddressController.current;
     if (current == null) {
       return false;
     }
-    String? currentMailboxName = this.currentMailboxName;
+    String? currentMailboxName = mailboxController._currentMailboxName.value;
     if (currentMailboxName == null) {
       return false;
     }
@@ -233,10 +345,11 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
   }
 
   Future<bool> _findLatestMailMessages() async {
+    var current = mailAddressController.current;
     if (current == null) {
       return false;
     }
-    String? currentMailboxName = this.currentMailboxName;
+    String? currentMailboxName = mailboxController._currentMailboxName.value;
     if (currentMailboxName == null) {
       return false;
     }
@@ -245,11 +358,11 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     List<MailMessage> emailMessages;
     if (currentMailMessages == null || currentMailMessages.isEmpty) {
       emailMessages = await mailMessageService.findLatestMessages(
-          current!.email, currentMailboxName);
+          current.email, currentMailboxName);
     } else {
       String? sendTime = currentMailMessages.first.sendTime;
       emailMessages = await mailMessageService.findLatestMessages(
-          current!.email, currentMailboxName,
+          current.email, currentMailboxName,
           sendTime: sendTime);
     }
     if (emailMessages.isNotEmpty) {
@@ -311,10 +424,11 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
   }
 
   Future<bool> _findMailMessages() async {
+    var current = mailAddressController.current;
     if (current == null) {
       return false;
     }
-    String? currentMailboxName = this.currentMailboxName;
+    String? currentMailboxName = mailboxController.currentMailboxName;
     if (currentMailboxName == null) {
       return false;
     }
@@ -323,11 +437,11 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     List<MailMessage> emailMessages;
     if (currentMailMessages == null || currentMailMessages.isEmpty) {
       emailMessages = await mailMessageService.findMessages(
-          current!.email, currentMailboxName);
+          current.email, currentMailboxName);
     } else {
       String? sendTime = currentMailMessages.last.sendTime;
       emailMessages = await mailMessageService
-          .findMessages(current!.email, currentMailboxName, sendTime: sendTime);
+          .findMessages(current.email, currentMailboxName, sendTime: sendTime);
     }
     if (emailMessages.isNotEmpty) {
       currentMailMessages?.insertAll(0, emailMessages);
@@ -357,126 +471,21 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
 
   ///以下是与邮件地址相关的部分
   ///重新获取所有的邮件地址实体，对没有连接的进行连接，设置缺省邮件地址
-  connectAllMailAddress() async {
-    if (data.isNotEmpty) {
-      for (var emailAddress in data) {
-        bool isConnected = await _connectMailAddress(emailAddress);
-        if (isConnected) {
-          if (emailAddress.isDefault) {
-            defaultMailAddress(emailAddress);
-          }
-        }
-      }
-    }
-  }
 
   ///连接特定的邮件地址服务器，获取地址的所有的邮箱
-  Future<bool> _connectMailAddress(entity.MailAddress emailAddress,
-      {bool listen = true}) async {
-    var password = emailAddress.password;
-    if (password != null) {
-      EmailClient? emailClient =
-          await emailClientPool.create(emailAddress, password);
-      if (emailClient != null) {
-        List<enough_mail.Mailbox>? mailboxes =
-            await emailClient.listMailboxes();
-        if (mailboxes != null) {
-          emailClient.startPolling(_onMessage);
-          _setMailboxes(emailAddress.email, mailboxes, listen: listen);
-          await fetchMessages();
-          Timer.periodic(const Duration(minutes: 2), (timer) {
-            fetchMessages();
-          });
-
-          return true;
-        }
-      }
-    } else {
-      logger.e('email address:${emailAddress.email} password is empty');
-    }
-    return false;
-  }
-
-  enough_mail.Mailbox? get currentMailbox {
-    return _currentMailbox.value;
-  }
-
-  ///设置当前邮箱名称
-  setCurrentMailbox(String? name) {
-    if (current == null) {
-      return;
-    }
-    _currentMailboxName(name);
-    Map<String, enough_mail.Mailbox>? mailboxMap =
-        _addressMailboxes[current!.email];
-    if (mailboxMap != null && mailboxMap.isNotEmpty) {
-      _currentMailbox(mailboxMap[name]);
-    }
-    //修改邮箱，抓取数据
-    findMailMessages();
-  }
 
   _onMessage(MimeMessage mimeMessage) {
     logger.i('Received mimeMessage:${mimeMessage.decodeSubject() ?? ''}');
   }
 
-  ///获取邮件地址的邮箱
-  List<enough_mail.Mailbox>? getMailboxes(String email) {
-    Map<String, enough_mail.Mailbox>? mailboxMap = _addressMailboxes[email];
-    if (mailboxMap != null && mailboxMap.isNotEmpty) {
-      return mailboxMap.values.toList();
-    }
-    return null;
-  }
-
-  enough_mail.Mailbox? getMailbox(String email, String mailboxName) {
-    Map<String, enough_mail.Mailbox>? mailboxMap = _addressMailboxes[email];
-    if (mailboxMap != null && mailboxMap.isNotEmpty) {
-      return mailboxMap[mailboxName];
-    }
-    return null;
-  }
-
-  ///设置邮件地址的邮箱
-  _setMailboxes(String email, List<enough_mail.Mailbox?> mailboxes,
-      {bool listen = true}) {
-    Map<String, List<MailMessage>>? addressMailMessages =
-        _addressMailMessages[email];
-    if (addressMailMessages == null) {
-      return;
-    }
-    Map<String, enough_mail.Mailbox>? mailboxMap = _addressMailboxes[email];
-    if (mailboxMap == null) {
-      mailboxMap = {};
-      _addressMailboxes[email] = mailboxMap;
-    }
-    if (mailboxes.isNotEmpty) {
-      for (var mailbox in mailboxes) {
-        if (mailbox != null) {
-          mailboxMap[mailbox.name] = mailbox;
-          if (!addressMailMessages.containsKey(mailbox.name)) {
-            addressMailMessages[mailbox.name] = <MailMessage>[];
-          }
-        }
-      }
-      _currentMailboxName(mailboxes.first?.name);
-      _currentMailbox(mailboxes.first);
-    } else {
-      _currentMailboxName(null);
-      _currentMailbox(null);
-    }
-  }
-
-  EmailClient? get currentEmailClient {
+  Future<EmailClient?> get currentEmailClient async {
+    var current = mailAddressController.current;
     if (current == null) {
       return null;
     }
-    String email = current!.email;
-
+    String email = current.email;
     EmailClient? emailClient = emailClientPool.get(email);
-    if (emailClient == null) {
-      _connectMailAddress(current!);
-    }
+    emailClient ??= await mailAddressController.connectMailAddress(current);
 
     return emailClient;
   }
@@ -501,18 +510,18 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     int page = 1,
     FetchPreference fetchPreference = FetchPreference.envelope,
   }) async {
+    var current = mailAddressController.current;
     if (current == null) {
       return;
     }
-    EmailClient? emailClient = currentEmailClient;
+    EmailClient? emailClient = await currentEmailClient;
     if (emailClient == null) {
       return;
     }
-    Mailbox? currentMailbox = this.currentMailbox;
+    Mailbox? currentMailbox = mailboxController.currentMailbox;
     if (currentMailbox == null) {
       return;
     }
-    bool notify = false;
     bool isMore = true;
     while (isMore) {
       try {
@@ -540,10 +549,8 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
           for (int i = mimeMessages.length - 1; i >= 0; i--) {
             var mimeMessage = mimeMessages[i];
             bool success = await mailMessageService.storeMimeMessage(
-                current!.email, currentMailbox, mimeMessage, fetchPreference);
-            if (success) {
-              notify = true;
-            } else {
+                current.email, currentMailbox, mimeMessage, fetchPreference);
+            if (!success) {
               isMore = false;
               break;
             }
@@ -567,14 +574,14 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     FetchPreference fetchPreference = FetchPreference.full,
     bool markAsSeen = false,
   }) async {
-    EmailClient? emailClient = currentEmailClient;
+    EmailClient? emailClient = await currentEmailClient;
     if (emailClient == null) {
       return null;
     }
     MessageSequence sequence = MessageSequence.fromIds(ids, isUid: true);
     List<enough_mail.MimeMessage>? mimeMessages =
         await emailClient.fetchMessageSequence(sequence,
-            mailbox: currentMailbox,
+            mailbox: mailboxController.currentMailbox,
             fetchPreference: fetchPreference,
             markAsSeen: markAsSeen);
 
@@ -598,14 +605,15 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     enough_mail.MimeMessage mimeMessage, {
     FetchPreference fetchPreference = FetchPreference.envelope,
   }) async {
+    var current = mailAddressController.current;
     if (current != null) {
       return;
     }
-    EmailClient? emailClient = currentEmailClient;
+    EmailClient? emailClient = await currentEmailClient;
     if (emailClient == null) {
       return;
     }
-    Mailbox? currentMailbox = this.currentMailbox;
+    Mailbox? currentMailbox = mailboxController.currentMailbox;
     if (currentMailbox == null) {
       return;
     }
@@ -626,10 +634,11 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
   ///当前邮件获取全部内容，包括附件
   Future<enough_mail.MimeMessage?> fetchMessageContents(
       enough_mail.MimeMessage mimeMessage) async {
-    EmailClient? emailClient = currentEmailClient;
+    EmailClient? emailClient = await currentEmailClient;
     if (emailClient == null) {
       return null;
     }
+    var current = mailAddressController.current;
     if (current != null) {
       return null;
     }
@@ -639,7 +648,7 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
           await emailClient.fetchMessageContents(mimeMessage);
       if (mimeMsg != null) {
         await mailMessageService.storeMimeMessage(current!.email,
-            _currentMailbox.value!, mimeMsg, FetchPreference.full);
+            mailboxController.currentMailbox!, mimeMsg, FetchPreference.full);
 
         return mimeMsg;
       }
@@ -653,7 +662,7 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     String fetchId, {
     Duration? responseTimeout,
   }) async {
-    EmailClient? emailClient = currentEmailClient;
+    EmailClient? emailClient = await currentEmailClient;
     if (emailClient == null) {
       return null;
     }
@@ -757,7 +766,7 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
   }
 
   deleteMessage(int index, {bool expunge = false}) async {
-    EmailClient? emailClient = currentEmailClient;
+    EmailClient? emailClient = await currentEmailClient;
     if (emailClient == null) {
       return null;
     }
@@ -783,7 +792,7 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
     bool? isDeleted,
     bool? isReadReceiptSent,
   }) async {
-    EmailClient? emailClient = currentEmailClient;
+    EmailClient? emailClient = await currentEmailClient;
     if (emailClient == null) {
       return null;
     }
@@ -810,7 +819,7 @@ class MailMimeMessageController extends DataListController<entity.MailAddress> {
   }
 
   Future<MoveResult?> junkMessage(int index) async {
-    EmailClient? emailClient = currentEmailClient;
+    EmailClient? emailClient = await currentEmailClient;
     if (emailClient == null) {
       return null;
     }

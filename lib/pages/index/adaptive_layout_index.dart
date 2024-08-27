@@ -4,7 +4,7 @@ import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/index/bottom_navigation.dart';
 import 'package:colla_chat/pages/index/primary_navigation.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
-import 'package:colla_chat/pages/mail/mail_widget.dart';
+import 'package:colla_chat/pages/mail/mail_address_widget.dart';
 import 'package:colla_chat/pages/chat/me/me_widget.dart';
 import 'package:colla_chat/pages/stock/main_stock_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
@@ -30,9 +30,9 @@ class AdaptiveLayoutIndex extends StatefulWidget {
     ];
     bool emailSwitch = myself.peerProfile.emailSwitch;
     if (emailSwitch) {
-      MailWidget mailWidget = MailWidget();
-      views.add(mailWidget);
-      indexWidgetProvider.define(mailWidget);
+      MailAddressWidget mailAddressWidget = MailAddressWidget();
+      views.add(mailAddressWidget);
+      indexWidgetProvider.define(mailAddressWidget);
     }
     bool stockSwitch = myself.peerProfile.stockSwitch;
     if (stockSwitch) {

@@ -7,32 +7,12 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
+import 'package:get/get.dart';
 
-class MimeMessageAttachmentController with ChangeNotifier {
-  MediaProvider? _mediaProvider;
+final Rx<MediaProvider?> attachmentMediaProvider = Rx<MediaProvider?>(null);
 
-  MediaProvider? get mediaProvider {
-    return _mediaProvider;
-  }
-
-  set mediaProvider(MediaProvider? mediaProvider) {
-    if (mediaProvider != _mediaProvider) {
-      _mediaProvider = mediaProvider;
-      notifyListeners();
-    }
-  }
-}
-
-final MimeMessageAttachmentController mimeMessageAttachmentController =
-    MimeMessageAttachmentController();
-
-class FullScreenAttachmentWidget extends StatefulWidget with TileDataMixin {
+class FullScreenAttachmentWidget extends StatelessWidget with TileDataMixin {
   const FullScreenAttachmentWidget({super.key});
-
-  @override
-  State<StatefulWidget> createState() {
-    return _FullScreenAttachmentWidgetState();
-  }
 
   @override
   bool get withLeading => true;
@@ -45,23 +25,9 @@ class FullScreenAttachmentWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'FullScreenAttachment';
-}
-
-class _FullScreenAttachmentWidgetState
-    extends State<FullScreenAttachmentWidget> {
-  @override
-  void initState() {
-    super.initState();
-    mimeMessageAttachmentController.addListener(_update);
-  }
-
-  _update() {
-    setState(() {});
-  }
 
   Future<Widget> _buildFullScreenWidget(BuildContext context) async {
-    MediaProvider? mediaProvider =
-        mimeMessageAttachmentController.mediaProvider;
+    MediaProvider? mediaProvider = attachmentMediaProvider.value;
     if (mediaProvider != null) {
       if (mediaProvider.isImage) {
         MemoryMediaProvider memoryMediaProvider =
@@ -78,27 +44,22 @@ class _FullScreenAttachmentWidgetState
 
   @override
   Widget build(BuildContext context) {
-    MediaProvider? mediaProvider =
-        mimeMessageAttachmentController.mediaProvider;
-    String? fileName = mediaProvider?.name;
-    if (fileName != null) {
-      fileName = FileUtil.filename(fileName);
-    }
-    return AppBarView(
-      title: fileName,
-      withLeading: true,
-      child: PlatformFutureBuilder(
-        future: _buildFullScreenWidget(context),
-        builder: (BuildContext context, Widget child) {
-          return child;
-        },
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    mimeMessageAttachmentController.removeListener(_update);
-    super.dispose();
+    return Obx(() {
+      MediaProvider? mediaProvider = attachmentMediaProvider.value;
+      String? fileName = mediaProvider?.name;
+      if (fileName != null) {
+        fileName = FileUtil.filename(fileName);
+      }
+      return AppBarView(
+        title: fileName,
+        withLeading: true,
+        child: PlatformFutureBuilder(
+          future: _buildFullScreenWidget(context),
+          builder: (BuildContext context, Widget child) {
+            return child;
+          },
+        ),
+      );
+    });
   }
 }

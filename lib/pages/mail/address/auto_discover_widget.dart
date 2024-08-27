@@ -17,13 +17,14 @@ import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:enough_mail/discover.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 /// 自动邮件发现视图，一个card下的录入框和按钮组合
-class AutoDiscoverWidget extends StatefulWidget with TileDataMixin {
-  const AutoDiscoverWidget({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _AutoDiscoverWidgetState();
+class AutoDiscoverWidget extends StatelessWidget with TileDataMixin {
+  AutoDiscoverWidget({super.key}) {
+    formInputController = FormInputController(_getAutoDiscoveryColumnField());
+    _updateEmailServiceProviderOptions();
+  }
 
   @override
   String get routeName => 'mail_address_auto_discover';
@@ -36,24 +37,15 @@ class AutoDiscoverWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'MailAddressAutoDiscover';
-}
 
-class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
-  late final FormInputController controller;
+  late final FormInputController formInputController;
 
-  ValueNotifier<EmailServiceProvider?> emailServiceProvider =
-      ValueNotifier<EmailServiceProvider?>(null);
+  Rx<EmailServiceProvider?> emailServiceProvider =
+      Rx<EmailServiceProvider?>(null);
   TextEditingController emailServiceProviderController =
       TextEditingController();
-  ValueNotifier<List<Option<String>>> emailServiceProviderOptions =
-      ValueNotifier<List<Option<String>>>([]);
-
-  @override
-  void initState() {
-    super.initState();
-    controller = FormInputController(_getAutoDiscoveryColumnField());
-    _updateEmailServiceProviderOptions();
-  }
+  RxList<Option<String>> emailServiceProviderOptions =
+      RxList<Option<String>>([]);
 
   _updateEmailServiceProviderOptions() {
     List<Option<String>> items = [];
@@ -162,7 +154,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
                   _connect(values);
                 }),
           ],
-          controller: controller,
+          controller: formInputController,
         ));
 
     return formInputWidget;
@@ -171,9 +163,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
   Future<void> _discover(Map<String, dynamic> values) async {
     String? email = values['email'];
     if (StringUtil.isEmpty(email)) {
-      if (mounted) {
-        DialogUtil.error( content: 'Email is empty');
-      }
+      DialogUtil.error(content: 'Email is empty');
       return;
     }
 
@@ -183,24 +173,16 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
       EmailServiceProvider? emailServiceProvider =
           await EmailMessageUtil.discover(email!);
       if (emailServiceProvider != null) {
-        if (mounted) {
-          DialogUtil.info( content: 'Auto discover successfully');
-        }
+        DialogUtil.info(content: 'Auto discover successfully');
         this.emailServiceProvider.value = emailServiceProvider;
       } else {
-        if (mounted) {
-          DialogUtil.error( content: 'Auto discover failure');
-        }
+        DialogUtil.error(content: 'Auto discover failure');
       }
     } catch (e) {
       logger.e('Auto discover failure:$e');
-      if (mounted) {
-        DialogUtil.error( content: 'Auto discover failure');
-      }
+      DialogUtil.error(content: 'Auto discover failure');
     }
-    if (mounted) {
-      DialogUtil.loadingHide();
-    }
+    DialogUtil.loadingHide();
   }
 
   _connect(Map<String, dynamic> values) async {
@@ -211,9 +193,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
         StringUtil.isEmpty(name) ||
         StringUtil.isEmpty(password)) {
       logger.e('email or name or password is empty');
-      if (mounted) {
-        DialogUtil.error( content: 'Email or name is empty teiv kacq rjvu upyx');
-      }
+      DialogUtil.error(content: 'Email or name is empty teiv kacq rjvu upyx');
       return;
     }
     var emailServiceProvider = this.emailServiceProvider.value;
@@ -222,20 +202,16 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
           await EmailMessageUtil.discover(email!);
       if (emailServiceProvider == null) {
         logger.e('auto discover emailServiceProvider is null');
-        if (mounted) {
-          DialogUtil.error(
-              content: 'Auto discovery emailServiceProvider is null');
-        }
+        DialogUtil.error(
+            content: 'Auto discovery emailServiceProvider is null');
         return;
       }
     }
     ClientConfig clientConfig = emailServiceProvider!.clientConfig;
     MailAddress emailAddress =
         EmailMessageUtil.buildDiscoverEmailAddress(email!, name!, clientConfig);
-    if (mounted) {
-      DialogUtil.loadingShow(
-          tip: 'Auto connecting email server,\n please waiting...');
-    }
+    DialogUtil.loadingShow(
+        tip: 'Auto connecting email server,\n please waiting...');
     EmailClient? emailClient;
     try {
       emailClient = await emailClientPool.create(emailAddress, password!,
@@ -243,33 +219,24 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
     } catch (e) {
       logger.e('emailClientPool create failure:$e');
     }
-    if (mounted) {
-      DialogUtil.loadingHide();
-    }
+    DialogUtil.loadingHide();
     if (emailClient == null) {
       logger.e('create (or connect) fail to $name.');
-      if (mounted) {
-        DialogUtil.info( content: 'Connect failure');
-      }
+      DialogUtil.info(content: 'Connect failure');
       return;
     }
-    if (mounted) {
-      DialogUtil.info(content: 'Connect successfully');
-    }
+    DialogUtil.info(content: 'Connect successfully');
     logger.i('create (or connect) success to $name.');
-    if (mounted) {
-      bool? result =
-          await DialogUtil.confirm( content: 'Save new mail address?');
-      if (result != null && result) {
-        MailAddress? old = await mailAddressService.findByMailAddress(email);
-        emailAddress.id = old?.id;
-        emailAddress.createDate = old?.createDate;
-        emailAddress.name = name;
-        emailAddress.password = password;
+    bool? result = await DialogUtil.confirm(content: 'Save new mail address?');
+    if (result != null && result) {
+      MailAddress? old = await mailAddressService.findByMailAddress(email);
+      emailAddress.id = old?.id;
+      emailAddress.createDate = old?.createDate;
+      emailAddress.name = name;
+      emailAddress.password = password;
 
-        ///保存地址
-        await mailAddressService.store(emailAddress);
-      }
+      ///保存地址
+      await mailAddressService.store(emailAddress);
     }
   }
 
@@ -297,35 +264,30 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
   @override
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
-        title: widget.title,
-        withLeading: widget.withLeading,
+        title: title,
+        withLeading: withLeading,
         child: Column(children: [
           const SizedBox(
             height: 10.0,
           ),
           //_buildEmailServiceProviderSelector(context),
           _buildFormInputWidget(context),
-          Expanded(
-              child: ValueListenableBuilder(
-                  valueListenable: emailServiceProvider,
-                  builder: (BuildContext context,
-                      EmailServiceProvider? emailServiceProvider,
-                      Widget? child) {
-                    if (emailServiceProvider != null) {
-                      return Card(
-                          elevation: 0.0,
-                          margin: EdgeInsets.zero,
-                          shape: const ContinuousRectangleBorder(),
-                          child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 5.0, horizontal: 15.0),
-                              child: ListView(
-                                children: clientConfigWidget(
-                                    emailServiceProvider.clientConfig),
-                              )));
-                    }
-                    return nil;
-                  }))
+          Expanded(child: Obx(() {
+            if (emailServiceProvider.value != null) {
+              return Card(
+                  elevation: 0.0,
+                  margin: EdgeInsets.zero,
+                  shape: const ContinuousRectangleBorder(),
+                  child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 5.0, horizontal: 15.0),
+                      child: ListView(
+                        children: clientConfigWidget(
+                            emailServiceProvider.value!.clientConfig),
+                      )));
+            }
+            return nil;
+          }))
         ]));
 
     return appBarView;

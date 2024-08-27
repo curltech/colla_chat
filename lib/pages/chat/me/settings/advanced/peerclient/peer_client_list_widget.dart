@@ -39,10 +39,12 @@ class PeerClientListWidget extends StatelessWidget with TileDataMixin {
     List<PeerClient> peerClients = peerClientController.data.value;
     List<TileData> tiles = [];
     if (peerClients.isNotEmpty) {
+      int i = 0;
       for (var peerClient in peerClients) {
         var title = peerClient.name;
         var subtitle = peerClient.peerId;
         TileData tile = TileData(
+            selected: peerClientController.currentIndex == i,
             prefix: peerClient.avatarImage,
             title: title,
             subtitle: subtitle,
@@ -67,6 +69,7 @@ class PeerClientListWidget extends StatelessWidget with TileDataMixin {
         slideActions.add(editSlideAction);
         tile.slideActions = slideActions;
         tiles.add(tile);
+        i++;
       }
     }
     return tiles;
@@ -82,19 +85,18 @@ class PeerClientListWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    var currentIndex = peerClientController.currentIndex;
     var peerClientView = RefreshIndicator(
         onRefresh: _onRefresh,
         //notificationPredicate: _notificationPredicate,
         child: Obx(() {
           var tiles = _buildPeerClientTileData();
           return DataListView(
-              onTap: _onTap,
-              itemCount: tiles.length,
-              itemBuilder: (BuildContext context, int index) {
-                return tiles[index];
-              },
-              currentIndex: currentIndex);
+            onTap: _onTap,
+            itemCount: tiles.length,
+            itemBuilder: (BuildContext context, int index) {
+              return tiles[index];
+            },
+          );
         }));
 
     var peerClientWidget = AppBarView(

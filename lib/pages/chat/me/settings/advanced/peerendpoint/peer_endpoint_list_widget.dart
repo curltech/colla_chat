@@ -145,11 +145,15 @@ class PeerEndpointListWidget extends StatelessWidget with TileDataMixin {
     var peerEndpoints = peerEndpointController.data;
     List<TileData> tiles = [];
     if (peerEndpoints.isNotEmpty) {
+      int i = 0;
       for (var peerEndpoint in peerEndpoints) {
         var title = peerEndpoint.name;
         var subtitle = peerEndpoint.peerId;
         TileData tile = TileData(
-            title: title, subtitle: subtitle, routeName: 'peer_endpoint_edit');
+            selected: peerEndpointController.currentIndex == i,
+            title: title,
+            subtitle: subtitle,
+            routeName: 'peer_endpoint_edit');
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(
             title: 'Delete',
@@ -191,6 +195,7 @@ class PeerEndpointListWidget extends StatelessWidget with TileDataMixin {
         tile.endSlideActions = endSlideActions;
 
         tiles.add(tile);
+        i++;
       }
     }
 
@@ -205,14 +210,13 @@ class PeerEndpointListWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     Widget dataListView = Obx(() {
       var tiles = _buildTileData();
-      var currentIndex = peerEndpointController.currentIndex;
       var dataListView = DataListView(
-          onTap: _onTap,
-          itemCount: tiles.length,
-          itemBuilder: (BuildContext context, int index) {
-            return tiles[index];
-          },
-          currentIndex: currentIndex);
+        onTap: _onTap,
+        itemCount: tiles.length,
+        itemBuilder: (BuildContext context, int index) {
+          return tiles[index];
+        },
+      );
       return dataListView;
     });
     Widget peerEndpointWidget = AppBarView(

@@ -1,38 +1,23 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class GroupDataListController {
-  final RxMap<TileData, DataListController<TileData>> controllers =
-      <TileData, DataListController<TileData>>{}.obs;
+  final Map<TileData, List<TileData>> allData = <TileData, List<TileData>>{};
 
   GroupDataListController({Map<TileData, List<TileData>> tileData = const {}}) {
     _addAll(tileData: tileData);
   }
 
-  DataListController<TileData>? get(TileData tile) {
-    return controllers[tile];
+  List<TileData>? get(TileData tile) {
+    return allData[tile];
   }
 
   _addAll({required Map<TileData, List<TileData>> tileData}) {
-    if (tileData.isNotEmpty) {
-      for (var tileEntry in tileData.entries) {
-        int? currentIndex;
-        DataListController<TileData>? dataListController =
-            controllers[tileEntry.key];
-        if (dataListController != null) {
-          currentIndex = dataListController.currentIndex;
-        }
-        dataListController = DataListController<TileData>(
-            data: tileEntry.value, currentIndex: currentIndex);
-        controllers[tileEntry.key] = dataListController;
-      }
-    }
+    allData.addEntries(tileData.entries);
   }
 
   addAll({required Map<TileData, List<TileData>> tileData}) {
@@ -42,19 +27,15 @@ class GroupDataListController {
   }
 
   add(TileData tile, List<TileData> tileData) {
-    int? currentIndex;
-    DataListController<TileData>? dataListController = controllers[tile];
-    if (dataListController != null) {
-      currentIndex = dataListController.currentIndex;
-    }
-    dataListController = DataListController<TileData>(
-        data: tileData, currentIndex: currentIndex);
-    controllers[tile] = dataListController;
+    List<TileData>? data = allData[tile];
+    data ??= [];
+    data.addAll([...tileData]);
+    allData[tile] = data;
   }
 
   remove(TileData tile) {
-    if (controllers.containsKey(tile)) {
-      controllers.remove(tile);
+    if (allData.containsKey(tile)) {
+      allData.remove(tile);
     }
   }
 }
@@ -84,8 +65,8 @@ class GroupDataListView extends StatelessWidget {
   }
 
   Widget? _buildExpansionTile(TileData tileData) {
-    var dataListController = groupDataListController.get(tileData);
-    if (dataListController == null) {
+    var data = groupDataListController.get(tileData);
+    if (data == null) {
       return null;
     }
     Widget? leading = tileData.getPrefixWidget(true);
@@ -115,9 +96,9 @@ class GroupDataListView extends StatelessWidget {
     Widget dataListView = DataListView(
       onTap: _onTap,
       group: tileData,
-      itemCount: dataListController.length,
+      itemCount: data.length,
       itemBuilder: (BuildContext context, int index) {
-        return dataListController.get(index);
+        return data[index];
       },
     );
     bool selected = tileData.selected ?? false;
@@ -150,7 +131,7 @@ class GroupDataListView extends StatelessWidget {
 
   Widget _buildListView(BuildContext context) {
     List<Widget> groups = [];
-    var controllers = groupDataListController.controllers;
+    var controllers = groupDataListController.allData;
     if (controllers.isNotEmpty) {
       for (var entry in controllers.entries) {
         Widget? groupExpansionTile = _buildExpansionTile(
@@ -168,8 +149,6 @@ class GroupDataListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      return _buildListView(context);
-    });
+    return _buildListView(context);
   }
 }

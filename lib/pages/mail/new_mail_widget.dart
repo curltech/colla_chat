@@ -26,6 +26,7 @@ import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/richtext/platform_editor_widget.dart';
 import 'package:enough_mail/highlevel.dart' as enough_mail;
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:mimecon/mimecon.dart';
 
 class PlatformAttachmentInfo {
@@ -67,35 +68,33 @@ class NewMailWidget extends StatelessWidget with TileDataMixin {
   String get title => 'New mail';
 
   //已经选择的收件人
-  ValueNotifier<List<String>> receipts = ValueNotifier([]);
+  final RxList<String> receipts = RxList([]);
 
-  ValueNotifier<List<PlatformAttachmentInfo>> attachmentInfos =
-      ValueNotifier<List<PlatformAttachmentInfo>>([]);
+  final RxList<PlatformAttachmentInfo> attachmentInfos =
+      RxList<PlatformAttachmentInfo>([]);
 
-  TextEditingController subjectController = TextEditingController();
+  final TextEditingController subjectController = TextEditingController();
 
-  PlatformEditorController platformEditorController =
+  final PlatformEditorController platformEditorController =
       PlatformEditorController();
 
   //收件人，联系人显示和选择界面
   Widget _buildReceiptsWidget(BuildContext context) {
-    var selector = ValueListenableBuilder(
-        valueListenable: receipts,
-        builder: (BuildContext context, List<String> receipts, Widget? child) {
-          return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 0.0),
-              child: LinkmanGroupSearchWidget(
-                key: UniqueKey(),
-                selectType: SelectType.chipMultiSelectField,
-                onSelected: (List<String>? selected) async {
-                  if (selected != null) {
-                    this.receipts.value = selected;
-                  }
-                },
-                selected: this.receipts.value,
-                includeGroup: false,
-              ));
-        });
+    var selector = Obx(() {
+      return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 0.0),
+          child: LinkmanGroupSearchWidget(
+            key: UniqueKey(),
+            selectType: SelectType.chipMultiSelectField,
+            onSelected: (List<String>? selected) async {
+              if (selected != null) {
+                receipts.value = selected;
+              }
+            },
+            selected: receipts.value,
+            includeGroup: false,
+          ));
+    });
 
     return selector;
   }
@@ -223,23 +222,19 @@ class NewMailWidget extends StatelessWidget with TileDataMixin {
     return Container(
         alignment: Alignment.centerLeft,
         color: myself.getBackgroundColor(context).withOpacity(0.6),
-        child: ValueListenableBuilder(
-            valueListenable: attachmentInfos,
-            builder: (BuildContext context,
-                List<PlatformAttachmentInfo> attachmentInfos, Widget? child) {
-              return PlatformFutureBuilder(
-                  future: _buildAttachmentChips(context, attachmentInfos),
-                  builder: (BuildContext context, List<Widget>? chips) {
-                    return Container(
-                        alignment: Alignment.centerLeft,
-                        color:
-                            myself.getBackgroundColor(context).withOpacity(0.6),
-                        child: Wrap(
-                          direction: Axis.horizontal,
-                          children: chips!,
-                        ));
-                  });
-            }));
+        child: Obx(() {
+          return PlatformFutureBuilder(
+              future: _buildAttachmentChips(context, attachmentInfos),
+              builder: (BuildContext context, List<Widget>? chips) {
+                return Container(
+                    alignment: Alignment.centerLeft,
+                    color: myself.getBackgroundColor(context).withOpacity(0.6),
+                    child: Wrap(
+                      direction: Axis.horizontal,
+                      children: chips!,
+                    ));
+              });
+        }));
   }
 
   /// 发送前的准备，准备数据和地址，加密
@@ -249,7 +244,7 @@ class NewMailWidget extends StatelessWidget with TileDataMixin {
       {bool needEncrypt = true}) async {
     List<enough_mail.MailAddress> from = [];
     enough_mail.MailAddress? sender;
-    MailAddress? current = mailMimeMessageController.current;
+    MailAddress? current = mailAddressController.current;
     String? email;
     String? name;
     if (current != null) {

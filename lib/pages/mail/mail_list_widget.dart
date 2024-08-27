@@ -1,16 +1,34 @@
 import 'package:colla_chat/entity/mail/mail_message.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:colla_chat/entity/mail/mail_address.dart' as entity;
 
 ///邮件列表子视图
-class MailListWidget extends StatelessWidget {
+class MailListWidget extends StatelessWidget with TileDataMixin {
   const MailListWidget({super.key});
+
+  @override
+  String get routeName => 'mail_list';
+
+  @override
+  bool get withLeading => true;
+
+  @override
+  IconData get iconData => Icons.email;
+
+  @override
+  String get title => 'MailList';
 
   ///当前邮箱邮件消息转换成tileData，如果为空则返回空列表
   Future<TileData?> findMailMessageTile(int index) async {
@@ -167,8 +185,33 @@ class MailListWidget extends StatelessWidget {
     return dataListView;
   }
 
+  String getMailboxName() {
+    entity.MailAddress? current = mailAddressController.current;
+    String email = current?.email ?? 'Mail';
+    String? name = mailboxController.currentMailboxName;
+    if (name == null) {
+      return email;
+    } else {
+      return '$email(${AppLocalizations.t(name)})';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return _buildMailListWidget(context);
+    return Obx(() {
+      Widget titleWidget = CommonAutoSizeText(
+        getMailboxName(),
+        style: const TextStyle(color: Colors.white),
+        softWrap: true,
+        maxLines: 1,
+        overflow: TextOverflow.visible,
+      );
+      var appBarView = AppBarView(
+          titleWidget: titleWidget,
+          withLeading: withLeading,
+          child: _buildMailListWidget(context));
+
+      return appBarView;
+    });
   }
 }

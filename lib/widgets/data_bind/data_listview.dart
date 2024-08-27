@@ -12,10 +12,9 @@ import 'package:flutter/material.dart';
 class DataListView extends StatefulWidget {
   final TileData? group;
   final bool reverse;
-  int? currentIndex;
   final int itemCount;
-  TileData? Function(BuildContext, int)? itemBuilder;
-  Future<TileData?> Function(BuildContext, int)? futureItemBuilder;
+  final TileData? Function(BuildContext, int)? itemBuilder;
+  final Future<TileData?> Function(BuildContext, int)? futureItemBuilder;
   final Future<void> Function()? onScrollMax;
   final Future<void> Function()? onScrollMin;
   final Future<void> Function()? onRefresh;
@@ -26,9 +25,8 @@ class DataListView extends StatefulWidget {
     TileData? group,
   })? onTap;
 
-  DataListView(
+  const DataListView(
       {super.key,
-      this.currentIndex,
       required this.itemCount,
       this.itemBuilder,
       this.futureItemBuilder,
@@ -95,7 +93,6 @@ class _DataListViewState extends State<DataListView> {
   _onTap(int index, String title, {String? subtitle}) {
     var onTap = widget.onTap;
     if (onTap != null) {
-      widget.currentIndex = index;
       onTap(index, title, subtitle: subtitle, group: widget.group);
     }
   }
@@ -128,7 +125,6 @@ class _DataListViewState extends State<DataListView> {
               return _buildListTile(
                   context,
                   DataListTile(
-                    selected: widget.currentIndex == index,
                     tileData: tileData,
                     index: index,
                     onTap: _onTap,
@@ -142,7 +138,6 @@ class _DataListViewState extends State<DataListView> {
                   return _buildListTile(
                       context,
                       DataListTile(
-                        selected: widget.currentIndex == index,
                         tileData: tileData!,
                         index: index,
                         onTap: _onTap,

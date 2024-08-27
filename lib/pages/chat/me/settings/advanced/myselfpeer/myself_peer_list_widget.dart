@@ -26,14 +26,17 @@ class MyselfPeerListWidget extends StatelessWidget with TileDataMixin {
     List<TileData> tiles = [];
     List<MyselfPeer> myselfPeers = myselfPeerController.data;
     if (myselfPeers.isNotEmpty) {
+      int i = 0;
       for (var myselfPeer in myselfPeers) {
         var tile = TileData(
+          selected: myselfPeerController.currentIndex == i,
           title: myselfPeer.loginName,
           subtitle: myselfPeer.peerId,
           titleTail: myselfPeer.name,
           prefix: myselfPeer.avatarImage,
         );
         tiles.add(tile);
+        i++;
       }
     }
 
@@ -48,7 +51,6 @@ class MyselfPeerListWidget extends StatelessWidget with TileDataMixin {
       itemBuilder: (BuildContext context, int index) {
         return tiles[index];
       },
-      currentIndex: myselfPeerController.currentIndex,
       onTap: (int index, String title, {TileData? group, String? subtitle}) {
         myselfPeerController.currentIndex = index;
       },

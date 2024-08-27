@@ -109,7 +109,6 @@ class TileData {
 
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
 class DataListTile extends StatelessWidget {
-  final bool selected;
   final TileData tileData;
   final int index;
   final EdgeInsets? contentPadding;
@@ -125,7 +124,6 @@ class DataListTile extends StatelessWidget {
 
   const DataListTile({
     super.key,
-    this.selected = false,
     required this.tileData,
     this.index = 0,
     this.onTap,
@@ -137,10 +135,7 @@ class DataListTile extends StatelessWidget {
   });
 
   Widget _buildListTile(BuildContext context) {
-    bool selected = false;
-    if (tileData.selected == true || this.selected) {
-      selected = true;
-    }
+    bool selected = tileData.selected ?? false;
 
     ///前导组件，一般是自定义图标或者图像
     Widget? leading = tileData.getPrefixWidget(selected);
@@ -201,6 +196,39 @@ class DataListTile extends StatelessWidget {
       ]);
     }
 
+    _onTap() async {
+      if (onTap != null ||
+          tileData.onTap != null ||
+          tileData.routeName != null) {
+        var fn = onTap;
+        if (fn != null) {
+          await fn(index, tileData.title, subtitle: tileData.subtitle);
+        }
+        fn = tileData.onTap;
+        if (fn != null) {
+          await fn(index, tileData.title, subtitle: tileData.subtitle);
+        }
+
+        ///如果路由名称存在，点击会调用路由
+        if (tileData.routeName != null) {
+          indexWidgetProvider.push(tileData.routeName!, context: context);
+        }
+      }
+    }
+
+    _onLongPress() async {
+      if (onLongPress != null || tileData.onLongPress != null) {
+        var fn = onLongPress;
+        if (fn != null) {
+          await fn(index, tileData.title, subtitle: tileData.subtitle);
+        }
+        fn = tileData.onLongPress;
+        if (fn != null) {
+          await fn(index, tileData.title, subtitle: tileData.subtitle);
+        }
+      }
+    }
+
     ///未来不使用ListTile，因为高度固定，不够灵活
     var listTile = ListTile(
       contentPadding: contentPadding,
@@ -221,37 +249,8 @@ class DataListTile extends StatelessWidget {
       trailing: trailingWidget,
       isThreeLine: tileData.isThreeLine,
       dense: tileData.dense,
-      onTap: onTap != null ||
-              tileData.onTap != null ||
-              tileData.routeName != null
-          ? () async {
-              var fn = onTap;
-              if (fn != null) {
-                await fn(index, tileData.title, subtitle: tileData.subtitle);
-              }
-              fn = tileData.onTap;
-              if (fn != null) {
-                await fn(index, tileData.title, subtitle: tileData.subtitle);
-              }
-
-              ///如果路由名称存在，点击会调用路由
-              if (tileData.routeName != null) {
-                indexWidgetProvider.push(tileData.routeName!, context: context);
-              }
-            }
-          : null,
-      onLongPress: onLongPress != null || tileData.onLongPress != null
-          ? () async {
-              var fn = onLongPress;
-              if (fn != null) {
-                await fn(index, tileData.title, subtitle: tileData.subtitle);
-              }
-              fn = tileData.onLongPress;
-              if (fn != null) {
-                await fn(index, tileData.title, subtitle: tileData.subtitle);
-              }
-            }
-          : null,
+      onTap: _onTap,
+      onLongPress: _onLongPress,
     );
 
     if (selected) {

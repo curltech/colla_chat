@@ -224,7 +224,7 @@ dependencies:
   # 多媒体
   ffmpeg_kit_flutter: ^6.0.3 #Android, iOS and macOS
   photo_view: ^0.14.0 #图片显示
-  pro_image_editor: ^5.0.3
+  pro_image_editor: ^5.1.4
   flutter_sound: ^9.4.6
   audioplayers: ^6.0.0 #音频处理,所有平台
   audioplayers_platform_interface: ^7.0.0
@@ -345,7 +345,7 @@ dependency_overrides:
   geolocator: ^13.0.1
   flutter_inappwebview: ^6.0.0
   connectivity_plus: ^6.0.2
-  emoji_picker_flutter: ^3.0.0
+  emoji_picker_flutter: ^2.2.0
   webview_flutter: ^4.8.0
   webview_all: ^0.4.1
   webf: ^0.16.1

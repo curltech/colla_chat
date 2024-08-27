@@ -15,11 +15,8 @@ import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:flutter/material.dart';
 
 /// 邮件地址手工注册组件，录入框和按钮组合
-class ManualAddWidget extends StatefulWidget with TileDataMixin {
-  const ManualAddWidget({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _ManualAddWidgetState();
+class ManualAddWidget extends StatelessWidget with TileDataMixin {
+  ManualAddWidget({super.key});
 
   @override
   String get routeName => 'mail_address_manual_add';
@@ -32,20 +29,13 @@ class ManualAddWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'MailAddressManualAdd';
-}
 
-class _ManualAddWidgetState extends State<ManualAddWidget> {
-  late final FormInputController controller;
+  late final FormInputController formInputController =
+      FormInputController(_getManualDiscoveryColumnField());
 
   static const String imapServerPort = '993';
   static const String popServerPort = '995';
   static const String smtpServerPort = '465';
-
-  @override
-  initState() {
-    super.initState();
-    controller = FormInputController(_getManualDiscoveryColumnField());
-  }
 
   List<PlatformDataField> _getManualDiscoveryColumnField() {
     final List<PlatformDataField> manualDiscoveryColumnField = [
@@ -157,7 +147,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
                         _connect(values);
                       }),
                 ],
-                controller: controller,
+                controller: formInputController,
               )
             ])));
 
@@ -172,9 +162,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
         StringUtil.isEmpty(name) ||
         StringUtil.isEmpty(password)) {
       logger.e('email or name or password is empty');
-      if (mounted) {
-        DialogUtil.error( content: 'Email or name is empty');
-      }
+      DialogUtil.error(content: 'Email or name is empty');
       return;
     }
     var emails = email!.split('@');
@@ -190,10 +178,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
       if (StringUtil.isEmpty(smtpServerHost) ||
           StringUtil.isEmpty(smtpServerPort)) {
         logger.e('smtpServerHost or smtpServerPort  is empty');
-        if (mounted) {
-          DialogUtil.error(
-              content: 'smtpServerHost or smtpServerPort is empty');
-        }
+        DialogUtil.error(content: 'smtpServerHost or smtpServerPort is empty');
         return;
       }
       String imapServerHost = values['imapServerHost']!;
@@ -201,10 +186,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
       if (StringUtil.isEmpty(imapServerHost) ||
           StringUtil.isEmpty(imapServerPort)) {
         logger.e('imapServerHost or imapServerPort  is empty');
-        if (mounted) {
-          DialogUtil.error(
-              content: 'imapServerHost or imapServerPort is empty');
-        }
+        DialogUtil.error(content: 'imapServerHost or imapServerPort is empty');
         return;
       }
       String? displayName = domain;
@@ -263,41 +245,32 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
     EmailClient? emailClient = await emailClientPool.create(
         emailAddress, password!,
         config: emailServiceProvider.clientConfig);
-    if (mounted) {
-      DialogUtil.loadingHide();
-    }
+    DialogUtil.loadingHide();
     if (emailClient == null) {
       logger.e('Connect fail to $name.');
-      if (mounted) {
-        DialogUtil.info( content: 'Connect failure');
-      }
+      DialogUtil.info(content: 'Connect failure');
       return;
     }
-    if (mounted) {
-      DialogUtil.info( content: 'Connect successfully');
-    }
+    DialogUtil.info(content: 'Connect successfully');
     logger.i('create (or connect) success to $name.');
-    if (mounted) {
-      bool? result =
-          await DialogUtil.confirm( content: 'Save new mail address?');
-      if (result != null && result) {
-        MailAddress? old = await mailAddressService.findByMailAddress(email);
-        emailAddress.id = old?.id;
-        emailAddress.createDate = old?.createDate;
-        emailAddress.name = name;
-        emailAddress.password = password;
+    bool? result = await DialogUtil.confirm(content: 'Save new mail address?');
+    if (result != null && result) {
+      MailAddress? old = await mailAddressService.findByMailAddress(email);
+      emailAddress.id = old?.id;
+      emailAddress.createDate = old?.createDate;
+      emailAddress.name = name;
+      emailAddress.password = password;
 
-        ///保存地址
-        await mailAddressService.store(emailAddress);
-      }
+      ///保存地址
+      await mailAddressService.store(emailAddress);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
-        title: widget.title,
-        withLeading: widget.withLeading,
+        title: title,
+        withLeading: withLeading,
         child: _buildFormInputWidget(context));
 
     return appBarView;

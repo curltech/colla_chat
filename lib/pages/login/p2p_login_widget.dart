@@ -109,6 +109,7 @@ class P2pLoginWidget extends StatelessWidget {
         subtitle: myselfPeer.peerId,
         titleTail: myselfPeer.name,
         prefix: myselfPeer.avatarImage,
+        selected: myselfPeerController.currentIndex == index,
         suffix: IconButton(
           onPressed: () async {
             bool? confirm =
@@ -160,7 +161,6 @@ class P2pLoginWidget extends StatelessWidget {
       ),
       Obx(() {
         return DataListView(
-          currentIndex: myselfPeerController.currentIndex,
           onTap: (int index, String title,
               {TileData? group, String? subtitle}) {
             myselfPeerController.currentIndex = index;
