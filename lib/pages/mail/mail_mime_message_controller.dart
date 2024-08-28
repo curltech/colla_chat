@@ -248,7 +248,7 @@ class MailMimeMessageController {
       RxMap<String, Map<String, List<MailMessage>>>({});
 
   ///当前的邮件
-  final Rx<int?> _currentMailIndex = Rx<int?>(null);
+  final Rx<int?> currentMailIndex = Rx<int?>(null);
 
   ///构造函数从数据库获取所有的邮件地址，初始化邮箱数据
   MailMimeMessageController();
@@ -263,16 +263,6 @@ class MailMimeMessageController {
       mailMimeMessageController._addressMailMessages[email] =
           addressMailMessages;
     }
-  }
-
-  ///当前邮件位置
-  int? get currentMailIndex {
-    return _currentMailIndex.value;
-  }
-
-  ///设置当前邮件位置
-  set currentMailIndex(int? currentMailIndex) {
-    _currentMailIndex(currentMailIndex);
   }
 
   ///获取当前地址的当前邮箱的邮件
@@ -294,7 +284,7 @@ class MailMimeMessageController {
   }
 
   MailMessage? get currentMailMessage {
-    var currentMailIndex = this.currentMailIndex;
+    var currentMailIndex = this.currentMailIndex.value;
     var currentMailMessages = this.currentMailMessages;
     if (currentMailMessages != null &&
         currentMailIndex != null &&
@@ -307,7 +297,7 @@ class MailMimeMessageController {
   }
 
   set currentMailMessage(MailMessage? mailMessage) {
-    var currentMailIndex = this.currentMailIndex;
+    var currentMailIndex = this.currentMailIndex.value;
     var currentMailMessages = this.currentMailMessages;
     if (currentMailMessages != null &&
         currentMailIndex != null &&
@@ -316,8 +306,6 @@ class MailMimeMessageController {
       currentMailMessages[currentMailIndex] = mailMessage!;
     }
   }
-
-  ///以下是从数据库取邮件的部分
 
   findCurrent() async {
     var current = mailAddressController.current;
@@ -466,13 +454,6 @@ class MailMimeMessageController {
 
     return page;
   }
-
-  ///以下是与邮件服务器相关的部分
-
-  ///以下是与邮件地址相关的部分
-  ///重新获取所有的邮件地址实体，对没有连接的进行连接，设置缺省邮件地址
-
-  ///连接特定的邮件地址服务器，获取地址的所有的邮箱
 
   _onMessage(MimeMessage mimeMessage) {
     logger.i('Received mimeMessage:${mimeMessage.decodeSubject() ?? ''}');

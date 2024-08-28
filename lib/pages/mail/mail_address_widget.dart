@@ -1,3 +1,4 @@
+import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/entity/mail/mail_address.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/mail/address/auto_discover_widget.dart';
@@ -9,6 +10,7 @@ import 'package:colla_chat/pages/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/pages/mail/new_mail_widget.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/mail/mail_address.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -24,15 +26,15 @@ import 'package:get/get.dart';
 class MailAddressWidget extends StatelessWidget with TileDataMixin {
   final AutoDiscoverWidget autoDiscoverWidget = AutoDiscoverWidget();
   final ManualAddWidget manualAddWidget = ManualAddWidget();
-  final MailListWidget mailListWidget = const MailListWidget();
   final MailContentWidget mailContentWidget = MailContentWidget();
   final NewMailWidget newMailWidget = NewMailWidget();
+
+  final MailListWidget mailListWidget = const MailListWidget();
 
   MailAddressWidget({super.key}) {
     platformEmailServiceProvider.init();
     indexWidgetProvider.define(autoDiscoverWidget);
     indexWidgetProvider.define(manualAddWidget);
-    indexWidgetProvider.define(mailListWidget);
     indexWidgetProvider.define(mailContentWidget);
     indexWidgetProvider.define(newMailWidget);
   }
@@ -49,6 +51,9 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Mail';
 
+  RxInt index = 0.obs;
+  SwiperController swiperController = SwiperController();
+
   _onTap(int index, String title, {String? subtitle, TileData? group}) {
     int i = 0;
     for (MailAddress emailAddress in mailAddressController.data) {
@@ -59,7 +64,7 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
       i++;
     }
     mailboxController.setCurrentMailbox(title);
-    indexWidgetProvider.push('mail_list');
+    swiperController.move(0);
   }
 
   Widget _buildMailAddressWidget(BuildContext context) {
@@ -164,18 +169,34 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
     ));
     return Obx(() {
       logger.i('mail address build');
-      Widget titleWidget = CommonAutoSizeText(
-        getMailboxName(),
-        style: const TextStyle(color: Colors.white),
-        softWrap: true,
-        maxLines: 1,
-        overflow: TextOverflow.visible,
-      );
+      Widget titleWidget = InkWell(
+          onTap: () {
+            swiperController.move(1);
+          },
+          child: CommonAutoSizeText(
+            getMailboxName(),
+            style: const TextStyle(color: Colors.white),
+            softWrap: true,
+            maxLines: 1,
+            overflow: TextOverflow.visible,
+          ));
       var appBarView = AppBarView(
           titleWidget: titleWidget,
           withLeading: withLeading,
           rightWidgets: rightWidgets,
-          child: _buildMailAddressWidget(context));
+          child: Swiper(
+              itemCount: 2,
+              index: index.value,
+              controller: swiperController,
+              onIndexChanged: (int index) {
+                this.index.value = index;
+              },
+              itemBuilder: (BuildContext context, int index) {
+                if (index == 1) {
+                  return _buildMailAddressWidget(context);
+                }
+                return mailListWidget;
+              }));
 
       return appBarView;
     });

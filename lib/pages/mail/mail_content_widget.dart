@@ -163,26 +163,28 @@ class MailContentWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    Widget mimeMessageViewer = PlatformFutureBuilder(
-        future: _buildMimeMessage(),
-        builder:
-            (BuildContext context, DecryptedMimeMessage? decryptedMimeMessage) {
-          var appBarView = AppBarView(
-              titleWidget:
-                  CommonAutoSizeText(decryptedMimeMessage?.subject ?? ''),
-              withLeading: withLeading,
-              child: Card(
-                  elevation: 0.0,
-                  shape: const ContinuousRectangleBorder(),
-                  margin: EdgeInsets.zero,
-                  child: SizedBox(
-                      width: double.infinity,
-                      child: _buildMimeMessageViewer(
-                          context, decryptedMimeMessage!))));
-          return appBarView;
-        });
+    return Obx(() {
+      Widget mimeMessageViewer = PlatformFutureBuilder(
+          future: _buildMimeMessage(),
+          builder: (BuildContext context,
+              DecryptedMimeMessage? decryptedMimeMessage) {
+            var appBarView = AppBarView(
+                titleWidget:
+                    CommonAutoSizeText(decryptedMimeMessage?.subject ?? ''),
+                withLeading: withLeading,
+                child: Card(
+                    elevation: 0.0,
+                    shape: const ContinuousRectangleBorder(),
+                    margin: EdgeInsets.zero,
+                    child: SizedBox(
+                        width: double.infinity,
+                        child: _buildMimeMessageViewer(
+                            context, decryptedMimeMessage!))));
+            return appBarView;
+          });
 
-    return mimeMessageViewer;
+      return mimeMessageViewer;
+    });
   }
 }
 
