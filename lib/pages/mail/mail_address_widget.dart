@@ -10,7 +10,6 @@ import 'package:colla_chat/pages/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/pages/mail/new_mail_widget.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/mail/mail_address.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -29,7 +28,7 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
   final MailContentWidget mailContentWidget = MailContentWidget();
   final NewMailWidget newMailWidget = NewMailWidget();
 
-  final MailListWidget mailListWidget = const MailListWidget();
+  final MailListWidget mailListWidget = MailListWidget();
 
   MailAddressWidget({super.key}) {
     platformEmailServiceProvider.init();
@@ -51,8 +50,8 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Mail';
 
-  RxInt index = 0.obs;
-  SwiperController swiperController = SwiperController();
+  final RxInt index = 0.obs;
+  final SwiperController swiperController = SwiperController();
 
   _onTap(int index, String title, {String? subtitle, TileData? group}) {
     int i = 0;

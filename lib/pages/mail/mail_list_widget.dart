@@ -1,8 +1,11 @@
 import 'package:colla_chat/entity/mail/mail_message.dart';
 import 'package:colla_chat/pages/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:enough_mail/enough_mail.dart';
@@ -11,7 +14,11 @@ import 'package:get/get.dart';
 
 ///邮件列表子视图
 class MailListWidget extends StatelessWidget {
-  const MailListWidget({super.key});
+  final List<ActionData> mailPopActionData = [];
+
+  MailListWidget({super.key}) {
+    _initMailActionData();
+  }
 
   ///当前邮箱邮件消息转换成tileData，如果为空则返回空列表
   Future<TileData?> findMailMessageTile(int index) async {
@@ -28,6 +35,89 @@ class MailListWidget extends StatelessWidget {
     return await _convertMimeMessage(currentMailMessages[index], index);
   }
 
+  _initMailActionData() {
+    mailPopActionData
+        .add(ActionData(icon: const Icon(Icons.delete), label: 'Delete'));
+    mailPopActionData.add(ActionData(
+      icon: const Icon(Icons.mark_email_unread),
+      label: 'Unread',
+    ));
+    mailPopActionData.add(ActionData(
+      icon: const Icon(Icons.mark_email_read),
+      label: 'Read',
+    ));
+    mailPopActionData.add(ActionData(
+      icon: const Icon(Icons.flag),
+      label: 'Flag',
+    ));
+    mailPopActionData.add(ActionData(
+      icon: const Icon(Icons.restore_from_trash),
+      label: 'Junk',
+    ));
+    mailPopActionData.add(ActionData(
+      icon: const Icon(Icons.reply),
+      label: 'Reply',
+    ));
+    mailPopActionData.add(ActionData(
+      icon: const Icon(Icons.reply_all),
+      label: 'Reply all',
+    ));
+    mailPopActionData.add(ActionData(
+      icon: const Icon(Icons.forward),
+      label: 'Forward',
+    ));
+  }
+
+  _onMailPopAction(BuildContext context, int index, String label,
+      {String? value}) async {
+    switch (label) {
+      case 'Delete':
+        mailMimeMessageController.deleteMessage(index, expunge: false);
+        break;
+      case 'Unread':
+        mailMimeMessageController.flagMessage(index, isSeen: false);
+        break;
+      case 'Read':
+        mailMimeMessageController.flagMessage(index, isSeen: true);
+        break;
+      case 'Flag':
+        mailMimeMessageController.flagMessage(index, isFlagged: true);
+        break;
+      case 'Junk':
+        mailMimeMessageController.junkMessage(index);
+        break;
+      case 'Reply':
+        break;
+      case 'Reply all':
+        break;
+      case 'Forward':
+        break;
+      default:
+        break;
+    }
+  }
+
+  _showMailPopAction({BuildContext? context}) async {
+    await DialogUtil.show(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+            elevation: 0.0,
+            insetPadding: EdgeInsets.zero,
+            child: DataActionCard(
+                onPressed: (int index, String label, {String? value}) {
+                  Navigator.pop(context);
+                  _onMailPopAction(context, index, label, value: value);
+                },
+                crossAxisCount: 4,
+                actions: mailPopActionData,
+                height: 200,
+                width: appDataProvider.secondaryBodyWidth,
+                iconSize: 30));
+      },
+    );
+  }
+
   Future<TileData?> _convertMimeMessage(
       MailMessage mailMessage, int index) async {
     MailAddress? sender = mailMessage.decodeSender();
@@ -35,7 +125,7 @@ class MailListWidget extends StatelessWidget {
     title = title ?? '';
     var email = sender?.email;
     email = email ?? '';
-    title = '$title[$email]';
+    title = '(${mailMessage.status})$title[$email]';
     var sendTime = mailMessage.sendTime;
     var titleTail = '';
     if (sendTime != null) {
@@ -64,57 +154,15 @@ class MailListWidget extends StatelessWidget {
       );
     }
     TileData tile = TileData(
-        prefix: prefix,
-        title: title,
-        titleTail: titleTail,
-        subtitle: subtitle.toString(),
-        selected: mailMimeMessageController.currentMailIndex == index);
-    tile.slideActions = [
-      TileData(
-          prefix: Icons.delete,
-          title: 'Delete',
-          onTap: (int index, String title, {String? subtitle}) async {
-            mailMimeMessageController.deleteMessage(index, expunge: false);
-          }),
-      TileData(
-          prefix: Icons.mark_email_unread,
-          title: 'Unread',
-          onTap: (int index, String title, {String? subtitle}) async {
-            mailMimeMessageController.flagMessage(index, isSeen: false);
-          }),
-      TileData(
-          prefix: Icons.mark_email_read,
-          title: 'Read',
-          onTap: (int index, String title, {String? subtitle}) async {
-            mailMimeMessageController.flagMessage(index, isSeen: true);
-          }),
-      TileData(
-          prefix: Icons.flag,
-          title: 'Flag',
-          onTap: (int index, String title, {String? subtitle}) async {
-            mailMimeMessageController.flagMessage(index, isFlagged: true);
-          }),
-      TileData(
-          prefix: Icons.restore_from_trash,
-          title: 'Junk',
-          onTap: (int index, String title, {String? subtitle}) async {
-            mailMimeMessageController.junkMessage(index);
-          }),
-    ];
-    tile.endSlideActions = [
-      TileData(
-          prefix: Icons.reply,
-          title: 'Reply',
-          onTap: (int index, String title, {String? subtitle}) async {}),
-      TileData(
-          prefix: Icons.reply_all,
-          title: 'Reply all',
-          onTap: (int index, String title, {String? subtitle}) async {}),
-      TileData(
-          prefix: Icons.forward,
-          title: 'Forward',
-          onTap: (int index, String title, {String? subtitle}) async {}),
-    ];
+      prefix: prefix,
+      title: title,
+      titleTail: titleTail,
+      subtitle: subtitle.toString(),
+      selected: mailMimeMessageController.currentMailIndex.value == index,
+      onLongPress: (int index, String title, {String? subtitle}) {
+        _showMailPopAction();
+      },
+    );
 
     return tile;
   }
