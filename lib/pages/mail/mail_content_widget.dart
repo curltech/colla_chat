@@ -124,7 +124,7 @@ class MailContentWidget extends StatelessWidget with TileDataMixin {
     if (decryptedMimeMessage.html == null) {
       return Center(
           child: Column(children: [
-        Text(AppLocalizations.t('MimeMessage is no content')),
+        Text(AppLocalizations.t('The message is no content')),
         const SizedBox(
           height: 15.0,
         ),

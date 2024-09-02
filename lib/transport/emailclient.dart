@@ -13,6 +13,7 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_html/enough_mail_html.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:synchronized/synchronized.dart';
+import 'package:colla_chat/l10n/localization.dart';
 
 class EmailMessageUtil {
   /// 创建带附件的消息
@@ -62,6 +63,7 @@ class EmailMessageUtil {
     String? emptyMessageText,
     TransformConfiguration? transformConfiguration,
   }) {
+    emptyMessageText ??= AppLocalizations.t('The message is no content');
     return mimeMessage.transformToHtml(
         blockExternalImages: blockExternalImages,
         preferPlainText: preferPlainText,
