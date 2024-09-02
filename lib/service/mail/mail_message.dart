@@ -92,6 +92,7 @@ class EmailMessageService extends GeneralBaseService<MailMessage> {
     return await store(emailMessage, force: force);
   }
 
+  /// 取本地存储中更旧的邮件
   Future<List<MailMessage>> findMessages(
     String emailAddress,
     String mailboxName, {
@@ -115,6 +116,7 @@ class EmailMessageService extends GeneralBaseService<MailMessage> {
     return emailMessages;
   }
 
+  /// 取本地存储中更新的邮件
   Future<List<MailMessage>> findLatestMessages(
     String emailAddress,
     String mailboxName, {

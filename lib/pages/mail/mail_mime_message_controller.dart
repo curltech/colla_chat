@@ -326,6 +326,7 @@ class MailMimeMessageController {
     }
   }
 
+  /// 取本地存储中更新的邮件
   Future<bool> findLatestMailMessages() async {
     return await lock.synchronized(() async {
       return await _findLatestMailMessages();
@@ -405,6 +406,7 @@ class MailMimeMessageController {
     return mimeMessage;
   }
 
+  /// 取本地存储中更旧的邮件
   Future<bool> findMailMessages() async {
     return await lock.synchronized(() async {
       return await _findMailMessages();
@@ -432,7 +434,7 @@ class MailMimeMessageController {
           .findMessages(current.email, currentMailboxName, sendTime: sendTime);
     }
     if (emailMessages.isNotEmpty) {
-      currentMailMessages?.insertAll(0, emailMessages);
+      currentMailMessages?.addAll(emailMessages);
 
       return true;
     } else {
@@ -471,7 +473,7 @@ class MailMimeMessageController {
     return emailClient;
   }
 
-  ///从邮件服务器中取当前地址当前邮箱的所有未取的最新邮件数据，放入数据提供者的数组中
+  /// 从邮件服务器中取当前地址当前邮箱的所有未取的最新邮件数据，放入数据提供者的数组中
   Future<void> fetchMessages({
     int count = 30,
     int page = 1,

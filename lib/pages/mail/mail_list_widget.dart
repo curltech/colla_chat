@@ -3,6 +3,7 @@ import 'package:colla_chat/pages/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -125,7 +126,7 @@ class MailListWidget extends StatelessWidget {
     title = title ?? '';
     var email = sender?.email;
     email = email ?? '';
-    title = '(${mailMessage.status})$title[$email]';
+    title = '$title[$email]';
     var sendTime = mailMessage.sendTime;
     var titleTail = '';
     if (sendTime != null) {
@@ -141,10 +142,31 @@ class MailListWidget extends StatelessWidget {
           await mailMimeMessageController.decryptMimeMessage(mimeMessage);
       subtitle = decryptedMimeMessage.subject;
       if (decryptedMimeMessage.needDecrypt) {
-        prefix = const Icon(
-          Icons.mail_lock,
-          color: Colors.yellow,
-        );
+        if (mailMessage.status == FetchPreference.envelope.name) {
+          prefix = const Icon(
+            Icons.mail_lock,
+            color: Colors.yellow,
+          );
+        }
+        if (mailMessage.status == FetchPreference.full.name) {
+          prefix = Icon(
+            Icons.mail_lock,
+            color: myself.primary,
+          );
+        }
+      } else {
+        if (mailMessage.status == FetchPreference.envelope.name) {
+          prefix = const Icon(
+            Icons.mail,
+            color: Colors.yellow,
+          );
+        }
+        if (mailMessage.status == FetchPreference.full.name) {
+          prefix = Icon(
+            Icons.mail,
+            color: myself.primary,
+          );
+        }
       }
     } else {
       logger.e('convert mailMessage failure');

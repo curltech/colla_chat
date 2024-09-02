@@ -101,7 +101,7 @@ class ChatMessageItem extends StatelessWidget {
     if (chatMessage.status == MessageStatus.unsent.name) {
       borderColor = Colors.redAccent;
     } else if (transportType == TransportType.websocket.name) {
-      borderColor = Colors.cyanAccent;
+      borderColor = Colors.yellowAccent;
     } else if (transportType == TransportType.sfu.name) {
       borderColor = Colors.greenAccent;
     }
