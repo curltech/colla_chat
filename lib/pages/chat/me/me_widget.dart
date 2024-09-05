@@ -10,9 +10,9 @@ import 'package:colla_chat/pages/chat/me/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_map_launcher_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_webview_widget.dart';
+import 'package:colla_chat/pages/chat/me/webrtc/local_media_stream_widget.dart';
 import 'package:colla_chat/pages/poem/poem_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
-import 'package:colla_chat/pages/chat/me/webrtc/webrtc_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -28,7 +28,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   final PersonalInfoWidget personalInfoWidget = PersonalInfoWidget();
   final CollectionListView collectionListView = CollectionListView();
   final SettingWidget settingWidget = SettingWidget();
-  final WebrtcWidget webrtcWidget = WebrtcWidget();
+  final LocalMediaStreamWidget localMediaStreamWidget = LocalMediaStreamWidget();
   final MediaWidget mediaWidget = MediaWidget();
   final PlatformWebViewWidget webViewWidget = PlatformWebViewWidget();
   final OpenVpnWidget openVpnWidget = const OpenVpnWidget();
@@ -48,7 +48,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(collectionListView);
     indexWidgetProvider.define(settingWidget);
     indexWidgetProvider.define(personalInfoWidget);
-    indexWidgetProvider.define(webrtcWidget);
+    indexWidgetProvider.define(localMediaStreamWidget);
     indexWidgetProvider.define(webViewWidget);
     indexWidgetProvider.define(mediaWidget);
     indexWidgetProvider.define(systemAlertWindowWidget);
@@ -100,7 +100,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     if (developerSwitch) {
       mixins.addAll([
         platformMapLauncherWidget,
-        webrtcWidget,
+        localMediaStreamWidget,
         webViewWidget,
         mediaWidget,
         liveKitSfuRoomWidget,

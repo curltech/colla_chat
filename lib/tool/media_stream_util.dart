@@ -2,69 +2,113 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/transport/webrtc/codec.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:uuid/uuid.dart';
 
 class MediaStreamUtil {
-  static Map<String, dynamic> _getDefaultConstraints({
+  static Map<String, dynamic> buildMediaConstraints({
     required double width,
     required double height,
     bool audio = true,
+    bool video = true,
     int frameRate = 30,
+    int minFrameRate = 15,
     int minWidth = 640,
     int minHeight = 360,
-    int minFrameRate = 15,
     double aspectRatio = 9 / 16,
+    double volume = 1,
+    int sampleRate = 48000,
+    int sampleSize = 16,
+    int channelCount = 1,
+    String? videoInputId,
+    String? audioInputId,
   }) {
-    return {
+    var mediaConstraints = {
       "audio": audio
           ? {
-              "volume": 1, // 音量 0-1
-              "sampleRate": {"exact": 48000}, // 采样率
-              "sampleSize": {"exact": 16}, // 采样位数
-              "channelCount": {"exact": 1}, // 声道
+              "volume": volume, // 音量 0-1
+              "sampleRate": {"exact": sampleRate}, // 采样率
+              "sampleSize": {"exact": sampleSize}, // 采样位数
+              "channelCount": {"exact": channelCount}, // 声道
               "echoCancellation": true, // 回音消除
               "autoGainControl": true, // 自动增益
-              "noiseSuppression": true // 降噪
+              "noiseSuppression": true, // 降噪
+              "optional": [
+                {'sourceId': audioInputId}
+              ],
             }
           : false,
-      "video": {
-        "focusMode": 'continuous', // 持续对焦
-        "facingMode": 'user', // 前摄
-        "resizeMode": 'crop-and-scale', // 'none'或'crop-and-scale'
-        "frameRate": {"ideal": frameRate, 'min': minFrameRate}, // 帧率
-        "aspectRatio": aspectRatio,
-        "width": {"ideal": width, "min": minWidth},
-        "height": {"ideal": height, "min": minHeight},
-        'mandatory': {
-          'minWidth': minWidth,
-          'minHeight': minHeight,
-          'minFrameRate': minFrameRate,
-        },
-        'optional': [
-          {'DtlsSrtpKeyAgreement': true}
-        ],
-      },
+      "video": video
+          ? {
+              "focusMode": 'continuous', // 持续对焦
+              "facingMode": 'user', // 前摄
+              "resizeMode": 'crop-and-scale', // 'none'或'crop-and-scale'
+              "frameRate": {"ideal": frameRate, 'min': minFrameRate}, // 帧率
+              "aspectRatio": aspectRatio,
+              "width": {"ideal": width, "min": minWidth},
+              "height": {"ideal": height, "min": minHeight},
+              'mandatory': {
+                'minWidth': minWidth,
+                'minHeight': minHeight,
+                'minFrameRate': minFrameRate,
+              },
+              'optional': [
+                {'sourceId': videoInputId, 'DtlsSrtpKeyAgreement': true}
+              ],
+            }
+          : false
     };
+
+    return mediaConstraints;
   }
 
   ///获取本机视频流
-  static Future<MediaStream> createVideoMediaStream(
-      {bool audio = true,
-      double width = 640,
-      double height = 480,
-      int frameRate = 30}) async {
-    Map<String, dynamic> mediaConstraints =
-        _getDefaultConstraints(width: width, height: height);
+  static Future<MediaStream> createVideoMediaStream({
+    bool audio = true,
+    double width = 640,
+    double height = 480,
+    bool video = true,
+    int frameRate = 30,
+    int minFrameRate = 15,
+    int minWidth = 640,
+    int minHeight = 360,
+    double aspectRatio = 9 / 16,
+    double volume = 1,
+    int sampleRate = 48000,
+    int sampleSize = 16,
+    int channelCount = 1,
+    String? videoInputId,
+    String? audioInputId,
+  }) async {
+    Map<String, dynamic> mediaConstraints = buildMediaConstraints(
+        audio: audio,
+        video: video,
+        width: width,
+        height: height,
+        frameRate: frameRate,
+        minFrameRate: minFrameRate,
+        minWidth: minWidth,
+        minHeight: minHeight,
+        aspectRatio: aspectRatio,
+        volume: volume,
+        sampleRate: sampleRate,
+        sampleSize: sampleSize,
+        channelCount: channelCount,
+        videoInputId: videoInputId,
+        audioInputId: audioInputId);
     var mediaStream =
         await navigator.mediaDevices.getUserMedia(mediaConstraints);
     return mediaStream;
   }
 
   ///获取本机屏幕流
-  static Future<MediaStream> createDisplayMediaStream(
-      {DesktopCapturerSource? selectedSource, bool audio = true}) async {
+  static Future<MediaStream> createDisplayMediaStream({
+    DesktopCapturerSource? selectedSource,
+    bool audio = true,
+    int frameRate = 30,
+  }) async {
     if (selectedSource == null) {
       var sources = await ScreenSelectUtil.getSources();
       if (sources.isNotEmpty) {
@@ -75,7 +119,7 @@ class MediaStreamUtil {
         ? true
         : {
             'deviceId': {'exact': selectedSource.id},
-            'mandatory': {'frameRate': 30.0}
+            'mandatory': {'frameRate': frameRate}
           };
     Map<String, dynamic> mediaConstraints = <String, dynamic>{
       'audio': audio,
@@ -100,15 +144,28 @@ class MediaStreamUtil {
   }
 
   ///获取本机的设备清单
-  static Future<List<MediaDeviceInfo>?> enumerateDevices() async {
+  static Future<List<MediaDeviceInfo>> enumerateDevices() async {
     return await navigator.mediaDevices.enumerateDevices();
   }
 
-  static Future<List<MediaDeviceInfo>> get cameras =>
+  static Future<List<MediaDeviceInfo>> get videoInput =>
       Helper.enumerateDevices('videoinput');
 
   static Future<List<MediaDeviceInfo>> get audiooutputs =>
       Helper.enumerateDevices('audiooutput');
+
+  static Future<List<MediaDeviceInfo>> get videoOutut =>
+      Helper.enumerateDevices('videooutput');
+
+  static Future<List<MediaDeviceInfo>> get audioInputs =>
+      Helper.enumerateDevices('audioinput');
+
+  static onDeviceChange(Function(List<MediaDeviceInfo>) onMediaDevices) {
+    navigator.mediaDevices.ondevicechange = (event) async {
+      var mediaDevices = await navigator.mediaDevices.enumerateDevices();
+      onMediaDevices(mediaDevices);
+    };
+  }
 
   ///获取媒体轨道支持的参数
   static MediaTrackSupportedConstraints getSupportedConstraints() {
@@ -119,7 +176,7 @@ class MediaStreamUtil {
   }
 
   /// 捕获视频流的帧，就是快照
-  static Future<ByteBuffer?> captureFrame(MediaStream mediaStream) async {
+  static Future<ByteBuffer> captureFrame(MediaStream mediaStream) async {
     final videoTrack = mediaStream
         .getVideoTracks()
         .firstWhere((track) => track.kind == 'video');
@@ -183,7 +240,10 @@ class MediaStreamUtil {
     var tracks = mediaStream.getVideoTracks();
     if (tracks.isNotEmpty) {
       for (MediaStreamTrack track in tracks) {
-        await track.setTorch(torch);
+        final has = await track.hasTorch();
+        if (has) {
+          await track.setTorch(torch);
+        }
       }
     }
   }
@@ -291,5 +351,29 @@ class MediaStreamUtil {
   /// 停止视频流的记录
   static Future<dynamic> stopRecording(MediaRecorder mediaRecorder) async {
     return await mediaRecorder.stop();
+  }
+
+  /// 设置webrtc会话描述sdp的编码
+  static void setPreferredCodec(RTCSessionDescription description,
+      {String audio = 'opus', String video = 'vp8'}) {
+    var capSel = CodecCapabilitySelector(description.sdp!);
+    var acaps = capSel.getCapabilities('audio');
+    if (acaps != null) {
+      acaps.codecs = acaps.codecs
+          .where((e) => (e['codec'] as String).toLowerCase() == audio)
+          .toList();
+      acaps.setCodecPreferences('audio', acaps.codecs);
+      capSel.setCapabilities(acaps);
+    }
+
+    var vcaps = capSel.getCapabilities('video');
+    if (vcaps != null) {
+      vcaps.codecs = vcaps.codecs
+          .where((e) => (e['codec'] as String).toLowerCase() == video)
+          .toList();
+      vcaps.setCodecPreferences('video', vcaps.codecs);
+      capSel.setCapabilities(vcaps);
+    }
+    description.sdp = capSel.sdp();
   }
 }
