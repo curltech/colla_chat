@@ -233,7 +233,7 @@ final Map<String, dynamic> sdpConstraints = {
 };
 
 ///支持的音频编码
-const List<String> audioCodecList = <String>[
+const List<String> supportedAudioCodecs = <String>[
   'OPUS',
   'ISAC',
   'PCMA',
@@ -242,7 +242,7 @@ const List<String> audioCodecList = <String>[
 ];
 
 ///支持的视频编码
-const List<String> videoCodecList = <String>['VP8', 'VP9', 'H264', 'AV1'];
+const List<String> supportedVideoCodecs = <String>['VP8', 'VP9', 'H264', 'AV1'];
 
 /// 基础的PeerConnection，实现建立连接和sdp协商
 /// 代表一个本地与远程的webrtc连接，这个类不含业务含义，不包含与信号服务器的交互部分
@@ -315,8 +315,8 @@ class BasePeerConnection {
   int reconnectTimes = 1;
 
   ///采用的音视频编码
-  String audioCodec = audioCodecList.first;
-  String videoCodec = videoCodecList.first;
+  String audioCodec = supportedAudioCodecs.first;
+  String videoCodec = supportedVideoCodecs.first;
 
   ///下面是实现端到端加密的部分
   final FrameCryptorFactory _frameCyrptorFactory = frameCryptorFactory;
