@@ -7,14 +7,18 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controll
 import 'package:colla_chat/pages/chat/chat/controller/llm_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/extended_text_message_input.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:icons_plus/icons_plus.dart';
 import 'package:record/record.dart';
 
 ///发送文本消息的输入框和按钮，
@@ -36,8 +40,8 @@ class LlmTextMessageInputWidget extends StatelessWidget {
     _buildVoiceRecordButton();
   }
 
-  BlueFireAudioPlayer audioPlayer = globalBlueFireAudioPlayer;
-  RxBool voiceVisible = true.obs;
+  final BlueFireAudioPlayer audioPlayer = globalBlueFireAudioPlayer;
+  final RxBool voiceVisible = true.obs;
 
   ///发送文本消息
   Future<void> onSendPressed() async {
@@ -66,14 +70,224 @@ class LlmTextMessageInputWidget extends StatelessWidget {
     }
   }
 
-  void onMorePressed() {
-    var height = chatMessageViewController.moreMessageInputHeight;
-    if (height == 0.0) {
-      chatMessageViewController.moreMessageInputHeight =
-          ChatMessageViewController.defaultMoreMessageInputHeight;
-    } else {
-      chatMessageViewController.moreMessageInputHeight = 0.0;
-    }
+  Widget _buildLlmActionButton(BuildContext context) {
+    return Obx(() {
+      LlmAction llmAction = llmChatMessageController.llmAction.value;
+      List<bool> isSelected = [];
+      for (var ele in LlmAction.values) {
+        if (ele == llmAction) {
+          isSelected.add(true);
+        } else {
+          isSelected.add(false);
+        }
+      }
+
+      final List<Widget> children = [
+        Tooltip(
+            message: AppLocalizations.t(LlmAction.chat.name),
+            child: const Icon(
+              Icons.chat,
+            )),
+        Tooltip(
+            message: AppLocalizations.t(LlmAction.translate.name),
+            child: const Icon(
+              Icons.translate,
+            )),
+        Tooltip(
+            message: AppLocalizations.t(LlmAction.extract.name),
+            child: const Icon(
+              Icons.summarize_outlined,
+            )),
+        Tooltip(
+          message: AppLocalizations.t(LlmAction.image.name),
+          child: const Icon(
+            Icons.image_outlined,
+          ),
+        ),
+        Tooltip(
+          message: AppLocalizations.t(LlmAction.audio.name),
+          child: const Icon(
+            Icons.multitrack_audio,
+          ),
+        ),
+      ];
+      return Center(
+        child: ToggleButtons(
+            borderRadius: BorderRadius.circular(16.0),
+            fillColor: myself.primary,
+            selectedColor: Colors.white,
+            isSelected: isSelected,
+            children: children,
+            onPressed: (int index) {
+              llmChatMessageController.llmAction.value =
+                  LlmAction.values[index];
+            }),
+      );
+    });
+  }
+
+  List<Widget> _getLlmLanguageIcons() {
+    final List<Widget> children = [
+      Tooltip(
+        message: AppLocalizations.t(LlmLanguage.English.name),
+        child: Flag(Flags.united_states_of_america),
+      ),
+      Tooltip(
+        message: AppLocalizations.t(LlmLanguage.Chinese.name),
+        child: Flag(Flags.china),
+      ),
+      Tooltip(
+          message: AppLocalizations.t(LlmLanguage.French.name),
+          child: Flag(Flags.france)),
+      Tooltip(
+        message: AppLocalizations.t(LlmLanguage.German.name),
+        child: Flag(Flags.germany),
+      ),
+      Tooltip(
+        message: AppLocalizations.t(LlmLanguage.Spanish.name),
+        child: Flag(Flags.spain),
+      ),
+      Tooltip(
+        message: AppLocalizations.t(LlmLanguage.Japanese.name),
+        child: Flag(Flags.japan),
+      ),
+      Tooltip(
+        message: AppLocalizations.t(LlmLanguage.Korean.name),
+        child: Flag(Flags.south_korea),
+      ),
+    ];
+
+    return children;
+  }
+
+  Widget _buildLlmLanguageButton(BuildContext context) {
+    return Obx(() {
+      LlmLanguage llmLanguage = llmChatMessageController.llmLanguage.value;
+      List<bool> isSelected = [];
+      for (var ele in LlmLanguage.values) {
+        if (ele == llmLanguage) {
+          isSelected.add(true);
+        } else {
+          isSelected.add(false);
+        }
+      }
+
+      return Center(
+        child: ToggleButtons(
+            borderRadius: BorderRadius.circular(16.0),
+            fillColor: myself.primary,
+            selectedColor: Colors.white,
+            isSelected: isSelected,
+            children: _getLlmLanguageIcons(),
+            onPressed: (int index) {
+              llmChatMessageController.llmLanguage.value =
+                  LlmLanguage.values[index];
+            }),
+      );
+    });
+  }
+
+  Widget _buildTargetLlmLanguageButton(BuildContext context) {
+    return Obx(() {
+      LlmLanguage llmLanguage =
+          llmChatMessageController.targetLlmLanguage.value;
+      List<bool> isSelected = [];
+      for (var ele in LlmLanguage.values) {
+        if (ele == llmLanguage) {
+          isSelected.add(true);
+        } else {
+          isSelected.add(false);
+        }
+      }
+
+      return Center(
+        child: ToggleButtons(
+            borderRadius: BorderRadius.circular(16.0),
+            fillColor: myself.primary,
+            selectedColor: Colors.white,
+            isSelected: isSelected,
+            children: _getLlmLanguageIcons(),
+            onPressed: (int index) {
+              llmChatMessageController.targetLlmLanguage.value =
+                  LlmLanguage.values[index];
+            }),
+      );
+    });
+  }
+
+  Widget _buildSettingWidget(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(children: [
+          Text(AppLocalizations.t('Action')),
+          const SizedBox(
+            width: 10.0,
+          ),
+          _buildLlmActionButton(context),
+        ]),
+        const SizedBox(
+          height: 15.0,
+        ),
+        Row(children: [
+          Text(AppLocalizations.t('Chat language')),
+          const SizedBox(
+            width: 10.0,
+          ),
+          _buildLlmLanguageButton(context),
+        ]),
+        const SizedBox(
+          height: 15.0,
+        ),
+        Row(children: [
+          Text(AppLocalizations.t('Target language')),
+          const SizedBox(
+            width: 10.0,
+          ),
+          _buildTargetLlmLanguageButton(context),
+        ]),
+        const Spacer(),
+        Row(children: [
+          const Spacer(),
+          TextButton(
+            style: StyleUtil.buildButtonStyle(
+              backgroundColor: myself.primary,
+              foregroundColor: Colors.white,
+            ),
+            child: CommonAutoSizeText(
+              AppLocalizations.t('Ok'),
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          const SizedBox(
+            width: 10.0,
+          ),
+        ]),
+        const SizedBox(
+          height: 15.0,
+        ),
+      ],
+    );
+  }
+
+  Future<void> onSettingPressed(BuildContext context) async {
+    await DialogUtil.show(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            elevation: 0.0,
+            insetPadding: EdgeInsets.zero,
+            child: Container(
+              height: 300,
+              width: appDataProvider.secondaryBodyWidth,
+              margin: const EdgeInsets.all(10.0),
+              padding: const EdgeInsets.all(15.0),
+              child: _buildSettingWidget(context),
+            ),
+          );
+        });
   }
 
   void insertText(String text) {
@@ -230,9 +444,9 @@ class LlmTextMessageInputWidget extends StatelessWidget {
                           horizontal: 0.0, vertical: 0.0),
                       child: IconButton(
                         // tooltip: AppLocalizations.t('More'),
-                        icon: Icon(Icons.more_horiz, color: myself.primary),
+                        icon: Icon(Icons.settings, color: myself.primary),
                         onPressed: () {
-                          onMorePressed();
+                          onSettingPressed(context);
                         },
                       ),
                     ));

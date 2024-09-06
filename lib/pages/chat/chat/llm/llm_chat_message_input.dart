@@ -31,65 +31,8 @@ class LlmChatMessageInputWidget extends StatelessWidget {
     if (chatMessageViewController.emojiMessageInputHeight > 0) {
       children.add(emojiMessageInputWidget);
     }
-    if (chatMessageViewController.moreMessageInputHeight > 0) {
-      children.add(_buildLlmActionButton());
-    }
     return Column(
         mainAxisAlignment: MainAxisAlignment.start, children: children);
-  }
-
-  Widget _buildLlmActionButton() {
-    return Obx(() {
-      LlmAction llmAction = llmChatMessageController.llmAction.value;
-      List<bool> isSelected = [];
-      for (var ele in LlmAction.values) {
-        if (ele == llmAction) {
-          isSelected.add(true);
-        } else {
-          isSelected.add(false);
-        }
-      }
-      final List<Widget> children = [
-        Tooltip(
-            message: AppLocalizations.t(LlmAction.chat.name),
-            child: const Icon(
-              Icons.chat,
-            )),
-        Tooltip(
-            message: AppLocalizations.t(LlmAction.translate.name),
-            child: const Icon(
-              Icons.translate,
-            )),
-        Tooltip(
-            message: AppLocalizations.t(LlmAction.extract.name),
-            child: const Icon(
-              Icons.summarize_outlined,
-            )),
-        Tooltip(
-          message: AppLocalizations.t(LlmAction.image.name),
-          child: const Icon(
-            Icons.image_outlined,
-          ),
-        ),
-        Tooltip(
-          message: AppLocalizations.t(LlmAction.audio.name),
-          child: const Icon(
-            Icons.multitrack_audio,
-          ),
-        ),
-      ];
-      return Center(
-        child: ToggleButtons(
-            borderRadius: BorderRadius.circular(16.0),
-            fillColor: Colors.white,
-            isSelected: isSelected,
-            children: children,
-            onPressed: (int index) {
-              llmChatMessageController.llmAction.value =
-                  LlmAction.values[index];
-            }),
-      );
-    });
   }
 
   @override

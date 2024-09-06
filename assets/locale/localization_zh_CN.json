@@ -790,5 +790,20 @@
   "decreaseVolume": "减少音量",
   "captureFrame": "捕获照片",
   "startRecording": "开始录像",
-  "stopRecording": "结束录像"
+  "stopRecording": "结束录像",
+  "Action": "行为",
+  "Chat language": "聊天语言",
+  "Target language": "翻译语言",
+  "chat": "聊天",
+  "image": "图片",
+  "audio": "语音",
+  "translate": "翻译",
+  "extract": "提取",
+  "English": "英语",
+  "Chinese": "中文",
+  "French": "法语",
+  "German": "德语",
+  "Spanish": "西班牙语",
+  "Japanese": "日语",
+  "Korean": "韩语"
 }

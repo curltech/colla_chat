@@ -14,11 +14,15 @@ import 'package:flutter/foundation.dart';
 import 'package:get/state_manager.dart';
 import 'package:uuid/uuid.dart';
 
-enum LlmAction { chat, image, audio, translate, extract }
+enum LlmAction { chat, translate, extract, image, audio }
+
+enum LlmLanguage { English, Chinese, French, German, Spanish, Japanese, Korean }
 
 class LlmChatMessageController extends ChatMessageController {
   DartOllamaClient? dartOllamaClient;
   Rx<LlmAction> llmAction = LlmAction.chat.obs;
+  Rx<LlmLanguage> llmLanguage = LlmLanguage.English.obs;
+  Rx<LlmLanguage> targetLlmLanguage = LlmLanguage.English.obs;
 
   LlmChatMessageController();
 
@@ -65,6 +69,16 @@ class LlmChatMessageController extends ChatMessageController {
         latest();
         if (llmAction.value == LlmAction.chat) {
           String? chatResponse = await dartOllamaClient!.prompt(content);
+          await onChatCompletion(chatResponse);
+        } else if (llmAction.value == LlmAction.translate) {
+          String prompt =
+              "Please translate the following sentence from ${llmLanguage.value} to ${targetLlmLanguage.value}:'$content'";
+          String? chatResponse = await dartOllamaClient!.prompt(prompt);
+          await onChatCompletion(chatResponse);
+        } else if (llmAction.value == LlmAction.audio) {
+          String prompt =
+              "Please translate the following sentence to audio using a standard male voice:'$content'";
+          String? chatResponse = await dartOllamaClient!.prompt(prompt);
           await onChatCompletion(chatResponse);
         }
       }
