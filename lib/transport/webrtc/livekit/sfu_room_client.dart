@@ -28,7 +28,8 @@ class LiveKitRoomClient {
   final bool simulcast;
   final bool fastConnect;
   final bool e2ee;
-  final Room room = Room();
+  late final Room room;
+
   EventsListener<RoomEvent>? _listener;
 
   LiveKitRoomClient(
@@ -39,10 +40,13 @@ class LiveKitRoomClient {
       this.dynacast = false,
       this.simulcast = true,
       this.fastConnect = false,
-      this.e2ee = false});
+      this.e2ee = false}) {
+    _buildRoomOptions().then((RoomOptions roomOptions) {
+      room = Room(roomOptions: roomOptions);
+    });
+  }
 
-  /// 连接服务器，根据token建立房间的连接
-  Future<void> connect() async {
+  Future<E2EEOptions?> _buildE2EEOptions() async {
     E2EEOptions? e2eeOptions;
     if (e2ee && sharedKey != null) {
       final keyProvider = await BaseKeyProvider.create();
@@ -50,6 +54,43 @@ class LiveKitRoomClient {
       await keyProvider.setKey(sharedKey!);
     }
 
+    return e2eeOptions;
+  }
+
+  Future<RoomOptions> _buildRoomOptions() async {
+    E2EEOptions? e2eeOptions = await _buildE2EEOptions();
+    RoomOptions roomOptions = RoomOptions(
+      adaptiveStream: adaptiveStream,
+      dynacast: dynacast,
+      defaultAudioPublishOptions:
+          const AudioPublishOptions(name: 'custom_audio_track_name'),
+      defaultVideoPublishOptions: VideoPublishOptions(
+        simulcast: simulcast,
+      ),
+      defaultScreenShareCaptureOptions: const ScreenShareCaptureOptions(
+          useiOSBroadcastExtension: true,
+          params: VideoParameters(
+              dimensions: VideoDimensionsPresets.h1080_169,
+              encoding: VideoEncoding(
+                maxBitrate: 3 * 1000 * 1000,
+                maxFramerate: 15,
+              ))),
+      e2eeOptions: e2eeOptions,
+      defaultCameraCaptureOptions: const CameraCaptureOptions(
+          maxFrameRate: 30,
+          params: VideoParameters(
+              dimensions: VideoDimensionsPresets.h720_169,
+              encoding: VideoEncoding(
+                maxBitrate: 2 * 1000 * 1000,
+                maxFramerate: 30,
+              ))),
+    );
+
+    return roomOptions;
+  }
+
+  /// 连接服务器，根据token建立房间的连接
+  Future<void> connect() async {
     // Create a Listener before connecting
     _listener = room.createListener();
     livekit_client.ConnectionState state = room.connectionState;
@@ -60,32 +101,6 @@ class LiveKitRoomClient {
       uri,
       token,
       connectOptions: const ConnectOptions(),
-      roomOptions: RoomOptions(
-        adaptiveStream: adaptiveStream,
-        dynacast: dynacast,
-        defaultAudioPublishOptions:
-            const AudioPublishOptions(name: 'custom_audio_track_name'),
-        defaultVideoPublishOptions: VideoPublishOptions(
-          simulcast: simulcast,
-        ),
-        defaultScreenShareCaptureOptions: const ScreenShareCaptureOptions(
-            useiOSBroadcastExtension: true,
-            params: VideoParameters(
-                dimensions: VideoDimensionsPresets.h1080_169,
-                encoding: VideoEncoding(
-                  maxBitrate: 3 * 1000 * 1000,
-                  maxFramerate: 15,
-                ))),
-        e2eeOptions: e2eeOptions,
-        defaultCameraCaptureOptions: const CameraCaptureOptions(
-            maxFrameRate: 30,
-            params: VideoParameters(
-                dimensions: VideoDimensionsPresets.h720_169,
-                encoding: VideoEncoding(
-                  maxBitrate: 2 * 1000 * 1000,
-                  maxFramerate: 30,
-                ))),
-      ),
       fastConnectOptions: fastConnect
           ? FastConnectOptions(
               microphone: const TrackOption(enabled: true),
