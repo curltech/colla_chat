@@ -182,6 +182,8 @@ class LlmTextMessageInputWidget extends StatelessWidget {
             onPressed: (int index) {
               llmChatMessageController.llmLanguage.value =
                   LlmLanguage.values[index];
+              llmChatMessageController.llmChatAction(
+                  'From now, please use ${llmChatMessageController.llmLanguage.value.name} to response me.');
             }),
       );
     });

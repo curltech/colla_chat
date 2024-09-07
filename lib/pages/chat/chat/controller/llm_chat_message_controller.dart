@@ -57,28 +57,26 @@ class LlmChatMessageController extends ChatMessageController {
     PartyType? type = StringUtil.enumFromString(PartyType.values, partyType);
     type ??= PartyType.linkman;
     if (type == PartyType.linkman) {
-      ChatMessage chatMessage = await chatMessageService.buildChatMessage(
-          receiverPeerId: peerId,
-          content: content,
-          messageType: ChatMessageType.chat,
-          contentType: ChatMessageContentType.text,
-          subMessageType: ChatMessageSubType.chat,
-          transportType: TransportType.llm);
       if (dartOllamaClient != null) {
-        await chatMessageService.store(chatMessage);
-        latest();
-        if (llmAction.value == LlmAction.chat) {
-          String? chatResponse = await dartOllamaClient!.prompt(content);
-          await onChatCompletion(chatResponse);
-        } else if (llmAction.value == LlmAction.translate) {
-          String prompt =
-              "Please translate the following sentence from ${llmLanguage.value} to ${targetLlmLanguage.value}:'$content'";
-          String? chatResponse = await dartOllamaClient!.prompt(prompt);
-          await onChatCompletion(chatResponse);
+        if (llmAction.value == LlmAction.translate) {
+          content =
+              "Please translate the following sentence from ${llmLanguage.value.name} to ${targetLlmLanguage.value.name}:'$content'";
         } else if (llmAction.value == LlmAction.audio) {
-          String prompt =
+          content =
               "Please translate the following sentence to audio using a standard male voice:'$content'";
-          String? chatResponse = await dartOllamaClient!.prompt(prompt);
+        }
+        if (llmAction.value == LlmAction.chat ||
+            llmAction.value == LlmAction.translate) {
+          ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+              receiverPeerId: peerId,
+              content: content,
+              messageType: ChatMessageType.chat,
+              contentType: ChatMessageContentType.text,
+              subMessageType: ChatMessageSubType.chat,
+              transportType: TransportType.llm);
+          await chatMessageService.store(chatMessage);
+          latest();
+          String? chatResponse = await dartOllamaClient!.prompt(content);
           await onChatCompletion(chatResponse);
         }
       }
