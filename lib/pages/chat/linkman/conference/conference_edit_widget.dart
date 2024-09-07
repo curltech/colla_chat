@@ -131,10 +131,10 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
   late final FormInputController formInputController =
       FormInputController(conferenceDataField);
 
-  OptionController conferenceOwnerController = OptionController();
+  final OptionController conferenceOwnerController = OptionController();
 
   //选择的会议成员
-  RxList<String> conferenceMembers = RxList<String>([]);
+  final RxList<String> conferenceMembers = RxList<String>([]);
 
   Conference _initConference() {
     Conference? current = conferenceNotifier.value;
@@ -264,8 +264,7 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
               .sendSfuConferenceMessage(current, participants, store: false);
         } catch (e) {
           logger.e('sendSfuConferenceMessage failure:$e');
-          DialogUtil.error(
-              content: 'send sfu conference message failure');
+          DialogUtil.error(content: 'send sfu conference message failure');
           return null;
         }
       }
@@ -402,8 +401,7 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
       return null;
     }
     if (StringUtil.isEmpty(values['name'])) {
-      DialogUtil.error(
-          content: AppLocalizations.t('Must has conference name'));
+      DialogUtil.error(content: AppLocalizations.t('Must has conference name'));
       return null;
     }
     if (StringUtil.isEmpty(currentConference.topic)) {
@@ -492,13 +490,12 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
                   current, participants);
             } catch (e) {
               logger.e('buildSfuConference failure:$e');
-              DialogUtil.error(
-                  content: 'build sfu conference failure');
+              DialogUtil.error(content: 'build sfu conference failure');
               return null;
             }
           } else {
             logger.e('buildSfuConference failure:');
-            DialogUtil.error( content: 'build sfu conference failure');
+            DialogUtil.error(content: 'build sfu conference failure');
             return null;
           }
         }

@@ -21,6 +21,10 @@ class JsonUtil {
       dynamic json = jsonDecode(entity);
       return json;
     }
+    else if (entity is String) {
+      dynamic json = jsonDecode(entity);
+      return json;
+    }
     return entity.toJson();
   }
 

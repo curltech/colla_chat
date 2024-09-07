@@ -22,7 +22,9 @@ import 'package:colla_chat/widgets/common/combine_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
+/// 发送命令到服务器进行房间的管理操作的报文
 class LiveKitManageRoom {
+  //房间管理命令
   String? manageType;
 
   int? emptyTimeout;
@@ -41,6 +43,7 @@ class LiveKitManageRoom {
 
   List<LiveKitParticipant>? participants;
 
+  // 当列出所有的房间的时候返回的房间列表
   List<LiveKitRoom>? rooms;
 
   LiveKitManageRoom() : super();
@@ -94,10 +97,18 @@ class LiveKitManageRoom {
       'tokens': tokens,
     });
     if (participants != null) {
-      json['participants'] = JsonUtil.toJson(participants);
+      List<dynamic> participants = [];
+      for (var participant in this.participants!) {
+        participants.add(JsonUtil.toJson(participant));
+      }
+      json['participants'] = participants;
     }
     if (rooms != null) {
-      json['rooms'] = JsonUtil.toJson(rooms);
+      List<dynamic> rooms = [];
+      for (var room in this.rooms!) {
+        rooms.add(JsonUtil.toJson(room));
+      }
+      json['rooms'] = rooms;
     }
 
     return json;
@@ -142,7 +153,7 @@ class LiveKitRoom {
       'sid': sid,
       'empty_timeout': emptyTimeout,
       'name': name,
-      'creation_time': creationTime,
+      'creation_time': creationTime?.toUtc().toIso8601String(),
       'turn_password': turnPassword,
       'enabled_codes': JsonUtil.toJson(enabledCodecs),
     });
@@ -584,10 +595,10 @@ class ConferenceService extends GeneralBaseService<Conference> {
     return name.isNotEmpty;
   }
 
-  Future<List<LiveKitRoom>?> listSfuRoom() async {
+  Future<LiveKitManageRoom> listSfuRoom() async {
     LiveKitManageRoom liveKitManageRoom = await manageRoom(ManageType.list);
 
-    return liveKitManageRoom.rooms;
+    return liveKitManageRoom;
   }
 
   Future<List<LiveKitParticipant>?> listSfuParticipants(String roomName) async {

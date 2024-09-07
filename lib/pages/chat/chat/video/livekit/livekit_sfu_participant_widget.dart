@@ -1,19 +1,18 @@
 import 'package:colla_chat/service/chat/conference.dart';
-import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-ValueNotifier<String?> roomNameNotifier = ValueNotifier<String?>(null);
+final Rx<String?> roomName = Rx<String?>(null);
 
 /// 创建参与者和管理参与者的界面
-class LiveKitSfuParticipantWidget extends StatefulWidget with TileDataMixin {
-  LiveKitSfuParticipantWidget({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _LiveKitSfuParticipantWidgetState();
+class LiveKitSfuParticipantWidget extends StatelessWidget with TileDataMixin {
+  LiveKitSfuParticipantWidget({super.key}) {
+    _init();
+  }
 
   @override
   bool get withLeading => true;
@@ -26,25 +25,15 @@ class LiveKitSfuParticipantWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'SfuParticipant';
-}
 
-class _LiveKitSfuParticipantWidgetState
-    extends State<LiveKitSfuParticipantWidget> with TickerProviderStateMixin {
-  ValueNotifier<List<TileData>> tileData = ValueNotifier<List<TileData>>([]);
-
-  @override
-  initState() {
-    super.initState();
-    _init();
-  }
+  final RxList<TileData> tileData = <TileData>[].obs;
 
   _init() async {
-    String? roomName = roomNameNotifier.value;
-    if (roomName == null) {
+    if (roomName.value == null) {
       return;
     }
     List<LiveKitParticipant>? participants =
-        await conferenceService.listSfuParticipants(roomName);
+        await conferenceService.listSfuParticipants(roomName.value!);
     List<TileData> tiles = [];
     if (participants != null && participants.isNotEmpty) {
       for (var participant in participants) {
@@ -65,40 +54,22 @@ class _LiveKitSfuParticipantWidgetState
     tileData.value = tiles;
   }
 
-  _createRoom(String roomName) async {
-    conferenceService.createSfuRoom(roomName);
-  }
-
   Widget _buildSearchRoomView(BuildContext context) {
-    return ValueListenableBuilder(
-        valueListenable: tileData,
-        builder: (BuildContext context, List<TileData> value, Widget? child) {
-          return DataListView(
-            itemCount: value.length,
-            itemBuilder: (BuildContext context, int index) {
-              return value[index];
-            },
-          );
-        });
+    return DataListView(
+      itemCount: tileData.value.length,
+      itemBuilder: (BuildContext context, int index) {
+        return tileData.value[index];
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Widget>? rightWidgets = [
-      IconButton(
-          onPressed: () async {
-            String? roomName = await DialogUtil.showTextFormField(
-                title: 'Add room', content: 'roomName');
-            if (roomName != null && roomName.isNotEmpty) {
-              _createRoom(roomName);
-            }
-          },
-          icon: const Icon(Icons.add)),
-    ];
-    return AppBarView(
-        title: roomNameNotifier.value,
-        withLeading: true,
-        rightWidgets: rightWidgets,
-        child: _buildSearchRoomView(context));
+    return Obx(() {
+      return AppBarView(
+          title: roomName.value,
+          withLeading: true,
+          child: _buildSearchRoomView(context));
+    });
   }
 }

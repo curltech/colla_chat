@@ -1,19 +1,20 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/video/livekit/livekit_sfu_participant_widget.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 /// 创建房间和管理房间的界面
-class LiveKitSfuRoomWidget extends StatefulWidget with TileDataMixin {
+class LiveKitSfuRoomWidget extends StatelessWidget with TileDataMixin {
   LiveKitSfuRoomWidget({super.key});
-
-  @override
-  State<StatefulWidget> createState() => _LiveKitSfuRoomWidgetState();
 
   @override
   bool get withLeading => true;
@@ -26,46 +27,38 @@ class LiveKitSfuRoomWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'SfuRoom';
-}
 
-class _LiveKitSfuRoomWidgetState extends State<LiveKitSfuRoomWidget>
-    with TickerProviderStateMixin {
-  ValueNotifier<List<TileData>> tileData = ValueNotifier<List<TileData>>([]);
-
-  @override
-  initState() {
-    super.initState();
-    _init();
-  }
+  final Rx<List<TileData>> tileData = Rx<List<TileData>>([]);
 
   _init() async {
-    List<LiveKitRoom>? rooms = await conferenceService.listSfuRoom();
+    LiveKitManageRoom liveKitManageRoom = await conferenceService.listSfuRoom();
+    List<LiveKitRoom>? rooms = liveKitManageRoom.rooms;
     List<TileData> tiles = [];
     if (rooms != null && rooms.isNotEmpty) {
-      for (var room in rooms) {
+      for (LiveKitRoom room in rooms) {
         String name = room.name ?? '';
         DateTime? creationTime = room.creationTime;
         Duration emptyTimeout = Duration(seconds: room.emptyTimeout ?? 0);
+        LiveKitRoom current = room;
         TileData tile = TileData(
-          title: name,
-          subtitle: creationTime.toString(),
-          titleTail: emptyTimeout.toString(),
-          selected: false,
-        );
+            title: name,
+            subtitle: creationTime.toString(),
+            titleTail: emptyTimeout.toString(),
+            selected: false,
+            onTap: (int index, String title, {String? subtitle}) {
+              _showRoom(liveKitManageRoom, current);
+            });
         tile.endSlideActions = [
           TileData(
               title: 'Delete',
-              onTap: (int index, String title, {String? subtitle}) {
-                conferenceService.deleteRoom(name);
-                _init();
+              onTap: (int index, String title, {String? subtitle}) async {
+                await conferenceService.deleteRoom(name);
+                await _init();
               }),
-          TileData(
-              title: 'Add participant',
-              onTap: (int index, String title, {String? subtitle}) {}),
           TileData(
               title: 'Participant',
               onTap: (int index, String title, {String? subtitle}) {
-                roomNameNotifier.value = name;
+                roomName.value = name;
                 indexWidgetProvider.push('sfu_participant');
               })
         ];
@@ -77,30 +70,58 @@ class _LiveKitSfuRoomWidgetState extends State<LiveKitSfuRoomWidget>
     tileData.value = tiles;
   }
 
-  _createRoom(String roomName) async {
-    conferenceService.createSfuRoom(roomName);
+  _showRoom(LiveKitManageRoom liveKitManageRoom, LiveKitRoom room) {
+    DialogUtil.show(builder: (BuildContext context) {
+      return Dialog(
+          child: Container(
+              width: appDataProvider.secondaryBodyWidth,
+              height: 300,
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('host:${liveKitManageRoom.host ?? ''}'),
+                  Text('maxParticipants:${liveKitManageRoom.maxParticipants}'),
+                  Text('identities:${liveKitManageRoom.identities ?? []}'),
+                  Text('names:${liveKitManageRoom.names ?? []}'),
+                  Text('tokens:${liveKitManageRoom.tokens ?? []}'),
+                  Text('name:${room.name ?? ''}'),
+                  Text(
+                      'creationTime:${room.creationTime?.toIso8601String() ?? ''}'),
+                  Text('turnPassword:${room.turnPassword ?? ''}'),
+                  Text('sid:${room.sid ?? ''}'),
+                  Text('emptyTimeout:${room.emptyTimeout?.toString() ?? ''}'),
+                  Text('enabledCodecs:${room.enabledCodecs ?? []}'),
+                ],
+              )));
+    });
+  }
+
+  Future<void> _createRoom(String roomName) async {
+    await conferenceService.createSfuRoom(roomName);
+    await _init();
   }
 
   Widget _buildSearchRoomView(BuildContext context) {
-    return ValueListenableBuilder(
-        valueListenable: tileData,
-        builder: (BuildContext context, List<TileData> value, Widget? child) {
-          return DataListView(
-            itemCount: value.length,
-            itemBuilder: (BuildContext context, int index) {
-              return value[index];
-            },
-          );
-        });
+    return Obx(() {
+      return DataListView(
+        itemCount: tileData.value.length,
+        itemBuilder: (BuildContext context, int index) {
+          return tileData.value[index];
+        },
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    _init();
     List<Widget>? rightWidgets = [
       IconButton(
+          tooltip: AppLocalizations.t('Add room'),
           onPressed: () async {
             String? roomName = await DialogUtil.showTextFormField(
-                title: 'Add room', content: 'roomName');
+                title: 'Add room', content: 'room name');
             if (roomName != null && roomName.isNotEmpty) {
               _createRoom(roomName);
             }
@@ -108,7 +129,7 @@ class _LiveKitSfuRoomWidgetState extends State<LiveKitSfuRoomWidget>
           icon: const Icon(Icons.add)),
     ];
     return AppBarView(
-        title: widget.title,
+        title: title,
         withLeading: true,
         rightWidgets: rightWidgets,
         child: _buildSearchRoomView(context));
