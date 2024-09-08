@@ -30,6 +30,7 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:get/get.dart';
 
 /// 安全设置组件，包括修改密码，登录选项（免登录设置），加密选项（加密算法，signal）
 class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
@@ -279,33 +280,40 @@ class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
         return securitySettingTileData[index];
       },
     );
-    var autoLoginTile = CheckboxListTile(
-        title: Row(children: [
-          Icon(
-            Icons.auto_mode,
-            color: myself.secondary,
-          ),
-          const SizedBox(
-            width: 15.0,
-          ),
-          CommonAutoSizeText(AppLocalizations.t('Auto login')),
-        ]),
-        dense: false,
-        activeColor: myself.primary,
-        value: appDataProvider.autoLogin,
-        onChanged: (bool? autoLogin) async {
-          autoLogin = autoLogin ?? false;
-          myself.autoLogin = autoLogin;
-          if (autoLogin) {
-            var loginName = myself.myselfPeer.loginName;
-            var password = myself.password;
-            await myselfPeerService.saveAutoCredential(loginName, password!);
-            appDataProvider.autoLogin = true;
-          } else {
-            await myselfPeerService.removeAutoCredential();
-            appDataProvider.autoLogin = false;
-          }
-        });
+    var autoLoginTile = ListenableBuilder(
+      listenable: appDataProvider,
+      builder: (BuildContext context, Widget? child) {
+        return CheckboxListTile(
+            title: Row(children: [
+              Icon(
+                Icons.auto_mode,
+                color: myself.secondary,
+              ),
+              const SizedBox(
+                width: 15.0,
+              ),
+              CommonAutoSizeText(AppLocalizations.t('Auto login')),
+            ]),
+            dense: false,
+            activeColor: myself.primary,
+            value: appDataProvider.autoLogin,
+            onChanged: (bool? autoLogin) async {
+              autoLogin = autoLogin ?? false;
+              myself.autoLogin = autoLogin;
+              if (autoLogin) {
+                var loginName = myself.myselfPeer.loginName;
+                var password = myself.password;
+                await myselfPeerService.saveAutoCredential(
+                    loginName, password!);
+                appDataProvider.autoLogin = true;
+              } else {
+                await myselfPeerService.removeAutoCredential();
+                appDataProvider.autoLogin = false;
+              }
+            });
+      },
+    );
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
