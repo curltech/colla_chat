@@ -57,6 +57,7 @@ class LiveKitRoomClient {
     return e2eeOptions;
   }
 
+
   Future<RoomOptions> _buildRoomOptions() async {
     E2EEOptions? e2eeOptions = await _buildE2EEOptions();
     RoomOptions roomOptions = RoomOptions(

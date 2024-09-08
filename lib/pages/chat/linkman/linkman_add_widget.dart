@@ -26,13 +26,14 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
   final LlmChatAddWidget llmChatAddWidget = LlmChatAddWidget();
   final NearbyGroupAddWidget nearbyGroupAddWidget = NearbyGroupAddWidget();
   final FaceGroupAddWidget faceGroupAddWidget = FaceGroupAddWidget();
+  final GroupEditWidget groupEditWidget = GroupEditWidget();
   final ConferenceEditWidget conferenceEditWidget = ConferenceEditWidget();
   final AnonymousConferenceEditWidget anonymousConferenceEditWidget =
       AnonymousConferenceEditWidget();
 
   //final NfcLinkmanAddWidget nfcLinkmanAddWidget = NfcLinkmanAddWidget();
 
-  Map<TileData, List<TileData>> tileData = {};
+  final Map<TileData, List<TileData>> tileData = {};
 
   LinkmanAddWidget({super.key}) {
     indexWidgetProvider.define(p2pLinkmanAddWidget);
@@ -78,7 +79,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
       conferenceEditWidget,
       anonymousConferenceEditWidget,
     ]);
-    conferenceNotifier.value = null;
+
     for (var tile in conferenceTileData) {
       tile.dense = false;
       tile.selected = false;
@@ -103,6 +104,8 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
+    groupNotifier.value = null;
+    conferenceNotifier.value = null;
     Widget child = GroupDataListView(tileData: tileData);
     var linkmanView = AppBarView(title: title, withLeading: true, child: child);
 

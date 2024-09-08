@@ -27,12 +27,13 @@ import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-final ValueNotifier<Group?> groupNotifier = ValueNotifier<Group?>(null);
+final Rx<Group?> groupNotifier = Rx<Group?>(null);
 
 ///创建和修改群，填写群的基本信息，选择群成员和群主
-class GroupEditWidget extends StatefulWidget with TileDataMixin {
-  const GroupEditWidget({super.key});
+class GroupEditWidget extends StatelessWidget with TileDataMixin {
+  GroupEditWidget({super.key});
 
   @override
   IconData get iconData => Icons.group;
@@ -46,11 +47,6 @@ class GroupEditWidget extends StatefulWidget with TileDataMixin {
   @override
   bool get withLeading => true;
 
-  @override
-  State<StatefulWidget> createState() => _GroupEditWidgetState();
-}
-
-class _GroupEditWidgetState extends State<GroupEditWidget> {
   final List<PlatformDataField> groupDataField = [
     PlatformDataField(
         name: 'id',
@@ -75,34 +71,26 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
         label: 'MyAlias',
         prefixIcon: Icon(Icons.person_pin, color: myself.primary)),
   ];
-  late final FormInputController controller =
+  late final FormInputController formInputController =
       FormInputController(groupDataField);
 
-  OptionController groupOwnerController = OptionController();
+  final OptionController groupOwnerController = OptionController();
 
   //已经选择的群成员
-  ValueNotifier<List<String>> groupMembers = ValueNotifier([]);
+  final RxList<String> groupMembers = RxList<String>([]);
 
   //当前群的头像
-  ValueNotifier<String?> groupAvatar = ValueNotifier(null);
+  final Rx<String?> groupAvatar = Rx<String?>(null);
 
-  @override
-  initState() {
+  _initGroup() {
     Group? current = groupNotifier.value;
     if (current == null) {
       current = Group('', '');
       groupNotifier.value = current;
     }
-    groupNotifier.addListener(_update);
-    _buildGroupData();
-    super.initState();
   }
 
-  _update() {
-    setState(() {});
-  }
-
-  _buildGroupData() async {
+  _buildGroupData(BuildContext context) async {
     Group? current = groupNotifier.value;
     if (current == null) {
       return;
@@ -147,11 +135,9 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
           groupOwnerOptions.add(option);
         } else {
           logger.e('Group member $groupMemberId is not linkman');
-          if (mounted) {
-            DialogUtil.error(
-                content:
-                    '${AppLocalizations.t('Group member')} $groupMemberId${AppLocalizations.t(' is not linkman')}');
-          }
+          DialogUtil.error(
+              content:
+                  '${AppLocalizations.t('Group member')} $groupMemberId${AppLocalizations.t(' is not linkman')}');
         }
       }
     }
@@ -160,31 +146,28 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
 
   //群成员显示和编辑界面
   Widget _buildGroupMembersWidget(BuildContext context) {
-    var selector = ValueListenableBuilder(
-        valueListenable: groupMembers,
-        builder:
-            (BuildContext context, List<String> groupMembers, Widget? child) {
-          if (!this.groupMembers.value.contains(myself.peerId)) {
-            this.groupMembers.value.add(myself.peerId!);
-          }
-          return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 0.0),
-              child: LinkmanGroupSearchWidget(
-                key: UniqueKey(),
-                selectType: SelectType.chipMultiSelectField,
-                onSelected: (List<String>? selected) async {
-                  if (selected != null) {
-                    if (!selected.contains(myself.peerId)) {
-                      selected.add(myself.peerId!);
-                    }
-                    this.groupMembers.value = selected;
-                    await _buildGroupOwnerOptions();
-                  }
-                },
-                selected: this.groupMembers.value,
-                includeGroup: false,
-              ));
-        });
+    var selector = Obx(() {
+      if (!groupMembers.value.contains(myself.peerId)) {
+        groupMembers.value.add(myself.peerId!);
+      }
+      return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 0.0),
+          child: LinkmanGroupSearchWidget(
+            key: UniqueKey(),
+            selectType: SelectType.chipMultiSelectField,
+            onSelected: (List<String>? selected) async {
+              if (selected != null) {
+                if (!selected.contains(myself.peerId)) {
+                  selected.add(myself.peerId!);
+                }
+                groupMembers.value = selected;
+                await _buildGroupOwnerOptions();
+              }
+            },
+            selected: groupMembers.value,
+            includeGroup: false,
+          ));
+    });
 
     return selector;
   }
@@ -224,7 +207,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     if (current == null) {
       return;
     }
-    Uint8List? avatar = await ImageUtil.pickAvatar(context:context);
+    Uint8List? avatar = await ImageUtil.pickAvatar(context: context);
     if (avatar != null) {
       current.avatar = ImageUtil.base64Img(CryptoUtil.encodeBase64(avatar));
       groupAvatar.value = current.avatar;
@@ -232,37 +215,35 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
   }
 
   Widget _buildAvatarWidget(BuildContext context) {
-    Group? current = groupNotifier.value;
-    if (current == null) {
-      return nil;
-    }
-    var avatarWidget = ValueListenableBuilder(
-        valueListenable: groupAvatar,
-        builder: (BuildContext context, String? groupAvatar, Widget? child) {
-          var avatar = current.avatar;
-          if (avatar != null && avatar.isNotEmpty) {
-            var avatarImage = ImageUtil.buildImageWidget(
-                image: avatar,
-                height: AppIconSize.mdSize,
-                width: AppIconSize.mdSize,
-                fit: BoxFit.contain);
-            current.avatarImage = avatarImage;
-          }
-          return Container(
-            padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 0.0),
-            child: ListTile(
-                leading: Icon(Icons.image, color: myself.primary),
-                title: CommonAutoSizeText(AppLocalizations.t('avatar')),
-                trailing: current.avatarImage,
-                minVerticalPadding: 0.0,
-                minLeadingWidth: 0.0,
-                onTap: () async {
-                  await _pickAvatar(
-                    context,
-                  );
-                }),
-          );
-        });
+    var avatarWidget = Obx(() {
+      Group? current = groupNotifier.value;
+      if (current == null) {
+        return nil;
+      }
+      var avatar = current.avatar;
+      if (avatar != null && avatar.isNotEmpty) {
+        var avatarImage = ImageUtil.buildImageWidget(
+            image: avatar,
+            height: AppIconSize.mdSize,
+            width: AppIconSize.mdSize,
+            fit: BoxFit.contain);
+        current.avatarImage = avatarImage;
+      }
+      return Container(
+        padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 0.0),
+        child: ListTile(
+            leading: Icon(Icons.image, color: myself.primary),
+            title: CommonAutoSizeText(AppLocalizations.t('avatar')),
+            trailing: current.avatarImage,
+            minVerticalPadding: 0.0,
+            minLeadingWidth: 0.0,
+            onTap: () async {
+              await _pickAvatar(
+                context,
+              );
+            }),
+      );
+    });
 
     return avatarWidget;
   }
@@ -287,7 +268,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
         valueListenable: groupNotifier,
         builder: (BuildContext context, Group? group, Widget? child) {
           if (group != null) {
-            controller.setValues(JsonUtil.toJson(group));
+            formInputController.setValues(JsonUtil.toJson(group));
           }
           return FormInputWidget(
             height: appDataProvider.portraitSize.height * 0.5,
@@ -299,7 +280,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
                 }
               });
             },
-            controller: controller,
+            controller: formInputController,
           );
         });
     children.add(formInputWidget);
@@ -363,10 +344,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     }
     current.participants = groupMembers.value;
     GroupChange groupChange = await groupService.store(current);
-    if (mounted) {
-      DialogUtil.info(
-          content: AppLocalizations.t('Group has stored completely'));
-    }
+    DialogUtil.info(content: AppLocalizations.t('Group has stored completely'));
     groupNotifier.value = current;
 
     //对所有的成员发送组变更的消息
@@ -376,10 +354,8 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
       if (groupModified) {
         bool allowed = groupService.canModifyGroup(current);
         if (!allowed) {
-          if (mounted) {
-            DialogUtil.error(
-                content: 'Not group owner or myself, can not modify group');
-          }
+          DialogUtil.error(
+              content: 'Not group owner or myself, can not modify group');
         } else {
           await groupService.modifyGroup(current);
         }
@@ -403,11 +379,8 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
       }
       bool allowed = groupService.canRemoveGroupMember(current, oldMemberIds);
       if (!allowed) {
-        if (mounted) {
-          DialogUtil.error(
-              content:
-                  'Not group owner or myself, can not remove group member');
-        }
+        DialogUtil.error(
+            content: 'Not group owner or myself, can not remove group member');
       } else {
         await groupService.removeGroupMember(current, oldMemberIds);
       }
@@ -416,15 +389,13 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
       groupChatSummaryController.refresh();
     }
 
-    if (currentGroup.id == null) {
-      setState(() {});
-    }
-
     return current;
   }
 
   @override
   Widget build(BuildContext context) {
+    _initGroup();
+    _buildGroupData(context);
     String title = 'Add group';
     if (groupNotifier.value?.id != null) {
       title = 'Edit group';
@@ -457,18 +428,10 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     ];
     var appBarView = AppBarView(
         title: title,
-        withLeading: widget.withLeading,
+        withLeading: withLeading,
         rightWidgets: rightWidgets,
         child: _buildFormInputWidget(context));
 
     return appBarView;
   }
-
-  @override
-  void dispose() {
-    groupNotifier.removeListener(_update);
-    super.dispose();
-  }
 }
-
-const GroupEditWidget groupEditWidget = GroupEditWidget();

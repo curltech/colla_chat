@@ -160,18 +160,18 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
           conferenceMembers.add(member.memberPeerId!);
         }
       }
-      await _buildConferenceOwnerOptions(context, conferenceMembers);
       this.conferenceMembers.value = conferenceMembers;
+      await _buildConferenceOwnerOptions();
     }
   }
 
   //更新ConferenceOwnerOptions，从会议成员中选择
-  _buildConferenceOwnerOptions(
-      BuildContext context, List<String> selected) async {
+  _buildConferenceOwnerOptions() async {
     Conference? current = conferenceNotifier.value;
     if (current == null) {
       return;
     }
+    List<String> selected = conferenceMembers.value;
     current.conferenceOwnerPeerId ??= myself.peerId;
     List<Option<String>> conferenceOwnerOptions = [];
     if (selected.isNotEmpty) {
@@ -218,7 +218,7 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
             onSelected: (List<String>? selected) async {
               if (selected != null) {
                 conferenceMembers.value = selected;
-                await _buildConferenceOwnerOptions(context, selected);
+                await _buildConferenceOwnerOptions();
               }
             },
             selected: conferenceMembers,
@@ -528,9 +528,6 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
     }
     if (conferenceModified) {
       conferenceChatSummaryController.refresh();
-    }
-    if (currentConference.id == null) {
-      //setState(() {});
     }
 
     return current;

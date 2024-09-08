@@ -101,7 +101,6 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
     indexWidgetProvider.define(const LinkmanInfoWidget());
     indexWidgetProvider.define(const HtmlPreviewWidget());
     indexWidgetProvider.define(LinkmanWebrtcConnectionWidget());
-    indexWidgetProvider.define(groupEditWidget);
   }
 
   @override
