@@ -160,6 +160,10 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
           conferenceMembers.add(member.memberPeerId!);
         }
       }
+
+      if (!conferenceMembers.contains(myself.peerId)) {
+        conferenceMembers.insert(0, myself.peerId!);
+      }
       this.conferenceMembers.value = conferenceMembers;
       await _buildConferenceOwnerOptions();
     }
@@ -207,9 +211,6 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
   //会议成员显示和编辑界面，从所有的联系人中选择会议成员
   Widget _buildConferenceMembersWidget(BuildContext context) {
     var selector = Obx(() {
-      if (!conferenceMembers.value.contains(myself.peerId)) {
-        conferenceMembers.insert(0, myself.peerId!);
-      }
       return Container(
           padding: const EdgeInsets.symmetric(horizontal: 0.0),
           child: LinkmanGroupSearchWidget(

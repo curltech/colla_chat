@@ -43,6 +43,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(llmChatAddWidget);
     indexWidgetProvider.define(nearbyGroupAddWidget);
     indexWidgetProvider.define(faceGroupAddWidget);
+    indexWidgetProvider.define(groupEditWidget);
     indexWidgetProvider.define(conferenceEditWidget);
     indexWidgetProvider.define(anonymousConferenceEditWidget);
     //indexWidgetProvider.define(nfcLinkmanAddWidget);

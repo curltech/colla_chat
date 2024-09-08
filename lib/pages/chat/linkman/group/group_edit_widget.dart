@@ -102,7 +102,11 @@ class GroupEditWidget extends StatelessWidget with TileDataMixin {
           await groupMemberService.findPeerIdsByGroupId(current.peerId);
       current.participants = participants;
     }
+    if (!participants.contains(myself.peerId)) {
+      participants.insert(0, myself.peerId!);
+    }
     groupMembers.value = participants;
+
     await _buildGroupOwnerOptions();
   }
 
@@ -147,9 +151,6 @@ class GroupEditWidget extends StatelessWidget with TileDataMixin {
   //群成员显示和编辑界面
   Widget _buildGroupMembersWidget(BuildContext context) {
     var selector = Obx(() {
-      if (!groupMembers.value.contains(myself.peerId)) {
-        groupMembers.value.add(myself.peerId!);
-      }
       return Container(
           padding: const EdgeInsets.symmetric(horizontal: 0.0),
           child: LinkmanGroupSearchWidget(
