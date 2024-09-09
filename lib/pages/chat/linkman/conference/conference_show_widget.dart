@@ -129,7 +129,7 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
           List<Chip> chips = [];
           for (var option in options) {
             var chip = Chip(
-              label: CommonAutoSizeText(
+              label: Text(
                 option.label,
                 style: const TextStyle(color: Colors.black),
               ),
@@ -276,7 +276,7 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
                 },
               );
             }
-            return nil;
+            return nilBox;
           },
         )),
       ],
