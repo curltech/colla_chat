@@ -2,7 +2,7 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:flutter/widgets.dart';
 
 const String appName = 'CollaChat';
-const String appVersion = '1.6.1';
+const String appVersion = '1.7.0';
 const String appVendor = 'CurlTech';
 const String vendorUrl = 'curltech.io';
 const bool appDebug = true;
@@ -175,5 +175,3 @@ class AppImage {
 }
 
 const double dialogSizeIndex = 0.8;
-
-const String tencentMapKey = 'QFSBZ-ZTGCT-JS2XU-LERCR-ISRAQ-EEFJA';

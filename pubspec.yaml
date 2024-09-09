@@ -96,11 +96,19 @@ dependencies:
   alarm: ^3.1.2
   stacked_notification_cards: ^0.1.0-dev.5
   toastification: ^2.0.0
-  cupertino_icons: ^1.0.2
+  cupertino_icons: ^1.0.8 #CupertinoIcons.heart_fill
+  # Icon(AntDesign.gitlab_fill),Icon(Bootstrap.google),Icon(BoxIcons.bxl_apple),Brand(Brands.icons8)
+  # Icon(Clarity.map_outline_badged),Icon(EvaIcons.clipboard),Flag(Flags.india),Icon(FontAwesome.stripe_brand)
+  # Icon(HeroIcons.printer),Icon(Iconsax.cake_bold),Icon(IonIcons.bug),Icon(LineAwesome.amazon)
+  # Icon(MingCute.knife_line),Icon(OctIcons.code_of_conduct),Icon(PixelArtIcons.gif),Icon(TeenyIcons.google_play_store)
+  # Icon(ZondIcons.shield)
   icons_plus: ^5.0.0
   simple_icons: ^10.1.3 #icon: Icon(SimpleIcons.github)
-  fluttericon: ^2.0.0
-  flutter_animated_icons: ^1.0.0
+  fluttericon: ^2.0.0 #Icon(Typicons.attention), Icon(Fontelico.emo_wink), Icon(Linecons.globe)
+  unicons: ^3.0.0 #Icon(UniconsLine.camera),Icon(UniconsSolid.airplay)
+  flutter_animated_icons: ^1.0.1
+  flutter_material_design_icons: ^1.1.7447 #Icon(MdiIcons.abacus)
+  hugeicons: ^0.0.7 #HugeIcons.strokeRoundedHome01
   country_pickers: ^3.0.1
   country_picker: ^2.0.15
   font_awesome_flutter: ^10.1.0
@@ -303,7 +311,7 @@ dependencies:
   flutter_native_splash: ^2.2.19
   system_tray: ^2.0.3
   tray_manager: ^0.2.0
-  livekit_client: ^2.2.4 #livekit sfu server flutter client
+  livekit_client: ^2.2.5 #livekit sfu server flutter client
   livekit_server_sdk: ^1.0.0
   langchain: ^0.7.1
   langchain_ollama: ^0.3.0
