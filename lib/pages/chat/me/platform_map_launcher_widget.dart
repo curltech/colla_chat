@@ -36,7 +36,7 @@ class PlatformMapLauncherWidget extends StatelessWidget with TileDataMixin {
     try {
       maps.value = await GeolocatorUtil.installedMaps();
     } catch (e) {
-      logger.e('find installed maps failure:e');
+      logger.e('find installed maps failure:$e');
     }
   }
 
