@@ -222,7 +222,7 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
                 await _buildConferenceOwnerOptions();
               }
             },
-            selected: conferenceMembers,
+            selected: conferenceMembers.value,
             includeGroup: false,
           ));
     });
