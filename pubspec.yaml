@@ -355,7 +355,7 @@ dependency_overrides:
   geolocator: ^13.0.1
   flutter_inappwebview: ^6.0.0
   connectivity_plus: ^6.0.2
-  emoji_picker_flutter: ^2.2.0
+  emoji_picker_flutter: ^3.0.0
   webview_flutter: ^4.8.0
   webview_all: ^0.4.1
   webf: ^0.16.1
