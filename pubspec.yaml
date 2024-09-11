@@ -53,8 +53,8 @@ dependencies:
   camera_linux: ^0.0.8
   camera_web: ^0.3.1+4
   camera_macos: ^0.0.8
-  wechat_camera_picker: ^4.2.2 #移动平台，wechat_assets_picker的扩展，照相，录像
-  photo_manager: ^3.1.1 #移动平台，图像等媒体的抽象，wechat_assets_picker使用
+  wechat_camera_picker: ^4.3.2 #移动平台，wechat_assets_picker的扩展，照相，录像
+  photo_manager: ^3.3.0 #移动平台，图像等媒体的抽象，wechat_assets_picker使用
   screenshot: ^3.0.0
   no_screenshot: 0.2.0 #^0.3.1
   screenshot_callback: ^3.0.1
@@ -156,7 +156,7 @@ dependencies:
   flex_color_scheme: ^7.3.1
   file_selector: ^1.0.3
   filesystem_picker: ^4.1.0
-  wechat_assets_picker: ^9.1.0 #移动平台，选择图像，视频等媒体并展示
+  wechat_assets_picker: ^9.2.1 #移动平台，选择图像，视频等媒体并展示
   flutter_slidable: ^3.0.1 #滑动的按钮
   #下面是各种轮播图组件
   carousel_slider: ^5.0.0 #不错的类似swiper的组件 CarouselSlider

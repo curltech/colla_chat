@@ -100,12 +100,14 @@ class AssetUtil {
   ///根据数据存储Image到gallery
   static Future<AssetEntity?> saveAssetEntity(
     Uint8List data, {
+    required String filename,
     required String title,
     String? desc,
     String? relativePath,
   }) async {
     final AssetEntity? fileEntity = await PhotoManager.editor.saveImage(
       data,
+      filename: filename,
       title: title,
       desc: desc,
       relativePath: relativePath,
@@ -141,12 +143,16 @@ class AssetUtil {
 
   static Future<AssetEntity?> fromJson(Map json) async {
     var data = json['data'];
+    var filename = json['filename'];
     var originBytes = CryptoUtil.decodeBase64(data);
     var title = json['title'];
     var desc = json['desc'];
     var relativePath = json['relativePath'];
     AssetEntity? entry = await saveAssetEntity(originBytes,
-        title: title, desc: desc, relativePath: relativePath);
+        filename: filename,
+        title: title,
+        desc: desc,
+        relativePath: relativePath);
 
     return entry;
   }

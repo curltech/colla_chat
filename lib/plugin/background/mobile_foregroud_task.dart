@@ -23,9 +23,8 @@ class MobileForegroundTaskHandler extends TaskHandler {
     showNotification: true,
     playSound: false,
   );
-  ForegroundTaskOptions foregroundTaskOptions = const ForegroundTaskOptions(
-    interval: 5000,
-    isOnceEvent: false,
+  ForegroundTaskOptions foregroundTaskOptions = ForegroundTaskOptions(
+    eventAction: ForegroundTaskEventAction.repeat(5000),
     autoRunOnBoot: true,
     autoRunOnMyPackageReplaced: true,
     allowWakeLock: true,
