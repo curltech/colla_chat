@@ -4,6 +4,7 @@ import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/download_file_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/permission_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -11,6 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sherpa_onnx/sherpa_onnx.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class SherpaConfigUtil {
   static String? _sherpaModelInstallationPath;
@@ -107,6 +109,7 @@ class SherpaConfigUtil {
     }
     Directory dir = Directory(_sherpaModelInstallationPath!);
     if (!dir.existsSync()) {
+      await PermissionUtil.requestPermission(Permission.storage);
       dir.createSync(recursive: true);
     }
     List<FileSystemEntity> entities = dir.listSync();

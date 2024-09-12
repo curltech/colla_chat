@@ -14,8 +14,8 @@ import 'package:flutter/material.dart';
 
 class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
   //'sherpa-onnx-conformer-zh','sherpa-onnx-vits-zh-ll'
-  TextEditingController modelNameController = TextEditingController();
-  Function()? onDownloadComplete;
+  final TextEditingController modelNameController = TextEditingController();
+  final Function()? onDownloadComplete;
 
   SherpaInstallWidget({super.key, this.onDownloadComplete}) {
     checkSherpa();
@@ -33,14 +33,14 @@ class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'SherpaInstall';
 
-  ValueNotifier<bool> sherpaPresent = ValueNotifier<bool>(false);
-  ValueNotifier<DownloadProgress> downloadProgress =
+  final ValueNotifier<bool> sherpaPresent = ValueNotifier<bool>(false);
+  final ValueNotifier<DownloadProgress> downloadProgress =
       ValueNotifier<DownloadProgress>(DownloadProgress(
     downloaded: 0,
     fileSize: 0,
     phase: DownloadProgressPhase.inactive,
   ));
-  TextEditingController controller = TextEditingController();
+  final TextEditingController controller = TextEditingController();
 
   Future<bool> checkSherpa() async {
     sherpaPresent.value = await SherpaConfigUtil.initializeSherpaModel();
