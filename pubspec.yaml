@@ -80,7 +80,7 @@ dependencies:
   idb_shim: ^2.0.1
 
   #网络
-  dio: ^5.5.0+1
+  dio: ^5.7.0
   dio_http2_adapter: ^2.1.0
   telephony: #不再维护了
     git:
@@ -183,7 +183,7 @@ dependencies:
   simple_animations: ^5.0.2
   flutter_animate: ^4.2.0
   auto_animated: ^3.1.0 #对滚动视图内的元素定义动画
-  animations: ^2.0.7
+  animations: ^2.0.11
   animate_do: ^3.0.2
   animated_text_kit: ^4.2.1
   loading_indicator: ^3.1.1
@@ -258,7 +258,7 @@ dependencies:
   media_kit_video: ^1.2.4                        # For video rendering.
   media_kit_libs_video: ^1.0.4
   video_player_media_kit: ^1.0.5
-  just_audio: ^0.9.39
+  just_audio: ^0.9.40
   just_audio_windows: ^0.2.0
   just_audio_mpv: ^0.1.4
   just_waveform: ^0.0.4
@@ -308,7 +308,7 @@ dependencies:
   # awesome_notifications_fcm: ^0.9.2 #要付钱
   pull_to_refresh_notification: ^3.1.0
   intercom_flutter: ^9.0.1
-  flutter_native_splash: ^2.2.19
+  flutter_native_splash: ^2.4.1
   system_tray: ^2.0.3
   tray_manager: ^0.2.0
   livekit_client: ^2.2.5 #livekit sfu server flutter client
@@ -334,7 +334,7 @@ dependency_overrides:
   web_socket_client: ^0.1.2
   websocket_universal: ^1.2.5
   flutter_math_fork: ^0.7.1
-  share_plus: ^10.0.1
+  share_plus: ^10.0.2
   sensors_plus: ^6.0.1
   photo_view: ^0.15.0
   device_info_plus: ^10.1.0
@@ -356,7 +356,7 @@ dependency_overrides:
   flutter_inappwebview: ^6.0.0
   connectivity_plus: ^6.0.2
   emoji_picker_flutter: ^3.0.0
-  webview_flutter: ^4.8.0
+  webview_flutter: ^4.9.0
   webview_all: ^0.4.1
   webf: ^0.16.1
   webview_flutter_android: ^3.13.1
@@ -392,7 +392,7 @@ dependency_overrides:
   secure_application: ^4.0.1
   visibility_detector: ^0.4.0+2 #组建可见性的大小发生变化
   focus_detector: ^2.0.1 #组建在界面上消失或者出现
-  image_picker: ^1.1.1 #选取图库,移动从图像廊或者相机选，桌面实现采用file_selector，从文件系统选
+  image_picker: ^1.1.2 #选取图库,移动从图像廊或者相机选，桌面实现采用file_selector，从文件系统选
   markdown: ^7.1.1
   lottie: ^3.1.2
   flutter_quill: ^10.4.0
