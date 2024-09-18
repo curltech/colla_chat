@@ -1,7 +1,8 @@
-import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/plugin/talker_logger.dart' as logger;
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:livekit_client/livekit_client.dart';
 import 'package:synchronized/synchronized.dart';
 
 ///媒体控制器，内部是PeerMediaStream的集合，以流的id为key
@@ -87,7 +88,7 @@ class PeerMediaStreamController with ChangeNotifier {
             int i = 0;
             for (var peerMediaStream in [...peerMediaStreams]) {
               if (peerMediaStream.contain(streamId)) {
-                logger.w(
+                logger.logger.w(
                     'add peerMediaStream peerId:$peerId, streamId:$streamId is exist');
                 peerMediaStreams.removeAt(i);
                 break;
@@ -98,11 +99,53 @@ class PeerMediaStreamController with ChangeNotifier {
 
           peerMediaStreams.add(peerMediaStream);
         }
+      }
+    });
+
+    if (notify) {
+      notifyListeners();
+    }
+  }
+
+  addRemoteTrack(RemoteTrack track, RemoteParticipant remoteParticipant,
+      {bool notify = true}) async {
+    bool changed = false;
+    var peerId = remoteParticipant.identity;
+    if (_peerMediaStreams.containsKey(peerId)) {
+      List<PeerMediaStream>? pmss = _peerMediaStreams[peerId];
+      if (pmss != null) {
+        for (PeerMediaStream pms in pmss) {
+          if (pms.mediaStream == null) {
+            if (pms.videoTrack == null) {
+              if (track is RemoteVideoTrack) {
+                pms.videoTrack = track;
+                changed = true;
+                break;
+              }
+            }
+            if (pms.audioTrack == null) {
+              if (track is RemoteAudioTrack) {
+                pms.audioTrack = track;
+                changed = true;
+                break;
+              }
+            }
+          }
+        }
+      }
+      if (!changed) {
+        PeerMediaStream? peerMediaStream =
+            await PeerMediaStream.createRemotePeerMediaStream(
+                track, remoteParticipant);
+        if (peerMediaStream != null) {
+          add(peerMediaStream, notify: notify);
+        }
+      } else {
         if (notify) {
           notifyListeners();
         }
       }
-    });
+    }
   }
 
   ///移除媒体流，如果是当前媒体流，则设置当前的媒体流为null，激活remove事件
@@ -128,6 +171,61 @@ class PeerMediaStreamController with ChangeNotifier {
       }
       return false;
     });
+  }
+
+  removeRemoteTrack(RemoteTrack track, RemoteParticipant remoteParticipant,
+      {bool notify = true}) async {
+    bool changed = false;
+    var peerId = remoteParticipant.identity;
+    if (_peerMediaStreams.containsKey(peerId)) {
+      List<PeerMediaStream>? pmss = _peerMediaStreams[peerId];
+      if (pmss != null) {
+        PeerMediaStream? delete;
+        for (PeerMediaStream pms in pmss) {
+          if (pms.mediaStream == null) {
+            if (pms.videoTrack != null) {
+              if (track is RemoteVideoTrack) {
+                if (pms.videoTrack!.getCid() == track.getCid()) {
+                  pms.videoTrack!.stop();
+                  pms.videoTrack!.dispose();
+                  pms.videoTrack = null;
+                  changed = true;
+                }
+              }
+            }
+            if (pms.audioTrack != null) {
+              if (track is RemoteAudioTrack) {
+                if (pms.audioTrack!.getCid() == track.getCid()) {
+                  pms.audioTrack!.stop();
+                  pms.audioTrack!.dispose();
+                  pms.audioTrack = null;
+                  changed = true;
+                }
+              }
+            }
+          }
+          if (pms.mediaStream == null &&
+              pms.videoTrack == null &&
+              pms.audioTrack == null) {
+            delete = pms;
+          }
+          if (changed) {
+            break;
+          }
+        }
+        if (delete != null) {
+          pmss.remove(delete);
+          if (pmss.isEmpty) {
+            _peerMediaStreams.remove(peerId);
+          }
+        }
+      }
+      if (changed) {
+        if (notify) {
+          notifyListeners();
+        }
+      }
+    }
   }
 
   Future<void> removeAll({String? peerId, bool notify = true}) async {

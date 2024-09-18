@@ -185,6 +185,29 @@ class PeerMediaStream {
         videoTrack: localVideo, platformParticipant: platformParticipant);
   }
 
+  static Future<PeerMediaStream?> createRemotePeerMediaStream(
+      RemoteTrack track, RemoteParticipant remoteParticipant) async {
+    String identity = remoteParticipant.identity;
+    String name = remoteParticipant.name;
+    PlatformParticipant platformParticipant =
+        PlatformParticipant(identity, name: name);
+    PeerMediaStream? peerMediaStream;
+    if (track is RemoteVideoTrack) {
+      peerMediaStream = PeerMediaStream(
+          videoTrack: track,
+          platformParticipant: platformParticipant,
+          participant: remoteParticipant);
+    }
+    if (track is RemoteAudioTrack) {
+      peerMediaStream = PeerMediaStream(
+          audioTrack: track,
+          platformParticipant: platformParticipant,
+          participant: remoteParticipant);
+    }
+
+    return peerMediaStream;
+  }
+
   bool get audio {
     bool a = false;
     if (mediaStream != null) {

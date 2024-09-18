@@ -57,7 +57,6 @@ class LiveKitRoomClient {
     return e2eeOptions;
   }
 
-
   Future<RoomOptions> _buildRoomOptions() async {
     E2EEOptions? e2eeOptions = await _buildE2EEOptions();
     RoomOptions roomOptions = RoomOptions(
@@ -573,11 +572,8 @@ class LiveKitConferenceClient {
       if (remoteTrack == null) {
         continue;
       }
-      PeerMediaStream? peerMediaStream =
-          await _buildRemotePeerMediaStream(remoteTrack, remoteParticipant);
-      if (peerMediaStream != null) {
-        remotePeerMediaStreamController.add(peerMediaStream, notify: false);
-      }
+      remotePeerMediaStreamController
+          .addRemoteTrack(remoteTrack, remoteParticipant, notify: false);
     }
     for (RemoteTrackPublication<RemoteVideoTrack> videoTrack
         in remoteParticipant.videoTrackPublications) {
@@ -585,15 +581,10 @@ class LiveKitConferenceClient {
       if (remoteTrack == null) {
         continue;
       }
-      PeerMediaStream? peerMediaStream =
-          await _buildRemotePeerMediaStream(remoteTrack, remoteParticipant);
-      if (peerMediaStream != null) {
-        remotePeerMediaStreamController.add(peerMediaStream, notify: false);
-      }
+      remotePeerMediaStreamController
+          .addRemoteTrack(remoteTrack, remoteParticipant, notify: false);
     }
-    if (notify) {
-      remotePeerMediaStreamController.notifyListeners();
-    }
+    remotePeerMediaStreamController.notifyListeners();
   }
 
   Future<void> removeRemoteParticipant(
@@ -614,29 +605,6 @@ class LiveKitConferenceClient {
     remotePeerMediaStreamController.notifyListeners();
   }
 
-  Future<PeerMediaStream?> _buildRemotePeerMediaStream(
-      RemoteTrack track, RemoteParticipant remoteParticipant) async {
-    String identity = remoteParticipant.identity;
-    String name = remoteParticipant.name;
-    PlatformParticipant platformParticipant =
-        PlatformParticipant(identity, name: name);
-    PeerMediaStream? peerMediaStream;
-    if (track is RemoteVideoTrack) {
-      peerMediaStream = PeerMediaStream(
-          videoTrack: track,
-          platformParticipant: platformParticipant,
-          participant: remoteParticipant);
-    }
-    if (track is RemoteAudioTrack) {
-      peerMediaStream = PeerMediaStream(
-          audioTrack: track,
-          platformParticipant: platformParticipant,
-          participant: remoteParticipant);
-    }
-
-    return peerMediaStream;
-  }
-
   /// 远程视频或者音频流的加入
   Future<FutureOr<void>> _onTrackSubscribedEvent(
       TrackSubscribedEvent event) async {
@@ -648,13 +616,9 @@ class LiveKitConferenceClient {
       RemoteParticipant remoteParticipant = event.participant;
       String identity = remoteParticipant.identity;
       String name = remoteParticipant.name;
-      PeerMediaStream? peerMediaStream =
-          await _buildRemotePeerMediaStream(track, remoteParticipant);
-      if (peerMediaStream != null) {
-        remotePeerMediaStreamController.add(peerMediaStream);
-        log.logger.i(
-            'peerId:$identity, name:$name streamId:$streamId remote peerMediaStream is added');
-      }
+      remotePeerMediaStreamController.addRemoteTrack(track, remoteParticipant);
+      log.logger.i(
+          'peerId:$identity, name:$name streamId:$streamId remote peerMediaStream is added');
     } else {
       log.logger.e('on TrackSubscribedEvent track is null');
     }
@@ -667,13 +631,7 @@ class LiveKitConferenceClient {
     String peerId = event.participant.identity;
     RemoteTrack? track = event.publication.track;
     if (track != null) {
-      List<PeerMediaStream> peerMediaStreams =
-          remotePeerMediaStreamController.getPeerMediaStreams(peerId).toList();
-      if (peerMediaStreams.isNotEmpty) {
-        for (var peerMediaStream in peerMediaStreams) {
-          remotePeerMediaStreamController.close(peerMediaStream);
-        }
-      }
+      remotePeerMediaStreamController.removeRemoteTrack(track, event.participant);
     }
   }
 
@@ -684,13 +642,7 @@ class LiveKitConferenceClient {
     String peerId = event.participant.identity;
     RemoteTrack? track = event.publication.track;
     if (track != null) {
-      List<PeerMediaStream> peerMediaStreams =
-          remotePeerMediaStreamController.getPeerMediaStreams(peerId).toList();
-      if (peerMediaStreams.isNotEmpty) {
-        for (var peerMediaStream in peerMediaStreams) {
-          remotePeerMediaStreamController.close(peerMediaStream);
-        }
-      }
+      remotePeerMediaStreamController.removeRemoteTrack(track, event.participant);
     }
   }
 
