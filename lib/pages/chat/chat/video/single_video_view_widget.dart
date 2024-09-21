@@ -320,7 +320,10 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
                 onPressed: () {
                   swiperController.next();
                 },
-                icon: const Icon(size: 36.0, Icons.navigate_next_outlined),
+                icon: const Icon(
+                    size: 36.0,
+                    color: Colors.white,
+                    Icons.navigate_next_outlined),
               ))));
     }
     return Container(

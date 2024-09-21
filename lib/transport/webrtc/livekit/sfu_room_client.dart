@@ -393,6 +393,7 @@ class LiveKitRoomClient {
 
 /// 会议客户端，包含有房间客户端和会议的消息控制器
 class LiveKitConferenceClient {
+  final key = UniqueKey();
   final LiveKitRoomClient roomClient;
   final PeerMediaStreamController remotePeerMediaStreamController =
       PeerMediaStreamController();
@@ -572,7 +573,7 @@ class LiveKitConferenceClient {
       if (remoteTrack == null) {
         continue;
       }
-      remotePeerMediaStreamController
+      await remotePeerMediaStreamController
           .addRemoteTrack(remoteTrack, remoteParticipant, notify: false);
     }
     for (RemoteTrackPublication<RemoteVideoTrack> videoTrack
@@ -581,10 +582,12 @@ class LiveKitConferenceClient {
       if (remoteTrack == null) {
         continue;
       }
-      remotePeerMediaStreamController
+      await remotePeerMediaStreamController
           .addRemoteTrack(remoteTrack, remoteParticipant, notify: false);
     }
-    remotePeerMediaStreamController.notifyListeners();
+    if (notify) {
+      remotePeerMediaStreamController.notifyListeners();
+    }
   }
 
   Future<void> removeRemoteParticipant(
@@ -616,7 +619,7 @@ class LiveKitConferenceClient {
       RemoteParticipant remoteParticipant = event.participant;
       String identity = remoteParticipant.identity;
       String name = remoteParticipant.name;
-      remotePeerMediaStreamController.addRemoteTrack(track, remoteParticipant);
+      await remotePeerMediaStreamController.addRemoteTrack(track, remoteParticipant);
       log.logger.i(
           'peerId:$identity, name:$name streamId:$streamId remote peerMediaStream is added');
     } else {
@@ -631,7 +634,8 @@ class LiveKitConferenceClient {
     String peerId = event.participant.identity;
     RemoteTrack? track = event.publication.track;
     if (track != null) {
-      remotePeerMediaStreamController.removeRemoteTrack(track, event.participant);
+      await remotePeerMediaStreamController.removeRemoteTrack(
+          track, event.participant);
     }
   }
 
@@ -642,7 +646,8 @@ class LiveKitConferenceClient {
     String peerId = event.participant.identity;
     RemoteTrack? track = event.publication.track;
     if (track != null) {
-      remotePeerMediaStreamController.removeRemoteTrack(track, event.participant);
+      await remotePeerMediaStreamController.removeRemoteTrack(
+          track, event.participant);
     }
   }
 

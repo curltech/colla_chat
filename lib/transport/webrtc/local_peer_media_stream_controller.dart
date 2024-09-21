@@ -10,6 +10,8 @@ import 'package:synchronized/synchronized.dart';
 ///前者代表本地的视频和音频的总共只能有一个，屏幕共享和媒体播放可以有多个
 ///后者代表远程的视频，包含所有的远程视频流的PeerMediaStream
 class PeerMediaStreamController with ChangeNotifier {
+  final key = UniqueKey();
+
   //当前选择的界面渲染器
   String? _currentPeerId;
 
@@ -74,35 +76,32 @@ class PeerMediaStreamController with ChangeNotifier {
     return streams;
   }
 
-  ///如果不存在，增加peerMediaStream，激活add事件
-  add(PeerMediaStream peerMediaStream, {bool notify = true}) async {
-    await _streamLock.synchronized(() {
-      var peerId = peerMediaStream.platformParticipant?.peerId;
-      if (peerId != null) {
-        String streamId = peerMediaStream.id!;
-        if (!_peerMediaStreams.containsKey(peerId)) {
-          _peerMediaStreams[peerId] = [peerMediaStream];
-        } else {
-          List<PeerMediaStream> peerMediaStreams = _peerMediaStreams[peerId]!;
-          if (peerMediaStreams.isNotEmpty) {
-            int i = 0;
-            for (var peerMediaStream in [...peerMediaStreams]) {
-              if (peerMediaStream.contain(streamId)) {
-                logger.logger.w(
-                    'add peerMediaStream peerId:$peerId, streamId:$streamId is exist');
-                peerMediaStreams.removeAt(i);
-                break;
-              }
-              i++;
-            }
-          }
+  _add(PeerMediaStream peerMediaStream) async {
+    var peerId = peerMediaStream.platformParticipant?.peerId;
+    if (peerId != null) {
+      if (!_peerMediaStreams.containsKey(peerId)) {
+        _peerMediaStreams[peerId] = [peerMediaStream];
 
+        return true;
+      } else {
+        List<PeerMediaStream> peerMediaStreams = _peerMediaStreams[peerId]!;
+        if (!peerMediaStreams.contains(peerMediaStream)) {
           peerMediaStreams.add(peerMediaStream);
+          return true;
         }
       }
+    }
+
+    return false;
+  }
+
+  /// 如果不存在，增加peerMediaStream，激活add事件
+  add(PeerMediaStream peerMediaStream, {bool notify = true}) async {
+    bool success = await _streamLock.synchronized(() async {
+      return await _add(peerMediaStream);
     });
 
-    if (notify) {
+    if (success && notify) {
       notifyListeners();
     }
   }
@@ -111,39 +110,37 @@ class PeerMediaStreamController with ChangeNotifier {
       {bool notify = true}) async {
     bool changed = false;
     var peerId = remoteParticipant.identity;
-    if (_peerMediaStreams.containsKey(peerId)) {
-      List<PeerMediaStream>? pmss = _peerMediaStreams[peerId];
-      if (pmss != null) {
-        for (PeerMediaStream pms in pmss) {
-          if (pms.mediaStream == null) {
-            if (pms.videoTrack == null) {
-              if (track is RemoteVideoTrack) {
-                pms.videoTrack = track;
-                changed = true;
-                break;
-              }
+    List<PeerMediaStream>? pmss = _peerMediaStreams[peerId];
+    if (pmss != null) {
+      for (PeerMediaStream pms in pmss) {
+        if (pms.mediaStream == null) {
+          if (pms.videoTrack == null) {
+            if (track is RemoteVideoTrack) {
+              pms.videoTrack = track;
+              changed = true;
+              break;
             }
-            if (pms.audioTrack == null) {
-              if (track is RemoteAudioTrack) {
-                pms.audioTrack = track;
-                changed = true;
-                break;
-              }
+          }
+          if (pms.audioTrack == null) {
+            if (track is RemoteAudioTrack) {
+              pms.audioTrack = track;
+              changed = true;
+              break;
             }
           }
         }
       }
-      if (!changed) {
-        PeerMediaStream? peerMediaStream =
-            await PeerMediaStream.createRemotePeerMediaStream(
-                track, remoteParticipant);
-        if (peerMediaStream != null) {
-          add(peerMediaStream, notify: notify);
-        }
-      } else {
-        if (notify) {
-          notifyListeners();
-        }
+    }
+    if (!changed) {
+      PeerMediaStream? peerMediaStream =
+          await PeerMediaStream.createRemotePeerMediaStream(
+              track, remoteParticipant);
+      if (peerMediaStream != null) {
+        await add(peerMediaStream, notify: notify);
+      }
+    } else {
+      if (notify) {
+        notifyListeners();
       }
     }
   }
@@ -177,53 +174,52 @@ class PeerMediaStreamController with ChangeNotifier {
       {bool notify = true}) async {
     bool changed = false;
     var peerId = remoteParticipant.identity;
-    if (_peerMediaStreams.containsKey(peerId)) {
-      List<PeerMediaStream>? pmss = _peerMediaStreams[peerId];
-      if (pmss != null) {
-        PeerMediaStream? delete;
-        for (PeerMediaStream pms in pmss) {
-          if (pms.mediaStream == null) {
-            if (pms.videoTrack != null) {
-              if (track is RemoteVideoTrack) {
-                if (pms.videoTrack!.getCid() == track.getCid()) {
-                  pms.videoTrack!.stop();
-                  pms.videoTrack!.dispose();
-                  pms.videoTrack = null;
-                  changed = true;
-                }
-              }
-            }
-            if (pms.audioTrack != null) {
-              if (track is RemoteAudioTrack) {
-                if (pms.audioTrack!.getCid() == track.getCid()) {
-                  pms.audioTrack!.stop();
-                  pms.audioTrack!.dispose();
-                  pms.audioTrack = null;
-                  changed = true;
-                }
+    List<PeerMediaStream>? pmss = _peerMediaStreams[peerId];
+
+    if (pmss != null) {
+      PeerMediaStream? delete;
+      for (PeerMediaStream pms in pmss) {
+        if (pms.mediaStream == null) {
+          if (pms.videoTrack != null) {
+            if (track is RemoteVideoTrack) {
+              if (pms.videoTrack!.getCid() == track.getCid()) {
+                pms.videoTrack!.stop();
+                pms.videoTrack!.dispose();
+                pms.videoTrack = null;
+                changed = true;
               }
             }
           }
-          if (pms.mediaStream == null &&
-              pms.videoTrack == null &&
-              pms.audioTrack == null) {
-            delete = pms;
-          }
-          if (changed) {
-            break;
+          if (pms.audioTrack != null) {
+            if (track is RemoteAudioTrack) {
+              if (pms.audioTrack!.getCid() == track.getCid()) {
+                pms.audioTrack!.stop();
+                pms.audioTrack!.dispose();
+                pms.audioTrack = null;
+                changed = true;
+              }
+            }
           }
         }
-        if (delete != null) {
-          pmss.remove(delete);
-          if (pmss.isEmpty) {
-            _peerMediaStreams.remove(peerId);
-          }
+        if (pms.mediaStream == null &&
+            pms.videoTrack == null &&
+            pms.audioTrack == null) {
+          delete = pms;
+        }
+        if (changed) {
+          break;
         }
       }
-      if (changed) {
-        if (notify) {
-          notifyListeners();
+      if (delete != null) {
+        pmss.remove(delete);
+        if (pmss.isEmpty) {
+          _peerMediaStreams.remove(peerId);
         }
+      }
+    }
+    if (changed) {
+      if (notify) {
+        notifyListeners();
       }
     }
   }
