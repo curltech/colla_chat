@@ -206,7 +206,7 @@ dependencies:
   xml: ^6.0.1
   mime: ^1.0.2
   keyboard_actions: ^4.2.0
-  synchronized: ^3.1.0
+  synchronized: ^3.3.0+2
   flutter_smart_dialog: ^4.9.4
   json_annotation: ^4.3.0
   provider: ^6.0.1 #状态管理
