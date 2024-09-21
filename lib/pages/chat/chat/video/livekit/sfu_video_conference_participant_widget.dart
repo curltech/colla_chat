@@ -99,32 +99,40 @@ class SfuVideoConferenceParticipantWidget extends StatelessWidget
             return nil;
           }
           List<Widget> children = [];
-          children.add(CommonAutoSizeText('name:${participant.name}'));
           children.add(CommonAutoSizeText(
-              'connectionQuality:${participant.connectionQuality}'));
-          children.add(CommonAutoSizeText('joinedAt:${participant.joinedAt}'));
-          children.add(CommonAutoSizeText('identity:${participant.identity}'));
-          children
-              .add(CommonAutoSizeText('audioLevel:${participant.audioLevel}'));
+              '${AppLocalizations.t('name')}:${participant.name}'));
           children.add(CommonAutoSizeText(
-              'firstTrackEncryptionType:${participant.firstTrackEncryptionType}'));
-          children.add(CommonAutoSizeText('hasAudio:${participant.hasAudio}'));
-          children.add(CommonAutoSizeText('hashCode:${participant.hashCode}'));
-          children.add(CommonAutoSizeText('hasVideo:${participant.hasVideo}'));
-          children.add(
-              CommonAutoSizeText('isEncrypted:${participant.isEncrypted}'));
-          children.add(CommonAutoSizeText('isMuted:${participant.isMuted}'));
-          children.add(
-              CommonAutoSizeText('lastSpokeAt:${participant.lastSpokeAt}'));
-          children.add(
-              CommonAutoSizeText('permissions:${participant.permissions}'));
-          children.add(CommonAutoSizeText('sid:${participant.sid}'));
+              '${AppLocalizations.t('connectionQuality')}:${participant.connectionQuality}'));
           children.add(CommonAutoSizeText(
-              'isCameraEnabled:${participant.isCameraEnabled()}'));
+              '${AppLocalizations.t('joinedAt')}:${participant.joinedAt}'));
           children.add(CommonAutoSizeText(
-              'isMicrophoneEnabled:${participant.isMicrophoneEnabled()}'));
+              '${AppLocalizations.t('identity')}:${participant.identity}'));
           children.add(CommonAutoSizeText(
-              'isScreenShareEnabled:${participant.isScreenShareEnabled()}'));
+              '${AppLocalizations.t('audioLevel')}:${participant.audioLevel}'));
+          children.add(CommonAutoSizeText(
+              '${AppLocalizations.t('firstTrackEncryptionType')}:${participant.firstTrackEncryptionType}'));
+          children.add(CommonAutoSizeText(
+              '${AppLocalizations.t('hasAudio')}:${participant.hasAudio}'));
+          children.add(CommonAutoSizeText(
+              '${AppLocalizations.t('hashCode')}:${participant.hashCode}'));
+          children.add(CommonAutoSizeText(
+              '${AppLocalizations.t('hasVideo')}:${participant.hasVideo}'));
+          children.add(CommonAutoSizeText(
+              '${AppLocalizations.t('isEncrypted')}:${participant.isEncrypted}'));
+          children.add(CommonAutoSizeText(
+              '${AppLocalizations.t('isMuted')}:${participant.isMuted}'));
+          children.add(CommonAutoSizeText(
+              '${AppLocalizations.t('lastSpokeAt')}:${participant.lastSpokeAt}'));
+          children.add(CommonAutoSizeText(
+              '${AppLocalizations.t('permissions')}:${participant.permissions}'));
+          children.add(CommonAutoSizeText(
+              '${AppLocalizations.t('sid')}:${participant.sid}'));
+          children.add(CommonAutoSizeText(
+              '${AppLocalizations.t('isCameraEnabled')}:${participant.isCameraEnabled()}'));
+          children.add(CommonAutoSizeText(
+              '${AppLocalizations.t('isMicrophoneEnabled')}:${participant.isMicrophoneEnabled()}'));
+          children.add(CommonAutoSizeText(
+              '${AppLocalizations.t('isScreenShareEnabled')}:${participant.isScreenShareEnabled()}'));
           // children.add(SfuParticipantStatsWidget(
           //   participant: participant,
           // ));

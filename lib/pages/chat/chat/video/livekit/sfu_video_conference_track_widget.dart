@@ -103,9 +103,9 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
             : const Icon(
                 Icons.audiotrack_outlined,
               ),
-        title: 'streamId:$streamId',
+        title: streamId,
         titleTail: platformParams.desktop ? ownerTag : null,
-        subtitle: 'trackId:$trackId',
+        subtitle: trackId,
         isThreeLine: false,
         onTap: (int index, String title, {String? subtitle}) {},
       );
@@ -156,26 +156,33 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
             return nil;
           }
           List<Widget> children = [];
-          children.add(CommonAutoSizeText('name:${trackPublication.name}'));
           children.add(CommonAutoSizeText(
-              'encryptionType:${trackPublication.encryptionType}'));
+              '${AppLocalizations.t('name')}:${trackPublication.name}'));
           children.add(CommonAutoSizeText(
-              'isScreenShare:${trackPublication.isScreenShare}'));
-          children
-              .add(CommonAutoSizeText('mimeType:${trackPublication.mimeType}'));
-          children.add(CommonAutoSizeText('muted:${trackPublication.muted}'));
+              '${AppLocalizations.t('encryptionType')}:${trackPublication.encryptionType}'));
           children.add(CommonAutoSizeText(
-              'simulcasted:${trackPublication.simulcasted}'));
-          children.add(
-              CommonAutoSizeText('subscribed:${trackPublication.subscribed}'));
+              '${AppLocalizations.t('isScreenShare')}:${trackPublication.isScreenShare}'));
+          children.add(CommonAutoSizeText(
+              '${AppLocalizations.t('mimeType')}:${trackPublication.mimeType}'));
+          children.add(CommonAutoSizeText(
+              '${AppLocalizations.t('muted')}:${trackPublication.muted}'));
+          children.add(CommonAutoSizeText(
+              '${AppLocalizations.t('simulcasted')}:${trackPublication.simulcasted}'));
+          children.add(CommonAutoSizeText(
+              '${AppLocalizations.t('subscribed')}:${trackPublication.subscribed}'));
 
           livekit_client.Track? track = trackPublication.track;
           if (track != null) {
-            children.add(CommonAutoSizeText('sid:${track.sid}'));
-            children.add(CommonAutoSizeText('kind:${track.kind}'));
-            children.add(CommonAutoSizeText('muted:${track.muted}'));
-            children.add(CommonAutoSizeText('isActive:${track.isActive}'));
-            children.add(CommonAutoSizeText('mediaType:${track.mediaType}'));
+            children.add(CommonAutoSizeText(
+                '${AppLocalizations.t('sid')}:${track.sid}'));
+            children.add(CommonAutoSizeText(
+                '${AppLocalizations.t('kind')}:${track.kind}'));
+            children.add(CommonAutoSizeText(
+                '${AppLocalizations.t('muted')}:${track.muted}'));
+            children.add(CommonAutoSizeText(
+                '${AppLocalizations.t('isActive')}:${track.isActive}'));
+            children.add(CommonAutoSizeText(
+                '${AppLocalizations.t('mediaType')}:${track.mediaType}'));
           }
           return ListView(
             children: children,
