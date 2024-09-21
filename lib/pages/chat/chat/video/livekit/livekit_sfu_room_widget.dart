@@ -4,7 +4,6 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -80,18 +79,26 @@ class LiveKitSfuRoomWidget extends StatelessWidget with TileDataMixin {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('host:${liveKitManageRoom.host ?? ''}'),
-                  Text('maxParticipants:${liveKitManageRoom.maxParticipants}'),
-                  Text('identities:${liveKitManageRoom.identities ?? []}'),
-                  Text('names:${liveKitManageRoom.names ?? []}'),
-                  Text('tokens:${liveKitManageRoom.tokens ?? []}'),
-                  Text('name:${room.name ?? ''}'),
                   Text(
-                      'creationTime:${room.creationTime?.toIso8601String() ?? ''}'),
-                  Text('turnPassword:${room.turnPassword ?? ''}'),
-                  Text('sid:${room.sid ?? ''}'),
-                  Text('emptyTimeout:${room.emptyTimeout?.toString() ?? ''}'),
-                  Text('enabledCodecs:${room.enabledCodecs ?? []}'),
+                      '${AppLocalizations.t('host')}:${liveKitManageRoom.host ?? ''}'),
+                  Text(
+                      '${AppLocalizations.t('maxParticipants')}:${liveKitManageRoom.maxParticipants}'),
+                  Text(
+                      '${AppLocalizations.t('identities')}:${liveKitManageRoom.identities ?? []}'),
+                  Text(
+                      '${AppLocalizations.t('names')}:${liveKitManageRoom.names ?? []}'),
+                  Text(
+                      '${AppLocalizations.t('tokens')}:${liveKitManageRoom.tokens ?? []}'),
+                  Text('${AppLocalizations.t('name')}:${room.name ?? ''}'),
+                  Text(
+                      '${AppLocalizations.t('creationTime')}:${room.creationTime?.toIso8601String() ?? ''}'),
+                  Text(
+                      '${AppLocalizations.t('turnPassword')}:${room.turnPassword ?? ''}'),
+                  Text('${AppLocalizations.t('sid')}:${room.sid ?? ''}'),
+                  Text(
+                      '${AppLocalizations.t('emptyTimeout')}:${room.emptyTimeout?.toString() ?? ''}'),
+                  Text(
+                      '${AppLocalizations.t('enabledCodecs')}:${room.enabledCodecs ?? []}'),
                 ],
               )));
     });
