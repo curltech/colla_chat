@@ -24,11 +24,29 @@ class VideoChatMessage extends StatelessWidget {
   final bool isMyself;
   final ChatMessage chatMessage;
 
-  const VideoChatMessage(
+  VideoChatMessage(
       {super.key,
       required this.isMyself,
       this.fullScreen = false,
-      required this.chatMessage});
+      required this.chatMessage}) {
+    _buildConference();
+  }
+
+  _buildConference() {
+    String? content = chatMessage.content;
+    if (content != null) {
+      content = chatMessageService.recoverContent(content);
+    }
+
+    Map<String, dynamic> map = JsonUtil.toJson(content);
+    Conference conference = Conference.fromJson(map);
+    bool valid = conferenceService.isValid(conference);
+    if (!valid) {
+      String conferenceId = chatMessage.messageId!;
+      p2pConferenceClientPool.terminate(conferenceId: conferenceId);
+    }
+    conferenceNotifier.value = conference;
+  }
 
   _join(BuildContext context) async {
     ChatSummary? chatSummary = chatMessageController.chatSummary;
@@ -63,24 +81,16 @@ class VideoChatMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var title = chatMessage.title;
-    String? content = chatMessage.content;
-    if (content != null) {
-      content = chatMessageService.recoverContent(content);
+    Conference? conference = conferenceNotifier.value;
+    if (conference == null) {
+      return Container();
     }
-
-    Map<String, dynamic> map = JsonUtil.toJson(content);
-    Conference conference = Conference.fromJson(map);
     bool valid = conferenceService.isValid(conference);
-    if (!valid) {
-      String conferenceId = chatMessage.messageId!;
-      p2pConferenceClientPool.terminate(conferenceId: conferenceId);
-    }
     var video = conference.video
         ? ChatMessageContentType.video.name
         : ChatMessageContentType.audio.name;
     Widget actionWidget;
     if (fullScreen) {
-      conferenceNotifier.value = conference;
       actionWidget = ConferenceShowWidget(hasTitle: false);
 
       return Card(
