@@ -15,6 +15,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 
@@ -83,7 +84,7 @@ class VideoChatMessage extends StatelessWidget {
     var title = chatMessage.title;
     Conference? conference = conferenceNotifier.value;
     if (conference == null) {
-      return Container();
+      return nilBox;
     }
     bool valid = conferenceService.isValid(conference);
     var video = conference.video

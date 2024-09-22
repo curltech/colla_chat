@@ -105,7 +105,7 @@ class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {
               tooltip: AppLocalizations.t('Local'),
             );
           }
-          return nil;
+          return nilBox;
         },
       );
       rightWidgets.add(local);
