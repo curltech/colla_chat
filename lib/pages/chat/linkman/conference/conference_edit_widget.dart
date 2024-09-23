@@ -151,8 +151,9 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
     if (current == null) {
       return;
     }
-    if (current.id != null) {
-      List<String> conferenceMembers = [];
+
+    List<String> conferenceMembers = [];
+    if (current.conferenceId.isNotEmpty) {
       List<GroupMember> members =
           await groupMemberService.findByGroupId(current.conferenceId);
       if (members.isNotEmpty) {
@@ -160,13 +161,13 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
           conferenceMembers.add(member.memberPeerId!);
         }
       }
-
-      if (!conferenceMembers.contains(myself.peerId)) {
-        conferenceMembers.insert(0, myself.peerId!);
-      }
-      this.conferenceMembers.value = conferenceMembers;
-      await _buildConferenceOwnerOptions();
     }
+
+    if (!conferenceMembers.contains(myself.peerId)) {
+      conferenceMembers.insert(0, myself.peerId!);
+    }
+    this.conferenceMembers.value = conferenceMembers;
+    await _buildConferenceOwnerOptions();
   }
 
   //更新ConferenceOwnerOptions，从会议成员中选择
@@ -347,9 +348,10 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
         backgroundColor: myself.primary, elevation: 10.0);
     var formInputWidget = Obx(() {
       var conference = conferenceNotifier.value;
-      if (conference != null) {
-        formInputController.setValues(JsonUtil.toJson(conference));
+      if (conference == null) {
+        return nilBox;
       }
+      formInputController.setValues(JsonUtil.toJson(conference));
       List<FormButton> formButtons = [
         FormButton(
             label: 'Ok',
@@ -362,7 +364,7 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
               }
             })
       ];
-      if (conference!.conferenceOwnerPeerId == myself.peerId) {
+      if (conference.conferenceOwnerPeerId == myself.peerId) {
         formButtons.add(FormButton(
             label: 'Qrcode',
             onTap: (Map<String, dynamic> values) async {
