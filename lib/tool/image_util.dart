@@ -295,7 +295,7 @@ class ImageUtil {
     String? path,
     CompressMode mode = CompressMode.LARGE2SMALL,
     int quality = 80,
-    int step = 6,
+    int step = 1,
     bool autoRatio = true,
   }) async {
     File? imageFile = File(filename);
@@ -442,9 +442,9 @@ class ImageUtil {
     if (xfile != null) {
       int length = await xfile.length();
       if (length > 10240) {
-        double quality = 10240 * 100 / length;
+        // double quality = 10240 * 100 / length;
         String? filename = await compress(
-            filename: xfile.path, path: dir.path, quality: quality.toInt());
+            filename: xfile.path, path: dir.path);
         avatar = await FileUtil.readFileAsBytes(filename!);
       } else {
         avatar = await xfile.readAsBytes();
@@ -454,14 +454,13 @@ class ImageUtil {
       String? mimeType = await assetEntity.mimeTypeAsync;
       Uint8List? avatar = await assetEntity.originBytes;
       if (avatar != null && avatar.length > 10240) {
-        double quality = 10240 * 100 / avatar.length;
+        // double quality = 10240 * 100 / avatar.length;
         mimeType = FileUtil.subMimeType(mimeType!);
         mimeType = mimeType ?? 'jpeg';
         CompressFormat? format =
             StringUtil.enumFromString(CompressFormat.values, mimeType);
         format = format ?? CompressFormat.jpeg;
-        avatar = await compressWithList(avatar,
-            quality: quality.toInt(), format: format);
+        avatar = await compressWithList(avatar, format: format);
 
         return avatar;
       }
