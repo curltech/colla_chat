@@ -345,13 +345,15 @@ class ConferenceService extends GeneralBaseService<Conference> {
       if (old != null) {
         conference.id = old.id;
         conference.createDate = old.createDate;
-        if (old.sfuToken != null && conference.sfuToken == null) {
+        if (old.sfuToken != null && old.sfuToken!.isNotEmpty) {
           conference.sfuToken = old.sfuToken;
         }
+        await update(conference);
       } else {
         conference.id = null;
+        await insert(conference);
       }
-      await upsert(conference);
+
       var conferenceId = conference.conferenceId;
       var participants = conference.participants;
       if (participants == null || participants.isEmpty) {
