@@ -268,9 +268,11 @@ class GroupEditWidget extends StatelessWidget with TileDataMixin {
     var formInputWidget = ValueListenableBuilder(
         valueListenable: groupNotifier,
         builder: (BuildContext context, Group? group, Widget? child) {
-          if (group != null) {
-            formInputController.setValues(JsonUtil.toJson(group));
+          if (group == null) {
+            return nilBox;
           }
+
+          formInputController.setValues(JsonUtil.toJson(group));
           return FormInputWidget(
             height: appDataProvider.portraitSize.height * 0.5,
             spacing: 5.0,
