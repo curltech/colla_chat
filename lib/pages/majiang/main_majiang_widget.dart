@@ -21,8 +21,12 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    var majiangMain =
-        AppBarView(title: title, child: backgroundImage.get('background')!);
+    MajiangCard card = MajiangCard('suo2');
+    var majiangMain = AppBarView(
+        title: title,
+        child: Stack(
+          children: [backgroundImage.get('background')!, card.handcard()!],
+        ));
 
     return majiangMain;
   }
