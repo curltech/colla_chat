@@ -467,6 +467,8 @@ flutter:
     - assets/images/
     - assets/images/bg/
     - assets/images/email/
+    - assets/images/majiang/
+    - assets/images/majiang/card/
     - assets/medias/
 
   # An image asset can refer to one or more resolution-specific "variants", see
