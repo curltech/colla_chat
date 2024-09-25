@@ -1,6 +1,8 @@
 import 'dart:math';
 
+import 'package:align_positioned/align_positioned.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class CardImage {
   static const String majiangCardPath = 'assets/images/majiang/card/';
@@ -117,155 +119,165 @@ class MajiangCard {
   MajiangCard(this.name);
 
   ///自己的手牌
-  Widget handcard({double width = 50.0}) {
-    double ratio = width / 50;
+  Widget handCard({double ratio = 1.0}) {
     return SizedBox(
-        width: width,
+        width: 50.0 * ratio,
         child: Stack(
           children: [
-            SizedBox(child: backgroundImage.get('handcard')!),
-            Column(children: [
-              SizedBox(
-                height: 3.0 * ratio,
-              ),
-              cardImage.get(name)!,
-            ]),
+            backgroundImage.get('handcard')!,
+            AlignPositioned(
+              alignment: Alignment.topLeft,
+              dx: 0.0,
+              dy: 4.0 * ratio,
+              touch: Touch.inside,
+              child: cardImage.get(name)!,
+            ),
           ],
         ));
   }
 
-  /// 自己的碰牌或者杠牌
-  Widget touchcard({double width = 46.0}) {
-    double ratio = width / 46;
+  /// 自己的河牌，碰牌或者杠牌
+  Widget touchCard({double ratio = 1.0}) {
     return SizedBox(
-        width: width,
+        width: 44.0 * ratio,
+        height: 66 * ratio,
         child: Stack(
           children: [
-            SizedBox(
-                height: 75 * ratio, child: backgroundImage.get('touchcard')!),
-            Row(children: [
-              SizedBox(
-                width: 2.0 * ratio,
-              ),
-              SizedBox(
-                height: 54.0 * ratio,
-                child: cardImage.get(name)!,
-              ),
-            ])
+            backgroundImage.get('touchcard')!,
+            AlignPositioned(
+              alignment: Alignment.topLeft,
+              dx: 0.0,
+              dy: -8.0 * ratio,
+              touch: Touch.inside,
+              child: cardImage.get(name)!,
+            ),
           ],
         ));
   }
 
-  /// 上家或者下家的河牌
-  Widget sidecard({double width = 49.0}) {
-    double ratio = width / 49;
+  /// 对家的手牌
+  Widget opponentHand({double ratio = 1.0}) {
     return SizedBox(
-        width: width,
+        width: 49.0 * ratio, child: backgroundImage.get('opponenthand')!);
+  }
+
+  /// 对家的河牌，碰牌或者杠牌
+  Widget opponentTouchCard({double ratio = 1.0}) {
+    return SizedBox(
+        width: 44 * ratio,
         child: Stack(
           children: [
-            SizedBox(
-                height: width * ratio, child: backgroundImage.get('sidecard')!),
-            Row(children: [
-              SizedBox(
-                width: 2.0 * ratio,
-              ),
-              SizedBox(
-                height: 33.0 * ratio,
-                child:
-                    RotatedBox(quarterTurns: 45, child: cardImage.get(name)!),
-              ),
-            ])
+            backgroundImage.get('touchcard')!,
+            AlignPositioned(
+              alignment: Alignment.topLeft,
+              dx: 0.0,
+              dy: -8.0 * ratio,
+              touch: Touch.inside,
+              child: RotatedBox(quarterTurns: 1, child: cardImage.get(name)!),
+            ),
           ],
         ));
   }
 
-  ///自己或者对家的河牌
-  Widget poolcard({double width = 49.0}) {
-    double ratio = width / 49;
-    return SizedBox(
-        width: width,
-        child: Stack(
-          children: [
-            SizedBox(
-                height: width * ratio, child: backgroundImage.get('poolcard')!),
-            Row(children: [
-              SizedBox(
-                width: 2.0 * ratio,
-              ),
-              SizedBox(
-                height: 33.0 * ratio,
-                child:
-                    RotatedBox(quarterTurns: 45, child: cardImage.get(name)!),
-              ),
-            ])
-          ],
-        ));
-  }
-
-  Widget rightSidehand({bool clip = true}) {
+  /// 下家的手牌
+  Widget rightSideHand({double ratio = 1.0, bool clip = true}) {
+    Widget clipWidget = backgroundImage.get('sidehand')!;
     if (clip) {
-      return ClipRect(
+      clipWidget = ClipRect(
           child: Align(
               alignment: Alignment.topLeft,
               heightFactor: 0.55,
-              child: backgroundImage.get('sidehand')!));
+              child: clipWidget));
     }
-    return backgroundImage.get('sidehand')!;
+
+    return SizedBox(width: 22 * ratio, child: clipWidget);
   }
 
-  Widget leftSidehand({bool clip = true}) {
+  /// 下家的河牌
+  Widget rightSideTouchCard({double ratio = 1.0}) {
+    return SizedBox(
+        width: 47.0 * ratio,
+        child: Stack(
+          children: [
+            backgroundImage.get('sidecard')!,
+            AlignPositioned(
+              alignment: Alignment.topLeft,
+              dx: 0.0,
+              dy: -8.0 * ratio,
+              touch: Touch.inside,
+              child: RotatedBox(quarterTurns: 1, child: cardImage.get(name)!),
+            ),
+          ],
+        ));
+  }
+
+  /// 上家的手牌
+  Widget leftSideHand({double ratio = 1.0, bool clip = true}) {
+    Widget clipWidget =
+        RotatedBox(quarterTurns: 2, child: backgroundImage.get('sidehand')!);
     if (clip) {
-      return ClipRect(
+      clipWidget = ClipRect(
           child: Align(
               alignment: Alignment.topLeft,
               heightFactor: 0.55,
-              child: RotatedBox(
-                  quarterTurns: 90, child: backgroundImage.get('sidehand')!)));
+              child: clipWidget));
     }
-    return RotatedBox(
-        quarterTurns: 90, child: backgroundImage.get('sidehand')!);
+    return SizedBox(width: 22 * ratio, child: clipWidget);
   }
 
-  Widget opponenthand({double width = 49.0}) {
-    return backgroundImage.get('opponenthand')!;
+  /// 上家的河牌
+  Widget leftSideTouchCard({double ratio = 1.0}) {
+    return SizedBox(
+        width: 47.0 * ratio,
+        child: Stack(
+          children: [
+            backgroundImage.get('sidecard')!,
+            AlignPositioned(
+              alignment: Alignment.topLeft,
+              dx: 0.0,
+              dy: -8.0 * ratio,
+              touch: Touch.inside,
+              child: RotatedBox(quarterTurns: -1, child: cardImage.get(name)!),
+            ),
+          ],
+        ));
   }
 }
 
 enum CardResult { touch, bar, darkbar, complete }
 
 class ParticipantCard {
-  String peerId;
+  final String peerId;
 
-  bool host;
+  final int position;
+
+  final RxBool host = false.obs;
 
   //手牌
-  List<String> handCards = [];
+  final RxList<String> handCards = <String>[].obs;
 
-  //碰牌
-  List<String> touchCards = [];
-
-  //杠牌
-  List<String> barCards = [];
+  //碰，杠牌
+  final RxList<String> touchCards = <String>[].obs;
 
   //吃牌
-  List<String> drawingCards = [];
+  final RxList<String> drawingCards = <String>[].obs;
 
   //打出的牌
-  List<String> poolCards = [];
+  final RxList<String> poolCards = <String>[].obs;
 
-  ParticipantCard(this.peerId, {this.host = false});
+  final Rx<String?> comingCard = Rx<String?>(null);
+
+  ParticipantCard(this.peerId, this.position);
 
   clear() {
     handCards.clear();
     touchCards.clear();
-    barCards.clear();
     drawingCards.clear();
     poolCards.clear();
   }
 
-  /// 摸一张新牌
-  add(String card) {
-    handCards.add(card);
+  /// 排序
+  sort() {
     handCards.sort((String a, String b) {
       return a.compareTo(b);
     });
@@ -284,7 +296,7 @@ class ParticipantCard {
 
   /// 检查明杠
   bool checkBar(String card) {
-    int count = _checkCount(barCards, card);
+    int count = _checkCount(touchCards, card);
     if (count == 3) {
       return true;
     }
@@ -381,6 +393,49 @@ class ParticipantCard {
 
   /// 检查是否可以杠牌，吃牌，碰牌和胡牌
   check(String card) {}
+
+  /// 打牌
+  send(String card) {
+    if (card != comingCard.value) {
+      handCards.remove(card);
+    } else {
+      comingCard.value = null;
+    }
+
+    poolCards.add(card);
+  }
+
+  /// 碰牌
+  touch(String card) {
+    handCards.remove(card);
+    handCards.remove(card);
+    touchCards.add(card);
+    touchCards.add(card);
+    touchCards.add(card);
+  }
+
+  /// 明杠牌
+  bar(String card) {
+    handCards.remove(card);
+    handCards.remove(card);
+    handCards.remove(card);
+    touchCards.add(card);
+    touchCards.add(card);
+    touchCards.add(card);
+    touchCards.add(card);
+  }
+
+  /// 暗杠牌
+  darkBar(String card) {
+    handCards.remove(card);
+    handCards.remove(card);
+    handCards.remove(card);
+    handCards.remove(card);
+    touchCards.add(card);
+    touchCards.add(card);
+    touchCards.add(card);
+    touchCards.add(card);
+  }
 }
 
 class MajiangRoom {
@@ -405,22 +460,25 @@ class MajiangRoom {
 
   //四个参与者的牌
   List<ParticipantCard> participantCards = [
-    ParticipantCard('自己', host: true),
-    ParticipantCard('下家'),
-    ParticipantCard('对家'),
-    ParticipantCard('上家')
+    ParticipantCard('自己', 0),
+    ParticipantCard('下家', 1),
+    ParticipantCard('对家', 2),
+    ParticipantCard('上家', 4)
   ];
 
   //未知的牌
   List<String> unknownCards = [];
+
+  //当前的参与者，正在思考
+  ParticipantCard? tokenParticipantCard;
 
   /// 加参与者，第一个是自己，第二个是下家，第三个是对家，第四个是上家
   addParticipant(ParticipantCard participant) {
     participantCards.add(participant);
   }
 
-  /// 新玩一局
-  List<int> play({List<int>? positions}) {
+  /// 新玩一局，positions为空自己发牌，不为空，别人发牌
+  List<int> play({String? peerId, List<int>? positions}) {
     for (var participantCard in participantCards) {
       participantCard.clear();
     }
@@ -439,12 +497,46 @@ class MajiangRoom {
       String card = allCards.removeAt(pos);
       if (i < 53) {
         int reminder = i % 4;
-        participantCards[reminder].add(card);
+        participantCards[reminder].handCards.add(card);
       } else {
         unknownCards.add(card);
       }
     }
+    participantCards[0].sort();
+    if (peerId == null) {
+      tokenParticipantCard = participantCards[0];
+    } else {
+      ParticipantCard? participantCard = get(peerId);
+      if (participantCard != null) {
+        tokenParticipantCard = participantCard;
+      }
+    }
 
     return positions;
+  }
+
+  ParticipantCard? get(String peerId) {
+    for (var participantCard in participantCards) {
+      if (participantCard.peerId == peerId) {
+        return participantCard;
+      }
+    }
+    return null;
+  }
+
+  /// 摸牌，peerId为空，自己摸牌，不为空，别人摸牌
+  take({String? peerId}) {
+    if (peerId == null) {
+      String card = unknownCards.removeLast();
+      participantCards[0].comingCard.value = card;
+      tokenParticipantCard = participantCards[0];
+    } else {
+      ParticipantCard? participantCard = get(peerId);
+      if (participantCard != null) {
+        String card = unknownCards.removeLast();
+        participantCard.comingCard.value = card;
+        tokenParticipantCard = participantCard;
+      }
+    }
   }
 }
