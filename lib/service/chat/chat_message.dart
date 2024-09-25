@@ -1054,7 +1054,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       ChatMessage? old = await findOne(where: 'id=?', whereArgs: [id]);
       if (old != null) {
         logger.e('id: $id chat message exist');
-        return false;
+        chatMessage.id = id;
       }
     }
     String? messageId = chatMessage.messageId;

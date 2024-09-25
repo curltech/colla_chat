@@ -18,7 +18,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_luban/flutter_luban.dart';
-import 'package:image/image.dart' as platform_image;
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:saver_gallery/saver_gallery.dart';
 import 'package:file_picker/file_picker.dart';
@@ -258,35 +257,34 @@ class ImageUtil {
         cropAspectRatio: 1);
   }
 
-  static platform_image.Image? read(String filename) {
+  static img.Image? read(String filename) {
     var imageBytes = io.File(filename).readAsBytesSync();
-    platform_image.Image? image = platform_image.decodeImage(imageBytes);
+    img.Image? image = img.decodeImage(imageBytes);
 
     return image;
   }
 
-  static platform_image.Image thumbnail(
-    platform_image.Image image, {
+  static img.Image thumbnail(
+    img.Image image, {
     int? width,
     int? height,
   }) {
-    platform_image.Image thumbnail =
-        platform_image.copyResize(image, width: width, height: height);
-    platform_image.encodePng(thumbnail);
+    img.Image thumbnail = img.copyResize(image, width: width, height: height);
+    img.encodePng(thumbnail);
 
     return thumbnail;
   }
 
-  static List<int> encodePng(platform_image.Image image, {int level = 6}) {
-    return platform_image.encodePng(image, level: level);
+  static List<int> encodePng(img.Image image, {int level = 6}) {
+    return img.encodePng(image, level: level);
   }
 
-  static List<int> encodeJpg(platform_image.Image image, {int quality = 100}) {
-    return platform_image.encodeJpg(image, quality: quality);
+  static List<int> encodeJpg(img.Image image, {int quality = 100}) {
+    return img.encodeJpg(image, quality: quality);
   }
 
-  static platform_image.Image? decodeImage(Uint8List data) {
-    return platform_image.decodeImage(data);
+  static img.Image? decodeImage(Uint8List data) {
+    return img.decodeImage(data);
   }
 
   ///压缩图片，适用于多个平台
@@ -443,8 +441,7 @@ class ImageUtil {
       int length = await xfile.length();
       if (length > 10240) {
         // double quality = 10240 * 100 / length;
-        String? filename = await compress(
-            filename: xfile.path, path: dir.path);
+        String? filename = await compress(filename: xfile.path, path: dir.path);
         avatar = await FileUtil.readFileAsBytes(filename!);
       } else {
         avatar = await xfile.readAsBytes();

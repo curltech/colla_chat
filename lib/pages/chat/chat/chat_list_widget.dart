@@ -13,11 +13,10 @@ import 'package:colla_chat/pages/chat/chat/chat_message_view.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/llm_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/llm/llm_chat_message_view.dart';
-import 'package:colla_chat/pages/chat/linkman/group/group_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_info_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_webrtc_connection_widget.dart';
-import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/plugin/notification/local_notifications_service.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -34,17 +33,17 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/websocket/universal_websocket.dart';
-import 'package:colla_chat/widgets/common/platform_future_builder.dart';
-import 'package:get/get.dart';
-import 'package:websocket_universal/websocket_universal.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/webview/html_preview_widget.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:websocket_universal/websocket_universal.dart';
 
 ///好友的汇总控制器，每当消息汇总表的数据有变化时更新控制器
 class LinkmanChatSummaryController extends DataListController<ChatSummary> {

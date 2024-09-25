@@ -177,6 +177,7 @@ dependencies:
   responsive_sizer: ^3.1.1
   introduction_screen: ^3.1.14
   pinput: ^5.0.0
+  align_positioned: ^4.0.1
 
   #界面效果动画
   flutter_adaptive_scaffold: ^0.2.1
