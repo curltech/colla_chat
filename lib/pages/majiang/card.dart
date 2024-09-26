@@ -8,13 +8,13 @@ import 'package:get/get.dart';
 class CardImage {
   static const String majiangCardPath = 'assets/images/majiang/card/';
   static const List<String> windImageFiles = [
-    'east',
-    'south',
-    'west',
-    'north',
-    'center',
-    'fortune',
-    'whiteboard',
+    '11_east',
+    '12_south',
+    '13_west',
+    '14_north',
+    '15_center',
+    '16_fortune',
+    '17_whiteboard',
   ];
   static const String suoImageFile = 'suo';
   static const String tongImageFile = 'tong';
