@@ -34,120 +34,99 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
   final Rx<MajiangRoom?> majiangRoom = Rx<MajiangRoom?>(null);
 
   /// 上家手牌
-  Widget _buildLeftSideHand() {
+  Widget _buildPreviousHand() {
     return Obx(() {
       MajiangRoom majiangRoom = this.majiangRoom.value!;
       List<Widget> children = [];
-      ParticipantCard participantCard = majiangRoom.participantCards[3];
+      int pos = majiangRoom.previous;
+      ParticipantCard participantCard = majiangRoom.participantCards[pos];
 
       for (var card in participantCard.drawingCards) {
         MajiangCard majiangCard = MajiangCard(card);
-        Widget leftSideTouchCard = majiangCard.leftSideTouchCard();
-        children.add(leftSideTouchCard);
+        Widget previousTouchCard = majiangCard.previousTouchCard();
+        children.add(previousTouchCard);
       }
       for (var card in participantCard.touchCards) {
         MajiangCard majiangCard = MajiangCard(card);
-        Widget leftSideTouchCard = majiangCard.leftSideTouchCard();
-        children.add(leftSideTouchCard);
+        Widget previousTouchCard = majiangCard.previousTouchCard();
+        children.add(previousTouchCard);
       }
       int i = 0;
       for (var card in participantCard.handCards) {
         MajiangCard majiangCard = MajiangCard(card);
-        Widget leftSideHand =
-            majiangCard.leftSideHand(clip: i < 12 ? true : false);
-        children.add(leftSideHand);
+        Widget previousHand =
+            majiangCard.previousHand(clip: i < 12 ? true : false);
+        children.add(previousHand);
         i++;
       }
-      return Container(
-          child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      return Wrap(
+        direction: Axis.vertical,
         children: children,
-      ));
+      );
     });
   }
 
   /// 上家河牌
-  Widget _buildLeftTouchCard() {
+  Widget _buildPreviousTouchCard() {
     return Obx(() {
       MajiangRoom majiangRoom = this.majiangRoom.value!;
-      List<Widget> columnChildren = [];
-      List<Widget> rowChildren = [];
-      ParticipantCard participantCard = majiangRoom.participantCards[3];
-      int i = 0;
+      List<Widget> children = [];
+      int pos = majiangRoom.previous;
+      ParticipantCard participantCard = majiangRoom.participantCards[pos];
       for (var card in participantCard.poolCards) {
         MajiangCard majiangCard = MajiangCard(card);
-        Widget leftSideTouchCard = majiangCard.leftSideTouchCard(ratio: 0.8);
-        columnChildren.add(leftSideTouchCard);
-        int reminder = i % 11;
-        if (reminder == 10 || i == participantCard.poolCards.length - 1) {
-          Widget row = Column(
-            children: columnChildren,
-          );
-          rowChildren.add(row);
-          columnChildren = [];
-        }
-        i++;
+        Widget previousTouchCard = majiangCard.previousTouchCard(ratio: 0.8);
+        children.add(previousTouchCard);
       }
-      return Wrap(children: rowChildren);
+      return Wrap(direction: Axis.vertical, children: children);
     });
   }
 
   /// 下家手牌
-  Widget _buildRightSideHand() {
+  Widget _buildNextHand() {
     return Obx(() {
       MajiangRoom majiangRoom = this.majiangRoom.value!;
       List<Widget> children = [];
-      ParticipantCard participantCard = majiangRoom.participantCards[1];
+      int pos = majiangRoom.next;
+      ParticipantCard participantCard = majiangRoom.participantCards[pos];
 
       for (var card in participantCard.drawingCards) {
         MajiangCard majiangCard = MajiangCard(card);
-        Widget rightSideTouchCard = majiangCard.rightSideTouchCard();
-        children.add(rightSideTouchCard);
+        Widget nextTouchCard = majiangCard.nextTouchCard();
+        children.add(nextTouchCard);
       }
       for (var card in participantCard.touchCards) {
         MajiangCard majiangCard = MajiangCard(card);
-        Widget rightSideTouchCard = majiangCard.rightSideTouchCard();
-        children.add(rightSideTouchCard);
+        Widget nextTouchCard = majiangCard.nextTouchCard();
+        children.add(nextTouchCard);
       }
       int i = 0;
       for (var card in participantCard.handCards) {
         MajiangCard majiangCard = MajiangCard(card);
-        Widget rightSideHand =
-            majiangCard.rightSideHand(clip: i < 12 ? true : false);
-        children.add(rightSideHand);
+        Widget nextHand = majiangCard.nextHand(clip: i < 12 ? true : false);
+        children.add(nextHand);
         i++;
       }
-      return Container(
-          child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      return Wrap(
+        direction: Axis.vertical,
         children: children,
-      ));
+      );
     });
   }
 
   /// 下家河牌
-  Widget _buildRightSideTouchCard() {
+  Widget _buildNextTouchCard() {
     return Obx(() {
       MajiangRoom majiangRoom = this.majiangRoom.value!;
-      List<Widget> columnChildren = [];
-      List<Widget> rowChildren = [];
-      ParticipantCard participantCard = majiangRoom.participantCards[1];
-      int i = 0;
+      List<Widget> children = [];
+      int pos = majiangRoom.next;
+      ParticipantCard participantCard = majiangRoom.participantCards[pos];
       for (var card in participantCard.poolCards) {
         MajiangCard majiangCard = MajiangCard(card);
-        Widget rightSideTouchCard = majiangCard.rightSideTouchCard(ratio: 0.8);
-        columnChildren.add(rightSideTouchCard);
-        int reminder = i % 11;
-        if (reminder == 10 || i == participantCard.poolCards.length - 1) {
-          Widget row = Column(
-            children: columnChildren,
-          );
-          rowChildren.add(row);
-          columnChildren = [];
-        }
-        i++;
+        Widget nextTouchCard = majiangCard.nextTouchCard(ratio: 0.8);
+        children.add(nextTouchCard);
       }
-      return Wrap(children: rowChildren);
+      return Wrap(direction: Axis.vertical, children: children);
     });
   }
 
@@ -156,7 +135,8 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
     return Obx(() {
       MajiangRoom majiangRoom = this.majiangRoom.value!;
       List<Widget> children = [];
-      ParticipantCard participantCard = majiangRoom.participantCards[0];
+      int pos = majiangRoom.me;
+      ParticipantCard participantCard = majiangRoom.participantCards[pos];
       for (var card in participantCard.drawingCards) {
         MajiangCard majiangCard = MajiangCard(card);
         Widget touchCard = majiangCard.touchCard();
@@ -169,7 +149,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
       }
       for (var card in participantCard.handCards) {
         MajiangCard majiangCard = MajiangCard(card);
-        Widget handcard = majiangCard.handCard();
+        Widget handcard = majiangCard.handCard(ratio: 0.8);
         handcard = InkWell(
             onTap: () {
               participantCard.send(card);
@@ -180,10 +160,9 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
           width: 1.0,
         ));
       }
-      return Container(
-          child: Row(
+      return Wrap(
         children: children,
-      ));
+      );
     });
   }
 
@@ -191,25 +170,15 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
   Widget _buildTouchCard() {
     return Obx(() {
       MajiangRoom majiangRoom = this.majiangRoom.value!;
-      List<Widget> columnChildren = [];
-      List<Widget> rowChildren = [];
-      ParticipantCard participantCard = majiangRoom.participantCards[0];
-      int i = 0;
+      List<Widget> children = [];
+      int pos = majiangRoom.me;
+      ParticipantCard participantCard = majiangRoom.participantCards[pos];
       for (var card in participantCard.poolCards) {
         MajiangCard majiangCard = MajiangCard(card);
         Widget touchCard = majiangCard.touchCard(ratio: 0.8);
-        rowChildren.add(touchCard);
-        int reminder = i % 11;
-        if (reminder == 10 || i == participantCard.poolCards.length - 1) {
-          Widget row = Row(
-            children: rowChildren,
-          );
-          columnChildren.add(row);
-          rowChildren = [];
-        }
-        i++;
+        children.add(touchCard);
       }
-      return Wrap(children: columnChildren);
+      return Wrap(children: children);
     });
   }
 
@@ -218,7 +187,8 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
     return Obx(() {
       MajiangRoom majiangRoom = this.majiangRoom.value!;
       List<Widget> children = [];
-      ParticipantCard participantCard = majiangRoom.participantCards[2];
+      int pos = majiangRoom.opponent;
+      ParticipantCard participantCard = majiangRoom.participantCards[pos];
 
       for (var card in participantCard.drawingCards) {
         MajiangCard majiangCard = MajiangCard(card);
@@ -236,7 +206,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
         children.add(opponentHand);
       }
       return Center(
-          child: Row(
+          child: Wrap(
         children: children,
       ));
     });
@@ -246,26 +216,17 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
   Widget _buildOpponentTouchCard() {
     return Obx(() {
       MajiangRoom majiangRoom = this.majiangRoom.value!;
-      List<Widget> columnChildren = [];
-      List<Widget> rowChildren = [];
-      ParticipantCard participantCard = majiangRoom.participantCards[2];
+      List<Widget> children = [];
+      int pos = majiangRoom.opponent;
+      ParticipantCard participantCard = majiangRoom.participantCards[pos];
       int i = 0;
       for (var card in participantCard.poolCards) {
         MajiangCard majiangCard = MajiangCard(card);
         Widget opponentTouchCard = majiangCard.opponentTouchCard(ratio: 0.8);
-        rowChildren.add(opponentTouchCard);
-        int reminder = i % 11;
-        if (reminder == 10 || i == participantCard.poolCards.length - 1) {
-          Widget row = Row(
-            children: rowChildren,
-          );
-          columnChildren.add(row);
-          rowChildren = [];
-        }
-        i++;
+        children.add(opponentTouchCard);
       }
       return Wrap(
-        children: columnChildren,
+        children: children,
       );
     });
   }
@@ -273,7 +234,8 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
   Widget _buildIncomingCard() {
     return Obx(() {
       MajiangRoom majiangRoom = this.majiangRoom.value!;
-      ParticipantCard participantCard = majiangRoom.participantCards[0];
+      int pos = majiangRoom.me;
+      ParticipantCard participantCard = majiangRoom.participantCards[pos];
       var card = participantCard.comingCard.value;
       Widget? handcard;
       if (card != null) {
@@ -319,7 +281,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
           color: Colors.white,
           height: 400,
           width: 200,
-          child: _buildLeftTouchCard(),
+          child: _buildPreviousTouchCard(),
         ),
       ),
       AlignPositioned(
@@ -343,7 +305,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
           color: Colors.white,
           height: 400,
           width: 200,
-          child: _buildRightSideTouchCard(),
+          child: _buildNextTouchCard(),
         ),
       ),
     ]);
@@ -371,7 +333,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
               Container(
                 width: bodyWidth * 0.15,
                 color: Colors.cyan,
-                child: _buildLeftSideHand(),
+                child: _buildPreviousHand(),
               ),
               Container(
                 width: bodyWidth * 0.7,
@@ -381,7 +343,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
               Expanded(
                   child: Container(
                 color: Colors.cyan,
-                child: _buildRightSideHand(),
+                child: _buildNextHand(),
               )),
             ],
           )),
