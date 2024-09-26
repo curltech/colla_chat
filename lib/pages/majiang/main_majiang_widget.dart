@@ -24,51 +24,6 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
 
   final MajiangRoom majiangRoom = MajiangRoom();
 
-  /// 对家手牌
-  Widget _buildOpponentHand() {
-    return Obx(() {
-      List<Widget> children = [];
-      ParticipantCard participantCard = majiangRoom.participantCards[2];
-
-      for (var card in participantCard.drawingCards) {
-        MajiangCard majiangCard = MajiangCard(card);
-        Widget opponentTouchCard = majiangCard.opponentTouchCard();
-        children.add(opponentTouchCard);
-      }
-      for (var card in participantCard.touchCards) {
-        MajiangCard majiangCard = MajiangCard(card);
-        Widget opponentTouchCard = majiangCard.opponentTouchCard();
-        children.add(opponentTouchCard);
-      }
-      for (var card in participantCard.handCards) {
-        MajiangCard majiangCard = MajiangCard(card);
-        Widget opponentHand = majiangCard.opponentHand();
-        children.add(opponentHand);
-      }
-      return Center(
-          child: Row(
-        children: children,
-      ));
-    });
-  }
-
-  /// 对家河牌
-  Widget _buildOpponentTouchCard() {
-    return Obx(() {
-      List<Widget> children = [];
-      ParticipantCard participantCard = majiangRoom.participantCards[2];
-      for (var card in participantCard.poolCards) {
-        MajiangCard majiangCard = MajiangCard(card);
-        Widget opponentTouchCard = majiangCard.opponentTouchCard();
-        children.add(opponentTouchCard);
-      }
-      return Container(
-          child: Row(
-        children: children,
-      ));
-    });
-  }
-
   /// 上家手牌
   Widget _buildLeftSideHand() {
     return Obx(() {
@@ -104,17 +59,25 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
   /// 上家河牌
   Widget _buildLeftTouchCard() {
     return Obx(() {
-      List<Widget> children = [];
+      List<Widget> columnChildren = [];
+      List<Widget> rowChildren = [];
       ParticipantCard participantCard = majiangRoom.participantCards[3];
+      int i = 0;
       for (var card in participantCard.poolCards) {
         MajiangCard majiangCard = MajiangCard(card);
-        Widget leftSideTouchCard = majiangCard.leftSideTouchCard();
-        children.add(leftSideTouchCard);
+        Widget leftSideTouchCard = majiangCard.leftSideTouchCard(ratio: 0.8);
+        columnChildren.add(leftSideTouchCard);
+        int reminder = i % 11;
+        if (reminder == 10 || i == participantCard.poolCards.length - 1) {
+          Widget row = Column(
+            children: columnChildren,
+          );
+          rowChildren.add(row);
+          columnChildren = [];
+        }
+        i++;
       }
-      return Container(
-          child: Row(
-        children: children,
-      ));
+      return Wrap(children: rowChildren);
     });
   }
 
@@ -153,18 +116,25 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
   /// 下家河牌
   Widget _buildRightSideTouchCard() {
     return Obx(() {
-      List<Widget> children = [];
+      List<Widget> columnChildren = [];
+      List<Widget> rowChildren = [];
       ParticipantCard participantCard = majiangRoom.participantCards[1];
-
+      int i = 0;
       for (var card in participantCard.poolCards) {
         MajiangCard majiangCard = MajiangCard(card);
-        Widget rightSideTouchCard = majiangCard.rightSideTouchCard();
-        children.add(rightSideTouchCard);
+        Widget rightSideTouchCard = majiangCard.rightSideTouchCard(ratio: 0.8);
+        columnChildren.add(rightSideTouchCard);
+        int reminder = i % 11;
+        if (reminder == 10 || i == participantCard.poolCards.length - 1) {
+          Widget row = Column(
+            children: columnChildren,
+          );
+          rowChildren.add(row);
+          columnChildren = [];
+        }
+        i++;
       }
-      return Container(
-          child: Row(
-        children: children,
-      ));
+      return Wrap(children: rowChildren);
     });
   }
 
@@ -215,7 +185,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
         Widget touchCard = majiangCard.touchCard(ratio: 0.8);
         rowChildren.add(touchCard);
         int reminder = i % 11;
-        if (reminder == 10 || i == participantCard.poolCards.length-1) {
+        if (reminder == 10 || i == participantCard.poolCards.length - 1) {
           Widget row = Row(
             children: rowChildren,
           );
@@ -224,8 +194,61 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
         }
         i++;
       }
-      return Container(
-        child: Wrap(children: columnChildren),
+      return Wrap(children: columnChildren);
+    });
+  }
+
+  /// 对家手牌
+  Widget _buildOpponentHand() {
+    return Obx(() {
+      List<Widget> children = [];
+      ParticipantCard participantCard = majiangRoom.participantCards[2];
+
+      for (var card in participantCard.drawingCards) {
+        MajiangCard majiangCard = MajiangCard(card);
+        Widget opponentTouchCard = majiangCard.opponentTouchCard();
+        children.add(opponentTouchCard);
+      }
+      for (var card in participantCard.touchCards) {
+        MajiangCard majiangCard = MajiangCard(card);
+        Widget opponentTouchCard = majiangCard.opponentTouchCard();
+        children.add(opponentTouchCard);
+      }
+      for (var card in participantCard.handCards) {
+        MajiangCard majiangCard = MajiangCard(card);
+        Widget opponentHand = majiangCard.opponentHand();
+        children.add(opponentHand);
+      }
+      return Center(
+          child: Row(
+        children: children,
+      ));
+    });
+  }
+
+  /// 对家河牌
+  Widget _buildOpponentTouchCard() {
+    return Obx(() {
+      List<Widget> columnChildren = [];
+      List<Widget> rowChildren = [];
+      ParticipantCard participantCard = majiangRoom.participantCards[2];
+      int i = 0;
+      for (var card in participantCard.poolCards) {
+        MajiangCard majiangCard = MajiangCard(card);
+        Widget opponentTouchCard = majiangCard.opponentTouchCard(ratio: 0.8);
+        rowChildren.add(opponentTouchCard);
+        int reminder = i % 11;
+        if (reminder == 10 || i == participantCard.poolCards.length - 1) {
+          Widget row = Row(
+            children: rowChildren,
+          );
+          columnChildren.add(row);
+          rowChildren = [];
+        }
+        i++;
+      }
+      return Wrap(
+        children: columnChildren,
       );
     });
   }
