@@ -130,7 +130,7 @@ class DialogUtil {
       builder: (BuildContext context) {
         return Dialog(
           child: Column(children: [
-            AppBarWidget.buildAppBar(context:context, title: title),
+            AppBarWidget.buildAppBar(context: context, title: title),
             Expanded(child: ListView(children: options))
           ]),
         );

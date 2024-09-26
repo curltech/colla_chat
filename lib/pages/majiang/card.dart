@@ -18,6 +18,8 @@ class CardImage {
   static const String suoImageFile = 'suo';
   static const String tongImageFile = 'tong';
   static const String wanImageFile = 'wan';
+  late final List<String> allCards;
+
   final windImages = <String, Widget>{};
   final suoImages = <String, Widget>{};
   final tongImages = <String, Widget>{};
@@ -57,6 +59,25 @@ class CardImage {
       );
       wanImages['$wanImageFile$i'] = image;
     }
+
+    allCards = [
+      ...windImages.keys,
+      ...suoImages.keys,
+      ...tongImages.keys,
+      ...wanImages.keys,
+      ...windImages.keys,
+      ...suoImages.keys,
+      ...tongImages.keys,
+      ...wanImages.keys,
+      ...windImages.keys,
+      ...suoImages.keys,
+      ...tongImages.keys,
+      ...wanImages.keys,
+      ...windImages.keys,
+      ...suoImages.keys,
+      ...tongImages.keys,
+      ...wanImages.keys,
+    ];
   }
 
   Widget? get(String name) {
@@ -249,9 +270,8 @@ enum CardResult { touch, bar, darkbar, complete }
 class ParticipantCard {
   final String peerId;
 
-  final int position;
-
-  final RxBool host = false.obs;
+  //是否庄家
+  RxBool host = false.obs;
 
   //手牌
   final RxList<String> handCards = <String>[].obs;
@@ -267,7 +287,7 @@ class ParticipantCard {
 
   final Rx<String?> comingCard = Rx<String?>(null);
 
-  ParticipantCard(this.peerId, this.position);
+  ParticipantCard(this.peerId);
 
   clear() {
     handCards.clear();
@@ -438,33 +458,12 @@ class ParticipantCard {
   }
 }
 
+/// 麻将房间
 class MajiangRoom {
-  final List<String> allCards = [
-    ...cardImage.windImages.keys,
-    ...cardImage.suoImages.keys,
-    ...cardImage.tongImages.keys,
-    ...cardImage.wanImages.keys,
-    ...cardImage.windImages.keys,
-    ...cardImage.suoImages.keys,
-    ...cardImage.tongImages.keys,
-    ...cardImage.wanImages.keys,
-    ...cardImage.windImages.keys,
-    ...cardImage.suoImages.keys,
-    ...cardImage.tongImages.keys,
-    ...cardImage.wanImages.keys,
-    ...cardImage.windImages.keys,
-    ...cardImage.suoImages.keys,
-    ...cardImage.tongImages.keys,
-    ...cardImage.wanImages.keys,
-  ];
+  final String name;
 
   //四个参与者的牌
-  List<ParticipantCard> participantCards = [
-    ParticipantCard('自己', 0),
-    ParticipantCard('下家', 1),
-    ParticipantCard('对家', 2),
-    ParticipantCard('上家', 4)
-  ];
+  final List<ParticipantCard> participantCards = [];
 
   //未知的牌
   List<String> unknownCards = [];
@@ -472,9 +471,16 @@ class MajiangRoom {
   //当前的参与者，正在思考
   ParticipantCard? tokenParticipantCard;
 
+  MajiangRoom(this.name, List<String> peerIds) {
+    _init(peerIds);
+  }
+
   /// 加参与者，第一个是自己，第二个是下家，第三个是对家，第四个是上家
-  addParticipant(ParticipantCard participant) {
-    participantCards.add(participant);
+  _init(List<String> peerIds) {
+    for (var peerId in peerIds) {
+      participantCards.add(ParticipantCard(peerId));
+    }
+    participantCards[0].host.value = true;
   }
 
   /// 新玩一局，positions为空自己发牌，不为空，别人发牌
@@ -483,7 +489,7 @@ class MajiangRoom {
       participantCard.clear();
     }
     unknownCards.clear();
-    List<String> allCards = [...this.allCards];
+    List<String> allCards = [...cardImage.allCards];
     Random random = Random.secure();
     positions ??= [];
     for (int i = 0; i < 136; ++i) {

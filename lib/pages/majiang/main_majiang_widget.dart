@@ -1,8 +1,17 @@
 import 'package:align_positioned/align_positioned.dart';
+import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/majiang/card.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/app_bar_widget.dart';
+import 'package:colla_chat/widgets/common/common_text_form_field.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -22,11 +31,12 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Majiang';
 
-  final MajiangRoom majiangRoom = MajiangRoom();
+  final Rx<MajiangRoom?> majiangRoom = Rx<MajiangRoom?>(null);
 
   /// 上家手牌
   Widget _buildLeftSideHand() {
     return Obx(() {
+      MajiangRoom majiangRoom = this.majiangRoom.value!;
       List<Widget> children = [];
       ParticipantCard participantCard = majiangRoom.participantCards[3];
 
@@ -59,6 +69,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
   /// 上家河牌
   Widget _buildLeftTouchCard() {
     return Obx(() {
+      MajiangRoom majiangRoom = this.majiangRoom.value!;
       List<Widget> columnChildren = [];
       List<Widget> rowChildren = [];
       ParticipantCard participantCard = majiangRoom.participantCards[3];
@@ -84,6 +95,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
   /// 下家手牌
   Widget _buildRightSideHand() {
     return Obx(() {
+      MajiangRoom majiangRoom = this.majiangRoom.value!;
       List<Widget> children = [];
       ParticipantCard participantCard = majiangRoom.participantCards[1];
 
@@ -116,6 +128,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
   /// 下家河牌
   Widget _buildRightSideTouchCard() {
     return Obx(() {
+      MajiangRoom majiangRoom = this.majiangRoom.value!;
       List<Widget> columnChildren = [];
       List<Widget> rowChildren = [];
       ParticipantCard participantCard = majiangRoom.participantCards[1];
@@ -141,6 +154,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
   /// 自己的手牌
   Widget _buildHandCard() {
     return Obx(() {
+      MajiangRoom majiangRoom = this.majiangRoom.value!;
       List<Widget> children = [];
       ParticipantCard participantCard = majiangRoom.participantCards[0];
       for (var card in participantCard.drawingCards) {
@@ -176,6 +190,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
   /// 自己的河牌，碰牌或者杠牌
   Widget _buildTouchCard() {
     return Obx(() {
+      MajiangRoom majiangRoom = this.majiangRoom.value!;
       List<Widget> columnChildren = [];
       List<Widget> rowChildren = [];
       ParticipantCard participantCard = majiangRoom.participantCards[0];
@@ -201,6 +216,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
   /// 对家手牌
   Widget _buildOpponentHand() {
     return Obx(() {
+      MajiangRoom majiangRoom = this.majiangRoom.value!;
       List<Widget> children = [];
       ParticipantCard participantCard = majiangRoom.participantCards[2];
 
@@ -229,6 +245,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
   /// 对家河牌
   Widget _buildOpponentTouchCard() {
     return Obx(() {
+      MajiangRoom majiangRoom = this.majiangRoom.value!;
       List<Widget> columnChildren = [];
       List<Widget> rowChildren = [];
       ParticipantCard participantCard = majiangRoom.participantCards[2];
@@ -255,6 +272,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
 
   Widget _buildIncomingCard() {
     return Obx(() {
+      MajiangRoom majiangRoom = this.majiangRoom.value!;
       ParticipantCard participantCard = majiangRoom.participantCards[0];
       var card = participantCard.comingCard.value;
       Widget? handcard;
@@ -332,6 +350,10 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
   }
 
   Widget _buildDesktop() {
+    MajiangRoom? majiangRoom = this.majiangRoom.value;
+    if (majiangRoom == null) {
+      return nilBox;
+    }
     double bodyWidth = appDataProvider.secondaryBodyWidth;
     double bodyHeight =
         appDataProvider.portraitSize.height - appDataProvider.toolbarHeight;
@@ -379,23 +401,126 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
     ]);
   }
 
+  TextEditingController textEditingController = TextEditingController();
+  List<String> peerIds = [];
+
+  //房间成员显示界面
+  Widget _buildRoomPartcipantWidget(BuildContext context) {
+    return Column(children: [
+      CommonAutoSizeTextFormField(
+        controller: textEditingController,
+        labelText: AppLocalizations.t('Name'),
+      ),
+      const SizedBox(
+        height: 20.0,
+      ),
+      LinkmanGroupSearchWidget(
+        key: UniqueKey(),
+        selectType: SelectType.chipMultiSelectField,
+        onSelected: (List<String>? selected) async {
+          if (selected != null) {
+            if (!selected.contains(myself.peerId)) {
+              selected.add(myself.peerId!);
+            }
+            peerIds = selected;
+          } else {
+            peerIds.clear();
+          }
+        },
+        selected: [myself.peerId!],
+        includeGroup: false,
+      ),
+    ]);
+  }
+
+  /// 弹出对话框，输入名称，选择参加的人
+  _createMajiangRoom(BuildContext context) async {
+    ButtonStyle style = StyleUtil.buildButtonStyle();
+    ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
+        backgroundColor: myself.primary, elevation: 10.0);
+    await DialogUtil.show(builder: (BuildContext context) {
+      return Dialog(
+          child: Card(
+              elevation: 0.0,
+              margin: const EdgeInsets.all(0.0),
+              shape: const ContinuousRectangleBorder(),
+              child: Column(
+                children: [
+                  AppBarWidget.buildTitleBar(
+                      title: CommonAutoSizeText(
+                    AppLocalizations.t('Majiang room and participants'),
+                    style: const TextStyle(fontSize: 16, color: Colors.white),
+                  )),
+                  const SizedBox(
+                    height: 10.0,
+                  ),
+                  Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: _buildRoomPartcipantWidget(context)),
+                  const Spacer(),
+                  Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: OverflowBar(
+                        spacing: 10.0,
+                        alignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                              style: style,
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: CommonAutoSizeText(
+                                  AppLocalizations.t('Cancel'))),
+                          TextButton(
+                              style: mainStyle,
+                              onPressed: () {
+                                Navigator.pop(context);
+                                String name = textEditingController.text;
+                                if (name.isNotEmpty) {
+                                  majiangRoom.value =
+                                      MajiangRoom(name, peerIds);
+                                }
+                              },
+                              child:
+                                  CommonAutoSizeText(AppLocalizations.t('Ok'))),
+                        ],
+                      ))
+                ],
+              )));
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<Widget>? rightWidgets = [
-      IconButton(
-          onPressed: () {
-            majiangRoom.play();
-          },
-          icon: const Icon(Icons.new_label))
-    ];
-    var majiangMain = AppBarView(
-        title: title,
-        withLeading: true,
-        rightWidgets: rightWidgets,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [backgroundImage.get('background')!, _buildDesktop()],
-        ));
+    var majiangMain = Obx(() {
+      MajiangRoom? majiangRoom = this.majiangRoom.value;
+      List<Widget>? rightWidgets = [
+        IconButton(
+            tooltip: AppLocalizations.t('New majiang room'),
+            onPressed: () {
+              _createMajiangRoom(context);
+            },
+            icon: const Icon(Icons.new_label)),
+        IconButton(
+            tooltip: AppLocalizations.t('New majiang card'),
+            onPressed: majiangRoom != null
+                ? () {
+                    majiangRoom.play();
+                  }
+                : null,
+            icon: const Icon(Icons.newspaper_outlined)),
+      ];
+
+      String? title = majiangRoom?.name;
+      return AppBarView(
+          title: title ?? this.title,
+          withLeading: true,
+          rightWidgets: rightWidgets,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [backgroundImage.get('background')!, _buildDesktop()],
+          ));
+    });
 
     return majiangMain;
   }
