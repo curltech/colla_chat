@@ -38,7 +38,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
     return Obx(() {
       MajiangRoom majiangRoom = this.majiangRoom.value!;
       List<Widget> children = [];
-      int pos = majiangRoom.previous;
+      int pos = majiangRoom.previous(majiangRoom.me);
       ParticipantCard participantCard = majiangRoom.participantCards[pos];
 
       for (var card in participantCard.drawingCards) {
@@ -71,7 +71,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
     return Obx(() {
       MajiangRoom majiangRoom = this.majiangRoom.value!;
       List<Widget> children = [];
-      int pos = majiangRoom.previous;
+      int pos = majiangRoom.previous(majiangRoom.me);
       ParticipantCard participantCard = majiangRoom.participantCards[pos];
       for (var card in participantCard.poolCards) {
         MajiangCard majiangCard = MajiangCard(card);
@@ -87,7 +87,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
     return Obx(() {
       MajiangRoom majiangRoom = this.majiangRoom.value!;
       List<Widget> children = [];
-      int pos = majiangRoom.next;
+      int pos = majiangRoom.next(majiangRoom.me);
       ParticipantCard participantCard = majiangRoom.participantCards[pos];
 
       for (var card in participantCard.drawingCards) {
@@ -119,7 +119,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
     return Obx(() {
       MajiangRoom majiangRoom = this.majiangRoom.value!;
       List<Widget> children = [];
-      int pos = majiangRoom.next;
+      int pos = majiangRoom.next(majiangRoom.me);
       ParticipantCard participantCard = majiangRoom.participantCards[pos];
       for (var card in participantCard.poolCards) {
         MajiangCard majiangCard = MajiangCard(card);
@@ -153,6 +153,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
         handcard = InkWell(
             onTap: () {
               participantCard.send(card);
+              majiangRoom.check(pos, card);
             },
             child: handcard);
         children.add(handcard);
@@ -187,7 +188,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
     return Obx(() {
       MajiangRoom majiangRoom = this.majiangRoom.value!;
       List<Widget> children = [];
-      int pos = majiangRoom.opponent;
+      int pos = majiangRoom.opponent(majiangRoom.me);
       ParticipantCard participantCard = majiangRoom.participantCards[pos];
 
       for (var card in participantCard.drawingCards) {
@@ -217,7 +218,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
     return Obx(() {
       MajiangRoom majiangRoom = this.majiangRoom.value!;
       List<Widget> children = [];
-      int pos = majiangRoom.opponent;
+      int pos = majiangRoom.opponent(majiangRoom.me);
       ParticipantCard participantCard = majiangRoom.participantCards[pos];
       int i = 0;
       for (var card in participantCard.poolCards) {

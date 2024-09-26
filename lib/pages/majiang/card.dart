@@ -272,7 +272,7 @@ class MajiangCard {
   }
 }
 
-enum CardResult { touch, bar, darkbar, complete }
+enum ParticipantStatus { touch, bar, darkbar, drawing, complete }
 
 class ParticipantCard {
   final String peerId;
@@ -293,6 +293,8 @@ class ParticipantCard {
   final RxList<String> poolCards = <String>[].obs;
 
   final Rx<String?> comingCard = Rx<String?>(null);
+
+  final RxList<ParticipantStatus> status = RxList<ParticipantStatus>([]);
 
   ParticipantCard(this.peerId, {this.robot = false});
 
@@ -419,7 +421,26 @@ class ParticipantCard {
   }
 
   /// 检查是否可以杠牌，吃牌，碰牌和胡牌
-  check(String card) {}
+  check(String card) {
+    List<ParticipantStatus> participantStatus = [];
+    if (checkBar(card)) {
+      participantStatus.add(ParticipantStatus.drawing);
+    }
+    if (checkBar(card)) {
+      participantStatus.add(ParticipantStatus.bar);
+    }
+    if (checkBar(card)) {
+      participantStatus.add(ParticipantStatus.darkbar);
+    }
+    if (checkBar(card)) {
+      participantStatus.add(ParticipantStatus.touch);
+    }
+    if (checkBar(card)) {
+      participantStatus.add(ParticipantStatus.complete);
+    }
+
+    status.assignAll(participantStatus);
+  }
 
   /// 打牌
   send(String card) {
@@ -463,6 +484,17 @@ class ParticipantCard {
     touchCards.add(card);
     touchCards.add(card);
   }
+
+  /// 过牌
+  pass() {
+    status.clear();
+  }
+
+  /// 摸牌，peerId为空，自己摸牌，不为空，别人摸牌
+  take(String card) {
+    comingCard.value = card;
+    check(card);
+  }
 }
 
 /// 麻将房间
@@ -476,19 +508,10 @@ class MajiangRoom {
   List<String> unknownCards = [];
 
   /// 庄家
-  String? host;
+  int? host;
 
   /// 当前的持有发牌的参与者，正在思考
-  String? keeper;
-
-  /// 对当前打出的牌能够碰或者杠的参与者，正在思考
-  String? toucher;
-
-  /// 对当前打出的牌能够吃的参与者，正在思考
-  String? drawher;
-
-  /// 对当前打出的牌能够胡的参与者，正在思考
-  List<String> completer = [];
+  int? keeper;
 
   MajiangRoom(this.name, List<String> peerIds) {
     _init(peerIds);
@@ -498,6 +521,13 @@ class MajiangRoom {
   _init(List<String> peerIds) {
     for (var peerId in peerIds) {
       participantCards.add(ParticipantCard(peerId));
+    }
+    if (peerIds.length < 4) {
+      for (int i = 0; i < 4 - peerIds.length; i++) {
+        ParticipantCard participantCard =
+            ParticipantCard('robot$i', robot: true);
+        participantCards.add(participantCard);
+      }
     }
   }
 
@@ -521,8 +551,7 @@ class MajiangRoom {
   }
 
   /// 下家
-  int get next {
-    int pos = me;
+  int next(int pos) {
     if (pos == participantCards.length - 1) {
       return 0;
     }
@@ -530,8 +559,7 @@ class MajiangRoom {
   }
 
   /// 上家
-  int get previous {
-    int pos = me;
+  int previous(int pos) {
     if (pos == 0) {
       return participantCards.length - 1;
     }
@@ -539,8 +567,7 @@ class MajiangRoom {
   }
 
   /// 对家
-  int get opponent {
-    int pos = me;
+  int opponent(int pos) {
     if (pos == 0) {
       return 2;
     }
@@ -564,9 +591,6 @@ class MajiangRoom {
     unknownCards.clear();
     this.host = null;
     keeper = null;
-    toucher = null;
-    drawher = null;
-    completer.clear();
     List<String> allCards = [...cardImage.allCards];
     Random random = Random.secure();
     positions ??= [];
@@ -593,12 +617,12 @@ class MajiangRoom {
 
     /// 如果没有指定庄家，自己就是庄家，否则设定庄家
     if (host == null) {
-      this.host = participantCards[pos].peerId;
+      this.host = pos;
       keeper = this.host;
     } else {
       int? pos = get(host);
       if (pos != null) {
-        this.host = host;
+        this.host = pos;
         keeper = this.host;
       }
     }
@@ -607,19 +631,31 @@ class MajiangRoom {
   }
 
   /// 摸牌，peerId为空，自己摸牌，不为空，别人摸牌
-  take({String? peerId}) {
-    if (peerId == null) {
+  take({int? current}) {
+    if (current == null) {
       String card = unknownCards.removeLast();
       int pos = me;
-      participantCards[pos].comingCard.value = card;
-      keeper = participantCards[pos].peerId;
+      participantCards[pos].take(card);
+      keeper = pos;
     } else {
-      int? pos = get(peerId);
-      if (pos != null) {
-        String card = unknownCards.removeLast();
-        participantCards[pos].comingCard.value = card;
-        keeper = participantCards[pos].peerId;
-      }
+      String card = unknownCards.removeLast();
+      participantCards[current].take(card);
+      keeper = current;
     }
+  }
+
+  /// pos的参与者打出一张牌，其他三家检查
+  check(int current, String card) {
+    int pos = next(current);
+    ParticipantCard participant = participantCards[pos];
+    participant.check(card);
+
+    pos = opponent(current);
+    participant = participantCards[pos];
+    participant.check(card);
+
+    pos = previous(current);
+    participant = participantCards[pos];
+    participant.check(card);
   }
 }
