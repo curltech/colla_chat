@@ -41,12 +41,12 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
       int pos = majiangRoom.previous(majiangRoom.me);
       ParticipantCard participantCard = majiangRoom.participantCards[pos];
 
-      for (var card in participantCard.drawingCards) {
+      for (var card in participantCard.allDrawingCards) {
         MajiangCard majiangCard = MajiangCard(card);
         Widget previousTouchCard = majiangCard.previousTouchCard();
         children.add(previousTouchCard);
       }
-      for (var card in participantCard.touchCards) {
+      for (var card in participantCard.allTouchCards) {
         MajiangCard majiangCard = MajiangCard(card);
         Widget previousTouchCard = majiangCard.previousTouchCard();
         children.add(previousTouchCard);
@@ -90,12 +90,12 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
       int pos = majiangRoom.next(majiangRoom.me);
       ParticipantCard participantCard = majiangRoom.participantCards[pos];
 
-      for (var card in participantCard.drawingCards) {
+      for (var card in participantCard.allDrawingCards) {
         MajiangCard majiangCard = MajiangCard(card);
         Widget nextTouchCard = majiangCard.nextTouchCard();
         children.add(nextTouchCard);
       }
-      for (var card in participantCard.touchCards) {
+      for (var card in participantCard.allTouchCards) {
         MajiangCard majiangCard = MajiangCard(card);
         Widget nextTouchCard = majiangCard.nextTouchCard();
         children.add(nextTouchCard);
@@ -137,12 +137,12 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
       List<Widget> children = [];
       int pos = majiangRoom.me;
       ParticipantCard participantCard = majiangRoom.participantCards[pos];
-      for (var card in participantCard.drawingCards) {
+      for (var card in participantCard.allDrawingCards) {
         MajiangCard majiangCard = MajiangCard(card);
         Widget touchCard = majiangCard.touchCard();
         children.add(touchCard);
       }
-      for (var card in participantCard.touchCards) {
+      for (var card in participantCard.allTouchCards) {
         MajiangCard majiangCard = MajiangCard(card);
         Widget touchCard = majiangCard.touchCard();
         children.add(touchCard);
@@ -152,8 +152,8 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
         Widget handcard = majiangCard.handCard(ratio: 0.8);
         handcard = InkWell(
             onTap: () {
-              participantCard.send(card);
-              majiangRoom.check(pos, card);
+              majiangRoom.send(pos, card);
+              majiangRoom.sendCheck(pos, card);
             },
             child: handcard);
         children.add(handcard);
@@ -191,12 +191,12 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
       int pos = majiangRoom.opponent(majiangRoom.me);
       ParticipantCard participantCard = majiangRoom.participantCards[pos];
 
-      for (var card in participantCard.drawingCards) {
+      for (var card in participantCard.allDrawingCards) {
         MajiangCard majiangCard = MajiangCard(card);
         Widget opponentTouchCard = majiangCard.opponentTouchCard();
         children.add(opponentTouchCard);
       }
-      for (var card in participantCard.touchCards) {
+      for (var card in participantCard.allTouchCards) {
         MajiangCard majiangCard = MajiangCard(card);
         Widget opponentTouchCard = majiangCard.opponentTouchCard();
         children.add(opponentTouchCard);
