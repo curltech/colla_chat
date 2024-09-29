@@ -171,7 +171,8 @@ class MajiangRoom {
         randoms.add(pos);
       }
       String card = allCards.removeAt(pos);
-      if (i < 53) {
+      /// 每个参与者发13张牌
+      if (i < 52) {
         int reminder = i % 4;
         participantCards[reminder].handCards.add(card);
       } else {
@@ -195,6 +196,8 @@ class MajiangRoom {
       keeper = banker;
       randoms.add(pos);
     }
+
+    take(0);
 
     return randoms;
   }

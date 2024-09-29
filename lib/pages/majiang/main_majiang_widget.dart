@@ -69,34 +69,27 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
             child: handcard);
         children.add(handcard);
         children.add(const SizedBox(
-          width: 1.0,
+          width: 0.5,
         ));
       }
-      return Wrap(
-        children: children,
-      );
-    });
-  }
-
-  Widget _buildIncomingCard() {
-    double ratio = 0.75;
-    return Obx(() {
-      MajiangRoom majiangRoom = this.majiangRoom.value!;
-      int pos = current.value;
-      ParticipantCard participantCard = majiangRoom.participantCards[pos];
       var card = participantCard.comingCard.value;
-      Widget? handcard;
+
       if (card != null) {
         MajiangCard majiangCard = MajiangCard(card);
-        handcard = majiangCard.handCard(ratio: ratio);
+        Widget handcard = majiangCard.handCard(ratio: ratio);
         handcard = InkWell(
             onTap: () {
               majiangRoom.send(pos, card);
             },
             child: handcard);
+        children.add(const SizedBox(
+          width: 15.0,
+        ));
+        children.add(handcard);
       }
-      return Container(
-        child: handcard,
+
+      return Wrap(
+        children: children,
       );
     });
   }
@@ -128,6 +121,13 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
         children.add(previousHand);
         i++;
       }
+      String? card = participantCard.comingCard.value;
+      if (card != null) {
+        MajiangCard majiangCard = MajiangCard(card);
+        Widget previousHand =
+            majiangCard.previousHand(clip: false, ratio: ratio);
+        children.add(previousHand);
+      }
       return Wrap(
         direction: Axis.vertical,
         children: children,
@@ -153,6 +153,15 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
         MajiangCard majiangCard = MajiangCard(card);
         Widget opponentTouchCard = majiangCard.opponentTouchCard(ratio: ratio);
         children.add(opponentTouchCard);
+      }
+      String? card = participantCard.comingCard.value;
+      if (card != null) {
+        MajiangCard majiangCard = MajiangCard(card);
+        Widget opponentHand = majiangCard.opponentHand(ratio: ratio);
+        children.add(opponentHand);
+        children.add(const SizedBox(
+          width: 15.0,
+        ));
       }
       for (var card in participantCard.handCards) {
         MajiangCard majiangCard = MajiangCard(card);
@@ -184,6 +193,12 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
         MajiangCard majiangCard = MajiangCard(card);
         Widget nextTouchCard = majiangCard.nextTouchCard(ratio: ratio);
         children.add(nextTouchCard);
+      }
+      String? card = participantCard.comingCard.value;
+      if (card != null) {
+        MajiangCard majiangCard = MajiangCard(card);
+        Widget nextHand = majiangCard.nextHand(clip: false, ratio: ratio);
+        children.add(nextHand);
       }
       int i = 0;
       for (var card in participantCard.handCards) {
@@ -503,10 +518,6 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
             Expanded(
                 child: Align(
                     alignment: Alignment.centerRight, child: _buildHandCard())),
-            const SizedBox(
-              width: 15.0,
-            ),
-            _buildIncomingCard(),
             const SizedBox(
               width: 30.0,
             ),
