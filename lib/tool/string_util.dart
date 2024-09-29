@@ -1,7 +1,7 @@
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/tool/number_format_util.dart';
+import 'package:colla_chat/tool/number_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 
 class StringUtil {
@@ -72,7 +72,7 @@ class StringUtil {
         break;
       case DataType.percentage:
         num m = num.parse(str);
-        value = NumberFormatUtil.stdPercentage(m.toDouble());
+        value = NumberUtil.stdPercentage(m.toDouble());
         break;
       case DataType.set:
         value = JsonUtil.toJson(str);

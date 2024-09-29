@@ -3,7 +3,7 @@ import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/tool/number_format_util.dart';
+import 'package:colla_chat/tool/number_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:data_table_2/data_table_2.dart';
@@ -108,12 +108,12 @@ class BindingDataTable2<T> extends StatelessWidget {
           if (dataType == DataType.percentage) {
             if (fieldValue is num) {
               fieldValue =
-                  NumberFormatUtil.stdPercentage(fieldValue.toDouble());
+                  NumberUtil.stdPercentage(fieldValue.toDouble());
             } else {
               fieldValue = fieldValue.toString();
             }
           } else if (dataType == DataType.double) {
-            fieldValue = NumberFormatUtil.stdDouble(fieldValue);
+            fieldValue = NumberUtil.stdDouble(fieldValue);
           } else {
             fieldValue = fieldValue.toString();
           }

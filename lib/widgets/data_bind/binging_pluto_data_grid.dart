@@ -2,7 +2,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/tool/number_format_util.dart';
+import 'package:colla_chat/tool/number_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -100,7 +100,7 @@ class BindingPlutoDataGrid<T> extends StatelessWidget {
           dynamic fieldValue = tMap[name];
           if (fieldValue != null) {
             if (fieldValue is double) {
-              fieldValue = NumberFormatUtil.stdDouble(fieldValue);
+              fieldValue = NumberUtil.stdDouble(fieldValue);
             } else {
               fieldValue = fieldValue.toString();
             }

@@ -7,12 +7,12 @@ enum SequenceCardType { single, pair, sequence, touch, bar, darkBar }
 enum CompleteType {
   thirteenOne, //13幺
   oneNine, //19碰碰胡
-  pair7, //7对
+  pureTouch, //清碰
   luxPair7, //豪华7对
-  mixOneType, //混一色
   pureOneType, //清一色
   mixTouch, //混碰
-  pureTouch, //清碰
+  pair7, //7对
+  mixOneType, //混一色
   touch, //碰碰胡
   small, //小胡
 }
