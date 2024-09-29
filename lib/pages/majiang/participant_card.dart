@@ -256,10 +256,12 @@ class ParticipantCard {
   send(String card) {
     if (card != comingCard.value) {
       handCards.remove(card);
-    } else {
-      comingCard.value = null;
+      if (comingCard.value != null) {
+        handCards.add(comingCard.value!);
+      }
+      CardUtil.sort(handCards);
     }
-
+    comingCard.value = null;
     poolCards.add(card);
   }
 
