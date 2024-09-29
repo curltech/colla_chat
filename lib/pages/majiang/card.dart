@@ -1,16 +1,9 @@
-import 'dart:async';
-
 import 'package:align_positioned/align_positioned.dart';
-import 'package:colla_chat/pages/majiang/card_util.dart';
-import 'package:colla_chat/pages/majiang/room.dart';
-import 'package:colla_chat/pages/majiang/split_card.dart';
-import 'package:colla_chat/plugin/talker_logger.dart';
-import 'package:colla_chat/tool/number_util.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class CardConcept {
   static const String majiangCardPath = 'assets/images/majiang/card/';
+  static const String majiangPath = 'assets/images/majiang/';
   static const List<String> windImageFiles = [
     '11_east',
     '12_south',
@@ -38,6 +31,14 @@ class CardConcept {
     'fortune',
     'whiteboard',
   ];
+  static const List<String> actions = [
+    'bar',
+    'complete',
+    'drawing',
+    'pass',
+    'selfcomplete',
+    'touch',
+  ];
 
   late final List<String> allCards;
 
@@ -45,6 +46,7 @@ class CardConcept {
   final suoImages = <String, Widget>{};
   final tongImages = <String, Widget>{};
   final wanImages = <String, Widget>{};
+  final actionImages = <String, Widget>{};
 
   CardConcept() {
     _load();
@@ -80,6 +82,14 @@ class CardConcept {
       );
       wanImages['$wanImageFile$i'] = image;
     }
+    for (int i = 0; i < actions.length; ++i) {
+      var image = Image.asset(
+        '$majiangPath${actions[i]}.webp',
+        fit: BoxFit.cover,
+      );
+
+      actionImages[actions[i]] = image;
+    }
 
     allCards = [
       ...windImages.keys,
@@ -101,11 +111,17 @@ class CardConcept {
     ];
   }
 
-  Widget? get(String name) {
+  Widget? getCardImage(String name) {
     Widget? image = windImages[name];
     image ??= suoImages[name];
     image ??= tongImages[name];
     image ??= wanImages[name];
+
+    return image;
+  }
+
+  Widget? getActionImage(String name) {
+    Widget? image = actionImages[name];
 
     return image;
   }
@@ -173,7 +189,7 @@ class MajiangCard {
               dx: 0.0,
               dy: 4.0 * ratio,
               touch: Touch.inside,
-              child: cardConcept.get(name)!,
+              child: cardConcept.getCardImage(name)!,
             ),
           ],
         ));
@@ -190,9 +206,9 @@ class MajiangCard {
             AlignPositioned(
               alignment: Alignment.topLeft,
               dx: 0.0,
-              dy: -8.0 * ratio,
+              dy: -11.0 * ratio,
               touch: Touch.inside,
-              child: cardConcept.get(name)!,
+              child: cardConcept.getCardImage(name)!,
             ),
           ],
         ));
@@ -216,10 +232,10 @@ class MajiangCard {
             backgroundImage.get('touchcard')!,
             AlignPositioned(
               alignment: Alignment.topLeft,
-              dx: 0.0,
-              dy: -8.0 * ratio,
+              dx: 0.0 * ratio,
+              dy: 0.0 * ratio,
               touch: Touch.inside,
-              child: RotatedBox(quarterTurns: 1, child: cardConcept.get(name)!),
+              child: RotatedBox(quarterTurns: 2, child: cardConcept.getCardImage(name)!),
             ),
           ],
         ));
@@ -232,7 +248,7 @@ class MajiangCard {
       clipWidget = ClipRect(
           child: Align(
               alignment: Alignment.topLeft,
-              heightFactor: 0.55,
+              heightFactor: 0.45,
               child: clipWidget));
     }
 
@@ -240,22 +256,34 @@ class MajiangCard {
   }
 
   /// 下家的河牌
-  Widget nextTouchCard({double ratio = 1.0}) {
-    return SizedBox(
+  Widget nextTouchCard({double ratio = 1.0, bool clip = true}) {
+    Widget clipWidget = backgroundImage.get('sidecard')!;
+
+    Widget cardWidget = SizedBox(
         width: 47.0 * ratio,
         height: 43.0 * ratio,
         child: Stack(
           children: [
-            backgroundImage.get('sidecard')!,
+            clipWidget,
             AlignPositioned(
               alignment: Alignment.topLeft,
-              dx: 0.0,
-              dy: -8.0 * ratio,
+              dx: -4.0 * ratio,
+              dy: -1.0 * ratio,
               touch: Touch.inside,
-              child: RotatedBox(quarterTurns: 1, child: cardConcept.get(name)!),
+              child:
+                  RotatedBox(quarterTurns: -1, child: cardConcept.getCardImage(name)!),
             ),
           ],
         ));
+    if (clip) {
+      cardWidget = ClipRect(
+          child: Align(
+              alignment: Alignment.topLeft,
+              heightFactor: 0.73,
+              child: cardWidget));
+    }
+
+    return cardWidget;
   }
 
   /// 上家的手牌
@@ -273,25 +301,32 @@ class MajiangCard {
   }
 
   /// 上家的河牌
-  Widget previousTouchCard({double ratio = 1.0}) {
-    return SizedBox(
+  Widget previousTouchCard({double ratio = 1.0, bool clip = true}) {
+    Widget clipWidget = backgroundImage.get('sidecard')!;
+
+    Widget cardWidget = SizedBox(
         width: 47.0 * ratio,
         height: 43.0 * ratio,
         child: Stack(
           children: [
-            backgroundImage.get('sidecard')!,
+            clipWidget,
             AlignPositioned(
               alignment: Alignment.topLeft,
-              dx: 0.0,
-              dy: -8.0 * ratio,
+              dx: 2.0 * ratio,
+              dy: -2.0 * ratio,
               touch: Touch.inside,
-              child:
-                  RotatedBox(quarterTurns: -1, child: cardConcept.get(name)!),
+              child: RotatedBox(quarterTurns: 1, child: cardConcept.getCardImage(name)!),
             ),
           ],
         ));
+    if (clip) {
+      cardWidget = ClipRect(
+          child: Align(
+              alignment: Alignment.topLeft,
+              heightFactor: 0.73,
+              child: cardWidget));
+    }
+
+    return cardWidget;
   }
 }
-
-
-

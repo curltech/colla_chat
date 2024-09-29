@@ -41,7 +41,7 @@ class CardUtil {
   static int sequence(String card) {
     CardType type = cardType(card);
     if (type != CardType.wind) {
-      String seq = card.substring(card.length - 2);
+      String seq = card.substring(card.length - 1);
 
       return int.parse(seq);
     }

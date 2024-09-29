@@ -1,6 +1,3 @@
-
-
-
 import 'dart:async';
 
 import 'package:colla_chat/pages/majiang/card_util.dart';
@@ -8,6 +5,7 @@ import 'package:colla_chat/pages/majiang/room.dart';
 import 'package:colla_chat/pages/majiang/split_card.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/number_util.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 enum ParticipantState { touch, bar, darkbar, drawing, complete }
@@ -15,8 +13,15 @@ enum ParticipantState { touch, bar, darkbar, drawing, complete }
 class ParticipantCard {
   final String peerId;
 
+  final String name;
+
+  Widget? avatarWidget;
+
   ///是否是机器人
   final bool robot;
+
+  //积分
+  final RxInt score = 0.obs;
 
   //手牌
   final RxList<String> handCards = <String>[].obs;
@@ -32,26 +37,28 @@ class ParticipantCard {
   final Rx<String?> comingCard = Rx<String?>(null);
 
   final RxMap<ParticipantState, List<int>> participantState =
-  RxMap<ParticipantState, List<int>>({});
+      RxMap<ParticipantState, List<int>>({});
 
   late final StreamSubscription<RoomEvent> roomEventStreamSubscription;
 
-  ParticipantCard(this.peerId,
+  ParticipantCard(this.peerId, this.name,
       {this.robot = false,
-        required StreamController<RoomEvent> roomEventStreamController}) {
+      required StreamController<RoomEvent> roomEventStreamController}) {
     roomEventStreamSubscription =
         roomEventStreamController.stream.listen((RoomEvent roomEvent) {
-          onRoomEvent(roomEvent);
-        });
+      onRoomEvent(roomEvent);
+    });
   }
 
   ParticipantCard.fromJson(Map json)
       : peerId = json['peerId'] == '' ? null : json['id'],
+        name = json['name'],
         robot = json['robot'] == true || json['robot'] == 1 ? true : false;
 
   Map<String, dynamic> toJson() {
     return {
       'peerId': peerId,
+      'name': name,
       'robot': robot,
     };
   }
@@ -303,7 +310,7 @@ class ParticipantCard {
     if (completes != null && completes.isNotEmpty) {
       int complete = completes.first;
       CompleteType? completeType =
-      NumberUtil.toEnum(CompleteType.values, complete);
+          NumberUtil.toEnum(CompleteType.values, complete);
       if (completeType != null) {
         logger.i('complete!');
       }

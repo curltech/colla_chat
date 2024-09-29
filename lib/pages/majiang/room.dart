@@ -1,10 +1,14 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/majiang/card.dart';
 import 'package:colla_chat/pages/majiang/card_util.dart';
 import 'package:colla_chat/pages/majiang/participant_card.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/json_util.dart';
 
 enum RoomEventAction {
@@ -68,35 +72,40 @@ class MajiangRoom {
 
   late final StreamSubscription<RoomEvent> roomEventStreamSubscription;
 
-  MajiangRoom(this.name, List<ParticipantCard> peers) {
-    _init(peers);
+  MajiangRoom(this.name);
+
+  /// 加参与者，第一个是自己，第二个是下家，第三个是对家，第四个是上家
+  init(List<ParticipantCard> peers) async {
+    /// 房间池分发到房间的事件每个参与者都需要监听
+    for (int i = 0; i < peers.length; ++i) {
+      var peer = peers[i];
+      if (myself.peerId == peer.peerId) {
+        current = i;
+      }
+      Linkman? linkman =
+          await linkmanService.findCachedOneByPeerId(peer.peerId);
+      ParticipantCard participantCard = ParticipantCard(peer.peerId, peer.name,
+          robot: peer.robot,
+          roomEventStreamController: roomEventStreamController);
+      participantCard.avatarWidget =
+          linkman == null ? AppImage.mdAppImage : linkman.avatarImage;
+      participantCard.avatarWidget ??= AppImage.mdAppImage;
+      participantCards.add(participantCard);
+    }
+    if (peers.length < 4) {
+      for (int i = 0; i < 4 - peers.length; i++) {
+        ParticipantCard participantCard = ParticipantCard(
+            'robot$i', '${AppLocalizations.t('robot')}$i',
+            robot: true, roomEventStreamController: roomEventStreamController);
+        participantCards.add(participantCard);
+      }
+    }
 
     /// 房间池分发到房间的事件自己也需要监听
     roomEventStreamSubscription =
         roomEventStreamController.stream.listen((RoomEvent roomEvent) {
       onRoomEvent(roomEvent);
     });
-  }
-
-  /// 加参与者，第一个是自己，第二个是下家，第三个是对家，第四个是上家
-  _init(List<ParticipantCard> peers) {
-    /// 房间池分发到房间的事件每个参与者都需要监听
-    for (int i = 0; i < peers.length; ++i) {
-      var peer = peers[i];
-      participantCards.add(ParticipantCard(peer.peerId,
-          robot: peer.robot,
-          roomEventStreamController: roomEventStreamController));
-      if (myself.peerId == peer.peerId) {
-        current = i;
-      }
-    }
-    if (peers.length < 4) {
-      for (int i = 0; i < 4 - peers.length; i++) {
-        ParticipantCard participantCard = ParticipantCard('robot$i',
-            robot: true, roomEventStreamController: roomEventStreamController);
-        participantCards.add(participantCard);
-      }
-    }
   }
 
   int? get(String peerId) {
@@ -310,8 +319,9 @@ class MajiangRoomPool {
   StreamController<RoomEvent> roomEventStreamController =
       StreamController<RoomEvent>.broadcast();
 
-  MajiangRoom createRoom(String name, List<ParticipantCard> peers) {
-    MajiangRoom majiangRoom = MajiangRoom(name, peers);
+  Future<MajiangRoom> createRoom(String name, List<ParticipantCard> peers) async {
+    MajiangRoom majiangRoom = MajiangRoom(name);
+    await majiangRoom.init(peers);
     rooms[name] = majiangRoom;
 
     return majiangRoom;
@@ -322,12 +332,12 @@ class MajiangRoomPool {
   }
 
   /// 房间的事件有外部触发，所有订阅者都会触发监听事件，本方法由外部调用，比如外部的消息chatMessage
-  onRoomEvent(RoomEvent roomEvent) {
+  onRoomEvent(RoomEvent roomEvent) async {
     if (roomEvent.action == RoomEventAction.create) {
       String name = roomEvent.name;
       dynamic content = roomEvent.content;
       List<ParticipantCard> peers = JsonUtil.toJson(content);
-      createRoom(name, peers);
+      await createRoom(name, peers);
     } else {
       String name = roomEvent.name;
       MajiangRoom? majiangRoom = get(name);

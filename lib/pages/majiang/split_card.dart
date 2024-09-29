@@ -50,7 +50,7 @@ class SplitCard {
   int splitPair(List<String> cards) {
     int count = 0;
     sequenceCards.clear();
-    for (int i = 0; i < cards.length; i++) {
+    for (int i = 0; i < cards.length - 1; i++) {
       String card = cards[i];
       String next = cards[i + 1];
 
