@@ -322,15 +322,17 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
         }
         Widget columnWidget = Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: columnChildren,
         );
         rowChildren.add(columnWidget);
       }
       rowChildren = rowChildren.reversed.toList();
       rowChildren.insert(0, const Spacer());
-      return Row(mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start, children: rowChildren);
+      return Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: rowChildren);
     });
   }
 
@@ -707,19 +709,19 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
   }
 
   _call(MajiangRoom majiangRoom, int owner, ParticipantState participantState,
-      List<int> pos) {
+      {List<int>? pos}) {
     if (participantState == ParticipantState.complete) {
       majiangRoom.complete(owner);
     } else if (participantState == ParticipantState.touch) {
-      majiangRoom.touch(owner, pos[0]);
+      majiangRoom.touch(owner, pos![0]);
     } else if (participantState == ParticipantState.bar) {
-      majiangRoom.bar(owner, pos[0]);
+      majiangRoom.bar(owner, pos![0]);
     } else if (participantState == ParticipantState.darkbar) {
-      majiangRoom.darkBar(owner, pos[0]);
+      majiangRoom.darkBar(owner, pos![0]);
     } else if (participantState == ParticipantState.pass) {
       majiangRoom.pass(owner);
     } else if (participantState == ParticipantState.drawing) {
-      majiangRoom.drawing(owner, pos[0]);
+      majiangRoom.drawing(owner, pos![0]);
     }
   }
 
@@ -745,12 +747,22 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
       if (image != null) {
         stateButtons.add(IconButton(
           onPressed: () {
-            _call(majiangRoom, owner, participantState, pos);
+            _call(majiangRoom, owner, participantState, pos: pos);
             participantCard.participantState.clear();
           },
           icon: image,
         ));
       }
+    }
+    Widget? image = cardConcept.getStateImage(ParticipantState.pass.name);
+    if (image != null) {
+      stateButtons.add(IconButton(
+        onPressed: () {
+          _call(majiangRoom, owner, ParticipantState.pass);
+          participantCard.participantState.clear();
+        },
+        icon: image,
+      ));
     }
 
     return Align(

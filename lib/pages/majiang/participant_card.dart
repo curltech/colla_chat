@@ -68,6 +68,7 @@ class ParticipantCard {
     touchCards.clear();
     drawingCards.clear();
     poolCards.clear();
+    comingCard.value = null;
   }
 
   updateParticipantState(ParticipantState state, int value) {
@@ -165,7 +166,7 @@ class ParticipantCard {
 
       success = CardUtil.next(card, c);
       if (success && i + 1 < handCards.length) {
-        String c1 = handCards[i + i];
+        String c1 = handCards[i + 1];
         success = CardUtil.next(c, c1);
         if (success) {
           pos ??= [];
@@ -175,7 +176,7 @@ class ParticipantCard {
       }
       success = CardUtil.next(c, card);
       if (success && i + 1 < handCards.length) {
-        String c1 = handCards[i + i];
+        String c1 = handCards[i + 1];
         success = CardUtil.next(card, c1);
         if (success) {
           pos ??= [];
@@ -184,7 +185,7 @@ class ParticipantCard {
         }
       }
 
-      String c1 = handCards[i - i];
+      String c1 = handCards[i - 1];
       success = CardUtil.next(c1, c);
       if (success) {
         success = CardUtil.next(c, card);
@@ -204,6 +205,7 @@ class ParticipantCard {
     CompleteType? completeType;
     List<String> cards = [...handCards];
     cards.add(card);
+    CardUtil.sort(cards);
     SplitCard splitCard = SplitCard();
     bool success = splitCard.check13_1(cards);
     if (success) {
@@ -253,7 +255,7 @@ class ParticipantCard {
       return false;
     }
     card = handCards.removeAt(pos);
-    handCards.removeAt(pos + 1);
+    handCards.removeAt(pos);
     SequenceCard sequenceCard = SequenceCard(
         CardUtil.cardType(card), SequenceCardType.touch, [card, card, card]);
     touchCards.add(sequenceCard);
@@ -267,8 +269,8 @@ class ParticipantCard {
       return false;
     }
     card = handCards.removeAt(pos);
-    handCards.removeAt(pos + 1);
-    handCards.removeAt(pos + 2);
+    handCards.removeAt(pos);
+    handCards.removeAt(pos);
     SequenceCard sequenceCard = SequenceCard(CardUtil.cardType(card),
         SequenceCardType.bar, [card, card, card, card]);
     touchCards.add(sequenceCard);
@@ -282,9 +284,9 @@ class ParticipantCard {
       return false;
     }
     card = handCards.removeAt(pos);
-    handCards.removeAt(pos + 1);
-    handCards.removeAt(pos + 2);
-    handCards.removeAt(pos + 3);
+    handCards.removeAt(pos);
+    handCards.removeAt(pos);
+    handCards.removeAt(pos);
     SequenceCard sequenceCard = SequenceCard(CardUtil.cardType(card),
         SequenceCardType.darkBar, [card, card, card, card]);
     touchCards.add(sequenceCard);
@@ -313,6 +315,7 @@ class ParticipantCard {
       if (completeType != null) {
         logger.i('complete!');
       }
+      score.value += 1;
 
       return completeType;
     }

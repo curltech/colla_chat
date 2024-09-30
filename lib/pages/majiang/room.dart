@@ -7,6 +7,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/majiang/card.dart';
 import 'package:colla_chat/pages/majiang/card_util.dart';
 import 'package:colla_chat/pages/majiang/participant_card.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -161,6 +162,8 @@ class MajiangRoom {
     unknownCards.clear();
     banker = null;
     keeper = null;
+    sendCard = null;
+    sender = null;
     List<String> allCards = [...cardConcept.allCards];
     Random random = Random.secure();
     randoms ??= [];
@@ -251,9 +254,9 @@ class MajiangRoom {
     if (result == -1) {
       result = previousParticipant.checkTouch(card);
     }
-    if (result == -1) {
-      results = nextParticipant.checkDrawing(card);
-    }
+    // if (result == -1) {
+    //   results = nextParticipant.checkDrawing(card);
+    // }
 
     /// 所有的参与者都无法响应，则发牌
     if (result == -1 &&
@@ -262,6 +265,8 @@ class MajiangRoom {
         opponentCompleteType == null &&
         previousCompleteType == null) {
       take(nextPos);
+    } else {
+      logger.e('error');
     }
   }
 
@@ -275,7 +280,10 @@ class MajiangRoom {
   }
 
   /// 某个参与者过，没有采取任何行为
-  pass(int owner) {
+  bool pass(int owner) {
+    if (sender == null) {
+      return false;
+    }
     ParticipantCard participant = participantCards[owner];
     participant.participantState.clear();
     int nextPos = next(owner);
@@ -291,6 +299,8 @@ class MajiangRoom {
         previousParticipant.participantState.isEmpty) {
       take(next(sender!));
     }
+
+    return true;
   }
 
   /// 某个参与者碰打出的牌
@@ -300,6 +310,7 @@ class MajiangRoom {
     }
     bool result = participantCards[owner].touch(pos, card: sendCard!);
     participantCards[sender!].poolCards.removeLast();
+    keeper = owner;
     sender = null;
     sendCard = null;
 
@@ -313,6 +324,7 @@ class MajiangRoom {
     }
     bool result = participantCards[owner].bar(pos, card: sendCard!);
     participantCards[sender!].poolCards.removeLast();
+    keeper = owner;
     sender = null;
     sendCard = null;
 
@@ -331,6 +343,7 @@ class MajiangRoom {
     }
     bool result = participantCards[owner].drawing(pos, sendCard!);
     participantCards[sender!].poolCards.removeLast();
+    keeper = owner;
     sender = null;
     sendCard = null;
 
@@ -338,8 +351,13 @@ class MajiangRoom {
   }
 
   /// 某个参与者胡牌
-  complete(int owner) {
-    participantCards[owner].complete();
+  CompleteType? complete(int owner) {
+    CompleteType? completeType = participantCards[owner].complete();
+    if (completeType != null) {
+      play();
+    }
+
+    return completeType;
   }
 
   void onRoomEvent(RoomEvent roomEvent) {

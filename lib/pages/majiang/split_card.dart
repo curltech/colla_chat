@@ -221,7 +221,8 @@ class SplitCard {
         /// 成对，去掉对子将牌
         if (card == previous) {
           List<String> subCards = cards.sublist(0, i - 1);
-          subCards.addAll(cards.sublist(i));
+          List<String> cs = cards.sublist(i + 1);
+          subCards.addAll(cs);
 
           /// 对无将牌的牌分类，遍历每种花色
           Map<CardType, List<String>> typeCardMap = splitType(subCards);
@@ -239,8 +240,8 @@ class SplitCard {
             } else {
               // 找到这种花色胡牌的组合
               for (var entry in sequenceCardMap.entries) {
-                List<SequenceCard> sequenceCards = entry.value;
-                sequenceCards.addAll(sequenceCards);
+                List<SequenceCard> scs = entry.value;
+                sequenceCards.addAll(scs);
               }
             }
           }
@@ -263,20 +264,14 @@ class SplitCard {
   /// 对无将牌的牌分类
   Map<CardType, List<String>> splitType(List<String> cards) {
     Map<CardType, List<String>> cardMap = {};
-    int start = 0;
-    for (int i = 1; i < cards.length; ++i) {
+    for (int i = 0; i < cards.length; ++i) {
       String card = cards[i];
-      String previous = cards[i - 1];
-      CardType? cardType = CardUtil.sameType(previous, card);
-      if (cardType == null) {
-        cardType = CardUtil.cardType(previous);
-        if (!cardMap.containsKey(cardType)) {
-          cardMap[cardType] = [];
-        }
-        List<String> typeCards = cardMap[cardType]!;
-        typeCards.addAll(cards.sublist(start, i));
-        start = i;
+      CardType cardType = CardUtil.cardType(card);
+      if (!cardMap.containsKey(cardType)) {
+        cardMap[cardType] = [];
       }
+      List<String> typeCards = cardMap[cardType]!;
+      typeCards.add(card);
     }
 
     return cardMap;
@@ -285,7 +280,7 @@ class SplitCard {
   /// 同花色类型的拆分，其中的一对将牌已经抽出，所以张数只能是3，6，9，12
   Map<SequenceCardType, List<SequenceCard>>? _split(List<String> cards) {
     int length = cards.length;
-    if (length != 3 || length != 6 || length != 9 || length != 12) {
+    if (length != 3 && length != 6 && length != 9 && length != 12) {
       return null;
     }
 
@@ -299,9 +294,9 @@ class SplitCard {
       if (sequenceCardType != SequenceCardType.touch &&
           sequenceCardType != SequenceCardType.sequence) {
         if (length > start + 3) {
-          String card = subCards[start + 3];
-          subCards[start + 3] = subCards[start + 2];
-          subCards[start + 2] = card;
+          String card = cards[start + 3];
+          cards[start + 3] = cards[start + 2];
+          cards[start + 2] = card;
           subCards = cards.sublist(start, start + 3);
           sequenceCardType = CardUtil.sequenceCardType(subCards);
         }

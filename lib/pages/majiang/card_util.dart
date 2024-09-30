@@ -1,7 +1,20 @@
 enum CardType { wind, suo, tong, wan }
 
 /// 对子,刻子,顺子,杠子
-enum SequenceCardType { single, pair, sequence, touch, bar, darkBar }
+enum SequenceCardType {
+  single,
+  pair, //11
+  sequence, //123
+  touch, //111
+  bar, //1111
+  darkBar, //1111
+  sequencePair, //122
+  pairSequence, //112
+  skipSequence, //134
+  skipPair, //133
+  pairSkip, //113
+  skip, //135
+}
 
 // 胡牌类型
 enum CompleteType {
