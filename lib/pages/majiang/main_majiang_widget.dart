@@ -40,6 +40,8 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
 
   final RxInt current = 0.obs;
 
+  final double amplyFactor = 1.2;
+
   /// 自己的手牌
   Widget _buildHandCard() {
     double ratio = 0.75;
@@ -55,14 +57,14 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
         Widget touchCard = card.touchCard();
         children.add(touchCard);
         children.add(const SizedBox(
-          width: 15,
+          width: 5,
         ));
       }
       for (var card in participantCard.touchCards) {
         Widget touchCard = card.touchCard();
         children.add(touchCard);
         children.add(const SizedBox(
-          width: 15,
+          width: 5,
         ));
       }
       for (var card in participantCard.handCards) {
@@ -117,21 +119,22 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
         Widget previousTouchCard = card.previousTouchCard(ratio: ratio);
         children.add(previousTouchCard);
         children.add(const SizedBox(
-          height: 15,
+          height: 5,
         ));
       }
       for (var card in participantCard.touchCards) {
         Widget previousTouchCard = card.previousTouchCard(ratio: ratio);
         children.add(previousTouchCard);
         children.add(const SizedBox(
-          height: 15,
+          height: 5,
         ));
       }
+      int length = participantCard.handCards.length;
       for (var i = 0; i < participantCard.handCards.length; ++i) {
         var card = participantCard.handCards[i];
         MajiangCard majiangCard = MajiangCard(card);
-        Widget previousHand =
-            majiangCard.previousHand(clip: i < 12 ? true : false, ratio: ratio);
+        Widget previousHand = majiangCard.previousHand(
+            clip: i < length - 1 ? true : false, ratio: ratio);
         children.add(previousHand);
       }
       String? card = participantCard.comingCard.value;
@@ -165,14 +168,14 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
         Widget opponentTouchCard = card.opponentTouchCard(ratio: ratio);
         children.add(opponentTouchCard);
         children.add(const SizedBox(
-          width: 15,
+          width: 5,
         ));
       }
       for (var card in participantCard.touchCards) {
         Widget opponentTouchCard = card.opponentTouchCard(ratio: ratio);
         children.add(opponentTouchCard);
         children.add(const SizedBox(
-          width: 15,
+          width: 5,
         ));
       }
       String? card = participantCard.comingCard.value;
@@ -181,7 +184,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
         Widget opponentHand = majiangCard.opponentHand(ratio: ratio);
         children.add(opponentHand);
         children.add(const SizedBox(
-          width: 15.0,
+          width: 5.0,
         ));
       }
       for (var card in participantCard.handCards) {
@@ -215,24 +218,25 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
         Widget nextHand = majiangCard.nextHand(clip: false, ratio: ratio);
         children.add(nextHand);
       }
+      int length = participantCard.handCards.length;
       for (var i = 0; i < participantCard.handCards.length; ++i) {
         var card = participantCard.handCards[i];
         MajiangCard majiangCard = MajiangCard(card);
-        Widget nextHand =
-            majiangCard.nextHand(clip: i < 12 ? true : false, ratio: ratio);
+        Widget nextHand = majiangCard.nextHand(
+            clip: i < length - 1 ? true : false, ratio: ratio);
         children.add(nextHand);
       }
       for (var card in participantCard.drawingCards) {
         Widget nextTouchCard = card.nextTouchCard(ratio: ratio);
         children.add(const SizedBox(
-          height: 15,
+          height: 5,
         ));
         children.add(nextTouchCard);
       }
       for (var card in participantCard.touchCards) {
         Widget nextTouchCard = card.nextTouchCard(ratio: ratio);
         children.add(const SizedBox(
-          height: 15,
+          height: 5,
         ));
         children.add(nextTouchCard);
       }
@@ -268,7 +272,10 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
               clip = false;
             }
             if (j + i == length - 1) {
-              factRatio = ratio * 1.2;
+              if (majiangRoom.sendCard != null &&
+                  majiangRoom.sendCard == card) {
+                factRatio = ratio * amplyFactor;
+              }
             }
             Widget previousTouchCard =
                 majiangCard.previousTouchCard(ratio: factRatio, clip: clip);
@@ -313,7 +320,10 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
               clip = false;
             }
             if (j + i == length - 1) {
-              factRatio = ratio * 1.2;
+              if (majiangRoom.sendCard != null &&
+                  majiangRoom.sendCard == card) {
+                factRatio = ratio * amplyFactor;
+              }
             }
             Widget nextTouchCard =
                 majiangCard.nextTouchCard(ratio: factRatio, clip: clip);
@@ -352,13 +362,16 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
       for (var i = 0; i < length; i = i + segment) {
         List<Widget> rowChildren = [];
         for (int j = 0; j < segment; ++j) {
-          double factRatio = ratio;
-          if (j + i == length - 1) {
-            factRatio = ratio * 1.2;
-          }
           if (j + i < length) {
             var card = participantCard.poolCards[j + i];
             MajiangCard majiangCard = MajiangCard(card);
+            double factRatio = ratio;
+            if (j + i == length - 1) {
+              if (majiangRoom.sendCard != null &&
+                  majiangRoom.sendCard == card) {
+                factRatio = ratio * amplyFactor;
+              }
+            }
             Widget touchCard = majiangCard.touchCard(ratio: factRatio);
             rowChildren.add(touchCard);
           }
@@ -395,12 +408,12 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
       for (var i = 0; i < length; i = i + segment) {
         List<Widget> rowChildren = [];
         for (int j = 0; j < segment; ++j) {
-          double factRatio = ratio;
-          if (j + i == length - 1) {
-            factRatio = ratio * 1.2;
-          }
           if (j + i < length) {
             var card = participantCard.poolCards[j + i];
+            double factRatio = ratio;
+            if (majiangRoom.sendCard != null && majiangRoom.sendCard == card) {
+              factRatio = ratio * amplyFactor;
+            }
             MajiangCard majiangCard = MajiangCard(card);
             Widget opponentTouchCard =
                 majiangCard.opponentTouchCard(ratio: factRatio);

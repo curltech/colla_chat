@@ -10,6 +10,9 @@ import 'package:get/get.dart';
 
 enum ParticipantState { pass, touch, bar, darkbar, drawing, complete }
 
+/// 自摸牌，杠上牌
+enum ComingCardType { self, bar, sea }
+
 class ParticipantCard {
   final String peerId;
 
@@ -35,6 +38,8 @@ class ParticipantCard {
   final RxList<String> poolCards = <String>[].obs;
 
   final Rx<String?> comingCard = Rx<String?>(null);
+
+  ComingCardType? comingCardType;
 
   final RxMap<ParticipantState, List<int>> participantState =
       RxMap<ParticipantState, List<int>>({});
@@ -69,6 +74,7 @@ class ParticipantCard {
     drawingCards.clear();
     poolCards.clear();
     comingCard.value = null;
+    comingCardType = null;
   }
 
   updateParticipantState(ParticipantState state, int value) {
@@ -246,6 +252,7 @@ class ParticipantCard {
       CardUtil.sort(handCards);
     }
     comingCard.value = null;
+    comingCardType = null;
     poolCards.add(card);
   }
 
@@ -313,9 +320,8 @@ class ParticipantCard {
       CompleteType? completeType =
           NumberUtil.toEnum(CompleteType.values, complete);
       if (completeType != null) {
-        logger.i('complete!');
+        logger.i('complete:$completeType');
       }
-      score.value += 1;
 
       return completeType;
     }
@@ -329,8 +335,9 @@ class ParticipantCard {
   }
 
   /// 摸牌，peerId为空，自己摸牌，不为空，别人摸牌
-  take(String card) {
+  take(String card, ComingCardType comingCardType) {
     comingCard.value = card;
+    this.comingCardType = comingCardType;
     takeCheck(card);
   }
 

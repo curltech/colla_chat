@@ -53,6 +53,20 @@ class MajiangRoom {
   /// 未知的牌
   List<String> unknownCards = [];
 
+  /// 胡牌的分数
+  Map<CompleteType, int> completeTypeScores = {
+    CompleteType.thirteenOne: 300,
+    CompleteType.oneNine: 150,
+    CompleteType.pureTouch: 150,
+    CompleteType.luxPair7: 150,
+    CompleteType.pureOneType: 150,
+    CompleteType.mixTouch: 100,
+    CompleteType.pair7: 80,
+    CompleteType.mixOneType: 60,
+    CompleteType.touch: 40,
+    CompleteType.small: 10,
+  };
+
   /// 庄家
   int? banker;
 
@@ -164,6 +178,7 @@ class MajiangRoom {
     keeper = null;
     sendCard = null;
     sender = null;
+    barCount = 0;
     List<String> allCards = [...cardConcept.allCards];
     Random random = Random.secure();
     randoms ??= [];
@@ -270,13 +285,45 @@ class MajiangRoom {
     }
   }
 
+  /// 杠牌次数
+  int barCount = 0;
+
+  /// 杠牌发牌
+  barTake(int owner) {
+    if (unknownCards.isEmpty) {
+      play();
+
+      return;
+    }
+    int mod = barCount ~/ 2;
+    String card;
+    if (mod == 0 && unknownCards.length > 1) {
+      card = unknownCards.removeAt(unknownCards.length - 2);
+    } else {
+      card = unknownCards.removeLast();
+    }
+    sender = null;
+    sendCard = null;
+    keeper = owner;
+    participantCards[owner].take(card, ComingCardType.bar);
+  }
+
   /// 发牌
   take(int owner) {
+    if (unknownCards.isEmpty) {
+      play();
+
+      return;
+    }
     String card = unknownCards.removeLast();
     sender = null;
     sendCard = null;
     keeper = owner;
-    participantCards[owner].take(card);
+    if (unknownCards.length < 5) {
+      participantCards[owner].take(card, ComingCardType.sea);
+    } else {
+      participantCards[owner].take(card, ComingCardType.self);
+    }
   }
 
   /// 某个参与者过，没有采取任何行为
@@ -325,8 +372,10 @@ class MajiangRoom {
     bool result = participantCards[owner].bar(pos, card: sendCard!);
     participantCards[sender!].poolCards.removeLast();
     keeper = owner;
+    barCount++;
     sender = null;
     sendCard = null;
+    barTake(owner);
 
     return result;
   }
@@ -334,6 +383,8 @@ class MajiangRoom {
   /// 某个参与者暗杠，pos表示杠牌的位置
   darkBar(int owner, int pos) {
     participantCards[owner].darkBar(pos);
+    barCount++;
+    barTake(owner);
   }
 
   /// 某个参与者吃打出的牌，pos表示吃牌的位置
@@ -350,10 +401,38 @@ class MajiangRoom {
     return result;
   }
 
+  bool score(int owner, CompleteType completeType) {
+    int? baseScore = completeTypeScores[completeType];
+    if (baseScore == null) {
+      return false;
+    }
+    ParticipantCard participantCard = participantCards[owner];
+    if (participantCard.comingCardType == ComingCardType.bar ||
+        participantCard.comingCardType == ComingCardType.sea) {
+      baseScore = baseScore * 2;
+      participantCard.score.value += baseScore * 3;
+    } else if (participantCard.comingCardType == ComingCardType.self) {
+      participantCard.score.value += baseScore * 3;
+    }
+    if (sender != null) {
+      participantCards[sender!].score.value -= baseScore;
+    } else {
+      for (int i = 0; i < participantCards.length; ++i) {
+        ParticipantCard participantCard = participantCards[i];
+        if (i == sender) {
+          participantCard.score.value -= baseScore;
+        }
+      }
+    }
+
+    return true;
+  }
+
   /// 某个参与者胡牌
   CompleteType? complete(int owner) {
     CompleteType? completeType = participantCards[owner].complete();
     if (completeType != null) {
+      score(owner, completeType);
       play();
     }
 
