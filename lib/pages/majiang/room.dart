@@ -206,12 +206,17 @@ class MajiangRoom {
   }
 
   /// 打牌
-  send(int owner, String card) {
+  bool send(int owner, String card) {
+    if (owner != keeper) {
+      return false;
+    }
     participantCards[owner].send(card);
     sender = owner;
     sendCard = card;
     keeper = null;
     sendCheck(owner, card);
+
+    return true;
   }
 
   /// pos的参与者打出一张牌，其他三家检查
@@ -289,13 +294,29 @@ class MajiangRoom {
   }
 
   /// 某个参与者碰打出的牌
-  touch(int owner, int pos) {
-    participantCards[owner].touch(pos, card: sendCard!);
+  bool touch(int owner, int pos) {
+    if (sendCard == null) {
+      return false;
+    }
+    bool result = participantCards[owner].touch(pos, card: sendCard!);
+    participantCards[sender!].poolCards.removeLast();
+    sender = null;
+    sendCard = null;
+
+    return result;
   }
 
   /// 某个参与者杠打出的牌
-  bar(int owner, int pos) {
-    participantCards[owner].bar(pos, card: sendCard!);
+  bool bar(int owner, int pos) {
+    if (sendCard == null) {
+      return false;
+    }
+    bool result = participantCards[owner].bar(pos, card: sendCard!);
+    participantCards[sender!].poolCards.removeLast();
+    sender = null;
+    sendCard = null;
+
+    return result;
   }
 
   /// 某个参与者暗杠，pos表示杠牌的位置
@@ -304,8 +325,16 @@ class MajiangRoom {
   }
 
   /// 某个参与者吃打出的牌，pos表示吃牌的位置
-  drawing(int owner, int pos) {
-    participantCards[owner].drawing(pos, sendCard!);
+  bool drawing(int owner, int pos) {
+    if (sendCard == null) {
+      return false;
+    }
+    bool result = participantCards[owner].drawing(pos, sendCard!);
+    participantCards[sender!].poolCards.removeLast();
+    sender = null;
+    sendCard = null;
+
+    return result;
   }
 
   /// 某个参与者胡牌

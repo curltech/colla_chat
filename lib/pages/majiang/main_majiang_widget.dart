@@ -10,7 +10,6 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/number_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
@@ -45,19 +44,26 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
   Widget _buildHandCard() {
     double ratio = 0.75;
     return Obx(() {
-      MajiangRoom majiangRoom = this.majiangRoom.value!;
+      MajiangRoom? majiangRoom = this.majiangRoom.value;
+      if (majiangRoom == null) {
+        return nilBox;
+      }
       List<Widget> children = [];
       int owner = current.value;
       ParticipantCard participantCard = majiangRoom.participantCards[owner];
-      for (var card in participantCard.allDrawingCards) {
-        MajiangCard majiangCard = MajiangCard(card);
-        Widget touchCard = majiangCard.touchCard();
+      for (var card in participantCard.drawingCards) {
+        Widget touchCard = card.touchCard();
         children.add(touchCard);
+        children.add(const SizedBox(
+          width: 15,
+        ));
       }
-      for (var card in participantCard.allTouchCards) {
-        MajiangCard majiangCard = MajiangCard(card);
-        Widget touchCard = majiangCard.touchCard();
+      for (var card in participantCard.touchCards) {
+        Widget touchCard = card.touchCard();
         children.add(touchCard);
+        children.add(const SizedBox(
+          width: 15,
+        ));
       }
       for (var card in participantCard.handCards) {
         MajiangCard majiangCard = MajiangCard(card);
@@ -88,7 +94,8 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
         children.add(handcard);
       }
 
-      return Wrap(
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: children,
       );
     });
@@ -98,20 +105,27 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
   Widget _buildPreviousHand() {
     double ratio = 0.8;
     return Obx(() {
-      MajiangRoom majiangRoom = this.majiangRoom.value!;
+      MajiangRoom? majiangRoom = this.majiangRoom.value;
+      if (majiangRoom == null) {
+        return nilBox;
+      }
       List<Widget> children = [];
       int owner = majiangRoom.previous(current.value);
       ParticipantCard participantCard = majiangRoom.participantCards[owner];
 
-      for (var card in participantCard.allDrawingCards) {
-        MajiangCard majiangCard = MajiangCard(card);
-        Widget previousTouchCard = majiangCard.previousTouchCard(ratio: ratio);
+      for (var card in participantCard.drawingCards) {
+        Widget previousTouchCard = card.previousTouchCard(ratio: ratio);
         children.add(previousTouchCard);
+        children.add(const SizedBox(
+          height: 15,
+        ));
       }
-      for (var card in participantCard.allTouchCards) {
-        MajiangCard majiangCard = MajiangCard(card);
-        Widget previousTouchCard = majiangCard.previousTouchCard(ratio: ratio);
+      for (var card in participantCard.touchCards) {
+        Widget previousTouchCard = card.previousTouchCard(ratio: ratio);
         children.add(previousTouchCard);
+        children.add(const SizedBox(
+          height: 15,
+        ));
       }
       for (var i = 0; i < participantCard.handCards.length; ++i) {
         var card = participantCard.handCards[i];
@@ -127,8 +141,9 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
             majiangCard.previousHand(clip: false, ratio: ratio);
         children.add(previousHand);
       }
-      return Wrap(
-        direction: Axis.vertical,
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: children,
       );
     });
@@ -138,20 +153,27 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
   Widget _buildOpponentHand() {
     double ratio = 0.8;
     return Obx(() {
-      MajiangRoom majiangRoom = this.majiangRoom.value!;
+      MajiangRoom? majiangRoom = this.majiangRoom.value;
+      if (majiangRoom == null) {
+        return nilBox;
+      }
       List<Widget> children = [];
       int owner = majiangRoom.opponent(current.value);
       ParticipantCard participantCard = majiangRoom.participantCards[owner];
 
-      for (var card in participantCard.allDrawingCards) {
-        MajiangCard majiangCard = MajiangCard(card);
-        Widget opponentTouchCard = majiangCard.opponentTouchCard(ratio: ratio);
+      for (var card in participantCard.drawingCards) {
+        Widget opponentTouchCard = card.opponentTouchCard(ratio: ratio);
         children.add(opponentTouchCard);
+        children.add(const SizedBox(
+          width: 15,
+        ));
       }
-      for (var card in participantCard.allTouchCards) {
-        MajiangCard majiangCard = MajiangCard(card);
-        Widget opponentTouchCard = majiangCard.opponentTouchCard(ratio: ratio);
+      for (var card in participantCard.touchCards) {
+        Widget opponentTouchCard = card.opponentTouchCard(ratio: ratio);
         children.add(opponentTouchCard);
+        children.add(const SizedBox(
+          width: 15,
+        ));
       }
       String? card = participantCard.comingCard.value;
       if (card != null) {
@@ -168,7 +190,8 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
         children.add(opponentHand);
       }
       return Center(
-          child: Wrap(
+          child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: children,
       ));
     });
@@ -178,21 +201,14 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
   Widget _buildNextHand() {
     double ratio = 0.8;
     return Obx(() {
-      MajiangRoom majiangRoom = this.majiangRoom.value!;
+      MajiangRoom? majiangRoom = this.majiangRoom.value;
+      if (majiangRoom == null) {
+        return nilBox;
+      }
       List<Widget> children = [];
       int owner = majiangRoom.next(current.value);
       ParticipantCard participantCard = majiangRoom.participantCards[owner];
 
-      for (var card in participantCard.allDrawingCards) {
-        MajiangCard majiangCard = MajiangCard(card);
-        Widget nextTouchCard = majiangCard.nextTouchCard(ratio: ratio);
-        children.add(nextTouchCard);
-      }
-      for (var card in participantCard.allTouchCards) {
-        MajiangCard majiangCard = MajiangCard(card);
-        Widget nextTouchCard = majiangCard.nextTouchCard(ratio: ratio);
-        children.add(nextTouchCard);
-      }
       String? card = participantCard.comingCard.value;
       if (card != null) {
         MajiangCard majiangCard = MajiangCard(card);
@@ -206,8 +222,22 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
             majiangCard.nextHand(clip: i < 12 ? true : false, ratio: ratio);
         children.add(nextHand);
       }
-      return Wrap(
-        direction: Axis.vertical,
+      for (var card in participantCard.drawingCards) {
+        Widget nextTouchCard = card.nextTouchCard(ratio: ratio);
+        children.add(const SizedBox(
+          height: 15,
+        ));
+        children.add(nextTouchCard);
+      }
+      for (var card in participantCard.touchCards) {
+        Widget nextTouchCard = card.nextTouchCard(ratio: ratio);
+        children.add(const SizedBox(
+          height: 15,
+        ));
+        children.add(nextTouchCard);
+      }
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: children,
       );
     });
@@ -218,7 +248,10 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
     double ratio = 0.9;
     int segment = 11;
     return Obx(() {
-      MajiangRoom majiangRoom = this.majiangRoom.value!;
+      MajiangRoom? majiangRoom = this.majiangRoom.value;
+      if (majiangRoom == null) {
+        return nilBox;
+      }
       int owner = majiangRoom.previous(current.value);
       ParticipantCard participantCard = majiangRoom.participantCards[owner];
       int length = participantCard.poolCards.length;
@@ -230,21 +263,28 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
             var card = participantCard.poolCards[j + i];
             MajiangCard majiangCard = MajiangCard(card);
             bool clip = true;
+            double factRatio = ratio;
             if (j == segment - 1 || j + i == length - 1) {
               clip = false;
             }
+            if (j + i == length - 1) {
+              factRatio = ratio * 1.2;
+            }
             Widget previousTouchCard =
-                majiangCard.previousTouchCard(ratio: ratio, clip: clip);
+                majiangCard.previousTouchCard(ratio: factRatio, clip: clip);
             columnChildren.add(previousTouchCard);
           }
         }
         Widget columnWidget = Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: columnChildren,
         );
         rowChildren.add(columnWidget);
       }
-      return Row(children: rowChildren);
+      Widget poolCard = Row(children: rowChildren);
+
+      return poolCard;
     });
   }
 
@@ -253,7 +293,10 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
     double ratio = 0.9;
     int segment = 11;
     return Obx(() {
-      MajiangRoom majiangRoom = this.majiangRoom.value!;
+      MajiangRoom? majiangRoom = this.majiangRoom.value;
+      if (majiangRoom == null) {
+        return nilBox;
+      }
       int owner = majiangRoom.next(current.value);
       ParticipantCard participantCard = majiangRoom.participantCards[owner];
       int length = participantCard.poolCards.length;
@@ -265,23 +308,28 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
             var card = participantCard.poolCards[j + i];
             MajiangCard majiangCard = MajiangCard(card);
             bool clip = true;
+            double factRatio = ratio;
             if (j == segment - 1 || j + i == length - 1) {
               clip = false;
             }
+            if (j + i == length - 1) {
+              factRatio = ratio * 1.2;
+            }
             Widget nextTouchCard =
-                majiangCard.nextTouchCard(ratio: ratio, clip: clip);
+                majiangCard.nextTouchCard(ratio: factRatio, clip: clip);
             columnChildren.add(nextTouchCard);
           }
         }
         Widget columnWidget = Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: columnChildren,
         );
         rowChildren.add(columnWidget);
       }
       rowChildren = rowChildren.reversed.toList();
       rowChildren.insert(0, const Spacer());
-      return Row(
+      return Row(mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start, children: rowChildren);
     });
   }
@@ -291,7 +339,10 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
     double ratio = 0.7;
     int segment = 11;
     return Obx(() {
-      MajiangRoom majiangRoom = this.majiangRoom.value!;
+      MajiangRoom? majiangRoom = this.majiangRoom.value;
+      if (majiangRoom == null) {
+        return nilBox;
+      }
       int owner = current.value;
       ParticipantCard participantCard = majiangRoom.participantCards[owner];
       int length = participantCard.poolCards.length;
@@ -299,15 +350,20 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
       for (var i = 0; i < length; i = i + segment) {
         List<Widget> rowChildren = [];
         for (int j = 0; j < segment; ++j) {
+          double factRatio = ratio;
+          if (j + i == length - 1) {
+            factRatio = ratio * 1.2;
+          }
           if (j + i < length) {
             var card = participantCard.poolCards[j + i];
             MajiangCard majiangCard = MajiangCard(card);
-            Widget touchCard = majiangCard.touchCard(ratio: ratio);
+            Widget touchCard = majiangCard.touchCard(ratio: factRatio);
             rowChildren.add(touchCard);
           }
         }
         Widget rowWidget = Row(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: rowChildren,
         );
         columnChildren.add(rowWidget);
@@ -315,7 +371,8 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
       columnChildren = columnChildren.reversed.toList();
       columnChildren.insert(0, const Spacer());
       return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: columnChildren);
     });
   }
@@ -325,7 +382,10 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
     double ratio = 0.7;
     int segment = 11;
     return Obx(() {
-      MajiangRoom majiangRoom = this.majiangRoom.value!;
+      MajiangRoom? majiangRoom = this.majiangRoom.value;
+      if (majiangRoom == null) {
+        return nilBox;
+      }
       int owner = majiangRoom.opponent(current.value);
       ParticipantCard participantCard = majiangRoom.participantCards[owner];
       int length = participantCard.poolCards.length;
@@ -333,21 +393,28 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
       for (var i = 0; i < length; i = i + segment) {
         List<Widget> rowChildren = [];
         for (int j = 0; j < segment; ++j) {
+          double factRatio = ratio;
+          if (j + i == length - 1) {
+            factRatio = ratio * 1.2;
+          }
           if (j + i < length) {
             var card = participantCard.poolCards[j + i];
             MajiangCard majiangCard = MajiangCard(card);
             Widget opponentTouchCard =
-                majiangCard.opponentTouchCard(ratio: ratio);
+                majiangCard.opponentTouchCard(ratio: factRatio);
             rowChildren.add(opponentTouchCard);
           }
         }
         Widget rowWidget = Row(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: rowChildren,
         );
         columnChildren.add(rowWidget);
       }
+
       return Column(
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: columnChildren);
     });
@@ -643,20 +710,15 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
       List<int> pos) {
     if (participantState == ParticipantState.complete) {
       majiangRoom.complete(owner);
-    }
-    if (participantState == ParticipantState.touch) {
+    } else if (participantState == ParticipantState.touch) {
       majiangRoom.touch(owner, pos[0]);
-    }
-    if (participantState == ParticipantState.bar) {
+    } else if (participantState == ParticipantState.bar) {
       majiangRoom.bar(owner, pos[0]);
-    }
-    if (participantState == ParticipantState.darkbar) {
+    } else if (participantState == ParticipantState.darkbar) {
       majiangRoom.darkBar(owner, pos[0]);
-    }
-    if (participantState == ParticipantState.pass) {
+    } else if (participantState == ParticipantState.pass) {
       majiangRoom.pass(owner);
-    }
-    if (participantState == ParticipantState.drawing) {
+    } else if (participantState == ParticipantState.drawing) {
       majiangRoom.drawing(owner, pos[0]);
     }
   }
@@ -670,7 +732,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
     ParticipantCard participantCard = majiangRoom.participantCards[owner];
     Map<ParticipantState, List<int>> participantState =
         participantCard.participantState;
-    if (participantState.isNotEmpty) {
+    if (participantState.isEmpty) {
       return null;
     }
     List<Widget>? stateButtons = [];
@@ -684,6 +746,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
         stateButtons.add(IconButton(
           onPressed: () {
             _call(majiangRoom, owner, participantState, pos);
+            participantCard.participantState.clear();
           },
           icon: image,
         ));
@@ -693,7 +756,7 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
     return Align(
         alignment: Alignment.bottomRight,
         child: Padding(
-            padding: const EdgeInsets.all(30.0),
+            padding: const EdgeInsets.all(100.0),
             child: OverflowBar(
               spacing: 10.0,
               alignment: MainAxisAlignment.end,
@@ -730,22 +793,24 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
       }
 
       String? title = majiangRoom?.name;
-      List<Widget> children = [
-        backgroundImage.get('background')!,
-        _buildDesktop(),
-      ];
+      Widget desktopWidget = Stack(
+        fit: StackFit.expand,
+        children: [
+          backgroundImage.get('background')!,
+          _buildDesktop(),
+        ],
+      );
       Widget? stateWidget = _buildParticipantStateWidget(context);
       if (stateWidget != null) {
-        children.add(stateWidget);
+        desktopWidget = Stack(
+          children: [IgnorePointer(child: desktopWidget), stateWidget],
+        );
       }
       return AppBarView(
           title: title ?? this.title,
           withLeading: true,
           rightWidgets: rightWidgets,
-          child: Stack(
-            fit: StackFit.expand,
-            children: children,
-          ));
+          child: desktopWidget);
     });
 
     return majiangMain;

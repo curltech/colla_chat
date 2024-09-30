@@ -1,5 +1,6 @@
 import 'package:colla_chat/pages/majiang/card.dart';
 import 'package:colla_chat/pages/majiang/card_util.dart';
+import 'package:flutter/material.dart';
 
 /// 连续牌，代表某个花色的连续牌形，一般只有两张或者三张牌，刻子，顺子或者对子
 class SequenceCard {
@@ -10,6 +11,72 @@ class SequenceCard {
   final List<String> cards;
 
   SequenceCard(this.cardType, this.sequenceCardType, this.cards);
+
+  Widget touchCard({double ratio = 1.0}) {
+    List<Widget> children = [];
+    for (var card in cards) {
+      MajiangCard majiangCard = MajiangCard(card);
+      Widget touchCard = majiangCard.touchCard(ratio: ratio);
+      children.add(touchCard);
+    }
+    Widget sequenceCard = Row(
+      children: children,
+    );
+
+    return sequenceCard;
+  }
+
+  Widget previousTouchCard({double ratio = 1.0}) {
+    List<Widget> children = [];
+    for (var i = 0; i < cards.length; ++i) {
+      var card = cards[i];
+      MajiangCard majiangCard = MajiangCard(card);
+      bool clip = i != cards.length - 1;
+      Widget previousTouchCard =
+          majiangCard.previousTouchCard(ratio: ratio, clip: clip);
+      children.add(previousTouchCard);
+    }
+    Widget sequenceCard = Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: children,
+    );
+
+    return sequenceCard;
+  }
+
+  Widget opponentTouchCard({double ratio = 1.0}) {
+    List<Widget> children = [];
+    for (var card in cards) {
+      MajiangCard majiangCard = MajiangCard(card);
+      Widget opponentTouchCard = majiangCard.opponentTouchCard(ratio: ratio);
+      children.add(opponentTouchCard);
+    }
+    Widget sequenceCard = Row(
+      children: children,
+    );
+
+    return sequenceCard;
+  }
+
+  Widget nextTouchCard({double ratio = 1.0}) {
+    List<Widget> children = [];
+    for (var i = 0; i < cards.length; ++i) {
+      var card = cards[i];
+      MajiangCard majiangCard = MajiangCard(card);
+      bool clip = i != cards.length - 1;
+      Widget nextTouchCard =
+          majiangCard.nextTouchCard(ratio: ratio, clip: clip);
+      children.add(nextTouchCard);
+    }
+    Widget sequenceCard = Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: children,
+    );
+
+    return sequenceCard;
+  }
 }
 
 /// 经过拆分的手牌，被按照花色，牌形进行拆分，用于判断是否胡牌

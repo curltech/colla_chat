@@ -84,24 +84,6 @@ class ParticipantCard {
     CardUtil.sort(handCards);
   }
 
-  List<String> get allTouchCards {
-    List<String> cards = [];
-    for (SequenceCard touchCard in touchCards.value) {
-      cards.addAll(touchCard.cards);
-    }
-
-    return cards;
-  }
-
-  List<String> get allDrawingCards {
-    List<String> cards = [];
-    for (SequenceCard drawingCard in drawingCards.value) {
-      cards.addAll(drawingCard.cards);
-    }
-
-    return cards;
-  }
-
   /// 检查碰牌
   int checkTouch(String card) {
     int length = handCards.length;
@@ -295,7 +277,7 @@ class ParticipantCard {
   }
 
   /// 暗杠牌
-  darkBar(int pos, {String? card}) {
+  bool darkBar(int pos, {String? card}) {
     if (card != null && handCards[pos] != card) {
       return false;
     }
@@ -306,15 +288,19 @@ class ParticipantCard {
     SequenceCard sequenceCard = SequenceCard(CardUtil.cardType(card),
         SequenceCardType.darkBar, [card, card, card, card]);
     touchCards.add(sequenceCard);
+
+    return true;
   }
 
   /// 吃牌
-  drawing(int pos, String card) {
+  bool drawing(int pos, String card) {
     handCards.removeAt(pos);
     handCards.removeAt(pos);
     SequenceCard sequenceCard = SequenceCard(
         CardUtil.cardType(card), SequenceCardType.sequence, [card, card, card]);
     touchCards.add(sequenceCard);
+
+    return true;
   }
 
   /// 胡牌
