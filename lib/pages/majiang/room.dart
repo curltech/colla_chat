@@ -61,6 +61,8 @@ class MajiangRoom {
   /// 刚出牌的参与者
   int? sender;
 
+  String? sendCard;
+
   /// 正在等待做出决定的参与者，如果为空，则房间发牌，
   /// 如果都是pass消解等待的，则发牌，有一家是非pass消解的不发牌
   List<int> waiting = [];
@@ -171,6 +173,7 @@ class MajiangRoom {
         randoms.add(pos);
       }
       String card = allCards.removeAt(pos);
+
       /// 每个参与者发13张牌
       if (i < 52) {
         int reminder = i % 4;
@@ -206,6 +209,7 @@ class MajiangRoom {
   send(int owner, String card) {
     participantCards[owner].send(card);
     sender = owner;
+    sendCard = card;
     keeper = null;
     sendCheck(owner, card);
   }
@@ -259,8 +263,10 @@ class MajiangRoom {
   /// 发牌
   take(int owner) {
     String card = unknownCards.removeLast();
-    participantCards[owner].take(card);
+    sender = null;
+    sendCard = null;
     keeper = owner;
+    participantCards[owner].take(card);
   }
 
   /// 某个参与者过，没有采取任何行为
@@ -282,24 +288,24 @@ class MajiangRoom {
     }
   }
 
-  /// 某个参与者碰
-  touch(int owner, String card) {
-    participantCards[owner].touch(card);
+  /// 某个参与者碰打出的牌
+  touch(int owner, int pos) {
+    participantCards[owner].touch(pos, card: sendCard!);
   }
 
-  /// 某个参与者杠
-  bar(int owner, String card) {
-    participantCards[owner].bar(card);
+  /// 某个参与者杠打出的牌
+  bar(int owner, int pos) {
+    participantCards[owner].bar(pos, card: sendCard!);
   }
 
-  /// 某个参与者暗杠
-  darkBar(int owner, String card) {
-    participantCards[owner].darkBar(card);
+  /// 某个参与者暗杠，pos表示杠牌的位置
+  darkBar(int owner, int pos) {
+    participantCards[owner].darkBar(pos);
   }
 
-  /// 某个参与者吃
-  drawing(int owner, String card) {
-    participantCards[owner].drawing(card);
+  /// 某个参与者吃打出的牌，pos表示吃牌的位置
+  drawing(int owner, int pos) {
+    participantCards[owner].drawing(pos, sendCard!);
   }
 
   /// 某个参与者胡牌
@@ -322,7 +328,8 @@ class MajiangRoomPool {
   StreamController<RoomEvent> roomEventStreamController =
       StreamController<RoomEvent>.broadcast();
 
-  Future<MajiangRoom> createRoom(String name, List<ParticipantCard> peers) async {
+  Future<MajiangRoom> createRoom(
+      String name, List<ParticipantCard> peers) async {
     MajiangRoom majiangRoom = MajiangRoom(name);
     await majiangRoom.init(peers);
     rooms[name] = majiangRoom;

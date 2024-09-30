@@ -46,7 +46,7 @@ class CardConcept {
   final suoImages = <String, Widget>{};
   final tongImages = <String, Widget>{};
   final wanImages = <String, Widget>{};
-  final actionImages = <String, Widget>{};
+  final stateImages = <String, Widget>{};
 
   CardConcept() {
     _load();
@@ -88,7 +88,7 @@ class CardConcept {
         fit: BoxFit.cover,
       );
 
-      actionImages[actions[i]] = image;
+      stateImages[actions[i]] = image;
     }
 
     allCards = [
@@ -120,8 +120,8 @@ class CardConcept {
     return image;
   }
 
-  Widget? getActionImage(String name) {
-    Widget? image = actionImages[name];
+  Widget? getStateImage(String name) {
+    Widget? image = stateImages[name];
 
     return image;
   }

@@ -15,6 +15,7 @@ class AppBarView extends StatelessWidget {
   final bool centerTitle;
 
   //右边按钮
+  final Widget? rightWidget;
   final List<Widget>? rightWidgets;
 
   //右边下拉菜单
@@ -29,6 +30,7 @@ class AppBarView extends StatelessWidget {
     this.title,
     this.titleWidget,
     this.centerTitle = false,
+    this.rightWidget,
     this.rightWidgets,
     this.rightPopupMenus,
     this.bottom,
@@ -57,6 +59,7 @@ class AppBarView extends StatelessWidget {
             leadingCallBack: leadingCallBack,
             title: titleWidget,
             centerTitle: centerTitle,
+            rightWidget: rightWidget,
             rightWidgets: rightWidgets,
             rightPopupMenus: rightPopupMenus,
             bottom: bottom,

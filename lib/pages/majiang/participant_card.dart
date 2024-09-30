@@ -8,7 +8,7 @@ import 'package:colla_chat/tool/number_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-enum ParticipantState { touch, bar, darkbar, drawing, complete }
+enum ParticipantState { pass, touch, bar, darkbar, drawing, complete }
 
 class ParticipantCard {
   final String peerId;
@@ -266,43 +266,54 @@ class ParticipantCard {
   }
 
   /// 碰牌
-  touch(String card) {
-    handCards.remove(card);
-    handCards.remove(card);
+  bool touch(int pos, {String? card}) {
+    if (card != null && handCards[pos] != card) {
+      return false;
+    }
+    card = handCards.removeAt(pos);
+    handCards.removeAt(pos + 1);
     SequenceCard sequenceCard = SequenceCard(
         CardUtil.cardType(card), SequenceCardType.touch, [card, card, card]);
     touchCards.add(sequenceCard);
+
+    return true;
   }
 
   /// 明杠牌
-  bar(String card) {
-    handCards.remove(card);
-    handCards.remove(card);
-    handCards.remove(card);
+  bool bar(int pos, {String? card}) {
+    if (card != null && handCards[pos] != card) {
+      return false;
+    }
+    card = handCards.removeAt(pos);
+    handCards.removeAt(pos + 1);
+    handCards.removeAt(pos + 2);
     SequenceCard sequenceCard = SequenceCard(CardUtil.cardType(card),
         SequenceCardType.bar, [card, card, card, card]);
     touchCards.add(sequenceCard);
+
+    return true;
   }
 
   /// 暗杠牌
-  darkBar(String card) {
-    handCards.remove(card);
-    handCards.remove(card);
-    handCards.remove(card);
-    handCards.remove(card);
+  darkBar(int pos, {String? card}) {
+    if (card != null && handCards[pos] != card) {
+      return false;
+    }
+    card = handCards.removeAt(pos);
+    handCards.removeAt(pos + 1);
+    handCards.removeAt(pos + 2);
+    handCards.removeAt(pos + 3);
     SequenceCard sequenceCard = SequenceCard(CardUtil.cardType(card),
         SequenceCardType.darkBar, [card, card, card, card]);
     touchCards.add(sequenceCard);
   }
 
   /// 吃牌
-  drawing(String card) {
-    handCards.remove(card);
-    handCards.remove(card);
-    handCards.remove(card);
-    handCards.remove(card);
-    SequenceCard sequenceCard = SequenceCard(CardUtil.cardType(card),
-        SequenceCardType.darkBar, [card, card, card, card]);
+  drawing(int pos, String card) {
+    handCards.removeAt(pos);
+    handCards.removeAt(pos);
+    SequenceCard sequenceCard = SequenceCard(
+        CardUtil.cardType(card), SequenceCardType.sequence, [card, card, card]);
     touchCards.add(sequenceCard);
   }
 

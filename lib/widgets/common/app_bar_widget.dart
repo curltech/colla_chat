@@ -26,6 +26,7 @@ class AppBarWidget {
     Function? leadingCallBack, //回退按钮的回调
     Widget? title = const CommonAutoSizeText(''),
     bool centerTitle = false, //标题是否居中
+    Widget? rightWidget,
     List<Widget>? rightWidgets, //右边的排列组件（按钮）
     List<AppBarPopupMenu>? rightPopupMenus, //右边的下拉菜单组件
     PreferredSizeWidget? bottom, //底部组件
@@ -36,6 +37,9 @@ class AppBarWidget {
     var actions = <Widget>[];
 
     ///首先加上右边的排列组件
+    if (rightWidget != null) {
+      actions.add(rightWidget);
+    }
     if (rightWidgets != null && rightWidgets.isNotEmpty) {
       actions.addAll(rightWidgets);
     }
