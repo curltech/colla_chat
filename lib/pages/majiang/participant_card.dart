@@ -69,6 +69,7 @@ class ParticipantCard {
   }
 
   clear() {
+    participantState.clear();
     handCards.clear();
     touchCards.clear();
     drawingCards.clear();
@@ -236,7 +237,11 @@ class ParticipantCard {
       }
     }
     if (completeType != null) {
-      updateParticipantState(ParticipantState.complete, completeType.index);
+      if (completeType == CompleteType.small && comingCard.value == null) {
+        completeType = null;
+      } else {
+        updateParticipantState(ParticipantState.complete, completeType.index);
+      }
     }
 
     return completeType;

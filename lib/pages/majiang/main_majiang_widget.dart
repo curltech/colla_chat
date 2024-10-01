@@ -815,6 +815,21 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
               current.value = next;
             },
             icon: const Icon(Icons.next_plan_outlined)));
+        rightWidgets.add(IconButton(
+            tooltip: AppLocalizations.t('Check complete'),
+            onPressed: () {
+              ParticipantCard participantCard =
+                  majiangRoom.participantCards[current.value];
+              String? senderCard = majiangRoom.sendCard;
+              String? comingCard = participantCard.comingCard.value;
+              if (senderCard != null) {
+                participantCard.checkComplete(senderCard);
+              }
+              if (comingCard != null) {
+                participantCard.checkComplete(comingCard);
+              }
+            },
+            icon: const Icon(Icons.check)));
       }
 
       String? title = majiangRoom?.name;
