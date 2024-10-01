@@ -659,6 +659,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
 class CustomMultiSelectField extends StatefulWidget {
   final Future<void> Function(String keyword)? onSearch;
   final Function(List<String>? value)? onConfirm;
+  final Function()? onCancel;
   final String title;
   final Widget? prefix;
   final Widget? suffix;
@@ -671,6 +672,7 @@ class CustomMultiSelectField extends StatefulWidget {
       required this.optionController,
       required this.onSearch,
       this.onConfirm,
+      this.onCancel,
       required this.title,
       this.prefix,
       this.suffix,
@@ -770,8 +772,10 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
                         },
                       );
                     });
-                if (widget.onConfirm != null) {
-                  widget.onConfirm!(selected);
+                if (selected != null) {
+                  widget.onConfirm?.call(selected);
+                } else {
+                  widget.onCancel?.call();
                 }
               });
         });

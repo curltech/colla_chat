@@ -628,7 +628,8 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
             }
             peerIds = selected;
           } else {
-            peerIds.assign(myself.peerId!);
+            peerIds.clear();
+            peerIds.add(myself.peerId!);
           }
         },
         selected: [myself.peerId!],
