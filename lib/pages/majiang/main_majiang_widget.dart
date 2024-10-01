@@ -4,6 +4,7 @@ import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/majiang/card.dart';
+import 'package:colla_chat/pages/majiang/card_util.dart';
 import 'package:colla_chat/pages/majiang/participant_card.dart';
 import 'package:colla_chat/pages/majiang/room.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
@@ -723,9 +724,19 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
   }
 
   _call(MajiangRoom majiangRoom, int owner, ParticipantState participantState,
-      {List<int>? pos}) {
+      {List<int>? pos}) async {
     if (participantState == ParticipantState.complete) {
-      majiangRoom.complete(owner);
+      CompleteType? completeType = majiangRoom.complete(owner);
+      if (completeType != null) {
+        bool? success = majiangRoom.score(owner, completeType);
+        if (success) {
+          success =
+              await DialogUtil.confirm(content: 'Do you want play a new one?');
+          if (success != null && success) {
+            majiangRoom.play();
+          }
+        }
+      }
     } else if (participantState == ParticipantState.touch) {
       majiangRoom.touch(owner, pos![0]);
     } else if (participantState == ParticipantState.bar) {

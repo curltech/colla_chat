@@ -433,7 +433,6 @@ class MajiangRoom {
     CompleteType? completeType = participantCards[owner].complete();
     if (completeType != null) {
       score(owner, completeType);
-      play();
     }
 
     return completeType;
