@@ -365,7 +365,9 @@ class MajiangRoom {
   }
 
   /// 某个参与者杠打出的牌或者摸到已经碰过的牌
+  /// 手牌杠的时候，pos为-1，表示杠comingCard，否则表示可杠的手牌的位置
   bool bar(int owner, int pos) {
+    /// 杠打出的牌
     if (sendCard != null) {
       bool result = participantCards[owner].bar(pos, card: sendCard!);
       participantCards[sender!].poolCards.removeLast();
@@ -377,8 +379,8 @@ class MajiangRoom {
 
       return result;
     } else {
+      /// 杠发出的牌或者杠手牌
       bool result = participantCards[owner].bar(pos);
-      participantCards[sender!].poolCards.removeLast();
       keeper = owner;
       barCount++;
       sender = null;

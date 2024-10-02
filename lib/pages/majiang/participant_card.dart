@@ -128,20 +128,33 @@ class ParticipantCard {
     return -1;
   }
 
-  /// 检查摸牌明杠
-  int checkTakeBar(String card) {
+  /// 检查摸牌明杠，需要检查card与碰牌是否相同
+  /// 返回的结果包含-1，则comingCard可杠，如果包含的数字不是-1，则表示手牌的可杠牌位置
+  /// 返回为空，则不可杠
+  List<int>? checkTakeBar(String card) {
     if (touchCards.isEmpty) {
-      return -1;
+      return null;
     }
+    List<int>? results;
     for (int i = 0; i < touchCards.length; ++i) {
       if (card == touchCards[i].cards[0]) {
-        updateParticipantState(ParticipantState.bar, i);
+        updateParticipantState(ParticipantState.bar, -1);
 
-        return i;
+        return [-1];
+      }
+    }
+    for (int i = 0; i < handCards.length; ++i) {
+      var handCard = handCards[i];
+      for (int j = 0; j < touchCards.length; ++j) {
+        if (handCard == touchCards[j].cards[0]) {
+          updateParticipantState(ParticipantState.bar, i);
+          results ??= [];
+          results.add(i);
+        }
       }
     }
 
-    return -1;
+    return results;
   }
 
   /// 检查暗杠
@@ -294,14 +307,33 @@ class ParticipantCard {
   /// 明杠牌
   bool bar(int pos, {String? card}) {
     if (card == null && comingCard.value != null) {
-      card = comingCard.value;
-      SequenceCard sequenceCard = touchCards[pos];
-      if (sequenceCard.cards[0] == card) {
-        sequenceCard.cards.add(card!);
-        comingCard.value == null;
-        comingCardType == null;
+      if (pos == -1) {
+        card = comingCard.value;
+        for (int i = 0; i < touchCards.length; ++i) {
+          SequenceCard sequenceCard = touchCards[i];
+          if (sequenceCard.cards[0] == card) {
+            sequenceCard.cards.add(card!);
+            comingCard.value == null;
+            comingCardType == null;
 
-        return true;
+            return true;
+          }
+        }
+      } else {
+        card = handCards[pos];
+        for (int i = 0; i < touchCards.length; ++i) {
+          SequenceCard sequenceCard = touchCards[i];
+          if (sequenceCard.cards[0] == card) {
+            sequenceCard.cards.add(card);
+            handCards.removeAt(pos);
+            handCards.add(comingCard.value!);
+            CardUtil.sort(handCards);
+            comingCard.value == null;
+            comingCardType == null;
+
+            return true;
+          }
+        }
       }
     } else {
       if (card != null && handCards[pos] != card) {
@@ -369,17 +401,18 @@ class ParticipantCard {
     participantState.clear();
   }
 
-  /// 摸牌，peerId为空，自己摸牌，不为空，别人摸牌
+  /// 摸牌
   take(String card, ComingCardType comingCardType) {
     comingCard.value = card;
     this.comingCardType = comingCardType;
     takeCheck(card);
   }
 
+  /// 检查摸到的牌，看需要采取的动作
   takeCheck(String card) {
     CompleteType? completeType = checkComplete(card);
-    int result = checkTakeBar(card);
-    List<int>? results = checkDarkBar(card: card);
+    List<int>? results = checkTakeBar(card);
+    results = checkDarkBar(card: card);
   }
 
   onRoomEvent(RoomEvent roomEvent) {}
