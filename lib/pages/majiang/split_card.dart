@@ -288,7 +288,7 @@ class SplitCard {
     Map<SequenceCardType, List<SequenceCard>> cardMap = {};
     int mod = length ~/ 3;
     for (int i = 0; i < mod; ++i) {
-      int start = i * mod;
+      int start = i * 3;
       List<String> subCards = cards.sublist(start, start + 3);
       SequenceCardType sequenceCardType = CardUtil.sequenceCardType(subCards);
       if (sequenceCardType != SequenceCardType.touch &&

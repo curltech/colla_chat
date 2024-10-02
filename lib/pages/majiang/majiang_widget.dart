@@ -450,7 +450,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
         dy: 0.0,
         touch: Touch.inside,
         child: InkWell(
-            onDoubleTap: () {
+            onTap: () {
               MajiangRoom? majiangRoom = this.majiangRoom.value;
               if (majiangRoom != null) {
                 int opponent = majiangRoom.opponent(current.value);
@@ -471,7 +471,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
         dy: (bodyHeight * 0.65 - poolHeight) / 2,
         touch: Touch.inside,
         child: InkWell(
-            onDoubleTap: () {
+            onTap: () {
               MajiangRoom? majiangRoom = this.majiangRoom.value;
               if (majiangRoom != null) {
                 int previous = majiangRoom.previous(current.value);
@@ -503,7 +503,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
           dy: (bodyHeight * 0.65 - poolHeight) / 2,
           touch: Touch.inside,
           child: InkWell(
-            onDoubleTap: () {
+            onTap: () {
               MajiangRoom? majiangRoom = this.majiangRoom.value;
               if (majiangRoom != null) {
                 int next = majiangRoom.next(current.value);
