@@ -21,15 +21,15 @@ import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-/// 股票功能主页面，带有路由回调函数
-class MainMajiangWidget extends StatelessWidget with TileDataMixin {
-  MainMajiangWidget({super.key});
+/// 功能主页面，带有路由回调函数
+class MajiangWidget extends StatelessWidget with TileDataMixin {
+  MajiangWidget({super.key});
 
   @override
   bool get withLeading => true;
 
   @override
-  String get routeName => 'majiang_main';
+  String get routeName => 'majiang';
 
   @override
   IconData get iconData => Icons.card_giftcard_outlined;
@@ -449,12 +449,20 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
         dx: (bodyWidth * 0.7 - poolHeight) / 2,
         dy: 0.0,
         touch: Touch.inside,
-        child: Container(
-          color: Colors.red,
-          height: poolWidth,
-          width: poolHeight,
-          child: _buildOpponentTouchCard(),
-        ),
+        child: InkWell(
+            onDoubleTap: () {
+              MajiangRoom? majiangRoom = this.majiangRoom.value;
+              if (majiangRoom != null) {
+                int opponent = majiangRoom.opponent(current.value);
+                current.value = opponent;
+              }
+            },
+            child: Container(
+              color: Colors.red,
+              height: poolWidth,
+              width: poolHeight,
+              child: _buildOpponentTouchCard(),
+            )),
       ),
       //上家
       AlignPositioned(
@@ -462,12 +470,20 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
         dx: 0.0,
         dy: (bodyHeight * 0.65 - poolHeight) / 2,
         touch: Touch.inside,
-        child: Container(
-          color: Colors.cyan,
-          height: poolHeight,
-          width: poolWidth,
-          child: _buildPreviousTouchCard(),
-        ),
+        child: InkWell(
+            onDoubleTap: () {
+              MajiangRoom? majiangRoom = this.majiangRoom.value;
+              if (majiangRoom != null) {
+                int previous = majiangRoom.previous(current.value);
+                current.value = previous;
+              }
+            },
+            child: Container(
+              color: Colors.cyan,
+              height: poolHeight,
+              width: poolWidth,
+              child: _buildPreviousTouchCard(),
+            )),
       ),
       AlignPositioned(
         alignment: Alignment.bottomLeft,
@@ -482,17 +498,25 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
         ),
       ),
       AlignPositioned(
-        alignment: Alignment.topRight,
-        dx: 0.0,
-        dy: (bodyHeight * 0.65 - poolHeight) / 2,
-        touch: Touch.inside,
-        child: Container(
-          color: Colors.white,
-          height: poolHeight,
-          width: poolWidth,
-          child: _buildNextTouchCard(),
-        ),
-      ),
+          alignment: Alignment.topRight,
+          dx: 0.0,
+          dy: (bodyHeight * 0.65 - poolHeight) / 2,
+          touch: Touch.inside,
+          child: InkWell(
+            onDoubleTap: () {
+              MajiangRoom? majiangRoom = this.majiangRoom.value;
+              if (majiangRoom != null) {
+                int next = majiangRoom.next(current.value);
+                current.value = next;
+              }
+            },
+            child: Container(
+              color: Colors.white,
+              height: poolHeight,
+              width: poolWidth,
+              child: _buildNextTouchCard(),
+            ),
+          )),
     ]);
   }
 
@@ -820,13 +844,6 @@ class MainMajiangWidget extends StatelessWidget with TileDataMixin {
               majiangRoom.play();
             },
             icon: const Icon(Icons.newspaper_outlined)));
-        rightWidgets.add(IconButton(
-            tooltip: AppLocalizations.t('Next participant'),
-            onPressed: () {
-              int next = majiangRoom.next(current.value);
-              current.value = next;
-            },
-            icon: const Icon(Icons.next_plan_outlined)));
         rightWidgets.add(IconButton(
             tooltip: AppLocalizations.t('Check complete'),
             onPressed: () {

@@ -24,6 +24,8 @@ final ElementDefinitionControllers elementDefinitionControllers =
 /// 画布
 class CanvasWidget extends StatelessWidget {
   final Rx<String?> packageName = Rx<String?>(null);
+  final TransformationController transformationController =
+      TransformationController();
 
   CanvasWidget({super.key});
 
@@ -35,7 +37,8 @@ class CanvasWidget extends StatelessWidget {
       onAcceptWithDetails: (details) {
         ElementDefinition elementDefinition = details.data;
         ElementDefinitionController? elementDefinitionController =
-        elementDefinitionControllers.packageDefinitionController[packageName.value];
+            elementDefinitionControllers
+                .packageDefinitionController[packageName.value];
         if (elementDefinitionController != null) {
           elementDefinitionController.elementDefinitions[elementDefinition] =
               details.offset;
@@ -63,7 +66,8 @@ class CanvasWidget extends StatelessWidget {
 
   Widget _buildElementDefinitionWidget(BuildContext context) {
     ElementDefinitionController? elementDefinitionController =
-    elementDefinitionControllers.packageDefinitionController[packageName.value];
+        elementDefinitionControllers
+            .packageDefinitionController[packageName.value];
     if (elementDefinitionController != null) {
       return nilBox;
     }
@@ -90,6 +94,9 @@ class CanvasWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _buildElementDefinitionWidget(context);
+    return Center(
+        child: InteractiveViewer(
+            transformationController: transformationController,
+            child: _buildElementDefinitionWidget(context)));
   }
 }

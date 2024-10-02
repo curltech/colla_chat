@@ -11,7 +11,7 @@ import 'package:colla_chat/pages/chat/me/platform_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_map_launcher_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_webview_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/local_media_stream_widget.dart';
-import 'package:colla_chat/pages/majiang/main_majiang_widget.dart';
+import 'package:colla_chat/pages/majiang/majiang_widget.dart';
 import 'package:colla_chat/pages/poem/poem_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
 import 'package:colla_chat/platform.dart';
@@ -45,7 +45,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   final PlatformInfoWidget platformInfoWidget = const PlatformInfoWidget();
   final PoemWidget poemWidget = PoemWidget();
   final SherpaInstallWidget sherpaInstallWidget = SherpaInstallWidget();
-  final MainMajiangWidget mainMajiangWidget = MainMajiangWidget();
+  final MajiangWidget mainMajiangWidget = MajiangWidget();
 
   MeWidget({super.key}) {
     indexWidgetProvider.define(collectionListView);
