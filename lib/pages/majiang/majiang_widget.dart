@@ -544,7 +544,8 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
               width: 10.0,
             ),
             IconTextButton(
-              label: opponentParticipantCard.name,
+              label:
+                  '${opponentParticipantCard.name}(${opponentParticipantCard.score})',
               icon: opponentParticipantCard.avatarWidget!,
               onPressed: null,
             ),
@@ -564,7 +565,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
                 width: 10.0,
               ),
               IconTextButton(
-                label: previousParticipantCard.name,
+                label: '${previousParticipantCard.name}(${previousParticipantCard.score})',
                 icon: previousParticipantCard.avatarWidget!,
                 onPressed: null,
               ),
@@ -595,7 +596,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
                 width: 10.0,
               ),
               IconTextButton(
-                label: nextParticipantCard.name,
+                label: '${nextParticipantCard.name}(${nextParticipantCard.score})',
                 icon: nextParticipantCard.avatarWidget!,
                 onPressed: null,
               ),
@@ -613,7 +614,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
               width: 10.0,
             ),
             IconTextButton(
-              label: participantCard.name,
+              label: '${participantCard.name}(${participantCard.score})',
               icon: participantCard.avatarWidget!,
               onPressed: null,
             ),
@@ -754,8 +755,9 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
       if (completeType != null) {
         bool? success = majiangRoom.score(owner, completeType);
         if (success) {
-          success =
-              await DialogUtil.confirm(content: 'Do you want play a new one?');
+          success = await DialogUtil.confirm(
+              content:
+                  'You have completed ${completeType.name}, do you want play a new one?');
           if (success != null && success) {
             majiangRoom.play();
           }

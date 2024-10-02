@@ -109,7 +109,7 @@ class ParticipantCard {
     return -1;
   }
 
-  /// 检查明杠
+  /// 检查打牌明杠
   int checkBar(String card) {
     int length = handCards.length;
     if (length < 4) {
@@ -122,6 +122,22 @@ class ParticipantCard {
         updateParticipantState(ParticipantState.bar, i - 2);
         updateParticipantState(ParticipantState.touch, i - 2);
         return i - 2;
+      }
+    }
+
+    return -1;
+  }
+
+  /// 检查摸牌明杠
+  int checkTakeBar(String card) {
+    if (touchCards.isEmpty) {
+      return -1;
+    }
+    for (int i = 0; i < touchCards.length; ++i) {
+      if (card == touchCards[i].cards[0]) {
+        updateParticipantState(ParticipantState.bar, i);
+
+        return i;
       }
     }
 
@@ -277,17 +293,31 @@ class ParticipantCard {
 
   /// 明杠牌
   bool bar(int pos, {String? card}) {
-    if (card != null && handCards[pos] != card) {
-      return false;
-    }
-    card = handCards.removeAt(pos);
-    handCards.removeAt(pos);
-    handCards.removeAt(pos);
-    SequenceCard sequenceCard = SequenceCard(CardUtil.cardType(card),
-        SequenceCardType.bar, [card, card, card, card]);
-    touchCards.add(sequenceCard);
+    if (card == null && comingCard.value != null) {
+      card = comingCard.value;
+      SequenceCard sequenceCard = touchCards[pos];
+      if (sequenceCard.cards[0] == card) {
+        sequenceCard.cards.add(card!);
+        comingCard.value == null;
+        comingCardType == null;
 
-    return true;
+        return true;
+      }
+    } else {
+      if (card != null && handCards[pos] != card) {
+        return false;
+      }
+      card = handCards.removeAt(pos);
+      handCards.removeAt(pos);
+      handCards.removeAt(pos);
+      SequenceCard sequenceCard = SequenceCard(CardUtil.cardType(card),
+          SequenceCardType.bar, [card, card, card, card]);
+      touchCards.add(sequenceCard);
+
+      return true;
+    }
+
+    return false;
   }
 
   /// 暗杠牌
@@ -348,6 +378,7 @@ class ParticipantCard {
 
   takeCheck(String card) {
     CompleteType? completeType = checkComplete(card);
+    int result = checkTakeBar(card);
     List<int>? results = checkDarkBar(card: card);
   }
 

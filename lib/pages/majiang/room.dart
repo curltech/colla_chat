@@ -364,20 +364,29 @@ class MajiangRoom {
     return result;
   }
 
-  /// 某个参与者杠打出的牌
+  /// 某个参与者杠打出的牌或者摸到已经碰过的牌
   bool bar(int owner, int pos) {
-    if (sendCard == null) {
-      return false;
-    }
-    bool result = participantCards[owner].bar(pos, card: sendCard!);
-    participantCards[sender!].poolCards.removeLast();
-    keeper = owner;
-    barCount++;
-    sender = null;
-    sendCard = null;
-    barTake(owner);
+    if (sendCard != null) {
+      bool result = participantCards[owner].bar(pos, card: sendCard!);
+      participantCards[sender!].poolCards.removeLast();
+      keeper = owner;
+      barCount++;
+      sender = null;
+      sendCard = null;
+      barTake(owner);
 
-    return result;
+      return result;
+    } else {
+      bool result = participantCards[owner].bar(pos);
+      participantCards[sender!].poolCards.removeLast();
+      keeper = owner;
+      barCount++;
+      sender = null;
+      sendCard = null;
+      barTake(owner);
+
+      return result;
+    }
   }
 
   /// 某个参与者暗杠，pos表示杠牌的位置
