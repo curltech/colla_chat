@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 /// 可拖拽的overlay浮动框
-// ignore: must_be_immutable
 class DragOverlay {
   OverlayEntry? overlayEntry;
   final double top;
