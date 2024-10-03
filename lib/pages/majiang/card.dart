@@ -235,7 +235,8 @@ class MajiangCard {
               dx: 0.0 * ratio,
               dy: 0.0 * ratio,
               touch: Touch.inside,
-              child: RotatedBox(quarterTurns: 2, child: cardConcept.getCardImage(name)!),
+              child: RotatedBox(
+                  quarterTurns: 2, child: cardConcept.getCardImage(name)!),
             ),
           ],
         ));
@@ -258,30 +259,46 @@ class MajiangCard {
   /// 下家的河牌
   Widget nextTouchCard({double ratio = 1.0, bool clip = true}) {
     Widget clipWidget = backgroundImage.get('sidecard')!;
+    if (clip) {
+      BoxDecoration decoration = BoxDecoration(
+        borderRadius: BorderRadius.circular(2),
+        boxShadow: const [BoxShadow(offset: Offset(0.0, 1.0))],
+        shape: BoxShape.rectangle,
+        color: Colors.white,
+      );
+      clipWidget = Container(
+        decoration: decoration,
+        width: 47.0 * ratio,
+        height: 43.0 * 0.73 * ratio,
+      );
+      // clipWidget = ClipRect(
+      //     child: Align(
+      //         alignment: Alignment.topLeft,
+      //         heightFactor: .73,
+      //         child: clipWidget));
+    }
+
+    Widget imageWidget = SizedBox(
+        width: 47.0 * ratio,
+        height: 43.0 * 0.73 * ratio,
+        child: RotatedBox(
+            quarterTurns: -1, child: cardConcept.getCardImage(name)!));
 
     Widget cardWidget = SizedBox(
         width: 47.0 * ratio,
-        height: 43.0 * ratio,
+        height: clip ? 43.0 * 0.73 * ratio : 43.0 * ratio,
         child: Stack(
           children: [
             clipWidget,
             AlignPositioned(
               alignment: Alignment.topLeft,
-              dx: -4.0 * ratio,
-              dy: -1.0 * ratio,
+              dx: -3.0 * ratio,
+              dy: 0.0 * ratio,
               touch: Touch.inside,
-              child:
-                  RotatedBox(quarterTurns: -1, child: cardConcept.getCardImage(name)!),
+              child: imageWidget,
             ),
           ],
         ));
-    if (clip) {
-      cardWidget = ClipRect(
-          child: Align(
-              alignment: Alignment.topLeft,
-              heightFactor: 0.73,
-              child: cardWidget));
-    }
 
     return cardWidget;
   }
@@ -303,29 +320,41 @@ class MajiangCard {
   /// 上家的河牌
   Widget previousTouchCard({double ratio = 1.0, bool clip = true}) {
     Widget clipWidget = backgroundImage.get('sidecard')!;
+    if (clip) {
+      BoxDecoration decoration = BoxDecoration(
+        borderRadius: BorderRadius.circular(2),
+        boxShadow: const [BoxShadow(offset: Offset(0.0, 1.0))],
+        shape: BoxShape.rectangle,
+        color: Colors.white,
+      );
+      clipWidget = Container(
+        decoration: decoration,
+        width: 47.0 * ratio,
+        height: 43.0 * 0.73 * ratio,
+      );
+    }
+
+    Widget imageWidget = SizedBox(
+        width: 47.0 * ratio,
+        height: 43.0 * 0.73 * ratio,
+        child: RotatedBox(
+            quarterTurns: 1, child: cardConcept.getCardImage(name)!));
 
     Widget cardWidget = SizedBox(
         width: 47.0 * ratio,
-        height: 43.0 * ratio,
+        height: clip ? 43.0 * 0.73 * ratio : 43.0 * ratio,
         child: Stack(
           children: [
             clipWidget,
             AlignPositioned(
               alignment: Alignment.topLeft,
-              dx: 2.0 * ratio,
-              dy: -2.0 * ratio,
+              dx: 3.0 * ratio,
+              dy: 0.0 * ratio,
               touch: Touch.inside,
-              child: RotatedBox(quarterTurns: 1, child: cardConcept.getCardImage(name)!),
+              child: imageWidget,
             ),
           ],
         ));
-    if (clip) {
-      cardWidget = ClipRect(
-          child: Align(
-              alignment: Alignment.topLeft,
-              heightFactor: 0.73,
-              child: cardWidget));
-    }
 
     return cardWidget;
   }

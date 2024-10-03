@@ -281,7 +281,7 @@ class MajiangRoom {
         previousCompleteType == null) {
       take(nextPos);
     } else {
-      logger.e('error');
+      logger.i('some one can action');
     }
   }
 
@@ -364,8 +364,7 @@ class MajiangRoom {
     return result;
   }
 
-  /// 某个参与者杠打出的牌或者摸到已经碰过的牌
-  /// 手牌杠的时候，pos为-1，表示杠comingCard，否则表示可杠的手牌的位置
+  /// 某个参与者杠打出的牌，pos表示可杠的手牌的位置
   bool bar(int owner, int pos) {
     /// 杠打出的牌
     if (sendCard != null) {
@@ -378,17 +377,9 @@ class MajiangRoom {
       barTake(owner);
 
       return result;
-    } else {
-      /// 杠发出的牌或者杠手牌
-      bool result = participantCards[owner].bar(pos);
-      keeper = owner;
-      barCount++;
-      sender = null;
-      sendCard = null;
-      barTake(owner);
-
-      return result;
     }
+
+    return false;
   }
 
   /// 某个参与者暗杠，pos表示杠牌的位置

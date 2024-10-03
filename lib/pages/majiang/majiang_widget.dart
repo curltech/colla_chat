@@ -588,7 +588,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
           )),
           SizedBox(
             width: bodyWidth * 0.15,
-            child: Row(children: [
+            child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
               const SizedBox(
                 width: 30.0,
               ),

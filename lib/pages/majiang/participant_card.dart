@@ -157,7 +157,7 @@ class ParticipantCard {
     return results;
   }
 
-  /// 检查暗杠
+  /// 检查暗杠，就是检查加上摸牌后，手上是否有连续的四张，如果有的话返回第一张的位置
   List<int>? checkDarkBar({String? card}) {
     List<String> cards = [...handCards];
     if (card != null) {
@@ -304,38 +304,29 @@ class ParticipantCard {
     return true;
   }
 
-  /// 明杠牌
+  /// 明杠牌，分三种情况
+  /// pos为-1，表示是摸牌可杠，否则表示手牌可杠的位置
   bool bar(int pos, {String? card}) {
+    /// 摸牌杠牌
     if (card == null && comingCard.value != null) {
       if (pos == -1) {
         card = comingCard.value;
-        for (int i = 0; i < touchCards.length; ++i) {
-          SequenceCard sequenceCard = touchCards[i];
-          if (sequenceCard.cards[0] == card) {
-            sequenceCard.cards.add(card!);
-            comingCard.value == null;
-            comingCardType == null;
-
-            return true;
-          }
-        }
       } else {
-        card = handCards[pos];
-        for (int i = 0; i < touchCards.length; ++i) {
-          SequenceCard sequenceCard = touchCards[i];
-          if (sequenceCard.cards[0] == card) {
-            sequenceCard.cards.add(card);
-            handCards.removeAt(pos);
-            handCards.add(comingCard.value!);
-            CardUtil.sort(handCards);
-            comingCard.value == null;
-            comingCardType == null;
+        card = handCards.removeAt(pos);
+      }
+      for (int i = 0; i < touchCards.length; ++i) {
+        SequenceCard sequenceCard = touchCards[i];
+        if (sequenceCard.cards[0] == card) {
+          sequenceCard.cards.add(card!);
+          CardUtil.sort(handCards);
+          comingCard.value == null;
+          comingCardType == null;
 
-            return true;
-          }
+          return true;
         }
       }
     } else {
+      ///打牌杠牌
       if (card != null && handCards[pos] != card) {
         return false;
       }
@@ -411,8 +402,8 @@ class ParticipantCard {
   /// 检查摸到的牌，看需要采取的动作
   takeCheck(String card) {
     CompleteType? completeType = checkComplete(card);
-    List<int>? results = checkTakeBar(card);
-    results = checkDarkBar(card: card);
+    List<int>? results = checkDarkBar(card: card);
+    results = checkTakeBar(card);
   }
 
   onRoomEvent(RoomEvent roomEvent) {}
