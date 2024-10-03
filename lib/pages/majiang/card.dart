@@ -33,6 +33,7 @@ class CardConcept {
   ];
   static const List<String> actions = [
     'bar',
+    'darkBar',
     'complete',
     'drawing',
     'pass',

@@ -162,6 +162,7 @@ class ParticipantCard {
     List<String> cards = [...handCards];
     if (card != null) {
       cards.add(card);
+      CardUtil.sort(cards);
     }
     int length = handCards.length;
     if (length < 4) {
@@ -174,6 +175,7 @@ class ParticipantCard {
           handCards[i] == handCards[i - 3]) {
         pos ??= [];
         pos.add(i - 3);
+        updateParticipantState(ParticipantState.darkbar, i - 3);
       }
     }
 
