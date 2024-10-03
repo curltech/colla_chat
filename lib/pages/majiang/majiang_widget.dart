@@ -117,14 +117,14 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
       ParticipantCard participantCard = majiangRoom.participantCards[owner];
 
       for (var card in participantCard.drawingCards) {
-        Widget previousTouchCard = card.previousTouchCard(ratio: ratio);
+        Widget previousTouchCard = card.previousTouchCard(ratio: ratio * 0.8);
         children.add(previousTouchCard);
         children.add(const SizedBox(
           height: 5,
         ));
       }
       for (var card in participantCard.touchCards) {
-        Widget previousTouchCard = card.previousTouchCard(ratio: ratio);
+        Widget previousTouchCard = card.previousTouchCard(ratio: ratio * 0.8);
         children.add(previousTouchCard);
         children.add(const SizedBox(
           height: 5,
@@ -147,7 +147,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
       }
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: children,
       );
     });
@@ -228,14 +228,14 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
         children.add(nextHand);
       }
       for (var card in participantCard.drawingCards) {
-        Widget nextTouchCard = card.nextTouchCard(ratio: ratio);
+        Widget nextTouchCard = card.nextTouchCard(ratio: ratio * 0.8);
         children.add(const SizedBox(
           height: 5,
         ));
         children.add(nextTouchCard);
       }
       for (var card in participantCard.touchCards) {
-        Widget nextTouchCard = card.nextTouchCard(ratio: ratio);
+        Widget nextTouchCard = card.nextTouchCard(ratio: ratio * 0.8);
         children.add(const SizedBox(
           height: 5,
         ));
@@ -243,6 +243,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
       }
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: children,
       );
     });
@@ -564,19 +565,19 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
               const SizedBox(
                 width: 10.0,
               ),
-              IconTextButton(
+              Expanded(
+                  child: IconTextButton(
                 label:
                     '${previousParticipantCard.name}(${previousParticipantCard.score})',
                 icon: previousParticipantCard.avatarWidget!,
                 onPressed: null,
-              ),
+              )),
               const SizedBox(
                 width: 10.0,
               ),
-              Expanded(
-                  child: Align(
-                      alignment: Alignment.centerRight,
-                      child: _buildPreviousHand())),
+              Align(
+                  alignment: Alignment.centerRight,
+                  child: _buildPreviousHand()),
               const SizedBox(
                 width: 30.0,
               ),
@@ -592,16 +593,17 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
               const SizedBox(
                 width: 30.0,
               ),
-              Expanded(child: _buildNextHand()),
+              _buildNextHand(),
               const SizedBox(
                 width: 10.0,
               ),
-              IconTextButton(
+              Expanded(
+                  child: IconTextButton(
                 label:
                     '${nextParticipantCard.name}(${nextParticipantCard.score})',
                 icon: nextParticipantCard.avatarWidget!,
                 onPressed: null,
-              ),
+              )),
               const SizedBox(
                 width: 10.0,
               ),
