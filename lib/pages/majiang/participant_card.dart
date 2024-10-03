@@ -164,15 +164,15 @@ class ParticipantCard {
       cards.add(card);
       CardUtil.sort(cards);
     }
-    int length = handCards.length;
+    int length = cards.length;
     if (length < 4) {
       return null;
     }
     List<int>? pos;
-    for (int i = 3; i < handCards.length; ++i) {
-      if (handCards[i] == handCards[i - 1] &&
-          handCards[i] == handCards[i - 2] &&
-          handCards[i] == handCards[i - 3]) {
+    for (int i = 3; i < length; ++i) {
+      if (cards[i] == cards[i - 1] &&
+          cards[i] == cards[i - 2] &&
+          cards[i] == cards[i - 3]) {
         pos ??= [];
         pos.add(i - 3);
         updateParticipantState(ParticipantState.darkbar, i - 3);

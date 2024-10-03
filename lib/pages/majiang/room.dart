@@ -415,6 +415,8 @@ class MajiangRoom {
       participantCard.score.value += baseScore * 3;
     } else if (participantCard.comingCardType == ComingCardType.self) {
       participantCard.score.value += baseScore * 3;
+    } else {
+      participantCard.score.value += baseScore;
     }
     if (sender != null) {
       participantCards[sender!].score.value -= baseScore;

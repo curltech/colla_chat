@@ -757,14 +757,11 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
     if (participantState == ParticipantState.complete) {
       CompleteType? completeType = majiangRoom.complete(owner);
       if (completeType != null) {
-        bool? success = majiangRoom.score(owner, completeType);
-        if (success) {
-          success = await DialogUtil.confirm(
-              content:
-                  'You have completed ${completeType.name}, do you want play a new one?');
-          if (success != null && success) {
-            majiangRoom.play();
-          }
+        bool? success = await DialogUtil.confirm(
+            content:
+                'You have completed ${completeType.name}, do you want play a new one?');
+        if (success != null && success) {
+          majiangRoom.play();
         }
       }
     } else if (participantState == ParticipantState.touch) {
@@ -865,6 +862,17 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
               }
             },
             icon: const Icon(Icons.check)));
+        rightWidgets.add(IconButton(
+            tooltip: AppLocalizations.t('Check take'),
+            onPressed: () {
+              ParticipantCard participantCard =
+              majiangRoom.participantCards[current.value];
+              String? comingCard = participantCard.comingCard.value;
+              if (comingCard != null) {
+                participantCard.takeCheck(comingCard);
+              }
+            },
+            icon: const Icon(Icons.takeout_dining_outlined)));
       }
 
       String? title = majiangRoom?.name;
