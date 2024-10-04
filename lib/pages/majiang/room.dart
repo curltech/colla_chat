@@ -423,9 +423,7 @@ class MajiangRoom {
     } else {
       for (int i = 0; i < participantCards.length; ++i) {
         ParticipantCard participantCard = participantCards[i];
-        if (i == sender) {
-          participantCard.score.value -= baseScore;
-        }
+        participantCard.score.value -= baseScore;
       }
     }
 

@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 class ElementDefinitionWidget extends StatelessWidget {
   final ElementDefinition elementDefinition;
 
-  final BorderSide bordSide = const BorderSide(
-    color: Colors.black,
+  final BorderSide bordSide = BorderSide(
+    color: Colors.amber.shade100,
     width: 1.0,
     style: BorderStyle.solid,
   );
@@ -23,7 +23,10 @@ class ElementDefinitionWidget extends StatelessWidget {
   ElementDefinitionWidget({super.key, required this.elementDefinition});
 
   _buildHeadWidget(BuildContext context) {
-    return CommonAutoSizeText(elementDefinition.name);
+    return Column(children: [
+      // CommonAutoSizeText(elementDefinition.packageName),
+      CommonAutoSizeText(elementDefinition.name),
+    ]);
   }
 
   _buildAttributesWidget(BuildContext context) {
@@ -59,13 +62,18 @@ class ElementDefinitionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+        padding: const EdgeInsets.all(5.0),
         decoration: BoxDecoration(
+          color: Colors.amber.shade100,
           border: Border.fromBorderSide(
               elementDefinition == elementDefinitionControllers.selected.value
                   ? selectedBordSide
                   : bordSide),
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(2),
           shape: BoxShape.rectangle,
+          boxShadow: const [
+            BoxShadow(offset: Offset(1.0, 1.0), blurRadius: 1.0)
+          ],
         ),
         child: Column(
           children: [

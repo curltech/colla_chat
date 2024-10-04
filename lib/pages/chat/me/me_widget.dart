@@ -12,6 +12,7 @@ import 'package:colla_chat/pages/chat/me/platform_map_launcher_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_webview_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/local_media_stream_widget.dart';
 import 'package:colla_chat/pages/majiang/majiang_widget.dart';
+import 'package:colla_chat/pages/model/modeller_widget.dart';
 import 'package:colla_chat/pages/poem/poem_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
 import 'package:colla_chat/platform.dart';
@@ -46,6 +47,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   final PoemWidget poemWidget = PoemWidget();
   final SherpaInstallWidget sherpaInstallWidget = SherpaInstallWidget();
   final MajiangWidget mainMajiangWidget = MajiangWidget();
+  final ModellerWidget modellerWidget = ModellerWidget();
 
   MeWidget({super.key}) {
     indexWidgetProvider.define(collectionListView);
@@ -64,6 +66,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(poemWidget);
     indexWidgetProvider.define(sherpaInstallWidget);
     indexWidgetProvider.define(mainMajiangWidget);
+    indexWidgetProvider.define(modellerWidget);
   }
 
   @override
@@ -110,6 +113,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
         liveKitSfuRoomWidget,
         poemWidget,
         mainMajiangWidget,
+        modellerWidget,
       ]);
     }
     List<TileData> meTileData = TileData.from(mixins);

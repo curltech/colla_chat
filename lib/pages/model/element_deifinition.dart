@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ElementDefinition {
+  final String packageName;
   final String name;
   final bool isAbstract;
   final Map<String, Type> attributes = {};
@@ -8,7 +9,7 @@ class ElementDefinition {
   final List<String> rules = [];
   Widget? image;
 
-  ElementDefinition(this.name, this.isAbstract);
+  ElementDefinition(this.name, this.isAbstract, this.packageName);
 }
 
 /// 一对一，包含的一对多，组合的一对多，多对多
