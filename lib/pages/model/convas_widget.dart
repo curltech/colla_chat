@@ -4,6 +4,7 @@ import 'package:colla_chat/pages/model/element_definition_widget.dart';
 import 'package:colla_chat/pages/model/element_deifinition.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/context_util.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -93,7 +94,15 @@ class CanvasWidget extends StatelessWidget {
       Widget relationshipWidget = CustomPaint(
           painter: RelationshipLinePainter(),
           child: RepaintBoundary(child: Container()));
-      children.insert(0, relationshipWidget);
+      children.insert(
+          0,
+          Container(
+            height: appDataProvider.portraitSize.height -
+                appDataProvider.toolbarHeight -
+                40,
+            width: appDataProvider.secondaryBodyWidth,
+            child: Text('Test'),
+          ));
 
       return Stack(
         children: children,
@@ -119,15 +128,15 @@ class CanvasWidget extends StatelessWidget {
             modelProjectController.addElementStatus.value = false;
           }
         },
-        child: Container(
-            key: _key,
-            height: appDataProvider.portraitSize.height -
-                appDataProvider.toolbarHeight -
-                40,
-            width: appDataProvider.secondaryBodyWidth,
-            color: Colors.blueGrey.shade100,
-            child: InteractiveViewer(
-                transformationController: transformationController,
+        child: InteractiveViewer(
+            transformationController: transformationController,
+            child: Container(
+                key: _key,
+                height: appDataProvider.portraitSize.height -
+                    appDataProvider.toolbarHeight -
+                    40,
+                width: appDataProvider.secondaryBodyWidth,
+                color: Colors.blueGrey.shade100,
                 child: _buildElementDefinitionWidget(context))));
   }
 }
