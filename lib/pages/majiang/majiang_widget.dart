@@ -757,12 +757,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
     if (participantState == ParticipantState.complete) {
       CompleteType? completeType = majiangRoom.complete(owner);
       if (completeType != null) {
-        bool? success = await DialogUtil.confirm(
-            content:
-                'You have completed ${completeType.name}, do you want play a new one?');
-        if (success != null && success) {
-          majiangRoom.play();
-        }
+        majiangRoom.play();
       }
     } else if (participantState == ParticipantState.touch) {
       majiangRoom.touch(owner, pos![0]);
@@ -866,7 +861,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
             tooltip: AppLocalizations.t('Check take'),
             onPressed: () {
               ParticipantCard participantCard =
-              majiangRoom.participantCards[current.value];
+                  majiangRoom.participantCards[current.value];
               String? comingCard = participantCard.comingCard.value;
               if (comingCard != null) {
                 participantCard.takeCheck(comingCard);

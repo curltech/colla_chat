@@ -46,6 +46,15 @@ class ParticipantCard {
 
   late final StreamSubscription<RoomEvent> roomEventStreamSubscription;
 
+  /// 杠牌次数
+  int barCount = 0;
+
+  /// 别人给自己杠牌的人
+  List<int> barSenders = [];
+
+  /// 包了自己的胡牌的人
+  int? packer;
+
   ParticipantCard(this.peerId, this.name,
       {this.robot = false,
       required StreamController<RoomEvent> roomEventStreamController}) {
@@ -76,6 +85,9 @@ class ParticipantCard {
     poolCards.clear();
     comingCard.value = null;
     comingCardType = null;
+    barCount = 0;
+    barSenders.clear();
+    packer = null;
   }
 
   updateParticipantState(ParticipantState state, int value) {
@@ -308,7 +320,7 @@ class ParticipantCard {
 
   /// 明杠牌，分三种情况
   /// pos为-1，表示是摸牌可杠，否则表示手牌可杠的位置
-  bool bar(int pos, {String? card}) {
+  bool bar(int pos, {int? sender, String? card}) {
     /// 摸牌杠牌
     if (card == null && comingCard.value != null) {
       if (pos == -1) {
@@ -319,10 +331,20 @@ class ParticipantCard {
       for (int i = 0; i < touchCards.length; ++i) {
         SequenceCard sequenceCard = touchCards[i];
         if (sequenceCard.cards[0] == card) {
-          sequenceCard.cards.add(card!);
+          if (sequenceCard.cards.length < 4) {
+            sequenceCard.cards.add(card!);
+          } else {
+            sequenceCard.cards.removeRange(4, sequenceCard.cards.length);
+          }
           CardUtil.sort(handCards);
-          comingCard.value == null;
-          comingCardType == null;
+          comingCard.value = null;
+          comingCardType = null;
+          barCount++;
+          for (int i = 0; i < 4; ++i) {
+            if (i != pos) {
+              barSenders.add(i);
+            }
+          }
 
           return true;
         }
@@ -338,6 +360,12 @@ class ParticipantCard {
       SequenceCard sequenceCard = SequenceCard(CardUtil.cardType(card),
           SequenceCardType.bar, [card, card, card, card]);
       touchCards.add(sequenceCard);
+      barCount++;
+      if (sender != null) {
+        barSenders.add(sender);
+        barSenders.add(sender);
+        barSenders.add(sender);
+      }
 
       return true;
     }
@@ -357,6 +385,13 @@ class ParticipantCard {
     SequenceCard sequenceCard = SequenceCard(CardUtil.cardType(card),
         SequenceCardType.darkBar, [card, card, card, card]);
     touchCards.add(sequenceCard);
+    barCount++;
+    for (int i = 0; i < 4; ++i) {
+      if (i != pos) {
+        barSenders.add(i);
+        barSenders.add(i);
+      }
+    }
 
     return true;
   }

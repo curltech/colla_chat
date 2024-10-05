@@ -168,7 +168,7 @@ class DialogUtil {
             Icons.check,
             color: myself.primary,
           )
-        : nil);
+        : nilBox);
     return SimpleDialogOption(
         onPressed: () {
           Navigator.pop(context!, value);

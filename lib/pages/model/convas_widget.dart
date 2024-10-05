@@ -1,38 +1,12 @@
+import 'package:chart_sparkline/chart_sparkline.dart';
+import 'package:colla_chat/pages/model/element_definition_controller.dart';
 import 'package:colla_chat/pages/model/element_definition_widget.dart';
 import 'package:colla_chat/pages/model/element_deifinition.dart';
-import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/context_util.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-class ElementDefinitionController {
-  final RxMap<ElementDefinition, Offset> elementDefinitions =
-      <ElementDefinition, Offset>{}.obs;
-
-  final RxMap<RelationshipDefinition, Offset> relationshipDefinition =
-      <RelationshipDefinition, Offset>{}.obs;
-}
-
-class ElementDefinitionControllers {
-  final Rx<String?> packageName = Rx<String?>(null);
-  final RxMap<String, ElementDefinitionController> packageDefinitionController =
-      <String, ElementDefinitionController>{}.obs;
-  final Rx<ElementDefinition?> selected = Rx<ElementDefinition?>(null);
-
-  final RxBool addElementStatus = false.obs;
-
-  ElementDefinitionController? getElementDefinitionController() {
-    if (packageName.value != null) {
-      return packageDefinitionController[packageName.value];
-    }
-    return null;
-  }
-}
-
-final ElementDefinitionControllers elementDefinitionControllers =
-    ElementDefinitionControllers();
 
 /// 画布
 class CanvasWidget extends StatelessWidget {
@@ -50,7 +24,7 @@ class CanvasWidget extends StatelessWidget {
       onAcceptWithDetails: (details) {
         ElementDefinition elementDefinition = details.data;
         ElementDefinitionController? elementDefinitionController =
-            elementDefinitionControllers.getElementDefinitionController();
+            modelProjectController.getElementDefinitionController();
         if (elementDefinitionController != null) {
           elementDefinitionController.elementDefinitions[elementDefinition] =
               offset;
@@ -69,10 +43,17 @@ class CanvasWidget extends StatelessWidget {
       // dragAnchorStrategy: pointerDragAnchorStrategy,
       ignoringFeedbackSemantics: false,
       feedback: child,
-      onDragStarted: () {},
+      onDragStarted: () {
+        // ElementDefinitionController? elementDefinitionController =
+        //     modelProjectController.getElementDefinitionController();
+        // if (elementDefinitionController != null) {
+        //   elementDefinitionController.elementDefinitions
+        //       .remove(elementDefinition);
+        // }
+      },
       onDragEnd: (DraggableDetails detail) {
         ElementDefinitionController? elementDefinitionController =
-            elementDefinitionControllers.getElementDefinitionController();
+            modelProjectController.getElementDefinitionController();
         if (elementDefinitionController != null) {
           Offset? offset = ContextUtil.getOffset(_key);
           if (offset != null) {
@@ -93,7 +74,7 @@ class CanvasWidget extends StatelessWidget {
   Widget _buildElementDefinitionWidget(BuildContext context) {
     return Obx(() {
       ElementDefinitionController? elementDefinitionController =
-          elementDefinitionControllers.getElementDefinitionController();
+          modelProjectController.getElementDefinitionController();
       if (elementDefinitionController == null) {
         return nilBox;
       }
@@ -109,6 +90,10 @@ class CanvasWidget extends StatelessWidget {
             child: _buildDraggableElementWidget(context, elementDefinition));
         children.add(ele);
       }
+      Widget relationshipWidget = CustomPaint(
+          painter: RelationshipLinePainter(),
+          child: RepaintBoundary(child: Container()));
+      children.insert(0, relationshipWidget);
 
       return Stack(
         children: children,
@@ -120,18 +105,18 @@ class CanvasWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
         onTapDown: (TapDownDetails details) {
-          if (elementDefinitionControllers.addElementStatus.value) {
+          if (modelProjectController.addElementStatus.value) {
             ElementDefinition elementDefinition = ElementDefinition('unknown',
-                false, elementDefinitionControllers.packageName.value!);
+                false, modelProjectController.currentPackageName.value!);
             ElementDefinitionController? elementDefinitionController =
-                elementDefinitionControllers.getElementDefinitionController();
+                modelProjectController.getElementDefinitionController();
             if (elementDefinitionController != null) {
               elementDefinitionController
                       .elementDefinitions[elementDefinition] =
                   details.localPosition;
             }
 
-            elementDefinitionControllers.addElementStatus.value = false;
+            modelProjectController.addElementStatus.value = false;
           }
         },
         child: Container(
@@ -145,4 +130,35 @@ class CanvasWidget extends StatelessWidget {
                 transformationController: transformationController,
                 child: _buildElementDefinitionWidget(context))));
   }
+}
+
+/// 画关系线的画笔
+/// CustomPaint的child指定绘制区域，而且RepaintBoundary(child:...)
+class RelationshipLinePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    ElementDefinitionController? elementDefinitionController =
+        modelProjectController.getElementDefinitionController();
+    if (elementDefinitionController == null) {
+      return;
+    }
+    Path path = Path();
+    for (var relationshipDefinition
+        in elementDefinitionController.relationshipDefinitions) {
+      Offset? srcOffset = elementDefinitionController
+          .elementDefinitions[relationshipDefinition.src];
+      Offset? dstOffset = elementDefinitionController
+          .elementDefinitions[relationshipDefinition.dst];
+      if (srcOffset != null && dstOffset != null) {
+        path.moveTo(srcOffset.dx + 10, srcOffset.dy);
+        path.lineTo(dstOffset.dx + 10, dstOffset.dy + 10);
+      }
+
+      canvas.drawPath(path, Paint()..color = Colors.blue);
+    }
+  }
+
+  // 返回false, 后面介绍
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

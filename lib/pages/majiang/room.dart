@@ -78,6 +78,9 @@ class MajiangRoom {
 
   String? sendCard;
 
+  int? robber;
+  String? robCard;
+
   /// 正在等待做出决定的参与者，如果为空，则房间发牌，
   /// 如果都是pass消解等待的，则发牌，有一家是非pass消解的不发牌
   List<int> waiting = [];
@@ -178,7 +181,6 @@ class MajiangRoom {
     keeper = null;
     sendCard = null;
     sender = null;
-    barCount = 0;
     List<String> allCards = [...cardConcept.allCards];
     Random random = Random.secure();
     randoms ??= [];
@@ -285,17 +287,18 @@ class MajiangRoom {
     }
   }
 
-  /// 杠牌次数
-  int barCount = 0;
-
   /// 杠牌发牌
-  barTake(int owner) {
+  bool barTake(int owner) {
     if (unknownCards.isEmpty) {
       play();
 
-      return;
+      return false;
     }
-    int mod = barCount ~/ 2;
+    int barCount = 0;
+    for (var participantCard in participantCards) {
+      barCount += participantCard.barCount;
+    }
+    int mod = barCount % 2;
     String card;
     if (mod == 0 && unknownCards.length > 1) {
       card = unknownCards.removeAt(unknownCards.length - 2);
@@ -306,6 +309,8 @@ class MajiangRoom {
     sendCard = null;
     keeper = owner;
     participantCards[owner].take(card, ComingCardType.bar);
+
+    return true;
   }
 
   /// 发牌
@@ -331,6 +336,8 @@ class MajiangRoom {
     if (sender == null) {
       return false;
     }
+    robber = null;
+    robCard = null;
     ParticipantCard participant = participantCards[owner];
     participant.participantState.clear();
     int nextPos = next(owner);
@@ -356,6 +363,9 @@ class MajiangRoom {
       return false;
     }
     bool result = participantCards[owner].touch(pos, card: sendCard!);
+    if (participantCards[owner].touchCards.length == 4) {
+      participantCards[owner].packer = sender;
+    }
     participantCards[sender!].poolCards.removeLast();
     keeper = owner;
     sender = null;
@@ -366,14 +376,32 @@ class MajiangRoom {
 
   /// 某个参与者杠打出的牌，pos表示可杠的手牌的位置
   bool bar(int owner, int pos) {
-    /// 杠打出的牌
-    if (sendCard != null) {
-      bool result = participantCards[owner].bar(pos, card: sendCard!);
+    ParticipantCard participantCard = participantCards[owner];
+
+    bool result = participantCard.bar(pos, sender: sender, card: sendCard);
+    if (sender != null) {
       participantCards[sender!].poolCards.removeLast();
+      if (participantCards[owner].touchCards.length == 4) {
+        participantCards[owner].packer = sender;
+      }
+    }
+    bool canRob = false;
+    for (int i = 0; i < participantCards.length; ++i) {
+      if (owner != i) {
+        ParticipantCard participantCard = participantCards[i];
+        CompleteType? completeType = participantCard.checkComplete(sendCard!);
+        if (completeType != null) {
+          canRob = true;
+          robber = owner;
+          robCard = sendCard!;
+        }
+      }
+    }
+    if (!canRob) {
       keeper = owner;
-      barCount++;
       sender = null;
       sendCard = null;
+
       barTake(owner);
 
       return result;
@@ -385,7 +413,6 @@ class MajiangRoom {
   /// 某个参与者暗杠，pos表示杠牌的位置
   darkBar(int owner, int pos) {
     participantCards[owner].darkBar(pos);
-    barCount++;
     barTake(owner);
   }
 
@@ -409,7 +436,10 @@ class MajiangRoom {
       return false;
     }
     ParticipantCard participantCard = participantCards[owner];
-    if (participantCard.comingCardType == ComingCardType.bar ||
+    if (robber != null && robCard != null) {
+      participantCard.score.value += baseScore * 3;
+      participantCards[robber!].score.value -= baseScore * 3;
+    } else if (participantCard.comingCardType == ComingCardType.bar ||
         participantCard.comingCardType == ComingCardType.sea) {
       baseScore = baseScore * 2;
       participantCard.score.value += baseScore * 3;
@@ -421,9 +451,24 @@ class MajiangRoom {
     if (sender != null) {
       participantCards[sender!].score.value -= baseScore;
     } else {
-      for (int i = 0; i < participantCards.length; ++i) {
-        ParticipantCard participantCard = participantCards[i];
-        participantCard.score.value -= baseScore;
+      if (participantCard.packer != null) {
+        ParticipantCard pc = participantCards[participantCard.packer!];
+        pc.score.value -= 3 * baseScore;
+      } else {
+        for (int i = 0; i < participantCards.length; ++i) {
+          if (i != owner) {
+            ParticipantCard participantCard = participantCards[i];
+            participantCard.score.value -= baseScore;
+          }
+        }
+      }
+    }
+
+    for (int i = 0; i < participantCards.length; ++i) {
+      ParticipantCard participantCard = participantCards[i];
+      for (var sender in participantCard.barSenders) {
+        participantCard.score.value += 10;
+        participantCards[sender].score.value -= 10;
       }
     }
 
