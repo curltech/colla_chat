@@ -6,6 +6,9 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+const double elementWidth = 80;
+const double elementHeight = 100;
+
 /// 元素定义的显示组件
 class ElementDefinitionWidget extends StatelessWidget {
   final ElementDefinition elementDefinition;
@@ -82,6 +85,8 @@ class ElementDefinitionWidget extends StatelessWidget {
             modelProjectController.selected.value = elementDefinition;
           },
           child: Container(
+              width: elementWidth,
+              height: elementHeight,
               padding: const EdgeInsets.all(5.0),
               decoration: BoxDecoration(
                 color: Colors.amber.shade100,

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:chart_sparkline/chart_sparkline.dart';
 import 'package:colla_chat/pages/model/element_definition_controller.dart';
 import 'package:colla_chat/pages/model/element_definition_widget.dart';
@@ -91,18 +93,6 @@ class CanvasWidget extends StatelessWidget {
             child: _buildDraggableElementWidget(context, elementDefinition));
         children.add(ele);
       }
-      Widget relationshipWidget = CustomPaint(
-          painter: RelationshipLinePainter(),
-          child: RepaintBoundary(child: Container()));
-      children.insert(
-          0,
-          Container(
-            height: appDataProvider.portraitSize.height -
-                appDataProvider.toolbarHeight -
-                40,
-            width: appDataProvider.secondaryBodyWidth,
-            child: Text('Test'),
-          ));
 
       return Stack(
         children: children,
@@ -130,14 +120,17 @@ class CanvasWidget extends StatelessWidget {
         },
         child: InteractiveViewer(
             transformationController: transformationController,
-            child: Container(
-                key: _key,
-                height: appDataProvider.portraitSize.height -
-                    appDataProvider.toolbarHeight -
-                    40,
-                width: appDataProvider.secondaryBodyWidth,
-                color: Colors.blueGrey.shade100,
-                child: _buildElementDefinitionWidget(context))));
+            child: CustomPaint(
+              painter: RelationshipLinePainter(),
+              child: RepaintBoundary(
+                  child: SizedBox(
+                      key: _key,
+                      height: appDataProvider.portraitSize.height -
+                          appDataProvider.toolbarHeight -
+                          40,
+                      width: appDataProvider.secondaryBodyWidth,
+                      child: _buildElementDefinitionWidget(context))),
+            )));
   }
 }
 
@@ -159,12 +152,20 @@ class RelationshipLinePainter extends CustomPainter {
       Offset? dstOffset = elementDefinitionController
           .elementDefinitions[relationshipDefinition.dst];
       if (srcOffset != null && dstOffset != null) {
-        path.moveTo(srcOffset.dx + 10, srcOffset.dy);
-        path.lineTo(dstOffset.dx + 10, dstOffset.dy + 10);
+        double sdx = srcOffset.dx + elementWidth / 2;
+        double sdy = srcOffset.dy;
+        double ddx = dstOffset.dx + elementWidth / 2;
+        double ddy = dstOffset.dy + elementHeight;
+        path.moveTo(sdx, sdy);
+        path.lineTo(sdx, (sdy - ddy) / 2 + ddy);
+        path.lineTo((ddx - sdx) + sdx, (sdy - ddy) / 2 + ddy);
+        path.lineTo((ddx - sdx) + sdx, ddy);
       }
-
-      canvas.drawPath(path, Paint()..color = Colors.blue);
     }
+    var paint = Paint()..color = Colors.blueAccent; //2080E5
+    paint.strokeWidth = 1.0;
+    paint.style = PaintingStyle.stroke;
+    canvas.drawPath(path, paint);
   }
 
   // 返回false, 后面介绍
