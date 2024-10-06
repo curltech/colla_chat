@@ -320,7 +320,8 @@ class ParticipantCard {
 
   /// 明杠牌，分三种情况
   /// pos为-1，表示是摸牌可杠，否则表示手牌可杠的位置
-  bool bar(int pos, {int? sender, String? card}) {
+  /// 返回值为杠的牌，为空表示未成功
+  String? bar(int pos, {int? sender, String? card}) {
     /// 摸牌杠牌
     if (card == null && comingCard.value != null) {
       if (pos == -1) {
@@ -346,13 +347,13 @@ class ParticipantCard {
             }
           }
 
-          return true;
+          return card;
         }
       }
     } else {
       ///打牌杠牌
       if (card != null && handCards[pos] != card) {
-        return false;
+        return null;
       }
       card = handCards.removeAt(pos);
       handCards.removeAt(pos);
@@ -367,16 +368,16 @@ class ParticipantCard {
         barSenders.add(sender);
       }
 
-      return true;
+      return card;
     }
 
-    return false;
+    return null;
   }
 
   /// 暗杠牌
-  bool darkBar(int pos, {String? card}) {
+  String? darkBar(int pos, {String? card}) {
     if (card != null && handCards[pos] != card) {
-      return false;
+      return null;
     }
     card = handCards.removeAt(pos);
     handCards.removeAt(pos);
@@ -393,7 +394,7 @@ class ParticipantCard {
       }
     }
 
-    return true;
+    return card;
   }
 
   /// 吃牌

@@ -375,10 +375,14 @@ class MajiangRoom {
   }
 
   /// 某个参与者杠打出的牌，pos表示可杠的手牌的位置
-  bool bar(int owner, int pos) {
+  /// 明杠牌，分三种情况 pos为-1，表示是摸牌可杠，否则表示手牌可杠的位置 返回值为杠的牌，为空表示未成功
+  String? bar(int owner, int pos) {
     ParticipantCard participantCard = participantCards[owner];
 
-    bool result = participantCard.bar(pos, sender: sender, card: sendCard);
+    String? card = participantCard.bar(pos, sender: sender, card: sendCard);
+    if (card == null) {
+      return null;
+    }
     if (sender != null) {
       participantCards[sender!].poolCards.removeLast();
       if (participantCards[owner].touchCards.length == 4) {
@@ -389,11 +393,11 @@ class MajiangRoom {
     for (int i = 0; i < participantCards.length; ++i) {
       if (owner != i) {
         ParticipantCard participantCard = participantCards[i];
-        CompleteType? completeType = participantCard.checkComplete(sendCard!);
+        CompleteType? completeType = participantCard.checkComplete(card);
         if (completeType != null) {
           canRob = true;
           robber = owner;
-          robCard = sendCard!;
+          robCard = card;
         }
       }
     }
@@ -404,15 +408,18 @@ class MajiangRoom {
 
       barTake(owner);
 
-      return result;
+      return card;
     }
 
-    return false;
+    return null;
   }
 
   /// 某个参与者暗杠，pos表示杠牌的位置
   darkBar(int owner, int pos) {
-    participantCards[owner].darkBar(pos);
+    String? card=participantCards[owner].darkBar(pos);
+    if (card==null){
+
+    }
     barTake(owner);
   }
 
