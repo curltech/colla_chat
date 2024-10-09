@@ -470,14 +470,20 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
             },
             child: Container(
                 color: current.value + 3 == majiangRoom.banker ||
-                        current.value + 3 == majiangRoom.banker! + 4
+                        current.value + 3 ==
+                            (majiangRoom.banker != null
+                                ? majiangRoom.banker! + 4
+                                : null)
                     ? Colors.yellow.withOpacity(0.2)
                     : Colors.white.withOpacity(0.2),
                 height: poolHeight,
                 width: poolWidth,
                 child: Stack(children: [
                   Center(
-                    child: Text(directions[current.value + 3]!),
+                    child: Text(
+                      directions[current.value + 3]!,
+                      style: const TextStyle(color: Colors.white, fontSize: 28),
+                    ),
                   ),
                   _buildPreviousTouchCard(),
                 ]))),
@@ -495,28 +501,41 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
                 },
                 child: Container(
                     color: current.value + 2 == majiangRoom.banker ||
-                            current.value + 2 == majiangRoom.banker! + 4
+                            current.value + 2 ==
+                                (majiangRoom.banker != null
+                                    ? majiangRoom.banker! + 4
+                                    : null)
                         ? Colors.yellow.withOpacity(0.2)
                         : Colors.white.withOpacity(0.2),
                     height: poolWidth,
                     width: poolHeight,
                     child: Stack(children: [
                       Center(
-                        child: Text(directions[current.value + 2]!),
+                        child: Text(
+                          directions[current.value + 2]!,
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 28),
+                        ),
                       ),
                       _buildOpponentTouchCard(),
                     ]))),
             const Spacer(),
             Container(
               color: current.value == majiangRoom.banker ||
-                      current.value == majiangRoom.banker! + 4
+                      current.value ==
+                          (majiangRoom.banker != null
+                              ? majiangRoom.banker! + 4
+                              : null)
                   ? Colors.yellow.withOpacity(0.2)
                   : Colors.white.withOpacity(0.2),
               height: poolWidth,
               width: poolHeight,
               child: Stack(children: [
                 Center(
-                  child: Text(directions[current.value]!),
+                  child: Text(
+                    directions[current.value]!,
+                    style: const TextStyle(color: Colors.white, fontSize: 28),
+                  ),
                 ),
                 _buildTouchCard(),
               ]),
@@ -533,14 +552,20 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
           },
           child: Container(
               color: current.value + 1 == majiangRoom.banker ||
-                      current.value + 1 == majiangRoom.banker! + 4
+                      current.value + 1 ==
+                          (majiangRoom.banker != null
+                              ? majiangRoom.banker! + 4
+                              : null)
                   ? Colors.yellow.withOpacity(0.2)
                   : Colors.white.withOpacity(0.2),
               height: poolHeight,
               width: poolWidth,
               child: Stack(children: [
                 Center(
-                  child: Text(directions[current.value + 1]!),
+                  child: Text(
+                    directions[current.value + 1]!,
+                    style: const TextStyle(color: Colors.white, fontSize: 28),
+                  ),
                 ),
                 _buildNextTouchCard(),
               ])),
