@@ -54,7 +54,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
     6: AppLocalizations.t('West'),
   };
 
-  bool fullscreen = false;
+  RxBool fullscreen = false.obs;
 
   /// 自己的手牌
   Widget _buildHandCard() {
@@ -575,114 +575,119 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
   }
 
   Widget _buildDesktop() {
-    MajiangRoom? majiangRoom = this.majiangRoom.value;
-    if (majiangRoom == null) {
-      return nilBox;
-    }
-    int pos = current.value;
-    ParticipantCard participantCard = majiangRoom.participantCards[pos];
-    pos = majiangRoom.next(current.value);
-    ParticipantCard nextParticipantCard = majiangRoom.participantCards[pos];
-    pos = majiangRoom.previous(current.value);
-    ParticipantCard previousParticipantCard = majiangRoom.participantCards[pos];
-    pos = majiangRoom.opponent(current.value);
-    ParticipantCard opponentParticipantCard = majiangRoom.participantCards[pos];
-    return Column(children: [
-      SizedBox(
-          height: totalHeight * 0.15,
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const SizedBox(
-              width: 10.0,
-            ),
-            IconTextButton(
-              label:
-                  '${opponentParticipantCard.name}(${opponentParticipantCard.score})',
-              icon: opponentParticipantCard.avatarWidget!,
-              onPressed: null,
-            ),
-            const SizedBox(
-              width: 10.0,
-            ),
-            Expanded(child: _buildOpponentHand()),
-          ])),
-      Expanded(
-          child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: totalWidth * 0.15,
-            child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+    return Obx(() {
+      MajiangRoom? majiangRoom = this.majiangRoom.value;
+      if (majiangRoom == null) {
+        return nilBox;
+      }
+      int pos = current.value;
+      ParticipantCard participantCard = majiangRoom.participantCards[pos];
+      pos = majiangRoom.next(current.value);
+      ParticipantCard nextParticipantCard = majiangRoom.participantCards[pos];
+      pos = majiangRoom.previous(current.value);
+      ParticipantCard previousParticipantCard =
+          majiangRoom.participantCards[pos];
+      pos = majiangRoom.opponent(current.value);
+      ParticipantCard opponentParticipantCard =
+          majiangRoom.participantCards[pos];
+      return Column(children: [
+        SizedBox(
+            height: totalHeight * 0.15,
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               const SizedBox(
                 width: 10.0,
               ),
-              Expanded(
-                  child: IconTextButton(
+              IconTextButton(
                 label:
-                    '${previousParticipantCard.name}(${previousParticipantCard.score})',
-                icon: previousParticipantCard.avatarWidget!,
+                    '${opponentParticipantCard.name}(${opponentParticipantCard.score})',
+                icon: opponentParticipantCard.avatarWidget!,
                 onPressed: null,
-              )),
+              ),
               const SizedBox(
                 width: 10.0,
               ),
-              Align(
-                  alignment: Alignment.centerRight,
-                  child: _buildPreviousHand()),
-              const SizedBox(
-                width: 30.0,
-              ),
-            ]),
-          ),
-          Expanded(
-              child: Container(
-            child: _buildCardPool(),
-          )),
-          SizedBox(
-            width: totalWidth * 0.15,
-            child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-              const SizedBox(
-                width: 30.0,
-              ),
-              _buildNextHand(),
-              const SizedBox(
-                width: 10.0,
-              ),
-              Expanded(
-                  child: IconTextButton(
-                label:
-                    '${nextParticipantCard.name}(${nextParticipantCard.score})',
-                icon: nextParticipantCard.avatarWidget!,
-                onPressed: null,
-              )),
-              const SizedBox(
-                width: 10.0,
-              ),
-            ]),
-          ),
-        ],
-      )),
-      SizedBox(
-          height: totalHeight * 0.2,
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const SizedBox(
-              width: 10.0,
-            ),
-            IconTextButton(
-              label: '${participantCard.name}(${participantCard.score})',
-              icon: participantCard.avatarWidget!,
-              onPressed: null,
-            ),
-            const SizedBox(
-              width: 10.0,
+              Expanded(child: _buildOpponentHand()),
+            ])),
+        Expanded(
+            child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: totalWidth * 0.15,
+              child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                const SizedBox(
+                  width: 10.0,
+                ),
+                Expanded(
+                    child: IconTextButton(
+                  label:
+                      '${previousParticipantCard.name}(${previousParticipantCard.score})',
+                  icon: previousParticipantCard.avatarWidget!,
+                  onPressed: null,
+                )),
+                const SizedBox(
+                  width: 10.0,
+                ),
+                Align(
+                    alignment: Alignment.centerRight,
+                    child: _buildPreviousHand()),
+                const SizedBox(
+                  width: 30.0,
+                ),
+              ]),
             ),
             Expanded(
-                child: Align(
-                    alignment: Alignment.centerRight, child: _buildHandCard())),
-            const SizedBox(
-              width: 30.0,
+                child: Container(
+              child: _buildCardPool(),
+            )),
+            SizedBox(
+              width: totalWidth * 0.15,
+              child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                const SizedBox(
+                  width: 30.0,
+                ),
+                _buildNextHand(),
+                const SizedBox(
+                  width: 10.0,
+                ),
+                Expanded(
+                    child: IconTextButton(
+                  label:
+                      '${nextParticipantCard.name}(${nextParticipantCard.score})',
+                  icon: nextParticipantCard.avatarWidget!,
+                  onPressed: null,
+                )),
+                const SizedBox(
+                  width: 10.0,
+                ),
+              ]),
             ),
-          ])),
-    ]);
+          ],
+        )),
+        SizedBox(
+            height: totalHeight * 0.2,
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              const SizedBox(
+                width: 10.0,
+              ),
+              IconTextButton(
+                label: '${participantCard.name}(${participantCard.score})',
+                icon: participantCard.avatarWidget!,
+                onPressed: null,
+              ),
+              const SizedBox(
+                width: 10.0,
+              ),
+              Expanded(
+                  child: Align(
+                      alignment: Alignment.centerRight,
+                      child: _buildHandCard())),
+              const SizedBox(
+                width: 30.0,
+              ),
+            ])),
+      ]);
+    });
   }
 
   TextEditingController textEditingController = TextEditingController();
@@ -891,25 +896,27 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
           children: [IgnorePointer(child: desktopWidget), stateWidget],
         );
       }
-      Widget child = GestureDetector(
-          onDoubleTap: () {
-            if (fullscreen) {
-              fullscreen = false;
-              Navigator.of(context).pop();
-            }
-          },
-          child: FittedBox(
-              child: SizedBox(
-                  height: totalHeight,
-                  width: totalWidth,
-                  child: desktopWidget)));
+      Widget child = FittedBox(
+          child: SizedBox(
+              height: totalHeight, width: totalWidth, child: desktopWidget));
+      if (fullscreen.value) {
+        child = InkWell(
+            onDoubleTap: () {
+              if (fullscreen.value) {
+                fullscreen.value = false;
+                Navigator.of(context).pop();
+              }
+            },
+            child: child);
+      }
 
       List<Widget>? rightWidgets = [
         IconButton(
             tooltip: AppLocalizations.t('Full screen'),
-            onPressed: () {
-              fullscreen = true;
-              DialogUtil.showFullScreen(context: context, child: child);
+            onPressed: () async {
+              fullscreen.value = true;
+              await DialogUtil.showFullScreen(context: context, child: child);
+              fullscreen.value = false;
             },
             icon: const Icon(Icons.fullscreen)),
         IconButton(
