@@ -450,7 +450,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
     });
   }
 
-  Widget _buildCardPool() {
+  Widget _buildCardPool(BuildContext context) {
     MajiangRoom? majiangRoom = this.majiangRoom.value;
     if (majiangRoom == null) {
       return nilBox;
@@ -519,7 +519,17 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
                       ),
                       _buildOpponentTouchCard(),
                     ]))),
-            const Spacer(),
+            fullscreen.value
+                ? Center(
+                    child: IconButton(
+                        onPressed: () {
+                          if (fullscreen.value) {
+                            fullscreen.value = false;
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        icon: const Icon(Icons.fullscreen_exit_outlined)))
+                : const Spacer(),
             Container(
               color: current.value == majiangRoom.banker ||
                       current.value ==
@@ -574,7 +584,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
     ]);
   }
 
-  Widget _buildDesktop() {
+  Widget _buildDesktop(BuildContext context) {
     return Obx(() {
       MajiangRoom? majiangRoom = this.majiangRoom.value;
       if (majiangRoom == null) {
@@ -638,7 +648,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
             ),
             Expanded(
                 child: Container(
-              child: _buildCardPool(),
+              child: _buildCardPool(context),
             )),
             SizedBox(
               width: totalWidth * 0.15,
@@ -827,55 +837,80 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  Widget? _buildParticipantStateWidget(BuildContext context) {
-    MajiangRoom? majiangRoom = this.majiangRoom.value;
-    if (majiangRoom == null) {
-      return null;
-    }
-    int owner = current.value;
-    ParticipantCard participantCard = majiangRoom.participantCards[owner];
-    Map<ParticipantState, List<int>> participantState =
-        participantCard.participantState;
-    if (participantState.isEmpty) {
-      return null;
-    }
-    List<Widget>? stateButtons = [];
-    for (var entry in participantState.entries) {
-      ParticipantState participantState = entry.key;
+  Widget _buildParticipantStateWidget(
+    BuildContext context,
+    Widget desktopWidget,
+  ) {
+    return Obx(() {
+      Widget child = desktopWidget;
+      MajiangRoom? majiangRoom = this.majiangRoom.value;
+      if (majiangRoom != null) {
+        int owner = current.value;
+        ParticipantCard participantCard = majiangRoom.participantCards[owner];
+        Map<ParticipantState, List<int>> participantState =
+            participantCard.participantState;
+        if (participantState.isNotEmpty) {
+          List<Widget>? stateButtons = [];
+          for (var entry in participantState.entries) {
+            ParticipantState participantState = entry.key;
 
-      /// 位置，在明杠，暗杠，吃牌的时候有用
-      List<int> pos = entry.value;
-      Widget? image = cardConcept.getStateImage(participantState.name);
-      if (image != null) {
-        stateButtons.add(IconButton(
-          onPressed: () {
-            _call(majiangRoom, owner, participantState, pos: pos);
-            participantCard.participantState.clear();
-          },
-          icon: image,
-        ));
+            /// 位置，在明杠，暗杠，吃牌的时候有用
+            List<int> pos = entry.value;
+            Widget? image = cardConcept.getStateImage(participantState.name);
+            if (image != null) {
+              stateButtons.add(IconButton(
+                onPressed: () {
+                  _call(majiangRoom, owner, participantState, pos: pos);
+                  participantCard.participantState.clear();
+                },
+                icon: image,
+              ));
+            }
+          }
+          Widget? image = cardConcept.getStateImage(ParticipantState.pass.name);
+          if (image != null) {
+            stateButtons.add(IconButton(
+              onPressed: () {
+                _call(majiangRoom, owner, ParticipantState.pass);
+                participantCard.participantState.clear();
+              },
+              icon: image,
+            ));
+          }
+
+          Widget stateWidget = Align(
+              alignment: Alignment.bottomRight,
+              child: Padding(
+                  padding: const EdgeInsets.all(100.0),
+                  child: OverflowBar(
+                    spacing: 10.0,
+                    alignment: MainAxisAlignment.end,
+                    children: stateButtons,
+                  )));
+          child = Stack(
+            children: [IgnorePointer(child: child), stateWidget],
+          );
+        }
+
+        child = FittedBox(
+            child:
+                SizedBox(height: totalHeight, width: totalWidth, child: child));
+
+        /// 这种做法鼠标点击太慢
+        // if (fullscreen.value) {
+        //   child = InkWell(
+        //       onDoubleTap: () {
+        //         if (fullscreen.value) {
+        //           fullscreen.value = false;
+        //           Navigator.of(context).pop();
+        //         }
+        //       },
+        //       child: child);
+        // }
       }
-    }
-    Widget? image = cardConcept.getStateImage(ParticipantState.pass.name);
-    if (image != null) {
-      stateButtons.add(IconButton(
-        onPressed: () {
-          _call(majiangRoom, owner, ParticipantState.pass);
-          participantCard.participantState.clear();
-        },
-        icon: image,
-      ));
-    }
 
-    return Align(
-        alignment: Alignment.bottomRight,
-        child: Padding(
-            padding: const EdgeInsets.all(100.0),
-            child: OverflowBar(
-              spacing: 10.0,
-              alignment: MainAxisAlignment.end,
-              children: stateButtons,
-            )));
+      return child;
+    });
   }
 
   @override
@@ -887,35 +922,18 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
         fit: StackFit.expand,
         children: [
           backgroundImage.get('background')!,
-          _buildDesktop(),
+          _buildDesktop(context),
         ],
       );
-      Widget? stateWidget = _buildParticipantStateWidget(context);
-      if (stateWidget != null) {
-        desktopWidget = Stack(
-          children: [IgnorePointer(child: desktopWidget), stateWidget],
-        );
-      }
-      Widget child = FittedBox(
-          child: SizedBox(
-              height: totalHeight, width: totalWidth, child: desktopWidget));
-      if (fullscreen.value) {
-        child = InkWell(
-            onDoubleTap: () {
-              if (fullscreen.value) {
-                fullscreen.value = false;
-                Navigator.of(context).pop();
-              }
-            },
-            child: child);
-      }
+      desktopWidget = _buildParticipantStateWidget(context, desktopWidget);
 
       List<Widget>? rightWidgets = [
         IconButton(
             tooltip: AppLocalizations.t('Full screen'),
             onPressed: () async {
               fullscreen.value = true;
-              await DialogUtil.showFullScreen(context: context, child: child);
+              await DialogUtil.showFullScreen(
+                  context: context, child: desktopWidget);
               fullscreen.value = false;
             },
             icon: const Icon(Icons.fullscreen)),
@@ -965,7 +983,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
           title: title ?? this.title,
           withLeading: true,
           rightWidgets: rightWidgets,
-          child: child);
+          child: desktopWidget);
     });
 
     return majiangMain;

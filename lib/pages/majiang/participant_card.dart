@@ -384,7 +384,11 @@ class ParticipantCard {
     card = handCards.removeAt(pos);
     handCards.removeAt(pos);
     handCards.removeAt(pos);
-    handCards.removeAt(pos);
+    if (comingCard.value == card) {
+      comingCard.value = null;
+    } else {
+      handCards.removeAt(pos);
+    }
     SequenceCard sequenceCard = SequenceCard(CardUtil.cardType(card),
         SequenceCardType.darkBar, [card, card, card, card]);
     touchCards.add(sequenceCard);
