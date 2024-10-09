@@ -43,6 +43,19 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
 
   final double amplyFactor = 1.2;
 
+  final double totalWidth = 1110;
+  final double totalHeight = 650;
+
+  final Map<int, String> directions = {
+    0: AppLocalizations.t('East'),
+    1: AppLocalizations.t('South'),
+    2: AppLocalizations.t('West'),
+    3: AppLocalizations.t('North'),
+    4: AppLocalizations.t('East'),
+    5: AppLocalizations.t('South'),
+    6: AppLocalizations.t('West'),
+  };
+
   /// 自己的手牌
   Widget _buildHandCard() {
     double ratio = 0.75;
@@ -438,40 +451,16 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
   }
 
   Widget _buildCardPool() {
-    double poolWidth = 180;
-    double poolHeight = 400;
-    double bodyWidth = appDataProvider.secondaryBodyWidth;
-    double bodyHeight =
-        appDataProvider.portraitSize.height - appDataProvider.toolbarHeight;
+    MajiangRoom? majiangRoom = this.majiangRoom.value;
+    if (majiangRoom == null) {
+      return nilBox;
+    }
+    double poolWidth = totalWidth * 0.17;
+    double poolHeight = totalHeight * 0.6;
     return Stack(children: [
-      //对家
-      AlignPositioned(
-        alignment: Alignment.topLeft,
-        dx: (bodyWidth * 0.7 - poolHeight) / 2,
-        dy: 0.0,
-        touch: Touch.inside,
-        child: InkWell(
-            onTap: () {
-              MajiangRoom? majiangRoom = this.majiangRoom.value;
-              if (majiangRoom != null) {
-                int opponent = majiangRoom.opponent(current.value);
-                current.value = opponent;
-              }
-            },
-            child: Container(
-              color: Colors.red,
-              height: poolWidth,
-              width: poolHeight,
-              child: _buildOpponentTouchCard(),
-            )),
-      ),
-      //上家
-      AlignPositioned(
-        alignment: Alignment.topLeft,
-        dx: 0.0,
-        dy: (bodyHeight * 0.65 - poolHeight) / 2,
-        touch: Touch.inside,
-        child: InkWell(
+      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        //上家
+        InkWell(
             onTap: () {
               MajiangRoom? majiangRoom = this.majiangRoom.value;
               if (majiangRoom != null) {
@@ -480,44 +469,83 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
               }
             },
             child: Container(
-              color: Colors.cyan,
-              height: poolHeight,
-              width: poolWidth,
-              child: _buildPreviousTouchCard(),
-            )),
-      ),
-      AlignPositioned(
-        alignment: Alignment.bottomLeft,
-        dx: (bodyWidth * 0.7 - poolHeight) / 2,
-        dy: 0.0,
-        touch: Touch.inside,
-        child: Container(
-          color: Colors.yellow,
-          height: poolWidth,
-          width: poolHeight,
-          child: _buildTouchCard(),
-        ),
-      ),
-      AlignPositioned(
-          alignment: Alignment.topRight,
-          dx: 0.0,
-          dy: (bodyHeight * 0.65 - poolHeight) / 2,
-          touch: Touch.inside,
-          child: InkWell(
-            onTap: () {
-              MajiangRoom? majiangRoom = this.majiangRoom.value;
-              if (majiangRoom != null) {
-                int next = majiangRoom.next(current.value);
-                current.value = next;
-              }
-            },
-            child: Container(
-              color: Colors.white,
-              height: poolHeight,
-              width: poolWidth,
-              child: _buildNextTouchCard(),
+                color: current.value + 3 == majiangRoom.banker ||
+                        current.value + 3 == majiangRoom.banker! + 4
+                    ? Colors.yellow.withOpacity(0.2)
+                    : Colors.white.withOpacity(0.2),
+                height: poolHeight,
+                width: poolWidth,
+                child: Stack(children: [
+                  Center(
+                    child: Text(directions[current.value + 3]!),
+                  ),
+                  _buildPreviousTouchCard(),
+                ]))),
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            //对家
+            InkWell(
+                onTap: () {
+                  MajiangRoom? majiangRoom = this.majiangRoom.value;
+                  if (majiangRoom != null) {
+                    int opponent = majiangRoom.opponent(current.value);
+                    current.value = opponent;
+                  }
+                },
+                child: Container(
+                    color: current.value + 2 == majiangRoom.banker ||
+                            current.value + 2 == majiangRoom.banker! + 4
+                        ? Colors.yellow.withOpacity(0.2)
+                        : Colors.white.withOpacity(0.2),
+                    height: poolWidth,
+                    width: poolHeight,
+                    child: Stack(children: [
+                      Center(
+                        child: Text(directions[current.value + 2]!),
+                      ),
+                      _buildOpponentTouchCard(),
+                    ]))),
+            const Spacer(),
+            Container(
+              color: current.value == majiangRoom.banker ||
+                      current.value == majiangRoom.banker! + 4
+                  ? Colors.yellow.withOpacity(0.2)
+                  : Colors.white.withOpacity(0.2),
+              height: poolWidth,
+              width: poolHeight,
+              child: Stack(children: [
+                Center(
+                  child: Text(directions[current.value]!),
+                ),
+                _buildTouchCard(),
+              ]),
             ),
-          )),
+          ],
+        ),
+        InkWell(
+          onTap: () {
+            MajiangRoom? majiangRoom = this.majiangRoom.value;
+            if (majiangRoom != null) {
+              int next = majiangRoom.next(current.value);
+              current.value = next;
+            }
+          },
+          child: Container(
+              color: current.value + 1 == majiangRoom.banker ||
+                      current.value + 1 == majiangRoom.banker! + 4
+                  ? Colors.yellow.withOpacity(0.2)
+                  : Colors.white.withOpacity(0.2),
+              height: poolHeight,
+              width: poolWidth,
+              child: Stack(children: [
+                Center(
+                  child: Text(directions[current.value + 1]!),
+                ),
+                _buildNextTouchCard(),
+              ])),
+        ),
+      ])
     ]);
   }
 
@@ -534,12 +562,9 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
     ParticipantCard previousParticipantCard = majiangRoom.participantCards[pos];
     pos = majiangRoom.opponent(current.value);
     ParticipantCard opponentParticipantCard = majiangRoom.participantCards[pos];
-    double bodyWidth = appDataProvider.secondaryBodyWidth;
-    double bodyHeight =
-        appDataProvider.portraitSize.height - appDataProvider.toolbarHeight;
     return Column(children: [
       SizedBox(
-          height: bodyHeight * 0.15,
+          height: totalHeight * 0.15,
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             const SizedBox(
               width: 10.0,
@@ -560,7 +585,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SizedBox(
-            width: bodyWidth * 0.15,
+            width: totalWidth * 0.15,
             child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
               const SizedBox(
                 width: 10.0,
@@ -588,7 +613,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
             child: _buildCardPool(),
           )),
           SizedBox(
-            width: bodyWidth * 0.15,
+            width: totalWidth * 0.15,
             child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
               const SizedBox(
                 width: 30.0,
@@ -612,7 +637,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
         ],
       )),
       SizedBox(
-          height: bodyHeight * 0.2,
+          height: totalHeight * 0.2,
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             const SizedBox(
               width: 10.0,
@@ -888,7 +913,11 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
           title: title ?? this.title,
           withLeading: true,
           rightWidgets: rightWidgets,
-          child: desktopWidget);
+          child: FittedBox(
+              child: SizedBox(
+                  height: totalHeight,
+                  width: totalWidth,
+                  child: desktopWidget)));
     });
 
     return majiangMain;

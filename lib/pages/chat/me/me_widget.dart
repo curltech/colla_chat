@@ -16,14 +16,17 @@ import 'package:colla_chat/pages/model/modeller_widget.dart';
 import 'package:colla_chat/pages/poem/poem_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/device_util.dart';
 import 'package:colla_chat/tool/sherpa/sherpa_install_widget.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 //我的页面，带有路由回调函数
 class MeWidget extends StatelessWidget with TileDataMixin {
@@ -121,6 +124,10 @@ class MeWidget extends StatelessWidget with TileDataMixin {
       tile.dense = false;
       tile.selected = false;
     }
+    meTileData[meTileData.length - 2].onTap =
+        (int index, String title, {String? subtitle}) {
+      DeviceUtil.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+    };
 
     return meTileData;
   }

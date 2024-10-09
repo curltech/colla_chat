@@ -78,6 +78,10 @@ class MajiangRoom {
 
   String? sendCard;
 
+  /// 同圈放弃的胡牌
+  int? giveUp;
+  String? giveUpCard;
+
   int? robber;
   String? robCard;
 
@@ -184,6 +188,16 @@ class MajiangRoom {
     List<String> allCards = [...cardConcept.allCards];
     Random random = Random.secure();
     randoms ??= [];
+
+    /// 如果没有指定庄家，开新局的参与者就是庄家，否则设定庄家
+    int length = randoms.length;
+    if (length == 137) {
+      banker = randoms[136];
+      keeper = banker;
+    } else {
+      banker = 0;
+      keeper = banker;
+    }
     for (int i = 0; i < 136; ++i) {
       int pos;
       if (i < randoms.length) {
@@ -196,11 +210,14 @@ class MajiangRoom {
 
       /// 每个参与者发13张牌
       if (i < 52) {
-        int reminder = i % 4;
+        int reminder = (i + banker!) % 4;
         participantCards[reminder].handCards.add(card);
       } else {
         unknownCards.add(card);
       }
+    }
+    if (length == 136) {
+      randoms.add(banker!);
     }
 
     /// 自己的牌现排序
@@ -208,19 +225,7 @@ class MajiangRoom {
       participantCard.handSort();
     }
 
-    /// 如果没有指定庄家，开新局的参与者就是庄家，否则设定庄家
-    int length = randoms.length;
-    if (length == 137) {
-      banker = randoms[136];
-      keeper = banker;
-    } else {
-      int pos = 0;
-      banker = pos;
-      keeper = banker;
-      randoms.add(pos);
-    }
-
-    take(0);
+    take(banker!);
 
     return randoms;
   }
@@ -336,6 +341,13 @@ class MajiangRoom {
     if (sender == null) {
       return false;
     }
+    for (int i = 0; i < participantCards.length; ++i) {
+      ParticipantCard participant = participantCards[owner];
+      if (participant.participantState.containsKey(ParticipantState.complete)) {
+        giveUp = owner;
+        giveUpCard = sendCard;
+      }
+    }
     robber = null;
     robCard = null;
     ParticipantCard participant = participantCards[owner];
@@ -416,10 +428,8 @@ class MajiangRoom {
 
   /// 某个参与者暗杠，pos表示杠牌的位置
   darkBar(int owner, int pos) {
-    String? card=participantCards[owner].darkBar(pos);
-    if (card==null){
-
-    }
+    String? card = participantCards[owner].darkBar(pos);
+    if (card == null) {}
     barTake(owner);
   }
 
@@ -487,6 +497,7 @@ class MajiangRoom {
     CompleteType? completeType = participantCards[owner].complete();
     if (completeType != null) {
       score(owner, completeType);
+      banker = owner;
     }
 
     return completeType;

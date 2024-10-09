@@ -213,12 +213,11 @@ class HomeWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return UpgradeAlert(
         upgrader: Upgrader(),
-        child: ScreenUtilInit(
-            designSize: appDataProvider.designSize,
-            minTextAdapt: true,
-            splitScreenMode: true,
-            builder: (BuildContext context, Widget? child) {
-              return Material(child: loginStatus ? indexView : p2pLogin);
-            }));
+        child: OrientationBuilder(
+          builder: (BuildContext context, Orientation orientation) {
+            appDataProvider.orientation = orientation;
+            return Material(child: loginStatus ? indexView : p2pLogin);
+          },
+        ));
   }
 }

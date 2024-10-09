@@ -1,4 +1,5 @@
 import 'package:colla_chat/pages/index/platform_breakpoint.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/locale_util.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
@@ -33,8 +34,15 @@ class AppDataProvider with ChangeNotifier {
   String sqlite3Path = '';
   int dataLength = 0;
   bool _autoLogin = false;
+  late Orientation orientation = Orientation.landscape;
 
-  AppDataProvider();
+  AppDataProvider() {
+    if (platformParams.mobile) {
+      orientation = Orientation.portrait;
+    } else {
+      orientation = Orientation.landscape;
+    }
+  }
 
   ///总的屏幕尺寸
   Size get totalSize {
@@ -204,8 +212,6 @@ class AppDataProvider with ChangeNotifier {
           _bodyRatio = 50;
         }
       }
-      // logger.i('Total size: $_totalSize');
-      // notifyListeners();
     }
   }
 }
