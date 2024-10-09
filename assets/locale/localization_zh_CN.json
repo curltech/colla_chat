@@ -806,11 +806,15 @@
   "Spanish": "西班牙语",
   "Japanese": "日语",
   "Korean": "韩语",
-  "Add room": "创建房间",
-  "room name": "房间名",
+  "Room name": "房间名",
   "Participant": "参与人",
   "East": "东",
   "South": "南",
   "West": "西",
-  "North": "北"
+  "North": "北",
+  "Full screen": "全屏",
+  "New room": "创建房间",
+  "New round": "新的一局",
+  "Check complete": "检查胡牌",
+  "Check take": "检查摸牌"
 }

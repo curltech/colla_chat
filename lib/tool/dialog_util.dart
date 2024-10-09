@@ -532,4 +532,47 @@ class DialogUtil {
     context ??= appDataProvider.context!;
     return showBottomSheet(context: context, builder: builder);
   }
+
+  /// barrierDismissible: false,
+  ///       transitionDuration: Duration(milliseconds: 2000),
+  ///       transitionBuilder: (context, animation, secondaryAnimation, child) {
+  ///         return FadeTransition(
+  ///           opacity: animation,
+  ///           child: ScaleTransition(
+  ///             scale: animation,
+  ///             child: child,
+  ///           ),
+  ///         );
+  ///       },
+  static Future<T?> showFullScreen<T>({
+    BuildContext? context,
+    bool barrierDismissible = true,
+    Color? barrierColor,
+    String? barrierLabel,
+    bool useSafeArea = true,
+    bool useRootNavigator = true,
+    RouteSettings? routeSettings,
+    Offset? anchorPoint,
+    Color? backgroundColor,
+    Duration insetAnimationDuration = Duration.zero,
+    Curve insetAnimationCurve = Curves.decelerate,
+    Widget? child,
+  }) async {
+    return await show<T>(
+        context: context,
+        barrierDismissible: barrierDismissible,
+        barrierColor: barrierColor,
+        barrierLabel: barrierLabel,
+        useSafeArea: useSafeArea,
+        useRootNavigator: useRootNavigator,
+        routeSettings: routeSettings,
+        anchorPoint: anchorPoint,
+        builder: (BuildContext context) {
+          return Dialog.fullscreen(
+              backgroundColor: backgroundColor,
+              insetAnimationDuration: insetAnimationDuration,
+              insetAnimationCurve: insetAnimationCurve,
+              child: child);
+        });
+  }
 }

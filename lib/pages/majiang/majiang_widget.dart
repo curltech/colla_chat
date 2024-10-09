@@ -1,4 +1,3 @@
-import 'package:align_positioned/align_positioned.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -7,7 +6,6 @@ import 'package:colla_chat/pages/majiang/card.dart';
 import 'package:colla_chat/pages/majiang/card_util.dart';
 import 'package:colla_chat/pages/majiang/participant_card.dart';
 import 'package:colla_chat/pages/majiang/room.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -55,6 +53,8 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
     5: AppLocalizations.t('South'),
     6: AppLocalizations.t('West'),
   };
+
+  bool fullscreen = false;
 
   /// 自己的手牌
   Widget _buildHandCard() {
@@ -877,9 +877,43 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     var majiangMain = Obx(() {
       MajiangRoom? majiangRoom = this.majiangRoom.value;
+      String? title = majiangRoom?.name;
+      Widget desktopWidget = Stack(
+        fit: StackFit.expand,
+        children: [
+          backgroundImage.get('background')!,
+          _buildDesktop(),
+        ],
+      );
+      Widget? stateWidget = _buildParticipantStateWidget(context);
+      if (stateWidget != null) {
+        desktopWidget = Stack(
+          children: [IgnorePointer(child: desktopWidget), stateWidget],
+        );
+      }
+      Widget child = GestureDetector(
+          onDoubleTap: () {
+            if (fullscreen) {
+              fullscreen = false;
+              Navigator.of(context).pop();
+            }
+          },
+          child: FittedBox(
+              child: SizedBox(
+                  height: totalHeight,
+                  width: totalWidth,
+                  child: desktopWidget)));
+
       List<Widget>? rightWidgets = [
         IconButton(
-            tooltip: AppLocalizations.t('New majiang room'),
+            tooltip: AppLocalizations.t('Full screen'),
+            onPressed: () {
+              fullscreen = true;
+              DialogUtil.showFullScreen(context: context, child: child);
+            },
+            icon: const Icon(Icons.fullscreen)),
+        IconButton(
+            tooltip: AppLocalizations.t('New room'),
             onPressed: () {
               _createMajiangRoom(context);
             },
@@ -887,7 +921,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
       ];
       if (majiangRoom != null) {
         rightWidgets.add(IconButton(
-            tooltip: AppLocalizations.t('New majiang card'),
+            tooltip: AppLocalizations.t('New round'),
             onPressed: () {
               majiangRoom.play();
             },
@@ -920,29 +954,11 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
             icon: const Icon(Icons.takeout_dining_outlined)));
       }
 
-      String? title = majiangRoom?.name;
-      Widget desktopWidget = Stack(
-        fit: StackFit.expand,
-        children: [
-          backgroundImage.get('background')!,
-          _buildDesktop(),
-        ],
-      );
-      Widget? stateWidget = _buildParticipantStateWidget(context);
-      if (stateWidget != null) {
-        desktopWidget = Stack(
-          children: [IgnorePointer(child: desktopWidget), stateWidget],
-        );
-      }
       return AppBarView(
           title: title ?? this.title,
           withLeading: true,
           rightWidgets: rightWidgets,
-          child: FittedBox(
-              child: SizedBox(
-                  height: totalHeight,
-                  width: totalWidth,
-                  child: desktopWidget)));
+          child: child);
     });
 
     return majiangMain;
