@@ -808,5 +808,9 @@
   "Korean": "韩语",
   "Add room": "创建房间",
   "room name": "房间名",
-  "Participant": "参与人"
+  "Participant": "参与人",
+  "East": "东",
+  "South": "南",
+  "West": "西",
+  "North": "北"
 }

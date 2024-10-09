@@ -124,10 +124,6 @@ class MeWidget extends StatelessWidget with TileDataMixin {
       tile.dense = false;
       tile.selected = false;
     }
-    meTileData[meTileData.length - 2].onTap =
-        (int index, String title, {String? subtitle}) {
-      DeviceUtil.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
-    };
 
     return meTileData;
   }
