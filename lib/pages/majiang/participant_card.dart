@@ -328,6 +328,8 @@ class ParticipantCard {
         card = comingCard.value;
       } else {
         card = handCards.removeAt(pos);
+        handCards.add(comingCard.value!);
+        CardUtil.sort(handCards);
       }
       for (int i = 0; i < touchCards.length; ++i) {
         SequenceCard sequenceCard = touchCards[i];
