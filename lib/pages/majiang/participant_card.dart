@@ -23,6 +23,10 @@ class ParticipantCard {
   ///是否是机器人
   final bool robot;
 
+  final int position;
+
+  final String roomName;
+
   //积分
   final RxInt score = 0.obs;
 
@@ -41,8 +45,14 @@ class ParticipantCard {
 
   ComingCardType? comingCardType;
 
+  /// 记录重要的事件
+  final List<RoomEvent> roomEvents = [];
+
   final RxMap<ParticipantState, List<int>> participantState =
       RxMap<ParticipantState, List<int>>({});
+
+  StreamController<RoomEvent> roomEventStreamController =
+      StreamController<RoomEvent>.broadcast();
 
   late final StreamSubscription<RoomEvent> roomEventStreamSubscription;
 
@@ -55,9 +65,13 @@ class ParticipantCard {
   /// 包了自己的胡牌的人
   int? packer;
 
-  ParticipantCard(this.peerId, this.name,
-      {this.robot = false,
-      required StreamController<RoomEvent> roomEventStreamController}) {
+  ParticipantCard(
+    this.peerId,
+    this.name,
+    this.position,
+    this.roomName, {
+    this.robot = false,
+  }) {
     roomEventStreamSubscription =
         roomEventStreamController.stream.listen((RoomEvent roomEvent) {
       onRoomEvent(roomEvent);
@@ -67,12 +81,16 @@ class ParticipantCard {
   ParticipantCard.fromJson(Map json)
       : peerId = json['peerId'] == '' ? null : json['id'],
         name = json['name'],
+        position = json['position'],
+        roomName = json['roomName'],
         robot = json['robot'] == true || json['robot'] == 1 ? true : false;
 
   Map<String, dynamic> toJson() {
     return {
       'peerId': peerId,
       'name': name,
+      'position': position,
+      'roomName': roomName,
       'robot': robot,
     };
   }
@@ -450,5 +468,33 @@ class ParticipantCard {
     results = checkTakeBar(card);
   }
 
-  onRoomEvent(RoomEvent roomEvent) {}
+  /// 发件分发来的事件
+  onRoomEvent(RoomEvent roomEvent) {
+    switch (roomEvent.action) {
+      case RoomEventAction.take:
+        break;
+      case RoomEventAction.barTake:
+        break;
+      case RoomEventAction.seaTake:
+        break;
+      case RoomEventAction.send:
+        break;
+      case RoomEventAction.touch:
+        break;
+      case RoomEventAction.bar:
+        break;
+      case RoomEventAction.darkBar:
+        break;
+      case RoomEventAction.drawing:
+        break;
+      case RoomEventAction.complete:
+        break;
+      case RoomEventAction.pass:
+        break;
+      case RoomEventAction.rob:
+        break;
+      default:
+        break;
+    }
+  }
 }

@@ -524,8 +524,8 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
                     child: IconButton(
                         onPressed: () {
                           if (fullscreen.value) {
-                            fullscreen.value = false;
                             Navigator.of(context).pop();
+                            fullscreen.value = false;
                           }
                         },
                         icon: const Icon(Icons.fullscreen_exit_outlined)))
@@ -790,30 +790,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
   }
 
   Future<void> createRoom(String name) async {
-    List<ParticipantCard> participantCards = [];
-    for (var peerId in peerIds) {
-      Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
-      String name =
-          linkman == null ? AppLocalizations.t('unknown') : linkman.name;
-      ParticipantCard participantCard = ParticipantCard(peerId, name,
-          roomEventStreamController: majiangRoomPool.roomEventStreamController);
-      participantCard.avatarWidget =
-          linkman == null ? AppImage.mdAppImage : linkman.avatarImage;
-      participantCard.avatarWidget ??= AppImage.mdAppImage;
-      participantCards.add(participantCard);
-    }
-    if (peerIds.length < 4) {
-      for (int i = 0; i < 4 - peerIds.length; i++) {
-        ParticipantCard participantCard = ParticipantCard(
-            'robot$i', '${AppLocalizations.t('robot')}$i',
-            robot: true,
-            roomEventStreamController:
-                majiangRoomPool.roomEventStreamController);
-        participantCards.add(participantCard);
-      }
-    }
-    majiangRoom.value =
-        await majiangRoomPool.createRoom(name, participantCards);
+    majiangRoom.value = await majiangRoomPool.createRoom(name, peerIds);
     current.value = majiangRoom.value!.current;
   }
 
@@ -822,7 +799,8 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
     if (participantState == ParticipantState.complete) {
       CompleteType? completeType = majiangRoom.complete(owner);
       if (completeType != null) {
-        majiangRoom.play();
+        majiangRoom.onRoomEvent(
+            RoomEvent(majiangRoom.name, owner, RoomEventAction.round));
       }
     } else if (participantState == ParticipantState.touch) {
       majiangRoom.touch(owner, pos![0]);
@@ -948,7 +926,8 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
         rightWidgets.add(IconButton(
             tooltip: AppLocalizations.t('New round'),
             onPressed: () {
-              majiangRoom.play();
+              majiangRoom.onRoomEvent(RoomEvent(
+                  majiangRoom.name, current.value, RoomEventAction.round));
             },
             icon: const Icon(Icons.newspaper_outlined)));
         rightWidgets.add(IconButton(

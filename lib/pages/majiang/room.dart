@@ -12,18 +12,28 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/json_util.dart';
 
+enum ParticipantPosition { east, south, west, north }
+
 enum RoomEventAction {
-  create, //新房间
-  play, //新局
+  room, //新房间
+  round, //新局
   take, //发牌
+  barTake, //杠上发牌
+  seaTake, //海底发牌
   send, //打牌
   touch, //碰牌
   bar, //杠牌
   darkBar, //暗杠
   drawing, //吃
   complete, //胡
+  rob, //抢杠胡牌
+  pass, //过牌
+  score,
 }
 
+/// 房间事件，一个房间事件由系统或者某个参与者触发，通知其他参与者，会触发一些检查动作或者其他的事件
+/// 比如参与者打牌事件将发送到房间，然后房间分发到所有的参与者
+/// 事件处理原则：参与者的事件也是先发送到房间，再分发到所有参与者，然后自己再进行处理，原因是考虑到网络环境
 class RoomEvent {
   /// 房间的名称
   final String name;
@@ -31,16 +41,41 @@ class RoomEvent {
   /// 事件的拥有者，-1表示房间或者系统，0，1，2，3表示参与者的位置
   final int owner;
 
+  /// RoomAction事件的枚举
+  final RoomEventAction action;
+
+  final String? card;
+
+  /// 行为发生的来源参与者，比如0胡了1打出的牌
+  final int? src;
+
   /// 每个事件的内容不同，
   /// 新房间事件是一个参与者数组
   /// 新局事件是庄家的位置和一个随机数的数组，代表发牌
   /// 其他的事件都是参与者的事件，表示牌
   final dynamic content;
 
-  /// RoomAction事件的枚举
-  final RoomEventAction action;
+  RoomEvent(this.name, this.owner, this.action,
+      {this.card, this.content, this.src});
 
-  RoomEvent(this.name, this.owner, this.content, this.action);
+  RoomEvent.fromJson(Map json)
+      : name = json['name'],
+        owner = json['owner'],
+        action = json['action'],
+        card = json['card'],
+        content = json['content'],
+        src = json['src'];
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'owner': owner,
+      'action': action,
+      'card': card,
+      'content': content,
+      'src': src,
+    };
+  }
 }
 
 /// 麻将房间
@@ -59,7 +94,7 @@ class MajiangRoom {
     CompleteType.oneNine: 150,
     CompleteType.pureTouch: 150,
     CompleteType.luxPair7: 150,
-    CompleteType.pureOneType: 150,
+    CompleteType.pureOneType: 100,
     CompleteType.mixTouch: 100,
     CompleteType.pair7: 80,
     CompleteType.mixOneType: 60,
@@ -99,28 +134,31 @@ class MajiangRoom {
   MajiangRoom(this.name);
 
   /// 加参与者，第一个是自己，第二个是下家，第三个是对家，第四个是上家
-  init(List<ParticipantCard> peers) async {
-    /// 房间池分发到房间的事件每个参与者都需要监听
-    for (int i = 0; i < peers.length; ++i) {
-      var peer = peers[i];
-      if (myself.peerId == peer.peerId) {
+  Future<void> init(List<String> peerIds) async {
+    for (int i = 0; i < peerIds.length; ++i) {
+      String peerId = peerIds[i];
+      if (myself.peerId == peerId) {
         current = i;
       }
-      Linkman? linkman =
-          await linkmanService.findCachedOneByPeerId(peer.peerId);
-      ParticipantCard participantCard = ParticipantCard(peer.peerId, peer.name,
-          robot: peer.robot,
-          roomEventStreamController: roomEventStreamController);
+      Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+      String linkmanName =
+          linkman == null ? AppLocalizations.t('unknown') : linkman.name;
+      ParticipantCard participantCard =
+          ParticipantCard(peerId, linkmanName, i, name);
       participantCard.avatarWidget =
           linkman == null ? AppImage.mdAppImage : linkman.avatarImage;
       participantCard.avatarWidget ??= AppImage.mdAppImage;
       participantCards.add(participantCard);
     }
-    if (peers.length < 4) {
-      for (int i = 0; i < 4 - peers.length; i++) {
+    if (peerIds.length < 4) {
+      for (int i = peerIds.length; i < 4; i++) {
         ParticipantCard participantCard = ParticipantCard(
-            'robot$i', '${AppLocalizations.t('robot')}$i',
-            robot: true, roomEventStreamController: roomEventStreamController);
+          'robot$i',
+          '${AppLocalizations.t('robot')}$i',
+          i,
+          name,
+          robot: true,
+        );
         participantCards.add(participantCard);
       }
     }
@@ -176,7 +214,7 @@ class MajiangRoom {
   }
 
   /// 新玩一局，positions为空自己发牌，不为空，别人发牌
-  List<int> play({List<int>? randoms}) {
+  List<int> _round({List<int>? randoms}) {
     for (var participantCard in participantCards) {
       participantCard.clear();
     }
@@ -295,7 +333,7 @@ class MajiangRoom {
   /// 杠牌发牌
   bool barTake(int owner) {
     if (unknownCards.isEmpty) {
-      play();
+      _round();
 
       return false;
     }
@@ -321,7 +359,7 @@ class MajiangRoom {
   /// 发牌
   take(int owner) {
     if (unknownCards.isEmpty) {
-      play();
+      _round();
 
       return;
     }
@@ -503,11 +541,43 @@ class MajiangRoom {
     return completeType;
   }
 
-  void onRoomEvent(RoomEvent roomEvent) {
-    if (roomEvent.action == RoomEventAction.play) {
-      dynamic content = roomEvent.content;
-      List<int>? randoms = JsonUtil.toJson(content);
-      play(randoms: randoms);
+  /// 房间的事件有外部触发，所有订阅者都会触发监听事件，本方法由外部调用，比如外部的消息chatMessage
+  onRoomEvent(RoomEvent roomEvent) async {
+    switch (roomEvent.action) {
+      case RoomEventAction.room:
+        break;
+      case RoomEventAction.round:
+        List<int>? randoms;
+        String? content = roomEvent.content;
+        if (content != null) {
+          randoms = JsonUtil.toJson(content);
+        }
+        _round(randoms: randoms);
+        break;
+      case RoomEventAction.take:
+        break;
+      case RoomEventAction.barTake:
+        break;
+      case RoomEventAction.seaTake:
+        break;
+      case RoomEventAction.send:
+        break;
+      case RoomEventAction.touch:
+        break;
+      case RoomEventAction.bar:
+        break;
+      case RoomEventAction.darkBar:
+        break;
+      case RoomEventAction.drawing:
+        break;
+      case RoomEventAction.complete:
+        break;
+      case RoomEventAction.pass:
+        break;
+      case RoomEventAction.rob:
+        break;
+      default:
+        break;
     }
   }
 }
@@ -518,10 +588,9 @@ class MajiangRoomPool {
   StreamController<RoomEvent> roomEventStreamController =
       StreamController<RoomEvent>.broadcast();
 
-  Future<MajiangRoom> createRoom(
-      String name, List<ParticipantCard> peers) async {
+  Future<MajiangRoom> createRoom(String name, List<String> peerIds) async {
     MajiangRoom majiangRoom = MajiangRoom(name);
-    await majiangRoom.init(peers);
+    await majiangRoom.init(peerIds);
     rooms[name] = majiangRoom;
 
     return majiangRoom;
@@ -533,17 +602,22 @@ class MajiangRoomPool {
 
   /// 房间的事件有外部触发，所有订阅者都会触发监听事件，本方法由外部调用，比如外部的消息chatMessage
   onRoomEvent(RoomEvent roomEvent) async {
-    if (roomEvent.action == RoomEventAction.create) {
-      String name = roomEvent.name;
-      dynamic content = roomEvent.content;
-      List<ParticipantCard> peers = JsonUtil.toJson(content);
-      await createRoom(name, peers);
-    } else {
-      String name = roomEvent.name;
-      MajiangRoom? majiangRoom = get(name);
-      if (majiangRoom != null) {
-        majiangRoom.roomEventStreamController.add(roomEvent);
+    String roomName = roomEvent.name;
+    MajiangRoom? room = get(roomName);
+    if (room == null) {
+      return;
+    }
+    if (roomEvent.action == RoomEventAction.room) {
+      List<String>? peerIds;
+      String? content = roomEvent.content;
+      if (content != null) {
+        peerIds = JsonUtil.toJson(content);
+      } else {
+        peerIds = [];
       }
+      createRoom(roomName, peerIds!);
+    } else {
+      room.onRoomEvent(roomEvent);
     }
   }
 }
