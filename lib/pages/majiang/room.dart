@@ -25,6 +25,8 @@ enum RoomEventAction {
   bar, //杠牌
   darkBar, //暗杠
   drawing, //吃
+  check, //检查
+  checkComplete, //检查胡牌
   complete, //胡
   rob, //抢杠胡牌
   pass, //过牌
@@ -49,6 +51,8 @@ class RoomEvent {
   /// 行为发生的来源参与者，比如0胡了1打出的牌
   final int? src;
 
+  final int? pos;
+
   /// 每个事件的内容不同，
   /// 新房间事件是一个参与者数组
   /// 新局事件是庄家的位置和一个随机数的数组，代表发牌
@@ -56,13 +60,14 @@ class RoomEvent {
   final dynamic content;
 
   RoomEvent(this.name, this.owner, this.action,
-      {this.card, this.content, this.src});
+      {this.card, this.pos, this.content, this.src});
 
   RoomEvent.fromJson(Map json)
       : name = json['name'],
         owner = json['owner'],
         action = json['action'],
         card = json['card'],
+        pos = json['pos'],
         content = json['content'],
         src = json['src'];
 
@@ -72,6 +77,7 @@ class RoomEvent {
       'owner': owner,
       'action': action,
       'card': card,
+      'pos': pos,
       'content': content,
       'src': src,
     };
@@ -263,79 +269,44 @@ class MajiangRoom {
       participantCard.handSort();
     }
 
-    take(banker!);
+    _take(banker!);
 
     return randoms;
   }
 
   /// 打牌
-  bool send(int owner, String card) {
+  bool _send(int owner, String card) {
     if (owner != keeper) {
       return false;
     }
-    participantCards[owner].send(card);
+    bool pass = true;
+    ParticipantCard participantCard = participantCards[owner];
+    int? pos = participantCard
+        .onRoomEvent(RoomEvent(name, owner, RoomEventAction.send, card: card));
+    for (int i = 0; i < participantCards.length; ++i) {
+      if (i != owner) {
+        participantCard = participantCards[i];
+        pos = participantCard.onRoomEvent(
+            RoomEvent(name, owner, RoomEventAction.send, card: card));
+        if (pos != null) {
+          pass = false;
+        }
+      }
+    }
     sender = owner;
     sendCard = card;
     keeper = null;
-    sendCheck(owner, card);
+    if (pass) {
+      onRoomEvent(RoomEvent(name, next(owner), RoomEventAction.take));
+    }
 
     return true;
   }
 
-  /// pos的参与者打出一张牌，其他三家检查
-  sendCheck(int owner, String card) {
-    int nextPos = next(owner);
-    ParticipantCard nextParticipant = participantCards[nextPos];
-    int opponentPos = opponent(owner);
-    ParticipantCard opponentParticipant = participantCards[opponentPos];
-    int previousPos = previous(owner);
-    ParticipantCard previousParticipant = participantCards[previousPos];
-
-    CompleteType? nextCompleteType = nextParticipant.checkComplete(card);
-    CompleteType? opponentCompleteType =
-        opponentParticipant.checkComplete(card);
-    CompleteType? previousCompleteType =
-        previousParticipant.checkComplete(card);
-
-    List<int>? results;
-    int result = nextParticipant.checkBar(card);
-    if (result == -1) {
-      result = nextParticipant.checkTouch(card);
-    }
-    if (result == -1) {
-      result = opponentParticipant.checkBar(card);
-    }
-    if (result == -1) {
-      result = opponentParticipant.checkTouch(card);
-    }
-    if (result == -1) {
-      result = previousParticipant.checkBar(card);
-    }
-    if (result == -1) {
-      result = previousParticipant.checkTouch(card);
-    }
-    // if (result == -1) {
-    //   results = nextParticipant.checkDrawing(card);
-    // }
-
-    /// 所有的参与者都无法响应，则发牌
-    if (result == -1 &&
-        results == null &&
-        nextCompleteType == null &&
-        opponentCompleteType == null &&
-        previousCompleteType == null) {
-      take(nextPos);
-    } else {
-      logger.i('some one can action');
-    }
-  }
-
   /// 杠牌发牌
-  bool barTake(int owner) {
+  String? _barTake(int owner) {
     if (unknownCards.isEmpty) {
-      _round();
-
-      return false;
+      return null;
     }
     int barCount = 0;
     for (var participantCard in participantCards) {
@@ -351,31 +322,49 @@ class MajiangRoom {
     sender = null;
     sendCard = null;
     keeper = owner;
-    participantCards[owner].take(card, ComingCardType.bar);
+    ParticipantCard participantCard = participantCards[owner];
+    participantCard.onRoomEvent(RoomEvent(name, owner, RoomEventAction.take,
+        card: card, content: TakeCardType.bar));
+    for (int i = 0; i < participantCards.length; ++i) {
+      if (i != owner) {
+        participantCard = participantCards[i];
+        participantCard.onRoomEvent(RoomEvent(name, owner, RoomEventAction.take,
+            card: card, content: TakeCardType.bar));
+      }
+    }
 
-    return true;
+    return card;
   }
 
   /// 发牌
-  take(int owner) {
+  String? _take(int owner) {
     if (unknownCards.isEmpty) {
-      _round();
-
-      return;
+      return null;
     }
     String card = unknownCards.removeLast();
     sender = null;
     sendCard = null;
     keeper = owner;
+    TakeCardType takeCardType = TakeCardType.self;
     if (unknownCards.length < 5) {
-      participantCards[owner].take(card, ComingCardType.sea);
-    } else {
-      participantCards[owner].take(card, ComingCardType.self);
+      takeCardType = TakeCardType.sea;
     }
+    ParticipantCard participantCard = participantCards[owner];
+    participantCard.onRoomEvent(RoomEvent(name, owner, RoomEventAction.take,
+        card: card, content: takeCardType));
+    for (int i = 0; i < participantCards.length; ++i) {
+      if (i != owner) {
+        ParticipantCard participantCard = participantCards[i];
+        participantCard.onRoomEvent(RoomEvent(name, owner, RoomEventAction.take,
+            card: card, content: takeCardType));
+      }
+    }
+
+    return card;
   }
 
   /// 某个参与者过，没有采取任何行为
-  bool pass(int owner) {
+  bool _pass(int owner) {
     if (sender == null) {
       return false;
     }
@@ -388,31 +377,24 @@ class MajiangRoom {
     }
     robber = null;
     robCard = null;
-    ParticipantCard participant = participantCards[owner];
-    participant.participantState.clear();
-    int nextPos = next(owner);
-    ParticipantCard nextParticipant = participantCards[nextPos];
-
-    int opponentPos = opponent(owner);
-    ParticipantCard opponentParticipant = participantCards[opponentPos];
-
-    int previousPos = previous(owner);
-    ParticipantCard previousParticipant = participantCards[previousPos];
-    if (nextParticipant.participantState.isEmpty &&
-        opponentParticipant.participantState.isEmpty &&
-        previousParticipant.participantState.isEmpty) {
-      take(next(sender!));
+    for (int i = 0; i < participantCards.length; ++i) {
+      ParticipantCard participantCard = participantCards[i];
+      participantCard.onRoomEvent(RoomEvent(name, owner, RoomEventAction.pass));
     }
 
     return true;
   }
 
   /// 某个参与者碰打出的牌
-  bool touch(int owner, int pos) {
+  bool _touch(int owner, int pos) {
     if (sendCard == null) {
       return false;
     }
-    bool result = participantCards[owner].touch(pos, card: sendCard!);
+    for (int i = 0; i < participantCards.length; ++i) {
+      ParticipantCard participantCard = participantCards[i];
+      participantCard.onRoomEvent(RoomEvent(name, owner, RoomEventAction.touch,
+          card: sendCard!, content: pos));
+    }
     if (participantCards[owner].touchCards.length == 4) {
       participantCards[owner].packer = sender;
     }
@@ -421,17 +403,24 @@ class MajiangRoom {
     sender = null;
     sendCard = null;
 
-    return result;
+    return true;
   }
 
   /// 某个参与者杠打出的牌，pos表示可杠的手牌的位置
   /// 明杠牌，分三种情况 pos为-1，表示是摸牌可杠，否则表示手牌可杠的位置 返回值为杠的牌，为空表示未成功
-  String? bar(int owner, int pos) {
-    ParticipantCard participantCard = participantCards[owner];
+  String? _bar(int owner, int pos) {
+    bool canRob = false;
+    Map<int, CompleteType>? completeTypes = _checkComplete(owner, sendCard!);
+    if (completeTypes != null) {
+      canRob = true;
+      robber = owner;
+      robCard = sendCard;
+    }
 
-    String? card = participantCard.bar(pos, sender: sender, card: sendCard);
-    if (card == null) {
-      return null;
+    for (int i = 0; i < participantCards.length; ++i) {
+      ParticipantCard participantCard = participantCards[i];
+      participantCard.onRoomEvent(RoomEvent(name, owner, RoomEventAction.bar,
+          src: sender, card: sendCard, content: pos));
     }
     if (sender != null) {
       participantCards[sender!].poolCards.removeLast();
@@ -439,53 +428,86 @@ class MajiangRoom {
         participantCards[owner].packer = sender;
       }
     }
-    bool canRob = false;
-    for (int i = 0; i < participantCards.length; ++i) {
-      if (owner != i) {
-        ParticipantCard participantCard = participantCards[i];
-        CompleteType? completeType = participantCard.checkComplete(card);
-        if (completeType != null) {
-          canRob = true;
-          robber = owner;
-          robCard = card;
-        }
-      }
+    keeper = owner;
+    sender = null;
+    sendCard = null;
+    if (canRob) {
+      return null;
     }
-    if (!canRob) {
-      keeper = owner;
-      sender = null;
-      sendCard = null;
 
-      barTake(owner);
-
-      return card;
-    }
+    _barTake(owner);
 
     return null;
   }
 
+  Map<int, CompleteType>? _checkComplete(int owner, String card) {
+    Map<int, CompleteType>? completeTypes;
+    for (int i = 0; i < participantCards.length; ++i) {
+      if (owner != i) {
+        ParticipantCard participantCard = participantCards[i];
+        CompleteType? completeType = participantCard.onRoomEvent(
+            RoomEvent(name, owner, RoomEventAction.checkComplete, card: card));
+        if (completeType != null) {
+          completeTypes ??= {};
+          completeTypes[i] = completeType;
+        }
+      }
+    }
+
+    return completeTypes;
+  }
+
+  /// owner抢src的明杠牌card
+  _rob(int owner, int src, String card) {}
+
   /// 某个参与者暗杠，pos表示杠牌的位置
-  darkBar(int owner, int pos) {
-    String? card = participantCards[owner].darkBar(pos);
-    if (card == null) {}
-    barTake(owner);
+  String? _darkBar(int owner, int pos) {
+    ParticipantCard participantCard = participantCards[owner];
+    String? card = participantCard
+        .onRoomEvent(RoomEvent(name, owner, RoomEventAction.darkBar, pos: pos));
+    if (card == null) {
+      return null;
+    }
+    for (int i = 0; i < participantCards.length; ++i) {
+      if (owner != i) {
+        ParticipantCard participantCard = participantCards[i];
+        participantCard.onRoomEvent(
+            RoomEvent(name, owner, RoomEventAction.darkBar, pos: pos));
+      }
+    }
+    _barTake(owner);
+
+    return card;
   }
 
   /// 某个参与者吃打出的牌，pos表示吃牌的位置
-  bool drawing(int owner, int pos) {
+  String? _drawing(int owner, int pos) {
     if (sendCard == null) {
-      return false;
+      return null;
     }
-    bool result = participantCards[owner].drawing(pos, sendCard!);
+    ParticipantCard participantCard = participantCards[owner];
+    String? card = participantCard.onRoomEvent(RoomEvent(
+        name, owner, RoomEventAction.drawing,
+        pos: pos, card: sendCard));
+    if (card == null) {
+      return card;
+    }
+    for (int i = 0; i < participantCards.length; ++i) {
+      if (owner != i) {
+        ParticipantCard participantCard = participantCards[i];
+        participantCard.onRoomEvent(
+            RoomEvent(name, owner, RoomEventAction.darkBar, pos: pos));
+      }
+    }
     participantCards[sender!].poolCards.removeLast();
     keeper = owner;
     sender = null;
     sendCard = null;
 
-    return result;
+    return card;
   }
 
-  bool score(int owner, CompleteType completeType) {
+  bool _score(int owner, CompleteType completeType) {
     int? baseScore = completeTypeScores[completeType];
     if (baseScore == null) {
       return false;
@@ -494,11 +516,11 @@ class MajiangRoom {
     if (robber != null && robCard != null) {
       participantCard.score.value += baseScore * 3;
       participantCards[robber!].score.value -= baseScore * 3;
-    } else if (participantCard.comingCardType == ComingCardType.bar ||
-        participantCard.comingCardType == ComingCardType.sea) {
+    } else if (participantCard.takeCardType == TakeCardType.bar ||
+        participantCard.takeCardType == TakeCardType.sea) {
       baseScore = baseScore * 2;
       participantCard.score.value += baseScore * 3;
-    } else if (participantCard.comingCardType == ComingCardType.self) {
+    } else if (participantCard.takeCardType == TakeCardType.self) {
       participantCard.score.value += baseScore * 3;
     } else {
       participantCard.score.value += baseScore;
@@ -531,18 +553,27 @@ class MajiangRoom {
   }
 
   /// 某个参与者胡牌
-  CompleteType? complete(int owner) {
-    CompleteType? completeType = participantCards[owner].complete();
-    if (completeType != null) {
-      score(owner, completeType);
-      banker = owner;
+  CompleteType? _complete(int owner) {
+    ParticipantCard participantCard = participantCards[owner];
+    CompleteType? completeType = participantCard.onRoomEvent(
+        RoomEvent(name, owner, RoomEventAction.complete, card: sendCard));
+    if (completeType == null) {
+      return null;
     }
+    for (int i = 0; i < participantCards.length; ++i) {
+      if (owner != i) {
+        ParticipantCard participantCard = participantCards[i];
+        participantCard.onRoomEvent(
+            RoomEvent(name, owner, RoomEventAction.complete, card: sendCard));
+      }
+    }
+    banker = owner;
 
     return completeType;
   }
 
   /// 房间的事件有外部触发，所有订阅者都会触发监听事件，本方法由外部调用，比如外部的消息chatMessage
-  onRoomEvent(RoomEvent roomEvent) async {
+  dynamic onRoomEvent(RoomEvent roomEvent) async {
     switch (roomEvent.action) {
       case RoomEventAction.room:
         break;
@@ -555,71 +586,39 @@ class MajiangRoom {
         _round(randoms: randoms);
         break;
       case RoomEventAction.take:
+        _take(roomEvent.owner);
         break;
       case RoomEventAction.barTake:
+        _barTake(roomEvent.owner);
         break;
       case RoomEventAction.seaTake:
+        _take(roomEvent.owner);
         break;
       case RoomEventAction.send:
+        _send(roomEvent.owner, roomEvent.card!);
         break;
       case RoomEventAction.touch:
+        _touch(roomEvent.owner, roomEvent.content);
         break;
       case RoomEventAction.bar:
+        _bar(roomEvent.owner, roomEvent.content);
         break;
       case RoomEventAction.darkBar:
+        _darkBar(roomEvent.owner, roomEvent.content);
         break;
       case RoomEventAction.drawing:
+        _drawing(roomEvent.owner, roomEvent.content);
         break;
       case RoomEventAction.complete:
-        break;
+        return _complete(roomEvent.owner);
       case RoomEventAction.pass:
+        _pass(roomEvent.owner);
         break;
       case RoomEventAction.rob:
+        _rob(roomEvent.owner, roomEvent.src!, roomEvent.card!);
         break;
       default:
         break;
     }
   }
 }
-
-class MajiangRoomPool {
-  final Map<String, MajiangRoom> rooms = {};
-
-  StreamController<RoomEvent> roomEventStreamController =
-      StreamController<RoomEvent>.broadcast();
-
-  Future<MajiangRoom> createRoom(String name, List<String> peerIds) async {
-    MajiangRoom majiangRoom = MajiangRoom(name);
-    await majiangRoom.init(peerIds);
-    rooms[name] = majiangRoom;
-
-    return majiangRoom;
-  }
-
-  MajiangRoom? get(String name) {
-    return rooms[name];
-  }
-
-  /// 房间的事件有外部触发，所有订阅者都会触发监听事件，本方法由外部调用，比如外部的消息chatMessage
-  onRoomEvent(RoomEvent roomEvent) async {
-    String roomName = roomEvent.name;
-    MajiangRoom? room = get(roomName);
-    if (room == null) {
-      return;
-    }
-    if (roomEvent.action == RoomEventAction.room) {
-      List<String>? peerIds;
-      String? content = roomEvent.content;
-      if (content != null) {
-        peerIds = JsonUtil.toJson(content);
-      } else {
-        peerIds = [];
-      }
-      createRoom(roomName, peerIds!);
-    } else {
-      room.onRoomEvent(roomEvent);
-    }
-  }
-}
-
-final MajiangRoomPool majiangRoomPool = MajiangRoomPool();

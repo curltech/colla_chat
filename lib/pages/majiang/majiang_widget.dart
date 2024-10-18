@@ -1,13 +1,11 @@
-import 'package:colla_chat/constant/base.dart';
-import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/majiang/card.dart';
 import 'package:colla_chat/pages/majiang/card_util.dart';
 import 'package:colla_chat/pages/majiang/participant_card.dart';
 import 'package:colla_chat/pages/majiang/room.dart';
+import 'package:colla_chat/pages/majiang/room_pool.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
@@ -86,7 +84,9 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
         Widget handcard = majiangCard.handCard(ratio: ratio);
         handcard = InkWell(
             onTap: () {
-              majiangRoom.send(owner, card);
+              majiangRoom.onRoomEvent(RoomEvent(
+                  majiangRoom.name, owner, RoomEventAction.send,
+                  card: card));
             },
             child: handcard);
         children.add(handcard);
@@ -94,14 +94,16 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
           width: 0.5,
         ));
       }
-      var card = participantCard.comingCard.value;
+      var card = participantCard.takeCard.value;
 
       if (card != null) {
         MajiangCard majiangCard = MajiangCard(card);
         Widget handcard = majiangCard.handCard(ratio: ratio);
         handcard = InkWell(
             onTap: () {
-              majiangRoom.send(owner, card);
+              majiangRoom.onRoomEvent(RoomEvent(
+                  majiangRoom.name, owner, RoomEventAction.send,
+                  card: card));
             },
             child: handcard);
         children.add(const SizedBox(
@@ -151,7 +153,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
             clip: i < length - 1 ? true : false, ratio: ratio);
         children.add(previousHand);
       }
-      String? card = participantCard.comingCard.value;
+      String? card = participantCard.takeCard.value;
       if (card != null) {
         MajiangCard majiangCard = MajiangCard(card);
         Widget previousHand =
@@ -192,7 +194,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
           width: 5,
         ));
       }
-      String? card = participantCard.comingCard.value;
+      String? card = participantCard.takeCard.value;
       if (card != null) {
         MajiangCard majiangCard = MajiangCard(card);
         Widget opponentHand = majiangCard.opponentHand(ratio: ratio);
@@ -226,7 +228,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
       int owner = majiangRoom.next(current.value);
       ParticipantCard participantCard = majiangRoom.participantCards[owner];
 
-      String? card = participantCard.comingCard.value;
+      String? card = participantCard.takeCard.value;
       if (card != null) {
         MajiangCard majiangCard = MajiangCard(card);
         Widget nextHand = majiangCard.nextHand(clip: false, ratio: ratio);
@@ -797,21 +799,32 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
   _call(MajiangRoom majiangRoom, int owner, ParticipantState participantState,
       {List<int>? pos}) async {
     if (participantState == ParticipantState.complete) {
-      CompleteType? completeType = majiangRoom.complete(owner);
+      CompleteType? completeType = await majiangRoom.onRoomEvent(
+          RoomEvent(majiangRoom.name, owner, RoomEventAction.complete));
       if (completeType != null) {
         majiangRoom.onRoomEvent(
             RoomEvent(majiangRoom.name, owner, RoomEventAction.round));
       }
     } else if (participantState == ParticipantState.touch) {
-      majiangRoom.touch(owner, pos![0]);
+      majiangRoom.onRoomEvent(RoomEvent(
+          majiangRoom.name, owner, RoomEventAction.touch,
+          content: pos![0]));
     } else if (participantState == ParticipantState.bar) {
-      majiangRoom.bar(owner, pos![0]);
-    } else if (participantState == ParticipantState.darkbar) {
-      majiangRoom.darkBar(owner, pos![0]);
+      majiangRoom.onRoomEvent(RoomEvent(
+          majiangRoom.name, owner, RoomEventAction.bar,
+          content: pos![0]));
+    } else if (participantState == ParticipantState.darkBar) {
+      majiangRoom.onRoomEvent(RoomEvent(
+          majiangRoom.name, owner, RoomEventAction.darkBar,
+          content: pos![0]));
     } else if (participantState == ParticipantState.pass) {
-      majiangRoom.pass(owner);
+      majiangRoom.onRoomEvent(RoomEvent(
+          majiangRoom.name, owner, RoomEventAction.pass,
+          content: pos![0]));
     } else if (participantState == ParticipantState.drawing) {
-      majiangRoom.drawing(owner, pos![0]);
+      majiangRoom.onRoomEvent(RoomEvent(
+          majiangRoom.name, owner, RoomEventAction.drawing,
+          content: pos![0]));
     }
   }
 
@@ -935,13 +948,17 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
             onPressed: () {
               ParticipantCard participantCard =
                   majiangRoom.participantCards[current.value];
-              String? senderCard = majiangRoom.sendCard;
-              String? comingCard = participantCard.comingCard.value;
-              if (senderCard != null) {
-                participantCard.checkComplete(senderCard);
+              String? sendCard = majiangRoom.sendCard;
+              String? comingCard = participantCard.takeCard.value;
+              if (sendCard != null) {
+                participantCard.onRoomEvent(RoomEvent(majiangRoom.name,
+                    current.value, RoomEventAction.checkComplete,
+                    card: sendCard));
               }
               if (comingCard != null) {
-                participantCard.checkComplete(comingCard);
+                participantCard.onRoomEvent(RoomEvent(majiangRoom.name,
+                    current.value, RoomEventAction.checkComplete,
+                    card: comingCard));
               }
             },
             icon: const Icon(Icons.check)));
@@ -950,9 +967,11 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
             onPressed: () {
               ParticipantCard participantCard =
                   majiangRoom.participantCards[current.value];
-              String? comingCard = participantCard.comingCard.value;
+              String? comingCard = participantCard.takeCard.value;
               if (comingCard != null) {
-                participantCard.takeCheck(comingCard);
+                participantCard.onRoomEvent(RoomEvent(
+                    majiangRoom.name, current.value, RoomEventAction.check,
+                    card: comingCard));
               }
             },
             icon: const Icon(Icons.takeout_dining_outlined)));

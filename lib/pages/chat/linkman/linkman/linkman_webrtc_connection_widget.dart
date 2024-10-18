@@ -1,7 +1,5 @@
-import 'package:badges/badges.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
-import 'package:badges/badges.dart' as badges;
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_edit_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
@@ -40,27 +38,15 @@ class LinkmanWebrtcConnectionWidget extends StatelessWidget with TileDataMixin {
 
   Widget _buildBadge(int connectionNum, {Widget? avatarImage}) {
     var badge = avatarImage ?? AppImage.mdAppImage;
-    badge = badges.Badge(
-      position: BadgePosition.topEnd(),
-      stackFit: StackFit.loose,
-      badgeContent: ConstrainedBox(
-          constraints: const BoxConstraints(
-            minWidth: 12,
-          ),
-          child: Center(
-              child: CommonAutoSizeText('$connectionNum',
-                  style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white)))),
-      badgeStyle: badges.BadgeStyle(
-        elevation: 0.0,
-        badgeColor: connectionNum == 0 ? Colors.red : Colors.green,
-        shape: badges.BadgeShape.square,
-        borderRadius: const BorderRadius.horizontal(
-            left: Radius.circular(8), right: Radius.circular(8)),
-        padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 2.0),
-      ),
+    badge = Badge(
+      backgroundColor: connectionNum == 0 ? Colors.red : Colors.green,
+      padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 2.0),
+      label: Center(
+          child: CommonAutoSizeText('$connectionNum',
+              style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white))),
       child: badge,
     );
 
@@ -107,8 +93,7 @@ class LinkmanWebrtcConnectionWidget extends StatelessWidget with TileDataMixin {
     var connectionView = Obx(() {
       return PlatformFutureBuilder(
         future: _buildConnectionTileData(context),
-        builder:
-            (BuildContext context, List<TileData> tileData) {
+        builder: (BuildContext context, List<TileData> tileData) {
           return DataListView(
             itemCount: tileData.length,
             itemBuilder: (BuildContext context, int index) {

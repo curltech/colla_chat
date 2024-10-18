@@ -143,7 +143,7 @@ class SplitCard {
         SequenceCard sequenceCard = sequenceCards[i];
         SequenceCard next = sequenceCards[i + 1];
         if (sequenceCard.cards[0] == next.cards[0]) {
-          count;
+          count++;
         }
       }
     } else {

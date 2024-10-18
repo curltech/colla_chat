@@ -1,4 +1,3 @@
-import 'package:badges/badges.dart' as badges;
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
@@ -204,22 +203,10 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                   fontWeight: FontWeight.w600,
                   color: Colors.white)));
     }
-    badge = badges.Badge(
-      position: badges.BadgePosition.topEnd(),
-      stackFit: StackFit.loose,
-      badgeContent: ConstrainedBox(
-          constraints: const BoxConstraints(
-            minWidth: 10,
-          ),
-          child: child),
-      badgeStyle: badges.BadgeStyle(
-        elevation: 0.0,
-        badgeColor: connectionNum == 0 ? Colors.red : Colors.green,
-        shape: badges.BadgeShape.square,
-        borderRadius: const BorderRadius.horizontal(
-            left: Radius.circular(8), right: Radius.circular(8)),
-        padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 2.0),
-      ),
+    badge = Badge(
+      backgroundColor: connectionNum == 0 ? Colors.red : Colors.green,
+      padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 2.0),
+      label: child,
       child: badge,
     );
 
