@@ -390,14 +390,11 @@ class MajiangRoom {
   }
 
   /// 某个参与者碰打出的牌
-  bool _touch(int owner, int pos) {
-    if (sendCard == null) {
-      return false;
-    }
+  bool _touch(int owner, int pos, int src, String sendCard) {
     for (int i = 0; i < participantCards.length; ++i) {
       ParticipantCard participantCard = participantCards[i];
       participantCard.onRoomEvent(RoomEvent(name, owner, RoomEventAction.touch,
-          card: sendCard!, pos: pos));
+          card: sendCard, src: src, pos: pos));
     }
     if (participantCards[owner].touchCards.length == 4) {
       participantCards[owner].packer = sender;
@@ -405,7 +402,7 @@ class MajiangRoom {
     participantCards[sender!].poolCards.removeLast();
     keeper = owner;
     sender = null;
-    sendCard = null;
+    this.sendCard = null;
 
     return true;
   }
@@ -607,7 +604,8 @@ class MajiangRoom {
         _send(roomEvent.owner, roomEvent.card!);
         break;
       case RoomEventAction.touch:
-        _touch(roomEvent.owner, roomEvent.pos!);
+        _touch(
+            roomEvent.owner, roomEvent.pos!, roomEvent.src!, roomEvent.card!);
         break;
       case RoomEventAction.bar:
         _bar(roomEvent.owner, roomEvent.pos!);

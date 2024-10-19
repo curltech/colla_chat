@@ -808,7 +808,7 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
     } else if (participantState == ParticipantState.touch) {
       majiangRoom.onRoomEvent(RoomEvent(
           majiangRoom.name, owner, RoomEventAction.touch,
-          pos: pos![0]));
+          src: majiangRoom.sender, card: majiangRoom.sendCard, pos: pos![0]));
     } else if (participantState == ParticipantState.bar) {
       majiangRoom.onRoomEvent(RoomEvent(
           majiangRoom.name, owner, RoomEventAction.bar,

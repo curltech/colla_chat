@@ -322,7 +322,7 @@ class ParticipantCard {
 
       return null;
     } else {
-      CompleteType? completeType = _checkComplete(owner,card);
+      CompleteType? completeType = _checkComplete(owner, card);
       int? pos = _checkBar(card);
       pos ??= _checkTouch(card);
       if (completeType != null) {
@@ -337,7 +337,7 @@ class ParticipantCard {
   }
 
   Map<ParticipantState, List<int>> _check(int owner, String card) {
-    _checkComplete(owner,card);
+    _checkComplete(owner, card);
     _checkBar(card);
     _checkTouch(card);
 
@@ -508,7 +508,7 @@ class ParticipantCard {
       this.takeCardType = takeCardType;
 
       /// 检查摸到的牌，看需要采取的动作
-      CompleteType? completeType = _checkComplete(owner,card);
+      CompleteType? completeType = _checkComplete(owner, card);
       List<int>? pos = _checkDarkBar(card);
       pos ??= _checkTakeBar(card);
       if (completeType != null) {
