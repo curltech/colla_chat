@@ -11,6 +11,7 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/number_util.dart';
 
 enum ParticipantPosition { east, south, west, north }
 
@@ -29,6 +30,7 @@ enum RoomEventAction {
   checkComplete, //检查胡牌
   complete, //胡
   rob, //抢杠胡牌
+  seaComplete, //海底捞胡
   pass, //过牌
   score,
 }
@@ -165,6 +167,7 @@ class MajiangRoom {
           name,
           robot: true,
         );
+        participantCard.avatarWidget ??= AppImage.mdAppImage;
         participantCards.add(participantCard);
       }
     }
@@ -260,6 +263,7 @@ class MajiangRoom {
         unknownCards.add(card);
       }
     }
+    length = randoms.length;
     if (length == 136) {
       randoms.add(banker!);
     }
@@ -324,12 +328,12 @@ class MajiangRoom {
     keeper = owner;
     ParticipantCard participantCard = participantCards[owner];
     participantCard.onRoomEvent(RoomEvent(name, owner, RoomEventAction.take,
-        card: card, content: TakeCardType.bar));
+        card: card, pos: TakeCardType.bar.index));
     for (int i = 0; i < participantCards.length; ++i) {
       if (i != owner) {
         participantCard = participantCards[i];
         participantCard.onRoomEvent(RoomEvent(name, owner, RoomEventAction.take,
-            card: card, content: TakeCardType.bar));
+            card: card, pos: TakeCardType.bar.index));
       }
     }
 
@@ -351,12 +355,12 @@ class MajiangRoom {
     }
     ParticipantCard participantCard = participantCards[owner];
     participantCard.onRoomEvent(RoomEvent(name, owner, RoomEventAction.take,
-        card: card, content: takeCardType));
+        card: card, pos: takeCardType.index));
     for (int i = 0; i < participantCards.length; ++i) {
       if (i != owner) {
         ParticipantCard participantCard = participantCards[i];
         participantCard.onRoomEvent(RoomEvent(name, owner, RoomEventAction.take,
-            card: card, content: takeCardType));
+            card: card, pos: takeCardType.index));
       }
     }
 
@@ -393,7 +397,7 @@ class MajiangRoom {
     for (int i = 0; i < participantCards.length; ++i) {
       ParticipantCard participantCard = participantCards[i];
       participantCard.onRoomEvent(RoomEvent(name, owner, RoomEventAction.touch,
-          card: sendCard!, content: pos));
+          card: sendCard!, pos: pos));
     }
     if (participantCards[owner].touchCards.length == 4) {
       participantCards[owner].packer = sender;
@@ -420,7 +424,7 @@ class MajiangRoom {
     for (int i = 0; i < participantCards.length; ++i) {
       ParticipantCard participantCard = participantCards[i];
       participantCard.onRoomEvent(RoomEvent(name, owner, RoomEventAction.bar,
-          src: sender, card: sendCard, content: pos));
+          src: sender, card: sendCard, pos: pos));
     }
     if (sender != null) {
       participantCards[sender!].poolCards.removeLast();
@@ -507,7 +511,12 @@ class MajiangRoom {
     return card;
   }
 
-  bool _score(int owner, CompleteType completeType) {
+  bool _score(int owner, int completeTypeIndex) {
+    CompleteType? completeType =
+        NumberUtil.toEnum(CompleteType.values, completeTypeIndex);
+    if (completeType == null) {
+      return false;
+    }
     int? baseScore = completeTypeScores[completeType];
     if (baseScore == null) {
       return false;
@@ -598,21 +607,24 @@ class MajiangRoom {
         _send(roomEvent.owner, roomEvent.card!);
         break;
       case RoomEventAction.touch:
-        _touch(roomEvent.owner, roomEvent.content);
+        _touch(roomEvent.owner, roomEvent.pos!);
         break;
       case RoomEventAction.bar:
-        _bar(roomEvent.owner, roomEvent.content);
+        _bar(roomEvent.owner, roomEvent.pos!);
         break;
       case RoomEventAction.darkBar:
-        _darkBar(roomEvent.owner, roomEvent.content);
+        _darkBar(roomEvent.owner, roomEvent.pos!);
         break;
       case RoomEventAction.drawing:
-        _drawing(roomEvent.owner, roomEvent.content);
+        _drawing(roomEvent.owner, roomEvent.pos!);
         break;
       case RoomEventAction.complete:
         return _complete(roomEvent.owner);
       case RoomEventAction.pass:
         _pass(roomEvent.owner);
+        break;
+      case RoomEventAction.score:
+        _score(roomEvent.owner, roomEvent.pos!);
         break;
       case RoomEventAction.rob:
         _rob(roomEvent.owner, roomEvent.src!, roomEvent.card!);

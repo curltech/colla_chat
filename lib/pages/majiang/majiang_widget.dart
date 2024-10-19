@@ -808,23 +808,23 @@ class MajiangWidget extends StatelessWidget with TileDataMixin {
     } else if (participantState == ParticipantState.touch) {
       majiangRoom.onRoomEvent(RoomEvent(
           majiangRoom.name, owner, RoomEventAction.touch,
-          content: pos![0]));
+          pos: pos![0]));
     } else if (participantState == ParticipantState.bar) {
       majiangRoom.onRoomEvent(RoomEvent(
           majiangRoom.name, owner, RoomEventAction.bar,
-          content: pos![0]));
+          pos: pos![0]));
     } else if (participantState == ParticipantState.darkBar) {
       majiangRoom.onRoomEvent(RoomEvent(
           majiangRoom.name, owner, RoomEventAction.darkBar,
-          content: pos![0]));
+          pos: pos![0]));
     } else if (participantState == ParticipantState.pass) {
       majiangRoom.onRoomEvent(RoomEvent(
           majiangRoom.name, owner, RoomEventAction.pass,
-          content: pos![0]));
+          pos: pos![0]));
     } else if (participantState == ParticipantState.drawing) {
       majiangRoom.onRoomEvent(RoomEvent(
           majiangRoom.name, owner, RoomEventAction.drawing,
-          content: pos![0]));
+          pos: pos![0]));
     }
   }
 

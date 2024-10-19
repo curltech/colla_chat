@@ -125,7 +125,7 @@ dependencies:
   intl_phone_field: ^3.2.0 #支持所有平台，电话号码的录入字段
   mobile_number: ^2.1.1 #仅支持android，获取电话号码，ios无此功能
   phone_numbers_parser: ^9.0.0 #支持所有的平台
-  badges: ^3.0.2
+  badges: ^3.1.2
   extended_list: ^3.0.0
   glass_kit: ^4.0.1
   #flui: 0.9.2
@@ -147,7 +147,7 @@ dependencies:
       url: https://github.com/r-mzy47/candlesticks.git
   fluent_ui: 4.9.1
   fluentui_system_icons: ^1.1.201 #FluentIcons.access_time_24_regular
-  macos_ui: ^2.0.2
+  macos_ui: ^2.0.9
   flutter_material_color_picker: ^1.2.0
   after_layout: ^1.1.0
   snapping_sheet: ^3.1.0 #在上下可以滑出的sheet
