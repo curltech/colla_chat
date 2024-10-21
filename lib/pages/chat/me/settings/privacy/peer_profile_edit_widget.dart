@@ -99,6 +99,15 @@ final List<PlatformDataField> peerProfileDataFields = [
         color: myself.primary,
       )),
   PlatformDataField(
+      name: 'gameSwitch',
+      label: 'GameSwitch',
+      inputType: InputType.switcher,
+      dataType: DataType.bool,
+      prefixIcon: Icon(
+        Icons.gamepad_outlined,
+        color: myself.primary,
+      )),
+  PlatformDataField(
       name: 'developerSwitch',
       label: 'DeveloperSwitch',
       inputType: InputType.switcher,
@@ -168,6 +177,7 @@ class PeerProfileEditWidget extends StatelessWidget with TileDataMixin {
       myselfPeerProfile.vpnSwitch = peerProfile.vpnSwitch;
       myselfPeerProfile.stockSwitch = peerProfile.stockSwitch;
       myselfPeerProfile.emailSwitch = peerProfile.emailSwitch;
+      myselfPeerProfile.gameSwitch = peerProfile.gameSwitch;
       if (myselfPeerProfile.developerSwitch != peerProfile.developerSwitch) {
         myselfPeerProfile.developerSwitch = peerProfile.developerSwitch;
         myself.peerProfile = myselfPeerProfile;
@@ -188,6 +198,11 @@ class PeerProfileEditWidget extends StatelessWidget with TileDataMixin {
         indexWidgetProvider.addMainView('mail');
       } else {
         indexWidgetProvider.removeMainView('mail');
+      }
+      if (peerProfile.gameSwitch) {
+        indexWidgetProvider.addMainView('game_main');
+      } else {
+        indexWidgetProvider.removeMainView('game_main');
       }
     }
   }

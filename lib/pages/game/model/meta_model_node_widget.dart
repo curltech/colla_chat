@@ -1,6 +1,8 @@
-import 'package:colla_chat/pages/model/convas_widget.dart';
-import 'package:colla_chat/pages/model/element_definition_controller.dart';
-import 'package:colla_chat/pages/model/element_deifinition.dart';
+import 'package:colla_chat/pages/game/model/flame/model_canvas_controller.dart';
+import 'package:colla_chat/pages/game/model/meta_canvas_widget.dart';
+import 'package:colla_chat/pages/game/model/model_project_controller.dart';
+import 'package:colla_chat/pages/game/model/flame/node.dart';
+import 'package:colla_chat/pages/game/model/meta_model_node.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
@@ -9,9 +11,9 @@ import 'package:get/get.dart';
 const double elementWidth = 80;
 const double elementHeight = 100;
 
-/// 元素定义的显示组件
-class ElementDefinitionWidget extends StatelessWidget {
-  final ElementDefinition elementDefinition;
+/// 元模型节点的显示组件
+class MetaModelNodeWidget extends StatelessWidget {
+  final MetaModelNode elementDefinition;
 
   final BorderSide bordSide = BorderSide(
     color: Colors.amber.shade100,
@@ -25,7 +27,7 @@ class ElementDefinitionWidget extends StatelessWidget {
     style: BorderStyle.solid,
   );
 
-  ElementDefinitionWidget({super.key, required this.elementDefinition});
+  MetaModelNodeWidget({super.key, required this.elementDefinition});
 
   _buildHeadWidget(BuildContext context) {
     return Column(children: [
@@ -71,14 +73,15 @@ class ElementDefinitionWidget extends StatelessWidget {
           onTap: () {
             if (modelProjectController.selected.value != null &&
                 modelProjectController.addRelationshipStatus.value) {
-              RelationshipDefinition relationshipDefinition =
-                  RelationshipDefinition(modelProjectController.selected.value!,
-                      elementDefinition, RelationshipType.direct);
-              ElementDefinitionController? elementDefinitionController =
-                  modelProjectController.getElementDefinitionController();
-              if (elementDefinitionController != null) {
-                elementDefinitionController.relationshipDefinitions
-                    .add(relationshipDefinition);
+              NodeRelationship nodeRelationship = NodeRelationship(
+                  modelProjectController.selected.value!,
+                  elementDefinition,
+                  RelationshipType.direct);
+              ModelCanvasController? modelCanvasController =
+                  modelProjectController.getModelCanvasController();
+              if (modelCanvasController != null) {
+                modelCanvasController.nodeRelationships[nodeRelationship.src] =
+                    [nodeRelationship];
               }
               modelProjectController.addRelationshipStatus.value = false;
             }

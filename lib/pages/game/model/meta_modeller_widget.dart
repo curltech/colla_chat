@@ -1,6 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/model/convas_widget.dart';
-import 'package:colla_chat/pages/model/element_definition_controller.dart';
+import 'package:colla_chat/pages/game/model/flame/model_canvas_controller.dart';
+import 'package:colla_chat/pages/game/model/meta_canvas_widget.dart';
+import 'package:colla_chat/pages/game/model/model_project_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -10,8 +11,8 @@ import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class ModellerWidget extends StatelessWidget with TileDataMixin {
-  ModellerWidget({super.key});
+class MetaModellerWidget extends StatelessWidget with TileDataMixin {
+  MetaModellerWidget({super.key});
 
   @override
   bool get withLeading => true;
@@ -41,8 +42,8 @@ class ModellerWidget extends StatelessWidget with TileDataMixin {
               if (packageName != null) {
                 modelProjectController.currentPackageName.value = packageName;
                 modelProjectController
-                        .packageDefinitionController[packageName] =
-                    ElementDefinitionController();
+                        .packageModelCanvasController[packageName] =
+                    ModelCanvasController();
               }
             },
             icon: Icon(
@@ -55,7 +56,7 @@ class ModellerWidget extends StatelessWidget with TileDataMixin {
             onPressed: () async {
               List<Option<String>> options = [];
               for (var key
-                  in modelProjectController.packageDefinitionController.keys) {
+                  in modelProjectController.packageModelCanvasController.keys) {
                 options.add(Option(key, key));
               }
               String? packageName = await DialogUtil.showSelectDialog<String>(
@@ -130,7 +131,7 @@ class ModellerWidget extends StatelessWidget with TileDataMixin {
           withLeading: true,
           rightWidgets: rightWidgets,
           child: Column(
-            children: [_buildToolPanelWidget(context), CanvasWidget()],
+            children: [_buildToolPanelWidget(context), MetaCanvasWidget()],
           ));
     });
   }

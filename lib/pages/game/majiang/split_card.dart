@@ -1,5 +1,5 @@
-import 'package:colla_chat/pages/majiang/card.dart';
-import 'package:colla_chat/pages/majiang/card_util.dart';
+import 'package:colla_chat/pages/game/majiang/card.dart';
+import 'package:colla_chat/pages/game/majiang/card_util.dart';
 import 'package:flutter/material.dart';
 
 /// 连续牌，代表某个花色的连续牌形，一般只有两张或者三张牌，刻子，顺子或者对子

@@ -1,32 +1,29 @@
 import 'package:colla_chat/pages/chat/chat/video/livekit/livekit_sfu_participant_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/livekit/livekit_sfu_room_widget.dart';
+import 'package:colla_chat/pages/chat/me/android_system_alert_window_widget.dart';
 import 'package:colla_chat/pages/chat/me/collection/collection_list_view.dart';
 import 'package:colla_chat/pages/chat/me/contact_widget.dart';
 import 'package:colla_chat/pages/chat/me/me_head_widget.dart';
 import 'package:colla_chat/pages/chat/me/media/media_widget.dart';
 import 'package:colla_chat/pages/chat/me/openvpn_widget.dart';
-import 'package:colla_chat/pages/chat/me/android_system_alert_window_widget.dart';
 import 'package:colla_chat/pages/chat/me/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_map_launcher_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_webview_widget.dart';
-import 'package:colla_chat/pages/chat/me/webrtc/local_media_stream_widget.dart';
-import 'package:colla_chat/pages/majiang/majiang_widget.dart';
-import 'package:colla_chat/pages/model/modeller_widget.dart';
-import 'package:colla_chat/pages/poem/poem_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
+import 'package:colla_chat/pages/chat/me/webrtc/local_media_stream_widget.dart';
+import 'package:colla_chat/pages/game/majiang/majiang_widget.dart';
+import 'package:colla_chat/pages/game/model/meta_modeller_widget.dart';
+import 'package:colla_chat/pages/poem/poem_widget.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/tool/device_util.dart';
 import 'package:colla_chat/tool/sherpa/sherpa_install_widget.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 //我的页面，带有路由回调函数
 class MeWidget extends StatelessWidget with TileDataMixin {
@@ -49,8 +46,6 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   final PlatformInfoWidget platformInfoWidget = const PlatformInfoWidget();
   final PoemWidget poemWidget = PoemWidget();
   final SherpaInstallWidget sherpaInstallWidget = SherpaInstallWidget();
-  final MajiangWidget mainMajiangWidget = MajiangWidget();
-  final ModellerWidget modellerWidget = ModellerWidget();
 
   MeWidget({super.key}) {
     indexWidgetProvider.define(collectionListView);
@@ -68,8 +63,6 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(platformInfoWidget);
     indexWidgetProvider.define(poemWidget);
     indexWidgetProvider.define(sherpaInstallWidget);
-    indexWidgetProvider.define(mainMajiangWidget);
-    indexWidgetProvider.define(modellerWidget);
   }
 
   @override
@@ -115,8 +108,6 @@ class MeWidget extends StatelessWidget with TileDataMixin {
         mediaWidget,
         liveKitSfuRoomWidget,
         poemWidget,
-        mainMajiangWidget,
-        modellerWidget,
       ]);
     }
     List<TileData> meTileData = TileData.from(mixins);

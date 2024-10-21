@@ -136,16 +136,17 @@ dependencies:
   clay_containers: ^0.3.4
   fl_chart: ^0.68.0
   k_chart: ^0.7.1
+  community_charts_flutter: ^1.0.4
   extended_text: ^14.0.1 #文本扩展显示
   extended_text_field: ^16.0.0 #文字表情混入
   extended_text_library: ^12.0.0
   extended_masked_text: ^3.0.1
   azlistview: ^2.0.0 #特殊列表滑动
   graphic: ^2.5.0 # 各种图表，取代flutter_echarts
-  flutter_graph_view: ^1.1.3+1 #漂亮的图形化数据展示
-  flutter_force_directed_graph: ^1.0.7 #可拖拽的节点和边的展示
-  graphview: ^1.2.0
-  advanced_graphview: ^1.0.3
+  flutter_unity_widget: ^2022.2.1
+  flutter_embed_unity: ^1.2.3
+  opencv_dart: ^1.2.5
+  flame: ^1.21.0
   candlesticks:
     git:
       url: https://github.com/r-mzy47/candlesticks.git

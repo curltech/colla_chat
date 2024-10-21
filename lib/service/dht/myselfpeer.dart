@@ -204,6 +204,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     peerProfile.vpnSwitch = false;
     peerProfile.stockSwitch = false;
     peerProfile.emailSwitch = false;
+    peerProfile.gameSwitch = false;
     peerProfile.autoLogin = false;
     peerProfile.developerSwitch = false;
     peerProfile.logLevel = 'none';

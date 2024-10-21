@@ -26,6 +26,7 @@ class PeerProfile extends StatusEntity {
   bool vpnSwitch = false; //是否提供vpn功能
   bool stockSwitch = false; //是否提供股票功能
   bool emailSwitch = false; //是否提供email功能
+  bool gameSwitch = false; //是否提供game功能
   bool autoLogin = false;
   bool developerSwitch = false;
   String? logLevel;
@@ -58,6 +59,9 @@ class PeerProfile extends StatusEntity {
             ? true
             : false,
         emailSwitch = json['emailSwitch'] == true || json['emailSwitch'] == 1
+            ? true
+            : false,
+        gameSwitch = json['gameSwitch'] == true || json['gameSwitch'] == 1
             ? true
             : false,
         autoLogin =
@@ -96,6 +100,7 @@ class PeerProfile extends StatusEntity {
       'vpnSwitch': vpnSwitch,
       'stockSwitch': stockSwitch,
       'emailSwitch': emailSwitch,
+      'gameSwitch': gameSwitch,
       'autoLogin': autoLogin,
       'developerSwitch': developerSwitch,
       'logLevel': logLevel,

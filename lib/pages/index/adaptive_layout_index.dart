@@ -1,12 +1,13 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/pages/chat/channel/subscribe_channel_list_widget.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
+import 'package:colla_chat/pages/game/game_main_widget.dart';
 import 'package:colla_chat/pages/index/bottom_navigation.dart';
 import 'package:colla_chat/pages/index/primary_navigation.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/pages/mail/mail_address_widget.dart';
 import 'package:colla_chat/pages/chat/me/me_widget.dart';
-import 'package:colla_chat/pages/stock/main_stock_widget.dart';
+import 'package:colla_chat/pages/stock/stock_main_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -36,9 +37,15 @@ class AdaptiveLayoutIndex extends StatefulWidget {
     }
     bool stockSwitch = myself.peerProfile.stockSwitch;
     if (stockSwitch) {
-      MainStockWidget mainStockWidget = MainStockWidget();
-      views.add(mainStockWidget);
-      indexWidgetProvider.define(mainStockWidget);
+      StockMainWidget stockMainWidget = StockMainWidget();
+      views.add(stockMainWidget);
+      indexWidgetProvider.define(stockMainWidget);
+    }
+    bool gameSwitch = myself.peerProfile.gameSwitch;
+    if (gameSwitch) {
+      GameMainWidget gameMainWidget = GameMainWidget();
+      views.add(gameMainWidget);
+      indexWidgetProvider.define(gameMainWidget);
     }
     indexWidgetProvider.initMainView(SwiperController(), views);
   }
