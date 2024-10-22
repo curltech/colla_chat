@@ -1,7 +1,8 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/game/model/flame/model_canvas_controller.dart';
-import 'package:colla_chat/pages/game/model/meta_canvas_widget.dart';
-import 'package:colla_chat/pages/game/model/model_project_controller.dart';
+import 'package:colla_chat/pages/game/model/base/model_node.dart';
+import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
+import 'package:colla_chat/pages/game/model/controller/model_world_controller.dart';
+import 'package:colla_chat/pages/game/model/widget/model_game_widget.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -11,6 +12,7 @@ import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+/// 元模型建模器
 class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   MetaModellerWidget({super.key});
 
@@ -43,7 +45,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
                 modelProjectController.currentPackageName.value = packageName;
                 modelProjectController
                         .packageModelCanvasController[packageName] =
-                    ModelCanvasController();
+                    ModelWorldController();
               }
             },
             icon: Icon(
@@ -105,6 +107,64 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     });
   }
 
+  Widget _buildModelCanvasWidget() {
+    ModelWorldController? modelWorldController =
+        modelProjectController.getModelWorldController();
+    if (modelWorldController == null) {
+      modelWorldController = ModelWorldController();
+      String? packageName = modelProjectController.currentPackageName.value;
+      modelProjectController.packageModelCanvasController[packageName!] =
+          modelWorldController;
+    }
+    return GestureDetector(
+        onTapDown: (TapDownDetails details) {
+          if (modelProjectController.addElementStatus.value) {
+            ModelNode metaModelNode = ModelNode(
+                name: 'unknown',
+                modelProjectController.currentPackageName.value!);
+            ModelWorldController? modelWorldController =
+                modelProjectController.getModelWorldController();
+            if (modelWorldController != null) {
+              modelWorldController.nodes[metaModelNode.name] = metaModelNode;
+            }
+
+            modelProjectController.addElementStatus.value = false;
+          }
+        },
+        child: ModelGameWidget<ModelNode>(
+          nodePadding: 50,
+          nodeSize: 200,
+          isDebug: false,
+          backgroundColor: Colors.black,
+          modelWorldController: modelWorldController,
+          onDrawLine: (lineFrom, lineTo) {
+            return Paint()
+              ..color = Colors.blue
+              ..strokeWidth = 1.5;
+          },
+          builder: (node) {
+            return SizedBox(
+              width: 100,
+              height: 100,
+              child: Center(
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    (node).name,
+                    style: const TextStyle(color: Colors.blue),
+                  ),
+                ),
+              ),
+            );
+          },
+        ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Obx(() {
@@ -131,7 +191,10 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
           withLeading: true,
           rightWidgets: rightWidgets,
           child: Column(
-            children: [_buildToolPanelWidget(context), MetaCanvasWidget()],
+            children: [
+              _buildToolPanelWidget(context),
+              _buildModelCanvasWidget()
+            ],
           ));
     });
   }

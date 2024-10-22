@@ -169,6 +169,16 @@ class ImageUtil {
     return bytes;
   }
 
+  /// 捕获的Widget必须用RepaintBoundary包裹，且设置GlobalKey
+  static Future<ui.Image> capturePng(GlobalKey key,
+      {double pixelRatio = 1.0}) async {
+    RenderRepaintBoundary boundary =
+        key.currentContext!.findRenderObject() as RenderRepaintBoundary;
+    ui.Image image = await boundary.toImage(pixelRatio: pixelRatio);
+
+    return image;
+  }
+
   ///保存图片到图片廊
   static Future<dynamic> saveImageGallery(
     Uint8List imageBytes, {

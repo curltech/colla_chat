@@ -1,9 +1,8 @@
-import 'package:colla_chat/pages/game/model/flame/canvas_component.dart';
-import 'package:colla_chat/pages/game/model/flame/focus_point.dart';
-import 'package:colla_chat/pages/game/model/flame/line_drawer.dart';
-import 'package:colla_chat/pages/game/model/flame/model_canvas_controller.dart';
-import 'package:colla_chat/pages/game/model/flame/node.dart';
-import 'package:colla_chat/pages/game/model/flame/node_position_component.dart';
+import 'package:colla_chat/pages/game/model/component/focus_point.dart';
+import 'package:colla_chat/pages/game/model/component/line_component.dart';
+import 'package:colla_chat/pages/game/model/base/node.dart';
+import 'package:colla_chat/pages/game/model/component/node_position_component.dart';
+import 'package:colla_chat/pages/game/model/controller/model_world_controller.dart';
 import 'package:flame/components.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
@@ -11,22 +10,24 @@ import 'package:flame/input.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' as mat;
 
-/// [ModelCanvasFlame] 使用flame engine渲染画布和所有的节点
-class ModelCanvasFlame extends FlameGame
+/// [ModelFlameGame] 使用flame engine渲染画布和所有的节点
+class ModelFlameGame extends FlameGame
     with HasCollisionDetection, HasKeyboardHandlerComponents, HasGameRef {
-  ModelCanvasFlame({
+  ModelFlameGame({
     required this.nodePadding,
     required this.nodeSize,
     required this.context,
     required this.isDebug,
     required this.onDrawLine,
-    required this.modelCanvasController,
+    required this.modelWorldController,
     required this.flameBackgroundColor,
     required this.pixelRatio,
     required this.onNodeTap,
   }) : super(
           camera: CameraComponent(),
         );
+
+  double width = 1500;
 
   /// [isDebug] 缺省false，调试模式将显示wireframe
   @override
@@ -39,7 +40,7 @@ class ModelCanvasFlame extends FlameGame
   final BuildContext context;
 
   /// [focusPoint] 画布的中心
-  late FocusPointImpl focusPoint;
+  late FocusPoint focusPoint;
 
   /// [nodeSize] 画布上所有节点占用的大小
   final double nodeSize;
@@ -54,7 +55,7 @@ class ModelCanvasFlame extends FlameGame
   final Paint? Function(Node lineFrom, Node lineTo)? onDrawLine;
 
   /// [modelCanvasController] 管理整个画布的状态
-  final ModelCanvasController modelCanvasController;
+  final ModelWorldController modelWorldController;
 
   /// [flameBackgroundColor] sets background color to the canvas
   final Color? flameBackgroundColor;
@@ -70,15 +71,12 @@ class ModelCanvasFlame extends FlameGame
 
   @override
   Future<void> onLoad() async {
-    /// 首先加画布组件
-    world.add(CanvasComponent());
-
     /// 加中心聚焦组件
-    world.add(focusPoint = FocusPointImpl());
+    world.add(focusPoint = FocusPoint());
 
     /// 设置画布的边界使得摄像头不可以超出范围
-    camera.setBounds(Rectangle.fromPoints(
-        Vector2(0, 0), Vector2(CanvasComponent.size, CanvasComponent.size)));
+    camera
+        .setBounds(Rectangle.fromPoints(Vector2(0, 0), Vector2(width, width)));
 
     ///  摄像头跟随画布中心移动
     camera.follow(
@@ -91,23 +89,23 @@ class ModelCanvasFlame extends FlameGame
       double j = 0;
 
       /// render the nodes in the screen
-      List<Node> nodes = modelCanvasController.nodes.values.toList();
+      List<Node> nodes = modelWorldController.nodes.values.toList();
       for (Node node in nodes) {
         double nodei = i;
         double nodej = j;
         NodePositionComponent nodePositionComponent = NodePositionComponent(
-          nodeSize: Vector2(
+          size: Vector2(
               (nodeSize + (nodePadding * 2)), (nodeSize + (nodePadding * 2))),
-          nodePosition: Vector2(nodej, nodei),
-          nodePadding: nodePadding,
+          position: Vector2(nodej, nodei),
+          padding: nodePadding,
           node: node,
-          nodeImageSize: nodeSize,
+          imageSize: nodeSize,
         );
         world.add(nodePositionComponent);
-        modelCanvasController.nodePositionComponents[node.name] =
+        modelWorldController.nodePositionComponents[node.name] =
             nodePositionComponent;
 
-        if (j < CanvasComponent.size - (nodeSize + (nodePadding * 2))) {
+        if (j < width - (nodeSize + (nodePadding * 2))) {
           j = j + (nodeSize + (nodePadding * 2));
         } else {
           i = i + (nodeSize + (nodePadding * 2));
@@ -118,11 +116,13 @@ class ModelCanvasFlame extends FlameGame
 
     /// 渲染线
     void addLines() {
-      List<Node> nodes = modelCanvasController.nodes.values.toList();
-      for (Node node in nodes) {
-        LineDrawer lineDrawer = LineDrawer(
-            node: node, modelCanvasController: modelCanvasController);
-        world.add(lineDrawer);
+      for (List<NodeRelationship> nodeRelationships
+          in modelWorldController.nodeRelationships.values) {
+        for (NodeRelationship nodeRelationship in nodeRelationships) {
+          LineComponent lineComponent =
+              LineComponent(nodeRelationship: nodeRelationship);
+          world.add(lineComponent);
+        }
       }
     }
 
@@ -140,6 +140,6 @@ class ModelCanvasFlame extends FlameGame
     super.update(dt);
 
     /// update the zoom value based on the controllers input
-    camera.viewfinder.zoom = modelCanvasController.zoom ?? 1;
+    camera.viewfinder.zoom = modelWorldController.zoom ?? 1;
   }
 }

@@ -1,9 +1,10 @@
-import 'package:colla_chat/pages/game/model/flame/node.dart';
-import 'package:colla_chat/pages/game/model/flame/node_position_component.dart';
+import 'package:colla_chat/pages/game/model/base/node.dart';
+import 'package:colla_chat/pages/game/model/component/node_position_component.dart';
 import 'package:flutter/material.dart';
 
-/// [ModelCanvasController] 控制画布和画布上所有节点的状态
-class ModelCanvasController extends ValueNotifier {
+/// [ModelWorldController] 控制画布和画布上所有节点的状态
+class ModelWorldController extends ValueNotifier {
+
   /// 节点name和节点捕获图像之间的映射
   final Map<String, Node> nodes = {};
 
@@ -12,8 +13,8 @@ class ModelCanvasController extends ValueNotifier {
   /// src节点和关系节点列表之间的映射
   final Map<Node, List<NodeRelationship>> nodeRelationships = {};
 
-  /// [ModelCanvasController] will control the state of the widget
-  ModelCanvasController() : super(null);
+  /// [ModelWorldController] will control the state of the widget
+  ModelWorldController() : super(null);
 
   /// [scrollX] give it to control the scroll in canvas
   double? scrollX;
