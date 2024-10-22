@@ -3,6 +3,7 @@ import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/pages/game/model/controller/model_world_controller.dart';
 import 'package:colla_chat/pages/game/model/widget/model_game_widget.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -30,105 +31,108 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
 
   Widget _buildToolPanelWidget(BuildContext context) {
     return Obx(() {
-      return OverflowBar(
-        alignment: MainAxisAlignment.end,
-        children: [
-          CommonAutoSizeText(
-              modelProjectController.currentPackageName.value ?? 'unknown'),
-          IconButton(
-            onPressed: () async {
-              String? packageName = await DialogUtil.showTextFormField(
-                  title: 'Add package',
-                  content: 'Please input new package name',
-                  tip: 'PackageName');
-              if (packageName != null) {
-                modelProjectController.currentPackageName.value = packageName;
-                modelProjectController
-                        .packageModelCanvasController[packageName] =
-                    ModelWorldController();
-              }
-            },
-            icon: Icon(
-              Icons.electric_meter,
-              color: myself.primary,
-            ),
-            tooltip: AppLocalizations.t('New package'),
+      var children = [
+        CommonAutoSizeText(
+            modelProjectController.currentSubjectName.value ?? 'unknown'),
+        IconButton(
+          onPressed: () async {
+            String? subjectName = await DialogUtil.showTextFormField(
+                title: 'Add subject',
+                content: 'Please input new subject name',
+                tip: 'SubjectName');
+            if (subjectName != null) {
+              modelProjectController.currentSubjectName.value = subjectName;
+              modelProjectController.subjectModelWorldController[subjectName] =
+                  ModelWorldController();
+            }
+          },
+          icon: Icon(
+            Icons.electric_meter,
+            color: myself.primary,
           ),
-          IconButton(
-            onPressed: () async {
-              List<Option<String>> options = [];
-              for (var key
-                  in modelProjectController.packageModelCanvasController.keys) {
-                options.add(Option(key, key));
-              }
-              String? packageName = await DialogUtil.showSelectDialog<String>(
-                  title: const CommonAutoSizeText('Select package'),
-                  items: options);
-              if (packageName != null) {
-                modelProjectController.currentPackageName.value = packageName;
-              }
-            },
-            icon: Icon(
-              Icons.list_alt_outlined,
-              color: myself.primary,
-            ),
-            tooltip: AppLocalizations.t('Select package'),
+          tooltip: AppLocalizations.t('New subject'),
+        ),
+        IconButton(
+          onPressed: () async {
+            List<Option<String>> options = [];
+            for (var key
+                in modelProjectController.subjectModelWorldController.keys) {
+              options.add(Option(key, key));
+            }
+            String? subjectName = await DialogUtil.showSelectDialog<String>(
+                title: const CommonAutoSizeText('Select subject'),
+                items: options);
+            if (subjectName != null) {
+              modelProjectController.currentSubjectName.value = subjectName;
+            }
+          },
+          icon: Icon(
+            Icons.list_alt_outlined,
+            color: myself.primary,
           ),
-          IconButton(
-            onPressed: () {
-              modelProjectController.addElementStatus.value =
-                  !modelProjectController.addElementStatus.value;
-              modelProjectController.addRelationshipStatus.value = false;
-            },
-            icon: Icon(
-              Icons.newspaper_outlined,
-              color: modelProjectController.addElementStatus.value
-                  ? Colors.amber
-                  : myself.primary,
-            ),
-            tooltip: AppLocalizations.t('New element'),
+          tooltip: AppLocalizations.t('Select subject'),
+        ),
+        IconButton(
+          onPressed: () {
+            modelProjectController.addNodeStatus.value =
+                !modelProjectController.addNodeStatus.value;
+            modelProjectController.addRelationshipStatus.value = false;
+          },
+          icon: Icon(
+            Icons.newspaper_outlined,
+            color: modelProjectController.addNodeStatus.value
+                ? Colors.amber
+                : myself.primary,
           ),
-          IconButton(
-            onPressed: () {
-              modelProjectController.addRelationshipStatus.value =
-                  !modelProjectController.addRelationshipStatus.value;
-              modelProjectController.addElementStatus.value = false;
-            },
-            icon: Icon(
-              Icons.link,
-              color: modelProjectController.addRelationshipStatus.value
-                  ? Colors.amber
-                  : myself.primary,
-            ),
-            tooltip: AppLocalizations.t('New relationship'),
+          tooltip: AppLocalizations.t('New node'),
+        ),
+        IconButton(
+          onPressed: () {
+            modelProjectController.addRelationshipStatus.value =
+                !modelProjectController.addRelationshipStatus.value;
+            modelProjectController.addNodeStatus.value = false;
+          },
+          icon: Icon(
+            Icons.link,
+            color: modelProjectController.addRelationshipStatus.value
+                ? Colors.amber
+                : myself.primary,
           ),
-        ],
-      );
+          tooltip: AppLocalizations.t('New relationship'),
+        ),
+      ];
+      return appDataProvider.landscape
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: children,
+            )
+          : Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: children,
+            );
     });
   }
 
-  Widget _buildModelCanvasWidget() {
+  Widget _buildModelGameWidget() {
     ModelWorldController? modelWorldController =
         modelProjectController.getModelWorldController();
     if (modelWorldController == null) {
       modelWorldController = ModelWorldController();
-      String? packageName = modelProjectController.currentPackageName.value;
-      modelProjectController.packageModelCanvasController[packageName!] =
+      String? packageName = modelProjectController.currentSubjectName.value;
+      modelProjectController.subjectModelWorldController[packageName!] =
           modelWorldController;
     }
     return GestureDetector(
         onTapDown: (TapDownDetails details) {
-          if (modelProjectController.addElementStatus.value) {
-            ModelNode metaModelNode = ModelNode(
-                name: 'unknown',
-                modelProjectController.currentPackageName.value!);
+          if (modelProjectController.addNodeStatus.value) {
+            ModelNode metaModelNode = ModelNode(name: 'unknown');
             ModelWorldController? modelWorldController =
                 modelProjectController.getModelWorldController();
             if (modelWorldController != null) {
               modelWorldController.nodes[metaModelNode.name] = metaModelNode;
             }
 
-            modelProjectController.addElementStatus.value = false;
+            modelProjectController.addNodeStatus.value = false;
           }
         },
         child: ModelGameWidget<ModelNode>(
@@ -185,17 +189,19 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
           tooltip: AppLocalizations.t('Save project'),
         ),
       ];
+      var children = [_buildToolPanelWidget(context), _buildModelGameWidget()];
 
       return AppBarView(
-          title: modelProjectController.title.value ?? title,
+          title: modelProjectController.name.value ?? title,
           withLeading: true,
           rightWidgets: rightWidgets,
-          child: Column(
-            children: [
-              _buildToolPanelWidget(context),
-              _buildModelCanvasWidget()
-            ],
-          ));
+          child: appDataProvider.landscape
+              ? Row(
+                  children: children,
+                )
+              : Column(
+                  children: children,
+                ));
     });
   }
 }

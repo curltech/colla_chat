@@ -187,6 +187,7 @@ dependencies:
   align_positioned: ^4.0.1
   #  chart_sparkline: ^1.1.1
   super_drag_and_drop: ^0.8.22
+  dashbook: ^0.1.15
 
   #界面效果动画
   flutter_adaptive_scaffold: ^0.2.1

@@ -4,18 +4,17 @@ import 'package:get/get.dart';
 
 class ModelProjectController {
   final Rx<String?> name = Rx<String?>(null);
-  final Rx<String?> title = Rx<String?>(null);
-  final Rx<String?> currentPackageName = Rx<String?>(null);
-  final RxMap<String, ModelWorldController> packageModelCanvasController =
+  final Rx<String?> currentSubjectName = Rx<String?>(null);
+  final RxMap<String, ModelWorldController> subjectModelWorldController =
       <String, ModelWorldController>{}.obs;
   final Rx<ModelNode?> selected = Rx<ModelNode?>(null);
 
-  final RxBool addElementStatus = false.obs;
+  final RxBool addNodeStatus = false.obs;
   final RxBool addRelationshipStatus = false.obs;
 
   ModelWorldController? getModelWorldController() {
-    if (currentPackageName.value != null) {
-      return packageModelCanvasController[currentPackageName.value];
+    if (currentSubjectName.value != null) {
+      return subjectModelWorldController[currentSubjectName.value];
     }
     return null;
   }
