@@ -1,15 +1,21 @@
+import 'dart:typed_data';
+
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
+import 'package:colla_chat/pages/game/model/base/project.dart';
+import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
-import 'package:colla_chat/pages/game/model/controller/model_world_controller.dart';
 import 'package:colla_chat/pages/game/model/widget/model_game_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -29,6 +35,29 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Modeller';
 
+  _addSubject() async {
+    String? subjectName = await DialogUtil.showTextFormField(
+        title: 'Add subject',
+        content: 'Please input new subject name',
+        tip: 'SubjectName');
+    if (subjectName != null) {
+      modelProjectController.currentSubjectName.value = subjectName;
+      modelProjectController.project.value?.subjects.add(Subject(subjectName));
+    }
+  }
+
+  _selectSubject() async {
+    List<Option<String>> options = [];
+    for (var subject in modelProjectController.project.value!.subjects) {
+      options.add(Option(subject.name, subject.name));
+    }
+    String? subjectName = await DialogUtil.showSelectDialog<String>(
+        title: const CommonAutoSizeText('Select subject'), items: options);
+    if (subjectName != null) {
+      modelProjectController.currentSubjectName.value = subjectName;
+    }
+  }
+
   Widget _buildToolPanelWidget(BuildContext context) {
     return Obx(() {
       var children = [
@@ -36,15 +65,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
             modelProjectController.currentSubjectName.value ?? 'unknown'),
         IconButton(
           onPressed: () async {
-            String? subjectName = await DialogUtil.showTextFormField(
-                title: 'Add subject',
-                content: 'Please input new subject name',
-                tip: 'SubjectName');
-            if (subjectName != null) {
-              modelProjectController.currentSubjectName.value = subjectName;
-              modelProjectController.subjectModelWorldController[subjectName] =
-                  ModelWorldController();
-            }
+            await _addSubject();
           },
           icon: Icon(
             Icons.electric_meter,
@@ -54,17 +75,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         ),
         IconButton(
           onPressed: () async {
-            List<Option<String>> options = [];
-            for (var key
-                in modelProjectController.subjectModelWorldController.keys) {
-              options.add(Option(key, key));
-            }
-            String? subjectName = await DialogUtil.showSelectDialog<String>(
-                title: const CommonAutoSizeText('Select subject'),
-                items: options);
-            if (subjectName != null) {
-              modelProjectController.currentSubjectName.value = subjectName;
-            }
+            _selectSubject();
           },
           icon: Icon(
             Icons.list_alt_outlined,
@@ -114,59 +125,49 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   }
 
   Widget _buildModelGameWidget() {
-    ModelWorldController? modelWorldController =
-        modelProjectController.getModelWorldController();
-    if (modelWorldController == null) {
-      modelWorldController = ModelWorldController();
-      String? packageName = modelProjectController.currentSubjectName.value;
-      modelProjectController.subjectModelWorldController[packageName!] =
-          modelWorldController;
-    }
     return GestureDetector(
         onTapDown: (TapDownDetails details) {
           if (modelProjectController.addNodeStatus.value) {
             ModelNode metaModelNode = ModelNode(name: 'unknown');
-            ModelWorldController? modelWorldController =
-                modelProjectController.getModelWorldController();
-            if (modelWorldController != null) {
-              modelWorldController.nodes[metaModelNode.name] = metaModelNode;
+            Subject? subject = modelProjectController.getCurrentSubject();
+            if (subject != null) {
+              subject.modelNodes.add(metaModelNode);
             }
 
             modelProjectController.addNodeStatus.value = false;
           }
         },
-        child: ModelGameWidget<ModelNode>(
-          nodePadding: 50,
-          nodeSize: 200,
-          isDebug: false,
-          backgroundColor: Colors.black,
-          modelWorldController: modelWorldController,
-          onDrawLine: (lineFrom, lineTo) {
-            return Paint()
-              ..color = Colors.blue
-              ..strokeWidth = 1.5;
-          },
-          builder: (node) {
-            return SizedBox(
-              width: 100,
-              height: 100,
-              child: Center(
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    (node).name,
-                    style: const TextStyle(color: Colors.blue),
-                  ),
-                ),
-              ),
-            );
-          },
-        ));
+        child: const ModelGameWidget<ModelNode>());
+  }
+
+  _newProject() async {
+    String? projectName = await DialogUtil.showTextFormField(
+        title: 'New project',
+        content: 'Please input new project name',
+        tip: 'ProjectName');
+    if (projectName != null) {
+      modelProjectController.project.value = Project(projectName);
+    }
+  }
+
+  _openProject() async {
+    XFile? xfile = await FileUtil.selectFile(allowedExtensions: ['json']);
+    if (xfile != null) {
+      String content = await xfile.readAsString();
+      Map<String, dynamic> json = JsonUtil.toJson(content);
+      Project project = Project.fromJson(json);
+      modelProjectController.project.value = project;
+    }
+  }
+
+  _saveProject() async {
+    String content =
+        JsonUtil.toJsonString(modelProjectController.project.value);
+    String filename = await FileUtil.saveFile(
+        modelProjectController.project.value!.name,
+        Uint8List.fromList(content.codeUnits),
+        'json');
+    modelProjectController.filename.value = filename;
   }
 
   @override
@@ -174,17 +175,23 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     return Obx(() {
       List<Widget> rightWidgets = [
         IconButton(
-          onPressed: () {},
+          onPressed: () {
+            _newProject();
+          },
           icon: const Icon(Icons.newspaper_sharp),
           tooltip: AppLocalizations.t('New project'),
         ),
         IconButton(
-          onPressed: () {},
+          onPressed: () {
+            _openProject();
+          },
           icon: const Icon(Icons.file_open),
           tooltip: AppLocalizations.t('Open project'),
         ),
         IconButton(
-          onPressed: () {},
+          onPressed: () {
+            _saveProject();
+          },
           icon: const Icon(Icons.save),
           tooltip: AppLocalizations.t('Save project'),
         ),
@@ -192,7 +199,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       var children = [_buildToolPanelWidget(context), _buildModelGameWidget()];
 
       return AppBarView(
-          title: modelProjectController.name.value ?? title,
+          title: modelProjectController.project.value?.name ?? title,
           withLeading: true,
           rightWidgets: rightWidgets,
           child: appDataProvider.landscape

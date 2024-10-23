@@ -11,17 +11,19 @@ class LineComponent extends PositionComponent with HasGameRef<ModelFlameGame> {
   /// [Node] draws line to its relationship nodes，this node is src node
   final NodeRelationship nodeRelationship;
 
+  Paint defaultPaint(lineFrom, lineTo) {
+    return Paint()
+      ..color = Colors.blue
+      ..strokeWidth = 1.5;
+  }
+
   @override
   Future<void> onLoad() async {}
 
   @override
   void render(Canvas canvas) {
     Paint paint = BasicPalette.red.paint();
-    if (game.onDrawLine != null) {
-      // get the pain from user implementation
-      paint = game.onDrawLine!(nodeRelationship.src!, nodeRelationship.dst!) ??
-          BasicPalette.red.paint();
-    }
+    paint = defaultPaint(nodeRelationship.src!, nodeRelationship.dst!);
     canvas.drawLine(
         nodeRelationship.src!.nodePositionComponent!.center.toOffset(),
         nodeRelationship.dst!.nodePositionComponent!.center.toOffset(),

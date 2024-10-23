@@ -1,27 +1,28 @@
-import 'package:colla_chat/pages/game/model/base/model_node.dart';
-import 'package:colla_chat/pages/game/model/base/node.dart';
+import 'package:colla_chat/pages/game/model/base/subject.dart';
 
 /// 模型项目
 class Project {
   String name;
 
-  /// 基于主题域的节点列表
-  Map<String, List<ModelNode>>? subjectModelNodes;
+  double nodeWidth = 200;
 
-  List<NodeRelationship>? nodeRelationships;
+  double nodePadding = 10;
+
+  double pixelRatio = 1;
+
+  List<Subject> subjects = [];
 
   Project(this.name);
 
+  void clear() {
+    subjects.clear();
+  }
+
   Project.fromJson(Map json)
       : name = json['name'] == '' ? null : json['name'],
-        subjectModelNodes = json['subjectModelNodes'],
-        nodeRelationships = json['nodeRelationships'];
+        subjects = json['subjects'];
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'subjectModelNodes': subjectModelNodes,
-      'nodeRelationships': nodeRelationships
-    };
+    return {'name': name, 'subjects': subjects};
   }
 }

@@ -1,20 +1,24 @@
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
-import 'package:colla_chat/pages/game/model/controller/model_world_controller.dart';
+import 'package:colla_chat/pages/game/model/base/project.dart';
+import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:get/get.dart';
 
 class ModelProjectController {
-  final Rx<String?> name = Rx<String?>(null);
+  final Rx<Project?> project = Rx<Project?>(null);
+  final Rx<String?> filename = Rx<String?>(null);
   final Rx<String?> currentSubjectName = Rx<String?>(null);
-  final RxMap<String, ModelWorldController> subjectModelWorldController =
-      <String, ModelWorldController>{}.obs;
   final Rx<ModelNode?> selected = Rx<ModelNode?>(null);
 
   final RxBool addNodeStatus = false.obs;
   final RxBool addRelationshipStatus = false.obs;
 
-  ModelWorldController? getModelWorldController() {
-    if (currentSubjectName.value != null) {
-      return subjectModelWorldController[currentSubjectName.value];
+  Subject? getCurrentSubject() {
+    if (project.value != null && currentSubjectName.value != null) {
+      for (var subject in project.value!.subjects) {
+        if (subject.name == currentSubjectName.value) {
+          return subject;
+        }
+      }
     }
     return null;
   }

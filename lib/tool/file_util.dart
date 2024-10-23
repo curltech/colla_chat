@@ -196,6 +196,7 @@ class FileUtil {
     return xfiles;
   }
 
+  /// 非原生的文件选择框
   static Future<XFile?> selectFile({
     String? initialDirectory,
     List<String>? allowedExtensions,
