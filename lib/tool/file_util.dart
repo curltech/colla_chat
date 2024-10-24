@@ -264,6 +264,7 @@ class FileUtil {
   static Future<String?> saveFilePicker({
     String? dialogTitle,
     String? fileName,
+    Uint8List? bytes,
     String? initialDirectory,
     FileType type = FileType.any,
     List<String>? allowedExtensions,
@@ -274,6 +275,7 @@ class FileUtil {
         fileName: fileName,
         initialDirectory: initialDirectory,
         type: type,
+        bytes: bytes,
         allowedExtensions: allowedExtensions,
         lockParentWindow: lockParentWindow);
 
@@ -490,7 +492,7 @@ class FileUtil {
     bool lockParentWindow = false,
     AssetPickerConfig pickerConfig = const AssetPickerConfig(),
   }) async {
-    context=context??appDataProvider.context!;
+    context = context ?? appDataProvider.context!;
     if (platformParams.desktop) {
       List<XFile> xfiles = await FileUtil.pickFiles(
           dialogTitle: dialogTitle,
@@ -504,8 +506,8 @@ class FileUtil {
           type: FileType.image);
       return xfiles;
     } else if (platformParams.mobile && context != null) {
-      List<AssetEntity>? assets =
-          await AssetUtil.pickAssets(context:context, pickerConfig: pickerConfig);
+      List<AssetEntity>? assets = await AssetUtil.pickAssets(
+          context: context, pickerConfig: pickerConfig);
       assets = assets ?? [];
 
       return assets;

@@ -7,6 +7,7 @@ import 'package:colla_chat/pages/game/model/component/line_component.dart';
 import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/component/node_position_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/experimental.dart';
@@ -111,16 +112,36 @@ class ModelFlameGame extends FlameGame
   }
 
   @override
-  void onTapDown(TapDownEvent event) {
-    event.localPosition;
-    event.canvasPosition;
-    if (modelProjectController.addNodeStatus.value) {
-      ModelNode metaModelNode = ModelNode(name: 'unknown');
-      Subject? subject = modelProjectController.getCurrentSubject();
-      if (subject != null) {
-        subject.modelNodes.add(metaModelNode);
+  Future<void> onTapDown(TapDownEvent event) async {
+    Vector2 localPosition = event.localPosition;
+    if (modelProjectController.addSubjectStatus.value) {
+      String? subjectName = await DialogUtil.showTextFormField(
+          title: 'New subject',
+          content: 'Please input new subject name',
+          tip: 'unknown');
+      if (subjectName != null) {
+        Subject subject = Subject(subjectName);
+        subject.x = localPosition.x;
+        subject.y = localPosition.y;
+        modelProjectController.currentSubjectName.value = subject.name;
+        modelProjectController.project.value?.subjects.add(subject);
       }
-
+      modelProjectController.addSubjectStatus.value = false;
+    }
+    if (modelProjectController.addNodeStatus.value) {
+      String? nodeName = await DialogUtil.showTextFormField(
+          title: 'New node',
+          content: 'Please input new node name',
+          tip: 'unknown');
+      if (nodeName != null) {
+        ModelNode metaModelNode = ModelNode(name: nodeName);
+        metaModelNode.x = localPosition.x;
+        metaModelNode.y = localPosition.y;
+        Subject? subject = modelProjectController.getCurrentSubject();
+        if (subject != null) {
+          subject.modelNodes.add(metaModelNode);
+        }
+      }
       modelProjectController.addNodeStatus.value = false;
     }
   }

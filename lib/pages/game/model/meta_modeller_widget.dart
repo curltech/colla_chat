@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:colla_chat/l10n/localization.dart';
@@ -11,6 +12,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -18,6 +20,7 @@ import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:path/path.dart' as p;
 
 /// 元模型建模器
 class MetaModellerWidget extends StatelessWidget with TileDataMixin {
@@ -155,7 +158,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     String? projectName = await DialogUtil.showTextFormField(
         title: 'New project',
         content: 'Please input new project name',
-        tip: 'ProjectName');
+        tip: 'unknown');
     if (projectName != null) {
       modelProjectController.project.value = Project(projectName);
     }
@@ -174,9 +177,9 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   _saveProject() async {
     String content =
         JsonUtil.toJsonString(modelProjectController.project.value);
-    String filename = await FileUtil.saveFile(
+    String? filename = await FileUtil.saveAsFile(
         modelProjectController.project.value!.name,
-        Uint8List.fromList(content.codeUnits),
+        utf8.encode(content),
         'json');
     modelProjectController.filename.value = filename;
   }
