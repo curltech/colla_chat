@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/base/subject.dart';
@@ -10,6 +12,7 @@ import 'package:flame/events.dart';
 import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
+import 'package:flutter/material.dart';
 
 /// [ModelFlameGame] 使用flame engine渲染画布和所有的节点
 class ModelFlameGame extends FlameGame
@@ -25,6 +28,11 @@ class ModelFlameGame extends FlameGame
       : super(
           camera: CameraComponent(),
         );
+
+  @override
+  Color backgroundColor() {
+    return Colors.grey;
+  }
 
   /// 渲染画布上的所有节点和线
   void _renderProject() {

@@ -15,7 +15,6 @@ class ModelGameWidget<T extends Node> extends StatefulWidget {
 }
 
 class _ModelGameWidgetState extends State<ModelGameWidget> {
-  bool loader = true;
   late int length;
 
   @override
@@ -25,7 +24,6 @@ class _ModelGameWidgetState extends State<ModelGameWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (loader) return const SizedBox();
     ModelFlameGame modelFlameGame = ModelFlameGame();
     return GameWidget(
       game: modelFlameGame,

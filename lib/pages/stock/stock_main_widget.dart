@@ -94,8 +94,7 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
       selected: true,
     )] = settingTileData;
 
-    Widget child = GroupDataListView(tileData: tileData);
-    var stockMain = AppBarView(title: title, child: child);
+    Widget stockMain = GroupDataListView(tileData: tileData);
 
     return stockMain;
   }

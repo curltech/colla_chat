@@ -36,6 +36,10 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   String get title => 'Modeller';
 
   _addSubject() async {
+    Project? project = modelProjectController.project.value;
+    if (project == null) {
+      return;
+    }
     modelProjectController.addSubjectStatus.value =
         !modelProjectController.addSubjectStatus.value;
     modelProjectController.addNodeStatus.value = false;
@@ -51,6 +55,10 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   }
 
   _selectSubject() async {
+    Project? project = modelProjectController.project.value;
+    if (project == null) {
+      return;
+    }
     List<Option<String>> options = [];
     for (var subject in modelProjectController.project.value!.subjects) {
       options.add(Option(subject.name, subject.name));
@@ -64,23 +72,30 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
 
   Widget _buildToolPanelWidget(BuildContext context) {
     return Obx(() {
+      Project? project = modelProjectController.project.value;
       var children = [
-        CommonAutoSizeText(
-            modelProjectController.currentSubjectName.value ?? 'unknown'),
+        // CommonAutoSizeText(
+        //     modelProjectController.currentSubjectName.value ?? 'unknown'),
         IconButton(
-          onPressed: () async {
-            await _addSubject();
-          },
+          onPressed: project != null
+              ? () async {
+                  await _addSubject();
+                }
+              : null,
           icon: Icon(
             Icons.electric_meter,
-            color: myself.primary,
+            color: modelProjectController.addSubjectStatus.value
+                ? Colors.amber
+                : myself.primary,
           ),
           tooltip: AppLocalizations.t('New subject'),
         ),
         IconButton(
-          onPressed: () async {
-            _selectSubject();
-          },
+          onPressed: project != null
+              ? () async {
+                  _selectSubject();
+                }
+              : null,
           icon: Icon(
             Icons.list_alt_outlined,
             color: myself.primary,
@@ -88,11 +103,13 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
           tooltip: AppLocalizations.t('Select subject'),
         ),
         IconButton(
-          onPressed: () {
-            modelProjectController.addNodeStatus.value =
-                !modelProjectController.addNodeStatus.value;
-            modelProjectController.addRelationshipStatus.value = false;
-          },
+          onPressed: project != null
+              ? () {
+                  modelProjectController.addNodeStatus.value =
+                      !modelProjectController.addNodeStatus.value;
+                  modelProjectController.addRelationshipStatus.value = false;
+                }
+              : null,
           icon: Icon(
             Icons.newspaper_outlined,
             color: modelProjectController.addNodeStatus.value
@@ -102,11 +119,13 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
           tooltip: AppLocalizations.t('New node'),
         ),
         IconButton(
-          onPressed: () {
-            modelProjectController.addRelationshipStatus.value =
-                !modelProjectController.addRelationshipStatus.value;
-            modelProjectController.addNodeStatus.value = false;
-          },
+          onPressed: project != null
+              ? () {
+                  modelProjectController.addRelationshipStatus.value =
+                      !modelProjectController.addRelationshipStatus.value;
+                  modelProjectController.addNodeStatus.value = false;
+                }
+              : null,
           icon: Icon(
             Icons.link,
             color: modelProjectController.addRelationshipStatus.value
@@ -165,6 +184,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
+      Project? project = modelProjectController.project.value;
       List<Widget> rightWidgets = [
         IconButton(
           onPressed: () {
@@ -181,24 +201,31 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
           tooltip: AppLocalizations.t('Open project'),
         ),
         IconButton(
-          onPressed: () {
-            _saveProject();
-          },
+          onPressed: project != null
+              ? () {
+                  _saveProject();
+                }
+              : null,
           icon: const Icon(Icons.save),
           tooltip: AppLocalizations.t('Save project'),
         ),
       ];
-      var children = [_buildToolPanelWidget(context), _buildModelGameWidget()];
+      var children = [
+        _buildToolPanelWidget(context),
+        Expanded(child: _buildModelGameWidget())
+      ];
 
       return AppBarView(
-          title: modelProjectController.project.value?.name ?? title,
+          title: project != null
+              ? '${AppLocalizations.t(title)}-${project.name}'
+              : title,
           withLeading: true,
           rightWidgets: rightWidgets,
           child: appDataProvider.landscape
-              ? Row(
+              ? Column(
                   children: children,
                 )
-              : Column(
+              : Row(
                   children: children,
                 ));
     });

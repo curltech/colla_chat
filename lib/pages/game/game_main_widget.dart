@@ -14,6 +14,7 @@ class GameMainWidget extends StatelessWidget with TileDataMixin {
 
   GameMainWidget({super.key}) {
     indexWidgetProvider.define(majiangWidget);
+    indexWidgetProvider.define(metaModellerWidget);
   }
 
   @override
@@ -23,7 +24,7 @@ class GameMainWidget extends StatelessWidget with TileDataMixin {
   String get routeName => 'game_main';
 
   @override
-  IconData get iconData => Icons.candlestick_chart;
+  IconData get iconData => Icons.games_outlined;
 
   @override
   String get title => 'Game';
@@ -39,13 +40,12 @@ class GameMainWidget extends StatelessWidget with TileDataMixin {
       tile.selected = false;
     }
 
-    Widget child = DataListView(
+    Widget gameMain = DataListView(
       itemBuilder: (BuildContext context, int index) {
         return gameTileData[index];
       },
       itemCount: gameTileData.length,
     );
-    var gameMain = AppBarView(title: title, child: child);
 
     return gameMain;
   }

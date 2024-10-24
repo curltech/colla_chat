@@ -357,7 +357,7 @@ class _FormInputWidgetState extends State<FormInputWidget> {
     return ChangeNotifierProvider(
         builder: (BuildContext context, Widget? child) {
       return Column(children: [
-        _buildFormSwiper(context),
+        Expanded(child: _buildFormSwiper(context)),
         SizedBox(
           height: widget.buttonSpacing,
         ),

@@ -145,7 +145,7 @@ dependencies:
   graphic: ^2.5.0 # 各种图表，取代flutter_echarts
   flutter_unity_widget: ^2022.2.1
   flutter_embed_unity: ^1.2.3
-  opencv_dart: ^1.2.5
+  #  opencv_dart: ^1.2.5
   flame: ^1.21.0
   candlesticks:
     git:
@@ -187,7 +187,7 @@ dependencies:
   align_positioned: ^4.0.1
   #  chart_sparkline: ^1.1.1
   super_drag_and_drop: ^0.8.22
-  dashbook: ^0.1.15
+  #  dashbook: ^0.1.15
 
   #界面效果动画
   flutter_adaptive_scaffold: ^0.2.1
@@ -480,7 +480,7 @@ flutter:
     - assets/images/email/
     - assets/images/majiang/
     - assets/images/majiang/card/
-    - assets/images/poke/
+    - assets/images/poker/
     - assets/medias/
 
   # An image asset can refer to one or more resolution-specific "variants", see

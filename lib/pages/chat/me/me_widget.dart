@@ -44,7 +44,6 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   final PlatformMapLauncherWidget platformMapLauncherWidget =
       PlatformMapLauncherWidget();
   final PlatformInfoWidget platformInfoWidget = const PlatformInfoWidget();
-  final PoemWidget poemWidget = PoemWidget();
   final SherpaInstallWidget sherpaInstallWidget = SherpaInstallWidget();
 
   MeWidget({super.key}) {
@@ -61,7 +60,6 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(liveKitSfuParticipantWidget);
     indexWidgetProvider.define(platformMapLauncherWidget);
     indexWidgetProvider.define(platformInfoWidget);
-    indexWidgetProvider.define(poemWidget);
     indexWidgetProvider.define(sherpaInstallWidget);
   }
 
@@ -107,7 +105,6 @@ class MeWidget extends StatelessWidget with TileDataMixin {
         webViewWidget,
         mediaWidget,
         liveKitSfuRoomWidget,
-        poemWidget,
       ]);
     }
     List<TileData> meTileData = TileData.from(mixins);

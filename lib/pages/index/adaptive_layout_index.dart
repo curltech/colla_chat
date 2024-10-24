@@ -3,6 +3,7 @@ import 'package:colla_chat/pages/chat/channel/subscribe_channel_list_widget.dart
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/game/game_main_widget.dart';
 import 'package:colla_chat/pages/index/bottom_navigation.dart';
+import 'package:colla_chat/pages/index/other_app_widget.dart';
 import 'package:colla_chat/pages/index/primary_navigation.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/pages/mail/mail_address_widget.dart';
@@ -28,25 +29,8 @@ class AdaptiveLayoutIndex extends StatefulWidget {
       LinkmanListWidget(),
       SubscribeChannelListWidget(),
       MeWidget(),
+      OtherAppWidget(),
     ];
-    bool emailSwitch = myself.peerProfile.emailSwitch;
-    if (emailSwitch) {
-      MailAddressWidget mailAddressWidget = MailAddressWidget();
-      views.add(mailAddressWidget);
-      indexWidgetProvider.define(mailAddressWidget);
-    }
-    bool stockSwitch = myself.peerProfile.stockSwitch;
-    if (stockSwitch) {
-      StockMainWidget stockMainWidget = StockMainWidget();
-      views.add(stockMainWidget);
-      indexWidgetProvider.define(stockMainWidget);
-    }
-    bool gameSwitch = myself.peerProfile.gameSwitch;
-    if (gameSwitch) {
-      GameMainWidget gameMainWidget = GameMainWidget();
-      views.add(gameMainWidget);
-      indexWidgetProvider.define(gameMainWidget);
-    }
     indexWidgetProvider.initMainView(SwiperController(), views);
   }
 
