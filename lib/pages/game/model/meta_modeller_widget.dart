@@ -36,14 +36,18 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   String get title => 'Modeller';
 
   _addSubject() async {
-    String? subjectName = await DialogUtil.showTextFormField(
-        title: 'Add subject',
-        content: 'Please input new subject name',
-        tip: 'SubjectName');
-    if (subjectName != null) {
-      modelProjectController.currentSubjectName.value = subjectName;
-      modelProjectController.project.value?.subjects.add(Subject(subjectName));
-    }
+    modelProjectController.addSubjectStatus.value =
+        !modelProjectController.addSubjectStatus.value;
+    modelProjectController.addNodeStatus.value = false;
+    modelProjectController.addRelationshipStatus.value = false;
+    // String? subjectName = await DialogUtil.showTextFormField(
+    //     title: 'Add subject',
+    //     content: 'Please input new subject name',
+    //     tip: 'SubjectName');
+    // if (subjectName != null) {
+    //   modelProjectController.currentSubjectName.value = subjectName;
+    //   modelProjectController.project.value?.subjects.add(Subject(subjectName));
+    // }
   }
 
   _selectSubject() async {
@@ -125,19 +129,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   }
 
   Widget _buildModelGameWidget() {
-    return GestureDetector(
-        onTapDown: (TapDownDetails details) {
-          if (modelProjectController.addNodeStatus.value) {
-            ModelNode metaModelNode = ModelNode(name: 'unknown');
-            Subject? subject = modelProjectController.getCurrentSubject();
-            if (subject != null) {
-              subject.modelNodes.add(metaModelNode);
-            }
-
-            modelProjectController.addNodeStatus.value = false;
-          }
-        },
-        child: const ModelGameWidget<ModelNode>());
+    return const ModelGameWidget<ModelNode>();
   }
 
   _newProject() async {

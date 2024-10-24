@@ -1,3 +1,4 @@
+import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:colla_chat/pages/game/model/component/line_component.dart';
@@ -93,13 +94,26 @@ class ModelFlameGame extends FlameGame
     _renderProject();
   }
 
-  static const speed = 2000.0;
-
   @override
   void update(double dt) {
     super.update(dt);
 
     /// update the zoom value based on the controllers input
     camera.viewfinder.zoom = 1;
+  }
+
+  @override
+  void onTapDown(TapDownEvent event) {
+    event.localPosition;
+    event.canvasPosition;
+    if (modelProjectController.addNodeStatus.value) {
+      ModelNode metaModelNode = ModelNode(name: 'unknown');
+      Subject? subject = modelProjectController.getCurrentSubject();
+      if (subject != null) {
+        subject.modelNodes.add(metaModelNode);
+      }
+
+      modelProjectController.addNodeStatus.value = false;
+    }
   }
 }

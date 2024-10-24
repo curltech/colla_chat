@@ -9,6 +9,7 @@ class ModelProjectController {
   final Rx<String?> currentSubjectName = Rx<String?>(null);
   final Rx<ModelNode?> selected = Rx<ModelNode?>(null);
 
+  final RxBool addSubjectStatus = false.obs;
   final RxBool addNodeStatus = false.obs;
   final RxBool addRelationshipStatus = false.obs;
 
