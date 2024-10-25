@@ -20,12 +20,14 @@ class JsonUtil {
     } else if (entity is String) {
       dynamic json = jsonDecode(entity);
       return json;
-    }
-    else if (entity is String) {
+    } else if (entity is String) {
       dynamic json = jsonDecode(entity);
       return json;
     }
-    return entity.toJson();
+    Map map = entity.toJson();
+    EntityUtil.removeNull(map);
+
+    return map;
   }
 
   /// 把map和一般的实体转换成json字符串

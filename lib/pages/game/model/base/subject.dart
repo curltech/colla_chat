@@ -2,6 +2,8 @@ import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'dart:ui' as ui;
 
+import 'package:colla_chat/tool/json_util.dart';
+
 /// 模型主题
 class Subject {
   String name;
@@ -31,9 +33,24 @@ class Subject {
         x = json['x'],
         y = json['y'],
         width = json['width'],
-        height = json['height'],
-        modelNodes = json['modelNodes'],
-        relationships = json['relationships'];
+        height = json['height'] {
+    modelNodes = [];
+    List<dynamic>? ss = json['modelNodes'];
+    if (ss != null && ss.isNotEmpty) {
+      for (var s in ss) {
+        ModelNode modelNode = ModelNode.fromJson(s);
+        modelNodes.add(modelNode);
+      }
+    }
+    relationships = [];
+    ss = json['relationships'];
+    if (ss != null && ss.isNotEmpty) {
+      for (var s in ss) {
+        NodeRelationship nodeRelationship = NodeRelationship.fromJson(s);
+        relationships.add(nodeRelationship);
+      }
+    }
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -42,8 +59,8 @@ class Subject {
       'y': y,
       'width': width,
       'height': height,
-      'modelNodes': modelNodes,
-      'relationships': relationships
+      'modelNodes': JsonUtil.toJson(modelNodes),
+      'relationships': JsonUtil.toJson(relationships)
     };
   }
 }

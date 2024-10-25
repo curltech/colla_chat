@@ -816,5 +816,18 @@
   "New room": "创建房间",
   "New round": "新的一局",
   "Check complete": "检查胡牌",
-  "Check take": "检查摸牌"
+  "Check take": "检查摸牌",
+  "Other app": "其他应用",
+  "Game": "游戏",
+  "Modeller": "建模器",
+  "Select subject": "选择主题",
+  "New subject": "创建主题",
+  "New node": "创建节点",
+  "New relationship": "创建链接",
+  "New project": "创建项目",
+  "Please input new project name": "请输入项目名称",
+  "ProjectName": "项目名称",
+  "Open project": "打开项目",
+  "Save project": "保存项目",
+  "Majiang": "麻将"
 }

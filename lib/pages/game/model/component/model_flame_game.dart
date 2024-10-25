@@ -113,6 +113,10 @@ class ModelFlameGame extends FlameGame
 
   @override
   Future<void> onTapDown(TapDownEvent event) async {
+    Project? project = modelProjectController.project.value;
+    if (project == null) {
+      return;
+    }
     Vector2 localPosition = event.localPosition;
     if (modelProjectController.addSubjectStatus.value) {
       String? subjectName = await DialogUtil.showTextFormField(
@@ -124,11 +128,15 @@ class ModelFlameGame extends FlameGame
         subject.x = localPosition.x;
         subject.y = localPosition.y;
         modelProjectController.currentSubjectName.value = subject.name;
-        modelProjectController.project.value?.subjects.add(subject);
+        project.subjects.add(subject);
       }
       modelProjectController.addSubjectStatus.value = false;
     }
     if (modelProjectController.addNodeStatus.value) {
+      Subject? subject = modelProjectController.getCurrentSubject();
+      if (subject == null) {
+        return;
+      }
       String? nodeName = await DialogUtil.showTextFormField(
           title: 'New node',
           content: 'Please input new node name',
@@ -137,10 +145,7 @@ class ModelFlameGame extends FlameGame
         ModelNode metaModelNode = ModelNode(name: nodeName);
         metaModelNode.x = localPosition.x;
         metaModelNode.y = localPosition.y;
-        Subject? subject = modelProjectController.getCurrentSubject();
-        if (subject != null) {
-          subject.modelNodes.add(metaModelNode);
-        }
+        subject.modelNodes.add(metaModelNode);
       }
       modelProjectController.addNodeStatus.value = false;
     }

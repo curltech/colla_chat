@@ -171,6 +171,10 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       Map<String, dynamic> json = JsonUtil.toJson(content);
       Project project = Project.fromJson(json);
       modelProjectController.project.value = project;
+      if (project.subjects.isNotEmpty) {
+        modelProjectController.currentSubjectName.value =
+            project.subjects[0].name;
+      }
     }
   }
 
@@ -217,11 +221,16 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         _buildToolPanelWidget(context),
         Expanded(child: _buildModelGameWidget())
       ];
-
+      String title = this.title;
+      if (project != null) {
+        title = '${AppLocalizations.t(title)}-${project.name}';
+      }
+      Subject? subject = modelProjectController.getCurrentSubject();
+      if (subject != null) {
+        title = '$title-${subject.name}';
+      }
       return AppBarView(
-          title: project != null
-              ? '${AppLocalizations.t(title)}-${project.name}'
-              : title,
+          title: title,
           withLeading: true,
           rightWidgets: rightWidgets,
           child: appDataProvider.landscape

@@ -22,8 +22,8 @@ class NodeRelationship {
   String? dstName;
 
   RelationshipType? relationshipType;
-  int? srcCount;
-  int? dstCount;
+  int? srcCardinality;
+  int? dstCardinality;
 
   Node? src;
   Node? dst;
@@ -34,16 +34,16 @@ class NodeRelationship {
       : srcName = json['srcName'] == '' ? null : json['srcName'],
         dstName = json['dstName'] == '' ? null : json['dstName'],
         relationshipType = json['relationshipType'],
-        srcCount = json['srcCount'],
-        dstCount = json['dstCount'];
+        srcCardinality = json['srcCardinality'],
+        dstCardinality = json['dstCardinality'];
 
   Map<String, dynamic> toJson() {
     return {
       'srcName': srcName,
       'dstName': dstName,
       'relationshipType': relationshipType,
-      'srcCount': srcCount,
-      'dstCount': dstCount
+      'srcCardinality': srcCardinality,
+      'dstCardinality': dstCardinality
     };
   }
 }
