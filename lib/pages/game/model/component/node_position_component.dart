@@ -19,7 +19,7 @@ class NodePositionComponent extends RectangleComponent
     ..style = PaintingStyle.fill;
   static final strokePaint = BasicPalette.black.paint()
     ..style = PaintingStyle.stroke
-    ..strokeWidth = 4.0;
+    ..strokeWidth = 1.0;
   late Rect strokeRect;
 
   final double padding;
@@ -69,6 +69,13 @@ class NodePositionComponent extends RectangleComponent
         priority: 2,
         boxConfig: boxConfig,
         textRenderer: textPaint);
+  }
+
+  PolygonComponent _buildDivideComponent(Vector2 start, Vector2 end) {
+    return PolygonComponent([
+      start,
+      end,
+    ], paint: strokePaint);
   }
 
   @override
