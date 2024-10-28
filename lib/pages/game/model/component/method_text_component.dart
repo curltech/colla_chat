@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
+import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
+import 'package:colla_chat/pages/game/model/component/node_position_component.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/extensions.dart';
@@ -23,11 +25,12 @@ class MethodTextComponent extends TextComponent
     ),
   );
 
+  static const double contentHeight = 30;
+
   /// String text = '${method.scope} ${method.returnType}:${method.name}';
   MethodTextComponent(
     Method method, {
     super.position,
-    super.size,
     super.scale,
     super.angle,
     super.anchor,
@@ -36,7 +39,9 @@ class MethodTextComponent extends TextComponent
     super.key,
   }) : super(
             text: '${method.scope} ${method.returnType}:${method.name}',
-            textRenderer: normal);
+            textRenderer: normal) {
+    size = Vector2(Project.nodeWidth, contentHeight);
+  }
 
   @override
   Future<void> onTapDown(TapDownEvent event) async {}
@@ -44,9 +49,6 @@ class MethodTextComponent extends TextComponent
 
 class MethodAreaComponent extends RectangleComponent
     with TapCallbacks, HasGameRef<ModelFlameGame> {
-  static final nodePaint = BasicPalette.black.paint()
-    ..style = PaintingStyle.stroke;
-
   final List<Method> methods;
 
   MethodAreaComponent({
@@ -55,17 +57,28 @@ class MethodAreaComponent extends RectangleComponent
     required this.methods,
   }) : super(
           position: position,
-          size: size,
-          paint: nodePaint,
+          paint: NodePositionComponent.fillPaint,
         );
 
   @override
   Future<void> onLoad() async {
-    for (int i = 0; i < methods.length; ++i) {
-      Method method = methods[i];
-      Vector2 position = Vector2(0, i * 50);
-      add(MethodTextComponent(method, position: position));
+    width = Project.nodeWidth;
+    height = MethodTextComponent.contentHeight;
+    if (methods.isNotEmpty) {
+      height = MethodTextComponent.contentHeight * methods.length;
+      for (int i = 0; i < methods.length; ++i) {
+        Method method = methods[i];
+        Vector2 position = Vector2(0, i * MethodTextComponent.contentHeight);
+        add(MethodTextComponent(method, position: position));
+      }
     }
+  }
+
+  @override
+  void render(Canvas canvas) {
+    canvas.drawLine(Offset(0, 0), Offset(Project.nodeWidth, 0),
+        NodePositionComponent.strokePaint);
+    super.render(canvas);
   }
 
   @override

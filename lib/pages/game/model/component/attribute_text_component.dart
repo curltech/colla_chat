@@ -1,8 +1,11 @@
 import 'dart:async';
 
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
+import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/method_text_component.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
+import 'package:colla_chat/pages/game/model/component/node_position_component.dart';
+import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/extensions.dart';
@@ -24,11 +27,12 @@ class AttributeTextComponent extends TextComponent
     ),
   );
 
+  static const double contentHeight = 30;
+
   /// String text = '${attribute.scope} ${attribute.dataType}:${attribute.name}';
   AttributeTextComponent(
     Attribute attribute, {
     super.position,
-    super.size,
     super.scale,
     super.angle,
     super.anchor,
@@ -37,7 +41,9 @@ class AttributeTextComponent extends TextComponent
     super.key,
   }) : super(
             text: '${attribute.scope} ${attribute.dataType}:${attribute.name}',
-            textRenderer: normal);
+            textRenderer: normal) {
+    size = Vector2(Project.nodeWidth, contentHeight);
+  }
 
   @override
   Future<void> onTapDown(TapDownEvent event) async {}
@@ -45,39 +51,34 @@ class AttributeTextComponent extends TextComponent
 
 class AttributeAreaComponent extends RectangleComponent
     with TapCallbacks, HasGameRef<ModelFlameGame> {
-  static final strokePaint = BasicPalette.black.paint()
-    ..style = PaintingStyle.stroke
-    ..strokeWidth = 1.0;
-
-  late Rect strokeRect;
-
   final List<Attribute> attributes;
 
   AttributeAreaComponent({
     required Vector2 position,
-    required Vector2 size,
     required this.attributes,
   }) : super(
           position: position,
-          size: size,
+          paint: NodePositionComponent.fillPaint,
         );
 
   @override
   Future<void> onLoad() async {
-    strokeRect = Rect.fromLTWH(0, 0, width, height);
-    size.addListener(() {
-      strokeRect = Rect.fromLTWH(0, 0, width, height);
-    });
-    for (int i = 0; i < attributes.length; ++i) {
-      Attribute attribute = attributes[i];
-      Vector2 position = Vector2(0, i * 50);
-      add(AttributeTextComponent(attribute, position: position));
+    width = Project.nodeWidth;
+    height = AttributeTextComponent.contentHeight;
+    if (attributes.isNotEmpty) {
+      height = AttributeTextComponent.contentHeight * attributes.length;
+      for (int i = 0; i < attributes.length; ++i) {
+        Attribute attribute = attributes[i];
+        Vector2 position = Vector2(0, i * AttributeTextComponent.contentHeight);
+        add(AttributeTextComponent(attribute, position: position));
+      }
     }
   }
 
   @override
   void render(Canvas canvas) {
-    canvas.drawRect(strokeRect, strokePaint);
+    canvas.drawLine(Offset(0, 0), Offset(Project.nodeWidth, 0),
+        NodePositionComponent.strokePaint);
     super.render(canvas);
   }
 

@@ -21,6 +21,7 @@ class NodePositionComponent extends RectangleComponent
     ..style = PaintingStyle.stroke
     ..strokeWidth = 1.0;
   late Rect strokeRect;
+  static const double headHeight = 30;
 
   final double padding;
   final double imageSize;
@@ -28,19 +29,16 @@ class NodePositionComponent extends RectangleComponent
 
   NodePositionComponent({
     required Vector2 position,
-    required Vector2 size,
     required this.padding,
     required this.node,
     required this.imageSize,
   }) : super(
           position: position,
-          size: size,
           paint: fillPaint,
         );
 
   TextBoxComponent _buildNodeTextComponent({
     required String text,
-    Vector2? size,
     Vector2? scale,
     double? angle,
     Anchor? anchor,
@@ -60,34 +58,20 @@ class NodePositionComponent extends RectangleComponent
 
     return TextBoxComponent(
         text: text,
-        size: size,
+        size: Vector2(Project.nodeWidth, 30),
         scale: scale,
         angle: angle,
-        position: Vector2(30, 0),
-        // anchor: anchor ?? Anchor.topCenter,
-        // align: align ?? Anchor.center,
+        position: Vector2(0, 0),
+        anchor: anchor ?? Anchor.topLeft,
+        align: align ?? Anchor.center,
         priority: 2,
         boxConfig: boxConfig,
         textRenderer: textPaint);
   }
 
-  PolygonComponent _buildDivideComponent(Vector2 start, Vector2 end) {
-    return PolygonComponent([
-      start,
-      end,
-    ], paint: strokePaint);
-  }
-
   @override
   Future<void> onLoad() async {
-    Project? project = modelProjectController.project.value;
-    if (project == null) {
-      return;
-    }
-    strokeRect = Rect.fromLTWH(0, 0, width, height);
-    size.addListener(() {
-      strokeRect = Rect.fromLTWH(0, 0, width, height);
-    });
+    width = Project.nodeWidth;
     if (node.image != null) {
       SpriteComponent spriteComponent =
           SpriteComponent(sprite: Sprite(node.image!));
@@ -98,16 +82,30 @@ class NodePositionComponent extends RectangleComponent
         add(_buildNodeTextComponent(
           text: metaModelNode.name,
         ));
+        int attributeLength = metaModelNode.attributes.isNotEmpty
+            ? metaModelNode.attributes.length
+            : 1;
+        double attributeHeight =
+            attributeLength * AttributeTextComponent.contentHeight;
         add(AttributeAreaComponent(
-            position: Vector2(0, 50),
-            size: Vector2(120, 40),
+            position: Vector2(0, headHeight),
             attributes: metaModelNode.attributes));
+        int methodLength =
+            metaModelNode.methods.isNotEmpty ? metaModelNode.methods.length : 1;
+        double methodHeight = methodLength * MethodTextComponent.contentHeight;
         add(MethodAreaComponent(
-            position: Vector2(0, 100),
+            position: Vector2(0, headHeight + attributeHeight),
             size: Vector2(120, 20),
             methods: metaModelNode.methods));
+
+        height = headHeight + attributeHeight + methodHeight;
       }
     }
+
+    strokeRect = Rect.fromLTWH(-1, -1, width + 2, height + 2);
+    size.addListener(() {
+      strokeRect = Rect.fromLTWH(-1, -1, width + 2, height + 2);
+    });
   }
 
   @override

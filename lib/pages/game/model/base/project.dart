@@ -3,13 +3,13 @@ import 'package:colla_chat/tool/json_util.dart';
 
 /// 模型项目
 class Project {
+  static const double nodeWidth = 100;
+
+  static const double nodePadding = 10;
+
+  static const double pixelRatio = 1;
+
   String name;
-
-  double nodeWidth = 100;
-
-  double nodePadding = 10;
-
-  double pixelRatio = 1;
 
   List<Subject> subjects = [];
 

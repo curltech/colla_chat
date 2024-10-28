@@ -23,12 +23,13 @@ class ModelFlameGame extends FlameGame
         ScrollDetector,
         ScaleDetector,
         HasCollisionDetection,
-        HasKeyboardHandlerComponents,
-        HasGameRef {
+        HasKeyboardHandlerComponents {
   ModelFlameGame()
       : super(
           camera: CameraComponent(),
         );
+  @override
+  bool debugMode = true;
 
   @override
   Color backgroundColor() {
@@ -52,7 +53,7 @@ class ModelFlameGame extends FlameGame
     if (project == null) {
       return 0.0;
     }
-    double totalWidth = project.nodeWidth * 7 + 100;
+    double totalWidth = Project.nodeWidth * 7 + 100;
 
     return totalWidth;
   }
@@ -60,26 +61,24 @@ class ModelFlameGame extends FlameGame
   void _renderSubject(Project project, Subject subject) {
     double i = 0;
     double j = 0;
-
-    List<Node> modelNodes = subject.modelNodes;
-    for (Node node in modelNodes) {
-      double nodei = i;
-      double nodej = j;
+    double nodeWidth = Project.nodeWidth;
+    List<ModelNode> modelNodes = subject.modelNodes;
+    for (ModelNode node in modelNodes) {
+      double? nodeX = node.x ?? i;
+      double? nodeY = node.y ?? j;
       NodePositionComponent nodePositionComponent = NodePositionComponent(
-        size: Vector2((project.nodeWidth + (project.nodePadding * 2)),
-            (project.nodeWidth + (project.nodePadding * 2))),
-        position: Vector2(nodej, nodei),
-        padding: project.nodePadding,
+        position: Vector2(nodeX, nodeY),
+        padding: Project.nodePadding,
         node: node,
-        imageSize: project.nodeWidth,
+        imageSize: Project.nodeWidth,
       );
-      world.add(nodePositionComponent);
+      add(nodePositionComponent);
 
-      if (j < totalWidth - (project.nodeWidth + (project.nodePadding * 2))) {
-        j = j + (project.nodeWidth + (project.nodePadding * 2));
+      if (i < totalWidth - nodeWidth) {
+        i = i + nodeWidth;
       } else {
-        i = i + (project.nodeWidth + (project.nodePadding * 2));
-        j = 0;
+        j = j + nodeWidth;
+        i = 0;
       }
     }
   }
@@ -89,15 +88,15 @@ class ModelFlameGame extends FlameGame
     for (NodeRelationship nodeRelationship in subject.relationships) {
       LineComponent lineComponent =
           LineComponent(nodeRelationship: nodeRelationship);
-      world.add(lineComponent);
+      add(lineComponent);
     }
   }
 
   @override
   Future<void> onLoad() async {
     /// 设置画布的边界使得摄像头不可以超出范围
-    camera.setBounds(
-        Rectangle.fromPoints(Vector2(0, 0), Vector2(totalWidth, totalWidth)));
+    // camera.setBounds(
+    //     Rectangle.fromPoints(Vector2(0, 0), Vector2(totalWidth, totalWidth)));
 
     /// render the nodes in the screen
     _renderProject();
@@ -108,7 +107,7 @@ class ModelFlameGame extends FlameGame
     super.update(dt);
 
     /// update the zoom value based on the controllers input
-    camera.viewfinder.zoom = 1;
+    // camera.viewfinder.zoom = 1;
   }
 
   @override
