@@ -28,8 +28,8 @@ class ModelFlameGame extends FlameGame
       : super(
           camera: CameraComponent(),
         );
-  @override
-  bool debugMode = true;
+  // @override
+  // bool debugMode = true;
 
   @override
   Color backgroundColor() {

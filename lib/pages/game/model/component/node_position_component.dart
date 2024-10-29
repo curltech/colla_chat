@@ -18,8 +18,9 @@ class NodePositionComponent extends RectangleComponent
     with DragCallbacks, TapCallbacks, HasGameRef<ModelFlameGame> {
   static final fillPaint = BasicPalette.cyan.paint()
     ..style = PaintingStyle.fill;
-  static final selectedFillPaint = BasicPalette.yellow.paint()
-    ..style = PaintingStyle.fill;
+
+  // static final selectedFillPaint = BasicPalette.yellow.paint()
+  //   ..style = PaintingStyle.fill;
   static final strokePaint = BasicPalette.black.paint()
     ..style = PaintingStyle.stroke
     ..strokeWidth = 1.0;
@@ -41,11 +42,7 @@ class NodePositionComponent extends RectangleComponent
   }) : super(
           position: position,
         ) {
-    if (modelProjectController.selected.value == modelNode) {
-      paint = selectedFillPaint;
-    } else {
-      paint = fillPaint;
-    }
+    paint = fillPaint;
   }
 
   TextBoxComponent _buildNodeTextComponent({
@@ -127,11 +124,6 @@ class NodePositionComponent extends RectangleComponent
   Future<void> onTapDown(TapDownEvent event) async {
     if (modelProjectController.selected.value == null) {
       modelProjectController.selected.value = modelNode;
-      if (modelProjectController.selected.value == modelNode) {
-        paint = selectedFillPaint;
-      } else {
-        paint = fillPaint;
-      }
     } else {
       if (modelProjectController.addRelationshipStatus.value &&
           modelProjectController.selected.value != modelNode) {
@@ -150,7 +142,6 @@ class NodePositionComponent extends RectangleComponent
         game.add(lineComponent);
       }
       modelProjectController.selected.value = null;
-      paint = fillPaint;
     }
   }
 
