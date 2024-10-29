@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 
+import 'package:colla_chat/pages/game/model/component/line_component.dart';
 import 'package:colla_chat/pages/game/model/component/node_position_component.dart';
 
 //泛化（Generalization）：继承关系，实线带三角形箭头，指向父类。
@@ -29,6 +30,8 @@ class NodeRelationship {
   Node? dst;
 
   NodeRelationship(this.src, this.dst, this.relationshipType);
+
+  LineComponent? lineComponent;
 
   NodeRelationship.fromJson(Map json)
       : srcName = json['srcName'] == '' ? null : json['srcName'],

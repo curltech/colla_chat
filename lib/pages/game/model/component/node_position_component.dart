@@ -4,6 +4,7 @@ import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/attribute_text_component.dart';
+import 'package:colla_chat/pages/game/model/component/line_component.dart';
 import 'package:colla_chat/pages/game/model/component/method_text_component.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
@@ -17,7 +18,12 @@ class NodePositionComponent extends RectangleComponent
     with DragCallbacks, TapCallbacks, HasGameRef<ModelFlameGame> {
   static final fillPaint = BasicPalette.cyan.paint()
     ..style = PaintingStyle.fill;
+  static final selectedFillPaint = BasicPalette.yellow.paint()
+    ..style = PaintingStyle.fill;
   static final strokePaint = BasicPalette.black.paint()
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 1.0;
+  static final selectedStrokePaint = BasicPalette.yellow.paint()
     ..style = PaintingStyle.stroke
     ..strokeWidth = 1.0;
   late Rect strokeRect;
@@ -25,17 +31,22 @@ class NodePositionComponent extends RectangleComponent
 
   final double padding;
   final double imageSize;
-  final Node node;
+  final ModelNode modelNode;
 
   NodePositionComponent({
     required Vector2 position,
     required this.padding,
-    required this.node,
+    required this.modelNode,
     required this.imageSize,
   }) : super(
           position: position,
-          paint: fillPaint,
-        );
+        ) {
+    if (modelProjectController.selected.value == modelNode) {
+      paint = selectedFillPaint;
+    } else {
+      paint = fillPaint;
+    }
+  }
 
   TextBoxComponent _buildNodeTextComponent({
     required String text,
@@ -58,7 +69,7 @@ class NodePositionComponent extends RectangleComponent
 
     return TextBoxComponent(
         text: text,
-        size: Vector2(Project.nodeWidth, 30),
+        size: Vector2(Project.nodeWidth, headHeight),
         scale: scale,
         angle: angle,
         position: Vector2(0, 0),
@@ -72,34 +83,28 @@ class NodePositionComponent extends RectangleComponent
   @override
   Future<void> onLoad() async {
     width = Project.nodeWidth;
-    if (node.image != null) {
+    if (modelNode.image != null) {
       SpriteComponent spriteComponent =
-          SpriteComponent(sprite: Sprite(node.image!));
+          SpriteComponent(sprite: Sprite(modelNode.image!));
       add(spriteComponent);
     } else {
-      if (node is ModelNode) {
-        ModelNode metaModelNode = node as ModelNode;
-        add(_buildNodeTextComponent(
-          text: metaModelNode.name,
-        ));
-        int attributeLength = metaModelNode.attributes.isNotEmpty
-            ? metaModelNode.attributes.length
-            : 1;
-        double attributeHeight =
-            attributeLength * AttributeTextComponent.contentHeight;
-        add(AttributeAreaComponent(
-            position: Vector2(0, headHeight),
-            attributes: metaModelNode.attributes));
-        int methodLength =
-            metaModelNode.methods.isNotEmpty ? metaModelNode.methods.length : 1;
-        double methodHeight = methodLength * MethodTextComponent.contentHeight;
-        add(MethodAreaComponent(
-            position: Vector2(0, headHeight + attributeHeight),
-            size: Vector2(120, 20),
-            methods: metaModelNode.methods));
+      add(_buildNodeTextComponent(
+        text: modelNode.name,
+      ));
+      int attributeLength =
+          modelNode.attributes.isNotEmpty ? modelNode.attributes.length : 1;
+      double attributeHeight =
+          attributeLength * AttributeTextComponent.contentHeight;
+      add(AttributeAreaComponent(
+          position: Vector2(0, headHeight), attributes: modelNode.attributes));
+      int methodLength =
+          modelNode.methods.isNotEmpty ? modelNode.methods.length : 1;
+      double methodHeight = methodLength * MethodTextComponent.contentHeight;
+      add(MethodAreaComponent(
+          position: Vector2(0, headHeight + attributeHeight),
+          methods: modelNode.methods));
 
-        height = headHeight + attributeHeight + methodHeight;
-      }
+      height = headHeight + attributeHeight + methodHeight;
     }
 
     strokeRect = Rect.fromLTWH(-1, -1, width + 2, height + 2);
@@ -111,16 +116,48 @@ class NodePositionComponent extends RectangleComponent
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    canvas.drawRect(strokeRect, strokePaint);
+    if (modelProjectController.selected.value == modelNode) {
+      canvas.drawRect(strokeRect, selectedStrokePaint);
+    } else {
+      canvas.drawRect(strokeRect, strokePaint);
+    }
   }
 
   @override
-  Future<void> onTapDown(TapDownEvent event) async {}
+  Future<void> onTapDown(TapDownEvent event) async {
+    if (modelProjectController.selected.value == null) {
+      modelProjectController.selected.value = modelNode;
+      if (modelProjectController.selected.value == modelNode) {
+        paint = selectedFillPaint;
+      } else {
+        paint = fillPaint;
+      }
+    } else {
+      if (modelProjectController.addRelationshipStatus.value &&
+          modelProjectController.selected.value != modelNode) {
+        NodeRelationship nodeRelationship = NodeRelationship(
+            modelProjectController.selected.value,
+            modelNode,
+            RelationshipType.association);
+        modelProjectController
+            .getCurrentSubject()!
+            .relationships
+            .add(nodeRelationship);
+        LineComponent lineComponent =
+            LineComponent(nodeRelationship: nodeRelationship);
+        nodeRelationship.lineComponent = lineComponent;
+        modelProjectController.addRelationshipStatus.value = false;
+        game.add(lineComponent);
+      }
+      modelProjectController.selected.value = null;
+      paint = fillPaint;
+    }
+  }
 
   @override
   void onDragUpdate(DragUpdateEvent event) {
     position += event.localDelta;
-    node.x = position.toOffset().dx;
-    node.y = position.toOffset().dy;
+    modelNode.x = position.toOffset().dx;
+    modelNode.y = position.toOffset().dy;
   }
 }

@@ -63,15 +63,16 @@ class ModelFlameGame extends FlameGame
     double j = 0;
     double nodeWidth = Project.nodeWidth;
     List<ModelNode> modelNodes = subject.modelNodes;
-    for (ModelNode node in modelNodes) {
-      double? nodeX = node.x ?? i;
-      double? nodeY = node.y ?? j;
+    for (ModelNode modelNode in modelNodes) {
+      double? nodeX = modelNode.x ?? i;
+      double? nodeY = modelNode.y ?? j;
       NodePositionComponent nodePositionComponent = NodePositionComponent(
         position: Vector2(nodeX, nodeY),
         padding: Project.nodePadding,
-        node: node,
+        modelNode: modelNode,
         imageSize: Project.nodeWidth,
       );
+      modelNode.nodePositionComponent = nodePositionComponent;
       add(nodePositionComponent);
 
       if (i < totalWidth - nodeWidth) {
@@ -88,6 +89,7 @@ class ModelFlameGame extends FlameGame
     for (NodeRelationship nodeRelationship in subject.relationships) {
       LineComponent lineComponent =
           LineComponent(nodeRelationship: nodeRelationship);
+      nodeRelationship.lineComponent = lineComponent;
       add(lineComponent);
     }
   }
@@ -100,6 +102,8 @@ class ModelFlameGame extends FlameGame
 
     /// render the nodes in the screen
     _renderProject();
+
+    return super.onLoad();
   }
 
   @override
@@ -141,10 +145,18 @@ class ModelFlameGame extends FlameGame
           content: 'Please input new node name',
           tip: 'unknown');
       if (nodeName != null) {
-        ModelNode metaModelNode = ModelNode(name: nodeName);
-        metaModelNode.x = localPosition.x;
-        metaModelNode.y = localPosition.y;
-        subject.modelNodes.add(metaModelNode);
+        ModelNode modelNode = ModelNode(name: nodeName);
+        modelNode.x = localPosition.x;
+        modelNode.y = localPosition.y;
+        subject.modelNodes.add(modelNode);
+        NodePositionComponent nodePositionComponent = NodePositionComponent(
+          position: Vector2(modelNode.x!, modelNode.y!),
+          padding: Project.nodePadding,
+          modelNode: modelNode,
+          imageSize: Project.nodeWidth,
+        );
+        modelNode.nodePositionComponent = nodePositionComponent;
+        add(nodePositionComponent);
       }
       modelProjectController.addNodeStatus.value = false;
     }

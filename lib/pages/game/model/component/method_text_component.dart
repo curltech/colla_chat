@@ -4,6 +4,7 @@ import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_position_component.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/extensions.dart';
@@ -44,7 +45,9 @@ class MethodTextComponent extends TextComponent
   }
 
   @override
-  Future<void> onTapDown(TapDownEvent event) async {}
+  Future<void> onTapDown(TapDownEvent event) async {
+    DialogUtil.info(content: 'MethodTextComponent onTapDown');
+  }
 }
 
 class MethodAreaComponent extends RectangleComponent
@@ -53,7 +56,6 @@ class MethodAreaComponent extends RectangleComponent
 
   MethodAreaComponent({
     required Vector2 position,
-    required Vector2 size,
     required this.methods,
   }) : super(
           position: position,
@@ -76,11 +78,13 @@ class MethodAreaComponent extends RectangleComponent
 
   @override
   void render(Canvas canvas) {
-    canvas.drawLine(Offset(0, 0), Offset(Project.nodeWidth, 0),
+    canvas.drawLine(const Offset(0, 0), const Offset(Project.nodeWidth, 0),
         NodePositionComponent.strokePaint);
     super.render(canvas);
   }
 
   @override
-  Future<void> onTapDown(TapDownEvent event) async {}
+  Future<void> onTapDown(TapDownEvent event) async {
+    DialogUtil.info(content: 'MethodAreaComponent onTapDown');
+  }
 }
