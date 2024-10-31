@@ -47,7 +47,7 @@ class GroupEditWidget extends StatelessWidget with TileDataMixin {
   @override
   bool get withLeading => true;
 
-  final List<PlatformDataField> groupDataField = [
+  final List<PlatformDataField> groupDataFields = [
     PlatformDataField(
         name: 'id',
         label: 'Id',
@@ -72,7 +72,7 @@ class GroupEditWidget extends StatelessWidget with TileDataMixin {
         prefixIcon: Icon(Icons.person_pin, color: myself.primary)),
   ];
   late final FormInputController formInputController =
-      FormInputController(groupDataField);
+      FormInputController(groupDataFields);
 
   final OptionController groupOwnerController = OptionController();
 

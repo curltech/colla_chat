@@ -6,6 +6,7 @@ import 'package:colla_chat/pages/game/model/component/method_text_component.dart
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_position_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
+import 'package:colla_chat/pages/game/model/widget/attribute_edit_widget.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
@@ -16,15 +17,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 
 class AttributeTextComponent extends TextComponent
-    with TapCallbacks, HasGameRef<ModelFlameGame> {
+    with TapCallbacks, DoubleTapCallbacks, HasGameRef<ModelFlameGame> {
   static final TextPaint normal = TextPaint(
     style: TextStyle(
       color: BasicPalette.black.color,
-      fontSize: 14.0,
-      shadows: const [
-        Shadow(color: Colors.red, offset: Offset(2, 2), blurRadius: 2),
-        Shadow(color: Colors.yellow, offset: Offset(4, 4), blurRadius: 4),
-      ],
+      fontSize: 12.0,
+      // shadows: const [
+      //   Shadow(color: Colors.red, offset: Offset(2, 2), blurRadius: 2),
+      //   Shadow(color: Colors.yellow, offset: Offset(4, 4), blurRadius: 4),
+      // ],
     ),
   );
 
@@ -53,7 +54,7 @@ class AttributeTextComponent extends TextComponent
 }
 
 class AttributeAreaComponent extends RectangleComponent
-    with TapCallbacks, HasGameRef<ModelFlameGame> {
+    with TapCallbacks, DoubleTapCallbacks, HasGameRef<ModelFlameGame> {
   final List<Attribute> attributes;
 
   AttributeAreaComponent({
@@ -88,5 +89,20 @@ class AttributeAreaComponent extends RectangleComponent
   @override
   Future<void> onTapDown(TapDownEvent event) async {
     DialogUtil.info(content: 'AttributeAreaComponent onTapDown');
+  }
+
+  @override
+  Future<void> onDoubleTapDown(DoubleTapDownEvent event) async {
+    Attribute attribute = Attribute();
+    attribute.name = 'unknown';
+    attributes.add(attribute);
+    Vector2 position =
+        Vector2(0, (attributes.length-1) * AttributeTextComponent.contentHeight);
+    add(AttributeTextComponent(attribute, position: position));
+    await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
+      return AttributeEditWidget(
+        attribute: attribute,
+      );
+    });
   }
 }

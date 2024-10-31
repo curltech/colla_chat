@@ -6,6 +6,8 @@ class Attribute {
   String? scope;
   String? dataType;
 
+  Attribute();
+
   Attribute.fromJson(Map json)
       : name = json['name'],
         scope = json['scope'],
@@ -24,6 +26,8 @@ class Method {
   String? name;
   String? scope;
   String? returnType;
+
+  Method();
 
   Method.fromJson(Map json)
       : name = json['name'],

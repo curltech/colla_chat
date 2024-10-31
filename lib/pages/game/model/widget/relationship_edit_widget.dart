@@ -1,0 +1,91 @@
+import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/game/model/base/model_node.dart';
+import 'package:colla_chat/pages/game/model/base/node.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
+import 'package:flutter/material.dart';
+
+class RelationshipEditWidget extends StatelessWidget {
+  final NodeRelationship nodeRelationship;
+
+  RelationshipEditWidget({super.key, required this.nodeRelationship});
+
+  final List<PlatformDataField> methodDataFields = [
+    PlatformDataField(
+        name: 'relationshipType',
+        label: 'RelationshipType',
+        prefixIcon: Icon(Icons.link, color: myself.primary)),
+    PlatformDataField(
+        name: 'srcCardinality',
+        label: 'SrcCardinality',
+        prefixIcon: Icon(Icons.numbers_outlined, color: myself.primary)),
+    PlatformDataField(
+        name: 'dstCardinality',
+        label: 'DstCardinality',
+        prefixIcon: Icon(Icons.numbers_outlined, color: myself.primary)),
+  ];
+
+  late final FormInputController formInputController =
+      FormInputController(methodDataFields);
+
+  //ModelNode信息编辑界面
+  Widget _buildFormInputWidget(BuildContext context) {
+    formInputController.setValues(JsonUtil.toJson(nodeRelationship));
+    var formInputWidget = FormInputWidget(
+      height: appDataProvider.portraitSize.height * 0.5,
+      spacing: 15.0,
+      onOk: (Map<String, dynamic> values) {
+        _onOk(values).then((nodeRelationship) {
+          if (nodeRelationship != null) {
+            DialogUtil.info(
+                content:
+                    'NodeRelationship ${nodeRelationship.srcName} is built');
+          }
+        });
+      },
+      controller: formInputController,
+    );
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),
+      child: formInputWidget,
+    );
+  }
+
+  Future<NodeRelationship?> _onOk(Map<String, dynamic> values) async {
+    NodeRelationship current = NodeRelationship.fromJson(values);
+    if (StringUtil.isEmpty(current.relationshipType)) {
+      DialogUtil.error(
+          content:
+              AppLocalizations.t('Must has nodeRelationship relationshipType'));
+      return null;
+    }
+    if (current.srcCardinality == null) {
+      DialogUtil.error(
+          content:
+              AppLocalizations.t('Must has nodeRelationship srcCardinality'));
+      return null;
+    }
+    if (current.dstCardinality == null) {
+      DialogUtil.error(
+          content:
+              AppLocalizations.t('Must has nodeRelationship dstCardinality'));
+      return null;
+    }
+    nodeRelationship.relationshipType = current.relationshipType;
+    nodeRelationship.srcCardinality = current.srcCardinality;
+    nodeRelationship.dstCardinality = current.dstCardinality;
+
+    return current;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildFormInputWidget(context);
+  }
+}

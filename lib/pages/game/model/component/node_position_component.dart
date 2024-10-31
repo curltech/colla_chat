@@ -8,7 +8,9 @@ import 'package:colla_chat/pages/game/model/component/line_component.dart';
 import 'package:colla_chat/pages/game/model/component/method_text_component.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
+import 'package:colla_chat/pages/game/model/widget/model_node_edit_widget.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/palette.dart';
@@ -16,7 +18,11 @@ import 'package:flutter/material.dart';
 
 /// [NodePositionComponent] 保存节点的位置和大小，是flame引擎的位置组件，可以在画布上拖拽
 class NodePositionComponent extends RectangleComponent
-    with DragCallbacks, TapCallbacks, HasGameRef<ModelFlameGame> {
+    with
+        DragCallbacks,
+        TapCallbacks,
+        DoubleTapCallbacks,
+        HasGameRef<ModelFlameGame> {
   static final fillPaint = Paint()
     ..color = myself.primary
     ..style = PaintingStyle.fill;
@@ -35,6 +41,7 @@ class NodePositionComponent extends RectangleComponent
   final double padding;
   final double imageSize;
   final ModelNode modelNode;
+  late final TextBoxComponent nodeTextComponent;
 
   NodePositionComponent({
     required Vector2 position,
@@ -57,7 +64,7 @@ class NodePositionComponent extends RectangleComponent
     final textPaint = TextPaint(
       style: TextStyle(
         color: BasicPalette.black.color,
-        fontSize: 16.0,
+        fontSize: 14.0,
         // shadows: const [
         //   Shadow(color: Colors.red, offset: Offset(2, 2), blurRadius: 2),
         //   Shadow(color: Colors.yellow, offset: Offset(4, 4), blurRadius: 4),
@@ -87,9 +94,10 @@ class NodePositionComponent extends RectangleComponent
           SpriteComponent(sprite: Sprite(modelNode.image!));
       add(spriteComponent);
     } else {
-      add(_buildNodeTextComponent(
+      nodeTextComponent = _buildNodeTextComponent(
         text: modelNode.name,
-      ));
+      );
+      add(nodeTextComponent);
       int attributeLength =
           modelNode.attributes.isNotEmpty ? modelNode.attributes.length : 1;
       double attributeHeight =
@@ -141,9 +149,22 @@ class NodePositionComponent extends RectangleComponent
         nodeRelationship.lineComponent = lineComponent;
         modelProjectController.addRelationshipStatus.value = false;
         game.add(lineComponent);
+
+        modelProjectController.selected.value = null;
+      } else {
+        modelProjectController.selected.value = modelNode;
       }
-      modelProjectController.selected.value = null;
     }
+  }
+
+  @override
+  Future<void> onDoubleTapDown(DoubleTapDownEvent event) async {
+    await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
+      return ModelNodeEditWidget(
+        modelNode: modelNode,
+      );
+    });
+    nodeTextComponent.text = modelNode.name;
   }
 
   @override

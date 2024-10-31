@@ -3,7 +3,7 @@ import 'package:colla_chat/tool/json_util.dart';
 
 /// 模型项目
 class Project {
-  static const double nodeWidth = 100;
+  static const double nodeWidth = 140;
 
   static const double nodePadding = 10;
 

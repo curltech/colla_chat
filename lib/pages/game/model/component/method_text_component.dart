@@ -4,6 +4,7 @@ import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_position_component.dart';
+import 'package:colla_chat/pages/game/model/widget/method_edit_widget.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
@@ -14,15 +15,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 
 class MethodTextComponent extends TextComponent
-    with TapCallbacks, HasGameRef<ModelFlameGame> {
+    with TapCallbacks, DoubleTapCallbacks, HasGameRef<ModelFlameGame> {
   static final TextPaint normal = TextPaint(
     style: TextStyle(
       color: BasicPalette.black.color,
-      fontSize: 14.0,
-      shadows: const [
-        Shadow(color: Colors.red, offset: Offset(2, 2), blurRadius: 2),
-        Shadow(color: Colors.yellow, offset: Offset(4, 4), blurRadius: 4),
-      ],
+      fontSize: 12.0,
+      // shadows: const [
+      //   Shadow(color: Colors.red, offset: Offset(2, 2), blurRadius: 2),
+      //   Shadow(color: Colors.yellow, offset: Offset(4, 4), blurRadius: 4),
+      // ],
     ),
   );
 
@@ -51,7 +52,7 @@ class MethodTextComponent extends TextComponent
 }
 
 class MethodAreaComponent extends RectangleComponent
-    with TapCallbacks, HasGameRef<ModelFlameGame> {
+    with TapCallbacks, DoubleTapCallbacks, HasGameRef<ModelFlameGame> {
   final List<Method> methods;
 
   MethodAreaComponent({
@@ -86,5 +87,19 @@ class MethodAreaComponent extends RectangleComponent
   @override
   Future<void> onTapDown(TapDownEvent event) async {
     DialogUtil.info(content: 'MethodAreaComponent onTapDown');
+  }
+
+  @override
+  Future<void> onDoubleTapDown(DoubleTapDownEvent event) async {
+    Method method = Method();
+    methods.add(method);
+    Vector2 position =
+        Vector2(0, methods.length * MethodTextComponent.contentHeight);
+    add(MethodTextComponent(method, position: position));
+    await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
+      return MethodEditWidget(
+        method: method,
+      );
+    });
   }
 }
