@@ -11,7 +11,7 @@ class Project {
 
   String name;
 
-  List<Subject> subjects = [];
+  Map<String, Subject> subjects = {};
 
   Project(this.name);
 
@@ -20,17 +20,17 @@ class Project {
   }
 
   Project.fromJson(Map json) : name = json['name'] == '' ? null : json['name'] {
-    subjects = [];
+    subjects = {};
     List<dynamic>? ss = json['subjects'];
     if (ss != null && ss.isNotEmpty) {
       for (var s in ss) {
         Subject subject = Subject.fromJson(s);
-        subjects.add(subject);
+        subjects[subject.name] = subject;
       }
     }
   }
 
   Map<String, dynamic> toJson() {
-    return {'name': name, 'subjects': JsonUtil.toJson(subjects)};
+    return {'name': name, 'subjects': JsonUtil.toJson(subjects.values)};
   }
 }

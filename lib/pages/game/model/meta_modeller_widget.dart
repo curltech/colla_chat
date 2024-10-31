@@ -60,7 +60,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       return;
     }
     List<Option<String>> options = [];
-    for (var subject in modelProjectController.project.value!.subjects) {
+    for (var subject in modelProjectController.project.value!.subjects.values) {
       options.add(Option(subject.name, subject.name));
     }
     String? subjectName = await DialogUtil.showSelectDialog<String>(
@@ -166,7 +166,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       modelProjectController.project.value = project;
       if (project.subjects.isNotEmpty) {
         modelProjectController.currentSubjectName.value =
-            project.subjects[0].name;
+            project.subjects.values.first.name;
       }
     }
   }

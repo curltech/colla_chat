@@ -140,10 +140,9 @@ class NodePositionComponent extends RectangleComponent
             modelProjectController.selected.value,
             modelNode,
             RelationshipType.association.name);
-        modelProjectController
-            .getCurrentSubject()!
-            .relationships
-            .add(nodeRelationship);
+        modelProjectController.getCurrentSubject()!.relationships[
+                '${nodeRelationship.srcName}-${nodeRelationship.dstName}'] =
+            nodeRelationship;
         LineComponent lineComponent =
             LineComponent(nodeRelationship: nodeRelationship);
         nodeRelationship.lineComponent = lineComponent;

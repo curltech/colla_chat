@@ -15,24 +15,15 @@ class ModelProjectController {
 
   Subject? getCurrentSubject() {
     if (project.value != null && currentSubjectName.value != null) {
-      for (var subject in project.value!.subjects) {
-        if (subject.name == currentSubjectName.value) {
-          return subject;
-        }
-      }
+      return project.value!.subjects[currentSubjectName.value];
     }
     return null;
   }
 
-  ModelNode? getModelNode(String name) {
+  ModelNode? getModelNode(String name, {String? packageName}) {
     if (project.value != null) {
-      List<Subject> subjects = project.value!.subjects;
-      for (Subject subject in subjects) {
-        for (ModelNode node in subject.modelNodes) {
-          if (node.name == name) {
-            return node;
-          }
-        }
+      for (Subject subject in project.value!.subjects.values) {
+        return subject.modelNodes['${packageName ?? ''}.$name'];
       }
     }
 

@@ -17,9 +17,9 @@ class Subject {
   ui.Image? image;
 
   /// 基于主题域的节点列表
-  List<ModelNode> modelNodes = [];
+  Map<String, ModelNode> modelNodes = {};
 
-  List<NodeRelationship> relationships = [];
+  Map<String, NodeRelationship> relationships = {};
 
   Subject(this.name);
 
@@ -34,20 +34,22 @@ class Subject {
         y = json['y'],
         width = json['width'],
         height = json['height'] {
-    modelNodes = [];
+    modelNodes = {};
     List<dynamic>? ss = json['modelNodes'];
     if (ss != null && ss.isNotEmpty) {
       for (var s in ss) {
         ModelNode modelNode = ModelNode.fromJson(s);
-        modelNodes.add(modelNode);
+        modelNodes['${modelNode.packageName}.${modelNode.name}'] = modelNode;
       }
     }
-    relationships = [];
+    relationships = {};
     ss = json['relationships'];
     if (ss != null && ss.isNotEmpty) {
       for (var s in ss) {
         NodeRelationship nodeRelationship = NodeRelationship.fromJson(s);
-        relationships.add(nodeRelationship);
+        relationships[
+                '${nodeRelationship.srcName}-${nodeRelationship.dstName}'] =
+            nodeRelationship;
       }
     }
   }
@@ -59,8 +61,8 @@ class Subject {
       'y': y,
       'width': width,
       'height': height,
-      'modelNodes': JsonUtil.toJson(modelNodes),
-      'relationships': JsonUtil.toJson(relationships)
+      'modelNodes': JsonUtil.toJson(modelNodes.values),
+      'relationships': JsonUtil.toJson(relationships.values)
     };
   }
 }

@@ -43,7 +43,7 @@ class ModelFlameGame extends FlameGame
     if (project == null) {
       return;
     }
-    for (Subject subject in project.subjects) {
+    for (Subject subject in project.subjects.values) {
       _renderSubject(project, subject);
       _renderRelationship(project, subject);
     }
@@ -63,7 +63,7 @@ class ModelFlameGame extends FlameGame
     double i = 0;
     double j = 0;
     double nodeWidth = Project.nodeWidth;
-    List<ModelNode> modelNodes = subject.modelNodes;
+    Iterable<ModelNode> modelNodes = subject.modelNodes.values;
     for (ModelNode modelNode in modelNodes) {
       double? nodeX = modelNode.x ?? i;
       double? nodeY = modelNode.y ?? j;
@@ -87,7 +87,7 @@ class ModelFlameGame extends FlameGame
 
   /// 渲染线
   void _renderRelationship(Project project, Subject subject) {
-    for (NodeRelationship nodeRelationship in subject.relationships) {
+    for (NodeRelationship nodeRelationship in subject.relationships.values) {
       LineComponent lineComponent =
           LineComponent(nodeRelationship: nodeRelationship);
       nodeRelationship.lineComponent = lineComponent;
@@ -133,7 +133,7 @@ class ModelFlameGame extends FlameGame
         subject.x = localPosition.x;
         subject.y = localPosition.y;
         modelProjectController.currentSubjectName.value = subject.name;
-        project.subjects.add(subject);
+        project.subjects[subject.name] = subject;
       }
       modelProjectController.addSubjectStatus.value = false;
     }
@@ -150,7 +150,8 @@ class ModelFlameGame extends FlameGame
         ModelNode modelNode = ModelNode(name: nodeName);
         modelNode.x = localPosition.x;
         modelNode.y = localPosition.y;
-        subject.modelNodes.add(modelNode);
+        subject.modelNodes['${modelNode.packageName ?? ''}.${modelNode.name}'] =
+            modelNode;
         NodePositionComponent nodePositionComponent = NodePositionComponent(
           position: Vector2(modelNode.x!, modelNode.y!),
           padding: Project.nodePadding,

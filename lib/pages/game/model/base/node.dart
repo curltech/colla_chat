@@ -30,8 +30,8 @@ class NodeRelationship {
   Node? dst;
 
   NodeRelationship(this.src, this.dst, this.relationshipType) {
-    srcName = src?.name;
-    dstName = dst?.name;
+    srcName = '${src?.packageName ?? ''}.${src?.name}';
+    dstName = '${dst?.packageName ?? ''}.${dst?.name}';
   }
 
   LineComponent? lineComponent;
