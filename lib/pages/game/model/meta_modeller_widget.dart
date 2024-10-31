@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
@@ -12,7 +11,6 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -20,7 +18,6 @@ import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:path/path.dart' as p;
 
 /// 元模型建模器
 class MetaModellerWidget extends StatelessWidget with TileDataMixin {
@@ -150,10 +147,6 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     });
   }
 
-  Widget _buildModelGameWidget() {
-    return const ModelGameWidget<ModelNode>();
-  }
-
   _newProject() async {
     String? projectName = await DialogUtil.showTextFormField(
         title: 'New project',
@@ -209,8 +202,8 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         ),
         IconButton(
           onPressed: project != null
-              ? () {
-                  _saveProject();
+              ? () async {
+                  await _saveProject();
                 }
               : null,
           icon: const Icon(Icons.save),
@@ -219,7 +212,10 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       ];
       var children = [
         _buildToolPanelWidget(context),
-        Expanded(child: _buildModelGameWidget())
+        Expanded(
+            child: ModelGameWidget<ModelNode>(
+          key: UniqueKey(),
+        ))
       ];
       String title = this.title;
       if (project != null) {

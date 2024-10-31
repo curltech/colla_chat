@@ -22,14 +22,17 @@ class NodeRelationship {
   String? srcName;
   String? dstName;
 
-  RelationshipType? relationshipType;
+  String? relationshipType;
   int? srcCardinality;
   int? dstCardinality;
 
   Node? src;
   Node? dst;
 
-  NodeRelationship(this.src, this.dst, this.relationshipType);
+  NodeRelationship(this.src, this.dst, this.relationshipType) {
+    srcName = src?.name;
+    dstName = dst?.name;
+  }
 
   LineComponent? lineComponent;
 

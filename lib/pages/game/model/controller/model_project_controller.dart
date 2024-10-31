@@ -23,6 +23,21 @@ class ModelProjectController {
     }
     return null;
   }
+
+  ModelNode? getModelNode(String name) {
+    if (project.value != null) {
+      List<Subject> subjects = project.value!.subjects;
+      for (Subject subject in subjects) {
+        for (ModelNode node in subject.modelNodes) {
+          if (node.name == name) {
+            return node;
+          }
+        }
+      }
+    }
+
+    return null;
+  }
 }
 
 final ModelProjectController modelProjectController = ModelProjectController();

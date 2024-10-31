@@ -28,12 +28,13 @@ class ModelFlameGame extends FlameGame
       : super(
           camera: CameraComponent(),
         );
+
   // @override
   // bool debugMode = true;
 
   @override
   Color backgroundColor() {
-    return Colors.grey;
+    return Colors.white.withOpacity(0.0);
   }
 
   /// 渲染画布上的所有节点和线
@@ -120,6 +121,7 @@ class ModelFlameGame extends FlameGame
     if (project == null) {
       return;
     }
+    modelProjectController.selected.value = null;
     Vector2 localPosition = event.localPosition;
     if (modelProjectController.addSubjectStatus.value) {
       String? subjectName = await DialogUtil.showTextFormField(

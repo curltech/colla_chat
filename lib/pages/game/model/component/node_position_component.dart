@@ -8,6 +8,7 @@ import 'package:colla_chat/pages/game/model/component/line_component.dart';
 import 'package:colla_chat/pages/game/model/component/method_text_component.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/palette.dart';
@@ -16,7 +17,8 @@ import 'package:flutter/material.dart';
 /// [NodePositionComponent] 保存节点的位置和大小，是flame引擎的位置组件，可以在画布上拖拽
 class NodePositionComponent extends RectangleComponent
     with DragCallbacks, TapCallbacks, HasGameRef<ModelFlameGame> {
-  static final fillPaint = BasicPalette.cyan.paint()
+  static final fillPaint = Paint()
+    ..color = myself.primary
     ..style = PaintingStyle.fill;
 
   // static final selectedFillPaint = BasicPalette.yellow.paint()
@@ -125,12 +127,11 @@ class NodePositionComponent extends RectangleComponent
     if (modelProjectController.selected.value == null) {
       modelProjectController.selected.value = modelNode;
     } else {
-      if (modelProjectController.addRelationshipStatus.value &&
-          modelProjectController.selected.value != modelNode) {
+      if (modelProjectController.addRelationshipStatus.value) {
         NodeRelationship nodeRelationship = NodeRelationship(
             modelProjectController.selected.value,
             modelNode,
-            RelationshipType.association);
+            RelationshipType.association.name);
         modelProjectController
             .getCurrentSubject()!
             .relationships
@@ -147,8 +148,13 @@ class NodePositionComponent extends RectangleComponent
 
   @override
   void onDragUpdate(DragUpdateEvent event) {
-    position += event.localDelta;
-    modelNode.x = position.toOffset().dx;
-    modelNode.y = position.toOffset().dy;
+    if (position.x + event.localDelta.x <= 1500 &&
+        position.x + event.localDelta.x >= 0 &&
+        position.y + event.localDelta.y < 1500 &&
+        position.y + event.localDelta.y >= 0) {
+      position += event.localDelta;
+      modelNode.x = position.toOffset().dx;
+      modelNode.y = position.toOffset().dy;
+    }
   }
 }
