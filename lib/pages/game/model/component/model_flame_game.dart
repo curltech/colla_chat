@@ -150,7 +150,7 @@ class ModelFlameGame extends FlameGame
         ModelNode modelNode = ModelNode(name: nodeName);
         modelNode.x = localPosition.x;
         modelNode.y = localPosition.y;
-        subject.modelNodes['${modelNode.packageName ?? ''}.${modelNode.name}'] =
+        subject.modelNodes['${modelNode.packageName}.${modelNode.name}'] =
             modelNode;
         NodePositionComponent nodePositionComponent = NodePositionComponent(
           position: Vector2(modelNode.x!, modelNode.y!),

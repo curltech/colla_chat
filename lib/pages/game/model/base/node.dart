@@ -56,7 +56,7 @@ class NodeRelationship {
 
 abstract class Node {
   String name;
-  String? packageName;
+  String packageName;
   bool isAbstract;
 
   /// 节点的位置和大小
@@ -69,11 +69,11 @@ abstract class Node {
 
   NodePositionComponent? nodePositionComponent;
 
-  Node(this.name, this.isAbstract, {this.packageName});
+  Node(this.name, {this.isAbstract = false, this.packageName = ''});
 
   Node.fromJson(Map json)
       : name = json['name'] == '' ? null : json['name'],
-        packageName = json['packageName'] == '' ? null : json['packageName'],
+        packageName = json['packageName'] ?? '',
         isAbstract = json['isAbstract'] == true || json['isAbstract'] == 1
             ? true
             : false,

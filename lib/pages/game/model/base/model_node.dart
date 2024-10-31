@@ -49,8 +49,8 @@ class ModelNode extends Node {
   List<Method> methods = [];
 
   ModelNode(
-      {required String name, bool isAbstract = false, String? packageName})
-      : super(name, isAbstract, packageName: packageName);
+      {required String name, bool isAbstract = false, String packageName = ''})
+      : super(name, isAbstract: isAbstract, packageName: packageName);
 
   ModelNode.fromJson(Map json) : super.fromJson(json) {
     attributes = [];
