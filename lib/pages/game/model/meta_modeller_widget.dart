@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
+import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
@@ -167,6 +168,23 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       if (project.subjects.isNotEmpty) {
         modelProjectController.currentSubjectName.value =
             project.subjects.values.first.name;
+        for (Subject subject in project.subjects.values) {
+          for (NodeRelationship relationship
+              in subject.relationships.values.toList()) {
+            String key = '${relationship.srcName}-${relationship.dstName}';
+            ModelNode? modelNode =
+                modelProjectController.getModelNode(relationship.srcName!);
+            if (modelNode == null) {
+              subject.relationships.remove(key);
+            } else {
+              modelNode =
+                  modelProjectController.getModelNode(relationship.dstName!);
+              if (modelNode == null) {
+                subject.relationships.remove(key);
+              }
+            }
+          }
+        }
       }
     }
   }

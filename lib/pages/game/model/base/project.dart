@@ -31,6 +31,9 @@ class Project {
   }
 
   Map<String, dynamic> toJson() {
-    return {'name': name, 'subjects': JsonUtil.toJson(subjects.values)};
+    return {
+      'name': name,
+      'subjects': JsonUtil.toJson(subjects.values.toList())
+    };
   }
 }

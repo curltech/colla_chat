@@ -61,8 +61,8 @@ class Subject {
       'y': y,
       'width': width,
       'height': height,
-      'modelNodes': JsonUtil.toJson(modelNodes.values),
-      'relationships': JsonUtil.toJson(relationships.values)
+      'modelNodes': JsonUtil.toJson(modelNodes.values.toList()),
+      'relationships': JsonUtil.toJson(relationships.values.toList())
     };
   }
 }
