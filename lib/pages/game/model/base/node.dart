@@ -19,7 +19,10 @@ enum RelationshipType {
 }
 
 class NodeRelationship {
+  /// src node的package+name
   String? srcName;
+
+  /// dst node的package+name
   String? dstName;
 
   String? relationshipType;

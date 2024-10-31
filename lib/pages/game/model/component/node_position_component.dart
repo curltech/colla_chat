@@ -145,9 +145,11 @@ class NodePositionComponent extends RectangleComponent
             nodeRelationship;
         LineComponent lineComponent =
             LineComponent(nodeRelationship: nodeRelationship);
-        nodeRelationship.lineComponent = lineComponent;
+        if (nodeRelationship.src != null && nodeRelationship.dst != null) {
+          nodeRelationship.lineComponent = lineComponent;
+          game.add(lineComponent);
+        }
         modelProjectController.addRelationshipStatus.value = false;
-        game.add(lineComponent);
 
         modelProjectController.selected.value = null;
       } else {

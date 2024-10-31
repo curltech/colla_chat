@@ -20,10 +20,10 @@ class ModelProjectController {
     return null;
   }
 
-  ModelNode? getModelNode(String name, {String? packageName}) {
+  ModelNode? getModelNode(String name) {
     if (project.value != null) {
       for (Subject subject in project.value!.subjects.values) {
-        return subject.modelNodes['${packageName ?? ''}.$name'];
+        return subject.modelNodes[name];
       }
     }
 

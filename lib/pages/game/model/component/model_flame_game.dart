@@ -90,6 +90,9 @@ class ModelFlameGame extends FlameGame
     for (NodeRelationship nodeRelationship in subject.relationships.values) {
       LineComponent lineComponent =
           LineComponent(nodeRelationship: nodeRelationship);
+      if (nodeRelationship.src == null || nodeRelationship.dst == null) {
+        return;
+      }
       nodeRelationship.lineComponent = lineComponent;
       add(lineComponent);
     }
