@@ -171,16 +171,15 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         for (Subject subject in project.subjects.values) {
           for (NodeRelationship relationship
               in subject.relationships.values.toList()) {
-            String key = '${relationship.srcName}-${relationship.dstName}';
             ModelNode? modelNode =
-                modelProjectController.getModelNode(relationship.srcName!);
+                modelProjectController.getModelNode(relationship.srcId);
             if (modelNode == null) {
-              subject.relationships.remove(key);
+              subject.remove(relationship);
             } else {
               modelNode =
-                  modelProjectController.getModelNode(relationship.dstName!);
+                  modelProjectController.getModelNode(relationship.dstId);
               if (modelNode == null) {
-                subject.relationships.remove(key);
+                subject.remove(relationship);
               }
             }
           }

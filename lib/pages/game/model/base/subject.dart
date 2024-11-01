@@ -3,9 +3,11 @@ import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'dart:ui' as ui;
 
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:flutter/material.dart';
 
 /// 模型主题
 class Subject {
+  late final String id;
   String name;
 
   /// 节点的位置和大小
@@ -21,7 +23,18 @@ class Subject {
 
   Map<String, NodeRelationship> relationships = {};
 
-  Subject(this.name);
+  Subject(this.name) {
+    id = UniqueKey().toString();
+  }
+
+  add(NodeRelationship nodeRelationship) {
+    relationships['${nodeRelationship.srcId}-${nodeRelationship.dstId}'] =
+        nodeRelationship;
+  }
+
+  remove(NodeRelationship nodeRelationship) {
+    relationships.remove('${nodeRelationship.srcId}-${nodeRelationship.dstId}');
+  }
 
   void clear() {
     modelNodes.clear();
@@ -29,7 +42,8 @@ class Subject {
   }
 
   Subject.fromJson(Map json)
-      : name = json['name'] == '' ? null : json['name'],
+      : id = json['id'],
+        name = json['name'],
         x = json['x'],
         y = json['y'],
         width = json['width'],
@@ -47,8 +61,7 @@ class Subject {
     if (ss != null && ss.isNotEmpty) {
       for (var s in ss) {
         NodeRelationship nodeRelationship = NodeRelationship.fromJson(s);
-        relationships[
-                '${nodeRelationship.srcName}-${nodeRelationship.dstName}'] =
+        relationships['${nodeRelationship.srcId}-${nodeRelationship.dstId}'] =
             nodeRelationship;
       }
     }
@@ -56,6 +69,7 @@ class Subject {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'name': name,
       'x': x,
       'y': y,

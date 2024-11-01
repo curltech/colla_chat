@@ -2,6 +2,48 @@ import 'dart:ui' as ui;
 
 import 'package:colla_chat/pages/game/model/component/line_component.dart';
 import 'package:colla_chat/pages/game/model/component/node_position_component.dart';
+import 'package:flutter/material.dart';
+
+abstract class Node {
+  late final String id;
+  String name;
+
+  /// 节点的位置和大小
+  double? x;
+  double? y;
+  double? width;
+  double? height;
+  String? imageContent;
+
+  ui.Image? image;
+
+  NodePositionComponent? nodePositionComponent;
+
+  Node(this.name) {
+    id = UniqueKey().toString();
+  }
+
+  Node.fromJson(Map json)
+      : id = json['id'],
+        name = json['name'],
+        imageContent = json['imageContent'],
+        x = json['x'],
+        y = json['y'],
+        width = json['width'],
+        height = json['height'];
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'imageContent': imageContent,
+      'x': x,
+      'y': y,
+      'width': width,
+      'height': height
+    };
+  }
+}
 
 //泛化（Generalization）：继承关系，实线带三角形箭头，指向父类。
 //实现（Realization）：实现关系，虚线带三角形箭头，指向接口。
@@ -19,11 +61,11 @@ enum RelationshipType {
 }
 
 class NodeRelationship {
-  /// src node的package+name
-  String? srcName;
+  /// src node的id
+  late String srcId;
 
-  /// dst node的package+name
-  String? dstName;
+  /// dst node的id
+  late String dstId;
 
   String? relationshipType;
   int? srcCardinality;
@@ -33,67 +75,26 @@ class NodeRelationship {
   Node? dst;
 
   NodeRelationship(this.src, this.dst, this.relationshipType) {
-    srcName = '${src?.packageName ?? ''}.${src?.name}';
-    dstName = '${dst?.packageName ?? ''}.${dst?.name}';
+    srcId = src!.id;
+    dstId = dst!.id;
   }
 
   LineComponent? lineComponent;
 
   NodeRelationship.fromJson(Map json)
-      : srcName = json['srcName'] == '' ? null : json['srcName'],
-        dstName = json['dstName'] == '' ? null : json['dstName'],
+      : srcId = json['srcId'],
+        dstId = json['dstId'],
         relationshipType = json['relationshipType'],
         srcCardinality = json['srcCardinality'],
         dstCardinality = json['dstCardinality'];
 
   Map<String, dynamic> toJson() {
     return {
-      'srcName': srcName,
-      'dstName': dstName,
+      'srcId': srcId,
+      'dstId': dstId,
       'relationshipType': relationshipType,
       'srcCardinality': srcCardinality,
       'dstCardinality': dstCardinality
-    };
-  }
-}
-
-abstract class Node {
-  String name;
-  String packageName;
-  bool isAbstract;
-
-  /// 节点的位置和大小
-  double? x;
-  double? y;
-  double? width;
-  double? height;
-
-  ui.Image? image;
-
-  NodePositionComponent? nodePositionComponent;
-
-  Node(this.name, {this.isAbstract = false, this.packageName = ''});
-
-  Node.fromJson(Map json)
-      : name = json['name'] == '' ? null : json['name'],
-        packageName = json['packageName'] ?? '',
-        isAbstract = json['isAbstract'] == true || json['isAbstract'] == 1
-            ? true
-            : false,
-        x = json['x'],
-        y = json['y'],
-        width = json['width'],
-        height = json['height'];
-
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'packageName': packageName,
-      'isAbstract': isAbstract,
-      'x': x,
-      'y': y,
-      'width': width,
-      'height': height
     };
   }
 }

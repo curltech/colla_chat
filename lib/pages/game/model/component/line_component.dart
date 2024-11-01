@@ -5,6 +5,7 @@ import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_position_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/pages/game/model/widget/relationship_edit_widget.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
@@ -20,16 +21,26 @@ class LineComponent extends PositionComponent
 
   LineComponent({required this.nodeRelationship}) : super() {
     Node? src = nodeRelationship.src;
-    if (src == null && nodeRelationship.srcName != null) {
+    if (src == null) {
       ModelNode? srcNode =
-          modelProjectController.getModelNode(nodeRelationship.srcName!);
-      nodeRelationship.src = srcNode;
+          modelProjectController.getModelNode(nodeRelationship.srcId);
+      if (srcNode != null) {
+        nodeRelationship.src = srcNode;
+      } else {
+        logger
+            .e('nodeRelationship srcId:${nodeRelationship.srcId} has no node');
+      }
     }
     Node? dst = nodeRelationship.dst;
-    if (dst == null && nodeRelationship.dstName != null) {
+    if (dst == null) {
       ModelNode? dstNode =
-          modelProjectController.getModelNode(nodeRelationship.dstName!);
-      nodeRelationship.dst = dstNode;
+          modelProjectController.getModelNode(nodeRelationship.dstId);
+      if (dstNode != null) {
+        nodeRelationship.dst = dstNode;
+      } else {
+        logger
+            .e('nodeRelationship dstId:${nodeRelationship.dstId} has no node');
+      }
     }
   }
 

@@ -16,6 +16,11 @@ class ModelNodeEditWidget extends StatelessWidget {
 
   final List<PlatformDataField> modelNodeDataFields = [
     PlatformDataField(
+        name: 'id',
+        label: 'Id',
+        inputType: InputType.label,
+        prefixIcon: Icon(Icons.numbers_outlined, color: myself.primary)),
+    PlatformDataField(
         name: 'name',
         label: 'Name',
         prefixIcon: Icon(Icons.person, color: myself.primary)),

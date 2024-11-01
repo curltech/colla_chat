@@ -15,7 +15,17 @@ class RelationshipEditWidget extends StatelessWidget {
 
   RelationshipEditWidget({super.key, required this.nodeRelationship});
 
-  final List<PlatformDataField> methodDataFields = [
+  final List<PlatformDataField> relationshipDataFields = [
+    PlatformDataField(
+        name: 'srcId',
+        label: 'SrcId',
+        inputType: InputType.label,
+        prefixIcon: Icon(Icons.numbers_outlined, color: myself.primary)),
+    PlatformDataField(
+        name: 'dstId',
+        label: 'DstId',
+        inputType: InputType.label,
+        prefixIcon: Icon(Icons.numbers_outlined, color: myself.primary)),
     PlatformDataField(
         name: 'relationshipType',
         label: 'RelationshipType',
@@ -31,7 +41,7 @@ class RelationshipEditWidget extends StatelessWidget {
   ];
 
   late final FormInputController formInputController =
-      FormInputController(methodDataFields);
+      FormInputController(relationshipDataFields);
 
   //ModelNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
@@ -44,7 +54,7 @@ class RelationshipEditWidget extends StatelessWidget {
           if (nodeRelationship != null) {
             DialogUtil.info(
                 content:
-                    'NodeRelationship ${nodeRelationship.srcName} is built');
+                    'NodeRelationship ${nodeRelationship.srcId}-${nodeRelationship.dstId} is built');
           }
         });
       },

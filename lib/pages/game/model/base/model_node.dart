@@ -1,12 +1,18 @@
 import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
+
+enum Scope { private, protected, public }
 
 class Attribute {
-  String? name;
-  String? scope;
-  String? dataType;
+  String name;
+  late String scope;
+  late String dataType;
 
-  Attribute();
+  Attribute(this.name, {String? dataType, String? scope}) {
+    this.scope = scope ?? Scope.public.name;
+    this.dataType = dataType ?? DataType.string.name;
+  }
 
   Attribute.fromJson(Map json)
       : name = json['name'],
@@ -23,11 +29,14 @@ class Attribute {
 }
 
 class Method {
-  String? name;
-  String? scope;
-  String? returnType;
+  String name;
+  late String scope;
+  late String returnType;
 
-  Method();
+  Method(this.name, {String? returnType, String? scope}) {
+    this.scope = scope ?? Scope.public.name;
+    this.returnType = returnType ?? DataType.string.name;
+  }
 
   Method.fromJson(Map json)
       : name = json['name'],
@@ -45,14 +54,20 @@ class Method {
 
 /// 模型节点
 class ModelNode extends Node {
+  late String packageName;
+  late bool isAbstract;
+
   List<Attribute> attributes = [];
   List<Method> methods = [];
 
   ModelNode(
-      {required String name, bool isAbstract = false, String packageName = ''})
-      : super(name, isAbstract: isAbstract, packageName: packageName);
+      {required String name, this.isAbstract = false, this.packageName = ''})
+      : super(name);
 
   ModelNode.fromJson(Map json) : super.fromJson(json) {
+    packageName = json['packageName'] ?? '';
+    isAbstract =
+        json['isAbstract'] == true || json['isAbstract'] == 1 ? true : false;
     attributes = [];
     List<dynamic>? ss = json['attributes'];
     if (ss != null && ss.isNotEmpty) {
@@ -74,7 +89,10 @@ class ModelNode extends Node {
   @override
   Map<String, dynamic> toJson() {
     var json = super.toJson();
+
     json.addAll({
+      'packageName': packageName,
+      'isAbstract': isAbstract,
       'attributes': JsonUtil.toJson(attributes),
       'methods': JsonUtil.toJson(methods)
     });

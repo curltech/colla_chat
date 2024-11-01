@@ -93,8 +93,7 @@ class AttributeAreaComponent extends RectangleComponent
 
   @override
   Future<void> onDoubleTapDown(DoubleTapDownEvent event) async {
-    Attribute attribute = Attribute();
-    attribute.name = 'unknown';
+    Attribute attribute = Attribute('unknown');
     attributes.add(attribute);
     Vector2 position =
         Vector2(0, (attributes.length-1) * AttributeTextComponent.contentHeight);

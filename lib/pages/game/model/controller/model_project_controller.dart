@@ -20,10 +20,10 @@ class ModelProjectController {
     return null;
   }
 
-  ModelNode? getModelNode(String name) {
+  ModelNode? getModelNode(String id) {
     if (project.value != null) {
       for (Subject subject in project.value!.subjects.values) {
-        return subject.modelNodes[name];
+        return subject.modelNodes[id];
       }
     }
 

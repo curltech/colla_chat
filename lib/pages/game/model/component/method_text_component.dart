@@ -91,8 +91,7 @@ class MethodAreaComponent extends RectangleComponent
 
   @override
   Future<void> onDoubleTapDown(DoubleTapDownEvent event) async {
-    Method method = Method();
-    methods.add(method);
+    Method method = Method('unknown');
     Vector2 position =
         Vector2(0, methods.length * MethodTextComponent.contentHeight);
     add(MethodTextComponent(method, position: position));
