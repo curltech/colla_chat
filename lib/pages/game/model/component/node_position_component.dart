@@ -154,10 +154,8 @@ class NodePositionComponent extends RectangleComponent
       modelProjectController.selected.value = modelNode;
     } else {
       if (modelProjectController.addRelationshipStatus.value) {
-        NodeRelationship nodeRelationship = NodeRelationship(
-            modelProjectController.selected.value,
-            modelNode,
-            RelationshipType.association.name);
+        NodeRelationship nodeRelationship =
+            NodeRelationship(modelProjectController.selected.value, modelNode);
         modelProjectController.getCurrentSubject()!.add(nodeRelationship);
         NodeRelationshipComponent nodeRelationshipComponent =
             NodeRelationshipComponent(nodeRelationship: nodeRelationship);

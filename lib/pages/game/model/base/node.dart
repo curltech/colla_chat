@@ -67,16 +67,21 @@ class NodeRelationship {
   /// dst node的id
   late String dstId;
 
-  String? relationshipType;
-  int? srcCardinality;
-  int? dstCardinality;
+  late String relationshipType;
+  late int srcCardinality;
+  late int dstCardinality;
 
   Node? src;
   Node? dst;
 
-  NodeRelationship(this.src, this.dst, this.relationshipType) {
+  NodeRelationship(this.src, this.dst,
+      {String? relationshipType, int? srcCardinality, int? dstCardinality}) {
     srcId = src!.id;
     dstId = dst!.id;
+    this.relationshipType =
+        relationshipType ?? RelationshipType.association.name;
+    this.srcCardinality = srcCardinality ?? 1;
+    this.dstCardinality = dstCardinality ?? 1;
   }
 
   NodeRelationshipComponent? nodeRelationshipComponent;
@@ -84,9 +89,10 @@ class NodeRelationship {
   NodeRelationship.fromJson(Map json)
       : srcId = json['srcId'],
         dstId = json['dstId'],
-        relationshipType = json['relationshipType'],
-        srcCardinality = json['srcCardinality'],
-        dstCardinality = json['dstCardinality'];
+        relationshipType =
+            json['relationshipType'] ?? RelationshipType.association.name,
+        srcCardinality = json['srcCardinality'] ?? 1,
+        dstCardinality = json['dstCardinality'] ?? 1;
 
   Map<String, dynamic> toJson() {
     return {

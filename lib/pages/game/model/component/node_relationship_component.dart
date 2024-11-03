@@ -9,15 +9,26 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 
 /// [NodeRelationshipComponent] 在src节点和dst关系节点之间画关系的连线
 class NodeRelationshipComponent extends PositionComponent
-    with TapCallbacks, HasGameRef<ModelFlameGame> {
+    with TapCallbacks, HoverCallbacks, HasGameRef<ModelFlameGame> {
   final strokePaint = Paint()
     ..color = Colors.black
     ..style = PaintingStyle.stroke
     ..strokeWidth = 1.0;
+  final selectedStrokePaint = Paint()
+    ..color = Colors.yellow
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 1.0;
+  final TextPaint normal = TextPaint(
+    style: TextStyle(
+      color: BasicPalette.black.color,
+      fontSize: 10.0,
+    ),
+  );
 
   NodeRelationshipComponent({required this.nodeRelationship}) : super() {
     Node? src = nodeRelationship.src;
@@ -93,7 +104,11 @@ class NodeRelationshipComponent extends PositionComponent
         dstNodePositionComponent.modelNode) {
       selfLine(path, srcBottomCenter, srcRightCenter);
       rightCenterArrow(path, srcRightCenter);
-      canvas.drawPath(path, strokePaint);
+      if (isHovered) {
+        canvas.drawPath(path, selectedStrokePaint);
+      } else {
+        canvas.drawPath(path, strokePaint);
+      }
 
       return;
     }
@@ -167,7 +182,11 @@ class NodeRelationshipComponent extends PositionComponent
         }
       }
     }
-    canvas.drawPath(path, strokePaint);
+    if (isHovered) {
+      canvas.drawPath(path, selectedStrokePaint);
+    } else {
+      canvas.drawPath(path, strokePaint);
+    }
   }
 
   void leftBottomLine(
@@ -175,6 +194,15 @@ class NodeRelationshipComponent extends PositionComponent
     path.moveTo(srcLeftCenter.x, srcLeftCenter.y);
     path.lineTo(dstBottomCenter.x, srcLeftCenter.y);
     path.lineTo(dstBottomCenter.x, dstBottomCenter.y);
+  }
+
+  void leftBottomCardinality(Vector2 srcLeftCenter, Vector2 dstBottomCenter) {
+    int srcCardinality = nodeRelationship.srcCardinality;
+    int dstCardinality = nodeRelationship.dstCardinality;
+    add(TextComponent(
+        text: '$srcCardinality:$dstCardinality',
+        textRenderer: normal,
+        position: Vector2(srcLeftCenter.x, srcLeftCenter.y)));
   }
 
   void leftRightLine(Path path, Vector2 srcLeftCenter, Vector2 dstRightCenter) {
@@ -186,6 +214,17 @@ class NodeRelationshipComponent extends PositionComponent
     path.lineTo(dstRightCenter.x, dstRightCenter.y);
   }
 
+  void leftRightCardinality(Vector2 srcLeftCenter, Vector2 dstRightCenter) {
+    int srcCardinality = nodeRelationship.srcCardinality;
+    int dstCardinality = nodeRelationship.dstCardinality;
+    add(TextComponent(
+        text: '$srcCardinality:$dstCardinality',
+        textRenderer: normal,
+        position: Vector2(
+            srcLeftCenter.x - (srcLeftCenter.x - dstRightCenter.x) / 2 - 24,
+            dstRightCenter.y)));
+  }
+
   void topBottomLine(Path path, Vector2 srcTopCenter, Vector2 dstBottomCenter) {
     path.moveTo(srcTopCenter.x, srcTopCenter.y);
     path.lineTo(srcTopCenter.x,
@@ -193,6 +232,16 @@ class NodeRelationshipComponent extends PositionComponent
     path.lineTo(dstBottomCenter.x,
         srcTopCenter.y - (srcTopCenter.y - dstBottomCenter.y) / 2);
     path.lineTo(dstBottomCenter.x, dstBottomCenter.y);
+  }
+
+  void topBottomCardinality(Vector2 srcTopCenter, Vector2 dstBottomCenter) {
+    int srcCardinality = nodeRelationship.srcCardinality;
+    int dstCardinality = nodeRelationship.dstCardinality;
+    add(TextComponent(
+        text: '$srcCardinality:$dstCardinality',
+        textRenderer: normal,
+        position: Vector2(srcTopCenter.x + 36,
+            srcTopCenter.y - (srcTopCenter.y - dstBottomCenter.y) / 2)));
   }
 
   void rightLeftLine(Path path, Vector2 srcRightCenter, Vector2 dstLeftCenter) {
@@ -204,6 +253,17 @@ class NodeRelationshipComponent extends PositionComponent
     path.lineTo(dstLeftCenter.x, dstLeftCenter.y);
   }
 
+  void rightLeftCardinality(Vector2 srcRightCenter, Vector2 dstLeftCenter) {
+    int srcCardinality = nodeRelationship.srcCardinality;
+    int dstCardinality = nodeRelationship.dstCardinality;
+    add(TextComponent(
+        text: '$srcCardinality:$dstCardinality',
+        textRenderer: normal,
+        position: Vector2(
+            srcRightCenter.x + (dstLeftCenter.x - srcRightCenter.x) / 2 - 36,
+            srcRightCenter.y - 16)));
+  }
+
   void bottomTopLine(Path path, Vector2 srcBottomCenter, Vector2 dstTopCenter) {
     path.moveTo(srcBottomCenter.x, srcBottomCenter.y);
     path.lineTo(srcBottomCenter.x,
@@ -211,6 +271,19 @@ class NodeRelationshipComponent extends PositionComponent
     path.lineTo(dstTopCenter.x,
         srcBottomCenter.y + (dstTopCenter.y - srcBottomCenter.y) / 2);
     path.lineTo(dstTopCenter.x, dstTopCenter.y);
+  }
+
+  void bottomTopCardinality(Vector2 srcBottomCenter, Vector2 dstTopCenter) {
+    int srcCardinality = nodeRelationship.srcCardinality;
+    int dstCardinality = nodeRelationship.dstCardinality;
+    add(TextComponent(
+        text: '$srcCardinality:$dstCardinality',
+        textRenderer: normal,
+        position: Vector2(
+            srcBottomCenter.x + 36,
+            srcBottomCenter.y +
+                (dstTopCenter.y - srcBottomCenter.y) / 2 -
+                16)));
   }
 
   void selfLine(Path path, Vector2 srcBottomCenter, Vector2 srcRightCenter) {
@@ -221,28 +294,38 @@ class NodeRelationshipComponent extends PositionComponent
     path.lineTo(srcRightCenter.x, srcRightCenter.y);
   }
 
+  void selfCardinality(Vector2 srcBottomCenter, Vector2 srcRightCenter) {
+    int srcCardinality = nodeRelationship.srcCardinality;
+    int dstCardinality = nodeRelationship.dstCardinality;
+    add(TextComponent(
+        text: '$srcCardinality:$dstCardinality',
+        textRenderer: normal,
+        position: Vector2(srcBottomCenter.x + Project.nodeWidth - 36,
+            srcBottomCenter.y + 16)));
+  }
+
   void bottomCenterArrow(Path path, Vector2 dstBottomCenter) {
-    path.lineTo(dstBottomCenter.x - 4, dstBottomCenter.y + 12);
+    path.lineTo(dstBottomCenter.x - 2, dstBottomCenter.y + 6);
     path.moveTo(dstBottomCenter.x, dstBottomCenter.y);
-    path.lineTo(dstBottomCenter.x + 4, dstBottomCenter.y + 12);
+    path.lineTo(dstBottomCenter.x + 2, dstBottomCenter.y + 6);
   }
 
   void leftCenterArrow(Path path, Vector2 dstLeftCenter) {
-    path.lineTo(dstLeftCenter.x - 12, dstLeftCenter.y - 4);
+    path.lineTo(dstLeftCenter.x - 6, dstLeftCenter.y - 2);
     path.moveTo(dstLeftCenter.x, dstLeftCenter.y);
-    path.lineTo(dstLeftCenter.x - 12, dstLeftCenter.y + 4);
+    path.lineTo(dstLeftCenter.x - 6, dstLeftCenter.y + 2);
   }
 
   void topCenterArrow(Path path, Vector2 dstTopCenter) {
-    path.lineTo(dstTopCenter.x - 4, dstTopCenter.y - 12);
+    path.lineTo(dstTopCenter.x - 2, dstTopCenter.y - 6);
     path.moveTo(dstTopCenter.x, dstTopCenter.y);
-    path.lineTo(dstTopCenter.x + 4, dstTopCenter.y - 12);
+    path.lineTo(dstTopCenter.x + 2, dstTopCenter.y - 6);
   }
 
   void rightCenterArrow(Path path, Vector2 dstRightCenter) {
-    path.lineTo(dstRightCenter.x + 12, dstRightCenter.y - 4);
+    path.lineTo(dstRightCenter.x + 6, dstRightCenter.y - 2);
     path.moveTo(dstRightCenter.x, dstRightCenter.y);
-    path.lineTo(dstRightCenter.x + 12, dstRightCenter.y + 4);
+    path.lineTo(dstRightCenter.x + 6, dstRightCenter.y + 2);
   }
 
   @override
