@@ -224,7 +224,7 @@ class GroupEditWidget extends StatelessWidget with TileDataMixin {
       var avatar = current.avatar;
       if (avatar != null && avatar.isNotEmpty) {
         var avatarImage = ImageUtil.buildImageWidget(
-            image: avatar,
+            imageContent: avatar,
             height: AppIconSize.mdSize,
             width: AppIconSize.mdSize,
             fit: BoxFit.contain);

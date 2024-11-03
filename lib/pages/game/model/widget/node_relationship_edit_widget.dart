@@ -10,10 +10,10 @@ import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-class RelationshipEditWidget extends StatelessWidget {
+class NodeRelationshipEditWidget extends StatelessWidget {
   final NodeRelationship nodeRelationship;
 
-  RelationshipEditWidget({super.key, required this.nodeRelationship});
+  NodeRelationshipEditWidget({super.key, required this.nodeRelationship});
 
   final List<PlatformDataField> relationshipDataFields = [
     PlatformDataField(
@@ -50,13 +50,9 @@ class RelationshipEditWidget extends StatelessWidget {
       height: appDataProvider.portraitSize.height * 0.5,
       spacing: 15.0,
       onOk: (Map<String, dynamic> values) {
-        _onOk(values).then((nodeRelationship) {
-          if (nodeRelationship != null) {
-            DialogUtil.info(
-                content:
-                    'NodeRelationship ${nodeRelationship.srcId}-${nodeRelationship.dstId} is built');
-          }
-        });
+        NodeRelationship? nodeRelationship = _onOk(values);
+
+        Navigator.pop(context, nodeRelationship);
       },
       controller: formInputController,
     );
@@ -67,7 +63,7 @@ class RelationshipEditWidget extends StatelessWidget {
     );
   }
 
-  Future<NodeRelationship?> _onOk(Map<String, dynamic> values) async {
+  NodeRelationship? _onOk(Map<String, dynamic> values) {
     NodeRelationship current = NodeRelationship.fromJson(values);
     if (StringUtil.isEmpty(current.relationshipType)) {
       DialogUtil.error(

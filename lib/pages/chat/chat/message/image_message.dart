@@ -34,7 +34,7 @@ class ImageMessage extends StatelessWidget {
       height = AppImageSize.lgSize;
       if (thumbnail != null) {
         imageWidget = ImageUtil.buildImageWidget(
-          image: thumbnail,
+          imageContent: thumbnail,
           width: width,
           height: height,
         );
@@ -43,7 +43,7 @@ class ImageMessage extends StatelessWidget {
       } else if (content != null) {
         String image = ImageUtil.base64Img(content!);
         imageWidget = ImageUtil.buildImageWidget(
-          image: image,
+          imageContent: image,
           width: width,
           height: height,
         );
@@ -55,7 +55,7 @@ class ImageMessage extends StatelessWidget {
     if (content != null) {
       String image = ImageUtil.base64Img(content!);
       imageWidget = ImageUtil.buildImageWidget(
-        image: image,
+        imageContent: image,
         width: width,
         height: height,
       );
@@ -67,7 +67,7 @@ class ImageMessage extends StatelessWidget {
         future: messageAttachmentService.getDecryptFilename(messageId, title),
         builder: (BuildContext context, String? filename) {
           return ImageUtil.buildImageWidget(
-            image: filename,
+            imageContent: filename,
             width: width,
             height: height,
           );

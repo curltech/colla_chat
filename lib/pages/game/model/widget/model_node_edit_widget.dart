@@ -46,11 +46,9 @@ class ModelNodeEditWidget extends StatelessWidget {
       height: appDataProvider.portraitSize.height * 0.5,
       spacing: 15.0,
       onOk: (Map<String, dynamic> values) {
-        _onOk(values).then((modelNode) {
-          if (modelNode != null) {
-            DialogUtil.info(content: 'ModelNode ${modelNode.name} is built');
-          }
-        });
+        ModelNode? modelNode = _onOk(values);
+
+        Navigator.pop(context, modelNode);
       },
       controller: formInputController,
     );
@@ -61,7 +59,7 @@ class ModelNodeEditWidget extends StatelessWidget {
     );
   }
 
-  Future<ModelNode?> _onOk(Map<String, dynamic> values) async {
+  ModelNode? _onOk(Map<String, dynamic> values) {
     ModelNode current = ModelNode.fromJson(values);
     if (StringUtil.isEmpty(current.name)) {
       DialogUtil.error(content: AppLocalizations.t('Must has modelNode name'));

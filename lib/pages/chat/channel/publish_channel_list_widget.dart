@@ -145,7 +145,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
     Widget? thumbnailWidget;
     if (thumbnail != null) {
       thumbnailWidget = ImageUtil.buildImageWidget(
-          image: thumbnail,
+          imageContent: thumbnail,
           height: AppImageSize.mdSize,
           width: AppImageSize.mdSize);
     }

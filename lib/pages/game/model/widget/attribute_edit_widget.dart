@@ -39,11 +39,9 @@ class AttributeEditWidget extends StatelessWidget {
       height: appDataProvider.portraitSize.height * 0.5,
       spacing: 15.0,
       onOk: (Map<String, dynamic> values) {
-        _onOk(values).then((attribute) {
-          if (attribute != null) {
-            DialogUtil.info(content: 'Attribute ${attribute.name} is built');
-          }
-        });
+        Attribute? attribute = _onOk(values);
+
+        Navigator.pop(context, attribute);
       },
       controller: formInputController,
     );
@@ -54,7 +52,7 @@ class AttributeEditWidget extends StatelessWidget {
     );
   }
 
-  Future<Attribute?> _onOk(Map<String, dynamic> values) async {
+  Attribute? _onOk(Map<String, dynamic> values) {
     Attribute current = Attribute.fromJson(values);
     if (StringUtil.isEmpty(current.name)) {
       DialogUtil.error(content: AppLocalizations.t('Must has attribute name'));

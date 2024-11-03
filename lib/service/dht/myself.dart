@@ -150,7 +150,7 @@ class MyselfService {
       String? avatar = myselfPeer.avatar;
       if (avatar != null) {
         var avatarImage = ImageUtil.buildImageWidget(
-            image: avatar,
+            imageContent: avatar,
             height: AppImageSize.mdSize,
             width: AppImageSize.mdSize,
             fit: BoxFit.contain);

@@ -80,7 +80,7 @@ class PeerClientService extends PeerEntityService<PeerClient> {
     }
     if (peerClient != null && peerClient.avatar != null) {
       var avatarImage = ImageUtil.buildImageWidget(
-          image: peerClient.avatar,
+          imageContent: peerClient.avatar,
           height: AppImageSize.mdSize,
           width: AppImageSize.mdSize,
           fit: BoxFit.contain);

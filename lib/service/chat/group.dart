@@ -57,7 +57,7 @@ class GroupService extends PeerPartyService<Group> {
     String? avatar = group.avatar;
     if (avatar != null) {
       var avatarImage = ImageUtil.buildImageWidget(
-          image: avatar,
+          imageContent: avatar,
           height: AppIconSize.lgSize,
           width: AppIconSize.lgSize,
           fit: BoxFit.contain);

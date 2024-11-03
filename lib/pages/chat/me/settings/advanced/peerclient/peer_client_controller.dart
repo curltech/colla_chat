@@ -16,7 +16,7 @@ class PeerClientController extends DataListController<PeerClient> {
       for (var peerClient in peerClients) {
         if (peerClient.avatar != null) {
           var avatarImage = ImageUtil.buildImageWidget(
-              image: peerClient.avatar,
+              imageContent: peerClient.avatar,
               height: AppImageSize.mdSize,
               width: AppImageSize.mdSize,
               fit: BoxFit.contain);

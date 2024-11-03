@@ -1,12 +1,14 @@
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/attribute_text_component.dart';
-import 'package:colla_chat/pages/game/model/component/line_component.dart';
+import 'package:colla_chat/pages/game/model/component/node_relationship_component.dart';
 import 'package:colla_chat/pages/game/model/component/method_text_component.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
+import 'package:colla_chat/pages/game/model/component/node_text_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/pages/game/model/widget/model_node_edit_widget.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -18,11 +20,7 @@ import 'package:flutter/material.dart';
 
 /// [NodePositionComponent] 保存节点的位置和大小，是flame引擎的位置组件，可以在画布上拖拽
 class NodePositionComponent extends RectangleComponent
-    with
-        DragCallbacks,
-        TapCallbacks,
-        DoubleTapCallbacks,
-        HasGameRef<ModelFlameGame> {
+    with DragCallbacks, TapCallbacks, HasGameRef<ModelFlameGame> {
   static final fillPaint = Paint()
     ..color = myself.primary
     ..style = PaintingStyle.fill;
@@ -41,7 +39,9 @@ class NodePositionComponent extends RectangleComponent
   final double padding;
   final double imageSize;
   final ModelNode modelNode;
-  late final TextBoxComponent nodeTextComponent;
+  late final TextBoxComponent nodeNameComponent;
+  late final AttributeAreaComponent attributeAreaComponent;
+  late final MethodAreaComponent methodAreaComponent;
 
   NodePositionComponent({
     required Vector2 position,
@@ -54,7 +54,7 @@ class NodePositionComponent extends RectangleComponent
     paint = fillPaint;
   }
 
-  TextBoxComponent _buildNodeTextComponent({
+  TextBoxComponent _buildNodeNameComponent({
     required String text,
     Vector2? scale,
     double? angle,
@@ -65,10 +65,6 @@ class NodePositionComponent extends RectangleComponent
       style: TextStyle(
         color: BasicPalette.black.color,
         fontSize: 14.0,
-        // shadows: const [
-        //   Shadow(color: Colors.red, offset: Offset(2, 2), blurRadius: 2),
-        //   Shadow(color: Colors.yellow, offset: Offset(4, 4), blurRadius: 4),
-        // ],
       ),
     );
     TextBoxConfig boxConfig = const TextBoxConfig();
@@ -88,36 +84,57 @@ class NodePositionComponent extends RectangleComponent
 
   @override
   Future<void> onLoad() async {
-    width = Project.nodeWidth;
-    if (modelNode.image != null) {
-      SpriteComponent spriteComponent =
-          SpriteComponent(sprite: Sprite(modelNode.image!));
-      add(spriteComponent);
+    if (modelNode.imageContent != null) {
+      NodeTextComponent nodeTextComponent = NodeTextComponent(modelNode);
+      add(nodeTextComponent);
     } else {
-      nodeTextComponent = _buildNodeTextComponent(
+      width = Project.nodeWidth;
+      nodeNameComponent = _buildNodeNameComponent(
         text: modelNode.name,
       );
-      add(nodeTextComponent);
-      int attributeLength =
-          modelNode.attributes.isNotEmpty ? modelNode.attributes.length : 1;
-      double attributeHeight =
-          attributeLength * AttributeTextComponent.contentHeight;
-      add(AttributeAreaComponent(
-          position: Vector2(0, headHeight), attributes: modelNode.attributes));
-      int methodLength =
-          modelNode.methods.isNotEmpty ? modelNode.methods.length : 1;
-      double methodHeight = methodLength * MethodTextComponent.contentHeight;
-      add(MethodAreaComponent(
-          position: Vector2(0, headHeight + attributeHeight),
-          methods: modelNode.methods));
+      add(nodeNameComponent);
+      attributeAreaComponent = AttributeAreaComponent(
+          position: Vector2(0, headHeight), attributes: modelNode.attributes);
+      add(attributeAreaComponent);
 
-      height = headHeight + attributeHeight + methodHeight;
+      methodAreaComponent = MethodAreaComponent(
+          position: Vector2(0, headHeight + calAttributeHeight()),
+          methods: modelNode.methods);
+      add(methodAreaComponent);
+
+      updateHeight();
     }
 
     strokeRect = Rect.fromLTWH(-1, -1, width + 2, height + 2);
     size.addListener(() {
       strokeRect = Rect.fromLTWH(-1, -1, width + 2, height + 2);
     });
+  }
+
+  double calAttributeHeight() {
+    double attributeHeight =
+        modelNode.attributes.length * AttributeTextComponent.contentHeight;
+    if (modelNode.attributes.isEmpty) {
+      attributeHeight = AttributeTextComponent.contentHeight;
+    }
+
+    return attributeHeight;
+  }
+
+  double calMethodHeight() {
+    double methodHeight =
+        modelNode.methods.length * MethodTextComponent.contentHeight;
+    if (modelNode.methods.isEmpty) {
+      methodHeight = MethodTextComponent.contentHeight;
+    }
+
+    return methodHeight;
+  }
+
+  updateHeight() {
+    height = headHeight + calAttributeHeight() + calMethodHeight();
+    methodAreaComponent.position =
+        Vector2(0, headHeight + calAttributeHeight());
   }
 
   @override
@@ -130,6 +147,7 @@ class NodePositionComponent extends RectangleComponent
     }
   }
 
+  /// 单击根据状态决定是否连线或者选择高亮
   @override
   Future<void> onTapDown(TapDownEvent event) async {
     if (modelProjectController.selected.value == null) {
@@ -141,11 +159,12 @@ class NodePositionComponent extends RectangleComponent
             modelNode,
             RelationshipType.association.name);
         modelProjectController.getCurrentSubject()!.add(nodeRelationship);
-        LineComponent lineComponent =
-            LineComponent(nodeRelationship: nodeRelationship);
+        NodeRelationshipComponent nodeRelationshipComponent =
+            NodeRelationshipComponent(nodeRelationship: nodeRelationship);
         if (nodeRelationship.src != null && nodeRelationship.dst != null) {
-          nodeRelationship.lineComponent = lineComponent;
-          game.add(lineComponent);
+          nodeRelationship.nodeRelationshipComponent =
+              nodeRelationshipComponent;
+          game.add(nodeRelationshipComponent);
         }
         modelProjectController.addRelationshipStatus.value = false;
 
@@ -156,14 +175,18 @@ class NodePositionComponent extends RectangleComponent
     }
   }
 
+  /// 长按弹出节点编辑窗口
   @override
-  Future<void> onDoubleTapDown(DoubleTapDownEvent event) async {
-    await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
+  Future<void> onLongTapDown(TapDownEvent event) async {
+    ModelNode? m =
+        await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
       return ModelNodeEditWidget(
         modelNode: modelNode,
       );
     });
-    nodeTextComponent.text = modelNode.name;
+    if (m != null) {
+      nodeNameComponent.text = modelNode.name;
+    }
   }
 
   @override

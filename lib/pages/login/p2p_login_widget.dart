@@ -247,7 +247,7 @@ class P2pLoginWidget extends StatelessWidget {
         height: appDataProvider.portraitSize.height * 0.1,
       ),
       ImageUtil.buildImageWidget(
-        image: 'assets/images/colla.png',
+        imageContent: 'assets/images/colla.png',
         height: AppImageSize.xlSize,
         width: AppImageSize.xlSize,
       ),

@@ -99,45 +99,46 @@ class ImageUtil {
     ByteData byteData = ByteData.view(buffer);
   }
 
-  static Widget buildImageWidget(
-      {String? image,
-      double? width,
-      double? height,
-      BoxFit? fit = BoxFit.contain,
-      bool isRadius = false,
-      double radius = 8.0}) {
-    Widget imageWidget = Image.asset(
+  static Image buildImage({
+    String? imageContent,
+    double? width,
+    double? height,
+    BoxFit? fit = BoxFit.contain,
+  }) {
+    Image image = Image.asset(
       key: UniqueKey(),
       AppImageFile.mdAppIconFile,
       width: width,
       height: height,
       fit: fit,
     );
-    if (image == null) {
-    } else if (ImageUtil.isBase64Img(image)) {
-      Uint8List bytes = ImageUtil.decodeBase64Img(image);
-      imageWidget = Image.memory(bytes, width: width, height: height, fit: fit);
-    } else if (ImageUtil.isAssetsImg(image)) {
-      imageWidget = Image.asset(
-        image,
+    if (imageContent == null) {
+      return image;
+    }
+    if (ImageUtil.isBase64Img(imageContent)) {
+      Uint8List bytes = ImageUtil.decodeBase64Img(imageContent);
+      image = Image.memory(bytes, width: width, height: height, fit: fit);
+    } else if (ImageUtil.isAssetsImg(imageContent)) {
+      image = Image.asset(
+        imageContent,
         key: UniqueKey(),
         width: width,
         height: height,
         fit: fit,
       );
-    } else if (ImageUtil.isNetWorkImg(image)) {
-      imageWidget = Image.network(
-        image,
+    } else if (ImageUtil.isNetWorkImg(imageContent)) {
+      image = Image.network(
+        imageContent,
         key: UniqueKey(),
         width: width,
         height: height,
         fit: fit,
       );
     } else {
-      File file = File(image);
+      File file = File(imageContent);
       bool exist = file.existsSync();
       if (exist) {
-        imageWidget = Image.file(
+        image = Image.file(
           file,
           key: UniqueKey(),
           width: width,
@@ -146,6 +147,18 @@ class ImageUtil {
         );
       }
     }
+    return image;
+  }
+
+  static Widget buildImageWidget(
+      {String? imageContent,
+      double? width,
+      double? height,
+      BoxFit? fit = BoxFit.contain,
+      bool isRadius = false,
+      double radius = 8.0}) {
+    Widget imageWidget = buildImage(
+        imageContent: imageContent, width: width, height: height, fit: fit);
     if (isRadius) {
       imageWidget = ClipRRect(
         borderRadius: BorderRadius.all(

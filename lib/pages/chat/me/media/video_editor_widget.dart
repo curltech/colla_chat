@@ -159,7 +159,7 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
                 margin: EdgeInsets.zero,
                 shape: const ContinuousRectangleBorder(),
                 child: ImageUtil.buildImageWidget(
-                    image: imageFile, height: 80, fit: BoxFit.contain))),
+                    imageContent: imageFile, height: 80, fit: BoxFit.contain))),
         onTap: () {
           imageFileController.current = imageFile;
         },

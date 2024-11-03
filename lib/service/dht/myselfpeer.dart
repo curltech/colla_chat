@@ -65,7 +65,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
         String? data = myselfPeer.avatar;
         if (data != null) {
           var avatarImage = ImageUtil.buildImageWidget(
-              image: data,
+              imageContent: data,
               height: AppIconSize.lgSize,
               width: AppIconSize.lgSize,
               fit: BoxFit.contain);
@@ -446,7 +446,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       final myselfPeer = myself.myselfPeer;
       myselfPeer.avatar = data;
       var avatarImage = ImageUtil.buildImageWidget(
-          image: data,
+          imageContent: data,
           height: AppIconSize.lgSize,
           width: AppIconSize.lgSize,
           fit: BoxFit.contain);

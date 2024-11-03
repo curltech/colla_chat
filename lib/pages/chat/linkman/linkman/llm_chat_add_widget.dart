@@ -31,7 +31,7 @@ class LlmChatAddWidget extends StatelessWidget with TileDataMixin {
 
   @override
   dynamic get iconData => ImageUtil.buildImageWidget(
-      image: 'assets/images/ollama.png',
+      imageContent: 'assets/images/ollama.png',
       width: AppIconSize.smSize,
       height: AppIconSize.smSize);
 

@@ -135,7 +135,7 @@ class AppIcon {
 class AppImage {
   ///16大小的app缺省图像
   static final minAppImage = ImageUtil.buildImageWidget(
-    image: AppImageFile.xsAppIconFile,
+    imageContent: AppImageFile.xsAppIconFile,
     width: AppImageSize.minSize,
     height: AppImageSize.minSize,
     fit: BoxFit.contain,
@@ -143,7 +143,7 @@ class AppImage {
 
   ///24大小的app缺省图像
   static final xsAppImage = ImageUtil.buildImageWidget(
-    image: AppImageFile.mdAppIconFile,
+    imageContent: AppImageFile.mdAppIconFile,
     width: AppImageSize.xsSize,
     height: AppImageSize.xsSize,
     fit: BoxFit.contain,
@@ -151,7 +151,7 @@ class AppImage {
 
   ///32大小的app缺省图像
   static final smAppImage = ImageUtil.buildImageWidget(
-    image: AppImageFile.mdAppIconFile,
+    imageContent: AppImageFile.mdAppIconFile,
     width: AppImageSize.smSize,
     height: AppImageSize.smSize,
     fit: BoxFit.contain,
@@ -159,7 +159,7 @@ class AppImage {
 
   ///40大小的app缺省图像
   static final mdAppImage = ImageUtil.buildImageWidget(
-    image: AppImageFile.mdAppIconFile,
+    imageContent: AppImageFile.mdAppIconFile,
     width: AppImageSize.mdSize,
     height: AppImageSize.mdSize,
     fit: BoxFit.contain,
@@ -167,7 +167,7 @@ class AppImage {
 
   ///64大小的app缺省图像
   static final lgAppImage = ImageUtil.buildImageWidget(
-    image: AppImageFile.mdAppIconFile,
+    imageContent: AppImageFile.mdAppIconFile,
     width: AppImageSize.lgSize,
     height: AppImageSize.lgSize,
     fit: BoxFit.contain,

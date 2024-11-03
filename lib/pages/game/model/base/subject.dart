@@ -53,7 +53,7 @@ class Subject {
     if (ss != null && ss.isNotEmpty) {
       for (var s in ss) {
         ModelNode modelNode = ModelNode.fromJson(s);
-        modelNodes['${modelNode.packageName}.${modelNode.name}'] = modelNode;
+        modelNodes[modelNode.id] = modelNode;
       }
     }
     relationships = {};

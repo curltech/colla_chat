@@ -39,11 +39,9 @@ class MethodEditWidget extends StatelessWidget {
       height: appDataProvider.portraitSize.height * 0.5,
       spacing: 15.0,
       onOk: (Map<String, dynamic> values) {
-        _onOk(values).then((method) {
-          if (method != null) {
-            DialogUtil.info(content: 'Method ${method.name} is built');
-          }
-        });
+        Method? method = _onOk(values);
+
+        Navigator.pop(context, method);
       },
       controller: formInputController,
     );
@@ -54,7 +52,7 @@ class MethodEditWidget extends StatelessWidget {
     );
   }
 
-  Future<Method?> _onOk(Map<String, dynamic> values) async {
+  Method? _onOk(Map<String, dynamic> values) {
     Method current = Method.fromJson(values);
     if (StringUtil.isEmpty(current.name)) {
       DialogUtil.error(content: AppLocalizations.t('Must has method name'));

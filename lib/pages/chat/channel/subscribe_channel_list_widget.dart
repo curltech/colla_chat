@@ -239,7 +239,7 @@ class ChannelChatMessageItem extends StatelessWidget {
     String? thumbnail = chatMessage.thumbnail;
     Widget? thumbnailWidget;
     if (thumbnail != null) {
-      thumbnailWidget = ImageUtil.buildImageWidget(image: thumbnail);
+      thumbnailWidget = ImageUtil.buildImageWidget(imageContent: thumbnail);
     }
 
     var sendTime = chatMessage.sendTime;

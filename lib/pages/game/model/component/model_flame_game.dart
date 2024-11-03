@@ -3,14 +3,13 @@ import 'dart:ui';
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/base/subject.dart';
-import 'package:colla_chat/pages/game/model/component/line_component.dart';
 import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/component/node_position_component.dart';
+import 'package:colla_chat/pages/game/model/component/node_relationship_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:flame/experimental.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flutter/material.dart';
@@ -88,13 +87,13 @@ class ModelFlameGame extends FlameGame
   /// 渲染线
   void _renderRelationship(Project project, Subject subject) {
     for (NodeRelationship nodeRelationship in subject.relationships.values) {
-      LineComponent lineComponent =
-          LineComponent(nodeRelationship: nodeRelationship);
+      NodeRelationshipComponent nodeRelationshipComponent =
+          NodeRelationshipComponent(nodeRelationship: nodeRelationship);
       if (nodeRelationship.src == null || nodeRelationship.dst == null) {
         return;
       }
-      nodeRelationship.lineComponent = lineComponent;
-      add(lineComponent);
+      nodeRelationship.nodeRelationshipComponent = nodeRelationshipComponent;
+      add(nodeRelationshipComponent);
     }
   }
 
@@ -153,8 +152,7 @@ class ModelFlameGame extends FlameGame
         ModelNode modelNode = ModelNode(name: nodeName);
         modelNode.x = localPosition.x;
         modelNode.y = localPosition.y;
-        subject.modelNodes['${modelNode.packageName}.${modelNode.name}'] =
-            modelNode;
+        subject.modelNodes[modelNode.id] = modelNode;
         NodePositionComponent nodePositionComponent = NodePositionComponent(
           position: Vector2(modelNode.x!, modelNode.y!),
           padding: Project.nodePadding,

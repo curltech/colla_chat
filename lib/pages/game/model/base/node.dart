@@ -1,7 +1,7 @@
 import 'dart:ui' as ui;
 
-import 'package:colla_chat/pages/game/model/component/line_component.dart';
 import 'package:colla_chat/pages/game/model/component/node_position_component.dart';
+import 'package:colla_chat/pages/game/model/component/node_relationship_component.dart';
 import 'package:flutter/material.dart';
 
 abstract class Node {
@@ -79,7 +79,7 @@ class NodeRelationship {
     dstId = dst!.id;
   }
 
-  LineComponent? lineComponent;
+  NodeRelationshipComponent? nodeRelationshipComponent;
 
   NodeRelationship.fromJson(Map json)
       : srcId = json['srcId'],

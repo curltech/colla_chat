@@ -90,7 +90,7 @@ class TileData {
         leading = prefix;
       } else if (prefix is String) {
         leading = ImageUtil.buildImageWidget(
-          image: prefix,
+          imageContent: prefix,
           fit: BoxFit.contain,
         );
       } else if (prefix is IconData) {

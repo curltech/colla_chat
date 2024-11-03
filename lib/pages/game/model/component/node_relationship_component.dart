@@ -4,22 +4,22 @@ import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_position_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
-import 'package:colla_chat/pages/game/model/widget/relationship_edit_widget.dart';
+import 'package:colla_chat/pages/game/model/widget/node_relationship_edit_widget.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 
-/// [LineComponent] 在src节点和dst关系节点之间画关系的连线
-class LineComponent extends PositionComponent
-    with TapCallbacks, DoubleTapCallbacks, HasGameRef<ModelFlameGame> {
-  static final strokePaint = Paint()
+/// [NodeRelationshipComponent] 在src节点和dst关系节点之间画关系的连线
+class NodeRelationshipComponent extends PositionComponent
+    with TapCallbacks, HasGameRef<ModelFlameGame> {
+  final strokePaint = Paint()
     ..color = Colors.black
     ..style = PaintingStyle.stroke
     ..strokeWidth = 1.0;
 
-  LineComponent({required this.nodeRelationship}) : super() {
+  NodeRelationshipComponent({required this.nodeRelationship}) : super() {
     Node? src = nodeRelationship.src;
     if (src == null) {
       ModelNode? srcNode =
@@ -82,11 +82,11 @@ class LineComponent extends PositionComponent
     double dstY = dstNodePositionComponent.position.y;
     double dstHeight = dstNodePositionComponent.size.y;
     Vector2 dstTopCenter = Vector2(dstX + Project.nodeWidth / 2, dstY);
-    Vector2 dstLeftCenter = Vector2(dstX, dstY + srcHeight / 2);
+    Vector2 dstLeftCenter = Vector2(dstX, dstY + dstHeight / 2);
     Vector2 dstRightCenter =
-        Vector2(dstX + Project.nodeWidth, dstY + srcHeight / 2);
+        Vector2(dstX + Project.nodeWidth, dstY + dstHeight / 2);
     Vector2 dstBottomCenter =
-        Vector2(dstX + Project.nodeWidth / 2, dstY + srcHeight);
+        Vector2(dstX + Project.nodeWidth / 2, dstY + dstHeight);
 
     Path path = Path();
     if (srcNodePositionComponent.modelNode ==
@@ -246,11 +246,13 @@ class LineComponent extends PositionComponent
   }
 
   @override
-  Future<void> onDoubleTapDown(DoubleTapDownEvent event) async {
-    await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
-      return RelationshipEditWidget(
+  Future<void> onTapDown(TapDownEvent event) async {
+    NodeRelationship? m =
+        await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
+      return NodeRelationshipEditWidget(
         nodeRelationship: nodeRelationship,
       );
     });
+    if (m != null) {}
   }
 }

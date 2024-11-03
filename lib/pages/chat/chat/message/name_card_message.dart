@@ -36,7 +36,7 @@ class NameCardMessage extends StatelessWidget {
       var peerId = linkman.peerId;
       String? avatar = linkman.avatar;
       Widget prefix = ImageUtil.buildImageWidget(
-          image: avatar, isRadius: true, radius: 2.0);
+          imageContent: avatar, isRadius: true, radius: 2.0);
       linkmanInfoTileData.add(TileData(
         prefix: prefix,
         title: name,
@@ -64,7 +64,7 @@ class NameCardMessage extends StatelessWidget {
       String? avatar = group.avatar;
       if (avatar != null) {
         prefix = ImageUtil.buildImageWidget(
-            image: avatar, isRadius: true, radius: 2.0);
+            imageContent: avatar, isRadius: true, radius: 2.0);
       } else {
         prefix = Icon(
           Icons.group_outlined,

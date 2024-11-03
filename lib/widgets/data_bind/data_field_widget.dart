@@ -348,7 +348,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     if (icon == null) {
       final avatar = widget.controller.dataField.avatar;
       if (avatar != null) {
-        icon = ImageUtil.buildImageWidget(image: avatar);
+        icon = ImageUtil.buildImageWidget(imageContent: avatar);
       }
     }
 

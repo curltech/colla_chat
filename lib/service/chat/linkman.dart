@@ -68,7 +68,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
     String? avatar = linkman.avatar;
     if (avatar != null) {
       var avatarImage = ImageUtil.buildImageWidget(
-          image: avatar,
+          imageContent: avatar,
           height: AppImageSize.mdSize,
           width: AppImageSize.mdSize,
           fit: BoxFit.contain);
@@ -83,7 +83,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
     if (linkman.avatarImage == null &&
         linkman.linkmanStatus == LinkmanStatus.G.name) {
       linkman.avatarImage = ImageUtil.buildImageWidget(
-          image: 'assets/images/ollama.png',
+          imageContent: 'assets/images/ollama.png',
           width: AppIconSize.lgSize,
           height: AppIconSize.lgSize);
     }

@@ -68,7 +68,7 @@ class _VideoMessageState extends State<VideoMessage> {
           ));
       if (widget.thumbnail != null) {
         prefix = ImageUtil.buildImageWidget(
-          image: widget.thumbnail,
+          imageContent: widget.thumbnail,
         );
       }
       var tileData = TileData(

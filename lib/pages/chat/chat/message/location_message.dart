@@ -43,7 +43,7 @@ class LocationMessage extends StatelessWidget {
       },
     );
     if (thumbnail != null) {
-      headingWidget = ImageUtil.buildImageWidget(image: thumbnail);
+      headingWidget = ImageUtil.buildImageWidget(imageContent: thumbnail);
     }
     Widget child;
     if (!fullScreen) {

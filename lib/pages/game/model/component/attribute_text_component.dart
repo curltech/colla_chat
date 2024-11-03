@@ -7,7 +7,9 @@ import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_position_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/pages/game/model/widget/attribute_edit_widget.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/extensions.dart';
@@ -17,23 +19,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 
 class AttributeTextComponent extends TextComponent
-    with TapCallbacks, DoubleTapCallbacks, HasGameRef<ModelFlameGame> {
+    with TapCallbacks, HasGameRef<ModelFlameGame> {
   static final TextPaint normal = TextPaint(
     style: TextStyle(
       color: BasicPalette.black.color,
       fontSize: 12.0,
-      // shadows: const [
-      //   Shadow(color: Colors.red, offset: Offset(2, 2), blurRadius: 2),
-      //   Shadow(color: Colors.yellow, offset: Offset(4, 4), blurRadius: 4),
-      // ],
     ),
   );
 
-  static const double contentHeight = 30;
+  static const double contentHeight = 20;
+
+  Attribute attribute;
 
   /// String text = '${attribute.scope} ${attribute.dataType}:${attribute.name}';
   AttributeTextComponent(
-    Attribute attribute, {
+    this.attribute, {
     super.position,
     super.scale,
     super.angle,
@@ -47,14 +47,85 @@ class AttributeTextComponent extends TextComponent
     size = Vector2(Project.nodeWidth, contentHeight);
   }
 
+  _onAction(int index, String name, {String? value}) async {
+    switch (name) {
+      case 'Add':
+        _onAdd();
+        break;
+      case 'Delete':
+        _onDelete();
+        break;
+      case 'Update':
+        _onUpdate();
+        break;
+      default:
+        break;
+    }
+  }
+
+  /// 单击询问是否删除属性
   @override
   Future<void> onTapDown(TapDownEvent event) async {
-    DialogUtil.info(content: 'AttributeTextComponent onTapDown');
+    List<ActionData> actionData = [
+      ActionData(
+          label: 'Add', tooltip: 'Add attribute', icon: const Icon(Icons.add)),
+      ActionData(
+          label: 'Delete',
+          tooltip: 'Delete attribute',
+          icon: const Icon(Icons.delete_outline)),
+      ActionData(
+          label: 'Update',
+          tooltip: 'Update attribute',
+          icon: const Icon(Icons.update)),
+    ];
+
+    await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
+      return DataActionCard(
+        actions: actionData,
+        width: appDataProvider.secondaryBodyWidth,
+        height: 100,
+        onPressed: (int index, String label, {String? value}) {
+          Navigator.pop(context);
+          _onAction(index, label, value: value);
+        },
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        crossAxisCount: 3,
+      );
+    });
+  }
+
+  Future<void> _onAdd() async {
+    (parent as AttributeAreaComponent).onAdd();
+  }
+
+  Future<void> _onDelete() async {
+    bool? success = await DialogUtil.confirm(
+        content: 'Do you confirm to delete this attribute:${attribute.name}');
+    if (success != null && success) {
+      List<Attribute> attributes =
+          (parent as AttributeAreaComponent).attributes;
+      attributes.remove(attribute);
+      removeFromParent();
+      (parent as AttributeAreaComponent).updateHeight();
+    }
+  }
+
+  Future<void> _onUpdate() async {
+    Attribute? a =
+        await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
+      return AttributeEditWidget(
+        attribute: attribute,
+      );
+    });
+    if (a != null) {
+      text = '${attribute.scope} ${attribute.dataType}:${attribute.name}';
+    }
   }
 }
 
 class AttributeAreaComponent extends RectangleComponent
-    with TapCallbacks, DoubleTapCallbacks, HasGameRef<ModelFlameGame> {
+    with TapCallbacks, HasGameRef<ModelFlameGame> {
   final List<Attribute> attributes;
 
   AttributeAreaComponent({
@@ -68,14 +139,24 @@ class AttributeAreaComponent extends RectangleComponent
   @override
   Future<void> onLoad() async {
     width = Project.nodeWidth;
-    height = AttributeTextComponent.contentHeight;
+    updateHeight();
     if (attributes.isNotEmpty) {
-      height = AttributeTextComponent.contentHeight * attributes.length;
       for (int i = 0; i < attributes.length; ++i) {
         Attribute attribute = attributes[i];
         Vector2 position = Vector2(0, i * AttributeTextComponent.contentHeight);
         add(AttributeTextComponent(attribute, position: position));
       }
+    }
+    size.addListener(() {
+      (parent as NodePositionComponent).updateHeight();
+    });
+  }
+
+  updateHeight() {
+    if (attributes.isEmpty) {
+      height = AttributeTextComponent.contentHeight;
+    } else {
+      height = AttributeTextComponent.contentHeight * attributes.length;
     }
   }
 
@@ -88,20 +169,23 @@ class AttributeAreaComponent extends RectangleComponent
 
   @override
   Future<void> onTapDown(TapDownEvent event) async {
-    DialogUtil.info(content: 'AttributeAreaComponent onTapDown');
+    onAdd();
   }
 
-  @override
-  Future<void> onDoubleTapDown(DoubleTapDownEvent event) async {
-    Attribute attribute = Attribute('unknown');
-    attributes.add(attribute);
-    Vector2 position =
-        Vector2(0, (attributes.length-1) * AttributeTextComponent.contentHeight);
-    add(AttributeTextComponent(attribute, position: position));
-    await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
+  Future<void> onAdd() async {
+    Attribute attribute = Attribute('unknownAttribute');
+    Attribute? a =
+        await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
       return AttributeEditWidget(
         attribute: attribute,
       );
     });
+    if (a != null) {
+      attributes.add(attribute);
+      Vector2 position = Vector2(
+          0, (attributes.length - 1) * AttributeTextComponent.contentHeight);
+      add(AttributeTextComponent(attribute, position: position));
+      updateHeight();
+    }
   }
 }

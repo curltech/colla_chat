@@ -65,7 +65,7 @@ class EmailServiceProvider {
   }) {
     String name = domainName.substring(0, domainName.indexOf('.'));
     logo = ImageUtil.buildImageWidget(
-        image: 'assets/images/email/$name.png', height: 36);
+        imageContent: 'assets/images/email/$name.png', height: 36);
   }
 }
 

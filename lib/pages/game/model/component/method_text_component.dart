@@ -5,7 +5,9 @@ import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_position_component.dart';
 import 'package:colla_chat/pages/game/model/widget/method_edit_widget.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/extensions.dart';
@@ -20,18 +22,16 @@ class MethodTextComponent extends TextComponent
     style: TextStyle(
       color: BasicPalette.black.color,
       fontSize: 12.0,
-      // shadows: const [
-      //   Shadow(color: Colors.red, offset: Offset(2, 2), blurRadius: 2),
-      //   Shadow(color: Colors.yellow, offset: Offset(4, 4), blurRadius: 4),
-      // ],
     ),
   );
 
-  static const double contentHeight = 30;
+  static const double contentHeight = 20;
+
+  Method method;
 
   /// String text = '${method.scope} ${method.returnType}:${method.name}';
   MethodTextComponent(
-    Method method, {
+    this.method, {
     super.position,
     super.scale,
     super.angle,
@@ -45,9 +45,78 @@ class MethodTextComponent extends TextComponent
     size = Vector2(Project.nodeWidth, contentHeight);
   }
 
+  _onAction(int index, String name, {String? value}) async {
+    switch (name) {
+      case 'Add':
+        _onAdd();
+        break;
+      case 'Delete':
+        _onDelete();
+        break;
+      case 'Update':
+        _onUpdate();
+        break;
+      default:
+        break;
+    }
+  }
+
   @override
   Future<void> onTapDown(TapDownEvent event) async {
-    DialogUtil.info(content: 'MethodTextComponent onTapDown');
+    List<ActionData> actionData = [
+      ActionData(
+          label: 'Add', tooltip: 'Add method', icon: const Icon(Icons.add)),
+      ActionData(
+          label: 'Delete',
+          tooltip: 'Delete method',
+          icon: const Icon(Icons.delete_outline)),
+      ActionData(
+          label: 'Update',
+          tooltip: 'Update method',
+          icon: const Icon(Icons.update)),
+    ];
+
+    await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
+      return DataActionCard(
+        actions: actionData,
+        width: appDataProvider.secondaryBodyWidth,
+        height: 100,
+        onPressed: (int index, String label, {String? value}) {
+          Navigator.pop(context);
+          _onAction(index, label, value: value);
+        },
+        mainAxisSpacing: 10,
+        crossAxisSpacing: 10,
+        crossAxisCount: 3,
+      );
+    });
+  }
+
+  Future<void> _onAdd() async {
+    (parent as MethodAreaComponent).onAdd();
+  }
+
+  Future<void> _onDelete() async {
+    bool? success = await DialogUtil.confirm(
+        content: 'Do you confirm to delete this method:${method.name}');
+    if (success != null && success) {
+      List<Method> methods = (parent as MethodAreaComponent).methods;
+      methods.remove(method);
+      removeFromParent();
+      (parent as MethodAreaComponent).updateHeight();
+    }
+  }
+
+  Future<void> _onUpdate() async {
+    Attribute? a =
+        await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
+      return MethodEditWidget(
+        method: method,
+      );
+    });
+    if (a != null) {
+      text = '${method.scope} ${method.returnType}:${method.name}';
+    }
   }
 }
 
@@ -66,14 +135,24 @@ class MethodAreaComponent extends RectangleComponent
   @override
   Future<void> onLoad() async {
     width = Project.nodeWidth;
-    height = MethodTextComponent.contentHeight;
+    updateHeight();
     if (methods.isNotEmpty) {
-      height = MethodTextComponent.contentHeight * methods.length;
       for (int i = 0; i < methods.length; ++i) {
         Method method = methods[i];
         Vector2 position = Vector2(0, i * MethodTextComponent.contentHeight);
         add(MethodTextComponent(method, position: position));
       }
+    }
+    size.addListener(() {
+      (parent as NodePositionComponent).updateHeight();
+    });
+  }
+
+  updateHeight() {
+    if (methods.isEmpty) {
+      height = MethodTextComponent.contentHeight;
+    } else {
+      height = MethodTextComponent.contentHeight * methods.length;
     }
   }
 
@@ -86,19 +165,25 @@ class MethodAreaComponent extends RectangleComponent
 
   @override
   Future<void> onTapDown(TapDownEvent event) async {
-    DialogUtil.info(content: 'MethodAreaComponent onTapDown');
+    onAdd();
   }
 
-  @override
-  Future<void> onDoubleTapDown(DoubleTapDownEvent event) async {
-    Method method = Method('unknown');
-    Vector2 position =
-        Vector2(0, methods.length * MethodTextComponent.contentHeight);
-    add(MethodTextComponent(method, position: position));
-    await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
+  Future<void> onAdd() async {
+    Method method = Method('unknownMethod');
+    Method? m =
+        await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
       return MethodEditWidget(
         method: method,
       );
     });
+    if (m != null) {
+      methods.add(method);
+      Vector2 position =
+          Vector2(0, methods.length * MethodTextComponent.contentHeight);
+      MethodTextComponent methodTextComponent =
+          MethodTextComponent(method, position: position);
+      add(methodTextComponent);
+      updateHeight();
+    }
   }
 }
