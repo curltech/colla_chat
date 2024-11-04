@@ -137,7 +137,8 @@ class ModelFlameGame extends FlameGame
       }
       modelProjectController.addSubjectStatus.value = false;
     }
-    if (modelProjectController.addNodeStatus.value) {
+    NodeType? addNodeStatus = modelProjectController.addNodeStatus.value;
+    if (addNodeStatus != null) {
       Subject? subject = modelProjectController.getCurrentSubject();
       if (subject == null) {
         return;
@@ -147,7 +148,8 @@ class ModelFlameGame extends FlameGame
           content: 'Please input new node name',
           tip: 'unknown');
       if (nodeName != null) {
-        ModelNode modelNode = ModelNode(name: nodeName);
+        ModelNode modelNode =
+            ModelNode(name: nodeName, nodeType: addNodeStatus.name);
         modelNode.x = localPosition.x;
         modelNode.y = localPosition.y;
         subject.modelNodes[modelNode.id] = modelNode;
@@ -158,7 +160,7 @@ class ModelFlameGame extends FlameGame
         modelNode.nodeFrameComponent = nodeFrameComponent;
         add(nodeFrameComponent);
       }
-      modelProjectController.addNodeStatus.value = false;
+      modelProjectController.addNodeStatus.value = null;
     }
   }
 }

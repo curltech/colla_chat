@@ -43,7 +43,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     }
     modelProjectController.addSubjectStatus.value =
         !modelProjectController.addSubjectStatus.value;
-    modelProjectController.addNodeStatus.value = false;
+    modelProjectController.addNodeStatus.value = null;
     modelProjectController.addRelationshipStatus.value = false;
     // String? subjectName = await DialogUtil.showTextFormField(
     //     title: 'Add subject',
@@ -106,25 +106,94 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         IconButton(
           onPressed: project != null
               ? () {
-                  modelProjectController.addNodeStatus.value =
-                      !modelProjectController.addNodeStatus.value;
+                  NodeType? addNodeStatus =
+                      modelProjectController.addNodeStatus.value;
+                  if (addNodeStatus == null) {
+                    modelProjectController.addNodeStatus.value = NodeType.type;
+                  } else {
+                    modelProjectController.addNodeStatus.value = null;
+                  }
                   modelProjectController.addRelationshipStatus.value = false;
                 }
               : null,
           icon: Icon(
             Icons.newspaper_outlined,
-            color: modelProjectController.addNodeStatus.value
+            color: modelProjectController.addNodeStatus.value != null
                 ? Colors.amber
                 : myself.primary,
           ),
-          tooltip: AppLocalizations.t('New node'),
+          tooltip: AppLocalizations.t('New type node'),
+        ),
+        IconButton(
+          onPressed: project != null
+              ? () {
+                  NodeType? addNodeStatus =
+                      modelProjectController.addNodeStatus.value;
+                  if (addNodeStatus == null) {
+                    modelProjectController.addNodeStatus.value = NodeType.image;
+                  } else {
+                    modelProjectController.addNodeStatus.value = null;
+                  }
+                  modelProjectController.addRelationshipStatus.value = false;
+                }
+              : null,
+          icon: Icon(
+            Icons.image_outlined,
+            color: modelProjectController.addNodeStatus.value != null
+                ? Colors.amber
+                : myself.primary,
+          ),
+          tooltip: AppLocalizations.t('New image node'),
+        ),
+        IconButton(
+          onPressed: project != null
+              ? () {
+                  NodeType? addNodeStatus =
+                      modelProjectController.addNodeStatus.value;
+                  if (addNodeStatus == null) {
+                    modelProjectController.addNodeStatus.value = NodeType.shape;
+                  } else {
+                    modelProjectController.addNodeStatus.value = null;
+                  }
+                  modelProjectController.addRelationshipStatus.value = false;
+                }
+              : null,
+          icon: Icon(
+            Icons.format_shapes_outlined,
+            color: modelProjectController.addNodeStatus.value != null
+                ? Colors.amber
+                : myself.primary,
+          ),
+          tooltip: AppLocalizations.t('New shape node'),
+        ),
+        IconButton(
+          onPressed: project != null
+              ? () {
+                  NodeType? addNodeStatus =
+                      modelProjectController.addNodeStatus.value;
+                  if (addNodeStatus == null) {
+                    modelProjectController.addNodeStatus.value =
+                        NodeType.remark;
+                  } else {
+                    modelProjectController.addNodeStatus.value = null;
+                  }
+                  modelProjectController.addRelationshipStatus.value = false;
+                }
+              : null,
+          icon: Icon(
+            Icons.comment,
+            color: modelProjectController.addNodeStatus.value != null
+                ? Colors.amber
+                : myself.primary,
+          ),
+          tooltip: AppLocalizations.t('New remark node'),
         ),
         IconButton(
           onPressed: project != null
               ? () {
                   modelProjectController.addRelationshipStatus.value =
                       !modelProjectController.addRelationshipStatus.value;
-                  modelProjectController.addNodeStatus.value = false;
+                  modelProjectController.addNodeStatus.value = null;
                 }
               : null,
           icon: Icon(
