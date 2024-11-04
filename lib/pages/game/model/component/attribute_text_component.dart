@@ -12,15 +12,14 @@ import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/extensions.dart';
-import 'package:flame/palette.dart';
 import 'package:flame/text.dart';
 import 'package:flutter/material.dart';
 
 class AttributeTextComponent extends TextComponent
-    with TapCallbacks, HasGameRef<ModelFlameGame> {
+    with TapCallbacks, HoverCallbacks, HasGameRef<ModelFlameGame> {
   static final TextPaint normal = TextPaint(
-    style: TextStyle(
-      color: BasicPalette.black.color,
+    style: const TextStyle(
+      color: Colors.black,
       fontSize: 12.0,
     ),
   );
@@ -29,7 +28,6 @@ class AttributeTextComponent extends TextComponent
 
   Attribute attribute;
 
-  /// String text = '${attribute.scope} ${attribute.dataType}:${attribute.name}';
   AttributeTextComponent(
     this.attribute, {
     super.position,

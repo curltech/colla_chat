@@ -2,6 +2,7 @@ import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/attribute_text_component.dart';
+import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/component/node_relationship_component.dart';
 import 'package:colla_chat/pages/game/model/component/method_text_component.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
@@ -25,11 +26,8 @@ class TypeNodeComponent extends PositionComponent
   late final MethodAreaComponent methodAreaComponent;
 
   TypeNodeComponent({
-    required Vector2 position,
     required this.modelNode,
-  }) : super(
-          position: position,
-        );
+  });
 
   TextBoxComponent _buildNodeNameComponent({
     required String text,
@@ -77,7 +75,9 @@ class TypeNodeComponent extends PositionComponent
           methods: modelNode.methods!);
       add(methodAreaComponent);
     }
-
+    size.addListener(() {
+      (parent as NodeFrameComponent).updateHeight();
+    });
     updateHeight();
   }
 

@@ -47,19 +47,19 @@ class NodeFrameComponent extends RectangleComponent
     String nodeType = modelNode.nodeType;
     if (nodeType == NodeType.type.name) {
       width = Project.nodeWidth;
-      child = TypeNodeComponent(modelNode: modelNode, position: position);
+      child = TypeNodeComponent(modelNode: modelNode);
       add(child!);
     } else if (nodeType == NodeType.image.name) {
       width = Project.nodeWidth;
-      child = ImageNodeComponent(modelNode, position: position);
+      child = ImageNodeComponent(modelNode);
       add(child!);
     } else if (nodeType == NodeType.shape.name) {
       width = Project.nodeWidth;
-      child = ShapeNodeComponent(modelNode, position: position);
+      child = ShapeNodeComponent(modelNode);
       add(child!);
     } else if (nodeType == NodeType.remark.name) {
       width = Project.nodeWidth;
-      child = RemarkNodeComponent(modelNode, position: position);
+      child = RemarkNodeComponent(modelNode);
       add(child!);
     }
 

@@ -108,7 +108,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
               ? () {
                   NodeType? addNodeStatus =
                       modelProjectController.addNodeStatus.value;
-                  if (addNodeStatus == null) {
+                  if (addNodeStatus != NodeType.type) {
                     modelProjectController.addNodeStatus.value = NodeType.type;
                   } else {
                     modelProjectController.addNodeStatus.value = null;
@@ -118,7 +118,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
               : null,
           icon: Icon(
             Icons.newspaper_outlined,
-            color: modelProjectController.addNodeStatus.value != null
+            color: modelProjectController.addNodeStatus.value == NodeType.type
                 ? Colors.amber
                 : myself.primary,
           ),
@@ -129,7 +129,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
               ? () {
                   NodeType? addNodeStatus =
                       modelProjectController.addNodeStatus.value;
-                  if (addNodeStatus == null) {
+                  if (addNodeStatus != NodeType.image) {
                     modelProjectController.addNodeStatus.value = NodeType.image;
                   } else {
                     modelProjectController.addNodeStatus.value = null;
@@ -139,7 +139,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
               : null,
           icon: Icon(
             Icons.image_outlined,
-            color: modelProjectController.addNodeStatus.value != null
+            color: modelProjectController.addNodeStatus.value == NodeType.image
                 ? Colors.amber
                 : myself.primary,
           ),
@@ -150,7 +150,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
               ? () {
                   NodeType? addNodeStatus =
                       modelProjectController.addNodeStatus.value;
-                  if (addNodeStatus == null) {
+                  if (addNodeStatus != NodeType.shape) {
                     modelProjectController.addNodeStatus.value = NodeType.shape;
                   } else {
                     modelProjectController.addNodeStatus.value = null;
@@ -160,7 +160,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
               : null,
           icon: Icon(
             Icons.format_shapes_outlined,
-            color: modelProjectController.addNodeStatus.value != null
+            color: modelProjectController.addNodeStatus.value == NodeType.shape
                 ? Colors.amber
                 : myself.primary,
           ),
@@ -171,7 +171,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
               ? () {
                   NodeType? addNodeStatus =
                       modelProjectController.addNodeStatus.value;
-                  if (addNodeStatus == null) {
+                  if (addNodeStatus != NodeType.remark) {
                     modelProjectController.addNodeStatus.value =
                         NodeType.remark;
                   } else {
@@ -182,7 +182,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
               : null,
           icon: Icon(
             Icons.comment,
-            color: modelProjectController.addNodeStatus.value != null
+            color: modelProjectController.addNodeStatus.value == NodeType.remark
                 ? Colors.amber
                 : myself.primary,
           ),

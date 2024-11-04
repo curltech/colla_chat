@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
@@ -79,6 +80,14 @@ class ShapeNodeComponent extends PositionComponent
     if (shapeType == ShapeType.oval.name) {
       Rect rect = Rect.fromLTWH(0, 0, width, height);
       canvas.drawOval(rect, NodeFrameComponent.strokePaint);
+    }
+    if (shapeType == ShapeType.paragraph.name) {
+      ParagraphStyle style =
+          ParagraphStyle(textAlign: TextAlign.start, fontSize: 10.0);
+      ParagraphBuilder paragraphBuilder = ParagraphBuilder(style);
+      paragraphBuilder.addText(modelNode.content ?? '');
+      Paragraph paragraph = paragraphBuilder.build();
+      canvas.drawParagraph(paragraph, const Offset(0, 0));
     }
     if (shapeType == ShapeType.diamond.name) {
       Path path = Path();
