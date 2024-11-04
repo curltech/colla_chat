@@ -3,8 +3,11 @@ import 'dart:ui';
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
+import 'package:colla_chat/pages/game/model/component/image_node_component.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_relationship_component.dart';
+import 'package:colla_chat/pages/game/model/component/remark_node_component.dart';
+import 'package:colla_chat/pages/game/model/component/shape_node_component.dart';
 import 'package:colla_chat/pages/game/model/component/type_node_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -28,6 +31,7 @@ class NodeFrameComponent extends RectangleComponent
     ..strokeWidth = 1.0;
   late Rect strokeRect;
   final ModelNode modelNode;
+  PositionComponent? child;
 
   NodeFrameComponent({
     required Vector2 position,
@@ -43,9 +47,20 @@ class NodeFrameComponent extends RectangleComponent
     String nodeType = modelNode.nodeType;
     if (nodeType == NodeType.type.name) {
       width = Project.nodeWidth;
-      TypeNodeComponent typeNodeComponent =
-          TypeNodeComponent(modelNode: modelNode, position: position);
-      add(typeNodeComponent);
+      child = TypeNodeComponent(modelNode: modelNode, position: position);
+      add(child!);
+    } else if (nodeType == NodeType.image.name) {
+      width = Project.nodeWidth;
+      child = ImageNodeComponent(modelNode, position: position);
+      add(child!);
+    } else if (nodeType == NodeType.shape.name) {
+      width = Project.nodeWidth;
+      child = ShapeNodeComponent(modelNode, position: position);
+      add(child!);
+    } else if (nodeType == NodeType.remark.name) {
+      width = Project.nodeWidth;
+      child = RemarkNodeComponent(modelNode, position: position);
+      add(child!);
     }
 
     strokeRect = Rect.fromLTWH(-1, -1, width + 2, height + 2);
@@ -61,6 +76,12 @@ class NodeFrameComponent extends RectangleComponent
       canvas.drawRect(strokeRect, selectedStrokePaint);
     } else {
       canvas.drawRect(strokeRect, strokePaint);
+    }
+  }
+
+  updateHeight() {
+    if (child != null) {
+      height = child!.height;
     }
   }
 

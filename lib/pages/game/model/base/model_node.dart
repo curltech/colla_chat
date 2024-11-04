@@ -76,7 +76,7 @@ class ModelNode extends Node {
   late String nodeType;
   String? shapeType;
 
-  String? imageContent;
+  String? content;
 
   ui.Image? image;
 
@@ -99,7 +99,7 @@ class ModelNode extends Node {
     shapeType = json['shapeType'];
     isAbstract =
         json['isAbstract'] == true || json['isAbstract'] == 1 ? true : false;
-    imageContent = json['imageContent'];
+    content = json['content'];
     attributes = [];
     List<dynamic>? ss = json['attributes'];
     if (ss != null && ss.isNotEmpty) {
@@ -129,7 +129,7 @@ class ModelNode extends Node {
       'nodeType': nodeType,
       'shapeType': shapeType,
       'isAbstract': isAbstract,
-      'imageContent': imageContent,
+      'content': content,
       'attributes': attributes != null ? JsonUtil.toJson(attributes) : null,
       'methods': methods != null ? JsonUtil.toJson(methods) : null
     });
