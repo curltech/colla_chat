@@ -1,6 +1,7 @@
 import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
+import 'dart:ui' as ui;
 
 enum Scope { private, protected, public }
 
@@ -52,36 +53,69 @@ class Method {
   }
 }
 
+enum NodeType { shape, image, type, remark }
+
+enum ShapeType {
+  rect,
+  rrect,
+  circle,
+  oval,
+  diamond,
+  drrect,
+  arc,
+  paragraph,
+  vertices,
+  imageRect,
+  image
+}
+
 /// 模型节点
 class ModelNode extends Node {
   late String packageName;
   late bool isAbstract;
+  late String nodeType;
+  String? shapeType;
 
-  List<Attribute> attributes = [];
-  List<Method> methods = [];
+  String? imageContent;
+
+  ui.Image? image;
+
+  List<Attribute>? attributes = [];
+  List<Method>? methods = [];
 
   ModelNode(
-      {required String name, this.isAbstract = false, this.packageName = ''})
-      : super(name);
+      {required String name,
+      String? nodeType,
+      this.shapeType,
+      this.isAbstract = false,
+      this.packageName = ''})
+      : super(name) {
+    this.nodeType = nodeType ?? NodeType.type.name;
+  }
 
   ModelNode.fromJson(Map json) : super.fromJson(json) {
     packageName = json['packageName'] ?? '';
+    nodeType = json['nodeType'] ?? NodeType.type.name;
+    shapeType = json['shapeType'];
     isAbstract =
         json['isAbstract'] == true || json['isAbstract'] == 1 ? true : false;
+    imageContent = json['imageContent'];
     attributes = [];
     List<dynamic>? ss = json['attributes'];
     if (ss != null && ss.isNotEmpty) {
+      attributes = [];
       for (var s in ss) {
         Attribute attribute = Attribute.fromJson(s);
-        attributes.add(attribute);
+        attributes!.add(attribute);
       }
     }
     methods = [];
     ss = json['methods'];
     if (ss != null && ss.isNotEmpty) {
+      methods = [];
       for (var s in ss) {
         Method method = Method.fromJson(s);
-        methods.add(method);
+        methods!.add(method);
       }
     }
   }
@@ -92,9 +126,12 @@ class ModelNode extends Node {
 
     json.addAll({
       'packageName': packageName,
+      'nodeType': nodeType,
+      'shapeType': shapeType,
       'isAbstract': isAbstract,
-      'attributes': JsonUtil.toJson(attributes),
-      'methods': JsonUtil.toJson(methods)
+      'imageContent': imageContent,
+      'attributes': attributes != null ? JsonUtil.toJson(attributes) : null,
+      'methods': methods != null ? JsonUtil.toJson(methods) : null
     });
     return json;
   }

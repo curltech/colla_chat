@@ -4,7 +4,7 @@ import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:colla_chat/pages/game/model/base/node.dart';
-import 'package:colla_chat/pages/game/model/component/node_position_component.dart';
+import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/component/node_relationship_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -66,14 +66,12 @@ class ModelFlameGame extends FlameGame
     for (ModelNode modelNode in modelNodes) {
       double? nodeX = modelNode.x ?? i;
       double? nodeY = modelNode.y ?? j;
-      NodePositionComponent nodePositionComponent = NodePositionComponent(
+      NodeFrameComponent nodeFrameComponent = NodeFrameComponent(
         position: Vector2(nodeX, nodeY),
-        padding: Project.nodePadding,
         modelNode: modelNode,
-        imageSize: Project.nodeWidth,
       );
-      modelNode.nodePositionComponent = nodePositionComponent;
-      add(nodePositionComponent);
+      modelNode.nodeFrameComponent = nodeFrameComponent;
+      add(nodeFrameComponent);
 
       if (i < totalWidth - nodeWidth) {
         i = i + nodeWidth;
@@ -153,14 +151,12 @@ class ModelFlameGame extends FlameGame
         modelNode.x = localPosition.x;
         modelNode.y = localPosition.y;
         subject.modelNodes[modelNode.id] = modelNode;
-        NodePositionComponent nodePositionComponent = NodePositionComponent(
+        NodeFrameComponent nodeFrameComponent = NodeFrameComponent(
           position: Vector2(modelNode.x!, modelNode.y!),
-          padding: Project.nodePadding,
           modelNode: modelNode,
-          imageSize: Project.nodeWidth,
         );
-        modelNode.nodePositionComponent = nodePositionComponent;
-        add(nodePositionComponent);
+        modelNode.nodeFrameComponent = nodeFrameComponent;
+        add(nodeFrameComponent);
       }
       modelProjectController.addNodeStatus.value = false;
     }

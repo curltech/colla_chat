@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
-import 'package:colla_chat/pages/game/model/component/node_position_component.dart';
+import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
+import 'package:colla_chat/pages/game/model/component/type_node_component.dart';
 import 'package:colla_chat/pages/game/model/widget/method_edit_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -129,7 +130,7 @@ class MethodAreaComponent extends RectangleComponent
     required this.methods,
   }) : super(
           position: position,
-          paint: NodePositionComponent.fillPaint,
+          paint: NodeFrameComponent.fillPaint,
         );
 
   @override
@@ -144,7 +145,7 @@ class MethodAreaComponent extends RectangleComponent
       }
     }
     size.addListener(() {
-      (parent as NodePositionComponent).updateHeight();
+      (parent as TypeNodeComponent).updateHeight();
     });
   }
 
@@ -159,7 +160,7 @@ class MethodAreaComponent extends RectangleComponent
   @override
   void render(Canvas canvas) {
     canvas.drawLine(const Offset(0, 0), const Offset(Project.nodeWidth, 0),
-        NodePositionComponent.strokePaint);
+        NodeFrameComponent.strokePaint);
     super.render(canvas);
   }
 

@@ -1,6 +1,7 @@
-import 'dart:ui' as ui;
 
-import 'package:colla_chat/pages/game/model/component/node_position_component.dart';
+
+import 'package:colla_chat/pages/game/model/base/model_node.dart';
+import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/component/node_relationship_component.dart';
 import 'package:flutter/material.dart';
 
@@ -13,11 +14,8 @@ abstract class Node {
   double? y;
   double? width;
   double? height;
-  String? imageContent;
 
-  ui.Image? image;
-
-  NodePositionComponent? nodePositionComponent;
+  NodeFrameComponent? nodeFrameComponent;
 
   Node(this.name) {
     id = UniqueKey().toString();
@@ -26,7 +24,6 @@ abstract class Node {
   Node.fromJson(Map json)
       : id = json['id'],
         name = json['name'],
-        imageContent = json['imageContent'],
         x = json['x'],
         y = json['y'],
         width = json['width'],
@@ -36,7 +33,6 @@ abstract class Node {
     return {
       'id': id,
       'name': name,
-      'imageContent': imageContent,
       'x': x,
       'y': y,
       'width': width,
@@ -68,20 +64,23 @@ class NodeRelationship {
   late String dstId;
 
   late String relationshipType;
-  late int srcCardinality;
-  late int dstCardinality;
+  int? srcCardinality;
+  int? dstCardinality;
 
-  Node? src;
-  Node? dst;
+  ModelNode? src;
+  ModelNode? dst;
 
-  NodeRelationship(this.src, this.dst,
-      {String? relationshipType, int? srcCardinality, int? dstCardinality}) {
+  NodeRelationship(
+    this.src,
+    this.dst, {
+    String? relationshipType,
+    this.srcCardinality,
+    this.dstCardinality,
+  }) {
     srcId = src!.id;
     dstId = dst!.id;
     this.relationshipType =
         relationshipType ?? RelationshipType.association.name;
-    this.srcCardinality = srcCardinality ?? 1;
-    this.dstCardinality = dstCardinality ?? 1;
   }
 
   NodeRelationshipComponent? nodeRelationshipComponent;
@@ -91,8 +90,8 @@ class NodeRelationship {
         dstId = json['dstId'],
         relationshipType =
             json['relationshipType'] ?? RelationshipType.association.name,
-        srcCardinality = json['srcCardinality'] ?? 1,
-        dstCardinality = json['dstCardinality'] ?? 1;
+        srcCardinality = json['srcCardinality'],
+        dstCardinality = json['dstCardinality'];
 
   Map<String, dynamic> toJson() {
     return {

@@ -2,7 +2,7 @@ import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
-import 'package:colla_chat/pages/game/model/component/node_position_component.dart';
+import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/pages/game/model/widget/node_relationship_edit_widget.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
@@ -60,6 +60,8 @@ class NodeRelationshipComponent extends PositionComponent
 
   List<Vector2> vertices = [];
 
+  TextComponent? cardinalityTextComponent;
+
   @override
   Future<void> onLoad() async {}
 
@@ -68,14 +70,14 @@ class NodeRelationshipComponent extends PositionComponent
     if (nodeRelationship.src == null) {
       return;
     }
-    NodePositionComponent? srcNodePositionComponent =
-        nodeRelationship.src!.nodePositionComponent;
-    if (srcNodePositionComponent == null) {
+    NodeFrameComponent? srcNodeFrameComponent =
+        nodeRelationship.src!.nodeFrameComponent;
+    if (srcNodeFrameComponent == null) {
       return;
     }
-    double srcX = srcNodePositionComponent.position.x;
-    double srcY = srcNodePositionComponent.position.y;
-    double srcHeight = srcNodePositionComponent.size.y;
+    double srcX = srcNodeFrameComponent.position.x;
+    double srcY = srcNodeFrameComponent.position.y;
+    double srcHeight = srcNodeFrameComponent.size.y;
     Vector2 srcTopCenter = Vector2(srcX + Project.nodeWidth / 2, srcY);
     Vector2 srcLeftCenter = Vector2(srcX, srcY + srcHeight / 2);
     Vector2 srcRightCenter =
@@ -86,14 +88,14 @@ class NodeRelationshipComponent extends PositionComponent
     if (nodeRelationship.dst == null) {
       return;
     }
-    NodePositionComponent? dstNodePositionComponent =
-        nodeRelationship.dst!.nodePositionComponent;
-    if (dstNodePositionComponent == null) {
+    NodeFrameComponent? dstNodeFrameComponent =
+        nodeRelationship.dst!.nodeFrameComponent;
+    if (dstNodeFrameComponent == null) {
       return;
     }
-    double dstX = dstNodePositionComponent.position.x;
-    double dstY = dstNodePositionComponent.position.y;
-    double dstHeight = dstNodePositionComponent.size.y;
+    double dstX = dstNodeFrameComponent.position.x;
+    double dstY = dstNodeFrameComponent.position.y;
+    double dstHeight = dstNodeFrameComponent.size.y;
     Vector2 dstTopCenter = Vector2(dstX + Project.nodeWidth / 2, dstY);
     Vector2 dstLeftCenter = Vector2(dstX, dstY + dstHeight / 2);
     Vector2 dstRightCenter =
@@ -101,9 +103,12 @@ class NodeRelationshipComponent extends PositionComponent
     Vector2 dstBottomCenter =
         Vector2(dstX + Project.nodeWidth / 2, dstY + dstHeight);
 
+    if (cardinalityTextComponent != null) {
+      remove(cardinalityTextComponent!);
+    }
+
     Path path = Path();
-    if (srcNodePositionComponent.modelNode ==
-        dstNodePositionComponent.modelNode) {
+    if (srcNodeFrameComponent.modelNode == dstNodeFrameComponent.modelNode) {
       selfLine(path, srcBottomCenter, srcRightCenter);
       rightCenterArrow(path, srcRightCenter);
       if (isHovered) {
@@ -189,6 +194,10 @@ class NodeRelationshipComponent extends PositionComponent
     } else {
       canvas.drawPath(path, strokePaint);
     }
+
+    if (cardinalityTextComponent != null) {
+      add(cardinalityTextComponent!);
+    }
   }
 
   void _drawLine(Path path, List<Vector2> vertices) {
@@ -213,12 +222,14 @@ class NodeRelationshipComponent extends PositionComponent
   }
 
   void leftBottomCardinality(Vector2 srcLeftCenter, Vector2 dstBottomCenter) {
-    int srcCardinality = nodeRelationship.srcCardinality;
-    int dstCardinality = nodeRelationship.dstCardinality;
-    add(TextComponent(
-        text: '$srcCardinality:$dstCardinality',
-        textRenderer: normal,
-        position: Vector2(srcLeftCenter.x, srcLeftCenter.y)));
+    int? srcCardinality = nodeRelationship.srcCardinality;
+    int? dstCardinality = nodeRelationship.dstCardinality;
+    if (srcCardinality != null && dstCardinality != null) {
+      cardinalityTextComponent = TextComponent(
+          text: '$srcCardinality:$dstCardinality',
+          textRenderer: normal,
+          position: Vector2(srcLeftCenter.x, srcLeftCenter.y));
+    }
   }
 
   void leftRightLine(Path path, Vector2 srcLeftCenter, Vector2 dstRightCenter) {
@@ -234,14 +245,16 @@ class NodeRelationshipComponent extends PositionComponent
   }
 
   void leftRightCardinality(Vector2 srcLeftCenter, Vector2 dstRightCenter) {
-    int srcCardinality = nodeRelationship.srcCardinality;
-    int dstCardinality = nodeRelationship.dstCardinality;
-    add(TextComponent(
-        text: '$srcCardinality:$dstCardinality',
-        textRenderer: normal,
-        position: Vector2(
-            srcLeftCenter.x - (srcLeftCenter.x - dstRightCenter.x) / 2 - 24,
-            dstRightCenter.y)));
+    int? srcCardinality = nodeRelationship.srcCardinality;
+    int? dstCardinality = nodeRelationship.dstCardinality;
+    if (srcCardinality != null && dstCardinality != null) {
+      cardinalityTextComponent = TextComponent(
+          text: '$srcCardinality:$dstCardinality',
+          textRenderer: normal,
+          position: Vector2(
+              srcLeftCenter.x - (srcLeftCenter.x - dstRightCenter.x) / 2 - 24,
+              dstRightCenter.y));
+    }
   }
 
   void topBottomLine(Path path, Vector2 srcTopCenter, Vector2 dstBottomCenter) {
@@ -257,13 +270,15 @@ class NodeRelationshipComponent extends PositionComponent
   }
 
   void topBottomCardinality(Vector2 srcTopCenter, Vector2 dstBottomCenter) {
-    int srcCardinality = nodeRelationship.srcCardinality;
-    int dstCardinality = nodeRelationship.dstCardinality;
-    add(TextComponent(
-        text: '$srcCardinality:$dstCardinality',
-        textRenderer: normal,
-        position: Vector2(srcTopCenter.x + 36,
-            srcTopCenter.y - (srcTopCenter.y - dstBottomCenter.y) / 2)));
+    int? srcCardinality = nodeRelationship.srcCardinality;
+    int? dstCardinality = nodeRelationship.dstCardinality;
+    if (srcCardinality != null && dstCardinality != null) {
+      cardinalityTextComponent = TextComponent(
+          text: '$srcCardinality:$dstCardinality',
+          textRenderer: normal,
+          position: Vector2(srcTopCenter.x + 36,
+              srcTopCenter.y - (srcTopCenter.y - dstBottomCenter.y) / 2));
+    }
   }
 
   void rightLeftLine(Path path, Vector2 srcRightCenter, Vector2 dstLeftCenter) {
@@ -279,14 +294,16 @@ class NodeRelationshipComponent extends PositionComponent
   }
 
   void rightLeftCardinality(Vector2 srcRightCenter, Vector2 dstLeftCenter) {
-    int srcCardinality = nodeRelationship.srcCardinality;
-    int dstCardinality = nodeRelationship.dstCardinality;
-    add(TextComponent(
-        text: '$srcCardinality:$dstCardinality',
-        textRenderer: normal,
-        position: Vector2(
-            srcRightCenter.x + (dstLeftCenter.x - srcRightCenter.x) / 2 - 36,
-            srcRightCenter.y - 16)));
+    int? srcCardinality = nodeRelationship.srcCardinality;
+    int? dstCardinality = nodeRelationship.dstCardinality;
+    if (srcCardinality != null && dstCardinality != null) {
+      cardinalityTextComponent = TextComponent(
+          text: '$srcCardinality:$dstCardinality',
+          textRenderer: normal,
+          position: Vector2(
+              srcRightCenter.x + (dstLeftCenter.x - srcRightCenter.x) / 2 - 36,
+              srcRightCenter.y - 16));
+    }
   }
 
   void bottomTopLine(Path path, Vector2 srcBottomCenter, Vector2 dstTopCenter) {
@@ -302,16 +319,18 @@ class NodeRelationshipComponent extends PositionComponent
   }
 
   void bottomTopCardinality(Vector2 srcBottomCenter, Vector2 dstTopCenter) {
-    int srcCardinality = nodeRelationship.srcCardinality;
-    int dstCardinality = nodeRelationship.dstCardinality;
-    add(TextComponent(
-        text: '$srcCardinality:$dstCardinality',
-        textRenderer: normal,
-        position: Vector2(
-            srcBottomCenter.x + 36,
-            srcBottomCenter.y +
-                (dstTopCenter.y - srcBottomCenter.y) / 2 -
-                16)));
+    int? srcCardinality = nodeRelationship.srcCardinality;
+    int? dstCardinality = nodeRelationship.dstCardinality;
+    if (srcCardinality != null && dstCardinality != null) {
+      cardinalityTextComponent = TextComponent(
+          text: '$srcCardinality:$dstCardinality',
+          textRenderer: normal,
+          position: Vector2(
+              srcBottomCenter.x + 36,
+              srcBottomCenter.y +
+                  (dstTopCenter.y - srcBottomCenter.y) / 2 -
+                  16));
+    }
   }
 
   void selfLine(Path path, Vector2 srcBottomCenter, Vector2 srcRightCenter) {
@@ -326,13 +345,15 @@ class NodeRelationshipComponent extends PositionComponent
   }
 
   void selfCardinality(Vector2 srcBottomCenter, Vector2 srcRightCenter) {
-    int srcCardinality = nodeRelationship.srcCardinality;
-    int dstCardinality = nodeRelationship.dstCardinality;
-    add(TextComponent(
-        text: '$srcCardinality:$dstCardinality',
-        textRenderer: normal,
-        position: Vector2(srcBottomCenter.x + Project.nodeWidth - 36,
-            srcBottomCenter.y + 16)));
+    int? srcCardinality = nodeRelationship.srcCardinality;
+    int? dstCardinality = nodeRelationship.dstCardinality;
+    if (srcCardinality != null && dstCardinality != null) {
+      cardinalityTextComponent = TextComponent(
+          text: '$srcCardinality:$dstCardinality',
+          textRenderer: normal,
+          position: Vector2(srcBottomCenter.x + Project.nodeWidth - 36,
+              srcBottomCenter.y + 16));
+    }
   }
 
   void bottomCenterArrow(Path path, Vector2 dstBottomCenter) {

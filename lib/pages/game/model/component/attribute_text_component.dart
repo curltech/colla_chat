@@ -2,10 +2,9 @@ import 'dart:async';
 
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
-import 'package:colla_chat/pages/game/model/component/method_text_component.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
-import 'package:colla_chat/pages/game/model/component/node_position_component.dart';
-import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
+import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
+import 'package:colla_chat/pages/game/model/component/type_node_component.dart';
 import 'package:colla_chat/pages/game/model/widget/attribute_edit_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -16,7 +15,6 @@ import 'package:flame/extensions.dart';
 import 'package:flame/palette.dart';
 import 'package:flame/text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 
 class AttributeTextComponent extends TextComponent
     with TapCallbacks, HasGameRef<ModelFlameGame> {
@@ -133,7 +131,7 @@ class AttributeAreaComponent extends RectangleComponent
     required this.attributes,
   }) : super(
           position: position,
-          paint: NodePositionComponent.fillPaint,
+          paint: NodeFrameComponent.fillPaint,
         );
 
   @override
@@ -148,7 +146,7 @@ class AttributeAreaComponent extends RectangleComponent
       }
     }
     size.addListener(() {
-      (parent as NodePositionComponent).updateHeight();
+      (parent as TypeNodeComponent).updateHeight();
     });
   }
 
@@ -163,7 +161,7 @@ class AttributeAreaComponent extends RectangleComponent
   @override
   void render(Canvas canvas) {
     canvas.drawLine(const Offset(0, 0), const Offset(Project.nodeWidth, 0),
-        NodePositionComponent.strokePaint);
+        NodeFrameComponent.strokePaint);
     super.render(canvas);
   }
 
