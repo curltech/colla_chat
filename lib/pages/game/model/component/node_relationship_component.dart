@@ -58,6 +58,8 @@ class NodeRelationshipComponent extends PositionComponent
   /// [Node] draws line to its relationship nodes，this node is src node
   final NodeRelationship nodeRelationship;
 
+  List<Vector2> vertices = [];
+
   @override
   Future<void> onLoad() async {}
 
@@ -189,11 +191,25 @@ class NodeRelationshipComponent extends PositionComponent
     }
   }
 
+  void _drawLine(Path path, List<Vector2> vertices) {
+    for (int i = 0; i < vertices.length; ++i) {
+      Vector2 point = vertices[i];
+      if (i == 0) {
+        path.moveTo(point.x, point.y);
+      } else {
+        path.lineTo(point.x, point.y);
+      }
+    }
+  }
+
   void leftBottomLine(
       Path path, Vector2 srcLeftCenter, Vector2 dstBottomCenter) {
-    path.moveTo(srcLeftCenter.x, srcLeftCenter.y);
-    path.lineTo(dstBottomCenter.x, srcLeftCenter.y);
-    path.lineTo(dstBottomCenter.x, dstBottomCenter.y);
+    vertices = [
+      srcLeftCenter,
+      Vector2(dstBottomCenter.x, srcLeftCenter.y),
+      Vector2(dstBottomCenter.x, dstBottomCenter.y),
+    ];
+    _drawLine(path, vertices);
   }
 
   void leftBottomCardinality(Vector2 srcLeftCenter, Vector2 dstBottomCenter) {
@@ -206,12 +222,15 @@ class NodeRelationshipComponent extends PositionComponent
   }
 
   void leftRightLine(Path path, Vector2 srcLeftCenter, Vector2 dstRightCenter) {
-    path.moveTo(srcLeftCenter.x, srcLeftCenter.y);
-    path.lineTo(srcLeftCenter.x - (srcLeftCenter.x - dstRightCenter.x) / 2,
-        srcLeftCenter.y);
-    path.lineTo(srcLeftCenter.x - (srcLeftCenter.x - dstRightCenter.x) / 2,
-        dstRightCenter.y);
-    path.lineTo(dstRightCenter.x, dstRightCenter.y);
+    vertices = [
+      Vector2(srcLeftCenter.x, srcLeftCenter.y),
+      Vector2(srcLeftCenter.x - (srcLeftCenter.x - dstRightCenter.x) / 2,
+          srcLeftCenter.y),
+      Vector2(srcLeftCenter.x - (srcLeftCenter.x - dstRightCenter.x) / 2,
+          dstRightCenter.y),
+      Vector2(dstRightCenter.x, dstRightCenter.y)
+    ];
+    _drawLine(path, vertices);
   }
 
   void leftRightCardinality(Vector2 srcLeftCenter, Vector2 dstRightCenter) {
@@ -226,12 +245,15 @@ class NodeRelationshipComponent extends PositionComponent
   }
 
   void topBottomLine(Path path, Vector2 srcTopCenter, Vector2 dstBottomCenter) {
-    path.moveTo(srcTopCenter.x, srcTopCenter.y);
-    path.lineTo(srcTopCenter.x,
-        srcTopCenter.y - (srcTopCenter.y - dstBottomCenter.y) / 2);
-    path.lineTo(dstBottomCenter.x,
-        srcTopCenter.y - (srcTopCenter.y - dstBottomCenter.y) / 2);
-    path.lineTo(dstBottomCenter.x, dstBottomCenter.y);
+    vertices = [
+      Vector2(srcTopCenter.x, srcTopCenter.y),
+      Vector2(srcTopCenter.x,
+          srcTopCenter.y - (srcTopCenter.y - dstBottomCenter.y) / 2),
+      Vector2(dstBottomCenter.x,
+          srcTopCenter.y - (srcTopCenter.y - dstBottomCenter.y) / 2),
+      Vector2(dstBottomCenter.x, dstBottomCenter.y)
+    ];
+    _drawLine(path, vertices);
   }
 
   void topBottomCardinality(Vector2 srcTopCenter, Vector2 dstBottomCenter) {
@@ -245,12 +267,15 @@ class NodeRelationshipComponent extends PositionComponent
   }
 
   void rightLeftLine(Path path, Vector2 srcRightCenter, Vector2 dstLeftCenter) {
-    path.moveTo(srcRightCenter.x, srcRightCenter.y);
-    path.lineTo(srcRightCenter.x + (dstLeftCenter.x - srcRightCenter.x) / 2,
-        srcRightCenter.y);
-    path.lineTo(srcRightCenter.x + (dstLeftCenter.x - srcRightCenter.x) / 2,
-        dstLeftCenter.y);
-    path.lineTo(dstLeftCenter.x, dstLeftCenter.y);
+    vertices = [
+      Vector2(srcRightCenter.x, srcRightCenter.y),
+      Vector2(srcRightCenter.x + (dstLeftCenter.x - srcRightCenter.x) / 2,
+          srcRightCenter.y),
+      Vector2(srcRightCenter.x + (dstLeftCenter.x - srcRightCenter.x) / 2,
+          dstLeftCenter.y),
+      Vector2(dstLeftCenter.x, dstLeftCenter.y)
+    ];
+    _drawLine(path, vertices);
   }
 
   void rightLeftCardinality(Vector2 srcRightCenter, Vector2 dstLeftCenter) {
@@ -265,12 +290,15 @@ class NodeRelationshipComponent extends PositionComponent
   }
 
   void bottomTopLine(Path path, Vector2 srcBottomCenter, Vector2 dstTopCenter) {
-    path.moveTo(srcBottomCenter.x, srcBottomCenter.y);
-    path.lineTo(srcBottomCenter.x,
-        srcBottomCenter.y + (dstTopCenter.y - srcBottomCenter.y) / 2);
-    path.lineTo(dstTopCenter.x,
-        srcBottomCenter.y + (dstTopCenter.y - srcBottomCenter.y) / 2);
-    path.lineTo(dstTopCenter.x, dstTopCenter.y);
+    vertices = [
+      Vector2(srcBottomCenter.x, srcBottomCenter.y),
+      Vector2(srcBottomCenter.x,
+          srcBottomCenter.y + (dstTopCenter.y - srcBottomCenter.y) / 2),
+      Vector2(dstTopCenter.x,
+          srcBottomCenter.y + (dstTopCenter.y - srcBottomCenter.y) / 2),
+      Vector2(dstTopCenter.x, dstTopCenter.y)
+    ];
+    _drawLine(path, vertices);
   }
 
   void bottomTopCardinality(Vector2 srcBottomCenter, Vector2 dstTopCenter) {
@@ -287,11 +315,14 @@ class NodeRelationshipComponent extends PositionComponent
   }
 
   void selfLine(Path path, Vector2 srcBottomCenter, Vector2 srcRightCenter) {
-    path.moveTo(srcBottomCenter.x, srcBottomCenter.y);
-    path.lineTo(srcBottomCenter.x, srcBottomCenter.y + 30);
-    path.lineTo(srcBottomCenter.x + Project.nodeWidth, srcBottomCenter.y + 30);
-    path.lineTo(srcBottomCenter.x + Project.nodeWidth, srcRightCenter.y);
-    path.lineTo(srcRightCenter.x, srcRightCenter.y);
+    vertices = [
+      srcBottomCenter,
+      Vector2(srcBottomCenter.x, srcBottomCenter.y + 30),
+      Vector2(srcBottomCenter.x + Project.nodeWidth, srcBottomCenter.y + 30),
+      Vector2(srcBottomCenter.x + Project.nodeWidth, srcRightCenter.y),
+      Vector2(srcRightCenter.x, srcRightCenter.y)
+    ];
+    _drawLine(path, vertices);
   }
 
   void selfCardinality(Vector2 srcBottomCenter, Vector2 srcRightCenter) {
@@ -337,5 +368,40 @@ class NodeRelationshipComponent extends PositionComponent
       );
     });
     if (m != null) {}
+  }
+
+  @override
+  bool containsLocalPoint(Vector2 point) {
+    for (int i = 1; i < vertices.length; ++i) {
+      Vector2 from = vertices[i - 1];
+      Vector2 to = vertices[i];
+      bool contain = _containsPoint(from, to, point);
+      if (contain) {
+        return contain;
+      }
+    }
+    return false;
+  }
+
+  bool between(double v, double m, double n) {
+    return ((v > m && v < n) || (v < m && v > n));
+  }
+
+  bool _containsPoint(Vector2 from, Vector2 to, Vector2 point,
+      {double epsilon = 15.0}) {
+    if (from.x == to.x) {
+      double absX = (point.x - from.x).abs();
+      if (absX < epsilon && between(point.y, from.y, to.y)) {
+        return true;
+      }
+    }
+    if (from.y == to.y) {
+      double absY = (point.y - from.y).abs();
+      if (absY < epsilon && between(point.x, from.x, to.x)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
