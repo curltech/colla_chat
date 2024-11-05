@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
+import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/widget/model_node_edit_widget.dart';
@@ -15,7 +16,7 @@ import 'package:flutter/material.dart';
 /// 在shape节点写文本
 class ShapeNodeComponent extends PositionComponent
     with TapCallbacks, HasGameRef<ModelFlameGame> {
-  static final TextPaint normal = TextPaint(
+  static final TextPaint normalTextPaint = TextPaint(
     style: TextStyle(
       color: BasicPalette.black.color,
       fontSize: 12.0,
@@ -23,38 +24,34 @@ class ShapeNodeComponent extends PositionComponent
   );
 
   final ModelNode modelNode;
-  Anchor align;
+  Anchor textAlign;
   late final TextBoxComponent nodeTextComponent;
 
   ShapeNodeComponent(
     this.modelNode, {
-    this.align = Anchor.center,
     super.position,
+    this.textAlign = Anchor.center,
     super.scale,
     super.angle,
-    super.anchor = Anchor.topLeft,
-    super.children,
-    super.priority,
-    super.key,
-  });
-
-  @override
-  Future<void> onTapDown(TapDownEvent event) async {
-    DialogUtil.info(content: 'ImageNodeComponent onTapDown');
-  }
+    Vector2? nodeSize,
+  }) : super(size: nodeSize ?? Vector2(Project.nodeWidth, Project.nodeHeight));
 
   @override
   Future<void> onLoad() async {
     nodeTextComponent = TextBoxComponent(
       text: modelNode.name,
-      textRenderer: normal,
+      textRenderer: normalTextPaint,
+      size: size,
       position: Vector2(0, 0),
-      anchor: anchor,
-      align: align,
+      align: textAlign,
       priority: 2,
       boxConfig: const TextBoxConfig(),
     );
     add(nodeTextComponent);
+    size.addListener(() {
+      (parent as NodeFrameComponent).updateSize();
+    });
+    (parent as NodeFrameComponent).updateSize();
   }
 
   @override
@@ -65,8 +62,8 @@ class ShapeNodeComponent extends PositionComponent
     }
     String shapeType = modelNode.shapeType ?? ShapeType.rect.name;
     if (shapeType == ShapeType.rect.name) {
-      Rect rect = Rect.fromLTWH(0, 0, width, height);
-      canvas.drawRect(rect, NodeFrameComponent.strokePaint);
+      // Rect rect = Rect.fromLTWH(0, 0, width, height);
+      // canvas.drawRect(rect, NodeFrameComponent.strokePaint);
     }
     if (shapeType == ShapeType.rrect.name) {
       Rect rect = Rect.fromLTWH(0, 0, width, height);
@@ -99,6 +96,11 @@ class ShapeNodeComponent extends PositionComponent
       path.lineTo(width / 2, height);
       canvas.drawPath(path, NodeFrameComponent.strokePaint);
     }
+  }
+
+  @override
+  Future<void> onTapDown(TapDownEvent event) async {
+    (parent as NodeFrameComponent).onTapDown(event);
   }
 
   @override

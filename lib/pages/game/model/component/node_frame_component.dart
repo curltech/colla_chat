@@ -21,7 +21,7 @@ import 'package:flutter/material.dart';
 class NodeFrameComponent extends RectangleComponent
     with DragCallbacks, TapCallbacks, HasGameRef<ModelFlameGame> {
   static final fillPaint = Paint()
-    ..color = myself.primary
+    ..color = Colors.white.withOpacity(0)
     ..style = PaintingStyle.fill;
   static final strokePaint = BasicPalette.black.paint()
     ..style = PaintingStyle.stroke
@@ -36,36 +36,35 @@ class NodeFrameComponent extends RectangleComponent
   NodeFrameComponent({
     required Vector2 position,
     required this.modelNode,
-  }) : super(
-          position: position,
-        ) {
-    paint = fillPaint;
-  }
+  }) : super(position: position, paint: fillPaint);
 
   @override
   Future<void> onLoad() async {
     String nodeType = modelNode.nodeType;
+    width = Project.nodeWidth;
     if (nodeType == NodeType.type.name) {
-      width = Project.nodeWidth;
       child = TypeNodeComponent(modelNode: modelNode);
       add(child!);
     } else if (nodeType == NodeType.image.name) {
-      width = Project.nodeWidth;
       child = ImageNodeComponent(modelNode);
       add(child!);
     } else if (nodeType == NodeType.shape.name) {
-      width = Project.nodeWidth;
       child = ShapeNodeComponent(modelNode);
       add(child!);
     } else if (nodeType == NodeType.remark.name) {
-      width = Project.nodeWidth;
-      child = RemarkNodeComponent(modelNode);
+      child = RemarkNodeComponent(
+        modelNode,
+        align: Anchor.topLeft,
+      );
       add(child!);
     }
 
+    /// 绘制框架组件的边框
     strokeRect = Rect.fromLTWH(-1, -1, width + 2, height + 2);
     size.addListener(() {
       strokeRect = Rect.fromLTWH(-1, -1, width + 2, height + 2);
+      modelNode.width = width;
+      modelNode.height = height;
     });
   }
 
@@ -79,9 +78,11 @@ class NodeFrameComponent extends RectangleComponent
     }
   }
 
-  updateHeight() {
+  /// 子组件的大小发生变化，调用此方法更新框架组件的大小
+  updateSize() {
     if (child != null) {
       height = child!.height;
+      width = child!.width;
     }
   }
 
@@ -94,6 +95,9 @@ class NodeFrameComponent extends RectangleComponent
       if (modelProjectController.addRelationshipStatus.value) {
         NodeRelationship nodeRelationship =
             NodeRelationship(modelProjectController.selected.value, modelNode);
+        if (modelNode.nodeType == NodeType.remark.name) {
+          nodeRelationship.relationshipType = RelationshipType.reference.name;
+        }
         modelProjectController.getCurrentSubject()!.add(nodeRelationship);
         NodeRelationshipComponent nodeRelationshipComponent =
             NodeRelationshipComponent(nodeRelationship: nodeRelationship);

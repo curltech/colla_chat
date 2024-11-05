@@ -28,7 +28,6 @@ class MethodTextComponent extends TextComponent
 
   Method method;
 
-  /// String text = '${method.scope} ${method.returnType}:${method.name}';
   MethodTextComponent(
     this.method, {
     super.position,
@@ -102,7 +101,7 @@ class MethodTextComponent extends TextComponent
       List<Method> methods = (parent as MethodAreaComponent).methods;
       methods.remove(method);
       removeFromParent();
-      (parent as MethodAreaComponent).updateHeight();
+      (parent as MethodAreaComponent).updateSize();
     }
   }
 
@@ -128,13 +127,13 @@ class MethodAreaComponent extends RectangleComponent
     required this.methods,
   }) : super(
           position: position,
-          paint: NodeFrameComponent.fillPaint,
+          paint: TypeNodeComponent.fillPaint,
         );
 
   @override
   Future<void> onLoad() async {
     width = Project.nodeWidth;
-    updateHeight();
+    updateSize();
     if (methods.isNotEmpty) {
       for (int i = 0; i < methods.length; ++i) {
         Method method = methods[i];
@@ -143,11 +142,11 @@ class MethodAreaComponent extends RectangleComponent
       }
     }
     size.addListener(() {
-      (parent as TypeNodeComponent).updateHeight();
+      (parent as TypeNodeComponent).updateSize();
     });
   }
 
-  updateHeight() {
+  updateSize() {
     if (methods.isEmpty) {
       height = MethodTextComponent.contentHeight;
     } else {
@@ -182,7 +181,7 @@ class MethodAreaComponent extends RectangleComponent
       MethodTextComponent methodTextComponent =
           MethodTextComponent(method, position: position);
       add(methodTextComponent);
-      updateHeight();
+      updateSize();
     }
   }
 }

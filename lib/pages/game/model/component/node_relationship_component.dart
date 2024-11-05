@@ -7,6 +7,7 @@ import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/pages/game/model/widget/node_relationship_edit_widget.dart';
+import 'package:colla_chat/plugin/painter/line/dash_painter.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flame/components.dart';
@@ -19,18 +20,13 @@ class NodeRelationshipComponent extends PositionComponent
   final strokePaint = Paint()
     ..color = Colors.black
     ..style = PaintingStyle.stroke
+    ..isAntiAlias = true
     ..strokeWidth = 1.0;
   final selectedStrokePaint = Paint()
     ..color = Colors.yellow
     ..style = PaintingStyle.stroke
+    ..isAntiAlias = true
     ..strokeWidth = 1.0;
-
-  // final TextPaint normal = TextPaint(
-  //   style: TextStyle(
-  //     color: BasicPalette.black.color,
-  //     fontSize: 10.0,
-  //   ),
-  // );
 
   NodeRelationshipComponent({required this.nodeRelationship}) : super() {
     Node? src = nodeRelationship.src;
@@ -102,10 +98,6 @@ class NodeRelationshipComponent extends PositionComponent
         Vector2(dstX + Project.nodeWidth, dstY + dstHeight / 2);
     Vector2 dstBottomCenter =
         Vector2(dstX + Project.nodeWidth / 2, dstY + dstHeight);
-
-    // if (cardinalityTextComponent != null) {
-    //   remove(cardinalityTextComponent!);
-    // }
 
     Path path = Path();
     if (srcNodeFrameComponent.modelNode == dstNodeFrameComponent.modelNode) {
@@ -202,10 +194,20 @@ class NodeRelationshipComponent extends PositionComponent
         }
       }
     }
-    if (isHovered) {
-      canvas.drawPath(path, selectedStrokePaint);
+
+    if (nodeRelationship.relationshipType == RelationshipType.reference.name) {
+      DashPainter dashPainter = const DashPainter();
+      if (isHovered) {
+        dashPainter.paint(canvas, path, selectedStrokePaint);
+      } else {
+        dashPainter.paint(canvas, path, strokePaint);
+      }
     } else {
-      canvas.drawPath(path, strokePaint);
+      if (isHovered) {
+        canvas.drawPath(path, selectedStrokePaint);
+      } else {
+        canvas.drawPath(path, strokePaint);
+      }
     }
   }
 

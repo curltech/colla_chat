@@ -1,10 +1,15 @@
 import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
 /// 模型项目
 class Project {
   static const double nodeWidth = 140;
+
+  static const double nodeHeight = 85;
+
+  static Vector2 nodeSize = Vector2(nodeWidth, nodeHeight);
 
   static const double nodePadding = 10;
 

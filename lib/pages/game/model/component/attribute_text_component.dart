@@ -103,7 +103,7 @@ class AttributeTextComponent extends TextComponent
           (parent as AttributeAreaComponent).attributes;
       attributes.remove(attribute);
       removeFromParent();
-      (parent as AttributeAreaComponent).updateHeight();
+      (parent as AttributeAreaComponent).updateSize();
     }
   }
 
@@ -129,13 +129,13 @@ class AttributeAreaComponent extends RectangleComponent
     required this.attributes,
   }) : super(
           position: position,
-          paint: NodeFrameComponent.fillPaint,
+          paint: TypeNodeComponent.fillPaint,
         );
 
   @override
   Future<void> onLoad() async {
     width = Project.nodeWidth;
-    updateHeight();
+    updateSize();
     if (attributes.isNotEmpty) {
       for (int i = 0; i < attributes.length; ++i) {
         Attribute attribute = attributes[i];
@@ -144,11 +144,11 @@ class AttributeAreaComponent extends RectangleComponent
       }
     }
     size.addListener(() {
-      (parent as TypeNodeComponent).updateHeight();
+      (parent as TypeNodeComponent).updateSize();
     });
   }
 
-  updateHeight() {
+  updateSize() {
     if (attributes.isEmpty) {
       height = AttributeTextComponent.contentHeight;
     } else {
@@ -181,7 +181,7 @@ class AttributeAreaComponent extends RectangleComponent
       Vector2 position = Vector2(
           0, (attributes.length - 1) * AttributeTextComponent.contentHeight);
       add(AttributeTextComponent(attribute, position: position));
-      updateHeight();
+      updateSize();
     }
   }
 }

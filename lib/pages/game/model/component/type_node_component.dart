@@ -8,6 +8,7 @@ import 'package:colla_chat/pages/game/model/component/method_text_component.dart
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/pages/game/model/widget/model_node_edit_widget.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
@@ -15,8 +16,12 @@ import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 
 /// [TypeNodeComponent] type节点，用于类图，包含属性和方法
-class TypeNodeComponent extends PositionComponent
+class TypeNodeComponent extends RectangleComponent
     with TapCallbacks, HasGameRef<ModelFlameGame> {
+  static final fillPaint = Paint()
+    ..color = myself.primary
+    ..style = PaintingStyle.fill;
+
   static const double headHeight = 30;
 
   final double padding = 10.0;
@@ -27,12 +32,18 @@ class TypeNodeComponent extends PositionComponent
 
   TypeNodeComponent({
     required this.modelNode,
-  });
+    double? width,
+    double? height,
+  }) : super(paint: fillPaint) {
+    width = width ?? Project.nodeWidth;
+    height = height ?? Project.nodeHeight;
+    size = Vector2(width, height);
+  }
 
   TextBoxComponent _buildNodeNameComponent({
     required String text,
-    Vector2? scale,
     double? angle,
+    Vector2? scale,
     Anchor? anchor,
     Anchor? align,
   }) {
@@ -42,7 +53,6 @@ class TypeNodeComponent extends PositionComponent
         fontSize: 14.0,
       ),
     );
-    TextBoxConfig boxConfig = const TextBoxConfig();
 
     return TextBoxComponent(
         text: text,
@@ -53,13 +63,12 @@ class TypeNodeComponent extends PositionComponent
         anchor: anchor ?? Anchor.topLeft,
         align: align ?? Anchor.center,
         priority: 2,
-        boxConfig: boxConfig,
+        boxConfig: const TextBoxConfig(),
         textRenderer: textPaint);
   }
 
   @override
   Future<void> onLoad() async {
-    width = Project.nodeWidth;
     nodeNameComponent = _buildNodeNameComponent(
       text: modelNode.name,
     );
@@ -76,9 +85,9 @@ class TypeNodeComponent extends PositionComponent
       add(methodAreaComponent);
     }
     size.addListener(() {
-      (parent as NodeFrameComponent).updateHeight();
+      (parent as NodeFrameComponent).updateSize();
     });
-    updateHeight();
+    updateSize();
   }
 
   double calAttributeHeight() {
@@ -101,7 +110,7 @@ class TypeNodeComponent extends PositionComponent
     return methodHeight;
   }
 
-  updateHeight() {
+  updateSize() {
     height = headHeight + calAttributeHeight() + calMethodHeight();
     methodAreaComponent.position =
         Vector2(0, headHeight + calAttributeHeight());

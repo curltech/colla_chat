@@ -147,6 +147,7 @@ dependencies:
   flutter_embed_unity: ^1.2.3
   #  opencv_dart: ^1.2.5
   flame: ^1.21.0
+  interactive_chart: ^0.3.5 #candlesticks
   candlesticks:
     git:
       url: https://github.com/r-mzy47/candlesticks.git
