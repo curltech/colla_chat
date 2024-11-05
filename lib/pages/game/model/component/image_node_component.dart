@@ -17,10 +17,10 @@ import 'package:flutter/material.dart';
 /// 在image节点写文本
 class ImageNodeComponent extends PositionComponent
     with TapCallbacks, HasGameRef<ModelFlameGame> {
-  static final TextPaint normal = TextPaint(
-    style: TextStyle(
-      color: BasicPalette.black.color,
-      fontSize: 12.0,
+  static final TextPaint normalTextPaint = TextPaint(
+    style: const TextStyle(
+      color: Colors.black,
+      fontSize: 16.0,
     ),
   );
 
@@ -57,7 +57,7 @@ class ImageNodeComponent extends PositionComponent
     }
     nodeTextComponent = TextBoxComponent(
       text: modelNode.name,
-      textRenderer: normal,
+      textRenderer: normalTextPaint,
       position: Vector2(0, 0),
       align: textAlign,
       size: size,

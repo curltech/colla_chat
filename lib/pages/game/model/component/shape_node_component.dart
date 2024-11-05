@@ -17,9 +17,9 @@ import 'package:flutter/material.dart';
 class ShapeNodeComponent extends PositionComponent
     with TapCallbacks, HasGameRef<ModelFlameGame> {
   static final TextPaint normalTextPaint = TextPaint(
-    style: TextStyle(
-      color: BasicPalette.black.color,
-      fontSize: 12.0,
+    style: const TextStyle(
+      color: Colors.black,
+      fontSize: 16.0,
     ),
   );
 
