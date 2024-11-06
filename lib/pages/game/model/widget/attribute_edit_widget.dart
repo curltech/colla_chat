@@ -141,10 +141,12 @@ class AttributeEditWidget extends StatelessWidget with TileDataMixin {
 
   Future<void> _onAdd() async {
     PositionComponent? child = modelNode.nodeFrameComponent?.child;
-    if (child != null && child is TypeNodeComponent) {
+    if (child != null) {
       attribute.value = Attribute('unknownAttribute');
       attributes.add(attribute.value!);
-      child.attributeAreaComponent.onAdd(attribute.value!);
+      if (child is TypeNodeComponent) {
+        child.attributeAreaComponent.onAdd(attribute.value!);
+      }
     }
   }
 

@@ -45,15 +45,10 @@ class AttributeTextComponent extends TextComponent
   }
 
   Future<void> onDelete() async {
-    bool? success = await DialogUtil.confirm(
-        content: 'Do you confirm to delete this attribute:${attribute.name}');
-    if (success != null && success) {
-      List<Attribute> attributes =
-          (parent as AttributeAreaComponent).attributes;
-      attributes.remove(attribute);
-      removeFromParent();
-      (parent as AttributeAreaComponent).updateSize();
-    }
+    List<Attribute> attributes = (parent as AttributeAreaComponent).attributes;
+    attributes.remove(attribute);
+    removeFromParent();
+    (parent as AttributeAreaComponent).updateSize();
   }
 
   Future<void> onUpdate() async {

@@ -7,6 +7,7 @@ import 'package:colla_chat/pages/game/model/component/node_frame_component.dart'
 import 'package:colla_chat/pages/game/model/component/type_node_component.dart';
 import 'package:colla_chat/pages/game/model/widget/method_edit_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flame/components.dart';
@@ -17,8 +18,8 @@ import 'package:flutter/material.dart';
 
 class MethodTextComponent extends TextComponent
     with TapCallbacks, DoubleTapCallbacks, HasGameRef<ModelFlameGame> {
-   static final TextPaint normal = TextPaint(
-    style:  const TextStyle(
+  static final TextPaint normal = TextPaint(
+    style: const TextStyle(
       color: Colors.black,
       fontSize: 12.0,
     ),
@@ -43,78 +44,15 @@ class MethodTextComponent extends TextComponent
     size = Vector2(Project.nodeWidth, contentHeight);
   }
 
-  _onAction(int index, String name, {String? value}) async {
-    switch (name) {
-      case 'Add':
-        _onAdd();
-        break;
-      case 'Delete':
-        _onDelete();
-        break;
-      case 'Update':
-        _onUpdate();
-        break;
-      default:
-        break;
-    }
+  Future<void> onDelete() async {
+    List<Method> methods = (parent as MethodAreaComponent).methods;
+    methods.remove(method);
+    removeFromParent();
+    (parent as MethodAreaComponent).updateSize();
   }
 
-  @override
-  Future<void> onTapDown(TapDownEvent event) async {
-    List<ActionData> actionData = [
-      ActionData(
-          label: 'Add', tooltip: 'Add method', icon: const Icon(Icons.add)),
-      ActionData(
-          label: 'Delete',
-          tooltip: 'Delete method',
-          icon: const Icon(Icons.delete_outline)),
-      ActionData(
-          label: 'Update',
-          tooltip: 'Update method',
-          icon: const Icon(Icons.update)),
-    ];
-
-    await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
-      return DataActionCard(
-        actions: actionData,
-        width: appDataProvider.secondaryBodyWidth,
-        height: 100,
-        onPressed: (int index, String label, {String? value}) {
-          Navigator.pop(context);
-          _onAction(index, label, value: value);
-        },
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
-        crossAxisCount: 3,
-      );
-    });
-  }
-
-  Future<void> _onAdd() async {
-    (parent as MethodAreaComponent).onAdd();
-  }
-
-  Future<void> _onDelete() async {
-    bool? success = await DialogUtil.confirm(
-        content: 'Do you confirm to delete this method:${method.name}');
-    if (success != null && success) {
-      List<Method> methods = (parent as MethodAreaComponent).methods;
-      methods.remove(method);
-      removeFromParent();
-      (parent as MethodAreaComponent).updateSize();
-    }
-  }
-
-  Future<void> _onUpdate() async {
-    Attribute? a =
-        await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
-      return MethodEditWidget(
-        method: method,
-      );
-    });
-    if (a != null) {
-      text = '${method.scope} ${method.returnType}:${method.name}';
-    }
+  Future<void> onUpdate() async {
+    text = '${method.scope} ${method.returnType}:${method.name}';
   }
 }
 
@@ -162,26 +100,21 @@ class MethodAreaComponent extends RectangleComponent
   }
 
   @override
-  Future<void> onTapDown(TapDownEvent event) async {
-    onAdd();
+  Future<void> onLongTapDown(TapDownEvent event) async {
+    indexWidgetProvider.push('method_edit');
   }
 
-  Future<void> onAdd() async {
-    Method method = Method('unknownMethod');
-    Method? m =
-        await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
-      return MethodEditWidget(
-        method: method,
-      );
-    });
-    if (m != null) {
+  Future<void> onAdd(Method method) async {
+    if (!methods.contains(method)) {
       methods.add(method);
-      Vector2 position =
-          Vector2(0, methods.length * MethodTextComponent.contentHeight);
-      MethodTextComponent methodTextComponent =
-          MethodTextComponent(method, position: position);
-      add(methodTextComponent);
-      updateSize();
     }
+    methods.add(method);
+    Vector2 position =
+        Vector2(0, methods.length * MethodTextComponent.contentHeight);
+    MethodTextComponent methodTextComponent =
+        MethodTextComponent(method, position: position);
+    method.methodTextComponent = methodTextComponent;
+    add(methodTextComponent);
+    updateSize();
   }
 }
