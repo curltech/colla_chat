@@ -151,7 +151,8 @@ class FormInputWidget extends StatefulWidget {
   final Function(Map<String, dynamic> values)? onReset;
   final bool showResetButton;
   final String okLabel;
-  final double height; //高度
+  final double? height; //高度
+  final double? width; //高度
   final MainAxisAlignment mainAxisAlignment;
   final double spacing;
   final double buttonSpacing;
@@ -166,7 +167,8 @@ class FormInputWidget extends StatefulWidget {
     this.onReset,
     this.showResetButton = true,
     this.okLabel = 'Ok',
-    required this.height,
+    this.height,
+    this.width,
     this.mainAxisAlignment = MainAxisAlignment.start,
     this.spacing = 0.0,
     this.buttonSpacing = 10.0,
@@ -320,7 +322,12 @@ class _FormInputWidgetState extends State<FormInputWidget> {
       }
     }
 
-    return ButtonBar(children: btns);
+    return OverflowBar(
+      alignment: MainAxisAlignment.end,
+      spacing: 10.0,
+      overflowSpacing: 10.0,
+      children: btns,
+    );
   }
 
   Widget _buildFormSwiper(BuildContext context) {
@@ -328,6 +335,7 @@ class _FormInputWidgetState extends State<FormInputWidget> {
     if (views.length > 1) {
       return SizedBox(
           height: widget.height, //最大高度
+          width: widget.width,
           child: Swiper(
             controller: SwiperController(),
             itemCount: views.length,
@@ -346,7 +354,8 @@ class _FormInputWidgetState extends State<FormInputWidget> {
             // )),
           ));
     } else if (views.length == 1) {
-      return SizedBox(height: widget.height, child: views[0]);
+      return SizedBox(
+          height: widget.height, width: widget.width, child: views[0]);
     } else {
       return nil;
     }

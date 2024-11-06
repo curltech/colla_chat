@@ -1,18 +1,32 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
+import 'package:colla_chat/pages/game/model/widget/attribute_edit_widget.dart';
+import 'package:colla_chat/pages/game/model/widget/method_edit_widget.dart';
+import 'package:colla_chat/pages/game/model/widget/node_relationship_edit_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
 class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
-  ModelNodeEditWidget({super.key});
+  final AttributeEditWidget attributeEditWidget = AttributeEditWidget();
+  final MethodEditWidget methodEditWidget = MethodEditWidget();
+  final NodeRelationshipEditWidget nodeRelationshipEditWidget =
+      NodeRelationshipEditWidget();
+
+  ModelNodeEditWidget({super.key}) {
+    indexWidgetProvider.define(attributeEditWidget);
+    indexWidgetProvider.define(methodEditWidget);
+    indexWidgetProvider.define(nodeRelationshipEditWidget);
+  }
 
   @override
   bool get withLeading => true;
@@ -90,6 +104,23 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    return _buildFormInputWidget(context);
+    return AppBarView(
+        title: title,
+        withLeading: true,
+        rightWidgets: [
+          IconButton(
+              tooltip: attributeEditWidget.title,
+              onPressed: () {
+                indexWidgetProvider.push(attributeEditWidget.routeName);
+              },
+              icon: Icon(attributeEditWidget.iconData)),
+          IconButton(
+              tooltip: methodEditWidget.title,
+              onPressed: () {
+                indexWidgetProvider.push(methodEditWidget.routeName);
+              },
+              icon: Icon(methodEditWidget.iconData))
+        ],
+        child: _buildFormInputWidget(context));
   }
 }

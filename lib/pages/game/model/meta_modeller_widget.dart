@@ -205,12 +205,12 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
           tooltip: AppLocalizations.t('New relationship'),
         ),
       ];
-      return appDataProvider.landscape
-          ? Row(
+      return appDataProvider.secondaryBodyLandscape
+          ? Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: children,
             )
-          : Column(
+          : Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: children,
             );
@@ -311,17 +311,22 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       if (subject != null) {
         title = '$title-${subject.name}';
       }
-      return AppBarView(
-          title: title,
-          withLeading: true,
-          rightWidgets: rightWidgets,
-          child: appDataProvider.landscape
-              ? Column(
-                  children: children,
-                )
-              : Row(
-                  children: children,
-                ));
+      return ListenableBuilder(
+          listenable: appDataProvider,
+          builder: (BuildContext context, Widget? _) {
+            return AppBarView(
+                title: title,
+                withLeading: true,
+                rightWidgets: rightWidgets,
+                child: appDataProvider.secondaryBodyLandscape
+                    ? Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: children,
+                      )
+                    : Column(
+                        children: children,
+                      ));
+          });
     });
   }
 }

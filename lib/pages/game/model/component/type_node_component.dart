@@ -7,10 +7,8 @@ import 'package:colla_chat/pages/game/model/component/node_relationship_componen
 import 'package:colla_chat/pages/game/model/component/method_text_component.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
-import 'package:colla_chat/pages/game/model/widget/model_node_edit_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/palette.dart';
@@ -74,17 +72,13 @@ class TypeNodeComponent extends RectangleComponent
       text: modelNode.name,
     );
     add(nodeNameComponent);
-    if (modelNode.attributes != null) {
-      attributeAreaComponent = AttributeAreaComponent(
-          position: Vector2(0, headHeight), attributes: modelNode.attributes!);
-      add(attributeAreaComponent);
-    }
-    if (modelNode.methods != null) {
-      methodAreaComponent = MethodAreaComponent(
-          position: Vector2(0, headHeight + calAttributeHeight()),
-          methods: modelNode.methods!);
-      add(methodAreaComponent);
-    }
+    attributeAreaComponent = AttributeAreaComponent(
+        position: Vector2(0, headHeight), attributes: modelNode.attributes);
+    add(attributeAreaComponent);
+    methodAreaComponent = MethodAreaComponent(
+        position: Vector2(0, headHeight + calAttributeHeight()),
+        methods: modelNode.methods);
+    add(methodAreaComponent);
     size.addListener(() {
       (parent as NodeFrameComponent).updateSize();
     });
@@ -93,9 +87,9 @@ class TypeNodeComponent extends RectangleComponent
 
   double calAttributeHeight() {
     double attributeHeight = AttributeTextComponent.contentHeight;
-    if (modelNode.attributes != null && modelNode.attributes!.isNotEmpty) {
+    if (modelNode.attributes.isNotEmpty) {
       attributeHeight =
-          modelNode.attributes!.length * AttributeTextComponent.contentHeight;
+          modelNode.attributes.length * AttributeTextComponent.contentHeight;
     }
 
     return attributeHeight;
@@ -103,9 +97,9 @@ class TypeNodeComponent extends RectangleComponent
 
   double calMethodHeight() {
     double methodHeight = MethodTextComponent.contentHeight;
-    if (modelNode.methods != null && modelNode.methods!.isNotEmpty) {
+    if (modelNode.methods.isNotEmpty) {
       methodHeight =
-          modelNode.methods!.length * MethodTextComponent.contentHeight;
+          modelNode.methods.length * MethodTextComponent.contentHeight;
     }
 
     return methodHeight;

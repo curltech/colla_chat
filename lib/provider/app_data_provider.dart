@@ -129,16 +129,16 @@ class AppDataProvider with ChangeNotifier {
   }
 
   changeBodyRatio() {
-    if (_bodyRatio < 30) {
+    if (_bodyRatio == 0) {
       if (_totalSize.width >= largeBreakpointLimit) {
         _bodyRatio = 40;
       } else if (_totalSize.width >= smallBreakpointLimit) {
         _bodyRatio = 50;
+      } else {
+        _bodyRatio = 0;
       }
-    } else if (_bodyRatio == 30) {
-      _bodyRatio = 0;
     } else {
-      _bodyRatio = _bodyRatio - 5;
+      _bodyRatio = 0;
     }
     notifyListeners();
   }
@@ -160,6 +160,11 @@ class AppDataProvider with ChangeNotifier {
       width = _totalSize.width;
     }
     return width;
+  }
+
+  /// 二级视图是否横屏
+  bool get secondaryBodyLandscape {
+    return secondaryBodyWidth > _totalSize.height;
   }
 
   double get keyboardHeight {

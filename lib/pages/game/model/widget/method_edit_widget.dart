@@ -32,14 +32,14 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'MethodEdit';
 
-  late RxList<Method> methods;
+  final Rx<List<Method>?> methods = Rx<List<Method>?>(null);
 
-  Rx<Method?> method = Rx<Method?>(null);
+  final Rx<Method?> method = Rx<Method?>(null);
 
   MethodEditWidget({super.key});
 
-  ModelNode get modelNode {
-    return modelProjectController.selectedModelNode.value!;
+  ModelNode? get modelNode {
+    return modelProjectController.selectedModelNode.value;
   }
 
   final List<PlatformDataField> methodDataFields = [
@@ -61,32 +61,29 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
       FormInputController(methodDataFields);
 
   Widget _buildMethodsWidget(BuildContext context) {
-    return Column(children: [
-      _buildToolPanel(context),
-      Expanded(child: Obx(() {
-        if (methods.isNotEmpty) {
-          List<TileData> tiles = [];
-          for (var method in methods) {
-            TileData tile =
-                TileData(title: method.name, subtitle: method.returnType);
-            tiles.add(tile);
-          }
-
-          return DataListView(
-            itemCount: tiles.length,
-            itemBuilder: (BuildContext context, int index) {
-              return tiles[index];
-            },
-            onTap: (int index, String title,
-                {TileData? group, String? subtitle}) {
-              method.value = methods[index];
-            },
-          );
+    return Obx(() {
+      if (methods.value != null && methods.value!.isNotEmpty) {
+        List<TileData> tiles = [];
+        for (var method in methods.value!) {
+          TileData tile =
+              TileData(title: method.name, subtitle: method.returnType);
+          tiles.add(tile);
         }
 
-        return nilBox;
-      }))
-    ]);
+        return DataListView(
+          itemCount: tiles.length,
+          itemBuilder: (BuildContext context, int index) {
+            return tiles[index];
+          },
+          onTap: (int index, String title,
+              {TileData? group, String? subtitle}) {
+            method.value = methods.value![index];
+          },
+        );
+      }
+
+      return nilBox;
+    });
   }
 
   //ModelNode信息编辑界面
@@ -138,12 +135,14 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
   }
 
   Future<void> _onAdd() async {
-    PositionComponent? child = modelNode.nodeFrameComponent?.child;
+    PositionComponent? child = modelNode?.nodeFrameComponent?.child;
     if (child != null) {
       method.value = Method('unknownMethod');
-      methods.add(method.value!);
-      if (child is TypeNodeComponent) {
-        child.methodAreaComponent.onAdd(method.value!);
+      if (methods.value != null) {
+        methods.value!.add(method.value!);
+        if (child is TypeNodeComponent) {
+          child.methodAreaComponent.onAdd(method.value!);
+        }
       }
     }
   }
@@ -152,8 +151,8 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
     bool? success = await DialogUtil.confirm(
         content: 'Do you confirm to delete this method:${method.value?.name}');
     if (success != null && success) {
-      List<Method> methods = modelNode.methods;
-      if (methods.isNotEmpty) {
+      List<Method>? methods = modelNode?.methods;
+      if (methods != null && methods.isNotEmpty) {
         methods.remove(method.value);
         MethodTextComponent? methodTextComponent =
             method.value?.methodTextComponent;
@@ -177,49 +176,64 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  Widget _buildToolPanel(BuildContext context) {
-    return OverflowBar(
-      children: [
-        IconButton(
-          tooltip: AppLocalizations.t('Add method'),
-          icon: const Icon(Icons.add),
-          onPressed: () {
-            _onAdd();
-          },
-        ),
-        IconButton(
-          tooltip: AppLocalizations.t('Delete method'),
-          icon: const Icon(Icons.delete_outline),
-          onPressed: () {
-            _onDelete();
-          },
-        ),
-        IconButton(
-          tooltip: AppLocalizations.t('Update method'),
-          icon: const Icon(Icons.update),
-          onPressed: () {
-            _onUpdate();
-          },
-        ),
-      ],
-    );
+  List<Widget> _buildRightButton(BuildContext context) {
+    return [
+      IconButton(
+        tooltip: AppLocalizations.t('Add method'),
+        icon: const Icon(Icons.add),
+        onPressed: () {
+          _onAdd();
+        },
+      ),
+      IconButton(
+        tooltip: AppLocalizations.t('Delete method'),
+        icon: const Icon(Icons.delete_outline),
+        onPressed: () {
+          _onDelete();
+        },
+      ),
+      IconButton(
+        tooltip: AppLocalizations.t('Update method'),
+        icon: const Icon(Icons.update),
+        onPressed: () {
+          _onUpdate();
+        },
+      ),
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget child;
-    if (appDataProvider.landscape) {
-      child = Row(children: [
-        _buildMethodsWidget(context),
-        _buildFormInputWidget(context)
-      ]);
-    } else {
-      child = Column(children: [
-        _buildMethodsWidget(context),
-        _buildFormInputWidget(context)
-      ]);
-    }
+    methods.value = modelNode?.methods;
+    Widget listenable = ListenableBuilder(
+        listenable: appDataProvider,
+        builder: (BuildContext context, Widget? _) {
+          Widget child;
+          if (appDataProvider.secondaryBodyLandscape) {
+            child =
+                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              SizedBox(
+                  width: appDataProvider.secondaryBodyWidth * 0.4,
+                  child: _buildMethodsWidget(context)),
+              const VerticalDivider(),
+              Expanded(child: _buildFormInputWidget(context))
+            ]);
+          } else {
+            child = Column(children: [
+              SizedBox(
+                  height: appDataProvider.portraitSize.height * 0.4,
+                  child: _buildMethodsWidget(context)),
+              const Divider(),
+              Expanded(child: _buildFormInputWidget(context))
+            ]);
+          }
+          return child;
+        });
 
-    return AppBarView(title: title, withLeading: true, child: child);
+    return AppBarView(
+        title: title,
+        withLeading: true,
+        rightWidgets: _buildRightButton(context),
+        child: listenable);
   }
 }

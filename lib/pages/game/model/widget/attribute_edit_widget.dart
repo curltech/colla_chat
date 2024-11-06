@@ -32,17 +32,15 @@ class AttributeEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'AttributeEdit';
 
-  ModelNode get modelNode {
-    return modelProjectController.selectedModelNode.value!;
+  ModelNode? get modelNode {
+    return modelProjectController.selectedModelNode.value;
   }
 
-  late RxList<Attribute> attributes;
+  final Rx<List<Attribute>?> attributes = Rx<List<Attribute>?>(null);
 
-  Rx<Attribute?> attribute = Rx<Attribute?>(null);
+  final Rx<Attribute?> attribute = Rx<Attribute?>(null);
 
-  AttributeEditWidget({super.key}) {
-    attributes.value = modelNode.attributes;
-  }
+  AttributeEditWidget({super.key});
 
   final List<PlatformDataField> attributeDataFields = [
     PlatformDataField(
@@ -63,32 +61,31 @@ class AttributeEditWidget extends StatelessWidget with TileDataMixin {
       FormInputController(attributeDataFields);
 
   Widget _buildAttributesWidget(BuildContext context) {
-    return Column(children: [
-      _buildToolPanel(context),
-      Expanded(child: Obx(() {
-        if (attributes.isNotEmpty) {
-          List<TileData> tiles = [];
-          for (var attribute in attributes) {
-            TileData tile =
-                TileData(title: attribute.name, subtitle: attribute.dataType);
-            tiles.add(tile);
-          }
-
-          return DataListView(
-            itemCount: tiles.length,
-            itemBuilder: (BuildContext context, int index) {
-              return tiles[index];
-            },
-            onTap: (int index, String title,
-                {TileData? group, String? subtitle}) {
-              attribute.value = attributes[index];
-            },
-          );
+    return Obx(() {
+      if (attributes.value != null && attributes.value!.isNotEmpty) {
+        List<TileData> tiles = [];
+        for (var attribute in attributes.value!) {
+          TileData tile = TileData(
+              title: attribute.name,
+              titleTail: attribute.dataType,
+              selected: this.attribute.value == attribute);
+          tiles.add(tile);
         }
 
-        return nilBox;
-      }))
-    ]);
+        return DataListView(
+          itemCount: tiles.length,
+          itemBuilder: (BuildContext context, int index) {
+            return tiles[index];
+          },
+          onTap: (int index, String title,
+              {TileData? group, String? subtitle}) {
+            attribute.value = attributes.value![index];
+          },
+        );
+      }
+
+      return nilBox;
+    });
   }
 
   //ModelNode信息编辑界面
@@ -99,7 +96,6 @@ class AttributeEditWidget extends StatelessWidget with TileDataMixin {
       }
       formInputController.setValues(JsonUtil.toJson(attribute.value));
       var formInputWidget = FormInputWidget(
-        height: appDataProvider.portraitSize.height * 0.5,
         spacing: 15.0,
         onOk: (Map<String, dynamic> values) {
           Attribute? attribute = _onOk(values);
@@ -140,12 +136,14 @@ class AttributeEditWidget extends StatelessWidget with TileDataMixin {
   }
 
   Future<void> _onAdd() async {
-    PositionComponent? child = modelNode.nodeFrameComponent?.child;
+    PositionComponent? child = modelNode?.nodeFrameComponent?.child;
     if (child != null) {
       attribute.value = Attribute('unknownAttribute');
-      attributes.add(attribute.value!);
-      if (child is TypeNodeComponent) {
-        child.attributeAreaComponent.onAdd(attribute.value!);
+      if (attributes.value != null) {
+        attributes.value!.add(attribute.value!);
+        if (child is TypeNodeComponent) {
+          child.attributeAreaComponent.onAdd(attribute.value!);
+        }
       }
     }
   }
@@ -155,8 +153,8 @@ class AttributeEditWidget extends StatelessWidget with TileDataMixin {
         content:
             'Do you confirm to delete this attribute:${attribute.value?.name}');
     if (success != null && success) {
-      List<Attribute> attributes = modelNode.attributes;
-      if (attributes.isNotEmpty) {
+      List<Attribute>? attributes = modelNode?.attributes;
+      if (attributes != null && attributes.isNotEmpty) {
         attributes.remove(attribute.value);
         AttributeTextComponent? attributeTextComponent =
             attribute.value?.attributeTextComponent;
@@ -180,49 +178,65 @@ class AttributeEditWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  Widget _buildToolPanel(BuildContext context) {
-    return OverflowBar(
-      children: [
-        IconButton(
-          tooltip: AppLocalizations.t('Add attribute'),
-          icon: const Icon(Icons.add),
-          onPressed: () {
-            _onAdd();
-          },
-        ),
-        IconButton(
-          tooltip: AppLocalizations.t('Delete attribute'),
-          icon: const Icon(Icons.delete_outline),
-          onPressed: () {
-            _onDelete();
-          },
-        ),
-        IconButton(
-          tooltip: AppLocalizations.t('Update attribute'),
-          icon: const Icon(Icons.update),
-          onPressed: () {
-            _onUpdate();
-          },
-        ),
-      ],
-    );
+  List<Widget> _buildRightButton(BuildContext context) {
+    return [
+      IconButton(
+        tooltip: AppLocalizations.t('Add attribute'),
+        icon: const Icon(Icons.add),
+        onPressed: () {
+          _onAdd();
+        },
+      ),
+      IconButton(
+        tooltip: AppLocalizations.t('Delete attribute'),
+        icon: const Icon(Icons.delete_outline),
+        onPressed: () {
+          _onDelete();
+        },
+      ),
+      IconButton(
+        tooltip: AppLocalizations.t('Update attribute'),
+        icon: const Icon(Icons.update),
+        onPressed: () {
+          _onUpdate();
+        },
+      ),
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget child;
-    if (appDataProvider.landscape) {
-      child = Row(children: [
-        _buildAttributesWidget(context),
-        _buildFormInputWidget(context)
-      ]);
-    } else {
-      child = Column(children: [
-        _buildAttributesWidget(context),
-        _buildFormInputWidget(context)
-      ]);
-    }
+    attributes.value = modelNode?.attributes;
 
-    return AppBarView(title: title, withLeading: true, child: child);
+    Widget listenable = ListenableBuilder(
+        listenable: appDataProvider,
+        builder: (BuildContext context, Widget? _) {
+          Widget child;
+          if (appDataProvider.secondaryBodyLandscape) {
+            child =
+                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              SizedBox(
+                  width: appDataProvider.secondaryBodyWidth * 0.4,
+                  child: _buildAttributesWidget(context)),
+              const VerticalDivider(),
+              Expanded(child: _buildFormInputWidget(context))
+            ]);
+          } else {
+            child = Column(children: [
+              SizedBox(
+                  height: appDataProvider.portraitSize.height * 0.4,
+                  child: _buildAttributesWidget(context)),
+              const Divider(),
+              Expanded(child: _buildFormInputWidget(context))
+            ]);
+          }
+          return child;
+        });
+
+    return AppBarView(
+        title: title,
+        withLeading: true,
+        rightWidgets: _buildRightButton(context),
+        child: listenable);
   }
 }
