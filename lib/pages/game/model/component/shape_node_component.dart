@@ -5,7 +5,9 @@ import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
+import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/pages/game/model/widget/model_node_edit_widget.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
@@ -105,11 +107,7 @@ class ShapeNodeComponent extends PositionComponent
 
   @override
   Future<void> onLongTapDown(TapDownEvent event) async {
-    await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
-      return ModelNodeEditWidget(
-        modelNode: modelNode,
-      );
-    });
-    nodeTextComponent.text = modelNode.name;
+    modelProjectController.selectedModelNode.value = modelNode;
+    indexWidgetProvider.push('node_edit');
   }
 }

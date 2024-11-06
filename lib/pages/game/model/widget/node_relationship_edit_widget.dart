@@ -1,19 +1,34 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/node.dart';
+import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-class NodeRelationshipEditWidget extends StatelessWidget {
-  final NodeRelationship nodeRelationship;
+class NodeRelationshipEditWidget extends StatelessWidget with TileDataMixin {
+  @override
+  bool get withLeading => true;
 
-  NodeRelationshipEditWidget({super.key, required this.nodeRelationship});
+  @override
+  String get routeName => 'relationship_edit';
+
+  @override
+  IconData get iconData => Icons.link;
+
+  @override
+  String get title => 'RelationshipEdit';
+
+  NodeRelationshipEditWidget({super.key});
+
+  NodeRelationship? get nodeRelationship {
+    return modelProjectController.selectedRelationship.value;
+  }
 
   final List<PlatformDataField> relationshipDataFields = [
     PlatformDataField(
@@ -83,9 +98,9 @@ class NodeRelationshipEditWidget extends StatelessWidget {
               AppLocalizations.t('Must has nodeRelationship dstCardinality'));
       return null;
     }
-    nodeRelationship.relationshipType = current.relationshipType;
-    nodeRelationship.srcCardinality = current.srcCardinality;
-    nodeRelationship.dstCardinality = current.dstCardinality;
+    nodeRelationship?.relationshipType = current.relationshipType;
+    nodeRelationship?.srcCardinality = current.srcCardinality;
+    nodeRelationship?.dstCardinality = current.dstCardinality;
 
     return current;
   }

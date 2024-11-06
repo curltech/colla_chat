@@ -4,8 +4,10 @@ import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
+import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/pages/game/model/widget/model_node_edit_widget.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
@@ -57,11 +59,7 @@ class RemarkNodeComponent extends TextBoxComponent
 
   @override
   Future<void> onLongTapDown(TapDownEvent event) async {
-    await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
-      return ModelNodeEditWidget(
-        modelNode: modelNode,
-      );
-    });
-    text = modelNode.content ?? '';
+    modelProjectController.selectedModelNode.value = modelNode;
+    indexWidgetProvider.push('node_edit');
   }
 }

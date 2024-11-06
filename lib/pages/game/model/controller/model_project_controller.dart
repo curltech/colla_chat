@@ -1,4 +1,5 @@
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
+import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:get/get.dart';
@@ -13,7 +14,9 @@ class ModelProjectController {
   /// 当前模型的文件名
   final Rx<String?> filename = Rx<String?>(null);
   final Rx<String?> currentSubjectName = Rx<String?>(null);
-  final Rx<ModelNode?> selected = Rx<ModelNode?>(null);
+  final Rx<ModelNode?> selectedModelNode = Rx<ModelNode?>(null);
+  final Rx<NodeRelationship?> selectedRelationship =
+      Rx<NodeRelationship?>(null);
 
   final RxBool addSubjectStatus = false.obs;
   final Rx<NodeType?> addNodeStatus = Rx<NodeType?>(null);

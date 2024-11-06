@@ -9,6 +9,7 @@ import 'package:colla_chat/pages/game/model/controller/model_project_controller.
 import 'package:colla_chat/pages/game/model/widget/node_relationship_edit_widget.dart';
 import 'package:colla_chat/plugin/painter/line/dash_painter.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
@@ -360,8 +361,8 @@ class NodeRelationshipComponent extends PositionComponent
 
   void selfCardinality(
       Canvas canvas, Vector2 srcBottomCenter, Vector2 srcRightCenter) {
-    int? srcCardinality = 1; //nodeRelationship.srcCardinality;
-    int? dstCardinality = 1; //nodeRelationship.dstCardinality;
+    int? srcCardinality = nodeRelationship.srcCardinality;
+    int? dstCardinality = nodeRelationship.dstCardinality;
     if (srcCardinality != null && dstCardinality != null) {
       _drawCardinality(canvas, '$srcCardinality:$dstCardinality',
           Offset(srcRightCenter.x, srcBottomCenter.y + 16));
@@ -405,14 +406,9 @@ class NodeRelationshipComponent extends PositionComponent
   }
 
   @override
-  Future<void> onTapDown(TapDownEvent event) async {
-    NodeRelationship? m =
-        await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
-      return NodeRelationshipEditWidget(
-        nodeRelationship: nodeRelationship,
-      );
-    });
-    if (m != null) {}
+  Future<void> onLongTapDown(TapDownEvent event) async {
+    modelProjectController.selectedRelationship.value = nodeRelationship;
+    indexWidgetProvider.push('relationship_edit');
   }
 
   @override

@@ -8,6 +8,7 @@ import 'package:colla_chat/pages/game/model/component/method_text_component.dart
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/pages/game/model/widget/model_node_edit_widget.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flame/components.dart';
@@ -78,7 +79,7 @@ class TypeNodeComponent extends RectangleComponent
           position: Vector2(0, headHeight), attributes: modelNode.attributes!);
       add(attributeAreaComponent);
     }
-    if (modelNode.attributes != null) {
+    if (modelNode.methods != null) {
       methodAreaComponent = MethodAreaComponent(
           position: Vector2(0, headHeight + calAttributeHeight()),
           methods: modelNode.methods!);
@@ -119,12 +120,12 @@ class TypeNodeComponent extends RectangleComponent
   /// 单击根据状态决定是否连线或者选择高亮
   @override
   Future<void> onTapDown(TapDownEvent event) async {
-    if (modelProjectController.selected.value == null) {
-      modelProjectController.selected.value = modelNode;
+    if (modelProjectController.selectedModelNode.value == null) {
+      modelProjectController.selectedModelNode.value = modelNode;
     } else {
       if (modelProjectController.addRelationshipStatus.value) {
-        NodeRelationship nodeRelationship =
-            NodeRelationship(modelProjectController.selected.value, modelNode);
+        NodeRelationship nodeRelationship = NodeRelationship(
+            modelProjectController.selectedModelNode.value, modelNode);
         modelProjectController.getCurrentSubject()!.add(nodeRelationship);
         NodeRelationshipComponent nodeRelationshipComponent =
             NodeRelationshipComponent(nodeRelationship: nodeRelationship);
@@ -135,9 +136,9 @@ class TypeNodeComponent extends RectangleComponent
         }
         modelProjectController.addRelationshipStatus.value = false;
 
-        modelProjectController.selected.value = null;
+        modelProjectController.selectedModelNode.value = null;
       } else {
-        modelProjectController.selected.value = modelNode;
+        modelProjectController.selectedModelNode.value = modelNode;
       }
     }
   }
@@ -145,14 +146,7 @@ class TypeNodeComponent extends RectangleComponent
   /// 长按弹出节点编辑窗口
   @override
   Future<void> onLongTapDown(TapDownEvent event) async {
-    ModelNode? m =
-        await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
-      return ModelNodeEditWidget(
-        modelNode: modelNode,
-      );
-    });
-    if (m != null) {
-      nodeNameComponent.text = modelNode.name;
-    }
+    modelProjectController.selectedModelNode.value = modelNode;
+    indexWidgetProvider.push('node_edit');
   }
 }

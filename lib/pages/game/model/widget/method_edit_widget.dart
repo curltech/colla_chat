@@ -1,18 +1,36 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
+import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-class MethodEditWidget extends StatelessWidget {
+class MethodEditWidget extends StatelessWidget with TileDataMixin {
+  @override
+  bool get withLeading => true;
+
+  @override
+  String get routeName => 'method_edit';
+
+  @override
+  IconData get iconData => Icons.call_to_action_outlined;
+
+  @override
+  String get title => 'MethodEdit';
+
   final Method method;
 
   MethodEditWidget({super.key, required this.method});
+
+  ModelNode? get modelNode {
+    return modelProjectController.selectedModelNode.value;
+  }
 
   final List<PlatformDataField> methodDataFields = [
     PlatformDataField(

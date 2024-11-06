@@ -1,18 +1,34 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
+import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-class ModelNodeEditWidget extends StatelessWidget {
-  final ModelNode modelNode;
+class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
+  ModelNodeEditWidget({super.key});
 
-  ModelNodeEditWidget({super.key, required this.modelNode});
+  @override
+  bool get withLeading => true;
+
+  @override
+  String get routeName => 'node_edit';
+
+  @override
+  IconData get iconData => Icons.edit_calendar_outlined;
+
+  @override
+  String get title => 'NodeEdit';
+
+  ModelNode? get modelNode {
+    return modelProjectController.selectedModelNode.value;
+  }
 
   final List<PlatformDataField> modelNodeDataFields = [
     PlatformDataField(
@@ -25,15 +41,17 @@ class ModelNodeEditWidget extends StatelessWidget {
         label: 'Name',
         prefixIcon: Icon(Icons.person, color: myself.primary)),
     PlatformDataField(
-        name: 'packageName',
-        label: 'PackageName',
-        prefixIcon: Icon(Icons.shopping_bag_outlined, color: myself.primary)),
+        name: 'nodeType',
+        label: 'NodeType',
+        prefixIcon: Icon(Icons.person, color: myself.primary)),
     PlatformDataField(
-        name: 'isAbstract',
-        label: 'IsAbstract',
-        inputType: InputType.switcher,
-        dataType: DataType.bool,
-        prefixIcon: Icon(Icons.ac_unit_outlined, color: myself.primary)),
+        name: 'shapeType',
+        label: 'ShapeType',
+        prefixIcon: Icon(Icons.person, color: myself.primary)),
+    PlatformDataField(
+        name: 'content',
+        label: 'Content',
+        prefixIcon: Icon(Icons.person, color: myself.primary)),
   ];
 
   late final FormInputController formInputController =
@@ -65,14 +83,7 @@ class ModelNodeEditWidget extends StatelessWidget {
       DialogUtil.error(content: AppLocalizations.t('Must has modelNode name'));
       return null;
     }
-    if (StringUtil.isEmpty(current.packageName)) {
-      DialogUtil.error(
-          content: AppLocalizations.t('Must has modelNode packageName'));
-      return null;
-    }
-    modelNode.name = current.name;
-    modelNode.packageName = current.packageName;
-    modelNode.isAbstract = current.isAbstract;
+    modelNode?.name = current.name;
 
     return current;
   }

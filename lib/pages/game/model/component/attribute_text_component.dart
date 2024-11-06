@@ -7,6 +7,7 @@ import 'package:colla_chat/pages/game/model/component/node_frame_component.dart'
 import 'package:colla_chat/pages/game/model/component/type_node_component.dart';
 import 'package:colla_chat/pages/game/model/widget/attribute_edit_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flame/components.dart';
@@ -43,59 +44,7 @@ class AttributeTextComponent extends TextComponent
     size = Vector2(Project.nodeWidth, contentHeight);
   }
 
-  _onAction(int index, String name, {String? value}) async {
-    switch (name) {
-      case 'Add':
-        _onAdd();
-        break;
-      case 'Delete':
-        _onDelete();
-        break;
-      case 'Update':
-        _onUpdate();
-        break;
-      default:
-        break;
-    }
-  }
-
-  /// 单击询问是否删除属性
-  @override
-  Future<void> onTapDown(TapDownEvent event) async {
-    List<ActionData> actionData = [
-      ActionData(
-          label: 'Add', tooltip: 'Add attribute', icon: const Icon(Icons.add)),
-      ActionData(
-          label: 'Delete',
-          tooltip: 'Delete attribute',
-          icon: const Icon(Icons.delete_outline)),
-      ActionData(
-          label: 'Update',
-          tooltip: 'Update attribute',
-          icon: const Icon(Icons.update)),
-    ];
-
-    await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
-      return DataActionCard(
-        actions: actionData,
-        width: appDataProvider.secondaryBodyWidth,
-        height: 100,
-        onPressed: (int index, String label, {String? value}) {
-          Navigator.pop(context);
-          _onAction(index, label, value: value);
-        },
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
-        crossAxisCount: 3,
-      );
-    });
-  }
-
-  Future<void> _onAdd() async {
-    (parent as AttributeAreaComponent).onAdd();
-  }
-
-  Future<void> _onDelete() async {
+  Future<void> onDelete() async {
     bool? success = await DialogUtil.confirm(
         content: 'Do you confirm to delete this attribute:${attribute.name}');
     if (success != null && success) {
@@ -107,16 +56,8 @@ class AttributeTextComponent extends TextComponent
     }
   }
 
-  Future<void> _onUpdate() async {
-    Attribute? a =
-        await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
-      return AttributeEditWidget(
-        attribute: attribute,
-      );
-    });
-    if (a != null) {
-      text = '${attribute.scope} ${attribute.dataType}:${attribute.name}';
-    }
+  Future<void> onUpdate() async {
+    text = '${attribute.scope} ${attribute.dataType}:${attribute.name}';
   }
 }
 
@@ -164,24 +105,20 @@ class AttributeAreaComponent extends RectangleComponent
   }
 
   @override
-  Future<void> onTapDown(TapDownEvent event) async {
-    onAdd();
+  Future<void> onLongTapDown(TapDownEvent event) async {
+    indexWidgetProvider.push('attribute_edit');
   }
 
-  Future<void> onAdd() async {
-    Attribute attribute = Attribute('unknownAttribute');
-    Attribute? a =
-        await DialogUtil.popModalBottomSheet(builder: (BuildContext context) {
-      return AttributeEditWidget(
-        attribute: attribute,
-      );
-    });
-    if (a != null) {
+  Future<void> onAdd(Attribute attribute) async {
+    if (!attributes.contains(attribute)) {
       attributes.add(attribute);
-      Vector2 position = Vector2(
-          0, (attributes.length - 1) * AttributeTextComponent.contentHeight);
-      add(AttributeTextComponent(attribute, position: position));
-      updateSize();
     }
+    Vector2 position = Vector2(
+        0, (attributes.length - 1) * AttributeTextComponent.contentHeight);
+    AttributeTextComponent attributeTextComponent =
+        AttributeTextComponent(attribute, position: position);
+    attribute.attributeTextComponent = attributeTextComponent;
+    add(attributeTextComponent);
+    updateSize();
   }
 }

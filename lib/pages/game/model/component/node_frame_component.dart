@@ -71,7 +71,7 @@ class NodeFrameComponent extends RectangleComponent
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    if (modelProjectController.selected.value == modelNode) {
+    if (modelProjectController.selectedModelNode.value == modelNode) {
       canvas.drawRect(strokeRect, selectedStrokePaint);
     } else {
       canvas.drawRect(strokeRect, strokePaint);
@@ -89,12 +89,12 @@ class NodeFrameComponent extends RectangleComponent
   /// 单击根据状态决定是否连线或者选择高亮
   @override
   Future<void> onTapDown(TapDownEvent event) async {
-    if (modelProjectController.selected.value == null) {
-      modelProjectController.selected.value = modelNode;
+    if (modelProjectController.selectedModelNode.value == null) {
+      modelProjectController.selectedModelNode.value = modelNode;
     } else {
       if (modelProjectController.addRelationshipStatus.value) {
         NodeRelationship nodeRelationship =
-            NodeRelationship(modelProjectController.selected.value, modelNode);
+            NodeRelationship(modelProjectController.selectedModelNode.value, modelNode);
         if (modelNode.nodeType == NodeType.remark.name) {
           nodeRelationship.relationshipType = RelationshipType.reference.name;
         }
@@ -108,9 +108,9 @@ class NodeFrameComponent extends RectangleComponent
         }
         modelProjectController.addRelationshipStatus.value = false;
 
-        modelProjectController.selected.value = null;
+        modelProjectController.selectedModelNode.value = null;
       } else {
-        modelProjectController.selected.value = modelNode;
+        modelProjectController.selectedModelNode.value = modelNode;
       }
     }
   }
