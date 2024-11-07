@@ -761,7 +761,10 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
         var option = options[i];
         var item = DropdownMenuItem<String>(
           value: option.value,
-          child: Text(AppLocalizations.t(option.label)),
+          child: Text(
+            AppLocalizations.t(option.label),
+            style: const TextStyle(color: Colors.black),
+          ),
         );
         children.add(item);
       }
