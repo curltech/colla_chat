@@ -776,7 +776,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
         padding: const EdgeInsets.all(10.0),
         hint: Text(AppLocalizations.t(dataFieldDef.hintText ?? '')),
         isDense: true,
-        elevation: 0,
+        // elevation: 0,
         value: widget.controller.value,
         items: children,
         onChanged: (String? value) {
