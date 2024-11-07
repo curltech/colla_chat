@@ -55,8 +55,7 @@ class NodeRelationshipEditWidget extends StatelessWidget with TileDataMixin {
         prefixIcon: Icon(Icons.star, color: myself.primary)),
   ];
 
-  late final FormInputController formInputController =
-      FormInputController(relationshipDataFields);
+  FormInputController? formInputController;
 
   //ModelNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
@@ -64,6 +63,9 @@ class NodeRelationshipEditWidget extends StatelessWidget with TileDataMixin {
     for (var value in RelationshipType.values) {
       options.add(Option(value.name, value.name));
     }
+    List<PlatformDataField> relationshipDataFields = [
+      ...this.relationshipDataFields
+    ];
     relationshipDataFields.add(PlatformDataField(
         name: 'relationshipType',
         label: 'RelationshipType',
@@ -71,13 +73,14 @@ class NodeRelationshipEditWidget extends StatelessWidget with TileDataMixin {
         prefixIcon: Icon(Icons.link, color: myself.primary),
         inputType: InputType.togglebuttons,
         options: options));
-    formInputController.setValues(JsonUtil.toJson(nodeRelationship));
+    formInputController = FormInputController(relationshipDataFields);
+    formInputController!.setValues(JsonUtil.toJson(nodeRelationship));
     var formInputWidget = FormInputWidget(
       spacing: 15.0,
       onOk: (Map<String, dynamic> values) {
         _onOk(values);
       },
-      controller: formInputController,
+      controller: formInputController!,
     );
 
     return Container(

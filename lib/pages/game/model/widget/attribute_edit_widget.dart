@@ -54,8 +54,7 @@ class AttributeEditWidget extends StatelessWidget with TileDataMixin {
         prefixIcon: Icon(Icons.shopping_bag_outlined, color: myself.primary)),
   ];
 
-  late final FormInputController formInputController =
-      FormInputController(attributeDataFields);
+  FormInputController? formInputController;
 
   Widget _buildAttributesWidget(BuildContext context) {
     return Obx(() {
@@ -91,23 +90,25 @@ class AttributeEditWidget extends StatelessWidget with TileDataMixin {
     for (var value in DataType.values) {
       options.add(Option(value.name, value.name));
     }
+    List<PlatformDataField> attributeDataFields = [...this.attributeDataFields];
     attributeDataFields.add(PlatformDataField(
         name: 'dataType',
         label: 'DataType',
         prefixIcon: Icon(Icons.data_object_outlined, color: myself.primary),
-        inputType: InputType.togglebuttons,
+        inputType: InputType.select,
         options: options));
+    formInputController = FormInputController(attributeDataFields);
     return Obx(() {
       if (attribute.value == null) {
         return nilBox;
       }
-      formInputController.setValues(JsonUtil.toJson(attribute.value));
+      formInputController!.setValues(JsonUtil.toJson(attribute.value));
       var formInputWidget = FormInputWidget(
         spacing: 15.0,
         onOk: (Map<String, dynamic> values) {
           _onOk(values);
         },
-        controller: formInputController,
+        controller: formInputController!,
       );
 
       return Container(

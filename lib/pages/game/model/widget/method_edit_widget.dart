@@ -54,8 +54,7 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
         prefixIcon: Icon(Icons.shopping_bag_outlined, color: myself.primary)),
   ];
 
-  late final FormInputController formInputController =
-      FormInputController(methodDataFields);
+  FormInputController? formInputController;
 
   Widget _buildMethodsWidget(BuildContext context) {
     return Obx(() {
@@ -89,24 +88,26 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
     for (var value in DataType.values) {
       options.add(Option(value.name, value.name));
     }
+    List<PlatformDataField> methodDataFields = [...this.methodDataFields];
     methodDataFields.add(PlatformDataField(
         name: 'returnType',
         label: 'ReturnType',
         prefixIcon: Icon(Icons.data_object_outlined, color: myself.primary),
-        inputType: InputType.togglebuttons,
+        inputType: InputType.select,
         options: options));
+    formInputController = FormInputController(methodDataFields);
     return Obx(() {
       if (method.value == null) {
         return nilBox;
       }
-      formInputController.setValues(JsonUtil.toJson(method.value));
+      formInputController!.setValues(JsonUtil.toJson(method.value));
       var formInputWidget = FormInputWidget(
         height: appDataProvider.portraitSize.height * 0.5,
         spacing: 15.0,
         onOk: (Map<String, dynamic> values) {
           _onOk(values);
         },
-        controller: formInputController,
+        controller: formInputController!,
       );
 
       return Container(
