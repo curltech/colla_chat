@@ -11,6 +11,7 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -51,10 +52,6 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
         name: 'scope',
         label: 'Scope',
         prefixIcon: Icon(Icons.shopping_bag_outlined, color: myself.primary)),
-    PlatformDataField(
-        name: 'returnType',
-        label: 'ReturnType',
-        prefixIcon: Icon(Icons.data_object_outlined, color: myself.primary)),
   ];
 
   late final FormInputController formInputController =
@@ -88,6 +85,16 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
 
   //ModelNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
+    List<Option<dynamic>> options = [];
+    for (var value in DataType.values) {
+      options.add(Option(value.name, value.name));
+    }
+    methodDataFields.add(PlatformDataField(
+        name: 'returnType',
+        label: 'ReturnType',
+        prefixIcon: Icon(Icons.data_object_outlined, color: myself.primary),
+        inputType: InputType.togglebuttons,
+        options: options));
     return Obx(() {
       if (method.value == null) {
         return nilBox;
@@ -97,9 +104,7 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
         height: appDataProvider.portraitSize.height * 0.5,
         spacing: 15.0,
         onOk: (Map<String, dynamic> values) {
-          Method? method = _onOk(values);
-
-          Navigator.pop(context, method);
+          _onOk(values);
         },
         controller: formInputController,
       );
@@ -130,6 +135,8 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
     method.value?.scope = current.scope;
     method.value?.returnType = current.returnType;
     _onUpdate();
+    DialogUtil.info(
+        content: 'Successfully update method:${method.value!.name}');
 
     return current;
   }

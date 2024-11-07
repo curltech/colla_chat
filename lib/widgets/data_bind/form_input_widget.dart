@@ -259,6 +259,9 @@ class _FormInputWidgetState extends State<FormInputWidget> {
       children.add(dataFieldWidget);
       if (i == widget.controller.dataFields.length - 1) {
         if (widget.tails != null) {
+          children.add(SizedBox(
+            height: widget.spacing,
+          ));
           children.addAll(widget.tails!);
         }
       }

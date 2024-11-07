@@ -8,6 +8,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
@@ -43,17 +44,15 @@ class NodeRelationshipEditWidget extends StatelessWidget with TileDataMixin {
         inputType: InputType.label,
         prefixIcon: Icon(Icons.numbers_outlined, color: myself.primary)),
     PlatformDataField(
-        name: 'relationshipType',
-        label: 'RelationshipType',
-        prefixIcon: Icon(Icons.link, color: myself.primary)),
-    PlatformDataField(
         name: 'srcCardinality',
         label: 'SrcCardinality',
-        prefixIcon: Icon(Icons.numbers_outlined, color: myself.primary)),
+        dataType: DataType.int,
+        prefixIcon: Icon(Icons.star, color: myself.primary)),
     PlatformDataField(
         name: 'dstCardinality',
         label: 'DstCardinality',
-        prefixIcon: Icon(Icons.numbers_outlined, color: myself.primary)),
+        dataType: DataType.int,
+        prefixIcon: Icon(Icons.star, color: myself.primary)),
   ];
 
   late final FormInputController formInputController =
@@ -61,14 +60,22 @@ class NodeRelationshipEditWidget extends StatelessWidget with TileDataMixin {
 
   //ModelNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
+    List<Option<dynamic>> options = [];
+    for (var value in RelationshipType.values) {
+      options.add(Option(value.name, value.name));
+    }
+    relationshipDataFields.add(PlatformDataField(
+        name: 'relationshipType',
+        label: 'RelationshipType',
+        readOnly: true,
+        prefixIcon: Icon(Icons.link, color: myself.primary),
+        inputType: InputType.togglebuttons,
+        options: options));
     formInputController.setValues(JsonUtil.toJson(nodeRelationship));
     var formInputWidget = FormInputWidget(
-      height: appDataProvider.portraitSize.height * 0.5,
       spacing: 15.0,
       onOk: (Map<String, dynamic> values) {
-        NodeRelationship? nodeRelationship = _onOk(values);
-
-        Navigator.pop(context, nodeRelationship);
+        _onOk(values);
       },
       controller: formInputController,
     );
@@ -102,6 +109,7 @@ class NodeRelationshipEditWidget extends StatelessWidget with TileDataMixin {
     nodeRelationship?.relationshipType = current.relationshipType;
     nodeRelationship?.srcCardinality = current.srcCardinality;
     nodeRelationship?.dstCardinality = current.dstCardinality;
+    DialogUtil.info(content: 'Successfully update nodeRelationship');
 
     return current;
   }

@@ -122,6 +122,7 @@ class ModelFlameGame extends FlameGame
       return;
     }
     modelProjectController.selectedModelNode.value = null;
+    modelProjectController.selectedRelationship.value = null;
     Vector2 localPosition = event.localPosition;
     if (modelProjectController.addSubjectStatus.value) {
       String? subjectName = await DialogUtil.showTextFormField(

@@ -24,7 +24,6 @@ class Attribute {
         scope = json['scope'],
         dataType = json['dataType'];
 
-  @override
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json.addAll({'name': name, 'scope': scope, 'dataType': dataType});
@@ -50,7 +49,6 @@ class Method {
         scope = json['scope'],
         returnType = json['returnType'];
 
-  @override
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json.addAll({'name': name, 'scope': scope, 'returnType': returnType});

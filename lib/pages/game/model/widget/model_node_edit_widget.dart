@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
@@ -8,13 +11,17 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
   final AttributeEditWidget attributeEditWidget = AttributeEditWidget();
@@ -54,36 +61,57 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
         name: 'name',
         label: 'Name',
         prefixIcon: Icon(Icons.person, color: myself.primary)),
-    PlatformDataField(
-        name: 'nodeType',
-        label: 'NodeType',
-        prefixIcon: Icon(Icons.person, color: myself.primary)),
-    PlatformDataField(
-        name: 'shapeType',
-        label: 'ShapeType',
-        prefixIcon: Icon(Icons.person, color: myself.primary)),
-    PlatformDataField(
-        name: 'content',
-        label: 'Content',
-        prefixIcon: Icon(Icons.person, color: myself.primary)),
   ];
 
-  late final FormInputController formInputController =
-      FormInputController(modelNodeDataFields);
+  FormInputController? formInputController;
+
+  final Rx<String?> content = Rx<String?>(null);
+
+  Future<void> _pickAvatar(BuildContext context) async {
+    Uint8List? avatar = await ImageUtil.pickAvatar(context: context);
+    if (avatar == null) {
+      bool? confirm =
+          await DialogUtil.confirm(content: 'Do you want delete image?');
+      if (confirm == null || !confirm) {
+        return;
+      }
+    }
+    if (avatar != null) {
+      String data = CryptoUtil.encodeBase64(avatar);
+      data = ImageUtil.base64Img(data);
+      content.value = data;
+    }
+  }
 
   //ModelNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
-    formInputController.setValues(JsonUtil.toJson(modelNode));
-    var formInputWidget = FormInputWidget(
-      height: appDataProvider.portraitSize.height * 0.5,
-      spacing: 15.0,
-      onOk: (Map<String, dynamic> values) {
-        ModelNode? modelNode = _onOk(values);
-
-        Navigator.pop(context, modelNode);
-      },
-      controller: formInputController,
-    );
+    if (modelNode == null) {
+      return nilBox;
+    }
+    formInputController = FormInputController(_buildModelNodeDataFields());
+    formInputController!.setValues(JsonUtil.toJson(modelNode));
+    Widget formInputWidget = FormInputWidget(
+        spacing: 15.0,
+        onOk: (Map<String, dynamic> values) {
+          _onOk(values);
+        },
+        controller: formInputController!,
+        tails: modelNode!.nodeType == NodeType.image.name
+            ? [
+                Obx(() {
+                  return ListTile(
+                    title: Text(AppLocalizations.t('Image')),
+                    trailing: content.value != null
+                        ? ImageUtil.buildImageWidget(
+                            width: 32, height: 32, imageContent: content.value)
+                        : null,
+                    onTap: () {
+                      _pickAvatar(context);
+                    },
+                  );
+                })
+              ]
+            : null);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),
@@ -98,24 +126,64 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
       return null;
     }
     modelNode?.name = current.name;
+    modelNode?.content = content.value;
+    DialogUtil.info(
+        content: 'Successfully update modelNode:${modelNode!.name}');
 
     return current;
   }
 
+  List<PlatformDataField> _buildModelNodeDataFields() {
+    ModelNode? modelNode = this.modelNode;
+    if (modelNode == null) {
+      return [];
+    }
+
+    List<PlatformDataField> modelNodeDataFields = [...this.modelNodeDataFields];
+    List<Option<dynamic>> options = [];
+    for (var value in NodeType.values) {
+      options.add(Option(value.name, value.name));
+    }
+    modelNodeDataFields.add(
+      PlatformDataField(
+          name: 'nodeType',
+          label: 'NodeType',
+          readOnly : true,
+          prefixIcon: Icon(Icons.type_specimen_outlined, color: myself.primary),
+          inputType: InputType.togglebuttons,
+          options: options),
+    );
+    if (modelNode.nodeType == NodeType.shape.name) {
+      options = [];
+      for (var value in ShapeType.values) {
+        options.add(Option(value.name, value.name));
+      }
+      modelNodeDataFields.add(PlatformDataField(
+          name: 'shapeType',
+          label: 'ShapeType',
+          prefixIcon: Icon(Icons.share_sharp, color: myself.primary),
+          inputType: InputType.select,
+          options: options));
+    }
+
+    return modelNodeDataFields;
+  }
+
   @override
   Widget build(BuildContext context) {
+    content.value = modelNode!.content;
     return AppBarView(
         title: title,
         withLeading: true,
         rightWidgets: [
           IconButton(
-              tooltip: attributeEditWidget.title,
+              tooltip: AppLocalizations.t(attributeEditWidget.title),
               onPressed: () {
                 indexWidgetProvider.push(attributeEditWidget.routeName);
               },
               icon: Icon(attributeEditWidget.iconData)),
           IconButton(
-              tooltip: methodEditWidget.title,
+              tooltip: AppLocalizations.t(methodEditWidget.title),
               onPressed: () {
                 indexWidgetProvider.push(methodEditWidget.routeName);
               },

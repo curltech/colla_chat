@@ -21,6 +21,7 @@ enum InputType {
   radio,
   checkbox,
   togglebuttons,
+  toggleswitch,
   select,
   switcher,
   toggle,
@@ -168,22 +169,20 @@ class DataFieldController with ChangeNotifier {
   bool _changed = false;
 
   //文本框的时候是TextEditingController，其他的时候是普通的ValueNotifier
-  ValueNotifier<dynamic>? _controller;
+  ValueNotifier<dynamic>? controller;
 
   DataFieldController(
     this.dataField, {
     dynamic value,
     dynamic flag,
-    ValueNotifier<dynamic>? controller,
+    this.controller,
   }) {
     _value = value;
     _flag = flag;
-    _controller = controller;
   }
 
   ///获取真实值，如果控制器为空，返回_value，否则取控制器的值，并覆盖_value
   dynamic get value {
-    var controller = _controller;
     if (controller != null) {
       if (dataField.inputType == InputType.text ||
           dataField.inputType == InputType.textarea ||
@@ -195,7 +194,7 @@ class DataFieldController with ChangeNotifier {
           } else if (dataField.dataType == DataType.double) {
             _value = double.parse(valueStr);
           } else if (dataField.dataType == DataType.string) {
-            _value = controller.text;
+            _value = (controller as TextEditingController).text;
           }
         } else {
           _value = null;
@@ -209,7 +208,6 @@ class DataFieldController with ChangeNotifier {
   set value(dynamic value) {
     var realValue = value;
     String valueStr = '';
-    var controller = _controller;
     if (controller != null) {
       if (value != null) {
         if (value is DateTime &&
@@ -235,15 +233,15 @@ class DataFieldController with ChangeNotifier {
     }
     if (controller != null) {
       if (controller is TextEditingController) {
-        String v = controller.text;
+        String v = (controller as TextEditingController).text;
         if (valueStr != v) {
-          controller.text = valueStr;
+          (controller as TextEditingController).text = valueStr;
           _changed = true;
         }
       } else {
-        dynamic v = controller.value;
+        dynamic v = controller!.value;
         if (valueStr != v) {
-          controller.value = valueStr;
+          controller!.value = valueStr;
           _changed = true;
         }
       }
@@ -271,21 +269,12 @@ class DataFieldController with ChangeNotifier {
     }
   }
 
-  ValueNotifier<dynamic>? get controller {
-    return _controller;
-  }
-
-  set controller(ValueNotifier<dynamic>? controller) {
-    _controller = controller;
-  }
-
   clear() {
-    var controller = _controller;
     if (controller != null) {
       if (controller is TextEditingController) {
-        controller.clear();
+        (controller as TextEditingController).clear();
       } else {
-        controller.value = null;
+        controller!.value = null;
       }
     } else {
       if (dataField.inputType == InputType.label) {
@@ -301,9 +290,8 @@ class DataFieldController with ChangeNotifier {
   @override
   dispose() {
     super.dispose();
-    var controller = _controller;
     if (controller != null) {
-      controller.dispose();
+      controller!.dispose();
     }
   }
 }
@@ -540,6 +528,9 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
         var option = options[i];
         var radio = Radio<String>(
           onChanged: (String? value) {
+            if (dataFieldDef.readOnly) {
+              return;
+            }
             widget.controller.value = value;
             setState(() {});
           },
@@ -564,7 +555,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     var options = dataFieldDef.options;
     List<String> labels = [];
     List<IconData?> icons = [];
-    String? value = _getInitValue(context);
+    dynamic value = _getInitValue(context);
     int? index;
     if (options != null && options.isNotEmpty) {
       for (var i = 0; i < options.length; ++i) {
@@ -587,6 +578,9 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
       labels: labels,
       icons: icons,
       onToggle: (index) {
+        if (dataFieldDef.readOnly) {
+          return;
+        }
         if (index != null) {
           widget.controller.value = options![index].value;
         } else {
@@ -595,7 +589,13 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
       },
     );
 
-    return Row(children: [Text(label), toggleSwitch]);
+    return Row(children: [
+      Text(AppLocalizations.t(label)),
+      const SizedBox(
+        width: 15.0,
+      ),
+      toggleSwitch
+    ]);
   }
 
   ///多个字符串选择多个，对应的字段是字符串的Set
@@ -614,6 +614,9 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
         value ??= <dynamic>{};
         var checkbox = Checkbox(
           onChanged: (bool? selected) {
+            if (dataFieldDef.readOnly) {
+              return;
+            }
             if (value != null) {
               if (selected == null || !selected) {
                 value.remove(option.value);
@@ -649,7 +652,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     );
   }
 
-  ///多个字符串选择多个，对应的字段是字符串的Set
+  /// 多个字符串选择一个
   Widget _buildToggleButtonsField(BuildContext context) {
     widget.controller.controller = null;
     var dataFieldDef = widget.controller.dataField;
@@ -657,13 +660,16 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     var options = dataFieldDef.options;
     List<Widget> children = [];
     List<bool> isSelected = [];
-    Set<String>? value = _getInitValue(context);
+    dynamic value = _getInitValue(context);
     if (options != null && options.isNotEmpty) {
-      value ??= <String>{};
       for (var i = 0; i < options.length; ++i) {
         var option = options[i];
-        children.add(option.leading!);
-        if (value.contains(option.value)) {
+        if (option.leading != null) {
+          children.add(option.leading!);
+        } else {
+          children.add(Text(AppLocalizations.t(option.label)));
+        }
+        if (value == option.value) {
           isSelected.add(true);
         } else {
           isSelected.add(false);
@@ -671,28 +677,38 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
       }
     }
     var toggleButtons = ToggleButtons(
+      borderRadius: BorderRadius.circular(16.0),
+      fillColor: myself.primary,
+      selectedColor: Colors.white,
       onPressed: (int newIndex) {
-        isSelected[newIndex] = true;
-        Set<String>? value = widget.controller.value;
-        var option = options![newIndex];
-        if (value!.contains(option.value)) {
-          value.remove(option.value);
-        } else {
-          value.add(option.value);
+        if (dataFieldDef.readOnly) {
+          return;
         }
-        widget.controller.value = value;
+        for (int i = 0; i < isSelected.length; ++i) {
+          if (i == newIndex) {
+            isSelected[i] = true;
+          } else {
+            isSelected[i] = false;
+          }
+        }
+        Option option = options![newIndex];
+        widget.controller.value = option.value;
+        setState(() {});
       },
       isSelected: isSelected,
       children: children,
     );
     var row = Row(
       children: [
-        CommonAutoSizeText(label),
+        Text(AppLocalizations.t(label)),
+        const SizedBox(
+          width: 15,
+        ),
         toggleButtons,
       ],
     );
 
-    return Column(children: children);
+    return row;
   }
 
   ///适合数据类型为bool
@@ -720,6 +736,9 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
       inactiveThumbColor: myself.secondary,
       inactiveTrackColor: Colors.grey,
       onChanged: (bool? value) {
+        if (dataFieldDef.readOnly) {
+          return;
+        }
         widget.controller.value = value;
         setState(() {});
       },
@@ -742,19 +761,21 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
         var option = options[i];
         var item = DropdownMenuItem<String>(
           value: option.value,
-          child: CommonAutoSizeText(option.label),
+          child: Text(AppLocalizations.t(option.label)),
         );
         children.add(item);
       }
     }
     var dropdownButton = Row(children: [
-      CommonAutoSizeText(AppLocalizations.t(dataFieldDef.label)),
-      const Spacer(),
+      Text(AppLocalizations.t(dataFieldDef.label)),
+      const SizedBox(
+        width: 15.0,
+      ),
       DropdownButton<String>(
-        dropdownColor: Colors.grey.withOpacity(0.7),
-        underline: nil,
-        hint:
-            CommonAutoSizeText(AppLocalizations.t(dataFieldDef.hintText ?? '')),
+        dropdownColor: myself.primary,
+        padding: const EdgeInsets.all(10.0),
+        hint: Text(AppLocalizations.t(dataFieldDef.hintText ?? '')),
+        isDense: true,
         elevation: 0,
         value: widget.controller.value,
         items: children,

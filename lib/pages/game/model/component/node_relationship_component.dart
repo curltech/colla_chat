@@ -6,11 +6,9 @@ import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
-import 'package:colla_chat/pages/game/model/widget/node_relationship_edit_widget.dart';
 import 'package:colla_chat/plugin/painter/line/dash_painter.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
@@ -198,13 +196,17 @@ class NodeRelationshipComponent extends PositionComponent
 
     if (nodeRelationship.relationshipType == RelationshipType.reference.name) {
       DashPainter dashPainter = const DashPainter();
-      if (isHovered) {
+      if (isHovered ||
+          modelProjectController.selectedRelationship.value ==
+              nodeRelationship) {
         dashPainter.paint(canvas, path, selectedStrokePaint);
       } else {
         dashPainter.paint(canvas, path, strokePaint);
       }
     } else {
-      if (isHovered) {
+      if (isHovered ||
+          modelProjectController.selectedRelationship.value ==
+              nodeRelationship) {
         canvas.drawPath(path, selectedStrokePaint);
       } else {
         canvas.drawPath(path, strokePaint);
@@ -264,8 +266,8 @@ class NodeRelationshipComponent extends PositionComponent
           canvas,
           '$srcCardinality:$dstCardinality',
           Offset(
-              srcLeftCenter.x - (srcLeftCenter.x - dstRightCenter.x) / 2 - 24,
-              dstRightCenter.y));
+              srcLeftCenter.x + (dstRightCenter.x - srcLeftCenter.x) / 2 - 24,
+              srcLeftCenter.y + (dstRightCenter.y - srcLeftCenter.y) / 2 - 8));
     }
   }
 
@@ -289,8 +291,8 @@ class NodeRelationshipComponent extends PositionComponent
       _drawCardinality(
           canvas,
           '$srcCardinality:$dstCardinality',
-          Offset(srcTopCenter.x + 36,
-              srcTopCenter.y - (srcTopCenter.y - dstBottomCenter.y) / 2));
+          Offset(srcTopCenter.x + (dstBottomCenter.x - srcTopCenter.x) / 2,
+              srcTopCenter.y + (dstBottomCenter.y - srcTopCenter.y) / 2 - 16));
     }
   }
 
@@ -315,8 +317,8 @@ class NodeRelationshipComponent extends PositionComponent
           canvas,
           '$srcCardinality:$dstCardinality',
           Offset(
-              srcRightCenter.x + (dstLeftCenter.x - srcRightCenter.x) / 2 - 36,
-              srcRightCenter.y - 16));
+              srcRightCenter.x + (dstLeftCenter.x - srcRightCenter.x) / 2 - 24,
+              srcRightCenter.y + (dstLeftCenter.y - srcRightCenter.y) / 2 - 8));
     }
   }
 
@@ -341,7 +343,7 @@ class NodeRelationshipComponent extends PositionComponent
           canvas,
           '$srcCardinality:$dstCardinality',
           Offset(
-              srcBottomCenter.x + 36,
+              srcBottomCenter.x + (dstTopCenter.x - srcBottomCenter.x) / 2,
               srcBottomCenter.y +
                   (dstTopCenter.y - srcBottomCenter.y) / 2 -
                   16));
@@ -403,6 +405,11 @@ class NodeRelationshipComponent extends PositionComponent
     path.lineTo(dstRightCenter.x + 6, dstRightCenter.y - 2);
     path.moveTo(dstRightCenter.x, dstRightCenter.y);
     path.lineTo(dstRightCenter.x + 6, dstRightCenter.y + 2);
+  }
+
+  @override
+  Future<void> onTapDown(TapDownEvent event) async {
+    modelProjectController.selectedRelationship.value = nodeRelationship;
   }
 
   @override

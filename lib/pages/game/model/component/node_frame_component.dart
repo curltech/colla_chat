@@ -19,7 +19,11 @@ import 'package:flutter/material.dart';
 /// [NodeFrameComponent] 节点框架组件，保存的位置和大小，是flame引擎的位置组件，可以在画布上拖拽
 /// 内部可以包含type，image，shape，remark等各种类型的组件
 class NodeFrameComponent extends RectangleComponent
-    with DragCallbacks, TapCallbacks, HasGameRef<ModelFlameGame> {
+    with
+        DragCallbacks,
+        TapCallbacks,
+        HoverCallbacks,
+        HasGameRef<ModelFlameGame> {
   static final fillPaint = Paint()
     ..color = Colors.white.withOpacity(0)
     ..style = PaintingStyle.fill;
@@ -71,7 +75,8 @@ class NodeFrameComponent extends RectangleComponent
   @override
   void render(Canvas canvas) {
     super.render(canvas);
-    if (modelProjectController.selectedModelNode.value == modelNode) {
+    if (isHovered ||
+        modelProjectController.selectedModelNode.value == modelNode) {
       canvas.drawRect(strokeRect, selectedStrokePaint);
     } else {
       canvas.drawRect(strokeRect, strokePaint);
@@ -93,8 +98,8 @@ class NodeFrameComponent extends RectangleComponent
       modelProjectController.selectedModelNode.value = modelNode;
     } else {
       if (modelProjectController.addRelationshipStatus.value) {
-        NodeRelationship nodeRelationship =
-            NodeRelationship(modelProjectController.selectedModelNode.value, modelNode);
+        NodeRelationship nodeRelationship = NodeRelationship(
+            modelProjectController.selectedModelNode.value, modelNode);
         if (modelNode.nodeType == NodeType.remark.name) {
           nodeRelationship.relationshipType = RelationshipType.reference.name;
         }

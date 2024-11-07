@@ -204,6 +204,18 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
           ),
           tooltip: AppLocalizations.t('New relationship'),
         ),
+        IconButton(
+          onPressed: project != null
+              ? () {
+                  modelProjectController.selectedRelationship;
+                }
+              : null,
+          icon: Icon(
+            Icons.delete_outline,
+            color: myself.primary,
+          ),
+          tooltip: AppLocalizations.t('Delete'),
+        ),
       ];
       return appDataProvider.secondaryBodyLandscape
           ? Column(
