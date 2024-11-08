@@ -73,6 +73,13 @@ class NodeRelationshipEditWidget extends StatelessWidget with TileDataMixin {
         prefixIcon: Icon(Icons.link, color: myself.primary),
         inputType: InputType.togglebuttons,
         options: options));
+    relationshipDataFields.add(PlatformDataField(
+        name: 'allowRelationshipTypes',
+        label: 'AllowRelationshipTypes',
+        prefixIcon: Icon(Icons.link, color: myself.primary),
+        dataType: DataType.list,
+        inputType: InputType.checkbox,
+        options: options));
     formInputController = FormInputController(relationshipDataFields);
     formInputController!.setValues(JsonUtil.toJson(nodeRelationship));
     var formInputWidget = FormInputWidget(
@@ -112,6 +119,7 @@ class NodeRelationshipEditWidget extends StatelessWidget with TileDataMixin {
     nodeRelationship?.relationshipType = current.relationshipType;
     nodeRelationship?.srcCardinality = current.srcCardinality;
     nodeRelationship?.dstCardinality = current.dstCardinality;
+    nodeRelationship?.allowRelationshipTypes = current.allowRelationshipTypes;
     DialogUtil.info(content: 'Successfully update nodeRelationship');
 
     return current;

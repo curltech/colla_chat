@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/poem/poem.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/poem/poem_widget.dart';
@@ -172,7 +173,7 @@ class PoemContentWidget extends StatelessWidget with TileDataMixin {
                         selectedBorderColor: myself.primary,
                         selectedColor: myself.primary,
                         borderColor: Colors.grey,
-                        borderRadius: BorderRadius.circular(16.0),
+                        borderRadius: borderRadius,
                         isSelected: value ? [true, false] : [false, true],
                         onPressed: (int newIndex) {
                           if (newIndex == 0) {

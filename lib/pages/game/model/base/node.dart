@@ -1,9 +1,7 @@
-
-
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/component/node_relationship_component.dart';
-import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 abstract class Node {
   late final String id;
@@ -18,7 +16,7 @@ abstract class Node {
   NodeFrameComponent? nodeFrameComponent;
 
   Node(this.name) {
-    id = UniqueKey().toString();
+    id = const Uuid().v4().toString();
   }
 
   Node.fromJson(Map json)
@@ -41,17 +39,17 @@ abstract class Node {
   }
 }
 
+//关联（Association）：拥有的关系，实线带普通箭头，指向被拥有者。
 //泛化（Generalization）：继承关系，实线带三角形箭头，指向父节点。
 //实现（Realization）：实现关系，虚线带三角形箭头，指向接口。
-//关联（Association）：拥有的关系，实线带普通箭头，指向被拥有者。
 //聚合（Aggregation）：整体与部分的关系，实线带空心菱形，指向整体。
 //组合（Composition）：整体和部分的关系，但不能离开整体单独存在。实线实心菱形，指向整体。
 //依赖（Dependency）：使用的关系，即一个节点的实现需要另一个节点的协助。虚线普通箭头，指向被使用者
 //引用（Reference）：引用的关系，即一个节点的注释。虚线无箭头
 enum RelationshipType {
+  association,
   generalization,
   realization,
-  association,
   aggregation,
   composition,
   dependency,
@@ -66,6 +64,7 @@ class NodeRelationship {
   late String dstId;
 
   late String relationshipType;
+  Set<String>? allowRelationshipTypes;
   int? srcCardinality;
   int? dstCardinality;
 
@@ -76,6 +75,7 @@ class NodeRelationship {
     this.src,
     this.dst, {
     String? relationshipType,
+    this.allowRelationshipTypes,
     this.srcCardinality,
     this.dstCardinality,
   }) {
@@ -93,13 +93,22 @@ class NodeRelationship {
         relationshipType =
             json['relationshipType'] ?? RelationshipType.association.name,
         srcCardinality = json['srcCardinality'],
-        dstCardinality = json['dstCardinality'];
+        dstCardinality = json['dstCardinality'] {
+    Set<dynamic>? types = json['allowRelationshipTypes'];
+    if (types != null && types.isNotEmpty) {
+      allowRelationshipTypes = {};
+      for (var type in types) {
+        allowRelationshipTypes!.add(type.toString());
+      }
+    }
+  }
 
   Map<String, dynamic> toJson() {
     return {
       'srcId': srcId,
       'dstId': dstId,
       'relationshipType': relationshipType,
+      'allowRelationshipTypes': allowRelationshipTypes,
       'srcCardinality': srcCardinality,
       'dstCardinality': dstCardinality
     };

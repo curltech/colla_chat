@@ -1,4 +1,5 @@
 import 'package:candlesticks/candlesticks.dart';
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
@@ -511,7 +512,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
         color: Colors.grey,
         selectedColor: Colors.white,
         fillColor: myself.primary,
-        borderRadius: BorderRadius.circular(16.0),
+        borderRadius: borderRadius,
         onPressed: (int value) {
           online.value = value == 0 ? true : false;
         },

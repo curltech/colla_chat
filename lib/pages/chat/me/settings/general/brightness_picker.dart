@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/string_util.dart';
@@ -42,6 +43,7 @@ class BrightnessPicker extends StatelessWidget {
             myself.themeMode == ThemeMode.dark,
           ];
           var toggleWidget = ToggleButtons(
+            borderRadius: borderRadius,
             isSelected: isSelected,
             onPressed: (int newIndex) {
               if (newIndex == 0) {

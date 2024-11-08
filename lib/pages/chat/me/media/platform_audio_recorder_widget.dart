@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -76,6 +77,7 @@ class _PlatformAudioRecorderWidgetState
       }
     }
     var toggleWidget = ToggleButtons(
+      borderRadius: borderRadius,
       selectedBorderColor: Colors.white,
       borderColor: Colors.grey,
       color: Colors.white,
@@ -154,6 +156,7 @@ class _PlatformAudioRecorderWidgetState
         isSelected = const [false, true];
       }
       var toggleWidget = ToggleButtons(
+        borderRadius: borderRadius,
         selectedBorderColor: Colors.white,
         borderColor: Colors.grey,
         isSelected: isSelected,

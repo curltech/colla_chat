@@ -906,6 +906,7 @@ abstract class WidgetFactory {
   }) {
     return ToggleButtons(
       key: key,
+      borderRadius: borderRadius,
       isSelected: isSelected,
       onPressed: onPressed,
       mouseCursor: mouseCursor,
@@ -925,7 +926,6 @@ abstract class WidgetFactory {
       borderColor: borderColor,
       selectedBorderColor: selectedBorderColor,
       disabledBorderColor: disabledBorderColor,
-      borderRadius: borderRadius,
       borderWidth: borderWidth,
       direction: direction,
       verticalDirection: verticalDirection,

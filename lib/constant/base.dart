@@ -175,3 +175,5 @@ class AppImage {
 }
 
 const double dialogSizeIndex = 0.8;
+
+final BorderRadius borderRadius = BorderRadius.circular(8.0);

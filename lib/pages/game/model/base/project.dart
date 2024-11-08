@@ -1,7 +1,7 @@
 import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 /// 模型项目
 class Project {
@@ -22,7 +22,7 @@ class Project {
   Map<String, Subject> subjects = {};
 
   Project(this.name) {
-    id = UniqueKey().toString();
+    id = const Uuid().v4().toString();
   }
 
   void clear() {

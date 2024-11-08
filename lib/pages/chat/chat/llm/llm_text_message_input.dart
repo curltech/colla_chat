@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controller.dart';
@@ -113,7 +114,7 @@ class LlmTextMessageInputWidget extends StatelessWidget {
       ];
       return Center(
         child: ToggleButtons(
-            borderRadius: BorderRadius.circular(16.0),
+            borderRadius: borderRadius,
             fillColor: myself.primary,
             selectedColor: Colors.white,
             isSelected: isSelected,
@@ -174,7 +175,7 @@ class LlmTextMessageInputWidget extends StatelessWidget {
 
       return Center(
         child: ToggleButtons(
-            borderRadius: BorderRadius.circular(16.0),
+            borderRadius: borderRadius,
             fillColor: myself.primary,
             selectedColor: Colors.white,
             isSelected: isSelected,
@@ -204,7 +205,7 @@ class LlmTextMessageInputWidget extends StatelessWidget {
 
       return Center(
         child: ToggleButtons(
-            borderRadius: BorderRadius.circular(16.0),
+            borderRadius: borderRadius,
             fillColor: myself.primary,
             selectedColor: Colors.white,
             isSelected: isSelected,

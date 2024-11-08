@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -522,7 +523,9 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     var dataFieldDef = widget.controller.dataField;
     var label = dataFieldDef.label;
     var options = dataFieldDef.options;
-    List<Widget> children = [Text(label)];
+    List<Widget> children = [Text(AppLocalizations.t(label))];
+    dynamic value = _getInitValue(context);
+    value ??= <dynamic>{};
     if (options != null && options.isNotEmpty) {
       for (var i = 0; i < options.length; ++i) {
         var option = options[i];
@@ -535,10 +538,13 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
             setState(() {});
           },
           value: option.value,
-          groupValue: _getInitValue(context),
+          groupValue: value,
         );
         var row = Row(
-          children: [radio, CommonAutoSizeText(option.label)],
+          children: [
+            radio,
+            CommonAutoSizeText(AppLocalizations.t(option.label))
+          ],
         );
         children.add(row);
       }
@@ -604,14 +610,14 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     var dataFieldDef = widget.controller.dataField;
     var label = dataFieldDef.label;
     var options = dataFieldDef.options;
-    List<Widget> children = [Text(label)];
+    List<Widget> children = [Text(AppLocalizations.t(label))];
+    dynamic value = _getInitValue(context);
+    value ??= <dynamic>{};
     Widget? checkWidget;
     if (options != null && options.isNotEmpty) {
       List<Widget> checkChildren = [];
       for (var i = 0; i < options.length; ++i) {
         var option = options[i];
-        Set<dynamic>? value = _getInitValue(context);
-        value ??= <dynamic>{};
         var checkbox = Checkbox(
           onChanged: (bool? selected) {
             if (dataFieldDef.readOnly) {
@@ -634,7 +640,8 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
             child: Row(
               children: [
                 checkbox,
-                Expanded(child: CommonAutoSizeText(option.label))
+                Expanded(
+                    child: CommonAutoSizeText(AppLocalizations.t(option.label)))
               ],
             ));
         checkChildren.add(row);
@@ -677,7 +684,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
       }
     }
     var toggleButtons = ToggleButtons(
-      borderRadius: BorderRadius.circular(16.0),
+      borderRadius: borderRadius,
       fillColor: myself.primary,
       selectedColor: Colors.white,
       onPressed: (int newIndex) {

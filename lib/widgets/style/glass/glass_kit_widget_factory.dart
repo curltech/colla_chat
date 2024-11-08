@@ -1104,7 +1104,7 @@ class GlassKitWidgetFactory extends WidgetFactory {
   }) {
     return _buildGlassWidget(
         child: ToggleButtons(
-      key: key,
+      key: key, borderRadius: borderRadius,
       isSelected: isSelected,
       onPressed: onPressed,
       mouseCursor: mouseCursor,
@@ -1124,7 +1124,6 @@ class GlassKitWidgetFactory extends WidgetFactory {
       borderColor: borderColor,
       selectedBorderColor: selectedBorderColor,
       disabledBorderColor: disabledBorderColor,
-      borderRadius: borderRadius,
       borderWidth: borderWidth,
       direction: direction,
       verticalDirection: verticalDirection,

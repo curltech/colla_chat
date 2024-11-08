@@ -3,9 +3,9 @@ import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'dart:ui' as ui;
 
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
-/// 模型主题
+/// 模型主题，每个主题将占据一块区域，主题之间相邻，大小为10个节点x6个节点
 class Subject {
   late final String id;
   String name;
@@ -24,7 +24,7 @@ class Subject {
   Map<String, NodeRelationship> relationships = {};
 
   Subject(this.name) {
-    id = UniqueKey().toString();
+    id = const Uuid().v4().toString();
   }
 
   add(NodeRelationship nodeRelationship) {

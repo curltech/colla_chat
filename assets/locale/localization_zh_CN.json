@@ -858,6 +858,7 @@
   "SrcCardinality": "源编节点基数",
   "DstCardinality": "目标节点基数",
   "RelationshipType": "关系类型",
+  "AllowRelationshipTypes": "允许关系类型",
   "generalization": "泛化",
   "realization": "实现",
   "association": "关联",
