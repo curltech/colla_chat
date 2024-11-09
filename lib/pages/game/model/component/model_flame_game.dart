@@ -6,6 +6,7 @@ import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/component/node_relationship_component.dart';
+import 'package:colla_chat/pages/game/model/component/subject_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/plugin/painter/line/dash_painter.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -30,11 +31,6 @@ class ModelFlameGame extends FlameGame
         ScaleDetector,
         HasCollisionDetection,
         HasKeyboardHandlerComponents {
-  static final subjectStrokePaint = Paint()
-    ..color = Colors.yellow.shade50
-    ..style = PaintingStyle.stroke
-    ..strokeWidth = 1.0;
-
   ModelFlameGame();
 
   static const zoomPerScrollUnit = 0.02;
@@ -102,7 +98,8 @@ class ModelFlameGame extends FlameGame
   Rect _renderSubject(Subject subject) {
     Rect rect = subject.rect;
     RectangleComponent rectangleComponent =
-        RectangleComponent.fromRect(rect, paint: subjectStrokePaint);
+        RectangleComponent.fromRect(rect, paint: SubjectComponent.strokePaint);
+    SubjectComponent subjectComponent = SubjectComponent.fromRect(rect);
     world.add(rectangleComponent);
     final textPaint = TextPaint(
       style: const TextStyle(
@@ -168,9 +165,6 @@ class ModelFlameGame extends FlameGame
   Future<void> onLongTapDown(TapDownEvent event) async {
     Vector2 globalPosition = event.devicePosition;
     Vector2 worldPosition = camera.globalToLocal(globalPosition);
-    // camera
-    //   ..viewport.position = worldPosition
-    //   ..viewfinder.position = worldPosition;
     camera.moveTo(worldPosition);
   }
 

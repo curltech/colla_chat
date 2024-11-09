@@ -25,8 +25,9 @@ import 'package:get/get.dart';
 
 /// 元模型建模器
 class MetaModellerWidget extends StatelessWidget with TileDataMixin {
-  final ModelFlameGame modelFlameGame = ModelFlameGame();
   final ModelNodeEditWidget modelNodeEditWidget = ModelNodeEditWidget();
+
+  ModelFlameGame? modelFlameGame;
 
   MetaModellerWidget({super.key}) {
     indexWidgetProvider.define(modelNodeEditWidget);
@@ -56,11 +57,11 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     if (subjectName != null) {
       Rect rect = project.rect;
       Subject subject = Subject(subjectName);
-      subject.x = rect.left;
+      subject.x = rect.right + Project.nodePadding;
       subject.y = rect.top;
       modelProjectController.currentSubjectName.value = subject.name;
       project.subjects[subject.name] = subject;
-      modelFlameGame.moveTo();
+      modelFlameGame?.moveTo();
     }
   }
 
@@ -77,7 +78,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         title: const CommonAutoSizeText('Select subject'), items: options);
     if (subjectName != null) {
       modelProjectController.currentSubjectName.value = subjectName;
-      modelFlameGame.moveTo();
+      modelFlameGame?.moveTo();
     }
   }
 
@@ -249,28 +250,29 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
 
   _openProject() async {
     XFile? xfile = await FileUtil.selectFile(allowedExtensions: ['json']);
-    if (xfile != null) {
-      String content = await xfile.readAsString();
-      Map<String, dynamic> json = JsonUtil.toJson(content);
-      Project project = Project.fromJson(json);
-      modelProjectController.project.value = project;
-      if (project.subjects.isNotEmpty) {
-        modelProjectController.currentSubjectName.value =
-            project.subjects.values.first.name;
-        for (Subject subject in project.subjects.values) {
-          for (NodeRelationship relationship
-              in subject.relationships.values.toList()) {
-            ModelNode? modelNode =
-                modelProjectController.getModelNode(relationship.srcId);
-            if (modelNode == null) {
-              subject.remove(relationship);
-            } else {
-              modelNode =
-                  modelProjectController.getModelNode(relationship.dstId);
-              if (modelNode == null) {
-                subject.remove(relationship);
-              }
-            }
+    if (xfile == null) {
+      return;
+    }
+    String content = await xfile.readAsString();
+    Map<String, dynamic> json = JsonUtil.toJson(content);
+    Project project = Project.fromJson(json);
+    modelProjectController.project.value = project;
+    if (project.subjects.isEmpty) {
+      return;
+    }
+    modelProjectController.currentSubjectName.value =
+        project.subjects.values.first.name;
+    for (Subject subject in project.subjects.values) {
+      for (NodeRelationship relationship
+          in subject.relationships.values.toList()) {
+        ModelNode? modelNode =
+            modelProjectController.getModelNode(relationship.srcId);
+        if (modelNode == null) {
+          subject.remove(relationship);
+        } else {
+          modelNode = modelProjectController.getModelNode(relationship.dstId);
+          if (modelNode == null) {
+            subject.remove(relationship);
           }
         }
       }
@@ -316,12 +318,13 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
           tooltip: AppLocalizations.t('Save project'),
         ),
       ];
+      modelFlameGame = ModelFlameGame();
       var children = [
         _buildToolPanelWidget(context),
         Expanded(
             child: GameWidget(
           key: UniqueKey(),
-          game: modelFlameGame,
+          game: modelFlameGame!,
         ))
       ];
       String title = this.title;

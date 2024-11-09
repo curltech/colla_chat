@@ -32,10 +32,11 @@ class Subject {
           Project.nodeWidth * 4 + Project.nodePadding,
           Project.nodeHeight * 4 + Project.nodePadding);
     }
-    double minX = 0;
-    double minY = 0;
-    double maxX = 0;
-    double maxY = 0;
+    ModelNode node = modelNodes.values.toList().first;
+    double minX = node.x!;
+    double minY = node.y!;
+    double maxX = node.x!;
+    double maxY = node.y!;
     for (ModelNode modelNode in modelNodes.values) {
       double? x = modelNode.x;
       double width = modelNode.width ?? Project.nodeWidth;
@@ -63,7 +64,7 @@ class Subject {
 
     return ui.Rect.fromLTRB(
         minX - Project.nodePadding,
-        minY - Project.nodePadding,
+        minY - Project.nodePadding * 4,
         maxX + Project.nodePadding,
         maxY + Project.nodePadding);
   }
