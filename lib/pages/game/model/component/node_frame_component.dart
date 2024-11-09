@@ -10,7 +10,6 @@ import 'package:colla_chat/pages/game/model/component/remark_node_component.dart
 import 'package:colla_chat/pages/game/model/component/shape_node_component.dart';
 import 'package:colla_chat/pages/game/model/component/type_node_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/palette.dart';
@@ -27,10 +26,12 @@ class NodeFrameComponent extends RectangleComponent
   static final fillPaint = Paint()
     ..color = Colors.white.withOpacity(0)
     ..style = PaintingStyle.fill;
-  static final strokePaint = BasicPalette.black.paint()
+  static final strokePaint = Paint()
+    ..color = Colors.black
     ..style = PaintingStyle.stroke
     ..strokeWidth = 1.0;
-  static final selectedStrokePaint = BasicPalette.yellow.paint()
+  static final selectedStrokePaint = Paint()
+    ..color = Colors.yellow
     ..style = PaintingStyle.stroke
     ..strokeWidth = 1.0;
   late Rect strokeRect;
@@ -122,10 +123,10 @@ class NodeFrameComponent extends RectangleComponent
 
   @override
   void onDragUpdate(DragUpdateEvent event) {
-    if (position.x + event.localDelta.x <= 1500 &&
-        position.x + event.localDelta.x >= 0 &&
-        position.y + event.localDelta.y < 1500 &&
-        position.y + event.localDelta.y >= 0) {
+    if (event.localDelta.x <= 500 &&
+        event.localDelta.x >= -500 &&
+        event.localDelta.y < 500 &&
+        event.localDelta.y >= -500) {
       position += event.localDelta;
       modelNode.x = position.toOffset().dx;
       modelNode.y = position.toOffset().dy;

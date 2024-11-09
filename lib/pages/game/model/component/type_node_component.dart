@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 
 /// [TypeNodeComponent] type节点，用于类图，包含属性和方法
 class TypeNodeComponent extends RectangleComponent
-    with TapCallbacks, HasGameRef<ModelFlameGame> {
+    with TapCallbacks,DragCallbacks, HasGameRef<ModelFlameGame> {
   static final fillPaint = Paint()
     ..color = myself.primary
     ..style = PaintingStyle.fill;
@@ -114,27 +114,7 @@ class TypeNodeComponent extends RectangleComponent
   /// 单击根据状态决定是否连线或者选择高亮
   @override
   Future<void> onTapDown(TapDownEvent event) async {
-    if (modelProjectController.selectedModelNode.value == null) {
-      modelProjectController.selectedModelNode.value = modelNode;
-    } else {
-      if (modelProjectController.addRelationshipStatus.value) {
-        NodeRelationship nodeRelationship = NodeRelationship(
-            modelProjectController.selectedModelNode.value, modelNode);
-        modelProjectController.getCurrentSubject()!.add(nodeRelationship);
-        NodeRelationshipComponent nodeRelationshipComponent =
-            NodeRelationshipComponent(nodeRelationship: nodeRelationship);
-        if (nodeRelationship.src != null && nodeRelationship.dst != null) {
-          nodeRelationship.nodeRelationshipComponent =
-              nodeRelationshipComponent;
-          game.add(nodeRelationshipComponent);
-        }
-        modelProjectController.addRelationshipStatus.value = false;
-
-        modelProjectController.selectedModelNode.value = null;
-      } else {
-        modelProjectController.selectedModelNode.value = modelNode;
-      }
-    }
+    (parent as NodeFrameComponent).onTapDown(event);
   }
 
   /// 长按弹出节点编辑窗口
@@ -142,5 +122,10 @@ class TypeNodeComponent extends RectangleComponent
   Future<void> onLongTapDown(TapDownEvent event) async {
     modelProjectController.selectedModelNode.value = modelNode;
     indexWidgetProvider.push('node_edit');
+  }
+
+  @override
+  void onDragUpdate(DragUpdateEvent event) {
+    (parent as NodeFrameComponent).onDragUpdate(event);
   }
 }

@@ -53,7 +53,7 @@ class DashPainter {
 class DashDecoration extends Decoration {
   final Gradient? gradient;
 
-  final Color? color;
+  final Color color;
   final double step;
   final double span;
   final int pointCount;
@@ -63,7 +63,7 @@ class DashDecoration extends Decoration {
 
   const DashDecoration(
       {this.gradient,
-      this.color,
+      required this.color,
       this.step = 2,
       this.strokeWidth = 1,
       this.span = 2,
@@ -91,7 +91,7 @@ class DashBoxPainter extends BoxPainter {
     canvas.save();
     final Paint paint = Paint()
       ..style = PaintingStyle.stroke
-      ..color = Colors.orangeAccent
+      ..color = _decoration.color
       ..strokeWidth = _decoration.strokeWidth;
     final Path path = Path();
 
@@ -105,11 +105,6 @@ class DashBoxPainter extends BoxPainter {
       width: configuration.size!.width,
       height: configuration.size!.height,
     );
-
-    if (_decoration.color != null) {
-      final Paint rectPaint = Paint()..color = _decoration.color!;
-      canvas.drawRRect(RRect.fromRectAndRadius(zone, radius), rectPaint);
-    }
 
     path.addRRect(RRect.fromRectAndRadius(
       zone,

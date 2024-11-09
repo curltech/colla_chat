@@ -18,7 +18,6 @@ class ModelProjectController {
   final Rx<NodeRelationship?> selectedRelationship =
       Rx<NodeRelationship?>(null);
 
-  final RxBool addSubjectStatus = false.obs;
   final Rx<NodeType?> addNodeStatus = Rx<NodeType?>(null);
   final RxBool addRelationshipStatus = false.obs;
 

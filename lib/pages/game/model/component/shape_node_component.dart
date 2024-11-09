@@ -17,7 +17,7 @@ import 'package:flutter/material.dart';
 
 /// 在shape节点写文本
 class ShapeNodeComponent extends PositionComponent
-    with TapCallbacks, HasGameRef<ModelFlameGame> {
+    with TapCallbacks,DragCallbacks, HasGameRef<ModelFlameGame> {
   static final TextPaint normalTextPaint = TextPaint(
     style: const TextStyle(
       color: Colors.black,
@@ -109,5 +109,10 @@ class ShapeNodeComponent extends PositionComponent
   Future<void> onLongTapDown(TapDownEvent event) async {
     modelProjectController.selectedModelNode.value = modelNode;
     indexWidgetProvider.push('node_edit');
+  }
+
+  @override
+  void onDragUpdate(DragUpdateEvent event) {
+    (parent as NodeFrameComponent).onDragUpdate(event);
   }
 }

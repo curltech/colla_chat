@@ -1,5 +1,6 @@
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/node.dart';
+import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'dart:ui' as ui;
 
 import 'package:colla_chat/tool/json_util.dart';
@@ -10,13 +11,9 @@ class Subject {
   late final String id;
   String name;
 
-  /// 节点的位置和大小
+  /// 当modelNodes为空时的初始位置
   double? x;
   double? y;
-  double? width;
-  double? height;
-
-  ui.Image? image;
 
   /// 基于主题域的节点列表
   Map<String, ModelNode> modelNodes = {};
@@ -25,6 +22,50 @@ class Subject {
 
   Subject(this.name) {
     id = const Uuid().v4().toString();
+  }
+
+  ui.Rect get rect {
+    if (modelNodes.isEmpty && x != null && y != null) {
+      return ui.Rect.fromLTWH(
+          x!,
+          y!,
+          Project.nodeWidth * 4 + Project.nodePadding,
+          Project.nodeHeight * 4 + Project.nodePadding);
+    }
+    double minX = 0;
+    double minY = 0;
+    double maxX = 0;
+    double maxY = 0;
+    for (ModelNode modelNode in modelNodes.values) {
+      double? x = modelNode.x;
+      double width = modelNode.width ?? Project.nodeWidth;
+      if (x != null) {
+        if (x < minX) {
+          minX = x;
+        }
+        x += width;
+        if (x > maxX) {
+          maxX = x;
+        }
+      }
+      double? y = modelNode.y;
+      double height = modelNode.height ?? Project.nodeHeight;
+      if (y != null) {
+        if (y < minY) {
+          minY = y;
+        }
+        y += height;
+        if (y > maxY) {
+          maxY = y;
+        }
+      }
+    }
+
+    return ui.Rect.fromLTRB(
+        minX - Project.nodePadding,
+        minY - Project.nodePadding,
+        maxX + Project.nodePadding,
+        maxY + Project.nodePadding);
   }
 
   add(NodeRelationship nodeRelationship) {
@@ -45,9 +86,7 @@ class Subject {
       : id = json['id'],
         name = json['name'],
         x = json['x'],
-        y = json['y'],
-        width = json['width'],
-        height = json['height'] {
+        y = json['y'] {
     modelNodes = {};
     List<dynamic>? ss = json['modelNodes'];
     if (ss != null && ss.isNotEmpty) {
@@ -73,8 +112,6 @@ class Subject {
       'name': name,
       'x': x,
       'y': y,
-      'width': width,
-      'height': height,
       'modelNodes': JsonUtil.toJson(modelNodes.values.toList()),
       'relationships': JsonUtil.toJson(relationships.values.toList())
     };

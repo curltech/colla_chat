@@ -2,6 +2,7 @@ import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:flame/components.dart';
 import 'package:uuid/uuid.dart';
+import 'dart:ui' as ui;
 
 /// 模型项目
 class Project {
@@ -27,6 +28,30 @@ class Project {
 
   void clear() {
     subjects.clear();
+  }
+
+  ui.Rect get rect {
+    double minX = 0;
+    double minY = 0;
+    double maxX = 0;
+    double maxY = 0;
+    for (Subject subject in subjects.values) {
+      ui.Rect rect = subject.rect;
+      if (rect.left < minX) {
+        minX = rect.left;
+      }
+      if (rect.top < minY) {
+        minY = rect.top;
+      }
+      if (rect.right > maxX) {
+        maxX = rect.right;
+      }
+      if (rect.bottom > maxY) {
+        maxY = rect.bottom;
+      }
+    }
+
+    return ui.Rect.fromLTRB(minX, minY, maxX, maxY);
   }
 
   Project.fromJson(Map json)

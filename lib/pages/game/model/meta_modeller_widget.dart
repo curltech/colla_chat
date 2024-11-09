@@ -5,9 +5,11 @@ import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/base/subject.dart';
+import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
-import 'package:colla_chat/pages/game/model/widget/model_game_widget.dart';
+import 'package:colla_chat/pages/game/model/widget/model_node_edit_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
@@ -17,12 +19,18 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:file_selector/file_selector.dart';
+import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 /// 元模型建模器
 class MetaModellerWidget extends StatelessWidget with TileDataMixin {
-  MetaModellerWidget({super.key});
+  final ModelFlameGame modelFlameGame = ModelFlameGame();
+  final ModelNodeEditWidget modelNodeEditWidget = ModelNodeEditWidget();
+
+  MetaModellerWidget({super.key}) {
+    indexWidgetProvider.define(modelNodeEditWidget);
+  }
 
   @override
   bool get withLeading => true;
@@ -41,18 +49,19 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     if (project == null) {
       return;
     }
-    modelProjectController.addSubjectStatus.value =
-        !modelProjectController.addSubjectStatus.value;
-    modelProjectController.addNodeStatus.value = null;
-    modelProjectController.addRelationshipStatus.value = false;
-    // String? subjectName = await DialogUtil.showTextFormField(
-    //     title: 'Add subject',
-    //     content: 'Please input new subject name',
-    //     tip: 'SubjectName');
-    // if (subjectName != null) {
-    //   modelProjectController.currentSubjectName.value = subjectName;
-    //   modelProjectController.project.value?.subjects.add(Subject(subjectName));
-    // }
+    String? subjectName = await DialogUtil.showTextFormField(
+        title: 'New subject',
+        content: 'Please input new subject name',
+        tip: 'unknown');
+    if (subjectName != null) {
+      Rect rect = project.rect;
+      Subject subject = Subject(subjectName);
+      subject.x = rect.left;
+      subject.y = rect.top;
+      modelProjectController.currentSubjectName.value = subject.name;
+      project.subjects[subject.name] = subject;
+      modelFlameGame.moveTo();
+    }
   }
 
   _selectSubject() async {
@@ -68,6 +77,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         title: const CommonAutoSizeText('Select subject'), items: options);
     if (subjectName != null) {
       modelProjectController.currentSubjectName.value = subjectName;
+      modelFlameGame.moveTo();
     }
   }
 
@@ -85,9 +95,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
               : null,
           icon: Icon(
             Icons.electric_meter,
-            color: modelProjectController.addSubjectStatus.value
-                ? Colors.amber
-                : myself.primary,
+            color: myself.primary,
           ),
           tooltip: AppLocalizations.t('New subject'),
         ),
@@ -311,8 +319,9 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       var children = [
         _buildToolPanelWidget(context),
         Expanded(
-            child: ModelGameWidget<ModelNode>(
+            child: GameWidget(
           key: UniqueKey(),
+          game: modelFlameGame,
         ))
       ];
       String title = this.title;
