@@ -71,6 +71,8 @@ class NodeFrameComponent extends RectangleComponent
       strokeRect = Rect.fromLTWH(-1, -1, width + 2, height + 2);
       modelNode.width = width;
       modelNode.height = height;
+      SubjectComponent? subjectComponent = subject.subjectComponent;
+      subjectComponent?.onUpdate();
     });
     position.addListener(() {
       SubjectComponent? subjectComponent = subject.subjectComponent;
