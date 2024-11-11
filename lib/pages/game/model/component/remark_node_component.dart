@@ -14,7 +14,11 @@ import 'package:flutter/material.dart';
 
 /// 在remark节点写文本
 class RemarkNodeComponent extends TextBoxComponent
-    with TapCallbacks, DragCallbacks, HasGameRef<ModelFlameGame> {
+    with
+        ModelNodeComponent,
+        TapCallbacks,
+        DragCallbacks,
+        HasGameRef<ModelFlameGame> {
   static final TextPaint normalTextPaint = TextPaint(
     style: TextStyle(
       color: BasicPalette.black.color,

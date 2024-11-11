@@ -6,6 +6,8 @@ import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
+import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
+import 'package:colla_chat/pages/game/model/component/node_relationship_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/pages/game/model/widget/model_node_edit_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
@@ -13,6 +15,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -22,6 +25,7 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'dart:ui' as ui;
 
 /// 元模型建模器
 class MetaModellerWidget extends StatelessWidget with TileDataMixin {
@@ -82,143 +86,354 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
+  List<Widget> _buildSubjectButtons() {
+    Project? project = modelProjectController.project.value;
+    return [
+      IconButton(
+        onPressed: project != null
+            ? () async {
+                await _addSubject();
+              }
+            : null,
+        icon: Icon(
+          Icons.electric_meter,
+          color: myself.primary,
+        ),
+        tooltip: AppLocalizations.t('New subject'),
+      ),
+      IconButton(
+        onPressed: project != null
+            ? () async {
+                _selectSubject();
+              }
+            : null,
+        icon: Icon(
+          Icons.list_alt_outlined,
+          color: myself.primary,
+        ),
+        tooltip: AppLocalizations.t('Select subject'),
+      )
+    ];
+  }
+
+  List<Widget> _buildMetaNodeButtons() {
+    List<ModelNode>? allowModelNodes =
+        modelProjectController.getAllModelNodes();
+    Project? project = modelProjectController.project.value;
+    List<Widget> btns = [];
+    for (var allowModelNode in allowModelNodes!) {
+      String nodeType = allowModelNode.nodeType;
+      Widget? btnIcon;
+      if (nodeType == NodeType.image.name) {
+        if (allowModelNode.content != null) {
+          btnIcon =
+              ImageUtil.buildImageWidget(imageContent: allowModelNode.content);
+        }
+        btnIcon ??= Icon(
+          Icons.image_outlined,
+          color: modelProjectController.canAddModelNode.value == allowModelNode
+              ? Colors.amber
+              : myself.primary,
+        );
+      }
+      if (nodeType == NodeType.type.name) {
+        btnIcon ??= Icon(
+          Icons.newspaper_outlined,
+          color: modelProjectController.canAddModelNode.value == allowModelNode
+              ? Colors.amber
+              : myself.primary,
+        );
+      }
+      if (nodeType == NodeType.remark.name) {
+        btnIcon ??= Icon(
+          Icons.comment,
+          color: modelProjectController.canAddModelNode.value == allowModelNode
+              ? Colors.amber
+              : myself.primary,
+        );
+      }
+      if (nodeType == NodeType.shape.name) {
+        btnIcon ??= Icon(
+          Icons.rectangle_outlined,
+          color: modelProjectController.canAddModelNode.value == allowModelNode
+              ? Colors.amber
+              : myself.primary,
+        );
+      }
+
+      Widget btn = IconButton(
+        onPressed: project != null
+            ? () {
+                _modelNodeAction(allowModelNode);
+              }
+            : null,
+        icon: btnIcon!,
+        tooltip: AppLocalizations.t('New ${allowModelNode.name}'),
+      );
+      btns.add(btn);
+    }
+    return btns;
+  }
+
+  _modelNodeAction(ModelNode modelNode) {
+    ModelNode? canAddModelNode = modelProjectController.canAddModelNode.value;
+    if (canAddModelNode == null) {
+      modelProjectController.canAddModelNode.value = modelNode;
+    } else {
+      if (modelNode != canAddModelNode) {
+        modelProjectController.canAddModelNode.value = modelNode;
+      } else {
+        modelProjectController.canAddModelNode.value = null;
+      }
+    }
+    modelProjectController.canAddRelationship.value = null;
+  }
+
+  List<Widget> _buildRelationshipButtons() {
+    Set<RelationshipType>? allowRelationshipTypes =
+        modelProjectController.getAllAllowRelationshipTypes();
+    Project? project = modelProjectController.project.value;
+    List<Widget> btns = [
+      IconButton(
+        onPressed: project != null
+            ? () {
+                RelationshipType? addRelationshipStatus =
+                    modelProjectController.canAddRelationship.value;
+                if (addRelationshipStatus != RelationshipType.reference) {
+                  modelProjectController.canAddRelationship.value =
+                      RelationshipType.reference;
+                } else {
+                  modelProjectController.canAddRelationship.value = null;
+                }
+                modelProjectController.canAddModelNode.value = null;
+              }
+            : null,
+        icon: Icon(
+          Icons.linear_scale_outlined,
+          color: modelProjectController.canAddRelationship.value ==
+                  RelationshipType.reference
+              ? Colors.amber
+              : myself.primary,
+        ),
+        tooltip: AppLocalizations.t('New reference relationship'),
+      )
+    ];
+    if (allowRelationshipTypes == null ||
+        allowRelationshipTypes.contains(RelationshipType.association)) {
+      btns.add(
+        IconButton(
+          onPressed: project != null
+              ? () {
+                  RelationshipType? addRelationshipStatus =
+                      modelProjectController.canAddRelationship.value;
+                  if (addRelationshipStatus != RelationshipType.association) {
+                    modelProjectController.canAddRelationship.value =
+                        RelationshipType.association;
+                  } else {
+                    modelProjectController.canAddRelationship.value = null;
+                  }
+                  modelProjectController.canAddModelNode.value = null;
+                }
+              : null,
+          icon: Icon(
+            Icons.stacked_line_chart_outlined,
+            color: modelProjectController.canAddRelationship.value ==
+                    RelationshipType.association
+                ? Colors.amber
+                : myself.primary,
+          ),
+          tooltip: AppLocalizations.t('New association relationship'),
+        ),
+      );
+    }
+    if (allowRelationshipTypes == null ||
+        allowRelationshipTypes.contains(RelationshipType.generalization)) {
+      btns.add(
+        IconButton(
+          onPressed: project != null
+              ? () {
+                  RelationshipType? addRelationshipStatus =
+                      modelProjectController.canAddRelationship.value;
+                  if (addRelationshipStatus !=
+                      RelationshipType.generalization) {
+                    modelProjectController.canAddRelationship.value =
+                        RelationshipType.generalization;
+                  } else {
+                    modelProjectController.canAddRelationship.value = null;
+                  }
+                  modelProjectController.canAddModelNode.value = null;
+                }
+              : null,
+          icon: Icon(
+            Icons.line_style_outlined,
+            color: modelProjectController.canAddRelationship.value ==
+                    RelationshipType.generalization
+                ? Colors.amber
+                : myself.primary,
+          ),
+          tooltip: AppLocalizations.t('New generalization relationship'),
+        ),
+      );
+    }
+    if (allowRelationshipTypes == null ||
+        allowRelationshipTypes.contains(RelationshipType.realization)) {
+      btns.add(
+        IconButton(
+          onPressed: project != null
+              ? () {
+                  RelationshipType? addRelationshipStatus =
+                      modelProjectController.canAddRelationship.value;
+                  if (addRelationshipStatus != RelationshipType.realization) {
+                    modelProjectController.canAddRelationship.value =
+                        RelationshipType.realization;
+                  } else {
+                    modelProjectController.canAddRelationship.value = null;
+                  }
+                  modelProjectController.canAddModelNode.value = null;
+                }
+              : null,
+          icon: Icon(
+            Icons.line_axis_outlined,
+            color: modelProjectController.canAddRelationship.value ==
+                    RelationshipType.realization
+                ? Colors.amber
+                : myself.primary,
+          ),
+          tooltip: AppLocalizations.t('New realization relationship'),
+        ),
+      );
+    }
+    if (allowRelationshipTypes == null ||
+        allowRelationshipTypes.contains(RelationshipType.dependency)) {
+      btns.add(
+        IconButton(
+          onPressed: project != null
+              ? () {
+                  RelationshipType? addRelationshipStatus =
+                      modelProjectController.canAddRelationship.value;
+                  if (addRelationshipStatus != RelationshipType.dependency) {
+                    modelProjectController.canAddRelationship.value =
+                        RelationshipType.dependency;
+                  } else {
+                    modelProjectController.canAddRelationship.value = null;
+                  }
+                  modelProjectController.canAddModelNode.value = null;
+                }
+              : null,
+          icon: Icon(
+            Icons.line_weight_outlined,
+            color: modelProjectController.canAddRelationship.value ==
+                    RelationshipType.dependency
+                ? Colors.amber
+                : myself.primary,
+          ),
+          tooltip: AppLocalizations.t('New dependency relationship'),
+        ),
+      );
+    }
+    if (allowRelationshipTypes == null ||
+        allowRelationshipTypes.contains(RelationshipType.aggregation)) {
+      btns.add(
+        IconButton(
+          onPressed: project != null
+              ? () {
+                  RelationshipType? addRelationshipStatus =
+                      modelProjectController.canAddRelationship.value;
+                  if (addRelationshipStatus != RelationshipType.aggregation) {
+                    modelProjectController.canAddRelationship.value =
+                        RelationshipType.aggregation;
+                  } else {
+                    modelProjectController.canAddRelationship.value = null;
+                  }
+                  modelProjectController.canAddModelNode.value = null;
+                }
+              : null,
+          icon: Icon(
+            Icons.blur_linear_outlined,
+            color: modelProjectController.canAddRelationship.value ==
+                    RelationshipType.aggregation
+                ? Colors.amber
+                : myself.primary,
+          ),
+          tooltip: AppLocalizations.t('New aggregation relationship'),
+        ),
+      );
+    }
+    if (allowRelationshipTypes == null ||
+        allowRelationshipTypes.contains(RelationshipType.composition)) {
+      btns.add(
+        IconButton(
+          onPressed: project != null
+              ? () {
+                  RelationshipType? addRelationshipStatus =
+                      modelProjectController.canAddRelationship.value;
+                  if (addRelationshipStatus != RelationshipType.composition) {
+                    modelProjectController.canAddRelationship.value =
+                        RelationshipType.composition;
+                  } else {
+                    modelProjectController.canAddRelationship.value = null;
+                  }
+                  modelProjectController.canAddModelNode.value = null;
+                }
+              : null,
+          icon: Icon(
+            Icons.format_line_spacing_outlined,
+            color: modelProjectController.canAddRelationship.value ==
+                    RelationshipType.composition
+                ? Colors.amber
+                : myself.primary,
+          ),
+          tooltip: AppLocalizations.t('New aggregation relationship'),
+        ),
+      );
+    }
+
+    return btns;
+  }
+
+  delete() async {
+    Project? project = modelProjectController.project.value;
+    if (project == null) {
+      return;
+    }
+    ModelNode? modelNode = modelProjectController.selectedModelNode.value;
+    if (modelNode != null) {
+      bool? confirm = await DialogUtil.confirm(
+          content: 'Do you confirm to delete model node:${modelNode.name}?');
+      if (confirm != null && confirm) {
+        NodeFrameComponent? nodeFrameComponent = modelNode.nodeFrameComponent;
+        if (nodeFrameComponent != null) {
+          nodeFrameComponent.subject.modelNodes.remove(modelNode.id);
+          nodeFrameComponent.removeFromParent();
+        }
+      }
+    }
+    NodeRelationship? nodeRelationship =
+        modelProjectController.selectedRelationship.value;
+    if (nodeRelationship != null) {
+      bool? confirm = await DialogUtil.confirm(
+          content:
+              'Do you confirm to delete node relationship:${nodeRelationship.srcId}-${nodeRelationship.dstId}?');
+      if (confirm != null && confirm) {
+        NodeRelationshipComponent? nodeRelationshipComponent =
+            nodeRelationship.nodeRelationshipComponent;
+        if (nodeRelationshipComponent != null) {
+          modelProjectController.removeRelationship(nodeRelationship);
+          nodeRelationshipComponent.removeFromParent();
+        }
+      }
+    }
+  }
+
   Widget _buildToolPanelWidget(BuildContext context) {
     return Obx(() {
       Project? project = modelProjectController.project.value;
       var children = [
-        // CommonAutoSizeText(
-        //     modelProjectController.currentSubjectName.value ?? 'unknown'),
+        ..._buildSubjectButtons(),
+        ..._buildMetaNodeButtons(),
+        ..._buildRelationshipButtons(),
         IconButton(
-          onPressed: project != null
-              ? () async {
-                  await _addSubject();
-                }
-              : null,
-          icon: Icon(
-            Icons.electric_meter,
-            color: myself.primary,
-          ),
-          tooltip: AppLocalizations.t('New subject'),
-        ),
-        IconButton(
-          onPressed: project != null
-              ? () async {
-                  _selectSubject();
-                }
-              : null,
-          icon: Icon(
-            Icons.list_alt_outlined,
-            color: myself.primary,
-          ),
-          tooltip: AppLocalizations.t('Select subject'),
-        ),
-        IconButton(
-          onPressed: project != null
-              ? () {
-                  NodeType? addNodeStatus =
-                      modelProjectController.addNodeStatus.value;
-                  if (addNodeStatus != NodeType.type) {
-                    modelProjectController.addNodeStatus.value = NodeType.type;
-                  } else {
-                    modelProjectController.addNodeStatus.value = null;
-                  }
-                  modelProjectController.addRelationshipStatus.value = false;
-                }
-              : null,
-          icon: Icon(
-            Icons.newspaper_outlined,
-            color: modelProjectController.addNodeStatus.value == NodeType.type
-                ? Colors.amber
-                : myself.primary,
-          ),
-          tooltip: AppLocalizations.t('New type node'),
-        ),
-        IconButton(
-          onPressed: project != null
-              ? () {
-                  NodeType? addNodeStatus =
-                      modelProjectController.addNodeStatus.value;
-                  if (addNodeStatus != NodeType.image) {
-                    modelProjectController.addNodeStatus.value = NodeType.image;
-                  } else {
-                    modelProjectController.addNodeStatus.value = null;
-                  }
-                  modelProjectController.addRelationshipStatus.value = false;
-                }
-              : null,
-          icon: Icon(
-            Icons.image_outlined,
-            color: modelProjectController.addNodeStatus.value == NodeType.image
-                ? Colors.amber
-                : myself.primary,
-          ),
-          tooltip: AppLocalizations.t('New image node'),
-        ),
-        IconButton(
-          onPressed: project != null
-              ? () {
-                  NodeType? addNodeStatus =
-                      modelProjectController.addNodeStatus.value;
-                  if (addNodeStatus != NodeType.shape) {
-                    modelProjectController.addNodeStatus.value = NodeType.shape;
-                  } else {
-                    modelProjectController.addNodeStatus.value = null;
-                  }
-                  modelProjectController.addRelationshipStatus.value = false;
-                }
-              : null,
-          icon: Icon(
-            Icons.format_shapes_outlined,
-            color: modelProjectController.addNodeStatus.value == NodeType.shape
-                ? Colors.amber
-                : myself.primary,
-          ),
-          tooltip: AppLocalizations.t('New shape node'),
-        ),
-        IconButton(
-          onPressed: project != null
-              ? () {
-                  NodeType? addNodeStatus =
-                      modelProjectController.addNodeStatus.value;
-                  if (addNodeStatus != NodeType.remark) {
-                    modelProjectController.addNodeStatus.value =
-                        NodeType.remark;
-                  } else {
-                    modelProjectController.addNodeStatus.value = null;
-                  }
-                  modelProjectController.addRelationshipStatus.value = false;
-                }
-              : null,
-          icon: Icon(
-            Icons.comment,
-            color: modelProjectController.addNodeStatus.value == NodeType.remark
-                ? Colors.amber
-                : myself.primary,
-          ),
-          tooltip: AppLocalizations.t('New remark node'),
-        ),
-        IconButton(
-          onPressed: project != null
-              ? () {
-                  modelProjectController.addRelationshipStatus.value =
-                      !modelProjectController.addRelationshipStatus.value;
-                  modelProjectController.addNodeStatus.value = null;
-                }
-              : null,
-          icon: Icon(
-            Icons.link,
-            color: modelProjectController.addRelationshipStatus.value
-                ? Colors.amber
-                : myself.primary,
-          ),
-          tooltip: AppLocalizations.t('New relationship'),
-        ),
-        IconButton(
-          onPressed: project != null
-              ? () {
-                  modelProjectController.selectedRelationship;
-                }
-              : null,
+          onPressed: project != null ? delete : null,
           icon: Icon(
             Icons.delete_outline,
             color: myself.primary,
@@ -289,34 +504,86 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     modelProjectController.filename.value = filename;
   }
 
+  List<Widget> _buildProjectButtons() {
+    Project? project = modelProjectController.project.value;
+    return [
+      IconButton(
+        onPressed: () {
+          _newProject();
+        },
+        icon: const Icon(Icons.newspaper_sharp),
+        tooltip: AppLocalizations.t('New project'),
+      ),
+      IconButton(
+        onPressed: () {
+          _openProject();
+        },
+        icon: const Icon(Icons.file_open),
+        tooltip: AppLocalizations.t('Open project'),
+      ),
+      IconButton(
+        onPressed: project != null
+            ? () async {
+                await _saveProject();
+              }
+            : null,
+        icon: const Icon(Icons.save),
+        tooltip: AppLocalizations.t('Save project'),
+      ),
+    ];
+  }
+
+  loadImage(ModelNode modelNode) async {
+    if (modelNode.image == null && modelFlameGame != null) {
+      ui.Image? image;
+      if (modelNode.content != null) {
+        image = await modelFlameGame!.images
+            .fromBase64('${modelNode.name}.png', modelNode.content!);
+      }
+      image ??= await modelFlameGame!.images.load('colla.png');
+      modelNode.image = image;
+    }
+  }
+
+  _openMetaProject() async {
+    XFile? xfile = await FileUtil.selectFile(allowedExtensions: ['json']);
+    if (xfile == null) {
+      return;
+    }
+    String content = await xfile.readAsString();
+    Map<String, dynamic> json = JsonUtil.toJson(content);
+    Project metaProject = Project.fromJson(json);
+    modelProjectController.metaProject.value = metaProject;
+    List<ModelNode>? modelNodes = modelProjectController.getAllModelNodes();
+    if (modelNodes != null && modelNodes.isNotEmpty) {
+      for (var modelNode in modelNodes) {
+        loadImage(modelNode);
+      }
+    }
+
+    modelProjectController.project.value = null;
+  }
+
+  List<Widget> _buildMetaProjectButtons() {
+    return [
+      IconButton(
+        onPressed: () {
+          _openMetaProject();
+        },
+        icon: const Icon(Icons.open_in_browser_outlined),
+        tooltip: AppLocalizations.t('Open meta project'),
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Obx(() {
+      Project? metaProject = modelProjectController.metaProject.value;
       Project? project = modelProjectController.project.value;
       List<Widget> rightWidgets = [
-        IconButton(
-          onPressed: () {
-            _newProject();
-          },
-          icon: const Icon(Icons.newspaper_sharp),
-          tooltip: AppLocalizations.t('New project'),
-        ),
-        IconButton(
-          onPressed: () {
-            _openProject();
-          },
-          icon: const Icon(Icons.file_open),
-          tooltip: AppLocalizations.t('Open project'),
-        ),
-        IconButton(
-          onPressed: project != null
-              ? () async {
-                  await _saveProject();
-                }
-              : null,
-          icon: const Icon(Icons.save),
-          tooltip: AppLocalizations.t('Save project'),
-        ),
+        ..._buildMetaProjectButtons(),
+        ..._buildProjectButtons(),
       ];
       modelFlameGame = ModelFlameGame();
       var children = [
@@ -327,13 +594,10 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
           game: modelFlameGame!,
         ))
       ];
-      String title = this.title;
+      String title = AppLocalizations.t(this.title);
+      title = '$title-${metaProject.name}';
       if (project != null) {
-        title = '${AppLocalizations.t(title)}-${project.name}';
-      }
-      Subject? subject = modelProjectController.getCurrentSubject();
-      if (subject != null) {
-        title = '$title-${subject.name}';
+        title = '$title-${project.name}';
       }
       return ListenableBuilder(
           listenable: appDataProvider,

@@ -14,7 +14,11 @@ import 'package:flutter/material.dart';
 
 /// [TypeNodeComponent] type节点，用于类图，包含属性和方法
 class TypeNodeComponent extends RectangleComponent
-    with TapCallbacks, DragCallbacks, HasGameRef<ModelFlameGame> {
+    with
+        ModelNodeComponent,
+        TapCallbacks,
+        DragCallbacks,
+        HasGameRef<ModelFlameGame> {
   static final fillPaint = Paint()
     ..color = myself.primary
     ..style = PaintingStyle.fill;

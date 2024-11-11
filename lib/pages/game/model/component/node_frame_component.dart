@@ -14,6 +14,10 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 
+mixin ModelNodeComponent on PositionComponent {
+  Future<void> onUpdate() async {}
+}
+
 /// [NodeFrameComponent] 节点框架组件，保存的位置和大小，是flame引擎的位置组件，可以在画布上拖拽
 /// 内部可以包含type，image，shape，remark等各种类型的组件
 class NodeFrameComponent extends RectangleComponent
@@ -36,7 +40,7 @@ class NodeFrameComponent extends RectangleComponent
   late Rect strokeRect;
   final ModelNode modelNode;
   final Subject subject;
-  PositionComponent? child;
+  ModelNodeComponent? child;
 
   NodeFrameComponent(
     this.modelNode,
@@ -105,9 +109,11 @@ class NodeFrameComponent extends RectangleComponent
     if (modelProjectController.selectedModelNode.value == null) {
       modelProjectController.selectedModelNode.value = modelNode;
     } else {
-      if (modelProjectController.addRelationshipStatus.value) {
+      if (modelProjectController.canAddRelationship.value != null) {
         NodeRelationship nodeRelationship = NodeRelationship(
-            modelProjectController.selectedModelNode.value, modelNode);
+            modelProjectController.selectedModelNode.value, modelNode,
+            relationshipType:
+                modelProjectController.canAddRelationship.value!.name);
         if (modelNode.nodeType == NodeType.remark.name) {
           nodeRelationship.relationshipType = RelationshipType.reference.name;
         }
@@ -119,7 +125,7 @@ class NodeFrameComponent extends RectangleComponent
               nodeRelationshipComponent;
           game.add(nodeRelationshipComponent);
         }
-        modelProjectController.addRelationshipStatus.value = false;
+        modelProjectController.canAddRelationship.value = null;
 
         modelProjectController.selectedModelNode.value = null;
       } else {

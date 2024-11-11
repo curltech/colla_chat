@@ -14,7 +14,11 @@ import 'package:flutter/material.dart';
 
 /// 在shape节点写文本
 class ShapeNodeComponent extends PositionComponent
-    with TapCallbacks, DragCallbacks, HasGameRef<ModelFlameGame> {
+    with
+        ModelNodeComponent,
+        TapCallbacks,
+        DragCallbacks,
+        HasGameRef<ModelFlameGame> {
   static final TextPaint normalTextPaint = TextPaint(
     style: const TextStyle(
       color: Colors.black,

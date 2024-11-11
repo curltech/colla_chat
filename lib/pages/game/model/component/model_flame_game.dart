@@ -164,8 +164,8 @@ class ModelFlameGame extends FlameGame
     Vector2 worldPosition = camera.globalToLocal(globalPosition);
     Vector2 cameraPosition = camera.viewfinder.position;
 
-    NodeType? addNodeStatus = modelProjectController.addNodeStatus.value;
-    if (addNodeStatus != null) {
+    ModelNode? addModelNode = modelProjectController.canAddModelNode.value;
+    if (addModelNode != null) {
       Subject? subject = modelProjectController.getCurrentSubject();
       if (subject == null) {
         return;
@@ -175,8 +175,12 @@ class ModelFlameGame extends FlameGame
           content: 'Please input new node name',
           tip: 'unknown');
       if (nodeName != null) {
-        ModelNode modelNode =
-            ModelNode(name: nodeName, nodeType: addNodeStatus.name);
+        ModelNode modelNode = ModelNode(
+            name: nodeName,
+            nodeType: addModelNode.nodeType,
+            shapeType: addModelNode.shapeType,
+            content: addModelNode.content);
+
         modelNode.x = worldPosition.x;
         modelNode.y = worldPosition.y;
         subject.modelNodes[modelNode.id] = modelNode;
@@ -188,7 +192,7 @@ class ModelFlameGame extends FlameGame
         modelNode.nodeFrameComponent = nodeFrameComponent;
         world.add(nodeFrameComponent);
       }
-      modelProjectController.addNodeStatus.value = null;
+      modelProjectController.canAddModelNode.value = null;
     }
   }
 }

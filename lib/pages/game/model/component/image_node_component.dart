@@ -11,11 +11,14 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/text.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 /// 在image节点写文本
 class ImageNodeComponent extends PositionComponent
-    with TapCallbacks, DragCallbacks, HasGameRef<ModelFlameGame> {
+    with
+        ModelNodeComponent,
+        TapCallbacks,
+        DragCallbacks,
+        HasGameRef<ModelFlameGame> {
   static final TextPaint normalTextPaint = TextPaint(
     style: const TextStyle(
       color: Colors.black,

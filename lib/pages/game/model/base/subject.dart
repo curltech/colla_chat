@@ -77,8 +77,12 @@ class Subject {
         nodeRelationship;
   }
 
-  remove(NodeRelationship nodeRelationship) {
-    relationships.remove('${nodeRelationship.srcId}-${nodeRelationship.dstId}');
+  NodeRelationship? remove(NodeRelationship nodeRelationship) {
+    return relationships.remove('${nodeRelationship.srcId}-${nodeRelationship.dstId}');
+  }
+
+  bool containsKey(NodeRelationship nodeRelationship) {
+    return relationships.containsKey('${nodeRelationship.srcId}-${nodeRelationship.dstId}');
   }
 
   void clear() {
