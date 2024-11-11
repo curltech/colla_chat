@@ -1,21 +1,16 @@
-import 'dart:ui';
-
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
+import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/base/subject.dart';
-import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/component/node_relationship_component.dart';
 import 'package:colla_chat/pages/game/model/component/subject_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
-import 'package:colla_chat/plugin/painter/line/dash_painter.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
-import 'package:flame/rendering.dart';
 import 'package:flutter/material.dart';
 
 /// [ModelFlameGame] 使用flame engine渲染画布和所有的节点
@@ -95,33 +90,20 @@ class ModelFlameGame extends FlameGame
     }
   }
 
-  Rect _renderSubject(Subject subject) {
-    Rect rect = subject.rect;
-    RectangleComponent rectangleComponent =
-        RectangleComponent.fromRect(rect, paint: SubjectComponent.strokePaint);
-    SubjectComponent subjectComponent = SubjectComponent.fromRect(rect);
-    world.add(rectangleComponent);
-    final textPaint = TextPaint(
-      style: const TextStyle(
-        color: Colors.black,
-        fontSize: 14.0,
-      ),
-    );
-    world.add(TextComponent(
-        text: subject.name,
-        textRenderer: textPaint,
-        position: Vector2(rect.left + 10.0, rect.top + 10.0)));
+  void _renderSubject(Subject subject) {
+    SubjectComponent subjectComponent = SubjectComponent(subject);
+    subject.subjectComponent = subjectComponent;
+    world.add(subjectComponent);
     Iterable<ModelNode> modelNodes = subject.modelNodes.values;
     for (ModelNode modelNode in modelNodes) {
       NodeFrameComponent nodeFrameComponent = NodeFrameComponent(
+        modelNode,
+        subject,
         position: Vector2(modelNode.x!, modelNode.y!),
-        modelNode: modelNode,
       );
       modelNode.nodeFrameComponent = nodeFrameComponent;
       world.add(nodeFrameComponent);
     }
-
-    return rect;
   }
 
   /// 渲染线
@@ -199,8 +181,9 @@ class ModelFlameGame extends FlameGame
         modelNode.y = worldPosition.y;
         subject.modelNodes[modelNode.id] = modelNode;
         NodeFrameComponent nodeFrameComponent = NodeFrameComponent(
+          modelNode,
+          subject,
           position: Vector2(modelNode.x!, modelNode.y!),
-          modelNode: modelNode,
         );
         modelNode.nodeFrameComponent = nodeFrameComponent;
         world.add(nodeFrameComponent);

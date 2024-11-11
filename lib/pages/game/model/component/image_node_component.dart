@@ -11,6 +11,7 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/text.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 /// 在image节点写文本
 class ImageNodeComponent extends PositionComponent
@@ -25,6 +26,7 @@ class ImageNodeComponent extends PositionComponent
   final ModelNode modelNode;
   Anchor textAlign;
   late final TextBoxComponent nodeTextComponent;
+  late final SpriteComponent spriteComponent;
 
   ImageNodeComponent(
     this.modelNode, {
@@ -40,19 +42,8 @@ class ImageNodeComponent extends PositionComponent
 
   @override
   Future<void> onLoad() async {
-    if (modelNode.image == null) {
-      ui.Image image = await game.images.load('colla.png');
-      if (modelNode.content != null) {
-        image = await game.images
-            .fromBase64('${modelNode.name}.png', modelNode.content!);
-      }
-      modelNode.image = image;
-    }
-    if (modelNode.image != null) {
-      SpriteComponent spriteComponent =
-          SpriteComponent(sprite: Sprite(modelNode.image!), size: size);
-      add(spriteComponent);
-    }
+    await loadImage();
+    add(spriteComponent);
     nodeTextComponent = TextBoxComponent(
       text: modelNode.name,
       textRenderer: normalTextPaint,
@@ -67,6 +58,28 @@ class ImageNodeComponent extends PositionComponent
       (parent as NodeFrameComponent).updateSize();
     });
     (parent as NodeFrameComponent).updateSize();
+  }
+
+  loadImage() async {
+    if (modelNode.image == null) {
+      ui.Image? image;
+      if (modelNode.content != null) {
+        image = await game.images
+            .fromBase64('${modelNode.name}.png', modelNode.content!);
+      }
+      image ??= await game.images.load('colla.png');
+      modelNode.image = image;
+    }
+    if (modelNode.image != null) {
+      spriteComponent =
+          SpriteComponent(sprite: Sprite(modelNode.image!), size: size);
+    }
+  }
+
+  Future<void> onUpdate() async {
+    remove(spriteComponent);
+    loadImage();
+    add(spriteComponent);
   }
 
   @override

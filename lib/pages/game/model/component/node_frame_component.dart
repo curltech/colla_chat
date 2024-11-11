@@ -1,18 +1,17 @@
-import 'dart:ui';
-
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
+import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:colla_chat/pages/game/model/component/image_node_component.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_relationship_component.dart';
 import 'package:colla_chat/pages/game/model/component/remark_node_component.dart';
 import 'package:colla_chat/pages/game/model/component/shape_node_component.dart';
+import 'package:colla_chat/pages/game/model/component/subject_component.dart';
 import 'package:colla_chat/pages/game/model/component/type_node_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 
 /// [NodeFrameComponent] 节点框架组件，保存的位置和大小，是flame引擎的位置组件，可以在画布上拖拽
@@ -36,11 +35,13 @@ class NodeFrameComponent extends RectangleComponent
     ..strokeWidth = 1.0;
   late Rect strokeRect;
   final ModelNode modelNode;
+  final Subject subject;
   PositionComponent? child;
 
-  NodeFrameComponent({
+  NodeFrameComponent(
+    this.modelNode,
+    this.subject, {
     required Vector2 position,
-    required this.modelNode,
   }) : super(position: position, paint: fillPaint);
 
   @override
@@ -48,7 +49,7 @@ class NodeFrameComponent extends RectangleComponent
     String nodeType = modelNode.nodeType;
     width = Project.nodeWidth;
     if (nodeType == NodeType.type.name) {
-      child = TypeNodeComponent(modelNode: modelNode);
+      child = TypeNodeComponent(modelNode);
       add(child!);
     } else if (nodeType == NodeType.image.name) {
       child = ImageNodeComponent(modelNode);
@@ -70,6 +71,10 @@ class NodeFrameComponent extends RectangleComponent
       strokeRect = Rect.fromLTWH(-1, -1, width + 2, height + 2);
       modelNode.width = width;
       modelNode.height = height;
+    });
+    position.addListener(() {
+      SubjectComponent? subjectComponent = subject.subjectComponent;
+      subjectComponent?.onUpdate();
     });
   }
 

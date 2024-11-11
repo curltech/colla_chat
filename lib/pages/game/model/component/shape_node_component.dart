@@ -6,18 +6,15 @@ import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
-import 'package:colla_chat/pages/game/model/widget/model_node_edit_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:flame/palette.dart';
 import 'package:flame/text.dart';
 import 'package:flutter/material.dart';
 
 /// 在shape节点写文本
 class ShapeNodeComponent extends PositionComponent
-    with TapCallbacks,DragCallbacks, HasGameRef<ModelFlameGame> {
+    with TapCallbacks, DragCallbacks, HasGameRef<ModelFlameGame> {
   static final TextPaint normalTextPaint = TextPaint(
     style: const TextStyle(
       color: Colors.black,
@@ -98,6 +95,10 @@ class ShapeNodeComponent extends PositionComponent
       path.lineTo(width / 2, height);
       canvas.drawPath(path, NodeFrameComponent.strokePaint);
     }
+  }
+
+  Future<void> onUpdate() async {
+    nodeTextComponent.text = modelNode.name;
   }
 
   @override

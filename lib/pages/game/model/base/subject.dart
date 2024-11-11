@@ -1,8 +1,9 @@
+import 'dart:ui' as ui;
+
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
-import 'dart:ui' as ui;
-
+import 'package:colla_chat/pages/game/model/component/subject_component.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:uuid/uuid.dart';
 
@@ -19,6 +20,8 @@ class Subject {
   Map<String, ModelNode> modelNodes = {};
 
   Map<String, NodeRelationship> relationships = {};
+
+  SubjectComponent? subjectComponent;
 
   Subject(this.name) {
     id = const Uuid().v4().toString();

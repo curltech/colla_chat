@@ -1,11 +1,9 @@
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
-import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/attribute_text_component.dart';
-import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
-import 'package:colla_chat/pages/game/model/component/node_relationship_component.dart';
 import 'package:colla_chat/pages/game/model/component/method_text_component.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
+import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -16,7 +14,7 @@ import 'package:flutter/material.dart';
 
 /// [TypeNodeComponent] type节点，用于类图，包含属性和方法
 class TypeNodeComponent extends RectangleComponent
-    with TapCallbacks,DragCallbacks, HasGameRef<ModelFlameGame> {
+    with TapCallbacks, DragCallbacks, HasGameRef<ModelFlameGame> {
   static final fillPaint = Paint()
     ..color = myself.primary
     ..style = PaintingStyle.fill;
@@ -29,8 +27,8 @@ class TypeNodeComponent extends RectangleComponent
   late final AttributeAreaComponent attributeAreaComponent;
   late final MethodAreaComponent methodAreaComponent;
 
-  TypeNodeComponent({
-    required this.modelNode,
+  TypeNodeComponent(
+    this.modelNode, {
     double? width,
     double? height,
   }) : super(paint: fillPaint) {
@@ -85,7 +83,12 @@ class TypeNodeComponent extends RectangleComponent
     updateSize();
   }
 
+  Future<void> onUpdate() async {
+    nodeNameComponent.text = modelNode.name;
+  }
+
   double calAttributeHeight() {
+    ModelNode modelNode = this.modelNode;
     double attributeHeight = AttributeTextComponent.contentHeight;
     if (modelNode.attributes.isNotEmpty) {
       attributeHeight =

@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:colla_chat/plugin/painter/line/dash_painter.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
@@ -11,7 +12,12 @@ class SubjectComponent extends RectangleComponent {
     ..style = PaintingStyle.stroke
     ..strokeWidth = 1.0;
 
-  SubjectComponent({
+  late TextComponent textComponent;
+
+  Subject subject;
+
+  SubjectComponent(
+    this.subject, {
     super.position,
     super.size,
     super.scale,
@@ -22,44 +28,39 @@ class SubjectComponent extends RectangleComponent {
     super.paint,
     super.paintLayers,
     super.key,
-  });
-
-  factory SubjectComponent.fromRect(
-    Rect rect, {
-    Vector2? scale,
-    double? angle,
-    Anchor anchor = Anchor.topLeft,
-    int? priority,
-    Paint? paint,
-    List<Paint>? paintLayers,
-    ComponentKey? key,
-    List<Component>? children,
   }) {
-    return SubjectComponent(
-      position: anchor == Anchor.topLeft
-          ? rect.topLeft.toVector2()
-          : Anchor.topLeft.toOtherAnchorPosition(
-              rect.topLeft.toVector2(),
-              anchor,
-              rect.size.toVector2(),
-            ),
-      size: rect.size.toVector2(),
-      scale: scale,
-      angle: angle,
-      anchor: anchor,
-      priority: priority,
-      paint: paint,
-      paintLayers: paintLayers,
-      key: key,
-      children: children,
+    Rect rect = subject.rect;
+    position = Vector2(rect.left, rect.top);
+    size = rect.size.toVector2();
+  }
+
+  @override
+  Future<void> onLoad() async {
+    final textPaint = TextPaint(
+      style: const TextStyle(
+        color: Colors.black,
+        fontSize: 14.0,
+      ),
     );
+    textComponent = TextComponent(
+        text: subject.name,
+        textRenderer: textPaint,
+        position: Vector2(10.0, 10.0));
+    add(textComponent);
+  }
+
+  onUpdate() {
+    textComponent.text = subject.name;
+    Rect rect = subject.rect;
+    position = Vector2(rect.left, rect.top);
+    size = rect.size.toVector2();
   }
 
   @override
   void render(Canvas canvas) {
     DashPainter dashPainter = const DashPainter();
     Path path = Path();
-    path.addRect(Rect.fromLTWH(position.x, position.y, width, height));
+    path.addRect(Rect.fromLTWH(0, 0, width, height));
     dashPainter.paint(canvas, path, strokePaint);
   }
 }

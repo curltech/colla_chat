@@ -7,7 +7,6 @@ import 'package:colla_chat/pages/game/model/controller/model_project_controller.
 import 'package:colla_chat/pages/game/model/widget/attribute_edit_widget.dart';
 import 'package:colla_chat/pages/game/model/widget/method_edit_widget.dart';
 import 'package:colla_chat/pages/game/model/widget/node_relationship_edit_widget.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -20,6 +19,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
+import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -126,7 +126,14 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
       return null;
     }
     modelNode?.name = current.name;
-    modelNode?.content = content.value;
+    modelNode?.content = current.content;
+    modelNode?.nodeType = current.nodeType;
+    modelNode?.shapeType = current.shapeType;
+    if (modelNode!.nodeType == NodeType.image.name) {
+      modelNode?.content = content.value;
+    }
+    dynamic child = modelNode?.nodeFrameComponent?.child;
+    child?.onUpdate();
     DialogUtil.info(
         content: 'Successfully update modelNode:${modelNode!.name}');
 
@@ -148,7 +155,7 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
       PlatformDataField(
           name: 'nodeType',
           label: 'NodeType',
-          readOnly : true,
+          readOnly: true,
           prefixIcon: Icon(Icons.type_specimen_outlined, color: myself.primary),
           inputType: InputType.togglebuttons,
           options: options),
@@ -164,6 +171,15 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
           prefixIcon: Icon(Icons.share_sharp, color: myself.primary),
           inputType: InputType.select,
           options: options));
+    }
+    if (modelNode.nodeType == NodeType.remark.name) {
+      modelNodeDataFields.add(PlatformDataField(
+        name: 'content',
+        label: 'Content',
+        minLines: 4,
+        inputType: InputType.textarea,
+        prefixIcon: Icon(Icons.content_copy, color: myself.primary),
+      ));
     }
 
     return modelNodeDataFields;

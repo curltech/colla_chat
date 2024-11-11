@@ -5,10 +5,7 @@ import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
-import 'package:colla_chat/pages/game/model/widget/model_node_edit_widget.dart';
-import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/palette.dart';
@@ -17,7 +14,7 @@ import 'package:flutter/material.dart';
 
 /// 在remark节点写文本
 class RemarkNodeComponent extends TextBoxComponent
-    with TapCallbacks,DragCallbacks, HasGameRef<ModelFlameGame> {
+    with TapCallbacks, DragCallbacks, HasGameRef<ModelFlameGame> {
   static final TextPaint normalTextPaint = TextPaint(
     style: TextStyle(
       color: BasicPalette.black.color,
@@ -25,7 +22,6 @@ class RemarkNodeComponent extends TextBoxComponent
     ),
   );
 
-  // double contentHeight = 100.0;
   final ModelNode modelNode;
 
   RemarkNodeComponent(
@@ -55,6 +51,10 @@ class RemarkNodeComponent extends TextBoxComponent
       (parent as NodeFrameComponent).updateSize();
     });
     return super.onLoad();
+  }
+
+  Future<void> onUpdate() async {
+    text = modelNode.content ?? '';
   }
 
   @override
