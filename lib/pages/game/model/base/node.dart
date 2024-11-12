@@ -15,8 +15,12 @@ abstract class Node {
 
   NodeFrameComponent? nodeFrameComponent;
 
-  Node(this.name) {
-    id = const Uuid().v4().toString();
+  Node(this.name, {String? id}) {
+    if (id == null) {
+      this.id = const Uuid().v4().toString();
+    } else {
+      this.id = id;
+    }
   }
 
   Node.fromJson(Map json)

@@ -221,6 +221,8 @@ dependencies:
   synchronized: ^3.3.0+2
   flutter_smart_dialog: ^4.9.4
   json_annotation: ^4.3.0
+  flutter_json_view: ^1.1.5
+  json_editor_flutter: ^1.4.2
   provider: ^6.0.1 #状态管理
   easy_refresh: ^3.3.2+1
   percent_indicator: ^4.2.3

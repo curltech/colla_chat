@@ -86,8 +86,12 @@ class ModelNode extends Node {
   List<Method> methods = [];
 
   ModelNode(
-      {required String name, String? nodeType, this.shapeType, this.content})
-      : super(name) {
+      {required String name,
+      String? nodeType,
+      String? id,
+      this.shapeType,
+      this.content})
+      : super(name, id: id) {
     this.nodeType = nodeType ?? NodeType.type.name;
   }
 

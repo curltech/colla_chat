@@ -180,6 +180,7 @@ class ModelFlameGame extends FlameGame
             nodeType: addModelNode.nodeType,
             shapeType: addModelNode.shapeType,
             content: addModelNode.content);
+        modelNode.image = addModelNode.image;
 
         modelNode.x = worldPosition.x;
         modelNode.y = worldPosition.y;

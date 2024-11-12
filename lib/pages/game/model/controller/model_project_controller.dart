@@ -1,13 +1,21 @@
+import 'dart:io';
+
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/base/subject.dart';
+import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:get/get.dart';
+import 'package:path/path.dart' as p;
 
 class ModelProjectController {
+  static const baseMetaId = '';
+
   /// 元模型
-  late final Rx<Project> metaProject;
+  final RxMap<String, Project> metaProjects = <String, Project>{}.obs;
+  final RxString currentMetaId = RxString(baseMetaId);
 
   /// 当前模型
   final Rx<Project?> project = Rx<Project?>(null);
@@ -36,7 +44,7 @@ class ModelProjectController {
   }
 
   initMetaProject() {
-    Project metaProject = Project('meta');
+    Project metaProject = Project('meta', baseMetaId, id: baseMetaId);
     Subject subject = Subject('meta');
     subject.modelNodes = {
       typeModelNode.id: typeModelNode,
@@ -46,7 +54,20 @@ class ModelProjectController {
     };
     subject.relationships = {};
     NodeRelationship nodeRelationship = NodeRelationship(
-        typeModelNode, imageModelNode,
+        typeModelNode, typeModelNode,
+        relationshipType: RelationshipType.association.name,
+        allowRelationshipTypes: {RelationshipType.association.name});
+    subject.add(nodeRelationship);
+    nodeRelationship = NodeRelationship(imageModelNode, imageModelNode,
+        relationshipType: RelationshipType.association.name,
+        allowRelationshipTypes: {RelationshipType.association.name});
+    subject.add(nodeRelationship);
+    nodeRelationship = NodeRelationship(shapeModelNode, shapeModelNode,
+        relationshipType: RelationshipType.association.name,
+        allowRelationshipTypes: {RelationshipType.association.name});
+    subject.add(nodeRelationship);
+
+    nodeRelationship = NodeRelationship(typeModelNode, imageModelNode,
         relationshipType: RelationshipType.association.name,
         allowRelationshipTypes: {RelationshipType.association.name});
     subject.add(nodeRelationship);
@@ -88,7 +109,7 @@ class ModelProjectController {
 
     metaProject.subjects = {subject.name: subject};
 
-    this.metaProject = Rx<Project>(metaProject);
+    metaProjects[metaProject.id] = metaProject;
   }
 
   Subject? getCurrentSubject() {
@@ -132,9 +153,16 @@ class ModelProjectController {
     }
   }
 
-  List<ModelNode>? getAllModelNodes() {
+  List<ModelNode>? getAllMetaModelNodes() {
     List<ModelNode>? modelNodes;
-    List<Subject> subjects = metaProject.value.subjects.values.toList();
+    if (project.value == null) {
+      return null;
+    }
+    Project? metaProject = metaProjects[project.value!.metaId];
+    if (metaProject == null) {
+      return null;
+    }
+    List<Subject> subjects = metaProject.subjects.values.toList();
     for (Subject subject in subjects) {
       if (subject.modelNodes.isNotEmpty) {
         modelNodes ??= [];
@@ -147,7 +175,14 @@ class ModelProjectController {
 
   Set<RelationshipType>? getAllAllowRelationshipTypes() {
     Set<RelationshipType>? relationshipTypes;
-    List<Subject> subjects = metaProject.value.subjects.values.toList();
+    if (project.value == null) {
+      return null;
+    }
+    Project? metaProject = metaProjects[project.value!.metaId];
+    if (metaProject == null) {
+      return null;
+    }
+    List<Subject> subjects = metaProject.subjects.values.toList();
     for (Subject subject in subjects) {
       if (subject.relationships.isNotEmpty) {
         relationshipTypes ??= {};
@@ -169,6 +204,73 @@ class ModelProjectController {
     }
 
     return relationshipTypes;
+  }
+
+  /// 注册元模型，覆盖原来加载的
+  registerMetaProject(String content) async {
+    Map<String, dynamic> json = JsonUtil.toJson(content);
+    Project metaProject = Project.fromJson(json);
+    String filename = p.join(platformParams.path, metaProject.id);
+    File file = File(filename);
+    if (file.existsSync()) {
+      file.deleteSync();
+    }
+    file.writeAsStringSync(content);
+
+    metaProjects[metaProject.id] = metaProject;
+  }
+
+  /// 根据metaId打开应用目录下已经注册的元模型项目
+  Future<Project?> openMetaProject(String metaId) async {
+    String filename = p.join(platformParams.path, metaId);
+    File file = File(filename);
+    if (file.existsSync()) {
+      String content = await file.readAsString();
+      Map<String, dynamic> json = JsonUtil.toJson(content);
+      Project project = Project.fromJson(json);
+
+      return project;
+    }
+
+    return null;
+  }
+
+  /// 根据json内容打开，检查并加载模型项目
+  Future<Project?> openProject(String content) async {
+    Map<String, dynamic> json = JsonUtil.toJson(content);
+    Project project = Project.fromJson(json);
+    String metaId = project.metaId;
+    if (!metaProjects.containsKey(metaId)) {
+      Project? metaProject =
+          await modelProjectController.openMetaProject(metaId);
+
+      if (metaProject == null) {
+        throw 'meta project is not exist';
+      }
+      metaProjects[metaId] = metaProject;
+      currentMetaId.value = metaId;
+      this.project.value = project;
+    }
+
+    if (project.subjects.isEmpty) {
+      return project;
+    }
+    currentSubjectName.value = project.subjects.values.first.name;
+    for (Subject subject in project.subjects.values) {
+      for (NodeRelationship relationship
+          in subject.relationships.values.toList()) {
+        ModelNode? modelNode = getModelNode(relationship.srcId);
+        if (modelNode == null) {
+          subject.remove(relationship);
+        } else {
+          modelNode = getModelNode(relationship.dstId);
+          if (modelNode == null) {
+            subject.remove(relationship);
+          }
+        }
+      }
+    }
+    return project;
   }
 }
 

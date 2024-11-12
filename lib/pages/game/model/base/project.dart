@@ -20,10 +20,16 @@ class Project {
 
   String name;
 
+  final String metaId;
+
   Map<String, Subject> subjects = {};
 
-  Project(this.name) {
-    id = const Uuid().v4().toString();
+  Project(this.name, this.metaId, {String? id}) {
+    if (id == null) {
+      this.id = const Uuid().v4().toString();
+    } else {
+      this.id = id;
+    }
   }
 
   void clear() {
@@ -56,6 +62,7 @@ class Project {
 
   Project.fromJson(Map json)
       : id = json['id'],
+        metaId = json['metaId'],
         name = json['name'] {
     subjects = {};
     List<dynamic>? ss = json['subjects'];
@@ -71,6 +78,7 @@ class Project {
     return {
       'id': id,
       'name': name,
+      'metaId': metaId,
       'subjects': JsonUtil.toJson(subjects.values.toList())
     };
   }

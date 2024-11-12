@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
@@ -10,6 +11,7 @@ import 'package:colla_chat/pages/game/model/component/node_frame_component.dart'
 import 'package:colla_chat/pages/game/model/component/node_relationship_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/pages/game/model/widget/model_node_edit_widget.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -26,6 +28,7 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:ui' as ui;
+import 'package:path/path.dart' as p;
 
 /// 元模型建模器
 class MetaModellerWidget extends StatelessWidget with TileDataMixin {
@@ -118,7 +121,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
 
   List<Widget> _buildMetaNodeButtons() {
     List<ModelNode>? allowModelNodes =
-        modelProjectController.getAllModelNodes();
+        modelProjectController.getAllMetaModelNodes();
     Project? project = modelProjectController.project.value;
     List<Widget> btns = [];
     for (var allowModelNode in allowModelNodes!) {
@@ -459,7 +462,8 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         content: 'Please input new project name',
         tip: 'unknown');
     if (projectName != null) {
-      modelProjectController.project.value = Project(projectName);
+      modelProjectController.project.value =
+          Project(projectName, modelProjectController.currentMetaId.value);
     }
   }
 
@@ -469,26 +473,17 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       return;
     }
     String content = await xfile.readAsString();
-    Map<String, dynamic> json = JsonUtil.toJson(content);
-    Project project = Project.fromJson(json);
-    modelProjectController.project.value = project;
-    if (project.subjects.isEmpty) {
-      return;
+    Project? project;
+    try {
+      project = await modelProjectController.openProject(content);
+    } catch (e) {
+      DialogUtil.error(content: e.toString());
     }
-    modelProjectController.currentSubjectName.value =
-        project.subjects.values.first.name;
-    for (Subject subject in project.subjects.values) {
-      for (NodeRelationship relationship
-          in subject.relationships.values.toList()) {
-        ModelNode? modelNode =
-            modelProjectController.getModelNode(relationship.srcId);
-        if (modelNode == null) {
-          subject.remove(relationship);
-        } else {
-          modelNode = modelProjectController.getModelNode(relationship.dstId);
-          if (modelNode == null) {
-            subject.remove(relationship);
-          }
+    if (project != null) {
+      List<ModelNode>? modelNodes = modelProjectController.getAllMetaModelNodes();
+      if (modelNodes != null && modelNodes.isNotEmpty) {
+        for (var modelNode in modelNodes) {
+          loadImage(modelNode);
         }
       }
     }
@@ -545,33 +540,24 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  _openMetaProject() async {
+  _registerMetaProject() async {
     XFile? xfile = await FileUtil.selectFile(allowedExtensions: ['json']);
     if (xfile == null) {
       return;
     }
     String content = await xfile.readAsString();
-    Map<String, dynamic> json = JsonUtil.toJson(content);
-    Project metaProject = Project.fromJson(json);
-    modelProjectController.metaProject.value = metaProject;
-    List<ModelNode>? modelNodes = modelProjectController.getAllModelNodes();
-    if (modelNodes != null && modelNodes.isNotEmpty) {
-      for (var modelNode in modelNodes) {
-        loadImage(modelNode);
-      }
-    }
 
-    modelProjectController.project.value = null;
+    await modelProjectController.registerMetaProject(content);
   }
 
   List<Widget> _buildMetaProjectButtons() {
     return [
       IconButton(
         onPressed: () {
-          _openMetaProject();
+          _registerMetaProject();
         },
         icon: const Icon(Icons.open_in_browser_outlined),
-        tooltip: AppLocalizations.t('Open meta project'),
+        tooltip: AppLocalizations.t('Register meta project'),
       ),
     ];
   }
@@ -579,7 +565,8 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      Project? metaProject = modelProjectController.metaProject.value;
+      Project? metaProject = modelProjectController
+          .metaProjects.value[modelProjectController.currentMetaId.value];
       Project? project = modelProjectController.project.value;
       List<Widget> rightWidgets = [
         ..._buildMetaProjectButtons(),
@@ -595,7 +582,9 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         ))
       ];
       String title = AppLocalizations.t(this.title);
-      title = '$title-${metaProject.name}';
+      if (metaProject != null) {
+        title = '$title-${metaProject.name}';
+      }
       if (project != null) {
         title = '$title-${project.name}';
       }
