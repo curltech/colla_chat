@@ -1,12 +1,13 @@
 import 'dart:ui';
 
 import 'package:colla_chat/pages/game/model/base/subject.dart';
+import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/plugin/painter/line/dash_painter.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flutter/material.dart';
 
-class SubjectComponent extends RectangleComponent {
+class SubjectComponent extends RectangleComponent with ModelNodeComponent{
   static final strokePaint = Paint()
     ..color = Colors.yellow.shade50
     ..style = PaintingStyle.stroke
@@ -49,7 +50,8 @@ class SubjectComponent extends RectangleComponent {
     add(textComponent);
   }
 
-  onUpdate() {
+  @override
+  Future<void> onUpdate() async {
     textComponent.text = subject.name;
     Rect rect = subject.rect;
     position = Vector2(rect.left, rect.top);

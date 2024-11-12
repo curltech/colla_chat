@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:ui' as ui;
 
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/base/json_editor.dart';
+import 'package:colla_chat/pages/base/json_viewer.dart';
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
@@ -29,12 +31,14 @@ import 'package:get/get.dart';
 
 /// 元模型建模器
 class MetaModellerWidget extends StatelessWidget with TileDataMixin {
+  final JsonViewerWidget jsonViewerWidget = JsonViewerWidget();
   final ModelNodeEditWidget modelNodeEditWidget = ModelNodeEditWidget();
 
   ModelFlameGame? modelFlameGame;
 
   MetaModellerWidget({super.key}) {
     indexWidgetProvider.define(modelNodeEditWidget);
+    indexWidgetProvider.define(jsonViewerWidget);
   }
 
   @override
@@ -59,10 +63,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         content: 'Please input new subject name',
         tip: 'unknown');
     if (subjectName != null) {
-      Rect rect = project.rect;
       Subject subject = Subject(subjectName);
-      subject.x = rect.right + Project.nodePadding;
-      subject.y = rect.top;
       modelProjectController.currentSubjectName.value = subject.name;
       project.subjects[subject.name] = subject;
       modelFlameGame?.moveTo();
@@ -87,14 +88,11 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   }
 
   List<Widget> _buildSubjectButtons() {
-    Project? project = modelProjectController.project.value;
     return [
       IconButton(
-        onPressed: project != null
-            ? () async {
-                await _addSubject();
-              }
-            : null,
+        onPressed: () async {
+          await _addSubject();
+        },
         icon: Icon(
           Icons.electric_meter,
           color: myself.primary,
@@ -102,11 +100,9 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         tooltip: AppLocalizations.t('New subject'),
       ),
       IconButton(
-        onPressed: project != null
-            ? () async {
-                _selectSubject();
-              }
-            : null,
+        onPressed: () async {
+          _selectSubject();
+        },
         icon: Icon(
           Icons.list_alt_outlined,
           color: myself.primary,
@@ -119,9 +115,11 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   List<Widget> _buildMetaNodeButtons() {
     List<ModelNode>? allowModelNodes =
         modelProjectController.getAllMetaModelNodes();
-    Project? project = modelProjectController.project.value;
     List<Widget> btns = [];
-    for (var allowModelNode in allowModelNodes!) {
+    if (allowModelNodes == null) {
+      return btns;
+    }
+    for (var allowModelNode in allowModelNodes) {
       String nodeType = allowModelNode.nodeType;
       Widget? btnIcon;
       if (nodeType == NodeType.image.name) {
@@ -162,11 +160,9 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       }
 
       Widget btn = IconButton(
-        onPressed: project != null
-            ? () {
-                _modelNodeAction(allowModelNode);
-              }
-            : null,
+        onPressed: () {
+          _modelNodeAction(allowModelNode);
+        },
         icon: btnIcon!,
         tooltip: AppLocalizations.t('New ${allowModelNode.name}'),
       );
@@ -189,32 +185,45 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   }
 
   List<Widget> _buildRelationshipButtons() {
+    List<Widget> btns = [];
+    ModelNode? selectedSrcModelNode =
+        modelProjectController.selectedSrcModelNode.value;
+    ModelNode? selectedDstModelNode =
+        modelProjectController.selectedDstModelNode.value;
+    if (selectedSrcModelNode == null || selectedDstModelNode == null) {
+      return btns;
+    }
+    String? srcMetaId = selectedSrcModelNode.metaId;
+    String? dstMetaId = selectedDstModelNode.metaId;
+    if (srcMetaId == null || dstMetaId == null) {
+      return btns;
+    }
     Set<RelationshipType>? allowRelationshipTypes =
-        modelProjectController.getAllAllowRelationshipTypes();
-    Project? project = modelProjectController.project.value;
-    List<Widget> btns = [
-      IconButton(
-        onPressed: project != null
-            ? () {
-                modelFlameGame?.addRelationship(RelationshipType.reference);
-              }
-            : null,
+        modelProjectController.getAllAllowRelationshipTypes(
+      srcMetaId,
+      dstMetaId,
+    );
+    if (allowRelationshipTypes == null) {
+      return btns;
+    }
+    if (allowRelationshipTypes.contains(RelationshipType.reference)) {
+      btns.add(IconButton(
+        onPressed: () {
+          modelFlameGame?.addRelationship(RelationshipType.reference);
+        },
         icon: Icon(
           Icons.linear_scale_outlined,
           color: myself.primary,
         ),
         tooltip: AppLocalizations.t('New reference relationship'),
-      )
-    ];
-    if (allowRelationshipTypes == null ||
-        allowRelationshipTypes.contains(RelationshipType.association)) {
+      ));
+    }
+    if (allowRelationshipTypes.contains(RelationshipType.association)) {
       btns.add(
         IconButton(
-          onPressed: project != null
-              ? () {
-                  modelFlameGame?.addRelationship(RelationshipType.association);
-                }
-              : null,
+          onPressed: () {
+            modelFlameGame?.addRelationship(RelationshipType.association);
+          },
           icon: Icon(
             Icons.stacked_line_chart_outlined,
             color: myself.primary,
@@ -223,16 +232,12 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         ),
       );
     }
-    if (allowRelationshipTypes == null ||
-        allowRelationshipTypes.contains(RelationshipType.generalization)) {
+    if (allowRelationshipTypes.contains(RelationshipType.generalization)) {
       btns.add(
         IconButton(
-          onPressed: project != null
-              ? () {
-                  modelFlameGame
-                      ?.addRelationship(RelationshipType.generalization);
-                }
-              : null,
+          onPressed: () {
+            modelFlameGame?.addRelationship(RelationshipType.generalization);
+          },
           icon: Icon(
             Icons.line_style_outlined,
             color: myself.primary,
@@ -241,15 +246,12 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         ),
       );
     }
-    if (allowRelationshipTypes == null ||
-        allowRelationshipTypes.contains(RelationshipType.realization)) {
+    if (allowRelationshipTypes.contains(RelationshipType.realization)) {
       btns.add(
         IconButton(
-          onPressed: project != null
-              ? () {
-                  modelFlameGame?.addRelationship(RelationshipType.realization);
-                }
-              : null,
+          onPressed: () {
+            modelFlameGame?.addRelationship(RelationshipType.realization);
+          },
           icon: Icon(
             Icons.line_axis_outlined,
             color: myself.primary,
@@ -258,15 +260,12 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         ),
       );
     }
-    if (allowRelationshipTypes == null ||
-        allowRelationshipTypes.contains(RelationshipType.dependency)) {
+    if (allowRelationshipTypes.contains(RelationshipType.dependency)) {
       btns.add(
         IconButton(
-          onPressed: project != null
-              ? () {
-                  modelFlameGame?.addRelationship(RelationshipType.dependency);
-                }
-              : null,
+          onPressed: () {
+            modelFlameGame?.addRelationship(RelationshipType.dependency);
+          },
           icon: Icon(
             Icons.line_weight_outlined,
             color: myself.primary,
@@ -275,15 +274,12 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         ),
       );
     }
-    if (allowRelationshipTypes == null ||
-        allowRelationshipTypes.contains(RelationshipType.aggregation)) {
+    if (allowRelationshipTypes.contains(RelationshipType.aggregation)) {
       btns.add(
         IconButton(
-          onPressed: project != null
-              ? () {
-                  modelFlameGame?.addRelationship(RelationshipType.aggregation);
-                }
-              : null,
+          onPressed: () {
+            modelFlameGame?.addRelationship(RelationshipType.aggregation);
+          },
           icon: Icon(
             Icons.blur_linear_outlined,
             color: myself.primary,
@@ -292,15 +288,12 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         ),
       );
     }
-    if (allowRelationshipTypes == null ||
-        allowRelationshipTypes.contains(RelationshipType.composition)) {
+    if (allowRelationshipTypes.contains(RelationshipType.composition)) {
       btns.add(
         IconButton(
-          onPressed: project != null
-              ? () {
-                  modelFlameGame?.addRelationship(RelationshipType.composition);
-                }
-              : null,
+          onPressed: () {
+            modelFlameGame?.addRelationship(RelationshipType.composition);
+          },
           icon: Icon(
             Icons.format_line_spacing_outlined,
             color: myself.primary,
@@ -327,8 +320,12 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         if (nodeFrameComponent != null) {
           nodeFrameComponent.subject.modelNodes.remove(modelNode.id);
           nodeFrameComponent.removeFromParent();
+
+          modelFlameGame?.subjectComponent.onUpdate();
         }
       }
+      modelProjectController.selectedSrcModelNode.value = null;
+      modelProjectController.selectedDstModelNode.value = null;
     }
     NodeRelationship? nodeRelationship =
         modelProjectController.selectedRelationship.value;
@@ -342,35 +339,41 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         if (nodeRelationshipComponent != null) {
           modelProjectController.removeRelationship(nodeRelationship);
           nodeRelationshipComponent.removeFromParent();
+
+          modelFlameGame?.subjectComponent.onUpdate();
         }
       }
+      modelProjectController.selectedRelationship.value = null;
     }
   }
 
   Widget _buildToolPanelWidget(BuildContext context) {
     return Obx(() {
+      List<Widget> btns = [];
       Project? project = modelProjectController.project.value;
-      var children = [
-        ..._buildSubjectButtons(),
-        ..._buildMetaNodeButtons(),
-        ..._buildRelationshipButtons(),
-        IconButton(
-          onPressed: project != null ? delete : null,
-          icon: Icon(
-            Icons.delete_outline,
-            color: myself.primary,
+      if (project != null) {
+        btns.addAll([
+          ..._buildSubjectButtons(),
+          ..._buildMetaNodeButtons(),
+          ..._buildRelationshipButtons(),
+          IconButton(
+            onPressed: delete,
+            icon: Icon(
+              Icons.delete_outline,
+              color: myself.primary,
+            ),
+            tooltip: AppLocalizations.t('Delete'),
           ),
-          tooltip: AppLocalizations.t('Delete'),
-        ),
-      ];
+        ]);
+      }
       return appDataProvider.secondaryBodyLandscape
           ? Column(
               mainAxisAlignment: MainAxisAlignment.start,
-              children: children,
+              children: btns,
             )
           : Row(
               mainAxisAlignment: MainAxisAlignment.start,
-              children: children,
+              children: btns,
             );
     });
   }
@@ -419,9 +422,31 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     modelProjectController.filename.value = filename;
   }
 
+  _viewProject() async {
+    if (modelProjectController.project.value != null) {
+      String content =
+          JsonUtil.toJsonString(modelProjectController.project.value);
+      jsonContent.value = content;
+      indexWidgetProvider.push(jsonViewerWidget.routeName);
+    }
+  }
+
+  _viewMetaProject() async {
+    Project? metaProject = modelProjectController
+        .metaProjects[modelProjectController.currentMetaId.value];
+    if (metaProject != null) {
+      String content = JsonUtil.toJsonString(metaProject);
+      jsonContent.value = content;
+      indexWidgetProvider.push(jsonViewerWidget.routeName);
+    }
+  }
+
   List<Widget> _buildProjectButtons() {
+    List<Widget> btns = [];
     Project? project = modelProjectController.project.value;
-    return [
+    Project? metaProject = modelProjectController
+        .metaProjects[modelProjectController.currentMetaId.value];
+    btns.addAll([
       IconButton(
         onPressed: () {
           _newProject();
@@ -436,16 +461,34 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         icon: const Icon(Icons.file_open),
         tooltip: AppLocalizations.t('Open project'),
       ),
-      IconButton(
-        onPressed: project != null
-            ? () async {
-                await _saveProject();
-              }
-            : null,
+    ]);
+    if (project != null) {
+      btns.add(IconButton(
+        onPressed: () async {
+          await _saveProject();
+        },
         icon: const Icon(Icons.save),
         tooltip: AppLocalizations.t('Save project'),
-      ),
-    ];
+      ));
+      btns.add(IconButton(
+        onPressed: () {
+          _viewProject();
+        },
+        icon: Icon(jsonViewerWidget.iconData),
+        tooltip: AppLocalizations.t('View project'),
+      ));
+    }
+    if (metaProject != null) {
+      btns.add(IconButton(
+        onPressed: () {
+          _viewMetaProject();
+        },
+        icon: const Icon(Icons.margin),
+        tooltip: AppLocalizations.t('View meta project'),
+      ));
+    }
+
+    return btns;
   }
 
   loadImage(ModelNode modelNode) async {

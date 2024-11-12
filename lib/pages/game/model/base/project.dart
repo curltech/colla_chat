@@ -16,7 +16,7 @@ class Project {
 
   static const double pixelRatio = 1;
 
-  static const baseMetaId = '';
+  static const baseMetaId = 'base-meta-project-000';
 
   late final String id;
 

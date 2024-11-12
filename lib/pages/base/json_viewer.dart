@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_json_view/flutter_json_view.dart';
 import 'package:get/get.dart';
 
-class JsonEditorWidget extends StatelessWidget with TileDataMixin {
-  JsonEditorWidget({super.key});
+class JsonViewerWidget extends StatelessWidget with TileDataMixin {
+  JsonViewerWidget({super.key});
 
   @override
   bool get withLeading => true;

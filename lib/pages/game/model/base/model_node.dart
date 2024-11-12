@@ -76,6 +76,11 @@ enum ShapeType {
 
 /// 模型节点
 class ModelNode extends Node {
+  static const String typeBaseMetaId = 'base-meta-type-000';
+  static const String imageBaseMetaId = 'base-meta-image-000';
+  static const String shapeBaseMetaId = 'base-meta-shape-000';
+  static const String remarkBaseMetaId = 'base-meta-remark-000';
+
   late String nodeType;
   String? shapeType;
   String? metaId;

@@ -17,7 +17,7 @@ import 'package:flame/text.dart';
 import 'package:flutter/material.dart';
 
 class AttributeTextComponent extends TextComponent
-    with TapCallbacks, HoverCallbacks, HasGameRef<ModelFlameGame> {
+    with ModelNodeComponent,TapCallbacks, HoverCallbacks, HasGameRef<ModelFlameGame> {
   static final TextPaint normal = TextPaint(
     style: const TextStyle(
       color: Colors.black,
@@ -51,6 +51,7 @@ class AttributeTextComponent extends TextComponent
     (parent as AttributeAreaComponent).updateSize();
   }
 
+  @override
   Future<void> onUpdate() async {
     text = '${attribute.scope} ${attribute.dataType}:${attribute.name}';
   }

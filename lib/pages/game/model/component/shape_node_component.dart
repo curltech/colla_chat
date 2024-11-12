@@ -101,6 +101,7 @@ class ShapeNodeComponent extends PositionComponent
     }
   }
 
+  @override
   Future<void> onUpdate() async {
     nodeTextComponent.text = modelNode.name;
   }

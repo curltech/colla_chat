@@ -27,14 +27,20 @@ class ModelProjectController {
       Rx<NodeRelationship?>(null);
 
   final Rx<ModelNode?> canAddModelNode = Rx<ModelNode?>(null);
-  final ModelNode typeModelNode =
-      ModelNode(name: 'type', nodeType: NodeType.type.name);
-  final ModelNode imageModelNode =
-      ModelNode(name: 'image', nodeType: NodeType.image.name);
-  final ModelNode shapeModelNode =
-      ModelNode(name: 'shape', nodeType: NodeType.shape.name);
-  final ModelNode remarkModelNode =
-      ModelNode(name: 'remark', nodeType: NodeType.remark.name);
+  final ModelNode typeModelNode = ModelNode(
+      name: 'type', nodeType: NodeType.type.name, id: ModelNode.typeBaseMetaId);
+  final ModelNode imageModelNode = ModelNode(
+      name: 'image',
+      nodeType: NodeType.image.name,
+      id: ModelNode.imageBaseMetaId);
+  final ModelNode shapeModelNode = ModelNode(
+      name: 'shape',
+      nodeType: NodeType.shape.name,
+      id: ModelNode.shapeBaseMetaId);
+  final ModelNode remarkModelNode = ModelNode(
+      name: 'remark',
+      nodeType: NodeType.remark.name,
+      id: ModelNode.remarkBaseMetaId);
 
   ModelProjectController() {
     initMetaProject();
@@ -42,8 +48,8 @@ class ModelProjectController {
 
   initMetaProject() {
     Project metaProject =
-        Project('meta', Project.baseMetaId, id: Project.baseMetaId);
-    Subject subject = Subject('meta');
+        Project(Project.baseMetaId, Project.baseMetaId, id: Project.baseMetaId);
+    Subject subject = Subject(Subject.baseMetaId, id: Subject.baseMetaId);
     subject.modelNodes = {
       typeModelNode.id: typeModelNode,
       imageModelNode.id: imageModelNode,
@@ -54,7 +60,14 @@ class ModelProjectController {
     NodeRelationship nodeRelationship = NodeRelationship(
         typeModelNode, typeModelNode,
         relationshipType: RelationshipType.association.name,
-        allowRelationshipTypes: {RelationshipType.association.name});
+        allowRelationshipTypes: {
+          RelationshipType.association.name,
+          RelationshipType.generalization.name,
+          RelationshipType.realization.name,
+          RelationshipType.aggregation.name,
+          RelationshipType.composition.name,
+          RelationshipType.dependency.name,
+        });
     subject.add(nodeRelationship);
     nodeRelationship = NodeRelationship(imageModelNode, imageModelNode,
         relationshipType: RelationshipType.association.name,
@@ -153,10 +166,12 @@ class ModelProjectController {
 
   List<ModelNode>? getAllMetaModelNodes() {
     List<ModelNode>? modelNodes;
+    Project? metaProject;
     if (project.value == null) {
-      return null;
+      metaProject = metaProjects[Project.baseMetaId];
+    } else {
+      metaProject = metaProjects[project.value!.metaId];
     }
-    Project? metaProject = metaProjects[project.value!.metaId];
     if (metaProject == null) {
       return null;
     }
@@ -171,12 +186,15 @@ class ModelProjectController {
     return modelNodes;
   }
 
-  Set<RelationshipType>? getAllAllowRelationshipTypes() {
+  Set<RelationshipType>? getAllAllowRelationshipTypes(
+      String srcId, String dstId) {
     Set<RelationshipType>? relationshipTypes;
+    Project? metaProject;
     if (project.value == null) {
-      return null;
+      metaProject = metaProjects[Project.baseMetaId];
+    } else {
+      metaProject = metaProjects[project.value!.metaId];
     }
-    Project? metaProject = metaProjects[project.value!.metaId];
     if (metaProject == null) {
       return null;
     }
@@ -191,11 +209,15 @@ class ModelProjectController {
         if (allowRelationshipTypes == null) {
           continue;
         }
-        for (String allowRelationshipType in allowRelationshipTypes.toList()) {
-          RelationshipType? type = StringUtil.enumFromString(
-              RelationshipType.values, allowRelationshipType);
-          if (type != null) {
-            relationshipTypes!.add(type);
+        if (nodeRelationship.srcId == srcId &&
+            nodeRelationship.dstId == dstId) {
+          for (String allowRelationshipType
+              in allowRelationshipTypes.toList()) {
+            RelationshipType? type = StringUtil.enumFromString(
+                RelationshipType.values, allowRelationshipType);
+            if (type != null) {
+              relationshipTypes!.add(type);
+            }
           }
         }
       }
@@ -246,9 +268,10 @@ class ModelProjectController {
         throw 'meta project is not exist';
       }
       metaProjects[metaId] = metaProject;
-      currentMetaId.value = metaId;
-      this.project.value = project;
     }
+
+    currentMetaId.value = metaId;
+    this.project.value = project;
 
     if (project.subjects.isEmpty) {
       return project;

@@ -57,6 +57,7 @@ class RemarkNodeComponent extends TextBoxComponent
     return super.onLoad();
   }
 
+  @override
   Future<void> onUpdate() async {
     text = modelNode.content ?? '';
   }

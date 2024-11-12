@@ -17,7 +17,11 @@ import 'package:flame/text.dart';
 import 'package:flutter/material.dart';
 
 class MethodTextComponent extends TextComponent
-    with TapCallbacks, DoubleTapCallbacks, HasGameRef<ModelFlameGame> {
+    with
+        ModelNodeComponent,
+        TapCallbacks,
+        DoubleTapCallbacks,
+        HasGameRef<ModelFlameGame> {
   static final TextPaint normal = TextPaint(
     style: const TextStyle(
       color: Colors.black,
@@ -51,6 +55,7 @@ class MethodTextComponent extends TextComponent
     (parent as MethodAreaComponent).updateSize();
   }
 
+  @override
   Future<void> onUpdate() async {
     text = '${method.scope} ${method.returnType}:${method.name}';
   }

@@ -79,6 +79,7 @@ class ImageNodeComponent extends PositionComponent
     }
   }
 
+  @override
   Future<void> onUpdate() async {
     remove(spriteComponent);
     loadImage();

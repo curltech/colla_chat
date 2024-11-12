@@ -12,16 +12,21 @@ class JsonUtil {
     }
     if (entity is List<int>) {
       dynamic json = jsonDecode(CryptoUtil.utf8ToString(entity));
+
       return json;
     } else if (entity is List) {
       return entity;
     } else if (entity is Map) {
       return entity;
+    } else if (entity is Set) {
+      return entity;
     } else if (entity is String) {
       dynamic json = jsonDecode(entity);
+
       return json;
     } else if (entity is String) {
       dynamic json = jsonDecode(entity);
+
       return json;
     }
     Map map = entity.toJson();

@@ -9,6 +9,7 @@ import 'package:uuid/uuid.dart';
 
 /// 模型主题，每个主题将占据一块区域，主题之间相邻，大小为10个节点x6个节点
 class Subject {
+  static const String baseMetaId = 'base-meta-subject-000';
   late final String id;
   String name;
 
@@ -23,8 +24,12 @@ class Subject {
 
   SubjectComponent? subjectComponent;
 
-  Subject(this.name) {
-    id = const Uuid().v4().toString();
+  Subject(this.name, {String? id}) {
+    if (id == null) {
+      this.id = const Uuid().v4().toString();
+    } else {
+      this.id = id;
+    }
   }
 
   ui.Rect get rect {
@@ -65,11 +70,16 @@ class Subject {
       }
     }
 
-    return ui.Rect.fromLTRB(
-        minX - Project.nodePadding,
+    ui.Rect rect = ui.Rect.fromLTRB(
+        minX - 3 * Project.nodePadding,
         minY - Project.nodePadding * 4,
-        maxX + Project.nodePadding,
-        maxY + Project.nodePadding);
+        maxX + 8 * Project.nodePadding,
+        maxY + 3 * Project.nodePadding);
+
+    x = rect.left;
+    y = rect.top;
+
+    return rect;
   }
 
   add(NodeRelationship nodeRelationship) {
@@ -78,11 +88,13 @@ class Subject {
   }
 
   NodeRelationship? remove(NodeRelationship nodeRelationship) {
-    return relationships.remove('${nodeRelationship.srcId}-${nodeRelationship.dstId}');
+    return relationships
+        .remove('${nodeRelationship.srcId}-${nodeRelationship.dstId}');
   }
 
   bool containsKey(NodeRelationship nodeRelationship) {
-    return relationships.containsKey('${nodeRelationship.srcId}-${nodeRelationship.dstId}');
+    return relationships
+        .containsKey('${nodeRelationship.srcId}-${nodeRelationship.dstId}');
   }
 
   void clear() {

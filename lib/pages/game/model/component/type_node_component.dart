@@ -87,6 +87,7 @@ class TypeNodeComponent extends RectangleComponent
     updateSize();
   }
 
+  @override
   Future<void> onUpdate() async {
     nodeNameComponent.text = modelNode.name;
   }

@@ -104,18 +104,18 @@ class NodeRelationshipEditWidget extends StatelessWidget with TileDataMixin {
               AppLocalizations.t('Must has nodeRelationship relationshipType'));
       return null;
     }
-    if (current.srcCardinality == null) {
-      DialogUtil.error(
-          content:
-              AppLocalizations.t('Must has nodeRelationship srcCardinality'));
-      return null;
-    }
-    if (current.dstCardinality == null) {
-      DialogUtil.error(
-          content:
-              AppLocalizations.t('Must has nodeRelationship dstCardinality'));
-      return null;
-    }
+    // if (current.srcCardinality == null) {
+    //   DialogUtil.error(
+    //       content:
+    //           AppLocalizations.t('Must has nodeRelationship srcCardinality'));
+    //   return null;
+    // }
+    // if (current.dstCardinality == null) {
+    //   DialogUtil.error(
+    //       content:
+    //           AppLocalizations.t('Must has nodeRelationship dstCardinality'));
+    //   return null;
+    // }
     nodeRelationship?.relationshipType = current.relationshipType;
     nodeRelationship?.srcCardinality = current.srcCardinality;
     nodeRelationship?.dstCardinality = current.dstCardinality;

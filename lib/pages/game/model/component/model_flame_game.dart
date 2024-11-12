@@ -21,7 +21,6 @@ import 'package:flutter/material.dart';
 class ModelFlameGame extends FlameGame
     with
         TapCallbacks,
-        DoubleTapCallbacks,
         ScrollDetector,
         ScaleDetector,
         HasCollisionDetection,
@@ -31,6 +30,8 @@ class ModelFlameGame extends FlameGame
   static const zoomPerScrollUnit = 0.02;
 
   late double startZoom;
+
+  late SubjectComponent subjectComponent;
 
   // @override
   // bool debugMode = true;
@@ -91,7 +92,7 @@ class ModelFlameGame extends FlameGame
   }
 
   void _renderSubject(Subject subject) {
-    SubjectComponent subjectComponent = SubjectComponent(subject);
+    subjectComponent = SubjectComponent(subject);
     subject.subjectComponent = subjectComponent;
     world.add(subjectComponent);
     Iterable<ModelNode> modelNodes = subject.modelNodes.values;
@@ -157,6 +158,7 @@ class ModelFlameGame extends FlameGame
       return;
     }
     modelProjectController.selectedSrcModelNode.value = null;
+    modelProjectController.selectedDstModelNode.value = null;
     modelProjectController.selectedRelationship.value = null;
     Vector2 globalPosition = event.devicePosition;
     Vector2 widgetPosition = event.canvasPosition;
@@ -193,6 +195,8 @@ class ModelFlameGame extends FlameGame
         );
         modelNode.nodeFrameComponent = nodeFrameComponent;
         world.add(nodeFrameComponent);
+
+        subjectComponent.onUpdate();
       }
       modelProjectController.canAddModelNode.value = null;
     }
@@ -213,7 +217,7 @@ class ModelFlameGame extends FlameGame
           NodeRelationshipComponent(nodeRelationship: nodeRelationship);
       if (nodeRelationship.src != null && nodeRelationship.dst != null) {
         nodeRelationship.nodeRelationshipComponent = nodeRelationshipComponent;
-        add(nodeRelationshipComponent);
+        world.add(nodeRelationshipComponent);
       }
       modelProjectController.selectedSrcModelNode.value = null;
       modelProjectController.selectedDstModelNode.value = null;

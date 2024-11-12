@@ -98,11 +98,16 @@ class NodeRelationship {
             json['relationshipType'] ?? RelationshipType.association.name,
         srcCardinality = json['srcCardinality'],
         dstCardinality = json['dstCardinality'] {
-    Set<dynamic>? types = json['allowRelationshipTypes'];
+    dynamic types = json['allowRelationshipTypes'];
     if (types != null && types.isNotEmpty) {
+      if (types is Set<dynamic>) {
+        types = types.toList();
+      }
       allowRelationshipTypes = {};
-      for (var type in types) {
-        allowRelationshipTypes!.add(type.toString());
+      if (types is List<dynamic>) {
+        for (var type in types) {
+          allowRelationshipTypes!.add(type.toString());
+        }
       }
     }
   }
@@ -112,7 +117,7 @@ class NodeRelationship {
       'srcId': srcId,
       'dstId': dstId,
       'relationshipType': relationshipType,
-      'allowRelationshipTypes': allowRelationshipTypes,
+      'allowRelationshipTypes': allowRelationshipTypes?.toList(),
       'srcCardinality': srcCardinality,
       'dstCardinality': dstCardinality
     };
