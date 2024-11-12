@@ -189,7 +189,6 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         modelProjectController.canAddModelNode.value = null;
       }
     }
-    modelProjectController.canAddRelationship.value = null;
   }
 
   List<Widget> _buildRelationshipButtons() {
@@ -200,23 +199,12 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       IconButton(
         onPressed: project != null
             ? () {
-                RelationshipType? addRelationshipStatus =
-                    modelProjectController.canAddRelationship.value;
-                if (addRelationshipStatus != RelationshipType.reference) {
-                  modelProjectController.canAddRelationship.value =
-                      RelationshipType.reference;
-                } else {
-                  modelProjectController.canAddRelationship.value = null;
-                }
-                modelProjectController.canAddModelNode.value = null;
+                modelFlameGame?.addRelationship(RelationshipType.reference);
               }
             : null,
         icon: Icon(
           Icons.linear_scale_outlined,
-          color: modelProjectController.canAddRelationship.value ==
-                  RelationshipType.reference
-              ? Colors.amber
-              : myself.primary,
+          color: myself.primary,
         ),
         tooltip: AppLocalizations.t('New reference relationship'),
       )
@@ -227,23 +215,12 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         IconButton(
           onPressed: project != null
               ? () {
-                  RelationshipType? addRelationshipStatus =
-                      modelProjectController.canAddRelationship.value;
-                  if (addRelationshipStatus != RelationshipType.association) {
-                    modelProjectController.canAddRelationship.value =
-                        RelationshipType.association;
-                  } else {
-                    modelProjectController.canAddRelationship.value = null;
-                  }
-                  modelProjectController.canAddModelNode.value = null;
+                  modelFlameGame?.addRelationship(RelationshipType.association);
                 }
               : null,
           icon: Icon(
             Icons.stacked_line_chart_outlined,
-            color: modelProjectController.canAddRelationship.value ==
-                    RelationshipType.association
-                ? Colors.amber
-                : myself.primary,
+            color: myself.primary,
           ),
           tooltip: AppLocalizations.t('New association relationship'),
         ),
@@ -255,24 +232,13 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         IconButton(
           onPressed: project != null
               ? () {
-                  RelationshipType? addRelationshipStatus =
-                      modelProjectController.canAddRelationship.value;
-                  if (addRelationshipStatus !=
-                      RelationshipType.generalization) {
-                    modelProjectController.canAddRelationship.value =
-                        RelationshipType.generalization;
-                  } else {
-                    modelProjectController.canAddRelationship.value = null;
-                  }
-                  modelProjectController.canAddModelNode.value = null;
+                  modelFlameGame
+                      ?.addRelationship(RelationshipType.generalization);
                 }
               : null,
           icon: Icon(
             Icons.line_style_outlined,
-            color: modelProjectController.canAddRelationship.value ==
-                    RelationshipType.generalization
-                ? Colors.amber
-                : myself.primary,
+            color: myself.primary,
           ),
           tooltip: AppLocalizations.t('New generalization relationship'),
         ),
@@ -284,23 +250,12 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         IconButton(
           onPressed: project != null
               ? () {
-                  RelationshipType? addRelationshipStatus =
-                      modelProjectController.canAddRelationship.value;
-                  if (addRelationshipStatus != RelationshipType.realization) {
-                    modelProjectController.canAddRelationship.value =
-                        RelationshipType.realization;
-                  } else {
-                    modelProjectController.canAddRelationship.value = null;
-                  }
-                  modelProjectController.canAddModelNode.value = null;
+                  modelFlameGame?.addRelationship(RelationshipType.realization);
                 }
               : null,
           icon: Icon(
             Icons.line_axis_outlined,
-            color: modelProjectController.canAddRelationship.value ==
-                    RelationshipType.realization
-                ? Colors.amber
-                : myself.primary,
+            color: myself.primary,
           ),
           tooltip: AppLocalizations.t('New realization relationship'),
         ),
@@ -312,23 +267,12 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         IconButton(
           onPressed: project != null
               ? () {
-                  RelationshipType? addRelationshipStatus =
-                      modelProjectController.canAddRelationship.value;
-                  if (addRelationshipStatus != RelationshipType.dependency) {
-                    modelProjectController.canAddRelationship.value =
-                        RelationshipType.dependency;
-                  } else {
-                    modelProjectController.canAddRelationship.value = null;
-                  }
-                  modelProjectController.canAddModelNode.value = null;
+                  modelFlameGame?.addRelationship(RelationshipType.dependency);
                 }
               : null,
           icon: Icon(
             Icons.line_weight_outlined,
-            color: modelProjectController.canAddRelationship.value ==
-                    RelationshipType.dependency
-                ? Colors.amber
-                : myself.primary,
+            color: myself.primary,
           ),
           tooltip: AppLocalizations.t('New dependency relationship'),
         ),
@@ -340,23 +284,12 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         IconButton(
           onPressed: project != null
               ? () {
-                  RelationshipType? addRelationshipStatus =
-                      modelProjectController.canAddRelationship.value;
-                  if (addRelationshipStatus != RelationshipType.aggregation) {
-                    modelProjectController.canAddRelationship.value =
-                        RelationshipType.aggregation;
-                  } else {
-                    modelProjectController.canAddRelationship.value = null;
-                  }
-                  modelProjectController.canAddModelNode.value = null;
+                  modelFlameGame?.addRelationship(RelationshipType.aggregation);
                 }
               : null,
           icon: Icon(
             Icons.blur_linear_outlined,
-            color: modelProjectController.canAddRelationship.value ==
-                    RelationshipType.aggregation
-                ? Colors.amber
-                : myself.primary,
+            color: myself.primary,
           ),
           tooltip: AppLocalizations.t('New aggregation relationship'),
         ),
@@ -368,23 +301,12 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         IconButton(
           onPressed: project != null
               ? () {
-                  RelationshipType? addRelationshipStatus =
-                      modelProjectController.canAddRelationship.value;
-                  if (addRelationshipStatus != RelationshipType.composition) {
-                    modelProjectController.canAddRelationship.value =
-                        RelationshipType.composition;
-                  } else {
-                    modelProjectController.canAddRelationship.value = null;
-                  }
-                  modelProjectController.canAddModelNode.value = null;
+                  modelFlameGame?.addRelationship(RelationshipType.composition);
                 }
               : null,
           icon: Icon(
             Icons.format_line_spacing_outlined,
-            color: modelProjectController.canAddRelationship.value ==
-                    RelationshipType.composition
-                ? Colors.amber
-                : myself.primary,
+            color: myself.primary,
           ),
           tooltip: AppLocalizations.t('New aggregation relationship'),
         ),
@@ -399,7 +321,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     if (project == null) {
       return;
     }
-    ModelNode? modelNode = modelProjectController.selectedModelNode.value;
+    ModelNode? modelNode = modelProjectController.selectedSrcModelNode.value;
     if (modelNode != null) {
       bool? confirm = await DialogUtil.confirm(
           content: 'Do you confirm to delete model node:${modelNode.name}?');
@@ -480,7 +402,8 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       DialogUtil.error(content: e.toString());
     }
     if (project != null) {
-      List<ModelNode>? modelNodes = modelProjectController.getAllMetaModelNodes();
+      List<ModelNode>? modelNodes =
+          modelProjectController.getAllMetaModelNodes();
       if (modelNodes != null && modelNodes.isNotEmpty) {
         for (var modelNode in modelNodes) {
           loadImage(modelNode);

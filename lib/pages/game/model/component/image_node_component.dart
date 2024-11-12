@@ -92,7 +92,7 @@ class ImageNodeComponent extends PositionComponent
 
   @override
   Future<void> onLongTapDown(TapDownEvent event) async {
-    modelProjectController.selectedModelNode.value = modelNode;
+    modelProjectController.selectedSrcModelNode.value = modelNode;
     indexWidgetProvider.push('node_edit');
   }
 

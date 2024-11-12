@@ -34,7 +34,7 @@ class AttributeEditWidget extends StatelessWidget with TileDataMixin {
   String get title => 'AttributeEdit';
 
   ModelNode? get modelNode {
-    return modelProjectController.selectedModelNode.value;
+    return modelProjectController.selectedSrcModelNode.value;
   }
 
   final Rx<List<Attribute>?> attributes = Rx<List<Attribute>?>(null);

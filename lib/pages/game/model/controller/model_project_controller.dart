@@ -23,13 +23,12 @@ class ModelProjectController {
   /// 当前模型的文件名
   final Rx<String?> filename = Rx<String?>(null);
   final Rx<String?> currentSubjectName = Rx<String?>(null);
-  final Rx<ModelNode?> selectedModelNode = Rx<ModelNode?>(null);
+  final Rx<ModelNode?> selectedSrcModelNode = Rx<ModelNode?>(null);
+  final Rx<ModelNode?> selectedDstModelNode = Rx<ModelNode?>(null);
   final Rx<NodeRelationship?> selectedRelationship =
       Rx<NodeRelationship?>(null);
 
   final Rx<ModelNode?> canAddModelNode = Rx<ModelNode?>(null);
-  final Rx<RelationshipType?> canAddRelationship = Rx<RelationshipType?>(null);
-
   final ModelNode typeModelNode =
       ModelNode(name: 'type', nodeType: NodeType.type.name);
   final ModelNode imageModelNode =

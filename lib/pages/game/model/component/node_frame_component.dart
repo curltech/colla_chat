@@ -88,7 +88,8 @@ class NodeFrameComponent extends RectangleComponent
   void render(Canvas canvas) {
     super.render(canvas);
     if (isHovered ||
-        modelProjectController.selectedModelNode.value == modelNode) {
+        modelProjectController.selectedSrcModelNode.value == modelNode ||
+        modelProjectController.selectedDstModelNode.value == modelNode) {
       canvas.drawRect(strokeRect, selectedStrokePaint);
     } else {
       canvas.drawRect(strokeRect, strokePaint);
@@ -106,30 +107,15 @@ class NodeFrameComponent extends RectangleComponent
   /// 单击根据状态决定是否连线或者选择高亮
   @override
   Future<void> onTapDown(TapDownEvent event) async {
-    if (modelProjectController.selectedModelNode.value == null) {
-      modelProjectController.selectedModelNode.value = modelNode;
+    if (modelProjectController.selectedSrcModelNode.value == null) {
+      modelProjectController.selectedSrcModelNode.value = modelNode;
     } else {
-      if (modelProjectController.canAddRelationship.value != null) {
-        NodeRelationship nodeRelationship = NodeRelationship(
-            modelProjectController.selectedModelNode.value, modelNode,
-            relationshipType:
-                modelProjectController.canAddRelationship.value!.name);
-        if (modelNode.nodeType == NodeType.remark.name) {
-          nodeRelationship.relationshipType = RelationshipType.reference.name;
-        }
-        modelProjectController.getCurrentSubject()!.add(nodeRelationship);
-        NodeRelationshipComponent nodeRelationshipComponent =
-            NodeRelationshipComponent(nodeRelationship: nodeRelationship);
-        if (nodeRelationship.src != null && nodeRelationship.dst != null) {
-          nodeRelationship.nodeRelationshipComponent =
-              nodeRelationshipComponent;
-          game.add(nodeRelationshipComponent);
-        }
-        modelProjectController.canAddRelationship.value = null;
-
-        modelProjectController.selectedModelNode.value = null;
+      if (modelProjectController.selectedDstModelNode.value == null) {
+        modelProjectController.selectedDstModelNode.value = modelNode;
       } else {
-        modelProjectController.selectedModelNode.value = modelNode;
+        modelProjectController.selectedSrcModelNode.value =
+            modelProjectController.selectedDstModelNode.value;
+        modelProjectController.selectedDstModelNode.value = modelNode;
       }
     }
   }

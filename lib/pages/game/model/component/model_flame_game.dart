@@ -156,7 +156,7 @@ class ModelFlameGame extends FlameGame
     if (project == null) {
       return;
     }
-    modelProjectController.selectedModelNode.value = null;
+    modelProjectController.selectedSrcModelNode.value = null;
     modelProjectController.selectedRelationship.value = null;
     Vector2 globalPosition = event.devicePosition;
     Vector2 widgetPosition = event.canvasPosition;
@@ -194,6 +194,28 @@ class ModelFlameGame extends FlameGame
         world.add(nodeFrameComponent);
       }
       modelProjectController.canAddModelNode.value = null;
+    }
+  }
+
+  addRelationship(RelationshipType relationshipType) {
+    ModelNode? srcModelNode = modelProjectController.selectedSrcModelNode.value;
+    ModelNode? dstModelNode = modelProjectController.selectedDstModelNode.value;
+    if (srcModelNode != null && dstModelNode != null) {
+      NodeRelationship nodeRelationship = NodeRelationship(
+          srcModelNode, dstModelNode,
+          relationshipType: relationshipType.name);
+      if (dstModelNode.nodeType == NodeType.remark.name) {
+        nodeRelationship.relationshipType = RelationshipType.reference.name;
+      }
+      modelProjectController.getCurrentSubject()!.add(nodeRelationship);
+      NodeRelationshipComponent nodeRelationshipComponent =
+          NodeRelationshipComponent(nodeRelationship: nodeRelationship);
+      if (nodeRelationship.src != null && nodeRelationship.dst != null) {
+        nodeRelationship.nodeRelationshipComponent = nodeRelationshipComponent;
+        add(nodeRelationshipComponent);
+      }
+      modelProjectController.selectedSrcModelNode.value = null;
+      modelProjectController.selectedDstModelNode.value = null;
     }
   }
 }

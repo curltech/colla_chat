@@ -40,7 +40,7 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
   MethodEditWidget({super.key});
 
   ModelNode? get modelNode {
-    return modelProjectController.selectedModelNode.value;
+    return modelProjectController.selectedSrcModelNode.value;
   }
 
   final List<PlatformDataField> methodDataFields = [

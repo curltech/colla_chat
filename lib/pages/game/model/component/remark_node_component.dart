@@ -63,7 +63,7 @@ class RemarkNodeComponent extends TextBoxComponent
 
   @override
   Future<void> onLongTapDown(TapDownEvent event) async {
-    modelProjectController.selectedModelNode.value = modelNode;
+    modelProjectController.selectedSrcModelNode.value = modelNode;
     indexWidgetProvider.push('node_edit');
   }
 

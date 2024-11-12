@@ -48,7 +48,7 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
   String get title => 'NodeEdit';
 
   ModelNode? get modelNode {
-    return modelProjectController.selectedModelNode.value;
+    return modelProjectController.selectedSrcModelNode.value;
   }
 
   final List<PlatformDataField> modelNodeDataFields = [
