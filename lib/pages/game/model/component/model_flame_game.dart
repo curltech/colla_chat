@@ -179,6 +179,7 @@ class ModelFlameGame extends FlameGame
             name: nodeName,
             nodeType: addModelNode.nodeType,
             shapeType: addModelNode.shapeType,
+            metaId: addModelNode.id,
             content: addModelNode.content);
         modelNode.image = addModelNode.image;
 

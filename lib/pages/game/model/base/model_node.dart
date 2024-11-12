@@ -1,4 +1,5 @@
 import 'package:colla_chat/pages/game/model/base/node.dart';
+import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/attribute_text_component.dart';
 import 'package:colla_chat/pages/game/model/component/method_text_component.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -77,10 +78,12 @@ enum ShapeType {
 class ModelNode extends Node {
   late String nodeType;
   String? shapeType;
+  late String metaId;
 
   String? content;
 
   ui.Image? image;
+  ModelNode? metaModelNode;
 
   List<Attribute> attributes = [];
   List<Method> methods = [];
@@ -89,6 +92,7 @@ class ModelNode extends Node {
       {required String name,
       String? nodeType,
       String? id,
+      this.metaId = Project.baseMetaId,
       this.shapeType,
       this.content})
       : super(name, id: id) {
@@ -98,6 +102,7 @@ class ModelNode extends Node {
   ModelNode.fromJson(Map json) : super.fromJson(json) {
     nodeType = json['nodeType'] ?? NodeType.type.name;
     shapeType = json['shapeType'];
+    metaId = json['metaId'] ?? Project.baseMetaId;
     content = json['content'];
 
     List<dynamic>? ss = json['attributes'];
@@ -125,6 +130,7 @@ class ModelNode extends Node {
       'nodeType': nodeType,
       'shapeType': shapeType,
       'content': content,
+      'metaId': metaId,
       'attributes': JsonUtil.toJson(attributes),
       'methods': JsonUtil.toJson(methods)
     });
