@@ -78,7 +78,7 @@ enum ShapeType {
 class ModelNode extends Node {
   late String nodeType;
   String? shapeType;
-  late String metaId;
+  String? metaId;
 
   String? content;
 
@@ -92,7 +92,7 @@ class ModelNode extends Node {
       {required String name,
       String? nodeType,
       String? id,
-      this.metaId = Project.baseMetaId,
+      this.metaId,
       this.shapeType,
       this.content})
       : super(name, id: id) {
@@ -102,7 +102,7 @@ class ModelNode extends Node {
   ModelNode.fromJson(Map json) : super.fromJson(json) {
     nodeType = json['nodeType'] ?? NodeType.type.name;
     shapeType = json['shapeType'];
-    metaId = json['metaId'] ?? Project.baseMetaId;
+    metaId = json['metaId'];
     content = json['content'];
 
     List<dynamic>? ss = json['attributes'];
