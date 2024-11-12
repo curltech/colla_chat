@@ -1,11 +1,9 @@
+import 'package:colla_chat/pages/base/json_editor.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_json_view/flutter_json_view.dart';
 import 'package:get/get.dart';
-import 'package:json_editor_flutter/json_editor_flutter.dart';
-
-final RxString jsonContent = ''.obs;
 
 class JsonEditorWidget extends StatelessWidget with TileDataMixin {
   JsonEditorWidget({super.key});

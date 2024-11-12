@@ -16,6 +16,8 @@ class Project {
 
   static const double pixelRatio = 1;
 
+  static const baseMetaId = '';
+
   late final String id;
 
   String name;
@@ -62,7 +64,7 @@ class Project {
 
   Project.fromJson(Map json)
       : id = json['id'],
-        metaId = json['metaId'],
+        metaId = json['metaId'] ?? baseMetaId,
         name = json['name'] {
     subjects = {};
     List<dynamic>? ss = json['subjects'];

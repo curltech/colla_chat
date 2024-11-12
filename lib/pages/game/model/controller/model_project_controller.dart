@@ -11,11 +11,9 @@ import 'package:get/get.dart';
 import 'package:path/path.dart' as p;
 
 class ModelProjectController {
-  static const baseMetaId = '';
-
   /// 元模型
   final RxMap<String, Project> metaProjects = <String, Project>{}.obs;
-  final RxString currentMetaId = RxString(baseMetaId);
+  final RxString currentMetaId = RxString(Project.baseMetaId);
 
   /// 当前模型
   final Rx<Project?> project = Rx<Project?>(null);
@@ -43,7 +41,8 @@ class ModelProjectController {
   }
 
   initMetaProject() {
-    Project metaProject = Project('meta', baseMetaId, id: baseMetaId);
+    Project metaProject =
+        Project('meta', Project.baseMetaId, id: Project.baseMetaId);
     Subject subject = Subject('meta');
     subject.modelNodes = {
       typeModelNode.id: typeModelNode,
