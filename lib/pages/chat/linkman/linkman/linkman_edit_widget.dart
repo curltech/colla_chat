@@ -172,7 +172,8 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
           formButtons: formButtons,
           controller: controller,
           heads: heads,
-        ));
+        )
+    );
 
     return formInputWidget;
   }

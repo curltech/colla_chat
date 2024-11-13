@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
@@ -63,23 +64,48 @@ class ShapeNodeComponent extends PositionComponent
     if (nodeType != NodeType.shape.name) {
       return;
     }
+    final fillPaint = Paint()..style = PaintingStyle.fill;
+    final strokePaint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+    int? fillColor = modelNode.fillColor;
+    if (fillColor != null) {
+      fillPaint.color = Color(fillColor);
+    } else {
+      fillPaint.color = Colors.white.withOpacity(0);
+    }
+    int? strokeColor = modelNode.strokeColor;
+    if (strokeColor != null) {
+      strokePaint.color = Color(strokeColor);
+    } else {
+      strokePaint.color = Colors.black;
+    }
+
     String shapeType = modelNode.shapeType ?? ShapeType.rect.name;
     if (shapeType == ShapeType.rect.name) {
-      // Rect rect = Rect.fromLTWH(0, 0, width, height);
-      // canvas.drawRect(rect, NodeFrameComponent.strokePaint);
+      Rect rect = Rect.fromLTWH(0, 0, width, height);
+      canvas.drawRect(rect, strokePaint);
     }
     if (shapeType == ShapeType.rrect.name) {
       Rect rect = Rect.fromLTWH(0, 0, width, height);
       RRect rrect = RRect.fromRectXY(rect, 8.0, 8.0);
-      canvas.drawRRect(rrect, NodeFrameComponent.strokePaint);
+      canvas.drawRRect(rrect, strokePaint);
     }
     if (shapeType == ShapeType.circle.name) {
-      canvas.drawCircle(Offset(width / 2, height / 2), width / 2,
-          NodeFrameComponent.strokePaint);
+      canvas.drawCircle(Offset(width / 2, height / 2), width / 2, strokePaint);
     }
     if (shapeType == ShapeType.oval.name) {
       Rect rect = Rect.fromLTWH(0, 0, width, height);
-      canvas.drawOval(rect, NodeFrameComponent.strokePaint);
+      canvas.drawOval(rect, strokePaint);
+    }
+    if (shapeType == ShapeType.drrect.name) {
+      Rect outerRect = Rect.fromLTWH(0, 0, width, height);
+      RRect outerRrect = RRect.fromRectXY(outerRect, 8.0, 8.0);
+      Rect innerRect = Rect.fromLTWH(0, 0, width - 8, height - 5);
+      RRect innerRrect = RRect.fromRectXY(innerRect, 8.0, 8.0);
+
+      canvas.drawDRRect(outerRrect, innerRrect, strokePaint);
     }
     if (shapeType == ShapeType.paragraph.name) {
       ParagraphStyle style =
@@ -97,7 +123,31 @@ class ShapeNodeComponent extends PositionComponent
       path.moveTo(width / 2, 0);
       path.lineTo(width, height);
       path.lineTo(width / 2, height);
-      canvas.drawPath(path, NodeFrameComponent.strokePaint);
+      canvas.drawPath(path, strokePaint);
+    }
+    if (shapeType == ShapeType.hexagonal.name) {
+      Path path = Path();
+      path.moveTo(width / 3, 0);
+      path.lineTo(width * 2 / 3, 0);
+      path.lineTo(width, height / 3);
+      path.lineTo(width, height * 2 / 3);
+      path.lineTo(width * 2 / 3, height);
+      path.lineTo(width / 3, height);
+      path.lineTo(0, height * 2 / 3);
+      path.lineTo(0, height / 3);
+      path.lineTo(width / 3, 0);
+      canvas.drawPath(path, strokePaint);
+    }
+    if (shapeType == ShapeType.arcrect.name) {
+      Path path = Path();
+      path.moveTo(height / 2, 0);
+      path.lineTo(width - height, 0);
+      path.arcToPoint(Offset(height / 2, height));
+      path.lineTo(width - height, height);
+      path.arcToPoint(Offset(height / 2, 0));
+      canvas.drawPath(path, strokePaint);
+
+      canvas.drawPath(path, strokePaint);
     }
   }
 

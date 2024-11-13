@@ -61,17 +61,16 @@ class Method {
 enum NodeType { shape, image, type, remark }
 
 enum ShapeType {
-  rect,
-  rrect,
-  circle,
-  oval,
-  diamond,
-  drrect,
-  arc,
-  paragraph,
-  vertices,
-  imageRect,
-  image
+  rect, //标准矩形
+  rrect, //圆角矩形
+  circle, //圆形
+  oval, //椭圆
+  diamond, //菱形
+  hexagonal, //六边型
+  arcrect, //圆弧矩形
+  drrect, //环形
+  paragraph, //文本框
+  vertices, //路径
 }
 
 /// 模型节点
@@ -87,20 +86,25 @@ class ModelNode extends Node {
 
   String? content;
 
+  int? fillColor; //填充颜色
+  int? strokeColor; //边框颜色
+
   ui.Image? image;
   ModelNode? metaModelNode;
 
   List<Attribute> attributes = [];
   List<Method> methods = [];
 
-  ModelNode(
-      {required String name,
-      String? nodeType,
-      String? id,
-      this.metaId,
-      this.shapeType,
-      this.content})
-      : super(name, id: id) {
+  ModelNode({
+    required String name,
+    String? nodeType,
+    String? id,
+    this.metaId,
+    this.shapeType,
+    this.content,
+    this.fillColor,
+    this.strokeColor,
+  }) : super(name, id: id) {
     this.nodeType = nodeType ?? NodeType.type.name;
   }
 
@@ -109,6 +113,8 @@ class ModelNode extends Node {
     shapeType = json['shapeType'];
     metaId = json['metaId'];
     content = json['content'];
+    fillColor = json['fillColor'];
+    strokeColor = json['strokeColor'];
 
     List<dynamic>? ss = json['attributes'];
     if (ss != null && ss.isNotEmpty) {
@@ -136,6 +142,8 @@ class ModelNode extends Node {
       'shapeType': shapeType,
       'content': content,
       'metaId': metaId,
+      'fillColor': fillColor,
+      'strokeColor': strokeColor,
       'attributes': JsonUtil.toJson(attributes),
       'methods': JsonUtil.toJson(methods)
     });

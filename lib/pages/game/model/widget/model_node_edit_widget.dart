@@ -169,8 +169,21 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
           name: 'shapeType',
           label: 'ShapeType',
           prefixIcon: Icon(Icons.share_sharp, color: myself.primary),
-          inputType: InputType.select,
+          inputType: InputType.radio,
           options: options));
+      modelNodeDataFields.add(PlatformDataField(
+          name: 'fillColor',
+          label: 'FillColor',
+          dataType: DataType.int,
+          prefixIcon: Icon(Icons.format_color_fill, color: myself.primary),
+          inputType: InputType.text));
+      modelNodeDataFields.add(PlatformDataField(
+        name: 'strokeColor',
+        label: 'StrokeColor',
+        dataType: DataType.int,
+        prefixIcon: Icon(Icons.border_color, color: myself.primary),
+        inputType: InputType.text,
+      ));
     }
     if (modelNode.nodeType == NodeType.remark.name) {
       modelNodeDataFields.add(PlatformDataField(

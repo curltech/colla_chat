@@ -45,8 +45,8 @@ class P2pLoginWidget extends StatelessWidget {
 
   _init() async {
     bool isAuth = (this.credential != null);
-    final List<PlatformDataField> p2pLoginInputFieldDef = [];
-    p2pLoginInputFieldDef.add(PlatformDataField(
+    final List<PlatformDataField> p2pLoginDataFields = [];
+    p2pLoginDataFields.add(PlatformDataField(
       name: 'credential',
       label: 'Credential(Mobile/Email/Name)',
       readOnly: isAuth,
@@ -71,7 +71,7 @@ class P2pLoginWidget extends StatelessWidget {
             )
           : null,
     ));
-    p2pLoginInputFieldDef.add(PlatformDataField(
+    p2pLoginDataFields.add(PlatformDataField(
       name: 'password',
       label: 'Password',
       inputType: InputType.password,
@@ -80,7 +80,7 @@ class P2pLoginWidget extends StatelessWidget {
         color: myself.primary,
       ),
     ));
-    formInputController = FormInputController(p2pLoginInputFieldDef);
+    formInputController = FormInputController(p2pLoginDataFields);
     String? credential = formInputController.getValue('credential');
     if (credential == null) {
       credential = this.credential;
@@ -242,7 +242,7 @@ class P2pLoginWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(children: [
+    return Column(children: [
       SizedBox(
         height: appDataProvider.portraitSize.height * 0.1,
       ),
@@ -264,22 +264,23 @@ class P2pLoginWidget extends StatelessWidget {
       SizedBox(
         height: appDataProvider.portraitSize.height * 0.1,
       ),
-      Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-          child: FormInputWidget(
-            mainAxisAlignment: MainAxisAlignment.start,
-            height: appDataProvider.portraitSize.height * 0.3,
-            spacing: 10.0,
-            onOk: (Map<String, dynamic> values) async {
-              if (credential == null) {
-                await _login(context, values);
-              } else {
-                await _auth(values);
-              }
-            },
-            okLabel: credential == null ? 'Login' : 'Auth',
-            controller: formInputController,
-          ))
+      Expanded(
+          child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: FormInputWidget(
+                mainAxisAlignment: MainAxisAlignment.start,
+                // height: appDataProvider.portraitSize.height * 0.3,
+                spacing: 10.0,
+                onOk: (Map<String, dynamic> values) async {
+                  if (credential == null) {
+                    await _login(context, values);
+                  } else {
+                    await _auth(values);
+                  }
+                },
+                okLabel: credential == null ? 'Login' : 'Auth',
+                controller: formInputController,
+              )))
     ]);
   }
 }
