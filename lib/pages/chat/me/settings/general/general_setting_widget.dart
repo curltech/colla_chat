@@ -1,7 +1,8 @@
 import 'package:colla_chat/pages/chat/me/settings/general/brightness_picker.dart';
-import 'package:colla_chat/pages/chat/me/settings/general/color_picker.dart';
+import 'package:colla_chat/pages/base/color_picker.dart';
 import 'package:colla_chat/pages/chat/me/settings/general/locale_picker.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +40,13 @@ class GeneralSettingWidget extends StatelessWidget with TileDataMixin {
             const SizedBox(height: 10.0),
             Padding(
               padding: padding,
-              child: ColorPicker(),
+              child: ColorPicker(
+                label: 'Seed color',
+                onColorChanged: (Color color) {
+                  myself.primaryColor = color;
+                },
+                initColor: myself.primaryColor,
+              ),
             ),
             const SizedBox(height: 10.0),
             Padding(

@@ -2,18 +2,26 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:flex_color_picker/flex_color_picker.dart' as flex;
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class ColorPicker extends StatelessWidget {
-  ColorPicker({super.key});
+  String label;
+  Rx<Color> color = Rx<Color>(myself.primaryColor);
+  Function(Color color)? onColorChanged;
 
-  Color primaryColor = myself.primaryColor;
+  ColorPicker(
+      {super.key, this.onColorChanged, required this.label, Color? initColor}) {
+    if (initColor != null) {
+      color.value = initColor;
+    }
+  }
 
   Future<bool> colorPickerDialog(BuildContext context) async {
     ThemeData themeData = myself.themeData;
     return flex.ColorPicker(
-      color: primaryColor,
+      color: color.value,
       onColorChanged: (Color color) {
-        primaryColor = color;
+        this.color.value = color;
       },
       width: 32,
       height: 32,
@@ -60,26 +68,25 @@ class ColorPicker extends StatelessWidget {
     );
   }
 
-  //群主选择界面
+  //颜色选择界面
   Widget _buildColorPicker(BuildContext context) {
-    return ListenableBuilder(
-      listenable: myself,
-      builder: (BuildContext context, Widget? child) {
+    return Obx(
+      () {
         Widget indicator = flex.ColorIndicator(
           width: 32,
           height: 32,
           borderRadius: 4,
-          color: myself.primaryColor,
+          color: color.value,
           onSelectFocus: false,
           onSelect: () async {
             var ok = await colorPickerDialog(context);
             if (ok) {
-              myself.primaryColor = primaryColor;
+              onColorChanged?.call(color.value);
             }
           },
         );
         return Row(children: [
-          Text(AppLocalizations.t('Seed color')),
+          Text(AppLocalizations.t(label)),
           const Spacer(),
           indicator,
           const SizedBox(

@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/attribute_text_component.dart';
@@ -113,8 +115,24 @@ class ModelNode extends Node {
     shapeType = json['shapeType'];
     metaId = json['metaId'];
     content = json['content'];
-    fillColor = json['fillColor'];
-    strokeColor = json['strokeColor'];
+    dynamic fillColor = json['fillColor'];
+    if (fillColor != null) {
+      if (fillColor is Color) {
+        this.fillColor = fillColor.value;
+      }
+      if (fillColor is int) {
+        this.fillColor = fillColor;
+      }
+    }
+    dynamic strokeColor = json['strokeColor'];
+    if (strokeColor != null) {
+      if (strokeColor is Color) {
+        this.strokeColor = strokeColor.value;
+      }
+      if (strokeColor is int) {
+        this.strokeColor = strokeColor;
+      }
+    }
 
     List<dynamic>? ss = json['attributes'];
     if (ss != null && ss.isNotEmpty) {

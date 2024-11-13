@@ -1,5 +1,6 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/base/color_picker.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/date_util.dart';
@@ -33,7 +34,8 @@ enum InputType {
   datetimerange,
   calendar,
   custom,
-  pinput
+  pinput,
+  color
 }
 
 enum DataType {
@@ -525,8 +527,8 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     var options = dataFieldDef.options;
     List<Widget> children = [Text(AppLocalizations.t(label))];
     dynamic value = _getInitValue(context);
-    value ??= <dynamic>{};
     if (options != null && options.isNotEmpty) {
+      List<Widget> radioChildren = [];
       for (var i = 0; i < options.length; ++i) {
         var option = options[i];
         var radio = Radio<String>(
@@ -540,17 +542,24 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
           value: option.value,
           groupValue: value,
         );
-        var row = Row(
-          children: [
-            radio,
-            CommonAutoSizeText(AppLocalizations.t(option.label))
-          ],
-        );
-        children.add(row);
+        var row = SizedBox(
+            width: dataFieldDef.width ?? 120,
+            child: Row(
+              children: [
+                radio,
+                Expanded(
+                    child: CommonAutoSizeText(AppLocalizations.t(option.label)))
+              ],
+            ));
+        radioChildren.add(row);
       }
+      children.add(Expanded(
+          child: Wrap(
+        children: radioChildren,
+      )));
     }
 
-    return Column(children: children);
+    return Row(children: children);
   }
 
   ///多个字符串选择一个，对应的字段是字符串
@@ -636,7 +645,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
           value: value.contains(option.value),
         );
         var row = SizedBox(
-            width: dataFieldDef.width ?? 100,
+            width: dataFieldDef.width ?? 120,
             child: Row(
               children: [
                 checkbox,
@@ -646,13 +655,12 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
             ));
         checkChildren.add(row);
       }
-      checkWidget = Expanded(
-          child: Wrap(
+      checkWidget = Wrap(
         children: checkChildren,
-      ));
+      );
     }
     if (checkWidget != null) {
-      children.add(checkWidget);
+      children.add(Expanded(child: checkWidget));
     }
     return Row(
       children: children,
@@ -1135,6 +1143,25 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
         });
   }
 
+  Widget _buildColorPicker(BuildContext context) {
+    widget.controller.controller = null;
+    var dataFieldDef = widget.controller.dataField;
+    var label = dataFieldDef.label;
+    dynamic value = _getInitValue(context);
+    if (value != null && value is int) {
+      value = Color(value);
+    }
+    Widget colorPicker = ColorPicker(
+      label: label,
+      onColorChanged: (Color color) {
+        widget.controller.value = color.value;
+      },
+      initColor: value ?? myself.primary,
+    );
+
+    return colorPicker;
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget dataFieldWidget;
@@ -1186,6 +1213,9 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
         break;
       case InputType.datetime:
         dataFieldWidget = _buildInputDateTime(context);
+        break;
+      case InputType.color:
+        dataFieldWidget = _buildColorPicker(context);
         break;
       default:
         dataFieldWidget = _buildTextFormField(context);

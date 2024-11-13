@@ -129,6 +129,8 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
     modelNode?.content = current.content;
     modelNode?.nodeType = current.nodeType;
     modelNode?.shapeType = current.shapeType;
+    modelNode?.fillColor = current.fillColor;
+    modelNode?.strokeColor = current.strokeColor;
     if (modelNode!.nodeType == NodeType.image.name) {
       modelNode?.content = content.value;
     }
@@ -174,15 +176,13 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
       modelNodeDataFields.add(PlatformDataField(
           name: 'fillColor',
           label: 'FillColor',
-          dataType: DataType.int,
           prefixIcon: Icon(Icons.format_color_fill, color: myself.primary),
-          inputType: InputType.text));
+          inputType: InputType.color));
       modelNodeDataFields.add(PlatformDataField(
         name: 'strokeColor',
         label: 'StrokeColor',
-        dataType: DataType.int,
         prefixIcon: Icon(Icons.border_color, color: myself.primary),
-        inputType: InputType.text,
+        inputType: InputType.color,
       ));
     }
     if (modelNode.nodeType == NodeType.remark.name) {
