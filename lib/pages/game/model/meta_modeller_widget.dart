@@ -506,7 +506,9 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   }
 
   loadImage(ModelNode modelNode) async {
-    if (modelNode.image == null && modelFlameGame != null) {
+    if ((modelNode.nodeType == NodeType.image.name ||
+            modelNode.nodeType == NodeType.image.name) &&
+        (modelNode.image == null && modelFlameGame != null)) {
       ui.Image? image;
       if (modelNode.content != null) {
         image = await modelFlameGame!.images

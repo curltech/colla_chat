@@ -199,10 +199,13 @@ class ModelFlameGame extends FlameGame
           nodeType: addModelNode.nodeType,
           shapeType: addModelNode.shapeType,
           metaId: addModelNode.id,
-          content: addModelNode.content,
           fillColor: addModelNode.fillColor,
           strokeColor: addModelNode.strokeColor,
         );
+        if (modelNode.nodeType == NodeType.remark.name ||
+            modelNode.nodeType == NodeType.type.name) {
+          modelNode.content = addModelNode.content;
+        }
         modelNode.image = addModelNode.image;
         modelNode.metaModelNode = addModelNode;
 

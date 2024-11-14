@@ -87,6 +87,7 @@ class ModelNode extends Node {
   String? shapeType;
   String? metaId;
 
+  /// 节点自定义的内容，对图像和图形节点来说，meta项目时需要填充，一般项目不需要有值
   String? content;
 
   int? fillColor; //填充颜色

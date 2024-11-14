@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
+import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/pages/game/model/widget/attribute_edit_widget.dart';
 import 'package:colla_chat/pages/game/model/widget/method_edit_widget.dart';
@@ -87,6 +88,27 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
     if (modelNode == null) {
       return nilBox;
     }
+    Project? project = modelProjectController.project.value;
+    if (project == null) {
+      return nilBox;
+    }
+    List<Widget> tails = [];
+    if (project.meta &&
+        (modelNode!.nodeType == NodeType.image.name ||
+            modelNode!.nodeType == NodeType.shape.name)) {
+      tails.add(Obx(() {
+        return ListTile(
+          title: Text(AppLocalizations.t('Image')),
+          trailing: content.value != null
+              ? ImageUtil.buildImageWidget(
+                  width: 24, height: 24, imageContent: content.value)
+              : null,
+          onTap: () {
+            _pickAvatar(context);
+          },
+        );
+      }));
+    }
     formInputController = FormInputController(_buildModelNodeDataFields());
     formInputController!.setValues(JsonUtil.toJson(modelNode));
     Widget formInputWidget = FormInputWidget(
@@ -95,23 +117,7 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
           _onOk(values);
         },
         controller: formInputController!,
-        tails: modelNode!.nodeType == NodeType.image.name ||
-                modelNode!.nodeType == NodeType.shape.name
-            ? [
-                Obx(() {
-                  return ListTile(
-                    title: Text(AppLocalizations.t('Image')),
-                    trailing: content.value != null
-                        ? ImageUtil.buildImageWidget(
-                            width: 24, height: 24, imageContent: content.value)
-                        : null,
-                    onTap: () {
-                      _pickAvatar(context);
-                    },
-                  );
-                })
-              ]
-            : null);
+        tails: tails);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),

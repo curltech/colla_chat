@@ -257,7 +257,7 @@ class ModelProjectController {
 
   /// 根据metaId打开应用目录下已经注册的元模型项目
   Future<Project?> openMetaProject(String metaId) async {
-    String filename = p.join(platformParams.path, metaId);
+    String filename = p.join(platformParams.path, '$metaId.json');
     File file = File(filename);
     if (file.existsSync()) {
       String content = await file.readAsString();
