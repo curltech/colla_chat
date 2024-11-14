@@ -158,7 +158,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
           _modelNodeAction(allowModelNode);
         },
         icon: btnIcon!,
-        tooltip: AppLocalizations.t('New ${allowModelNode.name}'),
+        tooltip: '${AppLocalizations.t('New')} ${allowModelNode.name}',
       );
       btns.add(btn);
     }
@@ -451,8 +451,6 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   List<Widget> _buildProjectButtons() {
     List<Widget> btns = [];
     Project? project = modelProjectController.project.value;
-    Project? metaProject = modelProjectController
-        .metaProjects[modelProjectController.currentMetaId.value];
     btns.addAll([
       IconButton(
         onPressed: () {
@@ -490,15 +488,6 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         },
         icon: const Icon(Icons.close_outlined),
         tooltip: AppLocalizations.t('Close project'),
-      ));
-    }
-    if (metaProject != null) {
-      btns.add(IconButton(
-        onPressed: () {
-          _viewMetaProject();
-        },
-        icon: const Icon(Icons.margin),
-        tooltip: AppLocalizations.t('View meta project'),
       ));
     }
 
@@ -561,7 +550,12 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   }
 
   List<Widget> _buildMetaProjectButtons() {
-    return [
+    Project? metaProject = modelProjectController
+        .metaProjects[modelProjectController.currentMetaId.value];
+    Project? project = modelProjectController.project.value;
+    List<Widget> btns = [];
+
+    btns.add(
       IconButton(
         onPressed: () {
           _registerMetaProject();
@@ -569,21 +563,38 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         icon: const Icon(Icons.open_in_browser_outlined),
         tooltip: AppLocalizations.t('Register meta project'),
       ),
-      IconButton(
-        onPressed: () {
-          _register();
-        },
-        icon: const Icon(Icons.app_registration),
-        tooltip: AppLocalizations.t('Register current project'),
-      ),
-      IconButton(
+    );
+    if (project != null) {
+      btns.add(
+        IconButton(
+          onPressed: () {
+            _register();
+          },
+          icon: const Icon(Icons.app_registration),
+          tooltip: AppLocalizations.t('Register current project'),
+        ),
+      );
+    }
+    if (modelProjectController.metaProjects.isNotEmpty) {
+      btns.add(IconButton(
         onPressed: () {
           _selectMetaProject();
         },
         icon: const Icon(Icons.select_all_outlined),
         tooltip: AppLocalizations.t('Select meta project'),
-      ),
-    ];
+      ));
+    }
+    if (metaProject != null) {
+      btns.add(IconButton(
+        onPressed: () {
+          _viewMetaProject();
+        },
+        icon: const Icon(Icons.margin),
+        tooltip: AppLocalizations.t('View meta project'),
+      ));
+    }
+
+    return btns;
   }
 
   @override

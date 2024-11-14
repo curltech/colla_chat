@@ -865,5 +865,14 @@
   "aggregation": "聚合",
   "composition": "组合",
   "dependency": "依赖",
-  "reference": "引用"
+  "reference": "引用",
+  "New": "创建",
+  "Register meta project": "注册元模型",
+  "Register current project": "注册当前模型",
+  "Select meta project": "选择元模型",
+  "View meta project": "查看元模型",
+  "View project": "查看模型",
+  "Close project": "关闭模型",
+  "FillColor": "填充颜色",
+  "StrokeColor": "边线颜色"
 }
