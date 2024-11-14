@@ -113,9 +113,9 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   }
 
   List<Widget> _buildMetaNodeButtons() {
+    List<Widget> btns = [];
     List<ModelNode>? allowModelNodes =
         modelProjectController.getAllMetaModelNodes();
-    List<Widget> btns = [];
     if (allowModelNodes == null) {
       return btns;
     }
@@ -352,19 +352,21 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       List<Widget> btns = [];
       Project? project = modelProjectController.project.value;
       if (project != null) {
-        btns.addAll([
-          ..._buildSubjectButtons(),
-          ..._buildMetaNodeButtons(),
-          ..._buildRelationshipButtons(),
-          IconButton(
-            onPressed: delete,
-            icon: Icon(
-              Icons.delete_outline,
-              color: myself.primary,
+        btns.addAll(_buildSubjectButtons());
+        if (modelProjectController.currentSubjectName.value != null) {
+          btns.addAll([
+            ..._buildMetaNodeButtons(),
+            ..._buildRelationshipButtons(),
+            IconButton(
+              onPressed: delete,
+              icon: Icon(
+                Icons.delete_outline,
+                color: myself.primary,
+              ),
+              tooltip: AppLocalizations.t('Delete'),
             ),
-            tooltip: AppLocalizations.t('Delete'),
-          ),
-        ]);
+          ]);
+        }
       }
       return appDataProvider.secondaryBodyLandscape
           ? Column(

@@ -5,7 +5,6 @@ import 'package:colla_chat/pages/chat/me/media/platform_audio_recorder_widget.da
 import 'package:colla_chat/pages/chat/me/media/platform_video_player_widget.dart';
 import 'package:colla_chat/pages/chat/me/media/video_editor_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -57,13 +56,12 @@ class MediaWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    Widget child = DataListView(
+    Widget media = DataListView(
       itemCount: mediaTileData.length,
       itemBuilder: (BuildContext context, int index) {
         return mediaTileData[index];
       },
     );
-    var media = AppBarView(withLeading: true, title: title, child: child);
     return media;
   }
 }

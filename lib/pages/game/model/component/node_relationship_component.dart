@@ -104,8 +104,10 @@ class NodeRelationshipComponent extends PositionComponent
       rightCenterArrow(path, srcRightCenter);
       selfCardinality(canvas, srcBottomCenter, srcRightCenter);
       if (isHovered) {
+        priority = 3;
         canvas.drawPath(path, selectedStrokePaint);
       } else {
+        priority = 1;
         canvas.drawPath(path, strokePaint);
       }
 
@@ -199,16 +201,20 @@ class NodeRelationshipComponent extends PositionComponent
       if (isHovered ||
           modelProjectController.selectedRelationship.value ==
               nodeRelationship) {
+        priority = 3;
         dashPainter.paint(canvas, path, selectedStrokePaint);
       } else {
+        priority = 1;
         dashPainter.paint(canvas, path, strokePaint);
       }
     } else {
       if (isHovered ||
           modelProjectController.selectedRelationship.value ==
               nodeRelationship) {
+        priority = 3;
         canvas.drawPath(path, selectedStrokePaint);
       } else {
+        priority = 1;
         canvas.drawPath(path, strokePaint);
       }
     }

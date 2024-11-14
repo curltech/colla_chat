@@ -69,6 +69,7 @@ enum ShapeType {
   oval, //椭圆
   diamond, //菱形
   hexagonal, //六边型
+  octagonal, //八边型
   arcrect, //圆弧矩形
   drrect, //环形
   paragraph, //文本框

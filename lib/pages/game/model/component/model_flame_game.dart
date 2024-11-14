@@ -178,12 +178,16 @@ class ModelFlameGame extends FlameGame
           tip: 'unknown');
       if (nodeName != null) {
         ModelNode modelNode = ModelNode(
-            name: nodeName,
-            nodeType: addModelNode.nodeType,
-            shapeType: addModelNode.shapeType,
-            metaId: addModelNode.id,
-            content: addModelNode.content);
+          name: nodeName,
+          nodeType: addModelNode.nodeType,
+          shapeType: addModelNode.shapeType,
+          metaId: addModelNode.id,
+          content: addModelNode.content,
+          fillColor: addModelNode.fillColor,
+          strokeColor: addModelNode.strokeColor,
+        );
         modelNode.image = addModelNode.image;
+        modelNode.metaModelNode = addModelNode;
 
         modelNode.x = worldPosition.x;
         modelNode.y = worldPosition.y;

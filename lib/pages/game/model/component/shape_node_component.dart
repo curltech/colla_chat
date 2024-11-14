@@ -26,10 +26,18 @@ class ShapeNodeComponent extends PositionComponent
       fontSize: 16.0,
     ),
   );
+  static final TextPaint metaTextPaint = TextPaint(
+    style: const TextStyle(
+      color: Colors.black,
+      fontSize: 10.0,
+      decoration: TextDecoration.underline,
+    ),
+  );
 
   final ModelNode modelNode;
   Anchor textAlign;
   late final TextBoxComponent nodeTextComponent;
+  TextBoxComponent? metaNodeTextComponent;
 
   ShapeNodeComponent(
     this.modelNode, {
@@ -42,6 +50,20 @@ class ShapeNodeComponent extends PositionComponent
 
   @override
   Future<void> onLoad() async {
+    ModelNode? metaModelNode = modelNode.metaModelNode;
+    if (metaModelNode != null) {
+      metaNodeTextComponent = TextBoxComponent(
+        text: metaModelNode.name,
+        textRenderer: metaTextPaint,
+        position: Vector2(0, 0),
+        size: size,
+        align: Anchor.topCenter,
+        priority: 2,
+        boxConfig: const TextBoxConfig(),
+      );
+      add(metaNodeTextComponent!);
+    }
+
     nodeTextComponent = TextBoxComponent(
       text: modelNode.name,
       textRenderer: normalTextPaint,
@@ -52,6 +74,7 @@ class ShapeNodeComponent extends PositionComponent
       boxConfig: const TextBoxConfig(),
     );
     add(nodeTextComponent);
+
     size.addListener(() {
       (parent as NodeFrameComponent).updateSize();
     });
@@ -64,48 +87,59 @@ class ShapeNodeComponent extends PositionComponent
     if (nodeType != NodeType.shape.name) {
       return;
     }
-    final fillPaint = Paint()..style = PaintingStyle.fill;
-    final strokePaint = Paint()
-      ..color = Colors.black
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0;
+    Paint? fillPaint;
+    Paint? strokePaint;
     int? fillColor = modelNode.fillColor;
     if (fillColor != null) {
-      fillPaint.color = Color(fillColor);
-    } else {
-      fillPaint.color = Colors.white.withOpacity(0);
+      fillPaint = Paint()
+        ..style = PaintingStyle.fill
+        ..color = Color(fillColor);
     }
     int? strokeColor = modelNode.strokeColor;
     if (strokeColor != null) {
-      strokePaint.color = Color(strokeColor);
-    } else {
-      strokePaint.color = Colors.black;
+      strokePaint = Paint()
+        ..color = Color(strokeColor)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.0;
     }
 
     String shapeType = modelNode.shapeType ?? ShapeType.rect.name;
     if (shapeType == ShapeType.rect.name) {
       Rect rect = Rect.fromLTWH(0, 0, width, height);
-      canvas.drawRect(rect, strokePaint);
+      if (fillPaint != null) {
+        canvas.drawRect(rect, fillPaint);
+      }
+      if (strokePaint != null) {
+        canvas.drawRect(rect, strokePaint);
+      }
     }
     if (shapeType == ShapeType.rrect.name) {
       Rect rect = Rect.fromLTWH(0, 0, width, height);
-      RRect rrect = RRect.fromRectXY(rect, 8.0, 8.0);
-      canvas.drawRRect(rrect, strokePaint);
+      RRect rrect = RRect.fromRectXY(rect, 16.0, 16.0);
+      if (fillPaint != null) {
+        canvas.drawRRect(rrect, fillPaint);
+      }
+      if (strokePaint != null) {
+        canvas.drawRRect(rrect, strokePaint);
+      }
     }
     if (shapeType == ShapeType.circle.name) {
-      canvas.drawCircle(Offset(width / 2, height / 2), width / 2, strokePaint);
+      if (fillPaint != null) {
+        canvas.drawCircle(Offset(width / 2, height / 2), height / 2, fillPaint);
+      }
+      if (strokePaint != null) {
+        Rect rect = Rect.fromLTWH(0, 0, width, height);
+        canvas.drawRect(rect, strokePaint);
+      }
     }
     if (shapeType == ShapeType.oval.name) {
       Rect rect = Rect.fromLTWH(0, 0, width, height);
-      canvas.drawOval(rect, strokePaint);
-    }
-    if (shapeType == ShapeType.drrect.name) {
-      Rect outerRect = Rect.fromLTWH(0, 0, width, height);
-      RRect outerRrect = RRect.fromRectXY(outerRect, 8.0, 8.0);
-      Rect innerRect = Rect.fromLTWH(0, 0, width - 8, height - 5);
-      RRect innerRrect = RRect.fromRectXY(innerRect, 8.0, 8.0);
-
-      canvas.drawDRRect(outerRrect, innerRrect, strokePaint);
+      if (fillPaint != null) {
+        canvas.drawOval(rect, fillPaint);
+      }
+      if (strokePaint != null) {
+        canvas.drawOval(rect, strokePaint);
+      }
     }
     if (shapeType == ShapeType.paragraph.name) {
       ParagraphStyle style =
@@ -117,15 +151,35 @@ class ShapeNodeComponent extends PositionComponent
     }
     if (shapeType == ShapeType.diamond.name) {
       Path path = Path();
-      path.moveTo(width / 2, 0);
+      path.moveTo(0, height / 2);
+      path.lineTo(width / 2, 0);
+      path.lineTo(width, height / 2);
+      path.lineTo(width / 2, height);
       path.lineTo(0, height / 2);
-      path.lineTo(width / 2, height);
-      path.moveTo(width / 2, 0);
-      path.lineTo(width, height);
-      path.lineTo(width / 2, height);
-      canvas.drawPath(path, strokePaint);
+      if (fillPaint != null) {
+        canvas.drawPath(path, fillPaint);
+      }
+      if (strokePaint != null) {
+        canvas.drawPath(path, strokePaint);
+      }
     }
     if (shapeType == ShapeType.hexagonal.name) {
+      Path path = Path();
+      path.moveTo(width / 3, 0);
+      path.lineTo(width * 2 / 3, 0);
+      path.lineTo(width, height / 2);
+      path.lineTo(width * 2 / 3, height);
+      path.lineTo(width / 3, height);
+      path.lineTo(0, height / 2);
+      path.lineTo(width / 3, 0);
+      if (fillPaint != null) {
+        canvas.drawPath(path, fillPaint);
+      }
+      if (strokePaint != null) {
+        canvas.drawPath(path, strokePaint);
+      }
+    }
+    if (shapeType == ShapeType.octagonal.name) {
       Path path = Path();
       path.moveTo(width / 3, 0);
       path.lineTo(width * 2 / 3, 0);
@@ -136,18 +190,28 @@ class ShapeNodeComponent extends PositionComponent
       path.lineTo(0, height * 2 / 3);
       path.lineTo(0, height / 3);
       path.lineTo(width / 3, 0);
-      canvas.drawPath(path, strokePaint);
+      if (fillPaint != null) {
+        canvas.drawPath(path, fillPaint);
+      }
+      if (strokePaint != null) {
+        canvas.drawPath(path, strokePaint);
+      }
     }
     if (shapeType == ShapeType.arcrect.name) {
       Path path = Path();
       path.moveTo(height / 2, 0);
-      path.lineTo(width - height, 0);
-      path.arcToPoint(Offset(height / 2, height));
-      path.lineTo(width - height, height);
-      path.arcToPoint(Offset(height / 2, 0));
-      canvas.drawPath(path, strokePaint);
-
-      canvas.drawPath(path, strokePaint);
+      path.lineTo(width - height / 2, 0);
+      path.arcToPoint(Offset(width - height / 2, height),
+          radius: Radius.circular(height / 2));
+      path.lineTo(height / 2, height);
+      path.arcToPoint(Offset(height / 2, 0),
+          radius: Radius.circular(height / 2));
+      if (fillPaint != null) {
+        canvas.drawPath(path, fillPaint);
+      }
+      if (strokePaint != null) {
+        canvas.drawPath(path, strokePaint);
+      }
     }
   }
 

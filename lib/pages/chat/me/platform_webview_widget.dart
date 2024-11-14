@@ -115,9 +115,6 @@ class PlatformWebViewWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-      title: title,
-      withLeading: true,
-      child: buildWebView(context),
-    );
+        title: title, withLeading: true, child: buildWebView(context));
   }
 }

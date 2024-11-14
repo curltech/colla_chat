@@ -140,6 +140,17 @@ class ModelProjectController {
     return null;
   }
 
+  ModelNode? getMetaModelNode(String id) {
+    Project? metaProject = metaProjects[currentMetaId.value];
+    if (metaProject != null) {
+      for (Subject subject in metaProject.subjects.values) {
+        return subject.modelNodes[id];
+      }
+    }
+
+    return null;
+  }
+
   removeModelNode(ModelNode modelNode) {
     if (project.value != null) {
       for (Subject subject in project.value!.subjects.values) {
@@ -278,6 +289,13 @@ class ModelProjectController {
     }
     currentSubjectName.value = project.subjects.values.first.name;
     for (Subject subject in project.subjects.values) {
+      for (ModelNode modelNode in subject.modelNodes.values.toList()) {
+        String? metaId = modelNode.metaId;
+        if (metaId != null) {
+          ModelNode? metaModelNode = getMetaModelNode(metaId);
+          modelNode.metaModelNode = metaModelNode;
+        }
+      }
       for (NodeRelationship relationship
           in subject.relationships.values.toList()) {
         ModelNode? modelNode = getModelNode(relationship.srcId);

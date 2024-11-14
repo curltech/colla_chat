@@ -92,7 +92,10 @@ class NodeFrameComponent extends RectangleComponent
         modelProjectController.selectedDstModelNode.value == modelNode) {
       canvas.drawRect(strokeRect, selectedStrokePaint);
     } else {
-      canvas.drawRect(strokeRect, strokePaint);
+      if (modelNode.nodeType == NodeType.type.name ||
+          modelNode.nodeType == NodeType.remark.name) {
+        canvas.drawRect(strokeRect, strokePaint);
+      }
     }
   }
 
