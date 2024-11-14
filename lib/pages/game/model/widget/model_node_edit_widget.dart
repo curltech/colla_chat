@@ -60,12 +60,6 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
         name: 'name',
         label: 'Name',
         prefixIcon: Icon(Icons.person, color: myself.primary)),
-    PlatformDataField(
-        name: 'meta',
-        label: 'Meta',
-        inputType: InputType.toggle,
-        dataType: DataType.bool,
-        prefixIcon: Icon(Icons.toggle_off_outlined, color: myself.primary)),
   ];
 
   FormInputController? formInputController;
