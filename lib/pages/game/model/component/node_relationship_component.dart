@@ -271,8 +271,7 @@ class NodeRelationshipComponent extends PositionComponent
       _drawCardinality(
           canvas,
           '$srcCardinality:$dstCardinality',
-          Offset(
-              srcLeftCenter.x + (dstRightCenter.x - srcLeftCenter.x) / 2 - 24,
+          Offset(srcLeftCenter.x + (dstRightCenter.x - srcLeftCenter.x) / 2 + 4,
               srcLeftCenter.y + (dstRightCenter.y - srcLeftCenter.y) / 2 - 8));
     }
   }
@@ -323,7 +322,7 @@ class NodeRelationshipComponent extends PositionComponent
           canvas,
           '$srcCardinality:$dstCardinality',
           Offset(
-              srcRightCenter.x + (dstLeftCenter.x - srcRightCenter.x) / 2 - 24,
+              srcRightCenter.x + (dstLeftCenter.x - srcRightCenter.x) / 2 + 4,
               srcRightCenter.y + (dstLeftCenter.y - srcRightCenter.y) / 2 - 8));
     }
   }
@@ -385,7 +384,7 @@ class NodeRelationshipComponent extends PositionComponent
         ui.TextStyle(color: isHovered ? Colors.yellow : Colors.black));
     paragraphBuilder.addText(text);
     ui.Paragraph paragraph = paragraphBuilder.build();
-    paragraph.layout(const ui.ParagraphConstraints(width: 30));
+    paragraph.layout(const ui.ParagraphConstraints(width: 60));
     canvas.drawParagraph(paragraph, offset);
   }
 
