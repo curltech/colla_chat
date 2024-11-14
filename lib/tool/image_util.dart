@@ -95,8 +95,18 @@ class ImageUtil {
     Uint8List raw = response.data;
 
     return raw;
-    var buffer = raw.buffer;
-    ByteData byteData = ByteData.view(buffer);
+  }
+
+  static Future<String?> toBase64String(ui.Image image) async {
+    ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    if (byteData != null) {
+      String data = CryptoUtil.encodeBase64(byteData.buffer.asUint8List());
+      data = ImageUtil.base64Img(data);
+
+      return data;
+    }
+
+    return null;
   }
 
   static Image buildImage({

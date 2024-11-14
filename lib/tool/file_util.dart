@@ -202,10 +202,7 @@ class FileUtil {
     List<String>? allowedExtensions,
     String? confirmButtonText,
   }) async {
-    if (initialDirectory == null) {
-      Directory? dir = await PathUtil.getApplicationDirectory();
-      initialDirectory = dir?.path;
-    }
+    initialDirectory ??= platformParams.path;
     List<XTypeGroup> acceptedTypeGroups = [];
     if (allowedExtensions != null) {
       XTypeGroup typeGroup = XTypeGroup(
@@ -298,10 +295,15 @@ class FileUtil {
     String name,
     Uint8List bytes,
     String ext, {
+    String? filePath,
     MimeType mimeType = MimeType.other,
   }) async {
-    return await FileSaver.instance
-        .saveAs(name: name, bytes: bytes, ext: ext, mimeType: mimeType);
+    return await FileSaver.instance.saveAs(
+        name: name,
+        bytes: bytes,
+        filePath: filePath,
+        ext: ext,
+        mimeType: mimeType);
   }
 
   /// 自定义的界面在文件系统中打开单个文件

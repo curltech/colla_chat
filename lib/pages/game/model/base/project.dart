@@ -24,9 +24,17 @@ class Project {
 
   final String metaId;
 
+  /// 用于是否截取图形节点的图像，对于元模型是需要的，此图形用于按钮图片，对于普通模型是不需要的
+  bool meta = false;
+
   Map<String, Subject> subjects = {};
 
-  Project(this.name, this.metaId, {String? id}) {
+  Project(
+    this.name,
+    this.metaId, {
+    String? id,
+    this.meta = false,
+  }) {
     if (id == null) {
       this.id = const Uuid().v4().toString();
     } else {
@@ -65,6 +73,7 @@ class Project {
   Project.fromJson(Map json)
       : id = json['id'],
         metaId = json['metaId'] ?? baseMetaId,
+        meta = json['meta'] ?? false,
         name = json['name'] {
     subjects = {};
     List<dynamic>? ss = json['subjects'];
@@ -81,6 +90,7 @@ class Project {
       'id': id,
       'name': name,
       'metaId': metaId,
+      'meta': meta,
       'subjects': JsonUtil.toJson(subjects.values.toList())
     };
   }

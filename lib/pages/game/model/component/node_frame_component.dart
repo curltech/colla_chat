@@ -1,10 +1,8 @@
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
-import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:colla_chat/pages/game/model/component/image_node_component.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
-import 'package:colla_chat/pages/game/model/component/node_relationship_component.dart';
 import 'package:colla_chat/pages/game/model/component/remark_node_component.dart';
 import 'package:colla_chat/pages/game/model/component/shape_node_component.dart';
 import 'package:colla_chat/pages/game/model/component/subject_component.dart';
@@ -36,7 +34,7 @@ class NodeFrameComponent extends RectangleComponent
   static final selectedStrokePaint = Paint()
     ..color = Colors.yellow
     ..style = PaintingStyle.stroke
-    ..strokeWidth = 1.0;
+    ..strokeWidth = 2.0;
   late Rect strokeRect;
   final ModelNode modelNode;
   final Subject subject;

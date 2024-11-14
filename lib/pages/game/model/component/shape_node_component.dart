@@ -1,13 +1,15 @@
 import 'dart:async';
-import 'dart:math';
-import 'dart:ui';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
+import 'package:colla_chat/plugin/painter/image_recorder.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/text.dart';
@@ -103,14 +105,23 @@ class ShapeNodeComponent extends PositionComponent
         ..strokeWidth = 1.0;
     }
 
+    /// 如果是元模型项目需要截取节点的图像
+    ImageRecorder? imageRecorder;
+    Project? project = modelProjectController.project.value;
+    if (project != null && project.meta && modelNode.image == null) {
+      imageRecorder = ImageRecorder();
+    }
+
     String shapeType = modelNode.shapeType ?? ShapeType.rect.name;
     if (shapeType == ShapeType.rect.name) {
       Rect rect = Rect.fromLTWH(0, 0, width, height);
       if (fillPaint != null) {
         canvas.drawRect(rect, fillPaint);
+        imageRecorder?.recorderCanvas.drawRect(rect, fillPaint);
       }
       if (strokePaint != null) {
         canvas.drawRect(rect, strokePaint);
+        imageRecorder?.recorderCanvas.drawRect(rect, strokePaint);
       }
     }
     if (shapeType == ShapeType.rrect.name) {
@@ -118,36 +129,45 @@ class ShapeNodeComponent extends PositionComponent
       RRect rrect = RRect.fromRectXY(rect, 16.0, 16.0);
       if (fillPaint != null) {
         canvas.drawRRect(rrect, fillPaint);
+        imageRecorder?.recorderCanvas.drawRRect(rrect, fillPaint);
       }
       if (strokePaint != null) {
         canvas.drawRRect(rrect, strokePaint);
+        imageRecorder?.recorderCanvas.drawRRect(rrect, strokePaint);
       }
     }
     if (shapeType == ShapeType.circle.name) {
       if (fillPaint != null) {
         canvas.drawCircle(Offset(width / 2, height / 2), height / 2, fillPaint);
+        imageRecorder?.recorderCanvas
+            .drawCircle(Offset(width / 2, height / 2), height / 2, fillPaint);
       }
       if (strokePaint != null) {
         Rect rect = Rect.fromLTWH(0, 0, width, height);
         canvas.drawRect(rect, strokePaint);
+        imageRecorder?.recorderCanvas.drawRect(rect, strokePaint);
       }
     }
     if (shapeType == ShapeType.oval.name) {
       Rect rect = Rect.fromLTWH(0, 0, width, height);
       if (fillPaint != null) {
         canvas.drawOval(rect, fillPaint);
+        imageRecorder?.recorderCanvas.drawOval(rect, fillPaint);
       }
       if (strokePaint != null) {
         canvas.drawOval(rect, strokePaint);
+        imageRecorder?.recorderCanvas.drawOval(rect, strokePaint);
       }
     }
     if (shapeType == ShapeType.paragraph.name) {
-      ParagraphStyle style =
-          ParagraphStyle(textAlign: TextAlign.start, fontSize: 10.0);
-      ParagraphBuilder paragraphBuilder = ParagraphBuilder(style);
+      ui.ParagraphStyle style =
+          ui.ParagraphStyle(textAlign: TextAlign.start, fontSize: 10.0);
+      ui.ParagraphBuilder paragraphBuilder = ui.ParagraphBuilder(style);
       paragraphBuilder.addText(modelNode.content ?? '');
-      Paragraph paragraph = paragraphBuilder.build();
+      ui.Paragraph paragraph = paragraphBuilder.build();
       canvas.drawParagraph(paragraph, const Offset(0, 0));
+      imageRecorder?.recorderCanvas
+          .drawParagraph(paragraph, const Offset(0, 0));
     }
     if (shapeType == ShapeType.diamond.name) {
       Path path = Path();
@@ -158,9 +178,11 @@ class ShapeNodeComponent extends PositionComponent
       path.lineTo(0, height / 2);
       if (fillPaint != null) {
         canvas.drawPath(path, fillPaint);
+        imageRecorder?.recorderCanvas.drawPath(path, fillPaint);
       }
       if (strokePaint != null) {
         canvas.drawPath(path, strokePaint);
+        imageRecorder?.recorderCanvas.drawPath(path, strokePaint);
       }
     }
     if (shapeType == ShapeType.hexagonal.name) {
@@ -174,9 +196,11 @@ class ShapeNodeComponent extends PositionComponent
       path.lineTo(width / 3, 0);
       if (fillPaint != null) {
         canvas.drawPath(path, fillPaint);
+        imageRecorder?.recorderCanvas.drawPath(path, fillPaint);
       }
       if (strokePaint != null) {
         canvas.drawPath(path, strokePaint);
+        imageRecorder?.recorderCanvas.drawPath(path, strokePaint);
       }
     }
     if (shapeType == ShapeType.octagonal.name) {
@@ -192,9 +216,11 @@ class ShapeNodeComponent extends PositionComponent
       path.lineTo(width / 3, 0);
       if (fillPaint != null) {
         canvas.drawPath(path, fillPaint);
+        imageRecorder?.recorderCanvas.drawPath(path, fillPaint);
       }
       if (strokePaint != null) {
         canvas.drawPath(path, strokePaint);
+        imageRecorder?.recorderCanvas.drawPath(path, strokePaint);
       }
     }
     if (shapeType == ShapeType.arcrect.name) {
@@ -208,10 +234,20 @@ class ShapeNodeComponent extends PositionComponent
           radius: Radius.circular(height / 2));
       if (fillPaint != null) {
         canvas.drawPath(path, fillPaint);
+        imageRecorder?.recorderCanvas.drawPath(path, fillPaint);
       }
       if (strokePaint != null) {
         canvas.drawPath(path, strokePaint);
+        imageRecorder?.recorderCanvas.drawPath(path, strokePaint);
       }
+    }
+
+    ui.Image? image = imageRecorder?.toImage(width.toInt(), height.toInt());
+    if (image != null) {
+      modelNode.image = image;
+      ImageUtil.toBase64String(image).then((data) {
+        modelNode.content = data;
+      });
     }
   }
 

@@ -241,10 +241,14 @@ class ModelProjectController {
   registerMetaProject(String content) async {
     Map<String, dynamic> json = JsonUtil.toJson(content);
     Project metaProject = Project.fromJson(json);
-    String filename = p.join(platformParams.path, metaProject.id);
+    String filename = p.join(platformParams.path, '${metaProject.id}.json');
     File file = File(filename);
     if (file.existsSync()) {
       file.deleteSync();
+    }
+    if (!metaProject.meta) {
+      metaProject.meta = true;
+      content = JsonUtil.toJsonString(metaProject);
     }
     file.writeAsStringSync(content);
 
@@ -258,9 +262,10 @@ class ModelProjectController {
     if (file.existsSync()) {
       String content = await file.readAsString();
       Map<String, dynamic> json = JsonUtil.toJson(content);
-      Project project = Project.fromJson(json);
+      Project metaProject = Project.fromJson(json);
+      metaProject.meta = true;
 
-      return project;
+      return metaProject;
     }
 
     return null;
@@ -268,6 +273,7 @@ class ModelProjectController {
 
   /// 根据json内容打开，检查并加载模型项目
   Future<Project?> openProject(String content) async {
+    reset();
     Map<String, dynamic> json = JsonUtil.toJson(content);
     Project project = Project.fromJson(json);
     String metaId = project.metaId;
@@ -310,6 +316,14 @@ class ModelProjectController {
       }
     }
     return project;
+  }
+
+  reset() {
+    currentSubjectName.value = null;
+    selectedSrcModelNode.value = null;
+    selectedDstModelNode.value = null;
+    selectedRelationship.value = null;
+    canAddModelNode.value = null;
   }
 }
 

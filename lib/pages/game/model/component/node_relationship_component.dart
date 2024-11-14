@@ -25,7 +25,7 @@ class NodeRelationshipComponent extends PositionComponent
     ..color = Colors.yellow
     ..style = PaintingStyle.stroke
     ..isAntiAlias = true
-    ..strokeWidth = 1.0;
+    ..strokeWidth = 2.0;
 
   NodeRelationshipComponent({required this.nodeRelationship}) : super() {
     Node? src = nodeRelationship.src;

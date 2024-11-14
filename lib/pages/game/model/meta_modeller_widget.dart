@@ -66,6 +66,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       Subject subject = Subject(subjectName);
       modelProjectController.currentSubjectName.value = subject.name;
       project.subjects[subject.name] = subject;
+      modelFlameGame?.renderSubject(subject);
       modelFlameGame?.moveTo();
     }
   }
@@ -77,7 +78,11 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     }
     List<Option<String>> options = [];
     for (var subject in modelProjectController.project.value!.subjects.values) {
-      options.add(Option(subject.name, subject.name));
+      if (modelProjectController.currentSubjectName.value == subject.name) {
+        options.add(Option(subject.name, subject.name, checked: true));
+      } else {
+        options.add(Option(subject.name, subject.name));
+      }
     }
     String? subjectName = await DialogUtil.showSelectDialog<String>(
         title: const CommonAutoSizeText('Select subject'), items: options);
@@ -124,8 +129,8 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       Widget? btnIcon;
       if (nodeType == NodeType.image.name) {
         if (allowModelNode.content != null) {
-          btnIcon =
-              ImageUtil.buildImageWidget(imageContent: allowModelNode.content);
+          btnIcon = ImageUtil.buildImageWidget(
+              imageContent: allowModelNode.content, width: 24, height: 24);
         }
         btnIcon ??= Icon(
           Icons.image_outlined,
@@ -151,6 +156,10 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         );
       }
       if (nodeType == NodeType.shape.name) {
+        if (allowModelNode.content != null) {
+          btnIcon = ImageUtil.buildImageWidget(
+              imageContent: allowModelNode.content, width: 24, height: 24);
+        }
         btnIcon ??= Icon(
           Icons.rectangle_outlined,
           color: modelProjectController.canAddModelNode.value == allowModelNode
@@ -353,19 +362,23 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       Project? project = modelProjectController.project.value;
       if (project != null) {
         btns.addAll(_buildSubjectButtons());
-        if (modelProjectController.currentSubjectName.value != null) {
-          btns.addAll([
-            ..._buildMetaNodeButtons(),
-            ..._buildRelationshipButtons(),
-            IconButton(
-              onPressed: delete,
-              icon: Icon(
-                Icons.delete_outline,
-                color: myself.primary,
+        String? currentSubjectName =
+            modelProjectController.currentSubjectName.value;
+        if (currentSubjectName != null) {
+          if (modelProjectController.currentSubjectName.value != null) {
+            btns.addAll([
+              ..._buildMetaNodeButtons(),
+              ..._buildRelationshipButtons(),
+              IconButton(
+                onPressed: delete,
+                icon: Icon(
+                  Icons.delete_outline,
+                  color: myself.primary,
+                ),
+                tooltip: AppLocalizations.t('Delete'),
               ),
-              tooltip: AppLocalizations.t('Delete'),
-            ),
-          ]);
+            ]);
+          }
         }
       }
       return appDataProvider.secondaryBodyLandscape
@@ -388,6 +401,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     if (projectName != null) {
       modelProjectController.project.value =
           Project(projectName, modelProjectController.currentMetaId.value);
+      modelProjectController.reset();
     }
   }
 
@@ -430,6 +444,12 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
           JsonUtil.toJsonString(modelProjectController.project.value);
       jsonContent.value = content;
       indexWidgetProvider.push(jsonViewerWidget.routeName);
+    }
+  }
+
+  _closeProject() async {
+    if (modelProjectController.project.value != null) {
+      modelProjectController.project.value = null;
     }
   }
 
@@ -479,6 +499,13 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         icon: Icon(jsonViewerWidget.iconData),
         tooltip: AppLocalizations.t('View project'),
       ));
+      btns.add(IconButton(
+        onPressed: () async {
+          _closeProject();
+        },
+        icon: const Icon(Icons.close_outlined),
+        tooltip: AppLocalizations.t('Close project'),
+      ));
     }
     if (metaProject != null) {
       btns.add(IconButton(
@@ -515,6 +542,37 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     await modelProjectController.registerMetaProject(content);
   }
 
+  _register() async {
+    Project? project = modelProjectController.project.value;
+    if (project != null) {
+      project.meta = true;
+      String content = JsonUtil.toJsonString(project);
+
+      await modelProjectController.registerMetaProject(content);
+    }
+  }
+
+  _selectMetaProject() async {
+    List<Option<String>> options = [];
+    for (var metaProject in modelProjectController.metaProjects.value.values) {
+      if (modelProjectController.currentMetaId.value == metaProject.id) {
+        options.add(Option(
+          metaProject.name,
+          metaProject.id,
+          checked: true,
+        ));
+      } else {
+        options.add(Option(metaProject.name, metaProject.id));
+      }
+    }
+    String? metaId = await DialogUtil.showSelectDialog<String>(
+        title: const CommonAutoSizeText('Select meta project'), items: options);
+    if (metaId != null) {
+      modelProjectController.currentMetaId.value = metaId;
+      modelProjectController.project.value = null;
+    }
+  }
+
   List<Widget> _buildMetaProjectButtons() {
     return [
       IconButton(
@@ -523,6 +581,20 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         },
         icon: const Icon(Icons.open_in_browser_outlined),
         tooltip: AppLocalizations.t('Register meta project'),
+      ),
+      IconButton(
+        onPressed: () {
+          _register();
+        },
+        icon: const Icon(Icons.app_registration),
+        tooltip: AppLocalizations.t('Register current project'),
+      ),
+      IconButton(
+        onPressed: () {
+          _selectMetaProject();
+        },
+        icon: const Icon(Icons.select_all_outlined),
+        tooltip: AppLocalizations.t('Select meta project'),
       ),
     ];
   }

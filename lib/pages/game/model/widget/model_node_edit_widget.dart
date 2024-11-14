@@ -19,7 +19,6 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
-import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -61,6 +60,12 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
         name: 'name',
         label: 'Name',
         prefixIcon: Icon(Icons.person, color: myself.primary)),
+    PlatformDataField(
+        name: 'meta',
+        label: 'Meta',
+        inputType: InputType.toggle,
+        dataType: DataType.bool,
+        prefixIcon: Icon(Icons.toggle_off_outlined, color: myself.primary)),
   ];
 
   FormInputController? formInputController;
@@ -96,14 +101,15 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
           _onOk(values);
         },
         controller: formInputController!,
-        tails: modelNode!.nodeType == NodeType.image.name
+        tails: modelNode!.nodeType == NodeType.image.name ||
+                modelNode!.nodeType == NodeType.shape.name
             ? [
                 Obx(() {
                   return ListTile(
                     title: Text(AppLocalizations.t('Image')),
                     trailing: content.value != null
                         ? ImageUtil.buildImageWidget(
-                            width: 32, height: 32, imageContent: content.value)
+                            width: 24, height: 24, imageContent: content.value)
                         : null,
                     onTap: () {
                       _pickAvatar(context);

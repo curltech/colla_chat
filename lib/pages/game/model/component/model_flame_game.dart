@@ -86,12 +86,12 @@ class ModelFlameGame extends FlameGame
     var subjects = project.subjects.values.toList();
     for (int i = 0; i < subjects.length; ++i) {
       Subject subject = subjects[i];
-      _renderSubject(subject);
+      renderSubject(subject);
       _renderRelationship(subject);
     }
   }
 
-  void _renderSubject(Subject subject) {
+  void renderSubject(Subject subject) {
     subjectComponent = SubjectComponent(subject);
     subject.subjectComponent = subjectComponent;
     world.add(subjectComponent);
@@ -138,9 +138,9 @@ class ModelFlameGame extends FlameGame
 
   @override
   Future<void> onLoad() async {
-    /// render the nodes in the screen
     _renderProject();
     moveTo();
+
     return super.onLoad();
   }
 
