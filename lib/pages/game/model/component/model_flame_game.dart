@@ -163,8 +163,25 @@ class ModelFlameGame extends FlameGame
     Vector2 globalPosition = event.devicePosition;
     Vector2 widgetPosition = event.canvasPosition;
     Vector2 localPosition = event.localPosition;
-    Vector2 worldPosition = camera.globalToLocal(globalPosition);
+    Vector2 worldPosition = camera.globalToLocal(widgetPosition);
     Vector2 cameraPosition = camera.viewfinder.position;
+
+    bool canAddSubject = modelProjectController.canAddSubject.value;
+    if (canAddSubject) {
+      String? subjectName = await DialogUtil.showTextFormField(
+          title: 'New subject',
+          content: 'Please input new subject name',
+          tip: 'unknown');
+      if (subjectName != null) {
+        Subject subject =
+            Subject(subjectName, x: worldPosition.x, y: worldPosition.y);
+        modelProjectController.currentSubjectName.value = subject.name;
+        project.subjects[subject.name] = subject;
+        renderSubject(subject);
+        moveTo();
+      }
+      modelProjectController.canAddSubject.value = false;
+    }
 
     ModelNode? addModelNode = modelProjectController.canAddModelNode.value;
     if (addModelNode != null) {

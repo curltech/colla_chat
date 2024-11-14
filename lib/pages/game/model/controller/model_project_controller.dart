@@ -25,7 +25,7 @@ class ModelProjectController {
   final Rx<ModelNode?> selectedDstModelNode = Rx<ModelNode?>(null);
   final Rx<NodeRelationship?> selectedRelationship =
       Rx<NodeRelationship?>(null);
-
+  final RxBool canAddSubject = false.obs;
   final Rx<ModelNode?> canAddModelNode = Rx<ModelNode?>(null);
   final ModelNode typeModelNode = ModelNode(
       name: 'type', nodeType: NodeType.type.name, id: ModelNode.typeBaseMetaId);

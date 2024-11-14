@@ -24,7 +24,7 @@ class Subject {
 
   SubjectComponent? subjectComponent;
 
-  Subject(this.name, {String? id}) {
+  Subject(this.name, {String? id, this.x, this.y}) {
     if (id == null) {
       this.id = const Uuid().v4().toString();
     } else {
@@ -33,12 +33,20 @@ class Subject {
   }
 
   ui.Rect get rect {
-    if (modelNodes.isEmpty && x != null && y != null) {
-      return ui.Rect.fromLTWH(
-          x!,
-          y!,
-          Project.nodeWidth * 4 + Project.nodePadding,
-          Project.nodeHeight * 4 + Project.nodePadding);
+    if (modelNodes.isEmpty) {
+      if (x != null && y != null) {
+        return ui.Rect.fromLTWH(
+            x!,
+            y!,
+            Project.nodeWidth * 2 + Project.nodePadding,
+            Project.nodeHeight * 2 + Project.nodePadding);
+      } else {
+        return const ui.Rect.fromLTWH(
+            0,
+            0,
+            Project.nodeWidth * 2 + Project.nodePadding,
+            Project.nodeHeight * 2 + Project.nodePadding);
+      }
     }
     ModelNode node = modelNodes.values.toList().first;
     double minX = node.x!;

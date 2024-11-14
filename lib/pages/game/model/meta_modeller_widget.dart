@@ -53,24 +53,6 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Modeller';
 
-  _addSubject() async {
-    Project? project = modelProjectController.project.value;
-    if (project == null) {
-      return;
-    }
-    String? subjectName = await DialogUtil.showTextFormField(
-        title: 'New subject',
-        content: 'Please input new subject name',
-        tip: 'unknown');
-    if (subjectName != null) {
-      Subject subject = Subject(subjectName);
-      modelProjectController.currentSubjectName.value = subject.name;
-      project.subjects[subject.name] = subject;
-      modelFlameGame?.renderSubject(subject);
-      modelFlameGame?.moveTo();
-    }
-  }
-
   _selectSubject() async {
     Project? project = modelProjectController.project.value;
     if (project == null) {
@@ -96,11 +78,14 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     return [
       IconButton(
         onPressed: () async {
-          await _addSubject();
+          modelProjectController.canAddSubject.value =
+              !modelProjectController.canAddSubject.value;
         },
         icon: Icon(
           Icons.electric_meter,
-          color: myself.primary,
+          color: modelProjectController.canAddSubject.value
+              ? Colors.yellow
+              : myself.primary,
         ),
         tooltip: AppLocalizations.t('New subject'),
       ),

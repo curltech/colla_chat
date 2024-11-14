@@ -2,16 +2,22 @@ import 'dart:ui';
 
 import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
+import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/plugin/painter/line/dash_painter.dart';
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flutter/material.dart';
 
-class SubjectComponent extends RectangleComponent with ModelNodeComponent{
-  static final strokePaint = Paint()
-    ..color = Colors.yellow.shade50
+class SubjectComponent extends RectangleComponent with ModelNodeComponent {
+  static final normalStrokePaint = Paint()
+    ..color = Colors.black
     ..style = PaintingStyle.stroke
     ..strokeWidth = 1.0;
+
+  static final currentStrokePaint = Paint()
+    ..color = Colors.yellow
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 2.0;
 
   late TextComponent textComponent;
 
@@ -63,6 +69,10 @@ class SubjectComponent extends RectangleComponent with ModelNodeComponent{
     DashPainter dashPainter = const DashPainter();
     Path path = Path();
     path.addRect(Rect.fromLTWH(0, 0, width, height));
-    dashPainter.paint(canvas, path, strokePaint);
+    if (subject.name == modelProjectController.currentSubjectName.value) {
+      dashPainter.paint(canvas, path, currentStrokePaint);
+    } else {
+      dashPainter.paint(canvas, path, normalStrokePaint);
+    }
   }
 }
