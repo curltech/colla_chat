@@ -167,7 +167,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
           onPressed: () {
             name.value = routeName;
           },
-          icon: const Icon(Icons.list_outlined));
+          icon: const Icon(Icons.arrow_back_ios));
       String title = this.title;
       Widget otherAppWidget = _buildOtherAppTileData(context);
       Widget child;
