@@ -114,8 +114,13 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       Widget? btnIcon;
       if (nodeType == NodeType.image.name) {
         if (allowModelNode.content != null) {
-          btnIcon = ImageUtil.buildImageWidget(
-              imageContent: allowModelNode.content, width: 24, height: 24);
+          btnIcon = Container(
+              color:
+                  modelProjectController.canAddModelNode.value == allowModelNode
+                      ? Colors.amber
+                      : null,
+              child: ImageUtil.buildImageWidget(
+                  imageContent: allowModelNode.content, width: 24, height: 24));
         }
         btnIcon ??= Icon(
           Icons.image_outlined,
@@ -142,8 +147,13 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       }
       if (nodeType == NodeType.shape.name) {
         if (allowModelNode.content != null) {
-          btnIcon = ImageUtil.buildImageWidget(
-              imageContent: allowModelNode.content, width: 24, height: 24);
+          btnIcon = btnIcon = Container(
+              color:
+                  modelProjectController.canAddModelNode.value == allowModelNode
+                      ? Colors.amber
+                      : null,
+              child: ImageUtil.buildImageWidget(
+                  imageContent: allowModelNode.content, width: 24, height: 24));
         }
         btnIcon ??= Icon(
           Icons.rectangle_outlined,
