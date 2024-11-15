@@ -134,23 +134,24 @@ dependencies:
   file_saver: ^0.2.10
   material_neumorphic: ^1.2.1
   clay_containers: ^0.3.4
-  fl_chart: ^0.68.0
-  k_chart: ^0.7.1
-  community_charts_flutter: ^1.0.4
   extended_text: ^14.0.1 #文本扩展显示
   extended_text_field: ^16.0.0 #文字表情混入
   extended_text_library: ^12.0.0
   extended_masked_text: ^3.0.1
   azlistview: ^2.0.0 #特殊列表滑动
+  # fl_chart: ^0.69.0
+  k_chart: ^0.7.1
+  community_charts_flutter: ^1.0.4
+  k_chart_plus: ^1.0.2
   graphic: ^2.5.0 # 各种图表，取代flutter_echarts
-  flutter_unity_widget: ^2022.2.1
-  flutter_embed_unity: ^1.2.3
+  # flutter_unity_widget: ^2022.2.1
+  # flutter_embed_unity: ^1.2.3
   #  opencv_dart: ^1.2.5
   flame: ^1.21.0
   interactive_chart: ^0.3.5 #candlesticks
-  candlesticks:
-    git:
-      url: https://github.com/r-mzy47/candlesticks.git
+  #  candlesticks:
+  #    git:
+  #      url: https://github.com/r-mzy47/candlesticks.git
   fluent_ui: 4.9.1
   fluentui_system_icons: ^1.1.201 #FluentIcons.access_time_24_regular
   macos_ui: ^2.0.9
@@ -186,7 +187,6 @@ dependencies:
   introduction_screen: ^3.1.14
   pinput: ^5.0.0
   align_positioned: ^4.0.1
-  #  chart_sparkline: ^1.1.1
   super_drag_and_drop: ^0.8.22
   #  dashbook: ^0.1.15
 
@@ -223,6 +223,8 @@ dependencies:
   json_annotation: ^4.3.0
   flutter_json_view: ^1.1.5
   json_editor_flutter: ^1.4.2
+  re_editor: ^0.6.0
+  re_highlight: ^0.0.3
   provider: ^6.0.1 #状态管理
   easy_refresh: ^3.3.2+1
   percent_indicator: ^4.2.3

@@ -1,4 +1,3 @@
-import 'package:candlesticks/candlesticks.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -12,13 +11,13 @@ import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/service/stock/wmqy_line.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:get/state_manager.dart';
+import 'package:interactive_chart/interactive_chart.dart';
 
 class StockLineController extends DataListController<dynamic> {
   String tsCode;
@@ -143,7 +142,7 @@ final MultiStockLineController multiStockLineController =
 
 class StockLineChartWidget extends StatelessWidget with TileDataMixin {
   StockLineChartWidget({super.key}) {
-    online.addListener(reload);
+    online.addListener(_reload);
   }
 
   @override
@@ -158,29 +157,27 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'StockLineChart';
 
-  List<Indicator> indicators = [
-    MovingAverageIndicator(
-      length: 5,
-      color: Colors.blue,
-    ),
-    MovingAverageIndicator(
-      length: 10,
-      color: Colors.yellowAccent,
-    ),
-    MovingAverageIndicator(
-      length: 20,
-      color: Colors.purpleAccent,
-    ),
-    MovingAverageIndicator(
-      length: 30,
-      color: Colors.cyanAccent,
-    ),
-  ];
-  Rx<List<Candle>?> candles = Rx<List<Candle>?>(null);
+  Rx<List<CandleData>?> candles = Rx<List<CandleData>?>(null);
   RxBool online = true.obs;
 
+  _computeTrendLines() {
+    final ma7 = CandleData.computeMA(candles.value!, 7);
+    final ma30 = CandleData.computeMA(candles.value!, 30);
+    final ma90 = CandleData.computeMA(candles.value!, 90);
+
+    for (int i = 0; i < candles.value!.length; i++) {
+      candles.value![i].trends = [ma7[i], ma30[i], ma90[i]];
+    }
+  }
+
+  _removeTrendLines() {
+    for (final data in candles.value!) {
+      data.trends = [];
+    }
+  }
+
   /// 在tsCode和lineType改变，也就是当前数据控制器改变的情况下，加载数据，
-  Future<void> reload() async {
+  Future<void> _reload() async {
     candles.value = null;
     StockLineController? stockLineController =
         multiStockLineController.stockLineController;
@@ -192,7 +189,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
     // 判断是否有更多的数据可以加载
     List<dynamic>? data = await _findMoreData();
     if (data != null && data.isNotEmpty) {
-      List<Candle> candles = _buildCandles(data);
+      List<CandleData> candles = _buildCandles(data);
       if (candles.isNotEmpty) {
         this.candles.value = candles;
       }
@@ -284,7 +281,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
   }
 
   /// 在tsCode和lineType没有改变，也就是当前数据控制器不变的情况下，加载更多的数据，
-  Future<void> loadMoreCandles() async {
+  Future<void> _loadMoreCandles() async {
     StockLineController? stockLineController =
         multiStockLineController.stockLineController;
     if (stockLineController == null) {
@@ -296,7 +293,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
     if (count == null || length == 0 || length < count) {
       List<dynamic>? data = await _findMoreData();
       if (data != null && data.isNotEmpty) {
-        List<Candle> candles = _buildCandles(data);
+        List<CandleData> candles = _buildCandles(data);
         if (candles.isNotEmpty && this.candles.value != null) {
           if (!online.value) {
             candles.addAll(this.candles.value!);
@@ -308,8 +305,8 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
   }
 
   /// 创建图形的数据
-  List<Candle> _buildCandles(List<dynamic> data) {
-    List<Candle> candles = [];
+  List<CandleData> _buildCandles(List<dynamic> data) {
+    List<CandleData> candles = [];
     for (int i = data.length - 1; i >= 0; i--) {
       Map<String, dynamic> map = JsonUtil.toJson(data[i]);
       int tradeDate = map['trade_date'];
@@ -321,19 +318,21 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
         minute = tradeMinute % 60;
       }
       DateTime date = DateUtil.toDateTime(tradeDate.toString());
-      DateTime time = date.copyWith(
-          year: date.year,
-          month: date.month,
-          day: date.day,
-          hour: hour,
-          minute: minute);
+      int timestamp = date
+          .copyWith(
+              year: date.year,
+              month: date.month,
+              day: date.day,
+              hour: hour,
+              minute: minute)
+          .millisecondsSinceEpoch;
       num high = map['high'];
       num low = map['low'];
       num open = map['open'];
       num close = map['close'];
       num volume = map['vol'];
-      Candle candle = Candle(
-          date: time,
+      CandleData candle = CandleData(
+          timestamp: timestamp,
           high: high.toDouble(),
           low: low.toDouble(),
           open: open.toDouble(),
@@ -345,156 +344,150 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
     return candles;
   }
 
-  CandleSticksStyle dark() {
-    return CandleSticksStyle.dark(
-      primaryBull: Colors.red,
-      secondaryBull: Colors.redAccent,
-      primaryBear: Colors.green,
-      secondaryBear: Colors.greenAccent,
+  ChartStyle _buildChartStyle(BuildContext context) {
+    final bool isDark = myself.getBrightness(context) == Brightness.dark;
+    return ChartStyle(
+      priceGainColor: Colors.teal[200]!,
+      priceLossColor: Colors.blueGrey,
+      volumeColor: Colors.teal.withOpacity(0.8),
+      trendLineStyles: [
+        Paint()
+          ..strokeWidth = 2.0
+          ..strokeCap = StrokeCap.round
+          ..color = Colors.deepOrange,
+        Paint()
+          ..strokeWidth = 4.0
+          ..strokeCap = StrokeCap.round
+          ..color = Colors.orange,
+      ],
+      priceGridLineColor: Colors.blue[200]!,
+      priceLabelStyle: TextStyle(color: Colors.blue[200]),
+      timeLabelStyle: TextStyle(color: Colors.blue[200]),
+      selectionHighlightColor: Colors.red.withOpacity(0.2),
+      overlayBackgroundColor: Colors.red[900]!.withOpacity(0.6),
+      overlayTextStyle: TextStyle(color: Colors.red[100]),
+      timeLabelHeight: 32,
+      volumeHeightFactor: 0.2, // volume area is 20% of total height
     );
   }
 
-  CandleSticksStyle light() {
-    return CandleSticksStyle.light(
-      primaryBull: Colors.red,
-      secondaryBull: Colors.redAccent,
-      primaryBear: Colors.green,
-      secondaryBear: Colors.greenAccent,
+  Widget _buildToolPanelWidget(BuildContext context) {
+    List<Widget> btns = [
+      IconButton(
+        onPressed: () {
+          multiStockLineController.lineType = 100;
+          _reload();
+        },
+        icon: Icon(
+          Icons.lock_clock,
+          color: myself.primary,
+        ),
+      ),
+      IconButton(
+        onPressed: () {
+          multiStockLineController.lineType = 101;
+          _reload();
+        },
+        icon: Icon(
+          Icons.calendar_view_day_outlined,
+          color: myself.primary,
+        ),
+      ),
+      IconButton(
+        onPressed: () {
+          multiStockLineController.lineType = 102;
+          _reload();
+        },
+        icon: Icon(
+          Icons.calendar_view_week_outlined,
+          color: myself.primary,
+        ),
+      ),
+      IconButton(
+        onPressed: () {
+          multiStockLineController.lineType = 103;
+          _reload();
+        },
+        icon: Icon(
+          Icons.calendar_view_month_outlined,
+          color: myself.primary,
+        ),
+      ),
+      IconButton(
+        onPressed: () {
+          multiStockLineController.lineType = 104;
+          _reload();
+        },
+        icon: Icon(
+          size: 22,
+          Icons.perm_contact_calendar,
+          color: myself.primary,
+        ),
+      ),
+      IconButton(
+        onPressed: () {
+          multiStockLineController.lineType = 105;
+          _reload();
+        },
+        icon: Icon(
+          size: 22,
+          Icons.calendar_month_outlined,
+          color: myself.primary,
+        ),
+      ),
+      IconButton(
+        onPressed: () {
+          multiStockLineController.lineType = 106;
+          _reload();
+        },
+        icon: Icon(
+          size: 20,
+          Icons.calendar_today_outlined,
+          color: myself.primary,
+        ),
+      ),
+    ];
+
+    return Row(
+      children: btns,
     );
   }
 
   Widget _buildCandlesticks(BuildContext context) {
-    final bool isDark = myself.getBrightness(context) == Brightness.dark;
-    final style = isDark ? dark() : light();
+    final ChartStyle style = _buildChartStyle(context);
     return Obx(
       () {
         if (candles.value == null) {
           return nil;
         }
-        return Candlesticks(
-          key: UniqueKey(),
-          indicators:
-              multiStockLineController.lineType == 100 ? null : indicators,
-          loadingWidget: LoadingUtil.buildLoadingIndicator(),
-          actions: <ToolBarAction>[
-            ToolBarAction(
-              onPressed: () {
-                multiStockLineController.lineType = 100;
-                reload();
-              },
-              child: Icon(
-                Icons.lock_clock,
-                color: multiStockLineController.lineType == 100
-                    ? myself.primary
-                    : isDark
-                        ? Colors.white
-                        : Colors.grey,
-              ),
-            ),
-            ToolBarAction(
-              onPressed: () {
-                multiStockLineController.lineType = 101;
-                reload();
-              },
-              child: Icon(
-                Icons.calendar_view_day_outlined,
-                color: multiStockLineController.lineType == 101
-                    ? myself.primary
-                    : isDark
-                        ? Colors.white
-                        : Colors.grey,
-              ),
-            ),
-            ToolBarAction(
-              onPressed: () {
-                multiStockLineController.lineType = 102;
-                reload();
-              },
-              child: Icon(
-                Icons.calendar_view_week_outlined,
-                color: multiStockLineController.lineType == 102
-                    ? myself.primary
-                    : isDark
-                        ? Colors.white
-                        : Colors.grey,
-              ),
-            ),
-            ToolBarAction(
-              onPressed: () {
-                multiStockLineController.lineType = 103;
-                reload();
-              },
-              child: Icon(
-                Icons.calendar_view_month_outlined,
-                color: multiStockLineController.lineType == 103
-                    ? myself.primary
-                    : isDark
-                        ? Colors.white
-                        : Colors.grey,
-              ),
-            ),
-            ToolBarAction(
-              onPressed: () {
-                multiStockLineController.lineType = 104;
-                reload();
-              },
-              child: Icon(
-                size: 22,
-                Icons.perm_contact_calendar,
-                color: multiStockLineController.lineType == 104
-                    ? myself.primary
-                    : isDark
-                        ? Colors.white
-                        : Colors.grey,
-              ),
-            ),
-            ToolBarAction(
-              onPressed: () {
-                multiStockLineController.lineType = 105;
-                reload();
-              },
-              child: Icon(
-                size: 22,
-                Icons.calendar_month_outlined,
-                color: multiStockLineController.lineType == 105
-                    ? myself.primary
-                    : isDark
-                        ? Colors.white
-                        : Colors.grey,
-              ),
-            ),
-            ToolBarAction(
-              onPressed: () {
-                multiStockLineController.lineType = 106;
-                reload();
-              },
-              child: Icon(
-                size: 20,
-                Icons.calendar_today_outlined,
-                color: multiStockLineController.lineType == 106
-                    ? myself.primary
-                    : isDark
-                        ? Colors.white
-                        : Colors.grey,
-              ),
-            ),
-          ],
-          candles: candles.value!,
-          style: style,
-          chartAdjust: ChartAdjust.visibleRange,
-          onLoadMoreCandles: loadMoreCandles,
-          onRemoveIndicator: (String indicator) {
-            indicators = [...indicators];
-            indicators.removeWhere((element) => element.name == indicator);
-          },
-        );
+        return Column(children: [
+          _buildToolPanelWidget(context),
+          InteractiveChart(
+            key: UniqueKey(),
+            candles: candles.value!,
+            style: style,
+            /** Customize axis labels */
+            // timeLabel: (timestamp, visibleDataCount) => "📅",
+            // priceLabel: (price) => "${price.round()} 💎",
+            /** Customize overlay (tap and hold to see it)
+             ** Or return an empty object to disable overlay info. */
+            // overlayInfo: (candle) => {
+            //   "💎": "🤚    ",
+            //   "Hi": "${candle.high?.toStringAsFixed(2)}",
+            //   "Lo": "${candle.low?.toStringAsFixed(2)}",
+            // },
+            /** Callbacks */
+            // onTap: (candle) => print("user tapped on $candle"),
+            // onCandleResize: (width) => print("each candle is $width wide"),
+          )
+        ]);
       },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    reload();
+    _reload();
     Widget titleWidget = Obx(
       () {
         StockLineController? stockLineController =
@@ -532,7 +525,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
             await multiStockLineController.previous();
             StockLineController? stockLineController =
                 multiStockLineController.stockLineController;
-            reload();
+            _reload();
           },
           icon: const Icon(Icons.skip_previous_outlined)),
       IconButton(
@@ -541,7 +534,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
             await multiStockLineController.next();
             StockLineController? stockLineController =
                 multiStockLineController.stockLineController;
-            reload();
+            _reload();
           },
           icon: const Icon(Icons.skip_next_outlined)),
     ]);
