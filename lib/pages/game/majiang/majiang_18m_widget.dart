@@ -6,6 +6,7 @@ import 'package:colla_chat/pages/game/majiang/base/room_pool.dart';
 import 'package:colla_chat/pages/game/majiang/base/round.dart';
 import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -37,7 +38,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Majiang 18m';
 
-  Widget gameWidget = GameWidget(game: MajiangFlameGame());
+  MajiangFlameGame? majiangFlameGame;
 
   final Rx<Room?> room = Rx<Room?>(null);
 
@@ -156,7 +157,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
           onPressed: () async {
             fullscreen.value = true;
             await DialogUtil.showFullScreen(
-                context: context, child: gameWidget);
+                context: context, child: GameWidget(game: majiangFlameGame!));
             fullscreen.value = false;
           },
           icon: const Icon(Icons.fullscreen)),
@@ -229,11 +230,12 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
+      majiangFlameGame = MajiangFlameGame();
       return AppBarView(
           title: title,
           withLeading: true,
           rightWidgets: _buildRightWidgets(context),
-          child: gameWidget);
+          child: GameWidget(game: majiangFlameGame!));
     });
   }
 }

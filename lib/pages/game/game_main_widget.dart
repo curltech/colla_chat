@@ -1,4 +1,5 @@
 import 'package:colla_chat/pages/game/majiang/back/majiang_widget.dart';
+import 'package:colla_chat/pages/game/majiang/majiang_18m_widget.dart';
 import 'package:colla_chat/pages/game/model/meta_modeller_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -8,11 +9,11 @@ import 'package:flutter/material.dart';
 
 /// 游戏功能主页面，带有路由回调函数
 class GameMainWidget extends StatelessWidget with TileDataMixin {
-  final MajiangWidget majiangWidget = MajiangWidget();
+  final Majiang18mWidget majiang18mWidget = Majiang18mWidget();
   final MetaModellerWidget metaModellerWidget = MetaModellerWidget();
 
   GameMainWidget({super.key}) {
-    indexWidgetProvider.define(majiangWidget);
+    indexWidgetProvider.define(majiang18mWidget);
     indexWidgetProvider.define(metaModellerWidget);
   }
 
@@ -31,7 +32,7 @@ class GameMainWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     final List<TileData> gameTileData = TileData.from([
-      majiangWidget,
+      majiang18mWidget,
       metaModellerWidget,
     ]);
     for (var tile in gameTileData) {

@@ -1,3 +1,16 @@
+import 'package:colla_chat/pages/game/majiang/component/next_hand_area_component.dart';
+import 'package:colla_chat/pages/game/majiang/component/next_participant_area_component.dart';
+import 'package:colla_chat/pages/game/majiang/component/next_waste_area_component.dart';
+import 'package:colla_chat/pages/game/majiang/component/opponent_hand_area_component.dart';
+import 'package:colla_chat/pages/game/majiang/component/opponent_participant_area_component.dart';
+import 'package:colla_chat/pages/game/majiang/component/opponent_waste_area_component.dart';
+import 'package:colla_chat/pages/game/majiang/component/previous_hand_area_component.dart';
+import 'package:colla_chat/pages/game/majiang/component/previous_participant_area_component.dart';
+import 'package:colla_chat/pages/game/majiang/component/previous_waste_area_component.dart';
+import 'package:colla_chat/pages/game/majiang/component/self_hand_area_component.dart';
+import 'package:colla_chat/pages/game/majiang/component/self_participant_area_component.dart';
+import 'package:colla_chat/pages/game/majiang/component/self_waste_area_component.dart';
+import 'package:colla_chat/pages/game/majiang/component/setting_area_component.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
@@ -17,12 +30,46 @@ class MajiangFlameGame extends FlameGame
         ScaleDetector,
         HasCollisionDetection,
         HasKeyboardHandlerComponents {
+  static const double width = 1110;
+  static const double height = 655;
+
+  static const double opponentHeightRadio = 0.16;
+  static const double opponentWidthRadio = 0.16;
+  static const double opponentHandWidthRadio = 0.68;
+  static const double settingWidthRadio = 0.16;
+
+  static const double selfHeightRadio = 0.2;
+  static const double selfWidthRadio = 0.16;
+  static const double selfHandWidthRadio = 0.84;
+
+  static const double nextHeightRadio = 0.64;
+  static const double opponentWasteHeightRadio = 0.3;
+  static const double selfWasteHeightRadio = 0.3;
+
+  static const double previousHeightRadio = 0.64;
+  static const double previousWidthRadio = 0.08;
+  static const double previousHandWidthRadio = 0.08;
+  static const double previousWasteWidthRadio = 0.16;
+
+  static const double nextWidthRadio = 0.08;
+  static const double nextHandWidthRadio = 0.08;
+  static const double nextWasteWidthRadio = 0.16;
+
+  static const double opponentWasteWidthRadio = 0.36;
+  static const double selfWasteWidthRadio = 0.36;
+
+  static double x(double x) {
+    return -MajiangFlameGame.width * 0.5 + x;
+  }
+
+  static double y(double y) {
+    return -MajiangFlameGame.height * 0.5 + y;
+  }
+
   MajiangFlameGame()
       : super(
             camera: CameraComponent.withFixedResolution(
-                width: appDataProvider.secondaryBodyWidth,
-                height: appDataProvider.totalSize.height -
-                    appDataProvider.toolbarHeight));
+                width: width, height: height));
 
   late final SpriteComponent backgroundComponent;
 
@@ -30,8 +77,30 @@ class MajiangFlameGame extends FlameGame
 
   late double startZoom;
 
-  // @override
-  // bool debugMode = true;
+  OpponentParticipantAreaComponent opponentParticipantAreaComponent =
+      OpponentParticipantAreaComponent();
+  OpponentHandAreaComponent opponentHandAreaComponent =
+      OpponentHandAreaComponent();
+  OpponentWasteAreaComponent opponentWasteAreaComponent =
+      OpponentWasteAreaComponent();
+  SettingAreaComponent settingAreaComponent = SettingAreaComponent();
+  PreviousParticipantAreaComponent previousParticipantAreaComponent =
+      PreviousParticipantAreaComponent();
+  PreviousHandAreaComponent previousHandAreaComponent =
+      PreviousHandAreaComponent();
+  PreviousWasteAreaComponent previousWasteAreaComponent =
+      PreviousWasteAreaComponent();
+  SelfWasteAreaComponent selfWasteAreaComponent = SelfWasteAreaComponent();
+  NextParticipantAreaComponent nextParticipantAreaComponent =
+      NextParticipantAreaComponent();
+  NextHandAreaComponent nextHandAreaComponent = NextHandAreaComponent();
+  NextWasteAreaComponent nextWasteAreaComponent = NextWasteAreaComponent();
+  SelfParticipantAreaComponent selfParticipantAreaComponent =
+      SelfParticipantAreaComponent();
+  SelfHandAreaComponent selfHandAreaComponent = SelfHandAreaComponent();
+
+  @override
+  bool debugMode = true;
 
   @override
   Color backgroundColor() {
@@ -76,30 +145,28 @@ class MajiangFlameGame extends FlameGame
 
   @override
   Future<void> onLoad() async {
-    final backgroundImage = await images.load('majiang/background.webp');
-    backgroundComponent = SpriteComponent(sprite: Sprite(backgroundImage));
-    world.add(backgroundComponent);
+    // final backgroundImage = await images.load('majiang/background.webp');
+    // backgroundComponent = SpriteComponent(
+    //     autoResize: true,
+    //     // position: Vector2(0, 0),
+    //     anchor: Anchor.center,
+    //     // size: Vector2(width, height),
+    //     sprite: Sprite(backgroundImage));
+    // world.add(backgroundComponent);
 
-    RectangleComponent opponentArea = RectangleComponent();
-    RectangleComponent opponentParticipantArea = RectangleComponent();
-    RectangleComponent opponentHandArea = RectangleComponent();
-    RectangleComponent settingArea = RectangleComponent();
-
-    RectangleComponent centerArea = RectangleComponent();
-    RectangleComponent previousParticipantArea = RectangleComponent();
-    RectangleComponent previousHandArea = RectangleComponent();
-    RectangleComponent previousWasteArea = RectangleComponent();
-
-    RectangleComponent opponentWasteArea = RectangleComponent();
-    RectangleComponent selfWasteArea = RectangleComponent();
-
-    RectangleComponent nextParticipantArea = RectangleComponent();
-    RectangleComponent nextHandArea = RectangleComponent();
-    RectangleComponent nextWasteArea = RectangleComponent();
-
-    RectangleComponent selfArea = RectangleComponent();
-    RectangleComponent selfParticipantArea = RectangleComponent();
-    RectangleComponent selfHandArea = RectangleComponent();
+    world.add(opponentParticipantAreaComponent);
+    world.add(opponentHandAreaComponent);
+    world.add(settingAreaComponent);
+    world.add(selfParticipantAreaComponent);
+    world.add(selfHandAreaComponent);
+    world.add(previousParticipantAreaComponent);
+    world.add(previousHandAreaComponent);
+    world.add(previousWasteAreaComponent);
+    world.add(opponentWasteAreaComponent);
+    world.add(selfWasteAreaComponent);
+    world.add(nextWasteAreaComponent);
+    world.add(nextHandAreaComponent);
+    world.add(nextParticipantAreaComponent);
 
     return super.onLoad();
   }
