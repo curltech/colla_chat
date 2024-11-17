@@ -106,8 +106,8 @@ class Room {
   /// 当前轮
   int? currentRoundIndex;
 
-  /// 游戏的当前参与者视角
-  ParticipantDirection currentDirection = ParticipantDirection.east;
+  /// 当前登录用户在游戏中的方位，在房间创建以后不能更改
+  late final ParticipantDirection currentDirection;
 
   /// 胡牌的分数
   Map<CompleteType, int> completeTypeScores = {
@@ -220,8 +220,8 @@ class Room {
     return participants[currentDirection.index];
   }
 
-  RoundParticipant? get currentRoundParticipant {
-    return currentRound?.currentRoundParticipant;
+  RoundParticipant? getRoundParticipant(ParticipantDirection direction) {
+    return currentRound?.getRoundParticipant(direction);
   }
 
   /// 新玩一局，positions为空自己发牌，不为空，别人发牌

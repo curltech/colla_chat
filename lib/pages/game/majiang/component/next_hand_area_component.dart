@@ -14,6 +14,7 @@ class NextHandAreaComponent extends RectangleComponent
     ..style = PaintingStyle.fill;
 
   HandPile? handPile;
+  HandPileComponent? handPileComponent;
 
   NextHandAreaComponent()
       : super(
@@ -30,14 +31,18 @@ class NextHandAreaComponent extends RectangleComponent
                 MajiangFlameGame.height * MajiangFlameGame.nextHeightRadio),
             paint: fillPaint);
 
-  void _loadHandPile() {
-    HandPileComponent handPileComponent = HandPileComponent(handPile!, 1);
-    add(handPileComponent);
+  loadHandPile() {
+    if (handPileComponent != null) {
+      remove(handPileComponent!);
+    }
+    if (handPile != null) {
+      handPileComponent = HandPileComponent(handPile!, 1);
+      add(handPileComponent!);
+    }
   }
 
   @override
   Future<void> onLoad() async {
-    _loadHandPile();
     return super.onLoad();
   }
 }
