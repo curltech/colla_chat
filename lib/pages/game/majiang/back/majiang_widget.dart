@@ -1,10 +1,10 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
-import 'package:colla_chat/pages/game/majiang/card.dart';
-import 'package:colla_chat/pages/game/majiang/card_util.dart';
-import 'package:colla_chat/pages/game/majiang/participant_card.dart';
-import 'package:colla_chat/pages/game/majiang/room.dart';
-import 'package:colla_chat/pages/game/majiang/room_pool.dart';
+import 'package:colla_chat/pages/game/majiang/back/card.dart';
+import 'package:colla_chat/pages/game/majiang/back/card_util.dart';
+import 'package:colla_chat/pages/game/majiang/back/participant_card.dart';
+import 'package:colla_chat/pages/game/majiang/back/room.dart';
+import 'package:colla_chat/pages/game/majiang/back/room_pool.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';

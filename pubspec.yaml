@@ -140,7 +140,7 @@ dependencies:
   extended_masked_text: ^3.0.1
   azlistview: ^2.0.0 #特殊列表滑动
   # fl_chart: ^0.69.0
-  k_chart: ^0.7.1
+  # k_chart: ^0.7.1
   community_charts_flutter: ^1.0.4
   k_chart_plus: ^1.0.2
   graphic: ^2.5.0 # 各种图表，取代flutter_echarts

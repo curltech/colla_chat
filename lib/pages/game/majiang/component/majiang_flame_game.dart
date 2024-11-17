@@ -1,3 +1,4 @@
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
@@ -16,7 +17,12 @@ class MajiangFlameGame extends FlameGame
         ScaleDetector,
         HasCollisionDetection,
         HasKeyboardHandlerComponents {
-  MajiangFlameGame();
+  MajiangFlameGame()
+      : super(
+            camera: CameraComponent.withFixedResolution(
+                width: appDataProvider.secondaryBodyWidth,
+                height: appDataProvider.totalSize.height -
+                    appDataProvider.toolbarHeight));
 
   late final SpriteComponent backgroundComponent;
 
@@ -73,6 +79,27 @@ class MajiangFlameGame extends FlameGame
     final backgroundImage = await images.load('majiang/background.webp');
     backgroundComponent = SpriteComponent(sprite: Sprite(backgroundImage));
     world.add(backgroundComponent);
+
+    RectangleComponent opponentArea = RectangleComponent();
+    RectangleComponent opponentParticipantArea = RectangleComponent();
+    RectangleComponent opponentHandArea = RectangleComponent();
+    RectangleComponent settingArea = RectangleComponent();
+
+    RectangleComponent centerArea = RectangleComponent();
+    RectangleComponent previousParticipantArea = RectangleComponent();
+    RectangleComponent previousHandArea = RectangleComponent();
+    RectangleComponent previousWasteArea = RectangleComponent();
+
+    RectangleComponent opponentWasteArea = RectangleComponent();
+    RectangleComponent selfWasteArea = RectangleComponent();
+
+    RectangleComponent nextParticipantArea = RectangleComponent();
+    RectangleComponent nextHandArea = RectangleComponent();
+    RectangleComponent nextWasteArea = RectangleComponent();
+
+    RectangleComponent selfArea = RectangleComponent();
+    RectangleComponent selfParticipantArea = RectangleComponent();
+    RectangleComponent selfHandArea = RectangleComponent();
 
     return super.onLoad();
   }

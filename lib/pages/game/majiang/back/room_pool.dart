@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:colla_chat/pages/game/majiang/room.dart';
+import 'package:colla_chat/pages/game/majiang/back/room.dart';
 import 'package:colla_chat/tool/json_util.dart';
 
 class MajiangRoomPool {

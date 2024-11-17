@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:colla_chat/pages/game/majiang/card_util.dart';
-import 'package:colla_chat/pages/game/majiang/room.dart';
-import 'package:colla_chat/pages/game/majiang/split_card.dart';
+import 'package:colla_chat/pages/game/majiang/back/card_util.dart';
+import 'package:colla_chat/pages/game/majiang/back/room.dart';
+import 'package:colla_chat/pages/game/majiang/back/split_card.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/number_util.dart';
 import 'package:flutter/material.dart';

@@ -92,7 +92,7 @@ class Card {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return toString() == other.toString();
   }
 }

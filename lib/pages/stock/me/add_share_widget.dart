@@ -1,6 +1,6 @@
 import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
-import 'package:colla_chat/pages/stock/me/stock_line_chart_widget.dart';
+import 'package:colla_chat/plugin/chart/k_chart/kline_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/share.dart';
@@ -67,8 +67,8 @@ class AddShareWidget extends StatelessWidget with TileDataMixin {
                 onTap: (int index, String title, {String? subtitle}) async {
                   Share? share = await shareService.findShare(tsCode);
                   String name = share?.name ?? '';
-                  multiStockLineController.replaceAll([tsCode]);
-                  multiStockLineController.put(tsCode, name);
+                  multiKlineController.replaceAll([tsCode]);
+                  multiKlineController.put(tsCode, name);
                   indexWidgetProvider.push('stockline_chart');
                 });
           }

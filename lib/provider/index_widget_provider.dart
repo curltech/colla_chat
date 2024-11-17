@@ -1,6 +1,7 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -169,6 +170,7 @@ class IndexWidgetProvider with ChangeNotifier {
       index = views.length - 1;
       if (index < mainViews.length) {
         index = _currentMainIndex;
+        appDataProvider.toggleBodyRatio(zero: false);
       }
       controller.move(index);
       notifyListeners();

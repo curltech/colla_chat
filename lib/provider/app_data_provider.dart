@@ -128,17 +128,31 @@ class AppDataProvider with ChangeNotifier {
     }
   }
 
-  changeBodyRatio() {
-    if (_bodyRatio == 0) {
-      if (_totalSize.width >= largeBreakpointLimit) {
-        _bodyRatio = 40;
-      } else if (_totalSize.width >= smallBreakpointLimit) {
-        _bodyRatio = 50;
+  toggleBodyRatio({bool? zero}) {
+    if (zero != null) {
+      if (zero) {
+        _bodyRatio = 0;
+      } else {
+        if (_totalSize.width >= largeBreakpointLimit) {
+          _bodyRatio = 40;
+        } else if (_totalSize.width >= smallBreakpointLimit) {
+          _bodyRatio = 50;
+        } else {
+          _bodyRatio = 0;
+        }
+      }
+    } else {
+      if (_bodyRatio == 0) {
+        if (_totalSize.width >= largeBreakpointLimit) {
+          _bodyRatio = 40;
+        } else if (_totalSize.width >= smallBreakpointLimit) {
+          _bodyRatio = 50;
+        } else {
+          _bodyRatio = 0;
+        }
       } else {
         _bodyRatio = 0;
       }
-    } else {
-      _bodyRatio = 0;
     }
     notifyListeners();
   }

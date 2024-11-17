@@ -84,7 +84,7 @@ class PrimaryNavigation {
           color: myself.primary,
           tooltip: AppLocalizations.t('Change body ratio'),
           onPressed: () {
-            appDataProvider.changeBodyRatio();
+            appDataProvider.toggleBodyRatio();
           },
           icon: const Icon(Icons.width_wide_outlined)),
     ]);
