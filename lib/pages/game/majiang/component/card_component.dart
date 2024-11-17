@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
 
@@ -11,9 +10,13 @@ import 'package:flame/events.dart';
 /// flame引擎渲染的麻将牌
 class CardComponent extends PositionComponent
     with DragCallbacks, TapCallbacks, HasGameRef<MajiangFlameGame> {
-  CardComponent(this.card, this.cardBackgroundType) : super();
+  CardComponent(this.card, this.direction, this.cardBackgroundType,
+      {super.position});
 
   final Card card;
+
+  /// 0:自己，1:下家，2:对家，3:上家
+  final int direction;
 
   final CardBackgroundType cardBackgroundType;
 
@@ -45,17 +48,57 @@ class CardComponent extends PositionComponent
 
   /// 根据不同的牌进行不同的渲染
   /// 自己的手牌handcard
-  ///自己的河牌，碰牌或者杠牌touchcard
-  ///对家的手牌opponenthand
-  ///对家的河牌，碰牌或者杠牌touchcard
-  ///下家的手牌sidehand
-  ///下家的河牌sidecard
-  ///上家的手牌sidehand
-  ///上家的河牌sidecard
+  /// 自己的河牌，碰牌或者杠牌touchcard
+  /// 对家的手牌opponenthand
+  /// 对家的河牌，碰牌或者杠牌touchcard
+  /// 下家的手牌sidehand
+  /// 下家的河牌sidecard
+  /// 上家的手牌sidehand
+  /// 上家的河牌sidecard
   @override
   void render(Canvas canvas) {
     Sprite? backgroundSprite = cardBackgroundSprite.sprites[cardBackgroundType];
-    _drawSprite(canvas, card.sprite, 0.1, 0.08);
-    _drawSprite(canvas, backgroundSprite!, 0.1, 0.08);
+    switch (cardBackgroundType) {
+      case CardBackgroundType.handcard:
+        _drawSprite(canvas, backgroundSprite!, 0.1, 0.08);
+        _drawSprite(canvas, card.sprite, 0.1, 0.08);
+        break;
+      case CardBackgroundType.touchcard:
+        if (direction == 0) {
+          _drawSprite(canvas, backgroundSprite!, 0.1, 0.08);
+          _drawSprite(canvas, card.sprite, 0.1, 0.08);
+        }
+        if (direction == 2) {
+          _drawSprite(canvas, backgroundSprite!, 0.1, 0.08);
+          _drawSprite(canvas, card.sprite, 0.1, 0.08);
+        }
+        break;
+      case CardBackgroundType.opponenthand:
+        _drawSprite(canvas, backgroundSprite!, 0.1, 0.08);
+        _drawSprite(canvas, card.sprite, 0.1, 0.08);
+        break;
+      case CardBackgroundType.sidehand:
+        if (direction == 1) {
+          _drawSprite(canvas, backgroundSprite!, 0.1, 0.08);
+          _drawSprite(canvas, card.sprite, 0.1, 0.08);
+        }
+        if (direction == 3) {
+          _drawSprite(canvas, backgroundSprite!, 0.1, 0.08);
+          _drawSprite(canvas, card.sprite, 0.1, 0.08);
+        }
+        break;
+      case CardBackgroundType.sidecard:
+        if (direction == 1) {
+          _drawSprite(canvas, backgroundSprite!, 0.1, 0.08);
+          _drawSprite(canvas, card.sprite, 0.1, 0.08);
+        }
+        if (direction == 3) {
+          _drawSprite(canvas, backgroundSprite!, 0.1, 0.08);
+          _drawSprite(canvas, card.sprite, 0.1, 0.08);
+        }
+        break;
+      default:
+        break;
+    }
   }
 }

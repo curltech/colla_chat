@@ -1,12 +1,12 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/game/majiang/base/RoundParticipant.dart';
+import 'package:colla_chat/pages/game/majiang/base/card.dart' as majiangCard;
 import 'package:colla_chat/pages/game/majiang/base/room.dart';
 import 'package:colla_chat/pages/game/majiang/base/room_pool.dart';
 import 'package:colla_chat/pages/game/majiang/base/round.dart';
 import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -18,7 +18,6 @@ import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:colla_chat/pages/game/majiang/base/card.dart' as majiangCard;
 
 /// 18m麻将游戏
 class Majiang18mWidget extends StatelessWidget with TileDataMixin {
@@ -42,7 +41,8 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
 
   final Rx<Room?> room = Rx<Room?>(null);
 
-  final RxInt currentRoundParticipant = 0.obs;
+  final Rx<ParticipantDirection> currentDirection =
+      ParticipantDirection.east.obs;
 
   final Map<int, String> directions = {
     0: AppLocalizations.t('East'),
@@ -173,31 +173,38 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
           tooltip: AppLocalizations.t('New round'),
           onPressed: () {
             room.onRoomEvent(RoomEvent(room.name, null,
-                room.currentParticipant!, RoomEventAction.round));
+                room.currentDirection.index, RoomEventAction.round));
           },
           icon: const Icon(Icons.newspaper_outlined)));
       rightWidgets.add(IconButton(
           tooltip: AppLocalizations.t('Check complete'),
           onPressed: () {
-            int? currentRound = room.currentRound;
+            Round? currentRound = room.currentRound;
             if (currentRound == null) {
               return;
             }
-            Round round = room.rounds[currentRound];
-            int currentRoundParticipant = round.currentRoundParticipant;
-            RoundParticipant roundParticipant =
-                round.roundParticipants[currentRoundParticipant];
-
-            majiangCard.Card? sendCard = round.sendCard;
-            majiangCard.Card? takeCard = roundParticipant.handPile.takeCard;
+            RoundParticipant? currentRoundParticipant =
+                room.currentRoundParticipant;
+            if (currentRoundParticipant == null) {
+              return;
+            }
+            majiangCard.Card? sendCard = currentRound.sendCard;
+            majiangCard.Card? takeCard =
+                currentRoundParticipant.handPile.takeCard;
             if (sendCard != null) {
-              roundParticipant.onRoomEvent(RoomEvent(room.name, round.id,
-                  currentRoundParticipant, RoomEventAction.checkComplete,
+              currentRoundParticipant.onRoomEvent(RoomEvent(
+                  room.name,
+                  currentRound.id,
+                  currentRoundParticipant.direction.index,
+                  RoomEventAction.checkComplete,
                   card: sendCard));
             }
             if (takeCard != null) {
-              roundParticipant.onRoomEvent(RoomEvent(room.name, round.id,
-                  currentRoundParticipant, RoomEventAction.checkComplete,
+              currentRoundParticipant.onRoomEvent(RoomEvent(
+                  room.name,
+                  currentRound.id,
+                  currentRoundParticipant.direction.index,
+                  RoomEventAction.checkComplete,
                   card: takeCard));
             }
           },
@@ -205,18 +212,20 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
       rightWidgets.add(IconButton(
           tooltip: AppLocalizations.t('Check take'),
           onPressed: () {
-            int? currentRound = room.currentRound;
+            Round? currentRound = room.currentRound;
             if (currentRound == null) {
               return;
             }
-            Round round = room.rounds[currentRound];
-            int currentRoundParticipant = round.currentRoundParticipant;
-            RoundParticipant roundParticipant =
-                round.roundParticipants[currentRoundParticipant];
-            majiangCard.Card? takeCard = roundParticipant.handPile.takeCard;
+            RoundParticipant currentRoundParticipant =
+                currentRound.currentRoundParticipant;
+            majiangCard.Card? takeCard =
+                currentRoundParticipant.handPile.takeCard;
             if (takeCard != null) {
-              roundParticipant.onRoomEvent(RoomEvent(room.name, round.id,
-                  currentRoundParticipant, RoomEventAction.checkComplete,
+              currentRoundParticipant.onRoomEvent(RoomEvent(
+                  room.name,
+                  currentRound.id,
+                  currentRoundParticipant.direction.index,
+                  RoomEventAction.checkComplete,
                   card: takeCard));
             }
           },

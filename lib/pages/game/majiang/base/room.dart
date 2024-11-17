@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/game/majiang/base/RoundParticipant.dart';
 import 'package:colla_chat/pages/game/majiang/base/card.dart';
 import 'package:colla_chat/pages/game/majiang/base/full_pile.dart';
 import 'package:colla_chat/pages/game/majiang/base/participant.dart';
@@ -11,8 +12,9 @@ import 'package:colla_chat/pages/game/majiang/base/suit.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/number_util.dart';
 
-enum ParticipantPosition { east, south, west, north }
+enum ParticipantDirection { east, south, west, north }
 
 enum RoomEventAction {
   room, //新房间
@@ -55,6 +57,7 @@ class RoomEvent {
   /// 行为发生的来源参与者，比如0胡了1打出的牌
   final int? src;
 
+  /// 事件指定的牌的位置
   final int? pos;
 
   /// 每个事件的内容不同，
@@ -101,10 +104,10 @@ class Room {
   final List<Round> rounds = [];
 
   /// 当前轮
-  int? currentRound;
+  int? currentRoundIndex;
 
   /// 游戏的当前参与者视角
-  int? currentParticipant;
+  ParticipantDirection currentDirection = ParticipantDirection.east;
 
   /// 胡牌的分数
   Map<CompleteType, int> completeTypeScores = {
@@ -132,7 +135,7 @@ class Room {
     for (int i = 0; i < peerIds.length; ++i) {
       String peerId = peerIds[i];
       if (myself.peerId == peerId) {
-        currentParticipant = i;
+        currentDirection = NumberUtil.toEnum(ParticipantDirection.values, i)!;
       }
       Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
       String linkmanName =
@@ -206,11 +209,26 @@ class Room {
     throw 'error position';
   }
 
+  Round? get currentRound {
+    if (currentRoundIndex != null) {
+      return rounds[currentRoundIndex!];
+    }
+    return null;
+  }
+
+  Participant get currentParticipant {
+    return participants[currentDirection.index];
+  }
+
+  RoundParticipant? get currentRoundParticipant {
+    return currentRound?.currentRoundParticipant;
+  }
+
   /// 新玩一局，positions为空自己发牌，不为空，别人发牌
   createRound({List<int>? randoms}) {
     Round round = Round(rounds.length, this);
     rounds.add(round);
-    currentRound = round.id;
+    currentRoundIndex = round.id;
   }
 
   /// 房间的事件有外部触发，所有订阅者都会触发监听事件，本方法由外部调用，比如外部的消息chatMessage

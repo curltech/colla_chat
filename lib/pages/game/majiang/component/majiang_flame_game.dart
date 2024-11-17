@@ -1,3 +1,4 @@
+import 'package:colla_chat/pages/game/majiang/base/room.dart';
 import 'package:colla_chat/pages/game/majiang/component/next_hand_area_component.dart';
 import 'package:colla_chat/pages/game/majiang/component/next_participant_area_component.dart';
 import 'package:colla_chat/pages/game/majiang/component/next_waste_area_component.dart';
@@ -71,6 +72,8 @@ class MajiangFlameGame extends FlameGame
             camera: CameraComponent.withFixedResolution(
                 width: width, height: height));
 
+  Room? room;
+
   late final SpriteComponent backgroundComponent;
 
   static const zoomPerScrollUnit = 0.02;
@@ -99,8 +102,8 @@ class MajiangFlameGame extends FlameGame
       SelfParticipantAreaComponent();
   SelfHandAreaComponent selfHandAreaComponent = SelfHandAreaComponent();
 
-  @override
-  bool debugMode = true;
+  // @override
+  // bool debugMode = true;
 
   @override
   Color backgroundColor() {

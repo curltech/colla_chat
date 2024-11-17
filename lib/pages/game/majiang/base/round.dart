@@ -47,7 +47,7 @@ class Round {
   /// 如果都是pass消解等待的，则发牌，有一家是非pass消解的不发牌
   List<int> waiting = [];
 
-  late final int currentRoundParticipant;
+  ParticipantDirection currentDirection = ParticipantDirection.east;
 
   /// 本轮的随机洗牌数组
   late List<int> randoms;
@@ -111,6 +111,10 @@ class Round {
     }
 
     _take(banker!);
+  }
+
+  RoundParticipant get currentRoundParticipant {
+    return roundParticipants[currentDirection.index];
   }
 
   /// 打牌
