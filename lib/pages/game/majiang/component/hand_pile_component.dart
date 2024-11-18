@@ -14,7 +14,11 @@ import 'package:flame/events.dart';
 class HandPileComponent extends RectangleComponent
     with DragCallbacks, TapCallbacks, HasGameRef<MajiangFlameGame> {
   HandPileComponent(this.handPile, this.direction,
-      {super.position, super.anchor = Anchor.center});
+      {super.position,
+      super.scale,
+      super.priority,
+      super.size,
+      super.anchor = Anchor.center});
 
   final HandPile handPile;
 
@@ -22,7 +26,7 @@ class HandPileComponent extends RectangleComponent
   final int direction;
 
   /// 绘制牌的图像，有相对的偏移量，旋转，放大等参数
-  void _loadHandPile() {
+  void loadHandPile() {
     CardBackgroundType cardBackgroundType;
     if (direction == 0) {
       cardBackgroundType = CardBackgroundType.handcard;
@@ -95,7 +99,7 @@ class HandPileComponent extends RectangleComponent
 
   @override
   FutureOr<void> onLoad() {
-    _loadHandPile();
+    loadHandPile();
 
     return super.onLoad();
   }
