@@ -11,9 +11,10 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 
 /// flame引擎渲染的麻将牌
-class HandPileComponent extends PositionComponent
+class HandPileComponent extends RectangleComponent
     with DragCallbacks, TapCallbacks, HasGameRef<MajiangFlameGame> {
-  HandPileComponent(this.handPile, this.direction, {super.position});
+  HandPileComponent(this.handPile, this.direction,
+      {super.position, super.anchor = Anchor.center});
 
   final HandPile handPile;
 
@@ -74,7 +75,7 @@ class HandPileComponent extends PositionComponent
       Card card = handPile.cards[i];
       Vector2? position;
       if (direction == 0) {
-        position = Vector2(i * 80, 0);
+        position = Vector2(i * 60, 0);
       }
       if (direction == 2) {
         position = Vector2(i * 70, 0);

@@ -138,9 +138,7 @@ class HandPile extends Pile {
     }
     List<Card> cards = [...this.cards];
     cards.add(takeCard!);
-    cards.sort((Card a, Card b) {
-      return a.toString().compareTo(b.toString());
-    });
+    Pile.sortCard(cards);
     int length = cards.length;
     if (length < 4) {
       return null;

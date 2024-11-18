@@ -135,8 +135,7 @@ class Room {
 
   /// 加参与者，第一个是自己，第二个是下家，第三个是对家，第四个是上家
   Future<void> init(List<String> peerIds) async {
-    Image defaultImage =
-        await Flame.images.load(AppImageFile.defaultAvatarFile);
+    Image defaultImage = await Flame.images.load('app.png');
     for (int i = 0; i < peerIds.length; ++i) {
       String peerId = peerIds[i];
       if (myself.peerId == peerId) {
@@ -237,7 +236,7 @@ class Room {
 
   /// 新玩一局，positions为空自己发牌，不为空，别人发牌
   createRound({List<int>? randoms}) {
-    Round round = Round(rounds.length, this);
+    Round round = Round(rounds.length, this, randoms: randoms);
     rounds.add(round);
     currentRoundIndex = round.id;
   }
@@ -250,7 +249,7 @@ class Room {
       round = rounds[roundId];
     }
     if (roomEvent.action == RoomEventAction.room) {
-    } else if (roomEvent.action == RoomEventAction.room) {
+    } else if (roomEvent.action == RoomEventAction.round) {
       List<int>? randoms;
       String? content = roomEvent.content;
       if (content != null) {

@@ -6,7 +6,7 @@ import 'package:colla_chat/tool/entity_util.dart';
 /// 实体有toJason和fromJson两个方法
 class JsonUtil {
   /// 把map，json字符串和一般的实体转换成map或者list，map转换成一般实体使用实体的fromJson构造函数
-  static dynamic toJson(dynamic entity) {
+  static dynamic toJson(dynamic entity, {bool removeNull = false}) {
     if (entity == null) {
       return null;
     }
@@ -30,7 +30,9 @@ class JsonUtil {
       return json;
     }
     Map map = entity.toJson();
-    EntityUtil.removeNull(map);
+    if (removeNull) {
+      EntityUtil.removeNull(map);
+    }
 
     return map;
   }

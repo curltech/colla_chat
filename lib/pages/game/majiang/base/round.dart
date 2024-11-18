@@ -51,22 +51,12 @@ class Round {
   late List<int> randoms;
 
   Round(this.id, this.room, {List<int>? randoms}) {
-    List<Card> stockCards = [];
-    for (int i = 0; i < 4; ++i) {
-      stockCards.addAll(fullPile.cards);
-    }
-    stockPile = StockPile(cards: stockCards);
-    for (int i = 0; i < room.participants.length; ++i) {
-      Participant participant = room.participants[i];
-      RoundParticipant roundParticipant =
-          RoundParticipant(i, this, participant);
-      roundParticipants.add(roundParticipant);
-    }
     if (randoms == null) {
       this.randoms = [];
     } else {
       this.randoms = randoms;
     }
+
     init();
   }
 
@@ -81,21 +71,36 @@ class Round {
       keeper = banker;
     }
 
+    for (int i = 0; i < room.participants.length; ++i) {
+      Participant participant = room.participants[i];
+      RoundParticipant roundParticipant =
+          RoundParticipant(i, this, participant);
+      roundParticipants.add(roundParticipant);
+    }
+    List<Card> stockCards = [
+      ...fullPile.cards,
+      ...fullPile.cards,
+      ...fullPile.cards,
+      ...fullPile.cards
+    ];
+    stockPile = StockPile();
     Random random = Random.secure();
     for (int i = 0; i < 136; ++i) {
       int pos;
       if (i < randoms.length) {
         pos = randoms[i];
       } else {
-        pos = random.nextInt(stockPile.cards.length);
+        pos = random.nextInt(stockCards.length);
         randoms.add(pos);
       }
-      Card card = stockPile.cards.removeAt(pos);
+      Card card = stockCards.removeAt(pos);
 
       /// 每个参与者发13张牌
       if (i < 52) {
         int reminder = (i + banker!) % 4;
         roundParticipants[reminder].handPile.cards.add(card);
+      } else {
+        stockPile.cards.add(card);
       }
     }
     length = randoms.length;

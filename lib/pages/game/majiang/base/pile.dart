@@ -17,11 +17,23 @@ class Pile {
     }
   }
 
+  static sortCard(List<Card> cards) {
+    cards.sort((Card a, Card b) {
+      if (a.suit != Suit.wind && b.suit != Suit.wind) {
+        return a.toString().compareTo(b.toString());
+      } else if (a.suit == Suit.wind && b.suit != Suit.wind) {
+        return -1;
+      } else if (a.suit != Suit.wind && b.suit == Suit.wind) {
+        return 1;
+      } else {
+        return a.windSuit!.index.compareTo(b.windSuit!.index);
+      }
+    });
+  }
+
   /// 排序
   sort() {
-    cards.sort((Card a, Card b) {
-      return a.toString().compareTo(b.toString());
-    });
+    sortCard(cards);
   }
 
   /// 洗牌

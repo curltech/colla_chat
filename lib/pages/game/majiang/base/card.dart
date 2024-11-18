@@ -20,8 +20,9 @@ class Card {
   }
 
   check() {
-    if (!(suit == Suit.wind && windSuit != null) ||
+    if ((suit == Suit.wind && windSuit != null) ||
         (suit != Suit.wind && rank != null)) {
+    } else {
       throw 'error card';
     }
   }

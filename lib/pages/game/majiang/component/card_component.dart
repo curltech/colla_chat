@@ -8,10 +8,10 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 
 /// flame引擎渲染的麻将牌
-class CardComponent extends PositionComponent
+class CardComponent extends RectangleComponent
     with DragCallbacks, TapCallbacks, HasGameRef<MajiangFlameGame> {
   CardComponent(this.card, this.direction, this.cardBackgroundType,
-      {super.position});
+      {super.position}):super(priority: 4);
 
   final Card card;
 
@@ -60,8 +60,8 @@ class CardComponent extends PositionComponent
     Sprite? backgroundSprite = cardBackgroundSprite.sprites[cardBackgroundType];
     switch (cardBackgroundType) {
       case CardBackgroundType.handcard:
-        _drawSprite(canvas, backgroundSprite!, 0.1, 0.08);
-        _drawSprite(canvas, card.sprite, 0.1, 0.08);
+        _drawSprite(canvas, backgroundSprite!, 0, 0,scale: 0.8);
+        _drawSprite(canvas, card.sprite, 0, 0,scale: 0.8);
         break;
       case CardBackgroundType.touchcard:
         if (direction == 0) {

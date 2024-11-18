@@ -196,8 +196,9 @@ class RoundParticipant {
 
   /// 摸牌，有三种摸牌，普通的自摸，海底捞的自摸，杠上自摸
   /// owner摸到card牌，takeCardType表示摸牌的方式
-  List<int>? _take(int owner, Card card, int pos) {
-    TakeCardType? takeCardType = NumberUtil.toEnum(TakeCardType.values, pos);
+  List<int>? _take(int owner, Card card, int takeCardTypeIndex) {
+    TakeCardType? takeCardType =
+        NumberUtil.toEnum(TakeCardType.values, takeCardTypeIndex);
     if (takeCardType == null) {
       return null;
     }

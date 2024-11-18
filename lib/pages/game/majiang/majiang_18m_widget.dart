@@ -6,6 +6,7 @@ import 'package:colla_chat/pages/game/majiang/base/room.dart';
 import 'package:colla_chat/pages/game/majiang/base/room_pool.dart';
 import 'package:colla_chat/pages/game/majiang/base/round.dart';
 import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
+import 'package:colla_chat/pages/game/majiang/room_controller.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -37,16 +38,6 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Majiang 18m';
 
-  MajiangFlameGame? majiangFlameGame;
-
-  final Rx<Room?> room = Rx<Room?>(null);
-
-  /// 自己是哪个方位的参与者，因为系统支持以哪个方位的参与者游戏
-  /// 所以在玩的过程中可以切换方位，即可以模拟或者代替其他的参与者玩
-  /// 比如，当前登录用户是东，除了可以打东的牌以外，通过切换方位也可以打南的牌
-  final Rx<ParticipantDirection?> currentDirection =
-      Rx<ParticipantDirection?>(null);
-
   final Map<int, String> directions = {
     0: AppLocalizations.t('East'),
     1: AppLocalizations.t('South'),
@@ -63,7 +54,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
   List<String> peerIds = [myself.peerId!];
 
   //房间成员显示界面
-  Widget _buildRoomPartcipantWidget(BuildContext context) {
+  Widget _buildRoomParticipantWidget(BuildContext context) {
     return Column(children: [
       CommonAutoSizeTextFormField(
         controller: textEditingController,
@@ -93,8 +84,9 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
   }
 
   Future<void> createRoom(String name) async {
-    room.value = await roomPool.createRoom(name, peerIds);
-    currentDirection.value = room.value!.currentDirection;
+    roomController.room.value = await roomPool.createRoom(name, peerIds);
+    roomController.currentDirection.value =
+        roomController.room.value!.currentDirection;
   }
 
   /// 弹出对话框，输入名称，选择参加的人
@@ -120,7 +112,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
                   ),
                   Padding(
                       padding: const EdgeInsets.all(15.0),
-                      child: _buildRoomPartcipantWidget(context)),
+                      child: _buildRoomParticipantWidget(context)),
                   const Spacer(),
                   Padding(
                       padding: const EdgeInsets.all(15.0),
@@ -154,15 +146,17 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
   }
 
   List<Widget> _buildRightWidgets(BuildContext context) {
-    Room? room = this.room.value;
+    Room? room = roomController.room.value;
     List<Widget>? rightWidgets = [
       IconButton(
           tooltip: AppLocalizations.t('Full screen'),
           onPressed: () async {
-            fullscreen.value = true;
-            await DialogUtil.showFullScreen(
-                context: context, child: GameWidget(game: majiangFlameGame!));
-            fullscreen.value = false;
+            // if (gameWidget != null) {
+            //   fullscreen.value = true;
+            //   await DialogUtil.showFullScreen(
+            //       context: context, child: gameWidget!);
+            //   fullscreen.value = false;
+            // }
           },
           icon: const Icon(Icons.fullscreen)),
       IconButton(
@@ -193,8 +187,8 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
             if (currentRound == null) {
               return;
             }
-            RoundParticipant? currentRoundParticipant =
-                room.getRoundParticipant(currentDirection.value!);
+            RoundParticipant? currentRoundParticipant = room
+                .getRoundParticipant(roomController.currentDirection.value!);
             if (currentRoundParticipant == null) {
               return;
             }
@@ -222,8 +216,8 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
       rightWidgets.add(IconButton(
           tooltip: AppLocalizations.t('Check take'),
           onPressed: () {
-            RoundParticipant? currentRoundParticipant =
-                room.getRoundParticipant(currentDirection.value!);
+            RoundParticipant? currentRoundParticipant = room
+                .getRoundParticipant(roomController.currentDirection.value!);
             majiangCard.Card? takeCard =
                 currentRoundParticipant?.handPile.takeCard;
             if (takeCard != null) {
@@ -245,12 +239,11 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      majiangFlameGame = MajiangFlameGame();
       return AppBarView(
           title: title,
           withLeading: true,
           rightWidgets: _buildRightWidgets(context),
-          child: GameWidget(game: majiangFlameGame!));
+          child: GameWidget(game: MajiangFlameGame()));
     });
   }
 }
