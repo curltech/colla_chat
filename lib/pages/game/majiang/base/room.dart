@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
@@ -13,6 +14,8 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/number_util.dart';
+import 'package:flame/components.dart';
+import 'package:flame/flame.dart';
 
 enum ParticipantDirection { east, south, west, north }
 
@@ -132,18 +135,25 @@ class Room {
 
   /// 加参与者，第一个是自己，第二个是下家，第三个是对家，第四个是上家
   Future<void> init(List<String> peerIds) async {
+    Image defaultImage =
+        await Flame.images.load(AppImageFile.defaultAvatarFile);
     for (int i = 0; i < peerIds.length; ++i) {
       String peerId = peerIds[i];
       if (myself.peerId == peerId) {
         currentDirection = NumberUtil.toEnum(ParticipantDirection.values, i)!;
       }
       Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
-      String linkmanName =
-          linkman == null ? AppLocalizations.t('unknown') : linkman.name;
+      String linkmanName = AppLocalizations.t('unknown');
+      Image image = defaultImage;
+      if (linkman != null) {
+        linkmanName = linkman.name;
+        if (linkman.avatar != null) {
+          image =
+              await Flame.images.fromBase64('linkmanName.png', linkman.avatar!);
+        }
+      }
       Participant participant = Participant(peerId, linkmanName, room: this);
-      participant.avatarWidget =
-          linkman == null ? AppImage.mdAppImage : linkman.avatarImage;
-      participant.avatarWidget ??= AppImage.mdAppImage;
+      participant.sprite = Sprite(image);
       participants.add(participant);
     }
     if (peerIds.length < 4) {
@@ -154,7 +164,7 @@ class Room {
           room: this,
           robot: true,
         );
-        participant.avatarWidget ??= AppImage.mdAppImage;
+        participant.sprite ??= Sprite(defaultImage);
         participants.add(participant);
       }
     }
@@ -216,6 +226,7 @@ class Room {
     return null;
   }
 
+  /// 当前登录用户对应的参与者
   Participant get currentParticipant {
     return participants[currentDirection.index];
   }

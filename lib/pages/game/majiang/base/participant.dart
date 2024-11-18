@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:colla_chat/pages/game/majiang/base/room.dart';
+import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -12,7 +13,7 @@ class Participant {
 
   final String name;
 
-  Widget? avatarWidget;
+  Sprite? sprite;
 
   ///是否是机器人
   final bool robot;

@@ -1,6 +1,8 @@
 import 'dart:ui';
 
+import 'package:colla_chat/pages/game/majiang/base/waste_pile.dart';
 import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
+import 'package:colla_chat/pages/game/majiang/component/waste_pile_component.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
@@ -10,6 +12,9 @@ class NextWasteAreaComponent extends RectangleComponent
   static final fillPaint = Paint()
     ..color = Colors.blue
     ..style = PaintingStyle.fill;
+
+  WastePile? wastePile;
+  WastePileComponent? wastePileComponent;
 
   NextWasteAreaComponent()
       : super(
@@ -26,6 +31,16 @@ class NextWasteAreaComponent extends RectangleComponent
                 MajiangFlameGame.width * MajiangFlameGame.nextWasteWidthRadio,
                 MajiangFlameGame.height * MajiangFlameGame.nextHeightRadio),
             paint: fillPaint);
+
+  loadWastePile() {
+    if (wastePileComponent != null) {
+      remove(wastePileComponent!);
+    }
+    if (wastePile != null) {
+      wastePileComponent = WastePileComponent(wastePile!, 1);
+      add(wastePileComponent!);
+    }
+  }
 
   @override
   Future<void> onLoad() async {}

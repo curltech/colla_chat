@@ -1,6 +1,8 @@
 import 'dart:ui';
 
+import 'package:colla_chat/pages/game/majiang/base/RoundParticipant.dart';
 import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
+import 'package:colla_chat/pages/game/majiang/component/round_participant_component.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
@@ -10,6 +12,9 @@ class PreviousParticipantAreaComponent extends RectangleComponent
   static final fillPaint = Paint()
     ..color = Colors.cyanAccent
     ..style = PaintingStyle.fill;
+
+  RoundParticipant? roundParticipant;
+  RoundParticipantComponent? roundParticipantComponent;
 
   PreviousParticipantAreaComponent()
       : super(
@@ -22,6 +27,17 @@ class PreviousParticipantAreaComponent extends RectangleComponent
                 MajiangFlameGame.width * MajiangFlameGame.previousWidthRadio,
                 MajiangFlameGame.height * MajiangFlameGame.previousHeightRadio),
             paint: fillPaint);
+
+  loadRoundParticipant() {
+    if (roundParticipantComponent != null) {
+      remove(roundParticipantComponent!);
+    }
+    if (roundParticipant != null) {
+      roundParticipantComponent =
+          RoundParticipantComponent(roundParticipant!, 3);
+      add(roundParticipantComponent!);
+    }
+  }
 
   @override
   Future<void> onLoad() async {}

@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:colla_chat/pages/game/majiang/base/hand_pile.dart';
+import 'package:colla_chat/pages/game/majiang/component/hand_pile_component.dart';
 import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +12,9 @@ class OpponentHandAreaComponent extends RectangleComponent
   static final fillPaint = Paint()
     ..color = Colors.blueGrey
     ..style = PaintingStyle.fill;
+
+  HandPile? handPile;
+  HandPileComponent? handPileComponent;
 
   OpponentHandAreaComponent()
       : super(
@@ -23,6 +28,16 @@ class OpponentHandAreaComponent extends RectangleComponent
                     MajiangFlameGame.opponentHandWidthRadio,
                 MajiangFlameGame.height * MajiangFlameGame.opponentHeightRadio),
             paint: fillPaint);
+
+  loadHandPile() {
+    if (handPileComponent != null) {
+      remove(handPileComponent!);
+    }
+    if (handPile != null) {
+      handPileComponent = HandPileComponent(handPile!, 2);
+      add(handPileComponent!);
+    }
+  }
 
   @override
   Future<void> onLoad() async {}
