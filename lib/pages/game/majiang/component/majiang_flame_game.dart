@@ -15,7 +15,7 @@ import 'package:flutter/material.dart';
 /// Camera.follow()，Camera.stop()，Camera.moveBy()，Camera.moveTo()，Camera.setBounds()
 class MajiangFlameGame extends FlameGame
     with
-        TapCallbacks,
+        // TapCallbacks,
         ScrollDetector,
         ScaleDetector,
         HasCollisionDetection,
@@ -153,23 +153,28 @@ class MajiangFlameGame extends FlameGame
     world.add(nextWasteAreaComponent);
     world.add(nextHandAreaComponent);
     world.add(nextParticipantAreaComponent);
-
-    return super.onLoad();
   }
 
-  @override
-  Future<void> onLongTapDown(TapDownEvent event) async {
-    Vector2 globalPosition = event.devicePosition;
-    Vector2 worldPosition = camera.globalToLocal(globalPosition);
-    camera.moveTo(worldPosition);
+  reload() {
+    opponentParticipantAreaComponent.loadRoundParticipant();
+    selfParticipantAreaComponent.loadRoundParticipant();
+    previousParticipantAreaComponent.loadRoundParticipant();
+    nextParticipantAreaComponent.loadRoundParticipant();
+    opponentHandAreaComponent.loadHandPile();
+    nextHandAreaComponent.loadHandPile();
+    selfHandAreaComponent.loadHandPile();
+    previousHandAreaComponent.loadHandPile();
+    previousWasteAreaComponent.loadWastePile();
+    opponentWasteAreaComponent.loadWastePile();
+    selfWasteAreaComponent.loadWastePile();
+    nextWasteAreaComponent.loadWastePile();
   }
-
-  @override
-  Future<void> onTapDown(TapDownEvent event) async {
-    Vector2 globalPosition = event.devicePosition;
-    Vector2 widgetPosition = event.canvasPosition;
-    Vector2 localPosition = event.localPosition;
-    Vector2 worldPosition = camera.globalToLocal(widgetPosition);
-    Vector2 cameraPosition = camera.viewfinder.position;
-  }
+// @override
+// Future<void> onTapDown(TapDownEvent event) async {
+//   Vector2 globalPosition = event.devicePosition;
+//   Vector2 widgetPosition = event.canvasPosition;
+//   Vector2 localPosition = event.localPosition;
+//   Vector2 worldPosition = camera.globalToLocal(widgetPosition);
+//   Vector2 cameraPosition = camera.viewfinder.position;
+// }
 }

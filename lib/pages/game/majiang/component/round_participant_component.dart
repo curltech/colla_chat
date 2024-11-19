@@ -1,23 +1,18 @@
 import 'dart:async';
 
 import 'package:colla_chat/pages/game/majiang/base/RoundParticipant.dart';
-import 'package:colla_chat/pages/game/majiang/base/card.dart';
-import 'package:colla_chat/pages/game/majiang/base/card_background_sprite.dart';
-import 'package:colla_chat/pages/game/majiang/base/format_card.dart';
 import 'package:colla_chat/pages/game/majiang/base/participant.dart';
-import 'package:colla_chat/pages/game/majiang/base/room.dart';
-import 'package:colla_chat/pages/game/majiang/base/round.dart';
-import 'package:colla_chat/pages/game/majiang/component/card_component.dart';
 import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
-import 'package:colla_chat/pages/game/majiang/room_controller.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:flame/text.dart';
+import 'package:flutter/material.dart';
 
 /// flame引擎渲染的麻将牌
 class RoundParticipantComponent extends PositionComponent
     with TapCallbacks, HasGameRef<MajiangFlameGame> {
   RoundParticipantComponent(this.roundParticipant, this.direction,
-      {super.position});
+      {super.position, super.size});
 
   final RoundParticipant roundParticipant;
 
@@ -25,25 +20,33 @@ class RoundParticipantComponent extends PositionComponent
   final int direction;
 
   SpriteComponent? spriteComponent;
-  TextBoxComponent? textBoxComponent;
+  TextComponent? textComponent;
 
   /// 绘制牌的图像，有相对的偏移量，旋转，放大等参数
   void loadTRoundParticipant() {
     if (spriteComponent != null) {
       remove(spriteComponent!);
     }
-    if (textBoxComponent != null) {
-      remove(textBoxComponent!);
+    if (textComponent != null) {
+      remove(textComponent!);
     }
     Participant participant = roundParticipant.participant;
     Sprite? sprite = participant.sprite;
     if (sprite != null) {
-      spriteComponent = SpriteComponent(sprite: sprite);
+      spriteComponent = SpriteComponent(
+          sprite: sprite, position: Vector2(0, 0), size: Vector2(32, 32));
       add(spriteComponent!);
     }
     String name = participant.name;
-    textBoxComponent = TextBoxComponent(text: name);
-    add(textBoxComponent!);
+    TextPaint textPaint = TextPaint(
+      style: const TextStyle(
+        color: Colors.black,
+        fontSize: 12.0,
+      ),
+    );
+    textComponent = TextComponent(
+        text: name, textRenderer: textPaint, position: Vector2(0, 32));
+    add(textComponent!);
   }
 
   @override

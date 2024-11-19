@@ -28,24 +28,26 @@ class TypePileComponent extends PositionComponent
     } else {
       cardBackgroundType = CardBackgroundType.sidecard;
     }
+    double x = 0;
+    double y = 0;
     for (int i = 0; i < typePile.cards.length; ++i) {
       Card card = typePile.cards[i];
-      Vector2? position;
       if (direction == 0) {
-        position = Vector2(i * 80, 0);
+        x += i * 75;
       }
       if (direction == 2) {
-        position = Vector2(i * 70, 0);
+        x += i * 37;
       }
       if (direction == 1) {
-        position = Vector2(0, i * 70);
+        y += i * 28;
       }
       if (direction == 3) {
-        position = Vector2(0, i * 70);
+        y += i * 28;
       }
+      Vector2 position = Vector2(x, y);
       CardComponent cardComponent = CardComponent(
           card, direction, cardBackgroundType,
-          position: position!);
+          position: position);
       add(cardComponent);
     }
   }

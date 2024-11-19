@@ -75,8 +75,10 @@ class ParticipantAreaComponent extends RectangleComponent
       RoundParticipant? roundParticipant =
           room.currentRound?.roundParticipants[direction];
       if (roundParticipant != null) {
-        roundParticipantComponent =
-            RoundParticipantComponent(roundParticipant, 1);
+        roundParticipantComponent = RoundParticipantComponent(
+            roundParticipant, 1,
+            size: Vector2(64, 42),
+            position: Vector2(size.x / 2 - 16, size.y / 2 - 16));
         add(roundParticipantComponent!);
       }
     }

@@ -96,4 +96,11 @@ class Card {
   bool operator ==(Object other) {
     return toString() == other.toString();
   }
+
+  Card copy() {
+    Card c = Card(suit, windSuit: windSuit, rank: rank);
+    c.sprite = sprite;
+
+    return c;
+  }
 }

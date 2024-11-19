@@ -1,17 +1,13 @@
-import 'dart:ui';
-
 import 'package:colla_chat/pages/game/majiang/base/hand_pile.dart';
 import 'package:colla_chat/pages/game/majiang/base/room.dart';
 import 'package:colla_chat/pages/game/majiang/component/hand_pile_component.dart';
 import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
 import 'package:colla_chat/pages/game/majiang/room_controller.dart';
 import 'package:flame/components.dart';
-import 'package:flame/events.dart';
-import 'package:flutter/material.dart';
 
 /// 手牌区域
-class HandAreaComponent extends RectangleComponent
-    with TapCallbacks, HasGameRef<MajiangFlameGame> {
+class HandAreaComponent extends PositionComponent
+    with HasGameRef<MajiangFlameGame> {
   final int direction;
 
   HandPileComponent? handPileComponent;
@@ -30,9 +26,9 @@ class HandAreaComponent extends RectangleComponent
       size = Vector2(
           MajiangFlameGame.width * MajiangFlameGame.selfHandWidthRadio,
           MajiangFlameGame.height * MajiangFlameGame.selfHeightRadio);
-      paint = Paint()
-        ..color = Colors.teal
-        ..style = PaintingStyle.fill;
+      // paint = Paint()
+      //   ..color = Colors.teal
+      //   ..style = PaintingStyle.fill;
     }
     if (direction == 1) {
       position = Vector2(
@@ -45,9 +41,9 @@ class HandAreaComponent extends RectangleComponent
       size = Vector2(
           MajiangFlameGame.width * MajiangFlameGame.nextHandWidthRadio,
           MajiangFlameGame.height * MajiangFlameGame.nextHeightRadio);
-      paint = Paint()
-        ..color = Colors.yellow
-        ..style = PaintingStyle.fill;
+      // paint = Paint()
+      //   ..color = Colors.yellow
+      //   ..style = PaintingStyle.fill;
     }
     if (direction == 2) {
       position = Vector2(
@@ -57,9 +53,9 @@ class HandAreaComponent extends RectangleComponent
       size = Vector2(
           MajiangFlameGame.width * MajiangFlameGame.opponentHandWidthRadio,
           MajiangFlameGame.height * MajiangFlameGame.opponentHeightRadio);
-      paint = Paint()
-        ..color = Colors.blueGrey
-        ..style = PaintingStyle.fill;
+      // paint = Paint()
+      //   ..color = Colors.blueGrey
+      //   ..style = PaintingStyle.fill;
     }
     if (direction == 3) {
       position = Vector2(
@@ -70,9 +66,9 @@ class HandAreaComponent extends RectangleComponent
       size = Vector2(
           MajiangFlameGame.width * MajiangFlameGame.previousHandWidthRadio,
           MajiangFlameGame.height * MajiangFlameGame.previousHeightRadio);
-      paint = Paint()
-        ..color = Colors.purple
-        ..style = PaintingStyle.fill;
+      // paint = Paint()
+      //   ..color = Colors.purple
+      //   ..style = PaintingStyle.fill;
     }
   }
 
@@ -90,10 +86,5 @@ class HandAreaComponent extends RectangleComponent
         add(handPileComponent!);
       }
     }
-  }
-
-  @override
-  void onTapDown(_) {
-    loadHandPile();
   }
 }

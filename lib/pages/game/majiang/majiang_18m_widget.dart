@@ -2,12 +2,14 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/game/majiang/base/RoundParticipant.dart';
 import 'package:colla_chat/pages/game/majiang/base/card.dart' as majiangCard;
+import 'package:colla_chat/pages/game/majiang/base/full_pile.dart';
 import 'package:colla_chat/pages/game/majiang/base/room.dart';
 import 'package:colla_chat/pages/game/majiang/base/room_pool.dart';
 import 'package:colla_chat/pages/game/majiang/base/round.dart';
 import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
 import 'package:colla_chat/pages/game/majiang/room_controller.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -24,7 +26,9 @@ import 'package:get/get.dart';
 class Majiang18mWidget extends StatelessWidget with TileDataMixin {
   ModelFlameGame? modelFlameGame;
 
-  Majiang18mWidget({super.key});
+  Majiang18mWidget({super.key}) {
+    logger.i('Full majiang cards category number is:${fullPile.cards.length}');
+  }
 
   @override
   bool get withLeading => true;
@@ -37,6 +41,8 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'Majiang 18m';
+
+  MajiangFlameGame majiangFlameGame = MajiangFlameGame();
 
   final Map<int, String> directions = {
     0: AppLocalizations.t('East'),
@@ -178,6 +184,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
 
             room.onRoomEvent(RoomEvent(room.name, null,
                 room.currentDirection.index, RoomEventAction.round));
+            majiangFlameGame.reload();
           },
           icon: const Icon(Icons.newspaper_outlined)));
       rightWidgets.add(IconButton(
@@ -243,7 +250,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
           title: title,
           withLeading: true,
           rightWidgets: _buildRightWidgets(context),
-          child: GameWidget(game: MajiangFlameGame()));
+          child: GameWidget(game: majiangFlameGame));
     });
   }
 }

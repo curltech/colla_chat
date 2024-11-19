@@ -1,20 +1,29 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:colla_chat/pages/game/majiang/base/card.dart';
+import 'package:colla_chat/pages/game/majiang/base/card.dart' as majiangCard;
 import 'package:colla_chat/pages/game/majiang/base/card_background_sprite.dart';
+import 'package:colla_chat/pages/game/majiang/base/hand_pile.dart';
+import 'package:colla_chat/pages/game/majiang/base/room.dart';
+import 'package:colla_chat/pages/game/majiang/base/round.dart';
 import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
+import 'package:colla_chat/pages/game/majiang/room_controller.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:flutter/material.dart';
 
 /// flame引擎渲染的麻将牌
-class CardComponent extends RectangleComponent
-    with DragCallbacks, TapCallbacks, HasGameRef<MajiangFlameGame> {
+class CardComponent extends PositionComponent
+    with TapCallbacks, HasGameRef<MajiangFlameGame> {
   CardComponent(this.card, this.direction, this.cardBackgroundType,
-      {super.position})
-      : super(priority: 4);
+      {super.position}) {
+    if (direction == 0) {
+      size = Vector2(card.sprite.image.width.toDouble(),
+          card.sprite.image.height.toDouble());
+    }
+  }
 
-  final Card card;
+  final majiangCard.Card card;
 
   /// 0:自己，1:下家，2:对家，3:上家
   final int direction;
@@ -55,8 +64,8 @@ class CardComponent extends RectangleComponent
   /// 下家的河牌sidecard
   /// 上家的手牌sidehand
   /// 上家的河牌sidecard
-  @override
-  void render(Canvas canvas) {
+
+  void _render(Canvas canvas) {
     Sprite? backgroundSprite = cardBackgroundSprite.sprites[cardBackgroundType];
     if (backgroundSprite == null) {
       return;
@@ -102,6 +111,52 @@ class CardComponent extends RectangleComponent
         break;
       default:
         break;
+    }
+  }
+
+  @override
+  void render(Canvas canvas) {
+    _render(canvas);
+  }
+
+  send() {
+    Room? room = roomController.room.value;
+    if (room != null) {
+      Round? currentRound = room.currentRound;
+      if (currentRound == null) {
+        return;
+      }
+      HandPile handPile = currentRound.roundParticipants[direction].handPile;
+      if (handPile.takeCard == card) {
+        room.onRoomEvent(RoomEvent(
+          room.name,
+          currentRound.id,
+          direction,
+          RoomEventAction.send,
+          card: card,
+          pos: -1,
+        ));
+      } else {
+        int pos = handPile.cards.indexOf(card);
+        if (pos > -1) {
+          room.onRoomEvent(RoomEvent(
+            room.name,
+            currentRound.id,
+            direction,
+            RoomEventAction.send,
+            card: card,
+            pos: pos,
+          ));
+        }
+      }
+    }
+  }
+
+  @override
+  void onTapUp(TapUpEvent event) {
+    /// 点击自家的牌表示打牌
+    if (direction == 0) {
+      send();
     }
   }
 }
