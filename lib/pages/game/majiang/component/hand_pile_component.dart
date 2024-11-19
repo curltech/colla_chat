@@ -1,6 +1,7 @@
 import 'dart:async';
+import 'dart:ui';
 
-import 'package:colla_chat/pages/game/majiang/base/card.dart';
+import 'package:colla_chat/pages/game/majiang/base/card.dart' as majiangCard;
 import 'package:colla_chat/pages/game/majiang/base/card_background_sprite.dart';
 import 'package:colla_chat/pages/game/majiang/base/format_card.dart';
 import 'package:colla_chat/pages/game/majiang/base/hand_pile.dart';
@@ -14,11 +15,7 @@ import 'package:flame/events.dart';
 class HandPileComponent extends RectangleComponent
     with DragCallbacks, TapCallbacks, HasGameRef<MajiangFlameGame> {
   HandPileComponent(this.handPile, this.direction,
-      {super.position,
-      super.scale,
-      super.priority,
-      super.size,
-      super.anchor = Anchor.center});
+      {super.position, super.scale, super.priority, super.size, super.anchor});
 
   final HandPile handPile;
 
@@ -76,19 +73,19 @@ class HandPileComponent extends RectangleComponent
       add(typePileComponent);
     }
     for (int i = 0; i < handPile.cards.length; ++i) {
-      Card card = handPile.cards[i];
+      majiangCard.Card card = handPile.cards[i];
       Vector2? position;
       if (direction == 0) {
-        position = Vector2(i * 60, 0);
+        position = Vector2(i * 75, 0);
       }
       if (direction == 2) {
-        position = Vector2(i * 70, 0);
+        position = Vector2(i * 37, 0);
       }
       if (direction == 1) {
-        position = Vector2(0, i * 70);
+        position = Vector2(0, i * 28);
       }
       if (direction == 3) {
-        position = Vector2(0, i * 70);
+        position = Vector2(0, i * 28);
       }
       CardComponent cardComponent = CardComponent(
           card, direction, cardBackgroundType,

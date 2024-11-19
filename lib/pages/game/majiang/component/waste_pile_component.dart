@@ -11,7 +11,8 @@ import 'package:flame/events.dart';
 /// flame引擎渲染的麻将牌
 class WastePileComponent extends PositionComponent
     with DragCallbacks, TapCallbacks, HasGameRef<MajiangFlameGame> {
-  WastePileComponent(this.wastePile, this.direction, {super.position});
+  WastePileComponent(this.wastePile, this.direction,
+      {super.position, super.scale});
 
   final WastePile wastePile;
 
@@ -19,7 +20,7 @@ class WastePileComponent extends PositionComponent
   final int direction;
 
   /// 绘制牌的图像，有相对的偏移量，旋转，放大等参数
-  void _loadWastePile() {
+  void loadWastePile() {
     CardBackgroundType cardBackgroundType;
     if (direction == 0) {
       cardBackgroundType = CardBackgroundType.touchcard;
@@ -52,7 +53,7 @@ class WastePileComponent extends PositionComponent
 
   @override
   FutureOr<void> onLoad() {
-    _loadWastePile();
+    loadWastePile();
 
     return super.onLoad();
   }

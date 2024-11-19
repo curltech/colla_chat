@@ -1,16 +1,7 @@
-import 'package:colla_chat/pages/game/majiang/component/next_hand_area_component.dart';
-import 'package:colla_chat/pages/game/majiang/component/next_participant_area_component.dart';
-import 'package:colla_chat/pages/game/majiang/component/next_waste_area_component.dart';
-import 'package:colla_chat/pages/game/majiang/component/opponent_hand_area_component.dart';
-import 'package:colla_chat/pages/game/majiang/component/opponent_participant_area_component.dart';
-import 'package:colla_chat/pages/game/majiang/component/opponent_waste_area_component.dart';
-import 'package:colla_chat/pages/game/majiang/component/previous_hand_area_component.dart';
-import 'package:colla_chat/pages/game/majiang/component/previous_participant_area_component.dart';
-import 'package:colla_chat/pages/game/majiang/component/previous_waste_area_component.dart';
-import 'package:colla_chat/pages/game/majiang/component/self_hand_area_component.dart';
-import 'package:colla_chat/pages/game/majiang/component/self_participant_area_component.dart';
-import 'package:colla_chat/pages/game/majiang/component/self_waste_area_component.dart';
+import 'package:colla_chat/pages/game/majiang/component/hand_area_component.dart';
+import 'package:colla_chat/pages/game/majiang/component/participant_area_component.dart';
 import 'package:colla_chat/pages/game/majiang/component/setting_area_component.dart';
+import 'package:colla_chat/pages/game/majiang/component/waste_area_component.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
@@ -76,27 +67,23 @@ class MajiangFlameGame extends FlameGame
 
   late double startZoom;
 
-  OpponentParticipantAreaComponent opponentParticipantAreaComponent =
-      OpponentParticipantAreaComponent();
-  OpponentHandAreaComponent opponentHandAreaComponent =
-      OpponentHandAreaComponent();
-  OpponentWasteAreaComponent opponentWasteAreaComponent =
-      OpponentWasteAreaComponent();
+  ParticipantAreaComponent opponentParticipantAreaComponent =
+      ParticipantAreaComponent(2);
+  HandAreaComponent opponentHandAreaComponent = HandAreaComponent(2);
+  WasteAreaComponent opponentWasteAreaComponent = WasteAreaComponent(2);
   SettingAreaComponent settingAreaComponent = SettingAreaComponent();
-  PreviousParticipantAreaComponent previousParticipantAreaComponent =
-      PreviousParticipantAreaComponent();
-  PreviousHandAreaComponent previousHandAreaComponent =
-      PreviousHandAreaComponent();
-  PreviousWasteAreaComponent previousWasteAreaComponent =
-      PreviousWasteAreaComponent();
-  SelfWasteAreaComponent selfWasteAreaComponent = SelfWasteAreaComponent();
-  NextParticipantAreaComponent nextParticipantAreaComponent =
-      NextParticipantAreaComponent();
-  NextHandAreaComponent nextHandAreaComponent = NextHandAreaComponent();
-  NextWasteAreaComponent nextWasteAreaComponent = NextWasteAreaComponent();
-  SelfParticipantAreaComponent selfParticipantAreaComponent =
-      SelfParticipantAreaComponent();
-  SelfHandAreaComponent selfHandAreaComponent = SelfHandAreaComponent();
+  ParticipantAreaComponent previousParticipantAreaComponent =
+      ParticipantAreaComponent(3);
+  HandAreaComponent previousHandAreaComponent = HandAreaComponent(3);
+  WasteAreaComponent previousWasteAreaComponent = WasteAreaComponent(3);
+  WasteAreaComponent selfWasteAreaComponent = WasteAreaComponent(0);
+  ParticipantAreaComponent nextParticipantAreaComponent =
+      ParticipantAreaComponent(1);
+  HandAreaComponent nextHandAreaComponent = HandAreaComponent(1);
+  WasteAreaComponent nextWasteAreaComponent = WasteAreaComponent(1);
+  ParticipantAreaComponent selfParticipantAreaComponent =
+      ParticipantAreaComponent(0);
+  HandAreaComponent selfHandAreaComponent = HandAreaComponent(0);
 
   // @override
   // bool debugMode = true;
@@ -153,19 +140,19 @@ class MajiangFlameGame extends FlameGame
     //     sprite: Sprite(backgroundImage));
     // world.add(backgroundComponent);
 
-    // world.add(opponentParticipantAreaComponent);
-    // world.add(opponentHandAreaComponent);
-    // world.add(settingAreaComponent);
-    // world.add(selfParticipantAreaComponent);
+    world.add(opponentParticipantAreaComponent);
+    world.add(opponentHandAreaComponent);
+    world.add(settingAreaComponent);
+    world.add(selfParticipantAreaComponent);
     world.add(selfHandAreaComponent);
-    // world.add(previousParticipantAreaComponent);
-    // world.add(previousHandAreaComponent);
-    // world.add(previousWasteAreaComponent);
-    // world.add(opponentWasteAreaComponent);
-    // world.add(selfWasteAreaComponent);
-    // world.add(nextWasteAreaComponent);
-    // world.add(nextHandAreaComponent);
-    // world.add(nextParticipantAreaComponent);
+    world.add(previousParticipantAreaComponent);
+    world.add(previousHandAreaComponent);
+    world.add(previousWasteAreaComponent);
+    world.add(opponentWasteAreaComponent);
+    world.add(selfWasteAreaComponent);
+    world.add(nextWasteAreaComponent);
+    world.add(nextHandAreaComponent);
+    world.add(nextParticipantAreaComponent);
 
     return super.onLoad();
   }

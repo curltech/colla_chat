@@ -19,7 +19,7 @@ class TypePileComponent extends PositionComponent
   final int direction;
 
   /// 绘制牌的图像，有相对的偏移量，旋转，放大等参数
-  void _loadTypePile() {
+  void loadTypePile() {
     CardBackgroundType cardBackgroundType;
     if (direction == 0) {
       cardBackgroundType = CardBackgroundType.touchcard;
@@ -52,7 +52,7 @@ class TypePileComponent extends PositionComponent
 
   @override
   FutureOr<void> onLoad() {
-    _loadTypePile();
+    loadTypePile();
 
     return super.onLoad();
   }
