@@ -11,12 +11,13 @@ import 'package:flutter/material.dart';
 
 /// 等待处理的行为区域
 class ActionAreaComponent extends RectangleComponent
-    with HasVisibility, HasGameRef<MajiangFlameGame> {
+    with HasGameRef<MajiangFlameGame> {
   ActionAreaComponent() {
     _init();
   }
 
   _init() {
+    priority = 10;
     position = Vector2(
         MajiangFlameGame.x(MajiangFlameGame.width *
             (1 -
@@ -24,9 +25,10 @@ class ActionAreaComponent extends RectangleComponent
                 MajiangFlameGame.nextHandWidthRadio -
                 MajiangFlameGame.nextWasteWidthRadio)),
         MajiangFlameGame.y(MajiangFlameGame.height *
-            (1 -
-                MajiangFlameGame.selfHeightRadio -
-                MajiangFlameGame.selfWasteHeightRadio)));
+                (1 -
+                    MajiangFlameGame.selfHeightRadio -
+                    MajiangFlameGame.selfWasteHeightRadio) +
+            70));
     size = Vector2(
         MajiangFlameGame.width *
             (MajiangFlameGame.nextWasteWidthRadio +
@@ -42,9 +44,10 @@ class ActionAreaComponent extends RectangleComponent
         .getRoundParticipant(roomController.selfParticipantDirection.value);
     Map<OutstandingAction, List<int>>? outstandingActions =
         roundParticipant?.outstandingActions.value;
-    if (outstandingActions == null) {
+    if (outstandingActions == null || outstandingActions.isEmpty) {
       return;
     }
+    outstandingActions[OutstandingAction.pass] = [];
     double x = 0;
     double y = 0;
     for (var entry in outstandingActions.entries) {
@@ -66,7 +69,7 @@ class ActionAreaComponent extends RectangleComponent
             onPressed: () {
               _call(outstandingAction, pos: pos);
               outstandingActions.clear();
-              roomController.majiangFlameGame.actionAreaVisible();
+              roomController.majiangFlameGame.loadActionArea();
             });
         add(spriteButtonComponent);
       }

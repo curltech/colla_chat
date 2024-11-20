@@ -129,14 +129,14 @@ class Round {
     }
     bool pass = true;
     RoundParticipant roundParticipant = roundParticipants[owner];
-    int? pos = roundParticipant.onRoomEvent(
+    Map<OutstandingAction, List<int>>? outstandingActions = roundParticipant.onRoomEvent(
         RoomEvent(room.name, id, owner, RoomEventAction.send, card: card));
     for (int i = 0; i < roundParticipants.length; ++i) {
       if (i != owner) {
         roundParticipant = roundParticipants[i];
-        pos = roundParticipant.onRoomEvent(
+        outstandingActions = roundParticipant.onRoomEvent(
             RoomEvent(room.name, id, owner, RoomEventAction.send, card: card));
-        if (pos != null) {
+        if (outstandingActions != null) {
           pass = false;
         }
       }
@@ -438,28 +438,28 @@ class Round {
     RoomEventAction action = roomEvent.action;
     switch (action) {
       case RoomEventAction.take:
-        _take(roomEvent.owner);
+        return _take(roomEvent.owner);
       case RoomEventAction.send:
-        _send(roomEvent.owner, roomEvent.card!);
+        return _send(roomEvent.owner, roomEvent.card!);
       case RoomEventAction.bar:
-        _bar(roomEvent.owner, roomEvent.pos!);
+        return _bar(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.barTake:
-        _barTake(roomEvent.owner);
+        return _barTake(roomEvent.owner);
       case RoomEventAction.touch:
-        _touch(
+        return _touch(
             roomEvent.owner, roomEvent.pos!, roomEvent.src!, roomEvent.card!);
       case RoomEventAction.darkBar:
-        _darkBar(roomEvent.owner, roomEvent.pos!);
+        return _darkBar(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.drawing:
-        _drawing(roomEvent.owner, roomEvent.pos!);
+        return _drawing(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.rob:
-        _rob(roomEvent.owner, roomEvent.src!, roomEvent.card!);
+        return _rob(roomEvent.owner, roomEvent.src!, roomEvent.card!);
       case RoomEventAction.score:
-        _score(roomEvent.owner, roomEvent.pos!);
+        return _score(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.pass:
-        _pass(roomEvent.owner);
+        return _pass(roomEvent.owner);
       case RoomEventAction.complete:
-        _complete(roomEvent.owner);
+        return _complete(roomEvent.owner);
       default:
         break;
     }

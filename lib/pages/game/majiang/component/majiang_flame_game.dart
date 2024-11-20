@@ -181,11 +181,12 @@ class MajiangFlameGame extends FlameGame
     opponentWasteAreaComponent.loadWastePile();
     selfWasteAreaComponent.loadWastePile();
     nextWasteAreaComponent.loadWastePile();
+    loadActionArea();
   }
 
-  actionAreaVisible() {
+  loadActionArea() {
     if (actionAreaComponent != null) {
-      remove(actionAreaComponent!);
+      world.remove(actionAreaComponent!);
       actionAreaComponent = null;
     }
     RoundParticipant? roundParticipant = roomController
@@ -196,7 +197,7 @@ class MajiangFlameGame extends FlameGame
     } else {
       actionAreaComponent = ActionAreaComponent();
       actionAreaComponent!.loadSpriteButton();
-      add(actionAreaComponent!);
+      world.add(actionAreaComponent!);
     }
   }
 }

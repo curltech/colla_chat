@@ -75,7 +75,7 @@ class RoundParticipant {
   }
 
   /// 打牌，owner打出牌card，对其他人检查打的牌是否能够胡牌，杠牌和碰牌，返回检查的结果
-  int? _send(int owner, Card card) {
+  Map<OutstandingAction, List<int>>? _send(int owner, Card card) {
     if (owner == index) {
       handPile.send(card);
       wastePile.cards.add(card);
@@ -83,21 +83,16 @@ class RoundParticipant {
       return null;
     } else {
       /// 不是owner，检查是否可以胡牌，碰牌或者杠牌
-      CompleteType? completeType = handPile.checkComplete(card);
-      int? pos = handPile.checkBar(card);
-      pos ??= handPile.checkTouch(card);
-      if (completeType != null) {
-        return completeType.index;
-      }
-      if (pos != null) {
-        return pos;
+      Map<OutstandingAction, List<int>> outstandingActions = _check(card);
+      if (outstandingActions.isNotEmpty) {
+        return outstandingActions;
       }
     }
 
     return null;
   }
 
-  Map<OutstandingAction, List<int>> _check(int owner, Card card) {
+  Map<OutstandingAction, List<int>> _check(Card card) {
     CompleteType? completeType = handPile.checkComplete(card);
     if (completeType != null) {
       addOutstandingAction(OutstandingAction.complete, completeType.index);
@@ -110,9 +105,11 @@ class RoundParticipant {
     if (pos != null) {
       addOutstandingAction(OutstandingAction.touch, pos);
     }
-    roomController.majiangFlameGame.actionAreaVisible();
+    if (outstandingActions.value.isNotEmpty) {
+      roomController.majiangFlameGame.loadActionArea();
+    }
 
-    return outstandingActions;
+    return outstandingActions.value;
   }
 
   /// 碰牌,owner碰pos位置，sender打出的card牌
@@ -257,52 +254,44 @@ class RoundParticipant {
     switch (roomEvent.action) {
       case RoomEventAction.take:
         if (TakeCardType.self.index == roomEvent.pos) {
-          _take(roomEvent.owner, roomEvent.card!, roomEvent.pos!);
+          return _take(roomEvent.owner, roomEvent.card!, roomEvent.pos!);
         }
         break;
       case RoomEventAction.barTake:
         if (TakeCardType.bar.index == roomEvent.pos) {
-          _take(roomEvent.owner, roomEvent.card!, roomEvent.pos!);
+          return _take(roomEvent.owner, roomEvent.card!, roomEvent.pos!);
         }
         break;
       case RoomEventAction.seaTake:
         if (TakeCardType.sea.index == roomEvent.pos) {
-          _take(roomEvent.owner, roomEvent.card!, roomEvent.pos!);
+          return _take(roomEvent.owner, roomEvent.card!, roomEvent.pos!);
         }
         break;
       case RoomEventAction.send:
         return _send(roomEvent.owner, roomEvent.card!);
       case RoomEventAction.touch:
-        _touch(
+        return _touch(
             roomEvent.owner, roomEvent.pos!, roomEvent.src!, roomEvent.card!);
-        break;
       case RoomEventAction.bar:
-        _bar(roomEvent.owner, roomEvent.pos!, roomEvent.card!, roomEvent.src!);
-        break;
+        return _bar(
+            roomEvent.owner, roomEvent.pos!, roomEvent.card!, roomEvent.src!);
       case RoomEventAction.takeBar:
-        _takeBar(roomEvent.owner, roomEvent.pos!, roomEvent.card!);
-        break;
+        return _takeBar(roomEvent.owner, roomEvent.pos!, roomEvent.card!);
       case RoomEventAction.darkBar:
-        _darkBar(roomEvent.owner, roomEvent.pos!);
-        break;
+        return _darkBar(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.drawing:
-        _drawing(roomEvent.owner, roomEvent.pos!, roomEvent.card!);
-        break;
+        return _drawing(roomEvent.owner, roomEvent.pos!, roomEvent.card!);
       case RoomEventAction.check:
-        _check(roomEvent.owner, roomEvent.card!);
-        break;
+        return _check(roomEvent.card!);
       case RoomEventAction.checkComplete:
-        _checkComplete(roomEvent.owner, roomEvent.card!);
-        break;
+        return _checkComplete(roomEvent.owner, roomEvent.card!);
       case RoomEventAction.complete:
-        _complete(roomEvent.owner, roomEvent.pos!);
-        break;
+        return _complete(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.pass:
-        _pass(roomEvent.owner);
-        break;
+        return _pass(roomEvent.owner);
       case RoomEventAction.rob:
-        _rob(roomEvent.owner, roomEvent.pos!, roomEvent.card!, roomEvent.src!);
-        break;
+        return _rob(
+            roomEvent.owner, roomEvent.pos!, roomEvent.card!, roomEvent.src!);
       default:
         break;
     }
