@@ -116,7 +116,8 @@ class Round {
     _take(banker!);
   }
 
-  RoundParticipant getRoundParticipant(ParticipantDirection participantDirection) {
+  RoundParticipant getRoundParticipant(
+      ParticipantDirection participantDirection) {
     return roundParticipants[participantDirection.index];
   }
 
@@ -432,5 +433,32 @@ class Round {
     return completeType;
   }
 
-  dynamic onRoomEvent(RoomEvent roomEvent) async {}
+  dynamic onRoomEvent(RoomEvent roomEvent) async {
+    RoomEventAction action = roomEvent.action;
+    switch (action) {
+      case RoomEventAction.send:
+        _send(roomEvent.owner, roomEvent.card!);
+      case RoomEventAction.bar:
+        _bar(roomEvent.owner, roomEvent.pos!);
+      case RoomEventAction.barTake:
+        _barTake(roomEvent.owner);
+      case RoomEventAction.touch:
+        _touch(
+            roomEvent.owner, roomEvent.pos!, roomEvent.src!, roomEvent.card!);
+      case RoomEventAction.darkBar:
+        _darkBar(roomEvent.owner, roomEvent.pos!);
+      case RoomEventAction.drawing:
+        _drawing(roomEvent.owner, roomEvent.pos!);
+      case RoomEventAction.rob:
+        _rob(roomEvent.owner, roomEvent.src!, roomEvent.card!);
+      case RoomEventAction.score:
+        _score(roomEvent.owner, roomEvent.pos!);
+      case RoomEventAction.pass:
+        _pass(roomEvent.owner);
+      case RoomEventAction.complete:
+        _complete(roomEvent.owner);
+      default:
+        break;
+    }
+  }
 }
