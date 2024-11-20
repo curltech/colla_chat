@@ -1,4 +1,5 @@
 import 'package:colla_chat/pages/game/majiang/base/room.dart';
+import 'package:colla_chat/pages/game/majiang/component/action_area_component.dart';
 import 'package:colla_chat/pages/game/majiang/component/hand_area_component.dart';
 import 'package:colla_chat/pages/game/majiang/component/participant_area_component.dart';
 import 'package:colla_chat/pages/game/majiang/component/setting_area_component.dart';
@@ -93,6 +94,7 @@ class MajiangFlameGame extends FlameGame
       ParticipantAreaComponent(AreaDirection.self);
   HandAreaComponent selfHandAreaComponent =
       HandAreaComponent(AreaDirection.self);
+  ActionAreaComponent actionAreaComponent = ActionAreaComponent();
 
   // @override
   // bool debugMode = true;
@@ -178,12 +180,8 @@ class MajiangFlameGame extends FlameGame
     selfWasteAreaComponent.loadWastePile();
     nextWasteAreaComponent.loadWastePile();
   }
-// @override
-// Future<void> onTapDown(TapDownEvent event) async {
-//   Vector2 globalPosition = event.devicePosition;
-//   Vector2 widgetPosition = event.canvasPosition;
-//   Vector2 localPosition = event.localPosition;
-//   Vector2 worldPosition = camera.globalToLocal(widgetPosition);
-//   Vector2 cameraPosition = camera.viewfinder.position;
-// }
+
+  actionAreaVisible(bool isVisible) {
+    actionAreaComponent.isVisible = isVisible;
+  }
 }

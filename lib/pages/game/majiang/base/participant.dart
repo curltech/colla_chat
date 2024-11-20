@@ -5,7 +5,7 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-enum OutstandingAction { pass, touch, bar, darkBar, drawing, complete }
+
 
 /// 参与者
 class Participant {

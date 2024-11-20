@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:colla_chat/pages/game/majiang/base/RoundParticipant.dart';
+import 'package:colla_chat/pages/game/majiang/base/round_participant.dart';
 import 'package:colla_chat/pages/game/majiang/base/participant.dart';
 import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
 import 'package:flame/components.dart';
@@ -11,13 +11,10 @@ import 'package:flutter/material.dart';
 /// flame引擎渲染的麻将牌
 class RoundParticipantComponent extends PositionComponent
     with TapCallbacks, HasGameRef<MajiangFlameGame> {
-  RoundParticipantComponent(this.roundParticipant, this.direction,
+  RoundParticipantComponent(this.roundParticipant,
       {super.position, super.size});
 
   final RoundParticipant roundParticipant;
-
-  /// 0:自己，1:下家，2:对家，3:上家
-  final int direction;
 
   SpriteComponent? spriteComponent;
   TextComponent? textComponent;

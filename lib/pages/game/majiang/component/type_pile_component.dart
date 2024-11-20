@@ -12,7 +12,7 @@ import 'package:universal_html/html.dart';
 
 /// flame引擎渲染的麻将牌
 class TypePileComponent extends PositionComponent
-    with DragCallbacks, TapCallbacks, HasGameRef<MajiangFlameGame> {
+    with TapCallbacks, HasGameRef<MajiangFlameGame> {
   TypePileComponent(this.typePile, this.areaDirection, {super.position});
 
   final TypePile typePile;

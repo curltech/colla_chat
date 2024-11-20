@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:colla_chat/pages/game/majiang/base/card.dart';
 import 'package:colla_chat/pages/game/majiang/base/hand_pile.dart';
+import 'package:colla_chat/pages/game/majiang/base/outstanding_action.dart';
 import 'package:colla_chat/pages/game/majiang/base/participant.dart';
 import 'package:colla_chat/pages/game/majiang/base/room.dart';
 import 'package:colla_chat/pages/game/majiang/base/round.dart';
@@ -96,9 +97,18 @@ class RoundParticipant {
   }
 
   Map<OutstandingAction, List<int>> _check(int owner, Card card) {
-    handPile.checkComplete(card);
-    handPile.checkBar(card);
-    handPile.checkTouch(card);
+    CompleteType? completeType = handPile.checkComplete(card);
+    if (completeType != null) {
+      addOutstandingAction(OutstandingAction.complete, completeType.index);
+    }
+    int? pos = handPile.checkBar(card);
+    if (pos != null) {
+      addOutstandingAction(OutstandingAction.bar, pos);
+    }
+    pos = handPile.checkTouch(card);
+    if (pos != null) {
+      addOutstandingAction(OutstandingAction.touch, pos);
+    }
 
     return outstandingActions;
   }

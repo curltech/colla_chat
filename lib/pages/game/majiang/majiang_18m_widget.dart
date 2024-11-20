@@ -1,11 +1,11 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
-import 'package:colla_chat/pages/game/majiang/base/RoundParticipant.dart';
 import 'package:colla_chat/pages/game/majiang/base/card.dart' as majiangCard;
 import 'package:colla_chat/pages/game/majiang/base/full_pile.dart';
 import 'package:colla_chat/pages/game/majiang/base/room.dart';
 import 'package:colla_chat/pages/game/majiang/base/room_pool.dart';
 import 'package:colla_chat/pages/game/majiang/base/round.dart';
+import 'package:colla_chat/pages/game/majiang/base/round_participant.dart';
 import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
 import 'package:colla_chat/pages/game/majiang/room_controller.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
@@ -216,7 +216,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
           tooltip: AppLocalizations.t('Check take'),
           onPressed: () {
             RoundParticipant? currentRoundParticipant =
-            roomController.getRoundParticipant(
+                roomController.getRoundParticipant(
                     roomController.selfParticipantDirection.value);
             majiangCard.Card? takeCard =
                 currentRoundParticipant?.handPile.takeCard;
@@ -231,7 +231,6 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
           },
           icon: const Icon(Icons.takeout_dining_outlined)));
     }
-    ;
 
     return rightWidgets;
   }

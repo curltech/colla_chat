@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/game/majiang/base/RoundParticipant.dart';
 import 'package:colla_chat/pages/game/majiang/base/card.dart';
 import 'package:colla_chat/pages/game/majiang/base/full_pile.dart';
 import 'package:colla_chat/pages/game/majiang/base/participant.dart';

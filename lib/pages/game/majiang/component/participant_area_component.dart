@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:colla_chat/pages/game/majiang/base/RoundParticipant.dart';
+import 'package:colla_chat/pages/game/majiang/base/round_participant.dart';
 import 'package:colla_chat/pages/game/majiang/base/room.dart';
 import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
 import 'package:colla_chat/pages/game/majiang/component/round_participant_component.dart';
@@ -75,8 +75,7 @@ class ParticipantAreaComponent extends RectangleComponent
       RoundParticipant? roundParticipant =
           roomController.findRoundParticipant(areaDirection);
       if (roundParticipant != null) {
-        roundParticipantComponent = RoundParticipantComponent(
-            roundParticipant, 1,
+        roundParticipantComponent = RoundParticipantComponent(roundParticipant,
             size: Vector2(64, 42),
             position: Vector2(size.x / 2 - 16, size.y / 2 - 16));
         add(roundParticipantComponent!);

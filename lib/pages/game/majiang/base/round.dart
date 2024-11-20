@@ -1,8 +1,9 @@
 import 'dart:math';
 
-import 'package:colla_chat/pages/game/majiang/base/RoundParticipant.dart';
+import 'package:colla_chat/pages/game/majiang/base/round_participant.dart';
 import 'package:colla_chat/pages/game/majiang/base/card.dart';
 import 'package:colla_chat/pages/game/majiang/base/full_pile.dart';
+import 'package:colla_chat/pages/game/majiang/base/outstanding_action.dart';
 import 'package:colla_chat/pages/game/majiang/base/participant.dart';
 import 'package:colla_chat/pages/game/majiang/base/room.dart';
 import 'package:colla_chat/pages/game/majiang/base/stock_pile.dart';
