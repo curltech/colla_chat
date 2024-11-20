@@ -91,29 +91,31 @@ class WasteAreaComponent extends RectangleComponent
   loadWastePile() {
     if (wastePileComponent != null) {
       remove(wastePileComponent!);
+      wastePileComponent = null;
     }
     if (textComponent != null) {
       remove(textComponent!);
+      textComponent = null;
     }
     Room? room = roomController.room.value;
     if (room != null) {
-      wastePileComponent = WastePileComponent(areaDirection,
-          position: Vector2(10, 10), scale: Vector2(0.85, 0.85));
+      wastePileComponent =
+          WastePileComponent(areaDirection, scale: Vector2(0.85, 0.85));
       add(wastePileComponent!);
 
-      String? name = roomController.getParticipantDirection(areaDirection).name;
-      TextPaint textPaint = TextPaint(
-        style: const TextStyle(
-          color: Colors.black,
-          fontSize: 20.0,
-        ),
-      );
-      textComponent = TextBoxComponent(
-          text: name,
-          align: Anchor.center,
-          textRenderer: textPaint,
-          position: Vector2(0, 32));
-      add(textComponent!);
+      // String? name = roomController.getParticipantDirection(areaDirection).name;
+      // TextPaint textPaint = TextPaint(
+      //   style: const TextStyle(
+      //     color: Colors.black,
+      //     fontSize: 20.0,
+      //   ),
+      // );
+      // textComponent = TextBoxComponent(
+      //     text: name,
+      //     align: Anchor.center,
+      //     textRenderer: textPaint,
+      //     position: Vector2(0, 32),priority: 1);
+      // add(textComponent!);
     }
   }
 

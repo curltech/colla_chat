@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 class CardComponent extends PositionComponent
     with TapCallbacks, HasGameRef<MajiangFlameGame> {
   CardComponent(this.card, this.areaDirection, this.cardBackgroundType,
-      {super.position}) {
+      {super.position, super.priority}) {
     if (areaDirection == AreaDirection.self) {
       size = Vector2(card.sprite.image.width.toDouble(),
           card.sprite.image.height.toDouble());
@@ -33,23 +33,23 @@ class CardComponent extends PositionComponent
   void _drawSprite(
     Canvas canvas,
     Sprite sprite,
-    double relativeX,
-    double relativeY, {
+    double x,
+    double y, {
     double scale = 1,
-    bool rotate = false,
+    double? radians,
   }) {
-    if (rotate) {
+    if (radians != null) {
       canvas.save();
       canvas.translate(sprite.image.width / 2, sprite.image.height / 2);
-      canvas.rotate(pi);
+      canvas.rotate(radians);
       canvas.translate(-sprite.image.width / 2, -sprite.image.height / 2);
     }
     sprite.render(
       canvas,
-      position: Vector2(relativeX * size.x, relativeY * size.y),
+      position: Vector2(x, y),
       size: sprite.srcSize.scaled(scale),
     );
-    if (rotate) {
+    if (radians != null) {
       canvas.restore();
     }
   }
@@ -72,16 +72,16 @@ class CardComponent extends PositionComponent
     switch (cardBackgroundType) {
       case CardBackgroundType.handcard:
         _drawSprite(canvas, backgroundSprite, 0, 0);
-        _drawSprite(canvas, card.sprite, 0, 0);
+        _drawSprite(canvas, card.sprite, 3, 10, scale: 0.9);
         break;
       case CardBackgroundType.touchcard:
         if (areaDirection == AreaDirection.self) {
           _drawSprite(canvas, backgroundSprite, 0, 0);
-          _drawSprite(canvas, card.sprite, 0, 0);
+          _drawSprite(canvas, card.sprite, 0, -10, scale: 0.55);
         }
         if (areaDirection == AreaDirection.opponent) {
           _drawSprite(canvas, backgroundSprite, 0, 0);
-          _drawSprite(canvas, card.sprite, 0, 0);
+          _drawSprite(canvas, card.sprite, 36, 50, scale: 0.55, radians: pi);
         }
         break;
       case CardBackgroundType.opponenthand:
@@ -94,18 +94,19 @@ class CardComponent extends PositionComponent
           // _drawSprite(canvas, card.sprite, 0, 0);
         }
         if (areaDirection == AreaDirection.previous) {
-          _drawSprite(canvas, backgroundSprite, 0, 0, rotate: true);
+          _drawSprite(canvas, backgroundSprite, 0, 0, radians: pi);
           // _drawSprite(canvas, card.sprite, 0, 0);
         }
         break;
       case CardBackgroundType.sidecard:
         if (areaDirection == AreaDirection.next) {
           _drawSprite(canvas, backgroundSprite, 0, 0);
-          _drawSprite(canvas, card.sprite, 0, 0);
+          _drawSprite(canvas, card.sprite, 60, 8, scale: 0.5, radians: -pi / 2);
         }
         if (areaDirection == AreaDirection.previous) {
           _drawSprite(canvas, backgroundSprite, 0, 0);
-          _drawSprite(canvas, card.sprite, 0, 0);
+          _drawSprite(canvas, card.sprite, -21, 40,
+              scale: 0.5, radians: pi / 2);
         }
         break;
       default:

@@ -13,7 +13,17 @@ import 'package:flame/events.dart';
 /// flame引擎渲染的麻将牌
 class WastePileComponent extends PositionComponent
     with DragCallbacks, TapCallbacks, HasGameRef<MajiangFlameGame> {
-  WastePileComponent(this.areaDirection, {super.position, super.scale});
+  WastePileComponent(this.areaDirection, {super.scale}) {
+    if (areaDirection == AreaDirection.self) {
+      position = Vector2(10, 130);
+    } else if (areaDirection == AreaDirection.opponent) {
+      position = Vector2(10, 10);
+    } else if (areaDirection == AreaDirection.next) {
+      position = Vector2(126, 10);
+    } else if (areaDirection == AreaDirection.previous) {
+      position = Vector2(10, 10);
+    }
+  }
 
   final AreaDirection areaDirection;
 
@@ -31,24 +41,48 @@ class WastePileComponent extends PositionComponent
     } else {
       cardBackgroundType = CardBackgroundType.sidecard;
     }
+    double x = 0;
+    double y = 0;
+    int priority = 8;
     for (int i = 0; i < wastePile!.cards.length; ++i) {
       Card card = wastePile!.cards[i];
-      Vector2? position;
+      int mod = i ~/ 10;
+      int reminder = i % 10;
+      if (reminder == 0) {
+        if (areaDirection == AreaDirection.self) {
+          x = 0;
+          y = -mod * 55;
+          priority = 8 - mod;
+        }
+        if (areaDirection == AreaDirection.opponent) {
+          x = 0;
+          y = mod * 55;
+        }
+        if (areaDirection == AreaDirection.next) {
+          x = -mod * 47;
+          y = 0;
+        }
+        if (areaDirection == AreaDirection.previous) {
+          x = mod * 47;
+          y = 0;
+        }
+      }
+      Vector2 position = Vector2(x, y);
       if (areaDirection == AreaDirection.self) {
-        position = Vector2(i * 80, 0);
+        x += 44;
       }
       if (areaDirection == AreaDirection.opponent) {
-        position = Vector2(i * 70, 0);
+        x += 44;
       }
       if (areaDirection == AreaDirection.next) {
-        position = Vector2(0, i * 70);
+        y += 33;
       }
       if (areaDirection == AreaDirection.previous) {
-        position = Vector2(0, i * 70);
+        y += 33;
       }
       CardComponent cardComponent = CardComponent(
           card, areaDirection, cardBackgroundType,
-          position: position!);
+          position: position, priority: priority);
       add(cardComponent);
     }
   }

@@ -33,19 +33,19 @@ class TypePileComponent extends PositionComponent
     double y = 0;
     for (int i = 0; i < typePile.cards.length; ++i) {
       Card card = typePile.cards[i];
+      Vector2 position = Vector2(x, y);
       if (areaDirection == AreaDirection.self) {
-        x += i * 75;
+        x += 75;
       }
       if (areaDirection == AreaDirection.opponent) {
-        x += i * 37;
+        x += 37;
       }
       if (areaDirection == AreaDirection.next) {
-        y += i * 28;
+        y += 28;
       }
       if (areaDirection == AreaDirection.previous) {
-        y += i * 28;
+        y += 28;
       }
-      Vector2 position = Vector2(x, y);
       CardComponent cardComponent = CardComponent(
           card, areaDirection, cardBackgroundType,
           position: position);
