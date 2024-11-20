@@ -8,6 +8,7 @@ import 'package:colla_chat/pages/game/majiang/base/room.dart';
 import 'package:colla_chat/pages/game/majiang/base/round.dart';
 import 'package:colla_chat/pages/game/majiang/base/suit.dart';
 import 'package:colla_chat/pages/game/majiang/base/waste_pile.dart';
+import 'package:colla_chat/pages/game/majiang/room_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/number_util.dart';
 import 'package:get/get.dart';
@@ -51,7 +52,11 @@ class RoundParticipant {
   /// 包了自己的胡牌的人
   int? packer;
 
-  RoundParticipant(this.index, this.round, this.participant);
+  RoundParticipant(this.index, this.round, this.participant) {
+    outstandingActions.addListener(() {
+      roomController.majiangFlameGame.actionAreaVisible();
+    });
+  }
 
   ParticipantDirection get direction {
     return NumberUtil.toEnum(ParticipantDirection.values, index)!;

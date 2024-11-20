@@ -42,8 +42,6 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Majiang 18m';
 
-  MajiangFlameGame majiangFlameGame = MajiangFlameGame();
-
   RxBool fullscreen = false.obs;
 
   TextEditingController textEditingController = TextEditingController();
@@ -175,7 +173,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
                 null,
                 roomController.selfParticipantDirection.value.index,
                 RoomEventAction.round));
-            majiangFlameGame.reload();
+            roomController.majiangFlameGame.reload();
           },
           icon: const Icon(Icons.newspaper_outlined)));
       rightWidgets.add(IconButton(
@@ -242,7 +240,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
           title: title,
           withLeading: true,
           rightWidgets: _buildRightWidgets(context),
-          child: GameWidget(game: majiangFlameGame));
+          child: GameWidget(game: roomController.majiangFlameGame));
     });
   }
 }

@@ -1,9 +1,12 @@
+import 'package:colla_chat/pages/game/majiang/base/outstanding_action.dart';
 import 'package:colla_chat/pages/game/majiang/base/room.dart';
+import 'package:colla_chat/pages/game/majiang/base/round_participant.dart';
 import 'package:colla_chat/pages/game/majiang/component/action_area_component.dart';
 import 'package:colla_chat/pages/game/majiang/component/hand_area_component.dart';
 import 'package:colla_chat/pages/game/majiang/component/participant_area_component.dart';
 import 'package:colla_chat/pages/game/majiang/component/setting_area_component.dart';
 import 'package:colla_chat/pages/game/majiang/component/waste_area_component.dart';
+import 'package:colla_chat/pages/game/majiang/room_controller.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
@@ -94,7 +97,7 @@ class MajiangFlameGame extends FlameGame
       ParticipantAreaComponent(AreaDirection.self);
   HandAreaComponent selfHandAreaComponent =
       HandAreaComponent(AreaDirection.self);
-  ActionAreaComponent actionAreaComponent = ActionAreaComponent();
+  ActionAreaComponent? actionAreaComponent;
 
   // @override
   // bool debugMode = true;
@@ -181,7 +184,20 @@ class MajiangFlameGame extends FlameGame
     nextWasteAreaComponent.loadWastePile();
   }
 
-  actionAreaVisible(bool isVisible) {
-    actionAreaComponent.isVisible = isVisible;
+  actionAreaVisible() {
+    if (actionAreaComponent != null) {
+      remove(actionAreaComponent!);
+      actionAreaComponent = null;
+    }
+    RoundParticipant? roundParticipant = roomController
+        .getRoundParticipant(roomController.selfParticipantDirection.value);
+    Map<OutstandingAction, List<int>>? outstandingActions =
+        roundParticipant?.outstandingActions.value;
+    if (outstandingActions == null || outstandingActions.isEmpty) {
+    } else {
+      actionAreaComponent = ActionAreaComponent();
+      actionAreaComponent!.loadSpriteButton();
+      add(actionAreaComponent!);
+    }
   }
 }

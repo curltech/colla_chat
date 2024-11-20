@@ -4,10 +4,13 @@ import 'package:colla_chat/pages/game/majiang/base/room.dart';
 import 'package:colla_chat/pages/game/majiang/base/round.dart';
 import 'package:colla_chat/pages/game/majiang/base/round_participant.dart';
 import 'package:colla_chat/pages/game/majiang/base/waste_pile.dart';
+import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
 import 'package:colla_chat/tool/number_util.dart';
 import 'package:get/get.dart';
 
 class RoomController {
+  MajiangFlameGame majiangFlameGame = MajiangFlameGame();
+
   final Rx<Room?> room = Rx<Room?>(null);
 
   /// self是哪个方位的参与者，用于取参与者牌的数据
