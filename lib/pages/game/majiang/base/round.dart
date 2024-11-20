@@ -116,8 +116,8 @@ class Round {
     _take(banker!);
   }
 
-  RoundParticipant getRoundParticipant(ParticipantDirection direction) {
-    return roundParticipants[direction.index];
+  RoundParticipant getRoundParticipant(ParticipantDirection participantDirection) {
+    return roundParticipants[participantDirection.index];
   }
 
   /// 打牌

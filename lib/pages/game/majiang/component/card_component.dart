@@ -15,9 +15,9 @@ import 'package:flutter/material.dart';
 /// flame引擎渲染的麻将牌
 class CardComponent extends PositionComponent
     with TapCallbacks, HasGameRef<MajiangFlameGame> {
-  CardComponent(this.card, this.direction, this.cardBackgroundType,
+  CardComponent(this.card, this.areaDirection, this.cardBackgroundType,
       {super.position}) {
-    if (direction == 0) {
+    if (areaDirection == AreaDirection.self) {
       size = Vector2(card.sprite.image.width.toDouble(),
           card.sprite.image.height.toDouble());
     }
@@ -25,8 +25,7 @@ class CardComponent extends PositionComponent
 
   final majiangCard.Card card;
 
-  /// 0:自己，1:下家，2:对家，3:上家
-  final int direction;
+  final AreaDirection areaDirection;
 
   final CardBackgroundType cardBackgroundType;
 
@@ -76,11 +75,11 @@ class CardComponent extends PositionComponent
         _drawSprite(canvas, card.sprite, 0, 0);
         break;
       case CardBackgroundType.touchcard:
-        if (direction == 0) {
+        if (areaDirection == AreaDirection.self) {
           _drawSprite(canvas, backgroundSprite, 0, 0);
           _drawSprite(canvas, card.sprite, 0, 0);
         }
-        if (direction == 2) {
+        if (areaDirection == AreaDirection.opponent) {
           _drawSprite(canvas, backgroundSprite, 0, 0);
           _drawSprite(canvas, card.sprite, 0, 0);
         }
@@ -90,21 +89,21 @@ class CardComponent extends PositionComponent
         // _drawSprite(canvas, card.sprite, 0, 0);
         break;
       case CardBackgroundType.sidehand:
-        if (direction == 1) {
+        if (areaDirection == AreaDirection.next) {
           _drawSprite(canvas, backgroundSprite, 0, 0);
           // _drawSprite(canvas, card.sprite, 0, 0);
         }
-        if (direction == 3) {
+        if (areaDirection == AreaDirection.previous) {
           _drawSprite(canvas, backgroundSprite, 0, 0, rotate: true);
           // _drawSprite(canvas, card.sprite, 0, 0);
         }
         break;
       case CardBackgroundType.sidecard:
-        if (direction == 1) {
+        if (areaDirection == AreaDirection.next) {
           _drawSprite(canvas, backgroundSprite, 0, 0);
           _drawSprite(canvas, card.sprite, 0, 0);
         }
-        if (direction == 3) {
+        if (areaDirection == AreaDirection.previous) {
           _drawSprite(canvas, backgroundSprite, 0, 0);
           _drawSprite(canvas, card.sprite, 0, 0);
         }
@@ -126,12 +125,15 @@ class CardComponent extends PositionComponent
       if (currentRound == null) {
         return;
       }
-      HandPile handPile = currentRound.roundParticipants[direction].handPile;
+      ParticipantDirection participantDirection =
+          roomController.getParticipantDirection(areaDirection);
+      HandPile handPile =
+          currentRound.roundParticipants[participantDirection.index].handPile;
       if (handPile.takeCard == card) {
         room.onRoomEvent(RoomEvent(
           room.name,
           currentRound.id,
-          direction,
+          participantDirection.index,
           RoomEventAction.send,
           card: card,
           pos: -1,
@@ -142,7 +144,7 @@ class CardComponent extends PositionComponent
           room.onRoomEvent(RoomEvent(
             room.name,
             currentRound.id,
-            direction,
+            participantDirection.index,
             RoomEventAction.send,
             card: card,
             pos: pos,
@@ -155,7 +157,7 @@ class CardComponent extends PositionComponent
   @override
   void onTapUp(TapUpEvent event) {
     /// 点击自家的牌表示打牌
-    if (direction == 0) {
+    if (areaDirection == AreaDirection.self) {
       send();
     }
   }

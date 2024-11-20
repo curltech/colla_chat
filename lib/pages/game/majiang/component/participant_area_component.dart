@@ -11,16 +11,16 @@ import 'package:flutter/material.dart';
 /// 信息区域
 class ParticipantAreaComponent extends RectangleComponent
     with HasGameRef<MajiangFlameGame> {
-  final int direction;
+  final AreaDirection areaDirection;
 
   RoundParticipantComponent? roundParticipantComponent;
 
-  ParticipantAreaComponent(this.direction) {
+  ParticipantAreaComponent(this.areaDirection) {
     _init();
   }
 
   _init() {
-    if (direction == 0) {
+    if (areaDirection == AreaDirection.self) {
       position = Vector2(
           MajiangFlameGame.x(0),
           MajiangFlameGame.y(MajiangFlameGame.height *
@@ -31,7 +31,7 @@ class ParticipantAreaComponent extends RectangleComponent
         ..color = Colors.lightGreen
         ..style = PaintingStyle.fill;
     }
-    if (direction == 1) {
+    if (areaDirection == AreaDirection.next) {
       position = Vector2(
           MajiangFlameGame.x(
               MajiangFlameGame.width * (1 - MajiangFlameGame.nextWidthRadio)),
@@ -43,7 +43,7 @@ class ParticipantAreaComponent extends RectangleComponent
         ..color = Colors.cyan
         ..style = PaintingStyle.fill;
     }
-    if (direction == 2) {
+    if (areaDirection == AreaDirection.opponent) {
       position = Vector2(MajiangFlameGame.x(0), MajiangFlameGame.y(0));
       size = Vector2(
           MajiangFlameGame.width * MajiangFlameGame.opponentWidthRadio,
@@ -52,7 +52,7 @@ class ParticipantAreaComponent extends RectangleComponent
         ..color = Colors.redAccent
         ..style = PaintingStyle.fill;
     }
-    if (direction == 3) {
+    if (areaDirection == AreaDirection.previous) {
       position = Vector2(
           MajiangFlameGame.x(0),
           MajiangFlameGame.y(
@@ -73,7 +73,7 @@ class ParticipantAreaComponent extends RectangleComponent
     Room? room = roomController.room.value;
     if (room != null) {
       RoundParticipant? roundParticipant =
-          room.currentRound?.roundParticipants[direction];
+          roomController.findRoundParticipant(areaDirection);
       if (roundParticipant != null) {
         roundParticipantComponent = RoundParticipantComponent(
             roundParticipant, 1,

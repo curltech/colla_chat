@@ -13,16 +13,18 @@ import 'package:flutter/material.dart';
 /// 河牌区域
 class WasteAreaComponent extends RectangleComponent
     with TapCallbacks, HasGameRef<MajiangFlameGame> {
-  final int direction;
+  final AreaDirection areaDirection;
 
   WastePileComponent? wastePileComponent;
 
-  WasteAreaComponent(this.direction) {
+  TextBoxComponent? textComponent;
+
+  WasteAreaComponent(this.areaDirection) {
     _init();
   }
 
   _init() {
-    if (direction == 0) {
+    if (areaDirection == AreaDirection.self) {
       position = Vector2(
           MajiangFlameGame.x(MajiangFlameGame.width *
               (MajiangFlameGame.previousWidthRadio +
@@ -39,7 +41,7 @@ class WasteAreaComponent extends RectangleComponent
         ..color = Colors.pinkAccent
         ..style = PaintingStyle.fill;
     }
-    if (direction == 1) {
+    if (areaDirection == AreaDirection.next) {
       position = Vector2(
           MajiangFlameGame.x(MajiangFlameGame.width *
               (1 -
@@ -55,7 +57,7 @@ class WasteAreaComponent extends RectangleComponent
         ..color = Colors.blue
         ..style = PaintingStyle.fill;
     }
-    if (direction == 2) {
+    if (areaDirection == AreaDirection.opponent) {
       position = Vector2(
           MajiangFlameGame.x(MajiangFlameGame.width *
               (MajiangFlameGame.previousWidthRadio +
@@ -70,7 +72,7 @@ class WasteAreaComponent extends RectangleComponent
         ..color = Colors.green
         ..style = PaintingStyle.fill;
     }
-    if (direction == 3) {
+    if (areaDirection == AreaDirection.previous) {
       position = Vector2(
           MajiangFlameGame.x(MajiangFlameGame.width *
               (MajiangFlameGame.previousWidthRadio +
@@ -90,15 +92,35 @@ class WasteAreaComponent extends RectangleComponent
     if (wastePileComponent != null) {
       remove(wastePileComponent!);
     }
+    if (textComponent != null) {
+      remove(textComponent!);
+    }
     Room? room = roomController.room.value;
     if (room != null) {
-      WastePile? wastePile =
-          room.currentRound?.roundParticipants[direction].wastePile;
-      if (wastePile != null) {
-        wastePileComponent = WastePileComponent(wastePile, direction,
-            position: Vector2(10, 10), scale: Vector2(0.85, 0.85));
-        add(wastePileComponent!);
-      }
+      wastePileComponent = WastePileComponent(areaDirection,
+          position: Vector2(10, 10), scale: Vector2(0.85, 0.85));
+      add(wastePileComponent!);
+
+      String? name = roomController.getParticipantDirection(areaDirection).name;
+      TextPaint textPaint = TextPaint(
+        style: const TextStyle(
+          color: Colors.black,
+          fontSize: 20.0,
+        ),
+      );
+      textComponent = TextBoxComponent(
+          text: name,
+          align: Anchor.center,
+          textRenderer: textPaint,
+          position: Vector2(0, 32));
+      add(textComponent!);
     }
+  }
+
+  @override
+  void onTapDown(TapDownEvent event) {
+    roomController.selfParticipantDirection.value =
+        roomController.getParticipantDirection(areaDirection);
+    game.reload();
   }
 }

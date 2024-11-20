@@ -8,16 +8,17 @@ import 'package:flame/components.dart';
 /// 手牌区域
 class HandAreaComponent extends PositionComponent
     with HasGameRef<MajiangFlameGame> {
-  final int direction;
+  /// 区域的方位，用于显示的方式
+  final AreaDirection areaDirection;
 
   HandPileComponent? handPileComponent;
 
-  HandAreaComponent(this.direction) {
+  HandAreaComponent(this.areaDirection) {
     _init();
   }
 
   _init() {
-    if (direction == 0) {
+    if (areaDirection == AreaDirection.self) {
       position = Vector2(
           MajiangFlameGame.x(
               MajiangFlameGame.width * MajiangFlameGame.selfWidthRadio),
@@ -30,7 +31,7 @@ class HandAreaComponent extends PositionComponent
       //   ..color = Colors.teal
       //   ..style = PaintingStyle.fill;
     }
-    if (direction == 1) {
+    if (areaDirection == AreaDirection.next) {
       position = Vector2(
           MajiangFlameGame.x(MajiangFlameGame.width *
               (1 -
@@ -45,7 +46,7 @@ class HandAreaComponent extends PositionComponent
       //   ..color = Colors.yellow
       //   ..style = PaintingStyle.fill;
     }
-    if (direction == 2) {
+    if (areaDirection == AreaDirection.opponent) {
       position = Vector2(
           MajiangFlameGame.x(
               MajiangFlameGame.width * MajiangFlameGame.opponentWidthRadio),
@@ -57,7 +58,7 @@ class HandAreaComponent extends PositionComponent
       //   ..color = Colors.blueGrey
       //   ..style = PaintingStyle.fill;
     }
-    if (direction == 3) {
+    if (areaDirection == AreaDirection.previous) {
       position = Vector2(
           MajiangFlameGame.x(
               MajiangFlameGame.width * MajiangFlameGame.previousWidthRadio),
@@ -78,13 +79,9 @@ class HandAreaComponent extends PositionComponent
     }
     Room? room = roomController.room.value;
     if (room != null) {
-      HandPile? handPile =
-          room.currentRound?.roundParticipants[direction].handPile;
-      if (handPile != null) {
-        handPileComponent = HandPileComponent(handPile, direction,
-            position: Vector2(10, 10), scale: Vector2(0.85, 0.85));
-        add(handPileComponent!);
-      }
+      handPileComponent = HandPileComponent(areaDirection,
+          position: Vector2(10, 10), scale: Vector2(0.85, 0.85));
+      add(handPileComponent!);
     }
   }
 }

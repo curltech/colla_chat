@@ -1,3 +1,4 @@
+import 'package:colla_chat/pages/game/majiang/base/room.dart';
 import 'package:colla_chat/pages/game/majiang/component/hand_area_component.dart';
 import 'package:colla_chat/pages/game/majiang/component/participant_area_component.dart';
 import 'package:colla_chat/pages/game/majiang/component/setting_area_component.dart';
@@ -68,22 +69,30 @@ class MajiangFlameGame extends FlameGame
   late double startZoom;
 
   ParticipantAreaComponent opponentParticipantAreaComponent =
-      ParticipantAreaComponent(2);
-  HandAreaComponent opponentHandAreaComponent = HandAreaComponent(2);
-  WasteAreaComponent opponentWasteAreaComponent = WasteAreaComponent(2);
+      ParticipantAreaComponent(AreaDirection.opponent);
+  HandAreaComponent opponentHandAreaComponent =
+      HandAreaComponent(AreaDirection.opponent);
+  WasteAreaComponent opponentWasteAreaComponent =
+      WasteAreaComponent(AreaDirection.opponent);
   SettingAreaComponent settingAreaComponent = SettingAreaComponent();
   ParticipantAreaComponent previousParticipantAreaComponent =
-      ParticipantAreaComponent(3);
-  HandAreaComponent previousHandAreaComponent = HandAreaComponent(3);
-  WasteAreaComponent previousWasteAreaComponent = WasteAreaComponent(3);
-  WasteAreaComponent selfWasteAreaComponent = WasteAreaComponent(0);
+      ParticipantAreaComponent(AreaDirection.previous);
+  HandAreaComponent previousHandAreaComponent =
+      HandAreaComponent(AreaDirection.previous);
+  WasteAreaComponent previousWasteAreaComponent =
+      WasteAreaComponent(AreaDirection.previous);
+  WasteAreaComponent selfWasteAreaComponent =
+      WasteAreaComponent(AreaDirection.self);
   ParticipantAreaComponent nextParticipantAreaComponent =
-      ParticipantAreaComponent(1);
-  HandAreaComponent nextHandAreaComponent = HandAreaComponent(1);
-  WasteAreaComponent nextWasteAreaComponent = WasteAreaComponent(1);
+      ParticipantAreaComponent(AreaDirection.next);
+  HandAreaComponent nextHandAreaComponent =
+      HandAreaComponent(AreaDirection.next);
+  WasteAreaComponent nextWasteAreaComponent =
+      WasteAreaComponent(AreaDirection.next);
   ParticipantAreaComponent selfParticipantAreaComponent =
-      ParticipantAreaComponent(0);
-  HandAreaComponent selfHandAreaComponent = HandAreaComponent(0);
+      ParticipantAreaComponent(AreaDirection.self);
+  HandAreaComponent selfHandAreaComponent =
+      HandAreaComponent(AreaDirection.self);
 
   // @override
   // bool debugMode = true;

@@ -44,16 +44,6 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
 
   MajiangFlameGame majiangFlameGame = MajiangFlameGame();
 
-  final Map<int, String> directions = {
-    0: AppLocalizations.t('East'),
-    1: AppLocalizations.t('South'),
-    2: AppLocalizations.t('West'),
-    3: AppLocalizations.t('North'),
-    4: AppLocalizations.t('East'),
-    5: AppLocalizations.t('South'),
-    6: AppLocalizations.t('West'),
-  };
-
   RxBool fullscreen = false.obs;
 
   TextEditingController textEditingController = TextEditingController();
@@ -91,8 +81,6 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
 
   Future<void> createRoom(String name) async {
     roomController.room.value = await roomPool.createRoom(name, peerIds);
-    roomController.currentDirection.value =
-        roomController.room.value!.currentDirection;
   }
 
   /// 弹出对话框，输入名称，选择参加的人
@@ -182,8 +170,11 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
               currentRound.banker;
             }
 
-            room.onRoomEvent(RoomEvent(room.name, null,
-                room.currentDirection.index, RoomEventAction.round));
+            room.onRoomEvent(RoomEvent(
+                room.name,
+                null,
+                roomController.selfParticipantDirection.value.index,
+                RoomEventAction.round));
             majiangFlameGame.reload();
           },
           icon: const Icon(Icons.newspaper_outlined)));
@@ -194,8 +185,9 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
             if (currentRound == null) {
               return;
             }
-            RoundParticipant? currentRoundParticipant = room
-                .getRoundParticipant(roomController.currentDirection.value!);
+            RoundParticipant? currentRoundParticipant =
+                roomController.getRoundParticipant(
+                    roomController.selfParticipantDirection.value);
             if (currentRoundParticipant == null) {
               return;
             }
@@ -223,8 +215,9 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
       rightWidgets.add(IconButton(
           tooltip: AppLocalizations.t('Check take'),
           onPressed: () {
-            RoundParticipant? currentRoundParticipant = room
-                .getRoundParticipant(roomController.currentDirection.value!);
+            RoundParticipant? currentRoundParticipant =
+            roomController.getRoundParticipant(
+                    roomController.selfParticipantDirection.value);
             majiangCard.Card? takeCard =
                 currentRoundParticipant?.handPile.takeCard;
             if (takeCard != null) {

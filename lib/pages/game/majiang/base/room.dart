@@ -10,6 +10,7 @@ import 'package:colla_chat/pages/game/majiang/base/full_pile.dart';
 import 'package:colla_chat/pages/game/majiang/base/participant.dart';
 import 'package:colla_chat/pages/game/majiang/base/round.dart';
 import 'package:colla_chat/pages/game/majiang/base/suit.dart';
+import 'package:colla_chat/pages/game/majiang/room_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -17,7 +18,14 @@ import 'package:colla_chat/tool/number_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
 
+/// 参与者的方位，房间创建时候固定的方位，用于获取牌的数据
+/// east表示参与者数组的index为0，以此类推
 enum ParticipantDirection { east, south, west, north }
+
+/// 显示的角度，用于牌的显示方式
+/// self表示自己，隐藏手牌会显示在屏幕上
+/// 其他的代表next下家，opponent对家和previous上家，隐藏手牌手牌不会显示在屏幕上，只有碰杠牌财显示
+enum AreaDirection { self, next, opponent, previous }
 
 enum RoomEventAction {
   room, //新房间
@@ -109,9 +117,6 @@ class Room {
   /// 当前轮
   int? currentRoundIndex;
 
-  /// 当前登录用户在游戏中的方位，在房间创建以后不能更改
-  late final ParticipantDirection currentDirection;
-
   /// 胡牌的分数
   Map<CompleteType, int> completeTypeScores = {
     CompleteType.thirteenOne: 300,
@@ -133,13 +138,14 @@ class Room {
 
   Room(this.name);
 
-  /// 加参与者，第一个是自己，第二个是下家，第三个是对家，第四个是上家
+  /// 加参与者
   Future<void> init(List<String> peerIds) async {
     Image defaultImage = await Flame.images.load('app.png');
     for (int i = 0; i < peerIds.length; ++i) {
       String peerId = peerIds[i];
       if (myself.peerId == peerId) {
-        currentDirection = NumberUtil.toEnum(ParticipantDirection.values, i)!;
+        roomController.selfParticipantDirection.value =
+            NumberUtil.toEnum(ParticipantDirection.values, i)!;
       }
       Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
       String linkmanName = AppLocalizations.t('unknown');
@@ -187,7 +193,7 @@ class Room {
 
   /// 下家
   int next(int pos) {
-    if (pos == participants.length - 1) {
+    if (pos == 3) {
       return 0;
     }
     return pos + 1;
@@ -196,7 +202,7 @@ class Room {
   /// 上家
   int previous(int pos) {
     if (pos == 0) {
-      return participants.length - 1;
+      return 3;
     }
     return pos - 1;
   }
@@ -215,23 +221,15 @@ class Room {
     if (pos == 3) {
       return 1;
     }
-    throw 'error position';
+    throw 'error direction';
   }
 
   Round? get currentRound {
     if (currentRoundIndex != null) {
       return rounds[currentRoundIndex!];
     }
+
     return null;
-  }
-
-  /// 当前登录用户对应的参与者
-  Participant get currentParticipant {
-    return participants[currentDirection.index];
-  }
-
-  RoundParticipant? getRoundParticipant(ParticipantDirection direction) {
-    return currentRound?.getRoundParticipant(direction);
   }
 
   /// 新玩一局，positions为空自己发牌，不为空，别人发牌
