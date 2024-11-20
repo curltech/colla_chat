@@ -255,5 +255,6 @@ class Room {
     } else {
       round?.onRoomEvent(roomEvent);
     }
+    roomController.majiangFlameGame.reload();
   }
 }

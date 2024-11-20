@@ -20,12 +20,11 @@ import 'package:flutter/material.dart';
 /// Camera.follow()，Camera.stop()，Camera.moveBy()，Camera.moveTo()，Camera.setBounds()
 class MajiangFlameGame extends FlameGame
     with
-        // TapCallbacks,
         ScrollDetector,
         ScaleDetector,
         HasCollisionDetection,
         HasKeyboardHandlerComponents {
-  static const double width = 1110;
+  static const double width = 1112;
   static const double height = 655;
 
   static const double opponentHeightRadio = 0.16;

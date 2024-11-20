@@ -173,7 +173,6 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
                 null,
                 roomController.selfParticipantDirection.value.index,
                 RoomEventAction.round));
-            roomController.majiangFlameGame.reload();
           },
           icon: const Icon(Icons.newspaper_outlined)));
       rightWidgets.add(IconButton(

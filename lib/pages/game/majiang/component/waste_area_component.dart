@@ -1,8 +1,4 @@
-import 'dart:ui';
-
-import 'package:colla_chat/pages/game/majiang/base/hand_pile.dart';
 import 'package:colla_chat/pages/game/majiang/base/room.dart';
-import 'package:colla_chat/pages/game/majiang/base/waste_pile.dart';
 import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
 import 'package:colla_chat/pages/game/majiang/component/waste_pile_component.dart';
 import 'package:colla_chat/pages/game/majiang/room_controller.dart';
@@ -123,6 +119,5 @@ class WasteAreaComponent extends RectangleComponent
   void onTapDown(TapDownEvent event) {
     roomController.selfParticipantDirection.value =
         roomController.getParticipantDirection(areaDirection);
-    game.reload();
   }
 }
