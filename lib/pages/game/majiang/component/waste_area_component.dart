@@ -119,5 +119,6 @@ class WasteAreaComponent extends RectangleComponent
   void onTapDown(TapDownEvent event) {
     roomController.selfParticipantDirection.value =
         roomController.getParticipantDirection(areaDirection);
+    roomController.majiangFlameGame.reload();
   }
 }

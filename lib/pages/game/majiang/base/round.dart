@@ -437,6 +437,8 @@ class Round {
   dynamic onRoomEvent(RoomEvent roomEvent) async {
     RoomEventAction action = roomEvent.action;
     switch (action) {
+      case RoomEventAction.take:
+        _take(roomEvent.owner);
       case RoomEventAction.send:
         _send(roomEvent.owner, roomEvent.card!);
       case RoomEventAction.bar:
