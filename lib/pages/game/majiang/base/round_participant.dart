@@ -52,11 +52,7 @@ class RoundParticipant {
   /// 包了自己的胡牌的人
   int? packer;
 
-  RoundParticipant(this.index, this.round, this.participant) {
-    outstandingActions.addListener(() {
-      roomController.majiangFlameGame.actionAreaVisible();
-    });
-  }
+  RoundParticipant(this.index, this.round, this.participant);
 
   ParticipantDirection get direction {
     return NumberUtil.toEnum(ParticipantDirection.values, index)!;
@@ -114,6 +110,7 @@ class RoundParticipant {
     if (pos != null) {
       addOutstandingAction(OutstandingAction.touch, pos);
     }
+    roomController.majiangFlameGame.actionAreaVisible();
 
     return outstandingActions;
   }

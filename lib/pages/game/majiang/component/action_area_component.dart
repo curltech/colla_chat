@@ -66,6 +66,7 @@ class ActionAreaComponent extends RectangleComponent
             onPressed: () {
               _call(outstandingAction, pos: pos);
               outstandingActions.clear();
+              roomController.majiangFlameGame.actionAreaVisible();
             });
         add(spriteButtonComponent);
       }
