@@ -33,8 +33,9 @@ enum RoomEventAction {
   seaTake, //海底发牌
   send, //打牌
   touch, //碰牌
-  bar, //杠牌
-  takeBar,
+  bar, //杠牌：包括sendBar和takeBar
+  sendBar, //打牌杠牌
+  takeBar, //摸牌杠牌和手牌杠牌
   darkBar, //暗杠
   drawing, //吃
   check, //检查

@@ -29,27 +29,45 @@ class TypePileComponent extends PositionComponent
     } else {
       cardBackgroundType = CardBackgroundType.sidecard;
     }
-    double x = 0;
-    double y = 0;
+    Vector2 position = Vector2(0, 0);
+    if (areaDirection == AreaDirection.self) {
+      position.x = position.x + 10;
+      width = position.x;
+    }
+    if (areaDirection == AreaDirection.opponent) {
+      position.x = position.x + 10;
+      width = position.x;
+    }
+    if (areaDirection == AreaDirection.next) {
+      position.y = position.y + 10;
+      height = position.y;
+    }
+    if (areaDirection == AreaDirection.previous) {
+      position.y = position.y + 10;
+      height = position.y;
+    }
     for (int i = 0; i < typePile.cards.length; ++i) {
       Card card = typePile.cards[i];
-      Vector2 position = Vector2(x, y);
-      if (areaDirection == AreaDirection.self) {
-        x += 75;
-      }
-      if (areaDirection == AreaDirection.opponent) {
-        x += 37;
-      }
-      if (areaDirection == AreaDirection.next) {
-        y += 28;
-      }
-      if (areaDirection == AreaDirection.previous) {
-        y += 28;
-      }
       CardComponent cardComponent = CardComponent(
           card, areaDirection, cardBackgroundType,
           position: position);
       add(cardComponent);
+      if (areaDirection == AreaDirection.self) {
+        position.x = position.x + 43;
+        width = position.x;
+      }
+      if (areaDirection == AreaDirection.opponent) {
+        position.x = position.x + 43;
+        width = position.x;
+      }
+      if (areaDirection == AreaDirection.next) {
+        position.y = position.y + 32;
+        height = position.y;
+      }
+      if (areaDirection == AreaDirection.previous) {
+        position.y = position.y + 32;
+        height = position.y;
+      }
     }
   }
 

@@ -79,15 +79,15 @@ class HandAreaComponent extends RectangleComponent
     }
     Room? room = roomController.room.value;
     if (room != null) {
-      Vector2 position= Vector2(10, 10);
+      Vector2 position= Vector2(0, 20);
       if (areaDirection == AreaDirection.opponent) {
-        position= Vector2(10, 50);
+        position= Vector2(0, 50);
       }
       if (areaDirection == AreaDirection.next) {
-        position= Vector2(10, 10);
+        position= Vector2(10, 0);
       }
       if (areaDirection == AreaDirection.previous) {
-        position= Vector2(60, 10);
+        position= Vector2(60, 0);
       }
       handPileComponent = HandPileComponent(areaDirection,
           position: position, scale: Vector2(0.85, 0.85));

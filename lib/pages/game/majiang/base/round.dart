@@ -129,8 +129,9 @@ class Round {
     }
     bool pass = true;
     RoundParticipant roundParticipant = roundParticipants[owner];
-    Map<OutstandingAction, List<int>>? outstandingActions = roundParticipant.onRoomEvent(
-        RoomEvent(room.name, id, owner, RoomEventAction.send, card: card));
+    Map<OutstandingAction, List<int>>? outstandingActions =
+        roundParticipant.onRoomEvent(
+            RoomEvent(room.name, id, owner, RoomEventAction.send, card: card));
     for (int i = 0; i < roundParticipants.length; ++i) {
       if (i != owner) {
         roundParticipant = roundParticipants[i];
@@ -259,9 +260,12 @@ class Round {
     return true;
   }
 
-  /// 某个参与者杠打出的牌，pos表示可杠的手牌的位置
-  /// 明杠牌，分三种情况 pos为-1，表示是摸牌可杠，否则表示手牌可杠的位置 返回值为杠的牌，为空表示未成功
+  /// 某个参与者明杠牌，pos表示可杠的手牌的位置
+  /// 明杠牌，分三种情况，打牌杠牌，摸牌杠牌和手牌杠牌
+  /// 打牌杠牌:返回值为杠的牌，为空表示未成功
+  /// 摸牌杠牌和手牌杠牌:pos为-1，表示是摸牌可杠，否则表示手牌可杠的位置
   String? _bar(int owner, int pos) {
+    /// 检查抢杠
     bool canRob = false;
     Map<int, CompleteType>? completeTypes = _checkComplete(owner, sendCard!);
     if (completeTypes != null) {

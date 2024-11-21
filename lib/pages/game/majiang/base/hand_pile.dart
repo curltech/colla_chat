@@ -45,7 +45,7 @@ class HandPile extends Pile {
   }
 
   /// 检查打牌明杠
-  int? checkBar(Card card) {
+  int? checkSendBar(Card card) {
     int length = cards.length;
     if (length < 4) {
       return null;
@@ -60,7 +60,7 @@ class HandPile extends Pile {
   }
 
   /// 打牌明杠
-  Card? bar(int pos, Card card, int sender) {
+  Card? sendBar(int pos, Card card, int sender) {
     if (cards[pos] != card) {
       return null;
     }
@@ -101,7 +101,7 @@ class HandPile extends Pile {
     return results;
   }
 
-  /// 摸牌明杠
+  /// 摸牌明杠：分成摸牌杠牌和手牌杠牌
   /// pos是-1，则takeCard可杠，
   /// pos不是-1，则表示手牌的可杠牌位置
   Card? takeBar(int pos, Card card, int source) {

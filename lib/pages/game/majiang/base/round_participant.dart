@@ -65,13 +65,13 @@ class RoundParticipant {
     packer = null;
   }
 
-  addOutstandingAction(OutstandingAction outstandingAction, int value) {
+  addOutstandingAction(OutstandingAction outstandingAction, List<int> vs) {
     List<int>? values = outstandingActions[outstandingAction];
     if (values == null) {
       values = [];
       outstandingActions[outstandingAction] = values;
     }
-    values.add(value);
+    values.addAll(vs);
   }
 
   /// 打牌，owner打出牌card，对其他人检查打的牌是否能够胡牌，杠牌和碰牌，返回检查的结果
@@ -95,15 +95,22 @@ class RoundParticipant {
   Map<OutstandingAction, List<int>> _check(Card card) {
     CompleteType? completeType = handPile.checkComplete(card);
     if (completeType != null) {
-      addOutstandingAction(OutstandingAction.complete, completeType.index);
+      addOutstandingAction(OutstandingAction.complete, [completeType.index]);
     }
-    int? pos = handPile.checkBar(card);
-    if (pos != null) {
-      addOutstandingAction(OutstandingAction.bar, pos);
+    if (card == handPile.takeCard) {
+      List<int>? pos = handPile.checkTakeBar();
+      if (pos != null) {
+        addOutstandingAction(OutstandingAction.bar, pos);
+      }
+    } else {
+      int? pos = handPile.checkSendBar(card);
+      if (pos != null) {
+        addOutstandingAction(OutstandingAction.bar, [pos]);
+      }
     }
-    pos = handPile.checkTouch(card);
+    int? pos = handPile.checkTouch(card);
     if (pos != null) {
-      addOutstandingAction(OutstandingAction.touch, pos);
+      addOutstandingAction(OutstandingAction.touch, [pos]);
     }
     if (outstandingActions.value.isNotEmpty) {
       roomController.majiangFlameGame.loadActionArea();
@@ -117,7 +124,7 @@ class RoundParticipant {
     if (index == owner) {
       handPile.touch(pos, card);
     } else {
-      if (wastePile.cards.last == card) {
+      if (wastePile.cards.lastOrNull == card) {
         wastePile.cards.removeLast();
       } else {
         return false;
@@ -127,9 +134,23 @@ class RoundParticipant {
     return true;
   }
 
-  Card? _bar(int owner, int pos, Card card, int sender) {
+  /// 杠牌，分成打牌杠牌sendBar和摸牌杠牌takeBar
+  Card? _bar(int owner, int pos, Card card, {int? sender}) {
     if (index == owner) {
-      return handPile.bar(pos, card, sender);
+      if (sender != null) {
+        return _sendBar(owner, pos, card, sender);
+      } else {
+        return _takeBar(owner, pos, card);
+      }
+    }
+
+    return null;
+  }
+
+  /// 打牌杠牌，分成打牌杠牌sendBar和摸牌杠牌takeBar
+  Card? _sendBar(int owner, int pos, Card card, int sender) {
+    if (index == owner) {
+      return handPile.sendBar(pos, card, sender);
     }
 
     return null;
@@ -273,7 +294,10 @@ class RoundParticipant {
         return _touch(
             roomEvent.owner, roomEvent.pos!, roomEvent.src!, roomEvent.card!);
       case RoomEventAction.bar:
-        return _bar(
+        return _bar(roomEvent.owner, roomEvent.pos!, roomEvent.card!,
+            sender: roomEvent.src);
+      case RoomEventAction.sendBar:
+        return _sendBar(
             roomEvent.owner, roomEvent.pos!, roomEvent.card!, roomEvent.src!);
       case RoomEventAction.takeBar:
         return _takeBar(roomEvent.owner, roomEvent.pos!, roomEvent.card!);

@@ -2,6 +2,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/game/majiang/base/card.dart' as majiangCard;
 import 'package:colla_chat/pages/game/majiang/base/full_pile.dart';
+import 'package:colla_chat/pages/game/majiang/base/outstanding_action.dart';
 import 'package:colla_chat/pages/game/majiang/base/room.dart';
 import 'package:colla_chat/pages/game/majiang/base/room_pool.dart';
 import 'package:colla_chat/pages/game/majiang/base/round.dart';
@@ -176,7 +177,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
           },
           icon: const Icon(Icons.newspaper_outlined)));
       rightWidgets.add(IconButton(
-          tooltip: AppLocalizations.t('Check complete'),
+          tooltip: AppLocalizations.t('Check'),
           onPressed: () {
             Round? currentRound = room.currentRound;
             if (currentRound == null) {
@@ -191,42 +192,28 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
             majiangCard.Card? sendCard = currentRound.sendCard;
             majiangCard.Card? takeCard =
                 currentRoundParticipant.handPile.takeCard;
+            Map<OutstandingAction, List<int>> outstandingActions = {};
             if (sendCard != null) {
-              currentRoundParticipant.onRoomEvent(RoomEvent(
-                  room.name,
-                  currentRound.id,
-                  currentRoundParticipant.direction.index,
-                  RoomEventAction.checkComplete,
-                  card: sendCard));
+              outstandingActions = currentRoundParticipant.onRoomEvent(
+                  RoomEvent(
+                      room.name,
+                      currentRound.id,
+                      currentRoundParticipant.direction.index,
+                      RoomEventAction.check,
+                      card: sendCard));
             }
             if (takeCard != null) {
-              currentRoundParticipant.onRoomEvent(RoomEvent(
-                  room.name,
-                  currentRound.id,
-                  currentRoundParticipant.direction.index,
-                  RoomEventAction.checkComplete,
-                  card: takeCard));
+              outstandingActions = currentRoundParticipant.onRoomEvent(
+                  RoomEvent(
+                      room.name,
+                      currentRound.id,
+                      currentRoundParticipant.direction.index,
+                      RoomEventAction.check,
+                      card: takeCard));
             }
+            roomController.majiangFlameGame.reload();
           },
           icon: const Icon(Icons.check)));
-      rightWidgets.add(IconButton(
-          tooltip: AppLocalizations.t('Check take'),
-          onPressed: () {
-            RoundParticipant? currentRoundParticipant =
-                roomController.getRoundParticipant(
-                    roomController.selfParticipantDirection.value);
-            majiangCard.Card? takeCard =
-                currentRoundParticipant?.handPile.takeCard;
-            if (takeCard != null) {
-              currentRoundParticipant!.onRoomEvent(RoomEvent(
-                  room.name,
-                  currentRoundParticipant.round.id,
-                  currentRoundParticipant.direction.index,
-                  RoomEventAction.checkComplete,
-                  card: takeCard));
-            }
-          },
-          icon: const Icon(Icons.takeout_dining_outlined)));
     }
 
     return rightWidgets;
