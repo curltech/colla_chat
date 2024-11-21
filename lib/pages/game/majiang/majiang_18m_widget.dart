@@ -163,12 +163,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
       rightWidgets.add(IconButton(
           tooltip: AppLocalizations.t('New round'),
           onPressed: () {
-            /// 需要计算新的一轮的庄家是谁
-            Round? currentRound = room.currentRound;
-            if (currentRound != null) {
-              currentRound.banker;
-            }
-
+            /// 新的一轮的庄家是当前选择的参与者
             room.onRoomEvent(RoomEvent(
                 room.name,
                 null,

@@ -67,7 +67,7 @@ class ActionAreaComponent extends RectangleComponent
             position: position,
             size: size,
             onPressed: () {
-              _call(outstandingAction, pos: pos);
+              _call(outstandingAction, pos);
               outstandingActions.clear();
               roomController.majiangFlameGame.loadActionArea();
             });
@@ -76,7 +76,7 @@ class ActionAreaComponent extends RectangleComponent
     }
   }
 
-  _call(OutstandingAction outstandingAction, {List<int>? pos}) async {
+  _call(OutstandingAction outstandingAction, List<int> pos) async {
     Room? room = roomController.room.value;
     if (room == null) {
       return;
@@ -87,8 +87,9 @@ class ActionAreaComponent extends RectangleComponent
       return;
     }
     if (outstandingAction == OutstandingAction.complete) {
-      CompleteType? completeType = await room.onRoomEvent(
-          RoomEvent(room.name, round.id, owner, RoomEventAction.complete));
+      CompleteType? completeType = await room.onRoomEvent(RoomEvent(
+          room.name, round.id, owner, RoomEventAction.complete,
+          pos: pos[0]));
       if (completeType != null) {
         room.onRoomEvent(
             RoomEvent(room.name, round.id, owner, RoomEventAction.round));
@@ -96,23 +97,22 @@ class ActionAreaComponent extends RectangleComponent
     } else if (outstandingAction == OutstandingAction.touch) {
       room.onRoomEvent(RoomEvent(
           room.name, round.id, owner, RoomEventAction.touch,
-          src: round.sender, card: round.sendCard, pos: pos![0]));
+          src: round.sender, card: round.sendCard, pos: pos[0]));
     } else if (outstandingAction == OutstandingAction.bar) {
       room.onRoomEvent(RoomEvent(
           room.name, round.id, owner, RoomEventAction.bar,
-          pos: pos![0]));
+          pos: pos[0]));
     } else if (outstandingAction == OutstandingAction.darkBar) {
       room.onRoomEvent(RoomEvent(
           room.name, round.id, owner, RoomEventAction.darkBar,
-          pos: pos![0]));
+          pos: pos[0]));
     } else if (outstandingAction == OutstandingAction.pass) {
-      room.onRoomEvent(RoomEvent(
-          room.name, round.id, owner, RoomEventAction.pass,
-          pos: pos![0]));
+      room.onRoomEvent(
+          RoomEvent(room.name, round.id, owner, RoomEventAction.pass));
     } else if (outstandingAction == OutstandingAction.drawing) {
       room.onRoomEvent(RoomEvent(
           room.name, round.id, owner, RoomEventAction.drawing,
-          pos: pos![0]));
+          pos: pos[0]));
     }
   }
 }

@@ -27,7 +27,7 @@ class Round {
   final List<RoundParticipant> roundParticipants = [];
 
   /// 庄家
-  int? banker;
+  int banker;
 
   /// 当前的持有发牌的参与者
   int? keeper;
@@ -51,27 +51,18 @@ class Round {
   /// 本轮的随机洗牌数组
   late List<int> randoms;
 
-  Round(this.id, this.room, {List<int>? randoms}) {
+  Round(this.id, this.room, this.banker, {List<int>? randoms}) {
     if (randoms == null) {
       this.randoms = [];
     } else {
       this.randoms = randoms;
     }
+    keeper = banker;
 
     init();
   }
 
   init() {
-    /// 如果没有指定庄家，开新局的参与者就是庄家，否则设定庄家
-    int length = randoms.length;
-    if (length == 137) {
-      banker = randoms[136];
-      keeper = banker;
-    } else {
-      banker = 0;
-      keeper = banker;
-    }
-
     for (int i = 0; i < room.participants.length; ++i) {
       Participant participant = room.participants[i];
       RoundParticipant roundParticipant =
@@ -98,15 +89,11 @@ class Round {
 
       /// 每个参与者发13张牌
       if (i < 52) {
-        int reminder = (i + banker!) % 4;
+        int reminder = (i + banker) % 4;
         roundParticipants[reminder].handPile.cards.add(card);
       } else {
         stockPile.cards.add(card);
       }
-    }
-    length = randoms.length;
-    if (length == 136) {
-      randoms.add(banker!);
     }
 
     /// 手牌排序
@@ -114,7 +101,7 @@ class Round {
       roundParticipant.handPile.sort();
     }
 
-    _take(banker!);
+    _take(banker);
   }
 
   RoundParticipant getRoundParticipant(
@@ -238,6 +225,19 @@ class Round {
           .onRoomEvent(RoomEvent(room.name, id, owner, RoomEventAction.pass));
     }
 
+    bool pass = true;
+    for (int i = 0; i < roundParticipants.length; ++i) {
+      RoundParticipant roundParticipant = roundParticipants[i];
+      if (roundParticipant.outstandingActions.isNotEmpty) {
+        pass = false;
+        break;
+      }
+    }
+    if (pass) {
+      onRoomEvent(
+          RoomEvent(room.name, id, room.next(sender!), RoomEventAction.take));
+    }
+
     return true;
   }
 
@@ -252,7 +252,10 @@ class Round {
     if (roundParticipants[owner].handPile.touchPiles.length == 4) {
       roundParticipants[owner].packer = sender;
     }
-    roundParticipants[sender!].wastePile.cards.removeLast();
+    List<Card> cards = roundParticipants[sender!].wastePile.cards;
+    if (cards.isNotEmpty) {
+      cards.removeLast();
+    }
     keeper = owner;
     sender = null;
     this.sendCard = null;
@@ -267,13 +270,14 @@ class Round {
   String? _bar(int owner, int pos) {
     /// 检查抢杠
     bool canRob = false;
-    Map<int, CompleteType>? completeTypes = _checkComplete(owner, sendCard!);
-    if (completeTypes != null) {
-      canRob = true;
-      robber = owner;
-      robCard = sendCard;
+    if (sendCard != null) {
+      Map<int, CompleteType>? completeTypes = _checkComplete(owner, sendCard!);
+      if (completeTypes != null) {
+        canRob = true;
+        robber = owner;
+        robCard = sendCard;
+      }
     }
-
     for (int i = 0; i < roundParticipants.length; ++i) {
       RoundParticipant roundParticipant = roundParticipants[i];
       roundParticipant.onRoomEvent(RoomEvent(
@@ -416,12 +420,12 @@ class Round {
     return true;
   }
 
-  /// 某个参与者胡牌
-  CompleteType? _complete(int owner) {
+  /// 某个参与者胡牌,pos表示胡牌的类型
+  CompleteType? _complete(int owner, int pos) {
     RoundParticipant roundParticipant = roundParticipants[owner];
     CompleteType? completeType = roundParticipant.onRoomEvent(RoomEvent(
         room.name, id, owner, RoomEventAction.complete,
-        card: sendCard));
+        pos: pos, card: sendCard));
     if (completeType == null) {
       return null;
     }
@@ -430,7 +434,7 @@ class Round {
         RoundParticipant roundParticipant = roundParticipants[i];
         roundParticipant.onRoomEvent(RoomEvent(
             room.name, id, owner, RoomEventAction.complete,
-            card: sendCard));
+            pos: pos, card: sendCard));
       }
     }
     banker = owner;
@@ -463,7 +467,7 @@ class Round {
       case RoomEventAction.pass:
         return _pass(roomEvent.owner);
       case RoomEventAction.complete:
-        return _complete(roomEvent.owner);
+        return _complete(roomEvent.owner, roomEvent.pos!);
       default:
         break;
     }

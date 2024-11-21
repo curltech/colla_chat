@@ -63,7 +63,6 @@ class CardComponent extends PositionComponent
   /// 下家的河牌sidecard
   /// 上家的手牌sidehand
   /// 上家的河牌sidecard
-
   void _render(Canvas canvas) {
     Sprite? backgroundSprite = cardBackgroundSprite.sprites[cardBackgroundType];
     if (backgroundSprite == null) {

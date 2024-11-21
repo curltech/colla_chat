@@ -104,14 +104,17 @@ class HandPile extends Pile {
   /// 摸牌明杠：分成摸牌杠牌和手牌杠牌
   /// pos是-1，则takeCard可杠，
   /// pos不是-1，则表示手牌的可杠牌位置
-  Card? takeBar(int pos, Card card, int source) {
+  Card? takeBar(int pos, int source) {
+    if (takeCard == null) {
+      return null;
+    }
+    Card card;
     if (pos == -1) {
-      if (card != takeCard) {
-        return null;
-      }
+      card = takeCard!;
     } else {
       card = cards.removeAt(pos);
     }
+
     takeCard = null;
     takeCardType = null;
     for (int i = 0; i < touchPiles.length; ++i) {

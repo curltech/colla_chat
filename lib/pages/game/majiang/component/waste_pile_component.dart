@@ -1,14 +1,17 @@
 import 'dart:async';
 
-import 'package:colla_chat/pages/game/majiang/base/card.dart';
+import 'package:colla_chat/pages/game/majiang/base/card.dart' as majiangCard;
 import 'package:colla_chat/pages/game/majiang/base/card_background_sprite.dart';
 import 'package:colla_chat/pages/game/majiang/base/room.dart';
+import 'package:colla_chat/pages/game/majiang/base/round_participant.dart';
 import 'package:colla_chat/pages/game/majiang/base/waste_pile.dart';
 import 'package:colla_chat/pages/game/majiang/component/card_component.dart';
 import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
 import 'package:colla_chat/pages/game/majiang/room_controller.dart';
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
+import 'package:flutter/material.dart';
 
 /// flame引擎渲染的麻将牌
 class WastePileComponent extends PositionComponent
@@ -31,6 +34,27 @@ class WastePileComponent extends PositionComponent
     return roomController.getWastePile(areaDirection);
   }
 
+  /// 是否刚打出的牌
+  bool last() {
+    bool last = false;
+    majiangCard.Card? lastCard = wastePile!.cards.lastOrNull;
+    if (lastCard != null) {
+      RoundParticipant? roundParticipant =
+          roomController.findRoundParticipant(areaDirection);
+      if (roundParticipant != null) {
+        int? sender = roundParticipant.round.sender;
+        if (sender == roundParticipant.index) {
+          majiangCard.Card? sendCard = roundParticipant.round.sendCard;
+          if (lastCard == sendCard) {
+            last = true;
+          }
+        }
+      }
+    }
+
+    return last;
+  }
+
   /// 绘制牌的图像，有相对的偏移量，旋转，放大等参数
   void loadWastePile() {
     CardBackgroundType cardBackgroundType;
@@ -45,7 +69,7 @@ class WastePileComponent extends PositionComponent
     double y = 0;
     int priority = 8;
     for (int i = 0; i < wastePile!.cards.length; ++i) {
-      Card card = wastePile!.cards[i];
+      majiangCard.Card card = wastePile!.cards[i];
       int mod = i ~/ 10;
       int reminder = i % 10;
       if (reminder == 0) {

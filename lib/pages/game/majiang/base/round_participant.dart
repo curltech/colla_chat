@@ -135,12 +135,14 @@ class RoundParticipant {
   }
 
   /// 杠牌，分成打牌杠牌sendBar和摸牌杠牌takeBar
-  Card? _bar(int owner, int pos, Card card, {int? sender}) {
+  /// card和sender不为空，则是_sendBar
+  /// 否则是_takeBar
+  Card? _bar(int owner, int pos, {Card? card, int? sender}) {
     if (index == owner) {
       if (sender != null) {
-        return _sendBar(owner, pos, card, sender);
+        return _sendBar(owner, pos, card!, sender);
       } else {
-        return _takeBar(owner, pos, card);
+        return _takeBar(owner, pos);
       }
     }
 
@@ -160,9 +162,9 @@ class RoundParticipant {
   /// 打牌杠牌的时候sender不为空，表示打牌的参与者
   /// pos表示杠牌的位置,如果摸牌杠牌的时候为手牌杠牌的位置，打牌杠牌的时候是杠牌的位置
   /// 返回值为杠的牌，为空表示未成功
-  Card? _takeBar(int owner, int pos, Card card) {
+  Card? _takeBar(int owner, int pos) {
     if (index == owner) {
-      return handPile.takeBar(pos, card, owner);
+      return handPile.takeBar(pos, owner);
     }
 
     return null;
@@ -199,11 +201,10 @@ class RoundParticipant {
   }
 
   /// 胡牌，owner胡participantState中的可胡的牌形,pos表示可胡牌形数组的位置
-  CompleteType? _complete(int owner, int pos) {
+  CompleteType? _complete(int owner, int complete) {
     if (index == owner) {
       List<int>? completes = outstandingActions[OutstandingAction.complete];
       if (completes != null && completes.isNotEmpty) {
-        int complete = completes[pos];
         CompleteType? completeType =
             NumberUtil.toEnum(CompleteType.values, complete);
         if (completeType != null) {
@@ -294,13 +295,13 @@ class RoundParticipant {
         return _touch(
             roomEvent.owner, roomEvent.pos!, roomEvent.src!, roomEvent.card!);
       case RoomEventAction.bar:
-        return _bar(roomEvent.owner, roomEvent.pos!, roomEvent.card!,
-            sender: roomEvent.src);
+        return _bar(roomEvent.owner, roomEvent.pos!,
+            card: roomEvent.card, sender: roomEvent.src);
       case RoomEventAction.sendBar:
         return _sendBar(
             roomEvent.owner, roomEvent.pos!, roomEvent.card!, roomEvent.src!);
       case RoomEventAction.takeBar:
-        return _takeBar(roomEvent.owner, roomEvent.pos!, roomEvent.card!);
+        return _takeBar(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.darkBar:
         return _darkBar(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.drawing:

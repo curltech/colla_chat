@@ -232,10 +232,12 @@ class Room {
   }
 
   /// 新玩一局，positions为空自己发牌，不为空，别人发牌
-  createRound({List<int>? randoms}) {
-    Round round = Round(rounds.length, this, randoms: randoms);
+  Round createRound(int banker, {List<int>? randoms}) {
+    Round round = Round(rounds.length, this, banker, randoms: randoms);
     rounds.add(round);
     currentRoundIndex = round.id;
+
+    return round;
   }
 
   /// 房间的事件有外部触发，所有订阅者都会触发监听事件，本方法由外部调用，比如外部的消息chatMessage
@@ -245,6 +247,7 @@ class Room {
     if (roundId != null) {
       round = rounds[roundId];
     }
+    dynamic returnValue;
     if (roomEvent.action == RoomEventAction.room) {
     } else if (roomEvent.action == RoomEventAction.round) {
       List<int>? randoms;
@@ -252,10 +255,12 @@ class Room {
       if (content != null) {
         randoms = JsonUtil.toJson(content);
       }
-      createRound(randoms: randoms);
+      returnValue = createRound(roomEvent.owner, randoms: randoms);
     } else {
-      round?.onRoomEvent(roomEvent);
+      returnValue = await round?.onRoomEvent(roomEvent);
     }
     roomController.majiangFlameGame.reload();
+
+    return returnValue;
   }
 }
