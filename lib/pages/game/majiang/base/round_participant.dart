@@ -227,7 +227,8 @@ class RoundParticipant {
 
   /// 摸牌，有三种摸牌，普通的自摸，海底捞的自摸，杠上自摸
   /// owner摸到card牌，takeCardType表示摸牌的方式
-  List<int>? _take(int owner, Card card, int takeCardTypeIndex) {
+  Map<OutstandingAction, List<int>>? _take(
+      int owner, Card card, int takeCardTypeIndex) {
     TakeCardType? takeCardType =
         NumberUtil.toEnum(TakeCardType.values, takeCardTypeIndex);
     if (takeCardType == null) {
@@ -239,14 +240,22 @@ class RoundParticipant {
 
       /// 检查摸到的牌，看需要采取的动作
       CompleteType? completeType = handPile.checkComplete(card);
-      List<int>? pos = handPile.checkDarkBar();
-      pos ??= handPile.checkTakeBar();
       if (completeType != null) {
-        return [completeType.index];
+        addOutstandingAction(OutstandingAction.complete, [completeType.index]);
       }
+      List<int>? pos = handPile.checkDarkBar();
       if (pos != null) {
-        return pos;
+        addOutstandingAction(OutstandingAction.complete, pos);
       }
+      pos ??= handPile.checkTakeBar();
+      if (pos != null) {
+        addOutstandingAction(OutstandingAction.complete, pos);
+      }
+      if (outstandingActions.value.isNotEmpty) {
+        roomController.majiangFlameGame.loadActionArea();
+      }
+
+      return outstandingActions.value;
     }
 
     return null;

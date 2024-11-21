@@ -168,20 +168,37 @@ class MajiangFlameGame extends FlameGame
     world.add(nextParticipantAreaComponent);
   }
 
-  reload() {
-    opponentParticipantAreaComponent.loadRoundParticipant();
+  reloadSelf() {
     selfParticipantAreaComponent.loadRoundParticipant();
-    previousParticipantAreaComponent.loadRoundParticipant();
-    nextParticipantAreaComponent.loadRoundParticipant();
-    opponentHandAreaComponent.loadHandPile();
-    nextHandAreaComponent.loadHandPile();
+    selfWasteAreaComponent.loadWastePile();
     selfHandAreaComponent.loadHandPile();
+
+    loadActionArea();
+  }
+
+  reloadOpponent() {
+    opponentParticipantAreaComponent.loadRoundParticipant();
+    opponentWasteAreaComponent.loadWastePile();
+    opponentHandAreaComponent.loadHandPile();
+  }
+
+  reloadNext() {
+    nextParticipantAreaComponent.loadRoundParticipant();
+    nextHandAreaComponent.loadHandPile();
+    nextWasteAreaComponent.loadWastePile();
+  }
+
+  reloadPrevious() {
     previousHandAreaComponent.loadHandPile();
     previousWasteAreaComponent.loadWastePile();
-    opponentWasteAreaComponent.loadWastePile();
-    selfWasteAreaComponent.loadWastePile();
-    nextWasteAreaComponent.loadWastePile();
-    loadActionArea();
+    previousParticipantAreaComponent.loadRoundParticipant();
+  }
+
+  reload() {
+    reloadSelf();
+    reloadOpponent();
+    reloadNext();
+    reloadPrevious();
   }
 
   loadActionArea() {

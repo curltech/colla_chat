@@ -259,7 +259,14 @@ class Room {
     } else {
       returnValue = await round?.onRoomEvent(roomEvent);
     }
-    roomController.majiangFlameGame.reload();
+    if (roomEvent.action == RoomEventAction.round) {
+      roomController.majiangFlameGame.reload();
+    } else {
+      if (roomEvent.action == RoomEventAction.send) {
+        roomController.majiangFlameGame.reloadNext();
+      }
+      roomController.majiangFlameGame.reloadSelf();
+    }
 
     return returnValue;
   }

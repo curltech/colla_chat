@@ -206,7 +206,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
                       RoomEventAction.check,
                       card: takeCard));
             }
-            roomController.majiangFlameGame.reload();
+            roomController.majiangFlameGame.reloadSelf();
           },
           icon: const Icon(Icons.check)));
     }
