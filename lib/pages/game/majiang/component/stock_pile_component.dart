@@ -50,14 +50,39 @@ class StockPileComponent extends PositionComponent
     List<majiangCard.Card> upCards = [];
     List<majiangCard.Card> downCards = [];
     for (int i = 0; i < cards.length; ++i) {
-
-    }
-    for (int i = 0; i < cards.length; ++i) {
-      majiangCard.Card card = stockPile.cards[i];
-      if (i == 13) {
-        x = 0;
-        y = -10;
+      if ((barCount.isOdd && cards.length.isOdd) ||
+          (!barCount.isOdd && !cards.length.isOdd)) {
+        if (i.isOdd) {
+          downCards.add(cards[i]);
+        } else {
+          upCards.add(cards[i]);
+        }
+      } else {
+        if (i.isOdd) {
+          upCards.add(cards[i]);
+        } else {
+          downCards.add(cards[i]);
+        }
       }
+    }
+    for (int i = 0; i < downCards.length; ++i) {
+      majiangCard.Card card = stockPile.cards[i];
+      x = 0;
+      Vector2 position = Vector2(x, y);
+      x += 35;
+      CardComponent cardComponent = CardComponent(
+          card, AreaDirection.self, cardBackgroundType,
+          position: position, priority: priority);
+      add(cardComponent);
+    }
+    for (int i = 0; i < upCards.length; ++i) {
+      majiangCard.Card card = stockPile.cards[i];
+      if ((barCount.isOdd && cards.length.isOdd) ||
+          (!barCount.isOdd && !cards.length.isOdd)) {
+      } else {
+        x += 35;
+      }
+      y = -10;
       Vector2 position = Vector2(x, y);
       x += 35;
       CardComponent cardComponent = CardComponent(
