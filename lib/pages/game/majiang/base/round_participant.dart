@@ -59,6 +59,7 @@ class RoundParticipant {
 
   clear() {
     outstandingActions.clear();
+    earnedActions.clear();
     packer = null;
   }
 
@@ -67,6 +68,15 @@ class RoundParticipant {
     if (values == null) {
       values = [];
       outstandingActions[outstandingAction] = values;
+    }
+    values.addAll(vs);
+  }
+
+  addEarnedAction(OutstandingAction outstandingAction, List<int> vs) {
+    List<int>? values = earnedActions[outstandingAction];
+    if (values == null) {
+      values = [];
+      earnedActions[outstandingAction] = values;
     }
     values.addAll(vs);
   }
@@ -150,7 +160,12 @@ class RoundParticipant {
   /// 打牌杠牌，分成打牌杠牌sendBar和摸牌杠牌takeBar
   Card? _sendBar(int owner, int pos, Card card, int sender) {
     if (index == owner) {
-      return handPile.sendBar(pos, card, sender);
+      Card? c = handPile.sendBar(pos, card, sender);
+      if (c != null) {
+        addEarnedAction(OutstandingAction.bar, [sender, sender, sender]);
+      }
+
+      return c;
     }
 
     return null;
@@ -162,7 +177,12 @@ class RoundParticipant {
   /// 返回值为杠的牌，为空表示未成功
   Card? _takeBar(int owner, int pos) {
     if (index == owner) {
-      return handPile.takeBar(pos, owner);
+      Card? card = handPile.takeBar(pos, owner);
+      if (card != null) {
+        addEarnedAction(OutstandingAction.bar, [owner]);
+      }
+
+      return card;
     }
 
     return null;
@@ -172,6 +192,9 @@ class RoundParticipant {
   Card? _darkBar(int owner, int pos) {
     if (index == owner) {
       Card? card = handPile.darkBar(pos, owner);
+      if (card != null) {
+        addEarnedAction(OutstandingAction.bar, [owner, owner]);
+      }
 
       return card;
     }
