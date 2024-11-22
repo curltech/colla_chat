@@ -35,7 +35,7 @@ class ActionAreaComponent extends RectangleComponent
                 MajiangFlameGame.nextHandWidthRadio),
         MajiangFlameGame.height * MajiangFlameGame.selfHeightRadio);
     paint = Paint()
-      ..color = Colors.orangeAccent
+      ..color = Colors.orangeAccent.withOpacity(0.5)
       ..style = PaintingStyle.fill;
   }
 
