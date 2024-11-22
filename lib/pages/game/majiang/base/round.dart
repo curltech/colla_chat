@@ -161,7 +161,7 @@ class Round {
     keeper = owner;
     RoundParticipant roundParticipant = roundParticipants[owner];
     roundParticipant.onRoomEvent(RoomEvent(
-        room.name, id, owner, RoomEventAction.take,
+        room.name, id, owner, RoomEventAction.barTake,
         card: card, pos: TakeCardType.bar.index));
     for (int i = 0; i < roundParticipants.length; ++i) {
       if (i != owner) {

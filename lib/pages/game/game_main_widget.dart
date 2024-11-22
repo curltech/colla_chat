@@ -1,4 +1,3 @@
-import 'package:colla_chat/pages/game/majiang/back/majiang_widget.dart';
 import 'package:colla_chat/pages/game/majiang/majiang_18m_widget.dart';
 import 'package:colla_chat/pages/game/model/meta_modeller_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';

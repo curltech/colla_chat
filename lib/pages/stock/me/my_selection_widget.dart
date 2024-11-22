@@ -242,16 +242,20 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
       return;
     }
     List<String> tsCodes = subscription.split(',');
-    for (var tsCode in tsCodes) {
-      /// 更新股票的日线的数据
-      stockLineService.getUpdateDayLine(tsCode);
-    }
-    List<DayLine> dayLines =
-        await remoteDayLineService.sendFindLatest(subscription);
-    dayLineController.replaceAll(dayLines);
-    tsCodes.clear();
-    for (var dayLine in dayLines) {
-      tsCodes.add(dayLine.tsCode);
+    try {
+      for (var tsCode in tsCodes) {
+        /// 更新股票的日线的数据
+        await stockLineService.getUpdateDayLine(tsCode);
+      }
+      List<DayLine> dayLines =
+          await remoteDayLineService.sendFindLatest(subscription);
+      dayLineController.replaceAll(dayLines);
+      tsCodes.clear();
+      for (var dayLine in dayLines) {
+        tsCodes.add(dayLine.tsCode);
+      }
+    } catch (e) {
+      DialogUtil.info(content: 'Update day line failure:$e');
     }
     multiKlineController.replaceAll(tsCodes);
   }

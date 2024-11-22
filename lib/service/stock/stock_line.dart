@@ -15,7 +15,7 @@ class StockLineService {
         if (response.statusCode == 200) {
           return response.data;
         }
-            }
+      }
     }
   }
 
