@@ -87,6 +87,10 @@ class CardComponent extends PositionComponent
         _drawSprite(canvas, backgroundSprite, 0, 0);
         // _drawSprite(canvas, card.sprite, 0, 0);
         break;
+      case CardBackgroundType.opponentbar:
+        _drawSprite(canvas, backgroundSprite, 0, 0);
+        // _drawSprite(canvas, card.sprite, 0, 0);
+        break;
       case CardBackgroundType.sidehand:
         if (areaDirection == AreaDirection.next) {
           _drawSprite(canvas, backgroundSprite, 0, 0);

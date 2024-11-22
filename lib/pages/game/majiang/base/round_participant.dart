@@ -35,6 +35,11 @@ class RoundParticipant {
   final RxMap<OutstandingAction, List<int>> outstandingActions =
       RxMap<OutstandingAction, List<int>>({});
 
+  /// 参与者已经发生的行为，比如，明杠，暗杠等，值数组代表行为的发生人
+  /// 自己代表自摸杠，别人代表打牌杠
+  final Map<OutstandingAction, List<int>> earnedActions =
+      <OutstandingAction, List<int>>{};
+
   /// 记录重要的事件
   final List<RoomEvent> roomEvents = [];
 
@@ -42,12 +47,6 @@ class RoundParticipant {
       StreamController<RoomEvent>.broadcast();
 
   late final StreamSubscription<RoomEvent> roomEventStreamSubscription;
-
-  /// 杠牌次数
-  int barCount = 0;
-
-  /// 别人给自己杠牌的人
-  List<int> barSenders = [];
 
   /// 包了自己的胡牌的人
   int? packer;
@@ -60,8 +59,6 @@ class RoundParticipant {
 
   clear() {
     outstandingActions.clear();
-    barCount = 0;
-    barSenders.clear();
     packer = null;
   }
 
@@ -93,6 +90,7 @@ class RoundParticipant {
   }
 
   Map<OutstandingAction, List<int>> _check(Card card) {
+    outstandingActions.clear();
     CompleteType? completeType = handPile.checkComplete(card);
     if (completeType != null) {
       addOutstandingAction(OutstandingAction.complete, [completeType.index]);

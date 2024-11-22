@@ -95,8 +95,16 @@ class WasteAreaComponent extends RectangleComponent
     }
     Room? room = roomController.room.value;
     if (room != null) {
-      wastePileComponent =
-          WastePileComponent(areaDirection, scale: Vector2(0.85, 0.85));
+      if (areaDirection == AreaDirection.previous ||
+          areaDirection == AreaDirection.next) {
+        wastePileComponent =
+            WastePileComponent(areaDirection, scale: Vector2(1, 1));
+      }
+      if (areaDirection == AreaDirection.self ||
+          areaDirection == AreaDirection.opponent) {
+        wastePileComponent =
+            WastePileComponent(areaDirection, scale: Vector2(0.85, 0.85));
+      }
       add(wastePileComponent!);
 
       // String? name = roomController.getParticipantDirection(areaDirection).name;

@@ -5,6 +5,7 @@ import 'package:colla_chat/pages/game/majiang/component/action_area_component.da
 import 'package:colla_chat/pages/game/majiang/component/hand_area_component.dart';
 import 'package:colla_chat/pages/game/majiang/component/participant_area_component.dart';
 import 'package:colla_chat/pages/game/majiang/component/setting_area_component.dart';
+import 'package:colla_chat/pages/game/majiang/component/stock_area_component.dart';
 import 'package:colla_chat/pages/game/majiang/component/waste_area_component.dart';
 import 'package:colla_chat/pages/game/majiang/room_controller.dart';
 import 'package:flame/components.dart';
@@ -24,33 +25,36 @@ class MajiangFlameGame extends FlameGame
         ScaleDetector,
         HasCollisionDetection,
         HasKeyboardHandlerComponents {
-  static const double width = 1112;
+  static const double width = 1114;
   static const double height = 655;
 
   static const double opponentHeightRadio = 0.16;
+  static const double opponentWasteHeightRadio = 0.26;
+  static const double selfWasteHeightRadio = 0.26;
+  static const double selfHeightRadio = 0.2;
+
+  static const double stockHeightRadio = 0.12;
+  static const double stockWidthRadio = 0.38;
+
+  static const double previousWidthRadio = 0.08;
+  static const double previousHandWidthRadio = 0.08;
+  static const double previousWasteWidthRadio = 0.15;
+  static const double opponentWasteWidthRadio = 0.38;
+  static const double selfWasteWidthRadio = 0.38;
+  static const double nextWasteWidthRadio = 0.15;
+  static const double nextHandWidthRadio = 0.08;
+  static const double nextWidthRadio = 0.08;
+
+  static const double previousHeightRadio = 0.64;
+
   static const double opponentWidthRadio = 0.16;
   static const double opponentHandWidthRadio = 0.68;
   static const double settingWidthRadio = 0.16;
 
-  static const double selfHeightRadio = 0.2;
+  static const double nextHeightRadio = 0.64;
+
   static const double selfWidthRadio = 0.16;
   static const double selfHandWidthRadio = 0.84;
-
-  static const double nextHeightRadio = 0.64;
-  static const double opponentWasteHeightRadio = 0.3;
-  static const double selfWasteHeightRadio = 0.3;
-
-  static const double previousHeightRadio = 0.64;
-  static const double previousWidthRadio = 0.08;
-  static const double previousHandWidthRadio = 0.08;
-  static const double previousWasteWidthRadio = 0.16;
-
-  static const double nextWidthRadio = 0.08;
-  static const double nextHandWidthRadio = 0.08;
-  static const double nextWasteWidthRadio = 0.16;
-
-  static const double opponentWasteWidthRadio = 0.36;
-  static const double selfWasteWidthRadio = 0.36;
 
   static double x(double x) {
     return -MajiangFlameGame.width * 0.5 + x;
@@ -96,6 +100,7 @@ class MajiangFlameGame extends FlameGame
       ParticipantAreaComponent(AreaDirection.self);
   HandAreaComponent selfHandAreaComponent =
       HandAreaComponent(AreaDirection.self);
+  StockAreaComponent stockAreaComponent = StockAreaComponent();
   ActionAreaComponent? actionAreaComponent;
 
   // @override
@@ -166,6 +171,7 @@ class MajiangFlameGame extends FlameGame
     world.add(nextWasteAreaComponent);
     world.add(nextHandAreaComponent);
     world.add(nextParticipantAreaComponent);
+    world.add(stockAreaComponent);
   }
 
   reloadSelf() {
@@ -194,11 +200,16 @@ class MajiangFlameGame extends FlameGame
     previousParticipantAreaComponent.loadRoundParticipant();
   }
 
+  reloadStock() {
+    stockAreaComponent.loadStockPile();
+  }
+
   reload() {
     reloadSelf();
     reloadOpponent();
     reloadNext();
     reloadPrevious();
+    reloadStock();
   }
 
   loadActionArea() {

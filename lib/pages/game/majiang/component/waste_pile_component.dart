@@ -75,7 +75,7 @@ class WastePileComponent extends PositionComponent
       if (reminder == 0) {
         if (areaDirection == AreaDirection.self) {
           x = 0;
-          y = -mod * 55;
+          y = -mod * 55 - 29;
           priority = 8 - mod;
         }
         if (areaDirection == AreaDirection.opponent) {
@@ -83,7 +83,7 @@ class WastePileComponent extends PositionComponent
           y = mod * 55;
         }
         if (areaDirection == AreaDirection.next) {
-          x = -mod * 47;
+          x = -mod * 47 - 24;
           y = 0;
         }
         if (areaDirection == AreaDirection.previous) {

@@ -263,6 +263,19 @@ class Round {
     return true;
   }
 
+  int get barCount {
+    int c = 0;
+    for (int i = 0; i < roundParticipants.length; ++i) {
+      RoundParticipant roundParticipant = roundParticipants[i];
+      List<List<int>> counts = roundParticipant.earnedActions.values.toList();
+      for (var count in counts) {
+        c += count.length;
+      }
+    }
+
+    return c;
+  }
+
   /// 某个参与者明杠牌，pos表示可杠的手牌的位置
   /// 明杠牌，分三种情况，打牌杠牌，摸牌杠牌和手牌杠牌
   /// 打牌杠牌:返回值为杠的牌，为空表示未成功
@@ -411,9 +424,18 @@ class Round {
 
     for (int i = 0; i < roundParticipants.length; ++i) {
       RoundParticipant roundParticipant = roundParticipants[i];
-      for (var sender in roundParticipant.barSenders) {
-        roundParticipant.score.value += 10;
-        roundParticipants[sender].score.value -= 10;
+      for (var entry in roundParticipant.earnedActions.entries) {
+        OutstandingAction outstandingAction = entry.key;
+        if (outstandingAction == OutstandingAction.darkBar) {}
+        if (outstandingAction == OutstandingAction.bar) {
+          List<int> participants = entry.value;
+          for (var participant in participants) {
+            // 自摸杠
+            if (i == participant) {
+              roundParticipant.score.value += 10;
+            } else {}
+          }
+        }
       }
     }
 
