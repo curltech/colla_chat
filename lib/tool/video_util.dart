@@ -92,7 +92,9 @@ class VideoUtil {
     return bytes;
   }
 
-  ///支持ANDROID，IOS，MACOS，WINDOWS
+  /// 使用原生的实现产生视频的缩略图
+  /// FcNativeVideoThumbnail实现
+  /// 支持ANDROID，IOS，MACOS，WINDOWS
   static Future<void> videoThumbnailFile({
     required String thumbnailPath,
     String? videoFile,
@@ -141,7 +143,9 @@ class VideoUtil {
     return mediaInfo;
   }
 
-  ///ANDROID,IOS,MACOS,WINDOWS
+  /// windows使用原生的实现FcNativeVideoThumbnail实现产生视频的缩略图
+  /// mobile使用VideoCompress
+  /// ANDROID,IOS,MACOS,WINDOWS
   static Future<Uint8List?> getByteThumbnail({
     String? videoFile,
     List<int>? data,
@@ -171,7 +175,8 @@ class VideoUtil {
     return null;
   }
 
-  ///ANDROID,IOS,MACOS,WINDOWS
+  /// 获取视频缩略图的临时文件
+  /// ANDROID,IOS,MACOS,WINDOWS
   static Future<File?> getFileThumbnail({
     String? videoFile,
     List<int>? data,
@@ -192,10 +197,11 @@ class VideoUtil {
       if (videoFile == null && data != null) {
         videoFile = await FileUtil.writeTempFileAsBytes(data);
       }
-      final thumbnailFile = await VideoCompress.getFileThumbnail(videoFile!,
-          quality: quality, // default(100)
-          position: position // default(-1)
-          );
+      final File thumbnailFile =
+          await VideoCompress.getFileThumbnail(videoFile!,
+              quality: quality, // default(100)
+              position: position // default(-1)
+              );
 
       return thumbnailFile;
     }

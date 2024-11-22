@@ -285,9 +285,9 @@ dependencies:
   speech_to_text: ^6.6.2
   sherpa_onnx: ^1.10.14
   flutter_image_compress: ^2.3.0
-  video_thumbnail: ^0.5.2
-  video_compress: ^3.1.2
-  fc_native_video_thumbnail: ^0.12.0
+  video_thumbnail: ^0.5.3
+  video_compress: ^3.1.3
+  fc_native_video_thumbnail: ^0.16.1
   extended_image: ^8.2.0 #所有平台，官方软件，管理图像
   extended_image_library: ^4.0.2
   image_editor: ^1.5.1
