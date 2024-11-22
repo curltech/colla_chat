@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:colla_chat/pages/chat/me/media/ffmpeg_media_widget.dart';
+import 'package:colla_chat/pages/media/ffmpeg_media_widget.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';

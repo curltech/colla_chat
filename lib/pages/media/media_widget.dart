@@ -1,9 +1,9 @@
-import 'package:colla_chat/pages/chat/me/media/ffmpeg_media_widget.dart';
-import 'package:colla_chat/pages/chat/me/media/image_editor_widget.dart';
-import 'package:colla_chat/pages/chat/me/media/platform_audio_player_widget.dart';
-import 'package:colla_chat/pages/chat/me/media/platform_audio_recorder_widget.dart';
-import 'package:colla_chat/pages/chat/me/media/platform_video_player_widget.dart';
-import 'package:colla_chat/pages/chat/me/media/video_editor_widget.dart';
+import 'package:colla_chat/pages/media/ffmpeg_media_widget.dart';
+import 'package:colla_chat/pages/media/image_editor_widget.dart';
+import 'package:colla_chat/pages/media/platform_audio_player_widget.dart';
+import 'package:colla_chat/pages/media/platform_audio_recorder_widget.dart';
+import 'package:colla_chat/pages/media/platform_video_player_widget.dart';
+import 'package:colla_chat/pages/media/video_editor_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
