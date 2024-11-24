@@ -196,8 +196,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
                       currentRoundParticipant.direction.index,
                       RoomEventAction.check,
                       card: sendCard));
-            }
-            if (takeCard != null) {
+            } else if (takeCard != null) {
               outstandingActions = currentRoundParticipant.onRoomEvent(
                   RoomEvent(
                       room.name,
@@ -205,6 +204,13 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
                       currentRoundParticipant.direction.index,
                       RoomEventAction.check,
                       card: takeCard));
+            } else {
+              outstandingActions = currentRoundParticipant.onRoomEvent(
+                  RoomEvent(
+                      room.name,
+                      currentRound.id,
+                      currentRoundParticipant.direction.index,
+                      RoomEventAction.check));
             }
             roomController.majiangFlameGame.reloadSelf();
           },

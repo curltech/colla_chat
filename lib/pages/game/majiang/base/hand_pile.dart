@@ -105,9 +105,6 @@ class HandPile extends Pile {
   /// pos是-1，则takeCard可杠，
   /// pos不是-1，则表示手牌的可杠牌位置
   Card? takeBar(int pos, int source) {
-    if (takeCard == null) {
-      return null;
-    }
     Card card;
     if (pos == -1) {
       card = takeCard!;
@@ -245,10 +242,12 @@ class HandPile extends Pile {
   }
 
   /// 检查胡牌，card是自摸或者别人打出的牌，返回是否可能胡的牌
-  CompleteType? checkComplete(Card card) {
+  CompleteType? checkComplete({Card? card}) {
     CompleteType? completeType;
     List<Card> cards = [...this.cards];
-    cards.add(card);
+    if (card != null) {
+      cards.add(card);
+    }
     FormatPile formatPile = FormatPile(cards: cards);
     bool success = formatPile.check13_1();
     if (success) {

@@ -15,7 +15,7 @@ import 'package:flame/events.dart';
 class StockPileComponent extends PositionComponent
     with DragCallbacks, TapCallbacks, HasGameRef<MajiangFlameGame> {
   StockPileComponent({super.scale}) {
-    position = Vector2(5, 18);
+    position = Vector2(5, 20);
   }
 
   StockPile? get stockPile {
@@ -45,29 +45,30 @@ class StockPileComponent extends PositionComponent
     if (stockPile.cards.length > length) {
       cards = stockPile.cards.sublist(stockPile.cards.length - length);
     } else {
-      cards = stockPile.cards;
+      cards = [...stockPile.cards];
     }
     List<majiangCard.Card> upCards = [];
     List<majiangCard.Card> downCards = [];
+    majiangCard.Card? lastCard;
+    if (barCount.isOdd && cards.isNotEmpty) {
+      lastCard = cards.removeLast();
+    }
+    if (cards.length.isOdd && cards.isNotEmpty) {
+      majiangCard.Card firstCard = cards.removeAt(0);
+      downCards.add(firstCard);
+    }
     for (int i = 0; i < cards.length; ++i) {
-      if ((barCount.isOdd && cards.length.isOdd) ||
-          (!barCount.isOdd && !cards.length.isOdd)) {
-        if (i.isOdd) {
-          downCards.add(cards[i]);
-        } else {
-          upCards.add(cards[i]);
-        }
+      if (i.isOdd) {
+        downCards.add(cards[i]);
       } else {
-        if (i.isOdd) {
-          upCards.add(cards[i]);
-        } else {
-          downCards.add(cards[i]);
-        }
+        upCards.add(cards[i]);
       }
     }
+    if (lastCard != null) {
+      downCards.add(lastCard);
+    }
     for (int i = 0; i < downCards.length; ++i) {
-      majiangCard.Card card = stockPile.cards[i];
-      x = 0;
+      majiangCard.Card card = downCards[i];
       Vector2 position = Vector2(x, y);
       x += 35;
       CardComponent cardComponent = CardComponent(
@@ -75,13 +76,13 @@ class StockPileComponent extends PositionComponent
           position: position, priority: priority);
       add(cardComponent);
     }
+    x = 0;
+    y = 0;
+    if (downCards.length == upCards.length + 2) {
+      x += 35;
+    }
     for (int i = 0; i < upCards.length; ++i) {
-      majiangCard.Card card = stockPile.cards[i];
-      if ((barCount.isOdd && cards.length.isOdd) ||
-          (!barCount.isOdd && !cards.length.isOdd)) {
-      } else {
-        x += 35;
-      }
+      majiangCard.Card card = upCards[i];
       y = -10;
       Vector2 position = Vector2(x, y);
       x += 35;

@@ -8,6 +8,7 @@ import 'package:colla_chat/pages/game/majiang/base/participant.dart';
 import 'package:colla_chat/pages/game/majiang/base/room.dart';
 import 'package:colla_chat/pages/game/majiang/base/stock_pile.dart';
 import 'package:colla_chat/pages/game/majiang/base/suit.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/number_util.dart';
 
 /// 摸牌的类型：自摸牌，杠上牌，海底捞
@@ -180,7 +181,10 @@ class Round {
     if (stockPile.cards.isEmpty) {
       return null;
     }
+
     Card card = stockPile.cards.removeLast();
+    logger.w(
+        'take card ${card.toString()}, leave ${stockPile.cards.length} cards');
     sender = null;
     sendCard = null;
     keeper = owner;
@@ -252,9 +256,11 @@ class Round {
     if (roundParticipants[owner].handPile.touchPiles.length == 4) {
       roundParticipants[owner].packer = sender;
     }
-    List<Card> cards = roundParticipants[sender!].wastePile.cards;
-    if (cards.isNotEmpty) {
-      cards.removeLast();
+    if (sender != null) {
+      List<Card> cards = roundParticipants[sender!].wastePile.cards;
+      if (cards.isNotEmpty) {
+        cards.removeLast();
+      }
     }
     keeper = owner;
     sender = null;

@@ -90,7 +90,7 @@ class RoundParticipant {
       return null;
     } else {
       /// 不是owner，检查是否可以胡牌，碰牌或者杠牌
-      Map<OutstandingAction, List<int>> outstandingActions = _check(card);
+      Map<OutstandingAction, List<int>> outstandingActions = _check(card: card);
       if (outstandingActions.isNotEmpty) {
         return outstandingActions;
       }
@@ -99,27 +99,33 @@ class RoundParticipant {
     return null;
   }
 
-  Map<OutstandingAction, List<int>> _check(Card card) {
+  /// 检查行为状态，既包括摸牌检查，也包含打牌检查
+  Map<OutstandingAction, List<int>> _check({Card? card}) {
     outstandingActions.clear();
-    CompleteType? completeType = handPile.checkComplete(card);
+    CompleteType? completeType = handPile.checkComplete(card: card);
     if (completeType != null) {
       addOutstandingAction(OutstandingAction.complete, [completeType.index]);
     }
     if (card == handPile.takeCard) {
-      List<int>? pos = handPile.checkTakeBar();
+      List<int>? pos = handPile.checkDarkBar();
+      if (pos != null) {
+        addOutstandingAction(OutstandingAction.darkBar, pos);
+      }
+      pos = handPile.checkTakeBar();
       if (pos != null) {
         addOutstandingAction(OutstandingAction.bar, pos);
       }
-    } else {
+    } else if (card != null) {
       int? pos = handPile.checkSendBar(card);
       if (pos != null) {
         addOutstandingAction(OutstandingAction.bar, [pos]);
       }
+      pos = handPile.checkTouch(card);
+      if (pos != null) {
+        addOutstandingAction(OutstandingAction.touch, [pos]);
+      }
     }
-    int? pos = handPile.checkTouch(card);
-    if (pos != null) {
-      addOutstandingAction(OutstandingAction.touch, [pos]);
-    }
+
     if (outstandingActions.value.isNotEmpty) {
       roomController.majiangFlameGame.loadActionArea();
     }
@@ -130,13 +136,7 @@ class RoundParticipant {
   /// 碰牌,owner碰pos位置，sender打出的card牌
   bool _touch(int owner, int pos, int sender, Card card) {
     if (index == owner) {
-      handPile.touch(pos, card);
-    } else {
-      if (wastePile.cards.lastOrNull == card) {
-        wastePile.cards.removeLast();
-      } else {
-        return false;
-      }
+      return handPile.touch(pos, card);
     }
 
     return true;
@@ -215,7 +215,7 @@ class RoundParticipant {
 
   CompleteType? _checkComplete(int owner, Card card) {
     if (index == owner) {
-      return handPile.checkComplete(card);
+      return handPile.checkComplete(card: card);
     }
 
     return null;
@@ -259,24 +259,13 @@ class RoundParticipant {
       handPile.takeCard = card;
       handPile.takeCardType = takeCardType;
 
-      /// 检查摸到的牌，看需要采取的动作
-      CompleteType? completeType = handPile.checkComplete(card);
-      if (completeType != null) {
-        addOutstandingAction(OutstandingAction.complete, [completeType.index]);
-      }
-      List<int>? pos = handPile.checkDarkBar();
-      if (pos != null) {
-        addOutstandingAction(OutstandingAction.complete, pos);
-      }
-      pos ??= handPile.checkTakeBar();
-      if (pos != null) {
-        addOutstandingAction(OutstandingAction.complete, pos);
-      }
-      if (outstandingActions.value.isNotEmpty) {
+      /// 检查摸到的牌，看需要采取的动作，这里其实只需要摸牌检查
+      Map<OutstandingAction, List<int>> outstandingActions = _check(card: card);
+      if (outstandingActions.isNotEmpty) {
         roomController.majiangFlameGame.loadActionArea();
       }
 
-      return outstandingActions.value;
+      return outstandingActions;
     }
 
     return null;
@@ -337,7 +326,7 @@ class RoundParticipant {
       case RoomEventAction.drawing:
         return _drawing(roomEvent.owner, roomEvent.pos!, roomEvent.card!);
       case RoomEventAction.check:
-        return _check(roomEvent.card!);
+        return _check(card: roomEvent.card);
       case RoomEventAction.checkComplete:
         return _checkComplete(roomEvent.owner, roomEvent.card!);
       case RoomEventAction.complete:
