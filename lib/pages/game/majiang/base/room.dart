@@ -30,7 +30,6 @@ enum RoomEventAction {
   round, //新局
   take, //发牌
   barTake, //杠上发牌
-  seaTake, //海底发牌
   send, //打牌
   touch, //碰牌
   bar, //杠牌：包括sendBar和takeBar

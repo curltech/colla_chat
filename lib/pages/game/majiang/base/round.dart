@@ -78,7 +78,7 @@ class Round {
     ];
     stockPile = StockPile();
     Random random = Random.secure();
-    for (int i = 0; i < 136; ++i) {
+    for (int i = 0; i < 58; ++i) {
       int pos;
       if (i < randoms.length) {
         pos = randoms[i];
@@ -146,10 +146,6 @@ class Round {
     if (stockPile.cards.isEmpty) {
       return null;
     }
-    int barCount = 0;
-    for (var roundParticipant in roundParticipants) {
-      // barCount += roundParticipant.barCount;
-    }
     int mod = barCount % 2;
     Card card;
     if (mod == 0 && stockPile.cards.length > 1) {
@@ -176,6 +172,10 @@ class Round {
     return card;
   }
 
+  bool get isSeaTake {
+    return stockPile.cards.length < 5;
+  }
+
   /// 发牌
   Card? _take(int owner) {
     if (stockPile.cards.isEmpty) {
@@ -189,20 +189,14 @@ class Round {
     sendCard = null;
     keeper = owner;
     TakeCardType takeCardType = TakeCardType.self;
-    if (stockPile.cards.length < 5) {
+    if (isSeaTake) {
       takeCardType = TakeCardType.sea;
     }
-    RoundParticipant roundParticipant = roundParticipants[owner];
-    roundParticipant.onRoomEvent(RoomEvent(
-        room.name, id, owner, RoomEventAction.take,
-        card: card, pos: takeCardType.index));
     for (int i = 0; i < roundParticipants.length; ++i) {
-      if (i != owner) {
-        RoundParticipant roundParticipant = roundParticipants[i];
-        roundParticipant.onRoomEvent(RoomEvent(
-            room.name, id, owner, RoomEventAction.take,
-            card: card, pos: takeCardType.index));
-      }
+      RoundParticipant roundParticipant = roundParticipants[i];
+      roundParticipant.onRoomEvent(RoomEvent(
+          room.name, id, owner, RoomEventAction.take,
+          card: card, pos: takeCardType.index));
     }
 
     return card;

@@ -81,6 +81,9 @@ class StockPileComponent extends PositionComponent
     if (downCards.length == upCards.length + 2) {
       x += 35;
     }
+    if (downCards.length == upCards.length + 1 && !barCount.isOdd) {
+      x += 35;
+    }
     for (int i = 0; i < upCards.length; ++i) {
       majiangCard.Card card = upCards[i];
       y = -10;

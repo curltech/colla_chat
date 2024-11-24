@@ -157,29 +157,39 @@ class HandPile extends Pile {
   }
 
   Card? darkBar(int pos, int source) {
-    if (cards[pos] != cards[pos + 1] ||
-        cards[pos] != cards[pos + 2] ||
-        cards[pos] != cards[pos + 3]) {
-      return null;
-    }
-    Card card = cards.removeAt(pos);
-    cards.removeAt(pos);
-    cards.removeAt(pos);
+    Card? card;
 
-    if (card != takeCard) {
-      cards.removeAt(pos);
-      if (takeCard != null) {
-        cards.add(takeCard!);
-        sort();
+    /// 三个手牌相同
+    if (cards[pos] == cards[pos + 1] && cards[pos] == cards[pos + 2]) {
+      /// 并且与摸牌相同
+      if (cards[pos] == takeCard) {
+        card = cards.removeAt(pos);
+        cards.removeAt(pos);
+        cards.removeAt(pos);
+        takeCard = null;
+        takeCardType = null;
+        TypePile typePile = TypePile(cards: [card, card, card, card]);
+        typePile.source = source;
+        touchPiles.add(typePile);
+      }
+
+      /// 并且与第四张牌相同，摸牌进入手牌
+      if (cards.length > pos + 3 && cards[pos] == cards[pos + 3]) {
+        card = cards.removeAt(pos);
+        cards.removeAt(pos);
+        cards.removeAt(pos);
+        cards.removeAt(pos);
+        if (takeCard != null) {
+          cards.add(takeCard!);
+          sort();
+        }
+        takeCard = null;
+        takeCardType = null;
+        TypePile typePile = TypePile(cards: [card, card, card, card]);
+        typePile.source = source;
+        touchPiles.add(typePile);
       }
     }
-    takeCard = null;
-    takeCardType = null;
-
-    TypePile typePile = TypePile(cards: [card, card, card, card]);
-    typePile.source = source;
-    touchPiles.add(typePile);
-
     return card;
   }
 

@@ -100,8 +100,18 @@ class RoundParticipant {
   }
 
   /// 检查行为状态，既包括摸牌检查，也包含打牌检查
-  Map<OutstandingAction, List<int>> _check({Card? card}) {
+  Map<OutstandingAction, List<int>> _check(
+      {Card? card, TakeCardType? takeCardType}) {
     outstandingActions.clear();
+    if (takeCardType == TakeCardType.sea) {
+      CompleteType? completeType = handPile.checkComplete(card: card);
+      if (completeType != null) {
+        addOutstandingAction(OutstandingAction.complete, [completeType.index]);
+      } else {
+        addOutstandingAction(OutstandingAction.pass, []);
+      }
+      return outstandingActions.value;
+    }
     CompleteType? completeType = handPile.checkComplete(card: card);
     if (completeType != null) {
       addOutstandingAction(OutstandingAction.complete, [completeType.index]);
@@ -260,7 +270,8 @@ class RoundParticipant {
       handPile.takeCardType = takeCardType;
 
       /// 检查摸到的牌，看需要采取的动作，这里其实只需要摸牌检查
-      Map<OutstandingAction, List<int>> outstandingActions = _check(card: card);
+      Map<OutstandingAction, List<int>> outstandingActions =
+          _check(card: card, takeCardType: takeCardType);
       if (outstandingActions.isNotEmpty) {
         roomController.majiangFlameGame.loadActionArea();
       }
@@ -300,11 +311,6 @@ class RoundParticipant {
         break;
       case RoomEventAction.barTake:
         if (TakeCardType.bar.index == roomEvent.pos) {
-          return _take(roomEvent.owner, roomEvent.card!, roomEvent.pos!);
-        }
-        break;
-      case RoomEventAction.seaTake:
-        if (TakeCardType.sea.index == roomEvent.pos) {
           return _take(roomEvent.owner, roomEvent.card!, roomEvent.pos!);
         }
         break;
