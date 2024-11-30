@@ -1,5 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/chart/k_chart/kline_controller.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
@@ -27,9 +29,21 @@ class KChartPlusWidget extends StatelessWidget {
   final RxList<DepthEntity> asks = <DepthEntity>[].obs;
 
   final ChartStyle chartStyle = ChartStyle();
-  final ChartColors chartColors = ChartColors(
+  final ChartColors lightChartColors = ChartColors(
     dnColor: const Color(0xFF14AD8F),
     upColor: const Color(0xFFD5405D),
+    nowPriceUpColor: const Color(0xFFD5405D),
+    nowPriceDnColor: const Color(0xFF14AD8F),
+  );
+  final ChartColors darkChartColors = ChartColors(
+    bgColor: Colors.black,
+    selectFillColor: Colors.black,
+    infoWindowNormalColor: Colors.white,
+    infoWindowTitleColor: Colors.white,
+    dnColor: const Color(0xFF14AD8F),
+    upColor: const Color(0xFFD5405D),
+    nowPriceUpColor: const Color(0xFFD5405D),
+    nowPriceDnColor: const Color(0xFF14AD8F),
   );
 
   void initDepth(List<DepthEntity>? bids, List<DepthEntity>? asks) {
@@ -157,7 +171,7 @@ class KChartPlusWidget extends StatelessWidget {
       klines.add(kline);
     }
     if (klines.isNotEmpty) {
-      DataUtil.calculate(klines, const [3, 5, 10, 30, 60]);
+      DataUtil.calculate(klines, const [5, 10, 30]);
     }
     this.klines.value.assignAll(klines);
   }
@@ -181,7 +195,9 @@ class KChartPlusWidget extends StatelessWidget {
       child: DepthChart(
         bids.value,
         asks.value,
-        chartColors,
+        myself.themeMode == ThemeMode.light
+            ? lightChartColors
+            : darkChartColors,
       ),
     );
   }
@@ -204,7 +220,9 @@ class KChartPlusWidget extends StatelessWidget {
             KChartWidget(
               klines.value,
               chartStyle,
-              chartColors,
+              myself.themeMode == ThemeMode.light
+                  ? lightChartColors
+                  : darkChartColors,
               chartTranslations: ChartTranslations(
                 date: AppLocalizations.t('Trade date'),
                 open: AppLocalizations.t('Open price'),
@@ -228,7 +246,7 @@ class KChartPlusWidget extends StatelessWidget {
               fixedLength: 2,
               timeFormat: TimeFormat.YEAR_MONTH_DAY,
               verticalTextAlignment: verticalTextAlignment.value,
-              maDayList: const [3, 5, 10, 30, 60],
+              maDayList: const [5, 10, 30],
             ),
             if (showLoading.value)
               Container(
