@@ -29,7 +29,7 @@ class RemoteDayLineService extends GeneralRemoteService<DayLine> {
   }
 
   /// 查询自选股的日线
-  Future<dynamic> sendFindPreceding(String tsCode,
+  Future<Map<String, dynamic>> sendFindPreceding(String tsCode,
       {int? from, int? limit, int? endDate, int? count}) async {
     var params = {
       'ts_code': tsCode,

@@ -1,3 +1,4 @@
+import 'package:colla_chat/entity/stock/day_line.dart';
 import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
@@ -137,6 +138,52 @@ class MultiKlineController extends DataListController<String> {
       this.currentIndex = currentIndex;
       load();
     }
+  }
+
+  /// 装载日线
+  loadDayLines({List<String>? tsCodes}) async {
+    tsCodes ??= data;
+    List<Future<Map<String, dynamic>?>> futures = [];
+    for (String tsCode in tsCodes) {
+      if (online.value) {
+        futures.add(CrawlerUtil.getDayLine(tsCode));
+      } else {
+        futures.add(remoteDayLineService.sendFindPreceding(tsCode));
+      }
+    }
+    List<Map<String, dynamic>?> responses = await Future.wait(futures);
+    for (Map<String, dynamic>? response in responses) {
+      if (response != null) {
+        List<DayLine> dayLines = response['data'];
+        if (dayLines.isNotEmpty) {
+          String tsCode = dayLines.first.tsCode;
+          Share? share = await shareService.findShare(tsCode);
+          if (share != null) {
+            put(tsCode, share.name!);
+          }
+          KlineController? klineController = klineControllers[tsCode]?[101];
+          if (klineController != null) {
+            klineController.replaceAll(dayLines);
+          }
+        }
+      }
+    }
+  }
+
+  List<DayLine> findLatestDayLines({List<String>? tsCodes}) {
+    tsCodes ??= data;
+    List<DayLine> dayLines = [];
+    for (String tsCode in tsCodes) {
+      KlineController? klineController = klineControllers[tsCode]?[101];
+      if (klineController != null) {
+        DayLine? dayLine = klineController.data.lastOrNull;
+        if (dayLine != null) {
+          dayLines.add(dayLine);
+        }
+      }
+    }
+
+    return dayLines;
   }
 
   /// 加载当前的tsCode和lineType全部（在线模式）或者更多的数据（服务器模式）

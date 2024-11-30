@@ -78,6 +78,7 @@ class Round {
     ];
     stockPile = StockPile();
     Random random = Random.secure();
+    /// 牌的总数是136
     for (int i = 0; i < 58; ++i) {
       int pos;
       if (i < randoms.length) {

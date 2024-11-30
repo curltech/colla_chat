@@ -19,6 +19,7 @@ import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+/// 存储在本地的自选股票的代码和分组
 class MyShareController {
   final RxString subscription = ''.obs;
 
@@ -35,6 +36,14 @@ class MyShareController {
     String? value =
         await localSharedPreferences.get('subscription', encrypt: true);
     subscription.value = value ?? '';
+    List<String> tsCodes = subscription.value.split(',');
+    for (String tsCode in tsCodes) {
+      Share? share = await shareService.findShare(tsCode);
+      if (share != null) {
+        multiKlineController.put(tsCode, share.name!);
+      }
+    }
+    multiKlineController.loadDayLines();
 
     await assignGroupSubscription();
   }
@@ -151,17 +160,13 @@ class MyShareController {
 
 MyShareController myShareController = MyShareController();
 
-/// 自选股当前日线的控制器
-final DataListController<DayLine> dayLineController =
-    DataListController<DayLine>();
-
 ///自选股和分组的查询界面
 class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
   final StockLineChartWidget stockLineChartWidget = StockLineChartWidget();
 
   ShareSelectionWidget({super.key}) {
     indexWidgetProvider.define(stockLineChartWidget);
-    _refresh(myShareController.groupName.value);
+    _refresh();
   }
 
   @override
@@ -175,6 +180,9 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'MySelection';
+
+  final DataListController<DayLine> dayLineController =
+      DataListController<DayLine>();
 
   Widget _buildActionWidget(BuildContext context, int index, dynamic dayLine) {
     Widget actionWidget = Row(
@@ -193,7 +201,6 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
                   content: 'Do you confirm remove from group?');
               if (confirm != null && confirm) {
                 await myShareController.removeShareGroup(groupName, tsCode);
-                dayLineController.delete(index: index);
               }
             }
           },
@@ -234,30 +241,18 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  _refresh(String groupName) async {
-    String? subscription = myShareController.groupSubscription.value[groupName];
-    if (subscription == null || subscription.isEmpty) {
-      dayLineController.replaceAll([]);
-      multiKlineController.replaceAll([]);
-      return;
-    }
-    List<String> tsCodes = subscription.split(',');
+  _refresh({List<String>? tsCodes}) async {
+    await multiKlineController.loadDayLines(tsCodes: tsCodes);
+    dayLineController
+        .replaceAll(multiKlineController.findLatestDayLines(tsCodes: tsCodes));
     try {
-      for (var tsCode in tsCodes) {
+      for (var tsCode in multiKlineController.data) {
         /// 更新股票的日线的数据
-        await stockLineService.getUpdateDayLine(tsCode);
-      }
-      List<DayLine> dayLines =
-          await remoteDayLineService.sendFindLatest(subscription);
-      dayLineController.replaceAll(dayLines);
-      tsCodes.clear();
-      for (var dayLine in dayLines) {
-        tsCodes.add(dayLine.tsCode);
+        stockLineService.getUpdateDayLine(tsCode);
       }
     } catch (e) {
       DialogUtil.info(content: 'Update day line failure:$e');
     }
-    multiKlineController.replaceAll(tsCodes);
   }
 
   Widget _buildShareListView(BuildContext context) {
@@ -317,7 +312,6 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
             return _buildActionWidget(context, index, dayLine);
           }),
     ];
-
     return BindingDataTable2<DayLine>(
       key: UniqueKey(),
       showCheckboxColumn: true,
@@ -337,7 +331,6 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
           onPressed: () {
             _addMember(key);
             myShareController.groupName.value = key;
-            _refresh(key);
           },
           child: Text(key,
               style: TextStyle(
@@ -381,8 +374,13 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
       ),
       IconButton(
         tooltip: AppLocalizations.t('Refresh'),
-        onPressed: () {
-          _refresh(myShareController.groupName.value);
+        onPressed: () async {
+          String? subscription = await myShareController
+              .findSubscription(myShareController.groupName.value);
+          if (subscription != null) {
+            List<String> tsCodes = subscription.split(',');
+            _refresh(tsCodes: tsCodes);
+          }
         },
         icon: const Icon(Icons.refresh),
       ),

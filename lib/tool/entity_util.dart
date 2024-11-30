@@ -6,7 +6,7 @@ class EntityUtil {
     if (entity is Map) {
       return entity['id'];
     } else {
-      return entity.index;
+      return entity.id;
     }
   }
 
@@ -14,7 +14,7 @@ class EntityUtil {
     if (entity is Map) {
       entity['id'] = val;
     } else {
-      entity.index = val;
+      entity.id = val;
     }
   }
 

@@ -12,10 +12,10 @@ class KChartPlusWidget extends StatelessWidget {
   KChartPlusWidget({super.key});
 
   final Rx<List<KLineEntity>> klines = Rx<List<KLineEntity>>([]);
-  final RxBool showLoading = true.obs;
+  final RxBool showLoading = false.obs;
   final RxBool showVol = true.obs;
-  final RxBool isLine = true.obs;
-  final RxBool hideGrid = false.obs;
+  final RxBool isLine = false.obs;
+  final RxBool hideGrid = true.obs;
   final RxBool showNowPrice = true.obs;
   final RxBool isTrendLine = false.obs;
   final Rx<VerticalTextAlignment> verticalTextAlignment =
@@ -26,7 +26,10 @@ class KChartPlusWidget extends StatelessWidget {
   final RxList<DepthEntity> asks = <DepthEntity>[].obs;
 
   final ChartStyle chartStyle = ChartStyle();
-  final ChartColors chartColors = ChartColors();
+  final ChartColors chartColors = ChartColors(
+    dnColor: const Color(0xFF14AD8F),
+    upColor: const Color(0xFFD5405D),
+  );
 
   void initDepth(List<DepthEntity>? bids, List<DepthEntity>? asks) {
     if (bids == null || asks == null || bids.isEmpty || asks.isEmpty) return;
@@ -119,7 +122,7 @@ class KChartPlusWidget extends StatelessWidget {
   /// 创建图形的数据
   _buildKlines(List<dynamic> data) {
     List<KLineEntity> klines = [];
-    for (int i = data.length - 1; i >= 0; i--) {
+    for (int i = 0; i < data.length; i++) {
       Map<String, dynamic> map = JsonUtil.toJson(data[i]);
       int tradeDate = map['trade_date'];
       int hour = 0;
@@ -151,6 +154,9 @@ class KChartPlusWidget extends StatelessWidget {
           close: close.toDouble(),
           vol: volume.toDouble());
       klines.add(kline);
+    }
+    if (klines.isNotEmpty) {
+      DataUtil.calculate(klines, const [3, 5, 10, 30, 60]);
     }
     this.klines.value.assignAll(klines);
   }
@@ -188,7 +194,7 @@ class KChartPlusWidget extends StatelessWidget {
         _buildKlines(data);
       }
       if (klines.value.isEmpty) {
-        return nil;
+        return nilBox;
       }
       return ListView(
         shrinkWrap: true,
