@@ -5,6 +5,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:k_chart_plus/chart_translations.dart';
 import 'package:k_chart_plus/k_chart_plus.dart';
 
 /// 增强版本的k_chart
@@ -204,6 +205,17 @@ class KChartPlusWidget extends StatelessWidget {
               klines.value,
               chartStyle,
               chartColors,
+              chartTranslations: ChartTranslations(
+                date: AppLocalizations.t('Trade date'),
+                open: AppLocalizations.t('Open price'),
+                high: AppLocalizations.t('High price'),
+                low: AppLocalizations.t('Low price'),
+                close: AppLocalizations.t('Close price'),
+                changeAmount: AppLocalizations.t('Amount change'),
+                change: AppLocalizations.t('Amount change%'),
+                amount: AppLocalizations.t('Trade amount'),
+                vol: AppLocalizations.t('Trade volume'),
+              ),
               isLine: isLine.value,
               mBaseHeight: 360,
               isTrendLine: isTrendLine.value,
