@@ -6,6 +6,7 @@ import 'package:colla_chat/service/stock/day_line.dart';
 import 'package:colla_chat/service/stock/eastmoney/crawler.dart';
 import 'package:colla_chat/service/stock/min_line.dart';
 import 'package:colla_chat/service/stock/share.dart';
+import 'package:colla_chat/service/stock/stock_line.dart';
 import 'package:colla_chat/service/stock/wmqy_line.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:get/get.dart';
@@ -142,6 +143,14 @@ class MultiKlineController extends DataListController<String> {
 
   /// 装载日线
   loadDayLines({List<String>? tsCodes}) async {
+    // try {
+    //   for (var tsCode in multiKlineController.data) {
+    //     /// 更新股票的日线的数据
+    //     stockLineService.getUpdateDayLine(tsCode);
+    //   }
+    // } catch (e) {
+    //   logger.i('Update day line failure:$e');
+    // }
     tsCodes ??= data;
     List<Future<Map<String, dynamic>?>> futures = [];
     for (String tsCode in tsCodes) {
@@ -161,6 +170,7 @@ class MultiKlineController extends DataListController<String> {
           if (share != null) {
             put(tsCode, share.name!);
           }
+
           KlineController? klineController = klineControllers[tsCode]?[101];
           if (klineController != null) {
             klineController.replaceAll(dayLines);
@@ -170,15 +180,23 @@ class MultiKlineController extends DataListController<String> {
     }
   }
 
-  List<DayLine> findLatestDayLines({List<String>? tsCodes}) {
+  Future<List<DayLine>> findLatestDayLines({List<String>? tsCodes}) async {
     tsCodes ??= data;
     List<DayLine> dayLines = [];
     for (String tsCode in tsCodes) {
       KlineController? klineController = klineControllers[tsCode]?[101];
       if (klineController != null) {
         DayLine? dayLine = klineController.data.lastOrNull;
+        if (dayLine == null) {
+          await loadDayLines(tsCodes: [tsCode]);
+        }
         if (dayLine != null) {
           dayLines.add(dayLine);
+          String tsCode = dayLine.tsCode;
+          Share? share = await shareService.findShare(tsCode);
+          if (share != null) {
+            dayLine.name = share.name;
+          }
         }
       }
     }

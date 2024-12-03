@@ -7,7 +7,6 @@ import 'package:colla_chat/plugin/chart/k_chart/kline_controller.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/service/stock/day_line.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/service/stock/share_group.dart';
 import 'package:colla_chat/service/stock/stock_line.dart';
@@ -241,17 +240,16 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  _refresh({List<String>? tsCodes}) async {
-    await multiKlineController.loadDayLines(tsCodes: tsCodes);
-    dayLineController
-        .replaceAll(multiKlineController.findLatestDayLines(tsCodes: tsCodes));
-    try {
-      for (var tsCode in multiKlineController.data) {
-        /// 更新股票的日线的数据
-        stockLineService.getUpdateDayLine(tsCode);
-      }
-    } catch (e) {
-      DialogUtil.info(content: 'Update day line failure:$e');
+  _refresh({String? groupName}) async {
+    groupName ??= myShareController.groupName.value;
+    String? subscription = await myShareController.findSubscription(groupName);
+    if (subscription != null) {
+      List<String> tsCodes = subscription.split(',');
+      List<DayLine> dayLines =
+          await multiKlineController.findLatestDayLines(tsCodes: tsCodes);
+      dayLineController.replaceAll(dayLines);
+    } else {
+      dayLineController.replaceAll([]);
     }
   }
 
@@ -323,6 +321,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
     );
   }
 
+  /// 股票分组的按钮
   Widget _buildShareGroupWidget() {
     return Obx(() {
       List<Widget> children = [];
@@ -331,6 +330,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
           onPressed: () {
             _addMember(key);
             myShareController.groupName.value = key;
+            _refresh();
           },
           child: Text(key,
               style: TextStyle(
@@ -375,12 +375,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
       IconButton(
         tooltip: AppLocalizations.t('Refresh'),
         onPressed: () async {
-          String? subscription = await myShareController
-              .findSubscription(myShareController.groupName.value);
-          if (subscription != null) {
-            List<String> tsCodes = subscription.split(',');
-            _refresh(tsCodes: tsCodes);
-          }
+          _refresh();
         },
         icon: const Icon(Icons.refresh),
       ),

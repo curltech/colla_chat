@@ -38,7 +38,13 @@ class BindingDataTable2<T> extends StatelessWidget {
     this.horizontalMargin,
     this.columnSpacing,
     this.fixedLeftColumns = 0,
-  });
+  }) {
+    controller.data.addListener(() {
+      changed.value = !changed.value;
+    });
+  }
+
+  RxBool changed = true.obs;
 
   double totalWidth = 0.0;
 
@@ -107,8 +113,7 @@ class BindingDataTable2<T> extends StatelessWidget {
           }
           if (dataType == DataType.percentage) {
             if (fieldValue is num) {
-              fieldValue =
-                  NumberUtil.stdPercentage(fieldValue.toDouble());
+              fieldValue = NumberUtil.stdPercentage(fieldValue.toDouble());
             } else {
               fieldValue = fieldValue.toString();
             }
@@ -142,6 +147,7 @@ class BindingDataTable2<T> extends StatelessWidget {
           fn(index, value);
         } else if (checked != value) {
           EntityUtil.setChecked(t, value);
+          changed.value = !changed.value;
         }
       },
       onTap: () {
@@ -183,41 +189,46 @@ class BindingDataTable2<T> extends StatelessWidget {
 
   /// 过滤条件的多项选择框的表
   Widget _buildDataTable(BuildContext context) {
-    return Obx(() {
-      return DataTable2(
-        key: UniqueKey(),
-        dataRowHeight: dataRowHeight,
-        minWidth: minWidth ?? 2000,
-        dividerThickness: 0.0,
-        showCheckboxColumn: showCheckboxColumn,
-        horizontalMargin: horizontalMargin,
-        columnSpacing: columnSpacing,
-        fixedLeftColumns: fixedLeftColumns,
-        sortArrowIcon: Icons.keyboard_arrow_up,
-        headingCheckboxTheme: CheckboxThemeData(
-          side: BorderSide(color: myself.primary),
-          fillColor: WidgetStateColor.resolveWith((states) => myself.primary),
-          // checkColor: MaterialStateColor.resolveWith((states) => Colors.white)
-        ),
-        datarowCheckboxTheme: CheckboxThemeData(
-          side: BorderSide(color: myself.primary),
-          fillColor: WidgetStateColor.resolveWith((states) => myself.primary),
-          // checkColor: MaterialStateColor.resolveWith((states) => Colors.white)
-        ),
-        sortColumnIndex: controller.sortColumnIndex.value,
-        sortAscending: controller.sortAscending.value,
-        columns: _buildDataColumns(),
-        rows: _buildDataRows(),
-        onSelectAll: (val) {
-          if (val != null) {
-            List<dynamic> data = controller.data;
-            for (dynamic t in data) {
-              EntityUtil.setChecked(t, val);
-            }
-          }
-        },
-      );
-    });
+    return ListenableBuilder(
+        listenable: changed,
+        builder: (BuildContext context, Widget? child) {
+          return DataTable2(
+            key: UniqueKey(),
+            dataRowHeight: dataRowHeight,
+            minWidth: minWidth ?? 2000,
+            dividerThickness: 0.0,
+            showCheckboxColumn: showCheckboxColumn,
+            horizontalMargin: horizontalMargin,
+            columnSpacing: columnSpacing,
+            fixedLeftColumns: fixedLeftColumns,
+            sortArrowIcon: Icons.keyboard_arrow_up,
+            headingCheckboxTheme: CheckboxThemeData(
+              side: BorderSide(color: myself.primary),
+              fillColor:
+                  WidgetStateColor.resolveWith((states) => myself.primary),
+              // checkColor: MaterialStateColor.resolveWith((states) => Colors.white)
+            ),
+            datarowCheckboxTheme: CheckboxThemeData(
+              side: BorderSide(color: myself.primary),
+              fillColor:
+                  WidgetStateColor.resolveWith((states) => myself.primary),
+              // checkColor: MaterialStateColor.resolveWith((states) => Colors.white)
+            ),
+            sortColumnIndex: controller.sortColumnIndex.value,
+            sortAscending: controller.sortAscending.value,
+            columns: _buildDataColumns(),
+            rows: _buildDataRows(),
+            onSelectAll: (val) {
+              if (val != null) {
+                List<dynamic> data = controller.data;
+                for (dynamic t in data) {
+                  EntityUtil.setChecked(t, val);
+                }
+                changed.value = !changed.value;
+              }
+            },
+          );
+        });
   }
 
   @override
