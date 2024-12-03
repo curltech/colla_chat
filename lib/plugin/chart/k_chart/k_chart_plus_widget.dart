@@ -13,7 +13,7 @@ import 'package:k_chart_plus/k_chart_plus.dart';
 class KChartPlusWidget extends StatelessWidget {
   KChartPlusWidget({super.key});
 
-  final Rx<List<KLineEntity>> klines = Rx<List<KLineEntity>>([]);
+  final RxList<KLineEntity> klines = <KLineEntity>[].obs;
   final RxBool showLoading = false.obs;
   final RxBool showVol = true.obs;
   final RxBool isLine = false.obs;
@@ -23,7 +23,8 @@ class KChartPlusWidget extends StatelessWidget {
   final Rx<VerticalTextAlignment> verticalTextAlignment =
       VerticalTextAlignment.left.obs;
   final Rx<MainState> mainState = MainState.MA.obs;
-  final RxList<SecondaryState> secondaryState = <SecondaryState>[].obs;
+  final RxList<SecondaryState> secondaryState =
+      <SecondaryState>[SecondaryState.MACD].obs;
   final RxList<DepthEntity> bids = <DepthEntity>[].obs;
   final RxList<DepthEntity> asks = <DepthEntity>[].obs;
 
@@ -153,7 +154,7 @@ class KChartPlusWidget extends StatelessWidget {
     if (klines.isNotEmpty) {
       DataUtil.calculate(klines, const [5, 10, 30]);
     }
-    this.klines.value.assignAll(klines);
+    this.klines.assignAll(klines);
   }
 
   Widget _buildToolPanel(BuildContext context) {
