@@ -65,73 +65,54 @@ class KChartPlusWidget extends StatelessWidget {
     }
   }
 
-  Widget _buildTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 12, 15),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-
   Widget buildVolButton() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: TextButton(
-          onPressed: () {
-            showVol.value = !showVol.value;
-          },
-          child: Text(AppLocalizations.t('Vol')),
+    return TextButton(
+      onPressed: () {
+        showVol.value = !showVol.value;
+      },
+      child: Text(
+        AppLocalizations.t('Trade volume'),
+        style: TextStyle(
+          color: showVol.value ? myself.primary : Colors.white,
         ),
       ),
     );
   }
 
-  Widget buildMainButtons() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Wrap(
-        alignment: WrapAlignment.start,
-        spacing: 10,
-        runSpacing: 10,
-        children: MainState.values.map((e) {
-          return TextButton(
-            onPressed: () {
-              mainState.value = e;
-            },
-            child: Text(AppLocalizations.t(e.name)),
-          );
-        }).toList(),
-      ),
-    );
+  List<Widget> buildMainButtons() {
+    return MainState.values.map((e) {
+      return TextButton(
+        onPressed: () {
+          mainState.value = e;
+        },
+        child: Text(
+          AppLocalizations.t(e.name),
+          style: TextStyle(
+            color: mainState.value == e ? myself.primary : Colors.white,
+          ),
+        ),
+      );
+    }).toList();
   }
 
-  Widget buildSecondButtons() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Wrap(
-        alignment: WrapAlignment.start,
-        spacing: 10,
-        runSpacing: 5,
-        children: SecondaryState.values.map((e) {
-          return TextButton(
-            onPressed: () {
-              if (secondaryState.contains(e)) {
-                secondaryState.value.remove(e);
-              } else {
-                secondaryState.add(e);
-              }
-            },
-            child: Text(AppLocalizations.t(e.name)),
-          );
-        }).toList(),
-      ),
-    );
+  List<Widget> buildSecondButtons() {
+    return SecondaryState.values.map((e) {
+      return TextButton(
+        onPressed: () {
+          if (secondaryState.contains(e)) {
+            secondaryState.value.remove(e);
+          } else {
+            secondaryState.add(e);
+          }
+        },
+        child: Text(
+          AppLocalizations.t(e.name),
+          style: TextStyle(
+            color: secondaryState.contains(e) ? myself.primary : Colors.white,
+          ),
+        ),
+      );
+    }).toList();
   }
 
   /// 创建图形的数据
@@ -176,15 +157,16 @@ class KChartPlusWidget extends StatelessWidget {
     this.klines.value.assignAll(klines);
   }
 
-  List<Widget> _buildToolPanel(BuildContext context) {
-    return [
-      _buildTitle('VOL'),
-      buildVolButton(),
-      _buildTitle('Main State'),
-      buildMainButtons(),
-      _buildTitle('Secondary State'),
-      buildSecondButtons()
-    ];
+  Widget _buildToolPanel(BuildContext context) {
+    return Container(
+        color: Colors.grey,
+        child: Obx(() {
+          return Wrap(children: [
+            buildVolButton(),
+            ...buildMainButtons(),
+            ...buildSecondButtons()
+          ]);
+        }));
   }
 
   Widget _buildDepthChart() {
@@ -216,6 +198,7 @@ class KChartPlusWidget extends StatelessWidget {
       return ListView(
         shrinkWrap: true,
         children: <Widget>[
+          _buildToolPanel(context),
           Stack(children: <Widget>[
             KChartWidget(
               klines.value,
@@ -238,7 +221,7 @@ class KChartPlusWidget extends StatelessWidget {
               mBaseHeight: 360,
               isTrendLine: isTrendLine.value,
               mainState: mainState.value,
-              volHidden: showVol.value,
+              volHidden: !showVol.value,
               secondaryStateLi: secondaryState.toSet(),
               showNowPrice: showNowPrice.value,
               hideGrid: hideGrid.value,
@@ -256,7 +239,6 @@ class KChartPlusWidget extends StatelessWidget {
                 child: const CircularProgressIndicator(),
               ),
           ]),
-          ..._buildToolPanel(context),
           const SizedBox(height: 30),
           if (bids.isNotEmpty && asks.isNotEmpty) _buildDepthChart()
         ],

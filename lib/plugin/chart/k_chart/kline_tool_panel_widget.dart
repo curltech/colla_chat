@@ -15,7 +15,6 @@ class KlineToolPanelWidget extends StatelessWidget {
             scale: 0.7,
             child: ToggleButtons(
               color: Colors.grey,
-              selectedColor: Colors.white,
               fillColor: myself.primary,
               borderRadius: borderRadius,
               onPressed: (int value) {
@@ -26,115 +25,120 @@ class KlineToolPanelWidget extends StatelessWidget {
                 !multiKlineController.online.value
               ],
               children: [
-                Tooltip(
-                    message: AppLocalizations.t('online'),
-                    child: const Icon(Icons.book_online_outlined)),
-                Tooltip(
-                    message: AppLocalizations.t('offline'),
-                    child: const Icon(Icons.offline_bolt_outlined))
+                TextButton(
+                    onPressed: () {
+                      multiKlineController.online.value = true;
+                    },
+                    child: Text(
+                      AppLocalizations.t('online'),
+                      style: const TextStyle(color: Colors.white),
+                    )),
+                TextButton(
+                    onPressed: () {
+                      multiKlineController.online.value = false;
+                    },
+                    child: Text(AppLocalizations.t('offline'),
+                        style: const TextStyle(color: Colors.white)))
               ],
             )),
-        IconButton(
-          onPressed: multiKlineController.lineType.value != 100
-              ? () {
-                  multiKlineController.lineType.value = 100;
-                }
-              : null,
-          icon: Icon(
-            Icons.lock_clock,
-            color: multiKlineController.lineType.value == 100
-                ? Colors.yellow
-                : myself.primary,
-          ),
-          tooltip: AppLocalizations.t('minline'),
-        ),
-        IconButton(
-          onPressed: multiKlineController.lineType.value != 101
-              ? () {
-                  multiKlineController.lineType.value = 101;
-                }
-              : null,
-          icon: Icon(
-            Icons.calendar_view_day_outlined,
-            color: multiKlineController.lineType.value == 101
-                ? Colors.yellow
-                : myself.primary,
-          ),
-          tooltip: AppLocalizations.t('dayline'),
-        ),
-        IconButton(
-          onPressed: multiKlineController.lineType.value != 102
-              ? () {
-                  multiKlineController.lineType.value = 102;
-                }
-              : null,
-          icon: Icon(
-            Icons.calendar_view_week_outlined,
-            color: multiKlineController.lineType.value == 102
-                ? Colors.yellow
-                : myself.primary,
-          ),
-          tooltip: AppLocalizations.t('weekline'),
-        ),
-        IconButton(
-          onPressed: multiKlineController.lineType.value != 103
-              ? () {
-                  multiKlineController.lineType.value = 103;
-                }
-              : null,
-          icon: Icon(
-            Icons.calendar_view_month_outlined,
-            color: multiKlineController.lineType.value == 103
-                ? Colors.yellow
-                : myself.primary,
-          ),
-          tooltip: AppLocalizations.t('monthline'),
-        ),
-        IconButton(
-          onPressed: multiKlineController.lineType.value != 104
-              ? () {
-                  multiKlineController.lineType.value = 104;
-                }
-              : null,
-          icon: Icon(
-            size: 22,
-            Icons.perm_contact_calendar,
-            color: multiKlineController.lineType.value == 104
-                ? Colors.yellow
-                : myself.primary,
-          ),
-          tooltip: AppLocalizations.t('qutarline'),
-        ),
-        IconButton(
-          onPressed: multiKlineController.lineType.value != 105
-              ? () {
-                  multiKlineController.lineType.value = 105;
-                }
-              : null,
-          icon: Icon(
-            size: 22,
-            Icons.calendar_month_outlined,
-            color: multiKlineController.lineType.value == 105
-                ? Colors.yellow
-                : myself.primary,
-          ),
-          tooltip: AppLocalizations.t('halfyearline'),
-        ),
-        IconButton(
-          onPressed: multiKlineController.lineType.value != 106
-              ? () {
-                  multiKlineController.lineType.value = 106;
-                }
-              : null,
-          icon: Icon(
-            size: 20,
-            Icons.calendar_today_outlined,
-            color: multiKlineController.lineType.value == 106
-                ? Colors.yellow
-                : myself.primary,
-          ),
-          tooltip: AppLocalizations.t('yearline'),
-        ),
+        TextButton(
+            onPressed: multiKlineController.lineType.value != 100
+                ? () {
+                    multiKlineController.lineType.value = 100;
+                  }
+                : null,
+            child: Text(
+              AppLocalizations.t('minline'),
+              style: TextStyle(
+                color: multiKlineController.lineType.value == 100
+                    ? myself.primary
+                    : Colors.white,
+              ),
+            )),
+        TextButton(
+            onPressed: multiKlineController.lineType.value != 101
+                ? () {
+                    multiKlineController.lineType.value = 101;
+                  }
+                : null,
+            child: Text(
+              AppLocalizations.t('dayline'),
+              style: TextStyle(
+                color: multiKlineController.lineType.value == 101
+                    ? myself.primary
+                    : Colors.white,
+              ),
+            )),
+        TextButton(
+            onPressed: multiKlineController.lineType.value != 102
+                ? () {
+                    multiKlineController.lineType.value = 102;
+                  }
+                : null,
+            child: Text(
+              AppLocalizations.t('weekline'),
+              style: TextStyle(
+                color: multiKlineController.lineType.value == 102
+                    ? myself.primary
+                    : Colors.white,
+              ),
+            )),
+        TextButton(
+            onPressed: multiKlineController.lineType.value != 103
+                ? () {
+                    multiKlineController.lineType.value = 103;
+                  }
+                : null,
+            child: Text(
+              AppLocalizations.t('monthline'),
+              style: TextStyle(
+                color: multiKlineController.lineType.value == 103
+                    ? myself.primary
+                    : Colors.white,
+              ),
+            )),
+        TextButton(
+            onPressed: multiKlineController.lineType.value != 104
+                ? () {
+                    multiKlineController.lineType.value = 104;
+                  }
+                : null,
+            child: Text(
+              AppLocalizations.t('quatarline'),
+              style: TextStyle(
+                color: multiKlineController.lineType.value == 104
+                    ? myself.primary
+                    : Colors.white,
+              ),
+            )),
+        TextButton(
+            onPressed: multiKlineController.lineType.value != 105
+                ? () {
+                    multiKlineController.lineType.value = 105;
+                  }
+                : null,
+            child: Text(
+              AppLocalizations.t('halfyearline'),
+              style: TextStyle(
+                color: multiKlineController.lineType.value == 105
+                    ? myself.primary
+                    : Colors.white,
+              ),
+            )),
+        TextButton(
+            onPressed: multiKlineController.lineType.value != 106
+                ? () {
+                    multiKlineController.lineType.value = 106;
+                  }
+                : null,
+            child: Text(
+              AppLocalizations.t('yearline'),
+              style: TextStyle(
+                color: multiKlineController.lineType.value == 106
+                    ? myself.primary
+                    : Colors.white,
+              ),
+            )),
         IconButton(
           tooltip: AppLocalizations.t('Previous'),
           onPressed: () async {
@@ -158,6 +162,6 @@ class KlineToolPanelWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _buildToolPanelWidget(context);
+    return Container(color: Colors.grey, child: _buildToolPanelWidget(context));
   }
 }
