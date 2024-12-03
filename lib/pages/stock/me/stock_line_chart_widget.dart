@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/state_manager.dart';
 
 class StockLineChartWidget extends StatelessWidget with TileDataMixin {
-  StockLineChartWidget({super.key}) ;
+  StockLineChartWidget({super.key});
 
   @override
   bool get withLeading => true;
@@ -21,6 +21,8 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'StockLineChart';
+
+  final KChartPlusController kChartPlusController = KChartPlusController();
 
   @override
   Widget build(BuildContext context) {
@@ -39,8 +41,13 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
       withLeading: true,
       child: Center(
           child: Column(children: [
-        const KlineToolPanelWidget(),
-        Expanded(child: KChartPlusWidget()),
+        KlineToolPanelWidget(
+          kChartPlusController: kChartPlusController,
+        ),
+        Expanded(
+            child: KChartPlusWidget(
+          kChartPlusController: kChartPlusController,
+        )),
       ])),
     );
   }

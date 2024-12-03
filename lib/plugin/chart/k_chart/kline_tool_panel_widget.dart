@@ -1,12 +1,15 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/plugin/chart/k_chart/k_chart_plus_widget.dart';
 import 'package:colla_chat/plugin/chart/k_chart/kline_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class KlineToolPanelWidget extends StatelessWidget {
-  const KlineToolPanelWidget({super.key});
+  final KChartPlusController kChartPlusController;
+
+  const KlineToolPanelWidget({super.key, required this.kChartPlusController});
 
   Widget _buildToolPanelWidget(BuildContext context) {
     return Obx(() {
@@ -45,6 +48,7 @@ class KlineToolPanelWidget extends StatelessWidget {
             onPressed: multiKlineController.lineType.value != 100
                 ? () {
                     multiKlineController.lineType.value = 100;
+                    kChartPlusController.isLine.value = true;
                   }
                 : null,
             child: Text(
@@ -59,6 +63,7 @@ class KlineToolPanelWidget extends StatelessWidget {
             onPressed: multiKlineController.lineType.value != 101
                 ? () {
                     multiKlineController.lineType.value = 101;
+                    kChartPlusController.isLine.value = false;
                   }
                 : null,
             child: Text(
@@ -73,6 +78,7 @@ class KlineToolPanelWidget extends StatelessWidget {
             onPressed: multiKlineController.lineType.value != 102
                 ? () {
                     multiKlineController.lineType.value = 102;
+                    kChartPlusController.isLine.value = false;
                   }
                 : null,
             child: Text(
@@ -87,6 +93,7 @@ class KlineToolPanelWidget extends StatelessWidget {
             onPressed: multiKlineController.lineType.value != 103
                 ? () {
                     multiKlineController.lineType.value = 103;
+                    kChartPlusController.isLine.value = false;
                   }
                 : null,
             child: Text(
@@ -101,6 +108,7 @@ class KlineToolPanelWidget extends StatelessWidget {
             onPressed: multiKlineController.lineType.value != 104
                 ? () {
                     multiKlineController.lineType.value = 104;
+                    kChartPlusController.isLine.value = false;
                   }
                 : null,
             child: Text(
@@ -115,6 +123,7 @@ class KlineToolPanelWidget extends StatelessWidget {
             onPressed: multiKlineController.lineType.value != 105
                 ? () {
                     multiKlineController.lineType.value = 105;
+                    kChartPlusController.isLine.value = false;
                   }
                 : null,
             child: Text(
@@ -129,6 +138,7 @@ class KlineToolPanelWidget extends StatelessWidget {
             onPressed: multiKlineController.lineType.value != 106
                 ? () {
                     multiKlineController.lineType.value = 106;
+                    kChartPlusController.isLine.value = false;
                   }
                 : null,
             child: Text(

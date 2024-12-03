@@ -9,10 +9,7 @@ import 'package:get/get.dart';
 import 'package:k_chart_plus/chart_translations.dart';
 import 'package:k_chart_plus/k_chart_plus.dart';
 
-/// 增强版本的k_chart
-class KChartPlusWidget extends StatelessWidget {
-  KChartPlusWidget({super.key});
-
+class KChartPlusController {
   final RxList<KLineEntity> klines = <KLineEntity>[].obs;
   final RxBool showLoading = false.obs;
   final RxBool showVol = true.obs;
@@ -27,6 +24,13 @@ class KChartPlusWidget extends StatelessWidget {
       <SecondaryState>[SecondaryState.MACD].obs;
   final RxList<DepthEntity> bids = <DepthEntity>[].obs;
   final RxList<DepthEntity> asks = <DepthEntity>[].obs;
+}
+
+/// 增强版本的k_chart
+class KChartPlusWidget extends StatelessWidget {
+  final KChartPlusController kChartPlusController;
+
+  KChartPlusWidget({super.key, required this.kChartPlusController});
 
   final ChartStyle chartStyle = ChartStyle();
   final ChartColors lightChartColors = ChartColors(
@@ -53,7 +57,7 @@ class KChartPlusWidget extends StatelessWidget {
     for (var item in bids.reversed) {
       amount += item.vol;
       item.vol = amount;
-      this.bids.insert(0, item);
+      kChartPlusController.bids.insert(0, item);
     }
 
     amount = 0.0;
@@ -61,19 +65,22 @@ class KChartPlusWidget extends StatelessWidget {
     for (var item in asks) {
       amount += item.vol;
       item.vol = amount;
-      this.asks.add(item);
+      kChartPlusController.asks.add(item);
     }
   }
 
   Widget buildVolButton() {
     return TextButton(
       onPressed: () {
-        showVol.value = !showVol.value;
+        kChartPlusController.showVol.value =
+            !kChartPlusController.showVol.value;
       },
       child: Text(
         AppLocalizations.t('Trade volume'),
         style: TextStyle(
-          color: showVol.value ? myself.primary : Colors.white,
+          color: kChartPlusController.showVol.value
+              ? myself.primary
+              : Colors.white,
         ),
       ),
     );
@@ -83,12 +90,14 @@ class KChartPlusWidget extends StatelessWidget {
     return MainState.values.map((e) {
       return TextButton(
         onPressed: () {
-          mainState.value = e;
+          kChartPlusController.mainState.value = e;
         },
         child: Text(
           AppLocalizations.t(e.name),
           style: TextStyle(
-            color: mainState.value == e ? myself.primary : Colors.white,
+            color: kChartPlusController.mainState.value == e
+                ? myself.primary
+                : Colors.white,
           ),
         ),
       );
@@ -99,16 +108,18 @@ class KChartPlusWidget extends StatelessWidget {
     return SecondaryState.values.map((e) {
       return TextButton(
         onPressed: () {
-          if (secondaryState.contains(e)) {
-            secondaryState.value.remove(e);
+          if (kChartPlusController.secondaryState.contains(e)) {
+            kChartPlusController.secondaryState.value.remove(e);
           } else {
-            secondaryState.add(e);
+            kChartPlusController.secondaryState.add(e);
           }
         },
         child: Text(
           AppLocalizations.t(e.name),
           style: TextStyle(
-            color: secondaryState.contains(e) ? myself.primary : Colors.white,
+            color: kChartPlusController.secondaryState.contains(e)
+                ? myself.primary
+                : Colors.white,
           ),
         ),
       );
@@ -154,7 +165,7 @@ class KChartPlusWidget extends StatelessWidget {
     if (klines.isNotEmpty) {
       DataUtil.calculate(klines, const [5, 10, 30]);
     }
-    this.klines.assignAll(klines);
+    kChartPlusController.klines.assignAll(klines);
   }
 
   Widget _buildToolPanel(BuildContext context) {
@@ -175,8 +186,8 @@ class KChartPlusWidget extends StatelessWidget {
       height: 320,
       width: double.infinity,
       child: DepthChart(
-        bids.value,
-        asks.value,
+        kChartPlusController.bids.value,
+        kChartPlusController.asks.value,
         myself.themeMode == ThemeMode.light
             ? lightChartColors
             : darkChartColors,
@@ -192,7 +203,7 @@ class KChartPlusWidget extends StatelessWidget {
         List<dynamic> data = klineController.data.value;
         _buildKlines(data);
       }
-      if (klines.value.isEmpty) {
+      if (kChartPlusController.klines.value.isEmpty) {
         return nilBox;
       }
       return ListView(
@@ -201,7 +212,7 @@ class KChartPlusWidget extends StatelessWidget {
           _buildToolPanel(context),
           Stack(children: <Widget>[
             KChartWidget(
-              klines.value,
+              kChartPlusController.klines.value,
               chartStyle,
               myself.themeMode == ThemeMode.light
                   ? lightChartColors
@@ -217,21 +228,22 @@ class KChartPlusWidget extends StatelessWidget {
                 amount: AppLocalizations.t('Trade amount'),
                 vol: AppLocalizations.t('Trade volume'),
               ),
-              isLine: isLine.value,
+              isLine: kChartPlusController.isLine.value,
               mBaseHeight: 360,
-              isTrendLine: isTrendLine.value,
-              mainState: mainState.value,
-              volHidden: !showVol.value,
-              secondaryStateLi: secondaryState.toSet(),
-              showNowPrice: showNowPrice.value,
-              hideGrid: hideGrid.value,
+              isTrendLine: kChartPlusController.isTrendLine.value,
+              mainState: kChartPlusController.mainState.value,
+              volHidden: !kChartPlusController.showVol.value,
+              secondaryStateLi: kChartPlusController.secondaryState.toSet(),
+              showNowPrice: kChartPlusController.showNowPrice.value,
+              hideGrid: kChartPlusController.hideGrid.value,
               isTapShowInfoDialog: false,
               fixedLength: 2,
               timeFormat: TimeFormat.YEAR_MONTH_DAY_WITH_HOUR,
-              verticalTextAlignment: verticalTextAlignment.value,
+              verticalTextAlignment:
+                  kChartPlusController.verticalTextAlignment.value,
               maDayList: const [5, 10, 30],
             ),
-            if (showLoading.value)
+            if (kChartPlusController.showLoading.value)
               Container(
                 width: double.infinity,
                 height: 450,
@@ -240,7 +252,9 @@ class KChartPlusWidget extends StatelessWidget {
               ),
           ]),
           const SizedBox(height: 30),
-          if (bids.isNotEmpty && asks.isNotEmpty) _buildDepthChart()
+          if (kChartPlusController.bids.isNotEmpty &&
+              kChartPlusController.asks.isNotEmpty)
+            _buildDepthChart()
         ],
       );
     });
