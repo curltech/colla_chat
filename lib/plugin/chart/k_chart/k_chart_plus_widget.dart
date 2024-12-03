@@ -1,6 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/chart/k_chart/kline_controller.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -227,7 +226,7 @@ class KChartPlusWidget extends StatelessWidget {
               hideGrid: hideGrid.value,
               isTapShowInfoDialog: false,
               fixedLength: 2,
-              timeFormat: TimeFormat.YEAR_MONTH_DAY,
+              timeFormat: TimeFormat.YEAR_MONTH_DAY_WITH_HOUR,
               verticalTextAlignment: verticalTextAlignment.value,
               maDayList: const [5, 10, 30],
             ),

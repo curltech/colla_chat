@@ -104,7 +104,7 @@ class KlineToolPanelWidget extends StatelessWidget {
                   }
                 : null,
             child: Text(
-              AppLocalizations.t('quatarline'),
+              AppLocalizations.t('quarterline'),
               style: TextStyle(
                 color: multiKlineController.lineType.value == 104
                     ? myself.primary
@@ -140,14 +140,14 @@ class KlineToolPanelWidget extends StatelessWidget {
               ),
             )),
         IconButton(
-          tooltip: AppLocalizations.t('Previous'),
+          tooltip: AppLocalizations.t('Previous share'),
           onPressed: () async {
             await multiKlineController.previous();
           },
           icon: Icon(Icons.skip_previous_outlined, color: myself.primary),
         ),
         IconButton(
-            tooltip: AppLocalizations.t('Next'),
+            tooltip: AppLocalizations.t('Next share'),
             onPressed: () async {
               await multiKlineController.next();
             },
