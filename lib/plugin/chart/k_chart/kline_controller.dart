@@ -44,6 +44,9 @@ class MultiKlineController extends DataListController<String> {
 
   /// 加入新的股票代码和控制器，包含所有的线型，并设置为当前
   put(String tsCode) async {
+    if (tsCode.isEmpty) {
+      return;
+    }
     String name;
     Share? share = await shareService.findShare(tsCode);
     if (share != null && share.name != null) {
@@ -82,6 +85,7 @@ class MultiKlineController extends DataListController<String> {
   remove(String tsCode) {
     if (klineControllers.containsKey(tsCode)) {
       klineControllers.remove(tsCode);
+      data.remove(tsCode);
     }
   }
 

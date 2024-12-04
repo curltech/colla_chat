@@ -184,7 +184,6 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
 
   ShareSelectionWidget({super.key}) {
     indexWidgetProvider.define(stockLineChartWidget);
-    _refresh();
   }
 
   @override
@@ -384,6 +383,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
+    _refresh();
     List<Widget> rightWidgets = [
       IconButton(
         tooltip: AppLocalizations.t('Add share'),
