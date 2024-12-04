@@ -14,7 +14,6 @@ class KChartPlusController {
   final RxList<KLineEntity> klines = <KLineEntity>[].obs;
   final RxBool showLoading = false.obs;
   final RxBool showVol = true.obs;
-  final RxBool isLine = false.obs;
   final RxBool hideGrid = true.obs;
   final RxBool showNowPrice = true.obs;
   final RxBool isTrendLine = false.obs;
@@ -65,6 +64,15 @@ class KChartPlusController {
       }
       buildKlines();
     });
+  }
+
+  bool get isLine {
+    KlineController? klineController = multiKlineController.klineController;
+    if (klineController != null) {
+      return klineController.lineType == 100;
+    }
+
+    return false;
   }
 
   /// 创建图形的数据
@@ -268,7 +276,7 @@ class KChartPlusWidget extends StatelessWidget {
                 amount: AppLocalizations.t('Trade amount'),
                 vol: AppLocalizations.t('Trade volume'),
               ),
-              isLine: kChartPlusController.isLine.value,
+              isLine: kChartPlusController.isLine,
               mBaseHeight: 360,
               isTrendLine: kChartPlusController.isTrendLine.value,
               mainState: kChartPlusController.mainState.value,

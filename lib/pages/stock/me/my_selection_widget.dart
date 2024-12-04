@@ -37,12 +37,16 @@ class MyShareController {
     subscription.value = value ?? '';
     List<String> tsCodes = subscription.value.split(',');
     for (String tsCode in tsCodes) {
+      if (tsCode.isEmpty) {
+        continue;
+      }
       await multiKlineController.put(tsCode);
     }
 
     await assignGroupSubscription();
   }
 
+  /// 新股票加入自选股
   Future<void> add(Share share) async {
     await shareService.store(share);
     String tsCode = share.tsCode!;
@@ -56,14 +60,19 @@ class MyShareController {
     await addShareGroup(defaultGroupName, [tsCode]);
   }
 
+  /// 删除股票，并从各各分组中删除
   Future<void> remove(String tsCode) async {
     if (subscription.contains(tsCode)) {
-      subscription.replaceAll('$tsCode,', '');
+      subscription.value = subscription.replaceAll('$tsCode,', '');
       await localSharedPreferences.save('subscription', subscription.value,
           encrypt: true);
+      for (String groupName in groupSubscription.keys) {
+        await removeShareGroup(groupName, tsCode);
+      }
     }
   }
 
+  /// 初始化各个分组和股票
   Future<void> assignGroupSubscription() async {
     Map<String, String> groupSubscription = {};
     String defaultGroupName =
@@ -77,6 +86,7 @@ class MyShareController {
     this.groupSubscription.assignAll(groupSubscription);
   }
 
+  /// 查询分组的股票
   Future<String?> findSubscription(String groupName) async {
     String? subscription = groupSubscription[groupName];
     if (subscription == null) {
@@ -98,11 +108,15 @@ class MyShareController {
     return subscription;
   }
 
+  /// 删除分组，自选股分组不能删除
   removeGroup(String groupName) async {
-    groupSubscription.remove(groupName);
-    shareGroupService.delete(where: 'groupName=?', whereArgs: [groupName]);
+    if (ShareGroupService.defaultGroupName != groupName) {
+      groupSubscription.remove(groupName);
+      shareGroupService.delete(where: 'groupName=?', whereArgs: [groupName]);
+    }
   }
 
+  /// 将股票加入分组
   Future<bool> addShareGroup(String groupName, List<String> tsCodes) async {
     String? subscription = groupSubscription[groupName];
     subscription ??= '';
@@ -124,7 +138,11 @@ class MyShareController {
     return false;
   }
 
+  /// 从分组中删除股票，不能从自选股分组中删除
   Future<bool> removeShareGroup(String groupName, String tsCode) async {
+    if (ShareGroupService.defaultGroupName == groupName) {
+      return false;
+    }
     String? subscription = groupSubscription[groupName];
     if (subscription != null) {
       if (subscription.contains(tsCode)) {
@@ -140,6 +158,7 @@ class MyShareController {
     return false;
   }
 
+  /// 能否增加股票到分组
   Future<bool> canBeAdd(String groupName, String tsCode) async {
     String? subscription = groupSubscription[groupName];
     if (subscription != null && subscription.isNotEmpty) {
@@ -148,7 +167,11 @@ class MyShareController {
     return true;
   }
 
+  /// 能否从分组删除股票
   Future<bool> canBeRemove(String groupName, String tsCode) async {
+    if (ShareGroupService.defaultGroupName == groupName) {
+      return false;
+    }
     return !(await canBeAdd(groupName, tsCode));
   }
 }
@@ -191,11 +214,20 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
             String groupName = myShareController.groupName.value;
             String defaultGroupName =
                 AppLocalizations.t(ShareGroupService.defaultGroupName);
-            if (groupName != defaultGroupName) {
+            if (groupName == defaultGroupName) {
               bool? confirm = await DialogUtil.confirm(
-                  content: 'Do you confirm remove from group?');
+                  content: 'Do you confirm remove from group:$groupName?');
+              if (confirm != null && confirm) {
+                await myShareController.remove(tsCode);
+                multiKlineController.remove(tsCode);
+                _refresh();
+              }
+            } else {
+              bool? confirm = await DialogUtil.confirm(
+                  content: 'Do you confirm remove from group$groupName?');
               if (confirm != null && confirm) {
                 await myShareController.removeShareGroup(groupName, tsCode);
+                _refresh();
               }
             }
           },

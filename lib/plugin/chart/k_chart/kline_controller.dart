@@ -127,17 +127,12 @@ class MultiKlineController extends DataListController<String> {
 
   /// 装载日线
   loadDayLines({List<String>? tsCodes}) async {
-    // try {
-    //   for (var tsCode in multiKlineController.data) {
-    //     /// 更新股票的日线的数据
-    //     stockLineService.getUpdateDayLine(tsCode);
-    //   }
-    // } catch (e) {
-    //   logger.i('Update day line failure:$e');
-    // }
     tsCodes ??= data;
     List<Future<Map<String, dynamic>?>> futures = [];
     for (String tsCode in tsCodes) {
+      if (tsCode.isEmpty) {
+        continue;
+      }
       await put(tsCode);
       if (online.value) {
         futures.add(CrawlerUtil.getDayLine(tsCode));
@@ -165,6 +160,9 @@ class MultiKlineController extends DataListController<String> {
     tsCodes ??= data;
     List<DayLine> dayLines = [];
     for (String tsCode in tsCodes) {
+      if (tsCode.isEmpty) {
+        continue;
+      }
       KlineController? klineController = klineControllers[tsCode]?[101];
       if (klineController == null) {
         await put(tsCode);
@@ -177,8 +175,10 @@ class MultiKlineController extends DataListController<String> {
           dayLine = klineController.data.lastOrNull;
         }
         if (dayLine != null) {
+          if (dayLine.tsCode != tsCode) {
+            continue;
+          }
           dayLines.add(dayLine);
-          String tsCode = dayLine.tsCode;
           Share? share = await shareService.findShare(tsCode);
           if (share != null) {
             dayLine.name = share.name;
@@ -270,7 +270,6 @@ class MultiKlineController extends DataListController<String> {
     /// 如果是服务器的，则添加，服务器支持分批获取
     if (data != null && data.isNotEmpty) {
       if (online.value) {
-        // klineController!.count = data.length;
         klineController!.replaceAll(data);
       } else {
         klineController!.insertAll(0, data);
