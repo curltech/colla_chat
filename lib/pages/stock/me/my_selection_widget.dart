@@ -346,10 +346,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
         ));
       }
       return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: children));
+          scrollDirection: Axis.horizontal, child: Wrap(children: children));
     });
   }
 
@@ -388,6 +385,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
       withLeading: true,
       rightWidgets: rightWidgets,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildShareGroupWidget(),
           Expanded(child: _buildShareListView(context))
