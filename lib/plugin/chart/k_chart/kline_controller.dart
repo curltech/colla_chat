@@ -6,7 +6,6 @@ import 'package:colla_chat/service/stock/day_line.dart';
 import 'package:colla_chat/service/stock/eastmoney/crawler.dart';
 import 'package:colla_chat/service/stock/min_line.dart';
 import 'package:colla_chat/service/stock/share.dart';
-import 'package:colla_chat/service/stock/stock_line.dart';
 import 'package:colla_chat/service/stock/wmqy_line.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:get/get.dart';
@@ -22,7 +21,7 @@ class KlineController extends DataListController<dynamic> {
 
   int? count;
 
-  KlineController(this.tsCode, this.name, {this.lineType = 100});
+  KlineController(this.tsCode, this.name, {this.lineType = 101});
 }
 
 class MultiKlineController extends DataListController<String> {
@@ -30,20 +29,10 @@ class MultiKlineController extends DataListController<String> {
   final RxBool online = true.obs;
 
   /// 当前线型
-  final RxInt lineType = 100.obs;
+  final RxInt lineType = 101.obs;
 
   /// 所有股票的所有线型的数据控制器集合，键值为股票代码和线型
   final Map<String, Map<int, KlineController>> klineControllers = {};
-
-  MultiKlineController() {
-    online.addListener(() {
-      klineController?.clear();
-      load();
-    });
-    lineType.addListener(() {
-      load();
-    });
-  }
 
   /// 当前股票控制器
   KlineController? get klineController {
@@ -54,7 +43,14 @@ class MultiKlineController extends DataListController<String> {
   }
 
   /// 加入新的股票代码和控制器，包含所有的线型，并设置为当前
-  put(String tsCode, String name) {
+  put(String tsCode) async {
+    String name;
+    Share? share = await shareService.findShare(tsCode);
+    if (share != null && share.name != null) {
+      name = share.name!;
+    } else {
+      return;
+    }
     if (!data.contains(tsCode)) {
       data.add(tsCode);
     }
@@ -78,7 +74,7 @@ class MultiKlineController extends DataListController<String> {
         klineControllers[tsCode]?[106] =
             KlineController(tsCode, name, lineType: 106);
       }
-      lineType(100);
+      lineType(101);
       current = tsCode;
     }
   }
@@ -92,52 +88,40 @@ class MultiKlineController extends DataListController<String> {
   /// 当前股票转为上一只股票
   previous() async {
     if (data.isEmpty) {
-      this.currentIndex = null;
+      setCurrentIndex = null;
     }
-    if (this.currentIndex == null ||
-        this.currentIndex == 0 ||
-        this.currentIndex == 1) {
-      this.currentIndex = 0;
+    if (this.currentIndex.value == null ||
+        this.currentIndex.value == 0 ||
+        this.currentIndex.value == 1) {
+      setCurrentIndex = 0;
     }
-    int currentIndex = this.currentIndex! - 1;
+    int currentIndex = this.currentIndex.value! - 1;
     if (currentIndex >= 0 && currentIndex < data.length) {
       String tsCode = data[currentIndex];
       if (!klineControllers.containsKey(tsCode)) {
-        Share? share = await shareService.findShare(tsCode);
-        if (share != null) {
-          String? name = share.name;
-          name ??= '';
-          put(tsCode, name);
-        }
+        await put(tsCode);
       }
-      this.currentIndex = currentIndex;
-      load();
+      setCurrentIndex = currentIndex;
     }
   }
 
   /// 当前股票转为下一只股票
   next() async {
     if (data.isEmpty) {
-      this.currentIndex = null;
+      setCurrentIndex = null;
     }
-    if (this.currentIndex == null ||
-        this.currentIndex == data.length - 1 ||
-        this.currentIndex == data.length - 2) {
-      this.currentIndex = data.length - 1;
+    if (this.currentIndex.value == null ||
+        this.currentIndex.value == data.length - 1 ||
+        this.currentIndex.value == data.length - 2) {
+      setCurrentIndex = data.length - 1;
     }
-    int currentIndex = this.currentIndex! + 1;
+    int currentIndex = this.currentIndex.value! + 1;
     if (currentIndex >= 0 && currentIndex < data.length) {
       String tsCode = data[currentIndex];
       if (!klineControllers.containsKey(tsCode)) {
-        Share? share = await shareService.findShare(tsCode);
-        if (share != null) {
-          String? name = share.name;
-          name ??= '';
-          put(tsCode, name);
-        }
+        await put(tsCode);
       }
-      this.currentIndex = currentIndex;
-      load();
+      setCurrentIndex = currentIndex;
     }
   }
 
@@ -154,6 +138,7 @@ class MultiKlineController extends DataListController<String> {
     tsCodes ??= data;
     List<Future<Map<String, dynamic>?>> futures = [];
     for (String tsCode in tsCodes) {
+      await put(tsCode);
       if (online.value) {
         futures.add(CrawlerUtil.getDayLine(tsCode));
       } else {
@@ -166,10 +151,6 @@ class MultiKlineController extends DataListController<String> {
         List<DayLine> dayLines = response['data'];
         if (dayLines.isNotEmpty) {
           String tsCode = dayLines.first.tsCode;
-          Share? share = await shareService.findShare(tsCode);
-          if (share != null) {
-            put(tsCode, share.name!);
-          }
 
           KlineController? klineController = klineControllers[tsCode]?[101];
           if (klineController != null) {
@@ -185,10 +166,15 @@ class MultiKlineController extends DataListController<String> {
     List<DayLine> dayLines = [];
     for (String tsCode in tsCodes) {
       KlineController? klineController = klineControllers[tsCode]?[101];
+      if (klineController == null) {
+        await put(tsCode);
+        klineController = klineControllers[tsCode]?[101];
+      }
       if (klineController != null) {
         DayLine? dayLine = klineController.data.lastOrNull;
         if (dayLine == null) {
           await loadDayLines(tsCodes: [tsCode]);
+          dayLine = klineController.data.lastOrNull;
         }
         if (dayLine != null) {
           dayLines.add(dayLine);
@@ -284,6 +270,7 @@ class MultiKlineController extends DataListController<String> {
     /// 如果是服务器的，则添加，服务器支持分批获取
     if (data != null && data.isNotEmpty) {
       if (online.value) {
+        // klineController!.count = data.length;
         klineController!.replaceAll(data);
       } else {
         klineController!.insertAll(0, data);

@@ -208,11 +208,11 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
         selected: selected,
         suffix: suffix,
         onTap: (int index, String title, {String? subtitle}) {
-          mediaFileController.currentIndex = index;
+          mediaFileController.setCurrentIndex = index;
           _buildTileData(context);
         },
         onLongPress: (int index, String title, {String? subtitle}) {
-          mediaFileController.currentIndex = index;
+          mediaFileController.setCurrentIndex = index;
           _buildTileData(context);
           _onSelectFile(context, index, title, subtitle: subtitle);
         },
@@ -394,7 +394,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
                 var currentIndex = mediaFileController.currentIndex;
                 if (currentIndex != -1) {
                   ffmpegSessions.remove(mediaFileController.current);
-                  mediaFileController.delete(index: currentIndex);
+                  mediaFileController.delete(index: currentIndex.value);
                   _buildTileData(context);
                 }
               },
@@ -476,7 +476,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
                       return InkWell(
                           child: thumbnails[index],
                           onTap: () {
-                            mediaFileController.currentIndex = index;
+                            mediaFileController.setCurrentIndex = index;
                             var title = tileData[index].title;
                             var fn = tileData[index].onTap;
                             if (fn != null) {
@@ -484,7 +484,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
                             }
                           },
                           onLongPress: () {
-                            mediaFileController.currentIndex = index;
+                            mediaFileController.setCurrentIndex = index;
                             var title = tileData[index].title;
                             var fn = tileData[index].onLongPress;
                             if (fn != null) {
@@ -496,7 +496,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
                 return DataListView(
                   onTap: (int index, String title,
                       {TileData? group, String? subtitle}) {
-                    mediaFileController.currentIndex = index;
+                    mediaFileController.setCurrentIndex = index;
                   },
                   itemCount: tileData.length,
                   itemBuilder: (BuildContext context, int index) {

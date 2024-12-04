@@ -280,7 +280,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
               if (confirm != true) {
                 return;
               }
-              linkmanController.currentIndex = index;
+              linkmanController.setCurrentIndex = index;
               await linkmanService.removeByPeerId(linkman.peerId);
               await chatSummaryService.removeChatSummary(linkman.peerId);
               await chatMessageService.removeByLinkman(linkman.peerId);
@@ -642,16 +642,16 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   }
 
   _onTapLinkman(int index, String title, {String? subtitle, TileData? group}) {
-    linkmanController.currentIndex = index;
+    linkmanController.setCurrentIndex = index;
   }
 
   _onTapGroup(int index, String title, {String? subtitle, TileData? group}) {
-    groupController.currentIndex = index;
+    groupController.setCurrentIndex = index;
   }
 
   _onTapConference(int index, String title,
       {String? subtitle, TileData? group}) {
-    conferenceController.currentIndex = index;
+    conferenceController.setCurrentIndex = index;
   }
 
   Widget _buildLinkmanListView(BuildContext context) {
@@ -774,9 +774,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
       IconButton(
         tooltip: AppLocalizations.t('Add linkman'),
         onPressed: () {
-          linkmanController.currentIndex = -1;
-          groupController.currentIndex = -1;
-          conferenceController.currentIndex = -1;
+          linkmanController.setCurrentIndex = -1;
+          groupController.setCurrentIndex = -1;
+          conferenceController.setCurrentIndex = -1;
           indexWidgetProvider.push('linkman_add');
         },
         icon: const Icon(

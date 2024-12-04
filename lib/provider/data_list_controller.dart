@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 class DataListController<T> {
   Key key = UniqueKey();
   final RxList<T> data = <T>[].obs;
-  final Rx<int?> _currentIndex = Rx<int?>(null);
+  final Rx<int?> currentIndex = Rx<int?>(null);
   final Rx<int?> sortColumnIndex = Rx<int?>(null);
   final Rx<String?> sortColumnName = Rx<String?>(null);
   final RxBool sortAscending = true.obs;
@@ -17,57 +17,53 @@ class DataListController<T> {
     if (data != null && data.isNotEmpty) {
       this.data.addAll(data);
       if (currentIndex == null) {
-        _currentIndex(0);
+        this.currentIndex(0);
       } else {
         if (currentIndex < -1 || currentIndex > data.length - 1) {
-          _currentIndex(0);
+          this.currentIndex(0);
         } else {
-          _currentIndex(currentIndex);
+          this.currentIndex(currentIndex);
         }
       }
     }
   }
 
   T? get current {
-    if (_currentIndex.value != null && data.isNotEmpty) {
-      return data[_currentIndex.value!];
+    if (this.currentIndex.value != null && data.isNotEmpty) {
+      return data[this.currentIndex.value!];
     }
     return null;
   }
 
   set current(T? element) {
     if (element == null) {
-      currentIndex = null;
+      setCurrentIndex = null;
     } else {
-      _currentIndex(data.indexOf(element));
+      this.currentIndex(data.indexOf(element));
     }
-  }
-
-  int? get currentIndex {
-    return _currentIndex.value;
   }
 
   ///设置当前数据索引
-  set currentIndex(int? index) {
+  set setCurrentIndex(int? index) {
     if (index == null || index > data.length - 1) {
-      _currentIndex(null);
+      this.currentIndex(null);
       return;
     }
-    if (_currentIndex.value != index) {
-      _currentIndex(index);
+    if (this.currentIndex.value != index) {
+      this.currentIndex(index);
     }
   }
 
   addAll(List<T> ds, {bool notify = true}) {
     if (ds.isNotEmpty) {
-      _currentIndex(data.length);
+      this.currentIndex(data.length);
       data.addAll(ds);
     }
   }
 
   add(T d, {bool notify = true}) {
     data.add(d);
-    _currentIndex(data.length - 1);
+    this.currentIndex(data.length - 1);
   }
 
   T? get(int index) {
@@ -81,27 +77,27 @@ class DataListController<T> {
   insert(int index, T d) {
     if (index >= 0 && index <= data.length) {
       data.insert(index, d);
-      _currentIndex(index);
+      this.currentIndex(index);
     }
   }
 
   insertAll(int index, List<T> ds) {
     if (index >= 0 && index <= data.length) {
       data.insertAll(index, ds);
-      _currentIndex(index);
+      this.currentIndex(index);
     }
   }
 
   T? delete({int? index}) {
-    index = index ?? _currentIndex.value;
+    index = index ?? this.currentIndex.value;
     if (index != null && index < data.length) {
       T t = data.removeAt(index);
       if (data.isEmpty) {
-        _currentIndex(null);
+        this.currentIndex(null);
       } else if (index == 0) {
-        _currentIndex(0);
+        this.currentIndex(0);
       } else {
-        _currentIndex(index - 1);
+        this.currentIndex(index - 1);
       }
       return t;
     }
@@ -110,7 +106,7 @@ class DataListController<T> {
   }
 
   update(T d, {int? index}) {
-    index = index ?? _currentIndex.value;
+    index = index ?? this.currentIndex.value;
     if (index != null && index < data.length) {
       data[index] = d;
     }
@@ -118,20 +114,20 @@ class DataListController<T> {
 
   clear({bool notify = true}) {
     data.clear();
-    _currentIndex(null);
+    this.currentIndex(null);
   }
 
   ///替换了当前的对象
   replace(T d) {
-    if (_currentIndex.value != null && data.isNotEmpty) {
-      data[_currentIndex.value!] = d;
+    if (this.currentIndex.value != null && data.isNotEmpty) {
+      data[this.currentIndex.value!] = d;
     }
   }
 
   replaceAll(List<T> ds) {
     data.assignAll(ds);
     if (ds.isNotEmpty) {
-      _currentIndex(0);
+      this.currentIndex(0);
     }
   }
 
@@ -167,7 +163,7 @@ class DataListController<T> {
       }
     });
 
-    _currentIndex(0);
+    this.currentIndex(0);
     sortColumnIndex(columnIndex);
     sortColumnName(columnName);
     sortAscending(ascending);

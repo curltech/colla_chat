@@ -221,7 +221,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     bool showFullscreenButton = true,
     bool showVolumeButton = true,
   }) {
-    int? currentIndex = playlistController.currentIndex;
+    int? currentIndex = playlistController.currentIndex.value;
     return JkVideoControlPanel(
         key: key,
         videoPlayerController,

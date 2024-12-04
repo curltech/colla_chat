@@ -1,5 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/chart/k_chart/kline_controller.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -24,6 +25,93 @@ class KChartPlusController {
       <SecondaryState>[SecondaryState.MACD].obs;
   final RxList<DepthEntity> bids = <DepthEntity>[].obs;
   final RxList<DepthEntity> asks = <DepthEntity>[].obs;
+
+  KChartPlusController() {
+    _init();
+  }
+
+  _init() {
+    multiKlineController.online.addListener(() async {
+      multiKlineController.klineController?.clear();
+      showLoading.value = true;
+      try {
+        await multiKlineController.load();
+        showLoading.value = false;
+      } catch (e) {
+        showLoading.value = false;
+        logger.e('Load data failure:$e');
+      }
+      buildKlines();
+    });
+    multiKlineController.lineType.addListener(() async {
+      showLoading.value = true;
+      try {
+        await multiKlineController.load();
+        showLoading.value = false;
+      } catch (e) {
+        showLoading.value = false;
+        logger.e('Load data failure:$e');
+      }
+      buildKlines();
+    });
+    multiKlineController.currentIndex.addListener(() async {
+      showLoading.value = true;
+      try {
+        await multiKlineController.load();
+        showLoading.value = false;
+      } catch (e) {
+        showLoading.value = false;
+        logger.e('Load data failure:$e');
+      }
+      buildKlines();
+    });
+  }
+
+  /// 创建图形的数据
+  buildKlines() {
+    KlineController? klineController = multiKlineController.klineController;
+    if (klineController != null) {
+      List<dynamic> data = klineController.data.value;
+      List<KLineEntity> klines = [];
+      for (int i = 0; i < data.length; i++) {
+        Map<String, dynamic> map = JsonUtil.toJson(data[i]);
+        int tradeDate = map['trade_date'];
+        int hour = 0;
+        int minute = 0;
+        int? tradeMinute = map['trade_minute'];
+        if (tradeMinute != null) {
+          hour = tradeMinute ~/ 60;
+          minute = tradeMinute % 60;
+        }
+        DateTime date = DateUtil.toDateTime(tradeDate.toString());
+        int timestamp = date
+            .copyWith(
+                year: date.year,
+                month: date.month,
+                day: date.day,
+                hour: hour,
+                minute: minute)
+            .millisecondsSinceEpoch;
+        num high = map['high'];
+        num low = map['low'];
+        num open = map['open'];
+        num close = map['close'];
+        num volume = map['vol'];
+        KLineEntity kline = KLineEntity.fromCustom(
+            time: timestamp,
+            high: high.toDouble(),
+            low: low.toDouble(),
+            open: open.toDouble(),
+            close: close.toDouble(),
+            vol: volume.toDouble());
+        klines.add(kline);
+      }
+      if (klines.isNotEmpty) {
+        DataUtil.calculate(klines, const [5, 10, 30]);
+      }
+      this.klines.assignAll(klines);
+    }
+  }
 }
 
 /// 增强版本的k_chart
@@ -109,7 +197,7 @@ class KChartPlusWidget extends StatelessWidget {
       return TextButton(
         onPressed: () {
           if (kChartPlusController.secondaryState.contains(e)) {
-            kChartPlusController.secondaryState.value.remove(e);
+            kChartPlusController.secondaryState.remove(e);
           } else {
             kChartPlusController.secondaryState.add(e);
           }
@@ -126,58 +214,15 @@ class KChartPlusWidget extends StatelessWidget {
     }).toList();
   }
 
-  /// 创建图形的数据
-  _buildKlines(List<dynamic> data) {
-    List<KLineEntity> klines = [];
-    for (int i = 0; i < data.length; i++) {
-      Map<String, dynamic> map = JsonUtil.toJson(data[i]);
-      int tradeDate = map['trade_date'];
-      int hour = 0;
-      int minute = 0;
-      int? tradeMinute = map['trade_minute'];
-      if (tradeMinute != null) {
-        hour = tradeMinute ~/ 60;
-        minute = tradeMinute % 60;
-      }
-      DateTime date = DateUtil.toDateTime(tradeDate.toString());
-      int timestamp = date
-          .copyWith(
-              year: date.year,
-              month: date.month,
-              day: date.day,
-              hour: hour,
-              minute: minute)
-          .millisecondsSinceEpoch;
-      num high = map['high'];
-      num low = map['low'];
-      num open = map['open'];
-      num close = map['close'];
-      num volume = map['vol'];
-      KLineEntity kline = KLineEntity.fromCustom(
-          time: timestamp,
-          high: high.toDouble(),
-          low: low.toDouble(),
-          open: open.toDouble(),
-          close: close.toDouble(),
-          vol: volume.toDouble());
-      klines.add(kline);
-    }
-    if (klines.isNotEmpty) {
-      DataUtil.calculate(klines, const [5, 10, 30]);
-    }
-    kChartPlusController.klines.assignAll(klines);
-  }
-
   Widget _buildToolPanel(BuildContext context) {
+    logger.i('rebuild tool panel');
     return Container(
         color: Colors.grey,
-        child: Obx(() {
-          return Wrap(children: [
-            buildVolButton(),
-            ...buildMainButtons(),
-            ...buildSecondButtons()
-          ]);
-        }));
+        child: Wrap(children: [
+          buildVolButton(),
+          ...buildMainButtons(),
+          ...buildSecondButtons()
+        ]));
   }
 
   Widget _buildDepthChart() {
@@ -198,11 +243,6 @@ class KChartPlusWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      KlineController? klineController = multiKlineController.klineController;
-      if (klineController != null) {
-        List<dynamic> data = klineController.data.value;
-        _buildKlines(data);
-      }
       if (kChartPlusController.klines.value.isEmpty) {
         return nilBox;
       }

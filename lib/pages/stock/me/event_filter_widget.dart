@@ -149,7 +149,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
   }
 
   _onDoubleTap(int index) {
-    eventFilterController.currentIndex = index;
+    eventFilterController.setCurrentIndex = index;
     swiperController.move(1);
   }
 
@@ -260,7 +260,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
 
   _onCopy(Map<String, dynamic> values) async {
     formInputController.setValue('id', null);
-    eventFilterController.currentIndex = -1;
+    eventFilterController.setCurrentIndex = -1;
   }
 
   _onCancel() async {
@@ -273,7 +273,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
       IconButton(
         tooltip: AppLocalizations.t('Add'),
         onPressed: () {
-          eventFilterController.currentIndex = -1;
+          eventFilterController.setCurrentIndex = -1;
           swiperController.move(1);
         },
         icon: const Icon(Icons.add_circle_outline),

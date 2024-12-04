@@ -151,14 +151,14 @@ class BindingDataTable2<T> extends StatelessWidget {
         }
       },
       onTap: () {
-        controller.currentIndex = index;
+        controller.setCurrentIndex = index;
         var fn = onTap;
         if (fn != null) {
           fn(index);
         }
       },
       onDoubleTap: () {
-        controller.currentIndex = index;
+        controller.setCurrentIndex = index;
         var fn = onDoubleTap;
         if (fn != null) {
           fn(index);

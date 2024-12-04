@@ -64,9 +64,9 @@ class CollectionItemWidget extends StatelessWidget with TileDataMixin {
         ));
       },
       itemCount: collectionChatMessageController.length,
-      index: collectionChatMessageController.currentIndex,
+      index: collectionChatMessageController.currentIndex.value,
       onIndexChanged: (index) {
-        collectionChatMessageController.currentIndex = index;
+        collectionChatMessageController.setCurrentIndex = index;
       },
     );
   }

@@ -65,10 +65,8 @@ class AddShareWidget extends StatelessWidget with TileDataMixin {
                   ),
                 ),
                 onTap: (int index, String title, {String? subtitle}) async {
-                  Share? share = await shareService.findShare(tsCode);
-                  String name = share?.name ?? '';
+                  await multiKlineController.put(tsCode);
                   multiKlineController.replaceAll([tsCode]);
-                  multiKlineController.put(tsCode, name);
                   indexWidgetProvider.push('stockline_chart');
                 });
           }

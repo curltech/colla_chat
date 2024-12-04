@@ -57,7 +57,7 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
     int i = 0;
     for (MailAddress emailAddress in mailAddressController.data) {
       if (emailAddress.email == group!.title) {
-        mailAddressController.currentIndex = i;
+        mailAddressController.setCurrentIndex = i;
         break;
       }
       i++;

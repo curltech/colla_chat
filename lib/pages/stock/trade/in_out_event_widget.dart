@@ -1,6 +1,5 @@
 import 'package:colla_chat/entity/stock/day_line.dart';
 import 'package:colla_chat/entity/stock/event_filter.dart';
-import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/chart/k_chart/kline_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
@@ -10,7 +9,6 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/day_line.dart';
 import 'package:colla_chat/service/stock/event_filter.dart';
-import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -147,9 +145,7 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
         IconButton(
           onPressed: () async {
             String tsCode = dayLine.tsCode;
-            Share? share = await shareService.findShare(tsCode);
-            String name = share?.name ?? '';
-            multiKlineController.put(tsCode, name);
+            await multiKlineController.put(tsCode);
             indexWidgetProvider.push('stockline_chart');
           },
           icon: const Icon(

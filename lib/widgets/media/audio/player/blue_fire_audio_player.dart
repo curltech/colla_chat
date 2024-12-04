@@ -244,7 +244,7 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
   @override
   seek(Duration position, {int? index}) async {
     if (index != null) {
-      playlistController.currentIndex = index;
+      playlistController.setCurrentIndex = index;
     }
     await player!.player.seek(position);
   }

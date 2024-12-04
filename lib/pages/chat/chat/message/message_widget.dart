@@ -232,7 +232,7 @@ class MessageWidget {
       body = InkWell(
           onDoubleTap: canFullScreen
               ? () {
-                  chatMessageController.currentIndex = index;
+                  chatMessageController.setCurrentIndex = index;
                   indexWidgetProvider.push('full_screen_chat_message');
                 }
               : null,

@@ -59,17 +59,17 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
   }
 
   previous() async {
-    if (currentIndex == null || currentIndex == 0) {
+    if (currentIndex.value == null || currentIndex.value == 0) {
       return;
     }
-    currentIndex = currentIndex! - 1;
+    setCurrentIndex = currentIndex.value! - 1;
   }
 
   next() async {
-    if (currentIndex == null || currentIndex! >= data.length - 1) {
+    if (currentIndex.value == null || currentIndex.value! >= data.length - 1) {
       return;
     }
-    currentIndex = currentIndex! + 1;
+    setCurrentIndex = currentIndex.value! + 1;
   }
 
   Future<PlatformMediaSource?> addMediaFile(
@@ -106,7 +106,7 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
     }
     addAll(mediaSources);
     if (data.isNotEmpty) {
-      currentIndex = data.length - 1;
+      setCurrentIndex = data.length - 1;
     }
 
     return mediaSources;
@@ -168,7 +168,7 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
               }
             }
           }
-          currentIndex = data.length - 1;
+          setCurrentIndex = data.length - 1;
         }
       }
     } else {
@@ -184,7 +184,7 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
             mediaSources.add(mediaSource);
           }
         }
-        currentIndex = data.length - 1;
+        setCurrentIndex = data.length - 1;
       }
     }
 
@@ -257,7 +257,7 @@ class PlaylistWidget extends StatelessWidget {
         subtitle: '$length',
         selected: selected,
         onTap: (int index, String title, {String? subtitle}) {
-          playlistController.currentIndex = index;
+          playlistController.setCurrentIndex = index;
           _buildTileData(context);
         },
       );
@@ -332,7 +332,7 @@ class PlaylistWidget extends StatelessWidget {
               return InkWell(
                   child: thumbnails[index],
                   onTap: () {
-                    playlistController.currentIndex = index;
+                    playlistController.setCurrentIndex = index;
                     if (onSelected != null) {
                       onSelected!(index, tileData[index].title);
                     }
@@ -342,7 +342,7 @@ class PlaylistWidget extends StatelessWidget {
         return DataListView(
           onTap: (int index, String title,
               {TileData? group, String? subtitle}) {
-            playlistController.currentIndex = index;
+            playlistController.setCurrentIndex = index;
             if (onSelected != null) {
               onSelected!(index, title);
             }
@@ -471,7 +471,7 @@ class PlaylistWidget extends StatelessWidget {
               ),
               onPressed: () async {
                 var currentIndex = playlistController.currentIndex;
-                playlistController.delete(index: currentIndex);
+                playlistController.delete(index: currentIndex.value);
                 _buildTileData(context);
               },
               tooltip: AppLocalizations.t('Remove video file'),
@@ -499,7 +499,7 @@ class PlaylistWidget extends StatelessWidget {
                 color: Colors.white, //myself.primary,
               ),
               onPressed: () async {
-                int? currentIndex = playlistController.currentIndex;
+                int? currentIndex = playlistController.currentIndex.value;
                 if (currentIndex != null) {
                   await _collectMediaSource(currentIndex);
                 }
@@ -513,7 +513,7 @@ class PlaylistWidget extends StatelessWidget {
                 color: Colors.white, //myself.primary,
               ),
               onPressed: () async {
-                var currentIndex = playlistController.currentIndex;
+                var currentIndex = playlistController.currentIndex.value;
                 if (currentIndex != null) {
                   await _removeFromCollect(currentIndex);
                 }

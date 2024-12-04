@@ -64,9 +64,9 @@ class FullScreenChatMessageWidget extends StatelessWidget with TileDataMixin {
         ));
       },
       itemCount: chatMessageController.length,
-      index: chatMessageController.currentIndex,
+      index: chatMessageController.currentIndex.value,
       onIndexChanged: (index) {
-        chatMessageController.currentIndex = index;
+        chatMessageController.setCurrentIndex = index;
       },
     );
   }

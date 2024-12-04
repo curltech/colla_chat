@@ -369,7 +369,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
         isThreeLine: true,
         onTap: (int index, String title, {String? subtitle}) async {
           Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
-          chatSummaryController.currentIndex = index;
+          chatSummaryController.setCurrentIndex = index;
           ChatSummary? current = chatSummaryController.current;
           if (linkman?.linkmanStatus == LinkmanStatus.G.name) {
             llmChatMessageController.chatSummary = current;
@@ -390,7 +390,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
           if (confirm != true) {
             return;
           }
-          chatSummaryController.currentIndex = index;
+          chatSummaryController.setCurrentIndex = index;
           await chatSummaryService.removeChatSummary(peerId);
           await chatMessageService.removeByLinkman(peerId);
           chatSummaryController.delete();

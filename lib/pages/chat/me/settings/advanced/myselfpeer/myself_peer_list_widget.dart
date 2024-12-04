@@ -29,7 +29,7 @@ class MyselfPeerListWidget extends StatelessWidget with TileDataMixin {
       int i = 0;
       for (var myselfPeer in myselfPeers) {
         var tile = TileData(
-          selected: myselfPeerController.currentIndex == i,
+          selected: myselfPeerController.currentIndex.value == i,
           title: myselfPeer.loginName,
           subtitle: myselfPeer.peerId,
           titleTail: myselfPeer.name,
@@ -52,7 +52,7 @@ class MyselfPeerListWidget extends StatelessWidget with TileDataMixin {
         return tiles[index];
       },
       onTap: (int index, String title, {TileData? group, String? subtitle}) {
-        myselfPeerController.currentIndex = index;
+        myselfPeerController.setCurrentIndex = index;
       },
     );
     var appBarView =

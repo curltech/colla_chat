@@ -9,7 +9,6 @@ import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/service/stock/share_group.dart';
-import 'package:colla_chat/service/stock/stock_line.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -20,6 +19,7 @@ import 'package:get/get.dart';
 
 /// 存储在本地的自选股票的代码和分组
 class MyShareController {
+  final RxBool showLoading = false.obs;
   final RxString subscription = ''.obs;
 
   final RxString groupName =
@@ -37,12 +37,8 @@ class MyShareController {
     subscription.value = value ?? '';
     List<String> tsCodes = subscription.value.split(',');
     for (String tsCode in tsCodes) {
-      Share? share = await shareService.findShare(tsCode);
-      if (share != null) {
-        multiKlineController.put(tsCode, share.name!);
-      }
+      await multiKlineController.put(tsCode);
     }
-    multiKlineController.loadDayLines();
 
     await assignGroupSubscription();
   }
@@ -212,9 +208,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
         IconButton(
           onPressed: () async {
             String tsCode = dayLine.tsCode;
-            Share? share = await shareService.findShare(tsCode);
-            String name = share?.name ?? '';
-            multiKlineController.put(tsCode, name);
+            await multiKlineController.put(tsCode);
             indexWidgetProvider.push('stockline_chart');
           },
           icon: const Icon(
@@ -310,15 +304,24 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
             return _buildActionWidget(context, index, dayLine);
           }),
     ];
-    return BindingDataTable2<DayLine>(
-      key: UniqueKey(),
-      showCheckboxColumn: true,
-      horizontalMargin: 10.0,
-      columnSpacing: 0.0,
-      platformDataColumns: dayLineDataColumns,
-      controller: dayLineController,
-      fixedLeftColumns: 2,
-    );
+    return Stack(children: <Widget>[
+      BindingDataTable2<DayLine>(
+        key: UniqueKey(),
+        showCheckboxColumn: true,
+        horizontalMargin: 10.0,
+        columnSpacing: 0.0,
+        platformDataColumns: dayLineDataColumns,
+        controller: dayLineController,
+        fixedLeftColumns: 2,
+      ),
+      if (myShareController.showLoading.value)
+        Container(
+          width: double.infinity,
+          height: 450,
+          alignment: Alignment.center,
+          child: const CircularProgressIndicator(),
+        ),
+    ]);
   }
 
   /// 股票分组的按钮

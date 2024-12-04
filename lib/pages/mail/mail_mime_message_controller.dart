@@ -56,11 +56,11 @@ class MailAddressController extends DataListController<entity.MailAddress> {
         String email = emailAddress.email;
         mailMimeMessageController.init(email);
       }
-      currentIndex = 0;
+      setCurrentIndex = 0;
       connectAllMailAddress();
       mailMimeMessageController.findMailMessages();
     } else {
-      currentIndex = null;
+      setCurrentIndex = null;
     }
   }
 

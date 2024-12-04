@@ -210,10 +210,10 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
               tiles.add(TileData(
                 title: poem.title,
                 subtitle: poem.rhythmic,
-                selected: poemController.currentIndex == i,
+                selected: poemController.currentIndex.value == i,
                 titleTail: '${poem.dynasty} ${poem.author}',
                 onTap: (int index, String title, {String? subtitle}) {
-                  poemController.currentIndex = index;
+                  poemController.setCurrentIndex = index;
                   indexWidgetProvider.push(poemContentWidget.routeName);
                 },
               ));

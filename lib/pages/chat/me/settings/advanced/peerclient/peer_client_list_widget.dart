@@ -44,7 +44,7 @@ class PeerClientListWidget extends StatelessWidget with TileDataMixin {
         var title = peerClient.name;
         var subtitle = peerClient.peerId;
         TileData tile = TileData(
-            selected: peerClientController.currentIndex == i,
+            selected: peerClientController.currentIndex.value == i,
             prefix: peerClient.avatarImage,
             title: title,
             subtitle: subtitle,
@@ -54,7 +54,7 @@ class PeerClientListWidget extends StatelessWidget with TileDataMixin {
             title: 'Delete',
             prefix: Icons.remove,
             onTap: (int index, String label, {String? subtitle}) async {
-              peerClientController.currentIndex = index;
+              peerClientController.setCurrentIndex = index;
               peerClientService.delete(entity: peerClient);
               peerClientController.delete();
             });
@@ -63,7 +63,7 @@ class PeerClientListWidget extends StatelessWidget with TileDataMixin {
             title: 'Edit',
             prefix: Icons.edit,
             onTap: (int index, String label, {String? subtitle}) async {
-              peerClientController.currentIndex = index;
+              peerClientController.setCurrentIndex = index;
               indexWidgetProvider.push('peer_client_edit');
             });
         slideActions.add(editSlideAction);
@@ -80,7 +80,7 @@ class PeerClientListWidget extends StatelessWidget with TileDataMixin {
   }
 
   _onTap(int index, String title, {String? subtitle, TileData? group}) {
-    peerClientController.currentIndex = index;
+    peerClientController.setCurrentIndex = index;
   }
 
   @override

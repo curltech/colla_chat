@@ -163,7 +163,7 @@ class P2pLoginWidget extends StatelessWidget {
         return DataListView(
           onTap: (int index, String title,
               {TileData? group, String? subtitle}) {
-            myselfPeerController.currentIndex = index;
+            myselfPeerController.setCurrentIndex = index;
             Navigator.pop(context);
           },
           itemCount: myselfPeerController.data.length,

@@ -294,7 +294,7 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
   @override
   seek(Duration? position, {int? index}) async {
     if (index != null) {
-      playlistController.currentIndex = index;
+      playlistController.setCurrentIndex = index;
     }
     if (position != null) {
       try {

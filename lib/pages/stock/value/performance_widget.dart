@@ -1,5 +1,4 @@
 import 'package:colla_chat/entity/stock/performance.dart';
-import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
 import 'package:colla_chat/plugin/chart/k_chart/kline_controller.dart';
@@ -8,7 +7,6 @@ import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/performance.dart';
-import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
@@ -246,9 +244,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
         IconButton(
           onPressed: () async {
             String tsCode = performance.securityCode;
-            Share? share = await shareService.findShare(tsCode);
-            String name = share?.name ?? '';
-            multiKlineController.put(tsCode, name);
+            await multiKlineController.put(tsCode);
             indexWidgetProvider.push('stockline_chart');
           },
           icon: const Icon(

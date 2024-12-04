@@ -267,7 +267,7 @@ class ChannelChatMessageItem extends StatelessWidget {
           if (confirm != true) {
             return;
           }
-          channelChatMessageController.currentIndex = index;
+          channelChatMessageController.setCurrentIndex = index;
           await chatMessageService.remove(chatMessage);
         });
     slideActions.add(deleteSlideAction);

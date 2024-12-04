@@ -57,7 +57,7 @@ class WaveformsAudioPlayerController extends AbstractAudioPlayerController {
   @override
   seek(Duration position, {int? index}) async {
     if (index != null) {
-      playlistController.currentIndex = index;
+      playlistController.setCurrentIndex = index;
     }
     try {
       await playerController!.seekTo(position.inMilliseconds);

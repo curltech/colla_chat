@@ -55,11 +55,11 @@ class BindingPaginatedDataTable2<T> extends StatelessWidget {
 
   Widget _buildPageNumber() {
     int currentPage;
-    if (controller.currentIndex == null) {
+    if (controller.currentIndex.value == null) {
       currentPage = 0;
     } else {
       currentPage =
-          ((controller.currentIndex! + 1) / controller.limit.value).floor() + 1;
+          ((controller.currentIndex.value! + 1) / controller.limit.value).floor() + 1;
     }
     int totalPage = (controller.limit.value).ceil();
 

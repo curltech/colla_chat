@@ -71,7 +71,7 @@ class MediaFileWidgetState extends State<MediaFileWidget> {
       String? mimeType = mediaFile.mimeType;
       var chip = GestureDetector(
           onTap: () async {
-            widget.mediaFileController.currentIndex = index;
+            widget.mediaFileController.setCurrentIndex = index;
           },
           child: Card(
             elevation: 0.0,
