@@ -132,24 +132,24 @@ class MultiKlineController extends DataListController<String> {
   /// 装载日线
   loadDayLines({List<String>? tsCodes}) async {
     tsCodes ??= data;
-    List<Future<Map<String, dynamic>?>> futures = [];
     for (String tsCode in tsCodes) {
       if (tsCode.isEmpty) {
         continue;
       }
       await put(tsCode);
+      Map<String, dynamic>? response;
       if (online.value) {
-        futures.add(CrawlerUtil.getDayLine(tsCode));
+        response = await CrawlerUtil.getDayLine(tsCode);
       } else {
-        futures.add(remoteDayLineService.sendFindPreceding(tsCode));
+        response = await remoteDayLineService.sendFindPreceding(tsCode);
       }
-    }
-    List<Map<String, dynamic>?> responses = await Future.wait(futures);
-    for (Map<String, dynamic>? response in responses) {
       if (response != null) {
         List<DayLine> dayLines = response['data'];
         if (dayLines.isNotEmpty) {
-          String tsCode = dayLines.first.tsCode;
+          if (tsCode != dayLines.first.tsCode) {
+            logger.e('Load day line:$tsCode failure: not match');
+            continue;
+          }
 
           KlineController? klineController = klineControllers[tsCode]?[101];
           if (klineController != null) {
