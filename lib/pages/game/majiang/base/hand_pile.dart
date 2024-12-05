@@ -18,6 +18,24 @@ class HandPile extends Pile {
 
   HandPile({super.cards});
 
+  int get total {
+    int total = 0;
+    for (TypePile touchPile in touchPiles) {
+      total += touchPile.cards.length;
+    }
+    for (TypePile drawingPile in drawingPiles) {
+      total += drawingPile.cards.length;
+    }
+    return total + cards.length + (takeCard == null ? 0 : 1);
+  }
+
+  int get count {
+    int total = 0;
+    total += touchPiles.length * 3;
+    total += drawingPiles.length * 3;
+    return total + cards.length + (takeCard == null ? 0 : 1);
+  }
+
   /// 检查碰牌
   int? checkTouch(Card card) {
     int length = cards.length;

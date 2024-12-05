@@ -1,7 +1,9 @@
 import 'package:colla_chat/pages/game/majiang/base/room.dart';
+import 'package:colla_chat/pages/game/majiang/base/round.dart';
 import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
 import 'package:colla_chat/pages/game/majiang/component/waste_pile_component.dart';
 import 'package:colla_chat/pages/game/majiang/room_controller.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
@@ -125,6 +127,14 @@ class WasteAreaComponent extends RectangleComponent
 
   @override
   void onTapDown(TapDownEvent event) {
+    Round? round = roomController.currentRound;
+    if (round == null) {
+      return;
+    }
+
+    if (round.total != 136) {
+      logger.e('round total error:${round.total}');
+    }
     roomController.selfParticipantDirection.value =
         roomController.getParticipantDirection(areaDirection);
     roomController.majiangFlameGame.reload();

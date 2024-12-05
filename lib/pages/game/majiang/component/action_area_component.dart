@@ -5,6 +5,7 @@ import 'package:colla_chat/pages/game/majiang/base/round_participant.dart';
 import 'package:colla_chat/pages/game/majiang/base/suit.dart';
 import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
 import 'package:colla_chat/pages/game/majiang/room_controller.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:flame/components.dart';
 import 'package:flame/input.dart';
 import 'package:flutter/material.dart';
@@ -86,6 +87,7 @@ class ActionAreaComponent extends RectangleComponent
     if (round == null) {
       return;
     }
+
     if (outstandingAction == OutstandingAction.complete) {
       CompleteType? completeType = await room.onRoomEvent(RoomEvent(
           room.name, round.id, owner, RoomEventAction.complete,

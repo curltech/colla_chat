@@ -78,8 +78,9 @@ class Round {
     ];
     stockPile = StockPile();
     Random random = Random.secure();
+
     /// 牌的总数是136
-    for (int i = 0; i < 58; ++i) {
+    for (int i = 0; i < 136; ++i) {
       int pos;
       if (i < randoms.length) {
         pos = randoms[i];
@@ -111,10 +112,18 @@ class Round {
     return roundParticipants[participantDirection.index];
   }
 
+  int get total {
+    int total = 0;
+    for (int i = 0; i < roundParticipants.length; ++i) {
+      total += roundParticipants[i].total;
+    }
+    return total + stockPile.cards.length;
+  }
+
   /// 打牌
   bool _send(int owner, Card card) {
     if (owner != keeper) {
-      return false;
+      // return false;
     }
     bool pass = true;
     RoundParticipant roundParticipant = roundParticipants[owner];
@@ -183,16 +192,16 @@ class Round {
       return null;
     }
 
+    TakeCardType takeCardType = TakeCardType.self;
+    if (isSeaTake) {
+      takeCardType = TakeCardType.sea;
+    }
     Card card = stockPile.cards.removeLast();
     logger.w(
         'take card ${card.toString()}, leave ${stockPile.cards.length} cards');
     sender = null;
     sendCard = null;
     keeper = owner;
-    TakeCardType takeCardType = TakeCardType.self;
-    if (isSeaTake) {
-      takeCardType = TakeCardType.sea;
-    }
     for (int i = 0; i < roundParticipants.length; ++i) {
       RoundParticipant roundParticipant = roundParticipants[i];
       roundParticipant.onRoomEvent(RoomEvent(
@@ -205,9 +214,6 @@ class Round {
 
   /// 某个参与者过，没有采取任何行为
   bool _pass(int owner) {
-    if (sender == null) {
-      return false;
-    }
     for (int i = 0; i < roundParticipants.length; ++i) {
       RoundParticipant roundParticipant = roundParticipants[owner];
       if (roundParticipant.outstandingActions
@@ -234,7 +240,7 @@ class Round {
     }
     if (pass) {
       onRoomEvent(
-          RoomEvent(room.name, id, room.next(sender!), RoomEventAction.take));
+          RoomEvent(room.name, id, room.next(owner), RoomEventAction.take));
     }
 
     return true;

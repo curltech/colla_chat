@@ -8,6 +8,7 @@ import 'package:colla_chat/pages/game/majiang/base/room.dart';
 import 'package:colla_chat/pages/game/majiang/base/round.dart';
 import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
 import 'package:colla_chat/pages/game/majiang/room_controller.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/material.dart';

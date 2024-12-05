@@ -63,6 +63,14 @@ class RoundParticipant {
     packer = null;
   }
 
+  int get total {
+    return handPile.total + wastePile.cards.length;
+  }
+
+  int get handCount {
+    return handPile.count;
+  }
+
   addOutstandingAction(OutstandingAction outstandingAction, List<int> vs) {
     List<int>? values = outstandingActions[outstandingAction];
     if (values == null) {
@@ -172,7 +180,7 @@ class RoundParticipant {
     if (index == owner) {
       Card? c = handPile.sendBar(pos, card, sender);
       if (c != null) {
-        addEarnedAction(OutstandingAction.bar, [sender, sender, sender]);
+        addEarnedAction(OutstandingAction.bar, [pos]);
       }
 
       return c;
@@ -189,7 +197,7 @@ class RoundParticipant {
     if (index == owner) {
       Card? card = handPile.takeBar(pos, owner);
       if (card != null) {
-        addEarnedAction(OutstandingAction.bar, [owner]);
+        addEarnedAction(OutstandingAction.bar, [pos]);
       }
 
       return card;
@@ -203,7 +211,7 @@ class RoundParticipant {
     if (index == owner) {
       Card? card = handPile.darkBar(pos, owner);
       if (card != null) {
-        addEarnedAction(OutstandingAction.bar, [owner, owner]);
+        addEarnedAction(OutstandingAction.bar, [pos]);
       }
 
       return card;
@@ -253,6 +261,10 @@ class RoundParticipant {
   _pass(int owner) {
     if (index == owner) {
       outstandingActions.clear();
+      if (handPile.takeCardType == TakeCardType.sea) {
+        round.room.onRoomEvent(RoomEvent(round.room.name, index,
+            round.room.next(owner), RoomEventAction.take));
+      }
     }
   }
 
@@ -305,10 +317,7 @@ class RoundParticipant {
   dynamic onRoomEvent(RoomEvent roomEvent) {
     switch (roomEvent.action) {
       case RoomEventAction.take:
-        if (TakeCardType.self.index == roomEvent.pos) {
-          return _take(roomEvent.owner, roomEvent.card!, roomEvent.pos!);
-        }
-        break;
+        return _take(roomEvent.owner, roomEvent.card!, roomEvent.pos!);
       case RoomEventAction.barTake:
         if (TakeCardType.bar.index == roomEvent.pos) {
           return _take(roomEvent.owner, roomEvent.card!, roomEvent.pos!);

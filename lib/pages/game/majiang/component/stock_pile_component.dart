@@ -38,8 +38,7 @@ class StockPileComponent extends PositionComponent
       length = 25;
     }
     CardBackgroundType cardBackgroundType = CardBackgroundType.opponentbar;
-    double x = 0;
-    double y = 0;
+
     int priority = 12;
     List<majiangCard.Card> cards;
     if (stockPile.cards.length > length) {
@@ -47,6 +46,17 @@ class StockPileComponent extends PositionComponent
     } else {
       cards = [...stockPile.cards];
     }
+    length = cards.length;
+    double initX;
+    if (length.isOdd) {
+      initX = MajiangFlameGame.width * MajiangFlameGame.stockWidthRadio -
+          (length / 2) * 35;
+    } else {
+      initX = MajiangFlameGame.width * MajiangFlameGame.stockWidthRadio -
+          (length / 2 - 1) * 35;
+    }
+    double x = initX;
+    double y = 0;
     List<majiangCard.Card> upCards = [];
     List<majiangCard.Card> downCards = [];
     majiangCard.Card? lastCard;
@@ -76,7 +86,7 @@ class StockPileComponent extends PositionComponent
           position: position, priority: priority);
       add(cardComponent);
     }
-    x = 0;
+    x = initX;
     y = 0;
     if (downCards.length == upCards.length + 2) {
       x += 35;
