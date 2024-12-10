@@ -31,7 +31,7 @@ class Round {
   int banker;
 
   /// 当前的持有发牌的参与者
-  int? keeper;
+  int? _keeper;
 
   /// 刚出牌的参与者
   int? sender;
@@ -58,9 +58,18 @@ class Round {
     } else {
       this.randoms = randoms;
     }
-    keeper = banker;
+    _keeper = banker;
 
     init();
+  }
+
+  int? get keeper {
+    return _keeper;
+  }
+
+  set keeper(int? keeper) {
+    logger.w('set keeper:$keeper');
+    _keeper = keeper;
   }
 
   init() {
@@ -189,6 +198,7 @@ class Round {
   /// 发牌
   Card? _take(int owner) {
     if (stockPile.cards.isEmpty) {
+      logger.e('owner:$owner take card failure, stockPile is empty');
       return null;
     }
 
@@ -472,7 +482,8 @@ class Round {
   }
 
   dynamic onRoomEvent(RoomEvent roomEvent) async {
-    RoomEventAction action = roomEvent.action;
+    logger.w('round:$id has received event:${roomEvent.toString()}');
+    RoomEventAction? action = roomEvent.action;
     switch (action) {
       case RoomEventAction.take:
         return _take(roomEvent.owner);

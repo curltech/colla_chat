@@ -262,7 +262,7 @@ class RoundParticipant {
     if (index == owner) {
       outstandingActions.clear();
       if (handPile.takeCardType == TakeCardType.sea) {
-        round.room.onRoomEvent(RoomEvent(round.room.name, index,
+        round.room.onRoomEvent(RoomEvent(round.room.name, round.id,
             round.room.next(owner), RoomEventAction.take));
       }
     }
@@ -278,6 +278,9 @@ class RoundParticipant {
       return null;
     }
     if (index == owner) {
+      if (handPile.takeCard != null) {
+        logger.e('take card is not null');
+      }
       handPile.takeCard = card;
       handPile.takeCardType = takeCardType;
 
@@ -315,6 +318,9 @@ class RoundParticipant {
 
   /// 分发房间来的事件，处理各参与者该自己处理的部分
   dynamic onRoomEvent(RoomEvent roomEvent) {
+    roomEvents.add(roomEvent);
+    logger.w(
+        'round participant:$index has received event:${roomEvent.toString()}');
     switch (roomEvent.action) {
       case RoomEventAction.take:
         return _take(roomEvent.owner, roomEvent.card!, roomEvent.pos!);

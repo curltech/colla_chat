@@ -269,7 +269,7 @@ class LiveKitRoomClient {
     return participants;
   }
 
-  ///发送数据
+  /// 发送数据到特定的成员或者主题
   Future<void> publishData(
     List<int> data, {
     bool? reliable,
@@ -619,7 +619,8 @@ class LiveKitConferenceClient {
       RemoteParticipant remoteParticipant = event.participant;
       String identity = remoteParticipant.identity;
       String name = remoteParticipant.name;
-      await remotePeerMediaStreamController.addRemoteTrack(track, remoteParticipant);
+      await remotePeerMediaStreamController.addRemoteTrack(
+          track, remoteParticipant);
       log.logger.i(
           'peerId:$identity, name:$name streamId:$streamId remote peerMediaStream is added');
     } else {
@@ -716,8 +717,16 @@ class LiveKitConferenceClient {
     // roomClient.room.startAudio();
   }
 
-  publishData(List<int> data) async {
-    await roomClient.publishData(data);
+  publishData(
+    List<int> data, {
+    bool? reliable,
+    List<String>? destinationIdentities,
+    String? topic,
+  }) async {
+    await roomClient.publishData(data,
+        reliable: reliable,
+        destinationIdentities: destinationIdentities,
+        topic: topic);
   }
 }
 

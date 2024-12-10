@@ -11,6 +11,7 @@ import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart'
 import 'package:colla_chat/pages/game/majiang/room_controller.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -142,14 +143,9 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
     Room? room = roomController.room.value;
     List<Widget>? rightWidgets = [
       IconButton(
-          tooltip: AppLocalizations.t('Full screen'),
+          tooltip: AppLocalizations.t('logger'),
           onPressed: () async {
-            // if (gameWidget != null) {
-            //   fullscreen.value = true;
-            //   await DialogUtil.showFullScreen(
-            //       context: context, child: gameWidget!);
-            //   fullscreen.value = false;
-            // }
+            indexWidgetProvider.push('logger');
           },
           icon: const Icon(Icons.fullscreen)),
       IconButton(

@@ -6,6 +6,7 @@ import 'package:colla_chat/pages/game/majiang/base/card_background_sprite.dart';
 import 'package:colla_chat/pages/game/majiang/base/hand_pile.dart';
 import 'package:colla_chat/pages/game/majiang/base/room.dart';
 import 'package:colla_chat/pages/game/majiang/base/round.dart';
+import 'package:colla_chat/pages/game/majiang/base/round_participant.dart';
 import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
 import 'package:colla_chat/pages/game/majiang/room_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
@@ -132,6 +133,14 @@ class CardComponent extends PositionComponent
       }
       ParticipantDirection participantDirection =
           roomController.getParticipantDirection(areaDirection);
+      RoundParticipant roundParticipant =
+          currentRound.roundParticipants[participantDirection.index];
+      if (roundParticipant.handCount != 14 ||
+          participantDirection.index != currentRound.keeper) {
+        logger.e(
+            'Cannot send card not keeper,current keeper:${currentRound.keeper}');
+        return;
+      }
       HandPile handPile =
           currentRound.roundParticipants[participantDirection.index].handPile;
       if (handPile.takeCard == card) {

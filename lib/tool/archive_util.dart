@@ -34,7 +34,7 @@ class ArchiveUtil {
 
   static unZip(String inputPath, String outputPath) {
     final InputFileStream inputStream = InputFileStream(inputPath);
-    final Archive archive = ZipDecoder().decodeBuffer(inputStream);
+    final Archive archive = ZipDecoder().decodeStream(inputStream);
     extractArchiveToDisk(archive, outputPath);
   }
 }

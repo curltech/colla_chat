@@ -5,6 +5,8 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
 
+final Card unknownCard = Card(Suit.none, windSuit: null);
+
 class Card {
   static const String majiangCardPath = 'majiang/card/';
 
@@ -20,7 +22,8 @@ class Card {
   }
 
   check() {
-    if ((suit == Suit.wind && windSuit != null) ||
+    if (suit == Suit.none ||
+        (suit == Suit.wind && windSuit != null) ||
         (suit != Suit.wind && rank != null)) {
     } else {
       throw 'error card';

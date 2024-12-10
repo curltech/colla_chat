@@ -1,5 +1,5 @@
 /// 麻将牌的花色
-enum Suit { wind, suo, tong, wan }
+enum Suit { wind, suo, tong, wan, none }
 
 /// 风牌
 enum WindSuit {

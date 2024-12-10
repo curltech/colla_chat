@@ -207,30 +207,30 @@ class ImageUtil {
     Uint8List imageBytes, {
     int quality = 100,
     String? fileExtension,
-    required String name,
+    required String fileName,
     String androidRelativePath = "Pictures",
-    required bool androidExistNotSave,
+    required bool skipIfExists,
   }) async {
     final result = await SaverGallery.saveImage(imageBytes,
         quality: quality,
-        name: name,
+        fileName: fileName,
         androidRelativePath: androidRelativePath,
-        androidExistNotSave: androidExistNotSave);
+        skipIfExists: skipIfExists);
     return result;
   }
 
   ///保存其他数据到图片廊，数据在文件中
   static Future<dynamic> saveFileGallery({
-    required String file,
-    required String name,
+    required String filePath,
+    required String fileName,
     String androidRelativePath = "Download",
-    required bool androidExistNotSave,
+    required bool skipIfExists,
   }) async {
     final result = await SaverGallery.saveFile(
-        file: file,
-        name: name,
+        filePath: filePath,
+        fileName: fileName,
         androidRelativePath: androidRelativePath,
-        androidExistNotSave: androidExistNotSave);
+        skipIfExists: skipIfExists);
     return result;
   }
 

@@ -293,7 +293,6 @@
 				};
 			};
 			buildConfigurationList = 33CC10E82044A3C60003C045 /* Build configuration list for PBXProject "Runner" */;
-			compatibilityVersion = "Xcode 15.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -301,6 +300,7 @@
 				Base,
 			);
 			mainGroup = 33CC10E42044A3C60003C045;
+			preferredProjectObjectVersion = 77;
 			productRefGroup = 33CC10EE2044A3C60003C045 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -541,6 +541,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -737,15 +738,9 @@
 					"-framework",
 					"\"screen_brightness_macos\"",
 					"-framework",
-					"\"screen_retriever\"",
-					"-framework",
 					"\"share_plus\"",
 					"-framework",
 					"\"shared_preferences_foundation\"",
-					"-framework",
-					"\"speech_to_text_macos\"",
-					"-framework",
-					"\"sqflite\"",
 					"-framework",
 					"\"sqlite3\"",
 					"-framework",
@@ -893,6 +888,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
@@ -1089,15 +1085,9 @@
 					"-framework",
 					"\"screen_brightness_macos\"",
 					"-framework",
-					"\"screen_retriever\"",
-					"-framework",
 					"\"share_plus\"",
 					"-framework",
 					"\"shared_preferences_foundation\"",
-					"-framework",
-					"\"speech_to_text_macos\"",
-					"-framework",
-					"\"sqflite\"",
 					"-framework",
 					"\"sqlite3\"",
 					"-framework",
@@ -1327,15 +1317,9 @@
 					"-framework",
 					"\"screen_brightness_macos\"",
 					"-framework",
-					"\"screen_retriever\"",
-					"-framework",
 					"\"share_plus\"",
 					"-framework",
 					"\"shared_preferences_foundation\"",
-					"-framework",
-					"\"speech_to_text_macos\"",
-					"-framework",
-					"\"sqflite\"",
 					"-framework",
 					"\"sqlite3\"",
 					"-framework",

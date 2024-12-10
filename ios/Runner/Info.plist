@@ -50,7 +50,6 @@
     <array>
         <string>A00000000386980701</string>
     </array>
-
 	<key>UIRequiredDeviceCapabilities</key>
     <array>
         <string>nfc</string>
@@ -171,6 +170,11 @@
         <string>tomtomgo</string>
         <string>copilot</string>
         <string>com.sygic.aura</string>
+        <string>nmap</string>
+        <string>kakaomap</string>
+        <string>tmap</string>
+        <string>szn-mapy</string>
+        <string>mappls</string>
     </array>
     <key>io.flutter.embedded_views_preview</key>
     <true/>

@@ -54,19 +54,6 @@ class LocalNotificationsService {
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,
-
-      ///只用于ios10之前的版本，应用处于前台收到本地通知
-      onDidReceiveLocalNotification:
-          (int id, String? title, String? body, String? payload) async {
-        onDidReceiveLocalNotification(
-          ReceivedNotification(
-            id: id,
-            title: title,
-            body: body,
-            payload: payload,
-          ),
-        );
-      },
       notificationCategories: darwinNotificationCategories,
     );
     //linux的初始化设置

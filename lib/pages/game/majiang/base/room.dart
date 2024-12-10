@@ -9,10 +9,12 @@ import 'package:colla_chat/pages/game/majiang/base/participant.dart';
 import 'package:colla_chat/pages/game/majiang/base/round.dart';
 import 'package:colla_chat/pages/game/majiang/base/suit.dart';
 import 'package:colla_chat/pages/game/majiang/room_controller.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/number_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
 
@@ -59,7 +61,7 @@ class RoomEvent {
   final int owner;
 
   /// RoomAction事件的枚举
-  final RoomEventAction action;
+  final RoomEventAction? action;
 
   final Card? card;
 
@@ -82,7 +84,9 @@ class RoomEvent {
       : name = json['name'],
         roundId = json['roundId'],
         owner = json['owner'],
-        action = json['action'],
+        action = json['action'] != null
+            ? StringUtil.enumFromString(RoomEventAction.values, json['action'])
+            : null,
         card = json['card'] != null ? fullPile[json['card']] : null,
         pos = json['pos'],
         content = json['content'],
@@ -93,12 +97,17 @@ class RoomEvent {
       'name': name,
       'roundId': roundId,
       'owner': owner,
-      'action': action,
+      'action': action?.name,
       'card': card?.toString(),
       'pos': pos,
       'content': content,
       'src': src,
     };
+  }
+
+  @override
+  String toString() {
+    return 'name:$name,roundId:$roundId,owner:$owner,action:${action?.name},card:$card,pos:$pos,src:$src,content:$content';
   }
 }
 
@@ -107,7 +116,7 @@ class Room {
   final String name;
 
   /// 四个参与者
-  final List<Participant> participants = [];
+  late final List<Participant> participants;
 
   /// 每个房间都有多轮
   final List<Round> rounds = [];
@@ -134,29 +143,37 @@ class Room {
 
   late final StreamSubscription<RoomEvent> roomEventStreamSubscription;
 
-  Room(this.name);
+  Room(this.name, {required List<String> peerIds}) {
+    participants = [];
+    _init(peerIds);
+  }
+
+  Room.fromJson(Map json) : name = json['name'] {
+    participants = [];
+    if (json['participants'] != null && json['participants'] is List) {
+      for (var participant in json['participants']) {
+        participants.add(Participant.fromJson(participant));
+      }
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'participants': JsonUtil.toJson(participants),
+    };
+  }
 
   /// 加参与者
-  Future<void> init(List<String> peerIds) async {
-    Image defaultImage = await Flame.images.load('app.png');
+  Future<void> _init(List<String> peerIds) async {
     for (int i = 0; i < peerIds.length; ++i) {
       String peerId = peerIds[i];
-      if (myself.peerId == peerId) {
-        roomController.selfParticipantDirection.value =
-            NumberUtil.toEnum(ParticipantDirection.values, i)!;
-      }
       Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
       String linkmanName = AppLocalizations.t('unknown');
-      Image image = defaultImage;
       if (linkman != null) {
         linkmanName = linkman.name;
-        if (linkman.avatar != null) {
-          image =
-              await Flame.images.fromBase64('linkmanName.png', linkman.avatar!);
-        }
       }
       Participant participant = Participant(peerId, linkmanName, room: this);
-      participant.sprite = Sprite(image);
       participants.add(participant);
     }
     if (peerIds.length < 4) {
@@ -167,7 +184,6 @@ class Room {
           room: this,
           robot: true,
         );
-        participant.sprite ??= Sprite(defaultImage);
         participants.add(participant);
       }
     }
@@ -177,6 +193,28 @@ class Room {
         roomEventStreamController.stream.listen((RoomEvent roomEvent) {
       onRoomEvent(roomEvent);
     });
+  }
+
+  /// 初始化参与者，设置名称，头像
+  Future<void> init() async {
+    Image defaultImage = await Flame.images.load('app.png');
+    for (int i = 0; i < participants.length; ++i) {
+      Participant participant = participants[i];
+      if (myself.peerId == participant.peerId) {
+        roomController.selfParticipantDirection.value =
+            NumberUtil.toEnum(ParticipantDirection.values, i)!;
+      }
+      Linkman? linkman =
+          await linkmanService.findCachedOneByPeerId(participant.peerId);
+      Image image = defaultImage;
+      if (linkman != null) {
+        if (linkman.avatar != null) {
+          image =
+              await Flame.images.fromBase64('linkmanName.png', linkman.avatar!);
+          participant.sprite = Sprite(image);
+        }
+      }
+    }
   }
 
   int? get(String peerId) {
@@ -241,6 +279,7 @@ class Room {
 
   /// 房间的事件有外部触发，所有订阅者都会触发监听事件，本方法由外部调用，比如外部的消息chatMessage
   dynamic onRoomEvent(RoomEvent roomEvent) async {
+    logger.w('room:$name has received event:${roomEvent.toString()}');
     int? roundId = roomEvent.roundId;
     Round? round;
     if (roundId != null) {

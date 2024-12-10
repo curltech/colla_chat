@@ -91,7 +91,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
       {bool isFile = true}) async {
     if (!isFile) {
       await ImageUtil.saveImageGallery(bytes,
-          name: filename, androidExistNotSave: true);
+          fileName: filename, skipIfExists: true);
       DialogUtil.info(content: 'save to gallery: $filename');
     } else {
       String? dir = await FileUtil.directoryPathPicker();
