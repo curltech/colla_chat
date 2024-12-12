@@ -290,36 +290,60 @@ class Room {
 
   /// 新玩一局
   /// 由庄家调用，然后向其他参与者发送chatMessage
-  Future<Round> createRound(int banker) async {
+  Future<Round> _createRound(int banker) async {
     Round round = Round(rounds.length, this, banker);
     rounds.add(round);
     currentRoundIndex = round.id;
-    for (int i = 0; i < round.roundParticipants.length; i++) {
-      RoundParticipant roundParticipant = round.roundParticipants[i];
-      if (roundParticipant.participant.peerId != myself.peerId) {
-        if (roundParticipant.participant.robot) {
-          String content = JsonUtil.toJsonString(roundParticipant.handPile);
-          RoomEvent roomEvent = RoomEvent(
-              name, round.id, i, RoomEventAction.round,
-              content: content);
-          ChatMessage chatMessage = await chatMessageService.buildChatMessage(
-              receiverPeerId: roundParticipant.participant.peerId,
-              subMessageType: ChatMessageSubType.majiang,
-              content: roomEvent);
-          roomPool.onRoomEvent(chatMessage);
-        }
-      }
-    }
 
     return round;
   }
 
-  /// 房间的事件有外部触发，所有订阅者都会触发监听事件，本方法由外部调用，比如外部的消息chatMessage
+  /// 发起房间的事件，由发起事件的参与者调用
+  /// 完成后把事件分发到其他参与者
+  dynamic startRoomEvent(RoomEvent roomEvent) async {
+    dynamic returnValue;
+    Round? round;
+    if (roomEvent.action == RoomEventAction.round) {
+      round = await _createRound(roomEvent.owner);
+
+      return round;
+    }
+    int? roundId = roomEvent.roundId;
+    if (roundId != null) {
+      round = rounds[roundId];
+    }
+    if (round == null) {
+      return null;
+    }
+    returnValue = await round.onRoomEvent(roomEvent);
+    for (int i = 0; i < round.roundParticipants.length; i++) {
+      RoundParticipant roundParticipant = round.roundParticipants[i];
+      if (roundParticipant.participant.peerId != myself.peerId) {
+        String content = JsonUtil.toJsonString(roundParticipant.handPile);
+        RoomEvent roomEvent = RoomEvent(
+            name, round.id, i, RoomEventAction.round,
+            content: content);
+        ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+            receiverPeerId: roundParticipant.participant.peerId,
+            subMessageType: ChatMessageSubType.majiang,
+            content: roomEvent);
+        if (roundParticipant.participant.robot) {
+          roomPool.onRoomEvent(chatMessage);
+        } else {
+          roomPool.send(chatMessage);
+        }
+      }
+    }
+
+    return returnValue;
+  }
+
+  /// 房间的事件
+  /// 直接调用round的事件处理器，不会进行事件分发到其他参与者
   dynamic onRoomEvent(RoomEvent roomEvent) async {
     logger.w('room:$name has received event:${roomEvent.toString()}');
     dynamic returnValue;
-    if (roomEvent.action == RoomEventAction.room) {
-    } else if (roomEvent.action == RoomEventAction.round) {
+    if (roomEvent.action == RoomEventAction.round) {
       String? content = roomEvent.content;
       if (content != null) {
         var json = JsonUtil.toJson(content);
@@ -331,6 +355,7 @@ class Room {
         }
         currentRoundIndex = round.id;
         returnValue = round;
+        roomController.majiangFlameGame.reload();
       }
     } else {
       int? roundId = roomEvent.roundId;
@@ -339,14 +364,6 @@ class Room {
         round = rounds[roundId];
       }
       returnValue = await round?.onRoomEvent(roomEvent);
-    }
-    if (roomEvent.action == RoomEventAction.round) {
-      roomController.majiangFlameGame.reload();
-    } else {
-      if (roomEvent.action == RoomEventAction.send) {
-        roomController.majiangFlameGame.reloadNext();
-      }
-      roomController.majiangFlameGame.reloadSelf();
     }
 
     return returnValue;

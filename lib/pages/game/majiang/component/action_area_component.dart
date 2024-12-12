@@ -93,26 +93,26 @@ class ActionAreaComponent extends RectangleComponent
           room.name, round.id, owner, RoomEventAction.complete,
           pos: pos[0]));
       if (completeType != null) {
-        room.onRoomEvent(
+        room.startRoomEvent(
             RoomEvent(room.name, round.id, owner, RoomEventAction.round));
       }
     } else if (outstandingAction == OutstandingAction.touch) {
-      room.onRoomEvent(RoomEvent(
+      room.startRoomEvent(RoomEvent(
           room.name, round.id, owner, RoomEventAction.touch,
           src: round.sender, card: round.sendCard, pos: pos[0]));
     } else if (outstandingAction == OutstandingAction.bar) {
-      room.onRoomEvent(RoomEvent(
+      room.startRoomEvent(RoomEvent(
           room.name, round.id, owner, RoomEventAction.bar,
           pos: pos[0]));
     } else if (outstandingAction == OutstandingAction.darkBar) {
-      room.onRoomEvent(RoomEvent(
+      room.startRoomEvent(RoomEvent(
           room.name, round.id, owner, RoomEventAction.darkBar,
           pos: pos[0]));
     } else if (outstandingAction == OutstandingAction.pass) {
-      room.onRoomEvent(
+      room.startRoomEvent(
           RoomEvent(room.name, round.id, owner, RoomEventAction.pass));
     } else if (outstandingAction == OutstandingAction.drawing) {
-      room.onRoomEvent(RoomEvent(
+      room.startRoomEvent(RoomEvent(
           room.name, round.id, owner, RoomEventAction.drawing,
           pos: pos[0]));
     }

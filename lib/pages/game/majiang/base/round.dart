@@ -10,6 +10,7 @@ import 'package:colla_chat/pages/game/majiang/base/participant.dart';
 import 'package:colla_chat/pages/game/majiang/base/room.dart';
 import 'package:colla_chat/pages/game/majiang/base/stock_pile.dart';
 import 'package:colla_chat/pages/game/majiang/base/suit.dart';
+import 'package:colla_chat/pages/game/majiang/room_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/number_util.dart';
@@ -480,33 +481,41 @@ class Round {
 
   dynamic onRoomEvent(RoomEvent roomEvent) async {
     logger.w('round:$id has received event:${roomEvent.toString()}');
+    dynamic returnValue;
     RoomEventAction? action = roomEvent.action;
     switch (action) {
       case RoomEventAction.take:
-        return _take(roomEvent.owner);
+        returnValue = _take(roomEvent.owner);
       case RoomEventAction.send:
-        return _send(roomEvent.owner, roomEvent.card!);
+        returnValue = _send(roomEvent.owner, roomEvent.card!);
       case RoomEventAction.bar:
-        return _bar(roomEvent.owner, roomEvent.pos!);
+        returnValue = _bar(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.barTake:
-        return _barTake(roomEvent.owner);
+        returnValue = _barTake(roomEvent.owner);
       case RoomEventAction.touch:
-        return _touch(
+        returnValue = _touch(
             roomEvent.owner, roomEvent.pos!, roomEvent.src!, roomEvent.card!);
       case RoomEventAction.darkBar:
-        return _darkBar(roomEvent.owner, roomEvent.pos!);
+        returnValue = _darkBar(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.drawing:
-        return _drawing(roomEvent.owner, roomEvent.pos!);
+        returnValue = _drawing(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.rob:
-        return _rob(roomEvent.owner, roomEvent.src!, roomEvent.card!);
+        returnValue = _rob(roomEvent.owner, roomEvent.src!, roomEvent.card!);
       case RoomEventAction.score:
-        return _score(roomEvent.owner, roomEvent.pos!);
+        returnValue = _score(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.pass:
-        return _pass(roomEvent.owner);
+        returnValue = _pass(roomEvent.owner);
       case RoomEventAction.complete:
-        return _complete(roomEvent.owner, roomEvent.pos!);
+        returnValue = _complete(roomEvent.owner, roomEvent.pos!);
       default:
         break;
     }
+
+    if (roomEvent.action == RoomEventAction.send) {
+      roomController.majiangFlameGame.reloadNext();
+    }
+    roomController.majiangFlameGame.reloadSelf();
+
+    return returnValue;
   }
 }

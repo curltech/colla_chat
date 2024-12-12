@@ -143,7 +143,7 @@ class CardComponent extends PositionComponent
       HandPile handPile =
           currentRound.roundParticipants[participantDirection.index].handPile;
       if (handPile.takeCard == card) {
-        room.onRoomEvent(RoomEvent(
+        room.startRoomEvent(RoomEvent(
           room.name,
           currentRound.id,
           participantDirection.index,
@@ -154,7 +154,7 @@ class CardComponent extends PositionComponent
       } else {
         int pos = handPile.cards.indexOf(card);
         if (pos > -1) {
-          room.onRoomEvent(RoomEvent(
+          room.startRoomEvent(RoomEvent(
             room.name,
             currentRound.id,
             participantDirection.index,

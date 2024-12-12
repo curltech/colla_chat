@@ -79,7 +79,8 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
   }
 
   Future<void> createRoom(String name) async {
-    roomController.room.value = await roomPool.createRoom(name, peerIds);
+    roomController.room.value = await roomPool.startRoomEvent(
+        RoomEvent(name, null, 0, RoomEventAction.room, content: peerIds));
   }
 
   /// 弹出对话框，输入名称，选择参加的人
@@ -160,7 +161,8 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
           tooltip: AppLocalizations.t('New round'),
           onPressed: () {
             /// 新的一轮的庄家是当前选择的参与者
-            room.createRound(room.banker);
+            room.startRoomEvent(
+                RoomEvent(room.name, null, room.banker, RoomEventAction.round));
           },
           icon: const Icon(Icons.newspaper_outlined)));
       rightWidgets.add(IconButton(

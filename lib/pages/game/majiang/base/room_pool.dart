@@ -18,17 +18,30 @@ class RoomPool {
 
   /// 根据房间名称和参与者的编号创建房间
   /// 用于按钮的调用
-  Future<Room> createRoom(String name, List<String> peerIds) async {
+  Future<Room> _createRoom(String name, List<String> peerIds) async {
     Room room = Room(name, peerIds: peerIds);
     await room.init();
     rooms[name] = room;
-    // 将创建房间的命令和数据发送给其他参与者
-    // 对机器人直接调用onRoomEvent处理
-    // 对正常参与者需要发送chatMessage
-    for (int i = 0; i < room.participants.length; ++i) {
-      Participant participant = room.participants[i];
-      if (participant.peerId != myself.peerId) {
-        if (participant.robot) {
+
+    return room;
+  }
+
+  void send(ChatMessage chatMessage) {}
+
+  Room? get(String name) {
+    return rooms[name];
+  }
+
+  /// 完成后把事件分发到其他参与者
+  dynamic startRoomEvent(RoomEvent roomEvent) async {
+    if (roomEvent.action == RoomEventAction.room) {
+      Room room = await _createRoom(roomEvent.name, roomEvent.content);
+      // 将创建房间的命令和数据发送给其他参与者
+      // 对机器人直接调用onRoomEvent处理
+      // 对正常参与者需要发送chatMessage
+      for (int i = 0; i < room.participants.length; ++i) {
+        Participant participant = room.participants[i];
+        if (participant.peerId != myself.peerId) {
           String content = JsonUtil.toJsonString(room);
           RoomEvent roomEvent = RoomEvent(
               room.name, null, i, RoomEventAction.room,
@@ -37,25 +50,28 @@ class RoomPool {
               receiverPeerId: participant.peerId,
               subMessageType: ChatMessageSubType.majiang,
               content: roomEvent);
-          onRoomEvent(chatMessage);
-        } else {}
+          if (participant.robot) {
+            onRoomEvent(chatMessage);
+          } else {
+            send(chatMessage);
+          }
+        }
       }
+
+      return room;
     }
 
-    return room;
-  }
-
-  Room? get(String name) {
-    return rooms[name];
+    return null;
   }
 
   /// 房间的事件有外部触发，所有订阅者都会触发监听事件，
   /// 本方法由外部调用，比如外部的消息chatMessage
-  onRoomEvent(ChatMessage chatMessage) async {
+  dynamic onRoomEvent(ChatMessage chatMessage) async {
     String json = chatMessageService.recoverContent(chatMessage.content!);
     Map<String, dynamic> map = JsonUtil.toJson(json);
     RoomEvent roomEvent = RoomEvent.fromJson(map);
     logger.w('room pool has received event:${roomEvent.toString()}');
+    dynamic returnValue;
     if (roomEvent.action == RoomEventAction.room) {
       String? content = roomEvent.content;
       if (content != null) {
@@ -66,15 +82,19 @@ class RoomPool {
           rooms[room.name] = room;
           roomController.room.value = room;
         }
+        returnValue = room;
       }
     } else {
       String roomName = roomEvent.name;
       Room? room = get(roomName);
       if (room == null) {
-        return;
+        return null;
       }
-      room.onRoomEvent(roomEvent);
+      returnValue = await room.onRoomEvent(roomEvent);
+      roomController.majiangFlameGame.reload();
     }
+
+    return returnValue;
   }
 }
 
