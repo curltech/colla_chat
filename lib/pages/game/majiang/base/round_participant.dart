@@ -25,10 +25,10 @@ class RoundParticipant {
   //积分
   final RxInt score = 0.obs;
 
-  // 手牌
+  // 手牌，每个参与者只能看到自己的手牌
   final HandPile handPile = HandPile();
 
-  //打出的牌
+  // 打出的牌，每个参与者能看到所有的打出的牌
   final WastePile wastePile = WastePile();
 
   /// 参与者等待处理的行为
@@ -69,6 +69,10 @@ class RoundParticipant {
 
   int get handCount {
     return handPile.count;
+  }
+
+  bool get canSend {
+    return handCount == 14;
   }
 
   addOutstandingAction(OutstandingAction outstandingAction, List<int> vs) {

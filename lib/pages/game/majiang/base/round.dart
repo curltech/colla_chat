@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:colla_chat/pages/game/majiang/base/hand_pile.dart';
+import 'package:colla_chat/pages/game/majiang/base/room_pool.dart';
 import 'package:colla_chat/pages/game/majiang/base/round_participant.dart';
 import 'package:colla_chat/pages/game/majiang/base/card.dart';
 import 'package:colla_chat/pages/game/majiang/base/full_pile.dart';
@@ -9,6 +11,7 @@ import 'package:colla_chat/pages/game/majiang/base/room.dart';
 import 'package:colla_chat/pages/game/majiang/base/stock_pile.dart';
 import 'package:colla_chat/pages/game/majiang/base/suit.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/number_util.dart';
 
 /// 摸牌的类型：自摸牌，杠上牌，海底捞
@@ -20,7 +23,7 @@ class Round {
   int id;
 
   /// 所属的房间
-  final Room room;
+  late final Room room;
 
   /// 未使用的牌
   late final StockPile stockPile;
@@ -29,9 +32,6 @@ class Round {
 
   /// 庄家
   int banker;
-
-  /// 当前的持有发牌的参与者
-  int? _keeper;
 
   /// 刚出牌的参与者
   int? sender;
@@ -45,40 +45,51 @@ class Round {
   int? robber;
   Card? robCard;
 
-  /// 正在等待做出决定的参与者，如果为空，则房间发牌，
-  /// 如果都是pass消解等待的，则发牌，有一家是非pass消解的不发牌
-  List<int> waiting = [];
-
-  /// 本轮的随机洗牌数组
-  late List<int> randoms;
-
-  Round(this.id, this.room, this.banker, {List<int>? randoms}) {
-    if (randoms == null) {
-      this.randoms = [];
-    } else {
-      this.randoms = randoms;
-    }
-    _keeper = banker;
-
-    init();
-  }
-
-  int? get keeper {
-    return _keeper;
-  }
-
-  set keeper(int? keeper) {
-    logger.w('set keeper:$keeper');
-    _keeper = keeper;
-  }
-
-  init() {
+  Round(this.id, this.room, this.banker, {int? owner, HandPile? handPile}) {
     for (int i = 0; i < room.participants.length; ++i) {
       Participant participant = room.participants[i];
       RoundParticipant roundParticipant =
           RoundParticipant(i, this, participant);
       roundParticipants.add(roundParticipant);
     }
+    if (owner == null && handPile == null) {
+      init();
+    } else {
+      roundParticipants[owner!].handPile.cards = handPile!.cards;
+    }
+  }
+
+  Round.fromJson(Map json)
+      : id = json['id'],
+        banker = json['banker'] {
+    String? name = json['name'];
+    if (name != null) {
+      Room? room = roomPool.get(name);
+      if (room != null) {
+        this.room = room;
+        List? roundParticipants = json['roundParticipants'];
+        if (roundParticipants != null && roundParticipants.isNotEmpty) {
+          for (int i = 0; i < roundParticipants.length; ++i) {
+            RoundParticipant roundParticipant = roundParticipants[i];
+            this.roundParticipants.add(roundParticipant);
+          }
+        }
+      } else {
+        throw 'New round failure, room name:$name is not exist';
+      }
+    }
+  }
+
+  Map<String, dynamic> toJson(int owner) {
+    return {
+      'id': id,
+      'name': room.name,
+      'banker': banker,
+      'roundParticipants': JsonUtil.toJson(roundParticipants),
+    };
+  }
+
+  init() {
     List<Card> stockCards = [
       ...fullPile.cards,
       ...fullPile.cards,
@@ -90,13 +101,7 @@ class Round {
 
     /// 牌的总数是136
     for (int i = 0; i < 136; ++i) {
-      int pos;
-      if (i < randoms.length) {
-        pos = randoms[i];
-      } else {
-        pos = random.nextInt(stockCards.length);
-        randoms.add(pos);
-      }
+      int pos = random.nextInt(stockCards.length);
       Card card = stockCards.removeAt(pos);
 
       /// 每个参与者发13张牌
@@ -131,27 +136,24 @@ class Round {
 
   /// 打牌
   bool _send(int owner, Card card) {
-    if (owner != keeper) {
-      // return false;
-    }
     bool pass = true;
     RoundParticipant roundParticipant = roundParticipants[owner];
     Map<OutstandingAction, List<int>>? outstandingActions =
         roundParticipant.onRoomEvent(
             RoomEvent(room.name, id, owner, RoomEventAction.send, card: card));
+
     for (int i = 0; i < roundParticipants.length; ++i) {
       if (i != owner) {
         roundParticipant = roundParticipants[i];
         outstandingActions = roundParticipant.onRoomEvent(
             RoomEvent(room.name, id, owner, RoomEventAction.send, card: card));
-        if (outstandingActions != null) {
+        if (outstandingActions != null && outstandingActions.isNotEmpty) {
           pass = false;
         }
       }
     }
     sender = owner;
     sendCard = card;
-    keeper = null;
     if (pass) {
       onRoomEvent(
           RoomEvent(room.name, id, room.next(owner), RoomEventAction.take));
@@ -174,7 +176,6 @@ class Round {
     }
     sender = null;
     sendCard = null;
-    keeper = owner;
     RoundParticipant roundParticipant = roundParticipants[owner];
     roundParticipant.onRoomEvent(RoomEvent(
         room.name, id, owner, RoomEventAction.barTake,
@@ -211,7 +212,6 @@ class Round {
         'take card ${card.toString()}, leave ${stockPile.cards.length} cards');
     sender = null;
     sendCard = null;
-    keeper = owner;
     for (int i = 0; i < roundParticipants.length; ++i) {
       RoundParticipant roundParticipant = roundParticipants[i];
       roundParticipant.onRoomEvent(RoomEvent(
@@ -273,7 +273,6 @@ class Round {
         cards.removeLast();
       }
     }
-    keeper = owner;
     sender = null;
     this.sendCard = null;
 
@@ -320,7 +319,6 @@ class Round {
         roundParticipants[owner].packer = sender;
       }
     }
-    keeper = owner;
     sender = null;
     sendCard = null;
     if (canRob) {
@@ -393,7 +391,6 @@ class Round {
       }
     }
     roundParticipants[sender!].wastePile.cards.removeLast();
-    keeper = owner;
     sender = null;
     sendCard = null;
 
@@ -476,7 +473,7 @@ class Round {
             pos: pos, card: sendCard));
       }
     }
-    banker = owner;
+    room.banker = owner;
 
     return completeType;
   }

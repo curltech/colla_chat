@@ -3,6 +3,8 @@ import 'package:colla_chat/pages/game/majiang/base/format_card.dart';
 import 'package:colla_chat/pages/game/majiang/base/pile.dart';
 import 'package:colla_chat/pages/game/majiang/base/round.dart';
 import 'package:colla_chat/pages/game/majiang/base/suit.dart';
+import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
 
 /// 正在使用的牌，手牌
 class HandPile extends Pile {
@@ -17,6 +19,42 @@ class HandPile extends Pile {
   TakeCardType? takeCardType;
 
   HandPile({super.cards});
+
+  HandPile.fromJson(Map json) {
+    List? cards = json['cards'];
+    if (cards != null) {
+      this.cards = [];
+      for (var card in cards) {
+        this.cards.add(Card.fromJson(card));
+      }
+    }
+    List? touchPiles = json['touchPiles'];
+    if (touchPiles != null) {
+      for (var touchPile in touchPiles) {
+        this.touchPiles.add(TypePile.fromJson(touchPile));
+      }
+    }
+    List? drawingPiles = json['drawingPiles'];
+    if (drawingPiles != null) {
+      for (var drawingPile in drawingPiles) {
+        this.drawingPiles.add(TypePile.fromJson(drawingPile));
+      }
+    }
+    takeCard =
+        json['takeCard'] != null ? Card.fromJson(json['takeCard']) : null;
+    takeCardType = json['takeCardType'] != null
+        ? StringUtil.enumFromString(TakeCardType.values, json['takeCard'])
+        : null;
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      'cards': JsonUtil.toJson(cards),
+      'takeCard': JsonUtil.toJson(takeCard),
+      'takeCardType': takeCardType?.name
+    };
+  }
 
   int get total {
     int total = 0;

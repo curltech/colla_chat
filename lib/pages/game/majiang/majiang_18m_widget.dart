@@ -7,7 +7,6 @@ import 'package:colla_chat/pages/game/majiang/base/room.dart';
 import 'package:colla_chat/pages/game/majiang/base/room_pool.dart';
 import 'package:colla_chat/pages/game/majiang/base/round.dart';
 import 'package:colla_chat/pages/game/majiang/base/round_participant.dart';
-import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
 import 'package:colla_chat/pages/game/majiang/room_controller.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
@@ -143,11 +142,11 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
     Room? room = roomController.room.value;
     List<Widget>? rightWidgets = [
       IconButton(
-          tooltip: AppLocalizations.t('logger'),
+          tooltip: AppLocalizations.t('Logger console'),
           onPressed: () async {
             indexWidgetProvider.push('logger');
           },
-          icon: const Icon(Icons.fullscreen)),
+          icon: const Icon(Icons.list_outlined)),
       IconButton(
           tooltip: AppLocalizations.t('New room'),
           onPressed: () {
@@ -155,16 +154,13 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
           },
           icon: const Icon(Icons.new_label))
     ];
-    if (room != null) {
+    if (room != null &&
+        room.banker == roomController.selfParticipantDirection.value.index) {
       rightWidgets.add(IconButton(
           tooltip: AppLocalizations.t('New round'),
           onPressed: () {
             /// 新的一轮的庄家是当前选择的参与者
-            room.onRoomEvent(RoomEvent(
-                room.name,
-                null,
-                roomController.selfParticipantDirection.value.index,
-                RoomEventAction.round));
+            room.createRound(room.banker);
           },
           icon: const Icon(Icons.newspaper_outlined)));
       rightWidgets.add(IconButton(

@@ -1,16 +1,21 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/game/majiang/base/card.dart';
 import 'package:colla_chat/pages/game/majiang/base/full_pile.dart';
+import 'package:colla_chat/pages/game/majiang/base/hand_pile.dart';
 import 'package:colla_chat/pages/game/majiang/base/participant.dart';
+import 'package:colla_chat/pages/game/majiang/base/room_pool.dart';
 import 'package:colla_chat/pages/game/majiang/base/round.dart';
+import 'package:colla_chat/pages/game/majiang/base/round_participant.dart';
 import 'package:colla_chat/pages/game/majiang/base/suit.dart';
 import 'package:colla_chat/pages/game/majiang/room_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/number_util.dart';
@@ -124,6 +129,10 @@ class Room {
   /// 当前轮
   int? currentRoundIndex;
 
+  /// 当前的庄家，在每一轮胡牌后设置胡牌的人为新的庄家
+  /// 如果没有人胡牌则庄家不变
+  late int banker;
+
   /// 胡牌的分数
   Map<CompleteType, int> completeTypeScores = {
     CompleteType.thirteenOne: 300,
@@ -148,7 +157,9 @@ class Room {
     _init(peerIds);
   }
 
-  Room.fromJson(Map json) : name = json['name'] {
+  Room.fromJson(Map json)
+      : name = json['name'],
+        banker = json['banker'] {
     participants = [];
     if (json['participants'] != null && json['participants'] is List) {
       for (var participant in json['participants']) {
@@ -160,12 +171,17 @@ class Room {
   Map<String, dynamic> toJson() {
     return {
       'name': name,
+      'banker': banker,
       'participants': JsonUtil.toJson(participants),
     };
   }
 
   /// 加参与者
   Future<void> _init(List<String> peerIds) async {
+    if (!peerIds.contains(myself.peerId)) {
+      logger.e('Participant has no myself');
+      throw 'Init room failure, participant has no myself';
+    }
     for (int i = 0; i < peerIds.length; ++i) {
       String peerId = peerIds[i];
       Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
@@ -175,6 +191,9 @@ class Room {
       }
       Participant participant = Participant(peerId, linkmanName, room: this);
       participants.add(participant);
+      if (myself.peerId == participant.peerId) {
+        banker = i;
+      }
     }
     if (peerIds.length < 4) {
       for (int i = peerIds.length; i < 4; i++) {
@@ -200,6 +219,7 @@ class Room {
     Image defaultImage = await Flame.images.load('app.png');
     for (int i = 0; i < participants.length; ++i) {
       Participant participant = participants[i];
+      participant.room = this;
       if (myself.peerId == participant.peerId) {
         roomController.selfParticipantDirection.value =
             NumberUtil.toEnum(ParticipantDirection.values, i)!;
@@ -268,11 +288,28 @@ class Room {
     return null;
   }
 
-  /// 新玩一局，positions为空自己发牌，不为空，别人发牌
-  Round createRound(int banker, {List<int>? randoms}) {
-    Round round = Round(rounds.length, this, banker, randoms: randoms);
+  /// 新玩一局
+  /// 由庄家调用，然后向其他参与者发送chatMessage
+  Future<Round> createRound(int banker) async {
+    Round round = Round(rounds.length, this, banker);
     rounds.add(round);
     currentRoundIndex = round.id;
+    for (int i = 0; i < round.roundParticipants.length; i++) {
+      RoundParticipant roundParticipant = round.roundParticipants[i];
+      if (roundParticipant.participant.peerId != myself.peerId) {
+        if (roundParticipant.participant.robot) {
+          String content = JsonUtil.toJsonString(roundParticipant.handPile);
+          RoomEvent roomEvent = RoomEvent(
+              name, round.id, i, RoomEventAction.round,
+              content: content);
+          ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+              receiverPeerId: roundParticipant.participant.peerId,
+              subMessageType: ChatMessageSubType.majiang,
+              content: roomEvent);
+          roomPool.onRoomEvent(chatMessage);
+        }
+      }
+    }
 
     return round;
   }
@@ -280,21 +317,27 @@ class Room {
   /// 房间的事件有外部触发，所有订阅者都会触发监听事件，本方法由外部调用，比如外部的消息chatMessage
   dynamic onRoomEvent(RoomEvent roomEvent) async {
     logger.w('room:$name has received event:${roomEvent.toString()}');
-    int? roundId = roomEvent.roundId;
-    Round? round;
-    if (roundId != null) {
-      round = rounds[roundId];
-    }
     dynamic returnValue;
     if (roomEvent.action == RoomEventAction.room) {
     } else if (roomEvent.action == RoomEventAction.round) {
-      List<int>? randoms;
       String? content = roomEvent.content;
       if (content != null) {
-        randoms = JsonUtil.toJson(content);
+        var json = JsonUtil.toJson(content);
+        HandPile handPile = HandPile.fromJson(json);
+        Round round = Round(roomEvent.roundId!, this, banker,
+            owner: roomEvent.owner, handPile: handPile);
+        if (round.id >= rounds.length) {
+          rounds.add(round);
+        }
+        currentRoundIndex = round.id;
+        returnValue = round;
       }
-      returnValue = createRound(roomEvent.owner, randoms: randoms);
     } else {
+      int? roundId = roomEvent.roundId;
+      Round? round;
+      if (roundId != null) {
+        round = rounds[roundId];
+      }
       returnValue = await round?.onRoomEvent(roomEvent);
     }
     if (roomEvent.action == RoomEventAction.round) {

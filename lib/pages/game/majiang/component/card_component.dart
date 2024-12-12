@@ -135,10 +135,9 @@ class CardComponent extends PositionComponent
           roomController.getParticipantDirection(areaDirection);
       RoundParticipant roundParticipant =
           currentRound.roundParticipants[participantDirection.index];
-      if (roundParticipant.handCount != 14 ||
-          participantDirection.index != currentRound.keeper) {
+      if (!roundParticipant.canSend) {
         logger.e(
-            'Cannot send card not keeper,current keeper:${currentRound.keeper}');
+            'roundParticipant:${roundParticipant.index} cannot send card,${roundParticipant.handCount}');
         return;
       }
       HandPile handPile =

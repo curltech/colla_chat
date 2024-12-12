@@ -44,7 +44,7 @@ class Participant {
   }
 
   Participant.fromJson(Map json)
-      : peerId = json['peerId'] == '' ? null : json['id'],
+      : peerId = json['peerId'] == '' ? null : json['peerId'],
         name = json['name'],
         robot = json['robot'] == true || json['robot'] == 1 ? true : false;
 

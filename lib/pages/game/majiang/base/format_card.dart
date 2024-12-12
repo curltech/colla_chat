@@ -1,6 +1,8 @@
 import 'package:colla_chat/pages/game/majiang/base/card.dart';
 import 'package:colla_chat/pages/game/majiang/base/pile.dart';
 import 'package:colla_chat/pages/game/majiang/base/suit.dart';
+import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
 
 /// 牌形牌
 class TypePile extends Pile {
@@ -32,6 +34,29 @@ class TypePile extends Pile {
     }
 
     return CardType.single;
+  }
+
+  TypePile.fromJson(Map json) {
+    List? cards = json['cards'];
+    if (cards != null) {
+      this.cards = [];
+      for (var card in cards) {
+        this.cards.add(Card.fromJson(card));
+      }
+    }
+    if (json['cardType'] != null) {
+      cardType = StringUtil.enumFromString(CardType.values, json['cardType'])!;
+    }
+    source = json['source'];
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      'cards': JsonUtil.toJson(cards),
+      'cardType': cardType.name,
+      'source': source
+    };
   }
 }
 
