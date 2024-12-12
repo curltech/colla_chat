@@ -305,24 +305,25 @@ class Room {
     Round? round;
     if (roomEvent.action == RoomEventAction.round) {
       round = await _createRound(roomEvent.owner);
-
-      return round;
+      returnValue = round;
+    } else {
+      int? roundId = roomEvent.roundId;
+      if (roundId != null) {
+        round = rounds[roundId];
+      }
+      if (round == null) {
+        return null;
+      }
+      returnValue = await round.onRoomEvent(roomEvent);
     }
-    int? roundId = roomEvent.roundId;
-    if (roundId != null) {
-      round = rounds[roundId];
-    }
-    if (round == null) {
-      return null;
-    }
-    returnValue = await round.onRoomEvent(roomEvent);
     for (int i = 0; i < round.roundParticipants.length; i++) {
       RoundParticipant roundParticipant = round.roundParticipants[i];
       if (roundParticipant.participant.peerId != myself.peerId) {
-        String content = JsonUtil.toJsonString(roundParticipant.handPile);
-        RoomEvent roomEvent = RoomEvent(
-            name, round.id, i, RoomEventAction.round,
-            content: content);
+        if (roomEvent.action == RoomEventAction.round) {
+          String content = JsonUtil.toJsonString(roundParticipant.handPile);
+          roomEvent = RoomEvent(name, round.id, i, RoomEventAction.round,
+              content: content);
+        }
         ChatMessage chatMessage = await chatMessageService.buildChatMessage(
             receiverPeerId: roundParticipant.participant.peerId,
             subMessageType: ChatMessageSubType.majiang,

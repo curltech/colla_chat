@@ -213,12 +213,10 @@ class Round {
         'take card ${card.toString()}, leave ${stockPile.cards.length} cards');
     sender = null;
     sendCard = null;
-    for (int i = 0; i < roundParticipants.length; ++i) {
-      RoundParticipant roundParticipant = roundParticipants[i];
-      roundParticipant.onRoomEvent(RoomEvent(
-          room.name, id, owner, RoomEventAction.take,
-          card: card, pos: takeCardType.index));
-    }
+    RoundParticipant roundParticipant = roundParticipants[owner];
+    roundParticipant.onRoomEvent(RoomEvent(
+        room.name, id, owner, RoomEventAction.take,
+        card: card, pos: takeCardType.index));
 
     return card;
   }

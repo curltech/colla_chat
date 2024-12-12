@@ -89,7 +89,7 @@ class ActionAreaComponent extends RectangleComponent
     }
 
     if (outstandingAction == OutstandingAction.complete) {
-      CompleteType? completeType = await room.onRoomEvent(RoomEvent(
+      CompleteType? completeType = await room.startRoomEvent(RoomEvent(
           room.name, round.id, owner, RoomEventAction.complete,
           pos: pos[0]));
       if (completeType != null) {

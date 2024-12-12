@@ -70,9 +70,9 @@ class RoomPool {
     String json = chatMessageService.recoverContent(chatMessage.content!);
     Map<String, dynamic> map = JsonUtil.toJson(json);
     RoomEvent roomEvent = RoomEvent.fromJson(map);
-    logger.w('room pool has received event:${roomEvent.toString()}');
     dynamic returnValue;
     if (roomEvent.action == RoomEventAction.room) {
+      logger.w('room pool has received event:${roomEvent.toString()}');
       String? content = roomEvent.content;
       if (content != null) {
         var json = JsonUtil.toJson(content);
