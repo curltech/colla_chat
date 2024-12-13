@@ -1,7 +1,7 @@
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/component/node_relationship_component.dart';
-import 'package:uuid/uuid.dart';
+import 'package:colla_chat/tool/string_util.dart';
 
 abstract class Node {
   late final String id;
@@ -17,7 +17,7 @@ abstract class Node {
 
   Node(this.name, {String? id}) {
     if (id == null) {
-      this.id = const Uuid().v4().toString();
+      this.id = StringUtil.uuid();
     } else {
       this.id = id;
     }

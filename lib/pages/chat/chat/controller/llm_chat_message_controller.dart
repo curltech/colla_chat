@@ -100,8 +100,7 @@ class LlmChatMessageController extends ChatMessageController {
     String? parentMessageId,
   }) {
     ChatMessage chatMessage = ChatMessage();
-    var uuid = const Uuid();
-    chatMessage.messageId = uuid.v4();
+    chatMessage.messageId = StringUtil.uuid();
     chatMessage.messageType = ChatMessageType.chat.name;
     chatMessage.subMessageType = ChatMessageSubType.chat.name;
     chatMessage.direct = ChatDirect.receive.name; //对自己而言，消息是属于发送或者接受

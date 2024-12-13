@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/pages/game/majiang/base/hand_pile.dart';
 import 'package:colla_chat/pages/game/majiang/base/room_pool.dart';
 import 'package:colla_chat/pages/game/majiang/base/round_participant.dart';
@@ -12,6 +13,8 @@ import 'package:colla_chat/pages/game/majiang/base/stock_pile.dart';
 import 'package:colla_chat/pages/game/majiang/base/suit.dart';
 import 'package:colla_chat/pages/game/majiang/room_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/number_util.dart';
 
@@ -53,10 +56,20 @@ class Round {
           RoundParticipant(i, this, participant);
       roundParticipants.add(roundParticipant);
     }
+
     if (owner == null && handPile == null) {
       init();
     } else {
-      roundParticipants[owner!].handPile.cards = handPile!.cards;
+      for (int i = 0; i < roundParticipants.length; ++i) {
+        if (i == owner) {
+          roundParticipants[i].handPile.cards = handPile!.cards;
+        } else {
+          roundParticipants[i].handPile.cards = [];
+          for (int j = 0; j < 13; ++j) {
+            roundParticipants[i].handPile.cards.add(unknownCard);
+          }
+        }
+      }
     }
   }
 
@@ -135,36 +148,26 @@ class Round {
     return total + stockPile.cards.length;
   }
 
-  /// 打牌
-  bool _send(int owner, Card card) {
-    bool pass = true;
-    RoundParticipant roundParticipant = roundParticipants[owner];
-    Map<OutstandingAction, List<int>>? outstandingActions =
-        roundParticipant.onRoomEvent(
-            RoomEvent(room.name, id, owner, RoomEventAction.send, card: card));
-
-    for (int i = 0; i < roundParticipants.length; ++i) {
-      if (i != owner) {
-        roundParticipant = roundParticipants[i];
-        outstandingActions = roundParticipant.onRoomEvent(
-            RoomEvent(room.name, id, owner, RoomEventAction.send, card: card));
-        if (outstandingActions != null && outstandingActions.isNotEmpty) {
-          pass = false;
-        }
-      }
+  /// 打牌，每个参与者都要执行一次
+  /// owner表示打牌的参与者，receiver代表接收到事件的参与者
+  Map<OutstandingAction, Set<int>>? _send(int owner, Card card,
+      {int? receiver}) {
+    /// 打牌的参与者执行事件处理
+    RoundParticipant roundParticipant;
+    if (receiver == null) {
+      roundParticipant = roundParticipants[owner];
+    } else {
+      roundParticipant = roundParticipants[receiver];
     }
     sender = owner;
     sendCard = card;
-    if (pass) {
-      onRoomEvent(
-          RoomEvent(room.name, id, room.next(owner), RoomEventAction.take));
-    }
 
-    return true;
+    return roundParticipant.onRoomEvent(RoomEvent(room.name,
+        roundId: id, owner: owner, action: RoomEventAction.send, card: card));
   }
 
   /// 杠牌发牌
-  Card? _barTake(int owner) {
+  Card? _barTake(int owner, {int? receiver}) {
     if (stockPile.cards.isEmpty) {
       return null;
     }
@@ -178,15 +181,21 @@ class Round {
     sender = null;
     sendCard = null;
     RoundParticipant roundParticipant = roundParticipants[owner];
-    roundParticipant.onRoomEvent(RoomEvent(
-        room.name, id, owner, RoomEventAction.barTake,
-        card: card, pos: TakeCardType.bar.index));
+    roundParticipant.onRoomEvent(RoomEvent(room.name,
+        roundId: id,
+        owner: owner,
+        action: RoomEventAction.barTake,
+        card: card,
+        pos: TakeCardType.bar.index));
     for (int i = 0; i < roundParticipants.length; ++i) {
       if (i != owner) {
         roundParticipant = roundParticipants[i];
-        roundParticipant.onRoomEvent(RoomEvent(
-            room.name, id, owner, RoomEventAction.take,
-            card: card, pos: TakeCardType.bar.index));
+        roundParticipant.onRoomEvent(RoomEvent(room.name,
+            roundId: id,
+            owner: owner,
+            action: RoomEventAction.take,
+            card: card,
+            pos: TakeCardType.bar.index));
       }
     }
 
@@ -198,7 +207,7 @@ class Round {
   }
 
   /// 发牌
-  Card? _take(int owner) {
+  Card? _take(int owner, {int? receiver}) {
     if (stockPile.cards.isEmpty) {
       logger.e('owner:$owner take card failure, stockPile is empty');
       return null;
@@ -214,15 +223,18 @@ class Round {
     sender = null;
     sendCard = null;
     RoundParticipant roundParticipant = roundParticipants[owner];
-    roundParticipant.onRoomEvent(RoomEvent(
-        room.name, id, owner, RoomEventAction.take,
-        card: card, pos: takeCardType.index));
+    roundParticipant.onRoomEvent(RoomEvent(room.name,
+        roundId: id,
+        owner: owner,
+        action: RoomEventAction.take,
+        card: card,
+        pos: takeCardType.index));
 
     return card;
   }
 
   /// 某个参与者过，没有采取任何行为
-  bool _pass(int owner) {
+  bool _pass(int owner, {int? receiver}) {
     for (int i = 0; i < roundParticipants.length; ++i) {
       RoundParticipant roundParticipant = roundParticipants[owner];
       if (roundParticipant.outstandingActions
@@ -235,8 +247,8 @@ class Round {
     robCard = null;
     for (int i = 0; i < roundParticipants.length; ++i) {
       RoundParticipant roundParticipant = roundParticipants[i];
-      roundParticipant
-          .onRoomEvent(RoomEvent(room.name, id, owner, RoomEventAction.pass));
+      roundParticipant.onRoomEvent(RoomEvent(room.name,
+          roundId: id, owner: owner, action: RoomEventAction.pass));
     }
 
     bool pass = true;
@@ -248,20 +260,24 @@ class Round {
       }
     }
     if (pass) {
-      onRoomEvent(
-          RoomEvent(room.name, id, room.next(owner), RoomEventAction.take));
+      onRoomEvent(RoomEvent(room.name,
+          roundId: id, owner: room.next(owner), action: RoomEventAction.take));
     }
 
     return true;
   }
 
   /// 某个参与者碰打出的牌
-  bool _touch(int owner, int pos, int src, Card sendCard) {
+  bool _touch(int owner, int pos, int src, Card sendCard, {int? receiver}) {
     for (int i = 0; i < roundParticipants.length; ++i) {
       RoundParticipant roundParticipant = roundParticipants[i];
-      roundParticipant.onRoomEvent(RoomEvent(
-          room.name, id, owner, RoomEventAction.touch,
-          card: sendCard, src: src, pos: pos));
+      roundParticipant.onRoomEvent(RoomEvent(room.name,
+          roundId: id,
+          owner: owner,
+          action: RoomEventAction.touch,
+          card: sendCard,
+          src: src,
+          pos: pos));
     }
     if (roundParticipants[owner].handPile.touchPiles.length == 4) {
       roundParticipants[owner].packer = sender;
@@ -282,7 +298,7 @@ class Round {
     int c = 0;
     for (int i = 0; i < roundParticipants.length; ++i) {
       RoundParticipant roundParticipant = roundParticipants[i];
-      List<List<int>> counts = roundParticipant.earnedActions.values.toList();
+      List<Set<int>> counts = roundParticipant.earnedActions.values.toList();
       for (var count in counts) {
         c += count.length;
       }
@@ -295,11 +311,12 @@ class Round {
   /// 明杠牌，分三种情况，打牌杠牌，摸牌杠牌和手牌杠牌
   /// 打牌杠牌:返回值为杠的牌，为空表示未成功
   /// 摸牌杠牌和手牌杠牌:pos为-1，表示是摸牌可杠，否则表示手牌可杠的位置
-  String? _bar(int owner, int pos) {
+  String? _bar(int owner, int pos, {int? receiver}) {
     /// 检查抢杠
     bool canRob = false;
     if (sendCard != null) {
-      Map<int, CompleteType>? completeTypes = _checkComplete(owner, sendCard!);
+      Map<int, CompleteType>? completeTypes =
+          _checkComplete(owner, sendCard!, receiver: receiver);
       if (completeTypes != null) {
         canRob = true;
         robber = owner;
@@ -308,9 +325,13 @@ class Round {
     }
     for (int i = 0; i < roundParticipants.length; ++i) {
       RoundParticipant roundParticipant = roundParticipants[i];
-      roundParticipant.onRoomEvent(RoomEvent(
-          room.name, id, owner, RoomEventAction.bar,
-          src: sender, card: sendCard, pos: pos));
+      roundParticipant.onRoomEvent(RoomEvent(room.name,
+          roundId: id,
+          owner: owner,
+          action: RoomEventAction.bar,
+          src: sender,
+          card: sendCard,
+          pos: pos));
     }
     if (sender != null) {
       roundParticipants[sender!].wastePile.cards.removeLast();
@@ -329,13 +350,17 @@ class Round {
     return null;
   }
 
-  Map<int, CompleteType>? _checkComplete(int owner, Card card) {
+  Map<int, CompleteType>? _checkComplete(int owner, Card card,
+      {int? receiver}) {
     Map<int, CompleteType>? completeTypes;
     for (int i = 0; i < roundParticipants.length; ++i) {
       if (owner != i) {
         RoundParticipant roundParticipant = roundParticipants[i];
         CompleteType? completeType = roundParticipant.onRoomEvent(RoomEvent(
-            room.name, id, owner, RoomEventAction.checkComplete,
+            room.name,
+            roundId: id,
+            owner: owner,
+            action: RoomEventAction.checkComplete,
             card: card));
         if (completeType != null) {
           completeTypes ??= {};
@@ -348,21 +373,24 @@ class Round {
   }
 
   /// owner抢src的明杠牌card
-  _rob(int owner, int src, Card card) {}
+  _rob(int owner, int src, Card card, {int? receiver}) {}
 
   /// 某个参与者暗杠，pos表示杠牌的位置
-  Card? _darkBar(int owner, int pos) {
+  Card? _darkBar(int owner, int pos, {int? receiver}) {
     RoundParticipant roundParticipant = roundParticipants[owner];
-    Card? card = roundParticipant.onRoomEvent(
-        RoomEvent(room.name, id, owner, RoomEventAction.darkBar, pos: pos));
+    Card? card = roundParticipant.onRoomEvent(RoomEvent(room.name,
+        roundId: id, owner: owner, action: RoomEventAction.darkBar, pos: pos));
     if (card == null) {
       return null;
     }
     for (int i = 0; i < roundParticipants.length; ++i) {
       if (owner != i) {
         RoundParticipant roundParticipant = roundParticipants[i];
-        roundParticipant.onRoomEvent(
-            RoomEvent(room.name, id, owner, RoomEventAction.darkBar, pos: pos));
+        roundParticipant.onRoomEvent(RoomEvent(room.name,
+            roundId: id,
+            owner: owner,
+            action: RoomEventAction.darkBar,
+            pos: pos));
       }
     }
     _barTake(owner);
@@ -371,22 +399,28 @@ class Round {
   }
 
   /// 某个参与者吃打出的牌，pos表示吃牌的位置
-  Card? _drawing(int owner, int pos) {
+  Card? _drawing(int owner, int pos, {int? receiver}) {
     if (sendCard == null) {
       return null;
     }
     RoundParticipant roundParticipant = roundParticipants[owner];
-    Card? card = roundParticipant.onRoomEvent(RoomEvent(
-        room.name, id, owner, RoomEventAction.drawing,
-        pos: pos, card: sendCard));
+    Card? card = roundParticipant.onRoomEvent(RoomEvent(room.name,
+        roundId: id,
+        owner: owner,
+        action: RoomEventAction.drawing,
+        pos: pos,
+        card: sendCard));
     if (card == null) {
       return card;
     }
     for (int i = 0; i < roundParticipants.length; ++i) {
       if (owner != i) {
         RoundParticipant roundParticipant = roundParticipants[i];
-        roundParticipant.onRoomEvent(
-            RoomEvent(room.name, id, owner, RoomEventAction.darkBar, pos: pos));
+        roundParticipant.onRoomEvent(RoomEvent(room.name,
+            roundId: id,
+            owner: owner,
+            action: RoomEventAction.darkBar,
+            pos: pos));
       }
     }
     roundParticipants[sender!].wastePile.cards.removeLast();
@@ -396,7 +430,7 @@ class Round {
     return card;
   }
 
-  bool _score(int owner, int completeTypeIndex) {
+  bool _score(int owner, int completeTypeIndex, {int? receiver}) {
     CompleteType? completeType =
         NumberUtil.toEnum(CompleteType.values, completeTypeIndex);
     if (completeType == null) {
@@ -441,7 +475,7 @@ class Round {
         OutstandingAction outstandingAction = entry.key;
         if (outstandingAction == OutstandingAction.darkBar) {}
         if (outstandingAction == OutstandingAction.bar) {
-          List<int> participants = entry.value;
+          Set<int> participants = entry.value;
           for (var participant in participants) {
             // 自摸杠
             if (i == participant) {
@@ -456,25 +490,55 @@ class Round {
   }
 
   /// 某个参与者胡牌,pos表示胡牌的类型
-  CompleteType? _complete(int owner, int pos) {
+  CompleteType? _complete(int owner, int pos, {int? receiver}) {
     RoundParticipant roundParticipant = roundParticipants[owner];
     CompleteType? completeType = roundParticipant.onRoomEvent(RoomEvent(
-        room.name, id, owner, RoomEventAction.complete,
-        pos: pos, card: sendCard));
+        room.name,
+        roundId: id,
+        owner: owner,
+        action: RoomEventAction.complete,
+        pos: pos,
+        card: sendCard));
     if (completeType == null) {
       return null;
     }
     for (int i = 0; i < roundParticipants.length; ++i) {
       if (owner != i) {
         RoundParticipant roundParticipant = roundParticipants[i];
-        roundParticipant.onRoomEvent(RoomEvent(
-            room.name, id, owner, RoomEventAction.complete,
-            pos: pos, card: sendCard));
+        roundParticipant.onRoomEvent(RoomEvent(room.name,
+            roundId: id,
+            owner: owner,
+            action: RoomEventAction.complete,
+            pos: pos,
+            card: sendCard));
       }
     }
     room.banker = owner;
 
     return completeType;
+  }
+
+  /// 发起房间的事件，由发起事件的参与者调用
+  /// 完成后把事件分发到其他参与者
+  dynamic startRoomEvent(RoomEvent roomEvent) async {
+    dynamic returnValue = onRoomEvent(roomEvent);
+    for (int i = 0; i < roundParticipants.length; i++) {
+      RoundParticipant roundParticipant = roundParticipants[i];
+      if (roundParticipant.participant.peerId != myself.peerId) {
+        roomEvent.receiver = i;
+        ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+            receiverPeerId: roundParticipant.participant.peerId,
+            subMessageType: ChatMessageSubType.majiang,
+            content: roomEvent);
+        if (roundParticipant.participant.robot) {
+          roomPool.onRoomEvent(chatMessage);
+        } else {
+          roomPool.send(chatMessage);
+        }
+      }
+    }
+
+    return returnValue;
   }
 
   dynamic onRoomEvent(RoomEvent roomEvent) async {
@@ -483,28 +547,36 @@ class Round {
     RoomEventAction? action = roomEvent.action;
     switch (action) {
       case RoomEventAction.take:
-        returnValue = _take(roomEvent.owner);
+        returnValue = _take(roomEvent.owner, receiver: roomEvent.receiver);
       case RoomEventAction.send:
-        returnValue = _send(roomEvent.owner, roomEvent.card!);
+        returnValue = _send(roomEvent.owner, roomEvent.card!,
+            receiver: roomEvent.receiver);
       case RoomEventAction.bar:
-        returnValue = _bar(roomEvent.owner, roomEvent.pos!);
+        returnValue =
+            _bar(roomEvent.owner, roomEvent.pos!, receiver: roomEvent.receiver);
       case RoomEventAction.barTake:
-        returnValue = _barTake(roomEvent.owner);
+        returnValue = _barTake(roomEvent.owner, receiver: roomEvent.receiver);
       case RoomEventAction.touch:
         returnValue = _touch(
-            roomEvent.owner, roomEvent.pos!, roomEvent.src!, roomEvent.card!);
+            roomEvent.owner, roomEvent.pos!, roomEvent.src!, roomEvent.card!,
+            receiver: roomEvent.receiver);
       case RoomEventAction.darkBar:
-        returnValue = _darkBar(roomEvent.owner, roomEvent.pos!);
+        returnValue = _darkBar(roomEvent.owner, roomEvent.pos!,
+            receiver: roomEvent.receiver);
       case RoomEventAction.drawing:
-        returnValue = _drawing(roomEvent.owner, roomEvent.pos!);
+        returnValue = _drawing(roomEvent.owner, roomEvent.pos!,
+            receiver: roomEvent.receiver);
       case RoomEventAction.rob:
-        returnValue = _rob(roomEvent.owner, roomEvent.src!, roomEvent.card!);
+        returnValue = _rob(roomEvent.owner, roomEvent.src!, roomEvent.card!,
+            receiver: roomEvent.receiver);
       case RoomEventAction.score:
-        returnValue = _score(roomEvent.owner, roomEvent.pos!);
+        returnValue = _score(roomEvent.owner, roomEvent.pos!,
+            receiver: roomEvent.receiver);
       case RoomEventAction.pass:
-        returnValue = _pass(roomEvent.owner);
+        returnValue = _pass(roomEvent.owner, receiver: roomEvent.receiver);
       case RoomEventAction.complete:
-        returnValue = _complete(roomEvent.owner, roomEvent.pos!);
+        returnValue = _complete(roomEvent.owner, roomEvent.pos!,
+            receiver: roomEvent.receiver);
       default:
         break;
     }

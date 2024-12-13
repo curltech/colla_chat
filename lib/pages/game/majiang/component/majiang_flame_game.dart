@@ -219,7 +219,7 @@ class MajiangFlameGame extends FlameGame
     }
     RoundParticipant? roundParticipant = roomController
         .getRoundParticipant(roomController.selfParticipantDirection.value);
-    Map<OutstandingAction, List<int>>? outstandingActions =
+    Map<OutstandingAction, Set<int>>? outstandingActions =
         roundParticipant?.outstandingActions.value;
     if (outstandingActions == null || outstandingActions.isEmpty) {
     } else {

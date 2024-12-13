@@ -57,16 +57,23 @@ enum RoomEventAction {
 /// 比如参与者打牌事件将发送到房间，然后房间分发到所有的参与者
 /// 事件处理原则：参与者的事件也是先发送到房间，再分发到所有参与者，然后自己再进行处理，原因是考虑到网络环境
 class RoomEvent {
+  late final String id;
+
   /// 房间的名称
   final String name;
 
   final int? roundId;
 
   /// 事件的拥有者，-1表示房间或者系统，0，1，2，3表示参与者的位置
+  /// 比如0打出的牌
   final int owner;
 
+  /// 事件的接收者，0，1，2，3表示参与者的位置
+  /// 比如1接收到事件0打牌
+  int? receiver;
+
   /// RoomAction事件的枚举
-  final RoomEventAction? action;
+  late final RoomEventAction action;
 
   final Card? card;
 
@@ -82,27 +89,52 @@ class RoomEvent {
   /// 其他的事件都是参与者的事件，表示牌
   final dynamic content;
 
-  RoomEvent(this.name, this.roundId, this.owner, this.action,
-      {this.card, this.pos, this.content, this.src});
+  RoomEvent(this.name,
+      {String? id,
+      this.roundId,
+      required this.owner,
+      this.receiver,
+      required this.action,
+      this.card,
+      this.pos,
+      this.content,
+      this.src}) {
+    if (id == null) {
+      this.id = StringUtil.uuid();
+    } else {
+      this.id = id;
+    }
+  }
 
   RoomEvent.fromJson(Map json)
-      : name = json['name'],
+      : id = json['id'],
+        name = json['name'],
         roundId = json['roundId'],
         owner = json['owner'],
-        action = json['action'] != null
-            ? StringUtil.enumFromString(RoomEventAction.values, json['action'])
-            : null,
+        receiver = json['receiver'],
         card = json['card'] != null ? fullPile[json['card']] : null,
         pos = json['pos'],
         content = json['content'],
-        src = json['src'];
+        src = json['src'] {
+    RoomEventAction? action;
+    if (json['action'] != null) {
+      action =
+          StringUtil.enumFromString(RoomEventAction.values, json['action']);
+    }
+    if (action == null) {
+      throw 'action has no right RoomEventAction';
+    }
+    this.action = action;
+  }
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'name': name,
       'roundId': roundId,
       'owner': owner,
-      'action': action?.name,
+      'receiver': receiver,
+      'action': action.name,
       'card': card?.toString(),
       'pos': pos,
       'content': content,
@@ -112,7 +144,7 @@ class RoomEvent {
 
   @override
   String toString() {
-    return 'name:$name,roundId:$roundId,owner:$owner,action:${action?.name},card:$card,pos:$pos,src:$src,content:$content';
+    return 'name:$name,roundId:$roundId,owner:$owner,receiver:$receiver,action:${action.name},card:$card,pos:$pos,src:$src,content:$content';
   }
 }
 
@@ -299,13 +331,34 @@ class Room {
   }
 
   /// 发起房间的事件，由发起事件的参与者调用
-  /// 完成后把事件分发到其他参与者
+  /// 完成后把round事件分发到其他参与者
   dynamic startRoomEvent(RoomEvent roomEvent) async {
     dynamic returnValue;
     Round? round;
     if (roomEvent.action == RoomEventAction.round) {
       round = await _createRound(roomEvent.owner);
       returnValue = round;
+      for (int i = 0; i < round.roundParticipants.length; i++) {
+        RoundParticipant roundParticipant = round.roundParticipants[i];
+        if (roundParticipant.participant.peerId != myself.peerId) {
+          String content = JsonUtil.toJsonString(roundParticipant.handPile);
+          roomEvent = RoomEvent(name,
+              roundId: round.id,
+              owner: roomEvent.owner,
+              receiver: i,
+              action: RoomEventAction.round,
+              content: content);
+          ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+              receiverPeerId: roundParticipant.participant.peerId,
+              subMessageType: ChatMessageSubType.majiang,
+              content: roomEvent);
+          if (roundParticipant.participant.robot) {
+            roomPool.onRoomEvent(chatMessage);
+          } else {
+            roomPool.send(chatMessage);
+          }
+        }
+      }
     } else {
       int? roundId = roomEvent.roundId;
       if (roundId != null) {
@@ -314,26 +367,7 @@ class Room {
       if (round == null) {
         return null;
       }
-      returnValue = await round.onRoomEvent(roomEvent);
-    }
-    for (int i = 0; i < round.roundParticipants.length; i++) {
-      RoundParticipant roundParticipant = round.roundParticipants[i];
-      if (roundParticipant.participant.peerId != myself.peerId) {
-        if (roomEvent.action == RoomEventAction.round) {
-          String content = JsonUtil.toJsonString(roundParticipant.handPile);
-          roomEvent = RoomEvent(name, round.id, i, RoomEventAction.round,
-              content: content);
-        }
-        ChatMessage chatMessage = await chatMessageService.buildChatMessage(
-            receiverPeerId: roundParticipant.participant.peerId,
-            subMessageType: ChatMessageSubType.majiang,
-            content: roomEvent);
-        if (roundParticipant.participant.robot) {
-          roomPool.onRoomEvent(chatMessage);
-        } else {
-          roomPool.send(chatMessage);
-        }
-      }
+      returnValue = await round.startRoomEvent(roomEvent);
     }
 
     return returnValue;

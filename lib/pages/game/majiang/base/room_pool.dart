@@ -32,7 +32,7 @@ class RoomPool {
     return rooms[name];
   }
 
-  /// 完成后把事件分发到其他参与者
+  /// 完成后把room事件分发到其他参与者
   dynamic startRoomEvent(RoomEvent roomEvent) async {
     if (roomEvent.action == RoomEventAction.room) {
       Room room = await _createRoom(roomEvent.name, roomEvent.content);
@@ -43,8 +43,10 @@ class RoomPool {
         Participant participant = room.participants[i];
         if (participant.peerId != myself.peerId) {
           String content = JsonUtil.toJsonString(room);
-          RoomEvent roomEvent = RoomEvent(
-              room.name, null, i, RoomEventAction.room,
+          roomEvent = RoomEvent(room.name,
+              owner: roomEvent.owner,
+              receiver: i,
+              action: RoomEventAction.room,
               content: content);
           ChatMessage chatMessage = await chatMessageService.buildChatMessage(
               receiverPeerId: participant.peerId,

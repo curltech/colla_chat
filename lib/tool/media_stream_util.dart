@@ -2,10 +2,10 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/codec.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:uuid/uuid.dart';
 
 class MediaStreamUtil {
   static Map<String, dynamic> buildMediaConstraints({
@@ -330,8 +330,7 @@ class MediaStreamUtil {
       logger.e('Recording is not available on iOS');
       return null;
     }
-    var uuid = const Uuid();
-    String name = uuid.v4();
+    String name = StringUtil.uuid();
     if (filePath == null) {
       String storagePath = platformParams.path;
       filePath = '$storagePath/media_record/$name.mp4';

@@ -59,8 +59,7 @@ class FileUtil {
     String tempFilename;
     if (StringUtil.isEmpty(filename)) {
       final dir = await getTemporaryDirectory();
-      var uuid = const Uuid();
-      var name = uuid.v4();
+      var name = StringUtil.uuid();
       if (extension != null) {
         tempFilename = p.join(dir.path, '$name.$extension');
       } else {
@@ -690,10 +689,7 @@ class FileUtil {
     var name = json['name'];
     var mimeType = json['mimeType'];
     final dir = await getTemporaryDirectory();
-    if (name == null) {
-      var uuid = const Uuid();
-      name = '${uuid.v4()}.$mimeType';
-    }
+    name ??= '${StringUtil.uuid()}.$mimeType';
     String path = p.join(dir.path, name);
     XFile file = XFile.fromData(content,
         mimeType: json['mimeType'],

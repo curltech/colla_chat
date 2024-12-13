@@ -145,9 +145,9 @@ class CardComponent extends PositionComponent
       if (handPile.takeCard == card) {
         room.startRoomEvent(RoomEvent(
           room.name,
-          currentRound.id,
-          participantDirection.index,
-          RoomEventAction.send,
+          roundId: currentRound.id,
+          owner: participantDirection.index,
+          action: RoomEventAction.send,
           card: card,
           pos: -1,
         ));
@@ -156,9 +156,9 @@ class CardComponent extends PositionComponent
         if (pos > -1) {
           room.startRoomEvent(RoomEvent(
             room.name,
-            currentRound.id,
-            participantDirection.index,
-            RoomEventAction.send,
+            roundId: currentRound.id,
+            owner: participantDirection.index,
+            action: RoomEventAction.send,
             card: card,
             pos: pos,
           ));

@@ -5,7 +5,6 @@ import 'package:colla_chat/pages/game/majiang/base/round_participant.dart';
 import 'package:colla_chat/pages/game/majiang/base/suit.dart';
 import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
 import 'package:colla_chat/pages/game/majiang/room_controller.dart';
-import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:flame/components.dart';
 import 'package:flame/input.dart';
 import 'package:flutter/material.dart';
@@ -43,19 +42,19 @@ class ActionAreaComponent extends RectangleComponent
   loadSpriteButton() {
     RoundParticipant? roundParticipant = roomController
         .getRoundParticipant(roomController.selfParticipantDirection.value);
-    Map<OutstandingAction, List<int>>? outstandingActions =
+    Map<OutstandingAction, Set<int>>? outstandingActions =
         roundParticipant?.outstandingActions.value;
     if (outstandingActions == null || outstandingActions.isEmpty) {
       return;
     }
-    outstandingActions[OutstandingAction.pass] = [];
+    outstandingActions[OutstandingAction.pass] = {};
     double x = 0;
     double y = 0;
     for (var entry in outstandingActions.entries) {
       OutstandingAction outstandingAction = entry.key;
 
       /// 位置，在明杠，暗杠，吃牌的时候有用
-      List<int> pos = entry.value;
+      Set<int> pos = entry.value;
       Sprite? sprite = allOutstandingActions[outstandingAction];
       if (sprite != null) {
         Vector2 position = Vector2(x, y);
@@ -68,7 +67,7 @@ class ActionAreaComponent extends RectangleComponent
             position: position,
             size: size,
             onPressed: () {
-              _call(outstandingAction, pos);
+              _call(outstandingAction, pos.toList());
               outstandingActions.clear();
               roomController.majiangFlameGame.loadActionArea();
             });
@@ -90,30 +89,43 @@ class ActionAreaComponent extends RectangleComponent
 
     if (outstandingAction == OutstandingAction.complete) {
       CompleteType? completeType = await room.startRoomEvent(RoomEvent(
-          room.name, round.id, owner, RoomEventAction.complete,
+          room.name,
+          roundId: round.id,
+          owner: owner,
+          action: RoomEventAction.complete,
           pos: pos[0]));
       if (completeType != null) {
-        room.startRoomEvent(
-            RoomEvent(room.name, round.id, owner, RoomEventAction.round));
+        room.startRoomEvent(RoomEvent(room.name,
+            roundId: round.id, owner: owner, action: RoomEventAction.round));
       }
     } else if (outstandingAction == OutstandingAction.touch) {
-      room.startRoomEvent(RoomEvent(
-          room.name, round.id, owner, RoomEventAction.touch,
-          src: round.sender, card: round.sendCard, pos: pos[0]));
+      room.startRoomEvent(RoomEvent(room.name,
+          roundId: round.id,
+          owner: owner,
+          action: RoomEventAction.touch,
+          src: round.sender,
+          card: round.sendCard,
+          pos: pos[0]));
     } else if (outstandingAction == OutstandingAction.bar) {
-      room.startRoomEvent(RoomEvent(
-          room.name, round.id, owner, RoomEventAction.bar,
+      room.startRoomEvent(RoomEvent(room.name,
+          roundId: round.id,
+          owner: owner,
+          action: RoomEventAction.bar,
           pos: pos[0]));
     } else if (outstandingAction == OutstandingAction.darkBar) {
-      room.startRoomEvent(RoomEvent(
-          room.name, round.id, owner, RoomEventAction.darkBar,
+      room.startRoomEvent(RoomEvent(room.name,
+          roundId: round.id,
+          owner: owner,
+          action: RoomEventAction.darkBar,
           pos: pos[0]));
     } else if (outstandingAction == OutstandingAction.pass) {
-      room.startRoomEvent(
-          RoomEvent(room.name, round.id, owner, RoomEventAction.pass));
+      room.startRoomEvent(RoomEvent(room.name,
+          roundId: round.id, owner: owner, action: RoomEventAction.pass));
     } else if (outstandingAction == OutstandingAction.drawing) {
-      room.startRoomEvent(RoomEvent(
-          room.name, round.id, owner, RoomEventAction.drawing,
+      room.startRoomEvent(RoomEvent(room.name,
+          roundId: round.id,
+          owner: owner,
+          action: RoomEventAction.drawing,
           pos: pos[0]));
     }
   }

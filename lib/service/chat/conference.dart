@@ -313,8 +313,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
     if (old != null) {
       return old;
     }
-    var uuid = const Uuid();
-    String conferenceId = uuid.v4();
+    String conferenceId = StringUtil.uuid();
     conferenceOwnerPeerId = conferenceOwnerPeerId ?? myself.peerId;
     startDate ??= DateUtil.currentDate();
     endDate ??= DateUtil.currentDateTime()

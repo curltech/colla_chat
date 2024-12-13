@@ -5,7 +5,7 @@ import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/subject_component.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:uuid/uuid.dart';
+import 'package:colla_chat/tool/string_util.dart';
 
 /// 模型主题，每个主题将占据一块区域，主题之间相邻，大小为10个节点x6个节点
 class Subject {
@@ -26,7 +26,7 @@ class Subject {
 
   Subject(this.name, {String? id, this.x, this.y}) {
     if (id == null) {
-      this.id = const Uuid().v4().toString();
+      this.id = StringUtil.uuid();
     } else {
       this.id = id;
     }

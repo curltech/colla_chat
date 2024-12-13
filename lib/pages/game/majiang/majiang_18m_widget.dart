@@ -79,8 +79,8 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
   }
 
   Future<void> createRoom(String name) async {
-    roomController.room.value = await roomPool.startRoomEvent(
-        RoomEvent(name, null, 0, RoomEventAction.room, content: peerIds));
+    roomController.room.value = await roomPool.startRoomEvent(RoomEvent(name,
+        owner: -1, action: RoomEventAction.room, content: peerIds));
   }
 
   /// 弹出对话框，输入名称，选择参加的人
@@ -161,8 +161,8 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
           tooltip: AppLocalizations.t('New round'),
           onPressed: () {
             /// 新的一轮的庄家是当前选择的参与者
-            room.startRoomEvent(
-                RoomEvent(room.name, null, room.banker, RoomEventAction.round));
+            room.startRoomEvent(RoomEvent(room.name,
+                owner: room.banker, action: RoomEventAction.round));
           },
           icon: const Icon(Icons.newspaper_outlined)));
       rightWidgets.add(IconButton(
@@ -184,27 +184,27 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
             Map<OutstandingAction, List<int>> outstandingActions = {};
             if (sendCard != null) {
               outstandingActions = currentRoundParticipant.onRoomEvent(
-                  RoomEvent(
-                      room.name,
-                      currentRound.id,
-                      currentRoundParticipant.direction.index,
-                      RoomEventAction.check,
+                  RoomEvent(room.name,
+                      roundId: currentRound.id,
+                      owner: currentRoundParticipant.index,
+                      receiver: currentRoundParticipant.index,
+                      action: RoomEventAction.check,
                       card: sendCard));
             } else if (takeCard != null) {
               outstandingActions = currentRoundParticipant.onRoomEvent(
-                  RoomEvent(
-                      room.name,
-                      currentRound.id,
-                      currentRoundParticipant.direction.index,
-                      RoomEventAction.check,
+                  RoomEvent(room.name,
+                      roundId: currentRound.id,
+                      owner: currentRoundParticipant.index,
+                      receiver: currentRoundParticipant.index,
+                      action: RoomEventAction.check,
                       card: takeCard));
             } else {
               outstandingActions = currentRoundParticipant.onRoomEvent(
-                  RoomEvent(
-                      room.name,
-                      currentRound.id,
-                      currentRoundParticipant.direction.index,
-                      RoomEventAction.check));
+                  RoomEvent(room.name,
+                      roundId: currentRound.id,
+                      owner: currentRoundParticipant.index,
+                      receiver: currentRoundParticipant.index,
+                      action: RoomEventAction.check));
             }
             roomController.majiangFlameGame.reloadSelf();
           },

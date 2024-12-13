@@ -3,6 +3,7 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/number_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
+import 'package:uuid/uuid.dart';
 
 class StringUtil {
   // 是否是空字符串
@@ -129,5 +130,10 @@ class StringUtil {
     //'${duration.inHours}:${duration.inMinutes}:${duration.inSeconds}';
 
     return durationText;
+  }
+
+  static String uuid() {
+    var uuid = const Uuid();
+    return uuid.v4();
   }
 }

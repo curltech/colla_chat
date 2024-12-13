@@ -5,9 +5,9 @@ import 'package:colla_chat/plugin/media_file_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
-import 'package:uuid/uuid.dart';
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
@@ -48,8 +48,8 @@ class _LinuxCameraWidgetState extends State<LinuxCameraWidget> {
   void _captureImage() async {
     String base64Image = await cameraLinuxPlugin.captureImage();
     Uint8List bytes = CryptoUtil.decodeBase64(base64Image);
-    var uuid = const Uuid();
-    var name = uuid.v4();
+
+    var name = StringUtil.uuid();
     String filename =
         await FileUtil.getTempFilename(filename: name, extension: 'jpg');
     XFile xfile =
@@ -144,7 +144,7 @@ class _LinuxCameraWidgetState extends State<LinuxCameraWidget> {
   Widget _buildCameraController(BuildContext context) {
     return Column(
       children: <Widget>[
-         Expanded(
+        Expanded(
           child: nil,
         ),
         Container(

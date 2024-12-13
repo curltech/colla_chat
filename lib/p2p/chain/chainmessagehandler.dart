@@ -108,8 +108,7 @@ class ChainMessageHandler {
     chainMessage.payloadType = payloadType?.name;
     chainMessage.messageType = msgType.name;
     chainMessage.messageDirect = MsgDirect.Request.name;
-    var uuid = const Uuid();
-    chainMessage.uuid = uuid.v4();
+    chainMessage.uuid = StringUtil.uuid();
     chainMessage.srcPeerId = myself.peerId;
     chainMessage.srcClientId = myself.clientId;
 

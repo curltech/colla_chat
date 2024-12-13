@@ -340,10 +340,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String? parentMessageId,
   }) async {
     ChatMessage chatMessage = ChatMessage();
-    if (messageId == null) {
-      var uuid = const Uuid();
-      messageId = uuid.v4();
-    }
+    messageId ??= StringUtil.uuid();
     chatMessage.messageId = messageId;
     chatMessage.messageType = messageType.name;
     chatMessage.subMessageType = subMessageType.name;
@@ -1149,8 +1146,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   Future<ChatMessage> collect(ChatMessage chatMessage) async {
     Map<String, dynamic> map = JsonUtil.toJson(chatMessage);
     ChatMessage collectChatMessage = ChatMessage.fromJson(map);
-    var uuid = const Uuid();
-    String messageId = uuid.v4();
+
+    String messageId = StringUtil.uuid();
     collectChatMessage.messageId = messageId;
     collectChatMessage.id = null;
     collectChatMessage.messageType = ChatMessageType.collection.name;

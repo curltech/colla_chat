@@ -348,13 +348,22 @@ class HandPile extends Pile {
 
   bool send(Card card) {
     bool success = false;
-    if (card == takeCard) {
-      success = true;
-    } else {
-      success = cards.remove(card);
+    Card? first = cards.firstOrNull;
+    if (first == unknownCard) {
+      success = cards.remove(unknownCard);
       if (takeCard != null) {
         cards.add(takeCard!);
         sort();
+      }
+    } else {
+      if (card == takeCard) {
+        success = true;
+      } else {
+        success = cards.remove(card);
+        if (takeCard != null) {
+          cards.add(takeCard!);
+          sort();
+        }
       }
     }
     takeCard = null;

@@ -31,14 +31,19 @@ class RoundParticipant {
   // 打出的牌，每个参与者能看到所有的打出的牌
   final WastePile wastePile = WastePile();
 
+  /// 当参与者打牌或者明杠的时候，banker需要等待其他参与者的回复事件
+  /// banker只有等到其他参与者的回复事件后才能决定下一步的处理
+  /// 比如打牌的时候，banker等待所有的参与者的回复，才决定是继续发牌还是有人胡牌或者杠牌
+  List<RoomEvent> outstandingRoomEvents = [];
+
   /// 参与者等待处理的行为
-  final RxMap<OutstandingAction, List<int>> outstandingActions =
-      RxMap<OutstandingAction, List<int>>({});
+  final RxMap<OutstandingAction, Set<int>> outstandingActions =
+      RxMap<OutstandingAction, Set<int>>({});
 
   /// 参与者已经发生的行为，比如，明杠，暗杠等，值数组代表行为的发生人
   /// 自己代表自摸杠，别人代表打牌杠
-  final Map<OutstandingAction, List<int>> earnedActions =
-      <OutstandingAction, List<int>>{};
+  final Map<OutstandingAction, Set<int>> earnedActions =
+      <OutstandingAction, Set<int>>{};
 
   /// 记录重要的事件
   final List<RoomEvent> roomEvents = [];
@@ -76,43 +81,34 @@ class RoundParticipant {
   }
 
   addOutstandingAction(OutstandingAction outstandingAction, List<int> vs) {
-    List<int>? values = outstandingActions[outstandingAction];
+    Set<int>? values = outstandingActions[outstandingAction];
     if (values == null) {
-      values = [];
+      values = {};
       outstandingActions[outstandingAction] = values;
     }
     values.addAll(vs);
   }
 
   addEarnedAction(OutstandingAction outstandingAction, List<int> vs) {
-    List<int>? values = earnedActions[outstandingAction];
+    Set<int>? values = earnedActions[outstandingAction];
     if (values == null) {
-      values = [];
+      values = {};
       earnedActions[outstandingAction] = values;
     }
     values.addAll(vs);
   }
 
   /// 打牌，owner打出牌card，对其他人检查打的牌是否能够胡牌，杠牌和碰牌，返回检查的结果
-  Map<OutstandingAction, List<int>>? _send(int owner, Card card) {
-    if (owner == index) {
-      handPile.send(card);
-      wastePile.cards.add(card);
+  Map<OutstandingAction, Set<int>>? _send(int owner, Card card) {
+    wastePile.cards.add(card);
+    handPile.send(card);
+    Map<OutstandingAction, Set<int>>? outstandingActions = _check(card: card);
 
-      return null;
-    } else {
-      /// 不是owner，检查是否可以胡牌，碰牌或者杠牌
-      Map<OutstandingAction, List<int>> outstandingActions = _check(card: card);
-      if (outstandingActions.isNotEmpty) {
-        return outstandingActions;
-      }
-    }
-
-    return null;
+    return outstandingActions;
   }
 
   /// 检查行为状态，既包括摸牌检查，也包含打牌检查
-  Map<OutstandingAction, List<int>> _check(
+  Map<OutstandingAction, Set<int>> _check(
       {Card? card, TakeCardType? takeCardType}) {
     outstandingActions.clear();
     if (takeCardType == TakeCardType.sea) {
@@ -246,7 +242,7 @@ class RoundParticipant {
   /// 胡牌，owner胡participantState中的可胡的牌形,pos表示可胡牌形数组的位置
   CompleteType? _complete(int owner, int complete) {
     if (index == owner) {
-      List<int>? completes = outstandingActions[OutstandingAction.complete];
+      Set<int>? completes = outstandingActions[OutstandingAction.complete];
       if (completes != null && completes.isNotEmpty) {
         CompleteType? completeType =
             NumberUtil.toEnum(CompleteType.values, complete);
@@ -266,15 +262,17 @@ class RoundParticipant {
     if (index == owner) {
       outstandingActions.clear();
       if (handPile.takeCardType == TakeCardType.sea) {
-        round.room.onRoomEvent(RoomEvent(round.room.name, round.id,
-            round.room.next(owner), RoomEventAction.take));
+        round.room.onRoomEvent(RoomEvent(round.room.name,
+            roundId: round.id,
+            owner: round.room.next(owner),
+            action: RoomEventAction.take));
       }
     }
   }
 
   /// 摸牌，有三种摸牌，普通的自摸，海底捞的自摸，杠上自摸
   /// owner摸到card牌，takeCardType表示摸牌的方式
-  Map<OutstandingAction, List<int>>? _take(
+  Map<OutstandingAction, Set<int>>? _take(
       int owner, Card card, int takeCardTypeIndex) {
     TakeCardType? takeCardType =
         NumberUtil.toEnum(TakeCardType.values, takeCardTypeIndex);
@@ -289,7 +287,7 @@ class RoundParticipant {
       handPile.takeCardType = takeCardType;
 
       /// 检查摸到的牌，看需要采取的动作，这里其实只需要摸牌检查
-      Map<OutstandingAction, List<int>> outstandingActions =
+      Map<OutstandingAction, Set<int>> outstandingActions =
           _check(card: card, takeCardType: takeCardType);
       if (outstandingActions.isNotEmpty) {
         roomController.majiangFlameGame.loadActionArea();
@@ -304,16 +302,17 @@ class RoundParticipant {
   /// 抢杠胡牌，owner抢src的明杠牌card胡牌
   CompleteType? _rob(int owner, int pos, Card card, int src) {
     if (index == owner) {
-      List<int>? completes = outstandingActions[OutstandingAction.complete];
+      Set<int>? completes = outstandingActions[OutstandingAction.complete];
       if (completes != null && completes.isNotEmpty) {
-        int complete = completes[pos];
-        CompleteType? completeType =
-            NumberUtil.toEnum(CompleteType.values, complete);
-        if (completeType != null) {
-          logger.i('complete:$completeType');
-        }
+        if (completes.contains(pos)) {
+          CompleteType? completeType =
+              NumberUtil.toEnum(CompleteType.values, pos);
+          if (completeType != null) {
+            logger.i('complete:$completeType');
+          }
 
-        return completeType;
+          return completeType;
+        }
       }
     }
 

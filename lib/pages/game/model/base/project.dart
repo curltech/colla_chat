@@ -1,7 +1,7 @@
 import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:flame/components.dart';
-import 'package:uuid/uuid.dart';
 import 'dart:ui' as ui;
 
 /// 模型项目
@@ -36,7 +36,7 @@ class Project {
     this.meta = false,
   }) {
     if (id == null) {
-      this.id = const Uuid().v4().toString();
+      this.id = StringUtil.uuid();
     } else {
       this.id = id;
     }
