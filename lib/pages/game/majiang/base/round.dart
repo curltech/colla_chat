@@ -1,19 +1,18 @@
 import 'dart:math';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
-import 'package:colla_chat/pages/game/majiang/base/hand_pile.dart';
-import 'package:colla_chat/pages/game/majiang/base/room_pool.dart';
-import 'package:colla_chat/pages/game/majiang/base/round_participant.dart';
 import 'package:colla_chat/pages/game/majiang/base/card.dart';
 import 'package:colla_chat/pages/game/majiang/base/full_pile.dart';
+import 'package:colla_chat/pages/game/majiang/base/hand_pile.dart';
 import 'package:colla_chat/pages/game/majiang/base/outstanding_action.dart';
 import 'package:colla_chat/pages/game/majiang/base/participant.dart';
 import 'package:colla_chat/pages/game/majiang/base/room.dart';
+import 'package:colla_chat/pages/game/majiang/base/room_pool.dart';
+import 'package:colla_chat/pages/game/majiang/base/round_participant.dart';
 import 'package:colla_chat/pages/game/majiang/base/stock_pile.dart';
 import 'package:colla_chat/pages/game/majiang/base/suit.dart';
 import 'package:colla_chat/pages/game/majiang/room_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/number_util.dart';
@@ -29,13 +28,23 @@ class Round {
   /// 所属的房间
   late final Room room;
 
-  /// 未使用的牌
-  late final StockPile stockPile;
+  /// 未使用的牌，如果是banker，则不为null，否则为null，用于区分是否是banker
+  StockPile? stockPile;
 
   final List<RoundParticipant> roundParticipants = [];
 
-  /// 庄家
+  /// 庄家，对每一轮来说，banker拥有所有的数据，包括每一个参与者的handPile和stockPile
+  /// 对非banker来说，每一个参与者的handPile和stockPile都是unknownCard
+  /// 应用的事件模型是所有的消息都发送给banker，然后banker再转发给其他的参与者
   int banker;
+
+  /// 最新的发牌的参与者，就是banker把牌发给taker
+  late int taker;
+
+  /// 当参与者打牌或者明杠的时候，banker需要等待其他参与者的回复事件
+  /// banker只有等到其他参与者的回复事件后才能决定下一步的处理
+  /// 比如打牌的时候，banker等待所有的参与者的回复，才决定是继续发牌还是有人胡牌或者杠牌
+  List<RoomEvent> outstandingRoomEvents = [];
 
   /// 刚出牌的参与者
   int? sender;
@@ -123,7 +132,7 @@ class Round {
         int reminder = (i + banker) % 4;
         roundParticipants[reminder].handPile.cards.add(card);
       } else {
-        stockPile.cards.add(card);
+        stockPile!.cards.add(card);
       }
     }
 
@@ -132,7 +141,16 @@ class Round {
       roundParticipant.handPile.sort();
     }
 
-    _take(banker);
+    /// 第一张发牌给banker
+    RoomEvent? roomEvent = take(banker);
+    if (roomEvent != null) {
+      onRoomEvent(roomEvent);
+    }
+  }
+
+  /// stockPile不为空，则是banker
+  bool get isBanker {
+    return stockPile != null;
   }
 
   RoundParticipant getRoundParticipant(
@@ -140,12 +158,62 @@ class Round {
     return roundParticipants[participantDirection.index];
   }
 
+  /// 牌的总数
   int get total {
     int total = 0;
     for (int i = 0; i < roundParticipants.length; ++i) {
       total += roundParticipants[i].total;
     }
-    return total + stockPile.cards.length;
+    return total + stockPile!.cards.length;
+  }
+
+  bool get isSeaTake {
+    return stockPile!.cards.length < 5;
+  }
+
+  /// banker发牌，只能是banker才能执行，把牌发给owner
+  RoomEvent? take(int owner, {int? receiver}) {
+    if (stockPile == null) {
+      logger.e('owner:$owner take card failure, not banker');
+      return null;
+    }
+    Card? first = stockPile!.cards.firstOrNull;
+    if (first == null) {
+      logger.e('owner:$owner take card failure, stockPile is empty');
+      return null;
+    }
+
+    TakeCardType takeCardType = TakeCardType.self;
+    if (isSeaTake) {
+      takeCardType = TakeCardType.sea;
+    }
+    Card card = stockPile!.cards.removeLast();
+    logger.w(
+        'take card ${card.toString()}, leave ${stockPile!.cards.length} cards');
+
+    return RoomEvent(room.name,
+        owner: owner,
+        action: RoomEventAction.take,
+        card: card,
+        pos: takeCardType.index);
+  }
+
+  /// 收到发的牌card
+  Card? _take(int owner, Card card, int takeCardTypeIndex, {int? receiver}) {
+    sender = null;
+    sendCard = null;
+    RoundParticipant roundParticipant = roundParticipants[owner];
+    RoomEvent roomEvent = RoomEvent(room.name,
+        roundId: id,
+        owner: owner,
+        action: RoomEventAction.take,
+        card: card,
+        pos: takeCardTypeIndex);
+    roundParticipant.onRoomEvent(roomEvent);
+
+    _sendChatMessage(roomEvent);
+
+    return card;
   }
 
   /// 打牌，每个参与者都要执行一次
@@ -168,15 +236,15 @@ class Round {
 
   /// 杠牌发牌
   Card? _barTake(int owner, {int? receiver}) {
-    if (stockPile.cards.isEmpty) {
+    if (stockPile == null || stockPile!.cards.isEmpty) {
       return null;
     }
     int mod = barCount % 2;
     Card card;
-    if (mod == 0 && stockPile.cards.length > 1) {
-      card = stockPile.cards.removeAt(stockPile.cards.length - 2);
+    if (mod == 0 && stockPile!.cards.length > 1) {
+      card = stockPile!.cards.removeAt(stockPile!.cards.length - 2);
     } else {
-      card = stockPile.cards.removeLast();
+      card = stockPile!.cards.removeLast();
     }
     sender = null;
     sendCard = null;
@@ -198,37 +266,6 @@ class Round {
             pos: TakeCardType.bar.index));
       }
     }
-
-    return card;
-  }
-
-  bool get isSeaTake {
-    return stockPile.cards.length < 5;
-  }
-
-  /// 发牌
-  Card? _take(int owner, {int? receiver}) {
-    if (stockPile.cards.isEmpty) {
-      logger.e('owner:$owner take card failure, stockPile is empty');
-      return null;
-    }
-
-    TakeCardType takeCardType = TakeCardType.self;
-    if (isSeaTake) {
-      takeCardType = TakeCardType.sea;
-    }
-    Card card = stockPile.cards.removeLast();
-    logger.w(
-        'take card ${card.toString()}, leave ${stockPile.cards.length} cards');
-    sender = null;
-    sendCard = null;
-    RoundParticipant roundParticipant = roundParticipants[owner];
-    roundParticipant.onRoomEvent(RoomEvent(room.name,
-        roundId: id,
-        owner: owner,
-        action: RoomEventAction.take,
-        card: card,
-        pos: takeCardType.index));
 
     return card;
   }
@@ -518,36 +555,54 @@ class Round {
     return completeType;
   }
 
-  /// 发起房间的事件，由发起事件的参与者调用
-  /// 完成后把事件分发到其他参与者
-  dynamic startRoomEvent(RoomEvent roomEvent) async {
-    dynamic returnValue = onRoomEvent(roomEvent);
-    for (int i = 0; i < roundParticipants.length; i++) {
-      RoundParticipant roundParticipant = roundParticipants[i];
-      if (roundParticipant.participant.peerId != myself.peerId) {
-        roomEvent.receiver = i;
-        ChatMessage chatMessage = await chatMessageService.buildChatMessage(
-            receiverPeerId: roundParticipant.participant.peerId,
-            subMessageType: ChatMessageSubType.majiang,
-            content: roomEvent);
-        if (roundParticipant.participant.robot) {
-          roomPool.onRoomEvent(chatMessage);
-        } else {
-          roomPool.send(chatMessage);
+  /// 作为banker，分发事件消息给其他参与者，不包括事件的原始发送者
+  /// 否则，发送消息给banker
+  _sendChatMessage(RoomEvent roomEvent) async {
+    if (isBanker) {
+      int sender = roomEvent.sender!;
+      for (int i = 0; i < roundParticipants.length; ++i) {
+        if (i != banker || i != sender) {
+          RoundParticipant roundParticipant = roundParticipants[i];
+          roomEvent.sender = banker;
+          roomEvent.receiver = i;
+          if (roomEvent.sender != roomEvent.receiver) {
+            ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+                receiverPeerId: roundParticipant.participant.peerId,
+                subMessageType: ChatMessageSubType.majiang,
+                content: roomEvent);
+            if (roundParticipant.participant.robot) {
+              roomPool.onRoomEvent(chatMessage);
+            } else {
+              roomPool.send(chatMessage);
+            }
+          }
         }
       }
+    } else {
+      ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+          receiverPeerId: roundParticipants[banker].participant.peerId,
+          subMessageType: ChatMessageSubType.majiang,
+          content: roomEvent);
+      if (roundParticipants[banker].participant.robot) {
+        roomPool.onRoomEvent(chatMessage);
+      } else {
+        roomPool.send(chatMessage);
+      }
     }
-
-    return returnValue;
   }
 
+  /// 接收到事件消息，只能是banker发送到其他参与者，或者其他参与者发送给banker
+  /// 假如自己是banker，则处理事件，然后分发事件消息到其他参与者
+  /// 假如自己不是banker，则发送者是banker，则处理事件消息
   dynamic onRoomEvent(RoomEvent roomEvent) async {
     logger.w('round:$id has received event:${roomEvent.toString()}');
     dynamic returnValue;
+
     RoomEventAction? action = roomEvent.action;
     switch (action) {
       case RoomEventAction.take:
-        returnValue = _take(roomEvent.owner, receiver: roomEvent.receiver);
+        returnValue = _take(roomEvent.owner, roomEvent.card!, roomEvent.pos!,
+            receiver: roomEvent.receiver);
       case RoomEventAction.send:
         returnValue = _send(roomEvent.owner, roomEvent.card!,
             receiver: roomEvent.receiver);

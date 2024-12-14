@@ -68,8 +68,11 @@ class RoomEvent {
   /// 比如0打出的牌
   final int owner;
 
-  /// 事件的接收者，0，1，2，3表示参与者的位置
-  /// 比如1接收到事件0打牌
+  /// 事件消息的发送者，0，1，2，3表示参与者的位置
+  /// sender和receiver必有一个为banker
+  int? sender;
+
+  /// 最简单的例子是加入banker为0，owner为1，1打牌，1发送消息给banker，banker接收处理后转发给2和3
   int? receiver;
 
   /// RoomAction事件的枚举
@@ -93,6 +96,7 @@ class RoomEvent {
       {String? id,
       this.roundId,
       required this.owner,
+      this.sender,
       this.receiver,
       required this.action,
       this.card,
@@ -111,6 +115,7 @@ class RoomEvent {
         name = json['name'],
         roundId = json['roundId'],
         owner = json['owner'],
+        sender = json['sender'],
         receiver = json['receiver'],
         card = json['card'] != null ? fullPile[json['card']] : null,
         pos = json['pos'],
@@ -133,6 +138,7 @@ class RoomEvent {
       'name': name,
       'roundId': roundId,
       'owner': owner,
+      'sender': sender,
       'receiver': receiver,
       'action': action.name,
       'card': card?.toString(),
@@ -144,7 +150,7 @@ class RoomEvent {
 
   @override
   String toString() {
-    return 'name:$name,roundId:$roundId,owner:$owner,receiver:$receiver,action:${action.name},card:$card,pos:$pos,src:$src,content:$content';
+    return 'name:$name,roundId:$roundId,owner:$owner,sender:$sender,receiver:$receiver,action:${action.name},card:$card,pos:$pos,src:$src,content:$content';
   }
 }
 
@@ -367,7 +373,7 @@ class Room {
       if (round == null) {
         return null;
       }
-      returnValue = await round.startRoomEvent(roomEvent);
+      returnValue = await round.onRoomEvent(roomEvent);
     }
 
     return returnValue;

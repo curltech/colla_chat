@@ -31,10 +31,7 @@ class RoundParticipant {
   // 打出的牌，每个参与者能看到所有的打出的牌
   final WastePile wastePile = WastePile();
 
-  /// 当参与者打牌或者明杠的时候，banker需要等待其他参与者的回复事件
-  /// banker只有等到其他参与者的回复事件后才能决定下一步的处理
-  /// 比如打牌的时候，banker等待所有的参与者的回复，才决定是继续发牌还是有人胡牌或者杠牌
-  List<RoomEvent> outstandingRoomEvents = [];
+
 
   /// 参与者等待处理的行为
   final RxMap<OutstandingAction, Set<int>> outstandingActions =
