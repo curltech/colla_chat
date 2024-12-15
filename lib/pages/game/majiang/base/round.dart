@@ -140,16 +140,10 @@ class Round {
     for (var roundParticipant in roundParticipants) {
       roundParticipant.handPile.sort();
     }
-
-    /// 第一张发牌给banker
-    RoomEvent? roomEvent = take(banker);
-    if (roomEvent != null) {
-      onRoomEvent(roomEvent);
-    }
   }
 
-  /// stockPile不为空，则是banker
-  bool get isBanker {
+  /// stockPile不为空，则是creator
+  bool get isCreator {
     return stockPile != null;
   }
 
@@ -171,10 +165,10 @@ class Round {
     return stockPile!.cards.length < 5;
   }
 
-  /// banker发牌，只能是banker才能执行，把牌发给owner
+  /// creator发牌，只能是creator才能执行，把牌发给owner
   RoomEvent? take(int owner, {int? receiver}) {
     if (stockPile == null) {
-      logger.e('owner:$owner take card failure, not banker');
+      logger.e('owner:$owner take card failure, not creator');
       return null;
     }
     Card? first = stockPile!.cards.firstOrNull;
@@ -192,6 +186,7 @@ class Round {
         'take card ${card.toString()}, leave ${stockPile!.cards.length} cards');
 
     return RoomEvent(room.name,
+        roundId: id,
         owner: owner,
         action: RoomEventAction.take,
         card: card,
@@ -202,16 +197,18 @@ class Round {
   Card? _take(int owner, Card card, int takeCardTypeIndex, {int? receiver}) {
     sender = null;
     sendCard = null;
-    RoundParticipant roundParticipant = roundParticipants[owner];
-    RoomEvent roomEvent = RoomEvent(room.name,
-        roundId: id,
-        owner: owner,
-        action: RoomEventAction.take,
-        card: card,
-        pos: takeCardTypeIndex);
-    roundParticipant.onRoomEvent(roomEvent);
+    if (receiver == null) {
+      RoundParticipant roundParticipant = roundParticipants[owner];
+      RoomEvent roomEvent = RoomEvent(room.name,
+          roundId: id,
+          owner: owner,
+          action: RoomEventAction.take,
+          card: card,
+          pos: takeCardTypeIndex);
+      roundParticipant.onRoomEvent(roomEvent);
 
-    _sendChatMessage(roomEvent);
+      _sendChatMessage(roomEvent);
+    }
 
     return card;
   }
@@ -221,17 +218,23 @@ class Round {
   Map<OutstandingAction, Set<int>>? _send(int owner, Card card,
       {int? receiver}) {
     /// 打牌的参与者执行事件处理
-    RoundParticipant roundParticipant;
-    if (receiver == null) {
-      roundParticipant = roundParticipants[owner];
-    } else {
-      roundParticipant = roundParticipants[receiver];
-    }
     sender = owner;
     sendCard = card;
+    RoundParticipant roundParticipant = roundParticipants[owner];
+    RoomEvent roomEvent = RoomEvent(room.name,
+        roundId: id, owner: owner, action: RoomEventAction.send, card: card);
+    Map<OutstandingAction, Set<int>>? outstandingActions =
+        roundParticipant.onRoomEvent(roomEvent);
 
-    return roundParticipant.onRoomEvent(RoomEvent(room.name,
-        roundId: id, owner: owner, action: RoomEventAction.send, card: card));
+    /// 没有receiver，不是消息事件，creator发送事件消息给其他参与者，或者发送消息事件给creator
+    /// 有receiver，是消息事件，receiver是creator发送事件消息给其他参与者，否则不发送消息
+    if (receiver == null) {
+      _sendChatMessage(roomEvent);
+    } else if (receiver == room.creator) {
+      _sendChatMessage(roomEvent);
+    }
+
+    return outstandingActions;
   }
 
   /// 杠牌发牌
@@ -555,15 +558,15 @@ class Round {
     return completeType;
   }
 
-  /// 作为banker，分发事件消息给其他参与者，不包括事件的原始发送者
-  /// 否则，发送消息给banker
+  /// 作为creator，分发事件消息给其他参与者，不包括事件的原始发送者
+  /// 否则，发送消息给creator
   _sendChatMessage(RoomEvent roomEvent) async {
-    if (isBanker) {
-      int sender = roomEvent.sender!;
+    if (isCreator) {
+      int? sender = roomEvent.sender;
       for (int i = 0; i < roundParticipants.length; ++i) {
-        if (i != banker || i != sender) {
+        if (i != room.creator || i != sender) {
           RoundParticipant roundParticipant = roundParticipants[i];
-          roomEvent.sender = banker;
+          roomEvent.sender = room.creator;
           roomEvent.receiver = i;
           if (roomEvent.sender != roomEvent.receiver) {
             ChatMessage chatMessage = await chatMessageService.buildChatMessage(
@@ -580,10 +583,10 @@ class Round {
       }
     } else {
       ChatMessage chatMessage = await chatMessageService.buildChatMessage(
-          receiverPeerId: roundParticipants[banker].participant.peerId,
+          receiverPeerId: roundParticipants[room.creator].participant.peerId,
           subMessageType: ChatMessageSubType.majiang,
           content: roomEvent);
-      if (roundParticipants[banker].participant.robot) {
+      if (roundParticipants[room.creator].participant.robot) {
         roomPool.onRoomEvent(chatMessage);
       } else {
         roomPool.send(chatMessage);
@@ -591,9 +594,9 @@ class Round {
     }
   }
 
-  /// 接收到事件消息，只能是banker发送到其他参与者，或者其他参与者发送给banker
-  /// 假如自己是banker，则处理事件，然后分发事件消息到其他参与者
-  /// 假如自己不是banker，则发送者是banker，则处理事件消息
+  /// 接收到事件消息，只能是creator发送到其他参与者，或者其他参与者发送给creator
+  /// 假如自己是creator，则处理事件，然后分发事件消息到其他参与者
+  /// 假如自己不是creator，则发送者是creator，则处理事件消息
   dynamic onRoomEvent(RoomEvent roomEvent) async {
     logger.w('round:$id has received event:${roomEvent.toString()}');
     dynamic returnValue;

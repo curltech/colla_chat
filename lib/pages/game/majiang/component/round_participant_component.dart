@@ -20,7 +20,7 @@ class RoundParticipantComponent extends PositionComponent
   TextComponent? textComponent;
 
   /// 绘制牌的图像，有相对的偏移量，旋转，放大等参数
-  void loadTRoundParticipant() {
+  void loadRoundParticipant() {
     if (spriteComponent != null) {
       remove(spriteComponent!);
     }
@@ -48,7 +48,7 @@ class RoundParticipantComponent extends PositionComponent
 
   @override
   FutureOr<void> onLoad() {
-    loadTRoundParticipant();
+    loadRoundParticipant();
 
     return super.onLoad();
   }

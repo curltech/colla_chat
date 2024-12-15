@@ -156,7 +156,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
           icon: const Icon(Icons.new_label))
     ];
     if (room != null &&
-        room.banker == roomController.selfParticipantDirection.value.index) {
+        room.creator == roomController.selfParticipantDirection.value.index) {
       rightWidgets.add(IconButton(
           tooltip: AppLocalizations.t('New round'),
           onPressed: () {

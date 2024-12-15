@@ -69,10 +69,10 @@ class RoomEvent {
   final int owner;
 
   /// 事件消息的发送者，0，1，2，3表示参与者的位置
-  /// sender和receiver必有一个为banker
+  /// sender和receiver必有一个为creator
   int? sender;
 
-  /// 最简单的例子是加入banker为0，owner为1，1打牌，1发送消息给banker，banker接收处理后转发给2和3
+  /// 最简单的例子是加入creator为0，owner为1，1打牌，1发送消息给creator，creator接收处理后转发给2和3
   int? receiver;
 
   /// RoomAction事件的枚举
@@ -158,6 +158,8 @@ class RoomEvent {
 class Room {
   final String name;
 
+  late final int creator;
+
   /// 四个参与者
   late final List<Participant> participants;
 
@@ -197,6 +199,7 @@ class Room {
 
   Room.fromJson(Map json)
       : name = json['name'],
+        creator = json['creator'],
         banker = json['banker'] {
     participants = [];
     if (json['participants'] != null && json['participants'] is List) {
@@ -209,6 +212,7 @@ class Room {
   Map<String, dynamic> toJson() {
     return {
       'name': name,
+      'creator': creator,
       'banker': banker,
       'participants': JsonUtil.toJson(participants),
     };
@@ -230,6 +234,7 @@ class Room {
       Participant participant = Participant(peerId, linkmanName, room: this);
       participants.add(participant);
       if (myself.peerId == participant.peerId) {
+        creator = i;
         banker = i;
       }
     }
@@ -269,9 +274,9 @@ class Room {
         if (linkman.avatar != null) {
           image =
               await Flame.images.fromBase64('linkmanName.png', linkman.avatar!);
-          participant.sprite = Sprite(image);
         }
       }
+      participant.sprite = Sprite(image);
     }
   }
 
@@ -327,7 +332,7 @@ class Room {
   }
 
   /// 新玩一局
-  /// 由庄家调用，然后向其他参与者发送chatMessage
+  /// 由creator调用，然后向其他参与者发送chatMessage
   Future<Round> _createRound(int banker) async {
     Round round = Round(rounds.length, this, banker);
     rounds.add(round);
@@ -340,17 +345,17 @@ class Room {
   /// 完成后把round事件分发到其他参与者
   dynamic startRoomEvent(RoomEvent roomEvent) async {
     dynamic returnValue;
-    Round? round;
     if (roomEvent.action == RoomEventAction.round) {
-      round = await _createRound(roomEvent.owner);
+      Round round = await _createRound(roomEvent.owner);
       returnValue = round;
       for (int i = 0; i < round.roundParticipants.length; i++) {
         RoundParticipant roundParticipant = round.roundParticipants[i];
-        if (roundParticipant.participant.peerId != myself.peerId) {
+        if (i != creator) {
           String content = JsonUtil.toJsonString(roundParticipant.handPile);
           roomEvent = RoomEvent(name,
               roundId: round.id,
               owner: roomEvent.owner,
+              sender: creator,
               receiver: i,
               action: RoomEventAction.round,
               content: content);
@@ -365,8 +370,15 @@ class Room {
           }
         }
       }
+
+      /// 第一张发牌给banker
+      RoomEvent? event = round.take(banker);
+      if (event != null) {
+        onRoomEvent(event);
+      }
     } else {
       int? roundId = roomEvent.roundId;
+      Round? round;
       if (roundId != null) {
         round = rounds[roundId];
       }

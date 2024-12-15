@@ -36,6 +36,9 @@ class WastePileComponent extends PositionComponent
 
   /// 是否刚打出的牌
   bool last() {
+    if (wastePile == null) {
+      return false;
+    }
     bool last = false;
     majiangCard.Card? lastCard = wastePile!.cards.lastOrNull;
     if (lastCard != null) {
@@ -57,6 +60,9 @@ class WastePileComponent extends PositionComponent
 
   /// 绘制牌的图像，有相对的偏移量，旋转，放大等参数
   void loadWastePile() {
+    if (wastePile == null) {
+      return;
+    }
     CardBackgroundType cardBackgroundType;
     if (areaDirection == AreaDirection.self) {
       cardBackgroundType = CardBackgroundType.touchcard;

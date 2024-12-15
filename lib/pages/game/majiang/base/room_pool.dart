@@ -45,6 +45,7 @@ class RoomPool {
           String content = JsonUtil.toJsonString(room);
           roomEvent = RoomEvent(room.name,
               owner: roomEvent.owner,
+              sender: room.creator,
               receiver: i,
               action: RoomEventAction.room,
               content: content);
