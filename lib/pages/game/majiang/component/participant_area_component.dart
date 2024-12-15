@@ -77,7 +77,7 @@ class ParticipantAreaComponent extends RectangleComponent
       if (roundParticipant != null) {
         roundParticipantComponent = RoundParticipantComponent(roundParticipant,
             size: Vector2(64, 42),
-            position: Vector2(size.x / 2 - 16, size.y / 2 - 16));
+            position: Vector2(size.x / 2 - 16, size.y / 2 - 30));
         add(roundParticipantComponent!);
       }
     }

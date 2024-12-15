@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/game/majiang/base/room.dart';
+import 'package:colla_chat/pages/game/majiang/base/round.dart';
 import 'package:colla_chat/pages/game/majiang/base/round_participant.dart';
 import 'package:colla_chat/pages/game/majiang/base/participant.dart';
 import 'package:colla_chat/pages/game/majiang/component/majiang_flame_game.dart';
@@ -34,7 +37,16 @@ class RoundParticipantComponent extends PositionComponent
           sprite: sprite, position: Vector2(0, 0), size: Vector2(32, 32));
       add(spriteComponent!);
     }
+    int banker = roundParticipant.round.banker;
+    int creator = roundParticipant.round.room.creator;
+    int index = roundParticipant.index;
     String name = participant.name;
+    if (creator == index) {
+      name = '$name\n${AppLocalizations.t('creator')}';
+    }
+    if (banker == index) {
+      name = '$name\n${AppLocalizations.t('banker')}';
+    }
     TextPaint textPaint = TextPaint(
       style: const TextStyle(
         color: Colors.black,

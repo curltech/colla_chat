@@ -894,5 +894,7 @@
   "monthline": "月线",
   "quarterline": "季线",
   "halfyearline": "半年线",
-  "yearline": "年线"
+  "yearline": "年线",
+  "creator": "创建者",
+  "banker": "庄家"
 }
