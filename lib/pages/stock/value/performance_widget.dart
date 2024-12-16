@@ -193,13 +193,13 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
     performanceDataPageController.sortAscending.addListener(_updatePerformance);
     searchDataField = [
       PlatformDataField(
-        name: 'securityCode',
-        label: 'SecurityCode',
+        name: 'tsCode',
+        label: 'TsCode',
         cancel: true,
         prefixIcon: IconButton(
           onPressed: () {
             searchController.setValue(
-                'securityCode', myShareController.subscription.value);
+                'tsCode', myShareController.subscription.value);
           },
           icon: Icon(
             Icons.perm_identity_outlined,
@@ -229,10 +229,9 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
       orderBy = '$sortColumnName ${sortAscending.value ? 'asc' : 'desc'}';
     }
     Map<String, dynamic> values = searchController.getValues();
-    String? securityCode = values['securityCode'];
+    String? tsCode = values['tsCode'];
     String? startDate = values['startDate'];
-    _refresh(
-        securityCode: securityCode, startDate: startDate, orderBy: orderBy);
+    _refresh(securityCode: tsCode, startDate: startDate, orderBy: orderBy);
   }
 
   Widget _buildActionWidget(int index, dynamic performance) {

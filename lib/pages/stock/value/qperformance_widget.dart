@@ -97,9 +97,9 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
       orderBy = '$sortColumnName ${sortAscending.value ? 'asc' : 'desc'}';
     }
     Map<String, dynamic> values = searchController.getValues();
-    String? securityCode = values['securityCode'];
+    String? tsCode = values['tsCode'];
     String? startDate = values['startDate'];
-    _refresh(tsCode: securityCode, startDate: startDate, orderBy: orderBy);
+    _refresh(tsCode: tsCode, startDate: startDate, orderBy: orderBy);
   }
 
   Widget _buildActionWidget(int index, dynamic qperformance) {
