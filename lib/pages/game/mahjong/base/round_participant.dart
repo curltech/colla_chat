@@ -102,22 +102,22 @@ class RoundParticipant {
 
   /// 检查行为状态，既包括摸牌检查，也包含打牌检查
   Map<OutstandingAction, Set<int>> _check(
-      {Tile? card, DealCardType? takeCardType}) {
+      {Tile? tile, DealTileType? dealTileType}) {
     outstandingActions.clear();
-    if (takeCardType == DealCardType.sea) {
-      WinType? completeType = handPile.checkWin(tile: card);
-      if (completeType != null) {
-        addOutstandingAction(OutstandingAction.win, [completeType.index]);
+    if (dealTileType == DealTileType.sea) {
+      WinType? winType = handPile.checkWin(tile: tile);
+      if (winType != null) {
+        addOutstandingAction(OutstandingAction.win, [winType.index]);
       } else {
         addOutstandingAction(OutstandingAction.pass, []);
       }
       return outstandingActions.value;
     }
-    WinType? completeType = handPile.checkWin(tile: card);
-    if (completeType != null) {
-      addOutstandingAction(OutstandingAction.win, [completeType.index]);
+    WinType? winType = handPile.checkWin(tile: tile);
+    if (winType != null) {
+      addOutstandingAction(OutstandingAction.win, [winType.index]);
     }
-    if (card == handPile.drawTile) {
+    if (tile == handPile.drawTile) {
       List<int>? pos = handPile.checkDarkBar();
       if (pos != null) {
         addOutstandingAction(OutstandingAction.darkBar, pos);
@@ -126,12 +126,12 @@ class RoundParticipant {
       if (pos != null) {
         addOutstandingAction(OutstandingAction.bar, pos);
       }
-    } else if (card != null) {
-      int? pos = handPile.checkDiscardBar(card);
+    } else if (tile != null) {
+      int? pos = handPile.checkDiscardBar(tile);
       if (pos != null) {
         addOutstandingAction(OutstandingAction.bar, [pos]);
       }
-      pos = handPile.checkTouch(card);
+      pos = handPile.checkTouch(tile);
       if (pos != null) {
         addOutstandingAction(OutstandingAction.touch, [pos]);
       }
@@ -145,21 +145,19 @@ class RoundParticipant {
   }
 
   /// 碰牌,owner碰pos位置，sender打出的card牌
-  bool _touch(int owner, int pos, int sender, Tile card) {
+  bool _touch(int owner, int pos, int sender, Tile tile) {
     if (index == owner) {
-      return handPile.touch(pos, card);
+      return handPile.touch(pos, tile);
     }
 
     return true;
   }
 
-  /// 杠牌，分成打牌杠牌sendBar和摸牌杠牌takeBar
-  /// card和sender不为空，则是_sendBar
-  /// 否则是_takeBar
-  Tile? _bar(int owner, int pos, {Tile? card, int? sender}) {
+  /// 杠牌，分成打牌杠牌_discardBar和摸牌杠牌_drawBar
+  Tile? _bar(int owner, int pos, {Tile? tile, int? discard}) {
     if (index == owner) {
-      if (sender != null) {
-        return _discardBar(owner, pos, card!, sender);
+      if (discard != null) {
+        return _discardBar(owner, pos, tile!, discard);
       } else {
         return _drawBar(owner, pos);
       }
@@ -169,9 +167,9 @@ class RoundParticipant {
   }
 
   /// 打牌杠牌，分成打牌杠牌sendBar和摸牌杠牌takeBar
-  Tile? _discardBar(int owner, int pos, Tile card, int sender) {
+  Tile? _discardBar(int owner, int pos, Tile tile, int discard) {
     if (index == owner) {
-      Tile? c = handPile.discardBar(pos, card, sender);
+      Tile? c = handPile.discardBar(pos, tile, discard);
       if (c != null) {
         addEarnedAction(OutstandingAction.bar, [pos]);
       }
@@ -214,9 +212,9 @@ class RoundParticipant {
   }
 
   /// 吃牌，owner在pos位置吃上家的牌card
-  Tile? _chow(int owner, int pos, Tile card) {
+  Tile? _chow(int owner, int pos, Tile tile) {
     if (index == owner) {
-      Tile? c = handPile.chow(pos, card);
+      Tile? c = handPile.chow(pos, tile);
 
       return c;
     }
@@ -224,26 +222,25 @@ class RoundParticipant {
     return null;
   }
 
-  WinType? _checkWin(int owner, Tile card) {
+  WinType? _checkWin(int owner, Tile tile) {
     if (index == owner) {
-      return handPile.checkWin(tile: card);
+      return handPile.checkWin(tile: tile);
     }
 
     return null;
   }
 
   /// 胡牌，owner胡participantState中的可胡的牌形,pos表示可胡牌形数组的位置
-  WinType? _complete(int owner, int complete) {
+  WinType? _win(int owner, int win) {
     if (index == owner) {
-      Set<int>? completes = outstandingActions[OutstandingAction.win];
-      if (completes != null && completes.isNotEmpty) {
-        WinType? completeType =
-            NumberUtil.toEnum(WinType.values, complete);
-        if (completeType != null) {
-          logger.i('complete:$completeType');
+      Set<int>? wins = outstandingActions[OutstandingAction.win];
+      if (wins != null && wins.isNotEmpty) {
+        WinType? winType = NumberUtil.toEnum(WinType.values, win);
+        if (winType != null) {
+          logger.i('win:$winType');
         }
 
-        return completeType;
+        return winType;
       }
     }
 
@@ -254,7 +251,7 @@ class RoundParticipant {
   _pass(int owner) {
     if (index == owner) {
       outstandingActions.clear();
-      if (handPile.drawTileType == DealCardType.sea) {
+      if (handPile.drawTileType == DealTileType.sea) {
         round.room.onRoomEvent(RoomEvent(round.room.name,
             roundId: round.id,
             owner: round.room.next(owner),
@@ -266,22 +263,22 @@ class RoundParticipant {
   /// 摸牌，有三种摸牌，普通的自摸，海底捞的自摸，杠上自摸
   /// owner摸到card牌，takeCardType表示摸牌的方式
   Map<OutstandingAction, Set<int>>? _deal(
-      int owner, Tile card, int takeCardTypeIndex) {
-    DealCardType? takeCardType =
-        NumberUtil.toEnum(DealCardType.values, takeCardTypeIndex);
-    if (takeCardType == null) {
+      int owner, Tile tile, int dealTileTypeIndex) {
+    DealTileType? dealTileType =
+        NumberUtil.toEnum(DealTileType.values, dealTileTypeIndex);
+    if (dealTileType == null) {
       return null;
     }
     if (index == owner) {
       if (handPile.drawTile != null) {
-        logger.e('take card is not null');
+        logger.e('draw tile is not null');
       }
-      handPile.drawTile = card;
-      handPile.drawTileType = takeCardType;
+      handPile.drawTile = tile;
+      handPile.drawTileType = dealTileType;
 
       /// 检查摸到的牌，看需要采取的动作，这里其实只需要摸牌检查
       Map<OutstandingAction, Set<int>> outstandingActions =
-          _check(card: card, takeCardType: takeCardType);
+          _check(tile: tile, dealTileType: dealTileType);
       if (outstandingActions.isNotEmpty) {
         roomController.mahjongFlameGame.loadActionArea();
       }
@@ -293,18 +290,17 @@ class RoundParticipant {
   }
 
   /// 抢杠胡牌，owner抢src的明杠牌card胡牌
-  WinType? _rob(int owner, int pos, Tile card, int src) {
+  WinType? _rob(int owner, int pos, Tile tile, int src) {
     if (index == owner) {
-      Set<int>? completes = outstandingActions[OutstandingAction.win];
-      if (completes != null && completes.isNotEmpty) {
-        if (completes.contains(pos)) {
-          WinType? completeType =
-              NumberUtil.toEnum(WinType.values, pos);
-          if (completeType != null) {
-            logger.i('complete:$completeType');
+      Set<int>? wins = outstandingActions[OutstandingAction.win];
+      if (wins != null && wins.isNotEmpty) {
+        if (wins.contains(pos)) {
+          WinType? winType = NumberUtil.toEnum(WinType.values, pos);
+          if (winType != null) {
+            logger.i('win:$winType');
           }
 
-          return completeType;
+          return winType;
         }
       }
     }
@@ -320,8 +316,8 @@ class RoundParticipant {
     switch (roomEvent.action) {
       case RoomEventAction.deal:
         return _deal(roomEvent.owner, roomEvent.tile!, roomEvent.pos!);
-      case RoomEventAction.barTake:
-        if (DealCardType.bar.index == roomEvent.pos) {
+      case RoomEventAction.barDeal:
+        if (DealTileType.bar.index == roomEvent.pos) {
           return _deal(roomEvent.owner, roomEvent.tile!, roomEvent.pos!);
         }
         break;
@@ -332,7 +328,7 @@ class RoundParticipant {
             roomEvent.owner, roomEvent.pos!, roomEvent.src!, roomEvent.tile!);
       case RoomEventAction.bar:
         return _bar(roomEvent.owner, roomEvent.pos!,
-            card: roomEvent.tile, sender: roomEvent.src);
+            tile: roomEvent.tile, discard: roomEvent.src);
       case RoomEventAction.discardBar:
         return _discardBar(
             roomEvent.owner, roomEvent.pos!, roomEvent.tile!, roomEvent.src!);
@@ -343,11 +339,11 @@ class RoundParticipant {
       case RoomEventAction.chow:
         return _chow(roomEvent.owner, roomEvent.pos!, roomEvent.tile!);
       case RoomEventAction.check:
-        return _check(card: roomEvent.tile);
+        return _check(tile: roomEvent.tile);
       case RoomEventAction.checkWin:
         return _checkWin(roomEvent.owner, roomEvent.tile!);
       case RoomEventAction.win:
-        return _complete(roomEvent.owner, roomEvent.pos!);
+        return _win(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.pass:
         return _pass(roomEvent.owner);
       case RoomEventAction.rob:

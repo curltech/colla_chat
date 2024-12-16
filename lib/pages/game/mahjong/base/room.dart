@@ -36,7 +36,7 @@ enum RoomEventAction {
   room, //新房间
   round, //新局
   deal, //发牌
-  barTake, //杠上发牌
+  barDeal, //杠上发牌
   discard, //打牌
   touch, //碰牌
   bar, //杠牌：包括sendBar和takeBar

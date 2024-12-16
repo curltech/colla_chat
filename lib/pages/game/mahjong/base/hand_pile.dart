@@ -16,7 +16,7 @@ class HandPile extends Pile {
   /// 刚摸进的牌
   Tile? drawTile;
 
-  DealCardType? drawTileType;
+  DealTileType? drawTileType;
 
   HandPile({super.tiles});
 
@@ -43,7 +43,7 @@ class HandPile extends Pile {
     drawTile =
         json['drawTile'] != null ? Tile.fromJson(json['drawTile']) : null;
     drawTileType = json['drawTileType'] != null
-        ? StringUtil.enumFromString(DealCardType.values, json['drawTile'])
+        ? StringUtil.enumFromString(DealTileType.values, json['drawTile'])
         : null;
   }
 

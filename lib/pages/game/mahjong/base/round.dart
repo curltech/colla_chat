@@ -18,7 +18,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/number_util.dart';
 
 /// 摸牌的类型：自摸牌，杠上牌，海底捞
-enum DealCardType { self, bar, sea }
+enum DealTileType { self, bar, sea }
 
 /// 每一轮，每轮有四个轮参与者
 class Round {
@@ -53,8 +53,8 @@ class Round {
   Tile? discardTile;
 
   /// 同圈放弃的胡牌
-  // int? discard;
-  // Tile? discardTile;
+  int? discardWin;
+  Tile? discardWinTile;
 
   int? robber;
   Tile? robCard;
@@ -114,7 +114,7 @@ class Round {
   }
 
   init() {
-    List<Tile> stockCards = [
+    List<Tile> stockTiles = [
       ...fullPile.tiles,
       ...fullPile.tiles,
       ...fullPile.tiles,
@@ -125,15 +125,15 @@ class Round {
 
     /// 牌的总数是136
     for (int i = 0; i < 136; ++i) {
-      int pos = random.nextInt(stockCards.length);
-      Tile card = stockCards.removeAt(pos);
+      int pos = random.nextInt(stockTiles.length);
+      Tile tile = stockTiles.removeAt(pos);
 
       /// 每个参与者发13张牌
       if (i < 52) {
         int reminder = (i + banker) % 4;
-        roundParticipants[reminder].handPile.tiles.add(card);
+        roundParticipants[reminder].handPile.tiles.add(tile);
       } else {
-        stockPile!.tiles.add(card);
+        stockPile!.tiles.add(tile);
       }
     }
 
@@ -204,9 +204,9 @@ class Round {
       return null;
     }
 
-    DealCardType dealCardType = DealCardType.self;
+    DealTileType dealCardType = DealTileType.self;
     if (isSeaTake) {
-      dealCardType = DealCardType.sea;
+      dealCardType = DealTileType.sea;
     }
     Tile tile = stockPile!.tiles.removeLast();
     logger.w(
@@ -309,7 +309,7 @@ class Round {
   }
 
   /// 杠牌发牌
-  Tile? _barTake(int owner, {int? receiver}) {
+  Tile? _barDeal(int owner, {int? receiver}) {
     if (stockPile == null || stockPile!.tiles.isEmpty) {
       return null;
     }
@@ -326,9 +326,9 @@ class Round {
     roundParticipant.onRoomEvent(RoomEvent(room.name,
         roundId: id,
         owner: owner,
-        action: RoomEventAction.barTake,
+        action: RoomEventAction.barDeal,
         tile: card,
-        pos: DealCardType.bar.index));
+        pos: DealTileType.bar.index));
     for (int i = 0; i < roundParticipants.length; ++i) {
       if (i != owner) {
         roundParticipant = roundParticipants[i];
@@ -337,7 +337,7 @@ class Round {
             owner: owner,
             action: RoomEventAction.deal,
             tile: card,
-            pos: DealCardType.bar.index));
+            pos: DealTileType.bar.index));
       }
     }
 
@@ -456,7 +456,7 @@ class Round {
       return null;
     }
 
-    _barTake(owner);
+    _barDeal(owner);
 
     return null;
   }
@@ -503,7 +503,7 @@ class Round {
             pos: pos));
       }
     }
-    _barTake(owner);
+    _barDeal(owner);
 
     return card;
   }
@@ -554,11 +554,11 @@ class Round {
     if (robber != null && robCard != null) {
       roundParticipant.score.value += baseScore * 3;
       roundParticipants[robber!].score.value -= baseScore * 3;
-    } else if (roundParticipant.handPile.drawTileType == DealCardType.bar ||
-        roundParticipant.handPile.drawTileType == DealCardType.sea) {
+    } else if (roundParticipant.handPile.drawTileType == DealTileType.bar ||
+        roundParticipant.handPile.drawTileType == DealTileType.sea) {
       baseScore = baseScore * 2;
       roundParticipant.score.value += baseScore * 3;
-    } else if (roundParticipant.handPile.drawTileType == DealCardType.self) {
+    } else if (roundParticipant.handPile.drawTileType == DealTileType.self) {
       roundParticipant.score.value += baseScore * 3;
     } else {
       roundParticipant.score.value += baseScore;
@@ -674,8 +674,8 @@ class Round {
       case RoomEventAction.bar:
         returnValue =
             _bar(roomEvent.owner, roomEvent.pos!, receiver: roomEvent.receiver);
-      case RoomEventAction.barTake:
-        returnValue = _barTake(roomEvent.owner, receiver: roomEvent.receiver);
+      case RoomEventAction.barDeal:
+        returnValue = _barDeal(roomEvent.owner, receiver: roomEvent.receiver);
       case RoomEventAction.touch:
         returnValue = _touch(
             roomEvent.owner, roomEvent.pos!, roomEvent.src!, roomEvent.tile!,
