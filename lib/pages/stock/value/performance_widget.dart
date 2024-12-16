@@ -306,7 +306,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
   _onOk(Map<String, dynamic> values) async {
     performanceDataPageController.reset();
 
-    String? securityCode = values['securityCode'];
+    String? securityCode = values['tsCode'];
     String? startDate = values['startDate'];
     _refresh(
       securityCode: securityCode,
