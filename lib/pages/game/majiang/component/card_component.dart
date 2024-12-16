@@ -140,8 +140,7 @@ class CardComponent extends PositionComponent
             'roundParticipant:${roundParticipant.index} cannot send card,${roundParticipant.handCount}');
         return;
       }
-      HandPile handPile =
-          currentRound.roundParticipants[participantDirection.index].handPile;
+      HandPile handPile = roundParticipant.handPile;
       if (handPile.takeCard == card) {
         room.startRoomEvent(RoomEvent(
           room.name,

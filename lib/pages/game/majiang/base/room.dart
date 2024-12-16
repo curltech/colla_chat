@@ -173,6 +173,8 @@ class Room {
   /// 如果没有人胡牌则庄家不变
   late int banker;
 
+  late int currentParticipant;
+
   /// 胡牌的分数
   Map<CompleteType, int> completeTypeScores = {
     CompleteType.thirteenOne: 300,
@@ -200,6 +202,7 @@ class Room {
   Room.fromJson(Map json)
       : name = json['name'],
         creator = json['creator'],
+        currentParticipant = json['currentParticipant'],
         banker = json['banker'] {
     participants = [];
     if (json['participants'] != null && json['participants'] is List) {
@@ -213,6 +216,7 @@ class Room {
     return {
       'name': name,
       'creator': creator,
+      'currentParticipant': currentParticipant,
       'banker': banker,
       'participants': JsonUtil.toJson(participants),
     };
@@ -235,6 +239,7 @@ class Room {
       participants.add(participant);
       if (myself.peerId == participant.peerId) {
         creator = i;
+        currentParticipant = i;
         banker = i;
       }
     }

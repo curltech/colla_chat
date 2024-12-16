@@ -288,8 +288,8 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
     Widget formInputWidget = Container(
         padding: const EdgeInsets.all(10.0),
         child: FormInputWidget(
-          height: appDataProvider.portraitSize.height * 0.2,
-          spacing: 5.0,
+          height: appDataProvider.portraitSize.height * 0.22,
+          spacing: 10.0,
           controller: searchController,
           formButtons: formButtonDefs,
         ));

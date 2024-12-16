@@ -1,3 +1,4 @@
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
@@ -8,6 +9,9 @@ class SpeechToTextUtil {
     void Function(SpeechRecognitionError)? onError,
     void Function(String)? onStatus,
   }) async {
+    if (platformParams.windows || platformParams.linux) {
+      throw 'Not supported platform';
+    }
     SpeechToText speech = SpeechToText();
     bool available =
         await speech.initialize(onStatus: onStatus, onError: onError);

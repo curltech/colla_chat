@@ -336,29 +336,19 @@ class _FormInputWidgetState extends State<FormInputWidget> {
   Widget _buildFormSwiper(BuildContext context) {
     List<Widget> views = _buildFormViews(context);
     if (views.length > 1) {
-      return SizedBox(
-          height: widget.height, //最大高度
-          width: widget.width,
-          child: Swiper(
-            controller: SwiperController(),
-            itemCount: views.length,
-            index: 0,
-            itemBuilder: (BuildContext context, int index) {
-              return views[index];
-            },
-            onIndexChanged: (int index) {
-              logger.i('changed to index $index');
-            },
-            // pagination: SwiperPagination(
-            //     builder: DotSwiperPaginationBuilder(
-            //   activeColor: myself.primary,
-            //   color: Colors.white,
-            //   activeSize: 15,
-            // )),
-          ));
+      return Swiper(
+        controller: SwiperController(),
+        itemCount: views.length,
+        index: 0,
+        itemBuilder: (BuildContext context, int index) {
+          return views[index];
+        },
+        onIndexChanged: (int index) {
+          logger.i('changed to index $index');
+        },
+      );
     } else if (views.length == 1) {
-      return SizedBox(
-          height: widget.height, width: widget.width, child: views[0]);
+      return views[0];
     } else {
       return nil;
     }
@@ -368,13 +358,16 @@ class _FormInputWidgetState extends State<FormInputWidget> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
         builder: (BuildContext context, Widget? child) {
-      return Column(children: [
-        Expanded(child: _buildFormSwiper(context)),
-        SizedBox(
-          height: widget.buttonSpacing,
-        ),
-        _buildButtonBar(context),
-      ]);
+      return SizedBox(
+          height: widget.height,
+          width: widget.width,
+          child: Column(children: [
+            Expanded(child: _buildFormSwiper(context)),
+            SizedBox(
+              height: widget.buttonSpacing,
+            ),
+            _buildButtonBar(context),
+          ]));
     }, create: (BuildContext context) {
       return widget.controller;
     });

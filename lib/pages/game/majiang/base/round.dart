@@ -197,8 +197,9 @@ class Round {
   Card? _take(int owner, Card card, int takeCardTypeIndex, {int? receiver}) {
     sender = null;
     sendCard = null;
-    if (receiver == null) {
-      RoundParticipant roundParticipant = roundParticipants[owner];
+    RoundParticipant roundParticipant = roundParticipants[owner];
+    bool robot = roundParticipant.participant.robot;
+    if (!robot) {
       RoomEvent roomEvent = RoomEvent(room.name,
           roundId: id,
           owner: owner,
@@ -223,8 +224,11 @@ class Round {
     RoundParticipant roundParticipant = roundParticipants[owner];
     RoomEvent roomEvent = RoomEvent(room.name,
         roundId: id, owner: owner, action: RoomEventAction.send, card: card);
-    Map<OutstandingAction, Set<int>>? outstandingActions =
-        roundParticipant.onRoomEvent(roomEvent);
+    Map<OutstandingAction, Set<int>>? outstandingActions;
+    bool robot = roundParticipant.participant.robot;
+    if (!robot) {
+      outstandingActions = roundParticipant.onRoomEvent(roomEvent);
+    }
 
     /// 没有receiver，不是消息事件，creator发送事件消息给其他参与者，或者发送消息事件给creator
     /// 有receiver，是消息事件，receiver是creator发送事件消息给其他参与者，否则不发送消息
@@ -574,21 +578,29 @@ class Round {
                 subMessageType: ChatMessageSubType.majiang,
                 content: roomEvent);
             if (roundParticipant.participant.robot) {
+              logger
+                  .w('round:$id has robot sent event:${roomEvent.toString()}');
               roomPool.onRoomEvent(chatMessage);
             } else {
+              logger.w(
+                  'round:$id has no robot sent event:${roomEvent.toString()}');
               roomPool.send(chatMessage);
             }
           }
         }
       }
     } else {
+      roomEvent.sender = roomEvent.owner;
+      roomEvent.receiver = room.creator;
       ChatMessage chatMessage = await chatMessageService.buildChatMessage(
           receiverPeerId: roundParticipants[room.creator].participant.peerId,
           subMessageType: ChatMessageSubType.majiang,
           content: roomEvent);
-      if (roundParticipants[room.creator].participant.robot) {
+      if (roundParticipants[roomEvent.owner].participant.robot) {
+        logger.w('round:$id has robot sent event:${roomEvent.toString()}');
         roomPool.onRoomEvent(chatMessage);
       } else {
+        logger.w('round:$id has no robot sent event:${roomEvent.toString()}');
         roomPool.send(chatMessage);
       }
     }
