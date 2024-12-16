@@ -12,7 +12,7 @@ import 'package:colla_chat/p2p/chain/action/chat.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/conference_chat_message_controller.dart';
-import 'package:colla_chat/pages/game/majiang/base/room_pool.dart';
+import 'package:colla_chat/pages/game/mahjong/base/room_pool.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -253,7 +253,7 @@ class GlobalChatMessage {
       case ChatMessageSubType.updateSubscript:
         await channelChatMessageService.receiveUpdateSubscript(chatMessage);
         break;
-      case ChatMessageSubType.majiang:
+      case ChatMessageSubType.mahjong:
         await roomPool.onRoomEvent(chatMessage);
         break;
       default:

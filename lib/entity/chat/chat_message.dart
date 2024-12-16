@@ -90,7 +90,7 @@ enum ChatMessageSubType {
   // 以下system消息，不在聊天界面显示
   signal, //webrtc signal消息，一般用于重新协商的情况
   preKeyBundle, //signal加解密
-  majiang, //麻将消息
+  mahjong, //麻将消息
 }
 
 enum MessageStatus {
