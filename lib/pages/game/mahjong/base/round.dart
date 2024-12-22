@@ -193,7 +193,7 @@ class Round {
   }
 
   /// creator发牌，只能是creator才能执行，把牌发给owner
-  Tile? deal(int owner) {
+  Future<Tile?> deal(int owner) async {
     if (!isCreator) {
       logger.e('owner:$owner deal tile failure, not creator');
       return null;
@@ -219,7 +219,7 @@ class Round {
         tile: tile,
         pos: dealTileType.index);
 
-    return onRoomEvent(roomEvent);
+    return await onRoomEvent(roomEvent);
   }
 
   /// 收到发的牌tile
