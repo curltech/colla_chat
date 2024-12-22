@@ -379,7 +379,7 @@ class Room {
       /// 第一张发牌给banker
       Tile? tile = round.deal(banker);
       if (tile != null) {
-        logger.w('deal tile:${tile.toString()} to $banker');
+        logger.w('first deal tile:${tile.toString()} to $banker');
       }
     } else {
       int? roundId = roomEvent.roundId;
