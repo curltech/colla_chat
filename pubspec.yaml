@@ -488,8 +488,8 @@ flutter:
     - assets/images/
     - assets/images/bg/
     - assets/images/email/
-    - assets/images/majiang/
-    - assets/images/majiang/card/
+    - assets/images/mahjong/
+    - assets/images/mahjong/tile/
     - assets/images/poker/
     - assets/medias/
 
