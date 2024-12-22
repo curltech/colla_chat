@@ -145,7 +145,7 @@ class Round {
 
   /// stockPile不为空，则是creator
   bool get isCreator {
-    return stockPile != null;
+    return room.creator == room.currentParticipant && stockPile != null;
   }
 
   RoundParticipant getRoundParticipant(
@@ -193,31 +193,33 @@ class Round {
   }
 
   /// creator发牌，只能是creator才能执行，把牌发给owner
-  RoomEvent? deal(int owner, {int? receiver}) {
-    if (stockPile == null) {
-      logger.e('owner:$owner take card failure, not creator');
+  Tile? deal(int owner) {
+    if (!isCreator) {
+      logger.e('owner:$owner deal tile failure, not creator');
       return null;
     }
     Tile? first = stockPile!.tiles.firstOrNull;
     if (first == null) {
-      logger.e('owner:$owner take card failure, stockPile is empty');
+      logger.e('owner:$owner deal tile failure, stockPile is empty');
       return null;
     }
 
-    DealTileType dealCardType = DealTileType.self;
+    DealTileType dealTileType = DealTileType.self;
     if (isSeaTake) {
-      dealCardType = DealTileType.sea;
+      dealTileType = DealTileType.sea;
     }
     Tile tile = stockPile!.tiles.removeLast();
     logger.w(
         'deal tile ${tile.toString()}, leave ${stockPile!.tiles.length} tiles');
 
-    return RoomEvent(room.name,
+    RoomEvent roomEvent = RoomEvent(room.name,
         roundId: id,
         owner: owner,
         action: RoomEventAction.deal,
         tile: tile,
-        pos: dealCardType.index);
+        pos: dealTileType.index);
+
+    return onRoomEvent(roomEvent);
   }
 
   /// 收到发的牌tile

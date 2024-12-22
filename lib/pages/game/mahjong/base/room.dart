@@ -377,9 +377,9 @@ class Room {
       }
 
       /// 第一张发牌给banker
-      RoomEvent? event = round.deal(banker);
-      if (event != null) {
-        onRoomEvent(event);
+      Tile? tile = round.deal(banker);
+      if (tile != null) {
+        logger.w('deal tile:${tile.toString()} to $banker');
       }
     } else {
       int? roundId = roomEvent.roundId;
