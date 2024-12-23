@@ -221,11 +221,32 @@ class NodeRelationshipComponent extends PositionComponent
   }
 
   void _drawLine(Path path, List<Vector2> vertices) {
-    for (int i = 0; i < vertices.length; ++i) {
-      Vector2 point = vertices[i];
-      if (i == 0) {
-        path.moveTo(point.x, point.y);
-      } else {
+    if (vertices.isEmpty) {
+      return;
+    }
+    Vector2 point0 = vertices[0];
+    path.moveTo(point0.x, point0.y);
+
+    /// 贝塞尔曲线
+    if (vertices.length == 2) {
+      /// 直线
+      Vector2 point1 = vertices[1];
+      path.lineTo(point1.x, point1.y);
+    } else if (vertices.length == 3) {
+      /// 二次贝塞尔曲线
+      Vector2 point1 = vertices[1];
+      Vector2 point2 = vertices[2];
+      path.quadraticBezierTo(point1.x, point1.y, point2.x, point2.y);
+    } else if (vertices.length == 4) {
+      /// 三次贝塞尔曲线
+      Vector2 point1 = vertices[1];
+      Vector2 point2 = vertices[2];
+      Vector2 point3 = vertices[3];
+      path.cubicTo(point1.x, point1.y, point2.x, point2.y, point3.x, point3.y);
+    } else {
+      /// 折线
+      for (int i = 1; i < vertices.length; ++i) {
+        Vector2 point = vertices[i];
         path.lineTo(point.x, point.y);
       }
     }

@@ -38,7 +38,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
   String get routeName => 'mahjong_18m';
 
   @override
-  IconData get iconData => Icons.model_training_outlined;
+  IconData get iconData => Icons.diamond_outlined;
 
   @override
   String get title => 'Mahjong 18m';
