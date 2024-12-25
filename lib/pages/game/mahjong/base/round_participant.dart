@@ -103,6 +103,7 @@ class RoundParticipant {
   /// 检查行为状态，既包括摸牌检查，也包含打牌检查
   Map<OutstandingAction, Set<int>> _check(
       {Tile? tile, DealTileType? dealTileType}) {
+    logger.w('$index check tile ${tile.toString()}}');
     outstandingActions.clear();
     if (dealTileType == DealTileType.sea) {
       WinType? winType = handPile.checkWin(tile: tile);
@@ -311,8 +312,8 @@ class RoundParticipant {
   /// 分发房间来的事件，处理各参与者该自己处理的部分
   dynamic onRoomEvent(RoomEvent roomEvent) {
     roomEvents.add(roomEvent);
-    logger.w(
-        'round participant:$index has received event:${roomEvent.toString()}');
+    // logger.w(
+    //     'round participant:$index has received event:${roomEvent.toString()}');
     switch (roomEvent.action) {
       case RoomEventAction.deal:
         return _deal(roomEvent.owner, roomEvent.tile!, roomEvent.pos!);

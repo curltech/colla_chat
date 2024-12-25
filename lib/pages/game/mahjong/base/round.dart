@@ -224,6 +224,7 @@ class Round {
 
   /// 收到发的牌tile
   Tile? _deal(int owner, Tile tile, int dealTileTypeIndex, {int? receiver}) {
+    logger.w('$receiver receive $owner deal tile ${tile.toString()}');
     discard = null;
     discardTile = null;
     int executor = (receiver ?? owner);
@@ -262,8 +263,11 @@ class Round {
 
   /// 打牌，每个参与者都要执行一次
   /// owner表示打牌的参与者，receiver代表接收到事件的参与者
-  Map<OutstandingAction, Set<int>>? _discard(int owner, Tile tile,
-      {int? receiver}) {
+  /// 返回值是true，表示打的牌没有需要等待的处理，可以发牌
+  /// 否则，表示有需要等待的处理
+  bool _discard(int owner, Tile tile, {int? receiver}) {
+    logger.w('$owner discard tile ${tile.toString()} to $receiver}');
+
     /// 打牌的参与者执行事件处理
     discard = owner;
     discardTile = tile;
@@ -271,6 +275,11 @@ class Round {
     RoundParticipant roundParticipant;
     int? sender;
     List<int>? receivers;
+    RoomEvent discardRoomEvent = RoomEvent(room.name,
+        roundId: id, owner: owner, action: RoomEventAction.discard, tile: tile);
+    RoomEvent checkRoomEvent = RoomEvent(room.name,
+        roundId: id, owner: owner, action: RoomEventAction.check, tile: tile);
+    bool pass = true;
     if (receiver == null) {
       /// receiver为空，事件初次触发
       if (owner == room.creator) {
@@ -281,7 +290,16 @@ class Round {
         for (int i = 0; i < roundParticipants.length; ++i) {
           if (room.creator != i) {
             receivers.add(i);
+            Map<OutstandingAction, Set<int>>? outstandingActions =
+                roundParticipants[i].onRoomEvent(checkRoomEvent);
+            if (outstandingActions != null && outstandingActions.isNotEmpty) {
+              pass = false;
+              addOutstandingRoomEvent(discardRoomEvent.id, [i]);
+            }
           }
+        }
+        if (pass) {
+          deal(room.next(owner));
         }
       } else {
         /// 事件的触发者不是creator，检查，发消息给creator，1个消息，不等待事件
@@ -291,33 +309,37 @@ class Round {
       }
     } else {
       /// receiver不为空，事件是消息触发
-      if (owner == room.creator) {
+      if (receiver == room.creator) {
         /// 事件消息的接收者是creator，检查，发消息给其他参与者，2个消息，等待2个事件
         roundParticipant = roundParticipants[receiver];
         sender = room.creator;
         receivers = [];
+
         for (int i = 0; i < roundParticipants.length; ++i) {
-          if (room.creator != i || owner != i) {
-            receivers.add(i);
+          if (owner != i) {
+            if (room.creator != i) {
+              receivers.add(i);
+            }
+            Map<OutstandingAction, Set<int>>? outstandingActions =
+                roundParticipants[i].onRoomEvent(checkRoomEvent);
+            if (outstandingActions != null && outstandingActions.isNotEmpty) {
+              pass = false;
+              addOutstandingRoomEvent(discardRoomEvent.id, [i]);
+            }
           }
+        }
+        if (pass) {
+          deal(room.next(owner));
         }
       } else {
         /// 事件消息的接收者不是creator，检查，不发消息
         roundParticipant = roundParticipants[receiver];
       }
     }
-    RoomEvent discardRoomEvent = RoomEvent(room.name,
-        roundId: id, owner: owner, action: RoomEventAction.discard, tile: tile);
-    RoomEvent checkRoomEvent = RoomEvent(room.name,
-        roundId: id, owner: owner, action: RoomEventAction.check, tile: tile);
+
     bool robot = roundParticipant.participant.robot;
     if (!robot) {
       roundParticipant.onRoomEvent(discardRoomEvent);
-    }
-    Map<OutstandingAction, Set<int>>? outstandingActions =
-        roundParticipant.onRoomEvent(checkRoomEvent);
-    if (outstandingActions != null) {
-      addOutstandingRoomEvent(discardRoomEvent.id, []);
     }
 
     /// 没有receiver，不是消息事件，creator发送事件消息给其他参与者，或者发送消息事件给creator
@@ -326,7 +348,7 @@ class Round {
       _sendChatMessage(discardRoomEvent, sender, receivers!);
     }
 
-    return outstandingActions;
+    return pass;
   }
 
   /// 杠牌发牌
@@ -649,10 +671,10 @@ class Round {
   /// 作为creator，分发事件消息给其他参与者，不包括事件的原始发送者
   /// 否则，发送消息给creator
   _sendChatMessage(RoomEvent roomEvent, int sender, List<int> receivers) async {
-    for (int i = 0; i < receivers.length; ++i) {
-      RoundParticipant roundParticipant = roundParticipants[i];
+    for (int receiver in receivers) {
+      RoundParticipant roundParticipant = roundParticipants[receiver];
       roomEvent.sender = sender;
-      roomEvent.receiver = i;
+      roomEvent.receiver = receiver;
       if (roomEvent.sender != roomEvent.receiver) {
         ChatMessage chatMessage = await chatMessageService.buildChatMessage(
             receiverPeerId: roundParticipant.participant.peerId,
@@ -679,7 +701,7 @@ class Round {
   /// 假如自己是creator，则处理事件，然后转发事件消息到其他参与者
   /// 假如自己不是creator，则不发送事件消息
   dynamic onRoomEvent(RoomEvent roomEvent) async {
-    logger.w('round:$id has received event:${roomEvent.toString()}');
+    // logger.w('round:$id has received event:${roomEvent.toString()}');
     dynamic returnValue;
 
     RoomEventAction? action = roomEvent.action;

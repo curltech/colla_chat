@@ -379,7 +379,7 @@ class Room {
       /// 第一张发牌给banker
       Tile? tile = await round.deal(banker);
       if (tile != null) {
-        logger.w('first deal tile:${tile.toString()} to $banker');
+        // logger.w('first deal tile:${tile.toString()} to $banker');
       }
     } else {
       int? roundId = roomEvent.roundId;
@@ -399,7 +399,7 @@ class Room {
   /// 房间的事件
   /// 直接调用round的事件处理器，不会进行事件分发到其他参与者
   dynamic onRoomEvent(RoomEvent roomEvent) async {
-    logger.w('room:$name has received event:${roomEvent.toString()}');
+    // logger.w('room:$name has received event:${roomEvent.toString()}');
     dynamic returnValue;
     if (roomEvent.action == RoomEventAction.round) {
       String? content = roomEvent.content;

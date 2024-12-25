@@ -66,7 +66,9 @@ class Tile {
 
   @override
   String toString() {
-    if (suit == Suit.wind && windSuit != null) {
+    if (suit == Suit.none) {
+      return Suit.none.name;
+    } else if (suit == Suit.wind && windSuit != null) {
       return windSuit!.name;
     } else if (rank != null) {
       return '${suit.name}$rank';

@@ -31,6 +31,7 @@ class FullPile extends Pile {
       tiles.add(tile);
       _tileMap[tile.toString()] = tile;
     }
+    _tileMap[unknownTile.toString()] = unknownTile;
   }
 
   Tile? operator [](String key) {
