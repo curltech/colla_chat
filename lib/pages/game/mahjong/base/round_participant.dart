@@ -103,7 +103,7 @@ class RoundParticipant {
   /// 检查行为状态，既包括摸牌检查，也包含打牌检查
   Map<OutstandingAction, Set<int>> _check(
       {Tile? tile, DealTileType? dealTileType}) {
-    logger.w('$index check tile ${tile.toString()}}');
+    logger.w('$index check tile ${tile.toString()}');
     outstandingActions.clear();
     if (dealTileType == DealTileType.sea) {
       WinType? winType = handPile.checkWin(tile: tile);
