@@ -193,7 +193,7 @@ class Round {
   }
 
   /// creator发牌，只能是creator才能执行，把牌发给owner
-  Future<Tile?> deal(int owner) async {
+  Tile? deal(int owner) {
     if (!isCreator) {
       logger.e('owner:$owner deal tile failure, not creator');
       return null;
@@ -212,14 +212,7 @@ class Round {
     logger.w(
         'deal tile ${tile.toString()}, leave ${stockPile!.tiles.length} tiles');
 
-    RoomEvent roomEvent = RoomEvent(room.name,
-        roundId: id,
-        owner: owner,
-        action: RoomEventAction.deal,
-        tile: tile,
-        pos: dealTileType.index);
-
-    return await onRoomEvent(roomEvent);
+    return _deal(owner, tile, dealTileType.index);
   }
 
   /// 收到发的牌tile
