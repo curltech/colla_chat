@@ -229,31 +229,30 @@ class Round {
     discardTile = null;
     int executor = (receiver ?? owner);
     RoundParticipant roundParticipant = roundParticipants[executor];
-    bool robot = roundParticipant.participant.robot;
-    if (!robot) {
-      RoomEvent tileRoomEvent = RoomEvent(room.name,
-          roundId: id,
-          owner: owner,
-          action: RoomEventAction.deal,
-          tile: tile,
-          pos: dealTileTypeIndex);
-      roundParticipant.onRoomEvent(tileRoomEvent);
-      RoomEvent unknownRoomEvent = RoomEvent(room.name,
-          roundId: id,
-          owner: owner,
-          action: RoomEventAction.deal,
-          tile: unknownTile,
-          pos: dealTileTypeIndex);
-      if (receiver == null) {
-        for (int i = 0; i < roundParticipants.length; ++i) {
-          if (i == room.creator) {
-            continue;
-          }
-          if (i == owner) {
-            _sendChatMessage(tileRoomEvent, room.creator, [owner]);
-          } else {
-            _sendChatMessage(unknownRoomEvent, room.creator, [i]);
-          }
+
+    roundParticipant.deal(owner, tile, dealTileTypeIndex);
+
+    if (receiver == null) {
+      for (int i = 0; i < roundParticipants.length; ++i) {
+        if (i == room.creator) {
+          continue;
+        }
+        if (i == owner) {
+          RoomEvent tileRoomEvent = RoomEvent(room.name,
+              roundId: id,
+              owner: owner,
+              action: RoomEventAction.deal,
+              tile: tile,
+              pos: dealTileTypeIndex);
+          _sendChatMessage(tileRoomEvent, room.creator, [owner]);
+        } else {
+          RoomEvent unknownRoomEvent = RoomEvent(room.name,
+              roundId: id,
+              owner: owner,
+              action: RoomEventAction.deal,
+              tile: unknownTile,
+              pos: dealTileTypeIndex);
+          _sendChatMessage(unknownRoomEvent, room.creator, [i]);
         }
       }
     }
@@ -277,8 +276,6 @@ class Round {
     List<int>? receivers;
     RoomEvent discardRoomEvent = RoomEvent(room.name,
         roundId: id, owner: owner, action: RoomEventAction.discard, tile: tile);
-    RoomEvent checkRoomEvent = RoomEvent(room.name,
-        roundId: id, owner: owner, action: RoomEventAction.check, tile: tile);
     bool pass = true;
     if (receiver == null) {
       /// receiver为空，事件初次触发
@@ -291,8 +288,8 @@ class Round {
           if (room.creator != i) {
             receivers.add(i);
             Map<OutstandingAction, Set<int>>? outstandingActions =
-                roundParticipants[i].onRoomEvent(checkRoomEvent);
-            if (outstandingActions != null && outstandingActions.isNotEmpty) {
+                roundParticipants[i].check(tile: tile);
+            if (outstandingActions.isNotEmpty) {
               pass = false;
               addOutstandingRoomEvent(discardRoomEvent.id, [i]);
             }
@@ -321,8 +318,8 @@ class Round {
               receivers.add(i);
             }
             Map<OutstandingAction, Set<int>>? outstandingActions =
-                roundParticipants[i].onRoomEvent(checkRoomEvent);
-            if (outstandingActions != null && outstandingActions.isNotEmpty) {
+                roundParticipants[i].check(tile: tile);
+            if (outstandingActions.isNotEmpty) {
               pass = false;
               addOutstandingRoomEvent(discardRoomEvent.id, [i]);
             }
@@ -337,10 +334,7 @@ class Round {
       }
     }
 
-    bool robot = roundParticipant.participant.robot;
-    if (!robot) {
-      roundParticipant.onRoomEvent(discardRoomEvent);
-    }
+    roundParticipant.discard(owner, tile);
 
     /// 没有receiver，不是消息事件，creator发送事件消息给其他参与者，或者发送消息事件给creator
     /// 有receiver，是消息事件，receiver是creator发送事件消息给其他参与者，否则不发送消息
@@ -366,21 +360,11 @@ class Round {
     discard = null;
     discardTile = null;
     RoundParticipant roundParticipant = roundParticipants[owner];
-    roundParticipant.onRoomEvent(RoomEvent(room.name,
-        roundId: id,
-        owner: owner,
-        action: RoomEventAction.barDeal,
-        tile: tile,
-        pos: DealTileType.bar.index));
+    roundParticipant.deal(owner, tile, DealTileType.bar.index);
     for (int i = 0; i < roundParticipants.length; ++i) {
       if (i != owner) {
         roundParticipant = roundParticipants[i];
-        roundParticipant.onRoomEvent(RoomEvent(room.name,
-            roundId: id,
-            owner: owner,
-            action: RoomEventAction.deal,
-            tile: tile,
-            pos: DealTileType.bar.index));
+        roundParticipant.deal(owner, tile, DealTileType.bar.index);
       }
     }
 
@@ -401,8 +385,7 @@ class Round {
     robCard = null;
     for (int i = 0; i < roundParticipants.length; ++i) {
       RoundParticipant roundParticipant = roundParticipants[i];
-      roundParticipant.onRoomEvent(RoomEvent(room.name,
-          roundId: id, owner: owner, action: RoomEventAction.pass));
+      roundParticipant.pass(owner);
     }
 
     bool pass = true;
@@ -425,13 +408,7 @@ class Round {
   bool _touch(int owner, int pos, int src, Tile discardTile, {int? receiver}) {
     for (int i = 0; i < roundParticipants.length; ++i) {
       RoundParticipant roundParticipant = roundParticipants[i];
-      roundParticipant.onRoomEvent(RoomEvent(room.name,
-          roundId: id,
-          owner: owner,
-          action: RoomEventAction.touch,
-          tile: discardTile,
-          src: src,
-          pos: pos));
+      roundParticipant.touch(owner, pos, src, discardTile);
     }
     if (roundParticipants[owner].handPile.touchPiles.length == 4) {
       roundParticipants[owner].packer = discard;
@@ -479,13 +456,7 @@ class Round {
     }
     for (int i = 0; i < roundParticipants.length; ++i) {
       RoundParticipant roundParticipant = roundParticipants[i];
-      roundParticipant.onRoomEvent(RoomEvent(room.name,
-          roundId: id,
-          owner: owner,
-          action: RoomEventAction.bar,
-          src: discard,
-          tile: discardTile,
-          pos: pos));
+      roundParticipant.bar(owner, pos, discard: discard, tile: discardTile);
     }
     if (discard != null) {
       roundParticipants[discard!].wastePile.tiles.removeLast();
@@ -509,11 +480,7 @@ class Round {
     for (int i = 0; i < roundParticipants.length; ++i) {
       if (owner != i) {
         RoundParticipant roundParticipant = roundParticipants[i];
-        WinType? winType = roundParticipant.onRoomEvent(RoomEvent(room.name,
-            roundId: id,
-            owner: owner,
-            action: RoomEventAction.checkWin,
-            tile: tile));
+        WinType? winType = roundParticipant.checkWin(owner, tile);
         if (winType != null) {
           winTypes ??= {};
           winTypes[i] = winType;
@@ -530,19 +497,14 @@ class Round {
   /// 某个参与者暗杠，pos表示杠牌的位置
   Tile? _darkBar(int owner, int pos, {int? receiver}) {
     RoundParticipant roundParticipant = roundParticipants[owner];
-    Tile? tile = roundParticipant.onRoomEvent(RoomEvent(room.name,
-        roundId: id, owner: owner, action: RoomEventAction.darkBar, pos: pos));
+    Tile? tile = roundParticipant.darkBar(owner, pos);
     if (tile == null) {
       return null;
     }
     for (int i = 0; i < roundParticipants.length; ++i) {
       if (owner != i) {
         RoundParticipant roundParticipant = roundParticipants[i];
-        roundParticipant.onRoomEvent(RoomEvent(room.name,
-            roundId: id,
-            owner: owner,
-            action: RoomEventAction.darkBar,
-            pos: pos));
+        roundParticipant.darkBar(owner, pos);
       }
     }
     _barDeal(owner);
@@ -556,23 +518,14 @@ class Round {
       return null;
     }
     RoundParticipant roundParticipant = roundParticipants[owner];
-    Tile? tile = roundParticipant.onRoomEvent(RoomEvent(room.name,
-        roundId: id,
-        owner: owner,
-        action: RoomEventAction.chow,
-        pos: pos,
-        tile: discardTile));
+    Tile? tile = roundParticipant.chow(owner, pos, discardTile!);
     if (tile == null) {
       return tile;
     }
     for (int i = 0; i < roundParticipants.length; ++i) {
       if (owner != i) {
         RoundParticipant roundParticipant = roundParticipants[i];
-        roundParticipant.onRoomEvent(RoomEvent(room.name,
-            roundId: id,
-            owner: owner,
-            action: RoomEventAction.darkBar,
-            pos: pos));
+        roundParticipant.darkBar(owner, pos);
       }
     }
     roundParticipants[discard!].wastePile.tiles.removeLast();
@@ -643,24 +596,14 @@ class Round {
   /// 某个参与者胡牌,pos表示胡牌的类型
   WinType? _win(int owner, int pos, {int? receiver}) {
     RoundParticipant roundParticipant = roundParticipants[owner];
-    WinType? winType = roundParticipant.onRoomEvent(RoomEvent(room.name,
-        roundId: id,
-        owner: owner,
-        action: RoomEventAction.win,
-        pos: pos,
-        tile: discardTile));
+    WinType? winType = roundParticipant.win(owner, pos);
     if (winType == null) {
       return null;
     }
     for (int i = 0; i < roundParticipants.length; ++i) {
       if (owner != i) {
         RoundParticipant roundParticipant = roundParticipants[i];
-        roundParticipant.onRoomEvent(RoomEvent(room.name,
-            roundId: id,
-            owner: owner,
-            action: RoomEventAction.win,
-            pos: pos,
-            tile: discardTile));
+        roundParticipant.win(owner, pos);
       }
     }
     room.banker = owner;

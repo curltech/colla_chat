@@ -184,30 +184,15 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
             mahjongCard.Tile? sendCard = currentRound.discardTile;
             mahjongCard.Tile? takeCard =
                 currentRoundParticipant.handPile.drawTile;
-            Map<OutstandingAction, List<int>> outstandingActions = {};
+            Map<OutstandingAction, Set<int>> outstandingActions;
             if (sendCard != null) {
-              outstandingActions = currentRoundParticipant.onRoomEvent(
-                  RoomEvent(room.name,
-                      roundId: currentRound.id,
-                      owner: currentRoundParticipant.index,
-                      receiver: currentRoundParticipant.index,
-                      action: RoomEventAction.check,
-                      tile: sendCard));
+              outstandingActions =
+                  currentRoundParticipant.check(tile: sendCard);
             } else if (takeCard != null) {
-              outstandingActions = currentRoundParticipant.onRoomEvent(
-                  RoomEvent(room.name,
-                      roundId: currentRound.id,
-                      owner: currentRoundParticipant.index,
-                      receiver: currentRoundParticipant.index,
-                      action: RoomEventAction.check,
-                      tile: takeCard));
+              outstandingActions =
+                  currentRoundParticipant.check(tile: takeCard);
             } else {
-              outstandingActions = currentRoundParticipant.onRoomEvent(
-                  RoomEvent(room.name,
-                      roundId: currentRound.id,
-                      owner: currentRoundParticipant.index,
-                      receiver: currentRoundParticipant.index,
-                      action: RoomEventAction.check));
+              outstandingActions = currentRoundParticipant.check();
             }
             roomController.mahjongFlameGame.reloadSelf();
           },

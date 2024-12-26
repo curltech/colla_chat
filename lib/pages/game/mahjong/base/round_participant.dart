@@ -93,15 +93,49 @@ class RoundParticipant {
     values.addAll(vs);
   }
 
+  /// 摸牌，有三种摸牌，普通的自摸，海底捞的自摸，杠上自摸
+  /// owner摸到card牌，takeCardType表示摸牌的方式
+  Map<OutstandingAction, Set<int>>? deal(
+      int owner, Tile tile, int dealTileTypeIndex) {
+    if (owner != index) {
+      return null;
+    }
+    DealTileType? dealTileType =
+        NumberUtil.toEnum(DealTileType.values, dealTileTypeIndex);
+    if (dealTileType == null) {
+      return null;
+    }
+    if (handPile.drawTile != null) {
+      logger.e('draw tile is not null');
+    }
+    handPile.drawTile = tile;
+    handPile.drawTileType = dealTileType;
+
+    /// 检查摸到的牌，看需要采取的动作，这里其实只需要摸牌检查
+    Map<OutstandingAction, Set<int>> outstandingActions =
+        check(tile: tile, dealTileType: dealTileType);
+    if (outstandingActions.isNotEmpty) {
+      roomController.mahjongFlameGame.loadActionArea();
+    }
+
+    return outstandingActions;
+  }
+
   /// 打牌，owner打出牌card，对其他人检查打的牌是否能够胡牌，杠牌和碰牌，返回检查的结果
-  bool _discard(int owner, Tile card) {
+  bool discard(int owner, Tile card) {
+    if (owner != index) {
+      return false;
+    }
+    if (!canDiscard) {
+      return false;
+    }
     wastePile.tiles.add(card);
 
     return handPile.discard(card);
   }
 
   /// 检查行为状态，既包括摸牌检查，也包含打牌检查
-  Map<OutstandingAction, Set<int>> _check(
+  Map<OutstandingAction, Set<int>> check(
       {Tile? tile, DealTileType? dealTileType}) {
     logger.w('$index check tile ${tile.toString()}');
     outstandingActions.clear();
@@ -145,8 +179,22 @@ class RoundParticipant {
     return outstandingActions.value;
   }
 
+  /// 过牌，owner宣布不做任何操作
+  pass(int owner) {
+    if (index != owner) {
+      return;
+    }
+    outstandingActions.clear();
+    if (handPile.drawTileType == DealTileType.sea) {
+      round.room.onRoomEvent(RoomEvent(round.room.name,
+          roundId: round.id,
+          owner: round.room.next(owner),
+          action: RoomEventAction.deal));
+    }
+  }
+
   /// 碰牌,owner碰pos位置，sender打出的card牌
-  bool _touch(int owner, int pos, int sender, Tile tile) {
+  bool touch(int owner, int pos, int sender, Tile tile) {
     if (index == owner) {
       return handPile.touch(pos, tile);
     }
@@ -155,12 +203,12 @@ class RoundParticipant {
   }
 
   /// 杠牌，分成打牌杠牌_discardBar和摸牌杠牌_drawBar
-  Tile? _bar(int owner, int pos, {Tile? tile, int? discard}) {
+  Tile? bar(int owner, int pos, {Tile? tile, int? discard}) {
     if (index == owner) {
       if (discard != null) {
-        return _discardBar(owner, pos, tile!, discard);
+        return discardBar(owner, pos, tile!, discard);
       } else {
-        return _drawBar(owner, pos);
+        return drawBar(owner, pos);
       }
     }
 
@@ -168,7 +216,7 @@ class RoundParticipant {
   }
 
   /// 打牌杠牌，分成打牌杠牌sendBar和摸牌杠牌takeBar
-  Tile? _discardBar(int owner, int pos, Tile tile, int discard) {
+  Tile? discardBar(int owner, int pos, Tile tile, int discard) {
     if (index == owner) {
       Tile? c = handPile.discardBar(pos, tile, discard);
       if (c != null) {
@@ -185,7 +233,7 @@ class RoundParticipant {
   /// 打牌杠牌的时候sender不为空，表示打牌的参与者
   /// pos表示杠牌的位置,如果摸牌杠牌的时候为手牌杠牌的位置，打牌杠牌的时候是杠牌的位置
   /// 返回值为杠的牌，为空表示未成功
-  Tile? _drawBar(int owner, int pos) {
+  Tile? drawBar(int owner, int pos) {
     if (index == owner) {
       Tile? card = handPile.drawBar(pos, owner);
       if (card != null) {
@@ -199,7 +247,7 @@ class RoundParticipant {
   }
 
   /// 暗杠牌，owner杠手上pos位置已有的四张牌（card==null）或者新进的card（card!=null）
-  Tile? _darkBar(int owner, int pos) {
+  Tile? darkBar(int owner, int pos) {
     if (index == owner) {
       Tile? card = handPile.darkBar(pos, owner);
       if (card != null) {
@@ -213,7 +261,7 @@ class RoundParticipant {
   }
 
   /// 吃牌，owner在pos位置吃上家的牌card
-  Tile? _chow(int owner, int pos, Tile tile) {
+  Tile? chow(int owner, int pos, Tile tile) {
     if (index == owner) {
       Tile? c = handPile.chow(pos, tile);
 
@@ -223,7 +271,7 @@ class RoundParticipant {
     return null;
   }
 
-  WinType? _checkWin(int owner, Tile tile) {
+  WinType? checkWin(int owner, Tile tile) {
     if (index == owner) {
       return handPile.checkWin(tile: tile);
     }
@@ -232,7 +280,7 @@ class RoundParticipant {
   }
 
   /// 胡牌，owner胡participantState中的可胡的牌形,pos表示可胡牌形数组的位置
-  WinType? _win(int owner, int win) {
+  WinType? win(int owner, int win) {
     if (index == owner) {
       Set<int>? wins = outstandingActions[OutstandingAction.win];
       if (wins != null && wins.isNotEmpty) {
@@ -248,50 +296,8 @@ class RoundParticipant {
     return null;
   }
 
-  /// 过牌，owner宣布不做任何操作
-  _pass(int owner) {
-    if (index == owner) {
-      outstandingActions.clear();
-      if (handPile.drawTileType == DealTileType.sea) {
-        round.room.onRoomEvent(RoomEvent(round.room.name,
-            roundId: round.id,
-            owner: round.room.next(owner),
-            action: RoomEventAction.deal));
-      }
-    }
-  }
-
-  /// 摸牌，有三种摸牌，普通的自摸，海底捞的自摸，杠上自摸
-  /// owner摸到card牌，takeCardType表示摸牌的方式
-  Map<OutstandingAction, Set<int>>? _deal(
-      int owner, Tile tile, int dealTileTypeIndex) {
-    DealTileType? dealTileType =
-        NumberUtil.toEnum(DealTileType.values, dealTileTypeIndex);
-    if (dealTileType == null) {
-      return null;
-    }
-    if (index == owner) {
-      if (handPile.drawTile != null) {
-        logger.e('draw tile is not null');
-      }
-      handPile.drawTile = tile;
-      handPile.drawTileType = dealTileType;
-
-      /// 检查摸到的牌，看需要采取的动作，这里其实只需要摸牌检查
-      Map<OutstandingAction, Set<int>> outstandingActions =
-          _check(tile: tile, dealTileType: dealTileType);
-      if (outstandingActions.isNotEmpty) {
-        roomController.mahjongFlameGame.loadActionArea();
-      }
-
-      return outstandingActions;
-    }
-
-    return null;
-  }
-
   /// 抢杠胡牌，owner抢src的明杠牌card胡牌
-  WinType? _rob(int owner, int pos, Tile tile, int src) {
+  WinType? rob(int owner, int pos, Tile tile, int src) {
     if (index == owner) {
       Set<int>? wins = outstandingActions[OutstandingAction.win];
       if (wins != null && wins.isNotEmpty) {
@@ -307,51 +313,5 @@ class RoundParticipant {
     }
 
     return null;
-  }
-
-  /// 分发房间来的事件，处理各参与者该自己处理的部分
-  dynamic onRoomEvent(RoomEvent roomEvent) {
-    roomEvents.add(roomEvent);
-    // logger.w(
-    //     'round participant:$index has received event:${roomEvent.toString()}');
-    switch (roomEvent.action) {
-      case RoomEventAction.deal:
-        return _deal(roomEvent.owner, roomEvent.tile!, roomEvent.pos!);
-      case RoomEventAction.barDeal:
-        if (DealTileType.bar.index == roomEvent.pos) {
-          return _deal(roomEvent.owner, roomEvent.tile!, roomEvent.pos!);
-        }
-        break;
-      case RoomEventAction.discard:
-        return _discard(roomEvent.owner, roomEvent.tile!);
-      case RoomEventAction.touch:
-        return _touch(
-            roomEvent.owner, roomEvent.pos!, roomEvent.src!, roomEvent.tile!);
-      case RoomEventAction.bar:
-        return _bar(roomEvent.owner, roomEvent.pos!,
-            tile: roomEvent.tile, discard: roomEvent.src);
-      case RoomEventAction.discardBar:
-        return _discardBar(
-            roomEvent.owner, roomEvent.pos!, roomEvent.tile!, roomEvent.src!);
-      case RoomEventAction.drawBar:
-        return _drawBar(roomEvent.owner, roomEvent.pos!);
-      case RoomEventAction.darkBar:
-        return _darkBar(roomEvent.owner, roomEvent.pos!);
-      case RoomEventAction.chow:
-        return _chow(roomEvent.owner, roomEvent.pos!, roomEvent.tile!);
-      case RoomEventAction.check:
-        return _check(tile: roomEvent.tile);
-      case RoomEventAction.checkWin:
-        return _checkWin(roomEvent.owner, roomEvent.tile!);
-      case RoomEventAction.win:
-        return _win(roomEvent.owner, roomEvent.pos!);
-      case RoomEventAction.pass:
-        return _pass(roomEvent.owner);
-      case RoomEventAction.rob:
-        return _rob(
-            roomEvent.owner, roomEvent.pos!, roomEvent.tile!, roomEvent.src!);
-      default:
-        break;
-    }
   }
 }
