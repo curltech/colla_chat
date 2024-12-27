@@ -14,7 +14,7 @@ class Tile {
   late final WindSuit? windSuit;
   final int? rank;
 
-  late final Sprite sprite;
+  Sprite? sprite;
 
   Tile(this.suit, {this.windSuit, this.rank}) {
     check();

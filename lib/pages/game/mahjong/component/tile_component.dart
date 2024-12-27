@@ -20,8 +20,13 @@ class TileComponent extends PositionComponent
   TileComponent(this.tile, this.areaDirection, this.tileBackgroundType,
       {super.position, super.priority}) {
     if (areaDirection == AreaDirection.self) {
-      size = Vector2(tile.sprite.image.width.toDouble(),
-          tile.sprite.image.height.toDouble());
+      double width = 79;
+      double height = 111;
+      if (tile.sprite != null) {
+        width = tile.sprite!.image.width.toDouble();
+        height = tile.sprite!.image.height.toDouble();
+      }
+      size = Vector2(width, height);
     }
   }
 
@@ -34,12 +39,15 @@ class TileComponent extends PositionComponent
   /// 绘制牌的图像，有相对的偏移量，旋转，放大等参数
   void _drawSprite(
     Canvas canvas,
-    Sprite sprite,
+    Sprite? sprite,
     double x,
     double y, {
     double scale = 1,
     double? radians,
   }) {
+    if (sprite == null) {
+      return;
+    }
     if (radians != null) {
       canvas.save();
       canvas.translate(sprite.image.width / 2, sprite.image.height / 2);

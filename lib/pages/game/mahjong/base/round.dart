@@ -220,9 +220,8 @@ class Round {
     logger.w('$receiver receive $owner deal tile ${tile.toString()}');
     discard = null;
     discardTile = null;
-    int executor = (receiver ?? owner);
-    RoundParticipant roundParticipant = roundParticipants[executor];
 
+    RoundParticipant roundParticipant = roundParticipants[owner];
     roundParticipant.deal(owner, tile, dealTileTypeIndex);
 
     if (receiver == null) {
@@ -258,13 +257,15 @@ class Round {
   /// 返回值是true，表示打的牌没有需要等待的处理，可以发牌
   /// 否则，表示有需要等待的处理
   bool _discard(int owner, Tile tile, {int? receiver}) {
-    logger.w('$owner discard tile ${tile.toString()} to $receiver}');
+    logger.w('$owner discard tile ${tile.toString()} to $receiver');
 
     /// 打牌的参与者执行事件处理
     discard = owner;
     discardTile = tile;
 
-    RoundParticipant roundParticipant;
+    final RoundParticipant roundParticipant = roundParticipants[owner];
+    roundParticipant.discard(owner, tile);
+
     int? sender;
     List<int>? receivers;
     RoomEvent discardRoomEvent = RoomEvent(room.name,
@@ -274,7 +275,6 @@ class Round {
       /// receiver为空，事件初次触发
       if (owner == room.creator) {
         /// 事件的触发者是creator，检查，发消息给其他参与者，3个消息，等待3个事件
-        roundParticipant = roundParticipants[owner];
         sender = room.creator;
         receivers = [];
         for (int i = 0; i < roundParticipants.length; ++i) {
@@ -293,7 +293,6 @@ class Round {
         }
       } else {
         /// 事件的触发者不是creator，检查，发消息给creator，1个消息，不等待事件
-        roundParticipant = roundParticipants[owner];
         sender = owner;
         receivers = [room.creator];
       }
@@ -301,7 +300,6 @@ class Round {
       /// receiver不为空，事件是消息触发
       if (receiver == room.creator) {
         /// 事件消息的接收者是creator，检查，发消息给其他参与者，2个消息，等待2个事件
-        roundParticipant = roundParticipants[receiver];
         sender = room.creator;
         receivers = [];
 
@@ -323,11 +321,8 @@ class Round {
         }
       } else {
         /// 事件消息的接收者不是creator，检查，不发消息
-        roundParticipant = roundParticipants[receiver];
       }
     }
-
-    roundParticipant.discard(owner, tile);
 
     /// 没有receiver，不是消息事件，creator发送事件消息给其他参与者，或者发送消息事件给creator
     /// 有receiver，是消息事件，receiver是creator发送事件消息给其他参与者，否则不发送消息
@@ -616,7 +611,8 @@ class Round {
             receiverPeerId: roundParticipant.participant.peerId,
             subMessageType: ChatMessageSubType.mahjong,
             content: roomEvent);
-        if (roundParticipant.participant.robot) {
+        if (roundParticipant.participant.robot ||
+            roundParticipants[sender].participant.robot) {
           logger.w('round:$id has robot sent event:${roomEvent.toString()}');
           roomPool.onRoomEvent(chatMessage);
         } else {

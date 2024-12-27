@@ -103,10 +103,12 @@ class RoundParticipant {
     DealTileType? dealTileType =
         NumberUtil.toEnum(DealTileType.values, dealTileTypeIndex);
     if (dealTileType == null) {
+      logger.e('draw tile dealTileType is null');
       return null;
     }
     if (handPile.drawTile != null) {
       logger.e('draw tile is not null');
+      return null;
     }
     handPile.drawTile = tile;
     handPile.drawTileType = dealTileType;
@@ -127,6 +129,7 @@ class RoundParticipant {
       return false;
     }
     if (!canDiscard) {
+      logger.e('owner:$owner can not discard');
       return false;
     }
     wastePile.tiles.add(card);
