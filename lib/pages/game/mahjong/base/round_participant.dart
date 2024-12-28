@@ -188,12 +188,6 @@ class RoundParticipant {
       return;
     }
     outstandingActions.clear();
-    if (handPile.drawTileType == DealTileType.sea) {
-      round.room.onRoomEvent(RoomEvent(round.room.name,
-          roundId: round.id,
-          owner: round.room.next(owner),
-          action: RoomEventAction.deal));
-    }
   }
 
   /// 碰牌,owner碰pos位置，sender打出的card牌

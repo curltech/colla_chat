@@ -103,7 +103,7 @@ class ActionAreaComponent extends RectangleComponent
           roundId: round.id,
           owner: owner,
           action: RoomEventAction.touch,
-          src: round.discard,
+          src: round.discardParticipant,
           tile: round.discardTile,
           pos: pos[0]));
     } else if (outstandingAction == OutstandingAction.bar) {
