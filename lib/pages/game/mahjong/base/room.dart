@@ -390,7 +390,7 @@ class Room {
       if (round == null) {
         return null;
       }
-      returnValue = await round.onRoomEvent(roomEvent);
+      returnValue = await round.startRoomEvent(roomEvent);
     }
 
     return returnValue;

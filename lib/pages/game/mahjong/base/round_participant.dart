@@ -124,17 +124,17 @@ class RoundParticipant {
   }
 
   /// 打牌，owner打出牌card，对其他人检查打的牌是否能够胡牌，杠牌和碰牌，返回检查的结果
-  bool discard(int owner, Tile card) {
+  bool discard(int owner, Tile tile) {
     if (owner != index) {
       return false;
     }
     if (!canDiscard) {
-      logger.e('owner:$owner can not discard');
+      logger.e('owner:$owner can not discard:$tile');
       return false;
     }
-    wastePile.tiles.add(card);
+    wastePile.tiles.add(tile);
 
-    return handPile.discard(card);
+    return handPile.discard(tile);
   }
 
   /// 检查行为状态，既包括摸牌检查，也包含打牌检查

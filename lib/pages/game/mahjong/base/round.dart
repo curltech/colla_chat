@@ -294,7 +294,7 @@ class Round {
   }
 
   /// 收到owner打牌的消息
-  bool _discard(int owner, Tile tile) {
+  bool _discard(int owner, Tile tile, int receiver) {
     logger.w('chat message: $owner discard tile ${tile.toString()}');
 
     /// 打牌的参与者执行事件处理
@@ -311,7 +311,7 @@ class Round {
     bool pass = true;
 
     /// receiver不为空，事件是消息触发
-    if (isCreator) {
+    if (receiver == room.creator) {
       /// 事件消息的接收者是creator，检查，发消息给其他参与者，2个消息，等待2个事件
       sender = room.creator;
       receivers = [];
@@ -332,12 +332,6 @@ class Round {
       if (pass) {
         deal();
       }
-    }
-
-    /// 没有receiver，不是消息事件，creator发送事件消息给其他参与者，或者发送消息事件给creator
-    /// 有receiver，是消息事件，receiver是creator发送事件消息给其他参与者，否则不发送消息
-    if (sender != null) {
-      _sendChatMessage(discardRoomEvent, sender, receivers!);
     }
 
     return pass;
@@ -719,6 +713,41 @@ class Round {
     }
   }
 
+  dynamic startRoomEvent(RoomEvent roomEvent) async {
+    // logger.w('round:$id has received event:${roomEvent.toString()}');
+    dynamic returnValue;
+
+    RoomEventAction? action = roomEvent.action;
+    switch (action) {
+      case RoomEventAction.deal:
+        returnValue = deal();
+      case RoomEventAction.discard:
+        returnValue = discard(roomEvent.owner, roomEvent.tile!);
+      case RoomEventAction.bar:
+        returnValue = bar(roomEvent.owner, roomEvent.pos!);
+      case RoomEventAction.touch:
+        returnValue = touch(
+            roomEvent.owner, roomEvent.pos!, roomEvent.src!, roomEvent.tile!);
+      case RoomEventAction.darkBar:
+        returnValue = darkBar(roomEvent.owner, roomEvent.pos!);
+      case RoomEventAction.chow:
+        returnValue = chow(roomEvent.owner, roomEvent.pos!);
+      case RoomEventAction.pass:
+        returnValue = pass(roomEvent.owner);
+      case RoomEventAction.win:
+        returnValue = win(roomEvent.owner, roomEvent.pos!);
+      default:
+        break;
+    }
+
+    if (roomEvent.action == RoomEventAction.discard) {
+      roomController.mahjongFlameGame.reloadNext();
+    }
+    roomController.mahjongFlameGame.reloadSelf();
+
+    return returnValue;
+  }
+
   /// roomEvent的receiver为空，则是直接调用，
   /// 否则是chatMessage消息方式调用，表示其他参与者发生事件，通知receiver
   /// 发送chatMessage事件消息，只能是creator发送到其他参与者，或者其他参与者发送给creator
@@ -737,7 +766,8 @@ class Round {
       case RoomEventAction.deal:
         returnValue = _deal(roomEvent.owner, roomEvent.tile!, roomEvent.pos!);
       case RoomEventAction.discard:
-        returnValue = _discard(roomEvent.owner, roomEvent.tile!);
+        returnValue =
+            _discard(roomEvent.owner, roomEvent.tile!, roomEvent.receiver!);
       case RoomEventAction.bar:
         returnValue = _bar(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.barDeal:
