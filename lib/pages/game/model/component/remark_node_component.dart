@@ -31,7 +31,6 @@ class RemarkNodeComponent extends TextBoxComponent
   RemarkNodeComponent(
     this.modelNode, {
     super.align,
-    Vector2? nodeSize,
     double? timePerChar,
     double? margins,
   }) : super(
@@ -42,7 +41,8 @@ class RemarkNodeComponent extends TextBoxComponent
               growingBox: true,
               margins: EdgeInsets.all(margins ?? 10),
             ),
-            size: nodeSize ?? Vector2(Project.nodeWidth, Project.nodeHeight));
+            size: Vector2(modelNode.width ?? Project.nodeWidth,
+                modelNode.height ?? Project.nodeHeight));
 
   @override
   Future<void> onTapDown(TapDownEvent event) async {

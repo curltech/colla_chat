@@ -40,8 +40,9 @@ class ImageNodeComponent extends PositionComponent
     super.anchor = Anchor.topLeft,
     super.children,
     super.priority,
-    Vector2? nodeSize,
-  }) : super(size: nodeSize ?? Vector2(Project.nodeWidth, Project.nodeHeight));
+  }) : super(
+            size: Vector2(modelNode.width ?? Project.nodeWidth,
+                modelNode.height ?? Project.nodeHeight));
 
   @override
   Future<void> onLoad() async {

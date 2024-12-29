@@ -32,12 +32,10 @@ class TypeNodeComponent extends RectangleComponent
   late final MethodAreaComponent methodAreaComponent;
 
   TypeNodeComponent(
-    this.modelNode, {
-    double? width,
-    double? height,
-  }) : super(paint: fillPaint) {
-    width = width ?? Project.nodeWidth;
-    height = height ?? Project.nodeHeight;
+    this.modelNode,
+  ) : super(paint: fillPaint) {
+    width = modelNode.width ?? Project.nodeWidth;
+    height = modelNode.height ?? Project.nodeHeight;
     size = Vector2(width, height);
   }
 

@@ -46,8 +46,9 @@ class ShapeNodeComponent extends PositionComponent
     this.textAlign = Anchor.center,
     super.scale,
     super.angle,
-    Vector2? nodeSize,
-  }) : super(size: nodeSize ?? Vector2(Project.nodeWidth, Project.nodeHeight));
+  }) : super(
+            size: Vector2(modelNode.width ?? Project.nodeWidth,
+                modelNode.height ?? Project.nodeHeight));
 
   @override
   Future<void> onLoad() async {
