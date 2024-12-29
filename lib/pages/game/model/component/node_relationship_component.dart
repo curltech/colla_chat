@@ -249,8 +249,9 @@ class NodeRelationshipComponent extends PositionComponent
       Vector2 point2 = vertices[2];
       Vector2 point3 = vertices[3];
       Vector2 point4 = vertices[4];
-      path.quadraticBezierTo(point1.x, point1.y, point2.x, point2.y);
-      path.quadraticBezierTo(point3.x, point3.y, point4.x, point4.y);
+      path.cubicTo(point2.x, point2.y, point3.x, point3.y, point4.x, point4.y);
+      // path.quadraticBezierTo(point1.x, point1.y, point2.x, point2.y);
+      // path.quadraticBezierTo(point3.x, point3.y, point4.x, point4.y);
     } else {
       /// 折线
       for (int i = 1; i < vertices.length; ++i) {
