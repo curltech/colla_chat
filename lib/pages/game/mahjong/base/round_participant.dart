@@ -182,6 +182,18 @@ class RoundParticipant {
     return outstandingActions.value;
   }
 
+  WinType? checkWin(int owner, Tile tile) {
+    if (index != owner) {
+      return null;
+    }
+    WinType? winType = handPile.checkWin(tile: tile);
+    if (winType != null) {
+      addOutstandingAction(OutstandingAction.win, [winType.index]);
+    }
+
+    return winType;
+  }
+
   /// 过牌，owner宣布不做任何操作
   pass(int owner) {
     if (index != owner) {
@@ -191,39 +203,30 @@ class RoundParticipant {
   }
 
   /// 碰牌,owner碰pos位置，sender打出的card牌
-  bool touch(int owner, int pos, int sender, Tile tile) {
-    if (index == owner) {
-      return handPile.touch(pos, tile);
+  bool touch(int owner, int pos, int discardParticipant, Tile tile) {
+    if (index != owner) {
+      return false;
     }
-
-    return true;
-  }
-
-  /// 杠牌，分成打牌杠牌_discardBar和摸牌杠牌_drawBar
-  Tile? bar(int owner, int pos, {Tile? tile, int? discard}) {
-    if (index == owner) {
-      if (discard != null) {
-        return discardBar(owner, pos, tile!, discard);
-      } else {
-        return drawBar(owner, pos);
-      }
+    if (handPile.touchPiles.length == 4) {
+      packer = discardParticipant;
     }
-
-    return null;
+    return handPile.touch(pos, tile);
   }
 
   /// 打牌杠牌，分成打牌杠牌sendBar和摸牌杠牌takeBar
-  Tile? discardBar(int owner, int pos, Tile tile, int discard) {
-    if (index == owner) {
-      Tile? c = handPile.discardBar(pos, tile, discard);
-      if (c != null) {
-        addEarnedAction(OutstandingAction.bar, [pos]);
-      }
-
-      return c;
+  Tile? discardBar(int owner, int pos, Tile tile, int discardParticipant) {
+    if (index != owner) {
+      return null;
+    }
+    Tile? c = handPile.discardBar(pos, tile, discardParticipant);
+    if (c != null) {
+      addEarnedAction(OutstandingAction.bar, [pos]);
+    }
+    if (handPile.touchPiles.length == 4) {
+      packer = discardParticipant;
     }
 
-    return null;
+    return c;
   }
 
   /// owner明杠位置pos的牌，分两种情况，摸牌杠牌和打牌杠牌
@@ -231,30 +234,28 @@ class RoundParticipant {
   /// pos表示杠牌的位置,如果摸牌杠牌的时候为手牌杠牌的位置，打牌杠牌的时候是杠牌的位置
   /// 返回值为杠的牌，为空表示未成功
   Tile? drawBar(int owner, int pos) {
-    if (index == owner) {
-      Tile? card = handPile.drawBar(pos, owner);
-      if (card != null) {
-        addEarnedAction(OutstandingAction.bar, [pos]);
-      }
-
-      return card;
+    if (index != owner) {
+      return null;
+    }
+    Tile? tile = handPile.drawBar(pos, owner);
+    if (tile != null) {
+      addEarnedAction(OutstandingAction.bar, [pos]);
     }
 
-    return null;
+    return tile;
   }
 
   /// 暗杠牌，owner杠手上pos位置已有的四张牌（card==null）或者新进的card（card!=null）
   Tile? darkBar(int owner, int pos) {
-    if (index == owner) {
-      Tile? card = handPile.darkBar(pos, owner);
-      if (card != null) {
-        addEarnedAction(OutstandingAction.bar, [pos]);
-      }
-
-      return card;
+    if (index != owner) {
+      return null;
+    }
+    Tile? tile = handPile.darkBar(pos, owner);
+    if (tile != null) {
+      addEarnedAction(OutstandingAction.bar, [pos]);
     }
 
-    return null;
+    return tile;
   }
 
   /// 吃牌，owner在pos位置吃上家的牌card
@@ -263,14 +264,6 @@ class RoundParticipant {
       Tile? c = handPile.chow(pos, tile);
 
       return c;
-    }
-
-    return null;
-  }
-
-  WinType? checkWin(int owner, Tile tile) {
-    if (index == owner) {
-      return handPile.checkWin(tile: tile);
     }
 
     return null;
