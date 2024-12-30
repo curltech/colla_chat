@@ -76,7 +76,7 @@ dependencies:
   # 存储
   flutter_secure_storage: 9.2.2
   sqlite3: ^2.5.0
-  sqlite3_flutter_libs: ^0.5.28
+  sqlite3_flutter_libs: 0.5.27
   # sqflite: ^2.4.1
   idb_shim: ^2.0.1
 
