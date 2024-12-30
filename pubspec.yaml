@@ -48,7 +48,7 @@ dependencies:
   upgrader: ^11.0.0
   path_provider: ^2.0.11
   url_launcher: ^6.1.11 #打开系统浏览器
-  open_filex: ^4.4.0 #打开文件,
+  open_filex: ^4.6.0 #打开文件,
   camera_windows: ^0.2.1+9
   camera_linux: ^0.0.8
   camera_web: ^0.3.1+4
@@ -76,7 +76,7 @@ dependencies:
   # 存储
   flutter_secure_storage: 9.2.2
   sqlite3: ^2.5.0
-  sqlite3_flutter_libs: ^0.5.27
+  sqlite3_flutter_libs: ^0.5.28
   # sqflite: ^2.4.1
   idb_shim: ^2.0.1
 
@@ -119,12 +119,12 @@ dependencies:
   chips_choice: ^3.0.0
   validation_pro: 1.2.0
   flutter_pw_validator: ^1.6.0 #FlutterPwValidator放在TextFormField下面显示校验结果
-  fzregex: ^2.0.0 #静态方法：Fzregex.hasMatch
+  fzregex: ^2.1.1 #静态方法：Fzregex.hasMatch
   regexpattern: ^2.5.0
   phone_number: ^2.0.1 #仅支持ios和android，解析电话号码
   phone_form_field: ^10.0.2 #支持所有平台，电话号码的录入字段
   intl_phone_field: ^3.2.0 #支持所有平台，电话号码的录入字段
-  mobile_number: ^2.1.1 #仅支持android，获取电话号码，ios无此功能
+  mobile_number: ^3.0.0 #仅支持android，获取电话号码，ios无此功能
   phone_numbers_parser: ^9.0.0 #支持所有的平台
   badges: ^3.1.2
   extended_list: ^3.0.0
@@ -155,7 +155,7 @@ dependencies:
   #      url: https://github.com/r-mzy47/candlesticks.git
   fluent_ui: ^4.9.2
   fluentui_system_icons: ^1.1.201 #FluentIcons.access_time_24_regular
-  macos_ui: ^2.0.9
+  macos_ui: ^2.1.4
   flutter_material_color_picker: ^1.2.0
   after_layout: ^1.1.0
   snapping_sheet: ^3.1.0 #在上下可以滑出的sheet
@@ -165,7 +165,7 @@ dependencies:
   flex_color_scheme: ^8.0.2
   file_selector: ^1.0.3
   filesystem_picker: ^4.1.0
-  wechat_assets_picker: ^9.4.1 #移动平台，选择图像，视频等媒体并展示
+  wechat_assets_picker: ^9.4.2 #移动平台，选择图像，视频等媒体并展示
   flutter_slidable: ^3.0.1 #滑动的按钮
   #下面是各种轮播图组件
   carousel_slider: ^5.0.0 #不错的类似swiper的组件 CarouselSlider
@@ -247,7 +247,7 @@ dependencies:
   # 多媒体
   ffmpeg_kit_flutter: ^6.0.3 #Android, iOS and macOS
   photo_view: ^0.14.0 #图片显示
-  pro_image_editor: ^6.2.0
+  pro_image_editor: ^7.1.0
   flutter_sound: ^9.4.6
   audioplayers: ^6.1.0 #音频处理,所有平台
   audioplayers_platform_interface: ^7.0.0
@@ -258,7 +258,7 @@ dependencies:
   audioplayers_android: ^5.0.0
   audio_waveforms: ^1.2.0
   waved_audio_player: ^1.3.0
-  waveform_recorder: ^1.3.1
+  waveform_recorder: ^1.4.0
   flick_video_player: ^0.9.0 #video_player的封装
 #  native_video_player: ^1.3.1
   #  fvp: ^0.19.0
@@ -291,8 +291,8 @@ dependencies:
   infinite_scroll_pagination: ^4.0.0
 
   #应用
-  i18n_extension: ^13.0.2
-  quill_html_editor: ^2.2.8
+  i18n_extension: ^15.0.0
+  quill_html_editor_v2: ^2.2.10
   vsc_quill_delta_to_html: ^1.0.5
   flutter_platform_widgets: ^7.0.1
   universal_html: ^2.0.8
@@ -320,7 +320,7 @@ dependencies:
   flutter_native_splash: ^2.4.1
   system_tray: ^2.0.3
   tray_manager: ^0.3.0
-  livekit_client: ^2.3.2 #livekit sfu server flutter client
+  livekit_client: ^2.3.4+hotfix.1 #livekit sfu server flutter client
   livekit_server_sdk: ^1.0.0
   langchain: ^0.7.1
   langchain_ollama: ^0.3.0
@@ -354,19 +354,19 @@ dependency_overrides:
   http: 1.2.0
   dart_webrtc: ^1.4.6+hotfix.1
   webrtc_interface: 1.2.0
-  flutter_webrtc: ^0.12.3
+  flutter_webrtc: ^0.12.5+hotfix.2
   #  flutter_webrtc_plus: ^0.11.2+5
   #  medea_flutter_webrtc: ^0.11.0
   protobuf: ^3.1.0
-  analyzer: 6.8.0
+  analyzer: 7.1.0
   provider: ^6.1.2
-  flex_seed_scheme: ^3.1.2
+  flex_seed_scheme: ^3.5.0
   flutter_inappwebview: ^6.0.0
   connectivity_plus: ^6.0.2
-  emoji_picker_flutter: ^3.0.0
-  webview_flutter: ^4.9.0
+  emoji_picker_flutter: ^4.2.0
+  webview_flutter: ^4.10.0
   webview_all: ^0.4.1
-  webf: ^0.16.1
+  webf: ^0.16.3
   webview_flutter_android: ^3.13.1
   webview_flutter_wkwebview: ^3.10.0
   webview_flutter_web: ^0.2.2+3
@@ -375,17 +375,17 @@ dependency_overrides:
     git: https://github.com/jakky1/webview_win_floating.git
   flutter_widget_from_html: ^0.15.3
   sprintf: ^7.0.0
-  flex_color_picker: ^3.5.0
+  flex_color_picker: ^3.7.0
   permission_handler: ^11.2.0
   file_picker: ^8.0.6
   shared_preferences: ^2.3.1
   intl: ^0.20.1
-  image: ^4.0.12
+  image: ^4.5.2
   camera: ^0.11.0+2 #调用相机
   google_fonts: ^6.1.0
   material_design_icons_flutter: ^7.0.7296
-  full_picker: ^2.1.2
-  image_cropper: ^8.0.1
+  full_picker: ^2.1.5
+  image_cropper: ^8.1.0
   light_compressor: ^2.2.0
   collection: ^1.17.0
   path: ^1.8.3
@@ -405,6 +405,7 @@ dependency_overrides:
   lottie: ^3.1.2
   flutter_quill: ^10.8.5
   flutter_quill_extensions: ^10.4.0
+  flutter_quill_delta_from_html: ^1.4.5
   saver_gallery: 4.0.1
   gal: ^2.3.0
   flutter_lints: ^5.0.0
@@ -442,7 +443,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
-  analyzer: 6.8.0
+  analyzer: 7.1.0
   flutter_launcher_icons: ^0.14.2
   build_runner: ^2.4.9
 
