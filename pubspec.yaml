@@ -309,7 +309,7 @@ dependencies:
   location_picker_flutter_map: ^3.0.1 #Open Street Map，需要翻墙
 
   #服务
-  firebase_core: ^3.8.1
+  firebase_core: ^3.9.0
   firebase_messaging: ^15.1.6
   # 支持本地和fcm
   awesome_notifications: ^0.10.0
