@@ -305,7 +305,6 @@ dependencies:
   apple_maps_flutter: ^1.3.0
   google_maps_flutter: ^2.6.1 #谷歌地图，移动设备
   tencent_map_flutter: ^0.1.0
-  platform_maps_flutter: ^1.0.2 #融合谷歌地图和苹果地图
   map_launcher: ^3.5.0 #打开设备已安装的地图软件，移动设备
   location_picker_flutter_map: ^3.0.1 #Open Street Map，需要翻墙
 
@@ -363,7 +362,7 @@ dependency_overrides:
   flex_seed_scheme: ^3.5.0
   flutter_inappwebview: ^6.0.0
   connectivity_plus: ^6.0.2
-  emoji_picker_flutter: ^4.2.0
+  emoji_picker_flutter: ^3.1.0 #^4.2.0
   webview_flutter: ^4.10.0
   webview_all: ^0.4.1
   webf: ^0.16.3
