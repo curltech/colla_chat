@@ -7,32 +7,32 @@ import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/webview/flutter_webview.dart';
 import 'package:colla_chat/widgets/webview/html_webview.dart';
+import 'package:colla_chat/widgets/webview/inapp_webview.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:webview_flutter/webview_flutter.dart' as webview;
-import 'package:webf/webf.dart' as webf;
-import 'package:webf/devtools.dart';
 
 /// 平台浏览器的控制器
 class PlatformWebViewController with ChangeNotifier {
-  webf.WebFController? webfController;
+  InAppWebViewController? inAppWebViewController;
   webview.WebViewController? webViewController;
 
   ///包装两种webview的实现
   PlatformWebViewController({
     this.webViewController,
-    this.webfController,
+    this.inAppWebViewController,
   });
 
   from(dynamic controller) {
     if (controller is webview.WebViewController) {
       webViewController = controller;
-      webfController = null;
-    } else if (controller is webf.WebFController) {
+      inAppWebViewController = null;
+    } else if (controller is InAppWebViewController) {
       webViewController = null;
-      webfController = controller;
+      inAppWebViewController = controller;
     } else {
       webViewController = null;
-      webfController = null;
+      inAppWebViewController = null;
     }
   }
 
@@ -50,9 +50,8 @@ class PlatformWebViewController with ChangeNotifier {
       } else {
         await webViewController!.loadHtmlString(html);
       }
-    } else if (webfController != null) {
-      webf.WebFBundle bundle = webf.WebFBundle.fromContent(html);
-      await webfController!.load(bundle);
+    } else if (inAppWebViewController != null) {
+      await inAppWebViewController!.loadData(data: html);
     }
   }
 
@@ -61,31 +60,29 @@ class PlatformWebViewController with ChangeNotifier {
       String html = """<html><body></body></html>""";
       if (webViewController != null) {
         await webViewController!.loadHtmlString(html);
-      } else if (webfController != null) {
-        webf.WebFBundle bundle = webf.WebFBundle.fromContent(html);
-        await webfController!.load(bundle);
+      } else if (inAppWebViewController != null) {
+        await inAppWebViewController!.loadData(data: html);
       }
     }
     if (filename!.startsWith('assets')) {
       if (webViewController != null) {
         await webViewController!.loadFlutterAsset(filename);
-      } else if (webfController != null) {
-        webf.WebFBundle bundle = webf.WebFBundle.fromUrl(filename);
-        await webfController!.load(bundle);
+      } else if (inAppWebViewController != null) {
+        await inAppWebViewController!.loadFile(assetFilePath: filename);
       }
     } else if (filename.startsWith('http')) {
       if (webViewController != null) {
         await webViewController!.loadRequest(Uri.parse(filename));
-      } else if (webfController != null) {
-        webf.WebFBundle bundle = webf.WebFBundle.fromUrl(filename);
-        await webfController!.load(bundle);
+      } else if (inAppWebViewController != null) {
+        await inAppWebViewController!
+            .loadUrl(urlRequest: URLRequest(url: WebUri(filename)));
       }
     } else {
       if (webViewController != null) {
         await webViewController!.loadFile(filename);
-      } else if (webfController != null) {
-        webf.WebFBundle bundle = webf.WebFBundle.fromUrl(filename);
-        await webfController!.load(bundle);
+      } else if (inAppWebViewController != null) {
+        await inAppWebViewController!
+            .loadUrl(urlRequest: URLRequest(url: WebUri(filename)));
       }
     }
   }
@@ -93,32 +90,32 @@ class PlatformWebViewController with ChangeNotifier {
   reload() async {
     if (webViewController != null) {
       await webViewController!.reload();
-    } else if (webfController != null) {
-      await webfController!.reload();
+    } else if (inAppWebViewController != null) {
+      await inAppWebViewController!.reload();
     }
   }
 
   goBack() async {
     if (webViewController != null) {
       await webViewController!.goBack();
-    } else if (webfController != null) {
-      webfController!.history.back();
+    } else if (inAppWebViewController != null) {
+      inAppWebViewController!.goBack();
     }
   }
 
   goForward() async {
     if (webViewController != null) {
       await webViewController!.goForward();
-    } else if (webfController != null) {
-      webfController!.history.forward();
+    } else if (inAppWebViewController != null) {
+      inAppWebViewController!.goForward();
     }
   }
 
   Future<String?> getUrl() async {
     if (webViewController != null) {
       return await webViewController!.currentUrl();
-    } else if (webfController != null) {
-      return webfController!.url;
+    } else if (inAppWebViewController != null) {
+      return inAppWebViewController!.getUrl().toString();
     }
     return null;
   }
@@ -175,7 +172,7 @@ class PlatformWebView extends StatelessWidget {
       }
     } else {
       if (platformParams.windows ||
-          // platformParams.macos ||
+          platformParams.macos ||
           platformParams.mobile ||
           platformParams.web) {
         platformWebView = FlutterWebView(
@@ -187,22 +184,13 @@ class PlatformWebView extends StatelessWidget {
           },
         );
       } else {
-        webf.WebFController webFController = webf.WebFController(
-          context,
-          // devToolsService: ChromeDevToolsService(),
-        );
-        if (initialUrl != null) {
-          webFController.preload(webf.WebFBundle.fromUrl(initialUrl!));
-        } else if (initialFilename != null) {
-          webFController.preload(webf.WebFBundle.fromUrl(initialFilename!));
-        } else if (html != null) {
-          webFController.preload(webf.WebFBundle.fromContent(html!));
-        } else {
-          String html = """<html><body></body></html>""";
-          webFController.preload(webf.WebFBundle.fromContent(html));
-        }
-        webViewController.from(webFController);
-        platformWebView = webf.WebF(controller: webFController);
+        platformWebView = FlutterInAppWebView(
+            initialUrl: initialUrl,
+            html: html,
+            initialFilename: initialFilename,
+            onWebViewCreated: (InAppWebViewController inAppWebViewController) {
+              webViewController.from(inAppWebViewController);
+            });
       }
     }
 

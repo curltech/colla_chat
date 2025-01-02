@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 /// InAppWebView，打开一个内部的浏览器窗口，可以用来观看网页，音频，视频文件，office文件
+/// 不支持linux
 class FlutterInAppWebView extends StatelessWidget {
   final String? initialUrl;
   final String? html;
@@ -81,10 +82,6 @@ class FlutterInAppWebView extends StatelessWidget {
       if (html != null) {
         controller!.loadData(data: html!);
       }
-    } else if (platformParams.macos && html != null) {
-      inAppWebView = Center(
-          child: CommonAutoSizeText(
-              AppLocalizations.t('Only supported in App browser')));
     } else {
       inAppWebView = Center(
           child:
