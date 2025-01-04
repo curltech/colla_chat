@@ -27,8 +27,8 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
 import 'package:phone_numbers_parser/phone_numbers_parser.dart'
     as phone_numbers_parser;
-import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:regexpattern/regexpattern.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 /// 用户注册组件，一个card下的录入框和按钮组合
 class P2pRegisterWidget extends StatelessWidget {

@@ -11,8 +11,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:sherpa_onnx/sherpa_onnx.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:sherpa_onnx/sherpa_onnx.dart';
 
 class SherpaConfigUtil {
   static String? _sherpaModelInstallationPath;

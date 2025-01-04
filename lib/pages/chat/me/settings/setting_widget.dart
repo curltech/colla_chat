@@ -1,8 +1,8 @@
-import 'package:colla_chat/pages/login/p2p_login_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/advanced_setting_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/general/general_setting_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/privacy/peer_profile_edit_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/security/security_setting_widget.dart';
+import 'package:colla_chat/pages/login/p2p_login_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/local_auth.dart';

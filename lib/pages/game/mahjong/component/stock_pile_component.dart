@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import 'package:colla_chat/pages/game/mahjong/base/tile.dart' as mahjongTile;
-import 'package:colla_chat/pages/game/mahjong/base/tile_background_sprite.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round.dart';
 import 'package:colla_chat/pages/game/mahjong/base/stock_pile.dart';
-import 'package:colla_chat/pages/game/mahjong/component/tile_component.dart';
+import 'package:colla_chat/pages/game/mahjong/base/tile.dart' as mahjongTile;
+import 'package:colla_chat/pages/game/mahjong/base/tile_background_sprite.dart';
 import 'package:colla_chat/pages/game/mahjong/component/mahjong_flame_game.dart';
+import 'package:colla_chat/pages/game/mahjong/component/tile_component.dart';
 import 'package:colla_chat/pages/game/mahjong/room_controller.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
@@ -49,10 +49,10 @@ class StockPileComponent extends PositionComponent
     length = tiles.length;
     double initX;
     if (length.isOdd) {
-      initX = MahjongFlameGame.width * MahjongFlameGame.stockWidthRadio -
+      initX = roomController.width * MahjongFlameGame.stockWidthRadio -
           (length / 2) * 35;
     } else {
-      initX = MahjongFlameGame.width * MahjongFlameGame.stockWidthRadio -
+      initX = roomController.width * MahjongFlameGame.stockWidthRadio -
           (length / 2 - 1) * 35;
     }
     double x = initX;

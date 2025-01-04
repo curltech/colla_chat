@@ -1,6 +1,5 @@
-import 'dart:ui';
-
 import 'package:colla_chat/pages/game/mahjong/component/mahjong_flame_game.dart';
+import 'package:colla_chat/pages/game/mahjong/room_controller.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
@@ -13,11 +12,11 @@ class SettingAreaComponent extends RectangleComponent
 
   _init() {
     position = Vector2(
-        MahjongFlameGame.x(
-            MahjongFlameGame.width * (1 - MahjongFlameGame.settingWidthRadio)),
-        MahjongFlameGame.y(0));
-    size = Vector2(MahjongFlameGame.width * MahjongFlameGame.settingWidthRadio,
-        MahjongFlameGame.height * MahjongFlameGame.opponentHeightRadio);
+        roomController.x(
+            roomController.width * (1 - MahjongFlameGame.settingWidthRadio)),
+        roomController.y(0));
+    size = Vector2(roomController.width * MahjongFlameGame.settingWidthRadio,
+        roomController.height * MahjongFlameGame.opponentHeightRadio);
     paint = Paint()
       ..color = Colors.lightBlueAccent
       ..style = PaintingStyle.fill;

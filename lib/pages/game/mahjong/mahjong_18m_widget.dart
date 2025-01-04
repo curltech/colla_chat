@@ -1,14 +1,14 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
-import 'package:colla_chat/pages/game/mahjong/base/tile.dart' as mahjongCard;
 import 'package:colla_chat/pages/game/mahjong/base/full_pile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/outstanding_action.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room_pool.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round_participant.dart';
+import 'package:colla_chat/pages/game/mahjong/base/tile.dart' as mahjongCard;
+import 'package:colla_chat/pages/game/mahjong/component/mahjong_flame_game.dart';
 import 'package:colla_chat/pages/game/mahjong/room_controller.dart';
-import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -23,10 +23,10 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+
+
 /// 18m麻将游戏
 class Majiang18mWidget extends StatelessWidget with TileDataMixin {
-  ModelFlameGame? modelFlameGame;
-
   Majiang18mWidget({super.key}) {
     logger.i('Full mahjong cards category number is:${fullPile.tiles.length}');
   }
@@ -194,7 +194,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
             } else {
               outstandingActions = currentRoundParticipant.check();
             }
-            roomController.mahjongFlameGame.reloadSelf();
+            mahjongFlameGame.reloadSelf();
           },
           icon: const Icon(Icons.check)));
     }
@@ -209,7 +209,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
           title: title,
           withLeading: true,
           rightWidgets: _buildRightWidgets(context),
-          child: GameWidget(game: roomController.mahjongFlameGame));
+          child: GameWidget(game: mahjongFlameGame));
     });
   }
 }

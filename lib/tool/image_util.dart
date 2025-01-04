@@ -14,14 +14,14 @@ import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:dio/dio.dart';
 import 'package:extended_image/extended_image.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_luban/flutter_luban.dart';
-import 'package:wechat_assets_picker/wechat_assets_picker.dart';
-import 'package:saver_gallery/saver_gallery.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:image/image.dart' as img;
+import 'package:saver_gallery/saver_gallery.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 ///image_gallery_saver,extended_image
 class ImageUtil {

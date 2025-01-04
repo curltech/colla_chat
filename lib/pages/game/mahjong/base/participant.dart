@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:colla_chat/pages/game/mahjong/base/room.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 

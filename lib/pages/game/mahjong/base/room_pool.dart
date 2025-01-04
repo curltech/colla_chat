@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/pages/game/mahjong/base/participant.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room.dart';
+import 'package:colla_chat/pages/game/mahjong/component/mahjong_flame_game.dart';
 import 'package:colla_chat/pages/game/mahjong/room_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -94,7 +95,7 @@ class RoomPool {
         return null;
       }
       returnValue = await room.onRoomEvent(roomEvent);
-      roomController.mahjongFlameGame.reload();
+      mahjongFlameGame.reload();
     }
 
     return returnValue;

@@ -1,14 +1,14 @@
 import 'dart:async';
 
-import 'package:colla_chat/pages/game/mahjong/base/tile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/hand_pile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/outstanding_action.dart';
 import 'package:colla_chat/pages/game/mahjong/base/participant.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round.dart';
 import 'package:colla_chat/pages/game/mahjong/base/suit.dart';
+import 'package:colla_chat/pages/game/mahjong/base/tile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/waste_pile.dart';
-import 'package:colla_chat/pages/game/mahjong/room_controller.dart';
+import 'package:colla_chat/pages/game/mahjong/component/mahjong_flame_game.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/number_util.dart';
 import 'package:get/get.dart';
@@ -117,7 +117,7 @@ class RoundParticipant {
     Map<OutstandingAction, Set<int>> outstandingActions =
         check(tile: tile, dealTileType: dealTileType);
     if (outstandingActions.isNotEmpty) {
-      roomController.mahjongFlameGame.loadActionArea();
+      mahjongFlameGame.loadActionArea();
     }
 
     return outstandingActions;
@@ -176,7 +176,7 @@ class RoundParticipant {
     }
 
     if (outstandingActions.value.isNotEmpty) {
-      roomController.mahjongFlameGame.loadActionArea();
+      mahjongFlameGame.loadActionArea();
     }
 
     return outstandingActions.value;

@@ -35,7 +35,6 @@ import 'package:colla_chat/transport/smsclient.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/websocket/universal_websocket.dart';
-import 'package:uuid/uuid.dart';
 
 class ChatMessageService extends GeneralBaseService<ChatMessage> {
   Timer? timer;

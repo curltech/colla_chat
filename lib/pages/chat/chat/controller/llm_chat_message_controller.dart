@@ -12,7 +12,6 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/ollama/dart_ollama_client.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/state_manager.dart';
-import 'package:uuid/uuid.dart';
 
 enum LlmAction { chat, translate, extract, image, audio }
 

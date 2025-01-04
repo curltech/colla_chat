@@ -1,7 +1,6 @@
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/document_util.dart';
-import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/richtext/html_editor_widget.dart';
 import 'package:colla_chat/widgets/richtext/quill_editor_widget.dart';
 import 'package:colla_chat/widgets/richtext/quill_html_editor_widget.dart';

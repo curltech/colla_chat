@@ -1,12 +1,9 @@
 import 'package:colla_chat/entity/stock/share.dart';
 import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
-import 'package:colla_chat/plugin/security_storage.dart';
-
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/general_remote.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/service/stock/stock_line.dart';
-import 'package:get/get.dart';
 
 class RemoteShareService extends GeneralRemoteService<Share> {
   RemoteShareService({required super.name}) {

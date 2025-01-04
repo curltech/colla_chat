@@ -1,10 +1,10 @@
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/plugin/talker_logger.dart' as log;
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/media_stream_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:livekit_client/livekit_client.dart';
-import 'package:colla_chat/plugin/talker_logger.dart' as log;
 
 final emptyVideoView = Center(
   child: AppImage.mdAppImage,

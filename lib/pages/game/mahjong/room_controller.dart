@@ -4,14 +4,37 @@ import 'package:colla_chat/pages/game/mahjong/base/room.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round_participant.dart';
 import 'package:colla_chat/pages/game/mahjong/base/waste_pile.dart';
-import 'package:colla_chat/pages/game/mahjong/component/mahjong_flame_game.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/number_util.dart';
 import 'package:get/get.dart';
 
 class RoomController {
-  MahjongFlameGame mahjongFlameGame = MahjongFlameGame();
+  late double width;
+  late double height;
 
   final Rx<Room?> room = Rx<Room?>(null);
+
+  RoomController() {
+    init();
+  }
+
+  init() {
+    width = appDataProvider.secondaryBodyWidth + appDataProvider.bodyWidth;
+    height = appDataProvider.totalSize.height - appDataProvider.toolbarHeight;
+    if (width < height) {
+      double temp = width;
+      width = height;
+      height = temp;
+    }
+  }
+
+  double x(double x) {
+    return -width * 0.5 + x;
+  }
+
+  double y(double y) {
+    return -height * 0.5 + y;
+  }
 
   /// self是哪个方位的参与者，用于取参与者牌的数据
   /// 因为系统支持以哪个方位的参与者游戏

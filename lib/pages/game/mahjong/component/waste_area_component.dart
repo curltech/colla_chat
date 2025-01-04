@@ -24,62 +24,62 @@ class WasteAreaComponent extends RectangleComponent
   _init() {
     if (areaDirection == AreaDirection.self) {
       position = Vector2(
-          MahjongFlameGame.x(MahjongFlameGame.width *
+          roomController.x(roomController.width *
               (MahjongFlameGame.previousWidthRadio +
                   MahjongFlameGame.previousHandWidthRadio +
                   MahjongFlameGame.previousWasteWidthRadio)),
-          MahjongFlameGame.y(MahjongFlameGame.height *
+          roomController.y(roomController.height *
               (1 -
                   MahjongFlameGame.selfHeightRadio -
                   MahjongFlameGame.selfWasteHeightRadio)));
       size = Vector2(
-          MahjongFlameGame.width * MahjongFlameGame.selfWasteWidthRadio,
-          MahjongFlameGame.height * MahjongFlameGame.selfWasteHeightRadio);
+          roomController.width * MahjongFlameGame.selfWasteWidthRadio,
+          roomController.height * MahjongFlameGame.selfWasteHeightRadio);
       paint = Paint()
         ..color = Colors.pinkAccent
         ..style = PaintingStyle.fill;
     }
     if (areaDirection == AreaDirection.next) {
       position = Vector2(
-          MahjongFlameGame.x(MahjongFlameGame.width *
+          roomController.x(roomController.width *
               (1 -
                   MahjongFlameGame.nextWidthRadio -
                   MahjongFlameGame.nextHandWidthRadio -
                   MahjongFlameGame.nextWasteWidthRadio)),
-          MahjongFlameGame.y(
-              MahjongFlameGame.height * MahjongFlameGame.opponentHeightRadio));
+          roomController.y(
+              roomController.height * MahjongFlameGame.opponentHeightRadio));
       size = Vector2(
-          MahjongFlameGame.width * MahjongFlameGame.nextWasteWidthRadio,
-          MahjongFlameGame.height * MahjongFlameGame.nextHeightRadio);
+          roomController.width * MahjongFlameGame.nextWasteWidthRadio,
+          roomController.height * MahjongFlameGame.nextHeightRadio);
       paint = Paint()
         ..color = Colors.blue
         ..style = PaintingStyle.fill;
     }
     if (areaDirection == AreaDirection.opponent) {
       position = Vector2(
-          MahjongFlameGame.x(MahjongFlameGame.width *
+          roomController.x(roomController.width *
               (MahjongFlameGame.previousWidthRadio +
                   MahjongFlameGame.previousHandWidthRadio +
                   MahjongFlameGame.previousWasteWidthRadio)),
-          MahjongFlameGame.y(
-              MahjongFlameGame.height * MahjongFlameGame.opponentHeightRadio));
+          roomController.y(
+              roomController.height * MahjongFlameGame.opponentHeightRadio));
       size = Vector2(
-          MahjongFlameGame.width * MahjongFlameGame.opponentWasteWidthRadio,
-          MahjongFlameGame.height * MahjongFlameGame.opponentWasteHeightRadio);
+          roomController.width * MahjongFlameGame.opponentWasteWidthRadio,
+          roomController.height * MahjongFlameGame.opponentWasteHeightRadio);
       paint = Paint()
         ..color = Colors.green
         ..style = PaintingStyle.fill;
     }
     if (areaDirection == AreaDirection.previous) {
       position = Vector2(
-          MahjongFlameGame.x(MahjongFlameGame.width *
+          roomController.x(roomController.width *
               (MahjongFlameGame.previousWidthRadio +
                   MahjongFlameGame.previousHandWidthRadio)),
-          MahjongFlameGame.y(
-              MahjongFlameGame.height * MahjongFlameGame.opponentHeightRadio));
+          roomController.y(
+              roomController.height * MahjongFlameGame.opponentHeightRadio));
       size = Vector2(
-          MahjongFlameGame.width * MahjongFlameGame.previousWasteWidthRadio,
-          MahjongFlameGame.height * MahjongFlameGame.previousHeightRadio);
+          roomController.width * MahjongFlameGame.previousWasteWidthRadio,
+          roomController.height * MahjongFlameGame.previousHeightRadio);
       paint = Paint()
         ..color = Colors.indigoAccent
         ..style = PaintingStyle.fill;
@@ -137,6 +137,6 @@ class WasteAreaComponent extends RectangleComponent
     }
     roomController.selfParticipantDirection.value =
         roomController.getParticipantDirection(areaDirection);
-    roomController.mahjongFlameGame.reload();
+    game.reload();
   }
 }

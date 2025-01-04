@@ -1,21 +1,21 @@
+import 'dart:async';
+import 'dart:typed_data';
+
+import 'package:camera_linux/camera_linux.dart';
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/media_file_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
-import 'dart:typed_data';
-
-import 'package:colla_chat/crypto/util.dart';
-import 'package:colla_chat/tool/file_util.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
-import 'package:camera_linux/camera_linux.dart';
 
 class LinuxCameraWidget extends StatefulWidget {
   final Function(XFile file)? onFile;

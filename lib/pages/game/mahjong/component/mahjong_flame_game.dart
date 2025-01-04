@@ -25,9 +25,6 @@ class MahjongFlameGame extends FlameGame
         ScaleDetector,
         HasCollisionDetection,
         HasKeyboardHandlerComponents {
-  static const double width = 1114;
-  static const double height = 655;
-
   static const double opponentHeightRadio = 0.16;
   static const double opponentWasteHeightRadio = 0.26;
   static const double selfWasteHeightRadio = 0.26;
@@ -56,18 +53,9 @@ class MahjongFlameGame extends FlameGame
   static const double selfWidthRadio = 0.16;
   static const double selfHandWidthRadio = 0.84;
 
-  static double x(double x) {
-    return -MahjongFlameGame.width * 0.5 + x;
+  MahjongFlameGame() {
+    _init();
   }
-
-  static double y(double y) {
-    return -MahjongFlameGame.height * 0.5 + y;
-  }
-
-  MahjongFlameGame()
-      : super(
-            camera: CameraComponent.withFixedResolution(
-                width: width, height: height));
 
   late final SpriteComponent backgroundComponent;
 
@@ -105,6 +93,11 @@ class MahjongFlameGame extends FlameGame
 
   // @override
   // bool debugMode = true;
+
+  _init() {
+    camera = CameraComponent.withFixedResolution(
+        width: roomController.width, height: roomController.height);
+  }
 
   @override
   Color backgroundColor() {
@@ -229,3 +222,5 @@ class MahjongFlameGame extends FlameGame
     }
   }
 }
+
+final MahjongFlameGame mahjongFlameGame = MahjongFlameGame();

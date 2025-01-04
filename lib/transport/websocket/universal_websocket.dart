@@ -9,11 +9,11 @@ import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/connectivity_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webclient.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:websocket_universal/websocket_universal.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 
 class ConnectivityController {
   late StreamSubscription<List<ConnectivityResult>> subscription;

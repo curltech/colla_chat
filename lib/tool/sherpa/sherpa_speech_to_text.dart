@@ -4,7 +4,6 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/sherpa/sherpa_config_util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:record/record.dart';
-
 import 'package:sherpa_onnx/sherpa_onnx.dart';
 
 /// 支持在线的录音识别，也支持单独的音频字节识别

@@ -1,4 +1,3 @@
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/url_util.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';

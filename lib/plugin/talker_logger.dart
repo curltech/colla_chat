@@ -4,10 +4,10 @@ import 'dart:io';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart' as p;
-import 'package:talker_flutter/talker_flutter.dart';
-import 'package:talker_flutter/talker_flutter.dart' as talker_logger;
 import 'package:logger/logger.dart';
+import 'package:path/path.dart' as p;
+import 'package:talker_flutter/talker_flutter.dart' as talker_logger;
+import 'package:talker_flutter/talker_flutter.dart';
 
 class FileTalkerObserver extends TalkerObserver {
   File? file;

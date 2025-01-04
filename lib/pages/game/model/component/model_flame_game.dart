@@ -7,7 +7,6 @@ import 'package:colla_chat/pages/game/model/component/node_relationship_componen
 import 'package:colla_chat/pages/game/model/component/subject_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';

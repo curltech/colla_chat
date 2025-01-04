@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'package:colla_chat/pages/game/mahjong/base/tile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/suit.dart';
+import 'package:colla_chat/pages/game/mahjong/base/tile.dart';
 import 'package:colla_chat/tool/json_util.dart';
 
 /// 一摞麻将牌，可以认为是一个序列的牌
