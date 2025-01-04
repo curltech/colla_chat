@@ -265,6 +265,7 @@ class Round {
     RoomEvent discardRoomEvent = RoomEvent(room.name,
         roundId: id, owner: owner, action: RoomEventAction.discard, tile: tile);
     bool pass = true;
+    outstandingParticipants.clear();
     for (int i = 0; i < roundParticipants.length; ++i) {
       receivers.add(i);
       if (room.creator != i && owner == room.creator) {
@@ -303,6 +304,8 @@ class Round {
 
     /// receiver不为空，事件是消息触发
     if (receiver == room.creator) {
+      outstandingParticipants.clear();
+
       /// 事件消息的接收者是creator，检查，发消息给其他参与者，2个消息，等待2个事件
       for (int i = 0; i < roundParticipants.length; ++i) {
         if (owner != i) {
@@ -327,15 +330,15 @@ class Round {
     final RoundParticipant roundParticipant = roundParticipants[owner];
     roundParticipant.pass(owner);
 
-    if (isCreator) {
+    if (owner == room.creator) {
       bool pass = checkOutstandingParticipant(owner);
       if (pass) {
         deal();
       }
-      RoomEvent passRoomEvent = RoomEvent(room.name,
-          roundId: id, owner: owner, action: RoomEventAction.pass);
-      _sendChatMessage(passRoomEvent, owner, [room.creator]);
     }
+    RoomEvent passRoomEvent = RoomEvent(room.name,
+        roundId: id, owner: owner, action: RoomEventAction.pass);
+    _sendChatMessage(passRoomEvent, owner, [room.creator]);
 
     return true;
   }
@@ -438,7 +441,9 @@ class Round {
   Tile? bar(int owner, int pos) {
     RoundParticipant roundParticipant = roundParticipants[owner];
     Tile? tile;
-    if (discardParticipant != null) {
+    if (roundParticipant.handPile.drawTile != null) {
+      tile = roundParticipant.drawBar(owner, pos);
+    } else if (discardParticipant != null) {
       tile = roundParticipant.discardBar(
           owner, pos, discardTile!, discardParticipant!);
       if (tile != null) {
@@ -446,8 +451,6 @@ class Round {
       }
       discardParticipant = null;
       discardTile = null;
-    } else {
-      tile = roundParticipant.drawBar(owner, pos);
     }
     if (tile == null) {
       return null;
@@ -457,15 +460,14 @@ class Round {
         roundId: id,
         owner: owner,
         action: RoomEventAction.bar,
-        tile: discardTile,
-        pos: pos,
-        src: discardParticipant);
+        tile: tile,
+        pos: pos);
     int sender = owner;
     List<int> receivers = [];
     bool pass = true;
     for (int i = 0; i < roundParticipants.length; ++i) {
+      receivers.add(i);
       if (owner == room.creator && room.creator != i) {
-        receivers.add(i);
         WinType? winType = roundParticipants[i].checkWin(i, tile);
         if (winType != null) {
           pass = false;
@@ -473,30 +475,26 @@ class Round {
         }
       }
     }
+    _sendChatMessage(barRoomEvent, sender, receivers);
     if (owner == room.creator && pass) {
       barDeal(owner);
     }
-    _sendChatMessage(barRoomEvent, sender, receivers);
 
     return tile;
   }
 
   /// 收到owner杠牌的消息
-  Tile? _bar(int owner, int pos, int receiver) {
+  Tile? _bar(int owner, int pos, Tile tile, int receiver) {
     logger.w('chat message: $owner bar pos:$pos');
     RoundParticipant roundParticipant = roundParticipants[owner];
-    Tile? tile;
-    if (discardParticipant != null) {
-      tile = roundParticipant.discardBar(
+    if (roundParticipant.handPile.drawTile != null) {
+      roundParticipant.drawBar(owner, pos);
+    } else if (discardParticipant != null) {
+      roundParticipant.discardBar(
           owner, pos, discardTile!, discardParticipant!);
       roundParticipants[discardParticipant!].wastePile.tiles.removeLast();
       discardParticipant = null;
       discardTile = null;
-    } else {
-      tile = roundParticipant.drawBar(owner, pos);
-    }
-    if (tile == null) {
-      return null;
     }
     roundParticipants[receiver].checkWin(receiver, tile);
 
@@ -522,6 +520,7 @@ class Round {
     return tile;
   }
 
+  /// 杠牌发牌，只有creator才能调用
   Tile? barDeal(int owner) {
     if (!isCreator) {
       logger.e('owner:$owner barDeal tile failure, not creator');
@@ -611,6 +610,7 @@ class Round {
   }
 
   /// 某个参与者吃打出的牌，pos表示吃牌的位置
+  /// 暂时不实现这个功能
   Tile? chow(int owner, int pos) {
     if (discardTile == null) {
       return null;
@@ -642,22 +642,6 @@ class Round {
     discardTile = null;
 
     return tile;
-  }
-
-  Map<int, WinType>? _checkWin(int owner, Tile tile) {
-    Map<int, WinType>? winTypes;
-    for (int i = 0; i < roundParticipants.length; ++i) {
-      if (owner != i) {
-        RoundParticipant roundParticipant = roundParticipants[i];
-        WinType? winType = roundParticipant.checkWin(owner, tile);
-        if (winType != null) {
-          winTypes ??= {};
-          winTypes[i] = winType;
-        }
-      }
-    }
-
-    return winTypes;
   }
 
   bool _score(int owner, int winTypeIndex, {int? receiver}) {
@@ -834,8 +818,8 @@ class Round {
         returnValue =
             _discard(roomEvent.owner, roomEvent.tile!, roomEvent.receiver!);
       case RoomEventAction.bar:
-        returnValue =
-            _bar(roomEvent.owner, roomEvent.pos!, roomEvent.receiver!);
+        returnValue = _bar(roomEvent.owner, roomEvent.pos!, roomEvent.tile!,
+            roomEvent.receiver!);
       case RoomEventAction.barDeal:
         returnValue = barDeal(roomEvent.owner);
       case RoomEventAction.touch:

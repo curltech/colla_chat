@@ -117,7 +117,7 @@ class HandPile extends Pile {
 
   /// 打牌明杠
   Tile? discardBar(int pos, Tile tile, int discard) {
-    if (tiles[pos] != tile) {
+    if (pos == -1 || tiles[pos] != tile) {
       return null;
     }
     tile = tiles.removeAt(pos);
@@ -130,8 +130,8 @@ class HandPile extends Pile {
     return tile;
   }
 
-  /// 检查摸牌明杠，需要检查card与碰牌是否相同
-  /// 返回的结果包含-1，则takeCard可杠，
+  /// 检查摸牌明杠，需要检查tile与碰牌是否相同
+  /// 返回的结果包含-1，则drawTile可杠，
   /// 如果包含的数字不是-1，则表示手牌的可杠牌位置
   /// 返回为空，则不可杠
   List<int>? checkDrawBar() {
@@ -158,7 +158,7 @@ class HandPile extends Pile {
   }
 
   /// 摸牌明杠：分成摸牌杠牌和手牌杠牌
-  /// pos是-1，则takeCard可杠，
+  /// pos是-1，则drawTile可杠，
   /// pos不是-1，则表示手牌的可杠牌位置
   Tile? drawBar(int pos, int source) {
     Tile tile;
@@ -187,7 +187,7 @@ class HandPile extends Pile {
     return null;
   }
 
-  /// 检查暗杠，就是检查加上摸牌card后，手上是否有连续的四张，如果有的话返回第一张的位置
+  /// 检查暗杠，就是检查加上摸牌tile后，手上是否有连续的四张，如果有的话返回第一张的位置
   List<int>? checkDarkBar() {
     if (drawTile == null) {
       return null;

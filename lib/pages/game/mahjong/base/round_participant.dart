@@ -94,7 +94,7 @@ class RoundParticipant {
   }
 
   /// 摸牌，有三种摸牌，普通的自摸，海底捞的自摸，杠上自摸
-  /// owner摸到card牌，takeCardType表示摸牌的方式
+  /// owner摸到tile牌，dealTileType表示摸牌的方式
   Map<OutstandingAction, Set<int>>? deal(
       int owner, Tile tile, int dealTileTypeIndex) {
     if (owner != index) {
@@ -213,7 +213,7 @@ class RoundParticipant {
     return handPile.touch(pos, tile);
   }
 
-  /// 打牌杠牌，分成打牌杠牌sendBar和摸牌杠牌takeBar
+  /// 打牌杠牌discardBar
   Tile? discardBar(int owner, int pos, Tile tile, int discardParticipant) {
     if (index != owner) {
       return null;
@@ -229,10 +229,9 @@ class RoundParticipant {
     return c;
   }
 
-  /// owner明杠位置pos的牌，分两种情况，摸牌杠牌和打牌杠牌
-  /// 打牌杠牌的时候sender不为空，表示打牌的参与者
-  /// pos表示杠牌的位置,如果摸牌杠牌的时候为手牌杠牌的位置，打牌杠牌的时候是杠牌的位置
-  /// 返回值为杠的牌，为空表示未成功
+  /// 摸牌杠牌和手牌杠牌drawBar
+  /// owner明杠位置，pos的值分两种情况，摸牌杠牌和手牌杠牌
+  /// 摸牌杠牌和手牌杠牌:pos为-1，表示是摸牌可杠，否则表示手牌可杠的位置
   Tile? drawBar(int owner, int pos) {
     if (index != owner) {
       return null;
@@ -245,7 +244,7 @@ class RoundParticipant {
     return tile;
   }
 
-  /// 暗杠牌，owner杠手上pos位置已有的四张牌（card==null）或者新进的card（card!=null）
+  /// 暗杠牌，owner杠手上pos位置已有的四张牌（tile==null）或者新进的tile（tile!=null）
   Tile? darkBar(int owner, int pos) {
     if (index != owner) {
       return null;

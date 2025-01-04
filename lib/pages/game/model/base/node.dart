@@ -72,6 +72,9 @@ class NodeRelationship {
   int? srcCardinality;
   int? dstCardinality;
 
+  String? srcAttributeName;
+  String? dstAttributeName;
+
   ModelNode? src;
   ModelNode? dst;
 
@@ -97,7 +100,9 @@ class NodeRelationship {
         relationshipType =
             json['relationshipType'] ?? RelationshipType.association.name,
         srcCardinality = json['srcCardinality'],
-        dstCardinality = json['dstCardinality'] {
+        dstCardinality = json['dstCardinality'],
+        srcAttributeName = json['srcAttributeName'],
+        dstAttributeName = json['dstAttributeName'] {
     dynamic types = json['allowRelationshipTypes'];
     if (types != null && types.isNotEmpty) {
       if (types is Set<dynamic>) {
@@ -119,7 +124,9 @@ class NodeRelationship {
       'relationshipType': relationshipType,
       'allowRelationshipTypes': allowRelationshipTypes?.toList(),
       'srcCardinality': srcCardinality,
-      'dstCardinality': dstCardinality
+      'dstCardinality': dstCardinality,
+      'srcAttributeName': srcAttributeName,
+      'dstAttributeName': dstAttributeName
     };
   }
 }

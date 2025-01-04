@@ -14,6 +14,10 @@ class Attribute {
   String name;
   late String scope;
   late String dataType;
+  bool canBeNull = true;
+  bool isPrimaryKey = false;
+  int? length;
+  int? scale;
 
   AttributeTextComponent? attributeTextComponent;
 
@@ -25,11 +29,23 @@ class Attribute {
   Attribute.fromJson(Map json)
       : name = json['name'],
         scope = json['scope'],
-        dataType = json['dataType'];
+        dataType = json['dataType'],
+        canBeNull = json['canBeNull'] ?? true,
+        isPrimaryKey = json['isPrimaryKey'] ?? true,
+        length = json['length'],
+        scale = json['scale'];
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
-    json.addAll({'name': name, 'scope': scope, 'dataType': dataType});
+    json.addAll({
+      'name': name,
+      'scope': scope,
+      'dataType': dataType,
+      'canBeNull': canBeNull,
+      'isPrimaryKey': isPrimaryKey,
+      'length': length,
+      'scale': scale,
+    });
 
     return json;
   }

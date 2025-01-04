@@ -168,6 +168,8 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
                 owner: room.banker, action: RoomEventAction.round));
           },
           icon: const Icon(Icons.newspaper_outlined)));
+    }
+    if (room != null) {
       rightWidgets.add(IconButton(
           tooltip: AppLocalizations.t('Check'),
           onPressed: () {
@@ -181,16 +183,16 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
             if (currentRoundParticipant == null) {
               return;
             }
-            mahjongCard.Tile? sendCard = currentRound.discardTile;
-            mahjongCard.Tile? takeCard =
+            mahjongCard.Tile? discardTile = currentRound.discardTile;
+            mahjongCard.Tile? drawTile =
                 currentRoundParticipant.handPile.drawTile;
             Map<OutstandingAction, Set<int>> outstandingActions;
-            if (sendCard != null) {
+            if (drawTile != null) {
               outstandingActions =
-                  currentRoundParticipant.check(tile: sendCard);
-            } else if (takeCard != null) {
+                  currentRoundParticipant.check(tile: drawTile);
+            } else if (discardTile != null) {
               outstandingActions =
-                  currentRoundParticipant.check(tile: takeCard);
+                  currentRoundParticipant.check(tile: discardTile);
             } else {
               outstandingActions = currentRoundParticipant.check();
             }
