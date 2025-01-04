@@ -35,7 +35,6 @@ class BindingMoreDataTable2<T> extends StatelessWidget {
     this.fixedLeftColumns = 0,
   });
 
-
   Future<void> _onRefresh() async {
     ///下拉刷新数据的地方，比如从数据库取更多数据
     if (onRefresh == null) {

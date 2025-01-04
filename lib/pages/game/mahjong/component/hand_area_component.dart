@@ -20,53 +20,51 @@ class HandAreaComponent extends RectangleComponent
   _init() {
     if (areaDirection == AreaDirection.self) {
       position = Vector2(
-          MahjongFlameGame.x(
-              MahjongFlameGame.width * MahjongFlameGame.selfWidthRadio),
-          MahjongFlameGame.y(MahjongFlameGame.height *
-              (1 - MahjongFlameGame.selfHeightRadio)));
-      size = Vector2(
-          MahjongFlameGame.width * MahjongFlameGame.selfHandWidthRadio,
-          MahjongFlameGame.height * MahjongFlameGame.selfHeightRadio);
+          roomController
+              .x(roomController.width * MahjongFlameGame.selfWidthRadio),
+          roomController.y(
+              roomController.height * (1 - MahjongFlameGame.selfHeightRadio)));
+      size = Vector2(roomController.width * MahjongFlameGame.selfHandWidthRadio,
+          roomController.height * MahjongFlameGame.selfHeightRadio);
       paint = Paint()
         ..color = Colors.teal
         ..style = PaintingStyle.fill;
     }
     if (areaDirection == AreaDirection.next) {
       position = Vector2(
-          MahjongFlameGame.x(MahjongFlameGame.width *
+          roomController.x(roomController.width *
               (1 -
                   MahjongFlameGame.nextWidthRadio -
                   MahjongFlameGame.nextHandWidthRadio)),
-          MahjongFlameGame.y(
-              MahjongFlameGame.height * MahjongFlameGame.opponentHeightRadio));
-      size = Vector2(
-          MahjongFlameGame.width * MahjongFlameGame.nextHandWidthRadio,
-          MahjongFlameGame.height * MahjongFlameGame.nextHeightRadio);
+          roomController
+              .y(roomController.height * MahjongFlameGame.opponentHeightRadio));
+      size = Vector2(roomController.width * MahjongFlameGame.nextHandWidthRadio,
+          roomController.height * MahjongFlameGame.nextHeightRadio);
       paint = Paint()
         ..color = Colors.yellow
         ..style = PaintingStyle.fill;
     }
     if (areaDirection == AreaDirection.opponent) {
       position = Vector2(
-          MahjongFlameGame.x(
-              MahjongFlameGame.width * MahjongFlameGame.opponentWidthRadio),
-          MahjongFlameGame.y(0));
+          roomController
+              .x(roomController.width * MahjongFlameGame.opponentWidthRadio),
+          roomController.y(0));
       size = Vector2(
-          MahjongFlameGame.width * MahjongFlameGame.opponentHandWidthRadio,
-          MahjongFlameGame.height * MahjongFlameGame.opponentHeightRadio);
+          roomController.width * MahjongFlameGame.opponentHandWidthRadio,
+          roomController.height * MahjongFlameGame.opponentHeightRadio);
       paint = Paint()
         ..color = Colors.blueGrey
         ..style = PaintingStyle.fill;
     }
     if (areaDirection == AreaDirection.previous) {
       position = Vector2(
-          MahjongFlameGame.x(
-              MahjongFlameGame.width * MahjongFlameGame.previousWidthRadio),
-          MahjongFlameGame.y(
-              MahjongFlameGame.height * MahjongFlameGame.opponentHeightRadio));
+          roomController
+              .x(roomController.width * MahjongFlameGame.previousWidthRadio),
+          roomController
+              .y(roomController.height * MahjongFlameGame.opponentHeightRadio));
       size = Vector2(
-          MahjongFlameGame.width * MahjongFlameGame.previousHandWidthRadio,
-          MahjongFlameGame.height * MahjongFlameGame.previousHeightRadio);
+          roomController.width * MahjongFlameGame.previousHandWidthRadio,
+          roomController.height * MahjongFlameGame.previousHeightRadio);
       paint = Paint()
         ..color = Colors.purple
         ..style = PaintingStyle.fill;
@@ -79,18 +77,18 @@ class HandAreaComponent extends RectangleComponent
     }
     Room? room = roomController.room.value;
     if (room != null) {
-      Vector2 position= Vector2(0, 20);
+      Vector2 position = Vector2(0, 20);
       if (areaDirection == AreaDirection.opponent) {
-        position= Vector2(0, 50);
+        position = Vector2(0, 50);
       }
       if (areaDirection == AreaDirection.next) {
-        position= Vector2(10, 0);
+        position = Vector2(10, 0);
       }
       if (areaDirection == AreaDirection.previous) {
-        position= Vector2(60, 0);
+        position = Vector2(60, 0);
       }
       handPileComponent = HandPileComponent(areaDirection,
-          position: position, scale: Vector2(0.85, 0.85));
+          position: position, scale: roomController.scale);
       add(handPileComponent!);
     }
   }

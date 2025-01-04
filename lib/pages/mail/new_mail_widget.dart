@@ -2,15 +2,15 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
-import 'package:colla_chat/entity/mail/mail_address.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/entity/mail/mail_address.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/mail/mail_mime_message_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/mail/mail_address.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/service/mail/mail_address.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';

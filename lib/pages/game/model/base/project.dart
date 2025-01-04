@@ -1,8 +1,9 @@
+import 'dart:ui' as ui;
+
 import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:flame/components.dart';
-import 'dart:ui' as ui;
 
 /// 模型项目
 class Project {

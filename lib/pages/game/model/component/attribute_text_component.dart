@@ -13,7 +13,11 @@ import 'package:flame/text.dart';
 import 'package:flutter/material.dart';
 
 class AttributeTextComponent extends TextComponent
-    with ModelNodeComponent,TapCallbacks, HoverCallbacks, HasGameRef<ModelFlameGame> {
+    with
+        ModelNodeComponent,
+        TapCallbacks,
+        HoverCallbacks,
+        HasGameRef<ModelFlameGame> {
   static final TextPaint normal = TextPaint(
     style: const TextStyle(
       color: Colors.black,

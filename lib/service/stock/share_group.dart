@@ -1,14 +1,9 @@
 import 'package:colla_chat/entity/stock/share_group.dart';
-import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
-
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
-import 'package:colla_chat/service/stock/share.dart';
 
 class ShareGroupService extends GeneralBaseService<ShareGroup> {
   static String defaultGroupName = 'MySelection';
-
-
 
   ShareGroupService(
       {required super.tableName,
@@ -18,7 +13,6 @@ class ShareGroupService extends GeneralBaseService<ShareGroup> {
       return ShareGroup.fromJson(map);
     };
   }
-
 
   Future<void> store(ShareGroup shareGroup) async {
     ShareGroup? old =

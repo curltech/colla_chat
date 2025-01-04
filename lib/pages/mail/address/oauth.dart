@@ -1,9 +1,9 @@
 import 'dart:convert';
 
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:http/http.dart' as http;
-import 'package:colla_chat/plugin/talker_logger.dart';
 
 /// Defines the ID and secret of an OAuth client
 class OauthClientId {

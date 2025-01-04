@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';

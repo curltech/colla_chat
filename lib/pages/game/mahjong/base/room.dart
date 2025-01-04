@@ -4,7 +4,6 @@ import 'dart:ui';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/game/mahjong/base/tile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/full_pile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/hand_pile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/participant.dart';
@@ -12,6 +11,8 @@ import 'package:colla_chat/pages/game/mahjong/base/room_pool.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round_participant.dart';
 import 'package:colla_chat/pages/game/mahjong/base/suit.dart';
+import 'package:colla_chat/pages/game/mahjong/base/tile.dart';
+import 'package:colla_chat/pages/game/mahjong/component/mahjong_flame_game.dart';
 import 'package:colla_chat/pages/game/mahjong/room_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -413,7 +414,7 @@ class Room {
         }
         currentRoundIndex = round.id;
         returnValue = round;
-        roomController.mahjongFlameGame.reload();
+        mahjongFlameGame.reload();
       }
     } else {
       int? roundId = roomEvent.roundId;

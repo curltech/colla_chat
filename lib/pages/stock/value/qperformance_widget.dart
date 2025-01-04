@@ -67,7 +67,8 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         cancel: true,
         prefixIcon: IconButton(
           onPressed: () {
-            searchController.setValue('tsCode', myShareController.subscription.value);
+            searchController.setValue(
+                'tsCode', myShareController.subscription.value);
           },
           icon: Icon(
             Icons.perm_identity_outlined,

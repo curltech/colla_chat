@@ -124,6 +124,7 @@ class KlondikeWorld extends World with HasGameReference<KlondikeGame> {
         game.klondikeDraw = (game.klondikeDraw == 3) ? 1 : 3;
       }
     }
+
     /// 数组数据随机化
     cards.shuffle(Random(game.seed));
 

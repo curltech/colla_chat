@@ -110,8 +110,6 @@ class FileOutput extends LogOutput {
 
 final customLogger = CustomLogger();
 
-
-
 class LoggerController with ChangeNotifier {
   int total = 100;
   final List<String> _logs = [];

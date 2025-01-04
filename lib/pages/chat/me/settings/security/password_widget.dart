@@ -91,12 +91,12 @@ class PasswordWidget extends StatelessWidget with TileDataMixin {
           RegVal.hasMatch(plainPassword, RegexPattern.passwordNormal1);
       // isPassword = Validate.isPassword(plainPassword);
       if (!isPassword) {
-        DialogUtil.error( content: 'password must be strong password');
+        DialogUtil.error(content: 'password must be strong password');
         return;
       }
       if (plainPassword != confirmPassword) {
         logger.e('new password is not matched');
-        DialogUtil.error( content: 'password is not matched');
+        DialogUtil.error(content: 'password is not matched');
         return;
       }
       String loginName = myself.myselfPeer.loginName;

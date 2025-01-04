@@ -1,4 +1,3 @@
-import 'package:colla_chat/plugin/talker_logger.dart' as logger;
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';

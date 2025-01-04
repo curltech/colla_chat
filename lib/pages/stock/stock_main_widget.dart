@@ -9,7 +9,6 @@ import 'package:colla_chat/pages/stock/value/qperformance_widget.dart';
 import 'package:colla_chat/pages/stock/value/qstat_widget.dart';
 import 'package:colla_chat/pages/stock/value/stat_score_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';

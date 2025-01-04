@@ -16,15 +16,15 @@ class StockAreaComponent extends RectangleComponent
 
   _init() {
     position = Vector2(
-        MahjongFlameGame.x(MahjongFlameGame.width *
+        roomController.x(roomController.width *
             (MahjongFlameGame.previousWidthRadio +
                 MahjongFlameGame.previousHandWidthRadio +
                 MahjongFlameGame.previousWasteWidthRadio)),
-        MahjongFlameGame.y(MahjongFlameGame.height *
+        roomController.y(roomController.height *
             (MahjongFlameGame.opponentHeightRadio +
                 MahjongFlameGame.opponentWasteHeightRadio)));
-    size = Vector2(MahjongFlameGame.width * MahjongFlameGame.stockWidthRadio,
-        MahjongFlameGame.height * MahjongFlameGame.stockHeightRadio);
+    size = Vector2(roomController.width * MahjongFlameGame.stockWidthRadio,
+        roomController.height * MahjongFlameGame.stockHeightRadio);
     paint = Paint()
       ..color = Colors.grey
       ..style = PaintingStyle.stroke;
@@ -37,7 +37,7 @@ class StockAreaComponent extends RectangleComponent
     }
     Room? room = roomController.room.value;
     if (room != null) {
-      stockPileComponent = StockPileComponent(scale: Vector2(0.9, 0.9));
+      stockPileComponent = StockPileComponent(scale: roomController.scale);
       add(stockPileComponent!);
     }
   }

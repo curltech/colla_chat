@@ -23,7 +23,6 @@ class PeerClientViewWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'PeerClientView';
 
-
   Widget _buildValueListView(BuildContext context) {
     Map<String, dynamic> values = {};
     PeerClient? currentPeerClient = peerClientController.current;
@@ -46,9 +45,7 @@ class PeerClientViewWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     var valueListView = _buildValueListView(context);
     var appBarView = AppBarView(
-        title: title,
-        withLeading: withLeading,
-        child: valueListView);
+        title: title, withLeading: withLeading, child: valueListView);
     return appBarView;
   }
 }

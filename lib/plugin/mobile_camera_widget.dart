@@ -144,7 +144,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
   Widget _buildCameraController(BuildContext context) {
     return Column(
       children: <Widget>[
-         Expanded(
+        Expanded(
           child: nil,
         ),
         Container(
@@ -373,9 +373,10 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
           : primary,
     );
     final ButtonStyle styleLocked = TextButton.styleFrom(
-      foregroundColor: cameraController?.value.exposureMode == ExposureMode.locked
-          ? Colors.orange
-          : primary,
+      foregroundColor:
+          cameraController?.value.exposureMode == ExposureMode.locked
+              ? Colors.orange
+              : primary,
     );
 
     return SizeTransition(
@@ -667,7 +668,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
   }
 
   void _showInSnackBar(String message) {
-    DialogUtil.info( content: message);
+    DialogUtil.info(content: message);
   }
 
   ///对焦和曝光手势的处理

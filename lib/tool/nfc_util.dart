@@ -1,4 +1,3 @@
-
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 import 'package:ndef/ndef.dart' as ndef;

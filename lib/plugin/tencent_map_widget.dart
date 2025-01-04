@@ -8,8 +8,8 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart' as geocoding;
 import 'package:latlong2/latlong.dart';
-import 'package:tencent_map_flutter/tencent_map_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:tencent_map_flutter/tencent_map_flutter.dart';
 
 /// 调用tencent地图，用于移动设备，有流量限制，功能强大
 class TencentMapWidget extends StatefulWidget {

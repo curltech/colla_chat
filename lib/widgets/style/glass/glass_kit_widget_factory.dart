@@ -1104,7 +1104,8 @@ class GlassKitWidgetFactory extends WidgetFactory {
   }) {
     return _buildGlassWidget(
         child: ToggleButtons(
-      key: key, borderRadius: borderRadius,
+      key: key,
+      borderRadius: borderRadius,
       isSelected: isSelected,
       onPressed: onPressed,
       mouseCursor: mouseCursor,

@@ -2,8 +2,9 @@ import 'dart:io';
 
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
-import 'package:colla_chat/entity/mail/mail_address.dart' as entity;
 import 'package:colla_chat/entity/chat/message_attachment.dart';
+import 'package:colla_chat/entity/mail/mail_address.dart' as entity;
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/mail/address/email_service_provider.dart';
 import 'package:colla_chat/pages/mail/address/oauth.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
@@ -13,7 +14,6 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_html/enough_mail_html.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:colla_chat/l10n/localization.dart';
 
 class EmailMessageUtil {
   /// 创建带附件的消息

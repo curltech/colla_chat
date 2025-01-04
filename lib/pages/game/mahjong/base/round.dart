@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
-import 'package:colla_chat/pages/game/mahjong/base/tile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/full_pile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/hand_pile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/outstanding_action.dart';
@@ -11,7 +10,8 @@ import 'package:colla_chat/pages/game/mahjong/base/room_pool.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round_participant.dart';
 import 'package:colla_chat/pages/game/mahjong/base/stock_pile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/suit.dart';
-import 'package:colla_chat/pages/game/mahjong/room_controller.dart';
+import 'package:colla_chat/pages/game/mahjong/base/tile.dart';
+import 'package:colla_chat/pages/game/mahjong/component/mahjong_flame_game.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -790,9 +790,9 @@ class Round {
     }
 
     if (roomEvent.action == RoomEventAction.discard) {
-      roomController.mahjongFlameGame.reloadNext();
+      mahjongFlameGame.reloadNext();
     }
-    roomController.mahjongFlameGame.reloadSelf();
+    mahjongFlameGame.reloadSelf();
 
     return returnValue;
   }
@@ -845,9 +845,9 @@ class Round {
     }
 
     if (roomEvent.action == RoomEventAction.discard) {
-      roomController.mahjongFlameGame.reloadNext();
+      mahjongFlameGame.reloadNext();
     }
-    roomController.mahjongFlameGame.reloadSelf();
+    mahjongFlameGame.reloadSelf();
 
     return returnValue;
   }

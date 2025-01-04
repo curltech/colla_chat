@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:colla_chat/pages/game/tool/ember.dart';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
@@ -10,7 +11,6 @@ import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:colla_chat/pages/game/tool/ember.dart';
 
 class FollowFlameGame extends FlameGame
     with HasCollisionDetection, HasKeyboardHandlerComponents {

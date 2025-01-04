@@ -98,7 +98,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
       if (dir != null) {
         String path = p.join(dir, filename);
         await FileUtil.writeFileAsBytes(bytes, path);
-        DialogUtil.info( content: 'save to file: $path');
+        DialogUtil.info(content: 'save to file: $path');
       }
     }
   }

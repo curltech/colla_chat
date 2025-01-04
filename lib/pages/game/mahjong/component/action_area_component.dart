@@ -19,21 +19,21 @@ class ActionAreaComponent extends RectangleComponent
   _init() {
     priority = 10;
     position = Vector2(
-        MahjongFlameGame.x(MahjongFlameGame.width *
+        roomController.x(roomController.width *
             (1 -
                 MahjongFlameGame.nextWidthRadio -
                 MahjongFlameGame.nextHandWidthRadio -
                 MahjongFlameGame.nextWasteWidthRadio)),
-        MahjongFlameGame.y(MahjongFlameGame.height *
+        roomController.y(roomController.height *
                 (1 -
                     MahjongFlameGame.selfHeightRadio -
                     MahjongFlameGame.selfWasteHeightRadio) +
             70));
     size = Vector2(
-        MahjongFlameGame.width *
+        roomController.width *
             (MahjongFlameGame.nextWasteWidthRadio +
                 MahjongFlameGame.nextHandWidthRadio),
-        MahjongFlameGame.height * MahjongFlameGame.selfHeightRadio);
+        roomController.height * MahjongFlameGame.selfHeightRadio);
     paint = Paint()
       ..color = Colors.orangeAccent.withOpacity(0.5)
       ..style = PaintingStyle.fill;
@@ -69,7 +69,7 @@ class ActionAreaComponent extends RectangleComponent
             onPressed: () {
               _call(outstandingAction, pos.toList());
               outstandingActions.clear();
-              roomController.mahjongFlameGame.loadActionArea();
+              game.loadActionArea();
             });
         add(spriteButtonComponent);
       }
@@ -88,8 +88,7 @@ class ActionAreaComponent extends RectangleComponent
     }
 
     if (outstandingAction == OutstandingAction.win) {
-      WinType? completeType = await room.startRoomEvent(RoomEvent(
-          room.name,
+      WinType? completeType = await room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,
           owner: owner,
           action: RoomEventAction.win,

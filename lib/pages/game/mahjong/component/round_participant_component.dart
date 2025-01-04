@@ -1,10 +1,8 @@
 import 'dart:async';
 
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/game/mahjong/base/room.dart';
-import 'package:colla_chat/pages/game/mahjong/base/round.dart';
-import 'package:colla_chat/pages/game/mahjong/base/round_participant.dart';
 import 'package:colla_chat/pages/game/mahjong/base/participant.dart';
+import 'package:colla_chat/pages/game/mahjong/base/round_participant.dart';
 import 'package:colla_chat/pages/game/mahjong/component/mahjong_flame_game.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';

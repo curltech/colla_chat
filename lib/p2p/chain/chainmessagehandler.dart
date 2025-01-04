@@ -19,7 +19,6 @@ import 'package:colla_chat/transport/httpclient.dart';
 import 'package:colla_chat/transport/websocket/common_websocket.dart';
 import 'package:colla_chat/transport/websocket/universal_websocket.dart';
 import 'package:dio/dio.dart';
-import 'package:uuid/uuid.dart';
 
 const packetSize = 4 * 1024 * 1024;
 const webRtcPacketSize = 128 * 1024;

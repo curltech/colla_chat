@@ -1,5 +1,5 @@
-import 'package:colla_chat/pages/chat/me/settings/general/brightness_picker.dart';
 import 'package:colla_chat/pages/base/color_picker.dart';
+import 'package:colla_chat/pages/chat/me/settings/general/brightness_picker.dart';
 import 'package:colla_chat/pages/chat/me/settings/general/locale_picker.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';

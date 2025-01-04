@@ -1,7 +1,7 @@
-import 'package:another_transformer_page_view/another_transformer_page_view.dart';
-import 'package:flutter/material.dart';
 import 'dart:math' as Math;
 
+import 'package:another_transformer_page_view/another_transformer_page_view.dart';
+import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 class AccordionTransformer extends PageTransformer {
@@ -31,7 +31,7 @@ class ThreeDTransformer extends PageTransformer {
     double? height = info.height;
     double? width = info.width;
     double pivotX = 0.0;
-    if (position! < 0 && position>= -1) {
+    if (position! < 0 && position >= -1) {
       // left scrolling
       pivotX = width!;
     }
@@ -51,7 +51,7 @@ class ZoomInPageTransformer extends PageTransformer {
   Widget transform(Widget child, TransformInfo info) {
     double? position = info.position;
     double? width = info.width;
-    if (position! > 0 && position<= 1) {
+    if (position! > 0 && position <= 1) {
       return Transform.translate(
         offset: Offset(-width! * position, 0.0),
         child: Transform.scale(

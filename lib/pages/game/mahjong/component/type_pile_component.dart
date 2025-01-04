@@ -1,14 +1,13 @@
 import 'dart:async';
 
-import 'package:colla_chat/pages/game/mahjong/base/tile.dart';
-import 'package:colla_chat/pages/game/mahjong/base/tile_background_sprite.dart';
 import 'package:colla_chat/pages/game/mahjong/base/format_tile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room.dart';
-import 'package:colla_chat/pages/game/mahjong/component/tile_component.dart';
+import 'package:colla_chat/pages/game/mahjong/base/tile.dart';
+import 'package:colla_chat/pages/game/mahjong/base/tile_background_sprite.dart';
 import 'package:colla_chat/pages/game/mahjong/component/mahjong_flame_game.dart';
+import 'package:colla_chat/pages/game/mahjong/component/tile_component.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:universal_html/html.dart';
 
 /// flame引擎渲染的麻将牌
 class TypePileComponent extends PositionComponent

@@ -84,7 +84,7 @@ class SystemMonitor {
     }
   }
 
-  static getSystemStatus(){
+  static getSystemStatus() {
     SystemResources.cpuLoadAvg();
     SystemResources.memUsage();
     SystemResources.memUsage();

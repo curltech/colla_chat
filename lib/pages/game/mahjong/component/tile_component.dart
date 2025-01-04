@@ -1,12 +1,12 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:colla_chat/pages/game/mahjong/base/tile.dart' as mahjongCard;
-import 'package:colla_chat/pages/game/mahjong/base/tile_background_sprite.dart';
 import 'package:colla_chat/pages/game/mahjong/base/hand_pile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round_participant.dart';
+import 'package:colla_chat/pages/game/mahjong/base/tile.dart' as mahjongCard;
+import 'package:colla_chat/pages/game/mahjong/base/tile_background_sprite.dart';
 import 'package:colla_chat/pages/game/mahjong/component/mahjong_flame_game.dart';
 import 'package:colla_chat/pages/game/mahjong/room_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';

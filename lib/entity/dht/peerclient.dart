@@ -1,4 +1,3 @@
-
 import 'base.dart';
 
 ///联系人（Linkman）能够连接节点服务器的客户
