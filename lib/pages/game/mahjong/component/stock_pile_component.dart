@@ -46,14 +46,14 @@ class StockPileComponent extends PositionComponent
     } else {
       tiles = [...stockPile.tiles];
     }
-    length = tiles.length;
+    length = length - 6;
     double initX;
     if (length.isOdd) {
       initX = roomController.width * MahjongFlameGame.stockWidthRadio -
-          (length / 2) * 35;
+          (length + 1) / 2 * 35;
     } else {
       initX = roomController.width * MahjongFlameGame.stockWidthRadio -
-          (length / 2 - 1) * 35;
+          (length / 2) * 35;
     }
     double x = initX;
     double y = 0;

@@ -90,7 +90,7 @@ class HandAreaComponent extends RectangleComponent
         position= Vector2(60, 0);
       }
       handPileComponent = HandPileComponent(areaDirection,
-          position: position, scale: Vector2(0.85, 0.85));
+          position: position, scale: roomController.scale);
       add(handPileComponent!);
     }
   }

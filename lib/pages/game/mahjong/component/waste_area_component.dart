@@ -105,7 +105,7 @@ class WasteAreaComponent extends RectangleComponent
       if (areaDirection == AreaDirection.self ||
           areaDirection == AreaDirection.opponent) {
         wastePileComponent =
-            WastePileComponent(areaDirection, scale: Vector2(0.85, 0.85));
+            WastePileComponent(areaDirection, scale: roomController.scale);
       }
       add(wastePileComponent!);
 

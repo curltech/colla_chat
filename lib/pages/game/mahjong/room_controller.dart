@@ -6,11 +6,13 @@ import 'package:colla_chat/pages/game/mahjong/base/round_participant.dart';
 import 'package:colla_chat/pages/game/mahjong/base/waste_pile.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/number_util.dart';
+import 'package:flame/game.dart';
 import 'package:get/get.dart';
 
 class RoomController {
   late double width;
   late double height;
+  late Vector2 scale;
 
   final Rx<Room?> room = Rx<Room?>(null);
 
@@ -26,6 +28,7 @@ class RoomController {
       width = height;
       height = temp;
     }
+    scale = Vector2(width * 0.8 / 1110, height * 0.8 / 650);
   }
 
   double x(double x) {

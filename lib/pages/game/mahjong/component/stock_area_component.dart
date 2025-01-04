@@ -37,7 +37,7 @@ class StockAreaComponent extends RectangleComponent
     }
     Room? room = roomController.room.value;
     if (room != null) {
-      stockPileComponent = StockPileComponent(scale: Vector2(0.9, 0.9));
+      stockPileComponent = StockPileComponent(scale: roomController.scale);
       add(stockPileComponent!);
     }
   }
