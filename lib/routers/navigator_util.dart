@@ -3,7 +3,6 @@ import 'package:colla_chat/routers/routes.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 
-
 class NavigatorUtil {
   // 返回
   static void goBack(BuildContext context) {

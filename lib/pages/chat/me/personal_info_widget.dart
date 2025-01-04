@@ -1,4 +1,3 @@
-
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/myself_qrcode_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -157,10 +156,10 @@ class PersonalInfoWidget extends StatelessWidget with TileDataMixin {
     BuildContext context,
     String peerId,
   ) async {
-    Uint8List? avatar = await ImageUtil.pickAvatar(context:context);
+    Uint8List? avatar = await ImageUtil.pickAvatar(context: context);
     if (avatar == null) {
-      bool? confirm = await DialogUtil.confirm(
-          content: 'Do you want delete avatar?');
+      bool? confirm =
+          await DialogUtil.confirm(content: 'Do you want delete avatar?');
       if (confirm == null || !confirm) {
         return;
       }

@@ -83,7 +83,7 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
         imageFileController.addAll(filenames, notify: true);
       });
     } catch (e) {
-      DialogUtil.error( content: '$e');
+      DialogUtil.error(content: '$e');
     }
   }
 
@@ -191,8 +191,7 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
                       title: 'Save as', content: 'Filename', tip: filename);
                   if (name != null) {
                     await FileUtil.writeFileAsBytes(bytes, name);
-                    DialogUtil.info(
-                        content: 'Save file:$name successfully');
+                    DialogUtil.info(content: 'Save file:$name successfully');
                   }
                 }, onCloseEditor: () {
                   indexWidgetProvider.pop();

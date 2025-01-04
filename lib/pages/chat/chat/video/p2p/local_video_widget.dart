@@ -532,15 +532,14 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     ChatMessage? chatMessage = conferenceChatMessageController.chatMessage;
     if (chatMessage == null) {
       if (mounted) {
-        DialogUtil.error(
-            content: AppLocalizations.t('No video chat message'));
+        DialogUtil.error(content: AppLocalizations.t('No video chat message'));
       }
       return;
     }
     Conference? conference = conferenceChatMessageController.conference;
     if (conference == null) {
       if (mounted) {
-        DialogUtil.error( content: AppLocalizations.t('No conference'));
+        DialogUtil.error(content: AppLocalizations.t('No conference'));
       }
       return;
     }

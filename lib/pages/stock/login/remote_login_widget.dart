@@ -51,9 +51,9 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
                 keyboardType: TextInputType.text,
                 //controller: _credentialController,
 
-                  labelText:
-                      AppLocalizations.t('Credential(Mobile/Email/LoginName)'),
-                  prefixIcon: const Icon(Icons.person),
+                labelText:
+                    AppLocalizations.t('Credential(Mobile/Email/LoginName)'),
+                prefixIcon: const Icon(Icons.person),
 
                 initialValue: _credential,
                 onChanged: (String val) {
@@ -71,17 +71,17 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
                 obscureText: !_pwdShow,
                 //controller: passwordController,
 
-                  labelText: AppLocalizations.t('Password'),
-                  prefixIcon: const Icon(Icons.lock),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                        _pwdShow ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () {
-                      setState(() {
-                        _pwdShow = !_pwdShow;
-                      });
-                    },
-                  ),
+                labelText: AppLocalizations.t('Password'),
+                prefixIcon: const Icon(Icons.lock),
+                suffixIcon: IconButton(
+                  icon:
+                      Icon(_pwdShow ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      _pwdShow = !_pwdShow;
+                    });
+                  },
+                ),
 
                 initialValue: _password,
                 onChanged: (String val) {

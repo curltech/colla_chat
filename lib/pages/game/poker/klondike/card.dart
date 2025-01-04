@@ -14,7 +14,6 @@ import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flutter/animation.dart';
 
-
 /// flame引擎渲染的扑克牌
 class Card extends PositionComponent
     with DragCallbacks, TapCallbacks, HasWorldReference<KlondikeWorld> {
@@ -22,8 +21,8 @@ class Card extends PositionComponent
       : rank = Rank.fromInt(intRank),
         suit = Suit.fromInt(intSuit),
         super(
-        size: KlondikeGame.cardSize,
-      );
+          size: KlondikeGame.cardSize,
+        );
 
   final Rank rank;
   final Suit suit;
@@ -34,11 +33,14 @@ class Card extends PositionComponent
 
   /// 是否面朝上
   bool _faceUp = false;
+
   /// 是否翻动动画
   bool _isAnimatedFlip = false;
   bool _isFaceUpView = false;
+
   /// 是否可拖拽
   bool _isDragging = false;
+
   /// 开始的位置
   Vector2 _whereCardStarted = Vector2(0, 0);
 
@@ -47,6 +49,7 @@ class Card extends PositionComponent
 
   bool get isFaceUp => _faceUp;
   bool get isFaceDown => !_faceUp;
+
   /// 翻动标识
   void flip() {
     if (_isAnimatedFlip) {
@@ -91,6 +94,7 @@ class Card extends PositionComponent
     const Radius.circular(KlondikeGame.cardRadius),
   );
   static final RRect backRRectInner = cardRRect.deflate(40);
+
   /// 创建牌的渲染组件，位置和大小
   static final Sprite flameSprite = klondikeSprite(1367, 6, 357, 501);
 
@@ -223,13 +227,13 @@ class Card extends PositionComponent
 
   /// 绘制牌，有相对的偏移量，旋转，放大等参数
   void _drawSprite(
-      Canvas canvas,
-      Sprite sprite,
-      double relativeX,
-      double relativeY, {
-        double scale = 1,
-        bool rotate = false,
-      }) {
+    Canvas canvas,
+    Sprite sprite,
+    double relativeX,
+    double relativeY, {
+    double scale = 1,
+    bool rotate = false,
+  }) {
     if (rotate) {
       canvas.save();
       canvas.translate(size.x / 2, size.y / 2);
@@ -255,7 +259,6 @@ class Card extends PositionComponent
       handleTapUp();
     }
   }
-
 
   /// 拖拽开始事件
   @override
@@ -393,13 +396,13 @@ class Card extends PositionComponent
 
   /// 移动牌，带速度和动画等参数
   void doMove(
-      Vector2 to, {
-        double speed = 10.0,
-        double start = 0.0,
-        int startPriority = 100,
-        Curve curve = Curves.easeOutQuad,
-        VoidCallback? onComplete,
-      }) {
+    Vector2 to, {
+    double speed = 10.0,
+    double start = 0.0,
+    int startPriority = 100,
+    Curve curve = Curves.easeOutQuad,
+    VoidCallback? onComplete,
+  }) {
     assert(speed > 0.0, 'Speed must be > 0 widths per second');
     final dt = (to - position).length / (speed * size.x);
     assert(dt > 0, 'Distance to move must be > 0');
@@ -418,12 +421,12 @@ class Card extends PositionComponent
 
   /// 移动并且翻牌
   void doMoveAndFlip(
-      Vector2 to, {
-        double speed = 10.0,
-        double start = 0.0,
-        Curve curve = Curves.easeOutQuad,
-        VoidCallback? whenDone,
-      }) {
+    Vector2 to, {
+    double speed = 10.0,
+    double start = 0.0,
+    Curve curve = Curves.easeOutQuad,
+    VoidCallback? whenDone,
+  }) {
     assert(speed > 0.0, 'Speed must be > 0 widths per second');
     final dt = (to - position).length / (speed * size.x);
     assert(dt > 0, 'Distance to move must be > 0');
@@ -485,11 +488,11 @@ class Card extends PositionComponent
 /// 牌移动的动画效果
 class CardMoveEffect extends MoveToEffect {
   CardMoveEffect(
-      super.destination,
-      super.controller, {
-        super.onComplete,
-        this.transitPriority = 100,
-      });
+    super.destination,
+    super.controller, {
+    super.onComplete,
+    this.transitPriority = 100,
+  });
 
   final int transitPriority;
 

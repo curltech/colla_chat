@@ -23,8 +23,6 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-
-
 /// 18m麻将游戏
 class Majiang18mWidget extends StatelessWidget with TileDataMixin {
   Majiang18mWidget({super.key}) {

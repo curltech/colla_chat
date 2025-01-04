@@ -43,7 +43,7 @@ class HandPileComponent extends PositionComponent
       }
       if (areaDirection == AreaDirection.opponent) {
         typePileComponent = TypePileComponent(typePile, areaDirection,
-            position: Vector2(position.x, position.y-12));
+            position: Vector2(position.x, position.y - 12));
       }
       if (areaDirection == AreaDirection.next) {
         typePileComponent = TypePileComponent(typePile, areaDirection,

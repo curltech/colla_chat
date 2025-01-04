@@ -6,7 +6,6 @@ import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 ///在操作系统层面的安全存储
 class LocalSecurityStorage {
   final IOSOptions iOptions =

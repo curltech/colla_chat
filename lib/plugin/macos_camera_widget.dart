@@ -81,7 +81,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
         selectedVideoIndex = 0;
       }
     } catch (e) {
-      DialogUtil.error( content: e.toString());
+      DialogUtil.error(content: e.toString());
     }
   }
 
@@ -94,7 +94,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
         selectedAudioIndex = 0;
       }
     } catch (e) {
-      DialogUtil.error( content: e.toString());
+      DialogUtil.error(content: e.toString());
     }
   }
 
@@ -175,7 +175,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
   Widget _buildCameraController(BuildContext context) {
     return Column(
       children: <Widget>[
-         Expanded(
+        Expanded(
           child: nil,
         ),
         Container(
@@ -313,7 +313,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
           },
         );
       } catch (e) {
-        DialogUtil.error( content: e.toString());
+        DialogUtil.error(content: e.toString());
       }
     }
   }

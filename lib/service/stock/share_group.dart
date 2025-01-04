@@ -5,8 +5,6 @@ import 'package:colla_chat/service/servicelocator.dart';
 class ShareGroupService extends GeneralBaseService<ShareGroup> {
   static String defaultGroupName = 'MySelection';
 
-
-
   ShareGroupService(
       {required super.tableName,
       required super.fields,
@@ -15,7 +13,6 @@ class ShareGroupService extends GeneralBaseService<ShareGroup> {
       return ShareGroup.fromJson(map);
     };
   }
-
 
   Future<void> store(ShareGroup shareGroup) async {
     ShareGroup? old =

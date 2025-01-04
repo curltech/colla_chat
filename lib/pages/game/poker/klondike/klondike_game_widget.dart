@@ -22,9 +22,9 @@ class KlondikeGameWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        title: title,
-        withLeading: true,
-        child: GameWidget(game: KlondikeGame()),
-        );
+      title: title,
+      withLeading: true,
+      child: GameWidget(game: KlondikeGame()),
+    );
   }
 }

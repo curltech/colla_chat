@@ -172,8 +172,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
           formButtons: formButtons,
           controller: controller,
           heads: heads,
-        )
-    );
+        ));
 
     return formInputWidget;
   }
@@ -182,10 +181,10 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     BuildContext context,
     String peerId,
   ) async {
-    Uint8List? avatar = await ImageUtil.pickAvatar(context:context);
+    Uint8List? avatar = await ImageUtil.pickAvatar(context: context);
     if (avatar == null) {
-      bool? confirm = await DialogUtil.confirm(
-          content: 'Do you want delete avatar?');
+      bool? confirm =
+          await DialogUtil.confirm(content: 'Do you want delete avatar?');
       if (confirm == null || !confirm) {
         return;
       }

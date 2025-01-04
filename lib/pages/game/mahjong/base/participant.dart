@@ -4,8 +4,6 @@ import 'package:colla_chat/pages/game/mahjong/base/room.dart';
 import 'package:flame/components.dart';
 import 'package:get/get.dart';
 
-
-
 /// 参与者
 class Participant {
   final String peerId;

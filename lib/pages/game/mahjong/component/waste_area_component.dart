@@ -46,8 +46,8 @@ class WasteAreaComponent extends RectangleComponent
                   MahjongFlameGame.nextWidthRadio -
                   MahjongFlameGame.nextHandWidthRadio -
                   MahjongFlameGame.nextWasteWidthRadio)),
-          roomController.y(
-              roomController.height * MahjongFlameGame.opponentHeightRadio));
+          roomController
+              .y(roomController.height * MahjongFlameGame.opponentHeightRadio));
       size = Vector2(
           roomController.width * MahjongFlameGame.nextWasteWidthRadio,
           roomController.height * MahjongFlameGame.nextHeightRadio);
@@ -61,8 +61,8 @@ class WasteAreaComponent extends RectangleComponent
               (MahjongFlameGame.previousWidthRadio +
                   MahjongFlameGame.previousHandWidthRadio +
                   MahjongFlameGame.previousWasteWidthRadio)),
-          roomController.y(
-              roomController.height * MahjongFlameGame.opponentHeightRadio));
+          roomController
+              .y(roomController.height * MahjongFlameGame.opponentHeightRadio));
       size = Vector2(
           roomController.width * MahjongFlameGame.opponentWasteWidthRadio,
           roomController.height * MahjongFlameGame.opponentWasteHeightRadio);
@@ -75,8 +75,8 @@ class WasteAreaComponent extends RectangleComponent
           roomController.x(roomController.width *
               (MahjongFlameGame.previousWidthRadio +
                   MahjongFlameGame.previousHandWidthRadio)),
-          roomController.y(
-              roomController.height * MahjongFlameGame.opponentHeightRadio));
+          roomController
+              .y(roomController.height * MahjongFlameGame.opponentHeightRadio));
       size = Vector2(
           roomController.width * MahjongFlameGame.previousWasteWidthRadio,
           roomController.height * MahjongFlameGame.previousHeightRadio);

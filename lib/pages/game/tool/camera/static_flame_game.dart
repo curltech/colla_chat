@@ -9,8 +9,7 @@ import 'package:flame/input.dart';
 import 'package:flame/parallax.dart';
 
 /// 静态视角，展示视差效果
-class StaticFlameGame extends FlameGame
-    with ScrollDetector, ScaleDetector {
+class StaticFlameGame extends FlameGame with ScrollDetector, ScaleDetector {
   static const description = '''
   This example shows a parallax which is attached to the viewport (behind the
   world), four Flame logos that are added to the world, and a player added to
@@ -58,10 +57,7 @@ class StaticFlameGame extends FlameGame
 }
 
 class _StaticComponentWorld extends World
-    with
-        HasGameReference<StaticFlameGame>,
-        TapCallbacks,
-        DoubleTapCallbacks {
+    with HasGameReference<StaticFlameGame>, TapCallbacks, DoubleTapCallbacks {
   late SpriteComponent player;
   @override
   Future<void> onLoad() async {

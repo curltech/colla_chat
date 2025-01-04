@@ -87,12 +87,11 @@ class LlmChatAddWidget extends StatelessWidget with TileDataMixin {
 
   _onOk(BuildContext context, Map<String, dynamic> values) async {
     if (values['name'] == null) {
-      DialogUtil.error( content: AppLocalizations.t('Must have name'));
+      DialogUtil.error(content: AppLocalizations.t('Must have name'));
       return;
     }
     if (values['peerId'] == null) {
-      DialogUtil.error(
-          content: AppLocalizations.t('Must have url address'));
+      DialogUtil.error(content: AppLocalizations.t('Must have url address'));
       return;
     }
     Linkman currentLinkman = Linkman.fromJson(values);

@@ -44,8 +44,7 @@ class ImageEditorWidget extends StatelessWidget with TileDataMixin {
                     title: 'Save as', content: 'Filename', tip: filename);
                 if (name != null) {
                   await FileUtil.writeFileAsBytes(bytes, name);
-                  DialogUtil.info(
-                      content: 'Save file:$name successfully');
+                  DialogUtil.info(content: 'Save file:$name successfully');
                 }
               },
               onCloseEditor: () {

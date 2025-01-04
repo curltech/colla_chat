@@ -21,8 +21,8 @@ class ParticipantAreaComponent extends RectangleComponent
     if (areaDirection == AreaDirection.self) {
       position = Vector2(
           roomController.x(0),
-          roomController.y(roomController.height *
-              (1 - MahjongFlameGame.selfHeightRadio)));
+          roomController.y(
+              roomController.height * (1 - MahjongFlameGame.selfHeightRadio)));
       size = Vector2(roomController.width * MahjongFlameGame.selfWidthRadio,
           roomController.height * MahjongFlameGame.selfHeightRadio);
       paint = Paint()
@@ -31,10 +31,10 @@ class ParticipantAreaComponent extends RectangleComponent
     }
     if (areaDirection == AreaDirection.next) {
       position = Vector2(
-          roomController.x(
-              roomController.width * (1 - MahjongFlameGame.nextWidthRadio)),
-          roomController.y(
-              roomController.height * MahjongFlameGame.opponentHeightRadio));
+          roomController
+              .x(roomController.width * (1 - MahjongFlameGame.nextWidthRadio)),
+          roomController
+              .y(roomController.height * MahjongFlameGame.opponentHeightRadio));
       size = Vector2(roomController.width * MahjongFlameGame.nextWidthRadio,
           roomController.height * MahjongFlameGame.nextHeightRadio);
       paint = Paint()
@@ -43,8 +43,7 @@ class ParticipantAreaComponent extends RectangleComponent
     }
     if (areaDirection == AreaDirection.opponent) {
       position = Vector2(roomController.x(0), roomController.y(0));
-      size = Vector2(
-          roomController.width * MahjongFlameGame.opponentWidthRadio,
+      size = Vector2(roomController.width * MahjongFlameGame.opponentWidthRadio,
           roomController.height * MahjongFlameGame.opponentHeightRadio);
       paint = Paint()
         ..color = Colors.redAccent
@@ -53,10 +52,9 @@ class ParticipantAreaComponent extends RectangleComponent
     if (areaDirection == AreaDirection.previous) {
       position = Vector2(
           roomController.x(0),
-          roomController.y(
-              roomController.height * MahjongFlameGame.opponentHeightRadio));
-      size = Vector2(
-          roomController.width * MahjongFlameGame.previousWidthRadio,
+          roomController
+              .y(roomController.height * MahjongFlameGame.opponentHeightRadio));
+      size = Vector2(roomController.width * MahjongFlameGame.previousWidthRadio,
           roomController.height * MahjongFlameGame.previousHeightRadio);
       paint = Paint()
         ..color = Colors.cyanAccent

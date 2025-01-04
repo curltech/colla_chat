@@ -4,7 +4,6 @@ import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/date_util.dart';
 
-
 class StockAccountService extends GeneralBaseService<StockAccount> {
   StockAccountService(
       {required super.tableName,

@@ -3,15 +3,7 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
 
-enum OutstandingAction {
-  pass,
-  touch,
-  bar,
-  darkBar,
-  chow,
-  win,
-  selfWin
-}
+enum OutstandingAction { pass, touch, bar, darkBar, chow, win, selfWin }
 
 class OutstandingActions {
   static const String mahjongPath = 'mahjong/';

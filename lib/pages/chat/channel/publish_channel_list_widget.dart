@@ -184,8 +184,8 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
         SlidableAction(
           padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 0),
           onPressed: (context) async {
-            bool? confirm = await DialogUtil.confirm(
-                content: 'Do you confirm publish?');
+            bool? confirm =
+                await DialogUtil.confirm(content: 'Do you confirm publish?');
             if (confirm != null && confirm) {
               _publish(chatMessage);
               setState(() {});
@@ -200,8 +200,8 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
         SlidableAction(
           padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 0),
           onPressed: (context) async {
-            bool? confirm = await DialogUtil.confirm(
-                content: 'Do you confirm delete?');
+            bool? confirm =
+                await DialogUtil.confirm(content: 'Do you confirm delete?');
             if (confirm != null && confirm) {
               await chatMessageService.remove(chatMessage);
               myChannelChatMessageController.delete(index: index);

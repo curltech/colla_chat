@@ -411,7 +411,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
         await _buildSfuConference(video: video, participants: participants);
     if (conference == null) {
       if (mounted) {
-        DialogUtil.error( content: 'build sfu conference failure');
+        DialogUtil.error(content: 'build sfu conference failure');
       }
       return;
     }
@@ -422,16 +422,14 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
       if (chatMessages.isEmpty) {
         logger.e('send sfu conference message failure');
         if (mounted) {
-          DialogUtil.error(
-              content: 'send sfu conference message failure');
+          DialogUtil.error(content: 'send sfu conference message failure');
         }
         return;
       }
     } catch (e) {
       logger.e('send sfu conference message failure:$e');
       if (mounted) {
-        DialogUtil.error(
-            content: 'send sfu conference message failure');
+        DialogUtil.error(content: 'send sfu conference message failure');
       }
       return;
     }
@@ -485,15 +483,14 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
     ChatMessage? chatMessage = conferenceChatMessageController.chatMessage;
     if (chatMessage == null) {
       if (mounted) {
-        DialogUtil.error(
-            content: AppLocalizations.t('No video chat message'));
+        DialogUtil.error(content: AppLocalizations.t('No video chat message'));
       }
       return;
     }
     Conference? conference = conferenceChatMessageController.conference;
     if (conference == null) {
       if (mounted) {
-        DialogUtil.error( content: AppLocalizations.t('No conference'));
+        DialogUtil.error(content: AppLocalizations.t('No conference'));
       }
       return;
     }
