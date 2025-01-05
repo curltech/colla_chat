@@ -649,9 +649,6 @@ class Round {
     logger.w('chat message: $owner darkBar pos:$pos');
     RoundParticipant roundParticipant = roundParticipants[owner];
     Tile? tile = roundParticipant.darkBar(owner, pos);
-    if (tile == null) {
-      return null;
-    }
     if (receiver == room.creator) {
       barDeal(owner);
     }
