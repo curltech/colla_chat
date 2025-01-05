@@ -89,15 +89,21 @@ class HandPile extends Pile {
     return null;
   }
 
-  bool touch(int pos, Tile tile) {
-    if (tiles[pos] != tile || tiles[pos + 1] != tile) {
-      return false;
+  Tile? touch(int pos, Tile tile) {
+    if (pos < 0 || pos >= tiles.length) {
+      return null;
     }
-    tiles.removeAt(pos);
-    tiles.removeAt(pos);
+    Tile? t = tiles.removeAt(pos);
+    if (t != unknownTile && t != tile) {
+      return null;
+    }
+    t = tiles.removeAt(pos);
+    if (t != unknownTile && t != tile) {
+      return null;
+    }
     touchPiles.add(TypePile(tiles: [tile, tile, tile]));
 
-    return true;
+    return t;
   }
 
   /// 检查打牌明杠
@@ -116,15 +122,27 @@ class HandPile extends Pile {
   }
 
   /// 打牌明杠
-  Tile? discardBar(int pos, Tile tile, int discard) {
-    if (pos == -1 || tiles[pos] != tile) {
+  Tile? discardBar(int pos, Tile tile, int discardParticipant) {
+    if (pos < 0 || pos >= tiles.length) {
       return null;
     }
-    tile = tiles.removeAt(pos);
-    tiles.removeAt(pos);
-    tiles.removeAt(pos);
+    if (tiles[pos] != tile) {
+      return null;
+    }
+    Tile? t = tiles.removeAt(pos);
+    if (t != unknownTile && t != tile) {
+      return null;
+    }
+    t = tiles.removeAt(pos);
+    if (t != unknownTile && t != tile) {
+      return null;
+    }
+    t = tiles.removeAt(pos);
+    if (t != unknownTile && t != tile) {
+      return null;
+    }
     TypePile typePile = TypePile(tiles: [tile, tile, tile, tile]);
-    typePile.source = discard;
+    typePile.source = discardParticipant;
     touchPiles.add(typePile);
 
     return tile;
@@ -160,16 +178,23 @@ class HandPile extends Pile {
   /// 摸牌明杠：分成摸牌杠牌和手牌杠牌
   /// pos是-1，则drawTile可杠，
   /// pos不是-1，则表示手牌的可杠牌位置
-  Tile? drawBar(int pos, int source) {
-    Tile tile;
+  Tile? drawBar(int pos, int source, {Tile? tile}) {
     if (pos == -1) {
-      tile = drawTile!;
+      if (tile == null) {
+        tile ??= drawTile!;
+        drawTile = null;
+        drawTileType = null;
+      }
+    } else if (pos > -1 && pos < tiles.length) {
+      Tile? t = tiles.removeAt(pos);
+      if (t != unknownTile && t != tile) {
+        return null;
+      }
+      tile ??= t;
     } else {
-      tile = tiles.removeAt(pos);
+      return null;
     }
 
-    drawTile = null;
-    drawTileType = null;
     for (int i = 0; i < touchPiles.length; ++i) {
       TypePile typePile = touchPiles[i];
       if (typePile.tiles[0] == tile) {
@@ -184,7 +209,7 @@ class HandPile extends Pile {
       }
     }
 
-    return null;
+    return tile;
   }
 
   /// 检查暗杠，就是检查加上摸牌tile后，手上是否有连续的四张，如果有的话返回第一张的位置
@@ -213,6 +238,12 @@ class HandPile extends Pile {
   }
 
   Tile? darkBar(int pos, int source) {
+    if (drawTile == null || drawTileType == null) {
+      return null;
+    }
+    if (pos < 0 || pos >= tiles.length) {
+      return null;
+    }
     Tile? tile;
 
     /// 三个手牌相同

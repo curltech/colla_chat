@@ -360,22 +360,43 @@ class Round {
   }
 
   /// 某个参与者碰打出的牌
-  bool touch(int owner, int pos, int src, Tile discardTile) {
+  Tile? touch(int owner, {int? pos, int? src, Tile? discardTile}) {
+    if (this.discardTile == null) {
+      logger.e('$owner touch, but discardTile is null');
+
+      return null;
+    }
     if (discardParticipant == null) {
       logger.e('$owner touch, but discardParticipant is null');
 
-      return false;
+      return null;
     }
-    if (discardParticipant != src) {
-      logger.e('$owner touch, but discardParticipant is not equal src:$src');
+    if (discardTile == null) {
+      discardTile = this.discardTile;
+    } else {
+      if (discardTile != this.discardTile) {
+        logger.e('$owner touch, but discardTile:$discardTile is not equal');
 
-      return false;
+        return null;
+      }
+    }
+    if (src == null) {
+      src = discardParticipant;
+    } else {
+      if (discardParticipant != src) {
+        logger.e('$owner touch, but discardParticipant is not equal src:$src');
+
+        return null;
+      }
     }
     RoundParticipant roundParticipant = roundParticipants[owner];
-    roundParticipant.touch(owner, pos, discardParticipant!, discardTile);
+    discardTile = roundParticipant.touch(owner, pos!, src!, discardTile!);
+    if (discardTile == null) {
+      return null;
+    }
 
-    List<Tile> tiles = roundParticipants[discardParticipant!].wastePile.tiles;
-    if (tiles.isNotEmpty) {
+    List<Tile> tiles = roundParticipants[src].wastePile.tiles;
+    if (tiles.isNotEmpty && discardTile == tiles.last) {
       tiles.removeLast();
     }
 
@@ -393,32 +414,45 @@ class Round {
       _sendChatMessage(touchRoomEvent, owner, [i]);
     }
 
-    return true;
+    return discardTile;
   }
 
-  bool _touch(int owner, int pos, int src, Tile discardTile) {
+  Tile? _touch(int owner, int pos, int src, Tile discardTile, int receiver) {
     logger.w('chat message: $owner touch pos:$pos src:$src tile:$discardTile');
+    if (this.discardTile == null) {
+      logger.e('$owner touch, but discardTile is null');
+
+      return null;
+    }
     if (discardParticipant == null) {
       logger.e('$owner touch, but discardParticipant is null');
 
-      return false;
+      return null;
+    }
+    if (discardTile != this.discardTile) {
+      logger.e('$owner touch, but discardTile:$discardTile is not equal');
+
+      return null;
     }
     if (discardParticipant != src) {
       logger.e('$owner touch, but discardParticipant is not equal src:$src');
 
-      return false;
+      return null;
     }
     RoundParticipant roundParticipant = roundParticipants[owner];
-    roundParticipant.touch(owner, pos, discardParticipant!, discardTile);
-    List<Tile> tiles = roundParticipants[discardParticipant!].wastePile.tiles;
-    if (tiles.isNotEmpty) {
+    Tile? tile = roundParticipant.touch(owner, pos, src, discardTile);
+    if (tile == null) {
+      return null;
+    }
+    List<Tile> tiles = roundParticipants[src].wastePile.tiles;
+    if (tiles.isNotEmpty && discardTile == tiles.last) {
       tiles.removeLast();
     }
 
     discardParticipant = null;
     this.discardTile = null;
 
-    return true;
+    return tile;
   }
 
   int get barCount {
@@ -441,16 +475,24 @@ class Round {
   Tile? bar(int owner, int pos) {
     RoundParticipant roundParticipant = roundParticipants[owner];
     Tile? tile;
-    if (roundParticipant.handPile.drawTile != null) {
+    int? src;
+    if (pos == -1) {
       tile = roundParticipant.drawBar(owner, pos);
-    } else if (discardParticipant != null) {
+      if (tile != null) {
+        src = owner;
+      }
+    } else if (pos > -1 && discardParticipant != null) {
       tile = roundParticipant.discardBar(
           owner, pos, discardTile!, discardParticipant!);
       if (tile != null) {
-        roundParticipants[discardParticipant!].wastePile.tiles.removeLast();
+        src = discardParticipant;
+        List<Tile> tiles = roundParticipants[src!].wastePile.tiles;
+        if (tiles.isNotEmpty && discardTile == tiles.last) {
+          tiles.removeLast();
+        }
+        discardParticipant = null;
+        discardTile = null;
       }
-      discardParticipant = null;
-      discardTile = null;
     }
     if (tile == null) {
       return null;
@@ -461,7 +503,8 @@ class Round {
         owner: owner,
         action: RoomEventAction.bar,
         tile: tile,
-        pos: pos);
+        pos: pos,
+        src: src);
     int sender = owner;
     List<int> receivers = [];
     bool pass = true;
@@ -484,17 +527,21 @@ class Round {
   }
 
   /// 收到owner杠牌的消息
-  Tile? _bar(int owner, int pos, Tile tile, int receiver) {
+  Tile? _bar(int owner, int pos, Tile tile, int src, int receiver) {
     logger.w('chat message: $owner bar pos:$pos');
     RoundParticipant roundParticipant = roundParticipants[owner];
-    if (roundParticipant.handPile.drawTile != null) {
+    if (pos == -1) {
       roundParticipant.drawBar(owner, pos);
-    } else if (discardParticipant != null) {
-      roundParticipant.discardBar(
-          owner, pos, discardTile!, discardParticipant!);
-      roundParticipants[discardParticipant!].wastePile.tiles.removeLast();
-      discardParticipant = null;
-      discardTile = null;
+    } else if (pos > -1) {
+      Tile? discardBarTile = roundParticipant.discardBar(owner, pos, tile, src);
+      if (discardBarTile != null) {
+        List<Tile> tiles = roundParticipants[src].wastePile.tiles;
+        if (tiles.isNotEmpty && tile == tiles.last) {
+          tiles.removeLast();
+        }
+        discardParticipant = null;
+        discardTile = null;
+      }
     }
     roundParticipants[receiver].checkWin(receiver, tile);
 
@@ -602,6 +649,9 @@ class Round {
     logger.w('chat message: $owner darkBar pos:$pos');
     RoundParticipant roundParticipant = roundParticipants[owner];
     Tile? tile = roundParticipant.darkBar(owner, pos);
+    if (tile == null) {
+      return null;
+    }
     if (receiver == room.creator) {
       barDeal(owner);
     }
@@ -775,8 +825,10 @@ class Round {
       case RoomEventAction.bar:
         returnValue = bar(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.touch:
-        returnValue = touch(
-            roomEvent.owner, roomEvent.pos!, roomEvent.src!, roomEvent.tile!);
+        returnValue = touch(roomEvent.owner,
+            pos: roomEvent.pos!,
+            src: roomEvent.src!,
+            discardTile: roomEvent.tile!);
       case RoomEventAction.darkBar:
         returnValue = darkBar(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.chow:
@@ -819,12 +871,12 @@ class Round {
             _discard(roomEvent.owner, roomEvent.tile!, roomEvent.receiver!);
       case RoomEventAction.bar:
         returnValue = _bar(roomEvent.owner, roomEvent.pos!, roomEvent.tile!,
-            roomEvent.receiver!);
+            roomEvent.src!, roomEvent.receiver!);
       case RoomEventAction.barDeal:
         returnValue = barDeal(roomEvent.owner);
       case RoomEventAction.touch:
-        returnValue = _touch(
-            roomEvent.owner, roomEvent.pos!, roomEvent.src!, roomEvent.tile!);
+        returnValue = _touch(roomEvent.owner, roomEvent.pos!, roomEvent.src!,
+            roomEvent.tile!, roomEvent.receiver!);
       case RoomEventAction.darkBar:
         returnValue =
             _darkBar(roomEvent.owner, roomEvent.pos!, roomEvent.receiver!);
