@@ -97,6 +97,7 @@ class MahjongFlameGame extends FlameGame
   _init() {
     camera = CameraComponent.withFixedResolution(
         width: roomController.width, height: roomController.height);
+    allOutstandingActions.outstandingActions.length;
   }
 
   @override
