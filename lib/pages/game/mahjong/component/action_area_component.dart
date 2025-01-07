@@ -5,6 +5,7 @@ import 'package:colla_chat/pages/game/mahjong/base/round_participant.dart';
 import 'package:colla_chat/pages/game/mahjong/base/suit.dart';
 import 'package:colla_chat/pages/game/mahjong/component/mahjong_flame_game.dart';
 import 'package:colla_chat/pages/game/mahjong/room_controller.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/input.dart';
 import 'package:flutter/material.dart';
@@ -28,14 +29,15 @@ class ActionAreaComponent extends RectangleComponent
                 (1 -
                     MahjongFlameGame.selfHeightRadio -
                     MahjongFlameGame.selfWasteHeightRadio) +
-            70));
+            90));
     size = Vector2(
         roomController.width *
             (MahjongFlameGame.nextWasteWidthRadio +
-                MahjongFlameGame.nextHandWidthRadio),
-        roomController.height * MahjongFlameGame.selfHeightRadio);
+                MahjongFlameGame.nextHandWidthRadio +
+                MahjongFlameGame.nextWidthRadio),
+        roomController.height * MahjongFlameGame.selfHeightRadio * 0.7);
     paint = Paint()
-      ..color = Colors.orangeAccent.withOpacity(0.5)
+      ..color = Colors.white.withAlpha(0)
       ..style = PaintingStyle.fill;
   }
 
@@ -76,7 +78,7 @@ class ActionAreaComponent extends RectangleComponent
     }
   }
 
-  _call(OutstandingAction outstandingAction, List<int> pos) async {
+  _call(OutstandingAction outstandingAction, List<int> pos) {
     Room? room = roomController.room.value;
     if (room == null) {
       return;
@@ -88,15 +90,11 @@ class ActionAreaComponent extends RectangleComponent
     }
 
     if (outstandingAction == OutstandingAction.win) {
-      WinType? completeType = await room.startRoomEvent(RoomEvent(room.name,
+      room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,
           owner: owner,
           action: RoomEventAction.win,
           pos: pos[0]));
-      if (completeType != null) {
-        room.startRoomEvent(RoomEvent(room.name,
-            roundId: round.id, owner: owner, action: RoomEventAction.round));
-      }
     } else if (outstandingAction == OutstandingAction.touch) {
       room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,

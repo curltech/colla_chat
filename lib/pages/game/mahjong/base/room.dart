@@ -378,7 +378,7 @@ class Room {
       }
 
       /// 第一张发牌给banker
-      Tile? tile = round.deal();
+      Tile? tile = await round.deal();
       if (tile != null) {
         // logger.w('first deal tile:${tile.toString()} to $banker');
       }

@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:colla_chat/pages/game/mahjong/base/hand_pile.dart';
+import 'package:colla_chat/pages/game/mahjong/base/outstanding_action.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round_participant.dart';
@@ -132,7 +133,14 @@ class TileComponent extends PositionComponent
     _render(canvas);
   }
 
-  send() {
+  discard() {
+    RoundParticipant? roundParticipant = roomController
+        .getRoundParticipant(roomController.selfParticipantDirection.value);
+    Map<OutstandingAction, Set<int>>? outstandingActions =
+        roundParticipant?.outstandingActions.value;
+    if (outstandingActions != null && outstandingActions.isNotEmpty) {
+      return;
+    }
     Room? room = roomController.room.value;
     if (room != null) {
       Round? currentRound = room.currentRound;
@@ -178,7 +186,7 @@ class TileComponent extends PositionComponent
   void onTapUp(TapUpEvent event) {
     /// 点击自家的牌表示打牌
     if (areaDirection == AreaDirection.self) {
-      send();
+      discard();
     }
   }
 }
