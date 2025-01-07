@@ -490,6 +490,7 @@ flutter:
     - assets/images/mahjong/tile/
     - assets/images/poker/
     - assets/medias/
+    - assets/model/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
