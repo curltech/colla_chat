@@ -7,6 +7,8 @@ import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart' as p;
 
@@ -44,6 +46,7 @@ class ModelProjectController {
 
   ModelProjectController() {
     initMetaProject();
+    registerAssetMetaProject();
   }
 
   initMetaProject() {
@@ -235,6 +238,23 @@ class ModelProjectController {
     }
 
     return relationshipTypes;
+  }
+
+  registerAssetMetaProject() {
+    _registerAssetMetaProject('product_model');
+    _registerAssetMetaProject('class_model');
+  }
+
+  _registerAssetMetaProject(String filename) async {
+    String content =
+        await rootBundle.loadString('assets/model/${filename}.json');
+    Map<String, dynamic> json = JsonUtil.toJson(content);
+    Project metaProject = Project.fromJson(json);
+    if (!metaProject.meta) {
+      metaProject.meta = true;
+    }
+
+    metaProjects[metaProject.id] = metaProject;
   }
 
   /// 注册元模型，覆盖原来加载的
