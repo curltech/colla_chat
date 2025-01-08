@@ -43,7 +43,6 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
               child: ListTile(
                 title: Text(node.data?.name ?? "N/A"),
                 dense: true,
-                // trailing: Text(node.data?.createdAt.toString() ?? "N/A"),
                 leading: node.icon,
               ),
             ));
@@ -51,7 +50,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
 }
 
 extension on ExplorableNode {
-  Icon get icon {
+  Widget get icon {
     if (isRoot) {
       return Icon(
         Icons.data_object,

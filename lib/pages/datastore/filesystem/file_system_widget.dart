@@ -40,7 +40,6 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
               padding: const EdgeInsets.only(left: 16.0),
               child: ListTile(
                 title: Text(node.data?.name ?? "N/A"),
-                subtitle: Text(node.data?.createdAt.toString() ?? "N/A"),
                 leading: node.icon,
               ),
             ));

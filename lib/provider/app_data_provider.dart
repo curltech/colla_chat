@@ -26,7 +26,7 @@ class AppDataProvider with ChangeNotifier {
   double toolbarHeight = kToolbarHeight;
   double primaryNavigationWidth = 90;
   double mediumPrimaryNavigationWidth = 90;
-  int _bodyRatio = 40;
+  int _bodyRatio = 35;
   double dividerWidth = 1;
   double topPadding = 0;
   double bottomPadding = 0;
@@ -134,7 +134,7 @@ class AppDataProvider with ChangeNotifier {
         _bodyRatio = 0;
       } else {
         if (_totalSize.width >= largeBreakpointLimit) {
-          _bodyRatio = 40;
+          _bodyRatio = 35;
         } else if (_totalSize.width >= smallBreakpointLimit) {
           _bodyRatio = 50;
         } else {
@@ -144,7 +144,7 @@ class AppDataProvider with ChangeNotifier {
     } else {
       if (_bodyRatio == 0) {
         if (_totalSize.width >= largeBreakpointLimit) {
-          _bodyRatio = 40;
+          _bodyRatio = 35;
         } else if (_totalSize.width >= smallBreakpointLimit) {
           _bodyRatio = 50;
         } else {

@@ -3,9 +3,8 @@ import 'package:animated_tree_view/animated_tree_view.dart';
 abstract class Explorable {
   final String name;
   final String? comment;
-  final DateTime createdAt;
 
-  Explorable(this.name, {this.comment}) : createdAt = DateTime.now();
+  Explorable(this.name, {this.comment});
 
   @override
   String toString() => name;
