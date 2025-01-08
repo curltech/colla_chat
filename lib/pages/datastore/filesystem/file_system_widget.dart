@@ -29,21 +29,13 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
         showRootNode: true,
         expansionBehavior: ExpansionBehavior.scrollToLastChild,
         expansionIndicatorBuilder: (context, node) {
-          if (node.isRoot) {
-            return PlusMinusIndicator(
-              tree: node,
-              alignment: Alignment.centerLeft,
-              color: Colors.grey[700],
-            );
-          }
-
           return ChevronIndicator.rightDown(
             tree: node,
             alignment: Alignment.centerLeft,
             color: Colors.grey[700],
           );
         },
-        indentation: const Indentation(),
+        indentation: Indentation(color: Colors.black),
         builder: (context, ExplorableNode node) => Padding(
               padding: const EdgeInsets.only(left: 16.0),
               child: ListTile(

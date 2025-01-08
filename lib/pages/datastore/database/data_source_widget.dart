@@ -2,6 +2,7 @@ import 'package:animated_tree_view/animated_tree_view.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_controller.dart';
 import 'package:colla_chat/pages/datastore/explorable_node.dart';
 import 'package:colla_chat/pages/datastore/filesystem/file_node.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
@@ -30,21 +31,13 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
         showRootNode: false,
         expansionBehavior: ExpansionBehavior.scrollToLastChild,
         expansionIndicatorBuilder: (context, node) {
-          if (node.isRoot) {
-            return PlusMinusIndicator(
-              tree: node,
-              alignment: Alignment.centerLeft,
-              color: Colors.grey[700],
-            );
-          }
-
           return ChevronIndicator.rightDown(
             tree: node,
             alignment: Alignment.centerLeft,
-            color: Colors.grey[700],
+            color: myself.primary,
           );
         },
-        indentation: const Indentation(),
+        indentation: Indentation(color: myself.primary),
         builder: (context, ExplorableNode node) => Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: ListTile(
@@ -59,21 +52,30 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
 
 extension on ExplorableNode {
   Icon get icon {
-    if (isRoot) return const Icon(Icons.data_object);
+    if (isRoot) {
+      return Icon(
+        Icons.data_object,
+        color: myself.primary,
+      );
+    }
 
     if (this is FolderNode) {
-      if (isExpanded) return const Icon(Icons.folder_open);
-      return const Icon(Icons.folder);
+      if (isExpanded) {
+        return Icon(Icons.folder_open, color: myself.primary);
+      }
+      return Icon(Icons.folder, color: myself.primary);
     }
 
     if (this is FileNode) {
       final file = data as File;
-      if (file.mimeType.startsWith("image")) return const Icon(Icons.image);
+      if (file.mimeType.startsWith("image")) {
+        return Icon(Icons.image, color: myself.primary);
+      }
       if (file.mimeType.startsWith("video")) {
-        return const Icon(Icons.video_file);
+        return Icon(Icons.video_file, color: myself.primary);
       }
     }
 
-    return const Icon(Icons.insert_drive_file);
+    return Icon(Icons.folder, color: myself.primary);
   }
 }

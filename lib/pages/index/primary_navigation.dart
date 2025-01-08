@@ -127,8 +127,10 @@ class PrimaryNavigation {
       if (view != null) {
         AnimationController slideController = _slideControllers[index.toInt()];
         destinations.add(slideInNavigationRailDestination(
-          label: Text(AppLocalizations.t(view.title)),
-          icon: Icon(view.iconData),
+          label: Text(''),
+          icon: Tooltip(
+              message: AppLocalizations.t(view.title),
+              child: Icon(view.iconData)),
           padding: EdgeInsets.zero,
           selectedIcon: Icon(
             view.iconData,
@@ -159,22 +161,14 @@ class PrimaryNavigation {
             onPressed: () {
               indexWidgetProvider.push(routeName);
             },
-            icon: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-              view.iconData is IconData
-                  ? Icon(
-                      view.iconData,
-                      color: myself.primary,
-                    )
-                  : view.iconData,
-              const SizedBox(
-                width: 10.0,
-              ),
-              Expanded(
-                  child: Text(
-                AppLocalizations.t(view.title),
-                style: const TextStyle(color: Colors.white),
-              ))
-            ])));
+            icon: Tooltip(
+                message: view.title,
+                child: view.iconData is IconData
+                    ? Icon(
+                        view.iconData,
+                        color: myself.primary,
+                      )
+                    : view.iconData)));
       }
       return Column(
           mainAxisAlignment: MainAxisAlignment.start, children: children);

@@ -24,7 +24,7 @@ class AppDataProvider with ChangeNotifier {
   Size _totalSize = const Size(412.0, 892.0);
   double bottomBarHeight = kBottomNavigationBarHeight;
   double toolbarHeight = kToolbarHeight;
-  double primaryNavigationWidth = 170;
+  double primaryNavigationWidth = 90;
   double mediumPrimaryNavigationWidth = 90;
   int _bodyRatio = 40;
   double dividerWidth = 1;
