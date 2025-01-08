@@ -23,6 +23,7 @@ class AppBarWidget {
     double? toolbarHeight,
     double? elevation,
     bool withLeading = false, //是否有缺省的回退按钮
+    Widget? leadingWidget,
     Function? leadingCallBack, //回退按钮的回调
     Widget? title = const CommonAutoSizeText(''),
     bool centerTitle = false, //标题是否居中
@@ -54,18 +55,19 @@ class AppBarWidget {
     }
 
     ///左边的回退按钮
-    var leading = backButton(
-        context: context,
-        foregroundColor: foregroundColor,
-        withLeading: withLeading,
-        leadingCallBack: leadingCallBack);
+    if (withLeading) {
+      leadingWidget ??= backButton(
+          context: context,
+          foregroundColor: foregroundColor,
+          leadingCallBack: leadingCallBack);
+    }
     backgroundColor ??= myself.primary;
     foregroundColor ??= Colors.white;
     PreferredSizeWidget appBar = AppBar(
       title: title,
       centerTitle: centerTitle,
-      titleSpacing: leading != null ? 0.0 : null,
-      leading: leading,
+      titleSpacing: leadingWidget != null ? 0.0 : null,
+      leading: leadingWidget,
       actions: actions,
       automaticallyImplyLeading: false,
       toolbarHeight: toolbarHeight,
@@ -117,27 +119,20 @@ class AppBarWidget {
 
   static Widget? backButton({
     BuildContext? context,
-    bool withLeading = false,
     final Function? leadingCallBack,
     Color? foregroundColor,
   }) {
     context = context ?? appDataProvider.context!;
-    Widget? leadingButton;
-    // foregroundColor ??= Colors.white;
-
-    ///是否加上回退按钮，如果回调存在，调用回调函数，然后回退路由
-    if (withLeading) {
-      leadingButton = IconButton(
-        tooltip: AppLocalizations.t('Back'),
-        icon: Icon(Icons.arrow_back_ios_new, color: foregroundColor),
-        onPressed: () async {
-          if (leadingCallBack != null) {
-            await leadingCallBack();
-          }
-          indexWidgetProvider.pop(context: context);
-        },
-      );
-    }
+    Widget? leadingButton = IconButton(
+      tooltip: AppLocalizations.t('Back'),
+      icon: Icon(Icons.arrow_back_ios_new, color: foregroundColor),
+      onPressed: () async {
+        if (leadingCallBack != null) {
+          await leadingCallBack();
+        }
+        indexWidgetProvider.pop(context: context);
+      },
+    );
     return leadingButton;
   }
 

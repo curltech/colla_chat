@@ -2,6 +2,8 @@ import 'package:colla_chat/pages/chat/me/android_system_alert_window_widget.dart
 import 'package:colla_chat/pages/chat/me/openvpn_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_map_launcher_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_webview_widget.dart';
+import 'package:colla_chat/pages/datastore/database/data_source_widget.dart';
+import 'package:colla_chat/pages/datastore/filesystem/file_system_widget.dart';
 import 'package:colla_chat/pages/game/game_main_widget.dart';
 import 'package:colla_chat/pages/mail/mail_address_widget.dart';
 import 'package:colla_chat/pages/media/media_widget.dart';
@@ -32,6 +34,8 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   final StockMainWidget stockMainWidget = StockMainWidget();
   final GameMainWidget gameMainWidget = GameMainWidget();
   final PoemWidget poemWidget = PoemWidget();
+  final DataSourceWidget dataSourceWidget = DataSourceWidget();
+  final FileSystemWidget fileSystemWidget = FileSystemWidget();
 
   late Map<String, TileDataMixin> widgets = {
     poemWidget.routeName: poemWidget,
@@ -44,6 +48,8 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     systemAlertWindowWidget.routeName: systemAlertWindowWidget,
     platformMapLauncherWidget.routeName: platformMapLauncherWidget,
     sherpaInstallWidget.routeName: sherpaInstallWidget,
+    dataSourceWidget.routeName: dataSourceWidget,
+    fileSystemWidget.routeName: fileSystemWidget,
   };
 
   OtherAppWidget({super.key}) {
@@ -150,6 +156,19 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
       }
     }
 
+    otherAppTileData.add(TileData(
+        title: dataSourceWidget.title,
+        prefix: dataSourceWidget.iconData,
+        onTap: (int index, String title, {String? subtitle}) {
+          name.value = dataSourceWidget.routeName;
+        }));
+    otherAppTileData.add(TileData(
+        title: fileSystemWidget.title,
+        prefix: fileSystemWidget.iconData,
+        onTap: (int index, String title, {String? subtitle}) {
+          name.value = fileSystemWidget.routeName;
+        }));
+
     Widget otherAppWidget = DataListView(
       itemCount: otherAppTileData.length,
       itemBuilder: (BuildContext context, int index) {
@@ -163,24 +182,25 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      Widget? rightWidget = IconButton(
-          onPressed: () {
-            name.value = routeName;
-          },
-          icon: const Icon(Icons.arrow_back_ios));
+      Widget? backWidget;
       String title = this.title;
       Widget otherAppWidget = _buildOtherAppTileData(context);
       Widget child;
       TileDataMixin? current = widgets[name.value];
       if (current == null) {
-        rightWidget = null;
+        backWidget = null;
         child = otherAppWidget;
       } else {
         title = current.title;
         child = current as Widget;
+        backWidget = IconButton(
+            onPressed: () {
+              name.value = routeName;
+            },
+            icon: const Icon(Icons.arrow_back_ios_new));
       }
       var otherApp =
-          AppBarView(title: title, rightWidget: rightWidget, child: child);
+          AppBarView(title: title, leadingWidget: backWidget, child: child);
 
       return otherApp;
     });

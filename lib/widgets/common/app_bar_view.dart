@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 ///工作区的标准视图，包裹了顶部栏AppBarWidget和一个包裹了child
 class AppBarView extends StatelessWidget {
   final bool withLeading;
+  final Widget? leadingWidget;
 
   //指定回退路由样式，不指定则系统判断
   final Function? leadingCallBack;
@@ -26,6 +27,7 @@ class AppBarView extends StatelessWidget {
   const AppBarView({
     super.key,
     this.withLeading = false,
+    this.leadingWidget,
     this.leadingCallBack,
     this.title,
     this.titleWidget,
@@ -56,6 +58,7 @@ class AppBarView extends StatelessWidget {
             context: context,
             backgroundColor: myself.primary,
             withLeading: withLeading,
+            leadingWidget: leadingWidget,
             leadingCallBack: leadingCallBack,
             title: titleWidget,
             centerTitle: centerTitle,

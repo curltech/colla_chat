@@ -5,6 +5,12 @@ enum SourceType { sqlite, postgres }
 
 class DataSource extends Explorable {
   final String sourceType;
+  String? filename;
+  String? host;
+  String? port;
+  String? user;
+  String? password;
+  String? database;
 
   DataSource(super.name, {required this.sourceType});
 }

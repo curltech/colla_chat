@@ -7,10 +7,4 @@ class File extends Explorable {
   File(super.name, {required this.mimeType});
 }
 
-class Folder extends Explorable {
-  Folder(super.name);
-}
-
 typedef FileNode = TreeNode<File>;
-
-typedef FolderNode = TreeNode<Folder>;
