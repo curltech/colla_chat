@@ -76,9 +76,10 @@ dependencies:
   # 存储
   flutter_secure_storage: 9.2.2
   sqlite3: ^2.5.0
-  sqlite3_flutter_libs: 0.5.27
+  sqlite3_flutter_libs: 0.5.28
   # sqflite: ^2.4.1
   idb_shim: ^2.0.1
+  postgres: ^3.4.8
 
   #网络
   dio: ^5.7.0
@@ -202,6 +203,7 @@ dependencies:
   loading_indicator: ^3.1.1
   loading_animation_widget: ^1.2.0+4
   mini_music_visualizer: ^1.1.4
+  animated_tree_view: ^2.3.0
 
   #安全加密
   cryptography: ^2.7.0 #ecc,aes
