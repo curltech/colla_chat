@@ -26,8 +26,10 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
 
   TreeViewController? treeViewController;
 
+  /// 单击表示编辑属性
   void _onTap(ExplorableNode node) {}
 
+  /// 长按表示进一步的操作
   void _onLongPress(ExplorableNode node) {}
 
   @override
