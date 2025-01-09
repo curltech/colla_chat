@@ -896,5 +896,11 @@
   "halfyearline": "半年线",
   "yearline": "年线",
   "creator": "创建者",
-  "banker": "庄家"
+  "banker": "庄家",
+  "DataSource": "数据源",
+  "Add data source": "增加数据源",
+  "Delete data source": "删除数据源",
+  "Refresh data source": "刷新数据源",
+  "Query console": "查询命令",
+  "FileSystem": "文件系统"
 }
