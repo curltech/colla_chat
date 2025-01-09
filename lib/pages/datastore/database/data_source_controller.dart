@@ -1,6 +1,4 @@
 import 'package:animated_tree_view/tree_view/tree_node.dart';
-import 'package:colla_chat/datastore/sql_builder.dart';
-import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart';
 import 'package:colla_chat/pages/datastore/explorable_node.dart';
 import 'package:get/get.dart';
@@ -9,6 +7,7 @@ class DataSourceController {
   final RxList<DataSource> dataSources = <DataSource>[].obs;
   final TreeNode<Explorable> root = TreeNode.root();
   int _current = -1;
+  Rx<ExplorableNode?> currentNode = Rx<ExplorableNode?>(null);
 
   DataSourceController() {
     init();

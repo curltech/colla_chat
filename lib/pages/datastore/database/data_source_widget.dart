@@ -96,7 +96,9 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
                       title: Text(node.data?.name ?? "/"),
                       dense: true,
                       leading: node.icon,
+                      selected: dataSourceController.currentNode.value == node,
                       onTap: () {
+                        dataSourceController.currentNode.value = node;
                         _onTap(node);
                       },
                       onLongPress: () {
