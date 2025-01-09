@@ -8,6 +8,17 @@ abstract class Explorable {
 
   @override
   String toString() => name;
+
+  Explorable.fromJson(Map json)
+      : name = json['name'],
+        comment = json['comment'];
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'comment': comment,
+    };
+  }
 }
 
 typedef ExplorableNode = TreeNode<Explorable>;

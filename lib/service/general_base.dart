@@ -61,7 +61,7 @@ abstract class GeneralBaseService<T> {
       args.addAll(whereArgs);
     }
     where = _buildWhere(where, args);
-    Map<dynamic, dynamic>? m = dataStore.findOne(tableName,
+    Map<dynamic, dynamic>? m = await dataStore.findOne(tableName,
         where: where,
         distinct: distinct,
         columns: columns,
@@ -102,7 +102,7 @@ abstract class GeneralBaseService<T> {
       args.addAll(whereArgs);
     }
     where = _buildWhere(where, args);
-    var ms = dataStore.find(tableName,
+    var ms = await dataStore.find(tableName,
         where: where,
         distinct: distinct,
         columns: columns,
@@ -143,7 +143,7 @@ abstract class GeneralBaseService<T> {
       args.addAll(whereArgs);
     }
     where = _buildWhere(where, args);
-    var page = dataStore.findPage(tableName,
+    var page = await dataStore.findPage(tableName,
         where: where,
         distinct: distinct,
         columns: columns,
@@ -286,7 +286,7 @@ abstract class GeneralBaseService<T> {
   Future<int> insert(dynamic entity) async {
     EntityUtil.createTimestamp(entity);
     Map<String, dynamic> json = await _encryptFields(entity);
-    int key = dataStore.insert(tableName, json);
+    int key = await dataStore.insert(tableName, json);
     Object? id = EntityUtil.getId(entity);
     if (id == null) {
       EntityUtil.setId(entity, key);
@@ -295,13 +295,14 @@ abstract class GeneralBaseService<T> {
   }
 
   /// 删除记录。根据entity的id字段作为条件删除，entity可以是Map
-  int delete({dynamic entity, String? where, List<Object>? whereArgs}) {
+  Future<int> delete(
+      {dynamic entity, String? where, List<Object>? whereArgs}) async {
     List<Object> args = [];
     if (whereArgs != null) {
       args.addAll(whereArgs);
     }
     where = _buildWhere(where, args);
-    return dataStore.delete(tableName,
+    return await dataStore.delete(tableName,
         entity: entity, where: where, whereArgs: args);
   }
 
@@ -319,7 +320,7 @@ abstract class GeneralBaseService<T> {
     where = _buildWhere(where, args);
     Map<String, dynamic> json = await _encryptFields(entity);
     int result =
-        dataStore.update(tableName, json, where: where, whereArgs: args);
+        await dataStore.update(tableName, json, where: where, whereArgs: args);
     return result;
   }
 
@@ -330,7 +331,7 @@ abstract class GeneralBaseService<T> {
       Map<String, dynamic> json = await _encryptFields(entity);
       operators.add({'table': tableName, 'entity': json});
     }
-    return dataStore.transaction(operators);
+    return await dataStore.transaction(operators);
   }
 
   /// 根据_id是否存在逐条增加或者修改

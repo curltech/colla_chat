@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/tool/pagination_util.dart';
 
@@ -70,9 +72,9 @@ abstract class DataStore {
 
   execute(List<Sql> sqls);
 
-  Object? get(String table, dynamic id);
+  FutureOr<Object?> get(String table, dynamic id);
 
-  List<Map> find(String table,
+  FutureOr<List<Map>> find(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -83,7 +85,7 @@ abstract class DataStore {
       int? limit,
       int? offset});
 
-  Pagination findPage(String table,
+  FutureOr<Pagination> findPage(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -98,7 +100,7 @@ abstract class DataStore {
   /// @param {*} tableName
   /// @param {*} fields
   /// @param {*} condition
-  Map? findOne(String table,
+  FutureOr<Map?> findOne(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -112,26 +114,26 @@ abstract class DataStore {
   /// 插入一条记录,假设entity时一个有id属性的Object，或者Map
   /// @param {*} tableName
   /// @param {*} entity
-  int insert(String table, dynamic entity);
+  FutureOr<int> insert(String table, dynamic entity);
 
   /// 删除记录
   /// @param {*} tableName
   /// @param {*} condition
-  int delete(String table,
+  FutureOr<int> delete(String table,
       {dynamic entity, String? where, List<Object>? whereArgs});
 
   /// 更新记录
   /// @param {*} tableName
   /// @param {*} entity
   /// @param {*} condition
-  int update(String table, dynamic entity,
+  FutureOr<int> update(String table, dynamic entity,
       {String? where, List<Object>? whereArgs});
 
-  int upsert(String table, dynamic entity,
+  FutureOr<int> upsert(String table, dynamic entity,
       {String? where, List<Object>? whereArgs});
 
   /// 在一个事务里面执行多个操作（insert,update,devare)
   /// operators是一个operator对象的数组，operator有四个属性（type，tableName，entity，condition）
   /// @param {*} operators
-  Object? transaction(List<Map<String, dynamic>> operators);
+  FutureOr<Object?> transaction(List<Map<String, dynamic>> operators);
 }

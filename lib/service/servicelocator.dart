@@ -84,6 +84,7 @@ class ServiceLocator {
         signalCryptographySecurityContextService;
 
     await sqlite3.open();
+    await sqlite3.init();
     await AppLocalizations.init();
     var defaultPeerEndpoint = peerEndpointController.defaultPeerEndpoint;
     if (defaultPeerEndpoint != null) {

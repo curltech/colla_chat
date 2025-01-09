@@ -39,7 +39,7 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
         builder: (context, ExplorableNode node) => Padding(
               padding: const EdgeInsets.only(left: 16.0),
               child: ListTile(
-                title: Text(node.data?.name ?? "N/A"),
+                title: Text(node.data?.name ?? "/"),
                 leading: node.icon,
               ),
             ));

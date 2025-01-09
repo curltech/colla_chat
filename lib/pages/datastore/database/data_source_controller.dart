@@ -1,7 +1,7 @@
 import 'package:animated_tree_view/tree_view/tree_node.dart';
+import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart';
 import 'package:colla_chat/pages/datastore/explorable_node.dart';
-import 'package:colla_chat/pages/datastore/filesystem/file_node.dart';
 import 'package:get/get.dart';
 
 class DataSourceController {
@@ -15,13 +15,11 @@ class DataSourceController {
   init() {
     String filename =
         '/Users/jingsonghu/Library/Containers/io.curltech.colla/Data/Documents/colla_chat/colla_chat.db';
-    DataSourceNode dataSourceNode = add('colla_chat',
+    addDataSource('colla_chat',
         sourceType: SourceType.sqlite.name, filename: filename);
-    FolderNode folderNode = FolderNode(data: Folder('tables'));
-    dataSourceNode.add(folderNode);
   }
 
-  DataSourceNode add(String name,
+  DataSourceNode addDataSource(String name,
       {required String sourceType,
       String? filename,
       String? host,
@@ -32,6 +30,7 @@ class DataSourceController {
     DataSource dataSource = DataSource(name, sourceType: sourceType);
     if (sourceType == SourceType.sqlite.name) {
       dataSource.filename = filename;
+      dataSource.sqlite3.open(name: name);
     }
     if (sourceType == SourceType.postgres.name) {
       dataSource.host = host;
@@ -43,11 +42,13 @@ class DataSourceController {
     dataSources.add(dataSource);
     DataSourceNode dataSourceNode = DataSourceNode(data: dataSource);
     root.add(dataSourceNode);
+    FolderNode folderNode = FolderNode(data: Folder('tables'));
+    dataSourceNode.add(folderNode);
 
     return dataSourceNode;
   }
 
-  delete(DataSourceNode node) {
+  deleteDataSource(DataSourceNode node) {
     DataSource? dataSource = node.data;
     if (dataSource != null) {
       dataSources.remove(dataSource);

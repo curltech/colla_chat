@@ -28,7 +28,7 @@ abstract class BaseService {
       int? limit,
       int? offset,
       dynamic Function(Map)? post}) async {
-    Map<dynamic, dynamic>? m = dataStore.findOne(tableName,
+    Map<dynamic, dynamic>? m = await dataStore.findOne(tableName,
         where: where,
         distinct: distinct,
         columns: columns,
@@ -62,7 +62,7 @@ abstract class BaseService {
       int? limit,
       int? offset,
       dynamic Function(Map)? post}) async {
-    var ms = dataStore.find(tableName,
+    var ms = await dataStore.find(tableName,
         where: where,
         distinct: distinct,
         columns: columns,
@@ -97,7 +97,7 @@ abstract class BaseService {
       int limit = defaultLimit,
       int offset = defaultOffset,
       dynamic Function(Map)? post}) async {
-    var page = dataStore.findPage(tableName,
+    var page = await dataStore.findPage(tableName,
         where: where,
         distinct: distinct,
         columns: columns,
@@ -150,18 +150,18 @@ abstract class BaseService {
         post: post);
   }
 
-  int insert(dynamic entity, [dynamic ignore, dynamic parent]) {
+  Future<int> insert(dynamic entity, [dynamic ignore, dynamic parent]) async {
     EntityUtil.createTimestamp(entity);
-    return dataStore.insert(tableName, entity);
+    return await dataStore.insert(tableName, entity);
   }
 
-  int delete(dynamic entity) {
-    return dataStore.delete(tableName, entity: entity);
+  Future<int> delete(dynamic entity) async {
+    return await dataStore.delete(tableName, entity: entity);
   }
 
-  int update(dynamic entity, [dynamic ignore, dynamic parent]) {
+  Future<int> update(dynamic entity, [dynamic ignore, dynamic parent]) async {
     EntityUtil.updateTimestamp(entity);
-    return dataStore.update(tableName, entity);
+    return await dataStore.update(tableName, entity);
   }
 
   /// 批量保存，根据脏标志新增，修改或者删除
@@ -174,12 +174,12 @@ abstract class BaseService {
   }
 
   /// 根据_id是否存在逐条增加或者修改
-  int upsert(dynamic entity, [dynamic ignore, dynamic parent]) {
+  Future<int> upsert(dynamic entity, [dynamic ignore, dynamic parent]) async {
     var id = EntityUtil.getId(entity);
     if (id != null) {
-      return update(entity, ignore, parent);
+      return await update(entity, ignore, parent);
     } else {
-      return insert(entity, ignore, parent);
+      return await insert(entity, ignore, parent);
     }
   }
 

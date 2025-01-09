@@ -1136,7 +1136,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
             await messageAttachmentService.remove(messageId!, title);
       }
     }
-    int count = super.delete(where: 'id=?', whereArgs: [chatMessage.id!]);
+    int count = await super.delete(where: 'id=?', whereArgs: [chatMessage.id!]);
 
     return Future.value(count);
   }

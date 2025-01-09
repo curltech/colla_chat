@@ -1,5 +1,6 @@
 import 'package:animated_tree_view/animated_tree_view.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_controller.dart';
+import 'package:colla_chat/pages/datastore/database/data_source_node.dart';
 import 'package:colla_chat/pages/datastore/explorable_node.dart';
 import 'package:colla_chat/pages/datastore/filesystem/file_node.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -38,10 +39,13 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
           );
         },
         indentation: Indentation(color: myself.primary),
+        onTreeReady: (controller) {
+          treeViewController = controller;
+        },
         builder: (context, ExplorableNode node) => Padding(
               padding: const EdgeInsets.only(left: 8.0),
               child: ListTile(
-                title: Text(node.data?.name ?? "N/A"),
+                title: Text(node.data?.name ?? "/"),
                 dense: true,
                 leading: node.icon,
               ),
@@ -65,6 +69,24 @@ extension on ExplorableNode {
       return Icon(Icons.folder, color: myself.primary);
     }
 
+    if (this is DataSourceNode) {
+      final dataSource = data as DataSource;
+      if (dataSource.sourceType == SourceType.sqlite.name) {
+        return DataSource.sqliteImage;
+      } else if (dataSource.sourceType == SourceType.postgres.name) {
+        return DataSource.postgresImage;
+      }
+      return DataSource.sqliteImage;
+    }
+
+    if (this is TableNode) {
+      return Icon(Icons.table_view_outlined, color: myself.primary);
+    }
+
+    if (this is ColumnNode) {
+      return Icon(Icons.view_column_outlined, color: myself.primary);
+    }
+
     if (this is FileNode) {
       final file = data as File;
       if (file.mimeType.startsWith("image")) {
@@ -73,8 +95,12 @@ extension on ExplorableNode {
       if (file.mimeType.startsWith("video")) {
         return Icon(Icons.video_file, color: myself.primary);
       }
+      return Icon(Icons.file_open_outlined, color: myself.primary);
     }
 
+    if (isExpanded) {
+      return Icon(Icons.folder_open, color: myself.primary);
+    }
     return Icon(Icons.folder, color: myself.primary);
   }
 }
