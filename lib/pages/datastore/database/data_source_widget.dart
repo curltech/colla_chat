@@ -1,4 +1,5 @@
 import 'package:animated_tree_view/animated_tree_view.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_controller.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart';
 import 'package:colla_chat/pages/datastore/explorable_node.dart';
@@ -25,31 +26,83 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
 
   TreeViewController? treeViewController;
 
+  void _onTap(ExplorableNode node) {}
+
+  void _onLongPress(ExplorableNode node) {}
+
   @override
   Widget build(BuildContext context) {
-    return TreeView.simpleTyped<Explorable, ExplorableNode>(
-        tree: dataSourceController.root,
-        showRootNode: false,
-        expansionBehavior: ExpansionBehavior.scrollToLastChild,
-        expansionIndicatorBuilder: (context, node) {
-          return ChevronIndicator.rightDown(
-            tree: node,
-            alignment: Alignment.centerLeft,
-            color: myself.primary,
-          );
-        },
-        indentation: Indentation(color: myself.primary),
-        onTreeReady: (controller) {
-          treeViewController = controller;
-        },
-        builder: (context, ExplorableNode node) => Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: ListTile(
-                title: Text(node.data?.name ?? "/"),
-                dense: true,
-                leading: node.icon,
+    return Column(children: [
+      OverflowBar(
+        alignment: MainAxisAlignment.start,
+        children: [
+          IconButton(
+              tooltip: AppLocalizations.t('Add data source'),
+              onPressed: () {},
+              icon: Icon(
+                Icons.add,
+                color: myself.primary,
+              )),
+          IconButton(
+              tooltip: AppLocalizations.t('Delete data source'),
+              onPressed: () {},
+              icon: Icon(
+                Icons.remove,
+                color: myself.primary,
+              )),
+          IconButton(
+              tooltip: AppLocalizations.t('Refresh data source'),
+              onPressed: () {},
+              icon: Icon(
+                Icons.refresh_outlined,
+                color: myself.primary,
+              )),
+          IconButton(
+              tooltip: AppLocalizations.t('Query console'),
+              onPressed: () {},
+              icon: Icon(
+                Icons.terminal_outlined,
+                color: myself.primary,
+              )),
+        ],
+      ),
+      Expanded(
+          child: TreeView.simpleTyped<Explorable, ExplorableNode>(
+              tree: dataSourceController.root,
+              showRootNode: false,
+              expansionBehavior: ExpansionBehavior.scrollToLastChild,
+              expansionIndicatorBuilder: (context, node) {
+                return ChevronIndicator.rightDown(
+                  tree: node,
+                  alignment: Alignment.centerLeft,
+                  color: myself.primary,
+                );
+              },
+              indentation: Indentation(
+                width: 12,
+                color: myself.primary,
+                style: IndentStyle.squareJoint,
+                thickness: 2,
+                offset: Offset(12, 0),
               ),
-            ));
+              onTreeReady: (controller) {
+                treeViewController = controller;
+              },
+              builder: (context, ExplorableNode node) => Padding(
+                    padding: const EdgeInsets.only(left: 10.0),
+                    child: ListTile(
+                      title: Text(node.data?.name ?? "/"),
+                      dense: true,
+                      leading: node.icon,
+                      onTap: () {
+                        _onTap(node);
+                      },
+                      onLongPress: () {
+                        _onLongPress(node);
+                      },
+                    ),
+                  ))),
+    ]);
   }
 }
 

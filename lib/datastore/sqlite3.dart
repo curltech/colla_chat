@@ -5,6 +5,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/entity/base.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
@@ -181,6 +182,11 @@ class Sqlite3 extends DataStore {
     return run(Sql(query));
   }
 
+  /// 删除表
+  ResultSet select(String sql, [List<Object?> parameters = const []]) {
+    return db!.select(sql, parameters);
+  }
+
   vacuum() {
     db!.execute('VACUUM');
   }
@@ -212,7 +218,7 @@ class Sqlite3 extends DataStore {
         limit: limit,
         offset: offset);
     whereArgs ??= [];
-    var results = db!.select(clause, whereArgs);
+    ResultSet results = db!.select(clause, whereArgs);
     // logger.i('execute sql:$clause');
     // logger.i('execute sql params:$whereArgs');
 

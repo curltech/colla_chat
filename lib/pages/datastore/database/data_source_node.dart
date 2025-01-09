@@ -1,4 +1,5 @@
 import 'package:animated_tree_view/animated_tree_view.dart';
+import 'package:colla_chat/datastore/postgres.dart';
 import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/pages/datastore/explorable_node.dart';
 import 'package:colla_chat/tool/image_util.dart';
@@ -15,12 +16,14 @@ class DataSource extends Explorable {
   final String sourceType;
   String? filename;
   String? host;
-  String? port;
+  int? port;
   String? user;
   String? password;
   String? database;
 
   final Sqlite3 sqlite3 = Sqlite3();
+
+  final Postgres postgres = Postgres();
 
   DataSource(super.name, {required this.sourceType});
 
@@ -62,8 +65,8 @@ class Table extends Explorable {
   Table(super.name);
 }
 
-class Column extends Explorable {
-  Column(super.name);
+class DataColumn extends Explorable {
+  DataColumn(super.name);
 }
 
 class Index extends Explorable {
