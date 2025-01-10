@@ -52,7 +52,7 @@ class MenuUtil {
       Color highlightColor = Colors.white,
       Color lineColor = Colors.white,
       TextStyle textStyle =
-          const TextStyle(color: Color(0xffc5c5c5), fontSize: 10.0),
+          const TextStyle(color: Colors.white, fontSize: 12.0),
       TextAlign textAlign = TextAlign.center,
       required List<ActionData> actions,
       required Function(BuildContext context, int index, String label,
