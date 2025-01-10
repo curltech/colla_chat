@@ -7,6 +7,7 @@ import 'package:colla_chat/pages/datastore/filesystem/file_node.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
@@ -41,31 +42,30 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
   Future<void> _onLongPress(BuildContext context, ExplorableNode node) async {
     List<ActionData> popActionData = [];
 
+    popActionData.add(
+        ActionData(label: 'New', tooltip: 'New', icon: const Icon(Icons.add)));
+    popActionData.add(ActionData(
+        label: 'Delete', tooltip: 'Delete', icon: const Icon(Icons.remove)));
+    popActionData.add(ActionData(
+        label: 'Edit', tooltip: 'Edit', icon: const Icon(Icons.edit)));
+    popActionData.add(ActionData(
+        label: 'Edit data',
+        tooltip: 'Edit data',
+        icon: const Icon(Icons.dataset)));
     if (node is DataSourceNode) {}
     if (node is DataTableNode) {}
-    if (node is DataColumnNode) {
-      popActionData.add(ActionData(
-          label: 'New', tooltip: 'New', icon: const Icon(Icons.add)));
-    }
+    if (node is DataColumnNode) {}
     if (node is DataIndexNode) {}
 
-    await DialogUtil.show(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-            elevation: 0.0,
-            insetPadding: EdgeInsets.zero,
-            child: DataActionCard(
-                onPressed: (int index, String label, {String? value}) {
-                  Navigator.pop(context);
-                  _onPopAction(context, node, index, label, value: value);
-                },
-                crossAxisCount: 4,
-                actions: popActionData,
-                height: 200,
-                width: appDataProvider.secondaryBodyWidth,
-                iconSize: 30));
+    await MenuUtil.showPopMenu(
+      context,
+      onPressed: (BuildContext context, int index, String label,
+          {String? value}) {
+        _onPopAction(context, node, index, label, value: value);
       },
+      height: 200,
+      width: appDataProvider.secondaryBodyWidth,
+      actions: popActionData,
     );
   }
 

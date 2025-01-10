@@ -177,6 +177,9 @@ dependencies:
   appinio_swiper: ^2.0.2 #不错的swiper的组件，可定制动画的角度
   flutter_drawing_board: ^0.9.4 #绘画工具
   custom_pop_up_menu: ^1.2.4
+  popup_menu: ^2.1.0
+  flutter_popup: ^3.3.0
+  contextmenu_plus: ^1.0.1
   star_menu: ^4.0.1
   sliding_up_panel2: ^3.3.0+1
   flutter_floating_bottom_bar: ^1.1.0

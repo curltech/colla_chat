@@ -1,10 +1,102 @@
+import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:floating_action_bubble/floating_action_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
+import 'package:popup_menu/popup_menu.dart';
 
 class MenuUtil {
+  /// 自定义的data action弹出菜单
+  static showPopActionMenu(BuildContext context,
+      {double? width,
+      double? height,
+      double iconSize = 32,
+      required List<ActionData> actions,
+      required Function(BuildContext context, int index, String label,
+              {String? value})?
+          onPressed}) async {
+    await DialogUtil.show(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+            elevation: 0.0,
+            insetPadding: EdgeInsets.zero,
+            child: DataActionCard(
+                onPressed: (int index, String label, {String? value}) {
+                  Navigator.pop(context);
+                  onPressed!(context, index, label, value: value);
+                },
+                crossAxisCount: 4,
+                actions: actions,
+                height: height,
+                width: width,
+                iconSize: iconSize));
+      },
+    );
+  }
+
+  /// 使用popmenu组件弹出菜单,widgetKey:弹出菜单位置的组件的GlobalKey，比如按钮菜单
+  static showPopMenu(BuildContext context,
+      {GlobalKey<State<StatefulWidget>>? widgetKey,
+      double? width,
+      double? height,
+      MenuType type = MenuType.grid,
+      double itemWidth = 72.0,
+      double itemHeight = 65.0,
+      double arrowHeight = 0.0,
+      int maxColumn = 4,
+      Color backgroundColor = Colors.grey,
+      Color highlightColor = Colors.white,
+      Color lineColor = Colors.white,
+      TextStyle textStyle =
+          const TextStyle(color: Color(0xffc5c5c5), fontSize: 10.0),
+      TextAlign textAlign = TextAlign.center,
+      required List<ActionData> actions,
+      required Function(BuildContext context, int index, String label,
+              {String? value})?
+          onPressed}) async {
+    List<MenuItemProvider> items = [];
+    for (var action in actions) {
+      items.add(MenuItem(title: action.label, image: action.icon));
+    }
+    PopupMenu menu = PopupMenu(
+      context: context,
+      config: MenuConfig(
+        type: type,
+        itemWidth: itemWidth,
+        itemHeight: itemHeight,
+        arrowHeight: arrowHeight,
+        maxColumn: maxColumn,
+        backgroundColor: backgroundColor,
+        highlightColor: highlightColor,
+        lineColor: lineColor,
+        textStyle: textStyle,
+        textAlign: textAlign,
+      ),
+      items: items,
+      onClickMenu: (MenuItemProvider item) {
+        if (onPressed != null) {
+          onPressed(context, 0, item.menuTitle);
+        }
+      },
+      onShow: () {},
+      onDismiss: () {},
+    );
+    if (widgetKey != null) {
+      menu.show(widgetKey: widgetKey);
+    } else {
+      double left = (appDataProvider.secondaryBodyWidth - width!) / 2;
+      double top = (appDataProvider.totalSize.height -
+              appDataProvider.toolbarHeight -
+              height!) /
+          2;
+      menu.show(rect: Rect.fromLTWH(left, top, width, height));
+    }
+  }
+
   ///浮动动画按钮
   static FloatingActionBubble buildActionBubble({
     Key? key,
