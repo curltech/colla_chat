@@ -1,4 +1,5 @@
 import 'package:animated_tree_view/animated_tree_view.dart';
+import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/datastore/postgres.dart';
 import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/pages/datastore/explorable_node.dart';
@@ -20,12 +21,9 @@ class DataSource extends Explorable {
   String? user;
   String? password;
   String? database;
+  DataStore? dataStore;
 
-  final Sqlite3 sqlite3 = Sqlite3();
-
-  final Postgres postgres = Postgres();
-
-  DataSource(super.name, {required this.sourceType});
+  DataSource(super.name, {required this.sourceType, this.dataStore});
 
   DataSource.fromJson(super.json)
       : sourceType = json['sourceType'] ?? SourceType.sqlite.name,
@@ -53,34 +51,34 @@ class DataSource extends Explorable {
   }
 }
 
-class Schema extends Explorable {
-  Schema(super.name);
+class DataSchema extends Explorable {
+  DataSchema(super.name);
 }
 
 class Database extends Explorable {
   Database(super.name);
 }
 
-class Table extends Explorable {
-  Table(super.name);
+class DataTable extends Explorable {
+  DataTable(super.name);
 }
 
 class DataColumn extends Explorable {
   DataColumn(super.name);
 }
 
-class Index extends Explorable {
-  Index(super.name);
+class DataIndex extends Explorable {
+  DataIndex(super.name);
 }
 
 typedef DataSourceNode = TreeNode<DataSource>;
 
-typedef SchemaNode = TreeNode<Schema>;
+typedef DataSchemaNode = TreeNode<DataSchema>;
 
 typedef DatabaseNode = TreeNode<Database>;
 
-typedef TableNode = TreeNode<Table>;
+typedef DataTableNode = TreeNode<DataTable>;
 
-typedef ColumnNode = TreeNode<Column>;
+typedef DataColumnNode = TreeNode<DataColumn>;
 
-typedef IndexNode = TreeNode<Index>;
+typedef DataIndexNode = TreeNode<DataIndex>;

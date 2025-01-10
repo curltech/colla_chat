@@ -2,15 +2,11 @@ import 'dart:io';
 
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
-import 'package:path/path.dart' as p;
 import 'package:sqlite3/common.dart';
 import 'package:sqlite3/sqlite3.dart';
 
-Future<CommonDatabase> openSqlite3({String name = 'colla_chat.db'}) async {
+Future<CommonDatabase> openSqlite3({required String path}) async {
   if (!platformParams.web) {
-    /// 除了web之外的创建打开数据库的方式
-    final String dbFolder = platformParams.path;
-    String path = p.join(dbFolder, name);
     File file = File(path);
 
     try {

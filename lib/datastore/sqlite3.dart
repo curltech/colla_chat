@@ -5,7 +5,6 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/entity/base.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
@@ -23,11 +22,15 @@ import './condition_import/unsupport.dart'
 /// 适用于移动手机（无数据限制），desktop和chrome浏览器的sqlite3的数据库（50M数据限制）
 class Sqlite3 extends DataStore {
   CommonDatabase? db;
+  late String dbPath;
 
-  Future<bool> open({String name = dbname}) async {
+  Sqlite3(this.dbPath);
+
+  @override
+  Future<bool> open() async {
     for (int i = 0; i < 3; i++) {
       try {
-        db = await sqlite3_open.openSqlite3(name: name);
+        db = await sqlite3_open.openSqlite3(path: dbPath);
         break;
       } catch (e) {
         await Future.delayed(Duration(milliseconds: (i + 1) * 100));
@@ -86,7 +89,7 @@ class Sqlite3 extends DataStore {
   }
 
   reset() {
-    File file = File(appDataProvider.sqlite3Path);
+    File file = File(dbPath);
     if (file.existsSync()) {
       file.deleteSync();
     }
@@ -101,22 +104,22 @@ class Sqlite3 extends DataStore {
   }
 
   File? backup() {
-    File file = File(appDataProvider.sqlite3Path);
+    File file = File(dbPath);
     if (file.existsSync()) {
-      return file.copySync('${appDataProvider.sqlite3Path}.bak');
+      return file.copySync('$dbPath.bak');
     }
     return null;
   }
 
   restore() async {
-    File file = File(appDataProvider.sqlite3Path);
+    File file = File(dbPath);
     if (file.existsSync()) {
       close();
-      file.renameSync('${appDataProvider.sqlite3Path}.ret');
+      file.renameSync('$dbPath.ret');
     }
-    file = File('${appDataProvider.sqlite3Path}.bak');
+    file = File('$dbPath.bak');
     if (file.existsSync()) {
-      file.renameSync(appDataProvider.sqlite3Path);
+      file.renameSync(dbPath);
     }
     await open();
     await init();
@@ -124,7 +127,7 @@ class Sqlite3 extends DataStore {
 
   /// 删除数据库
   /// @param {*} options
-  remove({name = dbname, location = 'default'}) {}
+  remove() {}
 
   /// 批量执行sql，参数是二维数组
   /// @param {*} sqls
@@ -182,7 +185,8 @@ class Sqlite3 extends DataStore {
     return run(Sql(query));
   }
 
-  /// 删除表
+  /// 查询执行
+  @override
   ResultSet select(String sql, [List<Object?> parameters = const []]) {
     return db!.select(sql, parameters);
   }
@@ -432,4 +436,4 @@ class Sqlite3 extends DataStore {
   }
 }
 
-final Sqlite3 sqlite3 = Sqlite3();
+final Sqlite3 sqlite3 = Sqlite3(appDataProvider.sqlite3Path);

@@ -64,6 +64,8 @@ const String dbname =
     String.fromEnvironment('dbname', defaultValue: 'colla_chat.db');
 
 abstract class DataStore {
+  FutureOr<bool> open();
+
   ///建表和索引
   dynamic create(String tableName, List<String> fields,
       {List<String>? indexFields, bool drop = false});
@@ -71,6 +73,8 @@ abstract class DataStore {
   dynamic run(Sql sql);
 
   execute(List<Sql> sqls);
+
+  FutureOr<List<Map>> select(String sql, [List<Object?> parameters = const []]);
 
   FutureOr<Object?> get(String table, dynamic id);
 

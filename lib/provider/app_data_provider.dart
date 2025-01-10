@@ -3,6 +3,7 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/locale_util.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
 
 /// 不同语言版本的下拉选择框的选项
 final localeOptions = [
@@ -31,12 +32,14 @@ class AppDataProvider with ChangeNotifier {
   double topPadding = 0;
   double bottomPadding = 0;
   TextScaler textScaler = TextScaler.noScaling;
-  String sqlite3Path = '';
+  late String sqlite3Path;
   int dataLength = 0;
   bool _autoLogin = false;
   late Orientation orientation = Orientation.landscape;
 
   AppDataProvider() {
+    final String dbFolder = platformParams.path;
+    sqlite3Path = p.join(dbFolder, 'colla_chat.db');
     if (platformParams.mobile) {
       orientation = Orientation.portrait;
     } else {

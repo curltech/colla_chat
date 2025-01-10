@@ -18,14 +18,22 @@ import 'package:postgres/postgres.dart';
 /// 适用于移动手机（无数据限制），desktop和chrome浏览器的sqlite3的数据库（50M数据限制）
 class Postgres extends DataStore {
   Connection? db;
+  late String host;
+  late int port;
+  late String user;
+  String? password;
+  late String database;
 
-  Future<bool> open({
-    String host = 'localhost',
-    int port = 5432,
-    String user = 'postgres',
+  Postgres({
+    this.host = 'localhost',
+    this.port = 5432,
+    this.user = 'postgres',
     required String password,
-    String database = 'postgres',
-  }) async {
+    this.database = 'postgres',
+  });
+
+  @override
+  Future<bool> open() async {
     db = await Connection.open(Endpoint(
       host: 'localhost',
       port: 5432,
@@ -124,7 +132,7 @@ class Postgres extends DataStore {
 
   /// 删除数据库
   /// @param {*} options
-  remove({name = dbname, location = 'default'}) {}
+  remove() {}
 
   /// 批量执行sql，参数是二维数组
   /// @param {*} sqls
@@ -153,6 +161,18 @@ class Postgres extends DataStore {
     } else {
       return await db!.execute(sql.clause);
     }
+  }
+
+  @override
+  Future<List<Map>> select(String sql,
+      [List<Object?> parameters = const []]) async {
+    Result result = await db!.execute(sql, parameters: parameters);
+    List<Map> maps = [];
+    for (var r in result) {
+      maps.add(r.toColumnMap());
+    }
+
+    return maps;
   }
 
   /// 建表和索引
@@ -207,9 +227,8 @@ class Postgres extends DataStore {
     whereArgs ??= [];
     Result result = await db!.execute(clause, parameters: whereArgs);
 
-    List<ResultRow> results = result.toList();
     List<Map> maps = [];
-    for (var r in results) {
+    for (var r in result) {
       maps.add(r.toColumnMap());
     }
 
@@ -418,5 +437,3 @@ class Postgres extends DataStore {
     return result;
   }
 }
-
-final Postgres postgres = Postgres();

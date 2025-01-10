@@ -1,6 +1,10 @@
 import 'package:animated_tree_view/tree_view/tree_node.dart';
+import 'package:colla_chat/datastore/datastore.dart';
+import 'package:colla_chat/datastore/postgres.dart';
+import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart';
 import 'package:colla_chat/pages/datastore/explorable_node.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:get/get.dart';
 
 class DataSourceController {
@@ -28,25 +32,34 @@ class DataSourceController {
     }
   }
 
-  init() {
-    String filename =
-        '/Users/jingsonghu/Library/Containers/io.curltech.colla/Data/Documents/colla_chat/colla_chat.db';
-    addDataSource('colla_chat',
-        sourceType: SourceType.sqlite.name, filename: filename);
+  init() async {
+    String filename = appDataProvider.sqlite3Path;
+    await addDataSource('colla_chat',
+        sourceType: SourceType.sqlite.name,
+        filename: filename,
+        dataStore: sqlite3);
   }
 
-  DataSourceNode addDataSource(String name,
+  Future<DataSourceNode> addDataSource(String name,
       {required String sourceType,
       String? filename,
       String? host,
       int? port,
       String? user,
       String? password,
-      String? database}) {
-    DataSource dataSource = DataSource(name, sourceType: sourceType);
+      String? database,
+      DataStore? dataStore}) async {
+    DataSource dataSource =
+        DataSource(name, sourceType: sourceType, dataStore: dataStore);
     if (sourceType == SourceType.sqlite.name) {
-      dataSource.filename = filename;
-      dataSource.sqlite3.open(name: name);
+      if (dataStore == null) {
+        dataSource.filename = filename!;
+        dataSource.dataStore = Sqlite3(filename);
+        await dataSource.dataStore!.open();
+      } else {
+        dataSource.filename = (dataStore as Sqlite3).dbPath;
+        dataSource.dataStore = dataStore;
+      }
     }
     if (sourceType == SourceType.postgres.name) {
       dataSource.host = host;
@@ -54,18 +67,16 @@ class DataSourceController {
       dataSource.user = user;
       dataSource.password = password;
       dataSource.database = database;
-      dataSource.postgres.open(
-          host: host!,
-          port: port!,
-          user: user!,
-          password: password!,
-          database: database!);
+      dataSource.dataStore = Postgres(password: password!);
+      dataSource.dataStore!.open();
     }
     dataSources.add(dataSource);
+    current = dataSource;
     DataSourceNode dataSourceNode = DataSourceNode(data: dataSource);
     root.add(dataSourceNode);
     FolderNode folderNode = FolderNode(data: Folder('tables'));
     dataSourceNode.add(folderNode);
+    findTables(folderNode);
 
     return dataSourceNode;
   }
@@ -78,17 +89,26 @@ class DataSourceController {
     node.delete();
   }
 
-  findTables(FolderNode folderNode) {
+  findTables(FolderNode folderNode) async {
     if (current != null && current!.sourceType == SourceType.sqlite.name) {
-      List<Map<dynamic, dynamic>> maps = current!.sqlite3.find('sqlite_master',
-          where: 'type=?', whereArgs: ['table'], orderBy: 'name');
+      List<Map<dynamic, dynamic>> maps = await current!.dataStore!.find(
+          'sqlite_master',
+          where: 'type=?',
+          whereArgs: ['table'],
+          orderBy: 'name');
+      for (var map in maps) {
+        String name = map['name'];
+        DataTable dataTable = DataTable(name);
+        DataTableNode dataTableNode = DataTableNode(data: dataTable);
+        folderNode.add(dataTableNode);
+      }
     }
   }
 
-  findColumns(String name, FolderNode folderNode) {
+  findColumns(String name, FolderNode folderNode) async {
     if (current != null && current!.sourceType == SourceType.sqlite.name) {
       List<Map<dynamic, dynamic>> maps =
-          current!.sqlite3.select('PRAGMA table_info($name)');
+          await current!.dataStore!.select('PRAGMA table_info($name)');
     }
   }
 }
