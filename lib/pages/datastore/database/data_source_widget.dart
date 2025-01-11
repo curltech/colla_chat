@@ -15,6 +15,8 @@ import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
+import 'package:colla_chat/pages/datastore/database/data_source_node.dart'
+    as data_source;
 
 /// 数据源管理功能主页面，带有路由回调函数
 class DataSourceWidget extends StatelessWidget with TileDataMixin {
@@ -96,8 +98,18 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
 
   void _add(ExplorableNode node) {
     if (node is FolderNode) {
-      if ('tables' == node.data!.name) {}
-      if ('columns' == node.data!.name) {}
+      if ('tables' == node.data!.name) {
+        data_source.DataTable dataTable = data_source.DataTable('');
+        DataTableNode dataTableNode = DataTableNode(data: dataTable);
+        rxDataTableNode.value = dataTableNode;
+        indexWidgetProvider.push('data_table_edit');
+      }
+      if ('columns' == node.data!.name) {
+        data_source.DataColumn dataColumn = data_source.DataColumn('');
+        DataColumnNode dataColumnNode = DataColumnNode(data: dataColumn);
+        rxDataColumnNode.value = dataColumnNode;
+        indexWidgetProvider.push('data_column_edit');
+      }
       if ('indexes' == node.data!.name) {}
     }
   }
