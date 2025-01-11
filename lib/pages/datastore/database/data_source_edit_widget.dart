@@ -38,10 +38,6 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
           label: 'Name',
           prefixIcon: Icon(Icons.person, color: myself.primary)),
       PlatformDataField(
-          name: 'sourceType',
-          label: 'SourceType',
-          prefixIcon: Icon(Icons.merge_type_outlined, color: myself.primary)),
-      PlatformDataField(
           name: 'comment',
           label: 'Comment',
           prefixIcon: Icon(Icons.comment, color: myself.primary)),
@@ -104,12 +100,14 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
     }
     List<PlatformDataField> dataSourceDataFields =
         buildDataSourceDataFields(dataSource.sourceType);
-    dataSourceDataFields.add(PlatformDataField(
-        name: 'sourceType',
-        label: 'SourceType',
-        prefixIcon: Icon(Icons.merge_type_outlined, color: myself.primary),
-        inputType: InputType.select,
-        options: options));
+    dataSourceDataFields.insert(
+        1,
+        PlatformDataField(
+            name: 'sourceType',
+            label: 'SourceType',
+            prefixIcon: Icon(Icons.merge_type_outlined, color: myself.primary),
+            inputType: InputType.select,
+            options: options));
     formInputController = FormInputController(dataSourceDataFields);
     return Obx(() {
       formInputController.setValues(JsonUtil.toJson(dataSource));
