@@ -1,13 +1,13 @@
 import 'package:animated_tree_view/animated_tree_view.dart';
 
 abstract class Explorable {
-  final String name;
-  final String? comment;
+  String? name;
+  String? comment;
 
   Explorable(this.name, {this.comment});
 
   @override
-  String toString() => name;
+  String toString() => name ?? '';
 
   Explorable.fromJson(Map json)
       : name = json['name'],

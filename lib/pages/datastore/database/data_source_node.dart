@@ -1,7 +1,5 @@
 import 'package:animated_tree_view/animated_tree_view.dart';
 import 'package:colla_chat/datastore/datastore.dart';
-import 'package:colla_chat/datastore/postgres.dart';
-import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/pages/datastore/explorable_node.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +12,7 @@ class DataSource extends Explorable {
   static Widget postgresImage = ImageUtil.buildImageWidget(
       imageContent: 'assets/images/postgres.webp', width: 24);
 
-  final String sourceType;
+  String sourceType;
   String? filename;
   String? host;
   int? port;
