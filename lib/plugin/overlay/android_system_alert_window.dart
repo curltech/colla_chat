@@ -67,7 +67,7 @@ class AndroidSystemAlertWindow {
   }
 
   remove() {
-    SystemAlertWindow.removeOnClickListener();
+    SystemAlertWindow.disposeOverlayListener();
   }
 
   static const mainPortName = "foreground_port";

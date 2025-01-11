@@ -252,7 +252,7 @@ dependencies:
   # 多媒体
   ffmpeg_kit_flutter: ^6.0.3 #Android, iOS and macOS
   photo_view: ^0.14.0 #图片显示
-  pro_image_editor: ^7.3.0
+  pro_image_editor: ^7.6.0
   flutter_sound: ^9.4.6
   audioplayers: ^6.1.0 #音频处理,所有平台
   audioplayers_platform_interface: ^7.0.0
