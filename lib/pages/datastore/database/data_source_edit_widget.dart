@@ -14,9 +14,11 @@ import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-final Rx<DataSourceNode?> dataSourceNode = Rx<DataSourceNode?>(null);
+final Rx<DataSourceNode?> rxDataSourceNode = Rx<DataSourceNode?>(null);
 
 class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
+  DataSourceEditWidget({super.key});
+
   @override
   bool get withLeading => true;
 
@@ -28,8 +30,6 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'DataSourceEdit';
-
-  DataSourceEditWidget({super.key});
 
   List<PlatformDataField> buildDataSourceDataFields(String sourceType) {
     var dataSourceDataFields = [
@@ -89,11 +89,11 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
 
   //DataSourceNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
-    if (dataSourceNode.value == null) {
-      dataSourceNode.value = DataSourceNode(
+    if (rxDataSourceNode.value == null) {
+      rxDataSourceNode.value = DataSourceNode(
           data: DataSource('', sourceType: SourceType.sqlite.name));
     }
-    DataSource dataSource = dataSourceNode.value!.data!;
+    DataSource dataSource = rxDataSourceNode.value!.data!;
     List<Option<dynamic>> options = [];
     for (var value in SourceType.values) {
       options.add(Option(value.name, value.name));
@@ -137,7 +137,7 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
           content: AppLocalizations.t('Must has dataSource sourceType'));
       return null;
     }
-    DataSource dataSource = dataSourceNode.value!.data!;
+    DataSource dataSource = rxDataSourceNode.value!.data!;
     dataSource.name = current.name;
     dataSource.sourceType = current.sourceType;
     if (current.sourceType == SourceType.sqlite.name) {

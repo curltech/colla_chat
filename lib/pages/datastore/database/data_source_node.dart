@@ -2,6 +2,7 @@ import 'package:animated_tree_view/animated_tree_view.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/pages/datastore/explorable_node.dart';
 import 'package:colla_chat/tool/image_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:flutter/material.dart';
 
 enum SourceType { sqlite, postgres }
@@ -51,22 +52,97 @@ class DataSource extends Explorable {
 
 class DataSchema extends Explorable {
   DataSchema(super.name);
+
+  DataSchema.fromJson(super.json) : super.fromJson();
+
+  @override
+  Map<String, dynamic> toJson() {
+    var json = super.toJson();
+
+    return json;
+  }
 }
 
 class Database extends Explorable {
   Database(super.name);
+
+  Database.fromJson(super.json) : super.fromJson();
+
+  @override
+  Map<String, dynamic> toJson() {
+    var json = super.toJson();
+
+    return json;
+  }
 }
 
 class DataTable extends Explorable {
   DataTable(super.name);
+
+  DataTable.fromJson(super.json) : super.fromJson();
+
+  @override
+  Map<String, dynamic> toJson() {
+    var json = super.toJson();
+
+    return json;
+  }
 }
 
 class DataColumn extends Explorable {
+  String? dataType;
+  bool? allowedNull;
+  bool? autoIncrement;
+
   DataColumn(super.name);
+
+  DataColumn.fromJson(super.json)
+      : dataType = json['dataType'],
+        allowedNull = json['allowedNull'],
+        autoIncrement = json['autoIncrement'],
+        super.fromJson();
+
+  @override
+  Map<String, dynamic> toJson() {
+    var json = super.toJson();
+    json.addAll({
+      'dataType': dataType,
+      'allowedNull': allowedNull,
+      'autoIncrement': autoIncrement,
+    });
+
+    return json;
+  }
 }
 
 class DataIndex extends Explorable {
+  bool? isKey;
+  bool? isUnique;
+  List<String>? columnNames;
+
   DataIndex(super.name);
+
+  DataIndex.fromJson(Map json)
+      : isKey = json['isKey'],
+        isUnique = json['isUnique'],
+        super.fromJson(json) {
+    String? columnNames = json['columnNames'];
+    if (columnNames != null) {
+      this.columnNames = JsonUtil.toJson(columnNames);
+    }
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    var json = super.toJson();
+    json.addAll({
+      'isKey': isKey,
+      'isUnique': isUnique,
+      'columnNames': JsonUtil.toJsonString(columnNames),
+    });
+
+    return json;
+  }
 }
 
 typedef DataSourceNode = TreeNode<DataSource>;

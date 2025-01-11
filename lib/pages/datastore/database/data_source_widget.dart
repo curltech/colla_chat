@@ -1,12 +1,16 @@
 import 'package:animated_tree_view/animated_tree_view.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/datastore/database/data_column_edit_widget.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_controller.dart';
+import 'package:colla_chat/pages/datastore/database/data_source_edit_widget.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart';
+import 'package:colla_chat/pages/datastore/database/data_table_edit_widget.dart';
+import 'package:colla_chat/pages/datastore/database/query_console_editor_widget.dart';
 import 'package:colla_chat/pages/datastore/explorable_node.dart';
 import 'package:colla_chat/pages/datastore/filesystem/file_node.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -14,7 +18,18 @@ import 'package:flutter/material.dart';
 
 /// 数据源管理功能主页面，带有路由回调函数
 class DataSourceWidget extends StatelessWidget with TileDataMixin {
-  DataSourceWidget({super.key});
+  final DataSourceEditWidget dataSourceEditWidget = DataSourceEditWidget();
+  final DataTableEditWidget dataTableEditWidget = DataTableEditWidget();
+  final DataColumnEditWidget dataColumnEditWidget = DataColumnEditWidget();
+  final QueryConsoleEditorWidget queryConsoleEditorWidget =
+      QueryConsoleEditorWidget();
+
+  DataSourceWidget({super.key}) {
+    indexWidgetProvider.define(dataSourceEditWidget);
+    indexWidgetProvider.define(dataTableEditWidget);
+    indexWidgetProvider.define(dataColumnEditWidget);
+    indexWidgetProvider.define(queryConsoleEditorWidget);
+  }
 
   @override
   bool get withLeading => true;
@@ -28,11 +43,14 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'DataSource';
 
-  TreeViewController? treeViewController;
+  late final TreeViewController? treeViewController;
 
   /// 单击表示编辑属性
   void _onTap(BuildContext context, ExplorableNode node) {
-    if (node is DataSourceNode) {}
+    if (node is DataSourceNode) {
+      rxDataSourceNode.value = node;
+      indexWidgetProvider.push('data_source_edit');
+    }
     if (node is DataTableNode) {}
     if (node is DataColumnNode) {}
     if (node is DataIndexNode) {}
@@ -69,11 +87,26 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     );
   }
 
+  void _addDataSource(String sourceType) {
+    DataSource dataSource = DataSource('', sourceType: sourceType);
+    DataSourceNode dataSourceNode = DataSourceNode(data: dataSource);
+    rxDataSourceNode.value = dataSourceNode;
+  }
+
+  void _add(ExplorableNode node) {
+    if (node is FolderNode) {
+      if ('tables' == node.data!.name) {}
+      if ('columns' == node.data!.name) {}
+      if ('indexes' == node.data!.name) {}
+    }
+  }
+
   _onPopAction(
       BuildContext context, ExplorableNode node, int index, String label,
       {String? value}) async {
     switch (label) {
       case 'Add':
+        _add(node);
       default:
     }
   }
@@ -107,7 +140,9 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
               )),
           IconButton(
               tooltip: AppLocalizations.t('Query console'),
-              onPressed: () {},
+              onPressed: () {
+                indexWidgetProvider.push('query_console_editor');
+              },
               icon: Icon(
                 Icons.terminal_outlined,
                 color: myself.primary,
@@ -146,6 +181,8 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
                     minVerticalPadding: 0.0,
                     minTileHeight: 28,
                     selected: dataSourceController.currentNode.value == node,
+                    selectedColor: myself.primary,
+                    selectedTileColor: myself.secondary,
                     onTap: () {
                       dataSourceController.currentNode.value = node;
                       _onTap(context, node);

@@ -140,7 +140,6 @@ dependencies:
   extended_text_field: ^16.0.0 #文字表情混入
   extended_text_library: ^12.0.0
   extended_masked_text: ^3.0.1
-  azlistview: ^2.0.0 #特殊列表滑动
   # fl_chart: ^0.69.0
   # k_chart: ^0.7.1
   community_charts_flutter: ^1.0.4
@@ -226,8 +225,11 @@ dependencies:
   flutter_smart_dialog: ^4.9.4
   json_annotation: ^4.3.0
   flutter_json_view: ^1.1.5
+  flutter_code_editor: ^0.3.2
   json_editor_flutter: ^1.4.2
   re_editor: ^0.6.0
+  flutter_highlight: ^0.7.0
+  highlight: ^0.7.0
   re_highlight: ^0.0.3
   provider: ^6.0.1 #状态管理
   easy_refresh: ^3.3.2+1
@@ -392,6 +394,8 @@ dependency_overrides:
   collection: ^1.17.0
   path: ^1.8.3
   audio_video_progress_bar: ^2.0.1
+  azlistview: ^2.0.0 #特殊列表滑动
+  scrollable_positioned_list: ^0.3.8
   pdfx:
     git:
       url: 'https://github.com/ScerIO/packages.flutter'
