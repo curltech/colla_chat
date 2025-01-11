@@ -91,6 +91,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     DataSource dataSource = DataSource('', sourceType: sourceType);
     DataSourceNode dataSourceNode = DataSourceNode(data: dataSource);
     rxDataSourceNode.value = dataSourceNode;
+    indexWidgetProvider.push('data_source_edit');
   }
 
   void _add(ExplorableNode node) {
@@ -119,7 +120,9 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
         children: [
           IconButton(
               tooltip: AppLocalizations.t('Add data source'),
-              onPressed: () {},
+              onPressed: () {
+                _addDataSource(SourceType.sqlite.name);
+              },
               icon: Icon(
                 Icons.add,
                 color: myself.primary,
