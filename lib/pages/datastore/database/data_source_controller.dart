@@ -4,7 +4,9 @@ import 'package:colla_chat/datastore/postgres.dart';
 import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart';
 import 'package:colla_chat/pages/datastore/explorable_node.dart';
+import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:get/get.dart';
 
 class DataSourceController {
@@ -32,12 +34,24 @@ class DataSourceController {
     }
   }
 
+  save() async {
+    String value = JsonUtil.toJsonString(dataSources.value);
+    await localSecurityStorage.save('DataSources', value);
+  }
+
   init() async {
     String filename = appDataProvider.sqlite3Path;
     await addDataSource('colla_chat',
         sourceType: SourceType.sqlite.name,
         filename: filename,
         dataStore: sqlite3);
+    String? value = await localSecurityStorage.get('DataSources');
+    List<dynamic> maps = JsonUtil.toJson(value);
+    for (var map in maps) {
+      DataSource dataSource = DataSource.fromJson(map);
+      await addDataSource(dataSource.name!,
+          sourceType: SourceType.sqlite.name, filename: dataSource.filename);
+    }
   }
 
   Future<DataSourceNode> addDataSource(String name,
@@ -71,6 +85,7 @@ class DataSourceController {
       dataSource.dataStore!.open();
     }
     dataSources.add(dataSource);
+    save();
     current = dataSource;
     DataSourceNode dataSourceNode = DataSourceNode(data: dataSource);
     root.add(dataSourceNode);
@@ -87,9 +102,10 @@ class DataSourceController {
       dataSources.remove(dataSource);
     }
     node.delete();
+    save();
   }
 
-  findTables(FolderNode folderNode) async {
+  findTables(FolderNode tableFolderNode) async {
     if (current != null && current!.sourceType == SourceType.sqlite.name) {
       List<Map<dynamic, dynamic>> maps = await current!.dataStore!.find(
           'sqlite_master',
@@ -100,15 +116,23 @@ class DataSourceController {
         String name = map['name'];
         DataTable dataTable = DataTable(name);
         DataTableNode dataTableNode = DataTableNode(data: dataTable);
-        folderNode.add(dataTableNode);
+        tableFolderNode.add(dataTableNode);
+
+        FolderNode columnFolderNode = FolderNode(data: Folder('columns'));
+        dataTableNode.add(columnFolderNode);
+        findColumns(name, columnFolderNode);
+
+        FolderNode indexFolderNode = FolderNode(data: Folder('indexes'));
+        dataTableNode.add(indexFolderNode);
       }
     }
   }
 
-  findColumns(String name, FolderNode folderNode) async {
+  findColumns(String name, FolderNode columnFolderNode) async {
     if (current != null && current!.sourceType == SourceType.sqlite.name) {
       List<Map<dynamic, dynamic>> maps =
           await current!.dataStore!.select('PRAGMA table_info($name)');
+      for (var map in maps) {}
     }
   }
 }
