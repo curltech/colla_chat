@@ -180,7 +180,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
           child: TreeView.simpleTyped<Explorable, ExplorableNode>(
               tree: dataSourceController.root,
               showRootNode: false,
-              expansionBehavior: ExpansionBehavior.scrollToLastChild,
+              expansionBehavior: ExpansionBehavior.none,
               expansionIndicatorBuilder: (context, node) {
                 return ChevronIndicator.rightDown(
                   tree: node,
@@ -203,6 +203,9 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
                   padding: const EdgeInsets.only(left: 10.0),
                   child: ListTile(
                     title: Text(node.data?.name ?? "/"),
+                    trailing: node is DataColumnNode
+                        ? Text(node.data?.dataType ?? "")
+                        : null,
                     dense: true,
                     leading: node.icon,
                     minVerticalPadding: 0.0,

@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 
 enum SourceType { sqlite, postgres }
 
+enum SqliteDataType { INTEGER, INT, TEXT, REAL, BLOB }
+
 class DataSource extends Explorable {
   static Widget sqliteImage = ImageUtil.buildImageWidget(
       imageContent: 'assets/images/sqlite.webp', width: 24);

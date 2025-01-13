@@ -44,13 +44,13 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
       PlatformDataField(
           name: 'allowedNull',
           label: 'AllowedNull',
-          inputType: InputType.checkbox,
+          inputType: InputType.switcher,
           dataType: DataType.bool,
           prefixIcon: Icon(Icons.hourglass_empty, color: myself.primary)),
       PlatformDataField(
           name: 'autoIncrement',
           label: 'AutoIncrement',
-          inputType: InputType.checkbox,
+          inputType: InputType.switcher,
           dataType: DataType.bool,
           prefixIcon: Icon(Icons.numbers_outlined, color: myself.primary)),
     ];
@@ -67,7 +67,7 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
     }
     data_source.DataColumn dataColumn = rxDataColumnNode.value!.data!;
     List<Option<dynamic>> options = [];
-    for (var value in SourceType.values) {
+    for (var value in SqliteDataType.values) {
       options.add(Option(value.name, value.name));
     }
     List<PlatformDataField> dataColumnDataFields = buildDataColumnDataFields();
@@ -77,7 +77,7 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
             name: 'dataType',
             label: 'DataType',
             prefixIcon: Icon(Icons.merge_type_outlined, color: myself.primary),
-            inputType: InputType.select,
+            inputType: InputType.checkbox,
             options: options));
     formInputController = FormInputController(dataColumnDataFields);
 

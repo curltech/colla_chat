@@ -619,7 +619,16 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     var dataFieldDef = widget.controller.dataField;
     var label = dataFieldDef.label;
     var options = dataFieldDef.options;
-    List<Widget> children = [Text(AppLocalizations.t(label))];
+
+    List<Widget> children = [];
+    var prefixIcon = dataFieldDef.prefixIcon;
+    if (prefixIcon != null) {
+      children.add(prefixIcon);
+      children.add(const SizedBox(
+        width: 15.0,
+      ));
+    }
+    children.add(Text(AppLocalizations.t(label)));
     dynamic value = _getInitValue(context);
     value ??= <dynamic>{};
     Widget? checkWidget;
