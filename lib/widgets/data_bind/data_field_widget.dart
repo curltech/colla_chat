@@ -754,20 +754,22 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
         width: 20.0,
       ));
     }
-    var switcher = Switch(
-      activeColor: myself.primary,
-      activeTrackColor: Colors.white,
-      inactiveThumbColor: myself.secondary,
-      inactiveTrackColor: Colors.grey,
-      onChanged: (bool? value) {
-        if (dataFieldDef.readOnly) {
-          return;
-        }
-        widget.controller.value = value;
-        setState(() {});
-      },
-      value: widget.controller.value ?? false,
-    );
+    var switcher = Transform.scale(
+        scale: 0.8,
+        child: Switch(
+          activeColor: myself.primary,
+          activeTrackColor: Colors.white,
+          inactiveThumbColor: myself.secondary,
+          inactiveTrackColor: Colors.grey,
+          onChanged: (bool? value) {
+            if (dataFieldDef.readOnly) {
+              return;
+            }
+            widget.controller.value = value;
+            setState(() {});
+          },
+          value: widget.controller.value ?? false,
+        ));
     children.add(switcher);
 
     return Container(
