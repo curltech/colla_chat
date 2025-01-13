@@ -2,7 +2,6 @@ import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_controller.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';

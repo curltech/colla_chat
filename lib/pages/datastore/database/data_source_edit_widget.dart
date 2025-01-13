@@ -93,36 +93,39 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
       rxDataSourceNode.value = DataSourceNode(
           data: DataSource('', sourceType: SourceType.sqlite.name));
     }
-    DataSource dataSource = rxDataSourceNode.value!.data!;
-    List<Option<dynamic>> options = [];
-    for (var value in SourceType.values) {
-      options.add(Option(value.name, value.name));
-    }
-    List<PlatformDataField> dataSourceDataFields =
-        buildDataSourceDataFields(dataSource.sourceType);
-    dataSourceDataFields.insert(
-        1,
-        PlatformDataField(
-            name: 'sourceType',
-            label: 'SourceType',
-            prefixIcon: Icon(Icons.merge_type_outlined, color: myself.primary),
-            inputType: InputType.select,
-            options: options));
-    formInputController = FormInputController(dataSourceDataFields);
+    return Obx(() {
+      DataSource dataSource = rxDataSourceNode.value!.data!;
+      List<Option<dynamic>> options = [];
+      for (var value in SourceType.values) {
+        options.add(Option(value.name, value.name));
+      }
+      List<PlatformDataField> dataSourceDataFields =
+          buildDataSourceDataFields(dataSource.sourceType);
+      dataSourceDataFields.insert(
+          1,
+          PlatformDataField(
+              name: 'sourceType',
+              label: 'SourceType',
+              prefixIcon:
+                  Icon(Icons.merge_type_outlined, color: myself.primary),
+              inputType: InputType.select,
+              options: options));
+      formInputController = FormInputController(dataSourceDataFields);
 
-    formInputController?.setValues(JsonUtil.toJson(dataSource));
-    var formInputWidget = FormInputWidget(
-      spacing: 15.0,
-      onOk: (Map<String, dynamic> values) {
-        _onOk(values);
-      },
-      controller: formInputController!,
-    );
+      formInputController?.setValues(JsonUtil.toJson(dataSource));
+      var formInputWidget = FormInputWidget(
+        spacing: 15.0,
+        onOk: (Map<String, dynamic> values) {
+          _onOk(values);
+        },
+        controller: formInputController!,
+      );
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),
-      child: formInputWidget,
-    );
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),
+        child: formInputWidget,
+      );
+    });
   }
 
   DataSource? _onOk(Map<String, dynamic> values) {

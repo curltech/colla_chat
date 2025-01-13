@@ -52,24 +52,26 @@ class DataTableEditWidget extends StatelessWidget with TileDataMixin {
     if (rxDataTableNode.value == null) {
       rxDataTableNode.value = DataTableNode(data: data_source.DataTable(''));
     }
-    data_source.DataTable dataTable = rxDataTableNode.value!.data!;
-    List<PlatformDataField> dataSourceDataFields =
-        buildDataTableDataFields(SourceType.sqlite.name);
-    formInputController = FormInputController(dataSourceDataFields);
+    return Obx(() {
+      data_source.DataTable dataTable = rxDataTableNode.value!.data!;
+      List<PlatformDataField> dataSourceDataFields =
+          buildDataTableDataFields(SourceType.sqlite.name);
+      formInputController = FormInputController(dataSourceDataFields);
 
-    formInputController?.setValues(JsonUtil.toJson(dataTable));
-    var formInputWidget = FormInputWidget(
-      spacing: 15.0,
-      onOk: (Map<String, dynamic> values) {
-        _onOk(values);
-      },
-      controller: formInputController!,
-    );
+      formInputController?.setValues(JsonUtil.toJson(dataTable));
+      var formInputWidget = FormInputWidget(
+        spacing: 15.0,
+        onOk: (Map<String, dynamic> values) {
+          _onOk(values);
+        },
+        controller: formInputController!,
+      );
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),
-      child: formInputWidget,
-    );
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),
+        child: formInputWidget,
+      );
+    });
   }
 
   data_source.DataTable? _onOk(Map<String, dynamic> values) {
