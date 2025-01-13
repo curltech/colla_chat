@@ -43,10 +43,9 @@ class SherpaTextToSpeechWidget extends StatelessWidget {
         ttsState.value = TtsState.paused;
       }
     });
-    _init();
   }
 
-  Future<void> _init() async {
+  Future<void> init() async {
     if (!isInitialized) {
       await checkSherpa();
       initBindings();

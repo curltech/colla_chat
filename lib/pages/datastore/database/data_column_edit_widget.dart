@@ -58,7 +58,7 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
     return dataSourceDataFields;
   }
 
-  late final FormInputController formInputController;
+  FormInputController? formInputController;
 
   //DataSourceNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
@@ -80,21 +80,20 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
             inputType: InputType.select,
             options: options));
     formInputController = FormInputController(dataColumnDataFields);
-    return Obx(() {
-      formInputController.setValues(JsonUtil.toJson(dataColumn));
-      var formInputWidget = FormInputWidget(
-        spacing: 15.0,
-        onOk: (Map<String, dynamic> values) {
-          _onOk(values);
-        },
-        controller: formInputController,
-      );
 
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),
-        child: formInputWidget,
-      );
-    });
+    formInputController?.setValues(JsonUtil.toJson(dataColumn));
+    var formInputWidget = FormInputWidget(
+      spacing: 15.0,
+      onOk: (Map<String, dynamic> values) {
+        _onOk(values);
+      },
+      controller: formInputController!,
+    );
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),
+      child: formInputWidget,
+    );
   }
 
   data_source.DataColumn? _onOk(Map<String, dynamic> values) {

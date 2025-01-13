@@ -183,9 +183,6 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
   PlatformTextToSpeechWidget platformTextToSpeechWidget =
       PlatformTextToSpeechWidget();
 
-  SherpaTextToSpeechWidget sherpaTextToSpeechWidget =
-      SherpaTextToSpeechWidget();
-
   RxBool platformTextToSpeech = true.obs;
 
   Future<void> _onRefresh(BuildContext context) async {

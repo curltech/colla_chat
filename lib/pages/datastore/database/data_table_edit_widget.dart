@@ -45,7 +45,7 @@ class DataTableEditWidget extends StatelessWidget with TileDataMixin {
     return dataSourceDataFields;
   }
 
-  late final FormInputController formInputController;
+  FormInputController? formInputController;
 
   //DataSourceNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
@@ -56,21 +56,20 @@ class DataTableEditWidget extends StatelessWidget with TileDataMixin {
     List<PlatformDataField> dataSourceDataFields =
         buildDataTableDataFields(SourceType.sqlite.name);
     formInputController = FormInputController(dataSourceDataFields);
-    return Obx(() {
-      formInputController.setValues(JsonUtil.toJson(dataTable));
-      var formInputWidget = FormInputWidget(
-        spacing: 15.0,
-        onOk: (Map<String, dynamic> values) {
-          _onOk(values);
-        },
-        controller: formInputController,
-      );
 
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),
-        child: formInputWidget,
-      );
-    });
+    formInputController?.setValues(JsonUtil.toJson(dataTable));
+    var formInputWidget = FormInputWidget(
+      spacing: 15.0,
+      onOk: (Map<String, dynamic> values) {
+        _onOk(values);
+      },
+      controller: formInputController!,
+    );
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),
+      child: formInputWidget,
+    );
   }
 
   data_source.DataTable? _onOk(Map<String, dynamic> values) {

@@ -37,7 +37,7 @@ class PoemContentWidget extends StatelessWidget with TileDataMixin {
 
   RxBool platformTextToSpeech = true.obs;
 
-  speak(Poem poem) {
+  speak(Poem poem) async {
     var platformTextToSpeech = this.platformTextToSpeech.value;
     if (platformTextToSpeech) {
       var ttsState = platformTextToSpeechWidget.ttsState.value;
@@ -46,6 +46,7 @@ class PoemContentWidget extends StatelessWidget with TileDataMixin {
         platformTextToSpeechWidget.speak(poem.paragraphs!);
       }
     } else {
+      await sherpaTextToSpeechWidget.init();
       var ttsState = sherpaTextToSpeechWidget.ttsState.value;
 
       if (ttsState == TtsState.stopped || ttsState == TtsState.paused) {

@@ -49,10 +49,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
 
   /// 单击表示编辑属性
   void _onTap(BuildContext context, ExplorableNode node) {
-    if (node is DataSourceNode) {
-      rxDataSourceNode.value = node;
-      indexWidgetProvider.push('data_source_edit');
-    }
+    if (node is DataSourceNode) {}
     if (node is DataTableNode) {}
     if (node is DataColumnNode) {}
     if (node is DataIndexNode) {}
@@ -120,6 +117,21 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     switch (label) {
       case 'Add':
         _add(node);
+      case 'Delete':
+      case 'Edit':
+        if (node is DataSourceNode) {
+          rxDataSourceNode.value = node;
+          indexWidgetProvider.push('data_source_edit');
+        }
+        if (node is DataTableNode) {
+          rxDataTableNode.value = node;
+          indexWidgetProvider.push('data_table_edit');
+        }
+        if (node is DataColumnNode) {
+          rxDataColumnNode.value = node;
+          indexWidgetProvider.push('data_column_edit');
+        }
+      case 'Edit data':
       default:
     }
   }

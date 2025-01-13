@@ -17,9 +17,7 @@ class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
   final TextEditingController modelNameController = TextEditingController();
   final Function()? onDownloadComplete;
 
-  SherpaInstallWidget({super.key, this.onDownloadComplete}) {
-    checkSherpa();
-  }
+  SherpaInstallWidget({super.key, this.onDownloadComplete});
 
   @override
   bool get withLeading => true;
@@ -164,6 +162,7 @@ class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
+    checkSherpa();
     return AppBarView(
         withLeading: true,
         title: title,

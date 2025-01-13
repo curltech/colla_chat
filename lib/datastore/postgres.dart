@@ -164,10 +164,10 @@ class Postgres extends DataStore {
   }
 
   @override
-  Future<List<Map>> select(String sql,
+  Future<List<Map<String, dynamic>>> select(String sql,
       [List<Object?> parameters = const []]) async {
     Result result = await db!.execute(sql, parameters: parameters);
-    List<Map> maps = [];
+    List<Map<String, dynamic>> maps = [];
     for (var r in result) {
       maps.add(r.toColumnMap());
     }
@@ -204,7 +204,7 @@ class Postgres extends DataStore {
   }
 
   @override
-  Future<List<Map>> find(String table,
+  Future<List<Map<String, dynamic>>> find(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -227,7 +227,7 @@ class Postgres extends DataStore {
     whereArgs ??= [];
     Result result = await db!.execute(clause, parameters: whereArgs);
 
-    List<Map> maps = [];
+    List<Map<String, dynamic>> maps = [];
     for (var r in result) {
       maps.add(r.toColumnMap());
     }
@@ -282,7 +282,7 @@ class Postgres extends DataStore {
   /// @param {*} fields
   /// @param {*} condition
   @override
-  Future<Map?> findOne(String table,
+  Future<Map<String, dynamic>?> findOne(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,

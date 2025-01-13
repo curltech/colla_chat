@@ -35,7 +35,7 @@ class DataSourceController {
   }
 
   save() async {
-    String value = JsonUtil.toJsonString(dataSources.value);
+    String value = JsonUtil.toJsonString(dataSources.value.sublist(1));
     await localSecurityStorage.save('DataSources', value);
   }
 
@@ -128,11 +128,20 @@ class DataSourceController {
     }
   }
 
-  findColumns(String name, FolderNode columnFolderNode) async {
+  findColumns(String tableName, FolderNode columnFolderNode) async {
     if (current != null && current!.sourceType == SourceType.sqlite.name) {
       List<Map<dynamic, dynamic>> maps =
-          await current!.dataStore!.select('PRAGMA table_info($name)');
-      for (var map in maps) {}
+          await current!.dataStore!.select('PRAGMA table_info($tableName)');
+      for (var map in maps) {
+        String name = map['name'];
+        String dataType = map['type'];
+        int notnull = map['notnull'];
+        int pk = map['pk'];
+        DataColumn dataColumn = DataColumn(name);
+        dataColumn.dataType = dataType;
+        dataColumn.allowedNull = notnull == 0 ? false : true;
+        columnFolderNode.add(DataColumnNode(data: dataColumn));
+      }
     }
   }
 }

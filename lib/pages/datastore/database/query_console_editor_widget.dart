@@ -1,5 +1,9 @@
+import 'package:colla_chat/datastore/datastore.dart';
+import 'package:colla_chat/pages/datastore/database/data_source_controller.dart';
+import 'package:colla_chat/pages/datastore/database/data_source_node.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
@@ -40,7 +44,15 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
     for (var entry in data.entries) {
       String columnName = entry.key;
       dynamic columnValue = entry.value;
-      if (columnValue is int || columnValue is double) {
+      if (columnValue is int) {
+        queryResultDataColumns.add(PlatformDataColumn(
+          label: columnName,
+          name: columnName,
+          dataType: DataType.int,
+          align: TextAlign.right,
+          width: 70,
+        ));
+      } else if (columnValue is double) {
         queryResultDataColumns.add(PlatformDataColumn(
           label: columnName,
           name: columnName,
@@ -69,31 +81,45 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        OverflowBar(
-          alignment: MainAxisAlignment.start,
+    return AppBarView(
+        withLeading: true,
+        title: title,
+        rightWidgets: [
+          IconButton(
+              onPressed: () async {
+                String sql = codeController.fullText;
+                DataSource? current = dataSourceController.current;
+                if (current == null) {
+                  return;
+                }
+                DataStore? dataStore = current.dataStore;
+                if (dataStore == null) {
+                  return;
+                }
+                List<Map<String, dynamic>> data =
+                    await dataStore.select('select * from ($sql) limit 10');
+                queryResultController.data.value = data;
+              },
+              icon: Icon(
+                Icons.run_circle_outlined,
+              ))
+        ],
+        child: Column(
           children: [
-            IconButton(
-                onPressed: () {},
-                icon: Icon(
-                  Icons.run_circle_outlined,
-                  color: myself.primary,
-                ))
+            SizedBox(
+                height: 300,
+                child: SingleChildScrollView(
+                  child: CodeTheme(
+                    data: CodeThemeData(styles: monokaiSublimeTheme),
+                    child: CodeField(
+                      minLines: 10,
+                      // maxLines: 10,
+                      controller: codeController,
+                    ),
+                  ),
+                )),
+            Expanded(child: _buildQueryResultListView(context))
           ],
-        ),
-        SizedBox(
-            height: 300,
-            child: CodeTheme(
-              data: CodeThemeData(styles: monokaiSublimeTheme),
-              child: SingleChildScrollView(
-                child: CodeField(
-                  controller: codeController,
-                ),
-              ),
-            )),
-        Expanded(child: _buildQueryResultListView(context))
-      ],
-    );
+        ));
   }
 }

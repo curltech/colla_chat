@@ -74,11 +74,12 @@ abstract class DataStore {
 
   execute(List<Sql> sqls);
 
-  FutureOr<List<Map>> select(String sql, [List<Object?> parameters = const []]);
+  FutureOr<List<Map<String, dynamic>>> select(String sql,
+      [List<Object?> parameters = const []]);
 
   FutureOr<Object?> get(String table, dynamic id);
 
-  FutureOr<List<Map>> find(String table,
+  FutureOr<List<Map<String, dynamic>>> find(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -104,7 +105,7 @@ abstract class DataStore {
   /// @param {*} tableName
   /// @param {*} fields
   /// @param {*} condition
-  FutureOr<Map?> findOne(String table,
+  FutureOr<Map<String, dynamic>?> findOne(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,

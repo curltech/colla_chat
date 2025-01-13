@@ -201,7 +201,7 @@ class Sqlite3 extends DataStore {
   }
 
   @override
-  List<Map> find(String table,
+  List<Map<String, dynamic>> find(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -278,7 +278,7 @@ class Sqlite3 extends DataStore {
   /// @param {*} fields
   /// @param {*} condition
   @override
-  Map? findOne(String table,
+  Map<String, dynamic>? findOne(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
