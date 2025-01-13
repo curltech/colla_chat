@@ -623,6 +623,9 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     List<Widget> children = [];
     var prefixIcon = dataFieldDef.prefixIcon;
     if (prefixIcon != null) {
+      children.add(const SizedBox(
+        width: 10.0,
+      ));
       children.add(prefixIcon);
       children.add(const SizedBox(
         width: 15.0,
@@ -651,7 +654,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
             widget.controller.value = value;
             setState(() {});
           },
-          value: value.contains(option.value),
+          value: value == option.value,
         );
         var row = SizedBox(
             width: dataFieldDef.width ?? 120,

@@ -65,35 +65,39 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
     if (rxDataColumnNode.value == null) {
       rxDataColumnNode.value = DataColumnNode(data: data_source.DataColumn(''));
     }
-    data_source.DataColumn dataColumn = rxDataColumnNode.value!.data!;
-    List<Option<dynamic>> options = [];
-    for (var value in SqliteDataType.values) {
-      options.add(Option(value.name, value.name));
-    }
-    List<PlatformDataField> dataColumnDataFields = buildDataColumnDataFields();
-    dataColumnDataFields.insert(
-        1,
-        PlatformDataField(
-            name: 'dataType',
-            label: 'DataType',
-            prefixIcon: Icon(Icons.merge_type_outlined, color: myself.primary),
-            inputType: InputType.checkbox,
-            options: options));
-    formInputController = FormInputController(dataColumnDataFields);
+    return Obx(() {
+      data_source.DataColumn dataColumn = rxDataColumnNode.value!.data!;
+      List<Option<dynamic>> options = [];
+      for (var value in SqliteDataType.values) {
+        options.add(Option(value.name, value.name));
+      }
+      List<PlatformDataField> dataColumnDataFields =
+          buildDataColumnDataFields();
+      dataColumnDataFields.insert(
+          1,
+          PlatformDataField(
+              name: 'dataType',
+              label: 'DataType',
+              prefixIcon:
+                  Icon(Icons.merge_type_outlined, color: myself.primary),
+              inputType: InputType.checkbox,
+              options: options));
+      formInputController = FormInputController(dataColumnDataFields);
 
-    formInputController?.setValues(JsonUtil.toJson(dataColumn));
-    var formInputWidget = FormInputWidget(
-      spacing: 15.0,
-      onOk: (Map<String, dynamic> values) {
-        _onOk(values);
-      },
-      controller: formInputController!,
-    );
+      formInputController?.setValues(JsonUtil.toJson(dataColumn));
+      var formInputWidget = FormInputWidget(
+        spacing: 15.0,
+        onOk: (Map<String, dynamic> values) {
+          _onOk(values);
+        },
+        controller: formInputController!,
+      );
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),
-      child: formInputWidget,
-    );
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15.0),
+        child: formInputWidget,
+      );
+    });
   }
 
   data_source.DataColumn? _onOk(Map<String, dynamic> values) {
