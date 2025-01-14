@@ -203,8 +203,8 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
         indentation: Indentation(
           width: 12,
           color: myself.primary,
-          style: IndentStyle.squareJoint,
-          thickness: 2,
+          style: IndentStyle.none,
+          thickness: 1,
           offset: Offset(12, 0),
         ),
         onTreeReady: (controller) {
@@ -213,7 +213,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
         builder: (context, ExplorableNode node) {
           return Obx(() {
             return Padding(
-              padding: const EdgeInsets.only(left: 10.0),
+              padding: const EdgeInsets.only(left: 16.0),
               child: ListTile(
                 title: Text(node.data?.name ?? "/"),
                 trailing: node is DataColumnNode
