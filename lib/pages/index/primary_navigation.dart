@@ -162,7 +162,7 @@ class PrimaryNavigation {
               indexWidgetProvider.push(routeName);
             },
             icon: Tooltip(
-                message: view.title,
+                message: AppLocalizations.t(view.title),
                 child: view.iconData is IconData
                     ? Icon(
                         view.iconData,

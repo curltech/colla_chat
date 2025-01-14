@@ -16,6 +16,7 @@ class BindingDataTable2<T> extends StatelessWidget {
   final bool showCheckboxColumn;
   final double? dataRowHeight;
   final double? minWidth;
+  final bool border;
   final double? horizontalMargin;
   final double? columnSpacing;
   final int fixedLeftColumns;
@@ -35,6 +36,7 @@ class BindingDataTable2<T> extends StatelessWidget {
     this.showCheckboxColumn = true,
     this.dataRowHeight,
     this.minWidth,
+    this.border = false,
     this.horizontalMargin,
     this.columnSpacing,
     this.fixedLeftColumns = 0,
@@ -191,15 +193,17 @@ class BindingDataTable2<T> extends StatelessWidget {
             key: UniqueKey(),
             dataRowHeight: dataRowHeight,
             minWidth: minWidth,
-            dividerThickness: 1.0,
-            border: TableBorder(
-                top: const BorderSide(color: Colors.grey),
-                bottom: BorderSide(color: Colors.grey),
-                left: BorderSide(color: Colors.grey),
-                right: BorderSide(color: Colors.grey),
-                verticalInside: BorderSide(color: Colors.grey),
-                horizontalInside:
-                    const BorderSide(color: Colors.grey, width: 1)),
+            dividerThickness: border ? 1.0 : 0.0,
+            border: border
+                ? TableBorder(
+                    top: const BorderSide(color: Colors.grey),
+                    bottom: BorderSide(color: Colors.grey),
+                    left: BorderSide(color: Colors.grey),
+                    right: BorderSide(color: Colors.grey),
+                    verticalInside: BorderSide(color: Colors.grey),
+                    horizontalInside:
+                        const BorderSide(color: Colors.grey, width: 1))
+                : null,
             isVerticalScrollBarVisible: true,
             showCheckboxColumn: showCheckboxColumn,
             horizontalMargin: horizontalMargin,
