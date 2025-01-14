@@ -11,12 +11,14 @@ import 'package:colla_chat/pages/datastore/filesystem/file_node.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart'
     as data_source;
+import 'package:get/get.dart';
 
 /// 数据源管理功能主页面，带有路由回调函数
 class DataSourceWidget extends StatelessWidget with TileDataMixin {
@@ -93,6 +95,14 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.push('data_source_edit');
   }
 
+  _deleteDataSource({DataSourceNode? node}) async {
+    bool? confirm = await DialogUtil.confirm(
+        content: 'Do you confirm delete selected data source node?');
+    if (confirm != null && confirm) {
+      dataSourceController.deleteDataSource(node: node);
+    }
+  }
+
   void _add(ExplorableNode node) {
     if (node is FolderNode) {
       if ('tables' == node.data!.name) {
@@ -136,97 +146,112 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
+  Widget _buildButtonWidget(BuildContext context) {
+    return OverflowBar(
+      alignment: MainAxisAlignment.start,
+      children: [
+        IconButton(
+            tooltip: AppLocalizations.t('Add data source'),
+            onPressed: () {
+              _addDataSource(SourceType.sqlite.name);
+            },
+            icon: Icon(
+              Icons.add,
+              color: myself.primary,
+            )),
+        IconButton(
+            tooltip: AppLocalizations.t('Delete data source'),
+            onPressed: () {
+              _deleteDataSource();
+            },
+            icon: Icon(
+              Icons.remove,
+              color: myself.primary,
+            )),
+        IconButton(
+            tooltip: AppLocalizations.t('Refresh data source'),
+            onPressed: () {},
+            icon: Icon(
+              Icons.refresh_outlined,
+              color: myself.primary,
+            )),
+        IconButton(
+            tooltip: AppLocalizations.t('Query console'),
+            onPressed: () {
+              indexWidgetProvider.push('query_console_editor');
+            },
+            icon: Icon(
+              Icons.terminal_outlined,
+              color: myself.primary,
+            )),
+      ],
+    );
+  }
+
+  Widget _buildTreeView(BuildContext context) {
+    return TreeView.simpleTyped<Explorable, ExplorableNode>(
+        tree: dataSourceController.root,
+        showRootNode: false,
+        expansionBehavior: ExpansionBehavior.none,
+        expansionIndicatorBuilder: (context, node) {
+          return ChevronIndicator.rightDown(
+            tree: node,
+            alignment: Alignment.centerLeft,
+            color: myself.primary,
+          );
+        },
+        indentation: Indentation(
+          width: 12,
+          color: myself.primary,
+          style: IndentStyle.squareJoint,
+          thickness: 2,
+          offset: Offset(12, 0),
+        ),
+        onTreeReady: (controller) {
+          treeViewController = controller;
+        },
+        builder: (context, ExplorableNode node) {
+          return Obx(() {
+            return Padding(
+              padding: const EdgeInsets.only(left: 10.0),
+              child: ListTile(
+                title: Text(node.data?.name ?? "/"),
+                trailing: node is DataColumnNode
+                    ? Text(node.data?.dataType ?? "")
+                    : null,
+                dense: true,
+                leading: node.icon,
+                minVerticalPadding: 0.0,
+                minTileHeight: 28,
+                selected: dataSourceController.currentNode.value == node,
+                selectedColor: Colors.white,
+                selectedTileColor: Colors.amber,
+                onTap: () {
+                  dataSourceController.currentNode.value = node;
+                  _onTap(context, node);
+                },
+                onLongPress: () {
+                  _onLongPress(context, node);
+                },
+              ),
+            );
+          });
+        },
+        onItemTap: (ExplorableNode node) {
+          _onTap(context, node);
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      OverflowBar(
-        alignment: MainAxisAlignment.start,
-        children: [
-          IconButton(
-              tooltip: AppLocalizations.t('Add data source'),
-              onPressed: () {
-                _addDataSource(SourceType.sqlite.name);
-              },
-              icon: Icon(
-                Icons.add,
-                color: myself.primary,
-              )),
-          IconButton(
-              tooltip: AppLocalizations.t('Delete data source'),
-              onPressed: () {},
-              icon: Icon(
-                Icons.remove,
-                color: myself.primary,
-              )),
-          IconButton(
-              tooltip: AppLocalizations.t('Refresh data source'),
-              onPressed: () {},
-              icon: Icon(
-                Icons.refresh_outlined,
-                color: myself.primary,
-              )),
-          IconButton(
-              tooltip: AppLocalizations.t('Query console'),
-              onPressed: () {
-                indexWidgetProvider.push('query_console_editor');
-              },
-              icon: Icon(
-                Icons.terminal_outlined,
-                color: myself.primary,
-              )),
-        ],
-      ),
-      Expanded(
-          child: TreeView.simpleTyped<Explorable, ExplorableNode>(
-              tree: dataSourceController.root,
-              showRootNode: false,
-              expansionBehavior: ExpansionBehavior.none,
-              expansionIndicatorBuilder: (context, node) {
-                return ChevronIndicator.rightDown(
-                  tree: node,
-                  alignment: Alignment.centerLeft,
-                  color: myself.primary,
-                );
-              },
-              indentation: Indentation(
-                width: 12,
-                color: myself.primary,
-                style: IndentStyle.squareJoint,
-                thickness: 2,
-                offset: Offset(12, 0),
-              ),
-              onTreeReady: (controller) {
-                treeViewController = controller;
-              },
-              builder: (context, ExplorableNode node) {
-                return Padding(
-                  padding: const EdgeInsets.only(left: 10.0),
-                  child: ListTile(
-                    title: Text(node.data?.name ?? "/"),
-                    trailing: node is DataColumnNode
-                        ? Text(node.data?.dataType ?? "")
-                        : null,
-                    dense: true,
-                    leading: node.icon,
-                    minVerticalPadding: 0.0,
-                    minTileHeight: 28,
-                    selected: dataSourceController.currentNode.value == node,
-                    selectedColor: myself.primary,
-                    selectedTileColor: myself.secondary,
-                    onTap: () {
-                      dataSourceController.currentNode.value = node;
-                      _onTap(context, node);
-                    },
-                    onLongPress: () {
-                      _onLongPress(context, node);
-                    },
-                  ),
-                );
-              },
-              onItemTap: (ExplorableNode node) {
-                _onTap(context, node);
-              })),
-    ]);
+    return Card(
+        elevation: 0.0,
+        margin: EdgeInsets.zero,
+        shape: ContinuousRectangleBorder(),
+        child: Column(children: [
+          _buildButtonWidget(context),
+          Expanded(child: _buildTreeView(context)),
+        ]));
   }
 }
 

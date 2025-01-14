@@ -38,14 +38,10 @@ class BindingPlutoDataGrid<T> extends StatelessWidget {
     this.fixedLeftColumns = 0,
   });
 
-  double totalWidth = 0.0;
-
   /// 过滤条件的多项选择框的列定义
   List<PlutoColumn> _buildDataColumns() {
-    totalWidth = 0.0;
     List<PlutoColumn> dataColumns = [];
     for (var platformDataColumn in platformDataColumns) {
-      totalWidth += platformDataColumn.width;
       PlutoColumnType type = PlutoColumnType.text();
       DataType dataType = platformDataColumn.dataType;
       if (dataType == DataType.double ||
@@ -76,7 +72,6 @@ class BindingPlutoDataGrid<T> extends StatelessWidget {
         );
       }
     }
-    totalWidth += 300;
     return dataColumns;
   }
 

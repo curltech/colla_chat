@@ -46,14 +46,10 @@ class BindingDataTable2<T> extends StatelessWidget {
 
   RxBool changed = true.obs;
 
-  double totalWidth = 0.0;
-
   /// 过滤条件的多项选择框的列定义
   List<DataColumn2> _buildDataColumns() {
-    totalWidth = 0.0;
     List<DataColumn2> dataColumns = [];
     for (var platformDataColumn in platformDataColumns) {
-      totalWidth = platformDataColumn.width + totalWidth;
       InputType inputType = platformDataColumn.inputType;
       if (inputType == InputType.custom) {
         dataColumns.add(
@@ -78,7 +74,6 @@ class BindingDataTable2<T> extends StatelessWidget {
         );
       }
     }
-    totalWidth = 300 + totalWidth;
     return dataColumns;
   }
 
@@ -195,8 +190,17 @@ class BindingDataTable2<T> extends StatelessWidget {
           return DataTable2(
             key: UniqueKey(),
             dataRowHeight: dataRowHeight,
-            minWidth: minWidth ?? 2000,
-            dividerThickness: 0.0,
+            minWidth: minWidth,
+            dividerThickness: 1.0,
+            border: TableBorder(
+                top: const BorderSide(color: Colors.grey),
+                bottom: BorderSide(color: Colors.grey),
+                left: BorderSide(color: Colors.grey),
+                right: BorderSide(color: Colors.grey),
+                verticalInside: BorderSide(color: Colors.grey),
+                horizontalInside:
+                    const BorderSide(color: Colors.grey, width: 1)),
+            isVerticalScrollBarVisible: true,
             showCheckboxColumn: showCheckboxColumn,
             horizontalMargin: horizontalMargin,
             columnSpacing: columnSpacing,

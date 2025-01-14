@@ -12,26 +12,12 @@ import 'package:get/get.dart';
 class DataSourceController {
   final RxList<DataSource> dataSources = <DataSource>[].obs;
   final TreeNode<Explorable> root = TreeNode.root();
-  int _current = -1;
+  final Rx<DataSource?> current = Rx<DataSource?>(null);
+
   Rx<ExplorableNode?> currentNode = Rx<ExplorableNode?>(null);
 
   DataSourceController() {
     init();
-  }
-
-  DataSource? get current {
-    if (_current > -1 && _current < dataSources.length) {
-      return dataSources[_current];
-    }
-    return null;
-  }
-
-  set current(DataSource? dataSource) {
-    if (dataSource == null) {
-      _current = -1;
-    } else {
-      _current = dataSources.indexOf(dataSource);
-    }
   }
 
   save() async {
@@ -86,7 +72,7 @@ class DataSourceController {
     }
     dataSources.add(dataSource);
     save();
-    current = dataSource;
+    current.value = dataSource;
     DataSourceNode dataSourceNode = DataSourceNode(data: dataSource);
     root.add(dataSourceNode);
     FolderNode folderNode = FolderNode(data: Folder('tables'));
@@ -96,18 +82,32 @@ class DataSourceController {
     return dataSourceNode;
   }
 
-  deleteDataSource(DataSourceNode node) {
-    DataSource? dataSource = node.data;
+  deleteDataSource({DataSourceNode? node}) {
+    DataSource? dataSource;
+    if (node != null) {
+      dataSource = node.data;
+      if (dataSource == dataSources[0]) {
+        return;
+      }
+      node.delete();
+    } else {
+      dataSource = current.value;
+      if (dataSource == dataSources[0]) {
+        return;
+      }
+      current.value = null;
+    }
+
     if (dataSource != null) {
       dataSources.remove(dataSource);
     }
-    node.delete();
     save();
   }
 
   findTables(FolderNode tableFolderNode) async {
-    if (current != null && current!.sourceType == SourceType.sqlite.name) {
-      List<Map<dynamic, dynamic>> maps = await current!.dataStore!.find(
+    if (current.value != null &&
+        current.value!.sourceType == SourceType.sqlite.name) {
+      List<Map<dynamic, dynamic>> maps = await current.value!.dataStore!.find(
           'sqlite_master',
           where: 'type=?',
           whereArgs: ['table'],
@@ -129,9 +129,10 @@ class DataSourceController {
   }
 
   findColumns(String tableName, FolderNode columnFolderNode) async {
-    if (current != null && current!.sourceType == SourceType.sqlite.name) {
-      List<Map<dynamic, dynamic>> maps =
-          await current!.dataStore!.select('PRAGMA table_info($tableName)');
+    if (current.value != null &&
+        current.value!.sourceType == SourceType.sqlite.name) {
+      List<Map<dynamic, dynamic>> maps = await current.value!.dataStore!
+          .select('PRAGMA table_info($tableName)');
       for (var map in maps) {
         String name = map['name'];
         String dataType = map['type'];

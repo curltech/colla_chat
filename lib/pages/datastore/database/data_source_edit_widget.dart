@@ -31,7 +31,12 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'DataSourceEdit';
 
-  List<PlatformDataField> buildDataSourceDataFields(String sourceType) {
+  final RxList<PlatformDataField> dataSourceDataFields =
+      RxList<PlatformDataField>([]);
+
+  void buildDataSourceDataFields() {
+    DataSource dataSource = rxDataSourceNode.value!.data!;
+    String sourceType = dataSource.sourceType;
     var dataSourceDataFields = [
       PlatformDataField(
           name: 'name',
@@ -81,8 +86,25 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
           label: 'Database',
           prefixIcon: Icon(Icons.data_usage_outlined, color: myself.primary)));
     }
+    List<Option<dynamic>> options = [];
+    for (var value in SourceType.values) {
+      options.add(Option(value.name, value.name));
+    }
+    dataSourceDataFields.insert(
+        1,
+        PlatformDataField(
+            name: 'sourceType',
+            label: 'SourceType',
+            prefixIcon: Icon(Icons.merge_type_outlined, color: myself.primary),
+            inputType: InputType.radio,
+            options: options,
+            onChanged: (sourceType) {
+              DataSource dataSource = rxDataSourceNode.value!.data!;
+              dataSource.sourceType = sourceType;
+              buildDataSourceDataFields();
+            }));
 
-    return dataSourceDataFields;
+    this.dataSourceDataFields.value = dataSourceDataFields;
   }
 
   FormInputController? formInputController;
@@ -93,25 +115,11 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
       rxDataSourceNode.value = DataSourceNode(
           data: DataSource('', sourceType: SourceType.sqlite.name));
     }
-    return Obx(() {
-      DataSource dataSource = rxDataSourceNode.value!.data!;
-      List<Option<dynamic>> options = [];
-      for (var value in SourceType.values) {
-        options.add(Option(value.name, value.name));
-      }
-      List<PlatformDataField> dataSourceDataFields =
-          buildDataSourceDataFields(dataSource.sourceType);
-      dataSourceDataFields.insert(
-          1,
-          PlatformDataField(
-              name: 'sourceType',
-              label: 'SourceType',
-              prefixIcon:
-                  Icon(Icons.merge_type_outlined, color: myself.primary),
-              inputType: InputType.select,
-              options: options));
-      formInputController = FormInputController(dataSourceDataFields);
 
+    DataSource dataSource = rxDataSourceNode.value!.data!;
+    buildDataSourceDataFields();
+    return Obx(() {
+      formInputController = FormInputController(dataSourceDataFields);
       formInputController?.setValues(JsonUtil.toJson(dataSource));
       var formInputWidget = FormInputWidget(
         spacing: 15.0,

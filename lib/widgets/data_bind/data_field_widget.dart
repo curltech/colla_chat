@@ -60,7 +60,7 @@ class PlatformDataColumn {
   final InputType inputType;
   final DataType dataType;
   final TextAlign align;
-  final double width;
+  final double? width;
   final Color? positiveColor;
   final Color? negativeColor;
   final String? hintText;
@@ -75,7 +75,7 @@ class PlatformDataColumn {
       this.positiveColor,
       this.negativeColor,
       this.inputType = InputType.label,
-      this.width = 100,
+      this.width,
       this.align = TextAlign.left,
       this.buildSuffix,
       this.onSort});
@@ -525,7 +525,18 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     var dataFieldDef = widget.controller.dataField;
     var label = dataFieldDef.label;
     var options = dataFieldDef.options;
-    List<Widget> children = [Text(AppLocalizations.t(label))];
+    List<Widget> children = [];
+    var prefixIcon = _buildIcon();
+    if (prefixIcon != null) {
+      children.add(const SizedBox(
+        width: 10.0,
+      ));
+      children.add(prefixIcon);
+      children.add(const SizedBox(
+        width: 15.0,
+      ));
+    }
+    children.add(Text(AppLocalizations.t(label)));
     dynamic value = _getInitValue(context);
     if (options != null && options.isNotEmpty) {
       List<Widget> radioChildren = [];
@@ -537,6 +548,10 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
               return;
             }
             widget.controller.value = value;
+            var fn = dataFieldDef.onChanged;
+            if (value != null && fn != null) {
+              fn(value);
+            }
             setState(() {});
           },
           value: option.value,
@@ -601,16 +616,31 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
         } else {
           widget.controller.value = null;
         }
+        var fn = dataFieldDef.onChanged;
+        if (widget.controller.value != null && fn != null) {
+          fn(widget.controller.value);
+        }
       },
     );
-
-    return Row(children: [
-      Text(AppLocalizations.t(label)),
+    List<Widget> children = [];
+    var prefixIcon = _buildIcon();
+    if (prefixIcon != null) {
+      children.add(const SizedBox(
+        width: 10.0,
+      ));
+      children.add(prefixIcon);
+      children.add(const SizedBox(
+        width: 15.0,
+      ));
+    }
+    children.add(Text(AppLocalizations.t(label)));
+    children.addAll([
       const SizedBox(
         width: 15.0,
       ),
       toggleSwitch
     ]);
+    return Row(children: children);
   }
 
   ///多个字符串选择多个，对应的字段是字符串的Set
@@ -621,7 +651,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     var options = dataFieldDef.options;
 
     List<Widget> children = [];
-    var prefixIcon = dataFieldDef.prefixIcon;
+    var prefixIcon = _buildIcon();
     if (prefixIcon != null) {
       children.add(const SizedBox(
         width: 10.0,
@@ -652,6 +682,10 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
               }
             }
             widget.controller.value = value;
+            var fn = dataFieldDef.onChanged;
+            if (widget.controller.value != null && fn != null) {
+              fn(widget.controller.value);
+            }
             setState(() {});
           },
           value: value == option.value,
@@ -685,16 +719,16 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     var dataFieldDef = widget.controller.dataField;
     var label = dataFieldDef.label;
     var options = dataFieldDef.options;
-    List<Widget> children = [];
+    List<Widget> toggleChildren = [];
     List<bool> isSelected = [];
     dynamic value = _getInitValue(context);
     if (options != null && options.isNotEmpty) {
       for (var i = 0; i < options.length; ++i) {
         var option = options[i];
         if (option.leading != null) {
-          children.add(option.leading!);
+          toggleChildren.add(option.leading!);
         } else {
-          children.add(Text(AppLocalizations.t(option.label)));
+          toggleChildren.add(Text(AppLocalizations.t(option.label)));
         }
         if (value == option.value) {
           isSelected.add(true);
@@ -720,19 +754,36 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
         }
         Option option = options![newIndex];
         widget.controller.value = option.value;
+        var fn = dataFieldDef.onChanged;
+        if (widget.controller.value != null && fn != null) {
+          fn(widget.controller.value);
+        }
         setState(() {});
       },
       isSelected: isSelected,
-      children: children,
+      children: toggleChildren,
     );
+
+    List<Widget> children = [];
+    var prefixIcon = _buildIcon();
+    if (prefixIcon != null) {
+      children.add(const SizedBox(
+        width: 10.0,
+      ));
+      children.add(prefixIcon);
+      children.add(const SizedBox(
+        width: 15.0,
+      ));
+    }
+    children.add(Text(AppLocalizations.t(label)));
+    children.addAll([
+      const SizedBox(
+        width: 15,
+      ),
+      toggleButtons,
+    ]);
     var row = Row(
-      children: [
-        Text(AppLocalizations.t(label)),
-        const SizedBox(
-          width: 15,
-        ),
-        toggleButtons,
-      ],
+      children: children,
     );
 
     return row;
@@ -769,6 +820,10 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
               return;
             }
             widget.controller.value = value;
+            var fn = dataFieldDef.onChanged;
+            if (widget.controller.value != null && fn != null) {
+              fn(widget.controller.value);
+            }
             setState(() {});
           },
           value: widget.controller.value ?? false,
@@ -813,6 +868,10 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
         items: children,
         onChanged: (String? value) {
           widget.controller.value = value;
+          var fn = dataFieldDef.onChanged;
+          if (widget.controller.value != null && fn != null) {
+            fn(widget.controller.value);
+          }
           setState(() {});
         },
       )

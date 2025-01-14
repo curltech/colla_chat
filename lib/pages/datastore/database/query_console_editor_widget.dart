@@ -9,7 +9,10 @@ import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
+import 'package:flutter_highlight/themes/idea.dart';
 import 'package:flutter_highlight/themes/monokai-sublime.dart';
+import 'package:flutter_highlight/themes/vs.dart';
+import 'package:get/get.dart';
 import 'package:highlight/languages/sql.dart';
 
 class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
@@ -35,47 +38,53 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
       DataListController<Map<String, dynamic>>();
 
   Widget _buildQueryResultListView(BuildContext context) {
-    Map<String, dynamic>? data = queryResultController.data.firstOrNull;
-    if (data == null) {
-      return nilBox;
-    }
-    final List<PlatformDataColumn> queryResultDataColumns = [];
-    for (var entry in data.entries) {
-      String columnName = entry.key;
-      dynamic columnValue = entry.value;
-      if (columnValue is int) {
-        queryResultDataColumns.add(PlatformDataColumn(
-          label: columnName,
-          name: columnName,
-          dataType: DataType.int,
-          align: TextAlign.right,
-          width: 70,
-        ));
-      } else if (columnValue is double) {
-        queryResultDataColumns.add(PlatformDataColumn(
-          label: columnName,
-          name: columnName,
-          dataType: DataType.double,
-          align: TextAlign.right,
-          width: 70,
-        ));
-      } else {
-        queryResultDataColumns.add(PlatformDataColumn(
-          label: columnName,
-          name: columnName,
-          width: 80,
-        ));
+    return Obx(() {
+      Map<String, dynamic>? data = queryResultController.data.firstOrNull;
+      if (data == null) {
+        return nilBox;
       }
-    }
-    return BindingDataTable2<Map<String, dynamic>>(
-      key: UniqueKey(),
-      showCheckboxColumn: true,
-      horizontalMargin: 10.0,
-      columnSpacing: 0.0,
-      platformDataColumns: queryResultDataColumns,
-      controller: queryResultController,
-      fixedLeftColumns: 2,
-    );
+      final List<PlatformDataColumn> queryResultDataColumns = [];
+      for (var entry in data.entries) {
+        String columnName = entry.key;
+        dynamic columnValue = entry.value;
+        if (columnValue is int) {
+          queryResultDataColumns.add(PlatformDataColumn(
+            label: columnName,
+            name: columnName,
+            dataType: DataType.int,
+            align: TextAlign.right,
+            // width: 70,
+          ));
+        } else if (columnValue is double) {
+          queryResultDataColumns.add(PlatformDataColumn(
+            label: columnName,
+            name: columnName,
+            dataType: DataType.double,
+            align: TextAlign.right,
+            // width: 70,
+          ));
+        } else {
+          queryResultDataColumns.add(PlatformDataColumn(
+            label: columnName,
+            name: columnName,
+            // width: 80,
+          ));
+        }
+      }
+      return Card(
+          elevation: 0.0,
+          margin: EdgeInsets.zero,
+          shape: ContinuousRectangleBorder(),
+          child: BindingDataTable2<Map<String, dynamic>>(
+            key: UniqueKey(),
+            showCheckboxColumn: false,
+            horizontalMargin: 0.0,
+            columnSpacing: 0.0,
+            platformDataColumns: queryResultDataColumns,
+            controller: queryResultController,
+            fixedLeftColumns: 0,
+          ));
+    });
   }
 
   @override
@@ -87,7 +96,7 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
           IconButton(
               onPressed: () async {
                 String sql = codeController.fullText;
-                DataSource? current = dataSourceController.current;
+                DataSource? current = dataSourceController.current.value;
                 if (current == null) {
                   return;
                 }
@@ -106,10 +115,10 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
         child: Column(
           children: [
             SizedBox(
-                height: 300,
+                height: 200,
                 child: SingleChildScrollView(
                   child: CodeTheme(
-                    data: CodeThemeData(styles: monokaiSublimeTheme),
+                    data: CodeThemeData(styles: ideaTheme),
                     child: CodeField(
                       minLines: 10,
                       // maxLines: 10,
