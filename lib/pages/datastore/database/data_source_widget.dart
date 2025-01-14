@@ -225,7 +225,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
                 minTileHeight: 28,
                 selected: dataSourceController.currentNode.value == node,
                 selectedColor: Colors.white,
-                selectedTileColor: Colors.amber,
+                selectedTileColor: myself.primary.withAlpha(180),
                 onTap: () {
                   dataSourceController.currentNode.value = node;
                   if (node is DataSourceNode) {
