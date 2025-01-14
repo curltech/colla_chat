@@ -228,6 +228,9 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
                 selectedTileColor: Colors.amber,
                 onTap: () {
                   dataSourceController.currentNode.value = node;
+                  if (node is DataSourceNode) {
+                    dataSourceController.current.value = node.data;
+                  }
                   _onTap(context, node);
                 },
                 onLongPress: () {
