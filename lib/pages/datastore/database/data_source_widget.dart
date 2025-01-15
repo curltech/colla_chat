@@ -48,7 +48,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'DataSource';
 
-  late final TreeViewController? treeViewController;
+  TreeViewController? treeViewController;
 
   /// 单击表示编辑属性
   void _onTap(BuildContext context, ExplorableNode node) {
@@ -215,8 +215,9 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
           return Obx(() {
             TileData tileData = TileData(
               title: node.data?.name ?? "/",
-              titleTail:
-                  node is DataColumnNode ? node.data?.dataType ?? "" : null,
+              titleTail: node is DataColumnNode
+                  ? node.data?.dataType ?? ""
+                  : node.length.toString(),
               dense: true,
               prefix: node.icon,
               selected: dataSourceController.currentNode.value == node,

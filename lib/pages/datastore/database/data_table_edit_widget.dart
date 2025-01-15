@@ -68,7 +68,7 @@ class DataTableEditWidget extends StatelessWidget with TileDataMixin {
 
       formInputController?.setValues(JsonUtil.toJson(dataTable));
       var formInputWidget = FormInputWidget(
-        spacing: 15.0,
+        spacing: 10.0,
         height: 160,
         onOk: (Map<String, dynamic> values) {
           _onOk(values);
