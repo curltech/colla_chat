@@ -110,6 +110,10 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
       return null;
     }
     data_source.DataColumn dataColumn = rxDataColumn.value!;
+    String? originalName = dataColumn.name;
+    if (originalName == null) {
+
+    }
     dataColumn.name = current.name;
     dataColumn.dataType = current.dataType;
 
