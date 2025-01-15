@@ -1,4 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/datastore/database/data_source_controller.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -36,6 +37,7 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
 
   void buildDataSourceDataFields() {
     DataSource dataSource = rxDataSourceNode.value!.data!;
+    String? originalName = dataSource.name;
     String sourceType = dataSource.sourceType;
     var dataSourceDataFields = [
       PlatformDataField(
@@ -51,16 +53,19 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
       dataSourceDataFields.add(PlatformDataField(
           name: 'filename',
           label: 'Filename',
+          readOnly: originalName == null ? false : true,
           prefixIcon: Icon(Icons.file_open_outlined, color: myself.primary),
-          suffixIcon: IconButton(
-              onPressed: () async {
-                XFile? xfile = await FileUtil.selectFile();
-                if (xfile != null) {
-                  formInputController?.setValue('filename', xfile.path);
-                }
-              },
-              icon: Icon(Icons.arrow_circle_down_outlined,
-                  color: myself.primary))));
+          suffixIcon: originalName == null
+              ? IconButton(
+                  onPressed: () async {
+                    XFile? xfile = await FileUtil.selectFile();
+                    if (xfile != null) {
+                      formInputController?.setValue('filename', xfile.path);
+                    }
+                  },
+                  icon: Icon(Icons.arrow_circle_down_outlined,
+                      color: myself.primary))
+              : null));
     }
     if (sourceType == SourceType.postgres.name) {
       dataSourceDataFields.add(PlatformDataField(
@@ -95,6 +100,7 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
         PlatformDataField(
             name: 'sourceType',
             label: 'SourceType',
+            readOnly: originalName == null ? false : true,
             prefixIcon: Icon(Icons.merge_type_outlined, color: myself.primary),
             inputType: InputType.radio,
             options: options,
@@ -111,14 +117,9 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
 
   //DataSourceNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
-    if (rxDataSourceNode.value == null) {
-      rxDataSourceNode.value = DataSourceNode(
-          data: DataSource('', sourceType: SourceType.sqlite.name));
-    }
-
-    DataSource dataSource = rxDataSourceNode.value!.data!;
-    buildDataSourceDataFields();
     return Obx(() {
+      DataSource dataSource = rxDataSourceNode.value!.data!;
+      buildDataSourceDataFields();
       formInputController = FormInputController(dataSourceDataFields);
       formInputController?.setValues(JsonUtil.toJson(dataSource));
       var formInputWidget = FormInputWidget(
@@ -148,6 +149,7 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
       return null;
     }
     DataSource dataSource = rxDataSourceNode.value!.data!;
+    String? originalName = dataSource.name;
     dataSource.name = current.name;
     dataSource.sourceType = current.sourceType;
     if (current.sourceType == SourceType.sqlite.name) {
@@ -157,8 +159,7 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
         return null;
       }
       dataSource.filename = current.filename;
-    }
-    if (current.sourceType == SourceType.postgres.name) {
+    } else if (current.sourceType == SourceType.postgres.name) {
       if (StringUtil.isEmpty(current.host)) {
         DialogUtil.error(
             content: AppLocalizations.t('Must has dataSource host'));
@@ -169,6 +170,11 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
       dataSource.user = current.user;
       dataSource.password = current.password;
       dataSource.database = current.database;
+    }
+    if (originalName == null) {
+      dataSourceController.addDataSource(dataSource);
+    } else {
+      dataSourceController.save();
     }
 
     DialogUtil.info(

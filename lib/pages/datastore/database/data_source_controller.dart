@@ -27,34 +27,24 @@ class DataSourceController {
 
   init() async {
     String filename = appDataProvider.sqlite3Path;
-    await addDataSource('colla_chat',
-        sourceType: SourceType.sqlite.name,
-        filename: filename,
-        dataStore: sqlite3);
+    DataSource dataSource =
+        DataSource(name: 'colla_chat', sourceType: SourceType.sqlite.name);
+    dataSource.filename = filename;
+    await addDataSource(dataSource, dataStore: sqlite3);
     String? value = await localSecurityStorage.get('DataSources');
     List<dynamic> maps = JsonUtil.toJson(value);
     for (var map in maps) {
       DataSource dataSource = DataSource.fromJson(map);
-      await addDataSource(dataSource.name!,
-          sourceType: SourceType.sqlite.name, filename: dataSource.filename);
+      await addDataSource(dataSource);
     }
   }
 
-  Future<DataSourceNode> addDataSource(String name,
-      {required String sourceType,
-      String? filename,
-      String? host,
-      int? port,
-      String? user,
-      String? password,
-      String? database,
-      DataStore? dataStore}) async {
-    DataSource dataSource =
-        DataSource(name, sourceType: sourceType, dataStore: dataStore);
+  Future<DataSourceNode> addDataSource(DataSource dataSource,
+      {DataStore? dataStore}) async {
+    String sourceType = dataSource.sourceType;
     if (sourceType == SourceType.sqlite.name) {
       if (dataStore == null) {
-        dataSource.filename = filename!;
-        dataSource.dataStore = Sqlite3(filename);
+        dataSource.dataStore = Sqlite3(dataSource.filename!);
         await dataSource.dataStore!.open();
       } else {
         dataSource.filename = (dataStore as Sqlite3).dbPath;
@@ -62,12 +52,7 @@ class DataSourceController {
       }
     }
     if (sourceType == SourceType.postgres.name) {
-      dataSource.host = host;
-      dataSource.port = port;
-      dataSource.user = user;
-      dataSource.password = password;
-      dataSource.database = database;
-      dataSource.dataStore = Postgres(password: password!);
+      dataSource.dataStore = Postgres(password: dataSource.password!);
       dataSource.dataStore!.open();
     }
     dataSources.add(dataSource);
@@ -75,7 +60,7 @@ class DataSourceController {
     current.value = dataSource;
     DataSourceNode dataSourceNode = DataSourceNode(data: dataSource);
     root.add(dataSourceNode);
-    FolderNode folderNode = FolderNode(data: Folder('tables'));
+    FolderNode folderNode = FolderNode(data: Folder(name: 'tables'));
     dataSourceNode.add(folderNode);
     findTables(folderNode);
 
@@ -114,15 +99,15 @@ class DataSourceController {
           orderBy: 'name');
       for (var map in maps) {
         String name = map['name'];
-        DataTable dataTable = DataTable(name);
+        DataTable dataTable = DataTable(name: name);
         DataTableNode dataTableNode = DataTableNode(data: dataTable);
         tableFolderNode.add(dataTableNode);
 
-        FolderNode columnFolderNode = FolderNode(data: Folder('columns'));
+        FolderNode columnFolderNode = FolderNode(data: Folder(name: 'columns'));
         dataTableNode.add(columnFolderNode);
         findColumns(name, columnFolderNode);
 
-        FolderNode indexFolderNode = FolderNode(data: Folder('indexes'));
+        FolderNode indexFolderNode = FolderNode(data: Folder(name: 'indexes'));
         dataTableNode.add(indexFolderNode);
       }
     }
@@ -138,7 +123,7 @@ class DataSourceController {
         String dataType = map['type'];
         int notnull = map['notnull'];
         int pk = map['pk'];
-        DataColumn dataColumn = DataColumn(name);
+        DataColumn dataColumn = DataColumn(name: name);
         dataColumn.dataType = dataType;
         dataColumn.allowedNull = notnull == 0 ? false : true;
         columnFolderNode.add(DataColumnNode(data: dataColumn));

@@ -71,19 +71,15 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
           ));
         }
       }
-      return Card(
-          elevation: 0.0,
-          margin: EdgeInsets.zero,
-          shape: ContinuousRectangleBorder(),
-          child: BindingDataTable2<Map<String, dynamic>>(
-            key: UniqueKey(),
-            showCheckboxColumn: false,
-            horizontalMargin: 0.0,
-            columnSpacing: 0.0,
-            platformDataColumns: queryResultDataColumns,
-            controller: queryResultController,
-            fixedLeftColumns: 0,
-          ));
+      return BindingDataTable2<Map<String, dynamic>>(
+        key: UniqueKey(),
+        showCheckboxColumn: false,
+        horizontalMargin: 0.0,
+        columnSpacing: 0.0,
+        platformDataColumns: queryResultDataColumns,
+        controller: queryResultController,
+        fixedLeftColumns: 0,
+      );
     });
   }
 
@@ -126,7 +122,12 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
                     ),
                   ),
                 )),
-            Expanded(child: _buildQueryResultListView(context))
+            Expanded(
+                child: Card(
+                    elevation: 0.0,
+                    margin: EdgeInsets.zero,
+                    shape: ContinuousRectangleBorder(),
+                    child: _buildQueryResultListView(context)))
           ],
         ));
   }

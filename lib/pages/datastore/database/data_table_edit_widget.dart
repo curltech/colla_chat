@@ -50,7 +50,7 @@ class DataTableEditWidget extends StatelessWidget with TileDataMixin {
   //DataSourceNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
     if (rxDataTableNode.value == null) {
-      rxDataTableNode.value = DataTableNode(data: data_source.DataTable(''));
+      rxDataTableNode.value = DataTableNode(data: data_source.DataTable());
     }
     return Obx(() {
       data_source.DataTable dataTable = rxDataTableNode.value!.data!;
@@ -81,7 +81,12 @@ class DataTableEditWidget extends StatelessWidget with TileDataMixin {
       return null;
     }
     data_source.DataTable dataTable = rxDataTableNode.value!.data!;
-    dataTable.name = current.name;
+    String? originalName = dataTable.name;
+    if (originalName == null) {
+      dataTable.name = current.name;
+    } else {
+      dataTable.name = current.name;
+    }
 
     DialogUtil.info(content: 'Successfully update dataTable:${dataTable.name}');
 

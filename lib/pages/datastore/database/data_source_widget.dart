@@ -89,7 +89,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
   }
 
   void _addDataSource(String sourceType) {
-    DataSource dataSource = DataSource('', sourceType: sourceType);
+    DataSource dataSource = DataSource(sourceType: sourceType);
     DataSourceNode dataSourceNode = DataSourceNode(data: dataSource);
     rxDataSourceNode.value = dataSourceNode;
     indexWidgetProvider.push('data_source_edit');
@@ -106,13 +106,13 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
   void _add(ExplorableNode node) {
     if (node is FolderNode) {
       if ('tables' == node.data!.name) {
-        data_source.DataTable dataTable = data_source.DataTable('');
+        data_source.DataTable dataTable = data_source.DataTable();
         DataTableNode dataTableNode = DataTableNode(data: dataTable);
         rxDataTableNode.value = dataTableNode;
         indexWidgetProvider.push('data_table_edit');
       }
       if ('columns' == node.data!.name) {
-        data_source.DataColumn dataColumn = data_source.DataColumn('');
+        data_source.DataColumn dataColumn = data_source.DataColumn();
         DataColumnNode dataColumnNode = DataColumnNode(data: dataColumn);
         rxDataColumnNode.value = dataColumnNode;
         indexWidgetProvider.push('data_column_edit');

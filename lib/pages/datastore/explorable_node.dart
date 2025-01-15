@@ -4,7 +4,7 @@ abstract class Explorable {
   String? name;
   String? comment;
 
-  Explorable(this.name, {this.comment});
+  Explorable({this.name, this.comment});
 
   @override
   String toString() => name ?? '';
@@ -24,7 +24,7 @@ abstract class Explorable {
 typedef ExplorableNode = TreeNode<Explorable>;
 
 class Folder extends Explorable {
-  Folder(super.name);
+  Folder({super.name});
 }
 
 typedef FolderNode = TreeNode<Folder>;

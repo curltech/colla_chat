@@ -63,7 +63,7 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
   //DataSourceNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
     if (rxDataColumnNode.value == null) {
-      rxDataColumnNode.value = DataColumnNode(data: data_source.DataColumn(''));
+      rxDataColumnNode.value = DataColumnNode(data: data_source.DataColumn());
     }
     return Obx(() {
       data_source.DataColumn dataColumn = rxDataColumnNode.value!.data!;

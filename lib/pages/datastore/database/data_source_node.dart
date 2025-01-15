@@ -24,7 +24,7 @@ class DataSource extends Explorable {
   String? database;
   DataStore? dataStore;
 
-  DataSource(super.name, {required this.sourceType, this.dataStore});
+  DataSource({super.name, required this.sourceType, this.dataStore});
 
   DataSource.fromJson(super.json)
       : sourceType = json['sourceType'] ?? SourceType.sqlite.name,
@@ -53,7 +53,7 @@ class DataSource extends Explorable {
 }
 
 class DataSchema extends Explorable {
-  DataSchema(super.name);
+  DataSchema({super.name});
 
   DataSchema.fromJson(super.json) : super.fromJson();
 
@@ -66,7 +66,7 @@ class DataSchema extends Explorable {
 }
 
 class Database extends Explorable {
-  Database(super.name);
+  Database({super.name});
 
   Database.fromJson(super.json) : super.fromJson();
 
@@ -79,7 +79,7 @@ class Database extends Explorable {
 }
 
 class DataTable extends Explorable {
-  DataTable(super.name);
+  DataTable({super.name});
 
   DataTable.fromJson(super.json) : super.fromJson();
 
@@ -96,7 +96,7 @@ class DataColumn extends Explorable {
   bool? allowedNull;
   bool? autoIncrement;
 
-  DataColumn(super.name);
+  DataColumn({super.name});
 
   DataColumn.fromJson(super.json)
       : dataType = json['dataType'],
@@ -122,7 +122,7 @@ class DataIndex extends Explorable {
   bool? isUnique;
   List<String>? columnNames;
 
-  DataIndex(super.name);
+  DataIndex({super.name});
 
   DataIndex.fromJson(Map json)
       : isKey = json['isKey'],
