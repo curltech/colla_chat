@@ -93,14 +93,14 @@ class DataTable extends Explorable {
 
 class DataColumn extends Explorable {
   String? dataType;
-  bool? allowedNull;
+  bool? notNull;
   bool? autoIncrement;
 
   DataColumn({super.name});
 
   DataColumn.fromJson(super.json)
       : dataType = json['dataType'],
-        allowedNull = json['allowedNull'],
+        notNull = json['notNull'],
         autoIncrement = json['autoIncrement'],
         super.fromJson();
 
@@ -109,7 +109,7 @@ class DataColumn extends Explorable {
     var json = super.toJson();
     json.addAll({
       'dataType': dataType,
-      'allowedNull': allowedNull,
+      'notNull': notNull,
       'autoIncrement': autoIncrement,
     });
 

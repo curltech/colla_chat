@@ -50,7 +50,7 @@ class TileData {
 
   static TileData of(TileDataMixin mixin, {bool dense = false}) {
     return TileData(
-        title: mixin.title,
+        title: AppLocalizations.t(mixin.title),
         routeName: mixin.routeName,
         dense: dense,
         prefix: mixin.iconData);
@@ -170,7 +170,7 @@ class DataListTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end, children: trailing));
     }
     Widget titleWidget = CommonAutoSizeText(
-      AppLocalizations.t(tileData.title),
+      tileData.title,
       style: tileData.dense
           ? const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)
           : null,
@@ -182,7 +182,7 @@ class DataListTile extends StatelessWidget {
         Expanded(child: titleWidget),
         //const Spacer(),
         CommonAutoSizeText(
-          AppLocalizations.t(tileData.titleTail ?? ''),
+          tileData.titleTail ?? '',
           style: tileData.dense
               ? const TextStyle(
                   fontSize: 12,

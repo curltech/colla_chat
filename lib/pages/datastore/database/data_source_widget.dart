@@ -15,6 +15,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart'
     as data_source;
@@ -91,7 +92,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
   void _addDataSource(String sourceType) {
     DataSource dataSource = DataSource(sourceType: sourceType);
     DataSourceNode dataSourceNode = DataSourceNode(data: dataSource);
-    rxDataSourceNode.value = dataSourceNode;
+    rxDataSource.value = dataSourceNode.data;
     indexWidgetProvider.push('data_source_edit');
   }
 
@@ -108,13 +109,13 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
       if ('tables' == node.data!.name) {
         data_source.DataTable dataTable = data_source.DataTable();
         DataTableNode dataTableNode = DataTableNode(data: dataTable);
-        rxDataTableNode.value = dataTableNode;
+        rxDataTable.value = dataTableNode.data;
         indexWidgetProvider.push('data_table_edit');
       }
       if ('columns' == node.data!.name) {
         data_source.DataColumn dataColumn = data_source.DataColumn();
         DataColumnNode dataColumnNode = DataColumnNode(data: dataColumn);
-        rxDataColumnNode.value = dataColumnNode;
+        rxDataColumn.value = dataColumnNode.data;
         indexWidgetProvider.push('data_column_edit');
       }
       if ('indexes' == node.data!.name) {}
@@ -125,20 +126,20 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
       BuildContext context, ExplorableNode node, int index, String label,
       {String? value}) async {
     switch (label) {
-      case 'Add':
+      case 'New':
         _add(node);
       case 'Delete':
       case 'Edit':
         if (node is DataSourceNode) {
-          rxDataSourceNode.value = node;
+          rxDataSource.value = node.data;
           indexWidgetProvider.push('data_source_edit');
         }
         if (node is DataTableNode) {
-          rxDataTableNode.value = node;
+          rxDataTable.value = node.data;
           indexWidgetProvider.push('data_table_edit');
         }
         if (node is DataColumnNode) {
-          rxDataColumnNode.value = node;
+          rxDataColumn.value = node.data;
           indexWidgetProvider.push('data_column_edit');
         }
       case 'Edit data':
@@ -212,30 +213,29 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
         },
         builder: (context, ExplorableNode node) {
           return Obx(() {
+            TileData tileData = TileData(
+              title: node.data?.name ?? "/",
+              titleTail:
+                  node is DataColumnNode ? node.data?.dataType ?? "" : null,
+              dense: true,
+              prefix: node.icon,
+              selected: dataSourceController.currentNode.value == node,
+              onTap: (int index, String label, {String? subtitle}) {
+                dataSourceController.currentNode.value = node;
+                if (node is DataSourceNode) {
+                  dataSourceController.current.value = node.data;
+                }
+                _onTap(context, node);
+              },
+              onLongPress: (int index, String label, {String? subtitle}) {
+                _onLongPress(context, node);
+              },
+            );
             return Padding(
               padding: const EdgeInsets.only(left: 16.0),
-              child: ListTile(
-                title: Text(node.data?.name ?? "/"),
-                trailing: node is DataColumnNode
-                    ? Text(node.data?.dataType ?? "")
-                    : null,
-                dense: true,
-                leading: node.icon,
+              child: DataListTile(
+                tileData: tileData,
                 minVerticalPadding: 0.0,
-                minTileHeight: 28,
-                selected: dataSourceController.currentNode.value == node,
-                selectedColor: Colors.white,
-                selectedTileColor: myself.primary.withAlpha(180),
-                onTap: () {
-                  dataSourceController.currentNode.value = node;
-                  if (node is DataSourceNode) {
-                    dataSourceController.current.value = node.data;
-                  }
-                  _onTap(context, node);
-                },
-                onLongPress: () {
-                  _onLongPress(context, node);
-                },
               ),
             );
           });
@@ -247,14 +247,10 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-        elevation: 0.0,
-        margin: EdgeInsets.zero,
-        shape: ContinuousRectangleBorder(),
-        child: Column(children: [
-          _buildButtonWidget(context),
-          Expanded(child: _buildTreeView(context)),
-        ]));
+    return Column(children: [
+      _buildButtonWidget(context),
+      Expanded(child: _buildTreeView(context)),
+    ]);
   }
 }
 

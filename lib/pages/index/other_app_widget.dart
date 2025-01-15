@@ -1,3 +1,4 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/android_system_alert_window_widget.dart';
 import 'package:colla_chat/pages/chat/me/openvpn_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_map_launcher_widget.dart';
@@ -77,7 +78,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   Widget _buildOtherAppTileData(BuildContext context) {
     List<TileData> otherAppTileData = [];
     otherAppTileData.add(TileData(
-        title: poemWidget.title,
+        title: AppLocalizations.t(poemWidget.title),
         prefix: poemWidget.iconData,
         onTap: (int index, String title, {String? subtitle}) {
           name.value = poemWidget.routeName;
@@ -85,7 +86,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     final bool emailSwitch = myself.peerProfile.emailSwitch;
     if (emailSwitch) {
       otherAppTileData.add(TileData(
-          title: mailAddressWidget.title,
+          title: AppLocalizations.t(mailAddressWidget.title),
           prefix: mailAddressWidget.iconData,
           onTap: (int index, String title, {String? subtitle}) {
             name.value = mailAddressWidget.routeName;
@@ -94,7 +95,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     final bool stockSwitch = myself.peerProfile.stockSwitch;
     if (stockSwitch) {
       otherAppTileData.add(TileData(
-          title: stockMainWidget.title,
+          title: AppLocalizations.t(stockMainWidget.title),
           prefix: stockMainWidget.iconData,
           onTap: (int index, String title, {String? subtitle}) {
             name.value = stockMainWidget.routeName;
@@ -103,7 +104,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     final bool gameSwitch = myself.peerProfile.gameSwitch;
     if (gameSwitch) {
       otherAppTileData.add(TileData(
-          title: gameMainWidget.title,
+          title: AppLocalizations.t(gameMainWidget.title),
           prefix: gameMainWidget.iconData,
           onTap: (int index, String title, {String? subtitle}) {
             name.value = gameMainWidget.routeName;
@@ -111,25 +112,25 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     }
 
     otherAppTileData.add(TileData(
-        title: mediaWidget.title,
+        title: AppLocalizations.t(mediaWidget.title),
         prefix: mediaWidget.iconData,
         onTap: (int index, String title, {String? subtitle}) {
           name.value = mediaWidget.routeName;
         }));
     otherAppTileData.add(TileData(
-        title: webViewWidget.title,
+        title: AppLocalizations.t(webViewWidget.title),
         prefix: webViewWidget.iconData,
         onTap: (int index, String title, {String? subtitle}) {
           indexWidgetProvider.push(webViewWidget.routeName);
         }));
     otherAppTileData.add(TileData(
-        title: platformMapLauncherWidget.title,
+        title: AppLocalizations.t(platformMapLauncherWidget.title),
         prefix: platformMapLauncherWidget.iconData,
         onTap: (int index, String title, {String? subtitle}) {
           indexWidgetProvider.push(platformMapLauncherWidget.routeName);
         }));
     otherAppTileData.add(TileData(
-        title: sherpaInstallWidget.title,
+        title: AppLocalizations.t(sherpaInstallWidget.title),
         prefix: sherpaInstallWidget.iconData,
         onTap: (int index, String title, {String? subtitle}) {
           indexWidgetProvider.push(sherpaInstallWidget.routeName);
@@ -138,7 +139,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     if (platformParams.mobile) {
       if (myself.peerProfile.vpnSwitch) {
         otherAppTileData.add(TileData(
-            title: openVpnWidget.title,
+            title: AppLocalizations.t(openVpnWidget.title),
             prefix: openVpnWidget.iconData,
             onTap: (int index, String title, {String? subtitle}) {
               indexWidgetProvider.push(openVpnWidget.routeName);
@@ -147,7 +148,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
       if (platformParams.android) {
         if (myself.peerProfile.developerSwitch) {
           otherAppTileData.add(TileData(
-              title: systemAlertWindowWidget.title,
+              title: AppLocalizations.t(systemAlertWindowWidget.title),
               prefix: systemAlertWindowWidget.iconData,
               onTap: (int index, String title, {String? subtitle}) {
                 indexWidgetProvider.push(systemAlertWindowWidget.routeName);
@@ -157,13 +158,13 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     }
 
     otherAppTileData.add(TileData(
-        title: dataSourceWidget.title,
+        title: AppLocalizations.t(dataSourceWidget.title),
         prefix: dataSourceWidget.iconData,
         onTap: (int index, String title, {String? subtitle}) {
           name.value = dataSourceWidget.routeName;
         }));
     otherAppTileData.add(TileData(
-        title: fileSystemWidget.title,
+        title: AppLocalizations.t(fileSystemWidget.title),
         prefix: fileSystemWidget.iconData,
         onTap: (int index, String title, {String? subtitle}) {
           name.value = fileSystemWidget.routeName;

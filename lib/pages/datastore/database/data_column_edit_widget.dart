@@ -14,7 +14,8 @@ import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-final Rx<DataColumnNode?> rxDataColumnNode = Rx<DataColumnNode?>(null);
+final Rx<data_source.DataColumn?> rxDataColumn =
+    Rx<data_source.DataColumn?>(null);
 
 class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
   @override
@@ -42,8 +43,8 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
           label: 'Comment',
           prefixIcon: Icon(Icons.comment, color: myself.primary)),
       PlatformDataField(
-          name: 'allowedNull',
-          label: 'AllowedNull',
+          name: 'notNull',
+          label: 'NotNull',
           inputType: InputType.switcher,
           dataType: DataType.bool,
           prefixIcon: Icon(Icons.hourglass_empty, color: myself.primary)),
@@ -62,11 +63,8 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
 
   //DataSourceNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
-    if (rxDataColumnNode.value == null) {
-      rxDataColumnNode.value = DataColumnNode(data: data_source.DataColumn());
-    }
     return Obx(() {
-      data_source.DataColumn dataColumn = rxDataColumnNode.value!.data!;
+      data_source.DataColumn dataColumn = rxDataColumn.value!;
       List<Option<dynamic>> options = [];
       for (var value in SqliteDataType.values) {
         options.add(Option(value.name, value.name));
@@ -111,7 +109,7 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
           content: AppLocalizations.t('Must has dataColumn dataType'));
       return null;
     }
-    data_source.DataColumn dataColumn = rxDataColumnNode.value!.data!;
+    data_source.DataColumn dataColumn = rxDataColumn.value!;
     dataColumn.name = current.name;
     dataColumn.dataType = current.dataType;
 

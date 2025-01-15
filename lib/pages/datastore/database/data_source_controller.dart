@@ -105,7 +105,7 @@ class DataSourceController {
 
         FolderNode columnFolderNode = FolderNode(data: Folder(name: 'columns'));
         dataTableNode.add(columnFolderNode);
-        findColumns(name, columnFolderNode);
+        updateColumnNodes(name, columnFolderNode);
 
         FolderNode indexFolderNode = FolderNode(data: Folder(name: 'indexes'));
         dataTableNode.add(indexFolderNode);
@@ -113,11 +113,15 @@ class DataSourceController {
     }
   }
 
-  findColumns(String tableName, FolderNode columnFolderNode) async {
+  Future<List<DataColumn>?> findColumns(String tableName) async {
     if (current.value != null &&
         current.value!.sourceType == SourceType.sqlite.name) {
       List<Map<dynamic, dynamic>> maps = await current.value!.dataStore!
           .select('PRAGMA table_info($tableName)');
+      if (maps.isEmpty) {
+        return null;
+      }
+      List<DataColumn> dataColumns = [];
       for (var map in maps) {
         String name = map['name'];
         String dataType = map['type'];
@@ -125,9 +129,23 @@ class DataSourceController {
         int pk = map['pk'];
         DataColumn dataColumn = DataColumn(name: name);
         dataColumn.dataType = dataType;
-        dataColumn.allowedNull = notnull == 0 ? false : true;
-        columnFolderNode.add(DataColumnNode(data: dataColumn));
+        dataColumn.notNull = notnull == 0 ? false : true;
+        dataColumns.add(dataColumn);
       }
+
+      return dataColumns;
+    }
+
+    return null;
+  }
+
+  updateColumnNodes(String tableName, FolderNode columnFolderNode) async {
+    List<DataColumn>? dataColumns = await findColumns(tableName);
+    if (dataColumns == null || dataColumns.isEmpty) {
+      return;
+    }
+    for (var dataColumn in dataColumns) {
+      columnFolderNode.add(DataColumnNode(data: dataColumn));
     }
   }
 }

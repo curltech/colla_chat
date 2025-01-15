@@ -15,7 +15,7 @@ import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-final Rx<DataSourceNode?> rxDataSourceNode = Rx<DataSourceNode?>(null);
+final Rx<DataSource?> rxDataSource = Rx<DataSource?>(null);
 
 class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
   DataSourceEditWidget({super.key});
@@ -36,7 +36,7 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
       RxList<PlatformDataField>([]);
 
   void buildDataSourceDataFields() {
-    DataSource dataSource = rxDataSourceNode.value!.data!;
+    DataSource dataSource = rxDataSource.value!;
     String? originalName = dataSource.name;
     String sourceType = dataSource.sourceType;
     var dataSourceDataFields = [
@@ -105,7 +105,7 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
             inputType: InputType.radio,
             options: options,
             onChanged: (sourceType) {
-              DataSource dataSource = rxDataSourceNode.value!.data!;
+              DataSource dataSource = rxDataSource.value!;
               dataSource.sourceType = sourceType;
               buildDataSourceDataFields();
             }));
@@ -118,7 +118,7 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
   //DataSourceNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
     return Obx(() {
-      DataSource dataSource = rxDataSourceNode.value!.data!;
+      DataSource dataSource = rxDataSource.value!;
       buildDataSourceDataFields();
       formInputController = FormInputController(dataSourceDataFields);
       formInputController?.setValues(JsonUtil.toJson(dataSource));
@@ -148,7 +148,7 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
           content: AppLocalizations.t('Must has dataSource sourceType'));
       return null;
     }
-    DataSource dataSource = rxDataSourceNode.value!.data!;
+    DataSource dataSource = rxDataSource.value!;
     String? originalName = dataSource.name;
     dataSource.name = current.name;
     dataSource.sourceType = current.sourceType;
