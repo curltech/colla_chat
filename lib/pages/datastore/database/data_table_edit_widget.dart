@@ -154,8 +154,9 @@ class DataTableEditWidget extends StatelessWidget with TileDataMixin {
         IconButton(
             onPressed: () {
               data_source.DataColumn dataColumn = data_source.DataColumn();
-              DataColumnNode dataColumnNode = DataColumnNode(data: dataColumn);
-              rxDataColumn.value = dataColumnNode.data;
+              rxDataColumn.value = dataColumn;
+              dataColumns.value?.add(dataColumn);
+              currentColumn.value = dataColumn;
               indexWidgetProvider.push('data_column_edit');
             },
             icon: Icon(
@@ -163,7 +164,10 @@ class DataTableEditWidget extends StatelessWidget with TileDataMixin {
               color: myself.primary,
             )),
         IconButton(
-            onPressed: () {}, icon: Icon(Icons.remove, color: myself.primary)),
+            onPressed: () {
+              dataColumns.value?.remove(currentColumn.value);
+            },
+            icon: Icon(Icons.remove, color: myself.primary)),
         IconButton(
             onPressed: () {
               rxDataColumn.value = currentColumn.value;
