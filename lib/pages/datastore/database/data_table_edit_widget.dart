@@ -52,9 +52,11 @@ class DataTableEditWidget extends StatelessWidget with TileDataMixin {
 
   FormInputController? formInputController;
 
-  final RxList<TileData> columnTiles = <TileData>[].obs;
+  final Rx<List<data_source.DataColumn>?> dataColumns =
+      Rx<List<data_source.DataColumn>?>(null);
 
-  final Rx<String?> currentColumn = Rx<String?>(null);
+  final Rx<data_source.DataColumn?> currentColumn =
+      Rx<data_source.DataColumn?>(null);
 
   //DataTableNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
@@ -100,38 +102,43 @@ class DataTableEditWidget extends StatelessWidget with TileDataMixin {
     return current;
   }
 
-  _buildColumnTiles(BuildContext context) async {
+  _buildColumns(BuildContext context) async {
     data_source.DataTable dataTable = rxDataTable.value!;
     if (dataTable.name == null) {
-      return;
+      return null;
     }
-    List<data_source.DataColumn>? dataColumns =
-        await dataSourceController.findColumns(dataTable.name!);
-    if (dataColumns != null) {
-      List<TileData> tiles = [];
-      for (var dataColumn in dataColumns) {
+    dataColumns.value = await dataSourceController.findColumns(dataTable.name!);
+  }
+
+  List<TileData> _buildColumnTiles(BuildContext context) {
+    List<TileData> tiles = [];
+    if (dataColumns.value != null) {
+      for (var dataColumn in dataColumns.value!) {
         tiles.add(TileData(
           prefix: Icon(Icons.view_column_outlined, color: myself.primary),
           title: dataColumn.name!,
-          selected: dataColumn.name == currentColumn.value,
+          selected: dataColumn.name == currentColumn.value?.name,
           titleTail: dataColumn.dataType,
           onTap: (int index, String label, {String? subtitle}) {
-            currentColumn.value = dataColumn.name;
+            currentColumn.value = dataColumn;
             _buildColumnTiles(context);
           },
           onLongPress: (int index, String label, {String? subtitle}) {
-            currentColumn.value = dataColumn.name;
+            currentColumn.value = dataColumn;
             rxDataColumn.value = dataColumn;
             indexWidgetProvider.push('data_column_edit');
           },
         ));
       }
-      columnTiles.assignAll(tiles);
     }
+
+    return tiles;
   }
 
   Widget _buildColumnsWidget(BuildContext context) {
     return Obx(() {
+      List<TileData> columnTiles = _buildColumnTiles(context);
+
       return DataListView(
           itemCount: columnTiles.length,
           itemBuilder: (BuildContext context, int index) {
@@ -145,7 +152,12 @@ class DataTableEditWidget extends StatelessWidget with TileDataMixin {
       alignment: MainAxisAlignment.start,
       children: [
         IconButton(
-            onPressed: () {},
+            onPressed: () {
+              data_source.DataColumn dataColumn = data_source.DataColumn();
+              DataColumnNode dataColumnNode = DataColumnNode(data: dataColumn);
+              rxDataColumn.value = dataColumnNode.data;
+              indexWidgetProvider.push('data_column_edit');
+            },
             icon: Icon(
               Icons.add,
               color: myself.primary,
@@ -153,14 +165,18 @@ class DataTableEditWidget extends StatelessWidget with TileDataMixin {
         IconButton(
             onPressed: () {}, icon: Icon(Icons.remove, color: myself.primary)),
         IconButton(
-            onPressed: () {}, icon: Icon(Icons.edit, color: myself.primary)),
+            onPressed: () {
+              rxDataColumn.value = currentColumn.value;
+              indexWidgetProvider.push('data_column_edit');
+            },
+            icon: Icon(Icons.edit, color: myself.primary)),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    _buildColumnTiles(context);
+    _buildColumns(context);
     return AppBarView(
         title: title,
         withLeading: true,
