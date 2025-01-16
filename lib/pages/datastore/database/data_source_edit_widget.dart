@@ -32,13 +32,11 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'DataSourceEdit';
 
-  final RxList<PlatformDataField> dataSourceDataFields =
-      RxList<PlatformDataField>([]);
+  final RxString sourceType = SourceType.sqlite.name.obs;
 
-  void buildDataSourceDataFields() {
+  List<PlatformDataField> buildDataSourceDataFields() {
     DataSource dataSource = rxDataSource.value!;
     String? originalName = dataSource.name;
-    String sourceType = dataSource.sourceType;
     var dataSourceDataFields = [
       PlatformDataField(
           name: 'name',
@@ -49,7 +47,7 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
           label: 'Comment',
           prefixIcon: Icon(Icons.comment, color: myself.primary)),
     ];
-    if (sourceType == SourceType.sqlite.name) {
+    if (sourceType.value == SourceType.sqlite.name) {
       dataSourceDataFields.add(PlatformDataField(
           name: 'filename',
           label: 'Filename',
@@ -67,7 +65,7 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
                       color: myself.primary))
               : null));
     }
-    if (sourceType == SourceType.postgres.name) {
+    if (sourceType.value == SourceType.postgres.name) {
       dataSourceDataFields.add(PlatformDataField(
           name: 'host',
           label: 'Host',
@@ -105,12 +103,10 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
             inputType: InputType.radio,
             options: options,
             onChanged: (sourceType) {
-              DataSource dataSource = rxDataSource.value!;
-              dataSource.sourceType = sourceType;
-              buildDataSourceDataFields();
+              this.sourceType.value = sourceType;
             }));
 
-    this.dataSourceDataFields.value = dataSourceDataFields;
+    return dataSourceDataFields;
   }
 
   FormInputController? formInputController;
@@ -119,7 +115,8 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
   Widget _buildFormInputWidget(BuildContext context) {
     return Obx(() {
       DataSource dataSource = rxDataSource.value!;
-      buildDataSourceDataFields();
+      List<PlatformDataField> dataSourceDataFields =
+          buildDataSourceDataFields();
       formInputController = FormInputController(dataSourceDataFields);
       formInputController?.setValues(JsonUtil.toJson(dataSource));
       var formInputWidget = FormInputWidget(
@@ -185,6 +182,8 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
+    DataSource dataSource = rxDataSource.value!;
+    sourceType.value = dataSource.sourceType;
     return AppBarView(
         title: title, withLeading: true, child: _buildFormInputWidget(context));
   }

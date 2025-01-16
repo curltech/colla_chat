@@ -1,4 +1,3 @@
-import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/datastore/database/data_column_edit_widget.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_controller.dart';
@@ -13,7 +12,6 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
@@ -46,7 +44,7 @@ class DataTableEditWidget extends StatefulWidget with TileDataMixin {
 class _DataTableEditWidgetState extends State<DataTableEditWidget>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController =
-      TabController(length: 3, vsync: this);
+      TabController(length: 4, vsync: this);
 
   @override
   void initState() {
@@ -218,6 +216,36 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
     );
   }
 
+  Widget _buildDataTableTab(BuildContext context) {
+    return Column(
+      children: [
+        _buildFormInputWidget(context),
+        Expanded(child: Container()),
+      ],
+    );
+  }
+
+  Widget _buildDataColumnTab(BuildContext context) {
+    return Column(
+      children: [
+        _buildButtonWidget(context),
+        Expanded(child: _buildDataColumnsWidget(context))
+      ],
+    );
+  }
+
+  Widget _buildDataKeyTab(BuildContext context) {
+    return Column(
+      children: [],
+    );
+  }
+
+  Widget _buildDataIndexTab(BuildContext context) {
+    return Column(
+      children: [],
+    );
+  }
+
   Widget _buildDataTableTabContainer(BuildContext context) {
     final tabContainer = TabContainer(
       controller: _tabController,
@@ -241,20 +269,21 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       selectedTextStyle: TextStyle(
         color: myself.primary,
         fontSize: 15.0,
+        fontWeight: FontWeight.w900,
       ),
       unselectedTextStyle: const TextStyle(
         color: Colors.white,
         fontSize: 13.0,
       ),
       tabs: [
+        Text(AppLocalizations.t('Table')),
         Text(AppLocalizations.t('Column')),
         Text(AppLocalizations.t('Key')),
         Text(AppLocalizations.t('Index'))
       ],
       children: [
-        _buildDataColumnsWidget(
-          context,
-        ),
+        _buildDataTableTab(context),
+        _buildDataColumnTab(context),
         Container(
           child: Text('Child 2'),
         ),
@@ -265,9 +294,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
     );
 
     return SizedBox(
-        // height: 320.0,
-        width: appDataProvider.secondaryBodyWidth,
-        child: tabContainer);
+        width: appDataProvider.secondaryBodyWidth, child: tabContainer);
   }
 
   @override
@@ -276,16 +303,13 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
     return AppBarView(
         title: widget.title,
         withLeading: true,
-        child: Column(children: [
-          _buildFormInputWidget(context),
-          _buildButtonWidget(context),
-          Expanded(child: _buildDataTableTabContainer(context))
-        ]));
+        child: _buildDataTableTabContainer(context));
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    formInputController?.dispose();
     super.dispose();
   }
 }
