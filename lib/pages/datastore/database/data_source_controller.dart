@@ -170,7 +170,7 @@ class DataSourceController {
         int start = sql.lastIndexOf('(');
         int end = sql.lastIndexOf(')');
         DataIndex dataIndex = DataIndex(name: name);
-        dataIndex.columnNames = sql.substring(start, end);
+        dataIndex.columnNames = sql.substring(start + 1, end);
         dataIndexes.add(dataIndex);
       }
 
