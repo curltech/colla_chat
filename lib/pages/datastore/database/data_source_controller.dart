@@ -165,7 +165,11 @@ class DataSourceController {
       List<DataIndex> dataIndexes = [];
       for (var map in maps) {
         String name = map['name'];
+        String sql = map['sql'];
+        int start=sql.lastIndexOf('(');
+        int end=sql.lastIndexOf(')');
         DataIndex dataIndex = DataIndex(name: name);
+        dataIndex.columnNames=sql.substring(start,end);
         dataIndexes.add(dataIndex);
       }
 

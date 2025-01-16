@@ -253,24 +253,33 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
   }
 
   Widget _buildDataIndexesWidget(BuildContext context) {
-    final List<TileData> tiles = [];
-    for (DataIndex dataIndex in dataIndexController.data) {
-      tiles.add(TileData(
-        prefix: Icon(
-          Icons.content_paste_search,
-          color: myself.primary,
-        ),
-        title: dataIndex.name!,
-        titleTail: dataIndex.isUnique! ? 'unique' : '',
-        subtitle: dataIndex.columnNames.toString(),
-      ));
-    }
+    return Obx(() {
+      final List<TileData> tiles = [];
+      for (DataIndex dataIndex in dataIndexController.data) {
+        String titleTail = '';
+        if (dataIndex.isKey != null && dataIndex.isKey!) {
+          titleTail = 'key';
+        }
+        if (dataIndex.isUnique != null && dataIndex.isUnique!) {
+          titleTail = 'unique';
+        }
+        tiles.add(TileData(
+          prefix: Icon(
+            Icons.content_paste_search,
+            color: myself.primary,
+          ),
+          title: dataIndex.name!,
+          titleTail: titleTail,
+          subtitle: dataIndex.columnNames ?? '',
+        ));
+      }
 
-    return DataListView(
-        itemCount: tiles.length,
-        itemBuilder: (context, index) {
-          return tiles[index];
-        });
+      return DataListView(
+          itemCount: tiles.length,
+          itemBuilder: (context, index) {
+            return tiles[index];
+          });
+    });
   }
 
   Widget _buildDataKeyTab(BuildContext context) {
@@ -281,7 +290,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
 
   Widget _buildDataIndexTab(BuildContext context) {
     return Column(
-      children: [_buildDataIndexesWidget(context)],
+      children: [Expanded(child: _buildDataIndexesWidget(context))],
     );
   }
 
@@ -337,6 +346,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
   @override
   Widget build(BuildContext context) {
     _buildDataColumns(context);
+    _buildDataIndexes(context);
     return AppBarView(
         title: widget.title,
         withLeading: true,
