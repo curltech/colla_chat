@@ -95,6 +95,7 @@ class DataColumn extends Explorable {
   String? dataType;
   bool? notNull;
   bool? autoIncrement;
+  bool? isKey;
   bool checked = false;
 
   DataColumn({super.name});
@@ -103,6 +104,7 @@ class DataColumn extends Explorable {
       : dataType = json['dataType'],
         notNull = json['notNull'],
         autoIncrement = json['autoIncrement'],
+        isKey = json['isKey'],
         checked = json['checked'],
         super.fromJson();
 
@@ -113,6 +115,7 @@ class DataColumn extends Explorable {
       'dataType': dataType,
       'notNull': notNull,
       'autoIncrement': autoIncrement,
+      'isKey': isKey,
       'checked': checked,
     });
 

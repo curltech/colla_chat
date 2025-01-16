@@ -286,6 +286,10 @@ extension on ExplorableNode {
     }
 
     if (this is DataColumnNode) {
+      final dataColumn = data as data_source.DataColumn;
+      if (dataColumn.isKey != null && dataColumn.isKey!) {
+        return Icon(Icons.key, color: myself.primary);
+      }
       return Icon(Icons.view_column_outlined, color: myself.primary);
     }
 

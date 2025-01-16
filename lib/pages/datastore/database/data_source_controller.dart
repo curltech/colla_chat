@@ -132,6 +132,7 @@ class DataSourceController {
         DataColumn dataColumn = DataColumn(name: name);
         dataColumn.dataType = dataType;
         dataColumn.notNull = notnull == 0 ? false : true;
+        dataColumn.isKey = pk == 0 ? false : true;
         dataColumns.add(dataColumn);
       }
 
@@ -166,10 +167,10 @@ class DataSourceController {
       for (var map in maps) {
         String name = map['name'];
         String sql = map['sql'];
-        int start=sql.lastIndexOf('(');
-        int end=sql.lastIndexOf(')');
+        int start = sql.lastIndexOf('(');
+        int end = sql.lastIndexOf(')');
         DataIndex dataIndex = DataIndex(name: name);
-        dataIndex.columnNames=sql.substring(start,end);
+        dataIndex.columnNames = sql.substring(start, end);
         dataIndexes.add(dataIndex);
       }
 

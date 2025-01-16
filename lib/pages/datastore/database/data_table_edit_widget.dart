@@ -162,6 +162,13 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       align: TextAlign.left,
       // width: 70,
     ));
+    platformDataColumns.add(PlatformDataColumn(
+      label: 'isKey',
+      name: 'isKey',
+      dataType: DataType.bool,
+      align: TextAlign.right,
+      // width: 70,
+    ));
 
     return BindingDataTable2<data_source.DataColumn>(
       key: UniqueKey(),
@@ -258,10 +265,10 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       for (DataIndex dataIndex in dataIndexController.data) {
         String titleTail = '';
         if (dataIndex.isKey != null && dataIndex.isKey!) {
-          titleTail = 'key';
+          titleTail = 'Key';
         }
         if (dataIndex.isUnique != null && dataIndex.isUnique!) {
-          titleTail = 'unique';
+          titleTail = 'Unique';
         }
         tiles.add(TileData(
           prefix: Icon(
