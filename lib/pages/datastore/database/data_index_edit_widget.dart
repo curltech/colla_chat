@@ -14,26 +14,25 @@ import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-final Rx<data_source.DataColumn?> rxDataColumn =
-    Rx<data_source.DataColumn?>(null);
+final Rx<data_source.DataIndex?> rxDataIndex = Rx<data_source.DataIndex?>(null);
 
-class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
+class DataIndexEditWidget extends StatelessWidget with TileDataMixin {
   @override
   bool get withLeading => true;
 
   @override
-  String get routeName => 'data_column_edit';
+  String get routeName => 'data_index_edit';
 
   @override
-  IconData get iconData => Icons.view_column_outlined;
+  IconData get iconData => Icons.content_paste_search;
 
   @override
-  String get title => 'DataColumnEdit';
+  String get title => 'DataIndexEdit';
 
-  DataColumnEditWidget({super.key});
+  DataIndexEditWidget({super.key});
 
-  List<PlatformDataField> buildDataColumnDataFields() {
-    var dataSourceDataFields = [
+  List<PlatformDataField> buildDataIndexDataFields() {
+    var dataIndexDataFields = [
       PlatformDataField(
           name: 'name',
           label: 'Name',
@@ -43,20 +42,20 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
           label: 'Comment',
           prefixIcon: Icon(Icons.comment, color: myself.primary)),
       PlatformDataField(
-          name: 'notNull',
-          label: 'NotNull',
+          name: 'isKey',
+          label: 'isKey',
           inputType: InputType.switcher,
           dataType: DataType.bool,
-          prefixIcon: Icon(Icons.hourglass_empty, color: myself.primary)),
+          prefixIcon: Icon(Icons.key, color: myself.primary)),
       PlatformDataField(
-          name: 'autoIncrement',
-          label: 'AutoIncrement',
+          name: 'isUnique',
+          label: 'isUnique',
           inputType: InputType.switcher,
           dataType: DataType.bool,
-          prefixIcon: Icon(Icons.numbers_outlined, color: myself.primary)),
+          prefixIcon: Icon(Icons.one_k_outlined, color: myself.primary)),
     ];
 
-    return dataSourceDataFields;
+    return dataIndexDataFields;
   }
 
   FormInputController? formInputController;
@@ -64,25 +63,10 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
   //DataSourceNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
     return Obx(() {
-      data_source.DataColumn dataColumn = rxDataColumn.value!;
-      List<Option<dynamic>> options = [];
-      for (var value in SqliteDataType.values) {
-        options.add(Option(value.name, value.name));
-      }
-      List<PlatformDataField> dataColumnDataFields =
-          buildDataColumnDataFields();
-      dataColumnDataFields.insert(
-          1,
-          PlatformDataField(
-              name: 'dataType',
-              label: 'DataType',
-              prefixIcon:
-                  Icon(Icons.merge_type_outlined, color: myself.primary),
-              inputType: InputType.checkbox,
-              options: options));
-      formInputController = FormInputController(dataColumnDataFields);
+      data_source.DataIndex dataIndex = rxDataIndex.value!;
+      formInputController = FormInputController(buildDataIndexDataFields());
 
-      formInputController?.setValues(JsonUtil.toJson(dataColumn));
+      formInputController?.setValues(JsonUtil.toJson(dataIndex));
       var formInputWidget = FormInputWidget(
         spacing: 15.0,
         onOk: (Map<String, dynamic> values) {
@@ -98,27 +82,18 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
     });
   }
 
-  data_source.DataColumn? _onOk(Map<String, dynamic> values) {
-    data_source.DataColumn current = data_source.DataColumn.fromJson(values);
+  data_source.DataIndex? _onOk(Map<String, dynamic> values) {
+    data_source.DataIndex current = data_source.DataIndex.fromJson(values);
     if (StringUtil.isEmpty(current.name)) {
       DialogUtil.error(content: AppLocalizations.t('Must has dataColumn name'));
       return null;
     }
-    if (StringUtil.isEmpty(current.dataType)) {
-      DialogUtil.error(
-          content: AppLocalizations.t('Must has dataColumn dataType'));
-      return null;
-    }
-    data_source.DataColumn dataColumn = rxDataColumn.value!;
-    String? originalName = dataColumn.name;
-    if (originalName == null) {
+    data_source.DataIndex dataIndex = rxDataIndex.value!;
+    String? originalName = dataIndex.name;
+    if (originalName == null) {}
+    dataIndex.name = current.name;
 
-    }
-    dataColumn.name = current.name;
-    dataColumn.dataType = current.dataType;
-
-    DialogUtil.info(
-        content: 'Successfully update dataColumn:${dataColumn.name}');
+    DialogUtil.info(content: 'Successfully update dataIndex:${dataIndex.name}');
 
     return current;
   }

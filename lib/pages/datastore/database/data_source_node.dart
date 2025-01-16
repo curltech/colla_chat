@@ -123,7 +123,7 @@ class DataColumn extends Explorable {
 class DataIndex extends Explorable {
   bool? isKey;
   bool? isUnique;
-  List<String>? columnNames;
+  Set<String>? columnNames;
 
   DataIndex({super.name});
 

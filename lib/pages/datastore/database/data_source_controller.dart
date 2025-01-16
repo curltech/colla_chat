@@ -2,6 +2,7 @@ import 'package:animated_tree_view/tree_view/tree_node.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/datastore/postgres.dart';
 import 'package:colla_chat/datastore/sqlite3.dart';
+import 'package:colla_chat/pages/datastore/database/data_index_edit_widget.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart';
 import 'package:colla_chat/pages/datastore/explorable_node.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
@@ -109,6 +110,7 @@ class DataSourceController {
 
         FolderNode indexFolderNode = FolderNode(data: Folder(name: 'indexes'));
         dataTableNode.add(indexFolderNode);
+        updateIndexNodes(name, indexFolderNode);
       }
     }
   }
@@ -146,6 +148,40 @@ class DataSourceController {
     }
     for (var dataColumn in dataColumns) {
       columnFolderNode.add(DataColumnNode(data: dataColumn));
+    }
+  }
+
+  Future<List<DataIndex>?> findIndexes(String tableName) async {
+    if (current.value != null &&
+        current.value!.sourceType == SourceType.sqlite.name) {
+      List<Map<dynamic, dynamic>> maps = await current.value!.dataStore!.find(
+          'sqlite_master',
+          where: 'type=? and tbl_name=?',
+          whereArgs: ['index', tableName],
+          orderBy: 'name');
+      if (maps.isEmpty) {
+        return null;
+      }
+      List<DataIndex> dataIndexes = [];
+      for (var map in maps) {
+        String name = map['name'];
+        DataIndex dataIndex = DataIndex(name: name);
+        dataIndexes.add(dataIndex);
+      }
+
+      return dataIndexes;
+    }
+
+    return null;
+  }
+
+  updateIndexNodes(String tableName, FolderNode indexesFolderNode) async {
+    List<DataIndex>? dataIndexes = await findIndexes(tableName);
+    if (dataIndexes == null || dataIndexes.isEmpty) {
+      return;
+    }
+    for (var dataIndex in dataIndexes) {
+      indexesFolderNode.add(DataIndexNode(data: dataIndex));
     }
   }
 }

@@ -289,6 +289,10 @@ extension on ExplorableNode {
       return Icon(Icons.view_column_outlined, color: myself.primary);
     }
 
+    if (this is DataIndexNode) {
+      return Icon(Icons.content_paste_search, color: myself.primary);
+    }
+
     if (this is FileNode) {
       final file = data as File;
       if (file.mimeType.startsWith("image")) {

@@ -15,6 +15,8 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
+import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -30,7 +32,7 @@ class DataTableEditWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'data_table_edit';
 
   @override
-  IconData get iconData => Icons.edit_attributes_outlined;
+  IconData get iconData => Icons.table_view_outlined;
 
   @override
   String get title => 'DataTableEdit';
@@ -70,6 +72,9 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
 
   final DataListController<data_source.DataColumn> dataColumnController =
       DataListController<data_source.DataColumn>();
+
+  final DataListController<data_source.DataIndex> dataIndexController =
+      DataListController<data_source.DataIndex>();
 
   //DataTableNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
@@ -126,6 +131,19 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       return null;
     }
     dataColumnController.data.assignAll(dataColumns);
+  }
+
+  _buildDataIndexes(BuildContext context) async {
+    data_source.DataTable dataTable = rxDataTable.value!;
+    if (dataTable.name == null) {
+      return null;
+    }
+    List<data_source.DataIndex>? dataIndexes =
+        await dataSourceController.findIndexes(dataTable.name!);
+    if (dataIndexes == null) {
+      return null;
+    }
+    dataIndexController.data.assignAll(dataIndexes);
   }
 
   Widget _buildDataColumnsWidget(BuildContext context) {
@@ -234,6 +252,27 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
     );
   }
 
+  Widget _buildDataIndexesWidget(BuildContext context) {
+    final List<TileData> tiles = [];
+    for (DataIndex dataIndex in dataIndexController.data) {
+      tiles.add(TileData(
+        prefix: Icon(
+          Icons.content_paste_search,
+          color: myself.primary,
+        ),
+        title: dataIndex.name!,
+        titleTail: dataIndex.isUnique! ? 'unique' : '',
+        subtitle: dataIndex.columnNames.toString(),
+      ));
+    }
+
+    return DataListView(
+        itemCount: tiles.length,
+        itemBuilder: (context, index) {
+          return tiles[index];
+        });
+  }
+
   Widget _buildDataKeyTab(BuildContext context) {
     return Column(
       children: [],
@@ -242,7 +281,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
 
   Widget _buildDataIndexTab(BuildContext context) {
     return Column(
-      children: [],
+      children: [_buildDataIndexesWidget(context)],
     );
   }
 
@@ -287,9 +326,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
         Container(
           child: Text('Child 2'),
         ),
-        Container(
-          child: Text('Child 3'),
-        ),
+        _buildDataIndexTab(context),
       ],
     );
 
