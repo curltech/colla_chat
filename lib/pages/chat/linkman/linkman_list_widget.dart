@@ -100,7 +100,7 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _LinkmanListWidgetState extends State<LinkmanListWidget>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   final TextEditingController _linkmanTextController = TextEditingController();
   final TextEditingController _groupTextController = TextEditingController();
   final TextEditingController _conferenceTextController =

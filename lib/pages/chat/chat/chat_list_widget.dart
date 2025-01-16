@@ -118,7 +118,7 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _ChatListWidgetState extends State<ChatListWidget>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   StreamSubscription<SocketStatus>? _socketStatusStreamSubscription;
   final Rx<SocketStatus?> _socketStatus = Rx<SocketStatus?>(null);
   late final TabController _tabController =
