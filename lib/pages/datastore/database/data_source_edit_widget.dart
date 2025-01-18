@@ -169,11 +169,10 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
       dataSource.password = current.password;
       dataSource.database = current.database;
     }
-    if (originalName == null) {
+    if (!dataSourceController.dataSources.containsKey(dataSource.name)) {
       dataSourceController.addDataSource(dataSource);
-    } else {
-      dataSourceController.save();
     }
+    dataSourceController.save();
 
     DialogUtil.info(
         content: 'Successfully update dataSource:${dataSource.name}');

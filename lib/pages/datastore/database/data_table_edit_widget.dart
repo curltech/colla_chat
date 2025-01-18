@@ -42,10 +42,45 @@ class DataTableEditWidget extends StatefulWidget with TileDataMixin {
   @override
   String get title => 'DataTableEdit';
 
-  DataTableEditWidget({super.key});
+  DataTableEditWidget({super.key}) {
+    _buildDataColumns();
+    _buildDataIndexes();
+  }
+
+  final DataListController<data_source.DataColumn> dataColumnController =
+      DataListController<data_source.DataColumn>();
+
+  final DataListController<data_source.DataIndex> dataIndexController =
+      DataListController<data_source.DataIndex>();
 
   @override
   State<StatefulWidget> createState() => _DataTableEditWidgetState();
+
+  _buildDataColumns() async {
+    data_source.DataTable dataTable = rxDataTable.value!;
+    if (dataTable.name == null) {
+      return null;
+    }
+    List<data_source.DataColumn>? dataColumns =
+        await dataSourceController.findColumns(dataTable.name!);
+    if (dataColumns == null) {
+      return null;
+    }
+    dataColumnController.data.assignAll(dataColumns);
+  }
+
+  _buildDataIndexes() async {
+    data_source.DataTable dataTable = rxDataTable.value!;
+    if (dataTable.name == null) {
+      return null;
+    }
+    List<data_source.DataIndex>? dataIndexes =
+        await dataSourceController.findIndexes(dataTable.name!);
+    if (dataIndexes == null) {
+      return null;
+    }
+    dataIndexController.data.assignAll(dataIndexes);
+  }
 }
 
 class _DataTableEditWidgetState extends State<DataTableEditWidget>
@@ -74,12 +109,6 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
   }
 
   FormInputController? formInputController;
-
-  final DataListController<data_source.DataColumn> dataColumnController =
-      DataListController<data_source.DataColumn>();
-
-  final DataListController<data_source.DataIndex> dataIndexController =
-      DataListController<data_source.DataIndex>();
 
   //DataTableNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
@@ -149,32 +178,6 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
     return current;
   }
 
-  _buildDataColumns(BuildContext context) async {
-    data_source.DataTable dataTable = rxDataTable.value!;
-    if (dataTable.name == null) {
-      return null;
-    }
-    List<data_source.DataColumn>? dataColumns =
-        await dataSourceController.findColumns(dataTable.name!);
-    if (dataColumns == null) {
-      return null;
-    }
-    dataColumnController.data.assignAll(dataColumns);
-  }
-
-  _buildDataIndexes(BuildContext context) async {
-    data_source.DataTable dataTable = rxDataTable.value!;
-    if (dataTable.name == null) {
-      return null;
-    }
-    List<data_source.DataIndex>? dataIndexes =
-        await dataSourceController.findIndexes(dataTable.name!);
-    if (dataIndexes == null) {
-      return null;
-    }
-    dataIndexController.data.assignAll(dataIndexes);
-  }
-
   Widget _buildDataColumnsWidget(BuildContext context) {
     final List<PlatformDataColumn> platformDataColumns = [];
     platformDataColumns.add(PlatformDataColumn(
@@ -202,14 +205,15 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       horizontalMargin: 15.0,
       columnSpacing: 0.0,
       platformDataColumns: platformDataColumns,
-      controller: dataColumnController,
+      controller: widget.dataColumnController,
       fixedLeftColumns: 0,
     );
   }
 
   List<String> _getCheckedNames() {
     List<String> names = [];
-    List<data_source.DataColumn> dataColumns = dataColumnController.checked;
+    List<data_source.DataColumn> dataColumns =
+        widget.dataColumnController.checked;
     for (data_source.DataColumn dataColumn in dataColumns) {
       names.add(dataColumn.name!);
     }
@@ -226,9 +230,9 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
             onPressed: () {
               data_source.DataColumn dataColumn = data_source.DataColumn();
               rxDataColumn.value = dataColumn;
-              dataColumnController.data.add(dataColumn);
-              dataColumnController.setCurrentIndex =
-                  dataColumnController.data.length - 1;
+              widget.dataColumnController.data.add(dataColumn);
+              widget.dataColumnController.setCurrentIndex =
+                  widget.dataColumnController.data.length - 1;
               indexWidgetProvider.push('data_column_edit');
             },
             icon: Icon(
@@ -239,19 +243,19 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
             tooltip: AppLocalizations.t('Delete column'),
             onPressed: () {
               List<data_source.DataColumn> dataColumns =
-                  dataColumnController.checked;
+                  widget.dataColumnController.checked;
               if (dataColumns.isEmpty) {
                 return;
               }
               for (data_source.DataColumn dataColumn in dataColumns) {
-                dataColumnController.data.remove(dataColumn);
+                widget.dataColumnController.data.remove(dataColumn);
               }
             },
             icon: Icon(Icons.remove, color: myself.primary)),
         IconButton(
             tooltip: AppLocalizations.t('Edit column'),
             onPressed: () {
-              rxDataColumn.value = dataColumnController.current;
+              rxDataColumn.value = widget.dataColumnController.current;
               indexWidgetProvider.push('data_column_edit');
             },
             icon: Icon(Icons.edit, color: myself.primary)),
@@ -278,7 +282,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
     }
     String sql = 'create table "$tableName"\n';
     sql += '(\n';
-    List<data_source.DataColumn> dataColumns = dataColumnController.data;
+    List<data_source.DataColumn> dataColumns = widget.dataColumnController.data;
     if (dataColumns.isNotEmpty) {
       String keyColumns = '';
       for (int i = 0; i < dataColumns.length; ++i) {
@@ -310,7 +314,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       return null;
     }
     String sql = '';
-    List<data_source.DataIndex> dataIndexes = dataIndexController.data;
+    List<data_source.DataIndex> dataIndexes = widget.dataIndexController.data;
     if (dataIndexes.isNotEmpty) {
       for (var dataIndex in dataIndexes) {
         String columnName = dataIndex.name!;
@@ -369,7 +373,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
   Widget _buildDataIndexesWidget(BuildContext context) {
     return Obx(() {
       final List<TileData> tiles = [];
-      for (DataIndex dataIndex in dataIndexController.data) {
+      for (DataIndex dataIndex in widget.dataIndexController.data) {
         String titleTail = '';
         if (dataIndex.isUnique != null && dataIndex.isUnique!) {
           titleTail = 'Unique';
@@ -446,8 +450,6 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
 
   @override
   Widget build(BuildContext context) {
-    _buildDataColumns(context);
-    _buildDataIndexes(context);
     return AppBarView(
         title: widget.title,
         withLeading: true,

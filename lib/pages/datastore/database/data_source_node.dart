@@ -105,7 +105,7 @@ class DataColumn extends Explorable {
         notNull = json['notNull'],
         autoIncrement = json['autoIncrement'],
         isKey = json['isKey'],
-        checked = json['checked'],
+        checked = json['checked'] ?? false,
         super.fromJson();
 
   @override

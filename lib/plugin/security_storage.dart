@@ -42,7 +42,7 @@ class LocalSecurityStorage {
 
   save(String key, String value, {bool userKey = true}) async {
     try {
-      return await _secureStorage.write(
+      await _secureStorage.write(
         key: _getKey(key, userKey: userKey),
         value: value,
         iOptions: iOptions,
@@ -51,6 +51,13 @@ class LocalSecurityStorage {
         mOptions: mOptions,
         lOptions: lOptions,
       );
+      String? v = await get(key, userKey: userKey);
+      if (v == null) {
+        throw 'save value failure, value is null';
+      }
+      if (v != value) {
+        throw 'save value failure, value is not equal';
+      }
     } catch (e) {
       logger.e('LocalSecurityStorage save:$e');
     }

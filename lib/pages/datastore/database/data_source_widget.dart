@@ -48,8 +48,6 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'DataSource';
 
-  TreeViewController? treeViewController;
-
   /// 单击表示编辑属性
   void _onTap(BuildContext context, ExplorableNode node) {
     if (node is DataSourceNode) {}
@@ -171,7 +169,9 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
             )),
         IconButton(
             tooltip: AppLocalizations.t('Refresh data source'),
-            onPressed: () {},
+            onPressed: () async {
+              await dataSourceController.init();
+            },
             icon: Icon(
               Icons.refresh_outlined,
               color: myself.primary,
@@ -209,7 +209,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
           offset: Offset(12, 0),
         ),
         onTreeReady: (controller) {
-          treeViewController = controller;
+          dataSourceController.treeViewController = controller;
         },
         builder: (context, ExplorableNode node) {
           return Obx(() {

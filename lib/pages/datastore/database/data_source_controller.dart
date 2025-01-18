@@ -1,17 +1,20 @@
+import 'package:animated_tree_view/animated_tree_view.dart';
 import 'package:animated_tree_view/tree_view/tree_node.dart';
+import 'package:animated_tree_view/tree_view/tree_view.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/datastore/postgres.dart';
 import 'package:colla_chat/datastore/sqlite3.dart';
-import 'package:colla_chat/pages/datastore/database/data_index_edit_widget.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart';
 import 'package:colla_chat/pages/datastore/explorable_node.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:get/get.dart';
 
 class DataSourceController {
-  final RxList<DataSource> dataSources = <DataSource>[].obs;
+  final RxMap<String, DataSource> dataSources = <String, DataSource>{}.obs;
+  TreeViewController? treeViewController;
   final TreeNode<Explorable> root = TreeNode.root();
   final Rx<DataSource?> current = Rx<DataSource?>(null);
 
@@ -22,21 +25,42 @@ class DataSourceController {
   }
 
   save() async {
-    String value = JsonUtil.toJsonString(dataSources.value.sublist(1));
+    String value = JsonUtil.toJsonString(dataSources);
     await localSecurityStorage.save('DataSources', value);
   }
 
+  clear() {
+    dataSources.clear();
+    root.clear();
+  }
+
   init() async {
-    String filename = appDataProvider.sqlite3Path;
-    DataSource dataSource =
-        DataSource(name: 'colla_chat', sourceType: SourceType.sqlite.name);
-    dataSource.filename = filename;
-    await addDataSource(dataSource, dataStore: sqlite3);
+    clear();
     String? value = await localSecurityStorage.get('DataSources');
-    List<dynamic> maps = JsonUtil.toJson(value);
-    for (var map in maps) {
-      DataSource dataSource = DataSource.fromJson(map);
+    Map<String, dynamic>? maps;
+    try {
+      maps = JsonUtil.toJson(value);
+    } catch (e) {
+      logger.e('get data sources failure');
+    }
+    maps ??= {};
+    if (!maps.containsKey('colla_chat')) {
+      String filename = appDataProvider.sqlite3Path;
+      DataSource dataSource =
+          DataSource(name: 'colla_chat', sourceType: SourceType.sqlite.name);
+      dataSource.filename = filename;
+      await addDataSource(dataSource, dataStore: sqlite3);
+    }
+    for (var entry in maps.entries) {
+      String name = entry.key;
+      dynamic value = entry.value;
+      DataSource dataSource = DataSource.fromJson(value);
       await addDataSource(dataSource);
+    }
+
+    List<ListenableNode> children = dataSourceController.root.childrenAsList;
+    for (var node in children) {
+      treeViewController?.collapseNode(node as ITreeNode);
     }
   }
 
@@ -56,8 +80,7 @@ class DataSourceController {
       dataSource.dataStore = Postgres(password: dataSource.password!);
       dataSource.dataStore!.open();
     }
-    dataSources.add(dataSource);
-    save();
+    dataSources[dataSource.name!] = dataSource;
     current.value = dataSource;
     DataSourceNode dataSourceNode = DataSourceNode(data: dataSource);
     root.add(dataSourceNode);
@@ -72,21 +95,18 @@ class DataSourceController {
     DataSource? dataSource;
     if (node != null) {
       dataSource = node.data;
-      if (dataSource == dataSources[0]) {
+      if (dataSource!.name == 'colla_chat') {
         return;
       }
       node.delete();
     } else {
       dataSource = current.value;
-      if (dataSource == dataSources[0]) {
+      if (dataSource!.name == 'colla_chat') {
         return;
       }
       current.value = null;
     }
-
-    if (dataSource != null) {
-      dataSources.remove(dataSource);
-    }
+    dataSources.remove(dataSource.name);
     save();
   }
 
