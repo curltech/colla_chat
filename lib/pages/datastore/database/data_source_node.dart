@@ -124,23 +124,20 @@ class DataColumn extends Explorable {
 }
 
 class DataIndex extends Explorable {
-  bool? isKey;
   bool? isUnique;
   String? columnNames;
 
   DataIndex({super.name});
 
-  DataIndex.fromJson(Map json)
-      : isKey = json['isKey'],
-        isUnique = json['isUnique'],
+  DataIndex.fromJson(super.json)
+      : isUnique = json['isUnique'],
         columnNames = json['columnNames'],
-        super.fromJson(json);
+        super.fromJson();
 
   @override
   Map<String, dynamic> toJson() {
     var json = super.toJson();
     json.addAll({
-      'isKey': isKey,
       'isUnique': isUnique,
       'columnNames': columnNames,
     });

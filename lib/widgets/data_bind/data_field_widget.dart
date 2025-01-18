@@ -688,7 +688,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
             }
             setState(() {});
           },
-          value: value == option.value,
+          value: value.contains(option.value),
         );
         var row = SizedBox(
             width: dataFieldDef.width ?? 120,

@@ -117,6 +117,7 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
       DataSource dataSource = rxDataSource.value!;
       List<PlatformDataField> dataSourceDataFields =
           buildDataSourceDataFields();
+      formInputController?.dispose();
       formInputController = FormInputController(dataSourceDataFields);
       formInputController?.setValues(JsonUtil.toJson(dataSource));
       var formInputWidget = FormInputWidget(

@@ -30,18 +30,35 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'DataColumnEdit';
 
-  DataColumnEditWidget({super.key});
+  late final FormInputController formInputController;
+
+  DataColumnEditWidget({super.key}) {
+    List<PlatformDataField> dataColumnDataFields = buildDataColumnDataFields();
+    formInputController = FormInputController(dataColumnDataFields);
+  }
 
   List<PlatformDataField> buildDataColumnDataFields() {
+    List<Option<dynamic>> options = [];
+    for (var value in SqliteDataType.values) {
+      options.add(Option(value.name, value.name));
+    }
     var dataSourceDataFields = [
       PlatformDataField(
           name: 'name',
           label: 'Name',
           prefixIcon: Icon(Icons.person, color: myself.primary)),
       PlatformDataField(
-          name: 'comment',
-          label: 'Comment',
-          prefixIcon: Icon(Icons.comment, color: myself.primary)),
+          name: 'dataType',
+          label: 'DataType',
+          prefixIcon: Icon(Icons.merge_type_outlined, color: myself.primary),
+          inputType: InputType.radio,
+          options: options),
+      PlatformDataField(
+          name: 'isKey',
+          label: 'isKey',
+          inputType: InputType.switcher,
+          dataType: DataType.bool,
+          prefixIcon: Icon(Icons.key, color: myself.primary)),
       PlatformDataField(
           name: 'notNull',
           label: 'NotNull',
@@ -54,41 +71,26 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
           inputType: InputType.switcher,
           dataType: DataType.bool,
           prefixIcon: Icon(Icons.numbers_outlined, color: myself.primary)),
+      PlatformDataField(
+          name: 'comment',
+          label: 'Comment',
+          prefixIcon: Icon(Icons.comment, color: myself.primary)),
     ];
 
     return dataSourceDataFields;
   }
 
-  FormInputController? formInputController;
-
   //DataSourceNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
     return Obx(() {
       data_source.DataColumn dataColumn = rxDataColumn.value!;
-      List<Option<dynamic>> options = [];
-      for (var value in SqliteDataType.values) {
-        options.add(Option(value.name, value.name));
-      }
-      List<PlatformDataField> dataColumnDataFields =
-          buildDataColumnDataFields();
-      dataColumnDataFields.insert(
-          1,
-          PlatformDataField(
-              name: 'dataType',
-              label: 'DataType',
-              prefixIcon:
-                  Icon(Icons.merge_type_outlined, color: myself.primary),
-              inputType: InputType.checkbox,
-              options: options));
-      formInputController = FormInputController(dataColumnDataFields);
-
-      formInputController?.setValues(JsonUtil.toJson(dataColumn));
+      formInputController.setValues(JsonUtil.toJson(dataColumn));
       var formInputWidget = FormInputWidget(
         spacing: 15.0,
         onOk: (Map<String, dynamic> values) {
           _onOk(values);
         },
-        controller: formInputController!,
+        controller: formInputController,
       );
 
       return Container(
@@ -111,11 +113,12 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
     }
     data_source.DataColumn dataColumn = rxDataColumn.value!;
     String? originalName = dataColumn.name;
-    if (originalName == null) {
-
-    }
+    if (originalName == null) {}
     dataColumn.name = current.name;
     dataColumn.dataType = current.dataType;
+    dataColumn.isKey = current.isKey;
+    dataColumn.notNull = current.notNull;
+    dataColumn.autoIncrement = current.autoIncrement;
 
     DialogUtil.info(
         content: 'Successfully update dataColumn:${dataColumn.name}');

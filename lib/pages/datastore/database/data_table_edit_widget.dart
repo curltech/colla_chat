@@ -1,9 +1,11 @@
+import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/datastore/database/data_column_edit_widget.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_controller.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart'
     as data_source;
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -19,7 +21,10 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_code_editor/flutter_code_editor.dart';
+import 'package:flutter_highlight/themes/idea.dart';
 import 'package:get/get.dart';
+import 'package:highlight/languages/sql.dart';
 import 'package:tab_container/tab_container.dart';
 
 final Rx<data_source.DataTable?> rxDataTable = Rx<data_source.DataTable?>(null);
@@ -46,7 +51,7 @@ class DataTableEditWidget extends StatefulWidget with TileDataMixin {
 class _DataTableEditWidgetState extends State<DataTableEditWidget>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController =
-      TabController(length: 4, vsync: this);
+      TabController(length: 3, vsync: this);
 
   @override
   void initState() {
@@ -92,6 +97,28 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
           _onOk(values);
         },
         controller: formInputController!,
+        formButtons: [
+          FormButton(
+              label: 'Generate',
+              onTap: (Map<String, dynamic> values) {
+                String? sql = _buildSql();
+
+                if (sql != null) {
+                  codeController.fullText = sql;
+                }
+              }),
+          FormButton(
+              label: 'Execute',
+              onTap: (Map<String, dynamic> values) {
+                String? sql = _buildSql();
+
+                if (sql != null) {
+                  var result = dataSourceController.current.value?.dataStore
+                      ?.run(Sql(sql));
+                  logger.i('execute sql result:$result');
+                }
+              })
+        ],
       );
 
       return Container(
@@ -111,8 +138,10 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
     String? originalName = dataTable.name;
     if (originalName == null) {
       dataTable.name = current.name;
+      dataTable.comment = current.comment;
     } else {
       dataTable.name = current.name;
+      dataTable.comment = current.comment;
     }
 
     DialogUtil.info(content: 'Successfully update dataTable:${dataTable.name}');
@@ -153,21 +182,18 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       name: 'name',
       dataType: DataType.string,
       align: TextAlign.left,
-      // width: 70,
     ));
     platformDataColumns.add(PlatformDataColumn(
       label: 'DataType',
       name: 'dataType',
       dataType: DataType.string,
       align: TextAlign.left,
-      // width: 70,
     ));
     platformDataColumns.add(PlatformDataColumn(
       label: 'isKey',
       name: 'isKey',
       dataType: DataType.bool,
       align: TextAlign.right,
-      // width: 70,
     ));
 
     return BindingDataTable2<data_source.DataColumn>(
@@ -241,11 +267,92 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
     );
   }
 
+  final codeController = CodeController(
+    language: sql,
+  );
+
+  String? _buildTableSql() {
+    String? tableName = formInputController?.controllers['name']?.value;
+    if (tableName == null) {
+      return null;
+    }
+    String sql = 'create table "$tableName"\n';
+    sql += '(\n';
+    List<data_source.DataColumn> dataColumns = dataColumnController.data;
+    if (dataColumns.isNotEmpty) {
+      String keyColumns = '';
+      for (int i = 0; i < dataColumns.length; ++i) {
+        data_source.DataColumn dataColumn = dataColumns[i];
+        String columnName = dataColumn.name!;
+        String dataType = dataColumn.dataType!;
+        sql += '    $columnName   $dataType,\n';
+        if (dataColumn.isKey != null && dataColumn.isKey!) {
+          if (keyColumns.isEmpty) {
+            keyColumns += columnName;
+          } else {
+            keyColumns += ',$columnName';
+          }
+        }
+      }
+      if (keyColumns.isNotEmpty) {
+        sql += '    constraint "${tableName}_pk"\n';
+        sql += '    primary key($keyColumns)\n';
+      }
+    }
+    sql += ');';
+
+    return sql;
+  }
+
+  String? _buildIndexSql() {
+    String? tableName = formInputController?.controllers['name']?.value;
+    if (tableName == null) {
+      return null;
+    }
+    String sql = '';
+    List<data_source.DataIndex> dataIndexes = dataIndexController.data;
+    if (dataIndexes.isNotEmpty) {
+      for (var dataIndex in dataIndexes) {
+        String columnName = dataIndex.name!;
+        String columnNames = dataIndex.columnNames!;
+        sql += 'create index "${tableName}_${columnName}_index"\n';
+        sql += 'on "$tableName"($columnNames);\n';
+      }
+    }
+    return sql;
+  }
+
+  String? _buildSql() {
+    String? tableSql = _buildTableSql();
+    String? indexSql = _buildIndexSql();
+    String? sql;
+    if (tableSql != null) {
+      sql = tableSql;
+      if (indexSql != null) {
+        sql += '\n$indexSql';
+      }
+    }
+
+    return sql;
+  }
+
   Widget _buildDataTableTab(BuildContext context) {
     return Column(
       children: [
         _buildFormInputWidget(context),
-        Expanded(child: Container()),
+        Expanded(
+          child: SingleChildScrollView(
+            child: CodeTheme(
+              data: CodeThemeData(styles: ideaTheme),
+              child: CodeField(
+                minLines: 15,
+                background: Colors.grey.withAlpha(25),
+                readOnly: true,
+                controller: codeController,
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -264,9 +371,6 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       final List<TileData> tiles = [];
       for (DataIndex dataIndex in dataIndexController.data) {
         String titleTail = '';
-        if (dataIndex.isKey != null && dataIndex.isKey!) {
-          titleTail = 'Key';
-        }
         if (dataIndex.isUnique != null && dataIndex.isUnique!) {
           titleTail = 'Unique';
         }
@@ -287,12 +391,6 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
             return tiles[index];
           });
     });
-  }
-
-  Widget _buildDataKeyTab(BuildContext context) {
-    return Column(
-      children: [],
-    );
   }
 
   Widget _buildDataIndexTab(BuildContext context) {
@@ -333,15 +431,11 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       tabs: [
         Text(AppLocalizations.t('Table')),
         Text(AppLocalizations.t('Column')),
-        Text(AppLocalizations.t('Key')),
         Text(AppLocalizations.t('Index'))
       ],
       children: [
         _buildDataTableTab(context),
         _buildDataColumnTab(context),
-        Container(
-          child: Text('Child 2'),
-        ),
         _buildDataIndexTab(context),
       ],
     );
