@@ -1,6 +1,7 @@
 import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/datastore/database/data_column_edit_widget.dart';
+import 'package:colla_chat/pages/datastore/database/data_index_edit_widget.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_controller.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart'
     as data_source;
@@ -45,6 +46,10 @@ class DataTableEditWidget extends StatefulWidget with TileDataMixin {
   DataTableEditWidget({super.key}) {
     _buildDataColumns();
     _buildDataIndexes();
+    rxDataTable.addListener(() {
+      _buildDataColumns();
+      _buildDataIndexes();
+    });
   }
 
   final DataListController<data_source.DataColumn> dataColumnController =
@@ -129,7 +134,8 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
         formButtons: [
           FormButton(
               label: 'Generate',
-              onTap: (Map<String, dynamic> values) {
+              onTap: (Map<String, dynamic> values) async {
+                await _onOk(values);
                 String? sql = _buildSql();
 
                 if (sql != null) {
@@ -138,7 +144,8 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
               }),
           FormButton(
               label: 'Execute',
-              onTap: (Map<String, dynamic> values) {
+              onTap: (Map<String, dynamic> values) async {
+                await _onOk(values);
                 String? sql = _buildSql();
 
                 if (sql != null) {
@@ -221,7 +228,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
     return names;
   }
 
-  Widget _buildButtonWidget(BuildContext context) {
+  Widget _buildColumnButtonWidget(BuildContext context) {
     return OverflowBar(
       alignment: MainAxisAlignment.start,
       children: [
@@ -259,14 +266,48 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
               indexWidgetProvider.push('data_column_edit');
             },
             icon: Icon(Icons.edit, color: myself.primary)),
-        IconButton(
-            tooltip: AppLocalizations.t('New key'),
-            onPressed: () {},
-            icon: Icon(Icons.add_circle_outline, color: myself.primary)),
+      ],
+    );
+  }
+
+  Widget _buildIndexButtonWidget(BuildContext context) {
+    return OverflowBar(
+      alignment: MainAxisAlignment.start,
+      children: [
         IconButton(
             tooltip: AppLocalizations.t('New index'),
-            onPressed: () {},
-            icon: Icon(Icons.add_comment_outlined, color: myself.primary)),
+            onPressed: () {
+              data_source.DataIndex dataIndex = data_source.DataIndex();
+              rxDataIndex.value = dataIndex;
+              widget.dataIndexController.data.add(dataIndex);
+              widget.dataIndexController.setCurrentIndex =
+                  widget.dataIndexController.data.length - 1;
+              indexWidgetProvider.push('data_index_edit');
+            },
+            icon: Icon(
+              Icons.add,
+              color: myself.primary,
+            )),
+        IconButton(
+            tooltip: AppLocalizations.t('Delete index'),
+            onPressed: () {
+              List<data_source.DataIndex> dataIndexes =
+                  widget.dataIndexController.checked;
+              if (dataIndexes.isEmpty) {
+                return;
+              }
+              for (data_source.DataIndex dataIndex in dataIndexes) {
+                widget.dataIndexController.data.remove(dataIndex);
+              }
+            },
+            icon: Icon(Icons.remove, color: myself.primary)),
+        IconButton(
+            tooltip: AppLocalizations.t('Edit index'),
+            onPressed: () {
+              rxDataIndex.value = widget.dataIndexController.current;
+              indexWidgetProvider.push('data_index_edit');
+            },
+            icon: Icon(Icons.edit, color: myself.primary)),
       ],
     );
   }
@@ -364,7 +405,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
   Widget _buildDataColumnTab(BuildContext context) {
     return Column(
       children: [
-        _buildButtonWidget(context),
+        _buildColumnButtonWidget(context),
         Expanded(child: _buildDataColumnsWidget(context))
       ],
     );
@@ -383,7 +424,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
             Icons.content_paste_search,
             color: myself.primary,
           ),
-          title: dataIndex.name!,
+          title: dataIndex.name ?? '',
           titleTail: titleTail,
           subtitle: dataIndex.columnNames ?? '',
         ));
@@ -399,7 +440,10 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
 
   Widget _buildDataIndexTab(BuildContext context) {
     return Column(
-      children: [Expanded(child: _buildDataIndexesWidget(context))],
+      children: [
+        _buildIndexButtonWidget(context),
+        Expanded(child: _buildDataIndexesWidget(context))
+      ],
     );
   }
 

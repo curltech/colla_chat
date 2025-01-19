@@ -1,6 +1,7 @@
 import 'package:animated_tree_view/animated_tree_view.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/datastore/database/data_column_edit_widget.dart';
+import 'package:colla_chat/pages/datastore/database/data_index_edit_widget.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_controller.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_edit_widget.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart';
@@ -26,6 +27,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
   final DataSourceEditWidget dataSourceEditWidget = DataSourceEditWidget();
   final DataTableEditWidget dataTableEditWidget = DataTableEditWidget();
   final DataColumnEditWidget dataColumnEditWidget = DataColumnEditWidget();
+  final DataIndexEditWidget dataIndexEditWidget = DataIndexEditWidget();
   final QueryConsoleEditorWidget queryConsoleEditorWidget =
       QueryConsoleEditorWidget();
 
@@ -33,6 +35,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(dataSourceEditWidget);
     indexWidgetProvider.define(dataTableEditWidget);
     indexWidgetProvider.define(dataColumnEditWidget);
+    indexWidgetProvider.define(dataIndexEditWidget);
     indexWidgetProvider.define(queryConsoleEditorWidget);
   }
 
@@ -116,7 +119,12 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
         rxDataColumn.value = dataColumnNode.data;
         indexWidgetProvider.push('data_column_edit');
       }
-      if ('indexes' == node.data!.name) {}
+      if ('indexes' == node.data!.name) {
+        data_source.DataIndex dataIndex = data_source.DataIndex();
+        DataIndexNode dataIndexNode = DataIndexNode(data: dataIndex);
+        rxDataIndex.value = dataIndexNode.data;
+        indexWidgetProvider.push('data_index_edit');
+      }
     }
   }
 
@@ -139,6 +147,10 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
         if (node is DataColumnNode) {
           rxDataColumn.value = node.data;
           indexWidgetProvider.push('data_column_edit');
+        }
+        if (node is DataIndexNode) {
+          rxDataIndex.value = node.data;
+          indexWidgetProvider.push('data_index_edit');
         }
       case 'Edit data':
       default:
