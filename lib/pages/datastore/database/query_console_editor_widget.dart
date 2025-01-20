@@ -10,8 +10,6 @@ import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
 import 'package:flutter_highlight/themes/idea.dart';
-import 'package:flutter_highlight/themes/monokai-sublime.dart';
-import 'package:flutter_highlight/themes/vs.dart';
 import 'package:get/get.dart';
 import 'package:highlight/languages/sql.dart';
 
