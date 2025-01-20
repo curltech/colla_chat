@@ -180,6 +180,12 @@ class DataListController<T> {
 
     return checkedData;
   }
+
+  setCheckAll(bool? val) {
+    for (var t in data) {
+      EntityUtil.setChecked(t, val);
+    }
+  }
 }
 
 /// 分页数据控制器，记录了分页的信息

@@ -49,6 +49,10 @@ class DataIndexEditWidget extends StatelessWidget with TileDataMixin {
           inputType: InputType.switcher,
           dataType: DataType.bool,
           prefixIcon: Icon(Icons.one_k_outlined, color: myself.primary)),
+      PlatformDataField(
+          name: 'columnNames',
+          label: 'ColumnNames',
+          prefixIcon: Icon(Icons.view_column_outlined, color: myself.primary)),
     ];
 
     return dataIndexDataFields;
@@ -58,13 +62,13 @@ class DataIndexEditWidget extends StatelessWidget with TileDataMixin {
   Widget _buildFormInputWidget(BuildContext context) {
     return Obx(() {
       data_source.DataIndex dataIndex = rxDataIndex.value!;
-      formInputController?.setValues(JsonUtil.toJson(dataIndex));
+      formInputController.setValues(JsonUtil.toJson(dataIndex));
       var formInputWidget = FormInputWidget(
         spacing: 15.0,
         onOk: (Map<String, dynamic> values) {
           _onOk(values);
         },
-        controller: formInputController!,
+        controller: formInputController,
       );
 
       return Container(
@@ -84,6 +88,8 @@ class DataIndexEditWidget extends StatelessWidget with TileDataMixin {
     String? originalName = dataIndex.name;
     if (originalName == null) {}
     dataIndex.name = current.name;
+    dataIndex.isUnique = current.isUnique;
+    dataIndex.columnNames = current.columnNames;
 
     DialogUtil.info(content: 'Successfully update dataIndex:${dataIndex.name}');
 

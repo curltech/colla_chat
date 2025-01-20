@@ -217,12 +217,19 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
     );
   }
 
-  List<String> _getCheckedNames() {
-    List<String> names = [];
+  String? _getCheckedColumnNames() {
     List<data_source.DataColumn> dataColumns =
         widget.dataColumnController.checked;
-    for (data_source.DataColumn dataColumn in dataColumns) {
-      names.add(dataColumn.name!);
+    if (dataColumns.isEmpty) {
+      return null;
+    }
+    String names = '';
+    for (int i = 0; i < dataColumns.length; ++i) {
+      data_source.DataColumn dataColumn = dataColumns[i];
+      if (i > 0) {
+        names += ',';
+      }
+      names += dataColumn.name!;
     }
 
     return names;
@@ -235,6 +242,11 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
         IconButton(
             tooltip: AppLocalizations.t('New column'),
             onPressed: () {
+              data_source.DataTable dataTable = rxDataTable.value!;
+              if (dataTable.name == null) {
+                DialogUtil.error(content: 'Please input table name');
+                return;
+              }
               data_source.DataColumn dataColumn = data_source.DataColumn();
               rxDataColumn.value = dataColumn;
               widget.dataColumnController.data.add(dataColumn);
@@ -249,6 +261,11 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
         IconButton(
             tooltip: AppLocalizations.t('Delete column'),
             onPressed: () {
+              data_source.DataTable dataTable = rxDataTable.value!;
+              if (dataTable.name == null) {
+                DialogUtil.error(content: 'Please input table name');
+                return;
+              }
               List<data_source.DataColumn> dataColumns =
                   widget.dataColumnController.checked;
               if (dataColumns.isEmpty) {
@@ -256,12 +273,19 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
               }
               for (data_source.DataColumn dataColumn in dataColumns) {
                 widget.dataColumnController.data.remove(dataColumn);
+                dataSourceController.current.value?.dataStore?.run(Sql(
+                    'alter table ${dataTable.name} drop column ${dataColumn.name};'));
               }
             },
             icon: Icon(Icons.remove, color: myself.primary)),
         IconButton(
             tooltip: AppLocalizations.t('Edit column'),
             onPressed: () {
+              data_source.DataTable dataTable = rxDataTable.value!;
+              if (dataTable.name == null) {
+                DialogUtil.error(content: 'Please input table name');
+                return;
+              }
               rxDataColumn.value = widget.dataColumnController.current;
               indexWidgetProvider.push('data_column_edit');
             },
@@ -277,7 +301,20 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
         IconButton(
             tooltip: AppLocalizations.t('New index'),
             onPressed: () {
+              data_source.DataTable dataTable = rxDataTable.value!;
+              if (dataTable.name == null) {
+                DialogUtil.error(content: 'Please input table name');
+                return;
+              }
+              String? columnNames = _getCheckedColumnNames();
+              if (columnNames == null) {
+                DialogUtil.error(content: 'Please choose column of index');
+                return;
+              }
               data_source.DataIndex dataIndex = data_source.DataIndex();
+              dataIndex.name = '${dataTable.name}_${columnNames}_index';
+              dataIndex.columnNames = columnNames;
+              widget.dataColumnController.setCheckAll(false);
               rxDataIndex.value = dataIndex;
               widget.dataIndexController.data.add(dataIndex);
               widget.dataIndexController.setCurrentIndex =
@@ -291,6 +328,11 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
         IconButton(
             tooltip: AppLocalizations.t('Delete index'),
             onPressed: () {
+              data_source.DataTable dataTable = rxDataTable.value!;
+              if (dataTable.name == null) {
+                DialogUtil.error(content: 'Please input table name');
+                return;
+              }
               List<data_source.DataIndex> dataIndexes =
                   widget.dataIndexController.checked;
               if (dataIndexes.isEmpty) {
@@ -298,12 +340,19 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
               }
               for (data_source.DataIndex dataIndex in dataIndexes) {
                 widget.dataIndexController.data.remove(dataIndex);
+                dataSourceController.current.value?.dataStore
+                    ?.run(Sql('drop index ${dataIndex.name}'));
               }
             },
             icon: Icon(Icons.remove, color: myself.primary)),
         IconButton(
             tooltip: AppLocalizations.t('Edit index'),
             onPressed: () {
+              data_source.DataTable dataTable = rxDataTable.value!;
+              if (dataTable.name == null) {
+                DialogUtil.error(content: 'Please input table name');
+                return;
+              }
               rxDataIndex.value = widget.dataIndexController.current;
               indexWidgetProvider.push('data_index_edit');
             },
@@ -321,7 +370,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
     if (tableName == null) {
       return null;
     }
-    String sql = 'create table "$tableName"\n';
+    String sql = 'create table $tableName\n';
     sql += '(\n';
     List<data_source.DataColumn> dataColumns = widget.dataColumnController.data;
     if (dataColumns.isNotEmpty) {
@@ -330,7 +379,12 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
         data_source.DataColumn dataColumn = dataColumns[i];
         String columnName = dataColumn.name!;
         String dataType = dataColumn.dataType!;
-        sql += '    $columnName   $dataType,\n';
+        bool? notNull = dataColumn.notNull;
+        if (notNull != null && notNull) {
+          sql += '    $columnName   $dataType not null,\n';
+        } else {
+          sql += '    $columnName   $dataType,\n';
+        }
         if (dataColumn.isKey != null && dataColumn.isKey!) {
           if (keyColumns.isEmpty) {
             keyColumns += columnName;
@@ -340,7 +394,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
         }
       }
       if (keyColumns.isNotEmpty) {
-        sql += '    constraint "${tableName}_pk"\n';
+        sql += '    constraint ${tableName}_pk\n';
         sql += '    primary key($keyColumns)\n';
       }
     }
@@ -358,10 +412,10 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
     List<data_source.DataIndex> dataIndexes = widget.dataIndexController.data;
     if (dataIndexes.isNotEmpty) {
       for (var dataIndex in dataIndexes) {
-        String columnName = dataIndex.name!;
+        String indexName = dataIndex.name!;
         String columnNames = dataIndex.columnNames!;
-        sql += 'create index "${tableName}_${columnName}_index"\n';
-        sql += 'on "$tableName"($columnNames);\n';
+        sql += 'create index $indexName\n';
+        sql += 'on $tableName($columnNames);\n';
       }
     }
     return sql;
@@ -414,20 +468,26 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
   Widget _buildDataIndexesWidget(BuildContext context) {
     return Obx(() {
       final List<TileData> tiles = [];
-      for (DataIndex dataIndex in widget.dataIndexController.data) {
+      for (int i = 0; i < widget.dataIndexController.data.length; ++i) {
+        DataIndex dataIndex = widget.dataIndexController.data[i];
         String titleTail = '';
         if (dataIndex.isUnique != null && dataIndex.isUnique!) {
           titleTail = 'Unique';
         }
         tiles.add(TileData(
-          prefix: Icon(
-            Icons.content_paste_search,
-            color: myself.primary,
-          ),
-          title: dataIndex.name ?? '',
-          titleTail: titleTail,
-          subtitle: dataIndex.columnNames ?? '',
-        ));
+            prefix: Icon(
+              Icons.content_paste_search,
+              color: myself.primary,
+            ),
+            title: dataIndex.name ?? '',
+            titleTail: titleTail,
+            subtitle: dataIndex.columnNames ?? '',
+            selected: widget.dataIndexController.currentIndex.value == i
+                ? true
+                : false,
+            onTap: (int index, String label, {String? subtitle}) {
+              widget.dataIndexController.currentIndex.value = index;
+            }));
       }
 
       return DataListView(
