@@ -13,6 +13,10 @@ import 'package:flutter_highlight/themes/idea.dart';
 import 'package:get/get.dart';
 import 'package:highlight/languages/sql.dart';
 
+final codeController = CodeController(
+  language: sql,
+);
+
 class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
   QueryConsoleEditorWidget({super.key});
 
@@ -27,10 +31,6 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'QueryConsoleEditor';
-
-  final codeController = CodeController(
-    language: sql,
-  );
 
   final DataListController<Map<String, dynamic>> queryResultController =
       DataListController<Map<String, dynamic>>();
