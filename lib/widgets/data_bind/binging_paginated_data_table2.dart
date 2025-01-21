@@ -1,5 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/tool/pagination_util.dart';
 import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:flutter/material.dart';
@@ -91,6 +92,8 @@ class BindingPager extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    int currentPage = PaginationUtil.getCurrentPage(
+        controller.offset.value, controller.limit.value);
     return Container(
       alignment: Alignment.centerLeft,
       child: Row(
@@ -104,12 +107,13 @@ class BindingPager extends StatelessWidget {
               tooltip: AppLocalizations.t('Previous'),
               onPressed: () => controller.previous(),
               icon: const Icon(Icons.chevron_left_sharp)),
+          Text('$currentPage'),
           // DropdownButton<int>(
           //     onChanged: (v) {
-          //       widget.controller.limit = v!;
+          //       controller.limit.value = v!;
           //     },
-          //     value: _availableSizes.contains(widget.controller.limit)
-          //         ? widget.controller.limit
+          //     value: _availableSizes.contains(controller.limit.value)
+          //         ? controller.limit.value
           //         : _availableSizes[0],
           //     items: _availableSizes
           //         .map((s) => DropdownMenuItem<int>(
