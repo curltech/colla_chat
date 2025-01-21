@@ -4,6 +4,7 @@ import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_controller.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -110,7 +111,6 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
         rightWidgets: [
           IconButton(
               onPressed: () async {
-                String sql = codeController.fullText;
                 DataSource? current = dataSourceController.current.value;
                 if (current == null) {
                   return;
@@ -119,10 +119,14 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
                 if (dataStore == null) {
                   return;
                 }
-                List<Map<String, dynamic>>? data =
-                    await queryResultController.findData();
-                if (data != null) {
-                  queryResultController.data.assignAll(data);
+                try {
+                  List<Map<String, dynamic>>? data =
+                      await queryResultController.findData();
+                  if (data != null) {
+                    queryResultController.data.assignAll(data);
+                  }
+                } catch (e) {
+                  DialogUtil.error(content: 'execute sql failure:$e');
                 }
               },
               icon: Icon(
