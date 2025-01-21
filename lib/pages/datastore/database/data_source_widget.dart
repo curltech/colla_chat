@@ -54,10 +54,23 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
 
   /// 单击表示编辑属性
   void _onTap(BuildContext context, ExplorableNode node) {
-    if (node is DataSourceNode) {}
-    if (node is DataTableNode) {}
-    if (node is DataColumnNode) {}
-    if (node is DataIndexNode) {}
+    dataSourceController.currentNode.value = node;
+    TreeNode? dataSourceNode;
+    if (node is DataSourceNode) {
+      dataSourceNode = node;
+    } else if (node is DataTableNode) {
+      dataSourceNode = node.parent?.parent as DataSourceNode;
+    } else if (node is DataColumnNode || node is DataIndexNode) {
+      dataSourceNode = node.parent?.parent?.parent?.parent as DataSourceNode;
+    } else if (node is FolderNode) {
+      String? name = node.data?.name;
+      if (name == 'tables') {
+        dataSourceNode = node.parent as DataSourceNode;
+      } else {
+        dataSourceNode = node.parent?.parent?.parent as DataSourceNode;
+      }
+    }
+    dataSourceController.current.value = dataSourceNode?.data;
   }
 
   /// 长按表示进一步的操作
@@ -118,14 +131,12 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
         DataTableNode dataTableNode = DataTableNode(data: dataTable);
         rxDataTable.value = dataTableNode.data;
         indexWidgetProvider.push('data_table_edit');
-      }
-      if ('columns' == node.data!.name) {
+      } else if ('columns' == node.data!.name) {
         data_source.DataColumn dataColumn = data_source.DataColumn();
         DataColumnNode dataColumnNode = DataColumnNode(data: dataColumn);
         rxDataColumn.value = dataColumnNode.data;
         indexWidgetProvider.push('data_column_edit');
-      }
-      if ('indexes' == node.data!.name) {
+      } else if ('indexes' == node.data!.name) {
         data_source.DataIndex dataIndex = data_source.DataIndex();
         DataIndexNode dataIndexNode = DataIndexNode(data: dataIndex);
         rxDataIndex.value = dataIndexNode.data;
@@ -141,16 +152,14 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
       if (confirm != null && confirm) {
         dataSourceController.deleteDataSource(node: node);
       }
-    }
-    if (node is DataTableNode) {
+    } else if (node is DataTableNode) {
       bool? confirm = await DialogUtil.confirm(
           content: 'Do you confirm delete selected data table node?');
       if (confirm != null && confirm) {
         dataSourceController.current.value?.dataStore
             ?.run(Sql('drop table ${node.data?.name}'));
       }
-    }
-    if (node is DataColumnNode) {
+    } else if (node is DataColumnNode) {
       bool? confirm = await DialogUtil.confirm(
           content: 'Do you confirm delete selected data column node?');
       if (confirm != null && confirm) {
@@ -158,8 +167,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
         dataSourceController.current.value?.dataStore?.run(Sql(
             'alter table ${dataTableNode.data.name} drop column ${node.data?.name};'));
       }
-    }
-    if (node is DataIndexNode) {
+    } else if (node is DataIndexNode) {
       bool? confirm = await DialogUtil.confirm(
           content: 'Do you confirm delete selected data index node?');
       if (confirm != null && confirm) {
@@ -173,16 +181,13 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     if (node is DataSourceNode) {
       rxDataSource.value = node.data;
       indexWidgetProvider.push('data_source_edit');
-    }
-    if (node is DataTableNode) {
+    } else if (node is DataTableNode) {
       rxDataTable.value = node.data;
       indexWidgetProvider.push('data_table_edit');
-    }
-    if (node is DataColumnNode) {
+    } else if (node is DataColumnNode) {
       rxDataColumn.value = node.data;
       indexWidgetProvider.push('data_column_edit');
-    }
-    if (node is DataIndexNode) {
+    } else if (node is DataIndexNode) {
       rxDataIndex.value = node.data;
       indexWidgetProvider.push('data_index_edit');
     }
@@ -192,11 +197,10 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     if (node is data_source.DataSourceNode) {
       dataSourceController.current.value = node.data;
       indexWidgetProvider.push('query_console_editor');
-    }
-    if (node is DataTableNode) {
+    } else if (node is DataTableNode) {
       rxDataTable.value = node.data;
       codeController.text = 'select * from ${rxDataTable.value!.name}';
-      indexWidgetProvider.push('data_table_edit');
+      indexWidgetProvider.push('query_console_editor');
     }
   }
 
@@ -292,6 +296,13 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
         },
         builder: (context, ExplorableNode node) {
           return Obx(() {
+            bool selected = false;
+            if (node is DataSourceNode) {
+              selected = dataSourceController.current.value == node.data;
+            }
+            if (!selected) {
+              selected = dataSourceController.currentNode.value == node;
+            }
             TileData tileData = TileData(
               title: node.data?.name ?? "/",
               titleTail: node is DataColumnNode
@@ -299,12 +310,8 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
                   : node.length.toString(),
               dense: true,
               prefix: node.icon,
-              selected: dataSourceController.currentNode.value == node,
+              selected: selected,
               onTap: (int index, String label, {String? subtitle}) {
-                dataSourceController.currentNode.value = node;
-                if (node is DataSourceNode) {
-                  dataSourceController.current.value = node.data;
-                }
                 _onTap(context, node);
               },
               onLongPress: (int index, String label, {String? subtitle}) {

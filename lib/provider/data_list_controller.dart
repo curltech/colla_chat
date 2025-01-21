@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/pagination_util.dart';
@@ -202,6 +204,12 @@ class DataPageController<T> extends DataListController<T> {
 
   DataPageController();
 
+  setCount() {}
+
+  FutureOr<List<T>?> findData() async {
+    return null;
+  }
+
   reset() {
     sortColumnName(null);
     sortColumnIndex(null);
@@ -212,35 +220,55 @@ class DataPageController<T> extends DataListController<T> {
     data.clear();
   }
 
-  previous() {
+  previous() async {
     if (offset.value >= limit.value) {
       offset(offset.value - limit.value);
+
+      List<T>? items = await findData();
+      items ??= [];
+      data.assignAll(items);
     }
   }
 
-  next() {
-    if (offset.value + limit.value <= count.value) {
+  next() async {
+    if (count.value == 0 || offset.value + limit.value <= count.value) {
       offset(offset.value + limit.value);
+
+      List<T>? items = await findData();
+      items ??= [];
+      data.assignAll(items);
     }
   }
 
-  first() {
+  first() async {
     if (offset.value != 0) {
       offset(0);
+
+      List<T>? items = await findData();
+      items ??= [];
+      data.assignAll(items);
     }
   }
 
-  last() {
+  last() async {
     int pageCount = PaginationUtil.getPageCount(count.value, limit.value);
-    if (pageCount > 0) {
+    if (count.value == 0 || pageCount > 0) {
       offset((pageCount - 1) * limit.value);
+
+      List<T>? items = await findData();
+      items ??= [];
+      data.assignAll(items);
     }
   }
 
-  movePage(int index) {
+  movePage(int index) async {
     int currentPage = PaginationUtil.getCurrentPage(offset.value, limit.value);
     if (currentPage != index) {
       offset(index * limit.value);
+
+      List<T>? items = await findData();
+      items ??= [];
+      data.assignAll(items);
     }
   }
 }

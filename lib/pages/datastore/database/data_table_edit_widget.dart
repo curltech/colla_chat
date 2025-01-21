@@ -62,12 +62,12 @@ class DataTableEditWidget extends StatefulWidget with TileDataMixin {
   State<StatefulWidget> createState() => _DataTableEditWidgetState();
 
   _buildDataColumns() async {
-    data_source.DataTable dataTable = rxDataTable.value!;
-    if (dataTable.name == null) {
+    data_source.DataTable? dataTable = rxDataTable.value;
+    if (dataTable?.name == null) {
       return null;
     }
     List<data_source.DataColumn>? dataColumns =
-        await dataSourceController.findColumns(dataTable.name!);
+        await dataSourceController.findColumns(dataTable!.name!);
     if (dataColumns == null) {
       return null;
     }
@@ -75,12 +75,12 @@ class DataTableEditWidget extends StatefulWidget with TileDataMixin {
   }
 
   _buildDataIndexes() async {
-    data_source.DataTable dataTable = rxDataTable.value!;
-    if (dataTable.name == null) {
+    data_source.DataTable? dataTable = rxDataTable.value;
+    if (dataTable?.name == null) {
       return null;
     }
     List<data_source.DataIndex>? dataIndexes =
-        await dataSourceController.findIndexes(dataTable.name!);
+        await dataSourceController.findIndexes(dataTable!.name!);
     if (dataIndexes == null) {
       return null;
     }

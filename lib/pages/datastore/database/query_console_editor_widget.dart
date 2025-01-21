@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_controller.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart';
@@ -5,7 +7,7 @@ import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
+import 'package:colla_chat/widgets/data_bind/binging_paginated_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_code_editor/flutter_code_editor.dart';
@@ -16,6 +18,25 @@ import 'package:highlight/languages/sql.dart';
 final codeController = CodeController(
   language: sql,
 );
+
+class QueryResultController extends DataPageController<Map<String, dynamic>> {
+  @override
+  FutureOr<List<Map<String, dynamic>>?> findData() async {
+    String sql = codeController.text;
+    DataSource? current = dataSourceController.current.value;
+    if (current == null) {
+      return null;
+    }
+    DataStore? dataStore = current.dataStore;
+    if (dataStore == null) {
+      return null;
+    }
+    List<Map<String, dynamic>> data = await dataStore.select(
+        'select * from ($sql) limit ${limit.value} offset ${offset.value}');
+
+    return data;
+  }
+}
 
 class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
   QueryConsoleEditorWidget({super.key});
@@ -32,8 +53,7 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'QueryConsoleEditor';
 
-  final DataListController<Map<String, dynamic>> queryResultController =
-      DataListController<Map<String, dynamic>>();
+  final QueryResultController queryResultController = QueryResultController();
 
   Widget _buildQueryResultListView(BuildContext context) {
     return Obx(() {
@@ -69,7 +89,7 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
           ));
         }
       }
-      return BindingDataTable2<Map<String, dynamic>>(
+      return BindingPaginatedDataTable2<Map<String, dynamic>>(
         key: UniqueKey(),
         showCheckboxColumn: false,
         horizontalMargin: 0.0,
@@ -83,6 +103,7 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
+    queryResultController.replaceAll([]);
     return AppBarView(
         withLeading: true,
         title: title,
@@ -98,9 +119,11 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
                 if (dataStore == null) {
                   return;
                 }
-                List<Map<String, dynamic>> data =
-                    await dataStore.select('select * from ($sql) limit 10');
-                queryResultController.data.value = data;
+                List<Map<String, dynamic>>? data =
+                    await queryResultController.findData();
+                if (data != null) {
+                  queryResultController.data.assignAll(data);
+                }
               },
               icon: Icon(
                 Icons.run_circle_outlined,

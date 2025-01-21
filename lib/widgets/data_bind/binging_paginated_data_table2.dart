@@ -39,7 +39,7 @@ class BindingPaginatedDataTable2<T> extends StatelessWidget {
     return BindingDataTable2(
       key: UniqueKey(),
       dataRowHeight: dataRowHeight,
-      minWidth: minWidth ?? 2000,
+      minWidth: minWidth,
       showCheckboxColumn: showCheckboxColumn,
       horizontalMargin: horizontalMargin,
       columnSpacing: columnSpacing,

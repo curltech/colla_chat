@@ -18,6 +18,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class PerformanceDataPageController extends DataPageController<Performance> {
+  PerformanceDataPageController();
+
   @override
   sort<S>(Comparable<S>? Function(Performance t) getFieldValue, int columnIndex,
       String columnName, bool ascending) {
