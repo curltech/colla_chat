@@ -192,7 +192,7 @@ class DataListController<T> {
 
 /// 分页数据控制器，记录了分页的信息
 /// 页面迁移时，其中的数组的数据被换掉
-class DataPageController<T> extends DataListController<T> {
+abstract class DataPageController<T> extends DataListController<T> {
   ///总行数
   final RxInt count = 0.obs;
 
