@@ -1,4 +1,5 @@
 import 'package:animated_tree_view/animated_tree_view.dart';
+import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/datastore/database/data_column_edit_widget.dart';
 import 'package:colla_chat/pages/datastore/database/data_index_edit_widget.dart';
@@ -62,21 +63,34 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
   /// 长按表示进一步的操作
   Future<void> _onLongPress(BuildContext context, ExplorableNode node) async {
     List<ActionData> popActionData = [];
-
-    popActionData.add(
-        ActionData(label: 'New', tooltip: 'New', icon: const Icon(Icons.add)));
     popActionData.add(ActionData(
-        label: 'Delete', tooltip: 'Delete', icon: const Icon(Icons.remove)));
+        label: 'New',
+        tooltip: 'New',
+        icon: Icon(
+          Icons.add,
+          color: myself.primary,
+        )));
     popActionData.add(ActionData(
-        label: 'Edit', tooltip: 'Edit', icon: const Icon(Icons.edit)));
+        label: 'Delete',
+        tooltip: 'Delete',
+        icon: Icon(
+          Icons.remove,
+          color: myself.primary,
+        )));
     popActionData.add(ActionData(
-        label: 'Edit data',
-        tooltip: 'Edit data',
-        icon: const Icon(Icons.dataset)));
-    if (node is DataSourceNode) {}
-    if (node is DataTableNode) {}
-    if (node is DataColumnNode) {}
-    if (node is DataIndexNode) {}
+        label: 'Edit',
+        tooltip: 'Edit',
+        icon: Icon(
+          Icons.edit,
+          color: myself.primary,
+        )));
+    popActionData.add(ActionData(
+        label: 'Query',
+        tooltip: 'Query',
+        icon: Icon(
+          Icons.search_outlined,
+          color: myself.primary,
+        )));
 
     await MenuUtil.showPopMenu(
       context,
@@ -95,14 +109,6 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     DataSourceNode dataSourceNode = DataSourceNode(data: dataSource);
     rxDataSource.value = dataSourceNode.data;
     indexWidgetProvider.push('data_source_edit');
-  }
-
-  _deleteDataSource({DataSourceNode? node}) async {
-    bool? confirm = await DialogUtil.confirm(
-        content: 'Do you confirm delete selected data source node?');
-    if (confirm != null && confirm) {
-      dataSourceController.deleteDataSource(node: node);
-    }
   }
 
   void _add(ExplorableNode node) {
@@ -128,36 +134,93 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
+  Future<void> _delete(ExplorableNode node) async {
+    if (node is DataSourceNode) {
+      bool? confirm = await DialogUtil.confirm(
+          content: 'Do you confirm delete selected data source node?');
+      if (confirm != null && confirm) {
+        dataSourceController.deleteDataSource(node: node);
+      }
+    }
+    if (node is DataTableNode) {
+      bool? confirm = await DialogUtil.confirm(
+          content: 'Do you confirm delete selected data table node?');
+      if (confirm != null && confirm) {
+        dataSourceController.current.value?.dataStore
+            ?.run(Sql('drop table ${node.data?.name}'));
+      }
+    }
+    if (node is DataColumnNode) {
+      bool? confirm = await DialogUtil.confirm(
+          content: 'Do you confirm delete selected data column node?');
+      if (confirm != null && confirm) {
+        TreeNode dataTableNode = node.parent?.parent as TreeNode;
+        dataSourceController.current.value?.dataStore?.run(Sql(
+            'alter table ${dataTableNode.data.name} drop column ${node.data?.name};'));
+      }
+    }
+    if (node is DataIndexNode) {
+      bool? confirm = await DialogUtil.confirm(
+          content: 'Do you confirm delete selected data index node?');
+      if (confirm != null && confirm) {
+        dataSourceController.current.value?.dataStore
+            ?.run(Sql('drop index ${node.data?.name}'));
+      }
+    }
+  }
+
+  void _edit(ExplorableNode node) {
+    if (node is DataSourceNode) {
+      rxDataSource.value = node.data;
+      indexWidgetProvider.push('data_source_edit');
+    }
+    if (node is DataTableNode) {
+      rxDataTable.value = node.data;
+      indexWidgetProvider.push('data_table_edit');
+    }
+    if (node is DataColumnNode) {
+      rxDataColumn.value = node.data;
+      indexWidgetProvider.push('data_column_edit');
+    }
+    if (node is DataIndexNode) {
+      rxDataIndex.value = node.data;
+      indexWidgetProvider.push('data_index_edit');
+    }
+  }
+
+  void _query(ExplorableNode node) {
+    if (node is data_source.DataSourceNode) {
+      dataSourceController.current.value = node.data;
+      indexWidgetProvider.push('query_console_editor');
+    }
+    if (node is DataTableNode) {
+      rxDataTable.value = node.data;
+      codeController.text = 'select * from ${rxDataTable.value!.name}';
+      indexWidgetProvider.push('data_table_edit');
+    }
+  }
+
   _onPopAction(
       BuildContext context, ExplorableNode node, int index, String label,
       {String? value}) async {
     switch (label) {
       case 'New':
         _add(node);
+        break;
       case 'Delete':
+        _delete(node);
+        break;
       case 'Edit':
-        if (node is DataSourceNode) {
-          rxDataSource.value = node.data;
-          indexWidgetProvider.push('data_source_edit');
-        }
-        if (node is DataTableNode) {
-          rxDataTable.value = node.data;
-          indexWidgetProvider.push('data_table_edit');
-        }
-        if (node is DataColumnNode) {
-          rxDataColumn.value = node.data;
-          indexWidgetProvider.push('data_column_edit');
-        }
-        if (node is DataIndexNode) {
-          rxDataIndex.value = node.data;
-          indexWidgetProvider.push('data_index_edit');
-        }
-      case 'Edit data':
+        _edit(node);
+        break;
+      case 'Query':
+        _query(node);
+        break;
       default:
     }
   }
 
-  Widget _buildButtonWidget(BuildContext context) {
+  Widget _buildDataSourceButtonWidget(BuildContext context) {
     return OverflowBar(
       alignment: MainAxisAlignment.start,
       children: [
@@ -172,8 +235,12 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
             )),
         IconButton(
             tooltip: AppLocalizations.t('Delete data source'),
-            onPressed: () {
-              _deleteDataSource();
+            onPressed: () async {
+              bool? confirm = await DialogUtil.confirm(
+                  content: 'Do you confirm delete current data source node?');
+              if (confirm != null && confirm) {
+                dataSourceController.deleteDataSource();
+              }
             },
             icon: Icon(
               Icons.remove,
@@ -261,7 +328,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      _buildButtonWidget(context),
+      _buildDataSourceButtonWidget(context),
       Expanded(child: _buildTreeView(context)),
     ]);
   }

@@ -312,7 +312,8 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
                 return;
               }
               data_source.DataIndex dataIndex = data_source.DataIndex();
-              dataIndex.name = '${dataTable.name}_${columnNames}_index';
+              dataIndex.name =
+                  '${dataTable.name}_${columnNames.replaceAll(',', '_')}_index';
               dataIndex.columnNames = columnNames;
               widget.dataColumnController.setCheckAll(false);
               rxDataIndex.value = dataIndex;
