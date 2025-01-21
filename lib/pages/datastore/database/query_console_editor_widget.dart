@@ -92,7 +92,7 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
       return BindingPaginatedDataTable2<Map<String, dynamic>>(
         key: UniqueKey(),
         showCheckboxColumn: false,
-        horizontalMargin: 0.0,
+        horizontalMargin: 10.0,
         columnSpacing: 0.0,
         platformDataColumns: queryResultDataColumns,
         controller: queryResultController,
