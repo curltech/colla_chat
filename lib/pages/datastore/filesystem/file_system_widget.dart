@@ -122,6 +122,9 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
           thickness: 1,
           offset: Offset(12, 0),
         ),
+        onTreeReady: (controller) {
+          fileSystemController.treeViewController = controller;
+        },
         builder: (context, ExplorableNode node) {
           return Obx(() {
             bool selected = false;
@@ -151,7 +154,14 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
           });
         },
         onItemTap: (ExplorableNode node) {
-          _onTap(context, node);
+          if (node.isExpanded) {
+            fileSystemController.treeViewController?.collapseNode(node);
+          } else {
+            fileSystemController.treeViewController?.expandAllChildren(node);
+          }
+          if (node.length == 0) {
+            fileSystemController.findDirectory(node as FolderNode);
+          }
         });
   }
 }
