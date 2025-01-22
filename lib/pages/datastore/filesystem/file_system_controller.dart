@@ -28,27 +28,28 @@ class FileSystemController {
     clear();
     Directory? applicationDirectory = await PathUtil.getApplicationDirectory();
     if (applicationDirectory != null) {
-      addDirectory(applicationDirectory);
+      addDirectory('applicationDirectory', applicationDirectory);
     }
     Directory applicationDocumentsDirectory =
         await PathUtil.getApplicationDocumentsDirectory();
-    addDirectory(applicationDocumentsDirectory);
+    addDirectory(
+        'applicationDocumentsDirectory', applicationDocumentsDirectory);
     Directory applicationSupportDirectory =
         await PathUtil.getApplicationSupportDirectory();
-    addDirectory(applicationSupportDirectory);
+    addDirectory('applicationSupportDirectory', applicationSupportDirectory);
 
     Directory? downloadsDirectory = await PathUtil.getDownloadsDirectory();
     if (downloadsDirectory != null) {
-      addDirectory(downloadsDirectory);
+      addDirectory('downloadsDirectory', downloadsDirectory);
     }
     Directory libraryDirectory = await PathUtil.getLibraryDirectory();
-    addDirectory(libraryDirectory);
+    addDirectory('libraryDirectory', libraryDirectory);
     Directory temporaryDirectory = await PathUtil.getTemporaryDirectory();
-    addDirectory(temporaryDirectory);
+    addDirectory('temporaryDirectory', temporaryDirectory);
     Directory? externalStorageDirectory =
         await PathUtil.getExternalStorageDirectory();
     if (externalStorageDirectory != null) {
-      addDirectory(externalStorageDirectory);
+      addDirectory('externalStorageDirectory', externalStorageDirectory);
     }
 
     List<ListenableNode> children = root.childrenAsList;
@@ -57,8 +58,8 @@ class FileSystemController {
     }
   }
 
-  FolderNode addDirectory(Directory directory) {
-    Folder folder = Folder(name: directory.path, directory: directory);
+  FolderNode addDirectory(String name, Directory directory) {
+    Folder folder = Folder(name: name, directory: directory);
     FolderNode folderNode = FolderNode(data: folder);
     root.add(folderNode);
     rootFolders[folder.name!] = folderNode;
