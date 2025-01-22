@@ -75,6 +75,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
 
   /// 长按表示进一步的操作
   Future<void> _onLongPress(BuildContext context, ExplorableNode node) async {
+    dataSourceController.currentNode.value = node;
     List<ActionData> popActionData = [];
     popActionData.add(ActionData(
         label: 'New',
