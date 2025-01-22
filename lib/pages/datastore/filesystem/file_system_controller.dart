@@ -26,6 +26,19 @@ class FileSystemController {
 
   init() async {
     clear();
+    initMac();
+    List<ListenableNode> children = root.childrenAsList;
+    for (var node in children) {
+      treeViewController?.collapseNode(node as ITreeNode);
+    }
+  }
+
+  initMac() {
+    Directory root = Directory('/');
+    addDirectory('/', root);
+  }
+
+  initMobile() async {
     Directory? applicationDirectory = await PathUtil.getApplicationDirectory();
     if (applicationDirectory != null) {
       addDirectory('applicationDirectory', applicationDirectory);
@@ -50,11 +63,6 @@ class FileSystemController {
         await PathUtil.getExternalStorageDirectory();
     if (externalStorageDirectory != null) {
       addDirectory('externalStorageDirectory', externalStorageDirectory);
-    }
-
-    List<ListenableNode> children = root.childrenAsList;
-    for (var node in children) {
-      treeViewController?.collapseNode(node as ITreeNode);
     }
   }
 
