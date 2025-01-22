@@ -64,6 +64,12 @@ class DataSchema extends Explorable {
   }
 }
 
+class Folder extends Explorable {
+  Folder({super.name});
+}
+
+typedef FolderNode = TreeNode<Folder>;
+
 class Database extends Explorable {
   Database({super.name});
 

@@ -9,7 +9,6 @@ import 'package:colla_chat/pages/datastore/database/data_source_node.dart';
 import 'package:colla_chat/pages/datastore/database/data_table_edit_widget.dart';
 import 'package:colla_chat/pages/datastore/database/query_console_editor_widget.dart';
 import 'package:colla_chat/pages/datastore/explorable_node.dart';
-import 'package:colla_chat/pages/datastore/filesystem/file_node.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -382,17 +381,6 @@ extension on ExplorableNode {
 
     if (this is DataIndexNode) {
       return Icon(Icons.content_paste_search, color: myself.primary);
-    }
-
-    if (this is FileNode) {
-      final file = data as File;
-      if (file.mimeType.startsWith("image")) {
-        return Icon(Icons.image, color: myself.primary);
-      }
-      if (file.mimeType.startsWith("video")) {
-        return Icon(Icons.video_file, color: myself.primary);
-      }
-      return Icon(Icons.file_open_outlined, color: myself.primary);
     }
 
     if (isExpanded) {

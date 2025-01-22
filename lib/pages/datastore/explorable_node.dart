@@ -22,9 +22,3 @@ abstract class Explorable {
 }
 
 typedef ExplorableNode = TreeNode<Explorable>;
-
-class Folder extends Explorable {
-  Folder({super.name});
-}
-
-typedef FolderNode = TreeNode<Folder>;

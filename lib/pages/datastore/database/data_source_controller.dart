@@ -58,7 +58,7 @@ class DataSourceController {
       await addDataSource(dataSource);
     }
 
-    List<ListenableNode> children = dataSourceController.root.childrenAsList;
+    List<ListenableNode> children = root.childrenAsList;
     for (var node in children) {
       treeViewController?.collapseNode(node as ITreeNode);
     }
