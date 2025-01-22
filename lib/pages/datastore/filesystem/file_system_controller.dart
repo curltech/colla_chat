@@ -99,7 +99,7 @@ class FileSystemController {
       if (fileSystemEntityType == FileSystemEntityType.directory) {
         FolderNode node = FolderNode(
             data: Folder(
-                name: fileSystemEntity.path,
+                name: PathUtil.basename(fileSystemEntity.path),
                 directory: fileSystemEntity as Directory));
         folderNode.add(node);
       }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:colla_chat/platform.dart';
 import 'package:path_provider/path_provider.dart' as path;
+import 'package:path/path.dart' as p;
 
 class PathUtil {
   ///获取本应用的数据存放路径
@@ -107,5 +108,17 @@ class PathUtil {
       }
     }
     return matches;
+  }
+
+  static String basename(String path) {
+    return p.basename(path);
+  }
+
+  static String extension(String path) {
+    return p.extension(path);
+  }
+
+  static String dirname(String path) {
+    return p.dirname(path);
   }
 }
