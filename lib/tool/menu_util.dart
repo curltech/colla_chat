@@ -1,3 +1,4 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -60,7 +61,10 @@ class MenuUtil {
           onPressed}) async {
     List<MenuItemProvider> items = [];
     for (var action in actions) {
-      items.add(MenuItem(title: action.label, image: action.icon));
+      items.add(MenuItem(
+          title: AppLocalizations.t(action.label),
+          userInfo: action.label,
+          image: action.icon));
     }
     PopupMenu menu = PopupMenu(
       context: context,
@@ -79,7 +83,7 @@ class MenuUtil {
       items: items,
       onClickMenu: (MenuItemProvider item) {
         if (onPressed != null) {
-          onPressed(context, 0, item.menuTitle);
+          onPressed(context, 0, item.menuUserInfo);
         }
       },
       onShow: () {},

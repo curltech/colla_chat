@@ -149,9 +149,13 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
                 String? sql = _buildSql();
 
                 if (sql != null) {
-                  var result = dataSourceController.current.value?.dataStore
-                      ?.run(Sql(sql));
-                  logger.i('execute sql result:$result');
+                  try {
+                    dataSourceController.current.value?.dataStore
+                        ?.run(Sql(sql));
+                  } catch (e) {
+                    DialogUtil.error(
+                        content: AppLocalizations.t('execute sql failure:$e'));
+                  }
                 }
               })
         ],
