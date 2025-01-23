@@ -126,11 +126,9 @@ class DataSourceController {
 
         FolderNode columnFolderNode = FolderNode(data: Folder(name: 'columns'));
         dataTableNode.add(columnFolderNode);
-        updateColumnNodes(name, columnFolderNode);
 
         FolderNode indexFolderNode = FolderNode(data: Folder(name: 'indexes'));
         dataTableNode.add(indexFolderNode);
-        updateIndexNodes(name, indexFolderNode);
       }
     }
   }

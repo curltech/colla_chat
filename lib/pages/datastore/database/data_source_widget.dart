@@ -117,6 +117,22 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     );
   }
 
+  void _onItemTap(BuildContext context, ExplorableNode node) {
+    if (node is FolderNode) {
+      String? tableName = (node.parent as TreeNode).data.name;
+      String? name = node.data?.name;
+      if (name == 'columns') {
+        if (node.length == 0) {
+          dataSourceController.updateColumnNodes(tableName!, node);
+        }
+      } else if (name == 'indexes') {
+        if (node.length == 0) {
+          dataSourceController.updateIndexNodes(tableName!, node);
+        }
+      }
+    }
+  }
+
   void _addDataSource(String sourceType) {
     DataSource dataSource = DataSource(sourceType: sourceType);
     DataSourceNode dataSourceNode = DataSourceNode(data: dataSource);
@@ -328,7 +344,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
           });
         },
         onItemTap: (ExplorableNode node) {
-          _onTap(context, node);
+          _onItemTap(context, node);
         });
   }
 

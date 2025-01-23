@@ -154,11 +154,6 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
           });
         },
         onItemTap: (ExplorableNode node) {
-          if (node.isExpanded) {
-            fileSystemController.treeViewController?.collapseNode(node);
-          } else {
-            fileSystemController.treeViewController?.expandAllChildren(node);
-          }
           if (node.length == 0) {
             fileSystemController.findDirectory(node as FolderNode);
           }
