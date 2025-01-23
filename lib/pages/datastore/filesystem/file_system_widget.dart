@@ -3,7 +3,9 @@ import 'package:colla_chat/pages/datastore/explorable_node.dart';
 import 'package:colla_chat/pages/datastore/filesystem/file_node.dart';
 import 'package:colla_chat/pages/datastore/filesystem/file_system_controller.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -11,7 +13,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-/// 数据存储管理功能主页面，带有路由回调函数
+/// 文件管理功能主页面，带有路由回调函数
 class FileSystemWidget extends StatelessWidget with TileDataMixin {
   FileSystemWidget({super.key});
 
@@ -35,6 +37,7 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
       folderNode = node;
     }
     fileSystemController.current.value = folderNode?.data;
+    indexWidgetProvider.push('file');
   }
 
   /// 长按表示进一步的操作
@@ -155,7 +158,11 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
         },
         onItemTap: (ExplorableNode node) {
           if (node.length == 0) {
-            fileSystemController.findDirectory(node as FolderNode);
+            try {
+              fileSystemController.findDirectory(node as FolderNode);
+            } catch (e) {
+              DialogUtil.error(content: 'list directory failure:$e');
+            }
           }
         });
   }
@@ -176,22 +183,6 @@ extension on ExplorableNode {
         Icons.folder,
         color: myself.primary,
       );
-    }
-
-    if (this is FileNode) {
-      final file = data as File;
-      if (file.mimeType.startsWith("image")) {
-        return Icon(
-          Icons.image,
-          color: myself.primary,
-        );
-      }
-      if (file.mimeType.startsWith("video")) {
-        return Icon(
-          Icons.video_file,
-          color: myself.primary,
-        );
-      }
     }
 
     return Icon(

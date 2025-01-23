@@ -926,5 +926,16 @@
   "NotNull": "不可为空",
   "AutoIncrement": "自动增长",
   "isUnique": "唯一",
-  "ColumnNames": "列名"
+  "ColumnNames": "列名",
+  "Application Directory": "应用目录",
+  "Application Documents Directory": "应用文档目录",
+  "Application Support Directory": "应用支持目录",
+  "Downloads Directory": "下载目录",
+  "Library Directory": "库目录",
+  "Temporary Directory": "临时目录",
+  "External Storage Directory": "外部存储",
+  "Changed": "改变时间",
+  "Modified": "修改时间",
+  "Accessed": "存取时间",
+  "MimeType": "媒体类型"
 }

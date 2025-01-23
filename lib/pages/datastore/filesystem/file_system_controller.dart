@@ -1,9 +1,11 @@
 import 'dart:core';
-import 'dart:io';
+import 'dart:io' as io;
 
 import 'package:animated_tree_view/animated_tree_view.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/datastore/explorable_node.dart';
 import 'package:colla_chat/pages/datastore/filesystem/file_node.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/path_util.dart';
 import 'package:get/get.dart';
 
@@ -26,7 +28,15 @@ class FileSystemController {
 
   init() async {
     clear();
-    initMac();
+    if (platformParams.mobile) {
+      initMobile();
+    } else if (platformParams.macos) {
+      initMac();
+      initMobile();
+    } else if (platformParams.windows) {
+      initWindows();
+      initMobile();
+    }
     List<ListenableNode> children = root.childrenAsList;
     for (var node in children) {
       treeViewController?.collapseNode(node as ITreeNode);
@@ -34,39 +44,49 @@ class FileSystemController {
   }
 
   initMac() {
-    Directory root = Directory('/');
+    io.Directory root = io.Directory('/');
     addDirectory('/', root);
   }
 
-  initMobile() async {
-    Directory? applicationDirectory = await PathUtil.getApplicationDirectory();
-    if (applicationDirectory != null) {
-      addDirectory('applicationDirectory', applicationDirectory);
-    }
-    Directory applicationDocumentsDirectory =
-        await PathUtil.getApplicationDocumentsDirectory();
-    addDirectory(
-        'applicationDocumentsDirectory', applicationDocumentsDirectory);
-    Directory applicationSupportDirectory =
-        await PathUtil.getApplicationSupportDirectory();
-    addDirectory('applicationSupportDirectory', applicationSupportDirectory);
+  initWindows() {
+    io.Directory root = io.Directory('c:/');
+    addDirectory('c:/', root);
+  }
 
-    Directory? downloadsDirectory = await PathUtil.getDownloadsDirectory();
-    if (downloadsDirectory != null) {
-      addDirectory('downloadsDirectory', downloadsDirectory);
+  initMobile() async {
+    io.Directory? applicationDirectory =
+        await PathUtil.getApplicationDirectory();
+    if (applicationDirectory != null) {
+      addDirectory(
+          AppLocalizations.t('Application Directory'), applicationDirectory);
     }
-    Directory libraryDirectory = await PathUtil.getLibraryDirectory();
-    addDirectory('libraryDirectory', libraryDirectory);
-    Directory temporaryDirectory = await PathUtil.getTemporaryDirectory();
-    addDirectory('temporaryDirectory', temporaryDirectory);
-    Directory? externalStorageDirectory =
+    io.Directory applicationDocumentsDirectory =
+        await PathUtil.getApplicationDocumentsDirectory();
+    addDirectory(AppLocalizations.t('Application Documents Directory'),
+        applicationDocumentsDirectory);
+    io.Directory applicationSupportDirectory =
+        await PathUtil.getApplicationSupportDirectory();
+    addDirectory(AppLocalizations.t('Application Support Directory'),
+        applicationSupportDirectory);
+
+    io.Directory? downloadsDirectory = await PathUtil.getDownloadsDirectory();
+    if (downloadsDirectory != null) {
+      addDirectory(
+          AppLocalizations.t('Downloads Directory'), downloadsDirectory);
+    }
+    io.Directory libraryDirectory = await PathUtil.getLibraryDirectory();
+    addDirectory(AppLocalizations.t('Library Directory'), libraryDirectory);
+    io.Directory temporaryDirectory = await PathUtil.getTemporaryDirectory();
+    addDirectory(AppLocalizations.t('Temporary Directory'), temporaryDirectory);
+    io.Directory? externalStorageDirectory =
         await PathUtil.getExternalStorageDirectory();
     if (externalStorageDirectory != null) {
-      addDirectory('externalStorageDirectory', externalStorageDirectory);
+      addDirectory(AppLocalizations.t('External Storage Directory'),
+          externalStorageDirectory);
     }
   }
 
-  FolderNode addDirectory(String name, Directory directory) {
+  FolderNode addDirectory(String name, io.Directory directory) {
     Folder folder = Folder(name: name, directory: directory);
     FolderNode folderNode = FolderNode(data: folder);
     root.add(folderNode);
@@ -87,23 +107,40 @@ class FileSystemController {
   }
 
   findDirectory(FolderNode folderNode) {
-    Directory? directory = folderNode.data?.directory;
+    io.Directory? directory = folderNode.data?.directory;
     if (directory == null) {
       return;
     }
-    List<FileSystemEntity> fileSystemEntities = directory.listSync();
+    List<io.FileSystemEntity> fileSystemEntities = directory.listSync();
 
-    for (FileSystemEntity fileSystemEntity in fileSystemEntities) {
-      FileStat fileStat = fileSystemEntity.statSync();
-      FileSystemEntityType fileSystemEntityType = fileStat.type;
-      if (fileSystemEntityType == FileSystemEntityType.directory) {
+    for (io.FileSystemEntity fileSystemEntity in fileSystemEntities) {
+      io.FileStat fileStat = fileSystemEntity.statSync();
+      io.FileSystemEntityType fileSystemEntityType = fileStat.type;
+      if (fileSystemEntityType == io.FileSystemEntityType.directory) {
         FolderNode node = FolderNode(
             data: Folder(
                 name: PathUtil.basename(fileSystemEntity.path),
-                directory: fileSystemEntity as Directory));
+                directory: fileSystemEntity as io.Directory));
         folderNode.add(node);
       }
     }
+  }
+
+  List<File> findFile(Folder folder) {
+    io.Directory? directory = folder.directory;
+    List<io.FileSystemEntity> fileSystemEntities = directory.listSync();
+    List<File> files = [];
+    for (io.FileSystemEntity fileSystemEntity in fileSystemEntities) {
+      io.FileStat fileStat = fileSystemEntity.statSync();
+      io.FileSystemEntityType fileSystemEntityType = fileStat.type;
+      if (fileSystemEntityType == io.FileSystemEntityType.file) {
+        File file = File(
+            name: PathUtil.basename(fileSystemEntity.path),
+            file: fileSystemEntity as io.File);
+        files.add(file);
+      }
+    }
+    return files;
   }
 }
 
