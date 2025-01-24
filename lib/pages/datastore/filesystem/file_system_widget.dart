@@ -1,17 +1,19 @@
+import 'dart:io';
+
 import 'package:animated_tree_view/animated_tree_view.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/datastore/explorable_node.dart';
 import 'package:colla_chat/pages/datastore/filesystem/file_node.dart';
 import 'package:colla_chat/pages/datastore/filesystem/file_system_controller.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/menu_util.dart';
+import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:path/path.dart' as p;
 
 /// 文件管理功能主页面，带有路由回调函数
 class FileSystemWidget extends StatelessWidget with TileDataMixin {
@@ -30,83 +32,106 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
   String get title => 'FileSystem';
 
   /// 单击表示编辑属性
-  void _onTap(BuildContext context, ExplorableNode node) {
-    fileSystemController.currentNode.value = node;
-    TreeNode? folderNode;
-    if (node is FolderNode) {
-      folderNode = node;
-    }
-    fileSystemController.current.value = folderNode?.data;
+  void _onTap(BuildContext context, FolderNode folderNode) {
+    fileSystemController.currentNode.value = folderNode;
     indexWidgetProvider.push('file');
   }
 
-  /// 长按表示进一步的操作
-  Future<void> _onLongPress(BuildContext context, ExplorableNode node) async {
-    fileSystemController.currentNode.value = node;
-    List<ActionData> popActionData = [];
-    popActionData.add(ActionData(
-        label: 'New',
-        tooltip: 'New',
-        icon: Icon(
-          Icons.add,
-          color: myself.primary,
-        )));
-    popActionData.add(ActionData(
-        label: 'Delete',
-        tooltip: 'Delete',
-        icon: Icon(
-          Icons.remove,
-          color: myself.primary,
-        )));
-    popActionData.add(ActionData(
-        label: 'Edit',
-        tooltip: 'Edit',
-        icon: Icon(
-          Icons.edit,
-          color: myself.primary,
-        )));
-    popActionData.add(ActionData(
-        label: 'Query',
-        tooltip: 'Query',
-        icon: Icon(
-          Icons.search_outlined,
-          color: myself.primary,
-        )));
 
-    await MenuUtil.showPopMenu(
-      context,
-      onPressed: (BuildContext context, int index, String label,
-          {String? value}) {
-        _onPopAction(context, node, index, label, value: value);
-      },
-      height: 200,
-      width: appDataProvider.secondaryBodyWidth,
-      actions: popActionData,
+
+  Widget _buildFolderButtonWidget(BuildContext context) {
+    return OverflowBar(
+      alignment: MainAxisAlignment.start,
+      children: [
+        IconButton(
+            tooltip: AppLocalizations.t('Add folder'),
+            onPressed: () {
+              _addFolder(context);
+            },
+            icon: Icon(
+              Icons.add,
+              color: myself.primary,
+            )),
+        IconButton(
+            tooltip: AppLocalizations.t('Delete folder'),
+            onPressed: () async {
+              _deleteFolder(context);
+            },
+            icon: Icon(
+              Icons.remove,
+              color: myself.primary,
+            )),
+        IconButton(
+            tooltip: AppLocalizations.t('Rename folder name'),
+            onPressed: () async {
+              _renameFolder(context);
+            },
+            icon: Icon(
+              Icons.drive_file_rename_outline_outlined,
+              color: myself.primary,
+            )),
+      ],
     );
   }
 
-  _onPopAction(
-      BuildContext context, ExplorableNode node, int index, String label,
-      {String? value}) async {
-    switch (label) {
-      case 'New':
-        // _add(node);
-        break;
-      case 'Delete':
-        // _delete(node);
-        break;
-      case 'Edit':
-        // _edit(node);
-        break;
-      case 'Query':
-        // _query(node);
-        break;
-      default:
+  Future<void> _addFolder(BuildContext context) async {
+    FolderNode? folderNode = fileSystemController.currentNode.value;
+    if (folderNode == null) {
+      return;
+    }
+    Folder? folder = folderNode.data;
+    if (folder == null) {
+      return;
+    }
+    String path = folder.directory.path;
+    String? content = await DialogUtil.showTextFormField(
+        context: context, title: 'New folder name');
+    if (content != null) {
+      String name = p.join(path, content);
+      Directory directory = Directory(name);
+      directory.createSync();
+      folderNode.add(FolderNode(
+          data: Folder(
+              name: PathUtil.basename(directory.path), directory: directory)));
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Future<void> _deleteFolder(BuildContext context) async {
+    FolderNode? folderNode = fileSystemController.currentNode.value;
+    if (folderNode == null) {
+      return;
+    }
+    Folder? folder = folderNode.data;
+    if (folder == null) {
+      return;
+    }
+    bool? confirm = await DialogUtil.confirm(
+        context: context,
+        content: 'Do you confirm delete folder:${folder.name}?');
+    if (confirm != null && confirm) {
+      Directory directory = folder.directory;
+      folderNode.delete();
+      directory.deleteSync(recursive: true);
+    }
+  }
+
+  Future<void> _renameFolder(BuildContext context) async {
+    Folder? folder = fileSystemController.currentNode.value?.data;
+    if (folder == null) {
+      return;
+    }
+    String path = folder.directory.path;
+    String name = PathUtil.basename(path);
+    String? content = await DialogUtil.showTextFormField(
+        context: context, title: 'New folder name', content: name);
+    if (content != null && content != name) {
+      name = p.join(p.dirname(path), content);
+      Directory directory = folder.directory.renameSync(name);
+      folder.directory = directory;
+    }
+  }
+
+  Widget _buildTreeViewWidget(BuildContext context) {
     return TreeView.simpleTyped<Explorable, ExplorableNode>(
         tree: fileSystemController.root,
         showRootNode: false,
@@ -132,7 +157,7 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
           return Obx(() {
             bool selected = false;
             if (node is FolderNode) {
-              selected = fileSystemController.current.value == node.data;
+              selected = fileSystemController.currentNode.value == node;
             }
             TileData tileData = TileData(
               title: node.data?.name ?? "/",
@@ -141,10 +166,7 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
               prefix: node.icon,
               selected: selected,
               onTap: (int index, String label, {String? subtitle}) {
-                _onTap(context, node);
-              },
-              onLongPress: (int index, String label, {String? subtitle}) {
-                _onLongPress(context, node);
+                _onTap(context, node as FolderNode);
               },
             );
             return Padding(
@@ -165,6 +187,16 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
             }
           }
         });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _buildFolderButtonWidget(context),
+        _buildTreeViewWidget(context)
+      ],
+    );
   }
 }
 

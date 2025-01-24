@@ -200,8 +200,8 @@ class PlaylistWidget extends StatelessWidget {
   PlaylistWidget(
       {super.key, this.onSelected, required this.playlistController});
 
-  RxList<TileData> tileData = <TileData>[].obs;
-  RxBool gridMode = false.obs;
+  final RxList<TileData> tileData = <TileData>[].obs;
+  final RxBool gridMode = false.obs;
 
   ///从收藏的文件中加入播放列表
   _collect() async {
@@ -411,7 +411,7 @@ class PlaylistWidget extends StatelessWidget {
   Widget _buildPlaylistButton(BuildContext context) {
     return Column(
       children: [
-        ButtonBar(
+        OverflowBar(
           alignment: MainAxisAlignment.start,
           children: [
             IconButton(
@@ -478,7 +478,7 @@ class PlaylistWidget extends StatelessWidget {
             ),
           ],
         ),
-        ButtonBar(
+        OverflowBar(
           alignment: MainAxisAlignment.end,
           children: [
             IconButton(

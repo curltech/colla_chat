@@ -13,9 +13,10 @@ class FileSystemController {
   final RxMap<String, FolderNode> rootFolders = <String, FolderNode>{}.obs;
   TreeViewController? treeViewController;
   final TreeNode<Explorable> root = TreeNode.root();
-  final Rx<Folder?> current = Rx<Folder?>(null);
 
-  Rx<ExplorableNode?> currentNode = Rx<ExplorableNode?>(null);
+  // final Rx<Folder?> current = Rx<Folder?>(null);
+
+  Rx<FolderNode?> currentNode = Rx<FolderNode?>(null);
 
   FileSystemController() {
     init();
@@ -100,8 +101,8 @@ class FileSystemController {
     if (node != null) {
       node.delete();
     } else {
-      folder = current.value;
-      current.value = null;
+      folder = currentNode.value?.data;
+      currentNode.value = null;
     }
     rootFolders.remove(folder!.name);
   }
