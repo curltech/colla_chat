@@ -255,7 +255,7 @@ class DataListTile extends StatelessWidget {
     if (selected) {
       return Container(
         margin: const EdgeInsets.symmetric(horizontal: 0.0),
-        color: myself.secondary.withOpacity(0.2),
+        color: myself.secondary.withAlpha(50),
         child: listTile,
       );
     }

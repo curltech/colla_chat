@@ -117,10 +117,19 @@ class BindingDataTable2<T> extends StatelessWidget {
             } else {
               fieldValue = fieldValue.toString();
             }
+            if (index == controller.currentIndex.value) {
+              textColor = Colors.white;
+            }
           } else if (dataType == DataType.double) {
             fieldValue = NumberUtil.stdDouble(fieldValue);
+            if (index == controller.currentIndex.value) {
+              textColor = Colors.white;
+            }
           } else {
             fieldValue = fieldValue.toString();
+            if (index == controller.currentIndex.value) {
+              textColor = Colors.white;
+            }
           }
         } else {
           fieldValue = '';
@@ -141,7 +150,7 @@ class BindingDataTable2<T> extends StatelessWidget {
       index: index,
       color: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
         if (index == controller.currentIndex.value) {
-          return myself.primary.withAlpha(100);
+          return myself.secondary.withAlpha(50);
         }
         return null; // Use the default value.
       }),

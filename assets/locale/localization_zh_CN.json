@@ -937,5 +937,10 @@
   "Changed": "改变时间",
   "Modified": "修改时间",
   "Accessed": "存取时间",
-  "MimeType": "媒体类型"
+  "MimeType": "媒体类型",
+  "New folder": "新目录",
+  "Delete folder": "删除目录",
+  "Rename folder name": "重命名目录",
+  "Rename": "重命名",
+  "Path": "路径"
 }
