@@ -232,26 +232,36 @@ class FileWidget extends StatelessWidget with TileDataMixin {
     platformDataColumns.add(PlatformDataColumn(
       label: 'Name',
       name: 'name',
+      width: 300,
       dataType: DataType.string,
       align: TextAlign.left,
+      onSort: (int index, bool ascending) =>
+          fileController.sort((File t) => t.name, index, 'name', ascending),
     ));
     platformDataColumns.add(PlatformDataColumn(
       label: 'MimeType',
       name: 'mimeType',
       dataType: DataType.string,
       align: TextAlign.left,
+      onSort: (int index, bool ascending) => fileController.sort(
+          (File t) => t.mimeType, index, 'mimeType', ascending),
     ));
     platformDataColumns.add(PlatformDataColumn(
       label: 'Modified',
       name: 'modified',
+      width: 180,
       dataType: DataType.string,
       align: TextAlign.left,
+      onSort: (int index, bool ascending) => fileController.sort(
+          (File t) => t.modified, index, 'modified', ascending),
     ));
     platformDataColumns.add(PlatformDataColumn(
       label: 'Size',
       name: 'size',
       dataType: DataType.int,
       align: TextAlign.right,
+      onSort: (int index, bool ascending) =>
+          fileController.sort((File t) => t.size, index, 'size', ascending),
     ));
 
     return BindingDataTable2<File>(
