@@ -44,9 +44,12 @@ class BindingDataTable2<T> extends StatelessWidget {
     controller.data.addListener(() {
       changed.value = !changed.value;
     });
+    controller.currentIndex.addListener(() {
+      changed.value = !changed.value;
+    });
   }
 
-  RxBool changed = true.obs;
+  final RxBool changed = true.obs;
 
   /// 过滤条件的多项选择框的列定义
   List<DataColumn2> _buildDataColumns() {
@@ -136,6 +139,12 @@ class BindingDataTable2<T> extends StatelessWidget {
     checked ??= false;
     var dataRow = DataRow2.byIndex(
       index: index,
+      color: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
+        if (index == controller.currentIndex.value) {
+          return myself.primary.withAlpha(100);
+        }
+        return null; // Use the default value.
+      }),
       selected: checked,
       onSelectChanged: (value) {
         bool? checked = EntityUtil.getChecked(t);

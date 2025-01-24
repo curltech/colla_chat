@@ -11,6 +11,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
@@ -121,15 +122,29 @@ class FileWidget extends StatelessWidget with TileDataMixin {
   }
 
   Future<void> _deleteFile(BuildContext context) async {
-    File? file = fileController.current;
-    if (file == null) {
-      return;
+    bool? confirm;
+    List<File> files = fileController.checked;
+    if (files.isEmpty) {
+      File? file = fileController.current;
+      if (file == null) {
+        return;
+      }
+      confirm = await DialogUtil.confirm(
+          context: context,
+          content: 'Do you confirm delete current file:${file.name}?');
+      if (confirm != null && confirm) {
+        files.add(file);
+      }
+    } else {
+      confirm = await DialogUtil.confirm(
+          context: context,
+          content: 'Do you confirm delete selected ${files.length} files?');
     }
-    bool? confirm = await DialogUtil.confirm(
-        context: context, content: 'Do you confirm delete file:${file.name}?');
     if (confirm != null && confirm) {
-      file.file.delete();
-      fileController.delete();
+      for (File file in files) {
+        file.file.delete();
+        fileController.data.remove(file);
+      }
     }
   }
 
@@ -170,7 +185,12 @@ class FileWidget extends StatelessWidget with TileDataMixin {
     return Obx(() {
       File? file = fileController.current;
       String? path = file?.file.path;
-      return CommonAutoSizeText(path ?? '');
+
+      return CommonAutoSizeTextFormField(
+        labelText: 'Path',
+        readOnly: true,
+        controller: TextEditingController(text: path ?? ''),
+      );
     });
   }
 
@@ -185,13 +205,25 @@ class FileWidget extends StatelessWidget with TileDataMixin {
             onTap: () {
               fileController.current = file;
             },
-            child: Card(
+            child: SizedBox(
+                width: 100,
+                height: 120,
                 child: Column(
-                    children: [file.icon, CommonAutoSizeText(file.name!)]))));
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      file.icon,
+                      Expanded(child: CommonAutoSizeText(file.name!))
+                    ]))));
       }
-      return Wrap(
+      return SingleChildScrollView(
+          // padding: EdgeInsets.zero,
+          child: Wrap(
+        spacing: 10.0,
+        // alignment: WrapAlignment.center,
+        // runAlignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
         children: children,
-      );
+      ));
     });
   }
 
@@ -266,9 +298,11 @@ class FileWidget extends StatelessWidget with TileDataMixin {
           child: Column(
             children: [
               _buildFilePathWidget(context),
-              gridMode.isTrue
-                  ? _buildFileWrapWidget(context)
-                  : _buildFileTableWidget(context),
+              Expanded(
+                child: gridMode.isTrue
+                    ? _buildFileWrapWidget(context)
+                    : _buildFileTableWidget(context),
+              )
             ],
           ));
     });

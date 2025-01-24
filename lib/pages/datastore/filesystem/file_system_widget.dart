@@ -37,8 +37,6 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.push('file');
   }
 
-
-
   Widget _buildFolderButtonWidget(BuildContext context) {
     return OverflowBar(
       alignment: MainAxisAlignment.start,
@@ -194,7 +192,7 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
     return Column(
       children: [
         _buildFolderButtonWidget(context),
-        _buildTreeViewWidget(context)
+        Expanded(child: _buildTreeViewWidget(context))
       ],
     );
   }
