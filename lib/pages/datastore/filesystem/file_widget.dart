@@ -205,14 +205,24 @@ class FileWidget extends StatelessWidget with TileDataMixin {
             onTap: () {
               fileController.current = file;
             },
-            child: SizedBox(
+            child: Container(
                 width: 100,
                 height: 120,
+                color: file == fileController.current
+                    ? myself.secondary.withAlpha(50)
+                    : null,
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       file.icon,
-                      Expanded(child: CommonAutoSizeText(file.name!))
+                      Expanded(
+                          child: CommonAutoSizeText(
+                        file.name!,
+                        style: TextStyle(
+                            color: file == fileController.current
+                                ? Colors.white
+                                : null),
+                      ))
                     ]))));
       }
       return SingleChildScrollView(
