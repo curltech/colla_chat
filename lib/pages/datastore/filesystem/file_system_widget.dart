@@ -42,7 +42,7 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
       alignment: MainAxisAlignment.start,
       children: [
         IconButton(
-            tooltip: AppLocalizations.t('Add folder'),
+            tooltip: AppLocalizations.t('New folder'),
             onPressed: () {
               _addFolder(context);
             },

@@ -187,7 +187,7 @@ class FileWidget extends StatelessWidget with TileDataMixin {
       String? path = file?.file.path;
 
       return CommonAutoSizeTextFormField(
-        labelText: 'Path',
+        labelText: AppLocalizations.t('Path'),
         readOnly: true,
         controller: TextEditingController(text: path ?? ''),
       );
