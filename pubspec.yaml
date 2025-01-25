@@ -134,6 +134,9 @@ dependencies:
   pluto_grid: ^8.0.0
   data_table_2: ^2.5.18
   material_table_view: ^5.0.0
+  multi_split_view: ^3.6.0
+  calendar_view: ^1.4.0
+  easy_image_viewer: ^1.5.1
   tab_container: ^3.5.3
   file_saver: ^0.2.10
   material_neumorphic: ^1.2.1
