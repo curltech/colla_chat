@@ -127,7 +127,7 @@ class FileSystemController {
     }
   }
 
-  List<File> findFile(Folder folder) {
+  List<File> findFile(Folder folder, {String? keyword}) {
     io.Directory? directory = folder.directory;
     List<io.FileSystemEntity> fileSystemEntities = directory.listSync();
     List<File> files = [];
@@ -135,9 +135,13 @@ class FileSystemController {
       io.FileStat fileStat = fileSystemEntity.statSync();
       io.FileSystemEntityType fileSystemEntityType = fileStat.type;
       if (fileSystemEntityType == io.FileSystemEntityType.file) {
-        File file = File(
-            name: PathUtil.basename(fileSystemEntity.path),
-            file: fileSystemEntity as io.File);
+        String name = PathUtil.basename(fileSystemEntity.path);
+        if (keyword != null && keyword.isNotEmpty) {
+          if (!name.contains(keyword)) {
+            continue;
+          }
+        }
+        File file = File(name: name, file: fileSystemEntity as io.File);
         files.add(file);
       }
     }

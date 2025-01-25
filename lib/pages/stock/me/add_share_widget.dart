@@ -31,8 +31,8 @@ class AddShareWidget extends StatelessWidget with TileDataMixin {
   final TextEditingController searchTextController = TextEditingController();
 
   /// 增加自选股的查询结果
-  RxList<Share> shares = <Share>[].obs;
-  RxList<TileData> tileData = <TileData>[].obs;
+  final RxList<Share> shares = <Share>[].obs;
+  final RxList<TileData> tileData = <TileData>[].obs;
 
   //将linkman和group数据转换从列表显示数据
   Future<List<TileData>> _buildShareTileData() async {

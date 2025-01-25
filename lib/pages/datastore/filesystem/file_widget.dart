@@ -46,6 +46,42 @@ class FileWidget extends StatelessWidget with TileDataMixin {
 
   final RxBool gridMode = false.obs;
 
+  final TextEditingController searchTextController = TextEditingController();
+
+  Widget _buildSearchTextWidget(BuildContext context) {
+    return CommonAutoSizeTextFormField(
+      labelText: AppLocalizations.t('Search'),
+      controller: searchTextController,
+      keyboardType: TextInputType.text,
+      suffixIcon: IconButton(
+        onPressed: () {
+          _searchFile(searchTextController.text);
+        },
+        icon: Icon(
+          Icons.search,
+          color: myself.primary,
+        ),
+      ),
+    );
+  }
+
+  _searchFile(String keyword) async {
+    Folder? folder = fileSystemController.currentNode.value?.data;
+    io.Directory? directory = folder?.directory;
+    if (directory == null) {
+      fileController.replaceAll([]);
+      return;
+    }
+    try {
+      List<File> files =
+          fileSystemController.findFile(folder!, keyword: keyword);
+      fileController.replaceAll(files);
+    } catch (e) {
+      logger.e('list file failure:$e');
+      fileController.replaceAll([]);
+    }
+  }
+
   /// 长按表示进一步的操作
   Future<void> _onLongPress(BuildContext context, File file) async {
     fileController.current = file;
@@ -318,6 +354,11 @@ class FileWidget extends StatelessWidget with TileDataMixin {
           child: Column(
             children: [
               _buildFilePathWidget(context),
+              Padding(
+                  padding: EdgeInsets.all(
+                    10.0,
+                  ),
+                  child: _buildSearchTextWidget(context)),
               Expanded(
                 child: gridMode.isTrue
                     ? _buildFileWrapWidget(context)
