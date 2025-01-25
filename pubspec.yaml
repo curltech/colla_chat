@@ -140,7 +140,6 @@ dependencies:
   tab_container: ^3.5.3
   file_saver: ^0.2.10
   material_neumorphic: ^1.2.1
-  flutter_neumo: ^1.0.2
   extended_text: ^14.0.1 #文本扩展显示
   extended_text_field: ^16.0.0 #文字表情混入
   extended_text_library: ^12.0.0

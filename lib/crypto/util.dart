@@ -74,9 +74,6 @@ class CryptoUtil {
   static List<int> compress(List<int> data) {
     //gzip 压缩
     List<int>? gzipBytes = GZipEncoder().encode(data);
-    if (gzipBytes == null) {
-      throw 'CompressFail';
-    }
     return gzipBytes;
   }
 

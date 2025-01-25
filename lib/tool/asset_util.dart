@@ -87,7 +87,7 @@ class AssetUtil {
     String? desc,
     String? relativePath,
   }) async {
-    final AssetEntity? fileEntity = await PhotoManager.editor.saveImageWithPath(
+    final AssetEntity fileEntity = await PhotoManager.editor.saveImageWithPath(
       path,
       title: title,
       desc: desc,
@@ -105,7 +105,7 @@ class AssetUtil {
     String? desc,
     String? relativePath,
   }) async {
-    final AssetEntity? fileEntity = await PhotoManager.editor.saveImage(
+    final AssetEntity fileEntity = await PhotoManager.editor.saveImage(
       data,
       filename: filename,
       title: title,
@@ -124,7 +124,7 @@ class AssetUtil {
     String? relativePath,
   }) async {
     var file = File(path);
-    final AssetEntity? fileEntity = await PhotoManager.editor.saveVideo(
+    final AssetEntity fileEntity = await PhotoManager.editor.saveVideo(
       file,
       title: title,
       desc: desc,

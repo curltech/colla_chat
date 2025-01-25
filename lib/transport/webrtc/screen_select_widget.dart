@@ -131,7 +131,7 @@ class ScreenSelectDialog extends StatelessWidget {
     var primary = myself.primary;
     return SizedBox(
       width: double.infinity,
-      child: ButtonBar(
+      child: OverflowBar(
         children: <Widget>[
           MaterialButton(
             child: CommonAutoSizeText(

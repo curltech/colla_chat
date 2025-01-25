@@ -371,7 +371,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
   }
 
   Widget _buildBackButton() {
-    var iconButton = ButtonBar(alignment: MainAxisAlignment.start, children: [
+    var iconButton = OverflowBar(alignment: MainAxisAlignment.start, children: [
       IconButton(
         tooltip: AppLocalizations.t('Back'),
         icon: const Icon(Icons.arrow_back_ios_new, size: 32),

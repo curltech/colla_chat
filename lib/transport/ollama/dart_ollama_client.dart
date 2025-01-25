@@ -125,7 +125,7 @@ class DartOllamaClient {
           stream: stream,
           keepAlive: keepAlive),
     );
-    return generated.message?.content;
+    return generated.message.content;
   }
 
   Future<String> chatStream(
@@ -154,7 +154,7 @@ class DartOllamaClient {
     );
     String text = '';
     await for (final res in completionStream) {
-      text += (res.message?.content ?? '').trim();
+      text += (res.message.content ?? '').trim();
     }
     return text;
   }

@@ -505,7 +505,7 @@ class FileUtil {
           lockParentWindow: lockParentWindow,
           type: FileType.image);
       return xfiles;
-    } else if (platformParams.mobile && context != null) {
+    } else if (platformParams.mobile) {
       List<AssetEntity>? assets = await AssetUtil.pickAssets(
           context: context, pickerConfig: pickerConfig);
       assets = assets ?? [];

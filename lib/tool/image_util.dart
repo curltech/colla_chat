@@ -512,7 +512,7 @@ class ImageUtil {
       if (xfiles.isNotEmpty) {
         avatar = await compressThumbnail(xfile: xfiles[0]);
       }
-    } else if (platformParams.mobile && context != null) {
+    } else if (platformParams.mobile) {
       List<AssetEntity>? assets = await AssetUtil.pickAssets(context: context);
       if (assets != null && assets.isNotEmpty) {
         avatar = await compressThumbnail(assetEntity: assets[0]);

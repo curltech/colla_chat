@@ -11,7 +11,6 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/poem/poem.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/tool/sherpa/sherpa_text_to_speech_widget.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';

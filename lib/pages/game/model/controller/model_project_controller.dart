@@ -7,7 +7,6 @@ import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart' as p;

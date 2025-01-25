@@ -228,7 +228,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
 
     return Column(
       children: [
-        ButtonBar(
+        OverflowBar(
           alignment: MainAxisAlignment.start,
           children: [
             IconButton(

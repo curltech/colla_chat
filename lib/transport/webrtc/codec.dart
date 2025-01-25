@@ -3,9 +3,9 @@ import 'package:sdp_transform/sdp_transform.dart' as sdp_transform;
 class CodecCapability {
   CodecCapability(
       this.kind, this.payloads, this.codecs, this.fmtp, this.rtcpFb) {
-    codecs.forEach((element) {
+    for (var element in codecs) {
       element['orign_payload'] = element['payload'];
-    });
+    }
   }
 
   String kind;
@@ -21,26 +21,26 @@ class CodecCapability {
     var newRtcpFb = <dynamic>[];
     var newFmtp = <dynamic>[];
     var newPayloads = <String>[];
-    newCodecs.forEach((element) {
-      var orign_payload = element['orign_payload'] as int;
+    for (var element in newCodecs) {
+      var orignPayload = element['orign_payload'] as int;
       var payload = element['payload'] as int;
       // change payload type
-      if (payload != orign_payload) {
+      if (payload != orignPayload) {
         newRtcpFb.addAll(rtcpFb.where((e) {
-          if (e['payload'] == orign_payload) {
+          if (e['payload'] == orignPayload) {
             e['payload'] = payload;
             return true;
           }
           return false;
         }).toList());
         newFmtp.addAll(fmtp.where((e) {
-          if (e['payload'] == orign_payload) {
+          if (e['payload'] == orignPayload) {
             e['payload'] = payload;
             return true;
           }
           return false;
         }).toList());
-        if (payloads.contains('$orign_payload')) {
+        if (payloads.contains('$orignPayload')) {
           newPayloads.add('$payload');
         }
       } else {
@@ -48,7 +48,7 @@ class CodecCapability {
         newFmtp.addAll(fmtp.where((e) => e['payload'] == payload).toList());
         newPayloads.addAll(payloads.where((e) => e == '$payload').toList());
       }
-    });
+    }
     rtcpFb = newRtcpFb;
     fmtp = newFmtp;
     payloads = newPayloads;

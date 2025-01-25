@@ -328,7 +328,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
   Widget _buildConvertFilesButton(BuildContext context) {
     return Column(
       children: [
-        ButtonBar(
+        OverflowBar(
           alignment: MainAxisAlignment.start,
           children: [
             IconButton(

@@ -618,7 +618,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
   }
 
   Widget _buildBackButton() {
-    var iconButton = ButtonBar(alignment: MainAxisAlignment.start, children: [
+    var iconButton = OverflowBar(alignment: MainAxisAlignment.start, children: [
       IconButton(
         icon: const Icon(Icons.arrow_back_ios_new, size: 32),
         color: myself.primary,

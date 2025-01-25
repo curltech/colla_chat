@@ -321,7 +321,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
       );
     }
 
-    return ButtonBar(
+    return OverflowBar(
       alignment: MainAxisAlignment.spaceBetween,
       children: children,
     );

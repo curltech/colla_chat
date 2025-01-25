@@ -103,7 +103,7 @@ class P2pLogin extends StatelessWidget with WindowListener {
         );
       }
 
-      return ButtonBar(
+      return OverflowBar(
         children: rightWidgets,
       );
     });

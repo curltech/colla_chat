@@ -22,7 +22,7 @@ class BindingPlutoDataGrid<T> extends StatelessWidget {
   final Function(bool?)? onSelectChanged;
   final Function(int index)? onLongPress;
 
-  BindingPlutoDataGrid({
+  const BindingPlutoDataGrid({
     super.key,
     required this.platformDataColumns,
     this.onTap,

@@ -292,7 +292,9 @@ class Card extends PositionComponent
     }
     final delta = event.localDelta;
     position.add(delta);
-    attachedCards.forEach((card) => card.position.add(delta));
+    for (var card in attachedCards) {
+      card.position.add(delta);
+    }
   }
 
   /// 拖拽结束事件
@@ -354,7 +356,7 @@ class Card extends PositionComponent
       },
     );
     if (attachedCards.isNotEmpty) {
-      attachedCards.forEach((card) {
+      for (var card in attachedCards) {
         final offset = card.position - position;
         card.doMove(
           _whereCardStarted + offset,
@@ -362,7 +364,7 @@ class Card extends PositionComponent
             pile!.returnCard(card);
           },
         );
-      });
+      }
       attachedCards.clear();
     }
   }

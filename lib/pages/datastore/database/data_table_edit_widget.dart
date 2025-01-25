@@ -6,7 +6,6 @@ import 'package:colla_chat/pages/datastore/database/data_source_controller.dart'
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart'
     as data_source;
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart';
-import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
