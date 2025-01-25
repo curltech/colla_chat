@@ -37,7 +37,7 @@ class ModelFlameGame extends FlameGame
 
   @override
   Color backgroundColor() {
-    return Colors.white.withOpacity(0.0);
+    return Colors.white.withAlpha(0);
   }
 
   double clampZoom(double zoom, {num lowerLimit = 0.05, num upperLimit = 3.0}) {

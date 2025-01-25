@@ -247,7 +247,7 @@ class ModelProjectController {
 
   _registerAssetMetaProject(String filename) async {
     String content =
-        await rootBundle.loadString('assets/model/${filename}.json');
+        await rootBundle.loadString('assets/model/$filename.json');
     Map<String, dynamic> json = JsonUtil.toJson(content);
     Project metaProject = Project.fromJson(json);
     if (!metaProject.meta) {
