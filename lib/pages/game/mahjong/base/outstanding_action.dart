@@ -3,17 +3,17 @@ import 'dart:ui';
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
 
-enum OutstandingAction { pass, touch, bar, darkBar, chow, win, selfWin }
+enum MahjongAction { pass, touch, bar, darkBar, chow, win, selfWin }
 
-class OutstandingActions {
+class MahjongActions {
   static const String mahjongPath = 'mahjong/';
-  final Map<OutstandingAction, Sprite> outstandingActions = {};
+  final Map<MahjongAction, Sprite> outstandingActions = {};
 
-  OutstandingActions() {
+  MahjongActions() {
     init();
   }
 
-  Future<Sprite> loadSprite(OutstandingAction outstandingAction) async {
+  Future<Sprite> loadSprite(MahjongAction outstandingAction) async {
     Image image =
         await Flame.images.load('$mahjongPath${outstandingAction.name}.webp');
 
@@ -21,15 +21,15 @@ class OutstandingActions {
   }
 
   init() async {
-    for (var outstandingAction in OutstandingAction.values) {
+    for (var outstandingAction in MahjongAction.values) {
       outstandingActions[outstandingAction] =
           await loadSprite(outstandingAction);
     }
   }
 
-  Sprite? operator [](OutstandingAction outstandingAction) {
+  Sprite? operator [](MahjongAction outstandingAction) {
     return outstandingActions[outstandingAction];
   }
 }
 
-final OutstandingActions allOutstandingActions = OutstandingActions();
+final MahjongActions allOutstandingActions = MahjongActions();

@@ -270,7 +270,7 @@ class Round {
     for (int i = 0; i < roundParticipants.length; ++i) {
       receivers.add(i);
       if (room.creator != i && owner == room.creator) {
-        Map<OutstandingAction, Set<int>>? outstandingActions =
+        Map<MahjongAction, Set<int>>? outstandingActions =
             roundParticipants[i].check(tile: tile);
         if (outstandingActions.isNotEmpty) {
           pass = false;
@@ -310,7 +310,7 @@ class Round {
       /// 事件消息的接收者是creator，检查，发消息给其他参与者，2个消息，等待2个事件
       for (int i = 0; i < roundParticipants.length; ++i) {
         if (owner != i) {
-          Map<OutstandingAction, Set<int>>? outstandingActions =
+          Map<MahjongAction, Set<int>>? outstandingActions =
               roundParticipants[i].check(tile: tile);
           if (outstandingActions.isNotEmpty) {
             pass = false;
@@ -461,7 +461,8 @@ class Round {
     int c = 0;
     for (int i = 0; i < roundParticipants.length; ++i) {
       RoundParticipant roundParticipant = roundParticipants[i];
-      List<Set<int>> counts = roundParticipant.earnedActions.values.toList();
+      List<Set<MahjongActionValue>> counts =
+          roundParticipant.earnedActions.values.toList();
       for (var count in counts) {
         c += count.length;
       }
@@ -693,7 +694,7 @@ class Round {
     return tile;
   }
 
-  bool _score(int owner, int winTypeIndex, {int? receiver}) {
+  bool _score(int owner, int winTypeIndex) {
     WinType? winType = NumberUtil.toEnum(WinType.values, winTypeIndex);
     if (winType == null) {
       return false;
@@ -703,25 +704,33 @@ class Round {
       return false;
     }
     RoundParticipant roundParticipant = roundParticipants[owner];
+
+    /// 抢杠，owner是胡牌人，robber是被抢人
     if (robber != null && robCard != null) {
       roundParticipant.score.value += baseScore * 3;
       roundParticipants[robber!].score.value -= baseScore * 3;
     } else if (roundParticipant.handPile.drawTileType == DealTileType.bar ||
         roundParticipant.handPile.drawTileType == DealTileType.sea) {
+      /// 杠上开花或者海底捞月
       baseScore = baseScore * 2;
       roundParticipant.score.value += baseScore * 3;
     } else if (roundParticipant.handPile.drawTileType == DealTileType.self) {
+      /// 自摸
       roundParticipant.score.value += baseScore * 3;
     } else {
+      /// 接别人打牌胡
       roundParticipant.score.value += baseScore;
     }
     if (discardParticipant != null) {
+      /// 打牌别人胡
       roundParticipants[discardParticipant!].score.value -= baseScore;
     } else {
       if (roundParticipant.packer != null) {
+        /// 包
         RoundParticipant pc = roundParticipants[roundParticipant.packer!];
         pc.score.value -= 3 * baseScore;
       } else {
+        /// 别人自摸
         for (int i = 0; i < roundParticipants.length; ++i) {
           if (i != owner) {
             RoundParticipant roundParticipant = roundParticipants[i];
@@ -731,18 +740,44 @@ class Round {
       }
     }
 
+    /// 杠牌的计算
     for (int i = 0; i < roundParticipants.length; ++i) {
       RoundParticipant roundParticipant = roundParticipants[i];
       for (var entry in roundParticipant.earnedActions.entries) {
-        OutstandingAction outstandingAction = entry.key;
-        if (outstandingAction == OutstandingAction.darkBar) {}
-        if (outstandingAction == OutstandingAction.bar) {
-          Set<int> participants = entry.value;
-          for (var participant in participants) {
+        MahjongAction mahjongAction = entry.key;
+
+        /// 暗杠
+        if (mahjongAction == MahjongAction.darkBar) {
+          Set<MahjongActionValue> mahjongActionValues = entry.value;
+          for (var mahjongActionValue in mahjongActionValues) {
+            if (mahjongActionValue.bar == mahjongActionValue.discard) {
+              if (i == mahjongActionValue.bar) {
+                roundParticipant.score.value += 60;
+              } else {
+                roundParticipant.score.value -= 20;
+              }
+            }
+          }
+        }
+
+        /// 明杠
+        if (mahjongAction == MahjongAction.bar) {
+          Set<MahjongActionValue> mahjongActionValues = entry.value;
+          for (var mahjongActionValue in mahjongActionValues) {
             // 自摸杠
-            if (i == participant) {
-              roundParticipant.score.value += 10;
-            } else {}
+            if (mahjongActionValue.bar == mahjongActionValue.discard) {
+              if (i == mahjongActionValue.bar) {
+                roundParticipant.score.value += 30;
+              } else {
+                roundParticipant.score.value -= 10;
+              }
+            } else {
+              if (i == mahjongActionValue.bar) {
+                roundParticipant.score.value += 30;
+              } else if (i == mahjongActionValue.discard) {
+                roundParticipant.score.value -= 30;
+              }
+            }
           }
         }
       }
@@ -763,6 +798,7 @@ class Round {
     if (confirm == null || !confirm) {
       return null;
     }
+    _score(owner, winType.index);
     RoomEvent winRoomEvent = RoomEvent(room.name,
         roundId: id, owner: owner, pos: pos, action: RoomEventAction.win);
     for (int i = 0; i < roundParticipants.length; ++i) {
@@ -778,10 +814,12 @@ class Round {
   }
 
   WinType? _win(int owner, int pos, int receiver) {
-    logger.w('chat message: $owner win pos:$pos');
     RoundParticipant roundParticipant = roundParticipants[owner];
     WinType? winType = roundParticipant.win(owner, pos);
-
+    if (winType == null) {
+      return null;
+    }
+    _score(owner, winType.index);
     if (receiver == room.creator) {
       room.banker = owner;
       room.startRoomEvent(RoomEvent(room.name,
@@ -887,8 +925,7 @@ class Round {
         returnValue = _rob(roomEvent.owner, roomEvent.src!, roomEvent.tile!,
             receiver: roomEvent.receiver);
       case RoomEventAction.score:
-        returnValue = _score(roomEvent.owner, roomEvent.pos!,
-            receiver: roomEvent.receiver);
+        returnValue = _score(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.pass:
         returnValue = _pass(roomEvent.owner, roomEvent.receiver!);
       case RoomEventAction.win:

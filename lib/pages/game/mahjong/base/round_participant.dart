@@ -13,6 +13,14 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/number_util.dart';
 import 'package:get/get.dart';
 
+class MahjongActionValue {
+  final MahjongAction action;
+  final int bar;
+  final int discard;
+
+  MahjongActionValue(this.action, this.bar, this.discard);
+}
+
 /// 每一轮的参与者
 class RoundParticipant {
   /// ParticipantDirection.index
@@ -32,13 +40,13 @@ class RoundParticipant {
   final WastePile wastePile = WastePile();
 
   /// 参与者等待处理的行为
-  final RxMap<OutstandingAction, Set<int>> outstandingActions =
-      RxMap<OutstandingAction, Set<int>>({});
+  final RxMap<MahjongAction, Set<int>> outstandingActions =
+      RxMap<MahjongAction, Set<int>>({});
 
   /// 参与者已经发生的行为，比如，明杠，暗杠等，值数组代表行为的发生人
-  /// 自己代表自摸杠，别人代表打牌杠
-  final Map<OutstandingAction, Set<int>> earnedActions =
-      <OutstandingAction, Set<int>>{};
+  /// key和value相同，代表自摸杠，否则表示value打牌，key杠
+  final Map<MahjongAction, Set<MahjongActionValue>> earnedActions =
+      <MahjongAction, Set<MahjongActionValue>>{};
 
   /// 记录重要的事件
   final List<RoomEvent> roomEvents = [];
@@ -75,7 +83,7 @@ class RoundParticipant {
     return handCount == 14;
   }
 
-  addOutstandingAction(OutstandingAction outstandingAction, List<int> vs) {
+  addOutstandingAction(MahjongAction outstandingAction, List<int> vs) {
     Set<int>? values = outstandingActions[outstandingAction];
     if (values == null) {
       values = {};
@@ -84,18 +92,19 @@ class RoundParticipant {
     values.addAll(vs);
   }
 
-  addEarnedAction(OutstandingAction outstandingAction, List<int> vs) {
-    Set<int>? values = earnedActions[outstandingAction];
+  addEarnedAction(
+      MahjongAction earnedAction, List<MahjongActionValue> earnedActionValues) {
+    Set<MahjongActionValue>? values = earnedActions[earnedAction];
     if (values == null) {
       values = {};
-      earnedActions[outstandingAction] = values;
+      earnedActions[earnedAction] = values;
     }
-    values.addAll(vs);
+    values.addAll(earnedActionValues);
   }
 
   /// 摸牌，有三种摸牌，普通的自摸，海底捞的自摸，杠上自摸
   /// owner摸到tile牌，dealTileType表示摸牌的方式
-  Map<OutstandingAction, Set<int>>? deal(
+  Map<MahjongAction, Set<int>>? deal(
       int owner, Tile tile, int dealTileTypeIndex) {
     if (owner != index) {
       return null;
@@ -114,7 +123,7 @@ class RoundParticipant {
     handPile.drawTileType = dealTileType;
 
     /// 检查摸到的牌，看需要采取的动作，这里其实只需要摸牌检查
-    Map<OutstandingAction, Set<int>> outstandingActions =
+    Map<MahjongAction, Set<int>> outstandingActions =
         check(tile: tile, dealTileType: dealTileType);
     if (outstandingActions.isNotEmpty) {
       mahjongFlameGame.loadActionArea();
@@ -138,40 +147,39 @@ class RoundParticipant {
   }
 
   /// 检查行为状态，既包括摸牌检查，也包含打牌检查
-  Map<OutstandingAction, Set<int>> check(
-      {Tile? tile, DealTileType? dealTileType}) {
+  Map<MahjongAction, Set<int>> check({Tile? tile, DealTileType? dealTileType}) {
     logger.w('$index check tile ${tile.toString()}');
     outstandingActions.clear();
     if (dealTileType == DealTileType.sea) {
       WinType? winType = handPile.checkWin(tile: tile);
       if (winType != null) {
-        addOutstandingAction(OutstandingAction.win, [winType.index]);
+        addOutstandingAction(MahjongAction.win, [winType.index]);
       } else {
-        addOutstandingAction(OutstandingAction.pass, []);
+        addOutstandingAction(MahjongAction.pass, []);
       }
       return outstandingActions.value;
     }
     WinType? winType = handPile.checkWin(tile: tile);
     if (winType != null) {
-      addOutstandingAction(OutstandingAction.win, [winType.index]);
+      addOutstandingAction(MahjongAction.win, [winType.index]);
     }
     if (tile == handPile.drawTile) {
       List<int>? pos = handPile.checkDarkBar();
       if (pos != null) {
-        addOutstandingAction(OutstandingAction.darkBar, pos);
+        addOutstandingAction(MahjongAction.darkBar, pos);
       }
       pos = handPile.checkDrawBar();
       if (pos != null) {
-        addOutstandingAction(OutstandingAction.bar, pos);
+        addOutstandingAction(MahjongAction.bar, pos);
       }
     } else if (tile != null) {
       int? pos = handPile.checkDiscardBar(tile);
       if (pos != null) {
-        addOutstandingAction(OutstandingAction.bar, [pos]);
+        addOutstandingAction(MahjongAction.bar, [pos]);
       }
       pos = handPile.checkTouch(tile);
       if (pos != null) {
-        addOutstandingAction(OutstandingAction.touch, [pos]);
+        addOutstandingAction(MahjongAction.touch, [pos]);
       }
     }
 
@@ -188,7 +196,7 @@ class RoundParticipant {
     }
     WinType? winType = handPile.checkWin(tile: tile);
     if (winType != null) {
-      addOutstandingAction(OutstandingAction.win, [winType.index]);
+      addOutstandingAction(MahjongAction.win, [winType.index]);
     }
 
     return winType;
@@ -221,7 +229,9 @@ class RoundParticipant {
     }
     Tile? discardBarTile = handPile.discardBar(pos, tile, discardParticipant);
     if (discardBarTile != null) {
-      addEarnedAction(OutstandingAction.bar, [owner]);
+      addEarnedAction(MahjongAction.bar, [
+        MahjongActionValue(MahjongAction.bar, owner, discardParticipant),
+      ]);
     }
     if (handPile.touchPiles.length == 4) {
       packer = discardParticipant;
@@ -239,7 +249,9 @@ class RoundParticipant {
     }
     tile = handPile.drawBar(pos, owner, tile: tile);
     if (tile != null) {
-      addEarnedAction(OutstandingAction.bar, [owner]);
+      addEarnedAction(MahjongAction.bar, [
+        MahjongActionValue(MahjongAction.bar, owner, owner),
+      ]);
     }
 
     return tile;
@@ -252,7 +264,9 @@ class RoundParticipant {
     }
     Tile? tile = handPile.darkBar(pos, owner);
     if (tile != null) {
-      addEarnedAction(OutstandingAction.bar, [pos]);
+      addEarnedAction(MahjongAction.darkBar, [
+        MahjongActionValue(MahjongAction.darkBar, owner, owner),
+      ]);
     }
 
     return tile;
@@ -272,7 +286,7 @@ class RoundParticipant {
   /// 胡牌，owner胡participantState中的可胡的牌形,pos表示可胡牌形数组的位置
   WinType? win(int owner, int win) {
     if (index == owner) {
-      Set<int>? wins = outstandingActions[OutstandingAction.win];
+      Set<int>? wins = outstandingActions[MahjongAction.win];
       if (wins != null && wins.isNotEmpty) {
         WinType? winType = NumberUtil.toEnum(WinType.values, win);
         if (winType != null) {
@@ -289,7 +303,7 @@ class RoundParticipant {
   /// 抢杠胡牌，owner抢src的明杠牌card胡牌
   WinType? rob(int owner, int pos, Tile tile, int src) {
     if (index == owner) {
-      Set<int>? wins = outstandingActions[OutstandingAction.win];
+      Set<int>? wins = outstandingActions[MahjongAction.win];
       if (wins != null && wins.isNotEmpty) {
         if (wins.contains(pos)) {
           WinType? winType = NumberUtil.toEnum(WinType.values, pos);

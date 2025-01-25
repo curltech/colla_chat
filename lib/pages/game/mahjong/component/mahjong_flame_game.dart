@@ -213,7 +213,7 @@ class MahjongFlameGame extends FlameGame
     }
     RoundParticipant? roundParticipant = roomController
         .getRoundParticipant(roomController.selfParticipantDirection.value);
-    Map<OutstandingAction, Set<int>>? outstandingActions =
+    Map<MahjongAction, Set<int>>? outstandingActions =
         roundParticipant?.outstandingActions.value;
     if (outstandingActions == null || outstandingActions.isEmpty) {
     } else {
