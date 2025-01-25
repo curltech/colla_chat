@@ -60,7 +60,7 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
     return Obx(() {
       Map<String, dynamic>? data = queryResultController.data.firstOrNull;
       if (data == null) {
-        return nilBox;
+        return Center(child: Text('No data'));
       }
       final List<PlatformDataColumn> queryResultDataColumns = [];
       for (var entry in data.entries) {
