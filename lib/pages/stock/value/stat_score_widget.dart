@@ -51,7 +51,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
 
   late final List<PlatformDataField> searchDataField;
   late final FormInputController searchController;
-  ExpansionTileController expansionTileController = ExpansionTileController();
+  final ExpansionTileController expansionTileController = ExpansionTileController();
 
   _init() {
     statScoreDataPageController.offset.addListener(_updateStatScore);
@@ -327,6 +327,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
     ];
     return BindingDataTable2<StatScore>(
       key: UniqueKey(),
+      minWidth: 1400,
       showCheckboxColumn: false,
       horizontalMargin: 10.0,
       columnSpacing: 0.0,

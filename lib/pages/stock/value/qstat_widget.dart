@@ -53,7 +53,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
 
   late final List<PlatformDataField> searchDataField;
   late final FormInputController searchController;
-  ExpansionTileController expansionTileController = ExpansionTileController();
+  final ExpansionTileController expansionTileController = ExpansionTileController();
 
   _init() {
     qstatDataPageController.offset.addListener(_updateQStat);
@@ -378,6 +378,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
 
     return BindingDataTable2<QStat>(
       key: UniqueKey(),
+      minWidth: 1400,
       showCheckboxColumn: false,
       horizontalMargin: 10.0,
       columnSpacing: 0.0,

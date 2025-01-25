@@ -52,7 +52,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
 
   late final List<PlatformDataField> searchDataField;
   late final FormInputController searchController;
-  ExpansionTileController expansionTileController = ExpansionTileController();
+  final ExpansionTileController expansionTileController = ExpansionTileController();
 
   _init() {
     qperformanceDataPageController.offset.addListener(_updateQPerformance);
@@ -334,6 +334,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
 
     return BindingPaginatedDataTable2<QPerformance>(
       key: UniqueKey(),
+      minWidth: 1400,
       showCheckboxColumn: false,
       horizontalMargin: 10.0,
       columnSpacing: 0.0,

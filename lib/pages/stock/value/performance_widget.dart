@@ -186,7 +186,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
   ];
   late final List<PlatformDataField> searchDataField;
   late final FormInputController searchController;
-  ExpansionTileController expansionTileController = ExpansionTileController();
+  final ExpansionTileController expansionTileController = ExpansionTileController();
 
   _init() {
     performanceDataPageController.offset.addListener(_updatePerformance);
@@ -320,6 +320,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
   Widget _buildPerformanceListView(BuildContext context) {
     return BindingPaginatedDataTable2<Performance>(
       key: UniqueKey(),
+      minWidth: 1500,
       showCheckboxColumn: false,
       horizontalMargin: 10.0,
       columnSpacing: 0.0,
