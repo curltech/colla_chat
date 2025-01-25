@@ -2,7 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:colla_chat/pages/game/mahjong/base/hand_pile.dart';
-import 'package:colla_chat/pages/game/mahjong/base/outstanding_action.dart';
+import 'package:colla_chat/pages/game/mahjong/base/mahjong_action.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round_participant.dart';

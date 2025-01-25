@@ -7,7 +7,7 @@ enum MahjongAction { pass, touch, bar, darkBar, chow, win, selfWin }
 
 class MahjongActions {
   static const String mahjongPath = 'mahjong/';
-  final Map<MahjongAction, Sprite> outstandingActions = {};
+  final Map<MahjongAction, Sprite> mahjongActions = {};
 
   MahjongActions() {
     init();
@@ -22,13 +22,13 @@ class MahjongActions {
 
   init() async {
     for (var outstandingAction in MahjongAction.values) {
-      outstandingActions[outstandingAction] =
+      mahjongActions[outstandingAction] =
           await loadSprite(outstandingAction);
     }
   }
 
   Sprite? operator [](MahjongAction outstandingAction) {
-    return outstandingActions[outstandingAction];
+    return mahjongActions[outstandingAction];
   }
 }
 

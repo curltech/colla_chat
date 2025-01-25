@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/pages/game/mahjong/base/full_pile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/hand_pile.dart';
-import 'package:colla_chat/pages/game/mahjong/base/outstanding_action.dart';
+import 'package:colla_chat/pages/game/mahjong/base/mahjong_action.dart';
 import 'package:colla_chat/pages/game/mahjong/base/participant.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room_pool.dart';

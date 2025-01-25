@@ -1,4 +1,4 @@
-import 'package:colla_chat/pages/game/mahjong/base/outstanding_action.dart';
+import 'package:colla_chat/pages/game/mahjong/base/mahjong_action.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round_participant.dart';
 import 'package:colla_chat/pages/game/mahjong/component/action_area_component.dart';
@@ -97,7 +97,7 @@ class MahjongFlameGame extends FlameGame
   _init() {
     camera = CameraComponent.withFixedResolution(
         width: roomController.width, height: roomController.height);
-    allOutstandingActions.outstandingActions.length;
+    allOutstandingActions.mahjongActions.length;
   }
 
   @override
