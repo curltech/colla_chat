@@ -225,10 +225,9 @@ class DataListController<T> {
     });
 
     this.currentIndex(0);
-    FindCondition findCondition = FindCondition();
-    findCondition.sortColumns
-        .add(SortColumn(columnIndex, columnName, ascending));
-    this.findCondition.value = findCondition;
+    this.findCondition.value.sortColumns = [
+      SortColumn(columnIndex, columnName, ascending)
+    ];
   }
 
   List<T> get checked {
