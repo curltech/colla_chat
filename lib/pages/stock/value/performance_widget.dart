@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:colla_chat/entity/stock/performance.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
@@ -8,6 +10,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/performance.dart';
 import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -15,7 +18,6 @@ import 'package:colla_chat/widgets/data_bind/binging_paginated_data_table2.dart'
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class PerformanceDataPageController extends DataPageController<Performance> {
   PerformanceDataPageController();
@@ -23,9 +25,23 @@ class PerformanceDataPageController extends DataPageController<Performance> {
   @override
   sort<S>(Comparable<S>? Function(Performance t) getFieldValue, int columnIndex,
       String columnName, bool ascending) {
-    sortColumnIndex(columnIndex);
-    sortColumnName(columnName);
-    sortAscending(ascending);
+    findCondition.value = findCondition.value
+        .copy(sortColumns: [SortColumn(columnIndex, columnName, ascending)]);
+  }
+
+  @override
+  FutureOr<void> findData() async {
+    Map<String, dynamic> responseData =
+        await remotePerformanceService.sendFindByQDate(
+            securityCode: findCondition.value.whereColumns['tsCode'],
+            startDate: findCondition.value.whereColumns['startDate'],
+            from: findCondition.value.offset,
+            limit: findCondition.value.limit,
+            orderBy: orderBy(),
+            count: findCondition.value.count);
+    findCondition.value.count = responseData['count'];
+    List<Performance> performances = responseData['data'];
+    replaceAll(performances);
   }
 }
 
@@ -186,13 +202,11 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
   ];
   late final List<PlatformDataField> searchDataField;
   late final FormInputController searchController;
-  final ExpansionTileController expansionTileController = ExpansionTileController();
+  final ExpansionTileController expansionTileController =
+      ExpansionTileController();
 
   _init() {
-    performanceDataPageController.offset.addListener(_updatePerformance);
-    performanceDataPageController.sortColumnName
-        .addListener(_updatePerformance);
-    performanceDataPageController.sortAscending.addListener(_updatePerformance);
+    performanceDataPageController.findCondition.addListener(_updatePerformance);
     searchDataField = [
       PlatformDataField(
         name: 'tsCode',
@@ -223,17 +237,9 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
   }
 
   _updatePerformance() {
-    var offset = performanceDataPageController.offset;
-    var sortColumnName = performanceDataPageController.sortColumnName;
-    var sortAscending = performanceDataPageController.sortAscending;
-    String? orderBy;
-    if (sortColumnName.value != null) {
-      orderBy = '$sortColumnName ${sortAscending.value ? 'asc' : 'desc'}';
-    }
     Map<String, dynamic> values = searchController.getValues();
-    String? tsCode = values['tsCode'];
-    String? startDate = values['startDate'];
-    _refresh(securityCode: tsCode, startDate: startDate, orderBy: orderBy);
+    performanceDataPageController.findCondition.value.whereColumns = values;
+    performanceDataPageController.findData();
   }
 
   Widget _buildActionWidget(int index, dynamic performance) {
@@ -257,24 +263,6 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
       ],
     );
     return actionWidget;
-  }
-
-  _refresh({String? securityCode, String? startDate, String? orderBy}) async {
-    RxInt offset = performanceDataPageController.offset;
-    RxInt limit = performanceDataPageController.limit;
-    RxInt count = performanceDataPageController.count;
-    Map<String, dynamic> responseData =
-        await remotePerformanceService.sendFindByQDate(
-            securityCode: securityCode,
-            startDate: startDate,
-            from: offset.value,
-            limit: limit.value,
-            orderBy: orderBy,
-            count: count.value);
-    count(responseData['count']);
-    List<Performance> performances = responseData['data'];
-    performanceDataPageController.count(count.value);
-    performanceDataPageController.replaceAll(performances);
   }
 
   /// 构建搜索条件
@@ -306,15 +294,11 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
   }
 
   _onOk(Map<String, dynamic> values) async {
-    performanceDataPageController.reset();
-
-    String? securityCode = values['tsCode'];
-    String? startDate = values['startDate'];
-    _refresh(
-      securityCode: securityCode,
-      startDate: startDate,
-    );
+    performanceDataPageController.findCondition.value.whereColumns = values;
+    await performanceDataPageController.findData();
     expansionTileController.collapse();
+    DialogUtil.info(
+        content: AppLocalizations.t('Performance search completely'));
   }
 
   Widget _buildPerformanceListView(BuildContext context) {

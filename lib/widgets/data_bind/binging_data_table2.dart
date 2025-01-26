@@ -40,16 +40,9 @@ class BindingDataTable2<T> extends StatelessWidget {
     this.horizontalMargin,
     this.columnSpacing,
     this.fixedLeftColumns = 0,
-  }) {
-    controller.data.addListener(() {
-      changed.value = !changed.value;
-    });
-    controller.currentIndex.addListener(() {
-      changed.value = !changed.value;
-    });
-  }
+  });
 
-  final RxBool changed = true.obs;
+  final RxBool selectChanged = false.obs;
 
   /// 过滤条件的多项选择框的列定义
   List<DataColumn2> _buildDataColumns() {
@@ -162,7 +155,7 @@ class BindingDataTable2<T> extends StatelessWidget {
           fn(index, value);
         } else if (checked != value) {
           EntityUtil.setChecked(t, value);
-          changed.value = !changed.value;
+          selectChanged.value = !selectChanged.value;
         }
       },
       onTap: () {
@@ -204,8 +197,9 @@ class BindingDataTable2<T> extends StatelessWidget {
 
   /// 过滤条件的多项选择框的表
   Widget _buildDataTable(BuildContext context) {
-    return ListenableBuilder(
-        listenable: changed,
+    return AnimatedBuilder(
+        animation: Listenable.merge(
+            [selectChanged, controller.data, controller.currentIndex]),
         builder: (BuildContext context, Widget? child) {
           return DataTable2(
             key: UniqueKey(),
@@ -240,8 +234,11 @@ class BindingDataTable2<T> extends StatelessWidget {
                   WidgetStateColor.resolveWith((states) => myself.primary),
               // checkColor: MaterialStateColor.resolveWith((states) => Colors.white)
             ),
-            sortColumnIndex: controller.sortColumnIndex.value,
-            sortAscending: controller.sortAscending.value,
+            sortColumnIndex:
+                controller.findCondition.value.sortColumns.firstOrNull?.index,
+            sortAscending: controller
+                    .findCondition.value.sortColumns.firstOrNull?.ascending ??
+                true,
             columns: _buildDataColumns(),
             rows: _buildDataRows(),
             onSelectAll: (val) {
@@ -250,7 +247,7 @@ class BindingDataTable2<T> extends StatelessWidget {
                 for (dynamic t in data) {
                   EntityUtil.setChecked(t, val);
                 }
-                changed.value = !changed.value;
+                selectChanged.value = !selectChanged.value;
               }
             },
           );

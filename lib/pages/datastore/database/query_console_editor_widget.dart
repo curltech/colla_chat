@@ -21,7 +21,7 @@ final codeController = CodeController(
 
 class QueryResultController extends DataPageController<Map<String, dynamic>> {
   @override
-  FutureOr<List<Map<String, dynamic>>?> findData() async {
+  FutureOr<void> findData() async {
     String sql = codeController.text;
     DataSource? current = dataSourceController.current.value;
     if (current == null) {
@@ -32,9 +32,8 @@ class QueryResultController extends DataPageController<Map<String, dynamic>> {
       return null;
     }
     List<Map<String, dynamic>> data = await dataStore.select(
-        'select * from ($sql) limit ${limit.value} offset ${offset.value}');
-
-    return data;
+        'select * from ($sql) limit ${findCondition.value.limit} offset ${findCondition.value.offset}');
+    replaceAll(data);
   }
 }
 
@@ -119,11 +118,7 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
                   return;
                 }
                 try {
-                  List<Map<String, dynamic>>? data =
-                      await queryResultController.findData();
-                  if (data != null) {
-                    queryResultController.data.assignAll(data);
-                  }
+                  await queryResultController.findData();
                 } catch (e) {
                   DialogUtil.error(content: 'execute sql failure:$e');
                 }

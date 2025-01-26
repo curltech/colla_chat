@@ -942,5 +942,10 @@
   "Delete folder": "删除目录",
   "Rename folder name": "重命名目录",
   "Rename": "重命名",
-  "Path": "路径"
+  "Path": "路径",
+  "Delete share": "删除股票",
+  "Delete group": "删除组",
+  "Remove member": "移除股票",
+  "Page/TotalPage": "页数/总页数",
+  "Records per page": "每页记录数"
 }

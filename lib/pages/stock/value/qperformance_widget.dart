@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:colla_chat/entity/stock/qperformance.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
@@ -16,15 +18,28 @@ import 'package:colla_chat/widgets/data_bind/binging_paginated_data_table2.dart'
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class QPerformanceDataPageController extends DataPageController<QPerformance> {
   @override
   sort<S>(Comparable<S>? Function(QPerformance t) getFieldValue,
       int columnIndex, String columnName, bool ascending) {
-    sortColumnIndex(columnIndex);
-    sortColumnName(columnName);
-    sortAscending(ascending);
+    findCondition.value = findCondition.value
+        .copy(sortColumns: [SortColumn(columnIndex, columnName, ascending)]);
+  }
+
+  @override
+  FutureOr<void> findData() async {
+    Map<String, dynamic> responseData =
+        await remoteQPerformanceService.sendFindByQDate(
+            tsCode: findCondition.value.whereColumns['tsCode'],
+            startDate: findCondition.value.whereColumns['startDate'],
+            from: findCondition.value.offset,
+            limit: findCondition.value.limit,
+            orderBy: orderBy(),
+            count: findCondition.value.count);
+    findCondition.value.count = responseData['count'];
+    List<QPerformance> qperformances = responseData['data'];
+    replaceAll(qperformances);
   }
 }
 
@@ -52,13 +67,11 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
 
   late final List<PlatformDataField> searchDataField;
   late final FormInputController searchController;
-  final ExpansionTileController expansionTileController = ExpansionTileController();
+  final ExpansionTileController expansionTileController =
+      ExpansionTileController();
 
   _init() {
-    qperformanceDataPageController.offset.addListener(_updateQPerformance);
-    qperformanceDataPageController.sortColumnName
-        .addListener(_updateQPerformance);
-    qperformanceDataPageController.sortAscending
+    qperformanceDataPageController.findCondition
         .addListener(_updateQPerformance);
     searchDataField = [
       PlatformDataField(
@@ -90,17 +103,9 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
   }
 
   _updateQPerformance() {
-    var offset = qperformanceDataPageController.offset;
-    var sortColumnName = qperformanceDataPageController.sortColumnName;
-    var sortAscending = qperformanceDataPageController.sortAscending;
-    String? orderBy;
-    if (sortColumnName.value != null) {
-      orderBy = '$sortColumnName ${sortAscending.value ? 'asc' : 'desc'}';
-    }
     Map<String, dynamic> values = searchController.getValues();
-    String? tsCode = values['tsCode'];
-    String? startDate = values['startDate'];
-    _refresh(tsCode: tsCode, startDate: startDate, orderBy: orderBy);
+    qperformanceDataPageController.findCondition.value.whereColumns = values;
+    qperformanceDataPageController.findData();
   }
 
   Widget _buildActionWidget(int index, dynamic qperformance) {
@@ -124,24 +129,6 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
       ],
     );
     return actionWidget;
-  }
-
-  _refresh({String? tsCode, String? startDate, String? orderBy}) async {
-    RxInt offset = qperformanceDataPageController.offset;
-    RxInt limit = qperformanceDataPageController.limit;
-    RxInt count = qperformanceDataPageController.count;
-    Map<String, dynamic> responseData =
-        await remoteQPerformanceService.sendFindByQDate(
-            tsCode: tsCode,
-            startDate: startDate,
-            from: offset.value,
-            limit: limit.value,
-            orderBy: orderBy,
-            count: count.value);
-    count(responseData['count']);
-    List<QPerformance> qperformances = responseData['data'];
-    qperformanceDataPageController.count(count.value);
-    qperformanceDataPageController.replaceAll(qperformances);
   }
 
   /// 构建搜索条件
@@ -173,14 +160,8 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
   }
 
   _onOk(BuildContext context, Map<String, dynamic> values) async {
-    qperformanceDataPageController.reset();
-
-    String? tsCode = values['tsCode'];
-    String? startDate = values['startDate'];
-    _refresh(
-      tsCode: tsCode,
-      startDate: startDate,
-    );
+    qperformanceDataPageController.findCondition.value.whereColumns=values;
+    await qperformanceDataPageController.findData();
     expansionTileController.collapse();
     DialogUtil.info(
         content: AppLocalizations.t('QPerformance search completely'));

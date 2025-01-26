@@ -135,7 +135,9 @@ class RemoteDayLineService extends GeneralRemoteService<DayLine> {
     }
     var responseData = await send('/dayline/FindFlexPoint', data: params);
     List<DayLine> dayLines = [];
-    if (responseData != null) {
+    if (responseData != null &&
+        responseData is Map &&
+        responseData.isNotEmpty) {
       List ms = responseData['data'];
       for (var m in ms) {
         var o = post(m);

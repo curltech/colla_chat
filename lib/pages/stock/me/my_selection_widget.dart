@@ -11,6 +11,7 @@ import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/service/stock/share_group.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
@@ -20,11 +21,15 @@ import 'package:get/get.dart';
 /// 存储在本地的自选股票的代码和分组
 class MyShareController {
   final RxBool showLoading = false.obs;
+
+  /// 自选股
   final RxString subscription = ''.obs;
 
+  /// 当前组
   final RxString groupName =
       AppLocalizations.t(ShareGroupService.defaultGroupName).obs;
 
+  /// 组的自选股
   final RxMap<String, String> groupSubscription = <String, String>{}.obs;
 
   MyShareController() {
@@ -57,7 +62,7 @@ class MyShareController {
     }
     String defaultGroupName =
         AppLocalizations.t(ShareGroupService.defaultGroupName);
-    await addShareGroup(defaultGroupName, [tsCode]);
+    await addMember(defaultGroupName, [tsCode]);
   }
 
   /// 删除股票，并从各各分组中删除
@@ -67,7 +72,7 @@ class MyShareController {
       await localSharedPreferences.save('subscription', subscription.value,
           encrypt: true);
       for (String groupName in groupSubscription.keys) {
-        await removeShareGroup(groupName, tsCode);
+        await removeMember(groupName, tsCode);
       }
     }
   }
@@ -78,9 +83,15 @@ class MyShareController {
     String defaultGroupName =
         AppLocalizations.t(ShareGroupService.defaultGroupName);
     groupSubscription[defaultGroupName] = subscription.value;
-    List<ShareGroup> shareGroups = await shareGroupService.findAll();
-    for (var shareGroup in shareGroups) {
-      groupSubscription[shareGroup.groupName] = shareGroup.subscription;
+    try {
+      myShareController.showLoading.value = true;
+      List<ShareGroup> shareGroups = await shareGroupService.findAll();
+      myShareController.showLoading.value = false;
+      for (var shareGroup in shareGroups) {
+        groupSubscription[shareGroup.groupName] = shareGroup.subscription;
+      }
+    } catch (e) {
+      myShareController.showLoading.value = false;
     }
 
     this.groupSubscription.assignAll(groupSubscription);
@@ -94,14 +105,20 @@ class MyShareController {
         subscription = myShareController.subscription.value;
         groupSubscription[groupName] = subscription;
       } else {
-        List<ShareGroup> shareGroups = await shareGroupService
-            .find(where: 'groupName=?', whereArgs: [groupName]);
-        if (shareGroups.isNotEmpty) {
-          subscription = '';
-          for (ShareGroup shareGroup in shareGroups) {
-            subscription = '${shareGroup.subscription}${subscription!},';
+        try {
+          myShareController.showLoading.value = true;
+          List<ShareGroup> shareGroups = await shareGroupService
+              .find(where: 'groupName=?', whereArgs: [groupName]);
+          myShareController.showLoading.value = false;
+          if (shareGroups.isNotEmpty) {
+            subscription = '';
+            for (ShareGroup shareGroup in shareGroups) {
+              subscription = '${shareGroup.subscription}${subscription!},';
+            }
+            groupSubscription[groupName] = subscription!;
           }
-          groupSubscription[groupName] = subscription!;
+        } catch (e) {
+          myShareController.showLoading.value = false;
         }
       }
     }
@@ -117,7 +134,7 @@ class MyShareController {
   }
 
   /// 将股票加入分组
-  Future<bool> addShareGroup(String groupName, List<String> tsCodes) async {
+  Future<bool> addMember(String groupName, List<String> tsCodes) async {
     String? subscription = groupSubscription[groupName];
     subscription ??= '';
     bool result = false;
@@ -139,7 +156,7 @@ class MyShareController {
   }
 
   /// 从分组中删除股票，不能从自选股分组中删除
-  Future<bool> removeShareGroup(String groupName, String tsCode) async {
+  Future<bool> removeMember(String groupName, String tsCode) async {
     if (ShareGroupService.defaultGroupName == groupName) {
       return false;
     }
@@ -210,35 +227,6 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
         IconButton(
           onPressed: () async {
             String tsCode = dayLine.tsCode;
-            String groupName = myShareController.groupName.value;
-            String defaultGroupName =
-                AppLocalizations.t(ShareGroupService.defaultGroupName);
-            if (groupName == defaultGroupName) {
-              bool? confirm = await DialogUtil.confirm(
-                  content: 'Do you confirm remove from group:$groupName?');
-              if (confirm != null && confirm) {
-                await myShareController.remove(tsCode);
-                multiKlineController.remove(tsCode);
-                _refresh();
-              }
-            } else {
-              bool? confirm = await DialogUtil.confirm(
-                  content: 'Do you confirm remove from group$groupName?');
-              if (confirm != null && confirm) {
-                await myShareController.removeShareGroup(groupName, tsCode);
-                _refresh();
-              }
-            }
-          },
-          icon: const Icon(
-            Icons.group_remove,
-            color: Colors.yellow,
-          ),
-          tooltip: AppLocalizations.t('Remove from group'),
-        ),
-        IconButton(
-          onPressed: () async {
-            String tsCode = dayLine.tsCode;
             await multiKlineController.put(tsCode);
             indexWidgetProvider.push('stockline_chart');
           },
@@ -255,13 +243,66 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
 
   /// 如果此时有记录被选择，则选择的记录将被移入组中
   _addMember(String groupName) async {
-    List<DayLine> checked = dayLineController.checked;
-    if (checked.isNotEmpty) {
-      List<String> tsCodes = [];
-      for (DayLine dayLine in checked) {
-        tsCodes.add(dayLine.tsCode);
+    List<DayLine> dayLines = dayLineController.checked;
+    if (dayLines.isEmpty) {
+      return;
+    }
+    bool? confirm = await DialogUtil.confirm(
+        content:
+            'Do you confirm add selected ${dayLines.length} shares to group:$groupName?');
+    if (confirm == null || !confirm) {
+      return;
+    }
+    dayLineController.setCheckAll(false);
+    List<String> tsCodes = [];
+    for (DayLine dayLine in dayLines) {
+      tsCodes.add(dayLine.tsCode);
+    }
+    await myShareController.addMember(groupName, tsCodes);
+  }
+
+  _removeMember() async {
+    String groupName = myShareController.groupName.value;
+    String defaultGroupName =
+        AppLocalizations.t(ShareGroupService.defaultGroupName);
+
+    List<DayLine> dayLines = dayLineController.checked;
+    if (dayLines.isEmpty) {
+      return;
+    }
+    bool? confirm = await DialogUtil.confirm(
+        content:
+            'Do you confirm remove selected ${dayLines.length} shares from group:$groupName?');
+    if (confirm == null || !confirm) {
+      return;
+    }
+    dayLineController.setCheckAll(false);
+    for (var dayLine in dayLines) {
+      String tsCode = dayLine.tsCode;
+      if (groupName == defaultGroupName) {
+        await myShareController.remove(tsCode);
+        multiKlineController.remove(tsCode);
+        _refresh();
+      } else {
+        await myShareController.removeMember(groupName, tsCode);
+        _refresh();
       }
-      await myShareController.addShareGroup(groupName, tsCodes);
+    }
+  }
+
+  _removeShare() async {
+    List<DayLine> dayLines = dayLineController.checked;
+    if (dayLines.isEmpty) {
+      return;
+    }
+    bool? confirm = await DialogUtil.confirm(
+        content: 'Do you confirm remove selected ${dayLines.length} shares?');
+    if (confirm != null && confirm) {
+      dayLineController.setCheckAll(false);
+      for (var dayLine in dayLines) {
+        await myShareController.remove(dayLine.tsCode);
+      }
+      _refresh();
     }
   }
 
@@ -270,9 +311,15 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
     String? subscription = await myShareController.findSubscription(groupName);
     if (subscription != null) {
       List<String> tsCodes = subscription.split(',');
-      List<DayLine> dayLines =
-          await multiKlineController.findLatestDayLines(tsCodes: tsCodes);
-      dayLineController.replaceAll(dayLines);
+      try {
+        myShareController.showLoading.value = true;
+        List<DayLine> dayLines =
+            await multiKlineController.findLatestDayLines(tsCodes: tsCodes);
+        dayLineController.replaceAll(dayLines);
+        myShareController.showLoading.value = false;
+      } catch (e) {
+        myShareController.showLoading.value = false;
+      }
     } else {
       dayLineController.replaceAll([]);
     }
@@ -284,11 +331,15 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
         label: '股票代码',
         name: 'ts_code',
         width: 80,
+        onSort: (int index, bool ascending) => dayLineController.sort(
+                (t) => t.tsCode, index, 'ts_code', ascending),
       ),
       PlatformDataColumn(
         label: '股票名',
         name: 'name',
         width: 80,
+        onSort: (int index, bool ascending) => dayLineController.sort(
+                (t) => t.name, index, 'name', ascending),
       ),
       PlatformDataColumn(
         label: '交易日期',
@@ -310,6 +361,8 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
         negativeColor: Colors.green,
         align: TextAlign.right,
         width: 70,
+        onSort: (int index, bool ascending) => dayLineController.sort(
+                (t) => t.pctChgClose, index, 'pct_chg_close', ascending),
       ),
       PlatformDataColumn(
         label: '量变化',
@@ -319,6 +372,8 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
         negativeColor: Colors.green,
         align: TextAlign.right,
         width: 70,
+        onSort: (int index, bool ascending) => dayLineController.sort(
+                (t) => t.pctChgVol, index, 'pct_chg_vol', ascending),
       ),
       PlatformDataColumn(
         label: '换手率',
@@ -326,6 +381,8 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
         dataType: DataType.double,
         align: TextAlign.right,
         width: 70,
+        onSort: (int index, bool ascending) => dayLineController.sort(
+                (t) => t.turnover, index, 'turnover', ascending),
       ),
       PlatformDataColumn(
           label: '',
@@ -335,23 +392,29 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
             return _buildActionWidget(context, index, dayLine);
           }),
     ];
+    Widget table = BindingDataTable2<DayLine>(
+      key: UniqueKey(),
+      showCheckboxColumn: true,
+      horizontalMargin: 10.0,
+      columnSpacing: 0.0,
+      platformDataColumns: dayLineDataColumns,
+      controller: dayLineController,
+      fixedLeftColumns: 2,
+    );
     return Stack(children: <Widget>[
-      BindingDataTable2<DayLine>(
-        key: UniqueKey(),
-        showCheckboxColumn: true,
-        horizontalMargin: 10.0,
-        columnSpacing: 0.0,
-        platformDataColumns: dayLineDataColumns,
-        controller: dayLineController,
-        fixedLeftColumns: 2,
-      ),
-      if (myShareController.showLoading.value)
-        Container(
-          width: double.infinity,
-          height: 450,
-          alignment: Alignment.center,
-          child: const CircularProgressIndicator(),
-        ),
+      table,
+      Obx(() {
+        if (myShareController.showLoading.value) {
+          return Container(
+            width: double.infinity,
+            height: 450,
+            alignment: Alignment.center,
+            child: const CircularProgressIndicator(),
+          );
+        } else {
+          return nilBox;
+        }
+      }),
     ]);
   }
 
@@ -361,8 +424,8 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
       List<Widget> children = [];
       for (String key in myShareController.groupSubscription.keys) {
         children.add(TextButton(
-          onPressed: () {
-            _addMember(key);
+          onPressed: () async {
+            await _addMember(key);
             myShareController.groupName.value = key;
             _refresh();
           },
@@ -390,7 +453,21 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
         onPressed: () {
           indexWidgetProvider.push('add_share');
         },
-        icon: const Icon(Icons.add_circle_outline),
+        icon: const Icon(Icons.add_chart_outlined),
+      ),
+      IconButton(
+        tooltip: AppLocalizations.t('Delete share'),
+        onPressed: () async {
+          await _removeShare();
+        },
+        icon: const Icon(Icons.bookmark_remove),
+      ),
+      IconButton(
+        tooltip: AppLocalizations.t('Remove member'),
+        onPressed: () async {
+          await _removeMember();
+        },
+        icon: const Icon(Icons.remove_road_outlined),
       ),
       IconButton(
         tooltip: AppLocalizations.t('Add group'),
@@ -402,7 +479,20 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
             myShareController.groupSubscription[groupName] = '';
           }
         },
-        icon: const Icon(Icons.group),
+        icon: const Icon(Icons.group_add_outlined),
+      ),
+      IconButton(
+        tooltip: AppLocalizations.t('Delete group'),
+        onPressed: () async {
+          String groupName = myShareController.groupName.value;
+          bool? confirm = await DialogUtil.confirm(
+              content: 'Do you confirm remove group $groupName?');
+          if (confirm != null && confirm) {
+            await myShareController.removeGroup(groupName);
+            _refresh();
+          }
+        },
+        icon: const Icon(Icons.group_remove_outlined),
       ),
       IconButton(
         tooltip: AppLocalizations.t('Refresh'),

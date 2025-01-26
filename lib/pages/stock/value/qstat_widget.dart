@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:colla_chat/entity/stock/qstat.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
@@ -17,15 +19,29 @@ import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class QStatDataPageController extends DataPageController<QStat> {
   @override
   sort<S>(Comparable<S>? Function(QStat t) getFieldValue, int columnIndex,
       String columnName, bool ascending) {
-    sortColumnIndex(columnIndex);
-    sortColumnName(columnName);
-    sortAscending(ascending);
+    findCondition.value = findCondition.value
+        .copy(sortColumns: [SortColumn(columnIndex, columnName, ascending)]);
+  }
+
+  @override
+  FutureOr<void> findData() async {
+    Map<String, dynamic> responseData =
+        await remoteQStatService.sendFindQStatBy(
+            tsCode: findCondition.value.whereColumns['tsCode'],
+            terms: findCondition.value.whereColumns['terms'],
+            source: findCondition.value.whereColumns['source'],
+            from: findCondition.value.offset,
+            // limit: findCondition.value.limit,
+            orderBy: orderBy(),
+            count: findCondition.value.count);
+    findCondition.value.count = responseData['count'];
+    List<QStat> qstats = responseData['data'];
+    replaceAll(qstats);
   }
 }
 
@@ -53,12 +69,11 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
 
   late final List<PlatformDataField> searchDataField;
   late final FormInputController searchController;
-  final ExpansionTileController expansionTileController = ExpansionTileController();
+  final ExpansionTileController expansionTileController =
+      ExpansionTileController();
 
   _init() {
-    qstatDataPageController.offset.addListener(_updateQStat);
-    qstatDataPageController.sortColumnName.addListener(_updateQStat);
-    qstatDataPageController.sortAscending.addListener(_updateQStat);
+    qstatDataPageController.findCondition.addListener(_updateQStat);
     searchDataField = [
       PlatformDataField(
         name: 'tsCode',
@@ -121,22 +136,9 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
   }
 
   _updateQStat() {
-    var offset = qstatDataPageController.offset;
-    var sortColumnName = qstatDataPageController.sortColumnName;
-    var sortAscending = qstatDataPageController.sortAscending;
-    String? orderBy;
-    if (sortColumnName.value != null) {
-      orderBy = '$sortColumnName ${sortAscending.value ? 'asc' : 'desc'}';
-    }
     Map<String, dynamic> values = searchController.getValues();
-    String? tsCode = values['tsCode'];
-    Set<dynamic>? terms = values['terms'];
-    Set<dynamic>? source = values['source'];
-    _refresh(
-        tsCode: tsCode,
-        terms: terms?.toList(),
-        source: source?.toList(),
-        orderBy: orderBy);
+    qstatDataPageController.findCondition.value.whereColumns = values;
+    qstatDataPageController.findData();
   }
 
   Widget _buildActionWidget(int index, dynamic qstat) {
@@ -145,7 +147,8 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
         const SizedBox(
           width: 10,
         ),
-        IconButton(
+        Expanded(
+            child: IconButton(
           onPressed: () async {
             String tsCode = qstat.tsCode;
             await multiKlineController.put(tsCode);
@@ -156,31 +159,10 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
             color: Colors.yellow,
           ),
           tooltip: AppLocalizations.t('StockLineChart'),
-        )
+        ))
       ],
     );
     return actionWidget;
-  }
-
-  _refresh(
-      {String? tsCode,
-      List<dynamic>? terms,
-      List<dynamic>? source,
-      String? orderBy}) async {
-    RxInt offset = qstatDataPageController.offset;
-    RxInt count = qstatDataPageController.count;
-    Map<String, dynamic> responseData =
-        await remoteQStatService.sendFindQStatBy(
-            tsCode: tsCode,
-            terms: terms,
-            source: source,
-            from: offset.value,
-            orderBy: orderBy,
-            count: count.value);
-    count(responseData['count']);
-    List<QStat> qstats = responseData['data'];
-    qstatDataPageController.count(count.value);
-    qstatDataPageController.replaceAll(qstats);
   }
 
   /// 构建搜索条件
@@ -212,20 +194,19 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
   }
 
   _onOk(BuildContext context, Map<String, dynamic> values) async {
-    qstatDataPageController.reset();
     String? tsCode = values['tsCode'];
     if (tsCode == null) {
       DialogUtil.error(content: 'tsCode must be value');
       return;
     }
-    Set<dynamic>? terms = values['terms'];
-    Set<dynamic>? source = values['source'];
-    _refresh(
-      tsCode: tsCode,
-      terms: terms?.toList(),
-      source: source?.toList(),
-    );
+    qstatDataPageController.findCondition.value.whereColumns = {
+      'tsCode': tsCode,
+      'terms': values['terms']?.toList(),
+      'source': values['source']?.toList(),
+    };
+    await qstatDataPageController.findData();
     expansionTileController.collapse();
+    DialogUtil.info(content: AppLocalizations.t('QStat search completely'));
   }
 
   Widget _buildQStatListView(BuildContext context) {

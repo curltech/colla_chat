@@ -54,21 +54,6 @@ class BindingPaginatedDataTable2<T> extends StatelessWidget {
     );
   }
 
-  Widget _buildPageNumber() {
-    int currentPage;
-    if (controller.currentIndex.value == null) {
-      currentPage = 0;
-    } else {
-      currentPage =
-          ((controller.currentIndex.value! + 1) / controller.limit.value)
-                  .floor() +
-              1;
-    }
-    int totalPage = (controller.limit.value).ceil();
-
-    return Text('${AppLocalizations.t('Page:')}$currentPage/$totalPage');
-  }
-
   @override
   Widget build(BuildContext context) {
     var dataTableView = Column(
@@ -88,12 +73,25 @@ class BindingPager extends StatelessWidget {
 
   final DataPageController controller;
 
-  static const List<int> _availableSizes = [3, 5, 10, 20];
+  static const List<int> _availableSizes = [3, 5, 10, 20, 50, 100, 500];
+
+  Widget _buildPageNumber() {
+    return ListenableBuilder(
+        listenable: controller.findCondition,
+        builder: (BuildContext context, Widget? child) {
+          int currentPage = PaginationUtil.getCurrentPage(
+              controller.findCondition.value.offset,
+              controller.findCondition.value.limit);
+          int totalPage = PaginationUtil.getPageCount(
+              controller.findCondition.value.count,
+              controller.findCondition.value.limit);
+          return Text(
+              '${AppLocalizations.t('Page/TotalPage')}:$currentPage/$totalPage');
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
-    int currentPage = PaginationUtil.getCurrentPage(
-        controller.offset.value, controller.limit.value);
     return Container(
       alignment: Alignment.centerLeft,
       child: Row(
@@ -107,20 +105,7 @@ class BindingPager extends StatelessWidget {
               tooltip: AppLocalizations.t('Previous'),
               onPressed: () => controller.previous(),
               icon: const Icon(Icons.chevron_left_sharp)),
-          Text('$currentPage'),
-          // DropdownButton<int>(
-          //     onChanged: (v) {
-          //       controller.limit.value = v!;
-          //     },
-          //     value: _availableSizes.contains(controller.limit.value)
-          //         ? controller.limit.value
-          //         : _availableSizes[0],
-          //     items: _availableSizes
-          //         .map((s) => DropdownMenuItem<int>(
-          //               value: s,
-          //               child: Text(s.toString()),
-          //             ))
-          //         .toList()),
+          _buildPageNumber(),
           IconButton(
               tooltip: AppLocalizations.t('Next'),
               onPressed: () => controller.next(),
@@ -128,7 +113,28 @@ class BindingPager extends StatelessWidget {
           IconButton(
               tooltip: AppLocalizations.t('Last'),
               onPressed: () => controller.last(),
-              icon: const Icon(Icons.skip_next))
+              icon: const Icon(Icons.skip_next)),
+          Text('${AppLocalizations.t('Records per page')}:'),
+          ListenableBuilder(
+              listenable: controller.findCondition,
+              builder: (BuildContext context, Widget? child) {
+                return DropdownButton<int>(
+                    onChanged: (v) {
+                      controller.findCondition.value = controller
+                          .findCondition.value
+                          .copy(offset: 0, limit: v!);
+                    },
+                    value: _availableSizes
+                            .contains(controller.findCondition.value.limit)
+                        ? controller.findCondition.value.limit
+                        : _availableSizes[0],
+                    items: _availableSizes
+                        .map((s) => DropdownMenuItem<int>(
+                              value: s,
+                              child: Text(s.toString()),
+                            ))
+                        .toList());
+              })
         ],
       ),
     );

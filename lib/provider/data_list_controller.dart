@@ -6,14 +6,59 @@ import 'package:colla_chat/tool/pagination_util.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+class SortColumn {
+  final int index;
+  final String name;
+  final bool ascending;
+
+  SortColumn(this.index, this.name, this.ascending);
+}
+
+class FindCondition {
+  Map<String, dynamic> whereColumns;
+  List<SortColumn> sortColumns;
+
+  ///总行数
+  int count;
+
+  ///当前页的第一行的行号
+  int offset;
+
+  ///每页行数
+  int limit;
+
+  FindCondition({
+    this.whereColumns = const {},
+    this.sortColumns = const [],
+    this.count = 0,
+    this.offset = defaultOffset,
+    this.limit = defaultLimit,
+  });
+
+  FindCondition copy(
+      {Map<String, dynamic>? whereColumns,
+      List<SortColumn>? sortColumns,
+      int? count,
+      int? offset,
+      int? limit}) {
+    FindCondition findCondition = FindCondition(
+      whereColumns: whereColumns ?? this.whereColumns,
+      sortColumns: sortColumns ?? this.sortColumns,
+      count: count ?? this.count,
+      offset: offset ?? this.offset,
+      limit: limit ?? this.limit,
+    );
+
+    return findCondition;
+  }
+}
+
 ///基础的数组数据控制器
 class DataListController<T> {
   Key key = UniqueKey();
   final RxList<T> data = <T>[].obs;
   final Rx<int?> currentIndex = Rx<int?>(null);
-  final Rx<int?> sortColumnIndex = Rx<int?>(null);
-  final Rx<String?> sortColumnName = Rx<String?>(null);
-  final RxBool sortAscending = true.obs;
+  final Rx<FindCondition> findCondition = Rx<FindCondition>(FindCondition());
 
   DataListController({List<T>? data, int? currentIndex}) {
     if (data != null && data.isNotEmpty) {
@@ -141,6 +186,20 @@ class DataListController<T> {
 
   int get length => data.length;
 
+  /// 获取数据的方法，子类可以覆盖
+  FutureOr<void> findData() async {}
+
+  String? orderBy() {
+    String? orderBy;
+    for (var sortColumn in findCondition.value.sortColumns) {
+      orderBy = orderBy == null ? '' : ',';
+      orderBy += '$sortColumn.name ${sortColumn.ascending ? 'asc' : 'desc'}';
+    }
+
+    return orderBy;
+  }
+
+  /// 已有数据的排序
   sort<S>(Comparable<S>? Function(T t) getFieldValue, int columnIndex,
       String columnName, bool ascending) {
     data.sort((T a, T b) {
@@ -166,9 +225,10 @@ class DataListController<T> {
     });
 
     this.currentIndex(0);
-    sortColumnIndex(columnIndex);
-    sortColumnName(columnName);
-    sortAscending(ascending);
+    FindCondition findCondition = FindCondition();
+    findCondition.sortColumns
+        .add(SortColumn(columnIndex, columnName, ascending));
+    this.findCondition.value = findCondition;
   }
 
   List<T> get checked {
@@ -193,82 +253,53 @@ class DataListController<T> {
 /// 分页数据控制器，记录了分页的信息
 /// 页面迁移时，其中的数组的数据被换掉
 abstract class DataPageController<T> extends DataListController<T> {
-  ///总行数
-  final RxInt count = 0.obs;
-
-  ///当前页的第一行的行号
-  final RxInt offset = defaultOffset.obs;
-
-  ///每页行数
-  final RxInt limit = defaultLimit.obs;
-
   DataPageController();
 
-  setCount() {}
-
-  FutureOr<List<T>?> findData() async {
-    return null;
-  }
-
-  reset() {
-    sortColumnName(null);
-    sortColumnIndex(null);
-    sortAscending(true);
-    count(0);
-    offset(defaultOffset);
-    limit(defaultLimit);
-    data.clear();
-  }
-
   previous() async {
-    if (offset.value >= limit.value) {
-      offset(offset.value - limit.value);
-
-      List<T>? items = await findData();
-      items ??= [];
-      data.assignAll(items);
+    int offset = findCondition.value.offset;
+    int limit = findCondition.value.limit;
+    if (offset >= limit) {
+      findCondition.value = findCondition.value.copy(offset: offset - limit);
+      await findData();
     }
   }
 
   next() async {
-    if (count.value == 0 || offset.value + limit.value <= count.value) {
-      offset(offset.value + limit.value);
-
-      List<T>? items = await findData();
-      items ??= [];
-      data.assignAll(items);
+    int offset = findCondition.value.offset;
+    int limit = findCondition.value.limit;
+    int count = findCondition.value.count;
+    if (count == 0 || offset + limit <= count) {
+      findCondition.value = findCondition.value.copy(offset: offset + limit);
+      await findData();
     }
   }
 
   first() async {
-    if (offset.value != 0) {
-      offset(0);
-
-      List<T>? items = await findData();
-      items ??= [];
-      data.assignAll(items);
+    int offset = findCondition.value.offset;
+    if (offset != 0) {
+      findCondition.value = findCondition.value.copy(offset: 0);
+      await findData();
     }
   }
 
   last() async {
-    int pageCount = PaginationUtil.getPageCount(count.value, limit.value);
-    if (count.value == 0 || pageCount > 0) {
-      offset((pageCount - 1) * limit.value);
-
-      List<T>? items = await findData();
-      items ??= [];
-      data.assignAll(items);
+    int limit = findCondition.value.limit;
+    int count = findCondition.value.count;
+    int pageCount = PaginationUtil.getPageCount(count, limit);
+    if (count == 0 || pageCount > 0) {
+      findCondition.value =
+          findCondition.value.copy(offset: (pageCount - 1) * limit);
+      await findData();
     }
   }
 
   movePage(int index) async {
-    int currentPage = PaginationUtil.getCurrentPage(offset.value, limit.value);
+    int offset = findCondition.value.offset;
+    int limit = findCondition.value.limit;
+    int currentPage = PaginationUtil.getCurrentPage(offset, limit);
     if (currentPage != index) {
-      offset(index * limit.value);
-
-      List<T>? items = await findData();
-      items ??= [];
-      data.assignAll(items);
+      findCondition.value = findCondition.value.copy(offset: index * limit);
+      await findData();
     }
   }
 }

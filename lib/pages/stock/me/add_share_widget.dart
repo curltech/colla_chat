@@ -57,7 +57,7 @@ class AddShareWidget extends StatelessWidget with TileDataMixin {
                 suffix: IconButton(
                   onPressed: () async {
                     await myShareController.add(share);
-                    _buildShareTileData();
+                    tileData.value = await _buildShareTileData();
                   },
                   icon: Icon(
                     Icons.add_box_outlined,

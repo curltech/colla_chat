@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:colla_chat/entity/stock/stat_score.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/stock/me/my_selection_widget.dart';
@@ -7,6 +9,7 @@ import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/stock/stat_score.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -15,15 +18,27 @@ import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class StatScoreDataPageController extends DataPageController<StatScore> {
   @override
   sort<S>(Comparable<S>? Function(StatScore t) getFieldValue, int columnIndex,
       String columnName, bool ascending) {
-    sortColumnIndex(columnIndex);
-    sortColumnName(columnName);
-    sortAscending(ascending);
+    findCondition.value = findCondition.value
+        .copy(sortColumns: [SortColumn(columnIndex, columnName, ascending)]);
+  }
+
+  @override
+  FutureOr<void> findData() async {
+    Map<String, dynamic> responseData = await remoteStatScoreService.sendSearch(
+        tsCode: findCondition.value.whereColumns['tsCode'],
+        terms: findCondition.value.whereColumns['terms'],
+        from: findCondition.value.offset,
+        // limit: findCondition.value.limit,
+        orderBy: orderBy(),
+        count: findCondition.value.count);
+    findCondition.value.count = responseData['count'];
+    List<StatScore> statScores = responseData['data'];
+    replaceAll(statScores);
   }
 }
 
@@ -51,12 +66,11 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
 
   late final List<PlatformDataField> searchDataField;
   late final FormInputController searchController;
-  final ExpansionTileController expansionTileController = ExpansionTileController();
+  final ExpansionTileController expansionTileController =
+      ExpansionTileController();
 
   _init() {
-    statScoreDataPageController.offset.addListener(_updateStatScore);
-    statScoreDataPageController.sortColumnName.addListener(_updateStatScore);
-    statScoreDataPageController.sortAscending.addListener(_updateStatScore);
+    statScoreDataPageController.findCondition.addListener(_updateStatScore);
     searchDataField = [
       PlatformDataField(
         name: 'keyword',
@@ -105,17 +119,9 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
   }
 
   _updateStatScore() {
-    var offset = statScoreDataPageController.offset;
-    var sortColumnName = statScoreDataPageController.sortColumnName;
-    var sortAscending = statScoreDataPageController.sortAscending;
-    String? orderBy;
-    if (sortColumnName.value != null) {
-      orderBy = '$sortColumnName ${sortAscending.value ? 'asc' : 'desc'}';
-    }
     Map<String, dynamic> values = searchController.getValues();
-    String? tsCode = values['tsCode'];
-    Set<dynamic>? terms = values['terms'];
-    _refresh(tsCode: tsCode, terms: terms?.toList(), orderBy: orderBy);
+    statScoreDataPageController.findCondition.value.whereColumns = values;
+    statScoreDataPageController.findData();
   }
 
   Widget _buildActionWidget(int index, dynamic qstat) {
@@ -139,21 +145,6 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
       ],
     );
     return actionWidget;
-  }
-
-  _refresh({String? tsCode, List<dynamic>? terms, String? orderBy}) async {
-    RxInt offset = statScoreDataPageController.offset;
-    RxInt count = statScoreDataPageController.count;
-    Map<String, dynamic> responseData = await remoteStatScoreService.sendSearch(
-        tsCode: tsCode,
-        terms: terms,
-        from: offset.value,
-        orderBy: orderBy,
-        count: count.value);
-    count(responseData['count']);
-    List<StatScore> statScores = responseData['data'];
-    statScoreDataPageController.count(count.value);
-    statScoreDataPageController.replaceAll(statScores);
   }
 
   /// 构建搜索条件
@@ -185,15 +176,14 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
   }
 
   _onOk(Map<String, dynamic> values) async {
-    statScoreDataPageController.reset();
-
     String? tsCode = values['tsCode'];
-    Set<dynamic>? terms = values['terms'];
-    _refresh(
-      tsCode: tsCode,
-      terms: terms?.toList(),
-    );
+    statScoreDataPageController.findCondition.value.whereColumns = {
+      'tsCode': tsCode,
+      'terms': values['terms']?.toList(),
+    };
+    await statScoreDataPageController.findData();
     expansionTileController.collapse();
+    DialogUtil.info(content: AppLocalizations.t('StatScore search completely'));
   }
 
   Widget _buildStatScoreListView(BuildContext context) {
