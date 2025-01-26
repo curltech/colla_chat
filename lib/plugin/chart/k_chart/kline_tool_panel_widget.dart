@@ -157,7 +157,8 @@ class KlineToolPanelWidget extends StatelessWidget {
             icon: Icon(Icons.skip_next_outlined, color: myself.primary)),
       ];
 
-      return Row(
+      return Wrap(
+        alignment: WrapAlignment.start,
         children: btns,
       );
     });
@@ -165,6 +166,9 @@ class KlineToolPanelWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(color: Colors.grey, child: _buildToolPanelWidget(context));
+    return Container(
+        alignment: Alignment.centerLeft,
+        color: Colors.grey,
+        child: _buildToolPanelWidget(context));
   }
 }

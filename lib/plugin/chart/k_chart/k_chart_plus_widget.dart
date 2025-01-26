@@ -1,6 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/chart/k_chart/kline_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -14,7 +15,7 @@ class KChartPlusController {
   final RxList<KLineEntity> klines = <KLineEntity>[].obs;
   final RxBool showLoading = false.obs;
   final RxBool showVol = true.obs;
-  final RxBool hideGrid = true.obs;
+  final RxBool hideGrid = false.obs;
   final RxBool showNowPrice = true.obs;
   final RxBool isTrendLine = false.obs;
   final Rx<VerticalTextAlignment> verticalTextAlignment =
@@ -79,6 +80,15 @@ class KChartPlusController {
   buildKlines() {
     KlineController? klineController = multiKlineController.klineController;
     if (klineController != null) {
+      double width = appDataProvider.secondaryBodyWidth;
+      int gap = 1;
+      if (width < 600) {
+        gap = 5;
+      } else if (width < 1000) {
+        gap = 3;
+      } else {
+        gap = 2;
+      }
       List<dynamic> data = klineController.data.value;
       List<KLineEntity> klines = [];
       for (int i = 0; i < data.length; i++) {
@@ -90,6 +100,10 @@ class KChartPlusController {
         if (tradeMinute != null) {
           hour = tradeMinute ~/ 60;
           minute = tradeMinute % 60;
+
+          if (minute % gap != 0) {
+            continue;
+          }
         }
         DateTime date = DateUtil.toDateTime(tradeDate.toString());
         int timestamp = date
