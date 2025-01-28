@@ -80,7 +80,7 @@ class FormatPile extends Pile {
         return false;
       }
     }
-    int count = splitPair();
+    int count = countPair();
     if (count != 1) {
       return false;
     }
@@ -98,8 +98,36 @@ class FormatPile extends Pile {
     return true;
   }
 
+  /// 计算19牌的数量
+  int count19() {
+    int count = 0;
+    for (int i = 0; i < tiles.length - 1; i++) {
+      Tile tile = tiles[i];
+      if (tile.is19()) {
+        count++;
+      }
+    }
+
+    return count;
+  }
+
+  /// 计算花色的数量
+  Map<Suit, int> countSuit() {
+    Map<Suit, int> counts = {};
+    for (int i = 0; i < tiles.length - 1; i++) {
+      Tile tile = tiles[i];
+      if (tile.suit != Suit.none) {
+        int? count = counts[tile.suit];
+        count = count ?? 0;
+        counts[tile.suit] = count + 1;
+      }
+    }
+
+    return counts;
+  }
+
   /// 分拆成对子，返回对子的个数
-  int splitPair() {
+  int countPair() {
     int count = 0;
     typePiles.clear();
     for (int i = 0; i < tiles.length - 1; i++) {
@@ -118,8 +146,12 @@ class FormatPile extends Pile {
     return count;
   }
 
-  int splitLux7Pair() {
-    int count = splitPair();
+  /// 相同两对的数目
+  /// -1，表示不是7对
+  /// 0，是7对
+  /// 其他，相同两对的数目
+  int countLux7Pair() {
+    int count = countPair();
     if (count == 7) {
       count = 0;
       for (int i = 0; i < typePiles.length - 1; ++i) {

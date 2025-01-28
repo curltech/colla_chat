@@ -42,7 +42,5 @@ enum WinType {
   small, //小胡
 }
 
-enum EnhanceType { lastOne, bar }
-
 /// 麻将牌的次序
 final List<int> rank = [1, 2, 3, 4, 5, 6, 7, 8, 9];

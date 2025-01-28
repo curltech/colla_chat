@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:colla_chat/pages/game/mahjong/base/format_tile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/hand_pile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/mahjong_action.dart';
+import 'package:colla_chat/pages/game/mahjong/base/mahjong_action_strategy.dart';
 import 'package:colla_chat/pages/game/mahjong/base/participant.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round.dart';
@@ -317,5 +319,184 @@ class RoundParticipant {
     }
 
     return null;
+  }
+
+  void predictAction() {
+    /// 首先判断是否有碰牌和杠牌，如果是wind，目标是混一色，混碰或者19碰
+    List<TypePile> touchPiles = handPile.touchPiles;
+    // 是否全是19牌刻子
+    bool is19 = true;
+    // 是否有wind牌刻子
+    bool isWind = false;
+    // 刻子的花色
+    Suit? suit;
+
+    MahjongActionStrategy actionStrategy = MahjongActionStrategy();
+    // 检查刻子牌
+    if (touchPiles.isNotEmpty) {
+      for (var touchPile in touchPiles) {
+        Tile tile = touchPile.tiles.first;
+        if (!tile.is19()) {
+          is19 = false;
+        }
+        Suit tileSuit = tile.suit;
+        if (tileSuit == Suit.wind) {
+          isWind = true;
+        } else {
+          if (suit == null) {
+            suit = tileSuit;
+          } else {
+            if (suit != tileSuit) {
+              actionStrategy.winGoals.add(WinType.touch);
+            }
+          }
+        }
+      }
+      if (is19) {
+        actionStrategy.winGoals.add(WinType.oneNine);
+      }
+      if (!actionStrategy.winGoals.contains(WinType.touch)) {
+        actionStrategy.winGoals.add(WinType.mixOneType);
+        actionStrategy.winGoals.add(WinType.mixTouch);
+        if (!isWind) {
+          actionStrategy.winGoals.add(WinType.pureTouch);
+          actionStrategy.winGoals.add(WinType.pureOneType);
+        }
+        actionStrategy.suitGoal = suit;
+      }
+    }
+
+    // 检查手牌，先格式化
+    FormatPile formatPile = FormatPile(tiles: [...handPile.tiles]);
+    // 19牌的数量，如果大于7，则可能打13幺
+    int count = formatPile.count19();
+    if (count > 7 && actionStrategy.winGoals.isEmpty) {
+      actionStrategy.winGoals.add(WinType.thirteenOne);
+    }
+    // 19牌的数量，如果大于7，则可能打19
+    if (handPile.tiles.length - count < 6 && actionStrategy.winGoals.isEmpty) {
+      actionStrategy.winGoals.add(WinType.oneNine);
+    }
+    // 打7对的检查
+    count = formatPile.countPair();
+    if (count > 3 && actionStrategy.winGoals.isEmpty) {
+      actionStrategy.winGoals.add(WinType.pair7);
+    }
+    // 检查最多的花色
+    if (actionStrategy.suitGoal == null) {
+      Map<Suit, int> countSuit = formatPile.countSuit();
+      Suit? maxSuit;
+      int max = 0;
+      for (var entry in countSuit.entries) {
+        Suit suit = entry.key;
+        if (suit == Suit.wind) {
+          continue;
+        }
+        int count = entry.value;
+        if (count > max) {
+          max = count;
+          maxSuit = suit;
+        }
+      }
+      actionStrategy.suitGoal = maxSuit;
+    }
+
+    /// 计算重要性的评分，0-14
+    /// 8-14:很重要，与最多花色相同，8表示19牌，9表示孤牌，10表示19相邻牌，11表示中间空心相邻牌，12表示中间带相邻牌，13表示对牌，14表示刻子或者顺子
+    /// 1-7:不重要，不是最多花色
+    /// 0:废牌
+    /// 如果目标有19，19牌的评分上升到15-17，如果有7对，则非花色的对子评分将上升到13
+    /// 如果目标有19，wind牌的评分上升到15-17，如果是混一色，单wind为8，对wind为11，三wind为14
+    List<int> scores = [];
+    // 对每一种手牌评分
+    int j = 0;
+    for (int i = 0; i < handPile.tiles.length; i = i + j + 1) {
+      Tile tile = handPile.tiles[i];
+      scores[i] = 0;
+      if (actionStrategy.winGoals.contains(WinType.thirteenOne)) {
+        if (tile.is19()) {
+          scores[i] = 15;
+        }
+        if (i + 1 < handPile.tiles.length && tile == handPile.tiles[i + 1]) {
+          scores[i + 1] = 1;
+          j = 1;
+          if (i + 2 < handPile.tiles.length && tile == handPile.tiles[i + 2]) {
+            scores[i + 2] = 1;
+            j = 2;
+          }
+        }
+      }
+      if (actionStrategy.winGoals.contains(WinType.oneNine)) {
+        if (tile.is19()) {
+          scores[i] = 15;
+        }
+        if (i + 1 < handPile.tiles.length && tile == handPile.tiles[i + 1]) {
+          scores[i] = 16;
+          scores[i + 1] = 16;
+          if (i + 2 < handPile.tiles.length && tile == handPile.tiles[i + 2]) {
+            scores[i] = 17;
+            scores[i + 1] = 17;
+            scores[i + 2] = 17;
+            j = 1;
+          }
+          j = 2;
+        }
+      }
+      if (actionStrategy.winGoals.contains(WinType.pair7)) {
+        if (i + 1 < handPile.tiles.length && tile == handPile.tiles[i + 1]) {
+          scores[i] = 15;
+          scores[i + 1] = 15;
+          if (tile.is19() || tile.suit == actionStrategy.suitGoal) {
+            scores[i] = 16;
+            scores[i + 1] = 16;
+          }
+          j = 1;
+        }
+      }
+      if (actionStrategy.winGoals.contains(WinType.mixOneType) ||
+          actionStrategy.winGoals.contains(WinType.mixTouch) ||
+          actionStrategy.winGoals.contains(WinType.pureOneType) ||
+          actionStrategy.winGoals.contains(WinType.pureTouch)) {
+        int increment;
+        if (tile.suit == actionStrategy.suitGoal) {
+          increment = 7;
+        } else {
+          increment = 0;
+        }
+        if (tile.is19()) {
+          scores[i] = increment + 1;
+        }
+        scores[i] = increment + 2;
+        if (i + 1 < handPile.tiles.length && tile.gap(handPile.tiles[i + 1])) {
+          scores[i] = increment + 4;
+          scores[i + 1] = increment + 4;
+          if (tile.is19() || handPile.tiles[i + 1].is19()) {
+            scores[i] = increment + 3;
+            scores[i + 1] = increment + 4;
+          }
+          j = 1;
+        }
+        if (i + 1 < handPile.tiles.length && tile.next(handPile.tiles[i + 1])) {
+          scores[i] = increment + 5;
+          scores[i + 1] = increment + 5;
+          if (tile.is19() || handPile.tiles[i + 1].is19()) {
+            scores[i] = increment + 3;
+            scores[i + 1] = increment + 3;
+          }
+          j = 1;
+        }
+        if (i + 1 < handPile.tiles.length && tile == handPile.tiles[i + 1]) {
+          scores[i] = increment + 6;
+          scores[i + 1] = increment + 6;
+          if (i + 2 < handPile.tiles.length && tile == handPile.tiles[i + 2]) {
+            scores[i] = increment + 7;
+            scores[i + 1] = increment + 7;
+            scores[i + 2] = increment + 7;
+            j = 2;
+          }
+          j = 1;
+        }
+      }
+    }
   }
 }

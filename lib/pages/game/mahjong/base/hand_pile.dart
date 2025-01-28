@@ -8,9 +8,9 @@ import 'package:colla_chat/tool/string_util.dart';
 
 /// 正在使用的牌，手牌
 class HandPile extends Pile {
-  //碰，杠牌，吃牌
+  //碰，杠牌
   final List<TypePile> touchPiles = [];
-
+  //吃牌
   final List<TypePile> drawingPiles = [];
 
   /// 刚摸进的牌
@@ -351,7 +351,7 @@ class HandPile extends Pile {
       winType = WinType.thirteenOne;
     }
     if (winType == null) {
-      int count = formatPile.splitLux7Pair();
+      int count = formatPile.countLux7Pair();
       if (count == 0) {
         winType = WinType.pair7;
       }

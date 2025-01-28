@@ -92,6 +92,17 @@ class Tile {
     return false;
   }
 
+  bool gap(Tile tile) {
+    if (suit == tile.suit &&
+        rank != null &&
+        tile.rank != null &&
+        rank! + 2 == tile.rank) {
+      return true;
+    }
+
+    return false;
+  }
+
   @override
   int get hashCode {
     return toString().hashCode;

@@ -254,6 +254,7 @@ dependencies:
   window_manager: ^0.4.0 #桌面应用的窗口管理
   #有特殊安装要求，否则编译出错
   any_link_preview: ^3.0.1 #预览link
+  drules: ^1.0.0
 
   # 多媒体
   ffmpeg_kit_flutter: ^6.0.3 #Android, iOS and macOS
