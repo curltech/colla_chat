@@ -321,7 +321,16 @@ class RoundParticipant {
     return null;
   }
 
-  void predictAction() {
+  MahjongActionStrategy actionStrategy = MahjongActionStrategy();
+
+  /// 对打出的牌判断是否杠牌
+  discardBarDecide() {}
+
+  /// 摸牌判断是否杠牌
+  drawBarDecide() {}
+
+  /// 摸牌后的重要性评分
+  List<int> drawScore() {
     /// 首先判断是否有碰牌和杠牌，如果是wind，目标是混一色，混碰或者19碰
     List<TypePile> touchPiles = handPile.touchPiles;
     // 是否全是19牌刻子
@@ -331,7 +340,8 @@ class RoundParticipant {
     // 刻子的花色
     Suit? suit;
 
-    MahjongActionStrategy actionStrategy = MahjongActionStrategy();
+    actionStrategy.winGoals.clear();
+    actionStrategy.suitGoal = null;
     // 检查刻子牌
     if (touchPiles.isNotEmpty) {
       for (var touchPile in touchPiles) {
@@ -498,5 +508,7 @@ class RoundParticipant {
         }
       }
     }
+
+    return scores;
   }
 }
