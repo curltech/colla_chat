@@ -10,6 +10,7 @@ import 'package:colla_chat/tool/string_util.dart';
 class HandPile extends Pile {
   //碰，杠牌
   final List<TypePile> touchPiles = [];
+
   //吃牌
   final List<TypePile> drawingPiles = [];
 
@@ -339,12 +340,10 @@ class HandPile extends Pile {
   }
 
   /// 检查胡牌，card是自摸或者别人打出的牌，返回是否可能胡的牌
-  WinType? checkWin({Tile? tile}) {
+  WinType? checkWin({required Tile tile}) {
     WinType? winType;
     List<Tile> tiles = [...this.tiles];
-    if (tile != null) {
-      tiles.add(tile);
-    }
+    tiles.add(tile);
     FormatPile formatPile = FormatPile(tiles: tiles);
     bool success = formatPile.check13_1();
     if (success) {

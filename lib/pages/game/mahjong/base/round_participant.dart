@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:colla_chat/pages/game/mahjong/base/format_tile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/hand_pile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/mahjong_action.dart';
 import 'package:colla_chat/pages/game/mahjong/base/mahjong_action_strategy.dart';
 import 'package:colla_chat/pages/game/mahjong/base/participant.dart';
+import 'package:colla_chat/pages/game/mahjong/base/pile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round.dart';
 import 'package:colla_chat/pages/game/mahjong/base/suit.dart';
@@ -149,7 +151,8 @@ class RoundParticipant {
   }
 
   /// 检查行为状态，既包括摸牌检查，也包含打牌检查
-  Map<MahjongAction, Set<int>> check({Tile? tile, DealTileType? dealTileType}) {
+  Map<MahjongAction, Set<int>> check(
+      {required Tile tile, DealTileType? dealTileType}) {
     logger.w('$index check tile ${tile.toString()}');
     outstandingActions.clear();
     if (dealTileType == DealTileType.sea) {
@@ -174,7 +177,7 @@ class RoundParticipant {
       if (pos != null) {
         addOutstandingAction(MahjongAction.bar, pos);
       }
-    } else if (tile != null) {
+    } else {
       int? pos = handPile.checkDiscardBar(tile);
       if (pos != null) {
         addOutstandingAction(MahjongAction.bar, [pos]);
@@ -183,6 +186,12 @@ class RoundParticipant {
       if (pos != null) {
         addOutstandingAction(MahjongAction.touch, [pos]);
       }
+    }
+
+    if (participant.robot) {
+      drawBarDecide(tile);
+      discardBarDecide(tile);
+      drawScore();
     }
 
     if (outstandingActions.value.isNotEmpty) {
@@ -324,13 +333,106 @@ class RoundParticipant {
   MahjongActionStrategy actionStrategy = MahjongActionStrategy();
 
   /// 对打出的牌判断是否杠牌
-  discardBarDecide() {}
+  MahjongAction discardBarDecide(Tile discardTile) {
+    if (actionStrategy.winGoals.contains(WinType.pair7) ||
+        actionStrategy.winGoals.contains(WinType.luxPair7) ||
+        actionStrategy.winGoals.contains(WinType.thirteenOne)) {
+      return MahjongAction.pass;
+    }
+    int pos = handPile.tiles.indexOf(discardTile);
+    if (pos == -1) {
+      return MahjongAction.pass;
+    }
+    if (pos + 1 >= handPile.tiles.length &&
+        handPile.tiles[pos + 1] != discardTile) {
+      return MahjongAction.pass;
+    }
+    if (pos + 2 >= handPile.tiles.length) {
+      return MahjongAction.touch;
+    }
+    if (discardTile.next(handPile.tiles[2]) ||
+        discardTile.gap(handPile.tiles[2])) {
+      return MahjongAction.pass;
+    }
+    if (discardTile == handPile.tiles[2]) {
+      if (pos + 3 < handPile.tiles.length) {
+        if (discardTile.next(handPile.tiles[3]) ||
+            discardTile.gap(handPile.tiles[3])) {
+          return MahjongAction.touch;
+        }
+      }
+      if (pos - 1 >= 0) {
+        if (handPile.tiles[pos - 1].next(discardTile) ||
+            handPile.tiles[pos - 1].gap(discardTile)) {
+          return MahjongAction.touch;
+        }
+      }
+      return MahjongAction.bar;
+    }
+    if (pos - 1 >= 0) {
+      if (handPile.tiles[pos - 1].next(discardTile) ||
+          handPile.tiles[pos - 1].gap(discardTile)) {
+        return MahjongAction.pass;
+      }
+    }
+
+    return MahjongAction.touch;
+  }
 
   /// 摸牌判断是否杠牌
-  drawBarDecide() {}
+  MahjongAction drawBarDecide(Tile drawTile) {
+    if (actionStrategy.winGoals.contains(WinType.pair7) ||
+        actionStrategy.winGoals.contains(WinType.luxPair7) ||
+        actionStrategy.winGoals.contains(WinType.thirteenOne)) {
+      return MahjongAction.pass;
+    }
+    List<TypePile> touchPiles = handPile.touchPiles;
+    if (touchPiles.isNotEmpty) {
+      for (var touchPile in touchPiles) {
+        if (touchPile.tiles.first == drawTile) {
+          for (var tile in handPile.tiles) {
+            if (tile.next(drawTile) ||
+                tile.gap(drawTile) ||
+                drawTile.next(tile) ||
+                drawTile.gap(tile)) {
+              return MahjongAction.pass;
+            }
+          }
+
+          return MahjongAction.bar;
+        }
+      }
+    }
+
+    int pos = handPile.tiles.indexOf(drawTile);
+    if (pos == -1) {
+      return MahjongAction.pass;
+    }
+    if (pos + 1 >= handPile.tiles.length &&
+        handPile.tiles[pos + 1] != drawTile) {
+      return MahjongAction.pass;
+    }
+    if (pos + 2 >= handPile.tiles.length &&
+        handPile.tiles[pos + 2] != drawTile) {
+      return MahjongAction.pass;
+    }
+    if (pos - 1 >= 0) {
+      if (handPile.tiles[pos - 1].next(drawTile) ||
+          handPile.tiles[pos - 1].gap(drawTile)) {
+        return MahjongAction.pass;
+      }
+    }
+    if (pos + 3 < handPile.tiles.length) {
+      if (drawTile.next(handPile.tiles[3]) || drawTile.gap(handPile.tiles[3])) {
+        return MahjongAction.pass;
+      }
+    }
+
+    return MahjongAction.darkBar;
+  }
 
   /// 摸牌后的重要性评分
-  List<int> drawScore() {
+  Map<Tile, int> drawScore() {
     /// 首先判断是否有碰牌和杠牌，如果是wind，目标是混一色，混碰或者19碰
     List<TypePile> touchPiles = handPile.touchPiles;
     // 是否全是19牌刻子
@@ -376,15 +478,20 @@ class RoundParticipant {
       }
     }
 
+    List<Tile> tiles = [...handPile.tiles];
+    if (handPile.drawTile != null) {
+      tiles.add(handPile.drawTile!);
+      Pile.sortTile(tiles);
+    }
     // 检查手牌，先格式化
-    FormatPile formatPile = FormatPile(tiles: [...handPile.tiles]);
+    FormatPile formatPile = FormatPile(tiles: tiles);
     // 19牌的数量，如果大于7，则可能打13幺
     int count = formatPile.count19();
     if (count > 7 && actionStrategy.winGoals.isEmpty) {
       actionStrategy.winGoals.add(WinType.thirteenOne);
     }
     // 19牌的数量，如果大于7，则可能打19
-    if (handPile.tiles.length - count < 6 && actionStrategy.winGoals.isEmpty) {
+    if (tiles.length - count < 6 && actionStrategy.winGoals.isEmpty) {
       actionStrategy.winGoals.add(WinType.oneNine);
     }
     // 打7对的检查
@@ -408,6 +515,10 @@ class RoundParticipant {
           maxSuit = suit;
         }
       }
+      actionStrategy.winGoals.add(WinType.mixOneType);
+      actionStrategy.winGoals.add(WinType.mixTouch);
+      actionStrategy.winGoals.add(WinType.pureOneType);
+      actionStrategy.winGoals.add(WinType.pureTouch);
       actionStrategy.suitGoal = maxSuit;
     }
 
@@ -417,94 +528,106 @@ class RoundParticipant {
     /// 0:废牌
     /// 如果目标有19，19牌的评分上升到15-17，如果有7对，则非花色的对子评分将上升到13
     /// 如果目标有19，wind牌的评分上升到15-17，如果是混一色，单wind为8，对wind为11，三wind为14
-    List<int> scores = [];
+    Map<Tile, int> scores = {};
     // 对每一种手牌评分
     int j = 0;
-    for (int i = 0; i < handPile.tiles.length; i = i + j + 1) {
-      Tile tile = handPile.tiles[i];
-      scores[i] = 0;
-      if (actionStrategy.winGoals.contains(WinType.thirteenOne)) {
-        if (tile.is19()) {
-          scores[i] = 15;
-        }
-        if (i + 1 < handPile.tiles.length && tile == handPile.tiles[i + 1]) {
-          scores[i + 1] = 1;
-          j = 1;
-          if (i + 2 < handPile.tiles.length && tile == handPile.tiles[i + 2]) {
-            scores[i + 2] = 1;
-            j = 2;
-          }
-        }
-      }
-      if (actionStrategy.winGoals.contains(WinType.oneNine)) {
-        if (tile.is19()) {
-          scores[i] = 15;
-        }
-        if (i + 1 < handPile.tiles.length && tile == handPile.tiles[i + 1]) {
-          scores[i] = 16;
-          scores[i + 1] = 16;
-          if (i + 2 < handPile.tiles.length && tile == handPile.tiles[i + 2]) {
-            scores[i] = 17;
-            scores[i + 1] = 17;
-            scores[i + 2] = 17;
-            j = 1;
-          }
-          j = 2;
-        }
-      }
-      if (actionStrategy.winGoals.contains(WinType.pair7)) {
-        if (i + 1 < handPile.tiles.length && tile == handPile.tiles[i + 1]) {
-          scores[i] = 15;
-          scores[i + 1] = 15;
-          if (tile.is19() || tile.suit == actionStrategy.suitGoal) {
-            scores[i] = 16;
-            scores[i + 1] = 16;
-          }
-          j = 1;
-        }
-      }
+    for (int i = 0; i < tiles.length; i = i + j + 1) {
+      Tile tile = tiles[i];
       if (actionStrategy.winGoals.contains(WinType.mixOneType) ||
           actionStrategy.winGoals.contains(WinType.mixTouch) ||
           actionStrategy.winGoals.contains(WinType.pureOneType) ||
           actionStrategy.winGoals.contains(WinType.pureTouch)) {
         int increment;
         if (tile.suit == actionStrategy.suitGoal) {
-          increment = 7;
+          increment = 8;
         } else {
-          increment = 0;
+          if (tile.suit == Suit.wind) {
+            increment = 8;
+          } else {
+            increment = 0;
+          }
         }
+        scores[tile] = increment;
         if (tile.is19()) {
-          scores[i] = increment + 1;
+          scores[tile] = increment + 1;
         }
-        scores[i] = increment + 2;
-        if (i + 1 < handPile.tiles.length && tile.gap(handPile.tiles[i + 1])) {
-          scores[i] = increment + 4;
-          scores[i + 1] = increment + 4;
-          if (tile.is19() || handPile.tiles[i + 1].is19()) {
-            scores[i] = increment + 3;
-            scores[i + 1] = increment + 4;
+        if (i + 1 < tiles.length) {
+          if (tile.gap(tiles[i + 1])) {
+            scores[tile] = increment + 3;
+            scores[tiles[i + 1]] = increment + 3;
+            if (tile.is19() || tiles[i + 1].is19()) {
+              scores[tile] = increment + 2;
+              scores[tiles[i + 1]] = increment + 3;
+            }
+            j = 1;
+          } else if (tile.next(tiles[i + 1])) {
+            scores[tile] = increment + 4;
+            scores[tiles[i + 1]] = increment + 4;
+            if (tile.is19() || tiles[i + 1].is19()) {
+              scores[tiles[i]] = increment + 2;
+              scores[tiles[i + 1]] = increment + 2;
+            }
+            j = 1;
+          } else if (tile == tiles[i + 1]) {
+            scores[tile] = increment + 5;
+            scores[tiles[i + 1]] = increment + 5;
+            j = 1;
+            if (i + 2 < tiles.length && tile == tiles[i + 2]) {
+              scores[tile] = increment + 7;
+              scores[tiles[i + 1]] = increment + 6;
+              scores[tiles[i + 2]] = increment + 6;
+              j = 2;
+            }
+          } else {
+            scores[tile] = increment;
+            j = 0;
+          }
+        }
+      }
+      if (actionStrategy.winGoals.contains(WinType.pair7)) {
+        if (i + 1 < tiles.length && tile == tiles[i + 1]) {
+          scores[tile] = 15;
+          scores[tiles[i + 1]] = 15;
+          if (tile.is19() || tile.suit == actionStrategy.suitGoal) {
+            scores[tile] = 16;
+            scores[tiles[i + 1]] = 16;
           }
           j = 1;
+        } else {
+          j = 0;
         }
-        if (i + 1 < handPile.tiles.length && tile.next(handPile.tiles[i + 1])) {
-          scores[i] = increment + 5;
-          scores[i + 1] = increment + 5;
-          if (tile.is19() || handPile.tiles[i + 1].is19()) {
-            scores[i] = increment + 3;
-            scores[i + 1] = increment + 3;
-          }
+      }
+      if (actionStrategy.winGoals.contains(WinType.thirteenOne)) {
+        if (tile.is19()) {
+          scores[tile] = 15;
+        }
+        if (i + 1 < tiles.length && tile == tiles[i + 1]) {
+          scores[tiles[i + 1]] = 1;
           j = 1;
-        }
-        if (i + 1 < handPile.tiles.length && tile == handPile.tiles[i + 1]) {
-          scores[i] = increment + 6;
-          scores[i + 1] = increment + 6;
-          if (i + 2 < handPile.tiles.length && tile == handPile.tiles[i + 2]) {
-            scores[i] = increment + 7;
-            scores[i + 1] = increment + 7;
-            scores[i + 2] = increment + 7;
+          if (i + 2 < tiles.length && tile == tiles[i + 2]) {
+            scores[tiles[i + 2]] = 1;
             j = 2;
           }
+        } else {
+          j = 0;
+        }
+      }
+      if (actionStrategy.winGoals.contains(WinType.oneNine)) {
+        if (tile.is19()) {
+          scores[tile] = 15;
+        }
+        if (i + 1 < tiles.length && tile == tiles[i + 1]) {
+          scores[tile] = 16;
+          scores[tiles[i + 1]] = 16;
           j = 1;
+          if (i + 2 < tiles.length && tile == tiles[i + 2]) {
+            scores[tile] = 17;
+            scores[tiles[i + 1]] = 17;
+            scores[tiles[i + 2]] = 17;
+            j = 2;
+          }
+        } else {
+          j = 0;
         }
       }
     }

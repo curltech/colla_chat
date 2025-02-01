@@ -114,7 +114,7 @@ class FormatPile extends Pile {
   /// 计算花色的数量
   Map<Suit, int> countSuit() {
     Map<Suit, int> counts = {};
-    for (int i = 0; i < tiles.length - 1; i++) {
+    for (int i = 0; i < tiles.length; i++) {
       Tile tile = tiles[i];
       if (tile.suit != Suit.none) {
         int? count = counts[tile.suit];

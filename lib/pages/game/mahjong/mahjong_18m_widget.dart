@@ -191,12 +191,31 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
             } else if (discardTile != null) {
               outstandingActions =
                   currentRoundParticipant.check(tile: discardTile);
-            } else {
-              outstandingActions = currentRoundParticipant.check();
             }
             mahjongFlameGame.reloadSelf();
           },
           icon: const Icon(Icons.check)));
+      rightWidgets.add(IconButton(
+          tooltip: AppLocalizations.t('score'),
+          onPressed: () {
+            Round? currentRound = room.currentRound;
+            if (currentRound == null) {
+              return;
+            }
+            RoundParticipant? currentRoundParticipant =
+                roomController.getRoundParticipant(
+                    roomController.selfParticipantDirection.value);
+            if (currentRoundParticipant == null) {
+              return;
+            }
+            mahjongCard.Tile? drawTile =
+                currentRoundParticipant.handPile.drawTile;
+            Map<mahjongCard.Tile, int> scores;
+            if (drawTile != null) {
+              scores = currentRoundParticipant.drawScore();
+            }
+          },
+          icon: const Icon(Icons.score_outlined)));
     }
 
     return rightWidgets;
