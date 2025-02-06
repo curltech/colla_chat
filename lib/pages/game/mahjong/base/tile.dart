@@ -1,22 +1,23 @@
 import 'dart:ui';
 
 import 'package:colla_chat/pages/game/mahjong/base/suit.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
 
-final Tile unknownTile = Tile(Suit.none, windSuit: null);
+final Tile unknownTile = Tile(-1, Suit.none, windSuit: null);
 
 class Tile {
   static const String mahjongCardPath = 'mahjong/tile/';
-
+  final int id;
   late final Suit suit;
   late final WindSuit? windSuit;
   final int? rank;
 
   Sprite? sprite;
 
-  Tile(this.suit, {this.windSuit, this.rank}) {
+  Tile(this.id, this.suit, {this.windSuit, this.rank}) {
     check();
     loadSprite();
   }
@@ -30,7 +31,9 @@ class Tile {
     }
   }
 
-  Tile.fromJson(Map json) : rank = json['rank'] {
+  Tile.fromJson(Map json)
+      : id = json['id'],
+        rank = json['rank'] {
     String? suit = json['suit'];
     if (suit != null) {
       this.suit = StringUtil.enumFromString(Suit.values, suit) ?? Suit.wind;
@@ -44,6 +47,7 @@ class Tile {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'suit': suit.name,
       'windSuit': windSuit?.name,
       'rank': rank,
@@ -52,14 +56,23 @@ class Tile {
 
   loadSprite() async {
     if (suit == Suit.wind && windSuit != null) {
-      Image image =
-          await Flame.images.load('$mahjongCardPath${windSuit!.name}.png');
-      sprite = Sprite(image);
+      String path = '$mahjongCardPath${windSuit!.name}.png';
+      try {
+        Image image =
+            await Flame.images.load('$mahjongCardPath${windSuit!.name}.png');
+        sprite = Sprite(image);
+      } catch (e) {
+        logger.e('Flame load image path:$path failure');
+      }
     } else {
       if (rank != null) {
-        Image image =
-            await Flame.images.load('$mahjongCardPath${suit.name}$rank.png');
-        sprite = Sprite(image);
+        String path = '$mahjongCardPath${suit.name}$rank.png';
+        try {
+          Image image = await Flame.images.load(path);
+          sprite = Sprite(image);
+        } catch (e) {
+          logger.e('Flame load image path:$path failure');
+        }
       }
     }
   }
@@ -108,13 +121,19 @@ class Tile {
     return toString().hashCode;
   }
 
+  /// 相同的牌，可能id不同
   @override
   bool operator ==(Object other) {
     return toString() == other.toString();
   }
 
+  /// 同一张牌，id也相同
+  bool same(Tile other) {
+    return toString() == other.toString() && id == other.id;
+  }
+
   Tile copy() {
-    Tile c = Tile(suit, windSuit: windSuit, rank: rank);
+    Tile c = Tile(id, suit, windSuit: windSuit, rank: rank);
     c.sprite = sprite;
 
     return c;

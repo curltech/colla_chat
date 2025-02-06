@@ -151,11 +151,12 @@ class TileComponent extends PositionComponent
           roomController.getParticipantDirection(areaDirection);
       RoundParticipant roundParticipant =
           currentRound.roundParticipants[participantDirection.index];
-      if (!roundParticipant.canDiscard) {
+      if (!roundParticipant.canDiscard()) {
         logger.e(
             'roundParticipant:${roundParticipant.index} cannot discard tile,${roundParticipant.handCount}');
         return;
       }
+
       HandPile handPile = roundParticipant.handPile;
       if (handPile.drawTile == tile) {
         room.startRoomEvent(RoomEvent(
@@ -167,6 +168,11 @@ class TileComponent extends PositionComponent
           pos: -1,
         ));
       } else {
+        if (!handPile.exist(tile)) {
+          logger.e(
+              'roundParticipant:${roundParticipant.index} cannot discard tile, not exist');
+          return;
+        }
         int pos = handPile.tiles.indexOf(tile);
         if (pos > -1) {
           room.startRoomEvent(RoomEvent(

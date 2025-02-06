@@ -1,8 +1,10 @@
 import 'package:colla_chat/pages/game/mahjong/base/format_tile.dart';
+import 'package:colla_chat/pages/game/mahjong/base/mahjong_action.dart';
 import 'package:colla_chat/pages/game/mahjong/base/pile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round.dart';
 import 'package:colla_chat/pages/game/mahjong/base/suit.dart';
 import 'package:colla_chat/pages/game/mahjong/base/tile.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 
@@ -376,20 +378,22 @@ class HandPile extends Pile {
     return winType;
   }
 
-  bool discard(Tile tile) {
-    bool success = false;
+  MahjongActionResult discard(Tile tile) {
+    MahjongActionResult result = MahjongActionResult.success;
     Tile? first = tiles.firstOrNull;
     if (first == unknownTile) {
-      success = tiles.remove(unknownTile);
+      if (!tiles.remove(unknownTile)) {
+        result = MahjongActionResult.exist;
+      }
       if (drawTile != null) {
         tiles.add(drawTile!);
         sort();
       }
     } else {
-      if (tile == drawTile) {
-        success = true;
-      } else {
-        success = tiles.remove(tile);
+      if (tile != drawTile) {
+        if (!tiles.remove(tile)) {
+          result = MahjongActionResult.exist;
+        }
         if (drawTile != null) {
           tiles.add(drawTile!);
           sort();
@@ -399,6 +403,9 @@ class HandPile extends Pile {
     drawTile = null;
     drawTileType = null;
 
-    return success;
+    logger.i(
+        'handPile discard tile:$tile result:${result.name}, drawTile is null');
+
+    return result;
   }
 }

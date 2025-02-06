@@ -4,38 +4,35 @@ import 'package:colla_chat/pages/game/mahjong/base/tile.dart';
 
 /// 完整的一副麻将
 class FullPile extends Pile {
-  final Map<String, Tile> _tileMap = {};
-
   FullPile() : super() {
     init();
   }
 
   init() async {
     for (var windSuit in WindSuit.values) {
-      Tile tile = Tile(Suit.wind, windSuit: windSuit);
-      tiles.add(tile);
-      _tileMap[tile.toString()] = tile;
+      for (int i = 0; i < 4; ++i) {
+        Tile tile = Tile(i, Suit.wind, windSuit: windSuit);
+        tiles.add(tile);
+      }
     }
     for (int i = 1; i < 10; ++i) {
-      Tile tile = Tile(Suit.suo, rank: i);
-      tiles.add(tile);
-      _tileMap[tile.toString()] = tile;
+      for (int j = 0; j < 4; ++j) {
+        Tile tile = Tile(j, Suit.suo, rank: i);
+        tiles.add(tile);
+      }
     }
     for (int i = 1; i < 10; ++i) {
-      Tile tile = Tile(Suit.tong, rank: i);
-      tiles.add(tile);
-      _tileMap[tile.toString()] = tile;
+      for (int j = 0; j < 4; ++j) {
+        Tile tile = Tile(j, Suit.tong, rank: i);
+        tiles.add(tile);
+      }
     }
     for (int i = 1; i < 10; ++i) {
-      Tile tile = Tile(Suit.wan, rank: i);
-      tiles.add(tile);
-      _tileMap[tile.toString()] = tile;
+      for (int j = 0; j < 4; ++j) {
+        Tile tile = Tile(j, Suit.wan, rank: i);
+        tiles.add(tile);
+      }
     }
-    _tileMap[unknownTile.toString()] = unknownTile;
-  }
-
-  Tile? operator [](String key) {
-    return _tileMap[key];
   }
 }
 

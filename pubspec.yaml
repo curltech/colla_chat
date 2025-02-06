@@ -152,7 +152,7 @@ dependencies:
   # flutter_unity_widget: ^2022.2.1
   # flutter_embed_unity: ^1.2.3
   #  opencv_dart: ^1.2.5
-  flame: ^1.21.0
+  flame: ^1.24.0
   interactive_chart: ^0.3.5 #candlesticks
   #  candlesticks:
   #    git:
@@ -331,7 +331,7 @@ dependencies:
   flutter_native_splash: ^2.4.1
   system_tray: ^2.0.3
   tray_manager: ^0.3.0
-  livekit_client: ^2.3.4+hotfix.1 #livekit sfu server flutter client
+  livekit_client: ^2.3.5 #livekit sfu server flutter client
   livekit_server_sdk: ^1.0.0
   langchain: ^0.7.1
   langchain_ollama: ^0.3.0
@@ -363,9 +363,9 @@ dependency_overrides:
   ffi: 2.1.0
   win32: 5.9.0
   http: 1.2.0
-  dart_webrtc: ^1.4.6+hotfix.1
+  dart_webrtc: ^1.4.10
   webrtc_interface: 1.2.0
-  flutter_webrtc: ^0.12.5+hotfix.2
+  flutter_webrtc: ^0.12.7
   #  flutter_webrtc_plus: ^0.11.2+5
   #  medea_flutter_webrtc: ^0.11.0
   protobuf: ^3.1.0

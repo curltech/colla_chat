@@ -57,4 +57,15 @@ class Pile {
   shuffle([Random? random]) {
     tiles.shuffle(random);
   }
+
+  /// 同一张牌是否存在
+  bool exist(Tile tile) {
+    for (var t in tiles) {
+      if (t == tile && t.id == tile.id) {
+        return true;
+      }
+    }
+
+    return false;
+  }
 }

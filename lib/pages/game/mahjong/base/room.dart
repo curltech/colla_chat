@@ -4,7 +4,6 @@ import 'dart:ui';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/game/mahjong/base/full_pile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/hand_pile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/participant.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room_pool.dart';
@@ -79,7 +78,7 @@ class RoomEvent {
   /// RoomAction事件的枚举
   late final RoomEventAction action;
 
-  final Tile? tile;
+  late final Tile? tile;
 
   /// 行为发生的来源参与者，比如0胡了1打出的牌
   final int? src;
@@ -118,10 +117,12 @@ class RoomEvent {
         owner = json['owner'],
         sender = json['sender'],
         receiver = json['receiver'],
-        tile = json['tile'] != null ? fullPile[json['tile']] : null,
         pos = json['pos'],
         content = json['content'],
         src = json['src'] {
+    if (json['tile'] != null) {
+      tile = Tile.fromJson(json['tile']);
+    }
     RoomEventAction? action;
     if (json['action'] != null) {
       action =
@@ -142,7 +143,7 @@ class RoomEvent {
       'sender': sender,
       'receiver': receiver,
       'action': action.name,
-      'tile': tile?.toString(),
+      'tile': JsonUtil.toJson(tile),
       'pos': pos,
       'content': content,
       'src': src,
@@ -159,6 +160,7 @@ class RoomEvent {
 class Room {
   final String name;
 
+  /// 房间的创建者
   late final int creator;
 
   /// 四个参与者
@@ -349,7 +351,7 @@ class Room {
 
   /// 发起房间的事件，由发起事件的参与者调用
   /// 完成后把round事件分发到其他参与者
-  dynamic startRoomEvent(RoomEvent roomEvent) async {
+  Future<dynamic> startRoomEvent(RoomEvent roomEvent) async {
     dynamic returnValue;
     if (roomEvent.action == RoomEventAction.round) {
       Round round = await _createRound(roomEvent.owner);
@@ -399,7 +401,7 @@ class Room {
 
   /// 房间的事件
   /// 直接调用round的事件处理器，不会进行事件分发到其他参与者
-  dynamic onRoomEvent(RoomEvent roomEvent) async {
+  Future<dynamic> onRoomEvent(RoomEvent roomEvent) async {
     // logger.w('room:$name has received event:${roomEvent.toString()}');
     dynamic returnValue;
     if (roomEvent.action == RoomEventAction.round) {

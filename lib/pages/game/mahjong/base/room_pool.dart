@@ -27,7 +27,7 @@ class RoomPool {
     return room;
   }
 
-  void send(ChatMessage chatMessage) {}
+  Future<void> send(ChatMessage chatMessage) async {}
 
   Room? get(String name) {
     return rooms[name];
@@ -70,7 +70,7 @@ class RoomPool {
 
   /// 房间的事件有外部触发，所有订阅者都会触发监听事件，
   /// 本方法由外部调用，比如外部的消息chatMessage
-  dynamic onRoomEvent(ChatMessage chatMessage) async {
+  Future<dynamic> onRoomEvent(ChatMessage chatMessage) async {
     String json = chatMessageService.recoverContent(chatMessage.content!);
     Map<String, dynamic> map = JsonUtil.toJson(json);
     RoomEvent roomEvent = RoomEvent.fromJson(map);

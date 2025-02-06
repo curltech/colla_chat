@@ -254,7 +254,7 @@ class GlobalChatMessage {
         await channelChatMessageService.receiveUpdateSubscript(chatMessage);
         break;
       case ChatMessageSubType.mahjong:
-        await roomPool.onRoomEvent(chatMessage);
+        roomPool.onRoomEvent(chatMessage);
         break;
       default:
         break;
