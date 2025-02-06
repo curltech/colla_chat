@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
@@ -46,7 +47,7 @@ class Round {
   /// creator只有等到其他参与者的回复事件后才能决定下一步的处理
   /// 比如打牌的时候，creator等待所有的参与者的回复，才决定是继续发牌还是有人胡牌或者杠牌
   /// Set<int>为等待回复的参与者
-  Set<int> outstandingParticipants = {};
+  Map<int, Completer<int>> outstandingParticipants = {};
 
   /// 刚出牌的参与者
   int? discardParticipant;
@@ -162,13 +163,18 @@ class Round {
 
   /// 增加等待决策的参与者
   addOutstandingParticipants(List<int> participants) {
-    outstandingParticipants.addAll(participants);
+    for (int participant in participants) {
+      if (!outstandingParticipants.containsKey(participant)) {
+        outstandingParticipants[participant] = Completer<int>();
+      }
+    }
   }
 
   /// 消解并检查等待的事件，如果全部消解则返回true，否则，返回false
-  bool checkOutstandingParticipant(int index) {
-    if (outstandingParticipants.contains(index)) {
-      outstandingParticipants.remove(index);
+  bool checkOutstandingParticipant(int participant) {
+    if (outstandingParticipants.containsKey(participant)) {
+      Completer? completer = outstandingParticipants.remove(participant);
+      completer?.complete(participant);
     }
     return outstandingParticipants.isEmpty;
   }
@@ -267,7 +273,7 @@ class Round {
     List<int> receivers = [];
     RoomEvent discardRoomEvent = RoomEvent(room.name,
         roundId: id, owner: owner, action: RoomEventAction.discard, tile: tile);
-    bool pass = true;
+
     outstandingParticipants.clear();
 
     /// 检查参与者，增加等待决策的参与者
@@ -277,41 +283,45 @@ class Round {
         Map<MahjongAction, Set<int>>? outstandingActions =
             roundParticipants[i].check(tile: tile);
         if (outstandingActions.isNotEmpty) {
-          pass = false;
+          result = MahjongActionResult.check;
           addOutstandingParticipants([i]);
         }
       }
-    }
-
-    /// 如果打牌者是创建者，并且无等待决策的参与者，则直接发牌
-    if (owner == room.creator && pass) {
-      deal();
     }
 
     /// 没有receiver，不是消息事件，creator发送事件消息给其他参与者，或者发送消息事件给creator
     /// 有receiver，是消息事件，receiver是creator发送事件消息给其他参与者，否则不发送消息
     await _sendChatMessage(discardRoomEvent, sender, receivers);
 
-    return pass ? MahjongActionResult.success : MahjongActionResult.check;
+    /// 如果打牌者是创建者，并且无等待决策的参与者，则直接发牌
+    if (result == MahjongActionResult.check) {
+      List<Future<int>> futures = [];
+      for (var entry in outstandingParticipants.entries) {
+        Future<int> future = entry.value.future;
+        futures.add(future);
+      }
+      await Future.wait<int>(futures);
+    }
+    if (owner == room.creator) {
+      deal();
+    }
+
+    return result;
   }
 
   /// 收到owner打牌的消息
-  MahjongActionResult _discard(int owner, Tile tile, int receiver) {
+  Future<MahjongActionResult> _discard(
+      int owner, Tile tile, int receiver) async {
     logger.w('chat message owner:$owner discard tile:$tile');
 
     /// 打牌的参与者执行事件处理
-
     final RoundParticipant roundParticipant = roundParticipants[owner];
     MahjongActionResult result = roundParticipant.discard(owner, tile);
-    if (result == MahjongActionResult.match ||
-        result == MahjongActionResult.count) {
-      return result;
+    if (result == MahjongActionResult.success) {
+      discardParticipant = owner;
+      discardTile = tile;
+      roundParticipants[receiver].check(tile: tile);
     }
-    discardParticipant = owner;
-    discardTile = tile;
-    roundParticipants[receiver].check(tile: tile);
-
-    bool pass = true;
 
     /// receiver不为空，事件是消息触发
     /// 接收者是创建者，等待检查其他的参与者的决策
@@ -324,17 +334,23 @@ class Round {
           Map<MahjongAction, Set<int>>? outstandingActions =
               roundParticipants[i].check(tile: tile);
           if (outstandingActions.isNotEmpty) {
-            pass = false;
+            result = MahjongActionResult.check;
             addOutstandingParticipants([i]);
           }
         }
       }
-      if (pass) {
-        deal();
+      if (result == MahjongActionResult.check) {
+        List<Future<int>> futures = [];
+        for (var entry in outstandingParticipants.entries) {
+          Future<int> future = entry.value.future;
+          futures.add(future);
+        }
+        await Future.wait<int>(futures);
       }
+      deal();
     }
 
-    return pass ? MahjongActionResult.success : MahjongActionResult.check;
+    return result;
   }
 
   Future<void> pass(int owner) async {
@@ -360,10 +376,7 @@ class Round {
     roundParticipant.pass(owner);
 
     if (receiver == room.creator) {
-      bool pass = checkOutstandingParticipant(owner);
-      if (pass) {
-        deal();
-      }
+      checkOutstandingParticipant(owner);
     }
   }
 
