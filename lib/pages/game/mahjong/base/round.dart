@@ -359,10 +359,7 @@ class Round {
     roundParticipant.pass(owner);
 
     if (owner == room.creator) {
-      bool pass = checkOutstandingParticipant(owner);
-      if (pass) {
-        deal();
-      }
+      checkOutstandingParticipant(owner);
     }
     RoomEvent passRoomEvent = RoomEvent(room.name,
         roundId: id, owner: owner, action: RoomEventAction.pass);
