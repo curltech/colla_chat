@@ -27,7 +27,7 @@ class QrcodeUtil {
       bytes = CryptoUtil.decodeBase64(embed.substring(pos));
       embeddedImage = MemoryImage(bytes);
     }
-    embeddedImageStyle ??= const QrEmbeddedImageStyle(
+    embeddedImageStyle ??= QrEmbeddedImageStyle(
       size: Size(80, 80),
     );
 
@@ -81,7 +81,7 @@ class QrcodeUtil {
             ),
             // size: 320.0,
             embeddedImage: snapshot.data,
-            embeddedImageStyle: const QrEmbeddedImageStyle(
+            embeddedImageStyle: QrEmbeddedImageStyle(
               size: Size.square(64),
             ),
           ),

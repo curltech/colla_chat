@@ -26,7 +26,7 @@ class ChewieVideoPlayerController extends OriginVideoPlayerController {
       additionalOptions: (context) {
         return <OptionItem>[
           OptionItem(
-            onTap: () {},
+            onTap: (BuildContext context) {},
             iconData: Icons.live_tv_sharp,
             title: 'Toggle Video Src',
           ),

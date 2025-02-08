@@ -390,7 +390,8 @@ dependency_overrides:
   shared_preferences: ^2.3.1
   intl: ^0.20.1
   image: ^4.5.2
-  camera: ^0.11.0+2 #调用相机
+  camera: ^0.11.1 #调用相机
+  camera_linux: ^0.0.8
   google_fonts: ^6.1.0
   material_design_icons_flutter: ^7.0.7296
   full_picker: ^2.1.5
