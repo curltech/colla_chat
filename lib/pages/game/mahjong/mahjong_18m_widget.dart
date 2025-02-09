@@ -18,6 +18,7 @@ import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
@@ -140,13 +141,71 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
     });
   }
 
+  _check() {
+    Room? room = roomController.room.value;
+    Round? currentRound = room?.currentRound;
+    if (currentRound == null) {
+      return;
+    }
+    RoundParticipant? currentRoundParticipant = roomController
+        .getRoundParticipant(roomController.selfParticipantDirection.value);
+    if (currentRoundParticipant == null) {
+      return;
+    }
+    mahjongCard.Tile? discardTile = currentRound.discardToken?.discardTile;
+    mahjongCard.Tile? drawTile = currentRoundParticipant.handPile.drawTile;
+    Map<RoomEventAction, Set<int>> outstandingActions;
+    if (drawTile != null) {
+      outstandingActions = currentRoundParticipant.check(tile: drawTile);
+    } else if (discardTile != null) {
+      outstandingActions = currentRoundParticipant.check(tile: discardTile);
+    }
+    mahjongFlameGame.reloadSelf();
+  }
+
+  _score() {
+    Room? room = roomController.room.value;
+    Round? currentRound = room?.currentRound;
+    if (currentRound == null) {
+      return;
+    }
+    RoundParticipant? currentRoundParticipant = roomController
+        .getRoundParticipant(roomController.selfParticipantDirection.value);
+    if (currentRoundParticipant == null) {
+      return;
+    }
+    mahjongCard.Tile? drawTile = currentRoundParticipant.handPile.drawTile;
+    Map<mahjongCard.Tile, int> scores;
+    if (drawTile != null) {
+      scores = currentRoundParticipant.drawScore();
+    }
+  }
+
+  _showEvent(BuildContext context) {
+    Room? room = roomController.room.value;
+    Round? currentRound = room?.currentRound;
+    if (currentRound == null) {
+      return;
+    }
+    DialogUtil.show(builder: (BuildContext context) {
+      return Dialog(
+        child: ListView.builder(
+          itemCount: currentRound.roomEvents.length,
+          itemBuilder: (BuildContext context, int index) {
+            return Text(currentRound.roomEvents[index].toString());
+          },
+        ),
+      );
+    });
+  }
+
   List<Widget> _buildRightWidgets(BuildContext context) {
     Room? room = roomController.room.value;
     List<Widget>? rightWidgets = [
       IconButton(
-          tooltip: AppLocalizations.t('Logger console'),
+          tooltip: AppLocalizations.t('Room event'),
           onPressed: () async {
-            indexWidgetProvider.push('logger');
+            _showEvent(context);
           },
           icon: const Icon(Icons.list_outlined)),
       IconButton(
@@ -171,50 +230,13 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
       rightWidgets.add(IconButton(
           tooltip: AppLocalizations.t('Check'),
           onPressed: () {
-            Round? currentRound = room.currentRound;
-            if (currentRound == null) {
-              return;
-            }
-            RoundParticipant? currentRoundParticipant =
-                roomController.getRoundParticipant(
-                    roomController.selfParticipantDirection.value);
-            if (currentRoundParticipant == null) {
-              return;
-            }
-            mahjongCard.Tile? discardTile =
-                currentRound.discardToken?.discardTile;
-            mahjongCard.Tile? drawTile =
-                currentRoundParticipant.handPile.drawTile;
-            Map<RoomEventAction, Set<int>> outstandingActions;
-            if (drawTile != null) {
-              outstandingActions =
-                  currentRoundParticipant.check(tile: drawTile);
-            } else if (discardTile != null) {
-              outstandingActions =
-                  currentRoundParticipant.check(tile: discardTile);
-            }
-            mahjongFlameGame.reloadSelf();
+            _check();
           },
           icon: const Icon(Icons.check)));
       rightWidgets.add(IconButton(
           tooltip: AppLocalizations.t('score'),
           onPressed: () {
-            Round? currentRound = room.currentRound;
-            if (currentRound == null) {
-              return;
-            }
-            RoundParticipant? currentRoundParticipant =
-                roomController.getRoundParticipant(
-                    roomController.selfParticipantDirection.value);
-            if (currentRoundParticipant == null) {
-              return;
-            }
-            mahjongCard.Tile? drawTile =
-                currentRoundParticipant.handPile.drawTile;
-            Map<mahjongCard.Tile, int> scores;
-            if (drawTile != null) {
-              scores = currentRoundParticipant.drawScore();
-            }
+            _score();
           },
           icon: const Icon(Icons.score_outlined)));
     }

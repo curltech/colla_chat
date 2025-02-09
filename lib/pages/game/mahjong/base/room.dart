@@ -20,11 +20,8 @@ import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/number_util.dart';
-import 'package:colla_chat/tool/string_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
-
-
 
 /// 麻将房间，包含一副麻将
 class Room {
@@ -272,7 +269,6 @@ class Room {
   /// 房间的事件
   /// 直接调用round的事件处理器，不会进行事件分发到其他参与者
   Future<dynamic> onRoomEvent(RoomEvent roomEvent) async {
-    // logger.w('room:$name has received event:${roomEvent.toString()}');
     dynamic returnValue;
     if (roomEvent.action == RoomEventAction.round) {
       String? content = roomEvent.content;
@@ -284,6 +280,7 @@ class Room {
         if (round.id >= rounds.length) {
           rounds.add(round);
         }
+        round.roomEvents.add(roomEvent);
         currentRoundIndex = round.id;
         returnValue = round;
         mahjongFlameGame.reload();

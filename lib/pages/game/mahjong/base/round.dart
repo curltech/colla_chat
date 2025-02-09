@@ -235,19 +235,19 @@ class Round {
     if (outstandingActions == null) {
       return null;
     }
-
+    RoomEvent tileRoomEvent = RoomEvent(room.name,
+        roundId: id,
+        owner: owner,
+        action: RoomEventAction.deal,
+        tile: tile,
+        src: room.creator,
+        pos: dealTileType.index);
+    roomEvents.add(tileRoomEvent);
     for (int i = 0; i < roundParticipants.length; ++i) {
       if (i == room.creator) {
         continue;
       }
       if (i == owner) {
-        RoomEvent tileRoomEvent = RoomEvent(room.name,
-            roundId: id,
-            owner: owner,
-            action: RoomEventAction.deal,
-            tile: tile,
-            src: room.creator,
-            pos: dealTileType.index);
         await _sendChatMessage(tileRoomEvent, room.creator, [owner]);
       } else {
         RoomEvent unknownRoomEvent = RoomEvent(room.name,
@@ -322,6 +322,7 @@ class Round {
     /// 有receiver，是消息事件，receiver是creator发送事件消息给其他参与者，否则不发送消息
     // logger.w(
     //     'send chat message owner:$owner to receivers:${receivers} discard tile:$tile');
+    roomEvents.add(discardRoomEvent);
     await _sendChatMessage(discardRoomEvent, sender, receivers);
 
     /// 如果打牌者是创建者，并且无等待决策的参与者，则直接发牌
@@ -406,6 +407,7 @@ class Round {
     }
     RoomEvent passRoomEvent = RoomEvent(room.name,
         roundId: id, owner: owner, src: owner, action: RoomEventAction.pass);
+    roomEvents.add(passRoomEvent);
     await _sendChatMessage(passRoomEvent, owner, [room.creator]);
   }
 
@@ -474,6 +476,7 @@ class Round {
         tile: discardTile,
         pos: pos,
         src: src);
+    roomEvents.add(touchRoomEvent);
     for (int i = 0; i < roundParticipants.length; ++i) {
       await _sendChatMessage(touchRoomEvent, owner, [i]);
     }
@@ -587,6 +590,7 @@ class Round {
         }
       }
     }
+    roomEvents.add(barRoomEvent);
     await _sendChatMessage(barRoomEvent, sender, receivers);
     if (owner == room.creator && pass) {
       barDeal(owner);
@@ -662,18 +666,20 @@ class Round {
     RoundParticipant roundParticipant = roundParticipants[owner];
     roundParticipant.deal(owner, tile, DealTileType.bar.index);
 
+    RoomEvent tileRoomEvent = RoomEvent(room.name,
+        roundId: id,
+        owner: owner,
+        action: RoomEventAction.deal,
+        tile: tile,
+        src: room.creator,
+        pos: DealTileType.bar.index);
+    roomEvents.add(tileRoomEvent);
+
     for (int i = 0; i < roundParticipants.length; ++i) {
       if (i == room.creator) {
         continue;
       }
       if (i == owner) {
-        RoomEvent tileRoomEvent = RoomEvent(room.name,
-            roundId: id,
-            owner: owner,
-            action: RoomEventAction.deal,
-            tile: tile,
-            src: room.creator,
-            pos: DealTileType.bar.index);
         await _sendChatMessage(tileRoomEvent, room.creator, [owner]);
       } else {
         RoomEvent unknownRoomEvent = RoomEvent(room.name,
@@ -707,6 +713,7 @@ class Round {
         tile: typePile.tiles.first,
         action: RoomEventAction.darkBar,
         pos: pos);
+    roomEvents.add(barRoomEvent);
     for (int i = 0; i < roundParticipants.length; ++i) {
       await _sendChatMessage(barRoomEvent, owner, [i]);
     }
@@ -884,6 +891,7 @@ class Round {
         src: owner,
         pos: pos,
         action: RoomEventAction.win);
+    roomEvents.add(winRoomEvent);
     for (int i = 0; i < roundParticipants.length; ++i) {
       await _sendChatMessage(winRoomEvent, owner, [i]);
     }
@@ -988,6 +996,7 @@ class Round {
   /// 假如自己是creator，则处理事件，然后转发事件消息到其他参与者
   /// 假如自己不是creator，则不发送事件消息
   Future<dynamic> onRoomEvent(RoomEvent roomEvent) async {
+    roomEvents.add(roomEvent);
     dynamic returnValue;
     RoomEventAction? action = roomEvent.action;
     switch (action) {

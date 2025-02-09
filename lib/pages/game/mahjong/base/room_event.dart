@@ -137,7 +137,7 @@ class RoomEvent {
 
   @override
   String toString() {
-    return 'name:$name,roundId:$roundId,owner:$owner,sender:$sender,receiver:$receiver,action:${action.name},tile:$tile,pos:$pos,src:$src,content:$content';
+    return 'name:$name,roundId:$roundId,action:${action.name},owner:$owner,src:$src,tile:$tile,pos:$pos,sender:$sender,receiver:$receiver,content:$content';
   }
 }
 
