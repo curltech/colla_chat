@@ -297,7 +297,11 @@ class Round {
     int sender = owner;
     List<int> receivers = [];
     RoomEvent discardRoomEvent = RoomEvent(room.name,
-        roundId: id, owner: owner, action: RoomEventAction.discard, tile: tile);
+        roundId: id,
+        owner: owner,
+        src: owner,
+        action: RoomEventAction.discard,
+        tile: tile);
 
     outstandingParticipants.clear();
 
@@ -401,7 +405,7 @@ class Round {
       checkOutstandingParticipant(owner);
     }
     RoomEvent passRoomEvent = RoomEvent(room.name,
-        roundId: id, owner: owner, action: RoomEventAction.pass);
+        roundId: id, owner: owner, src: owner, action: RoomEventAction.pass);
     await _sendChatMessage(passRoomEvent, owner, [room.creator]);
   }
 
@@ -668,6 +672,7 @@ class Round {
             owner: owner,
             action: RoomEventAction.deal,
             tile: tile,
+            src: room.creator,
             pos: DealTileType.bar.index);
         await _sendChatMessage(tileRoomEvent, room.creator, [owner]);
       } else {
@@ -676,6 +681,7 @@ class Round {
             owner: owner,
             action: RoomEventAction.deal,
             tile: unknownTile,
+            src: room.creator,
             pos: DealTileType.bar.index);
         await _sendChatMessage(unknownRoomEvent, room.creator, [i]);
       }
@@ -695,7 +701,12 @@ class Round {
       return null;
     }
     RoomEvent barRoomEvent = RoomEvent(room.name,
-        roundId: id, owner: owner, action: RoomEventAction.darkBar, pos: pos);
+        roundId: id,
+        owner: owner,
+        src: owner,
+        tile: typePile.tiles.first,
+        action: RoomEventAction.darkBar,
+        pos: pos);
     for (int i = 0; i < roundParticipants.length; ++i) {
       await _sendChatMessage(barRoomEvent, owner, [i]);
     }
@@ -860,14 +871,19 @@ class Round {
     if (winType == null) {
       return null;
     }
-    bool? confirm =
-        await DialogUtil.confirm(content: 'Do you want win ${winType.name}');
+    bool? confirm = await DialogUtil.confirm(
+        content:
+            '${roundParticipant.participant.name}, do you want win ${winType.name}');
     if (confirm == null || !confirm) {
       return null;
     }
     _score(owner, winType.index);
     RoomEvent winRoomEvent = RoomEvent(room.name,
-        roundId: id, owner: owner, pos: pos, action: RoomEventAction.win);
+        roundId: id,
+        owner: owner,
+        src: owner,
+        pos: pos,
+        action: RoomEventAction.win);
     for (int i = 0; i < roundParticipants.length; ++i) {
       await _sendChatMessage(winRoomEvent, owner, [i]);
     }
