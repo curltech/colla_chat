@@ -26,6 +26,8 @@ class TileComponent extends PositionComponent
       if (tile.sprite != null) {
         width = tile.sprite!.image.width.toDouble();
         height = tile.sprite!.image.height.toDouble();
+      } else {
+        logger.e('tile sprite image is null');
       }
       size = Vector2(width, height);
     }
@@ -136,7 +138,7 @@ class TileComponent extends PositionComponent
   discard() {
     RoundParticipant? roundParticipant = roomController
         .getRoundParticipant(roomController.selfParticipantDirection.value);
-    Map<MahjongAction, Set<int>>? outstandingActions =
+    Map<RoomEventAction, Set<int>>? outstandingActions =
         roundParticipant?.outstandingActions.value;
     if (outstandingActions != null && outstandingActions.isNotEmpty) {
       return;
@@ -158,6 +160,11 @@ class TileComponent extends PositionComponent
       }
 
       HandPile handPile = roundParticipant.handPile;
+      if (!handPile.exist(tile)) {
+        logger.e(
+            'roundParticipant:${roundParticipant.index} cannot discard tile, not exist');
+        return;
+      }
       if (handPile.drawTile == tile) {
         room.startRoomEvent(RoomEvent(
           room.name,
@@ -168,11 +175,6 @@ class TileComponent extends PositionComponent
           pos: -1,
         ));
       } else {
-        if (!handPile.exist(tile)) {
-          logger.e(
-              'roundParticipant:${roundParticipant.index} cannot discard tile, not exist');
-          return;
-        }
         int pos = handPile.tiles.indexOf(tile);
         if (pos > -1) {
           room.startRoomEvent(RoomEvent(

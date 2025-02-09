@@ -1,7 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/game/mahjong/base/full_pile.dart';
-import 'package:colla_chat/pages/game/mahjong/base/mahjong_action.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room_pool.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round.dart';
@@ -181,10 +180,11 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
             if (currentRoundParticipant == null) {
               return;
             }
-            mahjongCard.Tile? discardTile = currentRound.discardTile;
+            mahjongCard.Tile? discardTile =
+                currentRound.discardToken?.discardTile;
             mahjongCard.Tile? drawTile =
                 currentRoundParticipant.handPile.drawTile;
-            Map<MahjongAction, Set<int>> outstandingActions;
+            Map<RoomEventAction, Set<int>> outstandingActions;
             if (drawTile != null) {
               outstandingActions =
                   currentRoundParticipant.check(tile: drawTile);

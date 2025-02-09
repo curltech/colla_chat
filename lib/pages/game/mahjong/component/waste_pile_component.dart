@@ -43,9 +43,9 @@ class WastePileComponent extends PositionComponent
       RoundParticipant? roundParticipant =
           roomController.findRoundParticipant(areaDirection);
       if (roundParticipant != null) {
-        int? sender = roundParticipant.round.discardParticipant;
+        int? sender = roundParticipant.round.discardToken?.discardParticipant;
         if (sender == roundParticipant.index) {
-          mahjongTile.Tile? sendCard = roundParticipant.round.discardTile;
+          mahjongTile.Tile? sendCard = roundParticipant.round.discardToken?.discardTile;
           if (lastCard == sendCard) {
             last = true;
           }

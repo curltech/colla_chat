@@ -42,16 +42,16 @@ class ActionAreaComponent extends RectangleComponent
   loadSpriteButton() {
     RoundParticipant? roundParticipant = roomController
         .getRoundParticipant(roomController.selfParticipantDirection.value);
-    Map<MahjongAction, Set<int>>? outstandingActions =
+    Map<RoomEventAction, Set<int>>? outstandingActions =
         roundParticipant?.outstandingActions.value;
     if (outstandingActions == null || outstandingActions.isEmpty) {
       return;
     }
-    outstandingActions[MahjongAction.pass] = {};
+    outstandingActions[RoomEventAction.pass] = {};
     double x = 0;
     double y = 0;
     for (var entry in outstandingActions.entries) {
-      MahjongAction outstandingAction = entry.key;
+      RoomEventAction outstandingAction = entry.key;
 
       /// 位置，在明杠，暗杠，吃牌的时候有用
       Set<int> pos = entry.value;
@@ -76,7 +76,7 @@ class ActionAreaComponent extends RectangleComponent
     }
   }
 
-  _call(MahjongAction outstandingAction, List<int> pos) {
+  _call(RoomEventAction outstandingAction, List<int> pos) {
     Room? room = roomController.room.value;
     if (room == null) {
       return;
@@ -87,36 +87,36 @@ class ActionAreaComponent extends RectangleComponent
       return;
     }
 
-    if (outstandingAction == MahjongAction.win) {
+    if (outstandingAction == RoomEventAction.win) {
       room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,
           owner: owner,
           action: RoomEventAction.win,
           pos: pos[0]));
-    } else if (outstandingAction == MahjongAction.touch) {
+    } else if (outstandingAction == RoomEventAction.touch) {
       room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,
           owner: owner,
           action: RoomEventAction.touch,
-          src: round.discardParticipant,
-          tile: round.discardTile,
+          src: round.discardToken?.discardParticipant,
+          tile: round.discardToken?.discardTile,
           pos: pos[0]));
-    } else if (outstandingAction == MahjongAction.bar) {
+    } else if (outstandingAction == RoomEventAction.bar) {
       room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,
           owner: owner,
           action: RoomEventAction.bar,
           pos: pos[0]));
-    } else if (outstandingAction == MahjongAction.darkBar) {
+    } else if (outstandingAction == RoomEventAction.darkBar) {
       room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,
           owner: owner,
           action: RoomEventAction.darkBar,
           pos: pos[0]));
-    } else if (outstandingAction == MahjongAction.pass) {
+    } else if (outstandingAction == RoomEventAction.pass) {
       room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id, owner: owner, action: RoomEventAction.pass));
-    } else if (outstandingAction == MahjongAction.chow) {
+    } else if (outstandingAction == RoomEventAction.chow) {
       room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,
           owner: owner,

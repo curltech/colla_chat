@@ -50,7 +50,7 @@ enum RoomEventAction {
   rob, //抢杠胡牌
   seaWin, //海底捞胡
   pass, //过牌
-  score,
+  score, //计分
 }
 
 /// 房间事件，一个房间事件由系统或者某个参与者触发，通知其他参与者，会触发一些检查动作或者其他的事件
@@ -122,6 +122,8 @@ class RoomEvent {
         src = json['src'] {
     if (json['tile'] != null) {
       tile = Tile.fromJson(json['tile']);
+    } else {
+      tile = null;
     }
     RoomEventAction? action;
     if (json['action'] != null) {

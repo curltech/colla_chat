@@ -1,15 +1,14 @@
 import 'dart:ui';
 
+import 'package:colla_chat/pages/game/mahjong/base/room.dart';
 import 'package:flame/components.dart';
 import 'package:flame/flame.dart';
-
-enum MahjongAction { pass, touch, bar, darkBar, chow, win, selfWin }
 
 enum MahjongActionResult {
   // 成功
   success,
   // 参与者不匹配
-  match,
+  error,
   // 牌不存在
   exist,
   // 牌的数目不对
@@ -18,15 +17,15 @@ enum MahjongActionResult {
   check
 }
 
-class MahjongActions {
+class RoomEventActions {
   static const String mahjongPath = 'mahjong/';
-  final Map<MahjongAction, Sprite> mahjongActions = {};
+  final Map<RoomEventAction, Sprite> roomEventActions = {};
 
-  MahjongActions() {
+  RoomEventActions() {
     init();
   }
 
-  Future<Sprite> loadSprite(MahjongAction outstandingAction) async {
+  Future<Sprite> loadSprite(RoomEventAction outstandingAction) async {
     Image image =
         await Flame.images.load('$mahjongPath${outstandingAction.name}.webp');
 
@@ -34,14 +33,14 @@ class MahjongActions {
   }
 
   init() async {
-    for (var outstandingAction in MahjongAction.values) {
-      mahjongActions[outstandingAction] = await loadSprite(outstandingAction);
+    for (var outstandingAction in RoomEventAction.values) {
+      roomEventActions[outstandingAction] = await loadSprite(outstandingAction);
     }
   }
 
-  Sprite? operator [](MahjongAction outstandingAction) {
-    return mahjongActions[outstandingAction];
+  Sprite? operator [](RoomEventAction outstandingAction) {
+    return roomEventActions[outstandingAction];
   }
 }
 
-final MahjongActions allOutstandingActions = MahjongActions();
+final RoomEventActions allOutstandingActions = RoomEventActions();

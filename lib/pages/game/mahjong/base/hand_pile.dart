@@ -92,21 +92,59 @@ class HandPile extends Pile {
     return null;
   }
 
-  Tile? touch(int pos, Tile tile) {
-    if (pos < 0 || pos >= tiles.length) {
-      return null;
+  /// 手牌中是否存在
+  @override
+  bool exist(Tile tile) {
+    if (drawTile == null) {
+      return super.exist(tile);
     }
-    Tile? t = tiles.removeAt(pos);
-    if (t != unknownTile && t != tile) {
-      return null;
-    }
-    t = tiles.removeAt(pos);
-    if (t != unknownTile && t != tile) {
-      return null;
-    }
-    touchPiles.add(TypePile(tiles: [tile, tile, tile]));
+    return super.exist(tile) || drawTile!.same(tile);
+  }
 
-    return t;
+  Tile? remove(Tile tile) {
+    if (drawTile != null) {
+      if (drawTile!.same(tile)) {
+        drawTile = null;
+        drawTileType = null;
+
+        return tile;
+      }
+    }
+    int? pos;
+    for (int i = 0; i < tiles.length; ++i) {
+      if (tiles[i].same(tile)) {
+        pos = i;
+        break;
+      }
+    }
+    if (pos != null) {
+      return tiles.removeAt(pos);
+    }
+    return null;
+  }
+
+  TypePile? touch(int pos, Tile tile) {
+    if (pos < 0 || pos >= tiles.length - 1) {
+      return null;
+    }
+    if (tiles[pos] != tile) {
+      return null;
+    }
+    if (tiles[pos + 1] != tile) {
+      return null;
+    }
+    Tile? t1 = tiles.removeAt(pos);
+    if (t1 != unknownTile && t1 != tile) {
+      return null;
+    }
+    Tile? t2 = tiles.removeAt(pos);
+    if (t2 != unknownTile && t2 != tile) {
+      return null;
+    }
+    TypePile typePile = TypePile(tiles: [t1, t2, tile]);
+    touchPiles.add(typePile);
+
+    return typePile;
   }
 
   /// 检查打牌明杠
@@ -125,30 +163,36 @@ class HandPile extends Pile {
   }
 
   /// 打牌明杠
-  Tile? discardBar(int pos, Tile tile, int discardParticipant) {
-    if (pos < 0 || pos >= tiles.length) {
+  TypePile? discardBar(int pos, Tile tile, int discardParticipant) {
+    if (pos < 0 || pos >= tiles.length - 2) {
       return null;
     }
     if (tiles[pos] != tile) {
       return null;
     }
-    Tile? t = tiles.removeAt(pos);
-    if (t != unknownTile && t != tile) {
+    if (tiles[pos + 1] != tile) {
       return null;
     }
-    t = tiles.removeAt(pos);
-    if (t != unknownTile && t != tile) {
+    if (tiles[pos + 2] != tile) {
       return null;
     }
-    t = tiles.removeAt(pos);
-    if (t != unknownTile && t != tile) {
+    Tile? t1 = tiles.removeAt(pos);
+    if (t1 != unknownTile && t1 != tile) {
       return null;
     }
-    TypePile typePile = TypePile(tiles: [tile, tile, tile, tile]);
+    Tile? t2 = tiles.removeAt(pos);
+    if (t2 != unknownTile && t2 != tile) {
+      return null;
+    }
+    Tile? t3 = tiles.removeAt(pos);
+    if (t3 != unknownTile && t3 != tile) {
+      return null;
+    }
+    TypePile typePile = TypePile(tiles: [t1, t2, t3, tile]);
     typePile.source = discardParticipant;
     touchPiles.add(typePile);
 
-    return tile;
+    return typePile;
   }
 
   /// 检查摸牌明杠，需要检查tile与碰牌是否相同
@@ -181,7 +225,7 @@ class HandPile extends Pile {
   /// 摸牌明杠：分成摸牌杠牌和手牌杠牌
   /// pos是-1，则drawTile可杠，
   /// pos不是-1，则表示手牌的可杠牌位置
-  Tile? drawBar(int pos, int source, {Tile? tile}) {
+  TypePile? drawBar(int pos, int source, {Tile? tile}) {
     if (pos == -1) {
       if (tile == null) {
         tile ??= drawTile!;
@@ -197,22 +241,20 @@ class HandPile extends Pile {
     } else {
       return null;
     }
-
+    TypePile? typePile;
     for (int i = 0; i < touchPiles.length; ++i) {
-      TypePile typePile = touchPiles[i];
+      typePile = touchPiles[i];
       if (typePile.tiles[0] == tile) {
         if (typePile.tiles.length < 4) {
           typePile.tiles.add(tile);
           typePile.source = source;
-
-          return tile;
         } else {
           typePile.tiles.removeRange(4, typePile.tiles.length);
         }
       }
     }
 
-    return tile;
+    return typePile;
   }
 
   /// 检查暗杠，就是检查加上摸牌tile后，手上是否有连续的四张，如果有的话返回第一张的位置
@@ -240,47 +282,48 @@ class HandPile extends Pile {
     return pos;
   }
 
-  Tile? darkBar(int pos, int source) {
+  TypePile? darkBar(int pos, int source) {
     if (drawTile == null || drawTileType == null) {
       return null;
     }
     if (pos < 0 || pos >= tiles.length) {
       return null;
     }
-    Tile? tile;
+
+    TypePile? typePile;
 
     /// 三个手牌相同
     if (tiles[pos] == tiles[pos + 1] && tiles[pos] == tiles[pos + 2]) {
       /// 并且与摸牌相同
       if (tiles[pos] == drawTile) {
-        tile = tiles.removeAt(pos);
-        tiles.removeAt(pos);
-        tiles.removeAt(pos);
-        drawTile = null;
-        drawTileType = null;
-        TypePile typePile = TypePile(tiles: [tile, tile, tile, tile]);
+        Tile t1 = tiles.removeAt(pos);
+        Tile t2 = tiles.removeAt(pos);
+        Tile t3 = tiles.removeAt(pos);
+        typePile = TypePile(tiles: [t1, t2, t3, drawTile!]);
         typePile.source = source;
         touchPiles.add(typePile);
+        drawTile = null;
+        drawTileType = null;
       }
 
       /// 并且与第四张牌相同，摸牌进入手牌
       if (tiles.length > pos + 3 && tiles[pos] == tiles[pos + 3]) {
-        tile = tiles.removeAt(pos);
-        tiles.removeAt(pos);
-        tiles.removeAt(pos);
-        tiles.removeAt(pos);
+        Tile t1 = tiles.removeAt(pos);
+        Tile t2 = tiles.removeAt(pos);
+        Tile t3 = tiles.removeAt(pos);
+        Tile t4 = tiles.removeAt(pos);
         if (drawTile != null) {
           tiles.add(drawTile!);
           sort();
         }
         drawTile = null;
         drawTileType = null;
-        TypePile typePile = TypePile(tiles: [tile, tile, tile, tile]);
+        typePile = TypePile(tiles: [t1, t2, t3, t4]);
         typePile.source = source;
         touchPiles.add(typePile);
       }
     }
-    return tile;
+    return typePile;
   }
 
   /// 检查吃牌，tile是上家打出的牌
@@ -334,11 +377,13 @@ class HandPile extends Pile {
     return pos;
   }
 
-  chow(int pos, Tile tile) {
+  TypePile chow(int pos, Tile tile) {
     Tile tile1 = tiles.removeAt(pos);
     Tile tile2 = tiles.removeAt(pos);
     TypePile typePile = TypePile(tiles: [tile1, tile2, tile]);
     drawingPiles.add(typePile);
+
+    return typePile;
   }
 
   /// 检查胡牌，card是自摸或者别人打出的牌，返回是否可能胡的牌
@@ -380,31 +425,19 @@ class HandPile extends Pile {
 
   MahjongActionResult discard(Tile tile) {
     MahjongActionResult result = MahjongActionResult.success;
-    Tile? first = tiles.firstOrNull;
-    if (first == unknownTile) {
-      if (!tiles.remove(unknownTile)) {
-        result = MahjongActionResult.exist;
-      }
-      if (drawTile != null) {
-        tiles.add(drawTile!);
-        sort();
-      }
-    } else {
-      if (tile != drawTile) {
-        if (!tiles.remove(tile)) {
-          result = MahjongActionResult.exist;
-        }
-        if (drawTile != null) {
-          tiles.add(drawTile!);
-          sort();
-        }
-      }
+    Tile? removed = remove(tile);
+    if (removed == null) {
+      result = MahjongActionResult.exist;
     }
-    drawTile = null;
-    drawTileType = null;
+    if (drawTile != null) {
+      tiles.add(drawTile!);
+      drawTile = null;
+      drawTileType = null;
+      sort();
+    }
 
-    logger.i(
-        'handPile discard tile:$tile result:${result.name}, drawTile is null');
+    // logger.i(
+        // 'handPile discard tile:$tile result:${result.name}, drawTile is null');
 
     return result;
   }

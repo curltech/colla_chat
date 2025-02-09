@@ -97,7 +97,7 @@ class MahjongFlameGame extends FlameGame
   _init() {
     camera = CameraComponent.withFixedResolution(
         width: roomController.width, height: roomController.height);
-    allOutstandingActions.mahjongActions.length;
+    allOutstandingActions.roomEventActions.length;
   }
 
   @override
@@ -213,7 +213,7 @@ class MahjongFlameGame extends FlameGame
     }
     RoundParticipant? roundParticipant = roomController
         .getRoundParticipant(roomController.selfParticipantDirection.value);
-    Map<MahjongAction, Set<int>>? outstandingActions =
+    Map<RoomEventAction, Set<int>>? outstandingActions =
         roundParticipant?.outstandingActions.value;
     if (outstandingActions == null || outstandingActions.isEmpty) {
     } else {
