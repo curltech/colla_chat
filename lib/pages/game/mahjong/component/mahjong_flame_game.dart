@@ -1,5 +1,4 @@
 import 'package:colla_chat/pages/game/mahjong/base/room_event.dart';
-import 'package:colla_chat/pages/game/mahjong/base/room.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round_participant.dart';
 import 'package:colla_chat/pages/game/mahjong/component/action_area_component.dart';
 import 'package:colla_chat/pages/game/mahjong/component/hand_area_component.dart';

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:colla_chat/pages/game/mahjong/base/tile.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:flame/components.dart';
@@ -28,6 +29,7 @@ enum RoomEventAction {
   darkBar, //暗杠
   chow, //吃
   check, //检查
+  robotCheck,
   checkWin, //检查胡牌
   win, //胡
   rob, //抢杠胡牌
@@ -141,7 +143,7 @@ class RoomEvent {
   }
 }
 
-enum MahjongActionResult {
+enum RoomEventActionResult {
   // 成功
   success,
   // 参与者不匹配
@@ -162,16 +164,25 @@ class RoomEventActions {
     init();
   }
 
-  Future<Sprite> loadSprite(RoomEventAction outstandingAction) async {
-    Image image =
-        await Flame.images.load('$mahjongPath${outstandingAction.name}.webp');
+  Future<Sprite?> loadSprite(RoomEventAction outstandingAction) async {
+    try {
+      Image image =
+          await Flame.images.load('$mahjongPath${outstandingAction.name}.webp');
 
-    return Sprite(image);
+      return Sprite(image);
+    } catch (e) {
+      logger.e('loadSprite failure:$e');
+    }
+
+    return null;
   }
 
   init() async {
     for (var outstandingAction in RoomEventAction.values) {
-      roomEventActions[outstandingAction] = await loadSprite(outstandingAction);
+      Sprite? sprite = await loadSprite(outstandingAction);
+      if (sprite != null) {
+        roomEventActions[outstandingAction] = sprite;
+      }
     }
   }
 

@@ -110,7 +110,7 @@ class RoundParticipant {
       return null;
     }
 
-    if (handPile.exist(tile)) {
+    if (tile != unknownTile && handPile.exist(tile)) {
       logger.e('participant:$index draw tile:$tile is exist');
       return null;
     }
@@ -118,36 +118,37 @@ class RoundParticipant {
     handPile.drawTile = tile;
     handPile.drawTileType = dealTileType;
     round.discardToken = null;
-    // logger.w('participant:$index draw tile:$tile successfully');
+    // logger.w('owner:$owner deal tile:$tile successfully, discardToken is null');
 
     /// 检查摸到的牌，看需要采取的动作，这里其实只需要摸牌检查
-    Map<RoomEventAction, Set<int>> outstandingActions =
-        check(tile: tile, dealTileType: dealTileType);
+    if (tile != unknownTile) {
+      Map<RoomEventAction, Set<int>> outstandingActions =
+          check(tile: tile, dealTileType: dealTileType);
 
-    if (outstandingActions.isEmpty) {
-      // logger.i('participant:$index deal tile:$tile, robot discard');
-      _robotDiscard();
+      if (outstandingActions.isEmpty) {
+        robotDiscard();
+      }
+      mahjongFlameGame.reload();
     }
-    mahjongFlameGame.reload();
 
     return outstandingActions;
   }
 
   /// 打牌，owner打出牌card，对其他人检查打的牌是否能够胡牌，杠牌和碰牌，返回检查的结果
   /// -1:owner不对，0:数目不对,
-  MahjongActionResult discard(int owner, Tile tile) {
+  RoomEventActionResult discard(int owner, Tile tile) {
     if (owner != index) {
-      return MahjongActionResult.error;
+      return RoomEventActionResult.error;
     }
     if (!canDiscard()) {
       logger.e('participant:$index owner:$owner can not discard:$tile');
 
-      return MahjongActionResult.count;
+      return RoomEventActionResult.count;
     }
     if (!handPile.exist(tile)) {
       logger.e('participant:$index owner:$owner is not exist discard:$tile');
 
-      return MahjongActionResult.exist;
+      return RoomEventActionResult.exist;
     }
     if (wastePile.exist(tile)) {
       logger.e('participant:$index owner:$owner wastePile exist discard:$tile');
@@ -156,7 +157,7 @@ class RoundParticipant {
       logger.i('participant:$index owner:$owner wastePile add discard:$tile');
     }
 
-    MahjongActionResult result = handPile.discard(tile);
+    RoomEventActionResult result = handPile.discard(tile);
 
     return result;
   }
@@ -165,6 +166,17 @@ class RoundParticipant {
   Map<RoomEventAction, Set<int>> check(
       {required Tile tile, DealTileType? dealTileType}) {
     outstandingActions.clear();
+    if (tile == unknownTile) {
+      return outstandingActions;
+    }
+    round.roomEvents.add(RoomEvent(
+      round.room.name,
+      roundId: round.id,
+      owner: index,
+      tile: tile,
+      pos: dealTileType?.index,
+      action: RoomEventAction.check,
+    ));
     if (dealTileType == DealTileType.sea) {
       WinType? winType = handPile.checkWin(tile: tile);
       if (winType != null) {
@@ -211,7 +223,7 @@ class RoundParticipant {
     // logger.w(
     //     'participant:$index check tile:$tile, outstandingAction:${outstandingActions.value}');
 
-    _robotCheck();
+    robotCheck();
 
     if (outstandingActions.value.isNotEmpty) {
       mahjongFlameGame.reload();
@@ -233,10 +245,11 @@ class RoundParticipant {
   }
 
   /// 当机器参与者有未决的行为时，自动采取行为
-  _robotCheck() {
+  robotCheck() async {
     if (!participant.robot) {
       return;
     }
+
     Map<RoomEventAction, Set<int>> outstandingActions =
         this.outstandingActions.value;
     if (outstandingActions.isEmpty) {
@@ -244,9 +257,15 @@ class RoundParticipant {
     }
     Room room = round.room;
     int owner = index;
+    round.roomEvents.add(RoomEvent(
+      room.name,
+      roundId: round.id,
+      owner: owner,
+      action: RoomEventAction.robotCheck,
+    ));
     Set<int>? pos = outstandingActions[RoomEventAction.win];
     if (pos != null) {
-      room.startRoomEvent(RoomEvent(room.name,
+      await room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,
           owner: owner,
           action: RoomEventAction.win,
@@ -259,7 +278,7 @@ class RoundParticipant {
       if (tile != null) {
         RoomEventAction mahjongAction = drawBarDecide(tile);
         if (mahjongAction == RoomEventAction.darkBar) {
-          room.startRoomEvent(RoomEvent(room.name,
+          await room.startRoomEvent(RoomEvent(room.name,
               roundId: round.id,
               owner: owner,
               action: RoomEventAction.darkBar,
@@ -269,18 +288,18 @@ class RoundParticipant {
     }
     pos = outstandingActions[RoomEventAction.bar];
     if (pos != null) {
-      RoomEventAction? mahjongAction;
+      RoomEventAction? roomEventAction;
       Tile? tile = handPile.drawTile;
       if (tile != null) {
-        mahjongAction = drawBarDecide(tile);
+        roomEventAction = drawBarDecide(tile);
       } else {
         tile = round.discardToken?.discardTile;
         if (tile != null) {
-          mahjongAction = discardBarDecide(tile);
+          roomEventAction = discardBarDecide(tile);
         }
       }
-      if (mahjongAction == RoomEventAction.bar) {
-        room.startRoomEvent(RoomEvent(room.name,
+      if (roomEventAction == RoomEventAction.bar) {
+        await room.startRoomEvent(RoomEvent(room.name,
             roundId: round.id,
             owner: owner,
             action: RoomEventAction.bar,
@@ -292,9 +311,9 @@ class RoundParticipant {
     if (pos != null) {
       Tile? tile = round.discardToken?.discardTile;
       if (tile != null) {
-        RoomEventAction mahjongAction = discardBarDecide(tile);
-        if (mahjongAction == RoomEventAction.touch) {
-          room.startRoomEvent(RoomEvent(room.name,
+        RoomEventAction roomEventAction = discardBarDecide(tile);
+        if (roomEventAction == RoomEventAction.touch) {
+          await room.startRoomEvent(RoomEvent(room.name,
               roundId: round.id,
               owner: owner,
               action: RoomEventAction.touch,
@@ -326,7 +345,6 @@ class RoundParticipant {
     if (typePile != null && handPile.touchPiles.length == 4) {
       packer = discardParticipant;
     }
-    _robotDiscard();
 
     return typePile;
   }
@@ -349,7 +367,6 @@ class RoundParticipant {
     if (handPile.touchPiles.length == 4) {
       packer = discardParticipant;
     }
-    _robotDiscard();
 
     return typePile;
   }
@@ -372,8 +389,6 @@ class RoundParticipant {
       ]);
     }
 
-    _robotDiscard();
-
     return typePile;
   }
 
@@ -392,8 +407,6 @@ class RoundParticipant {
             src: owner),
       ]);
     }
-
-    _robotDiscard();
 
     return typePile;
   }
@@ -773,7 +786,7 @@ class RoundParticipant {
     return discardTile;
   }
 
-  _robotDiscard() {
+  robotDiscard() {
     if (participant.robot) {
       Future.delayed(Duration(seconds: 1), () {
         Map<Tile, int> scores = drawScore();
@@ -784,5 +797,7 @@ class RoundParticipant {
         }
       });
     }
+
+    mahjongFlameGame.reload();
   }
 }

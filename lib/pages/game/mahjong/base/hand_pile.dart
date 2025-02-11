@@ -423,11 +423,11 @@ class HandPile extends Pile {
     return winType;
   }
 
-  MahjongActionResult discard(Tile tile) {
-    MahjongActionResult result = MahjongActionResult.success;
+  RoomEventActionResult discard(Tile tile) {
+    RoomEventActionResult result = RoomEventActionResult.success;
     Tile? removed = remove(tile);
     if (removed == null) {
-      result = MahjongActionResult.exist;
+      result = RoomEventActionResult.exist;
     }
     if (drawTile != null) {
       tiles.add(drawTile!);

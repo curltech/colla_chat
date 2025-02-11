@@ -189,12 +189,14 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
     }
     DialogUtil.show(builder: (BuildContext context) {
       return Dialog(
-        child: ListView.builder(
-          itemCount: currentRound.roomEvents.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Text(currentRound.roomEvents[index].toString());
-          },
-        ),
+        child: Container(
+            padding: EdgeInsets.all(15.0),
+            child: ListView.builder(
+              itemCount: currentRound.roomEvents.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Text(currentRound.roomEvents[index].toString());
+              },
+            )),
       );
     });
   }
