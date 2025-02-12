@@ -5,9 +5,9 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/pages/game/mahjong/base/format_tile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/full_pile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/hand_pile.dart';
-import 'package:colla_chat/pages/game/mahjong/base/room_event.dart';
 import 'package:colla_chat/pages/game/mahjong/base/participant.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room.dart';
+import 'package:colla_chat/pages/game/mahjong/base/room_event.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room_pool.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round_participant.dart';
 import 'package:colla_chat/pages/game/mahjong/base/stock_pile.dart';
@@ -16,7 +16,6 @@ import 'package:colla_chat/pages/game/mahjong/base/tile.dart';
 import 'package:colla_chat/pages/game/mahjong/component/mahjong_flame_game.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
-import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/number_util.dart';
 
@@ -65,7 +64,7 @@ class Round {
   /// creator只有等到其他参与者的回复事件后才能决定下一步的处理
   /// 比如打牌的时候，creator等待所有的参与者的回复，才决定是继续发牌还是有人胡牌或者杠牌
   /// Set<int>为等待回复的参与者
-  Map<int, Completer<int>> outstandingParticipants = {};
+  Map<int, Set<int>> outstandingParticipants = {};
 
   /// 出牌的令牌，创建者发牌设置为空，打牌的参与者设置为打出的牌
   /// 只有为空的时候才可以打牌
@@ -179,21 +178,32 @@ class Round {
   }
 
   /// 增加等待决策的参与者
-  addOutstandingParticipants(List<int> participants) {
+  addOutstandingParticipants(int src, List<int> participants) {
+    Set<int>? ps = outstandingParticipants[src];
+    if (ps == null) {
+      ps = {};
+      outstandingParticipants[src] = ps;
+    }
     for (int participant in participants) {
-      if (!outstandingParticipants.containsKey(participant)) {
-        outstandingParticipants[participant] = Completer<int>();
-      }
+      ps.add(participant);
     }
   }
 
   /// 消解并检查等待的事件，如果全部消解则返回true，否则，返回false
-  bool checkOutstandingParticipant(int participant) {
-    if (outstandingParticipants.containsKey(participant)) {
-      Completer? completer = outstandingParticipants.remove(participant);
-      completer?.complete(participant);
+  bool checkOutstandingParticipant(int src, int participant) {
+    Set<int>? ps = outstandingParticipants[src];
+    if (ps != null) {
+      if (ps.contains(participant)) {
+        ps.remove(participant);
+      }
+      if (ps.isEmpty) {
+        return true;
+      }
+    } else {
+      return true;
     }
-    return outstandingParticipants.isEmpty;
+
+    return false;
   }
 
   bool get isSeaTake {
@@ -312,10 +322,10 @@ class Round {
     /// 别人的打牌自己检查是否需要决策
     if (owner != receiver) {
       Map<RoomEventAction, Set<int>> outstandingActions =
-          roundParticipants[receiver].check(tile: tile);
+          roundParticipants[receiver].check(owner, tile);
       if (outstandingActions.isNotEmpty) {
         result = RoomEventActionResult.check;
-        addOutstandingParticipants([receiver]);
+        addOutstandingParticipants(owner, [receiver]);
       }
     }
 
@@ -323,29 +333,10 @@ class Round {
     if (receiver == room.creator) {
       /// 事件消息的接收者是creator，检查，发消息给其他参与者，2个消息，等待2个事件
       for (int i = 0; i < roundParticipants.length; ++i) {
-        if (i != owner && i != receiver) {
-          Map<RoomEventAction, Set<int>>? outstandingActions =
-              roundParticipants[i].check(tile: tile);
-          if (outstandingActions.isNotEmpty) {
-            result = RoomEventActionResult.check;
-            addOutstandingParticipants([i]);
-          }
+        if (i != owner) {
+          addOutstandingParticipants(owner, [i]);
         }
       }
-      if (result == RoomEventActionResult.check) {
-        List<Future<int>> futures = [];
-        for (var entry in outstandingParticipants.entries) {
-          // logger.w(
-          //     'owner:$owner discard tile:$tile, receiver:$receiver has ${outstandingParticipants.length} futures');
-          Future<int> future = entry.value.future;
-          futures.add(future);
-        }
-        await Future.wait<int>(futures);
-
-        logger.w(
-            'receiver:$receiver creator received all outstanding events successfully, call deal');
-      }
-      await deal(discardParticipant: owner);
     }
 
     return result;
@@ -359,16 +350,16 @@ class Round {
   }
 
   /// 收到owner pass的消息
-  _pass(int owner, int receiver) async {
+  _pass(int owner, int pos, Tile tile, int src, int receiver) async {
     logger.w('chat message: owner:$owner pass');
     final RoundParticipant roundParticipant = roundParticipants[owner];
     roundParticipant.pass(owner);
-    checkOutstandingParticipant(owner);
+    checkOutstandingParticipant(src, owner);
 
     if (receiver == room.creator) {
-      bool pass = checkOutstandingParticipant(owner);
+      bool pass = checkOutstandingParticipant(src, owner);
       if (pass) {
-        await barDeal(owner);
+        await deal(discardParticipant: src);
       }
     }
   }
@@ -452,7 +443,7 @@ class Round {
     }
     discardToken!.action = RoomEventAction.touch;
     discardToken!.actionParticipant = owner;
-    checkOutstandingParticipant(owner);
+    checkOutstandingParticipant(src, owner);
     await barDeal(owner);
 
     return typePile;
@@ -503,7 +494,7 @@ class Round {
         discardToken!.actionParticipant = owner;
       }
     }
-    checkOutstandingParticipant(owner);
+    checkOutstandingParticipant(src, owner);
     await barDeal(owner);
 
     return typePile;
@@ -833,7 +824,8 @@ class Round {
       case RoomEventAction.score:
         returnValue = _score(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.pass:
-        returnValue = await _pass(roomEvent.owner, roomEvent.receiver!);
+        returnValue = await _pass(roomEvent.owner, roomEvent.pos!,
+            roomEvent.tile!, roomEvent.src!, roomEvent.receiver!);
       case RoomEventAction.win:
         returnValue =
             await _win(roomEvent.owner, roomEvent.pos!, roomEvent.receiver!);

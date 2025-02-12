@@ -10,7 +10,6 @@ import 'package:colla_chat/pages/game/mahjong/base/tile.dart' as mahjongCard;
 import 'package:colla_chat/pages/game/mahjong/component/mahjong_flame_game.dart';
 import 'package:colla_chat/pages/game/mahjong/room_controller.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
-import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -18,7 +17,6 @@ import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
@@ -42,10 +40,10 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Mahjong 18m';
 
-  RxBool fullscreen = false.obs;
+  final RxBool fullscreen = false.obs;
 
-  TextEditingController textEditingController = TextEditingController();
-  List<String> peerIds = [myself.peerId!];
+  final TextEditingController textEditingController = TextEditingController();
+  final List<String> peerIds = [myself.peerId!];
 
   //房间成员显示界面
   Widget _buildRoomParticipantWidget(BuildContext context) {
@@ -68,10 +66,9 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
             } else {
               selected.insert(0, myself.peerId!);
             }
-            peerIds = selected;
+            peerIds.assignAll(selected);
           } else {
-            peerIds.clear();
-            peerIds.add(myself.peerId!);
+            peerIds.assign(myself.peerId!);
           }
         },
         selected: [myself.peerId!],
@@ -153,12 +150,12 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
       return;
     }
     mahjongCard.Tile? discardTile = currentRound.discardToken?.discardTile;
+    int? discardParticipant = currentRound.discardToken?.discardParticipant;
     mahjongCard.Tile? drawTile = currentRoundParticipant.handPile.drawTile;
-    Map<RoomEventAction, Set<int>> outstandingActions;
     if (drawTile != null) {
-      outstandingActions = currentRoundParticipant.check(tile: drawTile);
+      currentRoundParticipant.check(currentRoundParticipant.index, drawTile);
     } else if (discardTile != null) {
-      outstandingActions = currentRoundParticipant.check(tile: discardTile);
+      currentRoundParticipant.check(discardParticipant!, discardTile);
     }
     mahjongFlameGame.reloadSelf();
   }

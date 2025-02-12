@@ -123,7 +123,7 @@ class RoundParticipant {
     /// 检查摸到的牌，看需要采取的动作，这里其实只需要摸牌检查
     if (tile != unknownTile) {
       Map<RoomEventAction, Set<int>> outstandingActions =
-          check(tile: tile, dealTileType: dealTileType);
+          check(owner, tile, dealTileType: dealTileType);
 
       if (outstandingActions.isEmpty) {
         robotDiscard();
@@ -163,8 +163,8 @@ class RoundParticipant {
   }
 
   /// 检查行为状态，既包括摸牌检查，也包含打牌检查，还包含机器人自动处理
-  Map<RoomEventAction, Set<int>> check(
-      {required Tile tile, DealTileType? dealTileType}) {
+  Map<RoomEventAction, Set<int>> check(int owner, Tile tile,
+      {DealTileType? dealTileType}) {
     outstandingActions.clear();
     if (tile == unknownTile) {
       return outstandingActions;
@@ -175,6 +175,7 @@ class RoundParticipant {
       owner: index,
       tile: tile,
       pos: dealTileType?.index,
+      src: owner,
       action: RoomEventAction.check,
     ));
     if (dealTileType == DealTileType.sea) {
@@ -223,7 +224,7 @@ class RoundParticipant {
     // logger.w(
     //     'participant:$index check tile:$tile, outstandingAction:${outstandingActions.value}');
 
-    robotCheck();
+    robotCheck(owner, tile, dealTileType: dealTileType);
 
     if (outstandingActions.value.isNotEmpty) {
       mahjongFlameGame.reload();
@@ -245,33 +246,43 @@ class RoundParticipant {
   }
 
   /// 当机器参与者有未决的行为时，自动采取行为
-  robotCheck() async {
+  robotCheck(int owner, Tile tile, {DealTileType? dealTileType}) async {
     if (!participant.robot) {
       return;
     }
 
+    Room room = round.room;
+    RoomEvent checkEvent = RoomEvent(
+      round.room.name,
+      roundId: round.id,
+      owner: index,
+      tile: tile,
+      pos: dealTileType?.index,
+      src: owner,
+      action: RoomEventAction.check,
+    );
+    round.roomEvents.add(checkEvent);
     Map<RoomEventAction, Set<int>> outstandingActions =
         this.outstandingActions.value;
     if (outstandingActions.isEmpty) {
-      return;
+      await room.startRoomEvent(RoomEvent(room.name,
+          roundId: round.id,
+          owner: index,
+          action: RoomEventAction.pass,
+          tile: tile,
+          src: owner,
+          pos: dealTileType?.index));
     }
-    Room room = round.room;
-    int owner = index;
-    round.roomEvents.add(RoomEvent(
-      room.name,
-      roundId: round.id,
-      owner: owner,
-      action: RoomEventAction.robotCheck,
-    ));
     Set<int>? pos = outstandingActions[RoomEventAction.win];
     if (pos != null) {
       await room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,
-          owner: owner,
+          owner: index,
           action: RoomEventAction.win,
+          tile: tile,
+          src: owner,
           pos: pos.first));
     }
-
     pos = outstandingActions[RoomEventAction.darkBar];
     if (pos != null) {
       Tile? tile = handPile.drawTile;
@@ -280,7 +291,9 @@ class RoundParticipant {
         if (mahjongAction == RoomEventAction.darkBar) {
           await room.startRoomEvent(RoomEvent(room.name,
               roundId: round.id,
-              owner: owner,
+              owner: index,
+              tile: tile,
+              src: owner,
               action: RoomEventAction.darkBar,
               pos: pos.first));
         }
@@ -301,7 +314,9 @@ class RoundParticipant {
       if (roomEventAction == RoomEventAction.bar) {
         await room.startRoomEvent(RoomEvent(room.name,
             roundId: round.id,
-            owner: owner,
+            owner: index,
+            tile: tile,
+            src: owner,
             action: RoomEventAction.bar,
             pos: pos.first));
       }
@@ -315,7 +330,7 @@ class RoundParticipant {
         if (roomEventAction == RoomEventAction.touch) {
           await room.startRoomEvent(RoomEvent(room.name,
               roundId: round.id,
-              owner: owner,
+              owner: index,
               action: RoomEventAction.touch,
               src: round.discardToken?.discardParticipant,
               tile: round.discardToken?.discardTile,
@@ -325,6 +340,7 @@ class RoundParticipant {
     }
 
     this.outstandingActions.clear();
+
     return;
   }
 
