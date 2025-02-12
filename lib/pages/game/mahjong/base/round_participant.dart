@@ -259,9 +259,10 @@ class RoundParticipant {
       tile: tile,
       pos: dealTileType?.index,
       src: owner,
-      action: RoomEventAction.check,
+      action: RoomEventAction.robotCheck,
     );
     round.roomEvents.add(checkEvent);
+
     Map<RoomEventAction, Set<int>> outstandingActions =
         this.outstandingActions.value;
     if (outstandingActions.isEmpty) {
