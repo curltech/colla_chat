@@ -195,8 +195,15 @@ class Round {
     if (ps != null) {
       if (ps.contains(participant)) {
         ps.remove(participant);
+        RoomEvent outstandingRoomEvent = RoomEvent(room.name,
+            roundId: id,
+            owner: participant,
+            content: outstandingParticipants.values.firstOrNull?.toList(),
+            action: RoomEventAction.checkOutstanding);
+        roomEvents.add(outstandingRoomEvent);
       }
       if (ps.isEmpty) {
+        outstandingParticipants.remove(src);
         return true;
       }
     } else {
@@ -318,15 +325,6 @@ class Round {
     discardToken = DiscardToken(owner, tile);
     // logger.w(
     //     'owner:$owner discard tile:$tile successfully, discardParticipant:${discardToken!.discardParticipant}, discardTile:${discardToken!.discardTile}');
-    /// 别人的打牌自己检查是否需要决策
-    if (owner != receiver) {
-      Map<RoomEventAction, Set<int>> outstandingActions =
-          roundParticipants[receiver].check(owner, tile);
-      if (outstandingActions.isNotEmpty) {
-        result = RoomEventActionResult.check;
-        addOutstandingParticipants(owner, [receiver]);
-      }
-    }
 
     /// 接收别人打牌的消息的是创建者，等待检查其他的参与者的决策
     if (receiver == room.creator) {
@@ -335,6 +333,24 @@ class Round {
         if (i != owner) {
           addOutstandingParticipants(owner, [i]);
         }
+      }
+      List<int>? ps = outstandingParticipants.values.firstOrNull?.toList();
+      RoomEvent outstandingRoomEvent = RoomEvent(room.name,
+          roundId: id,
+          owner: owner,
+          tile: tile,
+          content: ps,
+          action: RoomEventAction.outstanding);
+      roomEvents.add(outstandingRoomEvent);
+    }
+
+    /// 别人的打牌自己检查是否需要决策
+    if (owner != receiver) {
+      Map<RoomEventAction, Set<int>> outstandingActions =
+          roundParticipants[receiver].check(owner, tile);
+      if (outstandingActions.isNotEmpty) {
+        result = RoomEventActionResult.check;
+        addOutstandingParticipants(owner, [receiver]);
       }
     }
 
@@ -440,7 +456,9 @@ class Round {
     }
     discardToken!.action = RoomEventAction.touch;
     discardToken!.actionParticipant = owner;
-    checkOutstandingParticipant(src, owner);
+    if (receiver == room.creator) {
+      outstandingParticipants.clear();
+    }
 
     roundParticipant.robotDiscard();
 
@@ -497,7 +515,9 @@ class Round {
         discardToken!.actionParticipant = owner;
       }
     }
-    checkOutstandingParticipant(src, owner);
+    if (receiver == room.creator) {
+      outstandingParticipants.clear();
+    }
     await barDeal(owner);
 
     return typePile;

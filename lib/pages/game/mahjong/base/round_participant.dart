@@ -245,7 +245,7 @@ class RoundParticipant {
   /// 当机器参与者有未决的行为时，自动采取行为
   robotCheck(int owner, Tile tile, {DealTileType? dealTileType}) async {
     Room room = round.room;
-    RoomEvent checkEvent = RoomEvent(
+    RoomEvent robotCheckEvent = RoomEvent(
       round.room.name,
       roundId: round.id,
       owner: index,
@@ -254,19 +254,24 @@ class RoundParticipant {
       src: owner,
       action: RoomEventAction.robotCheck,
     );
-    round.roomEvents.add(checkEvent);
+    round.roomEvents.add(robotCheckEvent);
     Map<RoomEventAction, Set<int>> outstandingActions =
         this.outstandingActions.value;
 
+    RoomEvent passEvent = RoomEvent(
+      round.room.name,
+      roundId: round.id,
+      owner: index,
+      tile: tile,
+      pos: dealTileType?.index,
+      src: owner,
+      action: RoomEventAction.pass,
+    );
+
     ///如果没有任何可采取的行为，无论是否机器，都是pass事件
     if (dealTileType == null && outstandingActions.isEmpty) {
-      await room.startRoomEvent(RoomEvent(room.name,
-          roundId: round.id,
-          owner: index,
-          action: RoomEventAction.pass,
-          tile: tile,
-          src: owner,
-          pos: dealTileType?.index));
+      await room.startRoomEvent(passEvent);
+
       return;
     }
 
@@ -278,13 +283,9 @@ class RoundParticipant {
     ///如果有可采取的行为
     Set<int>? pos = outstandingActions[RoomEventAction.win];
     if (pos != null) {
-      await room.startRoomEvent(RoomEvent(room.name,
-          roundId: round.id,
-          owner: index,
-          action: RoomEventAction.win,
-          tile: tile,
-          src: owner,
-          pos: pos.first));
+      robotCheckEvent.action = RoomEventAction.win;
+      robotCheckEvent.pos = pos.first;
+      await room.startRoomEvent(robotCheckEvent);
     }
     pos = outstandingActions[RoomEventAction.darkBar];
     if (pos != null) {
@@ -292,13 +293,12 @@ class RoundParticipant {
       if (tile != null) {
         RoomEventAction mahjongAction = drawBarDecide(tile);
         if (mahjongAction == RoomEventAction.darkBar) {
-          await room.startRoomEvent(RoomEvent(room.name,
-              roundId: round.id,
-              owner: index,
-              tile: tile,
-              src: owner,
-              action: RoomEventAction.darkBar,
-              pos: pos.first));
+          robotCheckEvent.action = RoomEventAction.darkBar;
+          robotCheckEvent.tile = tile;
+          robotCheckEvent.pos = pos.first;
+          await room.startRoomEvent(robotCheckEvent);
+        } else {
+          await room.startRoomEvent(passEvent);
         }
       }
     }
@@ -315,13 +315,12 @@ class RoundParticipant {
         }
       }
       if (roomEventAction == RoomEventAction.bar) {
-        await room.startRoomEvent(RoomEvent(room.name,
-            roundId: round.id,
-            owner: index,
-            tile: tile,
-            src: owner,
-            action: RoomEventAction.bar,
-            pos: pos.first));
+        robotCheckEvent.action = RoomEventAction.bar;
+        robotCheckEvent.tile = tile;
+        robotCheckEvent.pos = pos.first;
+        await room.startRoomEvent(robotCheckEvent);
+      } else {
+        await room.startRoomEvent(passEvent);
       }
     }
 
@@ -331,18 +330,16 @@ class RoundParticipant {
       if (tile != null) {
         RoomEventAction roomEventAction = discardBarDecide(tile);
         if (roomEventAction == RoomEventAction.touch) {
-          await room.startRoomEvent(RoomEvent(room.name,
-              roundId: round.id,
-              owner: index,
-              action: RoomEventAction.touch,
-              src: round.discardToken?.discardParticipant,
-              tile: round.discardToken?.discardTile,
-              pos: pos.first));
+          robotCheckEvent.action = RoomEventAction.touch;
+          robotCheckEvent.tile = round.discardToken?.discardTile;
+          robotCheckEvent.src = round.discardToken?.discardParticipant;
+          robotCheckEvent.pos = pos.first;
+          await room.startRoomEvent(robotCheckEvent);
+        } else {
+          await room.startRoomEvent(passEvent);
         }
       }
     }
-
-    this.outstandingActions.clear();
 
     return;
   }
@@ -364,6 +361,7 @@ class RoundParticipant {
     if (typePile != null && handPile.touchPiles.length == 4) {
       packer = discardParticipant;
     }
+    outstandingActions.clear();
 
     return typePile;
   }

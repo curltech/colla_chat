@@ -22,6 +22,8 @@ enum RoomEventAction {
   deal, //发牌
   barDeal, //杠上发牌
   discard, //打牌
+  outstanding,
+  checkOutstanding,
   touch, //碰牌
   bar, //杠牌：包括sendBar和takeBar
   discardBar, //打牌杠牌
@@ -61,15 +63,15 @@ class RoomEvent {
   int? receiver;
 
   /// RoomAction事件的枚举
-  late final RoomEventAction action;
+  late RoomEventAction action;
 
-  late final Tile? tile;
+  late Tile? tile;
 
   /// 行为发生的来源参与者，比如0胡了1打出的牌
-  final int? src;
+  int? src;
 
   /// 事件指定的牌的位置
-  final int? pos;
+  late int? pos;
 
   /// 每个事件的内容不同，
   /// 新房间事件是一个参与者数组
