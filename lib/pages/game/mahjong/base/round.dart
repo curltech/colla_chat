@@ -342,15 +342,20 @@ class Round {
     return result;
   }
 
-  Future<void> pass(int owner) async {
+  Future<void> pass(int owner, Tile tile, int src, {int? pos}) async {
     List<int> receivers = _getParticipantIndexes();
     RoomEvent passRoomEvent = RoomEvent(room.name,
-        roundId: id, owner: owner, src: owner, action: RoomEventAction.pass);
+        roundId: id,
+        owner: owner,
+        src: src,
+        tile: tile,
+        pos: pos,
+        action: RoomEventAction.pass);
     await _sendChatMessage(passRoomEvent, owner, receivers);
   }
 
   /// 收到owner pass的消息
-  _pass(int owner, int pos, Tile tile, int src, int receiver) async {
+  _pass(int owner, Tile tile, int src, int receiver, {int? pos}) async {
     logger.w('chat message: owner:$owner pass');
     final RoundParticipant roundParticipant = roundParticipants[owner];
     roundParticipant.pass(owner);
@@ -365,7 +370,7 @@ class Round {
   }
 
   /// 某个参与者碰打出的牌
-  Future<void> touch(int owner, {int? pos, int? src, Tile? discardTile}) async {
+  Future<void> touch(int owner, int pos, int src, Tile discardTile) async {
     if (discardToken == null) {
       logger.e('owner:$owner touch, but discardToken is null');
 
@@ -376,25 +381,17 @@ class Round {
 
       return;
     }
-    if (discardTile == null) {
-      discardTile = discardToken!.discardTile;
-    } else {
-      if (discardTile != discardToken!.discardTile) {
-        logger
-            .e('owner:$owner touch, but discardTile:$discardTile is not equal');
+    if (discardTile != discardToken!.discardTile) {
+      logger.e('owner:$owner touch, but discardTile:$discardTile is not equal');
 
-        return;
-      }
+      return;
     }
-    if (src == null) {
-      src = discardToken!.discardParticipant;
-    } else {
-      if (discardToken!.discardParticipant != src) {
-        logger.e(
-            'owner:$owner touch, but discardParticipant is not equal src:$src');
 
-        return;
-      }
+    if (discardToken!.discardParticipant != src) {
+      logger.e(
+          'owner:$owner touch, but discardParticipant is not equal src:$src');
+
+      return;
     }
 
     List<int> receivers = _getParticipantIndexes();
@@ -465,10 +462,15 @@ class Round {
 
   /// 某个参与者明杠牌，pos表示可杠的手牌的位置
 
-  Future<void> bar(int owner, int pos) async {
+  Future<void> bar(int owner, int pos, Tile tile, int src) async {
     List<int> receivers = _getParticipantIndexes();
     RoomEvent barRoomEvent = RoomEvent(room.name,
-        roundId: id, owner: owner, action: RoomEventAction.bar, pos: pos);
+        roundId: id,
+        owner: owner,
+        src: src,
+        tile: tile,
+        action: RoomEventAction.bar,
+        pos: pos);
     await _sendChatMessage(barRoomEvent, owner, receivers);
   }
 
@@ -762,18 +764,18 @@ class Round {
       case RoomEventAction.discard:
         await discard(roomEvent.owner, roomEvent.tile!);
       case RoomEventAction.bar:
-        await bar(roomEvent.owner, roomEvent.pos!);
+        await bar(
+            roomEvent.owner, roomEvent.pos!, roomEvent.tile!, roomEvent.src!);
       case RoomEventAction.touch:
-        await touch(roomEvent.owner,
-            pos: roomEvent.pos!,
-            src: roomEvent.src!,
-            discardTile: roomEvent.tile!);
+        await touch(
+            roomEvent.owner, roomEvent.pos!, roomEvent.src!, roomEvent.tile!);
       case RoomEventAction.darkBar:
         await darkBar(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.chow:
         await chow(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.pass:
-        await pass(roomEvent.owner);
+        await pass(roomEvent.owner, roomEvent.tile!, roomEvent.src!,
+            pos: roomEvent.pos);
       case RoomEventAction.win:
         await win(roomEvent.owner, roomEvent.pos!);
       default:
@@ -824,8 +826,9 @@ class Round {
       case RoomEventAction.score:
         returnValue = _score(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.pass:
-        returnValue = await _pass(roomEvent.owner, roomEvent.pos!,
-            roomEvent.tile!, roomEvent.src!, roomEvent.receiver!);
+        returnValue = await _pass(roomEvent.owner, roomEvent.tile!,
+            roomEvent.src!, roomEvent.receiver!,
+            pos: roomEvent.pos);
       case RoomEventAction.win:
         returnValue =
             await _win(roomEvent.owner, roomEvent.pos!, roomEvent.receiver!);
