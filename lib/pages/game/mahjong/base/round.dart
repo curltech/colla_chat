@@ -200,7 +200,7 @@ class Round {
         return true;
       }
     } else {
-      return true;
+      return false;
     }
 
     return false;
@@ -256,7 +256,7 @@ class Round {
         pos: dealTileType.index);
     for (int i = 0; i < roundParticipants.length; ++i) {
       if (i == owner || i == room.creator) {
-        await _sendChatMessage(tileRoomEvent, room.creator, [owner]);
+        await _sendChatMessage(tileRoomEvent, room.creator, [i]);
       } else {
         RoomEvent unknownRoomEvent = RoomEvent(room.name,
             roundId: id,
@@ -316,7 +316,6 @@ class Round {
       return result;
     }
     discardToken = DiscardToken(owner, tile);
-    outstandingParticipants.clear();
     // logger.w(
     //     'owner:$owner discard tile:$tile successfully, discardParticipant:${discardToken!.discardParticipant}, discardTile:${discardToken!.discardTile}');
     /// 别人的打牌自己检查是否需要决策
@@ -359,13 +358,14 @@ class Round {
     logger.w('chat message: owner:$owner pass');
     final RoundParticipant roundParticipant = roundParticipants[owner];
     roundParticipant.pass(owner);
-    checkOutstandingParticipant(src, owner);
 
     if (receiver == room.creator) {
       bool pass = checkOutstandingParticipant(src, owner);
       if (pass) {
         await deal(discardParticipant: src);
       }
+    } else {
+      checkOutstandingParticipant(src, owner);
     }
   }
 
@@ -441,7 +441,8 @@ class Round {
     discardToken!.action = RoomEventAction.touch;
     discardToken!.actionParticipant = owner;
     checkOutstandingParticipant(src, owner);
-    await barDeal(owner);
+
+    roundParticipant.robotDiscard();
 
     return typePile;
   }

@@ -122,12 +122,9 @@ class RoundParticipant {
 
     /// 检查摸到的牌，看需要采取的动作，这里其实只需要摸牌检查
     if (tile != unknownTile) {
-      Map<RoomEventAction, Set<int>> outstandingActions =
-          check(owner, tile, dealTileType: dealTileType);
+      check(owner, tile, dealTileType: dealTileType);
 
-      if (outstandingActions.isEmpty) {
-        robotDiscard();
-      }
+      robotDiscard();
       mahjongFlameGame.reload();
     }
 
@@ -247,10 +244,6 @@ class RoundParticipant {
 
   /// 当机器参与者有未决的行为时，自动采取行为
   robotCheck(int owner, Tile tile, {DealTileType? dealTileType}) async {
-    if (!participant.robot) {
-      return;
-    }
-
     Room room = round.room;
     RoomEvent checkEvent = RoomEvent(
       round.room.name,
@@ -262,10 +255,11 @@ class RoundParticipant {
       action: RoomEventAction.robotCheck,
     );
     round.roomEvents.add(checkEvent);
-
     Map<RoomEventAction, Set<int>> outstandingActions =
         this.outstandingActions.value;
-    if (outstandingActions.isEmpty) {
+
+    ///如果没有任何可采取的行为，无论是否机器，都是pass事件
+    if (dealTileType == null && outstandingActions.isEmpty) {
       await room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,
           owner: index,
@@ -273,7 +267,15 @@ class RoundParticipant {
           tile: tile,
           src: owner,
           pos: dealTileType?.index));
+      return;
     }
+
+    ///如果不是机器
+    if (!participant.robot) {
+      return;
+    }
+
+    ///如果有可采取的行为
     Set<int>? pos = outstandingActions[RoomEventAction.win];
     if (pos != null) {
       await room.startRoomEvent(RoomEvent(room.name,
@@ -804,7 +806,7 @@ class RoundParticipant {
   }
 
   robotDiscard() {
-    if (participant.robot) {
+    if (participant.robot && outstandingActions.isEmpty) {
       Future.delayed(Duration(seconds: 1), () {
         Map<Tile, int> scores = drawScore();
         Tile discardTile = minTile(scores);
