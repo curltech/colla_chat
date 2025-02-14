@@ -268,8 +268,11 @@ class RoundParticipant {
       action: RoomEventAction.pass,
     );
 
-    ///如果没有任何可采取的行为，无论是否机器，都是pass事件
-    if (dealTileType == null && outstandingActions.isEmpty) {
+    /// dealTileType == null打牌
+    /// dealTileType == DealTileType.sea海底捞
+    /// 如果没有任何可采取的行为，无论是否机器，都是自动pass事件
+    if ((dealTileType == null || dealTileType == DealTileType.sea) &&
+        outstandingActions.isEmpty) {
       await room.startRoomEvent(passEvent);
 
       return;
@@ -479,10 +482,19 @@ class RoundParticipant {
 
   /// 对打出的牌判断是否杠牌
   RoomEventAction discardBarDecide(Tile discardTile) {
+    /// 目标是7对，13幺，不碰
     if (actionStrategy.winGoals.contains(WinType.pair7) ||
         actionStrategy.winGoals.contains(WinType.luxPair7) ||
         actionStrategy.winGoals.contains(WinType.thirteenOne)) {
       return RoomEventAction.pass;
+    }
+    if (actionStrategy.winGoals.contains(WinType.pureTouch) ||
+        actionStrategy.winGoals.contains(WinType.mixTouch) ||
+        actionStrategy.winGoals.contains(WinType.pureOneType) ||
+        actionStrategy.winGoals.contains(WinType.mixOneType)) {
+      if (actionStrategy.suitGoal != discardTile.suit) {
+        return RoomEventAction.pass;
+      }
     }
     int pos = handPile.tiles.indexOf(discardTile);
     if (pos == -1) {

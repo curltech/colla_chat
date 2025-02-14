@@ -91,21 +91,27 @@ class ActionAreaComponent extends RectangleComponent
       await room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,
           owner: owner,
+          src: round.discardToken?.discardParticipant,
+          tile: round.discardToken?.discardTile,
           action: RoomEventAction.win,
           pos: pos[0]));
     } else if (outstandingAction == RoomEventAction.touch) {
-      await room.startRoomEvent(RoomEvent(room.name,
-          roundId: round.id,
-          owner: owner,
-          action: RoomEventAction.touch,
-          src: round.discardToken?.discardParticipant,
-          tile: round.discardToken?.discardTile,
-          pos: pos[0]));
+      if (round.discardToken != null) {
+        await room.startRoomEvent(RoomEvent(room.name,
+            roundId: round.id,
+            owner: owner,
+            action: RoomEventAction.touch,
+            src: round.discardToken?.discardParticipant,
+            tile: round.discardToken?.discardTile,
+            pos: pos[0]));
+      }
     } else if (outstandingAction == RoomEventAction.bar) {
       await room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,
           owner: owner,
           action: RoomEventAction.bar,
+          src: round.discardToken?.discardParticipant,
+          tile: round.discardToken?.discardTile,
           pos: pos[0]));
     } else if (outstandingAction == RoomEventAction.darkBar) {
       await room.startRoomEvent(RoomEvent(room.name,
@@ -114,13 +120,21 @@ class ActionAreaComponent extends RectangleComponent
           action: RoomEventAction.darkBar,
           pos: pos[0]));
     } else if (outstandingAction == RoomEventAction.pass) {
-      await room.startRoomEvent(RoomEvent(room.name,
-          roundId: round.id, owner: owner, action: RoomEventAction.pass));
+      if (round.discardToken != null) {
+        await room.startRoomEvent(RoomEvent(room.name,
+            roundId: round.id,
+            owner: owner,
+            src: round.discardToken?.discardParticipant,
+            tile: round.discardToken?.discardTile,
+            action: RoomEventAction.pass));
+      }
     } else if (outstandingAction == RoomEventAction.chow) {
       await room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,
           owner: owner,
           action: RoomEventAction.chow,
+          src: round.discardToken?.discardParticipant,
+          tile: round.discardToken?.discardTile,
           pos: pos[0]));
     }
   }

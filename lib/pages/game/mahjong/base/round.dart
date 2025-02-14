@@ -252,7 +252,7 @@ class Round {
     Tile tile = stockPile!.tiles.removeLast();
 
     logger.w(
-        'owner:$owner deal tile:$tile successfully, leave ${stockPile!.tiles.length} tiles');
+        'owner:$owner deal tile:$tile, dealTileType:$dealTileType successfully, leave ${stockPile!.tiles.length} tiles');
 
     /// 发消息给所有人，包括自己
     RoomEvent tileRoomEvent = RoomEvent(room.name,
@@ -284,7 +284,7 @@ class Round {
   Tile? _deal(int owner, Tile tile, int dealTileTypeIndex, int receiver) {
     RoundParticipant roundParticipant = roundParticipants[owner];
     logger.w(
-        'receive:receiver chat message owner:$owner deal tile:$tile successfully');
+        'receive:$receiver chat message owner:$owner deal tile:$tile, dealTileTypeIndex:$dealTileTypeIndex successfully');
     Map<RoomEventAction, Set<int>>? outstandingActions =
         roundParticipant.deal(owner, tile, dealTileTypeIndex);
     if (outstandingActions == null) {
@@ -372,14 +372,19 @@ class Round {
 
   /// 收到owner pass的消息
   _pass(int owner, Tile tile, int src, int receiver, {int? pos}) async {
-    logger.w('chat message: owner:$owner pass');
+    logger.w(
+        'receiver:$receiver chat message: owner:$owner, tile:$tile, src:$src, pos:$pos, isSeaTake:$isSeaTake pass');
     final RoundParticipant roundParticipant = roundParticipants[owner];
     roundParticipant.pass(owner);
 
     if (receiver == room.creator) {
-      bool pass = checkOutstandingParticipant(src, owner);
-      if (pass) {
-        await deal(discardParticipant: src);
+      if (isSeaTake) {
+        await deal(discardParticipant: owner);
+      } else {
+        bool pass = checkOutstandingParticipant(src, owner);
+        if (pass) {
+          await deal(discardParticipant: src);
+        }
       }
     } else {
       checkOutstandingParticipant(src, owner);
@@ -732,7 +737,7 @@ class Round {
         return;
       }
     } else {
-      DialogUtil.info(content: 'owner:$owner win $winType?');
+      DialogUtil.info(content: 'owner:$owner win $winType');
     }
     RoomEvent winRoomEvent = RoomEvent(room.name,
         roundId: id,
