@@ -66,8 +66,8 @@ class ActionAreaComponent extends RectangleComponent
             buttonDown: sprite,
             position: position,
             size: size,
-            onPressed: () {
-              _call(outstandingAction, pos.toList());
+            onPressed: () async {
+              await _call(outstandingAction, pos.toList());
               outstandingActions.clear();
               game.loadActionArea();
             });
@@ -76,7 +76,7 @@ class ActionAreaComponent extends RectangleComponent
     }
   }
 
-  _call(RoomEventAction outstandingAction, List<int> pos) {
+  _call(RoomEventAction outstandingAction, List<int> pos) async {
     Room? room = roomController.room.value;
     if (room == null) {
       return;
@@ -88,13 +88,13 @@ class ActionAreaComponent extends RectangleComponent
     }
 
     if (outstandingAction == RoomEventAction.win) {
-      room.startRoomEvent(RoomEvent(room.name,
+      await room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,
           owner: owner,
           action: RoomEventAction.win,
           pos: pos[0]));
     } else if (outstandingAction == RoomEventAction.touch) {
-      room.startRoomEvent(RoomEvent(room.name,
+      await room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,
           owner: owner,
           action: RoomEventAction.touch,
@@ -102,22 +102,22 @@ class ActionAreaComponent extends RectangleComponent
           tile: round.discardToken?.discardTile,
           pos: pos[0]));
     } else if (outstandingAction == RoomEventAction.bar) {
-      room.startRoomEvent(RoomEvent(room.name,
+      await room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,
           owner: owner,
           action: RoomEventAction.bar,
           pos: pos[0]));
     } else if (outstandingAction == RoomEventAction.darkBar) {
-      room.startRoomEvent(RoomEvent(room.name,
+      await room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,
           owner: owner,
           action: RoomEventAction.darkBar,
           pos: pos[0]));
     } else if (outstandingAction == RoomEventAction.pass) {
-      room.startRoomEvent(RoomEvent(room.name,
+      await room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id, owner: owner, action: RoomEventAction.pass));
     } else if (outstandingAction == RoomEventAction.chow) {
-      room.startRoomEvent(RoomEvent(room.name,
+      await room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,
           owner: owner,
           action: RoomEventAction.chow,

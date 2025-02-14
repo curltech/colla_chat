@@ -16,6 +16,7 @@ import 'package:colla_chat/pages/game/mahjong/base/tile.dart';
 import 'package:colla_chat/pages/game/mahjong/component/mahjong_flame_game.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/number_util.dart';
 
@@ -719,6 +720,20 @@ class Round {
 
   /// 某个参与者胡牌,pos表示胡牌的类型
   Future<void> win(int owner, int pos) async {
+    WinType? winType = NumberUtil.toEnum(WinType.values, pos);
+    if (winType == null) {
+      return;
+    }
+    RoundParticipant roundParticipant = roundParticipants[owner];
+    if (!roundParticipant.participant.robot) {
+      bool? confirm = await DialogUtil.confirm(
+          content: 'owner:$owner, do you want win $winType?');
+      if (confirm == null || !confirm) {
+        return;
+      }
+    } else {
+      DialogUtil.info(content: 'owner:$owner win $winType?');
+    }
     RoomEvent winRoomEvent = RoomEvent(room.name,
         roundId: id,
         owner: owner,
@@ -735,6 +750,7 @@ class Round {
     if (winType == null) {
       return null;
     }
+
     _score(owner, winType.index);
     if (receiver == room.creator) {
       room.banker = owner;
