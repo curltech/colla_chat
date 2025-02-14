@@ -175,15 +175,6 @@ class RoundParticipant {
       src: owner,
       action: RoomEventAction.check,
     ));
-    if (dealTileType == DealTileType.sea) {
-      WinType? winType = handPile.checkWin(tile: tile);
-      if (winType != null) {
-        addOutstandingAction(RoomEventAction.win, [winType.index]);
-      } else {
-        addOutstandingAction(RoomEventAction.pass, []);
-      }
-      return outstandingActions.value;
-    }
 
     /// 可以胡牌
     WinType? winType = handPile.checkWin(tile: tile);
