@@ -26,6 +26,8 @@ enum TileType {
   skipPair, //133
   pairSkip, //113
   skip, //135
+  threePairStraight, // 112233
+  twoPairStraight, // 122334
 }
 
 // 胡牌类型

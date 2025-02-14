@@ -209,8 +209,8 @@ class RoundParticipant {
       }
     }
 
-    // logger.w(
-    //     'participant:$index check tile:$tile, outstandingAction:${outstandingActions.value}');
+    logger.w(
+        'participant:$index check tile:$tile, outstandingAction:${outstandingActions.value}');
 
     robotCheck(owner, tile, dealTileType: dealTileType);
 
@@ -807,15 +807,20 @@ class RoundParticipant {
   }
 
   robotDiscard() {
-    if (participant.robot && outstandingActions.isEmpty) {
-      Future.delayed(Duration(seconds: 1), () {
-        Map<Tile, int> scores = drawScore();
-        Tile discardTile = minTile(scores);
-        if (canDiscard() && handPile.exist(discardTile)) {
-          // logger.i('participant:$index decide to discard tile:$discardTile');
-          round.discard(index, discardTile);
-        }
-      });
+    if (participant.robot) {
+      if (outstandingActions.isNotEmpty) {
+        logger.e(
+            'participant:$index is robot, but outstandingActions is not empty');
+      } else {
+        Future.delayed(Duration(seconds: 1), () {
+          Map<Tile, int> scores = drawScore();
+          Tile discardTile = minTile(scores);
+          if (canDiscard() && handPile.exist(discardTile)) {
+            // logger.i('participant:$index decide to discard tile:$discardTile');
+            round.discard(index, discardTile);
+          }
+        });
+      }
     }
 
     mahjongFlameGame.reload();

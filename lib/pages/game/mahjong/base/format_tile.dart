@@ -31,6 +31,28 @@ class TypePile extends Pile {
         tiles[0].next(tiles[1]) &&
         tiles[1].next(tiles[2])) {
       return TileType.straight;
+    } else if (tiles.length == 3 &&
+        tiles[0] == tiles[1] &&
+        tiles[1].next(tiles[2])) {
+      return TileType.pairStraight;
+    } else if (tiles.length == 3 &&
+        tiles[0].next(tiles[1]) &&
+        tiles[1] == tiles[2]) {
+      return TileType.straightPair;
+    } else if (tiles.length == 6 &&
+        tiles[0] == tiles[1] &&
+        tiles[1].next(tiles[2]) &&
+        tiles[2] == tiles[3] &&
+        tiles[3].next(tiles[4]) &&
+        tiles[4] == tiles[5]) {
+      return TileType.threePairStraight;
+    } else if (tiles.length == 6 &&
+        tiles[0].next(tiles[1]) &&
+        tiles[1] == tiles[2] &&
+        tiles[2].next(tiles[3]) &&
+        tiles[3] == tiles[4] &&
+        tiles[4].next(tiles[5])) {
+      return TileType.twoPairStraight;
     }
 
     return TileType.single;
@@ -180,7 +202,9 @@ class FormatPile extends Pile {
       if (!tile.is19()) {
         oneNine = false;
       }
-      if (typePile.tileType == TileType.straight) {
+      if (typePile.tileType == TileType.straight ||
+          typePile.tileType == TileType.threePairStraight ||
+          typePile.tileType == TileType.threePairStraight) {
         touch = false;
       }
 
@@ -300,16 +324,6 @@ class FormatPile extends Pile {
       int start = i * 3;
       List<Tile> subTiles = tiles.sublist(start, start + 3);
       TypePile typePile = TypePile(tiles: subTiles);
-      if (typePile.tileType != TileType.touch &&
-          typePile.tileType != TileType.straight) {
-        if (length > start + 3) {
-          Tile tile = tiles[start + 3];
-          tiles[start + 3] = tiles[start + 2];
-          tiles[start + 2] = tile;
-          subTiles = tiles.sublist(start, start + 3);
-          typePile = TypePile(tiles: subTiles);
-        }
-      }
       if (typePile.tileType == TileType.straight ||
           typePile.tileType == TileType.touch) {
         if (!tileMap.containsKey(typePile.tileType)) {
@@ -318,7 +332,23 @@ class FormatPile extends Pile {
         List<TypePile> cs = tileMap[typePile.tileType]!;
         cs.add(typePile);
       } else {
-        return null;
+        if (length > start + 3) {
+          subTiles = tiles.sublist(start, start + 6);
+          typePile = TypePile(tiles: subTiles);
+          if (typePile.tileType == TileType.threePairStraight ||
+              typePile.tileType == TileType.threePairStraight) {
+            if (!tileMap.containsKey(typePile.tileType)) {
+              tileMap[typePile.tileType] = [];
+            }
+            List<TypePile> cs = tileMap[typePile.tileType]!;
+            cs.add(typePile);
+            ++i;
+          } else {
+            return null;
+          }
+        } else {
+          return null;
+        }
       }
     }
 

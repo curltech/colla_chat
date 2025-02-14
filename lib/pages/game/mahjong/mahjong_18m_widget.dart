@@ -152,8 +152,10 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
     mahjongCard.Tile? discardTile = currentRound.discardToken?.discardTile;
     int? discardParticipant = currentRound.discardToken?.discardParticipant;
     mahjongCard.Tile? drawTile = currentRoundParticipant.handPile.drawTile;
+    DealTileType? dealTileType = currentRoundParticipant.handPile.drawTileType;
     if (drawTile != null) {
-      currentRoundParticipant.check(currentRoundParticipant.index, drawTile);
+      currentRoundParticipant.check(currentRoundParticipant.index, drawTile,
+          dealTileType: dealTileType);
     } else if (discardTile != null) {
       currentRoundParticipant.check(discardParticipant!, discardTile);
     }
