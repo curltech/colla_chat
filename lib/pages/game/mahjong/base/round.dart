@@ -482,8 +482,7 @@ class Round {
   }
 
   /// 某个参与者明杠牌，pos表示可杠的手牌的位置
-
-  Future<void> bar(int owner, int pos, Tile tile, int src) async {
+  Future<void> bar(int owner, int pos, {Tile? tile, int? src}) async {
     List<int> receivers = _getParticipantIndexes();
     RoomEvent barRoomEvent = RoomEvent(room.name,
         roundId: id,
@@ -499,22 +498,26 @@ class Round {
   /// 明杠牌，分三种情况，打牌杠牌，摸牌杠牌和手牌杠牌
   /// 打牌杠牌:返回值为杠的牌，为空表示未成功
   /// 摸牌杠牌和手牌杠牌:pos为-1，表示是摸牌可杠，否则表示手牌可杠的位置
-  Future<TypePile?> _bar(
-      int owner, int pos, Tile tile, int src, int receiver) async {
+  Future<TypePile?> _bar(int owner, int pos, int receiver,
+      {Tile? tile, int? src}) async {
     logger.w('chat message: owner:$owner bar pos:$pos');
     RoundParticipant roundParticipant = roundParticipants[owner];
     TypePile? typePile;
     if (pos == -1) {
       roundParticipant.drawBar(owner, pos);
     } else if (pos > -1) {
-      typePile = roundParticipant.discardBar(owner, pos, tile, src);
-      if (typePile != null) {
-        List<Tile> tiles = roundParticipants[src].wastePile.tiles;
-        if (tiles.isNotEmpty && tile == tiles.last) {
-          tiles.removeLast();
+      if (tile == null) {
+        roundParticipant.drawBar(owner, pos);
+      } else {
+        typePile = roundParticipant.discardBar(owner, pos, tile, src!);
+        if (typePile != null) {
+          List<Tile> tiles = roundParticipants[src].wastePile.tiles;
+          if (tiles.isNotEmpty && tile == tiles.last) {
+            tiles.removeLast();
+          }
+          discardToken!.action = RoomEventAction.bar;
+          discardToken!.actionParticipant = owner;
         }
-        discardToken!.action = RoomEventAction.bar;
-        discardToken!.actionParticipant = owner;
       }
     }
     if (receiver == room.creator) {
@@ -628,7 +631,7 @@ class Round {
   }
 
   /// 胡牌计分
-  bool _score(int owner, int winTypeIndex) {
+  bool _score(int owner, int winTypeIndex, int receiver) {
     WinType? winType = NumberUtil.toEnum(WinType.values, winTypeIndex);
     if (winType == null) {
       return false;
@@ -637,10 +640,10 @@ class Round {
     if (baseScore == null) {
       return false;
     }
-    RoundParticipant roundParticipant = roundParticipants[owner];
-    if (roundParticipant.participant.robot) {
+    if (roundParticipants[receiver].participant.robot) {
       return false;
     }
+    RoundParticipant roundParticipant = roundParticipants[owner];
 
     /// 抢杠，owner是胡牌人，robber是被抢人
     if (robber != null && robCard != null) {
@@ -757,12 +760,12 @@ class Round {
       return null;
     }
 
-    _score(owner, winType.index);
+    _score(owner, winType.index, receiver);
     roundParticipant.isWin.value = true;
     if (receiver == room.creator) {
       room.banker = owner;
-      await room.startRoomEvent(RoomEvent(room.name,
-          roundId: id, owner: owner, action: RoomEventAction.round));
+      // await room.startRoomEvent(RoomEvent(room.name,
+      //     roundId: id, owner: owner, action: RoomEventAction.round));
     }
 
     return winType;
@@ -808,8 +811,8 @@ class Round {
       case RoomEventAction.discard:
         await discard(roomEvent.owner, roomEvent.tile!);
       case RoomEventAction.bar:
-        await bar(
-            roomEvent.owner, roomEvent.pos!, roomEvent.tile!, roomEvent.src!);
+        await bar(roomEvent.owner, roomEvent.pos!,
+            tile: roomEvent.tile, src: roomEvent.src);
       case RoomEventAction.touch:
         await touch(
             roomEvent.owner, roomEvent.pos!, roomEvent.src!, roomEvent.tile!);
@@ -852,8 +855,9 @@ class Round {
         returnValue = await _discard(
             roomEvent.owner, roomEvent.tile!, roomEvent.receiver!);
       case RoomEventAction.bar:
-        returnValue = await _bar(roomEvent.owner, roomEvent.pos!,
-            roomEvent.tile!, roomEvent.src!, roomEvent.receiver!);
+        returnValue = await _bar(
+            roomEvent.owner, roomEvent.pos!, roomEvent.receiver!,
+            tile: roomEvent.tile, src: roomEvent.src);
       case RoomEventAction.barDeal:
         returnValue = await barDeal(roomEvent.owner);
       case RoomEventAction.touch:
@@ -868,7 +872,8 @@ class Round {
         returnValue = _rob(roomEvent.owner, roomEvent.src!, roomEvent.tile!,
             receiver: roomEvent.receiver);
       case RoomEventAction.score:
-        returnValue = _score(roomEvent.owner, roomEvent.pos!);
+        returnValue =
+            _score(roomEvent.owner, roomEvent.pos!, roomEvent.receiver!);
       case RoomEventAction.pass:
         returnValue = await _pass(roomEvent.owner, roomEvent.tile!,
             roomEvent.src!, roomEvent.receiver!,

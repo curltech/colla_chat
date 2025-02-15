@@ -261,8 +261,7 @@ class RoundParticipant {
     /// dealTileType == null打牌
     /// dealTileType == DealTileType.sea海底捞
     /// 如果没有任何可采取的行为，无论是否机器，都是自动pass事件
-    if ((dealTileType == null || dealTileType == DealTileType.sea) &&
-        outstandingActions.isEmpty) {
+    if (dealTileType == null && outstandingActions.isEmpty) {
       await room.startRoomEvent(passEvent);
 
       return;
@@ -807,15 +806,15 @@ class RoundParticipant {
 
   /// 发牌或者碰牌的时候调用决定要打什么牌
   robotDiscard(int owner, Tile tile, {DealTileType? dealTileType}) {
-    if (participant.robot) {
-      /// 海底捞的时候不打牌
-      if (dealTileType == DealTileType.sea) {
-        Future.delayed(Duration(seconds: 1), () async {
-          await round.deal(discardParticipant: owner);
-        });
+    /// 海底捞的时候不打牌,只发牌
+    if (dealTileType == DealTileType.sea) {
+      Future.delayed(Duration(seconds: 1), () async {
+        await round.deal(discardParticipant: owner);
+      });
 
-        return;
-      }
+      return;
+    }
+    if (participant.robot) {
       if (outstandingActions.isNotEmpty) {
         logger.e(
             'participant:$index is robot, but outstandingActions is not empty');
