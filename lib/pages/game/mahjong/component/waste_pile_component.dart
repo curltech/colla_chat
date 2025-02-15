@@ -61,13 +61,13 @@ class WastePileComponent extends PositionComponent
     if (wastePile == null) {
       return;
     }
-    TileBackgroundType cardBackgroundType;
+    TileBackgroundType tileBackgroundType;
     if (areaDirection == AreaDirection.self) {
-      cardBackgroundType = TileBackgroundType.touchcard;
+      tileBackgroundType = TileBackgroundType.touchcard;
     } else if (areaDirection == AreaDirection.opponent) {
-      cardBackgroundType = TileBackgroundType.touchcard;
+      tileBackgroundType = TileBackgroundType.touchcard;
     } else {
-      cardBackgroundType = TileBackgroundType.sidecard;
+      tileBackgroundType = TileBackgroundType.sidecard;
     }
     double x = 0;
     double y = 0;
@@ -109,7 +109,7 @@ class WastePileComponent extends PositionComponent
         y += 33;
       }
       TileComponent cardComponent = TileComponent(
-          card, areaDirection, cardBackgroundType,
+          card, areaDirection, tileBackgroundType,
           position: position, priority: priority);
       add(cardComponent);
     }

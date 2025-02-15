@@ -25,8 +25,11 @@ class RoundParticipant {
 
   final Round round;
 
-  //积分
+  // 积分
   final RxInt score = 0.obs;
+
+  // 是否胡牌状态
+  final RxBool isWin = false.obs;
 
   // 手牌，每个参与者只能看到自己的手牌
   final HandPile handPile = HandPile();

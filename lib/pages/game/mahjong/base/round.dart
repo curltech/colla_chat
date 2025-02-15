@@ -757,6 +757,7 @@ class Round {
     }
 
     _score(owner, winType.index);
+    roundParticipant.isWin.value = true;
     if (receiver == room.creator) {
       room.banker = owner;
       await room.startRoomEvent(RoomEvent(room.name,

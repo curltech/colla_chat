@@ -19,7 +19,7 @@ import 'package:flutter/material.dart';
 class TileComponent extends PositionComponent
     with TapCallbacks, HasGameRef<MahjongFlameGame> {
   TileComponent(this.tile, this.areaDirection, this.tileBackgroundType,
-      {super.position, super.priority}) {
+      {this.tileScale = 1, super.position, super.priority}) {
     if (areaDirection == AreaDirection.self) {
       double width = 79;
       double height = 111;
@@ -39,6 +39,8 @@ class TileComponent extends PositionComponent
 
   final TileBackgroundType tileBackgroundType;
 
+  final double tileScale;
+
   /// 绘制牌的图像，有相对的偏移量，旋转，放大等参数
   void _drawSprite(
     Canvas canvas,
@@ -51,6 +53,7 @@ class TileComponent extends PositionComponent
     if (sprite == null) {
       return;
     }
+    scale = scale * tileScale;
     if (radians != null) {
       canvas.save();
       canvas.translate(sprite.image.width / 2, sprite.image.height / 2);

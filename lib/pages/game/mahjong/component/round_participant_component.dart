@@ -45,6 +45,8 @@ class RoundParticipantComponent extends PositionComponent
     if (banker == index) {
       name = '$name\n${AppLocalizations.t('banker')}';
     }
+    int score = roundParticipant.score.value;
+    name = '$name\n${AppLocalizations.t('score')}:$score';
     TextPaint textPaint = TextPaint(
       style: const TextStyle(
         color: Colors.black,

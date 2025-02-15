@@ -23,16 +23,40 @@ class HandPileComponent extends PositionComponent
     return roomController.getHandPile(areaDirection);
   }
 
+  bool? get isWin {
+    return true; //roomController.isWin(areaDirection);
+  }
+
   /// 绘制牌的图像，有相对的偏移量，旋转，放大等参数
   void loadHandPile() {
     Vector2 position = Vector2(0, 0);
+    if (isWin != null && isWin!) {
+      if (areaDirection == AreaDirection.previous) {
+        position = Vector2(-20, 0);
+      }
+      if (areaDirection == AreaDirection.opponent) {
+        position = Vector2(0, -16);
+      }
+    }
     TileBackgroundType tileBackgroundType;
     if (areaDirection == AreaDirection.self) {
-      tileBackgroundType = TileBackgroundType.handcard;
+      if (isWin != null && isWin!) {
+        tileBackgroundType = TileBackgroundType.touchcard;
+      } else {
+        tileBackgroundType = TileBackgroundType.handcard;
+      }
     } else if (areaDirection == AreaDirection.opponent) {
-      tileBackgroundType = TileBackgroundType.opponenthand;
+      if (isWin != null && isWin!) {
+        tileBackgroundType = TileBackgroundType.touchcard;
+      } else {
+        tileBackgroundType = TileBackgroundType.opponenthand;
+      }
     } else {
-      tileBackgroundType = TileBackgroundType.sidehand;
+      if (isWin != null && isWin!) {
+        tileBackgroundType = TileBackgroundType.sidecard;
+      } else {
+        tileBackgroundType = TileBackgroundType.sidehand;
+      }
     }
     for (int i = 0; i < handPile!.touchPiles.length; ++i) {
       TypePile typePile = handPile!.touchPiles[i];
@@ -99,21 +123,41 @@ class HandPileComponent extends PositionComponent
     }
     for (int i = 0; i < handPile!.tiles.length; ++i) {
       mahjongTile.Tile card = handPile!.tiles[i];
+      double tileScale = 1;
+      if (isWin != null && isWin! && areaDirection == AreaDirection.self) {
+        tileScale = 1.4;
+      }
       TileComponent cardComponent = TileComponent(
           card, areaDirection, tileBackgroundType,
-          position: position);
+          tileScale: tileScale, position: position);
       add(cardComponent);
       if (areaDirection == AreaDirection.self) {
-        position.x += 75;
+        if (isWin != null && isWin!) {
+          position.x += 62;
+        } else {
+          position.x += 75;
+        }
       }
       if (areaDirection == AreaDirection.opponent) {
-        position.x += 37;
+        if (isWin != null && isWin!) {
+          position.x += 44;
+        } else {
+          position.x += 37;
+        }
       }
       if (areaDirection == AreaDirection.next) {
-        position.y += 28;
+        if (isWin != null && isWin!) {
+          position.y += 34;
+        } else {
+          position.y += 28;
+        }
       }
       if (areaDirection == AreaDirection.previous) {
-        position.y += 28;
+        if (isWin != null && isWin!) {
+          position.y += 34;
+        } else {
+          position.y += 28;
+        }
       }
     }
 
@@ -131,10 +175,13 @@ class HandPileComponent extends PositionComponent
       if (areaDirection == AreaDirection.previous) {
         position.y += 10;
       }
-
+      double tileScale = 1;
+      if (isWin != null && isWin! && areaDirection == AreaDirection.self) {
+        tileScale = 1.4;
+      }
       TileComponent cardComponent = TileComponent(
           card, areaDirection, tileBackgroundType,
-          position: position);
+          tileScale: tileScale, position: position);
       add(cardComponent);
     }
   }

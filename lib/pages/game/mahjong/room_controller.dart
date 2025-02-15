@@ -85,6 +85,10 @@ class RoomController {
     return findRoundParticipant(areaDirection)?.handPile;
   }
 
+  bool? isWin(AreaDirection areaDirection) {
+    return findRoundParticipant(areaDirection)?.isWin.value;
+  }
+
   /// 区域方位对应的轮参与者的河牌数据
   WastePile? getWastePile(AreaDirection areaDirection) {
     return findRoundParticipant(areaDirection)?.wastePile;
