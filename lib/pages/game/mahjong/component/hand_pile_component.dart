@@ -24,7 +24,7 @@ class HandPileComponent extends PositionComponent
   }
 
   bool? get isWin {
-    return true; //roomController.isWin(areaDirection);
+    return roomController.isWin(areaDirection);
   }
 
   /// 绘制牌的图像，有相对的偏移量，旋转，放大等参数
