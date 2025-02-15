@@ -25,9 +25,6 @@ class RoundParticipant {
 
   final Round round;
 
-  // 积分
-  final RxInt score = 0.obs;
-
   // 是否胡牌状态
   final RxBool isWin = false.obs;
 
@@ -126,8 +123,7 @@ class RoundParticipant {
     /// 检查摸到的牌，看需要采取的动作，这里其实只需要摸牌检查
     if (tile != unknownTile) {
       check(owner, tile, dealTileType: dealTileType);
-
-      robotDiscard();
+      robotDiscard(owner, tile, dealTileType: dealTileType);
       mahjongFlameGame.reload();
     }
 
@@ -809,18 +805,27 @@ class RoundParticipant {
     return discardTile;
   }
 
-  robotDiscard() {
+  /// 发牌或者碰牌的时候调用决定要打什么牌
+  robotDiscard(int owner, Tile tile, {DealTileType? dealTileType}) {
     if (participant.robot) {
+      /// 海底捞的时候不打牌
+      if (dealTileType == DealTileType.sea) {
+        Future.delayed(Duration(seconds: 1), () async {
+          await round.deal(discardParticipant: owner);
+        });
+
+        return;
+      }
       if (outstandingActions.isNotEmpty) {
         logger.e(
             'participant:$index is robot, but outstandingActions is not empty');
       } else {
-        Future.delayed(Duration(seconds: 1), () {
+        Future.delayed(Duration(seconds: 1), () async {
           Map<Tile, int> scores = drawScore();
           Tile discardTile = minTile(scores);
           if (canDiscard() && handPile.exist(discardTile)) {
             // logger.i('participant:$index decide to discard tile:$discardTile');
-            round.discard(index, discardTile);
+            await round.discard(index, discardTile);
           }
         });
       }

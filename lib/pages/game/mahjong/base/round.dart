@@ -378,13 +378,9 @@ class Round {
     roundParticipant.pass(owner);
 
     if (receiver == room.creator) {
-      if (isSeaTake) {
-        await deal(discardParticipant: owner);
-      } else {
-        bool pass = checkOutstandingParticipant(src, owner);
-        if (pass) {
-          await deal(discardParticipant: src);
-        }
+      bool pass = checkOutstandingParticipant(src, owner);
+      if (pass) {
+        await deal(discardParticipant: src);
       }
     } else {
       checkOutstandingParticipant(src, owner);
@@ -466,7 +462,7 @@ class Round {
       outstandingParticipants.clear();
     }
 
-    roundParticipant.robotDiscard();
+    roundParticipant.robotDiscard(owner, discardTile);
 
     return typePile;
   }
@@ -642,38 +638,43 @@ class Round {
       return false;
     }
     RoundParticipant roundParticipant = roundParticipants[owner];
+    if (roundParticipant.participant.robot) {
+      return false;
+    }
 
     /// 抢杠，owner是胡牌人，robber是被抢人
     if (robber != null && robCard != null) {
-      roundParticipant.score.value += baseScore * 3;
-      roundParticipants[robber!].score.value -= baseScore * 3;
+      roundParticipant.participant.score.value += baseScore * 3;
+      roundParticipants[robber!].participant.score.value -= baseScore * 3;
     } else if (roundParticipant.handPile.drawTileType == DealTileType.bar ||
         roundParticipant.handPile.drawTileType == DealTileType.sea) {
       /// 杠上开花或者海底捞月
       baseScore = baseScore * 2;
-      roundParticipant.score.value += baseScore * 3;
+      roundParticipant.participant.score.value += baseScore * 3;
     } else if (roundParticipant.handPile.drawTileType == DealTileType.self) {
       /// 自摸
-      roundParticipant.score.value += baseScore * 3;
+      roundParticipant.participant.score.value += baseScore * 3;
     } else {
       /// 接别人打牌胡
-      roundParticipant.score.value += baseScore;
+      roundParticipant.participant.score.value += baseScore;
     }
     if (discardToken != null) {
       /// 打牌别人胡
-      roundParticipants[discardToken!.discardParticipant].score.value -=
-          baseScore;
+      roundParticipants[discardToken!.discardParticipant]
+          .participant
+          .score
+          .value -= baseScore;
     } else {
       if (roundParticipant.packer != null) {
         /// 包
         RoundParticipant pc = roundParticipants[roundParticipant.packer!];
-        pc.score.value -= 3 * baseScore;
+        pc.participant.score.value -= 3 * baseScore;
       } else {
         /// 别人自摸
         for (int i = 0; i < roundParticipants.length; ++i) {
           if (i != owner) {
             RoundParticipant roundParticipant = roundParticipants[i];
-            roundParticipant.score.value -= baseScore;
+            roundParticipant.participant.score.value -= baseScore;
           }
         }
       }
@@ -690,9 +691,9 @@ class Round {
           Set<RoomEvent> roomEvents = entry.value;
           for (var roomEvent in roomEvents) {
             if (i == roomEvent.owner) {
-              roundParticipant.score.value += 60;
+              roundParticipant.participant.score.value += 60;
             } else {
-              roundParticipant.score.value -= 20;
+              roundParticipant.participant.score.value -= 20;
             }
           }
         }
@@ -704,15 +705,15 @@ class Round {
             // 自摸杠
             if (roomEvent.owner == roomEvent.src) {
               if (i == roomEvent.owner) {
-                roundParticipant.score.value += 30;
+                roundParticipant.participant.score.value += 30;
               } else {
-                roundParticipant.score.value -= 10;
+                roundParticipant.participant.score.value -= 10;
               }
             } else {
               if (i == roomEvent.owner) {
-                roundParticipant.score.value += 30;
+                roundParticipant.participant.score.value += 30;
               } else if (i == roomEvent.src) {
-                roundParticipant.score.value -= 30;
+                roundParticipant.participant.score.value -= 30;
               }
             }
           }

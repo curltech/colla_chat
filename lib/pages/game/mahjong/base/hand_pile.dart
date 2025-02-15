@@ -205,14 +205,14 @@ class HandPile extends Pile {
     }
     List<int>? results;
     for (int i = 0; i < touchPiles.length; ++i) {
-      if (drawTile?.toString() == touchPiles[i].tiles[0].toString()) {
+      if (drawTile == touchPiles[i].tiles[0]) {
         return [-1];
       }
     }
     for (int i = 0; i < tiles.length; ++i) {
       var handTile = tiles[i];
       for (int j = 0; j < touchPiles.length; ++j) {
-        if (handTile.toString() == touchPiles[j].tiles[0].toString()) {
+        if (handTile == touchPiles[j].tiles[0]) {
           results ??= [];
           results.add(i);
         }
@@ -437,7 +437,7 @@ class HandPile extends Pile {
     }
 
     // logger.i(
-        // 'handPile discard tile:$tile result:${result.name}, drawTile is null');
+    // 'handPile discard tile:$tile result:${result.name}, drawTile is null');
 
     return result;
   }
