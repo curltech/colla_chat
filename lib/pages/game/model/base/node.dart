@@ -1,4 +1,5 @@
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
+import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/component/node_relationship_component.dart';
 import 'package:colla_chat/tool/string_util.dart';
@@ -10,8 +11,8 @@ abstract class Node {
   /// 节点的位置和大小
   double? x;
   double? y;
-  double? width;
-  double? height;
+  double width = Project.nodeWidth;
+  double height = Project.nodeHeight;
 
   NodeFrameComponent? nodeFrameComponent;
 
@@ -28,8 +29,8 @@ abstract class Node {
         name = json['name'],
         x = json['x'],
         y = json['y'],
-        width = json['width'],
-        height = json['height'];
+        width = json['width'] ?? Project.nodeWidth,
+        height = json['height'] ?? Project.nodeHeight;
 
   Map<String, dynamic> toJson() {
     return {

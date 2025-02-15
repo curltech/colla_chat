@@ -8,10 +8,12 @@ import 'package:colla_chat/pages/game/model/component/node_frame_component.dart'
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/plugin/painter/image_recorder.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/text.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 
 /// 在shape节点写文本
@@ -91,19 +93,19 @@ class ShapeNodeComponent extends PositionComponent
     }
     Paint? fillPaint;
     Paint? strokePaint;
-    int? fillColor = modelNode.fillColor;
-    if (fillColor != null) {
-      fillPaint = Paint()
-        ..style = PaintingStyle.fill
-        ..color = Color(fillColor);
-    }
-    int? strokeColor = modelNode.strokeColor;
-    if (strokeColor != null) {
-      strokePaint = Paint()
-        ..color = Color(strokeColor)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.0;
-    }
+    int? fillColor = modelNode.fillColor ?? myself.primaryColor.value32bit;
+    fillPaint = Paint()
+      ..style = PaintingStyle.fill
+      ..color = Color(fillColor);
+    int? fillColor1 = modelNode.strokeColor ?? Colors.white.value32bit;
+    Paint? fillPaint1 = Paint()
+      ..color = Color(fillColor1)
+      ..style = PaintingStyle.fill;
+    int? strokeColor = modelNode.strokeColor ?? Colors.white.value32bit;
+    strokePaint = Paint()
+      ..color = Color(strokeColor)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
 
     /// 如果是元模型项目需要截取节点的图像
     ImageRecorder? imageRecorder;
@@ -115,49 +117,42 @@ class ShapeNodeComponent extends PositionComponent
     String shapeType = modelNode.shapeType ?? ShapeType.rect.name;
     if (shapeType == ShapeType.rect.name) {
       Rect rect = Rect.fromLTWH(0, 0, width, height);
-      if (fillPaint != null) {
-        canvas.drawRect(rect, fillPaint);
-        imageRecorder?.recorderCanvas.drawRect(rect, fillPaint);
-      }
-      if (strokePaint != null) {
-        canvas.drawRect(rect, strokePaint);
-        imageRecorder?.recorderCanvas.drawRect(rect, strokePaint);
-      }
+      canvas.drawRect(rect, fillPaint);
+      imageRecorder?.recorderCanvas.drawRect(rect, fillPaint);
+      canvas.drawRect(rect, strokePaint);
+      imageRecorder?.recorderCanvas.drawRect(rect, strokePaint);
     }
     if (shapeType == ShapeType.rrect.name) {
       Rect rect = Rect.fromLTWH(0, 0, width, height);
       RRect rrect = RRect.fromRectXY(rect, 16.0, 16.0);
-      if (fillPaint != null) {
-        canvas.drawRRect(rrect, fillPaint);
-        imageRecorder?.recorderCanvas.drawRRect(rrect, fillPaint);
-      }
-      if (strokePaint != null) {
-        canvas.drawRRect(rrect, strokePaint);
-        imageRecorder?.recorderCanvas.drawRRect(rrect, strokePaint);
-      }
+      canvas.drawRRect(rrect, fillPaint);
+      imageRecorder?.recorderCanvas.drawRRect(rrect, fillPaint);
+      canvas.drawRRect(rrect, strokePaint);
+      imageRecorder?.recorderCanvas.drawRRect(rrect, strokePaint);
     }
     if (shapeType == ShapeType.circle.name) {
-      if (fillPaint != null) {
-        canvas.drawCircle(Offset(width / 2, height / 2), height / 2, fillPaint);
-        imageRecorder?.recorderCanvas
-            .drawCircle(Offset(width / 2, height / 2), height / 2, fillPaint);
-      }
-      if (strokePaint != null) {
-        Rect rect = Rect.fromLTWH(0, 0, width, height);
-        canvas.drawRect(rect, strokePaint);
-        imageRecorder?.recorderCanvas.drawRect(rect, strokePaint);
-      }
+      canvas.drawCircle(Offset(width / 2, height / 2), height / 2, fillPaint);
+      imageRecorder?.recorderCanvas
+          .drawCircle(Offset(width / 2, height / 2), height / 2, fillPaint);
+      // Rect rect = Rect.fromLTWH(0, 0, width, height);
+      // canvas.drawRect(rect, strokePaint);
+      // imageRecorder?.recorderCanvas.drawRect(rect, strokePaint);
     }
     if (shapeType == ShapeType.oval.name) {
       Rect rect = Rect.fromLTWH(0, 0, width, height);
-      if (fillPaint != null) {
-        canvas.drawOval(rect, fillPaint);
-        imageRecorder?.recorderCanvas.drawOval(rect, fillPaint);
-      }
-      if (strokePaint != null) {
-        canvas.drawOval(rect, strokePaint);
-        imageRecorder?.recorderCanvas.drawOval(rect, strokePaint);
-      }
+      canvas.drawOval(rect, fillPaint);
+      imageRecorder?.recorderCanvas.drawOval(rect, fillPaint);
+      canvas.drawOval(rect, strokePaint);
+      imageRecorder?.recorderCanvas.drawOval(rect, strokePaint);
+    }
+    if (shapeType == ShapeType.dcircle.name) {
+      canvas.drawCircle(Offset(width / 2, height / 2), height / 2, fillPaint);
+      imageRecorder?.recorderCanvas
+          .drawCircle(Offset(width / 2, height / 2), height / 2, fillPaint);
+      canvas.drawCircle(
+          Offset(width / 2, height / 2), height / 2 - 20, fillPaint1);
+      imageRecorder?.recorderCanvas.drawCircle(
+          Offset(width / 2, height / 2), height / 2 - 20, fillPaint1);
     }
     if (shapeType == ShapeType.paragraph.name) {
       ui.ParagraphStyle style =
@@ -176,14 +171,10 @@ class ShapeNodeComponent extends PositionComponent
       path.lineTo(width, height / 2);
       path.lineTo(width / 2, height);
       path.lineTo(0, height / 2);
-      if (fillPaint != null) {
-        canvas.drawPath(path, fillPaint);
-        imageRecorder?.recorderCanvas.drawPath(path, fillPaint);
-      }
-      if (strokePaint != null) {
-        canvas.drawPath(path, strokePaint);
-        imageRecorder?.recorderCanvas.drawPath(path, strokePaint);
-      }
+      canvas.drawPath(path, fillPaint);
+      imageRecorder?.recorderCanvas.drawPath(path, fillPaint);
+      canvas.drawPath(path, strokePaint);
+      imageRecorder?.recorderCanvas.drawPath(path, strokePaint);
     }
     if (shapeType == ShapeType.hexagonal.name) {
       Path path = Path();
@@ -194,14 +185,10 @@ class ShapeNodeComponent extends PositionComponent
       path.lineTo(width / 3, height);
       path.lineTo(0, height / 2);
       path.lineTo(width / 3, 0);
-      if (fillPaint != null) {
-        canvas.drawPath(path, fillPaint);
-        imageRecorder?.recorderCanvas.drawPath(path, fillPaint);
-      }
-      if (strokePaint != null) {
-        canvas.drawPath(path, strokePaint);
-        imageRecorder?.recorderCanvas.drawPath(path, strokePaint);
-      }
+      canvas.drawPath(path, fillPaint);
+      imageRecorder?.recorderCanvas.drawPath(path, fillPaint);
+      canvas.drawPath(path, strokePaint);
+      imageRecorder?.recorderCanvas.drawPath(path, strokePaint);
     }
     if (shapeType == ShapeType.octagonal.name) {
       Path path = Path();
@@ -214,14 +201,10 @@ class ShapeNodeComponent extends PositionComponent
       path.lineTo(0, height * 2 / 3);
       path.lineTo(0, height / 3);
       path.lineTo(width / 3, 0);
-      if (fillPaint != null) {
-        canvas.drawPath(path, fillPaint);
-        imageRecorder?.recorderCanvas.drawPath(path, fillPaint);
-      }
-      if (strokePaint != null) {
-        canvas.drawPath(path, strokePaint);
-        imageRecorder?.recorderCanvas.drawPath(path, strokePaint);
-      }
+      canvas.drawPath(path, fillPaint);
+      imageRecorder?.recorderCanvas.drawPath(path, fillPaint);
+      canvas.drawPath(path, strokePaint);
+      imageRecorder?.recorderCanvas.drawPath(path, strokePaint);
     }
     if (shapeType == ShapeType.arcrect.name) {
       Path path = Path();
@@ -232,14 +215,10 @@ class ShapeNodeComponent extends PositionComponent
       path.lineTo(height / 2, height);
       path.arcToPoint(Offset(height / 2, 0),
           radius: Radius.circular(height / 2));
-      if (fillPaint != null) {
-        canvas.drawPath(path, fillPaint);
-        imageRecorder?.recorderCanvas.drawPath(path, fillPaint);
-      }
-      if (strokePaint != null) {
-        canvas.drawPath(path, strokePaint);
-        imageRecorder?.recorderCanvas.drawPath(path, strokePaint);
-      }
+      canvas.drawPath(path, fillPaint);
+      imageRecorder?.recorderCanvas.drawPath(path, fillPaint);
+      canvas.drawPath(path, strokePaint);
+      imageRecorder?.recorderCanvas.drawPath(path, strokePaint);
     }
 
     ui.Image? image = imageRecorder?.toImage(width.toInt(), height.toInt());
