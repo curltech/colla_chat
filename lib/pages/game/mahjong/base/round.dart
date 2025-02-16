@@ -643,8 +643,9 @@ class Round {
     if (roundParticipants[receiver].participant.robot) {
       return false;
     }
-    RoundParticipant roundParticipant = roundParticipants[owner];
 
+    /// 胡牌的人
+    RoundParticipant roundParticipant = roundParticipants[owner];
     /// 抢杠，owner是胡牌人，robber是被抢人
     if (robber != null && robCard != null) {
       roundParticipant.participant.score.value += baseScore * 3;

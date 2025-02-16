@@ -546,6 +546,23 @@ class RoundParticipant {
           }
 
           return RoomEventAction.bar;
+        } else {
+          for (int i = 0; i < handPile.tiles.length; ++i) {
+            Tile touchTile = handPile.tiles[i];
+            if (touchPile.tiles.first == touchTile) {
+              Tile? pre = i - 1 >= 0 ? handPile.tiles[i - 1] : null;
+              Tile? next =
+                  i + 1 < handPile.tiles.length ? handPile.tiles[i + 1] : null;
+              if (pre != null && pre.next(touchTile)) {
+                return RoomEventAction.pass;
+              }
+              if (next != null && touchTile.next(next)) {
+                return RoomEventAction.pass;
+              }
+            }
+          }
+
+          return RoomEventAction.bar;
         }
       }
     }
