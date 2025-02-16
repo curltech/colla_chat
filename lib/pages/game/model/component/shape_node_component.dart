@@ -137,9 +137,9 @@ class ShapeNodeComponent extends PositionComponent
       canvas.drawCircle(Offset(width / 2, height / 2), height / 2, fillPaint);
       imageRecorder?.recorderCanvas
           .drawCircle(Offset(width / 2, height / 2), height / 2, fillPaint);
-      // Rect rect = Rect.fromLTWH(0, 0, width, height);
-      // canvas.drawRect(rect, strokePaint);
-      // imageRecorder?.recorderCanvas.drawRect(rect, strokePaint);
+      canvas.drawCircle(Offset(width / 2, height / 2), height / 2, strokePaint);
+      imageRecorder?.recorderCanvas
+          .drawCircle(Offset(width / 2, height / 2), height / 2, strokePaint);
     }
     if (shapeType == ShapeType.oval.name) {
       Rect rect = Rect.fromLTWH(0, 0, width, height);
@@ -152,6 +152,9 @@ class ShapeNodeComponent extends PositionComponent
       canvas.drawCircle(Offset(width / 2, height / 2), height / 2, fillPaint);
       imageRecorder?.recorderCanvas
           .drawCircle(Offset(width / 2, height / 2), height / 2, fillPaint);
+      canvas.drawCircle(Offset(width / 2, height / 2), height / 2, strokePaint);
+      imageRecorder?.recorderCanvas
+          .drawCircle(Offset(width / 2, height / 2), height / 2, strokePaint);
       canvas.drawCircle(Offset(width / 2, height / 2),
           height / 2 - modelNode.width / 5, fillPaint1);
       imageRecorder?.recorderCanvas.drawCircle(Offset(width / 2, height / 2),

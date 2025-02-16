@@ -429,28 +429,31 @@ class NodeRelationshipComponent extends PositionComponent
     canvas.drawParagraph(paragraph, offset);
   }
 
+  double arrowWidth = 10;
+  double arrowHeight = 4;
+
   void bottomCenterArrow(Path path, Vector2 dstBottomCenter) {
-    path.lineTo(dstBottomCenter.x - 2, dstBottomCenter.y + 6);
+    path.lineTo(dstBottomCenter.x - arrowHeight, dstBottomCenter.y + arrowWidth);
     path.moveTo(dstBottomCenter.x, dstBottomCenter.y);
-    path.lineTo(dstBottomCenter.x + 2, dstBottomCenter.y + 6);
+    path.lineTo(dstBottomCenter.x + arrowHeight, dstBottomCenter.y + arrowWidth);
   }
 
   void leftCenterArrow(Path path, Vector2 dstLeftCenter) {
-    path.lineTo(dstLeftCenter.x - 6, dstLeftCenter.y - 2);
+    path.lineTo(dstLeftCenter.x - arrowWidth, dstLeftCenter.y - arrowHeight);
     path.moveTo(dstLeftCenter.x, dstLeftCenter.y);
-    path.lineTo(dstLeftCenter.x - 6, dstLeftCenter.y + 2);
+    path.lineTo(dstLeftCenter.x - arrowWidth, dstLeftCenter.y + arrowHeight);
   }
 
   void topCenterArrow(Path path, Vector2 dstTopCenter) {
-    path.lineTo(dstTopCenter.x - 2, dstTopCenter.y - 6);
+    path.lineTo(dstTopCenter.x - arrowHeight, dstTopCenter.y - arrowWidth);
     path.moveTo(dstTopCenter.x, dstTopCenter.y);
-    path.lineTo(dstTopCenter.x + 2, dstTopCenter.y - 6);
+    path.lineTo(dstTopCenter.x + arrowHeight, dstTopCenter.y - arrowWidth);
   }
 
   void rightCenterArrow(Path path, Vector2 dstRightCenter) {
-    path.lineTo(dstRightCenter.x + 6, dstRightCenter.y - 2);
+    path.lineTo(dstRightCenter.x + arrowWidth, dstRightCenter.y - arrowHeight);
     path.moveTo(dstRightCenter.x, dstRightCenter.y);
-    path.lineTo(dstRightCenter.x + 6, dstRightCenter.y + 2);
+    path.lineTo(dstRightCenter.x + arrowWidth, dstRightCenter.y + arrowHeight);
   }
 
   @override
