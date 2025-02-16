@@ -56,16 +56,19 @@ class ShapeNodeComponent extends PositionComponent
   Future<void> onLoad() async {
     ModelNode? metaModelNode = modelNode.metaModelNode;
     if (metaModelNode != null) {
-      metaNodeTextComponent = TextBoxComponent(
-        text: metaModelNode.name,
-        textRenderer: metaTextPaint,
-        position: Vector2(0, 0),
-        size: size,
-        align: Anchor.topCenter,
-        priority: 2,
-        boxConfig: const TextBoxConfig(),
-      );
-      add(metaNodeTextComponent!);
+      if (modelNode.width > Project.nodeWidth - 10 &&
+          modelNode.height > Project.nodeHeight - 10) {
+        metaNodeTextComponent = TextBoxComponent(
+          text: metaModelNode.name,
+          textRenderer: metaTextPaint,
+          position: Vector2(0, 0),
+          size: size,
+          align: Anchor.topCenter,
+          priority: 2,
+          boxConfig: const TextBoxConfig(),
+        );
+        add(metaNodeTextComponent!);
+      }
     }
 
     nodeTextComponent = TextBoxComponent(
@@ -149,10 +152,10 @@ class ShapeNodeComponent extends PositionComponent
       canvas.drawCircle(Offset(width / 2, height / 2), height / 2, fillPaint);
       imageRecorder?.recorderCanvas
           .drawCircle(Offset(width / 2, height / 2), height / 2, fillPaint);
-      canvas.drawCircle(
-          Offset(width / 2, height / 2), height / 2 - 20, fillPaint1);
-      imageRecorder?.recorderCanvas.drawCircle(
-          Offset(width / 2, height / 2), height / 2 - 20, fillPaint1);
+      canvas.drawCircle(Offset(width / 2, height / 2),
+          height / 2 - modelNode.width / 5, fillPaint1);
+      imageRecorder?.recorderCanvas.drawCircle(Offset(width / 2, height / 2),
+          height / 2 - modelNode.width / 5, fillPaint1);
     }
     if (shapeType == ShapeType.paragraph.name) {
       ui.ParagraphStyle style =

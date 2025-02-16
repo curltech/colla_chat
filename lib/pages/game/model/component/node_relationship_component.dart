@@ -70,15 +70,20 @@ class NodeRelationshipComponent extends PositionComponent
     if (srcNodeFrameComponent == null) {
       return;
     }
+
+    /// 源位置
     double srcX = srcNodeFrameComponent.position.x;
     double srcY = srcNodeFrameComponent.position.y;
+
+    /// 源大小
     double srcHeight = srcNodeFrameComponent.size.y;
-    Vector2 srcTopCenter = Vector2(srcX + Project.nodeWidth / 2, srcY);
+    double srcWidth = srcNodeFrameComponent.size.x;
+
+    /// 源四个中心的位置
+    Vector2 srcTopCenter = Vector2(srcX + srcWidth / 2, srcY);
     Vector2 srcLeftCenter = Vector2(srcX, srcY + srcHeight / 2);
-    Vector2 srcRightCenter =
-        Vector2(srcX + Project.nodeWidth, srcY + srcHeight / 2);
-    Vector2 srcBottomCenter =
-        Vector2(srcX + Project.nodeWidth / 2, srcY + srcHeight);
+    Vector2 srcRightCenter = Vector2(srcX + srcWidth, srcY + srcHeight / 2);
+    Vector2 srcBottomCenter = Vector2(srcX + srcWidth / 2, srcY + srcHeight);
 
     if (nodeRelationship.dst == null) {
       return;
@@ -88,19 +93,24 @@ class NodeRelationshipComponent extends PositionComponent
     if (dstNodeFrameComponent == null) {
       return;
     }
+
+    /// 源大小
     double dstX = dstNodeFrameComponent.position.x;
     double dstY = dstNodeFrameComponent.position.y;
+
+    /// 源大小
     double dstHeight = dstNodeFrameComponent.size.y;
-    Vector2 dstTopCenter = Vector2(dstX + Project.nodeWidth / 2, dstY);
+    double dstWidth = dstNodeFrameComponent.size.x;
+
+    /// 源四个中心的位置
+    Vector2 dstTopCenter = Vector2(dstX + dstWidth / 2, dstY);
     Vector2 dstLeftCenter = Vector2(dstX, dstY + dstHeight / 2);
-    Vector2 dstRightCenter =
-        Vector2(dstX + Project.nodeWidth, dstY + dstHeight / 2);
-    Vector2 dstBottomCenter =
-        Vector2(dstX + Project.nodeWidth / 2, dstY + dstHeight);
+    Vector2 dstRightCenter = Vector2(dstX + dstWidth, dstY + dstHeight / 2);
+    Vector2 dstBottomCenter = Vector2(dstX + dstWidth / 2, dstY + dstHeight);
 
     Path path = Path();
     if (srcNodeFrameComponent.modelNode == dstNodeFrameComponent.modelNode) {
-      selfLine(path, srcBottomCenter, srcRightCenter);
+      selfLine(path, srcBottomCenter, srcWidth, srcRightCenter);
       rightCenterArrow(path, srcRightCenter);
       selfCardinality(canvas, srcBottomCenter, srcRightCenter);
       if (isHovered) {
@@ -113,7 +123,7 @@ class NodeRelationshipComponent extends PositionComponent
 
       return;
     }
-    if (srcX + Project.nodeWidth < dstX) {
+    if (srcX + srcWidth < dstX) {
       // src在dst的左边
       if (srcY < dstY) {
         // src在dst的上边
@@ -140,7 +150,7 @@ class NodeRelationshipComponent extends PositionComponent
           rightLeftCardinality(canvas, srcRightCenter, dstLeftCenter);
         }
       }
-    } else if (dstX + Project.nodeWidth < srcX) {
+    } else if (dstX + srcWidth < srcX) {
       // src在dst的右边
       if (srcY < dstY) {
         // src在dst的上边
@@ -385,12 +395,13 @@ class NodeRelationshipComponent extends PositionComponent
     }
   }
 
-  void selfLine(Path path, Vector2 srcBottomCenter, Vector2 srcRightCenter) {
+  void selfLine(Path path, Vector2 srcBottomCenter, double width,
+      Vector2 srcRightCenter) {
     vertices = [
       srcBottomCenter,
       Vector2(srcBottomCenter.x, srcBottomCenter.y + 30),
-      Vector2(srcBottomCenter.x + Project.nodeWidth, srcBottomCenter.y + 30),
-      Vector2(srcBottomCenter.x + Project.nodeWidth, srcRightCenter.y),
+      Vector2(srcBottomCenter.x + width, srcBottomCenter.y + 30),
+      Vector2(srcBottomCenter.x + width, srcRightCenter.y),
       Vector2(srcRightCenter.x, srcRightCenter.y)
     ];
     _drawLine(path, vertices);
