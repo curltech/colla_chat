@@ -1,5 +1,4 @@
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
-import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:colla_chat/pages/game/model/component/image_node_component.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
@@ -25,7 +24,7 @@ class NodeFrameComponent extends RectangleComponent
         HoverCallbacks,
         HasGameRef<ModelFlameGame> {
   static final fillPaint = Paint()
-    ..color = Colors.white.withOpacity(0)
+    ..color = Colors.white.withAlpha(0)
     ..style = PaintingStyle.fill;
   static final strokePaint = Paint()
     ..color = Colors.black
@@ -49,7 +48,7 @@ class NodeFrameComponent extends RectangleComponent
   @override
   Future<void> onLoad() async {
     String nodeType = modelNode.nodeType;
-    width = Project.nodeWidth;
+    width = modelNode.width;
     if (nodeType == NodeType.type.name) {
       child = TypeNodeComponent(modelNode);
       add(child!);

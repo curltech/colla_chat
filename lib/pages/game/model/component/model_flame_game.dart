@@ -210,6 +210,8 @@ class ModelFlameGame extends FlameGame
 
         modelNode.x = worldPosition.x;
         modelNode.y = worldPosition.y;
+        modelNode.width = addModelNode.width;
+        modelNode.height = addModelNode.height;
         subject.modelNodes[modelNode.id] = modelNode;
         NodeFrameComponent nodeFrameComponent = NodeFrameComponent(
           modelNode,

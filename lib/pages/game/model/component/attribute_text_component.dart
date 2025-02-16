@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
-import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/component/type_node_component.dart';
@@ -29,8 +28,11 @@ class AttributeTextComponent extends TextComponent
 
   Attribute attribute;
 
+  double nodeWidth;
+
   AttributeTextComponent(
-    this.attribute, {
+    this.attribute,
+    this.nodeWidth, {
     super.position,
     super.scale,
     super.angle,
@@ -41,7 +43,7 @@ class AttributeTextComponent extends TextComponent
   }) : super(
             text: '${attribute.scope} ${attribute.dataType}:${attribute.name}',
             textRenderer: normal) {
-    size = Vector2(Project.nodeWidth, contentHeight);
+    size = Vector2(nodeWidth, contentHeight);
   }
 
   Future<void> onDelete() async {
@@ -63,21 +65,22 @@ class AttributeAreaComponent extends RectangleComponent
 
   AttributeAreaComponent({
     required Vector2 position,
+    required Vector2 size,
     required this.attributes,
   }) : super(
           position: position,
+          size: size,
           paint: TypeNodeComponent.fillPaint,
         );
 
   @override
   Future<void> onLoad() async {
-    width = Project.nodeWidth;
     updateSize();
     if (attributes.isNotEmpty) {
       for (int i = 0; i < attributes.length; ++i) {
         Attribute attribute = attributes[i];
         Vector2 position = Vector2(0, i * AttributeTextComponent.contentHeight);
-        add(AttributeTextComponent(attribute, position: position));
+        add(AttributeTextComponent(attribute, width, position: position));
       }
     }
     size.addListener(() {
@@ -95,8 +98,8 @@ class AttributeAreaComponent extends RectangleComponent
 
   @override
   void render(Canvas canvas) {
-    canvas.drawLine(const Offset(0, 0), const Offset(Project.nodeWidth, 0),
-        NodeFrameComponent.strokePaint);
+    canvas.drawLine(
+        const Offset(0, 0), Offset(width, 0), NodeFrameComponent.strokePaint);
     super.render(canvas);
   }
 
@@ -112,7 +115,7 @@ class AttributeAreaComponent extends RectangleComponent
     Vector2 position = Vector2(
         0, (attributes.length - 1) * AttributeTextComponent.contentHeight);
     AttributeTextComponent attributeTextComponent =
-        AttributeTextComponent(attribute, position: position);
+        AttributeTextComponent(attribute, width, position: position);
     attribute.attributeTextComponent = attributeTextComponent;
     add(attributeTextComponent);
     updateSize();

@@ -69,7 +69,7 @@ class NodeRelationship {
   late String dstId;
 
   late String relationshipType;
-  Set<String>? allowRelationshipTypes;
+  late Set<String> allowRelationshipTypes;
   int? srcCardinality;
   int? dstCardinality;
 
@@ -83,7 +83,7 @@ class NodeRelationship {
     this.src,
     this.dst, {
     String? relationshipType,
-    this.allowRelationshipTypes,
+    Set<String>? allowRelationshipTypes,
     this.srcCardinality,
     this.dstCardinality,
   }) {
@@ -91,6 +91,8 @@ class NodeRelationship {
     dstId = dst!.id;
     this.relationshipType =
         relationshipType ?? RelationshipType.association.name;
+    this.allowRelationshipTypes =
+        allowRelationshipTypes ?? {RelationshipType.association.name};
   }
 
   NodeRelationshipComponent? nodeRelationshipComponent;
@@ -112,9 +114,11 @@ class NodeRelationship {
       allowRelationshipTypes = {};
       if (types is List<dynamic>) {
         for (var type in types) {
-          allowRelationshipTypes!.add(type.toString());
+          allowRelationshipTypes.add(type.toString());
         }
       }
+    } else {
+      allowRelationshipTypes = {RelationshipType.association.name};
     }
   }
 
@@ -123,7 +127,7 @@ class NodeRelationship {
       'srcId': srcId,
       'dstId': dstId,
       'relationshipType': relationshipType,
-      'allowRelationshipTypes': allowRelationshipTypes?.toList(),
+      'allowRelationshipTypes': allowRelationshipTypes.toList(),
       'srcCardinality': srcCardinality,
       'dstCardinality': dstCardinality,
       'srcAttributeName': srcAttributeName,

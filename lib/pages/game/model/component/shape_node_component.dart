@@ -48,16 +48,13 @@ class ShapeNodeComponent extends PositionComponent
     this.textAlign = Anchor.center,
     super.scale,
     super.angle,
-  }) : super(
-            size: Vector2(modelNode.width ?? Project.nodeWidth,
-                modelNode.height ?? Project.nodeHeight));
+  }) : super(size: Vector2(modelNode.width, modelNode.height));
 
   @override
   Future<void> onLoad() async {
     ModelNode? metaModelNode = modelNode.metaModelNode;
     if (metaModelNode != null) {
-      if (modelNode.width > Project.nodeWidth - 10 &&
-          modelNode.height > Project.nodeHeight - 10) {
+      if (modelNode.width > 150 && modelNode.height > 90) {
         metaNodeTextComponent = TextBoxComponent(
           text: metaModelNode.name,
           textRenderer: metaTextPaint,

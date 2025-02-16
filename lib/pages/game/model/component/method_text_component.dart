@@ -29,8 +29,11 @@ class MethodTextComponent extends TextComponent
 
   Method method;
 
+  double nodeWidth;
+
   MethodTextComponent(
-    this.method, {
+    this.method,
+    this.nodeWidth, {
     super.position,
     super.scale,
     super.angle,
@@ -41,7 +44,7 @@ class MethodTextComponent extends TextComponent
   }) : super(
             text: '${method.scope} ${method.returnType}:${method.name}',
             textRenderer: normal) {
-    size = Vector2(Project.nodeWidth, contentHeight);
+    size = Vector2(nodeWidth, contentHeight);
   }
 
   Future<void> onDelete() async {
@@ -71,13 +74,12 @@ class MethodAreaComponent extends RectangleComponent
 
   @override
   Future<void> onLoad() async {
-    width = Project.nodeWidth;
     updateSize();
     if (methods.isNotEmpty) {
       for (int i = 0; i < methods.length; ++i) {
         Method method = methods[i];
         Vector2 position = Vector2(0, i * MethodTextComponent.contentHeight);
-        add(MethodTextComponent(method, position: position));
+        add(MethodTextComponent(method, width, position: position));
       }
     }
     size.addListener(() {
@@ -95,8 +97,8 @@ class MethodAreaComponent extends RectangleComponent
 
   @override
   void render(Canvas canvas) {
-    canvas.drawLine(const Offset(0, 0), const Offset(Project.nodeWidth, 0),
-        NodeFrameComponent.strokePaint);
+    canvas.drawLine(
+        const Offset(0, 0), Offset(width, 0), NodeFrameComponent.strokePaint);
     super.render(canvas);
   }
 
@@ -113,7 +115,7 @@ class MethodAreaComponent extends RectangleComponent
     Vector2 position =
         Vector2(0, methods.length * MethodTextComponent.contentHeight);
     MethodTextComponent methodTextComponent =
-        MethodTextComponent(method, position: position);
+        MethodTextComponent(method, width, position: position);
     method.methodTextComponent = methodTextComponent;
     add(methodTextComponent);
     updateSize();

@@ -2,7 +2,6 @@ import 'dart:ui' as ui;
 
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/node.dart';
-import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
@@ -476,6 +475,7 @@ class NodeRelationshipComponent extends PositionComponent
       if (contain) {
         return contain;
       }
+      break;
     }
     return false;
   }
