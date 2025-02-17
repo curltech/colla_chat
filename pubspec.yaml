@@ -140,9 +140,9 @@ dependencies:
   tab_container: ^3.5.3
   file_saver: ^0.2.10
   material_neumorphic: ^1.2.1
-  extended_text: ^14.0.1 #文本扩展显示
-  extended_text_field: ^16.0.0 #文字表情混入
-  extended_text_library: ^12.0.0
+  extended_text: ^15.0.0 #文本扩展显示
+  extended_text_field: ^16.0.2 #文字表情混入
+  extended_text_library: ^12.0.1
   extended_masked_text: ^3.0.1
   # fl_chart: ^0.69.0
   # k_chart: ^0.7.1
@@ -294,8 +294,8 @@ dependencies:
   video_thumbnail: ^0.5.3
   video_compress: ^3.1.3
   fc_native_video_thumbnail: ^0.16.1
-  extended_image: ^9.0.7 #所有平台，官方软件，管理图像
-  extended_image_library: ^4.0.2
+  extended_image: ^9.1.0 #所有平台，官方软件，管理图像
+  extended_image_library: ^4.0.6
   image_editor: ^1.5.1
   image: ^4.0.17 #所有平台，装载，保存，管理图像
   flutter_luban: ^0.1.14
@@ -331,7 +331,7 @@ dependencies:
   flutter_native_splash: ^2.4.1
   system_tray: ^2.0.3
   tray_manager: ^0.3.0
-  livekit_client: ^2.3.5 #livekit sfu server flutter client
+  livekit_client: ^2.3.6 #livekit sfu server flutter client
   livekit_server_sdk: ^1.0.0
   langchain: ^0.7.1
   langchain_ollama: ^0.3.0
@@ -363,9 +363,9 @@ dependency_overrides:
   ffi: 2.1.0
   win32: 5.9.0
   http: 1.2.0
-  dart_webrtc: ^1.4.10
+  dart_webrtc: ^1.5.1
   webrtc_interface: 1.2.0
-  flutter_webrtc: ^0.12.7
+  flutter_webrtc: ^0.12.9
   #  flutter_webrtc_plus: ^0.11.2+5
   #  medea_flutter_webrtc: ^0.11.0
   protobuf: ^3.1.0

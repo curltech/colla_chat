@@ -696,7 +696,6 @@ abstract class WidgetFactory {
         clipBehavior: clipBehavior,
         statesController: statesController,
         isSemanticButton: isSemanticButton,
-        iconAlignment: iconAlignment,
         child: child);
   }
 

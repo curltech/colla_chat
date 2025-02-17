@@ -886,7 +886,6 @@ class GlassKitWidgetFactory extends WidgetFactory {
             clipBehavior: clipBehavior,
             statesController: statesController,
             isSemanticButton: isSemanticButton,
-            iconAlignment: iconAlignment,
             child: child));
   }
 
