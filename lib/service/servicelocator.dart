@@ -85,6 +85,10 @@ class ServiceLocator {
 
     await sqlite3.open();
     await sqlite3.init();
+    File file = File(appDataProvider.sqlite3Path);
+    if (file.existsSync()) {
+      appDataProvider.dataLength = await file.length();
+    }
     await AppLocalizations.init();
     var defaultPeerEndpoint = peerEndpointController.defaultPeerEndpoint;
     if (defaultPeerEndpoint != null) {
