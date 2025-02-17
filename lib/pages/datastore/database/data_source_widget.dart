@@ -329,6 +329,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
               selected: selected,
               onTap: (int index, String label, {String? subtitle}) {
                 _onTap(context, node);
+                _onItemTap(context, node);
               },
               onLongPress: (int index, String label, {String? subtitle}) {
                 _onLongPress(context, node);
