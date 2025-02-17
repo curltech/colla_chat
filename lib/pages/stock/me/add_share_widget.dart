@@ -93,6 +93,15 @@ class AddShareWidget extends StatelessWidget with TileDataMixin {
           child: CommonAutoSizeTextFormField(
             controller: searchTextController,
             keyboardType: TextInputType.text,
+            prefixIcon: IconButton(
+              onPressed: () {
+                searchTextController.text = '';
+              },
+              icon: Icon(
+                Icons.clear,
+                color: myself.primary,
+              ),
+            ),
             suffixIcon: IconButton(
               onPressed: () {
                 _searchShare(searchTextController.text);
