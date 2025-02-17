@@ -7,11 +7,13 @@ import 'package:colla_chat/pages/base/json_viewer.dart';
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/node.dart';
 import 'package:colla_chat/pages/game/model/base/project.dart';
+import 'package:colla_chat/pages/game/model/base/subject.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/component/node_relationship_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
 import 'package:colla_chat/pages/game/model/widget/model_node_edit_widget.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -66,7 +68,8 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       }
     }
     String? subjectName = await DialogUtil.showSelectDialog<String>(
-        title: const CommonAutoSizeText('Select subject'), items: options);
+        title: CommonAutoSizeText(AppLocalizations.t('Select subject')),
+        items: options);
     if (subjectName != null) {
       modelProjectController.currentSubjectName.value = subjectName;
       modelFlameGame?.moveTo();
@@ -97,6 +100,31 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
           color: myself.primary,
         ),
         tooltip: AppLocalizations.t('Select subject'),
+      ),
+      IconButton(
+        onPressed: () async {
+          Project? project = modelProjectController.project.value;
+          if (project == null) {
+            return;
+          }
+          String? subjectName =
+              modelProjectController.currentSubjectName.value ?? '';
+          Subject? subject = project.subjects.remove(subjectName);
+          if (subject == null) {
+            return;
+          }
+          subjectName = await DialogUtil.showTextFormField(
+              title: AppLocalizations.t('Update subject name'),
+              content: subjectName);
+          if (subjectName != null) {
+            subject.name = subjectName;
+            project.subjects[subjectName] = subject;
+            modelProjectController.currentSubjectName.value = subjectName;
+            subject.subjectComponent?.updateSubjectName();
+          }
+        },
+        icon: Icon(Icons.edit_calendar_outlined, color: myself.primary),
+        tooltip: AppLocalizations.t('Update subject name'),
       )
     ];
   }
@@ -355,12 +383,23 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       List<Widget> btns = [];
       Project? project = modelProjectController.project.value;
       if (project != null) {
-        btns.addAll(_buildSubjectButtons());
+        Widget projectWidget;
+        if (appDataProvider.secondaryBodyLandscape) {
+          projectWidget = Column(
+            children: _buildProjectButtons(),
+          );
+        } else {
+          projectWidget = Row(
+            children: _buildProjectButtons(),
+          );
+        }
+        btns.add(projectWidget);
+        List<Widget> subjectBtns = [..._buildSubjectButtons()];
         String? currentSubjectName =
             modelProjectController.currentSubjectName.value;
         if (currentSubjectName != null) {
           if (modelProjectController.currentSubjectName.value != null) {
-            btns.addAll([
+            subjectBtns.addAll([
               ..._buildMetaNodeButtons(),
               ..._buildRelationshipButtons(),
               IconButton(
@@ -374,14 +413,27 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
             ]);
           }
         }
+        Widget subjectWidget;
+        if (appDataProvider.secondaryBodyLandscape) {
+          subjectWidget = Column(
+            children: subjectBtns,
+          );
+        } else {
+          subjectWidget = Row(
+            children: subjectBtns,
+          );
+        }
+        btns.add(subjectWidget);
       }
       return appDataProvider.secondaryBodyLandscape
-          ? Column(
+          ? Row(
               mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: btns,
             )
-          : Row(
+          : Column(
               mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: btns,
             );
     });
@@ -460,42 +512,39 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   List<Widget> _buildProjectButtons() {
     List<Widget> btns = [];
     Project? project = modelProjectController.project.value;
-    btns.addAll([
-      IconButton(
-        onPressed: () {
-          _newProject();
-        },
-        icon: const Icon(Icons.newspaper_sharp),
-        tooltip: AppLocalizations.t('New project'),
-      ),
-      IconButton(
-        onPressed: () {
-          _openProject();
-        },
-        icon: const Icon(Icons.file_open),
-        tooltip: AppLocalizations.t('Open project'),
-      ),
-    ]);
+
     if (project != null) {
+      btns.add(IconButton(
+        onPressed: () async {
+          String? name = await DialogUtil.showTextFormField(
+              title: AppLocalizations.t('Update project name'),
+              content: project.name);
+          if (name != null) {
+            project.name = name;
+          }
+        },
+        icon: Icon(Icons.edit, color: myself.primary),
+        tooltip: AppLocalizations.t('Update project name'),
+      ));
       btns.add(IconButton(
         onPressed: () async {
           await _saveProject();
         },
-        icon: const Icon(Icons.save),
+        icon: Icon(Icons.save, color: myself.primary),
         tooltip: AppLocalizations.t('Save project'),
       ));
       btns.add(IconButton(
         onPressed: () {
           _viewProject();
         },
-        icon: Icon(jsonViewerWidget.iconData),
+        icon: Icon(jsonViewerWidget.iconData, color: myself.primary),
         tooltip: AppLocalizations.t('View project'),
       ));
       btns.add(IconButton(
         onPressed: () async {
           _closeProject();
         },
-        icon: const Icon(Icons.close_outlined),
+        icon: Icon(Icons.close_outlined, color: myself.primary),
         tooltip: AppLocalizations.t('Close project'),
       ));
     }
@@ -614,7 +663,20 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       Project? project = modelProjectController.project.value;
       List<Widget> rightWidgets = [
         ..._buildMetaProjectButtons(),
-        ..._buildProjectButtons(),
+        IconButton(
+          onPressed: () {
+            _newProject();
+          },
+          icon: Icon(Icons.newspaper_sharp),
+          tooltip: AppLocalizations.t('New project'),
+        ),
+        IconButton(
+          onPressed: () {
+            _openProject();
+          },
+          icon: Icon(Icons.file_open),
+          tooltip: AppLocalizations.t('Open project'),
+        )
       ];
       modelFlameGame = ModelFlameGame();
       var children = [
@@ -627,16 +689,22 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
       ];
       String title = AppLocalizations.t(this.title);
       if (metaProject != null) {
-        title = '$title-${metaProject.name}';
+        title = '$title\n${metaProject.name}';
       }
       if (project != null) {
-        title = '$title-${project.name}';
+        title = '$title\n${project.name}';
       }
+      Widget titleWidget = CommonAutoSizeText(
+        AppLocalizations.t(title ?? ''),
+        style: const TextStyle(color: Colors.white, fontSize: 12),
+        wrapWords: false,
+        overflow: TextOverflow.visible,
+      );
       return ListenableBuilder(
           listenable: appDataProvider,
           builder: (BuildContext context, Widget? _) {
             return AppBarView(
-                title: title,
+                titleWidget: titleWidget,
                 withLeading: true,
                 rightWidgets: rightWidgets,
                 child: appDataProvider.secondaryBodyLandscape

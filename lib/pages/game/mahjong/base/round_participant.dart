@@ -332,6 +332,7 @@ class RoundParticipant {
         }
       }
     }
+    this.outstandingActions.clear();
 
     return;
   }

@@ -145,9 +145,7 @@ class ModelFlameGame extends FlameGame
 
   @override
   Future<void> onLongTapDown(TapDownEvent event) async {
-    Vector2 globalPosition = event.devicePosition;
-    Vector2 worldPosition = camera.globalToLocal(globalPosition);
-    camera.moveTo(worldPosition);
+    moveTo();
   }
 
   @override
