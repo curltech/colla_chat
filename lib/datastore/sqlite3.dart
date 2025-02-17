@@ -22,7 +22,7 @@ import './condition_import/unsupport.dart'
 /// 适用于移动手机（无数据限制），desktop和chrome浏览器的sqlite3的数据库（50M数据限制）
 class Sqlite3 extends DataStore {
   CommonDatabase? db;
-  late String dbPath;
+  final String dbPath;
 
   Sqlite3(this.dbPath);
 
