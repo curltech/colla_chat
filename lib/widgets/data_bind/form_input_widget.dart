@@ -327,8 +327,8 @@ class _FormInputWidgetState extends State<FormInputWidget> {
 
     return OverflowBar(
       alignment: MainAxisAlignment.end,
-      spacing: 10.0,
-      overflowSpacing: 10.0,
+      spacing: widget.buttonSpacing,
+      overflowSpacing: widget.buttonSpacing,
       children: btns,
     );
   }
@@ -367,6 +367,9 @@ class _FormInputWidgetState extends State<FormInputWidget> {
               height: widget.buttonSpacing,
             ),
             _buildButtonBar(context),
+            SizedBox(
+              height: widget.buttonSpacing,
+            ),
           ]));
     }, create: (BuildContext context) {
       return widget.controller;
