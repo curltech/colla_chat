@@ -263,6 +263,7 @@ class Myself with ChangeNotifier {
   set locale(Locale locale) {
     if (locale != _locale) {
       _locale = locale;
+      myself.profileLocale = _locale;
       notifyListeners();
     }
   }
