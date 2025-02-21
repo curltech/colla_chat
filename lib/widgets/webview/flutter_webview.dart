@@ -33,7 +33,7 @@ class FlutterWebView extends StatelessWidget {
   void _buildWebViewController() {
     controller = WebViewController();
     controller!.setJavaScriptMode(JavaScriptMode.unrestricted);
-    controller!.setBackgroundColor(Colors.white);
+    // controller!.setBackgroundColor(Colors.white);
     controller!.setNavigationDelegate(
         NavigationDelegate(onNavigationRequest: (request) {
       //logger.i("request navigate ${request.url}");
@@ -82,7 +82,7 @@ class FlutterWebView extends StatelessWidget {
   }
 
   _buildWebViewWidget() {
-    if (platformParams.windows || platformParams.mobile || platformParams.web) {
+    if (platformParams.desktop || platformParams.mobile || platformParams.web) {
       webView = WebViewWidget(
         controller: controller!,
       );
