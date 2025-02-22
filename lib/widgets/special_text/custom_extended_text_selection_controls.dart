@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -12,48 +13,39 @@ const double _kToolbarContentDistanceBelow = _kHandleSize - 2.0;
 const double _kToolbarContentDistance = 8.0;
 
 /// Android Material styled text selection controls.
-class CustomTextSelectionControls extends TextSelectionControls {
+class CustomTextSelectionControls extends TextSelectionControls
+    with TextSelectionHandleControls {
+  static Widget defaultContextMenuBuilder(
+      BuildContext context, ExtendedEditableTextState editableTextState) {
+    return AdaptiveTextSelectionToolbar.buttonItems(
+      buttonItems: <ContextMenuButtonItem>[
+        ...editableTextState.contextMenuButtonItems,
+        ContextMenuButtonItem(
+          onPressed: () {
+            launchUrl(
+              Uri.parse(
+                'mailto:zmtzawqlp@live.com?subject=extended_text_share&body=${editableTextState.textEditingValue.text}',
+              ),
+            );
+            editableTextState.hideToolbar(true);
+            editableTextState.textEditingValue
+                .copyWith(selection: const TextSelection.collapsed(offset: 0));
+          },
+          type: ContextMenuButtonType.custom,
+          label: 'like',
+        ),
+      ],
+      anchors: editableTextState.contextMenuAnchors,
+    );
+    // return AdaptiveTextSelectionToolbar.editableText(
+    //   editableTextState: editableTextState,
+    // );
+  }
+
   /// Returns the size of the Material handle.
   @override
   Size getHandleSize(double textLineHeight) =>
       const Size(_kHandleSize, _kHandleSize);
-
-  /// Builder for material-style copy/paste text selection toolbar.
-  @override
-  Widget buildToolbar(
-    BuildContext context,
-    Rect globalEditableRegion,
-    double textLineHeight,
-    Offset selectionMidpoint,
-    List<TextSelectionPoint> endpoints,
-    TextSelectionDelegate delegate,
-    ValueListenable<ClipboardStatus>? clipboardStatus,
-    Offset? lastSecondaryTapDownPosition,
-  ) {
-    return _TextSelectionControlsToolbar(
-      globalEditableRegion: globalEditableRegion,
-      textLineHeight: textLineHeight,
-      selectionMidpoint: selectionMidpoint,
-      endpoints: endpoints,
-      delegate: delegate,
-      clipboardStatus: clipboardStatus,
-      handleCut: canCut(delegate) ? () => handleCut(delegate) : null,
-      handleCopy: canCopy(delegate) ? () => handleCopy(delegate) : null,
-      handlePaste: canPaste(delegate) ? () => handlePaste(delegate) : null,
-      handleSelectAll:
-          canSelectAll(delegate) ? () => handleSelectAll(delegate) : null,
-      handleLike: () {
-        launch(
-            'mailto:zmtzawqlp@live.com?subject=extended_text_share&body=${delegate.textEditingValue.text}');
-        delegate.hideToolbar();
-        delegate.userUpdateTextEditingValue(
-          delegate.textEditingValue
-              .copyWith(selection: const TextSelection.collapsed(offset: 0)),
-          SelectionChangedCause.toolbar,
-        );
-      },
-    );
-  }
 
   /// Builder for material-style text selection handles.
   @override
@@ -64,7 +56,7 @@ class CustomTextSelectionControls extends TextSelectionControls {
       width: _kHandleSize,
       height: _kHandleSize,
       child: Image.asset(
-        'assets/images/emoji/sg40.png',
+        'assets/colla.png',
       ),
     );
 
