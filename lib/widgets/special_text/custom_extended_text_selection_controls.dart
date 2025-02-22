@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/foundation.dart';
@@ -55,9 +56,7 @@ class CustomTextSelectionControls extends TextSelectionControls
     final Widget handle = SizedBox(
       width: _kHandleSize,
       height: _kHandleSize,
-      child: Image.asset(
-        'assets/colla.png',
-      ),
+      child: Icon(Icons.arrow_drop_up_outlined,color: myself.primary,),
     );
 
     // [handle] is a circle, with a rectangle in the top left quadrant of that
