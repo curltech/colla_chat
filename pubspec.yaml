@@ -241,7 +241,7 @@ dependencies:
   flutter_sharing_intent: ^1.1.1
   date_format: ^2.0.6
   omni_datetime_picker: ^2.0.3
-  toggle_switch: ^2.0.1
+  toggle_switch: ^2.3.0
   talker: ^4.2.4
   talker_flutter: ^4.2.0
   cross_file: ^0.3.4+1
