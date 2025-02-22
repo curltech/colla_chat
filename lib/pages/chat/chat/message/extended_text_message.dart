@@ -28,7 +28,7 @@ class ExtendedTextMessage extends StatelessWidget {
             child: ExtendedText(
               content,
               key: UniqueKey(),
-              selectionColor: Colors.yellow,
+              selectionColor: Colors.amber.shade700,
               style: TextStyle(
                 color: isMyself ? Colors.white : Colors.black,
                 //fontSize: 16.0,
