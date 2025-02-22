@@ -27,7 +27,7 @@ class ParticipantAreaComponent extends RectangleComponent
       size = Vector2(roomController.width * MahjongFlameGame.selfWidthRadio,
           roomController.height * MahjongFlameGame.selfHeightRadio);
       paint = Paint()
-        ..color = Colors.lightGreen
+        ..color = Colors.white.withAlpha(0)
         ..style = PaintingStyle.fill;
     }
     if (areaDirection == AreaDirection.next) {
@@ -39,7 +39,7 @@ class ParticipantAreaComponent extends RectangleComponent
       size = Vector2(roomController.width * MahjongFlameGame.nextWidthRadio,
           roomController.height * MahjongFlameGame.nextHeightRadio);
       paint = Paint()
-        ..color = Colors.cyan
+        ..color = Colors.white.withAlpha(0)
         ..style = PaintingStyle.fill;
     }
     if (areaDirection == AreaDirection.opponent) {
@@ -47,7 +47,7 @@ class ParticipantAreaComponent extends RectangleComponent
       size = Vector2(roomController.width * MahjongFlameGame.opponentWidthRadio,
           roomController.height * MahjongFlameGame.opponentHeightRadio);
       paint = Paint()
-        ..color = Colors.redAccent
+        ..color = Colors.white.withAlpha(0)
         ..style = PaintingStyle.fill;
     }
     if (areaDirection == AreaDirection.previous) {
@@ -58,7 +58,7 @@ class ParticipantAreaComponent extends RectangleComponent
       size = Vector2(roomController.width * MahjongFlameGame.previousWidthRadio,
           roomController.height * MahjongFlameGame.previousHeightRadio);
       paint = Paint()
-        ..color = Colors.cyanAccent
+        ..color = Colors.white.withAlpha(0)
         ..style = PaintingStyle.fill;
     }
   }

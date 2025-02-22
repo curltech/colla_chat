@@ -26,7 +26,7 @@ class StockAreaComponent extends RectangleComponent
     size = Vector2(roomController.width * MahjongFlameGame.stockWidthRadio,
         roomController.height * MahjongFlameGame.stockHeightRadio);
     paint = Paint()
-      ..color = Colors.grey
+      ..color = Colors.white.withAlpha(0)
       ..style = PaintingStyle.stroke;
   }
 

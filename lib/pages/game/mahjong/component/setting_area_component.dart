@@ -18,7 +18,7 @@ class SettingAreaComponent extends RectangleComponent
     size = Vector2(roomController.width * MahjongFlameGame.settingWidthRadio,
         roomController.height * MahjongFlameGame.opponentHeightRadio);
     paint = Paint()
-      ..color = Colors.lightBlueAccent
+      ..color = Colors.white.withAlpha(0)
       ..style = PaintingStyle.fill;
   }
 
