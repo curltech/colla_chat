@@ -214,6 +214,8 @@ dependencies:
   #安全加密
   cryptography: ^2.7.0 #ecc,aes
   cryptography_flutter: ^2.3.2
+#  cryptography_plus: ^2.7.1
+#  cryptography_flutter_plus: ^2.3.4
   pointycastle: ^3.7.4
   encrypt: ^5.0.3 #aes
   openpgp: ^3.9.0 #rsa,sha
