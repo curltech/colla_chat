@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:colla_chat/pages/game/mahjong/base/format_tile.dart';
-import 'package:colla_chat/pages/game/mahjong/base/room.dart';
+import 'package:colla_chat/pages/game/mahjong/base/room_event.dart';
 import 'package:colla_chat/pages/game/mahjong/base/tile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/tile_background_sprite.dart';
 import 'package:colla_chat/pages/game/mahjong/component/mahjong_flame_game.dart';

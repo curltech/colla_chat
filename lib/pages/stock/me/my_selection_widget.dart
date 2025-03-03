@@ -332,14 +332,14 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
         name: 'ts_code',
         width: 80,
         onSort: (int index, bool ascending) => dayLineController.sort(
-                (t) => t.tsCode, index, 'ts_code', ascending),
+            (t) => t.tsCode, index, 'ts_code', ascending),
       ),
       PlatformDataColumn(
         label: '股票名',
         name: 'name',
         width: 80,
-        onSort: (int index, bool ascending) => dayLineController.sort(
-                (t) => t.name, index, 'name', ascending),
+        onSort: (int index, bool ascending) =>
+            dayLineController.sort((t) => t.name, index, 'name', ascending),
       ),
       PlatformDataColumn(
         label: '交易日期',
@@ -362,7 +362,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
         align: TextAlign.right,
         width: 70,
         onSort: (int index, bool ascending) => dayLineController.sort(
-                (t) => t.pctChgClose, index, 'pct_chg_close', ascending),
+            (t) => t.pctChgClose, index, 'pct_chg_close', ascending),
       ),
       PlatformDataColumn(
         label: '量变化',
@@ -373,7 +373,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
         align: TextAlign.right,
         width: 70,
         onSort: (int index, bool ascending) => dayLineController.sort(
-                (t) => t.pctChgVol, index, 'pct_chg_vol', ascending),
+            (t) => t.pctChgVol, index, 'pct_chg_vol', ascending),
       ),
       PlatformDataColumn(
         label: '换手率',
@@ -382,7 +382,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
         align: TextAlign.right,
         width: 70,
         onSort: (int index, bool ascending) => dayLineController.sort(
-                (t) => t.turnover, index, 'turnover', ascending),
+            (t) => t.turnover, index, 'turnover', ascending),
       ),
       PlatformDataColumn(
           label: '',
@@ -393,14 +393,14 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
           }),
     ];
     Widget table = BindingDataTable2<DayLine>(
-      key: UniqueKey(),
-      showCheckboxColumn: true,
-      horizontalMargin: 10.0,
-      columnSpacing: 0.0,
-      platformDataColumns: dayLineDataColumns,
-      controller: dayLineController,
-      fixedLeftColumns: 2,
-    );
+        key: UniqueKey(),
+        showCheckboxColumn: true,
+        horizontalMargin: 10.0,
+        columnSpacing: 0.0,
+        platformDataColumns: dayLineDataColumns,
+        controller: dayLineController,
+        fixedLeftColumns: 2,
+        minWidth: 600);
     return Stack(children: <Widget>[
       table,
       Obx(() {

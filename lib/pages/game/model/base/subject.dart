@@ -55,7 +55,7 @@ class Subject {
     double maxY = node.y!;
     for (ModelNode modelNode in modelNodes.values) {
       double? x = modelNode.x;
-      double width = modelNode.width ?? Project.nodeWidth;
+      double width = modelNode.width;
       if (x != null) {
         if (x < minX) {
           minX = x;
@@ -66,7 +66,7 @@ class Subject {
         }
       }
       double? y = modelNode.y;
-      double height = modelNode.height ?? Project.nodeHeight;
+      double height = modelNode.height;
       if (y != null) {
         if (y < minY) {
           minY = y;

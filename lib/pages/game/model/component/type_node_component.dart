@@ -1,5 +1,4 @@
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
-import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/attribute_text_component.dart';
 import 'package:colla_chat/pages/game/model/component/method_text_component.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
@@ -34,8 +33,8 @@ class TypeNodeComponent extends RectangleComponent
   TypeNodeComponent(
     this.modelNode,
   ) : super(paint: fillPaint) {
-    width = modelNode.width ?? Project.nodeWidth;
-    height = modelNode.height ?? Project.nodeHeight;
+    width = modelNode.width;
+    height = modelNode.height;
     size = Vector2(width, height);
   }
 
@@ -55,7 +54,7 @@ class TypeNodeComponent extends RectangleComponent
 
     return TextBoxComponent(
         text: text,
-        size: Vector2(Project.nodeWidth, headHeight),
+        size: Vector2(width, headHeight),
         scale: scale,
         angle: angle,
         position: Vector2(0, 0),
@@ -73,7 +72,9 @@ class TypeNodeComponent extends RectangleComponent
     );
     add(nodeNameComponent);
     attributeAreaComponent = AttributeAreaComponent(
-        position: Vector2(0, headHeight), attributes: modelNode.attributes);
+        position: Vector2(0, headHeight),
+        attributes: modelNode.attributes,
+        size: Vector2(modelNode.width, modelNode.height));
     add(attributeAreaComponent);
     methodAreaComponent = MethodAreaComponent(
         position: Vector2(0, headHeight + calAttributeHeight()),

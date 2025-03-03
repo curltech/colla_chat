@@ -22,8 +22,6 @@ Future<CommonDatabase> openSqlite3({required String path}) async {
       }
       int userVersion = db.userVersion;
       print('sqlite3 db $path is set userVersion:$userVersion');
-      appDataProvider.sqlite3Path = path;
-      appDataProvider.dataLength = await file.length();
 
       return db;
     } catch (e) {

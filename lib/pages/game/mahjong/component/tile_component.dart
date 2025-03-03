@@ -2,7 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:colla_chat/pages/game/mahjong/base/hand_pile.dart';
-import 'package:colla_chat/pages/game/mahjong/base/mahjong_action.dart';
+import 'package:colla_chat/pages/game/mahjong/base/room_event.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round_participant.dart';
@@ -19,13 +19,15 @@ import 'package:flutter/material.dart';
 class TileComponent extends PositionComponent
     with TapCallbacks, HasGameRef<MahjongFlameGame> {
   TileComponent(this.tile, this.areaDirection, this.tileBackgroundType,
-      {super.position, super.priority}) {
+      {this.tileScale = 1, super.position, super.priority}) {
     if (areaDirection == AreaDirection.self) {
       double width = 79;
       double height = 111;
       if (tile.sprite != null) {
         width = tile.sprite!.image.width.toDouble();
         height = tile.sprite!.image.height.toDouble();
+      } else {
+        logger.e('tile sprite image is null');
       }
       size = Vector2(width, height);
     }
@@ -36,6 +38,8 @@ class TileComponent extends PositionComponent
   final AreaDirection areaDirection;
 
   final TileBackgroundType tileBackgroundType;
+
+  final double tileScale;
 
   /// 绘制牌的图像，有相对的偏移量，旋转，放大等参数
   void _drawSprite(
@@ -49,6 +53,7 @@ class TileComponent extends PositionComponent
     if (sprite == null) {
       return;
     }
+    scale = scale * tileScale;
     if (radians != null) {
       canvas.save();
       canvas.translate(sprite.image.width / 2, sprite.image.height / 2);
@@ -136,7 +141,7 @@ class TileComponent extends PositionComponent
   discard() {
     RoundParticipant? roundParticipant = roomController
         .getRoundParticipant(roomController.selfParticipantDirection.value);
-    Map<MahjongAction, Set<int>>? outstandingActions =
+    Map<RoomEventAction, Set<int>>? outstandingActions =
         roundParticipant?.outstandingActions.value;
     if (outstandingActions != null && outstandingActions.isNotEmpty) {
       return;
@@ -158,6 +163,11 @@ class TileComponent extends PositionComponent
       }
 
       HandPile handPile = roundParticipant.handPile;
+      if (!handPile.exist(tile)) {
+        logger.e(
+            'roundParticipant:${roundParticipant.index} cannot discard tile, not exist');
+        return;
+      }
       if (handPile.drawTile == tile) {
         room.startRoomEvent(RoomEvent(
           room.name,
@@ -168,11 +178,6 @@ class TileComponent extends PositionComponent
           pos: -1,
         ));
       } else {
-        if (!handPile.exist(tile)) {
-          logger.e(
-              'roundParticipant:${roundParticipant.index} cannot discard tile, not exist');
-          return;
-        }
         int pos = handPile.tiles.indexOf(tile);
         if (pos > -1) {
           room.startRoomEvent(RoomEvent(

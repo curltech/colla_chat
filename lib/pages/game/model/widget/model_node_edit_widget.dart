@@ -61,6 +61,16 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
         name: 'name',
         label: 'Name',
         prefixIcon: Icon(Icons.person, color: myself.primary)),
+    PlatformDataField(
+        name: 'width',
+        label: 'Width',
+        dataType: DataType.double,
+        prefixIcon: Icon(Icons.width_wide_outlined, color: myself.primary)),
+    PlatformDataField(
+        name: 'height',
+        label: 'Height',
+        dataType: DataType.double,
+        prefixIcon: Icon(Icons.height_outlined, color: myself.primary)),
   ];
 
   FormInputController? formInputController;
@@ -137,6 +147,8 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
     modelNode?.shapeType = current.shapeType;
     modelNode?.fillColor = current.fillColor;
     modelNode?.strokeColor = current.strokeColor;
+    modelNode?.width = current.width;
+    modelNode?.height = current.height;
     if (modelNode!.nodeType == NodeType.image.name) {
       modelNode?.content = content.value;
     }

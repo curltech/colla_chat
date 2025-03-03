@@ -31,7 +31,7 @@ class FileSystemController {
     clear();
     if (platformParams.mobile) {
       initMobile();
-    } else if (platformParams.macos) {
+    } else if (platformParams.macos || platformParams.linux) {
       initMac();
       initMobile();
     } else if (platformParams.windows) {

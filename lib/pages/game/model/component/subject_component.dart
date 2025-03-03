@@ -62,6 +62,10 @@ class SubjectComponent extends RectangleComponent with ModelNodeComponent {
     size = rect.size.toVector2();
   }
 
+  updateSubjectName() {
+    textComponent.text = subject.name;
+  }
+
   @override
   void render(Canvas canvas) {
     DashPainter dashPainter = const DashPainter();

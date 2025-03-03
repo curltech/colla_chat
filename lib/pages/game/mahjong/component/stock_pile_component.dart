@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:colla_chat/pages/game/mahjong/base/room.dart';
+import 'package:colla_chat/pages/game/mahjong/base/room_event.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round.dart';
 import 'package:colla_chat/pages/game/mahjong/base/stock_pile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/tile.dart' as mahjongTile;

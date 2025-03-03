@@ -1,4 +1,5 @@
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
+import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/component/node_relationship_component.dart';
 import 'package:colla_chat/tool/string_util.dart';
@@ -10,8 +11,8 @@ abstract class Node {
   /// 节点的位置和大小
   double? x;
   double? y;
-  double? width;
-  double? height;
+  double width = Project.nodeWidth;
+  double height = Project.nodeHeight;
 
   NodeFrameComponent? nodeFrameComponent;
 
@@ -28,8 +29,8 @@ abstract class Node {
         name = json['name'],
         x = json['x'],
         y = json['y'],
-        width = json['width'],
-        height = json['height'];
+        width = json['width'] ?? Project.nodeWidth,
+        height = json['height'] ?? Project.nodeHeight;
 
   Map<String, dynamic> toJson() {
     return {
@@ -68,7 +69,7 @@ class NodeRelationship {
   late String dstId;
 
   late String relationshipType;
-  Set<String>? allowRelationshipTypes;
+  late Set<String> allowRelationshipTypes;
   int? srcCardinality;
   int? dstCardinality;
 
@@ -82,7 +83,7 @@ class NodeRelationship {
     this.src,
     this.dst, {
     String? relationshipType,
-    this.allowRelationshipTypes,
+    Set<String>? allowRelationshipTypes,
     this.srcCardinality,
     this.dstCardinality,
   }) {
@@ -90,6 +91,8 @@ class NodeRelationship {
     dstId = dst!.id;
     this.relationshipType =
         relationshipType ?? RelationshipType.association.name;
+    this.allowRelationshipTypes =
+        allowRelationshipTypes ?? {RelationshipType.association.name};
   }
 
   NodeRelationshipComponent? nodeRelationshipComponent;
@@ -111,9 +114,11 @@ class NodeRelationship {
       allowRelationshipTypes = {};
       if (types is List<dynamic>) {
         for (var type in types) {
-          allowRelationshipTypes!.add(type.toString());
+          allowRelationshipTypes.add(type.toString());
         }
       }
+    } else {
+      allowRelationshipTypes = {RelationshipType.association.name};
     }
   }
 
@@ -122,7 +127,7 @@ class NodeRelationship {
       'srcId': srcId,
       'dstId': dstId,
       'relationshipType': relationshipType,
-      'allowRelationshipTypes': allowRelationshipTypes?.toList(),
+      'allowRelationshipTypes': allowRelationshipTypes.toList(),
       'srcCardinality': srcCardinality,
       'dstCardinality': dstCardinality,
       'srcAttributeName': srcAttributeName,

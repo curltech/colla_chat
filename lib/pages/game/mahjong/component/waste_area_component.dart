@@ -1,4 +1,5 @@
 import 'package:colla_chat/pages/game/mahjong/base/room.dart';
+import 'package:colla_chat/pages/game/mahjong/base/room_event.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round.dart';
 import 'package:colla_chat/pages/game/mahjong/component/mahjong_flame_game.dart';
 import 'package:colla_chat/pages/game/mahjong/component/waste_pile_component.dart';
@@ -36,7 +37,7 @@ class WasteAreaComponent extends RectangleComponent
           roomController.width * MahjongFlameGame.selfWasteWidthRadio,
           roomController.height * MahjongFlameGame.selfWasteHeightRadio);
       paint = Paint()
-        ..color = Colors.pinkAccent
+        ..color = Colors.white.withAlpha(0)
         ..style = PaintingStyle.fill;
     }
     if (areaDirection == AreaDirection.next) {
@@ -52,7 +53,7 @@ class WasteAreaComponent extends RectangleComponent
           roomController.width * MahjongFlameGame.nextWasteWidthRadio,
           roomController.height * MahjongFlameGame.nextHeightRadio);
       paint = Paint()
-        ..color = Colors.blue
+        ..color = Colors.white.withAlpha(0)
         ..style = PaintingStyle.fill;
     }
     if (areaDirection == AreaDirection.opponent) {
@@ -67,7 +68,7 @@ class WasteAreaComponent extends RectangleComponent
           roomController.width * MahjongFlameGame.opponentWasteWidthRadio,
           roomController.height * MahjongFlameGame.opponentWasteHeightRadio);
       paint = Paint()
-        ..color = Colors.green
+        ..color = Colors.white.withAlpha(0)
         ..style = PaintingStyle.fill;
     }
     if (areaDirection == AreaDirection.previous) {
@@ -81,7 +82,7 @@ class WasteAreaComponent extends RectangleComponent
           roomController.width * MahjongFlameGame.previousWasteWidthRadio,
           roomController.height * MahjongFlameGame.previousHeightRadio);
       paint = Paint()
-        ..color = Colors.indigoAccent
+        ..color = Colors.white.withAlpha(0)
         ..style = PaintingStyle.fill;
     }
   }

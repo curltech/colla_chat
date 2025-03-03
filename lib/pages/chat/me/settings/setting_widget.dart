@@ -21,23 +21,13 @@ class SettingWidget extends StatelessWidget with TileDataMixin {
   final PeerProfileEditWidget peerProfileEditWidget = PeerProfileEditWidget();
   final SecuritySettingWidget securitySettingWidget = SecuritySettingWidget();
   final AuthMethod authMethod = AuthMethod.app;
-  late final List<TileData> settingTileData;
+  List<TileData> settingTileData = [];
 
   SettingWidget({super.key}) {
     indexWidgetProvider.define(generalSettingWidget);
     indexWidgetProvider.define(advancedSettingWidget);
     indexWidgetProvider.define(peerProfileEditWidget);
     indexWidgetProvider.define(securitySettingWidget);
-    List<TileDataMixin> mixins = [
-      generalSettingWidget,
-      advancedSettingWidget,
-      peerProfileEditWidget,
-      securitySettingWidget
-    ];
-    settingTileData = TileData.from(mixins);
-    for (var tile in settingTileData) {
-      tile.dense = true;
-    }
   }
 
   @override
@@ -62,6 +52,21 @@ class SettingWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
+  List<TileData> _buildSettingTileData(BuildContext context) {
+    List<TileDataMixin> mixins = [
+      generalSettingWidget,
+      advancedSettingWidget,
+      peerProfileEditWidget,
+      securitySettingWidget
+    ];
+    settingTileData = TileData.from(mixins);
+    for (var tile in settingTileData) {
+      tile.dense = true;
+    }
+
+    return settingTileData;
+  }
+
   Widget _buildAppAuthenticate() {
     if (authMethod == AuthMethod.app) {
       P2pLoginWidget p2pLoginWidget = P2pLoginWidget(
@@ -76,6 +81,7 @@ class SettingWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
+    _buildSettingTileData(context);
     Widget settingWidget = DataListView(
       itemCount: settingTileData.length,
       itemBuilder: (BuildContext context, int index) {

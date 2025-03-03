@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:colla_chat/pages/game/mahjong/base/full_pile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/suit.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/tool/string_util.dart';
@@ -19,7 +20,6 @@ class Tile {
 
   Tile(this.id, this.suit, {this.windSuit, this.rank}) {
     check();
-    loadSprite();
   }
 
   check() {
@@ -42,7 +42,10 @@ class Tile {
     if (windSuit != null) {
       this.windSuit =
           StringUtil.enumFromString(WindSuit.values, windSuit) ?? WindSuit.east;
+    } else {
+      this.windSuit = null;
     }
+    sprite = fullPile.tiles[toString()]?.sprite;
   }
 
   Map<String, dynamic> toJson() {
@@ -77,8 +80,7 @@ class Tile {
     }
   }
 
-  @override
-  String toString() {
+  String _toString() {
     if (suit == Suit.none) {
       return Suit.none.name;
     } else if (suit == Suit.wind && windSuit != null) {
@@ -87,6 +89,11 @@ class Tile {
       return '${suit.name}$rank';
     }
     return 'error card';
+  }
+
+  @override
+  String toString() {
+    return '${_toString()}_$id';
   }
 
   bool is19() {
@@ -118,18 +125,18 @@ class Tile {
 
   @override
   int get hashCode {
-    return toString().hashCode;
+    return _toString().hashCode;
   }
 
   /// 相同的牌，可能id不同
   @override
   bool operator ==(Object other) {
-    return toString() == other.toString();
+    return _toString() == (other as Tile)._toString();
   }
 
   /// 同一张牌，id也相同
   bool same(Tile other) {
-    return toString() == other.toString() && id == other.id;
+    return toString() == other.toString();
   }
 
   Tile copy() {

@@ -165,6 +165,7 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
               selected: selected,
               onTap: (int index, String label, {String? subtitle}) {
                 _onTap(context, node as FolderNode);
+                _onItemTap(node);
               },
             );
             return Padding(
@@ -177,14 +178,18 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
           });
         },
         onItemTap: (ExplorableNode node) {
-          if (node.length == 0) {
-            try {
-              fileSystemController.findDirectory(node as FolderNode);
-            } catch (e) {
-              DialogUtil.error(content: 'list directory failure:$e');
-            }
-          }
+          _onItemTap(node as FolderNode);
         });
+  }
+
+  _onItemTap(FolderNode node) {
+    if (node.length == 0) {
+      try {
+        fileSystemController.findDirectory(node);
+      } catch (e) {
+        DialogUtil.error(content: 'list directory failure:$e');
+      }
+    }
   }
 
   @override

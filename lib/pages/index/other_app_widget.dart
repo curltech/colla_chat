@@ -40,7 +40,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   final FileSystemWidget fileSystemWidget = FileSystemWidget();
   final FileWidget fileWidget = FileWidget();
 
-  late Map<String, TileDataMixin> widgets = {
+  late final Map<String, TileDataMixin> widgets = {
     poemWidget.routeName: poemWidget,
     stockMainWidget.routeName: stockMainWidget,
     gameMainWidget.routeName: gameMainWidget,
@@ -74,7 +74,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   IconData get iconData => Icons.apps;
 
   @override
-  String get title => 'Other app';
+  String get title => 'Apps';
 
   late final RxString name = routeName.obs;
 

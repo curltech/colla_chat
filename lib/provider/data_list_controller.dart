@@ -76,7 +76,9 @@ class DataListController<T> {
   }
 
   T? get current {
-    if (this.currentIndex.value != null && data.isNotEmpty) {
+    if (this.currentIndex.value != -1 &&
+        this.currentIndex.value != null &&
+        data.isNotEmpty) {
       return data[this.currentIndex.value!];
     }
     return null;

@@ -1,5 +1,4 @@
-import 'package:colla_chat/pages/game/mahjong/base/mahjong_action.dart';
-import 'package:colla_chat/pages/game/mahjong/base/room.dart';
+import 'package:colla_chat/pages/game/mahjong/base/room_event.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round_participant.dart';
 import 'package:colla_chat/pages/game/mahjong/component/action_area_component.dart';
 import 'package:colla_chat/pages/game/mahjong/component/hand_area_component.dart';
@@ -97,12 +96,12 @@ class MahjongFlameGame extends FlameGame
   _init() {
     camera = CameraComponent.withFixedResolution(
         width: roomController.width, height: roomController.height);
-    allOutstandingActions.mahjongActions.length;
+    allOutstandingActions.roomEventActions.length;
   }
 
   @override
   Color backgroundColor() {
-    return Colors.white.withOpacity(0.0);
+    return Colors.white.withAlpha(0);
   }
 
   double clampZoom(double zoom, {num lowerLimit = 0.05, num upperLimit = 3.0}) {
@@ -213,7 +212,7 @@ class MahjongFlameGame extends FlameGame
     }
     RoundParticipant? roundParticipant = roomController
         .getRoundParticipant(roomController.selfParticipantDirection.value);
-    Map<MahjongAction, Set<int>>? outstandingActions =
+    Map<RoomEventAction, Set<int>>? outstandingActions =
         roundParticipant?.outstandingActions.value;
     if (outstandingActions == null || outstandingActions.isEmpty) {
     } else {

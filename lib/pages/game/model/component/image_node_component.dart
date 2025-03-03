@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
-import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
@@ -41,8 +40,8 @@ class ImageNodeComponent extends PositionComponent
     super.children,
     super.priority,
   }) : super(
-            size: Vector2(modelNode.width ?? Project.nodeWidth,
-                modelNode.height ?? Project.nodeHeight));
+            size: Vector2(modelNode.width,
+                modelNode.height));
 
   @override
   Future<void> onLoad() async {

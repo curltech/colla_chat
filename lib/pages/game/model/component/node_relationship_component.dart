@@ -2,7 +2,6 @@ import 'dart:ui' as ui;
 
 import 'package:colla_chat/pages/game/model/base/model_node.dart';
 import 'package:colla_chat/pages/game/model/base/node.dart';
-import 'package:colla_chat/pages/game/model/base/project.dart';
 import 'package:colla_chat/pages/game/model/component/model_flame_game.dart';
 import 'package:colla_chat/pages/game/model/component/node_frame_component.dart';
 import 'package:colla_chat/pages/game/model/controller/model_project_controller.dart';
@@ -70,15 +69,20 @@ class NodeRelationshipComponent extends PositionComponent
     if (srcNodeFrameComponent == null) {
       return;
     }
+
+    /// 源位置
     double srcX = srcNodeFrameComponent.position.x;
     double srcY = srcNodeFrameComponent.position.y;
+
+    /// 源大小
     double srcHeight = srcNodeFrameComponent.size.y;
-    Vector2 srcTopCenter = Vector2(srcX + Project.nodeWidth / 2, srcY);
+    double srcWidth = srcNodeFrameComponent.size.x;
+
+    /// 源四个中心的位置
+    Vector2 srcTopCenter = Vector2(srcX + srcWidth / 2, srcY);
     Vector2 srcLeftCenter = Vector2(srcX, srcY + srcHeight / 2);
-    Vector2 srcRightCenter =
-        Vector2(srcX + Project.nodeWidth, srcY + srcHeight / 2);
-    Vector2 srcBottomCenter =
-        Vector2(srcX + Project.nodeWidth / 2, srcY + srcHeight);
+    Vector2 srcRightCenter = Vector2(srcX + srcWidth, srcY + srcHeight / 2);
+    Vector2 srcBottomCenter = Vector2(srcX + srcWidth / 2, srcY + srcHeight);
 
     if (nodeRelationship.dst == null) {
       return;
@@ -88,19 +92,24 @@ class NodeRelationshipComponent extends PositionComponent
     if (dstNodeFrameComponent == null) {
       return;
     }
+
+    /// 源大小
     double dstX = dstNodeFrameComponent.position.x;
     double dstY = dstNodeFrameComponent.position.y;
+
+    /// 源大小
     double dstHeight = dstNodeFrameComponent.size.y;
-    Vector2 dstTopCenter = Vector2(dstX + Project.nodeWidth / 2, dstY);
+    double dstWidth = dstNodeFrameComponent.size.x;
+
+    /// 源四个中心的位置
+    Vector2 dstTopCenter = Vector2(dstX + dstWidth / 2, dstY);
     Vector2 dstLeftCenter = Vector2(dstX, dstY + dstHeight / 2);
-    Vector2 dstRightCenter =
-        Vector2(dstX + Project.nodeWidth, dstY + dstHeight / 2);
-    Vector2 dstBottomCenter =
-        Vector2(dstX + Project.nodeWidth / 2, dstY + dstHeight);
+    Vector2 dstRightCenter = Vector2(dstX + dstWidth, dstY + dstHeight / 2);
+    Vector2 dstBottomCenter = Vector2(dstX + dstWidth / 2, dstY + dstHeight);
 
     Path path = Path();
     if (srcNodeFrameComponent.modelNode == dstNodeFrameComponent.modelNode) {
-      selfLine(path, srcBottomCenter, srcRightCenter);
+      selfLine(path, srcBottomCenter, srcWidth, srcRightCenter);
       rightCenterArrow(path, srcRightCenter);
       selfCardinality(canvas, srcBottomCenter, srcRightCenter);
       if (isHovered) {
@@ -113,7 +122,7 @@ class NodeRelationshipComponent extends PositionComponent
 
       return;
     }
-    if (srcX + Project.nodeWidth < dstX) {
+    if (srcX + srcWidth < dstX) {
       // src在dst的左边
       if (srcY < dstY) {
         // src在dst的上边
@@ -140,7 +149,7 @@ class NodeRelationshipComponent extends PositionComponent
           rightLeftCardinality(canvas, srcRightCenter, dstLeftCenter);
         }
       }
-    } else if (dstX + Project.nodeWidth < srcX) {
+    } else if (dstX + srcWidth < srcX) {
       // src在dst的右边
       if (srcY < dstY) {
         // src在dst的上边
@@ -385,12 +394,13 @@ class NodeRelationshipComponent extends PositionComponent
     }
   }
 
-  void selfLine(Path path, Vector2 srcBottomCenter, Vector2 srcRightCenter) {
+  void selfLine(Path path, Vector2 srcBottomCenter, double width,
+      Vector2 srcRightCenter) {
     vertices = [
       srcBottomCenter,
       Vector2(srcBottomCenter.x, srcBottomCenter.y + 30),
-      Vector2(srcBottomCenter.x + Project.nodeWidth, srcBottomCenter.y + 30),
-      Vector2(srcBottomCenter.x + Project.nodeWidth, srcRightCenter.y),
+      Vector2(srcBottomCenter.x + width, srcBottomCenter.y + 30),
+      Vector2(srcBottomCenter.x + width, srcRightCenter.y),
       Vector2(srcRightCenter.x, srcRightCenter.y)
     ];
     _drawLine(path, vertices);
@@ -418,28 +428,31 @@ class NodeRelationshipComponent extends PositionComponent
     canvas.drawParagraph(paragraph, offset);
   }
 
+  double arrowWidth = 10;
+  double arrowHeight = 4;
+
   void bottomCenterArrow(Path path, Vector2 dstBottomCenter) {
-    path.lineTo(dstBottomCenter.x - 2, dstBottomCenter.y + 6);
+    path.lineTo(dstBottomCenter.x - arrowHeight, dstBottomCenter.y + arrowWidth);
     path.moveTo(dstBottomCenter.x, dstBottomCenter.y);
-    path.lineTo(dstBottomCenter.x + 2, dstBottomCenter.y + 6);
+    path.lineTo(dstBottomCenter.x + arrowHeight, dstBottomCenter.y + arrowWidth);
   }
 
   void leftCenterArrow(Path path, Vector2 dstLeftCenter) {
-    path.lineTo(dstLeftCenter.x - 6, dstLeftCenter.y - 2);
+    path.lineTo(dstLeftCenter.x - arrowWidth, dstLeftCenter.y - arrowHeight);
     path.moveTo(dstLeftCenter.x, dstLeftCenter.y);
-    path.lineTo(dstLeftCenter.x - 6, dstLeftCenter.y + 2);
+    path.lineTo(dstLeftCenter.x - arrowWidth, dstLeftCenter.y + arrowHeight);
   }
 
   void topCenterArrow(Path path, Vector2 dstTopCenter) {
-    path.lineTo(dstTopCenter.x - 2, dstTopCenter.y - 6);
+    path.lineTo(dstTopCenter.x - arrowHeight, dstTopCenter.y - arrowWidth);
     path.moveTo(dstTopCenter.x, dstTopCenter.y);
-    path.lineTo(dstTopCenter.x + 2, dstTopCenter.y - 6);
+    path.lineTo(dstTopCenter.x + arrowHeight, dstTopCenter.y - arrowWidth);
   }
 
   void rightCenterArrow(Path path, Vector2 dstRightCenter) {
-    path.lineTo(dstRightCenter.x + 6, dstRightCenter.y - 2);
+    path.lineTo(dstRightCenter.x + arrowWidth, dstRightCenter.y - arrowHeight);
     path.moveTo(dstRightCenter.x, dstRightCenter.y);
-    path.lineTo(dstRightCenter.x + 6, dstRightCenter.y + 2);
+    path.lineTo(dstRightCenter.x + arrowWidth, dstRightCenter.y + arrowHeight);
   }
 
   @override
@@ -462,6 +475,7 @@ class NodeRelationshipComponent extends PositionComponent
       if (contain) {
         return contain;
       }
+      break;
     }
     return false;
   }

@@ -1,4 +1,5 @@
 import 'package:colla_chat/pages/game/mahjong/base/room.dart';
+import 'package:colla_chat/pages/game/mahjong/base/room_event.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round_participant.dart';
 import 'package:colla_chat/pages/game/mahjong/component/mahjong_flame_game.dart';
 import 'package:colla_chat/pages/game/mahjong/component/round_participant_component.dart';
@@ -26,7 +27,7 @@ class ParticipantAreaComponent extends RectangleComponent
       size = Vector2(roomController.width * MahjongFlameGame.selfWidthRadio,
           roomController.height * MahjongFlameGame.selfHeightRadio);
       paint = Paint()
-        ..color = Colors.lightGreen
+        ..color = Colors.white.withAlpha(0)
         ..style = PaintingStyle.fill;
     }
     if (areaDirection == AreaDirection.next) {
@@ -38,7 +39,7 @@ class ParticipantAreaComponent extends RectangleComponent
       size = Vector2(roomController.width * MahjongFlameGame.nextWidthRadio,
           roomController.height * MahjongFlameGame.nextHeightRadio);
       paint = Paint()
-        ..color = Colors.cyan
+        ..color = Colors.white.withAlpha(0)
         ..style = PaintingStyle.fill;
     }
     if (areaDirection == AreaDirection.opponent) {
@@ -46,7 +47,7 @@ class ParticipantAreaComponent extends RectangleComponent
       size = Vector2(roomController.width * MahjongFlameGame.opponentWidthRadio,
           roomController.height * MahjongFlameGame.opponentHeightRadio);
       paint = Paint()
-        ..color = Colors.redAccent
+        ..color = Colors.white.withAlpha(0)
         ..style = PaintingStyle.fill;
     }
     if (areaDirection == AreaDirection.previous) {
@@ -57,7 +58,7 @@ class ParticipantAreaComponent extends RectangleComponent
       size = Vector2(roomController.width * MahjongFlameGame.previousWidthRadio,
           roomController.height * MahjongFlameGame.previousHeightRadio);
       paint = Paint()
-        ..color = Colors.cyanAccent
+        ..color = Colors.white.withAlpha(0)
         ..style = PaintingStyle.fill;
     }
   }
@@ -73,7 +74,7 @@ class ParticipantAreaComponent extends RectangleComponent
       if (roundParticipant != null) {
         roundParticipantComponent = RoundParticipantComponent(roundParticipant,
             size: Vector2(64, 42),
-            position: Vector2(size.x / 2 - 16, size.y / 2 - 30));
+            position: Vector2(size.x / 2 - 16, size.y / 2 - 40));
         add(roundParticipantComponent!);
       }
     }

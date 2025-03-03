@@ -2,11 +2,12 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/pages/game/mahjong/base/format_tile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/full_pile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/hand_pile.dart';
-import 'package:colla_chat/pages/game/mahjong/base/mahjong_action.dart';
 import 'package:colla_chat/pages/game/mahjong/base/participant.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room.dart';
+import 'package:colla_chat/pages/game/mahjong/base/room_event.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room_pool.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round_participant.dart';
 import 'package:colla_chat/pages/game/mahjong/base/stock_pile.dart';
@@ -21,6 +22,23 @@ import 'package:colla_chat/tool/number_util.dart';
 
 /// 摸牌的类型：自摸牌，杠上牌，海底捞
 enum DealTileType { self, bar, sea }
+
+/// 打牌的令牌
+class DiscardToken {
+  /// 刚出牌的参与者
+  int discardParticipant;
+
+  /// 出牌
+  Tile discardTile;
+
+  /// 被参与者采取了行为
+  RoomEventAction? action;
+
+  /// 采取了行为的参与者
+  int? actionParticipant;
+
+  DiscardToken(this.discardParticipant, this.discardTile);
+}
 
 /// 每一轮，每轮有四个轮参与者
 class Round {
@@ -40,19 +58,18 @@ class Round {
   /// 应用的事件模型是所有的消息都发送给banker，然后banker再转发给其他的参与者
   int banker;
 
-  /// 最新的发牌的参与者，就是creator把牌发给drawer
-  late int drawer;
+  /// 记录事件
+  final List<RoomEvent> roomEvents = [];
 
   /// 当参与者打牌或者明杠的时候，creator需要等待其他参与者的回复事件
   /// creator只有等到其他参与者的回复事件后才能决定下一步的处理
   /// 比如打牌的时候，creator等待所有的参与者的回复，才决定是继续发牌还是有人胡牌或者杠牌
   /// Set<int>为等待回复的参与者
-  Map<int, Completer<int>> outstandingParticipants = {};
+  Map<int, Set<int>> outstandingParticipants = {};
 
-  /// 刚出牌的参与者
-  int? discardParticipant;
-
-  Tile? discardTile;
+  /// 出牌的令牌，创建者发牌设置为空，打牌的参与者设置为打出的牌
+  /// 只有为空的时候才可以打牌
+  DiscardToken? discardToken;
 
   /// 同圈放弃的胡牌
   int? discardWin;
@@ -117,7 +134,7 @@ class Round {
 
   init() {
     List<Tile> stockTiles = [
-      ...fullPile.tiles,
+      ...fullPile.tiles.values,
     ];
     stockPile = StockPile();
     Random random = Random.secure();
@@ -162,34 +179,62 @@ class Round {
   }
 
   /// 增加等待决策的参与者
-  addOutstandingParticipants(List<int> participants) {
+  addOutstandingParticipants(int src, List<int> participants) {
+    Set<int>? ps = outstandingParticipants[src];
+    if (ps == null) {
+      ps = {};
+      outstandingParticipants[src] = ps;
+    }
     for (int participant in participants) {
-      if (!outstandingParticipants.containsKey(participant)) {
-        outstandingParticipants[participant] = Completer<int>();
-      }
+      ps.add(participant);
     }
   }
 
   /// 消解并检查等待的事件，如果全部消解则返回true，否则，返回false
-  bool checkOutstandingParticipant(int participant) {
-    if (outstandingParticipants.containsKey(participant)) {
-      Completer? completer = outstandingParticipants.remove(participant);
-      completer?.complete(participant);
+  bool checkOutstandingParticipant(int src, int participant) {
+    Set<int>? ps = outstandingParticipants[src];
+    if (ps != null) {
+      if (ps.contains(participant)) {
+        ps.remove(participant);
+        RoomEvent outstandingRoomEvent = RoomEvent(room.name,
+            roundId: id,
+            owner: participant,
+            content: outstandingParticipants.values.firstOrNull?.toList(),
+            action: RoomEventAction.checkOutstanding);
+        roomEvents.add(outstandingRoomEvent);
+      }
+      if (ps.isEmpty) {
+        outstandingParticipants.remove(src);
+        return true;
+      }
+    } else {
+      return false;
     }
-    return outstandingParticipants.isEmpty;
+
+    return false;
   }
 
   bool get isSeaTake {
     return stockPile!.tiles.length < 5;
   }
 
+  List<int> _getParticipantIndexes() {
+    return roundParticipants.map((RoundParticipant roundParticipant) {
+      return roundParticipant.index;
+    }).toList();
+  }
+
   /// 下面所有的事件命令函数，非_打头的是发起的参与者的直接调用的执行函数
   /// _打头的是通过消息接收到的其他参与者发起的事件
 
   /// creator发牌，只能是creator才能执行，把牌发给打牌人discard的下一家或者banker
-  Future<Tile?> deal() async {
-    int owner =
-        discardParticipant != null ? room.next(discardParticipant!) : banker;
+  Future<Tile?> deal({int? discardParticipant}) async {
+    int? owner;
+    if (discardParticipant != null) {
+      owner = room.next(discardParticipant);
+    } else {
+      owner = banker;
+    }
     if (!isCreator) {
       logger.e('owner:$owner deal tile failure, not creator');
       return null;
@@ -205,33 +250,28 @@ class Round {
       dealTileType = DealTileType.sea;
     }
     Tile tile = stockPile!.tiles.removeLast();
+
     logger.w(
-        'owner:$owner deal tile:$tile, leave ${stockPile!.tiles.length} tiles');
+        'owner:$owner deal tile:$tile, dealTileType:$dealTileType successfully, leave ${stockPile!.tiles.length} tiles');
 
-    discardParticipant = null;
-    discardTile = null;
-
-    RoundParticipant roundParticipant = roundParticipants[owner];
-    roundParticipant.deal(owner, tile, dealTileType.index);
-
+    /// 发消息给所有人，包括自己
+    RoomEvent tileRoomEvent = RoomEvent(room.name,
+        roundId: id,
+        owner: owner,
+        action: RoomEventAction.deal,
+        tile: tile,
+        src: room.creator,
+        pos: dealTileType.index);
     for (int i = 0; i < roundParticipants.length; ++i) {
-      if (i == room.creator) {
-        continue;
-      }
-      if (i == owner) {
-        RoomEvent tileRoomEvent = RoomEvent(room.name,
-            roundId: id,
-            owner: owner,
-            action: RoomEventAction.deal,
-            tile: tile,
-            pos: dealTileType.index);
-        await _sendChatMessage(tileRoomEvent, room.creator, [owner]);
+      if (i == owner || i == room.creator) {
+        await _sendChatMessage(tileRoomEvent, room.creator, [i]);
       } else {
         RoomEvent unknownRoomEvent = RoomEvent(room.name,
             roundId: id,
             owner: owner,
             action: RoomEventAction.deal,
             tile: unknownTile,
+            src: room.creator,
             pos: dealTileType.index);
         await _sendChatMessage(unknownRoomEvent, room.creator, [i]);
       }
@@ -242,12 +282,14 @@ class Round {
 
   /// 收到发的牌tile的消息
   Tile? _deal(int owner, Tile tile, int dealTileTypeIndex, int receiver) {
-    logger.w('chat message receiver:$receiver owner:$owner deal tile:$tile');
-    discardParticipant = null;
-    discardTile = null;
-
-    RoundParticipant roundParticipant = roundParticipants[receiver];
-    roundParticipant.deal(owner, tile, dealTileTypeIndex);
+    RoundParticipant roundParticipant = roundParticipants[owner];
+    logger.w(
+        'receive:$receiver chat message owner:$owner deal tile:$tile, dealTileTypeIndex:$dealTileTypeIndex successfully');
+    Map<RoomEventAction, Set<int>>? outstandingActions =
+        roundParticipant.deal(owner, tile, dealTileTypeIndex);
+    if (outstandingActions == null) {
+      return null;
+    }
 
     return tile;
   }
@@ -255,175 +297,122 @@ class Round {
   /// 主动打牌，owner表示打牌的参与者，receiver代表接收到事件的参与者
   /// 返回值是true，表示打的牌没有需要等待的处理，可以发牌
   /// 否则，表示有需要等待的处理
-  Future<MahjongActionResult> discard(int owner, Tile tile) async {
+  Future<void> discard(int owner, Tile tile) async {
+    List<int> receivers = _getParticipantIndexes();
+    // logger.w(
+    //     'owner:$owner send chat message to receivers:${receivers} discard tile:$tile');
+    RoomEvent discardRoomEvent = RoomEvent(room.name,
+        roundId: id,
+        owner: owner,
+        src: owner,
+        action: RoomEventAction.discard,
+        tile: tile);
+    await _sendChatMessage(discardRoomEvent, owner, receivers);
+  }
+
+  /// 收到owner打牌的消息
+  Future<RoomEventActionResult> _discard(
+      int owner, Tile tile, int receiver) async {
+    // logger.w('receiver:receiver receive chat message owner:$owner discard tile:$tile');
+
+    /// 打牌的参与者执行事件处理
     final RoundParticipant roundParticipant = roundParticipants[owner];
-    MahjongActionResult result = roundParticipant.discard(owner, tile);
-    if (result != MahjongActionResult.success) {
+    RoomEventActionResult result = roundParticipant.discard(owner, tile);
+    if (result == RoomEventActionResult.error) {
       logger.e('owner:$owner discard tile $tile failure:${result.name}');
 
       return result;
     }
+    discardToken = DiscardToken(owner, tile);
+    // logger.w(
+    //     'owner:$owner discard tile:$tile successfully, discardParticipant:${discardToken!.discardParticipant}, discardTile:${discardToken!.discardTile}');
 
-    /// 打牌的参与者执行事件处理
-    discardParticipant = owner;
-    discardTile = tile;
-    logger.w(
-        'owner:$owner discard tile:$tile successfully, discardParticipant:$discardParticipant, discardTile:$discardTile');
-    int sender = owner;
-    List<int> receivers = [];
-    RoomEvent discardRoomEvent = RoomEvent(room.name,
-        roundId: id, owner: owner, action: RoomEventAction.discard, tile: tile);
-
-    outstandingParticipants.clear();
-
-    /// 检查参与者，增加等待决策的参与者
-    for (int i = 0; i < roundParticipants.length; ++i) {
-      receivers.add(i);
-      if (room.creator != i && owner == room.creator) {
-        Map<MahjongAction, Set<int>>? outstandingActions =
-            roundParticipants[i].check(tile: tile);
-        if (outstandingActions.isNotEmpty) {
-          result = MahjongActionResult.check;
-          addOutstandingParticipants([i]);
-        }
-      }
-    }
-
-    /// 没有receiver，不是消息事件，creator发送事件消息给其他参与者，或者发送消息事件给creator
-    /// 有receiver，是消息事件，receiver是creator发送事件消息给其他参与者，否则不发送消息
-    await _sendChatMessage(discardRoomEvent, sender, receivers);
-
-    /// 如果打牌者是创建者，并且无等待决策的参与者，则直接发牌
-    if (result == MahjongActionResult.check) {
-      List<Future<int>> futures = [];
-      for (var entry in outstandingParticipants.entries) {
-        Future<int> future = entry.value.future;
-        futures.add(future);
-      }
-      await Future.wait<int>(futures);
-    }
-    if (owner == room.creator) {
-      deal();
-    }
-
-    return result;
-  }
-
-  /// 收到owner打牌的消息
-  Future<MahjongActionResult> _discard(
-      int owner, Tile tile, int receiver) async {
-    logger.w('chat message owner:$owner discard tile:$tile');
-
-    /// 打牌的参与者执行事件处理
-    final RoundParticipant roundParticipant = roundParticipants[owner];
-    MahjongActionResult result = roundParticipant.discard(owner, tile);
-    if (result == MahjongActionResult.success) {
-      discardParticipant = owner;
-      discardTile = tile;
-      roundParticipants[receiver].check(tile: tile);
-    }
-
-    /// receiver不为空，事件是消息触发
-    /// 接收者是创建者，等待检查其他的参与者的决策
+    /// 接收别人打牌的消息的是创建者，等待检查其他的参与者的决策
     if (receiver == room.creator) {
-      outstandingParticipants.clear();
-
       /// 事件消息的接收者是creator，检查，发消息给其他参与者，2个消息，等待2个事件
       for (int i = 0; i < roundParticipants.length; ++i) {
-        if (owner != i) {
-          Map<MahjongAction, Set<int>>? outstandingActions =
-              roundParticipants[i].check(tile: tile);
-          if (outstandingActions.isNotEmpty) {
-            result = MahjongActionResult.check;
-            addOutstandingParticipants([i]);
-          }
+        if (i != owner) {
+          addOutstandingParticipants(owner, [i]);
         }
       }
-      if (result == MahjongActionResult.check) {
-        List<Future<int>> futures = [];
-        for (var entry in outstandingParticipants.entries) {
-          Future<int> future = entry.value.future;
-          futures.add(future);
-        }
-        await Future.wait<int>(futures);
+      List<int>? ps = outstandingParticipants.values.firstOrNull?.toList();
+      RoomEvent outstandingRoomEvent = RoomEvent(room.name,
+          roundId: id,
+          owner: owner,
+          tile: tile,
+          content: ps,
+          action: RoomEventAction.outstanding);
+      roomEvents.add(outstandingRoomEvent);
+    }
+
+    /// 别人的打牌自己检查是否需要决策
+    if (owner != receiver) {
+      Map<RoomEventAction, Set<int>> outstandingActions =
+          roundParticipants[receiver].check(owner, tile);
+      if (outstandingActions.isNotEmpty) {
+        result = RoomEventActionResult.check;
+        addOutstandingParticipants(owner, [receiver]);
       }
-      deal();
     }
 
     return result;
   }
 
-  Future<void> pass(int owner) async {
-    logger.w('owner:$owner pass');
-    final RoundParticipant roundParticipant = roundParticipants[owner];
-    roundParticipant.pass(owner);
-
-    if (owner == room.creator) {
-      checkOutstandingParticipant(owner);
-    }
+  Future<void> pass(int owner, Tile tile, int src, {int? pos}) async {
+    List<int> receivers = _getParticipantIndexes();
     RoomEvent passRoomEvent = RoomEvent(room.name,
-        roundId: id, owner: owner, action: RoomEventAction.pass);
-    await _sendChatMessage(passRoomEvent, owner, [room.creator]);
+        roundId: id,
+        owner: owner,
+        src: src,
+        tile: tile,
+        pos: pos,
+        action: RoomEventAction.pass);
+    await _sendChatMessage(passRoomEvent, owner, receivers);
   }
 
   /// 收到owner pass的消息
-  _pass(int owner, int receiver) {
-    logger.w('chat message: owner:$owner pass');
+  _pass(int owner, Tile tile, int src, int receiver, {int? pos}) async {
+    logger.w(
+        'receiver:$receiver chat message: owner:$owner, tile:$tile, src:$src, pos:$pos, isSeaTake:$isSeaTake pass');
     final RoundParticipant roundParticipant = roundParticipants[owner];
     roundParticipant.pass(owner);
 
     if (receiver == room.creator) {
-      checkOutstandingParticipant(owner);
+      bool pass = checkOutstandingParticipant(src, owner);
+      if (pass) {
+        await deal(discardParticipant: src);
+      }
+    } else {
+      checkOutstandingParticipant(src, owner);
     }
   }
 
   /// 某个参与者碰打出的牌
-  Future<Tile?> touch(int owner,
-      {int? pos, int? src, Tile? discardTile}) async {
-    if (this.discardTile == null) {
-      logger.e('owner:$owner touch, but discardTile is null');
+  Future<void> touch(int owner, int pos, int src, Tile discardTile) async {
+    if (discardToken == null) {
+      logger.e('owner:$owner touch, but discardToken is null');
 
-      return null;
+      return;
     }
-    if (discardParticipant == null) {
-      logger.e('owner:$owner touch, but discardParticipant is null');
+    if (discardToken!.action != null) {
+      logger.e('owner:$owner touch, but discardToken action is not null');
 
-      return null;
+      return;
     }
-    if (discardTile == null) {
-      discardTile = this.discardTile;
-    } else {
-      if (discardTile != this.discardTile) {
-        logger
-            .e('owner:$owner touch, but discardTile:$discardTile is not equal');
+    if (discardTile != discardToken!.discardTile) {
+      logger.e('owner:$owner touch, but discardTile:$discardTile is not equal');
 
-        return null;
-      }
-    }
-    if (src == null) {
-      src = discardParticipant;
-    } else {
-      if (discardParticipant != src) {
-        logger.e(
-            'owner:$owner touch, but discardParticipant is not equal src:$src');
-
-        return null;
-      }
-    }
-    RoundParticipant roundParticipant = roundParticipants[owner];
-    discardTile = roundParticipant.touch(owner, pos!, src!, discardTile!);
-    if (discardTile == null) {
-      return null;
+      return;
     }
 
-    List<Tile> tiles = roundParticipants[src].wastePile.tiles;
-    if (tiles.isNotEmpty && discardTile == tiles.last) {
-      tiles.removeLast();
+    if (discardToken!.discardParticipant != src) {
+      logger.e(
+          'owner:$owner touch, but discardParticipant is not equal src:$src');
+
+      return;
     }
 
-    discardParticipant = null;
-    this.discardTile = null;
-
+    List<int> receivers = _getParticipantIndexes();
     RoomEvent touchRoomEvent = RoomEvent(room.name,
         roundId: id,
         owner: owner,
@@ -431,58 +420,58 @@ class Round {
         tile: discardTile,
         pos: pos,
         src: src);
-    for (int i = 0; i < roundParticipants.length; ++i) {
-      await _sendChatMessage(touchRoomEvent, owner, [i]);
-    }
-
-    return discardTile;
+    await _sendChatMessage(touchRoomEvent, owner, receivers);
   }
 
-  Tile? _touch(int owner, int pos, int src, Tile discardTile, int receiver) {
-    logger.w(
-        'chat message: owner:$owner touch pos:$pos src:$src tile:$discardTile');
-    if (this.discardTile == null) {
-      logger.e('owner:$owner touch, but discardTile is null');
+  Future<TypePile?> _touch(
+      int owner, int pos, int src, Tile discardTile, int receiver) async {
+    if (discardToken == null) {
+      logger.e('owner:$owner touch, but discardToken is null');
 
       return null;
     }
-    if (discardParticipant == null) {
-      logger.e('owner:$owner touch, but discardParticipant is null');
+    if (discardToken!.action != null) {
+      logger.e('owner:$owner touch, but discardToken action is not null');
 
       return null;
     }
-    if (discardTile != this.discardTile) {
-      logger.e('owner:$owner touch, but discardTile:$discardTile is not equal');
-
-      return null;
-    }
-    if (discardParticipant != src) {
+    if (discardTile != discardToken!.discardTile) {
       logger.e(
-          'owner:$owner touch, but discardParticipant is not equal src:$src');
+          'owner:$owner touch, but discardToken discardTile:$discardTile is not equal');
+
+      return null;
+    }
+    if (discardToken!.discardParticipant != src) {
+      logger.e(
+          'owner:$owner touch, but discardToken discardParticipant is not equal src:$src');
 
       return null;
     }
     RoundParticipant roundParticipant = roundParticipants[owner];
-    Tile? tile = roundParticipant.touch(owner, pos, src, discardTile);
-    if (tile == null) {
+    TypePile? typePile = roundParticipant.touch(owner, pos, src, discardTile);
+    if (typePile == null) {
       return null;
     }
     List<Tile> tiles = roundParticipants[src].wastePile.tiles;
     if (tiles.isNotEmpty && discardTile == tiles.last) {
       tiles.removeLast();
     }
+    discardToken!.action = RoomEventAction.touch;
+    discardToken!.actionParticipant = owner;
+    if (receiver == room.creator) {
+      outstandingParticipants.clear();
+    }
 
-    discardParticipant = null;
-    this.discardTile = null;
+    roundParticipant.robotDiscard(owner, discardTile);
 
-    return tile;
+    return typePile;
   }
 
   int get barCount {
     int c = 0;
     for (int i = 0; i < roundParticipants.length; ++i) {
       RoundParticipant roundParticipant = roundParticipants[i];
-      List<Set<MahjongActionValue>> counts =
+      List<Set<RoomEvent>> counts =
           roundParticipant.earnedActions.values.toList();
       for (var count in counts) {
         c += count.length;
@@ -493,102 +482,50 @@ class Round {
   }
 
   /// 某个参与者明杠牌，pos表示可杠的手牌的位置
-  /// 明杠牌，分三种情况，打牌杠牌，摸牌杠牌和手牌杠牌
-  /// 打牌杠牌:返回值为杠的牌，为空表示未成功
-  /// 摸牌杠牌和手牌杠牌:pos为-1，表示是摸牌可杠，否则表示手牌可杠的位置
-  Future<Tile?> bar(int owner, int pos) async {
-    RoundParticipant roundParticipant = roundParticipants[owner];
-    Tile? tile;
-    int? src;
-    if (pos == -1) {
-      tile = roundParticipant.drawBar(owner, pos);
-      if (tile != null) {
-        src = owner;
-      }
-    } else if (pos > -1 && discardParticipant != null) {
-      tile = roundParticipant.discardBar(
-          owner, pos, discardTile!, discardParticipant!);
-      if (tile != null) {
-        src = discardParticipant;
-        List<Tile> tiles = roundParticipants[src!].wastePile.tiles;
-        if (tiles.isNotEmpty && discardTile == tiles.last) {
-          tiles.removeLast();
-        }
-        discardParticipant = null;
-        discardTile = null;
-      }
-    }
-    if (tile == null) {
-      return null;
-    }
-
+  Future<void> bar(int owner, int pos, {Tile? tile, int? src}) async {
+    List<int> receivers = _getParticipantIndexes();
     RoomEvent barRoomEvent = RoomEvent(room.name,
         roundId: id,
         owner: owner,
-        action: RoomEventAction.bar,
+        src: src,
         tile: tile,
-        pos: pos,
-        src: src);
-    int sender = owner;
-    List<int> receivers = [];
-    bool pass = true;
-    for (int i = 0; i < roundParticipants.length; ++i) {
-      receivers.add(i);
-      if (owner == room.creator && room.creator != i) {
-        WinType? winType = roundParticipants[i].checkWin(i, tile);
-        if (winType != null) {
-          pass = false;
-          addOutstandingParticipants([i]);
-        }
-      }
-    }
-    await _sendChatMessage(barRoomEvent, sender, receivers);
-    if (owner == room.creator && pass) {
-      barDeal(owner);
-    }
-
-    return tile;
+        action: RoomEventAction.bar,
+        pos: pos);
+    await _sendChatMessage(barRoomEvent, owner, receivers);
   }
 
   /// 收到owner杠牌的消息
-  Tile? _bar(int owner, int pos, Tile tile, int src, int receiver) {
+  /// 明杠牌，分三种情况，打牌杠牌，摸牌杠牌和手牌杠牌
+  /// 打牌杠牌:返回值为杠的牌，为空表示未成功
+  /// 摸牌杠牌和手牌杠牌:pos为-1，表示是摸牌可杠，否则表示手牌可杠的位置
+  Future<TypePile?> _bar(int owner, int pos, int receiver,
+      {Tile? tile, int? src}) async {
     logger.w('chat message: owner:$owner bar pos:$pos');
     RoundParticipant roundParticipant = roundParticipants[owner];
+    TypePile? typePile;
     if (pos == -1) {
       roundParticipant.drawBar(owner, pos);
     } else if (pos > -1) {
-      Tile? discardBarTile = roundParticipant.discardBar(owner, pos, tile, src);
-      if (discardBarTile != null) {
-        List<Tile> tiles = roundParticipants[src].wastePile.tiles;
-        if (tiles.isNotEmpty && tile == tiles.last) {
-          tiles.removeLast();
-        }
-        discardParticipant = null;
-        discardTile = null;
-      }
-    }
-    roundParticipants[receiver].checkWin(receiver, tile);
-
-    bool pass = true;
-
-    /// receiver不为空，事件是消息触发
-    if (receiver == room.creator) {
-      /// 事件消息的接收者是creator，检查，发消息给其他参与者，2个消息，等待2个事件
-      for (int i = 0; i < roundParticipants.length; ++i) {
-        if (owner != i) {
-          WinType? winType = roundParticipants[i].checkWin(i, tile);
-          if (winType != null) {
-            pass = false;
-            addOutstandingParticipants([i]);
+      if (tile == null) {
+        roundParticipant.drawBar(owner, pos);
+      } else {
+        typePile = roundParticipant.discardBar(owner, pos, tile, src!);
+        if (typePile != null) {
+          List<Tile> tiles = roundParticipants[src].wastePile.tiles;
+          if (tiles.isNotEmpty && tile == tiles.last) {
+            tiles.removeLast();
           }
+          discardToken!.action = RoomEventAction.bar;
+          discardToken!.actionParticipant = owner;
         }
       }
-      if (pass) {
-        barDeal(owner);
-      }
     }
+    if (receiver == room.creator) {
+      outstandingParticipants.clear();
+    }
+    await barDeal(owner);
 
-    return tile;
+    return typePile;
   }
 
   /// 杠牌发牌，只有creator才能调用
@@ -613,23 +550,15 @@ class Round {
 
     logger.w('barDeal tile $tile, leave ${stockPile!.tiles.length} tiles');
 
-    discardParticipant = null;
-    discardTile = null;
-
-    RoundParticipant roundParticipant = roundParticipants[owner];
-    roundParticipant.deal(owner, tile, DealTileType.bar.index);
-
+    RoomEvent tileRoomEvent = RoomEvent(room.name,
+        roundId: id,
+        owner: owner,
+        action: RoomEventAction.deal,
+        tile: tile,
+        src: room.creator,
+        pos: DealTileType.bar.index);
     for (int i = 0; i < roundParticipants.length; ++i) {
-      if (i == room.creator) {
-        continue;
-      }
-      if (i == owner) {
-        RoomEvent tileRoomEvent = RoomEvent(room.name,
-            roundId: id,
-            owner: owner,
-            action: RoomEventAction.deal,
-            tile: tile,
-            pos: DealTileType.bar.index);
+      if (i == owner || i == room.creator) {
         await _sendChatMessage(tileRoomEvent, room.creator, [owner]);
       } else {
         RoomEvent unknownRoomEvent = RoomEvent(room.name,
@@ -637,6 +566,7 @@ class Round {
             owner: owner,
             action: RoomEventAction.deal,
             tile: unknownTile,
+            src: room.creator,
             pos: DealTileType.bar.index);
         await _sendChatMessage(unknownRoomEvent, room.creator, [i]);
       }
@@ -649,73 +579,59 @@ class Round {
   _rob(int owner, int src, Tile tile, {int? receiver}) {}
 
   /// 某个参与者暗杠，pos表示杠牌的位置
-  Future<Tile?> darkBar(int owner, int pos) async {
-    RoundParticipant roundParticipant = roundParticipants[owner];
-    Tile? tile = roundParticipant.darkBar(owner, pos);
-    if (tile == null) {
-      return null;
-    }
+  Future<void> darkBar(int owner, int pos) async {
     RoomEvent barRoomEvent = RoomEvent(room.name,
-        roundId: id, owner: owner, action: RoomEventAction.darkBar, pos: pos);
-    for (int i = 0; i < roundParticipants.length; ++i) {
-      await _sendChatMessage(barRoomEvent, owner, [i]);
-    }
-
-    if (owner == room.creator) {
-      barDeal(owner);
-    }
-
-    return tile;
+        roundId: id,
+        owner: owner,
+        src: owner,
+        action: RoomEventAction.darkBar,
+        pos: pos);
+    List<int> receivers = _getParticipantIndexes();
+    await _sendChatMessage(barRoomEvent, owner, receivers);
   }
 
-  Tile? _darkBar(int owner, int pos, int receiver) {
+  Future<TypePile?> _darkBar(int owner, int pos, int receiver) async {
     logger.w('chat message: owner:$owner darkBar pos:$pos');
     RoundParticipant roundParticipant = roundParticipants[owner];
-    Tile? tile = roundParticipant.darkBar(owner, pos);
-    if (receiver == room.creator) {
-      barDeal(owner);
-    }
+    TypePile? typePile = roundParticipant.darkBar(owner, pos);
+    await barDeal(owner);
 
-    return tile;
+    return typePile;
   }
 
   /// 某个参与者吃打出的牌，pos表示吃牌的位置
   /// 暂时不实现这个功能
-  Tile? chow(int owner, int pos) {
-    if (discardTile == null) {
-      return null;
-    }
-    RoundParticipant roundParticipant = roundParticipants[owner];
-    Tile? tile = roundParticipant.chow(owner, pos, discardTile!);
-    if (tile == null) {
-      return tile;
-    }
-    roundParticipants[discardParticipant!].wastePile.tiles.removeLast();
-    discardParticipant = null;
-    discardTile = null;
-
-    return tile;
+  Future<void> chow(int owner, int pos) async {
+    RoomEvent barRoomEvent = RoomEvent(room.name,
+        roundId: id, owner: owner, action: RoomEventAction.chow, pos: pos);
+    List<int> receivers = _getParticipantIndexes();
+    await _sendChatMessage(barRoomEvent, owner, receivers);
   }
 
-  Tile? _chow(int owner, int pos) {
-    if (discardTile == null) {
+  Future<TypePile?> _chow(int owner, int pos) async {
+    if (discardToken == null) {
       return null;
     }
     RoundParticipant roundParticipant = roundParticipants[owner];
-    Tile? tile = roundParticipant.chow(owner, pos, discardTile!);
-    if (tile == null) {
-      return tile;
+    TypePile? typePile =
+        roundParticipant.chow(owner, pos, discardToken!.discardTile);
+    if (typePile == null) {
+      return typePile;
     }
 
-    roundParticipants[discardParticipant!].wastePile.tiles.removeLast();
-    discardParticipant = null;
-    discardTile = null;
+    roundParticipants[discardToken!.discardParticipant]
+        .wastePile
+        .tiles
+        .removeLast();
+    discardToken!.action = RoomEventAction.chow;
+    discardToken!.actionParticipant = owner;
+    await barDeal(owner);
 
-    return tile;
+    return typePile;
   }
 
   /// 胡牌计分
-  bool _score(int owner, int winTypeIndex) {
+  bool _score(int owner, int winTypeIndex, int receiver) {
     WinType? winType = NumberUtil.toEnum(WinType.values, winTypeIndex);
     if (winType == null) {
       return false;
@@ -724,38 +640,45 @@ class Round {
     if (baseScore == null) {
       return false;
     }
-    RoundParticipant roundParticipant = roundParticipants[owner];
+    if (roundParticipants[receiver].participant.robot) {
+      return false;
+    }
 
+    /// 胡牌的人
+    RoundParticipant roundParticipant = roundParticipants[owner];
     /// 抢杠，owner是胡牌人，robber是被抢人
     if (robber != null && robCard != null) {
-      roundParticipant.score.value += baseScore * 3;
-      roundParticipants[robber!].score.value -= baseScore * 3;
+      roundParticipant.participant.score.value += baseScore * 3;
+      roundParticipants[robber!].participant.score.value -= baseScore * 3;
     } else if (roundParticipant.handPile.drawTileType == DealTileType.bar ||
         roundParticipant.handPile.drawTileType == DealTileType.sea) {
       /// 杠上开花或者海底捞月
       baseScore = baseScore * 2;
-      roundParticipant.score.value += baseScore * 3;
+      roundParticipant.participant.score.value += baseScore * 3;
     } else if (roundParticipant.handPile.drawTileType == DealTileType.self) {
       /// 自摸
-      roundParticipant.score.value += baseScore * 3;
+      roundParticipant.participant.score.value += baseScore * 3;
     } else {
       /// 接别人打牌胡
-      roundParticipant.score.value += baseScore;
+      roundParticipant.participant.score.value += baseScore;
     }
-    if (discardParticipant != null) {
+    if (discardToken != null) {
       /// 打牌别人胡
-      roundParticipants[discardParticipant!].score.value -= baseScore;
+      roundParticipants[discardToken!.discardParticipant]
+          .participant
+          .score
+          .value -= baseScore;
     } else {
       if (roundParticipant.packer != null) {
         /// 包
         RoundParticipant pc = roundParticipants[roundParticipant.packer!];
-        pc.score.value -= 3 * baseScore;
+        pc.participant.score.value -= 3 * baseScore;
       } else {
         /// 别人自摸
         for (int i = 0; i < roundParticipants.length; ++i) {
           if (i != owner) {
             RoundParticipant roundParticipant = roundParticipants[i];
-            roundParticipant.score.value -= baseScore;
+            roundParticipant.participant.score.value -= baseScore;
           }
         }
       }
@@ -765,38 +688,36 @@ class Round {
     for (int i = 0; i < roundParticipants.length; ++i) {
       RoundParticipant roundParticipant = roundParticipants[i];
       for (var entry in roundParticipant.earnedActions.entries) {
-        MahjongAction mahjongAction = entry.key;
+        RoomEventAction roomEventAction = entry.key;
 
         /// 暗杠
-        if (mahjongAction == MahjongAction.darkBar) {
-          Set<MahjongActionValue> mahjongActionValues = entry.value;
-          for (var mahjongActionValue in mahjongActionValues) {
-            if (mahjongActionValue.bar == mahjongActionValue.discard) {
-              if (i == mahjongActionValue.bar) {
-                roundParticipant.score.value += 60;
-              } else {
-                roundParticipant.score.value -= 20;
-              }
+        if (roomEventAction == RoomEventAction.darkBar) {
+          Set<RoomEvent> roomEvents = entry.value;
+          for (var roomEvent in roomEvents) {
+            if (i == roomEvent.owner) {
+              roundParticipant.participant.score.value += 60;
+            } else {
+              roundParticipant.participant.score.value -= 20;
             }
           }
         }
 
         /// 明杠
-        if (mahjongAction == MahjongAction.bar) {
-          Set<MahjongActionValue> mahjongActionValues = entry.value;
-          for (var mahjongActionValue in mahjongActionValues) {
+        if (roomEventAction == RoomEventAction.bar) {
+          Set<RoomEvent> roomEvents = entry.value;
+          for (var roomEvent in roomEvents) {
             // 自摸杠
-            if (mahjongActionValue.bar == mahjongActionValue.discard) {
-              if (i == mahjongActionValue.bar) {
-                roundParticipant.score.value += 30;
+            if (roomEvent.owner == roomEvent.src) {
+              if (i == roomEvent.owner) {
+                roundParticipant.participant.score.value += 30;
               } else {
-                roundParticipant.score.value -= 10;
+                roundParticipant.participant.score.value -= 10;
               }
             } else {
-              if (i == mahjongActionValue.bar) {
-                roundParticipant.score.value += 30;
-              } else if (i == mahjongActionValue.discard) {
-                roundParticipant.score.value -= 30;
+              if (i == roomEvent.owner) {
+                roundParticipant.participant.score.value += 30;
+              } else if (i == roomEvent.src) {
+                roundParticipant.participant.score.value -= 30;
               }
             }
           }
@@ -808,43 +729,44 @@ class Round {
   }
 
   /// 某个参与者胡牌,pos表示胡牌的类型
-  Future<WinType?> win(int owner, int pos) async {
-    RoundParticipant roundParticipant = roundParticipants[owner];
-    WinType? winType = roundParticipant.win(owner, pos);
+  Future<void> win(int owner, int pos) async {
+    WinType? winType = NumberUtil.toEnum(WinType.values, pos);
     if (winType == null) {
-      return null;
+      return;
     }
-    bool? confirm =
-        await DialogUtil.confirm(content: 'Do you want win ${winType.name}');
-    if (confirm == null || !confirm) {
-      return null;
+    RoundParticipant roundParticipant = roundParticipants[owner];
+    if (!roundParticipant.participant.robot) {
+      bool? confirm = await DialogUtil.confirm(
+          content: 'owner:$owner, do you want win $winType?');
+      if (confirm == null || !confirm) {
+        return;
+      }
+    } else {
+      DialogUtil.info(content: 'owner:$owner win $winType');
     }
-    _score(owner, winType.index);
     RoomEvent winRoomEvent = RoomEvent(room.name,
-        roundId: id, owner: owner, pos: pos, action: RoomEventAction.win);
-    for (int i = 0; i < roundParticipants.length; ++i) {
-      await _sendChatMessage(winRoomEvent, owner, [i]);
-    }
-    if (owner == room.creator) {
-      room.banker = owner;
-      room.startRoomEvent(RoomEvent(room.name,
-          roundId: id, owner: owner, action: RoomEventAction.round));
-    }
-
-    return winType;
+        roundId: id,
+        owner: owner,
+        src: owner,
+        pos: pos,
+        action: RoomEventAction.win);
+    List<int> receivers = _getParticipantIndexes();
+    await _sendChatMessage(winRoomEvent, owner, receivers);
   }
 
-  WinType? _win(int owner, int pos, int receiver) {
+  Future<WinType?> _win(int owner, int pos, int receiver) async {
     RoundParticipant roundParticipant = roundParticipants[owner];
     WinType? winType = roundParticipant.win(owner, pos);
     if (winType == null) {
       return null;
     }
-    _score(owner, winType.index);
+
+    _score(owner, winType.index, receiver);
+    roundParticipant.isWin.value = true;
     if (receiver == room.creator) {
       room.banker = owner;
-      room.startRoomEvent(RoomEvent(room.name,
-          roundId: id, owner: owner, action: RoomEventAction.round));
+      // await room.startRoomEvent(RoomEvent(room.name,
+      //     roundId: id, owner: owner, action: RoomEventAction.round));
     }
 
     return winType;
@@ -857,19 +779,26 @@ class Round {
       RoundParticipant roundParticipant = roundParticipants[receiver];
       roomEvent.sender = sender;
       roomEvent.receiver = receiver;
-      if (roomEvent.sender != roomEvent.receiver) {
-        ChatMessage chatMessage = await chatMessageService.buildChatMessage(
-            receiverPeerId: roundParticipant.participant.peerId,
-            subMessageType: ChatMessageSubType.mahjong,
-            content: roomEvent);
-        if (roundParticipant.participant.robot ||
-            roundParticipants[sender].participant.robot) {
-          logger.w('round:$id has robot sent event:${roomEvent.toString()}');
-          roomPool.onRoomEvent(chatMessage);
+      ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+          receiverPeerId: roundParticipant.participant.peerId,
+          subMessageType: ChatMessageSubType.mahjong,
+          content: roomEvent);
+      if (receiver == sender) {
+        await roomPool.onRoomEvent(chatMessage);
+      } else if (sender == room.creator) {
+        if (roundParticipant.participant.robot) {
+          await roomPool.onRoomEvent(chatMessage);
         } else {
-          logger.w('round:$id has no robot sent event:${roomEvent.toString()}');
-          roomPool.send(chatMessage);
+          await roomPool.send(chatMessage);
         }
+      } else if (roundParticipants[sender].participant.robot) {
+        if (roundParticipant.participant.robot || receiver == room.creator) {
+          await roomPool.onRoomEvent(chatMessage);
+        } else {
+          await roomPool.send(chatMessage);
+        }
+      } else {
+        await roomPool.send(chatMessage);
       }
     }
   }
@@ -879,32 +808,29 @@ class Round {
     RoomEventAction? action = roomEvent.action;
     switch (action) {
       case RoomEventAction.deal:
-        returnValue = deal();
+        returnValue = await deal();
       case RoomEventAction.discard:
-        returnValue = discard(roomEvent.owner, roomEvent.tile!);
+        await discard(roomEvent.owner, roomEvent.tile!);
       case RoomEventAction.bar:
-        returnValue = bar(roomEvent.owner, roomEvent.pos!);
+        await bar(roomEvent.owner, roomEvent.pos!,
+            tile: roomEvent.tile, src: roomEvent.src);
       case RoomEventAction.touch:
-        returnValue = touch(roomEvent.owner,
-            pos: roomEvent.pos!,
-            src: roomEvent.src!,
-            discardTile: roomEvent.tile!);
+        await touch(
+            roomEvent.owner, roomEvent.pos!, roomEvent.src!, roomEvent.tile!);
       case RoomEventAction.darkBar:
-        returnValue = darkBar(roomEvent.owner, roomEvent.pos!);
+        await darkBar(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.chow:
-        returnValue = chow(roomEvent.owner, roomEvent.pos!);
+        await chow(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.pass:
-        returnValue = pass(roomEvent.owner);
+        await pass(roomEvent.owner, roomEvent.tile!, roomEvent.src!,
+            pos: roomEvent.pos);
       case RoomEventAction.win:
-        returnValue = win(roomEvent.owner, roomEvent.pos!);
+        await win(roomEvent.owner, roomEvent.pos!);
       default:
         break;
     }
 
-    if (roomEvent.action == RoomEventAction.discard) {
-      mahjongFlameGame.reloadNext();
-    }
-    mahjongFlameGame.reloadSelf();
+    mahjongFlameGame.reload();
 
     return returnValue;
   }
@@ -919,6 +845,7 @@ class Round {
   /// 假如自己是creator，则处理事件，然后转发事件消息到其他参与者
   /// 假如自己不是creator，则不发送事件消息
   Future<dynamic> onRoomEvent(RoomEvent roomEvent) async {
+    roomEvents.add(roomEvent);
     dynamic returnValue;
     RoomEventAction? action = roomEvent.action;
     switch (action) {
@@ -926,39 +853,40 @@ class Round {
         returnValue = _deal(roomEvent.owner, roomEvent.tile!, roomEvent.pos!,
             roomEvent.receiver!);
       case RoomEventAction.discard:
-        returnValue =
-            _discard(roomEvent.owner, roomEvent.tile!, roomEvent.receiver!);
+        returnValue = await _discard(
+            roomEvent.owner, roomEvent.tile!, roomEvent.receiver!);
       case RoomEventAction.bar:
-        returnValue = _bar(roomEvent.owner, roomEvent.pos!, roomEvent.tile!,
-            roomEvent.src!, roomEvent.receiver!);
+        returnValue = await _bar(
+            roomEvent.owner, roomEvent.pos!, roomEvent.receiver!,
+            tile: roomEvent.tile, src: roomEvent.src);
       case RoomEventAction.barDeal:
-        returnValue = barDeal(roomEvent.owner);
+        returnValue = await barDeal(roomEvent.owner);
       case RoomEventAction.touch:
-        returnValue = _touch(roomEvent.owner, roomEvent.pos!, roomEvent.src!,
-            roomEvent.tile!, roomEvent.receiver!);
+        returnValue = await _touch(roomEvent.owner, roomEvent.pos!,
+            roomEvent.src!, roomEvent.tile!, roomEvent.receiver!);
       case RoomEventAction.darkBar:
-        returnValue =
-            _darkBar(roomEvent.owner, roomEvent.pos!, roomEvent.receiver!);
+        returnValue = await _darkBar(
+            roomEvent.owner, roomEvent.pos!, roomEvent.receiver!);
       case RoomEventAction.chow:
-        returnValue = _chow(roomEvent.owner, roomEvent.pos!);
+        returnValue = await _chow(roomEvent.owner, roomEvent.pos!);
       case RoomEventAction.rob:
         returnValue = _rob(roomEvent.owner, roomEvent.src!, roomEvent.tile!,
             receiver: roomEvent.receiver);
       case RoomEventAction.score:
-        returnValue = _score(roomEvent.owner, roomEvent.pos!);
+        returnValue =
+            _score(roomEvent.owner, roomEvent.pos!, roomEvent.receiver!);
       case RoomEventAction.pass:
-        returnValue = _pass(roomEvent.owner, roomEvent.receiver!);
+        returnValue = await _pass(roomEvent.owner, roomEvent.tile!,
+            roomEvent.src!, roomEvent.receiver!,
+            pos: roomEvent.pos);
       case RoomEventAction.win:
         returnValue =
-            _win(roomEvent.owner, roomEvent.pos!, roomEvent.receiver!);
+            await _win(roomEvent.owner, roomEvent.pos!, roomEvent.receiver!);
       default:
         break;
     }
 
-    if (roomEvent.action == RoomEventAction.discard) {
-      mahjongFlameGame.reloadNext();
-    }
-    mahjongFlameGame.reloadSelf();
+    mahjongFlameGame.reload();
 
     return returnValue;
   }

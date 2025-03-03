@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:colla_chat/pages/game/mahjong/base/room.dart';
+import 'package:colla_chat/pages/game/mahjong/base/room_event.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round_participant.dart';
 import 'package:colla_chat/pages/game/mahjong/base/tile.dart' as mahjongTile;
 import 'package:colla_chat/pages/game/mahjong/base/tile_background_sprite.dart';
@@ -43,9 +43,9 @@ class WastePileComponent extends PositionComponent
       RoundParticipant? roundParticipant =
           roomController.findRoundParticipant(areaDirection);
       if (roundParticipant != null) {
-        int? sender = roundParticipant.round.discardParticipant;
+        int? sender = roundParticipant.round.discardToken?.discardParticipant;
         if (sender == roundParticipant.index) {
-          mahjongTile.Tile? sendCard = roundParticipant.round.discardTile;
+          mahjongTile.Tile? sendCard = roundParticipant.round.discardToken?.discardTile;
           if (lastCard == sendCard) {
             last = true;
           }
@@ -61,13 +61,13 @@ class WastePileComponent extends PositionComponent
     if (wastePile == null) {
       return;
     }
-    TileBackgroundType cardBackgroundType;
+    TileBackgroundType tileBackgroundType;
     if (areaDirection == AreaDirection.self) {
-      cardBackgroundType = TileBackgroundType.touchcard;
+      tileBackgroundType = TileBackgroundType.touchcard;
     } else if (areaDirection == AreaDirection.opponent) {
-      cardBackgroundType = TileBackgroundType.touchcard;
+      tileBackgroundType = TileBackgroundType.touchcard;
     } else {
-      cardBackgroundType = TileBackgroundType.sidecard;
+      tileBackgroundType = TileBackgroundType.sidecard;
     }
     double x = 0;
     double y = 0;
@@ -109,7 +109,7 @@ class WastePileComponent extends PositionComponent
         y += 33;
       }
       TileComponent cardComponent = TileComponent(
-          card, areaDirection, cardBackgroundType,
+          card, areaDirection, tileBackgroundType,
           position: position, priority: priority);
       add(cardComponent);
     }

@@ -1,4 +1,4 @@
-import 'package:colla_chat/pages/game/mahjong/base/mahjong_action.dart';
+import 'package:colla_chat/pages/game/mahjong/base/room_event.dart';
 import 'package:colla_chat/pages/game/mahjong/base/room.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round.dart';
 import 'package:colla_chat/pages/game/mahjong/base/round_participant.dart';
@@ -42,16 +42,16 @@ class ActionAreaComponent extends RectangleComponent
   loadSpriteButton() {
     RoundParticipant? roundParticipant = roomController
         .getRoundParticipant(roomController.selfParticipantDirection.value);
-    Map<MahjongAction, Set<int>>? outstandingActions =
+    Map<RoomEventAction, Set<int>>? outstandingActions =
         roundParticipant?.outstandingActions.value;
     if (outstandingActions == null || outstandingActions.isEmpty) {
       return;
     }
-    outstandingActions[MahjongAction.pass] = {};
+    outstandingActions[RoomEventAction.pass] = {};
     double x = 0;
     double y = 0;
     for (var entry in outstandingActions.entries) {
-      MahjongAction outstandingAction = entry.key;
+      RoomEventAction outstandingAction = entry.key;
 
       /// 位置，在明杠，暗杠，吃牌的时候有用
       Set<int> pos = entry.value;
@@ -66,8 +66,8 @@ class ActionAreaComponent extends RectangleComponent
             buttonDown: sprite,
             position: position,
             size: size,
-            onPressed: () {
-              _call(outstandingAction, pos.toList());
+            onPressed: () async {
+              await _call(outstandingAction, pos.toList());
               outstandingActions.clear();
               game.loadActionArea();
             });
@@ -76,7 +76,7 @@ class ActionAreaComponent extends RectangleComponent
     }
   }
 
-  _call(MahjongAction outstandingAction, List<int> pos) {
+  _call(RoomEventAction outstandingAction, List<int> pos) async {
     Room? room = roomController.room.value;
     if (room == null) {
       return;
@@ -87,40 +87,54 @@ class ActionAreaComponent extends RectangleComponent
       return;
     }
 
-    if (outstandingAction == MahjongAction.win) {
-      room.startRoomEvent(RoomEvent(room.name,
+    if (outstandingAction == RoomEventAction.win) {
+      await room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,
           owner: owner,
+          src: round.discardToken?.discardParticipant,
+          tile: round.discardToken?.discardTile,
           action: RoomEventAction.win,
           pos: pos[0]));
-    } else if (outstandingAction == MahjongAction.touch) {
-      room.startRoomEvent(RoomEvent(room.name,
-          roundId: round.id,
-          owner: owner,
-          action: RoomEventAction.touch,
-          src: round.discardParticipant,
-          tile: round.discardTile,
-          pos: pos[0]));
-    } else if (outstandingAction == MahjongAction.bar) {
-      room.startRoomEvent(RoomEvent(room.name,
+    } else if (outstandingAction == RoomEventAction.touch) {
+      if (round.discardToken != null) {
+        await room.startRoomEvent(RoomEvent(room.name,
+            roundId: round.id,
+            owner: owner,
+            action: RoomEventAction.touch,
+            src: round.discardToken?.discardParticipant,
+            tile: round.discardToken?.discardTile,
+            pos: pos[0]));
+      }
+    } else if (outstandingAction == RoomEventAction.bar) {
+      await room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,
           owner: owner,
           action: RoomEventAction.bar,
+          src: round.discardToken?.discardParticipant,
+          tile: round.discardToken?.discardTile,
           pos: pos[0]));
-    } else if (outstandingAction == MahjongAction.darkBar) {
-      room.startRoomEvent(RoomEvent(room.name,
+    } else if (outstandingAction == RoomEventAction.darkBar) {
+      await room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,
           owner: owner,
           action: RoomEventAction.darkBar,
           pos: pos[0]));
-    } else if (outstandingAction == MahjongAction.pass) {
-      room.startRoomEvent(RoomEvent(room.name,
-          roundId: round.id, owner: owner, action: RoomEventAction.pass));
-    } else if (outstandingAction == MahjongAction.chow) {
-      room.startRoomEvent(RoomEvent(room.name,
+    } else if (outstandingAction == RoomEventAction.pass) {
+      if (round.discardToken != null) {
+        await room.startRoomEvent(RoomEvent(room.name,
+            roundId: round.id,
+            owner: owner,
+            src: round.discardToken?.discardParticipant,
+            tile: round.discardToken?.discardTile,
+            action: RoomEventAction.pass));
+      }
+    } else if (outstandingAction == RoomEventAction.chow) {
+      await room.startRoomEvent(RoomEvent(room.name,
           roundId: round.id,
           owner: owner,
           action: RoomEventAction.chow,
+          src: round.discardToken?.discardParticipant,
+          tile: round.discardToken?.discardTile,
           pos: pos[0]));
     }
   }

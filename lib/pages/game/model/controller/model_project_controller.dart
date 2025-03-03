@@ -242,6 +242,7 @@ class ModelProjectController {
   registerAssetMetaProject() {
     _registerAssetMetaProject('product_model');
     _registerAssetMetaProject('class_model');
+    _registerAssetMetaProject('process_model');
   }
 
   _registerAssetMetaProject(String filename) async {

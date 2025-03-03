@@ -86,7 +86,7 @@ enum ShapeType {
   hexagonal, //六边型
   octagonal, //八边型
   arcrect, //圆弧矩形
-  drrect, //环形
+  dcircle, //环形
   paragraph, //文本框
   vertices, //路径
 }

@@ -84,7 +84,7 @@ class EntityUtil {
   static removeNull(Map map) {
     List<String> keys = [];
     for (var entry in map.entries) {
-      String key = entry.key;
+      dynamic key = entry.key;
       var value = entry.value;
       if (value == null) {
         keys.add(key);
