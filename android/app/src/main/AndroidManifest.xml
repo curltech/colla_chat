@@ -1,6 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools">
-
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-feature android:name="android.hardware.camera"/>
     <uses-feature android:name="android.hardware.camera.autofocus"/>
     <uses-feature android:name="android.hardware.telephony"/>
@@ -105,37 +103,37 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
-    <queries>
-        <intent>
-            <action android:name="android.intent.action.TTS_SERVICE"/>
-        </intent>
-    </queries>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
+    <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
 
     <application
-            android:name="${applicationName}"
-            android:allowBackup="false"
-            tools:replace="android:allowBackup"
-            android:icon="@mipmap/ic_launcher"
-            android:label="CollaChat"
-            android:largeHeap="true"
-            android:usesCleartextTraffic="true">
+        android:label="CollaChat"
+        android:name="${applicationName}"
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"
+        android:largeHeap="true"
+        android:usesCleartextTraffic="true"
+        >
+
         <activity
-                android:name=".MainActivity"
-                android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
-                android:exported="true"
-                android:hardwareAccelerated="true"
-                android:launchMode="singleTask"
-                android:showWhenLocked="true"
-                android:theme="@style/LaunchTheme"
-                android:turnScreenOn="true"
-                android:windowSoftInputMode="adjustResize">
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:taskAffinity=""
+            android:showWhenLocked="true"
+            android:theme="@style/LaunchTheme"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize">
             <!-- Specifies an Android theme to apply to this Activity as soon as
                  the Android process has started. This theme is visible to the user
                  while the Flutter UI initializes. After that, this theme continues
                  to determine the Window background behind the Flutter UI. -->
             <meta-data
-                    android:name="io.flutter.embedding.android.NormalTheme"
-                    android:resource="@style/NormalTheme"/>
+              android:name="io.flutter.embedding.android.NormalTheme"
+              android:resource="@style/NormalTheme"
+              />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -147,9 +145,9 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <!--TODO:  Add this filter, if you want support opening urls into your app-->
                 <data
-                        android:host="example.com"
-                        android:pathPrefix="/invite"
-                        android:scheme="https"/>
+                    android:host="example.com"
+                    android:pathPrefix="/invite"
+                    android:scheme="https"/>
             </intent-filter>
             <!--TODO: Add this filter, if you want to support sharing text into your app-->
             <intent-filter>
@@ -192,8 +190,8 @@
             </intent-filter>
         </activity>
         <activity
-                android:name="com.linusu.flutter_web_auth_2.CallbackActivity"
-                android:exported="true">
+            android:name="com.linusu.flutter_web_auth_2.CallbackActivity"
+            android:exported="true">
             <intent-filter android:label="flutter_web_auth_2">
                 <action android:name="android.intent.action.VIEW"/>
 
@@ -204,50 +202,49 @@
             </intent-filter>
         </activity>
         <activity
-                android:name="com.yalantis.ucrop.UCropActivity"
-                android:screenOrientation="fullSensor"
-                android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="fullSensor"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
-                android:name="flutterEmbedding"
-                android:value="2"/>
-
+            android:name="flutterEmbedding"
+            android:value="2" />
         <meta-data
-                android:name="TencentMapSDK"
-                android:value="QFSBZ-ZTGCT-JS2XU-LERCR-ISRAQ-EEFJA"/>
+            android:name="TencentMapSDK"
+            android:value="QFSBZ-ZTGCT-JS2XU-LERCR-ISRAQ-EEFJA"/>
 
         <service
-                android:name="de.julianassmann.flutter_background.IsolateHolderService"
-                android:enabled="true"
-                android:exported="false"
-                android:foregroundServiceType="mediaProjection"/>
+            android:name="de.julianassmann.flutter_background.IsolateHolderService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection"/>
         <service
-                android:name="com.dexterous.flutterlocalnotifications.ForegroundService"
-                android:exported="false"
-                android:stopWithTask="false"/>
+            android:name="com.dexterous.flutterlocalnotifications.ForegroundService"
+            android:exported="false"
+            android:stopWithTask="false"/>
         <!-- Add android:stopWithTask option only when necessary. -->
         <service
-                android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
-                android:stopWithTask="true"/>
+            android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
+            android:stopWithTask="true"/>
         <service
-                android:name="flutter.overlay.window.flutter_overlay_window.OverlayService"
-                android:exported="false"/>
+            android:name="flutter.overlay.window.flutter_overlay_window.OverlayService"
+            android:exported="false"/>
         <service android:name="me.carda.awesome_notifications.core.services.ForegroundService"
-                 android:enabled="true"
-                 android:exported="false"
-                 android:stopWithTask="true"
-                 android:foregroundServiceType="phoneCall"/>
+            android:enabled="true"
+            android:exported="false"
+            android:stopWithTask="true"
+            android:foregroundServiceType="phoneCall"/>
         <service android:name="com.gdelataillade.alarm.services.NotificationOnKillService"/>
         <receiver
-                android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver"
-                android:exported="false"/>
+            android:name="com.dexterous.flutterlocalnotifications.ActionBroadcastReceiver"
+            android:exported="false"/>
         <receiver
-                android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"
-                android:exported="false"/>
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver"
+            android:exported="false"/>
         <receiver
-                android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"
-                android:exported="false">
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
@@ -256,12 +253,23 @@
             </intent-filter>
         </receiver>
         <receiver
-                android:name="com.shounakmulay.telephony.sms.IncomingSmsReceiver"
-                android:exported="true"
-                android:permission="android.permission.BROADCAST_SMS">
+            android:name="com.shounakmulay.telephony.sms.IncomingSmsReceiver"
+            android:exported="true"
+            android:permission="android.permission.BROADCAST_SMS">
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
             </intent-filter>
         </receiver>
     </application>
+    <!-- Required to query activities that can process text, see:
+         https://developer.android.com/training/package-visibility and
+         https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
+
+         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT"/>
+            <data android:mimeType="text/plain"/>
+        </intent>
+    </queries>
 </manifest>

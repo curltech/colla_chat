@@ -140,9 +140,9 @@ dependencies:
   tab_container: ^3.5.3
   file_saver: ^0.2.10
   material_neumorphic: ^1.2.1
-  extended_text: ^14.0.1 #文本扩展显示
-  extended_text_field: ^16.0.0 #文字表情混入
-  extended_text_library: ^12.0.0
+  extended_text: ^15.0.0 #文本扩展显示
+  extended_text_field: ^16.0.2 #文字表情混入
+  extended_text_library: ^12.0.1
   extended_masked_text: ^3.0.1
   # fl_chart: ^0.69.0
   # k_chart: ^0.7.1
@@ -214,6 +214,8 @@ dependencies:
   #安全加密
   cryptography: ^2.7.0 #ecc,aes
   cryptography_flutter: ^2.3.2
+#  cryptography_plus: ^2.7.1
+#  cryptography_flutter_plus: ^2.3.4
   pointycastle: ^3.7.4
   encrypt: ^5.0.3 #aes
   openpgp: ^3.9.0 #rsa,sha
@@ -241,7 +243,7 @@ dependencies:
   flutter_sharing_intent: ^1.1.1
   date_format: ^2.0.6
   omni_datetime_picker: ^2.0.3
-  toggle_switch: ^2.0.1
+  toggle_switch: ^2.3.0
   talker: ^4.2.4
   talker_flutter: ^4.2.0
   cross_file: ^0.3.4+1
@@ -270,12 +272,12 @@ dependencies:
   audioplayers_android: ^5.0.0
   audio_waveforms: ^1.2.0
   waved_audio_player: ^1.3.0
-  waveform_recorder: ^1.4.0
+  waveform_recorder: ^1.5.0
   flick_video_player: ^0.9.0 #video_player的封装
   #  native_video_player: ^1.3.1
   #  fvp: ^0.29.0
   fl_video: ^1.4.0  #video_Player control panel
-  chewie: ^1.3.6 #video_player的封装
+  chewie: ^1.10.0 #video_player的封装
   media_kit: ^1.1.11                             # Primary package.
   media_kit_video: ^1.2.5                        # For video rendering.
   media_kit_libs_video: ^1.0.5
@@ -294,8 +296,8 @@ dependencies:
   video_thumbnail: ^0.5.3
   video_compress: ^3.1.3
   fc_native_video_thumbnail: ^0.16.1
-  extended_image: ^9.0.7 #所有平台，官方软件，管理图像
-  extended_image_library: ^4.0.2
+  extended_image: ^9.1.0 #所有平台，官方软件，管理图像
+  extended_image_library: ^4.0.6
   image_editor: ^1.5.1
   image: ^4.0.17 #所有平台，装载，保存，管理图像
   flutter_luban: ^0.1.14
@@ -331,7 +333,7 @@ dependencies:
   flutter_native_splash: ^2.4.1
   system_tray: ^2.0.3
   tray_manager: ^0.3.0
-  livekit_client: ^2.3.5 #livekit sfu server flutter client
+  livekit_client: ^2.3.6 #livekit sfu server flutter client
   livekit_server_sdk: ^1.0.0
   langchain: ^0.7.1
   langchain_ollama: ^0.3.0
@@ -363,9 +365,9 @@ dependency_overrides:
   ffi: 2.1.0
   win32: 5.9.0
   http: 1.2.0
-  dart_webrtc: ^1.4.10
+  dart_webrtc: ^1.5.1
   webrtc_interface: 1.2.0
-  flutter_webrtc: ^0.12.7
+  flutter_webrtc: ^0.12.9
   #  flutter_webrtc_plus: ^0.11.2+5
   #  medea_flutter_webrtc: ^0.11.0
   protobuf: ^3.1.0
@@ -382,7 +384,7 @@ dependency_overrides:
   webview_flutter_platform_interface: ^2.9.0
   webview_win_floating: #2.0.0 #webView for win
     git: https://github.com/jakky1/webview_win_floating.git
-  flutter_widget_from_html: ^0.15.3
+  flutter_widget_from_html: ^0.16.0
   sprintf: ^7.0.0
   flex_color_picker: ^3.7.0
   permission_handler: ^11.2.0
@@ -390,7 +392,8 @@ dependency_overrides:
   shared_preferences: ^2.3.1
   intl: ^0.20.1
   image: ^4.5.2
-  camera: ^0.11.0+2 #调用相机
+  camera: ^0.11.1 #调用相机
+  camera_linux: ^0.0.8
   google_fonts: ^6.1.0
   material_design_icons_flutter: ^7.0.7296
   full_picker: ^2.1.5
@@ -412,7 +415,8 @@ dependency_overrides:
   visibility_detector: ^0.4.0+2 #组建可见性的大小发生变化
   focus_detector: ^2.0.1 #组建在界面上消失或者出现
   image_picker: ^1.1.2 #选取图库,移动从图像廊或者相机选，桌面实现采用file_selector，从文件系统选
-  markdown: ^7.1.1
+  markdown: ^7.3.0
+  markdown_widget: ^2.3.2+6
   lottie: ^3.1.2
   flutter_quill: ^10.8.5
   flutter_quill_extensions: ^10.4.0
@@ -424,7 +428,8 @@ dependency_overrides:
   lints: ^5.0.0
   archive: ^4.0.1
   screen_retriever: ^0.2.0
-  video_player: ^2.9.2 #mobile and web
+  flutter_vlc_player: ^7.4.2
+  video_player: ^2.9.3 #mobile and web
   video_player_platform_interface: ^6.2.2
   video_player_win: ^3.1.1
   video_player_avfoundation: ^2.6.5
