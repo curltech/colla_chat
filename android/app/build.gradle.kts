@@ -1,12 +1,12 @@
 import java.util.Properties
 
 val localProperties = Properties()
-file("local.properties").inputStream().use { localProperties.load(it) }
+file("../local.properties").inputStream().use { localProperties.load(it) }
 val flutterSdkPath: String = localProperties.getProperty("flutter.sdk")
 require(true) { "flutter.sdk not set in local.properties" }
 
 val keystoreProperties = Properties()
-file("keystore.properties").inputStream().use { keystoreProperties.load(it) }
+file("../keystore.properties").inputStream().use { keystoreProperties.load(it) }
 
 val flutterVersionCode: String = localProperties.getProperty("flutter.versionCode")
 
@@ -15,7 +15,7 @@ val flutterVersionName: String = localProperties.getProperty("flutter.versionNam
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    id("com.google.gms.google-services")
+//    id("com.google.gms.google-services")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
@@ -23,7 +23,7 @@ plugins {
 android {
     namespace = "io.curltech.colla_chat"
     compileSdk = 34
-    ndkVersion = "27.0.12077973"
+    ndkVersion = "27.0.12077973" //28.0.13004108
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -41,8 +41,9 @@ android {
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 33
         targetSdk = 34
-        versionCode = flutter.versionCode
-        versionName = "1.6.0"
+        versionCode = 1
+        versionName = "1.7.0"
+        multiDexEnabled = true
     }
 
     signingConfigs {
@@ -64,8 +65,9 @@ android {
     }
 
     dependencies {
-        implementation("androidx.appcompat:appcompat:1.4.1")
+        implementation("androidx.appcompat:appcompat:1.7.0")
         implementation("com.google.android.material:material:1.12.0")
+        implementation("com.google.gms:google-services:4.3.15")
     }
 }
 
