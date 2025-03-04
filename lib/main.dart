@@ -30,6 +30,7 @@ import 'package:provider/single_child_widget.dart';
 import 'package:upgrader/upgrader.dart';
 import 'package:webview_win_floating/webview.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
 ///全局处理证书问题
 class PlatformHttpOverrides extends HttpOverrides {
@@ -189,6 +190,7 @@ class CollaChatApp extends StatelessWidget {
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
+              FlutterQuillLocalizations.delegate,
             ],
             supportedLocales: supportedLocales,
             locale: myself.locale,

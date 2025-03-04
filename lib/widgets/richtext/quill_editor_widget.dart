@@ -95,8 +95,8 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
           ],
         ),
         content: QuillEditor.basic(
-            controller: quillEditorController,
-            configurations: QuillEditorConfigurations()),
+          controller: quillEditorController,
+        ),
       ),
     );
 
@@ -239,9 +239,8 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
   Widget _buildQuillToolbar(BuildContext context) {
     if (widget.withMultiMedia) {}
 
-    var toolbar = QuillToolbar.simple(
-        configurations:
-            QuillSimpleToolbarConfigurations(controller: quillController));
+    var toolbar = QuillSimpleToolbar(
+        controller: quillController, config: const QuillSimpleToolbarConfig());
 
     return toolbar;
   }
@@ -249,7 +248,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
   Widget _buildQuillEditor(BuildContext context) {
     Widget quillEditor = QuillEditor(
       controller: quillController,
-      configurations: QuillEditorConfigurations(
+      config: QuillEditorConfig(
         minHeight: 200,
         maxHeight: widget.height,
         scrollable: true,
@@ -257,7 +256,6 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
         enableSelectionToolbar: true,
         expands: false,
         padding: EdgeInsets.zero,
-        onImagePaste: _onImagePaste,
         embedBuilders: [
           ...FlutterQuillEmbeds.defaultEditorBuilders(),
           NotesEmbedBuilder(addEditNote: _addEditNote)
@@ -327,13 +325,9 @@ class NotesEmbedBuilder extends EmbedBuilder {
   @override
   Widget build(
     BuildContext context,
-    QuillController controller,
-    Embed node,
-    bool readOnly,
-    bool inline,
-    TextStyle textStyle,
+    EmbedContext embedContext,
   ) {
-    final notes = NotesBlockEmbed(node.value.data).document;
+    final notes = NotesBlockEmbed(embedContext.node.value.data).document;
 
     return Material(
       color: Colors.transparent,
