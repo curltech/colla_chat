@@ -60,7 +60,6 @@ dependencies:
   screenshot_callback: ^3.0.1
   orientation: ^1.2.0 # 控制屏幕旋转
   geocoding: ^3.0.0
-  device_info_plus: ^9.1.2
   network_info_plus: ^6.0.0
   beamer: ^1.4.1+1
   battery_plus: ^6.0.0
@@ -355,7 +354,7 @@ dependency_overrides:
   photo_view: ^0.15.0
   extended_image: ^10.0.0 #所有平台，官方软件，管理图像
   extended_image_library: ^5.0.0
-  device_info_plus: ^11.1.1
+  device_info_plus: ^11.3.3
   package_info_plus: ^8.0.0
   flutter_keyboard_visibility: ^6.0.0
   pointycastle: ^4.0.0
@@ -363,7 +362,8 @@ dependency_overrides:
   flutter_map_location_marker: ^10.0.0
   flutter_map: ^8.1.0 #Open Street Map，需要翻墙
   ffi: 2.1.0
-  win32: 5.9.0
+  win32_registry: 2.1.0
+  win32: 5.11.0
   http: 1.2.0
   dart_webrtc: ^1.5.1
   webrtc_interface: 1.2.0
