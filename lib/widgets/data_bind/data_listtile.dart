@@ -1,4 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/index/help_information_widget.dart';
+import 'package:colla_chat/pages/index/index_view.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/image_util.dart';
@@ -103,13 +105,6 @@ class TileData {
           leading = Icon(prefix, color: myself.primary);
         }
       }
-    }
-    if (information != null) {
-      leading ??= Icon(Icons.info_outline_rounded, color: Colors.white);
-      leading = Tooltip(
-        message: information,
-        child: leading,
-      );
     }
 
     return leading;

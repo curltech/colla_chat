@@ -303,7 +303,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
         builder: (BuildContext context) {
           return Dialog(
               child: Column(children: [
-            AppBarWidget.buildAppBar(
+            AppBarWidget(
               title: CommonAutoSizeText(AppLocalizations.t(title)),
             ),
             Expanded(

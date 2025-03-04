@@ -1,4 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/index/help_information_widget.dart';
+import 'package:colla_chat/pages/index/index_view.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -12,8 +14,10 @@ class AppBarView extends StatelessWidget {
   //指定回退路由样式，不指定则系统判断
   final Function? leadingCallBack;
   final String? title;
+  final String? information;
   final Widget? titleWidget;
   final bool centerTitle;
+  final bool isAppBar;
 
   //右边按钮
   final Widget? rightWidget;
@@ -30,6 +34,8 @@ class AppBarView extends StatelessWidget {
     this.leadingWidget,
     this.leadingCallBack,
     this.title,
+    this.information,
+    this.isAppBar = true,
     this.titleWidget,
     this.centerTitle = false,
     this.rightWidget,
@@ -53,9 +59,20 @@ class AppBarView extends StatelessWidget {
               overflow: TextOverflow.visible,
               //maxLines: 2
             );
+
+        if (information != null) {
+          titleWidget = InkWell(
+            onLongPress: () {
+              helpInformationController.title.value =
+                  '${title!} help information';
+              helpInformationController.information.value = information!;
+              sliderDrawerKey.currentState?.openSlider();
+            },
+            child: titleWidget,
+          );
+        }
         return Column(children: [
-          AppBarWidget.buildAppBar(
-            context: context,
+          AppBarWidget(
             backgroundColor: myself.primary,
             withLeading: withLeading,
             leadingWidget: leadingWidget,
@@ -66,6 +83,7 @@ class AppBarView extends StatelessWidget {
             rightWidgets: rightWidgets,
             rightPopupMenus: rightPopupMenus,
             bottom: bottom,
+            isAppBar: isAppBar,
           ),
           Expanded(child: this.child),
         ]);

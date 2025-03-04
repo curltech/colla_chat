@@ -212,12 +212,13 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
     List<Widget> children = [];
     if (StringUtil.isNotEmpty(widget.title)) {
       children.add(
-        AppBarWidget.buildTitleBar(
+        AppBarWidget(
+            isAppBar: false,
             title: CommonAutoSizeText(
-          AppLocalizations.t(widget.title ?? ''),
-          style: const TextStyle(
-              fontSize: AppFontSize.mdFontSize, color: Colors.white),
-        )),
+              AppLocalizations.t(widget.title ?? ''),
+              style: const TextStyle(
+                  fontSize: AppFontSize.mdFontSize, color: Colors.white),
+            )),
       );
       children.add(
         const SizedBox(
@@ -564,11 +565,12 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
     List<Widget> children = [];
     if (StringUtil.isNotEmpty(widget.title)) {
       children.add(
-        AppBarWidget.buildTitleBar(
+        AppBarWidget(
+            isAppBar: false,
             title: CommonAutoSizeText(
-          AppLocalizations.t(widget.title ?? ''),
-          style: const TextStyle(fontSize: 16, color: Colors.white),
-        )),
+              AppLocalizations.t(widget.title ?? ''),
+              style: const TextStyle(fontSize: 16, color: Colors.white),
+            )),
       );
       children.add(
         const SizedBox(

@@ -418,6 +418,7 @@ dependency_overrides:
   image_picker: ^1.1.2 #选取图库,移动从图像廊或者相机选，桌面实现采用file_selector，从文件系统选
   markdown: ^7.3.0
   markdown_widget: ^2.3.2+6
+  flutter_slider_drawer: ^3.0.2
   lottie: ^3.1.2
   flutter_quill: ^11.0.0
   flutter_quill_extensions: ^11.0.0

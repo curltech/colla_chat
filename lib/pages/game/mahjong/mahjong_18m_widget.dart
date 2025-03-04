@@ -98,11 +98,13 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
               shape: const ContinuousRectangleBorder(),
               child: Column(
                 children: [
-                  AppBarWidget.buildTitleBar(
+                  AppBarWidget(
+                      isAppBar: false,
                       title: CommonAutoSizeText(
-                    AppLocalizations.t('Majiang room and participants'),
-                    style: const TextStyle(fontSize: 16, color: Colors.white),
-                  )),
+                        AppLocalizations.t('Majiang room and participants'),
+                        style:
+                            const TextStyle(fontSize: 16, color: Colors.white),
+                      )),
                   const SizedBox(
                     height: 10.0,
                   ),

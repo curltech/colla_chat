@@ -15,7 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 import 'package:provider/provider.dart';
 
-///自动适配的主页面结构
+/// 自动适配的主页面结构
 class AdaptiveLayoutIndex extends StatefulWidget {
   final PrimaryNavigation primaryNavigation = PrimaryNavigation();
   final BottomNavigation bottomNavigation = BottomNavigation();

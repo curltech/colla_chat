@@ -130,7 +130,7 @@ class DialogUtil {
       builder: (BuildContext context) {
         return Dialog(
           child: Column(children: [
-            AppBarWidget.buildAppBar(context: context, title: title),
+            AppBarWidget(title: title),
             Expanded(child: ListView(children: options))
           ]),
         );
@@ -356,11 +356,12 @@ class DialogUtil {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: AppBarWidget.buildTitleBar(
+          title: AppBarWidget(
+              isAppBar: false,
               title: Text(
-            AppLocalizations.t(title),
-            style: const TextStyle(color: Colors.white),
-          )),
+                AppLocalizations.t(title),
+                style: const TextStyle(color: Colors.white),
+              )),
           titlePadding: EdgeInsets.zero,
           content: Text(AppLocalizations.t(content), softWrap: true),
           actions: <Widget>[
@@ -405,11 +406,12 @@ class DialogUtil {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: AppBarWidget.buildTitleBar(
+          title: AppBarWidget(
+              isAppBar: false,
               title: Text(
-            AppLocalizations.t(title),
-            style: const TextStyle(color: Colors.white),
-          )),
+                AppLocalizations.t(title),
+                style: const TextStyle(color: Colors.white),
+              )),
           titlePadding: EdgeInsets.zero,
           content: CommonTextFormField(
             keyboardType: TextInputType.text,

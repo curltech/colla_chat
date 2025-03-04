@@ -17,6 +17,7 @@ import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/index/adaptive_layout_index.dart';
 import 'package:colla_chat/pages/index/global_chat_message.dart';
 import 'package:colla_chat/pages/index/global_webrtc_event.dart';
+import 'package:colla_chat/pages/index/help_information_widget.dart';
 import 'package:colla_chat/pages/login/loading.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/overlay/overlay_notification.dart';
@@ -50,6 +51,9 @@ import 'package:flutter_sharing_intent/model/sharing_file.dart';
 import 'package:provider/provider.dart';
 import 'package:system_tray/system_tray.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:flutter_slider_drawer/flutter_slider_drawer.dart';
+
+GlobalKey<SliderDrawerState> sliderDrawerKey = GlobalKey<SliderDrawerState>();
 
 class IndexView extends StatefulWidget {
   final AdaptiveLayoutIndex adaptiveLayoutIndex = AdaptiveLayoutIndex();
@@ -689,8 +693,7 @@ class _IndexViewState extends State<IndexView>
     Scaffold scaffold = Scaffold(
       resizeToAvoidBottomInset: true,
       primary: true,
-      appBar: AppBarWidget.buildAppBar(
-          context: context, toolbarHeight: 0.0, elevation: 0.0),
+      appBar: AppBarWidget(toolbarHeight: 0.0, elevation: 0.0),
       body: KeyboardDismissOnTap(
           dismissOnCapturedTaps: false,
           child: SafeArea(
@@ -699,11 +702,21 @@ class _IndexViewState extends State<IndexView>
               opacity: 1,
               child: loadingWidget,
             ),
-            Center(
-                child: platformWidgetFactory.sizedBox(
-                    child: widget.adaptiveLayoutIndex,
-                    height: height,
-                    width: width)),
+            SliderDrawer(
+              key: sliderDrawerKey,
+              slideDirection: appDataProvider.landscape
+                  ? SlideDirection.rightToLeft
+                  : SlideDirection.topToBottom,
+              sliderOpenSize: 350,
+              backgroundColor: Colors.white.withAlpha(0),
+              appBar: Container(),
+              slider: Center(child: HelpInformationWidget()),
+              child: Center(
+                  child: platformWidgetFactory.sizedBox(
+                      child: widget.adaptiveLayoutIndex,
+                      height: height,
+                      width: width)),
+            ),
           ]))),
     );
 

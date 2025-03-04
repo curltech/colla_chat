@@ -114,7 +114,8 @@ class ScreenSelectDialog extends StatelessWidget {
   }
 
   Widget _buildTitle(BuildContext context) {
-    return AppBarWidget.buildTitleBar(
+    return AppBarWidget(
+        isAppBar: false,
         title: CommonAutoSizeText(
           AppLocalizations.t('Choose what to share'),
           style: const TextStyle(fontSize: 16, color: Colors.white),
@@ -284,6 +285,7 @@ class ThumbnailWidget extends StatefulWidget {
       required this.source,
       required this.selected,
       required this.onTap});
+
   final DesktopCapturerSource source;
   final bool selected;
   final Function(DesktopCapturerSource) onTap;

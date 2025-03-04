@@ -44,7 +44,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
   String get title => 'Poem';
 
   @override
-  String? get information => null;
+  String? get information => 'Search over 800k chinese poems';
 
   final List<PlatformDataField> searchDataField = [
     PlatformDataField(
@@ -86,7 +86,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
   late final FormInputController formInputController =
       FormInputController(searchDataField);
 
-  ExpansionTileController expansionTileController = ExpansionTileController();
+  final ExpansionTileController expansionTileController = ExpansionTileController();
 
   Widget _buildFormInputWidget(BuildContext context) {
     var formInputWidget = Container(
@@ -182,10 +182,10 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
     return tiles;
   }
 
-  PlatformTextToSpeechWidget platformTextToSpeechWidget =
+  final PlatformTextToSpeechWidget platformTextToSpeechWidget =
       PlatformTextToSpeechWidget();
 
-  RxBool platformTextToSpeech = true.obs;
+  final RxBool platformTextToSpeech = true.obs;
 
   Future<void> _onRefresh(BuildContext context) async {
     int length = poemController.data.length;

@@ -141,8 +141,7 @@ class P2pLogin extends StatelessWidget with WindowListener {
     return ListenableBuilder(
         listenable: myself,
         builder: (BuildContext context, Widget? child) {
-          PreferredSizeWidget appBar = AppBarWidget.buildAppBar(
-            context: context,
+          PreferredSizeWidget appBar = AppBarWidget(
             title: CommonAutoSizeText(AppLocalizations.t('Login')),
             rightWidgets: [_buildRightWidget(context)],
           );

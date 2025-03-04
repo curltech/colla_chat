@@ -86,6 +86,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     otherAppTileData.add(TileData(
         title: AppLocalizations.t(poemWidget.title),
         prefix: poemWidget.iconData,
+        information: poemWidget.information,
         onTap: (int index, String title, {String? subtitle}) {
           name.value = poemWidget.routeName;
         }));
@@ -206,8 +207,11 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
             },
             icon: const Icon(Icons.arrow_back_ios_new));
       }
-      var otherApp =
-          AppBarView(title: title, leadingWidget: backWidget, child: child);
+      var otherApp = AppBarView(
+          title: title,
+          information: current?.information,
+          leadingWidget: backWidget,
+          child: child);
 
       return otherApp;
     });

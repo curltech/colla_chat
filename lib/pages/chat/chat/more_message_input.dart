@@ -375,7 +375,7 @@ class MoreMessageInput extends StatelessWidget {
           )),
     ];
 
-    Widget title = AppBarWidget.buildAppBar(
+    Widget title = AppBarWidget(
       title: CommonAutoSizeText(
         AppLocalizations.t('Location map'),
         style: const TextStyle(color: Colors.white),
@@ -455,7 +455,7 @@ class MoreMessageInput extends StatelessWidget {
     await DialogUtil.show(builder: (BuildContext context) {
       return Dialog(
         child: Column(children: [
-          AppBarWidget.buildAppBar(
+          AppBarWidget(
             title: CommonAutoSizeText(
                 AppLocalizations.t('Select collect message')),
           ),

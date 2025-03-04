@@ -1,5 +1,4 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -15,120 +14,139 @@ class AppBarPopupMenu {
 
 ///工作区的顶部栏AppBar，定义了前导组件，比如回退按钮
 ///定义了尾部组件和下拉按钮
-class AppBarWidget {
-  static PreferredSizeWidget buildAppBar({
-    BuildContext? context,
-    Color? backgroundColor,
-    Color? foregroundColor,
-    double? toolbarHeight,
-    double? elevation,
-    bool withLeading = false, //是否有缺省的回退按钮
-    Widget? leadingWidget,
-    Function? leadingCallBack, //回退按钮的回调
-    Widget? title = const CommonAutoSizeText(''),
-    bool centerTitle = false, //标题是否居中
-    Widget? rightWidget,
-    List<Widget>? rightWidgets, //右边的排列组件（按钮）
-    List<AppBarPopupMenu>? rightPopupMenus, //右边的下拉菜单组件
-    PreferredSizeWidget? bottom, //底部组件
-  }) {
-    context = context ?? appDataProvider.context!;
+class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
+  final Color? backgroundColor;
+  final Color? foregroundColor;
+  final double? toolbarHeight;
+  final double? elevation;
+  final bool withLeading; //是否有缺省的回退按钮
+  final Widget? leadingWidget;
+  final Function? leadingCallBack; //回退按钮的回调
+  final Widget? title;
+  final bool centerTitle; //标题是否居中
+  final Widget? rightWidget;
+  final List<Widget>? rightWidgets; //右边的排列组件（按钮）
+  final List<AppBarPopupMenu>? rightPopupMenus; //右边的下拉菜单组件
+  final PreferredSizeWidget? bottom;
+  final bool isAppBar;
 
+  AppBarWidget(
+      {super.key,
+      this.backgroundColor,
+      this.foregroundColor,
+      this.toolbarHeight,
+      this.elevation,
+      this.leadingWidget,
+      this.leadingCallBack,
+      this.rightWidget,
+      this.rightWidgets,
+      this.rightPopupMenus,
+      this.bottom,
+      this.withLeading = false,
+      this.title = const CommonAutoSizeText(''),
+      this.centerTitle = false,
+      this.isAppBar = true});
+
+  Size _preferredSize = Size(0, 0);
+
+  @override
+  Widget build(BuildContext context) {
+    return isAppBar ? _buildAppBar(context) : _buildTitleBar(context);
+  }
+
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
     ///右边排列的按钮组件，最后一个是下拉按钮组件
     var actions = <Widget>[];
 
     ///首先加上右边的排列组件
     if (rightWidget != null) {
-      actions.add(rightWidget);
+      actions.add(rightWidget!);
     }
-    if (rightWidgets != null && rightWidgets.isNotEmpty) {
-      actions.addAll(rightWidgets);
+    if (rightWidgets != null && rightWidgets!.isNotEmpty) {
+      actions.addAll(rightWidgets!);
     }
 
     ///然后加上右边的下拉组件
-    var action = popMenuButton(
-      foregroundColor: foregroundColor,
-      rightPopupMenus: rightPopupMenus,
-    );
+    var action = _buildPopMenuButton(context);
     if (action != null) {
       actions.add(action);
     }
 
+    Widget? leading = leadingWidget;
+
     ///左边的回退按钮
     if (withLeading) {
-      leadingWidget ??= backButton(
-          context: context,
-          foregroundColor: foregroundColor,
-          leadingCallBack: leadingCallBack);
+      leading ??= _buildBackButton(context);
     }
-    backgroundColor ??= myself.primary;
-    foregroundColor ??= Colors.white;
-    PreferredSizeWidget appBar = AppBar(
+    AppBar appBar = AppBar(
       title: title,
       centerTitle: centerTitle,
       titleSpacing: leadingWidget != null ? 0.0 : null,
-      leading: leadingWidget,
+      leading: leading,
       actions: actions,
       automaticallyImplyLeading: false,
       toolbarHeight: toolbarHeight,
       elevation: elevation,
-      backgroundColor: backgroundColor,
-      foregroundColor: foregroundColor,
+      backgroundColor: backgroundColor ?? myself.primary,
+      foregroundColor: foregroundColor ?? Colors.white,
       bottom: bottom,
     );
+    // _preferredSize = appBar.preferredSize;
+
     return appBar;
   }
 
-  static Widget buildTitleBar({
-    Color? backgroundColor,
-    Color? foregroundColor,
-    Widget? title = const CommonAutoSizeText(
-      '',
-      style: TextStyle(color: Colors.white),
-    ),
-    bool centerTitle = false, //标题是否居中
-    List<Widget>? rightWidgets, //右边的排列组件（按钮）
-    List<AppBarPopupMenu>? rightPopupMenus,
-  }) {
-    backgroundColor = backgroundColor ?? myself.primary;
-    foregroundColor ??= Colors.white;
+  Widget _buildTitleBar(BuildContext context) {
+    List<Widget> children = [];
     var actions = <Widget>[const Spacer()];
-    if (rightWidgets != null && rightWidgets.isNotEmpty) {
-      actions.addAll(rightWidgets);
+    if (rightWidget != null) {
+      actions.add(rightWidget!);
     }
-    var action = popMenuButton(
-      foregroundColor: foregroundColor,
-      rightPopupMenus: rightPopupMenus,
-    );
-    if (action != null) {
-      actions.add(action);
+    if (rightWidgets != null && rightWidgets!.isNotEmpty) {
+      actions.addAll(rightWidgets!);
+    }
+    Widget? leading = leadingWidget;
+
+    ///左边的回退按钮
+    if (withLeading) {
+      leading ??= _buildBackButton(context);
+    }
+    if (leading != null) {
+      if (centerTitle || title == null) {
+        children.add(Row(
+          children: [leading, ...actions],
+        ));
+      } else {
+        children.add(Row(
+          children: [leading, title!, ...actions],
+        ));
+      }
+    } else {
+      if (!centerTitle && title != null) {
+        children.add(Row(
+          children: [title!, ...actions],
+        ));
+      }
+    }
+    if (centerTitle && title != null) {
+      children.add(Align(alignment: Alignment.center, child: title!));
     }
     return Container(
       padding: const EdgeInsets.all(10),
-      color: backgroundColor,
+      color: backgroundColor ?? myself.primary,
       child: Stack(
-        children: <Widget>[
-          Align(
-              alignment: centerTitle ? Alignment.center : Alignment.centerLeft,
-              child: title!),
-          Align(alignment: Alignment.topRight, child: Row(children: actions)),
-        ],
+        children: children,
       ),
     );
   }
 
-  static Widget? backButton({
-    BuildContext? context,
-    final Function? leadingCallBack,
-    Color? foregroundColor,
-  }) {
-    context = context ?? appDataProvider.context!;
+  Widget? _buildBackButton(BuildContext context) {
     Widget? leadingButton = IconButton(
       tooltip: AppLocalizations.t('Back'),
       icon: Icon(Icons.arrow_back_ios_new, color: foregroundColor),
       onPressed: () async {
         if (leadingCallBack != null) {
-          await leadingCallBack();
+          await leadingCallBack!();
         }
         indexWidgetProvider.pop(context: context);
       },
@@ -136,19 +154,15 @@ class AppBarWidget {
     return leadingButton;
   }
 
-  static PopupMenuButton<int>? popMenuButton({
-    Color? foregroundColor,
-    List<AppBarPopupMenu>? rightPopupMenus,
-  }) {
+  PopupMenuButton<int>? _buildPopMenuButton(BuildContext context) {
     PopupMenuButton<int>? popMenuButton;
-    // foregroundColor ??= Colors.white;
 
     ///左右边的下拉按钮
-    if (rightPopupMenus != null && rightPopupMenus.isNotEmpty) {
+    if (rightPopupMenus != null && rightPopupMenus!.isNotEmpty) {
       List<PopupMenuItem<int>> items = [];
       List<void Function()?> onPressed = [];
       int i = 0;
-      for (var rightAction in rightPopupMenus) {
+      for (var rightAction in rightPopupMenus!) {
         PopupMenuItem<int> item;
         Widget? iconWidget = rightAction.icon;
         String text = rightAction.title ?? '';
@@ -193,4 +207,7 @@ class AppBarWidget {
 
     return popMenuButton;
   }
+
+  @override
+  Size get preferredSize => _preferredSize;
 }

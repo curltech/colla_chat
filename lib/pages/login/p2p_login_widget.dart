@@ -153,8 +153,7 @@ class P2pLoginWidget extends StatelessWidget {
   Widget _buildMyselfPeers(BuildContext context) {
     return Dialog(
         child: Column(children: [
-      AppBarWidget.buildAppBar(
-        context: context,
+      AppBarWidget(
         title: CommonAutoSizeText(AppLocalizations.t('Select login peer')),
       ),
       const SizedBox(
