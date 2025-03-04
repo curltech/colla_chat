@@ -1,4 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -47,7 +48,8 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       this.centerTitle = false,
       this.isAppBar = true});
 
-  Size _preferredSize = Size(0, 0);
+  late final Size _preferredSize =
+      Size(0, toolbarHeight ?? appDataProvider.toolbarHeight);
 
   @override
   Widget build(BuildContext context) {
