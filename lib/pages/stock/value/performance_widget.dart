@@ -67,6 +67,9 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Performance';
 
+  @override
+  String? get information => null;
+
   late final List<PlatformDataColumn> performanceDataColumns = [
     PlatformDataColumn(
       label: '股票名',

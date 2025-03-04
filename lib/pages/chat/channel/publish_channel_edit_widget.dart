@@ -33,6 +33,9 @@ class PublishChannelEditWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'Publish Channel Edit';
+
+  @override
+  String? get information => null;
 }
 
 class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {

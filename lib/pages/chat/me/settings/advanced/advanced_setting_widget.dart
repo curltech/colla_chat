@@ -46,6 +46,9 @@ class AdvancedSettingWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Advanced Setting';
 
+  @override
+  String? get information => null;
+
   Widget _buildSettingWidget(BuildContext context) {
     Widget child = DataListView(
       itemCount: advancedSettingTileData.length,

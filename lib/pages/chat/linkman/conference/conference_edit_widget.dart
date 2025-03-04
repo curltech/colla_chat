@@ -47,6 +47,9 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
   String get title => 'Conference edit';
 
   @override
+  String? get information => null;
+
+  @override
   bool get withLeading => true;
 
   final List<PlatformDataField> conferenceDataField = [

@@ -31,6 +31,9 @@ class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'SherpaInstall';
 
+  @override
+  String? get information => null;
+
   final ValueNotifier<bool> sherpaPresent = ValueNotifier<bool>(false);
   final ValueNotifier<DownloadProgress> downloadProgress =
       ValueNotifier<DownloadProgress>(DownloadProgress(

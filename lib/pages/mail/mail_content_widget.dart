@@ -46,6 +46,9 @@ class MailContentWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'MailContent';
 
+  @override
+  String? get information => null;
+
   // late final PlatformWebView? platformWebView;
   final PlatformWebViewController platformWebViewController =
       PlatformWebViewController();

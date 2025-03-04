@@ -35,6 +35,9 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
   String get title => 'VideoEditor';
 
   @override
+  String? get information => null;
+
+  @override
   bool get withLeading => true;
 
   ///视频文件拆分成图像文件

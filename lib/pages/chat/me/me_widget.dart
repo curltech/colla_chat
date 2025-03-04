@@ -52,6 +52,9 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Me';
 
+  @override
+  String? get information => null;
+
   List<TileData> _buildMeTileData(BuildContext context) {
     final bool developerSwitch = myself.peerProfile.developerSwitch;
     List<TileDataMixin> mixins = [

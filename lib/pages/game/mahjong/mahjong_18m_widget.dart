@@ -40,6 +40,9 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Mahjong 18m';
 
+  @override
+  String? get information => null;
+
   final RxBool fullscreen = false.obs;
 
   final TextEditingController textEditingController = TextEditingController();

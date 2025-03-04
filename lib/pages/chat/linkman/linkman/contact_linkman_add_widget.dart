@@ -51,6 +51,9 @@ class ContactLinkmanAddWidget extends StatelessWidget with TileDataMixin {
   String get title => 'Contact add linkman';
 
   @override
+  String? get information => null;
+
+  @override
   bool get withLeading => true;
 
   TextEditingController textEditingController = TextEditingController();

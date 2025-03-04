@@ -23,6 +23,9 @@ class GeneralSettingWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'General Setting';
 
+  @override
+  String? get information => null;
+
   Widget _buildSettingWidget(BuildContext context) {
     return ListenableBuilder(
       listenable: appDataProvider,

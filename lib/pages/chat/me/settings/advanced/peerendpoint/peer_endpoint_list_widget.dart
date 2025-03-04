@@ -61,6 +61,9 @@ class PeerEndpointListWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'PeerEndpoint';
 
+  @override
+  String? get information => null;
+
   var red = const Icon(
     Icons.light_mode,
     color: Colors.red,

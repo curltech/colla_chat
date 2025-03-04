@@ -78,6 +78,9 @@ class ChatMessageView extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'ChatMessage';
+
+  @override
+  String? get information => null;
 }
 
 class _ChatMessageViewState extends State<ChatMessageView>

@@ -22,6 +22,9 @@ class MyselfPeerListWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'MyselfPeer';
 
+  @override
+  String? get information => null;
+
   List<TileData> _buildMyselfPeerTileData() {
     List<TileData> tiles = [];
     List<MyselfPeer> myselfPeers = myselfPeerController.data;

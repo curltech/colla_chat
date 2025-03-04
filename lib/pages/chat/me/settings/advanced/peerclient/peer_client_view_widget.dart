@@ -23,6 +23,9 @@ class PeerClientViewWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'PeerClientView';
 
+  @override
+  String? get information => null;
+
   Widget _buildValueListView(BuildContext context) {
     Map<String, dynamic> values = {};
     PeerClient? currentPeerClient = peerClientController.current;

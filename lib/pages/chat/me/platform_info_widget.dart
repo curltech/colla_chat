@@ -23,6 +23,9 @@ class PlatformInfoWidget extends StatelessWidget with TileDataMixin {
   String get title => 'Platform Information';
 
   @override
+  String? get information => null;
+
+  @override
   Widget build(BuildContext context) {
     final List<TileData> platformInfoTileData = [
       TileData(

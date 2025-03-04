@@ -32,6 +32,9 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'DataSourceEdit';
 
+  @override
+  String? get information => null;
+
   final RxString sourceType = SourceType.sqlite.name.obs;
 
   List<PlatformDataField> buildDataSourceDataFields() {

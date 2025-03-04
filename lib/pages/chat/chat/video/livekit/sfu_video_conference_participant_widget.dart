@@ -33,6 +33,9 @@ class SfuVideoConferenceParticipantWidget extends StatelessWidget
   @override
   String get title => 'Sfu video conference participant';
 
+  @override
+  String? get information => null;
+
   List<TileData> _buildRemoteParticipantTileData(BuildContext context) {
     LiveKitConferenceClient? liveKitConferenceClient =
         liveKitConferenceClientPool.conferenceClient;

@@ -38,6 +38,9 @@ class AutoDiscoverWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'MailAddressAutoDiscover';
 
+  @override
+  String? get information => null;
+
   late final FormInputController formInputController;
 
   Rx<EmailServiceProvider?> emailServiceProvider =

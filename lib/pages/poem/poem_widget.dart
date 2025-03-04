@@ -43,6 +43,9 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Poem';
 
+  @override
+  String? get information => null;
+
   final List<PlatformDataField> searchDataField = [
     PlatformDataField(
         name: 'title',

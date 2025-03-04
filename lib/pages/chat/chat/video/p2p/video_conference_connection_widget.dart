@@ -31,6 +31,9 @@ class VideoConferenceConnectionWidget extends StatelessWidget
   @override
   String get title => 'Video conference connection';
 
+  @override
+  String? get information => null;
+
   Future<List<TileData>> _buildConnectionTileData(BuildContext context) async {
     P2pConferenceClient? p2pConferenceClient =
         p2pConferenceClientPool.conferenceClient;

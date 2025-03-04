@@ -33,6 +33,9 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'MethodEdit';
 
+  @override
+  String? get information => null;
+
   final Rx<List<Method>?> methods = Rx<List<Method>?>(null);
 
   final Rx<Method?> method = Rx<Method?>(null);

@@ -33,6 +33,9 @@ class LinkmanWebrtcConnectionWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Linkman webrtc connection';
 
+  @override
+  String? get information => null;
+
   final ValueNotifier<List<TileData>> tileData =
       ValueNotifier<List<TileData>>([]);
 

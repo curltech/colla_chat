@@ -29,6 +29,9 @@ class LocalMediaStreamWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'LocalMediaStream';
 
+  @override
+  String? get information => null;
+
   LocalMediaStreamWidget({super.key}) {
     videoRenderer.initialize();
     MediaStreamUtil.enumerateDevices()

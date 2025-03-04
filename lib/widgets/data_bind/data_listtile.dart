@@ -21,6 +21,7 @@ class TileData {
   final String? subtitle;
   final dynamic suffix;
   final String? routeName;
+  final String? information;
 
   //是否缩小
   bool dense;
@@ -42,6 +43,7 @@ class TileData {
       this.titleTail,
       this.suffix,
       this.routeName,
+      this.information,
       this.dense = true,
       this.selected = false,
       this.isThreeLine = false,
@@ -52,6 +54,7 @@ class TileData {
     return TileData(
         title: AppLocalizations.t(mixin.title),
         routeName: mixin.routeName,
+        information: mixin.information,
         dense: dense,
         prefix: mixin.iconData);
   }
@@ -100,6 +103,13 @@ class TileData {
           leading = Icon(prefix, color: myself.primary);
         }
       }
+    }
+    if (information != null) {
+      leading ??= Icon(Icons.info_outline_rounded, color: Colors.white);
+      leading = Tooltip(
+        message: information,
+        child: leading,
+      );
     }
 
     return leading;

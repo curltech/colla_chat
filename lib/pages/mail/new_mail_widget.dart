@@ -67,6 +67,9 @@ class NewMailWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'New mail';
 
+  @override
+  String? get information => null;
+
   //已经选择的收件人
   final RxList<String> receipts = RxList([]);
 

@@ -29,6 +29,9 @@ class PoemContentWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Poem content';
 
+  @override
+  String? get information => null;
+
   PlatformTextToSpeechWidget platformTextToSpeechWidget =
       PlatformTextToSpeechWidget();
 

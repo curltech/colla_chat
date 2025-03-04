@@ -21,6 +21,9 @@ class NfcLinkmanAddWidget extends StatefulWidget with TileDataMixin {
   String get title => 'Nfc add linkman';
 
   @override
+  String? get information => null;
+
+  @override
   bool get withLeading => true;
 
   @override

@@ -46,6 +46,9 @@ class PasswordWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Password';
 
+  @override
+  String? get information => null;
+
   final FormInputController controller =
       FormInputController(passwordInputFieldDef);
 

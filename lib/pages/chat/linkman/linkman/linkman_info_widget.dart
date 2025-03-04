@@ -26,6 +26,9 @@ class LinkmanInfoWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'Linkman Information';
+
+  @override
+  String? get information => null;
 }
 
 class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget>

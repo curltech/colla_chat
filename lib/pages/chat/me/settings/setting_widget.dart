@@ -42,6 +42,9 @@ class SettingWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Setting';
 
+  @override
+  String? get information => null;
+
   //登录状态，null表示登录成功，否则表示登录失败原因，初始化的为init表示未开始登录
   ValueNotifier<String?> loginStatus = ValueNotifier<String?>('init');
 

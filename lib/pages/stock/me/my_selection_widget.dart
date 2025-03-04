@@ -215,6 +215,9 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'MySelection';
 
+  @override
+  String? get information => null;
+
   final DataListController<DayLine> dayLineController =
       DataListController<DayLine>();
 

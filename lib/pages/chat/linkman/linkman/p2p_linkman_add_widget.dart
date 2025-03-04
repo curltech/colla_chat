@@ -37,6 +37,9 @@ class P2pLinkmanAddWidget extends StatelessWidget with TileDataMixin {
   String get title => 'P2p add linkman';
 
   @override
+  String? get information => null;
+
+  @override
   bool get withLeading => true;
 
   TextEditingController controller = TextEditingController();

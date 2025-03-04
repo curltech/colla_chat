@@ -26,6 +26,9 @@ class LiveKitSfuParticipantWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'SfuParticipant';
 
+  @override
+  String? get information => null;
+
   final RxList<TileData> tileData = <TileData>[].obs;
 
   _init() async {

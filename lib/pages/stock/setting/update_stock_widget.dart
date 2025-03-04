@@ -25,6 +25,9 @@ class UpdateStockWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'UpdateStock';
 
+  @override
+  String? get information => null;
+
   final TextEditingController _startDateTextController =
       TextEditingController();
   final TextEditingController _tsCodeTextController = TextEditingController();

@@ -29,6 +29,9 @@ class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Video conference track';
 
+  @override
+  String? get information => null;
+
   Future<List<TileData>> _buildTrackSenderTileData(BuildContext context) async {
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionNotifier.value;

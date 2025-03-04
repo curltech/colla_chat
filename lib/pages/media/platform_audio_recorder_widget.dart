@@ -41,6 +41,9 @@ class PlatformAudioRecorderWidget extends StatefulWidget with TileDataMixin {
 
   @override
   bool get withLeading => true;
+
+  @override
+  String? get information => null;
 }
 
 class _PlatformAudioRecorderWidgetState

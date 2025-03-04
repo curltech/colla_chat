@@ -27,6 +27,9 @@ class PeerEndpointViewWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'PeerEndpointView';
 
+  @override
+  String? get information => null;
+
   Widget _buildValueListView(BuildContext context) {
     return Obx(() {
       Map<String, dynamic> values = {};

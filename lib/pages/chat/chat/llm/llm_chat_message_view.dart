@@ -64,6 +64,9 @@ class LlmChatMessageView extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'LlmChatMessage';
 
+  @override
+  String? get information => null;
+
   double visibleFraction = 0.0;
   NoScreenshot? noScreenshot;
   ScreenshotCallback? screenshotCallback;

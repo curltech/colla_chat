@@ -22,6 +22,9 @@ class MyselfQrcodeWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Myself Qrcode';
 
+  @override
+  String? get information => null;
+
   String? content;
 
   @override

@@ -48,6 +48,9 @@ class SfuVideoChatWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'SfuVideoChat';
+
+  @override
+  String? get information => null;
 }
 
 class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {

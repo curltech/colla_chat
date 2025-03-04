@@ -102,6 +102,9 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
   String get title => 'Conference show';
 
   @override
+  String? get information => null;
+
+  @override
   bool get withLeading => true;
 
   //当会议改变后，更新数据，局部刷新

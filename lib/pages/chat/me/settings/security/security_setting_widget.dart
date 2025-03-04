@@ -64,6 +64,9 @@ class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Security Setting';
 
+  @override
+  String? get information => null;
+
   Widget _buildBackupTileWidget(BuildContext context) {
     List<TileData> tiles = [
       TileData(title: 'Vacuum', prefix: Icons.compress_outlined),

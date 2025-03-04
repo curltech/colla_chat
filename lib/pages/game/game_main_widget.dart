@@ -29,6 +29,9 @@ class GameMainWidget extends StatelessWidget with TileDataMixin {
   String get title => 'Game';
 
   @override
+  String? get information => null;
+
+  @override
   Widget build(BuildContext context) {
     final List<TileData> gameTileData = TileData.from([
       mahjong18mWidget,

@@ -64,6 +64,9 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'StatScore';
 
+  @override
+  String? get information => null;
+
   late final List<PlatformDataField> searchDataField;
   late final FormInputController searchController;
   final ExpansionTileController expansionTileController =

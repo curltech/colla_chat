@@ -32,6 +32,9 @@ class OpenVpnWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'OpenVPN';
+
+  @override
+  String? get information => null;
 }
 
 class _OpenVpnWidgetState extends State<OpenVpnWidget> {

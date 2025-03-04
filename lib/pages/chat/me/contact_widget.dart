@@ -24,6 +24,9 @@ class ContactWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Contact';
 
+  @override
+  String? get information => null;
+
   Future<List<Contact>?> loadContacts() async {
     try {
       await ContactUtil.requestPermission();

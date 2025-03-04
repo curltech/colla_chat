@@ -55,6 +55,9 @@ class MediaWidget extends StatelessWidget with TileDataMixin {
   String get title => 'Media';
 
   @override
+  String? get information => null;
+
+  @override
   Widget build(BuildContext context) {
     Widget media = DataListView(
       itemCount: mediaTileData.length,

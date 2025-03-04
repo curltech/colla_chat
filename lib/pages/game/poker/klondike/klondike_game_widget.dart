@@ -20,6 +20,9 @@ class KlondikeGameWidget extends StatelessWidget with TileDataMixin {
   String get title => 'Klondike';
 
   @override
+  String? get information => null;
+
+  @override
   Widget build(BuildContext context) {
     return AppBarView(
       title: title,

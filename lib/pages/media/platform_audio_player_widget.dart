@@ -28,6 +28,9 @@ class PlatformAudioPlayerWidget extends StatelessWidget with TileDataMixin {
   String get title => 'AudioPlayer';
 
   @override
+  String? get information => null;
+
+  @override
   bool get withLeading => true;
 
   List<Widget>? _buildRightWidgets() {

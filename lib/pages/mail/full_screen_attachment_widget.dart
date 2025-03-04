@@ -25,6 +25,9 @@ class FullScreenAttachmentWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'FullScreenAttachment';
 
+  @override
+  String? get information => null;
+
   Future<Widget> _buildFullScreenWidget(BuildContext context) async {
     MediaProvider? mediaProvider = attachmentMediaProvider.value;
     if (mediaProvider != null) {

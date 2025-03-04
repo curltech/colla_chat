@@ -35,6 +35,9 @@ class PeerClientListWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'PeerClient';
 
+  @override
+  String? get information => null;
+
   List<TileData> _buildPeerClientTileData() {
     List<PeerClient> peerClients = peerClientController.data.value;
     List<TileData> tiles = [];

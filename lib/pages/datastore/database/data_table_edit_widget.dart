@@ -42,6 +42,9 @@ class DataTableEditWidget extends StatefulWidget with TileDataMixin {
   @override
   String get title => 'DataTableEdit';
 
+  @override
+  String? get information => null;
+
   DataTableEditWidget({super.key}) {
     _buildDataColumns();
     _buildDataIndexes();

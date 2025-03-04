@@ -50,6 +50,9 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Mail';
 
+  @override
+  String? get information => null;
+
   final RxInt index = 0.obs;
   final SwiperController swiperController = SwiperController();
 

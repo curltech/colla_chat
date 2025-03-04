@@ -60,6 +60,9 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'EventFilter';
 
+  @override
+  String? get information => null;
+
   final List<PlatformDataField> eventFilterDataField = [
     PlatformDataField(
         name: 'id',

@@ -27,6 +27,9 @@ class DruleEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'DruleEdit';
 
+  @override
+  String? get information => null;
+
   DruleEditWidget({super.key});
 
   final List<PlatformDataField> druleDataFields = [

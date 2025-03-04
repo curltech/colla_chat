@@ -20,6 +20,9 @@ class PlatformWebViewWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'WebView';
 
+  @override
+  String? get information => null;
+
   late final urlTextController = TextEditingController(text: initialUrl);
 
   PlatformWebViewController platformWebViewController =

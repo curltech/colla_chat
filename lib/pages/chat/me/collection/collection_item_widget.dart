@@ -25,6 +25,9 @@ class CollectionItemWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Collection Item';
 
+  @override
+  String? get information => null;
+
   SwiperController swiperController = SwiperController();
 
   Future<Widget> _buildMessageWidget(BuildContext context, int index) async {

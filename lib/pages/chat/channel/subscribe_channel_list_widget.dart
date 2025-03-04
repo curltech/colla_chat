@@ -61,6 +61,9 @@ class SubscribeChannelListWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'Channel';
+
+  @override
+  String? get information => null;
 }
 
 class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>

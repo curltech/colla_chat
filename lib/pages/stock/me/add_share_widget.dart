@@ -28,6 +28,9 @@ class AddShareWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'AddShare';
 
+  @override
+  String? get information => null;
+
   final TextEditingController searchTextController = TextEditingController();
 
   /// 增加自选股的查询结果

@@ -20,6 +20,9 @@ class PlatformVideoPlayerWidget extends StatelessWidget with TileDataMixin {
   String get title => 'VideoPlayer';
 
   @override
+  String? get information => null;
+
+  @override
   bool get withLeading => true;
 
   PlatformVideoPlayerWidget({

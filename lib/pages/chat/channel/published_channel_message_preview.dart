@@ -28,6 +28,9 @@ class PublishedChannelMessagePreview extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'PublishedChannelMessagePreview';
+
+  @override
+  String? get information => null;
 }
 
 class _PublishedChannelMessagePreviewState

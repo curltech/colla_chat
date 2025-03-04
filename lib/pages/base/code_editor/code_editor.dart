@@ -27,6 +27,9 @@ class CodeEditorWidget extends StatelessWidget with TileDataMixin {
   String get title => 'Code editor';
 
   @override
+  String? get information => null;
+
+  @override
   Widget build(BuildContext context) {
     return AppBarView(
       title: title,

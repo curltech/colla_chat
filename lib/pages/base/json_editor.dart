@@ -22,6 +22,9 @@ class JsonEditorWidget extends StatelessWidget with TileDataMixin {
   String get title => 'Json editor';
 
   @override
+  String? get information => null;
+
+  @override
   Widget build(BuildContext context) {
     return AppBarView(
       title: title,

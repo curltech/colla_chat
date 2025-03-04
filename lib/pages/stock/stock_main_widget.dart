@@ -53,6 +53,9 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
   String get title => 'Stock';
 
   @override
+  String? get information => null;
+
+  @override
   Widget build(BuildContext context) {
     Map<TileData, List<TileData>> tileData = {};
     final List<TileData> meTileData = TileData.from([

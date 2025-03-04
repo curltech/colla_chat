@@ -12,4 +12,6 @@ mixin TileDataMixin on Widget {
 
   //界面上是否有前导回退按钮
   bool get withLeading;
+
+  String? get information;
 }

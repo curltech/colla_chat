@@ -26,6 +26,9 @@ class PeerClientEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'PeerClientEdit';
 
+  @override
+  String? get information => null;
+
   final List<PlatformDataField> peerClientColumnField = [
     PlatformDataField(
         name: 'id',

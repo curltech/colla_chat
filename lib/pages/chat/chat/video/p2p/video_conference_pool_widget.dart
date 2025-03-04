@@ -33,6 +33,9 @@ class VideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Video conference pool';
 
+  @override
+  String? get information => null;
+
   List<TileData> _buildConferenceTileData(BuildContext context) {
     List<P2pConferenceClient> p2pConferenceClients =
         p2pConferenceClientPool.conferenceClients;

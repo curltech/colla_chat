@@ -47,6 +47,9 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'NodeEdit';
 
+  @override
+  String? get information => null;
+
   ModelNode? get modelNode {
     return modelProjectController.selectedSrcModelNode.value;
   }

@@ -27,6 +27,9 @@ class LiveKitSfuRoomWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'SfuRoom';
 
+  @override
+  String? get information => null;
+
   final Rx<List<TileData>> tileData = Rx<List<TileData>>([]);
 
   _init() async {

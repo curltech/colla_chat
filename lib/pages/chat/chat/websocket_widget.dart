@@ -20,6 +20,9 @@ class WebSocketWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'WebSocket';
 
+  @override
+  String? get information => null;
+
   List<TileData> _buildMeTileData(BuildContext context) {
     return [];
   }

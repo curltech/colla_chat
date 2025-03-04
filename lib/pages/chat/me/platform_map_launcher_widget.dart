@@ -32,6 +32,9 @@ class PlatformMapLauncherWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'MapLauncher';
 
+  @override
+  String? get information => null;
+
   _init() async {
     try {
       maps.value = await GeolocatorUtil.installedMaps();

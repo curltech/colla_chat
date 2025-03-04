@@ -30,6 +30,9 @@ class ManualAddWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'MailAddressManualAdd';
 
+  @override
+  String? get information => null;
+
   late final FormInputController formInputController =
       FormInputController(_getManualDiscoveryColumnField());
 

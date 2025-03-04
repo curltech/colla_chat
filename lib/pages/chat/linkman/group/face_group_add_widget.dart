@@ -51,6 +51,9 @@ class FaceGroupAddWidget extends StatelessWidget with TileDataMixin {
   String get title => 'Face add group';
 
   @override
+  String? get information => null;
+
+  @override
   bool get withLeading => true;
 
   TextEditingController textEditingController = TextEditingController();

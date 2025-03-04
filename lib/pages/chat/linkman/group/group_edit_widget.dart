@@ -45,6 +45,9 @@ class GroupEditWidget extends StatelessWidget with TileDataMixin {
   String get title => 'Group edit';
 
   @override
+  String? get information => null;
+
+  @override
   bool get withLeading => true;
 
   final List<PlatformDataField> groupDataFields = [

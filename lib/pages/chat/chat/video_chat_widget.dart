@@ -119,6 +119,9 @@ class VideoChatWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'VideoChat';
+
+  @override
+  String? get information => null;
 }
 
 class _VideoChatWidgetState extends State<VideoChatWidget> {

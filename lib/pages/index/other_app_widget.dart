@@ -76,6 +76,9 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Apps';
 
+  @override
+  String? get information => null;
+
   late final RxString name = routeName.obs;
 
   Widget _buildOtherAppTileData(BuildContext context) {

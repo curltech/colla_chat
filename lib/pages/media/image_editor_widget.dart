@@ -28,6 +28,9 @@ class ImageEditorWidget extends StatelessWidget with TileDataMixin {
   String get title => 'ImageEditor';
 
   @override
+  String? get information => null;
+
+  @override
   bool get withLeading => true;
 
   _buildImageEditor(BuildContext context) {

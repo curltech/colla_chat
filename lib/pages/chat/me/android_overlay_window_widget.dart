@@ -29,6 +29,9 @@ class AndroidOverlayWindowWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Android overlay window';
 
+  @override
+  String? get information => null;
+
   void init() {
     if (homePort != null) return;
     final res = IsolateNameServer.registerPortWithName(

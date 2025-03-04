@@ -150,6 +150,9 @@ class PeerProfileEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Privacy Setting';
 
+  @override
+  String? get information => null;
+
   final FormInputController controller =
       FormInputController(peerProfileDataFields);
 

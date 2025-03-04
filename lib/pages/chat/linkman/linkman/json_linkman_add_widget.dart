@@ -27,6 +27,9 @@ class JsonLinkmanAddWidget extends StatefulWidget with TileDataMixin {
   String get title => 'Json add linkman';
 
   @override
+  String? get information => null;
+
+  @override
   bool get withLeading => true;
 
   @override

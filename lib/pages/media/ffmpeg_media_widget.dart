@@ -46,6 +46,9 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
   String get title => 'FFMpegMedia';
 
   @override
+  String? get information => null;
+
+  @override
   bool get withLeading => true;
 
   final FileType fileType = FileType.custom;

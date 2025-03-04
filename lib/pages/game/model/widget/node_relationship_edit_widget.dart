@@ -25,6 +25,9 @@ class NodeRelationshipEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'RelationshipEdit';
 
+  @override
+  String? get information => null;
+
   NodeRelationshipEditWidget({super.key});
 
   NodeRelationship? get nodeRelationship {

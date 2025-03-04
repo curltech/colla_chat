@@ -37,6 +37,9 @@ class PersonalInfoWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Personal Information';
 
+  @override
+  String? get information => null;
+
   _buildPersonalInfo(BuildContext context) {
     personalInfoTileData.value = [
       TileData(

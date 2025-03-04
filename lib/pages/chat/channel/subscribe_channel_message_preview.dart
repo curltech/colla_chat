@@ -28,6 +28,9 @@ class SubscribeChannelMessagePreview extends StatelessWidget
   @override
   String get title => 'SubscribeChannelMessagePreview';
 
+  @override
+  String? get information => null;
+
   Future<String?> _buildHtml() async {
     ChatMessage? chatMessage = channelChatMessageController.current;
     if (chatMessage == null) {

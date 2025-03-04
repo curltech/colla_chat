@@ -32,6 +32,9 @@ class AnonymousConferenceEditWidget extends StatelessWidget with TileDataMixin {
   @override
   bool get withLeading => true;
 
+  @override
+  String? get information => null;
+
   final List<PlatformDataField> conferenceDataField = [
     PlatformDataField(
         name: 'id',

@@ -54,6 +54,9 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Modeller';
 
+  @override
+  String? get information => null;
+
   _selectSubject() async {
     Project? project = modelProjectController.project.value;
     if (project == null) {

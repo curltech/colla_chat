@@ -21,6 +21,9 @@ class JsonViewerWidget extends StatelessWidget with TileDataMixin {
   String get title => 'Json viewer';
 
   @override
+  String? get information => null;
+
+  @override
   Widget build(BuildContext context) {
     return AppBarView(
       title: title,

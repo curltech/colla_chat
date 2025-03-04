@@ -31,6 +31,9 @@ class DruleListWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Drules';
 
+  @override
+  String? get information => null;
+
   List<TileData> _buildDrulesTileData() {
     List<Drule> drules = drulesController.data.value;
     List<TileData> tiles = [];
