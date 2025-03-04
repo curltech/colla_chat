@@ -1,45 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-<dict>
-	<key>AppGroupId</key>
-	<string>$(CUSTOM_GROUP_ID)</string>
-	<key>CADisableMinimumFrameDurationOnPhone</key>
-	<true/>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>$(DEVELOPMENT_LANGUAGE)</string>
-	<key>CFBundleDisplayName</key>
-	<string>CollaChat</string>
-	<key>CFBundleExecutable</key>
-	<string>$(EXECUTABLE_NAME)</string>
-	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string>colla_chat</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>$(FLUTTER_BUILD_NAME)</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>ShareMedia-$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-			</array>
-		</dict>
-	</array>
-	<key>CFBundleVersion</key>
-	<string>1.7.0</string>
-	<key>LSRequiresIPhoneOS</key>
-	<true/>
-	<!--
+	<dict>
+		<key>AppGroupId</key>
+		<string>$(CUSTOM_GROUP_ID)</string>
+		<key>CADisableMinimumFrameDurationOnPhone</key>
+		<true/>
+		<key>CFBundleDevelopmentRegion</key>
+		<string>$(DEVELOPMENT_LANGUAGE)</string>
+		<key>CFBundleDisplayName</key>
+		<string>CollaChat</string>
+		<key>CFBundleExecutable</key>
+		<string>$(EXECUTABLE_NAME)</string>
+		<key>CFBundleIdentifier</key>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+		<key>CFBundleInfoDictionaryVersion</key>
+		<string>6.0</string>
+		<key>CFBundleName</key>
+		<string>colla_chat</string>
+		<key>CFBundlePackageType</key>
+		<string>APPL</string>
+		<key>CFBundleShortVersionString</key>
+		<string>$(FLUTTER_BUILD_NAME)</string>
+		<key>CFBundleSignature</key>
+		<string>????</string>
+		<key>CFBundleURLTypes</key>
+		<array>
+			<dict>
+				<key>CFBundleTypeRole</key>
+				<string>Editor</string>
+				<key>CFBundleURLSchemes</key>
+				<array>
+					<string>ShareMedia-$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+				</array>
+			</dict>
+		</array>
+		<key>CFBundleVersion</key>
+		<string>1.7.0</string>
+		<key>LSRequiresIPhoneOS</key>
+		<true/>
+		<!--
 	<key>NFCReaderUsageDescription</key>
 	<string>Add peer as friend by read NFC tags</string>
 	<key>com.apple.developer.nfc.readersession.felica.systemcodes</key>
@@ -55,128 +55,128 @@
         <string>nfc</string>
     </array>
 	 -->
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
+		<key>NSAppTransportSecurity</key>
+		<dict>
+			<key>NSAllowsArbitraryLoads</key>
+			<true/>
+		</dict>
+		<key>NSAppleMusicUsageDescription</key>
+		<string>Music!</string>
+		<key>NSBluetoothAlwaysUsageDescription</key>
+		<string>bluetooth</string>
+		<key>NSBluetoothPeripheralUsageDescription</key>
+		<string>bluetooth</string>
+		<key>NSBonjourServices</key>
+		<array>
+			<string>_{YOUR_SERVICE_TYPE}._tcp</string>
+		</array>
+		<key>NSCalendarsUsageDescription</key>
+		<string>Calendars</string>
+		<key>NSCameraUsageDescription</key>
+		<string>Need take photo using camera to send to other peer</string>
+		<key>NSContactsUsageDescription</key>
+		<string>Need find your contact mobile to search other peer</string>
+		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+		<string>Always and when in use!</string>
+		<key>NSLocationAlwaysUsageDescription</key>
+		<string>Can I have location always?</string>
+		<key>NSLocationUsageDescription</key>
+		<string>Need send your location to other peer</string>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>Need send your location to other peer</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>Need record your voice and send to other peer</string>
+		<key>NSMotionUsageDescription</key>
+		<string>motion</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>Select the photo from photo library and send them to other peers</string>
+		<key>NSPhotoLibraryAddUsageDescription</key>
+		<string>The photo which other peers send to this peer can be saved to photo library</string>
+		<key>NSRemindersUsageDescription</key>
+		<string>reminders</string>
+		<key>NSSpeechRecognitionUsageDescription</key>
+		<string>speech</string>
+		<key>RTCAppGroupIdentifier</key>
+		<string>group.io.curltech.colla</string>
+		<key>UIApplicationSupportsIndirectInputEvents</key>
+		<true/>
+		<key>UIBackgroundModes</key>
+		<array>
+			<string>audio</string>
+			<string>fetch</string>
+			<string>nearby-interaction</string>
+			<string>processing</string>
+			<string>push-to-talk</string>
+			<string>remote-notification</string>
+			<string>voip</string>
+		</array>
+		<key>UILaunchStoryboardName</key>
+		<string>LaunchScreen.storyboard</string>
+		<key>UIMainStoryboardFile</key>
+		<string>Main</string>
+		<key>UIRequiresFullScreen</key>
+		<true/>
+		<key>UIRequiresPersistentWiFi</key>
+		<true/>
+		<key>UIStatusBarHidden</key>
+		<false/>
+		<key>UIStatusBarStyle</key>
+		<string></string>
+		<key>UISupportedInterfaceOrientations</key>
+		<array>
+			<string>UIInterfaceOrientationPortrait</string>
+			<string>UIInterfaceOrientationPortraitUpsideDown</string>
+			<string>UIInterfaceOrientationLandscapeLeft</string>
+			<string>UIInterfaceOrientationLandscapeRight</string>
+		</array>
+		<key>UISupportedInterfaceOrientations~ipad</key>
+		<array>
+			<string>UIInterfaceOrientationPortrait</string>
+			<string>UIInterfaceOrientationPortraitUpsideDown</string>
+			<string>UIInterfaceOrientationLandscapeLeft</string>
+			<string>UIInterfaceOrientationLandscapeRight</string>
+		</array>
+		<key>UIViewControllerBasedStatusBarAppearance</key>
+		<false/>
+		<key>kTCCServiceMediaLibrary</key>
+		<string>media</string>
+		<key>NSAppTransportSecurity</key>
+		<dict>
+			<key>NSAllowsArbitraryLoads</key>
+			<true/>
+		</dict>
+		<key>BGTaskSchedulerPermittedIdentifiers</key>
+		<array>
+			<string>io.curltech.colla.task.identifier</string>
+		</array>
+		<key>LSSupportsOpeningDocumentsInPlace</key>
+		<true/>
+		<key>UIFileSharingEnabled</key>
+		<true/>
+		<key>LSApplicationQueriesSchemes</key>
+		<array>
+			<string>comgooglemaps</string>
+			<string>baidumap</string>
+			<string>iosamap</string>
+			<string>waze</string>
+			<string>yandexmaps</string>
+			<string>yandexnavi</string>
+			<string>citymapper</string>
+			<string>mapswithme</string>
+			<string>osmandmaps</string>
+			<string>dgis</string>
+			<string>qqmap</string>
+			<string>here-location</string>
+			<string>tomtomgo</string>
+			<string>copilot</string>
+			<string>com.sygic.aura</string>
+			<string>nmap</string>
+			<string>kakaomap</string>
+			<string>tmap</string>
+			<string>szn-mapy</string>
+			<string>mappls</string>
+		</array>
+		<key>io.flutter.embedded_views_preview</key>
 		<true/>
 	</dict>
-	<key>NSAppleMusicUsageDescription</key>
-	<string>Music!</string>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>bluetooth</string>
-	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>bluetooth</string>
-	<key>NSBonjourServices</key>
-	<array>
-		<string>_{YOUR_SERVICE_TYPE}._tcp</string>
-	</array>
-	<key>NSCalendarsUsageDescription</key>
-	<string>Calendars</string>
-	<key>NSCameraUsageDescription</key>
-	<string>Need take photo using camera to send to other peer</string>
-	<key>NSContactsUsageDescription</key>
-	<string>Need find your contact mobile to search other peer</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Always and when in use!</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Can I have location always?</string>
-	<key>NSLocationUsageDescription</key>
-	<string>Need send your location to other peer</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Need send your location to other peer</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Need record your voice and send to other peer</string>
-	<key>NSMotionUsageDescription</key>
-	<string>motion</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Select the photo from photo library and send them to other peers</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-    <string>The photo which other peers send to this peer can be saved to photo library</string>
-	<key>NSRemindersUsageDescription</key>
-	<string>reminders</string>
-	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>speech</string>
-	<key>RTCAppGroupIdentifier</key>
-	<string>group.io.curltech.colla</string>
-	<key>UIApplicationSupportsIndirectInputEvents</key>
-	<true/>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>audio</string>
-		<string>fetch</string>
-		<string>nearby-interaction</string>
-		<string>processing</string>
-		<string>push-to-talk</string>
-		<string>remote-notification</string>
-		<string>voip</string>
-	</array>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen.storyboard</string>
-	<key>UIMainStoryboardFile</key>
-	<string>Main</string>
-	<key>UIRequiresFullScreen</key>
-	<true/>
-	<key>UIRequiresPersistentWiFi</key>
-	<true/>
-	<key>UIStatusBarHidden</key>
-	<false/>
-	<key>UIStatusBarStyle</key>
-	<string></string>
-	<key>UISupportedInterfaceOrientations</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>UIViewControllerBasedStatusBarAppearance</key>
-	<false/>
-	<key>kTCCServiceMediaLibrary</key>
-	<string>media</string>
-	<key>NSAppTransportSecurity</key>
-    <dict>
-        <key>NSAllowsArbitraryLoads</key>
-        <true/>
-    </dict>
-    <key>BGTaskSchedulerPermittedIdentifiers</key>
-    <array>
-        <string>io.curltech.colla.task.identifier</string>
-    </array>
-    <key>LSSupportsOpeningDocumentsInPlace</key>
-    <true/>
-    <key>UIFileSharingEnabled</key>
-    <true/>
-    <key>LSApplicationQueriesSchemes</key>
-    <array>
-        <string>comgooglemaps</string>
-        <string>baidumap</string>
-        <string>iosamap</string>
-        <string>waze</string>
-        <string>yandexmaps</string>
-        <string>yandexnavi</string>
-        <string>citymapper</string>
-        <string>mapswithme</string>
-        <string>osmandmaps</string>
-        <string>dgis</string>
-        <string>qqmap</string>
-        <string>here-location</string>
-        <string>tomtomgo</string>
-        <string>copilot</string>
-        <string>com.sygic.aura</string>
-        <string>nmap</string>
-        <string>kakaomap</string>
-        <string>tmap</string>
-        <string>szn-mapy</string>
-        <string>mappls</string>
-    </array>
-    <key>io.flutter.embedded_views_preview</key>
-    <true/>
-</dict>
 </plist>

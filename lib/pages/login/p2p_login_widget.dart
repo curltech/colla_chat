@@ -75,6 +75,7 @@ class P2pLoginWidget extends StatelessWidget {
       name: 'password',
       label: 'Password',
       inputType: InputType.password,
+      cancel: true,
       prefixIcon: Icon(
         Icons.password,
         color: myself.primary,
