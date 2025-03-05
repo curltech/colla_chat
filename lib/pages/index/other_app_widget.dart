@@ -6,7 +6,7 @@ import 'package:colla_chat/pages/chat/me/platform_webview_widget.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_widget.dart';
 import 'package:colla_chat/pages/datastore/filesystem/file_system_widget.dart';
 import 'package:colla_chat/pages/datastore/filesystem/file_widget.dart';
-import 'package:colla_chat/pages/game/game_main_widget.dart';
+import 'package:colla_chat/pages/game/game_widget.dart';
 import 'package:colla_chat/pages/mail/mail_address_widget.dart';
 import 'package:colla_chat/pages/media/media_widget.dart';
 import 'package:colla_chat/pages/poem/poem_widget.dart';

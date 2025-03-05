@@ -706,7 +706,7 @@ class _IndexViewState extends State<IndexView>
               key: sliderDrawerKey,
               slideDirection: appDataProvider.landscape
                   ? SlideDirection.rightToLeft
-                  : SlideDirection.topToBottom,
+                  : SlideDirection.leftToRight,
               sliderOpenSize: appDataProvider.designSize.width,
               backgroundColor: Colors.white.withAlpha(0),
               appBar: Container(),

@@ -20,7 +20,7 @@ class GameMainWidget extends StatelessWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  String get routeName => 'game_main';
+  String get routeName => 'game';
 
   @override
   IconData get iconData => Icons.games_outlined;
