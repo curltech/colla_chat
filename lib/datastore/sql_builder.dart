@@ -38,7 +38,7 @@ class SqlBuilder {
     if (uniqueFields != null) {
       for (var uniqueField in uniqueFields) {
         query =
-            'CREATE UNIQUE INDEX IF NOT EXISTS ${tableName}_$uniqueField ON $tableName($uniqueField)';
+            'CREATE UNIQUE INDEX IF NOT EXISTS ${tableName}_${uniqueField}_uindex ON $tableName($uniqueField)';
         clauses.add(query);
       }
     }

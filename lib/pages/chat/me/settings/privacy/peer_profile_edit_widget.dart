@@ -11,6 +11,8 @@ import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../../plugin/talker_logger.dart';
+
 final List<PlatformDataField> peerProfileDataFields = [
   PlatformDataField(
       name: 'id',
@@ -186,10 +188,12 @@ class PeerProfileEditWidget extends StatelessWidget with TileDataMixin {
       myselfPeerProfile.logLevel = peerProfile.logLevel;
       try {
         await peerProfileService.store(myselfPeerProfile);
+        logger.i('myself peerProfile has stored successfully');
         DialogUtil.info(
-            content:
-                AppLocalizations.t('myself peerProfile has stored successfully'));
+            content: AppLocalizations.t(
+                'myself peerProfile has stored successfully'));
       } catch (e) {
+        logger.e('myself peerProfile has stored failure');
         DialogUtil.error(
             content:
                 AppLocalizations.t('myself peerProfile has stored failure'));
