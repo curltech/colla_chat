@@ -19,7 +19,9 @@ class EventFilterService extends GeneralBaseService<EventFilter> {
   EventFilterService(
       {required super.tableName,
       required super.fields,
-      required super.indexFields}) {
+      super.uniqueFields = const ['eventCode', 'eventName'],
+      super.indexFields,
+      super.encryptFields}) {
     post = (Map map) {
       return EventFilter.fromJson(map);
     };
@@ -27,6 +29,6 @@ class EventFilterService extends GeneralBaseService<EventFilter> {
 }
 
 final EventFilterService eventFilterService = EventFilterService(
-    tableName: 'stk_eventfilter',
-    fields: ServiceLocator.buildFields(EventFilter('', ''), []),
-    indexFields: ['eventCode', 'eventName']);
+  tableName: 'stk_eventfilter',
+  fields: ServiceLocator.buildFields(EventFilter('', ''), []),
+);

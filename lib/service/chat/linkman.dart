@@ -30,7 +30,16 @@ class LinkmanService extends PeerPartyService<Linkman> {
   LinkmanService(
       {required super.tableName,
       required super.fields,
-      required super.indexFields}) {
+      super.uniqueFields = const [
+        'peerId',
+      ],
+      super.indexFields = const [
+        'givenName',
+        'name',
+        'ownerPeerId',
+        'mobile',
+      ],
+      super.encryptFields}) {
     post = (Map map) {
       return Linkman.fromJson(map);
     };
@@ -357,11 +366,4 @@ class LinkmanService extends PeerPartyService<Linkman> {
 
 final linkmanService = LinkmanService(
     tableName: 'chat_linkman',
-    indexFields: [
-      'givenName',
-      'name',
-      'ownerPeerId',
-      'peerId',
-      'mobile',
-    ],
     fields: ServiceLocator.buildFields(Linkman('', ''), []));

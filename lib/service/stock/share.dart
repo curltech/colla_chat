@@ -45,7 +45,17 @@ class ShareService extends GeneralBaseService<Share> {
   ShareService(
       {required super.tableName,
       required super.fields,
-      required super.indexFields}) {
+      super.uniqueFields = const [
+        'tsCode',
+      ],
+      super.indexFields = const [
+        'symbol',
+        'name',
+        'area',
+        'industry',
+        'sector'
+      ],
+      super.encryptFields}) {
     post = (Map map) {
       return Share.fromJson(map);
     };
@@ -80,6 +90,6 @@ class ShareService extends GeneralBaseService<Share> {
 }
 
 final ShareService shareService = ShareService(
-    tableName: 'stk_share',
-    fields: ServiceLocator.buildFields(Share(), []),
-    indexFields: ['tsCode', 'symbol', 'name', 'area', 'industry', 'sector']);
+  tableName: 'stk_share',
+  fields: ServiceLocator.buildFields(Share(), []),
+);

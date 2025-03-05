@@ -21,7 +21,8 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
   MessageAttachmentService({
     required super.tableName,
     required super.fields,
-    required super.indexFields,
+    super.uniqueFields,
+    super.indexFields = const ['ownerPeerId', 'messageId', 'createDate'],
     super.encryptFields = const ['content'],
   }) {
     post = (Map map) {
@@ -226,5 +227,4 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
 
 final messageAttachmentService = MessageAttachmentService(
     tableName: "chat_messageattachment",
-    indexFields: ['ownerPeerId', 'messageId', 'createDate'],
     fields: ServiceLocator.buildFields(MessageAttachment(), []));

@@ -20,7 +20,9 @@ class PeerClientService extends PeerEntityService<PeerClient> {
   PeerClientService(
       {required super.tableName,
       required super.fields,
-      required super.indexFields}) {
+      super.uniqueFields,
+      super.indexFields = const ['peerId', 'name', 'mobile'],
+      super.encryptFields}) {
     post = (Map map) {
       return PeerClient.fromJson(map);
     };
@@ -198,5 +200,4 @@ class PeerClientService extends PeerEntityService<PeerClient> {
 
 final peerClientService = PeerClientService(
     tableName: "blc_peerclient",
-    indexFields: ['peerId', 'name', 'mobile'],
     fields: ServiceLocator.buildFields(PeerClient('', ''), []));

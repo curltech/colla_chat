@@ -12,7 +12,8 @@ class EmailAddressService extends GeneralBaseService<MailAddress> {
   EmailAddressService({
     required super.tableName,
     required super.fields,
-    required super.indexFields,
+    super.uniqueFields,
+    super.indexFields = const ['ownerPeerId', 'email', 'name'],
     super.encryptFields = const [
       'password',
     ],
@@ -168,5 +169,4 @@ class EmailAddressService extends GeneralBaseService<MailAddress> {
 
 final EmailAddressService mailAddressService = EmailAddressService(
     tableName: "chat_mailaddress",
-    indexFields: ['ownerPeerId', 'email', 'name'],
     fields: ServiceLocator.buildFields(MailAddress(name: '', email: '@'), []));

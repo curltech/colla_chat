@@ -6,7 +6,8 @@ class PeerEndpointService extends PeerEntityService<PeerEndpoint> {
   PeerEndpointService({
     required super.tableName,
     required super.fields,
-    required super.indexFields,
+    super.uniqueFields,
+    super.indexFields = const ['ownerPeerId', 'priority', 'address'],
     super.encryptFields = const [
       'uriKey',
       'uriSecret',
@@ -34,6 +35,6 @@ class PeerEndpointService extends PeerEntityService<PeerEndpoint> {
 }
 
 final peerEndpointService = PeerEndpointService(
-    tableName: "blc_peerendpoint",
-    fields: ServiceLocator.buildFields(PeerEndpoint(name: '', peerId: ''), []),
-    indexFields: ['ownerPeerId', 'priority', 'address']);
+  tableName: "blc_peerendpoint",
+  fields: ServiceLocator.buildFields(PeerEndpoint(name: '', peerId: ''), []),
+);

@@ -8,7 +8,15 @@ class EmailMessageService extends GeneralBaseService<MailMessage> {
   EmailMessageService({
     required super.tableName,
     required super.fields,
-    required super.indexFields,
+    super.uniqueFields,
+    super.indexFields = const [
+      'ownerPeerId',
+      'emailAddress',
+      'uid',
+      'mailboxName',
+      'senderPeerId',
+      'sendTime',
+    ],
     super.encryptFields = const [
       'content',
       'title',
@@ -143,12 +151,4 @@ class EmailMessageService extends GeneralBaseService<MailMessage> {
 
 final EmailMessageService mailMessageService = EmailMessageService(
     tableName: "chat_mailmessage",
-    indexFields: [
-      'ownerPeerId',
-      'emailAddress',
-      'uid',
-      'mailboxName',
-      'senderPeerId',
-      'sendTime',
-    ],
     fields: ServiceLocator.buildFields(MailMessage(), []));

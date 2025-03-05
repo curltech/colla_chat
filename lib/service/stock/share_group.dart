@@ -8,7 +8,9 @@ class ShareGroupService extends GeneralBaseService<ShareGroup> {
   ShareGroupService(
       {required super.tableName,
       required super.fields,
-      required super.indexFields}) {
+      super.uniqueFields,
+      super.indexFields = const ['subscription', 'groupName'],
+      super.encryptFields}) {
     post = (Map map) {
       return ShareGroup.fromJson(map);
     };
@@ -28,6 +30,6 @@ class ShareGroupService extends GeneralBaseService<ShareGroup> {
 }
 
 final ShareGroupService shareGroupService = ShareGroupService(
-    tableName: 'stk_sharegroup',
-    fields: ServiceLocator.buildFields(ShareGroup(''), []),
-    indexFields: ['subscription', 'groupName']);
+  tableName: 'stk_sharegroup',
+  fields: ServiceLocator.buildFields(ShareGroup(''), []),
+);

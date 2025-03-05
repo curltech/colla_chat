@@ -19,7 +19,7 @@ class SqlBuilder {
   /// @param {*} tableName
   /// @param {*} fields
   List<String> create(String tableName, List<String> fields,
-      [List<String>? indexFields]) {
+      {List<String>? uniqueFields, List<String>? indexFields}) {
     List<String> clauses = [];
     var query =
         'CREATE TABLE IF NOT EXISTS $tableName(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,';
@@ -35,10 +35,20 @@ class SqlBuilder {
     query = '$query)';
     clauses.add(query);
 
-    for (var indexField in indexFields!) {
-      query =
-          'CREATE INDEX IF NOT EXISTS ${tableName}_$indexField ON $tableName($indexField)';
-      clauses.add(query);
+    if (uniqueFields != null) {
+      for (var uniqueField in uniqueFields) {
+        query =
+            'CREATE UNIQUE INDEX IF NOT EXISTS ${tableName}_$uniqueField ON $tableName($uniqueField)';
+        clauses.add(query);
+      }
+    }
+
+    if (indexFields != null) {
+      for (var indexField in indexFields) {
+        query =
+            'CREATE INDEX IF NOT EXISTS ${tableName}_$indexField ON $tableName($indexField)';
+        clauses.add(query);
+      }
     }
 
     return clauses;

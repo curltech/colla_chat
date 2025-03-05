@@ -46,7 +46,17 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
   MyselfPeerService(
       {required super.tableName,
       required super.fields,
-      required super.indexFields}) {
+      super.uniqueFields,
+      super.indexFields = const [
+        'endDate',
+        'peerId',
+        'name',
+        'mobile',
+        'email',
+        'status',
+        'updateDate'
+      ],
+      super.encryptFields}) {
     post = (Map map) {
       return MyselfPeer.fromJson(map);
     };
@@ -507,13 +517,4 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
 
 final myselfPeerService = MyselfPeerService(
     tableName: "blc_myselfpeer",
-    indexFields: [
-      'endDate',
-      'peerId',
-      'name',
-      'mobile',
-      'email',
-      'status',
-      'updateDate'
-    ],
     fields: ServiceLocator.buildFields(MyselfPeer('', '', '', ''), []));

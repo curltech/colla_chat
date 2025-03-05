@@ -18,7 +18,13 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
   ChatSummaryService({
     required super.tableName,
     required super.fields,
-    required super.indexFields,
+    super.uniqueFields,
+    super.indexFields = const [
+      'ownerPeerId',
+      'peerId',
+      'partyType',
+      'sendReceiveTime'
+    ],
     super.encryptFields = const [
       'content',
       'thumbBody',
@@ -248,5 +254,4 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
 
 final chatSummaryService = ChatSummaryService(
     tableName: "chat_summary",
-    indexFields: ['ownerPeerId', 'peerId', 'partyType', 'sendReceiveTime'],
     fields: ServiceLocator.buildFields(ChatSummary(), []));

@@ -29,7 +29,19 @@ class GroupService extends PeerPartyService<Group> {
   GroupService(
       {required super.tableName,
       required super.fields,
-      required super.indexFields}) {
+      super.uniqueFields = const [
+        'peerId',
+      ],
+      super.indexFields = const [
+        'givenName',
+        'name',
+        'description',
+        'ownerPeerId',
+        'createDate',
+        'groupCategory',
+        'groupType'
+      ],
+      super.encryptFields}) {
     post = (Map map) {
       return Group.fromJson(map);
     };
@@ -553,23 +565,20 @@ class GroupService extends PeerPartyService<Group> {
 
 final groupService = GroupService(
     tableName: "chat_group",
-    indexFields: [
-      'givenName',
-      'name',
-      'description',
-      'ownerPeerId',
-      'createDate',
-      'peerId',
-      'groupCategory',
-      'groupType'
-    ],
     fields: ServiceLocator.buildFields(Group('', ''), []));
 
 class GroupMemberService extends GeneralBaseService<GroupMember> {
-  GroupMemberService(
-      {required super.tableName,
-      required super.fields,
-      required super.indexFields}) {
+  GroupMemberService({
+    required super.tableName,
+    required super.fields,
+    super.indexFields = const [
+      'ownerPeerId',
+      'createDate',
+      'groupId',
+      'memberPeerId',
+      'memberType'
+    ],
+  }) {
     post = (Map map) {
       return GroupMember.fromJson(map);
     };
@@ -647,11 +656,4 @@ class GroupMemberService extends GeneralBaseService<GroupMember> {
 
 final groupMemberService = GroupMemberService(
     tableName: "chat_groupmember",
-    indexFields: [
-      'ownerPeerId',
-      'createDate',
-      'groupId',
-      'memberPeerId',
-      'memberType'
-    ],
     fields: ServiceLocator.buildFields(GroupMember('', ''), []));

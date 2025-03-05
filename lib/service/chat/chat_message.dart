@@ -42,7 +42,17 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   ChatMessageService({
     required super.tableName,
     required super.fields,
-    required super.indexFields,
+    super.uniqueFields,
+    super.indexFields = const [
+      'ownerPeerId',
+      'transportType',
+      'messageId',
+      'messageType',
+      'subMessageType',
+      'receiverPeerId',
+      'senderPeerId',
+      'sendTime',
+    ],
     super.encryptFields = const [
       'content',
       'thumbBody',
@@ -53,10 +63,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     post = (Map map) {
       return ChatMessage.fromJson(map);
     };
-    // timer = Timer.periodic(const Duration(seconds: 60), (timer) async {
-    //   deleteTimeout();
-    //   deleteSystem();
-    // });
+// timer = Timer.periodic(const Duration(seconds: 60), (timer) async {
+//   deleteTimeout();
+//   deleteSystem();
+// });
   }
 
   ///查询消息号相同的所有消息
@@ -1241,23 +1251,20 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
 
 final ChatMessageService chatMessageService = ChatMessageService(
     tableName: "chat_message",
-    indexFields: [
-      'ownerPeerId',
-      'transportType',
-      'messageId',
-      'messageType',
-      'subMessageType',
-      'receiverPeerId',
-      'senderPeerId',
-      'sendTime',
-    ],
     fields: ServiceLocator.buildFields(ChatMessage(), []));
 
 class MergedMessageService extends GeneralBaseService<MergedMessage> {
-  MergedMessageService(
-      {required super.tableName,
-      required super.fields,
-      required super.indexFields}) {
+  MergedMessageService({
+    required super.tableName,
+    required super.fields,
+    super.uniqueFields,
+    super.indexFields = const [
+      'ownerPeerId',
+      'mergedMessageId',
+      'messageId',
+      'createDate'
+    ],
+  }) {
     post = (Map map) {
       return MergedMessage.fromJson(map);
     };
@@ -1266,14 +1273,22 @@ class MergedMessageService extends GeneralBaseService<MergedMessage> {
 
 final mergedMessageService = MergedMessageService(
     tableName: "chat_mergedmessage",
-    indexFields: ['ownerPeerId', 'mergedMessageId', 'messageId', 'createDate'],
     fields: ServiceLocator.buildFields(MergedMessage(), []));
 
 class ReceiveService extends GeneralBaseService<Receive> {
-  ReceiveService(
-      {required super.tableName,
-      required super.fields,
-      required super.indexFields}) {
+  ReceiveService({
+    required super.tableName,
+    required super.fields,
+    super.uniqueFields,
+    super.indexFields = const [
+      'ownerPeerId',
+      'targetPeerId',
+      'createDate',
+      'targetType',
+      'receiverPeerId',
+      'messageType',
+    ],
+  }) {
     post = (Map map) {
       return Receive.fromJson(map);
     };
@@ -1282,12 +1297,4 @@ class ReceiveService extends GeneralBaseService<Receive> {
 
 final receiveService = ReceiveService(
     tableName: "chat_receive",
-    indexFields: [
-      'ownerPeerId',
-      'targetPeerId',
-      'createDate',
-      'targetType',
-      'receiverPeerId',
-      'messageType',
-    ],
     fields: ServiceLocator.buildFields(Receive(), []));

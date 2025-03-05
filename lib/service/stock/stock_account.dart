@@ -8,7 +8,14 @@ class StockAccountService extends GeneralBaseService<StockAccount> {
   StockAccountService(
       {required super.tableName,
       required super.fields,
-      required super.indexFields}) {
+      super.uniqueFields,
+      super.indexFields = const [
+        'accountId',
+        'accountName',
+        'status',
+        'updateDate'
+      ],
+      super.encryptFields}) {
     post = (Map map) {
       return StockAccount.fromJson(map);
     };
@@ -45,6 +52,6 @@ class StockAccountService extends GeneralBaseService<StockAccount> {
 }
 
 final stockAccountService = StockAccountService(
-    tableName: 'stk_account',
-    fields: ServiceLocator.buildFields(StockAccount(), []),
-    indexFields: ['accountId', 'accountName', 'status', 'updateDate']);
+  tableName: 'stk_account',
+  fields: ServiceLocator.buildFields(StockAccount(), []),
+);

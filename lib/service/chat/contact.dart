@@ -10,7 +10,9 @@ class ContactService extends PeerPartyService<Contact> {
   ContactService(
       {required super.tableName,
       required super.fields,
-      required super.indexFields}) {
+      super.uniqueFields,
+      super.indexFields = const ['peerId', 'mobile', 'formattedName', 'name'],
+      super.encryptFields}) {
     post = (Map map) {
       return Contact.fromJson(map);
     };
@@ -111,5 +113,4 @@ class ContactService extends PeerPartyService<Contact> {
 
 final contactService = ContactService(
     tableName: "chat_contact",
-    indexFields: ['peerId', 'mobile', 'formattedName', 'name'],
     fields: ServiceLocator.buildFields(Contact('', ''), []));

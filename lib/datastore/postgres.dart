@@ -178,13 +178,15 @@ class Postgres extends DataStore {
   /// 建表和索引
   @override
   dynamic create(String tableName, List<String> fields,
-      {List<String>? indexFields, bool drop = false}) async {
+      {List<String>? uniqueFields,
+      List<String>? indexFields,
+      bool drop = false}) async {
     if (drop) {
       String clause = sql_builder.sqlBuilder.drop(tableName);
       await run(sql_builder.Sql(clause));
     }
-    List<String> clauses =
-        sql_builder.sqlBuilder.create(tableName, fields, indexFields);
+    List<String> clauses = sql_builder.sqlBuilder.create(tableName, fields,
+        uniqueFields: uniqueFields, indexFields: indexFields);
     for (var query in clauses) {
       await run(sql_builder.Sql(query));
     }

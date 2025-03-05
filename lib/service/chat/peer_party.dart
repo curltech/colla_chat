@@ -7,14 +7,17 @@ abstract class PeerPartyService<T> extends PeerEntityService<T> {
   PeerPartyService(
       {required super.tableName,
       required super.fields,
-      required super.indexFields});
+      super.uniqueFields,
+      super.indexFields,
+      super.encryptFields});
 }
 
 class TagService extends GeneralBaseService<Tag> {
-  TagService(
-      {required super.tableName,
-      required super.fields,
-      required super.indexFields}) {
+  TagService({
+    required super.tableName,
+    required super.fields,
+    super.indexFields = const ['ownerPeerId', 'createDate', 'tag'],
+  }) {
     post = (Map map) {
       return Tag.fromJson(map);
     };
@@ -22,15 +25,19 @@ class TagService extends GeneralBaseService<Tag> {
 }
 
 final tagService = TagService(
-    tableName: "chat_tag",
-    indexFields: ['ownerPeerId', 'createDate', 'tag'],
-    fields: ServiceLocator.buildFields(Tag(), []));
+    tableName: "chat_tag", fields: ServiceLocator.buildFields(Tag(), []));
 
 class PartyTagService extends GeneralBaseService<PartyTag> {
-  PartyTagService(
-      {required super.tableName,
-      required super.fields,
-      required super.indexFields}) {
+  PartyTagService({
+    required super.tableName,
+    required super.fields,
+    super.indexFields = const [
+      'ownerPeerId',
+      'createDate',
+      'tag',
+      'partyPeerId'
+    ],
+  }) {
     post = (Map map) {
       return PartyTag.fromJson(map);
     };
@@ -39,5 +46,4 @@ class PartyTagService extends GeneralBaseService<PartyTag> {
 
 final partyTagService = PartyTagService(
     tableName: "chat_partytag",
-    indexFields: ['ownerPeerId', 'createDate', 'tag', 'partyPeerId'],
     fields: ServiceLocator.buildFields(PartyTag(), []));

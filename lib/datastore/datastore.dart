@@ -68,7 +68,9 @@ abstract class DataStore {
 
   ///建表和索引
   dynamic create(String tableName, List<String> fields,
-      {List<String>? indexFields, bool drop = false});
+      {List<String>? uniqueFields,
+      List<String>? indexFields,
+      bool drop = false});
 
   dynamic run(Sql sql);
 

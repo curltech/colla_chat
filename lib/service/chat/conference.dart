@@ -214,7 +214,16 @@ class ConferenceService extends GeneralBaseService<Conference> {
   ConferenceService({
     required super.tableName,
     required super.fields,
-    required super.indexFields,
+    super.uniqueFields = const [
+      'conferenceId',
+    ],
+    super.indexFields = const [
+      'ownerPeerId',
+      'conferenceOwnerPeerId',
+      'startDate',
+      'name',
+      'topic'
+    ],
     super.encryptFields = const ['content', 'thumbnail', 'password'],
   }) {
     post = (Map map) {
@@ -613,12 +622,4 @@ class ConferenceService extends GeneralBaseService<Conference> {
 
 final conferenceService = ConferenceService(
     tableName: "chat_conference",
-    indexFields: [
-      'ownerPeerId',
-      'conferenceId',
-      'conferenceOwnerPeerId',
-      'startDate',
-      'name',
-      'topic'
-    ],
     fields: ServiceLocator.buildFields(Conference('', name: ''), []));

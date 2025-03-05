@@ -12,7 +12,9 @@ class PeerSignalService extends GeneralBaseService<PeerSignal> {
   PeerSignalService(
       {required super.tableName,
       required super.fields,
-      required super.indexFields}) {
+      super.uniqueFields,
+      super.indexFields = const ['peerId', 'clientId', 'signalType'],
+      super.encryptFields}) {
     post = (Map map) {
       return PeerSignal.fromJson(map);
     };
@@ -74,6 +76,6 @@ class PeerSignalService extends GeneralBaseService<PeerSignal> {
 }
 
 final peerSignalService = PeerSignalService(
-    tableName: "blc_peersignal",
-    fields: ServiceLocator.buildFields(PeerSignal('', '', ''), []),
-    indexFields: ['peerId', 'clientId', 'signalType']);
+  tableName: "blc_peersignal",
+  fields: ServiceLocator.buildFields(PeerSignal('', '', ''), []),
+);

@@ -71,6 +71,7 @@ class Sqlite3 extends DataStore {
     for (GeneralBaseService service in ServiceLocator.services.values) {
       try {
         create(service.tableName, service.fields,
+            uniqueFields: service.uniqueFields,
             indexFields: service.indexFields);
       } catch (e) {
         print('sqlite3 init create table exception:$e');
@@ -163,12 +164,15 @@ class Sqlite3 extends DataStore {
   /// 建表和索引
   @override
   dynamic create(String tableName, List<String> fields,
-      {List<String>? indexFields, bool drop = false}) {
+      {List<String>? uniqueFields,
+      List<String>? indexFields,
+      bool drop = false}) {
     if (drop) {
       String clause = sqlBuilder.drop(tableName);
       run(Sql(clause));
     }
-    List<String> clauses = sqlBuilder.create(tableName, fields, indexFields);
+    List<String> clauses = sqlBuilder.create(tableName, fields,
+        uniqueFields: uniqueFields, indexFields: indexFields);
     for (var query in clauses) {
       run(Sql(query));
     }

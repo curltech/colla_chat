@@ -15,8 +15,9 @@ import 'package:synchronized/synchronized.dart';
 abstract class GeneralBaseService<T> {
   final String tableName;
   final List<String> fields;
-  final List<String> indexFields;
-  final List<String> encryptFields;
+  final List<String>? uniqueFields;
+  final List<String>? indexFields;
+  final List<String>? encryptFields;
   late final DataStore dataStore;
   late final T Function(Map) post;
   Lock lock = Lock();
@@ -24,8 +25,9 @@ abstract class GeneralBaseService<T> {
   GeneralBaseService(
       {required this.tableName,
       required this.fields,
-      required this.indexFields,
-      this.encryptFields = const []});
+      this.uniqueFields,
+      this.indexFields,
+      this.encryptFields});
 
   String? _buildWhere(
     String? where,
@@ -208,8 +210,8 @@ abstract class GeneralBaseService<T> {
       bool needEncrypt = true,
       bool needSign = false}) async {
     Map<String, dynamic> json = JsonUtil.toJson(entity) as Map<String, dynamic>;
-    if (encryptFields.isNotEmpty) {
-      for (var encryptField in encryptFields) {
+    if (encryptFields != null && encryptFields!.isNotEmpty) {
+      for (var encryptField in encryptFields!) {
         SecurityContext securityContext = SecurityContext();
         securityContext.needCompress = needCompress;
         securityContext.needEncrypt = needEncrypt;
@@ -247,8 +249,8 @@ abstract class GeneralBaseService<T> {
       bool needEncrypt = true,
       bool needSign = false}) async {
     Map<String, dynamic> json = JsonUtil.toJson(entity) as Map<String, dynamic>;
-    if (encryptFields.isNotEmpty) {
-      for (var encryptField in encryptFields) {
+    if (encryptFields != null && encryptFields!.isNotEmpty) {
+      for (var encryptField in encryptFields!) {
         SecurityContext securityContext = SecurityContext();
         securityContext.needCompress = needCompress;
         securityContext.needEncrypt = needEncrypt;

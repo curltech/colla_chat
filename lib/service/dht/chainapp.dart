@@ -7,7 +7,9 @@ class ChainAppService extends GeneralBaseService<ChainApp> {
   ChainAppService(
       {required super.tableName,
       required super.fields,
-      required super.indexFields}) {
+        super.uniqueFields,
+        super.indexFields,
+        super.encryptFields}) {
     post = (Map map) {
       return ChainApp.fromJson(map);
     };

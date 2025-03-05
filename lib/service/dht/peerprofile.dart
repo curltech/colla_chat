@@ -9,7 +9,9 @@ class PeerProfileService extends PeerEntityService<PeerProfile> {
   PeerProfileService(
       {required super.tableName,
       required super.fields,
-      required super.indexFields}) {
+      super.uniqueFields = const ['peerId'],
+      super.indexFields = const ['clientId'],
+      super.encryptFields}) {
     post = (Map map) {
       return PeerProfile.fromJson(map);
     };
@@ -73,6 +75,6 @@ class PeerProfileService extends PeerEntityService<PeerProfile> {
 }
 
 final PeerProfileService peerProfileService = PeerProfileService(
-    tableName: "blc_peerprofile",
-    fields: ServiceLocator.buildFields(PeerProfile(''), []),
-    indexFields: ['peerId', 'clientId']);
+  tableName: "blc_peerprofile",
+  fields: ServiceLocator.buildFields(PeerProfile(''), []),
+);

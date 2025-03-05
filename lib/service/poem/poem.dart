@@ -14,8 +14,15 @@ class PoemService extends GeneralBaseService<Poem> {
   PoemService({
     required super.tableName,
     required super.fields,
-    required super.indexFields,
-    super.encryptFields = const [],
+    super.uniqueFields,
+    super.indexFields = const [
+      'title',
+      'author',
+      'collection',
+      'dynasty',
+      'rhythmic'
+    ],
+    super.encryptFields,
   }) {
     post = (Map map) {
       return Poem.fromJson(map);
@@ -162,6 +169,4 @@ class PoemService extends GeneralBaseService<Poem> {
 }
 
 final poemService = PoemService(
-    tableName: "pm_poem",
-    indexFields: ['title', 'author', 'collection', 'dynasty', 'rhythmic'],
-    fields: ServiceLocator.buildFields(Poem('', ''), []));
+    tableName: "pm_poem", fields: ServiceLocator.buildFields(Poem('', ''), []));
