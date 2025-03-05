@@ -29,8 +29,7 @@ class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Video conference track';
 
-  @override
-  String? get information => null;
+  
 
   Future<List<TileData>> _buildTrackSenderTileData(BuildContext context) async {
     AdvancedPeerConnection? advancedPeerConnection =
@@ -160,6 +159,7 @@ class VideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     return AppBarView(
       title: title,
+      helpPath: routeName,
       withLeading: withLeading,
       child: _buildTrackListView(context),
     );

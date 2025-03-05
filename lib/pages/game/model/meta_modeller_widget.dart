@@ -54,8 +54,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Modeller';
 
-  @override
-  String? get information => null;
+  
 
   _selectSubject() async {
     Project? project = modelProjectController.project.value;
@@ -708,6 +707,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
           builder: (BuildContext context, Widget? _) {
             return AppBarView(
                 titleWidget: titleWidget,
+                helpPath: routeName,
                 withLeading: true,
                 rightWidgets: rightWidgets,
                 child: appDataProvider.secondaryBodyLandscape

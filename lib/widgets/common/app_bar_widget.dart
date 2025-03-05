@@ -134,6 +134,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       children.add(Align(alignment: Alignment.center, child: title!));
     }
     return Container(
+      height: toolbarHeight,
       padding: const EdgeInsets.all(10),
       color: backgroundColor ?? myself.primary,
       child: Stack(

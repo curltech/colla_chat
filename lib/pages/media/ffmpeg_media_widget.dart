@@ -45,8 +45,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'FFMpegMedia';
 
-  @override
-  String? get information => null;
+  
 
   @override
   bool get withLeading => true;
@@ -531,6 +530,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
 
     return AppBarView(
       title: title,
+      helpPath: routeName,
       withLeading: true,
       rightWidgets: rightWidgets,
       child: ValueListenableBuilder(

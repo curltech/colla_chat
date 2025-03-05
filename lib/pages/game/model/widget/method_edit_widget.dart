@@ -33,8 +33,7 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'MethodEdit';
 
-  @override
-  String? get information => null;
+  
 
   final Rx<List<Method>?> methods = Rx<List<Method>?>(null);
 
@@ -243,6 +242,7 @@ class MethodEditWidget extends StatelessWidget with TileDataMixin {
 
     return AppBarView(
         title: title,
+        helpPath: routeName,
         withLeading: true,
         rightWidgets: _buildRightButton(context),
         child: listenable);

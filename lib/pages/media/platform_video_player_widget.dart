@@ -19,8 +19,7 @@ class PlatformVideoPlayerWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'VideoPlayer';
 
-  @override
-  String? get information => null;
+  
 
   @override
   bool get withLeading => true;
@@ -81,6 +80,7 @@ class PlatformVideoPlayerWidget extends StatelessWidget with TileDataMixin {
 
     return AppBarView(
       title: title,
+      helpPath: routeName,
       withLeading: true,
       rightWidgets: rightWidgets,
       child: platformVideoPlayer,

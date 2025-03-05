@@ -707,7 +707,7 @@ class _IndexViewState extends State<IndexView>
               slideDirection: appDataProvider.landscape
                   ? SlideDirection.rightToLeft
                   : SlideDirection.topToBottom,
-              sliderOpenSize: 350,
+              sliderOpenSize: appDataProvider.designSize.width,
               backgroundColor: Colors.white.withAlpha(0),
               appBar: Container(),
               slider: Center(child: HelpInformationWidget()),

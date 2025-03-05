@@ -22,8 +22,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'StockLineChart';
 
-  @override
-  String? get information => null;
+  
 
   final KChartPlusController kChartPlusController = KChartPlusController();
 
@@ -41,6 +40,7 @@ class StockLineChartWidget extends StatelessWidget with TileDataMixin {
     );
     return AppBarView(
       titleWidget: titleWidget,
+      helpPath: routeName,
       withLeading: true,
       child: Center(
           child: Column(children: [

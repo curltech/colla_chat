@@ -28,8 +28,7 @@ class AddShareWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'AddShare';
 
-  @override
-  String? get information => null;
+  
 
   final TextEditingController searchTextController = TextEditingController();
 
@@ -129,6 +128,6 @@ class AddShareWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        title: title, withLeading: true, child: _buildSearchShareView(context));
+        title: title, helpPath: routeName,withLeading: true, child: _buildSearchShareView(context));
   }
 }

@@ -27,8 +27,7 @@ class PlatformAudioPlayerWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'AudioPlayer';
 
-  @override
-  String? get information => null;
+  
 
   @override
   bool get withLeading => true;
@@ -78,6 +77,7 @@ class PlatformAudioPlayerWidget extends StatelessWidget with TileDataMixin {
     return AppBarView(
       titleWidget: CommonAutoSizeText(AppLocalizations.t(title),
           style: const TextStyle(fontSize: AppFontSize.mdFontSize)),
+      helpPath: routeName,
       withLeading: true,
       rightWidgets: rightWidgets,
       child: platformAudioPlayer,

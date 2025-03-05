@@ -61,8 +61,7 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'InoutEvent';
 
-  @override
-  String? get information => null;
+  
 
   late final List<PlatformDataColumn> inoutEventColumns;
   late final FormInputController searchController;
@@ -279,6 +278,7 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
     List<Widget> rightWidgets = [];
     return AppBarView(
         title: title,
+        helpPath: routeName,
         withLeading: true,
         rightWidgets: rightWidgets,
         child: Column(children: [

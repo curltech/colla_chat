@@ -25,8 +25,7 @@ class CollectionItemWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Collection Item';
 
-  @override
-  String? get information => null;
+  
 
   SwiperController swiperController = SwiperController();
 
@@ -78,6 +77,7 @@ class CollectionItemWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     return AppBarView(
         titleWidget: _buildTitleWidget(),
+        helpPath: routeName,
         withLeading: true,
         child: _buildCollectionWidget(context));
   }

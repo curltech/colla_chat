@@ -33,8 +33,7 @@ class OpenVpnWidget extends StatefulWidget with TileDataMixin {
   @override
   String get title => 'OpenVPN';
 
-  @override
-  String? get information => null;
+  
 }
 
 class _OpenVpnWidgetState extends State<OpenVpnWidget> {
@@ -308,6 +307,7 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
     return AppBarView(
         withLeading: true,
         title: widget.title,
+        helpPath: widget.routeName,
         child: _buildOpenVpnWidget(context));
   }
 

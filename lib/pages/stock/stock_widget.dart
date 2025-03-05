@@ -44,7 +44,7 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  String get routeName => 'stock_main';
+  String get routeName => 'stock';
 
   @override
   IconData get iconData => Icons.candlestick_chart;
@@ -52,8 +52,7 @@ class StockMainWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Stock';
 
-  @override
-  String? get information => null;
+  
 
   @override
   Widget build(BuildContext context) {

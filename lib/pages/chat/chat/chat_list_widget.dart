@@ -115,9 +115,6 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'Chat';
-
-  @override
-  String? get information => null;
 }
 
 class _ChatListWidgetState extends State<ChatListWidget>
@@ -651,6 +648,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
 
     return AppBarView(
         title: title,
+        helpPath: widget.routeName,
         rightWidgets: rightWidgets,
         child: _buildChatListView(context));
   }

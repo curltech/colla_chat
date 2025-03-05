@@ -67,8 +67,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'QStat';
 
-  @override
-  String? get information => null;
+  
 
   late final List<PlatformDataField> searchDataField;
   late final FormInputController searchController;

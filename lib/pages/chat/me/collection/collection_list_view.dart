@@ -30,14 +30,14 @@ class CollectionListView extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Collection';
 
-  @override
-  String? get information => null;
+  
 
   @override
   Widget build(BuildContext context) {
     final CollectionListWidget collectionListWidget = CollectionListWidget();
     var appBarView = AppBarView(
       title: title,
+      helpPath: routeName,
       withLeading: withLeading,
       child: collectionListWidget,
     );

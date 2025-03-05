@@ -28,8 +28,7 @@ class GameMainWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Game';
 
-  @override
-  String? get information => null;
+  
 
   @override
   Widget build(BuildContext context) {

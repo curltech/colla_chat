@@ -21,13 +21,13 @@ class JsonEditorWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Json editor';
 
-  @override
-  String? get information => null;
+
 
   @override
   Widget build(BuildContext context) {
     return AppBarView(
       title: title,
+      helpPath: routeName,
       withLeading: withLeading,
       child: Obx(() {
         return JsonEditor(

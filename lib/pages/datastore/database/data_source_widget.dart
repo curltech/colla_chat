@@ -51,8 +51,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'DataSource';
 
-  @override
-  String? get information => null;
+  
 
   /// 单击表示编辑属性
   void _onTap(BuildContext context, ExplorableNode node) {

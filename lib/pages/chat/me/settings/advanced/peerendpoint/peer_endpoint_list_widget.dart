@@ -61,8 +61,7 @@ class PeerEndpointListWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'PeerEndpoint';
 
-  @override
-  String? get information => null;
+  
 
   var red = const Icon(
     Icons.light_mode,
@@ -224,6 +223,7 @@ class PeerEndpointListWidget extends StatelessWidget with TileDataMixin {
     });
     Widget peerEndpointWidget = AppBarView(
       title: title,
+      helpPath: routeName,
       withLeading: withLeading,
       rightWidgets: rightWidgets,
       child: dataListView,

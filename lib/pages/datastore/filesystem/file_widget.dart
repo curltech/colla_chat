@@ -42,8 +42,7 @@ class FileWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'File';
 
-  @override
-  String? get information => null;
+  
 
   final DataListController<File> fileController = DataListController<File>();
 

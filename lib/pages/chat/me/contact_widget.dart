@@ -24,8 +24,7 @@ class ContactWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Contact';
 
-  @override
-  String? get information => null;
+  
 
   Future<List<Contact>?> loadContacts() async {
     try {
@@ -59,6 +58,7 @@ class ContactWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     return AppBarView(
       title: title,
+      helpPath: routeName,
       withLeading: withLeading,
       rightWidgets: [
         IconButton(

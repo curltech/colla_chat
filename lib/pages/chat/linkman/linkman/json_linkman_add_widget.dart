@@ -26,8 +26,7 @@ class JsonLinkmanAddWidget extends StatefulWidget with TileDataMixin {
   @override
   String get title => 'Json add linkman';
 
-  @override
-  String? get information => null;
+
 
   @override
   bool get withLeading => true;
@@ -144,6 +143,7 @@ class _JsonLinkmanAddWidgetState extends State<JsonLinkmanAddWidget> {
     return AppBarView(
         withLeading: true,
         title: widget.title,
+        helpPath: widget.routeName,
         child: _buildJsonTextField(context));
   }
 

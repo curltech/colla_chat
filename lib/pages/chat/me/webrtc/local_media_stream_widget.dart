@@ -29,8 +29,7 @@ class LocalMediaStreamWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'LocalMediaStream';
 
-  @override
-  String? get information => null;
+  
 
   LocalMediaStreamWidget({super.key}) {
     videoRenderer.initialize();
@@ -743,6 +742,7 @@ class LocalMediaStreamWidget extends StatelessWidget with TileDataMixin {
 
       var appBarView = AppBarView(
           title: title,
+          helpPath: routeName,
           withLeading: withLeading,
           rightWidgets: rightWidgets,
           child: GestureDetector(onLongPress: () {

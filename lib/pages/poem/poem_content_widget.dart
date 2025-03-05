@@ -29,8 +29,7 @@ class PoemContentWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Poem content';
 
-  @override
-  String? get information => null;
+
 
   PlatformTextToSpeechWidget platformTextToSpeechWidget =
       PlatformTextToSpeechWidget();
@@ -239,6 +238,7 @@ class PoemContentWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     var poemContentWidget = AppBarView(
       title: title,
+      helpPath: routeName,
       withLeading: withLeading,
       child: _buildPoemContent(context),
     );

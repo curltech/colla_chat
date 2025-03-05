@@ -29,8 +29,7 @@ class PublishedChannelMessagePreview extends StatefulWidget with TileDataMixin {
   @override
   String get title => 'PublishedChannelMessagePreview';
 
-  @override
-  String? get information => null;
+  
 }
 
 class _PublishedChannelMessagePreviewState
@@ -68,6 +67,7 @@ class _PublishedChannelMessagePreviewState
       centerTitle: false,
       withLeading: true,
       title: chatMessage.title,
+      helpPath: widget.routeName,
       child: PlatformFutureBuilder(
           future: _buildHtml(),
           builder: (BuildContext context, String? html) {

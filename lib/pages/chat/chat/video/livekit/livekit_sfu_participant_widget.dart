@@ -26,8 +26,7 @@ class LiveKitSfuParticipantWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'SfuParticipant';
 
-  @override
-  String? get information => null;
+  
 
   final RxList<TileData> tileData = <TileData>[].obs;
 
@@ -71,6 +70,7 @@ class LiveKitSfuParticipantWidget extends StatelessWidget with TileDataMixin {
     return Obx(() {
       return AppBarView(
           title: roomName.value,
+          helpPath: routeName,
           withLeading: true,
           child: _buildSearchRoomView(context));
     });

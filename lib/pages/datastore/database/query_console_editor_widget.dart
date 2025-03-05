@@ -52,8 +52,7 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'QueryConsoleEditor';
 
-  @override
-  String? get information => null;
+  
 
   final QueryResultController queryResultController = QueryResultController();
 

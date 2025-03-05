@@ -50,8 +50,7 @@ class ContactLinkmanAddWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Contact add linkman';
 
-  @override
-  String? get information => null;
+  
 
   @override
   bool get withLeading => true;
@@ -167,6 +166,7 @@ class ContactLinkmanAddWidget extends StatelessWidget with TileDataMixin {
     return AppBarView(
         withLeading: true,
         title: title,
+        helpPath: routeName,
         child:
             Column(children: [_buildSearchTextField(context), dataListView]));
   }

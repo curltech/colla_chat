@@ -20,8 +20,7 @@ class WebSocketWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'WebSocket';
 
-  @override
-  String? get information => null;
+  
 
   List<TileData> _buildMeTileData(BuildContext context) {
     return [];
@@ -37,7 +36,7 @@ class WebSocketWidget extends StatelessWidget with TileDataMixin {
       },
     );
 
-    var me = AppBarView(title: title, child: child);
+    var me = AppBarView(title: title, helpPath: routeName,child: child);
     return me;
   }
 }

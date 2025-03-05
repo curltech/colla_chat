@@ -27,8 +27,7 @@ class LiveKitSfuRoomWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'SfuRoom';
 
-  @override
-  String? get information => null;
+  
 
   final Rx<List<TileData>> tileData = Rx<List<TileData>>([]);
 
@@ -140,6 +139,7 @@ class LiveKitSfuRoomWidget extends StatelessWidget with TileDataMixin {
     ];
     return AppBarView(
         title: title,
+        helpPath: routeName,
         withLeading: true,
         rightWidgets: rightWidgets,
         child: _buildSearchRoomView(context));

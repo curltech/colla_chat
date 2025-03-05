@@ -30,8 +30,7 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'DataColumnEdit';
 
-  @override
-  String? get information => null;
+  
 
   late final FormInputController formInputController;
 

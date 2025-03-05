@@ -22,8 +22,7 @@ class PlatformInfoWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Platform Information';
 
-  @override
-  String? get information => null;
+  
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +75,7 @@ class PlatformInfoWidget extends StatelessWidget with TileDataMixin {
 
     var platformInfo = AppBarView(
       title: title,
+      helpPath: routeName,
       withLeading: withLeading,
       child: DataListView(
         itemCount: platformInfoTileData.length,

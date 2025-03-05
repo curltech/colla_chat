@@ -40,9 +40,6 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Mahjong 18m';
 
-  @override
-  String? get information => null;
-
   final RxBool fullscreen = false.obs;
 
   final TextEditingController textEditingController = TextEditingController();
@@ -271,6 +268,7 @@ class Majiang18mWidget extends StatelessWidget with TileDataMixin {
     return Obx(() {
       return AppBarView(
           title: title,
+          helpPath: routeName,
           withLeading: true,
           rightWidgets: _buildRightWidgets(context),
           child: GameWidget(game: mahjongFlameGame));

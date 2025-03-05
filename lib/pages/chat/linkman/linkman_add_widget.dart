@@ -103,15 +103,14 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Add linkman';
 
-  @override
-  String? get information => null;
+  
 
   @override
   Widget build(BuildContext context) {
     groupNotifier.value = null;
     conferenceNotifier.value = null;
     Widget child = GroupDataListView(tileData: tileData);
-    var linkmanView = AppBarView(title: title, withLeading: true, child: child);
+    var linkmanView = AppBarView(title: title,helpPath: routeName, withLeading: true, child: child);
 
     return linkmanView;
   }

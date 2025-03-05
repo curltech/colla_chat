@@ -32,8 +32,7 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Sfu video conference track';
 
-  @override
-  String? get information => null;
+  
 
   List<TileData> _buildAudioTrackTileData(BuildContext context) {
     livekit_client.Participant? participant = participantNotifier.value;
@@ -197,6 +196,7 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     return AppBarView(
       title: title,
+      helpPath: routeName,
       withLeading: withLeading,
       child: _buildTrackListView(context),
     );

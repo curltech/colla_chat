@@ -29,8 +29,7 @@ class AndroidOverlayWindowWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Android overlay window';
 
-  @override
-  String? get information => null;
+  
 
   void init() {
     if (homePort != null) return;
@@ -49,6 +48,7 @@ class AndroidOverlayWindowWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     var overlayApp = AppBarView(
       title: title,
+      helpPath: routeName,
       withLeading: withLeading,
       child: Center(
         child: Column(

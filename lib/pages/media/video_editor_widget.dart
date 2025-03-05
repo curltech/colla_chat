@@ -34,8 +34,7 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'VideoEditor';
 
-  @override
-  String? get information => null;
+  
 
   @override
   bool get withLeading => true;
@@ -210,6 +209,7 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
     _splitImageFiles(context);
     return AppBarView(
       title: title,
+      helpPath: routeName,
       withLeading: true,
       child: _buildVideoEditor(context),
     );

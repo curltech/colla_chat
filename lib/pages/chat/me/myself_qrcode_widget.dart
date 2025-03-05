@@ -22,8 +22,7 @@ class MyselfQrcodeWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Myself Qrcode';
 
-  @override
-  String? get information => null;
+  
 
   String? content;
 
@@ -61,6 +60,7 @@ class MyselfQrcodeWidget extends StatelessWidget with TileDataMixin {
     ];
     return AppBarView(
       title: title,
+      helpPath: routeName,
       withLeading: withLeading,
       child: Column(children: children),
     );

@@ -98,8 +98,7 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
   @override
   String get title => 'Linkman';
 
-  @override
-  String? get information => null;
+  
 }
 
 class _LinkmanListWidgetState extends State<LinkmanListWidget>
@@ -802,6 +801,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     }
     return AppBarView(
         title: widget.title,
+        helpPath: widget.routeName,
         rightWidgets: rightWidgets,
         child: _buildLinkmanListView(context));
   }

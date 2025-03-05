@@ -46,8 +46,7 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Conference edit';
 
-  @override
-  String? get information => null;
+  
 
   @override
   bool get withLeading => true;
@@ -573,6 +572,7 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
     ];
     var appBarView = AppBarView(
         title: title,
+        helpPath: routeName,
         withLeading: withLeading,
         rightWidgets: rightWidgets,
         child: _buildFormInputWidget(context));

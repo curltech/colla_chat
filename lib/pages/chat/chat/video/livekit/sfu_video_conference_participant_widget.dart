@@ -33,8 +33,7 @@ class SfuVideoConferenceParticipantWidget extends StatelessWidget
   @override
   String get title => 'Sfu video conference participant';
 
-  @override
-  String? get information => null;
+  
 
   List<TileData> _buildRemoteParticipantTileData(BuildContext context) {
     LiveKitConferenceClient? liveKitConferenceClient =
@@ -170,6 +169,7 @@ class SfuVideoConferenceParticipantWidget extends StatelessWidget
   Widget build(BuildContext context) {
     return AppBarView(
         title: title,
+        helpPath: routeName,
         withLeading: withLeading,
         child: Column(children: [
           CommonAutoSizeText(AppLocalizations.t('LocalParticipant')),

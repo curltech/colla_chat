@@ -20,8 +20,7 @@ class NfcLinkmanAddWidget extends StatefulWidget with TileDataMixin {
   @override
   String get title => 'Nfc add linkman';
 
-  @override
-  String? get information => null;
+  
 
   @override
   bool get withLeading => true;
@@ -133,6 +132,7 @@ class _NfcLinkmanAddWidgetState extends State<NfcLinkmanAddWidget> {
     return AppBarView(
         withLeading: true,
         title: widget.title,
+        helpPath: widget.routeName,
         child: Column(children: [
           _buildReadWidget(),
           ElevatedButton(

@@ -25,8 +25,7 @@ class NodeRelationshipEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'RelationshipEdit';
 
-  @override
-  String? get information => null;
+  
 
   NodeRelationshipEditWidget({super.key});
 
@@ -130,6 +129,6 @@ class NodeRelationshipEditWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        title: title, withLeading: true, child: _buildFormInputWidget(context));
+        title: title,helpPath: routeName, withLeading: true, child: _buildFormInputWidget(context));
   }
 }

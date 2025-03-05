@@ -31,8 +31,7 @@ class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'SherpaInstall';
 
-  @override
-  String? get information => null;
+  
 
   final ValueNotifier<bool> sherpaPresent = ValueNotifier<bool>(false);
   final ValueNotifier<DownloadProgress> downloadProgress =
@@ -169,6 +168,7 @@ class SherpaInstallWidget extends StatelessWidget with TileDataMixin {
     return AppBarView(
         withLeading: true,
         title: title,
+        helpPath: routeName,
         child: ValueListenableBuilder(
           valueListenable: sherpaPresent,
           builder: (BuildContext context, bool sherpaPresent, Widget? child) {

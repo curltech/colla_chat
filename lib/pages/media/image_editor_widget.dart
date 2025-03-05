@@ -27,8 +27,7 @@ class ImageEditorWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'ImageEditor';
 
-  @override
-  String? get information => null;
+
 
   @override
   bool get withLeading => true;
@@ -62,6 +61,7 @@ class ImageEditorWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     return AppBarView(
       title: title,
+      helpPath: routeName,
       withLeading: true,
       child: _buildImageEditor(context),
     );

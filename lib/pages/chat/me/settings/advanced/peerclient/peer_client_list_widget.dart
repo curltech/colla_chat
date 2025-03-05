@@ -35,8 +35,7 @@ class PeerClientListWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'PeerClient';
 
-  @override
-  String? get information => null;
+  
 
   List<TileData> _buildPeerClientTileData() {
     List<PeerClient> peerClients = peerClientController.data.value;
@@ -103,7 +102,7 @@ class PeerClientListWidget extends StatelessWidget with TileDataMixin {
         }));
 
     var peerClientWidget = AppBarView(
-        title: title, withLeading: withLeading, child: peerClientView);
+        title: title,helpPath: routeName, withLeading: withLeading, child: peerClientView);
 
     return peerClientWidget;
   }

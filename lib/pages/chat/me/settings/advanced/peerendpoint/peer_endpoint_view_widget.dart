@@ -27,8 +27,7 @@ class PeerEndpointViewWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'PeerEndpointView';
 
-  @override
-  String? get information => null;
+  
 
   Widget _buildValueListView(BuildContext context) {
     return Obx(() {
@@ -54,7 +53,7 @@ class PeerEndpointViewWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     var valueListView = _buildValueListView(context);
     var appBarView = AppBarView(
-        title: title, withLeading: withLeading, child: valueListView);
+        title: title,helpPath: routeName, withLeading: withLeading, child: valueListView);
     return appBarView;
   }
 }

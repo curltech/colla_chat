@@ -19,14 +19,14 @@ class LoggerConsoleView extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Logger console';
 
-  @override
-  String? get information => null;
+  
 
   @override
   Widget build(BuildContext context) {
     return AppBarView(
         withLeading: true,
         title: title,
+        helpPath: routeName,
         child: const TalkerLoggerScreenWidget());
   }
 }

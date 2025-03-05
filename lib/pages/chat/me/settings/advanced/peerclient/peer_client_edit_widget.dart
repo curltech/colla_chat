@@ -26,8 +26,7 @@ class PeerClientEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'PeerClientEdit';
 
-  @override
-  String? get information => null;
+  
 
   final List<PlatformDataField> peerClientColumnField = [
     PlatformDataField(
@@ -152,6 +151,7 @@ class PeerClientEditWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
         title: title,
+        helpPath: routeName,
         withLeading: withLeading,
         child: _buildFormInputWidget(context));
     return appBarView;

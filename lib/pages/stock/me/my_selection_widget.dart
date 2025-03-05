@@ -215,8 +215,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'MySelection';
 
-  @override
-  String? get information => null;
+  
 
   final DataListController<DayLine> dayLineController =
       DataListController<DayLine>();
@@ -507,6 +506,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
     ];
     return AppBarView(
       title: title,
+      helpPath: routeName,
       withLeading: true,
       rightWidgets: rightWidgets,
       child: Column(

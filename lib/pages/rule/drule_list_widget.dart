@@ -31,8 +31,7 @@ class DruleListWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Drules';
 
-  @override
-  String? get information => null;
+  
 
   List<TileData> _buildDrulesTileData() {
     List<Drule> drules = drulesController.data.value;
@@ -90,7 +89,7 @@ class DruleListWidget extends StatelessWidget with TileDataMixin {
     });
 
     var druleListWidget =
-        AppBarView(title: title, withLeading: withLeading, child: druleList);
+        AppBarView(title: title,helpPath: routeName, withLeading: withLeading, child: druleList);
 
     return druleListWidget;
   }

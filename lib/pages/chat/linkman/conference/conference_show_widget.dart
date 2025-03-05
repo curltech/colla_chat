@@ -101,8 +101,7 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Conference show';
 
-  @override
-  String? get information => null;
+  
 
   @override
   bool get withLeading => true;
@@ -297,7 +296,7 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
       return child;
     }
     var appBarView =
-        AppBarView(title: title, withLeading: withLeading, child: child);
+        AppBarView(title: title,helpPath: routeName, withLeading: withLeading, child: child);
 
     return appBarView;
   }

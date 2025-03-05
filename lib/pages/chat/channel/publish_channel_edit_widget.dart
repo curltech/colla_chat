@@ -34,8 +34,7 @@ class PublishChannelEditWidget extends StatefulWidget with TileDataMixin {
   @override
   String get title => 'Publish Channel Edit';
 
-  @override
-  String? get information => null;
+  
 }
 
 class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
@@ -160,6 +159,7 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
       centerTitle: false,
       withLeading: true,
       title: widget.title,
+      helpPath: widget.routeName,
       rightWidgets: [
         IconButton(
           icon: const Icon(Icons.save),

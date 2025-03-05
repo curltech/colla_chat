@@ -46,8 +46,7 @@ class MailContentWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'MailContent';
 
-  @override
-  String? get information => null;
+  
 
   // late final PlatformWebView? platformWebView;
   final PlatformWebViewController platformWebViewController =
@@ -174,6 +173,7 @@ class MailContentWidget extends StatelessWidget with TileDataMixin {
             var appBarView = AppBarView(
                 titleWidget:
                     CommonAutoSizeText(decryptedMimeMessage?.subject ?? ''),
+                helpPath: routeName,
                 withLeading: withLeading,
                 child: Card(
                     elevation: 0.0,

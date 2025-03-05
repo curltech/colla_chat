@@ -26,13 +26,13 @@ class CodeEditorWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Code editor';
 
-  @override
-  String? get information => null;
+  
 
   @override
   Widget build(BuildContext context) {
     return AppBarView(
       title: title,
+      helpPath: routeName,
       withLeading: withLeading,
       child: Obx(() {
         return CodeEditor(

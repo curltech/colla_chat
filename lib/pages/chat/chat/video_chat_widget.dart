@@ -120,8 +120,7 @@ class VideoChatWidget extends StatefulWidget with TileDataMixin {
   @override
   String get title => 'VideoChat';
 
-  @override
-  String? get information => null;
+  
 }
 
 class _VideoChatWidgetState extends State<VideoChatWidget> {
@@ -218,6 +217,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     Widget titleWidget = _buildTitleWidget(context);
     return AppBarView(
       titleWidget: titleWidget,
+      helpPath: widget.routeName,
       withLeading: true,
       rightWidgets: rightWidgets,
       leadingCallBack: () {

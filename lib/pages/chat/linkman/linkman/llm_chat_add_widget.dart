@@ -38,8 +38,7 @@ class LlmChatAddWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Add llm linkman';
 
-  @override
-  String? get information => null;
+  
 
   final List<PlatformDataField> llmChatDataFields = [
     PlatformDataField(
@@ -125,6 +124,7 @@ class LlmChatAddWidget extends StatelessWidget with TileDataMixin {
     }
     var appBarView = AppBarView(
         title: title,
+        helpPath: routeName,
         withLeading: withLeading,
         child: _buildFormInputWidget(context));
 

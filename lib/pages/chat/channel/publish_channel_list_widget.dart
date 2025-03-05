@@ -55,8 +55,7 @@ class PublishChannelListWidget extends StatefulWidget with TileDataMixin {
   @override
   String get title => 'Publish channel';
 
-  @override
-  String? get information => null;
+  
 }
 
 class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
@@ -284,6 +283,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
         centerTitle: false,
         withLeading: true,
         title: widget.title,
+        helpPath: widget.routeName,
         rightWidgets: rightWidgets,
         child: channelChatMessageWidget);
   }

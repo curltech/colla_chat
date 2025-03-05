@@ -1,6 +1,4 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/index/help_information_widget.dart';
-import 'package:colla_chat/pages/index/index_view.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/image_util.dart';
@@ -22,8 +20,12 @@ class TileData {
   final String? titleTail;
   final String? subtitle;
   final dynamic suffix;
+
+  //路由名称，用于是否点击路由
   final String? routeName;
-  final String? information;
+
+  //帮助文件路径，用于是否显示帮助按钮
+  final String? helpPath;
 
   //是否缩小
   bool dense;
@@ -45,7 +47,7 @@ class TileData {
       this.titleTail,
       this.suffix,
       this.routeName,
-      this.information,
+      this.helpPath,
       this.dense = true,
       this.selected = false,
       this.isThreeLine = false,
@@ -56,7 +58,7 @@ class TileData {
     return TileData(
         title: AppLocalizations.t(mixin.title),
         routeName: mixin.routeName,
-        information: mixin.information,
+        helpPath: mixin.routeName,
         dense: dense,
         prefix: mixin.iconData);
   }

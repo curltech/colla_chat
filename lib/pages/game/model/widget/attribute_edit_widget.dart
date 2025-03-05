@@ -33,8 +33,7 @@ class AttributeEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'AttributeEdit';
 
-  @override
-  String? get information => null;
+  
 
   ModelNode? get modelNode {
     return modelProjectController.selectedSrcModelNode.value;
@@ -246,6 +245,7 @@ class AttributeEditWidget extends StatelessWidget with TileDataMixin {
 
     return AppBarView(
         title: title,
+        helpPath: routeName,
         withLeading: true,
         rightWidgets: _buildRightButton(context),
         child: listenable);

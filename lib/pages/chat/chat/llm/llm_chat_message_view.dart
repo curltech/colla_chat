@@ -64,8 +64,7 @@ class LlmChatMessageView extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'LlmChatMessage';
 
-  @override
-  String? get information => null;
+  
 
   double visibleFraction = 0.0;
   NoScreenshot? noScreenshot;
@@ -165,10 +164,11 @@ class LlmChatMessageView extends StatelessWidget with TileDataMixin {
         String name = chatSummary.name!;
         String title = AppLocalizations.t(name);
         return AppBarView(
-            title: title, withLeading: withLeading, child: chatMessageWidget);
+            title: title, helpPath: routeName,withLeading: withLeading, child: chatMessageWidget);
       }
       return AppBarView(
           title: AppLocalizations.t('No current chatSummary'),
+          helpPath: routeName,
           withLeading: withLeading,
           child: chatMessageWidget);
     });

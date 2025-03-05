@@ -10,7 +10,7 @@ import 'package:colla_chat/pages/game/game_main_widget.dart';
 import 'package:colla_chat/pages/mail/mail_address_widget.dart';
 import 'package:colla_chat/pages/media/media_widget.dart';
 import 'package:colla_chat/pages/poem/poem_widget.dart';
-import 'package:colla_chat/pages/stock/stock_main_widget.dart';
+import 'package:colla_chat/pages/stock/stock_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -76,8 +76,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Apps';
 
-  @override
-  String? get information => null;
+  
 
   late final RxString name = routeName.obs;
 
@@ -86,7 +85,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     otherAppTileData.add(TileData(
         title: AppLocalizations.t(poemWidget.title),
         prefix: poemWidget.iconData,
-        information: poemWidget.information,
+        helpPath: poemWidget.routeName,
         onTap: (int index, String title, {String? subtitle}) {
           name.value = poemWidget.routeName;
         }));
@@ -95,6 +94,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
       otherAppTileData.add(TileData(
           title: AppLocalizations.t(mailAddressWidget.title),
           prefix: mailAddressWidget.iconData,
+          helpPath: mailAddressWidget.routeName,
           onTap: (int index, String title, {String? subtitle}) {
             name.value = mailAddressWidget.routeName;
           }));
@@ -104,6 +104,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
       otherAppTileData.add(TileData(
           title: AppLocalizations.t(stockMainWidget.title),
           prefix: stockMainWidget.iconData,
+          helpPath: stockMainWidget.routeName,
           onTap: (int index, String title, {String? subtitle}) {
             name.value = stockMainWidget.routeName;
           }));
@@ -113,6 +114,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
       otherAppTileData.add(TileData(
           title: AppLocalizations.t(gameMainWidget.title),
           prefix: gameMainWidget.iconData,
+          helpPath: gameMainWidget.routeName,
           onTap: (int index, String title, {String? subtitle}) {
             name.value = gameMainWidget.routeName;
           }));
@@ -121,24 +123,28 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     otherAppTileData.add(TileData(
         title: AppLocalizations.t(mediaWidget.title),
         prefix: mediaWidget.iconData,
+        helpPath: mediaWidget.routeName,
         onTap: (int index, String title, {String? subtitle}) {
           name.value = mediaWidget.routeName;
         }));
     otherAppTileData.add(TileData(
         title: AppLocalizations.t(webViewWidget.title),
         prefix: webViewWidget.iconData,
+        helpPath: webViewWidget.routeName,
         onTap: (int index, String title, {String? subtitle}) {
           indexWidgetProvider.push(webViewWidget.routeName);
         }));
     otherAppTileData.add(TileData(
         title: AppLocalizations.t(platformMapLauncherWidget.title),
         prefix: platformMapLauncherWidget.iconData,
+        helpPath: platformMapLauncherWidget.routeName,
         onTap: (int index, String title, {String? subtitle}) {
           indexWidgetProvider.push(platformMapLauncherWidget.routeName);
         }));
     otherAppTileData.add(TileData(
         title: AppLocalizations.t(sherpaInstallWidget.title),
         prefix: sherpaInstallWidget.iconData,
+        helpPath: sherpaInstallWidget.routeName,
         onTap: (int index, String title, {String? subtitle}) {
           indexWidgetProvider.push(sherpaInstallWidget.routeName);
         }));
@@ -148,6 +154,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
         otherAppTileData.add(TileData(
             title: AppLocalizations.t(openVpnWidget.title),
             prefix: openVpnWidget.iconData,
+            helpPath: openVpnWidget.routeName,
             onTap: (int index, String title, {String? subtitle}) {
               indexWidgetProvider.push(openVpnWidget.routeName);
             }));
@@ -157,6 +164,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
           otherAppTileData.add(TileData(
               title: AppLocalizations.t(systemAlertWindowWidget.title),
               prefix: systemAlertWindowWidget.iconData,
+              helpPath: systemAlertWindowWidget.routeName,
               onTap: (int index, String title, {String? subtitle}) {
                 indexWidgetProvider.push(systemAlertWindowWidget.routeName);
               }));
@@ -167,12 +175,14 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     otherAppTileData.add(TileData(
         title: AppLocalizations.t(dataSourceWidget.title),
         prefix: dataSourceWidget.iconData,
+        helpPath: dataSourceWidget.routeName,
         onTap: (int index, String title, {String? subtitle}) {
           name.value = dataSourceWidget.routeName;
         }));
     otherAppTileData.add(TileData(
         title: AppLocalizations.t(fileSystemWidget.title),
         prefix: fileSystemWidget.iconData,
+        helpPath: fileSystemWidget.routeName,
         onTap: (int index, String title, {String? subtitle}) {
           name.value = fileSystemWidget.routeName;
         }));
@@ -209,7 +219,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
       }
       var otherApp = AppBarView(
           title: title,
-          information: current?.information,
+          helpPath: current?.routeName,
           leadingWidget: backWidget,
           child: child);
 

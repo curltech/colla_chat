@@ -44,8 +44,7 @@ class GroupEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Group edit';
 
-  @override
-  String? get information => null;
+  
 
   @override
   bool get withLeading => true;
@@ -434,6 +433,7 @@ class GroupEditWidget extends StatelessWidget with TileDataMixin {
     ];
     var appBarView = AppBarView(
         title: title,
+        helpPath: routeName,
         withLeading: withLeading,
         rightWidgets: rightWidgets,
         child: _buildFormInputWidget(context));

@@ -36,8 +36,7 @@ class P2pLinkmanAddWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'P2p add linkman';
 
-  @override
-  String? get information => null;
+  
 
   @override
   bool get withLeading => true;
@@ -183,6 +182,7 @@ class P2pLinkmanAddWidget extends StatelessWidget with TileDataMixin {
     return AppBarView(
         withLeading: true,
         title: title,
+        helpPath: routeName,
         child: Column(children: [
           const SizedBox(
             height: 15,

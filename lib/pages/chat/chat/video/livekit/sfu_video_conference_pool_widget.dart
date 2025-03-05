@@ -37,8 +37,7 @@ class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Sfu video conference pool';
 
-  @override
-  String? get information => null;
+  
 
   List<TileData> _buildConferenceTileData(BuildContext context) {
     List<LiveKitConferenceClient> liveKitConferenceClients =
@@ -187,6 +186,7 @@ class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     return AppBarView(
       title: title,
+      helpPath: routeName,
       withLeading: withLeading,
       child: _buildVideoConferenceListView(context),
     );

@@ -47,8 +47,7 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'NodeEdit';
 
-  @override
-  String? get information => null;
+  
 
   ModelNode? get modelNode {
     return modelProjectController.selectedSrcModelNode.value;
@@ -224,6 +223,7 @@ class ModelNodeEditWidget extends StatelessWidget with TileDataMixin {
     content.value = modelNode!.content;
     return AppBarView(
         title: title,
+        helpPath: routeName,
         withLeading: true,
         rightWidgets: [
           IconButton(

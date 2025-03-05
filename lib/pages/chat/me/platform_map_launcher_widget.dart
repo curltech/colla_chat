@@ -32,8 +32,7 @@ class PlatformMapLauncherWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'MapLauncher';
 
-  @override
-  String? get information => null;
+  
 
   _init() async {
     try {
@@ -92,6 +91,6 @@ class PlatformMapLauncherWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        title: title, withLeading: true, child: buildMapLauncher(context));
+        title: title, helpPath: routeName,withLeading: true, child: buildMapLauncher(context));
   }
 }

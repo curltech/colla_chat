@@ -31,8 +31,7 @@ class VideoConferenceConnectionWidget extends StatelessWidget
   @override
   String get title => 'Video conference connection';
 
-  @override
-  String? get information => null;
+  
 
   Future<List<TileData>> _buildConnectionTileData(BuildContext context) async {
     P2pConferenceClient? p2pConferenceClient =
@@ -94,6 +93,7 @@ class VideoConferenceConnectionWidget extends StatelessWidget
   Widget build(BuildContext context) {
     return AppBarView(
       title: title,
+      helpPath: routeName,
       withLeading: withLeading,
       child: _buildConnectionListView(context),
     );

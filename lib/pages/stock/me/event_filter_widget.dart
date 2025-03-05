@@ -60,8 +60,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'EventFilter';
 
-  @override
-  String? get information => null;
+  
 
   final List<PlatformDataField> eventFilterDataField = [
     PlatformDataField(
@@ -299,6 +298,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
     ];
     return AppBarView(
       title: title,
+      helpPath: routeName,
       withLeading: true,
       rightWidgets: rightWidgets,
       child: Obx(() {

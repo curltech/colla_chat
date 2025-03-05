@@ -62,8 +62,7 @@ class SubscribeChannelListWidget extends StatefulWidget with TileDataMixin {
   @override
   String get title => 'Channel';
 
-  @override
-  String? get information => null;
+  
 }
 
 class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
@@ -212,6 +211,7 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
     return AppBarView(
         centerTitle: false,
         title: widget.title,
+        helpPath: widget.routeName,
         rightWidgets: rightWidgets,
         child: channelChatMessageWidget);
   }

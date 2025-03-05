@@ -64,8 +64,7 @@ class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Security Setting';
 
-  @override
-  String? get information => null;
+  
 
   Widget _buildBackupTileWidget(BuildContext context) {
     List<TileData> tiles = [
@@ -330,6 +329,6 @@ class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        withLeading: true, title: title, child: _buildSettingWidget(context));
+        withLeading: true, title: title,helpPath: routeName, child: _buildSettingWidget(context));
   }
 }

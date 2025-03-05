@@ -64,8 +64,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'StatScore';
 
-  @override
-  String? get information => null;
+  
 
   late final List<PlatformDataField> searchDataField;
   late final FormInputController searchController;
@@ -335,6 +334,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
     List<Widget> rightWidgets = [];
     return AppBarView(
       title: title,
+      helpPath: routeName,
       withLeading: true,
       rightWidgets: rightWidgets,
       child: Column(

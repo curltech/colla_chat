@@ -18,13 +18,13 @@ class SystemAlertWindowWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'System alert window';
 
-  @override
-  String? get information => null;
+  
 
   @override
   Widget build(BuildContext context) {
     var overlayApp = AppBarView(
         title: title,
+        helpPath: routeName,
         withLeading: withLeading,
         child: Center(
           child: Column(

@@ -42,8 +42,7 @@ class PlatformAudioRecorderWidget extends StatefulWidget with TileDataMixin {
   @override
   bool get withLeading => true;
 
-  @override
-  String? get information => null;
+  
 }
 
 class _PlatformAudioRecorderWidgetState
@@ -202,6 +201,7 @@ class _PlatformAudioRecorderWidgetState
   Widget build(BuildContext context) {
     return AppBarView(
         title: widget.title,
+        helpPath: widget.routeName,
         withLeading: true,
         rightWidgets: _buildRightWidgets(),
         child: Column(

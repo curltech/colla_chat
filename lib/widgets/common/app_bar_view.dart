@@ -14,7 +14,7 @@ class AppBarView extends StatelessWidget {
   //指定回退路由样式，不指定则系统判断
   final Function? leadingCallBack;
   final String? title;
-  final String? information;
+  final String? helpPath;
   final Widget? titleWidget;
   final bool centerTitle;
   final bool isAppBar;
@@ -34,7 +34,7 @@ class AppBarView extends StatelessWidget {
     this.leadingWidget,
     this.leadingCallBack,
     this.title,
-    this.information,
+    this.helpPath,
     this.isAppBar = true,
     this.titleWidget,
     this.centerTitle = false,
@@ -60,15 +60,23 @@ class AppBarView extends StatelessWidget {
               //maxLines: 2
             );
 
-        if (information != null) {
-          titleWidget = InkWell(
-            onLongPress: () {
-              helpInformationController.title.value =
-                  '${title!} help information';
-              helpInformationController.information.value = information!;
-              sliderDrawerKey.currentState?.openSlider();
-            },
-            child: titleWidget,
+        if (helpPath != null) {
+          titleWidget = Row(
+            children: [
+              titleWidget,
+              InkWell(
+                onTap: () {
+                  helpInformationController.title.value = title ?? '';
+                  helpInformationController.helpPath = helpPath ?? '';
+                  sliderDrawerKey.currentState?.openSlider();
+                },
+                child: Icon(
+                  size: 18,
+                  Icons.info_outline_rounded,
+                  color: Colors.white,
+                ),
+              )
+            ],
           );
         }
         return Column(children: [

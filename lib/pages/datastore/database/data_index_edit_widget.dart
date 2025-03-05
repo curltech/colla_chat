@@ -27,8 +27,7 @@ class DataIndexEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'DataIndexEdit';
 
-  @override
-  String? get information => null;
+  
 
   late final FormInputController formInputController;
 

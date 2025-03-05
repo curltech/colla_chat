@@ -22,8 +22,7 @@ class MyselfPeerListWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'MyselfPeer';
 
-  @override
-  String? get information => null;
+  
 
   List<TileData> _buildMyselfPeerTileData() {
     List<TileData> tiles = [];
@@ -59,7 +58,7 @@ class MyselfPeerListWidget extends StatelessWidget with TileDataMixin {
       },
     );
     var appBarView =
-        AppBarView(title: title, withLeading: withLeading, child: myselfPeers);
+        AppBarView(title: title,helpPath: routeName, withLeading: withLeading, child: myselfPeers);
 
     return appBarView;
   }

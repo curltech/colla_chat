@@ -50,8 +50,7 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Mail';
 
-  @override
-  String? get information => null;
+  
 
   final RxInt index = 0.obs;
   final SwiperController swiperController = SwiperController();
@@ -184,6 +183,7 @@ class MailAddressWidget extends StatelessWidget with TileDataMixin {
           ));
       var appBarView = AppBarView(
           titleWidget: titleWidget,
+          helpPath: routeName,
           withLeading: withLeading,
           rightWidgets: rightWidgets,
           child: Swiper(

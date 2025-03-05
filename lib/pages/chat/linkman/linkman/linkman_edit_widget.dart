@@ -41,8 +41,7 @@ class LinkmanEditWidget extends StatefulWidget with TileDataMixin {
   @override
   String get title => 'Linkman edit';
 
-  @override
-  String? get information => null;
+  
 }
 
 class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
@@ -253,6 +252,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     }
     var appBarView = AppBarView(
         title: title,
+        helpPath: widget.routeName,
         withLeading: widget.withLeading,
         child: SingleChildScrollView(child: _buildFormInputWidget(context)));
 

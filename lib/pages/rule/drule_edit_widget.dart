@@ -27,8 +27,7 @@ class DruleEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'DruleEdit';
 
-  @override
-  String? get information => null;
+  
 
   DruleEditWidget({super.key});
 
@@ -162,6 +161,7 @@ class DruleEditWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     return AppBarView(
         title: title,
+        helpPath: routeName,
         withLeading: true,
         rightWidgets: _buildRightButton(context),
         child: _buildFormInputWidget(context));

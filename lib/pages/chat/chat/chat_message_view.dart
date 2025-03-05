@@ -79,8 +79,7 @@ class ChatMessageView extends StatefulWidget with TileDataMixin {
   @override
   String get title => 'ChatMessage';
 
-  @override
-  String? get information => null;
+  
 }
 
 class _ChatMessageViewState extends State<ChatMessageView>
@@ -645,12 +644,14 @@ class _ChatMessageViewState extends State<ChatMessageView>
         List<Widget> rightWidgets = _buildRightWidgets(context, chatSummary);
         return AppBarView(
             title: title,
+            helpPath: widget.routeName,
             withLeading: widget.withLeading,
             rightWidgets: rightWidgets,
             child: chatMessageWidget);
       }
       return AppBarView(
           title: AppLocalizations.t('No current chatSummary'),
+          helpPath: widget.routeName,
           withLeading: widget.withLeading,
           child: chatMessageWidget);
     });

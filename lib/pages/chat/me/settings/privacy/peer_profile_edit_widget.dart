@@ -150,8 +150,7 @@ class PeerProfileEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Privacy Setting';
 
-  @override
-  String? get information => null;
+
 
   final FormInputController controller =
       FormInputController(peerProfileDataFields);
@@ -193,9 +192,9 @@ class PeerProfileEditWidget extends StatelessWidget with TileDataMixin {
               AppLocalizations.t('myself peerProfile has stored completely'));
 
       if (peerProfile.stockSwitch) {
-        indexWidgetProvider.addMainView('stock_main');
+        indexWidgetProvider.addMainView('stock');
       } else {
-        indexWidgetProvider.removeMainView('stock_main');
+        indexWidgetProvider.removeMainView('stock');
       }
       if (peerProfile.emailSwitch) {
         indexWidgetProvider.addMainView('mail');
@@ -214,6 +213,7 @@ class PeerProfileEditWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
         title: title,
+        helpPath: routeName,
         withLeading: withLeading,
         child: _buildFormInputWidget(context));
     return appBarView;

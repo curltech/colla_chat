@@ -32,8 +32,7 @@ class AnonymousConferenceEditWidget extends StatelessWidget with TileDataMixin {
   @override
   bool get withLeading => true;
 
-  @override
-  String? get information => null;
+
 
   final List<PlatformDataField> conferenceDataField = [
     PlatformDataField(
@@ -171,6 +170,7 @@ class AnonymousConferenceEditWidget extends StatelessWidget with TileDataMixin {
 
     var appBarView = AppBarView(
         title: title,
+        helpPath: routeName,
         withLeading: withLeading,
         child: _buildFormInputWidget(context));
     return appBarView;

@@ -67,8 +67,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Performance';
 
-  @override
-  String? get information => null;
+
 
   late final List<PlatformDataColumn> performanceDataColumns = [
     PlatformDataColumn(
@@ -322,6 +321,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
     List<Widget> rightWidgets = [];
     return AppBarView(
       title: title,
+      helpPath: routeName,
       withLeading: true,
       rightWidgets: rightWidgets,
       child: Column(

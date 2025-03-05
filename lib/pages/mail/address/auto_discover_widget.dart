@@ -38,8 +38,7 @@ class AutoDiscoverWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'MailAddressAutoDiscover';
 
-  @override
-  String? get information => null;
+  
 
   late final FormInputController formInputController;
 
@@ -268,6 +267,7 @@ class AutoDiscoverWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
         title: title,
+        helpPath: routeName,
         withLeading: withLeading,
         child: Column(children: [
           const SizedBox(
