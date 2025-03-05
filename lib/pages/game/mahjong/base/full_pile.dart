@@ -1,6 +1,6 @@
-import 'package:colla_chat/pages/game/mahjong/base/pile.dart';
 import 'package:colla_chat/pages/game/mahjong/base/suit.dart';
 import 'package:colla_chat/pages/game/mahjong/base/tile.dart';
+import 'package:flame/flame.dart';
 
 /// 完整的一副麻将
 class FullPile {

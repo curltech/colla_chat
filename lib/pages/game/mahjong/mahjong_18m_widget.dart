@@ -18,14 +18,16 @@ import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
+import 'package:flame/flame.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 /// 18m麻将游戏
 class Majiang18mWidget extends StatelessWidget with TileDataMixin {
-  Majiang18mWidget({super.key}) {
-    logger.i('Full mahjong cards category number is:${fullPile.tiles.length}');
+  Majiang18mWidget({super.key}){
+    Flame.images.prefix = 'assets/image/';
+    logger.i('all tiles have ${fullPile.tiles.length}');
   }
 
   @override

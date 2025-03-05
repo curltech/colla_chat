@@ -27,7 +27,7 @@ class TileComponent extends PositionComponent
         width = tile.sprite!.image.width.toDouble();
         height = tile.sprite!.image.height.toDouble();
       } else {
-        logger.e('tile sprite image is null');
+        logger.e('tile:$tile sprite image is null');
       }
       size = Vector2(width, height);
     }
