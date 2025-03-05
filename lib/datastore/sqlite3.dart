@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/datastore/datastore.dart';
+import 'package:colla_chat/datastore/create_service.dart';
 import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
@@ -56,15 +57,9 @@ class Sqlite3 extends DataStore {
     /// 删除新版本中有变化的表，重建
     String? existAppVersion = await localSharedPreferences.get('appVersion');
     print('current appVersion:$existAppVersion');
-    if (existAppVersion != null) {
-      if (existAppVersion.compareTo(appVersion) < 0) {
-        //drop(conferenceService.tableName);
-      }
+    for (var createServices in createServices) {
+      drop(createServices.tableName);
     }
-    // drop(myselfPeerService.tableName);
-    // drop(conferenceService.tableName);
-    // drop(peerEndpointService.tableName);
-    // drop(peerProfileService.tableName);
     await localSharedPreferences.save('appVersion', appVersion);
     print('new appVersion:$appVersion');
 
