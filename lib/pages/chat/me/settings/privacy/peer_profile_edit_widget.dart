@@ -150,8 +150,6 @@ class PeerProfileEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Privacy Setting';
 
-
-
   final FormInputController controller =
       FormInputController(peerProfileDataFields);
 
@@ -186,10 +184,16 @@ class PeerProfileEditWidget extends StatelessWidget with TileDataMixin {
       }
       myselfPeerProfile.mobileVerified = peerProfile.mobileVerified;
       myselfPeerProfile.logLevel = peerProfile.logLevel;
-      await peerProfileService.store(myselfPeerProfile);
-      DialogUtil.info(
-          content:
-              AppLocalizations.t('myself peerProfile has stored completely'));
+      try {
+        await peerProfileService.store(myselfPeerProfile);
+        DialogUtil.info(
+            content:
+                AppLocalizations.t('myself peerProfile has stored completely'));
+      } catch (e) {
+        DialogUtil.error(
+            content:
+                AppLocalizations.t('myself peerProfile has stored failure'));
+      }
 
       if (peerProfile.stockSwitch) {
         indexWidgetProvider.addMainView('stock');

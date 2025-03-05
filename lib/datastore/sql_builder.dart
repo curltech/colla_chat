@@ -5,6 +5,11 @@ class Sql {
   late List<Object?>? params;
 
   Sql(this.clause, [this.params]);
+
+  @override
+  String toString() {
+    return '$clause\n$params';
+  }
 }
 
 class SqlBuilder {

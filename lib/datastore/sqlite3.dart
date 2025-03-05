@@ -135,14 +135,8 @@ class Sqlite3 extends DataStore {
   @override
   dynamic execute(List<Sql> sqls) {
     for (var sql in sqls) {
-      if (sql.params != null) {
-        var params = sql.params;
-        db!.execute(sql.clause, params!);
-      } else {
-        db!.execute(sql.clause);
-      }
+      run(sql);
       logger.i('execute sql:${sql.clause}');
-      // logger.i('execute sql params:${sql.params}');
     }
   }
 
@@ -151,14 +145,17 @@ class Sqlite3 extends DataStore {
   /// @param {*} params
   @override
   dynamic run(Sql sql) {
-    if (sql.params != null) {
-      var params = sql.params;
-      db!.execute(sql.clause, params!);
-    } else {
-      db!.execute(sql.clause);
+    try {
+      if (sql.params != null) {
+        var params = sql.params;
+        db!.execute(sql.clause, params!);
+      } else {
+        db!.execute(sql.clause);
+      }
+    } catch (e) {
+      logger.e('sqlite3 run sql:$sql failure:\n$e');
+      rethrow;
     }
-    // logger.i('execute sql:${sql.clause}');
-    // logger.i('execute sql params:${sql.params}');
 
     return null;
   }
@@ -188,11 +185,21 @@ class Sqlite3 extends DataStore {
   /// 查询执行
   @override
   ResultSet select(String sql, [List<Object?> parameters = const []]) {
-    return db!.select(sql, parameters);
+    try {
+      return db!.select(sql, parameters);
+    } catch (e) {
+      logger.e('sqlite3 select sql:$sql failure:\n$e');
+      rethrow;
+    }
   }
 
   vacuum() {
-    db!.execute('VACUUM');
+    try {
+      db!.execute('VACUUM');
+    } catch (e) {
+      logger.e('sqlite3 execute sql:VACUUM failure:\n$e');
+      rethrow;
+    }
   }
 
   @override
@@ -222,9 +229,7 @@ class Sqlite3 extends DataStore {
         limit: limit,
         offset: offset);
     whereArgs ??= [];
-    ResultSet results = db!.select(clause, whereArgs);
-    // logger.i('execute sql:$clause');
-    // logger.i('execute sql params:$whereArgs');
+    ResultSet results = select(clause, whereArgs);
 
     return results;
   }
@@ -252,10 +257,8 @@ class Sqlite3 extends DataStore {
     );
     clause = 'select count(*) from ($clause)';
     whereArgs = whereArgs ?? [];
-    var totalResults = db!.select(clause, whereArgs);
-    // logger.i('execute sql:$clause');
-    // logger.i('execute sql params:$whereArgs');
-    var rowsNumber = TypeUtil.firstIntValue(totalResults);
+    ResultSet totalResults = select(clause, whereArgs);
+    int rowsNumber = TypeUtil.firstIntValue(totalResults);
     var results = find(table,
         distinct: distinct,
         columns: columns,
