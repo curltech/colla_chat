@@ -188,7 +188,7 @@ class PeerProfileEditWidget extends StatelessWidget with TileDataMixin {
         await peerProfileService.store(myselfPeerProfile);
         DialogUtil.info(
             content:
-                AppLocalizations.t('myself peerProfile has stored completely'));
+                AppLocalizations.t('myself peerProfile has stored successfully'));
       } catch (e) {
         DialogUtil.error(
             content:
