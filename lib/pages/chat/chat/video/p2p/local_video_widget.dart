@@ -158,14 +158,14 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   _playAudio() {
     var conferenceChatMessageController =
         p2pConferenceClientPool.conferenceChatMessageController;
-    conferenceChatMessageController?.playAudio('assets/medias/call.mp3', true);
+    conferenceChatMessageController?.playAudio('assets/imedia/call.mp3', true);
   }
 
   _stopAudio() async {
     var conferenceChatMessageController =
         p2pConferenceClientPool.conferenceChatMessageController;
     conferenceChatMessageController?.stopAudio(
-        filename: 'assets/medias/close.mp3');
+        filename: 'assets/imedia/close.mp3');
   }
 
   ///在视频会议中增加本地视频到会议的所有连接

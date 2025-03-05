@@ -84,10 +84,10 @@ class AppFontSize {
 }
 
 class AppImageFile {
-  static const xsAppIconFile = 'assets/images/app.png';
-  static const mdAppIconFile = 'assets/images/app.png';
-  static const defaultAvatarFile = 'assets/images/app.png';
-  static const defaultGroupAvatarFile = 'assets/images/app.png';
+  static const xsAppIconFile = 'assets/image/app.png';
+  static const mdAppIconFile = 'assets/image/app.png';
+  static const defaultAvatarFile = 'assets/image/app.png';
+  static const defaultGroupAvatarFile = 'assets/image/app.png';
 }
 
 class AppIcon {

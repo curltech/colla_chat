@@ -146,14 +146,14 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
   _playAudio() {
     var conferenceChatMessageController =
         liveKitConferenceClientPool.conferenceChatMessageController;
-    conferenceChatMessageController?.playAudio('assets/medias/call.mp3', true);
+    conferenceChatMessageController?.playAudio('assets/imedia/call.mp3', true);
   }
 
   _stopAudio() async {
     var conferenceChatMessageController =
         liveKitConferenceClientPool.conferenceChatMessageController;
     conferenceChatMessageController?.stopAudio(
-        filename: 'assets/medias/close.mp3');
+        filename: 'assets/imedia/close.mp3');
   }
 
   /// 发布视频流

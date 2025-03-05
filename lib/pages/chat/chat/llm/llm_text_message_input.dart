@@ -54,7 +54,7 @@ class LlmTextMessageInputWidget extends StatelessWidget {
 
   _play() {
     audioPlayer.setLoopMode(false);
-    audioPlayer.play('assets/medias/send.mp3');
+    audioPlayer.play('assets/imedia/send.mp3');
   }
 
   _stop() {

@@ -385,6 +385,7 @@ dependency_overrides:
   webview_win_floating: #2.0.0 #webView for win
     git: https://github.com/jakky1/webview_win_floating.git
   flutter_widget_from_html: ^0.16.0
+  flutter_widget_from_html_core: ^0.16.0
   sprintf: ^7.0.0
   flex_color_picker: ^3.7.0
   permission_handler: ^11.2.0
@@ -417,6 +418,7 @@ dependency_overrides:
   focus_detector: ^2.0.1 #组建在界面上消失或者出现
   image_picker: ^1.1.2 #选取图库,移动从图像廊或者相机选，桌面实现采用file_selector，从文件系统选
   markdown: ^7.3.0
+  flutter_markdown: ^0.7.6+2
   markdown_widget: ^2.3.2+6
   flutter_slider_drawer: ^3.0.2
   lottie: ^3.1.2
@@ -469,24 +471,24 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 flutter_icons:
-  image_path: "assets/images/app1024.png"
+  image_path: "assets/image/app1024.png"
   android: true
   ios: true
   web:
     generate: true
-    image_path: "assets/images/app1024.png"
+    image_path: "assets/image/app1024.png"
     background_color: "#hexcode"
     theme_color: "#hexcode"
   windows:
     generate: true
-    image_path: "assets/images/app1024.png"
+    image_path: "assets/image/app1024.png"
     icon_size: 48 # min:48, max:256, default: 48
   macos:
     generate: true
-    image_path: "assets/images/app1024.png"
+    image_path: "assets/image/app1024.png"
 flutter_native_splash:
-  background_image: "assets/images/splash_bg.png"
-  image: assets/images/splash.png
+  background_image: "assets/image/splash_bg.png"
+  image: assets/image/splash.png
 # The following section is specific to Flutter packages.
 flutter:
 
@@ -503,15 +505,16 @@ flutter:
     - packages/openpgp/web/assets/openpgp.wasm
     - assets/wasm/sqlite3.wasm
     - assets/locale/
-    - assets/icons/
-    - assets/images/
-    - assets/images/bg/
-    - assets/images/email/
-    - assets/images/mahjong/
-    - assets/images/mahjong/tile/
-    - assets/images/poker/
-    - assets/medias/
+    - assets/icon/
+    - assets/image/
+    - assets/image/bg/
+    - assets/image/email/
+    - assets/image/mahjong/
+    - assets/image/mahjong/tile/
+    - assets/image/poker/
+    - assets/media/
     - assets/model/
+    - assets/markdown/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

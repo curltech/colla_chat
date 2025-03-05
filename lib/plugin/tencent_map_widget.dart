@@ -136,7 +136,7 @@ class TencentMapWidgetState extends State<TencentMapWidget> {
     selectedMarker = Marker(
       id: selectedMarkerId,
       position: LatLng(locationPosition.latitude, locationPosition.longitude),
-      icon: Bitmap(asset: 'assets/images/marker.png'),
+      icon: Bitmap(asset: 'assets/image/marker.png'),
       anchor: Anchor(x: 0.5, y: 1),
       draggable: true,
     );

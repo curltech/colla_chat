@@ -251,7 +251,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         if (linkman.linkmanStatus == LinkmanStatus.G.name) {
           // prefix = prefix ??
           //     ImageUtil.buildImageWidget(
-          //         image: 'assets/images/ollama.png',
+          //         image: 'assets/image/ollama.png',
           //         width: AppIconSize.lgSize,
           //         height: AppIconSize.lgSize);
           // routeName = 'llm_chat_add';

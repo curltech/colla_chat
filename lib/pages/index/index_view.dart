@@ -248,8 +248,8 @@ class _IndexViewState extends State<IndexView>
       return;
     }
     String path = platformParams.windows
-        ? 'assets/icons/favicon-32x32.ico'
-        : 'assets/images/colla-white.png';
+        ? 'assets/icon/favicon-32x32.ico'
+        : 'assets/image/colla-white.png';
 
     final AppWindow appWindow = AppWindow();
     final SystemTray systemTray = SystemTray();
@@ -333,7 +333,7 @@ class _IndexViewState extends State<IndexView>
 
   _play() {
     conferenceChatMessageController.playAudio(
-        'assets/medias/invitation.mp3', true);
+        'assets/imedia/invitation.mp3', true);
   }
 
   _stop() {

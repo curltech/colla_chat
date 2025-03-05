@@ -340,7 +340,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
         if (linkmanStatus == LinkmanStatus.G.name) {
           avatarImage = avatarImage ??
               ImageUtil.buildImageWidget(
-                  imageContent: 'assets/images/ollama.png',
+                  imageContent: 'assets/image/ollama.png',
                   width: AppImageSize.mdSize,
                   height: AppImageSize.mdSize);
         }

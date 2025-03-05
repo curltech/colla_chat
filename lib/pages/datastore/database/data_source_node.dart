@@ -10,9 +10,9 @@ enum SqliteDataType { INTEGER, INT, TEXT, REAL, BLOB }
 
 class DataSource extends Explorable {
   static Widget sqliteImage = ImageUtil.buildImageWidget(
-      imageContent: 'assets/images/sqlite.webp', width: 24);
+      imageContent: 'assets/image/sqlite.webp', width: 24);
   static Widget postgresImage = ImageUtil.buildImageWidget(
-      imageContent: 'assets/images/postgres.webp', width: 24);
+      imageContent: 'assets/image/postgres.webp', width: 24);
 
   String sourceType;
   String? filename;
