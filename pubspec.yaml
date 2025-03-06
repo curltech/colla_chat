@@ -42,7 +42,7 @@ dependencies:
   flutter_foreground_task: ^8.8.1+1
   flutter_background_service: ^5.0.10
   flutter_background_executor: ^1.0.0
-  system_alert_window: ^2.0.0
+  system_alert_window: ^2.0.4
   flutter_overlay_window: ^0.4.3
   flutter_floating: ^1.0.8
   upgrader: ^11.0.0
@@ -324,8 +324,8 @@ dependencies:
   flutter_native_splash: ^2.4.5
   system_tray: ^2.0.3
   tray_manager: ^0.3.0
-  livekit_client: ^2.3.6 #livekit sfu server flutter client
-  livekit_server_sdk: ^1.0.0
+  livekit_client: ^2.4.0 #livekit sfu server flutter client
+  livekit_server_sdk: ^1.0.1
   langchain: ^0.7.1
   langchain_ollama: ^0.3.0
   langchain_openai: ^0.7.0
