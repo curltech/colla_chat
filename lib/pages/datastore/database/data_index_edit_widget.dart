@@ -1,4 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/datastore/database/data_source_controller.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart'
     as data_source;
 import 'package:colla_chat/provider/myself.dart';
@@ -12,8 +13,6 @@ import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-final Rx<data_source.DataIndex?> rxDataIndex = Rx<data_source.DataIndex?>(null);
-
 class DataIndexEditWidget extends StatelessWidget with TileDataMixin {
   @override
   bool get withLeading => true;
@@ -26,8 +25,6 @@ class DataIndexEditWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'DataIndexEdit';
-
-  
 
   late final FormInputController formInputController;
 
@@ -63,7 +60,7 @@ class DataIndexEditWidget extends StatelessWidget with TileDataMixin {
   //DataIndex信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
     return Obx(() {
-      data_source.DataIndex dataIndex = rxDataIndex.value!;
+      data_source.DataIndex dataIndex = dataSourceController.getDataIndex()!;
       formInputController.setValues(JsonUtil.toJson(dataIndex));
       var formInputWidget = FormInputWidget(
         spacing: 15.0,
@@ -86,7 +83,7 @@ class DataIndexEditWidget extends StatelessWidget with TileDataMixin {
       DialogUtil.error(content: AppLocalizations.t('Must has dataIndex name'));
       return null;
     }
-    data_source.DataIndex dataIndex = rxDataIndex.value!;
+    data_source.DataIndex dataIndex = dataSourceController.getDataIndex()!;
     String? originalName = dataIndex.name;
     if (originalName == null) {}
     dataIndex.name = current.name;

@@ -1,7 +1,5 @@
 import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/datastore/database/data_column_edit_widget.dart';
-import 'package:colla_chat/pages/datastore/database/data_index_edit_widget.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_controller.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart'
     as data_source;
@@ -27,8 +25,6 @@ import 'package:get/get.dart';
 import 'package:highlight/languages/sql.dart';
 import 'package:tab_container/tab_container.dart';
 
-final Rx<data_source.DataTable?> rxDataTable = Rx<data_source.DataTable?>(null);
-
 class DataTableEditWidget extends StatefulWidget with TileDataMixin {
   @override
   bool get withLeading => true;
@@ -42,51 +38,10 @@ class DataTableEditWidget extends StatefulWidget with TileDataMixin {
   @override
   String get title => 'DataTableEdit';
 
-
-
-  DataTableEditWidget({super.key}) {
-    _buildDataColumns();
-    _buildDataIndexes();
-    rxDataTable.addListener(() {
-      _buildDataColumns();
-      _buildDataIndexes();
-    });
-  }
-
-  final DataListController<data_source.DataColumn> dataColumnController =
-      DataListController<data_source.DataColumn>();
-
-  final DataListController<data_source.DataIndex> dataIndexController =
-      DataListController<data_source.DataIndex>();
+  DataTableEditWidget({super.key});
 
   @override
   State<StatefulWidget> createState() => _DataTableEditWidgetState();
-
-  _buildDataColumns() async {
-    data_source.DataTable? dataTable = rxDataTable.value;
-    if (dataTable?.name == null) {
-      return null;
-    }
-    List<data_source.DataColumn>? dataColumns =
-        await dataSourceController.findColumns(dataTable!.name!);
-    if (dataColumns == null) {
-      return null;
-    }
-    dataColumnController.data.assignAll(dataColumns);
-  }
-
-  _buildDataIndexes() async {
-    data_source.DataTable? dataTable = rxDataTable.value;
-    if (dataTable?.name == null) {
-      return null;
-    }
-    List<data_source.DataIndex>? dataIndexes =
-        await dataSourceController.findIndexes(dataTable!.name!);
-    if (dataIndexes == null) {
-      return null;
-    }
-    dataIndexController.data.assignAll(dataIndexes);
-  }
 }
 
 class _DataTableEditWidgetState extends State<DataTableEditWidget>
@@ -94,9 +49,45 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
   late final TabController _tabController =
       TabController(length: 3, vsync: this);
 
+  final Rx<data_source.DataTable?> dataTable = Rx<data_source.DataTable?>(null);
+
   @override
   void initState() {
     super.initState();
+  }
+
+  _buildDataColumns() async {
+    final DataListController<data_source.DataColumn>? dataColumnController =
+        dataSourceController.getDataColumnController();
+    if (dataColumnController == null) {
+      return;
+    }
+    if (dataColumnController.length > 0) {
+      return;
+    }
+    List<data_source.DataColumn>? dataColumns =
+        await dataSourceController.findColumns();
+    if (dataColumns == null) {
+      return;
+    }
+    dataColumnController.data.assignAll(dataColumns);
+  }
+
+  _buildDataIndexes() async {
+    final DataListController<data_source.DataIndex>? dataIndexController =
+        dataSourceController.getDataIndexController();
+    if (dataIndexController == null) {
+      return;
+    }
+    if (dataIndexController.length > 0) {
+      return;
+    }
+    List<data_source.DataIndex>? dataIndexes =
+        await dataSourceController.findIndexes();
+    if (dataIndexes == null) {
+      return null;
+    }
+    dataIndexController.data.assignAll(dataIndexes);
   }
 
   List<PlatformDataField> buildDataTableDataFields(String sourceType) {
@@ -119,7 +110,10 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
   //DataTableNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
     return Obx(() {
-      data_source.DataTable dataTable = rxDataTable.value!;
+      data_source.DataTable? dataTable = dataSourceController.getDataTable();
+      if (dataTable?.name == null) {
+        return Container();
+      }
       List<PlatformDataField> dataSourceDataFields =
           buildDataTableDataFields(SourceType.sqlite.name);
       formInputController = FormInputController(dataSourceDataFields);
@@ -151,8 +145,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
 
                 if (sql != null) {
                   try {
-                    dataSourceController.current.value?.dataStore
-                        ?.run(Sql(sql));
+                    dataSourceController.current?.dataStore?.run(Sql(sql));
                   } catch (e) {
                     DialogUtil.error(
                         content: AppLocalizations.t('execute sql failure:$e'));
@@ -175,17 +168,18 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       DialogUtil.error(content: AppLocalizations.t('Must has dataTable name'));
       return null;
     }
-    data_source.DataTable dataTable = rxDataTable.value!;
-    String? originalName = dataTable.name;
+    data_source.DataTable? dataTable = this.dataTable.value;
+    String? originalName = dataTable?.name;
     if (originalName == null) {
-      dataTable.name = current.name;
-      dataTable.comment = current.comment;
+      dataTable?.name = current.name;
+      dataTable?.comment = current.comment;
     } else {
-      dataTable.name = current.name;
-      dataTable.comment = current.comment;
+      dataTable?.name = current.name;
+      dataTable?.comment = current.comment;
     }
 
-    DialogUtil.info(content: 'Successfully update dataTable:${dataTable.name}');
+    DialogUtil.info(
+        content: 'Successfully update dataTable:${dataTable?.name}');
 
     return current;
   }
@@ -217,14 +211,17 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       horizontalMargin: 15.0,
       columnSpacing: 0.0,
       platformDataColumns: platformDataColumns,
-      controller: widget.dataColumnController,
+      controller: dataSourceController.getDataColumnController()!,
       fixedLeftColumns: 0,
     );
   }
 
   String? _getCheckedColumnNames() {
-    List<data_source.DataColumn> dataColumns =
-        widget.dataColumnController.checked;
+    var dataColumnController = dataSourceController.getDataColumnController();
+    if (dataColumnController == null) {
+      return null;
+    }
+    List<data_source.DataColumn> dataColumns = dataColumnController.checked;
     if (dataColumns.isEmpty) {
       return null;
     }
@@ -241,22 +238,24 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
   }
 
   Widget _buildColumnButtonWidget(BuildContext context) {
+    data_source.DataTable? dataTable = dataSourceController.getDataTable();
+    if (dataTable == null) {
+      return Container();
+    }
     return OverflowBar(
       alignment: MainAxisAlignment.start,
       children: [
         IconButton(
             tooltip: AppLocalizations.t('New column'),
             onPressed: () {
-              data_source.DataTable dataTable = rxDataTable.value!;
               if (dataTable.name == null) {
                 DialogUtil.error(content: 'Please input table name');
                 return;
               }
+              DataListController<data_source.DataColumn>? dataColumnController =
+                  dataSourceController.getDataColumnController();
               data_source.DataColumn dataColumn = data_source.DataColumn();
-              rxDataColumn.value = dataColumn;
-              widget.dataColumnController.data.add(dataColumn);
-              widget.dataColumnController.setCurrentIndex =
-                  widget.dataColumnController.data.length - 1;
+              dataColumnController?.add(dataColumn);
               indexWidgetProvider.push('data_column_edit');
             },
             icon: Icon(
@@ -266,19 +265,20 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
         IconButton(
             tooltip: AppLocalizations.t('Delete column'),
             onPressed: () {
-              data_source.DataTable dataTable = rxDataTable.value!;
               if (dataTable.name == null) {
                 DialogUtil.error(content: 'Please input table name');
                 return;
               }
-              List<data_source.DataColumn> dataColumns =
-                  widget.dataColumnController.checked;
-              if (dataColumns.isEmpty) {
+              DataListController<data_source.DataColumn>? dataColumnController =
+                  dataSourceController.getDataColumnController();
+              List<data_source.DataColumn>? dataColumns =
+                  dataColumnController?.checked;
+              if (dataColumns == null || dataColumns.isEmpty) {
                 return;
               }
               for (data_source.DataColumn dataColumn in dataColumns) {
-                widget.dataColumnController.data.remove(dataColumn);
-                dataSourceController.current.value?.dataStore?.run(Sql(
+                dataColumnController?.data.remove(dataColumn);
+                dataSourceController.current?.dataStore?.run(Sql(
                     'alter table ${dataTable.name} drop column ${dataColumn.name};'));
               }
             },
@@ -286,12 +286,10 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
         IconButton(
             tooltip: AppLocalizations.t('Edit column'),
             onPressed: () {
-              data_source.DataTable dataTable = rxDataTable.value!;
               if (dataTable.name == null) {
                 DialogUtil.error(content: 'Please input table name');
                 return;
               }
-              rxDataColumn.value = widget.dataColumnController.current;
               indexWidgetProvider.push('data_column_edit');
             },
             icon: Icon(Icons.edit, color: myself.primary)),
@@ -300,13 +298,16 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
   }
 
   Widget _buildIndexButtonWidget(BuildContext context) {
+    data_source.DataTable? dataTable = dataSourceController.getDataTable();
+    if (dataTable == null) {
+      return Container();
+    }
     return OverflowBar(
       alignment: MainAxisAlignment.start,
       children: [
         IconButton(
             tooltip: AppLocalizations.t('New index'),
             onPressed: () {
-              data_source.DataTable dataTable = rxDataTable.value!;
               if (dataTable.name == null) {
                 DialogUtil.error(content: 'Please input table name');
                 return;
@@ -320,11 +321,12 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
               dataIndex.name =
                   '${dataTable.name}_${columnNames.replaceAll(',', '_')}_index';
               dataIndex.columnNames = columnNames;
-              widget.dataColumnController.setCheckAll(false);
-              rxDataIndex.value = dataIndex;
-              widget.dataIndexController.data.add(dataIndex);
-              widget.dataIndexController.setCurrentIndex =
-                  widget.dataIndexController.data.length - 1;
+              DataListController<data_source.DataColumn>? dataColumnController =
+                  dataSourceController.getDataColumnController();
+              dataColumnController?.setCheckAll(false);
+              DataListController<data_source.DataIndex>? dataIndexController =
+                  dataSourceController.getDataIndexController();
+              dataIndexController?.add(dataIndex);
               indexWidgetProvider.push('data_index_edit');
             },
             icon: Icon(
@@ -334,19 +336,20 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
         IconButton(
             tooltip: AppLocalizations.t('Delete index'),
             onPressed: () {
-              data_source.DataTable dataTable = rxDataTable.value!;
               if (dataTable.name == null) {
                 DialogUtil.error(content: 'Please input table name');
                 return;
               }
-              List<data_source.DataIndex> dataIndexes =
-                  widget.dataIndexController.checked;
-              if (dataIndexes.isEmpty) {
+              DataListController<data_source.DataIndex>? dataIndexController =
+                  dataSourceController.getDataIndexController();
+              List<data_source.DataIndex>? dataIndexes =
+                  dataIndexController?.checked;
+              if (dataIndexes == null || dataIndexes.isEmpty) {
                 return;
               }
               for (data_source.DataIndex dataIndex in dataIndexes) {
-                widget.dataIndexController.data.remove(dataIndex);
-                dataSourceController.current.value?.dataStore
+                dataIndexController?.remove(dataIndex);
+                dataSourceController.current?.dataStore
                     ?.run(Sql('drop index ${dataIndex.name}'));
               }
             },
@@ -354,12 +357,11 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
         IconButton(
             tooltip: AppLocalizations.t('Edit index'),
             onPressed: () {
-              data_source.DataTable dataTable = rxDataTable.value!;
               if (dataTable.name == null) {
                 DialogUtil.error(content: 'Please input table name');
                 return;
               }
-              rxDataIndex.value = widget.dataIndexController.current;
+
               indexWidgetProvider.push('data_index_edit');
             },
             icon: Icon(Icons.edit, color: myself.primary)),
@@ -378,8 +380,10 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
     }
     String sql = 'create table $tableName\n';
     sql += '(\n';
-    List<data_source.DataColumn> dataColumns = widget.dataColumnController.data;
-    if (dataColumns.isNotEmpty) {
+    DataListController<data_source.DataColumn>? dataColumnController =
+        dataSourceController.getDataColumnController();
+    List<data_source.DataColumn>? dataColumns = dataColumnController?.data;
+    if (dataColumns != null && dataColumns.isNotEmpty) {
       String keyColumns = '';
       for (int i = 0; i < dataColumns.length; ++i) {
         data_source.DataColumn dataColumn = dataColumns[i];
@@ -415,12 +419,18 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       return null;
     }
     String sql = '';
-    List<data_source.DataIndex> dataIndexes = widget.dataIndexController.data;
-    if (dataIndexes.isNotEmpty) {
+    DataListController<data_source.DataIndex>? dataIndexController =
+        dataSourceController.getDataIndexController();
+    List<data_source.DataIndex>? dataIndexes = dataIndexController?.data;
+    if (dataIndexes != null && dataIndexes.isNotEmpty) {
       for (var dataIndex in dataIndexes) {
         String indexName = dataIndex.name!;
         String columnNames = dataIndex.columnNames!;
-        sql += 'create index $indexName\n';
+        if (dataIndex.isUnique != null && dataIndex.isUnique!) {
+          sql += 'create unique index $indexName\n';
+        } else {
+          sql += 'create index $indexName\n';
+        }
         sql += 'on $tableName($columnNames);\n';
       }
     }
@@ -474,8 +484,13 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
   Widget _buildDataIndexesWidget(BuildContext context) {
     return Obx(() {
       final List<TileData> tiles = [];
-      for (int i = 0; i < widget.dataIndexController.data.length; ++i) {
-        DataIndex dataIndex = widget.dataIndexController.data[i];
+      DataListController<data_source.DataIndex>? dataIndexController =
+          dataSourceController.getDataIndexController();
+      if (dataIndexController == null) {
+        return Container();
+      }
+      for (int i = 0; i < dataIndexController.data.length; ++i) {
+        DataIndex dataIndex = dataIndexController.data[i];
         String titleTail = '';
         if (dataIndex.isUnique != null && dataIndex.isUnique!) {
           titleTail = 'Unique';
@@ -488,11 +503,10 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
             title: dataIndex.name ?? '',
             titleTail: titleTail,
             subtitle: dataIndex.columnNames ?? '',
-            selected: widget.dataIndexController.currentIndex.value == i
-                ? true
-                : false,
+            selected:
+                dataIndexController.currentIndex.value == i ? true : false,
             onTap: (int index, String label, {String? subtitle}) {
-              widget.dataIndexController.currentIndex.value = index;
+              dataIndexController.currentIndex.value = index;
             }));
       }
 
@@ -560,6 +574,9 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
 
   @override
   Widget build(BuildContext context) {
+    dataTable.value = dataSourceController.getDataTable();
+    _buildDataColumns();
+    _buildDataIndexes();
     return AppBarView(
         title: widget.title,
         withLeading: true,

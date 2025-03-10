@@ -193,7 +193,7 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
       ),
       IconButton(
         onPressed: () async {
-          myChannelChatMessageController.clear(notify: false);
+          myChannelChatMessageController.clear();
           await myChannelChatMessageController.previous(limit: defaultLimit);
           indexWidgetProvider.push('publish_channel');
         },

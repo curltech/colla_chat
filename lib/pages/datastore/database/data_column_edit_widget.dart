@@ -1,4 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/datastore/database/data_source_controller.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart'
     as data_source;
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart';
@@ -14,9 +15,6 @@ import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-final Rx<data_source.DataColumn?> rxDataColumn =
-    Rx<data_source.DataColumn?>(null);
-
 class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
   @override
   bool get withLeading => true;
@@ -29,8 +27,6 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'DataColumnEdit';
-
-  
 
   late final FormInputController formInputController;
 
@@ -85,7 +81,7 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
   //DataSourceNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
     return Obx(() {
-      data_source.DataColumn dataColumn = rxDataColumn.value!;
+      data_source.DataColumn dataColumn = dataSourceController.getDataColumn()!;
       formInputController.setValues(JsonUtil.toJson(dataColumn));
       var formInputWidget = FormInputWidget(
         spacing: 15.0,
@@ -113,7 +109,7 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
           content: AppLocalizations.t('Must has dataColumn dataType'));
       return null;
     }
-    data_source.DataColumn dataColumn = rxDataColumn.value!;
+    data_source.DataColumn dataColumn = dataSourceController.getDataColumn()!;
     String? originalName = dataColumn.name;
     if (originalName == null) {}
     dataColumn.name = current.name;

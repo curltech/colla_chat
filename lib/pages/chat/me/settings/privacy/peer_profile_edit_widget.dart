@@ -173,9 +173,11 @@ class PeerProfileEditWidget extends StatelessWidget with TileDataMixin {
 
   _onOk(BuildContext context, Map<String, dynamic> values) async {
     PeerProfile peerProfile = PeerProfile.fromJson(values);
-    int count = await peerProfileService.upsert(peerProfile);
     PeerProfile? myselfPeerProfile = myself.myselfPeer.peerProfile;
-    if (myselfPeerProfile != null) {
+    if (myselfPeerProfile == null) {
+      myselfPeerProfile = peerProfile;
+      myself.myselfPeer.peerProfile = myselfPeerProfile;
+    } else {
       myselfPeerProfile.vpnSwitch = peerProfile.vpnSwitch;
       myselfPeerProfile.stockSwitch = peerProfile.stockSwitch;
       myselfPeerProfile.emailSwitch = peerProfile.emailSwitch;
@@ -186,34 +188,31 @@ class PeerProfileEditWidget extends StatelessWidget with TileDataMixin {
       }
       myselfPeerProfile.mobileVerified = peerProfile.mobileVerified;
       myselfPeerProfile.logLevel = peerProfile.logLevel;
-      try {
-        await peerProfileService.store(myselfPeerProfile);
-        logger.i('myself peerProfile has stored successfully');
-        DialogUtil.info(
-            content: AppLocalizations.t(
-                'myself peerProfile has stored successfully'));
-      } catch (e) {
-        logger.e('myself peerProfile has stored failure');
-        DialogUtil.error(
-            content:
-                AppLocalizations.t('myself peerProfile has stored failure'));
-      }
+    }
+    try {
+      await peerProfileService.store(myselfPeerProfile);
+      DialogUtil.info(
+          content:
+              AppLocalizations.t('myself peerProfile has stored successfully'));
+    } catch (e) {
+      DialogUtil.error(
+          content: AppLocalizations.t('myself peerProfile has stored failure'));
+    }
 
-      if (peerProfile.stockSwitch) {
-        indexWidgetProvider.addMainView('stock');
-      } else {
-        indexWidgetProvider.removeMainView('stock');
-      }
-      if (peerProfile.emailSwitch) {
-        indexWidgetProvider.addMainView('mail');
-      } else {
-        indexWidgetProvider.removeMainView('mail');
-      }
-      if (peerProfile.gameSwitch) {
-        indexWidgetProvider.addMainView('game_main');
-      } else {
-        indexWidgetProvider.removeMainView('game_main');
-      }
+    if (myselfPeerProfile.stockSwitch) {
+      indexWidgetProvider.addMainView('stock');
+    } else {
+      indexWidgetProvider.removeMainView('stock');
+    }
+    if (myselfPeerProfile.emailSwitch) {
+      indexWidgetProvider.addMainView('mail');
+    } else {
+      indexWidgetProvider.removeMainView('mail');
+    }
+    if (myselfPeerProfile.gameSwitch) {
+      indexWidgetProvider.addMainView('game_main');
+    } else {
+      indexWidgetProvider.removeMainView('game_main');
     }
   }
 

@@ -98,7 +98,7 @@ class PoemWidget extends StatelessWidget with TileDataMixin {
           okLabel: 'Search',
           controller: formInputController,
           onOk: (Map<String, dynamic> values) {
-            poemController.clear(notify: false);
+            poemController.clear();
             _onOk(context, values);
           },
         ));

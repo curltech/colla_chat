@@ -103,14 +103,14 @@ class DataListController<T> {
     }
   }
 
-  addAll(List<T> ds, {bool notify = true}) {
+  addAll(List<T> ds) {
     if (ds.isNotEmpty) {
       this.currentIndex(data.length);
       data.addAll(ds);
     }
   }
 
-  add(T d, {bool notify = true}) {
+  add(T d) {
     data.add(d);
     this.currentIndex(data.length - 1);
   }
@@ -154,6 +154,15 @@ class DataListController<T> {
     return null;
   }
 
+  T? remove(T t) {
+    int index = data.indexOf(t);
+    if (index == -1) {
+      return null;
+    }
+
+    return delete(index: index);
+  }
+
   update(T d, {int? index}) {
     index = index ?? this.currentIndex.value;
     if (index != null && index < data.length) {
@@ -161,7 +170,7 @@ class DataListController<T> {
     }
   }
 
-  clear({bool notify = true}) {
+  clear() {
     data.clear();
     this.currentIndex(null);
   }

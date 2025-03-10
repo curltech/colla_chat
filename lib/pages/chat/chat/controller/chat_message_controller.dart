@@ -38,7 +38,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   set chatSummary(ChatSummary? chatSummary) {
     if (_chatSummary.value != chatSummary) {
       _chatSummary(chatSummary);
-      clear(notify: false);
+      clear();
       previous(limit: defaultLimit);
     }
   }
@@ -69,11 +69,11 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     return _lock.synchronized(() async {
       ChatSummary? chatSummary = _chatSummary.value;
       if (chatSummary == null) {
-        clear(notify: false);
+        clear();
         return 0;
       }
       if (chatSummary.peerId == null) {
-        clear(notify: false);
+        clear();
         return 0;
       }
       List<ChatMessage>? chatMessages;
@@ -115,11 +115,11 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     return _lock.synchronized(() async {
       var chatSummary = this.chatSummary;
       if (chatSummary == null) {
-        clear(notify: false);
+        clear();
         return 0;
       }
       if (chatSummary.peerId == null) {
-        clear(notify: false);
+        clear();
         return 0;
       }
       String? sendTime;

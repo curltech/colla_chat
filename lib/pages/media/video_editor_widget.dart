@@ -82,7 +82,7 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
     try {
       await FFMpegHelper.runAsync(commands,
           completeCallback: (FFMpegHelperSession session) async {
-        imageFileController.addAll(filenames, notify: true);
+        imageFileController.addAll(filenames);
       });
     } catch (e) {
       DialogUtil.error(content: '$e');
