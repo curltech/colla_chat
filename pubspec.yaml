@@ -259,8 +259,8 @@ dependencies:
   photo_view: ^0.14.0 #图片显示
   pro_image_editor: ^8.3.5
   flutter_sound: ^9.4.6
-  audioplayers: ^6.1.0 #音频处理,所有平台
-  audioplayers_platform_interface: ^7.0.0
+  audioplayers: ^6.4.0 #音频处理,所有平台
+  audioplayers_platform_interface: ^7.1.0
   audioplayers_windows: ^4.0.0
   audioplayers_darwin: ^6.0.0
   audioplayers_linux: ^4.0.0
@@ -269,10 +269,12 @@ dependencies:
   audio_waveforms: ^1.2.0
   waved_audio_player: ^1.3.0
   waveform_recorder: ^1.5.0
+  native_video_player: ^3.0.0-dev.4
   flick_video_player: ^0.9.0 #video_player的封装
   #  native_video_player: ^1.3.1
   #  fvp: ^0.29.0
   fl_video: ^1.4.0  #video_Player control panel
+  better_player_plus: ^1.0.8
   chewie: ^1.10.0 #video_player的封装
   media_kit: ^1.1.11                             # Primary package.
   media_kit_video: ^1.2.5                        # For video rendering.
@@ -423,7 +425,7 @@ dependency_overrides:
   gpt_markdown: ^1.0.11
   flutter_slider_drawer: ^3.0.2
   lottie: ^3.1.2
-  flutter_quill: ^11.0.0
+  flutter_quill: ^11.1.0
   flutter_quill_extensions: ^11.0.0
   flutter_quill_delta_from_html: ^1.4.5
   saver_gallery: 4.0.1
@@ -437,10 +439,11 @@ dependency_overrides:
   video_player: ^2.9.3 #mobile and web
   video_player_platform_interface: ^6.2.2
   video_player_win: ^3.1.1
-  video_player_avfoundation: ^2.6.5
-  video_player_android: ^2.5.2
+  video_player_avfoundation: ^2.7.0
+  video_player_android: ^2.8.2
   video_player_web: ^2.3.1
-  video_player_control_panel: ^1.1.1
+  video_player_control_panel: ^1.1.2
+  cached_video_player_plus: ^3.0.3
   mime: ^2.0.0
   enough_mail: #^2.1.6
     git: https://github.com/Enough-Software/enough_mail.git
