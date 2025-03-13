@@ -39,26 +39,31 @@ class DataSourceController extends DataListController<data_source.DataSource> {
   init() async {
     clear();
     String? value = await localSecurityStorage.get('DataSources');
-    Map<String, dynamic>? maps;
+    List<Map<String, dynamic>>? dataSources;
     try {
-      maps = JsonUtil.toJson(value);
+      if (value != null) {
+        dataSources = JsonUtil.toJson(value);
+      }
     } catch (e) {
-      logger.e('get data sources failure');
+      logger.e('get data sources failure:$e');
     }
-    maps ??= {};
-    if (!maps.containsKey('colla_chat')) {
+    dataSources ??= [];
+    bool include = false;
+
+    for (var ds in dataSources) {
+      data_source.DataSource dataSource = data_source.DataSource.fromJson(ds);
+      if (dataSource.name == 'colla_chat') {
+        include = true;
+      }
+      await addDataSource(dataSource);
+    }
+
+    if (!include) {
       String filename = appDataProvider.sqlite3Path;
       data_source.DataSource dataSource = data_source.DataSource(
           name: 'colla_chat', sourceType: data_source.SourceType.sqlite.name);
       dataSource.filename = filename;
       await addDataSource(dataSource, dataStore: sqlite3);
-    }
-    for (var entry in maps.entries) {
-      // String name = entry.key;
-      dynamic value = entry.value;
-      data_source.DataSource dataSource =
-          data_source.DataSource.fromJson(value);
-      await addDataSource(dataSource);
     }
 
     List<ListenableNode> children = root.childrenAsList;
