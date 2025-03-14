@@ -39,7 +39,7 @@ class DataSourceController extends DataListController<data_source.DataSource> {
   init() async {
     clear();
     String? value = await localSecurityStorage.get('DataSources');
-    List<Map<String, dynamic>>? dataSources;
+    List<dynamic>? dataSources;
     try {
       if (value != null) {
         dataSources = JsonUtil.toJson(value);
@@ -228,12 +228,19 @@ class DataSourceController extends DataListController<data_source.DataSource> {
     List<data_source.DataTable> dataTables, {
     data_source.DataSource? dataSource,
   }) {
-    DataTableController? dataTableController =
-        getDataTableController(dataSource: dataSource);
-    if (dataTableController == null) {
-      return;
+    if (dataSource == null) {
+      dataSource = dataSourceController.current;
+      if (dataSource == null) {
+        return null;
+      }
     }
-    dataTableController.addAll(dataTables);
+    DataTableController? dataTableController;
+    if (!dataTableControllers.containsKey(dataSource.name)) {
+      dataTableControllers[dataSource.name!] =
+          DataTableController(dataSource.name!);
+    }
+    dataTableController = dataTableControllers[dataSource.name!];
+    dataTableController?.replaceAll(dataTables);
   }
 
   data_source.DataColumn? getDataColumn(
@@ -416,10 +423,9 @@ class DataSourceController extends DataListController<data_source.DataSource> {
     }
     DataListController<data_source.DataColumn>? dataColumnController =
         getDataColumnController(dataSource: dataSource, tableName: tableName);
-    if (dataColumnController == null) {
-      return;
-    }
-    dataColumnController.addAll(dataColumns);
+
+    dataColumnController ??= DataListController<data_source.DataColumn>();
+    dataColumnController.replaceAll(dataColumns);
     for (var dataColumn in dataColumns) {
       columnFolderNode.add(data_source.DataColumnNode(data: dataColumn));
     }
@@ -483,10 +489,8 @@ class DataSourceController extends DataListController<data_source.DataSource> {
     }
     DataListController<data_source.DataIndex>? dataIndexController =
         getDataIndexController(dataSource: dataSource, tableName: tableName);
-    if (dataIndexController == null) {
-      return;
-    }
-    dataIndexController.addAll(dataIndexes);
+    dataIndexController ??= DataListController<data_source.DataIndex>();
+    dataIndexController.replaceAll(dataIndexes);
     for (var dataIndex in dataIndexes) {
       indexesFolderNode.add(data_source.DataIndexNode(data: dataIndex));
     }
