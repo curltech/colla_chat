@@ -10,23 +10,22 @@ import 'package:video_player_win/video_player_win_plugin.dart';
 class PlatformVideoPlayer extends StatelessWidget {
   final SwiperController swiperController = SwiperController();
   late final AbstractMediaPlayerController mediaPlayerController;
-  bool showPlaylist;
-  List<String>? filenames;
-  PlaylistController? playlistController;
+  final bool showPlaylist;
+  late final PlaylistController? playlistController;
   late final PlatformMediaPlayer platformMediaPlayer;
 
   PlatformVideoPlayer({
     super.key,
-    this.filenames,
     this.showPlaylist = true,
     this.playlistController,
+    List<String>? filenames,
   }) {
     if (platformParams.windows) {
       WindowsVideoPlayer.registerWith();
     }
     playlistController ??= PlaylistController();
     if (filenames != null) {
-      playlistController!.addMediaFiles(filenames: filenames!);
+      playlistController!.addMediaFiles(filenames: filenames);
     }
     mediaPlayerController = MediaKitVideoPlayerController(playlistController!);
     platformMediaPlayer = PlatformMediaPlayer(
