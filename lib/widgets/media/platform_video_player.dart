@@ -27,6 +27,7 @@ class PlatformVideoPlayer extends StatelessWidget {
     if (filenames != null) {
       playlistController!.addMediaFiles(filenames: filenames);
     }
+    // mediaPlayerController = OriginVideoPlayerController(playlistController!);
     mediaPlayerController = MediaKitVideoPlayerController(playlistController!);
     platformMediaPlayer = PlatformMediaPlayer(
       showPlaylist: showPlaylist,
