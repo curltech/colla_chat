@@ -75,6 +75,7 @@ class DataSourceController extends DataListController<data_source.DataSource> {
     for (var child in animatedRoot.childrenAsList) {
       treeViewController?.collapseNode(child as animated.ITreeNode);
     }
+    treeViewController?.collapseNode(animatedRoot as animated.ITreeNode);
   }
 
   Future<data_source.DataSourceNode> addDataSource(
@@ -418,15 +419,15 @@ class DataSourceController extends DataListController<data_source.DataSource> {
   }
 
   /// 把数据源的表的所有字段加入节点
-  updateColumnNodes(
-    data_source.FolderNode columnFolderNode, {
+  Future<DataListController<data_source.DataColumn>?> updateColumnNodes({
     data_source.DataSource? dataSource,
     String? tableName,
+    data_source.FolderNode? columnFolderNode,
   }) async {
     List<data_source.DataColumn>? dataColumns =
         await findColumns(dataSource: dataSource, tableName: tableName);
     if (dataColumns == null || dataColumns.isEmpty) {
-      return;
+      return null;
     }
     if (dataSource == null) {
       dataSource = dataSourceController.current;
@@ -440,8 +441,26 @@ class DataSourceController extends DataListController<data_source.DataSource> {
       return null;
     }
     if (tableName == null) {
-      return;
+      data_source.DataTable? dataTable = getDataTable(dataSource: dataSource);
+      if (dataTable != null) {
+        tableName = dataTable.name;
+      }
     }
+    if (tableName == null) {
+      return null;
+    }
+
+    if (columnFolderNode == null) {
+      AnimatedExplorableNode? dataTableNode = currentNode.value;
+      if (dataTableNode != null && dataTableNode is data_source.DataTableNode) {
+        columnFolderNode =
+            dataTableNode.childrenAsList.first as data_source.FolderNode;
+      }
+    }
+    if (columnFolderNode == null) {
+      return null;
+    }
+
     DataListController<data_source.DataColumn>? dataColumnController =
         dataTableController.dataColumnControllers[tableName];
     if (dataColumnController == null) {
@@ -453,6 +472,8 @@ class DataSourceController extends DataListController<data_source.DataSource> {
     for (var dataColumn in dataColumns) {
       columnFolderNode.add(data_source.DataColumnNode(data: dataColumn));
     }
+
+    return dataColumnController;
   }
 
   /// 获取数据源的表的所有的索引
@@ -501,15 +522,15 @@ class DataSourceController extends DataListController<data_source.DataSource> {
   }
 
   /// 把数据源的表的索引加入节点
-  updateIndexNodes(
-    data_source.FolderNode indexesFolderNode, {
+  Future<DataListController<data_source.DataIndex>?> updateIndexNodes({
     data_source.DataSource? dataSource,
     String? tableName,
+    data_source.FolderNode? indexesFolderNode,
   }) async {
     List<data_source.DataIndex>? dataIndexes =
         await findIndexes(dataSource: dataSource, tableName: tableName);
     if (dataIndexes == null || dataIndexes.isEmpty) {
-      return;
+      return null;
     }
     if (dataSource == null) {
       dataSource = dataSourceController.current;
@@ -523,8 +544,26 @@ class DataSourceController extends DataListController<data_source.DataSource> {
       return null;
     }
     if (tableName == null) {
-      return;
+      data_source.DataTable? dataTable = getDataTable(dataSource: dataSource);
+      if (dataTable != null) {
+        tableName = dataTable.name;
+      }
     }
+    if (tableName == null) {
+      return null;
+    }
+
+    if (indexesFolderNode == null) {
+      AnimatedExplorableNode? dataTableNode = currentNode.value;
+      if (dataTableNode != null && dataTableNode is data_source.DataTableNode) {
+        indexesFolderNode =
+            dataTableNode.childrenAsList.last as data_source.FolderNode;
+      }
+    }
+    if (indexesFolderNode == null) {
+      return null;
+    }
+
     DataListController<data_source.DataIndex>? dataIndexController =
         getDataIndexController(dataSource: dataSource, tableName: tableName);
     if (dataIndexController == null) {
@@ -535,6 +574,8 @@ class DataSourceController extends DataListController<data_source.DataSource> {
     for (var dataIndex in dataIndexes) {
       indexesFolderNode.add(data_source.DataIndexNode(data: dataIndex));
     }
+
+    return dataIndexController;
   }
 }
 

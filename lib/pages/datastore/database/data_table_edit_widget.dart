@@ -50,45 +50,21 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
   late final TabController _tabController =
       TabController(length: 3, vsync: this);
 
-  final Rx<data_source.DataTable?> dataTable = Rx<data_source.DataTable?>(null);
-
   @override
   void initState() {
     super.initState();
   }
 
   _buildDataColumns() async {
-    final DataListController<data_source.DataColumn>? dataColumnController =
+    DataListController<data_source.DataColumn>? dataColumnController =
         dataSourceController.getDataColumnController();
-    if (dataColumnController == null) {
-      return;
-    }
-    if (dataColumnController.length > 0) {
-      return;
-    }
-    List<data_source.DataColumn>? dataColumns =
-        await dataSourceController.findColumns();
-    if (dataColumns == null) {
-      return;
-    }
-    dataColumnController.data.assignAll(dataColumns);
+    dataColumnController ??= await dataSourceController.updateColumnNodes();
   }
 
   _buildDataIndexes() async {
-    final DataListController<data_source.DataIndex>? dataIndexController =
+    DataListController<data_source.DataIndex>? dataIndexController =
         dataSourceController.getDataIndexController();
-    if (dataIndexController == null) {
-      return;
-    }
-    if (dataIndexController.length > 0) {
-      return;
-    }
-    List<data_source.DataIndex>? dataIndexes =
-        await dataSourceController.findIndexes();
-    if (dataIndexes == null) {
-      return null;
-    }
-    dataIndexController.data.assignAll(dataIndexes);
+    dataIndexController ??= await dataSourceController.updateIndexNodes();
   }
 
   List<PlatformDataField> buildDataTableDataFields(String sourceType) {
@@ -169,7 +145,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       DialogUtil.error(content: AppLocalizations.t('Must has dataTable name'));
       return null;
     }
-    data_source.DataTable? dataTable = this.dataTable.value;
+    data_source.DataTable? dataTable = dataSourceController.getDataTable();
     String? originalName = dataTable?.name;
     if (originalName == null) {
       dataTable?.name = current.name;
@@ -206,21 +182,24 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       align: TextAlign.right,
     ));
 
-    DataListController<data_source.DataColumn>? dataColumnController =
-        dataSourceController.getDataColumnController();
-    if (dataColumnController == null) {
-      return nilBox;
-    }
+    return Obx(() {
+      _buildDataColumns();
+      DataListController<data_source.DataColumn>? dataColumnController =
+          dataSourceController.getDataColumnController();
+      if (dataColumnController == null) {
+        return nilBox;
+      }
 
-    return BindingDataTable2<data_source.DataColumn>(
-      key: UniqueKey(),
-      showCheckboxColumn: true,
-      horizontalMargin: 15.0,
-      columnSpacing: 0.0,
-      platformDataColumns: platformDataColumns,
-      controller: dataColumnController,
-      fixedLeftColumns: 0,
-    );
+      return BindingDataTable2<data_source.DataColumn>(
+        key: UniqueKey(),
+        showCheckboxColumn: true,
+        horizontalMargin: 15.0,
+        columnSpacing: 0.0,
+        platformDataColumns: platformDataColumns,
+        controller: dataColumnController,
+        fixedLeftColumns: 0,
+      );
+    });
   }
 
   String? _getCheckedColumnNames() {
@@ -490,11 +469,12 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
 
   Widget _buildDataIndexesWidget(BuildContext context) {
     return Obx(() {
+      _buildDataIndexes();
       final List<TileData> tiles = [];
       DataListController<data_source.DataIndex>? dataIndexController =
           dataSourceController.getDataIndexController();
       if (dataIndexController == null) {
-        return Container();
+        return nilBox;
       }
       for (int i = 0; i < dataIndexController.data.length; ++i) {
         DataIndex dataIndex = dataIndexController.data[i];
@@ -539,7 +519,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       controller: _tabController,
       borderRadius: BorderRadius.circular(8),
       tabBorderRadius: BorderRadius.circular(8),
-      color: Colors.white.withAlpha(128),
+      color: Colors.white.withAlpha(0),
       curve: Curves.easeIn,
       transitionBuilder: (child, animation) {
         animation = CurvedAnimation(curve: Curves.easeIn, parent: animation);
@@ -581,9 +561,6 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
 
   @override
   Widget build(BuildContext context) {
-    dataTable.value = dataSourceController.getDataTable();
-    _buildDataColumns();
-    _buildDataIndexes();
     return AppBarView(
         title: widget.title,
         withLeading: true,

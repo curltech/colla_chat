@@ -61,9 +61,10 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
       dataSourceNode = node;
     } else if (node is DataTableNode) {
       dataSourceNode = node.parent?.parent as DataSourceNode;
+      dataTableNode = node;
     } else if (node is DataColumnNode || node is DataIndexNode) {
-      dataTableNode = node.parent as DataTableNode;
       dataSourceNode = node.parent?.parent?.parent?.parent as DataSourceNode;
+      dataTableNode = node.parent as DataTableNode;
     } else if (node is FolderNode) {
       String? name = node.data?.name;
       if (name == 'tables') {
@@ -141,12 +142,16 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
       if (name == 'columns') {
         if (node.length == 0) {
           dataSourceController.updateColumnNodes(
-              dataSource: dataSource, tableName: tableName, node);
+              dataSource: dataSource,
+              tableName: tableName,
+              columnFolderNode: node);
         }
       } else if (name == 'indexes') {
         if (node.length == 0) {
           dataSourceController.updateIndexNodes(
-              dataSource: dataSource, tableName: tableName, node);
+              dataSource: dataSource,
+              tableName: tableName,
+              indexesFolderNode: node);
         }
       }
     }
