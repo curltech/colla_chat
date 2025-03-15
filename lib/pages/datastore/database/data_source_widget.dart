@@ -1,4 +1,5 @@
-import 'package:animated_tree_view/animated_tree_view.dart';
+import 'package:animated_tree_view/animated_tree_view.dart' as animated;
+import 'package:checkable_treeview/checkable_treeview.dart' as checkable;
 import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/datastore/database/data_column_edit_widget.dart';
@@ -52,10 +53,10 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
   String get title => 'DataSource';
 
   /// 单击节点，设置当前数据源和数据表
-  void _onTap(BuildContext context, ExplorableNode node) {
+  void _onTap(BuildContext context, AnimatedExplorableNode node) {
     dataSourceController.currentNode.value = node;
-    TreeNode? dataSourceNode;
-    TreeNode? dataTableNode;
+    animated.TreeNode? dataSourceNode;
+    animated.TreeNode? dataTableNode;
     if (node is DataSourceNode) {
       dataSourceNode = node;
     } else if (node is DataTableNode) {
@@ -83,7 +84,8 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
   }
 
   /// 长按表示进一步的操作
-  Future<void> _onLongPress(BuildContext context, ExplorableNode node) async {
+  Future<void> _onLongPress(
+      BuildContext context, AnimatedExplorableNode node) async {
     dataSourceController.currentNode.value = node;
     List<ActionData> popActionData = [];
     popActionData.add(ActionData(
@@ -128,9 +130,9 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
   }
 
   /// 单击时加载列或索引
-  void _onItemTap(BuildContext context, ExplorableNode node) {
+  void _onItemTap(BuildContext context, AnimatedExplorableNode node) {
     if (node is FolderNode) {
-      String? tableName = (node.parent as TreeNode).data.name;
+      String? tableName = (node.parent as animated.TreeNode).data.name;
       String? name = node.data?.name;
       DataSource? dataSource = dataSourceController.current;
       if (dataSource == null) {
@@ -158,7 +160,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
   }
 
   /// 增加表，列或索引，节点没有变化，进入数据编辑页面
-  void _add(ExplorableNode node) {
+  void _add(AnimatedExplorableNode node) {
     if (node is FolderNode) {
       if ('tables' == node.data!.name) {
         data_source.DataTable dataTable = data_source.DataTable();
@@ -185,7 +187,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
   }
 
   /// 删除节点，同时删除数据
-  Future<void> _delete(ExplorableNode node) async {
+  Future<void> _delete(AnimatedExplorableNode node) async {
     if (node is DataSourceNode) {
       bool? confirm = await DialogUtil.confirm(
           content: 'Do you confirm delete selected data source node?');
@@ -248,7 +250,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  void _edit(ExplorableNode node) {
+  void _edit(AnimatedExplorableNode node) {
     if (node is DataSourceNode) {
       indexWidgetProvider.push('data_source_edit');
     } else if (node is DataTableNode) {
@@ -260,7 +262,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  void _query(ExplorableNode node) {
+  void _query(AnimatedExplorableNode node) {
     if (node is data_source.DataSourceNode) {
       dataSourceController.current = node.data;
       indexWidgetProvider.push('query_console_editor');
@@ -270,8 +272,8 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
-  _onPopAction(
-      BuildContext context, ExplorableNode node, int index, String label,
+  _onPopAction(BuildContext context, AnimatedExplorableNode node, int index,
+      String label,
       {String? value}) async {
     switch (label) {
       case 'New':
@@ -338,29 +340,29 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     );
   }
 
-  Widget _buildTreeView(BuildContext context) {
-    return TreeView.simpleTyped<Explorable, ExplorableNode>(
-        tree: dataSourceController.root,
+  Widget _buildAnimatedTreeView(BuildContext context) {
+    return animated.TreeView.simpleTyped<Explorable, AnimatedExplorableNode>(
+        tree: dataSourceController.animatedRoot,
         showRootNode: false,
-        expansionBehavior: ExpansionBehavior.none,
+        expansionBehavior: animated.ExpansionBehavior.none,
         expansionIndicatorBuilder: (context, node) {
-          return ChevronIndicator.rightDown(
+          return animated.ChevronIndicator.rightDown(
             tree: node,
             alignment: Alignment.centerLeft,
             color: myself.primary,
           );
         },
-        indentation: Indentation(
+        indentation: animated.Indentation(
           width: 12,
           color: myself.primary,
-          style: IndentStyle.none,
+          style: animated.IndentStyle.none,
           thickness: 1,
           offset: Offset(12, 0),
         ),
         onTreeReady: (controller) {
           dataSourceController.treeViewController = controller;
         },
-        builder: (context, ExplorableNode node) {
+        builder: (context, AnimatedExplorableNode node) {
           return Obx(() {
             bool selected = false;
             if (node is DataSourceNode) {
@@ -394,21 +396,31 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
             );
           });
         },
-        onItemTap: (ExplorableNode node) {
+        onItemTap: (AnimatedExplorableNode node) {
           _onItemTap(context, node);
         });
+  }
+
+  Widget _buildCheckableTreeView(BuildContext context) {
+    return checkable.TreeView<Explorable>(
+      key: dataSourceController.checkableTreeViewKey,
+      nodes: dataSourceController.checkableRoot,
+      onSelectionChanged: (selectedValues) {
+        print('Selected values: $selectedValues');
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(children: [
       _buildDataSourceButtonWidget(context),
-      Expanded(child: _buildTreeView(context)),
+      Expanded(child: _buildAnimatedTreeView(context)),
     ]);
   }
 }
 
-extension on ExplorableNode {
+extension on AnimatedExplorableNode {
   Widget get icon {
     if (isRoot) {
       return Icon(

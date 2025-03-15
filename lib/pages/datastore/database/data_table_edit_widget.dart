@@ -12,6 +12,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
@@ -205,13 +206,19 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       align: TextAlign.right,
     ));
 
+    DataListController<data_source.DataColumn>? dataColumnController =
+        dataSourceController.getDataColumnController();
+    if (dataColumnController == null) {
+      return nilBox;
+    }
+
     return BindingDataTable2<data_source.DataColumn>(
       key: UniqueKey(),
       showCheckboxColumn: true,
       horizontalMargin: 15.0,
       columnSpacing: 0.0,
       platformDataColumns: platformDataColumns,
-      controller: dataSourceController.getDataColumnController()!,
+      controller: dataColumnController,
       fixedLeftColumns: 0,
     );
   }

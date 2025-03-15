@@ -30,11 +30,11 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'DataSourceEdit';
 
-  final RxString sourceType = SourceType.sqlite.name.obs;
+  final Rx<String?> sourceType = Rx<String?>(null);
 
   List<PlatformDataField> buildDataSourceDataFields() {
-    DataSource dataSource = dataSourceController.current!;
-    String? originalName = dataSource.name;
+    DataSource? dataSource = dataSourceController.current;
+    String? originalName = dataSource?.name;
     var dataSourceDataFields = [
       PlatformDataField(
           name: 'name',
@@ -45,6 +45,7 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
           label: 'Comment',
           prefixIcon: Icon(Icons.comment, color: myself.primary)),
     ];
+
     if (sourceType.value == SourceType.sqlite.name) {
       dataSourceDataFields.add(PlatformDataField(
           name: 'filename',
@@ -112,12 +113,16 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
   //DataSourceNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
     return Obx(() {
-      DataSource dataSource = dataSourceController.current!;
+      DataSource? dataSource = dataSourceController.current;
       List<PlatformDataField> dataSourceDataFields =
           buildDataSourceDataFields();
       formInputController?.dispose();
       formInputController = FormInputController(dataSourceDataFields);
-      formInputController?.setValues(JsonUtil.toJson(dataSource));
+      if (dataSource != null) {
+        formInputController?.setValues(JsonUtil.toJson(dataSource));
+      } else {
+        formInputController?.setValues({'sourceType': sourceType.value});
+      }
       var formInputWidget = FormInputWidget(
         spacing: 15.0,
         onOk: (Map<String, dynamic> values) {
@@ -144,7 +149,10 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
           content: AppLocalizations.t('Must has dataSource sourceType'));
       return null;
     }
-    DataSource dataSource = dataSourceController.current!;
+    DataSource? dataSource = dataSourceController.current;
+    if (dataSource == null) {
+      return null;
+    }
     String? originalName = dataSource.name;
     dataSource.name = current.name;
     dataSource.sourceType = current.sourceType;
@@ -180,8 +188,8 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    DataSource dataSource =  dataSourceController.current!;
-    sourceType.value = dataSource.sourceType;
+    DataSource? dataSource = dataSourceController.current;
+    sourceType.value = dataSource?.sourceType;
     return AppBarView(
         title: title, withLeading: true, child: _buildFormInputWidget(context));
   }

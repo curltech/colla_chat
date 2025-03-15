@@ -1,4 +1,5 @@
-import 'package:animated_tree_view/animated_tree_view.dart';
+import 'package:animated_tree_view/animated_tree_view.dart' as animated;
+import 'package:checkable_treeview/checkable_treeview.dart' as checkable;
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/datastore/postgres.dart';
 import 'package:colla_chat/datastore/sqlite3.dart';
@@ -10,13 +11,16 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class DataSourceController extends DataListController<data_source.DataSource> {
-  TreeViewController? treeViewController;
-  final TreeNode<Explorable> root = TreeNode.root();
+  animated.TreeViewController? treeViewController;
+  final checkableTreeViewKey = GlobalKey<checkable.TreeViewState<Explorable>>();
+  final AnimatedExplorableNode animatedRoot = AnimatedExplorableNode.root();
+  final List<CheckableExplorableNode> checkableRoot = [];
 
-  Rx<ExplorableNode?> currentNode = Rx<ExplorableNode?>(null);
+  Rx<AnimatedExplorableNode?> currentNode = Rx<AnimatedExplorableNode?>(null);
 
   final RxMap<String, DataTableController> dataTableControllers =
       <String, DataTableController>{}.obs;
@@ -32,7 +36,8 @@ class DataSourceController extends DataListController<data_source.DataSource> {
 
   @override
   clear() {
-    root.clear();
+    animatedRoot.clear();
+    checkableRoot.clear();
     super.clear();
   }
 
@@ -64,11 +69,11 @@ class DataSourceController extends DataListController<data_source.DataSource> {
           name: 'colla_chat', sourceType: data_source.SourceType.sqlite.name);
       dataSource.filename = filename;
       await addDataSource(dataSource, dataStore: sqlite3);
+      save();
     }
 
-    List<ListenableNode> children = root.childrenAsList;
-    for (var node in children) {
-      treeViewController?.collapseNode(node as ITreeNode);
+    for (var child in animatedRoot.childrenAsList) {
+      treeViewController?.collapseNode(child as animated.ITreeNode);
     }
   }
 
@@ -92,7 +97,9 @@ class DataSourceController extends DataListController<data_source.DataSource> {
     add(dataSource);
     data_source.DataSourceNode dataSourceNode =
         data_source.DataSourceNode(data: dataSource);
-    root.add(dataSourceNode);
+    animatedRoot.add(dataSourceNode);
+    checkableRoot.add(CheckableExplorableNode(
+        label: Text(dataSource.name!), value: dataSource));
     data_source.FolderNode folderNode =
         data_source.FolderNode(data: data_source.Folder(name: 'tables'));
     dataSourceNode.add(folderNode);
@@ -421,10 +428,27 @@ class DataSourceController extends DataListController<data_source.DataSource> {
     if (dataColumns == null || dataColumns.isEmpty) {
       return;
     }
+    if (dataSource == null) {
+      dataSource = dataSourceController.current;
+      if (dataSource == null) {
+        return null;
+      }
+    }
+    DataTableController? dataTableController =
+        dataSourceController.dataTableControllers[dataSource.name];
+    if (dataTableController == null) {
+      return null;
+    }
+    if (tableName == null) {
+      return;
+    }
     DataListController<data_source.DataColumn>? dataColumnController =
-        getDataColumnController(dataSource: dataSource, tableName: tableName);
-
-    dataColumnController ??= DataListController<data_source.DataColumn>();
+        dataTableController.dataColumnControllers[tableName];
+    if (dataColumnController == null) {
+      dataColumnController = DataListController<data_source.DataColumn>();
+      dataTableController.dataColumnControllers[tableName] =
+          dataColumnController;
+    }
     dataColumnController.replaceAll(dataColumns);
     for (var dataColumn in dataColumns) {
       columnFolderNode.add(data_source.DataColumnNode(data: dataColumn));
@@ -487,9 +511,26 @@ class DataSourceController extends DataListController<data_source.DataSource> {
     if (dataIndexes == null || dataIndexes.isEmpty) {
       return;
     }
+    if (dataSource == null) {
+      dataSource = dataSourceController.current;
+      if (dataSource == null) {
+        return null;
+      }
+    }
+    DataTableController? dataTableController =
+        dataSourceController.dataTableControllers[dataSource.name];
+    if (dataTableController == null) {
+      return null;
+    }
+    if (tableName == null) {
+      return;
+    }
     DataListController<data_source.DataIndex>? dataIndexController =
         getDataIndexController(dataSource: dataSource, tableName: tableName);
-    dataIndexController ??= DataListController<data_source.DataIndex>();
+    if (dataIndexController == null) {
+      dataIndexController = DataListController<data_source.DataIndex>();
+      dataTableController.dataIndexControllers[tableName] = dataIndexController;
+    }
     dataIndexController.replaceAll(dataIndexes);
     for (var dataIndex in dataIndexes) {
       indexesFolderNode.add(data_source.DataIndexNode(data: dataIndex));

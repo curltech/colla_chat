@@ -1,4 +1,5 @@
-import 'package:animated_tree_view/animated_tree_view.dart';
+import 'package:animated_tree_view/animated_tree_view.dart' as animated;
+import 'package:checkable_treeview/checkable_treeview.dart' as checkable;
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/pages/datastore/explorable_node.dart';
 import 'package:colla_chat/tool/image_util.dart';
@@ -68,7 +69,7 @@ class Folder extends Explorable {
   Folder({super.name});
 }
 
-typedef FolderNode = TreeNode<Folder>;
+typedef FolderNode = animated.TreeNode<Folder>;
 
 class Database extends Explorable {
   Database({super.name});
@@ -151,14 +152,14 @@ class DataIndex extends Explorable {
   }
 }
 
-typedef DataSourceNode = TreeNode<DataSource>;
+typedef DataSourceNode = animated.TreeNode<DataSource>;
 
-typedef DataSchemaNode = TreeNode<DataSchema>;
+typedef DataSchemaNode = animated.TreeNode<DataSchema>;
 
-typedef DatabaseNode = TreeNode<Database>;
+typedef DatabaseNode = animated.TreeNode<Database>;
 
-typedef DataTableNode = TreeNode<DataTable>;
+typedef DataTableNode = animated.TreeNode<DataTable>;
 
-typedef DataColumnNode = TreeNode<DataColumn>;
+typedef DataColumnNode = animated.TreeNode<DataColumn>;
 
-typedef DataIndexNode = TreeNode<DataIndex>;
+typedef DataIndexNode = animated.TreeNode<DataIndex>;

@@ -132,7 +132,7 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
   }
 
   Widget _buildTreeViewWidget(BuildContext context) {
-    return TreeView.simpleTyped<Explorable, ExplorableNode>(
+    return TreeView.simpleTyped<Explorable, AnimatedExplorableNode>(
         tree: fileSystemController.root,
         showRootNode: false,
         expansionBehavior: ExpansionBehavior.none,
@@ -153,7 +153,7 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
         onTreeReady: (controller) {
           fileSystemController.treeViewController = controller;
         },
-        builder: (context, ExplorableNode node) {
+        builder: (context, AnimatedExplorableNode node) {
           return Obx(() {
             bool selected = false;
             if (node is FolderNode) {
@@ -179,7 +179,7 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
             );
           });
         },
-        onItemTap: (ExplorableNode node) {
+        onItemTap: (AnimatedExplorableNode node) {
           _onItemTap(node as FolderNode);
         });
   }
@@ -205,7 +205,7 @@ class FileSystemWidget extends StatelessWidget with TileDataMixin {
   }
 }
 
-extension on ExplorableNode {
+extension on AnimatedExplorableNode {
   Icon get icon {
     if (isRoot) return const Icon(Icons.data_object);
 

@@ -1,4 +1,5 @@
-import 'package:animated_tree_view/animated_tree_view.dart';
+import 'package:animated_tree_view/animated_tree_view.dart' as animated;
+import 'package:checkable_treeview/checkable_treeview.dart' as checkable;
 
 abstract class Explorable {
   String? name;
@@ -21,4 +22,6 @@ abstract class Explorable {
   }
 }
 
-typedef ExplorableNode = TreeNode<Explorable>;
+typedef AnimatedExplorableNode = animated.TreeNode<Explorable>;
+
+typedef CheckableExplorableNode = checkable.TreeNode<Explorable>;
