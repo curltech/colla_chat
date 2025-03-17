@@ -2,6 +2,7 @@ import 'package:animated_tree_view/animated_tree_view.dart' as animated;
 import 'package:checkable_treeview/checkable_treeview.dart' as checkable;
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/datastore/postgres.dart';
+import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart'
     as data_source;
@@ -197,6 +198,80 @@ class DataSourceController extends DataListController<data_source.DataSource> {
     return dataIndexController;
   }
 
+  addDataTable(
+    data_source.DataTable dataTable, {
+    data_source.DataSource? dataSource,
+  }) {
+    if (dataSource == null) {
+      dataSource = dataSourceController.current;
+      if (dataSource == null) {
+        return null;
+      }
+    }
+    DataTableController? dataTableController;
+    if (!dataTableControllers.containsKey(dataSource.name)) {
+      dataTableControllers[dataSource.name!] =
+          DataTableController(dataSource.name!);
+    }
+    dataTableController = dataTableControllers[dataSource.name!];
+    dataTableController?.add(dataTable);
+  }
+
+  /// 在数据库中创建表，要求数据源和列控制器存在
+  String? createDataTable(
+      {data_source.DataSource? dataSource,
+      data_source.DataTable? dataTable,
+      bool mock = true}) {
+    if (dataSource == null) {
+      dataSource = dataSourceController.current;
+      if (dataSource == null) {
+        return null;
+      }
+    }
+    if (dataTable == null) {
+      dataTable = dataSourceController.getDataTable();
+      if (dataTable == null) {
+        return null;
+      }
+    }
+    String sql = 'create table ${dataTable.name}\n';
+    sql += '(\n';
+    DataListController<data_source.DataColumn>? dataColumnController =
+        dataSourceController.getDataColumnController();
+    List<data_source.DataColumn>? dataColumns = dataColumnController?.data;
+    if (dataColumns != null && dataColumns.isNotEmpty) {
+      String keyColumns = '';
+      for (int i = 0; i < dataColumns.length; ++i) {
+        data_source.DataColumn dataColumn = dataColumns[i];
+        String columnName = dataColumn.name!;
+        String dataType = dataColumn.dataType!;
+        bool? notNull = dataColumn.notNull;
+        if (notNull != null && notNull) {
+          sql += '    $columnName   $dataType not null,\n';
+        } else {
+          sql += '    $columnName   $dataType,\n';
+        }
+        if (dataColumn.isKey != null && dataColumn.isKey!) {
+          if (keyColumns.isEmpty) {
+            keyColumns += columnName;
+          } else {
+            keyColumns += ',$columnName';
+          }
+        }
+      }
+      if (keyColumns.isNotEmpty) {
+        sql += '    constraint ${dataTable.name}_pk\n';
+        sql += '    primary key($keyColumns)\n';
+      }
+    }
+    sql += ');';
+    if (!mock) {
+      dataSource.dataStore?.run(Sql(sql));
+    }
+
+    return sql;
+  }
+
   /// 根据数据源和表名获取表
   data_source.DataTable? getDataTable(
       {data_source.DataSource? dataSource, String? tableName}) {
@@ -232,7 +307,7 @@ class DataSourceController extends DataListController<data_source.DataSource> {
   }
 
   /// 对数据源加表
-  addDataTables(
+  updateDataTables(
     List<data_source.DataTable> dataTables, {
     data_source.DataSource? dataSource,
   }) {
@@ -249,6 +324,56 @@ class DataSourceController extends DataListController<data_source.DataSource> {
     }
     dataTableController = dataTableControllers[dataSource.name!];
     dataTableController?.replaceAll(dataTables);
+  }
+
+  /// 在数据库中加列，要求数据源，表和列控制器存在
+  data_source.DataColumn? addDataColumn(data_source.DataColumn dataColumn,
+      {data_source.DataSource? dataSource, String? tableName}) {
+    if (dataSource == null) {
+      dataSource = dataSourceController.current;
+      if (dataSource == null) {
+        return null;
+      }
+    }
+    data_source.DataTable? dataTable = dataSourceController.getDataTable();
+    if (dataTable == null) {
+      return null;
+    }
+    DataListController<data_source.DataColumn>? dataColumnController =
+        getDataColumnController(dataSource: dataSource, tableName: tableName);
+    if (dataColumnController == null) {
+      return null;
+    }
+    dataColumnController.add(dataColumn);
+    dataSource.dataStore?.run(
+        Sql('alter table ${dataTable.name} add column ${dataColumn.name};'));
+
+    return null;
+  }
+
+  /// 在数据库中删除列，要求数据源，表和列控制器存在
+  data_source.DataColumn? deleteDataColumn(data_source.DataColumn dataColumn,
+      {data_source.DataSource? dataSource, String? tableName}) {
+    if (dataSource == null) {
+      dataSource = dataSourceController.current;
+      if (dataSource == null) {
+        return null;
+      }
+    }
+    data_source.DataTable? dataTable = dataSourceController.getDataTable();
+    if (dataTable == null) {
+      return null;
+    }
+    DataListController<data_source.DataColumn>? dataColumnController =
+        getDataColumnController(dataSource: dataSource, tableName: tableName);
+    if (dataColumnController == null) {
+      return null;
+    }
+    dataColumnController.remove(dataColumn);
+    dataSource.dataStore?.run(
+        Sql('alter table ${dataTable.name} drop column ${dataColumn.name};'));
+
+    return null;
   }
 
   data_source.DataColumn? getDataColumn(
@@ -287,6 +412,99 @@ class DataSourceController extends DataListController<data_source.DataSource> {
       return null;
     }
     dataColumnController.current = dataColumn;
+  }
+
+  addDataIndex(data_source.DataIndex dataIndex,
+      {data_source.DataSource? dataSource,
+      data_source.DataTable? dataTable,
+      bool mock = true}) {
+    if (dataSource == null) {
+      dataSource = dataSourceController.current;
+      if (dataSource == null) {
+        return null;
+      }
+    }
+    if (dataTable == null) {
+      dataTable = dataSourceController.getDataTable();
+      if (dataTable == null) {
+        return null;
+      }
+    }
+    DataListController<data_source.DataIndex>? dataIndexController =
+        getDataIndexController(
+            dataSource: dataSource, tableName: dataTable.name);
+    if (dataIndexController == null) {
+      return null;
+    }
+    dataIndexController.add(dataIndex);
+  }
+
+  String? createDataIndex(
+      {data_source.DataSource? dataSource,
+      data_source.DataTable? dataTable,
+      data_source.DataIndex? dataIndex,
+      bool mock = true}) {
+    if (dataSource == null) {
+      dataSource = dataSourceController.current;
+      if (dataSource == null) {
+        return null;
+      }
+    }
+    if (dataTable == null) {
+      dataTable = dataSourceController.getDataTable();
+      if (dataTable == null) {
+        return null;
+      }
+    }
+    DataListController<data_source.DataIndex>? dataIndexController =
+        getDataIndexController(
+            dataSource: dataSource, tableName: dataTable.name);
+    if (dataIndexController == null) {
+      return null;
+    }
+    if (dataIndex == null) {
+      dataIndex = dataIndexController.current;
+      if (dataIndex == null) {
+        return null;
+      }
+    }
+    String indexName = dataIndex.name!;
+    String columnNames = dataIndex.columnNames!;
+    String sql = '';
+    if (dataIndex.isUnique != null && dataIndex.isUnique!) {
+      sql += 'create unique index $indexName\n';
+    } else {
+      sql += 'create index $indexName\n';
+    }
+    sql += 'on ${dataTable.name}($columnNames);\n';
+    if (!mock) {
+      dataSource.dataStore?.run(Sql(sql));
+    }
+
+    return sql;
+  }
+
+  data_source.DataIndex? removeDataIndex(data_source.DataIndex dataIndex,
+      {data_source.DataSource? dataSource, String? tableName}) {
+    if (dataSource == null) {
+      dataSource = dataSourceController.current;
+      if (dataSource == null) {
+        return null;
+      }
+    }
+    data_source.DataTable? dataTable = dataSourceController.getDataTable();
+    if (dataTable == null) {
+      return null;
+    }
+    DataListController<data_source.DataIndex>? dataIndexController =
+        getDataIndexController(dataSource: dataSource, tableName: tableName);
+    if (dataIndexController == null) {
+      return null;
+    }
+    dataIndexController.remove(dataIndex);
+    dataSource.dataStore?.run(Sql('drop index ${dataIndex.name}'));
+
+    return null;
   }
 
   data_source.DataIndex? getDataIndex(
@@ -362,7 +580,7 @@ class DataSourceController extends DataListController<data_source.DataSource> {
       return;
     }
 
-    addDataTables(dataTables, dataSource: dataSource);
+    updateDataTables(dataTables, dataSource: dataSource);
     for (var dataTable in dataTables) {
       data_source.DataTableNode dataTableNode =
           data_source.DataTableNode(data: dataTable);

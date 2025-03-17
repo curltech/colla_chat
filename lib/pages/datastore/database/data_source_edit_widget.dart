@@ -149,37 +149,37 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
           content: AppLocalizations.t('Must has dataSource sourceType'));
       return null;
     }
-    DataSource? dataSource = dataSourceController.current;
-    if (dataSource == null) {
-      return null;
-    }
-    String? originalName = dataSource.name;
-    dataSource.name = current.name;
-    dataSource.sourceType = current.sourceType;
     if (current.sourceType == SourceType.sqlite.name) {
       if (StringUtil.isEmpty(current.filename)) {
         DialogUtil.error(
             content: AppLocalizations.t('Must has dataSource filename'));
         return null;
       }
-      dataSource.filename = current.filename;
     } else if (current.sourceType == SourceType.postgres.name) {
       if (StringUtil.isEmpty(current.host)) {
         DialogUtil.error(
             content: AppLocalizations.t('Must has dataSource host'));
         return null;
       }
+    }
+    DataSource? dataSource = dataSourceController.current;
+    if (dataSource == null) {
+      dataSource = current;
+      if (!dataSourceController.data.contains(dataSource)) {
+        dataSourceController.addDataSource(dataSource);
+      }
+    } else {
+      dataSource.name = current.name;
+      dataSource.sourceType = current.sourceType;
+      dataSource.filename = current.filename;
       dataSource.host = current.host;
       dataSource.port = current.port;
       dataSource.user = current.user;
       dataSource.password = current.password;
       dataSource.database = current.database;
     }
-    if (!dataSourceController.data.contains(dataSource)) {
-      dataSourceController.addDataSource(dataSource);
-    }
-    dataSourceController.save();
 
+    dataSourceController.save();
     DialogUtil.info(
         content: 'Successfully update dataSource:${dataSource.name}');
 

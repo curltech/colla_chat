@@ -83,12 +83,16 @@ class DataIndexEditWidget extends StatelessWidget with TileDataMixin {
       DialogUtil.error(content: AppLocalizations.t('Must has dataIndex name'));
       return null;
     }
-    data_source.DataIndex dataIndex = dataSourceController.getDataIndex()!;
-    String? originalName = dataIndex.name;
-    if (originalName == null) {}
-    dataIndex.name = current.name;
-    dataIndex.isUnique = current.isUnique;
-    dataIndex.columnNames = current.columnNames;
+    data_source.DataIndex? dataIndex = dataSourceController.getDataIndex();
+    if (dataIndex == null) {
+      dataIndex = current;
+      dataSourceController.addDataIndex(dataIndex);
+    } else {
+      dataIndex.name = current.name;
+      dataIndex.isUnique = current.isUnique;
+      dataIndex.columnNames = current.columnNames;
+    }
+    dataSourceController.createDataIndex();
 
     DialogUtil.info(content: 'Successfully update dataIndex:${dataIndex.name}');
 

@@ -1,3 +1,4 @@
+import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_controller.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart'
@@ -109,14 +110,25 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
           content: AppLocalizations.t('Must has dataColumn dataType'));
       return null;
     }
-    data_source.DataColumn dataColumn = dataSourceController.getDataColumn()!;
-    String? originalName = dataColumn.name;
-    if (originalName == null) {}
-    dataColumn.name = current.name;
-    dataColumn.dataType = current.dataType;
-    dataColumn.isKey = current.isKey;
-    dataColumn.notNull = current.notNull;
-    dataColumn.autoIncrement = current.autoIncrement;
+    data_source.DataTable? dataTable = dataSourceController.getDataTable();
+    if (dataTable == null) {
+      DialogUtil.error(
+          content: AppLocalizations.t('Must has current data table'));
+      return null;
+    }
+    data_source.DataColumn? dataColumn = dataSourceController.getDataColumn();
+    if (dataColumn == null) {
+      dataColumn = current;
+      dataSourceController.addDataColumn(dataColumn);
+    } else {
+      dataColumn.name = current.name;
+      dataColumn.dataType = current.dataType;
+      dataColumn.isKey = current.isKey;
+      dataColumn.notNull = current.notNull;
+      dataColumn.autoIncrement = current.autoIncrement;
+    }
+
+    dataSourceController.addDataColumn(dataColumn);
 
     DialogUtil.info(
         content: 'Successfully update dataColumn:${dataColumn.name}');

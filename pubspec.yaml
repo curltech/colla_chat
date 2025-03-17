@@ -270,6 +270,7 @@ dependencies:
   audio_waveforms: ^1.3.0
   waved_audio_player: ^1.3.0
   waveform_recorder: ^1.5.0
+  flutter_cache_manager: ^3.4.1
 #  native_video_player: ^3.0.0-dev.4
   flick_video_player: ^0.9.0 #video_player的封装
   #  native_video_player: ^1.3.1

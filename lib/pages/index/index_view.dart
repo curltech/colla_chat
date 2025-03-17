@@ -711,6 +711,7 @@ class _IndexViewState extends State<IndexView>
               backgroundColor: Colors.white.withAlpha(0),
               appBar: Container(),
               slider: Center(child: HelpInformationWidget()),
+              isDraggable: false,
               child: Center(
                   child: platformWidgetFactory.sizedBox(
                       child: widget.adaptiveLayoutIndex,

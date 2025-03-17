@@ -108,7 +108,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
               label: 'Generate',
               onTap: (Map<String, dynamic> values) async {
                 await _onOk(values);
-                String? sql = _buildSql();
+                String? sql = createTableAndIndex();
 
                 if (sql != null) {
                   codeController.fullText = sql;
@@ -118,15 +118,14 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
               label: 'Execute',
               onTap: (Map<String, dynamic> values) async {
                 await _onOk(values);
-                String? sql = _buildSql();
-
-                if (sql != null) {
-                  try {
-                    dataSourceController.current?.dataStore?.run(Sql(sql));
-                  } catch (e) {
-                    DialogUtil.error(
-                        content: AppLocalizations.t('execute sql failure:$e'));
+                try {
+                  String? sql = createTableAndIndex(mock: false);
+                  if (sql != null) {
+                    codeController.fullText = sql;
                   }
+                } catch (e) {
+                  DialogUtil.error(
+                      content: AppLocalizations.t('execute sql failure:$e'));
                 }
               })
         ],
@@ -146,17 +145,17 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       return null;
     }
     data_source.DataTable? dataTable = dataSourceController.getDataTable();
-    String? originalName = dataTable?.name;
-    if (originalName == null) {
-      dataTable?.name = current.name;
-      dataTable?.comment = current.comment;
+    if (dataTable == null) {
+      dataTable = data_source.DataTable();
+      dataTable.name = current.name;
+      dataTable.comment = current.comment;
+      dataSourceController.addDataTable(dataTable);
     } else {
-      dataTable?.name = current.name;
-      dataTable?.comment = current.comment;
+      dataTable.name = current.name;
+      dataTable.comment = current.comment;
     }
 
-    DialogUtil.info(
-        content: 'Successfully update dataTable:${dataTable?.name}');
+    DialogUtil.info(content: 'Successfully update dataTable:${dataTable.name}');
 
     return current;
   }
@@ -359,73 +358,9 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
     language: sql,
   );
 
-  String? _buildTableSql() {
-    String? tableName = formInputController?.controllers['name']?.value;
-    if (tableName == null) {
-      return null;
-    }
-    String sql = 'create table $tableName\n';
-    sql += '(\n';
-    DataListController<data_source.DataColumn>? dataColumnController =
-        dataSourceController.getDataColumnController();
-    List<data_source.DataColumn>? dataColumns = dataColumnController?.data;
-    if (dataColumns != null && dataColumns.isNotEmpty) {
-      String keyColumns = '';
-      for (int i = 0; i < dataColumns.length; ++i) {
-        data_source.DataColumn dataColumn = dataColumns[i];
-        String columnName = dataColumn.name!;
-        String dataType = dataColumn.dataType!;
-        bool? notNull = dataColumn.notNull;
-        if (notNull != null && notNull) {
-          sql += '    $columnName   $dataType not null,\n';
-        } else {
-          sql += '    $columnName   $dataType,\n';
-        }
-        if (dataColumn.isKey != null && dataColumn.isKey!) {
-          if (keyColumns.isEmpty) {
-            keyColumns += columnName;
-          } else {
-            keyColumns += ',$columnName';
-          }
-        }
-      }
-      if (keyColumns.isNotEmpty) {
-        sql += '    constraint ${tableName}_pk\n';
-        sql += '    primary key($keyColumns)\n';
-      }
-    }
-    sql += ');';
-
-    return sql;
-  }
-
-  String? _buildIndexSql() {
-    String? tableName = formInputController?.controllers['name']?.value;
-    if (tableName == null) {
-      return null;
-    }
-    String sql = '';
-    DataListController<data_source.DataIndex>? dataIndexController =
-        dataSourceController.getDataIndexController();
-    List<data_source.DataIndex>? dataIndexes = dataIndexController?.data;
-    if (dataIndexes != null && dataIndexes.isNotEmpty) {
-      for (var dataIndex in dataIndexes) {
-        String indexName = dataIndex.name!;
-        String columnNames = dataIndex.columnNames!;
-        if (dataIndex.isUnique != null && dataIndex.isUnique!) {
-          sql += 'create unique index $indexName\n';
-        } else {
-          sql += 'create index $indexName\n';
-        }
-        sql += 'on $tableName($columnNames);\n';
-      }
-    }
-    return sql;
-  }
-
-  String? _buildSql() {
-    String? tableSql = _buildTableSql();
-    String? indexSql = _buildIndexSql();
+  String? createTableAndIndex({bool mock = true}) {
+    String? tableSql = dataSourceController.createDataTable(mock: mock);
+    String? indexSql = dataSourceController.createDataIndex(mock: mock);
     String? sql;
     if (tableSql != null) {
       sql = tableSql;
