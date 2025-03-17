@@ -207,12 +207,8 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
         if (dataSource == null) {
           return;
         }
-        var dataTableController =
-            dataSourceController.dataTableControllers[dataSource.name];
-        dataTableController?.remove(node.data!);
+        dataSourceController.removeDataTable();
         node.delete();
-        dataSourceController.current?.dataStore
-            ?.run(Sql('drop table ${node.data?.name}'));
       }
     } else if (node is DataColumnNode) {
       bool? confirm = await DialogUtil.confirm(
@@ -226,12 +222,8 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
         if (dataTable == null) {
           return;
         }
-        var dataColumnController = dataSourceController.getDataColumnController(
-            dataSource: dataSource, tableName: dataTable.name);
-        dataColumnController?.remove(node.data!);
+        dataSourceController.removeDataColumn(node.data!);
         node.delete();
-        dataSourceController.current?.dataStore?.run(Sql(
-            'alter table ${dataTable.name} drop column ${node.data?.name};'));
       }
     } else if (node is DataIndexNode) {
       bool? confirm = await DialogUtil.confirm(
@@ -245,12 +237,8 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
         if (dataTable == null) {
           return;
         }
-        var dataIndexController = dataSourceController.getDataIndexController(
-            dataSource: dataSource, tableName: dataTable.name);
-        dataIndexController?.remove(node.data!);
+        dataSourceController.removeDataIndex(node.data!);
         node.delete();
-        dataSourceController.current?.dataStore
-            ?.run(Sql('drop index ${node.data?.name}'));
       }
     }
   }

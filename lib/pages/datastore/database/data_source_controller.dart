@@ -234,7 +234,7 @@ class DataSourceController extends DataListController<data_source.DataSource> {
         return null;
       }
     }
-    String sql = 'create table ${dataTable.name}\n';
+    String sql = 'create table if not exists ${dataTable.name}\n';
     sql += '(\n';
     DataListController<data_source.DataColumn>? dataColumnController =
         dataSourceController.getDataColumnController();
@@ -270,6 +270,33 @@ class DataSourceController extends DataListController<data_source.DataSource> {
     }
 
     return sql;
+  }
+
+  removeDataTable({
+    data_source.DataSource? dataSource,
+    data_source.DataTable? dataTable,
+  }) {
+    if (dataSource == null) {
+      dataSource = dataSourceController.current;
+      if (dataSource == null) {
+        return null;
+      }
+    }
+    DataTableController? dataTableController =
+        getDataTableController(dataSource: dataSource);
+    if (dataTableController == null) {
+      return null;
+    }
+    if (dataTable == null) {
+      dataTable = dataTableController.current;
+      if (dataTable == null) {
+        return null;
+      }
+    }
+    String sql = 'drop table if exists ${dataTable.name}\n';
+    dataSource.dataStore?.run(Sql(sql));
+
+    dataTableController.remove(dataTable);
   }
 
   /// 根据数据源和表名获取表
@@ -344,15 +371,15 @@ class DataSourceController extends DataListController<data_source.DataSource> {
     if (dataColumnController == null) {
       return null;
     }
-    dataColumnController.add(dataColumn);
     dataSource.dataStore?.run(
         Sql('alter table ${dataTable.name} add column ${dataColumn.name};'));
+    dataColumnController.add(dataColumn);
 
     return null;
   }
 
   /// 在数据库中删除列，要求数据源，表和列控制器存在
-  data_source.DataColumn? deleteDataColumn(data_source.DataColumn dataColumn,
+  data_source.DataColumn? removeDataColumn(data_source.DataColumn dataColumn,
       {data_source.DataSource? dataSource, String? tableName}) {
     if (dataSource == null) {
       dataSource = dataSourceController.current;
@@ -369,9 +396,9 @@ class DataSourceController extends DataListController<data_source.DataSource> {
     if (dataColumnController == null) {
       return null;
     }
-    dataColumnController.remove(dataColumn);
     dataSource.dataStore?.run(
         Sql('alter table ${dataTable.name} drop column ${dataColumn.name};'));
+    dataColumnController.remove(dataColumn);
 
     return null;
   }
@@ -472,9 +499,9 @@ class DataSourceController extends DataListController<data_source.DataSource> {
     String columnNames = dataIndex.columnNames!;
     String sql = '';
     if (dataIndex.isUnique != null && dataIndex.isUnique!) {
-      sql += 'create unique index $indexName\n';
+      sql += 'create unique index if not exists $indexName\n';
     } else {
-      sql += 'create index $indexName\n';
+      sql += 'create index if not exists $indexName\n';
     }
     sql += 'on ${dataTable.name}($columnNames);\n';
     if (!mock) {
@@ -501,8 +528,8 @@ class DataSourceController extends DataListController<data_source.DataSource> {
     if (dataIndexController == null) {
       return null;
     }
+    dataSource.dataStore?.run(Sql('drop index if exists ${dataIndex.name}'));
     dataIndexController.remove(dataIndex);
-    dataSource.dataStore?.run(Sql('drop index ${dataIndex.name}'));
 
     return null;
   }

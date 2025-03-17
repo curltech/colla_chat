@@ -262,9 +262,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
                 return;
               }
               for (data_source.DataColumn dataColumn in dataColumns) {
-                dataColumnController?.data.remove(dataColumn);
-                dataSourceController.current?.dataStore?.run(Sql(
-                    'alter table ${dataTable.name} drop column ${dataColumn.name};'));
+                dataSourceController.removeDataColumn(dataColumn);
               }
             },
             icon: Icon(Icons.remove, color: myself.primary)),
@@ -306,12 +304,10 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
               dataIndex.name =
                   '${dataTable.name}_${columnNames.replaceAll(',', '_')}_index';
               dataIndex.columnNames = columnNames;
+              dataSourceController.addDataIndex(dataIndex);
               DataListController<data_source.DataColumn>? dataColumnController =
                   dataSourceController.getDataColumnController();
               dataColumnController?.setCheckAll(false);
-              DataListController<data_source.DataIndex>? dataIndexController =
-                  dataSourceController.getDataIndexController();
-              dataIndexController?.add(dataIndex);
               indexWidgetProvider.push('data_index_edit');
             },
             icon: Icon(
@@ -333,9 +329,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
                 return;
               }
               for (data_source.DataIndex dataIndex in dataIndexes) {
-                dataIndexController?.remove(dataIndex);
-                dataSourceController.current?.dataStore
-                    ?.run(Sql('drop index ${dataIndex.name}'));
+                dataSourceController.removeDataIndex(dataIndex);
               }
             },
             icon: Icon(Icons.remove, color: myself.primary)),
