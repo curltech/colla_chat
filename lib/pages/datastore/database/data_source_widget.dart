@@ -1,11 +1,12 @@
 import 'package:animated_tree_view/animated_tree_view.dart' as animated;
 import 'package:checkable_treeview/checkable_treeview.dart' as checkable;
-import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/datastore/database/data_column_edit_widget.dart';
 import 'package:colla_chat/pages/datastore/database/data_index_edit_widget.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_controller.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_edit_widget.dart';
+import 'package:colla_chat/pages/datastore/database/data_source_node.dart'
+as data_source;
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart';
 import 'package:colla_chat/pages/datastore/database/data_table_edit_widget.dart';
 import 'package:colla_chat/pages/datastore/database/query_console_editor_widget.dart';
@@ -19,8 +20,6 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
-import 'package:colla_chat/pages/datastore/database/data_source_node.dart'
-    as data_source;
 import 'package:get/get.dart';
 
 /// 数据源管理功能主页面，带有路由回调函数
@@ -169,23 +168,19 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     if (node is FolderNode) {
       if ('tables' == node.data!.name) {
         data_source.DataTable dataTable = data_source.DataTable();
-        DataTableNode dataTableNode = DataTableNode(data: dataTable);
         data_source.DataSource? dataSource = dataSourceController.current;
         if (dataSource == null) {
           return;
         }
-        DataTableController? dataTableController =
-            dataSourceController.dataTableControllers[dataSource.name];
-        dataTableController!.add(dataTableNode.data!);
+        dataSourceController.addDataTable(dataTable);
         indexWidgetProvider.push('data_table_edit');
       } else if ('columns' == node.data!.name) {
         data_source.DataColumn dataColumn = data_source.DataColumn();
-        dataSourceController.setCurrentDataColumn(dataColumn);
+        dataSourceController.addDataColumn(dataColumn);
         indexWidgetProvider.push('data_column_edit');
       } else if ('indexes' == node.data!.name) {
         data_source.DataIndex dataIndex = data_source.DataIndex();
-        DataIndexNode dataIndexNode = DataIndexNode(data: dataIndex);
-        dataSourceController.setCurrentDataIndex(dataIndex);
+        dataSourceController.addDataIndex(dataIndex);
         indexWidgetProvider.push('data_index_edit');
       }
     }
