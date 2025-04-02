@@ -60,8 +60,9 @@ class DataIndexEditWidget extends StatelessWidget with TileDataMixin {
   //DataIndex信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
     return Obx(() {
-      data_source.DataIndex dataIndex = dataSourceController.getDataIndex()!;
-      formInputController.setValues(JsonUtil.toJson(dataIndex));
+      data_source.DataIndexNode? dataIndexNode =
+          dataSourceController.getDataIndexNode();
+      formInputController.setValues(JsonUtil.toJson(dataIndexNode?.value));
       var formInputWidget = FormInputWidget(
         spacing: 15.0,
         onOk: (Map<String, dynamic> values) {
@@ -83,11 +84,14 @@ class DataIndexEditWidget extends StatelessWidget with TileDataMixin {
       DialogUtil.error(content: AppLocalizations.t('Must has dataIndex name'));
       return null;
     }
-    data_source.DataIndex? dataIndex = dataSourceController.getDataIndex();
-    if (dataIndex == null) {
+    data_source.DataIndex dataIndex;
+    data_source.DataIndexNode? dataIndexNode =
+        dataSourceController.getDataIndexNode();
+    if (dataIndexNode == null) {
       dataIndex = current;
       dataSourceController.addDataIndex(dataIndex);
     } else {
+      dataIndex = dataIndexNode.value as data_source.DataIndex;
       dataIndex.name = current.name;
       dataIndex.isUnique = current.isUnique;
       dataIndex.columnNames = current.columnNames;

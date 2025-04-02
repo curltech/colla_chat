@@ -1,30 +1,20 @@
 import 'dart:core';
 import 'dart:io' as io;
 
-import 'package:animated_tree_view/animated_tree_view.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/datastore/explorable_node.dart';
 import 'package:colla_chat/pages/datastore/filesystem/file_node.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/tool/path_util.dart';
+import 'package:colla_chat/widgets/data_bind/tree_view.dart';
 import 'package:get/get.dart';
 
-class FileSystemController {
-  final RxMap<String, FolderNode> rootFolders = <String, FolderNode>{}.obs;
-  TreeViewController? treeViewController;
-  final TreeNode<Explorable> root = TreeNode.root();
-
-  // final Rx<Folder?> current = Rx<Folder?>(null);
-
+class FileSystemController extends DataListController<FolderNode> {
+  late final TreeViewController treeViewController;
   Rx<FolderNode?> currentNode = Rx<FolderNode?>(null);
 
   FileSystemController() {
     init();
-  }
-
-  clear() {
-    rootFolders.clear();
-    root.clear();
   }
 
   init() async {
@@ -38,10 +28,7 @@ class FileSystemController {
       initWindows();
       initMobile();
     }
-    List<ListenableNode> children = root.childrenAsList;
-    for (var node in children) {
-      treeViewController?.collapseNode(node as ITreeNode);
-    }
+    treeViewController = TreeViewController(data.value);
   }
 
   initMac() {
@@ -88,30 +75,20 @@ class FileSystemController {
   }
 
   FolderNode addDirectory(String name, io.Directory directory) {
-    Folder folder = Folder(name: name, directory: directory);
-    FolderNode folderNode = FolderNode(data: folder);
-    root.add(folderNode);
-    rootFolders[folder.name!] = folderNode;
+    Folder folder = Folder(name, directory: directory);
+    FolderNode folderNode = FolderNode(folder);
+    add(folderNode);
 
     return folderNode;
   }
 
   deleteDirectory({FolderNode? node}) {
-    Folder? folder;
-    if (node != null) {
-      node.delete();
-    } else {
-      folder = currentNode.value?.data;
-      currentNode.value = null;
-    }
-    rootFolders.remove(folder!.name);
+    node ??= current;
+    remove(node!);
   }
 
   findDirectory(FolderNode folderNode) {
-    io.Directory? directory = folderNode.data?.directory;
-    if (directory == null) {
-      return;
-    }
+    io.Directory directory = (folderNode.value as Folder).directory;
     List<io.FileSystemEntity> fileSystemEntities = directory.listSync();
 
     for (io.FileSystemEntity fileSystemEntity in fileSystemEntities) {
@@ -119,10 +96,10 @@ class FileSystemController {
       io.FileSystemEntityType fileSystemEntityType = fileStat.type;
       if (fileSystemEntityType == io.FileSystemEntityType.directory) {
         FolderNode node = FolderNode(
-            data: Folder(
-                name: PathUtil.basename(fileSystemEntity.path),
+            Folder(
+                PathUtil.basename(fileSystemEntity.path),
                 directory: fileSystemEntity as io.Directory));
-        folderNode.add(node);
+        folderNode.children.add(node);
       }
     }
   }
@@ -141,7 +118,7 @@ class FileSystemController {
             continue;
           }
         }
-        File file = File(name: name, file: fileSystemEntity as io.File);
+        File file = File(name, file: fileSystemEntity as io.File);
         files.add(file);
       }
     }

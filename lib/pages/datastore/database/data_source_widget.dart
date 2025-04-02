@@ -1,16 +1,13 @@
-import 'package:animated_tree_view/animated_tree_view.dart' as animated;
-import 'package:checkable_treeview/checkable_treeview.dart' as checkable;
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/datastore/database/data_column_edit_widget.dart';
 import 'package:colla_chat/pages/datastore/database/data_index_edit_widget.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_controller.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_edit_widget.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart'
-as data_source;
+    as data_source;
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart';
 import 'package:colla_chat/pages/datastore/database/data_table_edit_widget.dart';
 import 'package:colla_chat/pages/datastore/database/query_console_editor_widget.dart';
-import 'package:colla_chat/pages/datastore/explorable_node.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -18,9 +15,8 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
-import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
+import 'package:colla_chat/widgets/data_bind/tree_view.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 /// 数据源管理功能主页面，带有路由回调函数
 class DataSourceWidget extends StatelessWidget with TileDataMixin {
@@ -52,10 +48,10 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
   String get title => 'DataSource';
 
   /// 单击节点，设置当前数据源和数据表
-  void _onTap(BuildContext context, AnimatedExplorableNode node) {
+  void _onTap(BuildContext context, ExplorableNode node) {
     dataSourceController.currentNode.value = node;
-    animated.TreeNode? dataSourceNode;
-    animated.TreeNode? dataTableNode;
+    DataSourceNode? dataSourceNode;
+    DataTableNode? dataTableNode;
     if (node is DataSourceNode) {
       dataSourceNode = node;
     } else if (node is DataTableNode) {
@@ -65,27 +61,21 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
       dataSourceNode = node.parent?.parent?.parent?.parent as DataSourceNode;
       dataTableNode = node.parent as DataTableNode;
     } else if (node is FolderNode) {
-      String? name = node.data?.name;
+      String? name = node.value.name;
       if (name == 'tables') {
         dataSourceNode = node.parent as DataSourceNode;
       } else {
         dataSourceNode = node.parent?.parent?.parent as DataSourceNode;
       }
     }
-    DataSource? dataSource = dataSourceNode?.data;
-    dataSourceController.current = dataSource;
-    if (dataSource != null) {
-      var dataTableController =
-          dataSourceController.dataTableControllers[dataSource.name];
-      if (dataTableController != null) {
-        dataTableController.current = dataTableNode?.data;
-      }
-    }
+
+    dataSourceController.current = dataSourceNode;
+    dataSourceController.currentDataTableNode.value = dataTableNode;
+    dataSourceController.currentNode.value = node;
   }
 
   /// 长按表示进一步的操作
-  Future<void> _onLongPress(
-      BuildContext context, AnimatedExplorableNode node) async {
+  Future<void> _onLongPress(BuildContext context, ExplorableNode node) async {
     dataSourceController.currentNode.value = node;
     List<ActionData> popActionData = [];
     popActionData.add(ActionData(
@@ -130,56 +120,58 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
   }
 
   /// 单击时加载列或索引
-  void _onItemTap(BuildContext context, AnimatedExplorableNode node) {
+  void _onToggleNodeExpansion(BuildContext context, ExplorableNode node) {
     if (node is FolderNode) {
-      String? tableName = (node.parent as animated.TreeNode).data.name;
-      String? name = node.data?.name;
-      DataSource? dataSource = dataSourceController.current;
-      if (dataSource == null) {
+      String tableName = (node.parent as ExplorableNode).value.name;
+      String name = node.value.name;
+      DataSourceNode? dataSourceNode = dataSourceController.current;
+      if (dataSourceNode == null) {
         return;
       }
       if (name == 'columns') {
-        if (node.length == 0) {
+        if (node.children.isEmpty) {
           dataSourceController.updateColumnNodes(
-              dataSource: dataSource,
-              tableName: tableName,
-              columnFolderNode: node);
+            dataSourceNode: dataSourceNode,
+            tableName: tableName,
+          );
         }
       } else if (name == 'indexes') {
-        if (node.length == 0) {
+        if (node.children.isEmpty) {
           dataSourceController.updateIndexNodes(
-              dataSource: dataSource,
-              tableName: tableName,
-              indexesFolderNode: node);
+            dataSourceNode: dataSourceNode,
+            tableName: tableName,
+          );
         }
       }
     }
   }
 
   void _addDataSource(String sourceType) {
-    DataSource dataSource = DataSource(sourceType: sourceType);
-    DataSourceNode dataSourceNode = DataSourceNode(data: dataSource);
-    dataSourceController.current = dataSourceNode.data;
+    DataSource dataSource = DataSource('', sourceType: sourceType);
+    DataSourceNode dataSourceNode = DataSourceNode(dataSource);
+    dataSourceController.current = dataSourceNode;
     indexWidgetProvider.push('data_source_edit');
   }
 
   /// 增加表，列或索引，节点没有变化，进入数据编辑页面
-  void _add(AnimatedExplorableNode node) {
-    if (node is FolderNode) {
-      if ('tables' == node.data!.name) {
-        data_source.DataTable dataTable = data_source.DataTable();
-        data_source.DataSource? dataSource = dataSourceController.current;
+  void _add(ExplorableNode node) {
+    Explorable? explorable = node.value;
+    if (explorable is Folder) {
+      if ('tables' == node.value.name) {
+        data_source.DataTable dataTable = data_source.DataTable('');
+        data_source.DataSource? dataSource =
+            dataSourceController.current as data_source.DataSource?;
         if (dataSource == null) {
           return;
         }
         dataSourceController.addDataTable(dataTable);
         indexWidgetProvider.push('data_table_edit');
-      } else if ('columns' == node.data!.name) {
-        data_source.DataColumn dataColumn = data_source.DataColumn();
+      } else if ('columns' == node.value.name) {
+        data_source.DataColumn dataColumn = data_source.DataColumn('');
         dataSourceController.addDataColumn(dataColumn);
         indexWidgetProvider.push('data_column_edit');
-      } else if ('indexes' == node.data!.name) {
-        data_source.DataIndex dataIndex = data_source.DataIndex();
+      } else if ('indexes' == node.value.name) {
+        data_source.DataIndex dataIndex = data_source.DataIndex('');
         dataSourceController.addDataIndex(dataIndex);
         indexWidgetProvider.push('data_index_edit');
       }
@@ -187,81 +179,83 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
   }
 
   /// 删除节点，同时删除数据
-  Future<void> _delete(AnimatedExplorableNode node) async {
+  Future<void> _delete(ExplorableNode node) async {
     if (node is DataSourceNode) {
       bool? confirm = await DialogUtil.confirm(
           content: 'Do you confirm delete selected data source node?');
       if (confirm != null && confirm) {
-        dataSourceController.deleteDataSource(node: node);
+        dataSourceController.deleteDataSource(dataSourceNode: node);
       }
     } else if (node is DataTableNode) {
       bool? confirm = await DialogUtil.confirm(
           content: 'Do you confirm delete selected data table node?');
       if (confirm != null && confirm) {
-        DataSource? dataSource = dataSourceController.current;
+        DataSource? dataSource =
+            dataSourceController.current as data_source.DataSource?;
         if (dataSource == null) {
           return;
         }
-        dataSourceController.removeDataTable();
-        node.delete();
+        dataSourceController.removeDataTableNode(dataTableNode: node);
       }
     } else if (node is DataColumnNode) {
       bool? confirm = await DialogUtil.confirm(
           content: 'Do you confirm delete selected data column node?');
       if (confirm != null && confirm) {
-        DataSource? dataSource = dataSourceController.current;
+        DataSource? dataSource =
+            dataSourceController.current as data_source.DataSource?;
         if (dataSource == null) {
           return;
         }
-        var dataTable = dataSourceController.getDataTable();
+        var dataTable = dataSourceController.getDataTableNode();
         if (dataTable == null) {
           return;
         }
-        dataSourceController.removeDataColumn(node.data!);
-        node.delete();
+        dataSourceController.removeDataColumnNode(node);
       }
     } else if (node is DataIndexNode) {
       bool? confirm = await DialogUtil.confirm(
           content: 'Do you confirm delete selected data index node?');
       if (confirm != null && confirm) {
-        DataSource? dataSource = dataSourceController.current;
+        DataSource? dataSource =
+            dataSourceController.current as data_source.DataSource?;
         if (dataSource == null) {
           return;
         }
-        var dataTable = dataSourceController.getDataTable();
+        var dataTable = dataSourceController.getDataTableNode();
         if (dataTable == null) {
           return;
         }
-        dataSourceController.removeDataIndex(node.data!);
-        node.delete();
+        dataSourceController.removeDataIndexNode(node);
       }
     }
   }
 
-  void _edit(AnimatedExplorableNode node) {
-    if (node is DataSourceNode) {
+  void _edit(ExplorableNode node) {
+    Explorable? explorable = node.value;
+    if (explorable is DataSource) {
       indexWidgetProvider.push('data_source_edit');
-    } else if (node is DataTableNode) {
+    } else if (explorable is data_source.DataTable) {
       indexWidgetProvider.push('data_table_edit');
-    } else if (node is DataColumnNode) {
+    } else if (explorable is data_source.DataColumn) {
       indexWidgetProvider.push('data_column_edit');
-    } else if (node is DataIndexNode) {
+    } else if (explorable is data_source.DataIndex) {
       indexWidgetProvider.push('data_index_edit');
     }
   }
 
-  void _query(AnimatedExplorableNode node) {
-    if (node is data_source.DataSourceNode) {
-      dataSourceController.current = node.data;
+  void _query(ExplorableNode node) {
+    Explorable? explorable = node.value;
+    if (explorable is data_source.DataSource) {
+      dataSourceController.current = node as data_source.DataSourceNode?;
       indexWidgetProvider.push('query_console_editor');
-    } else if (node is DataTableNode) {
-      codeController.text = 'select * from ${node.data!.name}';
+    } else if (explorable is data_source.DataTable) {
+      codeController.text = 'select * from ${node.value.name}';
       indexWidgetProvider.push('query_console_editor');
     }
   }
 
-  _onPopAction(BuildContext context, AnimatedExplorableNode node, int index,
-      String label,
+  _onPopAction(
+      BuildContext context, ExplorableNode node, int index, String label,
       {String? value}) async {
     switch (label) {
       case 'New':
@@ -328,73 +322,17 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     );
   }
 
-  Widget _buildAnimatedTreeView(BuildContext context) {
-    return animated.TreeView.simpleTyped<Explorable, AnimatedExplorableNode>(
-        tree: dataSourceController.animatedRoot,
-        showRootNode: false,
-        expansionBehavior: animated.ExpansionBehavior.none,
-        expansionIndicatorBuilder: (context, node) {
-          return animated.ChevronIndicator.rightDown(
-            tree: node,
-            alignment: Alignment.centerLeft,
-            color: myself.primary,
-          );
-        },
-        indentation: animated.Indentation(
-          width: 12,
-          color: myself.primary,
-          style: animated.IndentStyle.none,
-          thickness: 1,
-          offset: Offset(12, 0),
-        ),
-        onTreeReady: (controller) {
-          dataSourceController.treeViewController = controller;
-        },
-        builder: (context, AnimatedExplorableNode node) {
-          return Obx(() {
-            bool selected = false;
-            if (node is DataSourceNode) {
-              selected = dataSourceController.current == node.data;
-            }
-            if (!selected) {
-              selected = dataSourceController.currentNode.value == node;
-            }
-            TileData tileData = TileData(
-              title: node.data?.name ?? "/",
-              titleTail: node is DataColumnNode
-                  ? node.data?.dataType ?? ""
-                  : node.length.toString(),
-              dense: true,
-              prefix: node.icon,
-              selected: selected,
-              onTap: (int index, String label, {String? subtitle}) {
-                _onTap(context, node);
-                _onItemTap(context, node);
-              },
-              onLongPress: (int index, String label, {String? subtitle}) {
-                _onLongPress(context, node);
-              },
-            );
-            return Padding(
-              padding: const EdgeInsets.only(left: 16.0),
-              child: DataListTile(
-                tileData: tileData,
-                minVerticalPadding: 0.0,
-              ),
-            );
-          });
-        },
-        onItemTap: (AnimatedExplorableNode node) {
-          _onItemTap(context, node);
-        });
-  }
-
-  Widget _buildCheckableTreeView(BuildContext context) {
-    return checkable.TreeView<Explorable>(
-      key: dataSourceController.checkableTreeViewKey,
-      nodes: dataSourceController.checkableRoot,
-      onSelectionChanged: (selectedValues) {
-        print('Selected values: $selectedValues');
+  Widget _buildTreeView(BuildContext context) {
+    return TreeView(
+      treeViewController: dataSourceController.treeViewController,
+      onTap: (ExplorableNode node) {
+        _onTap(context, node);
+      },
+      toggleNodeExpansion: (ExplorableNode node) {
+        _onToggleNodeExpansion(context, node);
+      },
+      onLongPress: (ExplorableNode node) {
+        _onLongPress(context, node);
       },
     );
   }
@@ -403,56 +341,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     return Column(children: [
       _buildDataSourceButtonWidget(context),
-      Expanded(child: _buildAnimatedTreeView(context)),
+      Expanded(child: _buildTreeView(context)),
     ]);
-  }
-}
-
-extension on AnimatedExplorableNode {
-  Widget get icon {
-    if (isRoot) {
-      return Icon(
-        Icons.data_object,
-        color: myself.primary,
-      );
-    }
-
-    if (this is FolderNode) {
-      if (isExpanded) {
-        return Icon(Icons.folder_open, color: myself.primary);
-      }
-      return Icon(Icons.folder, color: myself.primary);
-    }
-
-    if (this is DataSourceNode) {
-      final dataSource = data as DataSource;
-      if (dataSource.sourceType == SourceType.sqlite.name) {
-        return DataSource.sqliteImage;
-      } else if (dataSource.sourceType == SourceType.postgres.name) {
-        return DataSource.postgresImage;
-      }
-      return DataSource.sqliteImage;
-    }
-
-    if (this is DataTableNode) {
-      return Icon(Icons.table_view_outlined, color: myself.primary);
-    }
-
-    if (this is DataColumnNode) {
-      final dataColumn = data as data_source.DataColumn;
-      if (dataColumn.isKey != null && dataColumn.isKey!) {
-        return Icon(Icons.key, color: myself.primary);
-      }
-      return Icon(Icons.view_column_outlined, color: myself.primary);
-    }
-
-    if (this is DataIndexNode) {
-      return Icon(Icons.content_paste_search, color: myself.primary);
-    }
-
-    if (isExpanded) {
-      return Icon(Icons.folder_open, color: myself.primary);
-    }
-    return Icon(Icons.folder, color: myself.primary);
   }
 }

@@ -68,7 +68,7 @@ class FileWidget extends StatelessWidget with TileDataMixin {
   }
 
   _searchFile(String keyword) async {
-    Folder? folder = fileSystemController.currentNode.value?.data;
+    Folder? folder = fileSystemController.currentNode.value?.value as Folder?;
     io.Directory? directory = folder?.directory;
     if (directory == null) {
       fileController.replaceAll([]);
@@ -143,7 +143,7 @@ class FileWidget extends StatelessWidget with TileDataMixin {
     if (folderNode == null) {
       return;
     }
-    Folder? folder = folderNode.data;
+    Folder? folder = folderNode.value as Folder?;
     if (folder == null) {
       return;
     }
@@ -154,14 +154,14 @@ class FileWidget extends StatelessWidget with TileDataMixin {
       String name = p.join(path, content);
       io.File file = io.File(name);
       file.createSync();
-      File f = File(name: content, file: file);
+      File f = File(content, file: file);
       fileController.add(f);
     }
   }
 
   Future<void> _deleteFile(BuildContext context) async {
     bool? confirm;
-    List<File> files = fileController.checked;
+    List<File> files = fileController.selected;
     if (files.isEmpty) {
       File? file = fileController.current;
       if (file == null) {
@@ -204,7 +204,7 @@ class FileWidget extends StatelessWidget with TileDataMixin {
   }
 
   _buildFiles() {
-    Folder? folder = fileSystemController.currentNode.value?.data;
+    Folder? folder = fileSystemController.currentNode.value?.value as Folder?;
     io.Directory? directory = folder?.directory;
     if (directory == null) {
       fileController.replaceAll([]);
@@ -255,7 +255,7 @@ class FileWidget extends StatelessWidget with TileDataMixin {
                       file.icon,
                       Expanded(
                           child: CommonAutoSizeText(
-                        file.name!,
+                        file.name,
                         style: TextStyle(
                             color: file == fileController.current
                                 ? Colors.white

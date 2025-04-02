@@ -206,8 +206,6 @@ dependencies:
   loading_indicator: ^3.1.1
   loading_animation_widget: ^1.2.0+4
   mini_music_visualizer: ^1.1.4
-  animated_tree_view: ^2.3.0
-  checkable_treeview: ^1.3.1
 
   #安全加密
   cryptography: ^2.7.0 #ecc,aes

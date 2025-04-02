@@ -23,7 +23,7 @@ class QueryResultController extends DataPageController<Map<String, dynamic>> {
   @override
   FutureOr<void> findData() async {
     String sql = codeController.text;
-    DataSource? current = dataSourceController.current;
+    DataSource? current = dataSourceController.current as DataSource?;
     if (current == null) {
       return null;
     }
@@ -109,7 +109,7 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
         rightWidgets: [
           IconButton(
               onPressed: () async {
-                DataSource? current = dataSourceController.current;
+                DataSource? current = dataSourceController.current as DataSource?;
                 if (current == null) {
                   return;
                 }

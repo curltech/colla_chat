@@ -33,7 +33,7 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
   final Rx<String?> sourceType = Rx<String?>(null);
 
   List<PlatformDataField> buildDataSourceDataFields() {
-    DataSource? dataSource = dataSourceController.current;
+    DataSource? dataSource = dataSourceController.current?.value as DataSource?;
     String? originalName = dataSource?.name;
     var dataSourceDataFields = [
       PlatformDataField(
@@ -113,7 +113,8 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
   //DataSourceNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
     return Obx(() {
-      DataSource? dataSource = dataSourceController.current;
+      DataSource? dataSource =
+          dataSourceController.current?.value as DataSource?;
       List<PlatformDataField> dataSourceDataFields =
           buildDataSourceDataFields();
       formInputController?.dispose();
@@ -162,7 +163,7 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
         return null;
       }
     }
-    DataSource? dataSource = dataSourceController.current;
+    DataSource? dataSource = dataSourceController.current?.value as DataSource?;
     if (dataSource == null) {
       dataSource = current;
       if (!dataSourceController.data.contains(dataSource)) {
@@ -188,7 +189,7 @@ class DataSourceEditWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
-    DataSource? dataSource = dataSourceController.current;
+    DataSource? dataSource = dataSourceController.current?.value as DataSource?;
     sourceType.value = dataSource?.sourceType;
     return AppBarView(
         title: title, withLeading: true, child: _buildFormInputWidget(context));

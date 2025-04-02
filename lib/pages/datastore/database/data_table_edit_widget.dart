@@ -1,4 +1,3 @@
-import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_controller.dart';
 import 'package:colla_chat/pages/datastore/database/data_source_node.dart'
@@ -47,6 +46,10 @@ class DataTableEditWidget extends StatefulWidget with TileDataMixin {
 
 class _DataTableEditWidgetState extends State<DataTableEditWidget>
     with SingleTickerProviderStateMixin {
+  DataListController<data_source.DataColumn> dataColumnController =
+      DataListController<data_source.DataColumn>(data: []);
+  DataListController<data_source.DataIndex> dataIndexController =
+      DataListController<data_source.DataIndex>(data: []);
   late final TabController _tabController =
       TabController(length: 3, vsync: this);
 
@@ -56,15 +59,11 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
   }
 
   _buildDataColumns() async {
-    DataListController<data_source.DataColumn>? dataColumnController =
-        dataSourceController.getDataColumnController();
-    dataColumnController ??= await dataSourceController.updateColumnNodes();
+    await dataSourceController.updateColumnNodes();
   }
 
   _buildDataIndexes() async {
-    DataListController<data_source.DataIndex>? dataIndexController =
-        dataSourceController.getDataIndexController();
-    dataIndexController ??= await dataSourceController.updateIndexNodes();
+    await dataSourceController.updateIndexNodes();
   }
 
   List<PlatformDataField> buildDataTableDataFields(String sourceType) {
@@ -84,18 +83,19 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
 
   FormInputController? formInputController;
 
-  //DataTableNode信息编辑界面
+  /// DataTableNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
     return Obx(() {
-      data_source.DataTable? dataTable = dataSourceController.getDataTable();
-      if (dataTable?.name == null) {
+      data_source.DataTableNode? dataTableNode =
+          dataSourceController.getDataTableNode();
+      if (dataTableNode == null) {
         return Container();
       }
       List<PlatformDataField> dataSourceDataFields =
           buildDataTableDataFields(SourceType.sqlite.name);
       formInputController = FormInputController(dataSourceDataFields);
 
-      formInputController?.setValues(JsonUtil.toJson(dataTable));
+      formInputController?.setValues(JsonUtil.toJson(dataTableNode.value));
       var formInputWidget = FormInputWidget(
         spacing: 10.0,
         height: 160,
@@ -144,18 +144,17 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       DialogUtil.error(content: AppLocalizations.t('Must has dataTable name'));
       return null;
     }
-    data_source.DataTable? dataTable = dataSourceController.getDataTable();
-    if (dataTable == null) {
-      dataTable = data_source.DataTable();
-      dataTable.name = current.name;
-      dataTable.comment = current.comment;
+    data_source.DataTableNode? dataTableNode =
+        dataSourceController.getDataTableNode();
+    if (dataTableNode == null) {
+      data_source.DataTable dataTable = data_source.DataTable(current.name);
       dataSourceController.addDataTable(dataTable);
     } else {
-      dataTable.name = current.name;
-      dataTable.comment = current.comment;
+      dataTableNode.value.name = current.name;
+      dataTableNode.value.comment = current.comment;
     }
 
-    DialogUtil.info(content: 'Successfully update dataTable:${dataTable.name}');
+    DialogUtil.info(content: 'Successfully update dataTable:${current.name}');
 
     return current;
   }
@@ -183,11 +182,16 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
 
     return Obx(() {
       _buildDataColumns();
-      DataListController<data_source.DataColumn>? dataColumnController =
-          dataSourceController.getDataColumnController();
-      if (dataColumnController == null) {
+      List<DataColumnNode>? dataColumnNodes =
+          dataSourceController.getDataColumnNodes();
+      if (dataColumnNodes == null) {
         return nilBox;
       }
+      List<data_source.DataColumn>? dataColumns = [];
+      for (DataColumnNode dataColumnNode in dataColumnNodes) {
+        dataColumns.add(dataColumnNode.value as data_source.DataColumn);
+      }
+      dataColumnController.replaceAll(dataColumns);
 
       return BindingDataTable2<data_source.DataColumn>(
         key: UniqueKey(),
@@ -202,11 +206,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
   }
 
   String? _getCheckedColumnNames() {
-    var dataColumnController = dataSourceController.getDataColumnController();
-    if (dataColumnController == null) {
-      return null;
-    }
-    List<data_source.DataColumn> dataColumns = dataColumnController.checked;
+    List<data_source.DataColumn> dataColumns = dataColumnController.selected;
     if (dataColumns.isEmpty) {
       return null;
     }
@@ -216,15 +216,16 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       if (i > 0) {
         names += ',';
       }
-      names += dataColumn.name!;
+      names += dataColumn.name;
     }
 
     return names;
   }
 
   Widget _buildColumnButtonWidget(BuildContext context) {
-    data_source.DataTable? dataTable = dataSourceController.getDataTable();
-    if (dataTable == null) {
+    data_source.DataTableNode? dataTableNode =
+        dataSourceController.getDataTableNode();
+    if (dataTableNode == null) {
       return Container();
     }
     return OverflowBar(
@@ -233,14 +234,12 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
         IconButton(
             tooltip: AppLocalizations.t('New column'),
             onPressed: () {
-              if (dataTable.name == null) {
+              if (dataTableNode.value.name.isEmpty) {
                 DialogUtil.error(content: 'Please input table name');
                 return;
               }
-              DataListController<data_source.DataColumn>? dataColumnController =
-                  dataSourceController.getDataColumnController();
-              data_source.DataColumn dataColumn = data_source.DataColumn();
-              dataColumnController?.add(dataColumn);
+              data_source.DataColumn dataColumn = data_source.DataColumn('');
+              dataColumnController.add(dataColumn);
               indexWidgetProvider.push('data_column_edit');
             },
             icon: Icon(
@@ -250,26 +249,25 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
         IconButton(
             tooltip: AppLocalizations.t('Delete column'),
             onPressed: () {
-              if (dataTable.name == null) {
+              if (dataTableNode.value.name.isEmpty) {
                 DialogUtil.error(content: 'Please input table name');
                 return;
               }
-              DataListController<data_source.DataColumn>? dataColumnController =
-                  dataSourceController.getDataColumnController();
-              List<data_source.DataColumn>? dataColumns =
-                  dataColumnController?.checked;
-              if (dataColumns == null || dataColumns.isEmpty) {
+              List<data_source.DataColumn> dataColumns =
+                  dataColumnController.selected;
+              if (dataColumns.isEmpty) {
                 return;
               }
               for (data_source.DataColumn dataColumn in dataColumns) {
-                dataSourceController.removeDataColumn(dataColumn);
+                dataSourceController
+                    .removeDataColumnNode(DataColumnNode(dataColumn));
               }
             },
             icon: Icon(Icons.remove, color: myself.primary)),
         IconButton(
             tooltip: AppLocalizations.t('Edit column'),
             onPressed: () {
-              if (dataTable.name == null) {
+              if (dataTableNode.value.name.isEmpty) {
                 DialogUtil.error(content: 'Please input table name');
                 return;
               }
@@ -281,8 +279,9 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
   }
 
   Widget _buildIndexButtonWidget(BuildContext context) {
-    data_source.DataTable? dataTable = dataSourceController.getDataTable();
-    if (dataTable == null) {
+    data_source.DataTableNode? dataTableNode =
+        dataSourceController.getDataTableNode();
+    if (dataTableNode == null) {
       return Container();
     }
     return OverflowBar(
@@ -291,7 +290,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
         IconButton(
             tooltip: AppLocalizations.t('New index'),
             onPressed: () {
-              if (dataTable.name == null) {
+              if (dataTableNode.value.name.isEmpty) {
                 DialogUtil.error(content: 'Please input table name');
                 return;
               }
@@ -300,14 +299,12 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
                 DialogUtil.error(content: 'Please choose column of index');
                 return;
               }
-              data_source.DataIndex dataIndex = data_source.DataIndex();
+              data_source.DataIndex dataIndex = data_source.DataIndex('');
               dataIndex.name =
-                  '${dataTable.name}_${columnNames.replaceAll(',', '_')}_index';
+                  '${dataTableNode.value.name}_${columnNames.replaceAll(',', '_')}_index';
               dataIndex.columnNames = columnNames;
               dataSourceController.addDataIndex(dataIndex);
-              DataListController<data_source.DataColumn>? dataColumnController =
-                  dataSourceController.getDataColumnController();
-              dataColumnController?.setCheckAll(false);
+              dataColumnController.unselectAll();
               indexWidgetProvider.push('data_index_edit');
             },
             icon: Icon(
@@ -317,26 +314,25 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
         IconButton(
             tooltip: AppLocalizations.t('Delete index'),
             onPressed: () {
-              if (dataTable.name == null) {
+              if (dataTableNode.value.name.isEmpty) {
                 DialogUtil.error(content: 'Please input table name');
                 return;
               }
-              DataListController<data_source.DataIndex>? dataIndexController =
-                  dataSourceController.getDataIndexController();
               List<data_source.DataIndex>? dataIndexes =
-                  dataIndexController?.checked;
-              if (dataIndexes == null || dataIndexes.isEmpty) {
+                  dataIndexController.selected;
+              if (dataIndexes.isEmpty) {
                 return;
               }
               for (data_source.DataIndex dataIndex in dataIndexes) {
-                dataSourceController.removeDataIndex(dataIndex);
+                dataSourceController
+                    .removeDataIndexNode(DataIndexNode(dataIndex));
               }
             },
             icon: Icon(Icons.remove, color: myself.primary)),
         IconButton(
             tooltip: AppLocalizations.t('Edit index'),
             onPressed: () {
-              if (dataTable.name == null) {
+              if (dataTableNode.value.name.isEmpty) {
                 DialogUtil.error(content: 'Please input table name');
                 return;
               }
@@ -400,11 +396,6 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
     return Obx(() {
       _buildDataIndexes();
       final List<TileData> tiles = [];
-      DataListController<data_source.DataIndex>? dataIndexController =
-          dataSourceController.getDataIndexController();
-      if (dataIndexController == null) {
-        return nilBox;
-      }
       for (int i = 0; i < dataIndexController.data.length; ++i) {
         DataIndex dataIndex = dataIndexController.data[i];
         String titleTail = '';
@@ -416,7 +407,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
               Icons.content_paste_search,
               color: myself.primary,
             ),
-            title: dataIndex.name ?? '',
+            title: dataIndex.name,
             titleTail: titleTail,
             subtitle: dataIndex.columnNames ?? '',
             selected:

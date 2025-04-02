@@ -245,7 +245,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
 
   /// 如果此时有记录被选择，则选择的记录将被移入组中
   _addMember(String groupName) async {
-    List<DayLine> dayLines = dayLineController.checked;
+    List<DayLine> dayLines = dayLineController.selected;
     if (dayLines.isEmpty) {
       return;
     }
@@ -255,7 +255,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
     if (confirm == null || !confirm) {
       return;
     }
-    dayLineController.setCheckAll(false);
+    dayLineController.unselectAll();
     List<String> tsCodes = [];
     for (DayLine dayLine in dayLines) {
       tsCodes.add(dayLine.tsCode);
@@ -268,7 +268,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
     String defaultGroupName =
         AppLocalizations.t(ShareGroupService.defaultGroupName);
 
-    List<DayLine> dayLines = dayLineController.checked;
+    List<DayLine> dayLines = dayLineController.selected;
     if (dayLines.isEmpty) {
       return;
     }
@@ -278,7 +278,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
     if (confirm == null || !confirm) {
       return;
     }
-    dayLineController.setCheckAll(false);
+    dayLineController.unselectAll();
     for (var dayLine in dayLines) {
       String tsCode = dayLine.tsCode;
       if (groupName == defaultGroupName) {
@@ -293,14 +293,14 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
   }
 
   _removeShare() async {
-    List<DayLine> dayLines = dayLineController.checked;
+    List<DayLine> dayLines = dayLineController.selected;
     if (dayLines.isEmpty) {
       return;
     }
     bool? confirm = await DialogUtil.confirm(
         content: 'Do you confirm remove selected ${dayLines.length} shares?');
     if (confirm != null && confirm) {
-      dayLineController.setCheckAll(false);
+      dayLineController.unselectAll();
       for (var dayLine in dayLines) {
         await myShareController.remove(dayLine.tsCode);
       }

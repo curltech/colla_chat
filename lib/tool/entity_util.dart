@@ -22,7 +22,7 @@ class EntityUtil {
     if (entity is Map) {
       return entity['checked'];
     } else {
-      return entity.checked;
+      return entity.selected;
     }
   }
 
@@ -30,7 +30,7 @@ class EntityUtil {
     if (entity is Map) {
       entity['checked'] = val;
     } else {
-      entity.checked = val;
+      entity.selected = val;
     }
   }
 
