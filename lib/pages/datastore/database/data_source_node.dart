@@ -197,7 +197,7 @@ class DataSourceNode extends ExplorableNode {
       return null;
     }
     DataTableNode dataTableNode = DataTableNode(dataTable);
-    dataTableNode.parent = this;
+    dataTableNode.parent = folderNode;
     folderNode.children.add(dataTableNode);
 
     return dataTableNode;
@@ -241,7 +241,9 @@ class DataTableNode extends ExplorableNode {
     if (folderNode == null) {
       return null;
     }
-    return folderNode.children as List<DataColumnNode>?;
+    return folderNode.children.value
+        .map((node) => node as DataColumnNode)
+        .toList() as List<DataColumnNode>?;
   }
 
   List<DataIndexNode>? getDataIndexNodes() {
@@ -249,7 +251,9 @@ class DataTableNode extends ExplorableNode {
     if (folderNode == null) {
       return null;
     }
-    return folderNode.children as List<DataIndexNode>?;
+    return folderNode.children.value
+        .map((node) => node as DataIndexNode)
+        .toList() as List<DataIndexNode>?;
   }
 
   DataColumnNode? getDataColumnNode(String columnName) {

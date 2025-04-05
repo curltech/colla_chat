@@ -337,7 +337,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
     }
     if (columnName == null) {
       if (currentNode.value != null &&
-          currentNode.value!.value is DataColumnNode) {
+          currentNode.value! is DataColumnNode) {
         columnName = currentNode.value!.value.name;
       }
     }
@@ -453,7 +453,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
     }
     if (indexName == null) {
       if (currentNode.value != null &&
-          currentNode.value!.value is DataIndexNode) {
+          currentNode.value! is DataIndexNode) {
         indexName = currentNode.value!.value.name;
       }
     }

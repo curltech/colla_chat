@@ -62,7 +62,9 @@ class DataIndexEditWidget extends StatelessWidget with TileDataMixin {
     return Obx(() {
       data_source.DataIndexNode? dataIndexNode =
           dataSourceController.getDataIndexNode();
-      formInputController.setValues(JsonUtil.toJson(dataIndexNode?.value));
+      if (dataIndexNode!=null) {
+        formInputController.setValues(JsonUtil.toJson(dataIndexNode.value));
+      }
       var formInputWidget = FormInputWidget(
         spacing: 15.0,
         onOk: (Map<String, dynamic> values) {

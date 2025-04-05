@@ -60,7 +60,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
       dataTableNode = node;
     } else if (node is DataColumnNode || node is DataIndexNode) {
       dataSourceNode = node.parent?.parent?.parent?.parent as DataSourceNode;
-      dataTableNode = node.parent as DataTableNode;
+      dataTableNode = node.parent?.parent as DataTableNode;
     } else if (node is FolderNode) {
       String? name = node.value.name;
       if (name == 'tables') {
@@ -77,6 +77,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
 
   /// 长按表示进一步的操作
   Future<void> _onLongPress(BuildContext context, ExplorableNode node) async {
+    _onTap(context, node);
     dataSourceController.currentNode.value = node;
     List<ActionData> popActionData = [];
     popActionData.add(ActionData(

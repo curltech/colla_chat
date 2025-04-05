@@ -81,8 +81,11 @@ class DataColumnEditWidget extends StatelessWidget with TileDataMixin {
   //DataSourceNode信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
     return Obx(() {
-      data_source.DataColumnNode? dataColumnNode = dataSourceController.getDataColumnNode();
-      formInputController.setValues(JsonUtil.toJson(dataColumnNode?.value));
+      data_source.DataColumnNode? dataColumnNode =
+          dataSourceController.getDataColumnNode();
+      if (dataColumnNode != null) {
+        formInputController.setValues(JsonUtil.toJson(dataColumnNode.value));
+      }
       var formInputWidget = FormInputWidget(
         spacing: 15.0,
         onOk: (Map<String, dynamic> values) {
