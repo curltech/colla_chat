@@ -152,6 +152,7 @@ class DataIndex extends Explorable {
 class DataSourceNode extends ExplorableNode {
   DataSourceNode(DataSource super.dataSource) {
     FolderNode folderNode = FolderNode(Folder('tables'));
+    folderNode.parent = this;
     children.add(folderNode);
   }
 
@@ -196,6 +197,7 @@ class DataSourceNode extends ExplorableNode {
       return null;
     }
     DataTableNode dataTableNode = DataTableNode(dataTable);
+    dataTableNode.parent = this;
     folderNode.children.add(dataTableNode);
 
     return dataTableNode;
@@ -213,9 +215,11 @@ class DataSourceNode extends ExplorableNode {
 class DataTableNode extends ExplorableNode {
   DataTableNode(DataTable super.dataTable) {
     FolderNode columnFolderNode = FolderNode(Folder('columns'));
+    columnFolderNode.parent = this;
     children.add(columnFolderNode);
 
     FolderNode indexFolderNode = FolderNode(Folder('indexes'));
+    indexFolderNode.parent = this;
     children.add(indexFolderNode);
   }
 
@@ -282,6 +286,7 @@ class DataTableNode extends ExplorableNode {
     List<DataColumnNode> dataColumnNodes = [];
     for (DataColumn dataColumn in dataColumns) {
       DataColumnNode dataColumnNode = DataColumnNode(dataColumn);
+      dataColumnNode.parent = folderNode;
       folderNode.children.add(dataColumnNode);
       dataColumnNodes.add(dataColumnNode);
     }
@@ -306,6 +311,7 @@ class DataTableNode extends ExplorableNode {
     List<DataIndexNode> dataIndexNodes = [];
     for (DataIndex dataIndex in dataIndexes) {
       DataIndexNode dataIndexNode = DataIndexNode(dataIndex);
+      dataIndexNode.parent = folderNode;
       folderNode.children.add(dataIndexNode);
       dataIndexNodes.add(dataIndexNode);
     }
@@ -355,7 +361,7 @@ class FolderNode extends ExplorableNode {
 
   @override
   Widget? get icon {
-    return isExpanded
+    return isExpanded.value
         ? Icon(Icons.folder_open, color: myself.primary)
         : Icon(Icons.folder, color: myself.primary);
   }

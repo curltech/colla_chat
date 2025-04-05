@@ -14,13 +14,11 @@ import 'package:colla_chat/widgets/data_bind/tree_view.dart';
 import 'package:get/get.dart';
 
 class DataSourceController extends DataListController<DataSourceNode> {
-  late final TreeViewController treeViewController;
+  TreeViewController? treeViewController;
   final Rx<DataTableNode?> currentDataTableNode = Rx<DataTableNode?>(null);
   final Rx<ExplorableNode?> currentNode = Rx<ExplorableNode?>(null);
 
-  DataSourceController() {
-    init();
-  }
+  DataSourceController();
 
   save() async {
     String value = JsonUtil.toJsonString(data.value);
@@ -126,19 +124,12 @@ class DataSourceController extends DataListController<DataSourceNode> {
 
   /// 当前表的所有列
   List<DataColumnNode>? getDataColumnNodes(
-      {DataSourceNode? dataSourceNode, String? tableName}) {
+      {DataSourceNode? dataSourceNode, DataTableNode? dataTableNode}) {
     dataSourceNode ??= current;
     if (dataSourceNode == null) {
       return null;
     }
-    if (tableName == null) {
-      final DataTableNode? dataTableNode = currentDataTableNode.value;
-      if (dataTableNode == null) {
-        return null;
-      }
-      tableName = dataTableNode.value.name;
-    }
-    DataTableNode? dataTableNode = dataSourceNode.getDataTableNode(tableName);
+    dataTableNode ??= getDataTableNode(dataSourceNode: dataSourceNode);
     if (dataTableNode == null) {
       return null;
     }
@@ -148,19 +139,12 @@ class DataSourceController extends DataListController<DataSourceNode> {
 
   /// 当前索引控制器
   List<DataIndexNode>? getDataIndexNodes(
-      {DataSourceNode? dataSourceNode, String? tableName}) {
+      {DataSourceNode? dataSourceNode, DataTableNode? dataTableNode}) {
     dataSourceNode ??= current;
     if (dataSourceNode == null) {
       return null;
     }
-    if (tableName == null) {
-      final DataTableNode? dataTableNode = currentDataTableNode.value;
-      if (dataTableNode == null) {
-        return null;
-      }
-      tableName = dataTableNode.value.name;
-    }
-    DataTableNode? dataTableNode = dataSourceNode.getDataTableNode(tableName);
+    dataTableNode ??= getDataTableNode(dataSourceNode: dataSourceNode);
     if (dataTableNode == null) {
       return null;
     }
@@ -256,22 +240,13 @@ class DataSourceController extends DataListController<DataSourceNode> {
   }
 
   /// 根据数据源和表名获取表
-  DataTableNode? getDataTableNode(
-      {DataSourceNode? dataSourceNode, String? tableName}) {
+  DataTableNode? getDataTableNode({DataSourceNode? dataSourceNode}) {
     dataSourceNode ??= current;
     if (dataSourceNode == null) {
       return null;
     }
-    if (tableName == null) {
-      if (currentDataTableNode.value != null) {
-        tableName = currentDataTableNode.value?.value.name;
-      }
-    }
-    if (tableName != null) {
-      dataSourceNode.getDataTableNode(tableName);
-    }
 
-    return null;
+    return currentDataTableNode.value;
   }
 
   setCurrentDataTableNode(
@@ -291,35 +266,34 @@ class DataSourceController extends DataListController<DataSourceNode> {
   updateDataTables(
     List<data_source.DataTable> dataTables, {
     DataSourceNode? dataSourceNode,
-  }) {
+  }) async {
     DataSourceNode? dataSourceNode = current;
     if (dataSourceNode == null) {
       return null;
     }
     for (data_source.DataTable dataTable in dataTables) {
-      dataSourceNode.addDataTableNode(dataTable);
+      DataTableNode? dataTableNode = dataSourceNode.addDataTableNode(dataTable);
+      if (dataTableNode != null) {
+        await updateColumnNodes(
+            dataSourceNode: dataSourceNode, dataTableNode: dataTableNode);
+        await updateIndexNodes(
+            dataSourceNode: dataSourceNode, dataTableNode: dataTableNode);
+      }
     }
   }
 
   /// 在数据库中加列，要求数据源，表和列控制器存在
   addDataColumn(data_source.DataColumn dataColumn,
-      {DataSourceNode? dataSourceNode, String? tableName}) {
+      {DataSourceNode? dataSourceNode, DataTableNode? dataTableNode}) {
     DataSourceNode? dataSourceNode = current;
     if (dataSourceNode == null) {
       return null;
     }
-    if (tableName == null) {
-      if (currentDataTableNode.value != null) {
-        tableName = currentDataTableNode.value?.value.name;
-      }
-    }
-    if (tableName == null) {
-      return null;
-    }
-    DataTableNode? dataTableNode = dataSourceNode.getDataTableNode(tableName);
+    dataTableNode ??= getDataTableNode();
     if (dataTableNode == null) {
       return null;
     }
+
     dataTableNode.addDataColumns([dataColumn]);
     data_source.DataSource? dataSource =
         getDataSource(dataSourceNode: dataSourceNode);
@@ -332,14 +306,14 @@ class DataSourceController extends DataListController<DataSourceNode> {
 
   /// 在数据库中删除列，要求数据源，表和列控制器存在
   bool removeDataColumnNode(DataColumnNode dataColumnNode,
-      {DataSourceNode? dataSourceNode, String? tableName}) {
+      {DataSourceNode? dataSourceNode, DataTableNode? dataTableNode}) {
     data_source.DataSource? dataSource =
         getDataSource(dataSourceNode: dataSourceNode);
     if (dataSource == null) {
       return false;
     }
     DataTableNode? dataTableNode =
-        getDataTableNode(dataSourceNode: dataSourceNode, tableName: tableName);
+        getDataTableNode(dataSourceNode: dataSourceNode);
     if (dataTableNode == null) {
       return false;
     }
@@ -349,14 +323,15 @@ class DataSourceController extends DataListController<DataSourceNode> {
   }
 
   DataColumnNode? getDataColumnNode(
-      {DataSourceNode? dataSourceNode, String? tableName, String? columnName}) {
+      {DataSourceNode? dataSourceNode,
+      DataTableNode? dataTableNode,
+      String? columnName}) {
     data_source.DataSource? dataSource =
         getDataSource(dataSourceNode: dataSourceNode);
     if (dataSource == null) {
       return null;
     }
-    DataTableNode? dataTableNode =
-        getDataTableNode(dataSourceNode: dataSourceNode, tableName: tableName);
+    dataTableNode = getDataTableNode(dataSourceNode: dataSourceNode);
     if (dataTableNode == null) {
       return null;
     }
@@ -376,15 +351,14 @@ class DataSourceController extends DataListController<DataSourceNode> {
   setCurrentDataColumnNode(
     DataColumnNode dataColumnNode, {
     DataSourceNode? dataSourceNode,
-    String? tableName,
+    DataTableNode? dataTableNode,
   }) {
     data_source.DataSource? dataSource =
         getDataSource(dataSourceNode: dataSourceNode);
     if (dataSource == null) {
       return null;
     }
-    DataTableNode? dataTableNode =
-        getDataTableNode(dataSourceNode: dataSourceNode, tableName: tableName);
+    dataTableNode ??= getDataTableNode(dataSourceNode: dataSourceNode);
     if (dataTableNode == null) {
       return null;
     }
@@ -400,9 +374,9 @@ class DataSourceController extends DataListController<DataSourceNode> {
     if (dataSource == null) {
       return false;
     }
-    dataTableNode ??= currentDataTableNode.value;
+    dataTableNode ??= getDataTableNode(dataSourceNode: dataSourceNode);
     if (dataTableNode == null) {
-      return false;
+      return null;
     }
     dataTableNode.addDataIndexes([dataIndex]);
   }
@@ -417,7 +391,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
     if (dataSource == null) {
       return null;
     }
-    dataTableNode ??= currentDataTableNode.value;
+    dataTableNode ??= getDataTableNode(dataSourceNode: dataSourceNode);
     if (dataTableNode == null) {
       return null;
     }
@@ -448,14 +422,13 @@ class DataSourceController extends DataListController<DataSourceNode> {
   }
 
   bool removeDataIndexNode(DataIndexNode dataIndexNode,
-      {DataSourceNode? dataSourceNode, String? tableName}) {
+      {DataSourceNode? dataSourceNode, DataTableNode? dataTableNode}) {
     data_source.DataSource? dataSource =
         getDataSource(dataSourceNode: dataSourceNode);
     if (dataSource == null) {
       return false;
     }
-    DataTableNode? dataTableNode =
-        getDataTableNode(dataSourceNode: dataSourceNode, tableName: tableName);
+    dataTableNode ??= getDataTableNode(dataSourceNode: dataSourceNode);
     if (dataTableNode == null) {
       return false;
     }
@@ -466,14 +439,15 @@ class DataSourceController extends DataListController<DataSourceNode> {
   }
 
   DataIndexNode? getDataIndexNode(
-      {DataSourceNode? dataSourceNode, String? tableName, String? indexName}) {
+      {DataSourceNode? dataSourceNode,
+      DataTableNode? dataTableNode,
+      String? indexName}) {
     data_source.DataSource? dataSource =
         getDataSource(dataSourceNode: dataSourceNode);
     if (dataSource == null) {
       return null;
     }
-    DataTableNode? dataTableNode =
-        getDataTableNode(dataSourceNode: dataSourceNode, tableName: tableName);
+    dataTableNode ??= getDataTableNode(dataSourceNode: dataSourceNode);
     if (dataTableNode == null) {
       return null;
     }
@@ -492,7 +466,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
   setCurrentDataIndexNode(
     DataIndexNode? dataIndexNode, {
     DataSourceNode? dataSourceNode,
-    String? tableName,
+    DataTableNode? dataTableNode,
   }) {
     data_source.DataSource? dataSource =
         getDataSource(dataSourceNode: dataSourceNode);
@@ -543,27 +517,22 @@ class DataSourceController extends DataListController<DataSourceNode> {
       return;
     }
 
-    updateDataTables(dataTables, dataSourceNode: dataSourceNode);
+    await updateDataTables(dataTables, dataSourceNode: dataSourceNode);
   }
 
   /// 获取数据源的表的所有字段
   Future<List<data_source.DataColumn>?> findColumns(
-      {DataSourceNode? dataSourceNode, String? tableName}) async {
+      {DataSourceNode? dataSourceNode, DataTableNode? dataTableNode}) async {
     data_source.DataSource? dataSource =
         getDataSource(dataSourceNode: dataSourceNode);
     if (dataSource == null) {
       return null;
     }
-    if (tableName == null) {
-      DataTableNode? dataTableNode =
-          getDataTableNode(dataSourceNode: dataSourceNode);
-      if (dataTableNode != null) {
-        tableName = dataTableNode.value.name;
-      }
-    }
-    if (tableName == null) {
+    dataTableNode ??= getDataTableNode(dataSourceNode: dataSourceNode);
+    if (dataTableNode == null) {
       return null;
     }
+    String tableName = dataTableNode.value.name;
     List<data_source.DataColumn> dataColumns = [];
     if (dataSource.sourceType == data_source.SourceType.sqlite.name) {
       List<Map<dynamic, dynamic>> maps =
@@ -590,20 +559,19 @@ class DataSourceController extends DataListController<DataSourceNode> {
   /// 把数据源的表的所有字段加入节点
   Future<List<DataColumnNode>?> updateColumnNodes({
     DataSourceNode? dataSourceNode,
-    String? tableName,
+    DataTableNode? dataTableNode,
   }) async {
     data_source.DataSource? dataSource =
         getDataSource(dataSourceNode: dataSourceNode);
     if (dataSource == null) {
       return null;
     }
-    List<data_source.DataColumn>? dataColumns =
-        await findColumns(dataSourceNode: dataSourceNode, tableName: tableName);
+    List<data_source.DataColumn>? dataColumns = await findColumns(
+        dataSourceNode: dataSourceNode, dataTableNode: dataTableNode);
     if (dataColumns == null || dataColumns.isEmpty) {
       return null;
     }
-    DataTableNode? dataTableNode =
-        getDataTableNode(dataSourceNode: dataSourceNode, tableName: tableName);
+    dataTableNode ??= getDataTableNode(dataSourceNode: dataSourceNode);
     if (dataTableNode == null) {
       return null;
     }
@@ -612,14 +580,13 @@ class DataSourceController extends DataListController<DataSourceNode> {
 
   /// 获取数据源的表的所有的索引
   Future<List<DataIndex>?> findIndexes(
-      {DataSourceNode? dataSourceNode, String? tableName}) async {
+      {DataSourceNode? dataSourceNode, DataTableNode? dataTableNode}) async {
     data_source.DataSource? dataSource =
         getDataSource(dataSourceNode: dataSourceNode);
     if (dataSource == null) {
       return null;
     }
-    DataTableNode? dataTableNode =
-        getDataTableNode(dataSourceNode: dataSourceNode, tableName: tableName);
+    dataTableNode ??= getDataTableNode(dataSourceNode: dataSourceNode);
     if (dataTableNode == null) {
       return null;
     }
@@ -639,6 +606,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
         int start = sql.lastIndexOf('(');
         int end = sql.lastIndexOf(')');
         data_source.DataIndex dataIndex = data_source.DataIndex(name);
+        dataIndexes.add(dataIndex);
         if (sql.startsWith('CREATE UNIQUE INDEX')) {
           dataIndex.isUnique = true;
         }
@@ -652,23 +620,23 @@ class DataSourceController extends DataListController<DataSourceNode> {
   /// 把数据源的表的索引加入节点
   Future<List<DataIndexNode>?> updateIndexNodes({
     DataSourceNode? dataSourceNode,
-    String? tableName,
+    DataTableNode? dataTableNode,
   }) async {
     data_source.DataSource? dataSource =
         getDataSource(dataSourceNode: dataSourceNode);
     if (dataSource == null) {
       return null;
     }
-    List<DataIndex>? dataIndexes =
-        await findIndexes(dataSourceNode: dataSourceNode, tableName: tableName);
-    if (dataIndexes == null || dataIndexes.isEmpty) {
-      return null;
-    }
-    DataTableNode? dataTableNode =
-        getDataTableNode(dataSourceNode: dataSourceNode);
+    dataTableNode ??= getDataTableNode(dataSourceNode: dataSourceNode);
     if (dataTableNode == null) {
       return null;
     }
+    List<DataIndex>? dataIndexes = await findIndexes(
+        dataSourceNode: dataSourceNode, dataTableNode: dataTableNode);
+    if (dataIndexes == null || dataIndexes.isEmpty) {
+      return null;
+    }
+
     return dataTableNode.addDataIndexes(dataIndexes);
   }
 }

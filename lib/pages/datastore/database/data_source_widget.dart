@@ -33,6 +33,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(dataColumnEditWidget);
     indexWidgetProvider.define(dataIndexEditWidget);
     indexWidgetProvider.define(queryConsoleEditorWidget);
+    dataSourceController.init();
   }
 
   @override
@@ -122,24 +123,25 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
   /// 单击时加载列或索引
   void _onToggleNodeExpansion(BuildContext context, ExplorableNode node) {
     if (node is FolderNode) {
-      String tableName = (node.parent as ExplorableNode).value.name;
       String name = node.value.name;
       DataSourceNode? dataSourceNode = dataSourceController.current;
       if (dataSourceNode == null) {
         return;
       }
       if (name == 'columns') {
+        DataTableNode dataTableNode = node.parent as DataTableNode;
         if (node.children.isEmpty) {
           dataSourceController.updateColumnNodes(
             dataSourceNode: dataSourceNode,
-            tableName: tableName,
+            dataTableNode: dataTableNode,
           );
         }
       } else if (name == 'indexes') {
+        DataTableNode dataTableNode = node.parent as DataTableNode;
         if (node.children.isEmpty) {
           dataSourceController.updateIndexNodes(
             dataSourceNode: dataSourceNode,
-            tableName: tableName,
+            dataTableNode: dataTableNode,
           );
         }
       }
@@ -324,7 +326,7 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
 
   Widget _buildTreeView(BuildContext context) {
     return TreeView(
-      treeViewController: dataSourceController.treeViewController,
+      treeViewController: dataSourceController.treeViewController!,
       onTap: (ExplorableNode node) {
         _onTap(context, node);
       },

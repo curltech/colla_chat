@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 abstract class Explorable {
   String name;
@@ -28,23 +29,19 @@ class ExplorableNode {
     return null;
   }
 
-  final List<ExplorableNode> children;
   ExplorableNode? parent;
-  bool hidden = false;
   int originalIndex = 0;
-  bool isExpanded = false;
-  bool isSelected = false;
-  bool isPartiallySelected = false;
+
+  final RxList<ExplorableNode> children = <ExplorableNode>[].obs;
+  RxBool hidden = false.obs;
+  RxBool isExpanded = false.obs;
+  RxBool isSelected = false.obs;
+  RxBool isPartiallySelected = false.obs;
 
   ExplorableNode(
     this.value, {
-    this.children = const [],
     this.parent,
-    this.hidden = false,
     this.originalIndex = 0,
-    this.isExpanded = false,
-    this.isSelected = false,
-    this.isPartiallySelected = false,
   }) {
     for (var child in children) {
       child.parent = this;
@@ -136,9 +133,9 @@ class TreeViewController {
 
   void _setNodeAndDescendantsSelectionByValue(
       ExplorableNode node, List selectedValues) {
-    if (node.hidden) return;
-    node.isSelected = selectedValues.contains(node.value);
-    node.isPartiallySelected = false;
+    if (node.hidden.value) return;
+    node.isSelected.value = selectedValues.contains(node.value);
+    node.isPartiallySelected.value = false;
     for (var child in node.children) {
       _setNodeAndDescendantsSelectionByValue(child, selectedValues);
     }
@@ -178,11 +175,11 @@ class TreeViewController {
     }
     for (var node in nodes) {
       if (initialExpandedLevels == 0) {
-        node.isExpanded = true;
+        node.isExpanded.value = true;
       } else {
-        node.isExpanded = currentLevel < initialExpandedLevels!;
+        node.isExpanded.value = currentLevel < initialExpandedLevels!;
       }
-      if (node.isExpanded) {
+      if (node.isExpanded.value) {
         _setInitialExpansion(node.children, currentLevel + 1);
       }
     }
@@ -203,7 +200,7 @@ class TreeViewController {
     for (var node in nodes) {
       bool shouldShow =
           filterFunction(node) || _hasVisibleDescendant(node, filterFunction);
-      node.hidden = !shouldShow;
+      node.hidden.value = !shouldShow;
       _applyFilter(node.children, filterFunction);
     }
   }
@@ -233,7 +230,7 @@ class TreeViewController {
   }
 
   void _handlePartialSelection(ExplorableNode node) {
-    if (node.isSelected || node.isPartiallySelected) {
+    if (node.isSelected.value || node.isPartiallySelected.value) {
       _updateNodeAndDescendants(node, false);
     } else {
       _updateNodeAndDescendants(node, true);
@@ -241,9 +238,9 @@ class TreeViewController {
   }
 
   void _updateNodeAndDescendants(ExplorableNode node, bool isSelected) {
-    if (!node.hidden) {
-      node.isSelected = isSelected;
-      node.isPartiallySelected = false;
+    if (!node.hidden.value) {
+      node.isSelected.value = isSelected;
+      node.isPartiallySelected.value = false;
       for (var child in node.children) {
         _updateNodeAndDescendants(child, isSelected);
       }
@@ -266,7 +263,7 @@ class TreeViewController {
   List<Explorable?> _getSelectedValues(List<ExplorableNode> nodes) {
     List<Explorable?> selectedValues = [];
     for (var node in nodes) {
-      if (node.isSelected && !node.hidden) {
+      if (node.isSelected.value && !node.hidden.value) {
         selectedValues.add(node.value);
       }
       selectedValues.addAll(_getSelectedValues(node.children));
@@ -286,31 +283,32 @@ class TreeViewController {
   }
 
   void _updateSingleNodeSelectionState(ExplorableNode node) {
-    if (node.children.isEmpty || node.children.every((child) => child.hidden)) {
+    if (node.children.isEmpty ||
+        node.children.every((child) => child.hidden.value)) {
       return;
     }
 
     List<ExplorableNode> visibleChildren =
-        node.children.where((child) => !child.hidden).toList();
-    bool allSelected = visibleChildren.every((child) => child.isSelected);
-    bool anySelected = visibleChildren
-        .any((child) => child.isSelected || child.isPartiallySelected);
+        node.children.where((child) => !child.hidden.value).toList();
+    bool allSelected = visibleChildren.every((child) => child.isSelected.value);
+    bool anySelected = visibleChildren.any(
+        (child) => child.isSelected.value || child.isPartiallySelected.value);
 
     if (allSelected) {
-      node.isSelected = true;
-      node.isPartiallySelected = false;
+      node.isSelected.value = true;
+      node.isPartiallySelected.value = false;
     } else if (anySelected) {
-      node.isSelected = false;
-      node.isPartiallySelected = true;
+      node.isSelected.value = false;
+      node.isPartiallySelected.value = true;
     } else {
-      node.isSelected = false;
-      node.isPartiallySelected = false;
+      node.isSelected.value = false;
+      node.isPartiallySelected.value = false;
     }
   }
 
   void _setExpansionState(List<ExplorableNode> nodes, bool isExpanded) {
     for (var node in nodes) {
-      node.isExpanded = isExpanded;
+      node.isExpanded.value = isExpanded;
       _setExpansionState(node.children, isExpanded);
     }
   }
@@ -318,16 +316,16 @@ class TreeViewController {
   void _updateSelectAllState() {
     if (!showSelectAll) return;
     bool allSelected = roots
-        .where((node) => !node.hidden)
+        .where((node) => !node.hidden.value)
         .every((node) => _isNodeFullySelected(node));
     isAllSelected = allSelected;
   }
 
   bool _isNodeFullySelected(ExplorableNode node) {
-    if (node.hidden) return true;
-    if (!node.isSelected) return false;
+    if (node.hidden.value) return true;
+    if (!node.isSelected.value) return false;
     return node.children
-        .where((child) => !child.hidden)
+        .where((child) => !child.hidden.value)
         .every(_isNodeFullySelected);
   }
 
@@ -345,9 +343,9 @@ class TreeViewController {
   }
 
   void _setNodeAndDescendantsSelection(ExplorableNode node, bool isSelected) {
-    if (node.hidden) return;
-    node.isSelected = isSelected;
-    node.isPartiallySelected = false;
+    if (node.hidden.value) return;
+    node.isSelected.value = isSelected;
+    node.isPartiallySelected.value = false;
     for (var child in node.children) {
       _setNodeAndDescendantsSelection(child, isSelected);
     }
@@ -361,7 +359,7 @@ class TreeViewController {
   List<ExplorableNode> _getSelectedNodesRecursive(List<ExplorableNode> nodes) {
     List<ExplorableNode> selectedNodes = [];
     for (var node in nodes) {
-      if (node.isSelected && !node.hidden) {
+      if (node.isSelected.value && !node.hidden.value) {
         selectedNodes.add(node);
       }
       if (node.children.isNotEmpty) {
@@ -372,7 +370,7 @@ class TreeViewController {
   }
 
   void toggleNodeExpansion(ExplorableNode node) {
-    node.isExpanded = !node.isExpanded;
+    node.isExpanded.value = !node.isExpanded.value;
   }
 }
 
@@ -409,40 +407,47 @@ class TreeViewState extends State<TreeView> {
 
   /// 构建树的每个节点的头的展开和搜索按钮
   Widget _buildExpandCollapseButton(ExplorableNode node) {
-    return SizedBox(
-      width: 24,
-      child: node.children.isNotEmpty
-          ? IconButton(
-              icon: Icon(
-                node.isExpanded ? Icons.expand_more : Icons.chevron_right,
-              ),
-              onPressed: () {
-                widget.treeViewController.toggleNodeExpansion(node);
-                widget.toggleNodeExpansion?.call(node);
-              },
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-            )
-          : null,
-    );
+    return Obx(() {
+      return SizedBox(
+        width: 24,
+        child: node.children.isNotEmpty
+            ? IconButton(
+                icon: Icon(
+                  node.isExpanded.value
+                      ? Icons.expand_more
+                      : Icons.chevron_right,
+                ),
+                onPressed: () {
+                  widget.treeViewController.toggleNodeExpansion(node);
+                  widget.toggleNodeExpansion?.call(node);
+                },
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              )
+            : null,
+      );
+    });
   }
 
   /// 构建树的每个节点的头的选择框按钮
   Widget _buildCheckboxButton(ExplorableNode node) {
-    return SizedBox(
-      width: 24,
-      height: 24,
-      child: Checkbox(
-        value:
-            node.isSelected ? true : (node.isPartiallySelected ? null : false),
-        tristate: true,
-        onChanged: (bool? value) {
-          widget.treeViewController.updateNodeSelection(node, value ?? false);
-          widget.updateNodeSelection?.call(node, value ?? false);
-        },
-        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      ),
-    );
+    return Obx(() {
+      return SizedBox(
+        width: 24,
+        height: 24,
+        child: Checkbox(
+          value: node.isSelected.value
+              ? true
+              : (node.isPartiallySelected.value ? null : false),
+          tristate: true,
+          onChanged: (bool? value) {
+            widget.treeViewController.updateNodeSelection(node, value ?? false);
+            widget.updateNodeSelection?.call(node, value ?? false);
+          },
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+      );
+    });
   }
 
   /// 构建树的每个节点的头的文本
@@ -457,33 +462,35 @@ class TreeViewState extends State<TreeView> {
 
   /// 构建树的每个节点的子树
   Widget _buildChildrenTreeNode(ExplorableNode node) {
-    return TweenAnimationBuilder<double>(
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeInOut,
-      tween: Tween<double>(
-        begin: node.isExpanded ? 0 : 1,
-        end: node.isExpanded ? 1 : 0,
-      ),
-      builder: (context, value, child) {
-        return ClipRect(
-          child: Align(
-            heightFactor: value,
-            child: child,
-          ),
-        );
-      },
-      child: node.children.isNotEmpty
-          ? Padding(
-              padding: const EdgeInsets.only(left: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: node.children
-                    .map((child) => _buildTreeNode(child))
-                    .toList(),
-              ),
-            )
-          : null,
-    );
+    return Obx(() {
+      return TweenAnimationBuilder<double>(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        tween: Tween<double>(
+          begin: node.isExpanded.value ? 0 : 1,
+          end: node.isExpanded.value ? 1 : 0,
+        ),
+        builder: (context, value, child) {
+          return ClipRect(
+            child: Align(
+              heightFactor: value,
+              child: child,
+            ),
+          );
+        },
+        child: node.children.isNotEmpty
+            ? Padding(
+                padding: const EdgeInsets.only(left: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: node.children
+                      .map((child) => _buildTreeNode(child))
+                      .toList(),
+                ),
+              )
+            : null,
+      );
+    });
   }
 
   /// 构建树的每个节点的头
@@ -503,7 +510,7 @@ class TreeViewState extends State<TreeView> {
         child: Row(
           children: [
             _buildExpandCollapseButton(node),
-            _buildCheckboxButton(node),
+            // _buildCheckboxButton(node),
             const SizedBox(width: 4),
             if (node.icon != null) node.icon!,
             const SizedBox(width: 4),
@@ -516,20 +523,22 @@ class TreeViewState extends State<TreeView> {
 
   /// 构建一个节点及其所有子节点
   Widget _buildTreeNode(ExplorableNode node, {double leftPadding = 0}) {
-    if (node.hidden) {
-      return const SizedBox.shrink();
-    }
-    return Padding(
-      padding: EdgeInsets.only(left: leftPadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 2),
-          _buildTreeNodeHead(node),
-          _buildChildrenTreeNode(node),
-        ],
-      ),
-    );
+    return Obx(() {
+      if (node.hidden.value) {
+        return const SizedBox.shrink();
+      }
+      return Padding(
+        padding: EdgeInsets.only(left: leftPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 2),
+            _buildTreeNodeHead(node),
+            _buildChildrenTreeNode(node),
+          ],
+        ),
+      );
+    });
   }
 
   /// 构建选择所有和去选择所有的扩展和收缩按钮，显示在树的上边

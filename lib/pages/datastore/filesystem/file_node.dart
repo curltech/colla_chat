@@ -16,7 +16,7 @@ class FolderNode extends ExplorableNode {
 
   @override
   Widget? get icon {
-    return isExpanded
+    return isExpanded.value
         ? Icon(Icons.folder_open, color: myself.primary)
         : Icon(Icons.folder, color: myself.primary);
   }
