@@ -58,12 +58,30 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
     super.initState();
   }
 
-  _buildDataColumns() async {
-    await dataSourceController.updateColumnNodes();
+  _updateDataColumns() async {
+    List<DataColumnNode>? dataColumnNodes =
+        dataSourceController.getDataColumnNodes();
+    if (dataColumnNodes == null) {
+      return nilBox;
+    }
+    List<data_source.DataColumn>? dataColumns = [];
+    for (DataColumnNode dataColumnNode in dataColumnNodes) {
+      dataColumns.add(dataColumnNode.value as data_source.DataColumn);
+    }
+    dataColumnController.replaceAll(dataColumns);
   }
 
-  _buildDataIndexes() async {
-    await dataSourceController.updateIndexNodes();
+  _updateDataIndexes() async {
+    List<DataIndexNode>? dataIndexNodes =
+        dataSourceController.getDataIndexNodes();
+    if (dataIndexNodes == null) {
+      return nilBox;
+    }
+    List<data_source.DataIndex>? dataIndexes = [];
+    for (DataIndexNode dataIndexNode in dataIndexNodes) {
+      dataIndexes.add(dataIndexNode.value as data_source.DataIndex);
+    }
+    dataIndexController.replaceAll(dataIndexes);
   }
 
   List<PlatformDataField> buildDataTableDataFields(String sourceType) {
@@ -180,32 +198,18 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       align: TextAlign.right,
     ));
 
-    return Obx(() {
-      _buildDataColumns();
-      List<DataColumnNode>? dataColumnNodes =
-          dataSourceController.getDataColumnNodes();
-      if (dataColumnNodes == null) {
-        return nilBox;
-      }
-      List<data_source.DataColumn>? dataColumns = [];
-      for (DataColumnNode dataColumnNode in dataColumnNodes) {
-        dataColumns.add(dataColumnNode.value as data_source.DataColumn);
-      }
-      dataColumnController.replaceAll(dataColumns);
-
-      return BindingDataTable2<data_source.DataColumn>(
-        key: UniqueKey(),
-        showCheckboxColumn: true,
-        horizontalMargin: 15.0,
-        columnSpacing: 0.0,
-        platformDataColumns: platformDataColumns,
-        controller: dataColumnController,
-        fixedLeftColumns: 0,
-      );
-    });
+    return BindingDataTable2<data_source.DataColumn>(
+      key: UniqueKey(),
+      showCheckboxColumn: true,
+      horizontalMargin: 15.0,
+      columnSpacing: 0.0,
+      platformDataColumns: platformDataColumns,
+      controller: dataColumnController,
+      fixedLeftColumns: 0,
+    );
   }
 
-  String? _getCheckedColumnNames() {
+  String? _getSelectedColumnNames() {
     List<data_source.DataColumn> dataColumns = dataColumnController.selected;
     if (dataColumns.isEmpty) {
       return null;
@@ -294,7 +298,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
                 DialogUtil.error(content: 'Please input table name');
                 return;
               }
-              String? columnNames = _getCheckedColumnNames();
+              String? columnNames = _getSelectedColumnNames();
               if (columnNames == null) {
                 DialogUtil.error(content: 'Please choose column of index');
                 return;
@@ -394,7 +398,6 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
 
   Widget _buildDataIndexesWidget(BuildContext context) {
     return Obx(() {
-      _buildDataIndexes();
       final List<TileData> tiles = [];
       for (int i = 0; i < dataIndexController.data.length; ++i) {
         DataIndex dataIndex = dataIndexController.data[i];

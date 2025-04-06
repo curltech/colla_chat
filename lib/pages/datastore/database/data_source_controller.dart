@@ -319,7 +319,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
     }
     dataSource.dataStore?.run(Sql(
         'alter table ${dataTableNode.value.name} drop column ${dataColumnNode.value.name};'));
-    return dataTableNode.deleteDataColumnNode(dataColumnNode);
+    return dataTableNode.deleteDataColumnNode(dataColumnNode: dataColumnNode);
   }
 
   DataColumnNode? getDataColumnNode(
@@ -336,8 +336,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
       return null;
     }
     if (columnName == null) {
-      if (currentNode.value != null &&
-          currentNode.value! is DataColumnNode) {
+      if (currentNode.value != null && currentNode.value! is DataColumnNode) {
         columnName = currentNode.value!.value.name;
       }
     }
@@ -435,7 +434,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
     dataSource.dataStore
         ?.run(Sql('drop index if exists ${dataIndexNode.value.name}'));
 
-    return dataTableNode.deleteDataIndexNode(dataIndexNode);
+    return dataTableNode.deleteDataIndexNode(dataIndexNode: dataIndexNode);
   }
 
   DataIndexNode? getDataIndexNode(
@@ -452,8 +451,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
       return null;
     }
     if (indexName == null) {
-      if (currentNode.value != null &&
-          currentNode.value! is DataIndexNode) {
+      if (currentNode.value != null && currentNode.value! is DataIndexNode) {
         indexName = currentNode.value!.value.name;
       }
     }
@@ -575,6 +573,8 @@ class DataSourceController extends DataListController<DataSourceNode> {
     if (dataTableNode == null) {
       return null;
     }
+    dataTableNode.deleteDataColumnNode();
+
     return dataTableNode.addDataColumns(dataColumns);
   }
 
@@ -636,6 +636,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
     if (dataIndexes == null || dataIndexes.isEmpty) {
       return null;
     }
+    dataTableNode.deleteDataIndexNode();
 
     return dataTableNode.addDataIndexes(dataIndexes);
   }

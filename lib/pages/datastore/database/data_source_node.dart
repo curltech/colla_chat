@@ -300,14 +300,17 @@ class DataTableNode extends ExplorableNode {
     return dataColumnNodes;
   }
 
-  deleteDataColumnNode(DataColumnNode dataColumnNode) {
+  deleteDataColumnNode({DataColumnNode? dataColumnNode}) {
     FolderNode? folderNode = getColumnFolderNode();
     if (folderNode == null) {
       return;
     }
-
-    folderNode.children
-        .removeWhere((item) => item.value.name == dataColumnNode.value.name);
+    if (dataColumnNode == null) {
+      folderNode.children.clear();
+    } else {
+      folderNode.children
+          .removeWhere((item) => item.value.name == dataColumnNode.value.name);
+    }
   }
 
   List<DataIndexNode>? addDataIndexes(List<DataIndex> dataIndexes) {
@@ -326,14 +329,17 @@ class DataTableNode extends ExplorableNode {
     return dataIndexNodes;
   }
 
-  deleteDataIndexNode(DataIndexNode dataIndexNode) {
+  deleteDataIndexNode({DataIndexNode? dataIndexNode}) {
     FolderNode? folderNode = getIndexFolderNode();
     if (folderNode == null) {
       return false;
     }
-
-    folderNode.children
-        .removeWhere((item) => item.value.name == dataIndexNode.value.name);
+    if (dataIndexNode == null) {
+      folderNode.children.clear();
+    } else {
+      folderNode.children
+          .removeWhere((item) => item.value.name == dataIndexNode.value.name);
+    }
   }
 }
 
