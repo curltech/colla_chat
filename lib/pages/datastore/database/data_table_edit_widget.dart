@@ -173,17 +173,15 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       align: TextAlign.right,
     ));
 
-    return Obx(() {
-      return BindingDataTable2<data_source.DataColumn>(
-        key: UniqueKey(),
-        showCheckboxColumn: true,
-        horizontalMargin: 15.0,
-        columnSpacing: 0.0,
-        platformDataColumns: platformDataColumns,
-        controller: dataTableColumnController,
-        fixedLeftColumns: 0,
-      );
-    });
+    return BindingDataTable2<data_source.DataColumn>(
+      key: UniqueKey(),
+      showCheckboxColumn: true,
+      horizontalMargin: 15.0,
+      columnSpacing: 0.0,
+      platformDataColumns: platformDataColumns,
+      controller: dataTableColumnController,
+      fixedLeftColumns: 0,
+    );
   }
 
   String? _getSelectedColumnNames() {

@@ -235,26 +235,16 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
   }
 
   _updateDataColumns() async {
-    DataTableNode? dataTableNode = dataSourceController.getDataTableNode();
-    if (dataTableNode == null) {
-      return null;
+    List<DataColumnNode>? dataColumnNodes =
+        dataSourceController.getDataColumnNodes();
+    if (dataColumnNodes == null) {
+      return;
     }
-    FolderNode? columnFolderNode = dataTableNode.getColumnFolderNode();
-    if (columnFolderNode == null) {
-      return null;
+    List<data_source.DataColumn>? dataColumns = [];
+    for (DataColumnNode dataColumnNode in dataColumnNodes) {
+      dataColumns.add(dataColumnNode.value as data_source.DataColumn);
     }
-    columnFolderNode.children.addListener(() {
-      List<DataColumnNode>? dataColumnNodes =
-          dataSourceController.getDataColumnNodes();
-      if (dataColumnNodes == null) {
-        return;
-      }
-      List<data_source.DataColumn>? dataColumns = [];
-      for (DataColumnNode dataColumnNode in dataColumnNodes) {
-        dataColumns.add(dataColumnNode.value as data_source.DataColumn);
-      }
-      dataTableColumnController.replaceAll(dataColumns);
-    });
+    dataTableColumnController.replaceAll(dataColumns);
   }
 
   _updateDataIndexes() async {
