@@ -11,7 +11,6 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
@@ -24,6 +23,12 @@ import 'package:flutter_highlight/themes/idea.dart';
 import 'package:get/get.dart';
 import 'package:highlight/languages/sql.dart';
 import 'package:tab_container/tab_container.dart';
+
+DataListController<data_source.DataColumn> dataTableColumnController =
+    DataListController<data_source.DataColumn>(data: []);
+
+DataListController<data_source.DataIndex> dataTableIndexController =
+    DataListController<data_source.DataIndex>(data: []);
 
 class DataTableEditWidget extends StatefulWidget with TileDataMixin {
   @override
@@ -46,42 +51,12 @@ class DataTableEditWidget extends StatefulWidget with TileDataMixin {
 
 class _DataTableEditWidgetState extends State<DataTableEditWidget>
     with SingleTickerProviderStateMixin {
-  DataListController<data_source.DataColumn> dataColumnController =
-      DataListController<data_source.DataColumn>(data: []);
-  DataListController<data_source.DataIndex> dataIndexController =
-      DataListController<data_source.DataIndex>(data: []);
   late final TabController _tabController =
       TabController(length: 3, vsync: this);
 
   @override
   void initState() {
     super.initState();
-  }
-
-  _updateDataColumns() async {
-    List<DataColumnNode>? dataColumnNodes =
-        dataSourceController.getDataColumnNodes();
-    if (dataColumnNodes == null) {
-      return nilBox;
-    }
-    List<data_source.DataColumn>? dataColumns = [];
-    for (DataColumnNode dataColumnNode in dataColumnNodes) {
-      dataColumns.add(dataColumnNode.value as data_source.DataColumn);
-    }
-    dataColumnController.replaceAll(dataColumns);
-  }
-
-  _updateDataIndexes() async {
-    List<DataIndexNode>? dataIndexNodes =
-        dataSourceController.getDataIndexNodes();
-    if (dataIndexNodes == null) {
-      return nilBox;
-    }
-    List<data_source.DataIndex>? dataIndexes = [];
-    for (DataIndexNode dataIndexNode in dataIndexNodes) {
-      dataIndexes.add(dataIndexNode.value as data_source.DataIndex);
-    }
-    dataIndexController.replaceAll(dataIndexes);
   }
 
   List<PlatformDataField> buildDataTableDataFields(String sourceType) {
@@ -198,19 +173,22 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       align: TextAlign.right,
     ));
 
-    return BindingDataTable2<data_source.DataColumn>(
-      key: UniqueKey(),
-      showCheckboxColumn: true,
-      horizontalMargin: 15.0,
-      columnSpacing: 0.0,
-      platformDataColumns: platformDataColumns,
-      controller: dataColumnController,
-      fixedLeftColumns: 0,
-    );
+    return Obx(() {
+      return BindingDataTable2<data_source.DataColumn>(
+        key: UniqueKey(),
+        showCheckboxColumn: true,
+        horizontalMargin: 15.0,
+        columnSpacing: 0.0,
+        platformDataColumns: platformDataColumns,
+        controller: dataTableColumnController,
+        fixedLeftColumns: 0,
+      );
+    });
   }
 
   String? _getSelectedColumnNames() {
-    List<data_source.DataColumn> dataColumns = dataColumnController.selected;
+    List<data_source.DataColumn> dataColumns =
+        dataTableColumnController.selected;
     if (dataColumns.isEmpty) {
       return null;
     }
@@ -243,7 +221,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
                 return;
               }
               data_source.DataColumn dataColumn = data_source.DataColumn('');
-              dataColumnController.add(dataColumn);
+              dataTableColumnController.add(dataColumn);
               indexWidgetProvider.push('data_column_edit');
             },
             icon: Icon(
@@ -258,7 +236,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
                 return;
               }
               List<data_source.DataColumn> dataColumns =
-                  dataColumnController.selected;
+                  dataTableColumnController.selected;
               if (dataColumns.isEmpty) {
                 return;
               }
@@ -308,7 +286,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
                   '${dataTableNode.value.name}_${columnNames.replaceAll(',', '_')}_index';
               dataIndex.columnNames = columnNames;
               dataSourceController.addDataIndex(dataIndex);
-              dataColumnController.unselectAll();
+              dataTableColumnController.unselectAll();
               indexWidgetProvider.push('data_index_edit');
             },
             icon: Icon(
@@ -323,7 +301,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
                 return;
               }
               List<data_source.DataIndex>? dataIndexes =
-                  dataIndexController.selected;
+                  dataTableIndexController.selected;
               if (dataIndexes.isEmpty) {
                 return;
               }
@@ -399,8 +377,8 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
   Widget _buildDataIndexesWidget(BuildContext context) {
     return Obx(() {
       final List<TileData> tiles = [];
-      for (int i = 0; i < dataIndexController.data.length; ++i) {
-        DataIndex dataIndex = dataIndexController.data[i];
+      for (int i = 0; i < dataTableIndexController.data.length; ++i) {
+        DataIndex dataIndex = dataTableIndexController.data[i];
         String titleTail = '';
         if (dataIndex.isUnique != null && dataIndex.isUnique!) {
           titleTail = 'Unique';
@@ -414,9 +392,9 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
             titleTail: titleTail,
             subtitle: dataIndex.columnNames ?? '',
             selected:
-                dataIndexController.currentIndex.value == i ? true : false,
+                dataTableIndexController.currentIndex.value == i ? true : false,
             onTap: (int index, String label, {String? subtitle}) {
-              dataIndexController.currentIndex.value = index;
+              dataTableIndexController.currentIndex.value = index;
             }));
       }
 

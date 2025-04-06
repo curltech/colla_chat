@@ -17,6 +17,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/tree_view.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 /// 数据源管理功能主页面，带有路由回调函数
 class DataSourceWidget extends StatelessWidget with TileDataMixin {
@@ -233,11 +234,49 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     }
   }
 
+  _updateDataColumns() async {
+    DataTableNode? dataTableNode = dataSourceController.getDataTableNode();
+    if (dataTableNode == null) {
+      return null;
+    }
+    FolderNode? columnFolderNode = dataTableNode.getColumnFolderNode();
+    if (columnFolderNode == null) {
+      return null;
+    }
+    columnFolderNode.children.addListener(() {
+      List<DataColumnNode>? dataColumnNodes =
+          dataSourceController.getDataColumnNodes();
+      if (dataColumnNodes == null) {
+        return;
+      }
+      List<data_source.DataColumn>? dataColumns = [];
+      for (DataColumnNode dataColumnNode in dataColumnNodes) {
+        dataColumns.add(dataColumnNode.value as data_source.DataColumn);
+      }
+      dataTableColumnController.replaceAll(dataColumns);
+    });
+  }
+
+  _updateDataIndexes() async {
+    List<DataIndexNode>? dataIndexNodes =
+        dataSourceController.getDataIndexNodes();
+    if (dataIndexNodes == null) {
+      return;
+    }
+    List<data_source.DataIndex>? dataIndexes = [];
+    for (DataIndexNode dataIndexNode in dataIndexNodes) {
+      dataIndexes.add(dataIndexNode.value as data_source.DataIndex);
+    }
+    dataTableIndexController.replaceAll(dataIndexes);
+  }
+
   void _edit(ExplorableNode node) {
     Explorable? explorable = node.value;
     if (explorable is DataSource) {
       indexWidgetProvider.push('data_source_edit');
     } else if (explorable is data_source.DataTable) {
+      _updateDataColumns();
+      _updateDataIndexes();
       indexWidgetProvider.push('data_table_edit');
     } else if (explorable is data_source.DataColumn) {
       indexWidgetProvider.push('data_column_edit');
