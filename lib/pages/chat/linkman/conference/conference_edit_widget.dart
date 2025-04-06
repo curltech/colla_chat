@@ -185,16 +185,16 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
       for (String conferenceMemberId in selected) {
         Linkman? linkman =
             await linkmanService.findCachedOneByPeerId(conferenceMemberId);
-        bool checked = false;
+        bool selected = false;
         if (linkman != null) {
           if (current.conferenceOwnerPeerId != null) {
             String? peerId = current.conferenceOwnerPeerId!;
             if (linkman.peerId == peerId) {
-              checked = true;
+              selected = true;
             }
           }
           Option<String> option = Option<String>(linkman.name, linkman.peerId,
-              checked: checked,
+              selected: selected,
               leading: linkman.avatarImage,
               hint: linkman.email);
           conferenceOwnerOptions.add(option);

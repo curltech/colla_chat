@@ -137,8 +137,8 @@ class BindingDataTable2<T> extends StatelessWidget {
         cells.add(dataCell);
       }
     }
-    bool? checked = EntityUtil.getChecked(t);
-    checked ??= false;
+    bool? selected = EntityUtil.getSelected(t);
+    selected ??= false;
     var dataRow = DataRow2.byIndex(
       index: index,
       color: WidgetStateProperty.resolveWith<Color?>((Set<WidgetState> states) {
@@ -147,14 +147,14 @@ class BindingDataTable2<T> extends StatelessWidget {
         }
         return null; // Use the default value.
       }),
-      selected: checked,
+      selected: selected,
       onSelectChanged: (value) {
-        bool? checked = EntityUtil.getChecked(t);
+        bool? selected = EntityUtil.getSelected(t);
         var fn = onSelectChanged;
         if (fn != null) {
           fn(index, value);
-        } else if (checked != value) {
-          EntityUtil.setChecked(t, value);
+        } else if (selected != value) {
+          EntityUtil.setSelected(t, value);
           selectChanged.value = !selectChanged.value;
         }
       },
@@ -245,7 +245,7 @@ class BindingDataTable2<T> extends StatelessWidget {
               if (val != null) {
                 List<dynamic> data = controller.data;
                 for (dynamic t in data) {
-                  EntityUtil.setChecked(t, val);
+                  EntityUtil.setSelected(t, val);
                 }
                 selectChanged.value = !selectChanged.value;
               }

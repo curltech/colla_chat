@@ -64,7 +64,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     List<Option<String>> options = [];
     for (var subject in modelProjectController.project.value!.subjects.values) {
       if (modelProjectController.currentSubjectName.value == subject.name) {
-        options.add(Option(subject.name, subject.name, checked: true));
+        options.add(Option(subject.name, subject.name, selected: true));
       } else {
         options.add(Option(subject.name, subject.name));
       }
@@ -595,7 +595,7 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         options.add(Option(
           metaProject.name,
           metaProject.id,
-          checked: true,
+          selected: true,
         ));
       } else {
         options.add(Option(metaProject.name, metaProject.id));

@@ -28,7 +28,7 @@ class File extends Explorable {
   late final String accessed;
   late final int size;
   late final String? mimeType;
-  bool checked = false;
+  bool selected = false;
   io.File file;
 
   File(super.name, {required this.file}) {
@@ -47,7 +47,7 @@ class File extends Explorable {
         size = json['size'],
         file = io.File(json['file']),
         mimeType = json['mimeType'],
-        checked = json['checked'] ?? false,
+        selected = json['selected'] ?? false,
         super.fromJson();
 
   @override
@@ -60,7 +60,7 @@ class File extends Explorable {
       'size': size,
       'file': file.path,
       'mimeType': mimeType,
-      'checked': checked,
+      'selected': selected,
     });
 
     return json;

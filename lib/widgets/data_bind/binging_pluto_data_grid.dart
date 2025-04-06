@@ -107,11 +107,11 @@ class BindingPlutoDataGrid<T> extends StatelessWidget {
           cells[name] = dataCell;
         }
       }
-      bool? checked = EntityUtil.getChecked(t);
-      checked ??= false;
+      bool? selected = EntityUtil.getSelected(t);
+      selected ??= false;
       var dataRow = PlutoRow(
         type: PlutoRowType.normal(),
-        checked: checked,
+        checked: selected,
         cells: cells,
       );
       rows.add(dataRow);

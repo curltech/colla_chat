@@ -126,16 +126,16 @@ class GroupEditWidget extends StatelessWidget with TileDataMixin {
       for (String groupMemberId in selected) {
         Linkman? linkman =
             await linkmanService.findCachedOneByPeerId(groupMemberId);
-        bool checked = false;
+        bool selected = false;
         if (linkman != null) {
           if (current.groupOwnerPeerId != null) {
             String peerId = current.groupOwnerPeerId!;
             if (linkman.peerId == peerId) {
-              checked = true;
+              selected = true;
             }
           }
           Option<String> option = Option<String>(linkman.name, linkman.peerId,
-              checked: checked,
+              selected: selected,
               leading: linkman.avatarImage,
               hint: linkman.email ?? '');
           groupOwnerOptions.add(option);

@@ -189,7 +189,7 @@ class MoreMessageInput extends StatelessWidget {
 
   Option _buildOption(int deleteTime) {
     return Option('${deleteTime}s', deleteTime,
-        checked: chatMessageController.deleteTime == deleteTime, hint: '');
+        selected: chatMessageController.deleteTime == deleteTime, hint: '');
   }
 
   ///视频通话

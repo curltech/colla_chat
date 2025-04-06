@@ -17,7 +17,7 @@ class BrightnessPicker extends StatelessWidget {
           Option<String>(themeModeOption.name, themeModeOption.name, hint: '');
 
       if (myself.themeMode.name == option.value) {
-        option.checked = true;
+        option.selected = true;
       }
       themeModeOptions.add(option);
     }

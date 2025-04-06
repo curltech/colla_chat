@@ -56,7 +56,7 @@ class AutoDiscoverWidget extends StatelessWidget with TileDataMixin {
       items.add(Option(
           emailServiceProvider.domainName, emailServiceProvider.domainName,
           leading: emailServiceProvider.logo,
-          checked: emailServiceProviderController.text ==
+          selected: emailServiceProviderController.text ==
               emailServiceProvider.domainName,
           hint: emailServiceProvider.incomingHostName));
     }
@@ -70,7 +70,7 @@ class AutoDiscoverWidget extends StatelessWidget with TileDataMixin {
             Widget? child) {
           Widget? prefix;
           for (var option in options) {
-            if (option.checked && option.leading != null) {
+            if (option.selected && option.leading != null) {
               prefix = Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
                   child: option.leading);

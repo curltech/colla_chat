@@ -45,7 +45,7 @@ class GroupLinkmanWidget extends StatelessWidget {
         bool checked = selected.contains(memberPeerId);
         Option<String> item = Option<String>(
             groupMember.memberAlias!, memberPeerId,
-            leading: avatar, checked: checked, hint: '');
+            leading: avatar, selected: checked, hint: '');
         options.add(item);
       }
     }

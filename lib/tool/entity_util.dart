@@ -18,17 +18,17 @@ class EntityUtil {
     }
   }
 
-  static bool? getChecked(dynamic entity) {
+  static bool? getSelected(dynamic entity) {
     if (entity is Map) {
-      return entity['checked'];
+      return entity['selected'];
     } else {
       return entity.selected;
     }
   }
 
-  static setChecked(dynamic entity, bool? val) {
+  static setSelected(dynamic entity, bool? val) {
     if (entity is Map) {
-      entity['checked'] = val;
+      entity['selected'] = val;
     } else {
       entity.selected = val;
     }

@@ -28,26 +28,26 @@ class OptionController with ChangeNotifier {
     }
   }
 
-  setChecked(Option<String> option, bool checked) {
-    if (option.checked != checked) {
-      option.checked = checked;
+  setSelected(Option<String> option, bool selected) {
+    if (option.selected != selected) {
+      option.selected = selected;
       notifyListeners();
     }
   }
 
-  setSingleChecked(Option<String> option, bool checked) {
+  setSingleSelected(Option<String> option, bool selected) {
     for (var opt in _options) {
       if (opt != option) {
-        opt.checked = false;
+        opt.selected = false;
       }
     }
-    setChecked(option, checked);
+    setSelected(option, selected);
   }
 
   List<Option<String>> get selectedOptions {
     List<Option<String>> selected = <Option<String>>[];
     for (var option in _options) {
-      if (option.checked) {
+      if (option.selected) {
         selected.add(option);
       }
     }
@@ -57,7 +57,7 @@ class OptionController with ChangeNotifier {
   List<String> get selected {
     List<String> selected = <String>[];
     for (var option in _options) {
-      if (option.checked) {
+      if (option.selected) {
         selected.add(option.value);
       }
     }
@@ -105,7 +105,7 @@ class _DataDropdownButtonState extends State<DataDropdownButton> {
       var label = AppLocalizations.t(item.label);
       var menuItem = DropdownMenuItem<String>(
           value: item.value, child: CommonAutoSizeText(label));
-      if (item.checked) {
+      if (item.selected) {
         selected = item.value;
       }
       menuItems.add(menuItem);
@@ -271,11 +271,11 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
                   secondary: option.leading,
                   controlAffinity: ListTileControlAffinity.trailing,
                   activeColor: myself.primary,
-                  selected: option.checked,
-                  value: option.checked,
+                  selected: option.selected,
+                  value: option.selected,
                   onChanged: (bool? value) {
                     //通知本地变量的改变，刷新界面RadioListTile
-                    widget.optionController.setSingleChecked(option, !value!);
+                    widget.optionController.setSingleSelected(option, !value!);
                     widget.onChanged(option.value);
                   },
                 );
@@ -335,7 +335,7 @@ class _CustomSingleSelectFieldState extends State<CustomSingleSelectField> {
 
   _update() {
     for (var option in widget.optionController.options) {
-      if (option.checked) {
+      if (option.selected) {
         textEditingController.text = option.label;
         return;
       }
@@ -498,7 +498,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
                   label: Text(
                     option.label,
                     style: TextStyle(
-                        color: option.checked ? Colors.white : Colors.black),
+                        color: option.selected ? Colors.white : Colors.black),
                   ),
                   //avatar: option.leading,
                   disabledColor: Colors.white,
@@ -506,9 +506,9 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
                   backgroundColor: Colors.white,
                   showCheckmark: false,
                   checkmarkColor: myself.primary,
-                  selected: option.checked,
+                  selected: option.selected,
                   onSelected: (bool value) {
-                    option.checked = value;
+                    option.selected = value;
                     this.options.value = [...options];
                   },
                 ));
@@ -545,10 +545,10 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
                   subtitle: CommonAutoSizeText(option.hint ?? ''),
                   secondary: option.leading,
                   controlAffinity: ListTileControlAffinity.trailing,
-                  value: option.checked,
-                  selected: option.checked,
+                  value: option.selected,
+                  selected: option.selected,
                   onChanged: (bool? value) {
-                    option.checked = value!;
+                    option.selected = value!;
                     //通知本地变量的改变，刷新界面CheckboxListTile
                     this.options.value = [...options];
                   },
@@ -702,7 +702,7 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
   Widget _buildSelectedChips(BuildContext context) {
     List<Widget> chips = [];
     for (var option in widget.optionController.options) {
-      if (option.checked) {
+      if (option.selected) {
         var chip = Tooltip(
             message: option.hint,
             child: Chip(
@@ -716,7 +716,7 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
               //backgroundColor: Colors.white,
               deleteIconColor: myself.primary,
               onDeleted: () {
-                widget.optionController.setChecked(option, false);
+                widget.optionController.setSelected(option, false);
                 widget.onConfirm!(widget.optionController.selected);
               },
             ));

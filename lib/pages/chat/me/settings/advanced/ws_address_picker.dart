@@ -35,7 +35,7 @@ class WsAddressPicker extends StatelessWidget {
       Option<String> option =
           Option<String>(peerEndpoint.name, peerEndpoint.peerId, hint: '');
       if (defaultPeerEndpoint?.peerId == peerEndpoint.peerId) {
-        option.checked = true;
+        option.selected = true;
       }
       addressOptions.add(option);
     }

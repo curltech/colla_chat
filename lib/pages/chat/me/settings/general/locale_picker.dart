@@ -21,7 +21,7 @@ class LocalePicker extends StatelessWidget {
           String tag =
               '${myself.locale.languageCode}_${myself.locale.countryCode}';
           if (tag == option.value) {
-            option.checked = true;
+            option.selected = true;
           }
           options.add(option);
         }

@@ -99,7 +99,7 @@ class DataColumn extends Explorable {
   bool? notNull;
   bool? autoIncrement;
   bool? isKey;
-  bool checked = false;
+  bool selected = false;
 
   DataColumn(super.name);
 
@@ -108,7 +108,7 @@ class DataColumn extends Explorable {
         notNull = json['notNull'],
         autoIncrement = json['autoIncrement'],
         isKey = json['isKey'],
-        checked = json['checked'] ?? false,
+        selected = json['selected'] ?? false,
         super.fromJson();
 
   @override
@@ -119,7 +119,7 @@ class DataColumn extends Explorable {
       'notNull': notNull,
       'autoIncrement': autoIncrement,
       'isKey': isKey,
-      'checked': checked,
+      'selected': selected,
     });
 
     return json;
@@ -129,12 +129,14 @@ class DataColumn extends Explorable {
 class DataIndex extends Explorable {
   bool? isUnique;
   String? columnNames;
+  bool selected = false;
 
   DataIndex(super.name);
 
   DataIndex.fromJson(super.json)
       : isUnique = json['isUnique'],
         columnNames = json['columnNames'],
+        selected = json['selected'] ?? false,
         super.fromJson();
 
   @override
@@ -143,6 +145,7 @@ class DataIndex extends Explorable {
     json.addAll({
       'isUnique': isUnique,
       'columnNames': columnNames,
+      'selected': selected,
     });
 
     return json;

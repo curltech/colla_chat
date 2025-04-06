@@ -59,7 +59,7 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
           Linkman? linkman = await linkmanService.findCachedOneByPeerId(select);
           if (linkman != null) {
             Option<String> item = Option<String>(linkman.name, linkman.peerId,
-                checked: true,
+                selected: true,
                 leading: linkman.avatarImage,
                 hint: linkman.email ?? '');
             options.add(item);
@@ -69,7 +69,7 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
           Group? group = await groupService.findCachedOneByPeerId(select);
           if (group != null) {
             Option<String> item = Option<String>(group.name, group.peerId,
-                checked: true, leading: group.avatarImage, hint: '');
+                selected: true, leading: group.avatarImage, hint: '');
             options.add(item);
           }
         }
@@ -92,9 +92,9 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
     List<Option<String>> options = [];
     if (widget.includeLinkman) {
       for (Linkman linkman in linkmen) {
-        bool checked = widget.selected.contains(linkman.peerId);
+        bool selected = widget.selected.contains(linkman.peerId);
         Option<String> item = Option<String>(linkman.name, linkman.peerId,
-            checked: checked,
+            selected: selected,
             leading: linkman.avatarImage,
             hint: linkman.email ?? '');
         options.add(item);
@@ -102,9 +102,9 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
     }
     if (widget.includeGroup) {
       for (Group group in groups) {
-        bool checked = widget.selected.contains(group.peerId);
+        bool selected = widget.selected.contains(group.peerId);
         Option<String> item = Option<String>(group.name, group.peerId,
-            checked: checked, leading: group.avatarImage, hint: '');
+            selected: selected, leading: group.avatarImage, hint: '');
         options.add(item);
       }
     }

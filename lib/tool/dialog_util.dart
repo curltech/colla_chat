@@ -122,7 +122,7 @@ class DialogUtil {
           prefix: item.leading,
           label: item.label,
           value: item.value,
-          checked: item.checked);
+          selected: item.selected);
       options.add(option);
     }
     T? value = await show<T>(
@@ -144,7 +144,7 @@ class DialogUtil {
     BuildContext? context,
     required String label,
     required T value,
-    required bool checked,
+    required bool selected,
     Widget? prefix,
   }) {
     context ??= appDataProvider.context!;
@@ -158,12 +158,12 @@ class DialogUtil {
     }
     children.add(CommonAutoSizeText(
       label,
-      style: checked ? style : null,
+      style: selected ? style : null,
     ));
     children.add(
       const Spacer(),
     );
-    children.add(checked
+    children.add(selected
         ? Icon(
             Icons.check,
             color: myself.primary,
@@ -190,9 +190,9 @@ class DialogUtil {
           context: context,
           label: item.label,
           value: item.value,
-          checked: item.checked);
+          selected: item.selected);
       options.add(option);
-      if (item.checked) {
+      if (item.selected) {
         initialValue = item.value;
       }
     }
@@ -210,7 +210,7 @@ class DialogUtil {
     BuildContext? context,
     required String label,
     required T value,
-    required bool checked,
+    required bool selected,
   }) {
     context ??= appDataProvider.context!;
     TextStyle style = TextStyle(color: myself.primary);
@@ -219,10 +219,10 @@ class DialogUtil {
         child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
           CommonAutoSizeText(
             AppLocalizations.t(label),
-            style: checked ? style : null,
+            style: selected ? style : null,
           ),
           const Spacer(),
-          checked ? const Icon(Icons.check) : nil
+          selected ? const Icon(Icons.check) : nil
         ]));
   }
 

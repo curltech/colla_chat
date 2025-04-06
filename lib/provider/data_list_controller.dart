@@ -244,8 +244,8 @@ class DataListController<T> {
   List<T> get selected {
     List<T> selectedData = [];
     for (var t in data) {
-      bool? checked = EntityUtil.getChecked(t);
-      if (checked != null && checked) {
+      bool? selected = EntityUtil.getSelected(t);
+      if (selected != null && selected) {
         selectedData.add(t);
       }
     }
@@ -255,13 +255,13 @@ class DataListController<T> {
 
   selectAll(l) {
     for (var t in data) {
-      EntityUtil.setChecked(t, true);
+      EntityUtil.setSelected(t, true);
     }
   }
 
   unselectAll() {
     for (var t in data) {
-      EntityUtil.setChecked(t, false);
+      EntityUtil.setSelected(t, false);
     }
   }
 }

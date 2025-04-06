@@ -8,8 +8,8 @@ enum EntityStatus {
   checking,
   undefined,
   locked,
-  checked,
-  unchecked,
+  selected,
+  unselected,
   enabled,
   disable,
   discarded,
@@ -34,7 +34,7 @@ abstract class BaseEntity {
   String? ownerPeerId; // 区分属主
   String? entityId;
   EntityState? state;
-  bool? checked;
+  bool? selected;
 
   BaseEntity();
 
