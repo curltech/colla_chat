@@ -126,8 +126,8 @@ class PlatformSoundRecorder {
         recordingDataController = StreamController<Uint8List>();
         recordingDataSubscription =
             recordingDataController!.stream.listen((buffer) {
-          sink!.add(buffer);
-        });
+              sink!.add(buffer);
+            });
         await recorder.startRecorder(
           toStream: recordingDataController!.sink,
           codec: codec,
@@ -147,11 +147,11 @@ class PlatformSoundRecorder {
 
       recorderSubscription =
           recorder.onProgress!.listen((RecordingDisposition e) {
-        var date = DateTime.fromMillisecondsSinceEpoch(
-            e.duration.inMilliseconds,
-            isUtc: true);
-        var txt = DateFormat('mm:ss:SS', 'en_GB').format(date);
-      });
+            var date = DateTime.fromMillisecondsSinceEpoch(
+                e.duration.inMilliseconds,
+                isUtc: true);
+            var txt = DateFormat('mm:ss:SS', 'en_GB').format(date);
+          });
     } on Exception catch (err) {
       logger.e('startRecorder error: $err');
       stopRecorder();
@@ -291,10 +291,11 @@ class PlatformSoundPlayer {
       } else {
         //stream
         await player.startPlayerFromStream(
-          codec: Codec.pcm16,
-          numChannels: 1,
-          sampleRate: 44000,
-        );
+            codec: Codec.pcm16,
+            numChannels: 1,
+            sampleRate: 44000,
+            interleaved: false,
+            bufferSize: 1024);
         await writeBuffer(buffer);
       }
       //await player.startPlayerFromMic();
