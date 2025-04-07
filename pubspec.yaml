@@ -326,7 +326,7 @@ dependencies:
   flutter_native_splash: ^2.4.5
   system_tray: ^2.0.3
   tray_manager: ^0.3.0
-  livekit_client: ^2.4.1 #livekit sfu server flutter client
+  livekit_client: ^2.4.2+hotfix.1 #livekit sfu server flutter client
   livekit_server_sdk: ^1.0.1
   langchain: ^0.7.1
   langchain_ollama: ^0.3.0
@@ -365,11 +365,11 @@ dependency_overrides:
   flutter_map: ^8.1.0 #Open Street Map，需要翻墙
   ffi: 2.1.0
   win32_registry: 2.1.0
-  win32: 5.11.0
+  win32: 5.11.0S
   http: 1.2.0
-  dart_webrtc: ^1.5.2+hotfix.1
-  webrtc_interface: 1.2.1+hotfix.1
-  flutter_webrtc: ^0.12.12+hotfix.1
+  dart_webrtc: ^1.5.3
+  webrtc_interface: 1.2.2+hotfix.1
+  flutter_webrtc: ^0.13.1+hotfix.1
   #  flutter_webrtc_plus: ^0.11.2+5
   #  medea_flutter_webrtc: ^0.11.0
   protobuf: ^3.1.0
