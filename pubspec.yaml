@@ -416,7 +416,7 @@ dependency_overrides:
   pdf: ^3.10.4 #所有平台，创建pdf
   audio_session: ^0.2.0
   record: 6.0.0
-  record_darwin: 1.2.2
+  # record_darwin: 1.2.2
   secure_application: ^4.1.0
   visibility_detector: ^0.4.0+2 #组建可见性的大小发生变化
   focus_detector: ^2.0.1 #组建在界面上消失或者出现
