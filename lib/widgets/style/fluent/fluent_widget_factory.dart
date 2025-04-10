@@ -69,7 +69,6 @@ class FluentWidgetFactory extends WidgetFactory {
     TextAlignVertical? textAlignVertical,
     bool autofocus = false,
     bool readOnly = false,
-    ToolbarOptions? toolbarOptions,
     bool? showCursor,
     String obscuringCharacter = '•',
     bool obscureText = false,
@@ -199,7 +198,6 @@ class FluentWidgetFactory extends WidgetFactory {
     TextAlignVertical? textAlignVertical,
     TextDirection? textDirection,
     bool readOnly = false,
-    ToolbarOptions? toolbarOptions,
     bool? showCursor,
     bool autofocus = false,
     WidgetStatesController? statesController,
@@ -219,7 +217,7 @@ class FluentWidgetFactory extends WidgetFactory {
     void Function(String)? onSubmitted,
     void Function(String, Map<String, dynamic>)? onAppPrivateCommand,
     List<TextInputFormatter>? inputFormatters,
-    bool? enabled = true,
+    bool? enabled,
     bool? ignorePointers,
     double cursorWidth = 2.0,
     double? cursorHeight,
@@ -239,10 +237,10 @@ class FluentWidgetFactory extends WidgetFactory {
     void Function(PointerDownEvent)? onTapOutside,
     MouseCursor? mouseCursor,
     Widget? Function(BuildContext,
-            {required int currentLength,
-            required bool isFocused,
-            required int? maxLength})?
-        buildCounter,
+        {required int currentLength,
+        required bool isFocused,
+        required int? maxLength})?
+    buildCounter,
     ScrollController? scrollController,
     ScrollPhysics? scrollPhysics,
     Iterable<String>? autofillHints = const <String>[],
@@ -304,7 +302,6 @@ class FluentWidgetFactory extends WidgetFactory {
       autofillHints: autofillHints,
       clipBehavior: clipBehavior,
       restorationId: restorationId,
-      scribbleEnabled: scribbleEnabled,
       enableIMEPersonalizedLearning: enableIMEPersonalizedLearning,
       contextMenuBuilder: contextMenuBuilder,
       spellCheckConfiguration: spellCheckConfiguration,
@@ -418,7 +415,6 @@ class FluentWidgetFactory extends WidgetFactory {
       locale: locale,
       softWrap: softWrap,
       overflow: overflow,
-      textScaleFactor: textScaleFactor,
       textScaler: textScaler,
       maxLines: maxLines,
       semanticsLabel: semanticsLabel,
@@ -578,7 +574,7 @@ class FluentWidgetFactory extends WidgetFactory {
     );
   }
 
-  @override
+
   Widget progressIndeterminate({
     Key? key,
     double? value,
@@ -747,7 +743,6 @@ class FluentWidgetFactory extends WidgetFactory {
     );
   }
 
-  @override
   Widget bottomNavigationBar({
     Key? key,
     required List<BottomNavigationBarItem> items,
@@ -777,7 +772,7 @@ class FluentWidgetFactory extends WidgetFactory {
     throw UnimplementedError();
   }
 
-  @override
+
   Widget listTile(
       {Key? key,
       Widget? leading,
