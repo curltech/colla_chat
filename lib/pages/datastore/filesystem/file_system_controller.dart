@@ -91,16 +91,19 @@ class FileSystemController extends DataListController<FolderNode> {
     io.Directory directory = (folderNode.value as Folder).directory;
     List<io.FileSystemEntity> fileSystemEntities = directory.listSync();
 
-    for (io.FileSystemEntity fileSystemEntity in fileSystemEntities) {
-      io.FileStat fileStat = fileSystemEntity.statSync();
-      io.FileSystemEntityType fileSystemEntityType = fileStat.type;
-      if (fileSystemEntityType == io.FileSystemEntityType.directory) {
-        FolderNode node = FolderNode(
-            Folder(
-                PathUtil.basename(fileSystemEntity.path),
-                directory: fileSystemEntity as io.Directory));
-        folderNode.children.add(node);
+    if (fileSystemEntities.isNotEmpty) {
+      for (io.FileSystemEntity fileSystemEntity in fileSystemEntities) {
+        io.FileStat fileStat = fileSystemEntity.statSync();
+        io.FileSystemEntityType fileSystemEntityType = fileStat.type;
+        if (fileSystemEntityType == io.FileSystemEntityType.directory) {
+          FolderNode node = FolderNode(Folder(
+              PathUtil.basename(fileSystemEntity.path),
+              directory: fileSystemEntity as io.Directory));
+          folderNode.children.add(node);
+        }
       }
+    } else {
+      folderNode.canBeExpanded.value = false;
     }
   }
 

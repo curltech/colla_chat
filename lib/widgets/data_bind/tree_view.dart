@@ -34,6 +34,7 @@ class ExplorableNode {
 
   final RxList<ExplorableNode> children = <ExplorableNode>[].obs;
   RxBool hidden = false.obs;
+  RxBool canBeExpanded = true.obs;
   RxBool isExpanded = false.obs;
   RxBool isSelected = false.obs;
   RxBool isPartiallySelected = false.obs;
@@ -410,7 +411,7 @@ class TreeViewState extends State<TreeView> {
     return Obx(() {
       return SizedBox(
         width: 24,
-        child: node.children.isNotEmpty
+        child: node.canBeExpanded.value
             ? IconButton(
                 icon: Icon(
                   node.isExpanded.value
