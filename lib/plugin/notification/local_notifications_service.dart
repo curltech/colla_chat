@@ -70,7 +70,7 @@ class LocalNotificationsService {
         WindowsInitializationSettings(
             appName: 'colla_chat',
             appUserModelId: 'io.curltech.colla_chat',
-            guid: 'd49b0314-ee7a-4626-bf79-97cdb8a991bb');
+            guid: '5d719c82-91c0-4113-b1bf-19d32236c918');
     //初始化设置
     final InitializationSettings initializationSettings =
         InitializationSettings(
