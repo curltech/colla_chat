@@ -65,14 +65,20 @@ class LocalNotificationsService {
 
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon');
+
+    final WindowsInitializationSettings initializationSettingsWindows =
+        WindowsInitializationSettings(
+            appName: 'colla_chat',
+            appUserModelId: 'io.curltech.colla_chat',
+            guid: 'd49b0314-ee7a-4626-bf79-97cdb8a991bb');
     //初始化设置
     final InitializationSettings initializationSettings =
         InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsDarwin,
-      macOS: initializationSettingsDarwin,
-      linux: initializationSettingsLinux,
-    );
+            android: initializationSettingsAndroid,
+            iOS: initializationSettingsDarwin,
+            macOS: initializationSettingsDarwin,
+            linux: initializationSettingsLinux,
+            windows: initializationSettingsWindows);
     // 初始化，定义通知的响应函数，包括通知选择本身和通知的按钮
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
