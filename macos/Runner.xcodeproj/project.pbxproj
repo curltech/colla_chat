@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -12,6 +12,8 @@
 			buildConfigurationList = 33CC111B2044C6BA0003C045 /* Build configuration list for PBXAggregateTarget "Flutter Assemble" */;
 			buildPhases = (
 				33CC111E2044C6BF0003C045 /* ShellScript */,
+			);
+			dependencies = (
 			);
 			name = "Flutter Assemble";
 			productName = FLX;
@@ -50,11 +52,13 @@
 /* Begin PBXCopyFilesBuildPhase section */
 		F40D64B02ABED36D0088D39C /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
 			dstPath = "";
-			dstSubfolder = PlugIns;
+			dstSubfolderSpec = 13;
 			files = (
 			);
 			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -95,15 +99,19 @@
 /* Begin PBXFrameworksBuildPhase section */
 		33CC10EA2044A3C60003C045 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
 				BBDBB61FC045310DB86C44D7 /* Pods_Runner.framework in Frameworks */,
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F40D64A42ABED36D0088D39C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
 				A382AB8AD55365D249F4517B /* Pods_ImageNotification.framework in Frameworks */,
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
@@ -248,6 +256,8 @@
 			);
 			buildRules = (
 			);
+			dependencies = (
+			);
 			name = ImageNotification;
 			productName = ImageNotification;
 			productReference = F40D64A72ABED36D0088D39C /* ImageNotification.appex */;
@@ -290,7 +300,7 @@
 				Base,
 			);
 			mainGroup = 33CC10E42044A3C60003C045;
-			preferredProjectObjectVersion = 90;
+			preferredProjectObjectVersion = 77;
 			productRefGroup = 33CC10EE2044A3C60003C045 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -305,63 +315,85 @@
 /* Begin PBXResourcesBuildPhase section */
 		33CC10EB2044A3C60003C045 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
 				33CC10F32044A3C60003C045 /* Assets.xcassets in Resources */,
 				33CC10F62044A3C60003C045 /* MainMenu.xib in Resources */,
 				AFA546760A0D63F130E8C387 /* GoogleService-Info.plist in Resources */,
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F40D64A52ABED36D0088D39C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
 		1572C8007289E2361725601F /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
-			shellPath = /bin/sh;
-			shellScript = (
-				"\"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks.sh\"",
-				"",
+			outputPaths = (
 			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks.sh\"\n\n";
 			showEnvVarsInLog = 0;
 		};
 		1C57FFBE8949EA19F39275B8 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
 			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
-			shellPath = /bin/sh;
-			shellScript = (
-				"\"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources.sh\"",
-				"",
+			outputPaths = (
 			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources.sh\"\n\n";
 			showEnvVarsInLog = 0;
 		};
 		3399D490228B24CF009A79C7 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
-			shellPath = /bin/sh;
-			shellScript = (
-				"echo \"$PRODUCT_NAME.app\" > \"$PROJECT_DIR\"/Flutter/ephemeral/.app_filename && \"$FLUTTER_ROOT\"/packages/flutter_tools/bin/macos_assemble.sh embed",
-				"",
+			buildActionMask = 2147483647;
+			files = (
 			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo \"$PRODUCT_NAME.app\" > \"$PROJECT_DIR\"/Flutter/ephemeral/.app_filename && \"$FLUTTER_ROOT\"/packages/flutter_tools/bin/macos_assemble.sh embed\n\n";
 		};
 		33CC111E2044C6BF0003C045 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
 			inputFileListPaths = (
 				Flutter/ephemeral/FlutterInputs.xcfilelist,
 			);
@@ -371,13 +403,17 @@
 			outputFileListPaths = (
 				Flutter/ephemeral/FlutterOutputs.xcfilelist,
 			);
-			shellPath = /bin/sh;
-			shellScript = (
-				"\"$FLUTTER_ROOT\"/packages/flutter_tools/bin/macos_assemble.sh && touch Flutter/ephemeral/tripwire",
+			outputPaths = (
 			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$FLUTTER_ROOT\"/packages/flutter_tools/bin/macos_assemble.sh && touch Flutter/ephemeral/tripwire\n";
 		};
 		40085AD89D55BC5094399743 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
 			inputPaths = (
 				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
 				"${PODS_ROOT}/Manifest.lock",
@@ -386,22 +422,16 @@
 			outputPaths = (
 				"$(DERIVED_FILE_DIR)/Pods-ImageNotification-checkManifestLockResult.txt",
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = (
-				"diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null",
-				"if [ $? != 0 ] ; then",
-				"    # print error to STDERR",
-				"    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2",
-				"    exit 1",
-				"fi",
-				"# This output is used by Xcode 'outputs' to avoid re-running this script phase.",
-				"echo \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"",
-				"",
-			);
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n\n";
 			showEnvVarsInLog = 0;
 		};
 		C661D28285814D8FFB6C3213 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
 			inputPaths = (
 				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
 				"${PODS_ROOT}/Manifest.lock",
@@ -410,18 +440,9 @@
 			outputPaths = (
 				"$(DERIVED_FILE_DIR)/Pods-Runner-checkManifestLockResult.txt",
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = (
-				"diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null",
-				"if [ $? != 0 ] ; then",
-				"    # print error to STDERR",
-				"    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2",
-				"    exit 1",
-				"fi",
-				"# This output is used by Xcode 'outputs' to avoid re-running this script phase.",
-				"echo \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"",
-				"",
-			);
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -429,17 +450,21 @@
 /* Begin PBXSourcesBuildPhase section */
 		33CC10E92044A3C60003C045 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
 				33CC11132044BFA00003C045 /* MainFlutterWindow.swift in Sources */,
 				33CC10F12044A3C60003C045 /* AppDelegate.swift in Sources */,
 				335BBD1B22A9A15E00E9071D /* GeneratedPluginRegistrant.swift in Sources */,
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F40D64A32ABED36D0088D39C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
 			files = (
 				F40D64AB2ABED36D0088D39C /* NotificationService.m in Sources */,
 			);
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
@@ -469,7 +494,7 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		338D0CE9231458BD00FA5F75 /* Profile configuration for PBXProject "Runner" */ = {
+		338D0CE9231458BD00FA5F75 /* Profile */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
 			buildSettings = {
@@ -519,7 +544,7 @@
 			};
 			name = Profile;
 		};
-		338D0CEA231458BD00FA5F75 /* Profile configuration for PBXNativeTarget "Runner" */ = {
+		338D0CEA231458BD00FA5F75 /* Profile */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33E5194F232828860026EE4D /* AppInfo.xcconfig */;
 			buildSettings = {
@@ -745,7 +770,7 @@
 			};
 			name = Profile;
 		};
-		338D0CEB231458BD00FA5F75 /* Profile configuration for PBXAggregateTarget "Flutter Assemble" */ = {
+		338D0CEB231458BD00FA5F75 /* Profile */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
@@ -755,7 +780,7 @@
 			};
 			name = Profile;
 		};
-		33CC10F92044A3C60003C045 /* Debug configuration for PBXProject "Runner" */ = {
+		33CC10F92044A3C60003C045 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9740EEB21CF90195004384FC /* Debug.xcconfig */;
 			buildSettings = {
@@ -811,7 +836,7 @@
 			};
 			name = Debug;
 		};
-		33CC10FA2044A3C60003C045 /* Release configuration for PBXProject "Runner" */ = {
+		33CC10FA2044A3C60003C045 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 7AFA3C8E1D35360C0083082E /* Release.xcconfig */;
 			buildSettings = {
@@ -861,7 +886,7 @@
 			};
 			name = Release;
 		};
-		33CC10FC2044A3C60003C045 /* Debug configuration for PBXNativeTarget "Runner" */ = {
+		33CC10FC2044A3C60003C045 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33E5194F232828860026EE4D /* AppInfo.xcconfig */;
 			buildSettings = {
@@ -1088,7 +1113,7 @@
 			};
 			name = Debug;
 		};
-		33CC10FD2044A3C60003C045 /* Release configuration for PBXNativeTarget "Runner" */ = {
+		33CC10FD2044A3C60003C045 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 33E5194F232828860026EE4D /* AppInfo.xcconfig */;
 			buildSettings = {
@@ -1314,7 +1339,7 @@
 			};
 			name = Release;
 		};
-		33CC111C2044C6BA0003C045 /* Debug configuration for PBXAggregateTarget "Flutter Assemble" */ = {
+		33CC111C2044C6BA0003C045 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Manual;
@@ -1324,7 +1349,7 @@
 			};
 			name = Debug;
 		};
-		33CC111D2044C6BA0003C045 /* Release configuration for PBXAggregateTarget "Flutter Assemble" */ = {
+		33CC111D2044C6BA0003C045 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
@@ -1334,7 +1359,7 @@
 			};
 			name = Release;
 		};
-		F40D64B12ABED36D0088D39C /* Debug configuration for PBXNativeTarget "ImageNotification" */ = {
+		F40D64B12ABED36D0088D39C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FD2BFBB6E924FBFA6CB3C09E /* Pods-ImageNotification.debug.xcconfig */;
 			buildSettings = {
@@ -1381,7 +1406,7 @@
 			};
 			name = Debug;
 		};
-		F40D64B22ABED36D0088D39C /* Release configuration for PBXNativeTarget "ImageNotification" */ = {
+		F40D64B22ABED36D0088D39C /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B1C6E76B20A8FFFD692B8B31 /* Pods-ImageNotification.release.xcconfig */;
 			buildSettings = {
@@ -1427,7 +1452,7 @@
 			};
 			name = Release;
 		};
-		F40D64B32ABED36D0088D39C /* Profile configuration for PBXNativeTarget "ImageNotification" */ = {
+		F40D64B32ABED36D0088D39C /* Profile */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 874BD3F520CA2B3D838C1C6A /* Pods-ImageNotification.profile.xcconfig */;
 			buildSettings = {
@@ -1479,37 +1504,41 @@
 		33CC10E82044A3C60003C045 /* Build configuration list for PBXProject "Runner" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				33CC10F92044A3C60003C045 /* Debug configuration for PBXProject "Runner" */,
-				33CC10FA2044A3C60003C045 /* Release configuration for PBXProject "Runner" */,
-				338D0CE9231458BD00FA5F75 /* Profile configuration for PBXProject "Runner" */,
+				33CC10F92044A3C60003C045 /* Debug */,
+				33CC10FA2044A3C60003C045 /* Release */,
+				338D0CE9231458BD00FA5F75 /* Profile */,
 			);
+			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		33CC10FB2044A3C60003C045 /* Build configuration list for PBXNativeTarget "Runner" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				33CC10FC2044A3C60003C045 /* Debug configuration for PBXNativeTarget "Runner" */,
-				33CC10FD2044A3C60003C045 /* Release configuration for PBXNativeTarget "Runner" */,
-				338D0CEA231458BD00FA5F75 /* Profile configuration for PBXNativeTarget "Runner" */,
+				33CC10FC2044A3C60003C045 /* Debug */,
+				33CC10FD2044A3C60003C045 /* Release */,
+				338D0CEA231458BD00FA5F75 /* Profile */,
 			);
+			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		33CC111B2044C6BA0003C045 /* Build configuration list for PBXAggregateTarget "Flutter Assemble" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				33CC111C2044C6BA0003C045 /* Debug configuration for PBXAggregateTarget "Flutter Assemble" */,
-				33CC111D2044C6BA0003C045 /* Release configuration for PBXAggregateTarget "Flutter Assemble" */,
-				338D0CEB231458BD00FA5F75 /* Profile configuration for PBXAggregateTarget "Flutter Assemble" */,
+				33CC111C2044C6BA0003C045 /* Debug */,
+				33CC111D2044C6BA0003C045 /* Release */,
+				338D0CEB231458BD00FA5F75 /* Profile */,
 			);
+			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		F40D64B42ABED36D0088D39C /* Build configuration list for PBXNativeTarget "ImageNotification" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				F40D64B12ABED36D0088D39C /* Debug configuration for PBXNativeTarget "ImageNotification" */,
-				F40D64B22ABED36D0088D39C /* Release configuration for PBXNativeTarget "ImageNotification" */,
-				F40D64B32ABED36D0088D39C /* Profile configuration for PBXNativeTarget "ImageNotification" */,
+				F40D64B12ABED36D0088D39C /* Debug */,
+				F40D64B22ABED36D0088D39C /* Release */,
+				F40D64B32ABED36D0088D39C /* Profile */,
 			);
+			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
