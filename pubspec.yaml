@@ -253,7 +253,10 @@ dependencies:
   drules: ^1.0.0
 
   # 多媒体
-  ffmpeg_kit_flutter: ^6.0.3 #Android, iOS and macOS
+  ffmpeg_kit_flutter_full_gpl:
+    git:
+      url: https://github.com/Sahad2701/ffmpeg_kit_flutter_full_gpl.git
+      ref: flutter-upgrade/remove-v1-embedding
   photo_view: ^0.15.0 #图片显示
   pro_image_editor: ^9.4.0
   flutter_sound: ^9.28.0
