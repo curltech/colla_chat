@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:colla_chat/entity/chat/chat_message.dart' as colla_chat;
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
@@ -14,8 +15,8 @@ import 'package:colla_chat/transport/webrtc/local_peer_media_stream_controller.d
 import 'package:colla_chat/transport/webrtc/peer_media_stream.dart';
 import 'package:colla_chat/widgets/media/audio/audio_session.dart';
 import 'package:flutter/material.dart';
-import 'package:livekit_client/livekit_client.dart' as livekit_client;
 import 'package:livekit_client/livekit_client.dart';
+import 'package:livekit_client/livekit_client.dart' as livekit_client;
 import 'package:synchronized/synchronized.dart';
 
 /// LiveKit的房间连接客户端,ws协议
@@ -748,7 +749,7 @@ class LiveKitConferenceClientPool with ChangeNotifier {
   ///根据当前的视频邀请消息，查找或者创建当前消息对应的会议，并设置为当前会议
   ///在发起者接收到至少一个同意回执，开始重新协商，或者接收者发送出同意回执的时候调用
   Future<LiveKitConferenceClient?> createConferenceClient(
-      ChatMessage chatMessage,
+      colla_chat.ChatMessage chatMessage,
       {ChatSummary? chatSummary}) async {
     return await _clientLock.synchronized(() async {
       LiveKitConferenceClient? liveKitConferenceClient;
