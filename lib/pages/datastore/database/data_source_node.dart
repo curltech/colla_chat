@@ -178,7 +178,7 @@ class DataSourceNode extends ExplorableNode {
     if (folderNode == null) {
       return null;
     }
-    return folderNode.children as List<DataTableNode>?;
+    return folderNode.children.map((node) => node as DataTableNode).toList();
   }
 
   DataTableNode? getDataTableNode(String tableName) {
