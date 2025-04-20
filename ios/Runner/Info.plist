@@ -103,6 +103,8 @@
 		<key>UIBackgroundModes</key>
 		<array>
 			<string>audio</string>
+			<string>AirPlay</string>
+            <string>picture-in-picture</string>
 			<string>fetch</string>
 			<string>nearby-interaction</string>
 			<string>processing</string>
