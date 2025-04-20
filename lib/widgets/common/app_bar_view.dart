@@ -1,6 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/index/help_information_widget.dart';
 import 'package:colla_chat/pages/index/index_view.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -68,7 +69,7 @@ class AppBarView extends StatelessWidget {
                 onTap: () {
                   helpInformationController.title.value = title ?? '';
                   helpInformationController.helpPath = helpPath ?? '';
-                  sliderDrawerKey.currentState?.openSlider();
+                  indexWidgetProvider.push('help');
                 },
                 child: Icon(
                   size: 18,

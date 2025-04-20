@@ -30,7 +30,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
   }
 
   save() async {
-    String value = JsonUtil.toJsonString(data.value.map((node) => node.value));
+    String value = JsonUtil.toJsonString(data.value.map((node) => node.value).toList());
     await localSecurityStorage.save('DataSources', value);
   }
 

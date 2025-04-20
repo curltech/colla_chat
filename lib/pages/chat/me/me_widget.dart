@@ -7,6 +7,7 @@ import 'package:colla_chat/pages/chat/me/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/local_media_stream_widget.dart';
+import 'package:colla_chat/pages/index/help_information_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -28,6 +29,8 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   final LiveKitSfuParticipantWidget liveKitSfuParticipantWidget =
       LiveKitSfuParticipantWidget();
   final PlatformInfoWidget platformInfoWidget = const PlatformInfoWidget();
+  final HelpInformationWidget helpInformationWidget =
+      const HelpInformationWidget();
 
   MeWidget({super.key}) {
     indexWidgetProvider.define(collectionListView);
@@ -38,6 +41,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(liveKitSfuRoomWidget);
     indexWidgetProvider.define(liveKitSfuParticipantWidget);
     indexWidgetProvider.define(platformInfoWidget);
+    indexWidgetProvider.define(helpInformationWidget);
   }
 
   @override
@@ -51,8 +55,6 @@ class MeWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'Me';
-
-
 
   List<TileData> _buildMeTileData(BuildContext context) {
     final bool developerSwitch = myself.peerProfile.developerSwitch;

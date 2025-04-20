@@ -2,6 +2,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/index/index_view.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -44,8 +45,20 @@ final HelpInformationController helpInformationController =
     HelpInformationController();
 
 // 帮助信息页面
-class HelpInformationWidget extends StatelessWidget {
+class HelpInformationWidget extends StatelessWidget  with TileDataMixin {
   const HelpInformationWidget({super.key});
+
+  @override
+  bool get withLeading => true;
+
+  @override
+  String get routeName => 'help';
+
+  @override
+  IconData get iconData => Icons.person;
+
+  @override
+  String get title => 'Help information';
 
   @override
   Widget build(BuildContext context) {
@@ -54,15 +67,7 @@ class HelpInformationWidget extends StatelessWidget {
       return AppBarView(
           title:
               '${helpInformationController.title.value} ${AppLocalizations.t('help')}',
-          isAppBar: true,
-          rightWidget: IconButton(
-              onPressed: () {
-                sliderDrawerKey.currentState?.closeSlider();
-              },
-              icon: Icon(
-                Icons.clear,
-                color: Colors.white,
-              )),
+          withLeading: true,
           child: Container(
               color: Colors.white.withAlpha(0),
               child: GptMarkdown(information)));
