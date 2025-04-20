@@ -5,8 +5,10 @@ import 'package:pip_flutter/pipflutter_player_controller.dart';
 import 'package:pip_flutter/pipflutter_player_data_source.dart';
 import 'package:pip_flutter/pipflutter_player_data_source_type.dart';
 
-/// video_player播放视频
-class FlutterPipWidget extends StatelessWidget {
+/// video_player以画中画模式播放视频，很久没更新了
+/// pipFlutterPlayerController.enablePictureInPicture(pipFlutterPlayerKey);
+/// pipFlutterPlayerController.disablePictureInPicture();
+class VideoPlayerPipWidget extends StatelessWidget {
   final GlobalKey pipFlutterPlayerKey = GlobalKey();
   late final PipFlutterPlayerController pipFlutterPlayerController;
   final PipFlutterPlayerConfiguration pipFlutterPlayerConfiguration =
@@ -16,7 +18,7 @@ class FlutterPipWidget extends StatelessWidget {
   );
   late final PipFlutterPlayerDataSource dataSource;
 
-  FlutterPipWidget(
+  VideoPlayerPipWidget(
       {required PipFlutterPlayerDataSourceType type,
       required String url,
       super.key}) {

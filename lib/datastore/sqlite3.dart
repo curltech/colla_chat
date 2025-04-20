@@ -107,13 +107,14 @@ class Sqlite3 extends DataStore {
     return null;
   }
 
-  restore() async {
+  restore({String? path}) async {
     File file = File(dbPath);
     if (file.existsSync()) {
       close();
-      file.renameSync('$dbPath.ret');
+      file.renameSync('$dbPath.res');
     }
-    file = File('$dbPath.bak');
+    path ??= '$dbPath.bak';
+    file = File(path);
     if (file.existsSync()) {
       file.renameSync(dbPath);
     }

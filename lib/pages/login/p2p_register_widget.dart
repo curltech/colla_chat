@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:card_swiper/card_swiper.dart';
@@ -29,6 +30,7 @@ import 'package:phone_numbers_parser/phone_numbers_parser.dart'
     as phone_numbers_parser;
 import 'package:regexpattern/regexpattern.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
+import 'package:colla_chat/datastore/sqlite3.dart';
 
 /// 用户注册组件，一个card下的录入框和按钮组合
 class P2pRegisterWidget extends StatelessWidget {
@@ -42,10 +44,10 @@ class P2pRegisterWidget extends StatelessWidget {
     }
   }
 
-  ValueNotifier<String> countryCode = ValueNotifier<String>('CN');
-  TextEditingController mobileController = TextEditingController();
-  ValueNotifier<String?> peerId = ValueNotifier<String?>(null);
-  ValueNotifier<Uint8List?> avatar = ValueNotifier<Uint8List?>(null);
+  final ValueNotifier<String> countryCode = ValueNotifier<String>('CN');
+  final TextEditingController mobileController = TextEditingController();
+  final ValueNotifier<String?> peerId = ValueNotifier<String?>(null);
+  final ValueNotifier<Uint8List?> avatar = ValueNotifier<Uint8List?>(null);
   final List<PlatformDataField> p2pRegisterDataFields = [
     PlatformDataField(
         name: 'name',
@@ -101,17 +103,23 @@ class P2pRegisterWidget extends StatelessWidget {
     }
   }
 
-  Future<void> _restore(Map<String, dynamic> values) async {
-    String? backup;
+  Future<File?> _restore(Map<String, dynamic> values) async {
+    String? backupFile;
     if (platformParams.desktop) {
       List<XFile> xfiles = await FileUtil.pickFiles();
       if (xfiles.isNotEmpty) {
-        backup = await xfiles[0].readAsString();
+        backupFile = xfiles[0].path;
       }
     } else if (platformParams.mobile) {
       List<AssetEntity>? assets = await AssetUtil.pickAssets();
-      if (assets != null && assets.isNotEmpty) {}
+      if (assets != null && assets.isNotEmpty) {
+        backupFile = (await assets[0].file)?.path;
+      }
     }
+    if (backupFile != null) {
+      return sqlite3.restore(path: backupFile);
+    }
+    return null;
   }
 
   @override

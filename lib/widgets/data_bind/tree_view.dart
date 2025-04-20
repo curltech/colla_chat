@@ -38,6 +38,7 @@ class ExplorableNode {
   RxBool isExpanded = false.obs;
   RxBool isSelected = false.obs;
   RxBool isPartiallySelected = false.obs;
+  RxBool isCurrent = false.obs;
 
   ExplorableNode(
     this.value, {
@@ -456,7 +457,12 @@ class TreeViewState extends State<TreeView> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(node.value.name),
+        Text(
+          node.value.name,
+          style: TextStyle(
+              fontWeight:
+                  node.isCurrent.value ? FontWeight.w400 : FontWeight.normal),
+        ),
       ],
     );
   }

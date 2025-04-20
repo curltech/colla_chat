@@ -17,7 +17,6 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/tree_view.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 /// 数据源管理功能主页面，带有路由回调函数
 class DataSourceWidget extends StatelessWidget with TileDataMixin {
@@ -51,7 +50,6 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
 
   /// 单击节点，设置当前数据源和数据表
   void _onTap(BuildContext context, ExplorableNode node) {
-    dataSourceController.currentNode.value = node;
     DataSourceNode? dataSourceNode;
     DataTableNode? dataTableNode;
     if (node is DataSourceNode) {
@@ -72,36 +70,48 @@ class DataSourceWidget extends StatelessWidget with TileDataMixin {
     }
 
     dataSourceController.current = dataSourceNode;
-    dataSourceController.currentDataTableNode.value = dataTableNode;
-    dataSourceController.currentNode.value = node;
+    dataSourceController.setCurrentDataTableNode(current: dataTableNode);
+    if (node is DataColumnNode) {
+      dataSourceController.setCurrentDataColumnNode(node);
+    }
+    if (node is DataIndexNode) {
+      dataSourceController.setCurrentDataIndexNode(node);
+    }
   }
 
   /// 长按表示进一步的操作
   Future<void> _onLongPress(BuildContext context, ExplorableNode node) async {
     _onTap(context, node);
-    dataSourceController.currentNode.value = node;
+    String? name = node.value.name;
     List<ActionData> popActionData = [];
-    popActionData.add(ActionData(
-        label: 'New',
-        tooltip: 'New',
-        icon: Icon(
-          Icons.add,
-          color: myself.primary,
-        )));
-    popActionData.add(ActionData(
-        label: 'Delete',
-        tooltip: 'Delete',
-        icon: Icon(
-          Icons.remove,
-          color: myself.primary,
-        )));
-    popActionData.add(ActionData(
-        label: 'Edit',
-        tooltip: 'Edit',
-        icon: Icon(
-          Icons.edit,
-          color: myself.primary,
-        )));
+    if (node is FolderNode &&
+        (name == 'tables' || name == 'columns' || name == 'indexes')) {
+      popActionData.add(ActionData(
+          label: 'New',
+          tooltip: 'New',
+          icon: Icon(
+            Icons.add,
+            color: myself.primary,
+          )));
+    }
+    if (node is DataTableNode ||
+        node is DataColumnNode ||
+        node is DataIndexNode) {
+      popActionData.add(ActionData(
+          label: 'Delete',
+          tooltip: 'Delete',
+          icon: Icon(
+            Icons.remove,
+            color: myself.primary,
+          )));
+      popActionData.add(ActionData(
+          label: 'Edit',
+          tooltip: 'Edit',
+          icon: Icon(
+            Icons.edit,
+            color: myself.primary,
+          )));
+    }
     popActionData.add(ActionData(
         label: 'Query',
         tooltip: 'Query',

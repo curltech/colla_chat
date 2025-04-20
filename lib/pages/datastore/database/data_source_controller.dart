@@ -20,8 +20,17 @@ class DataSourceController extends DataListController<DataSourceNode> {
 
   DataSourceController();
 
+  @override
+  set current(DataSourceNode? element) {
+    for (var ele in data) {
+      ele.isCurrent.value = false;
+    }
+    element?.isCurrent.value = true;
+    super.current = element;
+  }
+
   save() async {
-    String value = JsonUtil.toJsonString(data.value);
+    String value = JsonUtil.toJsonString(data.value.map((node) => node.value));
     await localSecurityStorage.save('DataSources', value);
   }
 
@@ -120,6 +129,21 @@ class DataSourceController extends DataListController<DataSourceNode> {
     }
 
     return dataSourceNode.getDataTableNodes();
+  }
+
+  setCurrentDataTableNode(
+      {DataTableNode? current, DataSourceNode? dataSourceNode}) {
+    List<DataTableNode>? dataTableNodes = getDataTableNodes();
+    if (dataTableNodes != null && dataTableNodes.isNotEmpty) {
+      for (DataTableNode dataTableNode in dataTableNodes) {
+        if (current == dataTableNode) {
+          dataTableNode.isCurrent.value = true;
+        } else {
+          dataTableNode.isCurrent.value = false;
+        }
+      }
+    }
+    currentDataTableNode.value = current;
   }
 
   /// 当前表的所有列
@@ -249,19 +273,6 @@ class DataSourceController extends DataListController<DataSourceNode> {
     return currentDataTableNode.value;
   }
 
-  setCurrentDataTableNode(
-    DataTableNode? dataTableNode, {
-    DataSourceNode? dataSourceNode,
-  }) {
-    data_source.DataSource? dataSource =
-        getDataSource(dataSourceNode: dataSourceNode);
-    if (dataSource == null) {
-      return null;
-    }
-
-    currentDataTableNode.value = dataTableNode;
-  }
-
   /// 对数据源加表
   updateDataTables(
     List<data_source.DataTable> dataTables, {
@@ -348,7 +359,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
   }
 
   setCurrentDataColumnNode(
-    DataColumnNode dataColumnNode, {
+    DataColumnNode current, {
     DataSourceNode? dataSourceNode,
     DataTableNode? dataTableNode,
   }) {
@@ -361,7 +372,17 @@ class DataSourceController extends DataListController<DataSourceNode> {
     if (dataTableNode == null) {
       return null;
     }
-    currentNode.value = dataColumnNode;
+    List<DataColumnNode>? dataColumnNode = dataTableNode.getDataColumnNodes();
+    if (dataColumnNode != null && dataColumnNode.isNotEmpty) {
+      for (DataColumnNode dataColumnNode in dataColumnNode) {
+        if (current == dataColumnNode) {
+          dataColumnNode.isCurrent.value = true;
+        } else {
+          dataColumnNode.isCurrent.value = false;
+        }
+      }
+    }
+    currentNode.value = current;
   }
 
   addDataIndex(DataIndex dataIndex,
@@ -462,7 +483,7 @@ class DataSourceController extends DataListController<DataSourceNode> {
   }
 
   setCurrentDataIndexNode(
-    DataIndexNode? dataIndexNode, {
+    DataIndexNode? current, {
     DataSourceNode? dataSourceNode,
     DataTableNode? dataTableNode,
   }) {
@@ -471,7 +492,21 @@ class DataSourceController extends DataListController<DataSourceNode> {
     if (dataSource == null) {
       return null;
     }
-    currentNode.value = dataIndexNode;
+    dataTableNode ??= getDataTableNode(dataSourceNode: dataSourceNode);
+    if (dataTableNode == null) {
+      return null;
+    }
+    List<DataIndexNode>? dataIndexNodes = dataTableNode.getDataIndexNodes();
+    if (dataIndexNodes != null && dataIndexNodes.isNotEmpty) {
+      for (DataIndexNode dataIndexNode in dataIndexNodes) {
+        if (current == dataIndexNode) {
+          dataIndexNode.isCurrent.value = true;
+        } else {
+          dataIndexNode.isCurrent.value = false;
+        }
+      }
+    }
+    currentNode.value = current;
   }
 
   /// 获取数据源的所有表
