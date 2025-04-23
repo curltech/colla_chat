@@ -95,7 +95,7 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
   ChatListWidget({super.key}) {
     websocketPool.getDefault();
     indexWidgetProvider.define(ChatMessageView());
-    indexWidgetProvider.define(LlmChatMessageView());
+    // indexWidgetProvider.define(LlmChatMessageView());
     indexWidgetProvider.define(const LinkmanInfoWidget());
     indexWidgetProvider.define(const HtmlPreviewWidget());
     indexWidgetProvider.define(LinkmanWebrtcConnectionWidget());

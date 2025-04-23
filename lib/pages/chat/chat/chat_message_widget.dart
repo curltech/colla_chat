@@ -39,13 +39,14 @@ class ChatMessageWidget extends StatefulWidget {
 class _ChatMessageWidgetState extends State<ChatMessageWidget>
     with TickerProviderStateMixin {
   FocusNode textFocusNode = FocusNode();
-  late final AnimationController animateController = AnimationController(
-      vsync: this, duration: const Duration(milliseconds: 500));
+  late AnimationController animateController;
   RxBool securityTip = true.obs;
 
   @override
   void initState() {
     super.initState();
+    animateController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 500));
     //不能同时监听chatMessageController和globalChatMessageController
     //因为globalChatMessageController会通知chatMessageController的新消息
     var scrollController = widget.scrollController;

@@ -41,16 +41,12 @@ class ChatMessageViewController {
   }
 
   ///输入框的高度可能发生变化，延时进行计算消息输入部分的高度
-  changeExtendedTextHeight(GlobalKey<ExtendedTextFieldState> extendedTextKey) {
-    Future.delayed(const Duration(milliseconds: 1), () {
-      double? chatMessageInputHeight =
-          extendedTextKey.currentContext?.size?.height;
-      if (chatMessageInputHeight != null &&
-          chatMessageInputHeight != chatMessageInputHeight) {
-        _chatMessageInputHeight(chatMessageInputHeight);
-        logger.i('chatMessageInputHeight: $_chatMessageInputHeight');
-      }
-    });
+  changeExtendedTextHeight(Size size) {
+    double chatMessageInputHeight = size.height;
+    if (_chatMessageInputHeight.value != chatMessageInputHeight) {
+      _chatMessageInputHeight.value = chatMessageInputHeight;
+      logger.i('chatMessageInputHeight: $_chatMessageInputHeight');
+    }
   }
 
   double get chatMessageInputHeight {

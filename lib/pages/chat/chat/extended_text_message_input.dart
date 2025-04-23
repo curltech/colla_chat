@@ -11,6 +11,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/common_text_form_field.dart';
+import 'package:colla_chat/widgets/common/size_observer_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/special_text/custom_extended_text_selection_controls.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
@@ -21,8 +22,6 @@ import 'package:flutter/scheduler.dart';
 ///发送文本消息的输入框
 class ExtendedTextMessageInputWidget extends StatelessWidget {
   final TextEditingController textEditingController;
-  final GlobalKey<ExtendedTextFieldState> extendedTextKey =
-      GlobalKey<ExtendedTextFieldState>();
 
   ExtendedTextMessageInputWidget(
       {super.key, required this.textEditingController});
@@ -63,8 +62,8 @@ class ExtendedTextMessageInputWidget extends StatelessWidget {
     }
 
     SchedulerBinding.instance.addPostFrameCallback((Duration timeStamp) {
-      extendedTextKey.currentState
-          ?.bringIntoView(textEditingController.selection.base);
+      // extendedTextKey.currentState
+      //     ?.bringIntoView(textEditingController.selection.base);
     });
   }
 
@@ -138,59 +137,61 @@ class ExtendedTextMessageInputWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    chatMessageViewController.changeExtendedTextHeight(extendedTextKey);
-    //不随系统的字体大小变化
-    return MediaQuery(
-      data: MediaQuery.of(context)
-          .copyWith(textScaler: const TextScaler.linear(1.0)),
-      child: ExtendedTextField(
-        key: extendedTextKey,
-        minLines: 1,
-        maxLines: 8,
-        style: const TextStyle(fontSize: AppFontSize.mdFontSize),
-        specialTextSpanBuilder: CustomSpecialTextSpanBuilder(
-          showAtBackground: true,
-        ),
-        controller: textEditingController,
-        selectionControls: extendedMaterialTextSelectionControls,
-        focusNode: chatMessageViewController.focusNode,
-        onChanged: (String value) async {
-          if (value == '@') {
-            await _selectGroupLinkman();
-          }
+    // 不随系统的字体大小变化
+    return SizeObserverWidget(
+        onSizeChanged: (Size size) {
+          chatMessageViewController.changeExtendedTextHeight(size);
         },
-        //onChanged: onChanged,
-        decoration: InputDecoration(
-          fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
-          filled: true,
-          border: textFormFieldBorder,
-          focusedBorder: textFormFieldBorder,
-          enabledBorder: textFormFieldBorder,
-          errorBorder: textFormFieldBorder,
-          disabledBorder: textFormFieldBorder,
-          focusedErrorBorder: textFormFieldBorder,
-          hintText: AppLocalizations.t('Please input message'),
-          suffixIcon: textEditingController.text.isNotEmpty
-              ? InkWell(
-                  onTap: () {
-                    textEditingController.clear();
-                  },
-                  child: Icon(
-                    Icons.clear_rounded,
-                    color: myself.primary,
-                  ),
-                )
-              : null,
-          //isCollapsed: true,
-        ),
-        onEditingComplete: () {
-          logger.i('onEditingComplete');
-        },
-        onSubmitted: (value) {
-          logger.i('onSubmitted');
-        },
-        //textDirection: TextDirection.rtl,
-      ),
-    );
+        child: MediaQuery(
+          data: MediaQuery.of(context)
+              .copyWith(textScaler: const TextScaler.linear(1.0)),
+          child: ExtendedTextField(
+            minLines: 1,
+            maxLines: 8,
+            style: const TextStyle(fontSize: AppFontSize.mdFontSize),
+            specialTextSpanBuilder: CustomSpecialTextSpanBuilder(
+              showAtBackground: true,
+            ),
+            controller: textEditingController,
+            selectionControls: extendedMaterialTextSelectionControls,
+            focusNode: chatMessageViewController.focusNode,
+            autofocus: true,
+            onChanged: (String value) async {
+              if (value == '@') {
+                await _selectGroupLinkman();
+              }
+            },
+            decoration: InputDecoration(
+              fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
+              filled: true,
+              border: textFormFieldBorder,
+              focusedBorder: textFormFieldBorder,
+              enabledBorder: textFormFieldBorder,
+              errorBorder: textFormFieldBorder,
+              disabledBorder: textFormFieldBorder,
+              focusedErrorBorder: textFormFieldBorder,
+              hintText: AppLocalizations.t('Please input message'),
+              suffixIcon: textEditingController.text.isNotEmpty
+                  ? InkWell(
+                      onTap: () {
+                        textEditingController.clear();
+                      },
+                      child: Icon(
+                        Icons.clear_rounded,
+                        color: myself.primary,
+                      ),
+                    )
+                  : null,
+              //isCollapsed: true,
+            ),
+            onEditingComplete: () {
+              logger.i('onEditingComplete');
+            },
+            onSubmitted: (value) {
+              logger.i('onSubmitted');
+            },
+            //textDirection: TextDirection.rtl,
+          ),
+        ));
   }
 }

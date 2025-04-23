@@ -34,7 +34,7 @@ class TextMessageInputWidget extends StatelessWidget {
   ///文本录入按钮
   late final ExtendedTextMessageInputWidget extendedTextMessageInputWidget =
       ExtendedTextMessageInputWidget(
-    textEditingController: textEditingController,
+    textEditingController: textEditingController
   );
   late final PlatformAudioRecorder platformAudioRecorder;
 
@@ -57,10 +57,10 @@ class TextMessageInputWidget extends StatelessWidget {
     return platformAudioRecorder;
   }
 
-  RxBool voiceVisible = true.obs;
-  bool sendVisible = false;
-  bool moreVisible = false;
-  bool voiceRecording = false;
+  final RxBool voiceVisible = true.obs;
+  final RxBool sendVisible = false.obs;
+  final RxBool moreVisible = false.obs;
+  final RxBool voiceRecording = false.obs;
 
   ///停止录音，把录音数据作为消息发送
   _onStop(String filename) async {
@@ -171,11 +171,11 @@ class TextMessageInputWidget extends StatelessWidget {
     }
   }
 
-  BlueFireAudioPlayer audioPlayer = globalBlueFireAudioPlayer;
+  final BlueFireAudioPlayer audioPlayer = globalBlueFireAudioPlayer;
 
   _play() {
     audioPlayer.setLoopMode(false);
-    audioPlayer.play('assets/imedia/send.mp3');
+    audioPlayer.play('assets/media/send.mp3');
   }
 
   _stop() {

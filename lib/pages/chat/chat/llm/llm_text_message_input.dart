@@ -31,7 +31,7 @@ class LlmTextMessageInputWidget extends StatelessWidget {
   ///文本录入按钮
   late final ExtendedTextMessageInputWidget extendedTextMessageInputWidget =
       ExtendedTextMessageInputWidget(
-    textEditingController: textEditingController,
+    textEditingController: textEditingController
   );
   late final PlatformAudioRecorder platformAudioRecorder;
 
