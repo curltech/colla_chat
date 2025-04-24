@@ -1,5 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/index/index_view.dart';
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
-import 'package:colla_chat/plugin/talker_logger.dart';
 
 class HelpInformationController {
   RxString title = ''.obs;
@@ -45,7 +44,7 @@ final HelpInformationController helpInformationController =
     HelpInformationController();
 
 // 帮助信息页面
-class HelpInformationWidget extends StatelessWidget  with TileDataMixin {
+class HelpInformationWidget extends StatelessWidget with TileDataMixin {
   const HelpInformationWidget({super.key});
 
   @override
@@ -66,7 +65,7 @@ class HelpInformationWidget extends StatelessWidget  with TileDataMixin {
       String information = helpInformationController.information.value;
       return AppBarView(
           title:
-              '${helpInformationController.title.value} ${AppLocalizations.t('help')}',
+              '${AppLocalizations.t(helpInformationController.title.value)} ${AppLocalizations.t('help')}',
           withLeading: true,
           child: Container(
               color: Colors.white.withAlpha(0),
