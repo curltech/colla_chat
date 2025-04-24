@@ -14,7 +14,7 @@ import 'package:flutter/material.dart';
 
 /// [NodeRelationshipComponent] 在src节点和dst关系节点之间画关系的连线
 class NodeRelationshipComponent extends PositionComponent
-    with TapCallbacks, HoverCallbacks, HasGameRef<ModelFlameGame> {
+    with TapCallbacks, HoverCallbacks, HasGameReference<ModelFlameGame> {
   final strokePaint = Paint()
     ..color = Colors.black
     ..style = PaintingStyle.stroke

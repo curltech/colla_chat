@@ -117,13 +117,15 @@ class ModelNode extends Node {
   ModelNode({
     required String name,
     String? nodeType,
-    String? id,
     this.metaId,
     this.shapeType,
     this.content,
     this.fillColor,
     this.strokeColor,
-  }) : super(name, id: id) {
+    super.x,
+    super.y,
+    super.id,
+  }) : super(name) {
     this.nodeType = nodeType ?? NodeType.type.name;
   }
 

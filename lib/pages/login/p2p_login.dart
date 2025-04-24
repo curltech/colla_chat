@@ -35,7 +35,7 @@ class P2pLogin extends StatelessWidget with WindowListener {
     init();
   }
 
-  RxInt index = 0.obs;
+  final RxInt index = 0.obs;
 
   void init() async {
     await myselfPeerController.init();

@@ -143,10 +143,10 @@ class MyselfService {
     var peerId = myselfPeer.peerId;
     var peerProfile = await peerProfileService.findOneByPeerId(peerId);
     if (peerProfile != null) {
+      myself.peerProfile = peerProfile;
       if (myself.locale == platformParams.locale) {
         myself.locale = LocaleUtil.getLocale(peerProfile.locale);
       }
-      myself.peerProfile = peerProfile;
       String? avatar = myselfPeer.avatar;
       if (avatar != null) {
         var avatarImage = ImageUtil.buildImageWidget(

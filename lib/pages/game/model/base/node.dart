@@ -16,7 +16,7 @@ abstract class Node {
 
   NodeFrameComponent? nodeFrameComponent;
 
-  Node(this.name, {String? id}) {
+  Node(this.name, {this.x, this.y, String? id}) {
     if (id == null) {
       this.id = StringUtil.uuid();
     } else {

@@ -17,7 +17,7 @@ class RemarkNodeComponent extends TextBoxComponent
         ModelNodeComponent,
         TapCallbacks,
         DragCallbacks,
-        HasGameRef<ModelFlameGame> {
+        HasGameReference<ModelFlameGame> {
   static final TextPaint normalTextPaint = TextPaint(
     style: TextStyle(
       color: BasicPalette.black.color,
@@ -33,7 +33,7 @@ class RemarkNodeComponent extends TextBoxComponent
     double? timePerChar,
     double? margins,
   }) : super(
-            text: modelNode.content ?? '',
+            text: modelNode.content ?? modelNode.name,
             textRenderer: normalTextPaint,
             boxConfig: TextBoxConfig(
               timePerChar: timePerChar ?? 0.05,

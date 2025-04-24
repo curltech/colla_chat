@@ -29,6 +29,7 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:colla_chat/constant/base.dart';
 
 /// 元模型建模器
 class MetaModellerWidget extends StatelessWidget with TileDataMixin {
@@ -53,8 +54,6 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'Modeller';
-
-  
 
   _selectSubject() async {
     Project? project = modelProjectController.project.value;
@@ -447,8 +446,10 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
         content: 'Please input new project name',
         tip: 'unknown');
     if (projectName != null) {
-      modelProjectController.project.value =
+      modelProjectController.currentProject.value =
           Project(projectName, modelProjectController.currentMetaId.value);
+      modelProjectController.project.value =
+          modelProjectController.currentProject.value;
       modelProjectController.reset();
     }
   }
@@ -496,6 +497,9 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
   }
 
   _closeProject() async {
+    if (modelProjectController.currentProject.value != null) {
+      modelProjectController.currentProject.value = null;
+    }
     if (modelProjectController.project.value != null) {
       modelProjectController.project.value = null;
     }
@@ -657,6 +661,41 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
     return btns;
   }
 
+  Widget _buildToggleButtons() {
+    final List<bool> isSelected = <bool>[
+      modelProjectController.project.value ==
+          modelProjectController.currentProject.value,
+      modelProjectController.project.value ==
+          modelProjectController
+              .metaProjects[modelProjectController.currentMetaId.value],
+    ];
+    return ToggleButtons(
+      borderRadius: borderRadius,
+      renderBorder: false,
+      color: Colors.grey,
+      fillColor: myself.primary,
+      selectedColor: Colors.white,
+      isSelected: isSelected,
+      onPressed: (int newIndex) {
+        if (newIndex == 0) {
+          modelProjectController.project.value =
+              modelProjectController.currentProject.value;
+        } else if (newIndex == 1) {
+          modelProjectController.project.value = modelProjectController
+              .metaProjects[modelProjectController.currentMetaId.value];
+        }
+      },
+      children: <Widget>[
+        Tooltip(
+            message: AppLocalizations.t('Current project'),
+            child: Icon(Icons.stay_current_landscape)),
+        Tooltip(
+            message: AppLocalizations.t('Meta project'),
+            child: Icon(Icons.stay_current_portrait)),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Obx(() {
@@ -678,7 +717,8 @@ class MetaModellerWidget extends StatelessWidget with TileDataMixin {
           },
           icon: Icon(Icons.file_open),
           tooltip: AppLocalizations.t('Open project'),
-        )
+        ),
+        _buildToggleButtons(),
       ];
       modelFlameGame = ModelFlameGame();
       var children = [

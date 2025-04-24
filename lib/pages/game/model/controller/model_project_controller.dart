@@ -17,6 +17,9 @@ class ModelProjectController {
   final RxString currentMetaId = RxString(Project.baseMetaId);
 
   /// 当前模型
+  final Rx<Project?> currentProject = Rx<Project?>(null);
+
+  /// 当前展示模型
   final Rx<Project?> project = Rx<Project?>(null);
 
   /// 当前模型的文件名
@@ -29,18 +32,28 @@ class ModelProjectController {
   final RxBool canAddSubject = false.obs;
   final Rx<ModelNode?> canAddModelNode = Rx<ModelNode?>(null);
   final ModelNode typeModelNode = ModelNode(
-      name: 'type', nodeType: NodeType.type.name, id: ModelNode.typeBaseMetaId);
+      name: 'type',
+      nodeType: NodeType.type.name,
+      x: -260,
+      y: -260,
+      id: ModelNode.typeBaseMetaId);
   final ModelNode imageModelNode = ModelNode(
       name: 'image',
       nodeType: NodeType.image.name,
+      x: -260,
+      y: -60,
       id: ModelNode.imageBaseMetaId);
   final ModelNode shapeModelNode = ModelNode(
       name: 'shape',
       nodeType: NodeType.shape.name,
+      x: 60,
+      y: -60,
       id: ModelNode.shapeBaseMetaId);
   final ModelNode remarkModelNode = ModelNode(
       name: 'remark',
       nodeType: NodeType.remark.name,
+      x: 60,
+      y: -260,
       id: ModelNode.remarkBaseMetaId);
 
   ModelProjectController() {
@@ -51,7 +64,8 @@ class ModelProjectController {
   initMetaProject() {
     Project metaProject =
         Project(Project.baseMetaId, Project.baseMetaId, id: Project.baseMetaId);
-    Subject subject = Subject(Subject.baseMetaId, id: Subject.baseMetaId);
+    Subject subject =
+        Subject(Subject.baseMetaId, id: Subject.baseMetaId, x: -300, y: -300);
     subject.modelNodes = {
       typeModelNode.id: typeModelNode,
       imageModelNode.id: imageModelNode,
@@ -246,8 +260,7 @@ class ModelProjectController {
   }
 
   _registerAssetMetaProject(String filename) async {
-    String content =
-        await rootBundle.loadString('assets/model/$filename.json');
+    String content = await rootBundle.loadString('assets/model/$filename.json');
     Map<String, dynamic> json = JsonUtil.toJson(content);
     Project metaProject = Project.fromJson(json);
     if (!metaProject.meta) {
@@ -308,6 +321,7 @@ class ModelProjectController {
     }
 
     currentMetaId.value = metaId;
+    currentProject.value = project;
     this.project.value = project;
 
     if (project.subjects.isEmpty) {

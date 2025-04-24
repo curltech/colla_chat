@@ -17,7 +17,7 @@ class ImageNodeComponent extends PositionComponent
         ModelNodeComponent,
         TapCallbacks,
         DragCallbacks,
-        HasGameRef<ModelFlameGame> {
+        HasGameReference<ModelFlameGame> {
   static final TextPaint normalTextPaint = TextPaint(
     style: const TextStyle(
       color: Colors.black,

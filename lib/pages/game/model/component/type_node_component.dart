@@ -17,7 +17,7 @@ class TypeNodeComponent extends RectangleComponent
         ModelNodeComponent,
         TapCallbacks,
         DragCallbacks,
-        HasGameRef<ModelFlameGame> {
+        HasGameReference<ModelFlameGame> {
   static final fillPaint = Paint()
     ..color = myself.primary
     ..style = PaintingStyle.fill;
