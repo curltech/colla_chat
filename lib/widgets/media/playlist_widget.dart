@@ -176,7 +176,7 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
           allowMultiple: allowMultiple,
           type: fileType,
           allowedExtensions: allowedExtensions.toList());
-      if (xfiles.isNotEmpty) {
+      if (xfiles!=null && xfiles.isNotEmpty) {
         for (var xfile in xfiles) {
           PlatformMediaSource? mediaSource =
               await addMediaFile(filename: xfile.path);

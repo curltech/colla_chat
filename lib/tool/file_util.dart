@@ -149,7 +149,7 @@ class FileUtil {
   }
 
   /// 使用原生的选择文件对话框，适用于所有的平台，在ios平台上只能访问
-  static Future<List<XFile>> pickFiles({
+  static Future<List<XFile>?> pickFiles({
     String? dialogTitle,
     String? initialDirectory,
     FileType type = FileType.any,
@@ -162,7 +162,10 @@ class FileUtil {
     bool lockParentWindow = false,
   }) async {
     if (initialDirectory == null) {
-      Directory dir = await PathUtil.getApplicationDocumentsDirectory();
+      Directory? dir = await PathUtil.getApplicationDocumentsDirectory();
+      if (dir == null) {
+        return null;
+      }
       initialDirectory = dir.path;
     }
     List<XFile> xfiles = [];
@@ -324,22 +327,33 @@ class FileUtil {
     FilesystemPickerThemeBase? theme,
     List<FilesystemPickerContextAction> contextActions = const [],
   }) async {
-    List<FilesystemPickerShortcut> shortcuts = [
-      FilesystemPickerShortcut(
+    List<FilesystemPickerShortcut> shortcuts = [];
+    Directory? applicationDocumentsDirectory =
+        await PathUtil.getApplicationDocumentsDirectory();
+    if (applicationDocumentsDirectory != null) {
+      shortcuts.add(FilesystemPickerShortcut(
           name: 'Documents',
-          path: await PathUtil.getApplicationDocumentsDirectory(),
-          icon: Icons.snippet_folder),
-      FilesystemPickerShortcut(
-          name: 'Temporary', path: await PathUtil.getTemporaryDirectory()),
-      FilesystemPickerShortcut(
-          name: 'Library',
-          path: await PathUtil.getLibraryDirectory(),
-          icon: Icons.snippet_folder),
-      FilesystemPickerShortcut(
+          path: applicationDocumentsDirectory,
+          icon: Icons.snippet_folder));
+    }
+    Directory? temporaryDirectory = await PathUtil.getTemporaryDirectory();
+    if (temporaryDirectory != null) {
+      shortcuts.add(FilesystemPickerShortcut(
+          name: 'Temporary', path: temporaryDirectory));
+    }
+    Directory? libraryDirectory = await PathUtil.getLibraryDirectory();
+    if (libraryDirectory != null) {
+      shortcuts.add(FilesystemPickerShortcut(
+          name: 'Library', path: libraryDirectory, icon: Icons.snippet_folder));
+    }
+    Directory? applicationSupportDirectory =
+        await PathUtil.getApplicationSupportDirectory();
+    if (applicationSupportDirectory != null) {
+      shortcuts.add(FilesystemPickerShortcut(
           name: 'Support',
-          path: await PathUtil.getApplicationSupportDirectory(),
-          icon: Icons.snippet_folder),
-    ];
+          path: applicationSupportDirectory,
+          icon: Icons.snippet_folder));
+    }
     Directory? downloadsDirectory = await PathUtil.getDownloadsDirectory();
     if (downloadsDirectory != null) {
       shortcuts.add(
@@ -478,7 +492,7 @@ class FileUtil {
 
   ///所有平台，对移动平台选择图像或者媒体，返回List<AssetEntity>,
   ///对桌面平台，选择文件，返回List<XFile>,
-  static Future<List<dynamic>> pickAssetOrFiles({
+  static Future<List<dynamic>?> pickAssetOrFiles({
     BuildContext? context,
     String? dialogTitle,
     String? initialDirectory,
@@ -494,7 +508,7 @@ class FileUtil {
   }) async {
     context = context ?? appDataProvider.context!;
     if (platformParams.desktop) {
-      List<XFile> xfiles = await FileUtil.pickFiles(
+      List<XFile>? xfiles = await FileUtil.pickFiles(
           dialogTitle: dialogTitle,
           initialDirectory: initialDirectory,
           allowedExtensions: allowedExtensions,

@@ -48,24 +48,33 @@ class FileSystemController extends DataListController<FolderNode> {
       addDirectory(
           AppLocalizations.t('Application Directory'), applicationDirectory);
     }
-    io.Directory applicationDocumentsDirectory =
+    io.Directory? applicationDocumentsDirectory =
         await PathUtil.getApplicationDocumentsDirectory();
-    addDirectory(AppLocalizations.t('Application Documents Directory'),
-        applicationDocumentsDirectory);
-    io.Directory applicationSupportDirectory =
+    if (applicationDocumentsDirectory != null) {
+      addDirectory(AppLocalizations.t('Application Documents Directory'),
+          applicationDocumentsDirectory);
+    }
+    io.Directory? applicationSupportDirectory =
         await PathUtil.getApplicationSupportDirectory();
-    addDirectory(AppLocalizations.t('Application Support Directory'),
-        applicationSupportDirectory);
+    if (applicationSupportDirectory != null) {
+      addDirectory(AppLocalizations.t('Application Support Directory'),
+          applicationSupportDirectory);
+    }
 
     io.Directory? downloadsDirectory = await PathUtil.getDownloadsDirectory();
     if (downloadsDirectory != null) {
       addDirectory(
           AppLocalizations.t('Downloads Directory'), downloadsDirectory);
     }
-    io.Directory libraryDirectory = await PathUtil.getLibraryDirectory();
-    addDirectory(AppLocalizations.t('Library Directory'), libraryDirectory);
-    io.Directory temporaryDirectory = await PathUtil.getTemporaryDirectory();
-    addDirectory(AppLocalizations.t('Temporary Directory'), temporaryDirectory);
+    io.Directory? libraryDirectory = await PathUtil.getLibraryDirectory();
+    if (libraryDirectory != null) {
+      addDirectory(AppLocalizations.t('Library Directory'), libraryDirectory);
+    }
+    io.Directory? temporaryDirectory = await PathUtil.getTemporaryDirectory();
+    if (temporaryDirectory != null) {
+      addDirectory(
+          AppLocalizations.t('Temporary Directory'), temporaryDirectory);
+    }
     io.Directory? externalStorageDirectory =
         await PathUtil.getExternalStorageDirectory();
     if (externalStorageDirectory != null) {
