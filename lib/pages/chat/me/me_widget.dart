@@ -12,6 +12,7 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/system_status_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -29,6 +30,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   final LiveKitSfuParticipantWidget liveKitSfuParticipantWidget =
       LiveKitSfuParticipantWidget();
   final PlatformInfoWidget platformInfoWidget = const PlatformInfoWidget();
+  final SystemStatusWidget systemStatusWidget = SystemStatusWidget();
   final HelpInformationWidget helpInformationWidget =
       const HelpInformationWidget();
 
@@ -41,6 +43,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(liveKitSfuRoomWidget);
     indexWidgetProvider.define(liveKitSfuParticipantWidget);
     indexWidgetProvider.define(platformInfoWidget);
+    indexWidgetProvider.define(systemStatusWidget);
     indexWidgetProvider.define(helpInformationWidget);
   }
 
@@ -64,6 +67,8 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     ];
 
     mixins.add(platformInfoWidget);
+    mixins.add(systemStatusWidget);
+    
     if (developerSwitch) {
       mixins.addAll([
         localMediaStreamWidget,

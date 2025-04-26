@@ -323,7 +323,7 @@ class ImageUtil {
   ///压缩图片，适用于多个平台
   static compress({
     required String filename,
-    String? path,
+    required String path,
     CompressMode mode = CompressMode.LARGE2SMALL,
     int quality = 80,
     int step = 1,
@@ -333,7 +333,7 @@ class ImageUtil {
     CompressObject compressObject = CompressObject(
         imageFile: imageFile,
         //image
-        path: path,
+        targetPath: path,
         //compress to path
         quality: quality,
         //first compress quality, default 80

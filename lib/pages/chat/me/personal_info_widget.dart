@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class PersonalInfoWidget extends StatelessWidget with TileDataMixin {
-  ValueNotifier<List<TileData>> personalInfoTileData =
+  final ValueNotifier<List<TileData>> personalInfoTileData =
       ValueNotifier<List<TileData>>([]);
 
   final MyselfQrcodeWidget qrcodeWidget = MyselfQrcodeWidget();
@@ -35,7 +35,7 @@ class PersonalInfoWidget extends StatelessWidget with TileDataMixin {
   IconData get iconData => Icons.personal_injury_outlined;
 
   @override
-  String get title => 'Personal Information';
+  String get title => 'Personal information';
 
   
 

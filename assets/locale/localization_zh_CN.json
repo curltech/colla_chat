@@ -59,7 +59,7 @@
   "VideoPlayer": "视频播放器",
   "AudioPlayer": "音频播放器",
   "AudioRecorder": "录音器",
-  "Personal Information": "个人信息",
+  "Personal information": "个人信息",
   "Avatar": "头像",
   "PeerId": "身份码",
   "Qrcode": "二维码",
@@ -953,5 +953,10 @@
   "Update project name": "修改项目名",
   "Apps": "应用",
   "Mahjong 18m": "18m麻将",
-  "Help information": "帮助信息"
+  "Help information": "帮助信息",
+  "System status": "系统状态",
+  "CPU status": "系统状态",
+  "Battery status": "系统状态",
+  "DiskSpace status": "系统状态",
+  "Memory status": "系统状态"
 }
