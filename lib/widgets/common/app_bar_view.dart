@@ -73,7 +73,7 @@ class AppBarView extends StatelessWidget {
                 child: Icon(
                   size: 18,
                   Icons.info_outline_rounded,
-                  color: Colors.white,
+                  color: Colors.yellowAccent,
                 ),
               )
             ],
