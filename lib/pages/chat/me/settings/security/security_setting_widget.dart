@@ -204,11 +204,11 @@ class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
 
   ///从备份的peer的登录信息json文件恢复到数据库
   Future<void> _restorePeer(BuildContext context) async {
-    List<XFile> xfiles = await FileUtil.pickFiles(
+    List<XFile>? xfiles = await FileUtil.pickFiles(
         initialDirectory: platformParams.path,
         type: FileType.custom,
         allowedExtensions: ['json']);
-    if (xfiles.isNotEmpty) {
+    if (xfiles!=null && xfiles.isNotEmpty) {
       String backup = await xfiles.first.readAsString();
       await myselfPeerService.restore(backup);
       DialogUtil.info(
@@ -236,11 +236,11 @@ class SecuritySettingWidget extends StatelessWidget with TileDataMixin {
   Future<String?> _restoreAttachment(BuildContext context) async {
     String? peerId = myself.peerId;
     if (peerId != null) {
-      List<XFile> xfiles = await FileUtil.pickFiles(
+      List<XFile>? xfiles = await FileUtil.pickFiles(
           initialDirectory: platformParams.path,
           type: FileType.custom,
           allowedExtensions: ['tgz']);
-      if (xfiles.isNotEmpty) {
+      if (xfiles!=null && xfiles.isNotEmpty) {
         String? path =
             await messageAttachmentService.restore(peerId, xfiles.first.path);
         if (path != null) {

@@ -464,7 +464,10 @@ class ImageUtil {
       Uint8List? image,
       String extension = 'jpeg'}) async {
     Uint8List? avatar;
-    Directory dir = await PathUtil.getTemporaryDirectory();
+    Directory? dir = await PathUtil.getTemporaryDirectory();
+    if (dir == null) {
+      return null;
+    }
     if (image != null) {
       var path =
           await FileUtil.writeTempFileAsBytes(image, extension: extension);
@@ -506,10 +509,10 @@ class ImageUtil {
     context = context ?? appDataProvider.context!;
     Uint8List? avatar;
     if (platformParams.desktop) {
-      List<XFile> xfiles = await FileUtil.pickFiles(
+      List<XFile>? xfiles = await FileUtil.pickFiles(
           type: FileType.custom,
           allowedExtensions: ['png', 'jpg', 'jpeg', 'webp', 'gif']);
-      if (xfiles.isNotEmpty) {
+      if (xfiles!=null && xfiles.isNotEmpty) {
         avatar = await compressThumbnail(xfile: xfiles[0]);
       }
     } else if (platformParams.mobile) {

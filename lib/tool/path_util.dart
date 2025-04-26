@@ -4,6 +4,8 @@ import 'package:colla_chat/platform.dart';
 import 'package:path_provider/path_provider.dart' as path;
 import 'package:path/path.dart' as p;
 
+import 'package:colla_chat/plugin/talker_logger.dart';
+
 class PathUtil {
   ///获取本应用的数据存放路径
   static Future<Directory?> getApplicationDirectory() async {
@@ -11,54 +13,69 @@ class PathUtil {
     try {
       dir = await path.getApplicationDocumentsDirectory();
     } catch (e) {
-      print('getApplicationDocumentsDirectory err:$e');
+      print('getApplicationDocumentsDirectory failure:$e');
     }
     if (dir == null) {
       try {
         dir = await path.getApplicationSupportDirectory();
       } catch (e) {
-        print('getApplicationSupportDirectory err:$e');
+        print('getApplicationSupportDirectory failure:$e');
       }
     }
     if (dir == null && !platformParams.ios) {
       try {
         dir = await path.getExternalStorageDirectory();
       } catch (e) {
-        print('getExternalStorageDirectory err:$e');
+        print('getExternalStorageDirectory failure:$e');
       }
     }
     if (dir == null && !platformParams.android) {
       try {
         dir = await path.getLibraryDirectory();
       } catch (e) {
-        print('getLibraryDirectory err:$e');
+        print('getLibraryDirectory failure:$e');
       }
     }
     return dir;
   }
 
   /// 获取文档目录文件
-  static Future<Directory> getApplicationDocumentsDirectory() async {
-    final dir = await path.getApplicationDocumentsDirectory();
-
-    return dir;
+  static Future<Directory?> getApplicationDocumentsDirectory() async {
+    try {
+      return await path.getApplicationDocumentsDirectory();
+    } catch (e) {
+      logger.e('getApplicationDocumentsDirectory failure:$e');
+    }
+    return null;
   }
 
   /// 获取临时目录文件
-  static Future<Directory> getTemporaryDirectory() async {
-    final dir = await path.getTemporaryDirectory();
-    return dir;
+  static Future<Directory?> getTemporaryDirectory() async {
+    try {
+      return await path.getTemporaryDirectory();
+    } catch (e) {
+      logger.e('getTemporaryDirectory failure:$e');
+    }
+    return null;
   }
 
   /// 获取应用程序目录文件
-  static Future<Directory> getApplicationSupportDirectory() async {
-    final dir = await path.getApplicationSupportDirectory();
-    return dir;
+  static Future<Directory?> getApplicationSupportDirectory() async {
+    try {
+      return await path.getApplicationSupportDirectory();
+    } catch (e) {
+      logger.e('getApplicationSupportDirectory failure:$e');
+    }
+    return null;
   }
 
-  static Future<Directory> getLibraryDirectory() async {
-    final dir = await path.getLibraryDirectory();
-    return dir;
+  static Future<Directory?> getLibraryDirectory() async {
+    try {
+      return await path.getLibraryDirectory();
+    } catch (e) {
+      logger.e('getLibraryDirectory failure:$e');
+    }
+    return null;
   }
 
   static Future<Directory?> getExternalStorageDirectory() async {
@@ -70,8 +87,12 @@ class PathUtil {
   }
 
   static Future<Directory?> getDownloadsDirectory() async {
-    final dir = await path.getDownloadsDirectory();
-    return dir;
+    try {
+      return await path.getDownloadsDirectory();
+    } catch (e) {
+      logger.e('getLibraryDirectory failure:$e');
+    }
+    return null;
   }
 
   static Directory? createDir(String path) {

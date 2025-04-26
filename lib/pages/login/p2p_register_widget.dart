@@ -106,8 +106,8 @@ class P2pRegisterWidget extends StatelessWidget {
   Future<File?> _restore(Map<String, dynamic> values) async {
     String? backupFile;
     if (platformParams.desktop) {
-      List<XFile> xfiles = await FileUtil.pickFiles();
-      if (xfiles.isNotEmpty) {
+      List<XFile>? xfiles = await FileUtil.pickFiles();
+      if (xfiles!=null && xfiles.isNotEmpty) {
         backupFile = xfiles[0].path;
       }
     } else if (platformParams.mobile) {

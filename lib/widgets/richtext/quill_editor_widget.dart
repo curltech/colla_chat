@@ -148,8 +148,8 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
 
   ///桌面平台的文件选择对话框，返回选择的文件名
   Future<String?> _filePickImpl(BuildContext context) async {
-    final List<XFile> result = await FileUtil.pickFiles();
-    if (result.isEmpty) {
+    final List<XFile>? result = await FileUtil.pickFiles();
+    if (result==null || result.isEmpty) {
       return null;
     }
     final filename = result.first.path;
@@ -160,8 +160,8 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
   ///web平台选择图像文件
   Future<String?> _webImagePickImpl(
       Function(String) onImagePickCallback) async {
-    final List<XFile> result = await FileUtil.pickFiles();
-    if (result.isEmpty) {
+    final List<XFile>? result = await FileUtil.pickFiles();
+    if (result==null || result.isEmpty) {
       return null;
     }
     final filename = result.first.name;
@@ -173,8 +173,8 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
   ///web平台选择视频文件
   Future<String?> _webVideoPickImpl(
       Function(String) onVideoPickCallback) async {
-    final List<XFile> result = await FileUtil.pickFiles();
-    if (result.isEmpty) {
+    final List<XFile>? result = await FileUtil.pickFiles();
+    if (result==null || result.isEmpty) {
       return null;
     }
     final filename = result.first.name;
