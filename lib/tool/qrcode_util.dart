@@ -252,6 +252,10 @@ class QrcodeUtil {
                               return const Icon(Icons.camera_front);
                             case CameraFacing.back:
                               return const Icon(Icons.camera_rear);
+                            case mobile_scanner.CameraFacing.external:
+                              return const Icon(Icons.camera_outlined);
+                            case mobile_scanner.CameraFacing.unknown:
+                              return const Icon(Icons.camera_enhance_outlined);
                           }
                         },
                       ),

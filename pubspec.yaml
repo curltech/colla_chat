@@ -241,7 +241,7 @@ dependencies:
   talker: ^4.7.1
   talker_flutter: ^4.7.0
   cross_file: ^0.3.4+1
-  mobile_scanner: ^6.0.7 #^5.2.3
+  mobile_scanner: ^7.0.0-rc.2
   qr_flutter:
     git:
       url: https://github.com/theyakka/qr.flutter.git
@@ -258,7 +258,7 @@ dependencies:
       url: https://github.com/Sahad2701/ffmpeg_kit_flutter_full_gpl.git
       ref: flutter-upgrade/remove-v1-embedding
   photo_view: ^0.15.0 #图片显示
-  pro_image_editor: ^9.4.0
+  pro_image_editor: ^9.5.2
   flutter_sound: ^9.28.0
   audioplayers: ^6.4.0 #音频处理,所有平台
   audioplayers_platform_interface: ^7.1.0
@@ -272,9 +272,9 @@ dependencies:
   waveform_recorder: ^1.7.0
   # flutter_recorder: ^1.1.0
   flutter_cache_manager: ^3.4.1
-  fl_pip: ^3.2.1
-#  pip_mode: ^0.0.3
   pip: ^0.0.2
+  native_plugin:
+    path: ./packages/native_plugin
   flutter_in_app_pip: ^1.7.4
 #  native_video_player: ^3.0.0-dev.4
   flick_video_player: ^0.9.0 #video_player的封装
@@ -413,9 +413,9 @@ dependency_overrides:
   light_compressor: ^2.2.0
   collection: ^1.17.0
   path: ^1.8.3
-  pip_flutter: ^0.0.3
-  flutter_pip:
-    git: https://github.com/ahyangnb/flutter_pip.git
+  #  android_pip: ^2.0.1
+  #  flutter_pip:
+  #    git: https://github.com/ahyangnb/flutter_pip.git
   audio_video_progress_bar: ^2.0.1
   azlistview: ^2.0.0 #特殊列表滑动
   scrollable_positioned_list: ^0.3.8

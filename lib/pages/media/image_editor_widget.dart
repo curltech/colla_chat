@@ -10,6 +10,7 @@ import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pro_image_editor/core/enums/editor_mode.dart';
 import 'package:pro_image_editor/core/models/editor_callbacks/pro_image_editor_callbacks.dart';
 import 'package:pro_image_editor/features/main_editor/main_editor.dart';
 
@@ -49,7 +50,7 @@ class ImageEditorWidget extends StatelessWidget with TileDataMixin {
                   DialogUtil.info(content: 'Save file:$name successfully');
                 }
               },
-              onCloseEditor: () {
+              onCloseEditor: (EditorMode mode) {
                 indexWidgetProvider.pop(context: context);
               },
             ));
