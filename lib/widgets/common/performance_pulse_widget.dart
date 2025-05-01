@@ -54,6 +54,6 @@ class PerformancePulseWidget extends StatelessWidget with TileDataMixin {
         title: title,
         helpPath: routeName,
         withLeading: withLeading,
-        child: PerformanceDashboard());
+        child: PerformanceDashboard(theme:DashboardTheme.light(),));
   }
 }

@@ -955,8 +955,8 @@
   "Mahjong 18m": "18m麻将",
   "Help information": "帮助信息",
   "System status": "系统状态",
-  "CPU status": "系统状态",
-  "Battery status": "系统状态",
-  "DiskSpace status": "系统状态",
-  "Memory status": "系统状态"
+  "CPU status": "CPU状态",
+  "Battery status": "电池状态",
+  "DiskSpace status": "磁盘状态",
+  "Memory status": "内存状态"
 }
