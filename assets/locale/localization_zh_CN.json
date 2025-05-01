@@ -958,5 +958,6 @@
   "CPU status": "CPU状态",
   "Battery status": "电池状态",
   "DiskSpace status": "磁盘状态",
-  "Memory status": "内存状态"
+  "Memory status": "内存状态",
+  "Performance pulse": "性能监控"
 }
