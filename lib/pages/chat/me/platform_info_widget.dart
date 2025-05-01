@@ -20,7 +20,7 @@ class PlatformInfoWidget extends StatelessWidget with TileDataMixin {
   IconData get iconData => Icons.personal_video;
 
   @override
-  String get title => 'Platform Information';
+  String get title => 'Platform information';
 
   
 

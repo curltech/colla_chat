@@ -2,7 +2,7 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:flutter/material.dart';
-import 'package:quill_html_editor_v2/quill_html_editor_v2.dart';
+import 'package:kat_html_editor/kat_html_editor.dart';
 
 ///quill_html_editor一样的实现，用于移动和web
 ///缺省的最小高度200

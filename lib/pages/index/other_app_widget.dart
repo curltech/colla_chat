@@ -9,6 +9,7 @@ import 'package:colla_chat/pages/datastore/filesystem/file_widget.dart';
 import 'package:colla_chat/pages/game/game_widget.dart';
 import 'package:colla_chat/pages/mail/mail_address_widget.dart';
 import 'package:colla_chat/pages/media/media_widget.dart';
+import 'package:colla_chat/pages/pip/pip_widget.dart';
 import 'package:colla_chat/pages/poem/poem_widget.dart';
 import 'package:colla_chat/pages/stock/stock_widget.dart';
 import 'package:colla_chat/platform.dart';
@@ -34,6 +35,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   final SherpaInstallWidget sherpaInstallWidget = SherpaInstallWidget();
   final MailAddressWidget mailAddressWidget = MailAddressWidget();
   final StockMainWidget stockMainWidget = StockMainWidget();
+  final PipMainWidget pipMainWidget = PipMainWidget();
   final GameMainWidget gameMainWidget = GameMainWidget();
   final PoemWidget poemWidget = PoemWidget();
   final DataSourceWidget dataSourceWidget = DataSourceWidget();
@@ -43,6 +45,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   late final Map<String, TileDataMixin> widgets = {
     poemWidget.routeName: poemWidget,
     stockMainWidget.routeName: stockMainWidget,
+    pipMainWidget.routeName: pipMainWidget,
     gameMainWidget.routeName: gameMainWidget,
     mailAddressWidget.routeName: mailAddressWidget,
     mediaWidget.routeName: mediaWidget,
@@ -76,8 +79,6 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Apps';
 
-  
-
   late final RxString name = routeName.obs;
 
   Widget _buildOtherAppTileData(BuildContext context) {
@@ -88,6 +89,13 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
         helpPath: poemWidget.routeName,
         onTap: (int index, String title, {String? subtitle}) {
           name.value = poemWidget.routeName;
+        }));
+    otherAppTileData.add(TileData(
+        title: AppLocalizations.t(pipMainWidget.title),
+        prefix: pipMainWidget.iconData,
+        helpPath: pipMainWidget.routeName,
+        onTap: (int index, String title, {String? subtitle}) {
+          name.value = pipMainWidget.routeName;
         }));
     final bool emailSwitch = myself.peerProfile.emailSwitch;
     if (emailSwitch) {

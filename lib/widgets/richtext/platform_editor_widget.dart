@@ -9,7 +9,7 @@ import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:html_editor_enhanced/html_editor.dart';
-import 'package:quill_html_editor_v2/quill_html_editor_v2.dart';
+import 'package:kat_html_editor/kat_html_editor.dart';
 
 class PlatformEditorController with ChangeNotifier {
   dynamic originalController;
