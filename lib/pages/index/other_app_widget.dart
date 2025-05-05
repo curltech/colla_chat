@@ -13,6 +13,7 @@ import 'package:colla_chat/pages/pip/pip_widget.dart';
 import 'package:colla_chat/pages/poem/poem_widget.dart';
 import 'package:colla_chat/pages/stock/stock_widget.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/overlay/flutter_floating_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/sherpa/sherpa_install_widget.dart';
@@ -30,6 +31,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   final OpenVpnWidget openVpnWidget = const OpenVpnWidget();
   final MobileSystemAlertWindowWidget mobileSystemAlertWindowWidget =
       MobileSystemAlertWindowWidget();
+  final FlutterFloatingWidget flutterFloatingWidget = FlutterFloatingWidget();
   final PlatformMapLauncherWidget platformMapLauncherWidget =
       PlatformMapLauncherWidget();
   final SherpaInstallWidget sherpaInstallWidget = SherpaInstallWidget();
@@ -52,6 +54,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     webViewWidget.routeName: webViewWidget,
     openVpnWidget.routeName: openVpnWidget,
     mobileSystemAlertWindowWidget.routeName: mobileSystemAlertWindowWidget,
+    flutterFloatingWidget.routeName: flutterFloatingWidget,
     platformMapLauncherWidget.routeName: platformMapLauncherWidget,
     sherpaInstallWidget.routeName: sherpaInstallWidget,
     dataSourceWidget.routeName: dataSourceWidget,
@@ -62,6 +65,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(webViewWidget);
     indexWidgetProvider.define(openVpnWidget);
     indexWidgetProvider.define(mobileSystemAlertWindowWidget);
+    indexWidgetProvider.define(flutterFloatingWidget);
     indexWidgetProvider.define(platformMapLauncherWidget);
     indexWidgetProvider.define(sherpaInstallWidget);
     indexWidgetProvider.define(fileWidget);
@@ -156,7 +160,13 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
         onTap: (int index, String title, {String? subtitle}) {
           indexWidgetProvider.push(sherpaInstallWidget.routeName);
         }));
-
+    otherAppTileData.add(TileData(
+        title: AppLocalizations.t(flutterFloatingWidget.title),
+        prefix: flutterFloatingWidget.iconData,
+        helpPath: flutterFloatingWidget.routeName,
+        onTap: (int index, String title, {String? subtitle}) {
+          indexWidgetProvider.push(flutterFloatingWidget.routeName);
+        }));
     if (platformParams.mobile) {
       if (myself.peerProfile.vpnSwitch) {
         otherAppTileData.add(TileData(
@@ -167,20 +177,16 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
               indexWidgetProvider.push(openVpnWidget.routeName);
             }));
       }
-      if (platformParams.android) {
-        if (myself.peerProfile.developerSwitch) {
-          otherAppTileData.add(TileData(
-              title: AppLocalizations.t(mobileSystemAlertWindowWidget.title),
-              prefix: mobileSystemAlertWindowWidget.iconData,
-              helpPath: mobileSystemAlertWindowWidget.routeName,
-              onTap: (int index, String title, {String? subtitle}) {
-                indexWidgetProvider
-                    .push(mobileSystemAlertWindowWidget.routeName);
-              }));
-        }
+      if (myself.peerProfile.developerSwitch) {
+        otherAppTileData.add(TileData(
+            title: AppLocalizations.t(mobileSystemAlertWindowWidget.title),
+            prefix: mobileSystemAlertWindowWidget.iconData,
+            helpPath: mobileSystemAlertWindowWidget.routeName,
+            onTap: (int index, String title, {String? subtitle}) {
+              indexWidgetProvider.push(mobileSystemAlertWindowWidget.routeName);
+            }));
       }
     }
-
     otherAppTileData.add(TileData(
         title: AppLocalizations.t(dataSourceWidget.title),
         prefix: dataSourceWidget.iconData,
