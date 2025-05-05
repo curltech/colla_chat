@@ -3,7 +3,7 @@ import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-/// 可拖拽的overlay浮动框
+/// 自己编写的可拖拽的overlay浮动框，用于视频会议的悬浮按钮
 class DragOverlay {
   OverlayEntry? overlayEntry;
   final double top;

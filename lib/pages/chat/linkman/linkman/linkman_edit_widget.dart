@@ -13,12 +13,12 @@ import 'package:colla_chat/tool/clipboard_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/share_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:share_plus/share_plus.dart';
 
 final ValueNotifier<Linkman?> linkmanNotifier = ValueNotifier<Linkman?>(null);
 
@@ -40,8 +40,6 @@ class LinkmanEditWidget extends StatefulWidget with TileDataMixin {
 
   @override
   String get title => 'Linkman edit';
-
-  
 }
 
 class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
@@ -225,8 +223,8 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     if (peerClient == null) {
       return;
     }
-    Share.share(
-      JsonUtil.toJsonString(peerClient),
+    ShareUtil.share(
+      text: JsonUtil.toJsonString(peerClient),
       subject: peerClient.name,
       sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
     );

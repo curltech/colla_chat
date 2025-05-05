@@ -1,5 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/me/android_system_alert_window_widget.dart';
+import 'package:colla_chat/pages/chat/me/mobile_system_alert_window_widget.dart';
 import 'package:colla_chat/pages/chat/me/openvpn_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_map_launcher_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_webview_widget.dart';
@@ -28,8 +28,8 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   final MediaWidget mediaWidget = MediaWidget();
   final PlatformWebViewWidget webViewWidget = PlatformWebViewWidget();
   final OpenVpnWidget openVpnWidget = const OpenVpnWidget();
-  final SystemAlertWindowWidget systemAlertWindowWidget =
-      const SystemAlertWindowWidget();
+  final MobileSystemAlertWindowWidget mobileSystemAlertWindowWidget =
+      MobileSystemAlertWindowWidget();
   final PlatformMapLauncherWidget platformMapLauncherWidget =
       PlatformMapLauncherWidget();
   final SherpaInstallWidget sherpaInstallWidget = SherpaInstallWidget();
@@ -51,7 +51,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     mediaWidget.routeName: mediaWidget,
     webViewWidget.routeName: webViewWidget,
     openVpnWidget.routeName: openVpnWidget,
-    systemAlertWindowWidget.routeName: systemAlertWindowWidget,
+    mobileSystemAlertWindowWidget.routeName: mobileSystemAlertWindowWidget,
     platformMapLauncherWidget.routeName: platformMapLauncherWidget,
     sherpaInstallWidget.routeName: sherpaInstallWidget,
     dataSourceWidget.routeName: dataSourceWidget,
@@ -61,7 +61,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   OtherAppWidget({super.key}) {
     indexWidgetProvider.define(webViewWidget);
     indexWidgetProvider.define(openVpnWidget);
-    indexWidgetProvider.define(systemAlertWindowWidget);
+    indexWidgetProvider.define(mobileSystemAlertWindowWidget);
     indexWidgetProvider.define(platformMapLauncherWidget);
     indexWidgetProvider.define(sherpaInstallWidget);
     indexWidgetProvider.define(fileWidget);
@@ -170,11 +170,12 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
       if (platformParams.android) {
         if (myself.peerProfile.developerSwitch) {
           otherAppTileData.add(TileData(
-              title: AppLocalizations.t(systemAlertWindowWidget.title),
-              prefix: systemAlertWindowWidget.iconData,
-              helpPath: systemAlertWindowWidget.routeName,
+              title: AppLocalizations.t(mobileSystemAlertWindowWidget.title),
+              prefix: mobileSystemAlertWindowWidget.iconData,
+              helpPath: mobileSystemAlertWindowWidget.routeName,
               onTap: (int index, String title, {String? subtitle}) {
-                indexWidgetProvider.push(systemAlertWindowWidget.routeName);
+                indexWidgetProvider
+                    .push(mobileSystemAlertWindowWidget.routeName);
               }));
         }
       }

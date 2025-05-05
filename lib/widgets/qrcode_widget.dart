@@ -7,11 +7,12 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/qrcode_util.dart';
+import 'package:colla_chat/tool/share_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
+import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'package:screenshot/screenshot.dart';
-import 'package:share_plus/share_plus.dart';
 
 class QrcodeWidget extends StatefulWidget {
   final String content;
@@ -105,8 +106,8 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
 
   Future<void> _share(String filename) async {
     final box = context.findRenderObject() as RenderBox?;
-    Share.shareXFiles(
-      [XFile(filename)],
+    ShareUtil.share(
+      files: [XFile(filename)],
       sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
     );
   }

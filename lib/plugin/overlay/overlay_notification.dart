@@ -52,12 +52,11 @@ enum StackedType {
   same
 }
 
-/// 平台定制的overlay浮动框
-// ignore: must_be_immutable
+/// 自己编写的平台定制的overlay浮动框，用于消息通知
 class OverlayNotification extends StatefulWidget {
   static final Map<String, OverlayNotification> _platformOverlays = {};
 
-  late Widget? child;
+  late final Widget? child;
   final double top;
   final bool isDraggable;
 
@@ -136,11 +135,11 @@ class OverlayNotification extends StatefulWidget {
   final StackedOptions? stackedOptions;
 
   final NotificationType notificationType;
-  OverlayEntry? overlayEntry;
-  String? id;
-  late Timer _closeTimer;
-  late Animation<Offset> _offsetAnimation;
-  late AnimationController _slideController;
+  late final OverlayEntry? overlayEntry;
+  late final String? id;
+  late final Timer _closeTimer;
+  late final Animation<Offset> _offsetAnimation;
+  late final AnimationController _slideController;
 
   OverlayNotification(
       {super.key,
@@ -576,17 +575,6 @@ class OverlayNotificationState extends State<OverlayNotification>
       case AnimationType.fromBottom:
         widget._offsetAnimation = Tween<Offset>(
           begin: const Offset(0, 4),
-          end: const Offset(0, 0),
-        ).animate(
-          CurvedAnimation(
-            parent: widget._slideController,
-            curve: widget.animationCurve,
-          ),
-        );
-        break;
-      default:
-        widget._offsetAnimation = Tween<Offset>(
-          begin: const Offset(-2, 0),
           end: const Offset(0, 0),
         ).animate(
           CurvedAnimation(

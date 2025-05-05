@@ -7,8 +7,7 @@ import 'package:colla_chat/pages/pip/background_pip_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/notification/firebase_messaging_service.dart';
 import 'package:colla_chat/plugin/notification/local_notifications_service.dart';
-import 'package:colla_chat/plugin/overlay/android_overlay_window_util.dart';
-import 'package:colla_chat/plugin/overlay/chat_message_overlay.dart';
+import 'package:colla_chat/plugin/overlay/android_system_overlay.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -59,7 +58,7 @@ void overlayMain() {
     runApp(
       const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: ChatMessageOverlay(),
+        home: AndroidSystemOverlay(),
       ),
     );
   }

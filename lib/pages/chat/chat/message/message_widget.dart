@@ -40,6 +40,7 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/pdf_util.dart';
+import 'package:colla_chat/tool/share_util.dart';
 import 'package:colla_chat/tool/sherpa/sherpa_speech_to_text.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -47,9 +48,9 @@ import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
+import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
-import 'package:share_plus/share_plus.dart';
 
 ///每种消息的显示组件
 class MessageWidget {
@@ -430,8 +431,8 @@ class MessageWidget {
     if (subMessageType == ChatMessageSubType.chat.name) {
       String contentType = chatMessage.contentType!;
       if (contentType == ChatMessageContentType.text.name) {
-        Share.share(
-          chatMessage.content!,
+        ShareUtil.share(
+          text: chatMessage.content!,
           subject: chatMessage.contentType,
           sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
         );
@@ -445,8 +446,8 @@ class MessageWidget {
         String? filename = await messageAttachmentService.getDecryptFilename(
             chatMessage.messageId!, chatMessage.title);
         if (filename != null) {
-          Share.shareXFiles(
-            [XFile(filename)],
+          ShareUtil.share(
+            files: [XFile(filename)],
             text: chatMessage.content,
             subject: chatMessage.contentType,
             sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
