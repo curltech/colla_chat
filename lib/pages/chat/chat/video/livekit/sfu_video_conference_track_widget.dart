@@ -155,7 +155,7 @@ class SfuVideoConferenceTrackWidget extends StatelessWidget with TileDataMixin {
                 trackPublication,
             Widget? child) {
           if (trackPublication == null) {
-            return nil;
+            return nilBox;
           }
           List<Widget> children = [];
           children.add(CommonAutoSizeText(

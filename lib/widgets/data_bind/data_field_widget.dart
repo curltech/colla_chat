@@ -359,7 +359,7 @@ class _DataFieldWidgetState extends State<DataFieldWidget> {
     return Container(
         padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 14.0),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          _buildIcon() ?? nil,
+          _buildIcon() ?? nilBox,
           const SizedBox(
             width: 10.0,
           ),

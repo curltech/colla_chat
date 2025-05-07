@@ -59,7 +59,7 @@ class MediaFileWidgetState extends State<MediaFileWidget> {
       );
     }
 
-    return nil;
+    return nilBox;
   }
 
   /// 图片显示区
@@ -106,7 +106,7 @@ class MediaFileWidgetState extends State<MediaFileWidget> {
         ),
       );
     } else {
-      return nil;
+      return nilBox;
     }
   }
 

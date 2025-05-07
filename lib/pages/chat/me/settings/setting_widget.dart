@@ -78,7 +78,7 @@ class SettingWidget extends StatelessWidget with TileDataMixin {
           });
       return p2pLoginWidget;
     }
-    return nil;
+    return nilBox;
   }
 
   @override

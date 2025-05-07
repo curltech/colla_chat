@@ -168,7 +168,7 @@ class PlatformWebView extends StatelessWidget {
               );
             });
       } else {
-        platformWebView = nil;
+        platformWebView = nilBox;
       }
     } else {
       if (platformParams.windows ||

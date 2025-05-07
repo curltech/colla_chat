@@ -121,7 +121,7 @@ class _DataDropdownButtonState extends State<DataDropdownButton> {
         child: Row(children: [
           DropdownButton<String>(
             dropdownColor: Colors.grey.withOpacity(0.7),
-            underline: nil,
+            underline: nilBox,
             elevation: 0,
             value: selected,
             items: menuItems,

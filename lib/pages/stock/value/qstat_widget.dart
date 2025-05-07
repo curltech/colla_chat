@@ -335,7 +335,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
           inputType: InputType.custom,
           width: 20,
           buildSuffix: (int index, dynamic data) {
-            return nil;
+            return nilBox;
           }),
       PlatformDataColumn(
         label: '股票代码',

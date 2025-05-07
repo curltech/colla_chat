@@ -2,16 +2,11 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
-
-class AppBarPopupMenu {
-  Widget? icon;
-  void Function()? onPressed;
-  String? title;
-
-  AppBarPopupMenu({this.title, this.icon, this.onPressed});
-}
 
 ///工作区的顶部栏AppBar，定义了前导组件，比如回退按钮
 ///定义了尾部组件和下拉按钮
@@ -25,9 +20,8 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final Function? leadingCallBack; //回退按钮的回调
   final Widget? title;
   final bool centerTitle; //标题是否居中
-  final Widget? rightWidget;
+  final List<ActionData>? actions;
   final List<Widget>? rightWidgets; //右边的排列组件（按钮）
-  final List<AppBarPopupMenu>? rightPopupMenus; //右边的下拉菜单组件
   final PreferredSizeWidget? bottom;
   final bool isAppBar;
 
@@ -39,9 +33,8 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       this.elevation,
       this.leadingWidget,
       this.leadingCallBack,
-      this.rightWidget,
+      this.actions,
       this.rightWidgets,
-      this.rightPopupMenus,
       this.bottom,
       this.withLeading = false,
       this.title = const CommonAutoSizeText(''),
@@ -61,17 +54,9 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
     var actions = <Widget>[];
 
     ///首先加上右边的排列组件
-    if (rightWidget != null) {
-      actions.add(rightWidget!);
-    }
+
     if (rightWidgets != null && rightWidgets!.isNotEmpty) {
       actions.addAll(rightWidgets!);
-    }
-
-    ///然后加上右边的下拉组件
-    var action = _buildPopMenuButton(context);
-    if (action != null) {
-      actions.add(action);
     }
 
     Widget? leading = leadingWidget;
@@ -100,12 +85,19 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
 
   Widget _buildTitleBar(BuildContext context) {
     List<Widget> children = [];
-    var actions = <Widget>[const Spacer()];
-    if (rightWidget != null) {
-      actions.add(rightWidget!);
-    }
+    var btns = <Widget>[const Spacer()];
     if (rightWidgets != null && rightWidgets!.isNotEmpty) {
-      actions.addAll(rightWidgets!);
+      btns.addAll(rightWidgets!);
+    }
+    if (actions != null && actions!.isNotEmpty) {
+      btns.add(IconButton(
+          onPressed: () {
+            _showActionCard(context);
+          },
+          icon: Icon(
+            Icons.more_horiz,
+            color: foregroundColor,
+          )));
     }
     Widget? leading = leadingWidget;
 
@@ -116,17 +108,17 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
     if (leading != null) {
       if (centerTitle || title == null) {
         children.add(Row(
-          children: [leading, ...actions],
+          children: [leading, ...btns],
         ));
       } else {
         children.add(Row(
-          children: [leading, title!, ...actions],
+          children: [leading, title!, ...btns],
         ));
       }
     } else {
       if (!centerTitle && title != null) {
         children.add(Row(
-          children: [title!, ...actions],
+          children: [title!, ...btns],
         ));
       }
     }
@@ -157,58 +149,11 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
     return leadingButton;
   }
 
-  PopupMenuButton<int>? _buildPopMenuButton(BuildContext context) {
-    PopupMenuButton<int>? popMenuButton;
-
-    ///左右边的下拉按钮
-    if (rightPopupMenus != null && rightPopupMenus!.isNotEmpty) {
-      List<PopupMenuItem<int>> items = [];
-      List<void Function()?> onPressed = [];
-      int i = 0;
-      for (var rightAction in rightPopupMenus!) {
-        PopupMenuItem<int> item;
-        Widget? iconWidget = rightAction.icon;
-        String text = rightAction.title ?? '';
-        Widget textWidget = CommonAutoSizeText(AppLocalizations.t(text));
-        List<Widget> rows = [];
-        if (iconWidget != null) {
-          rows.add(iconWidget);
-        }
-        rows.add(const SizedBox(
-          width: 25,
-        ));
-        rows.add(textWidget);
-        item = PopupMenuItem<int>(
-            value: i,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: rows,
-            ));
-        onPressed.add(rightAction.onPressed);
-        items.add(item);
-        ++i;
-      }
-      popMenuButton = PopupMenuButton<int>(
-        color: Colors.white,
-        itemBuilder: (BuildContext context) {
-          return items;
-        },
-        icon: Icon(
-          Icons.more_horiz,
-          color: foregroundColor,
-        ),
-        //调用下拉按钮的回调函数，参数为按钮序号
-        onSelected: (int index) async {
-          var onPress = onPressed[index];
-          if (onPress != null) {
-            onPress();
-          }
-        },
-      );
+  Future<dynamic> _showActionCard(BuildContext context) async {
+    if (actions == null || actions!.isEmpty) {
+      return;
     }
-
-    return popMenuButton;
+    return MenuUtil.popModalBottomSheet(context, actions: actions!);
   }
 
   @override

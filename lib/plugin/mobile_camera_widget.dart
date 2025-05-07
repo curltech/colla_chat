@@ -145,7 +145,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
     return Column(
       children: <Widget>[
         Expanded(
-          child: nil,
+          child: nilBox,
         ),
         Container(
             color: Colors.grey.withOpacity(AppOpacity.lgOpacity),
@@ -173,7 +173,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
     if (cameraController != null && cameraController.value.isInitialized) {
       Size? previewSize = cameraController.value.previewSize;
       var resolutionPreset = cameraController.resolutionPreset;
-      Widget previewText = nil;
+      Widget previewText = nilBox;
       if (previewSize != null) {
         previewText = Align(
             alignment: Alignment.topRight,
@@ -202,7 +202,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
       return previewText;
     }
 
-    return nil;
+    return nilBox;
   }
 
   /// 预览窗口
@@ -661,7 +661,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
               return iconButton;
             }
           }
-          return nil;
+          return nilBox;
         });
 
     return toggleWidget;

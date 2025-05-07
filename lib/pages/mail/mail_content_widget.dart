@@ -140,7 +140,7 @@ class MailContentWidget extends StatelessWidget with TileDataMixin {
             ))
       ]));
     }
-    Widget webView = nil;
+    Widget webView = nilBox;
     try {
       webView = Center(
           child: PlatformWebView(

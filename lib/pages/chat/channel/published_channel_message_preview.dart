@@ -60,7 +60,7 @@ class _PublishedChannelMessagePreviewState
   Widget build(BuildContext context) {
     var chatMessage = myChannelChatMessageController.current;
     if (chatMessage == null) {
-      return nil;
+      return nilBox;
     }
 
     return AppBarView(

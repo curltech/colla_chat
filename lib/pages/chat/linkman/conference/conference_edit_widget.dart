@@ -237,7 +237,7 @@ class ConferenceEditWidget extends StatelessWidget with TileDataMixin {
   Widget _buildConferenceOwnerWidget(BuildContext context) {
     Conference? current = conferenceNotifier.value;
     if (current == null) {
-      return nil;
+      return nilBox;
     }
     var selector = Container(
         padding: const EdgeInsets.symmetric(horizontal: 0.0),

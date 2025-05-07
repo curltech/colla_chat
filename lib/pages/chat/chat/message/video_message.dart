@@ -51,7 +51,6 @@ class _VideoMessageState extends State<VideoMessage> {
     videoMessagePlayerController.autoplay = true;
     videoMessagePlayer = PlatformMediaPlayer(
       key: UniqueKey(),
-      showPlaylist: false,
       mediaPlayerController: videoMessagePlayerController,
     );
     super.initState();
@@ -89,7 +88,7 @@ class _VideoMessageState extends State<VideoMessage> {
                 .addMediaFiles(filenames: [filename]);
             return videoMessagePlayer;
           }
-          return nil;
+          return nilBox;
         });
     return videoPlayer;
   }

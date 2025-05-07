@@ -222,7 +222,7 @@ class DialogUtil {
             style: selected ? style : null,
           ),
           const Spacer(),
-          selected ? const Icon(Icons.check) : nil
+          selected ? const Icon(Icons.check) : nilBox
         ]));
   }
 

@@ -653,7 +653,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     return NeumorphicToggle(
       key: key,
       style: const NeumorphicToggleStyle(),
-      thumb: nil,
+      thumb: nilBox,
       children: const [],
     );
   }

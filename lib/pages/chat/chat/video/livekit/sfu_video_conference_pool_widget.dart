@@ -129,7 +129,7 @@ class SfuVideoConferencePoolWidget extends StatelessWidget with TileDataMixin {
     LiveKitConferenceClient? liveKitConferenceClient =
         liveKitConferenceClientPool.conferenceClient;
     if (liveKitConferenceClient == null) {
-      return nil;
+      return nilBox;
     }
     List<Widget> children = [];
     LiveKitRoomClient roomClient = liveKitConferenceClient.roomClient;

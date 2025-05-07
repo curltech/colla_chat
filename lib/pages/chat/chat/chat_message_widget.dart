@@ -186,7 +186,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
               ))
         ]);
       }
-      return nil;
+      return nilBox;
     });
     return Column(
         children: [securityTipWidget, Expanded(child: chatMessageWidget)]);

@@ -32,7 +32,7 @@ class DragOverlay {
         _createDragTarget(context, detail.offset);
       },
       //当拖拽的时候就展示空
-      childWhenDragging: nil,
+      childWhenDragging: nilBox,
       ignoringFeedbackSemantics: false,
       child: child,
     );

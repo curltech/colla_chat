@@ -7,8 +7,7 @@ import 'package:flutter/material.dart';
 
 ///平台标准的video_player的实现，缺省采用MediaKit
 class PlatformVideoPlayerWidget extends StatelessWidget with TileDataMixin {
-  final PlaylistController playlistController = PlaylistController();
-  late final PlatformVideoPlayer platformVideoPlayer;
+  late final PlatformVideoPlayer platformVideoPlayer = PlatformVideoPlayer();
 
   @override
   String get routeName => 'video_player';
@@ -19,28 +18,24 @@ class PlatformVideoPlayerWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'VideoPlayer';
 
-  
-
   @override
   bool get withLeading => true;
 
   PlatformVideoPlayerWidget({
     super.key,
-  }) {
-    platformVideoPlayer =
-        PlatformVideoPlayer(playlistController: playlistController);
-  }
+  });
 
   List<Widget>? _buildRightWidgets() {
     List<Widget> children = [];
     Widget btn = ValueListenableBuilder(
-        valueListenable: platformVideoPlayer.platformMediaPlayer.index,
+        valueListenable: platformVideoPlayer.index,
         builder: (BuildContext context, int index, Widget? child) {
           if (index == 0) {
             return IconButton(
               tooltip: AppLocalizations.t('Video player'),
               onPressed: () async {
                 await platformVideoPlayer.swiperController.move(1);
+                platformVideoPlayer.play();
               },
               icon: const Icon(Icons.video_call),
             );
@@ -64,8 +59,7 @@ class PlatformVideoPlayerWidget extends StatelessWidget with TileDataMixin {
       IconButton(
         tooltip: AppLocalizations.t('Close'),
         onPressed: () async {
-          platformVideoPlayer.mediaPlayerController.close();
-          playlistController.clear();
+          platformVideoPlayer.playlistController.clear();
         },
         icon: const Icon(Icons.close),
       ),

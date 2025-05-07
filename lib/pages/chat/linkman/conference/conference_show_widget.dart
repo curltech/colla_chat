@@ -148,7 +148,7 @@ class ConferenceShowWidget extends StatelessWidget with TileDataMixin {
               children: chips,
             );
           } else {
-            return nil;
+            return nilBox;
           }
         });
   }

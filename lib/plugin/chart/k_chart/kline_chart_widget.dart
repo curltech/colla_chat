@@ -99,7 +99,7 @@ class KlineChartWidget extends StatelessWidget {
     return Obx(
       () {
         if (candles.value.isEmpty) {
-          return nil;
+          return nilBox;
         }
         return Column(children: [
           InteractiveChart(

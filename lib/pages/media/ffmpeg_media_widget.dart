@@ -448,7 +448,7 @@ class FFMpegMediaWidget extends StatelessWidget with TileDataMixin {
                     shape: const ContinuousRectangleBorder(),
                     child: Stack(
                       children: [
-                        tile.prefix ?? nil,
+                        tile.prefix ?? nilBox,
                         Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,

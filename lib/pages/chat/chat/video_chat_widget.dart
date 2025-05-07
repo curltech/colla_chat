@@ -173,7 +173,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
               tooltip: AppLocalizations.t('Local'),
             );
           }
-          return nil;
+          return nilBox;
         },
       );
       rightWidgets.add(local);
@@ -189,7 +189,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
               tooltip: AppLocalizations.t('Remote'),
             );
           }
-          return nil;
+          return nilBox;
         },
       );
       rightWidgets.add(remote);

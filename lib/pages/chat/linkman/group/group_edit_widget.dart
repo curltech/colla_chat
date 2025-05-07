@@ -179,7 +179,7 @@ class GroupEditWidget extends StatelessWidget with TileDataMixin {
   Widget _buildGroupOwnerWidget(BuildContext context) {
     Group? current = groupNotifier.value;
     if (current == null) {
-      return nil;
+      return nilBox;
     }
     var selector = Container(
         padding: const EdgeInsets.symmetric(horizontal: 0.0),
@@ -221,7 +221,7 @@ class GroupEditWidget extends StatelessWidget with TileDataMixin {
     var avatarWidget = Obx(() {
       Group? current = groupNotifier.value;
       if (current == null) {
-        return nil;
+        return nilBox;
       }
       var avatar = current.avatar;
       if (avatar != null && avatar.isNotEmpty) {

@@ -180,7 +180,7 @@ class VideoEditorWidget extends StatelessWidget with TileDataMixin {
     return Obx(() {
       String? filename = imageFileController.current;
       if (filename == null) {
-        return nil;
+        return nilBox;
       }
       return Column(children: [
         Expanded(

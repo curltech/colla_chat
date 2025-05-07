@@ -42,7 +42,6 @@ class _AudioMessageState extends State<AudioMessage> {
     });
     audioMessagePlayer = PlatformMediaPlayer(
       key: UniqueKey(),
-      showPlaylist: false,
       mediaPlayerController: audioMessagePlayerController,
     );
     super.initState();
@@ -63,7 +62,7 @@ class _AudioMessageState extends State<AudioMessage> {
 
             return audioMessagePlayer;
           }
-          return nil;
+          return nilBox;
         });
     if (widget.fullScreen) {
       return audioPlayer;

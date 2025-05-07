@@ -101,6 +101,36 @@ class MenuUtil {
     }
   }
 
+  static Future<dynamic> popModalBottomSheet(BuildContext context,
+      {double? width,
+      double? height,
+      double iconSize = 32,
+      required List<ActionData> actions,
+      Function(BuildContext context, int index, String label, {String? value})?
+          onPressed}) async {
+    return await DialogUtil.popModalBottomSheet(builder: (context) {
+      int level = (actions.length / 3).ceil();
+      height ??= 90.0 * level;
+      width ??= appDataProvider.secondaryBodyWidth;
+      return Card(
+          child: DataActionCard(
+        showLabel: true,
+        showTooltip: true,
+        crossAxisCount: 4,
+        actions: actions,
+        mainAxisSpacing: 20,
+        crossAxisSpacing: 20,
+        height: height,
+        width: width,
+        iconSize: iconSize,
+        onPressed: (int index, String label, {String? value}) {
+          Navigator.pop(context);
+          onPressed?.call(context, index, label, value: value);
+        },
+      ));
+    });
+  }
+
   ///浮动动画按钮
   static FloatingActionBubble buildActionBubble({
     Key? key,
@@ -187,63 +217,6 @@ class MenuUtil {
         trailingIcon: trailingIcon,
         onPressed: onPressed);
   }
-
-  // static showPopupMenu({
-  //   required BuildContext context,
-  //   required List<ActionData> actions,
-  //   Rect? rect,
-  //   GlobalKey? widgetKey,
-  //   void Function(String label)? onPressed,
-  // }) {
-  //   List<popup.MenuItem> actionWidgets = List.generate(actions.length, (index) {
-  //     ActionData actionData = actions[index];
-  //     return MenuUtil._buildMenuItem(
-  //       title: actionData.label,
-  //       image: actionData.icon,
-  //     );
-  //   });
-  //   popup.PopupMenu popMenu = MenuUtil._buildPopupMenu(
-  //       onClickMenu: (popup.MenuItemProvider item) {
-  //         if (onPressed != null) {
-  //           onPressed(item.menuTitle);
-  //         }
-  //       },
-  //       context: context,
-  //       items: actionWidgets);
-  //   popMenu.show(rect: rect, widgetKey: widgetKey);
-  // }
-  //
-  // ///PopupMenu.show()
-  // static popup.PopupMenu _buildPopupMenu(
-  //     {required popup.MenuClickCallback onClickMenu,
-  //     required BuildContext context,
-  //     VoidCallback? onDismiss,
-  //     int? maxColumn,
-  //     Color? backgroundColor,
-  //     Color? highlightColor,
-  //     Color? lineColor,
-  //     popup.PopupMenuStateChanged? stateChanged,
-  //     required List<popup.MenuItemProvider> items}) {
-  //   popup.PopupMenu.context = context;
-  //   return popup.PopupMenu(
-  //       context: context,
-  //       onClickMenu: onClickMenu,
-  //       onDismiss: onDismiss,
-  //       maxColumn: maxColumn,
-  //       backgroundColor: backgroundColor,
-  //       highlightColor: highlightColor,
-  //       lineColor: lineColor,
-  //       stateChanged: stateChanged,
-  //       items: items);
-  // }
-  //
-  // static popup.MenuItem _buildMenuItem(
-  //     {required String title,
-  //     required Widget image,
-  //     userInfo,
-  //     TextStyle? textStyle}) {
-  //   return popup.MenuItem(title: title, image: image, textStyle: textStyle);
-  // }
 
   ///弹出式菜单，在child处弹出menuBuilder的Widget
   static Widget buildPopupMenu({

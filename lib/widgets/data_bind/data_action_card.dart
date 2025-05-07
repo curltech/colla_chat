@@ -88,7 +88,8 @@ class DataActionCard extends StatelessWidget {
         onPressed: () {
           if (onPressed != null) {
             onPressed!(index, actionData.label);
-          } else if (actionData.onTap != null) {
+          }
+          if (actionData.onTap != null) {
             actionData.onTap!(index, actionData.label);
           }
         },
@@ -113,7 +114,8 @@ class DataActionCard extends StatelessWidget {
             onPressed: () {
               if (onPressed != null) {
                 onPressed!(index, actionData.label, value: controller.text);
-              } else if (actionData.onTap != null) {
+              }
+              if (actionData.onTap != null) {
                 actionData.onTap!(index, actionData.label,
                     value: controller.text);
               }
@@ -136,7 +138,8 @@ class DataActionCard extends StatelessWidget {
         onPressed: () {
           if (onPressed != null) {
             onPressed!(index, actionData.label);
-          } else if (actionData.onTap != null) {
+          }
+          if (actionData.onTap != null) {
             actionData.onTap!(index, actionData.label);
           }
         },
@@ -163,7 +166,8 @@ class DataActionCard extends StatelessWidget {
               onPressed: () {
                 if (onPressed != null) {
                   onPressed!(index, actionData.label);
-                } else if (actionData.onTap != null) {
+                }
+                if (actionData.onTap != null) {
                   actionData.onTap!(index, actionData.label);
                 }
               },

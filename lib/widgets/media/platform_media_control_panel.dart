@@ -549,7 +549,7 @@ class _PlatformMediaControlPanelState extends State<PlatformMediaControlPanel>
               ),
             );
           } else {
-            return nil;
+            return nilBox;
           }
         });
   }

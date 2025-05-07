@@ -79,7 +79,7 @@ class EmailText extends SpecialText {
                 return Column(
                   children: <Widget>[
                     Expanded(
-                      child: nil,
+                      child: nilBox,
                     ),
                     Material(
                         child: Padding(
@@ -107,7 +107,7 @@ class EmailText extends SpecialText {
                       ),
                     )),
                     Expanded(
-                      child: nil,
+                      child: nilBox,
                     )
                   ],
                 );

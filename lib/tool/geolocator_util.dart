@@ -497,7 +497,7 @@ class GeolocatorUtil {
             latitude: latitude, longitude: longitude, onPicked: (data) {});
       }
     }
-    return nil;
+    return nilBox;
   }
 
   static Widget buildLocationPicker(

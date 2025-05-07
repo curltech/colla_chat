@@ -209,7 +209,7 @@ class P2pRegisterWidget extends StatelessWidget {
                       );
                     });
               }
-              return nil;
+              return nilBox;
             }),
         Container(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),

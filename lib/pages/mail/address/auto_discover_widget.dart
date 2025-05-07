@@ -289,7 +289,7 @@ class AutoDiscoverWidget extends StatelessWidget with TileDataMixin {
                             emailServiceProvider.value!.clientConfig),
                       )));
             }
-            return nil;
+            return nilBox;
           }))
         ]));
 

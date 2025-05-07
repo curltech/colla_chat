@@ -65,7 +65,7 @@ class PdfUtil {
         );
       }
     }
-    view = view ?? nil;
+    view = view ?? nilBox;
 
     return view;
   }
@@ -85,7 +85,7 @@ class PdfUtil {
         controller: pdfController,
       );
     }
-    view = view ?? nil;
+    view = view ?? nilBox;
 
     return view;
   }

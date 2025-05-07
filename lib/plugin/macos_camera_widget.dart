@@ -176,7 +176,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
     return Column(
       children: <Widget>[
         Expanded(
-          child: nil,
+          child: nilBox,
         ),
         Container(
             color: Colors.grey.withOpacity(AppOpacity.lgOpacity),
@@ -447,7 +447,7 @@ class MacosCameraWidgetState extends State<MacosCameraWidget> {
   //     return previewText;
   //   }
   //
-  //   return nil;
+  //   return nilBox;
   // }
 
   @override

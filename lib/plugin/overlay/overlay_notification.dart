@@ -347,7 +347,7 @@ class OverlayNotification extends StatefulWidget {
                   height: 5,
                 ),
               ],
-              Expanded(child: description ?? nil),
+              Expanded(child: description ?? nilBox),
               if (action != null) ...[
                 const SizedBox(
                   height: 5,

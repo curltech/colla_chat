@@ -229,7 +229,7 @@ class PoemContentWidget extends StatelessWidget with TileDataMixin {
             ],
           );
         }
-        return nil;
+        return nilBox;
       },
     );
   }

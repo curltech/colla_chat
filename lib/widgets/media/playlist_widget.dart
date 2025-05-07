@@ -5,17 +5,20 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
+import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
@@ -176,7 +179,7 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
           allowMultiple: allowMultiple,
           type: fileType,
           allowedExtensions: allowedExtensions.toList());
-      if (xfiles!=null && xfiles.isNotEmpty) {
+      if (xfiles != null && xfiles.isNotEmpty) {
         for (var xfile in xfiles) {
           PlatformMediaSource? mediaSource =
               await addMediaFile(filename: xfile.path);
@@ -304,7 +307,7 @@ class PlaylistWidget extends StatelessWidget {
                 shape: const ContinuousRectangleBorder(),
                 child: Stack(
                   children: [
-                    tile.prefix ?? nil,
+                    tile.prefix ?? nilBox,
                     Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -359,8 +362,7 @@ class PlaylistWidget extends StatelessWidget {
   ///选择文件加入播放列表
   _addMediaSource(BuildContext context, {bool directory = false}) async {
     try {
-      List<PlatformMediaSource> mediaSources =
-          await playlistController.sourceFilePicker(directory: directory);
+      await playlistController.sourceFilePicker(directory: directory);
     } catch (e) {
       DialogUtil.error(content: 'add media file failure:$e');
     }
@@ -407,136 +409,130 @@ class PlaylistWidget extends StatelessWidget {
     await chatMessageService.store(chatMessage);
   }
 
+  Future<dynamic> showActionCard(BuildContext context) async {
+    List<ActionData> actions = _buildActions(context);
+    return MenuUtil.popModalBottomSheet(context,
+        actions: actions, width: appDataProvider.secondaryBodyWidth);
+  }
+
   ///播放列表按钮
-  Widget _buildPlaylistButton(BuildContext context) {
-    return Column(
-      children: [
-        OverflowBar(
-          alignment: MainAxisAlignment.start,
-          children: [
-            IconButton(
-              color: myself.primary,
-              icon: Obx(() {
-                return Icon(
-                  gridMode.isTrue ? Icons.list : Icons.grid_on,
-                  color: Colors.white,
-                );
-              }),
-              onPressed: () {
-                gridMode(!gridMode.value);
-              },
-              tooltip: AppLocalizations.t('Toggle grid mode'),
-            ),
-            IconButton(
-              color: myself.primary,
-              icon: const Icon(
-                Icons.featured_play_list_outlined,
-                color: Colors.white,
-              ),
-              onPressed: () async {
-                await _addMediaSource(context, directory: true);
-                _buildTileData(context);
-              },
-              tooltip: AppLocalizations.t('Add video directory'),
-            ),
-            IconButton(
-              color: myself.primary,
-              icon: const Icon(
-                Icons.playlist_add,
-                color: Colors.white,
-              ),
-              onPressed: () async {
-                await _addMediaSource(context);
-                _buildTileData(context);
-              },
-              tooltip: AppLocalizations.t('Add video file'),
-            ),
-            IconButton(
-              color: myself.primary,
-              icon: const Icon(
-                Icons.bookmark_remove,
-                color: Colors.white,
-              ),
-              onPressed: () async {
-                await playlistController.clear();
-                _buildTileData(context);
-              },
-              tooltip: AppLocalizations.t('Remove all video file'),
-            ),
-            IconButton(
-              color: myself.primary,
-              icon: const Icon(
-                Icons.playlist_remove,
-                color: Colors.white, //myself.primary,
-              ),
-              onPressed: () async {
-                var currentIndex = playlistController.currentIndex;
-                playlistController.delete(index: currentIndex.value);
-                _buildTileData(context);
-              },
-              tooltip: AppLocalizations.t('Remove video file'),
-            ),
-          ],
+  List<ActionData> _buildActions(BuildContext context) {
+    return [
+      ActionData(
+        label: 'Grid',
+        icon: Obx(() {
+          return Icon(
+            gridMode.isTrue ? Icons.list : Icons.grid_on,
+            color: Colors.white,
+          );
+        }),
+        onTap: (int index, String label, {String? value}) {
+          gridMode(!gridMode.value);
+        },
+        tooltip: AppLocalizations.t('Toggle grid mode'),
+      ),
+      ActionData(
+        label: 'Add directory',
+        icon: const Icon(
+          Icons.featured_play_list_outlined,
+          color: Colors.white,
         ),
-        OverflowBar(
-          alignment: MainAxisAlignment.end,
-          children: [
-            IconButton(
-              color: myself.primary,
-              icon: const Icon(
-                Icons.video_collection,
-                color: Colors.white, //myself.primary,
-              ),
-              onPressed: () async {
-                await _collect();
-              },
-              tooltip: AppLocalizations.t('Select collect file'),
-            ),
-            IconButton(
-              color: myself.primary,
-              icon: const Icon(
-                Icons.collections,
-                color: Colors.white, //myself.primary,
-              ),
-              onPressed: () async {
-                int? currentIndex = playlistController.currentIndex.value;
-                if (currentIndex != null) {
-                  await _collectMediaSource(currentIndex);
-                }
-              },
-              tooltip: AppLocalizations.t('Collect video file'),
-            ),
-            IconButton(
-              color: myself.primary,
-              icon: const Icon(
-                Icons.bookmark_remove,
-                color: Colors.white, //myself.primary,
-              ),
-              onPressed: () async {
-                var currentIndex = playlistController.currentIndex.value;
-                if (currentIndex != null) {
-                  await _removeFromCollect(currentIndex);
-                }
-              },
-              tooltip: AppLocalizations.t('Remove collect file'),
-            ),
-          ],
-        )
-      ],
-    );
+        onTap: (int index, String label, {String? value}) async {
+          await _addMediaSource(context, directory: true);
+          _buildTileData(context);
+        },
+        tooltip: AppLocalizations.t('Add video directory'),
+      ),
+      ActionData(
+        label: 'Add file',
+        icon: const Icon(
+          Icons.playlist_add,
+          color: Colors.white,
+        ),
+        onTap: (int index, String label, {String? value}) async {
+          await _addMediaSource(context);
+          _buildTileData(context);
+        },
+        tooltip: AppLocalizations.t('Add video file'),
+      ),
+      ActionData(
+        label: 'Remove all',
+        icon: const Icon(
+          Icons.bookmark_remove,
+          color: Colors.white,
+        ),
+        onTap: (int index, String label, {String? value}) async {
+          await playlistController.clear();
+          _buildTileData(context);
+        },
+        tooltip: AppLocalizations.t('Remove all video file'),
+      ),
+      ActionData(
+        label: 'Remove file',
+        icon: const Icon(
+          Icons.playlist_remove,
+          color: Colors.white, //myself.primary,
+        ),
+        onTap: (int index, String label, {String? value}) {
+          var currentIndex = playlistController.currentIndex;
+          playlistController.delete(index: currentIndex.value);
+          _buildTileData(context);
+        },
+        tooltip: AppLocalizations.t('Remove video file'),
+      ),
+      ActionData(
+        label: 'Select',
+        icon: const Icon(
+          Icons.video_collection,
+          color: Colors.white, //myself.primary,
+        ),
+        onTap: (int index, String label, {String? value}) async {
+          await _collect();
+        },
+        tooltip: AppLocalizations.t('Select collect file'),
+      ),
+      ActionData(
+        label: 'Collect',
+        icon: const Icon(
+          Icons.collections,
+          color: Colors.white, //myself.primary,
+        ),
+        onTap: (int index, String label, {String? value}) async {
+          int? currentIndex = playlistController.currentIndex.value;
+          if (currentIndex != null) {
+            await _collectMediaSource(currentIndex);
+          }
+        },
+        tooltip: AppLocalizations.t('Collect video file'),
+      ),
+      ActionData(
+        label: 'Remove collect',
+        icon: const Icon(
+          Icons.bookmark_remove,
+          color: Colors.white, //myself.primary,
+        ),
+        onTap: (int index, String label, {String? value}) async {
+          var currentIndex = playlistController.currentIndex.value;
+          if (currentIndex != null) {
+            await _removeFromCollect(currentIndex);
+          }
+        },
+        tooltip: AppLocalizations.t('Remove collect file'),
+      ),
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
     _buildTileData(context);
-    return Column(children: [
-      _buildPlaylistButton(context),
-      Expanded(
-          child: PlatformFutureBuilder(
-              future: _buildThumbnailView(context),
-              builder: (BuildContext context, Widget playlist) {
-                return playlist;
-              })),
-    ]);
+    return InkWell(
+        onLongPress: () {
+          showActionCard(context);
+        },
+        child: PlatformFutureBuilder(
+            future: _buildThumbnailView(context),
+            builder: (BuildContext context, Widget playlist) {
+              return playlist;
+            }));
   }
 }

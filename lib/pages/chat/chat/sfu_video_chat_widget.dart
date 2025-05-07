@@ -123,7 +123,7 @@ class _SfuVideoChatWidgetState extends State<SfuVideoChatWidget> {
               tooltip: AppLocalizations.t('Remote'),
             );
           }
-          return nil;
+          return nilBox;
         },
       );
       rightWidgets.add(remote);

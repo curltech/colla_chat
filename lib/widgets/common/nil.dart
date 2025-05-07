@@ -1,7 +1,5 @@
 import 'package:flutter/widgets.dart';
 
-const nil = Nil();
-
 const nilBox = SizedBox();
 
 class Nil extends Widget {

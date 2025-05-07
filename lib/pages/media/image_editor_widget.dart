@@ -38,7 +38,7 @@ class ImageEditorWidget extends StatelessWidget with TileDataMixin {
       () {
         String? filename = mediaFileController.current?.filename;
         if (filename == null) {
-          return nil;
+          return nilBox;
         }
         return ProImageEditor.file(File(filename),
             callbacks: ProImageEditorCallbacks(

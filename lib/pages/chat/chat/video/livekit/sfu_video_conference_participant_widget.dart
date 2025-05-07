@@ -98,7 +98,7 @@ class SfuVideoConferenceParticipantWidget extends StatelessWidget
         builder: (BuildContext context, livekit_client.Participant? participant,
             Widget? child) {
           if (participant == null) {
-            return nil;
+            return nilBox;
           }
           List<Widget> children = [];
           children.add(CommonAutoSizeText(

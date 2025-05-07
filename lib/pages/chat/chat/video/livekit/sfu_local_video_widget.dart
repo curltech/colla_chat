@@ -532,7 +532,7 @@ class _SfuLocalVideoWidgetState extends State<SfuLocalVideoWidget> {
                 labelColor: Colors.white,
               );
             }
-            return nil;
+            return nilBox;
           }),
     );
   }

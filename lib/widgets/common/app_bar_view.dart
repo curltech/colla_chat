@@ -4,6 +4,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 
 ///工作区的标准视图，包裹了顶部栏AppBarWidget和一个包裹了child
@@ -20,11 +21,8 @@ class AppBarView extends StatelessWidget {
   final bool isAppBar;
 
   //右边按钮
-  final Widget? rightWidget;
   final List<Widget>? rightWidgets;
-
-  //右边下拉菜单
-  final List<AppBarPopupMenu>? rightPopupMenus;
+  final List<ActionData>? actions;
   final PreferredSizeWidget? bottom;
   final Widget child;
 
@@ -38,9 +36,8 @@ class AppBarView extends StatelessWidget {
     this.isAppBar = true,
     this.titleWidget,
     this.centerTitle = false,
-    this.rightWidget,
+    this.actions,
     this.rightWidgets,
-    this.rightPopupMenus,
     this.bottom,
     required this.child,
   });
@@ -87,9 +84,7 @@ class AppBarView extends StatelessWidget {
             leadingCallBack: leadingCallBack,
             title: titleWidget,
             centerTitle: centerTitle,
-            rightWidget: rightWidget,
             rightWidgets: rightWidgets,
-            rightPopupMenus: rightPopupMenus,
             bottom: bottom,
             isAppBar: isAppBar,
           ),

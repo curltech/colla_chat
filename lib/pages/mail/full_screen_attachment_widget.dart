@@ -40,7 +40,7 @@ class FullScreenAttachmentWidget extends StatelessWidget with TileDataMixin {
       }
     }
 
-    return nil;
+    return nilBox;
   }
 
   @override

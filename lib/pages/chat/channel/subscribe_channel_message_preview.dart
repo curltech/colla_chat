@@ -50,7 +50,7 @@ class SubscribeChannelMessagePreview extends StatelessWidget
   Widget build(BuildContext context) {
     ChatMessage? chatMessage = channelChatMessageController.current;
     if (chatMessage == null) {
-      return nil;
+      return nilBox;
     }
 
     return AppBarView(

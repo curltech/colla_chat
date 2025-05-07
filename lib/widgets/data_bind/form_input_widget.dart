@@ -350,7 +350,7 @@ class _FormInputWidgetState extends State<FormInputWidget> {
     } else if (views.length == 1) {
       return views[0];
     } else {
-      return nil;
+      return nilBox;
     }
   }
 

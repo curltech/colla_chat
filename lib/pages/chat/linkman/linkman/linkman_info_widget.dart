@@ -40,7 +40,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget>
   @override
   Widget build(BuildContext context) {
     Linkman? linkman = linkmanController.current;
-    Widget linkmanInfo = nil;
+    Widget linkmanInfo = nilBox;
     if (linkman != null) {
       String name = linkman.name;
       var peerId = linkman.peerId;

@@ -9,14 +9,9 @@ import 'package:flutter/material.dart';
 
 ///平台标准的AudioPlayer的实现，支持标准的audioplayers，just_audio和webview
 class PlatformAudioPlayerWidget extends StatelessWidget with TileDataMixin {
-  final PlaylistController playlistController = PlaylistController();
-  late final PlatformAudioPlayer platformAudioPlayer;
+  final PlatformAudioPlayer platformAudioPlayer = PlatformAudioPlayer();
 
-  PlatformAudioPlayerWidget({super.key}) {
-    platformAudioPlayer = PlatformAudioPlayer(
-      playlistController: playlistController,
-    );
-  }
+  PlatformAudioPlayerWidget({super.key});
 
   @override
   String get routeName => 'audio_player';
@@ -27,15 +22,13 @@ class PlatformAudioPlayerWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'AudioPlayer';
 
-  
-
   @override
   bool get withLeading => true;
 
   List<Widget>? _buildRightWidgets() {
     List<Widget> children = [
       ValueListenableBuilder(
-          valueListenable: platformAudioPlayer.platformMediaPlayer.index,
+          valueListenable: platformAudioPlayer.playlistMediaPlayer.index,
           builder: (BuildContext context, int index, Widget? child) {
             if (index == 0) {
               return IconButton(
@@ -62,7 +55,7 @@ class PlatformAudioPlayerWidget extends StatelessWidget with TileDataMixin {
         tooltip: AppLocalizations.t('Close'),
         onPressed: () async {
           platformAudioPlayer.mediaPlayerController.close();
-          playlistController.clear();
+          platformAudioPlayer.playlistController.clear();
         },
         icon: const Icon(Icons.close),
       ),

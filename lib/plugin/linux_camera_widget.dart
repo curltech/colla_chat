@@ -145,7 +145,7 @@ class _LinuxCameraWidgetState extends State<LinuxCameraWidget> {
     return Column(
       children: <Widget>[
         Expanded(
-          child: nil,
+          child: nilBox,
         ),
         Container(
             color: Colors.grey.withOpacity(AppOpacity.lgOpacity),

@@ -67,7 +67,7 @@ class PrimaryNavigation {
 
   Widget _buildAppBar(BuildContext context) {
     if (appDataProvider.smallBreakpoint.isActive(context)) {
-      return nil;
+      return nilBox;
     }
 
     Widget avatarImage = myself.avatarImage ?? AppImage.mdAppImage;

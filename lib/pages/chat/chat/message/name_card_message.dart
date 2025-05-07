@@ -147,6 +147,6 @@ class NameCardMessage extends StatelessWidget {
       }
     }
 
-    return nil;
+    return nilBox;
   }
 }
