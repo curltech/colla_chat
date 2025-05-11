@@ -12,6 +12,7 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -272,16 +273,19 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   }
 
   Widget buildOpenFileWidget() {
-    return IconButton(
-      icon: const Icon(
-        Icons.playlist_add,
-        color: Colors.white,
-      ),
-      onPressed: () async {
-        await _addMediaSource();
-      },
-      tooltip: AppLocalizations.t('Open media file'),
-    );
+    if (filename.value == null) {
+      return IconButton(
+        icon: const Icon(
+          Icons.playlist_add,
+          color: Colors.white,
+        ),
+        onPressed: () async {
+          await _addMediaSource();
+        },
+        tooltip: AppLocalizations.t('Open media file'),
+      );
+    }
+    return nilBox;
   }
 
   Widget buildMediaPlayer({
