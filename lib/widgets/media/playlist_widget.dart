@@ -391,9 +391,6 @@ class PlaylistWidget extends StatelessWidget {
     }
     Uint8List? thumbnail =
         await VideoUtil.getByteThumbnail(videoFile: filename);
-    // ChatMessageMimeType? chatMessageMimeType =
-    //     StringUtil.enumFromString<ChatMessageMimeType>(
-    //         ChatMessageMimeType.values, mediaFormat);
     String fileType = playlistController.fileType.name;
     ChatMessageContentType? contentType =
         StringUtil.enumFromString(ChatMessageContentType.values, fileType);
@@ -423,7 +420,7 @@ class PlaylistWidget extends StatelessWidget {
         icon: Obx(() {
           return Icon(
             gridMode.isTrue ? Icons.list : Icons.grid_on,
-            color: Colors.white,
+            color: myself.primary,
           );
         }),
         onTap: (int index, String label, {String? value}) {
@@ -433,9 +430,9 @@ class PlaylistWidget extends StatelessWidget {
       ),
       ActionData(
         label: 'Add directory',
-        icon: const Icon(
+        icon: Icon(
           Icons.featured_play_list_outlined,
-          color: Colors.white,
+          color: myself.primary,
         ),
         onTap: (int index, String label, {String? value}) async {
           await _addMediaSource(context, directory: true);
@@ -445,9 +442,9 @@ class PlaylistWidget extends StatelessWidget {
       ),
       ActionData(
         label: 'Add file',
-        icon: const Icon(
+        icon: Icon(
           Icons.playlist_add,
-          color: Colors.white,
+          color: myself.primary,
         ),
         onTap: (int index, String label, {String? value}) async {
           await _addMediaSource(context);
@@ -457,9 +454,9 @@ class PlaylistWidget extends StatelessWidget {
       ),
       ActionData(
         label: 'Remove all',
-        icon: const Icon(
+        icon: Icon(
           Icons.bookmark_remove,
-          color: Colors.white,
+          color: myself.primary,
         ),
         onTap: (int index, String label, {String? value}) async {
           await playlistController.clear();
@@ -469,9 +466,9 @@ class PlaylistWidget extends StatelessWidget {
       ),
       ActionData(
         label: 'Remove file',
-        icon: const Icon(
+        icon: Icon(
           Icons.playlist_remove,
-          color: Colors.white, //myself.primary,
+          color: myself.primary, //myself.primary,
         ),
         onTap: (int index, String label, {String? value}) {
           var currentIndex = playlistController.currentIndex;
@@ -482,9 +479,9 @@ class PlaylistWidget extends StatelessWidget {
       ),
       ActionData(
         label: 'Select',
-        icon: const Icon(
+        icon: Icon(
           Icons.video_collection,
-          color: Colors.white, //myself.primary,
+          color: myself.primary, //myself.primary,
         ),
         onTap: (int index, String label, {String? value}) async {
           await _collect();
@@ -493,9 +490,9 @@ class PlaylistWidget extends StatelessWidget {
       ),
       ActionData(
         label: 'Collect',
-        icon: const Icon(
+        icon: Icon(
           Icons.collections,
-          color: Colors.white, //myself.primary,
+          color: myself.primary, //myself.primary,
         ),
         onTap: (int index, String label, {String? value}) async {
           int? currentIndex = playlistController.currentIndex.value;
@@ -507,9 +504,9 @@ class PlaylistWidget extends StatelessWidget {
       ),
       ActionData(
         label: 'Remove collect',
-        icon: const Icon(
+        icon: Icon(
           Icons.bookmark_remove,
-          color: Colors.white, //myself.primary,
+          color: myself.primary, //myself.primary,
         ),
         onTap: (int index, String label, {String? value}) async {
           var currentIndex = playlistController.currentIndex.value;

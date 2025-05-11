@@ -79,41 +79,8 @@ class PlatformMediaPlayer extends StatelessWidget {
     );
   }
 
-  ///选择文件加入播放列表
-  _addMediaSource(BuildContext context, {bool directory = false}) async {
-    try {
-      await mediaPlayerController.playlistController
-          .sourceFilePicker(directory: directory);
-    } catch (e) {
-      DialogUtil.error(content: 'add media file failure:$e');
-    }
-  }
-
-  Widget _buildAddFile(BuildContext context) {
-    return IconButton(
-      icon: const Icon(
-        Icons.playlist_add,
-        color: Colors.white,
-      ),
-      onPressed: () async {
-        await _addMediaSource(context);
-      },
-      tooltip: AppLocalizations.t('Add media file'),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      if (mediaPlayerController.filename.value != null) {
-        return player;
-      }
-      return Stack(
-        children: [
-          player,
-          Center(child: _buildAddFile(context)),
-        ],
-      );
-    });
+    return player;
   }
 }

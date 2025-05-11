@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/ffmpeg_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
@@ -254,6 +256,29 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   void dispose() {
     close();
     super.dispose();
+  }
+
+  ///选择文件加入播放列表
+  _addMediaSource() async {
+    try {
+      await playlistController
+          .sourceFilePicker();
+    } catch (e) {
+      DialogUtil.error(content: 'add media file failure:$e');
+    }
+  }
+
+  Widget buildOpenFileWidget() {
+    return IconButton(
+      icon: const Icon(
+        Icons.playlist_add,
+        color: Colors.white,
+      ),
+      onPressed: () async {
+        await _addMediaSource();
+      },
+      tooltip: AppLocalizations.t('Open media file'),
+    );
   }
 
   Widget buildMediaPlayer({

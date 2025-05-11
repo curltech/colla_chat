@@ -46,11 +46,7 @@ class BetterVideoPlayerController extends AbstractMediaPlayerController {
           if (playlistController.current != null) {
             return LoadingUtil.buildLoadingIndicator();
           }
-          return Center(
-              child: CommonAutoSizeText(
-            AppLocalizations.t('Please select a media file'),
-            style: const TextStyle(color: Colors.white),
-          ));
+          return Center(child: buildOpenFileWidget());
         });
 
     return player;
