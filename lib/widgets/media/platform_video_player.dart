@@ -110,7 +110,6 @@ class PlatformVideoPlayer extends StatelessWidget {
                   //子组件宽高长度比例
                   childAspectRatio: 1),
               itemBuilder: (BuildContext context, int index) {
-                //Widget Function(BuildContext context, int index)
                 return platformMediaPlayers[index];
               });
         }
