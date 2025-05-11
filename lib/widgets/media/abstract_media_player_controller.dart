@@ -115,8 +115,12 @@ class PlatformMediaSource {
     String? extension = FileUtil.extension(filename);
     if (mediaFormat == null) {
       if (extension != null) {
-        mediaFormat =
-            StringUtil.enumFromString(ChatMessageMimeType.values, extension);
+        if (extension == '3gp') {
+          mediaFormat = ChatMessageMimeType.mp4;
+        } else {
+          mediaFormat =
+              StringUtil.enumFromString(ChatMessageMimeType.values, extension);
+        }
       }
     }
     if (filename.startsWith('assets')) {
@@ -139,7 +143,7 @@ class PlatformMediaSource {
         if (mimeType.startsWith('video')) {
           try {
             Uint8List? data;
-            if (filename.endsWith('mp4')) {
+            if (filename.endsWith('mp4') || filename.endsWith('3gp')) {
               data = await VideoUtil.getByteThumbnail(videoFile: filename);
             } else {
               data = await FFMpegUtil.thumbnail(videoFile: filename);
@@ -261,8 +265,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   ///选择文件加入播放列表
   _addMediaSource() async {
     try {
-      await playlistController
-          .sourceFilePicker();
+      await playlistController.sourceFilePicker();
     } catch (e) {
       DialogUtil.error(content: 'add media file failure:$e');
     }

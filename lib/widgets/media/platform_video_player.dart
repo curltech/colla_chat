@@ -18,6 +18,7 @@ class PlatformVideoPlayer extends StatelessWidget {
   final List<AbstractMediaPlayerController> mediaPlayerControllers = [];
   final bool showPlaylist;
   final PlaylistController playlistController = PlaylistController();
+  late final PlaylistWidget playlistWidget;
   final List<PlatformMediaPlayer> platformMediaPlayers = [];
   final RxInt index = 0.obs;
 
@@ -65,18 +66,23 @@ class PlatformVideoPlayer extends StatelessWidget {
     platformMediaPlayers.add(PlatformMediaPlayer(
       mediaPlayerController: webViewVideoPlayerController,
     ));
+    playlistWidget = PlaylistWidget(
+      onSelected: _onSelected,
+      playlistController: playlistController,
+    );
   }
 
   _onSelected(int index, String filename) {
     swiperController.move(1);
   }
 
-  Widget _buildVideoPlayer(BuildContext context) {
-    Widget playlistWidget = PlaylistWidget(
-      onSelected: _onSelected,
-      playlistController: playlistController,
-    );
+  close() {
+    for (var mediaPlayerController in mediaPlayerControllers) {
+      mediaPlayerController.close();
+    }
+  }
 
+  Widget _buildVideoPlayer(BuildContext context) {
     Widget mediaView = Swiper(
       itemCount: 2,
       index: index.value,
@@ -89,10 +95,8 @@ class PlatformVideoPlayer extends StatelessWidget {
           return playlistWidget;
         }
         if (index == 1) {
-          int crossAxisCount = 1;
-          if (appDataProvider.secondaryBodyLandscape) {
-            crossAxisCount = 2;
-          }
+          int crossAxisCount =
+              (appDataProvider.secondaryBodyWidth / 400).ceil();
           return GridView.builder(
               itemCount: platformMediaPlayers.length,
               //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget

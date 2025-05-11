@@ -277,7 +277,8 @@ class PlaylistWidget extends StatelessWidget {
             alignment: Alignment.center,
             child: CommonAutoSizeText(AppLocalizations.t('Playlist is empty')));
       }
-      int crossAxisCount = 3;
+      int crossAxisCount =
+          (appDataProvider.secondaryBodyWidth / 250).ceil();
       List<Widget> thumbnails = [];
       for (var tile in tileData) {
         List<Widget> children = [];
@@ -416,7 +417,7 @@ class PlaylistWidget extends StatelessWidget {
   List<ActionData> _buildActions(BuildContext context) {
     return [
       ActionData(
-        label: 'Grid',
+        label: gridMode.isTrue ? 'List' : 'Grid',
         icon: Obx(() {
           return Icon(
             gridMode.isTrue ? Icons.list : Icons.grid_on,
@@ -522,14 +523,10 @@ class PlaylistWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _buildTileData(context);
-    return InkWell(
-        onLongPress: () {
-          showActionCard(context);
-        },
-        child: PlatformFutureBuilder(
-            future: _buildThumbnailView(context),
-            builder: (BuildContext context, Widget playlist) {
-              return playlist;
-            }));
+    return PlatformFutureBuilder(
+        future: _buildThumbnailView(context),
+        builder: (BuildContext context, Widget playlist) {
+          return playlist;
+        });
   }
 }

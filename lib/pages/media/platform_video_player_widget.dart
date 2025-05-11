@@ -1,6 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/media/platform_video_player.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,7 @@ class PlatformVideoPlayerWidget extends StatelessWidget with TileDataMixin {
     super.key,
   });
 
-  List<Widget>? _buildRightWidgets() {
+  List<Widget>? _buildRightWidgets(BuildContext context) {
     List<Widget> children = [];
     Widget btn = ValueListenableBuilder(
         valueListenable: platformVideoPlayer.index,
@@ -64,13 +65,23 @@ class PlatformVideoPlayerWidget extends StatelessWidget with TileDataMixin {
         icon: const Icon(Icons.close),
       ),
     );
+    children.add(
+      IconButton(
+        tooltip: AppLocalizations.t('More'),
+        onPressed: () {
+          platformVideoPlayer.close();
+          platformVideoPlayer.playlistWidget.showActionCard(context);
+        },
+        icon: const Icon(Icons.more_horiz_outlined),
+      ),
+    );
 
     return children;
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Widget>? rightWidgets = _buildRightWidgets();
+    List<Widget>? rightWidgets = _buildRightWidgets(context);
 
     return AppBarView(
       title: title,
