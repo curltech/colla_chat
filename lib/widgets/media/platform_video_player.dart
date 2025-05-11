@@ -1,4 +1,5 @@
 import 'package:card_swiper/card_swiper.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
@@ -88,12 +89,16 @@ class PlatformVideoPlayer extends StatelessWidget {
           return playlistWidget;
         }
         if (index == 1) {
+          int crossAxisCount = 1;
+          if (appDataProvider.secondaryBodyLandscape) {
+            crossAxisCount = 2;
+          }
           return GridView.builder(
               itemCount: platformMediaPlayers.length,
               //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   //横轴元素个数
-                  crossAxisCount: 3,
+                  crossAxisCount: crossAxisCount,
                   //纵轴间距
                   mainAxisSpacing: 1.0,
                   //横轴间距
@@ -104,7 +109,6 @@ class PlatformVideoPlayer extends StatelessWidget {
                 //Widget Function(BuildContext context, int index)
                 return platformMediaPlayers[index];
               });
-          ;
         }
         return nilBox;
       },
