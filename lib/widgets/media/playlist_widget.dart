@@ -17,7 +17,6 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
-import 'package:colla_chat/widgets/common/platform_future_builder.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -201,7 +200,11 @@ class PlaylistWidget extends StatelessWidget {
   final PlaylistController playlistController;
 
   PlaylistWidget(
-      {super.key, this.onSelected, required this.playlistController});
+      {super.key, this.onSelected, required this.playlistController}) {
+    playlistController.currentIndex.addListener(() {
+      _buildTileData();
+    });
+  }
 
   final RxList<TileData> tileData = <TileData>[].obs;
   final RxBool gridMode = false.obs;
@@ -235,7 +238,7 @@ class PlaylistWidget extends StatelessWidget {
     playlistController.addMediaFiles(filenames: filenames);
   }
 
-  Future<void> _buildTileData(BuildContext context) async {
+  Future<void> _buildTileData() async {
     List<PlatformMediaSource> mediaSources = playlistController.data;
     List<TileData> tileData = [];
     for (var mediaSource in mediaSources) {
@@ -261,7 +264,7 @@ class PlaylistWidget extends StatelessWidget {
         selected: selected,
         onTap: (int index, String title, {String? subtitle}) {
           playlistController.setCurrentIndex = index;
-          _buildTileData(context);
+          _buildTileData();
         },
       );
       tileData.add(tile);
@@ -270,15 +273,14 @@ class PlaylistWidget extends StatelessWidget {
     this.tileData(tileData);
   }
 
-  Future<Widget> _buildThumbnailView(BuildContext context) async {
+  Widget _buildThumbnailView(BuildContext context) {
     return Obx(() {
       if (tileData.isEmpty) {
         return Container(
             alignment: Alignment.center,
             child: CommonAutoSizeText(AppLocalizations.t('Playlist is empty')));
       }
-      int crossAxisCount =
-          (appDataProvider.secondaryBodyWidth / 250).ceil();
+      int crossAxisCount = (appDataProvider.secondaryBodyWidth / 250).ceil();
       List<Widget> thumbnails = [];
       for (var tile in tileData) {
         List<Widget> children = [];
@@ -332,7 +334,6 @@ class PlaylistWidget extends StatelessWidget {
                 //子组件宽高长度比例
                 childAspectRatio: 1),
             itemBuilder: (BuildContext context, int index) {
-              //Widget Function(BuildContext context, int index)
               return InkWell(
                   child: thumbnails[index],
                   onTap: () {
@@ -437,7 +438,6 @@ class PlaylistWidget extends StatelessWidget {
         ),
         onTap: (int index, String label, {String? value}) async {
           await _addMediaSource(context, directory: true);
-          _buildTileData(context);
         },
         tooltip: AppLocalizations.t('Add video directory'),
       ),
@@ -449,7 +449,6 @@ class PlaylistWidget extends StatelessWidget {
         ),
         onTap: (int index, String label, {String? value}) async {
           await _addMediaSource(context);
-          _buildTileData(context);
         },
         tooltip: AppLocalizations.t('Add video file'),
       ),
@@ -461,7 +460,6 @@ class PlaylistWidget extends StatelessWidget {
         ),
         onTap: (int index, String label, {String? value}) async {
           await playlistController.clear();
-          _buildTileData(context);
         },
         tooltip: AppLocalizations.t('Remove all video file'),
       ),
@@ -474,7 +472,6 @@ class PlaylistWidget extends StatelessWidget {
         onTap: (int index, String label, {String? value}) {
           var currentIndex = playlistController.currentIndex;
           playlistController.delete(index: currentIndex.value);
-          _buildTileData(context);
         },
         tooltip: AppLocalizations.t('Remove video file'),
       ),
@@ -522,11 +519,6 @@ class PlaylistWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    _buildTileData(context);
-    return PlatformFutureBuilder(
-        future: _buildThumbnailView(context),
-        builder: (BuildContext context, Widget playlist) {
-          return playlist;
-        });
+    return _buildThumbnailView(context);
   }
 }

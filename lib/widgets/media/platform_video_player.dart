@@ -18,7 +18,10 @@ class PlatformVideoPlayer extends StatelessWidget {
   final List<AbstractMediaPlayerController> mediaPlayerControllers = [];
   final bool showPlaylist;
   final PlaylistController playlistController = PlaylistController();
-  late final PlaylistWidget playlistWidget;
+  late final PlaylistWidget playlistWidget = PlaylistWidget(
+    onSelected: _onSelected,
+    playlistController: playlistController,
+  );
   final List<PlatformMediaPlayer> platformMediaPlayers = [];
   final RxInt index = 0.obs;
 
@@ -66,14 +69,10 @@ class PlatformVideoPlayer extends StatelessWidget {
     platformMediaPlayers.add(PlatformMediaPlayer(
       mediaPlayerController: webViewVideoPlayerController,
     ));
-    playlistWidget = PlaylistWidget(
-      onSelected: _onSelected,
-      playlistController: playlistController,
-    );
   }
 
   _onSelected(int index, String filename) {
-    swiperController.move(1);
+    // swiperController.move(1);
   }
 
   close() {
@@ -130,7 +129,7 @@ class PlatformVideoPlayer extends StatelessWidget {
       if (currentIndex + i < length) {
         PlatformMediaSource mediaSource =
             playlistController.data[currentIndex + i];
-        mediaPlayerControllers[currentIndex + i].playMediaSource(mediaSource);
+        mediaPlayerControllers[i].playMediaSource(mediaSource);
       }
     }
   }

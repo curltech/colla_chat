@@ -1,24 +1,31 @@
 import 'package:better_player_plus/better_player_plus.dart';
-import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/tool/loading_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:flutter/material.dart';
 
 ///基于better实现的媒体播放器和记录器，
 class BetterVideoPlayerController extends AbstractMediaPlayerController {
-  BetterPlayerController? betterPlayerController;
+  late final BetterPlayerController betterPlayerController =
+      BetterPlayerController(
+    BetterPlayerConfiguration(
+      autoPlay: true,
+      looping: true,
+    ),
+    betterPlayerPlaylistConfiguration: BetterPlayerPlaylistConfiguration(),
+  );
 
   BetterVideoPlayerController(super.playlistController);
 
-  void _buildBetterPlayerController() {
-    betterPlayerController = BetterPlayerController(
-      BetterPlayerConfiguration(
-        autoPlay: true,
-        looping: true,
-      ),
-      betterPlayerPlaylistConfiguration: BetterPlayerPlaylistConfiguration(),
-    );
+  Future<bool?> isPictureInPictureSupported() async {
+    return await betterPlayerController.isPictureInPictureSupported();
+  }
+
+  enablePictureInPicture() async {
+    await betterPlayerController.enablePictureInPicture(key);
+  }
+
+  disablePictureInPicture() async {
+    await betterPlayerController.disablePictureInPicture();
   }
 
   @override
@@ -28,20 +35,18 @@ class BetterVideoPlayerController extends AbstractMediaPlayerController {
     bool showFullscreenButton = true,
     bool showVolumeButton = true,
   }) {
+    key ??= this.key;
     Widget player = ValueListenableBuilder(
         valueListenable: filename,
         builder: (BuildContext context, String? filename, Widget? child) {
-          if (betterPlayerController != null) {
-            _buildBetterPlayerController();
-            if (betterPlayerController != null) {
-              return Stack(children: [
-                BetterPlayer(
-                  key: key,
-                  controller: betterPlayerController!,
-                ),
-                buildPlaylistController()
-              ]);
-            }
+          if (filename != null) {
+            return Stack(children: [
+              BetterPlayer(
+                key: key,
+                controller: betterPlayerController,
+              ),
+              buildPlaylistController()
+            ]);
           }
           return Center(child: buildOpenFileWidget());
         });
@@ -50,31 +55,42 @@ class BetterVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  void close() {
-    super.close();
-    if (betterPlayerController != null) {
-      betterPlayerController!.dispose();
-      betterPlayerController = null;
-    }
+  void close() async {
+    await super.close();
+    betterPlayerController.dispose();
   }
 
   @override
   pause() {
-    betterPlayerController?.pause();
+    betterPlayerController.pause();
   }
 
   @override
   Future<void> playMediaSource(PlatformMediaSource mediaSource) async {
-    betterPlayerController?.pause();
+    if (autoplay) {
+      BetterPlayerDataSourceType? sourceType = StringUtil.enumFromString(
+          BetterPlayerDataSourceType.values, mediaSource.mediaSourceType.name);
+      await betterPlayerController.setupDataSource(
+          BetterPlayerDataSource(sourceType!, mediaSource.filename));
+      betterPlayerController.play();
+    }
+    filename.value = mediaSource.filename;
+  }
+
+  @override
+  play() {
+    if (playlistController.current != null) {
+      playMediaSource(playlistController.current!);
+    }
   }
 
   @override
   resume() {
-    betterPlayerController?.play();
+    betterPlayerController.play();
   }
 
   @override
   stop() {
-    betterPlayerController?.playNextVideo();
+    betterPlayerController.dispose();
   }
 }

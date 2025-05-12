@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
@@ -130,11 +128,13 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
     bool showFullscreenButton = true,
     bool showVolumeButton = true,
   }) {
+    key ??= this.key;
     Widget player = ValueListenableBuilder(
         valueListenable: filename,
         builder: (BuildContext context, String? filename, Widget? child) {
           if (filename != null) {
             Widget player = Video(
+              key: key,
               controller: videoController!,
               controls: AdaptiveVideoControls,
             );

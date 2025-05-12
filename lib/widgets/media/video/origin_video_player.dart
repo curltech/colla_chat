@@ -5,7 +5,6 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/loading_util.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:fl_video/fl_video.dart';
 import 'package:flutter/material.dart';
@@ -208,7 +207,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
 
     return Stack(
       children: [
-        FlVideoPlayer(controller: controller),
+        FlVideoPlayer(key: key, controller: controller),
         buildPlaylistController(),
       ],
     );
@@ -222,9 +221,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     bool showVolumeButton = true,
   }) {
     int? currentIndex = playlistController.currentIndex.value;
-    return JkVideoControlPanel(
-        key: key,
-        videoPlayerController,
+    return JkVideoControlPanel(videoPlayerController,
         showClosedCaptionButton: showClosedCaptionButton,
         showFullscreenButton: showFullscreenButton,
         showVolumeButton: showVolumeButton,

@@ -76,7 +76,7 @@ enum MediaSourceType {
   asset,
   file,
   network,
-  buffer,
+  memory,
 }
 
 ///平台定义的媒体源
@@ -92,7 +92,7 @@ class PlatformMediaSource {
 
   PlatformMediaSource({
     required this.filename,
-    this.mediaSourceType = MediaSourceType.buffer,
+    this.mediaSourceType = MediaSourceType.memory,
     this.mediaFormat,
     this.messageId,
     this.thumbnailWidget,
@@ -201,7 +201,7 @@ class PositionData {
 ///定义通用媒体播放控制器的接口，包含媒体播放列表及其操作，列表是否显示
 ///选择文件的功能，媒体窗口的产生方法接口
 abstract class AbstractMediaPlayerController with ChangeNotifier {
-  Key key = UniqueKey();
+  GlobalKey key = GlobalKey();
   final PlaylistController playlistController;
   ValueNotifier<String?> filename = ValueNotifier<String?>(null);
   bool _playlistVisible = true;

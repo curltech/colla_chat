@@ -11,21 +11,20 @@ class PlaylistMediaPlayer extends StatelessWidget {
 
   final Widget player;
   final PlaylistController playlistController;
+  late final Widget playlistWidget = PlaylistWidget(
+    onSelected: _onSelected,
+    playlistController: playlistController,
+  );
   final RxInt index = 0.obs;
 
   PlaylistMediaPlayer(
       {super.key, required this.player, required this.playlistController});
 
   _onSelected(int index, String filename) {
-    swiperController.move(1);
+    // swiperController.move(1);
   }
 
   Widget _buildMediaPlayer(BuildContext context) {
-    Widget playlistWidget = PlaylistWidget(
-      onSelected: _onSelected,
-      playlistController: playlistController,
-    );
-
     Widget mediaView = Swiper(
       itemCount: 2,
       index: index.value,
