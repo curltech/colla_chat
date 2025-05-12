@@ -188,7 +188,7 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
   Future<void> playMediaSource(PlatformMediaSource mediaSource) async {
     _init();
     await close();
-    if (autoplay) {
+    if (autoPlay) {
       try {
         await player!.play(mediaSource.filename);
       } catch (e) {

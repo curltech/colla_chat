@@ -48,7 +48,7 @@ class _VideoMessageState extends State<VideoMessage> {
         this.filename.value = filename;
       });
     }
-    videoMessagePlayerController.autoplay = true;
+    videoMessagePlayerController.autoPlay = true;
     videoMessagePlayer = PlatformMediaPlayer(
       key: UniqueKey(),
       mediaPlayerController: videoMessagePlayerController,

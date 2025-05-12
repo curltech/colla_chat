@@ -26,7 +26,7 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   Future<void> playMediaSource(PlatformMediaSource mediaSource) async {
-    if (autoplay) {
+    if (autoPlay) {
       platformWebViewController.load(mediaSource.filename);
     }
   }

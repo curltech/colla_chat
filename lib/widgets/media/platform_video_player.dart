@@ -1,4 +1,5 @@
 import 'package:card_swiper/card_swiper.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
@@ -39,12 +40,14 @@ class PlatformVideoPlayer extends StatelessWidget {
     platformMediaPlayers.add(PlatformMediaPlayer(
       mediaPlayerController: mediaKitVideoPlayerController,
     ));
-    BetterVideoPlayerController betterVideoPlayerController =
-        BetterVideoPlayerController(playlistController);
-    mediaPlayerControllers.add(betterVideoPlayerController);
-    platformMediaPlayers.add(PlatformMediaPlayer(
-      mediaPlayerController: betterVideoPlayerController,
-    ));
+    if (platformParams.mobile) {
+      BetterVideoPlayerController betterVideoPlayerController =
+          BetterVideoPlayerController(playlistController);
+      mediaPlayerControllers.add(betterVideoPlayerController);
+      platformMediaPlayers.add(PlatformMediaPlayer(
+        mediaPlayerController: betterVideoPlayerController,
+      ));
+    }
     ChewieVideoPlayerController chewieVideoPlayerController =
         ChewieVideoPlayerController(playlistController);
     mediaPlayerControllers.add(chewieVideoPlayerController);
@@ -63,12 +66,12 @@ class PlatformVideoPlayer extends StatelessWidget {
     platformMediaPlayers.add(PlatformMediaPlayer(
       mediaPlayerController: originVideoPlayerController,
     ));
-    WebViewVideoPlayerController webViewVideoPlayerController =
-        WebViewVideoPlayerController(playlistController);
-    mediaPlayerControllers.add(webViewVideoPlayerController);
-    platformMediaPlayers.add(PlatformMediaPlayer(
-      mediaPlayerController: webViewVideoPlayerController,
-    ));
+    // WebViewVideoPlayerController webViewVideoPlayerController =
+    //     WebViewVideoPlayerController(playlistController);
+    // mediaPlayerControllers.add(webViewVideoPlayerController);
+    // platformMediaPlayers.add(PlatformMediaPlayer(
+    //   mediaPlayerController: webViewVideoPlayerController,
+    // ));
   }
 
   _onSelected(int index, String filename) {

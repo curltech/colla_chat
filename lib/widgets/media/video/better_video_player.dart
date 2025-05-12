@@ -8,7 +8,7 @@ class BetterVideoPlayerController extends AbstractMediaPlayerController {
   late final BetterPlayerController betterPlayerController =
       BetterPlayerController(
     BetterPlayerConfiguration(
-      autoPlay: true,
+      autoPlay: autoPlay,
       looping: true,
     ),
     betterPlayerPlaylistConfiguration: BetterPlayerPlaylistConfiguration(),
@@ -62,12 +62,14 @@ class BetterVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   pause() {
-    betterPlayerController.pause();
+    if (betterPlayerController.videoPlayerController != null) {
+      betterPlayerController.pause();
+    }
   }
 
   @override
   Future<void> playMediaSource(PlatformMediaSource mediaSource) async {
-    if (autoplay) {
+    if (autoPlay) {
       BetterPlayerDataSourceType? sourceType = StringUtil.enumFromString(
           BetterPlayerDataSourceType.values, mediaSource.mediaSourceType.name);
       await betterPlayerController.setupDataSource(
@@ -86,11 +88,15 @@ class BetterVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   resume() {
-    betterPlayerController.play();
+    if (betterPlayerController.videoPlayerController != null) {
+      betterPlayerController.play();
+    }
   }
 
   @override
   stop() {
-    betterPlayerController.dispose();
+    if (betterPlayerController.videoPlayerController != null) {
+      betterPlayerController.dispose();
+    }
   }
 }

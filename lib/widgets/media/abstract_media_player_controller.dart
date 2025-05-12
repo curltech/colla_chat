@@ -201,14 +201,14 @@ class PositionData {
 ///定义通用媒体播放控制器的接口，包含媒体播放列表及其操作，列表是否显示
 ///选择文件的功能，媒体窗口的产生方法接口
 abstract class AbstractMediaPlayerController with ChangeNotifier {
-  GlobalKey key = GlobalKey();
+  final GlobalKey key = GlobalKey();
   final PlaylistController playlistController;
-  ValueNotifier<String?> filename = ValueNotifier<String?>(null);
+  final ValueNotifier<String?> filename = ValueNotifier<String?>(null);
   bool _playlistVisible = true;
-  MediaPlayerState mediaPlayerState = MediaPlayerState();
-  bool autoplay = false;
+  final MediaPlayerState mediaPlayerState = MediaPlayerState();
+  bool autoPlay = true;
 
-  AbstractMediaPlayerController(this.playlistController);
+  AbstractMediaPlayerController(this.playlistController, {bool? autoPlay});
 
   bool get playlistVisible {
     return _playlistVisible;

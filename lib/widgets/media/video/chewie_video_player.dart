@@ -16,32 +16,31 @@ class ChewieVideoPlayerController extends OriginVideoPlayerController {
       return;
     }
     chewieController = ChewieController(
-      videoPlayerController: controller,
-      autoPlay: true,
-      looping: true,
-      progressIndicatorDelay: const Duration(milliseconds: 200),
-      additionalOptions: (context) {
-        return <OptionItem>[
-          OptionItem(
-            onTap: (BuildContext context) {},
-            iconData: Icons.live_tv_sharp,
-            title: 'Toggle Video Src',
-          ),
-        ];
-      },
-      hideControlsTimer: const Duration(seconds: 3),
-      showControls: true,
-      materialProgressColors: ChewieProgressColors(
-        playedColor: myself.primary,
-        handleColor: myself.primary,
-        backgroundColor: myself.secondary,
-        bufferedColor: Colors.green,
-      ),
-      placeholder: Container(
-        color: Colors.black,
-      ),
-      autoInitialize: true,
-    );
+        videoPlayerController: controller,
+        autoPlay: autoPlay,
+        looping: true,
+        progressIndicatorDelay: const Duration(milliseconds: 200),
+        additionalOptions: (context) {
+          return <OptionItem>[
+            OptionItem(
+              onTap: (BuildContext context) {},
+              iconData: Icons.live_tv_sharp,
+              title: 'Toggle Video Src',
+            ),
+          ];
+        },
+        hideControlsTimer: const Duration(seconds: 3),
+        showControls: true,
+        materialProgressColors: ChewieProgressColors(
+          playedColor: myself.primary,
+          handleColor: myself.primary,
+          backgroundColor: myself.secondary,
+          bufferedColor: Colors.green,
+        ),
+        placeholder: Container(
+          color: Colors.black,
+        ),
+        autoInitialize: true,);
   }
 
   @override

@@ -64,12 +64,12 @@ class DataListController<T> {
     if (data != null && data.isNotEmpty) {
       this.data.addAll(data);
       if (currentIndex == null) {
-        this.currentIndex(0);
+        this.currentIndex.value = 0;
       } else {
         if (currentIndex < -1 || currentIndex > data.length - 1) {
-          this.currentIndex(0);
+          this.currentIndex.value = 0;
         } else {
-          this.currentIndex(currentIndex);
+          this.currentIndex.value = currentIndex;
         }
       }
     }
@@ -88,31 +88,31 @@ class DataListController<T> {
     if (element == null) {
       setCurrentIndex = null;
     } else {
-      this.currentIndex(data.indexOf(element));
+      setCurrentIndex = data.indexOf(element);
     }
   }
 
   ///设置当前数据索引
   set setCurrentIndex(int? index) {
     if (index == null || index > data.length - 1) {
-      this.currentIndex(null);
+      this.currentIndex.value = null;
       return;
     }
     if (this.currentIndex.value != index) {
-      this.currentIndex(index);
+      this.currentIndex.value = index;
     }
   }
 
   addAll(List<T> ds) {
     if (ds.isNotEmpty) {
-      this.currentIndex(data.length);
+      this.currentIndex.value = data.length;
       data.addAll(ds);
     }
   }
 
   add(T d) {
     data.add(d);
-    this.currentIndex(data.length - 1);
+    this.currentIndex.value = data.length - 1;
   }
 
   T? get(int index) {
@@ -126,14 +126,14 @@ class DataListController<T> {
   insert(int index, T d) {
     if (index >= 0 && index <= data.length) {
       data.insert(index, d);
-      this.currentIndex(index);
+      this.currentIndex.value = index;
     }
   }
 
   insertAll(int index, List<T> ds) {
     if (index >= 0 && index <= data.length) {
       data.insertAll(index, ds);
-      this.currentIndex(index);
+      this.currentIndex.value = index;
     }
   }
 
@@ -144,9 +144,9 @@ class DataListController<T> {
       if (data.isEmpty) {
         this.currentIndex(null);
       } else if (index == 0) {
-        this.currentIndex(0);
+        this.currentIndex.value = 0;
       } else {
-        this.currentIndex(index - 1);
+        this.currentIndex.value = (index - 1);
       }
       return t;
     }
@@ -172,7 +172,7 @@ class DataListController<T> {
 
   clear() {
     data.clear();
-    this.currentIndex(null);
+    this.currentIndex.value = null;
   }
 
   ///替换了当前的对象
@@ -185,7 +185,7 @@ class DataListController<T> {
   replaceAll(List<T> ds) {
     data.assignAll(ds);
     if (ds.isNotEmpty) {
-      this.currentIndex(0);
+      this.currentIndex.value = 0;
     }
   }
 
@@ -235,7 +235,7 @@ class DataListController<T> {
       }
     });
 
-    this.currentIndex(0);
+    this.currentIndex.value = 0;
     this.findCondition.value.sortColumns = [
       SortColumn(columnIndex, columnName, ascending)
     ];
