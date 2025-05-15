@@ -25,13 +25,13 @@ class PlatformAudioPlayerWidget extends StatelessWidget with TileDataMixin {
   List<Widget>? _buildRightWidgets(BuildContext context) {
     List<Widget> children = [
       ValueListenableBuilder(
-          valueListenable: platformAudioPlayer.playlistMediaPlayer.index,
+          valueListenable: platformAudioPlayer.index,
           builder: (BuildContext context, int index, Widget? child) {
             if (index == 0) {
               return IconButton(
                 tooltip: AppLocalizations.t('Audio player'),
                 onPressed: () {
-                  platformAudioPlayer.playlistMediaPlayer.swiperController
+                  platformAudioPlayer.swiperController
                       .move(1);
                 },
                 icon: const Icon(Icons.audiotrack),
@@ -40,7 +40,7 @@ class PlatformAudioPlayerWidget extends StatelessWidget with TileDataMixin {
               return IconButton(
                 tooltip: AppLocalizations.t('Playlist'),
                 onPressed: () {
-                  platformAudioPlayer.playlistMediaPlayer.swiperController
+                  platformAudioPlayer.swiperController
                       .move(0);
                 },
                 icon: const Icon(Icons.featured_play_list_outlined),
@@ -63,7 +63,7 @@ class PlatformAudioPlayerWidget extends StatelessWidget with TileDataMixin {
       IconButton(
         tooltip: AppLocalizations.t('More'),
         onPressed: () {
-          platformAudioPlayer.playlistMediaPlayer.playlistWidget
+          platformAudioPlayer.playlistWidget
               .showActionCard(context);
         },
         icon: const Icon(Icons.more_horiz_outlined),
