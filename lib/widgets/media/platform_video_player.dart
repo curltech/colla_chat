@@ -10,10 +10,10 @@ import 'package:colla_chat/widgets/media/video/chewie_video_player.dart';
 import 'package:colla_chat/widgets/media/video/flick_video_player.dart';
 import 'package:colla_chat/widgets/media/video/mediakit_video_player.dart';
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
-import 'package:colla_chat/widgets/media/video/webview_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+/// 平台的多个视频媒体播放器组件
 class PlatformVideoPlayer extends StatelessWidget {
   final SwiperController swiperController = SwiperController();
   final List<AbstractMediaPlayerController> mediaPlayerControllers = [];

@@ -194,7 +194,7 @@ class PlaylistController extends DataListController<PlatformMediaSource> {
   }
 }
 
-///媒体文件播放列表
+/// 媒体文件播放列表
 class PlaylistWidget extends StatelessWidget {
   final Function(int index, String filename)? onSelected;
   final PlaylistController playlistController;

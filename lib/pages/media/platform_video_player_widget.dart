@@ -1,14 +1,12 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/media/platform_video_player.dart';
-import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:flutter/material.dart';
 
 ///平台标准的video_player的实现，缺省采用MediaKit
 class PlatformVideoPlayerWidget extends StatelessWidget with TileDataMixin {
-  late final PlatformVideoPlayer platformVideoPlayer = PlatformVideoPlayer();
+  final PlatformVideoPlayer platformVideoPlayer = PlatformVideoPlayer();
 
   @override
   String get routeName => 'video_player';

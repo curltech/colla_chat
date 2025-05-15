@@ -5,13 +5,13 @@ import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-///平台的媒体播放器组件
+/// 带有播放列表平台的媒体播放器组件
 class PlaylistMediaPlayer extends StatelessWidget {
   final SwiperController swiperController = SwiperController();
 
   final Widget player;
   final PlaylistController playlistController;
-  late final Widget playlistWidget = PlaylistWidget(
+  late final PlaylistWidget playlistWidget = PlaylistWidget(
     onSelected: _onSelected,
     playlistController: playlistController,
   );

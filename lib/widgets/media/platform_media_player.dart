@@ -19,7 +19,7 @@ enum AudioPlayerType {
   waveforms,
 }
 
-///平台的媒体播放器组件
+/// 平台的单个视频媒体播放器组件
 class PlatformMediaPlayer extends StatelessWidget {
   final bool showClosedCaptionButton;
   final bool showFullscreenButton;
