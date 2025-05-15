@@ -259,9 +259,6 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
                 showFullscreenButton: showFullscreenButton,
                 showVolumeButton: showVolumeButton);
           }
-          if (playlistController.current != null) {
-            return LoadingUtil.buildLoadingIndicator();
-          }
           return Center(child: buildOpenFileWidget());
         });
 

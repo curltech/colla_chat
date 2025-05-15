@@ -1,11 +1,8 @@
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 import 'package:video_player_win/video_player_win_plugin.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 enum VideoPlayerType {
   dart_vlc,

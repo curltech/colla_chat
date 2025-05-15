@@ -324,14 +324,14 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     if (currentIndex != null &&
         currentIndex >= 0 &&
         currentIndex < playlistController.length) {
-      PlatformMediaSource? platformMediaSource =
-          playlistController.get(currentIndex);
-      String name = FileUtil.filename(platformMediaSource!.filename);
-      children.add(CommonAutoSizeText(
-        name,
-        style: const TextStyle(color: Colors.white),
-        maxLines: 1,
-      ));
+      if (filename.value != null) {
+        String name = FileUtil.filename(filename.value!);
+        children.add(CommonAutoSizeText(
+          name,
+          style: const TextStyle(color: Colors.white),
+          maxLines: 1,
+        ));
+      }
     }
     if (currentIndex != null && currentIndex < playlistController.length - 1) {
       children.add(
