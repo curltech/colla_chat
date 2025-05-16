@@ -959,5 +959,13 @@
   "Battery status": "电池状态",
   "DiskSpace status": "磁盘状态",
   "Memory status": "内存状态",
-  "Performance pulse": "性能监控"
+  "Performance pulse": "性能监控",
+  "Grid": "网格",
+  "List": "列表",
+  "Add directory": "增加目录",
+  "Add file": "增加文件",
+  "Remove all": "删除全部",
+  "Remove collect": "删除收藏",
+  "Remove file": "删除文件",
+  "Video player": "视频播放"
 }
