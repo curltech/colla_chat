@@ -1,12 +1,12 @@
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_floating/floating/assist/Point.dart';
+import 'package:flutter_floating/floating/assist/floating_slide_type.dart';
+import 'package:flutter_floating/floating/assist/slide_stop_type.dart';
 import 'package:flutter_floating/floating/floating.dart';
 import 'package:flutter_floating/floating/manager/floating_manager.dart';
 import 'package:flutter_floating/floating_icon.dart';
-import 'package:flutter_floating/floating/assist/floating_slide_type.dart';
-import 'package:flutter_floating/floating/assist/slide_stop_type.dart';
-import 'package:flutter_floating/floating/assist/Point.dart';
 import 'package:get/get.dart';
 
 class FlutterFloatingController {
@@ -62,9 +62,11 @@ class FlutterFloatingController {
     if (key == null) {
       return;
     }
-    Floating floating = floatingManager.getFloating(key);
+    if (floatingManager.containsFloating(key)) {
+      Floating floating = floatingManager.getFloating(key);
 
-    floating.open(context);
+      floating.open(context);
+    }
   }
 
   showFloating({String? key}) {
@@ -72,19 +74,24 @@ class FlutterFloatingController {
     if (key == null) {
       return;
     }
-    Floating floating = floatingManager.getFloating(key);
+    if (floatingManager.containsFloating(key)) {
+      Floating floating = floatingManager.getFloating(key);
 
-    floating.showFloating();
+      floating.showFloating();
+    }
   }
 
-  isShowing({String? key}) {
+  bool isShowing({String? key}) {
     key ??= current.value;
     if (key == null) {
-      return;
+      return false;
     }
-    Floating floating = floatingManager.getFloating(key);
+    if (floatingManager.containsFloating(key)) {
+      Floating floating = floatingManager.getFloating(key);
 
-    return floating.isShowing;
+      return floating.isShowing;
+    }
+    return true;
   }
 
   hideFloating({String? key}) {
@@ -92,17 +99,22 @@ class FlutterFloatingController {
     if (key == null) {
       return;
     }
-    Floating floating = floatingManager.getFloating(key);
+    if (floatingManager.containsFloating(key)) {
+      Floating floating = floatingManager.getFloating(key);
 
-    floating.hideFloating();
+      floating.hideFloating();
+    }
   }
 
-  getFloating({String? key}) {
+  Floating? getFloating({String? key}) {
     key ??= current.value;
     if (key == null) {
-      return;
+      return null;
     }
-    return floatingManager.getFloating(key);
+    if (floatingManager.containsFloating(key)) {
+      return floatingManager.getFloating(key);
+    }
+    return null;
   }
 
   closeFloating({String? key}) {
@@ -110,7 +122,9 @@ class FlutterFloatingController {
     if (key == null) {
       return;
     }
-    floatingManager.closeFloating(key);
+    if (floatingManager.containsFloating(key)) {
+      floatingManager.closeFloating(key);
+    }
   }
 
   closeAllFloating() {
@@ -123,7 +137,7 @@ FlutterFloatingController flutterFloatingController =
 
 /// 应用内的悬浮框，overlay实现方式
 class FlutterFloatingWidget extends StatelessWidget with TileDataMixin {
-  const FlutterFloatingWidget({super.key});
+  FlutterFloatingWidget({super.key});
 
   @override
   bool get withLeading => true;
@@ -137,6 +151,8 @@ class FlutterFloatingWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Floating';
 
+  final Widget enabled = Icon(Icons.access_alarm_rounded);
+
   @override
   Widget build(BuildContext context) {
     return AppBarView(
@@ -145,7 +161,7 @@ class FlutterFloatingWidget extends StatelessWidget with TileDataMixin {
       rightWidgets: [
         IconButton(
             onPressed: () {
-              flutterFloatingController.createFloating(const FloatingIcon(),
+              flutterFloatingController.createFloating(enabled,
                   slideType: FloatingSlideType.onRightAndBottom,
                   isShowLog: false,
                   isSnapToEdge: false,

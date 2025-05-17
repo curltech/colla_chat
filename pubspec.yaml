@@ -418,7 +418,6 @@ dependency_overrides:
   flutter_overlay_window: ^0.4.5 #android悬浮框
   flutter_floating: ^1.1.0
   floating: ^6.0.0
-  android_pip: ^2.0.1
   audio_video_progress_bar: ^2.0.1
   azlistview: ^2.0.0 #特殊列表滑动
   scrollable_positioned_list: ^0.3.8

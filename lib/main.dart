@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/pip/background_pip_widget.dart';
+import 'package:colla_chat/pages/pip/mobile_fl_pip_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/notification/firebase_messaging_service.dart';
 import 'package:colla_chat/plugin/notification/local_notifications_service.dart';
@@ -69,7 +69,7 @@ void overlayMain() {
 void pipMain() {
   runApp(ClipRRect(
       borderRadius: BorderRadius.circular(12),
-      child: BackgroundPipView()));
+      child: mobileFlPipEnabledWidget));
 }
 
 ///应用主函数，使用runApp加载主应用Widget

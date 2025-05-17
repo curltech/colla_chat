@@ -9,7 +9,7 @@ import 'package:colla_chat/pages/datastore/filesystem/file_widget.dart';
 import 'package:colla_chat/pages/game/game_widget.dart';
 import 'package:colla_chat/pages/mail/mail_address_widget.dart';
 import 'package:colla_chat/pages/media/media_widget.dart';
-import 'package:colla_chat/pages/pip/pip_widget.dart';
+import 'package:colla_chat/pages/pip/mobile_pip_widget.dart';
 import 'package:colla_chat/pages/poem/poem_widget.dart';
 import 'package:colla_chat/pages/stock/stock_widget.dart';
 import 'package:colla_chat/platform.dart';
@@ -37,7 +37,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   final SherpaInstallWidget sherpaInstallWidget = SherpaInstallWidget();
   final MailAddressWidget mailAddressWidget = MailAddressWidget();
   final StockMainWidget stockMainWidget = StockMainWidget();
-  final PipMainWidget pipMainWidget = PipMainWidget();
+  final MobilePipWidget mobilePipWidget = MobilePipWidget();
   final GameMainWidget gameMainWidget = GameMainWidget();
   final PoemWidget poemWidget = PoemWidget();
   final DataSourceWidget dataSourceWidget = DataSourceWidget();
@@ -47,7 +47,6 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   late final Map<String, TileDataMixin> widgets = {
     poemWidget.routeName: poemWidget,
     stockMainWidget.routeName: stockMainWidget,
-    pipMainWidget.routeName: pipMainWidget,
     gameMainWidget.routeName: gameMainWidget,
     mailAddressWidget.routeName: mailAddressWidget,
     mediaWidget.routeName: mediaWidget,
@@ -55,6 +54,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     openVpnWidget.routeName: openVpnWidget,
     mobileSystemAlertWindowWidget.routeName: mobileSystemAlertWindowWidget,
     flutterFloatingWidget.routeName: flutterFloatingWidget,
+    mobilePipWidget.routeName: mobilePipWidget,
     platformMapLauncherWidget.routeName: platformMapLauncherWidget,
     sherpaInstallWidget.routeName: sherpaInstallWidget,
     dataSourceWidget.routeName: dataSourceWidget,
@@ -66,6 +66,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(openVpnWidget);
     indexWidgetProvider.define(mobileSystemAlertWindowWidget);
     indexWidgetProvider.define(flutterFloatingWidget);
+    indexWidgetProvider.define(mobilePipWidget);
     indexWidgetProvider.define(platformMapLauncherWidget);
     indexWidgetProvider.define(sherpaInstallWidget);
     indexWidgetProvider.define(fileWidget);
@@ -93,13 +94,6 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
         helpPath: poemWidget.routeName,
         onTap: (int index, String title, {String? subtitle}) {
           name.value = poemWidget.routeName;
-        }));
-    otherAppTileData.add(TileData(
-        title: AppLocalizations.t(pipMainWidget.title),
-        prefix: pipMainWidget.iconData,
-        helpPath: pipMainWidget.routeName,
-        onTap: (int index, String title, {String? subtitle}) {
-          name.value = pipMainWidget.routeName;
         }));
     final bool emailSwitch = myself.peerProfile.emailSwitch;
     if (emailSwitch) {
@@ -166,6 +160,13 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
         helpPath: flutterFloatingWidget.routeName,
         onTap: (int index, String title, {String? subtitle}) {
           indexWidgetProvider.push(flutterFloatingWidget.routeName);
+        }));
+    otherAppTileData.add(TileData(
+        title: AppLocalizations.t(mobilePipWidget.title),
+        prefix: mobilePipWidget.iconData,
+        helpPath: mobilePipWidget.routeName,
+        onTap: (int index, String title, {String? subtitle}) {
+          indexWidgetProvider.push(mobilePipWidget.routeName);
         }));
     if (platformParams.mobile) {
       if (myself.peerProfile.vpnSwitch) {
