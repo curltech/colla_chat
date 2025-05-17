@@ -98,7 +98,7 @@ class PlatformVideoPlayer extends StatelessWidget {
         }
         if (index == 1) {
           int crossAxisCount =
-              (appDataProvider.secondaryBodyWidth / 400).ceil();
+              (appDataProvider.secondaryBodyWidth / appDataProvider.designSize.width).floor();
           return GridView.builder(
               itemCount: platformMediaPlayers.length,
               //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget

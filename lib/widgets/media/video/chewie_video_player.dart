@@ -34,7 +34,7 @@ class ChewieVideoPlayerController extends OriginVideoPlayerController {
         materialProgressColors: ChewieProgressColors(
           playedColor: myself.primary,
           handleColor: myself.primary,
-          backgroundColor: myself.secondary,
+          backgroundColor: Colors.white,
           bufferedColor: Colors.green,
         ),
         placeholder: Container(
