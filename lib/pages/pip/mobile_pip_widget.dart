@@ -1,6 +1,7 @@
 import 'package:colla_chat/pages/pip/android_floating_pip_widget.dart';
 import 'package:colla_chat/pages/pip/inapp_pip_player_widget.dart';
 import 'package:colla_chat/pages/pip/mobile_fl_pip_widget.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -23,11 +24,13 @@ class MobilePipWidget extends StatelessWidget with TileDataMixin {
 
   final Widget enabled = Icon(Icons.access_alarm_rounded);
 
-  late final AndroidFloatingPipWidget androidFloatingPipWidget =
-      AndroidFloatingPipWidget(
-    disabled: Center(child: Text('AndroidFloatingPip')),
-    enabled: enabled,
-  );
+  late final AndroidFloatingPipWidget? androidFloatingPipWidget =
+      platformParams.android
+          ? AndroidFloatingPipWidget(
+              disabled: Center(child: Text('AndroidFloatingPip')),
+              enabled: enabled,
+            )
+          : null;
   late final InAppPipPlayerWidget inAppPipPlayerWidget = InAppPipPlayerWidget(
     title: 'InAppPipPlayer',
     disabled: Center(child: Text('InAppPipPlayer')),
@@ -40,26 +43,31 @@ class MobilePipWidget extends StatelessWidget with TileDataMixin {
         withLeading: true,
         title: title,
         rightWidgets: [
+          if (platformParams.mobile)
+            IconButton(
+                onPressed: () {
+                  mobileFlPipEnabledWidget.enabled.value = enabled;
+                  mobileFlPipController.enable();
+                },
+                icon: Icon(Icons.picture_in_picture)),
+          if (platformParams.android)
+            IconButton(
+                onPressed: () {
+                  androidFloatingPipWidget?.androidFloatingPipController
+                      .enable();
+                },
+                icon: Icon(Icons.picture_in_picture_alt_outlined)),
           IconButton(
               onPressed: () {
-                mobileFlPipEnabledWidget.enabled.value = enabled;
-                mobileFlPipController.enable();
-              },
-              icon: Icon(Icons.picture_in_picture)),
-          IconButton(
-              onPressed: () {
-                androidFloatingPipWidget.androidFloatingPipController.enable();
-              },
-              icon: Icon(Icons.picture_in_picture_alt_outlined)),
-          IconButton(
-              onPressed: () {
-                mobileFlPipEnabledWidget.enabled.value = enabled;
-                mobileFlPipController.enable();
+                inAppPipPlayerWidget.pipController.show();
               },
               icon: Icon(Icons.picture_in_picture_outlined))
         ],
         child: Column(
-          children: [androidFloatingPipWidget, inAppPipPlayerWidget],
+          children: [
+            if (androidFloatingPipWidget != null) androidFloatingPipWidget!,
+            SizedBox(height: 300, child: inAppPipPlayerWidget)
+          ],
         ));
   }
 }
