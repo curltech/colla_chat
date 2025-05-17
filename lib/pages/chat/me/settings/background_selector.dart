@@ -31,7 +31,7 @@ class BackgroundSelector extends StatelessWidget {
         child: Wrap(
           runSpacing: 10.0,
           spacing: 10.0,
-          children: LoadingBackgroundImage.darkBackgroundImages
+          children: BackgroundImages.darkBackgroundImages
               .map(buildBackground)
               .toList(),
         ),

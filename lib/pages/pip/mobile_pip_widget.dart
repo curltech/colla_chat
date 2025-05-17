@@ -31,11 +31,6 @@ class MobilePipWidget extends StatelessWidget with TileDataMixin {
               enabled: enabled,
             )
           : null;
-  late final InAppPipPlayerWidget inAppPipPlayerWidget = InAppPipPlayerWidget(
-    title: 'InAppPipPlayer',
-    disabled: Center(child: Text('InAppPipPlayer')),
-    enabled: enabled,
-  );
 
   @override
   Widget build(BuildContext context) {
@@ -65,8 +60,7 @@ class MobilePipWidget extends StatelessWidget with TileDataMixin {
         ],
         child: Column(
           children: [
-            if (androidFloatingPipWidget != null) androidFloatingPipWidget!,
-            SizedBox(height: 300, child: inAppPipPlayerWidget)
+            if (androidFloatingPipWidget != null) androidFloatingPipWidget!
           ],
         ));
   }

@@ -303,7 +303,7 @@ class DialogUtil {
           height: double.infinity,
           child: Opacity(
             opacity: 0.8,
-            child: loadingBackgroundImage.currentBackgroundImage(context),
+            child: backgroundImages.currentBackgroundImage(context),
           ),
         ),
         Center(child: loading),

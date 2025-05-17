@@ -7,7 +7,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
-class LoadingBackgroundImage {
+class BackgroundImages {
   static const List<String> darkBackgroundImages = [
     'assets/image/bg/login-bg-wd-1.webp',
     'assets/image/bg/login-bg-wd-2.webp',
@@ -42,7 +42,7 @@ class LoadingBackgroundImage {
   final darkChildren = <Widget>[];
   int currentIndex = 0;
 
-  LoadingBackgroundImage() {
+  BackgroundImages() {
     for (int i = 0; i < lightBackgroundImages.length; ++i) {
       var image = Image.asset(
         lightBackgroundImages[i],
@@ -62,20 +62,20 @@ class LoadingBackgroundImage {
 
   Widget? currentBackgroundImage(BuildContext? context) {
     if (context == null) {
-      return loadingBackgroundImage.lightChildren[currentIndex];
+      return backgroundImages.lightChildren[currentIndex];
     }
     if (myself.getBrightness(context) == Brightness.light) {
-      return loadingBackgroundImage.lightChildren[currentIndex];
+      return backgroundImages.lightChildren[currentIndex];
     }
     if (myself.getBrightness(context) == Brightness.dark) {
-      return loadingBackgroundImage.darkChildren[currentIndex];
+      return backgroundImages.darkChildren[currentIndex];
     }
 
     return null;
   }
 }
 
-final LoadingBackgroundImage loadingBackgroundImage = LoadingBackgroundImage();
+final BackgroundImages backgroundImages = BackgroundImages();
 
 class Loading extends StatelessWidget {
   final bool autoPlay = true;
@@ -87,19 +87,19 @@ class Loading extends StatelessWidget {
   }
 
   void init() {
-    int count = LoadingBackgroundImage.lightBackgroundImages.length;
+    int count = BackgroundImages.lightBackgroundImages.length;
 
     ///在initState中调用context出错
     // if (myself.getBrightness(context) == Brightness.dark) {
-    //   count = loadingBackgroundImage.darkBackgroudImages.length;
+    //   count = backgroundImages.darkBackgroundImages.length;
     // }
     if (autoPlay) {
       Timer.periodic(const Duration(seconds: 60), (timer) {
         var random = Random.secure();
-        loadingBackgroundImage.currentIndex = random.nextInt(count);
+        backgroundImages.currentIndex = random.nextInt(count);
         try {
-          if (loadingBackgroundImage.currentIndex < count) {
-            swiperController.move(loadingBackgroundImage.currentIndex);
+          if (backgroundImages.currentIndex < count) {
+            swiperController.move(backgroundImages.currentIndex);
           }
         } catch (e) {
           logger.e(e.toString());
@@ -113,14 +113,14 @@ class Loading extends StatelessWidget {
     return ListenableBuilder(
       listenable: myself,
       builder: (BuildContext context, Widget? child) {
-        List<Widget> children = loadingBackgroundImage.lightChildren;
+        List<Widget> children = backgroundImages.lightChildren;
         if (myself.getBrightness(context) == Brightness.dark) {
-          children = loadingBackgroundImage.darkChildren;
+          children = backgroundImages.darkChildren;
         }
         return Swiper(
           controller: swiperController,
           onIndexChanged: (int index) {
-            loadingBackgroundImage.currentIndex = index;
+            backgroundImages.currentIndex = index;
           },
           itemCount: children.length,
           itemBuilder: (BuildContext context, int index) {
