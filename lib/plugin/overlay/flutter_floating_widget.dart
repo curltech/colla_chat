@@ -6,7 +6,6 @@ import 'package:flutter_floating/floating/assist/floating_slide_type.dart';
 import 'package:flutter_floating/floating/assist/slide_stop_type.dart';
 import 'package:flutter_floating/floating/floating.dart';
 import 'package:flutter_floating/floating/manager/floating_manager.dart';
-import 'package:flutter_floating/floating_icon.dart';
 import 'package:get/get.dart';
 
 class FlutterFloatingController {
@@ -132,9 +131,6 @@ class FlutterFloatingController {
   }
 }
 
-FlutterFloatingController flutterFloatingController =
-    FlutterFloatingController();
-
 /// 应用内的悬浮框，overlay实现方式
 class FlutterFloatingWidget extends StatelessWidget with TileDataMixin {
   FlutterFloatingWidget({super.key});
@@ -151,7 +147,9 @@ class FlutterFloatingWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'Floating';
 
-  final Widget enabled = Icon(Icons.access_alarm_rounded);
+  final FlutterFloatingHome flutterFloatingHome =
+      FlutterFloatingHome(disabled: Text('测试版'));
+  String? floatingKey;
 
   @override
   Widget build(BuildContext context) {
@@ -161,41 +159,82 @@ class FlutterFloatingWidget extends StatelessWidget with TileDataMixin {
       rightWidgets: [
         IconButton(
             onPressed: () {
-              flutterFloatingController.createFloating(enabled,
-                  slideType: FloatingSlideType.onRightAndBottom,
-                  isShowLog: false,
-                  isSnapToEdge: false,
-                  isPosCache: true,
-                  moveOpacity: 1,
-                  left: 100,
-                  bottom: 100,
-                  slideBottomHeight: 100);
-            },
-            icon: Icon(Icons.add_photo_alternate)),
-        IconButton(
-            onPressed: () {
-              flutterFloatingController.open(context);
+              flutterFloatingOverlay.enabled.value =
+                  Icon(Icons.access_alarm_outlined);
+              floatingKey ??= flutterFloatingHome.flutterFloatingController
+                  .createFloating(flutterFloatingOverlay,
+                      slideType: FloatingSlideType.onRightAndBottom,
+                      isShowLog: false,
+                      isSnapToEdge: false,
+                      isPosCache: true,
+                      moveOpacity: 1,
+                      left: 100,
+                      bottom: 100,
+                      slideBottomHeight: 100);
+              flutterFloatingHome.flutterFloatingController.open(context);
+              flutterFloatingHome.flutterFloatingController.showFloating();
             },
             icon: Icon(Icons.folder_open)),
         IconButton(
             onPressed: () {
-              flutterFloatingController.closeFloating();
+              flutterFloatingHome.flutterFloatingController.closeFloating();
             },
             icon: Icon(Icons.folder)),
-        IconButton(
-            onPressed: () {
-              flutterFloatingController.showFloating();
-            },
-            icon: Icon(Icons.show_chart)),
-        IconButton(
-            onPressed: () {
-              flutterFloatingController.hideFloating();
-            },
-            icon: Icon(Icons.hide_image_outlined)),
       ],
-      child: Center(
-          child: Text(
-              '测试版')), // This trailing comma makes auto-formatting nicer for build methods.
+      child:
+          flutterFloatingHome, // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
+
+/// 应用内的悬浮框的主窗口，overlay实现方式
+class FlutterFloatingHome extends StatelessWidget {
+  final FlutterFloatingController flutterFloatingController =
+      FlutterFloatingController();
+  final Widget disabled;
+
+  FlutterFloatingHome({super.key, required this.disabled});
+
+  @override
+  Widget build(BuildContext context) {
+    return disabled;
+  }
+}
+
+/// 应用级overlay窗口的overlay部分
+class FlutterFloatingOverlay extends StatelessWidget {
+  final Rx<Widget> enabled = Rx<Widget>(Container());
+
+  //系统级窗口的形状
+  final Rx<BoxShape> boxShape = BoxShape.circle.obs;
+
+  FlutterFloatingOverlay({super.key});
+
+  Future<void> toggleShape() async {
+    if (boxShape.value == BoxShape.rectangle) {
+      boxShape.value = BoxShape.circle;
+    } else {
+      boxShape.value = BoxShape.rectangle;
+    }
+  }
+
+  Widget _buildEnabledWidget(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: boxShape.value,
+      ),
+      child: Center(child: enabled.value),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+        color: Colors.transparent,
+        elevation: 0.0,
+        child: _buildEnabledWidget(context));
+  }
+}
+
+final FlutterFloatingOverlay flutterFloatingOverlay = FlutterFloatingOverlay();

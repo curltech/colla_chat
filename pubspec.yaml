@@ -42,7 +42,6 @@ dependencies:
   flutter_foreground_task: ^8.8.1+1
   flutter_background_service: ^5.0.10
   flutter_background_executor: ^1.0.0
-  system_alert_window: ^2.0.7
   upgrader: ^11.0.0
   path_provider: ^2.0.11
   url_launcher: ^6.1.11 #打开系统浏览器
@@ -415,7 +414,8 @@ dependency_overrides:
   flutter_waya: ^11.0.2 #UI组件
   fl_pip: ^3.2.1 #系统级画中画，ios有问题
   flutter_float_window: ^0.2.2
-  flutter_overlay_window: ^0.4.5 #android悬浮框
+  system_alert_window: ^2.0.7
+  #  flutter_overlay_window: ^0.5.0 #android悬浮框
   flutter_floating: ^1.1.0
   floating: ^6.0.0
   audio_video_progress_bar: ^2.0.1

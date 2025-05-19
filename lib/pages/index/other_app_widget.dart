@@ -1,5 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/me/mobile_system_alert_window_widget.dart';
+import 'package:colla_chat/plugin/overlay/mobile_system_alert_window.dart';
 import 'package:colla_chat/pages/chat/me/openvpn_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_map_launcher_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_webview_widget.dart';
@@ -9,7 +9,7 @@ import 'package:colla_chat/pages/datastore/filesystem/file_widget.dart';
 import 'package:colla_chat/pages/game/game_widget.dart';
 import 'package:colla_chat/pages/mail/mail_address_widget.dart';
 import 'package:colla_chat/pages/media/media_widget.dart';
-import 'package:colla_chat/pages/pip/mobile_pip_widget.dart';
+import 'package:colla_chat/plugin/pip/mobile_pip_widget.dart';
 import 'package:colla_chat/pages/poem/poem_widget.dart';
 import 'package:colla_chat/pages/stock/stock_widget.dart';
 import 'package:colla_chat/platform.dart';
@@ -30,7 +30,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   final PlatformWebViewWidget webViewWidget = PlatformWebViewWidget();
   final OpenVpnWidget openVpnWidget = const OpenVpnWidget();
   final MobileSystemAlertWindowWidget mobileSystemAlertWindowWidget =
-      MobileSystemAlertWindowWidget();
+  MobileSystemAlertWindowWidget();
   final FlutterFloatingWidget flutterFloatingWidget = FlutterFloatingWidget();
   final PlatformMapLauncherWidget platformMapLauncherWidget =
       PlatformMapLauncherWidget();

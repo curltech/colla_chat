@@ -3,11 +3,11 @@ import 'dart:ui';
 
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/pip/mobile_fl_pip_widget.dart';
+import 'package:colla_chat/plugin/pip/mobile_fl_pip_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/notification/firebase_messaging_service.dart';
 import 'package:colla_chat/plugin/notification/local_notifications_service.dart';
-import 'package:colla_chat/plugin/overlay/android_system_overlay.dart';
+import 'package:colla_chat/plugin/overlay/mobile_system_alert_window.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -31,6 +31,7 @@ import 'package:upgrader/upgrader.dart';
 import 'package:webview_win_floating/webview.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:system_alert_window/system_alert_window.dart';
 
 ///全局处理证书问题
 class PlatformHttpOverrides extends HttpOverrides {
@@ -56,9 +57,9 @@ void overlayMain() {
   if (platformParams.android) {
     WidgetsFlutterBinding.ensureInitialized();
     runApp(
-      const MaterialApp(
+      MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: AndroidSystemOverlay(),
+        home: mobileSystemAlertOverlay,
       ),
     );
   }
@@ -85,9 +86,11 @@ void main(List<String> args) async {
   SystemChannels.lifecycle.setMessageHandler((msg) async {
     //logger.w('system channel switch to $msg');
     if (msg == AppLifecycleState.resumed.toString()) {
-      bool? allowed = await AndroidOverlayWindowUtil.isPermissionGranted();
-      if (!allowed) {
-        allowed = await AndroidOverlayWindowUtil.requestPermission();
+      bool? allowed = await SystemAlertWindow.checkPermissions(
+          prefMode: SystemWindowPrefMode.OVERLAY);
+      if (allowed == null || !allowed) {
+        allowed = await SystemAlertWindow.requestPermissions(
+            prefMode: SystemWindowPrefMode.OVERLAY);
       }
       await websocketPool.connect();
     } else if (msg == AppLifecycleState.paused.toString() ||

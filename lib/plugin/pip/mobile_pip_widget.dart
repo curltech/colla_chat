@@ -1,6 +1,6 @@
-import 'package:colla_chat/pages/pip/android_floating_pip_widget.dart';
-import 'package:colla_chat/pages/pip/inapp_pip_player_widget.dart';
-import 'package:colla_chat/pages/pip/mobile_fl_pip_widget.dart';
+import 'package:colla_chat/plugin/pip/android_floating_pip_widget.dart';
+import 'package:colla_chat/plugin/pip/inapp_pip_player_widget.dart';
+import 'package:colla_chat/plugin/pip/mobile_fl_pip_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';

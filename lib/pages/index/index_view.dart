@@ -18,7 +18,7 @@ import 'package:colla_chat/pages/index/adaptive_layout_index.dart';
 import 'package:colla_chat/pages/index/global_chat_message.dart';
 import 'package:colla_chat/pages/index/global_webrtc_event.dart';
 import 'package:colla_chat/pages/login/loading.dart';
-import 'package:colla_chat/pages/pip/inapp_pip_player_widget.dart';
+import 'package:colla_chat/plugin/pip/inapp_pip_player_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/overlay/overlay_notification.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
