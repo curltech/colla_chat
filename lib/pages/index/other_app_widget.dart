@@ -121,7 +121,6 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
             name.value = gameMainWidget.routeName;
           }));
     }
-
     otherAppTileData.add(TileData(
         title: AppLocalizations.t(mediaWidget.title),
         prefix: mediaWidget.iconData,
@@ -150,7 +149,6 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
         onTap: (int index, String title, {String? subtitle}) {
           indexWidgetProvider.push(sherpaInstallWidget.routeName);
         }));
-
     otherAppTileData.add(TileData(
         title: AppLocalizations.t(mobilePipWidget.title),
         prefix: mobilePipWidget.iconData,
@@ -192,7 +190,6 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
         onTap: (int index, String title, {String? subtitle}) {
           name.value = fileSystemWidget.routeName;
         }));
-
     Widget otherAppWidget = DataListView(
       itemCount: otherAppTileData.length,
       itemBuilder: (BuildContext context, int index) {
