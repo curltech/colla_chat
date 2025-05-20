@@ -1,5 +1,4 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/plugin/overlay/mobile_system_alert_window.dart';
 import 'package:colla_chat/pages/chat/me/openvpn_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_map_launcher_widget.dart';
 import 'package:colla_chat/pages/chat/me/platform_webview_widget.dart';
@@ -9,11 +8,11 @@ import 'package:colla_chat/pages/datastore/filesystem/file_widget.dart';
 import 'package:colla_chat/pages/game/game_widget.dart';
 import 'package:colla_chat/pages/mail/mail_address_widget.dart';
 import 'package:colla_chat/pages/media/media_widget.dart';
-import 'package:colla_chat/plugin/pip/mobile_pip_widget.dart';
 import 'package:colla_chat/pages/poem/poem_widget.dart';
 import 'package:colla_chat/pages/stock/stock_widget.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/overlay/flutter_floating_widget.dart';
+import 'package:colla_chat/plugin/overlay/flutter_overlay_window.dart';
+import 'package:colla_chat/plugin/pip/mobile_pip_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/sherpa/sherpa_install_widget.dart';
@@ -29,9 +28,8 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   final MediaWidget mediaWidget = MediaWidget();
   final PlatformWebViewWidget webViewWidget = PlatformWebViewWidget();
   final OpenVpnWidget openVpnWidget = const OpenVpnWidget();
-  final MobileSystemAlertWindowWidget mobileSystemAlertWindowWidget =
-  MobileSystemAlertWindowWidget();
-  final FlutterFloatingWidget flutterFloatingWidget = FlutterFloatingWidget();
+  final FlutterOverlayWindowWidget flutterOverlayWindowWidget =
+      FlutterOverlayWindowWidget();
   final PlatformMapLauncherWidget platformMapLauncherWidget =
       PlatformMapLauncherWidget();
   final SherpaInstallWidget sherpaInstallWidget = SherpaInstallWidget();
@@ -52,8 +50,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     mediaWidget.routeName: mediaWidget,
     webViewWidget.routeName: webViewWidget,
     openVpnWidget.routeName: openVpnWidget,
-    mobileSystemAlertWindowWidget.routeName: mobileSystemAlertWindowWidget,
-    flutterFloatingWidget.routeName: flutterFloatingWidget,
+    flutterOverlayWindowWidget.routeName: flutterOverlayWindowWidget,
     mobilePipWidget.routeName: mobilePipWidget,
     platformMapLauncherWidget.routeName: platformMapLauncherWidget,
     sherpaInstallWidget.routeName: sherpaInstallWidget,
@@ -64,8 +61,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   OtherAppWidget({super.key}) {
     indexWidgetProvider.define(webViewWidget);
     indexWidgetProvider.define(openVpnWidget);
-    indexWidgetProvider.define(mobileSystemAlertWindowWidget);
-    indexWidgetProvider.define(flutterFloatingWidget);
+    indexWidgetProvider.define(flutterOverlayWindowWidget);
     indexWidgetProvider.define(mobilePipWidget);
     indexWidgetProvider.define(platformMapLauncherWidget);
     indexWidgetProvider.define(sherpaInstallWidget);
@@ -154,13 +150,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
         onTap: (int index, String title, {String? subtitle}) {
           indexWidgetProvider.push(sherpaInstallWidget.routeName);
         }));
-    otherAppTileData.add(TileData(
-        title: AppLocalizations.t(flutterFloatingWidget.title),
-        prefix: flutterFloatingWidget.iconData,
-        helpPath: flutterFloatingWidget.routeName,
-        onTap: (int index, String title, {String? subtitle}) {
-          indexWidgetProvider.push(flutterFloatingWidget.routeName);
-        }));
+
     otherAppTileData.add(TileData(
         title: AppLocalizations.t(mobilePipWidget.title),
         prefix: mobilePipWidget.iconData,
@@ -180,11 +170,11 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
       }
       if (myself.peerProfile.developerSwitch) {
         otherAppTileData.add(TileData(
-            title: AppLocalizations.t(mobileSystemAlertWindowWidget.title),
-            prefix: mobileSystemAlertWindowWidget.iconData,
-            helpPath: mobileSystemAlertWindowWidget.routeName,
+            title: AppLocalizations.t(flutterOverlayWindowWidget.title),
+            prefix: flutterOverlayWindowWidget.iconData,
+            helpPath: flutterOverlayWindowWidget.routeName,
             onTap: (int index, String title, {String? subtitle}) {
-              indexWidgetProvider.push(mobileSystemAlertWindowWidget.routeName);
+              indexWidgetProvider.push(flutterOverlayWindowWidget.routeName);
             }));
       }
     }

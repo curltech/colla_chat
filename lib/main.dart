@@ -86,11 +86,13 @@ void main(List<String> args) async {
   SystemChannels.lifecycle.setMessageHandler((msg) async {
     //logger.w('system channel switch to $msg');
     if (msg == AppLifecycleState.resumed.toString()) {
-      bool? allowed = await SystemAlertWindow.checkPermissions(
-          prefMode: SystemWindowPrefMode.OVERLAY);
-      if (allowed == null || !allowed) {
-        allowed = await SystemAlertWindow.requestPermissions(
+      if (platformParams.mobile) {
+        bool? allowed = await SystemAlertWindow.checkPermissions(
             prefMode: SystemWindowPrefMode.OVERLAY);
+        if (allowed == null || !allowed) {
+          allowed = await SystemAlertWindow.requestPermissions(
+              prefMode: SystemWindowPrefMode.OVERLAY);
+        }
       }
       await websocketPool.connect();
     } else if (msg == AppLifecycleState.paused.toString() ||

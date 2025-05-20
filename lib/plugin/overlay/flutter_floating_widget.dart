@@ -1,5 +1,3 @@
-import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_floating/floating/assist/Point.dart';
 import 'package:flutter_floating/floating/assist/floating_slide_type.dart';
@@ -131,62 +129,6 @@ class FlutterFloatingController {
   }
 }
 
-/// 应用内的悬浮框，overlay实现方式
-class FlutterFloatingWidget extends StatelessWidget with TileDataMixin {
-  FlutterFloatingWidget({super.key});
-
-  @override
-  bool get withLeading => true;
-
-  @override
-  String get routeName => 'floating';
-
-  @override
-  IconData get iconData => Icons.picture_in_picture;
-
-  @override
-  String get title => 'Floating';
-
-  final FlutterFloatingHome flutterFloatingHome =
-      FlutterFloatingHome(disabled: Text('测试版'));
-  String? floatingKey;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBarView(
-      withLeading: true,
-      title: title,
-      rightWidgets: [
-        IconButton(
-            onPressed: () {
-              flutterFloatingOverlay.enabled.value =
-                  Icon(Icons.access_alarm_outlined);
-              floatingKey ??= flutterFloatingHome.flutterFloatingController
-                  .createFloating(flutterFloatingOverlay,
-                      slideType: FloatingSlideType.onRightAndBottom,
-                      isShowLog: false,
-                      isSnapToEdge: false,
-                      isPosCache: true,
-                      moveOpacity: 1,
-                      left: 100,
-                      bottom: 100,
-                      slideBottomHeight: 100);
-              flutterFloatingHome.flutterFloatingController.open(context);
-              flutterFloatingHome.flutterFloatingController.showFloating();
-            },
-            icon: Icon(Icons.folder_open)),
-        IconButton(
-            onPressed: () {
-              flutterFloatingHome.flutterFloatingController.closeFloating();
-            },
-            icon: Icon(Icons.folder)),
-      ],
-      child:
-          flutterFloatingHome, // This trailing comma makes auto-formatting nicer for build methods.
-    );
-  }
-}
-
 /// 应用内的悬浮框的主窗口，overlay实现方式
 class FlutterFloatingHome extends StatelessWidget {
   final FlutterFloatingController flutterFloatingController =
@@ -206,7 +148,7 @@ class FlutterFloatingOverlay extends StatelessWidget {
   final Rx<Widget> enabled = Rx<Widget>(Container());
 
   //系统级窗口的形状
-  final Rx<BoxShape> boxShape = BoxShape.circle.obs;
+  final Rx<BoxShape> boxShape = BoxShape.rectangle.obs;
 
   FlutterFloatingOverlay({super.key});
 
@@ -219,13 +161,15 @@ class FlutterFloatingOverlay extends StatelessWidget {
   }
 
   Widget _buildEnabledWidget(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        shape: boxShape.value,
-      ),
-      child: Center(child: enabled.value),
-    );
+    return Obx(() {
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: boxShape.value,
+        ),
+        child: Center(child: enabled.value),
+      );
+    });
   }
 
   @override

@@ -2,54 +2,11 @@ import 'dart:isolate';
 import 'dart:ui';
 
 import 'package:colla_chat/plugin/talker_logger.dart';
-import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:system_alert_window/system_alert_window.dart';
 
-class MobileSystemAlertWindowWidget extends StatelessWidget with TileDataMixin {
-  MobileSystemAlertWindowWidget({super.key});
 
-  @override
-  bool get withLeading => true;
-
-  @override
-  String get routeName => 'mobile_system_alert';
-
-  @override
-  IconData get iconData => Icons.picture_in_picture;
-
-  @override
-  String get title => 'Mobile system alert window';
-
-  final MobileSystemAlertHome mobileSystemAlertHome =
-      MobileSystemAlertHome(disabled: Text('测试版'));
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBarView(
-      withLeading: true,
-      title: title,
-      rightWidgets: [
-        IconButton(
-            onPressed: () {
-              mobileSystemAlertOverlay.enabled.value =
-                  Icon(Icons.access_alarm_outlined);
-              mobileSystemAlertHome.showOverlay();
-            },
-            icon: Icon(Icons.folder_open)),
-        IconButton(
-            onPressed: () {
-              mobileSystemAlertHome.closeOverlayWindow();
-            },
-            icon: Icon(Icons.folder)),
-      ],
-      child:
-          mobileSystemAlertHome, // This trailing comma makes auto-formatting nicer for build methods.
-    );
-  }
-}
 
 /// 系统overlay组件的发送端口的名称
 const String mainSendPortName = 'MainSendPortName';
@@ -71,8 +28,6 @@ class MobileSystemAlertHome extends StatelessWidget {
     await SystemAlertWindow.enableLogs(true);
     await SystemAlertWindow.requestPermissions(
         prefMode: SystemWindowPrefMode.OVERLAY);
-    // await FlutterOverlayWindow.isPermissionGranted();
-    // await FlutterOverlayWindow.requestPermission();
     final res = IsolateNameServer.registerPortWithName(
       receivePort.sendPort,
       mainSendPortName,
@@ -139,7 +94,7 @@ class MobileSystemAlertHome extends StatelessWidget {
     );
   }
 
-  Future<bool?> closeOverlayWindow(
+  Future<bool?> closeOverlay(
       {SystemWindowPrefMode prefMode = SystemWindowPrefMode.DEFAULT}) async {
     isShowingWindow.value = false;
     return await SystemAlertWindow.closeSystemWindow(prefMode: prefMode);
@@ -161,7 +116,7 @@ class MobileSystemAlertOverlay extends StatelessWidget {
   late final SendPort? sendPort;
 
   //系统级窗口的形状
-  final Rx<BoxShape> boxShape = BoxShape.circle.obs;
+  final Rx<BoxShape> boxShape = BoxShape.rectangle.obs;
 
   MobileSystemAlertOverlay({super.key}) {
     _init();
@@ -203,13 +158,15 @@ class MobileSystemAlertOverlay extends StatelessWidget {
   }
 
   Widget _buildEnabledWidget(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        shape: boxShape.value,
-      ),
-      child: Center(child: enabled.value),
-    );
+    return Obx(() {
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          shape: boxShape.value,
+        ),
+        child: Center(child: enabled.value),
+      );
+    });
   }
 
   @override
