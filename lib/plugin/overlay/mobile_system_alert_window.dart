@@ -132,7 +132,7 @@ class MobileSystemAlertOverlay extends StatelessWidget {
     SystemAlertWindow.overlayListener.listen((event) {
       logger.i("$event in overlay");
     });
-    sendPort ??= IsolateNameServer.lookupPortByName(
+    sendPort = IsolateNameServer.lookupPortByName(
       mainSendPortName,
     );
   }

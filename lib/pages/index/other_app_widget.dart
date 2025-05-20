@@ -166,15 +166,15 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
               indexWidgetProvider.push(openVpnWidget.routeName);
             }));
       }
-      if (myself.peerProfile.developerSwitch) {
-        otherAppTileData.add(TileData(
-            title: AppLocalizations.t(flutterOverlayWindowWidget.title),
-            prefix: flutterOverlayWindowWidget.iconData,
-            helpPath: flutterOverlayWindowWidget.routeName,
-            onTap: (int index, String title, {String? subtitle}) {
-              indexWidgetProvider.push(flutterOverlayWindowWidget.routeName);
-            }));
-      }
+    }
+    if (myself.peerProfile.developerSwitch) {
+      otherAppTileData.add(TileData(
+          title: AppLocalizations.t(flutterOverlayWindowWidget.title),
+          prefix: flutterOverlayWindowWidget.iconData,
+          helpPath: flutterOverlayWindowWidget.routeName,
+          onTap: (int index, String title, {String? subtitle}) {
+            indexWidgetProvider.push(flutterOverlayWindowWidget.routeName);
+          }));
     }
     otherAppTileData.add(TileData(
         title: AppLocalizations.t(dataSourceWidget.title),

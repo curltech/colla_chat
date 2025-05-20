@@ -36,10 +36,10 @@ class FlutterOverlayWindowWidget extends StatelessWidget with TileDataMixin {
       rightWidgets: [
         IconButton(
             onPressed: () {
-              mobileSystemAlertOverlay.enabled.value = Icon(
+              flutterOverlayWindow.setOverlay(Icon(
                 Icons.access_alarm_outlined,
                 color: myself.primary,
-              );
+              ));
               flutterOverlayWindow.showOverlay(context);
             },
             icon: Icon(Icons.folder_open)),
@@ -104,19 +104,19 @@ class DesktopConfig {
 
   const DesktopConfig(
       {this.slideType = FloatingSlideType.onRightAndBottom,
-      this.moveOpacity = 0.3,
+      this.moveOpacity = 1,
       this.isPosCache = true,
       this.isShowLog = true,
       this.isSnapToEdge = true,
       this.isStartScroll = true,
       this.slideTopHeight = 0,
-      this.slideBottomHeight = 0,
+      this.slideBottomHeight = 100,
       this.snapToEdgeSpace = 0,
       this.slideStopType = SlideStopType.slideStopAutoType,
       this.top,
-      this.left,
+      this.left = 100,
       this.right,
-      this.bottom,
+      this.bottom = 100,
       this.point});
 }
 
@@ -177,7 +177,11 @@ class FlutterOverlayWindow extends StatelessWidget {
   }
 
   setOverlay(Widget enabled) {
-    mobileSystemAlertOverlay.enabled.value = enabled;
+    if (platformParams.mobile) {
+      mobileSystemAlertOverlay.enabled.value = enabled;
+    } else {
+      flutterFloatingOverlay.enabled.value = enabled;
+    }
   }
 
   @override
