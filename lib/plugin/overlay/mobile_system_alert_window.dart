@@ -6,8 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:system_alert_window/system_alert_window.dart';
 
-
-
 /// 系统overlay组件的发送端口的名称
 const String mainSendPortName = 'MainSendPortName';
 
@@ -32,7 +30,8 @@ class MobileSystemAlertHome extends StatelessWidget {
       receivePort.sendPort,
       mainSendPortName,
     );
-    logger.i("$res: OVERLAY");
+
+    /// 接收系统overlay窗口的消息
     receivePort.listen((data) {
       logger.i("data from OVERLAY: $data");
       if (onReceived != null) {
@@ -44,10 +43,12 @@ class MobileSystemAlertHome extends StatelessWidget {
     );
   }
 
+  /// 发送消息给系统overlay窗口
   Future<dynamic> sendMessageToOverlay(dynamic data) async {
     return await SystemAlertWindow.sendMessageToOverlay(data);
   }
 
+  /// 更新系统overlay窗口
   Future<bool?> showOverlay({
     SystemWindowGravity gravity = SystemWindowGravity.CENTER,
     int? width,
@@ -73,6 +74,7 @@ class MobileSystemAlertHome extends StatelessWidget {
     return result;
   }
 
+  /// 更新系统overlay窗口
   Future<bool?> updateOverlayWindow({
     SystemWindowGravity gravity = SystemWindowGravity.CENTER,
     int? width,
@@ -110,9 +112,6 @@ class MobileSystemAlertHome extends StatelessWidget {
 /// 支持向主组件发送消息和接收消息
 class MobileSystemAlertOverlay extends StatelessWidget {
   final Rx<Widget> enabled = Rx<Widget>(Container());
-
-  //接收消息的端口
-  final receivePort = ReceivePort();
   late final SendPort? sendPort;
 
   //系统级窗口的形状
@@ -123,12 +122,6 @@ class MobileSystemAlertOverlay extends StatelessWidget {
   }
 
   void _init() {
-    IsolateNameServer.registerPortWithName(
-        receivePort.sendPort, mainSendPortName);
-    //监听主窗口的消息
-    receivePort.listen((data) {
-      logger.i("message from home: $data");
-    });
     SystemAlertWindow.overlayListener.listen((event) {
       logger.i("$event in overlay");
     });
@@ -137,6 +130,7 @@ class MobileSystemAlertOverlay extends StatelessWidget {
     );
   }
 
+  /// 发送消息给系统overlay窗口
   void send(Object? message) {
     sendPort ??= IsolateNameServer.lookupPortByName(
       mainSendPortName,
@@ -144,6 +138,7 @@ class MobileSystemAlertOverlay extends StatelessWidget {
     sendPort?.send(message);
   }
 
+  /// 关闭系统overlay窗口
   Future<bool?> close() async {
     return await SystemAlertWindow.closeSystemWindow(
         prefMode: SystemWindowPrefMode.OVERLAY);

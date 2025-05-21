@@ -24,7 +24,7 @@ class NotificationUtil {
       bool displayCloseButton = true,
       void Function(OverlayNotification self)? onCloseButtonPressed,
       void Function(OverlayNotification self)? onProgressFinished,
-      Alignment position = Alignment.topCenter,
+      Alignment alignment = Alignment.topCenter,
       AnimationType animation = AnimationType.fromTop,
       Duration animationDuration = const Duration(milliseconds: 600),
       double iconSize = 24,
@@ -53,14 +53,11 @@ class NotificationUtil {
         border: border,
         showProgressIndicator: showProgressIndicator,
         closeButton: closeButton,
-        stackedOptions: stackedOptions,
-        notificationMargin: notificationMargin,
         progressIndicatorColor: progressIndicatorColor ?? myself.primary,
         toastDuration: toastDuration,
         displayCloseButton: displayCloseButton,
         onCloseButtonPressed: onCloseButtonPressed,
         onProgressFinished: onProgressFinished,
-        position: position,
         animation: animation,
         animationDuration: animationDuration,
         iconSize: iconSize,
@@ -79,7 +76,13 @@ class NotificationUtil {
         animationCurve: animationCurve,
         shadow: shadow,
         notificationType: notificationType);
-    overlayNotification.show(context);
+    platformOverlays.show(context,
+        child: overlayNotification,
+        stackedOptions: stackedOptions,
+        margin: notificationMargin,
+        alignment: alignment,
+        height: height,
+        width: width);
 
     return overlayNotification;
   }
@@ -99,7 +102,7 @@ class NotificationUtil {
       notificationType: NotificationType.info,
       displayCloseButton: false,
     );
-    overlayNotification.show(context);
+    platformOverlays.show(context, child: overlayNotification);
 
     return overlayNotification;
   }
@@ -119,7 +122,7 @@ class NotificationUtil {
       notificationType: NotificationType.success,
       displayCloseButton: false,
     );
-    overlayNotification.show(context);
+    platformOverlays.show(context, child: overlayNotification);
 
     return overlayNotification;
   }
@@ -139,7 +142,7 @@ class NotificationUtil {
       notificationType: NotificationType.error,
       displayCloseButton: false,
     );
-    overlayNotification.show(context);
+    platformOverlays.show(context, child: overlayNotification);
 
     return overlayNotification;
   }
@@ -159,7 +162,7 @@ class NotificationUtil {
       notificationType: NotificationType.warning,
       displayCloseButton: false,
     );
-    overlayNotification.show(context);
+    platformOverlays.show(context, child: overlayNotification);
 
     return overlayNotification;
   }
@@ -188,7 +191,7 @@ class NotificationUtil {
     TextDirection? direction,
     bool? showProgressBar,
     ProgressIndicatorThemeData? progressBarTheme,
-    CloseButtonShowType? closeButtonShowType,
+    ToastCloseButton closeButton = const ToastCloseButton(),
     bool? closeOnClick,
     bool? dragToClose,
     DismissDirection? dismissDirection,
@@ -219,7 +222,7 @@ class NotificationUtil {
       direction: direction,
       showProgressBar: showProgressBar,
       progressBarTheme: progressBarTheme,
-      closeButtonShowType: closeButtonShowType,
+      closeButton: closeButton,
       closeOnClick: closeOnClick,
       dragToClose: dragToClose,
       dismissDirection: dismissDirection,

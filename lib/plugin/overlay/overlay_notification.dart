@@ -52,12 +52,195 @@ enum StackedType {
   same
 }
 
+class PlatformOverlays {
+  final Map<String, OverlayEntry> _platformOverlays = {};
+
+  /// overlay的数目
+  int get overlaysLength {
+    return _platformOverlays.keys.length;
+  }
+
+  /// overlay的位置
+  int index(String id) {
+    int i = 0;
+    for (String key in _platformOverlays.keys.toList()) {
+      if (key == id) {
+        return i;
+      }
+      i++;
+    }
+    return 0;
+  }
+
+  /// 第x个距离顶部高度的偏移量
+  double _top(BuildContext context,
+      {required Key key, StackedOptions? stackedOptions, double? height}) {
+    height ??= MediaQuery.sizeOf(context).height * 0.12;
+    String id = key.toString();
+    if (stackedOptions?.type == StackedType.above) {
+      return -(height * platformOverlays.index(id)) +
+          (stackedOptions?.itemOffset.dy ?? 0) * platformOverlays.index(id);
+    } else if (stackedOptions?.type == StackedType.below) {
+      return (height * platformOverlays.index(id)) +
+          (stackedOptions?.itemOffset.dy ?? 0) * platformOverlays.index(id);
+    } else {
+      return (stackedOptions?.itemOffset.dy ?? 0) *
+          (platformOverlays.overlaysLength - 1 - platformOverlays.index(id));
+    }
+  }
+
+  /// 距离左边的宽度
+  double _left(BuildContext context,
+      {double margin = 20,
+      Alignment alignment = Alignment.topRight,
+      required double width}) {
+    if (alignment.x == 1) {
+      return MediaQuery.sizeOf(context).width - width - margin;
+    } else if (alignment.x == -1) {
+      return margin;
+    } else {
+      return ((alignment.x + 1) / 2) * MediaQuery.sizeOf(context).width -
+          (width / 2);
+    }
+  }
+
+  /// 第一个组件距离顶部高度
+  double _firstTop(BuildContext context,
+      {double margin = 20,
+      Alignment alignment = Alignment.topRight,
+      required double height}) {
+    if (alignment.y == 1) {
+      return MediaQuery.sizeOf(context).height - height - margin + 30;
+    } else if (alignment.y == -1) {
+      return margin + 30;
+    } else {
+      return ((alignment.y + 1) / 2) * MediaQuery.sizeOf(context).height -
+          (height / 2) +
+          30;
+    }
+  }
+
+  /// 保证取值在范围之间
+  double _clampDouble(double x, double min, double max) {
+    assert(min <= max && !max.isNaN && !min.isNaN);
+    if (x < min) {
+      return min;
+    }
+    if (x > max) {
+      return max;
+    }
+    if (x.isNaN) {
+      return max;
+    }
+    return x;
+  }
+
+  /// 放大系数
+  double _scale({required Key key, StackedOptions? stackedOptions}) {
+    if (stackedOptions?.scaleFactor != null) {
+      return _clampDouble(
+        (1 -
+            (stackedOptions?.scaleFactor ?? 0) *
+                (platformOverlays.overlaysLength -
+                    (platformOverlays.index(key.toString()) + 1))),
+        0,
+        1,
+      );
+    } else {
+      return 1.0;
+    }
+  }
+
+  /// 创建定制（child不为空）或者notification的浮动框
+  /// 计算显示位置，包含本组件
+  Widget buildAnimatedWidget({
+    required Widget child,
+    double? scale,
+    double? left,
+    double? top,
+    double? right,
+    double? bottom,
+    double? width,
+    double? height,
+  }) {
+    scale ??= _scale(key: child.key!);
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 300),
+      left: left,
+      right: right,
+      bottom: bottom,
+      width: width,
+      height: height,
+      top: top,
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 300),
+        scale: scale,
+        alignment: Alignment.bottomCenter,
+        child: Material(
+          color: Colors.transparent,
+          child: child,
+        ),
+      ),
+    );
+  }
+
+  /// 增加并显示一个新的浮动框，用于外部调用
+  show(
+    BuildContext context, {
+    required Widget child,
+    StackedOptions? stackedOptions,
+    Alignment alignment = Alignment.topRight,
+    double margin = 20,
+    double? scale,
+    double? left,
+    double? top,
+    double? right,
+    double? bottom,
+    double? width,
+    double? height,
+  }) {
+    String id = child.key!.toString();
+    height ??= MediaQuery.sizeOf(context).height * 0.12;
+    width ??= MediaQuery.sizeOf(context).width * 0.9;
+    left ??= _left(context,
+            alignment: alignment, margin: margin, width: width) +
+        (stackedOptions?.itemOffset.dx ?? 0) *
+            (platformOverlays.overlaysLength - 1 - platformOverlays.index(id));
+    top ??= _firstTop(context,
+            alignment: alignment, margin: margin, height: height) +
+        _top(context,
+            key: child.key!, stackedOptions: stackedOptions, height: height);
+    OverlayEntry entry = OverlayEntry(builder: (BuildContext context) {
+      return buildAnimatedWidget(
+          child: child,
+          scale: scale,
+          left: left,
+          top: top,
+          right: right,
+          bottom: bottom,
+          width: width,
+          height: height);
+    });
+    _platformOverlays[id] = entry;
+    Overlay.of(context).insert(entry);
+  }
+
+  /// 关闭，用于外部调用
+  void close(String id) {
+    OverlayEntry? overlayEntry = _platformOverlays.remove(id);
+    if (overlayEntry == null) {
+      return;
+    }
+    overlayEntry.remove();
+    overlayEntry.dispose();
+  }
+}
+
+final PlatformOverlays platformOverlays = PlatformOverlays();
+
 /// 自己编写的平台定制的overlay浮动框，用于消息通知
 class OverlayNotification extends StatefulWidget {
-  static final Map<String, OverlayNotification> _platformOverlays = {};
-
   late final Widget? child;
-  final double top;
   final bool isDraggable;
 
   ///通知的标题
@@ -122,21 +305,13 @@ class OverlayNotification extends StatefulWidget {
 
   final DismissDirection dismissDirection;
 
-  final Alignment position;
-
   final double? width;
 
   final double? height;
 
   final bool isDismissable;
 
-  final double notificationMargin;
-
-  final StackedOptions? stackedOptions;
-
   final NotificationType notificationType;
-  late final OverlayEntry? overlayEntry;
-  late final String? id;
   late final Timer _closeTimer;
   late final Animation<Offset> _offsetAnimation;
   late final AnimationController _slideController;
@@ -151,14 +326,11 @@ class OverlayNotification extends StatefulWidget {
       this.border,
       this.showProgressIndicator = true,
       this.closeButton,
-      this.stackedOptions,
-      this.notificationMargin = 20,
       this.progressIndicatorColor,
       this.toastDuration = const Duration(milliseconds: 3000),
       this.displayCloseButton = true,
       this.onCloseButtonPressed,
       this.onProgressFinished,
-      this.position = Alignment.topRight,
       this.animation = AnimationType.fromTop,
       this.animationDuration = const Duration(milliseconds: 600),
       this.iconSize = 24.0,
@@ -176,27 +348,9 @@ class OverlayNotification extends StatefulWidget {
       this.onNotificationPressed,
       this.animationCurve = Curves.ease,
       this.shadow,
-      this.top = 20.0,
       this.isDraggable = false,
       this.notificationType = NotificationType.custom,
       this.child});
-
-  /// overlay的数目
-  int get _overlaysLength {
-    return _platformOverlays.keys.length;
-  }
-
-  /// overlay的位置
-  int get _index {
-    int i = 0;
-    for (String key in _platformOverlays.keys.toList()) {
-      if (key == id) {
-        return i;
-      }
-      i++;
-    }
-    return 0;
-  }
 
   /// 高度
   double _height(BuildContext context) {
@@ -206,106 +360,6 @@ class OverlayNotification extends StatefulWidget {
   /// 宽度
   double _width(BuildContext context) {
     return width ?? MediaQuery.sizeOf(context).width * 0.9;
-  }
-
-  /// 第x个距离顶部高度的偏移量
-  double _top(BuildContext context) {
-    if (stackedOptions?.type == StackedType.above) {
-      return -(_height(context) * _index) +
-          (stackedOptions?.itemOffset.dy ?? 0) * _index;
-    } else if (stackedOptions?.type == StackedType.below) {
-      return (_height(context) * _index) +
-          (stackedOptions?.itemOffset.dy ?? 0) * _index;
-    } else {
-      return (stackedOptions?.itemOffset.dy ?? 0) *
-          (_overlaysLength - 1 - _index);
-    }
-  }
-
-  /// 距离左边的宽度
-  double _left(BuildContext context) {
-    if (position.x == 1) {
-      return MediaQuery.sizeOf(context).width -
-          _width(context) -
-          notificationMargin;
-    } else if (position.x == -1) {
-      return notificationMargin;
-    } else {
-      return ((position.x + 1) / 2) * MediaQuery.sizeOf(context).width -
-          (_width(context) / 2);
-    }
-  }
-
-  /// 第一个组件距离顶部高度
-  double _firstTop(BuildContext context) {
-    if (position.y == 1) {
-      return MediaQuery.sizeOf(context).height -
-          _height(context) -
-          notificationMargin +
-          30;
-    } else if (position.y == -1) {
-      return notificationMargin + 30;
-    } else {
-      return ((position.y + 1) / 2) * MediaQuery.sizeOf(context).height -
-          (_height(context) / 2) +
-          30;
-    }
-  }
-
-  /// 保证取值在范围之间
-  double _clampDouble(double x, double min, double max) {
-    assert(min <= max && !max.isNaN && !min.isNaN);
-    if (x < min) {
-      return min;
-    }
-    if (x > max) {
-      return max;
-    }
-    if (x.isNaN) {
-      return max;
-    }
-    return x;
-  }
-
-  /// 放大系数
-  double _scale() {
-    if (stackedOptions?.scaleFactor != null) {
-      return _clampDouble(
-        (1 -
-            (stackedOptions?.scaleFactor ?? 0) *
-                (_overlaysLength - (_index + 1))),
-        0,
-        1,
-      );
-    } else {
-      return 1.0;
-    }
-  }
-
-  /// 创建定制（child不为空）或者notification的浮动框
-  /// 计算显示位置，包含本组件
-  OverlayEntry _buildFloatWidget() {
-    return OverlayEntry(
-      opaque: false,
-      builder: (context) {
-        return AnimatedPositioned(
-          duration: const Duration(milliseconds: 300),
-          left: _left(context) +
-              (stackedOptions?.itemOffset.dx ?? 0) *
-                  (_overlaysLength - 1 - _index),
-          top: _firstTop(context) + _top(context),
-          child: AnimatedScale(
-            duration: const Duration(milliseconds: 300),
-            scale: _scale(),
-            alignment: Alignment.bottomCenter,
-            child: Material(
-              color: Colors.transparent,
-              child: this,
-            ),
-          ),
-        );
-      },
-    );
   }
 
   /// 根据title和description创建通知组件的中心内容部分
@@ -462,32 +516,10 @@ class OverlayNotification extends StatefulWidget {
     );
   }
 
-  /// 增加并显示一个新的浮动框，用于外部调用
-  String show(BuildContext context) {
-    Key uniqueKey = UniqueKey();
-    id = uniqueKey.toString();
-    overlayEntry = _buildFloatWidget();
-    _platformOverlays[id!] = this;
-    Overlay.of(context).insert(overlayEntry!);
-
-    return id!;
-  }
-
   void _onCloseButtonPressed() {
     if (onCloseButtonPressed != null) {
       onCloseButtonPressed!(this);
       dismiss();
-    }
-  }
-
-  /// 关闭，用于外部调用
-  void close() {
-    if (id != null) {
-      _platformOverlays.remove(id!);
-      overlayEntry!.remove();
-      overlayEntry!.dispose();
-      id = null;
-      overlayEntry = null;
     }
   }
 
@@ -498,7 +530,7 @@ class OverlayNotification extends StatefulWidget {
       if (onDismiss != null) {
         onDismiss!(this);
       }
-      close();
+      platformOverlays.close(key!.toString());
     });
   }
 
@@ -523,7 +555,7 @@ class OverlayNotificationState extends State<OverlayNotification>
           if (widget.onProgressFinished != null) {
             widget.onProgressFinished!(widget);
           }
-          widget.close();
+          platformOverlays.close(widget.key!.toString());
         }
       });
     });
