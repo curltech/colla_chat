@@ -59,7 +59,7 @@ void overlayMain() {
     runApp(
       MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: mobileSystemAlertOverlay,
+        home: MobileSystemAlertOverlay(),
       ),
     );
   }

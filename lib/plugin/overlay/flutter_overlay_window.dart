@@ -177,9 +177,7 @@ class FlutterOverlayWindow extends StatelessWidget {
   }
 
   setOverlay(Widget enabled) {
-    if (platformParams.mobile) {
-      mobileSystemAlertOverlay.enabled.value = enabled;
-    } else {
+    if (platformParams.desktop) {
       flutterFloatingOverlay.enabled.value = enabled;
     }
   }
