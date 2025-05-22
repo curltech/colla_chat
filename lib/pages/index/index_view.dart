@@ -253,7 +253,7 @@ class _IndexViewState extends State<IndexView>
 
     // We first init the systray menu
     await systemTray.initSystemTray(
-      toolTip: AppLocalizations.t("CollaChat"),
+      toolTip: AppLocalizations.t(appName),
       iconPath: path,
     );
     final Menu menu = Menu();

@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/overlay/overlay_notification.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -9,7 +10,7 @@ import 'package:toastification/toastification.dart';
 class NotificationUtil {
   static OverlayNotification show(BuildContext context,
       {Key? key,
-      Widget? title,
+      Widget title = const CommonAutoSizeText(appName),
       required Widget description,
       Widget? icon,
       Color? background,
@@ -89,14 +90,14 @@ class NotificationUtil {
 
   static OverlayNotification info(
     BuildContext context, {
-    String? title,
+    String title = appName,
     required String description,
     Widget? icon,
     bool showProgressIndicator = false,
   }) {
     OverlayNotification overlayNotification = OverlayNotification(
-      key:UniqueKey(),
-      title: CommonAutoSizeText(AppLocalizations.t(title ?? '')),
+      key: UniqueKey(),
+      title: CommonAutoSizeText(AppLocalizations.t(title)),
       description: CommonAutoSizeText(AppLocalizations.t(description)),
       icon: icon,
       showProgressIndicator: showProgressIndicator,
@@ -110,14 +111,14 @@ class NotificationUtil {
 
   static OverlayNotification success(
     BuildContext context, {
-    String? title,
+    String title = appName,
     required String description,
     Widget? icon,
     bool showProgressIndicator = false,
   }) {
     OverlayNotification overlayNotification = OverlayNotification(
-      key:UniqueKey(),
-      title: CommonAutoSizeText(AppLocalizations.t(title ?? '')),
+      key: UniqueKey(),
+      title: CommonAutoSizeText(AppLocalizations.t(title)),
       description: CommonAutoSizeText(AppLocalizations.t(description)),
       icon: icon,
       showProgressIndicator: showProgressIndicator,
@@ -131,14 +132,14 @@ class NotificationUtil {
 
   static OverlayNotification error(
     BuildContext context, {
-    String? title,
+    String title = appName,
     required String description,
     Widget? icon,
     bool showProgressIndicator = false,
   }) {
     OverlayNotification overlayNotification = OverlayNotification(
-      key:UniqueKey(),
-      title: CommonAutoSizeText(AppLocalizations.t(title ?? '')),
+      key: UniqueKey(),
+      title: CommonAutoSizeText(AppLocalizations.t(title)),
       description: CommonAutoSizeText(AppLocalizations.t(description)),
       icon: icon,
       showProgressIndicator: showProgressIndicator,
@@ -152,14 +153,14 @@ class NotificationUtil {
 
   static OverlayNotification warning(
     BuildContext context, {
-    String? title,
+    String title = appName,
     required String description,
     Widget? icon,
     bool showProgressIndicator = false,
   }) {
     OverlayNotification overlayNotification = OverlayNotification(
-      key:UniqueKey(),
-      title: CommonAutoSizeText(AppLocalizations.t(title ?? '')),
+      key: UniqueKey(),
+      title: CommonAutoSizeText(AppLocalizations.t(title)),
       description: CommonAutoSizeText(AppLocalizations.t(description)),
       icon: icon,
       showProgressIndicator: showProgressIndicator,
@@ -180,7 +181,7 @@ class NotificationUtil {
         animationBuilder,
     ToastificationType? type,
     ToastificationStyle? style,
-    Widget? title,
+    Widget title = const CommonAutoSizeText(appName),
     Duration? animationDuration,
     Widget? description,
     Widget? icon,

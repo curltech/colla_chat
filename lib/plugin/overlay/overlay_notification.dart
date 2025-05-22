@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/animated_progress_bar.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
 
@@ -240,14 +242,14 @@ final PlatformOverlays platformOverlays = PlatformOverlays();
 
 /// 自己编写的平台定制的overlay浮动框，用于消息通知
 class OverlayNotification extends StatefulWidget {
-  late final Widget? child;
+  Widget? child;
   final bool isDraggable;
 
   ///通知的标题
-  final Widget? title;
+  final Widget title;
 
   ///通知的描述
-  final Widget? description;
+  Widget? description;
 
   ///描述的下面显示
   final Widget? action;
@@ -318,7 +320,7 @@ class OverlayNotification extends StatefulWidget {
 
   OverlayNotification(
       {super.key,
-      this.title,
+      this.title = const CommonAutoSizeText(appName),
       this.description,
       this.icon,
       this.background,
@@ -350,7 +352,11 @@ class OverlayNotification extends StatefulWidget {
       this.shadow,
       this.isDraggable = false,
       this.notificationType = NotificationType.custom,
-      this.child});
+      this.child}) {
+    if (child == null) {
+      description ??= CommonAutoSizeText('');
+    }
+  }
 
   /// 高度
   double _height(BuildContext context) {
@@ -395,12 +401,10 @@ class OverlayNotification extends StatefulWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              if (title != null) ...[
-                title!,
-                const SizedBox(
-                  height: 5,
-                ),
-              ],
+              title,
+              const SizedBox(
+                height: 5,
+              ),
               Expanded(child: description ?? nilBox),
               if (action != null) ...[
                 const SizedBox(
@@ -453,13 +457,13 @@ class OverlayNotification extends StatefulWidget {
         return const Icon(Icons.error, color: Colors.red);
       case NotificationType.warning:
         return const Icon(
-          Icons.error,
+          Icons.warning,
           color: Colors.yellow,
         );
       case NotificationType.info:
         return const Icon(Icons.info, color: Colors.green);
       default:
-        return icon!;
+        return Icon(Icons.dashboard_customize_outlined, color: myself.primary);
     }
   }
 
@@ -530,7 +534,6 @@ class OverlayNotification extends StatefulWidget {
       if (onDismiss != null) {
         onDismiss!(this);
       }
-      platformOverlays.close(key!.toString());
     });
   }
 
@@ -555,7 +558,6 @@ class OverlayNotificationState extends State<OverlayNotification>
           if (widget.onProgressFinished != null) {
             widget.onProgressFinished!(widget);
           }
-          platformOverlays.close(widget.key!.toString());
         }
       });
     });
@@ -634,7 +636,10 @@ class OverlayNotificationState extends State<OverlayNotification>
   @override
   Widget build(BuildContext context) {
     /// 如果定制组件为空，而且是通知组件，创建通知组件设置为child
-    if (widget.child == null && widget.description != null) {
+    if (widget.child == null) {
+      if (widget.description == null) {
+        widget.description = CommonAutoSizeText('');
+      }
       widget.child = widget._buildNotificationWidget(context);
     }
     return widget.child!;

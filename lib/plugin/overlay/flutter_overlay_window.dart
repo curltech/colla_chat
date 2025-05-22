@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/overlay/flutter_floating_widget.dart';
 import 'package:colla_chat/plugin/overlay/mobile_system_alert_window.dart';
@@ -38,7 +39,22 @@ class FlutterOverlayWindowWidget extends StatelessWidget with TileDataMixin {
         IconButton(
             onPressed: () {
               flutterOverlayWindow.setOverlay(OverlayNotification(
+                key: UniqueKey(),
                 description: CommonAutoSizeText('Text'),
+                onCloseButtonPressed:
+                    (OverlayNotification overlayNotification) {
+                  flutterOverlayWindow.closeOverlay();
+                },
+                onDismiss: (OverlayNotification overlayNotification) {
+                  flutterOverlayWindow.closeOverlay();
+                },
+                onProgressFinished: (OverlayNotification overlayNotification) {
+                  flutterOverlayWindow.closeOverlay();
+                },
+                onNotificationPressed:
+                    (OverlayNotification overlayNotification) {
+                  flutterOverlayWindow.closeOverlay();
+                },
               ));
               flutterOverlayWindow.showOverlay(context);
             },
@@ -70,8 +86,8 @@ class MobileOverlayConfig {
   const MobileOverlayConfig(
       {this.height,
       this.width,
-      this.notificationTitle = "CollaChat",
-      this.notificationBody = "CollaChat",
+      this.notificationTitle = appName,
+      this.notificationBody = appName,
       this.prefMode = SystemWindowPrefMode.DEFAULT,
       this.layoutParamFlags,
       this.gravity = SystemWindowGravity.CENTER});
@@ -104,7 +120,7 @@ class DesktopConfig {
 
   const DesktopConfig(
       {this.slideType = FloatingSlideType.onRightAndBottom,
-      this.moveOpacity = 1,
+      this.moveOpacity = 0,
       this.isPosCache = true,
       this.isShowLog = true,
       this.isSnapToEdge = true,
@@ -113,10 +129,10 @@ class DesktopConfig {
       this.slideBottomHeight = 100,
       this.snapToEdgeSpace = 0,
       this.slideStopType = SlideStopType.slideStopAutoType,
-      this.top,
+      this.top = 100,
       this.left = 100,
       this.right,
-      this.bottom = 100,
+      this.bottom,
       this.point});
 }
 

@@ -1,6 +1,7 @@
 import 'dart:isolate';
 import 'dart:ui';
 
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/plugin/overlay/overlay_notification.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -55,8 +56,8 @@ class MobileSystemAlertHome extends StatelessWidget {
     SystemWindowGravity gravity = SystemWindowGravity.CENTER,
     int? width,
     int? height,
-    String notificationTitle = "CollaChat",
-    String notificationBody = "CollaChat",
+    String notificationTitle = appName,
+    String notificationBody = appName,
     SystemWindowPrefMode prefMode = SystemWindowPrefMode.DEFAULT,
     List<SystemWindowFlags>? layoutParamFlags,
   }) async {
@@ -81,8 +82,8 @@ class MobileSystemAlertHome extends StatelessWidget {
     SystemWindowGravity gravity = SystemWindowGravity.CENTER,
     int? width,
     int? height,
-    String notificationTitle = "CollaChat",
-    String notificationBody = "CollaChat",
+    String notificationTitle = appName,
+    String notificationBody = appName,
     SystemWindowPrefMode prefMode = SystemWindowPrefMode.DEFAULT,
     List<SystemWindowFlags>? layoutParamFlags,
   }) async {
