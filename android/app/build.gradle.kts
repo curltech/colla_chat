@@ -26,6 +26,11 @@ android {
     compileSdk = 35
     ndkVersion = "28.0.13004108"
 
+    packagingOptions {
+        // Fixes duplicate libraries build issue,
+        // when your project uses more than one plugin that depend on C++ libs.
+        pickFirst = 'lib/**/libc++_shared.so'
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21

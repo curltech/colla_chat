@@ -10,6 +10,7 @@ import 'package:colla_chat/widgets/media/video/chewie_video_player.dart';
 import 'package:colla_chat/widgets/media/video/flick_video_player.dart';
 import 'package:colla_chat/widgets/media/video/mediakit_video_player.dart';
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
+import 'package:colla_chat/widgets/media/video/vlc_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -47,6 +48,12 @@ class PlatformVideoPlayer extends StatelessWidget {
       mediaPlayerControllers.add(betterVideoPlayerController);
       platformMediaPlayers.add(PlatformMediaPlayer(
         mediaPlayerController: betterVideoPlayerController,
+      ));
+      MobileVlcPlayerController mobileVlcPlayerController =
+          MobileVlcPlayerController(playlistController);
+      mediaPlayerControllers.add(mobileVlcPlayerController);
+      platformMediaPlayers.add(PlatformMediaPlayer(
+        mediaPlayerController: mobileVlcPlayerController,
       ));
     }
     ChewieVideoPlayerController chewieVideoPlayerController =

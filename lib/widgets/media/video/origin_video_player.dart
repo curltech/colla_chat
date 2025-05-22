@@ -78,10 +78,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     videoPlayerController =
         await OriginMediaSource.media(filename: mediaSource.filename);
     if (autoPlay && videoPlayerController != null) {
-      var controller = videoPlayerController;
-      if (controller != null) {
-        controller.play();
-      }
+      videoPlayerController!.play();
     }
     filename.value = mediaSource.filename;
   }
@@ -277,58 +274,49 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频
   @override
   pause() async {
-    var controller = videoPlayerController;
-    controller?.pause();
+    videoPlayerController?.pause();
   }
 
   @override
   resume() async {
-    var controller = videoPlayerController;
-    controller?.play();
+    videoPlayerController?.play();
   }
 
   @override
   stop() async {
-    var controller = videoPlayerController;
-    controller?.pause();
+    videoPlayerController?.pause();
   }
 
   seek(Duration position, {int? index}) async {
-    var controller = videoPlayerController;
-    controller?.seekTo(position);
+    videoPlayerController?.seekTo(position);
   }
 
   Future<double> getSpeed() async {
     double speed = 1.0;
-    var controller = videoPlayerController;
-    if (controller != null) {
-      speed = controller.value.playbackSpeed;
+    if (videoPlayerController != null) {
+      speed = videoPlayerController!.value.playbackSpeed;
     }
     return Future.value(speed);
   }
 
   setSpeed(double speed) async {
-    var controller = videoPlayerController;
-    controller?.setPlaybackSpeed(speed);
+    videoPlayerController?.setPlaybackSpeed(speed);
   }
 
   Future<double> getVolume() async {
     double volume = 1.0;
-    var controller = videoPlayerController;
-    if (controller != null) {
-      volume = controller.value.volume;
+    if (videoPlayerController != null) {
+      volume = videoPlayerController!.value.volume;
     }
     return Future.value(volume);
   }
 
   setVolume(double volume) async {
-    var controller = videoPlayerController;
-    controller?.setVolume(volume);
+    videoPlayerController?.setVolume(volume);
   }
 
   VideoPlayerValue? get value {
-    var controller = videoPlayerController;
-    VideoPlayerValue? value = controller?.value;
+    VideoPlayerValue? value = videoPlayerController?.value;
 
     return value;
   }
