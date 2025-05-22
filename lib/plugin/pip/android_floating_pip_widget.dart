@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -56,7 +57,7 @@ class AndroidFloatingPipWidget extends StatelessWidget {
   final AndroidFloatingPipController androidFloatingPipController =
       AndroidFloatingPipController();
   final Widget disabled;
-  final Rx<Widget> enabled = Rx<Widget>(Container());
+  final Rx<Widget> enabled = Rx<Widget>(nilBox);
 
   AndroidFloatingPipWidget({super.key, required this.disabled});
 

@@ -1,3 +1,4 @@
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_floating/floating/assist/Point.dart';
 import 'package:flutter_floating/floating/assist/floating_slide_type.dart';
@@ -145,7 +146,7 @@ class FlutterFloatingHome extends StatelessWidget {
 
 /// 应用级overlay窗口的overlay部分
 class FlutterFloatingOverlay extends StatelessWidget {
-  final Rx<Widget> enabled = Rx<Widget>(Container());
+  final Rx<Widget> enabled = Rx<Widget>(nilBox);
 
   //系统级窗口的形状
   final Rx<BoxShape> boxShape = BoxShape.rectangle.obs;

@@ -1,3 +1,4 @@
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:fl_pip/fl_pip.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -35,7 +36,7 @@ class MobileFlPipController {
 /// enabled是pip生效的时候显示的组件
 class MobileFlPipEnabledWidget extends StatelessWidget {
   final MobileFlPipController mobileFlPipController = MobileFlPipController();
-  final Rx<Widget> enabled = Rx<Widget>(Container());
+  final Rx<Widget> enabled = Rx<Widget>(nilBox);
 
   MobileFlPipEnabledWidget({super.key});
 

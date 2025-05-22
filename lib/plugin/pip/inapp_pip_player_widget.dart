@@ -1,7 +1,6 @@
-import 'dart:developer';
-
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pip_player/models/pip_settings.dart';
 import 'package:flutter_pip_player/pip_controller.dart';
@@ -11,7 +10,7 @@ import 'package:get/get.dart';
 /// flutter_pip_player实现的应用内的模拟画中画功能
 /// enabled是pip生效的时候显示的组件
 class InAppPipPlayerWidget extends StatelessWidget {
-  final Rx<Widget> enabled = Rx<Widget>(Container());
+  final Rx<Widget> enabled = Rx<Widget>(nilBox);
   final RxBool isPlaying = false.obs;
 
   InAppPipPlayerWidget({super.key});

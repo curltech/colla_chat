@@ -5,6 +5,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/plugin/overlay/overlay_notification.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:system_alert_window/system_alert_window.dart';
@@ -114,7 +115,7 @@ class MobileSystemAlertHome extends StatelessWidget {
 /// 移动版的系统警告窗口的overlay部分
 /// 支持向主组件发送消息和接收消息
 class MobileSystemAlertOverlay extends StatelessWidget {
-  final Rx<Widget> enabled = Rx<Widget>(Container());
+  final Rx<Widget> enabled = Rx<Widget>(nilBox);
   late final SendPort? sendPort;
 
   //系统级窗口的形状
