@@ -31,20 +31,27 @@ class MobileFlPipController {
   }
 }
 
-final MobileFlPipController mobileFlPipController = MobileFlPipController();
-
 /// FlPip实现移动的背景画中画功能
 /// enabled是pip生效的时候显示的组件
 class MobileFlPipEnabledWidget extends StatelessWidget {
+  final MobileFlPipController mobileFlPipController = MobileFlPipController();
   final Rx<Widget> enabled = Rx<Widget>(Container());
 
   MobileFlPipEnabledWidget({super.key});
 
+  enable(
+      {Widget? enabled,
+      FlPiPAndroidConfig android = const FlPiPAndroidConfig(),
+      FlPiPiOSConfig ios = const FlPiPiOSConfig()}) {
+    if (enabled != null) {
+      this.enabled.value = enabled;
+    }
+    mobileFlPipController.enable(android: android, ios: ios);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      return enabled.value;
-    });
+    return enabled.value;
   }
 }
 

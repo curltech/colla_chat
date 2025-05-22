@@ -970,5 +970,6 @@
   "Video player": "视频播放",
   "Audio player": "音频播放",
   "Play": "播放",
-  "Overlay window": "浮动窗口"
+  "Overlay window": "浮动窗口",
+  "Pip window": "画中画窗口"
 }

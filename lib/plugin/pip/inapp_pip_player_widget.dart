@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pip_player/models/pip_settings.dart';
@@ -24,16 +25,25 @@ class InAppPipPlayerWidget extends StatelessWidget {
     ),
   );
 
+  enable({Widget? enabled}) {
+    if (enabled != null) {
+      this.enabled.value = enabled;
+    }
+    pipController.show();
+  }
+
   @override
   Widget build(BuildContext context) {
     return PipPlayer(
       controller: pipController,
-      content: enabled.value,
+      content: Obx(() {
+        return enabled.value;
+      }),
       onReelsDown: () {
-        log('down');
+        logger.i('Reels down');
       },
       onReelsUp: () {
-        log('up');
+        logger.i('Reels up');
       },
       onClose: () {
         pipController.hide();

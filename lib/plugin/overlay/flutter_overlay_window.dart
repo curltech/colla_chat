@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_floating/floating/assist/Point.dart';
 import 'package:flutter_floating/floating/assist/floating_slide_type.dart';
 import 'package:flutter_floating/floating/assist/slide_stop_type.dart';
+import 'package:get/get.dart';
 import 'package:system_alert_window/system_alert_window.dart';
 
 class FlutterOverlayWindowWidget extends StatelessWidget with TileDataMixin {
@@ -146,7 +147,7 @@ class FlutterOverlayWindow extends StatelessWidget {
 
   late final FlutterFloatingHome flutterFloatingHome =
       FlutterFloatingHome(disabled: disabled);
-  String? floatingKey;
+  final Rx<String?> floatingKey = Rx<String?>(null);
 
   showOverlay(BuildContext context,
       {MobileOverlayConfig mobileOverlayConfig = const MobileOverlayConfig(),
@@ -161,7 +162,7 @@ class FlutterOverlayWindow extends StatelessWidget {
           prefMode: mobileOverlayConfig.prefMode,
           layoutParamFlags: mobileOverlayConfig.layoutParamFlags);
     } else {
-      floatingKey ??= flutterFloatingHome.flutterFloatingController
+      floatingKey.value ??= flutterFloatingHome.flutterFloatingController
           .createFloating(flutterFloatingOverlay,
               slideType: desktopConfig.slideType,
               isShowLog: desktopConfig.isShowLog,
@@ -188,7 +189,7 @@ class FlutterOverlayWindow extends StatelessWidget {
       mobileSystemAlertHome.closeOverlay();
     } else {
       flutterFloatingHome.flutterFloatingController.closeFloating();
-      floatingKey = null;
+      floatingKey.value = null;
     }
   }
 

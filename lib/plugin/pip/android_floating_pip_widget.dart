@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:floating/floating.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 /// 用floating实现android的画中画功能
 class AndroidFloatingPipController {
@@ -52,18 +53,34 @@ class AndroidFloatingPipController {
 /// enabled是pip生效的时候显示的组件
 /// disabled是pip无效的时候显示的组件
 class AndroidFloatingPipWidget extends StatelessWidget {
-  final AndroidFloatingPipController androidFloatingPipController = AndroidFloatingPipController();
+  final AndroidFloatingPipController androidFloatingPipController =
+      AndroidFloatingPipController();
   final Widget disabled;
-  final Widget enabled;
+  final Rx<Widget> enabled = Rx<Widget>(Container());
 
-  AndroidFloatingPipWidget(
-      {super.key, required this.disabled, required this.enabled});
+  AndroidFloatingPipWidget({super.key, required this.disabled});
+
+  enable(
+      {Widget? enabled,
+      Rational aspectRatio = const Rational.landscape(),
+      Rectangle<int>? sourceRectHint,
+      bool isImmediate = true}) {
+    if (enabled != null) {
+      this.enabled.value = enabled;
+    }
+    androidFloatingPipController.enable(
+        aspectRatio: aspectRatio,
+        sourceRectHint: sourceRectHint,
+        isImmediate: isImmediate);
+  }
 
   @override
   Widget build(BuildContext context) {
     return PiPSwitcher(
       childWhenDisabled: disabled,
-      childWhenEnabled: enabled,
+      childWhenEnabled: Obx(() {
+        return enabled.value;
+      }),
     );
   }
 }

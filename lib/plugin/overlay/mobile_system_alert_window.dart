@@ -160,7 +160,6 @@ class MobileSystemAlertOverlay extends StatelessWidget {
     return Obx(() {
       return Container(
         decoration: BoxDecoration(
-          color: Colors.white,
           shape: boxShape.value,
         ),
         child: Center(child: enabled.value),

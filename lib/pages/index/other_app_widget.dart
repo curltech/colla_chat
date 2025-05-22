@@ -12,7 +12,7 @@ import 'package:colla_chat/pages/poem/poem_widget.dart';
 import 'package:colla_chat/pages/stock/stock_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/overlay/flutter_overlay_window.dart';
-import 'package:colla_chat/plugin/pip/mobile_pip_widget.dart';
+import 'package:colla_chat/plugin/pip/flutter_pip_window_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/sherpa/sherpa_install_widget.dart';
@@ -35,7 +35,8 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
   final SherpaInstallWidget sherpaInstallWidget = SherpaInstallWidget();
   final MailAddressWidget mailAddressWidget = MailAddressWidget();
   final StockMainWidget stockMainWidget = StockMainWidget();
-  final MobilePipWidget mobilePipWidget = MobilePipWidget();
+  final FlutterPipWindowWidget flutterPipWindowWidget =
+      FlutterPipWindowWidget();
   final GameMainWidget gameMainWidget = GameMainWidget();
   final PoemWidget poemWidget = PoemWidget();
   final DataSourceWidget dataSourceWidget = DataSourceWidget();
@@ -51,7 +52,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     webViewWidget.routeName: webViewWidget,
     openVpnWidget.routeName: openVpnWidget,
     flutterOverlayWindowWidget.routeName: flutterOverlayWindowWidget,
-    mobilePipWidget.routeName: mobilePipWidget,
+    flutterPipWindowWidget.routeName: flutterPipWindowWidget,
     platformMapLauncherWidget.routeName: platformMapLauncherWidget,
     sherpaInstallWidget.routeName: sherpaInstallWidget,
     dataSourceWidget.routeName: dataSourceWidget,
@@ -62,7 +63,7 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(webViewWidget);
     indexWidgetProvider.define(openVpnWidget);
     indexWidgetProvider.define(flutterOverlayWindowWidget);
-    indexWidgetProvider.define(mobilePipWidget);
+    indexWidgetProvider.define(flutterPipWindowWidget);
     indexWidgetProvider.define(platformMapLauncherWidget);
     indexWidgetProvider.define(sherpaInstallWidget);
     indexWidgetProvider.define(fileWidget);
@@ -150,11 +151,11 @@ class OtherAppWidget extends StatelessWidget with TileDataMixin {
           indexWidgetProvider.push(sherpaInstallWidget.routeName);
         }));
     otherAppTileData.add(TileData(
-        title: AppLocalizations.t(mobilePipWidget.title),
-        prefix: mobilePipWidget.iconData,
-        helpPath: mobilePipWidget.routeName,
+        title: AppLocalizations.t(flutterPipWindowWidget.title),
+        prefix: flutterPipWindowWidget.iconData,
+        helpPath: flutterPipWindowWidget.routeName,
         onTap: (int index, String title, {String? subtitle}) {
-          indexWidgetProvider.push(mobilePipWidget.routeName);
+          indexWidgetProvider.push(flutterPipWindowWidget.routeName);
         }));
     if (platformParams.mobile) {
       if (myself.peerProfile.vpnSwitch) {
