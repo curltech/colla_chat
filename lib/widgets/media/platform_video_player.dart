@@ -25,6 +25,7 @@ class PlatformVideoPlayer extends StatelessWidget {
   );
   final List<PlatformMediaPlayer> platformMediaPlayers = [];
   final RxInt index = 0.obs;
+  final RxInt crossAxisCount = 1.obs;
 
   PlatformVideoPlayer({
     super.key,
@@ -78,6 +79,14 @@ class PlatformVideoPlayer extends StatelessWidget {
     // swiperController.move(1);
   }
 
+  toggleCrossAxisCount() {
+    if (crossAxisCount.value == 4) {
+      crossAxisCount.value = 1;
+    } else {
+      crossAxisCount.value = crossAxisCount.value + 1;
+    }
+  }
+
   close() {
     for (var mediaPlayerController in mediaPlayerControllers) {
       mediaPlayerController.close();
@@ -97,23 +106,23 @@ class PlatformVideoPlayer extends StatelessWidget {
           return playlistWidget;
         }
         if (index == 1) {
-          int crossAxisCount =
-              (appDataProvider.secondaryBodyWidth / appDataProvider.designSize.width).floor();
-          return GridView.builder(
-              itemCount: platformMediaPlayers.length,
-              //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  //横轴元素个数
-                  crossAxisCount: crossAxisCount,
-                  //纵轴间距
-                  mainAxisSpacing: 1.0,
-                  //横轴间距
-                  crossAxisSpacing: 1.0,
-                  //子组件宽高长度比例
-                  childAspectRatio: 1),
-              itemBuilder: (BuildContext context, int index) {
-                return platformMediaPlayers[index];
-              });
+          return Obx(() {
+            return GridView.builder(
+                itemCount: platformMediaPlayers.length,
+                //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    //横轴元素个数
+                    crossAxisCount: crossAxisCount.value,
+                    //纵轴间距
+                    mainAxisSpacing: 1.0,
+                    //横轴间距
+                    crossAxisSpacing: 1.0,
+                    //子组件宽高长度比例
+                    childAspectRatio: 1),
+                itemBuilder: (BuildContext context, int index) {
+                  return platformMediaPlayers[index];
+                });
+          });
         }
         return nilBox;
       },

@@ -39,21 +39,25 @@ class PlatformVideoPlayerWidget extends StatelessWidget with TileDataMixin {
               icon: const Icon(Icons.video_call),
             );
           } else {
-            return IconButton(
-              tooltip: AppLocalizations.t('Playlist'),
-              onPressed: () async {
-                await platformVideoPlayer.swiperController.move(0);
-              },
-              icon: const Icon(Icons.featured_play_list_outlined),
-            );
+            return Row(children: [
+              IconButton(
+                tooltip: AppLocalizations.t('Playlist'),
+                onPressed: () async {
+                  await platformVideoPlayer.swiperController.move(0);
+                },
+                icon: const Icon(Icons.featured_play_list_outlined),
+              ),
+              IconButton(
+                tooltip: AppLocalizations.t('Toggle'),
+                onPressed: () async {
+                  platformVideoPlayer.toggleCrossAxisCount();
+                },
+                icon: const Icon(Icons.toggle_off_outlined),
+              ),
+            ]);
           }
         });
     children.add(btn);
-    children.add(
-      const SizedBox(
-        width: 5.0,
-      ),
-    );
     children.add(
       IconButton(
         tooltip: AppLocalizations.t('Close'),
