@@ -125,8 +125,8 @@ class MobileSystemAlertOverlay extends StatelessWidget {
 
   void _init() {
     SystemAlertWindow.overlayListener.listen((event) {
-      enabled.value =
-          OverlayNotification(description: CommonAutoSizeText(event));
+      enabled.value = OverlayNotification(
+          key: UniqueKey(), description: CommonAutoSizeText(event));
     });
     sendPort = IsolateNameServer.lookupPortByName(
       mainSendPortName,

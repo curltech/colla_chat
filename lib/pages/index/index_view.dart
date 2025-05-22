@@ -411,6 +411,7 @@ class _IndexViewState extends State<IndexView>
       }
 
       OverlayNotification overlayNotification = NotificationUtil.show(context,
+          key:UniqueKey(),
           icon: bannerAvatarImage,
           displayCloseButton: true,
           toastDuration: const Duration(milliseconds: 10000),
@@ -549,6 +550,7 @@ class _IndexViewState extends State<IndexView>
     _play();
     OverlayNotification overlayNotification = NotificationUtil.show(
       context,
+      key:UniqueKey(),
       icon: bannerAvatarImage,
       toastDuration: const Duration(milliseconds: 10000),
       title: CommonAutoSizeText(conferenceChatMessage.senderName ?? '',

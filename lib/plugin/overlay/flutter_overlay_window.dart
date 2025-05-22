@@ -1,14 +1,15 @@
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/overlay/flutter_floating_widget.dart';
 import 'package:colla_chat/plugin/overlay/mobile_system_alert_window.dart';
-import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/plugin/overlay/overlay_notification.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
-import 'package:system_alert_window/system_alert_window.dart';
 import 'package:flutter_floating/floating/assist/Point.dart';
 import 'package:flutter_floating/floating/assist/floating_slide_type.dart';
 import 'package:flutter_floating/floating/assist/slide_stop_type.dart';
+import 'package:system_alert_window/system_alert_window.dart';
 
 class FlutterOverlayWindowWidget extends StatelessWidget with TileDataMixin {
   FlutterOverlayWindowWidget({super.key});
@@ -36,9 +37,8 @@ class FlutterOverlayWindowWidget extends StatelessWidget with TileDataMixin {
       rightWidgets: [
         IconButton(
             onPressed: () {
-              flutterOverlayWindow.setOverlay(Icon(
-                Icons.access_alarm_outlined,
-                color: myself.primary,
+              flutterOverlayWindow.setOverlay(OverlayNotification(
+                description: CommonAutoSizeText('Text'),
               ));
               flutterOverlayWindow.showOverlay(context);
             },

@@ -95,6 +95,7 @@ class NotificationUtil {
     bool showProgressIndicator = false,
   }) {
     OverlayNotification overlayNotification = OverlayNotification(
+      key:UniqueKey(),
       title: CommonAutoSizeText(AppLocalizations.t(title ?? '')),
       description: CommonAutoSizeText(AppLocalizations.t(description)),
       icon: icon,
@@ -115,6 +116,7 @@ class NotificationUtil {
     bool showProgressIndicator = false,
   }) {
     OverlayNotification overlayNotification = OverlayNotification(
+      key:UniqueKey(),
       title: CommonAutoSizeText(AppLocalizations.t(title ?? '')),
       description: CommonAutoSizeText(AppLocalizations.t(description)),
       icon: icon,
@@ -135,6 +137,7 @@ class NotificationUtil {
     bool showProgressIndicator = false,
   }) {
     OverlayNotification overlayNotification = OverlayNotification(
+      key:UniqueKey(),
       title: CommonAutoSizeText(AppLocalizations.t(title ?? '')),
       description: CommonAutoSizeText(AppLocalizations.t(description)),
       icon: icon,
@@ -155,6 +158,7 @@ class NotificationUtil {
     bool showProgressIndicator = false,
   }) {
     OverlayNotification overlayNotification = OverlayNotification(
+      key:UniqueKey(),
       title: CommonAutoSizeText(AppLocalizations.t(title ?? '')),
       description: CommonAutoSizeText(AppLocalizations.t(description)),
       icon: icon,
