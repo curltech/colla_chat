@@ -161,7 +161,7 @@ class MobileForegroundTaskHandler extends TaskHandler {
   }
 
   @override
-  Future<void> onDestroy(DateTime timestamp) async {
+  Future<void> onDestroy(DateTime timestamp, bool b) async {
     // TODO: implement onDestroy
   }
 
