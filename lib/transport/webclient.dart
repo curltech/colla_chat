@@ -1,7 +1,7 @@
 /// webclient代表httpclient或者websocketclient
 library;
 
-import 'package:colla_chat/transport/httpclient.dart';
+import 'package:colla_chat/transport/dio_http_client.dart';
 import 'package:colla_chat/transport/websocket/universal_websocket.dart';
 
 abstract class IWebClient {

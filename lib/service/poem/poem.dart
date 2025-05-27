@@ -7,7 +7,7 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/transport/httpclient.dart';
+import 'package:colla_chat/transport/dio_http_client.dart';
 import 'package:dio/dio.dart';
 
 class PoemService extends GeneralBaseService<Poem> {

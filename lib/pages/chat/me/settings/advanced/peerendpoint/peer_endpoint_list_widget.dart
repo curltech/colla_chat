@@ -7,7 +7,7 @@ import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_end
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_view_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/dht/peerendpoint.dart';
-import 'package:colla_chat/transport/httpclient.dart';
+import 'package:colla_chat/transport/dio_http_client.dart';
 import 'package:colla_chat/transport/websocket/common_websocket.dart';
 import 'package:colla_chat/transport/websocket/universal_websocket.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';

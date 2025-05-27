@@ -6,7 +6,7 @@ import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/service/stock/share.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/transport/httpclient.dart';
+import 'package:colla_chat/transport/dio_http_client.dart';
 import 'package:dio/dio.dart';
 
 class DayLineRequestParam {

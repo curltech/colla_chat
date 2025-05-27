@@ -15,7 +15,7 @@ import 'package:colla_chat/service/p2p/message_serializer.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/transport/httpclient.dart';
+import 'package:colla_chat/transport/dio_http_client.dart';
 import 'package:colla_chat/transport/websocket/common_websocket.dart';
 import 'package:colla_chat/transport/websocket/universal_websocket.dart';
 import 'package:dio/dio.dart';

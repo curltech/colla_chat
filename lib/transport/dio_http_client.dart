@@ -9,7 +9,6 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 class DioHttpClient implements IWebClient {
   final Dio _client = Dio();
-  String? _address;
 
   DioHttpClient(String address) {
     if (address.startsWith('http')) {
@@ -38,7 +37,6 @@ class DioHttpClient implements IWebClient {
       var token = '';
       var headers = {'Authorization': 'Bearer $token'};
       _client.options.headers = headers;
-      _address = address;
     }
 
     // request interceptor
