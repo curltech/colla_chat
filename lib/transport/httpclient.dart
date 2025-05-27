@@ -15,7 +15,10 @@ class DioHttpClient implements IWebClient {
     if (address.startsWith('http')) {
       ///获取dio中的httpclient，处理证书问题
       (_client.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
-        final client = HttpClient();
+        /// 解决Connection closed before full header was received错误
+        final context = SecurityContext.defaultContext;
+        context.allowLegacyUnsafeRenegotiation = true;
+        final client = HttpClient(context: context);
         client.findProxy = (url) {
           // ///设置代理 电脑ip地址
           // return "PROXY 192.168.31.102:8888";
@@ -28,6 +31,7 @@ class DioHttpClient implements IWebClient {
         return client;
       };
       // Set default configs
+      // _client.options.persistentConnection = false;
       _client.options.baseUrl = address;
       _client.options.connectTimeout = const Duration(seconds: 5); //5s
       _client.options.receiveTimeout = const Duration(seconds: 1800);

@@ -283,7 +283,7 @@ dependencies:
   video_player_media_kit: ^1.0.6
   universal_video_controls: ^1.1.0
   audio_service: ^0.18.17
-  flutter_tts: ^4.2.0
+  flutter_tts: ^4.2.2
   speech_to_text: ^7.1.0-beta.3
   sherpa_onnx: ^1.12.0
   flutter_image_compress: ^2.4.0
