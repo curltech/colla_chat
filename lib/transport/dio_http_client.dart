@@ -6,6 +6,7 @@ import 'package:colla_chat/transport/webclient.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:dio_smart_retry/dio_smart_retry.dart';
 
 class DioHttpClient implements IWebClient {
   final Dio _client = Dio();
@@ -40,6 +41,9 @@ class DioHttpClient implements IWebClient {
     }
 
     // request interceptor
+    _client.interceptors.add(RetryInterceptor(
+      dio: _client,
+    ));
     _client.interceptors
         .add(InterceptorsWrapper(onResponse: (response, handler) {
       if (response.statusCode != 200) {

@@ -79,6 +79,7 @@ dependencies:
   #网络
   dio: ^5.8.0+1
   dio_http2_adapter: ^2.6.0
+  dio_smart_retry: ^7.0.1
   telephony: #不再维护了
     git:
       url: https://github.com/suhardik/s_telephony.git
