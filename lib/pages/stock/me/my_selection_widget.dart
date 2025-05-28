@@ -14,6 +14,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
+import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -215,17 +216,12 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'MySelection';
 
-  
-
   final DataListController<DayLine> dayLineController =
       DataListController<DayLine>();
 
   Widget _buildActionWidget(BuildContext context, int index, dynamic dayLine) {
-    Widget actionWidget = Row(
-      children: [
-        const SizedBox(
-          width: 10,
-        ),
+    Widget actionWidget=
+
         IconButton(
           onPressed: () async {
             String tsCode = dayLine.tsCode;
@@ -237,9 +233,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
             color: Colors.yellow,
           ),
           tooltip: AppLocalizations.t('StockLineChart'),
-        )
-      ],
-    );
+        );
     return actionWidget;
   }
 
@@ -389,6 +383,8 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
       PlatformDataColumn(
           label: '',
           name: 'action',
+          align: TextAlign.right,
+          width: 70,
           inputType: InputType.custom,
           buildSuffix: (int index, dynamic dayLine) {
             return _buildActionWidget(context, index, dayLine);
@@ -402,7 +398,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
         platformDataColumns: dayLineDataColumns,
         controller: dayLineController,
         fixedLeftColumns: 2,
-        minWidth: 600);
+        minWidth: 700);
     return Stack(children: <Widget>[
       table,
       Obx(() {
@@ -449,31 +445,31 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     _refresh();
-    List<Widget> rightWidgets = [
-      IconButton(
-        tooltip: AppLocalizations.t('Add share'),
-        onPressed: () {
+    List<ActionData> actions = [
+      ActionData(
+        label: AppLocalizations.t('Add share'),
+        onTap: (int index, String label, {String? value}) {
           indexWidgetProvider.push('add_share');
         },
         icon: const Icon(Icons.add_chart_outlined),
       ),
-      IconButton(
-        tooltip: AppLocalizations.t('Delete share'),
-        onPressed: () async {
+      ActionData(
+        label: AppLocalizations.t('Delete share'),
+        onTap: (int index, String label, {String? value}) async {
           await _removeShare();
         },
         icon: const Icon(Icons.bookmark_remove),
       ),
-      IconButton(
-        tooltip: AppLocalizations.t('Remove member'),
-        onPressed: () async {
+      ActionData(
+        label: AppLocalizations.t('Remove member'),
+        onTap: (int index, String label, {String? value}) async {
           await _removeMember();
         },
         icon: const Icon(Icons.remove_road_outlined),
       ),
-      IconButton(
-        tooltip: AppLocalizations.t('Add group'),
-        onPressed: () async {
+      ActionData(
+        label: AppLocalizations.t('Add group'),
+        onTap: (int index, String label, {String? value}) async {
           String? groupName = await DialogUtil.showTextFormField(
               title: 'Add group', content: 'Group name');
           if (groupName != null) {
@@ -483,9 +479,9 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
         },
         icon: const Icon(Icons.group_add_outlined),
       ),
-      IconButton(
-        tooltip: AppLocalizations.t('Delete group'),
-        onPressed: () async {
+      ActionData(
+        label: AppLocalizations.t('Delete group'),
+        onTap: (int index, String label, {String? value}) async {
           String groupName = myShareController.groupName.value;
           bool? confirm = await DialogUtil.confirm(
               content: 'Do you confirm remove group $groupName?');
@@ -496,9 +492,9 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
         },
         icon: const Icon(Icons.group_remove_outlined),
       ),
-      IconButton(
-        tooltip: AppLocalizations.t('Refresh'),
-        onPressed: () async {
+      ActionData(
+        label: AppLocalizations.t('Refresh'),
+        onTap: (int index, String label, {String? value}) async {
           _refresh();
         },
         icon: const Icon(Icons.refresh),
@@ -508,7 +504,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
       title: title,
       helpPath: routeName,
       withLeading: true,
-      rightWidgets: rightWidgets,
+      actions: actions,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

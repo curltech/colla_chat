@@ -60,7 +60,6 @@ class AppBarView extends StatelessWidget {
         if (helpPath != null) {
           titleWidget = Row(
             children: [
-              titleWidget,
               InkWell(
                 onTap: () {
                   helpInformationController.title.value = title ?? '';
@@ -72,7 +71,8 @@ class AppBarView extends StatelessWidget {
                   Icons.help_outline,
                   color: Colors.yellowAccent,
                 ),
-              )
+              ),
+              Expanded(child: titleWidget),
             ],
           );
         }
@@ -84,6 +84,7 @@ class AppBarView extends StatelessWidget {
             leadingCallBack: leadingCallBack,
             title: titleWidget,
             centerTitle: centerTitle,
+            actions: actions,
             rightWidgets: rightWidgets,
             bottom: bottom,
             isAppBar: isAppBar,

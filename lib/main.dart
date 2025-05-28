@@ -3,11 +3,11 @@ import 'dart:ui';
 
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/plugin/pip/mobile_fl_pip_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/notification/firebase_messaging_service.dart';
 import 'package:colla_chat/plugin/notification/local_notifications_service.dart';
 import 'package:colla_chat/plugin/overlay/mobile_system_alert_window.dart';
+import 'package:colla_chat/plugin/pip/mobile_fl_pip_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -23,15 +23,15 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart' as inapp;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart' as webrtc;
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
+import 'package:system_alert_window/system_alert_window.dart';
 import 'package:upgrader/upgrader.dart';
 import 'package:webview_win_floating/webview.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:flutter_quill/flutter_quill.dart';
-import 'package:system_alert_window/system_alert_window.dart';
 
 ///全局处理证书问题
 class PlatformHttpOverrides extends HttpOverrides {
@@ -86,7 +86,7 @@ void main(List<String> args) async {
   SystemChannels.lifecycle.setMessageHandler((msg) async {
     //logger.w('system channel switch to $msg');
     if (msg == AppLifecycleState.resumed.toString()) {
-      if (platformParams.mobile) {
+      if (platformParams.android) {
         bool? allowed = await SystemAlertWindow.checkPermissions(
             prefMode: SystemWindowPrefMode.OVERLAY);
         if (allowed == null || !allowed) {
@@ -97,16 +97,6 @@ void main(List<String> args) async {
       await websocketPool.connect();
     } else if (msg == AppLifecycleState.paused.toString() ||
         msg == AppLifecycleState.hidden.toString()) {
-      // localNotificationsService.showNotification(
-      //     'CollaChat', AppLocalizations.t('CollaChat App inactive'));
-      // if (platformParams.android) {
-      //   if (!await AndroidOverlayWindowUtil.isActive()) {
-      //     bool allowed = await AndroidOverlayWindowUtil.isPermissionGranted();
-      //     if (allowed) {
-      //       await AndroidOverlayWindowUtil.showOverlay();
-      //     }
-      //   }
-      // }
     } else if (msg == AppLifecycleState.inactive.toString()) {}
     return msg;
   });
@@ -162,7 +152,7 @@ Future<void> _initDesktopWindows() async {
       await windowManager.show();
       await windowManager.focus();
     });
-    windowManager.setMinimumSize(const Size(398.0, 600.0));
+    windowManager.setMinimumSize(Size(appDataProvider.designSize.width, 600));
   }
 }
 

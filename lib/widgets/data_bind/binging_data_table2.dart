@@ -44,6 +44,15 @@ class BindingDataTable2<T> extends StatelessWidget {
 
   final RxBool selectChanged = false.obs;
 
+  double _calculateTotalFixedWidth() {
+    double totalFixedWidth = 0;
+    for (var platformDataColumn in platformDataColumns) {
+      totalFixedWidth = (platformDataColumn.width ?? 0) + totalFixedWidth;
+    }
+
+    return totalFixedWidth;
+  }
+
   /// 过滤条件的多项选择框的列定义
   List<DataColumn2> _buildDataColumns() {
     List<DataColumn2> dataColumns = [];
@@ -55,6 +64,7 @@ class BindingDataTable2<T> extends StatelessWidget {
             label: CommonAutoSizeText(
                 AppLocalizations.t(platformDataColumn.label)),
             fixedWidth: platformDataColumn.width,
+            numeric: true,
           ),
         );
       } else {
@@ -201,6 +211,16 @@ class BindingDataTable2<T> extends StatelessWidget {
         animation: Listenable.merge(
             [selectChanged, controller.data, controller.currentIndex]),
         builder: (BuildContext context, Widget? child) {
+          double? minWidth = this.minWidth;
+          double totalFixedWidth = _calculateTotalFixedWidth();
+          if (minWidth != null) {
+            if (totalFixedWidth > minWidth) {
+              minWidth = totalFixedWidth + 40;
+            }
+          } else {
+            minWidth = totalFixedWidth + 40;
+          }
+
           return DataTable2(
             key: UniqueKey(),
             dataRowHeight: dataRowHeight,

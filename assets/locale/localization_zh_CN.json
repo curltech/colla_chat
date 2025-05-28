@@ -971,5 +971,6 @@
   "Audio player": "音频播放",
   "Play": "播放",
   "Overlay window": "浮动窗口",
-  "Pip window": "画中画窗口"
+  "Pip window": "画中画窗口",
+  "toggle": "切换"
 }

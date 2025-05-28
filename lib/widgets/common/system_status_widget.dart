@@ -47,7 +47,11 @@ class SystemStatusWidget extends StatelessWidget with TileDataMixin {
     battery.value?.onBatteryStateChanged.listen((BatteryState state) {
       batteryState.value = state;
     });
-    await SystemResources.init();
+    try {
+      await SystemResources.init();
+    } catch (e) {
+      logger.e('SystemResources init failure:$e');
+    }
   }
 
   Widget _buildMacSystemMonitorWidget() {

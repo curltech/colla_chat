@@ -2,7 +2,6 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -50,13 +49,19 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
   }
 
   PreferredSizeWidget _buildAppBar(BuildContext context) {
-    ///右边排列的按钮组件，最后一个是下拉按钮组件
-    var actions = <Widget>[];
-
-    ///首先加上右边的排列组件
-
+    var btns = <Widget>[];
     if (rightWidgets != null && rightWidgets!.isNotEmpty) {
-      actions.addAll(rightWidgets!);
+      btns.addAll(rightWidgets!);
+    }
+    if (actions != null && actions!.isNotEmpty) {
+      btns.add(IconButton(
+          onPressed: () {
+            _showActionCard(context);
+          },
+          icon: Icon(
+            Icons.more_horiz,
+            color: foregroundColor,
+          )));
     }
 
     Widget? leading = leadingWidget;
@@ -70,7 +75,7 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       centerTitle: centerTitle,
       titleSpacing: leadingWidget != null ? 0.0 : null,
       leading: leading,
-      actions: actions,
+      actions: btns,
       automaticallyImplyLeading: false,
       toolbarHeight: toolbarHeight,
       elevation: elevation,
@@ -78,7 +83,6 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       foregroundColor: foregroundColor ?? Colors.white,
       bottom: bottom,
     );
-    // _preferredSize = appBar.preferredSize;
 
     return appBar;
   }

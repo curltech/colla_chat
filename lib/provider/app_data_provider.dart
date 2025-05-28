@@ -22,7 +22,8 @@ class AppDataProvider with ChangeNotifier {
 
   //屏幕宽高
   double _keyboardHeight = 270.0;
-  Size _totalSize = const Size(412.0, 892.0);
+  final Size _designSize = const Size(390.0, 844.0);
+  late Size _totalSize = _designSize;
   double bottomBarHeight = kBottomNavigationBarHeight;
   double toolbarHeight = kToolbarHeight;
   double primaryNavigationWidth = 90;
@@ -53,8 +54,8 @@ class AppDataProvider with ChangeNotifier {
   }
 
   Size get designSize {
-    //特殊效果的尺寸，宽度最大是412，高度最大是892
-    return const Size(412.0, 892.0);
+    //特殊效果的尺寸，宽度最大是390，高度最大是844
+    return _designSize;
   }
 
   ///竖屏尺寸，在竖屏的情况下，等于总尺寸，

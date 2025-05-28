@@ -141,17 +141,17 @@ class IconTextButton extends StatelessWidget {
         const SizedBox(height: 2.0),
       );
       children.add(
-        Flexible(
-            fit: FlexFit.loose,
+        Expanded(
             child: CommonAutoSizeText(
-              AppLocalizations.t(label ?? ''),
-              style: TextStyle(
-                color: labelColor,
-                fontSize: labelSize,
-              ),
-              overflow: TextOverflow.visible,
-              softWrap: true,
-            )),
+          AppLocalizations.t(label ?? ''),
+          style: TextStyle(
+            color: labelColor,
+            fontSize: labelSize,
+          ),
+          overflow: TextOverflow.visible,
+          softWrap: true,
+          wrapWords: false,
+        )),
       );
     }
     return IconButton(
