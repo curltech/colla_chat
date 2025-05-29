@@ -267,6 +267,10 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   _addMediaSource() async {
     try {
       await playlistController.sourceFilePicker();
+      PlatformMediaSource? mediaSource = playlistController.current;
+      if (mediaSource != null) {
+        await playMediaSource(mediaSource);
+      }
     } catch (e) {
       DialogUtil.error(content: 'add media file failure:$e');
     }
