@@ -30,7 +30,7 @@ flutter_macos_podfile_setup
 target 'Runner' do
   use_frameworks!
   use_modular_headers!
-
+  pod 'VLCKit', '~>3.6.1b1'
   flutter_install_all_macos_pods File.dirname(File.realpath(__FILE__))
 end
 
