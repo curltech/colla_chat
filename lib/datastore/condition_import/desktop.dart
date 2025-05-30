@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:sqlite3/common.dart';
 import 'package:sqlite3/sqlite3.dart';
 

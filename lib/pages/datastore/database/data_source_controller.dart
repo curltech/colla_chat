@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/datastore/postgres.dart';
 import 'package:colla_chat/datastore/sql_builder.dart';
@@ -30,7 +32,8 @@ class DataSourceController extends DataListController<DataSourceNode> {
   }
 
   save() async {
-    String value = JsonUtil.toJsonString(data.value.map((node) => node.value).toList());
+    String value =
+        JsonUtil.toJsonString(data.value.map((node) => node.value).toList());
     await localSecurityStorage.save('DataSources', value);
   }
 
@@ -47,13 +50,26 @@ class DataSourceController extends DataListController<DataSourceNode> {
     }
     dataSources ??= [];
     bool include = false;
+    bool changed = false;
 
     for (var ds in dataSources) {
       data_source.DataSource dataSource = data_source.DataSource.fromJson(ds);
       if (dataSource.name == 'colla_chat') {
         include = true;
       }
-      await addDataSource(dataSource);
+      if (dataSource.filename != null) {
+        File file = File(dataSource.filename!);
+        if (file.existsSync()) {
+          await addDataSource(dataSource);
+        } else {
+          changed = true;
+        }
+      } else {
+        changed = true;
+      }
+    }
+    if (changed) {
+      await save();
     }
 
     if (!include) {
