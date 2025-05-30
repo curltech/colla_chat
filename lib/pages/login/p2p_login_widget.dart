@@ -242,45 +242,49 @@ class P2pLoginWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      SizedBox(
-        height: appDataProvider.portraitSize.height * 0.1,
-      ),
-      ImageUtil.buildImageWidget(
-        imageContent: 'assets/image/colla.png',
-        height: AppImageSize.xlSize,
-        width: AppImageSize.xlSize,
-      ),
-      CommonAutoSizeText(
-        AppLocalizations.t('Secure your collaboration'),
-        textAlign: TextAlign.center,
-        style: const TextStyle(
-          color: Colors.cyan,
-          fontStyle: FontStyle.italic,
-          fontWeight: FontWeight.bold,
-          fontSize: 14,
+    List<Widget> heads = [
+      Center(
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+        SizedBox(
+          height: appDataProvider.portraitSize.height * 0.1,
         ),
-      ),
-      SizedBox(
-        height: appDataProvider.portraitSize.height * 0.1,
-      ),
-      Expanded(
-          child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              child: FormInputWidget(
-                mainAxisAlignment: MainAxisAlignment.start,
-                // height: appDataProvider.portraitSize.height * 0.3,
-                spacing: 10.0,
-                onOk: (Map<String, dynamic> values) async {
-                  if (credential == null) {
-                    await _login(context, values);
-                  } else {
-                    await _auth(values);
-                  }
-                },
-                okLabel: credential == null ? 'Login' : 'Auth',
-                controller: formInputController,
-              )))
-    ]);
+        ImageUtil.buildImageWidget(
+          imageContent: 'assets/image/colla.png',
+          height: AppImageSize.xlSize,
+          width: AppImageSize.xlSize,
+        ),
+        CommonAutoSizeText(
+          AppLocalizations.t('Secure your collaboration'),
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: Colors.cyan,
+            fontStyle: FontStyle.italic,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
+        ),
+        SizedBox(
+          height: appDataProvider.portraitSize.height * 0.1,
+        ),
+      ]))
+    ];
+    return Container(
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+        child: FormInputWidget(
+          heads: heads,
+          mainAxisAlignment: MainAxisAlignment.start,
+          // height: appDataProvider.portraitSize.height * 0.3,
+          spacing: 10.0,
+          onOk: (Map<String, dynamic> values) async {
+            if (credential == null) {
+              await _login(context, values);
+            } else {
+              await _auth(values);
+            }
+          },
+          okLabel: credential == null ? 'Login' : 'Auth',
+          controller: formInputController,
+        ));
   }
 }
