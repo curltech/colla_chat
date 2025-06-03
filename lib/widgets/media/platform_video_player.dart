@@ -50,7 +50,7 @@ class PlatformVideoPlayer extends StatelessWidget {
         mediaPlayerController: betterVideoPlayerController,
       ));
     }
-    if (platformParams.mobile || platformParams.macos) {
+    if (platformParams.mobile) {
       MobileVlcPlayerController mobileVlcPlayerController =
           MobileVlcPlayerController(playlistController);
       mediaPlayerControllers.add(mobileVlcPlayerController);
