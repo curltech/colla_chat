@@ -12,7 +12,6 @@ class WsAddressPicker extends StatelessWidget {
     _init();
   }
 
-  String _peerId = '';
   ValueNotifier<List<Option<String>>> addressOptions =
       ValueNotifier<List<Option<String>>>([]);
   String _wsConnectAddress = '';
@@ -27,7 +26,6 @@ class WsAddressPicker extends StatelessWidget {
         _wsConnectAddress = wsConnectAddress;
       }
       _wsConnectAddressController.text = _wsConnectAddress;
-      _peerId = defaultPeerEndpoint.peerId;
     }
     var peerEndpoints = peerEndpointController.data;
     List<Option<String>> addressOptions = [];

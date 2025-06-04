@@ -91,7 +91,6 @@ class ChainMessageHandler {
         peerEndpointController.defaultPeerEndpoint;
     if (defaultPeerEndpoint != null) {
       chainMessage.srcConnectAddress = defaultPeerEndpoint.wsConnectAddress;
-      chainMessage.srcConnectPeerId = defaultPeerEndpoint.peerId;
       UniversalWebsocket? websocket =
           (await websocketPool.get(defaultPeerEndpoint.wsConnectAddress!));
       if (websocket != null) {
@@ -168,7 +167,8 @@ class ChainMessageHandler {
         // if (websocket == null || websocket.status != SocketStatus.connected) {
         //   Future.delayed(const Duration(seconds: 1));
         // }
-        if (websocket != null && websocket.status == SocketStatus.connected) {
+        if (websocket != null &&
+            websocket.status?.name == SocketStatus.connected.name) {
           var data = MessageSerializer.marshal(chainMessage);
           success = await websocket.sendMsg(data);
         }

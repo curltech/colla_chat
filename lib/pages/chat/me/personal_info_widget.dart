@@ -86,6 +86,10 @@ class PersonalInfoWidget extends StatelessWidget with TileDataMixin {
         suffix: myself.myselfPeer.loginName,
       ),
       TileData(
+        title: 'ConnectPeerId',
+        suffix: myself.myselfPeer.connectPeerId,
+      ),
+      TileData(
           title: 'Email',
           suffix: myself.myselfPeer.email,
           onTap: (
