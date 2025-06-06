@@ -463,7 +463,7 @@ class OverlayNotification extends StatefulWidget {
       case NotificationType.info:
         return const Icon(Icons.info, color: Colors.green);
       default:
-        return Icon(Icons.dashboard_customize_outlined, color: myself.primary);
+        return Icon(Icons.message_outlined, color: myself.primary);
     }
   }
 
@@ -491,7 +491,7 @@ class OverlayNotification extends StatefulWidget {
                   elevation: 0.0,
                   shape: RoundedRectangleBorder(
                       borderRadius: borderRadius ?? BorderRadius.circular(8.0)),
-                  margin: EdgeInsets.zero,
+                  margin: EdgeInsets.all(10.0),
                   child: Column(
                     children: [
                       Expanded(

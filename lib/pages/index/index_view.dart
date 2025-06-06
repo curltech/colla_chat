@@ -330,7 +330,7 @@ class _IndexViewState extends State<IndexView>
 
   _play() {
     conferenceChatMessageController.playAudio(
-        'assets/imedia/invitation.mp3', true);
+        'assets/media/invitation.mp3', true);
   }
 
   _stop() {
