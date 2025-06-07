@@ -1,3 +1,4 @@
+import com.android.build.api.dsl.Packaging
 import java.util.Properties
 
 val localProperties = Properties()
@@ -15,21 +16,24 @@ val flutterVersionName: String = localProperties.getProperty("flutter.versionNam
 plugins {
     id("com.android.application")
     id("kotlin-android")
-//    id("com.google.gms.google-services")
+    // id("com.google.gms.google-services")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
-    id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.android") version "2.1.0"
 }
 
 android {
     namespace = "io.curltech.colla_chat"
-    compileSdk = 35
-    ndkVersion = "28.0.13004108"
+    compileSdk = 36
+    ndkVersion = "29.0.13113456"
 
-    packagingOptions {
+    // Fixes duplicate libraries build issue,
+    // when your project uses more than one plugin that depend on C++ libs.
+    // pickFirst = 'lib/**/libc++_shared.so'
+    fun Packaging.() {
         // Fixes duplicate libraries build issue,
         // when your project uses more than one plugin that depend on C++ libs.
-        pickFirst = 'lib/**/libc++_shared.so'
+        // pickFirst = 'lib/**/libc++_shared.so'
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
