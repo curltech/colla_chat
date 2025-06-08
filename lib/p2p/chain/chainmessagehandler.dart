@@ -16,8 +16,7 @@ import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/dio_http_client.dart';
-import 'package:colla_chat/transport/websocket/common_websocket.dart';
-import 'package:colla_chat/transport/websocket/universal_websocket.dart';
+import 'package:colla_chat/transport/websocket/websocket_channel.dart';
 import 'package:dio/dio.dart';
 
 const packetSize = 4 * 1024 * 1024;
@@ -80,7 +79,7 @@ class ChainMessageHandler {
     chainMessage.connectPeerId = connectPeerId;
     chainMessage.connectAddress = connectAddress;
     if (connectAddress != null) {
-      UniversalWebsocket? websocket = (await websocketPool.get(connectAddress));
+      WebSocketChannel? websocket = (await websocketPool.get(connectAddress));
       if (websocket != null) {
         chainMessage.connectSessionId = websocket.sessionId;
       }
@@ -91,7 +90,7 @@ class ChainMessageHandler {
         peerEndpointController.defaultPeerEndpoint;
     if (defaultPeerEndpoint != null) {
       chainMessage.srcConnectAddress = defaultPeerEndpoint.wsConnectAddress;
-      UniversalWebsocket? websocket =
+      WebSocketChannel? websocket =
           (await websocketPool.get(defaultPeerEndpoint.wsConnectAddress!));
       if (websocket != null) {
         chainMessage.srcConnectSessionId = websocket.sessionId;

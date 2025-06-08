@@ -16,7 +16,7 @@ import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/ffmpeg/ffmpeg_helper.dart';
-import 'package:colla_chat/transport/websocket/universal_websocket.dart';
+import 'package:colla_chat/transport/websocket/websocket_channel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';

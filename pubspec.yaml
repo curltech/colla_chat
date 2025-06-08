@@ -349,9 +349,9 @@ dependency_overrides:
   rxdart: ^0.28.0
   flutter_platform_widgets: ^8.0.0
   logger: ^2.3.0
-  web_socket_channel: ^3.0.0
-  web_socket_client: ^0.2.1
-  websocket_universal: ^1.2.5
+  web_socket_channel: ^3.0.3
+  #  web_socket_client: ^0.2.1
+  #  websocket_universal: ^1.2.5
   flutter_math_fork: ^0.7.4
   share_plus: ^11.0.0
   sensors_plus: ^6.0.1

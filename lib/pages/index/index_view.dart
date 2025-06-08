@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
 
@@ -36,7 +35,7 @@ import 'package:colla_chat/tool/notification_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/livekit/sfu_room_client.dart';
 import 'package:colla_chat/transport/webrtc/p2p/p2p_conference_client.dart';
-import 'package:colla_chat/transport/websocket/universal_websocket.dart';
+import 'package:colla_chat/transport/websocket/websocket_channel.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
@@ -79,9 +78,6 @@ class _IndexViewState extends State<IndexView>
   StreamSubscription<ChatMessage>? chatMessageStreamSubscription;
   StreamSubscription<WebrtcEvent>? errorWebrtcEventStreamSubscription;
   List<SharedFile>? _sharedFiles;
-
-  Socket? _socket;
-  StreamSubscription? _socketStreamSub;
 
   late final AppLifecycleListener _appLifecycleListener;
   late AppLifecycleState? _appLifecycleState;

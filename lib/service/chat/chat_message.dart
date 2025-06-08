@@ -34,7 +34,7 @@ import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/transport/smsclient.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
-import 'package:colla_chat/transport/websocket/universal_websocket.dart';
+import 'package:colla_chat/transport/websocket/websocket_channel.dart';
 
 class ChatMessageService extends GeneralBaseService<ChatMessage> {
   Timer? timer;
@@ -358,7 +358,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.senderClientId = myself.clientId;
     chatMessage.senderType = PartyType.linkman.name;
     chatMessage.senderName = myself.myselfPeer.name;
-    UniversalWebsocket? websocket = websocketPool.getDefault();
+    WebSocketChannel? websocket = websocketPool.getDefault();
     if (websocket != null) {
       chatMessage.senderAddress = websocket.address;
     }

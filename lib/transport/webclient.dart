@@ -2,7 +2,7 @@
 library;
 
 import 'package:colla_chat/transport/dio_http_client.dart';
-import 'package:colla_chat/transport/websocket/universal_websocket.dart';
+import 'package:colla_chat/transport/websocket/websocket_channel.dart';
 
 abstract class IWebClient {
   Function()? postConnected;

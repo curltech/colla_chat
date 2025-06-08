@@ -8,8 +8,7 @@ import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_end
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/dht/peerendpoint.dart';
 import 'package:colla_chat/transport/dio_http_client.dart';
-import 'package:colla_chat/transport/websocket/common_websocket.dart';
-import 'package:colla_chat/transport/websocket/universal_websocket.dart';
+import 'package:colla_chat/transport/websocket/websocket_channel.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -108,7 +107,7 @@ class PeerEndpointListWidget extends StatelessWidget with TileDataMixin {
     if (peerEndpoint.wsConnectAddress == null) {
       wsLight = grey;
     } else {
-      UniversalWebsocket? websocket =
+      WebSocketChannel? websocket =
           await websocketPool.get(peerEndpoint.wsConnectAddress!);
       if (websocket == null) {
         wsLight = grey;

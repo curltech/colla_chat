@@ -11,7 +11,6 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_view.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/llm_chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/chat/llm/llm_chat_message_view.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_info_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_webrtc_connection_widget.dart';
 import 'package:colla_chat/plugin/notification/local_notifications_service.dart';
@@ -31,7 +30,7 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
-import 'package:colla_chat/transport/websocket/universal_websocket.dart';
+import 'package:colla_chat/transport/websocket/websocket_channel.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/platform_future_builder.dart';
@@ -42,7 +41,6 @@ import 'package:colla_chat/widgets/webview/html_preview_widget.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:websocket_universal/websocket_universal.dart';
 
 ///好友的汇总控制器，每当消息汇总表的数据有变化时更新控制器
 class LinkmanChatSummaryController extends DataListController<ChatSummary> {
@@ -120,7 +118,8 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
 class _ChatListWidgetState extends State<ChatListWidget>
     with SingleTickerProviderStateMixin {
   StreamSubscription<SocketStatus>? _socketStatusStreamSubscription;
-  final Rx<SocketStatus?> _socketStatus = Rx<SocketStatus?>(null);
+  final Rx<SocketStatus> _socketStatus =
+      Rx<SocketStatus>(SocketStatus.disconnected);
   late final TabController _tabController =
       TabController(length: 3, vsync: this);
 
@@ -136,7 +135,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
   }
 
   _initStatusStreamController() async {
-    UniversalWebsocket? websocket = await websocketPool.connect();
+    WebSocketChannel? websocket = await websocketPool.connect();
     if (websocket != null) {
       if (_socketStatusStreamSubscription != null) {
         _socketStatusStreamSubscription!.cancel();
@@ -162,7 +161,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
     if (ConnectivityUtil.getMainResult(
             connectivityController.connectivityResult.value) !=
         ConnectivityResult.none) {
-      UniversalWebsocket? websocket = websocketPool.getDefault();
+      WebSocketChannel? websocket = websocketPool.getDefault();
       if (websocket != null) {
         await websocket.connect();
       }
@@ -616,7 +615,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
 
     var wssWidget = Obx(() {
       String address = AppLocalizations.t('Websocket status');
-      UniversalWebsocket? websocket = websocketPool.getDefault();
+      WebSocketChannel? websocket = websocketPool.getDefault();
       if (websocket != null) {
         address = websocket.address;
       }
