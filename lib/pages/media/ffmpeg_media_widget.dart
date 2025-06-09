@@ -21,9 +21,9 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
-import 'package:ffmpeg_kit_flutter_full_gpl/media_information.dart';
-import 'package:ffmpeg_kit_flutter_full_gpl/return_code.dart';
-import 'package:ffmpeg_kit_flutter_full_gpl/session_state.dart';
+import 'package:ffmpeg_kit_flutter_minimal/media_information.dart';
+import 'package:ffmpeg_kit_flutter_minimal/return_code.dart';
+import 'package:ffmpeg_kit_flutter_minimal/session_state.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 

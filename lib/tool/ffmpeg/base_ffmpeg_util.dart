@@ -1,15 +1,15 @@
 import 'dart:async';
 
-import 'package:ffmpeg_kit_flutter_full_gpl/abstract_session.dart';
-import 'package:ffmpeg_kit_flutter_full_gpl/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_full_gpl/ffmpeg_kit_config.dart';
-import 'package:ffmpeg_kit_flutter_full_gpl/ffmpeg_session.dart';
-import 'package:ffmpeg_kit_flutter_full_gpl/ffprobe_kit.dart';
-import 'package:ffmpeg_kit_flutter_full_gpl/ffprobe_session.dart';
-import 'package:ffmpeg_kit_flutter_full_gpl/log.dart';
-import 'package:ffmpeg_kit_flutter_full_gpl/media_information.dart';
-import 'package:ffmpeg_kit_flutter_full_gpl/media_information_session.dart';
-import 'package:ffmpeg_kit_flutter_full_gpl/statistics.dart';
+import 'package:ffmpeg_kit_flutter_minimal/abstract_session.dart';
+import 'package:ffmpeg_kit_flutter_minimal/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_minimal/ffmpeg_kit_config.dart';
+import 'package:ffmpeg_kit_flutter_minimal/ffmpeg_session.dart';
+import 'package:ffmpeg_kit_flutter_minimal/ffprobe_kit.dart';
+import 'package:ffmpeg_kit_flutter_minimal/ffprobe_session.dart';
+import 'package:ffmpeg_kit_flutter_minimal/log.dart';
+import 'package:ffmpeg_kit_flutter_minimal/media_information.dart';
+import 'package:ffmpeg_kit_flutter_minimal/media_information_session.dart';
+import 'package:ffmpeg_kit_flutter_minimal/statistics.dart';
 
 /// 非windows环境下执行ffmpeg和probe
 class BaseFFMpegUtil {

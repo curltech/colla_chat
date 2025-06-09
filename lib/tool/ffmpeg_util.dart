@@ -4,12 +4,12 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/tool/ffmpeg/ffmpeg_helper.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:ffmpeg_kit_flutter_full_gpl/abstract_session.dart';
-import 'package:ffmpeg_kit_flutter_full_gpl/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_full_gpl/ffprobe_kit.dart';
-import 'package:ffmpeg_kit_flutter_full_gpl/log.dart';
-import 'package:ffmpeg_kit_flutter_full_gpl/media_information.dart';
-import 'package:ffmpeg_kit_flutter_full_gpl/media_information_session.dart';
+import 'package:ffmpeg_kit_flutter_minimal/abstract_session.dart';
+import 'package:ffmpeg_kit_flutter_minimal/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_minimal/ffprobe_kit.dart';
+import 'package:ffmpeg_kit_flutter_minimal/log.dart';
+import 'package:ffmpeg_kit_flutter_minimal/media_information.dart';
+import 'package:ffmpeg_kit_flutter_minimal/media_information_session.dart';
 
 class FFMpegUtil {
   static Future<String?> formats() async {
