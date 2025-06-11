@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:trina_grid/trina_grid.dart';
 
-class BindingPlutoDataGrid<T> extends StatelessWidget {
+class BindingTrinaDataGrid<T> extends StatelessWidget {
   final List<PlatformDataColumn> platformDataColumns;
   final DataListController<T> controller;
   final bool showCheckboxColumn;
@@ -19,10 +19,10 @@ class BindingPlutoDataGrid<T> extends StatelessWidget {
   final int fixedLeftColumns;
   final Function(int index)? onTap;
   final Function(int index)? onDoubleTap;
-  final Function(bool?)? onSelectChanged;
+  final Function(int, bool?)? onSelectChanged;
   final Function(int index)? onLongPress;
 
-  const BindingPlutoDataGrid({
+  const BindingTrinaDataGrid({
     super.key,
     required this.platformDataColumns,
     this.onTap,
@@ -52,7 +52,8 @@ class BindingPlutoDataGrid<T> extends StatelessWidget {
       DataType dataType = platformDataColumn.dataType;
       if (dataType == DataType.double ||
           dataType == DataType.int ||
-          dataType == DataType.num) {
+          dataType == DataType.num ||
+          dataType == DataType.percentage) {
         type = TrinaColumnType.number();
       } else if (dataType == DataType.datetime) {
         type = TrinaColumnType.date();
@@ -119,6 +120,7 @@ class BindingPlutoDataGrid<T> extends StatelessWidget {
       bool? selected = EntityUtil.getSelected(t);
       selected ??= false;
       var dataRow = TrinaRow(
+        sortIdx: index,
         type: TrinaRowType.normal(),
         checked: selected,
         cells: cells,
@@ -148,9 +150,33 @@ class BindingPlutoDataGrid<T> extends StatelessWidget {
         rows: _buildDataRows(),
         onLoaded: (TrinaGridOnLoadedEvent event) {},
         onChanged: (TrinaGridOnChangedEvent event) {},
-        onSelected: (TrinaGridOnSelectedEvent event) {},
-        onRowChecked: (TrinaGridOnRowCheckedEvent event) {},
-        onRowDoubleTap: (TrinaGridOnRowDoubleTapEvent event) {},
+        onSelected: (TrinaGridOnSelectedEvent event) {
+          int? index = event.row?.sortIdx;
+          controller.setCurrentIndex = index;
+          var fn = onDoubleTap;
+          if (fn != null && index != null) {
+            fn(index);
+          }
+        },
+        onRowChecked: (TrinaGridOnRowCheckedEvent event) {
+          dynamic value = event.row?.data;
+          int? index = event.row?.sortIdx;
+          bool? selected = event.isChecked;
+          var fn = onSelectChanged;
+          if (fn != null && index != null) {
+            fn(index, selected!);
+          } else {
+            EntityUtil.setSelected(value, selected);
+          }
+        },
+        onRowDoubleTap: (TrinaGridOnRowDoubleTapEvent event) {
+          int index = event.row.sortIdx;
+          controller.setCurrentIndex = index;
+          var fn = onDoubleTap;
+          if (fn != null) {
+            fn(index);
+          }
+        },
         onRowSecondaryTap: (TrinaGridOnRowSecondaryTapEvent event) {},
         onRowsMoved: (TrinaGridOnRowsMovedEvent event) {},
       );
