@@ -6,7 +6,7 @@ import 'package:colla_chat/tool/number_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pluto_grid/pluto_grid.dart';
+import 'package:trina_grid/trina_grid.dart';
 
 class BindingPlutoDataGrid<T> extends StatelessWidget {
   final List<PlatformDataColumn> platformDataColumns;
@@ -39,36 +39,45 @@ class BindingPlutoDataGrid<T> extends StatelessWidget {
   });
 
   /// 过滤条件的多项选择框的列定义
-  List<PlutoColumn> _buildDataColumns() {
-    List<PlutoColumn> dataColumns = [];
+  List<TrinaColumn> _buildDataColumns() {
+    List<TrinaColumn> dataColumns = [];
     for (var platformDataColumn in platformDataColumns) {
-      PlutoColumnType type = PlutoColumnType.text();
+      TrinaColumnType type = TrinaColumnType.text();
+      TrinaColumnTextAlign align = TrinaColumnTextAlign.start;
+      if (platformDataColumn.align == TextAlign.center) {
+        align = TrinaColumnTextAlign.center;
+      } else if (platformDataColumn.align == TextAlign.end) {
+        align = TrinaColumnTextAlign.end;
+      }
       DataType dataType = platformDataColumn.dataType;
       if (dataType == DataType.double ||
           dataType == DataType.int ||
           dataType == DataType.num) {
-        type = PlutoColumnType.number();
+        type = TrinaColumnType.number();
       } else if (dataType == DataType.datetime) {
-        type = PlutoColumnType.date();
+        type = TrinaColumnType.date();
       } else if (dataType == DataType.time) {
-        type = PlutoColumnType.time();
+        type = TrinaColumnType.time();
       } else if (dataType == DataType.list) {
-        type = PlutoColumnType.select([]);
+        type = TrinaColumnType.select([]);
       }
       InputType inputType = platformDataColumn.inputType;
       if (inputType == InputType.custom) {
-        dataColumns.add(PlutoColumn(
+        dataColumns.add(TrinaColumn(
           title: AppLocalizations.t(platformDataColumn.label),
           field: platformDataColumn.name,
+          textAlign: align,
+          width: platformDataColumn.width ?? TrinaGridSettings.columnWidth,
           type: type,
         ));
       } else {
         dataColumns.add(
-          PlutoColumn(
+          TrinaColumn(
               title: AppLocalizations.t(platformDataColumn.label),
               field: platformDataColumn.name,
               type: type,
-              sort: PlutoColumnSort.ascending),
+              width: platformDataColumn.width ?? TrinaGridSettings.columnWidth,
+              sort: TrinaColumnSort.ascending),
         );
       }
     }
@@ -76,20 +85,20 @@ class BindingPlutoDataGrid<T> extends StatelessWidget {
   }
 
   /// 过滤条件的多项选择框的行数据
-  List<PlutoRow> _buildDataRows() {
+  List<TrinaRow> _buildDataRows() {
     List data = controller.data;
-    List<PlutoRow> rows = [];
+    List<TrinaRow> rows = [];
     for (int index = 0; index < data.length; ++index) {
       dynamic t = data[index];
       var tMap = JsonUtil.toJson(t);
-      Map<String, PlutoCell> cells = {};
+      Map<String, TrinaCell> cells = {};
       for (PlatformDataColumn platformDataColumn in platformDataColumns) {
         String name = platformDataColumn.name;
         InputType inputType = platformDataColumn.inputType;
         if (inputType == InputType.custom &&
             platformDataColumn.buildSuffix != null) {
           Widget suffix = platformDataColumn.buildSuffix!(index, t);
-          var dataCell = PlutoCell(value: suffix);
+          var dataCell = TrinaCell(value: suffix);
           cells[name] = dataCell;
         } else {
           dynamic fieldValue = tMap[name];
@@ -103,14 +112,14 @@ class BindingPlutoDataGrid<T> extends StatelessWidget {
             fieldValue = '';
           }
 
-          var dataCell = PlutoCell(value: fieldValue!);
+          var dataCell = TrinaCell(value: fieldValue!);
           cells[name] = dataCell;
         }
       }
       bool? selected = EntityUtil.getSelected(t);
       selected ??= false;
-      var dataRow = PlutoRow(
-        type: PlutoRowType.normal(),
+      var dataRow = TrinaRow(
+        type: TrinaRowType.normal(),
         checked: selected,
         cells: cells,
       );
@@ -122,10 +131,10 @@ class BindingPlutoDataGrid<T> extends StatelessWidget {
   /// 过滤条件的多项选择框的表
   Widget _buildDataTable(BuildContext context) {
     return Obx(() {
-      return PlutoGrid(
+      return TrinaGrid(
         key: UniqueKey(),
-        configuration: const PlutoGridConfiguration(
-          style: PlutoGridStyleConfig(
+        configuration: const TrinaGridConfiguration(
+          style: TrinaGridStyleConfig(
             enableColumnBorderVertical: false,
             enableColumnBorderHorizontal: false,
             gridBorderColor: Colors.white,
@@ -133,17 +142,17 @@ class BindingPlutoDataGrid<T> extends StatelessWidget {
             activatedBorderColor: Colors.white,
             inactivatedBorderColor: Colors.white,
           ),
-          localeText: PlutoGridLocaleText.china(),
+          localeText: TrinaGridLocaleText.china(),
         ),
         columns: _buildDataColumns(),
         rows: _buildDataRows(),
-        onLoaded: (PlutoGridOnLoadedEvent event) {},
-        onChanged: (PlutoGridOnChangedEvent event) {},
-        onSelected: (PlutoGridOnSelectedEvent event) {},
-        onRowChecked: (PlutoGridOnRowCheckedEvent event) {},
-        onRowDoubleTap: (PlutoGridOnRowDoubleTapEvent event) {},
-        onRowSecondaryTap: (PlutoGridOnRowSecondaryTapEvent event) {},
-        onRowsMoved: (PlutoGridOnRowsMovedEvent event) {},
+        onLoaded: (TrinaGridOnLoadedEvent event) {},
+        onChanged: (TrinaGridOnChangedEvent event) {},
+        onSelected: (TrinaGridOnSelectedEvent event) {},
+        onRowChecked: (TrinaGridOnRowCheckedEvent event) {},
+        onRowDoubleTap: (TrinaGridOnRowDoubleTapEvent event) {},
+        onRowSecondaryTap: (TrinaGridOnRowSecondaryTapEvent event) {},
+        onRowsMoved: (TrinaGridOnRowsMovedEvent event) {},
       );
     });
   }

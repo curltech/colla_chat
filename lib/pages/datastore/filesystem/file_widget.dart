@@ -42,8 +42,6 @@ class FileWidget extends StatelessWidget with TileDataMixin {
   @override
   String get title => 'File';
 
-  
-
   final DataListController<File> fileController = DataListController<File>();
 
   final RxBool gridMode = false.obs;
@@ -216,6 +214,7 @@ class FileWidget extends StatelessWidget with TileDataMixin {
     } catch (e) {
       logger.e('list file failure:$e');
       fileController.replaceAll([]);
+      DialogUtil.error(content: '$e');
     }
   }
 
@@ -280,7 +279,7 @@ class FileWidget extends StatelessWidget with TileDataMixin {
     platformDataColumns.add(PlatformDataColumn(
       label: 'Name',
       name: 'name',
-      width: 300,
+      width: 100,
       dataType: DataType.string,
       align: TextAlign.left,
       onSort: (int index, bool ascending) =>
@@ -297,7 +296,7 @@ class FileWidget extends StatelessWidget with TileDataMixin {
     platformDataColumns.add(PlatformDataColumn(
       label: 'Modified',
       name: 'modified',
-      width: 180,
+      width: 80,
       dataType: DataType.string,
       align: TextAlign.left,
       onSort: (int index, bool ascending) => fileController.sort(
@@ -355,7 +354,11 @@ class FileWidget extends StatelessWidget with TileDataMixin {
           rightWidgets: rightWidgets,
           child: Column(
             children: [
-              _buildFilePathWidget(context),
+              Padding(
+                  padding: EdgeInsets.all(
+                    10.0,
+                  ),
+                  child: _buildFilePathWidget(context)),
               Padding(
                   padding: EdgeInsets.all(
                     10.0,
@@ -386,10 +389,5 @@ extension on File {
       size: 36,
       isOutlined: true,
     );
-
-    // return Icon(
-    //   Icons.insert_drive_file,
-    //   color: myself.primary,
-    // );
   }
 }
