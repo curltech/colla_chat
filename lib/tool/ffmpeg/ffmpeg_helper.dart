@@ -9,12 +9,12 @@ import 'package:colla_chat/tool/download_file_util.dart';
 import 'package:colla_chat/tool/ffmpeg/base_ffmpeg_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:dio/dio.dart';
-import 'package:ffmpeg_kit_flutter_minimal/ffmpeg_session.dart';
-import 'package:ffmpeg_kit_flutter_minimal/log.dart';
-import 'package:ffmpeg_kit_flutter_minimal/media_information.dart';
-import 'package:ffmpeg_kit_flutter_minimal/return_code.dart';
-import 'package:ffmpeg_kit_flutter_minimal/session_state.dart';
-import 'package:ffmpeg_kit_flutter_minimal/statistics.dart';
+import 'package:ffmpeg_kit_flutter_new/ffmpeg_session.dart';
+import 'package:ffmpeg_kit_flutter_new/log.dart';
+import 'package:ffmpeg_kit_flutter_new/media_information.dart';
+import 'package:ffmpeg_kit_flutter_new/return_code.dart';
+import 'package:ffmpeg_kit_flutter_new/session_state.dart';
+import 'package:ffmpeg_kit_flutter_new/statistics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -190,7 +190,7 @@ class FFMpegHelperSession {
           double.tryParse(temp['fps'] ?? '0.0') ?? 0.0,
           double.tryParse(temp['stream_0_0_q'] ?? '0.0') ?? 0.0,
           int.tryParse(temp['total_size'] ?? '0') ?? 0,
-          double.tryParse(temp['out_time_us'] ?? '0') ?? 0,
+          int.tryParse(temp['out_time_us'] ?? '0') ?? 0,
           // 2189.6kbits/s => 2189.6
           double.tryParse((temp['bitrate'] ?? '0.0')
                   ?.replaceAll(RegExp('[a-z/]'), '')) ??
