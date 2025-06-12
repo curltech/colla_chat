@@ -366,7 +366,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
         positiveColor: Colors.red,
         negativeColor: Colors.green,
         align: Alignment.centerRight,
-        width: 70,
+        width: 90,
         onSort: (int index, bool ascending) => dayLineController.sort(
             (t) => t.pctChgVol, index, 'pct_chg_vol', ascending),
       ),
