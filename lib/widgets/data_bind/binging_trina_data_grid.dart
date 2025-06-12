@@ -132,40 +132,43 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
           cells[name] = dataCell;
         } else {
           dynamic fieldValue = tMap[name];
-          String value = '';
-          Color? color;
-          DataType dataType = platformDataColumn.dataType;
-          if (dataType == DataType.double ||
-              dataType == DataType.num ||
-              dataType == DataType.int ||
-              dataType == DataType.percentage) {
-            if (fieldValue != null) {
-              if (dataType == DataType.double) {
-                value = NumberUtil.stdDouble(fieldValue);
-              } else if (dataType == DataType.percentage) {
-                value = NumberUtil.stdPercentage(fieldValue);
+          TrinaCell dataCell = TrinaCell(value: fieldValue ?? '');
+          if (platformDataColumn.positiveColor != null ||
+              platformDataColumn.negativeColor != null) {
+            String value = '';
+            Color? color;
+            DataType dataType = platformDataColumn.dataType;
+            if (dataType == DataType.double ||
+                dataType == DataType.num ||
+                dataType == DataType.int ||
+                dataType == DataType.percentage) {
+              if (fieldValue != null) {
+                if (dataType == DataType.double) {
+                  value = NumberUtil.stdDouble(fieldValue);
+                } else if (dataType == DataType.percentage) {
+                  value = NumberUtil.stdPercentage(fieldValue);
+                } else {
+                  value = fieldValue!.toString();
+                }
+                if (fieldValue > 0) {
+                  color = platformDataColumn.positiveColor;
+                } else if (fieldValue < 0) {
+                  color = platformDataColumn.negativeColor;
+                }
               } else {
-                value = fieldValue!.toString();
+                fieldValue = '';
               }
-              if (fieldValue > 0) {
-                color = platformDataColumn.positiveColor;
-              } else if (fieldValue < 0) {
-                color = platformDataColumn.negativeColor;
+              if (color != null) {
+                dataCell = TrinaCell(
+                    value: fieldValue!,
+                    renderer: (rendererContext) {
+                      return Text(
+                        value,
+                        style: TextStyle(color: color),
+                      );
+                    });
               }
-            } else {
-              fieldValue = '';
             }
-          }
-          TrinaCell dataCell = TrinaCell(value: fieldValue!);
-          if (color != null) {
-            dataCell = TrinaCell(
-                value: fieldValue!,
-                renderer: (rendererContext) {
-                  return Text(
-                    value,
-                    style: TextStyle(color: color),
-                  );
-                });
           }
           cells[name] = dataCell;
         }
