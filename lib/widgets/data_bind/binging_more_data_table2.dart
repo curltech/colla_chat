@@ -1,5 +1,5 @@
 import 'package:colla_chat/provider/data_list_controller.dart';
-import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
+import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -49,7 +49,7 @@ class BindingMoreDataTable2<T> extends StatelessWidget {
     return RefreshIndicator(
         onRefresh: _onRefresh,
         //notificationPredicate: _notificationPredicate,
-        child: BindingDataTable2(
+        child: BindingTrinaDataGrid(
           key: UniqueKey(),
           dataRowHeight: dataRowHeight,
           minWidth: minWidth ?? 2000,

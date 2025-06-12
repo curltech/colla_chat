@@ -14,7 +14,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
-import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
+import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
@@ -68,8 +68,8 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
 
   late final List<PlatformDataField> searchDataField;
   late final FormInputController searchController;
-  final ExpansionTileController expansionTileController =
-      ExpansionTileController();
+  final ExpansibleController expansibleController =
+      ExpansibleController();
 
   _init() {
     statScoreDataPageController.findCondition.addListener(_updateStatScore);
@@ -170,7 +170,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
     formInputWidget = ExpansionTile(
       title: Text(AppLocalizations.t('Search')),
       initiallyExpanded: true,
-      controller: expansionTileController,
+      controller: expansibleController,
       children: [formInputWidget],
     );
 
@@ -184,7 +184,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
       'terms': values['terms']?.toList(),
     };
     await statScoreDataPageController.findData();
-    expansionTileController.collapse();
+    expansibleController.collapse();
     DialogUtil.info(content: AppLocalizations.t('StatScore search completely'));
   }
 
@@ -317,7 +317,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
           inputType: InputType.custom,
           buildSuffix: _buildActionWidget),
     ];
-    return BindingDataTable2<StatScore>(
+    return BindingTrinaDataGrid<StatScore>(
       key: UniqueKey(),
       minWidth: 1400,
       showCheckboxColumn: false,

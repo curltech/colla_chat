@@ -12,7 +12,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
+import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -173,7 +173,7 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       align: TextAlign.right,
     ));
 
-    return BindingDataTable2<data_source.DataColumn>(
+    return BindingTrinaDataGrid<data_source.DataColumn>(
       key: UniqueKey(),
       showCheckboxColumn: true,
       horizontalMargin: 15.0,

@@ -10,7 +10,7 @@ import 'package:colla_chat/service/stock/event_filter.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
+import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
@@ -180,7 +180,7 @@ class EventFilterWidget extends StatelessWidget with TileDataMixin {
             return _buildActionWidget(context, index, eventFilter);
           }),
     ];
-    return BindingDataTable2<EventFilter>(
+    return BindingTrinaDataGrid<EventFilter>(
       key: UniqueKey(),
       showCheckboxColumn: false,
       horizontalMargin: 10.0,

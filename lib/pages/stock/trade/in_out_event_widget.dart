@@ -14,7 +14,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
+import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
@@ -65,7 +65,7 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
 
   late final List<PlatformDataColumn> inoutEventColumns;
   late final FormInputController searchController;
-  ExpansionTileController expansionTileController = ExpansionTileController();
+  ExpansibleController expansibleController = ExpansibleController();
 
   _init() {
     final List<PlatformDataField> searchDataField = [
@@ -183,7 +183,7 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
 
     formInputWidget = ExpansionTile(
       title: Text(AppLocalizations.t('Search')),
-      controller: expansionTileController,
+      controller: expansibleController,
       children: [formInputWidget],
     );
 
@@ -200,12 +200,12 @@ class InoutEventWidget extends StatelessWidget with TileDataMixin {
         tradeDate: tradeDate,
         startDate: startDate,
         endDate: endDate);
-    expansionTileController.collapse();
+    expansibleController.collapse();
     DialogUtil.info(content: AppLocalizations.t('Inout search completely'));
   }
 
   Widget _buildInOutEventListView(BuildContext context) {
-    return BindingDataTable2<DayLine>(
+    return BindingTrinaDataGrid<DayLine>(
       key: UniqueKey(),
       showCheckboxColumn: false,
       horizontalMargin: 10.0,

@@ -13,7 +13,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/binging_data_table2.dart';
+import 'package:colla_chat/widgets/data_bind/binging_trina_data_grid.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
 import 'package:flutter/material.dart';
@@ -221,7 +221,6 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
 
   Widget _buildActionWidget(BuildContext context, int index, dynamic dayLine) {
     Widget actionWidget=
-
         IconButton(
           onPressed: () async {
             String tsCode = dayLine.tsCode;
@@ -390,7 +389,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
             return _buildActionWidget(context, index, dayLine);
           }),
     ];
-    Widget table = BindingDataTable2<DayLine>(
+    Widget table = BindingTrinaDataGrid<DayLine>(
         key: UniqueKey(),
         showCheckboxColumn: true,
         horizontalMargin: 10.0,

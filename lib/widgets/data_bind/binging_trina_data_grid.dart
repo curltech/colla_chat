@@ -50,27 +50,42 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
         align = TrinaColumnTextAlign.end;
       }
       DataType dataType = platformDataColumn.dataType;
-      if (dataType == DataType.double ||
-          dataType == DataType.int ||
-          dataType == DataType.num ||
-          dataType == DataType.percentage) {
-        type = TrinaColumnType.number();
+      if (dataType == DataType.double || dataType == DataType.num) {
+        type = TrinaColumnType.number(format: '#,###.00');
+        align = TrinaColumnTextAlign.end;
+      } else if (dataType == DataType.int) {
+        type = TrinaColumnType.number(format: '#,###');
+        align = TrinaColumnTextAlign.end;
+      } else if (dataType == DataType.percentage) {
+        type = TrinaColumnType.percentage();
+        align = TrinaColumnTextAlign.end;
       } else if (dataType == DataType.datetime) {
         type = TrinaColumnType.date();
+        align = TrinaColumnTextAlign.end;
       } else if (dataType == DataType.time) {
         type = TrinaColumnType.time();
+        align = TrinaColumnTextAlign.end;
       } else if (dataType == DataType.list) {
         type = TrinaColumnType.select([]);
       }
       InputType inputType = platformDataColumn.inputType;
       if (inputType == InputType.custom) {
         dataColumns.add(TrinaColumn(
-          title: AppLocalizations.t(platformDataColumn.label),
-          field: platformDataColumn.name,
-          textAlign: align,
-          width: platformDataColumn.width ?? TrinaGridSettings.columnWidth,
-          type: type,
-        ));
+            title: AppLocalizations.t(platformDataColumn.label),
+            field: platformDataColumn.name,
+            textAlign: align,
+            width: platformDataColumn.width ?? TrinaGridSettings.columnWidth,
+            type: type,
+            // enableRowChecked: true,
+            // enableTitleChecked: true,
+            enableSorting: false,
+            enableContextMenu: false,
+            enableFilterMenuItem: false,
+            enableHideColumnMenuItem: false,
+            enableSetColumnsMenuItem: false,
+            enableAutoEditing: false,
+            enableEditingMode: false,
+            sort: TrinaColumnSort.none));
       } else {
         dataColumns.add(
           TrinaColumn(
@@ -78,6 +93,15 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
               field: platformDataColumn.name,
               type: type,
               width: platformDataColumn.width ?? TrinaGridSettings.columnWidth,
+              // enableRowChecked: true,
+              // enableTitleChecked: true,
+              enableSorting: true,
+              enableContextMenu: false,
+              enableFilterMenuItem: false,
+              enableHideColumnMenuItem: false,
+              enableSetColumnsMenuItem: false,
+              enableAutoEditing: false,
+              enableEditingMode: false,
               sort: TrinaColumnSort.ascending),
         );
       }
@@ -99,21 +123,50 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
         if (inputType == InputType.custom &&
             platformDataColumn.buildSuffix != null) {
           Widget suffix = platformDataColumn.buildSuffix!(index, t);
-          var dataCell = TrinaCell(value: suffix);
+          var dataCell =
+              TrinaCell(renderer: (TrinaCellRendererContext context) {
+            return suffix;
+          });
           cells[name] = dataCell;
         } else {
           dynamic fieldValue = tMap[name];
-          if (fieldValue != null) {
-            if (fieldValue is double) {
-              fieldValue = NumberUtil.stdDouble(fieldValue);
+          String value = '';
+          Color? color;
+          DataType dataType = platformDataColumn.dataType;
+          if (dataType == DataType.double ||
+              dataType == DataType.num ||
+              dataType == DataType.int ||
+              dataType == DataType.percentage) {
+            if (fieldValue != null) {
+              if (dataType == DataType.double) {
+                value = NumberUtil.stdDouble(fieldValue);
+              } else if (dataType == DataType.percentage) {
+                value = NumberUtil.stdPercentage(fieldValue);
+              } else {
+                value = fieldValue!.toString();
+              }
+              if (fieldValue > 0) {
+                color = platformDataColumn.positiveColor;
+              } else if (fieldValue < 0) {
+                color = platformDataColumn.negativeColor;
+              }
             } else {
-              fieldValue = fieldValue.toString();
+              fieldValue = '';
             }
-          } else {
-            fieldValue = '';
           }
-
-          var dataCell = TrinaCell(value: fieldValue!);
+          TrinaCell dataCell = TrinaCell(value: fieldValue!);
+          if (color != null) {
+            dataCell = TrinaCell(
+                value: fieldValue!,
+                renderer: (rendererContext) {
+                  return Text(
+                    value,
+                    style: TextStyle(
+                      color: color
+                    ),
+                  );
+                });
+          }
           cells[name] = dataCell;
         }
       }
@@ -166,7 +219,9 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
           if (fn != null && index != null) {
             fn(index, selected!);
           } else {
-            EntityUtil.setSelected(value, selected);
+            if (value != null) {
+              EntityUtil.setSelected(value, selected);
+            }
           }
         },
         onRowDoubleTap: (TrinaGridOnRowDoubleTapEvent event) {
