@@ -69,7 +69,7 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
             label: columnName,
             name: columnName,
             dataType: DataType.int,
-            align: TextAlign.right,
+            align: Alignment.centerRight,
             // width: 70,
           ));
         } else if (columnValue is double) {
@@ -77,7 +77,7 @@ class QueryConsoleEditorWidget extends StatelessWidget with TileDataMixin {
             label: columnName,
             name: columnName,
             dataType: DataType.double,
-            align: TextAlign.right,
+            align: Alignment.centerRight,
             // width: 70,
           ));
         } else {

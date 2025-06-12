@@ -228,7 +228,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
         name: 'pe',
         width: 50,
         dataType: DataType.double,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         onSort: (int index, bool ascending) =>
             qstatDataPageController.sort((t) => t.pe, index, 'pe', ascending),
       ),
@@ -237,7 +237,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
         name: 'peg',
         width: 70,
         dataType: DataType.double,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         onSort: (int index, bool ascending) =>
             qstatDataPageController.sort((t) => t.peg, index, 'peg', ascending),
       ),
@@ -247,7 +247,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 80,
         onSort: (int index, bool ascending) => qstatDataPageController.sort(
             (t) => t.close, index, 'close', ascending),
@@ -256,7 +256,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
         label: '涨幅',
         name: 'pct_chg_close',
         dataType: DataType.percentage,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
         width: 80,
@@ -269,7 +269,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 100,
         onSort: (int index, bool ascending) => qstatDataPageController.sort(
             (t) => t.yoySales, index, 'yoySales', ascending),
@@ -280,7 +280,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 110,
         onSort: (int index, bool ascending) => qstatDataPageController.sort(
             (t) => t.yoyDeduNp, index, 'yoyDeduNp', ascending),
@@ -291,7 +291,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 110,
         onSort: (int index, bool ascending) => qstatDataPageController.sort(
             (t) => t.orLastMonth, index, 'orLastMonth', ascending),
@@ -302,7 +302,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 130,
         onSort: (int index, bool ascending) => qstatDataPageController.sort(
             (t) => t.npLastMonth, index, 'npLastMonth', ascending),
@@ -313,7 +313,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 100,
         onSort: (int index, bool ascending) => qstatDataPageController.sort(
             (t) => t.weightAvgRoe, index, 'weightAvgRoe', ascending),
@@ -324,7 +324,7 @@ class QStatWidget extends StatelessWidget with TileDataMixin {
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 80,
         onSort: (int index, bool ascending) => qstatDataPageController.sort(
             (t) => t.grossProfitMargin, index, 'grossProfitMargin', ascending),

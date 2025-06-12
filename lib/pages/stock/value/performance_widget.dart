@@ -86,7 +86,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.right,
+      align: Alignment.centerRight,
       width: 100,
       onSort: (int index, bool ascending) => performanceDataPageController.sort(
           (t) => t.yoySales, index, 'yoySales', ascending),
@@ -97,7 +97,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.right,
+      align: Alignment.centerRight,
       width: 110,
       onSort: (int index, bool ascending) => performanceDataPageController.sort(
           (t) => t.yoyDeduNp, index, 'yoyDeduNp', ascending),
@@ -108,7 +108,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.right,
+      align: Alignment.centerRight,
       width: 110,
       onSort: (int index, bool ascending) => performanceDataPageController.sort(
           (t) => t.orLastMonth, index, 'orLastMonth', ascending),
@@ -119,7 +119,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.right,
+      align: Alignment.centerRight,
       width: 130,
       onSort: (int index, bool ascending) => performanceDataPageController.sort(
           (t) => t.npLastMonth, index, 'npLastMonth', ascending),
@@ -130,7 +130,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.right,
+      align: Alignment.centerRight,
       width: 100,
       onSort: (int index, bool ascending) => performanceDataPageController.sort(
           (t) => t.weightAvgRoe, index, 'weightAvgRoe', ascending),
@@ -141,7 +141,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.right,
+      align: Alignment.centerRight,
       width: 80,
       onSort: (int index, bool ascending) => performanceDataPageController.sort(
           (t) => t.grossProfitMargin, index, 'grossProfitMargin', ascending),
@@ -152,7 +152,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.right,
+      align: Alignment.centerRight,
       width: 110,
       onSort: (int index, bool ascending) => performanceDataPageController.sort(
           (t) => t.basicEps, index, 'basicEps', ascending),
@@ -161,7 +161,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
       label: '总营收',
       name: 'total_operate_income',
       dataType: DataType.double,
-      align: TextAlign.right,
+      align: Alignment.centerRight,
       width: 140,
       onSort: (int index, bool ascending) => performanceDataPageController.sort(
           (t) => t.totalOperateIncome, index, 'totalOperateIncome', ascending),
@@ -172,7 +172,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
       dataType: DataType.double,
       positiveColor: Colors.red,
       negativeColor: Colors.green,
-      align: TextAlign.right,
+      align: Alignment.centerRight,
       width: 140,
       onSort: (int index, bool ascending) => performanceDataPageController.sort(
           (t) => t.parentNetProfit, index, 'parentNetProfit', ascending),
@@ -188,7 +188,7 @@ class PerformanceWidget extends StatelessWidget with TileDataMixin {
     PlatformDataColumn(
       label: '股票代码',
       name: 'security_code',
-      align: TextAlign.right,
+      align: Alignment.centerRight,
       width: 120,
     ),
     PlatformDataColumn(

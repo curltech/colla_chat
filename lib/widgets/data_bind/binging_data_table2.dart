@@ -137,7 +137,14 @@ class BindingDataTable2<T> extends StatelessWidget {
         } else {
           fieldValue = '';
         }
-        TextAlign align = platformDataColumn.align;
+        TextAlign align = TextAlign.left;
+        if (platformDataColumn.align == Alignment.center) {
+          align = TextAlign.center;
+        } else if (platformDataColumn.align == Alignment.centerRight) {
+          align = TextAlign.right;
+        } else if (platformDataColumn.align == Alignment.centerLeft) {
+          align = TextAlign.left;
+        }
         var dataCell = DataCell(
           CommonAutoSizeText(fieldValue!,
               style: TextStyle(

@@ -59,7 +59,7 @@ class PlatformDataColumn {
   final String label;
   final InputType inputType;
   final DataType dataType;
-  final TextAlign align;
+  final Alignment align;
   final double? width;
   final Color? positiveColor;
   final Color? negativeColor;
@@ -76,7 +76,7 @@ class PlatformDataColumn {
       this.negativeColor,
       this.inputType = InputType.label,
       this.width,
-      this.align = TextAlign.left,
+      this.align = Alignment.centerLeft,
       this.buildSuffix,
       this.onSort});
 }

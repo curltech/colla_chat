@@ -345,7 +345,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
         label: '收盘价',
         name: 'close',
         dataType: DataType.double,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 70,
       ),
       PlatformDataColumn(
@@ -354,7 +354,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
         dataType: DataType.percentage,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 70,
         onSort: (int index, bool ascending) => dayLineController.sort(
             (t) => t.pctChgClose, index, 'pct_chg_close', ascending),
@@ -365,7 +365,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
         dataType: DataType.percentage,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 70,
         onSort: (int index, bool ascending) => dayLineController.sort(
             (t) => t.pctChgVol, index, 'pct_chg_vol', ascending),
@@ -374,7 +374,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
         label: '换手率',
         name: 'turnover',
         dataType: DataType.double,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 70,
         onSort: (int index, bool ascending) => dayLineController.sort(
             (t) => t.turnover, index, 'turnover', ascending),
@@ -382,7 +382,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
       PlatformDataColumn(
           label: '',
           name: 'action',
-          align: TextAlign.right,
+          align: Alignment.centerRight,
           width: 70,
           inputType: InputType.custom,
           buildSuffix: (int index, dynamic dayLine) {

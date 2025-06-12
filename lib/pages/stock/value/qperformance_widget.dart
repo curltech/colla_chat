@@ -181,7 +181,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         name: 'pe',
         width: 50,
         dataType: DataType.double,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         onSort: (int index, bool ascending) => qperformanceDataPageController
             .sort((t) => t.pe, index, 'pe', ascending),
       ),
@@ -190,7 +190,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         name: 'peg',
         width: 70,
         dataType: DataType.double,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         onSort: (int index, bool ascending) => qperformanceDataPageController
             .sort((t) => t.peg, index, 'peg', ascending),
       ),
@@ -200,7 +200,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 80,
         onSort: (int index, bool ascending) => qperformanceDataPageController
             .sort((t) => t.close, index, 'close', ascending),
@@ -209,7 +209,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         label: '涨幅',
         name: 'pct_chg_close',
         dataType: DataType.percentage,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
         width: 80,
@@ -222,7 +222,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 100,
         onSort: (int index, bool ascending) => qperformanceDataPageController
             .sort((t) => t.yoySales, index, 'yoySales', ascending),
@@ -233,7 +233,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 110,
         onSort: (int index, bool ascending) => qperformanceDataPageController
             .sort((t) => t.yoyDeduNp, index, 'yoyDeduNp', ascending),
@@ -244,7 +244,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 110,
         onSort: (int index, bool ascending) => qperformanceDataPageController
             .sort((t) => t.orLastMonth, index, 'orLastMonth', ascending),
@@ -255,7 +255,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 130,
         onSort: (int index, bool ascending) => qperformanceDataPageController
             .sort((t) => t.npLastMonth, index, 'npLastMonth', ascending),
@@ -266,7 +266,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 100,
         onSort: (int index, bool ascending) => qperformanceDataPageController
             .sort((t) => t.weightAvgRoe, index, 'weightAvgRoe', ascending),
@@ -277,7 +277,7 @@ class QPerformanceWidget extends StatelessWidget with TileDataMixin {
         dataType: DataType.double,
         positiveColor: Colors.red,
         negativeColor: Colors.green,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 80,
         onSort: (int index, bool ascending) =>
             qperformanceDataPageController.sort((t) => t.grossProfitMargin,

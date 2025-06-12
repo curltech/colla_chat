@@ -44,10 +44,12 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
     for (var platformDataColumn in platformDataColumns) {
       TrinaColumnType type = TrinaColumnType.text();
       TrinaColumnTextAlign align = TrinaColumnTextAlign.start;
-      if (platformDataColumn.align == TextAlign.center) {
+      if (platformDataColumn.align == Alignment.center) {
         align = TrinaColumnTextAlign.center;
-      } else if (platformDataColumn.align == TextAlign.end) {
-        align = TrinaColumnTextAlign.end;
+      } else if (platformDataColumn.align == Alignment.centerRight) {
+        align = TrinaColumnTextAlign.right;
+      } else if (platformDataColumn.align == Alignment.centerLeft) {
+        align = TrinaColumnTextAlign.left;
       }
       DataType dataType = platformDataColumn.dataType;
       if (dataType == DataType.double || dataType == DataType.num) {
@@ -125,7 +127,7 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
           Widget suffix = platformDataColumn.buildSuffix!(index, t);
           var dataCell =
               TrinaCell(renderer: (TrinaCellRendererContext context) {
-            return suffix;
+            return Align(alignment: platformDataColumn.align, child: suffix);
           });
           cells[name] = dataCell;
         } else {
@@ -161,9 +163,7 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
                 renderer: (rendererContext) {
                   return Text(
                     value,
-                    style: TextStyle(
-                      color: color
-                    ),
+                    style: TextStyle(color: color),
                   );
                 });
           }

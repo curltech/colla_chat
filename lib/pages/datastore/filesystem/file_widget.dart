@@ -281,7 +281,6 @@ class FileWidget extends StatelessWidget with TileDataMixin {
       name: 'name',
       width: 100,
       dataType: DataType.string,
-      align: TextAlign.left,
       onSort: (int index, bool ascending) =>
           fileController.sort((File t) => t.name, index, 'name', ascending),
     ));
@@ -289,7 +288,6 @@ class FileWidget extends StatelessWidget with TileDataMixin {
       label: 'MimeType',
       name: 'mimeType',
       dataType: DataType.string,
-      align: TextAlign.left,
       onSort: (int index, bool ascending) => fileController.sort(
           (File t) => t.mimeType, index, 'mimeType', ascending),
     ));
@@ -298,7 +296,6 @@ class FileWidget extends StatelessWidget with TileDataMixin {
       name: 'modified',
       width: 80,
       dataType: DataType.string,
-      align: TextAlign.left,
       onSort: (int index, bool ascending) => fileController.sort(
           (File t) => t.modified, index, 'modified', ascending),
     ));
@@ -306,7 +303,7 @@ class FileWidget extends StatelessWidget with TileDataMixin {
       label: 'Size',
       name: 'size',
       dataType: DataType.int,
-      align: TextAlign.right,
+      align: Alignment.centerRight,
       onSort: (int index, bool ascending) =>
           fileController.sort((File t) => t.size, index, 'size', ascending),
     ));

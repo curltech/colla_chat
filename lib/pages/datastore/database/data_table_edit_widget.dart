@@ -158,19 +158,17 @@ class _DataTableEditWidgetState extends State<DataTableEditWidget>
       label: 'Name',
       name: 'name',
       dataType: DataType.string,
-      align: TextAlign.left,
     ));
     platformDataColumns.add(PlatformDataColumn(
       label: 'DataType',
       name: 'dataType',
       dataType: DataType.string,
-      align: TextAlign.left,
     ));
     platformDataColumns.add(PlatformDataColumn(
       label: 'isKey',
       name: 'isKey',
       dataType: DataType.bool,
-      align: TextAlign.right,
+      align: Alignment.centerRight,
     ));
 
     return BindingTrinaDataGrid<data_source.DataColumn>(

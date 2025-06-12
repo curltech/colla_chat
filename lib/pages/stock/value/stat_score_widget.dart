@@ -200,7 +200,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
         name: 'risk_score',
         width: 50,
         dataType: DataType.double,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         onSort: (int index, bool ascending) => statScoreDataPageController.sort(
             (t) => t.riskScore, index, 'riskScore', ascending),
       ),
@@ -209,7 +209,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
         name: 'stable_score',
         width: 70,
         dataType: DataType.double,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         onSort: (int index, bool ascending) => statScoreDataPageController.sort(
             (t) => t.stableScore, index, 'stableScore', ascending),
       ),
@@ -217,7 +217,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
         label: '增长',
         name: 'increase_score',
         dataType: DataType.double,
-        align: TextAlign.right,
+        align:Alignment.centerRight,
         width: 80,
         onSort: (int index, bool ascending) => statScoreDataPageController.sort(
             (t) => t.increaseScore, index, 'increaseScore', ascending),
@@ -226,7 +226,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
         label: '累计业绩',
         name: 'acc_score',
         dataType: DataType.double,
-        align: TextAlign.right,
+        align:Alignment.centerRight,
         width: 80,
         onSort: (int index, bool ascending) => statScoreDataPageController.sort(
             (t) => t.accScore, index, 'accScore', ascending),
@@ -235,7 +235,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
         label: '相关性',
         name: 'corr_score',
         dataType: DataType.double,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 100,
         onSort: (int index, bool ascending) => statScoreDataPageController.sort(
             (t) => t.corrScore, index, 'corrScore', ascending),
@@ -244,7 +244,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
         label: '最新业绩',
         name: 'pros_score',
         dataType: DataType.double,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 110,
         onSort: (int index, bool ascending) => statScoreDataPageController.sort(
             (t) => t.prosScore, index, 'prosScore', ascending),
@@ -253,7 +253,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
         label: '趋势',
         name: 'trend_score',
         dataType: DataType.double,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 110,
         onSort: (int index, bool ascending) => statScoreDataPageController.sort(
             (t) => t.trendScore, index, 'trendScore', ascending),
@@ -262,7 +262,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
         label: '运营',
         name: 'operation_score',
         dataType: DataType.double,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 130,
         onSort: (int index, bool ascending) => statScoreDataPageController.sort(
             (t) => t.operationScore, index, 'operationScore', ascending),
@@ -271,7 +271,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
         label: '总分',
         name: 'total_score',
         dataType: DataType.double,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 100,
         onSort: (int index, bool ascending) => statScoreDataPageController.sort(
             (t) => t.totalScore, index, 'totalScore', ascending),
@@ -280,7 +280,7 @@ class StatScoreWidget extends StatelessWidget with TileDataMixin {
         label: '总分分位数',
         name: 'percentile_total_score',
         dataType: DataType.double,
-        align: TextAlign.right,
+        align: Alignment.centerRight,
         width: 100,
         onSort: (int index, bool ascending) => statScoreDataPageController.sort(
             (t) => t.percentileTotalScore,
