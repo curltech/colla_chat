@@ -55,6 +55,7 @@ dependencies:
   screenshot: ^3.0.0
   no_screenshot: ^0.3.2-beta.1
   screenshot_callback: ^3.0.1
+  screen_brightness: ^2.1.4
   orientation: ^1.2.0 # 控制屏幕旋转
   geocoding: ^3.0.0
   network_info_plus: ^6.0.0

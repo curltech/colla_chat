@@ -1,5 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/number_util.dart';
@@ -186,22 +188,53 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
     return rows;
   }
 
+  TrinaGridConfiguration _buildTrinaGridConfiguration(BuildContext context) {
+    Brightness brightness = myself.getBrightness(context);
+    Locale? locale = AppLocalizations.current?.locale;
+    TrinaGridLocaleText localeText;
+    if (locale == Locale('zh', 'TW') || locale == Locale('zh', 'CN')) {
+      localeText = TrinaGridLocaleText.china();
+    } else if (locale == Locale('ja', 'JP')) {
+      localeText = TrinaGridLocaleText.japanese();
+    } else if (locale == Locale('ko', 'KR')) {
+      localeText = TrinaGridLocaleText.korean();
+    } else {
+      localeText = TrinaGridLocaleText();
+    }
+    TrinaGridStyleConfig trinaGridStyleConfig;
+    if (brightness == Brightness.dark) {
+      trinaGridStyleConfig = TrinaGridStyleConfig.dark(
+        enableColumnBorderVertical: true,
+        enableColumnBorderHorizontal: true,
+        enableCellBorderVertical: false,
+        enableCellBorderHorizontal: false,
+        oddRowColor: myself.secondary.withAlpha(64),
+        evenRowColor: Colors.grey.withAlpha(64),
+        gridBorderColor: myself.primary,
+      );
+    } else {
+      trinaGridStyleConfig = TrinaGridStyleConfig(
+        enableColumnBorderVertical: true,
+        enableColumnBorderHorizontal: true,
+        enableCellBorderVertical: false,
+        enableCellBorderHorizontal: false,
+        oddRowColor: myself.secondary.withAlpha(64),
+        evenRowColor: Colors.grey.withAlpha(64),
+        gridBorderColor: myself.primary,
+      );
+    }
+    return TrinaGridConfiguration(
+      style: trinaGridStyleConfig,
+      localeText: localeText,
+    );
+  }
+
   /// 过滤条件的多项选择框的表
   Widget _buildDataTable(BuildContext context) {
     return Obx(() {
       return TrinaGrid(
         key: UniqueKey(),
-        configuration: const TrinaGridConfiguration(
-          style: TrinaGridStyleConfig(
-            enableColumnBorderVertical: false,
-            enableColumnBorderHorizontal: false,
-            gridBorderColor: Colors.white,
-            borderColor: Colors.white,
-            activatedBorderColor: Colors.white,
-            inactivatedBorderColor: Colors.white,
-          ),
-          localeText: TrinaGridLocaleText.china(),
-        ),
+        configuration: _buildTrinaGridConfiguration(context),
         columns: _buildDataColumns(),
         rows: _buildDataRows(),
         onLoaded: (TrinaGridOnLoadedEvent event) {},

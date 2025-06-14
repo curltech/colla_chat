@@ -77,16 +77,21 @@ class MultiKlineController extends DataListController<String> {
         klineControllers[tsCode]?[106] =
             KlineController(tsCode, name, lineType: 106);
       }
-      lineType(101);
+      lineType.value = 101;
       current = tsCode;
     }
   }
 
-  remove(String tsCode) {
+  @override
+  String? remove(String tsCode) {
     if (klineControllers.containsKey(tsCode)) {
       klineControllers.remove(tsCode);
       data.remove(tsCode);
+
+      return tsCode;
     }
+
+    return null;
   }
 
   /// 当前股票转为上一只股票
@@ -174,7 +179,7 @@ class MultiKlineController extends DataListController<String> {
       }
       if (klineController != null) {
         DayLine? dayLine = klineController.data.lastOrNull;
-        if (dayLine == null) {
+        if (dayLine == null || dayLine.tsCode != tsCode) {
           await loadDayLines(tsCodes: [tsCode]);
           dayLine = klineController.data.lastOrNull;
         }
@@ -196,13 +201,14 @@ class MultiKlineController extends DataListController<String> {
 
   /// 加载当前的tsCode和lineType全部（在线模式）或者更多的数据（服务器模式）
   Future<void> _loadMore() async {
+    KlineController? klineController = this.klineController;
     if (klineController == null) {
       return;
     }
 
-    int lineType = klineController!.lineType;
-    String tsCode = klineController!.tsCode;
-    int length = klineController!.length;
+    int lineType = klineController.lineType;
+    String tsCode = klineController.tsCode;
+    int length = klineController.length;
     Map<String, dynamic>? response;
     DateTime start = DateTime.now();
 
@@ -211,8 +217,8 @@ class MultiKlineController extends DataListController<String> {
       ///在线获取
       if (online.value) {
         int? tradeDate;
-        if (klineController!.data.isNotEmpty) {
-          Map map = JsonUtil.toJson(klineController!.data[0]);
+        if (klineController.data.isNotEmpty) {
+          Map map = JsonUtil.toJson(klineController.data[0]);
           tradeDate = map['tradeDate'];
         }
         if (tradeDate != null) {
@@ -229,8 +235,8 @@ class MultiKlineController extends DataListController<String> {
       /// 日线
       if (online.value) {
         int? tradeDate;
-        if (klineController!.data.isNotEmpty) {
-          Map map = JsonUtil.toJson(klineController!.data[0]);
+        if (klineController.data.isNotEmpty) {
+          Map map = JsonUtil.toJson(klineController.data[0]);
           tradeDate = map['tradeDate'];
         }
         if (tradeDate != null) {
@@ -246,8 +252,8 @@ class MultiKlineController extends DataListController<String> {
       /// 其他的线，包括周线，月线等
       if (online.value) {
         int? tradeDate;
-        if (klineController!.data.isNotEmpty) {
-          Map map = JsonUtil.toJson(klineController!.data[0]);
+        if (klineController.data.isNotEmpty) {
+          Map map = JsonUtil.toJson(klineController.data[0]);
           tradeDate = map['tradeDate'];
         }
         if (tradeDate != null) {
@@ -268,26 +274,27 @@ class MultiKlineController extends DataListController<String> {
     }
     List<dynamic>? data = response['data'];
     int? count = response['count'];
-    klineController!.count = count;
+    klineController.count = count;
 
     /// 获取的数据如果是在线的，则是所有的数据取代原有的数据
     /// 如果是服务器的，则添加，服务器支持分批获取
     if (data != null && data.isNotEmpty) {
       if (online.value) {
-        klineController!.replaceAll(data);
+        klineController.replaceAll(data);
       } else {
-        klineController!.insertAll(0, data);
+        klineController.insertAll(0, data);
       }
     }
   }
 
   /// 检查当前的数据是否存在，是否加载完毕决定加载数据
   Future<void> load() async {
+    KlineController? klineController = this.klineController;
     if (klineController == null) {
       return;
     }
-    int length = klineController!.data.length;
-    int? count = klineController!.count;
+    int length = klineController.data.length;
+    int? count = klineController.count;
     // 判断是否有更多的数据可以加载
     if (count == null || length == 0 || length < count) {
       await _loadMore();

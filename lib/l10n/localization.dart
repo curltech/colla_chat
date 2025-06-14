@@ -21,9 +21,9 @@ class AppLocalizations {
   static final Map<Locale, AppLocalizations> _all = {};
 
   final Map<dynamic, dynamic> _localisedValues;
-  final Locale _locale;
+  final Locale locale;
 
-  AppLocalizations(this._locale, this._localisedValues);
+  AppLocalizations(this.locale, this._localisedValues);
 
   static init() async {
     for (var supportedLocale in supportedLocales) {
