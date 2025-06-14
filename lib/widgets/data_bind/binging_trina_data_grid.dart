@@ -205,22 +205,20 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
     if (brightness == Brightness.dark) {
       trinaGridStyleConfig = TrinaGridStyleConfig.dark(
         enableColumnBorderVertical: true,
-        enableColumnBorderHorizontal: true,
+        enableColumnBorderHorizontal: false,
         enableCellBorderVertical: false,
-        enableCellBorderHorizontal: false,
+        enableCellBorderHorizontal: true,
         oddRowColor: myself.secondary.withAlpha(64),
         evenRowColor: Colors.grey.withAlpha(64),
-        gridBorderColor: myself.primary,
       );
     } else {
       trinaGridStyleConfig = TrinaGridStyleConfig(
         enableColumnBorderVertical: true,
-        enableColumnBorderHorizontal: true,
+        enableColumnBorderHorizontal: false,
         enableCellBorderVertical: false,
-        enableCellBorderHorizontal: false,
+        enableCellBorderHorizontal: true,
         oddRowColor: myself.secondary.withAlpha(64),
         evenRowColor: Colors.grey.withAlpha(64),
-        gridBorderColor: myself.primary,
       );
     }
     return TrinaGridConfiguration(
