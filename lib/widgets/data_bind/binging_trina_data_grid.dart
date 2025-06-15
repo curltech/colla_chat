@@ -209,8 +209,9 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
         enableColumnBorderHorizontal: false,
         enableCellBorderVertical: false,
         enableCellBorderHorizontal: true,
-        oddRowColor: myself.secondary.withAlpha(64),
+        oddRowColor: myself.primaryColor.withAlpha(64),
         evenRowColor: Colors.grey.withAlpha(64),
+        activatedColor: Colors.blue.withAlpha(64),
       );
     } else {
       trinaGridStyleConfig = TrinaGridStyleConfig(
@@ -220,11 +221,16 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
         enableCellBorderHorizontal: true,
         oddRowColor: myself.secondary.withAlpha(64),
         evenRowColor: Colors.grey.withAlpha(64),
+        activatedColor: Colors.blue.withAlpha(64),
       );
     }
     return TrinaGridConfiguration(
       style: trinaGridStyleConfig,
       localeText: localeText,
+      columnSize: TrinaGridColumnSizeConfig(
+        autoSizeMode: TrinaAutoSizeMode.scale,
+        resizeMode: TrinaResizeMode.normal,
+      ),
     );
   }
 
@@ -233,6 +239,7 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
     return Obx(() {
       return TrinaGrid(
         key: UniqueKey(),
+        mode: TrinaGridMode.select,
         configuration: _buildTrinaGridConfiguration(context),
         columns: _buildDataColumns(),
         rows: _buildDataRows(),
