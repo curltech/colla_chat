@@ -211,7 +211,6 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
         enableCellBorderHorizontal: true,
         oddRowColor: myself.primaryColor.withAlpha(64),
         evenRowColor: Colors.grey.withAlpha(64),
-        activatedColor: Colors.blue.withAlpha(64),
       );
     } else {
       trinaGridStyleConfig = TrinaGridStyleConfig(
@@ -221,7 +220,6 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
         enableCellBorderHorizontal: true,
         oddRowColor: myself.secondary.withAlpha(64),
         evenRowColor: Colors.grey.withAlpha(64),
-        activatedColor: Colors.blue.withAlpha(64),
       );
     }
     return TrinaGridConfiguration(

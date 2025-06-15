@@ -40,6 +40,10 @@ class MyShareController {
     String? value =
         await localSharedPreferences.get('subscription', encrypt: true);
     subscription.value = value ?? '';
+    if (subscription.value.endsWith(",")) {
+      subscription.value =
+          subscription.value.substring(0, subscription.value.length - 1);
+    }
     List<String> tsCodes = subscription.value.split(',');
     for (String tsCode in tsCodes) {
       if (tsCode.isEmpty) {
@@ -56,23 +60,30 @@ class MyShareController {
     await shareService.store(share);
     String tsCode = share.tsCode!;
     if (!subscription.contains(tsCode)) {
-      subscription.value += '$tsCode,';
+      if (subscription.value.endsWith(',')) {
+        subscription.value += tsCode;
+      } else {
+        subscription.value += ',$tsCode';
+      }
       await localSharedPreferences.save('subscription', subscription.value,
           encrypt: true);
     }
     String defaultGroupName = ShareGroupService.defaultGroupName;
-    await addMember(defaultGroupName, [tsCode]);
+    groupSubscription[defaultGroupName] = subscription.value;
   }
 
   /// 删除股票，并从各各分组中删除
   Future<void> remove(String tsCode) async {
+    if (subscription.contains(',$tsCode')) {
+      subscription.value = subscription.replaceAll(',$tsCode', '');
+    }
     if (subscription.contains(tsCode)) {
-      subscription.value = subscription.replaceAll('$tsCode,', '');
-      await localSharedPreferences.save('subscription', subscription.value,
-          encrypt: true);
-      for (String groupName in groupSubscription.keys) {
-        await removeMember(groupName, tsCode);
-      }
+      subscription.value = subscription.replaceAll(tsCode, '');
+    }
+    await localSharedPreferences.save('subscription', subscription.value,
+        encrypt: true);
+    for (String groupName in groupSubscription.keys) {
+      await removeMember(groupName, tsCode);
     }
   }
 
@@ -86,6 +97,9 @@ class MyShareController {
       List<ShareGroup> shareGroups = await shareGroupService.findAll();
       myShareController.showLoading.value = false;
       for (var shareGroup in shareGroups) {
+        if (ShareGroupService.defaultGroupName == shareGroup.groupName) {
+          continue;
+        }
         String subscription = shareGroup.subscription;
         if (subscription.endsWith(",")) {
           subscription = subscription.substring(0, subscription.length - 1);
@@ -109,15 +123,13 @@ class MyShareController {
       } else {
         try {
           myShareController.showLoading.value = true;
-          List<ShareGroup> shareGroups = await shareGroupService
-              .find(where: 'groupName=?', whereArgs: [groupName]);
+          ShareGroup? shareGroup = await shareGroupService
+              .findOne(where: 'groupName=?', whereArgs: [groupName]);
           myShareController.showLoading.value = false;
-          if (shareGroups.isNotEmpty) {
-            subscription = '';
-            for (ShareGroup shareGroup in shareGroups) {
-              subscription = '${subscription!},${shareGroup.subscription}';
-            }
-            groupSubscription[groupName] = subscription!;
+          if (shareGroup != null) {
+            groupSubscription[groupName] = shareGroup.subscription;
+          } else {
+            groupSubscription[groupName] = '';
           }
         } catch (e) {
           myShareController.showLoading.value = false;
@@ -142,7 +154,11 @@ class MyShareController {
     bool result = false;
     for (String tsCode in tsCodes) {
       if (!subscription!.contains(tsCode)) {
-        subscription = '$subscription$tsCode,';
+        if (subscription.endsWith(',')) {
+          subscription += tsCode;
+        } else {
+          subscription += ',$tsCode';
+        }
         groupSubscription[groupName] = subscription;
         result = true;
       }
@@ -164,15 +180,17 @@ class MyShareController {
     }
     String? subscription = groupSubscription[groupName];
     if (subscription != null) {
-      if (subscription.contains(tsCode)) {
-        subscription = subscription.replaceAll('$tsCode,', '');
-        groupSubscription[groupName] = subscription;
-        ShareGroup shareGroup =
-            ShareGroup(groupName, subscription: subscription);
-        await shareGroupService.store(shareGroup);
-
-        return true;
+      if (subscription.contains(',$tsCode')) {
+        subscription = subscription.replaceAll(',$tsCode', '');
       }
+      if (subscription.contains(tsCode)) {
+        subscription = subscription.replaceAll(tsCode, '');
+      }
+      groupSubscription[groupName] = subscription;
+      ShareGroup shareGroup = ShareGroup(groupName, subscription: subscription);
+      await shareGroupService.store(shareGroup);
+
+      return true;
     }
     return false;
   }
@@ -203,6 +221,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
 
   ShareSelectionWidget({super.key}) {
     indexWidgetProvider.define(stockLineChartWidget);
+    myShareController.subscription;
   }
 
   @override
@@ -324,7 +343,7 @@ class ShareSelectionWidget extends StatelessWidget with TileDataMixin {
       PlatformDataColumn(
         label: '股票代码',
         name: 'ts_code',
-        width: 80,
+        width: 120,
         onSort: (int index, bool ascending) => dayLineController.sort(
             (t) => t.tsCode, index, 'ts_code', ascending),
       ),
