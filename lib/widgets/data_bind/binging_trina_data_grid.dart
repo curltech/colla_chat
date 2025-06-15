@@ -43,7 +43,8 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
   /// 过滤条件的多项选择框的列定义
   List<TrinaColumn> _buildDataColumns() {
     List<TrinaColumn> dataColumns = [];
-    for (var platformDataColumn in platformDataColumns) {
+    for (int i = 0; i < platformDataColumns.length; ++i) {
+      PlatformDataColumn platformDataColumn = platformDataColumns[i];
       TrinaColumnType type = TrinaColumnType.text();
       TrinaColumnTextAlign align = TrinaColumnTextAlign.start;
       if (platformDataColumn.align == Alignment.center) {
@@ -80,7 +81,7 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
             textAlign: align,
             width: platformDataColumn.width ?? TrinaGridSettings.columnWidth,
             type: type,
-            // enableRowChecked: true,
+            enableRowChecked: i == 0 ? true : false,
             // enableTitleChecked: true,
             enableSorting: false,
             enableContextMenu: false,
@@ -97,7 +98,7 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
               field: platformDataColumn.name,
               type: type,
               width: platformDataColumn.width ?? TrinaGridSettings.columnWidth,
-              // enableRowChecked: true,
+              enableRowChecked: i == 0 ? true : false,
               // enableTitleChecked: true,
               enableSorting: true,
               enableContextMenu: false,
