@@ -23,7 +23,7 @@ final defaultBorderGradient = LinearGradient(
   ],
 );
 
-const double defaultBlur = 20;
+const double defaultBlur = 15;
 const double defaultFrostedOpacity = 0.12;
 const BorderRadius defaultBorderRadius = BorderRadius.zero;
 final Color defaultShadowColor = Colors.black.withAlpha(50);
