@@ -27,7 +27,7 @@ class FullScreenChatMessageWidget extends StatelessWidget with TileDataMixin {
 
   
 
-  SwiperController swiperController = SwiperController();
+  final SwiperController swiperController = SwiperController();
 
   Future<Widget> _buildMessageWidget(BuildContext context, int index) async {
     ChatMessage chatMessage = chatMessageController.data[index];

@@ -27,11 +27,13 @@ import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/websocket/websocket_channel.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -45,7 +47,8 @@ import 'package:window_manager/window_manager.dart';
 
 /// 聊天界面，包括文本聊天，视频通话呼叫，视频通话，全屏展示四个组件
 /// 支持群聊
-class ChatMessageView extends StatefulWidget with TileDataMixin {
+class ChatMessageView extends StatelessWidget
+    with TileDataMixin, WidgetsBindingObserver, WindowListener {
   final FullScreenChatMessageWidget fullScreenChatMessageWidget =
       FullScreenChatMessageWidget();
   final VideoChatWidget videoChatWidget = VideoChatWidget();
@@ -60,11 +63,7 @@ class ChatMessageView extends StatefulWidget with TileDataMixin {
     indexWidgetProvider.define(fullScreenChatMessageWidget);
     indexWidgetProvider.define(videoChatWidget);
     indexWidgetProvider.define(sfuVideoChatWidget);
-  }
-
-  @override
-  State<StatefulWidget> createState() {
-    return _ChatMessageViewState();
+    _init();
   }
 
   @override
@@ -79,11 +78,6 @@ class ChatMessageView extends StatefulWidget with TileDataMixin {
   @override
   String get title => 'ChatMessage';
 
-  
-}
-
-class _ChatMessageViewState extends State<ChatMessageView>
-    with WidgetsBindingObserver, WindowListener {
   final Rx<RTCPeerConnectionState?> _peerConnectionState =
       Rx<RTCPeerConnectionState?>(null);
   final Rx<RTCDataChannelState?> _dataChannelState =
@@ -99,12 +93,9 @@ class _ChatMessageViewState extends State<ChatMessageView>
   NoScreenshot? noScreenshot;
   ScreenshotCallback? screenshotCallback;
 
-  @override
-  void initState() {
-    super.initState();
+  void _init() {
     WidgetsBinding.instance.addObserver(this);
     windowManager.addListener(this);
-    chatMessageController.getChatSummary().addListener(_updateChatSummary);
     WakelockPlus.enable();
 
     ///不准截屏
@@ -120,9 +111,26 @@ class _ChatMessageViewState extends State<ChatMessageView>
         logger.e('screenshotOff failure:$e');
       }
     }
+  }
 
-    ///初始化数据
-    _updateChatSummary();
+  void _dispose() {
+    var chatSummary = chatMessageController.chatSummary;
+    if (chatSummary != null) {
+      connectionStateStreamSubscription?.cancel();
+      connectionStateStreamSubscription = null;
+      signalingStateStreamSubscription?.cancel();
+      signalingStateStreamSubscription = null;
+      closedStreamSubscription?.cancel();
+      closedStreamSubscription = null;
+      initiatorStreamSubscription?.cancel();
+      initiatorStreamSubscription = null;
+    }
+    WidgetsBinding.instance.removeObserver(this);
+    windowManager.removeListener(this);
+    WakelockPlus.disable();
+    if (platformParams.mobile) {
+      screenshotCallback?.dispose();
+    }
   }
 
   /// 消息窗口恢复的时候，恢复webrtc的连接
@@ -150,15 +158,35 @@ class _ChatMessageViewState extends State<ChatMessageView>
     //logger.i('[WindowManager] chat message view onWindowEvent: $eventName');
   }
 
-  _updateChatSummary() {
-    ///初始化数据
-    _createPeerConnection();
-    _buildReadStatus();
+  _updateChatSummary() async {
+    await _createPeerConnection();
+    await _buildReadStatus();
+  }
+
+  ///初始化，webrtc如果没有连接，尝试连接
+  ///在初始化，窗口恢复，背景恢复都会调用，因此需要能够重复调用
+  ///如果ChatGPT，则设置
+  _createPeerConnection() async {
+    await websocketPool.connect();
+    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    if (chatSummary == null) {
+      logger.e('chatSummary is null');
+      return;
+    }
+    String? partyType = chatSummary.partyType;
+    String peerId = chatSummary.peerId!;
+    if (partyType == PartyType.linkman.name) {
+      await _createLinkmanPeerConnection(peerId);
+    } else if (partyType == PartyType.group.name) {
+      await _createGroupPeerConnection(peerId);
+    } else if (partyType == PartyType.conference.name) {
+      await _createGroupPeerConnection(peerId);
+    }
   }
 
   ///更新为已读状态
   Future<void> _buildReadStatus() async {
-    var chatSummary = chatMessageController.chatSummary;
+    ChatSummary? chatSummary = chatMessageController.chatSummary;
     if (chatSummary == null) {
       logger.e('chatSummary is null');
       return;
@@ -190,29 +218,8 @@ class _ChatMessageViewState extends State<ChatMessageView>
     }
   }
 
-  ///初始化，webrtc如果没有连接，尝试连接
-  ///在初始化，窗口恢复，背景恢复都会调用，因此需要能够重复调用
-  ///如果ChatGPT，则设置
-  _createPeerConnection() async {
-    await websocketPool.connect();
-    var chatSummary = chatMessageController.chatSummary;
-    if (chatSummary == null) {
-      logger.e('chatSummary is null');
-      return;
-    }
-    String peerId = chatSummary.peerId!;
-    String partyType = chatSummary.partyType!;
-    if (partyType == PartyType.linkman.name) {
-      await _createLinkmanPeerConnection(peerId);
-    } else if (partyType == PartyType.group.name) {
-      await _createGroupPeerConnection(peerId);
-    } else if (partyType == PartyType.conference.name) {
-      await _createGroupPeerConnection(peerId);
-    }
-  }
-
   _createDataChannel() async {
-    var chatSummary = chatMessageController.chatSummary;
+    ChatSummary? chatSummary = chatMessageController.chatSummary;
     if (chatSummary == null) {
       logger.e('chatSummary is null');
       return;
@@ -228,7 +235,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
   }
 
   _disconnectPeerConnection() async {
-    var chatSummary = chatMessageController.chatSummary;
+    ChatSummary? chatSummary = chatMessageController.chatSummary;
     if (chatSummary == null) {
       logger.e('chatSummary is null');
       return;
@@ -359,7 +366,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
   }
 
   Future<void> _updatePeerConnectionState(WebrtcEvent event) async {
-    var chatSummary = chatMessageController.chatSummary;
+    ChatSummary? chatSummary = chatMessageController.chatSummary;
     if (chatSummary == null) {
       logger.e('chatSummary is null');
       return;
@@ -372,21 +379,17 @@ class _ChatMessageViewState extends State<ChatMessageView>
     WebrtcEventType eventType = event.eventType;
     if (eventType == WebrtcEventType.signalingState) {
       RTCSignalingState? state = event.data;
-      // if (mounted) {
-      //   DialogUtil.info(
-      //       content: AppLocalizations.t(
-      //               'PeerConnection signalingState was changed to ') +
-      //           AppLocalizations.t(state.toString().substring(21)));
-      // }
+        DialogUtil.info(
+            content: AppLocalizations.t(
+                    'PeerConnection signalingState was changed to ') +
+                AppLocalizations.t(state.toString().substring(21)));
     } else if (eventType == WebrtcEventType.closed) {
       _peerConnectionState.value =
           RTCPeerConnectionState.RTCPeerConnectionStateClosed;
       _dataChannelState.value = RTCDataChannelState.RTCDataChannelClosed;
       _initiator.value = null;
-      // if (mounted) {
-      //   DialogUtil.info(
-      //       content: AppLocalizations.t('PeerConnection was closed'));
-      // }
+        DialogUtil.info(
+            content: AppLocalizations.t('PeerConnection was closed'));
     } else if (eventType == WebrtcEventType.connectionState) {
       RTCPeerConnectionState? state = event.data;
       RTCPeerConnectionState? oldState = _peerConnectionState.value;
@@ -394,40 +397,33 @@ class _ChatMessageViewState extends State<ChatMessageView>
         _peerConnectionState.value = state;
         if (_peerConnectionState.value !=
             RTCPeerConnectionState.RTCPeerConnectionStateClosed) {
-          // if (mounted) {
-          //   String stateText = "Unknown";
-          //   if (state != null) {
-          //     stateText = state.name.substring(22);
-          //   }
-          //   DialogUtil.info(
-          //       content:
-          //           AppLocalizations.t('PeerConnection state was changed to ') +
-          //               AppLocalizations.t(stateText));
-          // }
+            String stateText = "Unknown";
+            if (state != null) {
+              stateText = state.name.substring(22);
+            }
+            DialogUtil.info(
+                content:
+                    AppLocalizations.t('PeerConnection state was changed to ') +
+                        AppLocalizations.t(stateText));
         } else {
-          // if (mounted) {
-          //   DialogUtil.info(
-          //       content: AppLocalizations.t('PeerConnection was closed'));
-          // }
+            DialogUtil.info(
+              content: AppLocalizations.t('PeerConnection was closed'));
+
         }
       }
     } else if (eventType == WebrtcEventType.dataChannelState) {
       RTCDataChannelState? state = event.data;
       _dataChannelState.value = state;
-      // if (mounted) {
-      //   DialogUtil.info(
-      //       content:
-      //           AppLocalizations.t('PeerConnection initiator was changed to ') +
-      //               _initiator.value.toString());
-      // }
+        DialogUtil.info(
+            content:
+                AppLocalizations.t('PeerConnection initiator was changed to ') +
+                    _initiator.value.toString());
     } else if (eventType == WebrtcEventType.initiator) {
       _initiator.value = event.data;
-      // if (mounted) {
-      //   DialogUtil.info(
-      //       content:
-      //           AppLocalizations.t('PeerConnection initiator was changed to ') +
-      //               _initiator.value.toString());
-      // }
+      DialogUtil.info(
+          content:
+              AppLocalizations.t('PeerConnection initiator was changed to ') +
+                  _initiator.value.toString());
     }
   }
 
@@ -458,32 +454,29 @@ class _ChatMessageViewState extends State<ChatMessageView>
 
   ///创建消息显示面板，包含消息的输入框
   Widget _buildChatMessageWidget(BuildContext context) {
-    final Widget chatMessageView = Obx(() {
-      var height = chatMessageViewController.chatMessageHeight;
-      Widget chatMessageWidget =
-          SizedBox(height: height, child: widget.chatMessageWidget);
-      return VisibilityDetector(
-          key: UniqueKey(),
-          onVisibilityChanged: (VisibilityInfo visibilityInfo) {
-            if (visibleFraction == 0.0 && visibilityInfo.visibleFraction > 0) {
-              // logger.i(
-              //     'ChatMessageView visibleFraction from 0 to ${visibilityInfo.visibleFraction}');
-              _createPeerConnection();
-            }
-            visibleFraction = visibilityInfo.visibleFraction;
-          },
-          child: KeyboardActions(
-              autoScroll: true,
-              config: _buildKeyboardActionsConfig(context),
-              child: Column(children: <Widget>[
-                chatMessageWidget,
-                Divider(
-                  color: Colors.white.withOpacity(AppOpacity.xlOpacity),
-                  height: 1.0,
-                ),
-                widget.chatMessageInputWidget
-              ])));
-    });
+    final Widget chatMessageView = VisibilityDetector(
+        key: UniqueKey(),
+        onVisibilityChanged: (VisibilityInfo visibilityInfo) {
+          if (visibleFraction == 0.0 && visibilityInfo.visibleFraction > 0) {
+            _createPeerConnection();
+          }
+          visibleFraction = visibilityInfo.visibleFraction;
+        },
+        child: KeyboardActions(
+            autoScroll: true,
+            config: _buildKeyboardActionsConfig(context),
+            child: Column(children: <Widget>[
+              Obx(() {
+                var height = chatMessageViewController.chatMessageHeight;
+                return SizedBox(height: height, child: chatMessageWidget);
+              }),
+              Divider(
+                color: Colors.white.withAlpha(AppOpacity.xlOpacity),
+                height: 1.0,
+              ),
+              chatMessageInputWidget
+            ])));
+
     return chatMessageView;
   }
 
@@ -492,97 +485,104 @@ class _ChatMessageViewState extends State<ChatMessageView>
     String partyType = chatSummary.partyType!;
     List<Widget> rightWidgets = [];
     if (partyType == PartyType.linkman.name) {
-      RTCPeerConnectionState? peerConnectionState = _peerConnectionState.value;
-      String? stateText = peerConnectionState?.name;
-      stateText = stateText?.substring(22);
-      stateText ??= 'Unknown';
-      Widget widget;
-      if (_peerConnectionState.value ==
-          RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
-        widget = IconButton(
-          onPressed: () {
-            _disconnectPeerConnection();
-          },
-          icon: const Icon(
-            Icons.wifi,
-            color: Colors.white,
-          ),
-          // label: stateText,
-          tooltip: AppLocalizations.t('Disconnect'),
-        );
-      } else {
-        widget = IconButton(
-          onPressed: () {
-            _createPeerConnection();
-          },
-          icon: const Icon(
-            Icons.wifi_off,
-            color: Colors.red,
-          ),
-          // label: stateText,
-          tooltip: AppLocalizations.t('Reconnect'),
-        );
-      }
-      rightWidgets.add(widget);
+      Widget peerConnectionStateWidget = ListenableBuilder(
+          listenable: _peerConnectionState,
+          builder: (BuildContext context, Widget? child) {
+            if (_peerConnectionState.value ==
+                RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+              return IconButton(
+                onPressed: () {
+                  _disconnectPeerConnection();
+                },
+                icon: const Icon(
+                  Icons.wifi,
+                  color: Colors.white,
+                ),
+                // label: stateText,
+                tooltip: AppLocalizations.t('Disconnect'),
+              );
+            } else {
+              return IconButton(
+                onPressed: () {
+                  _createPeerConnection();
+                },
+                icon: const Icon(
+                  Icons.wifi_off,
+                  color: Colors.red,
+                ),
+                // label: stateText,
+                tooltip: AppLocalizations.t('Reconnect'),
+              );
+            }
+          });
+
+      rightWidgets.add(peerConnectionStateWidget);
       rightWidgets.add(const SizedBox(
         width: 5,
       ));
 
-      RTCDataChannelState? dataChannelState = _dataChannelState.value;
-      stateText = dataChannelState?.name;
-      stateText = stateText?.substring(14);
-      stateText ??= 'Unknown';
-      if (_dataChannelState.value == RTCDataChannelState.RTCDataChannelOpen) {
-        widget = IconButton(
-          onPressed: null,
-          icon: const Icon(
-            Icons.wb_cloudy_outlined,
-            color: Colors.white,
-          ),
-          // label: stateText,
-          tooltip: AppLocalizations.t('DataChannel'),
-        );
-      } else {
-        widget = IconButton(
-          onPressed: () {
-            _createDataChannel();
-          },
-          icon: const Icon(
-            Icons.cloud_off,
-            color: Colors.red,
-          ),
-          // label: stateText,
-          tooltip: AppLocalizations.t('DataChannel'),
-        );
-      }
-      rightWidgets.add(widget);
+      Widget dataChannelStateWidget = ListenableBuilder(
+          listenable: _dataChannelState,
+          builder: (BuildContext context, Widget? child) {
+            if (_dataChannelState.value ==
+                RTCDataChannelState.RTCDataChannelOpen) {
+              return IconButton(
+                onPressed: null,
+                icon: const Icon(
+                  Icons.wb_cloudy_outlined,
+                  color: Colors.white,
+                ),
+                // label: stateText,
+                tooltip: AppLocalizations.t('DataChannel'),
+              );
+            } else {
+              return IconButton(
+                onPressed: () {
+                  _createDataChannel();
+                },
+                icon: const Icon(
+                  Icons.cloud_off,
+                  color: Colors.red,
+                ),
+                // label: stateText,
+                tooltip: AppLocalizations.t('DataChannel'),
+              );
+            }
+          });
+      rightWidgets.add(dataChannelStateWidget);
       rightWidgets.add(const SizedBox(
         width: 5,
       ));
+
       if (myself.peerProfile.developerSwitch) {
-        if (_initiator.value != null) {
-          if (_initiator.value!) {
-            widget = Tooltip(
-                message: AppLocalizations.t('Leader'),
-                child: const Icon(
-                  Icons.light_mode,
-                  color: Colors.yellow,
-                ));
-          } else {
-            widget = Tooltip(
-                message: AppLocalizations.t('Follower'),
-                child: const Icon(
-                  Icons.light_mode,
-                  color: Colors.grey,
-                ));
-          }
-        }
-      }
-      rightWidgets.add(widget);
+        Widget initiatorWidget = ListenableBuilder(
+            listenable: _initiator,
+            builder: (BuildContext context, Widget? child) {
+              if (_initiator.value != null) {
+                if (_initiator.value!) {
+                  return Tooltip(
+                      message: AppLocalizations.t('Leader'),
+                      child: const Icon(
+                        Icons.light_mode,
+                        color: Colors.yellow,
+                      ));
+                } else {
+                  return Tooltip(
+                      message: AppLocalizations.t('Follower'),
+                      child: const Icon(
+                        Icons.light_mode,
+                        color: Colors.grey,
+                      ));
+                }
+              }
 
-      rightWidgets.add(const SizedBox(
-        width: 15,
-      ));
+              return nilBox;
+            });
+        rightWidgets.add(initiatorWidget);
+        rightWidgets.add(const SizedBox(
+          width: 15,
+        ));
+      }
     }
     if (partyType == PartyType.group.name) {
       rightWidgets.add(IconButton(
@@ -635,50 +635,31 @@ class _ChatMessageViewState extends State<ChatMessageView>
 
   @override
   Widget build(BuildContext context) {
-    Widget appBarView = Obx(() {
-      Widget chatMessageWidget = _buildChatMessageWidget(context);
-      var chatSummary = chatMessageController.chatSummary;
-      if (chatSummary != null) {
-        String name = chatSummary.name!;
-        String title = AppLocalizations.t(name);
-        List<Widget> rightWidgets = _buildRightWidgets(context, chatSummary);
-        return AppBarView(
-            title: title,
-            helpPath: widget.routeName,
-            withLeading: widget.withLeading,
-            rightWidgets: rightWidgets,
-            child: chatMessageWidget);
-      }
-      return AppBarView(
-          title: AppLocalizations.t('No current chatSummary'),
-          helpPath: widget.routeName,
-          withLeading: widget.withLeading,
-          child: chatMessageWidget);
-    });
+    Widget chatMessageWidget = _buildChatMessageWidget(context);
+    Widget appBarView = ListenableBuilder(
+        listenable: chatMessageController.getChatSummary(),
+        builder: (BuildContext context, Widget? child) {
+          ChatSummary? chatSummary = chatMessageController.chatSummary;
+          if (chatSummary != null) {
+            _updateChatSummary();
+            String name = chatSummary.name!;
+            String title = AppLocalizations.t(name);
+            List<Widget> rightWidgets =
+                _buildRightWidgets(context, chatSummary);
+            return AppBarView(
+                title: title,
+                helpPath: routeName,
+                withLeading: withLeading,
+                rightWidgets: rightWidgets,
+                child: chatMessageWidget);
+          }
+          return AppBarView(
+              title: AppLocalizations.t('No current chatSummary'),
+              helpPath: routeName,
+              withLeading: withLeading,
+              child: chatMessageWidget);
+        });
 
     return appBarView;
-  }
-
-  @override
-  void dispose() {
-    chatMessageController.getChatSummary().removeListener(_updateChatSummary);
-    var chatSummary = chatMessageController.chatSummary;
-    if (chatSummary != null) {
-      connectionStateStreamSubscription?.cancel();
-      connectionStateStreamSubscription = null;
-      signalingStateStreamSubscription?.cancel();
-      signalingStateStreamSubscription = null;
-      closedStreamSubscription?.cancel();
-      closedStreamSubscription = null;
-      initiatorStreamSubscription?.cancel();
-      initiatorStreamSubscription = null;
-    }
-    WidgetsBinding.instance.removeObserver(this);
-    windowManager.removeListener(this);
-    WakelockPlus.disable();
-    if (platformParams.mobile) {
-      screenshotCallback?.dispose();
-    }
-    super.dispose();
   }
 }

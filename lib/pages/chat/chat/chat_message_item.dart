@@ -23,23 +23,17 @@ import 'package:get/get.dart';
 class ChatMessageItem extends StatelessWidget {
   final ChatMessage chatMessage;
   final int index;
-  late final MessageWidget messageWidget;
-  bool isMyself = false;
-  bool isPredefine = false;
+  late final MessageWidget messageWidget = MessageWidget(chatMessage, index);
 
   ChatMessageItem({
     super.key,
     required this.chatMessage,
     required this.index,
   }) {
-    messageWidget = MessageWidget(chatMessage, index);
-    isMyself = chatMessage.isMyself;
-    isPredefine = chatMessage.isPredefine;
-    //logger.w('ChatMessageItem() chatMessage id: ${chatMessage.id}');
     _buildDeleteTimer();
   }
 
-  RxInt leftDeleteTime = 0.obs;
+  final RxInt leftDeleteTime = 0.obs;
   Timer? timer;
 
   _buildDeleteTimer() async {
@@ -54,11 +48,11 @@ class ChatMessageItem extends StatelessWidget {
       Duration duration = now.difference(readTime);
       leftDeleteTime.value = deleteTime - duration.inSeconds;
       logger.w(
-          '_buildDeleteTimer chatMessage id: ${chatMessage.id},  leftDeleteTime:$leftDeleteTime');
-      if (leftDeleteTime > 0) {
+          '_buildDeleteTimer chatMessage id: ${chatMessage.id},  leftDeleteTime:${leftDeleteTime.value}');
+      if (leftDeleteTime.value > 0) {
         //延时删除
         timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-          leftDeleteTime--;
+          leftDeleteTime.value--;
           if (leftDeleteTime <= 0) {
             if (this.timer != null) {
               this.timer!.cancel();
@@ -66,7 +60,7 @@ class ChatMessageItem extends StatelessWidget {
               chatMessageService.delete(entity: chatMessage);
               chatMessageController.delete(index: index);
               logger.w(
-                  'Timer.periodic delete chatMessage id: ${chatMessage.id}, leftDeleteTime:$leftDeleteTime');
+                  'Timer.periodic delete chatMessage id: ${chatMessage.id}, leftDeleteTime:${leftDeleteTime.value}');
             }
           }
         });
@@ -74,7 +68,7 @@ class ChatMessageItem extends StatelessWidget {
         chatMessageService.delete(entity: chatMessage);
         chatMessageController.delete(index: index);
         logger.w(
-            '_buildDeleteTimer delete chatMessage id: ${chatMessage.id}, leftDeleteTime:$leftDeleteTime');
+            '_buildDeleteTimer delete chatMessage id: ${chatMessage.id}, leftDeleteTime:${leftDeleteTime.value}');
       }
     }
   }
@@ -88,6 +82,7 @@ class ChatMessageItem extends StatelessWidget {
         return child;
       },
     );
+    bool isMyself = chatMessage.isMyself;
     var crossAxisAlignment = CrossAxisAlignment.start;
     if (isMyself) {
       crossAxisAlignment = CrossAxisAlignment.end;
@@ -151,6 +146,7 @@ class ChatMessageItem extends StatelessWidget {
     }
     double width = appDataProvider.secondaryBodyWidth * 0.8;
     logger.w('chat message bubble width:$width');
+    bool isMyself = chatMessage.isMyself;
     return Row(
       mainAxisAlignment:
           isMyself ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -351,6 +347,8 @@ class ChatMessageItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isMyself = chatMessage.isMyself;
+    bool isPredefine = chatMessage.isPredefine;
     if (isPredefine) {
       return _buildPredefine(context);
     }
@@ -360,7 +358,7 @@ class ChatMessageItem extends StatelessWidget {
     return _buildOther(context);
   }
 
-  void dispose() {
+  void _dispose() {
     if (timer != null) {
       timer!.cancel();
       timer = null;

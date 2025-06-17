@@ -148,7 +148,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
           child: nilBox,
         ),
         Container(
-            color: Colors.grey.withOpacity(AppOpacity.lgOpacity),
+            color: Colors.grey.withAlpha(AppOpacity.lgOpacity),
             child: Center(
                 child: Column(children: <Widget>[
               _buildCameraModeWidget(),

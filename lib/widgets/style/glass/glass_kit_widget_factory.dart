@@ -15,19 +15,19 @@ final defaultLinearGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      Colors.white.withOpacity(AppOpacity.lgOpacity),
-      Colors.white.withOpacity(AppOpacity.xlOpacity),
+      Colors.white.withAlpha(AppOpacity.lgOpacity),
+      Colors.white.withAlpha(AppOpacity.xlOpacity),
     ],
     stops: const [
-      AppOpacity.lgOpacity,
-      AppOpacity.xsOpacity,
+      0.3,
+      0.9,
     ]);
 final defaultBorderGradient = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
   colors: [
-    Colors.white.withOpacity(AppOpacity.lgOpacity),
-    Colors.white.withOpacity(AppOpacity.lgOpacity),
+    Colors.white.withAlpha(AppOpacity.lgOpacity),
+    Colors.white.withAlpha(AppOpacity.lgOpacity),
   ],
 );
 
@@ -35,19 +35,19 @@ final primaryLinearGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      myself.primary.withOpacity(AppOpacity.smOpacity),
-      myself.primary.withOpacity(AppOpacity.xsOpacity),
+      myself.primary.withAlpha(AppOpacity.smOpacity),
+      myself.primary.withAlpha(AppOpacity.xsOpacity),
     ],
     stops: const [
-      AppOpacity.lgOpacity,
-      AppOpacity.xsOpacity,
+      0.3,
+      0.9,
     ]);
 final primaryBorderGradient = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
   colors: [
-    myself.primary.withOpacity(AppOpacity.smOpacity),
-    myself.primary.withOpacity(AppOpacity.smOpacity),
+    myself.primary.withAlpha(AppOpacity.smOpacity),
+    myself.primary.withAlpha(AppOpacity.smOpacity),
   ],
 );
 
@@ -160,7 +160,7 @@ class GlassKitWidgetFactory extends WidgetFactory {
       blur: blur,
       isFrostedGlass: false,
       shape: BoxShape.rectangle,
-      shadowColor: Colors.black.withOpacity(0.20),
+      shadowColor: Colors.black.withAlpha(50),
       frostedOpacity: 0.12,
       child: child,
     );
@@ -198,7 +198,7 @@ class GlassKitWidgetFactory extends WidgetFactory {
       borderGradient: defaultBorderGradient,
       blur: blur,
       isFrostedGlass: false,
-      shadowColor: Colors.black.withOpacity(0.20),
+      shadowColor: Colors.black.withAlpha(50),
       frostedOpacity: 0.12,
       shape: BoxShape.rectangle,
       child: child,
@@ -212,18 +212,18 @@ class GlassKitWidgetFactory extends WidgetFactory {
       blur: 20,
       gradient: LinearGradient(
         colors: [
-          Colors.white.withOpacity(0.25),
-          Colors.white.withOpacity(0.05),
+          Colors.white.withAlpha(64),
+          Colors.white.withAlpha(13),
         ],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
       borderGradient: LinearGradient(
         colors: [
-          Colors.white.withOpacity(0.60),
-          Colors.white.withOpacity(0.0),
-          Colors.white.withOpacity(0.0),
-          Colors.white.withOpacity(0.60),
+          Colors.white.withAlpha(150),
+          Colors.white.withAlpha(0),
+          Colors.white.withAlpha(0),
+          Colors.white.withAlpha(150),
         ],
         stops: const [0.0, 0.45, 0.55, 1.0],
         begin: Alignment.topLeft,

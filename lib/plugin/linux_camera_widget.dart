@@ -148,7 +148,7 @@ class _LinuxCameraWidgetState extends State<LinuxCameraWidget> {
           child: nilBox,
         ),
         Container(
-            color: Colors.grey.withOpacity(AppOpacity.lgOpacity),
+            color: Colors.grey.withAlpha(AppOpacity.lgOpacity),
             child: Center(
                 child: Padding(
               padding: const EdgeInsets.all(5.0),

@@ -34,8 +34,7 @@ class TextMessageInputWidget extends StatelessWidget {
   ///文本录入按钮
   late final ExtendedTextMessageInputWidget extendedTextMessageInputWidget =
       ExtendedTextMessageInputWidget(
-    textEditingController: textEditingController
-  );
+          textEditingController: textEditingController);
   late final PlatformAudioRecorder platformAudioRecorder;
 
   TextMessageInputWidget({
@@ -96,7 +95,7 @@ class TextMessageInputWidget extends StatelessWidget {
           tooltip: 'Webrtc send',
           icon: Icon(
             Icons.webhook_rounded,
-            color: TransportType.webrtc == transportType
+            color: TransportType.webrtc == transportType.value
                 ? myself.primary
                 : myself.secondary,
           )),
@@ -105,7 +104,7 @@ class TextMessageInputWidget extends StatelessWidget {
           tooltip: 'Email send',
           icon: Icon(
             Icons.email,
-            color: TransportType.email == transportType
+            color: TransportType.email == transportType.value
                 ? myself.primary
                 : myself.secondary,
           )),
@@ -114,7 +113,7 @@ class TextMessageInputWidget extends StatelessWidget {
         tooltip: 'SFU send',
         icon: Icon(
           Icons.center_focus_strong,
-          color: TransportType.sfu == transportType
+          color: TransportType.sfu == transportType.value
               ? myself.primary
               : myself.secondary,
         ),
@@ -124,7 +123,7 @@ class TextMessageInputWidget extends StatelessWidget {
         tooltip: 'Nearby send',
         icon: Icon(
           Icons.near_me_outlined,
-          color: TransportType.nearby == transportType
+          color: TransportType.nearby == transportType.value
               ? myself.primary
               : myself.secondary,
         ),
@@ -138,7 +137,7 @@ class TextMessageInputWidget extends StatelessWidget {
             tooltip: 'SMS send',
             icon: Icon(
               Icons.sms,
-              color: TransportType.sms == transportType
+              color: TransportType.sms == transportType.value
                   ? myself.primary
                   : myself.secondary,
             )),
@@ -167,7 +166,7 @@ class TextMessageInputWidget extends StatelessWidget {
         return null;
       }
       chatMessageController.transportType(transportType);
-      _send();
+      _send(context);
     }
   }
 
@@ -241,9 +240,10 @@ class TextMessageInputWidget extends StatelessWidget {
     }
   }
 
-  _send() {
+  _send(BuildContext context) {
     onSendPressed();
     textEditingController.clear();
+    FocusScope.of(context).requestFocus(chatMessageViewController.focusNode);
   }
 
   ///接收到加密短信
@@ -275,7 +275,7 @@ class TextMessageInputWidget extends StatelessWidget {
                   // tooltip: AppLocalizations.t('Send'),
                   icon: Icon(Icons.send_outlined, color: myself.primary),
                   onPressed: () {
-                    _send();
+                    _send(context);
                   },
                 ),
               ));

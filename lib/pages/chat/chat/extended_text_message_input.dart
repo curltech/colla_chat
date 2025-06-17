@@ -19,7 +19,7 @@ import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
-///发送文本消息的输入框
+/// 发送文本消息的输入框
 class ExtendedTextMessageInputWidget extends StatelessWidget {
   final TextEditingController textEditingController;
 
@@ -162,7 +162,7 @@ class ExtendedTextMessageInputWidget extends StatelessWidget {
               }
             },
             decoration: InputDecoration(
-              fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
+              fillColor: Colors.grey.withAlpha(AppOpacity.lgOpacity),
               filled: true,
               border: textFormFieldBorder,
               focusedBorder: textFormFieldBorder,

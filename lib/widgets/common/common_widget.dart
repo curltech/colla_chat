@@ -239,7 +239,7 @@ class StyleUtil {
       Size minimumSize = const Size(60, 40.0),
       Size maximumSize = const Size(120.0, 48.0)}) {
     backgroundColor =
-        backgroundColor ?? Colors.grey.withOpacity(AppOpacity.smOpacity);
+        backgroundColor ?? Colors.grey.withAlpha(AppOpacity.smOpacity);
     foregroundColor = foregroundColor ?? Colors.white;
     textStyle = textStyle ?? const TextStyle(color: Colors.white);
     elevation = elevation ?? 0.0;

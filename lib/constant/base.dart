@@ -9,13 +9,13 @@ const bool appDebug = true;
 
 ///background opacity
 class AppOpacity {
-  static const double maxOpacity = 0;
-  static const double xlOpacity = 0.1;
-  static const double lgOpacity = 0.3;
-  static const double mdOpacity = 0.5;
-  static const double smOpacity = 0.7;
-  static const double xsOpacity = 0.9;
-  static const double minOpacity = 1;
+  static const int maxOpacity = 0;
+  static const int xlOpacity = 26;
+  static const int lgOpacity = 76;
+  static const int mdOpacity = 128;
+  static const int smOpacity = 180;
+  static const int xsOpacity = 225;
+  static const int minOpacity = 255;
 }
 
 ///padding

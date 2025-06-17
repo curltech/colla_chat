@@ -201,11 +201,11 @@ class _CommonTextFormFieldState extends State<CommonTextFormField> {
       decoration: widget.decoration ??
           InputDecoration(
               fillColor: widget.fillColor ??
-                  Colors.grey.withOpacity(AppOpacity.xlOpacity),
+                  Colors.grey.withAlpha(AppOpacity.xlOpacity),
               focusColor: widget.focusColor ??
-                  Colors.grey.withOpacity(AppOpacity.xlOpacity),
+                  Colors.grey.withAlpha(AppOpacity.xlOpacity),
               hoverColor: widget.hoverColor ??
-                  Colors.grey.withOpacity(AppOpacity.xlOpacity),
+                  Colors.grey.withAlpha(AppOpacity.xlOpacity),
               filled: true,
               border: textFormFieldBorder,
               focusedBorder: outlineTextFormFieldBorder,
@@ -417,11 +417,11 @@ class _CommonAutoSizeTextFormFieldState
       decoration: widget.decoration ??
           InputDecoration(
               fillColor: widget.fillColor ??
-                  Colors.grey.withOpacity(AppOpacity.xlOpacity),
+                  Colors.grey.withAlpha(AppOpacity.xlOpacity),
               focusColor: widget.focusColor ??
-                  Colors.grey.withOpacity(AppOpacity.xlOpacity),
+                  Colors.grey.withAlpha(AppOpacity.xlOpacity),
               hoverColor: widget.hoverColor ??
-                  Colors.grey.withOpacity(AppOpacity.xlOpacity),
+                  Colors.grey.withAlpha(AppOpacity.xlOpacity),
               filled: true,
               border: textFormFieldBorder,
               focusedBorder: outlineTextFormFieldBorder,

@@ -104,7 +104,7 @@ class _DataListViewState extends State<DataListView> {
         padding: const EdgeInsets.only(left: 10.0, right: 10.0),
         child: Divider(
           height: 1,
-          color: Colors.grey.withOpacity(AppOpacity.lgOpacity),
+          color: Colors.grey.withAlpha(AppOpacity.lgOpacity),
         ),
       ),
     ]);

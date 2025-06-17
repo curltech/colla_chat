@@ -144,7 +144,7 @@ class LlmChatMessageView extends StatelessWidget with TileDataMixin {
               child: Column(children: <Widget>[
                 chatMessageWidget,
                 Divider(
-                  color: Colors.white.withOpacity(AppOpacity.xlOpacity),
+                  color: Colors.white.withAlpha(AppOpacity.xlOpacity),
                   height: 1.0,
                 ),
                 llmChatMessageInputWidget

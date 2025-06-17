@@ -40,7 +40,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     with TickerProviderStateMixin {
   FocusNode textFocusNode = FocusNode();
   late AnimationController animateController;
-  RxBool securityTip = true.obs;
+  final RxBool securityTip = true.obs;
 
   @override
   void initState() {
