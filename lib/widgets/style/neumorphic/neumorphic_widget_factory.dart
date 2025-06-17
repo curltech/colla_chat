@@ -3,13 +3,12 @@ import 'dart:ui';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
-import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_neumorphic/material_neumorphic.dart';
 
-class NeumorphicWidgetFactory extends WidgetFactory {
+class NeumorphicWidgetFactory {
   ///创建neumorphic样式
   ThemeData buildThemeData(
       {Color seedColor = NeumorphicTheme.defaultSeedColor,
@@ -26,7 +25,6 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
-  @override
   Widget container({
     Key? key,
     AlignmentGeometry? alignment,
@@ -60,7 +58,6 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
-  @override
   Widget sizedBox({
     Key? key,
     double? width,
@@ -79,7 +76,6 @@ class NeumorphicWidgetFactory extends WidgetFactory {
         ));
   }
 
-  @override
   Widget card({
     Key? key,
     Color? color,
@@ -100,7 +96,6 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
-  @override
   PreferredSizeWidget appBar({
     Key? key,
     Widget? leading,
@@ -150,7 +145,6 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
-  @override
   Widget text(
     String data, {
     Key? key,
@@ -181,7 +175,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
   }
 
   ///自适应文本
-  @override
+
   Widget commonAutoSizeText(
     String data, {
     Key? key,
@@ -216,7 +210,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
   }
 
   ///输入框
-  @override
+
   Widget textField({
     Key? key,
     TextEditingController? controller,
@@ -340,7 +334,6 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
-  @override
   Widget textFormField({
     Key? key,
     TextEditingController? controller,
@@ -468,7 +461,6 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
-  @override
   Widget button({
     Key? key,
     required void Function()? onPressed,
@@ -495,7 +487,6 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
-  @override
   Widget radio({
     Key? key,
     required dynamic value,
@@ -522,7 +513,6 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
-  @override
   Widget checkbox({
     Key? key,
     required bool? value,
@@ -556,7 +546,6 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
-  @override
   Widget icon(
     IconData icon, {
     Key? key,
@@ -581,7 +570,6 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
-  @override
   Widget switchButton({
     Key? key,
     required bool value,
@@ -622,7 +610,6 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
-  @override
   Widget toggle({
     Key? key,
     required List children,
@@ -658,7 +645,6 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
-  @override
   Widget slider({
     Key? key,
     required double value,
@@ -690,7 +676,6 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
-  @override
   Widget progress({
     Key? key,
     double? value,
@@ -712,7 +697,6 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
-  @override
   Widget progressIndicator({
     Key? key,
     double? value,
@@ -735,7 +719,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
   }
 
   ///下拉按钮
-  @override
+
   Widget dropdownButton({
     Key? key,
     required List<DropdownMenuItem<double>>? items,

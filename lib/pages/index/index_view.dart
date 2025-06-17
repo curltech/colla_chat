@@ -40,13 +40,15 @@ import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
-import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
+import 'package:colla_chat/widgets/style/glass/glass_kit_widget.dart';
+import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_sharing_intent/flutter_sharing_intent.dart';
 import 'package:flutter_sharing_intent/model/sharing_file.dart';
+import 'package:glass/glass.dart';
 import 'package:provider/provider.dart';
 import 'package:system_tray/system_tray.dart';
 import 'package:window_manager/window_manager.dart';
@@ -407,7 +409,7 @@ class _IndexViewState extends State<IndexView>
       }
 
       OverlayNotification overlayNotification = NotificationUtil.show(context,
-          key:UniqueKey(),
+          key: UniqueKey(),
           icon: bannerAvatarImage,
           displayCloseButton: true,
           toastDuration: const Duration(milliseconds: 10000),
@@ -546,7 +548,7 @@ class _IndexViewState extends State<IndexView>
     _play();
     OverlayNotification overlayNotification = NotificationUtil.show(
       context,
-      key:UniqueKey(),
+      key: UniqueKey(),
       icon: bannerAvatarImage,
       toastDuration: const Duration(milliseconds: 10000),
       title: CommonAutoSizeText(conferenceChatMessage.senderName ?? '',
@@ -698,10 +700,10 @@ class _IndexViewState extends State<IndexView>
               child: loadingWidget,
             ),
             Center(
-              child: platformWidgetFactory.sizedBox(
-                  child: widget.adaptiveLayoutIndex,
-                  height: height,
-                  width: width),
+              child: widget.adaptiveLayoutIndex.asGlassKit(
+                height: height,
+                width: width,
+              ),
             ),
             inAppPipPlayerWidget,
           ]))),

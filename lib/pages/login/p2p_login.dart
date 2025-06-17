@@ -10,10 +10,11 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
-import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
+import 'package:colla_chat/widgets/style/glass/glass_kit_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:get/get.dart';
+import 'package:glass/glass.dart';
 import 'package:window_manager/window_manager.dart';
 
 /// 远程登录页面，一个Scaffold，IndexStack下的远程登录组件，注册组件和配置组件
@@ -130,10 +131,9 @@ class P2pLogin extends StatelessWidget with WindowListener {
           );
         });
         return Center(
-            child: platformWidgetFactory.sizedBox(
+            child: pageView.asGlassKit(
           height: appDataProvider.portraitSize.height,
           width: appDataProvider.portraitSize.width,
-          child: pageView,
         ));
       },
     );
