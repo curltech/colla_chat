@@ -381,7 +381,7 @@ class ChatMessageView extends StatelessWidget
       RTCSignalingState? state = event.data;
         DialogUtil.info(
             content: AppLocalizations.t(
-                    'PeerConnection signalingState was changed to ') +
+                    '${chatSummary.name} PeerConnection signalingState was changed to ') +
                 AppLocalizations.t(state.toString().substring(21)));
     } else if (eventType == WebrtcEventType.closed) {
       _peerConnectionState.value =
@@ -389,7 +389,7 @@ class ChatMessageView extends StatelessWidget
       _dataChannelState.value = RTCDataChannelState.RTCDataChannelClosed;
       _initiator.value = null;
         DialogUtil.info(
-            content: AppLocalizations.t('PeerConnection was closed'));
+            content: AppLocalizations.t('${chatSummary.name} PeerConnection was closed'));
     } else if (eventType == WebrtcEventType.connectionState) {
       RTCPeerConnectionState? state = event.data;
       RTCPeerConnectionState? oldState = _peerConnectionState.value;
@@ -403,11 +403,11 @@ class ChatMessageView extends StatelessWidget
             }
             DialogUtil.info(
                 content:
-                    AppLocalizations.t('PeerConnection state was changed to ') +
+                    AppLocalizations.t('${chatSummary.name} PeerConnection state was changed to ') +
                         AppLocalizations.t(stateText));
         } else {
             DialogUtil.info(
-              content: AppLocalizations.t('PeerConnection was closed'));
+              content: AppLocalizations.t('${chatSummary.name} PeerConnection was closed'));
 
         }
       }
@@ -416,13 +416,13 @@ class ChatMessageView extends StatelessWidget
       _dataChannelState.value = state;
         DialogUtil.info(
             content:
-                AppLocalizations.t('PeerConnection initiator was changed to ') +
+                AppLocalizations.t('${chatSummary.name} PeerConnection initiator was changed to ') +
                     _initiator.value.toString());
     } else if (eventType == WebrtcEventType.initiator) {
       _initiator.value = event.data;
       DialogUtil.info(
           content:
-              AppLocalizations.t('PeerConnection initiator was changed to ') +
+              AppLocalizations.t('${chatSummary.name} PeerConnection initiator was changed to ') +
                   _initiator.value.toString());
     }
   }
