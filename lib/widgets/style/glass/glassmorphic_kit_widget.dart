@@ -15,7 +15,7 @@ final defaultLinearGradient = LinearGradient(
       0.9,
     ]);
 
-const double defaultBlur = 20;
+const double defaultBlur = 15;
 const double defaultOpacity = 0.12;
 const BorderRadius defaultBorderRadius = BorderRadius.zero;
 
