@@ -1,6 +1,6 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:flutter/material.dart';
-import 'package:glass_kit/glass_kit.dart';
+import 'package:glass_kit/glass_kit.dart' as glass;
 
 /// glass_kit实现，实际上只提供了一个glass化的Container
 final defaultLinearGradient = LinearGradient(
@@ -29,10 +29,10 @@ const BorderRadius defaultBorderRadius = BorderRadius.zero;
 final Color defaultShadowColor = Colors.black.withAlpha(50);
 
 extension GlassKitWidget<T extends Widget> on T {
-  Widget asGlassKit(
+  Widget asStyle(
       {Key? key,
-      required double height,
-      required double width,
+      double? height,
+      double? width,
       bool isFrostedGlass = false,
       AlignmentGeometry? alignment,
       Matrix4? transform,
@@ -50,7 +50,7 @@ extension GlassKitWidget<T extends Widget> on T {
       Color? shadowColor,
       BoxShape shape = BoxShape.rectangle,
       double? frostedOpacity = defaultFrostedOpacity}) {
-    return GlassContainer(
+    return glass.GlassContainer(
       key: key,
       height: height,
       width: width,
@@ -74,58 +74,33 @@ extension GlassKitWidget<T extends Widget> on T {
 }
 
 /// glass的实现，使用比较方便，调用asGlass
-class GlassKitContainer extends StatelessWidget {
-  final Widget child;
-
-  final double height;
-  final double width;
-  final bool isFrostedGlass;
-
-  final AlignmentGeometry? alignment;
-  final Matrix4? transform;
-  final AlignmentGeometry? transformAlignment;
-  final EdgeInsetsGeometry? padding;
-  final EdgeInsetsGeometry? margin;
-  final Gradient? gradient;
-  final Color? color;
-  final BorderRadius? borderRadius;
-
-  final double? borderWidth;
-  final Gradient? borderGradient;
-  final Color? borderColor;
-  final double? blur;
-
-  final double? elevation;
-  final Color? shadowColor;
-  final BoxShape shape;
-  final double? frostedOpacity;
-
-  const GlassKitContainer(
+class PlatformStyleContainer extends glass.GlassContainer {
+  PlatformStyleContainer(
       {super.key,
-      required this.height,
-      required this.width,
-      this.isFrostedGlass = false,
-      this.alignment,
-      this.transform,
-      this.transformAlignment,
-      this.padding,
-      this.margin,
-      this.gradient,
-      this.color,
-      this.borderRadius = defaultBorderRadius,
-      this.borderWidth,
-      this.borderGradient,
-      this.borderColor,
-      this.blur = defaultBlur,
-      this.elevation,
-      this.shadowColor,
-      this.shape = BoxShape.rectangle,
-      this.frostedOpacity = defaultFrostedOpacity,
-      required this.child});
+      super.height,
+      super.width,
+      super.isFrostedGlass = false,
+      super.alignment,
+      super.transform,
+      super.transformAlignment,
+      super.padding,
+      super.margin,
+      super.gradient,
+      super.color,
+      super.borderRadius = defaultBorderRadius,
+      super.borderWidth,
+      super.borderGradient,
+      super.borderColor,
+      super.blur = defaultBlur,
+      super.elevation,
+      super.shadowColor,
+      super.shape = BoxShape.rectangle,
+      super.frostedOpacity = defaultFrostedOpacity,
+      required super.child});
 
   @override
   Widget build(BuildContext context) {
-    return child.asGlassKit(
+    return child!.asStyle(
         key: key,
         height: height,
         width: width,
@@ -138,10 +113,10 @@ class GlassKitContainer extends StatelessWidget {
         padding: padding,
         margin: margin,
         color: color,
-        gradient: defaultLinearGradient,
+        gradient: gradient ?? defaultLinearGradient,
         borderRadius: borderRadius,
-        borderGradient: defaultBorderGradient,
-        shadowColor: shadowColor ?? defaultShadowColor,
+        borderGradient: borderGradient ?? defaultBorderGradient,
+        shadowColor: defaultShadowColor,
         shape: shape);
   }
 }

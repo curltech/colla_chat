@@ -40,6 +40,10 @@ class Myself with ChangeNotifier {
   String? signalPublicKey;
   String? signalPrivateKey;
 
+  late ColorScheme colorScheme;
+
+  late ColorScheme darkColorScheme;
+
   late ThemeData _themeData;
 
   late ThemeData _darkThemeData;
@@ -71,7 +75,7 @@ class Myself with ChangeNotifier {
 
   _buildThemeData() {
     TextTheme textTheme = const TextTheme();
-    final ColorScheme colorScheme = SeedColorScheme.fromSeeds(
+    colorScheme = SeedColorScheme.fromSeeds(
       brightness: Brightness.light,
       primaryKey: primaryColor,
       primary: primaryColor,
@@ -87,7 +91,7 @@ class Myself with ChangeNotifier {
 
   _buildDarkThemeData() {
     TextTheme textTheme = const TextTheme();
-    final ColorScheme colorScheme = SeedColorScheme.fromSeeds(
+    darkColorScheme = SeedColorScheme.fromSeeds(
       brightness: Brightness.dark,
       primaryKey: primaryColor,
       primary: primaryColor,
@@ -98,7 +102,7 @@ class Myself with ChangeNotifier {
       tones: FlexTones.vivid(Brightness.dark),
     );
     _darkThemeData = ThemeData.from(
-      colorScheme: colorScheme,
+      colorScheme: darkColorScheme,
       textTheme: textTheme,
       useMaterial3: true,
     );
@@ -113,8 +117,8 @@ class Myself with ChangeNotifier {
   }
 
   set primaryColor(Color color) {
-    if (peerProfile.primaryColor != color.value) {
-      peerProfile.primaryColor = color.value;
+    if (peerProfile.primaryColor != color.toARGB32()) {
+      peerProfile.primaryColor = color.toARGB32();
       if (peerProfile.id != null) {
         peerProfileService.update({'primaryColor': peerProfile.primaryColor},
             where: 'id=?', whereArgs: [peerProfile.id!]);
@@ -126,8 +130,8 @@ class Myself with ChangeNotifier {
   }
 
   set secondaryColor(Color color) {
-    if (peerProfile.secondaryColor != color.value) {
-      peerProfile.secondaryColor = color.value;
+    if (peerProfile.secondaryColor != color.toARGB32()) {
+      peerProfile.secondaryColor = color.toARGB32();
       if (peerProfile.id != null) {
         peerProfileService.update(
             {'secondaryColor': peerProfile.secondaryColor},
@@ -164,6 +168,21 @@ class Myself with ChangeNotifier {
       return _darkThemeData;
     } else {
       return _themeData;
+    }
+  }
+
+  setThemeData({ThemeData? themeData, ThemeData? darkThemeData}) {
+    bool updated = false;
+    if (themeData != null && themeData != _themeData) {
+      _themeData = themeData;
+      updated = true;
+    }
+    if (darkThemeData != null && darkThemeData != _darkThemeData) {
+      _darkThemeData = darkThemeData;
+      updated = true;
+    }
+    if (updated) {
+      notifyListeners();
     }
   }
 

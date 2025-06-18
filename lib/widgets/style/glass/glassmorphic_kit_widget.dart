@@ -1,6 +1,7 @@
 import 'package:colla_chat/constant/base.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:glassmorphic_ui_kit/glassmorphic_ui_kit.dart';
+import 'package:glassmorphic_ui_kit/glassmorphic_ui_kit.dart' as glass;
 
 /// glassmorphic_ui_kit实现，提供了多个个glass化的Widget
 final defaultLinearGradient = LinearGradient(
@@ -20,7 +21,7 @@ const double defaultOpacity = 0.12;
 const BorderRadius defaultBorderRadius = BorderRadius.zero;
 
 extension GlassmorphicKitWidget<T extends Widget> on T {
-  Widget asGlassmorphicKit(
+  Widget asStyle(
       {Key? key,
       double? height,
       double? width,
@@ -31,75 +32,7 @@ extension GlassmorphicKitWidget<T extends Widget> on T {
       BoxBorder? border,
       double blur = defaultBlur,
       double opacity = defaultOpacity}) {
-    GlassButton(
-      key: key,
-      blur: blur,
-      opacity: opacity,
-      borderRadius: borderRadius,
-      gradient: gradient ?? defaultLinearGradient,
-      padding: padding,
-      child: this,
-    );
-    GlassCard(
-      width: width,
-      height: height,
-      blur: blur,
-      opacity: opacity,
-      borderRadius: borderRadius,
-      gradient: gradient ?? defaultLinearGradient,
-      padding: padding,
-      child: this,
-    );
-    GlassDialog(
-      blur: blur,
-      borderRadius: borderRadius,
-      gradient: gradient ?? defaultLinearGradient,
-    );
-    GlassBottomSheet(
-      height: height,
-      blur: blur,
-      borderRadius: borderRadius,
-      gradient: gradient ?? defaultLinearGradient,
-      padding: padding,
-      child: this,
-    );
-    GlassNavigationBar(
-      blur: blur,
-      opacity: opacity,
-      borderRadius: borderRadius,
-      gradient: gradient ?? defaultLinearGradient,
-      padding: padding,
-      destinations: [],
-      selectedIndex: 0,
-    );
-    GlassNavigationDrawer(
-      width: width,
-      blur: blur,
-      opacity: opacity,
-      borderRadius: borderRadius,
-      gradient: gradient ?? defaultLinearGradient,
-      padding: padding,
-    );
-    GlassProgressIndicator(
-      blur: blur,
-      opacity: opacity,
-      gradient: gradient ?? defaultLinearGradient,
-    );
-    GlassSlider(
-      blur: blur,
-      opacity: opacity,
-      borderRadius: borderRadius,
-      gradient: gradient ?? defaultLinearGradient,
-      value: 0,
-      onChanged: (double value) {},
-    );
-    GlassTextField(
-      blur: blur,
-      opacity: opacity,
-      gradient: gradient ?? defaultLinearGradient,
-    );
-
-    return GlassContainer(
+    return glass.GlassContainer(
       key: key,
       width: width,
       height: height,
@@ -116,43 +49,161 @@ extension GlassmorphicKitWidget<T extends Widget> on T {
 }
 
 /// glass的实现，使用比较方便，调用asGlass
-class GlassmorphicKitContainer extends StatelessWidget {
-  final Widget child;
-  final double? width;
-  final double? height;
-  final double blur;
-  final double opacity;
-  final BorderRadius? borderRadius;
-  final Gradient? gradient;
-  final BoxBorder? border;
-  final Color? color;
-  final EdgeInsetsGeometry? padding;
-
-  const GlassmorphicKitContainer(
+class PlatformStyleContainer extends glass.GlassContainer {
+  const PlatformStyleContainer(
       {super.key,
-      this.width,
-      this.height,
-      this.blur = GlassConstants.defaultBlur,
-      this.opacity = GlassConstants.defaultOpacity,
-      this.borderRadius,
-      this.gradient,
-      this.border,
-      this.color,
-      this.padding,
-      required this.child});
+      super.width,
+      super.height,
+      super.blur = glass.GlassConstants.defaultBlur,
+      super.opacity = glass.GlassConstants.defaultOpacity,
+      super.borderRadius,
+      super.gradient,
+      super.border,
+      super.color,
+      super.padding,
+      required super.child});
+}
 
-  @override
-  Widget build(BuildContext context) {
-    return child.asGlassmorphicKit(
-        key: key,
-        height: height,
-        width: width,
-        opacity: opacity,
-        blur: blur,
-        padding: padding,
-        color: color,
-        border: border,
-        gradient: defaultLinearGradient,
-        borderRadius: borderRadius);
-  }
+class PlatformStyleButton extends glass.GlassButton {
+  const PlatformStyleButton({
+    super.key,
+    required super.child,
+    super.onPressed,
+    super.blur = glass.GlassConstants.defaultBlur,
+    super.opacity = glass.GlassConstants.defaultOpacity,
+    super.borderRadius,
+    super.padding,
+    super.gradient,
+    super.enabled = true,
+    super.animationDuration = const Duration(milliseconds: 200),
+  });
+}
+
+class PlatformStyleCard extends glass.GlassCard {
+  const PlatformStyleCard({
+    super.key,
+    required super.child,
+    super.blur = glass.GlassConstants.defaultBlur,
+    super.opacity = glass.GlassConstants.defaultOpacity,
+    super.borderRadius,
+    super.padding,
+    super.margin,
+    super.gradient,
+    super.width,
+    super.height,
+    super.onTap,
+    super.shadow,
+  });
+}
+
+class PlatformStyleDialog extends glass.GlassDialog {
+  const PlatformStyleDialog({
+    super.key,
+    super.title,
+    super.content,
+    super.actions,
+    super.blur = 10,
+    super.borderRadius,
+    super.gradient,
+  });
+}
+
+class PlatformStyleBottomSheet extends glass.GlassBottomSheet {
+  const PlatformStyleBottomSheet({
+    super.key,
+    required super.child,
+    super.blur = 10,
+    super.height,
+    super.borderRadius,
+    super.gradient,
+    super.padding,
+  });
+}
+
+class PlatformStyleNavigationBar extends glass.GlassNavigationBar {
+  const PlatformStyleNavigationBar({
+    super.key,
+    required super.destinations,
+    required super.selectedIndex,
+    super.onDestinationSelected,
+    super.blur = glass.GlassConstants.defaultBlur,
+    super.opacity = glass.GlassConstants.defaultOpacity,
+    super.height = 80.0,
+    super.borderRadius,
+    super.gradient,
+    super.padding,
+    super.animateLabels = true,
+    super.labelBehavior = NavigationDestinationLabelBehavior.alwaysShow,
+  });
+}
+
+class PlatformStyleNavigationDrawer extends glass.GlassNavigationDrawer {
+  const PlatformStyleNavigationDrawer({
+    super.key,
+    super.header,
+    super.children = const <Widget>[],
+    super.blur = glass.GlassConstants.defaultBlur,
+    super.opacity = glass.GlassConstants.defaultOpacity,
+    super.borderRadius,
+    super.gradient,
+    super.padding,
+    super.width,
+    super.backgroundColor,
+    super.surfaceTintColor,
+    super.shadowColor,
+    super.elevation,
+  });
+}
+
+class PlatformStyleProgressIndicator extends glass.GlassProgressIndicator {
+  const PlatformStyleProgressIndicator({
+    super.key,
+    super.type = glass.GlassProgressType.linear,
+    super.value,
+    super.blur = glass.GlassConstants.defaultBlur,
+    super.opacity = glass.GlassConstants.defaultOpacity,
+    super.gradient,
+  });
+}
+
+class PlatformStyleSlider extends glass.GlassSlider {
+  const PlatformStyleSlider({
+    super.key,
+    required super.value,
+    required super.onChanged,
+    super.onChangeStart,
+    super.onChangeEnd,
+    super.min = 0.0,
+    super.max = 1.0,
+    super.divisions,
+    super.label,
+    super.activeColor,
+    super.inactiveColor,
+    super.activeTrackColor,
+    super.inactiveTrackColor,
+    super.activeThumbImage,
+    super.inactiveThumbImage,
+    super.thumbColor,
+    super.trackColor,
+    super.thumbIcon,
+    super.dragStartBehavior = DragStartBehavior.start,
+    super.mouseCursor,
+    super.blur = glass.GlassConstants.defaultBlur,
+    super.opacity = glass.GlassConstants.defaultOpacity,
+    super.gradient,
+    super.trackHeight = 4.0,
+    super.borderRadius,
+  });
+}
+
+class PlatformStyleTextField extends glass.GlassTextField {
+  const PlatformStyleTextField({
+    super.key,
+    super.controller,
+    super.hintText,
+    super.prefixIcon,
+    super.blur = glass.GlassConstants.defaultBlur,
+    super.opacity = glass.GlassConstants.defaultOpacity,
+    super.gradient,
+  });
 }

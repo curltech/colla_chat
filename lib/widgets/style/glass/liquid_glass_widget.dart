@@ -2,23 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 extension LiquidGlassWidget<T extends Widget> on T {
-  Widget asLiquidGlass(
+  Widget asStyle(
       {Key? key,
+      double? height,
+      double? width,
       LiquidShape? shape,
       bool glassContainsChild = true,
-      double blur = 0,
+      double blur = 15,
       Clip clipBehavior = Clip.hardEdge,
       LiquidGlassSettings settings = const LiquidGlassSettings()}) {
-    return LiquidGlass(
-      key: key,
-      shape:
-          shape ?? LiquidRoundedSuperellipse(borderRadius: Radius.circular(50)),
-      glassContainsChild: glassContainsChild,
-      blur: blur,
-      clipBehavior: clipBehavior,
-      settings: settings,
-      child: this,
-    );
+    return SizedBox(
+        height: height,
+        width: width,
+        child: LiquidGlass(
+          key: key,
+          shape: shape ??
+              LiquidRoundedSuperellipse(borderRadius: Radius.circular(0)),
+          glassContainsChild: glassContainsChild,
+          blur: blur,
+          clipBehavior: clipBehavior,
+          settings: settings,
+          child: this,
+        ));
   }
 
   /// 多个LiquidGlass.inLayer widgets的混合
@@ -32,26 +37,29 @@ extension LiquidGlassWidget<T extends Widget> on T {
   }
 }
 
-class LiquidGlassContainer extends StatelessWidget {
-  final Widget child;
-  final LiquidShape? shape;
-  final bool glassContainsChild;
-  final double blur;
-  final Clip clipBehavior;
+class PlatformStyleContainer extends LiquidGlass {
+  final double? height;
+  final double? width;
   final LiquidGlassSettings settings;
 
-  const LiquidGlassContainer(
+  const PlatformStyleContainer(
       {super.key,
-      this.shape,
-      this.glassContainsChild = true,
-      this.blur = 0,
-      this.clipBehavior = Clip.hardEdge,
+      this.height,
+      this.width,
+      super.shape =
+          const LiquidRoundedSuperellipse(borderRadius: Radius.circular(0)),
+      super.glassContainsChild = true,
+      super.blur = 15,
+      super.clipBehavior = Clip.hardEdge,
       this.settings = const LiquidGlassSettings(),
-      required this.child});
+      required super.child});
 
   @override
   Widget build(BuildContext context) {
-    return child.asLiquidGlass(
+    return child.asStyle(
+        key: key,
+        height: height,
+        width: width,
         shape: shape,
         glassContainsChild: glassContainsChild,
         blur: blur,
