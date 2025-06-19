@@ -5,6 +5,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/animated_progress_bar.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
+import 'package:colla_chat/widgets/style/glass/glass_widget.dart';
 import 'package:flutter/material.dart';
 
 enum NotificationType {
@@ -478,44 +479,44 @@ class OverlayNotification extends StatefulWidget {
           dismiss();
         },
         child: InkWell(
-            onTap: () {
-              if (onNotificationPressed != null) {
-                onNotificationPressed!(this);
-              }
-              dismiss();
-            },
-            child: SizedBox(
-              width: _width(context),
-              height: _height(context),
-              child: Card(
-                  elevation: 0.0,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: borderRadius ?? BorderRadius.circular(8.0)),
-                  margin: EdgeInsets.all(10.0),
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: _buildNotification(context),
-                      ),
-                      if (showProgressIndicator)
-                        Padding(
-                          padding:
-                              progressBarPadding ?? const EdgeInsets.all(0),
-                          child: SizedBox(
-                            width: progressBarWidth,
-                            height: progressBarHeight,
-                            child: AnimatedProgressBar(
-                              foregroundColor:
-                                  progressIndicatorColor ?? myself.primary,
-                              duration: toastDuration,
-                              backgroundColor:
-                                  progressIndicatorBackground ?? Colors.grey,
-                            ),
-                          ),
+          onTap: () {
+            if (onNotificationPressed != null) {
+              onNotificationPressed!(this);
+            }
+            dismiss();
+          },
+          child: Card(
+              elevation: 0.0,
+              color: Colors.white.withAlpha(0),
+              shape: RoundedRectangleBorder(
+                  borderRadius: borderRadius ?? BorderRadius.circular(8.0)),
+              margin: EdgeInsets.all(10.0),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: _buildNotification(context),
+                  ),
+                  if (showProgressIndicator)
+                    Padding(
+                      padding: progressBarPadding ?? const EdgeInsets.all(0),
+                      child: SizedBox(
+                        width: progressBarWidth,
+                        height: progressBarHeight,
+                        child: AnimatedProgressBar(
+                          foregroundColor:
+                              progressIndicatorColor ?? myself.primary,
+                          duration: toastDuration,
+                          backgroundColor:
+                              progressIndicatorBackground ?? Colors.grey,
                         ),
-                    ],
-                  )),
-            )),
+                      ),
+                    ),
+                ],
+              )).asStyle(
+            width: _width(context),
+            height: _height(context),
+          ),
+        ),
       ),
     );
   }
