@@ -10,7 +10,7 @@ extension GlassWidget<T extends Widget> on T {
     double blurX = 15.0,
     double blurY = 15.0,
     Color tintColor = Colors.white,
-    bool frosted = true,
+    bool frosted = false,
     BorderRadius clipBorderRadius = BorderRadius.zero,
     Clip clipBehaviour = Clip.antiAlias,
     TileMode tileMode = TileMode.clamp,
