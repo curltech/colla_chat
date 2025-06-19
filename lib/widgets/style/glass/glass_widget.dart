@@ -4,6 +4,8 @@ import 'package:glass/glass.dart';
 extension GlassWidget<T extends Widget> on T {
   Widget asStyle({
     Key? key,
+    double? height,
+    double? width,
     bool enabled = true,
     double blurX = 15.0,
     double blurY = 15.0,
@@ -14,16 +16,19 @@ extension GlassWidget<T extends Widget> on T {
     TileMode tileMode = TileMode.clamp,
     CustomClipper<RRect>? clipper,
   }) {
-    return asGlass(
-        enabled: enabled,
-        blurX: blurX,
-        blurY: blurY,
-        tintColor: tintColor,
-        tileMode: tileMode,
-        frosted: frosted,
-        clipBehaviour: clipBehaviour,
-        clipBorderRadius: clipBorderRadius,
-        clipper: clipper);
+    return SizedBox(
+        height: height,
+        width: width,
+        child: asGlass(
+            enabled: enabled,
+            blurX: blurX,
+            blurY: blurY,
+            tintColor: tintColor,
+            tileMode: tileMode,
+            frosted: frosted,
+            clipBehaviour: clipBehaviour,
+            clipBorderRadius: clipBorderRadius,
+            clipper: clipper));
   }
 }
 
