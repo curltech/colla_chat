@@ -364,7 +364,12 @@ class DialogUtil {
                 style: const TextStyle(color: Colors.white),
               )),
           titlePadding: EdgeInsets.zero,
-          content: Text(AppLocalizations.t(content), softWrap: true),
+          content: CommonAutoSizeText(
+              style: TextStyle(color: Colors.white),
+              softWrap: true,
+              maxLines: 4,
+              overflow: TextOverflow.ellipsis,
+              AppLocalizations.t(content)),
           actions: <Widget>[
             TextButton(
               style: style,
@@ -502,7 +507,12 @@ class DialogUtil {
         Icons.error_outline_outlined,
         color: Colors.red,
       ),
-      content: CommonAutoSizeText(AppLocalizations.t(content)),
+      content: CommonAutoSizeText(
+          style: TextStyle(color: Colors.white),
+          softWrap: true,
+          maxLines: 4,
+          overflow: TextOverflow.ellipsis,
+          AppLocalizations.t(content)),
     ));
   }
 
@@ -514,7 +524,12 @@ class DialogUtil {
         Icons.warning_amber,
         color: Colors.amber,
       ),
-      content: CommonAutoSizeText(AppLocalizations.t(content)),
+      content: CommonAutoSizeText(
+          style: TextStyle(color: Colors.white),
+          softWrap: true,
+          maxLines: 4,
+          overflow: TextOverflow.ellipsis,
+          AppLocalizations.t(content)),
     ));
   }
 
@@ -529,7 +544,7 @@ class DialogUtil {
         content: CommonAutoSizeText(
             style: TextStyle(color: Colors.white),
             softWrap: true,
-            maxLines: 3,
+            maxLines: 4,
             overflow: TextOverflow.ellipsis,
             AppLocalizations.t(content))));
   }
