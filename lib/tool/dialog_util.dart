@@ -132,7 +132,7 @@ class DialogUtil {
         return Dialog(
           child: Column(children: [
             AppBarWidget(title: title),
-            Expanded(child: ListView(children: options))
+            Expanded(child: ListView(children: options).asStyle())
           ]),
         );
       },
@@ -245,7 +245,7 @@ class DialogUtil {
     if (title != null) {
       child = Column(children: [
         title,
-        Expanded(child: child),
+        Expanded(child: child.asStyle()),
       ]);
     }
     T? value = await showDialog<T>(
@@ -556,10 +556,7 @@ class DialogUtil {
       content: Padding(
           padding: EdgeInsets.all(15.0),
           child: Row(children: [
-            Icon(
-              Icons.info_outline,
-              color: Colors.green,
-            ),
+            icon,
             SizedBox(
               width: 15.0,
             ),
@@ -574,14 +571,25 @@ class DialogUtil {
   static Future<T?> popModalBottomSheet<T>(
       {BuildContext? context, required Widget Function(BuildContext) builder}) {
     context ??= appDataProvider.context!;
-    return showModalBottomSheet<T>(context: context, builder: builder);
+    Widget child = builder(context).asStyle();
+    return showModalBottomSheet<T>(
+        context: context,
+        backgroundColor: Colors.white.withAlpha(0),
+        builder: (BuildContext context) {
+          return child;
+        });
   }
 
   /// 底部弹出全屏，返回的controller可以关闭
   static PersistentBottomSheetController popBottomSheet(
       {BuildContext? context, required Widget Function(BuildContext) builder}) {
     context ??= appDataProvider.context!;
-    return showBottomSheet(context: context, builder: builder);
+    Widget child = builder(context).asStyle();
+    return showBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return child;
+        });
   }
 
   /// barrierDismissible: false,

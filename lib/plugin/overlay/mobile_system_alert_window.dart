@@ -2,6 +2,7 @@ import 'dart:isolate';
 import 'dart:ui';
 
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/overlay/overlay_notification.dart';
 import 'package:colla_chat/plugin/talker_logger.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -63,7 +64,7 @@ class MobileSystemAlertHome extends StatelessWidget {
     List<SystemWindowFlags>? layoutParamFlags,
   }) async {
     bool? result;
-    if (!isShowingWindow.value) {
+    if (!isShowingWindow.value && !platformParams.ios) {
       result = await SystemAlertWindow.showSystemWindow(
           height: height,
           width: width,

@@ -1,11 +1,11 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/number_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_field_widget.dart';
+import 'package:colla_chat/widgets/style/glass/glass_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:trina_grid/trina_grid.dart';
@@ -209,8 +209,11 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
         enableColumnBorderHorizontal: false,
         enableCellBorderVertical: false,
         enableCellBorderHorizontal: true,
-        oddRowColor: myself.primaryColor.withAlpha(64),
-        evenRowColor: Colors.grey.withAlpha(64),
+        oddRowColor: myself.primaryColor.withAlpha(32),
+        evenRowColor: Colors.grey.withAlpha(32),
+        gridBackgroundColor: Colors.white.withAlpha(0),
+        menuBackgroundColor: Colors.white.withAlpha(0),
+        activatedColor: Colors.green.shade50,
       );
     } else {
       trinaGridStyleConfig = TrinaGridStyleConfig(
@@ -218,8 +221,12 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
         enableColumnBorderHorizontal: false,
         enableCellBorderVertical: false,
         enableCellBorderHorizontal: true,
-        oddRowColor: myself.secondary.withAlpha(64),
-        evenRowColor: Colors.grey.withAlpha(64),
+        oddRowColor: myself.secondary.withAlpha(32),
+        evenRowColor: Colors.grey.withAlpha(32),
+        gridBackgroundColor: Colors.white.withAlpha(0),
+        menuBackgroundColor: Colors.white.withAlpha(0),
+        rowColor: Colors.white.withAlpha(0),
+        activatedColor: Colors.green.shade50,
       );
     }
     return TrinaGridConfiguration(
@@ -274,7 +281,7 @@ class BindingTrinaDataGrid<T> extends StatelessWidget {
         },
         onRowSecondaryTap: (TrinaGridOnRowSecondaryTapEvent event) {},
         onRowsMoved: (TrinaGridOnRowsMovedEvent event) {},
-      );
+      ).asStyle();
     });
   }
 

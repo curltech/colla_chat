@@ -109,11 +109,10 @@ class MenuUtil {
       Function(BuildContext context, int index, String label, {String? value})?
           onPressed}) async {
     return await DialogUtil.popModalBottomSheet(builder: (context) {
-      int level = (actions.length / 3).ceil();
+      int level = (actions.length / 4).ceil();
       height ??= 90.0 * level;
       width ??= appDataProvider.secondaryBodyWidth;
-      return Card(
-          child: DataActionCard(
+      return DataActionCard(
         showLabel: true,
         showTooltip: true,
         crossAxisCount: 4,
@@ -127,7 +126,7 @@ class MenuUtil {
           Navigator.pop(context);
           onPressed?.call(context, index, label, value: value);
         },
-      ));
+      );
     });
   }
 

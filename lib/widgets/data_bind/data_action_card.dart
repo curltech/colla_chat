@@ -209,7 +209,7 @@ class DataActionCard extends StatelessWidget {
         height: height,
         width: width,
         margin: const EdgeInsets.all(0.0),
-        padding: const EdgeInsets.all(0.0),
+        padding: const EdgeInsets.all(10.0),
         child: GridView.builder(
             itemCount: actionWidgets.length,
             shrinkWrap: true,

@@ -66,6 +66,12 @@ class BottomNavigation {
             NavigationBarTheme.of(context);
         return NavigationBarTheme(
           data: currentNavBarTheme.copyWith(
+            labelTextStyle:
+                WidgetStateProperty.resolveWith((Set<WidgetState> states) {
+              return currentNavBarTheme.labelTextStyle
+                  ?.resolve(states)
+                  ?.copyWith(color: Colors.white);
+            }),
             iconTheme: WidgetStateProperty.resolveWith(
               (Set<WidgetState> states) {
                 return currentNavBarTheme.iconTheme

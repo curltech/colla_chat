@@ -6,6 +6,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/style/glass/glass_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 
@@ -207,15 +208,17 @@ class PrimaryNavigation {
                       color: myself.primary,
                     ),
                     unselectedIconTheme: const IconThemeData(
-                      color: Colors.grey,
+                      color: Colors.white,
                     ),
-                    selectedLabelTextStyle: const TextStyle(
+                    selectedLabelTextStyle: TextStyle(
+                        color: myself.primary,
                         fontSize: AppFontSize.mdFontSize,
                         fontWeight: FontWeight.bold),
                     unSelectedLabelTextStyle: const TextStyle(
+                      color: Colors.white,
                       fontSize: AppFontSize.smFontSize,
                     ),
-                  ));
+                  )).asStyle();
             }),
         appDataProvider.largeBreakpoint: SlotLayout.from(
             key: const Key('Primary Navigation Large'),
@@ -242,17 +245,17 @@ class PrimaryNavigation {
                       color: myself.primary,
                     ),
                     unselectedIconTheme: const IconThemeData(
-                      color: Colors.grey,
+                      color: Colors.white,
                     ),
                     selectedLabelTextStyle: TextStyle(
                         color: myself.primary,
                         fontSize: AppFontSize.mdFontSize,
                         fontWeight: FontWeight.bold),
                     unSelectedLabelTextStyle: const TextStyle(
-                      color: Colors.grey,
+                      color: Colors.white,
                       fontSize: AppFontSize.smFontSize,
                     ),
-                  ));
+                  )).asStyle();
             }),
       },
     );
