@@ -309,6 +309,7 @@ class TextMessageInputWidget extends StatelessWidget {
   Widget _buildTextMessageInput(BuildContext context) {
     double iconInset = 0.0;
     return Card(
+        color: myself.primary.withAlpha(15),
         elevation: 0.0,
         margin:
             EdgeInsets.symmetric(horizontal: iconInset, vertical: iconInset),

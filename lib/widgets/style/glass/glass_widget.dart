@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:glass/glass.dart';
 
+const double defaultBlur = 15;
+
 extension GlassWidget<T extends Widget> on T {
   Widget asStyle({
     Key? key,
     double? height,
     double? width,
     bool enabled = true,
-    double blurX = 15.0,
-    double blurY = 15.0,
+    double blur = defaultBlur,
     Color tintColor = Colors.white,
     bool frosted = false,
     BorderRadius clipBorderRadius = BorderRadius.zero,
@@ -21,8 +22,8 @@ extension GlassWidget<T extends Widget> on T {
         width: width,
         child: asGlass(
             enabled: enabled,
-            blurX: blurX,
-            blurY: blurY,
+            blurX: blur,
+            blurY: blur,
             tintColor: tintColor,
             tileMode: tileMode,
             frosted: frosted,
@@ -42,9 +43,7 @@ class PlatformStyleContainer extends StatelessWidget {
 
   final bool enabled;
 
-  final double blurX;
-
-  final double blurY;
+  final double blur;
 
   final Color tintColor;
 
@@ -63,8 +62,7 @@ class PlatformStyleContainer extends StatelessWidget {
       this.height,
       this.width,
       this.enabled = false,
-      this.blurX = 10.0,
-      this.blurY = 10.0,
+      this.blur = defaultBlur,
       this.tintColor = Colors.white,
       this.frosted = true,
       this.clipBorderRadius = BorderRadius.zero,
@@ -80,8 +78,8 @@ class PlatformStyleContainer extends StatelessWidget {
         width: width,
         child: child.asGlass(
             enabled: enabled,
-            blurX: blurX,
-            blurY: blurY,
+            blurX: blur,
+            blurY: blur,
             tintColor: tintColor,
             tileMode: tileMode,
             frosted: frosted,

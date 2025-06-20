@@ -4,6 +4,7 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/style/glass/glass_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 
@@ -53,6 +54,41 @@ class BottomNavigation {
     return destinations;
   }
 
+  Builder _standardBottomNavigationBar({
+    required List<NavigationDestination> destinations,
+    int? currentIndex,
+    double iconSize = 24,
+    ValueChanged<int>? onDestinationSelected,
+  }) {
+    return Builder(
+      builder: (BuildContext context) {
+        final NavigationBarThemeData currentNavBarTheme =
+            NavigationBarTheme.of(context);
+        return NavigationBarTheme(
+          data: currentNavBarTheme.copyWith(
+            iconTheme: WidgetStateProperty.resolveWith(
+              (Set<WidgetState> states) {
+                return currentNavBarTheme.iconTheme
+                        ?.resolve(states)
+                        ?.copyWith(size: iconSize) ??
+                    IconTheme.of(context).copyWith(size: iconSize);
+              },
+            ),
+          ),
+          child: MediaQuery(
+            data: MediaQuery.of(context).removePadding(removeTop: true),
+            child: NavigationBar(
+              backgroundColor: myself.primary.withAlpha(15),
+              selectedIndex: currentIndex ?? 0,
+              destinations: destinations,
+              onDestinationSelected: onDestinationSelected,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   SlotLayout build() {
     final List<NavigationDestination> destinations =
         _buildNavigationDestination();
@@ -63,13 +99,13 @@ class BottomNavigation {
           inAnimation: AdaptiveScaffold.bottomToTop,
           outAnimation: AdaptiveScaffold.topToBottom,
           builder: (_) {
-            return AdaptiveScaffold.standardBottomNavigationBar(
+            return _standardBottomNavigationBar(
               destinations: destinations,
               currentIndex: indexWidgetProvider.currentMainIndex,
               onDestinationSelected: (int index) {
                 indexWidgetProvider.currentMainIndex = index;
               },
-            );
+            ).asStyle(blur: 128);
           },
         )
       },

@@ -8,6 +8,7 @@ import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
+import 'package:colla_chat/widgets/style/glass/glass_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 
@@ -382,7 +383,7 @@ class DialogUtil {
               child: Text(AppLocalizations.t(okLabel)),
             ),
           ],
-        );
+        ).asStyle();
       },
     );
 
@@ -436,7 +437,7 @@ class DialogUtil {
               child: Text(AppLocalizations.t('Ok')),
             ),
           ],
-        );
+        ).asStyle();
       },
     );
     return result;
@@ -496,28 +497,61 @@ class DialogUtil {
   /// 底部延时提示错误
   static error({BuildContext? context, String content = 'Error'}) {
     context ??= appDataProvider.context!;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(_buildSnackBar(
+      icon: Icon(
+        Icons.error_outline_outlined,
+        color: Colors.red,
+      ),
       content: CommonAutoSizeText(AppLocalizations.t(content)),
-      backgroundColor: Colors.red,
     ));
   }
 
   /// 底部延时警告
   static warn({BuildContext? context, String content = 'Warning'}) {
     context ??= appDataProvider.context!;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(_buildSnackBar(
+      icon: Icon(
+        Icons.warning_amber,
+        color: Colors.amber,
+      ),
       content: CommonAutoSizeText(AppLocalizations.t(content)),
-      backgroundColor: Colors.amber,
     ));
   }
 
   /// 底部延时提示
   static info({BuildContext? context, String content = 'Information'}) {
     context ??= appDataProvider.context!;
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: CommonAutoSizeText(AppLocalizations.t(content)),
-      backgroundColor: Colors.green,
-    ));
+    ScaffoldMessenger.of(context).showSnackBar(_buildSnackBar(
+        icon: Icon(
+          Icons.info_outline,
+          color: Colors.green,
+        ),
+        content: CommonAutoSizeText(
+            style: TextStyle(color: Colors.white),
+            softWrap: true,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            AppLocalizations.t(content))));
+  }
+
+  static SnackBar _buildSnackBar(
+      {required Widget icon, required Widget content}) {
+    return SnackBar(
+      padding: EdgeInsets.all(15.0),
+      content: Padding(
+          padding: EdgeInsets.all(15.0),
+          child: Row(children: [
+            Icon(
+              Icons.info_outline,
+              color: Colors.green,
+            ),
+            SizedBox(
+              width: 15.0,
+            ),
+            Expanded(child: content)
+          ])).asStyle(),
+      backgroundColor: Colors.white.withAlpha(0),
+    );
   }
 
   /// 底部弹出半屏对话框，内部调用Navigator.of(context).pop(result)关闭
