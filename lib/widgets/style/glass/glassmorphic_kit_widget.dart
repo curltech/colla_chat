@@ -21,7 +21,7 @@ const double defaultOpacity = 0.12;
 const BorderRadius defaultBorderRadius = BorderRadius.zero;
 
 extension GlassmorphicKitWidget<T extends Widget> on T {
-  Widget asStyle(
+  Widget asGlassmorphicKit(
       {Key? key,
       double? height,
       double? width,

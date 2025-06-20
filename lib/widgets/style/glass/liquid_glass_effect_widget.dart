@@ -22,7 +22,7 @@ buildThemeData() {
 }
 
 extension LiquidGlassEffectWidget<T extends Widget> on T {
-  Widget asStyle(
+  Widget asLiquidGlassEffect(
       {Key? key,
       double? height,
       double? width,
@@ -86,7 +86,7 @@ class PlatformStyleContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return child.asStyle(
+    return child.asLiquidGlassEffect(
       height: height,
       width: width,
       blurAmount: blurAmount,

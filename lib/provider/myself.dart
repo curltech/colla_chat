@@ -5,6 +5,7 @@ import 'package:colla_chat/entity/dht/peerprofile.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/tool/locale_util.dart';
+import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
@@ -47,6 +48,8 @@ class Myself with ChangeNotifier {
   late ThemeData _themeData;
 
   late ThemeData _darkThemeData;
+
+  PlatformStyle platformStyle = PlatformStyle.glass;
 
   Myself() {
     _buildThemeData();

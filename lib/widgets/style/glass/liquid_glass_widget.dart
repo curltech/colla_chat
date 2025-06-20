@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 extension LiquidGlassWidget<T extends Widget> on T {
-  Widget asStyle(
+  Widget asLiquidGlass(
       {Key? key,
       double? height,
       double? width,
@@ -56,7 +56,7 @@ class PlatformStyleContainer extends LiquidGlass {
 
   @override
   Widget build(BuildContext context) {
-    return child.asStyle(
+    return child.asLiquidGlass(
         key: key,
         height: height,
         width: width,

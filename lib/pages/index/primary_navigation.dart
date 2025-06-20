@@ -6,7 +6,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/style/glass/glass_widget.dart';
+import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 

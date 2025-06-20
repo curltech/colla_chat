@@ -4,7 +4,7 @@ import 'package:glass/glass.dart';
 const double defaultBlur = 15;
 
 extension GlassWidget<T extends Widget> on T {
-  Widget asStyle({
+  Widget asGlassWidget({
     Key? key,
     double? height,
     double? width,

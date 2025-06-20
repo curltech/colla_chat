@@ -8,7 +8,7 @@ import 'package:colla_chat/widgets/common/common_text_form_field.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/nil.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
-import 'package:colla_chat/widgets/style/glass/glass_widget.dart';
+import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 

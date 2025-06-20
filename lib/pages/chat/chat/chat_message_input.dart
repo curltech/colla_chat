@@ -4,7 +4,7 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controll
 import 'package:colla_chat/pages/chat/chat/emoji_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/more_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/text_message_input.dart';
-import 'package:colla_chat/widgets/style/glass/glass_widget.dart';
+import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

@@ -40,7 +40,7 @@ import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
-import 'package:colla_chat/widgets/style/glass/glass_widget.dart';
+import 'package:colla_chat/widgets/style/platform_style_widget.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';

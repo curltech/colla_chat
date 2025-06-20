@@ -20,7 +20,7 @@ buildThemeData() {
 }
 
 extension NeumorphicWidget<T extends Widget> on T {
-  Widget asStyle({
+  Widget asNeumorphic({
     Key? key,
     double? height,
     double? width,
@@ -70,7 +70,7 @@ class PlatformStyleContainer extends Neumorphic {
 
   @override
   Widget build(BuildContext context) {
-    return child!.asStyle(
+    return child!.asNeumorphic(
         key: key,
         height: height,
         width: width,

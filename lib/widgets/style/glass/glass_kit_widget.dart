@@ -29,7 +29,7 @@ const BorderRadius defaultBorderRadius = BorderRadius.zero;
 final Color defaultShadowColor = Colors.black.withAlpha(50);
 
 extension GlassKitWidget<T extends Widget> on T {
-  Widget asStyle(
+  Widget asGlassKit(
       {Key? key,
       double? height,
       double? width,
@@ -100,7 +100,7 @@ class PlatformStyleContainer extends glass.GlassContainer {
 
   @override
   Widget build(BuildContext context) {
-    return child!.asStyle(
+    return child!.asGlassKit(
         key: key,
         height: height,
         width: width,
